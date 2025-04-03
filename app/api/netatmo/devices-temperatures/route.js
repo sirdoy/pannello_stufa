@@ -47,10 +47,10 @@ export async function GET() {
     const results = [];
     for (const device of deviceData.body.devices) {
       const device_id = device._id;
-      for (const module of device.modules || []) {
-        const module_id = module._id;
-        const temperature = module.measured?.temperature;
-        const name = module.module_name || module_id;
+      for (const dev of device.modules || []) {
+        const module_id = dev._id;
+        const temperature = dev.measured?.temperature;
+        const name = dev.module_name || module_id;
 
         if (temperature !== undefined) {
           results.push({ device_id, module_id, name, temperature });

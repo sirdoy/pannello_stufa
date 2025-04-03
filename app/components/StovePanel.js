@@ -25,14 +25,14 @@ export default function StovePanel() {
   };
 
   useEffect(() => {
-    const refreshToken = sessionStorage.getItem('netatmo_refresh_token');
-    if (!refreshToken) {
-      const clientId = process.env.NEXT_PUBLIC_NETATMO_CLIENT_ID;
-      const redirectUri = process.env.NEXT_PUBLIC_NETATMO_REDIRECT_URI;
-      const netatmoUrl = `https://api.netatmo.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read_thermostat&state=auto`;
-      window.location.href = netatmoUrl;
-      return;
-    }
+    // const refreshToken = sessionStorage.getItem('netatmo_refresh_token');
+    // if (!refreshToken) {
+    //   const clientId = process.env.NEXT_PUBLIC_NETATMO_CLIENT_ID;
+    //   const redirectUri = process.env.NEXT_PUBLIC_NETATMO_REDIRECT_URI;
+    //   const netatmoUrl = `https://api.netatmo.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read_thermostat&state=auto`;
+    //   window.location.href = netatmoUrl;
+    //   return;
+    // }
 
     const fetchTemperature = () => {
       console.log('Fetching Netatmo temperature...');

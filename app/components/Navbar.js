@@ -20,9 +20,9 @@ export default async function Navbar() {
         <Link href="/log" className="text-blue-600 hover:underline">
           Storico
         </Link>
-        <a href="/api/auth/logout" className="text-red-600 hover:underline">
+        <Link href="/api/auth/logout" className="text-red-600 hover:underline">
           Logout
-        </a>
+        </Link>
       </div>
     </nav>
   );

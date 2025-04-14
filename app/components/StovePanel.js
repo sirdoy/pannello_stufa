@@ -7,8 +7,8 @@ export default function StovePanel() {
   const router = useRouter();
 
   const [status, setStatus] = useState('...');
-  const [fanLevel, setFanLevel] = useState(3);
-  const [powerLevel, setPowerLevel] = useState(2);
+  const [fanLevel, setFanLevel] = useState(null);
+  const [powerLevel, setPowerLevel] = useState(null);
   const [ambientTemp, setAmbientTemp] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -34,25 +34,53 @@ export default function StovePanel() {
     //   return;
     // }
 
-    const fetchTemperature = () => {
-      console.log('Fetching Netatmo temperature...');
+    // const fetchTemperature = () => {
+    //   console.log('Fetching Netatmo temperature...');
+    //
+    //   fetch('/api/netatmo/temperature', {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({ refresh_token: refreshToken }),
+    //   })
+    //     .then((res) => res.json())
+    //     .then((data) => {
+    //       console.log('Netatmo response:', data);
+    //       if (data.temperature) setAmbientTemp(data.temperature);
+    //     })
+    //     .catch((err) => console.error('Errore Netatmo:', err));
+    // };
+    //
+    // fetchTemperature();
+    // const interval = setInterval(fetchTemperature, 10000);
+    // return () => clearInterval(interval);
 
-      fetch('/api/netatmo/temperature', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refresh_token: refreshToken }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          console.log('Netatmo response:', data);
-          if (data.temperature) setAmbientTemp(data.temperature);
-        })
-        .catch((err) => console.error('Errore Netatmo:', err));
+    const fetchFanLevel = async () => {
+      try {
+        const res = await fetch('/api/stove/getFan');
+        const data = await res.json();
+        if (typeof data.Result === 'number') {
+          console.log(data.Result);
+          setFanLevel(data.Result);
+        }
+      } catch (err) {
+        console.error('Errore caricamento fanLevel:', err);
+      }
     };
 
-    fetchTemperature();
-    const interval = setInterval(fetchTemperature, 10000);
-    return () => clearInterval(interval);
+    const fetchPowerLevel = async () => {
+      try {
+        const res = await fetch('/api/stove/getPower');
+        const data = await res.json();
+        if (typeof data.Result === 'number') {
+          setPowerLevel(data.Result);
+        }
+      } catch (err) {
+        console.error('Errore caricamento powerLevel:', err);
+      }
+    };
+
+    fetchFanLevel();
+    fetchPowerLevel();
   }, []);
 
   useEffect(() => {
@@ -71,7 +99,7 @@ export default function StovePanel() {
       try {
         const res = await fetch('/api/stove/getFan');
         const json = await res.json();
-        setFanLevel(json?.Data ?? 3);
+        setFanLevel(json?.Result ?? 3);
       } catch (err) {
         console.error('Errore livello ventola:', err);
       }
@@ -81,7 +109,7 @@ export default function StovePanel() {
       try {
         const res = await fetch('/api/stove/getPower');
         const json = await res.json();
-        setPowerLevel(json?.Data ?? 2);
+        setPowerLevel(json?.Result ?? 2);
       } catch (err) {
         console.error('Errore livello potenza:', err);
       }
@@ -98,7 +126,7 @@ export default function StovePanel() {
   const logAction = async (action, value = null) => {
     await fetch('/api/log/add', {
       method: 'POST',
-      body: JSON.stringify({ action, ...(value !== null && { value }) }),
+      body: JSON.stringify({action, ...(value !== null && {value})}),
     });
   };
 
@@ -107,7 +135,7 @@ export default function StovePanel() {
     setFanLevel(level);
     await fetch('/api/stove/setFan', {
       method: 'POST',
-      body: JSON.stringify({ level }),
+      body: JSON.stringify({level}),
     });
     await logAction('Set ventola', level);
   };
@@ -117,21 +145,21 @@ export default function StovePanel() {
     setPowerLevel(level);
     await fetch('/api/stove/setPower', {
       method: 'POST',
-      body: JSON.stringify({ level }),
+      body: JSON.stringify({level}),
     });
     await logAction('Set potenza', level);
   };
 
   const handleIgnite = async () => {
     setLoading(true);
-    await fetch('/api/stove/ignite', { method: 'POST' });
+    await fetch('/api/stove/ignite', {method: 'POST'});
     await logAction('Accensione');
     setLoading(false);
   };
 
   const handleShutdown = async () => {
     setLoading(true);
-    await fetch('/api/stove/shutdown', { method: 'POST' });
+    await fetch('/api/stove/shutdown', {method: 'POST'});
     await logAction('Spegnimento');
     setLoading(false);
   };
@@ -216,12 +244,13 @@ export default function StovePanel() {
       <div>
         <label className="block text-sm font-medium mb-1">Livello Ventilazione</label>
         <select
-          value={fanLevel}
+          value={fanLevel ?? ''}
           onChange={handleFanChange}
           className="w-full border rounded-lg p-2"
         >
-          {[1, 2, 3, 4, 5, 6].map((lvl) => (
-            <option key={lvl} value={lvl}>{lvl}</option>
+          <option disabled value="">-- Seleziona --</option>
+          {[1, 2, 3, 4, 5, 6].map((level) => (
+            <option key={level} value={level}>{level}</option>
           ))}
         </select>
       </div>
@@ -229,12 +258,13 @@ export default function StovePanel() {
       <div>
         <label className="block text-sm font-medium mb-1">Livello Potenza</label>
         <select
-          value={powerLevel}
+          value={powerLevel ?? ''}
           onChange={handlePowerChange}
           className="w-full border rounded-lg p-2"
         >
-          {[0, 1, 2, 3, 4, 5].map((lvl) => (
-            <option key={lvl} value={lvl}>{lvl}</option>
+          <option disabled value="">-- Seleziona --</option>
+          {[0, 1, 2, 3, 4, 5].map((level) => (
+            <option key={level} value={level}>{level}</option>
           ))}
         </select>
       </div>

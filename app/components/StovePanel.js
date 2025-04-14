@@ -149,13 +149,14 @@ export default function StovePanel() {
     if (!status) return '❔';
     if (status.includes('WORK')) return '🔥';
     if (status.includes('OFF')) return '❄️';
-    if (status.includes('STANDBY')) return '💤';
     if (status.includes('ERROR')) return '⚠️';
+    if (status.includes('START')) return '⏱️';
+    if (status.includes('WAIT')) return '💤';
     return '❔';
   };
 
-  const isAccesa = status?.includes('WORK');
-  const isSpenta = status?.includes('OFF');
+  const isAccesa = status?.includes('WORK') || status?.includes('START');
+  const isSpenta = status?.includes('OFF') || status?.includes('ERROR') || status?.includes('WAIT');
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-2xl shadow-md space-y-6 border">

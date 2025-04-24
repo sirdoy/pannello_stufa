@@ -17,6 +17,9 @@ export default async function Navbar() {
             👤 {user.name}
           </span>
         )}
+        <Link href="/scheduler" className="text-blue-600 hover:underline">
+          Schedule
+        </Link>
         <Link href="/log" className="text-blue-600 hover:underline">
           Storico
         </Link>

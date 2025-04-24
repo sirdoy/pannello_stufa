@@ -13,5 +13,7 @@ export async function middleware(req) {
 }
 
 export const config = {
-  matcher: ["/((?!api/auth|_next|favicon.ico).*)"],
+  matcher: [
+    "/((?!api/auth|api/scheduler/check|_next|favicon.ico).*)",
+  ],
 };

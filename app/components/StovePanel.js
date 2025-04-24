@@ -11,6 +11,7 @@ export default function StovePanel() {
   const [powerLevel, setPowerLevel] = useState(null);
   const [ambientTemp, setAmbientTemp] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleNetatmoLogout = () => {
     sessionStorage.removeItem('netatmo_refresh_token');
@@ -24,104 +25,52 @@ export default function StovePanel() {
     window.location.href = netatmoUrl;
   };
 
-  useEffect(() => {
-    // const refreshToken = sessionStorage.getItem('netatmo_refresh_token');
-    // if (!refreshToken) {
-    //   const clientId = process.env.NEXT_PUBLIC_NETATMO_CLIENT_ID;
-    //   const redirectUri = process.env.NEXT_PUBLIC_NETATMO_REDIRECT_URI;
-    //   const netatmoUrl = `https://api.netatmo.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read_thermostat&state=auto`;
-    //   window.location.href = netatmoUrl;
-    //   return;
-    // }
+  const fetchFanLevel = async () => {
+    try {
+      const res = await fetch('/api/stove/getFan');
+      const json = await res.json();
+      setFanLevel(json?.Result ?? 3);
+    } catch (err) {
+      console.error('Errore livello ventola:', err);
+    }
+  };
 
-    // const fetchTemperature = () => {
-    //   console.log('Fetching Netatmo temperature...');
-    //
-    //   fetch('/api/netatmo/temperature', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ refresh_token: refreshToken }),
-    //   })
-    //     .then((res) => res.json())
-    //     .then((data) => {
-    //       console.log('Netatmo response:', data);
-    //       if (data.temperature) setAmbientTemp(data.temperature);
-    //     })
-    //     .catch((err) => console.error('Errore Netatmo:', err));
-    // };
-    //
-    // fetchTemperature();
-    // const interval = setInterval(fetchTemperature, 10000);
-    // return () => clearInterval(interval);
-
-    const fetchFanLevel = async () => {
-      try {
-        const res = await fetch('/api/stove/getFan');
-        const data = await res.json();
-        if (typeof data.Result === 'number') {
-          console.log(data.Result);
-          setFanLevel(data.Result);
-        }
-      } catch (err) {
-        console.error('Errore caricamento fanLevel:', err);
-      }
-    };
-
-    const fetchPowerLevel = async () => {
-      try {
-        const res = await fetch('/api/stove/getPower');
-        const data = await res.json();
-        if (typeof data.Result === 'number') {
-          setPowerLevel(data.Result);
-        }
-      } catch (err) {
-        console.error('Errore caricamento powerLevel:', err);
-      }
-    };
-
-    fetchFanLevel();
-    fetchPowerLevel();
-  }, []);
+  const fetchPowerLevel = async () => {
+    try {
+      const res = await fetch('/api/stove/getPower');
+      const json = await res.json();
+      setPowerLevel(json?.Result ?? 2);
+    } catch (err) {
+      console.error('Errore livello potenza:', err);
+    }
+  };
 
   useEffect(() => {
-    const fetchStatus = async () => {
-      try {
-        const res = await fetch('/api/stove/status');
-        const json = await res.json();
-        setStatus(json?.StatusDescription || 'sconosciuto');
-      } catch (err) {
-        console.error('Errore stato:', err);
-        setStatus('errore');
-      }
-    };
-
-    const fetchFanLevel = async () => {
-      try {
-        const res = await fetch('/api/stove/getFan');
-        const json = await res.json();
-        setFanLevel(json?.Result ?? 3);
-      } catch (err) {
-        console.error('Errore livello ventola:', err);
-      }
-    };
-
-    const fetchPowerLevel = async () => {
-      try {
-        const res = await fetch('/api/stove/getPower');
-        const json = await res.json();
-        setPowerLevel(json?.Result ?? 2);
-      } catch (err) {
-        console.error('Errore livello potenza:', err);
-      }
-    };
-
-    fetchStatus();
-    fetchFanLevel();
-    fetchPowerLevel();
-
-    const interval = setInterval(fetchStatus, 5000);
+    fetchStatusAndUpdate();
+    const interval = setInterval(fetchStatusAndUpdate, 5000);
     return () => clearInterval(interval);
   }, []);
+
+
+  const fetchStatusAndUpdate = async () => {
+    try {
+      const res = await fetch('/api/stove/status');
+      const json = await res.json();
+      const newStatus = json?.StatusDescription || 'sconosciuto';
+      setStatus(newStatus);
+      await fetchFanLevel();
+      await fetchPowerLevel();
+    } catch (err) {
+      console.error('Errore stato:', err);
+      setStatus('errore');
+    }
+  };
+
+  const handleManualRefresh = async () => {
+    setRefreshing(true);
+    await fetchStatusAndUpdate();
+    setRefreshing(false);
+  };
 
   const logAction = async (action, value = null) => {
     await fetch('/api/log/add', {
@@ -211,7 +160,27 @@ export default function StovePanel() {
           <span>{getStatusIcon(status)}</span>
           <span>{status}</span>
         </p>
+        <div className="text-center mt-2">
+          <button
+            onClick={handleManualRefresh}
+            disabled={refreshing}
+            className="text-sm text-blue-500 hover:underline flex items-center justify-center gap-1 disabled:opacity-50"
+          >
+            {refreshing ? (
+              <>
+                <span className="animate-spin inline-block">⏳</span>
+                Aggiornamento...
+              </>
+            ) : (
+              <>
+                🔄
+              </>
+            )}
+          </button>
+        </div>
+
       </div>
+
 
       {ambientTemp !== null && (
         <div className="text-center">

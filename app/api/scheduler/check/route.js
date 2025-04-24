@@ -8,7 +8,7 @@ export async function GET(req) {
       return new Response('Unauthorized', { status: 401 });
     }
 
-    const now = new Date();
+    const now = new Date(new Date().toLocaleString('it-IT', { timeZone: 'Europe/Rome' }));
     const day = now.toLocaleDateString('it-IT', { weekday: 'long' });
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { saveSchedule, getWeeklySchedule } from '@/lib/schedulerService';
 
 const daysOfWeek = [
@@ -73,27 +73,59 @@ export default function WeeklyScheduler() {
     saveSchedule(day, updated);
   };
 
-
   const TimeBar = ({ intervals }) => {
     const totalMinutes = 24 * 60;
+
     return (
-      <div className="relative h-4 w-full bg-gray-200 rounded overflow-hidden mb-3">
-        {intervals.map((range, idx) => {
-          const [startH, startM] = range.start.split(':').map(Number);
-          const [endH, endM] = range.end.split(':').map(Number);
-          const start = startH * 60 + startM;
-          const end = endH * 60 + endM;
-          const left = (start / totalMinutes) * 100;
-          const width = ((end - start) / totalMinutes) * 100;
-          return (
-            <div
-              key={idx}
-              className="absolute top-0 bottom-0 bg-green-500"
-              style={{ left: `${left}%`, width: `${width}%` }}
-              title={`Accesa: ${range.start} - ${range.end}`}
-            />
-          );
-        })}
+      <div className="relative w-full mb-6">
+        {/* Barra base */}
+        <div className="relative h-4 w-full bg-gray-200 rounded overflow-hidden">
+          {intervals.map((range, idx) => {
+            const [startH, startM] = range.start.split(':').map(Number);
+            const [endH, endM] = range.end.split(':').map(Number);
+            const start = startH * 60 + startM;
+            const end = endH * 60 + endM;
+            const left = (start / totalMinutes) * 100;
+            const width = ((end - start) / totalMinutes) * 100;
+            return (
+              <div
+                key={idx}
+                className="absolute top-0 bottom-0 bg-green-500"
+                style={{ left: `${left}%`, width: `${width}%` }}
+                title={`Accesa: ${range.start} - ${range.end}`}
+              />
+            );
+          })}
+        </div>
+        {/* Etichette orari sopra/sotto */}
+        <div className="relative w-full">
+          {intervals.map((range, idx) => {
+            const [startH, startM] = range.start.split(':').map(Number);
+            const [endH, endM] = range.end.split(':').map(Number);
+            const start = startH * 60 + startM;
+            const end = endH * 60 + endM;
+            const startLeft = (start / totalMinutes) * 100;
+            const endLeft = (end / totalMinutes) * 100;
+            return (
+              <>
+                <span
+                  key={`start-${idx}`}
+                  className="absolute -top-5 text-[10px] text-gray-600"
+                  style={{ left: `${startLeft}%`, transform: 'translateX(-50%)' }}
+                >
+                  {range.start}
+                </span>
+                <span
+                  key={`end-${idx}`}
+                  className="absolute top-5 text-[10px] text-gray-600"
+                  style={{ left: `${endLeft}%`, transform: 'translateX(-50%)' }}
+                >
+                  {range.end}
+                </span>
+              </>
+            );
+          })}
+        </div>
       </div>
     );
   };

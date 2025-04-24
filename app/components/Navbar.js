@@ -18,7 +18,7 @@ export default async function Navbar() {
           </span>
         )}
         <Link href="/scheduler" className="text-blue-600 hover:underline">
-          Schedule
+          Pianificazione
         </Link>
         <Link href="/log" className="text-blue-600 hover:underline">
           Storico

@@ -1,47 +1,52 @@
-// app/api/scheduler/check/route.js (Next.js App Router)
-
 import { get, ref } from 'firebase/database';
 import { db } from '@/lib/firebase';
 
 export async function GET(req) {
-  const secret = req.nextUrl.searchParams.get('secret');
-  if (secret !== process.env.CRON_SECRET) {
-    return new Response('Unauthorized', {status: 401});
-  }
+  try {
+    const secret = req.nextUrl.searchParams.get('secret');
+    if (secret !== process.env.CRON_SECRET) {
+      return new Response('Unauthorized', {status: 401});
+    }
 
-  const now = new Date();
-  const day = now.toLocaleDateString('it-IT', {weekday: 'long'});
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const now = new Date();
+    const day = now.toLocaleDateString('it-IT', {weekday: 'long'});
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-  const snapshot = await get(ref(db, `stoveScheduler/${capitalize(day)}`));
-  if (!snapshot.exists()) return Response.json({message: 'Nessuno scheduler'});
+    const snapshot = await get(ref(db, `stoveScheduler/${capitalize(day)}`));
+    if (!snapshot.exists()) return Response.json({message: 'Nessuno scheduler'});
 
-  const intervals = snapshot.val();
-  const active = intervals.find(({start, end}) => {
-    const [sh, sm] = start.split(':').map(Number);
-    const [eh, em] = end.split(':').map(Number);
-    const startMin = sh * 60 + sm;
-    const endMin = eh * 60 + em;
-    return currentMinutes >= startMin && currentMinutes < endMin;
-  });
-
-  if (active) {
-    await fetch(process.env.NEXT_PUBLIC_API_IGNITE, {method: 'POST'});
-    await fetch(process.env.NEXT_PUBLIC_API_SET_POWER, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({level: active.power}),
+    const intervals = snapshot.val();
+    const active = intervals.find(({start, end}) => {
+      const [sh, sm] = start.split(':').map(Number);
+      const [eh, em] = end.split(':').map(Number);
+      const startMin = sh * 60 + sm;
+      const endMin = eh * 60 + em;
+      return currentMinutes >= startMin && currentMinutes < endMin;
     });
-    await fetch(process.env.NEXT_PUBLIC_API_SET_FAN, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({level: active.fan}),
-    });
-  } else {
-    await fetch(process.env.NEXT_PUBLIC_API_SHUTDOWN, {method: 'POST'});
-  }
 
-  return Response.json({status: active ? 'ACCESA' : 'SPENTA'});
+    const baseUrl = `${req.nextUrl.protocol}//${req.headers.get("host")}`;
+
+    if (active) {
+      await fetch(`${baseUrl}/api/stove/ignite`, {method: 'POST'});
+      await fetch(`${baseUrl}/api/stove/setPower`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({level: active.power}),
+      });
+      await fetch(`${baseUrl}/api/stove/setFan`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({level: active.fan}),
+      });
+    } else {
+      await fetch(`${baseUrl}/api/stove/shutdown`, {method: 'POST'});
+    }
+
+    return Response.json({status: active ? 'ACCESA' : 'SPENTA'});
+  } catch (error) {
+    console.error('Errore nel cron:', error);
+    return new Response('Errore interno', {status: 500});
+  }
 }
 
 function capitalize(str) {

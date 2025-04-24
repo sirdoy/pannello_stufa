@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon';
 import { get, ref } from 'firebase/database';
 import { db } from '@/lib/firebase';
 
@@ -6,24 +5,36 @@ export async function GET(req) {
   try {
     const secret = req.nextUrl.searchParams.get('secret');
     if (secret !== process.env.CRON_SECRET) {
-      return new Response('Unauthorized', {status: 401});
+      return new Response('Unauthorized', { status: 401 });
     }
 
-    const now = DateTime.now().setZone('Europe/Rome');
-    const day = now.setLocale('it').toFormat('cccc'); // Es: "Lunedì"
-    const currentMinutes = now.hour * 60 + now.minute;
+    // Fuso orario Europe/Rome con Intl
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat('it-IT', {
+      timeZone: 'Europe/Rome',
+      weekday: 'long',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    const [dayPart, timePart] = formatter.formatToParts(now).reduce((acc, part) => {
+      if (part.type === 'weekday') acc[0] = part.value;
+      if (part.type === 'hour') acc[1] = part.value;
+      if (part.type === 'minute') acc[2] = part.value;
+      return acc;
+    }, []);
 
-    const snapshot = await get(ref(db, `stoveScheduler/${capitalize(day)}`));
+    const giorno = capitalize(dayPart);
+    const ora = `${timePart}:${formatter.formatToParts(now).find(p => p.type === 'minute').value}`;
+    const currentMinutes = parseInt(timePart) * 60 + parseInt(formatter.formatToParts(now).find(p => p.type === 'minute').value);
+
+    const snapshot = await get(ref(db, `stoveScheduler/${giorno}`));
     if (!snapshot.exists()) {
-      return Response.json({
-        message: 'Nessuno scheduler',
-        giorno: day,
-        ora: now.toFormat('HH:mm'),
-      });
+      return Response.json({ message: 'Nessuno scheduler', giorno, ora });
     }
 
     const intervals = snapshot.val();
-    const active = intervals.find(({start, end}) => {
+    const active = intervals.find(({ start, end }) => {
       const [sh, sm] = start.split(':').map(Number);
       const [eh, em] = end.split(':').map(Number);
       const startMin = sh * 60 + sm;
@@ -33,7 +44,6 @@ export async function GET(req) {
 
     const baseUrl = `${req.nextUrl.protocol}//${req.headers.get('host')}`;
 
-    // Stato attuale della stufa
     const statusRes = await fetch(`${baseUrl}/api/stove/status`);
     const statusJson = await statusRes.json();
     const isOn = statusJson?.StatusDescription?.includes('WORK') || statusJson?.StatusDescription?.includes('START');
@@ -46,38 +56,36 @@ export async function GET(req) {
 
     if (active) {
       if (!isOn) {
-        await fetch(`${baseUrl}/api/stove/ignite`, {method: 'POST'});
+        await fetch(`${baseUrl}/api/stove/ignite`, { method: 'POST' });
       }
-
       if (powerLevel !== active.power) {
         await fetch(`${baseUrl}/api/stove/setPower`, {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({level: active.power}),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ level: active.power }),
         });
       }
-
       if (fanLevel !== active.fan) {
         await fetch(`${baseUrl}/api/stove/setFan`, {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({level: active.fan}),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ level: active.fan }),
         });
       }
     } else {
       if (isOn) {
-        await fetch(`${baseUrl}/api/stove/shutdown`, {method: 'POST'});
+        await fetch(`${baseUrl}/api/stove/shutdown`, { method: 'POST' });
       }
     }
 
     return Response.json({
       status: active ? 'ACCESA' : 'SPENTA',
-      giorno: day,
-      ora: now.toFormat('HH:mm'),
+      giorno,
+      ora,
     });
   } catch (error) {
     console.error('Errore nel cron:', error);
-    return new Response('Errore interno', {status: 500});
+    return new Response('Errore interno', { status: 500 });
   }
 }
 

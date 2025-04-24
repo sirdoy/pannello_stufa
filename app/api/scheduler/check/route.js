@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import { get, ref } from 'firebase/database';
 import { db } from '@/lib/firebase';
 
@@ -8,17 +9,16 @@ export async function GET(req) {
       return new Response('Unauthorized', {status: 401});
     }
 
-    // Fuso orario italiano
-    const now = new Date(new Date().toLocaleString('it-IT', {timeZone: 'Europe/Rome'}));
-    const day = now.toLocaleDateString('it-IT', {weekday: 'long'});
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const now = DateTime.now().setZone('Europe/Rome');
+    const day = now.setLocale('it').toFormat('cccc'); // Es: "Lunedì"
+    const currentMinutes = now.hour * 60 + now.minute;
 
     const snapshot = await get(ref(db, `stoveScheduler/${capitalize(day)}`));
     if (!snapshot.exists()) {
       return Response.json({
         message: 'Nessuno scheduler',
         giorno: day,
-        ora: now.toTimeString().slice(0, 5),
+        ora: now.toFormat('HH:mm'),
       });
     }
 
@@ -33,7 +33,7 @@ export async function GET(req) {
 
     const baseUrl = `${req.nextUrl.protocol}//${req.headers.get('host')}`;
 
-    // Recupera stato attuale della stufa
+    // Stato attuale della stufa
     const statusRes = await fetch(`${baseUrl}/api/stove/status`);
     const statusJson = await statusRes.json();
     const isOn = statusJson?.StatusDescription?.includes('WORK') || statusJson?.StatusDescription?.includes('START');
@@ -48,6 +48,7 @@ export async function GET(req) {
       if (!isOn) {
         await fetch(`${baseUrl}/api/stove/ignite`, {method: 'POST'});
       }
+
       if (powerLevel !== active.power) {
         await fetch(`${baseUrl}/api/stove/setPower`, {
           method: 'POST',
@@ -55,6 +56,7 @@ export async function GET(req) {
           body: JSON.stringify({level: active.power}),
         });
       }
+
       if (fanLevel !== active.fan) {
         await fetch(`${baseUrl}/api/stove/setFan`, {
           method: 'POST',
@@ -71,7 +73,7 @@ export async function GET(req) {
     return Response.json({
       status: active ? 'ACCESA' : 'SPENTA',
       giorno: day,
-      ora: now.toTimeString().slice(0, 5),
+      ora: now.toFormat('HH:mm'),
     });
   } catch (error) {
     console.error('Errore nel cron:', error);

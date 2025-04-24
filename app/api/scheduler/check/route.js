@@ -5,7 +5,7 @@ export async function GET(req) {
   try {
     const secret = req.nextUrl.searchParams.get('secret');
     if (secret !== process.env.CRON_SECRET) {
-      return new Response('Unauthorized', { status: 401 });
+      return new Response('Unauthorized', {status: 401});
     }
 
     // Fuso orario Europe/Rome con Intl
@@ -30,11 +30,11 @@ export async function GET(req) {
 
     const snapshot = await get(ref(db, `stoveScheduler/${giorno}`));
     if (!snapshot.exists()) {
-      return Response.json({ message: 'Nessuno scheduler', giorno, ora });
+      return Response.json({message: 'Nessuno scheduler', giorno, ora});
     }
 
     const intervals = snapshot.val();
-    const active = intervals.find(({ start, end }) => {
+    const active = intervals.find(({start, end}) => {
       const [sh, sm] = start.split(':').map(Number);
       const [eh, em] = end.split(':').map(Number);
       const startMin = sh * 60 + sm;
@@ -44,37 +44,34 @@ export async function GET(req) {
 
     const baseUrl = `${req.nextUrl.protocol}//${req.headers.get('host')}`;
 
-    const statusRes = await fetch(`${baseUrl}/api/stove/status`);
-    const statusJson = await statusRes.json();
+    const statusJson = await fetch(`${baseUrl}/api/stove/status`);
     const isOn = statusJson?.StatusDescription?.includes('WORK') || statusJson?.StatusDescription?.includes('START');
 
-    const fanRes = await fetch(`${baseUrl}/api/stove/getFan`);
-    const fanLevel = (await fanRes.json())?.Result;
+    const fanLevel = (await fetch(`${baseUrl}/api/stove/getFan`))?.Result;
 
-    const powerRes = await fetch(`${baseUrl}/api/stove/getPower`);
-    const powerLevel = (await powerRes.json())?.Result;
+    const powerLevel = (await fetch(`${baseUrl}/api/stove/getPower`))?.Result;
 
     if (active) {
       if (!isOn) {
-        await fetch(`${baseUrl}/api/stove/ignite`, { method: 'POST' });
+        await fetch(`${baseUrl}/api/stove/ignite`, {method: 'POST'});
       }
       if (powerLevel !== active.power) {
         await fetch(`${baseUrl}/api/stove/setPower`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ level: active.power }),
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({level: active.power}),
         });
       }
       if (fanLevel !== active.fan) {
         await fetch(`${baseUrl}/api/stove/setFan`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ level: active.fan }),
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({level: active.fan}),
         });
       }
     } else {
       if (isOn) {
-        await fetch(`${baseUrl}/api/stove/shutdown`, { method: 'POST' });
+        await fetch(`${baseUrl}/api/stove/shutdown`, {method: 'POST'});
       }
     }
 
@@ -85,7 +82,7 @@ export async function GET(req) {
     });
   } catch (error) {
     console.error('Errore nel cron:', error);
-    return new Response('Errore interno', { status: 500 });
+    return new Response('Errore interno', {status: 500});
   }
 }
 

@@ -14,6 +14,6 @@ export async function middleware(req) {
 
 export const config = {
   matcher: [
-    "/((?!api/auth|api/scheduler/check|_next|favicon.ico).*)",
+    "/((?!api/auth|api/scheduler/check|api/stove/status|api/stove/ignite|api/stove/shutdown|api/stove/setPower|api/stove/setFan|_next|favicon.ico).*)",
   ],
 };

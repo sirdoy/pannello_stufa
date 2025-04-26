@@ -43,17 +43,33 @@ export async function GET(req) {
     });
 
     const baseUrl = `${req.nextUrl.protocol}//${req.headers.get('host')}`;
+    console.log(baseUrl);
 
-    const statusJson = await fetch(`${baseUrl}/api/stove/status`);
+
+    const statusRes = await fetch(`${baseUrl}/api/stove/status`);
+    const statusJson = await statusRes.json();
     const isOn = statusJson?.StatusDescription?.includes('WORK') || statusJson?.StatusDescription?.includes('START');
 
-    const fanLevel = (await fetch(`${baseUrl}/api/stove/getFan`))?.Result;
+    const fanLevel = (await fetch(`${baseUrl}/api/stove/getFan`));
 
-    const powerLevel = (await fetch(`${baseUrl}/api/stove/getPower`))?.Result;
+    const powerLevel = (await fetch(`${baseUrl}/api/stove/getPower`));
+
+    // console.log(statusJson);
+    // console.log(isOn);
+    // console.log(fanLevel);
+    // console.log(powerLevel);
+    // console.log(`Scheduler attivo: ${active ? 'SI' : 'NO'}`);
+    // console.log(`Attivo: ${JSON.stringify(active)}`);
 
     if (active) {
       if (!isOn) {
-        await fetch(`${baseUrl}/api/stove/ignite`, {method: 'POST'});
+        await fetch(`${baseUrl}/api/stove/ignite`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({}), // Invia un corpo vuoto se non sono necessari dati
+        });
       }
       if (powerLevel !== active.power) {
         await fetch(`${baseUrl}/api/stove/setPower`, {

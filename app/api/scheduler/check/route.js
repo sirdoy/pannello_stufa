@@ -8,6 +8,17 @@ export async function GET(req) {
       return new Response('Unauthorized', {status: 401});
     }
 
+    // Check if scheduler mode is enabled
+    const modeSnapshot = await get(ref(db, `stoveScheduler/mode`));
+    const schedulerEnabled = modeSnapshot.exists() ? modeSnapshot.val().enabled : false;
+
+    if (!schedulerEnabled) {
+      return Response.json({
+        status: 'MODALITA_MANUALE',
+        message: 'Scheduler disattivato - modalità manuale attiva'
+      });
+    }
+
     // Fuso orario Europe/Rome con Intl
     const now = new Date();
     const formatter = new Intl.DateTimeFormat('it-IT', {
@@ -50,14 +61,18 @@ export async function GET(req) {
     const statusJson = await statusRes.json();
     const isOn = statusJson?.StatusDescription?.includes('WORK') || statusJson?.StatusDescription?.includes('START');
 
-    const fanLevel = (await fetch(`${baseUrl}/api/stove/getFan`));
+    const fanRes = await fetch(`${baseUrl}/api/stove/getFan`);
+    const fanJson = await fanRes.json();
+    const currentFanLevel = fanJson?.Result ?? 3;
 
-    const powerLevel = (await fetch(`${baseUrl}/api/stove/getPower`));
+    const powerRes = await fetch(`${baseUrl}/api/stove/getPower`);
+    const powerJson = await powerRes.json();
+    const currentPowerLevel = powerJson?.Result ?? 2;
 
     // console.log(statusJson);
     // console.log(isOn);
-    // console.log(fanLevel);
-    // console.log(powerLevel);
+    // console.log(currentFanLevel);
+    // console.log(currentPowerLevel);
     // console.log(`Scheduler attivo: ${active ? 'SI' : 'NO'}`);
     // console.log(`Attivo: ${JSON.stringify(active)}`);
 
@@ -68,17 +83,17 @@ export async function GET(req) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({}), // Invia un corpo vuoto se non sono necessari dati
+          body: JSON.stringify({}),
         });
       }
-      if (powerLevel !== active.power) {
+      if (currentPowerLevel !== active.power) {
         await fetch(`${baseUrl}/api/stove/setPower`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({level: active.power}),
         });
       }
-      if (fanLevel !== active.fan) {
+      if (currentFanLevel !== active.fan) {
         await fetch(`${baseUrl}/api/stove/setFan`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
@@ -93,8 +108,10 @@ export async function GET(req) {
 
     return Response.json({
       status: active ? 'ACCESA' : 'SPENTA',
+      schedulerEnabled: true,
       giorno,
       ora,
+      activeSchedule: active || null,
     });
   } catch (error) {
     console.error('Errore nel cron:', error);

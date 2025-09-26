@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { saveSchedule, getWeeklySchedule } from '@/lib/schedulerService';
+import { saveSchedule, getWeeklySchedule, setSchedulerMode, getSchedulerMode } from '@/lib/schedulerService';
 
 const daysOfWeek = [
   'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'
@@ -14,6 +14,7 @@ export default function WeeklyScheduler() {
       return acc;
     }, {})
   );
+  const [schedulerEnabled, setSchedulerEnabled] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,6 +24,9 @@ export default function WeeklyScheduler() {
         return acc;
       }, {});
       setSchedule(filledData);
+
+      const mode = await getSchedulerMode();
+      setSchedulerEnabled(mode);
     };
     fetchData();
   }, []);
@@ -71,6 +75,12 @@ export default function WeeklyScheduler() {
     const updatedSchedule = { ...schedule, [day]: updated };
     setSchedule(updatedSchedule);
     saveSchedule(day, updated);
+  };
+
+  const toggleSchedulerMode = async () => {
+    const newMode = !schedulerEnabled;
+    setSchedulerEnabled(newMode);
+    await setSchedulerMode(newMode);
   };
 
   const TimeBar = ({ intervals }) => {
@@ -132,7 +142,26 @@ export default function WeeklyScheduler() {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Scheduler Settimanale Stufa</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Scheduler Settimanale Stufa</h1>
+        <div className="flex items-center gap-4">
+          <span className="text-sm font-medium">
+            Modalità: <span className={schedulerEnabled ? 'text-green-600' : 'text-orange-600'}>
+              {schedulerEnabled ? 'Automatica' : 'Manuale'}
+            </span>
+          </span>
+          <button
+            onClick={toggleSchedulerMode}
+            className={`px-4 py-2 rounded-lg text-white font-medium transition-colors ${
+              schedulerEnabled
+                ? 'bg-red-600 hover:bg-red-700'
+                : 'bg-green-600 hover:bg-green-700'
+            }`}
+          >
+            {schedulerEnabled ? 'Disattiva Scheduler' : 'Attiva Scheduler'}
+          </button>
+        </div>
+      </div>
       {daysOfWeek.map((day) => (
         <div key={day} className="mb-8">
           <h2 className="text-lg font-semibold mb-2">{day}</h2>

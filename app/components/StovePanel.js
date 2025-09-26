@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { getSchedulerMode } from '@/lib/schedulerService';
 
 export default function StovePanel() {
   const router = useRouter();
@@ -12,6 +13,7 @@ export default function StovePanel() {
   const [ambientTemp, setAmbientTemp] = useState(null);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [schedulerEnabled, setSchedulerEnabled] = useState(false);
 
   const handleNetatmoLogout = () => {
     sessionStorage.removeItem('netatmo_refresh_token');
@@ -45,14 +47,16 @@ export default function StovePanel() {
     }
   };
 
-  useEffect(() => {
-    fetchStatusAndUpdate();
-    const interval = setInterval(fetchStatusAndUpdate, 5000);
-    return () => clearInterval(interval);
-  }, []);
+  const fetchSchedulerMode = async () => {
+    try {
+      const mode = await getSchedulerMode();
+      setSchedulerEnabled(mode);
+    } catch (err) {
+      console.error('Errore modalità scheduler:', err);
+    }
+  };
 
-
-  const fetchStatusAndUpdate = async () => {
+  const fetchStatusAndUpdate = useCallback(async () => {
     try {
       const res = await fetch('/api/stove/status');
       const json = await res.json();
@@ -60,11 +64,18 @@ export default function StovePanel() {
       setStatus(newStatus);
       await fetchFanLevel();
       await fetchPowerLevel();
+      await fetchSchedulerMode();
     } catch (err) {
       console.error('Errore stato:', err);
       setStatus('errore');
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchStatusAndUpdate();
+    const interval = setInterval(fetchStatusAndUpdate, 5000);
+    return () => clearInterval(interval);
+  }, [fetchStatusAndUpdate]);
 
   const handleManualRefresh = async () => {
     setRefreshing(true);
@@ -181,6 +192,21 @@ export default function StovePanel() {
 
       </div>
 
+      <div className="text-center">
+        <span className="text-gray-600 text-sm">Modalità controllo:</span>
+        <div className={`text-base font-medium mt-1 flex items-center justify-center gap-2 ${
+          schedulerEnabled ? 'text-green-600' : 'text-orange-600'
+        }`}>
+          <span>{schedulerEnabled ? '⏰' : '🔧'}</span>
+          <span>{schedulerEnabled ? 'Automatica' : 'Manuale'}</span>
+          <button
+            onClick={() => router.push('/scheduler')}
+            className="ml-2 text-xs text-blue-500 hover:underline"
+          >
+            Configura
+          </button>
+        </div>
+      </div>
 
       {ambientTemp !== null && (
         <div className="text-center">

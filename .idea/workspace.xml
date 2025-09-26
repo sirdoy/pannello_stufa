@@ -5,7 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fdfc8ccc-3a81-41ac-93f3-8d003aaba64f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/app/api/scheduler/check.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/scheduler/check/route.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/components/StovePanel.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/StovePanel.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/scheduler/page.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/scheduler/page.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/schedulerService.js" beforeDir="false" afterPath="$PROJECT_DIR$/lib/schedulerService.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/sw.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/sw.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,22 +51,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "js.debugger.nextJs.config.created.client": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.dev.executor": "Run",
-    "ts.external.directory.path": "/Applications/PhpStorm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;js.debugger.nextJs.config.created.client&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.build.executor&quot;: &quot;Run&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;npm.start.executor&quot;: &quot;Run&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Applications/PhpStorm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/app/api/scheduler/check" />
@@ -70,6 +80,16 @@
   </component>
   <component name="RunManager" selected="npm.dev">
     <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3000/">
+      <method v="2" />
+    </configuration>
+    <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="build" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
       <method v="2" />
     </configuration>
     <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
@@ -82,17 +102,29 @@
       <envs />
       <method v="2" />
     </configuration>
+    <configuration name="start" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="npm.dev" />
+        <item itemvalue="npm.build" />
+        <item itemvalue="npm.start" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-f27c65a3e318-JavaScript-PS-251.23774.436" />
-        <option value="bundled-php-predefined-a98d8de5180a-aaeaa8632555-com.jetbrains.php.sharedIndexes-PS-251.23774.436" />
+        <option value="bundled-js-predefined-d6986cc7102b-9c94529fcfe0-JavaScript-PS-252.26199.163" />
+        <option value="bundled-php-predefined-a98d8de5180a-f0a8ef430dfa-com.jetbrains.php.sharedIndexes-PS-252.26199.163" />
       </set>
     </attachedChunks>
   </component>
@@ -112,7 +144,33 @@
       <workItem from="1743840146932" duration="594000" />
       <workItem from="1744009952156" duration="1850000" />
       <workItem from="1744623217303" duration="3138000" />
-      <workItem from="1745502984527" duration="3523000" />
+      <workItem from="1745502984527" duration="8672000" />
+      <workItem from="1745562112414" duration="156000" />
+      <workItem from="1745562312814" duration="2677000" />
+      <workItem from="1745824255082" duration="596000" />
+      <workItem from="1745846940490" duration="130000" />
+      <workItem from="1745996788041" duration="812000" />
+      <workItem from="1746171258005" duration="593000" />
+      <workItem from="1746256709307" duration="543000" />
+      <workItem from="1746431798789" duration="331000" />
+      <workItem from="1746513579635" duration="384000" />
+      <workItem from="1757491348374" duration="2662000" />
+      <workItem from="1757580877637" duration="585000" />
+      <workItem from="1757661246733" duration="445000" />
+      <workItem from="1758025093149" duration="1296000" />
+      <workItem from="1758094153811" duration="633000" />
+      <workItem from="1758118266187" duration="1288000" />
+      <workItem from="1758200940679" duration="417000" />
+      <workItem from="1758273498526" duration="160000" />
+      <workItem from="1758273686625" duration="321000" />
+      <workItem from="1758284198489" duration="117000" />
+      <workItem from="1758284470395" duration="545000" />
+      <workItem from="1758544981391" duration="519000" />
+      <workItem from="1758545797409" duration="506000" />
+      <workItem from="1758551190002" duration="561000" />
+      <workItem from="1758629476861" duration="1500000" />
+      <workItem from="1758715737271" duration="596000" />
+      <workItem from="1758888779575" duration="821000" />
     </task>
     <servers />
   </component>

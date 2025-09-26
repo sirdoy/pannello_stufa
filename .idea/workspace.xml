@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fdfc8ccc-3a81-41ac-93f3-8d003aaba64f" name="Changes" comment="aggiorna librerie e miglioramenti nel controllo scheduler">
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/middleware.js" beforeDir="false" afterPath="$PROJECT_DIR$/middleware.js" afterDir="false" />
-    </list>
+    <list default="true" id="fdfc8ccc-3a81-41ac-93f3-8d003aaba64f" name="Changes" comment="aggiorna workspace.xml per riflettere modifiche nella gestione scheduler e aggiornamenti librerie" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -173,7 +169,7 @@
       <workItem from="1758551190002" duration="561000" />
       <workItem from="1758629476861" duration="1500000" />
       <workItem from="1758715737271" duration="596000" />
-      <workItem from="1758888779575" duration="1432000" />
+      <workItem from="1758888779575" duration="1605000" />
     </task>
     <task id="LOCAL-00001" summary="aggiungi configurazioni Claude e linea guida sviluppo">
       <option name="closed" value="true" />
@@ -199,7 +195,23 @@
       <option name="project" value="LOCAL" />
       <updated>1758893051285</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="aggiorna configurazioni Claude per includere nuove regole Bash">
+      <option name="closed" value="true" />
+      <created>1758894041659</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1758894041659</updated>
+    </task>
+    <task id="LOCAL-00005" summary="aggiorna workspace.xml per riflettere modifiche nella gestione scheduler e aggiornamenti librerie">
+      <option name="closed" value="true" />
+      <created>1758894305763</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1758894305763</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -221,6 +233,8 @@
     <MESSAGE value="aggiorna librerie e dipendenze, aggiunta libreria Workbox" />
     <MESSAGE value="aggiungi script workbox e aggiorna configurazioni workspace" />
     <MESSAGE value="aggiorna librerie e miglioramenti nel controllo scheduler" />
-    <option name="LAST_COMMIT_MESSAGE" value="aggiorna librerie e miglioramenti nel controllo scheduler" />
+    <MESSAGE value="aggiorna configurazioni Claude per includere nuove regole Bash" />
+    <MESSAGE value="aggiorna workspace.xml per riflettere modifiche nella gestione scheduler e aggiornamenti librerie" />
+    <option name="LAST_COMMIT_MESSAGE" value="aggiorna workspace.xml per riflettere modifiche nella gestione scheduler e aggiornamenti librerie" />
   </component>
 </project>

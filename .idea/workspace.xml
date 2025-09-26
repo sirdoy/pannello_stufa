@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fdfc8ccc-3a81-41ac-93f3-8d003aaba64f" name="Changes" comment="">
+    <list default="true" id="fdfc8ccc-3a81-41ac-93f3-8d003aaba64f" name="Changes" comment="aggiungi configurazioni Claude e linea guida sviluppo">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/scheduler/check/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/scheduler/check/route.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/components/StovePanel.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/StovePanel.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/scheduler/page.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/scheduler/page.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/schedulerService.js" beforeDir="false" afterPath="$PROJECT_DIR$/lib/schedulerService.js" afterDir="false" />
@@ -16,6 +17,12 @@
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager">
+    <option name="groupingKeys">
+      <option value="directory" />
+      <option value="repository" />
+    </option>
   </component>
   <component name="ComposerSettings">
     <execution />
@@ -170,11 +177,24 @@
       <workItem from="1758551190002" duration="561000" />
       <workItem from="1758629476861" duration="1500000" />
       <workItem from="1758715737271" duration="596000" />
-      <workItem from="1758888779575" duration="821000" />
+      <workItem from="1758888779575" duration="1097000" />
     </task>
+    <task id="LOCAL-00001" summary="aggiungi configurazioni Claude e linea guida sviluppo">
+      <option name="closed" value="true" />
+      <created>1758892354961</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1758892354961</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="aggiungi configurazioni Claude e linea guida sviluppo" />
+    <option name="LAST_COMMIT_MESSAGE" value="aggiungi configurazioni Claude e linea guida sviluppo" />
   </component>
 </project>

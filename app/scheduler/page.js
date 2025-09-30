@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { saveSchedule, getWeeklySchedule, setSchedulerMode, getSchedulerMode } from '@/lib/schedulerService';
+import { saveSchedule, getWeeklySchedule, setSchedulerMode, getFullSchedulerMode, clearSemiManualMode, getNextScheduledChange, setSemiManualMode } from '@/lib/schedulerService';
 
 const daysOfWeek = [
   'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'
@@ -15,6 +15,8 @@ export default function WeeklyScheduler() {
     }, {})
   );
   const [schedulerEnabled, setSchedulerEnabled] = useState(false);
+  const [semiManualMode, setSemiManualModeState] = useState(false);
+  const [returnToAutoAt, setReturnToAutoAt] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,8 +27,10 @@ export default function WeeklyScheduler() {
       }, {});
       setSchedule(filledData);
 
-      const mode = await getSchedulerMode();
-      setSchedulerEnabled(mode);
+      const mode = await getFullSchedulerMode();
+      setSchedulerEnabled(mode.enabled);
+      setSemiManualModeState(mode.semiManual || false);
+      setReturnToAutoAt(mode.returnToAutoAt || null);
     };
     fetchData();
   }, []);
@@ -60,7 +64,7 @@ export default function WeeklyScheduler() {
     return start < end;
   };
 
-  const handleChange = (day, index, field, value) => {
+  const handleChange = async (day, index, field, value) => {
     const updated = [...schedule[day]];
     updated[index][field] = value;
 
@@ -74,13 +78,29 @@ export default function WeeklyScheduler() {
 
     const updatedSchedule = { ...schedule, [day]: updated };
     setSchedule(updatedSchedule);
-    saveSchedule(day, updated);
+    await saveSchedule(day, updated);
+
+    // Se siamo in semi-manuale, aggiorna il returnToAutoAt
+    if (semiManualMode) {
+      const nextChange = await getNextScheduledChange();
+      if (nextChange) {
+        await setSemiManualMode(nextChange);
+        setReturnToAutoAt(nextChange);
+      }
+    }
   };
 
   const toggleSchedulerMode = async () => {
     const newMode = !schedulerEnabled;
     setSchedulerEnabled(newMode);
     await setSchedulerMode(newMode);
+
+    // Reset semi-manual quando si cambia modalità manualmente
+    if (semiManualMode) {
+      await clearSemiManualMode();
+      setSemiManualModeState(false);
+      setReturnToAutoAt(null);
+    }
   };
 
   const TimeBar = ({ intervals }) => {
@@ -160,16 +180,36 @@ export default function WeeklyScheduler() {
 
         {/* Status e toggle - stack su mobile, inline su desktop */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center justify-center sm:justify-start">
-            <span className="text-sm font-medium mr-2">Modalità:</span>
-            <div className="flex items-center gap-2">
-              <span className={`text-lg ${schedulerEnabled ? 'text-green-600' : 'text-orange-600'}`}>
-                {schedulerEnabled ? '⏰' : '🔧'}
-              </span>
-              <span className={`font-semibold ${schedulerEnabled ? 'text-green-600' : 'text-orange-600'}`}>
-                {schedulerEnabled ? 'Automatica' : 'Manuale'}
-              </span>
+          <div className="flex flex-col items-center sm:items-start">
+            <div className="flex items-center">
+              <span className="text-sm font-medium mr-2">Modalità:</span>
+              <div className="flex items-center gap-2">
+                <span className={`text-lg ${
+                  schedulerEnabled && semiManualMode ? 'text-yellow-600' :
+                  schedulerEnabled ? 'text-green-600' : 'text-orange-600'
+                }`}>
+                  {schedulerEnabled && semiManualMode ? '⚙️' : schedulerEnabled ? '⏰' : '🔧'}
+                </span>
+                <span className={`font-semibold ${
+                  schedulerEnabled && semiManualMode ? 'text-yellow-600' :
+                  schedulerEnabled ? 'text-green-600' : 'text-orange-600'
+                }`}>
+                  {schedulerEnabled && semiManualMode ? 'Semi-manuale' :
+                   schedulerEnabled ? 'Automatica' : 'Manuale'}
+                </span>
+              </div>
             </div>
+            {schedulerEnabled && semiManualMode && returnToAutoAt && (
+              <span className="text-xs text-gray-500 mt-1">
+                Ritorno automatico: {new Date(returnToAutoAt).toLocaleString('it-IT', {
+                  weekday: 'short',
+                  day: '2-digit',
+                  month: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </span>
+            )}
           </div>
 
           <button

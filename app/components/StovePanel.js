@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { getSchedulerMode } from '@/lib/schedulerService';
+import { getFullSchedulerMode } from '@/lib/schedulerService';
 
 export default function StovePanel() {
   const router = useRouter();
@@ -14,6 +14,8 @@ export default function StovePanel() {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [schedulerEnabled, setSchedulerEnabled] = useState(false);
+  const [semiManualMode, setSemiManualMode] = useState(false);
+  const [returnToAutoAt, setReturnToAutoAt] = useState(null);
 
   const handleNetatmoLogout = () => {
     sessionStorage.removeItem('netatmo_refresh_token');
@@ -49,8 +51,10 @@ export default function StovePanel() {
 
   const fetchSchedulerMode = async () => {
     try {
-      const mode = await getSchedulerMode();
-      setSchedulerEnabled(mode);
+      const mode = await getFullSchedulerMode();
+      setSchedulerEnabled(mode.enabled);
+      setSemiManualMode(mode.semiManual || false);
+      setReturnToAutoAt(mode.returnToAutoAt || null);
     } catch (err) {
       console.error('Errore modalità scheduler:', err);
     }
@@ -194,17 +198,33 @@ export default function StovePanel() {
 
       <div className="text-center">
         <span className="text-gray-600 text-sm">Modalità controllo:</span>
-        <div className={`text-base font-medium mt-1 flex items-center justify-center gap-2 ${
+        <div className={`text-base font-medium mt-1 flex flex-col items-center justify-center gap-1 ${
+          schedulerEnabled && semiManualMode ? 'text-yellow-600' :
           schedulerEnabled ? 'text-green-600' : 'text-orange-600'
         }`}>
-          <span>{schedulerEnabled ? '⏰' : '🔧'}</span>
-          <span>{schedulerEnabled ? 'Automatica' : 'Manuale'}</span>
-          <button
-            onClick={() => router.push('/scheduler')}
-            className="ml-2 text-xs text-blue-500 hover:underline"
-          >
-            Configura
-          </button>
+          <div className="flex items-center gap-2">
+            <span>{schedulerEnabled && semiManualMode ? '⚙️' : schedulerEnabled ? '⏰' : '🔧'}</span>
+            <span>
+              {schedulerEnabled && semiManualMode ? 'Semi-manuale' :
+               schedulerEnabled ? 'Automatica' : 'Manuale'}
+            </span>
+            <button
+              onClick={() => router.push('/scheduler')}
+              className="ml-2 text-xs text-blue-500 hover:underline"
+            >
+              Configura
+            </button>
+          </div>
+          {schedulerEnabled && semiManualMode && returnToAutoAt && (
+            <span className="text-xs text-gray-500">
+              Ritorno automatico: {new Date(returnToAutoAt).toLocaleString('it-IT', {
+                day: '2-digit',
+                month: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
+            </span>
+          )}
         </div>
       </div>
 

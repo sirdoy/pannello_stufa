@@ -20,24 +20,139 @@ This is a Next.js 15 PWA application called "Pannello Stufa" (Stove Panel) that 
 - **Navbar** (`app/components/Navbar.js`) - Navigation with Auth0 integration, glassmorphism design with backdrop blur
 
 ### Pages
-- `/` (home) - Main StovePanel interface for controlling the stove
-- `/scheduler` - Weekly schedule configuration with timeline visualization and mode toggle
-- `/log` - Historical logs of stove operations
+- `/` (`app/page.js`) - Main StovePanel interface for controlling the stove
+  - Real-time status polling every 5 seconds
+  - Ignite/shutdown buttons
+  - Fan (1-6) and power (0-5) level controls
+  - Netatmo temperature display and connection management
+  - Scheduler mode indicator with link to scheduler page
+  - Force dynamic rendering for real-time data
+- `/scheduler` (`app/scheduler/page.js`) - Weekly schedule configuration
+  - Weekly timeline view (7 days × 24 hours)
+  - Add/remove time intervals per day
+  - Configure power and fan levels per interval
+  - Manual/Automatic mode toggle
+  - Semi-manual status display with return time
+  - Firebase integration for schedule persistence
+- `/log` (`app/log/page.js`) - Historical logs viewer
+  - Display of stove operation logs from Firebase
+  - Timestamped entries of all actions
+- `/netatmo/authorized` (`app/netatmo/authorized/page.js`) - Netatmo OAuth success page
+  - Confirmation page after Netatmo authorization
+  - Shows authorization status
 
 ### API Routes Structure
 All API routes are in `app/api/` with the following organization:
-- `stove/*` - Thermorossi stove control endpoints (ignite, shutdown, fan/power control, status)
-- `auth/[...auth0]/*` - Auth0 authentication handling
-- `netatmo/*` - Netatmo temperature sensor integration
-- `scheduler/*` - Automated stove scheduling system
-- `log/*` - Firebase logging functionality
-- `user/*` - User management
+
+#### Stove Control (`/api/stove/*`)
+- `GET /api/stove/status` - Get current stove status from Thermorossi API
+  - Returns: `StatusDescription`, operational state (WORK, START, etc.)
+- `POST /api/stove/ignite` - Turn on the stove
+  - Triggers semi-manual mode if scheduler is active
+  - Sets `returnToAutoAt` to next scheduled change
+- `POST /api/stove/shutdown` - Turn off the stove
+  - Triggers semi-manual mode if scheduler is active
+  - Sets `returnToAutoAt` to next scheduled change
+- `POST /api/stove/setFan` - Set fan level (1-6)
+  - Body: `{ level: number }`
+- `POST /api/stove/setPower` - Set power level (0-5)
+  - Body: `{ level: number }`
+- `GET /api/stove/getFan` - Get current fan level
+  - Returns: `{ Result: number }`
+- `GET /api/stove/getPower` - Get current power level
+  - Returns: `{ Result: number }`
+- `GET /api/stove/settings` - Get all stove settings
+  - Calls: `GetSettings/${API_KEY}`
+- `POST /api/stove/setSettings` - Update stove settings
+  - Body: `{ fanLevel: number, powerLevel: number }`
+
+#### Authentication (`/api/auth/*`)
+- `/api/auth/[...auth0]` - Auth0 dynamic routes for login/logout/callback
+  - Handled by `@auth0/nextjs-auth0` package
+
+#### Netatmo Integration (`/api/netatmo/*`)
+- `POST /api/netatmo/devices` - Get list of Netatmo devices
+  - Body: `{ refresh_token: string }`
+  - Returns: Array of devices with modules
+- `POST /api/netatmo/temperature` - Get temperature from configured device
+  - Uses `refresh_token` from Firebase (`netatmo/refresh_token`)
+  - Reads `device_id` and `module_id` from Firebase (`netatmo/deviceConfig`)
+  - Calls Netatmo `getthermstate` API
+  - Saves temperature to Firebase (`netatmo/temperature`)
+- `GET /api/netatmo/callback` - OAuth2 callback handler
+  - Query param: `code` (authorization code)
+  - Exchanges code for refresh token
+  - Saves refresh token to Firebase
+  - Redirects to `/netatmo/authorized`
+- `GET /api/netatmo/devices-temperatures` - Get all devices with temperatures
+  - Returns array of all modules with current temperature readings
+  - Format: `{ device_id, module_id, name, temperature }`
+
+#### Scheduler System (`/api/scheduler/*`)
+- `GET /api/scheduler/check?secret=<CRON_SECRET>` - Cron endpoint for automatic control
+  - Called every minute by external cron job
+  - Checks scheduler mode (manual/automatic/semi-manual)
+  - Returns `MODALITA_MANUALE` if scheduler disabled
+  - Returns `MODALITA_SEMI_MANUALE` if waiting for next scheduled change
+  - Compares current time with schedule intervals
+  - Executes stove commands (ignite/shutdown/setFan/setPower) as needed
+  - Clears semi-manual mode when scheduled change is applied
+  - Uses `Europe/Rome` timezone for scheduling
+
+#### Logging (`/api/log/*`)
+- `POST /api/log/add` - Add log entry to Firebase
+  - Body: Any JSON object with log data
+  - Adds timestamp automatically
+  - Saves to `log/` path in Firebase
+
+#### User Management (`/api/user/*`)
+- `GET /api/user` - Get current authenticated user info
+  - Returns Auth0 session user object
+  - Returns `{ user: null }` if not authenticated
 
 ### External Integrations
 - **Thermorossi Cloud API** (`lib/stoveApi.js`) - Contains API endpoints and key for stove control
 - **Firebase Realtime Database** (`lib/firebase.js`) - Used for logging stove operations and scheduler data storage
 - **Auth0** - User authentication and session management with middleware protection
 - **Netatmo API** - Temperature monitoring from smart thermostats
+
+### Route Management System
+- **Route Configuration** (`lib/routes.js`) - Centralized API route definitions
+  - All API routes are defined in a single source of truth
+  - Prevents hardcoded URLs throughout the codebase
+  - Makes route changes easier to manage and maintain
+
+  **Exported Constants:**
+  - `STOVE_ROUTES`: All stove control endpoints
+    - `status`, `ignite`, `shutdown`, `getFan`, `getPower`, `setFan`, `setPower`, `getSettings`, `setSettings`
+  - `SCHEDULER_ROUTES`: Scheduler system endpoints
+    - `check(secret)` - Function that returns cron endpoint with secret parameter
+  - `NETATMO_ROUTES`: Netatmo integration endpoints
+    - `devices`, `temperature`, `callback`, `devicesTemperatures`
+  - `LOG_ROUTES`: Logging endpoints
+    - `add`
+  - `USER_ROUTES`: User management endpoints
+    - `me`
+  - `AUTH_ROUTES`: Authentication endpoints
+    - `login`, `logout`, `callback`, `me`
+  - `API_ROUTES`: Combined export of all route groups
+
+  **Usage Examples:**
+  ```javascript
+  // Frontend component
+  import { STOVE_ROUTES, LOG_ROUTES } from '@/lib/routes';
+
+  await fetch(STOVE_ROUTES.status);
+  await fetch(STOVE_ROUTES.ignite, { method: 'POST' });
+  await fetch(LOG_ROUTES.add, { method: 'POST', body: JSON.stringify(data) });
+  ```
+
+  ```javascript
+  // Backend endpoint
+  import { STOVE_ROUTES } from '@/lib/routes';
+
+  const response = await fetch(`${baseUrl}${STOVE_ROUTES.status}`);
+  ```
 
 ### Firebase Structure
 - `stoveScheduler/{day}` - Weekly schedule data (Lunedì, Martedì, Mercoledì, Giovedì, Venerdì, Sabato, Domenica)
@@ -86,6 +201,10 @@ Custom utility classes in `app/globals.css`:
 - Italian language interface ("it" locale)
 - All UI text and labels are in Italian
 - Theme color for PWA: `#ef4444` (primary red)
+- **Route system**: All API routes are centralized in `lib/routes.js` for consistency
+  - Frontend components import routes from this file
+  - Backend endpoints also use the same route definitions
+  - Makes route changes easier to manage and prevents hardcoded URLs
 
 ## UI/UX Guidelines
 

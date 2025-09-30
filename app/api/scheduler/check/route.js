@@ -1,6 +1,7 @@
 import { get, ref } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import { clearSemiManualMode } from '@/lib/schedulerService';
+import { STOVE_ROUTES } from '@/lib/routes';
 
 export async function GET(req) {
   try {
@@ -79,15 +80,15 @@ export async function GET(req) {
     console.log(baseUrl);
 
 
-    const statusRes = await fetch(`${baseUrl}/api/stove/status`);
+    const statusRes = await fetch(`${baseUrl}${STOVE_ROUTES.status}`);
     const statusJson = await statusRes.json();
     const isOn = statusJson?.StatusDescription?.includes('WORK') || statusJson?.StatusDescription?.includes('START');
 
-    const fanRes = await fetch(`${baseUrl}/api/stove/getFan`);
+    const fanRes = await fetch(`${baseUrl}${STOVE_ROUTES.getFan}`);
     const fanJson = await fanRes.json();
     const currentFanLevel = fanJson?.Result ?? 3;
 
-    const powerRes = await fetch(`${baseUrl}/api/stove/getPower`);
+    const powerRes = await fetch(`${baseUrl}${STOVE_ROUTES.getPower}`);
     const powerJson = await powerRes.json();
     const currentPowerLevel = powerJson?.Result ?? 2;
 
@@ -102,7 +103,7 @@ export async function GET(req) {
 
     if (active) {
       if (!isOn) {
-        await fetch(`${baseUrl}/api/stove/ignite`, {
+        await fetch(`${baseUrl}${STOVE_ROUTES.ignite}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -112,7 +113,7 @@ export async function GET(req) {
         changeApplied = true;
       }
       if (currentPowerLevel !== active.power) {
-        await fetch(`${baseUrl}/api/stove/setPower`, {
+        await fetch(`${baseUrl}${STOVE_ROUTES.setPower}`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({level: active.power}),
@@ -120,7 +121,7 @@ export async function GET(req) {
         changeApplied = true;
       }
       if (currentFanLevel !== active.fan) {
-        await fetch(`${baseUrl}/api/stove/setFan`, {
+        await fetch(`${baseUrl}${STOVE_ROUTES.setFan}`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({level: active.fan}),
@@ -129,7 +130,7 @@ export async function GET(req) {
       }
     } else {
       if (isOn) {
-        await fetch(`${baseUrl}/api/stove/shutdown`, {method: 'POST'});
+        await fetch(`${baseUrl}${STOVE_ROUTES.shutdown}`, {method: 'POST'});
         changeApplied = true;
       }
     }

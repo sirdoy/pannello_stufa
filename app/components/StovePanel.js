@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { getFullSchedulerMode } from '@/lib/schedulerService';
+import { STOVE_ROUTES, LOG_ROUTES } from '@/lib/routes';
 
 export default function StovePanel() {
   const router = useRouter();
@@ -31,7 +32,7 @@ export default function StovePanel() {
 
   const fetchFanLevel = async () => {
     try {
-      const res = await fetch('/api/stove/getFan');
+      const res = await fetch(STOVE_ROUTES.getFan);
       const json = await res.json();
       setFanLevel(json?.Result ?? 3);
     } catch (err) {
@@ -41,7 +42,7 @@ export default function StovePanel() {
 
   const fetchPowerLevel = async () => {
     try {
-      const res = await fetch('/api/stove/getPower');
+      const res = await fetch(STOVE_ROUTES.getPower);
       const json = await res.json();
       setPowerLevel(json?.Result ?? 2);
     } catch (err) {
@@ -62,7 +63,7 @@ export default function StovePanel() {
 
   const fetchStatusAndUpdate = useCallback(async () => {
     try {
-      const res = await fetch('/api/stove/status');
+      const res = await fetch(STOVE_ROUTES.status);
       const json = await res.json();
       const newStatus = json?.StatusDescription || 'sconosciuto';
       setStatus(newStatus);
@@ -88,7 +89,7 @@ export default function StovePanel() {
   };
 
   const logAction = async (action, value = null) => {
-    await fetch('/api/log/add', {
+    await fetch(LOG_ROUTES.add, {
       method: 'POST',
       body: JSON.stringify({action, ...(value !== null && {value})}),
     });
@@ -97,7 +98,7 @@ export default function StovePanel() {
   const handleFanChange = async (e) => {
     const level = Number(e.target.value);
     setFanLevel(level);
-    await fetch('/api/stove/setFan', {
+    await fetch(STOVE_ROUTES.setFan, {
       method: 'POST',
       body: JSON.stringify({level}),
     });
@@ -107,7 +108,7 @@ export default function StovePanel() {
   const handlePowerChange = async (e) => {
     const level = Number(e.target.value);
     setPowerLevel(level);
-    await fetch('/api/stove/setPower', {
+    await fetch(STOVE_ROUTES.setPower, {
       method: 'POST',
       body: JSON.stringify({level}),
     });
@@ -116,14 +117,14 @@ export default function StovePanel() {
 
   const handleIgnite = async () => {
     setLoading(true);
-    await fetch('/api/stove/ignite', {method: 'POST'});
+    await fetch(STOVE_ROUTES.ignite, {method: 'POST'});
     await logAction('Accensione');
     setLoading(false);
   };
 
   const handleShutdown = async () => {
     setLoading(true);
-    await fetch('/api/stove/shutdown', {method: 'POST'});
+    await fetch(STOVE_ROUTES.shutdown, {method: 'POST'});
     await logAction('Spegnimento');
     setLoading(false);
   };

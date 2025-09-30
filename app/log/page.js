@@ -41,6 +41,9 @@ export default function LogPage() {
     if (action.toLowerCase().includes('spegnimento')) return '❄️';
     if (action.toLowerCase().includes('ventola')) return '💨';
     if (action.toLowerCase().includes('potenza')) return '⚡';
+    if (action.toLowerCase().includes('scheduler') || action.toLowerCase().includes('modalità')) return '⏰';
+    if (action.toLowerCase().includes('netatmo')) return '🌡️';
+    if (action.toLowerCase().includes('intervallo')) return '📅';
     return '📄';
   };
 
@@ -51,8 +54,8 @@ export default function LogPage() {
   const hasPrev = currentPage > 0;
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-2xl shadow-md space-y-6 border">
-      <h2 className="text-2xl font-semibold text-center">Storico Azioni</h2>
+    <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-md space-y-6 border">
+      <h2 className="text-2xl font-semibold text-center">Storico Azioni Utenti</h2>
 
       {log.length === 0 ? (
         <p className="text-center text-gray-500">Nessuna azione registrata</p>
@@ -60,16 +63,42 @@ export default function LogPage() {
         <>
           <ul className="space-y-4">
             {currentPageData.map((entry) => (
-              <li key={entry.id} className="border-b pb-2 flex items-start gap-3">
-                <div className="text-xl">{getIcon(entry.action)}</div>
-                <div>
-                  <div className="text-sm text-gray-500">{formatDate(entry.timestamp)}</div>
-                  <div className="text-base">
+              <li key={entry.id} className="border-b pb-3 flex items-start gap-3">
+                <div className="text-2xl mt-1">{getIcon(entry.action)}</div>
+                <div className="flex-1">
+                  {/* Informazioni utente */}
+                  {entry.user && (
+                    <div className="flex items-center gap-2 mb-2">
+                      {entry.user.picture && (
+                        <img
+                          src={entry.user.picture}
+                          alt={entry.user.name || entry.user.email}
+                          className="w-6 h-6 rounded-full"
+                        />
+                      )}
+                      <span className="text-sm font-semibold text-gray-700">
+                        {entry.user.name || entry.user.email}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Timestamp */}
+                  <div className="text-xs text-gray-500 mb-1">{formatDate(entry.timestamp)}</div>
+
+                  {/* Azione */}
+                  <div className="text-base font-medium text-gray-900">
                     {entry.action}
                     {entry.value !== undefined && (
-                      <span className="ml-2 text-blue-600 font-medium">→ {entry.value}</span>
+                      <span className="ml-2 text-blue-600 font-semibold">→ {entry.value}</span>
                     )}
                   </div>
+
+                  {/* Metadata opzionale */}
+                  {entry.day && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      Giorno: {entry.day}
+                    </div>
+                  )}
                 </div>
               </li>
             ))}

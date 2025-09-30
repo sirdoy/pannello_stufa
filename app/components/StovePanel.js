@@ -3,7 +3,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { getFullSchedulerMode } from '@/lib/schedulerService';
-import { STOVE_ROUTES, LOG_ROUTES } from '@/lib/routes';
+import { STOVE_ROUTES } from '@/lib/routes';
+import { logStoveAction, logNetatmoAction } from '@/lib/logService';
 
 export default function StovePanel() {
   const router = useRouter();
@@ -18,12 +19,14 @@ export default function StovePanel() {
   const [semiManualMode, setSemiManualMode] = useState(false);
   const [returnToAutoAt, setReturnToAutoAt] = useState(null);
 
-  const handleNetatmoLogout = () => {
+  const handleNetatmoLogout = async () => {
     sessionStorage.removeItem('netatmo_refresh_token');
+    await logNetatmoAction.disconnect();
     window.location.reload();
   };
 
-  const handleNetatmoLogin = () => {
+  const handleNetatmoLogin = async () => {
+    await logNetatmoAction.connect();
     const clientId = process.env.NEXT_PUBLIC_NETATMO_CLIENT_ID;
     const redirectUri = process.env.NEXT_PUBLIC_NETATMO_REDIRECT_URI;
     const netatmoUrl = `https://api.netatmo.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read_thermostat&state=manual`;
@@ -88,13 +91,6 @@ export default function StovePanel() {
     setRefreshing(false);
   };
 
-  const logAction = async (action, value = null) => {
-    await fetch(LOG_ROUTES.add, {
-      method: 'POST',
-      body: JSON.stringify({action, ...(value !== null && {value})}),
-    });
-  };
-
   const handleFanChange = async (e) => {
     const level = Number(e.target.value);
     setFanLevel(level);
@@ -102,7 +98,7 @@ export default function StovePanel() {
       method: 'POST',
       body: JSON.stringify({level}),
     });
-    await logAction('Set ventola', level);
+    await logStoveAction.setFan(level);
   };
 
   const handlePowerChange = async (e) => {
@@ -112,20 +108,20 @@ export default function StovePanel() {
       method: 'POST',
       body: JSON.stringify({level}),
     });
-    await logAction('Set potenza', level);
+    await logStoveAction.setPower(level);
   };
 
   const handleIgnite = async () => {
     setLoading(true);
     await fetch(STOVE_ROUTES.ignite, {method: 'POST'});
-    await logAction('Accensione');
+    await logStoveAction.ignite();
     setLoading(false);
   };
 
   const handleShutdown = async () => {
     setLoading(true);
     await fetch(STOVE_ROUTES.shutdown, {method: 'POST'});
-    await logAction('Spegnimento');
+    await logStoveAction.shutdown();
     setLoading(false);
   };
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { saveSchedule, getWeeklySchedule, setSchedulerMode, getFullSchedulerMode, clearSemiManualMode, getNextScheduledChange, setSemiManualMode } from '@/lib/schedulerService';
+import { logSchedulerAction } from '@/lib/logService';
 
 const daysOfWeek = [
   'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'
@@ -35,7 +36,7 @@ export default function WeeklyScheduler() {
     fetchData();
   }, []);
 
-  const addTimeRange = (day) => {
+  const addTimeRange = async (day) => {
     const daySchedule = schedule[day];
     const lastEnd = daySchedule.length ? daySchedule[daySchedule.length - 1].end : '00:00';
     if (lastEnd >= '23:59') return;
@@ -49,7 +50,8 @@ export default function WeeklyScheduler() {
       [day]: [...daySchedule, newRange],
     };
     setSchedule(updatedSchedule);
-    saveSchedule(day, updatedSchedule[day]);
+    await saveSchedule(day, updatedSchedule[day]);
+    await logSchedulerAction.addInterval(day);
   };
 
   const incrementTime = (time, minutesToAdd) => {
@@ -79,6 +81,7 @@ export default function WeeklyScheduler() {
     const updatedSchedule = { ...schedule, [day]: updated };
     setSchedule(updatedSchedule);
     await saveSchedule(day, updated);
+    await logSchedulerAction.updateSchedule(day);
 
     // Se siamo in semi-manuale, aggiorna il returnToAutoAt
     if (semiManualMode) {
@@ -94,10 +97,12 @@ export default function WeeklyScheduler() {
     const newMode = !schedulerEnabled;
     setSchedulerEnabled(newMode);
     await setSchedulerMode(newMode);
+    await logSchedulerAction.toggleMode(newMode);
 
     // Reset semi-manual quando si cambia modalità manualmente
     if (semiManualMode) {
       await clearSemiManualMode();
+      await logSchedulerAction.clearSemiManual();
       setSemiManualModeState(false);
       setReturnToAutoAt(null);
     }
@@ -297,11 +302,12 @@ export default function WeeklyScheduler() {
 
                     {/* Pulsante rimuovi */}
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         const updated = schedule[day].filter((_, i) => i !== index);
                         const updatedSchedule = { ...schedule, [day]: updated };
                         setSchedule(updatedSchedule);
-                        saveSchedule(day, updated);
+                        await saveSchedule(day, updated);
+                        await logSchedulerAction.removeInterval(day, index);
                       }}
                       className="p-3 text-xl text-primary-600 hover:bg-primary-50 rounded-xl transition-colors duration-200 border border-primary-200"
                       title="Rimuovi intervallo"

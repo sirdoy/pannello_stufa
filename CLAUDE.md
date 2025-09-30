@@ -34,9 +34,13 @@ This is a Next.js 15 PWA application called "Pannello Stufa" (Stove Panel) that 
   - Manual/Automatic mode toggle
   - Semi-manual status display with return time
   - Firebase integration for schedule persistence
-- `/log` (`app/log/page.js`) - Historical logs viewer
-  - Display of stove operation logs from Firebase
-  - Timestamped entries of all actions
+- `/log` (`app/log/page.js`) - User action logs viewer
+  - Real-time display of all user actions from Firebase
+  - Shows user information (name/email, avatar)
+  - Timestamped entries with action details
+  - Icons for different action types (🔥 ignite, ❄️ shutdown, 💨 fan, ⚡ power, ⏰ scheduler, 🌡️ netatmo, 📅 intervals)
+  - Pagination (50 entries per page)
+  - Reverse chronological order (newest first)
 - `/netatmo/authorized` (`app/netatmo/authorized/page.js`) - Netatmo OAuth success page
   - Confirmation page after Netatmo authorization
   - Shows authorization status
@@ -100,9 +104,13 @@ All API routes are in `app/api/` with the following organization:
   - Uses `Europe/Rome` timezone for scheduling
 
 #### Logging (`/api/log/*`)
-- `POST /api/log/add` - Add log entry to Firebase
-  - Body: Any JSON object with log data
-  - Adds timestamp automatically
+- `POST /api/log/add` - Add user action log entry to Firebase
+  - Body: `{ action: string, value?: any, ...metadata }`
+  - Automatically adds:
+    - `timestamp`: Current timestamp (Date.now())
+    - `user`: Auth0 user object with email, name, picture, sub
+    - `source`: Always 'user' for manual actions
+  - Only tracks manual user actions (not automated scheduler actions)
   - Saves to `log/` path in Firebase
 
 #### User Management (`/api/user/*`)
@@ -115,6 +123,19 @@ All API routes are in `app/api/` with the following organization:
 - **Firebase Realtime Database** (`lib/firebase.js`) - Used for logging stove operations and scheduler data storage
 - **Auth0** - User authentication and session management with middleware protection
 - **Netatmo API** - Temperature monitoring from smart thermostats
+
+### Logging System
+- **Log Service** (`lib/logService.js`) - Centralized logging service for user actions
+  - `logUserAction(action, value?, metadata?)` - Generic logging function
+  - `logStoveAction` - Pre-configured functions for stove operations:
+    - `ignite()`, `shutdown()`, `setFan(level)`, `setPower(level)`
+  - `logSchedulerAction` - Pre-configured functions for scheduler operations:
+    - `toggleMode(enabled)`, `updateSchedule(day)`, `addInterval(day)`, `removeInterval(day, index)`, `clearSemiManual()`
+  - `logNetatmoAction` - Pre-configured functions for Netatmo operations:
+    - `connect()`, `disconnect()`, `selectDevice(deviceId)`
+  - All logs automatically include Auth0 user information (email, name, picture, sub)
+  - Only tracks manual user actions, not automated scheduler actions
+  - Usage: `import { logStoveAction } from '@/lib/logService'`
 
 ### Route Management System
 - **Route Configuration** (`lib/routes.js`) - Centralized API route definitions
@@ -162,8 +183,18 @@ All API routes are in `app/api/` with the following organization:
   - `timestamp`: when mode was last changed
   - `semiManual`: boolean (temporary manual override)
   - `returnToAutoAt`: ISO timestamp for automatic return to scheduled mode
+- `log/` - User action logs with full traceability:
+  - `action`: Description of the action performed
+  - `value`: Optional value associated with action (e.g., fan level)
+  - `timestamp`: Unix timestamp (Date.now())
+  - `user`: Auth0 user object:
+    - `email`: User email address
+    - `name`: User display name
+    - `picture`: User avatar URL
+    - `sub`: Auth0 user ID
+  - `source`: Always 'user' for manual actions
+  - Additional metadata fields (e.g., `day` for scheduler actions)
 - Firebase uses client SDK for all operations (no Admin SDK currently)
-- `stoveLogs/` - Historical logs of all stove operations with timestamps
 
 ### Key Configuration
 - PWA enabled via `next-pwa` plugin (disabled in development)

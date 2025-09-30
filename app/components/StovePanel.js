@@ -161,109 +161,155 @@ export default function StovePanel() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      {/* Status Card */}
-      <Card className={`p-6 space-y-4 border-2 transition-all duration-300 ${getStatusBgColor(status)}`}>
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-neutral-900">Stato Stufa</h2>
-          <button
-            onClick={handleManualRefresh}
-            disabled={refreshing}
-            className="p-2 rounded-xl hover:bg-white/50 transition-all duration-200 disabled:opacity-50"
-            title="Aggiorna stato"
-          >
-            <span className={`text-2xl inline-block ${refreshing ? 'animate-spin' : ''}`}>
-              {refreshing ? '⏳' : '🔄'}
-            </span>
-          </button>
-        </div>
+    <div className="max-w-7xl mx-auto space-y-6">
+      {/* Hero Section - Stato */}
+      <Card className={`p-8 border-2 transition-all duration-300 ${getStatusBgColor(status)}`}>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-3xl font-bold text-neutral-900">🔥 Stato Stufa</h2>
+            <button
+              onClick={handleManualRefresh}
+              disabled={refreshing}
+              className="p-2 rounded-xl hover:bg-white/50 transition-all duration-200 disabled:opacity-50"
+              title="Aggiorna stato"
+            >
+              <span className={`text-2xl inline-block ${refreshing ? 'animate-spin' : ''}`}>
+                {refreshing ? '⏳' : '🔄'}
+              </span>
+            </button>
+          </div>
 
-        <StatusBadge status={status} />
+          <div className="flex items-center justify-center py-4">
+            <StatusBadge status={status} size="lg" />
+          </div>
 
-        {/* Modalità controllo */}
-        <div className="pt-4 border-t border-neutral-200">
-          <ModeIndicator
-            enabled={schedulerEnabled}
-            semiManual={semiManualMode}
-            returnToAutoAt={returnToAutoAt}
-            onConfigClick={() => router.push('/scheduler')}
-          />
-        </div>
-
-        {/* Temperatura */}
-        {ambientTemp !== null && (
           <div className="pt-4 border-t border-neutral-200">
-            <div className="flex items-center justify-center gap-3">
-              <span className="text-3xl">🌡️</span>
-              <div className="text-center">
-                <p className="text-3xl font-bold text-info-600">{ambientTemp.toFixed(1)}°C</p>
-                <p className="text-xs text-neutral-500">Temperatura ambiente</p>
+            <ModeIndicator
+              enabled={schedulerEnabled}
+              semiManual={semiManualMode}
+              returnToAutoAt={returnToAutoAt}
+              onConfigClick={() => router.push('/scheduler')}
+              showConfigButton={true}
+            />
+          </div>
+        </div>
+      </Card>
+
+      {/* Controlli Principali - Grid responsive */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Quick Actions */}
+        <Card className="p-8">
+          <h3 className="text-2xl font-bold text-neutral-900 mb-6">⚡ Azioni Rapide</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <Button
+              variant="success"
+              size="lg"
+              icon="🔥"
+              onClick={handleIgnite}
+              disabled={loading || isAccesa}
+              className="h-24 text-lg"
+            >
+              Accendi
+            </Button>
+            <Button
+              variant="danger"
+              size="lg"
+              icon="❄️"
+              onClick={handleShutdown}
+              disabled={loading || isSpenta}
+              className="h-24 text-lg"
+            >
+              Spegni
+            </Button>
+          </div>
+
+          {/* Indicatore stato azione */}
+          {isAccesa && (
+            <div className="mt-4 p-3 bg-success-50 border border-success-200 rounded-xl text-center">
+              <p className="text-sm font-medium text-success-700">✓ Stufa in funzione</p>
+            </div>
+          )}
+          {isSpenta && (
+            <div className="mt-4 p-3 bg-neutral-50 border border-neutral-200 rounded-xl text-center">
+              <p className="text-sm font-medium text-neutral-600">○ Stufa spenta</p>
+            </div>
+          )}
+        </Card>
+
+        {/* Livelli */}
+        <Card className="p-8">
+          <h3 className="text-2xl font-bold text-neutral-900 mb-6">⚙️ Regolazioni</h3>
+          <div className="space-y-4">
+            <Select
+              label="💨 Livello Ventilazione"
+              value={fanLevel ?? ''}
+              onChange={handleFanChange}
+              options={fanOptions}
+              className="text-lg py-4"
+            />
+
+            <Select
+              label="⚡ Livello Potenza"
+              value={powerLevel ?? ''}
+              onChange={handlePowerChange}
+              options={powerOptions}
+              className="text-lg py-4"
+            />
+
+            {/* Visualizzazione livelli attivi */}
+            <div className="mt-6 pt-4 border-t border-neutral-200 grid grid-cols-2 gap-4 text-center">
+              <div>
+                <p className="text-sm text-neutral-500 mb-1">Ventola</p>
+                <p className="text-2xl font-bold text-info-600">{fanLevel ?? '-'}/6</p>
+              </div>
+              <div>
+                <p className="text-sm text-neutral-500 mb-1">Potenza</p>
+                <p className="text-2xl font-bold text-accent-600">{powerLevel ?? '-'}/5</p>
               </div>
             </div>
           </div>
-        )}
-      </Card>
+        </Card>
+      </div>
 
-      {/* Controlli Card */}
-      <Card className="p-6 space-y-6">
-        <h3 className="text-xl font-bold text-neutral-900">Controlli</h3>
+      {/* Netatmo e Temperatura - Da implementare */}
+      <Card className="p-6 bg-neutral-50 border-dashed border-2 border-neutral-300">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🌐</span>
+            <div>
+              <h3 className="text-lg font-bold text-neutral-900">Netatmo</h3>
+              <p className="text-xs text-neutral-500">Gestione connessione termostato • In fase di sviluppo</p>
+            </div>
+          </div>
 
-        {/* Accendi/Spegni */}
-        <div className="grid grid-cols-2 gap-4">
-          <Button
-            variant="success"
-            size="lg"
-            icon="🔥"
-            onClick={handleIgnite}
-            disabled={loading || isAccesa}
-          >
-            Accendi
-          </Button>
-          <Button
-            variant="danger"
-            size="lg"
-            icon="❄️"
-            onClick={handleShutdown}
-            disabled={loading || isSpenta}
-          >
-            Spegni
-          </Button>
-        </div>
+          {/* Temperatura placeholder */}
+          {ambientTemp !== null && (
+            <div className="pt-4 border-t border-neutral-300">
+              <div className="flex items-center justify-center gap-3 py-2">
+                <span className="text-3xl">🌡️</span>
+                <div className="text-center">
+                  <p className="text-3xl font-bold text-info-600">{ambientTemp.toFixed(1)}°C</p>
+                  <p className="text-xs text-neutral-500">Temperatura ambiente</p>
+                </div>
+              </div>
+            </div>
+          )}
 
-        {/* Livelli */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Select
-            label="💨 Livello Ventilazione"
-            value={fanLevel ?? ''}
-            onChange={handleFanChange}
-            options={fanOptions}
-          />
-
-          <Select
-            label="⚡ Livello Potenza"
-            value={powerLevel ?? ''}
-            onChange={handlePowerChange}
-            options={powerOptions}
-          />
-        </div>
-      </Card>
-
-      {/* Netatmo Card */}
-      <Card className="p-6">
-        <h3 className="text-lg font-bold text-neutral-900 mb-4">Connessione Netatmo</h3>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={handleNetatmoLogin}
-            className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-info-600 hover:bg-info-50 border border-info-200 transition-colors duration-200"
-          >
-            🔗 Riconnetti Netatmo
-          </button>
-          <button
-            onClick={handleNetatmoLogout}
-            className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-primary-600 hover:bg-primary-50 border border-primary-200 transition-colors duration-200"
-          >
-            🔌 Disconnetti Netatmo
-          </button>
+          {/* Pulsanti connessione */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            <button
+              onClick={handleNetatmoLogin}
+              className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-info-600 hover:bg-info-50 border border-info-200 transition-colors duration-200"
+            >
+              🔗 Riconnetti Netatmo
+            </button>
+            <button
+              onClick={handleNetatmoLogout}
+              className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-primary-600 hover:bg-primary-50 border border-primary-200 transition-colors duration-200"
+            >
+              🔌 Disconnetti Netatmo
+            </button>
+          </div>
         </div>
       </Card>
     </div>

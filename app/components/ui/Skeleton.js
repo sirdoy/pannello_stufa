@@ -46,48 +46,76 @@ Skeleton.Card = function SkeletonCard({ children, className = '', ...props }) {
 };
 
 /**
- * Skeleton.StovePanel - Skeleton for StovePanel component
+ * Skeleton.StovePanel - Skeleton for StovePanel component (new dashboard layout)
  */
 Skeleton.StovePanel = function SkeletonStovePanel() {
   return (
-    <div className="space-y-6">
-      {/* Scheduler Mode Indicator */}
-      <Skeleton.Card>
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-10 w-10 rounded-lg" />
-          <div className="flex-1">
-            <Skeleton className="h-5 w-32 mb-2" />
-            <Skeleton className="h-4 w-48" />
+    <div className="max-w-7xl mx-auto space-y-6">
+      {/* Hero Section - Stato */}
+      <Skeleton.Card className="p-8">
+        <div className="flex items-center justify-between mb-6">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-10 w-10 rounded-xl" />
+        </div>
+        <Skeleton className="h-16 w-full mb-6" />
+        <div className="pt-4 border-t border-neutral-200">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-10 w-10 rounded-lg" />
+            <div className="flex-1">
+              <Skeleton className="h-5 w-32 mb-2" />
+              <Skeleton className="h-4 w-48" />
+            </div>
           </div>
         </div>
       </Skeleton.Card>
 
-      {/* Status Card */}
-      <Skeleton.Card>
-        <Skeleton className="h-6 w-40 mb-4" />
-        <div className="space-y-3">
+      {/* Controlli - Grid 2 colonne */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Azioni Rapide */}
+        <Skeleton.Card className="p-8">
+          <Skeleton className="h-7 w-40 mb-6" />
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <Skeleton className="h-24" />
+            <Skeleton className="h-24" />
+          </div>
           <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
-        </div>
-      </Skeleton.Card>
+        </Skeleton.Card>
 
-      {/* Controls Card */}
-      <Skeleton.Card>
-        <Skeleton className="h-6 w-32 mb-4" />
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <Skeleton className="h-12" />
-          <Skeleton className="h-12" />
-        </div>
-        <div className="space-y-3">
-          <Skeleton className="h-20" />
-          <Skeleton className="h-20" />
-        </div>
-      </Skeleton.Card>
+        {/* Regolazioni */}
+        <Skeleton.Card className="p-8">
+          <Skeleton className="h-7 w-40 mb-6" />
+          <div className="space-y-4">
+            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-20 w-full" />
+            <div className="mt-6 pt-4 border-t border-neutral-200 grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <Skeleton className="h-4 w-16 mx-auto mb-1" />
+                <Skeleton className="h-8 w-12 mx-auto" />
+              </div>
+              <div className="text-center">
+                <Skeleton className="h-4 w-16 mx-auto mb-1" />
+                <Skeleton className="h-8 w-12 mx-auto" />
+              </div>
+            </div>
+          </div>
+        </Skeleton.Card>
+      </div>
 
-      {/* Netatmo Card */}
-      <Skeleton.Card>
-        <Skeleton className="h-6 w-48 mb-4" />
-        <Skeleton className="h-16 w-full" />
+      {/* Netatmo */}
+      <Skeleton.Card className="p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-8 w-8 rounded-lg" />
+            <div>
+              <Skeleton className="h-5 w-24 mb-1" />
+              <Skeleton className="h-3 w-48" />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-24" />
+            <Skeleton className="h-10 w-24" />
+          </div>
+        </div>
       </Skeleton.Card>
     </div>
   );

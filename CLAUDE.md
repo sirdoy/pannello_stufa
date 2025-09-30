@@ -16,10 +16,17 @@ This is a Next.js 15 PWA application called "Pannello Stufa" (Stove Panel) that 
 ## Architecture
 
 ### Core Components
-- **StovePanel** (`app/components/StovePanel.js`) - Main control interface with real-time status updates, separated into status card, controls card, and Netatmo connection card
+- **StovePanel** (`app/components/StovePanel.js`) - Main control interface with dashboard layout
+  - **Layout**: Modern dashboard with hero section (status card), 2-column grid (actions + settings), and Netatmo footer
+  - **Hero Section**: Full-width status card with state badge, mode indicator, and refresh button
+  - **Quick Actions Card**: Large buttons (h-24) for ignite/shutdown with visual feedback (✓ in funzione / ○ spenta)
+  - **Regolazioni Card**: Fan and power controls with live display showing current levels (X/6, X/5)
+  - **Netatmo Section**: Bottom card with dashed border indicating "work in progress", shows temperature if available
   - Uses: Card, Button, Select, StatusBadge, ModeIndicator, Skeleton
   - Implements loading state with `initialLoading` flag
   - Shows `Skeleton.StovePanel` until all initial data (status, fan, power, scheduler mode) is fetched
+  - Responsive: Full dashboard on desktop (max-w-7xl), stacked on mobile
+  - Real-time status polling every 5 seconds
 - **Navbar** (`app/components/Navbar.js`) - Navigation with Auth0 integration, glassmorphism design with backdrop blur
 
 ### Reusable UI Components (`app/components/ui/`)
@@ -143,13 +150,18 @@ import { LogEntry } from '@/app/components/log';
 
 ### Pages
 - `/` (`app/page.js`) - Main StovePanel interface for controlling the stove
+  - **Dashboard Layout**:
+    - Hero: Full-width status card with badge, mode indicator, refresh button
+    - Grid: 2 columns on desktop (Quick Actions + Regolazioni), stacked on mobile
+    - Footer: Netatmo card (dashed border, "in development" style)
   - Real-time status polling every 5 seconds
-  - Ignite/shutdown buttons
-  - Fan (1-6) and power (1-5) level controls for manual operation
-  - Netatmo temperature display and connection management
+  - **Quick Actions**: Large ignite/shutdown buttons with visual status feedback
+  - **Regolazioni**: Fan (1-6) and power (0-5) controls with live level display
+  - Netatmo temperature display (if available) and connection management in bottom section
   - Scheduler mode indicator with link to scheduler page
   - Force dynamic rendering for real-time data
   - **Loading state**: Shows `Skeleton.StovePanel` during initial data fetch
+  - Responsive: max-w-7xl container, grid adapts mobile/desktop
   - Note: Power level 0 available in manual control (allows setting stove to standby while on)
 - `/scheduler` (`app/scheduler/page.js`) - Weekly schedule configuration
   - Weekly timeline view (7 days × 24 hours) with interactive TimeBar
@@ -409,7 +421,7 @@ The application follows a **balanced component approach**:
 
 When modifying components, maintain these design principles:
 - **Mobile-first**: Always design for mobile screens first, then scale up
-- **Consistent spacing**: Use Tailwind spacing scale (gap-2, gap-4, p-6, etc.)
+- **Consistent spacing**: Use Tailwind spacing scale (gap-2, gap-4, p-6, p-8, etc.)
 - **Icon usage**: Emoji icons throughout for visual clarity and simplicity
 - **Color semantics**: Follow the design system colors for consistent meaning
 - **Smooth transitions**: All interactive elements should have `transition-all duration-200`
@@ -417,6 +429,13 @@ When modifying components, maintain these design principles:
 - **Active states**: Buttons should have hover, active, and disabled states clearly defined
 - **Accessibility**: Maintain proper contrast ratios and semantic HTML
 - **Reusable components**: Always use existing UI components from `app/components/ui/` instead of duplicating styles
+- **Visual hierarchy**: Use size and spacing to create clear information hierarchy
+  - Hero sections: Large text (text-3xl), prominent icons (text-6xl), ample padding (p-8)
+  - Action buttons: Increased height for touch targets (h-24 for primary actions)
+  - Status feedback: Immediate visual confirmation below actions (✓/○ indicators)
+  - Live data display: Large numbers with labels (text-2xl for values, text-sm for labels)
+- **Dashboard layouts**: Use responsive grids (lg:grid-cols-2, lg:grid-cols-3) with mobile stacking
+- **Development states**: Mark incomplete features with dashed borders and "In fase di sviluppo" labels
 - **Loading states**: All pages/components that fetch external data should implement skeleton loading states
   - Use component-specific skeletons (`Skeleton.StovePanel`, `Skeleton.Scheduler`, `Skeleton.LogPage`)
   - Loading states should occupy the exact space of the final content

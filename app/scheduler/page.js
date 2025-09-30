@@ -30,7 +30,8 @@ export default function WeeklyScheduler() {
       try {
         const data = await getWeeklySchedule();
         const filledData = daysOfWeek.reduce((acc, day) => {
-          acc[day] = data[day] || [];
+          // Ordina gli intervalli caricati da Firebase
+          acc[day] = sortIntervals(data[day] || []);
           return acc;
         }, {});
         setSchedule(filledData);
@@ -48,26 +49,33 @@ export default function WeeklyScheduler() {
 
   const addTimeRange = async (day) => {
     const daySchedule = schedule[day];
-    const lastEnd = daySchedule.length ? daySchedule[daySchedule.length - 1].end : '00:00';
+
+    // Trova l'ultimo intervallo in ordine temporale
+    const sorted = sortIntervals(daySchedule);
+    const lastEnd = sorted.length ? sorted[sorted.length - 1].end : '00:00';
+
     if (lastEnd >= '23:59') return;
 
     const newStart = lastEnd;
     const newEnd = incrementTime(lastEnd, 30);
     const newRange = { start: newStart, end: newEnd, power: 2, fan: 3 };
 
+    // Aggiungi e ordina
+    const newSchedule = sortIntervals([...daySchedule, newRange]);
+
     const updatedSchedule = {
       ...schedule,
-      [day]: [...daySchedule, newRange],
+      [day]: newSchedule,
     };
     setSchedule(updatedSchedule);
-    await saveSchedule(day, updatedSchedule[day]);
+    await saveSchedule(day, newSchedule);
     await logSchedulerAction.addInterval(day);
   };
 
   const incrementTime = (time, minutesToAdd) => {
     const [h, m] = time.split(':').map(Number);
     const total = h * 60 + m + minutesToAdd;
-    const newH = String(Math.floor(total / 60)).padStart(2, '0');
+    const newH = String(Math.floor(total / 60) % 24).padStart(2, '0');
     const newM = String(total % 60).padStart(2, '0');
     return `${newH}:${newM}`;
   };
@@ -76,29 +84,104 @@ export default function WeeklyScheduler() {
     return start < end;
   };
 
-  const handleChange = async (day, index, field, value) => {
-    const updated = [...schedule[day]];
-    updated[index][field] = value;
+  // Ordina gli intervalli per orario di inizio
+  const sortIntervals = (intervals) => {
+    return [...intervals].sort((a, b) => {
+      if (a.start < b.start) return -1;
+      if (a.start > b.start) return 1;
+      return 0;
+    });
+  };
 
-    const { start, end } = updated[index];
-    if (field === 'start' || field === 'end') {
-      if (!isValidRange(start, end)) {
-        alert('L\'orario di fine deve essere successivo all\'orario di inizio.');
-        return;
+  // Applica collegamento tra intervalli adiacenti e rimuove sovrapposizioni
+  const applyAdjacentLinksAndRemoveOverlaps = (intervals, changedIndex, originalStart, originalEnd, field) => {
+    let result = [...intervals];
+    const changedInterval = result[changedIndex];
+
+    // 1. Collegamento bidirezionale con intervalli adiacenti
+    result = result.map((interval, idx) => {
+      // Non modificare l'intervallo che abbiamo cambiato
+      if (idx === changedIndex) return interval;
+
+      // Se questo intervallo terminava esattamente dove iniziava quello modificato
+      // E abbiamo modificato lo start di quello cambiato
+      if (field === 'start' && interval.end === originalStart) {
+        return { ...interval, end: changedInterval.start };
       }
+
+      // Se questo intervallo iniziava esattamente dove terminava quello modificato
+      // E abbiamo modificato l'end di quello cambiato
+      if (field === 'end' && interval.start === originalEnd) {
+        return { ...interval, start: changedInterval.end };
+      }
+
+      return interval;
+    });
+
+    // 2. Rimuovi intervalli completamente sovrapposti
+    result = result.filter((interval, idx) => {
+      // Non rimuovere l'intervallo che abbiamo modificato
+      if (idx === changedIndex) return true;
+
+      // Rimuovi se l'intervallo è completamente contenuto in quello modificato
+      const isCompletelyOverlapped =
+        interval.start >= changedInterval.start &&
+        interval.end <= changedInterval.end;
+
+      return !isCompletelyOverlapped;
+    });
+
+    return result;
+  };
+
+  const handleChange = async (day, index, field, value, isBlur = false) => {
+    const originalSchedule = schedule[day];
+    const originalInterval = originalSchedule[index];
+    const originalStart = originalInterval.start;
+    const originalEnd = originalInterval.end;
+
+    let updated = [...originalSchedule];
+    updated[index] = { ...updated[index], [field]: value };
+
+    // Validazione e aggiustamento orari (solo al blur per i campi time)
+    if (isBlur && (field === 'start' || field === 'end')) {
+      let { start, end } = updated[index];
+
+      // Validazione: end deve essere > start di almeno 15 minuti
+      if (end <= start) {
+        end = incrementTime(start, 15);
+        updated[index].end = end;
+      }
+
+      // Applica collegamento con adiacenti e rimuovi sovrapposizioni
+      updated = applyAdjacentLinksAndRemoveOverlaps(
+        updated,
+        index,
+        originalStart,
+        originalEnd,
+        field
+      );
     }
 
-    const updatedSchedule = { ...schedule, [day]: updated };
-    setSchedule(updatedSchedule);
-    await saveSchedule(day, updated);
-    await logSchedulerAction.updateSchedule(day);
+    // Ordina gli intervalli
+    const sorted = sortIntervals(updated);
 
-    // Se siamo in semi-manuale, aggiorna il returnToAutoAt
-    if (semiManualMode) {
-      const nextChange = await getNextScheduledChange();
-      if (nextChange) {
-        await setSemiManualMode(nextChange);
-        setReturnToAutoAt(nextChange);
+    // Aggiorna lo stato con ordinamento
+    const updatedSchedule = { ...schedule, [day]: sorted };
+    setSchedule(updatedSchedule);
+
+    // Salva su Firebase solo al blur
+    if (isBlur) {
+      await saveSchedule(day, sorted);
+      await logSchedulerAction.updateSchedule(day);
+
+      // Se siamo in semi-manuale, aggiorna il returnToAutoAt
+      if (semiManualMode) {
+        const nextChange = await getNextScheduledChange();
+        if (nextChange) {
+          await setSemiManualMode(nextChange);
+          setReturnToAutoAt(nextChange);
+        }
       }
     }
   };
@@ -161,7 +244,7 @@ export default function WeeklyScheduler() {
             await saveSchedule(day, updated);
             await logSchedulerAction.removeInterval(day, index);
           }}
-          onChangeInterval={(index, field, value) => handleChange(day, index, field, value)}
+          onChangeInterval={(index, field, value, isBlur) => handleChange(day, index, field, value, isBlur)}
         />
       ))}
     </div>

@@ -1,5 +1,23 @@
-export default function TimeBar({ intervals }) {
+import { useState } from 'react';
+
+export default function TimeBar({ intervals, hoveredIndex, selectedIndex, onHover, onClick }) {
   const totalMinutes = 24 * 60;
+  const [tooltipData, setTooltipData] = useState(null);
+
+  const handleMouseEnter = (index, range, event) => {
+    onHover(index);
+    const rect = event.currentTarget.getBoundingClientRect();
+    setTooltipData({
+      range,
+      x: rect.left + rect.width / 2,
+      y: rect.top - 10,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    onHover(null);
+    setTooltipData(null);
+  };
 
   return (
     <div className="relative w-full mb-8">
@@ -12,16 +30,49 @@ export default function TimeBar({ intervals }) {
           const end = endH * 60 + endM;
           const left = (start / totalMinutes) * 100;
           const width = ((end - start) / totalMinutes) * 100;
+          const isActive = idx === hoveredIndex || idx === selectedIndex;
+
           return (
             <div
               key={idx}
-              className="absolute top-0 bottom-0 bg-gradient-to-r from-primary-400 to-accent-500 hover:from-primary-500 hover:to-accent-600 transition-all duration-200 cursor-pointer"
+              className={`absolute top-0 bottom-0 transition-all duration-200 cursor-pointer ${
+                isActive
+                  ? 'bg-gradient-to-r from-primary-500 to-accent-600 scale-y-110 z-10 shadow-lg'
+                  : 'bg-gradient-to-r from-primary-400 to-accent-500 hover:from-primary-500 hover:to-accent-600'
+              }`}
               style={{ left: `${left}%`, width: `${width}%` }}
-              title={`Accesa: ${range.start} - ${range.end} (P:${range.power} F:${range.fan})`}
+              onMouseEnter={(e) => handleMouseEnter(idx, range, e)}
+              onMouseLeave={handleMouseLeave}
+              onClick={() => onClick(idx)}
             />
           );
         })}
       </div>
+
+      {/* Tooltip */}
+      {tooltipData && (
+        <div
+          className="fixed z-50 bg-neutral-900 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-xl border border-neutral-700 pointer-events-none"
+          style={{
+            left: `${tooltipData.x}px`,
+            top: `${tooltipData.y}px`,
+            transform: 'translate(-50%, -100%)',
+          }}
+        >
+          <div className="space-y-1">
+            <div>⏰ {tooltipData.range.start} - {tooltipData.range.end}</div>
+            <div className="flex gap-3">
+              <span>⚡ Potenza: {tooltipData.range.power}</span>
+              <span>💨 Ventola: {tooltipData.range.fan}</span>
+            </div>
+          </div>
+          {/* Freccia del tooltip */}
+          <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-full">
+            <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-neutral-900"></div>
+          </div>
+        </div>
+      )}
+
       {/* Etichette orari sopra/sotto - nascosti su mobile molto piccolo */}
       {intervals.length > 0 && (
         <div className="relative w-full hidden xs:block">

@@ -5,6 +5,10 @@ export default function ScheduleInterval({
   range,
   onRemove,
   onChange,
+  isHighlighted = false,
+  onMouseEnter,
+  onMouseLeave,
+  onClick,
 }) {
   const powerOptions = [0, 1, 2, 3, 4, 5].map(p => ({
     value: p,
@@ -17,7 +21,16 @@ export default function ScheduleInterval({
   }));
 
   return (
-    <div className="bg-neutral-50 rounded-xl p-4 border border-neutral-200 hover:border-neutral-300 transition-colors duration-200">
+    <div
+      className={`rounded-xl p-4 border transition-all duration-200 cursor-pointer ${
+        isHighlighted
+          ? 'bg-primary-50 border-primary-400 shadow-lg scale-[1.02] ring-2 ring-primary-200'
+          : 'bg-neutral-50 border-neutral-200 hover:border-neutral-300 hover:shadow-md'
+      }`}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      onClick={onClick}
+    >
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Orari */}
         <div className="flex flex-col sm:flex-row gap-3 flex-1">
@@ -26,7 +39,8 @@ export default function ScheduleInterval({
             <input
               type="time"
               value={range.start}
-              onChange={(e) => onChange('start', e.target.value)}
+              onChange={(e) => onChange('start', e.target.value, false)}
+              onBlur={(e) => onChange('start', e.target.value, true)}
               className="input-modern text-sm"
             />
           </div>
@@ -36,7 +50,8 @@ export default function ScheduleInterval({
             <input
               type="time"
               value={range.end}
-              onChange={(e) => onChange('end', e.target.value)}
+              onChange={(e) => onChange('end', e.target.value, false)}
+              onBlur={(e) => onChange('end', e.target.value, true)}
               className="input-modern text-sm"
             />
           </div>
@@ -48,7 +63,8 @@ export default function ScheduleInterval({
             <label className="block text-xs font-semibold text-neutral-700 mb-1">⚡ Potenza</label>
             <select
               value={range.power}
-              onChange={(e) => onChange('power', Number(e.target.value))}
+              onChange={(e) => onChange('power', Number(e.target.value), false)}
+              onBlur={(e) => onChange('power', Number(e.target.value), true)}
               className="select-modern text-sm"
             >
               {powerOptions.map(opt => (
@@ -61,7 +77,8 @@ export default function ScheduleInterval({
             <label className="block text-xs font-semibold text-neutral-700 mb-1">💨 Ventola</label>
             <select
               value={range.fan}
-              onChange={(e) => onChange('fan', Number(e.target.value))}
+              onChange={(e) => onChange('fan', Number(e.target.value), false)}
+              onBlur={(e) => onChange('fan', Number(e.target.value), true)}
               className="select-modern text-sm"
             >
               {fanOptions.map(opt => (

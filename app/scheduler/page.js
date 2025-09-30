@@ -143,46 +143,47 @@ export default function WeeklyScheduler() {
     let updated = [...originalSchedule];
     updated[index] = { ...updated[index], [field]: value };
 
-    // Validazione e aggiustamento orari (solo al blur per i campi time)
-    if (isBlur && (field === 'start' || field === 'end')) {
-      let { start, end } = updated[index];
+    if (isBlur) {
+      // Al blur: applica tutte le validazioni e salva
+      if (field === 'start' || field === 'end') {
+        let { start, end } = updated[index];
 
-      // Validazione: end deve essere > start di almeno 15 minuti
-      if (end <= start) {
-        end = incrementTime(start, 15);
-        updated[index].end = end;
+        // Validazione: end deve essere > start di almeno 15 minuti
+        if (end <= start) {
+          end = incrementTime(start, 15);
+          updated[index].end = end;
+        }
+
+        // Applica collegamento con adiacenti e rimuovi sovrapposizioni
+        updated = applyAdjacentLinksAndRemoveOverlaps(
+          updated,
+          index,
+          originalStart,
+          originalEnd,
+          field
+        );
       }
 
-      // Applica collegamento con adiacenti e rimuovi sovrapposizioni
-      updated = applyAdjacentLinksAndRemoveOverlaps(
-        updated,
-        index,
-        originalStart,
-        originalEnd,
-        field
-      );
-    }
+      // Ordina gli intervalli e salva (per tutti i campi al blur)
+      const sorted = sortIntervals(updated);
+      const updatedSchedule = { ...schedule, [day]: sorted };
+      setSchedule(updatedSchedule);
 
-    // Ordina gli intervalli
-    const sorted = sortIntervals(updated);
-
-    // Aggiorna lo stato con ordinamento
-    const updatedSchedule = { ...schedule, [day]: sorted };
-    setSchedule(updatedSchedule);
-
-    // Salva su Firebase solo al blur
-    if (isBlur) {
       await saveSchedule(day, sorted);
       await logSchedulerAction.updateSchedule(day);
 
       // Se siamo in semi-manuale, aggiorna il returnToAutoAt
-      if (semiManualMode) {
+      if (semiManualMode && (field === 'start' || field === 'end')) {
         const nextChange = await getNextScheduledChange();
         if (nextChange) {
           await setSemiManualMode(nextChange);
           setReturnToAutoAt(nextChange);
         }
       }
+    } else {
+      // Durante onChange (non blur), aggiorna solo lo stato locale senza ordinare né validare
+      const updatedSchedule = { ...schedule, [day]: updated };
+      setSchedule(updatedSchedule);
     }
   };
 

@@ -83,20 +83,28 @@ Modular component system for consistent UI across the application:
 ### Scheduler Components (`app/components/scheduler/`)
 Specialized components for weekly schedule management:
 
-- **TimeBar** (`TimeBar.js`) - 24-hour visual timeline
-  - Props: `intervals` (array of time ranges with start, end, power, fan)
-  - Shows colored bars for scheduled intervals
+- **TimeBar** (`TimeBar.js`) - 24-hour visual timeline with interactive features
+  - Props: `intervals`, `hoveredIndex`, `selectedIndex`, `onHover`, `onClick`
+  - Shows colored bars for scheduled intervals with hover/selection states
   - Displays time labels and reference hours
-  - Usage: `<TimeBar intervals={schedule[day]} />`
+  - **Interactive tooltip**: Shows interval details (time range, power, fan) on hover
+  - **Visual feedback**: Hovered/selected intervals scale up and change color
+  - **Click to select**: Click on interval bar to toggle persistent selection
+  - Usage: `<TimeBar intervals={schedule[day]} hoveredIndex={0} selectedIndex={1} onHover={setHover} onClick={handleClick} />`
 
 - **ScheduleInterval** (`ScheduleInterval.js`) - Single time interval editor
-  - Props: `range` (start, end, power, fan), `onRemove`, `onChange`
-  - Editable time inputs, power/fan selects, remove button
-  - Usage: `<ScheduleInterval range={interval} onRemove={handleRemove} onChange={handleChange} />`
+  - Props: `range`, `onRemove`, `onChange`, `isHighlighted`, `onMouseEnter`, `onMouseLeave`, `onClick`
+  - Editable time inputs (start/end), power (1-5) and fan (1-6) selects, remove button
+  - **Validation on blur**: Time inputs validate only when user leaves the field
+  - **Highlighted state**: Visual emphasis when hovered or selected (pink background, border, ring, scale)
+  - **Bidirectional sync**: Syncs with TimeBar for hover/selection states
+  - Usage: `<ScheduleInterval range={interval} isHighlighted={true} onRemove={handleRemove} onChange={handleChange} />`
 
-- **DayScheduleCard** (`DayScheduleCard.js`) - Complete day schedule card
+- **DayScheduleCard** (`DayScheduleCard.js`) - Complete day schedule card with state management
   - Props: `day`, `intervals`, `onAddInterval`, `onRemoveInterval`, `onChangeInterval`
+  - Manages hover and selection state for synchronization between TimeBar and ScheduleInterval cards
   - Combines TimeBar, list of ScheduleIntervals, and add button
+  - **State tracking**: `hoveredIndex` and `selectedIndex` for interactive highlighting
   - Usage: `<DayScheduleCard day="Lunedì" intervals={schedule['Lunedì']} onAddInterval={addInterval} onRemoveInterval={removeInterval} onChangeInterval={changeInterval} />`
 
 ### Log Components (`app/components/log/`)
@@ -127,18 +135,26 @@ import { LogEntry } from '@/app/components/log';
 - `/` (`app/page.js`) - Main StovePanel interface for controlling the stove
   - Real-time status polling every 5 seconds
   - Ignite/shutdown buttons
-  - Fan (1-6) and power (0-5) level controls
+  - Fan (1-6) and power (1-5) level controls for manual operation
   - Netatmo temperature display and connection management
   - Scheduler mode indicator with link to scheduler page
   - Force dynamic rendering for real-time data
   - **Loading state**: Shows `Skeleton.StovePanel` during initial data fetch
+  - Note: Power level 0 available in manual control (allows setting stove to standby while on)
 - `/scheduler` (`app/scheduler/page.js`) - Weekly schedule configuration
-  - Weekly timeline view (7 days × 24 hours)
+  - Weekly timeline view (7 days × 24 hours) with interactive TimeBar
   - Add/remove time intervals per day
-  - Configure power and fan levels per interval
+  - Configure power (1-5) and fan (1-6) levels per interval
   - Manual/Automatic mode toggle
   - Semi-manual status display with return time
   - Firebase integration for schedule persistence
+  - **Interactive features**:
+    - Hover on TimeBar or interval card to see tooltip and highlight both
+    - Click to toggle persistent selection
+    - Automatic interval sorting by start time
+    - Bidirectional linking of adjacent intervals (on blur)
+    - Automatic removal of completely overlapped intervals (on blur)
+    - Validation: minimum 15-minute interval duration (on blur)
   - **Loading state**: Shows `Skeleton.Scheduler` during initial data fetch
 - `/log` (`app/log/page.js`) - User action logs viewer
   - Real-time display of all user actions from Firebase
@@ -284,7 +300,9 @@ All API routes are in `app/api/` with the following organization:
 
 ### Firebase Structure
 - `stoveScheduler/{day}` - Weekly schedule data (Lunedì, Martedì, Mercoledì, Giovedì, Venerdì, Sabato, Domenica)
-  - Each day contains array of time ranges with: `start`, `end`, `power` (0-5), `fan` (1-6)
+  - Each day contains array of time ranges with: `start`, `end`, `power` (1-5), `fan` (1-6)
+  - Intervals are automatically sorted by start time before saving
+  - Note: Power level 0 not used in scheduler (stove would be off)
 - `stoveScheduler/mode` - Scheduler mode state object:
   - `enabled`: boolean (manual/automatic toggle)
   - `timestamp`: when mode was last changed
@@ -433,6 +451,58 @@ When modifying components, maintain these design principles:
   - Checks current time against schedule
   - Executes stove commands based on schedule
   - Respects manual mode (returns "MODALITA_MANUALE")
+
+### Scheduler Validation Logic
+The scheduler implements smart validation and synchronization rules:
+
+#### Interval Sorting
+- All intervals are automatically sorted by start time (ascending)
+- Sorting occurs at: data load from Firebase, after adding new interval, and on blur of time fields
+- During typing (onChange), no sorting to preserve input focus and avoid index shifts
+
+#### Time Validation (on blur only)
+- **Minimum duration**: End time must be > start time by at least 15 minutes
+- **Auto-increment**: If end ≤ start, end is automatically set to start + 15 minutes
+- Validation triggers only when user leaves the time field (onBlur), not during typing
+
+#### Adjacent Interval Linking (bidirectional, on blur only)
+When modifying time boundaries:
+- **Start time change**: If previous interval's end was equal to old start → previous end updates to new start
+- **End time change**: If next interval's start was equal to old end → next start updates to new end
+- **Gap creation allowed**: If you create a time gap between intervals, it stays (no automatic closing)
+- **Example**: Intervals 08:00-12:00 and 12:00-16:00
+  - Change first end to 13:00 → second becomes 13:00-16:00
+  - Change first end to 11:00 → second stays 12:00-16:00 (gap: 11:00-12:00)
+
+#### Overlap Detection and Removal (on blur only)
+- When an interval is extended to completely contain another interval, the contained one is automatically removed
+- **Example**: Intervals 08:00-12:00, 14:00-16:00, 18:00-20:00
+  - Extend first to 08:00-19:00 → middle interval (14:00-16:00) is deleted
+  - Last interval stays because only partially overlapped
+
+#### Power and Fan Levels
+- **Power**: Levels 1-5 (Level 0 removed from scheduler as stove would be off during scheduled operation)
+- **Fan**: Levels 1-6
+- Changes to power/fan trigger save on blur but don't affect time-based validations
+
+#### onChange vs onBlur Behavior
+- **onChange** (during typing):
+  - Updates local state only
+  - No validation
+  - No sorting
+  - No linking with adjacent intervals
+  - No Firebase save
+  - Visual feedback only
+
+- **onBlur** (when leaving field):
+  - Validates end > start (+15min minimum)
+  - Links adjacent intervals if applicable
+  - Removes completely overlapped intervals
+  - Sorts all intervals
+  - Saves to Firebase
+  - Updates semi-manual returnToAutoAt if in semi-manual mode (for time fields only)
+
+This design ensures smooth typing experience while maintaining data integrity.
 
 ## Security & Middleware
 

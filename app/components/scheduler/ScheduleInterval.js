@@ -10,7 +10,7 @@ export default function ScheduleInterval({
   onMouseLeave,
   onClick,
 }) {
-  const powerOptions = [0, 1, 2, 3, 4, 5].map(p => ({
+  const powerOptions = [1, 2, 3, 4, 5].map(p => ({
     value: p,
     label: `Livello ${p}`,
   }));

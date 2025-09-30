@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
 import { onValue, ref } from 'firebase/database';
 import Card from '@/app/components/ui/Card';
+import Skeleton from '@/app/components/ui/Skeleton';
 import LogEntry from '@/app/components/log/LogEntry';
 import Pagination from '@/app/components/ui/Pagination';
 
@@ -12,6 +13,7 @@ const PAGE_SIZE = 50;
 export default function LogPage() {
   const [log, setLog] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const logRef = ref(db, 'log');
@@ -20,6 +22,7 @@ export default function LogPage() {
       const data = snapshot.val();
       if (!data) {
         setLog([]);
+        setLoading(false);
         return;
       }
 
@@ -28,6 +31,7 @@ export default function LogPage() {
         .sort((a, b) => b.timestamp - a.timestamp); // Ordine inverso
 
       setLog(entries);
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -55,6 +59,10 @@ export default function LogPage() {
 
   const hasNext = startIndex + PAGE_SIZE < log.length;
   const hasPrev = currentPage > 0;
+
+  if (loading) {
+    return <Skeleton.LogPage />;
+  }
 
   return (
     <Card className="max-w-3xl mx-auto mt-10 p-6 space-y-6">

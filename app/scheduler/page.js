@@ -6,6 +6,7 @@ import { logSchedulerAction } from '@/lib/logService';
 import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
 import ModeIndicator from '@/app/components/ui/ModeIndicator';
+import Skeleton from '@/app/components/ui/Skeleton';
 import DayScheduleCard from '@/app/components/scheduler/DayScheduleCard';
 
 const daysOfWeek = [
@@ -22,20 +23,25 @@ export default function WeeklyScheduler() {
   const [schedulerEnabled, setSchedulerEnabled] = useState(false);
   const [semiManualMode, setSemiManualModeState] = useState(false);
   const [returnToAutoAt, setReturnToAutoAt] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getWeeklySchedule();
-      const filledData = daysOfWeek.reduce((acc, day) => {
-        acc[day] = data[day] || [];
-        return acc;
-      }, {});
-      setSchedule(filledData);
+      try {
+        const data = await getWeeklySchedule();
+        const filledData = daysOfWeek.reduce((acc, day) => {
+          acc[day] = data[day] || [];
+          return acc;
+        }, {});
+        setSchedule(filledData);
 
-      const mode = await getFullSchedulerMode();
-      setSchedulerEnabled(mode.enabled);
-      setSemiManualModeState(mode.semiManual || false);
-      setReturnToAutoAt(mode.returnToAutoAt || null);
+        const mode = await getFullSchedulerMode();
+        setSchedulerEnabled(mode.enabled);
+        setSemiManualModeState(mode.semiManual || false);
+        setReturnToAutoAt(mode.returnToAutoAt || null);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchData();
   }, []);
@@ -111,6 +117,10 @@ export default function WeeklyScheduler() {
       setReturnToAutoAt(null);
     }
   };
+
+  if (loading) {
+    return <Skeleton.Scheduler />;
+  }
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">

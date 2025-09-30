@@ -17,7 +17,9 @@ This is a Next.js 15 PWA application called "Pannello Stufa" (Stove Panel) that 
 
 ### Core Components
 - **StovePanel** (`app/components/StovePanel.js`) - Main control interface with real-time status updates, separated into status card, controls card, and Netatmo connection card
-  - Uses: Card, Button, Select, StatusBadge, ModeIndicator
+  - Uses: Card, Button, Select, StatusBadge, ModeIndicator, Skeleton
+  - Implements loading state with `initialLoading` flag
+  - Shows `Skeleton.StovePanel` until all initial data (status, fan, power, scheduler mode) is fetched
 - **Navbar** (`app/components/Navbar.js`) - Navigation with Auth0 integration, glassmorphism design with backdrop blur
 
 ### Reusable UI Components (`app/components/ui/`)
@@ -54,6 +56,30 @@ Modular component system for consistent UI across the application:
   - Props: `currentPage`, `totalPages`, `onPrevious`, `onNext`, `hasPrev`, `hasNext`
   - Usage: `<Pagination currentPage={0} totalPages={10} onPrevious={handlePrev} onNext={handleNext} hasPrev={true} hasNext={true} />`
 
+- **Skeleton** (`Skeleton.js`) - Loading placeholder component with shimmer animation
+  - Props: `className` (for generic skeleton), `children` (for Skeleton.Card)
+  - Pre-built specialized loaders:
+    - `Skeleton.StovePanel` - Full skeleton for StovePanel component (home page)
+    - `Skeleton.Scheduler` - Full skeleton for Scheduler page
+    - `Skeleton.LogPage` - Full skeleton for Log page
+    - `Skeleton.Card` - Card wrapper for custom skeleton content
+    - `Skeleton.LogEntry` - Single log entry skeleton
+  - Design: Gradient shimmer animation following app's neutral color palette
+  - Usage:
+    ```javascript
+    // Generic skeleton
+    <Skeleton className="h-8 w-32" />
+
+    // Page-specific skeleton (shown during data fetch)
+    if (loading) return <Skeleton.StovePanel />;
+
+    // Custom card skeleton
+    <Skeleton.Card>
+      <Skeleton className="h-6 w-1/2 mb-4" />
+      <Skeleton className="h-4 w-full" />
+    </Skeleton.Card>
+    ```
+
 ### Scheduler Components (`app/components/scheduler/`)
 Specialized components for weekly schedule management:
 
@@ -84,7 +110,7 @@ Components for user action log display:
 ### Component Export Structure
 All UI components are exported from `app/components/ui/index.js` for clean imports:
 ```javascript
-import { Card, Button, Select, StatusBadge, ModeIndicator, Pagination } from '@/app/components/ui';
+import { Card, Button, Select, StatusBadge, ModeIndicator, Pagination, Skeleton } from '@/app/components/ui';
 ```
 
 Scheduler components from `app/components/scheduler/index.js`:
@@ -105,6 +131,7 @@ import { LogEntry } from '@/app/components/log';
   - Netatmo temperature display and connection management
   - Scheduler mode indicator with link to scheduler page
   - Force dynamic rendering for real-time data
+  - **Loading state**: Shows `Skeleton.StovePanel` during initial data fetch
 - `/scheduler` (`app/scheduler/page.js`) - Weekly schedule configuration
   - Weekly timeline view (7 days × 24 hours)
   - Add/remove time intervals per day
@@ -112,6 +139,7 @@ import { LogEntry } from '@/app/components/log';
   - Manual/Automatic mode toggle
   - Semi-manual status display with return time
   - Firebase integration for schedule persistence
+  - **Loading state**: Shows `Skeleton.Scheduler` during initial data fetch
 - `/log` (`app/log/page.js`) - User action logs viewer
   - Real-time display of all user actions from Firebase
   - Shows user information (name/email, avatar)
@@ -119,6 +147,7 @@ import { LogEntry } from '@/app/components/log';
   - Icons for different action types (🔥 ignite, ❄️ shutdown, 💨 fan, ⚡ power, ⏰ scheduler, 🌡️ netatmo, 📅 intervals)
   - Pagination (50 entries per page)
   - Reverse chronological order (newest first)
+  - **Loading state**: Shows `Skeleton.LogPage` during initial data fetch from Firebase
 - `/netatmo/authorized` (`app/netatmo/authorized/page.js`) - Netatmo OAuth success page
   - Confirmation page after Netatmo authorization
   - Shows authorization status
@@ -293,6 +322,7 @@ Custom utility classes in `app/globals.css`:
 - `.card`: Modern white cards with soft shadow and border
 - `.btn-primary`, `.btn-secondary`: Consistent button styles
 - `.input-modern`, `.select-modern`: Form controls with custom styling
+- `@keyframes shimmer`: Animation for Skeleton loading states (1.5s ease-in-out infinite)
 - Gradient background on body for depth
 - Mobile-first responsive approach throughout
 
@@ -356,6 +386,11 @@ When modifying components, maintain these design principles:
 - **Active states**: Buttons should have hover, active, and disabled states clearly defined
 - **Accessibility**: Maintain proper contrast ratios and semantic HTML
 - **Reusable components**: Always use existing UI components from `app/components/ui/` instead of duplicating styles
+- **Loading states**: All pages/components that fetch external data should implement skeleton loading states
+  - Use component-specific skeletons (`Skeleton.StovePanel`, `Skeleton.Scheduler`, `Skeleton.LogPage`)
+  - Loading states should occupy the exact space of the final content
+  - Only show skeleton during initial data fetch, not on subsequent updates
+  - Pattern: Add `loading` state, show skeleton if `loading === true`, set to `false` in `finally` block
 
 ## Scheduler System
 

@@ -10,6 +10,7 @@ import Button from './ui/Button';
 import StatusBadge from './ui/StatusBadge';
 import ModeIndicator from './ui/ModeIndicator';
 import Select from './ui/Select';
+import Skeleton from './ui/Skeleton';
 
 export default function StovePanel() {
   const router = useRouter();
@@ -23,6 +24,7 @@ export default function StovePanel() {
   const [schedulerEnabled, setSchedulerEnabled] = useState(false);
   const [semiManualMode, setSemiManualMode] = useState(false);
   const [returnToAutoAt, setReturnToAutoAt] = useState(null);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const handleNetatmoLogout = async () => {
     sessionStorage.removeItem('netatmo_refresh_token');
@@ -81,6 +83,8 @@ export default function StovePanel() {
     } catch (err) {
       console.error('Errore stato:', err);
       setStatus('errore');
+    } finally {
+      setInitialLoading(false);
     }
   }, []);
 
@@ -151,6 +155,10 @@ export default function StovePanel() {
 
   const isAccesa = status?.includes('WORK') || status?.includes('START');
   const isSpenta = status?.includes('OFF') || status?.includes('ERROR') || status?.includes('WAIT');
+
+  if (initialLoading) {
+    return <Skeleton.StovePanel />;
+  }
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">

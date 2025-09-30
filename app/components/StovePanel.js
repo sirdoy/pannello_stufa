@@ -129,12 +129,21 @@ export default function StovePanel() {
   };
 
   const getStatusColor = (status) => {
-    if (!status) return 'text-gray-500';
-    if (status.includes('WORK')) return 'text-green-600';
-    if (status.includes('OFF')) return 'text-red-600';
-    if (status.includes('STANDBY')) return 'text-yellow-600';
-    if (status.includes('ERROR')) return 'text-red-700 font-bold';
-    return 'text-gray-500';
+    if (!status) return 'text-neutral-500';
+    if (status.includes('WORK')) return 'text-success-600';
+    if (status.includes('OFF')) return 'text-neutral-500';
+    if (status.includes('STANDBY')) return 'text-warning-500';
+    if (status.includes('ERROR')) return 'text-primary-600 font-bold';
+    return 'text-neutral-500';
+  };
+
+  const getStatusBgColor = (status) => {
+    if (!status) return 'bg-neutral-50';
+    if (status.includes('WORK')) return 'bg-success-50 border-success-200';
+    if (status.includes('OFF')) return 'bg-neutral-50 border-neutral-200';
+    if (status.includes('STANDBY')) return 'bg-warning-50 border-warning-200';
+    if (status.includes('ERROR')) return 'bg-primary-50 border-primary-200';
+    return 'bg-neutral-50 border-neutral-200';
   };
 
   const getStatusIcon = (status) => {
@@ -151,137 +160,168 @@ export default function StovePanel() {
   const isSpenta = status?.includes('OFF') || status?.includes('ERROR') || status?.includes('WAIT');
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-2xl shadow-md space-y-6 border">
-      <h2 className="text-2xl font-semibold text-center">Pannello Stufa</h2>
-
-      <div className="flex justify-between mb-4">
-        <button
-          onClick={handleNetatmoLogin}
-          className="text-sm text-blue-600 underline"
-        >
-          Riconnetti Netatmo
-        </button>
-        <button
-          onClick={handleNetatmoLogout}
-          className="text-sm text-red-600 underline"
-        >
-          Disconnetti Netatmo
-        </button>
-      </div>
-
-      <div className="text-center">
-        <span className="text-gray-600 text-sm">Stato stufa:</span>
-        <p className={`text-xl font-semibold mt-1 flex items-center justify-center gap-2 ${getStatusColor(status)}`}>
-          <span>{getStatusIcon(status)}</span>
-          <span>{status}</span>
-        </p>
-        <div className="text-center mt-2">
+    <div className="max-w-2xl mx-auto space-y-6">
+      {/* Status Card */}
+      <div className={`card p-6 space-y-4 border-2 transition-all duration-300 ${getStatusBgColor(status)}`}>
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-neutral-900">Stato Stufa</h2>
           <button
             onClick={handleManualRefresh}
             disabled={refreshing}
-            className="text-sm text-blue-500 hover:underline flex items-center justify-center gap-1 disabled:opacity-50"
+            className="p-2 rounded-xl hover:bg-white/50 transition-all duration-200 disabled:opacity-50"
+            title="Aggiorna stato"
           >
-            {refreshing ? (
-              <>
-                <span className="animate-spin inline-block">⏳</span>
-                Aggiornamento...
-              </>
-            ) : (
-              <>
-                🔄
-              </>
-            )}
+            <span className={`text-2xl inline-block ${refreshing ? 'animate-spin' : ''}`}>
+              {refreshing ? '⏳' : '🔄'}
+            </span>
           </button>
         </div>
 
-      </div>
+        <div className="flex items-center justify-center gap-4 py-6">
+          <span className="text-5xl">{getStatusIcon(status)}</span>
+          <div className="text-center">
+            <p className={`text-3xl font-bold ${getStatusColor(status)}`}>
+              {status}
+            </p>
+          </div>
+        </div>
 
-      <div className="text-center">
-        <span className="text-gray-600 text-sm">Modalità controllo:</span>
-        <div className={`text-base font-medium mt-1 flex flex-col items-center justify-center gap-1 ${
-          schedulerEnabled && semiManualMode ? 'text-yellow-600' :
-          schedulerEnabled ? 'text-green-600' : 'text-orange-600'
-        }`}>
-          <div className="flex items-center gap-2">
-            <span>{schedulerEnabled && semiManualMode ? '⚙️' : schedulerEnabled ? '⏰' : '🔧'}</span>
-            <span>
-              {schedulerEnabled && semiManualMode ? 'Semi-manuale' :
-               schedulerEnabled ? 'Automatica' : 'Manuale'}
-            </span>
+        {/* Modalità controllo */}
+        <div className="pt-4 border-t border-neutral-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">
+                {schedulerEnabled && semiManualMode ? '⚙️' : schedulerEnabled ? '⏰' : '🔧'}
+              </span>
+              <div>
+                <p className={`text-sm font-semibold ${
+                  schedulerEnabled && semiManualMode ? 'text-warning-600' :
+                  schedulerEnabled ? 'text-success-600' : 'text-accent-600'
+                }`}>
+                  {schedulerEnabled && semiManualMode ? 'Semi-manuale' :
+                   schedulerEnabled ? 'Automatica' : 'Manuale'}
+                </p>
+                <p className="text-xs text-neutral-500">Modalità controllo</p>
+              </div>
+            </div>
             <button
               onClick={() => router.push('/scheduler')}
-              className="ml-2 text-xs text-blue-500 hover:underline"
+              className="px-4 py-2 rounded-xl text-sm font-medium text-info-600 hover:bg-info-50 transition-colors duration-200"
             >
               Configura
             </button>
           </div>
           {schedulerEnabled && semiManualMode && returnToAutoAt && (
-            <span className="text-xs text-gray-500">
+            <p className="text-xs text-neutral-500 mt-2 ml-10">
               Ritorno automatico: {new Date(returnToAutoAt).toLocaleString('it-IT', {
                 day: '2-digit',
                 month: '2-digit',
                 hour: '2-digit',
                 minute: '2-digit'
               })}
-            </span>
+            </p>
           )}
         </div>
+
+        {/* Temperatura */}
+        {ambientTemp !== null && (
+          <div className="pt-4 border-t border-neutral-200">
+            <div className="flex items-center justify-center gap-3">
+              <span className="text-3xl">🌡️</span>
+              <div className="text-center">
+                <p className="text-3xl font-bold text-info-600">{ambientTemp.toFixed(1)}°C</p>
+                <p className="text-xs text-neutral-500">Temperatura ambiente</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {ambientTemp !== null && (
-        <div className="text-center">
-          <span className="text-gray-600 text-sm">Temperatura ambiente:</span>
-          <p className="text-xl font-medium text-sky-600">{ambientTemp.toFixed(1)}°C</p>
+      {/* Controlli Card */}
+      <div className="card p-6 space-y-6">
+        <h3 className="text-xl font-bold text-neutral-900">Controlli</h3>
+
+        {/* Accendi/Spegni */}
+        <div className="grid grid-cols-2 gap-4">
+          <button
+            onClick={handleIgnite}
+            disabled={loading || isAccesa}
+            className={`py-4 px-6 rounded-2xl text-white font-semibold text-lg shadow-card transition-all duration-200 flex items-center justify-center gap-2 ${
+              isAccesa
+                ? 'bg-neutral-300 cursor-not-allowed'
+                : 'bg-success-600 hover:bg-success-700 active:scale-95'
+            }`}
+          >
+            <span className="text-2xl">🔥</span>
+            Accendi
+          </button>
+          <button
+            onClick={handleShutdown}
+            disabled={loading || isSpenta}
+            className={`py-4 px-6 rounded-2xl text-white font-semibold text-lg shadow-card transition-all duration-200 flex items-center justify-center gap-2 ${
+              isSpenta
+                ? 'bg-neutral-300 cursor-not-allowed'
+                : 'bg-primary-500 hover:bg-primary-600 active:scale-95'
+            }`}
+          >
+            <span className="text-2xl">❄️</span>
+            Spegni
+          </button>
         </div>
-      )}
 
-      <div className="flex gap-4">
-        <button
-          onClick={handleIgnite}
-          disabled={loading || isAccesa}
-          className={`w-1/2 py-2 px-4 rounded-xl text-white ${
-            isAccesa ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
-          }`}
-        >
-          Accendi
-        </button>
-        <button
-          onClick={handleShutdown}
-          disabled={loading || isSpenta}
-          className={`w-1/2 py-2 px-4 rounded-xl text-white ${
-            isSpenta ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'
-          }`}
-        >
-          Spegni
-        </button>
+        {/* Livelli */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-semibold text-neutral-700 mb-2">
+              💨 Livello Ventilazione
+            </label>
+            <select
+              value={fanLevel ?? ''}
+              onChange={handleFanChange}
+              className="select-modern"
+            >
+              <option disabled value="">-- Seleziona --</option>
+              {[1, 2, 3, 4, 5, 6].map((level) => (
+                <option key={level} value={level}>Livello {level}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-neutral-700 mb-2">
+              ⚡ Livello Potenza
+            </label>
+            <select
+              value={powerLevel ?? ''}
+              onChange={handlePowerChange}
+              className="select-modern"
+            >
+              <option disabled value="">-- Seleziona --</option>
+              {[0, 1, 2, 3, 4, 5].map((level) => (
+                <option key={level} value={level}>Livello {level}</option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Livello Ventilazione</label>
-        <select
-          value={fanLevel ?? ''}
-          onChange={handleFanChange}
-          className="w-full border rounded-lg p-2"
-        >
-          <option disabled value="">-- Seleziona --</option>
-          {[1, 2, 3, 4, 5, 6].map((level) => (
-            <option key={level} value={level}>{level}</option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium mb-1">Livello Potenza</label>
-        <select
-          value={powerLevel ?? ''}
-          onChange={handlePowerChange}
-          className="w-full border rounded-lg p-2"
-        >
-          <option disabled value="">-- Seleziona --</option>
-          {[0, 1, 2, 3, 4, 5].map((level) => (
-            <option key={level} value={level}>{level}</option>
-          ))}
-        </select>
+      {/* Netatmo Card */}
+      <div className="card p-6">
+        <h3 className="text-lg font-bold text-neutral-900 mb-4">Connessione Netatmo</h3>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={handleNetatmoLogin}
+            className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-info-600 hover:bg-info-50 border border-info-200 transition-colors duration-200"
+          >
+            🔗 Riconnetti Netatmo
+          </button>
+          <button
+            onClick={handleNetatmoLogout}
+            className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-primary-600 hover:bg-primary-50 border border-primary-200 transition-colors duration-200"
+          >
+            🔌 Disconnetti Netatmo
+          </button>
+        </div>
       </div>
     </div>
   );

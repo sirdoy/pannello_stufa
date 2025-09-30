@@ -23,49 +23,104 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-white border-b shadow-sm px-4 py-3 flex items-center justify-between">
-      <Link href="/" className="text-lg font-semibold text-gray-800 hover:text-black">
-        🔥 Pannello Stufa
-      </Link>
+    <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-neutral-200/50 shadow-soft">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo/Brand */}
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="text-2xl group-hover:scale-110 transition-transform duration-200">
+              🔥
+            </div>
+            <span className="text-lg font-bold bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
+              Pannello Stufa
+            </span>
+          </Link>
 
-      {/* Desktop menu */}
-      <div className="hidden md:flex items-center space-x-4 text-sm">
-        {user && (
-          <span className="text-gray-600 truncate max-w-[120px]">
-            👤 {user.name}
-          </span>
-        )}
-        <Link href="/scheduler" className="text-blue-600 hover:underline">
-          Pianificazione
-        </Link>
-        <Link href="/log" className="text-blue-600 hover:underline">
-          Storico
-        </Link>
-        <Link href="/api/auth/logout" className="text-red-600 hover:underline">
-          Logout
-        </Link>
+          {/* Desktop menu */}
+          <div className="hidden md:flex items-center gap-2">
+            {user && (
+              <div className="flex items-center gap-2 mr-4 px-3 py-2 rounded-xl bg-neutral-100 text-neutral-700">
+                <span className="text-sm">👤</span>
+                <span className="text-sm font-medium truncate max-w-[120px]">{user.name}</span>
+              </div>
+            )}
+            <Link
+              href="/scheduler"
+              className="px-4 py-2 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors duration-200"
+            >
+              Pianificazione
+            </Link>
+            <Link
+              href="/log"
+              className="px-4 py-2 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors duration-200"
+            >
+              Storico
+            </Link>
+            <Link
+              href="/api/auth/logout"
+              className="px-4 py-2 rounded-xl text-sm font-medium text-primary-600 hover:bg-primary-50 transition-colors duration-200"
+            >
+              Logout
+            </Link>
+          </div>
+
+          {/* Mobile menu button */}
+          <button
+            onClick={toggleMenu}
+            className="md:hidden p-2 rounded-xl hover:bg-neutral-100 transition-colors duration-200"
+            aria-label="Menu"
+          >
+            <svg
+              className="w-6 h-6 text-neutral-700"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              {menuOpen ? (
+                <path d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+        </div>
       </div>
-
-      {/* Hamburger toggle */}
-      <button onClick={toggleMenu} className="md:hidden text-gray-700 text-xl">
-        ☰
-      </button>
 
       {/* Mobile dropdown */}
       {menuOpen && (
-        <div className="absolute top-full left-0 w-full bg-white shadow-md border-t mt-2 p-4 flex flex-col space-y-3 text-sm md:hidden z-50">
-          {user && (
-            <span className="text-gray-600 truncate">👤 {user.name}</span>
-          )}
-          <Link href="/scheduler" onClick={() => setMenuOpen(false)} className="text-blue-600 hover:underline">
-            Pianificazione
-          </Link>
-          <Link href="/log" onClick={() => setMenuOpen(false)} className="text-blue-600 hover:underline">
-            Storico
-          </Link>
-          <Link href="/api/auth/logout" onClick={() => setMenuOpen(false)} className="text-red-600 hover:underline">
-            Logout
-          </Link>
+        <div className="md:hidden border-t border-neutral-200/50 bg-white/95 backdrop-blur-md">
+          <div className="px-4 py-4 space-y-2">
+            {user && (
+              <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-neutral-100 text-neutral-700 mb-3">
+                <span>👤</span>
+                <span className="text-sm font-medium truncate">{user.name}</span>
+              </div>
+            )}
+            <Link
+              href="/scheduler"
+              onClick={() => setMenuOpen(false)}
+              className="block px-4 py-3 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors duration-200"
+            >
+              Pianificazione
+            </Link>
+            <Link
+              href="/log"
+              onClick={() => setMenuOpen(false)}
+              className="block px-4 py-3 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors duration-200"
+            >
+              Storico
+            </Link>
+            <Link
+              href="/api/auth/logout"
+              onClick={() => setMenuOpen(false)}
+              className="block px-4 py-3 rounded-xl text-sm font-medium text-primary-600 hover:bg-primary-50 transition-colors duration-200"
+            >
+              Logout
+            </Link>
+          </div>
         </div>
       )}
     </nav>

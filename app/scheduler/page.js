@@ -109,7 +109,7 @@ export default function WeeklyScheduler() {
     return (
       <div className="relative w-full mb-8">
         {/* Barra base */}
-        <div className="relative h-6 sm:h-4 w-full bg-gray-200 rounded overflow-hidden">
+        <div className="relative h-8 w-full bg-neutral-200 rounded-xl overflow-hidden shadow-inner">
           {intervals.map((range, idx) => {
             const [startH, startM] = range.start.split(':').map(Number);
             const [endH, endM] = range.end.split(':').map(Number);
@@ -120,7 +120,7 @@ export default function WeeklyScheduler() {
             return (
               <div
                 key={idx}
-                className="absolute top-0 bottom-0 bg-green-500 rounded-sm"
+                className="absolute top-0 bottom-0 bg-gradient-to-r from-primary-400 to-accent-500 hover:from-primary-500 hover:to-accent-600 transition-all duration-200 cursor-pointer"
                 style={{ left: `${left}%`, width: `${width}%` }}
                 title={`Accesa: ${range.start} - ${range.end} (P:${range.power} F:${range.fan})`}
               />
@@ -140,13 +140,13 @@ export default function WeeklyScheduler() {
               return (
                 <div key={idx}>
                   <span
-                    className="absolute -top-6 text-xs sm:text-[10px] text-gray-600 font-mono bg-white px-1 rounded"
+                    className="absolute -top-7 text-xs font-semibold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-lg border border-primary-200"
                     style={{ left: `${startLeft}%`, transform: 'translateX(-50%)' }}
                   >
                     {range.start}
                   </span>
                   <span
-                    className="absolute top-7 text-xs sm:text-[10px] text-gray-600 font-mono bg-white px-1 rounded"
+                    className="absolute top-10 text-xs font-semibold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-lg border border-primary-200"
                     style={{ left: `${endLeft}%`, transform: 'translateX(-50%)' }}
                   >
                     {range.end}
@@ -157,11 +157,11 @@ export default function WeeklyScheduler() {
           </div>
         )}
         {/* Indicatori ore principali per riferimento */}
-        <div className="relative w-full mt-2">
+        <div className="relative w-full mt-3">
           {[0, 6, 12, 18, 24].map(hour => (
             <span
               key={hour}
-              className="absolute text-xs text-gray-400 font-mono"
+              className="absolute text-xs text-neutral-400 font-mono"
               style={{ left: `${(hour / 24) * 100}%`, transform: 'translateX(-50%)' }}
             >
               {hour.toString().padStart(2, '0')}:00
@@ -173,137 +173,141 @@ export default function WeeklyScheduler() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4 sm:p-6">
-      {/* Header mobile-first */}
-      <div className="mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold mb-4">Scheduler Settimanale Stufa</h1>
+    <div className="max-w-5xl mx-auto space-y-6">
+      {/* Header Card */}
+      <div className="card p-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 mb-6">Pianificazione Settimanale</h1>
 
-        {/* Status e toggle - stack su mobile, inline su desktop */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex flex-col items-center sm:items-start">
-            <div className="flex items-center">
-              <span className="text-sm font-medium mr-2">Modalità:</span>
-              <div className="flex items-center gap-2">
-                <span className={`text-lg ${
-                  schedulerEnabled && semiManualMode ? 'text-yellow-600' :
-                  schedulerEnabled ? 'text-green-600' : 'text-orange-600'
-                }`}>
-                  {schedulerEnabled && semiManualMode ? '⚙️' : schedulerEnabled ? '⏰' : '🔧'}
-                </span>
-                <span className={`font-semibold ${
-                  schedulerEnabled && semiManualMode ? 'text-yellow-600' :
-                  schedulerEnabled ? 'text-green-600' : 'text-orange-600'
-                }`}>
-                  {schedulerEnabled && semiManualMode ? 'Semi-manuale' :
-                   schedulerEnabled ? 'Automatica' : 'Manuale'}
-                </span>
-              </div>
+        {/* Status e toggle */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl bg-neutral-50">
+          <div className="flex items-center gap-3">
+            <span className={`text-3xl ${
+              schedulerEnabled && semiManualMode ? 'text-warning-500' :
+              schedulerEnabled ? 'text-success-600' : 'text-accent-600'
+            }`}>
+              {schedulerEnabled && semiManualMode ? '⚙️' : schedulerEnabled ? '⏰' : '🔧'}
+            </span>
+            <div>
+              <p className={`text-lg font-bold ${
+                schedulerEnabled && semiManualMode ? 'text-warning-600' :
+                schedulerEnabled ? 'text-success-600' : 'text-accent-600'
+              }`}>
+                {schedulerEnabled && semiManualMode ? 'Semi-manuale' :
+                 schedulerEnabled ? 'Automatica' : 'Manuale'}
+              </p>
+              <p className="text-sm text-neutral-500">Modalità controllo</p>
+              {schedulerEnabled && semiManualMode && returnToAutoAt && (
+                <p className="text-xs text-neutral-500 mt-1">
+                  Ritorno automatico: {new Date(returnToAutoAt).toLocaleString('it-IT', {
+                    weekday: 'short',
+                    day: '2-digit',
+                    month: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </p>
+              )}
             </div>
-            {schedulerEnabled && semiManualMode && returnToAutoAt && (
-              <span className="text-xs text-gray-500 mt-1">
-                Ritorno automatico: {new Date(returnToAutoAt).toLocaleString('it-IT', {
-                  weekday: 'short',
-                  day: '2-digit',
-                  month: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-              </span>
-            )}
           </div>
 
           <button
             onClick={toggleSchedulerMode}
-            className={`w-full sm:w-auto px-6 py-3 sm:px-4 sm:py-2 rounded-lg text-white font-medium transition-colors text-center ${
+            className={`w-full sm:w-auto px-6 py-3 rounded-xl text-white font-semibold shadow-card transition-all duration-200 active:scale-95 ${
               schedulerEnabled
-                ? 'bg-red-600 hover:bg-red-700 active:bg-red-800'
-                : 'bg-green-600 hover:bg-green-700 active:bg-green-800'
+                ? 'bg-primary-500 hover:bg-primary-600'
+                : 'bg-success-600 hover:bg-success-700'
             }`}
           >
             {schedulerEnabled ? 'Disattiva Scheduler' : 'Attiva Scheduler'}
           </button>
         </div>
       </div>
+
+      {/* Days Cards */}
       {daysOfWeek.map((day) => (
-        <div key={day} className="mb-8 bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-800">{day}</h2>
-            <span className="text-sm text-gray-500">
-              {schedule[day].length} {schedule[day].length === 1 ? 'intervallo' : 'intervalli'}
-            </span>
+        <div key={day} className="card p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">📅</span>
+              <div>
+                <h2 className="text-xl font-bold text-neutral-900">{day}</h2>
+                <p className="text-sm text-neutral-500">
+                  {schedule[day].length} {schedule[day].length === 1 ? 'intervallo' : 'intervalli'}
+                </p>
+              </div>
+            </div>
           </div>
 
           <TimeBar intervals={schedule[day]} />
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {schedule[day].map((range, index) => (
-              <div key={index} className="bg-gray-50 rounded-lg p-4 border border-gray-100">
-                {/* Layout mobile: stack verticalmente */}
-                <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
+              <div key={index} className="bg-neutral-50 rounded-xl p-4 border border-neutral-200 hover:border-neutral-300 transition-colors duration-200">
+                <div className="flex flex-col lg:flex-row gap-4">
                   {/* Orari */}
-                  <div className="flex items-center gap-2 flex-1">
-                    <label className="text-sm font-medium text-gray-600 min-w-12">Dalle:</label>
-                    <input
-                      type="time"
-                      value={range.start}
-                      onChange={(e) => handleChange(day, index, 'start', e.target.value)}
-                      className="flex-1 border border-gray-300 p-3 sm:p-2 rounded-lg text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3 flex-1">
+                    <div className="flex items-center gap-2 flex-1">
+                      <label className="text-sm font-semibold text-neutral-700 min-w-fit whitespace-nowrap">⏰ Dalle</label>
+                      <input
+                        type="time"
+                        value={range.start}
+                        onChange={(e) => handleChange(day, index, 'start', e.target.value)}
+                        className="input-modern text-sm"
+                      />
+                    </div>
 
-                  <div className="flex items-center gap-2 flex-1">
-                    <label className="text-sm font-medium text-gray-600 min-w-12">Alle:</label>
-                    <input
-                      type="time"
-                      value={range.end}
-                      onChange={(e) => handleChange(day, index, 'end', e.target.value)}
-                      className="flex-1 border border-gray-300 p-3 sm:p-2 rounded-lg text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                    <div className="flex items-center gap-2 flex-1">
+                      <label className="text-sm font-semibold text-neutral-700 min-w-fit whitespace-nowrap">⏰ Alle</label>
+                      <input
+                        type="time"
+                        value={range.end}
+                        onChange={(e) => handleChange(day, index, 'end', e.target.value)}
+                        className="input-modern text-sm"
+                      />
+                    </div>
                   </div>
 
                   {/* Controlli Power e Fan */}
-                  <div className="flex gap-2 sm:gap-3">
-                    <div className="flex-1">
-                      <label className="block text-xs font-medium text-gray-600 mb-1">Potenza</label>
+                  <div className="flex gap-3 items-end">
+                    <div className="flex-1 min-w-[100px]">
+                      <label className="block text-xs font-semibold text-neutral-700 mb-1">⚡ Potenza</label>
                       <select
                         value={range.power}
                         onChange={(e) => handleChange(day, index, 'power', Number(e.target.value))}
-                        className="w-full border border-gray-300 p-3 sm:p-2 rounded-lg text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                        className="select-modern text-sm"
                       >
                         {[0, 1, 2, 3, 4, 5].map(p => (
-                          <option key={p} value={p}>P{p}</option>
+                          <option key={p} value={p}>Livello {p}</option>
                         ))}
                       </select>
                     </div>
 
-                    <div className="flex-1">
-                      <label className="block text-xs font-medium text-gray-600 mb-1">Ventola</label>
+                    <div className="flex-1 min-w-[100px]">
+                      <label className="block text-xs font-semibold text-neutral-700 mb-1">💨 Ventola</label>
                       <select
                         value={range.fan}
                         onChange={(e) => handleChange(day, index, 'fan', Number(e.target.value))}
-                        className="w-full border border-gray-300 p-3 sm:p-2 rounded-lg text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                        className="select-modern text-sm"
                       >
                         {[1, 2, 3, 4, 5, 6].map(f => (
-                          <option key={f} value={f}>F{f}</option>
+                          <option key={f} value={f}>Livello {f}</option>
                         ))}
                       </select>
                     </div>
 
                     {/* Pulsante rimuovi */}
-                    <div className="flex items-end">
-                      <button
-                        onClick={() => {
-                          const updated = schedule[day].filter((_, i) => i !== index);
-                          const updatedSchedule = { ...schedule, [day]: updated };
-                          setSchedule(updatedSchedule);
-                          saveSchedule(day, updated);
-                        }}
-                        className="p-3 sm:p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Rimuovi intervallo"
-                      >
-                        🗑️
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => {
+                        const updated = schedule[day].filter((_, i) => i !== index);
+                        const updatedSchedule = { ...schedule, [day]: updated };
+                        setSchedule(updatedSchedule);
+                        saveSchedule(day, updated);
+                      }}
+                      className="p-3 text-xl text-primary-600 hover:bg-primary-50 rounded-xl transition-colors duration-200 border border-primary-200"
+                      title="Rimuovi intervallo"
+                    >
+                      🗑️
+                    </button>
                   </div>
                 </div>
               </div>
@@ -312,9 +316,9 @@ export default function WeeklyScheduler() {
 
           <button
             onClick={() => addTimeRange(day)}
-            className="mt-4 w-full sm:w-auto px-4 py-3 sm:py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+            className="mt-4 w-full px-6 py-3 bg-success-600 hover:bg-success-700 active:scale-95 text-white rounded-xl font-semibold shadow-card transition-all duration-200 flex items-center justify-center gap-2"
           >
-            <span className="text-lg">+</span>
+            <span className="text-xl">+</span>
             Aggiungi intervallo
           </button>
         </div>

@@ -1,3 +1,40 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-200;
+  }
+}
+
+@layer components {
+  /* Pulsante primario */
+  .btn-primary {
+    @apply px-6 py-3 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white font-medium rounded-xl shadow-card transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Pulsante secondario */
+  .btn-secondary {
+    @apply px-6 py-3 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-800 font-medium rounded-xl shadow-card border border-neutral-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Card moderna */
+  .card {
+    @apply bg-white rounded-2xl shadow-soft border border-neutral-200/50 backdrop-blur-sm;
+  }
+
+  /* Input moderno */
+  .input-modern {
+    @apply w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl text-neutral-900 placeholder:text-neutral-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+  }
+
+  /* Select moderno */
+  .select-modern {
+    @apply w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl text-neutral-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 appearance-none;
+  }
+}

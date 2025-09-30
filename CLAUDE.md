@@ -17,7 +17,85 @@ This is a Next.js 15 PWA application called "Pannello Stufa" (Stove Panel) that 
 
 ### Core Components
 - **StovePanel** (`app/components/StovePanel.js`) - Main control interface with real-time status updates, separated into status card, controls card, and Netatmo connection card
+  - Uses: Card, Button, Select, StatusBadge, ModeIndicator
 - **Navbar** (`app/components/Navbar.js`) - Navigation with Auth0 integration, glassmorphism design with backdrop blur
+
+### Reusable UI Components (`app/components/ui/`)
+Modular component system for consistent UI across the application:
+
+- **Card** (`Card.js`) - Base container component
+  - Props: `children`, `className`, `...props`
+  - Usage: `<Card className="p-6">content</Card>`
+
+- **Button** (`Button.js`) - Standardized button with variants
+  - Props: `variant` (primary|secondary|success|danger|accent|outline|ghost), `size` (sm|md|lg), `icon`, `disabled`, `loading`
+  - Usage: `<Button variant="success" icon="🔥" onClick={handleClick}>Accendi</Button>`
+
+- **Input** (`Input.js`) - Text input with label and icon support
+  - Props: `type`, `label`, `icon`, `className`, `containerClassName`
+  - Usage: `<Input type="time" label="⏰ Dalle" value={start} onChange={handleChange} />`
+
+- **Select** (`Select.js`) - Dropdown select with label and icon support
+  - Props: `label`, `icon`, `options` (array of `{value, label, disabled?}`), `className`, `containerClassName`
+  - Usage: `<Select label="💨 Ventola" options={fanOptions} value={level} onChange={handleChange} />`
+
+- **StatusBadge** (`StatusBadge.js`) - Status display with dynamic colors and icons
+  - Props: `status`, `icon`, `size` (sm|md|lg)
+  - Automatically determines color and icon based on status keywords (WORK, OFF, ERROR, etc.)
+  - Usage: `<StatusBadge status="WORK" />`
+
+- **ModeIndicator** (`ModeIndicator.js`) - Scheduler mode indicator
+  - Props: `enabled`, `semiManual`, `returnToAutoAt`, `onConfigClick`, `showConfigButton`, `compact`
+  - Displays current mode (Manual/Automatic/Semi-manual) with icon and colors
+  - Optional configure button and return time display
+  - Usage: `<ModeIndicator enabled={schedulerEnabled} semiManual={semiManualMode} returnToAutoAt={returnToAutoAt} onConfigClick={() => router.push('/scheduler')} />`
+
+- **Pagination** (`Pagination.js`) - Page navigation controls
+  - Props: `currentPage`, `totalPages`, `onPrevious`, `onNext`, `hasPrev`, `hasNext`
+  - Usage: `<Pagination currentPage={0} totalPages={10} onPrevious={handlePrev} onNext={handleNext} hasPrev={true} hasNext={true} />`
+
+### Scheduler Components (`app/components/scheduler/`)
+Specialized components for weekly schedule management:
+
+- **TimeBar** (`TimeBar.js`) - 24-hour visual timeline
+  - Props: `intervals` (array of time ranges with start, end, power, fan)
+  - Shows colored bars for scheduled intervals
+  - Displays time labels and reference hours
+  - Usage: `<TimeBar intervals={schedule[day]} />`
+
+- **ScheduleInterval** (`ScheduleInterval.js`) - Single time interval editor
+  - Props: `range` (start, end, power, fan), `onRemove`, `onChange`
+  - Editable time inputs, power/fan selects, remove button
+  - Usage: `<ScheduleInterval range={interval} onRemove={handleRemove} onChange={handleChange} />`
+
+- **DayScheduleCard** (`DayScheduleCard.js`) - Complete day schedule card
+  - Props: `day`, `intervals`, `onAddInterval`, `onRemoveInterval`, `onChangeInterval`
+  - Combines TimeBar, list of ScheduleIntervals, and add button
+  - Usage: `<DayScheduleCard day="Lunedì" intervals={schedule['Lunedì']} onAddInterval={addInterval} onRemoveInterval={removeInterval} onChangeInterval={changeInterval} />`
+
+### Log Components (`app/components/log/`)
+Components for user action log display:
+
+- **LogEntry** (`LogEntry.js`) - Single log entry display
+  - Props: `entry`, `formatDate`, `getIcon`
+  - Shows user avatar, name, timestamp, action, and optional metadata
+  - Usage: `<LogEntry entry={logEntry} formatDate={formatFn} getIcon={getIconFn} />`
+
+### Component Export Structure
+All UI components are exported from `app/components/ui/index.js` for clean imports:
+```javascript
+import { Card, Button, Select, StatusBadge, ModeIndicator, Pagination } from '@/app/components/ui';
+```
+
+Scheduler components from `app/components/scheduler/index.js`:
+```javascript
+import { TimeBar, ScheduleInterval, DayScheduleCard } from '@/app/components/scheduler';
+```
+
+Log components from `app/components/log/index.js`:
+```javascript
+import { LogEntry } from '@/app/components/log';
+```
 
 ### Pages
 - `/` (`app/page.js`) - Main StovePanel interface for controlling the stove
@@ -237,6 +315,35 @@ Custom utility classes in `app/globals.css`:
   - Backend endpoints also use the same route definitions
   - Makes route changes easier to manage and prevents hardcoded URLs
 
+## Component Architecture Philosophy
+
+### Component Strategy
+The application follows a **balanced component approach**:
+- **Atomic UI components** (`app/components/ui/`) for basic elements (Card, Button, Input, Select, etc.)
+- **Composite domain components** (`app/components/scheduler/`, `app/components/log/`) for feature-specific functionality
+- **Presentation-focused**: Components handle UI and user interaction, business logic stays in parent components
+- **Prop-based communication**: All data and callbacks passed via props, no internal state for data fetching
+
+### When to Create New Components
+✅ **DO create components for:**
+- Repeated UI patterns across multiple pages
+- Complex UI sections that benefit from encapsulation
+- Elements that need variant support (buttons, badges, etc.)
+- Standalone features that can be tested independently
+
+❌ **DON'T create components for:**
+- One-off UI sections used in a single place
+- Trivial wrappers that don't add value
+- Over-abstracting simple HTML structures
+
+### Component Best Practices
+- **Props over configuration**: Pass behavior via props, not internal config
+- **Composition over inheritance**: Combine small components to build complex ones
+- **Single responsibility**: Each component should do one thing well
+- **Predictable props**: Use consistent naming (e.g., `onClick`, `onChange`, `className`)
+- **Forward ...props**: Allow parent to override any HTML attributes
+- **TypeScript-ready**: Structure components for easy future TypeScript migration
+
 ## UI/UX Guidelines
 
 When modifying components, maintain these design principles:
@@ -248,6 +355,7 @@ When modifying components, maintain these design principles:
 - **Card-based layout**: Main content areas use the `.card` utility class
 - **Active states**: Buttons should have hover, active, and disabled states clearly defined
 - **Accessibility**: Maintain proper contrast ratios and semantic HTML
+- **Reusable components**: Always use existing UI components from `app/components/ui/` instead of duplicating styles
 
 ## Scheduler System
 

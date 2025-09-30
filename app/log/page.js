@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
 import { onValue, ref } from 'firebase/database';
+import Card from '@/app/components/ui/Card';
+import LogEntry from '@/app/components/log/LogEntry';
+import Pagination from '@/app/components/ui/Pagination';
 
 const PAGE_SIZE = 50;
 
@@ -54,7 +57,7 @@ export default function LogPage() {
   const hasPrev = currentPage > 0;
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-md space-y-6 border">
+    <Card className="max-w-3xl mx-auto mt-10 p-6 space-y-6">
       <h2 className="text-2xl font-semibold text-center">Storico Azioni Utenti</h2>
 
       {log.length === 0 ? (
@@ -63,72 +66,25 @@ export default function LogPage() {
         <>
           <ul className="space-y-4">
             {currentPageData.map((entry) => (
-              <li key={entry.id} className="border-b pb-3 flex items-start gap-3">
-                <div className="text-2xl mt-1">{getIcon(entry.action)}</div>
-                <div className="flex-1">
-                  {/* Informazioni utente */}
-                  {entry.user && (
-                    <div className="flex items-center gap-2 mb-2">
-                      {entry.user.picture && (
-                        <img
-                          src={entry.user.picture}
-                          alt={entry.user.name || entry.user.email}
-                          className="w-6 h-6 rounded-full"
-                        />
-                      )}
-                      <span className="text-sm font-semibold text-gray-700">
-                        {entry.user.name || entry.user.email}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Timestamp */}
-                  <div className="text-xs text-gray-500 mb-1">{formatDate(entry.timestamp)}</div>
-
-                  {/* Azione */}
-                  <div className="text-base font-medium text-gray-900">
-                    {entry.action}
-                    {entry.value !== undefined && (
-                      <span className="ml-2 text-blue-600 font-semibold">→ {entry.value}</span>
-                    )}
-                  </div>
-
-                  {/* Metadata opzionale */}
-                  {entry.day && (
-                    <div className="text-xs text-gray-500 mt-1">
-                      Giorno: {entry.day}
-                    </div>
-                  )}
-                </div>
-              </li>
+              <LogEntry
+                key={entry.id}
+                entry={entry}
+                formatDate={formatDate}
+                getIcon={getIcon}
+              />
             ))}
           </ul>
 
-          <div className="flex justify-between items-center pt-4">
-            <button
-              onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
-              disabled={!hasPrev}
-              className={`px-4 py-2 rounded ${
-                hasPrev ? 'bg-gray-200 hover:bg-gray-300' : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              }`}
-            >
-              ◀ Precedente
-            </button>
-            <span className="text-sm text-gray-600">
-              Pagina {currentPage + 1} di {Math.ceil(log.length / PAGE_SIZE)}
-            </span>
-            <button
-              onClick={() => setCurrentPage((p) => p + 1)}
-              disabled={!hasNext}
-              className={`px-4 py-2 rounded ${
-                hasNext ? 'bg-gray-200 hover:bg-gray-300' : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              }`}
-            >
-              Successivo ▶
-            </button>
-          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={Math.ceil(log.length / PAGE_SIZE)}
+            onPrevious={() => setCurrentPage((p) => Math.max(0, p - 1))}
+            onNext={() => setCurrentPage((p) => p + 1)}
+            hasPrev={hasPrev}
+            hasNext={hasNext}
+          />
         </>
       )}
-    </div>
+    </Card>
   );
 }

@@ -5,6 +5,11 @@ import { useRouter } from 'next/navigation';
 import { getFullSchedulerMode } from '@/lib/schedulerService';
 import { STOVE_ROUTES } from '@/lib/routes';
 import { logStoveAction, logNetatmoAction } from '@/lib/logService';
+import Card from './ui/Card';
+import Button from './ui/Button';
+import StatusBadge from './ui/StatusBadge';
+import ModeIndicator from './ui/ModeIndicator';
+import Select from './ui/Select';
 
 export default function StovePanel() {
   const router = useRouter();
@@ -111,6 +116,16 @@ export default function StovePanel() {
     await logStoveAction.setPower(level);
   };
 
+  const fanOptions = [
+    { value: '', label: '-- Seleziona --', disabled: true },
+    ...([1, 2, 3, 4, 5, 6].map(level => ({ value: level, label: `Livello ${level}` })))
+  ];
+
+  const powerOptions = [
+    { value: '', label: '-- Seleziona --', disabled: true },
+    ...([0, 1, 2, 3, 4, 5].map(level => ({ value: level, label: `Livello ${level}` })))
+  ];
+
   const handleIgnite = async () => {
     setLoading(true);
     await fetch(STOVE_ROUTES.ignite, {method: 'POST'});
@@ -125,15 +140,6 @@ export default function StovePanel() {
     setLoading(false);
   };
 
-  const getStatusColor = (status) => {
-    if (!status) return 'text-neutral-500';
-    if (status.includes('WORK')) return 'text-success-600';
-    if (status.includes('OFF')) return 'text-neutral-500';
-    if (status.includes('STANDBY')) return 'text-warning-500';
-    if (status.includes('ERROR')) return 'text-primary-600 font-bold';
-    return 'text-neutral-500';
-  };
-
   const getStatusBgColor = (status) => {
     if (!status) return 'bg-neutral-50';
     if (status.includes('WORK')) return 'bg-success-50 border-success-200';
@@ -143,23 +149,13 @@ export default function StovePanel() {
     return 'bg-neutral-50 border-neutral-200';
   };
 
-  const getStatusIcon = (status) => {
-    if (!status) return '❔';
-    if (status.includes('WORK')) return '🔥';
-    if (status.includes('OFF')) return '❄️';
-    if (status.includes('ERROR')) return '⚠️';
-    if (status.includes('START')) return '⏱️';
-    if (status.includes('WAIT')) return '💤';
-    return '❔';
-  };
-
   const isAccesa = status?.includes('WORK') || status?.includes('START');
   const isSpenta = status?.includes('OFF') || status?.includes('ERROR') || status?.includes('WAIT');
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Status Card */}
-      <div className={`card p-6 space-y-4 border-2 transition-all duration-300 ${getStatusBgColor(status)}`}>
+      <Card className={`p-6 space-y-4 border-2 transition-all duration-300 ${getStatusBgColor(status)}`}>
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-neutral-900">Stato Stufa</h2>
           <button
@@ -174,50 +170,16 @@ export default function StovePanel() {
           </button>
         </div>
 
-        <div className="flex items-center justify-center gap-4 py-6">
-          <span className="text-5xl">{getStatusIcon(status)}</span>
-          <div className="text-center">
-            <p className={`text-3xl font-bold ${getStatusColor(status)}`}>
-              {status}
-            </p>
-          </div>
-        </div>
+        <StatusBadge status={status} />
 
         {/* Modalità controllo */}
         <div className="pt-4 border-t border-neutral-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">
-                {schedulerEnabled && semiManualMode ? '⚙️' : schedulerEnabled ? '⏰' : '🔧'}
-              </span>
-              <div>
-                <p className={`text-sm font-semibold ${
-                  schedulerEnabled && semiManualMode ? 'text-warning-600' :
-                  schedulerEnabled ? 'text-success-600' : 'text-accent-600'
-                }`}>
-                  {schedulerEnabled && semiManualMode ? 'Semi-manuale' :
-                   schedulerEnabled ? 'Automatica' : 'Manuale'}
-                </p>
-                <p className="text-xs text-neutral-500">Modalità controllo</p>
-              </div>
-            </div>
-            <button
-              onClick={() => router.push('/scheduler')}
-              className="px-4 py-2 rounded-xl text-sm font-medium text-info-600 hover:bg-info-50 transition-colors duration-200"
-            >
-              Configura
-            </button>
-          </div>
-          {schedulerEnabled && semiManualMode && returnToAutoAt && (
-            <p className="text-xs text-neutral-500 mt-2 ml-10">
-              Ritorno automatico: {new Date(returnToAutoAt).toLocaleString('it-IT', {
-                day: '2-digit',
-                month: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
-              })}
-            </p>
-          )}
+          <ModeIndicator
+            enabled={schedulerEnabled}
+            semiManual={semiManualMode}
+            returnToAutoAt={returnToAutoAt}
+            onConfigClick={() => router.push('/scheduler')}
+          />
         </div>
 
         {/* Temperatura */}
@@ -232,78 +194,54 @@ export default function StovePanel() {
             </div>
           </div>
         )}
-      </div>
+      </Card>
 
       {/* Controlli Card */}
-      <div className="card p-6 space-y-6">
+      <Card className="p-6 space-y-6">
         <h3 className="text-xl font-bold text-neutral-900">Controlli</h3>
 
         {/* Accendi/Spegni */}
         <div className="grid grid-cols-2 gap-4">
-          <button
+          <Button
+            variant="success"
+            size="lg"
+            icon="🔥"
             onClick={handleIgnite}
             disabled={loading || isAccesa}
-            className={`py-4 px-6 rounded-2xl text-white font-semibold text-lg shadow-card transition-all duration-200 flex items-center justify-center gap-2 ${
-              isAccesa
-                ? 'bg-neutral-300 cursor-not-allowed'
-                : 'bg-success-600 hover:bg-success-700 active:scale-95'
-            }`}
           >
-            <span className="text-2xl">🔥</span>
             Accendi
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="danger"
+            size="lg"
+            icon="❄️"
             onClick={handleShutdown}
             disabled={loading || isSpenta}
-            className={`py-4 px-6 rounded-2xl text-white font-semibold text-lg shadow-card transition-all duration-200 flex items-center justify-center gap-2 ${
-              isSpenta
-                ? 'bg-neutral-300 cursor-not-allowed'
-                : 'bg-primary-500 hover:bg-primary-600 active:scale-95'
-            }`}
           >
-            <span className="text-2xl">❄️</span>
             Spegni
-          </button>
+          </Button>
         </div>
 
         {/* Livelli */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-semibold text-neutral-700 mb-2">
-              💨 Livello Ventilazione
-            </label>
-            <select
-              value={fanLevel ?? ''}
-              onChange={handleFanChange}
-              className="select-modern"
-            >
-              <option disabled value="">-- Seleziona --</option>
-              {[1, 2, 3, 4, 5, 6].map((level) => (
-                <option key={level} value={level}>Livello {level}</option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="💨 Livello Ventilazione"
+            value={fanLevel ?? ''}
+            onChange={handleFanChange}
+            options={fanOptions}
+          />
 
-          <div>
-            <label className="block text-sm font-semibold text-neutral-700 mb-2">
-              ⚡ Livello Potenza
-            </label>
-            <select
-              value={powerLevel ?? ''}
-              onChange={handlePowerChange}
-              className="select-modern"
-            >
-              <option disabled value="">-- Seleziona --</option>
-              {[0, 1, 2, 3, 4, 5].map((level) => (
-                <option key={level} value={level}>Livello {level}</option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="⚡ Livello Potenza"
+            value={powerLevel ?? ''}
+            onChange={handlePowerChange}
+            options={powerOptions}
+          />
         </div>
-      </div>
+      </Card>
 
       {/* Netatmo Card */}
-      <div className="card p-6">
+      <Card className="p-6">
         <h3 className="text-lg font-bold text-neutral-900 mb-4">Connessione Netatmo</h3>
         <div className="flex flex-col sm:flex-row gap-3">
           <button
@@ -319,7 +257,7 @@ export default function StovePanel() {
             🔌 Disconnetti Netatmo
           </button>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

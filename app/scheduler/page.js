@@ -7,7 +7,7 @@ import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
 import ModeIndicator from '@/app/components/ui/ModeIndicator';
 import Skeleton from '@/app/components/ui/Skeleton';
-import DayScheduleCard from '@/app/components/scheduler/DayScheduleCard';
+import DayAccordionItem from '@/app/components/scheduler/DayAccordionItem';
 
 const daysOfWeek = [
   'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'
@@ -24,6 +24,12 @@ export default function WeeklyScheduler() {
   const [semiManualMode, setSemiManualModeState] = useState(false);
   const [returnToAutoAt, setReturnToAutoAt] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [expandedDays, setExpandedDays] = useState(() =>
+    daysOfWeek.reduce((acc, day) => {
+      acc[day] = false; // Tutti collassati di default
+      return acc;
+    }, {})
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -202,6 +208,27 @@ export default function WeeklyScheduler() {
     }
   };
 
+  const toggleDay = (day) => {
+    setExpandedDays(prev => ({
+      ...prev,
+      [day]: !prev[day]
+    }));
+  };
+
+  const expandAll = () => {
+    setExpandedDays(daysOfWeek.reduce((acc, day) => {
+      acc[day] = true;
+      return acc;
+    }, {}));
+  };
+
+  const collapseAll = () => {
+    setExpandedDays(daysOfWeek.reduce((acc, day) => {
+      acc[day] = false;
+      return acc;
+    }, {}));
+  };
+
   if (loading) {
     return <Skeleton.Scheduler />;
   }
@@ -213,7 +240,7 @@ export default function WeeklyScheduler() {
         <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 mb-6">Pianificazione Settimanale</h1>
 
         {/* Status e toggle */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl bg-neutral-50">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl bg-neutral-50 mb-4">
           <ModeIndicator
             enabled={schedulerEnabled}
             semiManual={semiManualMode}
@@ -229,14 +256,36 @@ export default function WeeklyScheduler() {
             {schedulerEnabled ? 'Disattiva Scheduler' : 'Attiva Scheduler'}
           </Button>
         </div>
+
+        {/* Pulsanti Espandi/Comprimi tutto */}
+        <div className="flex gap-3 justify-end">
+          <Button
+            variant="ghost"
+            size="sm"
+            icon="📂"
+            onClick={expandAll}
+          >
+            Espandi tutto
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            icon="📁"
+            onClick={collapseAll}
+          >
+            Comprimi tutto
+          </Button>
+        </div>
       </Card>
 
       {/* Days Cards */}
       {daysOfWeek.map((day) => (
-        <DayScheduleCard
+        <DayAccordionItem
           key={day}
           day={day}
           intervals={schedule[day]}
+          isExpanded={expandedDays[day]}
+          onToggle={() => toggleDay(day)}
           onAddInterval={() => addTimeRange(day)}
           onRemoveInterval={async (index) => {
             const updated = schedule[day].filter((_, i) => i !== index);

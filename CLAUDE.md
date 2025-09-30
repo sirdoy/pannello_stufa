@@ -107,6 +107,16 @@ Specialized components for weekly schedule management:
   - **State tracking**: `hoveredIndex` and `selectedIndex` for interactive highlighting
   - Usage: `<DayScheduleCard day="Lunedì" intervals={schedule['Lunedì']} onAddInterval={addInterval} onRemoveInterval={removeInterval} onChangeInterval={changeInterval} />`
 
+- **DayAccordionItem** (`DayAccordionItem.js`) - Collapsible day schedule card with preview
+  - Props: `day`, `intervals`, `isExpanded`, `onToggle`, `onAddInterval`, `onRemoveInterval`, `onChangeInterval`
+  - **Accordion UI**: Clickable header to expand/collapse day content
+  - **Compact preview**: When collapsed, shows time range coverage and total hours
+  - **Smart preview**: Displays "08:00 - 22:00 • 3 intervalli • 6.5h totali" in collapsed state
+  - **Empty state**: Shows friendly message when no intervals configured
+  - **Smooth animations**: 300ms transition for expand/collapse with opacity fade
+  - Includes all DayScheduleCard features (TimeBar, intervals, hover/selection)
+  - Usage: `<DayAccordionItem day="Lunedì" intervals={schedule['Lunedì']} isExpanded={true} onToggle={toggleDay} ... />`
+
 ### Log Components (`app/components/log/`)
 Components for user action log display:
 
@@ -123,7 +133,7 @@ import { Card, Button, Select, StatusBadge, ModeIndicator, Pagination, Skeleton 
 
 Scheduler components from `app/components/scheduler/index.js`:
 ```javascript
-import { TimeBar, ScheduleInterval, DayScheduleCard } from '@/app/components/scheduler';
+import { TimeBar, ScheduleInterval, DayScheduleCard, DayAccordionItem } from '@/app/components/scheduler';
 ```
 
 Log components from `app/components/log/index.js`:
@@ -143,6 +153,8 @@ import { LogEntry } from '@/app/components/log';
   - Note: Power level 0 available in manual control (allows setting stove to standby while on)
 - `/scheduler` (`app/scheduler/page.js`) - Weekly schedule configuration
   - Weekly timeline view (7 days × 24 hours) with interactive TimeBar
+  - **Accordion UI**: Collapsible days with preview (time range, intervals count, total hours)
+  - **Expand/Collapse controls**: Buttons to expand/collapse all days at once
   - Add/remove time intervals per day
   - Configure power (1-5) and fan (1-6) levels per interval
   - Manual/Automatic mode toggle
@@ -156,6 +168,7 @@ import { LogEntry } from '@/app/components/log';
     - Automatic removal of completely overlapped intervals (on blur)
     - Validation: minimum 15-minute interval duration (on blur)
   - **Loading state**: Shows `Skeleton.Scheduler` during initial data fetch
+  - **Default state**: All days collapsed on page load for compact view
 - `/log` (`app/log/page.js`) - User action logs viewer
   - Real-time display of all user actions from Firebase
   - Shows user information (name/email, avatar)

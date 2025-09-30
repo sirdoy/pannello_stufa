@@ -1,0 +1,169 @@
+import { useState } from 'react';
+import Card from '../ui/Card';
+import Button from '../ui/Button';
+import TimeBar from './TimeBar';
+import ScheduleInterval from './ScheduleInterval';
+
+export default function DayAccordionItem({
+  day,
+  intervals,
+  isExpanded,
+  onToggle,
+  onAddInterval,
+  onRemoveInterval,
+  onChangeInterval,
+}) {
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(null);
+
+  const handleIntervalClick = (index) => {
+    setSelectedIndex(selectedIndex === index ? null : index);
+  };
+
+  // Calcola preview: orario totale coperto
+  const getTimeRangePreview = () => {
+    if (intervals.length === 0) return 'Nessun intervallo configurato';
+
+    const sorted = [...intervals].sort((a, b) => a.start.localeCompare(b.start));
+    const first = sorted[0].start;
+    const last = sorted[sorted.length - 1].end;
+
+    return `${first} - ${last}`;
+  };
+
+  // Calcola durata totale in ore
+  const getTotalDuration = () => {
+    if (intervals.length === 0) return 0;
+
+    const totalMinutes = intervals.reduce((sum, interval) => {
+      const [startH, startM] = interval.start.split(':').map(Number);
+      const [endH, endM] = interval.end.split(':').map(Number);
+      const start = startH * 60 + startM;
+      const end = endH * 60 + endM;
+      return sum + (end - start);
+    }, 0);
+
+    return (totalMinutes / 60).toFixed(1);
+  };
+
+  return (
+    <Card className="overflow-hidden">
+      {/* Header - sempre visibile */}
+      <div className="w-full">
+        <button
+          onClick={onToggle}
+          className="w-full p-6 flex items-center justify-between hover:bg-neutral-50 transition-colors duration-200"
+        >
+          <div className="flex items-center gap-4 flex-1 min-w-0">
+            {/* Icona giorno e nome */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <span className="text-2xl">📅</span>
+              <div className="text-left">
+                <h2 className="text-xl font-bold text-neutral-900">{day}</h2>
+                <p className="text-sm text-neutral-500">
+                  {intervals.length} {intervals.length === 1 ? 'intervallo' : 'intervalli'}
+                  {intervals.length > 0 && ` • ${getTotalDuration()}h totali`}
+                </p>
+              </div>
+            </div>
+
+            {/* Preview compatta - solo quando collassato */}
+            {!isExpanded && intervals.length > 0 && (
+              <div className="hidden md:flex items-center gap-3 ml-auto mr-4">
+                <div className="text-sm font-semibold text-primary-600 bg-primary-50 px-3 py-1.5 rounded-lg border border-primary-200">
+                  ⏰ {getTimeRangePreview()}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Icona expand/collapse */}
+          <div className="ml-4 flex-shrink-0">
+            <span className={`text-2xl transition-transform duration-300 ${isExpanded ? 'rotate-180' : 'rotate-0'}`}>
+              ⌄
+            </span>
+          </div>
+        </button>
+
+        {/* TimeBar compatta - solo quando collassato e ci sono intervalli */}
+        {!isExpanded && intervals.length > 0 && (
+          <div className="px-6 pb-4">
+            <div className="relative h-4 w-full bg-neutral-200 rounded-lg overflow-hidden shadow-inner">
+              {intervals.map((range, idx) => {
+                const totalMinutes = 24 * 60;
+                const [startH, startM] = range.start.split(':').map(Number);
+                const [endH, endM] = range.end.split(':').map(Number);
+                const start = startH * 60 + startM;
+                const end = endH * 60 + endM;
+                const left = (start / totalMinutes) * 100;
+                const width = ((end - start) / totalMinutes) * 100;
+
+                return (
+                  <div
+                    key={idx}
+                    className="absolute top-0 bottom-0 bg-gradient-to-r from-primary-400 to-accent-500"
+                    style={{ left: `${left}%`, width: `${width}%` }}
+                    title={`${range.start} - ${range.end} | ⚡${range.power} 💨${range.fan}`}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Contenuto collassabile */}
+      <div
+        className={`transition-all duration-300 ease-in-out ${
+          isExpanded ? 'max-h-[3000px] opacity-100' : 'max-h-0 opacity-0'
+        } overflow-hidden`}
+      >
+        <div className="px-6 pb-6 space-y-4">
+          {/* TimeBar */}
+          {intervals.length > 0 && (
+            <TimeBar
+              intervals={intervals}
+              hoveredIndex={hoveredIndex}
+              selectedIndex={selectedIndex}
+              onHover={setHoveredIndex}
+              onClick={handleIntervalClick}
+            />
+          )}
+
+          {/* Lista intervalli */}
+          {intervals.length > 0 ? (
+            <div className="space-y-3">
+              {intervals.map((range, index) => (
+                <ScheduleInterval
+                  key={index}
+                  range={range}
+                  isHighlighted={index === hoveredIndex || index === selectedIndex}
+                  onRemove={() => onRemoveInterval(index)}
+                  onChange={(field, value, isBlur) => onChangeInterval(index, field, value, isBlur)}
+                  onMouseEnter={() => setHoveredIndex(index)}
+                  onMouseLeave={() => setHoveredIndex(null)}
+                  onClick={() => handleIntervalClick(index)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-neutral-500">
+              <p className="text-lg mb-2">📭 Nessun intervallo configurato</p>
+              <p className="text-sm">Aggiungi il primo intervallo per iniziare</p>
+            </div>
+          )}
+
+          {/* Pulsante aggiungi */}
+          <Button
+            variant="success"
+            icon="+"
+            onClick={onAddInterval}
+            className="w-full"
+          >
+            Aggiungi intervallo
+          </Button>
+        </div>
+      </div>
+    </Card>
+  );
+}

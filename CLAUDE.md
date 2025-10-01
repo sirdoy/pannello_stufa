@@ -8,10 +8,16 @@ This is a Next.js 15 PWA application called "Pannello Stufa" (Stove Panel) that 
 
 ## Development Commands
 
-- `npm run dev` - Start development server on http://localhost:3000
-- `npm run build` - Build for production
-- `npm run start` - Start production server
+- `npm run dev` - Start development server on http://localhost:3000 (PWA disabled in dev mode)
+- `npm run build` - Build for production (generates service worker and PWA assets)
+- `npm run start` - Start production server (PWA enabled)
 - `npm run lint` - Run ESLint
+
+**PWA Testing**:
+- PWA features (service worker, offline mode, install prompt) are **disabled in development**
+- To test PWA: run `npm run build` then `npm run start`
+- Service worker is generated in `public/sw.js` during production build
+- Clear service worker cache: DevTools → Application → Service Workers → Unregister
 
 ## Architecture
 
@@ -271,6 +277,12 @@ Componenti per visualizzazione errori/allarmi:
   - **Loading state**: Skeleton durante caricamento dati
   - Link rapido alla home page
   - Responsive design con card layout
+- `/offline` (`app/offline/page.js`) - PWA offline fallback page
+  - Displayed when user is offline and navigates to an uncached page
+  - Friendly message with connectivity status
+  - Manual retry button to attempt reconnection
+  - Automatically reloads when connection restored (via `reloadOnOnline` PWA config)
+  - Consistent UI using Card component and app design system
 
 ### API Routes Structure
 All API routes are in `app/api/` with the following organization:
@@ -548,7 +560,6 @@ await fetch(STUFA_API.ignite);
 - Firebase uses client SDK for all operations (no Admin SDK currently)
 
 ### Key Configuration
-- PWA enabled via `next-pwa` plugin (disabled in development)
 - **Tailwind CSS** for styling with custom design system
 - App Router architecture (Next.js 15)
 - Force dynamic rendering on main page for real-time data
@@ -560,6 +571,93 @@ await fetch(STUFA_API.ignite);
     - `s.gravatar.com` (Secure Gravatar)
   - Uses ES modules syntax with `import` statements
   - PWA configuration wrapped with `withPWA(nextConfig)`
+
+### PWA Configuration
+Complete Progressive Web App implementation with offline support and native-like experience:
+
+**`public/manifest.json`** - PWA manifest with full metadata:
+- **App info**: Name, short name, description in Italian
+- **Display**: Standalone mode (fullscreen app experience)
+- **Theme**: `#ef4444` (primary red) matching app design
+- **Icons**: 8 sizes (72, 96, 128, 144, 152, 192, 384, 512px) for all platforms
+  - `purpose: "any maskable"` for 192x192 and 512x512 (adaptive icons)
+  - Covers Android, iOS, Windows, Chrome requirements
+  - **Original sources**: `icon-192.png` and `icon-512.png` (manually created)
+  - **Generated sizes**: 72, 96, 128, 144, 152, 384px (auto-generated from icon-512.png using ImageMagick)
+  - **To regenerate**: Use ImageMagick `magick` command to resize icon-512.png to needed dimensions
+  - **Favicon**: `app/favicon.png` is a copy of `public/icons/icon-192.png`
+- **Shortcuts**: Quick actions accessible from home screen (long-press app icon on iOS/Android):
+  - 🔥 "Accendi stufa" → `/?action=ignite` - Direct ignition action
+  - ⏰ "Pianificazione" → `/scheduler` - Open scheduler configuration
+  - 🚨 "Allarmi" → `/errors` - View error history
+  - **IMPORTANT**: Shortcuts are **static only** - defined in manifest.json at build time
+  - **Cannot display dynamic data** (e.g., current stove status, temperature)
+  - **Cannot be updated** in real-time or based on API responses
+  - Limit: 4-5 shortcuts recommended (iOS/Android constraint)
+  - To modify: edit `public/manifest.json` shortcuts array and rebuild
+- **Categories**: utilities, lifestyle
+
+**`next.config.mjs`** - PWA plugin configuration:
+- Enabled only in production (`disable: process.env.NODE_ENV === 'development'`)
+- `reloadOnOnline: true` - Auto-reload when connection restored
+- Offline fallback to `/offline` page
+- **Workbox caching strategies**:
+  - **Stove API** (`wsthermorossi.cloudwinet.it`): NetworkFirst with 10s timeout, 60s cache
+  - **Images**: CacheFirst, 7-day expiration, 100 entries max
+  - **Static resources** (JS/CSS): StaleWhileRevalidate, 24h cache
+
+**`app/layout.js`** - PWA metadata and iOS support:
+- Next.js metadata API integration for PWA tags
+- Apple Web App support: capable, status bar style, custom title
+- Multiple icon sizes for iOS home screen
+- Viewport optimized for mobile (max-scale=5, user-scalable)
+- Format detection disabled for phone numbers
+
+**`app/offline/page.js`** - Offline fallback page:
+- Friendly message when no connection available
+- Automatic reconnection detection
+- Manual retry button
+- Consistent UI with app design (Card component)
+
+**Service Worker**: Auto-generated in `public/` by next-pwa during build
+- Registration: Automatic on page load
+- Skip waiting: Immediate activation of new versions
+- Background sync: Queues failed requests for retry
+- Push notifications: Ready for Firebase Cloud Messaging integration
+
+### PWA Limitations and Alternatives
+
+**Static Shortcuts Limitation**:
+- PWA shortcuts in `manifest.json` are **static only** - cannot display real-time data
+- No API exists to update shortcut text/labels dynamically
+- iOS and Android read shortcuts once at installation time
+- **Cannot show**: current stove status, temperature, power level, or any live data in shortcut menu
+
+**Alternatives for Dynamic Information**:
+
+1. **App Badge** (icon notification badge):
+   - Can show numeric count (e.g., number of active errors)
+   - Limited iOS support, requires notification permissions
+   - Only numbers, no text or status labels
+   - Implementation: Badging API (experimental)
+
+2. **Push Notifications**:
+   - Periodic status updates sent as notifications
+   - Already implemented for errors via `lib/errorMonitor.js`
+   - Could be extended to send status changes (e.g., "Stufa accesa", "Stufa spenta")
+   - User must grant notification permission
+
+3. **Fast App Launch**:
+   - Current approach: App loads in <1 second, shows real-time status immediately
+   - Polling every 5 seconds ensures fresh data on home page
+   - Most reliable solution for real-time monitoring
+
+4. **Native App Widgets** (requires native development):
+   - iOS/Android home screen widgets with live data
+   - Requires building native apps (Swift/Kotlin), not web PWA
+   - Out of scope for current web-based architecture
+
+**Recommendation**: For users wanting quick status checks, the best approach is opening the app (instant load via PWA) rather than attempting to show dynamic data in shortcuts.
 
 ### Design System (Tailwind)
 Modern, minimal design with warm color palette reflecting the stove's purpose:
@@ -623,11 +721,17 @@ Modern, minimal design with warm color palette reflecting the stove's purpose:
 - **Critical errors**: Errors marked as CRITICAL severity will show `requireInteraction: true` in notifications
 
 ### Application Behavior
-- PWA configuration generates service worker in `public/` directory (disabled in development)
-- Italian language interface ("it" locale) - All UI text and labels are in Italian
-- Theme color for PWA: `#ef4444` (primary red)
-- Development server typically runs on port 3000, but may use alternative ports (3002, 3003) if 3000 is occupied
-- Navigation links in Navbar:
+- **PWA Features**:
+  - Service worker auto-generated in `public/` during build (disabled in development)
+  - Install prompt on supported browsers (Chrome, Edge, Safari iOS 16.4+)
+  - Offline fallback to `/offline` page when no connection
+  - Home screen shortcuts for quick actions (ignite, scheduler, errors) - **static only, no dynamic data**
+  - Full-screen standalone mode on mobile
+  - Smart caching: Stove API (1min), images (7 days), static files (24h)
+  - Favicon: Uses PWA icon (`app/favicon.png` from `public/icons/icon-192.png`)
+- **Language**: Italian interface ("it" locale) - All UI text and labels in Italian
+- **Development server**: Typically runs on port 3000, but may use alternatives (3002, 3003) if occupied
+- **Navigation** links in Navbar:
   - **Home** (`/`) - Stove control panel
   - **Pianificazione** (`/scheduler`) - Weekly schedule configuration
   - **Storico** (`/log`) - User action logs
@@ -977,6 +1081,15 @@ export default logService;
 - **Add new animation**: Define keyframes in `tailwind.config.js` theme.extend.keyframes and add to theme.extend.animation
 - **Modify existing component styles**: Edit component file directly using Tailwind utility classes (e.g., `Card.js`, `Button.js`, `Input.js`)
 
+**PWA-specific tasks**:
+- **Update PWA shortcuts**: Edit `public/manifest.json` shortcuts array, then rebuild
+- **Change PWA theme color**: Update `theme_color` in `public/manifest.json` AND `viewport.themeColor` in `app/layout.js`
+- **Update app icon**: Replace `public/icons/icon-192.png` and `icon-512.png`, regenerate other sizes with ImageMagick, update `app/favicon.png`
+- **Modify cache strategies**: Edit `runtimeCaching` array in `next.config.mjs` (NetworkFirst, CacheFirst, StaleWhileRevalidate)
+- **Add new cached route**: Add new entry to `runtimeCaching` in `next.config.mjs` with appropriate handler
+- **Test PWA offline**: Build production (`npm run build`), start server (`npm run start`), disable network in DevTools
+- **Clear service worker**: DevTools → Application → Service Workers → Unregister, then hard refresh
+
 ### Development Best Practices
 
 #### When Creating New API Routes:
@@ -1023,7 +1136,15 @@ export default function Card({ children, className }) {
 #### Code Quality Checks:
 ```bash
 # Run these before committing
-npm run build    # Check for build errors
+npm run build    # Check for build errors (also generates PWA files)
 npm run lint     # Check for ESLint warnings
 npm run dev      # Test runtime behavior
 ```
+
+#### When Modifying PWA Configuration:
+1. ✅ **Shortcuts are static** - remind user that shortcuts in manifest.json cannot show dynamic data
+2. ✅ **Test in production mode** - PWA is disabled in dev, always test with `npm run build && npm run start`
+3. ✅ **Update both files** - if changing theme color, update BOTH `manifest.json` and `app/layout.js` viewport export
+4. ✅ **Regenerate icons** - use ImageMagick `magick` command to create all sizes from a single source
+5. ✅ **Clear cache after changes** - service worker caches aggressively, users may need to unregister SW to see updates
+6. ✅ **Verify offline fallback** - ensure `/offline` page works when disconnected (test in DevTools Network tab)

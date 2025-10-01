@@ -14,7 +14,9 @@
       "WebSearch",
       "Bash(python3:*)",
       "Bash(cat:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(identify:*)",
+      "Bash(convert:*)"
     ],
     "deny": [],
     "ask": []

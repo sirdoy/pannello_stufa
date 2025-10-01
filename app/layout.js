@@ -3,18 +3,33 @@ import Navbar from './components/Navbar';
 
 export const metadata = {
   title: 'Pannello Stufa',
-  description: 'Controllo remoto della stufa',
+  description: 'Controllo remoto della stufa Thermorossi con pianificazione automatica e monitoraggio temperatura',
+  applicationName: 'Pannello Stufa',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Stufa',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  manifest: '/manifest.json',
+};
+
+export const viewport = {
+  themeColor: '#ef4444',
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="it">
     <head>
-      <link rel="manifest" href="/manifest.json" />
-      <meta name="theme-color" content="#ef4444" />
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
       <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-      <meta name="apple-mobile-web-app-capable" content="yes" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
+      <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      <meta name="mobile-web-app-capable" content="yes" />
     </head>
     <body className="min-h-screen text-neutral-900">
     <Navbar />

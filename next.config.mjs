@@ -32,7 +32,47 @@ const withPWA = createPwaPlugin({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development', // attivo solo in produzione
+  disable: process.env.NODE_ENV === 'development',
+  reloadOnOnline: true,
+  fallbacks: {
+    document: '/offline',
+  },
+  runtimeCaching: [
+    {
+      urlPattern: /^https:\/\/wsthermorossi\.cloudwinet\.it\/.*/i,
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'stove-api-cache',
+        expiration: {
+          maxEntries: 50,
+          maxAgeSeconds: 60,
+        },
+        networkTimeoutSeconds: 10,
+      },
+    },
+    {
+      urlPattern: /^https:\/\/.*\.(?:png|jpg|jpeg|svg|gif|webp)$/i,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'image-cache',
+        expiration: {
+          maxEntries: 100,
+          maxAgeSeconds: 7 * 24 * 60 * 60,
+        },
+      },
+    },
+    {
+      urlPattern: /\.(?:js|css)$/i,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'static-resources',
+        expiration: {
+          maxEntries: 100,
+          maxAgeSeconds: 24 * 60 * 60,
+        },
+      },
+    },
+  ],
 });
 
 export default withPWA(nextConfig);

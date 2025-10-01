@@ -34,6 +34,7 @@ Modular component system for consistent UI across the application:
 
 - **Card** (`Card.js`) - Base container component
   - Props: `children`, `className`, `...props`
+  - Implementation: Uses pure Tailwind classes (`bg-white rounded-2xl shadow-soft border border-neutral-200/50 backdrop-blur-sm`)
   - Usage: `<Card className="p-6">content</Card>`
 
 - **Button** (`Button.js`) - Standardized button with variants
@@ -42,13 +43,14 @@ Modular component system for consistent UI across the application:
 
 - **Input** (`Input.js`) - Text input with label and icon support
   - Props: `type`, `label`, `icon`, `className`, `containerClassName`
+  - Implementation: Uses pure Tailwind classes for styling (focus ring, border, rounded corners)
   - Usage: `<Input type="time" label="⏰ Dalle" value={start} onChange={handleChange} />`
 
 - **Select** (`Select.js`) - Custom dropdown select with modern UI
   - **Implementation**: Custom dropdown (not native `<select>`) with React state management
   - Props: `label`, `icon`, `options` (array of `{value, label, disabled?}`), `value`, `onChange`, `disabled`, `className`, `containerClassName`
   - **Features**:
-    - Custom dropdown menu with smooth animations (fade in + slide down + scale)
+    - Custom dropdown menu with smooth animations using `animate-dropdown` from Tailwind config (fade in + slide down + scale)
     - Selected option highlighted with red background and left border
     - Checkmark (✓) on selected item
     - Animated chevron that rotates on open/close
@@ -83,6 +85,7 @@ Modular component system for consistent UI across the application:
     - `Skeleton.Card` - Card wrapper for custom skeleton content
     - `Skeleton.LogEntry` - Single log entry skeleton
   - Design: Gradient shimmer animation following app's neutral color palette
+  - Implementation: Uses `animate-shimmer` from Tailwind config (keyframes defined in tailwind.config.js)
   - Usage:
     ```javascript
     // Generic skeleton
@@ -567,13 +570,29 @@ Modern, minimal design with warm color palette reflecting the stove's purpose:
 - **Warning** (yellow #f59e0b): Semi-manual mode, standby states
 - **Info** (blue #3b82f6): Information and links
 
-Custom utility classes in `app/globals.css`:
-- `.card`: Modern white cards with soft shadow and border
-- `.btn-primary`, `.btn-secondary`: Consistent button styles
-- `.input-modern`, `.select-modern`: Form controls with custom styling
-- `@keyframes shimmer`: Animation for Skeleton loading states (1.5s ease-in-out infinite)
-- Gradient background on body for depth
+**CSS Architecture**: The application uses **pure Tailwind CSS** with no custom CSS classes for components.
+
+**`app/globals.css`** - Minimal global styles only:
+```css
+@layer base {
+  html { @apply antialiased; }
+  body { @apply bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-200; }
+}
+```
+
+**`tailwind.config.js`** - Custom animations and design tokens:
+- **Animations**:
+  - `animate-shimmer`: Gradient shimmer for skeleton loaders (1.5s ease-in-out infinite)
+  - `animate-dropdown`: Smooth dropdown menu animation (fade + slide + scale, 0.15s ease-out)
+- **Custom shadows**: `shadow-soft`, `shadow-card`
+- **Custom border radius**: `rounded-xl` (1rem), `rounded-2xl` (1.5rem), `rounded-3xl` (2rem)
+
+**Component Styling Approach**:
+- All components use inline Tailwind classes (no `.card`, `.btn-primary`, etc.)
+- Reusable components (Card, Button, Input, Select) encapsulate common Tailwind patterns
+- Consistent spacing with Tailwind scale (gap-2, gap-4, p-6, p-8, etc.)
 - Mobile-first responsive approach throughout
+- All interactive elements have `transition-all duration-200` for smooth animations
 
 ### Environment Variables Required
 - Firebase config variables (`NEXT_PUBLIC_FIREBASE_*`)
@@ -658,7 +677,7 @@ When modifying components, maintain these design principles:
 - **Icon usage**: Emoji icons throughout for visual clarity and simplicity
 - **Color semantics**: Follow the design system colors for consistent meaning
 - **Smooth transitions**: All interactive elements should have `transition-all duration-200`
-- **Card-based layout**: Main content areas use the `.card` utility class
+- **Card-based layout**: Main content areas use the `<Card>` component (encapsulates Tailwind styles: `bg-white rounded-2xl shadow-soft border border-neutral-200/50 backdrop-blur-sm`)
 - **Active states**: Buttons should have hover, active, and disabled states clearly defined
 - **Accessibility**: Maintain proper contrast ratios and semantic HTML
 - **Reusable components**: Always use existing UI components from `app/components/ui/` instead of duplicating styles
@@ -945,16 +964,18 @@ export default logService;
 - **Error handling**: `lib/errorMonitor.js`, `app/components/ui/ErrorAlert.js`
 - **Logging**: `lib/logService.js`
 - **Scheduler logic**: `lib/schedulerService.js`, `app/api/scheduler/check/route.js`
-- **Styling**: `app/globals.css`, Tailwind classes inline
+- **Styling**: `tailwind.config.js` (animations, colors, shadows), inline Tailwind classes in components. **Note**: `app/globals.css` contains only base styles (no component classes)
 - **Configuration**: `CLAUDE.md`, `.env.local`
 
 ### Common Tasks
 - **Add new error code**: Update `ERROR_CODES` in `lib/errorMonitor.js`
-- **Add new UI component**: Create in `app/components/ui/`, export in `index.js`
+- **Add new UI component**: Create in `app/components/ui/`, export in `index.js`, use inline Tailwind classes (no custom CSS classes)
 - **Modify scheduler logic**: Edit `app/api/scheduler/check/route.js`
 - **Change polling interval**: Modify `setInterval` in `app/components/StovePanel.js` (currently 5000ms)
 - **Add new log action**: Add to `lib/logService.js` with pre-configured function
-- **Modify color scheme**: Update Tailwind config or `app/globals.css`
+- **Modify color scheme**: Update `tailwind.config.js` theme.extend.colors
+- **Add new animation**: Define keyframes in `tailwind.config.js` theme.extend.keyframes and add to theme.extend.animation
+- **Modify existing component styles**: Edit component file directly using Tailwind utility classes (e.g., `Card.js`, `Button.js`, `Input.js`)
 
 ### Development Best Practices
 
@@ -974,6 +995,30 @@ export default logService;
 1. ✅ Assign objects to variables before exporting: `const x = {...}; export default x`
 2. ✅ Use named exports when exporting multiple items: `export { a, b, c }`
 3. ✅ Avoid anonymous object exports: `export default { ... }` triggers ESLint warnings
+
+#### When Styling Components:
+1. ✅ Use inline Tailwind utility classes directly in components (no custom CSS classes)
+2. ✅ Never add new classes to `app/globals.css` (reserved for base styles only)
+3. ✅ For custom animations, define in `tailwind.config.js` under `theme.extend.keyframes` and `theme.extend.animation`
+4. ✅ For new colors/shadows/etc., extend Tailwind theme in `tailwind.config.js`
+5. ✅ Reusable styles should be encapsulated in components (e.g., `<Card>`, `<Button>`), not CSS classes
+6. ❌ Never create utility classes like `.card`, `.btn-primary`, `.input-modern` in globals.css
+7. ✅ Example of correct approach:
+```javascript
+// ✅ CORRECT - Component with inline Tailwind
+export default function Card({ children, className }) {
+  return (
+    <div className={`bg-white rounded-2xl shadow-soft border border-neutral-200/50 ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+// ❌ WRONG - Using custom CSS class
+export default function Card({ children, className }) {
+  return <div className={`card ${className}`}>{children}</div>;
+}
+```
 
 #### Code Quality Checks:
 ```bash

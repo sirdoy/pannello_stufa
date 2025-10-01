@@ -21,7 +21,6 @@ export default function StovePanel() {
   const [fanLevel, setFanLevel] = useState(null);
   const [powerLevel, setPowerLevel] = useState(null);
   const [ambientTemp, setAmbientTemp] = useState(null);
-  const [roomTemp, setRoomTemp] = useState(null);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [schedulerEnabled, setSchedulerEnabled] = useState(false);
@@ -79,18 +78,6 @@ export default function StovePanel() {
     }
   };
 
-  const fetchRoomTemperature = async () => {
-    try {
-      const res = await fetch(STOVE_ROUTES.getRoomTemperature);
-      const json = await res.json();
-      if (json?.Result !== undefined) {
-        setRoomTemp(json.Result);
-      }
-    } catch (err) {
-      console.error('Errore temperatura target:', err);
-    }
-  };
-
   const fetchStatusAndUpdate = useCallback(async () => {
     try {
       const res = await fetch(STOVE_ROUTES.status);
@@ -120,7 +107,6 @@ export default function StovePanel() {
 
       await fetchFanLevel();
       await fetchPowerLevel();
-      await fetchRoomTemperature();
       await fetchSchedulerMode();
     } catch (err) {
       console.error('Errore stato:', err);
@@ -195,6 +181,25 @@ export default function StovePanel() {
     return 'bg-neutral-50 border-neutral-200';
   };
 
+  const getStatusIcon = (status) => {
+    if (!status) return '❔';
+    if (status.includes('WORK')) return '🔥';
+    if (status.includes('OFF')) return '❄️';
+    if (status.includes('ERROR')) return '⚠️';
+    if (status.includes('START')) return '⏱️';
+    if (status.includes('WAIT')) return '💤';
+    return '❔';
+  };
+
+  const getStatusColor = (status) => {
+    if (!status) return 'text-neutral-500';
+    if (status.includes('WORK')) return 'text-success-600';
+    if (status.includes('OFF')) return 'text-neutral-500';
+    if (status.includes('STANDBY')) return 'text-warning-500';
+    if (status.includes('ERROR')) return 'text-primary-600';
+    return 'text-neutral-500';
+  };
+
   const isAccesa = status?.includes('WORK') || status?.includes('START');
   const isSpenta = status?.includes('OFF') || status?.includes('ERROR') || status?.includes('WAIT');
 
@@ -214,34 +219,105 @@ export default function StovePanel() {
       )}
 
       {/* Hero Section - Stato */}
-      <Card className={`p-8 border-2 transition-all duration-300 ${getStatusBgColor(status)}`}>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-3xl font-bold text-neutral-900">🔥 Stato Stufa</h2>
-            <button
-              onClick={handleManualRefresh}
-              disabled={refreshing}
-              className="p-2 rounded-xl hover:bg-white/50 transition-all duration-200 disabled:opacity-50"
-              title="Aggiorna stato"
-            >
-              <span className={`text-2xl inline-block ${refreshing ? 'animate-spin' : ''}`}>
-                {refreshing ? '⏳' : '🔄'}
-              </span>
-            </button>
-          </div>
+      <Card className={`overflow-hidden border-2 transition-all duration-300 ${getStatusBgColor(status)}`}>
+        <div className="relative">
+          {/* Header con gradiente */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 via-accent-500 to-primary-500"></div>
 
-          <div className="flex items-center justify-center py-4">
-            <StatusBadge status={status} size="lg" />
-          </div>
+          <div className="p-8">
+            {/* Top bar: Titolo e Refresh */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-neutral-900">Stato Stufa</h2>
+              <button
+                onClick={handleManualRefresh}
+                disabled={refreshing}
+                className="group relative p-3 rounded-xl hover:bg-white/70 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:hover:bg-transparent"
+                title="Aggiorna stato"
+              >
+                <span className={`text-xl inline-block ${refreshing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-300'}`}>
+                  {refreshing ? '⏳' : '🔄'}
+                </span>
+              </button>
+            </div>
 
-          <div className="pt-4 border-t border-neutral-200">
-            <ModeIndicator
-              enabled={schedulerEnabled}
-              semiManual={semiManualMode}
-              returnToAutoAt={returnToAutoAt}
-              onConfigClick={() => router.push('/scheduler')}
-              showConfigButton={true}
-            />
+            {/* Main Status Display - Grid 2 colonne */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              {/* Colonna 1: Status principale */}
+              <div className="flex flex-col items-center justify-center p-6 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/80 shadow-sm">
+                <div className="flex items-center gap-4 mb-2">
+                  <span className="text-6xl drop-shadow-lg">{getStatusIcon(status)}</span>
+                  <div className="text-left">
+                    <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mb-1">Status</p>
+                    <p className={`text-3xl font-bold ${getStatusColor(status)}`}>
+                      {status}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Colonna 2: Info aggiuntive */}
+              <div className="grid grid-cols-2 gap-3">
+                {/* Ventola */}
+                <div className="flex flex-col items-center justify-center p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-white/80 shadow-sm">
+                  <span className="text-3xl mb-2">💨</span>
+                  <p className="text-xs text-neutral-500 font-semibold mb-1">Ventola</p>
+                  <p className="text-2xl font-bold text-info-600">{fanLevel ?? '-'}<span className="text-base text-neutral-400">/6</span></p>
+                </div>
+
+                {/* Potenza */}
+                <div className="flex flex-col items-center justify-center p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-white/80 shadow-sm">
+                  <span className="text-3xl mb-2">⚡</span>
+                  <p className="text-xs text-neutral-500 font-semibold mb-1">Potenza</p>
+                  <p className="text-2xl font-bold text-accent-600">{powerLevel ?? '-'}<span className="text-base text-neutral-400">/5</span></p>
+                </div>
+              </div>
+            </div>
+
+            {/* Separator */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-neutral-200"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-3 bg-white/60 text-neutral-500 font-medium rounded-full">Modalità Controllo</span>
+              </div>
+            </div>
+
+            {/* Mode Indicator - Redesign inline */}
+            <div className="flex items-center justify-between p-5 bg-white/40 backdrop-blur-sm rounded-xl border border-neutral-200/60">
+              <div className="flex items-center gap-3">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                  schedulerEnabled && semiManualMode ? 'bg-warning-100 border-2 border-warning-300' :
+                  schedulerEnabled ? 'bg-success-100 border-2 border-success-300' :
+                  'bg-accent-100 border-2 border-accent-300'
+                }`}>
+                  <span className="text-2xl">
+                    {schedulerEnabled && semiManualMode ? '⚙️' : schedulerEnabled ? '⏰' : '🔧'}
+                  </span>
+                </div>
+                <div>
+                  <p className={`text-base font-bold ${
+                    schedulerEnabled && semiManualMode ? 'text-warning-700' :
+                    schedulerEnabled ? 'text-success-700' :
+                    'text-accent-700'
+                  }`}>
+                    {schedulerEnabled && semiManualMode ? 'Modalità Semi-manuale' : schedulerEnabled ? 'Modalità Automatica' : 'Modalità Manuale'}
+                  </p>
+                  <p className="text-xs text-neutral-500 mt-0.5">
+                    {schedulerEnabled && semiManualMode && returnToAutoAt
+                      ? `Ritorno auto: ${new Date(returnToAutoAt).toLocaleString('it-IT', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'})}`
+                      : schedulerEnabled ? 'Controllo automatico attivo' : 'Controllo manuale attivo'
+                    }
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => router.push('/scheduler')}
+                className="px-5 py-2.5 rounded-xl text-sm font-semibold text-info-700 bg-info-50 hover:bg-info-100 border border-info-200 hover:border-info-300 transition-all duration-200 active:scale-95"
+              >
+                Configura
+              </button>
+            </div>
           </div>
         </div>
       </Card>
@@ -290,7 +366,14 @@ export default function StovePanel() {
         {/* Livelli */}
         <Card className="p-8">
           <h3 className="text-2xl font-bold text-neutral-900 mb-6">⚙️ Regolazioni</h3>
-          <div className="space-y-4">
+
+          {isSpenta && (
+            <div className="mb-6 p-4 bg-neutral-100 border border-neutral-300 rounded-xl text-center">
+              <p className="text-sm font-medium text-neutral-600">⚠️ Regolazioni disponibili solo con stufa accesa</p>
+            </div>
+          )}
+
+          <div className="space-y-5">
             <Select
               label="💨 Livello Ventilazione"
               value={fanLevel ?? ''}
@@ -308,28 +391,6 @@ export default function StovePanel() {
               className="text-lg py-4"
               disabled={isSpenta}
             />
-
-            {/* Visualizzazione livelli attivi */}
-            <div className="mt-6 pt-4 border-t border-neutral-200">
-              <div className="grid grid-cols-2 gap-4 text-center mb-4">
-                <div>
-                  <p className="text-sm text-neutral-500 mb-1">Ventola</p>
-                  <p className="text-2xl font-bold text-info-600">{fanLevel ?? '-'}/6</p>
-                </div>
-                <div>
-                  <p className="text-sm text-neutral-500 mb-1">Potenza</p>
-                  <p className="text-2xl font-bold text-accent-600">{powerLevel ?? '-'}/5</p>
-                </div>
-              </div>
-
-              {/* Temperatura target */}
-              {roomTemp !== null && (
-                <div className="mt-4 p-3 bg-info-50 border border-info-200 rounded-xl text-center">
-                  <p className="text-xs text-info-600 mb-1">🎯 Temperatura Target</p>
-                  <p className="text-xl font-bold text-info-700">{roomTemp}°C</p>
-                </div>
-              )}
-            </div>
           </div>
         </Card>
       </div>

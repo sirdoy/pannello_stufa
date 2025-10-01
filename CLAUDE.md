@@ -98,6 +98,7 @@ lib/
 - Animazione `animate-dropdown` da Tailwind config
 - No placeholder options, solo valori reali
 - Click-outside to close
+- Support `disabled` prop con styling opacity + cursor-not-allowed
 
 **Skeleton** - Loading placeholders
 - Pre-built: `Skeleton.StovePanel`, `Skeleton.Scheduler`, `Skeleton.LogPage`
@@ -116,11 +117,13 @@ import { Card, Button, Select, StatusBadge, Skeleton, ErrorAlert, Footer } from 
 ### Pagine
 
 **`/` (Home)** - StovePanel
-- Layout: Error Alert → Hero (status) → Grid 2 col (Actions + Regolazioni) → Netatmo footer
+- Layout: Error Alert → Hero (status con glassmorphism + info compatte) → Grid 2 col (Actions + Regolazioni) → Netatmo footer
+- Hero modernizzato: barra gradiente top, grid 2 col (status principale + ventola/potenza), separator decorativo, mode indicator con icona colorata
 - Real-time polling: 5 secondi
 - Monitora errori e invia notifiche browser
 - Loading: `Skeleton.StovePanel`
 - Responsive: max-w-7xl, grid adapts mobile/desktop
+- Regolazioni disabilitate quando stufa OFF con alert visivo
 
 **`/scheduler`** - Pianificazione settimanale
 - Accordion UI (giorni collassabili con preview)
@@ -150,11 +153,11 @@ import { Card, Button, Select, StatusBadge, Skeleton, ErrorAlert, Footer } from 
 - `GET status` - Status + errori (GetStatus)
 - `GET getFan` - Fan level 1-6 (GetFanLevel)
 - `GET getPower` - Power level 0-5 (GetPower) - UI mostra solo 1-5
-- `GET getRoomTemperature` - Setpoint temperatura (GetRoomControlTemperature)
+- ~~`GET getRoomTemperature`~~ - **NON SUPPORTATA** dalla stufa (endpoint deprecato)
 - `POST ignite` - Accensione (Ignit) - trigger semi-manual se scheduler attivo
 - `POST shutdown` - Spegnimento (Shutdown) - trigger semi-manual se scheduler attivo
-- `POST setFan` - Imposta ventola (SetFanLevel/[apikey];[level])
-- `POST setPower` - Imposta potenza (SetPower/[apikey];[level])
+- `POST setFan` - Imposta ventola (SetFanLevel/[apikey];[level]) - **DISABILITATA quando stufa OFF**
+- `POST setPower` - Imposta potenza (SetPower/[apikey];[level]) - **DISABILITATA quando stufa OFF**
 
 **Scheduler (`/api/scheduler/*`)**
 - `GET check?secret=<CRON_SECRET>` - Cron endpoint (chiamato ogni minuto)
@@ -183,15 +186,14 @@ import { Card, Button, Select, StatusBadge, Skeleton, ErrorAlert, Footer } from 
 
 **Base URL**: `https://wsthermorossi.cloudwinet.it/WiNetStove.svc/json`
 
-**8 Endpoints integrati**:
+**7 Endpoints integrati** (GetRoomControlTemperature non supportata dalla stufa):
 1. `GetStatus/[apikey]` → `STUFA_API.getStatus`
 2. `GetFanLevel/[apikey]` → `STUFA_API.getFan`
 3. `GetPower/[apikey]` → `STUFA_API.getPower`
-4. `GetRoomControlTemperature/[apikey]` → `STUFA_API.getRoomTemperature`
-5. `SetFanLevel/[apikey];[level]` → `STUFA_API.setFan(level)`
-6. `SetPower/[apikey];[level]` → `STUFA_API.setPower(level)`
-7. `Ignit/[apikey]` → `STUFA_API.ignite`
-8. `Shutdown/[apikey]` → `STUFA_API.shutdown`
+4. `SetFanLevel/[apikey];[level]` → `STUFA_API.setFan(level)`
+5. `SetPower/[apikey];[level]` → `STUFA_API.setPower(level)`
+6. `Ignit/[apikey]` → `STUFA_API.ignite`
+7. `Shutdown/[apikey]` → `STUFA_API.shutdown`
 
 **Note**: API key hardcoded in `lib/stoveApi.js:18` (considerare env var per production)
 
@@ -422,6 +424,11 @@ export default function Card({ children, className }) {
 - Mobile-first, Tailwind spacing scale, emoji icons, color semantics
 - Smooth transitions (`transition-all duration-200`)
 - Card-based layout, proper contrast, semantic HTML
+- Glassmorphism: `backdrop-blur-sm`, `bg-white/60` per effetto moderno
+- Active feedback: `active:scale-95` sui pulsanti interattivi
+- Hover animations: `group-hover:rotate-180` per icone
+- Disabled states: opacity + cursor-not-allowed + alert visivo contestuale
+- Gradienti decorativi: `bg-gradient-to-r from-primary-500 via-accent-500 to-primary-500`
 
 ---
 
@@ -538,10 +545,11 @@ CRON_SECRET=cazzo
 
 ### Real-time Monitoring
 1. User opens app → `Skeleton.StovePanel`
-2. Fetch: status, fan, power, temperature, scheduler mode
+2. Fetch: status, fan, power, scheduler mode (NO temperatura - non supportata)
 3. If `Error !== 0`: log Firebase, show ErrorAlert, send notification
 4. Poll every 5s
 5. Manual actions: API call + log + semi-manual mode
+6. Regolazioni disabilitate automaticamente se `status.includes('OFF|ERROR|WAIT')`
 
 ### Scheduler Automation
 1. User configures → save Firebase

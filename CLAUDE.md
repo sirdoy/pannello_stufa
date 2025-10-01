@@ -107,6 +107,14 @@ Modular component system for consistent UI across the application:
     </Skeleton.Card>
     ```
 
+- **Footer** (`Footer.js`) - Application footer with author and version info
+  - Props: `className`
+  - Displays: "Made with ❤️ by Federico Manfredi" and current app version
+  - Design: Glassmorphism style with backdrop blur, fixed to bottom of page
+  - Version sourced from `lib/version.js`
+  - Automatically included in all pages via `app/layout.js`
+  - Usage: `<Footer />` (or `<Footer className="custom-class" />`)
+
 ### Scheduler Components (`app/components/scheduler/`)
 Specialized components for weekly schedule management:
 
@@ -159,7 +167,7 @@ Components for user action log display:
 ### Component Export Structure
 All UI components are exported from `app/components/ui/index.js` for clean imports:
 ```javascript
-import { Card, Button, Select, StatusBadge, ModeIndicator, Pagination, Skeleton, ErrorAlert, ErrorBadge } from '@/app/components/ui';
+import { Card, Button, Select, StatusBadge, ModeIndicator, Pagination, Skeleton, ErrorAlert, ErrorBadge, Footer } from '@/app/components/ui';
 ```
 
 Scheduler components from `app/components/scheduler/index.js`:
@@ -571,6 +579,51 @@ await fetch(STUFA_API.ignite);
     - `s.gravatar.com` (Secure Gravatar)
   - Uses ES modules syntax with `import` statements
   - PWA configuration wrapped with `withPWA(nextConfig)`
+
+### Version Management System
+The application includes a centralized version tracking system to maintain a history of changes and releases.
+
+**`lib/version.js`** - Version configuration file:
+- **APP_VERSION**: Current application version (format: MAJOR.MINOR.PATCH)
+  - MAJOR: Breaking changes or major feature releases
+  - MINOR: New features, non-breaking changes
+  - PATCH: Bug fixes, minor improvements
+- **APP_AUTHOR**: Application author name
+- **LAST_UPDATE**: Date of last version update (YYYY-MM-DD format)
+- **VERSION_HISTORY**: Array of version objects with changelog
+  - Each entry contains: `version`, `date`, `changes` (array of change descriptions)
+
+**Usage in Footer**:
+The Footer component automatically displays the current version from `lib/version.js`:
+```javascript
+import { APP_VERSION, APP_AUTHOR } from '@/lib/version';
+```
+
+**Updating Versions**:
+When making significant changes to the application:
+1. Increment `APP_VERSION` following semantic versioning
+2. Update `LAST_UPDATE` to current date
+3. Add new entry to `VERSION_HISTORY` array with detailed changelog
+4. Commit changes with descriptive commit message
+
+Example version update:
+```javascript
+export const APP_VERSION = '1.1.0';
+export const LAST_UPDATE = '2025-10-15';
+
+export const VERSION_HISTORY = [
+  {
+    version: '1.1.0',
+    date: '2025-10-15',
+    changes: [
+      'Aggiunta nuova funzionalità X',
+      'Migliorata interfaccia Y',
+      'Corretti bug Z',
+    ],
+  },
+  // ... previous versions
+];
+```
 
 ### PWA Configuration
 Complete Progressive Web App implementation with offline support and native-like experience:
@@ -1068,6 +1121,7 @@ export default logService;
 - **Error handling**: `lib/errorMonitor.js`, `app/components/ui/ErrorAlert.js`
 - **Logging**: `lib/logService.js`
 - **Scheduler logic**: `lib/schedulerService.js`, `app/api/scheduler/check/route.js`
+- **Version management**: `lib/version.js` (update APP_VERSION, LAST_UPDATE, VERSION_HISTORY)
 - **Styling**: `tailwind.config.js` (animations, colors, shadows), inline Tailwind classes in components. **Note**: `app/globals.css` contains only base styles (no component classes)
 - **Configuration**: `CLAUDE.md`, `.env.local`
 
@@ -1077,6 +1131,11 @@ export default logService;
 - **Modify scheduler logic**: Edit `app/api/scheduler/check/route.js`
 - **Change polling interval**: Modify `setInterval` in `app/components/StovePanel.js` (currently 5000ms)
 - **Add new log action**: Add to `lib/logService.js` with pre-configured function
+- **Update app version**: Edit `lib/version.js`:
+  1. Increment `APP_VERSION` (MAJOR.MINOR.PATCH)
+  2. Update `LAST_UPDATE` to current date (YYYY-MM-DD)
+  3. Add new entry to `VERSION_HISTORY` array with changes list
+  4. Version automatically displays in Footer on all pages
 - **Modify color scheme**: Update `tailwind.config.js` theme.extend.colors
 - **Add new animation**: Define keyframes in `tailwind.config.js` theme.extend.keyframes and add to theme.extend.animation
 - **Modify existing component styles**: Edit component file directly using Tailwind utility classes (e.g., `Card.js`, `Button.js`, `Input.js`)

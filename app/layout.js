@@ -1,5 +1,6 @@
 import './globals.css';
 import Navbar from './components/Navbar';
+import { Footer } from './components/ui';
 
 export const metadata = {
   title: 'Pannello Stufa',
@@ -31,13 +32,14 @@ export default function RootLayout({ children }) {
       <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       <meta name="mobile-web-app-capable" content="yes" />
     </head>
-    <body className="min-h-screen text-neutral-900">
+    <body className="min-h-screen text-neutral-900 flex flex-col">
     <Navbar />
-    <main className="pt-6 pb-12 px-4 sm:px-6 lg:px-8">
+    <main className="flex-1 pt-6 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {children}
       </div>
     </main>
+    <Footer />
     </body>
     </html>
   );

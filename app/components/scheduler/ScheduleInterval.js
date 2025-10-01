@@ -41,7 +41,7 @@ export default function ScheduleInterval({
               value={range.start}
               onChange={(e) => onChange('start', e.target.value, false)}
               onBlur={(e) => onChange('start', e.target.value, true)}
-              className="input-modern text-sm"
+              className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl text-neutral-900 placeholder:text-neutral-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-sm"
             />
           </div>
 
@@ -52,7 +52,7 @@ export default function ScheduleInterval({
               value={range.end}
               onChange={(e) => onChange('end', e.target.value, false)}
               onBlur={(e) => onChange('end', e.target.value, true)}
-              className="input-modern text-sm"
+              className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl text-neutral-900 placeholder:text-neutral-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-sm"
             />
           </div>
         </div>
@@ -65,7 +65,7 @@ export default function ScheduleInterval({
               value={range.power}
               onChange={(e) => onChange('power', Number(e.target.value), false)}
               onBlur={(e) => onChange('power', Number(e.target.value), true)}
-              className="select-modern text-sm"
+              className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl text-neutral-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 appearance-none text-sm"
             >
               {powerOptions.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -79,7 +79,7 @@ export default function ScheduleInterval({
               value={range.fan}
               onChange={(e) => onChange('fan', Number(e.target.value), false)}
               onBlur={(e) => onChange('fan', Number(e.target.value), true)}
-              className="select-modern text-sm"
+              className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl text-neutral-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 appearance-none text-sm"
             >
               {fanOptions.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>

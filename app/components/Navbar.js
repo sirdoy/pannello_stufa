@@ -57,6 +57,12 @@ export default function Navbar() {
               Storico
             </Link>
             <Link
+              href="/errors"
+              className="px-4 py-2 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors duration-200"
+            >
+              Allarmi
+            </Link>
+            <Link
               href="/api/auth/logout"
               className="px-4 py-2 rounded-xl text-sm font-medium text-primary-600 hover:bg-primary-50 transition-colors duration-200"
             >
@@ -112,6 +118,13 @@ export default function Navbar() {
               className="block px-4 py-3 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors duration-200"
             >
               Storico
+            </Link>
+            <Link
+              href="/errors"
+              onClick={() => setMenuOpen(false)}
+              className="block px-4 py-3 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors duration-200"
+            >
+              Allarmi
             </Link>
             <Link
               href="/api/auth/logout"

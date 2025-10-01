@@ -1,16 +1,18 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { getFullSchedulerMode } from '@/lib/schedulerService';
 import { STOVE_ROUTES } from '@/lib/routes';
 import { logStoveAction, logNetatmoAction } from '@/lib/logService';
+import { logError, shouldNotify, sendErrorNotification } from '@/lib/errorMonitor';
 import Card from './ui/Card';
 import Button from './ui/Button';
 import StatusBadge from './ui/StatusBadge';
 import ModeIndicator from './ui/ModeIndicator';
 import Select from './ui/Select';
 import Skeleton from './ui/Skeleton';
+import ErrorAlert from './ui/ErrorAlert';
 
 export default function StovePanel() {
   const router = useRouter();
@@ -19,12 +21,18 @@ export default function StovePanel() {
   const [fanLevel, setFanLevel] = useState(null);
   const [powerLevel, setPowerLevel] = useState(null);
   const [ambientTemp, setAmbientTemp] = useState(null);
+  const [roomTemp, setRoomTemp] = useState(null);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [schedulerEnabled, setSchedulerEnabled] = useState(false);
   const [semiManualMode, setSemiManualMode] = useState(false);
   const [returnToAutoAt, setReturnToAutoAt] = useState(null);
   const [initialLoading, setInitialLoading] = useState(true);
+
+  // Error monitoring states
+  const [errorCode, setErrorCode] = useState(0);
+  const [errorDescription, setErrorDescription] = useState('');
+  const previousErrorCode = useRef(0);
 
   const handleNetatmoLogout = async () => {
     sessionStorage.removeItem('netatmo_refresh_token');
@@ -71,14 +79,48 @@ export default function StovePanel() {
     }
   };
 
+  const fetchRoomTemperature = async () => {
+    try {
+      const res = await fetch(STOVE_ROUTES.getRoomTemperature);
+      const json = await res.json();
+      if (json?.Result !== undefined) {
+        setRoomTemp(json.Result);
+      }
+    } catch (err) {
+      console.error('Errore temperatura target:', err);
+    }
+  };
+
   const fetchStatusAndUpdate = useCallback(async () => {
     try {
       const res = await fetch(STOVE_ROUTES.status);
       const json = await res.json();
       const newStatus = json?.StatusDescription || 'sconosciuto';
+      const newErrorCode = json?.Error ?? 0;
+      const newErrorDescription = json?.ErrorDescription || '';
+
       setStatus(newStatus);
+      setErrorCode(newErrorCode);
+      setErrorDescription(newErrorDescription);
+
+      // Log error to Firebase and send notification if needed
+      if (newErrorCode !== 0) {
+        await logError(newErrorCode, newErrorDescription, {
+          status: newStatus,
+          source: 'status_monitor',
+        });
+
+        // Send notification for new errors
+        if (shouldNotify(newErrorCode, previousErrorCode.current)) {
+          await sendErrorNotification(newErrorCode, newErrorDescription);
+        }
+      }
+
+      previousErrorCode.current = newErrorCode;
+
       await fetchFanLevel();
       await fetchPowerLevel();
+      await fetchRoomTemperature();
       await fetchSchedulerMode();
     } catch (err) {
       console.error('Errore stato:', err);
@@ -162,6 +204,15 @@ export default function StovePanel() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
+      {/* Error Alert - Always on top if present */}
+      {errorCode !== 0 && (
+        <ErrorAlert
+          errorCode={errorCode}
+          errorDescription={errorDescription}
+          onDismiss={() => router.push('/errors')}
+        />
+      )}
+
       {/* Hero Section - Stato */}
       <Card className={`p-8 border-2 transition-all duration-300 ${getStatusBgColor(status)}`}>
         <div className="space-y-6">
@@ -257,15 +308,25 @@ export default function StovePanel() {
             />
 
             {/* Visualizzazione livelli attivi */}
-            <div className="mt-6 pt-4 border-t border-neutral-200 grid grid-cols-2 gap-4 text-center">
-              <div>
-                <p className="text-sm text-neutral-500 mb-1">Ventola</p>
-                <p className="text-2xl font-bold text-info-600">{fanLevel ?? '-'}/6</p>
+            <div className="mt-6 pt-4 border-t border-neutral-200">
+              <div className="grid grid-cols-2 gap-4 text-center mb-4">
+                <div>
+                  <p className="text-sm text-neutral-500 mb-1">Ventola</p>
+                  <p className="text-2xl font-bold text-info-600">{fanLevel ?? '-'}/6</p>
+                </div>
+                <div>
+                  <p className="text-sm text-neutral-500 mb-1">Potenza</p>
+                  <p className="text-2xl font-bold text-accent-600">{powerLevel ?? '-'}/5</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-neutral-500 mb-1">Potenza</p>
-                <p className="text-2xl font-bold text-accent-600">{powerLevel ?? '-'}/5</p>
-              </div>
+
+              {/* Temperatura target */}
+              {roomTemp !== null && (
+                <div className="mt-4 p-3 bg-info-50 border border-info-200 rounded-xl text-center">
+                  <p className="text-xs text-info-600 mb-1">🎯 Temperatura Target</p>
+                  <p className="text-xl font-bold text-info-700">{roomTemp}°C</p>
+                </div>
+              )}
             </div>
           </div>
         </Card>

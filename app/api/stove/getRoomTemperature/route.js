@@ -1,16 +1,16 @@
 import { STUFA_API } from '@/lib/stoveApi';
 
 /**
- * GET /api/stove/status
- * Returns the current operational status of the stove
+ * GET /api/stove/getRoomTemperature
+ * Returns the target room temperature setpoint from the stove
  */
 export async function GET() {
   try {
-    const res = await fetch(STUFA_API.getStatus);
+    const res = await fetch(STUFA_API.getRoomTemperature);
 
     if (!res.ok) {
       return Response.json(
-        { error: 'Failed to fetch stove status' },
+        { error: 'Failed to fetch room temperature' },
         { status: res.status }
       );
     }

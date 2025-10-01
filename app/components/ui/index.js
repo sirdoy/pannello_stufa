@@ -6,3 +6,4 @@ export { default as StatusBadge } from './StatusBadge';
 export { default as ModeIndicator } from './ModeIndicator';
 export { default as Pagination } from './Pagination';
 export { default as Skeleton } from './Skeleton';
+export { default as ErrorAlert, ErrorBadge } from './ErrorAlert';

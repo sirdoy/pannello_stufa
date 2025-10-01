@@ -135,7 +135,7 @@ Components for user action log display:
 ### Component Export Structure
 All UI components are exported from `app/components/ui/index.js` for clean imports:
 ```javascript
-import { Card, Button, Select, StatusBadge, ModeIndicator, Pagination, Skeleton } from '@/app/components/ui';
+import { Card, Button, Select, StatusBadge, ModeIndicator, Pagination, Skeleton, ErrorAlert, ErrorBadge } from '@/app/components/ui';
 ```
 
 Scheduler components from `app/components/scheduler/index.js`:
@@ -148,15 +148,62 @@ Log components from `app/components/log/index.js`:
 import { LogEntry } from '@/app/components/log';
 ```
 
+### Error Monitoring System (`lib/errorMonitor.js`)
+Sistema completo per il monitoraggio e tracking degli errori/allarmi della stufa:
+
+**Funzionalità principali**:
+- **Rilevamento errori**: Monitora il campo `Error` e `ErrorDescription` da `GetStatus`
+- **Classificazione severità**: INFO, WARNING, ERROR, CRITICAL
+- **Logging su Firebase**: Salva tutti gli errori in `errors/` con timestamp e metadata
+- **Notifiche browser**: Alert push per errori critici (richiede permesso utente)
+- **Storico errori**: Query Firebase per visualizzare errori recenti
+- **Risoluzione manuale**: Possibilità di segnare errori come risolti
+
+**Funzioni esportate**:
+- `getErrorInfo(errorCode)` - Ottiene informazioni su un codice errore
+- `isCriticalError(errorCode)` - Verifica se errore è critico
+- `logError(errorCode, errorDescription, additionalData)` - Salva errore su Firebase
+- `getRecentErrors(limit)` - Recupera errori recenti (default 50)
+- `getActiveErrors()` - Recupera solo errori non risolti
+- `resolveError(errorId)` - Segna errore come risolto
+- `shouldNotify(errorCode, previousErrorCode)` - Logica notifica
+- `sendErrorNotification(errorCode, errorDescription)` - Invia notifica browser
+
+**Costanti**:
+- `ERROR_SEVERITY`: Enum per livelli di severità
+- `ERROR_CODES`: Dizionario codici errore conosciuti (espandibile)
+
+### UI Components - Error Management (`app/components/ui/ErrorAlert.js`)
+Componenti per visualizzazione errori/allarmi:
+
+- **ErrorAlert** - Alert completo per visualizzare errori
+  - Props: `errorCode`, `errorDescription`, `className`, `onDismiss`
+  - Styling dinamico basato su severità (critical=rosso, error=rosso chiaro, warning=giallo, info=blu)
+  - Icone contestuali (🚨 critical, ⚠️ error, ⚡ warning, ℹ️ info)
+  - Pulsante dismiss opzionale
+  - Usage: `<ErrorAlert errorCode={5} errorDescription="Pellet esaurito" onDismiss={handleDismiss} />`
+
+- **ErrorBadge** - Badge compatto per indicatore errore
+  - Props: `errorCode`, `className`
+  - Mostra solo se errorCode !== 0
+  - Usage: `<ErrorBadge errorCode={5} />`
+
 ### Pages
 - `/` (`app/page.js`) - Main StovePanel interface for controlling the stove
   - **Dashboard Layout**:
+    - **Error Alert** (top): Visualizza errori/allarmi in tempo reale quando presenti
     - Hero: Full-width status card with badge, mode indicator, refresh button
     - Grid: 2 columns on desktop (Quick Actions + Regolazioni), stacked on mobile
     - Footer: Netatmo card (dashed border, "in development" style)
-  - Real-time status polling every 5 seconds
+  - **Real-time monitoring**:
+    - Polling every 5 seconds for status updates
+    - Monitora `Error` e `ErrorDescription` da GetStatus
+    - Salva automaticamente errori su Firebase
+    - Invia notifiche browser per nuovi errori
   - **Quick Actions**: Large ignite/shutdown buttons with visual status feedback
-  - **Regolazioni**: Fan (1-6) and power (0-5) controls with live level display
+  - **Regolazioni**:
+    - Fan (1-6) and power (0-5) controls with live level display
+    - **Temperatura Target**: Visualizza setpoint da `GetRoomControlTemperature`
   - Netatmo temperature display (if available) and connection management in bottom section
   - Scheduler mode indicator with link to scheduler page
   - Force dynamic rendering for real-time data
@@ -192,30 +239,62 @@ import { LogEntry } from '@/app/components/log';
 - `/netatmo/authorized` (`app/netatmo/authorized/page.js`) - Netatmo OAuth success page
   - Confirmation page after Netatmo authorization
   - Shows authorization status
+- `/errors` (`app/errors/page.js`) - Storico allarmi e errori stufa
+  - Visualizzazione completa storico errori da Firebase
+  - **Filtri**: Tutti / Attivi / Risolti
+  - **Paginazione**: 20 errori per pagina
+  - **Dettagli per ogni errore**:
+    - Codice errore e descrizione
+    - Data e ora occorrenza
+    - Stato stufa al momento dell'errore
+    - Status: Attivo o Risolto
+    - Durata (per errori risolti)
+  - **Azioni**: Pulsante "Segna come Risolto" per errori attivi
+  - **Loading state**: Skeleton durante caricamento dati
+  - Link rapido alla home page
+  - Responsive design con card layout
 
 ### API Routes Structure
 All API routes are in `app/api/` with the following organization:
 
 #### Stove Control (`/api/stove/*`)
-- `GET /api/stove/status` - Get current stove status from Thermorossi API
-  - Returns: `StatusDescription`, operational state (WORK, START, etc.)
+Internal API endpoints that wrap Thermorossi Cloud API calls. All routes proxy requests to the external API.
+
+**Status & Information**:
+- `GET /api/stove/status` - Get current stove status
+  - Returns: `StatusDescription`, operational state (WORK, OFF, START, CLEAN, COOL, etc.)
+  - Proxies: `GetStatus/[apikey]`
+- `GET /api/stove/getFan` - Get current fan level
+  - Returns: `{ Result: number }` (1-6)
+  - Proxies: `GetFanLevel/[apikey]`
+- `GET /api/stove/getPower` - Get current power level
+  - Returns: `{ Result: number }` (0-5)
+  - Proxies: `GetPower/[apikey]`
+- `GET /api/stove/getRoomTemperature` - Get target room temperature setpoint
+  - Returns: Temperature setpoint value
+  - Proxies: `GetRoomControlTemperature/[apikey]`
+- `GET /api/stove/settings` - Get all stove settings
+  - Returns: Complete settings object
+  - Proxies: `GetSettings/[apikey]`
+
+**Control Commands**:
 - `POST /api/stove/ignite` - Turn on the stove
   - Triggers semi-manual mode if scheduler is active
   - Sets `returnToAutoAt` to next scheduled change
+  - Proxies: `Ignit/[apikey]`
 - `POST /api/stove/shutdown` - Turn off the stove
   - Triggers semi-manual mode if scheduler is active
   - Sets `returnToAutoAt` to next scheduled change
+  - Proxies: `Shutdown/[apikey]`
+
+**Settings**:
 - `POST /api/stove/setFan` - Set fan level (1-6)
   - Body: `{ level: number }`
+  - Proxies: `SetFanLevel/[apikey];[level]`
 - `POST /api/stove/setPower` - Set power level (0-5)
   - Body: `{ level: number }`
-- `GET /api/stove/getFan` - Get current fan level
-  - Returns: `{ Result: number }`
-- `GET /api/stove/getPower` - Get current power level
-  - Returns: `{ Result: number }`
-- `GET /api/stove/settings` - Get all stove settings
-  - Calls: `GetSettings/${API_KEY}`
-- `POST /api/stove/setSettings` - Update stove settings
+  - Proxies: `SetPower/[apikey];[level]`
+- `POST /api/stove/setSettings` - Update multiple stove settings
   - Body: `{ fanLevel: number, powerLevel: number }`
 
 #### Authentication (`/api/auth/*`)
@@ -267,7 +346,94 @@ All API routes are in `app/api/` with the following organization:
   - Returns `{ user: null }` if not authenticated
 
 ### External Integrations
-- **Thermorossi Cloud API** (`lib/stoveApi.js`) - Contains API endpoints and key for stove control
+
+#### Thermorossi Cloud API (`lib/stoveApi.js`)
+Complete integration with Thermorossi WiNetStove cloud service for remote stove control.
+
+**Base URL**: `https://wsthermorossi.cloudwinet.it/WiNetStove.svc/json`
+
+**All 8 Thermorossi API Endpoints** (fully integrated and documented):
+
+1. **`GetStatus/[apikey]`** - Get current operational status and errors
+   - Mapped to: `STUFA_API.getStatus`
+   - Internal route: `GET /api/stove/status`
+   - Returns: `{ Error, ErrorDescription, Status, StatusDescription, Success }`
+   - Used for: Real-time monitoring, error detection, status display
+
+2. **`GetFanLevel/[apikey]`** - Get current fan level
+   - Mapped to: `STUFA_API.getFan`
+   - Internal route: `GET /api/stove/getFan`
+   - Returns: `{ Result: number }` (1-6)
+   - Used for: Displaying current fan setting
+
+3. **`GetPower/[apikey]`** - Get current power level
+   - Mapped to: `STUFA_API.getPower`
+   - Internal route: `GET /api/stove/getPower`
+   - Returns: `{ Result: number }` (0-5)
+   - Used for: Displaying current power setting
+
+4. **`GetRoomControlTemperature/[apikey]`** - Get target room temperature setpoint
+   - Mapped to: `STUFA_API.getRoomTemperature`
+   - Internal route: `GET /api/stove/getRoomTemperature`
+   - Returns: `{ Result: number }` (temperature in °C)
+   - Used for: Displaying target temperature in Regolazioni card
+   - Note: May return special values (e.g., -18) when temperature control disabled
+
+5. **`SetFanLevel/[apikey];[level]`** - Set fan level (1-6)
+   - Mapped to: `STUFA_API.setFan(level)`
+   - Internal route: `POST /api/stove/setFan`
+   - Used for: Manual fan control, automatic scheduler adjustments
+
+6. **`SetPower/[apikey];[level]`** - Set power level (0-5)
+   - Mapped to: `STUFA_API.setPower(level)`
+   - Internal route: `POST /api/stove/setPower`
+   - Used for: Manual power control, automatic scheduler adjustments
+   - Note: Level 0 available only in manual control (standby mode)
+
+7. **`Ignit/[apikey]`** - Turn on the stove
+   - Mapped to: `STUFA_API.ignite`
+   - Internal route: `POST /api/stove/ignite`
+   - Used for: Manual ignition, automatic scheduler ignition
+   - Side effect: Triggers semi-manual mode if scheduler is active
+
+8. **`Shutdown/[apikey]`** - Turn off the stove
+   - Mapped to: `STUFA_API.shutdown`
+   - Internal route: `POST /api/stove/shutdown`
+   - Used for: Manual shutdown, automatic scheduler shutdown
+   - Side effect: Triggers semi-manual mode if scheduler is active
+
+**Usage Examples**:
+```javascript
+import { STUFA_API } from '@/lib/stoveApi';
+
+// Get status with error information
+const statusRes = await fetch(STUFA_API.getStatus);
+const { Error, ErrorDescription, StatusDescription } = await statusRes.json();
+
+// Get current settings
+const fanRes = await fetch(STUFA_API.getFan);
+const { Result: fanLevel } = await fanRes.json();
+
+// Get temperature target
+const tempRes = await fetch(STUFA_API.getRoomTemperature);
+const { Result: targetTemp } = await tempRes.json();
+
+// Set fan level
+await fetch(STUFA_API.setFan(4));
+
+// Turn on stove
+await fetch(STUFA_API.ignite);
+```
+
+**Internal Routes**: All 8 endpoints are wrapped by internal Next.js API routes in `/api/stove/*` for:
+- Auth0 middleware bypass (required for scheduler cron)
+- Consistent error handling
+- Logging and monitoring
+- Response normalization
+
+**Security Note**: API key is currently hardcoded in `lib/stoveApi.js:18`. Consider moving to environment variables for production.
+
+#### Other Integrations
 - **Firebase Realtime Database** (`lib/firebase.js`) - Used for logging stove operations and scheduler data storage
 - **Auth0** - User authentication and session management with middleware protection
 - **Netatmo API** - Temperature monitoring from smart thermostats
@@ -293,7 +459,7 @@ All API routes are in `app/api/` with the following organization:
 
   **Exported Constants:**
   - `STOVE_ROUTES`: All stove control endpoints
-    - `status`, `ignite`, `shutdown`, `getFan`, `getPower`, `setFan`, `setPower`, `getSettings`, `setSettings`
+    - `status`, `ignite`, `shutdown`, `getFan`, `getPower`, `getRoomTemperature`, `setFan`, `setPower`, `getSettings`, `setSettings`
   - `SCHEDULER_ROUTES`: Scheduler system endpoints
     - `check(secret)` - Function that returns cron endpoint with secret parameter
   - `NETATMO_ROUTES`: Netatmo integration endpoints
@@ -344,6 +510,16 @@ All API routes are in `app/api/` with the following organization:
     - `sub`: Auth0 user ID
   - `source`: Always 'user' for manual actions
   - Additional metadata fields (e.g., `day` for scheduler actions)
+- `errors/` - Error and alarm logs for stove monitoring:
+  - `errorCode`: Numeric error code from GetStatus API
+  - `errorDescription`: Error description from GetStatus API
+  - `severity`: ERROR_SEVERITY enum (info, warning, error, critical)
+  - `timestamp`: Unix timestamp when error occurred (Date.now())
+  - `resolved`: Boolean flag indicating if error has been resolved
+  - `resolvedAt`: Unix timestamp when error was marked as resolved (if applicable)
+  - `status`: Stove status at time of error (e.g., "WORK", "START")
+  - `source`: Source of error detection (e.g., "status_monitor")
+  - Additional metadata fields as needed
 - Firebase uses client SDK for all operations (no Admin SDK currently)
 
 ### Key Configuration
@@ -377,16 +553,43 @@ Custom utility classes in `app/globals.css`:
 
 ## Important Notes
 
-- The stove API key is hardcoded in `lib/stoveApi.js:15` - consider moving to environment variables for security
-- Main component uses polling every 5 seconds for status updates
-- PWA configuration generates service worker in `public/` directory
-- Italian language interface ("it" locale)
-- All UI text and labels are in Italian
-- Theme color for PWA: `#ef4444` (primary red)
+### Security & Configuration
+- The stove API key is hardcoded in `lib/stoveApi.js:18` - consider moving to environment variables for production
+- All Thermorossi API endpoints use semicolon (`;`) as parameter separator (e.g., `SetFanLevel/[apikey];[level]`)
 - **Route system**: All API routes are centralized in `lib/routes.js` for consistency
   - Frontend components import routes from this file
   - Backend endpoints also use the same route definitions
   - Makes route changes easier to manage and prevents hardcoded URLs
+
+### Real-time Monitoring & Error Detection
+- **Polling interval**: Main StovePanel polls API every 5 seconds for status updates
+- **Error detection**: The `GetStatus` endpoint returns:
+  - `Error`: Numeric error code (0 = no error)
+  - `ErrorDescription`: Human-readable error message
+  - `Status`: Numeric status code
+  - `StatusDescription`: Human-readable status (WORK, OFF, START, CLEAN, COOL, etc.)
+- **Error logging**: All non-zero errors are automatically logged to Firebase `errors/` path
+- **Browser notifications**: New errors trigger browser push notifications (requires user permission)
+- **Error codes**: The `ERROR_CODES` dictionary in `lib/errorMonitor.js` can be expanded as new error codes are discovered
+- **Critical errors**: Errors marked as CRITICAL severity will show `requireInteraction: true` in notifications
+
+### Application Behavior
+- PWA configuration generates service worker in `public/` directory (disabled in development)
+- Italian language interface ("it" locale) - All UI text and labels are in Italian
+- Theme color for PWA: `#ef4444` (primary red)
+- Development server typically runs on port 3000, but may use alternative ports (3002, 3003) if 3000 is occupied
+- Navigation links in Navbar:
+  - **Home** (`/`) - Stove control panel
+  - **Pianificazione** (`/scheduler`) - Weekly schedule configuration
+  - **Storico** (`/log`) - User action logs
+  - **Allarmi** (`/errors`) - Error/alarm history
+
+### Temperature Monitoring
+- **Room Temperature Target**: Retrieved from `GetRoomControlTemperature` endpoint
+  - Returns `Result` field with temperature setpoint value
+  - Displayed in StovePanel "Regolazioni" card
+  - Note: Some stoves may return special values (e.g., -18) when temperature control is disabled
+- **Netatmo Integration**: Separate system for ambient temperature monitoring (work in progress)
 
 ## Component Architecture Philosophy
 
@@ -545,8 +748,84 @@ This design ensures smooth typing experience while maintaining data integrity.
   - Static assets (`_next`, `favicon.ico`)
 - **Important**: The `/api/scheduler/check` route makes internal fetch calls to `/api/stove/status`, `/api/stove/getFan`, `/api/stove/getPower`, `/api/stove/ignite`, `/api/stove/shutdown`, `/api/stove/setFan`, and `/api/stove/setPower`. These internal calls don't have an Auth0 session, so all `/api/stove/*` routes must be excluded from Auth0 middleware to prevent redirect loops and JSON parsing errors.
 
+## Application Workflow
+
+### Real-time Monitoring Flow
+1. **User opens app** → Loads StovePanel component
+2. **Initial fetch** → Shows `Skeleton.StovePanel` while loading
+3. **Data fetching** → Simultaneous calls to:
+   - `/api/stove/status` (status + errors)
+   - `/api/stove/getFan` (fan level)
+   - `/api/stove/getPower` (power level)
+   - `/api/stove/getRoomTemperature` (temperature target)
+   - `getFullSchedulerMode()` (scheduler mode)
+4. **Error detection** → If `Error !== 0`:
+   - Logs error to Firebase (`errors/`)
+   - Displays ErrorAlert at top of page
+   - Sends browser notification (if new error)
+5. **Continuous monitoring** → Polling repeats every 5 seconds
+6. **User actions** → Manual controls trigger:
+   - API calls to Thermorossi
+   - Logging to Firebase (`log/`)
+   - Semi-manual mode if scheduler active
+
+### Scheduler Flow
+1. **User configures schedule** → `/scheduler` page
+2. **Saves to Firebase** → `stoveScheduler/{day}` and `stoveScheduler/mode`
+3. **External cron** → Calls `/api/scheduler/check?secret=cazzo` every minute
+4. **Scheduler logic**:
+   - Checks if mode is automatic
+   - Fetches current status and settings
+   - Compares current time with schedule
+   - Executes commands if needed (ignite, shutdown, setFan, setPower)
+   - Clears semi-manual mode when scheduled change occurs
+5. **Semi-manual override** → When user manually controls stove:
+   - Sets `semiManual: true`
+   - Calculates `returnToAutoAt` (next scheduled change)
+   - Shows countdown in UI
+   - Automatically returns to automatic mode at scheduled time
+
+### Error Management Flow
+1. **Error detected** → `GetStatus` returns `Error !== 0`
+2. **Logged to Firebase** → Saved in `errors/` with severity classification
+3. **Notification sent** → Browser push notification (if critical or new)
+4. **Displayed in UI**:
+   - ErrorAlert on home page
+   - Badge in StatusBadge component
+   - Full history in `/errors` page
+5. **User resolution** → User can mark error as resolved in `/errors` page
+6. **Tracking** → Duration calculated between occurrence and resolution
+
+### Authentication Flow
+1. **User visits app** → Auth0 middleware checks session
+2. **Not authenticated** → Redirects to `/api/auth/login`
+3. **Auth0 flow** → User logs in with Auth0
+4. **Callback** → Redirects to `/api/auth/callback`
+5. **Session created** → User info stored in session
+6. **Navbar displays** → User avatar and name
+7. **All actions logged** → User info automatically added to Firebase logs
+
 ## Firebase Permissions Issue
 
 - Current Firebase rules may block write access to `stoveScheduler/mode`
 - Error: "PERMISSION_DENIED: Permission denied"
 - Solution: Update Firebase security rules or implement Firebase Admin SDK for server operations
+
+## Quick Reference
+
+### Key Files to Modify
+- **Add/modify API endpoints**: `lib/stoveApi.js`, `lib/routes.js`, `app/api/stove/*`
+- **UI components**: `app/components/ui/*`
+- **Error handling**: `lib/errorMonitor.js`, `app/components/ui/ErrorAlert.js`
+- **Logging**: `lib/logService.js`
+- **Scheduler logic**: `lib/schedulerService.js`, `app/api/scheduler/check/route.js`
+- **Styling**: `app/globals.css`, Tailwind classes inline
+- **Configuration**: `CLAUDE.md`, `.env.local`
+
+### Common Tasks
+- **Add new error code**: Update `ERROR_CODES` in `lib/errorMonitor.js`
+- **Add new UI component**: Create in `app/components/ui/`, export in `index.js`
+- **Modify scheduler logic**: Edit `app/api/scheduler/check/route.js`
+- **Change polling interval**: Modify `setInterval` in `app/components/StovePanel.js` (currently 5000ms)
+- **Add new log action**: Add to `lib/logService.js` with pre-configured function
+- **Modify color scheme**: Update Tailwind config or `app/globals.css`

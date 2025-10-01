@@ -297,6 +297,7 @@ export default function StovePanel() {
               onChange={handleFanChange}
               options={fanOptions}
               className="text-lg py-4"
+              disabled={isSpenta}
             />
 
             <Select
@@ -305,6 +306,7 @@ export default function StovePanel() {
               onChange={handlePowerChange}
               options={powerOptions}
               className="text-lg py-4"
+              disabled={isSpenta}
             />
 
             {/* Visualizzazione livelli attivi */}

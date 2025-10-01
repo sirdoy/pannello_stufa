@@ -541,8 +541,9 @@ This design ensures smooth typing experience while maintaining data integrity.
 - Auth0 middleware (`middleware.js`) protects all routes except:
   - `/api/auth/*` - Authentication endpoints
   - `/api/scheduler/check` - Cron endpoint (protected by CRON_SECRET)
-  - `/api/stove/*` - Stove control endpoints
+  - `/api/stove/*` - Stove control endpoints (REQUIRED: must be excluded to allow internal API calls from `/api/scheduler/check` without Auth0 session)
   - Static assets (`_next`, `favicon.ico`)
+- **Important**: The `/api/scheduler/check` route makes internal fetch calls to `/api/stove/status`, `/api/stove/getFan`, `/api/stove/getPower`, `/api/stove/ignite`, `/api/stove/shutdown`, `/api/stove/setFan`, and `/api/stove/setPower`. These internal calls don't have an Auth0 session, so all `/api/stove/*` routes must be excluded from Auth0 middleware to prevent redirect loops and JSON parsing errors.
 
 ## Firebase Permissions Issue
 

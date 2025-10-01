@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 export default function LogEntry({ entry, formatDate, getIcon }) {
   return (
     <li className="border-b pb-3 flex items-start gap-3">
@@ -7,9 +9,11 @@ export default function LogEntry({ entry, formatDate, getIcon }) {
         {entry.user && (
           <div className="flex items-center gap-2 mb-2">
             {entry.user.picture && (
-              <img
+              <Image
                 src={entry.user.picture}
                 alt={entry.user.name || entry.user.email}
+                width={24}
+                height={24}
                 className="w-6 h-6 rounded-full"
               />
             )}

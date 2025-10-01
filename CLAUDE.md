@@ -130,6 +130,10 @@ Components for user action log display:
 - **LogEntry** (`LogEntry.js`) - Single log entry display
   - Props: `entry`, `formatDate`, `getIcon`
   - Shows user avatar, name, timestamp, action, and optional metadata
+  - **IMPORTANT**: Uses Next.js `<Image>` component (not `<img>`) for avatars
+  - Imports: `import Image from 'next/image'`
+  - Image props: `src`, `alt`, `width={24}`, `height={24}`, `className`
+  - Remote images require configuration in `next.config.mjs`
   - Usage: `<LogEntry entry={logEntry} formatDate={formatFn} getIcon={getIconFn} />`
 
 ### Component Export Structure
@@ -435,7 +439,13 @@ await fetch(STUFA_API.ignite);
 
 #### Other Integrations
 - **Firebase Realtime Database** (`lib/firebase.js`) - Used for logging stove operations and scheduler data storage
+  - **IMPORTANT**: Exports both `db` and `database` for compatibility: `export { db, db as database }`
+  - `db` used in most components, `database` used in `lib/errorMonitor.js`
+  - Client SDK only (no Admin SDK), works with Node.js runtime (not Edge)
 - **Auth0** - User authentication and session management with middleware protection
+  - **Node.js Runtime**: All Auth0 routes use standard `@auth0/nextjs-auth0` (NOT `/edge` version)
+  - Import: `import { handleAuth, getSession } from '@auth0/nextjs-auth0'`
+  - Edge runtime incompatible with Firebase client SDK
 - **Netatmo API** - Temperature monitoring from smart thermostats
 
 ### Logging System
@@ -527,6 +537,14 @@ await fetch(STUFA_API.ignite);
 - **Tailwind CSS** for styling with custom design system
 - App Router architecture (Next.js 15)
 - Force dynamic rendering on main page for real-time data
+- **Next.js Config** (`next.config.mjs`):
+  - `outputFileTracingRoot: resolve(__dirname)` - Prevents workspace root warnings
+  - `images.remotePatterns` - Allows Auth0 avatar images from:
+    - `**.gravatar.com` (Gravatar avatars)
+    - `**.googleusercontent.com` (Google profile pictures)
+    - `s.gravatar.com` (Secure Gravatar)
+  - Uses ES modules syntax with `import` statements
+  - PWA configuration wrapped with `withPWA(nextConfig)`
 
 ### Design System (Tailwind)
 Modern, minimal design with warm color palette reflecting the stove's purpose:
@@ -805,11 +823,106 @@ This design ensures smooth typing experience while maintaining data integrity.
 6. **Navbar displays** → User avatar and name
 7. **All actions logged** → User info automatically added to Firebase logs
 
-## Firebase Permissions Issue
+## Common Issues & Solutions
 
+### Firebase Configuration
 - Current Firebase rules may block write access to `stoveScheduler/mode`
 - Error: "PERMISSION_DENIED: Permission denied"
 - Solution: Update Firebase security rules or implement Firebase Admin SDK for server operations
+
+### Build Errors
+
+#### 1. Firebase Export Issue
+**Error**: `'database' is not exported from './firebase'`
+**Cause**: `lib/errorMonitor.js` imports `database`, but `lib/firebase.js` only exported `db`
+**Solution**: Export both names from `lib/firebase.js`:
+```javascript
+export { db, db as database };
+```
+
+#### 2. Auth0 Edge Runtime Conflict
+**Error**: Build failures in `/api/auth/[...auth0]` and `/api/log/add`
+**Cause**: Using `@auth0/nextjs-auth0/edge` with Firebase client SDK (incompatible)
+**Solution**: Use standard Node.js runtime:
+```javascript
+// CORRECT
+import { handleAuth } from '@auth0/nextjs-auth0';
+
+// WRONG - don't use edge runtime with Firebase
+import { handleAuth } from '@auth0/nextjs-auth0/edge';
+export const runtime = 'edge'; // ❌ Remove this
+```
+
+#### 3. Next.js Image Component Warning
+**Error**: ESLint warning about using `<img>` instead of `<Image>`
+**Cause**: Direct HTML `<img>` tags for Auth0 avatars in `LogEntry.js`
+**Solution**:
+```javascript
+import Image from 'next/image';
+
+// Use Next.js Image component with explicit dimensions
+<Image
+  src={entry.user.picture}
+  alt={entry.user.name}
+  width={24}
+  height={24}
+  className="w-6 h-6 rounded-full"
+/>
+```
+
+#### 4. Remote Image Domain Error
+**Error**: Images from external domains (Gravatar, Google) fail to load
+**Solution**: Configure `next.config.mjs`:
+```javascript
+images: {
+  remotePatterns: [
+    { protocol: 'https', hostname: '**.gravatar.com' },
+    { protocol: 'https', hostname: '**.googleusercontent.com' },
+    { protocol: 'https', hostname: 's.gravatar.com' },
+  ],
+}
+```
+
+#### 5. Workspace Root Warning
+**Warning**: "Next.js inferred your workspace root, but it may not be correct"
+**Cause**: Multiple package-lock.json files detected
+**Solution**: Add to `next.config.mjs`:
+```javascript
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const nextConfig = {
+  outputFileTracingRoot: resolve(__dirname),
+  // ... rest of config
+};
+```
+
+#### 6. ESLint Anonymous Export Warning
+**Warning**: "Assign object to a variable before exporting as module default"
+**Cause**: Direct object literal in export statement in `lib/logService.js`
+**Solution**:
+```javascript
+// WRONG
+export default {
+  logUserAction,
+  stove: logStoveAction,
+};
+
+// CORRECT
+const logService = {
+  logUserAction,
+  stove: logStoveAction,
+};
+export default logService;
+```
+
+### Runtime Compatibility
+- **Firebase Client SDK**: Node.js runtime only (not Edge)
+- **Auth0**: Works with both, but use Node.js for consistency
+- **API Routes with Firebase**: Never use `export const runtime = 'edge'`
 
 ## Quick Reference
 
@@ -829,3 +942,30 @@ This design ensures smooth typing experience while maintaining data integrity.
 - **Change polling interval**: Modify `setInterval` in `app/components/StovePanel.js` (currently 5000ms)
 - **Add new log action**: Add to `lib/logService.js` with pre-configured function
 - **Modify color scheme**: Update Tailwind config or `app/globals.css`
+
+### Development Best Practices
+
+#### When Creating New API Routes:
+1. ✅ Use `@auth0/nextjs-auth0` (NOT `/edge` version)
+2. ✅ Never add `export const runtime = 'edge'` when using Firebase
+3. ✅ Import Firebase as `import { db } from '@/lib/firebase'`
+4. ✅ Test with `npm run build` before committing
+
+#### When Using Images:
+1. ✅ Always use `<Image>` from `next/image` (not `<img>`)
+2. ✅ Provide explicit `width` and `height` props
+3. ✅ Add remote domains to `next.config.mjs` if loading external images
+4. ✅ Use descriptive `alt` text for accessibility
+
+#### When Exporting Modules:
+1. ✅ Assign objects to variables before exporting: `const x = {...}; export default x`
+2. ✅ Use named exports when exporting multiple items: `export { a, b, c }`
+3. ✅ Avoid anonymous object exports: `export default { ... }` triggers ESLint warnings
+
+#### Code Quality Checks:
+```bash
+# Run these before committing
+npm run build    # Check for build errors
+npm run lint     # Check for ESLint warnings
+npm run dev      # Test runtime behavior
+```

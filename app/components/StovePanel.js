@@ -162,15 +162,15 @@ export default function StovePanel() {
     await logStoveAction.setPower(level);
   };
 
-  const fanOptions = [
-    { value: '', label: '-- Seleziona --', disabled: true },
-    ...([1, 2, 3, 4, 5, 6].map(level => ({ value: level, label: `Livello ${level}` })))
-  ];
+  const fanOptions = [1, 2, 3, 4, 5, 6].map(level => ({
+    value: level,
+    label: `Livello ${level}`
+  }));
 
-  const powerOptions = [
-    { value: '', label: '-- Seleziona --', disabled: true },
-    ...([0, 1, 2, 3, 4, 5].map(level => ({ value: level, label: `Livello ${level}` })))
-  ];
+  const powerOptions = [1, 2, 3, 4, 5].map(level => ({
+    value: level,
+    label: `Livello ${level}`
+  }));
 
   const handleIgnite = async () => {
     setLoading(true);

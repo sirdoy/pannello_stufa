@@ -44,8 +44,19 @@ Modular component system for consistent UI across the application:
   - Props: `type`, `label`, `icon`, `className`, `containerClassName`
   - Usage: `<Input type="time" label="⏰ Dalle" value={start} onChange={handleChange} />`
 
-- **Select** (`Select.js`) - Dropdown select with label and icon support
-  - Props: `label`, `icon`, `options` (array of `{value, label, disabled?}`), `className`, `containerClassName`
+- **Select** (`Select.js`) - Custom dropdown select with modern UI
+  - **Implementation**: Custom dropdown (not native `<select>`) with React state management
+  - Props: `label`, `icon`, `options` (array of `{value, label, disabled?}`), `value`, `onChange`, `disabled`, `className`, `containerClassName`
+  - **Features**:
+    - Custom dropdown menu with smooth animations (fade in + slide down + scale)
+    - Selected option highlighted with red background and left border
+    - Checkmark (✓) on selected item
+    - Animated chevron that rotates on open/close
+    - Click-outside to close functionality
+    - Touch-friendly padding for mobile
+    - Hover and active states with visual feedback
+    - Max-height with scroll for long lists
+  - **Design**: No placeholder options (e.g., "-- Seleziona --"), only actual values
   - Usage: `<Select label="💨 Ventola" options={fanOptions} value={level} onChange={handleChange} />`
 
 - **StatusBadge** (`StatusBadge.js`) - Status display with dynamic colors and icons
@@ -206,14 +217,14 @@ Componenti per visualizzazione errori/allarmi:
     - Invia notifiche browser per nuovi errori
   - **Quick Actions**: Large ignite/shutdown buttons with visual status feedback
   - **Regolazioni**:
-    - Fan (1-6) and power (0-5) controls with live level display
+    - Fan (1-6) and power (1-5) controls with live level display
     - **Temperatura Target**: Visualizza setpoint da `GetRoomControlTemperature`
+    - Note: Power level 0 not available in UI (reserved for API-only standby mode)
   - Netatmo temperature display (if available) and connection management in bottom section
   - Scheduler mode indicator with link to scheduler page
   - Force dynamic rendering for real-time data
   - **Loading state**: Shows `Skeleton.StovePanel` during initial data fetch
   - Responsive: max-w-7xl container, grid adapts mobile/desktop
-  - Note: Power level 0 available in manual control (allows setting stove to standby while on)
 - `/scheduler` (`app/scheduler/page.js`) - Weekly schedule configuration
   - Weekly timeline view (7 days × 24 hours) with interactive TimeBar
   - **Accordion UI**: Collapsible days with preview (time range, intervals count, total hours)
@@ -295,9 +306,10 @@ Internal API endpoints that wrap Thermorossi Cloud API calls. All routes proxy r
 - `POST /api/stove/setFan` - Set fan level (1-6)
   - Body: `{ level: number }`
   - Proxies: `SetFanLevel/[apikey];[level]`
-- `POST /api/stove/setPower` - Set power level (0-5)
+- `POST /api/stove/setPower` - Set power level (0-5, but UI only exposes 1-5)
   - Body: `{ level: number }`
   - Proxies: `SetPower/[apikey];[level]`
+  - Note: Level 0 is supported by API but not exposed in the UI controls
 - `POST /api/stove/setSettings` - Update multiple stove settings
   - Body: `{ fanLevel: number, powerLevel: number }`
 
@@ -392,7 +404,7 @@ Complete integration with Thermorossi WiNetStove cloud service for remote stove 
    - Mapped to: `STUFA_API.setPower(level)`
    - Internal route: `POST /api/stove/setPower`
    - Used for: Manual power control, automatic scheduler adjustments
-   - Note: Level 0 available only in manual control (standby mode)
+   - Note: API supports level 0 (standby mode) but UI controls only expose levels 1-5
 
 7. **`Ignit/[apikey]`** - Turn on the stove
    - Mapped to: `STUFA_API.ignite`
@@ -503,7 +515,7 @@ await fetch(STUFA_API.ignite);
 - `stoveScheduler/{day}` - Weekly schedule data (Lunedì, Martedì, Mercoledì, Giovedì, Venerdì, Sabato, Domenica)
   - Each day contains array of time ranges with: `start`, `end`, `power` (1-5), `fan` (1-6)
   - Intervals are automatically sorted by start time before saving
-  - Note: Power level 0 not used in scheduler (stove would be off)
+  - Note: Power level 0 not available in scheduler or manual UI (would keep stove in standby)
 - `stoveScheduler/mode` - Scheduler mode state object:
   - `enabled`: boolean (manual/automatic toggle)
   - `timestamp`: when mode was last changed
@@ -696,7 +708,7 @@ When modifying components, maintain these design principles:
 - `app/components/StovePanel.js` - Home interface with mode indication
   - Real-time status display with dynamic colors
   - Manual control buttons (ignite/shutdown)
-  - Fan level (1-6) and power level (0-5) controls
+  - Fan level (1-6) and power level (1-5) controls with custom Select dropdowns
   - Netatmo connection management
   - Mode indicator with link to scheduler
 - `app/api/scheduler/check/route.js` - Cron endpoint for automatic control
@@ -734,9 +746,10 @@ When modifying time boundaries:
   - Last interval stays because only partially overlapped
 
 #### Power and Fan Levels
-- **Power**: Levels 1-5 (Level 0 removed from scheduler as stove would be off during scheduled operation)
+- **Power**: Levels 1-5 only in UI (Level 0 exists in API but removed from all UI controls - scheduler and manual)
 - **Fan**: Levels 1-6
 - Changes to power/fan trigger save on blur but don't affect time-based validations
+- Note: Level 0 would keep stove in standby mode, not useful for scheduled operation or manual control
 
 #### onChange vs onBlur Behavior
 - **onChange** (during typing):

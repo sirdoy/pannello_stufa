@@ -208,6 +208,13 @@ export default function WeeklyScheduler() {
     }
   };
 
+  const handleClearSemiManual = async () => {
+    await clearSemiManualMode();
+    await logSchedulerAction.clearSemiManual();
+    setSemiManualModeState(false);
+    setReturnToAutoAt(null);
+  };
+
   const toggleDay = (day) => {
     setExpandedDays(prev => ({
       ...prev,
@@ -248,13 +255,25 @@ export default function WeeklyScheduler() {
             showConfigButton={false}
           />
 
-          <Button
-            variant={schedulerEnabled ? 'danger' : 'success'}
-            onClick={toggleSchedulerMode}
-            className="w-full sm:w-auto"
-          >
-            {schedulerEnabled ? 'Disattiva Scheduler' : 'Attiva Scheduler'}
-          </Button>
+          <div className="flex gap-3 w-full sm:w-auto">
+            {schedulerEnabled && semiManualMode && (
+              <Button
+                variant="warning"
+                onClick={handleClearSemiManual}
+                className="flex-1 sm:flex-initial"
+                icon="↩️"
+              >
+                Torna in {schedulerEnabled ? 'Automatico' : 'Manuale'}
+              </Button>
+            )}
+            <Button
+              variant={schedulerEnabled ? 'danger' : 'success'}
+              onClick={toggleSchedulerMode}
+              className="flex-1 sm:flex-initial"
+            >
+              {schedulerEnabled ? 'Disattiva Scheduler' : 'Attiva Scheduler'}
+            </Button>
+          </div>
         </div>
 
         {/* Pulsanti Espandi/Comprimi tutto */}

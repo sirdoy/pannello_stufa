@@ -485,6 +485,27 @@ export default function Card({ children, className }) {
 
 ## Best Practices
 
+### Versioning (IMPORTANTE)
+**OGNI VOLTA che viene effettuata una lavorazione, aggiornare `lib/version.js`**:
+
+1. **Versionamento Semantico** (MAJOR.MINOR.PATCH):
+   - **MAJOR** (x.0.0): Breaking changes, modifiche architetturali importanti
+   - **MINOR** (0.x.0): Nuove funzionalità, feature aggiunte senza breaking changes
+   - **PATCH** (0.0.x): Bug fixes, correzioni, miglioramenti minori
+
+2. **Aggiornare**:
+   - `APP_VERSION` - Incrementa secondo semantic versioning
+   - `LAST_UPDATE` - Data corrente formato YYYY-MM-DD
+   - `VERSION_HISTORY` - Aggiungi nuovo oggetto in testa all'array con:
+     - `version`: numero versione
+     - `date`: data aggiornamento
+     - `changes`: array descrizioni modifiche (bullet points chiari e concisi)
+
+3. **Esempi**:
+   - Nuova feature → 1.0.0 → 1.1.0
+   - Bug fix → 1.1.0 → 1.1.1
+   - Breaking change → 1.1.1 → 2.0.0
+
 ### API Routes
 1. ✅ Use `@auth0/nextjs-auth0` (NO `/edge`)
 2. ✅ Never `export const runtime = 'edge'` with Firebase
@@ -594,11 +615,11 @@ const nextConfig = { outputFileTracingRoot: resolve(__dirname) };
 - Config: `next.config.mjs`, `.env.local`, `CLAUDE.md`
 
 ### Common Tasks
+- **Update version** (SEMPRE dopo modifiche): Edit `lib/version.js` - Incrementa APP_VERSION (semantic), aggiorna LAST_UPDATE, aggiungi entry in VERSION_HISTORY
 - **Add error code**: Update `ERROR_CODES` in `lib/errorMonitor.js`
 - **Add UI component**: Create in `app/components/ui/`, export in `index.js`, inline Tailwind
 - **Modify scheduler**: Edit `app/api/scheduler/check/route.js`
 - **Change polling**: Modify `setInterval` in `StovePanel.js` (default 5000ms)
-- **Update version**: Edit `lib/version.js` (VERSION, LAST_UPDATE, VERSION_HISTORY)
 - **Modify colors**: Update `tailwind.config.js` theme.extend.colors
 - **Add animation**: Define in `tailwind.config.js` keyframes + animation
 

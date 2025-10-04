@@ -43,6 +43,8 @@ app/
 │   ├── Navbar.js              # Navigazione + Auth0
 │   ├── WhatsNewModal.js       # Modal novità versione
 │   ├── VersionNotifier.js     # Notifier versioni (wrapper modal)
+│   ├── ForceUpdateModal.js    # Modal bloccante per forzare aggiornamento
+│   ├── VersionEnforcer.js     # Wrapper controllo versione obbligatorio
 │   ├── ui/                    # Componenti UI atomici
 │   │   ├── Card.js
 │   │   ├── Button.js
@@ -64,7 +66,8 @@ app/
 │   └── log/
 │       └── LogEntry.js
 ├── hooks/                     # Custom React hooks
-│   └── useVersionCheck.js     # Hook confronto versioni + localStorage
+│   ├── useVersionCheck.js     # Hook confronto versioni + localStorage
+│   └── useVersionEnforcement.js # Hook controllo forzato versione (polling 60s)
 ├── page.js                    # Home - controllo stufa
 ├── netatmo/page.js           # Dashboard Netatmo
 ├── scheduler/page.js          # Pianificazione settimanale
@@ -130,6 +133,23 @@ lib/
 - Checkbox "Non mostrare più" per versione specifica
 - Chiusura con ESC o backdrop click
 
+**ForceUpdateModal** - Modal bloccante per aggiornamento obbligatorio
+- Appare quando versione locale ≠ versione Firebase (confronto strict)
+- **Non dismissibile**: no close button, no ESC, no backdrop click
+- Design distintivo con gradiente primary/accent e animazione pulse
+- Mostra versione corrente vs. versione richiesta
+- Unica azione: pulsante "🔄 Aggiorna Ora" → `window.location.reload()`
+- z-index elevato (9999/10000) per garantire visibilità sopra tutto
+- **Blocca completamente l'uso dell'applicazione** fino al reload
+
+**VersionEnforcer** - Wrapper per enforcement versione
+- Client component che wrappa tutta l'app in `layout.js`
+- Utilizza hook `useVersionEnforcement` per polling Firebase ogni 60s
+- Confronto strict: versione locale deve essere = versione Firebase
+- Se versioni diverse: renderizza `ForceUpdateModal` bloccante
+- Se versioni allineate: invisibile, app funziona normalmente
+- Previene uso applicazione con versione obsoleta
+
 **Import centralizzato**:
 ```javascript
 import { Card, Button, Select, StatusBadge, Skeleton, ErrorAlert, Footer } from '@/app/components/ui';
@@ -158,6 +178,82 @@ const { hasNewVersion, latestVersion, showWhatsNew, dismissWhatsNew, dismissBadg
 **localStorage keys**:
 - `lastSeenVersion` - Ultima versione vista dall'utente
 - `dismissedVersions` - Array versioni permanentemente dismesse
+
+**useVersionEnforcement** - Hook per forzare aggiornamento app
+```javascript
+const { needsUpdate, firebaseVersion } = useVersionEnforcement();
+```
+
+**Funzionalità**:
+- **Polling automatico**: Check ogni 60 secondi tramite `setInterval`
+- **Confronto strict** (`!==`): Versione locale deve essere esattamente uguale a Firebase
+- **Trigger automatico**: `needsUpdate = true` quando versioni diverse
+- **Impedisce uso app**: Blocca applicazione fino a reload con versione corretta
+- **Check iniziale + ricorrente**: Verifica al mount + ogni minuto
+
+**States**:
+- `needsUpdate` (boolean) - True se versione locale ≠ Firebase
+- `firebaseVersion` (string|null) - Versione attuale su Firebase (es. "1.3.0")
+
+**Differenze con useVersionCheck**:
+| Feature | useVersionCheck | useVersionEnforcement |
+|---------|-----------------|----------------------|
+| Scopo | Notifica soft | Enforcement hard |
+| Trigger | Semantic version > | Strict !== |
+| UI | Badge + modal dismissibile | Modal bloccante |
+| App usabilità | Piena | Bloccata |
+| Polling | No (solo mount) | Sì (60s) |
+| localStorage | Sì (tracking viste) | No |
+
+**Usage**:
+- Usato esclusivamente da `VersionEnforcer.js`
+- Integrato in `layout.js` per copertura globale
+- Polling automatico in background
+- Previene accesso con versione obsoleta
+
+**Componenti correlati**:
+- `ForceUpdateModal` - Modal bloccante (no dismiss, solo reload)
+- `VersionEnforcer` - Wrapper integrato in `layout.js`
+
+### Layout Root (`app/layout.js`)
+
+**Struttura e Ordine Rendering**:
+```jsx
+<html lang="it">
+  <body>
+    <VersionEnforcer />     {/* Version enforcement bloccante */}
+    <Navbar />
+    <main>{children}</main>
+    <Footer />              {/* Badge "NEW" soft notification */}
+  </body>
+</html>
+```
+
+**VersionEnforcer Integration**:
+- **Posizione**: Primo componente nel body (prima di tutto il resto)
+- **Scopo**: Controllo versione globale con enforcement hard
+- **Comportamento**:
+  - Polling Firebase ogni 60s tramite `useVersionEnforcement`
+  - Se versione locale ≠ Firebase → mostra `ForceUpdateModal` bloccante
+  - Se versioni allineate → invisibile, app funziona normalmente
+- **z-index**: 9999/10000 per garantire modal sopra tutto
+
+**Due Sistemi di Notifica Versione**:
+1. **Soft (Footer + VersionNotifier)**:
+   - Badge "NEW" dismissibile in footer
+   - Modal "What's New" informativa (chiudibile con ESC)
+   - App rimane completamente usabile
+   - Tracking localStorage per versioni viste
+
+2. **Hard (VersionEnforcer + ForceUpdateModal)**:
+   - Modal bloccante non dismissibile
+   - App completamente inutilizzabile
+   - Unica azione: reload pagina
+   - Nessun tracking localStorage
+
+**Quando usare quale sistema**:
+- **Soft**: Minor/patch updates, nuove features, bug fixes non critici
+- **Hard**: Breaking changes, fix critici sicurezza, modifiche architetturali
 
 ### Pagine
 
@@ -571,16 +667,68 @@ export default function Card({ children, className }) {
      - `type`: 'major' | 'minor' | 'patch'
      - `changes`: array descrizioni modifiche (bullet points chiari e concisi)
 
-3. **Aggiornare `CHANGELOG.md`**:
+3. **Aggiornare `package.json`**:
+   - Campo `version` - Sincronizza con `APP_VERSION` da `lib/version.js`
+   - Mantieni consistenza tra versione applicazione e package npm
+
+4. **Aggiornare `CHANGELOG.md`**:
    - Formato [Keep a Changelog](https://keepachangelog.com/it/1.0.0/)
    - Sezioni: Aggiunto, Modificato, Deprecato, Rimosso, Corretto, Sicurezza
    - Ordine: versioni più recenti in alto
 
-4. **Sincronizzazione Firebase** (opzionale):
-   - Sync automatico su deploy
-   - Manuale: usa `changelogService.syncVersionHistoryToFirebase(VERSION_HISTORY)`
+5. **Sincronizzazione Firebase** (**OBBLIGATORIO per enforcement**):
+   - **Quando**: Dopo deploy app, prima che utenti accedano
+   - **Come**: `changelogService.syncVersionHistoryToFirebase(VERSION_HISTORY)`
+   - **Verifica**: `changelogService.getLatestVersion()` deve ritornare nuova versione
+   - **Importante**: Firebase è source of truth per `VersionEnforcer`
+   - Se non sincronizzato: utenti vedranno `ForceUpdateModal` anche con versione corretta
 
-5. **Esempi**:
+6. **Workflow Deployment Completo**:
+   ```bash
+   # 1. Aggiorna versioni (lib/version.js, package.json, CHANGELOG.md)
+   # 2. Build locale
+   npm run build
+
+   # 3. Test locale
+   npm run start
+
+   # 4. Deploy app su hosting
+   # (comando dipende da hosting: vercel deploy, firebase deploy, etc.)
+
+   # 5. Sync Firebase (OBBLIGATORIO per enforcement)
+   # Esegui script o manualmente da console Firebase
+   node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require('./lib/version').VERSION_HISTORY)"
+
+   # 6. Verifica enforcement
+   # Utenti con versione vecchia vedranno ForceUpdateModal (max 60s)
+   ```
+
+7. **Soft vs Hard Updates**:
+   - **Soft (notifica dismissibile)**:
+     - Minor/patch updates
+     - Nuove features non breaking
+     - Bug fixes non critici
+     - Badge "NEW" + Modal "What's New"
+     - App rimane usabile
+
+   - **Hard (enforcement bloccante)**:
+     - Major updates (breaking changes)
+     - Fix critici sicurezza
+     - Modifiche architetturali importanti
+     - `ForceUpdateModal` bloccante
+     - App inutilizzabile fino a reload
+
+8. **Checklist Versioning**:
+   - [ ] `lib/version.js` → APP_VERSION, LAST_UPDATE, VERSION_HISTORY
+   - [ ] `package.json` → campo "version"
+   - [ ] `CHANGELOG.md` → nuova sezione con data e modifiche
+   - [ ] `npm run build` → verifica compilazione
+   - [ ] Deploy app su hosting
+   - [ ] Sync Firebase → `syncVersionHistoryToFirebase(VERSION_HISTORY)`
+   - [ ] Verifica → `getLatestVersion()` ritorna nuova versione
+   - [ ] Test enforcement → utenti con versione vecchia vedono modal
+
+9. **Esempi**:
    - Nuova feature → 1.0.0 → 1.1.0 (minor)
    - Bug fix → 1.1.0 → 1.1.1 (patch)
    - Breaking change → 1.1.1 → 2.0.0 (major)
@@ -728,18 +876,31 @@ find app -name "*.js" -type f -exec grep -l "useState\|useEffect" {} \; | \
 ### Key Files
 - API endpoints: `lib/stoveApi.js`, `lib/netatmoApi.js`, `lib/routes.js`
 - UI components: `app/components/ui/*`, `app/components/netatmo/*`
+- Version components: `app/components/WhatsNewModal.js`, `app/components/ForceUpdateModal.js`, `app/components/VersionEnforcer.js`
+- Hooks: `app/hooks/useVersionCheck.js`, `app/hooks/useVersionEnforcement.js`
 - Error handling: `lib/errorMonitor.js`
 - Logging: `lib/logService.js`
-- Services: `lib/schedulerService.js`, `lib/netatmoService.js`
+- Services: `lib/schedulerService.js`, `lib/netatmoService.js`, `lib/changelogService.js`
 - Version: `lib/version.js` (APP_VERSION, LAST_UPDATE, VERSION_HISTORY)
 - Styling: `tailwind.config.js`, inline Tailwind in components
-- Config: `next.config.mjs`, `.env.local`, `CLAUDE.md`
+- Config: `next.config.mjs`, `.env.local`, `package.json`, `CLAUDE.md`
 
 ### Common Tasks
 - **Update version** (SEMPRE dopo modifiche):
-  1. Edit `lib/version.js` - Incrementa APP_VERSION (semantic), aggiorna LAST_UPDATE, aggiungi entry con `type` in VERSION_HISTORY
-  2. Edit `CHANGELOG.md` - Aggiungi sezione nuova versione con formato Keep a Changelog
-  3. (Opzionale) Sync Firebase: `changelogService.syncVersionHistoryToFirebase(VERSION_HISTORY)`
+  1. Edit `lib/version.js` → APP_VERSION, LAST_UPDATE, VERSION_HISTORY (con type)
+  2. Edit `package.json` → campo "version" (sincronizza con APP_VERSION)
+  3. Edit `CHANGELOG.md` → Nuova sezione con formato Keep a Changelog
+  4. Build: `npm run build`
+  5. Deploy app su hosting
+  6. **Sync Firebase** (OBBLIGATORIO): `changelogService.syncVersionHistoryToFirebase(VERSION_HISTORY)`
+  7. Verifica: utenti con versione vecchia vedranno `ForceUpdateModal` (max 60s)
+
+- **Force user updates** (version enforcement):
+  - Aggiorna versione come sopra
+  - Deploy + Sync Firebase (step 5-6)
+  - Utenti outdated: `ForceUpdateModal` bloccante al prossimo polling
+  - Hard reload utente: scarica nuova versione automaticamente
+
 - **Add error code**: Update `ERROR_CODES` in `lib/errorMonitor.js`
 - **Add UI component**: Create in `app/components/ui/`, export in `index.js`, inline Tailwind
 - **Modify scheduler**: Edit `app/api/scheduler/check/route.js`
@@ -828,3 +989,15 @@ CRON_SECRET=cazzo
    - Standard: salva `APP_VERSION` in `lastSeenVersion`
    - "Non mostrare più": aggiunge a `dismissedVersions` array
 8. Click badge NEW: dismiss notifica + salva in localStorage
+
+### Version Enforcement (Forced Update)
+1. App mount → `useVersionEnforcement` hook si attiva in `VersionEnforcer`
+2. Check iniziale + polling ogni 60 secondi
+3. Fetch ultima versione da Firebase (`getLatestVersion`)
+4. Confronto **strict**: `latest.version !== APP_VERSION`
+5. **Se versioni diverse**: Mostra `ForceUpdateModal` bloccante
+6. Modal bloccante:
+   - No chiusura con ESC o backdrop click
+   - Mostra versione attuale e nuova richiesta
+   - Unica azione: pulsante "Aggiorna Ora" → `window.location.reload()`
+7. **Impedisce uso applicazione** fino al reload con versione corretta

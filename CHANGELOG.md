@@ -5,6 +5,18 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.3.0] - 2025-10-04
+
+### Aggiunto
+- Sistema controllo versione bloccante con modal forzato aggiornamento
+- Hook `useVersionEnforcement` per polling periodico versione Firebase (ogni 60 secondi)
+- Componente `ForceUpdateModal` bloccante quando versione locale è diversa da Firebase
+- Integrazione `VersionEnforcer` in `layout.js` per controllo globale applicazione
+- Prevenzione uso applicazione con versione obsoleta
+
+### Modificato
+- Layout principale ora include controllo versione automatico al caricamento
+
 ## [1.2.1] - 2025-10-04
 
 ### Corretto

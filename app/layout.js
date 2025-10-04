@@ -1,6 +1,7 @@
 import './globals.css';
 import Navbar from './components/Navbar';
 import { Footer } from './components/ui';
+import VersionEnforcer from './components/VersionEnforcer';
 
 export const metadata = {
   title: 'Pannello Stufa',
@@ -33,6 +34,7 @@ export default function RootLayout({ children }) {
       <meta name="mobile-web-app-capable" content="yes" />
     </head>
     <body className="min-h-screen text-neutral-900 flex flex-col">
+    <VersionEnforcer />
     <Navbar />
     <main className="flex-1 pt-6 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">

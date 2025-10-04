@@ -57,9 +57,12 @@ app/
 │   │   ├── ScheduleInterval.js
 │   │   ├── DayScheduleCard.js
 │   │   └── DayAccordionItem.js
+│   ├── netatmo/               # Componenti Netatmo
+│   │   └── RoomCard.js
 │   └── log/
 │       └── LogEntry.js
 ├── page.js                    # Home - controllo stufa
+├── netatmo/page.js           # Dashboard Netatmo
 ├── scheduler/page.js          # Pianificazione settimanale
 ├── log/page.js               # Storico azioni utente
 ├── errors/page.js            # Storico allarmi
@@ -68,15 +71,17 @@ app/
     ├── stove/*               # Proxy Thermorossi API
     ├── scheduler/check/      # Cron endpoint
     ├── auth/[...auth0]/      # Auth0 routes
-    ├── netatmo/*             # Netatmo integration
+    ├── netatmo/*             # Netatmo Energy API
     ├── log/add/              # Logging utente
     └── user/                 # User info
 
 lib/
 ├── stoveApi.js               # Thermorossi API wrapper
+├── netatmoApi.js             # Netatmo Energy API wrapper
 ├── routes.js                 # Route definitions centralizzate
 ├── firebase.js               # Firebase client SDK
 ├── schedulerService.js       # Firebase scheduler operations
+├── netatmoService.js         # Netatmo state & automation
 ├── logService.js             # Logging service
 ├── errorMonitor.js           # Error detection & notification
 └── version.js                # App versioning
@@ -207,6 +212,14 @@ stoveScheduler/
   {day}/               # Array intervalli: {start, end, power:1-5, fan:1-6}
   mode/                # {enabled, timestamp, semiManual, returnToAutoAt}
 
+netatmo/
+  refresh_token/       # Token OAuth2 per autenticazione
+  home_id/             # ID casa principale
+  topology/            # {home_id, home_name, rooms[], modules[], schedules[], updated_at}
+  currentStatus/       # {rooms[], mode, updated_at}
+  deviceConfig/        # {device_id, module_id} - per retrocompatibilità
+  automation/          # {ruleId: {id, name, enabled, trigger, conditions, actions}}
+
 log/                   # {action, value, timestamp, user:{email,name,picture,sub}, source}
 
 errors/                # {errorCode, errorDescription, severity, timestamp, resolved, resolvedAt, status}
@@ -244,6 +257,76 @@ errors/                # {errorCode, errorDescription, severity, timestamp, reso
 - `logNetatmoAction.connect()`, `.disconnect()`, `.selectDevice(id)`
 
 **Auto-include**: Auth0 user info (email, name, picture, sub)
+
+### Netatmo Integration (`lib/netatmoApi.js`, `lib/netatmoService.js`)
+
+**API Wrapper** (`lib/netatmoApi.js`):
+- **Autenticazione**: `getAccessToken(refreshToken)` - Ottiene access token da refresh token
+- **Topologia**: `getHomesData()`, `getDeviceList()` - Recupera struttura casa/dispositivi
+- **Stato Real-time**: `getHomeStatus(homeId)`, `getThermState(deviceId, moduleId)` - Temperature e setpoint
+- **Controllo**: `setRoomThermpoint(params)`, `setThermMode(params)`, `switchHomeSchedule(homeId, scheduleId)`
+- **Storico**: `getRoomMeasure(params)` - Dati storici temperature
+- **Helper**: `parseRooms()`, `parseModules()`, `extractTemperatures()`, `isHeatingActive()`
+
+**Service Layer** (`lib/netatmoService.js`):
+- **State Management**: Firebase CRUD per refresh_token, home_id, topology, currentStatus
+- **Automation**: CRUD regole automazione in `netatmo/automation/`
+- **Helper Functions**: `getRoomsWithTemperatures()`, `getRoomsNeedingHeating()`, `isAnyRoomHeating()`, `getAverageTemperature()`
+- **Logging**: `logNetatmoAction(action, details, user)` - Log azioni Netatmo
+
+**API Endpoints** (`app/api/netatmo/*`):
+- `GET /api/netatmo/homesdata` - Topologia completa (home_id, rooms, modules) + save Firebase
+- `GET /api/netatmo/homestatus` - Stato real-time tutte le stanze + temperature
+- `POST /api/netatmo/setroomthermpoint` - Imposta setpoint temperatura stanza (body: `{room_id, mode, temp?, endtime?}`)
+- `POST /api/netatmo/setthermmode` - Imposta modalità riscaldamento casa (body: `{mode, endtime?}`)
+- `POST /api/netatmo/devices` - Lista dispositivi (legacy)
+- `POST /api/netatmo/temperature` - Temperatura singolo modulo (legacy)
+- `GET /api/netatmo/callback` - OAuth2 callback
+- `GET /api/netatmo/devices-temperatures` - Tutte temperature (legacy)
+
+**Room Modes**:
+- `manual` - Setpoint manuale (richiede `temp`)
+- `home` - Modalità comfort
+- `max` - Massimo riscaldamento
+- `off` - Spento
+
+**Home Modes**:
+- `schedule` - Programmazione attiva
+- `away` - Modalità assenza
+- `hg` - Antigelo (frost guard)
+- `off` - Spento
+
+**Dashboard** (`/netatmo`):
+- Grid stanze con RoomCard component
+- Controllo modalità riscaldamento globale
+- Visualizzazione temperature real-time + setpoint
+- Indicatori riscaldamento attivo
+- Controlli per stanza: imposta temperatura, auto, off
+- Polling ogni 30 secondi
+
+**Struttura Firebase**:
+```
+netatmo/
+  refresh_token          # OAuth2 refresh token
+  home_id                # ID casa principale Netatmo
+  topology/              # Struttura completa
+    home_id
+    home_name
+    rooms[]              # [{id, name, type, modules[]}]
+    modules[]            # [{id, name, type, bridge, room_id}]
+    schedules[]          # Programmazioni disponibili
+    updated_at
+  currentStatus/         # Stato real-time
+    rooms[]              # [{room_id, room_name, temperature, setpoint, mode, heating}]
+    mode                 # Modalità globale (schedule/away/hg/off)
+    updated_at
+  deviceConfig/          # Legacy - compatibilità endpoint vecchi
+    device_id
+    module_id
+  automation/            # Regole automazione (future)
+    {ruleId}/
+      id, name, enabled, trigger, conditions, actions, updated_at
+```
 
 ### Route Management (`lib/routes.js`)
 
@@ -487,11 +570,11 @@ const nextConfig = { outputFileTracingRoot: resolve(__dirname) };
 ## Quick Reference
 
 ### Key Files
-- API endpoints: `lib/stoveApi.js`, `lib/routes.js`, `app/api/stove/*`
-- UI components: `app/components/ui/*`
+- API endpoints: `lib/stoveApi.js`, `lib/netatmoApi.js`, `lib/routes.js`
+- UI components: `app/components/ui/*`, `app/components/netatmo/*`
 - Error handling: `lib/errorMonitor.js`
 - Logging: `lib/logService.js`
-- Scheduler: `lib/schedulerService.js`, `app/api/scheduler/check/route.js`
+- Services: `lib/schedulerService.js`, `lib/netatmoService.js`
 - Version: `lib/version.js` (APP_VERSION, LAST_UPDATE, VERSION_HISTORY)
 - Styling: `tailwind.config.js`, inline Tailwind in components
 - Config: `next.config.mjs`, `.env.local`, `CLAUDE.md`

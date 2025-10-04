@@ -45,6 +45,12 @@ export default function Navbar() {
               </div>
             )}
             <Link
+              href="/netatmo"
+              className="px-4 py-2 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors duration-200"
+            >
+              Netatmo
+            </Link>
+            <Link
               href="/scheduler"
               className="px-4 py-2 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors duration-200"
             >
@@ -105,6 +111,13 @@ export default function Navbar() {
                 <span className="text-sm font-medium truncate">{user.name}</span>
               </div>
             )}
+            <Link
+              href="/netatmo"
+              onClick={() => setMenuOpen(false)}
+              className="block px-4 py-3 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors duration-200"
+            >
+              Netatmo
+            </Link>
             <Link
               href="/scheduler"
               onClick={() => setMenuOpen(false)}

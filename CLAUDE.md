@@ -124,6 +124,10 @@ import { Card, Button, Select, StatusBadge, Skeleton, ErrorAlert, Footer } from 
 **`/` (Home)** - StovePanel
 - Layout: Error Alert → Hero (status con glassmorphism + info compatte) → Grid 2 col (Actions + Regolazioni) → Netatmo footer
 - Hero modernizzato: barra gradiente top, grid 2 col (status principale + ventola/potenza), separator decorativo, mode indicator con icona colorata
+- **Mode Indicator**:
+  - Modalità Automatica: mostra prossimo cambio scheduler (🔥 Accensione/❄️ Spegnimento) con orario formato "HH:MM del DD/MM", potenza e ventola
+  - Modalità Semi-manuale: mostra "Ritorno auto: HH:MM del DD/MM" + pulsante "↩️ Torna in Automatico"
+  - Modalità Manuale: mostra "Controllo manuale attivo"
 - Real-time polling: 5 secondi
 - Monitora errori e invia notifiche browser
 - Loading: `Skeleton.StovePanel`
@@ -134,7 +138,7 @@ import { Card, Button, Select, StatusBadge, Skeleton, ErrorAlert, Footer } from 
 - Accordion UI (giorni collassabili con preview)
 - TimeBar interattiva 24h
 - Toggle Manual/Automatic mode
-- Semi-manual status con returnToAutoAt
+- Semi-manual status con returnToAutoAt + pulsante "↩️ Torna in Automatico/Manuale" (visibile solo in semi-manuale)
 - Loading: `Skeleton.Scheduler`
 
 **`/log`** - Storico azioni utente
@@ -253,7 +257,7 @@ errors/                # {errorCode, errorDescription, severity, timestamp, reso
 
 **Pre-configured functions**:
 - `logStoveAction.ignite()`, `.shutdown()`, `.setFan(level)`, `.setPower(level)`
-- `logSchedulerAction.toggleMode(enabled)`, `.updateSchedule(day)`, `.addInterval(day)`, `.removeInterval(day, index)`, `.clearSemiManual()`
+- `logSchedulerAction.toggleMode(enabled)`, `.updateSchedule(day)`, `.addInterval(day)`, `.removeInterval(day, index)`, `.clearSemiManual()` - log uscita manuale da modalità semi-manuale
 - `logNetatmoAction.connect()`, `.disconnect()`, `.selectDevice(id)`
 
 **Auto-include**: Auth0 user info (email, name, picture, sub)
@@ -349,12 +353,22 @@ await fetch(STOVE_ROUTES.status);
 
 - **Manual** 🔧 - Controllo manuale via UI (accent color)
 - **Automatic** ⏰ - Controllo automatico via cron (success color)
+  - Visualizza prossimo cambio scheduler in home: azione (accensione/spegnimento), orario "HH:MM del DD/MM", potenza e ventola
 - **Semi-Manual** ⚙️ - Override manuale temporaneo con returnToAutoAt (warning color)
+  - Pulsante "↩️ Torna in Automatico" disponibile in StovePanel e Scheduler page per uscire dalla modalità semi-manuale
 
 ### Cron Integration
 
 - External cron → `/api/scheduler/check?secret=cazzo` ogni minuto
 - Logic: verifica mode → fetch status → compara orari → esegue comandi → clear semi-manual quando scheduled change
+
+### Funzioni schedulerService.js
+
+- `getNextScheduledChange()` - Ritorna timestamp ISO del prossimo cambio (per returnToAutoAt)
+- `getNextScheduledAction()` - Ritorna oggetto con `{timestamp, action: 'ignite'|'shutdown', power?, fan?}` per visualizzazione UI
+- `saveSchedule(day, intervals)`, `getSchedule(day)`, `getWeeklySchedule()` - CRUD scheduler
+- `setSchedulerMode(enabled)`, `getSchedulerMode()`, `getFullSchedulerMode()` - Gestione modalità
+- `setSemiManualMode(nextScheduledChange)`, `clearSemiManualMode()` - Gestione semi-manual
 
 ### Validation Logic (Scheduler Intervals)
 
@@ -629,15 +643,22 @@ CRON_SECRET=cazzo
 ### Real-time Monitoring
 1. User opens app → `Skeleton.StovePanel`
 2. Fetch: status, fan, power, scheduler mode (NO temperatura - non supportata)
-3. If `Error !== 0`: log Firebase, show ErrorAlert, send notification
-4. Poll every 5s
-5. Manual actions: API call + log + semi-manual mode
-6. Regolazioni disabilitate automaticamente se `status.includes('OFF|ERROR|WAIT')`
+3. If modalità automatica: fetch prossimo cambio scheduler con `getNextScheduledAction()` → mostra in UI (azione, orario, potenza, ventola)
+4. If `Error !== 0`: log Firebase, show ErrorAlert, send notification
+5. Poll every 5s
+6. Manual actions: API call + log + semi-manual mode
+7. Regolazioni disabilitate automaticamente se `status.includes('OFF|ERROR|WAIT')`
 
 ### Scheduler Automation
 1. User configures → save Firebase
 2. Cron calls `/api/scheduler/check?secret=cazzo` every minute
 3. Check mode → fetch status → compare time → execute commands → clear semi-manual
+
+### Semi-Manual Mode
+1. User fa azione manuale (accensione/spegnimento) mentre scheduler in automatico → trigger semi-manual
+2. Calcola `nextScheduledChange` con `getNextScheduledChange()` → salva come `returnToAutoAt`
+3. Mostra in UI: "Ritorno auto: HH:MM del DD/MM" + pulsante "↩️ Torna in Automatico"
+4. Click pulsante → `clearSemiManualMode()` + log → torna in automatico, reload prossimo cambio scheduler
 
 ### Error Management
 1. Error detected → log Firebase with severity

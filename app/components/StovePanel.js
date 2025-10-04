@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { getFullSchedulerMode, clearSemiManualMode } from '@/lib/schedulerService';
+import { getFullSchedulerMode, clearSemiManualMode, getNextScheduledAction } from '@/lib/schedulerService';
 import { STOVE_ROUTES } from '@/lib/routes';
 import { logStoveAction, logNetatmoAction, logSchedulerAction } from '@/lib/logService';
 import { logError, shouldNotify, sendErrorNotification } from '@/lib/errorMonitor';
@@ -26,6 +26,7 @@ export default function StovePanel() {
   const [schedulerEnabled, setSchedulerEnabled] = useState(false);
   const [semiManualMode, setSemiManualMode] = useState(false);
   const [returnToAutoAt, setReturnToAutoAt] = useState(null);
+  const [nextScheduledAction, setNextScheduledAction] = useState(null);
   const [initialLoading, setInitialLoading] = useState(true);
 
   // Error monitoring states
@@ -73,6 +74,14 @@ export default function StovePanel() {
       setSchedulerEnabled(mode.enabled);
       setSemiManualMode(mode.semiManual || false);
       setReturnToAutoAt(mode.returnToAutoAt || null);
+
+      // Fetch prossimo cambio scheduler se automatico
+      if (mode.enabled && !mode.semiManual) {
+        const nextAction = await getNextScheduledAction();
+        setNextScheduledAction(nextAction);
+      } else {
+        setNextScheduledAction(null);
+      }
     } catch (err) {
       console.error('Errore modalità scheduler:', err);
     }
@@ -177,6 +186,10 @@ export default function StovePanel() {
     await logSchedulerAction.clearSemiManual();
     setSemiManualMode(false);
     setReturnToAutoAt(null);
+
+    // Ricarica il prossimo cambio scheduler
+    const nextAction = await getNextScheduledAction();
+    setNextScheduledAction(nextAction);
   };
 
   const getStatusBgColor = (status) => {
@@ -311,10 +324,36 @@ export default function StovePanel() {
                     {schedulerEnabled && semiManualMode ? 'Modalità Semi-manuale' : schedulerEnabled ? 'Modalità Automatica' : 'Modalità Manuale'}
                   </p>
                   <p className="text-sm text-neutral-500 mt-1">
-                    {schedulerEnabled && semiManualMode && returnToAutoAt
-                      ? `Ritorno auto: ${new Date(returnToAutoAt).toLocaleString('it-IT', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'})}`
-                      : schedulerEnabled ? 'Controllo automatico attivo' : 'Controllo manuale attivo'
-                    }
+                    {schedulerEnabled && semiManualMode && returnToAutoAt ? (
+                      (() => {
+                        const date = new Date(returnToAutoAt);
+                        const time = date.toLocaleString('it-IT', {hour: '2-digit', minute: '2-digit'});
+                        const day = date.toLocaleString('it-IT', {day: '2-digit', month: '2-digit'});
+                        return `Ritorno auto: ${time} del ${day}`;
+                      })()
+                    ) : schedulerEnabled && nextScheduledAction ? (
+                      <>
+                        <span className={`font-semibold ${nextScheduledAction.action === 'ignite' ? 'text-success-600' : 'text-primary-600'}`}>
+                          {nextScheduledAction.action === 'ignite' ? '🔥 Accensione' : '❄️ Spegnimento'}
+                        </span>
+                        {' alle '}
+                        <span className="font-medium text-neutral-700">
+                          {(() => {
+                            const date = new Date(nextScheduledAction.timestamp);
+                            const time = date.toLocaleString('it-IT', {hour: '2-digit', minute: '2-digit'});
+                            const day = date.toLocaleString('it-IT', {day: '2-digit', month: '2-digit'});
+                            return `${time} del ${day}`;
+                          })()}
+                        </span>
+                        {nextScheduledAction.action === 'ignite' && (
+                          <span className="text-neutral-400"> • Potenza {nextScheduledAction.power}, Ventola {nextScheduledAction.fan}</span>
+                        )}
+                      </>
+                    ) : schedulerEnabled ? (
+                      'Controllo automatico attivo'
+                    ) : (
+                      'Controllo manuale attivo'
+                    )}
                   </p>
                 </div>
               </div>

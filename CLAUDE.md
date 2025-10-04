@@ -41,6 +41,8 @@ app/
 ├── components/
 │   ├── StovePanel.js          # Pannello controllo principale
 │   ├── Navbar.js              # Navigazione + Auth0
+│   ├── WhatsNewModal.js       # Modal novità versione
+│   ├── VersionNotifier.js     # Notifier versioni (wrapper modal)
 │   ├── ui/                    # Componenti UI atomici
 │   │   ├── Card.js
 │   │   ├── Button.js
@@ -50,7 +52,7 @@ app/
 │   │   ├── ModeIndicator.js
 │   │   ├── Skeleton.js
 │   │   ├── ErrorAlert.js
-│   │   ├── Footer.js
+│   │   ├── Footer.js          # Client component con badge NEW e modal
 │   │   └── index.js           # Export centralizzato
 │   ├── scheduler/             # Componenti pianificazione
 │   │   ├── TimeBar.js
@@ -61,6 +63,8 @@ app/
 │   │   └── RoomCard.js
 │   └── log/
 │       └── LogEntry.js
+├── hooks/                     # Custom React hooks
+│   └── useVersionCheck.js     # Hook confronto versioni + localStorage
 ├── page.js                    # Home - controllo stufa
 ├── netatmo/page.js           # Dashboard Netatmo
 ├── scheduler/page.js          # Pianificazione settimanale
@@ -84,6 +88,7 @@ lib/
 ├── netatmoService.js         # Netatmo state & automation
 ├── logService.js             # Logging service
 ├── errorMonitor.js           # Error detection & notification
+├── changelogService.js       # Changelog management & Firebase sync
 └── version.js                # App versioning
 ```
 
@@ -110,14 +115,49 @@ lib/
 - Animazione `animate-shimmer`
 - Pattern: mostra solo durante fetch iniziale, non updates successivi
 
-**Footer** - Info autore e versione
+**Footer** - Info autore e versione (client component)
 - Version da `lib/version.js`
 - Auto-incluso in tutte le pagine via `app/layout.js`
+- Badge "NEW" animato quando disponibile nuova versione
+- Click badge → dismiss notifica + salva in localStorage
+- Modal "What's New" integrato
+
+**WhatsNewModal** - Modal novità versione
+- Mostra automaticamente al primo accesso post-update
+- Header gradiente colorato per tipo versione (major/minor/patch)
+- Lista modifiche versione corrente
+- Link a changelog completo
+- Checkbox "Non mostrare più" per versione specifica
+- Chiusura con ESC o backdrop click
 
 **Import centralizzato**:
 ```javascript
 import { Card, Button, Select, StatusBadge, Skeleton, ErrorAlert, Footer } from '@/app/components/ui';
 ```
+
+### Custom Hooks (`app/hooks/`)
+
+**useVersionCheck** - Hook per controllo nuove versioni
+```javascript
+const { hasNewVersion, latestVersion, showWhatsNew, dismissWhatsNew, dismissBadge } = useVersionCheck();
+```
+
+**Funzionalità**:
+- Confronta versione locale (`APP_VERSION`) con ultima versione Firebase
+- Controlla localStorage per versioni già viste (`lastSeenVersion`)
+- Gestisce lista versioni dismesse (`dismissedVersions`)
+- Mostra modal al primo accesso se versione diversa
+
+**States**:
+- `hasNewVersion` (boolean) - True se disponibile versione più recente
+- `latestVersion` (object|null) - Oggetto ultima versione da Firebase
+- `showWhatsNew` (boolean) - True se mostrare modal What's New
+- `dismissWhatsNew(dontShowAgain)` - Chiude modal, opzionale dismiss permanente
+- `dismissBadge()` - Nasconde badge NEW nel footer
+
+**localStorage keys**:
+- `lastSeenVersion` - Ultima versione vista dall'utente
+- `dismissedVersions` - Array versioni permanentemente dismesse
 
 ### Pagine
 
@@ -151,6 +191,13 @@ import { Card, Button, Select, StatusBadge, Skeleton, ErrorAlert, Footer } from 
 - Filtri: Tutti / Attivi / Risolti
 - Paginazione: 20 errors/page
 - Azione: "Segna come Risolto"
+
+**`/changelog`** - Storico versioni e modifiche
+- Timeline versioni con badge tipo (Major/Minor/Patch)
+- Visualizzazione modifiche per versione
+- Source indicator (Firebase/Locale)
+- Link da Footer (versione cliccabile)
+- Fallback automatico a VERSION_HISTORY se Firebase non disponibile
 
 **`/offline`** - PWA offline fallback
 - Messaggio friendly
@@ -227,6 +274,14 @@ netatmo/
 log/                   # {action, value, timestamp, user:{email,name,picture,sub}, source}
 
 errors/                # {errorCode, errorDescription, severity, timestamp, resolved, resolvedAt, status}
+
+changelog/             # Storico versioni
+  {version}/           # Es: "1_1_0" (dots sostituiti da underscore)
+    version            # "1.1.0"
+    date               # "2025-10-04"
+    type               # "major" | "minor" | "patch"
+    changes[]          # Array descrizioni modifiche
+    timestamp          # ISO timestamp creazione
 ```
 
 **Runtime**: Node.js only (no Edge) - Client SDK only
@@ -261,6 +316,20 @@ errors/                # {errorCode, errorDescription, severity, timestamp, reso
 - `logNetatmoAction.connect()`, `.disconnect()`, `.selectDevice(id)`
 
 **Auto-include**: Auth0 user info (email, name, picture, sub)
+
+### Changelog Service (`lib/changelogService.js`)
+
+**Funzioni**:
+- `saveVersionToFirebase(version, date, changes, type)` - Salva versione su Firebase
+- `getChangelogFromFirebase()` - Recupera tutte le versioni ordinate per data (più recenti prima)
+- `getLatestVersion()` - Recupera ultima versione rilasciata
+- `getVersionType(currentVersion, newVersion)` - Determina tipo versione ('major'|'minor'|'patch')
+- `syncVersionHistoryToFirebase(versionHistory)` - Sincronizza VERSION_HISTORY con Firebase
+
+**Workflow**:
+1. Aggiorna `lib/version.js` (APP_VERSION, LAST_UPDATE, VERSION_HISTORY con `type`)
+2. Aggiorna `CHANGELOG.md` manualmente seguendo formato Keep a Changelog
+3. Sync automatico su deploy o manuale (opzionale)
 
 ### Netatmo Integration (`lib/netatmoApi.js`, `lib/netatmoService.js`)
 
@@ -486,25 +555,35 @@ export default function Card({ children, className }) {
 ## Best Practices
 
 ### Versioning (IMPORTANTE)
-**OGNI VOLTA che viene effettuata una lavorazione, aggiornare `lib/version.js`**:
+**OGNI VOLTA che viene effettuata una lavorazione, aggiornare sistema di versioning**:
 
 1. **Versionamento Semantico** (MAJOR.MINOR.PATCH):
    - **MAJOR** (x.0.0): Breaking changes, modifiche architetturali importanti
    - **MINOR** (0.x.0): Nuove funzionalità, feature aggiunte senza breaking changes
    - **PATCH** (0.0.x): Bug fixes, correzioni, miglioramenti minori
 
-2. **Aggiornare**:
+2. **Aggiornare `lib/version.js`**:
    - `APP_VERSION` - Incrementa secondo semantic versioning
    - `LAST_UPDATE` - Data corrente formato YYYY-MM-DD
    - `VERSION_HISTORY` - Aggiungi nuovo oggetto in testa all'array con:
      - `version`: numero versione
      - `date`: data aggiornamento
+     - `type`: 'major' | 'minor' | 'patch'
      - `changes`: array descrizioni modifiche (bullet points chiari e concisi)
 
-3. **Esempi**:
-   - Nuova feature → 1.0.0 → 1.1.0
-   - Bug fix → 1.1.0 → 1.1.1
-   - Breaking change → 1.1.1 → 2.0.0
+3. **Aggiornare `CHANGELOG.md`**:
+   - Formato [Keep a Changelog](https://keepachangelog.com/it/1.0.0/)
+   - Sezioni: Aggiunto, Modificato, Deprecato, Rimosso, Corretto, Sicurezza
+   - Ordine: versioni più recenti in alto
+
+4. **Sincronizzazione Firebase** (opzionale):
+   - Sync automatico su deploy
+   - Manuale: usa `changelogService.syncVersionHistoryToFirebase(VERSION_HISTORY)`
+
+5. **Esempi**:
+   - Nuova feature → 1.0.0 → 1.1.0 (minor)
+   - Bug fix → 1.1.0 → 1.1.1 (patch)
+   - Breaking change → 1.1.1 → 2.0.0 (major)
 
 ### API Routes
 1. ✅ Use `@auth0/nextjs-auth0` (NO `/edge`)
@@ -615,7 +694,10 @@ const nextConfig = { outputFileTracingRoot: resolve(__dirname) };
 - Config: `next.config.mjs`, `.env.local`, `CLAUDE.md`
 
 ### Common Tasks
-- **Update version** (SEMPRE dopo modifiche): Edit `lib/version.js` - Incrementa APP_VERSION (semantic), aggiorna LAST_UPDATE, aggiungi entry in VERSION_HISTORY
+- **Update version** (SEMPRE dopo modifiche):
+  1. Edit `lib/version.js` - Incrementa APP_VERSION (semantic), aggiorna LAST_UPDATE, aggiungi entry con `type` in VERSION_HISTORY
+  2. Edit `CHANGELOG.md` - Aggiungi sezione nuova versione con formato Keep a Changelog
+  3. (Opzionale) Sync Firebase: `changelogService.syncVersionHistoryToFirebase(VERSION_HISTORY)`
 - **Add error code**: Update `ERROR_CODES` in `lib/errorMonitor.js`
 - **Add UI component**: Create in `app/components/ui/`, export in `index.js`, inline Tailwind
 - **Modify scheduler**: Edit `app/api/scheduler/check/route.js`
@@ -692,3 +774,15 @@ CRON_SECRET=cazzo
 2. Not authenticated → redirect `/api/auth/login`
 3. Login → callback → session created
 4. All actions logged with user info
+
+### Version Notifications
+1. App mount → `useVersionCheck` hook si attiva
+2. Fetch ultima versione da Firebase (`getLatestVersion`)
+3. Confronta con `APP_VERSION` locale (semantic versioning)
+4. Check localStorage: `lastSeenVersion` e `dismissedVersions`
+5. **Se nuova versione disponibile**: Mostra badge "NEW" nel footer
+6. **Se prima volta post-update**: Mostra modal "What's New" automatico
+7. User dismiss modal:
+   - Standard: salva `APP_VERSION` in `lastSeenVersion`
+   - "Non mostrare più": aggiunge a `dismissedVersions` array
+8. Click badge NEW: dismiss notifica + salva in localStorage

@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { getLatestVersion } from '@/lib/changelogService';
 import { APP_VERSION } from '@/lib/version';

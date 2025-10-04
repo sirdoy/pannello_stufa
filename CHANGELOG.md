@@ -5,6 +5,16 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.2.1] - 2025-10-04
+
+### Corretto
+- Warning ESLint per export anonimo in `lib/version.js` (ora usa variabile prima dell'export)
+- Direttiva `'use client'` mancante in componenti con React hooks
+- Componente `DayAccordionItem.js` ora ha direttiva client corretta
+- Componente `DayScheduleCard.js` ora ha direttiva client corretta
+- Componente `TimeBar.js` now ha direttiva client corretta
+- Hook `useVersionCheck.js` ora ha direttiva client corretta
+
 ## [1.2.0] - 2025-10-04
 
 ### Aggiunto

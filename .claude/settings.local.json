@@ -16,7 +16,19 @@
       "Bash(cat:*)",
       "Bash(pkill:*)",
       "Bash(identify:*)",
-      "Bash(convert:*)"
+      "Bash(convert:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(npx tsc:*)",
+      "Bash(for file in app/changelog/page.js app/scheduler/page.js app/components/ui/Select.js app/components/Navbar.js app/components/scheduler/DayAccordionItem.js)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(head:*)",
+      "Bash(done)",
+      "Bash(while read file)",
+      "Bash(do if ! head -1 \"$file\")",
+      "Bash(then echo \"$file\")",
+      "Bash(fi)",
+      "Bash(find:*)",
+      "Bash(xargs -I {} sh -c 'if [ \"\"\"\"$(head -1 \"\"\"\"{}\"\"\"\" | grep -c \"\"\"\"use client\"\"\"\")\"\"\"\" -eq 0 ]; then echo \"\"\"\"{}\"\"\"\"; fi')"
     ],
     "deny": [],
     "ask": []

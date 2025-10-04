@@ -612,6 +612,28 @@ export default function Card({ children, className }) {
 - **DON'T**: One-off sections, trivial wrappers, over-abstraction
 - **Props over config**, **Composition over inheritance**, **Single responsibility**
 
+### Client Components (Next.js 15 App Router)
+1. ✅ Usa `'use client'` quando il componente:
+   - Usa React hooks (`useState`, `useEffect`, `useCallback`, `useMemo`, etc.)
+   - Gestisce eventi browser (`onClick`, `onChange`, etc.)
+   - Usa browser APIs (localStorage, window, document, etc.)
+   - Necessita di interattività lato client
+2. ✅ Posiziona `'use client'` come **prima riga** del file (prima di qualsiasi import)
+3. ✅ Server components per default - aggiungi `'use client'` solo se necessario
+4. ❌ Non dimenticare la direttiva in custom hooks che usano hooks React
+
+**Pattern corretto**:
+```javascript
+'use client';
+
+import { useState } from 'react';
+
+export default function MyComponent() {
+  const [state, setState] = useState(false);
+  return <button onClick={() => setState(!state)}>Toggle</button>;
+}
+```
+
 ### Loading States
 - ✅ Use component-specific skeletons
 - ✅ Show skeleton during initial fetch only
@@ -672,6 +694,26 @@ import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const nextConfig = { outputFileTracingRoot: resolve(__dirname) };
+```
+
+**Missing 'use client' Directive**:
+```javascript
+// ❌ WRONG - Hook senza 'use client'
+import { useState } from 'react';
+export default function Component() { ... }
+
+// ✅ CORRECT - Aggiungi 'use client' come prima riga
+'use client';
+
+import { useState } from 'react';
+export default function Component() { ... }
+```
+
+**Diagnosi rapida**:
+```bash
+# Trova file con hooks ma senza 'use client'
+find app -name "*.js" -type f -exec grep -l "useState\|useEffect" {} \; | \
+  xargs -I {} sh -c 'if [ "$(head -1 "{}" | grep -c "use client")" -eq 0 ]; then echo "{}"; fi'
 ```
 
 ### Runtime Compatibility

@@ -5,6 +5,13 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.4.1] - 2025-10-06
+
+### Corretto
+- Fix build error: aggiunto `export const dynamic = 'force-dynamic'` alla route `/api/admin/sync-changelog`
+- Risolto "Cannot find module for page: /api/admin/sync-changelog" durante `npm run build`
+- Migliorata compatibilità Firebase Client SDK con Next.js build process (evita inizializzazione Firebase durante build-time)
+
 ## [1.4.0] - 2025-10-06
 
 ### Aggiunto

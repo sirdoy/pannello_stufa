@@ -1578,10 +1578,14 @@ node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require(
 1. ✅ Use `@auth0/nextjs-auth0` (NO `/edge`)
 2. ✅ Never `export const runtime = 'edge'` with Firebase
 3. ✅ Import Firebase: `import { db } from '@/lib/firebase'`
-4. ✅ Test with `npm run build` before commit
-5. ✅ Validate input parameters
-6. ✅ Handle errors gracefully (try/catch)
-7. ✅ Return consistent response format
+4. ✅ **Force dynamic rendering** when using Firebase: `export const dynamic = 'force-dynamic'`
+   - Prevents build-time Firebase initialization errors
+   - Required for routes that import Firebase Client SDK
+   - Example: `/api/admin/sync-changelog/route.js`
+5. ✅ Test with `npm run build` before commit
+6. ✅ Validate input parameters
+7. ✅ Handle errors gracefully (try/catch)
+8. ✅ Return consistent response format
 
 ### Images
 1. ✅ Always `<Image>` from `next/image` (not `<img>`)
@@ -1879,6 +1883,39 @@ export const runtime = 'edge';
 import { handleAuth } from '@auth0/nextjs-auth0';
 // No edge runtime
 ```
+
+#### Firebase Build-Time Initialization Error
+```bash
+# Error durante build:
+# Error [PageNotFoundError]: Cannot find module for page: /api/admin/sync-changelog
+# > Build error occurred
+# [Error: Failed to collect page data for /api/admin/sync-changelog]
+```
+
+**Causa**: Next.js tenta di inizializzare Firebase Client SDK durante build-time quando raccoglie page data.
+
+**Soluzione**: Forza dynamic rendering per la route API:
+```javascript
+// ❌ WRONG - Firebase si inizializza durante build
+import { NextResponse } from 'next/server';
+import { syncVersionHistoryToFirebase } from '@/lib/changelogService';
+
+export async function POST(request) { ... }
+
+// ✅ CORRECT - Force dynamic rendering
+import { NextResponse } from 'next/server';
+import { syncVersionHistoryToFirebase } from '@/lib/changelogService';
+
+export const dynamic = 'force-dynamic';  // Aggiungi questa linea
+
+export async function POST(request) { ... }
+```
+
+**Quando usare**:
+- ✅ API routes che importano Firebase Client SDK
+- ✅ Routes che usano `lib/changelogService.js`, `lib/firebase.js`
+- ✅ Routes con operazioni database real-time
+- ❌ Non necessario per routes che non usano Firebase
 
 #### Next.js Image Domains
 ```javascript
@@ -2468,8 +2505,8 @@ cp .env.example .env.local
 ---
 
 **Last Updated**: 2025-10-06
-**Document Version**: 2.4
-**App Version**: 1.4.0
+**Document Version**: 2.5
+**App Version**: 1.4.1
 
 ---
 

@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { syncVersionHistoryToFirebase } from '@/lib/changelogService';
 import { VERSION_HISTORY } from '@/lib/version';
 
+// Force dynamic rendering to avoid build-time Firebase initialization
+export const dynamic = 'force-dynamic';
+
 /**
  * API route per sincronizzare changelog con Firebase
  * Protetta da ADMIN_SECRET per prevenire accessi non autorizzati

@@ -29,7 +29,10 @@
       "Bash(fi)",
       "Bash(find:*)",
       "Bash(xargs -I {} sh -c 'if [ \"\"\"\"$(head -1 \"\"\"\"{}\"\"\"\" | grep -c \"\"\"\"use client\"\"\"\")\"\"\"\" -eq 0 ]; then echo \"\"\"\"{}\"\"\"\"; fi')",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(npm run start:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)"
     ],
     "deny": [],
     "ask": []

@@ -167,11 +167,14 @@ pannello-stufa/
 │   │   ├── WhatsNewModal.js      # Version changelog modal
 │   │   ├── VersionNotifier.js    # Soft version notification
 │   │   ├── ForceUpdateModal.js   # Hard version enforcement
-│   │   └── VersionEnforcer.js    # Version check wrapper
+│   │   ├── VersionEnforcer.js    # Version check wrapper
+│   │   └── ClientProviders.js    # Client-side providers wrapper
+│   │
+│   ├── context/                  # React Context providers
+│   │   └── VersionContext.js     # Version state management
 │   │
 │   ├── hooks/                    # Custom React hooks
-│   │   ├── useVersionCheck.js    # Soft version check
-│   │   └── useVersionEnforcement.js  # Hard version enforcement
+│   │   └── useVersionCheck.js    # Soft version check
 │   │
 │   ├── api/                      # API Routes
 │   │   ├── stove/                # Thermorossi proxy
@@ -421,36 +424,54 @@ const {
 
 ---
 
-### useVersionEnforcement
-Hook per forzare aggiornamento app (hard enforcement).
+### VersionContext + useVersion
+Context React per gestione globale stato versioning con check on-demand.
 
 ```javascript
-import { useVersionEnforcement } from '@/app/hooks/useVersionEnforcement';
+import { useVersion } from '@/app/context/VersionContext';
 
 const {
   needsUpdate,        // boolean - true se versione locale ≠ Firebase
-  firebaseVersion     // string|null - versione attuale Firebase
-} = useVersionEnforcement();
+  firebaseVersion,    // string|null - versione attuale Firebase
+  checkVersion,       // function() - check versione on-demand
+  isChecking          // boolean - true durante check
+} = useVersion();
 ```
 
 **Funzionalità**:
-- **Polling automatico**: Check ogni 60 secondi (`setInterval`)
+- **Check on-demand**: Chiamabile da qualsiasi componente
+- **State globale**: Context condiviso in tutta l'app
+- **Evita check simultanei**: Flag `isChecking` per prevenire race conditions
 - **Confronto strict** (`!==`): Versione deve essere esattamente uguale
-- **Trigger automatico**: `needsUpdate = true` quando diverse
-- **Blocco app**: Impedisce uso fino a reload
+- **Auto-reset**: `needsUpdate = false` quando versioni tornano uguali
+- **Integrazione polling**: Chiamato ogni 5s da `StovePanel` nel polling status
+
+**VersionProvider**:
+```javascript
+// In app/layout.js via ClientProviders
+import { VersionProvider } from '@/app/context/VersionContext';
+
+<VersionProvider>
+  {children}
+</VersionProvider>
+```
 
 **Differenze con useVersionCheck**:
 
-| Feature | useVersionCheck | useVersionEnforcement |
-|---------|-----------------|----------------------|
+| Feature | useVersionCheck | useVersion (VersionContext) |
+|---------|-----------------|----------------------------|
 | Scopo | Notifica soft | Enforcement hard |
 | Trigger | Semantic version > | Strict !== |
 | UI | Badge + modal dismissibile | Modal bloccante |
 | App usabilità | Piena | Bloccata |
-| Polling | No (solo mount) | Sì (60s) |
+| Check frequency | Solo mount | Ogni 5s (integrato in status polling) |
 | localStorage | Sì (tracking) | No |
+| Architecture | Hook standalone | Context globale |
 
-**Usage**: Usato da `VersionEnforcer.js` in `app/layout.js`
+**Usage**:
+- `VersionEnforcer.js` usa `useVersion()` per mostrare `ForceUpdateModal`
+- `StovePanel.js` chiama `checkVersion()` ogni 5s nel polling status
+- Qualsiasi componente può accedere allo stato via `useVersion()`
 
 ---
 
@@ -701,18 +722,35 @@ Return status
 ```
 App Mount
   ↓
-useVersionEnforcement (60s polling)
+VersionProvider initializes (via ClientProviders in layout.js)
   ↓
-Fetch latest version from Firebase
+StovePanel mounts → polling status starts (every 5s)
+  ↓
+Each status poll calls: checkVersion() from VersionContext
+  ↓
+Fetch latest version from Firebase (if not already checking)
   ↓
 Compare: local_version !== firebase_version?
   ↓
-YES → Show ForceUpdateModal (blocking)
+YES → Set needsUpdate = true in VersionContext
+  ↓
+VersionEnforcer detects needsUpdate = true via useVersion()
+  ↓
+Show ForceUpdateModal (blocking - z-index 10000)
   ↓
 User clicks "Aggiorna Ora"
   ↓
-window.location.reload() → Load new version
+window.location.reload() → Load new version from server
+  ↓
+Service Worker updates, app reloads with new code
 ```
+
+**Vantaggi nuovo sistema**:
+- ✅ Check ogni **5 secondi** (12x più veloce che 60s)
+- ✅ Un solo Firebase read (non due polling separati)
+- ✅ Integrato con polling esistente (nessun overhead)
+- ✅ Context globale accessibile ovunque
+- ✅ Prevenzione race conditions con flag `isChecking`
 
 ---
 
@@ -1455,13 +1493,31 @@ export const VERSION_HISTORY = [
 ```
 
 ### 5. Sync Firebase (**OBBLIGATORIO per enforcement**)
+
+**Opzione A - API Route (Consigliata):**
 ```bash
-# Dopo deploy app, PRIMA che utenti accedano
+# Script automatico (dopo deploy su Vercel)
+export ADMIN_SECRET="your-admin-secret"
+./scripts/sync-changelog.sh https://your-app.vercel.app
+```
+
+**Opzione B - cURL Manuale:**
+```bash
+curl -X POST https://your-app.vercel.app/api/admin/sync-changelog \
+  -H "Authorization: Bearer your-admin-secret"
+```
+
+**Opzione C - Node.js Locale:**
+```bash
+# Richiede Firebase credentials in .env.local
 node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require('./lib/version').VERSION_HISTORY)"
 ```
 
-**⚠️ Importante**: Firebase è source of truth per `VersionEnforcer`.
-Se non sincronizzato: utenti vedranno `ForceUpdateModal` anche con versione corretta.
+**⚠️ Importante**:
+- Firebase è source of truth per `VersionEnforcer`
+- Sync **entro 5 minuti** dal deploy (utenti vedono modal dopo primo polling)
+- Se non sincronizzato: utenti vedranno `ForceUpdateModal` anche con versione corretta
+- Vedi `DEPLOY.md` per guida completa setup Vercel + automazione
 
 ### 6. Deployment Workflow Completo
 ```bash
@@ -1745,6 +1801,8 @@ npm run build
 
 ## Deployment Workflow
 
+> **📘 Per guida completa deploy e sync**: Vedi `DEPLOY.md`
+
 ### Pre-deployment Checklist
 - [ ] Update version (`lib/version.js`, `package.json`, `CHANGELOG.md`)
 - [ ] Run `npm run lint` - Fix all issues
@@ -1962,14 +2020,17 @@ console.log('Firebase connected:', !!db);
 ├── 📄 app/page.js                 # Home (StovePanel)
 ├── 📄 app/components/StovePanel.js
 ├── 📄 app/components/VersionEnforcer.js
+├── 📄 app/components/ClientProviders.js
+├── 📄 app/context/VersionContext.js
 ├── 📄 app/hooks/useVersionCheck.js
-├── 📄 app/hooks/useVersionEnforcement.js
 ├── 📄 middleware.js               # Auth0 middleware
 ├── 📄 next.config.mjs             # Next.js + PWA config
 ├── 📄 tailwind.config.js          # Design system
 ├── 📄 package.json                # Dependencies + version
 ├── 📄 CLAUDE.md                   # This file
-└── 📄 CHANGELOG.md                # Version history
+├── 📄 CHANGELOG.md                # Version history
+├── 📄 DEPLOY.md                   # Deploy & sync guide
+└── 📄 .env.example                # Environment variables template
 ```
 
 ### Common Tasks
@@ -2003,9 +2064,10 @@ console.log('Firebase connected:', !!db);
 - Update logic in `lib/schedulerService.js`
 
 **Change polling interval**:
-- StovePanel: `setInterval` in `app/page.js` (default 5000ms)
+- StovePanel: `setInterval` in `app/components/StovePanel.js` (default 5000ms)
+  - Include automaticamente `checkVersion()` per enforcement versione
 - Netatmo: `setInterval` in `app/netatmo/page.js` (default 30000ms)
-- VersionEnforcer: `useVersionEnforcement.js` (60000ms)
+- Version check: Integrato nel polling StovePanel (5000ms)
 
 **Modify colors**:
 - `tailwind.config.js` → `theme.extend.colors`
@@ -2228,42 +2290,62 @@ cp .env.example .env.local
 ```
 1. App mount (layout.js)
    ↓
-2. VersionEnforcer component renders
+2. ClientProviders wraps app → VersionProvider initializes
    ↓
-3. useVersionEnforcement hook activates
+3. VersionEnforcer component renders inside VersionProvider
    ↓
-4. Initial check:
+4. useVersion() hook connects to VersionContext
+   ↓
+5. StovePanel mounts → starts polling status (every 5s)
+   ↓
+6. Each status poll:
+   - Fetch stove status
+   - Fetch fan/power levels
+   - Fetch scheduler mode
+   - **Call checkVersion()** from VersionContext
+   ↓
+7. checkVersion() logic:
+   - Check if already checking (isChecking flag) → skip if true
+   - Set isChecking = true
    - Fetch getLatestVersion() from Firebase
    - Compare: latest.version !== APP_VERSION?
+   - If DIFFERENT: set needsUpdate = true, firebaseVersion = latest.version
+   - If SAME: set needsUpdate = false (reset)
+   - Set isChecking = false
    ↓
-5. If versions DIFFERENT:
-   - Set needsUpdate = true
-   - firebaseVersion = latest.version
+8. If versions DIFFERENT:
+   - VersionEnforcer detects needsUpdate = true via useVersion()
+   - Renders ForceUpdateModal:
+     - Modal covers entire screen (z-index 10000)
+     - No dismiss (no ESC, no backdrop click, no close button)
+     - Shows: "Versione corrente: 1.3.0"
+     - Shows: "Nuova versione: 1.4.0"
+     - Only action: "🔄 Aggiorna Ora" button
+     - App completely blocked (can't interact with anything)
    ↓
-6. VersionEnforcer renders ForceUpdateModal:
-   - Modal covers entire screen (z-index 10000)
-   - No dismiss (no ESC, no backdrop click, no close button)
-   - Shows: "Versione corrente: 1.2.0"
-   - Shows: "Nuova versione: 1.3.0"
-   - Only action: "🔄 Aggiorna Ora" button
-   - App completely blocked (can't interact with anything)
-   ↓
-7. User clicks "Aggiorna Ora":
+9. User clicks "Aggiorna Ora":
    - window.location.reload()
    - Browser hard refresh
    - Downloads new version from server
    - Service Worker updates
    - App reloads with new version
    ↓
-8. Polling continues (60s interval):
-   - Check every minute
-   - If new version deployed → force update again
-   ↓
-9. If versions SAME:
-   - needsUpdate = false
-   - VersionEnforcer renders nothing (invisible)
-   - App works normally
+10. Polling continues (every 5s):
+    - Check automatically during status polling
+    - If new version deployed → force update appears within 5s max
+    ↓
+11. If versions SAME:
+    - needsUpdate = false
+    - VersionEnforcer renders nothing (invisible)
+    - App works normally
 ```
+
+**Key Advantages**:
+- **Faster detection**: 5s polling instead of 60s (12x faster)
+- **Zero overhead**: No separate polling, reuses existing status interval
+- **Single Firebase read**: One request instead of two separate streams
+- **Race condition safe**: `isChecking` flag prevents concurrent checks
+- **Global state**: Any component can trigger or check enforcement via VersionContext
 
 ### Version Notification Flow (Soft)
 ```
@@ -2386,8 +2468,8 @@ cp .env.example .env.local
 ---
 
 **Last Updated**: 2025-10-06
-**Document Version**: 2.3
-**App Version**: 1.3.3
+**Document Version**: 2.4
+**App Version**: 1.4.0
 
 ---
 

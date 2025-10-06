@@ -1,14 +1,15 @@
 'use client';
 
-import { useVersionEnforcement } from '@/app/hooks/useVersionEnforcement';
+import { useVersion } from '@/app/context/VersionContext';
 import ForceUpdateModal from './ForceUpdateModal';
 
 /**
  * Componente wrapper per controllo versione e modal bloccante
+ * Usa VersionContext per stato globale sincronizzato con polling status
  * Invisibile - renderizza solo la modal quando necessario
  */
 export default function VersionEnforcer() {
-  const { needsUpdate, firebaseVersion } = useVersionEnforcement();
+  const { needsUpdate, firebaseVersion } = useVersion();
 
   return (
     <ForceUpdateModal

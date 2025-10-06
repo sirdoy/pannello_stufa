@@ -5,6 +5,25 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.4.0] - 2025-10-06
+
+### Aggiunto
+- **VersionContext**: Context React per gestione globale stato versioning con funzione `checkVersion()` on-demand
+- **ClientProviders**: Wrapper componente per provider client-side in layout Server Component
+- Hook `useVersion()` per accedere a VersionContext da qualsiasi componente
+- Check versione integrato nel polling status stufa (ogni 5 secondi invece di 60)
+
+### Modificato
+- `VersionEnforcer` ora usa `VersionContext` invece di hook autonomo
+- `StovePanel` chiama `checkVersion()` ogni 5s nel polling status esistente
+- Layout root wrappato in `ClientProviders` per context globale
+- Performance migliorata: un solo Firebase read invece di due polling separati
+- UX migliorata: rilevamento aggiornamenti **12x più veloce** (5s vs 60s)
+
+### Rimosso
+- Hook `useVersionEnforcement.js` (sostituito da VersionContext + useVersion)
+- Polling autonomo 60 secondi (ora integrato nel polling status)
+
 ## [1.3.4] - 2025-10-06
 
 ### Modificato

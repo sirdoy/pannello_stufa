@@ -6,6 +6,7 @@ import { getFullSchedulerMode, clearSemiManualMode, getNextScheduledAction } fro
 import { STOVE_ROUTES } from '@/lib/routes';
 import { logStoveAction, logNetatmoAction, logSchedulerAction } from '@/lib/logService';
 import { logError, shouldNotify, sendErrorNotification } from '@/lib/errorMonitor';
+import { useVersion } from '@/app/context/VersionContext';
 import Card from './ui/Card';
 import Button from './ui/Button';
 import StatusBadge from './ui/StatusBadge';
@@ -16,6 +17,7 @@ import ErrorAlert from './ui/ErrorAlert';
 
 export default function StovePanel() {
   const router = useRouter();
+  const { checkVersion } = useVersion();
 
   const [status, setStatus] = useState('...');
   const [fanLevel, setFanLevel] = useState(null);
@@ -117,13 +119,16 @@ export default function StovePanel() {
       await fetchFanLevel();
       await fetchPowerLevel();
       await fetchSchedulerMode();
+
+      // Check versione app (ogni 5s insieme allo status)
+      await checkVersion();
     } catch (err) {
       console.error('Errore stato:', err);
       setStatus('errore');
     } finally {
       setInitialLoading(false);
     }
-  }, []);
+  }, [checkVersion]);
 
   useEffect(() => {
     fetchStatusAndUpdate();

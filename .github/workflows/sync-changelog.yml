@@ -1,0 +1,21 @@
+name: Sync Changelog to Firebase
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'lib/version.js'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Vercel deployment
+        run: sleep 180  # Attendi 3 minuti per deploy
+
+      - name: Sync changelog
+        run: |
+          curl -X POST ${{ secrets.VERCEL_APP_URL }}/api/admin/sync-changelog \
+            -H "Authorization: Bearer ${{ secrets.ADMIN_SECRET }}" \
+            -H "Content-Type: application/json"

@@ -5,6 +5,20 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.3.3] - 2025-10-06
+
+### Aggiunto
+- Design glassmorphism moderno stile iOS 18 per UI ancora più moderna e raffinata
+- Componente `Card`: nuova prop opzionale `glass` per effetto vetro smerigliato (`bg-white/70`, `backdrop-blur-xl`)
+- Componente `Button`: nuova variante `glass` con trasparenza, blur e bordi luminosi
+- Componente `Select`: dropdown automaticamente aggiornato con effetto glassmorphism (`bg-white/90`, `backdrop-blur-xl`)
+- Tailwind config: nuove shadow personalizzate (`shadow-glass`, `shadow-glass-lg`, `shadow-inner-glow`)
+- Tailwind config: nuovo backdrop-blur utility (`backdrop-blur-xs` = 2px)
+
+### Modificato
+- Migliorato design system con effetti trasparenza e blur professionali
+- UI più leggera e moderna con separazione visiva elegante
+
 ## [1.3.2] - 2025-10-06
 
 ### Corretto

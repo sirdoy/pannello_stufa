@@ -230,17 +230,26 @@ pannello-stufa/
 ## Componenti UI
 
 ### Card Component
-Container base per layout consistente.
+Container base per layout consistente con supporto glassmorphism.
 
 ```jsx
 import { Card } from '@/app/components/ui';
 
+// Card standard (default)
 <Card className="p-6">
+  {/* content */}
+</Card>
+
+// Card con effetto glassmorphism (iOS 18 style)
+<Card glass className="p-6">
   {/* content */}
 </Card>
 ```
 
-**Props**: `children`, `className` (merged con base styles)
+**Props**:
+- `children` - Contenuto card
+- `className` - Classi aggiuntive (merged con base styles)
+- `glass` (boolean, default: false) - Attiva effetto glassmorphism (bg-white/70, backdrop-blur-xl, shadow-glass-lg, border-white/40)
 
 ---
 
@@ -270,6 +279,7 @@ import { Button } from '@/app/components/ui';
 - `accent` - Arancione, mode manuale
 - `outline` - Bordo, azioni terziarie
 - `ghost` - Trasparente, minimal
+- `glass` - Glassmorphism (bg-white/70, backdrop-blur-xl, bordo luminoso) - stile iOS 18
 
 ---
 
@@ -298,6 +308,7 @@ import { Select } from '@/app/components/ui';
 - Disabled state (opacity + cursor-not-allowed)
 - No placeholder options (solo valori reali)
 - Dropdown con `z-[100]` per evitare sovrapposizione con elementi successivi
+- **Glassmorphism automatico**: dropdown con bg-white/90, backdrop-blur-xl, shadow-glass-lg (stile iOS 18)
 
 ---
 
@@ -1086,7 +1097,13 @@ keyframes: {
 ```javascript
 boxShadow: {
   soft: '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
-  card: '0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)'
+  card: '0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)',
+  glass: '0 8px 32px 0 rgba(31, 38, 135, 0.15)',                               // Glassmorphism base
+  'glass-lg': '0 8px 32px 0 rgba(31, 38, 135, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.18)',  // Glassmorphism intenso
+  'inner-glow': 'inset 0 1px 0 0 rgba(255, 255, 255, 0.7)',                   // Glow interno
+},
+backdropBlur: {
+  xs: '2px',  // Blur extra-small per effetti sottili
 },
 borderRadius: {
   xl: '0.75rem',
@@ -1169,7 +1186,7 @@ export default function MyComponent() {
 - Mobile-first responsive design
 - Semantic color usage (primary=danger, success=confirm, etc.)
 - Smooth transitions (`transition-all duration-200`)
-- Glassmorphism (`backdrop-blur-sm`, `bg-white/60`)
+- Glassmorphism moderno iOS 18 style (vedi sezione dedicata sotto)
 - Active feedback (`active:scale-95`)
 - Hover animations (`group-hover:rotate-180`)
 - Z-index layering consistente (vedi Z-Index Layers in Tailwind Configuration)
@@ -1188,6 +1205,100 @@ export default function MyComponent() {
     @apply bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-200;
   }
 }
+```
+
+---
+
+### Glassmorphism Design (iOS 18 Style)
+
+**Quando usare glassmorphism**:
+- ✅ Card fluttuanti o sovrapposte (hero sections, modals)
+- ✅ Elementi UI secondari che non devono distrarre (toolbar, sidebars)
+- ✅ Dropdown, popover, tooltips
+- ✅ Elementi che devono integrarsi con sfondo dinamico
+- ❌ Contenuto principale che richiede massima leggibilità
+- ❌ Testo lungo o denso (contrast issues)
+- ❌ Elementi CTA primari (use solid colors)
+
+**Pattern glassmorphism disponibili**:
+
+```jsx
+// 1. Card glass (componente pre-configurato)
+<Card glass className="p-6">
+  <h2>Titolo</h2>
+  <p>Contenuto leggero e moderno</p>
+</Card>
+
+// 2. Button glass (componente pre-configurato)
+<Button variant="glass" icon="✨">
+  Azione Secondaria
+</Button>
+
+// 3. Dropdown glass (automatico in Select component)
+<Select
+  value={value}
+  onChange={setValue}
+  options={options}
+/>
+// Dropdown ha automaticamente glassmorphism
+
+// 4. Custom glassmorphism (manual)
+<div className="bg-white/70 backdrop-blur-xl shadow-glass-lg border border-white/40 rounded-2xl p-4">
+  Custom glass element
+</div>
+```
+
+**Combinazioni colori glassmorphism**:
+```jsx
+// Background semi-trasparente
+bg-white/70        // Bianco 70% opacità (standard)
+bg-white/80        // Bianco 80% opacità (più opaco)
+bg-white/90        // Bianco 90% opacità (quasi opaco - dropdown)
+bg-white/60        // Bianco 60% opacità (molto trasparente)
+
+// Backdrop blur
+backdrop-blur-xs   // 2px - blur sottile
+backdrop-blur-sm   // 4px - blur leggero
+backdrop-blur-md   // 12px - blur medio (default Card)
+backdrop-blur-xl   // 24px - blur intenso (default Button/Select)
+
+// Shadow
+shadow-glass       // Base glassmorphism shadow
+shadow-glass-lg    // Intenso glassmorphism shadow + border glow
+shadow-inner-glow  // Inner glow per highlight
+
+// Border
+border-white/40    // Bordo bianco 40% opacità (luminoso)
+border-white/20    // Bordo bianco 20% opacità (sottile)
+```
+
+**Best practices glassmorphism**:
+1. **Contrasto sufficiente**: Usa sempre `text-neutral-900` su glass per leggibilità
+2. **Background coerente**: Glassmorphism funziona meglio su sfondi gradienti o immagini
+3. **Stratificazione**: Usa z-index appropriato per elementi glass sovrapposti
+4. **Performance**: Limita numero elementi con backdrop-blur (GPU intensive)
+5. **Accessibilità**: Verifica contrasto WCAG AA (min 4.5:1 per testo normale)
+6. **Consistenza**: Usa componenti pre-configurati (Card glass, Button glass) quando possibile
+7. **Transizioni**: Aggiungi `transition-all duration-300` per smooth hover/focus states
+
+**Esempio completo glassmorphism hero section**:
+```jsx
+<Card glass className="p-8 max-w-2xl mx-auto">
+  <h1 className="text-3xl font-bold text-neutral-900 mb-4">
+    Controllo Stufa
+  </h1>
+  <p className="text-neutral-700 mb-6">
+    Modalità automatica attiva
+  </p>
+  <div className="flex gap-3">
+    <Button variant="primary" icon="🔥">
+      Accendi
+    </Button>
+    <Button variant="glass" icon="⚙️">
+      Impostazioni
+    </Button>
+  </div>
+</Card>
 ```
 
 ---
@@ -1478,15 +1589,16 @@ node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require(
 - Tailwind spacing scale (4px increments)
 - Emoji icons (accessibility: aria-label)
 - Color semantics (primary=danger, success=confirm)
-- Smooth transitions (`transition-all duration-200`)
+- Smooth transitions (`transition-all duration-200` o `duration-300` per glass)
 - Card-based layout
-- Proper contrast (WCAG AA)
+- Proper contrast (WCAG AA - min 4.5:1)
 - Semantic HTML (button, nav, main, section)
-- Glassmorphism: `backdrop-blur-sm`, `bg-white/60`
+- **Glassmorphism iOS 18 style**: Card glass, Button glass, Select dropdown automatico (vedi sezione Glassmorphism Design)
 - Active feedback: `active:scale-95`
 - Hover animations: `group-hover:rotate-180`
 - Disabled states: opacity + cursor-not-allowed + alert visivo
 - Z-index appropriato per layering (dropdown=100, modal=50+, blocking-modal=9999+)
+- Performance: limita backdrop-blur per elementi critici (GPU intensive)
 
 ---
 
@@ -2274,8 +2386,8 @@ cp .env.example .env.local
 ---
 
 **Last Updated**: 2025-10-06
-**Document Version**: 2.2
-**App Version**: 1.3.2
+**Document Version**: 2.3
+**App Version**: 1.3.3
 
 ---
 

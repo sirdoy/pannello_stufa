@@ -142,7 +142,7 @@ export default function StovePanel() {
     setFanLevel(level);
     await fetch(STOVE_ROUTES.setFan, {
       method: 'POST',
-      body: JSON.stringify({level}),
+      body: JSON.stringify({level, source: 'manual'}),
     });
     await logStoveAction.setFan(level);
   };
@@ -152,7 +152,7 @@ export default function StovePanel() {
     setPowerLevel(level);
     await fetch(STOVE_ROUTES.setPower, {
       method: 'POST',
-      body: JSON.stringify({level}),
+      body: JSON.stringify({level, source: 'manual'}),
     });
     await logStoveAction.setPower(level);
   };
@@ -169,14 +169,20 @@ export default function StovePanel() {
 
   const handleIgnite = async () => {
     setLoading(true);
-    await fetch(STOVE_ROUTES.ignite, {method: 'POST'});
+    await fetch(STOVE_ROUTES.ignite, {
+      method: 'POST',
+      body: JSON.stringify({source: 'manual'}),
+    });
     await logStoveAction.ignite();
     setLoading(false);
   };
 
   const handleShutdown = async () => {
     setLoading(true);
-    await fetch(STOVE_ROUTES.shutdown, {method: 'POST'});
+    await fetch(STOVE_ROUTES.shutdown, {
+      method: 'POST',
+      body: JSON.stringify({source: 'manual'}),
+    });
     await logStoveAction.shutdown();
     setLoading(false);
   };

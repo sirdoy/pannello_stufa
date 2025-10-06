@@ -557,15 +557,24 @@ PWA offline fallback.
 ### Stove Control (`/api/stove/*`)
 Proxy per Thermorossi Cloud API.
 
-| Endpoint | Method | Descrizione | Note |
-|----------|--------|-------------|------|
+| Endpoint | Method | Descrizione | Body / Note |
+|----------|--------|-------------|-------------|
 | `/status` | GET | Status + errori | GetStatus |
 | `/getFan` | GET | Fan level 1-6 | GetFanLevel |
 | `/getPower` | GET | Power level 0-5 | GetPower (UI: 1-5) |
-| `/ignite` | POST | Accensione | Trigger semi-manual se scheduler attivo |
-| `/shutdown` | POST | Spegnimento | Trigger semi-manual se scheduler attivo |
-| `/setFan` | POST | Imposta ventola | Body: `{level: 1-6}` - Disabled se OFF |
-| `/setPower` | POST | Imposta potenza | Body: `{level: 1-5}` - Disabled se OFF |
+| `/ignite` | POST | Accensione | `{source: 'manual'\|'scheduler'}` - Semi-manual SOLO se `source='manual'` |
+| `/shutdown` | POST | Spegnimento | `{source: 'manual'\|'scheduler'}` - Semi-manual SOLO se `source='manual'` |
+| `/setFan` | POST | Imposta ventola | `{level: 1-6, source: 'manual'\|'scheduler'}` - Semi-manual SOLO se `source='manual'` E stufa ON |
+| `/setPower` | POST | Imposta potenza | `{level: 1-5, source: 'manual'\|'scheduler'}` - Semi-manual SOLO se `source='manual'` E stufa ON |
+
+**Parametro `source`**:
+- `'manual'` - Comando da homepage utente → **attiva** semi-manual se scheduler abilitato
+- `'scheduler'` - Comando da cron automatico → **NON attiva** semi-manual
+
+**Attivazione semi-manual**:
+- ✅ Ignite/Shutdown manuali (sempre se scheduler attivo)
+- ✅ SetPower/SetFan manuali (solo se stufa già accesa)
+- ❌ Tutti i comandi da scheduler cron (source='scheduler')
 
 **⚠️ NON SUPPORTATA**: `getRoomTemperature` (endpoint deprecato dalla stufa)
 
@@ -944,10 +953,18 @@ await logNetatmoAction.selectDevice(deviceId);
 - Override manuale temporaneo
 - Color: Warning (yellow)
 - Scheduler rimane abilitato
-- Trigger: Azione manuale (ignite/shutdown) mentre in automatico
+- **Trigger**: Azione manuale **dalla homepage** mentre in automatico
+  - ✅ Ignite manuale → attiva semi-manual
+  - ✅ Shutdown manuale → attiva semi-manual
+  - ✅ SetPower/SetFan manuali → attiva semi-manual (solo se stufa già accesa)
+  - ❌ Comandi da scheduler cron → **NON** attiva semi-manual
 - Calcola `returnToAutoAt` = prossimo cambio scheduler
 - Mostra in UI: "Ritorno auto: 18:30 del 04/10"
 - Pulsante "↩️ Torna in Automatico" per uscire manualmente
+
+**Differenza source='manual' vs source='scheduler'**:
+- `source='manual'` → Comando da StovePanel homepage → Attiva semi-manual
+- `source='scheduler'` → Comando da cron automatico → Mantiene modalità automatica
 
 ---
 
@@ -976,7 +993,7 @@ GET /api/scheduler/check?secret=<CRON_SECRET>
 ### Scheduler Service Functions
 ```javascript
 import {
-  getNextScheduledChange,   // () → ISO timestamp prossimo cambio
+  getNextScheduledChange,   // () → ISO timestamp prossimo cambio (UTC)
   getNextScheduledAction,   // () → {timestamp, action, power?, fan?}
   saveSchedule,             // (day, intervals) → Promise<void>
   getSchedule,              // (day) → Promise<intervals[]>
@@ -988,6 +1005,20 @@ import {
   clearSemiManualMode       // () → Promise<void>
 } from '@/lib/schedulerService';
 ```
+
+**Gestione Fusi Orari**:
+Tutte le funzioni scheduler utilizzano internamente `createDateInRomeTimezone()` per garantire consistenza:
+- **Input utente**: Orari in formato `HH:MM` (interpretati come Europe/Rome)
+- **Calcoli interni**: Conversione automatica Europe/Rome → UTC
+- **Salvataggio Firebase**: ISO string UTC (`.toISOString()`)
+- **Confronti**: Date objects UTC (consistenti indipendentemente da timezone server)
+
+Helper interno:
+```javascript
+// Crea Date UTC da componenti in timezone Europe/Rome
+function createDateInRomeTimezone(baseDate, targetHour, targetMinute)
+```
+Gestisce automaticamente DST (ora legale/solare) e garantisce che gli orari siano sempre corretti anche se il server è in timezone diverso da Europe/Rome.
 
 ---
 
@@ -2010,36 +2041,51 @@ cp .env.example .env.local
 ```
 1. User in automatic mode
    ↓
-2. User clicks manual action (ignite/shutdown)
+2. User clicks manual action (ignite/shutdown/setPower/setFan) dalla HOMEPAGE
    ↓
-3. Check scheduler mode: enabled = true
+3. StovePanel invia request con source='manual':
+   - POST /api/stove/ignite {source: 'manual'}
+   - POST /api/stove/shutdown {source: 'manual'}
+   - POST /api/stove/setPower {level: X, source: 'manual'}
+   - POST /api/stove/setFan {level: X, source: 'manual'}
    ↓
-4. Calculate next scheduled change:
-   - getNextScheduledChange() → ISO timestamp
+4. API route verifica source='manual':
+   - Se source='scheduler' → Skip logic semi-manual (exit)
+   - Se source='manual' → Continua
    ↓
-5. Set semi-manual mode:
+5. Verifica condizioni:
+   - Check scheduler mode: enabled = true
+   - Se setPower/setFan: verifica stufa ON (StatusDescription includes 'WORK'|'START')
+   ↓
+6. Calculate next scheduled change:
+   - getNextScheduledChange() → ISO timestamp UTC (Europe/Rome timezone aware)
+   ↓
+7. Set semi-manual mode:
    - setSemiManualMode(nextScheduledChange)
    - Firebase: {
        enabled: true,
        semiManual: true,
-       returnToAutoAt: "2025-10-04T18:30:00Z"
+       returnToAutoAt: "2025-10-04T18:30:00Z"  // UTC timestamp
      }
    ↓
-6. UI updates:
+8. UI updates:
    - Mode indicator: "Ritorno auto: 18:30 del 04/10"
    - Show button: "↩️ Torna in Automatico"
    ↓
-7. User clicks "Torna in Automatico":
+9. User clicks "Torna in Automatico":
    - clearSemiManualMode()
    - logSchedulerAction.clearSemiManual()
    - UI updates to automatic mode
    - Fetch next scheduled action for display
    ↓
-8. OR wait for scheduled time:
-   - Cron reaches returnToAutoAt
-   - Execute scheduled change
-   - Clear semi-manual automatically
+10. OR wait for scheduled time:
+    - Cron reaches returnToAutoAt
+    - Execute scheduled change (con source='scheduler')
+    - Clear semi-manual automatically
+    - Ritorno in modalità automatica
 ```
+
+**IMPORTANTE**: Comandi da scheduler cron usano sempre `source='scheduler'` quindi **NON** attivano mai semi-manual, evitando loop infiniti.
 
 ### Version Enforcement Flow (Hard)
 ```
@@ -2202,9 +2248,9 @@ cp .env.example .env.local
 
 ---
 
-**Last Updated**: 2025-10-04
-**Document Version**: 2.0
-**App Version**: 1.3.0
+**Last Updated**: 2025-10-06
+**Document Version**: 2.1
+**App Version**: 1.3.1
 
 ---
 

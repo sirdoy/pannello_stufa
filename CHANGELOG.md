@@ -5,6 +5,23 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.3.1] - 2025-10-06
+
+### Modificato
+- Modalità semi-manuale ora si attiva **SOLO** da comandi manuali homepage (ignite, shutdown, setPower, setFan con stufa accesa)
+- API routes `/api/stove/*` ora richiedono parametro `source` ("manual" o "scheduler") per distinguere origine comando
+- Comandi da scheduler cron (`source="scheduler"`) **non** attivano più modalità semi-manuale
+
+### Aggiunto
+- Helper `createDateInRomeTimezone()` in `schedulerService.js` per gestione consistente fusi orari
+- Verifica stato stufa accesa prima di attivare semi-manual con setPower/setFan
+- Parametro `source` in tutti i comandi API stove (ignite, shutdown, setPower, setFan)
+
+### Corretto
+- Problema orari scheduler incorretti quando server in timezone diverso da Europe/Rome
+- Tutti gli orari scheduler ora gestiti con timezone Europe/Rome e salvataggio UTC consistente
+- Attivazione semi-manual non intenzionale da comandi automatici scheduler
+
 ## [1.3.0] - 2025-10-04
 
 ### Aggiunto

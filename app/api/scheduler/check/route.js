@@ -108,7 +108,7 @@ export async function GET(req) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({}),
+          body: JSON.stringify({source: 'scheduler'}),
         });
         changeApplied = true;
       }
@@ -116,7 +116,7 @@ export async function GET(req) {
         await fetch(`${baseUrl}${STOVE_ROUTES.setPower}`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({level: active.power}),
+          body: JSON.stringify({level: active.power, source: 'scheduler'}),
         });
         changeApplied = true;
       }
@@ -124,13 +124,17 @@ export async function GET(req) {
         await fetch(`${baseUrl}${STOVE_ROUTES.setFan}`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({level: active.fan}),
+          body: JSON.stringify({level: active.fan, source: 'scheduler'}),
         });
         changeApplied = true;
       }
     } else {
       if (isOn) {
-        await fetch(`${baseUrl}${STOVE_ROUTES.shutdown}`, {method: 'POST'});
+        await fetch(`${baseUrl}${STOVE_ROUTES.shutdown}`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({source: 'scheduler'}),
+        });
         changeApplied = true;
       }
     }

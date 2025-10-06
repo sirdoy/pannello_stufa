@@ -32,7 +32,10 @@
       "Bash(chmod:*)",
       "Bash(npm run start:*)",
       "Bash(lsof:*)",
-      "Bash(xargs kill:*)"
+      "Bash(xargs kill:*)",
+      "Bash(set -a)",
+      "Bash(source:*)",
+      "Bash(set +a)"
     ],
     "deny": [],
     "ask": []

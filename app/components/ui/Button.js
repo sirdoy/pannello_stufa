@@ -18,6 +18,7 @@ export default function Button({
     accent: 'bg-accent-600 hover:bg-accent-700 text-white active:scale-95',
     outline: 'border-2 border-neutral-300 hover:bg-neutral-50 text-neutral-900 active:scale-95',
     ghost: 'hover:bg-neutral-100 text-neutral-900 active:scale-95',
+    glass: 'bg-white/70 backdrop-blur-xl border border-white/40 shadow-glass text-neutral-900 hover:bg-white/80 active:scale-95',
   };
 
   const sizeClasses = {

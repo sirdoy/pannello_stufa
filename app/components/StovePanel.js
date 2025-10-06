@@ -425,36 +425,30 @@ export default function StovePanel() {
           )}
         </Card>
 
-        {/* Livelli */}
-        <Card className="p-8">
-          <h3 className="text-2xl font-bold text-neutral-900 mb-6">⚙️ Regolazioni</h3>
+        {/* Livelli - Visibile solo quando stufa accesa */}
+        {!isSpenta && (
+          <Card className="p-8">
+            <h3 className="text-2xl font-bold text-neutral-900 mb-6">⚙️ Regolazioni</h3>
 
-          {isSpenta && (
-            <div className="mb-6 p-4 bg-neutral-100 border border-neutral-300 rounded-xl text-center">
-              <p className="text-sm font-medium text-neutral-600">⚠️ Regolazioni disponibili solo con stufa accesa</p>
+            <div className="space-y-5">
+              <Select
+                label="💨 Livello Ventilazione"
+                value={fanLevel ?? ''}
+                onChange={handleFanChange}
+                options={fanOptions}
+                className="text-lg py-4"
+              />
+
+              <Select
+                label="⚡ Livello Potenza"
+                value={powerLevel ?? ''}
+                onChange={handlePowerChange}
+                options={powerOptions}
+                className="text-lg py-4"
+              />
             </div>
-          )}
-
-          <div className="space-y-5">
-            <Select
-              label="💨 Livello Ventilazione"
-              value={fanLevel ?? ''}
-              onChange={handleFanChange}
-              options={fanOptions}
-              className="text-lg py-4"
-              disabled={isSpenta}
-            />
-
-            <Select
-              label="⚡ Livello Potenza"
-              value={powerLevel ?? ''}
-              onChange={handlePowerChange}
-              options={powerOptions}
-              className="text-lg py-4"
-              disabled={isSpenta}
-            />
-          </div>
-        </Card>
+          </Card>
+        )}
       </div>
 
       {/* Netatmo e Temperatura - Da implementare */}

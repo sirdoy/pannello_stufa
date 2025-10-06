@@ -5,6 +5,17 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.3.4] - 2025-10-06
+
+### Modificato
+- Card regolazioni (ventola e potenza) ora completamente nascosta quando stufa spenta
+- Layout home più pulito con grid adattivo a singola colonna quando necessario
+- Esperienza utente migliorata: nessun controllo disabilitato visibile, solo elementi utilizzabili
+
+### Rimosso
+- Alert "⚠️ Regolazioni disponibili solo con stufa accesa" (non più necessario con card nascosta)
+- Stati disabilitati Select ventola/potenza (ora mostrati solo quando utilizzabili)
+
 ## [1.3.3] - 2025-10-06
 
 ### Aggiunto

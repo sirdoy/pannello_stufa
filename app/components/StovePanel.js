@@ -89,6 +89,9 @@ export default function StovePanel() {
     }
   };
 
+  // Flag per prevenire double fetch in React Strict Mode
+  const pollingStartedRef = useRef(false);
+
   const fetchStatusAndUpdate = useCallback(async () => {
     try {
       const res = await fetch(STOVE_ROUTES.status);
@@ -121,6 +124,7 @@ export default function StovePanel() {
       await fetchSchedulerMode();
 
       // Check versione app (ogni 5s insieme allo status)
+      // checkVersion è ora stabile (no dependencies nel VersionContext)
       await checkVersion();
     } catch (err) {
       console.error('Errore stato:', err);
@@ -131,9 +135,18 @@ export default function StovePanel() {
   }, [checkVersion]);
 
   useEffect(() => {
+    // Previeni double execution in React Strict Mode
+    if (pollingStartedRef.current) return;
+    pollingStartedRef.current = true;
+
     fetchStatusAndUpdate();
     const interval = setInterval(fetchStatusAndUpdate, 5000);
-    return () => clearInterval(interval);
+
+    return () => {
+      clearInterval(interval);
+      // Reset ref on unmount per permettere re-mount
+      pollingStartedRef.current = false;
+    };
   }, [fetchStatusAndUpdate]);
 
   const handleManualRefresh = async () => {

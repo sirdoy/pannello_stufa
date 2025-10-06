@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, Button, Skeleton, ErrorAlert } from '@/app/components/ui';
 import RoomCard from '@/app/components/netatmo/RoomCard';
 import NetatmoAuthCard from '@/app/components/netatmo/NetatmoAuthCard';
@@ -15,8 +15,16 @@ export default function NetatmoPage() {
   const [mode, setMode] = useState('schedule');
   const [refreshing, setRefreshing] = useState(false);
 
+  // Flags per prevenire double fetch in React Strict Mode
+  const connectionCheckedRef = useRef(false);
+  const pollingStartedRef = useRef(false);
+
   // Check connection status on mount
   useEffect(() => {
+    // Skip se già controllato (React 18 Strict Mode double mount)
+    if (connectionCheckedRef.current) return;
+    connectionCheckedRef.current = true;
+
     checkConnection();
   }, []);
 
@@ -31,9 +39,18 @@ export default function NetatmoPage() {
   useEffect(() => {
     if (!topology) return;
 
+    // Previeni double execution in React Strict Mode
+    if (pollingStartedRef.current) return;
+    pollingStartedRef.current = true;
+
     fetchStatus();
     const interval = setInterval(fetchStatus, 30000);
-    return () => clearInterval(interval);
+
+    return () => {
+      clearInterval(interval);
+      // Reset ref on unmount per permettere re-mount
+      pollingStartedRef.current = false;
+    };
   }, [topology]);
 
   async function checkConnection() {

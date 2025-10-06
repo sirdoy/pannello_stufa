@@ -53,14 +53,22 @@ export default function Navbar() {
     };
   }, [menuOpen]);
 
+  // Flag per prevenire double fetch in React Strict Mode
+  const fetchedRef = useRef(false);
+
   useEffect(() => {
+    // Skip se già fetchato (React 18 Strict Mode double mount)
+    if (fetchedRef.current) return;
+
     const fetchUser = async () => {
       try {
+        fetchedRef.current = true;
         const res = await fetch('/api/user');
         const data = await res.json();
         if (data.user) setUser(data.user);
       } catch (error) {
         console.error('Errore nel recupero utente:', error);
+        fetchedRef.current = false; // Reset on error per retry
       }
     };
     fetchUser();

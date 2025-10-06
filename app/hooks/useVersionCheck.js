@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getLatestVersion } from '@/lib/changelogService';
 import { APP_VERSION } from '@/lib/version';
 
@@ -15,10 +15,16 @@ export function useVersionCheck() {
   const [hasNewVersion, setHasNewVersion] = useState(false);
   const [latestVersion, setLatestVersion] = useState(null);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
+    // Previeni double fetch in React Strict Mode
+    if (fetchedRef.current) return;
+
     const checkVersion = async () => {
       try {
+        fetchedRef.current = true;
+
         // Recupera ultima versione da Firebase
         const latest = await getLatestVersion();
 
@@ -44,6 +50,7 @@ export function useVersionCheck() {
         }
       } catch (error) {
         console.error('Errore nel controllo versione:', error);
+        fetchedRef.current = false; // Reset on error per retry
       }
     };
 

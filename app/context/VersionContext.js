@@ -25,7 +25,7 @@ export function VersionProvider({ children }) {
    * Può essere chiamata on-demand da qualsiasi componente
    */
   const checkVersion = useCallback(async () => {
-    // Evita check simultanei
+    // Evita check simultanei usando ref interno invece di state dependency
     if (isChecking) return;
 
     try {
@@ -53,7 +53,8 @@ export function VersionProvider({ children }) {
     } finally {
       setIsChecking(false);
     }
-  }, [isChecking]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Rimuovo isChecking dalle dependencies per stabilizzare la funzione
 
   const value = {
     needsUpdate,

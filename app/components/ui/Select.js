@@ -80,7 +80,7 @@ export default function Select({
 
         {/* Dropdown Menu */}
         {isOpen && (
-          <div className="absolute z-50 w-full mt-2 bg-white border-2 border-neutral-200 rounded-xl shadow-2xl overflow-hidden animate-dropdown">
+          <div className="absolute z-[100] w-full mt-2 bg-white border-2 border-neutral-200 rounded-xl shadow-2xl overflow-hidden animate-dropdown">
             <div className="max-h-64 overflow-y-auto scrollbar-thin">
               {options.map((option) => (
                 <button

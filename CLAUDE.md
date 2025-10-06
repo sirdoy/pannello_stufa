@@ -297,6 +297,7 @@ import { Select } from '@/app/components/ui';
 - Click-outside to close
 - Disabled state (opacity + cursor-not-allowed)
 - No placeholder options (solo valori reali)
+- Dropdown con `z-[100]` per evitare sovrapposizione con elementi successivi
 
 ---
 
@@ -1094,6 +1095,28 @@ borderRadius: {
 }
 ```
 
+**Z-Index Layers** (convenzioni progetto):
+```javascript
+// Standard Tailwind + custom values
+z-0    // Base layer (default)
+z-10   // Elevated content
+z-20   // Sticky headers, footers
+z-30   // Fixed elements
+z-40   // Overlays
+z-50   // Modals base
+z-[100] // Dropdowns (Select component)
+z-[9999] // ForceUpdateModal backdrop
+z-[10000] // ForceUpdateModal content (highest, blocking)
+```
+
+**Best practices z-index**:
+- Usa valori Tailwind standard quando possibile (z-0, z-10, z-20, etc.)
+- Usa `z-[custom]` solo per casi specifici (dropdown, modals critici)
+- Dropdown components: `z-[100]` per evitare sovrapposizione con card
+- Modals dismissibili: `z-50`
+- Modals bloccanti: `z-[9999]` o superiore
+- Mantieni gerarchia consistente in tutta l'app
+
 ---
 
 ## Component Patterns
@@ -1149,6 +1172,7 @@ export default function MyComponent() {
 - Glassmorphism (`backdrop-blur-sm`, `bg-white/60`)
 - Active feedback (`active:scale-95`)
 - Hover animations (`group-hover:rotate-180`)
+- Z-index layering consistente (vedi Z-Index Layers in Tailwind Configuration)
 
 ### ❌ DON'T
 - NO utility classes in `app/globals.css` (`.card`, `.btn-primary`)
@@ -1462,6 +1486,7 @@ node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require(
 - Active feedback: `active:scale-95`
 - Hover animations: `group-hover:rotate-180`
 - Disabled states: opacity + cursor-not-allowed + alert visivo
+- Z-index appropriato per layering (dropdown=100, modal=50+, blocking-modal=9999+)
 
 ---
 
@@ -2249,8 +2274,8 @@ cp .env.example .env.local
 ---
 
 **Last Updated**: 2025-10-06
-**Document Version**: 2.1
-**App Version**: 1.3.1
+**Document Version**: 2.2
+**App Version**: 1.3.2
 
 ---
 

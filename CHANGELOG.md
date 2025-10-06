@@ -5,6 +5,12 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.3.2] - 2025-10-06
+
+### Corretto
+- Z-index dropdown componente Select aumentato da `z-50` a `z-[100]` per evitare sovrapposizione con card successive
+- Tendine select ora visualizzate correttamente sopra altri elementi della pagina
+
 ## [1.3.1] - 2025-10-06
 
 ### Modificato

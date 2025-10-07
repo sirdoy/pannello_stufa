@@ -5,6 +5,14 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.4.2] - 2025-10-07
+
+### Modificato
+- Navbar: aggiunto dropdown utente cliccabile per miglior gestione viewport intermedi (riduce affollamento header)
+- Navbar: logout spostato nel menu dropdown utente con sezione info complete (nome + email dell'utente connesso)
+- Navbar: ottimizzazione spazio header con responsive text truncation (max-w-[80px] su schermi md-xl, max-w-[120px] su xl+)
+- Navbar: gestione completa dropdown (click outside, tasto ESC, chiusura automatica al cambio route)
+
 ## [1.4.1] - 2025-10-06
 
 ### Corretto

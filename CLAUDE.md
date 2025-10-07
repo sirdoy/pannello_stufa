@@ -84,6 +84,17 @@ lib/
 if (loading) return <Skeleton.StovePanel />;
 ```
 
+### Navbar
+- **Desktop**: Links orizzontali + dropdown utente (nome + logout)
+- **Mobile**: Hamburger menu con slide-down
+- **User Dropdown Pattern**:
+  - State: `const [dropdownOpen, setDropdownOpen] = useState(false)`
+  - Ref: `const dropdownRef = useRef(null)` per click outside detection
+  - Click outside: `useEffect` con `mousedown` listener + `ref.current.contains(event.target)`
+  - Escape key: `useEffect` con `keydown` listener + `e.key === 'Escape'`
+  - Route change: chiudi automaticamente dropdown in `useEffect([pathname])`
+- **Responsive**: Glassmorphism + z-[100] per dropdown, text truncation con breakpoint (max-w-[80px] md-xl, max-w-[120px] xl+)
+
 ## Custom Hooks
 
 ### useVersionCheck (Soft Notification)
@@ -258,6 +269,53 @@ node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require(
 - **Soft**: Badge "NEW" + modal dismissibile (minor/patch)
 - **Hard**: ForceUpdateModal bloccante (major/critical fixes)
 
+## Pattern Comuni Riutilizzabili
+
+### Dropdown/Modal Pattern
+```javascript
+// 1. State + Ref
+const [isOpen, setIsOpen] = useState(false);
+const dropdownRef = useRef(null);
+
+// 2. Click Outside
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (isOpen && dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsOpen(false);
+    }
+  };
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => document.removeEventListener('mousedown', handleClickOutside);
+}, [isOpen]);
+
+// 3. Escape Key
+useEffect(() => {
+  const handleEscape = (e) => {
+    if (e.key === 'Escape' && isOpen) setIsOpen(false);
+  };
+  document.addEventListener('keydown', handleEscape);
+  return () => document.removeEventListener('keydown', handleEscape);
+}, [isOpen]);
+
+// 4. Route Change (se necessario)
+const pathname = usePathname();
+useEffect(() => {
+  setIsOpen(false);
+}, [pathname]);
+```
+
+### Responsive Breakpoints Strategy
+- **Mobile**: < 768px (`md:hidden`)
+- **Tablet/Intermediate**: 768px-1024px (`md:flex`)
+- **Desktop Small**: 1024px-1280px (`lg:`)
+- **Desktop Large**: > 1280px (`xl:`)
+
+**Best Practice Viewport Intermedi**:
+- Usa text truncation con max-width responsive: `max-w-[80px] xl:max-w-[120px]`
+- Riduci padding/gap nei viewport intermedi: `gap-1.5 lg:gap-2`
+- Dropdown/collapse elementi non critici: info utente, badge, secondary actions
+- Priorità: logo > navigation links > user menu
+
 ## Code Quality Best Practices
 
 ### API Routes
@@ -365,5 +423,5 @@ CRON_SECRET=your-secret-here
 ---
 
 **Last Updated**: 2025-10-07
-**Version**: 1.4.1
+**Version**: 1.4.2
 **Author**: Federico Manfredi

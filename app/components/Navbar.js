@@ -6,18 +6,22 @@ import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [user, setUser] = useState(null);
   const menuRef = useRef(null);
+  const userDropdownRef = useRef(null);
   const pathname = usePathname();
 
   const toggleMenu = () => setMenuOpen((prev) => !prev);
+  const toggleUserDropdown = () => setUserDropdownOpen((prev) => !prev);
 
   // Close menu on route change
   useEffect(() => {
     setMenuOpen(false);
+    setUserDropdownOpen(false);
   }, [pathname]);
 
-  // Click outside to close
+  // Click outside to close mobile menu
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuOpen && menuRef.current && !menuRef.current.contains(event.target)) {
@@ -29,17 +33,30 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [menuOpen]);
 
+  // Click outside to close user dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userDropdownOpen && userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
+        setUserDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [userDropdownOpen]);
+
   // Escape key to close
   useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === 'Escape' && menuOpen) {
-        setMenuOpen(false);
+      if (e.key === 'Escape') {
+        if (menuOpen) setMenuOpen(false);
+        if (userDropdownOpen) setUserDropdownOpen(false);
       }
     };
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [menuOpen]);
+  }, [menuOpen, userDropdownOpen]);
 
   // Prevent scroll when menu open
   useEffect(() => {
@@ -111,25 +128,56 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop menu */}
-          <div className="hidden md:flex items-center gap-1.5">
-            {user && (
-              <div className="flex items-center gap-2 mr-3 px-3 py-1.5 rounded-xl bg-white/70 backdrop-blur-sm border border-neutral-200/50 text-neutral-700 shadow-sm">
-                <span className="text-sm">👤</span>
-                <span className="text-xs font-medium truncate max-w-[100px] lg:max-w-[150px]">{user.name}</span>
-              </div>
-            )}
+          <div className="hidden md:flex items-center gap-2">
             <NavLink href="/netatmo">Netatmo</NavLink>
             <NavLink href="/scheduler">Pianificazione</NavLink>
             <NavLink href="/log">Storico</NavLink>
             <NavLink href="/errors">Allarmi</NavLink>
-            <div className="ml-1 pl-1.5 border-l border-neutral-200">
-              <Link
-                href="/api/auth/logout"
-                className="px-4 py-2 rounded-xl text-sm font-medium text-primary-600 hover:bg-primary-50 transition-all duration-200 active:scale-95"
-              >
-                Logout
-              </Link>
-            </div>
+
+            {/* User dropdown */}
+            {user && (
+              <div className="relative ml-2" ref={userDropdownRef}>
+                <button
+                  onClick={toggleUserDropdown}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/70 hover:bg-white/90 backdrop-blur-sm border border-neutral-200/50 text-neutral-700 shadow-sm transition-all duration-200 active:scale-95"
+                  aria-expanded={userDropdownOpen}
+                >
+                  <span className="text-sm">👤</span>
+                  <span className="text-xs font-medium truncate max-w-[80px] xl:max-w-[120px]">{user.name}</span>
+                  <svg
+                    className={`w-4 h-4 transition-transform duration-200 ${userDropdownOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* Dropdown menu */}
+                {userDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white/95 backdrop-blur-xl border border-neutral-200/50 rounded-xl shadow-glass-lg overflow-hidden z-[100]">
+                    <div className="px-4 py-3 border-b border-neutral-200/50">
+                      <p className="text-xs text-neutral-500">Connesso come</p>
+                      <p className="text-sm font-medium text-neutral-800 truncate">{user.name}</p>
+                      {user.email && (
+                        <p className="text-xs text-neutral-500 truncate mt-0.5">{user.email}</p>
+                      )}
+                    </div>
+                    <Link
+                      href="/api/auth/logout"
+                      className="block px-4 py-3 text-sm font-medium text-primary-600 hover:bg-primary-50 transition-colors duration-200"
+                      onClick={() => setUserDropdownOpen(false)}
+                    >
+                      Logout
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Mobile menu button */}

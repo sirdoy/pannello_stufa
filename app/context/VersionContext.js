@@ -5,6 +5,46 @@ import { getLatestVersion } from '@/lib/changelogService';
 import { APP_VERSION } from '@/lib/version';
 
 /**
+ * Confronta due versioni semantiche (MAJOR.MINOR.PATCH)
+ * @param {string} v1 - Versione 1 (es. "1.4.2")
+ * @param {string} v2 - Versione 2 (es. "1.5.0")
+ * @returns {number} -1 se v1 < v2, 0 se v1 === v2, 1 se v1 > v2
+ */
+function compareVersions(v1, v2) {
+  const parts1 = v1.split('.').map(Number);
+  const parts2 = v2.split('.').map(Number);
+
+  for (let i = 0; i < 3; i++) {
+    const p1 = parts1[i] || 0;
+    const p2 = parts2[i] || 0;
+
+    if (p1 < p2) return -1;
+    if (p1 > p2) return 1;
+  }
+
+  return 0;
+}
+
+/**
+ * Verifica se siamo in ambiente locale
+ * @returns {boolean} true se in development locale
+ */
+function isLocalEnvironment() {
+  // Check NODE_ENV
+  if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+    return true;
+  }
+
+  // Check hostname (browser)
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    return hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.');
+  }
+
+  return false;
+}
+
+/**
  * Context per gestione globale stato version enforcement
  * Permette check on-demand da qualsiasi componente (es. polling status)
  */
@@ -28,6 +68,12 @@ export function VersionProvider({ children }) {
     // Evita check simultanei usando ref interno invece di state dependency
     if (isChecking) return;
 
+    // Non mostrare modal bloccante in ambiente locale
+    if (isLocalEnvironment()) {
+      console.log('🔧 Ambiente locale: versioning enforcement disabilitato');
+      return;
+    }
+
     try {
       setIsChecking(true);
 
@@ -39,12 +85,17 @@ export function VersionProvider({ children }) {
         return;
       }
 
-      // Controlla se la versione su Firebase è diversa da quella locale
-      if (latest.version !== APP_VERSION) {
+      // Confronta versioni semanticamente
+      // Modal bloccante SOLO se versione locale < Firebase
+      const comparison = compareVersions(APP_VERSION, latest.version);
+
+      if (comparison < 0) {
+        // Versione locale è INFERIORE → update necessario
+        console.log(`⚠️ Update richiesto: ${APP_VERSION} → ${latest.version}`);
         setNeedsUpdate(true);
         setFirebaseVersion(latest.version);
       } else {
-        // Reset se versioni sono uguali (utente ha aggiornato)
+        // Versione locale >= Firebase → no update
         setNeedsUpdate(false);
         setFirebaseVersion(null);
       }

@@ -5,6 +5,15 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.4.3] - 2025-10-07
+
+### Modificato
+- **Version enforcement**: disabilitata modal bloccante in ambiente locale/development per migliore developer experience
+- **Version enforcement**: modal bloccante ora appare SOLO se versione locale è **inferiore** a quella su Firebase (semantic comparison)
+- Aggiunta funzione `compareVersions()` per confronto semantico versioni MAJOR.MINOR.PATCH
+- Aggiunta funzione `isLocalEnvironment()` per detection ambiente sviluppo (NODE_ENV, localhost, 127.0.0.1, IP privati)
+- Migliorata UX sviluppatori: nessuna interruzione durante development su macchina locale
+
 ## [1.4.2] - 2025-10-07
 
 ### Modificato

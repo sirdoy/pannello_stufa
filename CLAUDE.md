@@ -111,8 +111,10 @@ const { needsUpdate, firebaseVersion, checkVersion, isChecking } = useVersion();
 ```
 - Global context state
 - On-demand check (chiamato da StovePanel ogni 5s)
-- Strict comparison (`!==`)
-- ForceUpdateModal bloccante se `needsUpdate = true`
+- Semantic version comparison (`compareVersions(local, firebase) < 0`)
+- Disabilitato in ambiente locale (development, localhost)
+- ForceUpdateModal bloccante SOLO se versione locale < Firebase
+- Log detection: `🔧 Ambiente locale: versioning enforcement disabilitato`
 
 ## API Routes Principali
 
@@ -221,15 +223,23 @@ App mount → VersionProvider initializes
   ↓
 StovePanel polling → checkVersion() ogni 5s
   ↓
+Check isLocalEnvironment() → Se true, early return (no modal)
+  ↓
 Firebase fetch latest version
   ↓
-If local !== firebase → needsUpdate = true
+Semantic comparison: compareVersions(local, firebase)
+  ↓
+If local < firebase → needsUpdate = true
   ↓
 VersionEnforcer → ForceUpdateModal (blocking, z-10000)
   ↓
 User clicks "Aggiorna Ora" → window.location.reload()
 ```
-**Vantaggi**: 12x più veloce (5s vs 60s), zero overhead, single Firebase read
+**Vantaggi**:
+- 12x più veloce (5s vs 60s)
+- Zero overhead, single Firebase read
+- No interruzioni in dev (localhost detection)
+- Modal SOLO se update realmente necessario (semantic comparison)
 
 ## Versioning Workflow (CRITICO)
 
@@ -268,6 +278,31 @@ node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require(
 ### 4. Soft vs Hard Updates
 - **Soft**: Badge "NEW" + modal dismissibile (minor/patch)
 - **Hard**: ForceUpdateModal bloccante (major/critical fixes)
+
+### 5. Version Enforcement Technical Details
+
+**Funzioni Helper** (`app/context/VersionContext.js`):
+
+```javascript
+// Confronto semantico versioni
+compareVersions(v1, v2)
+// Returns: -1 se v1 < v2, 0 se v1 === v2, 1 se v1 > v2
+// Esempio: compareVersions('1.4.2', '1.5.0') => -1
+
+// Detection ambiente locale
+isLocalEnvironment()
+// Returns: true se NODE_ENV=development || hostname in [localhost, 127.0.0.1, 192.168.*]
+```
+
+**Comportamento**:
+- **Production**: Modal bloccante se `compareVersions(APP_VERSION, firebaseVersion) < 0`
+- **Development**: Modal sempre disabilitata, log `🔧 Ambiente locale: versioning enforcement disabilitato`
+- **Edge Case**: Se versione locale > Firebase (es. test nuova release), modal NON appare
+
+**Perché Semantic Comparison**:
+- Evita modal per versioni uguali (1.4.3 === 1.4.3)
+- Evita modal per downgrade intenzionale Firebase (1.5.0 local vs 1.4.9 Firebase)
+- Attiva modal SOLO quando utente ha versione obsoleta (1.4.2 local vs 1.5.0 Firebase)
 
 ## Pattern Comuni Riutilizzabili
 
@@ -356,10 +391,14 @@ find app -name "*.js" -exec grep -l "useState\|useEffect" {} \; | \
 ```
 
 ### Version Enforcement Not Working
-1. Check Firebase sync: `getLatestVersion()` should return latest
-2. Verify polling: StovePanel calls `checkVersion()` ogni 5s
-3. Compare: `APP_VERSION !== firebaseVersion`
-4. Clear cache + reload
+1. **Check environment**: In localhost/dev, modal è disabilitata (by design). Verifica `isLocalEnvironment()` = false in production
+2. **Check Firebase sync**: `getLatestVersion()` should return latest version
+3. **Verify polling**: StovePanel calls `checkVersion()` ogni 5s
+4. **Verify semantic comparison**: Modal appare SOLO se `compareVersions(APP_VERSION, firebaseVersion) < 0`
+   - 1.4.2 < 1.5.0 → modal ✅
+   - 1.5.0 >= 1.4.9 → NO modal ❌
+5. **Console logs**: Cerca `🔧 Ambiente locale` o `⚠️ Update richiesto`
+6. **Clear cache + reload**
 
 ### Scheduler Not Executing
 1. Check mode: `enabled: true`, `semiManual: false`
@@ -423,5 +462,5 @@ CRON_SECRET=your-secret-here
 ---
 
 **Last Updated**: 2025-10-07
-**Version**: 1.4.2
+**Version**: 1.4.3
 **Author**: Federico Manfredi

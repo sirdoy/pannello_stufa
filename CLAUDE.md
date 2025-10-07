@@ -304,6 +304,49 @@ isLocalEnvironment()
 - Evita modal per downgrade intenzionale Firebase (1.5.0 local vs 1.4.9 Firebase)
 - Attiva modal SOLO quando utente ha versione obsoleta (1.4.2 local vs 1.5.0 Firebase)
 
+### 6. Changelog Page Implementation
+
+**Pagina**: `app/changelog/page.js`
+
+**Data Source Priority**:
+1. **Firebase** (primary): `getChangelogFromFirebase()` da `changelogService.js`
+2. **Local fallback**: `VERSION_HISTORY` da `lib/version.js`
+3. **Indicatore fonte**: UI mostra "Firebase Realtime" o "Locale"
+
+**Ordinamento Semantico**:
+```javascript
+// CRITICO: Firebase ordina solo per data, serve ordinamento semantico client-side
+const sortVersions = (versions) => {
+  return [...versions].sort((a, b) => {
+    const [aMajor, aMinor, aPatch] = a.version.split('.').map(Number);
+    const [bMajor, bMinor, bPatch] = b.version.split('.').map(Number);
+
+    if (bMajor !== aMajor) return bMajor - aMajor;  // Confronta MAJOR
+    if (bMinor !== aMinor) return bMinor - aMinor;  // Confronta MINOR
+    return bPatch - aPatch;                          // Confronta PATCH
+  });
+};
+```
+
+**Perché Necessario**:
+- `changelogService.getChangelogFromFirebase()` ordina solo per data (Date object)
+- Quando più versioni hanno stessa data (es. 1.4.4, 1.4.3, 1.4.2 tutte 2025-10-07), ordine può essere errato
+- Ordinamento semantico garantisce sempre ordine corretto: 1.4.4 > 1.4.3 > 1.4.2 > 1.4.1
+
+**Pattern di Utilizzo**:
+```javascript
+const firebaseChangelog = await getChangelogFromFirebase();
+const sorted = sortVersions(firebaseChangelog);  // SEMPRE ordina semanticamente
+setChangelog(sorted);
+```
+
+**Badge "LATEST"**: Applicato al primo elemento dell'array ordinato (index === 0)
+
+**Colori per Tipo**:
+- `major`: 🚀 rosso/primary (breaking changes)
+- `minor`: ✨ verde/success (nuove features)
+- `patch`: 🔧 blu/info (bug fix)
+
 ## Pattern Comuni Riutilizzabili
 
 ### Dropdown/Modal Pattern
@@ -406,6 +449,13 @@ find app -name "*.js" -exec grep -l "useState\|useEffect" {} \; | \
 3. Check `/api/stove/*` not blocked by middleware
 4. Verify intervals valid in Firebase
 
+### Changelog Ordering Wrong
+1. **Check sortVersions()**: Deve essere chiamata su dati Firebase in `app/changelog/page.js`
+2. **Problema**: `changelogService.getChangelogFromFirebase()` ordina solo per data
+3. **Soluzione**: Applica sempre `sortVersions()` dopo fetch Firebase
+4. **Test**: Verifica 1.4.4 > 1.4.3 > 1.4.2 quando stessa data
+5. **Fallback**: `VERSION_HISTORY` locale è già ordinato correttamente
+
 ## Quick Reference Commands
 
 ```bash
@@ -462,5 +512,5 @@ CRON_SECRET=your-secret-here
 ---
 
 **Last Updated**: 2025-10-07
-**Version**: 1.4.3
+**Version**: 1.4.4
 **Author**: Federico Manfredi

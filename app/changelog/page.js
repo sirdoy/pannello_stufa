@@ -17,10 +17,12 @@ export default function ChangelogPage() {
         const firebaseChangelog = await getChangelogFromFirebase();
 
         if (firebaseChangelog.length > 0) {
-          setChangelog(firebaseChangelog);
+          // Ordina per versione semantica decrescente
+          const sorted = sortVersions(firebaseChangelog);
+          setChangelog(sorted);
           setSource('firebase');
         } else {
-          // Fallback a VERSION_HISTORY locale
+          // Fallback a VERSION_HISTORY locale (già ordinato)
           setChangelog(VERSION_HISTORY);
           setSource('local');
         }
@@ -35,6 +37,18 @@ export default function ChangelogPage() {
 
     fetchChangelog();
   }, []);
+
+  // Ordina versioni in modo semantico decrescente
+  const sortVersions = (versions) => {
+    return [...versions].sort((a, b) => {
+      const [aMajor, aMinor, aPatch] = a.version.split('.').map(Number);
+      const [bMajor, bMinor, bPatch] = b.version.split('.').map(Number);
+
+      if (bMajor !== aMajor) return bMajor - aMajor;
+      if (bMinor !== aMinor) return bMinor - aMinor;
+      return bPatch - aPatch;
+    });
+  };
 
   const getVersionIcon = (type) => {
     switch (type) {

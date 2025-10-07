@@ -5,6 +5,17 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.4.4] - 2025-10-07
+
+### Corretto
+- Ordinamento changelog nella pagina `/changelog` ora utilizza confronto semantico versioni (MAJOR.MINOR.PATCH)
+- Risolto problema quando più versioni hanno la stessa data (es. 1.4.4 > 1.4.3 > 1.4.2 tutte del 2025-10-07)
+- Funzione `sortVersions()` nella pagina changelog per ordinamento decrescente corretto
+
+### Modificato
+- `changelogService.getChangelogFromFirebase()` ora ordina solo per data
+- Ordinamento semantico finale applicato nella pagina changelog per garantire ordine corretto
+
 ## [1.4.3] - 2025-10-07
 
 ### Modificato

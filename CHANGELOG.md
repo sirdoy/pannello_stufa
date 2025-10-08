@@ -5,6 +5,41 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.4.5] - 2025-10-08
+
+### Aggiunto
+- **Sistema manutenzione stufa completo** con tracking automatico ore utilizzo H24 (funziona anche se app chiusa)
+- Pagina `/maintenance` per configurazione ore target pulizia con default 50h e preselezioni rapide (25/50/75/100/150/200h)
+- `lib/maintenanceService.js`: servizio completo per gestione manutenzione con funzioni Firebase
+  - `getMaintenanceData()`: recupera dati manutenzione
+  - `updateTargetHours()`: aggiorna ore target configurazione
+  - `trackUsageHours()`: tracking automatico server-side via cron (calcolo tempo reale da lastUpdatedAt)
+  - `confirmCleaning()`: reset contatore con log automatico su Firebase
+  - `canIgnite()`: verifica se accensione consentita
+  - `getMaintenanceStatus()`: status completo con percentuale e ore rimanenti
+- Componente `MaintenanceBar`: barra progresso lineare sempre visibile in home con:
+  - Colori dinamici (verde → giallo → arancione → rosso)
+  - Animazione shimmer quando utilizzo ≥80%
+  - Link diretto a `/maintenance`
+- Banner bloccante in home quando pulizia richiesta con pulsante conferma "Ho Pulito la Stufa"
+- Blocco automatico accensione (manuale e scheduler) quando `needsCleaning=true`
+- Schema Firebase `maintenance/` con `currentHours`, `targetHours`, `lastCleanedAt`, `needsCleaning`, `lastUpdatedAt`
+- Tracking integrato in `/api/scheduler/check`: chiamata `trackUsageHours()` ogni minuto quando stufa in status WORK
+- Log dettagliati console: "✅ Maintenance tracked: +1.2min → 47.5h total"
+- Link "Manutenzione" in Navbar (desktop + mobile) dopo "Pianificazione"
+
+### Modificato
+- `StovePanel.js`: rimosso tracking client-side (ora server-side via cron), aggiunto fetch `maintenanceStatus` e banner pulizia
+- `/api/stove/ignite`: aggiunto check `canIgnite()` prima accensione, return 403 se manutenzione richiesta
+- `/api/scheduler/check`: aggiunto check `canIgnite()` iniziale, skip silenzioso scheduler se manutenzione richiesta
+- `ClientProviders.js`: aggiunto `UserProvider` da Auth0 per supporto hook `useUser()` nelle pagine
+- Pulsanti Accendi/Spegni e Select Ventola/Potenza ora disabilitati quando `needsMaintenance=true`
+
+### Tecnico
+- Tracking autonomo H24: cron calcola tempo trascorso da `lastUpdatedAt` Firebase, non dipende più da app aperta
+- Auto-recovery: se cron salta chiamate, prossima esecuzione recupera automaticamente minuti persi
+- Accuratezza 100%: contatore si aggiorna sempre, anche se nessuno usa l'app per giorni
+
 ## [1.4.4] - 2025-10-07
 
 ### Corretto

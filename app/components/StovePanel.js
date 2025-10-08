@@ -2,11 +2,13 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useUser } from '@auth0/nextjs-auth0/client';
 import { getFullSchedulerMode, clearSemiManualMode, getNextScheduledAction } from '@/lib/schedulerService';
 import { STOVE_ROUTES } from '@/lib/routes';
 import { logStoveAction, logNetatmoAction, logSchedulerAction } from '@/lib/logService';
 import { logError, shouldNotify, sendErrorNotification } from '@/lib/errorMonitor';
 import { useVersion } from '@/app/context/VersionContext';
+import { getMaintenanceStatus, confirmCleaning } from '@/lib/maintenanceService';
 import Card from './ui/Card';
 import Button from './ui/Button';
 import StatusBadge from './ui/StatusBadge';
@@ -14,10 +16,12 @@ import ModeIndicator from './ui/ModeIndicator';
 import Select from './ui/Select';
 import Skeleton from './ui/Skeleton';
 import ErrorAlert from './ui/ErrorAlert';
+import MaintenanceBar from './MaintenanceBar';
 
 export default function StovePanel() {
   const router = useRouter();
   const { checkVersion } = useVersion();
+  const { user } = useUser();
 
   const [status, setStatus] = useState('...');
   const [fanLevel, setFanLevel] = useState(null);
@@ -35,6 +39,10 @@ export default function StovePanel() {
   const [errorCode, setErrorCode] = useState(0);
   const [errorDescription, setErrorDescription] = useState('');
   const previousErrorCode = useRef(0);
+
+  // Maintenance states
+  const [maintenanceStatus, setMaintenanceStatus] = useState(null);
+  const [cleaningInProgress, setCleaningInProgress] = useState(false);
 
   const handleNetatmoLogout = async () => {
     sessionStorage.removeItem('netatmo_refresh_token');
@@ -89,6 +97,15 @@ export default function StovePanel() {
     }
   };
 
+  const fetchMaintenanceStatus = async () => {
+    try {
+      const status = await getMaintenanceStatus();
+      setMaintenanceStatus(status);
+    } catch (err) {
+      console.error('Errore stato manutenzione:', err);
+    }
+  };
+
   // Flag per prevenire double fetch in React Strict Mode
   const pollingStartedRef = useRef(false);
 
@@ -122,6 +139,7 @@ export default function StovePanel() {
       await fetchFanLevel();
       await fetchPowerLevel();
       await fetchSchedulerMode();
+      await fetchMaintenanceStatus();
 
       // Check versione app (ogni 5s insieme allo status)
       // checkVersion è ora stabile (no dependencies nel VersionContext)
@@ -216,6 +234,18 @@ export default function StovePanel() {
     setNextScheduledAction(nextAction);
   };
 
+  const handleConfirmCleaning = async () => {
+    setCleaningInProgress(true);
+    try {
+      await confirmCleaning(user);
+      await fetchMaintenanceStatus();
+    } catch (err) {
+      console.error('Errore conferma pulizia:', err);
+    } finally {
+      setCleaningInProgress(false);
+    }
+  };
+
   const getStatusBgColor = (status) => {
     if (!status) return 'bg-neutral-50';
     if (status.includes('WORK')) return 'bg-success-50 border-success-200';
@@ -246,6 +276,7 @@ export default function StovePanel() {
 
   const isAccesa = status?.includes('WORK') || status?.includes('START');
   const isSpenta = status?.includes('OFF') || status?.includes('ERROR') || status?.includes('WAIT');
+  const needsMaintenance = maintenanceStatus?.needsCleaning || false;
 
   if (initialLoading) {
     return <Skeleton.StovePanel />;
@@ -253,6 +284,46 @@ export default function StovePanel() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
+      {/* Maintenance Bar - Always visible */}
+      {maintenanceStatus && <MaintenanceBar maintenanceStatus={maintenanceStatus} />}
+
+      {/* Maintenance Cleaning Banner - When cleaning needed */}
+      {needsMaintenance && (
+        <Card className="bg-orange-50 border-2 border-orange-300">
+          <div className="p-6">
+            <div className="flex items-start gap-4">
+              <span className="text-4xl">🧹</span>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-orange-900 mb-2">
+                  Pulizia Stufa Richiesta
+                </h3>
+                <p className="text-orange-700 mb-4">
+                  La stufa ha raggiunto <strong>{maintenanceStatus.currentHours.toFixed(1)} ore</strong> di utilizzo.
+                  È necessario effettuare la pulizia prima di poterla riaccendere.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button
+                    variant="success"
+                    onClick={handleConfirmCleaning}
+                    disabled={cleaningInProgress}
+                    className="sm:flex-initial"
+                  >
+                    {cleaningInProgress ? '⏳ Conferma in corso...' : '✓ Ho Pulito la Stufa'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => router.push('/maintenance')}
+                    className="sm:flex-initial"
+                  >
+                    ⚙️ Vai alle Impostazioni
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+
       {/* Error Alert - Always on top if present */}
       {errorCode !== 0 && (
         <ErrorAlert
@@ -413,7 +484,7 @@ export default function StovePanel() {
               size="lg"
               icon="🔥"
               onClick={handleIgnite}
-              disabled={loading || isAccesa}
+              disabled={loading || isAccesa || needsMaintenance}
               className="h-24 text-lg"
             >
               Accendi
@@ -423,7 +494,7 @@ export default function StovePanel() {
               size="lg"
               icon="❄️"
               onClick={handleShutdown}
-              disabled={loading || isSpenta}
+              disabled={loading || isSpenta || needsMaintenance}
               className="h-24 text-lg"
             >
               Spegni
@@ -454,6 +525,7 @@ export default function StovePanel() {
                 value={fanLevel ?? ''}
                 onChange={handleFanChange}
                 options={fanOptions}
+                disabled={needsMaintenance}
                 className="text-lg py-4"
               />
 
@@ -462,6 +534,7 @@ export default function StovePanel() {
                 value={powerLevel ?? ''}
                 onChange={handlePowerChange}
                 options={powerOptions}
+                disabled={needsMaintenance}
                 className="text-lg py-4"
               />
             </div>

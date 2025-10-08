@@ -1,6 +1,7 @@
 import { get, ref } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import { clearSemiManualMode } from '@/lib/schedulerService';
+import { canIgnite, trackUsageHours } from '@/lib/maintenanceService';
 import { STOVE_ROUTES } from '@/lib/routes';
 
 export async function GET(req) {
@@ -8,6 +9,15 @@ export async function GET(req) {
     const secret = req.nextUrl.searchParams.get('secret');
     if (secret !== process.env.CRON_SECRET) {
       return new Response('Unauthorized', {status: 401});
+    }
+
+    // Check maintenance status first
+    const maintenanceAllowed = await canIgnite();
+    if (!maintenanceAllowed) {
+      return Response.json({
+        status: 'MANUTENZIONE_RICHIESTA',
+        message: 'Scheduler in pausa - manutenzione stufa richiesta'
+      });
     }
 
     // Check if scheduler mode is enabled
@@ -82,7 +92,14 @@ export async function GET(req) {
 
     const statusRes = await fetch(`${baseUrl}${STOVE_ROUTES.status}`);
     const statusJson = await statusRes.json();
-    const isOn = statusJson?.StatusDescription?.includes('WORK') || statusJson?.StatusDescription?.includes('START');
+    const currentStatus = statusJson?.StatusDescription || 'unknown';
+    const isOn = currentStatus.includes('WORK') || currentStatus.includes('START');
+
+    // Track maintenance hours (automatic tracking based on WORK status)
+    const maintenanceTrack = await trackUsageHours(currentStatus);
+    if (maintenanceTrack.tracked) {
+      console.log(`✅ Maintenance tracked: +${maintenanceTrack.elapsedMinutes}min → ${maintenanceTrack.newCurrentHours.toFixed(2)}h total`);
+    }
 
     const fanRes = await fetch(`${baseUrl}${STOVE_ROUTES.getFan}`);
     const fanJson = await fanRes.json();

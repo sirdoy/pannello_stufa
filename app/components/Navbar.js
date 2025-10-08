@@ -131,6 +131,7 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-2">
             <NavLink href="/netatmo">Netatmo</NavLink>
             <NavLink href="/scheduler">Pianificazione</NavLink>
+            <NavLink href="/maintenance">Manutenzione</NavLink>
             <NavLink href="/log">Storico</NavLink>
             <NavLink href="/errors">Allarmi</NavLink>
 
@@ -224,6 +225,7 @@ export default function Navbar() {
           )}
           <NavLink href="/netatmo" mobile>Netatmo</NavLink>
           <NavLink href="/scheduler" mobile>Pianificazione</NavLink>
+          <NavLink href="/maintenance" mobile>Manutenzione</NavLink>
           <NavLink href="/log" mobile>Storico</NavLink>
           <NavLink href="/errors" mobile>Allarmi</NavLink>
 

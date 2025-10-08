@@ -30,20 +30,22 @@ app/
 │   ├── ui/                   # Card, Button, Select, Skeleton, Footer
 │   ├── scheduler/            # TimeBar, DayAccordionItem
 │   ├── StovePanel.js         # Controllo principale + polling 5s
+│   ├── MaintenanceBar.js     # Barra progresso manutenzione
 │   ├── VersionEnforcer.js    # Hard update modal
-│   └── ClientProviders.js    # Wrapper contexts
+│   └── ClientProviders.js    # Wrapper contexts (UserProvider + VersionProvider)
 ├── context/
 │   └── VersionContext.js     # State globale versioning
 ├── hooks/
 │   └── useVersionCheck.js    # Soft version notification
 ├── api/
 │   ├── stove/                # Proxy Thermorossi (status, ignite, shutdown, setFan, setPower)
-│   ├── scheduler/check/      # Cron endpoint
+│   ├── scheduler/check/      # Cron endpoint + maintenance tracking
 │   ├── netatmo/              # Termostato API
 │   ├── log/add/              # User action logging
 │   └── auth/[...auth0]/      # Auth0 handler
 ├── page.js                   # Home (StovePanel)
 ├── scheduler/page.js         # Pianificazione settimanale
+├── maintenance/page.js       # Configurazione manutenzione stufa
 ├── log/page.js              # Storico azioni
 ├── errors/page.js           # Allarmi
 └── changelog/page.js        # Versioni
@@ -51,6 +53,7 @@ app/
 lib/
 ├── stoveApi.js              # Thermorossi wrapper
 ├── schedulerService.js      # Scheduler logic + timezone handling
+├── maintenanceService.js    # Maintenance tracking + Firebase operations
 ├── firebase.js              # Client SDK (NO Edge runtime)
 ├── version.js               # APP_VERSION, VERSION_HISTORY
 ├── changelogService.js      # Version management + Firebase sync
@@ -149,6 +152,13 @@ stoveScheduler/
     ├── semiManual           # boolean
     └── returnToAutoAt       # ISO string UTC
 
+maintenance/
+├── currentHours             # float (ore utilizzo attuali, 4 decimali)
+├── targetHours              # float (ore prima pulizia, default 50)
+├── lastCleanedAt            # ISO string UTC (null se mai pulita)
+├── needsCleaning            # boolean (blocco accensione)
+└── lastUpdatedAt            # ISO string UTC (per calcolo elapsed time)
+
 log/
 └── {logId}/
     ├── action, value, timestamp
@@ -189,6 +199,170 @@ changelog/
 - Calcola `returnToAutoAt` = prossimo cambio scheduler
 - UI: "Ritorno auto: 18:30 del 04/10" + pulsante "↩️ Torna in Automatico"
 
+## Sistema Manutenzione Stufa 🔧
+
+### Overview
+Sistema autonomo H24 per tracking ore utilizzo e gestione pulizia periodica.
+
+**Caratteristiche principali**:
+- ✅ Tracking automatico server-side (cron ogni minuto)
+- ✅ Funziona anche app chiusa (calcolo tempo reale da Firebase)
+- ✅ Blocco automatico accensione quando pulizia richiesta
+- ✅ Configurazione flessibile ore target (default 50h)
+- ✅ Barra progresso visiva con colori dinamici
+- ✅ Auto-recovery se cron salta chiamate
+
+### Funzioni maintenanceService.js
+
+```javascript
+// Recupera dati manutenzione (con init default se non esiste)
+getMaintenanceData()
+
+// Aggiorna ore target configurazione
+updateTargetHours(hours)
+
+// CRITICO: Tracking automatico chiamato da cron (NON client-side!)
+// Calcola elapsed time da lastUpdatedAt e aggiorna currentHours
+trackUsageHours(stoveStatus)
+
+// Reset contatore dopo pulizia + log Firebase
+confirmCleaning(user)
+
+// Verifica se accensione consentita (blocco se needsCleaning)
+canIgnite()
+
+// Status completo: percentage, remainingHours, isNearLimit
+getMaintenanceStatus()
+```
+
+### Configurazione (/maintenance page)
+
+**UI Elements**:
+- Card "Stato Attuale" con 3 metriche: Ore Utilizzo / Ore Target / Ore Rimanenti
+- Input numerico custom (range 1-1000h)
+- Preselezioni rapide: 25 / 50 / 75 / 100 / 150 / 200 ore
+- Default: 50h
+- Info ultima pulizia se disponibile
+
+**Validazione**:
+- Min: 1h, Max: 1000h
+- Controllo threshold dopo update: se currentHours >= targetHours → needsCleaning=true
+
+### UI Components
+
+**MaintenanceBar** (sempre visibile in home):
+```jsx
+<MaintenanceBar maintenanceStatus={status} />
+```
+- Barra progresso lineare orizzontale
+- Colori dinamici:
+  - 0-59%: verde (`bg-success-600`)
+  - 60-79%: giallo (`bg-yellow-500`)
+  - 80-99%: arancione (`bg-orange-500`)
+  - 100%+: rosso (`bg-danger-600`)
+- Animazione shimmer quando ≥80% (warning visivo)
+- Link cliccabile a `/maintenance`
+- Info: "47.5h / 50h" + "2.5h rimanenti" + "95%"
+
+**Banner Pulizia** (quando needsCleaning=true):
+- Card arancione bloccante sopra StovePanel
+- Icona 🧹 + messaggio chiaro
+- Pulsante "✓ Ho Pulito la Stufa" → conferma pulizia
+- Pulsante "⚙️ Vai alle Impostazioni" → link /maintenance
+- Disabilita tutti i controlli stufa fino a conferma
+
+### Blocco Accensione
+
+**API Routes modificate**:
+```javascript
+// /api/stove/ignite
+const allowed = await canIgnite();
+if (!allowed) return Response.json({ error: 'Maintenance required' }, { status: 403 });
+
+// /api/scheduler/check
+const allowed = await canIgnite();
+if (!allowed) return Response.json({ status: 'MANUTENZIONE_RICHIESTA' });
+```
+
+**UI Disabilitata**:
+- Pulsante "🔥 Accendi" → `disabled={needsMaintenance}`
+- Pulsante "❄️ Spegni" → `disabled={needsMaintenance}`
+- Select Ventola → `disabled={needsMaintenance}`
+- Select Potenza → `disabled={needsMaintenance}`
+
+### Tracking Server-Side (CRITICO!)
+
+**Perché Server-Side**:
+- ❌ Client-side polling (vecchia implementazione): tracking SOLO se app aperta
+- ✅ Server-side cron: tracking H24, anche app chiusa
+
+**Implementazione**:
+```javascript
+// /api/scheduler/check (chiamato ogni minuto da cron esterno)
+const statusRes = await fetch(`${baseUrl}/api/stove/status`);
+const currentStatus = statusJson?.StatusDescription || 'unknown';
+
+// Track usage automaticamente
+const track = await trackUsageHours(currentStatus);
+if (track.tracked) {
+  console.log(`✅ Maintenance tracked: +${track.elapsedMinutes}min → ${track.newCurrentHours}h`);
+}
+```
+
+**Logica trackUsageHours()**:
+1. Check status WORK → se no, skip
+2. Fetch lastUpdatedAt da Firebase
+3. Calcola `elapsed = now - lastUpdatedAt` (minuti)
+4. Se elapsed < 0.5min → skip (troppo presto)
+5. Converti elapsed in ore: `hoursToAdd = elapsed / 60`
+6. Update Firebase: `currentHours += hoursToAdd`, `lastUpdatedAt = now`
+7. Se `currentHours >= targetHours` → `needsCleaning = true`
+
+**Auto-Recovery**:
+Se cron salta 10 chiamate (10 minuti), la successiva chiamata recupera tutti i 10 minuti automaticamente calcolando elapsed time corretto.
+
+### Log e Monitoring
+
+**Pulizia Confermata**:
+```javascript
+await logUserAction('Pulizia stufa', '47.50h', {
+  previousHours: 47.5,
+  targetHours: 50,
+  cleanedAt: '2025-10-08T...',
+  source: 'manual'
+});
+```
+
+**Console Logs**:
+- `✅ Maintenance tracked: +1.2min → 47.5h total` (ogni minuto se WORK)
+- `⚠️ Maintenance threshold reached: 50.02h / 50h` (quando supera)
+
+### Best Practices
+
+1. **Configurazione iniziale**: Imposta targetHours adeguato al tipo di pellet (20-100h tipico)
+2. **Monitoring**: Controlla barra progresso in home regolarmente
+3. **Warning 80%**: Animazione shimmer indica pulizia imminente
+4. **Reset pulizia**: SEMPRE confermare dopo aver pulito fisicamente la stufa
+5. **Log storico**: Verificare in `/log` frequenza pulizie per ottimizzare targetHours
+
+### Troubleshooting
+
+**Contatore non avanza**:
+1. Verifica cron attivo: `/api/scheduler/check` chiamato ogni minuto
+2. Check status stufa: deve essere "WORK" per tracking
+3. Verifica Firebase: `lastUpdatedAt` deve aggiornarsi ogni minuto
+4. Console logs: cerca `✅ Maintenance tracked`
+
+**Blocco accensione errato**:
+1. Check Firebase: `needsCleaning` deve essere `false`
+2. Verifica `currentHours < targetHours`
+3. Se bloccato erroneamente: reset manuale Firebase o re-conferma pulizia
+
+**Tracking impreciso**:
+- Normal: precisione ±1 minuto (dipende da frequenza cron)
+- Se cron salta chiamate: auto-recovery recupera tempo perso
+- Per massima accuratezza: cron job stabile ogni 60 secondi
+
 ## Data Flow Essenziale
 
 ### Polling Status (ogni 5s)
@@ -208,6 +382,10 @@ Update UI
 ```
 GET /api/scheduler/check?secret=xxx
   ↓
+Check maintenance status (canIgnite)
+  ↓
+If needsCleaning → skip + return MANUTENZIONE_RICHIESTA
+  ↓
 Check mode (manual/auto/semi-manual)
   ↓
 If auto: fetch schedule + compare time
@@ -215,7 +393,38 @@ If auto: fetch schedule + compare time
 Execute actions (ignite/shutdown/set) con source='scheduler'
   ↓
 If scheduled change → clear semi-manual
+  ↓
+Track usage hours: trackUsageHours(currentStatus)
 ```
+
+### Maintenance Tracking Flow (Autonomo H24)
+```
+Cron ogni minuto → /api/scheduler/check
+  ↓
+Fetch stove status (WORK/OFF/etc)
+  ↓
+trackUsageHours(status)
+  ↓
+If status !== WORK → return (no tracking)
+  ↓
+Calculate elapsed = now - lastUpdatedAt (Firebase)
+  ↓
+If elapsed < 0.5min → return (too soon)
+  ↓
+Add elapsed time to currentHours
+  ↓
+Update Firebase: currentHours, lastUpdatedAt
+  ↓
+If currentHours >= targetHours → set needsCleaning=true
+  ↓
+Log: "✅ Maintenance tracked: +1.2min → 47.5h total"
+```
+
+**CRITICO**: Tracking è **server-side via cron**, non client-side!
+- ✅ Funziona H24, anche se nessuno ha app aperta
+- ✅ Auto-recovery: se cron salta, prossima esecuzione recupera minuti persi
+- ✅ Accuratezza 100%: calcolo basato su timestamp Firebase, non su polling client
+- ❌ NO più tracking in StovePanel (era inaffidabile, solo quando app aperta)
 
 ### Version Enforcement Flow
 ```
@@ -511,6 +720,6 @@ CRON_SECRET=your-secret-here
 
 ---
 
-**Last Updated**: 2025-10-07
-**Version**: 1.4.4
+**Last Updated**: 2025-10-08
+**Version**: 1.4.5
 **Author**: Federico Manfredi

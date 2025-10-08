@@ -1,5 +1,6 @@
 'use client';
 
+import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { VersionProvider } from '@/app/context/VersionContext';
 
 /**
@@ -8,8 +9,10 @@ import { VersionProvider } from '@/app/context/VersionContext';
  */
 export default function ClientProviders({ children }) {
   return (
-    <VersionProvider>
-      {children}
-    </VersionProvider>
+    <UserProvider>
+      <VersionProvider>
+        {children}
+      </VersionProvider>
+    </UserProvider>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import styles from './MaintenanceBar.module.css';
 
 export default function MaintenanceBar({ maintenanceStatus }) {
   if (!maintenanceStatus) return null;
@@ -43,7 +44,7 @@ export default function MaintenanceBar({ maintenanceStatus }) {
           >
             {/* Animated shimmer effect when near limit */}
             {isNearLimit && (
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+              <div className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent ${styles.shimmer}`} />
             )}
           </div>
         </div>

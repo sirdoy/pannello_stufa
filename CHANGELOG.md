@@ -5,6 +5,20 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.4.6] - 2025-10-08
+
+### Modificato
+- **CSS Modules**: modularizzazione `globals.css` per ridurre bundle size e migliorare organizzazione
+- Creato `app/components/MaintenanceBar.module.css` con animazione shimmer (precedentemente in globals.css)
+- `globals.css` ridotto da 27 a 13 righe (-52%) rimuovendo CSS non globale
+- Animazione shimmer ora caricata solo quando componente `MaintenanceBar` è renderizzato
+- Best practice: CSS specifico di componente ora in CSS Modules (`.module.css`), non in `globals.css`
+
+### Tecnico
+- Pattern CSS Modules Next.js: `import styles from './Component.module.css'` + `className={styles.shimmer}`
+- Code splitting CSS: animazioni e stili componente-specifici ora caricati on-demand
+- Separazione chiara: `globals.css` solo per base Tailwind + stili veramente globali (html/body)
+
 ## [1.4.5] - 2025-10-08
 
 ### Aggiunto

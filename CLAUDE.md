@@ -31,6 +31,7 @@ app/
 │   ├── scheduler/            # TimeBar, DayAccordionItem
 │   ├── StovePanel.js         # Controllo principale + polling 5s
 │   ├── MaintenanceBar.js     # Barra progresso manutenzione
+│   ├── MaintenanceBar.module.css  # CSS Module: animazione shimmer
 │   ├── VersionEnforcer.js    # Hard update modal
 │   └── ClientProviders.js    # Wrapper contexts (UserProvider + VersionProvider)
 ├── context/
@@ -622,10 +623,48 @@ import { useState } from 'react';
 - ✅ Add remote domains to `next.config.mjs` (`images.remotePatterns`)
 
 ### Styling
-- ✅ Inline Tailwind only
-- ✅ Glassmorphism: `bg-white/70 backdrop-blur-xl shadow-glass-lg border-white/40`
-- ✅ Z-index: dropdown=100, modal=50, blocking-modal=9999+
-- ❌ NO custom CSS in `globals.css`
+
+**Hierarchy CSS (in ordine di preferenza)**:
+1. ✅ **Tailwind Inline** (caso principale, ~95% del codice)
+   - `className="bg-white/70 backdrop-blur-xl p-4 rounded-2xl"`
+   - Glassmorphism: `bg-white/70 backdrop-blur-xl shadow-glass-lg border-white/40`
+   - Z-index: dropdown=100, modal=50, blocking-modal=9999+
+
+2. ✅ **CSS Modules** (per animazioni e stili complessi componente-specifici)
+   - File: `Component.module.css` nella stessa directory del componente
+   - Import: `import styles from './Component.module.css'`
+   - Usage: `className={styles.shimmer}` o `${styles.shimmer}`
+   - **Quando usare**: Keyframe animations, hover complessi, stili che richiedono CSS puro
+   - **Esempio**: `MaintenanceBar.module.css` contiene animazione shimmer
+   ```css
+   /* MaintenanceBar.module.css */
+   @keyframes shimmer {
+     0% { transform: translateX(-100%); }
+     100% { transform: translateX(100%); }
+   }
+   .shimmer {
+     animation: shimmer 2s infinite;
+   }
+   ```
+   ```jsx
+   // MaintenanceBar.js
+   import styles from './MaintenanceBar.module.css';
+   <div className={`...tailwind-classes ${styles.shimmer}`} />
+   ```
+
+3. ✅ **globals.css** (SOLO per base Tailwind + stili veramente globali)
+   - Tailwind directives: `@tailwind base/components/utilities`
+   - Stili base html/body in `@layer base`
+   - ❌ NO animazioni componente-specifici
+   - ❌ NO stili che possono essere in CSS Modules
+   - Mantieni file minimo (~13 righe è ideale)
+
+**Best Practices**:
+- Se uno stile è usato da UN solo componente → CSS Module
+- Se uno stile è usato da PIÙ componenti → Tailwind classe custom in `tailwind.config.js`
+- Se uno stile è veramente globale (html/body) → `globals.css` in `@layer base`
+- Preferisci sempre Tailwind quando possibile (utility-first)
+- Code splitting automatico: CSS Modules caricati solo quando componente renderizzato
 
 ## Troubleshooting Comune
 
@@ -721,5 +760,5 @@ CRON_SECRET=your-secret-here
 ---
 
 **Last Updated**: 2025-10-08
-**Version**: 1.4.5
+**Version**: 1.4.6
 **Author**: Federico Manfredi

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { getMaintenanceData, updateTargetHours } from '@/lib/maintenanceService';
+import { getMaintenanceData, updateTargetHours, confirmCleaning } from '@/lib/maintenanceService';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,12 +15,25 @@ export default function MaintenancePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   useEffect(() => {
     if (!isLoading && user) {
       loadMaintenanceData();
     }
   }, [user, isLoading]);
+
+  // Close modal on Escape key
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && showResetConfirm) {
+        setShowResetConfirm(false);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [showResetConfirm]);
 
   const loadMaintenanceData = async () => {
     try {
@@ -54,6 +67,30 @@ export default function MaintenancePage() {
       setIsSaving(false);
       setTimeout(() => setSaveMessage(null), 3000);
     }
+  };
+
+  const handleResetRequest = () => {
+    setShowResetConfirm(true);
+  };
+
+  const handleConfirmReset = async () => {
+    setIsResetting(true);
+    try {
+      await confirmCleaning(user);
+      setSaveMessage({ type: 'success', text: 'Contatore azzerato con successo' });
+      await loadMaintenanceData();
+      setShowResetConfirm(false);
+    } catch (error) {
+      console.error('Error resetting maintenance:', error);
+      setSaveMessage({ type: 'error', text: 'Errore durante il reset' });
+    } finally {
+      setIsResetting(false);
+      setTimeout(() => setSaveMessage(null), 3000);
+    }
+  };
+
+  const handleCancelReset = () => {
+    setShowResetConfirm(false);
   };
 
   if (isLoading || loading) {
@@ -109,6 +146,18 @@ export default function MaintenancePage() {
                 {Math.max(0, (maintenanceData?.targetHours || 50) - (maintenanceData?.currentHours || 0)).toFixed(1)}h
               </div>
             </div>
+          </div>
+
+          {/* Reset Button */}
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <Button
+              variant="danger"
+              onClick={handleResetRequest}
+              disabled={isResetting || (maintenanceData?.currentHours || 0) === 0}
+              className="w-full"
+            >
+              🔄 Azzera Contatore Manutenzione
+            </Button>
           </div>
 
           {maintenanceData?.lastCleanedAt && (
@@ -204,6 +253,47 @@ export default function MaintenancePage() {
           </ul>
         </Card>
       </div>
+
+      {/* Reset Confirmation Modal */}
+      {showResetConfirm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[10000] p-4">
+          <Card glass className="max-w-md w-full p-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">🔄 Conferma Reset</h2>
+            <p className="text-gray-700 mb-6">
+              Sei sicuro di voler azzerare il contatore di manutenzione?
+            </p>
+            <div className="space-y-2 mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <p className="text-sm text-yellow-800">
+                ⚠️ Questa operazione:
+              </p>
+              <ul className="text-sm text-yellow-700 space-y-1 ml-4">
+                <li>• Azzererà il contatore a 0.0 ore</li>
+                <li>• Registrerà la data e ora della pulizia</li>
+                <li>• Sbloccherà l&apos;accensione della stufa se era bloccata</li>
+                <li>• Creerà un log dell&apos;operazione</li>
+              </ul>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={handleCancelReset}
+                disabled={isResetting}
+                className="flex-1"
+              >
+                ✕ Annulla
+              </Button>
+              <Button
+                variant="danger"
+                onClick={handleConfirmReset}
+                disabled={isResetting}
+                className="flex-1"
+              >
+                {isResetting ? '⏳ Attendere...' : '✓ Conferma Reset'}
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

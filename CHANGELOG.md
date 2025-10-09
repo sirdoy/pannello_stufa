@@ -5,6 +5,21 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.4.8] - 2025-10-09
+
+### Aggiunto
+- **Pulsante reset manutenzione**: pagina `/maintenance` ora include pulsante "Azzera Contatore Manutenzione"
+- **Modal conferma reset**: confirmation modal con backdrop blur, warning dettagliato effetti operazione
+  - Chiusura con tasto Escape
+  - Disabilitato quando contatore già a 0
+  - Feedback visivo durante reset (loading state)
+- Reset manutenzione ora disponibile sia da banner home che da pagina configurazione
+
+### Tecnico
+- Pattern confirmation modal: `fixed inset-0 bg-black/50 backdrop-blur-sm z-[10000]`
+- Gestione stati: `showResetConfirm`, `isResetting`
+- Chiamata `confirmCleaning(user)` da `maintenanceService.js`
+
 ## [1.4.7] - 2025-10-09
 
 ### Aggiunto

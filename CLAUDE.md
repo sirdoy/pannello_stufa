@@ -724,6 +724,47 @@ useEffect(() => {
 }, [pathname]);
 ```
 
+### Confirmation Modal Pattern
+```jsx
+// Struttura visuale modal bloccante con backdrop
+{showModal && (
+  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[10000] p-4">
+    <Card glass className="max-w-md w-full p-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">Titolo Modal</h2>
+      <p className="text-gray-700 mb-6">Messaggio di conferma</p>
+
+      {/* Warning box opzionale */}
+      <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <p className="text-sm text-yellow-800">⚠️ Attenzione:</p>
+        <ul className="text-sm text-yellow-700 space-y-1 ml-4">
+          <li>• Effetto 1</li>
+          <li>• Effetto 2</li>
+        </ul>
+      </div>
+
+      {/* Pulsanti azione */}
+      <div className="flex gap-3">
+        <Button variant="outline" onClick={handleCancel} disabled={isLoading} className="flex-1">
+          ✕ Annulla
+        </Button>
+        <Button variant="danger" onClick={handleConfirm} disabled={isLoading} className="flex-1">
+          {isLoading ? '⏳ Attendere...' : '✓ Conferma'}
+        </Button>
+      </div>
+    </Card>
+  </div>
+)}
+```
+
+**Caratteristiche**:
+- **Backdrop**: `fixed inset-0 bg-black/50 backdrop-blur-sm` per overlay scuro con blur
+- **Z-index**: `z-[10000]` per modal bloccante (più alto di dropdown z-[100] e modal z-50)
+- **Centering**: `flex items-center justify-center` con padding responsive `p-4`
+- **Glassmorphism**: Card con prop `glass` per effetto vetro smerigliato
+- **Responsive**: `max-w-md w-full` per larghezza limitata su desktop, full-width su mobile
+- **Loading state**: pulsanti disabilitati durante operazione async
+- **Escape key**: gestito con pattern base (vedi Dropdown/Modal Pattern)
+
 ### Responsive Breakpoints Strategy
 - **Mobile**: < 768px (`md:hidden`)
 - **Tablet/Intermediate**: 768px-1024px (`md:flex`)
@@ -892,5 +933,5 @@ CRON_SECRET=your-secret-here
 ---
 
 **Last Updated**: 2025-10-09
-**Version**: 1.4.7
+**Version**: 1.4.8
 **Author**: Federico Manfredi

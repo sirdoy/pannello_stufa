@@ -1,4 +1,4 @@
-import { get, ref } from 'firebase/database';
+import { get, ref, set } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import { clearSemiManualMode } from '@/lib/schedulerService';
 import { canIgnite, trackUsageHours } from '@/lib/maintenanceService';
@@ -10,6 +10,11 @@ export async function GET(req) {
     if (secret !== process.env.CRON_SECRET) {
       return new Response('Unauthorized', {status: 401});
     }
+
+    // Save cron health timestamp
+    const cronHealthTimestamp = new Date().toISOString();
+    await set(ref(db, 'cronHealth/lastCall'), cronHealthTimestamp);
+    console.log(`✅ Cron health updated: ${cronHealthTimestamp}`);
 
     // Check maintenance status first
     const maintenanceAllowed = await canIgnite();

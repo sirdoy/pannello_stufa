@@ -27,11 +27,12 @@ npm run build && npm run start  # Test PWA locale
 ```
 app/
 ├── components/
-│   ├── ui/                   # Card, Button, Select, Skeleton, Footer
+│   ├── ui/                   # Card, Button, Banner, Select, Skeleton, Footer
 │   ├── scheduler/            # TimeBar, DayAccordionItem
 │   ├── StovePanel.js         # Controllo principale + polling 5s
 │   ├── MaintenanceBar.js     # Barra progresso manutenzione
 │   ├── MaintenanceBar.module.css  # CSS Module: animazione shimmer
+│   ├── CronHealthBanner.js   # Alert cronjob inattivo >5min
 │   ├── VersionEnforcer.js    # Hard update modal
 │   └── ClientProviders.js    # Wrapper contexts (UserProvider + VersionProvider)
 ├── context/
@@ -75,6 +76,39 @@ lib/
 <Button variant="primary|secondary|success|danger|accent|outline|ghost|glass"
         size="sm|md|lg" icon="🔥">Accendi</Button>
 ```
+
+### Banner
+```jsx
+// Componente riutilizzabile per alert, warnings e messaggi informativi
+<Banner
+  variant="info|warning|error|success"
+  icon="⚠️"
+  title="Titolo Banner"
+  description="Descrizione messaggio"
+  actions={<Button onClick={handleAction}>Azione</Button>}
+  dismissible
+  onDismiss={() => setShow(false)}
+/>
+
+// Con JSX inline per description e actions
+<Banner
+  variant="warning"
+  icon="🧹"
+  title="Pulizia Richiesta"
+  description={<>Testo con <strong>bold</strong></>}
+  actions={
+    <>
+      <Button variant="success" onClick={confirm}>Conferma</Button>
+      <Button variant="outline" onClick={cancel}>Annulla</Button>
+    </>
+  }
+/>
+```
+- **Props**: `variant`, `icon`, `title`, `description`, `actions`, `dismissible`, `onDismiss`, `children`, `className`
+- **Varianti**: `info` (blu), `warning` (arancione), `error` (rosso), `success` (verde)
+- **Icone default**: info=ℹ️, warning=⚠️, error=❌, success=✅
+- **Layout responsive**: sm breakpoint per mobile/desktop
+- **Stile**: Glassmorphism consistente con resto app
 
 ### Select
 ```jsx
@@ -159,6 +193,9 @@ maintenance/
 ├── lastCleanedAt            # ISO string UTC (null se mai pulita)
 ├── needsCleaning            # boolean (blocco accensione)
 └── lastUpdatedAt            # ISO string UTC (per calcolo elapsed time)
+
+cronHealth/
+└── lastCall                 # ISO string UTC (timestamp ultima chiamata cron)
 
 log/
 └── {logId}/
@@ -364,6 +401,89 @@ await logUserAction('Pulizia stufa', '47.50h', {
 - Se cron salta chiamate: auto-recovery recupera tempo perso
 - Per massima accuratezza: cron job stabile ogni 60 secondi
 
+## Sistema Monitoring Cronjob 🔍
+
+### Overview
+Sistema autonomo per monitoraggio affidabilità cronjob scheduler.
+
+**Caratteristiche principali**:
+- ✅ Salvataggio timestamp Firebase ad ogni chiamata cron
+- ✅ Monitoring realtime client-side su Firebase listener
+- ✅ Alert automatico se cron inattivo >5 minuti
+- ✅ Link diretto a console cron per riavvio immediato
+- ✅ Auto-hide quando cron riprende a funzionare
+
+### Implementazione Server-Side
+
+**Endpoint `/api/scheduler/check`**:
+```javascript
+// SEMPRE all'inizio dell'esecuzione (dopo auth check)
+const cronHealthTimestamp = new Date().toISOString();
+await set(ref(db, 'cronHealth/lastCall'), cronHealthTimestamp);
+console.log(`✅ Cron health updated: ${cronHealthTimestamp}`);
+```
+
+**Firebase Schema**:
+```
+cronHealth/
+└── lastCall  # ISO string UTC, es: "2025-10-09T17:26:00.000Z"
+```
+
+### Implementazione Client-Side
+
+**Componente CronHealthBanner**:
+```jsx
+import { ref, onValue } from 'firebase/database';
+import { db } from '@/lib/firebase';
+import Banner from './ui/Banner';
+
+// Firebase listener realtime
+useEffect(() => {
+  const cronHealthRef = ref(db, 'cronHealth/lastCall');
+  const unsubscribe = onValue(cronHealthRef, (snapshot) => {
+    if (snapshot.exists()) {
+      setLastCallTime(snapshot.val());
+    }
+  });
+  return () => unsubscribe();
+}, []);
+
+// Check health ogni 30s
+useEffect(() => {
+  const checkCronHealth = () => {
+    const diffMinutes = Math.floor((now - lastCallDate) / 1000 / 60);
+    setShowBanner(diffMinutes > 5);  // Threshold 5 minuti
+  };
+  const interval = setInterval(checkCronHealth, 30000);
+  return () => clearInterval(interval);
+}, [lastCallTime]);
+```
+
+**Integrazione UI**:
+- Banner posizionato in cima a StovePanel (sopra MaintenanceBar)
+- Variant "warning" con icona ⚠️
+- Mostra minuti trascorsi dall'ultima chiamata
+- Link esterno: `https://console.cron-job.org/jobs/6061667`
+- Condizionale: `if (!showBanner) return null`
+
+### Troubleshooting
+
+**Banner non scompare dopo riavvio cron**:
+1. Verifica Firebase: `cronHealth/lastCall` deve aggiornarsi
+2. Check console: cerca log `✅ Cron health updated`
+3. Attendi 30s: client-side check ha intervallo 30s
+4. Force refresh pagina se necessario
+
+**Banner appare anche con cron attivo**:
+1. Verifica timezone: timestamp deve essere UTC (ISO string)
+2. Check calcolo diff: `(now - lastCallDate) / 1000 / 60`
+3. Threshold: attualmente 5 minuti, modificabile in CronHealthBanner.js
+
+**Firebase listener non funziona**:
+1. Verifica Firebase config in `.env.local`
+2. Check Firebase rules: read access su `cronHealth/`
+3. Console DevTools: cerca errori Firebase SDK
+
 ## Data Flow Essenziale
 
 ### Polling Status (ogni 5s)
@@ -383,6 +503,10 @@ Update UI
 ```
 GET /api/scheduler/check?secret=xxx
   ↓
+Verify CRON_SECRET (return 401 if invalid)
+  ↓
+Save timestamp to Firebase: cronHealth/lastCall = now (ISO UTC)
+  ↓
 Check maintenance status (canIgnite)
   ↓
 If needsCleaning → skip + return MANUTENZIONE_RICHIESTA
@@ -396,7 +520,15 @@ Execute actions (ignite/shutdown/set) con source='scheduler'
 If scheduled change → clear semi-manual
   ↓
 Track usage hours: trackUsageHours(currentStatus)
+  ↓
+Log: "✅ Cron health updated: {timestamp}"
 ```
+
+**Cron Health Monitoring**:
+- Timestamp salvato SEMPRE ad ogni chiamata (anche se scheduler disabilitato)
+- Usato da `CronHealthBanner` per rilevare cron inattivo >5min
+- Client-side check ogni 30s su Firebase `cronHealth/lastCall`
+- Banner warning automatico in home con link diretto riavvio cron
 
 ### Maintenance Tracking Flow (Autonomo H24)
 ```
@@ -759,6 +891,6 @@ CRON_SECRET=your-secret-here
 
 ---
 
-**Last Updated**: 2025-10-08
-**Version**: 1.4.6
+**Last Updated**: 2025-10-09
+**Version**: 1.4.7
 **Author**: Federico Manfredi

@@ -5,6 +5,33 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.4.7] - 2025-10-09
+
+### Aggiunto
+- **Sistema monitoring cronjob**: endpoint `/api/scheduler/check` ora salva timestamp su Firebase (`cronHealth/lastCall`) ad ogni chiamata
+- **Componente `Banner` riutilizzabile**: componente UI unificato con 4 varianti (info, warning, error, success)
+- **CronHealthBanner**: alert automatico in home se cronjob non eseguito da più di 5 minuti
+  - Monitoraggio realtime Firebase su `cronHealth/lastCall`
+  - Check automatico ogni 30 secondi client-side
+  - Link diretto a console.cron-job.org per riavvio immediato
+  - Auto-hide quando cron riprende a funzionare
+- Schema Firebase `cronHealth/lastCall` per tracking affidabilità scheduler
+- Props componente `Banner`: `variant`, `icon`, `title`, `description`, `actions`, `dismissible`, `onDismiss`, `children`
+
+### Modificato
+- **Refactoring completo banner UI**: tutti i banner ora utilizzano componente `Banner` unificato
+  - `CronHealthBanner`: da Card custom a Banner variant="warning"
+  - Banner pulizia stufa in `StovePanel`: da Card custom a Banner variant="warning"
+  - `ErrorAlert`: refactoring completo con mapping dinamico severity → variant
+- `/api/scheduler/check`: aggiunto salvataggio timestamp `cronHealth/lastCall` all'inizio dell'esecuzione (dopo auth check)
+- `StovePanel.js`: integrato `CronHealthBanner` sopra MaintenanceBar
+
+### Tecnico
+- Pattern Banner component: supporto `React.ReactNode` per `description` e `actions` (permette JSX inline)
+- Responsive design: breakpoint sm per layout mobile/desktop
+- Glassmorphism style consistente con resto dell'app
+- Console log: "✅ Cron health updated: {timestamp}" ad ogni chiamata cron
+
 ## [1.4.6] - 2025-10-08
 
 ### Modificato

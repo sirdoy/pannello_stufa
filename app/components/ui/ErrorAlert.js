@@ -4,6 +4,7 @@
  */
 
 import { ERROR_SEVERITY, getErrorInfo } from '@/lib/errorMonitor';
+import Banner from './Banner';
 
 export default function ErrorAlert({ errorCode, errorDescription, className = '', onDismiss }) {
   if (errorCode === 0 || !errorCode) {
@@ -13,65 +14,32 @@ export default function ErrorAlert({ errorCode, errorDescription, className = ''
   const errorInfo = getErrorInfo(errorCode);
   const { severity } = errorInfo;
 
-  // Determine styling based on severity
-  const getSeverityStyles = () => {
+  // Map severity to Banner variant and icon
+  const getSeverityConfig = () => {
     switch (severity) {
       case ERROR_SEVERITY.CRITICAL:
-        return {
-          container: 'bg-primary-50 border-primary-500',
-          icon: '🚨',
-          title: 'text-primary-800',
-          description: 'text-primary-700',
-        };
+        return { variant: 'error', icon: '🚨' };
       case ERROR_SEVERITY.ERROR:
-        return {
-          container: 'bg-primary-50 border-primary-400',
-          icon: '⚠️',
-          title: 'text-primary-700',
-          description: 'text-primary-600',
-        };
+        return { variant: 'error', icon: '⚠️' };
       case ERROR_SEVERITY.WARNING:
-        return {
-          container: 'bg-warning-50 border-warning-400',
-          icon: '⚡',
-          title: 'text-warning-700',
-          description: 'text-warning-600',
-        };
+        return { variant: 'warning', icon: '⚡' };
       default:
-        return {
-          container: 'bg-info-50 border-info-400',
-          icon: 'ℹ️',
-          title: 'text-info-700',
-          description: 'text-info-600',
-        };
+        return { variant: 'info', icon: 'ℹ️' };
     }
   };
 
-  const styles = getSeverityStyles();
+  const config = getSeverityConfig();
 
   return (
-    <div className={`border-l-4 p-4 rounded-r-xl ${styles.container} ${className}`}>
-      <div className="flex items-start gap-3">
-        <span className="text-2xl flex-shrink-0">{styles.icon}</span>
-        <div className="flex-1 min-w-0">
-          <h4 className={`text-sm font-bold ${styles.title} mb-1`}>
-            Codice Errore: {errorCode}
-          </h4>
-          <p className={`text-sm ${styles.description}`}>
-            {errorDescription || errorInfo.description}
-          </p>
-        </div>
-        {onDismiss && (
-          <button
-            onClick={onDismiss}
-            className={`flex-shrink-0 text-lg ${styles.title} hover:opacity-70 transition-opacity`}
-            aria-label="Chiudi avviso"
-          >
-            ✕
-          </button>
-        )}
-      </div>
-    </div>
+    <Banner
+      variant={config.variant}
+      icon={config.icon}
+      title={`Codice Errore: ${errorCode}`}
+      description={errorDescription || errorInfo.description}
+      dismissible={!!onDismiss}
+      onDismiss={onDismiss}
+      className={className}
+    />
   );
 }
 

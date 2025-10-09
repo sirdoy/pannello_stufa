@@ -16,7 +16,9 @@ import ModeIndicator from './ui/ModeIndicator';
 import Select from './ui/Select';
 import Skeleton from './ui/Skeleton';
 import ErrorAlert from './ui/ErrorAlert';
+import Banner from './ui/Banner';
 import MaintenanceBar from './MaintenanceBar';
+import CronHealthBanner from './CronHealthBanner';
 
 export default function StovePanel() {
   const router = useRouter();
@@ -284,44 +286,42 @@ export default function StovePanel() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
+      {/* Cron Health Banner - Show if cron not running */}
+      <CronHealthBanner />
+
       {/* Maintenance Bar - Always visible */}
       {maintenanceStatus && <MaintenanceBar maintenanceStatus={maintenanceStatus} />}
 
       {/* Maintenance Cleaning Banner - When cleaning needed */}
       {needsMaintenance && (
-        <Card className="bg-orange-50 border-2 border-orange-300">
-          <div className="p-6">
-            <div className="flex items-start gap-4">
-              <span className="text-4xl">🧹</span>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold text-orange-900 mb-2">
-                  Pulizia Stufa Richiesta
-                </h3>
-                <p className="text-orange-700 mb-4">
-                  La stufa ha raggiunto <strong>{maintenanceStatus.currentHours.toFixed(1)} ore</strong> di utilizzo.
-                  È necessario effettuare la pulizia prima di poterla riaccendere.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Button
-                    variant="success"
-                    onClick={handleConfirmCleaning}
-                    disabled={cleaningInProgress}
-                    className="sm:flex-initial"
-                  >
-                    {cleaningInProgress ? '⏳ Conferma in corso...' : '✓ Ho Pulito la Stufa'}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => router.push('/maintenance')}
-                    className="sm:flex-initial"
-                  >
-                    ⚙️ Vai alle Impostazioni
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Card>
+        <Banner
+          variant="warning"
+          icon="🧹"
+          title="Pulizia Stufa Richiesta"
+          description={
+            <>
+              La stufa ha raggiunto <strong>{maintenanceStatus.currentHours.toFixed(1)} ore</strong> di utilizzo.
+              È necessario effettuare la pulizia prima di poterla riaccendere.
+            </>
+          }
+          actions={
+            <>
+              <Button
+                variant="success"
+                onClick={handleConfirmCleaning}
+                disabled={cleaningInProgress}
+              >
+                {cleaningInProgress ? '⏳ Conferma in corso...' : '✓ Ho Pulito la Stufa'}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => router.push('/maintenance')}
+              >
+                ⚙️ Vai alle Impostazioni
+              </Button>
+            </>
+          }
+        />
       )}
 
       {/* Error Alert - Always on top if present */}

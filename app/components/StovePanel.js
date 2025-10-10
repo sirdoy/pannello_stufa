@@ -286,9 +286,6 @@ export default function StovePanel() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      {/* Cron Health Banner - Show if cron not running */}
-      <CronHealthBanner />
-
       {/* Maintenance Cleaning Banner - When cleaning needed */}
       {needsMaintenance && (
         <Banner
@@ -465,6 +462,11 @@ export default function StovePanel() {
                   Configura
                 </button>
               </div>
+            </div>
+
+            {/* Cron Health Warning - Integrated inline */}
+            <div className="mt-6">
+              <CronHealthBanner variant="inline" />
             </div>
 
             {/* Separator Manutenzione */}

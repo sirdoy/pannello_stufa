@@ -480,11 +480,14 @@ useEffect(() => {
 ```
 
 **Integrazione UI**:
-- Banner posizionato in cima a StovePanel (sopra MaintenanceBar)
-- Variant "warning" con icona ⚠️
-- Mostra minuti trascorsi dall'ultima chiamata
-- Link esterno: `https://console.cron-job.org/jobs/6061667`
-- Condizionale: `if (!showBanner) return null`
+- **Due varianti disponibili**: `variant="banner"` (standalone) e `variant="inline"` (integrato)
+- **Variante inline** (default in StovePanel): integrato dentro card "Stato Stufa", dopo Mode Indicator
+  - Layout compatto orizzontale responsive (full-width mobile, auto desktop)
+  - Design simile a Mode Indicator per consistenza visiva
+  - Icona warning in box 12x12 + testo info + pulsante azione inline
+- **Variante banner**: full-width standalone sopra card (per uso in altre pagine)
+- Mostra minuti trascorsi dall'ultima chiamata con link diretto riavvio cron
+- Condizionale: `if (!showBanner) return null` (auto-hide quando cron attivo)
 
 ### Troubleshooting
 
@@ -864,6 +867,35 @@ const toggleExpanded = (e) => {
 - Dropdown/collapse elementi non critici: info utente, badge, secondary actions
 - Priorità: logo > navigation links > user menu
 
+### Componenti con Varianti Multiple
+```jsx
+// Pattern per componenti che supportano layout/stile diversi
+export default function Component({ variant = 'default' }) {
+  // Variante compatta per integrazione inline
+  if (variant === 'inline') {
+    return (
+      <div className="flex items-center gap-4 p-5 bg-warning-50/80 rounded-xl border-2 border-warning-300">
+        {/* Layout orizzontale compatto */}
+      </div>
+    );
+  }
+
+  // Variante default full-width standalone
+  return (
+    <Card className="p-6">
+      {/* Layout standard verticale */}
+    </Card>
+  );
+}
+```
+
+**Best Practices**:
+- Usa prop `variant` per distinguere layout/stile
+- Default variant sempre usabile standalone
+- Varianti aggiuntive per integrazioni specifiche (inline, compact, minimal)
+- Mantieni stessi dati/logica, varia solo presentazione UI
+- Esempi: `CronHealthBanner` (banner/inline), `Banner` (info/warning/error/success)
+
 ## Design System
 
 ### Palette Colori Semantici
@@ -1083,5 +1115,5 @@ CRON_SECRET=your-secret-here
 ---
 
 **Last Updated**: 2025-10-10
-**Version**: 1.5.4
+**Version**: 1.5.5
 **Author**: Federico Manfredi

@@ -5,6 +5,22 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.5.5] - 2025-10-10
+
+### Modificato
+- **UI consolidata**: CronHealthBanner integrato dentro card principale "Stato Stufa" per ridurre frammentazione visiva
+- **Layout home ottimizzato**: tutte le info stato stufa (status, modalità, cron health, manutenzione) ora in unica card coesa
+- **Nuovo pattern componenti**: supporto varianti multiple (banner standalone vs inline compatto) per flessibilità layout
+- **Design coerente**: variante inline warning con styling simile a Mode Indicator per consistenza visiva
+- **Posizione integrata**: CronHealthBanner inline dopo Mode Indicator, prima del separator Manutenzione
+
+### Tecnico
+- `CronHealthBanner.js`: aggiunta prop `variant="inline"` con layout compatto orizzontale
+- Variante inline: design responsive (full-width mobile, auto desktop) con icona box + pulsante azione integrato
+- Stile warning uniforme: `bg-warning-50/80` con bordo `border-warning-300`, consistente con palette semantica
+- `StovePanel.js` (StovePanel.js:468): rendering condizionale inline dentro card, non più banner standalone sopra
+- CLAUDE.md aggiornato: sezione "Sistema Monitoring Cronjob" riflette nuova integrazione UI
+
 ## [1.5.4] - 2025-10-10
 
 ### Modificato

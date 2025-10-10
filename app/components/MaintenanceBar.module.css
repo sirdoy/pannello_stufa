@@ -1,3 +1,4 @@
+/* Shimmer animation for warning state */
 @keyframes shimmer {
   0% {
     transform: translateX(-100%);
@@ -9,4 +10,18 @@
 
 .shimmer {
   animation: shimmer 2s infinite;
+}
+
+/* Collapse/Expand animation */
+.collapseContent {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.collapseContent.expanded {
+  max-height: 200px; /* Abbastanza per contenere tutti i dettagli */
+  opacity: 1;
+  transition: max-height 0.3s ease-in, opacity 0.3s ease-in;
 }

@@ -5,6 +5,25 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.5.1] - 2025-10-10
+
+### Modificato
+- **MaintenanceBar collapse/expand**: banner manutenzione home ora a scomparsa per ottimizzazione spazio UI
+  - Collapsed by default: mini-bar compatta con badge percentuale colorato + info ore (desktop)
+  - Expand on-demand: click per dettagli completi (progress bar + ore rimanenti + link settings)
+  - Auto-expand intelligente: apertura automatica SOLO prima volta quando utilizzo ≥80% (warning visivo)
+  - Persistenza localStorage: preferenza utente rispettata tra reload e polling
+
+### Corretto
+- Auto-expand non più ignora chiusura manuale: fix logica prioritaria in `useEffect` (savedState priorità massima)
+- Eliminata duplicazione dati: badge e info ore nascoste quando banner espanso
+- Polling 5s non forza più riapertura banner dopo chiusura manuale utente
+
+### Tecnico
+- Pattern collapse/expand: CSS Modules con animazione `max-height + opacity` (300ms ease-in/out)
+- Logica prioritaria localStorage: `'false'` (max) → `'true'` (alta) → `null + percentage ≥80%` (bassa)
+- Conditional rendering responsive: `{!isExpanded && <Badge />}` per evitare duplicazioni
+
 ## [1.5.0] - 2025-10-10
 
 ### Aggiunto

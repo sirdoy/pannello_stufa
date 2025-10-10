@@ -294,15 +294,18 @@ getMaintenanceStatus()
 ```jsx
 <MaintenanceBar maintenanceStatus={status} />
 ```
-- Barra progresso lineare orizzontale
-- Colori dinamici:
+- **Collapse/Expand intelligente**: mini-bar compatta di default, expand on-demand
+- **Auto-expand**: apertura automatica SOLO prima volta quando percentage ≥80%
+- **Persistenza localStorage**: preferenza utente rispettata (chiusura manuale bloccata da auto-expand)
+- **Collapsed state**: badge percentuale colorato + info ore (HH:MM format)
+- **Expanded state**: progress bar + ore rimanenti + link `/maintenance`
+- Colori dinamici badge/bar:
   - 0-59%: verde (`bg-success-600`)
   - 60-79%: giallo (`bg-yellow-500`)
   - 80-99%: arancione (`bg-orange-500`)
   - 100%+: rosso (`bg-danger-600`)
 - Animazione shimmer quando ≥80% (warning visivo)
-- Link cliccabile a `/maintenance`
-- Info: "47.5h / 50h" + "2.5h rimanenti" + "95%"
+- Animazione collapse: CSS Module con `max-height + opacity` transizione 300ms
 
 **Banner Pulizia** (quando needsCleaning=true):
 - Card arancione bloccante sopra StovePanel
@@ -767,6 +770,73 @@ useEffect(() => {
 - **Loading state**: pulsanti disabilitati durante operazione async
 - **Escape key**: gestito con pattern base (vedi Dropdown/Modal Pattern)
 
+### Collapse/Expand Components with localStorage
+```javascript
+// 1. State
+const [isExpanded, setIsExpanded] = useState(false);
+
+// 2. Load preference + auto-expand logic (priority-based)
+useEffect(() => {
+  if (!data) return;
+
+  const savedState = localStorage.getItem('componentExpanded');
+
+  // PRIORITY 1: Respect manual close (highest)
+  if (savedState === 'false') {
+    setIsExpanded(false);
+    return;
+  }
+
+  // PRIORITY 2: Respect manual open
+  if (savedState === 'true') {
+    setIsExpanded(true);
+    return;
+  }
+
+  // PRIORITY 3: Auto-expand first time only (lowest)
+  if (data.shouldAutoExpand && savedState === null) {
+    setIsExpanded(true);
+  }
+}, [data]);
+
+// 3. Toggle with localStorage save
+const toggleExpanded = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  const newState = !isExpanded;
+  setIsExpanded(newState);
+  localStorage.setItem('componentExpanded', String(newState));
+};
+
+// 4. CSS Module animation
+// Component.module.css
+.collapseContent {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+}
+.collapseContent.expanded {
+  max-height: 200px; /* adjust per contenuto */
+  opacity: 1;
+  transition: max-height 0.3s ease-in, opacity 0.3s ease-in;
+}
+
+// 5. Conditional rendering (evita duplicazioni)
+{!isExpanded && <CompactInfo />}
+<div className={`${styles.collapseContent} ${isExpanded ? styles.expanded : ''}`}>
+  <ExpandedDetails />
+</div>
+```
+
+**Best Practices**:
+- **Priority logic**: savedState 'false'/'true' > auto-expand condition
+- **Auto-expand**: solo PRIMA volta (savedState === null), non forzare dopo chiusura manuale
+- **Persistenza**: salva SEMPRE in localStorage, non solo su collapse
+- **Evita duplicazioni**: usa conditional rendering `{!isExpanded && ...}` per info visibili in entrambi stati
+- **Smooth animation**: CSS Modules con max-height + opacity, non solo height
+- **Polling resilience**: verifica savedState ad ogni render, non sovrascrivere preferenza utente
+
 ### Responsive Breakpoints Strategy
 - **Mobile**: < 768px (`md:hidden`)
 - **Tablet/Intermediate**: 768px-1024px (`md:flex`)
@@ -998,5 +1068,5 @@ CRON_SECRET=your-secret-here
 ---
 
 **Last Updated**: 2025-10-10
-**Version**: 1.5.0
+**Version**: 1.5.1
 **Author**: Federico Manfredi

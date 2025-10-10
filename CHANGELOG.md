@@ -5,6 +5,24 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.5.2] - 2025-10-10
+
+### Modificato
+- **UI consolidata**: MaintenanceBar integrato dentro card principale "Stato Stufa" per ridurre frammentazione visiva
+- **Layout home ottimizzato**: tutte le informazioni stato stufa (status, modalità, manutenzione) ora in un'unica card
+- **Separator dedicato**: aggiunta sezione "Stato Manutenzione" con separator consistente tra Modalità Controllo e MaintenanceBar
+- **Styling integrato**: background più leggero (`bg-white/40` vs `bg-white/70`) per migliore integrazione visiva con card principale
+- **Animazione collapse**: ridotto `max-height` da 200px a 150px dopo rimozione link settings
+
+### Rimosso
+- Link "Vai alle Impostazioni" dal MaintenanceBar espanso (già disponibile nel menu Navbar principale)
+- Import `Link` non utilizzato in `MaintenanceBar.js`
+
+### Tecnico
+- `StovePanel.js` (StovePanel.js:470-485): MaintenanceBar ora renderizzato dentro card con conditional separator
+- `MaintenanceBar.js` (MaintenanceBar.js:78): styling aggiornato per integrazione visiva
+- `MaintenanceBar.module.css` (MaintenanceBar.module.css:24): max-height collapse ridotto a 150px
+
 ## [1.5.1] - 2025-10-10
 
 ### Modificato

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import styles from './MaintenanceBar.module.css';
 import { formatHoursToHHMM } from '@/lib/formatUtils';
 
@@ -75,7 +74,7 @@ export default function MaintenanceBar({ maintenanceStatus }) {
   };
 
   return (
-    <div className="bg-white/70 backdrop-blur-xl rounded-2xl border border-white/40 hover:bg-white/80 transition-colors overflow-hidden">
+    <div className="bg-white/40 backdrop-blur-sm rounded-xl border border-neutral-200/60 hover:bg-white/50 transition-colors overflow-hidden">
       {/* Mini Bar - Always visible */}
       <div className="flex items-center justify-between p-4 cursor-pointer" onClick={toggleExpanded}>
         <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -114,14 +113,6 @@ export default function MaintenanceBar({ maintenanceStatus }) {
       {/* Expanded Details - Conditional */}
       <div className={`${styles.collapseContent} ${isExpanded ? styles.expanded : ''}`}>
         <div className="px-4 pb-4 space-y-3">
-          {/* Link a pagina manutenzione */}
-          <Link
-            href="/maintenance"
-            className="block text-xs text-info-600 hover:text-info-700 font-medium hover:underline"
-          >
-            ⚙️ Vai alle Impostazioni →
-          </Link>
-
           {/* Progress Bar */}
           <div className="relative w-full h-3 bg-neutral-200 rounded-full overflow-hidden">
             <div

@@ -290,22 +290,37 @@ getMaintenanceStatus()
 
 ### UI Components
 
-**MaintenanceBar** (sempre visibile in home):
+**MaintenanceBar** (integrato in card "Stato Stufa"):
 ```jsx
-<MaintenanceBar maintenanceStatus={status} />
+{/* Inside StovePanel Hero Card, after Mode Indicator */}
+{maintenanceStatus && (
+  <>
+    <div className="relative my-6">
+      <div className="absolute inset-0 flex items-center">
+        <div className="w-full border-t border-neutral-200"></div>
+      </div>
+      <div className="relative flex justify-center text-sm">
+        <span className="px-3 bg-white/60 text-neutral-500 font-medium rounded-full">Stato Manutenzione</span>
+      </div>
+    </div>
+    <MaintenanceBar maintenanceStatus={maintenanceStatus} />
+  </>
+)}
 ```
+- **Posizione**: integrato dentro card principale "Stato Stufa", dopo separator "Stato Manutenzione"
 - **Collapse/Expand intelligente**: mini-bar compatta di default, expand on-demand
 - **Auto-expand**: apertura automatica SOLO prima volta quando percentage ≥80%
 - **Persistenza localStorage**: preferenza utente rispettata (chiusura manuale bloccata da auto-expand)
 - **Collapsed state**: badge percentuale colorato + info ore (HH:MM format)
-- **Expanded state**: progress bar + ore rimanenti + link `/maintenance`
+- **Expanded state**: progress bar + ore rimanenti (NO link, già in Navbar)
+- **Styling integrato**: `bg-white/40` (più leggero) per blend con card principale glassmorphism
 - Colori dinamici badge/bar:
   - 0-59%: verde (`bg-success-600`)
   - 60-79%: giallo (`bg-yellow-500`)
   - 80-99%: arancione (`bg-orange-500`)
   - 100%+: rosso (`bg-danger-600`)
 - Animazione shimmer quando ≥80% (warning visivo)
-- Animazione collapse: CSS Module con `max-height + opacity` transizione 300ms
+- Animazione collapse: CSS Module con `max-height(150px) + opacity` transizione 300ms
 
 **Banner Pulizia** (quando needsCleaning=true):
 - Card arancione bloccante sopra StovePanel
@@ -1068,5 +1083,5 @@ CRON_SECRET=your-secret-here
 ---
 
 **Last Updated**: 2025-10-10
-**Version**: 1.5.1
+**Version**: 1.5.2
 **Author**: Federico Manfredi

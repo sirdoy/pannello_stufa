@@ -21,7 +21,7 @@
 }
 
 .collapseContent.expanded {
-  max-height: 200px; /* Abbastanza per contenere tutti i dettagli */
+  max-height: 150px; /* Ridotto dopo rimozione link settings */
   opacity: 1;
   transition: max-height 0.3s ease-in, opacity 0.3s ease-in;
 }

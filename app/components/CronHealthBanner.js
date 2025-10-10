@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ref, onValue } from 'firebase/database';
+import { ref, get } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import Banner from './ui/Banner';
 import Button from './ui/Button';
@@ -12,27 +12,47 @@ export default function CronHealthBanner() {
   const [minutesSinceLastCall, setMinutesSinceLastCall] = useState(0);
 
   useEffect(() => {
-    // Listen to Firebase for cron health updates
-    const cronHealthRef = ref(db, 'cronHealth/lastCall');
-
-    const unsubscribe = onValue(cronHealthRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const lastCall = snapshot.val();
-        setLastCallTime(lastCall);
+    // Manual polling instead of listener (workaround for stale data)
+    const fetchCronHealth = async () => {
+      try {
+        const snapshot = await get(ref(db, 'cronHealth/lastCall'));
+        if (snapshot.exists()) {
+          const lastCall = snapshot.val();
+          console.log('🔍 Firebase cronHealth/lastCall (manual fetch):', lastCall);
+          setLastCallTime(lastCall);
+        }
+      } catch (error) {
+        console.error('❌ Error fetching cronHealth:', error);
       }
-    });
+    };
 
-    return () => unsubscribe();
+    fetchCronHealth(); // Initial fetch
+    const interval = setInterval(fetchCronHealth, 30000); // Poll every 30s
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
     // Check every 30 seconds if cron is healthy
     const checkCronHealth = () => {
-      if (!lastCallTime) return;
+      if (!lastCallTime) {
+        console.log('🔍 lastCallTime è null, skip check');
+        return;
+      }
 
       const lastCallDate = new Date(lastCallTime);
       const now = new Date();
-      const diffMinutes = Math.floor((now - lastCallDate) / 1000 / 60);
+      const diffMs = now - lastCallDate;
+      const diffMinutes = Math.floor(diffMs / 1000 / 60);
+
+      console.log('🔍 Cron Health Check:', {
+        lastCallTime,
+        lastCallDate: lastCallDate.toISOString(),
+        now: now.toISOString(),
+        diffMs,
+        diffMinutes,
+        showBanner: diffMinutes > 5
+      });
 
       setMinutesSinceLastCall(diffMinutes);
       setShowBanner(diffMinutes > 5);

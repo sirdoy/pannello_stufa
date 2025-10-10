@@ -13,8 +13,14 @@ export async function GET(req) {
 
     // Save cron health timestamp
     const cronHealthTimestamp = new Date().toISOString();
-    await set(ref(db, 'cronHealth/lastCall'), cronHealthTimestamp);
-    console.log(`✅ Cron health updated: ${cronHealthTimestamp}`);
+    console.log(`🔄 Tentativo salvataggio Firebase cronHealth/lastCall: ${cronHealthTimestamp}`);
+    try {
+      await set(ref(db, 'cronHealth/lastCall'), cronHealthTimestamp);
+      console.log(`✅ Cron health updated: ${cronHealthTimestamp}`);
+    } catch (error) {
+      console.error('❌ ERRORE salvataggio cronHealth:', error);
+      throw error;
+    }
 
     // Check maintenance status first
     const maintenanceAllowed = await canIgnite();

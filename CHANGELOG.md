@@ -5,6 +5,23 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.4.9] - 2025-10-10
+
+### Modificato
+- **Formato orario HH:MM per manutenzione**: ore utilizzo, target e rimanenti ora visualizzate in formato ore:minuti
+  - Esempio: `47.5h` → `47:30`, `2.5h rimanenti` → `2:30 rimanenti`
+  - MaintenanceBar home e card pagina /maintenance aggiornate
+- Pagina 404 personalizzata (`app/not-found.js`) con design glassmorphism consistente
+
+### Aggiunto
+- Utility `formatHoursToHHMM()` in `lib/formatUtils.js` per conversione ore decimali → formato HH:MM
+  - Gestisce edge cases (null, undefined, arrotondamento 60 minuti)
+  - Riutilizzabile per altre feature future
+
+### Tecnico
+- Pattern utility functions: file dedicato `lib/formatUtils.js` per helper generici
+- Next.js 15: aggiunta pagina `not-found.js` richiesta dal framework
+
 ## [1.4.8] - 2025-10-09
 
 ### Aggiunto

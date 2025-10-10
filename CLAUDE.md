@@ -50,7 +50,8 @@ app/
 ├── maintenance/page.js       # Configurazione manutenzione stufa
 ├── log/page.js              # Storico azioni
 ├── errors/page.js           # Allarmi
-└── changelog/page.js        # Versioni
+├── changelog/page.js        # Versioni
+└── not-found.js             # Pagina 404 (richiesta Next.js 15)
 
 lib/
 ├── stoveApi.js              # Thermorossi wrapper
@@ -60,7 +61,8 @@ lib/
 ├── version.js               # APP_VERSION, VERSION_HISTORY
 ├── changelogService.js      # Version management + Firebase sync
 ├── errorMonitor.js          # Error detection + notification
-└── logService.js            # Pre-configured logging functions
+├── logService.js            # Pre-configured logging functions
+└── formatUtils.js           # Utility functions (es. formatHoursToHHMM)
 ```
 
 ## Componenti UI Principali
@@ -932,6 +934,6 @@ CRON_SECRET=your-secret-here
 
 ---
 
-**Last Updated**: 2025-10-09
-**Version**: 1.4.8
+**Last Updated**: 2025-10-10
+**Version**: 1.4.9
 **Author**: Federico Manfredi

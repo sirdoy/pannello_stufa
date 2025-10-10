@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import styles from './MaintenanceBar.module.css';
+import { formatHoursToHHMM } from '@/lib/formatUtils';
 
 export default function MaintenanceBar({ maintenanceStatus }) {
   if (!maintenanceStatus) return null;
@@ -32,7 +33,7 @@ export default function MaintenanceBar({ maintenanceStatus }) {
             <span className="font-medium text-gray-800">Manutenzione</span>
           </div>
           <div className={`text-sm font-semibold ${getTextColor()}`}>
-            {currentHours.toFixed(1)}h / {targetHours}h
+            {formatHoursToHHMM(currentHours)} / {formatHoursToHHMM(targetHours)}
           </div>
         </div>
 
@@ -54,7 +55,7 @@ export default function MaintenanceBar({ maintenanceStatus }) {
           <span className="text-xs text-gray-600">
             {percentage >= 100
               ? 'Pulizia richiesta!'
-              : `${remainingHours.toFixed(1)}h rimanenti`}
+              : `${formatHoursToHHMM(remainingHours)} rimanenti`}
           </span>
           <span className="text-xs text-gray-500">
             {percentage.toFixed(0)}%

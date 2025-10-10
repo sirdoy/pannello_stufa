@@ -5,6 +5,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { getMaintenanceData, updateTargetHours, confirmCleaning } from '@/lib/maintenanceService';
+import { formatHoursToHHMM } from '@/lib/formatUtils';
 
 export const dynamic = 'force-dynamic';
 
@@ -129,21 +130,21 @@ export default function MaintenancePage() {
             <div className="bg-white/50 rounded-lg p-4">
               <div className="text-sm text-gray-600 mb-1">Ore di Utilizzo</div>
               <div className="text-2xl font-bold text-gray-800">
-                {maintenanceData?.currentHours?.toFixed(1) || '0.0'}h
+                {formatHoursToHHMM(maintenanceData?.currentHours || 0)}
               </div>
             </div>
 
             <div className="bg-white/50 rounded-lg p-4">
               <div className="text-sm text-gray-600 mb-1">Ore Target</div>
               <div className="text-2xl font-bold text-primary-600">
-                {maintenanceData?.targetHours || '50'}h
+                {formatHoursToHHMM(maintenanceData?.targetHours || 50)}
               </div>
             </div>
 
             <div className="bg-white/50 rounded-lg p-4">
               <div className="text-sm text-gray-600 mb-1">Ore Rimanenti</div>
               <div className="text-2xl font-bold text-success-600">
-                {Math.max(0, (maintenanceData?.targetHours || 50) - (maintenanceData?.currentHours || 0)).toFixed(1)}h
+                {formatHoursToHHMM(Math.max(0, (maintenanceData?.targetHours || 50) - (maintenanceData?.currentHours || 0)))}
               </div>
             </div>
           </div>

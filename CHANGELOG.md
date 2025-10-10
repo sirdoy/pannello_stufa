@@ -5,6 +5,23 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.5.3] - 2025-10-10
+
+### Modificato
+- **Dipendenze aggiornate**: React 19.1.1 → 19.2.0 (minor update)
+- **Dipendenze aggiornate**: Firebase 11.10.0 → 12.4.0 (major update, compatibilità verificata)
+- **Dipendenze aggiornate**: ESLint 9.36.0 → 9.37.0 (patch update)
+- **Dipendenze dev**: autoprefixer e postcss aggiornate alle ultime versioni
+- Auth0 mantenuto a 3.8.0 (v4.x richiede refactoring esteso, upgrade rimandato)
+
+### Sicurezza
+- Nessuna vulnerabilità rilevata dopo aggiornamenti (npm audit clean)
+
+### Tecnico
+- Build production testato e verificato funzionante con tutte le librerie aggiornate
+- Firebase 12.x: compatibilità retroattiva garantita, nessun breaking change rilevato
+- React 19.2: aggiornamento smooth senza modifiche codice necessarie
+
 ## [1.5.2] - 2025-10-10
 
 ### Modificato

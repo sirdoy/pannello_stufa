@@ -38,7 +38,8 @@
       "Bash(set +a)",
       "Bash(git add:*)",
       "Bash(git commit -m \"$(cat <<''EOF''\nFix version synchronization: uniforma tutti i file a versione 1.4.1\n\n- package.json: 1.4.2 → 1.4.1\n- package-lock.json: rigenerato con versione corretta 1.4.1\n- CLAUDE.md: compattato da 85k a 8k caratteri, aggiornato a v1.4.1\n\nMotivazione: versione 1.4.1 è l''ultima documentata in CHANGELOG.md\n(fix build error /api/admin/sync-changelog con force-dynamic).\nRimosso riferimento errato a 1.4.2 per consistenza.\n\n🤖 Generated with Claude Code\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npm update:*)"
     ],
     "deny": [],
     "ask": []

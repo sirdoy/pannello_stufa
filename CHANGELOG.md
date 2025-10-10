@@ -5,6 +5,20 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.5.4] - 2025-10-10
+
+### Modificato
+- **Documentazione aggiornata**: `CLAUDE.md` allineato con stack tecnologico attuale
+  - Stack: React 18 → React 19.2 (versione installata)
+  - Stack: Next.js 15 → Next.js 15.5.4 (versione specifica)
+  - Version footer: 1.5.2 → 1.5.4
+- `package.json`: esplicitate versioni React corrette (`^19.2.0` invece di `^19.0.0`)
+
+### Tecnico
+- Verificato che codebase già ottimizzato per React 19 e Next.js 15.5
+- Nessuna modifica codice necessaria: pattern attuali già compatibili e performanti
+- Build production testato e funzionante
+
 ## [1.5.3] - 2025-10-10
 
 ### Modificato

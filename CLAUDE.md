@@ -13,8 +13,8 @@ npm run build && npm run start  # Test PWA locale
 
 ## Stack
 
-- **Next.js 15**: App Router, Server/Client Components, API Routes
-- **React 18**: Hooks, Suspense
+- **Next.js 15.5.4**: App Router, Server/Client Components, API Routes
+- **React 19.2**: Hooks, Suspense, modern async patterns
 - **Tailwind CSS 3**: Utility-first + glassmorphism iOS 18 style
 - **Firebase Realtime DB**: Scheduler, logs, versioning
 - **Auth0**: Autenticazione
@@ -1083,5 +1083,5 @@ CRON_SECRET=your-secret-here
 ---
 
 **Last Updated**: 2025-10-10
-**Version**: 1.5.2
+**Version**: 1.5.4
 **Author**: Federico Manfredi

@@ -88,13 +88,13 @@ export default function ChangelogPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <Card className="p-8 bg-gradient-to-br from-primary-50 to-accent-50 border-2 border-primary-200">
-        <div className="flex items-center justify-between mb-4">
+      <Card glass className="p-6 border-2 border-primary-200">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <div>
             <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 mb-2">📋 Changelog</h1>
             <p className="text-neutral-600">Storico di tutte le versioni e modifiche dell&apos;applicazione</p>
           </div>
-          <div className="text-right">
+          <div className="text-left sm:text-right">
             <p className="text-sm text-neutral-500 mb-1">Versione Corrente</p>
             <p className="text-3xl font-bold text-primary-600">{APP_VERSION}</p>
           </div>

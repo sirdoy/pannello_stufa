@@ -779,6 +779,69 @@ useEffect(() => {
 - Dropdown/collapse elementi non critici: info utente, badge, secondary actions
 - Priorità: logo > navigation links > user menu
 
+## Design System
+
+### Palette Colori Semantici
+**Tutti i colori hanno scala completa 50-900** (10 tonalità ciascuno):
+- **primary** (rosso fuoco): `primary-50` → `primary-900` - Azioni primarie, errori critici
+- **danger** (alias primary): Stesso colore di primary, per compatibilità nomenclatura componenti
+- **accent** (arancione): `accent-50` → `accent-900` - Accenti, highlight, warning secondari
+- **success** (verde): `success-50` → `success-900` - Successo, status positivi, conferme
+- **warning** (giallo-arancio): `warning-50` → `warning-900` - Attenzioni, alert, avvisi
+- **info** (blu): `info-50` → `info-900` - Informazioni, note, messaggi informativi
+- **neutral** (grigio): `neutral-50` → `neutral-900` - Testi, bordi, background
+
+### Nomenclatura Colori
+**Regola fondamentale**: Usare SOLO `neutral-*`, MAI `gray-*`
+```jsx
+// ✅ CORRETTO
+className="text-neutral-800 bg-neutral-50 border-neutral-200"
+
+// ❌ ERRATO
+className="text-gray-800 bg-gray-50 border-gray-200"
+```
+
+### Card Styling Standards
+**Pattern standardizzati**:
+```jsx
+// Standard card (default)
+<Card className="p-6">Content</Card>
+
+// Hero card (sezioni principali)
+<Card className="p-8">Hero Content</Card>
+
+// Header card con glassmorphism
+<Card glass className="p-6 border-2 border-primary-200">Header</Card>
+
+// Info card colorata
+<Card className="p-6 bg-info-50 border-2 border-info-200">Info</Card>
+<Card className="p-6 bg-warning-50 border-2 border-warning-200">Warning</Card>
+<Card className="p-6 bg-success-50 border-2 border-success-200">Success</Card>
+```
+
+**Regole**:
+- `p-6`: Default per tutte le card normali
+- `p-8`: Solo per hero sections (es. StovePanel main)
+- `glass`: Header importanti + modal overlay
+- Info card: `bg-{color}-50 border-2 border-{color}-200`
+
+### Background Consistenza
+**Usare SEMPRE background globale** definito in `globals.css`:
+```css
+body {
+  @apply bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-200;
+}
+```
+
+❌ **MAI override custom** nelle singole pagine:
+```jsx
+// ❌ ERRATO - Override custom
+<div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-orange-100">
+
+// ✅ CORRETTO - Usa background globale
+<div className="max-w-2xl mx-auto py-8 px-4">
+```
+
 ## Code Quality Best Practices
 
 ### API Routes
@@ -935,5 +998,5 @@ CRON_SECRET=your-secret-here
 ---
 
 **Last Updated**: 2025-10-10
-**Version**: 1.4.9
+**Version**: 1.5.0
 **Author**: Federico Manfredi

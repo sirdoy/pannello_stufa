@@ -30,7 +30,7 @@ export default function MaintenanceBar({ maintenanceStatus }) {
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <span className="text-lg">🔧</span>
-            <span className="font-medium text-gray-800">Manutenzione</span>
+            <span className="font-medium text-neutral-800">Manutenzione</span>
           </div>
           <div className={`text-sm font-semibold ${getTextColor()}`}>
             {formatHoursToHHMM(currentHours)} / {formatHoursToHHMM(targetHours)}
@@ -38,7 +38,7 @@ export default function MaintenanceBar({ maintenanceStatus }) {
         </div>
 
         {/* Progress Bar */}
-        <div className="relative w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+        <div className="relative w-full h-3 bg-neutral-200 rounded-full overflow-hidden">
           <div
             className={`h-full ${getBarColor()} transition-all duration-500 ease-out`}
             style={{ width: `${Math.min(100, percentage)}%` }}
@@ -52,12 +52,12 @@ export default function MaintenanceBar({ maintenanceStatus }) {
 
         {/* Info Text */}
         <div className="flex items-center justify-between mt-2">
-          <span className="text-xs text-gray-600">
+          <span className="text-xs text-neutral-600">
             {percentage >= 100
               ? 'Pulizia richiesta!'
               : `${formatHoursToHHMM(remainingHours)} rimanenti`}
           </span>
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-neutral-500">
             {percentage.toFixed(0)}%
           </span>
         </div>

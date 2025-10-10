@@ -5,6 +5,33 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.5.0] - 2025-10-10
+
+### Aggiunto
+- **Design System completo**: palette colori semantici estese con scala 50-900 per tutti i colori (success, warning, info, danger)
+- Alias `danger` in `tailwind.config.js` per compatibilità componenti che usano nomenclatura "danger" (punta a palette primary)
+- Sezione **Design System** in CLAUDE.md con guidelines colori, spacing e nomenclature per sviluppi futuri
+
+### Modificato
+- **Nomenclatura colori uniformata**: `gray-*` → `neutral-*` in tutta l'applicazione per consistenza
+  - MaintenanceBar: 3 occorrenze aggiornate
+  - Pagina maintenance: 12 occorrenze aggiornate
+  - Pagina not-found: 2 occorrenze aggiornate
+- **Background globale consistente**: rimossi override custom arancioni (`from-orange-50 via-red-50 to-orange-100`) dalle pagine `/maintenance` e `/not-found`
+- **Card styling standardizzato**: definito pattern chiaro per padding e styling
+  - `p-6`: padding standard per tutte le card
+  - `p-8`: padding aumentato per hero sections (es. StovePanel main card)
+  - `glass` prop: per header importanti con effetto glassmorphism
+  - `bg-{color}-50 border-2 border-{color}-200`: pattern per info card colorate
+- Info card manutenzione: `bg-blue-50 border-blue-200` → `bg-info-50 border-2 border-info-200` (palette semantica corretta)
+- Changelog header: da custom gradient a glass effect standard con layout responsive migliorato
+- Log page: titolo aggiornato con emoji e font bold per consistenza con altre pagine
+
+### Tecnico
+- Palette colori Tailwind complete: success (10 tonalità), warning (10 tonalità), info (10 tonalità), danger (10 tonalità)
+- Best practices UI/UX documentate in CLAUDE.md per riferimento futuro sviluppi
+- Build production verificata con successo dopo tutte le modifiche
+
 ## [1.4.9] - 2025-10-10
 
 ### Modificato

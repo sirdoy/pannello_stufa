@@ -65,11 +65,11 @@ export default function LogPage() {
   }
 
   return (
-    <Card className="max-w-3xl mx-auto mt-10 p-6 space-y-6">
-      <h2 className="text-2xl font-semibold text-center">Storico Azioni Utenti</h2>
+    <Card className="max-w-3xl mx-auto p-6 space-y-6">
+      <h2 className="text-2xl font-bold text-neutral-900 text-center">📋 Storico Azioni Utenti</h2>
 
       {log.length === 0 ? (
-        <p className="text-center text-gray-500">Nessuna azione registrata</p>
+        <p className="text-center text-neutral-500">Nessuna azione registrata</p>
       ) : (
         <>
           <ul className="space-y-4">

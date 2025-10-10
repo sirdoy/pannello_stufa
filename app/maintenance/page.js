@@ -96,17 +96,17 @@ export default function MaintenancePage() {
 
   if (isLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-red-50 to-orange-100">
-        <div className="text-gray-600">Caricamento...</div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-neutral-600">Caricamento...</div>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-red-50 to-orange-100">
+      <div className="min-h-screen flex items-center justify-center">
         <Card className="p-8 text-center">
-          <p className="text-gray-600 mb-4">Accesso non autorizzato</p>
+          <p className="text-neutral-600 mb-4">Accesso non autorizzato</p>
           <Button href="/api/auth/login" variant="primary">Accedi</Button>
         </Card>
       </div>
@@ -114,35 +114,35 @@ export default function MaintenancePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-orange-100 py-8 px-4">
-      <div className="max-w-2xl mx-auto space-y-6">
+    <>
+      <div className="max-w-2xl mx-auto py-8 px-4 space-y-6">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">🔧 Manutenzione</h1>
-          <p className="text-gray-600">Configura gli intervalli di pulizia della stufa</p>
+          <h1 className="text-3xl font-bold text-neutral-800 mb-2">🔧 Manutenzione</h1>
+          <p className="text-neutral-600">Configura gli intervalli di pulizia della stufa</p>
         </div>
 
         {/* Current Status Card */}
         <Card glass className="p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">📊 Stato Attuale</h2>
+          <h2 className="text-xl font-semibold text-neutral-800 mb-4">📊 Stato Attuale</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-white/50 rounded-lg p-4">
-              <div className="text-sm text-gray-600 mb-1">Ore di Utilizzo</div>
-              <div className="text-2xl font-bold text-gray-800">
+              <div className="text-sm text-neutral-600 mb-1">Ore di Utilizzo</div>
+              <div className="text-2xl font-bold text-neutral-800">
                 {formatHoursToHHMM(maintenanceData?.currentHours || 0)}
               </div>
             </div>
 
             <div className="bg-white/50 rounded-lg p-4">
-              <div className="text-sm text-gray-600 mb-1">Ore Target</div>
+              <div className="text-sm text-neutral-600 mb-1">Ore Target</div>
               <div className="text-2xl font-bold text-primary-600">
                 {formatHoursToHHMM(maintenanceData?.targetHours || 50)}
               </div>
             </div>
 
             <div className="bg-white/50 rounded-lg p-4">
-              <div className="text-sm text-gray-600 mb-1">Ore Rimanenti</div>
+              <div className="text-sm text-neutral-600 mb-1">Ore Rimanenti</div>
               <div className="text-2xl font-bold text-success-600">
                 {formatHoursToHHMM(Math.max(0, (maintenanceData?.targetHours || 50) - (maintenanceData?.currentHours || 0)))}
               </div>
@@ -150,7 +150,7 @@ export default function MaintenancePage() {
           </div>
 
           {/* Reset Button */}
-          <div className="mt-4 pt-4 border-t border-gray-200">
+          <div className="mt-4 pt-4 border-t border-neutral-200">
             <Button
               variant="danger"
               onClick={handleResetRequest}
@@ -162,8 +162,8 @@ export default function MaintenancePage() {
           </div>
 
           {maintenanceData?.lastCleanedAt && (
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <div className="text-sm text-gray-600">
+            <div className="mt-4 pt-4 border-t border-neutral-200">
+              <div className="text-sm text-neutral-600">
                 Ultima pulizia: {new Date(maintenanceData.lastCleanedAt).toLocaleDateString('it-IT', {
                   day: '2-digit',
                   month: '2-digit',
@@ -178,11 +178,11 @@ export default function MaintenancePage() {
 
         {/* Configuration Card */}
         <Card glass className="p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">⚙️ Configurazione</h2>
+          <h2 className="text-xl font-semibold text-neutral-800 mb-4">⚙️ Configurazione</h2>
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="targetHours" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="targetHours" className="block text-sm font-medium text-neutral-700 mb-2">
                 Ore di utilizzo prima della pulizia
               </label>
               <input
@@ -193,17 +193,17 @@ export default function MaintenancePage() {
                 step="1"
                 value={targetHours}
                 onChange={(e) => setTargetHours(parseFloat(e.target.value) || 0)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 disabled={isSaving}
               />
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-neutral-500 mt-1">
                 Default consigliato: 50 ore. Range: 1-1000 ore.
               </p>
             </div>
 
             {/* Quick presets */}
             <div>
-              <div className="text-sm font-medium text-gray-700 mb-2">Preselezioni rapide:</div>
+              <div className="text-sm font-medium text-neutral-700 mb-2">Preselezioni rapide:</div>
               <div className="flex gap-2 flex-wrap">
                 {[25, 50, 75, 100, 150, 200].map((hours) => (
                   <button
@@ -212,7 +212,7 @@ export default function MaintenancePage() {
                     className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                       targetHours === hours
                         ? 'bg-primary-600 text-white'
-                        : 'bg-white/70 text-gray-700 hover:bg-white'
+                        : 'bg-white/70 text-neutral-700 hover:bg-white'
                     }`}
                     disabled={isSaving}
                   >
@@ -244,9 +244,9 @@ export default function MaintenancePage() {
         </Card>
 
         {/* Info Card */}
-        <Card className="p-6 bg-blue-50 border-blue-200">
-          <h3 className="font-semibold text-blue-900 mb-2">ℹ️ Come Funziona</h3>
-          <ul className="text-sm text-blue-800 space-y-1">
+        <Card className="p-6 bg-info-50 border-2 border-info-200">
+          <h3 className="font-semibold text-info-900 mb-2">ℹ️ Come Funziona</h3>
+          <ul className="text-sm text-info-800 space-y-1">
             <li>• Il contatore aumenta automaticamente ogni minuto quando la stufa è in funzione (status WORK)</li>
             <li>• Al raggiungimento delle ore impostate, apparirà un banner di richiesta pulizia</li>
             <li>• La stufa non potrà essere accesa (né manualmente né automaticamente) finché non confermi la pulizia</li>
@@ -259,15 +259,15 @@ export default function MaintenancePage() {
       {showResetConfirm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[10000] p-4">
           <Card glass className="max-w-md w-full p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">🔄 Conferma Reset</h2>
-            <p className="text-gray-700 mb-6">
+            <h2 className="text-2xl font-bold text-neutral-800 mb-4">🔄 Conferma Reset</h2>
+            <p className="text-neutral-700 mb-6">
               Sei sicuro di voler azzerare il contatore di manutenzione?
             </p>
-            <div className="space-y-2 mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <p className="text-sm text-yellow-800">
+            <div className="space-y-2 mb-6 bg-warning-50 border border-warning-200 rounded-lg p-4">
+              <p className="text-sm text-warning-800">
                 ⚠️ Questa operazione:
               </p>
-              <ul className="text-sm text-yellow-700 space-y-1 ml-4">
+              <ul className="text-sm text-warning-700 space-y-1 ml-4">
                 <li>• Azzererà il contatore a 0.0 ore</li>
                 <li>• Registrerà la data e ora della pulizia</li>
                 <li>• Sbloccherà l&apos;accensione della stufa se era bloccata</li>
@@ -295,6 +295,6 @@ export default function MaintenancePage() {
           </Card>
         </div>
       )}
-    </div>
+    </>
   );
 }

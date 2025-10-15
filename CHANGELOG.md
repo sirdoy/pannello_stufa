@@ -5,6 +5,25 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.5.7] - 2025-10-15
+
+### Aggiunto
+- **Sistema rilevamento errori esteso**: database completo con 23 codici errore Thermorossi
+- **Database ERROR_CODES**: ogni errore con severità (INFO/WARNING/ERROR/CRITICAL) e suggerimento risoluzione automatico
+- **Badge errore pulsante**: visualizzazione badge rosso pulsante con animazione pulse + blur effect nel display status
+- **Pagina debug** (`/debug`): monitoraggio real-time API con auto-refresh 3 secondi e visualizzazione parametri completi
+- Documentazione `ERRORS-DETECTION.md`: guida completa errori stufa con troubleshooting e best practices
+
+### Modificato
+- **ErrorAlert component**: aggiunto box suggerimenti glassmorphism con icona 💡 e pulsante "Vedi Storico Errori"
+- `lib/errorMonitor.js`: espanso da 2 a 23 codici errore con categorie (accensione, temperatura, tiraggio, meccanici, sicurezza)
+- `ErrorAlert.js`: supporto prop `showSuggestion` e `showDetailsButton` per flessibilità visualizzazione
+
+### Tecnico
+- Pattern badge pulsante: `absolute -top-2 -right-2 animate-pulse` con doppio layer (blur + solid)
+- Categorie errori: accensione (1-3), temperatura (4-7), tiraggio (8-10), meccanici (11-12), sicurezza (13-15), altri (20, 30, 40)
+- Debug page: grid responsive con color-coding per error code, status, fan, power + raw JSON viewer
+
 ## [1.5.6] - 2025-10-15
 
 ### Aggiunto

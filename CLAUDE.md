@@ -207,9 +207,14 @@ log/
 
 errors/
 └── {errorId}/
-    ├── errorCode, errorDescription
-    ├── severity: INFO|WARNING|ERROR|CRITICAL
-    ├── timestamp, resolved
+    ├── errorCode: number           # Codice errore (0 = nessun errore)
+    ├── errorDescription: string    # Descrizione testuale
+    ├── severity: string            # INFO|WARNING|ERROR|CRITICAL
+    ├── timestamp: number           # Unix timestamp (ms)
+    ├── resolved: boolean
+    ├── resolvedAt: number          # Unix timestamp (ms) [opzionale]
+    ├── status: string              # Status stufa quando errore verificato
+    └── source: string              # Origine rilevamento (es. 'status_monitor')
 
 changelog/
 └── {version}/               # "1_1_0" (dots → underscores)
@@ -896,6 +901,131 @@ export default function Component({ variant = 'default' }) {
 - Mantieni stessi dati/logica, varia solo presentazione UI
 - Esempi: `CronHealthBanner` (banner/inline), `Banner` (info/warning/error/success)
 
+### Badge Pulsante con Animazione
+Pattern per notifiche visibili che richiedono attenzione immediata (errori, alert, contatori).
+
+```jsx
+{/* Badge posizionato in angolo card */}
+{showBadge && (
+  <div className="absolute -top-2 -right-2 animate-pulse">
+    <div className="relative">
+      {/* Layer 1: Blur effect per glow */}
+      <div className="absolute inset-0 bg-primary-500 rounded-full blur-md opacity-75"></div>
+
+      {/* Layer 2: Badge solido */}
+      <div className="relative bg-primary-600 text-white px-3 py-1.5 rounded-full border-2 border-white shadow-lg">
+        <span className="text-xs font-bold">⚠️ {badgeText}</span>
+      </div>
+    </div>
+  </div>
+)}
+```
+
+**Caratteristiche**:
+- **Doppio layer**: blur effect + badge solido per effetto glow pulsante
+- **Positioning**: `absolute -top-2 -right-2` per angolo superiore destro card parent
+- **Animazione**: `animate-pulse` Tailwind per pulsazione automatica
+- **Colori semantici**: primary/danger (rosso), warning (arancione), info (blu)
+- **Parent requirement**: Card parent deve avere `relative` positioning
+- **Z-index**: Naturalmente sopra contenuto card, sotto modal (no z-index custom necessario)
+
+**Varianti Colori**:
+```jsx
+// Errore critico (rosso)
+bg-primary-500 blur → bg-primary-600 solid
+
+// Warning (arancione)
+bg-warning-500 blur → bg-warning-600 solid
+
+// Info (blu)
+bg-info-500 blur → bg-info-600 solid
+
+// Success (verde)
+bg-success-500 blur → bg-success-600 solid
+```
+
+**Use Cases**: contatori manutenzione, errori stufa, notifiche non lette, status critici
+
+### Debug/Monitoring Page Pattern
+Pattern per pagine debug e monitoring real-time di API/services.
+
+```jsx
+'use client';
+
+export default function DebugPage() {
+  const [data, setData] = useState(null);
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const fetchData = async () => {
+    setLoading(true);
+    const res = await fetch('/api/endpoint');
+    const json = await res.json();
+    setData(json);
+    setLoading(false);
+  };
+
+  // Auto-refresh interval
+  useEffect(() => {
+    if (autoRefresh) {
+      const interval = setInterval(fetchData, 3000); // 3s
+      return () => clearInterval(interval);
+    }
+  }, [autoRefresh]);
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-6">
+      <Card className="p-6">
+        {/* Header con controlli */}
+        <div className="flex items-center justify-between mb-6">
+          <h1>Debug API</h1>
+          <div className="flex gap-3">
+            <Button onClick={fetchData} disabled={loading}>
+              {loading ? '⏳' : '🔄'} Refresh
+            </Button>
+            <Button
+              variant={autoRefresh ? 'success' : 'outline'}
+              onClick={() => setAutoRefresh(!autoRefresh)}
+            >
+              {autoRefresh ? '⏸️ Stop' : '▶️ Start'} Auto (3s)
+            </Button>
+          </div>
+        </div>
+
+        {/* Grid parametri con color-coding */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card className={`p-4 ${data?.error ? 'bg-primary-50 border-primary-300' : 'bg-success-50 border-success-300'}`}>
+            <p className="text-xs text-neutral-500 mb-1">Parameter Name</p>
+            <p className="text-3xl font-bold">{data?.value}</p>
+          </Card>
+        </div>
+
+        {/* Raw JSON viewer */}
+        <Card className="p-4 bg-neutral-900 border-neutral-700 mt-6">
+          <pre className="text-xs text-success-400 font-mono overflow-auto">
+            {JSON.stringify(data, null, 2)}
+          </pre>
+        </Card>
+      </Card>
+    </div>
+  );
+}
+```
+
+**Caratteristiche**:
+- **Auto-refresh toggle**: pulsante play/pause con interval configurabile
+- **Color-coding**: card parametri con colori semantici (success=verde, error=rosso)
+- **Manual refresh**: pulsante refresh con loading state
+- **Raw JSON viewer**: debug avanzato con sintassi highlighted
+- **Grid responsive**: 1 colonna mobile, 2+ colonne desktop
+- **Info box**: spiegazione funzionamento sistema per utente finale
+
+**Best Practices**:
+- Auto-refresh: 3-5 secondi per API veloci, 10-30s per API lente
+- Color-coding: usa palette semantica app (primary, success, warning, info)
+- Layout: max-w-4xl per leggibilità, grid responsive per multi-parametri
+- Raw JSON: sempre in fondo, syntax highlighting con text-success-400 su bg-neutral-900
+
 ## Design System
 
 ### Palette Colori Semantici
@@ -1231,5 +1361,5 @@ CRON_SECRET=your-secret-here
 ---
 
 **Last Updated**: 2025-10-15
-**Version**: 1.5.6
+**Version**: 1.5.7
 **Author**: Federico Manfredi

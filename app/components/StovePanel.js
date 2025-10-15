@@ -323,7 +323,8 @@ export default function StovePanel() {
         <ErrorAlert
           errorCode={errorCode}
           errorDescription={errorDescription}
-          onDismiss={() => router.push('/errors')}
+          showDetailsButton={true}
+          showSuggestion={true}
         />
       )}
 
@@ -352,7 +353,19 @@ export default function StovePanel() {
             {/* Main Status Display - Grid 2 colonne */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               {/* Colonna 1: Status principale */}
-              <div className="flex flex-col items-center justify-center p-6 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/80 shadow-sm">
+              <div className="flex flex-col items-center justify-center p-6 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/80 shadow-sm relative">
+                {/* Error Badge - Pulsante, in alto a destra */}
+                {errorCode !== 0 && (
+                  <div className="absolute -top-2 -right-2 animate-pulse">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-primary-500 rounded-full blur-md opacity-75"></div>
+                      <div className="relative bg-primary-600 text-white px-3 py-1.5 rounded-full border-2 border-white shadow-lg">
+                        <span className="text-xs font-bold">⚠️ ERR {errorCode}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex items-center gap-4 mb-2">
                   <span className="text-6xl drop-shadow-lg">{getStatusIcon(status)}</span>
                   <div className="text-left">

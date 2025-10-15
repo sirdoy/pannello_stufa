@@ -5,14 +5,15 @@
 
 import { ERROR_SEVERITY, getErrorInfo } from '@/lib/errorMonitor';
 import Banner from './Banner';
+import Button from './Button';
 
-export default function ErrorAlert({ errorCode, errorDescription, className = '', onDismiss }) {
+export default function ErrorAlert({ errorCode, errorDescription, className = '', onDismiss, showSuggestion = true, showDetailsButton = false }) {
   if (errorCode === 0 || !errorCode) {
     return null;
   }
 
   const errorInfo = getErrorInfo(errorCode);
-  const { severity } = errorInfo;
+  const { severity, suggestion } = errorInfo;
 
   // Map severity to Banner variant and icon
   const getSeverityConfig = () => {
@@ -30,12 +31,39 @@ export default function ErrorAlert({ errorCode, errorDescription, className = ''
 
   const config = getSeverityConfig();
 
+  // Build description with suggestion if available
+  const fullDescription = (
+    <>
+      <div className="font-semibold mb-2">
+        {errorDescription || errorInfo.description}
+      </div>
+      {showSuggestion && suggestion && (
+        <div className="mt-3 p-3 bg-white/40 backdrop-blur-sm rounded-lg border border-white/60">
+          <p className="text-sm font-medium text-neutral-700 mb-1">💡 Suggerimento:</p>
+          <p className="text-sm text-neutral-600">{suggestion}</p>
+        </div>
+      )}
+    </>
+  );
+
+  // Actions for banner (optional details button)
+  const actions = showDetailsButton ? (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={() => window.location.href = '/errors'}
+    >
+      📋 Vedi Storico Errori
+    </Button>
+  ) : undefined;
+
   return (
     <Banner
       variant={config.variant}
       icon={config.icon}
-      title={`Codice Errore: ${errorCode}`}
-      description={errorDescription || errorInfo.description}
+      title={`Allarme Stufa - Codice ${errorCode}`}
+      description={fullDescription}
+      actions={actions}
       dismissible={!!onDismiss}
       onDismiss={onDismiss}
       className={className}

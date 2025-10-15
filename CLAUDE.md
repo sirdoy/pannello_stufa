@@ -1067,12 +1067,128 @@ npm run dev              # Dev server
 npm run build            # Production build
 npm run lint             # ESLint
 
+# Testing
+npm test                 # Run all tests
+npm run test:watch       # Watch mode
+npm run test:coverage    # Coverage report
+npm run test:ci          # CI/CD mode
+
 # Firebase
 node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require('./lib/version').VERSION_HISTORY)"
 
 # Debugging
 find app -name "*.js" -exec grep -l "useState" {} \;  # Find client components
 ```
+
+## Testing & Quality Assurance
+
+### Setup e Configurazione
+- **Framework**: Jest 30.2 + Testing Library React 16.3
+- **Test Environment**: jsdom per simulazione browser
+- **Config**: `jest.config.js` + `jest.setup.js` con mock globali
+- **Coverage Target**: 70% (statements, branches, functions, lines)
+
+### Struttura Test Files
+```
+lib/__tests__/           # Test per utility/services
+app/components/ui/__tests__/  # Test componenti UI
+app/hooks/__tests__/     # Test custom hooks
+app/context/__tests__/   # Test context providers
+```
+
+### Pattern di Testing
+
+**Naming Convention**:
+```javascript
+describe('ComponentName or ServiceName', () => {
+  describe('Feature Group', () => {
+    test('should do something specific', () => {
+      // Test implementation
+    });
+  });
+});
+```
+
+**AAA Pattern (Arrange-Act-Assert)**:
+```javascript
+test('updates state correctly', async () => {
+  // ARRANGE: Setup test data and mocks
+  const mockFn = jest.fn();
+
+  // ACT: Execute the code under test
+  const result = await functionToTest(mockFn);
+
+  // ASSERT: Verify the results
+  expect(result).toBe(expectedValue);
+  expect(mockFn).toHaveBeenCalled();
+});
+```
+
+**Mock Strategy**:
+```javascript
+// Mock Firebase functions manualmente per evitare import circolari
+const ref = jest.fn();
+const get = jest.fn();
+const set = jest.fn();
+jest.mock('firebase/database', () => ({ ref, get, set }));
+
+// Mock moduli con comportamento custom
+jest.mock('@/lib/firebase', () => ({ db: {} }));
+jest.mock('@/lib/logService', () => ({
+  logUserAction: jest.fn(),
+}));
+```
+
+### Best Practices
+
+1. **Test Isolation**: Ogni test deve essere indipendente
+   - `beforeEach(() => jest.clearAllMocks())` per reset mock
+   - No shared state tra test
+
+2. **User-Centric Testing**: Testa comportamento, non implementazione
+   - Usa query `getByRole`, `getByText` invece di `getByTestId`
+   - Simula interazioni utente con `userEvent.setup()`
+
+3. **Async Operations**: Gestisci correttamente operazioni asincrone
+   - `await waitFor(() => expect(...)` per attese
+   - `async/await` per promise
+   - Mock async functions: `mockResolvedValue()`, `mockRejectedValue()`
+
+4. **Coverage vs Quality**: Coverage alto non è garanzia qualità
+   - Focus su test significativi, non su 100% coverage artificiale
+   - Testa edge cases e error handling
+
+### Comandi Utili
+```bash
+# Test specifico file
+npm test -- path/to/test-file.test.js
+
+# Test con pattern nome
+npm test -- ComponentName
+
+# Watch mode durante sviluppo
+npm run test:watch
+
+# Coverage HTML report (coverage/lcov-report/index.html)
+npm run test:coverage
+```
+
+### Troubleshooting Comune
+
+**"Cannot find module '@/...'"**: Verifica `moduleNameMapper` in `jest.config.js`
+```javascript
+moduleNameMapper: {
+  '^@/(.*)$': '<rootDir>/$1',
+}
+```
+
+**"localStorage is not defined"**: Mock già presente in `jest.setup.js`
+
+**"window.matchMedia is not a function"**: Mock già presente in `jest.setup.js`
+
+**Firebase errors in tests**: Mock Firebase in `jest.setup.js` già configurato
+
+**Documentazione Completa**: Vedi `README-TESTING.md` per guide dettagliate, esempi specifici, e troubleshooting avanzato
 
 ## Environment Variables
 
@@ -1114,6 +1230,6 @@ CRON_SECRET=your-secret-here
 
 ---
 
-**Last Updated**: 2025-10-10
-**Version**: 1.5.5
+**Last Updated**: 2025-10-15
+**Version**: 1.5.6
 **Author**: Federico Manfredi

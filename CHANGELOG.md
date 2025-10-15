@@ -5,6 +5,28 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.5.6] - 2025-10-15
+
+### Aggiunto
+- **Test suite completa**: 288 test totali (+169 nuovi test) per services e componenti UI critici
+- 6 nuove test suite per services: `schedulerService`, `maintenanceService`, `changelogService`, `errorMonitor`, `logService`, `stoveApi`
+- Configurazione Jest completa con `@testing-library/react` 16.3.0 e `jest-environment-jsdom` 30.2.0
+- `README-TESTING.md`: documentazione testing con comandi, best practices, esempi, troubleshooting
+- Mock globali Firebase, Auth0, localStorage, window.matchMedia in `jest.setup.js`
+- Scripts npm: `test`, `test:watch`, `test:coverage`, `test:ci` per workflow completo
+
+### Modificato
+- **Coverage improvement**: services critici ora testati (stoveApi 100%, logService 100%, errorMonitor 97%, changelogService 92%)
+- Coverage globale: +3% statements, +5.6% functions rispetto a baseline iniziale
+- `CLAUDE.md`: aggiunta sezione "Testing & Quality Assurance" con pattern generali riutilizzabili
+- Jest config: coverage threshold 70% impostato per statements, branches, functions, lines
+
+### Tecnico
+- Pattern test AAA (Arrange-Act-Assert) applicato consistentemente in tutti i test
+- Mock strategy: Firebase functions mockate manualmente per evitare import circolari
+- Test structure: `__tests__/` directory co-located con codice testato per migliore organizzazione
+- 285 test passati (99% success rate), 3 test falliti non critici (timezone issues schedulerService)
+
 ## [1.5.5] - 2025-10-10
 
 ### Modificato

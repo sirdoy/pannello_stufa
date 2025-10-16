@@ -5,6 +5,30 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.5.8] - 2025-10-16
+
+### Aggiunto
+- **Integrazione Netatmo completa**: OAuth 2.0 flow con sessione persistente
+- Token helper centralizzato (`lib/netatmoTokenHelper.js`) con auto-refresh automatico refresh token
+- 8 endpoint API Netatmo: callback, homesdata, homestatus, devices, setthermmode, setroomthermpoint, temperature, devices-temperatures
+- Pattern generico per integrazioni API esterne con OAuth 2.0 in CLAUDE.md
+- Sezione **Testing & Quality Assurance** aggiunta a CLAUDE.md come priorità fondamentale (regola #6)
+
+### Modificato
+- **Sessione Netatmo ora permanente**: token si auto-rinnova ad ogni chiamata API
+- **UI feedback errori**: banner dismissibili con flag `reconnect` per riconnessione guidata
+- **Tutte le API routes Netatmo** (~60% codice ridotto) ora usano token helper centralizzato
+- **CLAUDE.md ottimizzato**: pattern generici `[external-api]` riutilizzabili, rimossi dettagli specifici Netatmo
+- Callback OAuth usa redirect URI dinamico invece di hardcoded localhost:3000
+- `NetatmoPage` wrapped in Suspense per compatibilità Next.js 15 con useSearchParams()
+
+### Tecnico
+- Error handling: 5 tipi errore (NOT_CONNECTED, TOKEN_EXPIRED, TOKEN_ERROR, NO_ACCESS_TOKEN, NETWORK_ERROR)
+- Auto-save nuovo refresh_token quando Netatmo lo ritorna (garantisce persistenza indefinita)
+- Pattern riutilizzabile per integrazioni OAuth: token helper + API wrapper + service layer + Firebase storage
+- Client reconnect pattern: flag `reconnect: true` in response API per trigger UI riconnessione
+- Suspense boundary in `NetatmoPage` con `Skeleton.NetatmoPage` fallback per SSG
+
 ## [1.5.7] - 2025-10-15
 
 ### Aggiunto

@@ -3,6 +3,9 @@ import { ref, get, set } from 'firebase/database';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
 
+// Force dynamic rendering for Firebase operations
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/netatmo/homesdata
  * Retrieves complete Netatmo topology (homes, rooms, modules)

@@ -19,6 +19,7 @@ import ErrorAlert from './ui/ErrorAlert';
 import Banner from './ui/Banner';
 import MaintenanceBar from './MaintenanceBar';
 import CronHealthBanner from './CronHealthBanner';
+import NetatmoTemperatureReport from './netatmo/NetatmoTemperatureReport';
 
 export default function StovePanel() {
   const router = useRouter();
@@ -571,47 +572,8 @@ export default function StovePanel() {
         )}
       </div>
 
-      {/* Netatmo e Temperatura - Da implementare */}
-      <Card className="p-6 bg-neutral-50 border-dashed border-2 border-neutral-300">
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">🌐</span>
-            <div>
-              <h3 className="text-lg font-bold text-neutral-900">Netatmo</h3>
-              <p className="text-xs text-neutral-500">Gestione connessione termostato • In fase di sviluppo</p>
-            </div>
-          </div>
-
-          {/* Temperatura placeholder */}
-          {ambientTemp !== null && (
-            <div className="pt-4 border-t border-neutral-300">
-              <div className="flex items-center justify-center gap-3 py-2">
-                <span className="text-3xl">🌡️</span>
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-info-600">{ambientTemp.toFixed(1)}°C</p>
-                  <p className="text-xs text-neutral-500">Temperatura ambiente</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Pulsanti connessione */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <button
-              onClick={handleNetatmoLogin}
-              className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-info-600 hover:bg-info-50 border border-info-200 transition-colors duration-200"
-            >
-              🔗 Riconnetti Netatmo
-            </button>
-            <button
-              onClick={handleNetatmoLogout}
-              className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-primary-600 hover:bg-primary-50 border border-primary-200 transition-colors duration-200"
-            >
-              🔌 Disconnetti Netatmo
-            </button>
-          </div>
-        </div>
-      </Card>
+      {/* Netatmo Temperature Report */}
+      <NetatmoTemperatureReport />
     </div>
   );
 }

@@ -4,6 +4,9 @@ import NETATMO_API from '@/lib/netatmoApi';
 import { getSession } from '@auth0/nextjs-auth0';
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
 
+// Force dynamic rendering for Firebase operations
+export const dynamic = 'force-dynamic';
+
 /**
  * POST /api/netatmo/setroomthermpoint
  * Sets temperature setpoint for a specific room

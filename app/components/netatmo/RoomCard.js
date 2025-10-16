@@ -10,8 +10,24 @@ export default function RoomCard({ room, onRefresh }) {
   const [editingTemp, setEditingTemp] = useState(false);
   const [targetTemp, setTargetTemp] = useState(room.setpoint || 20);
 
-  const hasData = room.temperature !== undefined;
+  const hasSetpoint = room.setpoint !== undefined;
+  const hasTemperature = room.temperature !== undefined;
   const isHeating = room.heating || false;
+
+  // Get device type icon and label
+  function getDeviceIcon(module) {
+    if (!module) return { icon: '📡', label: 'Dispositivo' };
+
+    const types = {
+      NATherm1: { icon: '🌡️', label: 'Termostato' },
+      NRV: { icon: '🔧', label: 'Valvola' },
+      NAPlug: { icon: '🔌', label: 'Relè' },
+      OTM: { icon: '⚙️', label: 'Modulo OpenTherm' },
+      OTH: { icon: '🎛️', label: 'Termostato OpenTherm' },
+    };
+
+    return types[module.type] || { icon: '📡', label: module.type || 'Sconosciuto' };
+  }
 
   // Temperature color coding
   function getTempColor(temp, setpoint) {
@@ -126,15 +142,50 @@ export default function RoomCard({ room, onRefresh }) {
     <Card className="p-6 transition-all duration-200 hover:shadow-lg">
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
-        <div>
-          <h3 className="text-lg font-semibold text-neutral-900">
-            {room.name}
-          </h3>
-          <p className="text-xs text-neutral-500 mt-1">
-            {room.type || 'Stanza'}
-          </p>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            {/* Room type icon */}
+            <span className="text-xl">
+              {room.type === 'livingroom' && '🛋️'}
+              {room.type === 'bedroom' && '🛏️'}
+              {room.type === 'kitchen' && '🍳'}
+              {room.type === 'bathroom' && '🚿'}
+              {room.type === 'office' && '💼'}
+              {room.type === 'corridor' && '🚪'}
+              {room.type === 'custom' && '🏠'}
+              {!room.type && '🏠'}
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 mb-0.5">
+                <h3 className="text-lg font-semibold text-neutral-900 truncate">
+                  {room.name}
+                </h3>
+                {/* Device type badge */}
+                {room.deviceType === 'thermostat' && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-info-100 text-info-700 flex-shrink-0" title="Termostato">
+                    🌡️ Termostato
+                  </span>
+                )}
+                {room.deviceType === 'valve' && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-accent-100 text-accent-700 flex-shrink-0" title="Valvola">
+                    🔧 Valvola
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-neutral-500">
+                {room.type === 'livingroom' && 'Soggiorno'}
+                {room.type === 'bedroom' && 'Camera'}
+                {room.type === 'kitchen' && 'Cucina'}
+                {room.type === 'bathroom' && 'Bagno'}
+                {room.type === 'office' && 'Ufficio'}
+                {room.type === 'corridor' && 'Corridoio'}
+                {room.type === 'custom' && 'Personalizzata'}
+                {!room.type && 'Stanza'}
+              </p>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ml-2">
           {isHeating && (
             <span className="text-2xl" title="Riscaldamento attivo">
               🔥
@@ -147,24 +198,36 @@ export default function RoomCard({ room, onRefresh }) {
       </div>
 
       {/* Temperature Display */}
-      {hasData ? (
+      {room.setpoint !== undefined ? (
         <div className="mb-4">
           <div className="flex items-baseline gap-2">
-            <span className={`text-4xl font-bold ${getTempColor(room.temperature, room.setpoint)}`}>
-              {room.temperature?.toFixed(1)}°
-            </span>
-            <span className="text-neutral-400">/</span>
+            {room.temperature !== undefined ? (
+              <>
+                <span className={`text-4xl font-bold ${getTempColor(room.temperature, room.setpoint)}`}>
+                  {room.temperature.toFixed(1)}°
+                </span>
+                <span className="text-neutral-400">/</span>
+              </>
+            ) : (
+              <span className="text-2xl font-medium text-neutral-400" title="Sensore temperatura non disponibile">
+                --°
+                <span className="text-neutral-400 mx-1">/</span>
+              </span>
+            )}
             <span className="text-xl font-semibold text-neutral-600">
-              {room.setpoint?.toFixed(1)}°
+              {room.setpoint.toFixed(1)}°
             </span>
           </div>
           <p className="text-xs text-neutral-500 mt-1">
-            Attuale / Setpoint
+            {room.temperature !== undefined ? 'Attuale / Setpoint' : 'Sensore non disponibile / Setpoint'}
           </p>
         </div>
       ) : (
-        <div className="mb-4">
-          <p className="text-neutral-400 italic">Dati non disponibili</p>
+        <div className="mb-4 p-3 bg-neutral-50 border border-neutral-200 rounded-xl">
+          <p className="text-sm text-neutral-600 flex items-center gap-2">
+            <span>⚠️</span>
+            <span>Stanza non configurata o fuori linea</span>
+          </p>
         </div>
       )}
 
@@ -224,36 +287,65 @@ export default function RoomCard({ room, onRefresh }) {
           <Button
             variant="accent"
             onClick={() => setEditingTemp(true)}
-            disabled={loading}
+            disabled={loading || !hasSetpoint}
             size="sm"
+            title={!hasSetpoint ? 'Stanza non configurata' : 'Imposta temperatura manuale'}
           >
             🎯 Imposta
           </Button>
           <Button
             variant="success"
             onClick={setModeHome}
-            disabled={loading}
+            disabled={loading || !hasSetpoint}
             size="sm"
+            title={!hasSetpoint ? 'Stanza non configurata' : 'Ritorna alla programmazione'}
           >
             🏠 Auto
           </Button>
           <Button
             variant="outline"
             onClick={setModeOff}
-            disabled={loading}
+            disabled={loading || !hasSetpoint}
             size="sm"
+            title={!hasSetpoint ? 'Stanza non configurata' : 'Spegni riscaldamento'}
           >
             ⏸️ Off
           </Button>
         </div>
       )}
 
-      {/* Module Count */}
-      {room.modules && room.modules.length > 0 && (
+      {/* Module Details */}
+      {room.roomModules && room.roomModules.length > 0 && (
         <div className="mt-4 pt-4 border-t border-neutral-200">
-          <p className="text-xs text-neutral-500">
-            {room.modules.length} {room.modules.length === 1 ? 'modulo' : 'moduli'}
+          <p className="text-xs font-semibold text-neutral-700 mb-2">
+            Dispositivi ({room.roomModules.length})
           </p>
+          <div className="space-y-2">
+            {room.roomModules.map(module => {
+              const deviceInfo = getDeviceIcon(module);
+              return (
+                <div
+                  key={module.id}
+                  className="flex items-center gap-2 p-2 bg-neutral-50 rounded-lg"
+                >
+                  <span className="text-lg">{deviceInfo.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-neutral-900 truncate">
+                      {module.name}
+                    </p>
+                    <p className="text-xs text-neutral-500">
+                      {deviceInfo.label}
+                    </p>
+                  </div>
+                  {module.bridge && (
+                    <span className="text-xs text-neutral-400" title="Connesso tramite bridge">
+                      🔗
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </Card>

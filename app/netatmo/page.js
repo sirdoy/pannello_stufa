@@ -71,11 +71,16 @@ function NetatmoContent() {
       setLoading(true);
       setError(null);
 
+      console.log('🔍 Netatmo: Checking connection...');
+
       const response = await fetch(NETATMO_ROUTES.homesData);
       const data = await response.json();
 
+      console.log('🔍 Netatmo: Response status', response.status, 'reconnect:', data.reconnect, 'error:', data.error);
+
       // ✅ Handle reconnect flag from token helper
       if (data.reconnect) {
+        console.log('❌ Netatmo: Reconnect required -', data.error);
         setConnected(false);
         setError(data.error);
         return;
@@ -83,17 +88,21 @@ function NetatmoContent() {
 
       // If we get data without error, we're connected
       if (!data.error && data.home_id) {
+        console.log('✅ Netatmo: Connected successfully - home_id:', data.home_id);
         setConnected(true);
         setTopology(data);
       } else if (data.error && (data.error.includes('refresh token') || data.error.includes('Nessun refresh token'))) {
         // Not connected - show auth card
+        console.log('❌ Netatmo: Not connected - no token');
         setConnected(false);
       } else {
         // Other error - still connected but something else failed
+        console.error('❌ Netatmo: API error -', data.error);
         setConnected(true);
         throw new Error(data.error);
       }
     } catch (err) {
+      console.error('❌ Netatmo: Exception in checkConnection -', err);
       // If fetch fails, check if it's auth error
       if (err.message && (err.message.includes('refresh token') || err.message.includes('Nessun refresh token'))) {
         setConnected(false);
@@ -203,12 +212,40 @@ function NetatmoContent() {
   if (!topology && error) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <ErrorAlert message={`Impossibile caricare la configurazione Netatmo: ${error}`} />
-        <div className="mt-4">
-          <Button variant="primary" onClick={checkConnection}>
-            🔄 Riprova
-          </Button>
-        </div>
+        <Card className="p-8">
+          <h2 className="text-2xl font-bold text-neutral-900 mb-4">
+            Errore Connessione Netatmo
+          </h2>
+
+          <ErrorAlert message={error} />
+
+          {/* Helpful troubleshooting info */}
+          <div className="mt-6 p-4 bg-info-50 border border-info-200 rounded-lg">
+            <p className="text-sm font-semibold text-info-900 mb-2">💡 Suggerimenti:</p>
+            <ul className="text-sm text-info-800 space-y-1 ml-4">
+              <li>• Verifica di aver completato l&apos;autenticazione Netatmo</li>
+              <li>• Controlla che il tuo account Netatmo sia attivo</li>
+              <li>• Assicurati di avere almeno un termostato configurato</li>
+              <li>• Se il problema persiste, prova a disconnettere e riconnettere</li>
+            </ul>
+          </div>
+
+          <div className="mt-6 flex gap-3">
+            <Button variant="primary" onClick={checkConnection}>
+              🔄 Riprova
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setConnected(false);
+                setError(null);
+                setTopology(null);
+              }}
+            >
+              🔗 Riconnetti Account
+            </Button>
+          </div>
+        </Card>
       </div>
     );
   }
@@ -218,15 +255,49 @@ function NetatmoContent() {
   }
 
   const rooms = topology.rooms || [];
+  const modules = topology.modules || [];
+
+  // Map rooms with status and enrich with module info
   const roomsWithStatus = rooms.map(room => {
     const roomStatus = status?.rooms?.find(r => r.room_id === room.id);
+
+    // Find modules for this room (exclude relays - NAPlug)
+    const roomModules = room.modules?.map(moduleId => {
+      return modules.find(m => m.id === moduleId);
+    }).filter(Boolean).filter(m => m.type !== 'NAPlug') || [];
+
+    // Determine device type
+    const hasThermostat = roomModules.some(m => m.type === 'NATherm1' || m.type === 'OTH');
+    const hasValve = roomModules.some(m => m.type === 'NRV');
+
     return {
       ...room,
       temperature: roomStatus?.temperature,
       setpoint: roomStatus?.setpoint,
       mode: roomStatus?.mode,
       heating: roomStatus?.heating,
+      roomModules, // Add module details (without relays)
+      deviceType: hasThermostat ? 'thermostat' : hasValve ? 'valve' : 'unknown',
     };
+  });
+
+  // Sort rooms: thermostats first, then valves, then by temperature availability
+  const sortedRooms = roomsWithStatus.sort((a, b) => {
+    // Priority 1: Thermostats first
+    if (a.deviceType === 'thermostat' && b.deviceType !== 'thermostat') return -1;
+    if (a.deviceType !== 'thermostat' && b.deviceType === 'thermostat') return 1;
+
+    // Priority 2: Valves before unknown
+    if (a.deviceType === 'valve' && b.deviceType === 'unknown') return -1;
+    if (a.deviceType === 'unknown' && b.deviceType === 'valve') return 1;
+
+    // Priority 3: Rooms with temperature first
+    const aHasTemp = a.temperature !== undefined;
+    const bHasTemp = b.temperature !== undefined;
+    if (aHasTemp && !bHasTemp) return -1;
+    if (!aHasTemp && bHasTemp) return 1;
+
+    return 0;
   });
 
   return (
@@ -333,7 +404,7 @@ function NetatmoContent() {
 
       {/* Rooms Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {roomsWithStatus.map(room => (
+        {sortedRooms.map(room => (
           <RoomCard
             key={room.id}
             room={room}

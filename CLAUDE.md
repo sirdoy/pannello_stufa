@@ -1193,6 +1193,56 @@ body {
 - ✅ NO `export const runtime = 'edge'` con Firebase
 - ✅ Test `npm run build` before commit
 
+### Firebase Operations
+**CRITICO**: Firebase Realtime Database **NON accetta valori `undefined`** nelle write operations.
+
+**Pattern per filtrare undefined values**:
+```javascript
+// ❌ ERRATO - Causa errore Firebase
+const data = {
+  id: item.id,
+  name: item.name,
+  optional: item.optional, // ← undefined causa errore!
+};
+await set(ref(db, 'path'), data);
+
+// ✅ CORRETTO - Filtra undefined prima di salvare
+const data = {
+  id: item.id,
+  name: item.name,
+};
+
+// Aggiungi proprietà opzionali solo se definite
+if (item.optional !== undefined && item.optional !== null) {
+  data.optional = item.optional;
+}
+
+await set(ref(db, 'path'), data);
+```
+
+**Quando applicare**:
+- ✅ API esterne che ritornano dati con campi opzionali
+- ✅ Parsing di oggetti complessi prima di Firebase write
+- ✅ Dati da form/input utente con campi non obbligatori
+- ✅ Mapping array di oggetti con proprietà variabili
+
+**Helper pattern riutilizzabile**:
+```javascript
+// Rimuove tutte le proprietà undefined da un oggetto
+function filterUndefined(obj) {
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    if (value !== undefined && value !== null) {
+      acc[key] = value;
+    }
+    return acc;
+  }, {});
+}
+
+// Uso
+const cleanData = filterUndefined(rawData);
+await set(ref(db, 'path'), cleanData);
+```
+
 ### Client Components
 ```javascript
 'use client';  // PRIMA riga, prima degli import
@@ -1484,5 +1534,5 @@ CRON_SECRET=your-secret-here
 ---
 
 **Last Updated**: 2025-10-16
-**Version**: 1.5.8
+**Version**: 1.5.9
 **Author**: Federico Manfredi

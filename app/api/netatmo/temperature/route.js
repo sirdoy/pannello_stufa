@@ -5,6 +5,9 @@ import { ref, get, update } from 'firebase/database';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
 
+// Force dynamic rendering for Firebase operations
+export const dynamic = 'force-dynamic';
+
 /**
  * POST /api/netatmo/temperature
  * Gets temperature from configured device/module

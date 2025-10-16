@@ -2,6 +2,9 @@
 
 import { saveRefreshToken } from '@/lib/netatmoTokenHelper';
 
+// Force dynamic rendering for Firebase operations
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
@@ -42,7 +45,10 @@ export async function GET(request) {
     }
 
     // ✅ Save refresh token to Firebase using centralized helper
+    // Wait for Firebase write to complete before redirecting
     await saveRefreshToken(json.refresh_token);
+
+    console.log('✅ Netatmo OAuth success: token saved, redirecting to /netatmo/authorized');
 
     // ✅ Redirect to success page (dynamic origin, not hardcoded)
     return Response.redirect(`${origin}/netatmo/authorized`, 302);

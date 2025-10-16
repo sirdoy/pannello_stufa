@@ -1,52 +1,28 @@
 // ✅ File: app/api/netatmo/devices/route.js
 
-export async function POST(request) {
+import NETATMO_API from '@/lib/netatmoApi';
+import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
+
+/**
+ * GET /api/netatmo/devices
+ * Retrieves list of all Netatmo devices
+ * Note: Changed from POST to GET for consistency
+ */
+export async function GET() {
   try {
-    const { refresh_token } = await request.json();
-
-    if (!refresh_token) {
-      return new Response('Missing refresh token', { status: 400 });
+    // ✅ Get valid access token using centralized helper (auto-refresh)
+    const { accessToken, error, message } = await getValidAccessToken();
+    if (error) {
+      const { status, reconnect } = handleTokenError(error);
+      return Response.json({ error: message, reconnect }, { status });
     }
 
-    // Step 1: ottieni access token
-    const tokenRes = await fetch('https://api.netatmo.com/oauth2/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        grant_type: 'refresh_token',
-        refresh_token,
-        client_id: process.env.NETATMO_CLIENT_ID,
-        client_secret: process.env.NETATMO_CLIENT_SECRET,
-      }),
-    });
+    // Get device list from Netatmo API
+    const devices = await NETATMO_API.getDeviceList(accessToken);
 
-    const tokenData = await tokenRes.json();
-
-    if (!tokenData.access_token) {
-      console.error('Errore access_token:', tokenData);
-      return Response.json({ error: 'Token non valido', details: tokenData }, { status: 500 });
-    }
-
-    const accessToken = tokenData.access_token;
-
-    // Step 2: ottieni lista dispositivi
-    const deviceRes = await fetch('https://api.netatmo.com/api/devicelist', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    const deviceData = await deviceRes.json();
-
-    if (!deviceData.body) {
-      console.error('Errore devicelist:', deviceData);
-      return Response.json({ error: 'Errore devicelist', details: deviceData }, { status: 500 });
-    }
-
-    return Response.json({ devices: deviceData.body });
+    return Response.json({ devices });
   } catch (err) {
-    console.error('Errore Netatmo /devices:', err);
-    return Response.json({ error: 'Errore server' }, { status: 500 });
+    console.error('Error in /api/netatmo/devices:', err);
+    return Response.json({ error: err.message || 'Errore server' }, { status: 500 });
   }
 }

@@ -1,36 +1,23 @@
 // ✅ File: app/api/netatmo/temperature/route.js
 
 import { db } from '@/lib/firebase';
-import { ref, get, set, update } from 'firebase/database';
+import { ref, get, update } from 'firebase/database';
+import NETATMO_API from '@/lib/netatmoApi';
+import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
 
+/**
+ * POST /api/netatmo/temperature
+ * Gets temperature from configured device/module
+ * Requires device_id and module_id in Firebase
+ */
 export async function POST() {
   try {
-    // 🔐 Leggi il refresh_token salvato su Firebase
-    const tokenSnap = await get(ref(db, 'netatmo/refresh_token'));
-    if (!tokenSnap.exists()) {
-      return Response.json({ error: 'Nessun refresh token trovato' }, { status: 401 });
+    // ✅ Get valid access token using centralized helper (auto-refresh)
+    const { accessToken, error, message } = await getValidAccessToken();
+    if (error) {
+      const { status, reconnect } = handleTokenError(error);
+      return Response.json({ error: message, reconnect }, { status });
     }
-    const refresh_token = tokenSnap.val();
-
-    // Step 1: ottieni access token
-    const tokenRes = await fetch('https://api.netatmo.com/oauth2/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        grant_type: 'refresh_token',
-        refresh_token,
-        client_id: process.env.NETATMO_CLIENT_ID,
-        client_secret: process.env.NETATMO_CLIENT_SECRET,
-      }),
-    });
-
-    const tokenData = await tokenRes.json();
-    if (!tokenData.access_token) {
-      console.error('Errore access_token:', tokenData);
-      return Response.json({ error: 'Token non valido', details: tokenData }, { status: 500 });
-    }
-
-    const accessToken = tokenData.access_token;
 
     // Step 2: recupera device_id e module_id da Firebase (o fallisce)
     const configSnap = await get(ref(db, 'netatmo/deviceConfig'));

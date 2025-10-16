@@ -1,6 +1,7 @@
 import { db } from '@/lib/firebase';
 import { ref, get, set } from 'firebase/database';
 import NETATMO_API from '@/lib/netatmoApi';
+import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
 
 /**
  * GET /api/netatmo/homestatus
@@ -9,12 +10,12 @@ import NETATMO_API from '@/lib/netatmoApi';
  */
 export async function GET() {
   try {
-    // Get refresh token from Firebase
-    const tokenSnap = await get(ref(db, 'netatmo/refresh_token'));
-    if (!tokenSnap.exists()) {
-      return Response.json({ error: 'Nessun refresh token trovato' }, { status: 401 });
+    // ✅ Get valid access token using centralized helper (auto-refresh)
+    const { accessToken, error, message } = await getValidAccessToken();
+    if (error) {
+      const { status, reconnect } = handleTokenError(error);
+      return Response.json({ error: message, reconnect }, { status });
     }
-    const refreshToken = tokenSnap.val();
 
     // Get home_id from Firebase
     const homeIdSnap = await get(ref(db, 'netatmo/home_id'));
@@ -24,9 +25,6 @@ export async function GET() {
       }, { status: 400 });
     }
     const homeId = homeIdSnap.val();
-
-    // Get access token
-    const accessToken = await NETATMO_API.getAccessToken(refreshToken);
 
     // Get home status
     const homeStatus = await NETATMO_API.getHomeStatus(accessToken, homeId);

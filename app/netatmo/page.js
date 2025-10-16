@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { Card, Button, Skeleton, ErrorAlert } from '@/app/components/ui';
+import { useState, useEffect, useRef, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Card, Button, Skeleton, ErrorAlert, Banner } from '@/app/components/ui';
 import RoomCard from '@/app/components/netatmo/RoomCard';
 import NetatmoAuthCard from '@/app/components/netatmo/NetatmoAuthCard';
 import { NETATMO_ROUTES } from '@/lib/routes';
 
-export default function NetatmoPage() {
+function NetatmoContent() {
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [connected, setConnected] = useState(false);
@@ -14,10 +16,21 @@ export default function NetatmoPage() {
   const [status, setStatus] = useState(null);
   const [mode, setMode] = useState('schedule');
   const [refreshing, setRefreshing] = useState(false);
+  const [oauthError, setOauthError] = useState(null);
 
   // Flags per prevenire double fetch in React Strict Mode
   const connectionCheckedRef = useRef(false);
   const pollingStartedRef = useRef(false);
+
+  // Check for OAuth callback errors in URL
+  useEffect(() => {
+    const errorParam = searchParams.get('error');
+    if (errorParam) {
+      setOauthError(decodeURIComponent(errorParam));
+      // Clear error from URL without reload
+      window.history.replaceState({}, '', '/netatmo');
+    }
+  }, [searchParams]);
 
   // Check connection status on mount
   useEffect(() => {
@@ -60,6 +73,13 @@ export default function NetatmoPage() {
 
       const response = await fetch(NETATMO_ROUTES.homesData);
       const data = await response.json();
+
+      // ✅ Handle reconnect flag from token helper
+      if (data.reconnect) {
+        setConnected(false);
+        setError(data.error);
+        return;
+      }
 
       // If we get data without error, we're connected
       if (!data.error && data.home_id) {
@@ -159,7 +179,24 @@ export default function NetatmoPage() {
 
   // Show auth card if not connected
   if (!connected) {
-    return <NetatmoAuthCard />;
+    return (
+      <>
+        {/* Show OAuth error banner if present */}
+        {oauthError && (
+          <div className="max-w-2xl mx-auto px-4 pt-8">
+            <Banner
+              variant="error"
+              icon="❌"
+              title="Errore Connessione Netatmo"
+              description={oauthError}
+              dismissible
+              onDismiss={() => setOauthError(null)}
+            />
+          </div>
+        )}
+        <NetatmoAuthCard />
+      </>
+    );
   }
 
   // Show error if topology failed to load
@@ -314,5 +351,14 @@ export default function NetatmoPage() {
         </Card>
       )}
     </div>
+  );
+}
+
+// ✅ Wrap with Suspense for useSearchParams
+export default function NetatmoPage() {
+  return (
+    <Suspense fallback={<Skeleton.NetatmoPage />}>
+      <NetatmoContent />
+    </Suspense>
   );
 }

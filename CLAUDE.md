@@ -62,7 +62,11 @@ lib/
 ├── changelogService.js      # Version management + Firebase sync
 ├── errorMonitor.js          # Error detection + notification
 ├── logService.js            # Pre-configured logging functions
-└── formatUtils.js           # Utility functions (es. formatHoursToHHMM)
+├── formatUtils.js           # Utility functions (es. formatHoursToHHMM)
+└── [external-api]/          # Pattern per integrazioni API esterne
+    ├── api.js               # API wrapper (es. netatmoApi.js)
+    ├── service.js           # State management + Firebase (es. netatmoService.js)
+    └── tokenHelper.js       # Token management per OAuth APIs (es. netatmoTokenHelper.js)
 ```
 
 ## Componenti UI Principali
@@ -179,6 +183,61 @@ const { needsUpdate, firebaseVersion, checkVersion, isChecking } = useVersion();
 - Esegue comandi se automatico
 - Clear semi-manual quando scheduled change
 
+### External APIs Pattern (`/api/[external-api]/*`)
+
+Pattern generico per integrare API esterne (es. Netatmo, Stripe, Twilio, etc.).
+
+**Struttura consigliata**:
+```
+app/api/[external-api]/
+├── callback/route.js        # OAuth callback (se necessario)
+├── [endpoint]/route.js      # Endpoint API specifici
+
+lib/[external-api]/
+├── api.js                   # API wrapper con funzioni per ogni endpoint
+├── service.js               # State management + Firebase operations
+└── tokenHelper.js           # Token management (se OAuth required)
+```
+
+**Token Helper Pattern** (per OAuth 2.0 APIs):
+```javascript
+// lib/[external-api]/tokenHelper.js
+export async function getValidAccessToken() {
+  // 1. Fetch refresh_token from Firebase
+  // 2. Exchange for access_token
+  // 3. If new refresh_token → save to Firebase
+  // 4. Handle errors (expired, invalid, etc.)
+  return { accessToken, error, message };
+}
+```
+
+**API Route Pattern**:
+```javascript
+// app/api/[external-api]/[endpoint]/route.js
+import { getValidAccessToken, handleTokenError } from '@/lib/[external-api]/tokenHelper';
+
+export async function GET() {
+  const { accessToken, error, message } = await getValidAccessToken();
+  if (error) {
+    const { status, reconnect } = handleTokenError(error);
+    return Response.json({ error: message, reconnect }, { status });
+  }
+
+  // Use accessToken for API call
+  const data = await externalAPI.getData(accessToken);
+  return Response.json(data);
+}
+```
+
+**Client Reconnect Pattern**:
+```javascript
+const response = await fetch('/api/external-api/endpoint');
+const data = await response.json();
+if (data.reconnect) {
+  setConnected(false); // Show auth/connection UI
+}
+```
+
 ## Firebase Schema Essenziale
 
 ```
@@ -221,6 +280,13 @@ changelog/
     ├── version, date, type
     ├── changes[]
     └── timestamp
+
+[external-api]/              # Pattern per integrazioni esterne (es. netatmo/)
+├── refresh_token            # OAuth refresh token persistente
+├── [config]/                # Configurazione API (es. home_id, device_id, etc.)
+├── [data]/                  # Cache dati fetched (es. topology, status)
+│   └── updated_at           # timestamp last fetch
+└── [automation]/            # Regole automazione custom (opzionale)
 ```
 
 **Export Pattern**: `export { db, db as database };` (NO Edge runtime)
@@ -586,6 +652,36 @@ Log: "✅ Maintenance tracked: +1.2min → 47.5h total"
 - ✅ Auto-recovery: se cron salta, prossima esecuzione recupera minuti persi
 - ✅ Accuratezza 100%: calcolo basato su timestamp Firebase, non su polling client
 - ❌ NO più tracking in StovePanel (era inaffidabile, solo quando app aperta)
+
+### OAuth Token Management Flow (Generic Pattern)
+```
+Client request → API route
+  ↓
+getValidAccessToken()  // Token helper
+  ↓
+Fetch refresh_token from Firebase
+  ↓
+If not exists → return { error: 'NOT_CONNECTED', reconnect: true }
+  ↓
+Exchange refresh_token for access_token (External OAuth API)
+  ↓
+If invalid_grant/expired → clear Firebase + return { error: 'TOKEN_EXPIRED', reconnect: true }
+  ↓
+If success:
+  - If new refresh_token returned → update Firebase automatically
+  - Return { accessToken: 'xxx', error: null }
+  ↓
+API route uses accessToken for external API call
+  ↓
+Return data to client (+ reconnect flag se necessario)
+```
+
+**Vantaggi Pattern**:
+- ⚡ Zero config client-side (tutto server-side)
+- 🔒 Refresh token sicuro in Firebase, access token temporaneo
+- ♻️ Auto-refresh: token rinnovato ad ogni chiamata
+- 🔄 Sessione permanente: finché app usata, nessun re-login
+- 🚨 Flag `reconnect` per UI feedback quando serve riconnettere
 
 ### Version Enforcement Flow
 ```
@@ -1212,6 +1308,24 @@ find app -name "*.js" -exec grep -l "useState" {} \;  # Find client components
 
 ## Testing & Quality Assurance
 
+### 🚨 REGOLA FONDAMENTALE: Test-Driven Development
+**OGNI modifica o nuova implementazione DEVE essere accompagnata da unit tests aggiornati o nuovi.**
+
+**Quando creare/aggiornare test**:
+- ✅ Nuove funzioni in `lib/` → Creare test in `lib/__tests__/`
+- ✅ Nuovi componenti UI → Creare test in `app/components/ui/__tests__/`
+- ✅ Modifiche a logica esistente → Aggiornare test esistenti
+- ✅ Fix bug → Aggiungere test che verifica il fix
+- ✅ Nuove API routes → Test con mock delle dipendenze
+- ✅ Nuovi custom hooks → Test in `app/hooks/__tests__/`
+
+**Workflow consigliato**:
+1. Implementa feature/fix
+2. Crea/aggiorna test
+3. Verifica coverage: `npm run test:coverage`
+4. Build production: `npm run build`
+5. Commit solo se test passano
+
 ### Setup e Configurazione
 - **Framework**: Jest 30.2 + Testing Library React 16.3
 - **Test Environment**: jsdom per simulazione browser
@@ -1334,13 +1448,21 @@ AUTH0_BASE_URL=http://localhost:3000
 AUTH0_CLIENT_ID=
 AUTH0_CLIENT_SECRET=
 
-# Netatmo
-NEXT_PUBLIC_NETATMO_CLIENT_ID=
-NETATMO_CLIENT_SECRET=
+# External APIs (pattern esempio con Netatmo)
+NEXT_PUBLIC_[EXTERNAL_API]_CLIENT_ID=
+NEXT_PUBLIC_[EXTERNAL_API]_REDIRECT_URI=http://localhost:3000/api/[external-api]/callback
+[EXTERNAL_API]_CLIENT_ID=
+[EXTERNAL_API]_CLIENT_SECRET=
+[EXTERNAL_API]_REDIRECT_URI=http://localhost:3000/api/[external-api]/callback
 
 # Scheduler
 CRON_SECRET=your-secret-here
 ```
+
+**⚠️ IMPORTANTE External APIs OAuth**:
+- `REDIRECT_URI` deve corrispondere a porta e path corretto dell'app
+- Il redirect URI deve essere registrato nella console developer dell'API esterna
+- Usa HTTPS in production, HTTP solo per localhost/testing
 
 ## Task Priorities
 
@@ -1349,6 +1471,7 @@ CRON_SECRET=your-secret-here
 3. 🟡 **PREFER** editing existing files
 4. 🟢 **MAINTAIN** coding patterns
 5. 🔵 **TEST** `npm run build` before commit
+6. ⚡ **ALWAYS** create or update unit tests when modifying or implementing new features
 
 ## Critical Decision Matrix
 
@@ -1360,6 +1483,6 @@ CRON_SECRET=your-secret-here
 
 ---
 
-**Last Updated**: 2025-10-15
-**Version**: 1.5.7
+**Last Updated**: 2025-10-16
+**Version**: 1.5.8
 **Author**: Federico Manfredi

@@ -8,3 +8,4 @@ export { default as Pagination } from './Pagination';
 export { default as Skeleton } from './Skeleton';
 export { default as ErrorAlert, ErrorBadge } from './ErrorAlert';
 export { default as Footer } from './Footer';
+export { default as Banner } from './Banner';

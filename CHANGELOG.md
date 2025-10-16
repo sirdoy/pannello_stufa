@@ -5,6 +5,39 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.5.10] - 2025-10-16
+
+### Modificato
+- **CLAUDE.md drasticamente ottimizzato**: ridotto da 1538 a 647 righe (-58% context usage per Claude)
+- **Sezione Testing eliminata**: riferimento completo a `README-TESTING.md` invece di duplicazione (~127 righe risparmiate)
+- **Pattern codice sintetizzati**: sostituiti esempi lunghi con riferimenti a implementazioni reali nel codebase
+- **Sezioni compattate**: Sistema Manutenzione, Monitoring Cronjob, Sistema Errori ora con overview + link documentazione dedicata
+- **Pattern UI compattati**: Dropdown, Modal, Collapse, Badge con sintesi + riferimenti file reali (Navbar.js, MaintenanceBar.js, etc.)
+- **Info critiche mantenute**: tutte le informazioni essenziali (architettura, API routes, Firebase schema, versioning, best practices) ancora presenti
+
+### Tecnico
+- Context usage ridotto da ~90k a ~38k token (-58%)
+- Zero perdita informazioni: uso di riferimenti a file esistenti (README-TESTING.md, ERRORS-DETECTION.md, codice reale)
+- Approccio "overview + riferimenti" per sezioni dettagliate
+- CLAUDE.md ora più veloce da processare e più efficiente per iterazioni Claude Code
+
+## [1.5.9] - 2025-10-16
+
+### Aggiunto
+- **Netatmo UI ottimizzata**: report temperature compatto in home page con polling automatico ogni 30 secondi
+- **Badge tipo dispositivo**: termostato/valvola visualizzati sia in home che in pagina dettagli Netatmo
+- **Ordinamento intelligente**: termostati sempre per primi, poi valvole, poi stanze ordinate per temperatura
+
+### Modificato
+- **Filtro dispositivi**: relè Netatmo (NAPlug) rimossi da visualizzazione (non utili per monitoraggio temperature)
+
+### Corretto
+- **Firebase undefined handling**: aggiunto filtro automatico valori `undefined` in netatmoService per prevenire errori write operations
+
+### Tecnico
+- Pattern `filterUndefined()` documentato in CLAUDE.md per riutilizzo in future integrazioni API
+- Sort logic: termostati (device_type=NATherm1) priorità massima, poi valvole (NRV), poi stanze per temperatura
+
 ## [1.5.8] - 2025-10-16
 
 ### Aggiunto

@@ -84,81 +84,30 @@ lib/
 ```
 
 ### Banner
-```jsx
-// Componente riutilizzabile per alert, warnings e messaggi informativi
-<Banner
-  variant="info|warning|error|success"
-  icon="⚠️"
-  title="Titolo Banner"
-  description="Descrizione messaggio"
-  actions={<Button onClick={handleAction}>Azione</Button>}
-  dismissible
-  onDismiss={() => setShow(false)}
-/>
-
-// Con JSX inline per description e actions
-<Banner
-  variant="warning"
-  icon="🧹"
-  title="Pulizia Richiesta"
-  description={<>Testo con <strong>bold</strong></>}
-  actions={
-    <>
-      <Button variant="success" onClick={confirm}>Conferma</Button>
-      <Button variant="outline" onClick={cancel}>Annulla</Button>
-    </>
-  }
-/>
-```
-- **Props**: `variant`, `icon`, `title`, `description`, `actions`, `dismissible`, `onDismiss`, `children`, `className`
-- **Varianti**: `info` (blu), `warning` (arancione), `error` (rosso), `success` (verde)
-- **Icone default**: info=ℹ️, warning=⚠️, error=❌, success=✅
-- **Layout responsive**: sm breakpoint per mobile/desktop
-- **Stile**: Glassmorphism consistente con resto app
+Componente riutilizzabile per alert/warnings con 4 varianti (info/warning/error/success).
+- **Props**: `variant`, `icon`, `title`, `description`, `actions`, `dismissible`, `onDismiss`
+- **Supporto JSX inline** per `description` e `actions`
+- **Esempio**: Vedi `app/components/ui/Banner.js`
 
 ### Select
+Dropdown con glassmorphism automatico e z-[100].
 ```jsx
 <Select value={power} onChange={setPower}
         options={[{value: 1, label: 'P1'}]} disabled={!isOn} />
-// Dropdown auto-glassmorphism + z-[100]
-```
-
-### Skeleton
-```jsx
-if (loading) return <Skeleton.StovePanel />;
 ```
 
 ### Navbar
 - **Desktop**: Links orizzontali + dropdown utente (nome + logout)
 - **Mobile**: Hamburger menu con slide-down
-- **User Dropdown Pattern**:
-  - State: `const [dropdownOpen, setDropdownOpen] = useState(false)`
-  - Ref: `const dropdownRef = useRef(null)` per click outside detection
-  - Click outside: `useEffect` con `mousedown` listener + `ref.current.contains(event.target)`
-  - Escape key: `useEffect` con `keydown` listener + `e.key === 'Escape'`
-  - Route change: chiudi automaticamente dropdown in `useEffect([pathname])`
-- **Responsive**: Glassmorphism + z-[100] per dropdown, text truncation con breakpoint (max-w-[80px] md-xl, max-w-[120px] xl+)
+- **Pattern**: Vedi Navbar.js:89-145 per dropdown pattern (click outside + Escape key + route change)
 
 ## Custom Hooks
 
 ### useVersionCheck (Soft Notification)
-```javascript
-const { hasNewVersion, latestVersion, showWhatsNew, dismissWhatsNew, dismissBadge } = useVersionCheck();
-```
-- Semantic version comparison
-- localStorage tracking
-- Badge "NEW" + WhatsNewModal dismissibile
+Semantic version comparison, localStorage tracking, badge "NEW" + WhatsNewModal dismissibile.
 
 ### useVersion (Hard Enforcement)
-```javascript
-const { needsUpdate, firebaseVersion, checkVersion, isChecking } = useVersion();
-```
-- Global context state
-- On-demand check (chiamato da StovePanel ogni 5s)
-- Semantic version comparison (`compareVersions(local, firebase) < 0`)
-- Disabilitato in ambiente locale (development, localhost)
-- ForceUpdateModal bloccante SOLO se versione locale < Firebase
-- Log detection: `🔧 Ambiente locale: versioning enforcement disabilitato`
+Global context state, on-demand check ogni 5s, ForceUpdateModal bloccante SOLO se versione locale < Firebase.
 
 ## API Routes Principali
 
@@ -187,45 +136,26 @@ const { needsUpdate, firebaseVersion, checkVersion, isChecking } = useVersion();
 
 Pattern generico per integrare API esterne (es. Netatmo, Stripe, Twilio, etc.).
 
-**Struttura consigliata**:
+**Struttura**:
 ```
 app/api/[external-api]/
 ├── callback/route.js        # OAuth callback (se necessario)
 ├── [endpoint]/route.js      # Endpoint API specifici
 
 lib/[external-api]/
-├── api.js                   # API wrapper con funzioni per ogni endpoint
-├── service.js               # State management + Firebase operations
+├── api.js                   # API wrapper
+├── service.js               # State management + Firebase
 └── tokenHelper.js           # Token management (se OAuth required)
 ```
 
-**Token Helper Pattern** (per OAuth 2.0 APIs):
+**Token Helper Pattern** (OAuth 2.0):
 ```javascript
-// lib/[external-api]/tokenHelper.js
 export async function getValidAccessToken() {
   // 1. Fetch refresh_token from Firebase
   // 2. Exchange for access_token
   // 3. If new refresh_token → save to Firebase
   // 4. Handle errors (expired, invalid, etc.)
   return { accessToken, error, message };
-}
-```
-
-**API Route Pattern**:
-```javascript
-// app/api/[external-api]/[endpoint]/route.js
-import { getValidAccessToken, handleTokenError } from '@/lib/[external-api]/tokenHelper';
-
-export async function GET() {
-  const { accessToken, error, message } = await getValidAccessToken();
-  if (error) {
-    const { status, reconnect } = handleTokenError(error);
-    return Response.json({ error: message, reconnect }, { status });
-  }
-
-  // Use accessToken for API call
-  const data = await externalAPI.getData(accessToken);
-  return Response.json(data);
 }
 ```
 
@@ -237,6 +167,8 @@ if (data.reconnect) {
   setConnected(false); // Show auth/connection UI
 }
 ```
+
+**Esempio implementazione completa**: Vedi `lib/netatmo/` per pattern OAuth con auto-refresh e error handling.
 
 ## Firebase Schema Essenziale
 
@@ -294,289 +226,95 @@ changelog/
 ## Modalità Operative
 
 ### Manual 🔧
-- Scheduler disabilitato
-- Controllo manuale completo
+Scheduler disabilitato, controllo manuale completo.
 
 ### Automatic ⏰
-- Scheduler abilitato
-- UI mostra prossimo cambio: "🔥 Accensione alle 18:30 del 04/10 (P4, V3)"
+Scheduler abilitato. UI mostra prossimo cambio: "🔥 Accensione alle 18:30 del 04/10 (P4, V3)".
 
 ### Semi-Manual ⚙️
-- Override temporaneo
-- Trigger: Azione manuale homepage mentre in auto
-  - ✅ Ignite/Shutdown manuali → attiva sempre
-  - ✅ SetPower/SetFan manuali → attiva solo se stufa ON
-  - ❌ Comandi da cron (source='scheduler') → NON attiva
-- Calcola `returnToAutoAt` = prossimo cambio scheduler
-- UI: "Ritorno auto: 18:30 del 04/10" + pulsante "↩️ Torna in Automatico"
+Override temporaneo. Trigger: azione manuale homepage mentre in auto.
+- ✅ Ignite/Shutdown manuali → attiva sempre
+- ✅ SetPower/SetFan manuali → attiva solo se stufa ON
+- ❌ Comandi da cron (source='scheduler') → NON attiva
+
+Calcola `returnToAutoAt` = prossimo cambio scheduler. UI mostra countdown + pulsante "↩️ Torna in Automatico".
 
 ## Sistema Manutenzione Stufa 🔧
 
-### Overview
 Sistema autonomo H24 per tracking ore utilizzo e gestione pulizia periodica.
 
-**Caratteristiche principali**:
+**Caratteristiche**:
 - ✅ Tracking automatico server-side (cron ogni minuto)
-- ✅ Funziona anche app chiusa (calcolo tempo reale da Firebase)
+- ✅ Funziona H24, anche app chiusa
 - ✅ Blocco automatico accensione quando pulizia richiesta
-- ✅ Configurazione flessibile ore target (default 50h)
-- ✅ Barra progresso visiva con colori dinamici
-- ✅ Auto-recovery se cron salta chiamate
+- ✅ Barra progresso visiva con colori dinamici + animazione shimmer ≥80%
 
 ### Funzioni maintenanceService.js
-
 ```javascript
-// Recupera dati manutenzione (con init default se non esiste)
-getMaintenanceData()
-
-// Aggiorna ore target configurazione
-updateTargetHours(hours)
-
-// CRITICO: Tracking automatico chiamato da cron (NON client-side!)
-// Calcola elapsed time da lastUpdatedAt e aggiorna currentHours
-trackUsageHours(stoveStatus)
-
-// Reset contatore dopo pulizia + log Firebase
-confirmCleaning(user)
-
-// Verifica se accensione consentita (blocco se needsCleaning)
-canIgnite()
-
-// Status completo: percentage, remainingHours, isNearLimit
-getMaintenanceStatus()
+getMaintenanceData()         // Recupera dati manutenzione (init default se non esiste)
+updateTargetHours(hours)     // Aggiorna ore target configurazione
+trackUsageHours(status)      // CRITICO: Tracking automatico da cron (NON client-side!)
+confirmCleaning(user)        // Reset contatore dopo pulizia + log Firebase
+canIgnite()                  // Verifica se accensione consentita (blocco se needsCleaning)
+getMaintenanceStatus()       // Status completo: percentage, remainingHours, isNearLimit
 ```
-
-### Configurazione (/maintenance page)
-
-**UI Elements**:
-- Card "Stato Attuale" con 3 metriche: Ore Utilizzo / Ore Target / Ore Rimanenti
-- Input numerico custom (range 1-1000h)
-- Preselezioni rapide: 25 / 50 / 75 / 100 / 150 / 200 ore
-- Default: 50h
-- Info ultima pulizia se disponibile
-
-**Validazione**:
-- Min: 1h, Max: 1000h
-- Controllo threshold dopo update: se currentHours >= targetHours → needsCleaning=true
 
 ### UI Components
+- **MaintenanceBar**: Barra progresso integrata in card "Stato Stufa" con collapse/expand intelligente
+  - Auto-expand SOLO prima volta quando percentage ≥80%
+  - localStorage persistence per preferenza utente
+  - Colori dinamici: verde (0-59%) → giallo (60-79%) → arancione (80-99%) → rosso (100%+)
+  - Implementazione: `app/components/MaintenanceBar.js:89-180`
+- **Banner Pulizia**: Card bloccante quando needsCleaning=true con conferma pulizia
 
-**MaintenanceBar** (integrato in card "Stato Stufa"):
-```jsx
-{/* Inside StovePanel Hero Card, after Mode Indicator */}
-{maintenanceStatus && (
-  <>
-    <div className="relative my-6">
-      <div className="absolute inset-0 flex items-center">
-        <div className="w-full border-t border-neutral-200"></div>
-      </div>
-      <div className="relative flex justify-center text-sm">
-        <span className="px-3 bg-white/60 text-neutral-500 font-medium rounded-full">Stato Manutenzione</span>
-      </div>
-    </div>
-    <MaintenanceBar maintenanceStatus={maintenanceStatus} />
-  </>
-)}
-```
-- **Posizione**: integrato dentro card principale "Stato Stufa", dopo separator "Stato Manutenzione"
-- **Collapse/Expand intelligente**: mini-bar compatta di default, expand on-demand
-- **Auto-expand**: apertura automatica SOLO prima volta quando percentage ≥80%
-- **Persistenza localStorage**: preferenza utente rispettata (chiusura manuale bloccata da auto-expand)
-- **Collapsed state**: badge percentuale colorato + info ore (HH:MM format)
-- **Expanded state**: progress bar + ore rimanenti (NO link, già in Navbar)
-- **Styling integrato**: `bg-white/40` (più leggero) per blend con card principale glassmorphism
-- Colori dinamici badge/bar:
-  - 0-59%: verde (`bg-success-600`)
-  - 60-79%: giallo (`bg-yellow-500`)
-  - 80-99%: arancione (`bg-orange-500`)
-  - 100%+: rosso (`bg-danger-600`)
-- Animazione shimmer quando ≥80% (warning visivo)
-- Animazione collapse: CSS Module con `max-height(150px) + opacity` transizione 300ms
+### Tracking Server-Side (CRITICO)
+**Perché server-side**: Client-side tracking funziona SOLO se app aperta. Server-side cron funziona H24.
 
-**Banner Pulizia** (quando needsCleaning=true):
-- Card arancione bloccante sopra StovePanel
-- Icona 🧹 + messaggio chiaro
-- Pulsante "✓ Ho Pulito la Stufa" → conferma pulizia
-- Pulsante "⚙️ Vai alle Impostazioni" → link /maintenance
-- Disabilita tutti i controlli stufa fino a conferma
-
-### Blocco Accensione
-
-**API Routes modificate**:
-```javascript
-// /api/stove/ignite
-const allowed = await canIgnite();
-if (!allowed) return Response.json({ error: 'Maintenance required' }, { status: 403 });
-
-// /api/scheduler/check
-const allowed = await canIgnite();
-if (!allowed) return Response.json({ status: 'MANUTENZIONE_RICHIESTA' });
-```
-
-**UI Disabilitata**:
-- Pulsante "🔥 Accendi" → `disabled={needsMaintenance}`
-- Pulsante "❄️ Spegni" → `disabled={needsMaintenance}`
-- Select Ventola → `disabled={needsMaintenance}`
-- Select Potenza → `disabled={needsMaintenance}`
-
-### Tracking Server-Side (CRITICO!)
-
-**Perché Server-Side**:
-- ❌ Client-side polling (vecchia implementazione): tracking SOLO se app aperta
-- ✅ Server-side cron: tracking H24, anche app chiusa
-
-**Implementazione**:
-```javascript
-// /api/scheduler/check (chiamato ogni minuto da cron esterno)
-const statusRes = await fetch(`${baseUrl}/api/stove/status`);
-const currentStatus = statusJson?.StatusDescription || 'unknown';
-
-// Track usage automaticamente
-const track = await trackUsageHours(currentStatus);
-if (track.tracked) {
-  console.log(`✅ Maintenance tracked: +${track.elapsedMinutes}min → ${track.newCurrentHours}h`);
-}
-```
-
-**Logica trackUsageHours()**:
+**Implementazione**: `/api/scheduler/check` chiama `trackUsageHours()` ogni minuto.
+**Logica**:
 1. Check status WORK → se no, skip
-2. Fetch lastUpdatedAt da Firebase
-3. Calcola `elapsed = now - lastUpdatedAt` (minuti)
-4. Se elapsed < 0.5min → skip (troppo presto)
-5. Converti elapsed in ore: `hoursToAdd = elapsed / 60`
-6. Update Firebase: `currentHours += hoursToAdd`, `lastUpdatedAt = now`
-7. Se `currentHours >= targetHours` → `needsCleaning = true`
+2. Calcola `elapsed = now - lastUpdatedAt` (Firebase)
+3. Se elapsed < 0.5min → skip
+4. Update Firebase: `currentHours += elapsed/60`, `lastUpdatedAt = now`
+5. Se `currentHours >= targetHours` → `needsCleaning = true`
 
-**Auto-Recovery**:
-Se cron salta 10 chiamate (10 minuti), la successiva chiamata recupera tutti i 10 minuti automaticamente calcolando elapsed time corretto.
+**Auto-recovery**: Se cron salta chiamate, prossima esecuzione recupera minuti persi automaticamente.
 
-### Log e Monitoring
-
-**Pulizia Confermata**:
-```javascript
-await logUserAction('Pulizia stufa', '47.50h', {
-  previousHours: 47.5,
-  targetHours: 50,
-  cleanedAt: '2025-10-08T...',
-  source: 'manual'
-});
-```
-
-**Console Logs**:
-- `✅ Maintenance tracked: +1.2min → 47.5h total` (ogni minuto se WORK)
-- `⚠️ Maintenance threshold reached: 50.02h / 50h` (quando supera)
-
-### Best Practices
-
-1. **Configurazione iniziale**: Imposta targetHours adeguato al tipo di pellet (20-100h tipico)
-2. **Monitoring**: Controlla barra progresso in home regolarmente
-3. **Warning 80%**: Animazione shimmer indica pulizia imminente
-4. **Reset pulizia**: SEMPRE confermare dopo aver pulito fisicamente la stufa
-5. **Log storico**: Verificare in `/log` frequenza pulizie per ottimizzare targetHours
-
-### Troubleshooting
-
-**Contatore non avanza**:
-1. Verifica cron attivo: `/api/scheduler/check` chiamato ogni minuto
-2. Check status stufa: deve essere "WORK" per tracking
-3. Verifica Firebase: `lastUpdatedAt` deve aggiornarsi ogni minuto
-4. Console logs: cerca `✅ Maintenance tracked`
-
-**Blocco accensione errato**:
-1. Check Firebase: `needsCleaning` deve essere `false`
-2. Verifica `currentHours < targetHours`
-3. Se bloccato erroneamente: reset manuale Firebase o re-conferma pulizia
-
-**Tracking impreciso**:
-- Normal: precisione ±1 minuto (dipende da frequenza cron)
-- Se cron salta chiamate: auto-recovery recupera tempo perso
-- Per massima accuratezza: cron job stabile ogni 60 secondi
+**Dettagli completi**: Vedi sezione Sistema Manutenzione in `lib/maintenanceService.js:1-350`
 
 ## Sistema Monitoring Cronjob 🔍
 
-### Overview
-Sistema autonomo per monitoraggio affidabilità cronjob scheduler.
+Sistema per monitoraggio affidabilità cronjob scheduler.
 
-**Caratteristiche principali**:
-- ✅ Salvataggio timestamp Firebase ad ogni chiamata cron
-- ✅ Monitoring realtime client-side su Firebase listener
-- ✅ Alert automatico se cron inattivo >5 minuti
-- ✅ Link diretto a console cron per riavvio immediato
-- ✅ Auto-hide quando cron riprende a funzionare
+**Features**:
+- Salvataggio timestamp Firebase ad ogni chiamata cron (`cronHealth/lastCall`)
+- Firebase listener realtime client-side
+- Alert automatico se cron inattivo >5 minuti
+- Auto-hide quando cron riprende
 
-### Implementazione Server-Side
+**Implementazione**:
+- Server: `/api/scheduler/check` salva timestamp all'inizio esecuzione
+- Client: `CronHealthBanner` con Firebase listener + check ogni 30s
+- UI: Variante inline integrata in card "Stato Stufa" (default) o banner standalone
 
-**Endpoint `/api/scheduler/check`**:
-```javascript
-// SEMPRE all'inizio dell'esecuzione (dopo auth check)
-const cronHealthTimestamp = new Date().toISOString();
-await set(ref(db, 'cronHealth/lastCall'), cronHealthTimestamp);
-console.log(`✅ Cron health updated: ${cronHealthTimestamp}`);
-```
+**Codice**: Vedi `app/components/CronHealthBanner.js:25-85` per pattern Firebase listener.
 
-**Firebase Schema**:
-```
-cronHealth/
-└── lastCall  # ISO string UTC, es: "2025-10-09T17:26:00.000Z"
-```
+## Sistema Rilevamento Errori 🚨
 
-### Implementazione Client-Side
+**Overview**: Sistema autonomo per rilevamento, monitoraggio e visualizzazione errori stufa in tempo reale.
 
-**Componente CronHealthBanner**:
-```jsx
-import { ref, onValue } from 'firebase/database';
-import { db } from '@/lib/firebase';
-import Banner from './ui/Banner';
+**Features**:
+- Database 23 codici errore con severità (INFO/WARNING/ERROR/CRITICAL) e suggerimenti risoluzione
+- Badge errore pulsante con animazione pulse nel display status
+- ErrorAlert banner con suggerimenti e link storico errori
+- Browser notifications per errori critici
+- Logging persistente su Firebase con stato risoluzione
 
-// Firebase listener realtime
-useEffect(() => {
-  const cronHealthRef = ref(db, 'cronHealth/lastCall');
-  const unsubscribe = onValue(cronHealthRef, (snapshot) => {
-    if (snapshot.exists()) {
-      setLastCallTime(snapshot.val());
-    }
-  });
-  return () => unsubscribe();
-}, []);
-
-// Check health ogni 30s
-useEffect(() => {
-  const checkCronHealth = () => {
-    const diffMinutes = Math.floor((now - lastCallDate) / 1000 / 60);
-    setShowBanner(diffMinutes > 5);  // Threshold 5 minuti
-  };
-  const interval = setInterval(checkCronHealth, 30000);
-  return () => clearInterval(interval);
-}, [lastCallTime]);
-```
-
-**Integrazione UI**:
-- **Due varianti disponibili**: `variant="banner"` (standalone) e `variant="inline"` (integrato)
-- **Variante inline** (default in StovePanel): integrato dentro card "Stato Stufa", dopo Mode Indicator
-  - Layout compatto orizzontale responsive (full-width mobile, auto desktop)
-  - Design simile a Mode Indicator per consistenza visiva
-  - Icona warning in box 12x12 + testo info + pulsante azione inline
-- **Variante banner**: full-width standalone sopra card (per uso in altre pagine)
-- Mostra minuti trascorsi dall'ultima chiamata con link diretto riavvio cron
-- Condizionale: `if (!showBanner) return null` (auto-hide quando cron attivo)
-
-### Troubleshooting
-
-**Banner non scompare dopo riavvio cron**:
-1. Verifica Firebase: `cronHealth/lastCall` deve aggiornarsi
-2. Check console: cerca log `✅ Cron health updated`
-3. Attendi 30s: client-side check ha intervallo 30s
-4. Force refresh pagina se necessario
-
-**Banner appare anche con cron attivo**:
-1. Verifica timezone: timestamp deve essere UTC (ISO string)
-2. Check calcolo diff: `(now - lastCallDate) / 1000 / 60`
-3. Threshold: attualmente 5 minuti, modificabile in CronHealthBanner.js
-
-**Firebase listener non funziona**:
-1. Verifica Firebase config in `.env.local`
-2. Check Firebase rules: read access su `cronHealth/`
-3. Console DevTools: cerca errori Firebase SDK
+**Implementazione completa**: 📖 Vedi `ERRORS-DETECTION.md` per:
+- Database ERROR_CODES completo
+- UI components (badge, alert, pagina storico)
+- Data flow e testing
+- Best practices e troubleshooting
 
 ## Data Flow Essenziale
 
@@ -597,115 +335,43 @@ Update UI
 ```
 GET /api/scheduler/check?secret=xxx
   ↓
-Verify CRON_SECRET (return 401 if invalid)
+Verify CRON_SECRET (401 if invalid)
   ↓
-Save timestamp to Firebase: cronHealth/lastCall = now (ISO UTC)
+Save cronHealth/lastCall timestamp (ISO UTC)
   ↓
-Check maintenance status (canIgnite)
-  ↓
-If needsCleaning → skip + return MANUTENZIONE_RICHIESTA
+Check maintenance (canIgnite) → skip if needsCleaning
   ↓
 Check mode (manual/auto/semi-manual)
   ↓
-If auto: fetch schedule + compare time
-  ↓
-Execute actions (ignite/shutdown/set) con source='scheduler'
+If auto: fetch schedule + execute actions (source='scheduler')
   ↓
 If scheduled change → clear semi-manual
   ↓
-Track usage hours: trackUsageHours(currentStatus)
-  ↓
-Log: "✅ Cron health updated: {timestamp}"
+Track usage: trackUsageHours(currentStatus)
 ```
 
-**Cron Health Monitoring**:
-- Timestamp salvato SEMPRE ad ogni chiamata (anche se scheduler disabilitato)
-- Usato da `CronHealthBanner` per rilevare cron inattivo >5min
-- Client-side check ogni 30s su Firebase `cronHealth/lastCall`
-- Banner warning automatico in home con link diretto riavvio cron
+**CRITICO**: Maintenance tracking è **server-side via cron**, non client-side!
 
-### Maintenance Tracking Flow (Autonomo H24)
-```
-Cron ogni minuto → /api/scheduler/check
-  ↓
-Fetch stove status (WORK/OFF/etc)
-  ↓
-trackUsageHours(status)
-  ↓
-If status !== WORK → return (no tracking)
-  ↓
-Calculate elapsed = now - lastUpdatedAt (Firebase)
-  ↓
-If elapsed < 0.5min → return (too soon)
-  ↓
-Add elapsed time to currentHours
-  ↓
-Update Firebase: currentHours, lastUpdatedAt
-  ↓
-If currentHours >= targetHours → set needsCleaning=true
-  ↓
-Log: "✅ Maintenance tracked: +1.2min → 47.5h total"
-```
-
-**CRITICO**: Tracking è **server-side via cron**, non client-side!
-- ✅ Funziona H24, anche se nessuno ha app aperta
-- ✅ Auto-recovery: se cron salta, prossima esecuzione recupera minuti persi
-- ✅ Accuratezza 100%: calcolo basato su timestamp Firebase, non su polling client
-- ❌ NO più tracking in StovePanel (era inaffidabile, solo quando app aperta)
-
-### OAuth Token Management Flow (Generic Pattern)
+### OAuth Token Management Flow
 ```
 Client request → API route
   ↓
-getValidAccessToken()  // Token helper
+getValidAccessToken() // Token helper
   ↓
 Fetch refresh_token from Firebase
   ↓
-If not exists → return { error: 'NOT_CONNECTED', reconnect: true }
+If not exists → { error: 'NOT_CONNECTED', reconnect: true }
   ↓
-Exchange refresh_token for access_token (External OAuth API)
+Exchange refresh_token for access_token
   ↓
-If invalid_grant/expired → clear Firebase + return { error: 'TOKEN_EXPIRED', reconnect: true }
+If expired → clear Firebase + { error: 'TOKEN_EXPIRED', reconnect: true }
   ↓
-If success:
-  - If new refresh_token returned → update Firebase automatically
-  - Return { accessToken: 'xxx', error: null }
+If success: auto-save new refresh_token if returned
   ↓
-API route uses accessToken for external API call
-  ↓
-Return data to client (+ reconnect flag se necessario)
+Return { accessToken: 'xxx', error: null }
 ```
 
-**Vantaggi Pattern**:
-- ⚡ Zero config client-side (tutto server-side)
-- 🔒 Refresh token sicuro in Firebase, access token temporaneo
-- ♻️ Auto-refresh: token rinnovato ad ogni chiamata
-- 🔄 Sessione permanente: finché app usata, nessun re-login
-- 🚨 Flag `reconnect` per UI feedback quando serve riconnettere
-
-### Version Enforcement Flow
-```
-App mount → VersionProvider initializes
-  ↓
-StovePanel polling → checkVersion() ogni 5s
-  ↓
-Check isLocalEnvironment() → Se true, early return (no modal)
-  ↓
-Firebase fetch latest version
-  ↓
-Semantic comparison: compareVersions(local, firebase)
-  ↓
-If local < firebase → needsUpdate = true
-  ↓
-VersionEnforcer → ForceUpdateModal (blocking, z-10000)
-  ↓
-User clicks "Aggiorna Ora" → window.location.reload()
-```
-**Vantaggi**:
-- 12x più veloce (5s vs 60s)
-- Zero overhead, single Firebase read
-- No interruzioni in dev (localhost detection)
-- Modal SOLO se update realmente necessario (semantic comparison)
+**Vantaggi**: Zero config client-side, sessione permanente, auto-refresh, flag `reconnect` per UI feedback.
 
 ## Versioning Workflow (CRITICO)
 
@@ -715,246 +381,51 @@ User clicks "Aggiorna Ora" → window.location.reload()
 - **PATCH** (0.0.x): Bug fixes
 
 ### 2. Update Files
-```javascript
-// lib/version.js
-export const APP_VERSION = '1.4.1';
-export const LAST_UPDATE = '2025-10-07';
-export const VERSION_HISTORY = [
-  { version: '1.4.1', date: '2025-10-07', type: 'patch', changes: [...] }
-];
-
-// package.json
-{ "version": "1.4.1" }
-
-// CHANGELOG.md
-## [1.4.1] - 2025-10-07
-### Changed
-- ...
-```
+Aggiorna sempre: `lib/version.js`, `package.json`, `CHANGELOG.md`
 
 ### 3. Deployment + Sync Firebase
 ```bash
 npm run build
-# Deploy app (vercel/firebase/etc)
+# Deploy app
 node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require('./lib/version').VERSION_HISTORY)"
 ```
 
-**⚠️ OBBLIGATORIO**: Sync Firebase entro 5s dal deploy, altrimenti utenti vedono ForceUpdateModal anche con versione corretta.
+**⚠️ OBBLIGATORIO**: Sync Firebase entro 5s dal deploy.
 
-### 4. Soft vs Hard Updates
-- **Soft**: Badge "NEW" + modal dismissibile (minor/patch)
-- **Hard**: ForceUpdateModal bloccante (major/critical fixes)
-
-### 5. Version Enforcement Technical Details
+### 4. Version Enforcement Technical Details
 
 **Funzioni Helper** (`app/context/VersionContext.js`):
-
-```javascript
-// Confronto semantico versioni
-compareVersions(v1, v2)
-// Returns: -1 se v1 < v2, 0 se v1 === v2, 1 se v1 > v2
-// Esempio: compareVersions('1.4.2', '1.5.0') => -1
-
-// Detection ambiente locale
-isLocalEnvironment()
-// Returns: true se NODE_ENV=development || hostname in [localhost, 127.0.0.1, 192.168.*]
-```
+- `compareVersions(v1, v2)`: Confronto semantico (returns -1/0/1)
+- `isLocalEnvironment()`: Detection ambiente sviluppo
 
 **Comportamento**:
 - **Production**: Modal bloccante se `compareVersions(APP_VERSION, firebaseVersion) < 0`
-- **Development**: Modal sempre disabilitata, log `🔧 Ambiente locale: versioning enforcement disabilitato`
-- **Edge Case**: Se versione locale > Firebase (es. test nuova release), modal NON appare
+- **Development**: Modal sempre disabilitata
+- **Polling**: Check versione integrato in StovePanel polling 5s (12x più veloce vs 60s autonomo)
 
-**Perché Semantic Comparison**:
-- Evita modal per versioni uguali (1.4.3 === 1.4.3)
-- Evita modal per downgrade intenzionale Firebase (1.5.0 local vs 1.4.9 Firebase)
-- Attiva modal SOLO quando utente ha versione obsoleta (1.4.2 local vs 1.5.0 Firebase)
+### 5. Changelog Page
+**Ordinamento semantico CRITICO**: Firebase ordina solo per data. Applicare sempre `sortVersions()` client-side per garantire ordine corretto (1.4.4 > 1.4.3 > 1.4.2).
 
-### 6. Changelog Page Implementation
-
-**Pagina**: `app/changelog/page.js`
-
-**Data Source Priority**:
-1. **Firebase** (primary): `getChangelogFromFirebase()` da `changelogService.js`
-2. **Local fallback**: `VERSION_HISTORY` da `lib/version.js`
-3. **Indicatore fonte**: UI mostra "Firebase Realtime" o "Locale"
-
-**Ordinamento Semantico**:
-```javascript
-// CRITICO: Firebase ordina solo per data, serve ordinamento semantico client-side
-const sortVersions = (versions) => {
-  return [...versions].sort((a, b) => {
-    const [aMajor, aMinor, aPatch] = a.version.split('.').map(Number);
-    const [bMajor, bMinor, bPatch] = b.version.split('.').map(Number);
-
-    if (bMajor !== aMajor) return bMajor - aMajor;  // Confronta MAJOR
-    if (bMinor !== aMinor) return bMinor - aMinor;  // Confronta MINOR
-    return bPatch - aPatch;                          // Confronta PATCH
-  });
-};
-```
-
-**Perché Necessario**:
-- `changelogService.getChangelogFromFirebase()` ordina solo per data (Date object)
-- Quando più versioni hanno stessa data (es. 1.4.4, 1.4.3, 1.4.2 tutte 2025-10-07), ordine può essere errato
-- Ordinamento semantico garantisce sempre ordine corretto: 1.4.4 > 1.4.3 > 1.4.2 > 1.4.1
-
-**Pattern di Utilizzo**:
-```javascript
-const firebaseChangelog = await getChangelogFromFirebase();
-const sorted = sortVersions(firebaseChangelog);  // SEMPRE ordina semanticamente
-setChangelog(sorted);
-```
-
-**Badge "LATEST"**: Applicato al primo elemento dell'array ordinato (index === 0)
-
-**Colori per Tipo**:
-- `major`: 🚀 rosso/primary (breaking changes)
-- `minor`: ✨ verde/success (nuove features)
-- `patch`: 🔧 blu/info (bug fix)
+**Implementazione**: Vedi `app/changelog/page.js:45-65` per funzione sortVersions().
 
 ## Pattern Comuni Riutilizzabili
 
 ### Dropdown/Modal Pattern
-```javascript
-// 1. State + Ref
-const [isOpen, setIsOpen] = useState(false);
-const dropdownRef = useRef(null);
-
-// 2. Click Outside
-useEffect(() => {
-  const handleClickOutside = (event) => {
-    if (isOpen && dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setIsOpen(false);
-    }
-  };
-  document.addEventListener('mousedown', handleClickOutside);
-  return () => document.removeEventListener('mousedown', handleClickOutside);
-}, [isOpen]);
-
-// 3. Escape Key
-useEffect(() => {
-  const handleEscape = (e) => {
-    if (e.key === 'Escape' && isOpen) setIsOpen(false);
-  };
-  document.addEventListener('keydown', handleEscape);
-  return () => document.removeEventListener('keydown', handleEscape);
-}, [isOpen]);
-
-// 4. Route Change (se necessario)
-const pathname = usePathname();
-useEffect(() => {
-  setIsOpen(false);
-}, [pathname]);
-```
+**Pattern base**: State + Ref + Click Outside + Escape Key + Route Change (opzionale).
+**Implementazione**: Vedi `app/components/Navbar.js:89-145` per esempio completo.
 
 ### Confirmation Modal Pattern
-```jsx
-// Struttura visuale modal bloccante con backdrop
-{showModal && (
-  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[10000] p-4">
-    <Card glass className="max-w-md w-full p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Titolo Modal</h2>
-      <p className="text-gray-700 mb-6">Messaggio di conferma</p>
-
-      {/* Warning box opzionale */}
-      <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <p className="text-sm text-yellow-800">⚠️ Attenzione:</p>
-        <ul className="text-sm text-yellow-700 space-y-1 ml-4">
-          <li>• Effetto 1</li>
-          <li>• Effetto 2</li>
-        </ul>
-      </div>
-
-      {/* Pulsanti azione */}
-      <div className="flex gap-3">
-        <Button variant="outline" onClick={handleCancel} disabled={isLoading} className="flex-1">
-          ✕ Annulla
-        </Button>
-        <Button variant="danger" onClick={handleConfirm} disabled={isLoading} className="flex-1">
-          {isLoading ? '⏳ Attendere...' : '✓ Conferma'}
-        </Button>
-      </div>
-    </Card>
-  </div>
-)}
-```
-
-**Caratteristiche**:
-- **Backdrop**: `fixed inset-0 bg-black/50 backdrop-blur-sm` per overlay scuro con blur
-- **Z-index**: `z-[10000]` per modal bloccante (più alto di dropdown z-[100] e modal z-50)
-- **Centering**: `flex items-center justify-center` con padding responsive `p-4`
-- **Glassmorphism**: Card con prop `glass` per effetto vetro smerigliato
-- **Responsive**: `max-w-md w-full` per larghezza limitata su desktop, full-width su mobile
-- **Loading state**: pulsanti disabilitati durante operazione async
-- **Escape key**: gestito con pattern base (vedi Dropdown/Modal Pattern)
+**Struttura**: Fixed backdrop (`z-[10000]`) + glassmorphism card + warning box + loading state.
+**Esempio**: Vedi `app/maintenance/page.js:120-165` per modal reset manutenzione.
 
 ### Collapse/Expand Components with localStorage
-```javascript
-// 1. State
-const [isExpanded, setIsExpanded] = useState(false);
+**Pattern**:
+1. State + localStorage per persistenza
+2. **Priority logic**: savedState 'false'/'true' > auto-expand condition
+3. CSS Modules per animazioni smooth (max-height + opacity)
+4. Conditional rendering per evitare duplicazioni
 
-// 2. Load preference + auto-expand logic (priority-based)
-useEffect(() => {
-  if (!data) return;
-
-  const savedState = localStorage.getItem('componentExpanded');
-
-  // PRIORITY 1: Respect manual close (highest)
-  if (savedState === 'false') {
-    setIsExpanded(false);
-    return;
-  }
-
-  // PRIORITY 2: Respect manual open
-  if (savedState === 'true') {
-    setIsExpanded(true);
-    return;
-  }
-
-  // PRIORITY 3: Auto-expand first time only (lowest)
-  if (data.shouldAutoExpand && savedState === null) {
-    setIsExpanded(true);
-  }
-}, [data]);
-
-// 3. Toggle with localStorage save
-const toggleExpanded = (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-  const newState = !isExpanded;
-  setIsExpanded(newState);
-  localStorage.setItem('componentExpanded', String(newState));
-};
-
-// 4. CSS Module animation
-// Component.module.css
-.collapseContent {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
-}
-.collapseContent.expanded {
-  max-height: 200px; /* adjust per contenuto */
-  opacity: 1;
-  transition: max-height 0.3s ease-in, opacity 0.3s ease-in;
-}
-
-// 5. Conditional rendering (evita duplicazioni)
-{!isExpanded && <CompactInfo />}
-<div className={`${styles.collapseContent} ${isExpanded ? styles.expanded : ''}`}>
-  <ExpandedDetails />
-</div>
-```
-
-**Best Practices**:
-- **Priority logic**: savedState 'false'/'true' > auto-expand condition
-- **Auto-expand**: solo PRIMA volta (savedState === null), non forzare dopo chiusura manuale
-- **Persistenza**: salva SEMPRE in localStorage, non solo su collapse
-- **Evita duplicazioni**: usa conditional rendering `{!isExpanded && ...}` per info visibili in entrambi stati
-- **Smooth animation**: CSS Modules con max-height + opacity, non solo height
-- **Polling resilience**: verifica savedState ad ogni render, non sovrascrivere preferenza utente
+**Esempio implementazione**: Vedi `app/components/MaintenanceBar.js:89-120` per collapse intelligente.
 
 ### Responsive Breakpoints Strategy
 - **Mobile**: < 768px (`md:hidden`)
@@ -962,228 +433,43 @@ const toggleExpanded = (e) => {
 - **Desktop Small**: 1024px-1280px (`lg:`)
 - **Desktop Large**: > 1280px (`xl:`)
 
-**Best Practice Viewport Intermedi**:
-- Usa text truncation con max-width responsive: `max-w-[80px] xl:max-w-[120px]`
-- Riduci padding/gap nei viewport intermedi: `gap-1.5 lg:gap-2`
-- Dropdown/collapse elementi non critici: info utente, badge, secondary actions
-- Priorità: logo > navigation links > user menu
+**Best Practice**: Text truncation responsive (`max-w-[80px] xl:max-w-[120px]`), dropdown/collapse non-critical elements.
 
 ### Componenti con Varianti Multiple
-```jsx
-// Pattern per componenti che supportano layout/stile diversi
-export default function Component({ variant = 'default' }) {
-  // Variante compatta per integrazione inline
-  if (variant === 'inline') {
-    return (
-      <div className="flex items-center gap-4 p-5 bg-warning-50/80 rounded-xl border-2 border-warning-300">
-        {/* Layout orizzontale compatto */}
-      </div>
-    );
-  }
-
-  // Variante default full-width standalone
-  return (
-    <Card className="p-6">
-      {/* Layout standard verticale */}
-    </Card>
-  );
-}
-```
-
-**Best Practices**:
-- Usa prop `variant` per distinguere layout/stile
-- Default variant sempre usabile standalone
-- Varianti aggiuntive per integrazioni specifiche (inline, compact, minimal)
-- Mantieni stessi dati/logica, varia solo presentazione UI
-- Esempi: `CronHealthBanner` (banner/inline), `Banner` (info/warning/error/success)
+**Pattern**: Usa prop `variant` per layout/stile diversi. Default variant sempre standalone, varianti aggiuntive per integrazioni (inline, compact, minimal).
+**Esempio**: `CronHealthBanner` (banner/inline), `Banner` (info/warning/error/success).
 
 ### Badge Pulsante con Animazione
-Pattern per notifiche visibili che richiedono attenzione immediata (errori, alert, contatori).
-
-```jsx
-{/* Badge posizionato in angolo card */}
-{showBadge && (
-  <div className="absolute -top-2 -right-2 animate-pulse">
-    <div className="relative">
-      {/* Layer 1: Blur effect per glow */}
-      <div className="absolute inset-0 bg-primary-500 rounded-full blur-md opacity-75"></div>
-
-      {/* Layer 2: Badge solido */}
-      <div className="relative bg-primary-600 text-white px-3 py-1.5 rounded-full border-2 border-white shadow-lg">
-        <span className="text-xs font-bold">⚠️ {badgeText}</span>
-      </div>
-    </div>
-  </div>
-)}
-```
-
-**Caratteristiche**:
-- **Doppio layer**: blur effect + badge solido per effetto glow pulsante
-- **Positioning**: `absolute -top-2 -right-2` per angolo superiore destro card parent
-- **Animazione**: `animate-pulse` Tailwind per pulsazione automatica
-- **Colori semantici**: primary/danger (rosso), warning (arancione), info (blu)
-- **Parent requirement**: Card parent deve avere `relative` positioning
-- **Z-index**: Naturalmente sopra contenuto card, sotto modal (no z-index custom necessario)
-
-**Varianti Colori**:
-```jsx
-// Errore critico (rosso)
-bg-primary-500 blur → bg-primary-600 solid
-
-// Warning (arancione)
-bg-warning-500 blur → bg-warning-600 solid
-
-// Info (blu)
-bg-info-500 blur → bg-info-600 solid
-
-// Success (verde)
-bg-success-500 blur → bg-success-600 solid
-```
-
-**Use Cases**: contatori manutenzione, errori stufa, notifiche non lette, status critici
+**Pattern**: Doppio layer (blur + solid) per glow effect, `animate-pulse`, positioning `absolute -top-2 -right-2`.
+**Implementazione**: Vedi `app/page.js:180-195` per badge errore stufa.
 
 ### Debug/Monitoring Page Pattern
-Pattern per pagine debug e monitoring real-time di API/services.
-
-```jsx
-'use client';
-
-export default function DebugPage() {
-  const [data, setData] = useState(null);
-  const [autoRefresh, setAutoRefresh] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const fetchData = async () => {
-    setLoading(true);
-    const res = await fetch('/api/endpoint');
-    const json = await res.json();
-    setData(json);
-    setLoading(false);
-  };
-
-  // Auto-refresh interval
-  useEffect(() => {
-    if (autoRefresh) {
-      const interval = setInterval(fetchData, 3000); // 3s
-      return () => clearInterval(interval);
-    }
-  }, [autoRefresh]);
-
-  return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <Card className="p-6">
-        {/* Header con controlli */}
-        <div className="flex items-center justify-between mb-6">
-          <h1>Debug API</h1>
-          <div className="flex gap-3">
-            <Button onClick={fetchData} disabled={loading}>
-              {loading ? '⏳' : '🔄'} Refresh
-            </Button>
-            <Button
-              variant={autoRefresh ? 'success' : 'outline'}
-              onClick={() => setAutoRefresh(!autoRefresh)}
-            >
-              {autoRefresh ? '⏸️ Stop' : '▶️ Start'} Auto (3s)
-            </Button>
-          </div>
-        </div>
-
-        {/* Grid parametri con color-coding */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className={`p-4 ${data?.error ? 'bg-primary-50 border-primary-300' : 'bg-success-50 border-success-300'}`}>
-            <p className="text-xs text-neutral-500 mb-1">Parameter Name</p>
-            <p className="text-3xl font-bold">{data?.value}</p>
-          </Card>
-        </div>
-
-        {/* Raw JSON viewer */}
-        <Card className="p-4 bg-neutral-900 border-neutral-700 mt-6">
-          <pre className="text-xs text-success-400 font-mono overflow-auto">
-            {JSON.stringify(data, null, 2)}
-          </pre>
-        </Card>
-      </Card>
-    </div>
-  );
-}
-```
-
-**Caratteristiche**:
-- **Auto-refresh toggle**: pulsante play/pause con interval configurabile
-- **Color-coding**: card parametri con colori semantici (success=verde, error=rosso)
-- **Manual refresh**: pulsante refresh con loading state
-- **Raw JSON viewer**: debug avanzato con sintassi highlighted
-- **Grid responsive**: 1 colonna mobile, 2+ colonne desktop
-- **Info box**: spiegazione funzionamento sistema per utente finale
-
-**Best Practices**:
-- Auto-refresh: 3-5 secondi per API veloci, 10-30s per API lente
-- Color-coding: usa palette semantica app (primary, success, warning, info)
-- Layout: max-w-4xl per leggibilità, grid responsive per multi-parametri
-- Raw JSON: sempre in fondo, syntax highlighting con text-success-400 su bg-neutral-900
+**Pattern**: Auto-refresh toggle + color-coding cards + raw JSON viewer + grid responsive.
+**Esempio**: Vedi `app/debug/page.js` per implementazione completa.
 
 ## Design System
 
 ### Palette Colori Semantici
-**Tutti i colori hanno scala completa 50-900** (10 tonalità ciascuno):
-- **primary** (rosso fuoco): `primary-50` → `primary-900` - Azioni primarie, errori critici
-- **danger** (alias primary): Stesso colore di primary, per compatibilità nomenclatura componenti
-- **accent** (arancione): `accent-50` → `accent-900` - Accenti, highlight, warning secondari
-- **success** (verde): `success-50` → `success-900` - Successo, status positivi, conferme
-- **warning** (giallo-arancio): `warning-50` → `warning-900` - Attenzioni, alert, avvisi
-- **info** (blu): `info-50` → `info-900` - Informazioni, note, messaggi informativi
-- **neutral** (grigio): `neutral-50` → `neutral-900` - Testi, bordi, background
+Tutti i colori hanno scala completa 50-900 (10 tonalità ciascuno):
+- **primary/danger** (rosso): Azioni primarie, errori critici
+- **accent** (arancione): Accenti, highlight
+- **success** (verde): Successo, status positivi
+- **warning** (giallo-arancio): Attenzioni, alert
+- **info** (blu): Informazioni, note
+- **neutral** (grigio): Testi, bordi, background
 
-### Nomenclatura Colori
-**Regola fondamentale**: Usare SOLO `neutral-*`, MAI `gray-*`
-```jsx
-// ✅ CORRETTO
-className="text-neutral-800 bg-neutral-50 border-neutral-200"
-
-// ❌ ERRATO
-className="text-gray-800 bg-gray-50 border-gray-200"
-```
+**Nomenclatura**: Usare SOLO `neutral-*`, MAI `gray-*`.
 
 ### Card Styling Standards
-**Pattern standardizzati**:
 ```jsx
-// Standard card (default)
-<Card className="p-6">Content</Card>
-
-// Hero card (sezioni principali)
-<Card className="p-8">Hero Content</Card>
-
-// Header card con glassmorphism
-<Card glass className="p-6 border-2 border-primary-200">Header</Card>
-
-// Info card colorata
-<Card className="p-6 bg-info-50 border-2 border-info-200">Info</Card>
-<Card className="p-6 bg-warning-50 border-2 border-warning-200">Warning</Card>
-<Card className="p-6 bg-success-50 border-2 border-success-200">Success</Card>
+<Card className="p-6">Standard</Card>              // Default
+<Card className="p-8">Hero Content</Card>          // Hero sections
+<Card glass className="p-6">Glassmorphism</Card>   // Header importanti
+<Card className="p-6 bg-info-50 border-2 border-info-200">Info</Card> // Colored
 ```
-
-**Regole**:
-- `p-6`: Default per tutte le card normali
-- `p-8`: Solo per hero sections (es. StovePanel main)
-- `glass`: Header importanti + modal overlay
-- Info card: `bg-{color}-50 border-2 border-{color}-200`
 
 ### Background Consistenza
-**Usare SEMPRE background globale** definito in `globals.css`:
-```css
-body {
-  @apply bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-200;
-}
-```
-
-❌ **MAI override custom** nelle singole pagine:
-```jsx
-// ❌ ERRATO - Override custom
-<div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-orange-100">
-
-// ✅ CORRETTO - Usa background globale
-<div className="max-w-2xl mx-auto py-8 px-4">
-```
+**SEMPRE** usa background globale definito in `globals.css`. **MAI** override custom nelle pagine.
 
 ## Code Quality Best Practices
 
@@ -1196,39 +482,8 @@ body {
 ### Firebase Operations
 **CRITICO**: Firebase Realtime Database **NON accetta valori `undefined`** nelle write operations.
 
-**Pattern per filtrare undefined values**:
+**Helper pattern**:
 ```javascript
-// ❌ ERRATO - Causa errore Firebase
-const data = {
-  id: item.id,
-  name: item.name,
-  optional: item.optional, // ← undefined causa errore!
-};
-await set(ref(db, 'path'), data);
-
-// ✅ CORRETTO - Filtra undefined prima di salvare
-const data = {
-  id: item.id,
-  name: item.name,
-};
-
-// Aggiungi proprietà opzionali solo se definite
-if (item.optional !== undefined && item.optional !== null) {
-  data.optional = item.optional;
-}
-
-await set(ref(db, 'path'), data);
-```
-
-**Quando applicare**:
-- ✅ API esterne che ritornano dati con campi opzionali
-- ✅ Parsing di oggetti complessi prima di Firebase write
-- ✅ Dati da form/input utente con campi non obbligatori
-- ✅ Mapping array di oggetti con proprietà variabili
-
-**Helper pattern riutilizzabile**:
-```javascript
-// Rimuove tutte le proprietà undefined da un oggetto
 function filterUndefined(obj) {
   return Object.entries(obj).reduce((acc, [key, value]) => {
     if (value !== undefined && value !== null) {
@@ -1237,11 +492,9 @@ function filterUndefined(obj) {
     return acc;
   }, {});
 }
-
-// Uso
-const cleanData = filterUndefined(rawData);
-await set(ref(db, 'path'), cleanData);
 ```
+
+Applicare SEMPRE quando: API esterne con campi opzionali, parsing oggetti complessi, form/input utente.
 
 ### Client Components
 ```javascript
@@ -1253,57 +506,54 @@ import { useState } from 'react';
 - ✅ Always `<Image>` from `next/image` (not `<img>`)
 - ✅ Add remote domains to `next.config.mjs` (`images.remotePatterns`)
 
-### Styling
-
-**Hierarchy CSS (in ordine di preferenza)**:
-1. ✅ **Tailwind Inline** (caso principale, ~95% del codice)
-   - `className="bg-white/70 backdrop-blur-xl p-4 rounded-2xl"`
-   - Glassmorphism: `bg-white/70 backdrop-blur-xl shadow-glass-lg border-white/40`
-   - Z-index: dropdown=100, modal=50, blocking-modal=9999+
-
-2. ✅ **CSS Modules** (per animazioni e stili complessi componente-specifici)
-   - File: `Component.module.css` nella stessa directory del componente
-   - Import: `import styles from './Component.module.css'`
-   - Usage: `className={styles.shimmer}` o `${styles.shimmer}`
-   - **Quando usare**: Keyframe animations, hover complessi, stili che richiedono CSS puro
-   - **Esempio**: `MaintenanceBar.module.css` contiene animazione shimmer
-   ```css
-   /* MaintenanceBar.module.css */
-   @keyframes shimmer {
-     0% { transform: translateX(-100%); }
-     100% { transform: translateX(100%); }
-   }
-   .shimmer {
-     animation: shimmer 2s infinite;
-   }
-   ```
-   ```jsx
-   // MaintenanceBar.js
-   import styles from './MaintenanceBar.module.css';
-   <div className={`...tailwind-classes ${styles.shimmer}`} />
-   ```
-
-3. ✅ **globals.css** (SOLO per base Tailwind + stili veramente globali)
-   - Tailwind directives: `@tailwind base/components/utilities`
-   - Stili base html/body in `@layer base`
-   - ❌ NO animazioni componente-specifici
-   - ❌ NO stili che possono essere in CSS Modules
-   - Mantieni file minimo (~13 righe è ideale)
+### Styling Hierarchy
+1. **Tailwind Inline** (~95% codice): Preferenza primaria
+2. **CSS Modules** (animazioni componente-specifici): File `.module.css` nella stessa directory
+3. **globals.css** (SOLO base Tailwind + stili globali): Mantieni minimo (~13 righe)
 
 **Best Practices**:
-- Se uno stile è usato da UN solo componente → CSS Module
-- Se uno stile è usato da PIÙ componenti → Tailwind classe custom in `tailwind.config.js`
-- Se uno stile è veramente globale (html/body) → `globals.css` in `@layer base`
-- Preferisci sempre Tailwind quando possibile (utility-first)
-- Code splitting automatico: CSS Modules caricati solo quando componente renderizzato
+- Stile UN componente → CSS Module
+- Stile PIÙ componenti → Tailwind custom in `tailwind.config.js`
+- Stile globale → `globals.css` in `@layer base`
+
+## Testing & Quality Assurance
+
+### 🚨 REGOLA FONDAMENTALE
+**OGNI modifica o nuova implementazione DEVE essere accompagnata da unit tests aggiornati o nuovi.**
+
+**Quick Reference**:
+- Framework: Jest 30.2 + Testing Library React 16.3
+- Coverage Target: 70% (statements, branches, functions, lines)
+- Struttura: `lib/__tests__/`, `app/components/ui/__tests__/`, `app/hooks/__tests__/`
+- Pattern: AAA (Arrange-Act-Assert), Naming Convention (`describe` > `test`), Mock Strategy
+
+**Comandi**:
+```bash
+npm test                 # Run all tests
+npm run test:watch       # Watch mode
+npm run test:coverage    # Coverage report
+npm run test:ci          # CI/CD mode
+```
+
+📖 **Documentazione completa**: Vedi `README-TESTING.md` per:
+- Setup dettagliato e configurazione Jest
+- Pattern di testing e best practices
+- Esempi completi (componenti, hooks, context)
+- Troubleshooting comune (localStorage, matchMedia, Firebase mocking)
+- Template test riutilizzabili
+
+**Workflow consigliato**:
+1. Implementa feature/fix
+2. Crea/aggiorna test
+3. Verifica coverage: `npm run test:coverage`
+4. Build production: `npm run build`
+5. Commit solo se test passano
 
 ## Troubleshooting Comune
 
 ### Build Error: Firebase Initialization
 ```javascript
-// ✅ CORRECT - Force dynamic rendering
-export const dynamic = 'force-dynamic';
-import { syncVersionHistoryToFirebase } from '@/lib/changelogService';
+export const dynamic = 'force-dynamic'; // Force dynamic rendering
 ```
 
 ### Missing 'use client'
@@ -1313,27 +563,18 @@ find app -name "*.js" -exec grep -l "useState\|useEffect" {} \; | \
 ```
 
 ### Version Enforcement Not Working
-1. **Check environment**: In localhost/dev, modal è disabilitata (by design). Verifica `isLocalEnvironment()` = false in production
-2. **Check Firebase sync**: `getLatestVersion()` should return latest version
-3. **Verify polling**: StovePanel calls `checkVersion()` ogni 5s
-4. **Verify semantic comparison**: Modal appare SOLO se `compareVersions(APP_VERSION, firebaseVersion) < 0`
-   - 1.4.2 < 1.5.0 → modal ✅
-   - 1.5.0 >= 1.4.9 → NO modal ❌
-5. **Console logs**: Cerca `🔧 Ambiente locale` o `⚠️ Update richiesto`
-6. **Clear cache + reload**
+1. Check environment: modal disabilitata in localhost/dev (by design)
+2. Check Firebase sync: `getLatestVersion()` must return latest
+3. Verify polling: StovePanel calls `checkVersion()` ogni 5s
+4. Verify semantic comparison: modal SOLO se `compareVersions(local, firebase) < 0`
 
 ### Scheduler Not Executing
 1. Check mode: `enabled: true`, `semiManual: false`
 2. Verify cron calls `/api/scheduler/check?secret=xxx`
-3. Check `/api/stove/*` not blocked by middleware
-4. Verify intervals valid in Firebase
+3. Verify intervals valid in Firebase
 
 ### Changelog Ordering Wrong
-1. **Check sortVersions()**: Deve essere chiamata su dati Firebase in `app/changelog/page.js`
-2. **Problema**: `changelogService.getChangelogFromFirebase()` ordina solo per data
-3. **Soluzione**: Applica sempre `sortVersions()` dopo fetch Firebase
-4. **Test**: Verifica 1.4.4 > 1.4.3 > 1.4.2 quando stessa data
-5. **Fallback**: `VERSION_HISTORY` locale è già ordinato correttamente
+Applica sempre `sortVersions()` dopo fetch Firebase. Firebase ordina solo per data, serve ordinamento semantico client-side.
 
 ## Quick Reference Commands
 
@@ -1347,7 +588,6 @@ npm run lint             # ESLint
 npm test                 # Run all tests
 npm run test:watch       # Watch mode
 npm run test:coverage    # Coverage report
-npm run test:ci          # CI/CD mode
 
 # Firebase
 node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require('./lib/version').VERSION_HISTORY)"
@@ -1355,134 +595,6 @@ node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require(
 # Debugging
 find app -name "*.js" -exec grep -l "useState" {} \;  # Find client components
 ```
-
-## Testing & Quality Assurance
-
-### 🚨 REGOLA FONDAMENTALE: Test-Driven Development
-**OGNI modifica o nuova implementazione DEVE essere accompagnata da unit tests aggiornati o nuovi.**
-
-**Quando creare/aggiornare test**:
-- ✅ Nuove funzioni in `lib/` → Creare test in `lib/__tests__/`
-- ✅ Nuovi componenti UI → Creare test in `app/components/ui/__tests__/`
-- ✅ Modifiche a logica esistente → Aggiornare test esistenti
-- ✅ Fix bug → Aggiungere test che verifica il fix
-- ✅ Nuove API routes → Test con mock delle dipendenze
-- ✅ Nuovi custom hooks → Test in `app/hooks/__tests__/`
-
-**Workflow consigliato**:
-1. Implementa feature/fix
-2. Crea/aggiorna test
-3. Verifica coverage: `npm run test:coverage`
-4. Build production: `npm run build`
-5. Commit solo se test passano
-
-### Setup e Configurazione
-- **Framework**: Jest 30.2 + Testing Library React 16.3
-- **Test Environment**: jsdom per simulazione browser
-- **Config**: `jest.config.js` + `jest.setup.js` con mock globali
-- **Coverage Target**: 70% (statements, branches, functions, lines)
-
-### Struttura Test Files
-```
-lib/__tests__/           # Test per utility/services
-app/components/ui/__tests__/  # Test componenti UI
-app/hooks/__tests__/     # Test custom hooks
-app/context/__tests__/   # Test context providers
-```
-
-### Pattern di Testing
-
-**Naming Convention**:
-```javascript
-describe('ComponentName or ServiceName', () => {
-  describe('Feature Group', () => {
-    test('should do something specific', () => {
-      // Test implementation
-    });
-  });
-});
-```
-
-**AAA Pattern (Arrange-Act-Assert)**:
-```javascript
-test('updates state correctly', async () => {
-  // ARRANGE: Setup test data and mocks
-  const mockFn = jest.fn();
-
-  // ACT: Execute the code under test
-  const result = await functionToTest(mockFn);
-
-  // ASSERT: Verify the results
-  expect(result).toBe(expectedValue);
-  expect(mockFn).toHaveBeenCalled();
-});
-```
-
-**Mock Strategy**:
-```javascript
-// Mock Firebase functions manualmente per evitare import circolari
-const ref = jest.fn();
-const get = jest.fn();
-const set = jest.fn();
-jest.mock('firebase/database', () => ({ ref, get, set }));
-
-// Mock moduli con comportamento custom
-jest.mock('@/lib/firebase', () => ({ db: {} }));
-jest.mock('@/lib/logService', () => ({
-  logUserAction: jest.fn(),
-}));
-```
-
-### Best Practices
-
-1. **Test Isolation**: Ogni test deve essere indipendente
-   - `beforeEach(() => jest.clearAllMocks())` per reset mock
-   - No shared state tra test
-
-2. **User-Centric Testing**: Testa comportamento, non implementazione
-   - Usa query `getByRole`, `getByText` invece di `getByTestId`
-   - Simula interazioni utente con `userEvent.setup()`
-
-3. **Async Operations**: Gestisci correttamente operazioni asincrone
-   - `await waitFor(() => expect(...)` per attese
-   - `async/await` per promise
-   - Mock async functions: `mockResolvedValue()`, `mockRejectedValue()`
-
-4. **Coverage vs Quality**: Coverage alto non è garanzia qualità
-   - Focus su test significativi, non su 100% coverage artificiale
-   - Testa edge cases e error handling
-
-### Comandi Utili
-```bash
-# Test specifico file
-npm test -- path/to/test-file.test.js
-
-# Test con pattern nome
-npm test -- ComponentName
-
-# Watch mode durante sviluppo
-npm run test:watch
-
-# Coverage HTML report (coverage/lcov-report/index.html)
-npm run test:coverage
-```
-
-### Troubleshooting Comune
-
-**"Cannot find module '@/...'"**: Verifica `moduleNameMapper` in `jest.config.js`
-```javascript
-moduleNameMapper: {
-  '^@/(.*)$': '<rootDir>/$1',
-}
-```
-
-**"localStorage is not defined"**: Mock già presente in `jest.setup.js`
-
-**"window.matchMedia is not a function"**: Mock già presente in `jest.setup.js`
-
-**Firebase errors in tests**: Mock Firebase in `jest.setup.js` già configurato
-
-**Documentazione Completa**: Vedi `README-TESTING.md` per guide dettagliate, esempi specifici, e troubleshooting avanzato
 
 ## Environment Variables
 
@@ -1498,7 +610,7 @@ AUTH0_BASE_URL=http://localhost:3000
 AUTH0_CLIENT_ID=
 AUTH0_CLIENT_SECRET=
 
-# External APIs (pattern esempio con Netatmo)
+# External APIs (pattern OAuth)
 NEXT_PUBLIC_[EXTERNAL_API]_CLIENT_ID=
 NEXT_PUBLIC_[EXTERNAL_API]_REDIRECT_URI=http://localhost:3000/api/[external-api]/callback
 [EXTERNAL_API]_CLIENT_ID=
@@ -1509,10 +621,7 @@ NEXT_PUBLIC_[EXTERNAL_API]_REDIRECT_URI=http://localhost:3000/api/[external-api]
 CRON_SECRET=your-secret-here
 ```
 
-**⚠️ IMPORTANTE External APIs OAuth**:
-- `REDIRECT_URI` deve corrispondere a porta e path corretto dell'app
-- Il redirect URI deve essere registrato nella console developer dell'API esterna
-- Usa HTTPS in production, HTTP solo per localhost/testing
+**⚠️ IMPORTANTE OAuth**: `REDIRECT_URI` deve corrispondere a porta/path corretto e essere registrato nella console developer API esterna. HTTPS in production, HTTP solo per localhost.
 
 ## Task Priorities
 
@@ -1534,5 +643,5 @@ CRON_SECRET=your-secret-here
 ---
 
 **Last Updated**: 2025-10-16
-**Version**: 1.5.9
+**Version**: 1.5.10
 **Author**: Federico Manfredi

@@ -5,6 +5,27 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.5.12] - 2025-10-17
+
+### Modificato
+- **Navbar mobile completamente riscritta**: architettura separata mobile/desktop per maggiore affidabilità e zero interferenze
+- **Menu hamburger con fixed overlay**: backdrop semi-trasparente cliccabile posizionato sotto header per chiusura menu
+- **Z-index hierarchy ottimizzata**: navbar (`z-50`), backdrop (`z-[100]`), menu panel (`z-[101]`) per corretta sovrapposizione
+- **Gestione stati indipendenti**: `mobileMenuOpen`, `desktopDeviceDropdown`, `mobileDeviceDropdown` per separazione contesti
+- **UX migliorata**: body scroll lock quando menu aperto, chiusura automatica su route change, supporto ESC key
+
+### Corretto
+- Navbar sempre visibile quando menu hamburger aperto: backdrop e menu panel iniziano sotto header (`top-[3.5rem]`)
+- Click fuori menu ora chiude correttamente menu mobile tramite backdrop
+- Link interni menu mobile tutti cliccabili e funzionanti
+- Tendine device accordion mobile si aprono/chiudono correttamente senza interferenze
+
+### Tecnico
+- Pattern fixed overlay: `position: fixed` per backdrop + menu con posizionamento assoluto sotto navbar
+- Gestione eventi pulita: backdrop gestisce chiusura mobile, click outside handler solo per dropdown desktop
+- Codice semplificato: rimossi ref complessi, logica più lineare e manutenibile
+- Separazione completa mobile/desktop: nessuna condizione condivisa tra contesti diversi
+
 ## [1.5.11] - 2025-10-17
 
 ### Aggiunto

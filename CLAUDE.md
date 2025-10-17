@@ -104,9 +104,22 @@ Dropdown con glassmorphism automatico e z-[100].
 ```
 
 ### Navbar
-- **Desktop**: Links orizzontali + dropdown utente (nome + logout)
-- **Mobile**: Hamburger menu con slide-down
-- **Pattern**: Vedi Navbar.js:89-145 per dropdown pattern (click outside + Escape key + route change)
+**Architettura**: Stati separati mobile/desktop per zero interferenze
+- **Desktop** (≥1024px): Links orizzontali + dropdown device + dropdown utente
+- **Mobile** (< 1024px): Hamburger button + fixed overlay menu
+
+**Pattern Mobile Menu**:
+- Fixed overlay: backdrop (`z-[100]`) + menu panel (`z-[101]`) sotto navbar (`z-50`)
+- Backdrop position: `fixed top-[navbar-height]` per mantenere header visibile
+- Click fuori → chiude menu (backdrop onClick)
+- Body scroll lock quando menu aperto
+- Auto-chiusura: route change + ESC key
+
+**Pattern Dropdown Desktop**:
+- State + ref per click outside detection
+- `useEffect` con addEventListener mousedown
+- Chiusura: click outside + ESC key + route change
+- Z-index: `z-[100]` per dropdown sopra altri elementi
 
 ## Multi-Device Architecture
 
@@ -725,5 +738,5 @@ CRON_SECRET=your-secret-here
 ---
 
 **Last Updated**: 2025-10-17
-**Version**: 1.5.11
+**Version**: 1.5.12
 **Author**: Federico Manfredi

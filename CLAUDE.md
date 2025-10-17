@@ -28,8 +28,11 @@ npm run build && npm run start  # Test PWA locale
 app/
 ├── components/
 │   ├── ui/                   # Card, Button, Banner, Select, Skeleton, Footer
+│   ├── devices/              # Device-specific components (multi-device architecture)
+│   │   ├── stove/            # StoveCard (polling 5s, controls, maintenance)
+│   │   ├── thermostat/       # ThermostatCard (Netatmo multi-room)
+│   │   └── lights/           # LightsCard (Hue - future dev)
 │   ├── scheduler/            # TimeBar, DayAccordionItem
-│   ├── StovePanel.js         # Controllo principale + polling 5s
 │   ├── MaintenanceBar.js     # Barra progresso manutenzione
 │   ├── MaintenanceBar.module.css  # CSS Module: animazione shimmer
 │   ├── CronHealthBanner.js   # Alert cronjob inattivo >5min
@@ -42,18 +45,22 @@ app/
 ├── api/
 │   ├── stove/                # Proxy Thermorossi (status, ignite, shutdown, setFan, setPower)
 │   ├── scheduler/check/      # Cron endpoint + maintenance tracking
-│   ├── netatmo/              # Termostato API
+│   ├── netatmo/              # Termostato API (OAuth 2.0)
+│   ├── hue/                  # Luci API (Local API - future dev)
 │   ├── log/add/              # User action logging
 │   └── auth/[...auth0]/      # Auth0 handler
-├── page.js                   # Home (StovePanel)
+├── page.js                   # Home (grid responsive multi-device)
 ├── scheduler/page.js         # Pianificazione settimanale
 ├── maintenance/page.js       # Configurazione manutenzione stufa
-├── log/page.js              # Storico azioni
-├── errors/page.js           # Allarmi
+├── log/page.js              # Storico azioni (con device filtering)
+├── errors/page.js           # Allarmi stufa
 ├── changelog/page.js        # Versioni
 └── not-found.js             # Pagina 404 (richiesta Next.js 15)
 
 lib/
+├── devices/                 # Multi-device registry (CRITICO per scalabilità)
+│   ├── deviceTypes.js       # DEVICE_CONFIG registry + getEnabledDevices()
+│   └── index.js             # Esporta funzioni helper
 ├── stoveApi.js              # Thermorossi wrapper
 ├── schedulerService.js      # Scheduler logic + timezone handling
 ├── maintenanceService.js    # Maintenance tracking + Firebase operations
@@ -61,12 +68,12 @@ lib/
 ├── version.js               # APP_VERSION, VERSION_HISTORY
 ├── changelogService.js      # Version management + Firebase sync
 ├── errorMonitor.js          # Error detection + notification
-├── logService.js            # Pre-configured logging functions
+├── logService.js            # Pre-configured logging functions (device-aware)
 ├── formatUtils.js           # Utility functions (es. formatHoursToHHMM)
 └── [external-api]/          # Pattern per integrazioni API esterne
-    ├── api.js               # API wrapper (es. netatmoApi.js)
-    ├── service.js           # State management + Firebase (es. netatmoService.js)
-    └── tokenHelper.js       # Token management per OAuth APIs (es. netatmoTokenHelper.js)
+    ├── api.js               # API wrapper (es. netatmoApi.js, hueApi.js)
+    ├── service.js           # State management + Firebase (opzionale)
+    └── tokenHelper.js       # Token management per OAuth APIs
 ```
 
 ## Componenti UI Principali
@@ -100,6 +107,65 @@ Dropdown con glassmorphism automatico e z-[100].
 - **Desktop**: Links orizzontali + dropdown utente (nome + logout)
 - **Mobile**: Hamburger menu con slide-down
 - **Pattern**: Vedi Navbar.js:89-145 per dropdown pattern (click outside + Escape key + route change)
+
+## Multi-Device Architecture
+
+### Device Registry (`lib/devices/deviceTypes.js`)
+Centralizza configurazione tutti i dispositivi supportati.
+
+```javascript
+export const DEVICE_TYPES = {
+  STOVE: 'stove',
+  THERMOSTAT: 'thermostat',
+  LIGHTS: 'lights',    // Future dev
+  SONOS: 'sonos',      // Future dev
+};
+
+export const DEVICE_CONFIG = {
+  [DEVICE_TYPES.STOVE]: {
+    id: 'stove',
+    name: 'Stufa',
+    icon: '🔥',
+    color: 'primary',     // Tailwind palette
+    enabled: true,        // Mostra in homepage
+    routes: { main, scheduler, maintenance, errors },
+    features: { hasScheduler, hasMaintenance, hasErrors },
+  },
+  // ... altri device
+};
+```
+
+**Helper Functions**:
+- `getEnabledDevices()` - Filtra solo device con `enabled: true`
+- `getDeviceConfig(id)` - Ottiene config singolo device
+
+### Device Cards Pattern
+Ogni device ha card dedicata in `app/components/devices/{device}/`:
+- **StoveCard**: Polling 5s, controls, maintenance bar
+- **ThermostatCard**: Multi-room selection, temperature controls
+- Pattern: connection check → polling → controls → link pagina dedicata
+
+### Homepage Layout
+```jsx
+// app/page.js
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+  {enabledDevices.map(device => {
+    if (device.id === 'stove') return <StoveCard key={device.id} />;
+    if (device.id === 'thermostat') return <ThermostatCard key={device.id} />;
+    // ...
+  })}
+</div>
+```
+- **Mobile** (< 1024px): Stack verticale
+- **Desktop** (≥ 1024px): Grid 2 colonne
+
+### Aggiungere Nuovo Device
+1. Aggiorna `DEVICE_TYPES` in `deviceTypes.js`
+2. Aggiungi config in `DEVICE_CONFIG` con `enabled: false`
+3. Crea directory `app/components/devices/{device}/`
+4. Crea `{Device}Card.js` con pattern esistente
+5. Aggiungi case in `app/page.js` mapping
+6. Quando pronto: `enabled: true`
 
 ## Custom Hooks
 
@@ -169,6 +235,22 @@ if (data.reconnect) {
 ```
 
 **Esempio implementazione completa**: Vedi `lib/netatmo/` per pattern OAuth con auto-refresh e error handling.
+
+## Log Service (`lib/logService.js`)
+
+Sistema centralizzato logging azioni utente con supporto multi-device.
+
+```javascript
+logUserAction(action, device, value, metadata)
+// device: from DEVICE_TYPES ('stove', 'thermostat', 'lights', 'sonos')
+```
+
+**Pre-configured helpers**:
+- `logStoveAction.{ignite, shutdown, setFan, setPower}`
+- `logSchedulerAction.{toggleMode, updateSchedule, addInterval}`
+- `logNetatmoAction.{connect, setRoomTemperature, setMode}`
+
+**Device Filtering**: `/log` page supporta filtri per dispositivo (Tutti, Stufa, Termostato, Luci, Sonos).
 
 ## Firebase Schema Essenziale
 
@@ -642,6 +724,6 @@ CRON_SECRET=your-secret-here
 
 ---
 
-**Last Updated**: 2025-10-16
-**Version**: 1.5.10
+**Last Updated**: 2025-10-17
+**Version**: 1.5.11
 **Author**: Federico Manfredi

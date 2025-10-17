@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
+import Card from '@/app/components/ui/Card';
+import Button from '@/app/components/ui/Button';
 import { getMaintenanceData, updateTargetHours, confirmCleaning } from '@/lib/maintenanceService';
 import { formatHoursToHHMM } from '@/lib/formatUtils';
 

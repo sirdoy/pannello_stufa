@@ -135,7 +135,7 @@ export default function NetatmoTemperatureReport() {
         <div className="flex gap-3">
           <Button
             variant="info"
-            onClick={() => router.push('/netatmo')}
+            onClick={() => router.push('/thermostat')}
             className="flex-1"
           >
             🔗 Connetti Netatmo
@@ -185,7 +185,7 @@ export default function NetatmoTemperatureReport() {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => router.push('/netatmo')}
+          onClick={() => router.push('/thermostat')}
         >
           Dettagli →
         </Button>

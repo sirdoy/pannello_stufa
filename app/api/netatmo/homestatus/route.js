@@ -30,25 +30,14 @@ export async function GET() {
     const homeId = homeIdSnap.val();
 
     // Get home status
-    console.log('🔍 Fetching homestatus for home_id:', homeId);
     const homeStatus = await NETATMO_API.getHomeStatus(accessToken, homeId);
-
-    console.log('🔍 Netatmo homestatus raw data:', JSON.stringify({
-      mode: homeStatus.therm_mode,
-      rooms_count: homeStatus.rooms?.length || 0,
-      first_room: homeStatus.rooms?.[0] || null,
-    }, null, 2));
 
     // Extract temperature data
     const temperatures = NETATMO_API.extractTemperatures(homeStatus);
 
-    console.log('🔍 Netatmo extracted temperatures:', JSON.stringify(temperatures, null, 2));
-
     // Get topology to enrich data with room names
     const topologySnap = await get(ref(db, 'netatmo/topology'));
     const topology = topologySnap.exists() ? topologySnap.val() : null;
-
-    console.log('🔍 Topology rooms:', topology?.rooms?.length || 0);
 
     // Enrich with room names (filter out undefined values for Firebase)
     const enrichedRooms = temperatures.map(temp => {
@@ -78,8 +67,6 @@ export async function GET() {
       return enriched;
     });
 
-    console.log('🔍 Enriched rooms:', JSON.stringify(enrichedRooms, null, 2));
-
     // Save current status to Firebase (only if we have valid data)
     const statusToSave = {
       rooms: enrichedRooms,
@@ -102,8 +89,6 @@ export async function GET() {
     if (homeStatus.therm_mode !== undefined && homeStatus.therm_mode !== null) {
       response.mode = homeStatus.therm_mode;
     }
-
-    console.log('✅ Homestatus API response ready, returning', enrichedRooms.length, 'rooms');
 
     return Response.json(response);
   } catch (err) {

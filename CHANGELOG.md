@@ -5,6 +5,25 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.5.11] - 2025-10-17
+
+### Aggiunto
+- **Multi-device architecture**: device registry centralizzato in `lib/devices/` per gestione scalabile dispositivi connessi
+- **Device registry pattern**: `DEVICE_CONFIG` con configurazione completa (routes, features, enabled flag) per ogni device
+- **Device cards modulari**: componenti organizzati in `app/components/devices/{device}/` (StoveCard, ThermostatCard, LightsCard)
+- **Helper functions**: `getEnabledDevices()` per filtrare solo device abilitati, `getDeviceConfig(id)` per config singolo device
+- **Future development preparati**: Philips Hue (Local API) e Spotify+Sonos pronti ma disabilitati (`enabled: false`)
+
+### Modificato
+- **Homepage layout responsive**: grid 2 colonne su desktop (≥1024px), stack verticale su mobile
+- **Log service**: supporto completo device filtering per filtrare azioni per tipo dispositivo (Stufa, Termostato, Luci, Sonos)
+- **CLAUDE.md aggiornato**: sezioni Multi-Device Architecture e Log Service con pattern generali riutilizzabili
+
+### Tecnico
+- Pattern scalabile per aggiungere nuovi device: registry → card component → homepage mapping → `enabled: true`
+- Grid CSS responsive: `grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8`
+- Organizzazione directory modulare per componenti device-specific
+
 ## [1.5.10] - 2025-10-16
 
 ### Modificato

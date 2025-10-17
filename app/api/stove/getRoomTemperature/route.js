@@ -1,4 +1,4 @@
-import { STUFA_API } from '@/lib/stoveApi';
+import { STUFA_API, fetchWithTimeout } from '@/lib/stoveApi';
 
 /**
  * GET /api/stove/getRoomTemperature
@@ -6,11 +6,11 @@ import { STUFA_API } from '@/lib/stoveApi';
  */
 export async function GET() {
   try {
-    const res = await fetch(STUFA_API.getRoomTemperature);
+    const res = await fetchWithTimeout(STUFA_API.getRoomTemperature);
 
     if (!res.ok) {
       return Response.json(
-        { error: 'Failed to fetch room temperature' },
+        { error: 'Failed to fetch room temperature', details: `HTTP ${res.status}` },
         { status: res.status }
       );
     }
@@ -18,8 +18,17 @@ export async function GET() {
     const data = await res.json();
     return Response.json(data);
   } catch (error) {
+    console.error('[Stove API] GetRoomTemperature error:', error.message);
+
+    if (error.message === 'STOVE_TIMEOUT') {
+      return Response.json(
+        { error: 'Stufa non raggiungibile', code: 'TIMEOUT', Result: 20 },
+        { status: 504 }
+      );
+    }
+
     return Response.json(
-      { error: 'Internal server error' },
+      { error: 'Errore di connessione', code: 'NETWORK_ERROR', Result: 20 },
       { status: 500 }
     );
   }

@@ -28,7 +28,7 @@ function NetatmoContent() {
     if (errorParam) {
       setOauthError(decodeURIComponent(errorParam));
       // Clear error from URL without reload
-      window.history.replaceState({}, '', '/netatmo');
+      window.history.replaceState({}, '', '/thermostat');
     }
   }, [searchParams]);
 
@@ -71,16 +71,11 @@ function NetatmoContent() {
       setLoading(true);
       setError(null);
 
-      console.log('🔍 Netatmo: Checking connection...');
-
       const response = await fetch(NETATMO_ROUTES.homesData);
       const data = await response.json();
 
-      console.log('🔍 Netatmo: Response status', response.status, 'reconnect:', data.reconnect, 'error:', data.error);
-
       // ✅ Handle reconnect flag from token helper
       if (data.reconnect) {
-        console.log('❌ Netatmo: Reconnect required -', data.error);
         setConnected(false);
         setError(data.error);
         return;
@@ -88,12 +83,10 @@ function NetatmoContent() {
 
       // If we get data without error, we're connected
       if (!data.error && data.home_id) {
-        console.log('✅ Netatmo: Connected successfully - home_id:', data.home_id);
         setConnected(true);
         setTopology(data);
       } else if (data.error && (data.error.includes('refresh token') || data.error.includes('Nessun refresh token'))) {
         // Not connected - show auth card
-        console.log('❌ Netatmo: Not connected - no token');
         setConnected(false);
       } else {
         // Other error - still connected but something else failed

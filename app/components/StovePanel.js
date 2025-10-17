@@ -310,7 +310,7 @@ export default function StovePanel() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => router.push('/maintenance')}
+                onClick={() => router.push('/stove/maintenance')}
               >
                 ⚙️ Vai alle Impostazioni
               </Button>
@@ -470,7 +470,7 @@ export default function StovePanel() {
                   </button>
                 )}
                 <button
-                  onClick={() => router.push('/scheduler')}
+                  onClick={() => router.push('/stove/scheduler')}
                   className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl text-sm font-semibold text-info-700 bg-info-50 hover:bg-info-100 border border-info-200 hover:border-info-300 transition-all duration-200 active:scale-95"
                 >
                   Configura

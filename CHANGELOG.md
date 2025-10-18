@@ -5,6 +5,25 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.5.13] - 2025-10-18
+
+### Corretto
+- **Bug tracking manutenzione critico**: `lastUpdatedAt` ora aggiornato **SOLO** durante tracking WORK effettivo
+  - Problema: `lastUpdatedAt` veniva aggiornato in `updateTargetHours()` e inizializzazione → conteggio ore fantasma
+  - Scenario bug: stufa spenta, modifica config alle 10:00 → stufa accende alle 13:00 → contava 3 ore non lavorate
+- `lastUpdatedAt` ora inizializzato a `null` invece di timestamp corrente
+- `updateTargetHours()` non tocca più `lastUpdatedAt` (modifica solo `targetHours`)
+- `trackUsageHours()` ora inizializza `lastUpdatedAt` al primo tracking WORK senza aggiungere tempo
+
+### Modificato
+- **Spegnimento sempre permesso**: blocco manutenzione applicato solo all'accensione (manuale e schedulata)
+- `/api/scheduler/check`: check `canIgnite()` spostato solo prima accensione schedulata (shutdown sempre permesso)
+
+### Tecnico
+- Test suite maintenanceService: 30 test aggiornati con pattern `jest.useFakeTimers()` per Date mocking affidabile
+- Pattern inizializzazione Firebase: valori `null` preferibili a valori default quando il dato sarà popolato successivamente
+- Lifecycle `lastUpdatedAt`: `null` → primo WORK tracking → aggiornamento ogni minuto durante WORK
+
 ## [1.5.12] - 2025-10-17
 
 ### Modificato

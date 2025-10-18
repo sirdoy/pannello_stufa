@@ -196,8 +196,8 @@ Global context state, on-demand check ogni 5s, ForceUpdateModal bloccante SOLO s
 | `/status` | GET | - | Status + errori |
 | `/getFan` | GET | - | Fan 1-6 |
 | `/getPower` | GET | - | Power 0-5 (UI: 1-5) |
-| `/ignite` | POST | `{source: 'manual'\|'scheduler'}` | Semi-manual SOLO se source='manual' |
-| `/shutdown` | POST | `{source: 'manual'\|'scheduler'}` | Semi-manual SOLO se source='manual' |
+| `/ignite` | POST | `{source: 'manual'\|'scheduler'}` | Semi-manual SOLO se source='manual'. **Bloccato se needsCleaning=true** |
+| `/shutdown` | POST | `{source: 'manual'\|'scheduler'}` | Semi-manual SOLO se source='manual'. **Sempre permesso** |
 | `/setFan` | POST | `{level: 1-6, source}` | Semi-manual SOLO se source='manual' E stufa ON |
 | `/setPower` | POST | `{level: 1-5, source}` | Semi-manual SOLO se source='manual' E stufa ON |
 
@@ -341,7 +341,7 @@ Sistema autonomo H24 per tracking ore utilizzo e gestione pulizia periodica.
 **Caratteristiche**:
 - ✅ Tracking automatico server-side (cron ogni minuto)
 - ✅ Funziona H24, anche app chiusa
-- ✅ Blocco automatico accensione quando pulizia richiesta
+- ✅ Blocco automatico **solo accensione** quando pulizia richiesta (spegnimento sempre permesso)
 - ✅ Barra progresso visiva con colori dinamici + animazione shimmer ≥80%
 
 ### Funzioni maintenanceService.js
@@ -366,16 +366,22 @@ getMaintenanceStatus()       // Status completo: percentage, remainingHours, isN
 **Perché server-side**: Client-side tracking funziona SOLO se app aperta. Server-side cron funziona H24.
 
 **Implementazione**: `/api/scheduler/check` chiama `trackUsageHours()` ogni minuto.
-**Logica**:
+
+**Lifecycle `lastUpdatedAt`** (IMPORTANTE per evitare ore fantasma):
+1. **Init**: `null` in Firebase (NO timestamp inizializzazione)
+2. **Primo WORK**: Inizializza `lastUpdatedAt = now` senza aggiungere ore
+3. **Tracking continuo**: Calcola `elapsed = now - lastUpdatedAt`, aggiorna entrambi
+4. **Config change**: `updateTargetHours()` NON tocca `lastUpdatedAt` (evita ore fantasma)
+
+**Logica tracking**:
 1. Check status WORK → se no, skip
-2. Calcola `elapsed = now - lastUpdatedAt` (Firebase)
-3. Se elapsed < 0.5min → skip
-4. Update Firebase: `currentHours += elapsed/60`, `lastUpdatedAt = now`
-5. Se `currentHours >= targetHours` → `needsCleaning = true`
+2. Se `lastUpdatedAt === null` → inizializza e return (no tracking)
+3. Calcola `elapsed = now - lastUpdatedAt` (Firebase)
+4. Se elapsed < 0.5min → skip
+5. Update Firebase: `currentHours += elapsed/60`, `lastUpdatedAt = now`
+6. Se `currentHours >= targetHours` → `needsCleaning = true`
 
 **Auto-recovery**: Se cron salta chiamate, prossima esecuzione recupera minuti persi automaticamente.
-
-**Dettagli completi**: Vedi sezione Sistema Manutenzione in `lib/maintenanceService.js:1-350`
 
 ## Sistema Monitoring Cronjob 🔍
 
@@ -434,18 +440,22 @@ Verify CRON_SECRET (401 if invalid)
   ↓
 Save cronHealth/lastCall timestamp (ISO UTC)
   ↓
-Check maintenance (canIgnite) → skip if needsCleaning
-  ↓
 Check mode (manual/auto/semi-manual)
   ↓
 If auto: fetch schedule + execute actions (source='scheduler')
+  ↓
+  ├─ IGNITE: Check maintenance (canIgnite) → skip if needsCleaning
+  └─ SHUTDOWN/SetFan/SetPower: NO maintenance check (sempre permessi)
   ↓
 If scheduled change → clear semi-manual
   ↓
 Track usage: trackUsageHours(currentStatus)
 ```
 
-**CRITICO**: Maintenance tracking è **server-side via cron**, non client-side!
+**CRITICO**:
+- Maintenance tracking è **server-side via cron**, non client-side
+- Blocco manutenzione applicato **solo all'accensione** (manuale e schedulata)
+- Spegnimento sempre permesso, anche con manutenzione richiesta
 
 ### OAuth Token Management Flow
 ```
@@ -577,7 +587,7 @@ Tutti i colori hanno scala completa 50-900 (10 tonalità ciascuno):
 ### Firebase Operations
 **CRITICO**: Firebase Realtime Database **NON accetta valori `undefined`** nelle write operations.
 
-**Helper pattern**:
+**Helper pattern per undefined**:
 ```javascript
 function filterUndefined(obj) {
   return Object.entries(obj).reduce((acc, [key, value]) => {
@@ -589,7 +599,13 @@ function filterUndefined(obj) {
 }
 ```
 
-Applicare SEMPRE quando: API esterne con campi opzionali, parsing oggetti complessi, form/input utente.
+**Pattern `null` initialization** (IMPORTANTE):
+- Usa `null` per campi che saranno popolati successivamente (es. `lastUpdatedAt: null`)
+- Evita timestamp/valori default se il dato sarà aggiornato da eventi futuri
+- Previene "dati fantasma" in calcoli basati su elapsed time
+- Esempio: `lastUpdatedAt` inizia `null`, settato solo al primo evento WORK
+
+Applicare SEMPRE quando: API esterne con campi opzionali, parsing oggetti complessi, form/input utente, campi timestamp event-driven.
 
 ### Client Components
 ```javascript
@@ -643,6 +659,16 @@ npm run test:ci          # CI/CD mode
 3. Verifica coverage: `npm run test:coverage`
 4. Build production: `npm run build`
 5. Commit solo se test passano
+
+**Pattern Date mocking** (per test con timestamp):
+```javascript
+// ❌ EVITARE: jest.spyOn(global, 'Date') - instabile
+// ✅ USARE: jest.useFakeTimers()
+jest.useFakeTimers();
+jest.setSystemTime(new Date('2025-10-15T12:00:00.000Z'));
+// ... test code ...
+jest.useRealTimers(); // cleanup
+```
 
 ## Troubleshooting Comune
 
@@ -737,6 +763,6 @@ CRON_SECRET=your-secret-here
 
 ---
 
-**Last Updated**: 2025-10-17
-**Version**: 1.5.12
+**Last Updated**: 2025-10-18
+**Version**: 1.5.13
 **Author**: Federico Manfredi

@@ -22,15 +22,6 @@ export async function GET(req) {
       throw error;
     }
 
-    // Check maintenance status first
-    const maintenanceAllowed = await canIgnite();
-    if (!maintenanceAllowed) {
-      return Response.json({
-        status: 'MANUTENZIONE_RICHIESTA',
-        message: 'Scheduler in pausa - manutenzione stufa richiesta'
-      });
-    }
-
     // Check if scheduler mode is enabled
     const modeSnapshot = await get(ref(db, `stoveScheduler/mode`));
     const modeData = modeSnapshot.exists() ? modeSnapshot.val() : { enabled: false, semiManual: false };
@@ -131,6 +122,19 @@ export async function GET(req) {
 
     if (active) {
       if (!isOn) {
+        // Check maintenance ONLY before scheduled ignition
+        const maintenanceAllowed = await canIgnite();
+        if (!maintenanceAllowed) {
+          console.log('⚠️ Accensione schedulata bloccata - manutenzione richiesta');
+          return Response.json({
+            status: 'MANUTENZIONE_RICHIESTA',
+            message: 'Accensione schedulata bloccata - manutenzione stufa richiesta',
+            schedulerEnabled: true,
+            giorno,
+            ora
+          });
+        }
+
         await fetch(`${baseUrl}${STOVE_ROUTES.ignite}`, {
           method: 'POST',
           headers: {

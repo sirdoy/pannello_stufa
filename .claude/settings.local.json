@@ -42,7 +42,8 @@
       "Bash(npm update:*)",
       "Bash(npm:*)",
       "WebFetch(domain:developers.meethue.com)",
-      "WebFetch(domain:gotoguy.blog)"
+      "WebFetch(domain:gotoguy.blog)",
+      "Bash(wait $!)"
     ],
     "deny": [],
     "ask": []

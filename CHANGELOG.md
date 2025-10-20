@@ -5,6 +5,26 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.5.14] - 2025-10-20
+
+### Aggiunto
+- **Liquid Glass Style unificato**: tutti i componenti UI ora supportano prop `liquid={true}` per style iOS 18
+- Prop `liquid` aggiunto a: Card, Button, Select, Banner, Input
+- Pattern consistente: `bg-white/[0.08]` + `backdrop-blur-3xl` + `shadow-liquid` + `ring-1 ring-white/20 ring-inset`
+
+### Modificato
+- **Navbar e menu mobile**: redesign completo con liquid glass style
+  - Menu mobile: tutte le voci (user info, device buttons, links, logout) con liquid glass
+  - Dropdowns desktop: style liquid per maggiore coerenza
+  - Separatori: `border-white/20` invece di `border-neutral-200`
+- **Pagine aggiornate**: scheduler, maintenance, errors, changelog, not-found con liquid glass uniforme
+- **Device Cards**: StoveCard, ThermostatCard, LightsCard con liquid glass su tutti i componenti
+- **DayAccordionItem**: aggiornato con liquid glass per consistenza scheduler page
+
+### Documentazione
+- CLAUDE.md: integrata sezione "Liquid Glass Style Pattern" con esempi e best practices
+- Documentati componenti base con prop `liquid` e pattern di utilizzo
+
 ## [1.5.13] - 2025-10-18
 
 ### Corretto

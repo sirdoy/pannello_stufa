@@ -86,7 +86,7 @@ export default function ErrorsPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <Card className="p-6">
+      <Card liquid className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-neutral-900 flex items-center gap-3">
@@ -97,7 +97,7 @@ export default function ErrorsPage() {
               Registro completo degli errori e allarmi della stufa
             </p>
           </div>
-          <Button
+          <Button liquid
             variant="outline"
             icon="🏠"
             onClick={() => router.push('/')}
@@ -153,7 +153,7 @@ export default function ErrorsPage() {
       {/* Errors List */}
       <div className="space-y-4">
         {paginatedErrors.length === 0 ? (
-          <Card className="p-12 text-center">
+          <Card liquid className="p-12 text-center">
             <span className="text-6xl mb-4 block">✅</span>
             <h3 className="text-xl font-bold text-neutral-900 mb-2">
               Nessun errore trovato
@@ -220,7 +220,7 @@ export default function ErrorsPage() {
                 {/* Actions */}
                 {!error.resolved && (
                   <div className="pt-4 border-t border-neutral-200">
-                    <Button
+                    <Button liquid
                       variant="success"
                       size="sm"
                       icon="✓"
@@ -238,7 +238,7 @@ export default function ErrorsPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <Card className="p-4">
+        <Card liquid className="p-4">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

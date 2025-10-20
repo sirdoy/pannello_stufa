@@ -20,10 +20,12 @@ export default function Banner({
   actions,
   dismissible = false,
   onDismiss,
+  liquid = false,
   className = '',
   children,
 }) {
-  const variants = {
+  // Solid variants (tradizionali)
+  const solidVariants = {
     info: {
       bg: 'bg-info-50 dark:bg-info-900/20',
       border: 'border-info-200 dark:border-info-800/40',
@@ -54,11 +56,48 @@ export default function Banner({
     },
   };
 
+  // Liquid glass variants (iOS 18 style)
+  const liquidVariants = {
+    info: {
+      bg: 'bg-info-500/10',
+      border: 'border-info-500/20',
+      titleColor: 'text-info-900',
+      descColor: 'text-info-700',
+      defaultIcon: 'ℹ️',
+    },
+    warning: {
+      bg: 'bg-warning-500/10',
+      border: 'border-warning-500/20',
+      titleColor: 'text-warning-900',
+      descColor: 'text-warning-700',
+      defaultIcon: '⚠️',
+    },
+    error: {
+      bg: 'bg-danger-500/10',
+      border: 'border-danger-500/20',
+      titleColor: 'text-danger-900',
+      descColor: 'text-danger-700',
+      defaultIcon: '❌',
+    },
+    success: {
+      bg: 'bg-success-500/10',
+      border: 'border-success-500/20',
+      titleColor: 'text-success-900',
+      descColor: 'text-success-700',
+      defaultIcon: '✅',
+    },
+  };
+
+  const variants = liquid ? liquidVariants : solidVariants;
+
   const styles = variants[variant] || variants.info;
   const displayIcon = icon || styles.defaultIcon;
 
   return (
-    <Card className={`${styles.bg} border-2 ${styles.border} ${className}`}>
+    <Card
+      liquid={liquid}
+      className={`${styles.bg} border-2 ${styles.border} ${className}`}
+    >
       <div className="p-4 sm:p-6">
         <div className="flex items-start gap-3 sm:gap-4">
           {/* Icon */}

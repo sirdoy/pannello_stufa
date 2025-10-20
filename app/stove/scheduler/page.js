@@ -243,7 +243,7 @@ export default function WeeklyScheduler() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Header Card */}
-      <Card className="p-6">
+      <Card liquid className="p-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 mb-6">Pianificazione Settimanale</h1>
 
         {/* Status e toggle */}
@@ -257,7 +257,7 @@ export default function WeeklyScheduler() {
 
           <div className="flex gap-3 w-full sm:w-auto">
             {schedulerEnabled && semiManualMode && (
-              <Button
+              <Button liquid
                 variant="warning"
                 onClick={handleClearSemiManual}
                 className="flex-1 sm:flex-initial"
@@ -266,7 +266,7 @@ export default function WeeklyScheduler() {
                 Torna in {schedulerEnabled ? 'Automatico' : 'Manuale'}
               </Button>
             )}
-            <Button
+            <Button liquid
               variant={schedulerEnabled ? 'danger' : 'success'}
               onClick={toggleSchedulerMode}
               className="flex-1 sm:flex-initial"
@@ -278,7 +278,7 @@ export default function WeeklyScheduler() {
 
         {/* Pulsanti Espandi/Comprimi tutto */}
         <div className="flex gap-3 justify-end">
-          <Button
+          <Button liquid
             variant="ghost"
             size="sm"
             icon="📂"
@@ -286,7 +286,7 @@ export default function WeeklyScheduler() {
           >
             Espandi tutto
           </Button>
-          <Button
+          <Button liquid
             variant="ghost"
             size="sm"
             icon="📁"

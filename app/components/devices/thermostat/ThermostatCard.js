@@ -176,23 +176,13 @@ export default function ThermostatCard() {
   };
 
   if (loading) {
-    return (
-      <div className="space-y-4">
-        <Card className="p-4 sm:p-6 lg:p-8">
-          <div className="space-y-4">
-            <div className="h-6 bg-neutral-200 rounded animate-pulse w-1/3" />
-            <div className="h-4 bg-neutral-200 rounded animate-pulse w-2/3" />
-            <div className="h-24 bg-neutral-200 rounded animate-pulse" />
-          </div>
-        </Card>
-      </div>
-    );
+    return <Skeleton.ThermostatCard />;
   }
 
   if (!connected) {
     return (
       <div className="space-y-4 sm:space-y-6">
-        <Card className="p-4 sm:p-6 lg:p-8 border-2 border-info-200 bg-info-50">
+        <Card liquid className="p-4 sm:p-6 lg:p-8 border-2 border-info-200 bg-info-50">
           <div className="relative">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-info-500 via-info-400 to-info-500"></div>
 
@@ -218,6 +208,7 @@ export default function ThermostatCard() {
 
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button
+                    liquid
                     variant="success"
                     onClick={handleAuth}
                     icon="🔗"
@@ -225,6 +216,7 @@ export default function ThermostatCard() {
                     Connetti Netatmo
                   </Button>
                   <Button
+                    liquid
                     variant="outline"
                     onClick={() => router.push('/thermostat')}
                   >
@@ -249,6 +241,7 @@ export default function ThermostatCard() {
     <div className="space-y-4 sm:space-y-6">
       {error && (
         <Banner
+          liquid
           variant="error"
           icon="⚠️"
           title="Errore Connessione"
@@ -259,7 +252,7 @@ export default function ThermostatCard() {
       )}
 
       {/* Main Status Card */}
-      <Card className={`overflow-hidden border-2 transition-all duration-300 ${hasHeating ? 'bg-warning-50 border-warning-200' : 'bg-info-50 border-info-200'}`}>
+      <Card liquid className={`overflow-hidden border-2 transition-all duration-300 ${hasHeating ? 'bg-warning-50 border-warning-200' : 'bg-info-50 border-info-200'}`}>
         <div className="relative">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-info-500 via-info-400 to-info-500"></div>
 
@@ -283,6 +276,7 @@ export default function ThermostatCard() {
             {roomsWithStatus.length > 1 && (
               <div className="mb-4 sm:mb-6">
                 <Select
+                  liquid
                   label="🚪 Seleziona Stanza"
                   value={selectedRoomId || ''}
                   onChange={(e) => setSelectedRoomId(e.target.value)}
@@ -344,6 +338,7 @@ export default function ThermostatCard() {
                 {selectedRoom.setpoint && (
                   <div className="flex items-center gap-3">
                     <Button
+                      liquid
                       variant="outline"
                       size="sm"
                       icon="➖"
@@ -357,6 +352,7 @@ export default function ThermostatCard() {
                       <p className="text-lg font-bold text-neutral-800">{selectedRoom.setpoint}°</p>
                     </div>
                     <Button
+                      liquid
                       variant="outline"
                       size="sm"
                       icon="➕"
@@ -471,6 +467,7 @@ export default function ThermostatCard() {
             {/* Link to full page */}
             <div className="mt-4 sm:mt-6">
               <Button
+                liquid
                 variant="outline"
                 onClick={() => router.push('/thermostat')}
                 className="w-full"

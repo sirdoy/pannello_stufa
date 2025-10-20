@@ -99,12 +99,16 @@ export default function Navbar() {
   const NavLink = ({ href, children, mobile = false, onClick }) => {
     const active = isActive(href);
     const baseClasses = mobile
-      ? 'block px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200'
+      ? 'block px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 relative overflow-hidden'
       : 'px-3 lg:px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200';
 
-    const activeClasses = active
-      ? 'bg-primary-50 text-primary-600 shadow-sm'
-      : 'text-neutral-700 hover:bg-neutral-100';
+    const activeClasses = mobile
+      ? active
+        ? 'bg-primary-500/10 backdrop-blur-2xl text-primary-700 shadow-liquid-sm ring-1 ring-primary-500/20 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-primary-400/10 before:to-transparent before:pointer-events-none'
+        : 'text-neutral-800 bg-white/[0.08] backdrop-blur-2xl hover:bg-white/[0.12] shadow-liquid-sm ring-1 ring-white/20 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none'
+      : active
+        ? 'bg-primary-50 text-primary-600 shadow-sm'
+        : 'text-neutral-700 hover:bg-neutral-100';
 
     return (
       <Link
@@ -112,14 +116,14 @@ export default function Navbar() {
         className={`${baseClasses} ${activeClasses}`}
         onClick={onClick}
       >
-        {children}
+        <span className={mobile ? 'relative z-10' : ''}>{children}</span>
       </Link>
     );
   };
 
   return (
     <>
-      <nav className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-xl border-b border-neutral-200/50 shadow-glass">
+      <nav className="sticky top-0 z-50 w-full bg-white/[0.08] backdrop-blur-3xl border-b border-white/20 shadow-liquid">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16 lg:h-[4.5rem]">
 
@@ -172,7 +176,7 @@ export default function Navbar() {
 
                   {/* Desktop Dropdown Menu */}
                   {desktopDeviceDropdown === device.id && (
-                    <div className="absolute left-0 mt-2 w-48 xl:w-56 bg-white/95 backdrop-blur-xl border border-neutral-200/50 rounded-xl shadow-glass-lg overflow-hidden z-[100]">
+                    <div className="absolute left-0 mt-2 w-48 xl:w-56 bg-white/[0.10] backdrop-blur-3xl border border-white/20 rounded-xl shadow-liquid-lg overflow-hidden z-[100] ring-1 ring-white/10 ring-inset">
                       {device.items.map(item => (
                         <Link
                           key={item.route}
@@ -205,7 +209,7 @@ export default function Navbar() {
                 <div className="relative ml-2" ref={userDropdownRef}>
                   <button
                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/70 hover:bg-white/90 backdrop-blur-sm border border-neutral-200/50 text-neutral-700 shadow-sm transition-all duration-200"
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.08] hover:bg-white/[0.12] backdrop-blur-2xl border border-white/20 text-neutral-700 shadow-liquid-sm ring-1 ring-white/10 ring-inset transition-all duration-200"
                     aria-expanded={userDropdownOpen}
                   >
                     <span className="text-sm xl:text-base">👤</span>
@@ -226,7 +230,7 @@ export default function Navbar() {
                   </button>
 
                   {userDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 xl:w-64 bg-white/95 backdrop-blur-xl border border-neutral-200/50 rounded-xl shadow-glass-lg overflow-hidden z-[100]">
+                    <div className="absolute right-0 mt-2 w-56 xl:w-64 bg-white/[0.10] backdrop-blur-3xl border border-white/20 rounded-xl shadow-liquid-lg overflow-hidden z-[100] ring-1 ring-white/10 ring-inset">
                       <div className="px-4 py-3 border-b border-neutral-200/50">
                         <p className="text-xs text-neutral-500">Connesso come</p>
                         <p className="text-sm xl:text-base font-medium text-neutral-800 truncate mt-0.5">{user.name}</p>
@@ -279,23 +283,23 @@ export default function Navbar() {
         <>
           {/* Backdrop */}
           <div
-            className="fixed top-[3.5rem] sm:top-16 left-0 right-0 bottom-0 bg-black/30 backdrop-blur-sm z-[100] lg:hidden"
+            className="fixed top-[3.5rem] sm:top-16 left-0 right-0 bottom-0 bg-black/40 backdrop-blur-md z-[100] lg:hidden"
             onClick={() => setMobileMenuOpen(false)}
             aria-hidden="true"
           />
 
           {/* Mobile Menu Panel */}
-          <div className="fixed top-[3.5rem] sm:top-16 left-0 right-0 bottom-0 bg-white/95 backdrop-blur-xl z-[101] lg:hidden overflow-y-auto">
+          <div className="fixed top-[3.5rem] sm:top-16 left-0 right-0 bottom-0 bg-white/[0.10] backdrop-blur-3xl z-[101] lg:hidden overflow-y-auto">
             <div className="px-3 sm:px-4 py-4 space-y-2">
 
               {/* User Info */}
               {user && (
-                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-neutral-50 border border-neutral-200 mb-4">
-                  <span className="text-lg">👤</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{user.name}</p>
+                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-white/[0.08] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-white/20 ring-inset mb-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none">
+                  <span className="text-lg relative z-10">👤</span>
+                  <div className="flex-1 min-w-0 relative z-10">
+                    <p className="text-sm font-medium truncate text-neutral-900">{user.name}</p>
                     {user.email && (
-                      <p className="text-xs text-neutral-500 truncate">{user.email}</p>
+                      <p className="text-xs text-neutral-600 truncate">{user.email}</p>
                     )}
                   </div>
                 </div>
@@ -306,18 +310,18 @@ export default function Navbar() {
                 <div key={device.id} className="space-y-1">
                   <button
                     onClick={() => setMobileDeviceDropdown(mobileDeviceDropdown === device.id ? null : device.id)}
-                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 relative overflow-hidden ${
                       pathname.startsWith(`/${device.id}`)
-                        ? 'bg-primary-50 text-primary-600'
-                        : 'text-neutral-700 bg-neutral-50 hover:bg-neutral-100'
+                        ? 'bg-primary-500/10 backdrop-blur-2xl text-primary-700 shadow-liquid-sm ring-1 ring-primary-500/20 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-primary-400/10 before:to-transparent before:pointer-events-none'
+                        : 'text-neutral-800 bg-white/[0.08] backdrop-blur-2xl hover:bg-white/[0.12] shadow-liquid-sm ring-1 ring-white/20 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none'
                     }`}
                   >
-                    <span className="flex items-center gap-3">
+                    <span className="flex items-center gap-3 relative z-10">
                       <span className="text-lg">{device.icon}</span>
                       <span>{device.name}</span>
                     </span>
                     <svg
-                      className={`w-5 h-5 transition-transform duration-200 ${mobileDeviceDropdown === device.id ? 'rotate-180' : ''}`}
+                      className={`w-5 h-5 transition-transform duration-200 relative z-10 ${mobileDeviceDropdown === device.id ? 'rotate-180' : ''}`}
                       fill="none"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -348,7 +352,7 @@ export default function Navbar() {
               ))}
 
               {/* Global Links */}
-              <div className="pt-3 mt-3 border-t border-neutral-200 space-y-1">
+              <div className="pt-3 mt-3 border-t border-white/20 space-y-1">
                 {navStructure.global.map(item => (
                   <NavLink
                     key={item.route}
@@ -365,14 +369,14 @@ export default function Navbar() {
               </div>
 
               {/* Logout */}
-              <div className="pt-3 mt-3 border-t border-neutral-200">
+              <div className="pt-3 mt-3 border-t border-white/20">
                 <Link
                   href="/api/auth/logout"
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-primary-600 bg-primary-50 hover:bg-primary-100 transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-primary-700 bg-primary-500/10 backdrop-blur-2xl hover:bg-primary-500/15 shadow-liquid-sm ring-1 ring-primary-500/20 ring-inset transition-all duration-200 active:scale-[0.98] relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-primary-400/10 before:to-transparent before:pointer-events-none"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <span className="text-base">🚪</span>
-                  <span>Logout</span>
+                  <span className="text-base relative z-10">🚪</span>
+                  <span className="relative z-10">Logout</span>
                 </Link>
               </div>
             </div>

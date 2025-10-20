@@ -43,74 +43,248 @@ Skeleton.Card = function SkeletonCard({ children, className = '', ...props }) {
 };
 
 /**
- * Skeleton.StovePanel - Skeleton for StovePanel component (new dashboard layout)
+ * Skeleton.StovePanel - Skeleton for StoveCard component (homepage stove control)
  */
 Skeleton.StovePanel = function SkeletonStovePanel() {
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* Hero Section - Stato */}
-      <Skeleton.Card className="p-8">
-        <div className="flex items-center justify-between mb-6">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-10 w-10 rounded-xl" />
-        </div>
-        <Skeleton className="h-16 w-full mb-6" />
-        <div className="pt-4 border-t border-neutral-200">
-          <div className="flex items-center gap-3">
-            <Skeleton className="h-10 w-10 rounded-lg" />
-            <div className="flex-1">
-              <Skeleton className="h-5 w-32 mb-2" />
-              <Skeleton className="h-4 w-48" />
+    <div className="space-y-4 sm:space-y-6">
+      {/* Main Status Card */}
+      <Skeleton.Card className="overflow-hidden bg-gradient-to-br from-neutral-50/80 via-neutral-100/60 to-neutral-50/80 shadow-glass-lg ring-1 ring-white/20">
+        <div className="relative">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 via-accent-500 to-primary-500 opacity-80"></div>
+
+          <div className="p-6 sm:p-8">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <Skeleton className="h-8 w-32" />
+              <Skeleton className="h-12 w-12 rounded-xl" />
+            </div>
+
+            {/* Main Status Display */}
+            <div className="space-y-4 mb-6">
+              {/* Status principale - Glassmorphism Design */}
+              <div className="relative overflow-hidden rounded-3xl">
+                <div className="relative flex flex-col items-center justify-center p-8 sm:p-10 bg-white/85 backdrop-blur-xl rounded-3xl shadow-glass ring-1 ring-white/50 ring-inset">
+                  {/* Status Icon */}
+                  <div className="relative mb-5">
+                    <Skeleton className="h-24 w-24 rounded-full" />
+                  </div>
+
+                  {/* Status Text */}
+                  <div className="text-center w-full">
+                    <Skeleton className="h-3 w-24 mb-3 mx-auto" />
+                    <Skeleton className="h-12 w-56 mx-auto" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Ventola e Potenza - Grid responsive con Glassmorphism */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* Ventola */}
+                <div className="relative overflow-hidden rounded-2xl">
+                  <div className="relative flex flex-col items-center justify-center p-5 sm:p-6 bg-gradient-to-br from-white/80 to-info-50/40 backdrop-blur-lg rounded-2xl shadow-glass-sm ring-1 ring-white/40 ring-inset">
+                    <div className="relative mb-3">
+                      <Skeleton className="h-12 w-12 sm:h-14 sm:w-14 rounded-full" />
+                    </div>
+                    <Skeleton className="h-3 w-12 mb-2" />
+                    <Skeleton className="h-8 w-16" />
+                  </div>
+                </div>
+
+                {/* Potenza */}
+                <div className="relative overflow-hidden rounded-2xl">
+                  <div className="relative flex flex-col items-center justify-center p-5 sm:p-6 bg-gradient-to-br from-white/80 to-accent-50/40 backdrop-blur-lg rounded-2xl shadow-glass-sm ring-1 ring-white/40 ring-inset">
+                    <div className="relative mb-3">
+                      <Skeleton className="h-12 w-12 sm:h-14 sm:w-14 rounded-full" />
+                    </div>
+                    <Skeleton className="h-3 w-12 mb-2" />
+                    <Skeleton className="h-8 w-16" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Separator */}
+            <div className="relative my-6 sm:my-8">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 to-transparent"></div>
+              </div>
+              <div className="relative flex justify-center">
+                <Skeleton className="h-7 w-36 rounded-full" />
+              </div>
+            </div>
+
+            {/* Mode Indicator */}
+            <div className="flex flex-col gap-4 p-5 sm:p-6 bg-white/60 backdrop-blur-md rounded-2xl shadow-glass-sm ring-1 ring-white/40 ring-inset mb-6">
+              <div className="flex items-center gap-4">
+                <Skeleton className="h-14 w-14 rounded-xl" />
+                <div className="flex-1 min-w-0">
+                  <Skeleton className="h-5 w-32 mb-2" />
+                  <Skeleton className="h-4 w-full max-w-xs" />
+                </div>
+              </div>
+              <Skeleton className="h-11 w-full rounded-xl" />
+            </div>
+
+            {/* Cron Health Banner placeholder */}
+            <div className="mb-6">
+              <Skeleton className="h-12 w-full rounded-xl" />
+            </div>
+
+            {/* Separator */}
+            <div className="relative my-6 sm:my-8">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 to-transparent"></div>
+              </div>
+              <div className="relative flex justify-center">
+                <Skeleton className="h-7 w-32 rounded-full" />
+              </div>
+            </div>
+
+            {/* Maintenance Bar placeholder */}
+            <div className="mb-6">
+              <Skeleton className="h-16 w-full rounded-xl" />
+            </div>
+
+            {/* Separator Controllo */}
+            <div className="relative my-6 sm:my-8">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 to-transparent"></div>
+              </div>
+              <div className="relative flex justify-center">
+                <Skeleton className="h-7 w-28 rounded-full" />
+              </div>
+            </div>
+
+            {/* Azioni On/Off */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <Skeleton className="h-20 sm:h-24 rounded-xl" />
+              <Skeleton className="h-20 sm:h-24 rounded-xl" />
+            </div>
+
+            {/* Status indicator */}
+            <div className="mb-6">
+              <Skeleton className="h-12 w-full rounded-xl" />
+            </div>
+
+            {/* Regolazioni - Select */}
+            <div className="space-y-4">
+              <Skeleton className="h-16 w-full rounded-xl" />
+              <Skeleton className="h-16 w-full rounded-xl" />
             </div>
           </div>
         </div>
       </Skeleton.Card>
+    </div>
+  );
+};
 
-      {/* Controlli - Grid 2 colonne */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Azioni Rapide */}
-        <Skeleton.Card className="p-8">
-          <Skeleton className="h-7 w-40 mb-6" />
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <Skeleton className="h-24" />
-            <Skeleton className="h-24" />
-          </div>
-          <Skeleton className="h-12 w-full" />
-        </Skeleton.Card>
+/**
+ * Skeleton.ThermostatCard - Skeleton for ThermostatCard component (homepage thermostat control)
+ */
+Skeleton.ThermostatCard = function SkeletonThermostatCard() {
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      {/* Main Status Card */}
+      <Skeleton.Card className="overflow-hidden border-2 border-neutral-200 bg-neutral-50">
+        <div className="relative">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-info-500 via-info-400 to-info-500"></div>
 
-        {/* Regolazioni */}
-        <Skeleton.Card className="p-8">
-          <Skeleton className="h-7 w-40 mb-6" />
-          <div className="space-y-4">
-            <Skeleton className="h-20 w-full" />
-            <Skeleton className="h-20 w-full" />
-            <div className="mt-6 pt-4 border-t border-neutral-200 grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <Skeleton className="h-4 w-16 mx-auto mb-1" />
-                <Skeleton className="h-8 w-12 mx-auto" />
+          <div className="p-4 sm:p-6 lg:p-8">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <Skeleton className="h-8 w-40" />
+              <Skeleton className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl" />
+            </div>
+
+            {/* Room Selection (opzionale, se più stanze) */}
+            <div className="mb-4 sm:mb-6">
+              <Skeleton className="h-14 sm:h-16 w-full rounded-xl" />
+            </div>
+
+            {/* Temperature Display */}
+            <div className="space-y-4 mb-4 sm:mb-6">
+              <div className="flex flex-col items-center justify-center p-4 sm:p-6 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/80 shadow-sm">
+                <div className="flex items-center gap-6">
+                  {/* Current temp */}
+                  <div className="text-center">
+                    <Skeleton className="h-3 w-16 mb-2 mx-auto" />
+                    <Skeleton className="h-12 sm:h-14 w-20 sm:w-24" />
+                  </div>
+
+                  {/* Arrow */}
+                  <Skeleton className="h-6 w-6" />
+
+                  {/* Target temp */}
+                  <div className="text-center">
+                    <Skeleton className="h-3 w-16 mb-2 mx-auto" />
+                    <Skeleton className="h-12 sm:h-14 w-20 sm:w-24" />
+                  </div>
+                </div>
               </div>
-              <div className="text-center">
-                <Skeleton className="h-4 w-16 mx-auto mb-1" />
-                <Skeleton className="h-8 w-12 mx-auto" />
+
+              {/* Quick temperature controls */}
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-10 w-full rounded-xl" />
+                <div className="text-center px-4">
+                  <Skeleton className="h-3 w-12 mb-1 mx-auto" />
+                  <Skeleton className="h-6 w-16 mx-auto" />
+                </div>
+                <Skeleton className="h-10 w-full rounded-xl" />
               </div>
             </div>
-          </div>
-        </Skeleton.Card>
-      </div>
 
-      {/* Netatmo */}
-      <Skeleton.Card className="p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Skeleton className="h-8 w-8 rounded-lg" />
-            <div>
-              <Skeleton className="h-5 w-24 mb-1" />
-              <Skeleton className="h-3 w-48" />
+            {/* Separator */}
+            <div className="relative my-4 sm:my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-neutral-200"></div>
+              </div>
+              <div className="relative flex justify-center text-xs sm:text-sm">
+                <Skeleton className="h-5 w-24 rounded-full" />
+              </div>
             </div>
-          </div>
-          <div className="flex gap-2">
-            <Skeleton className="h-10 w-24" />
-            <Skeleton className="h-10 w-24" />
+
+            {/* Mode Control - 4 buttons */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <Skeleton className="h-20 sm:h-24 rounded-xl" />
+              <Skeleton className="h-20 sm:h-24 rounded-xl" />
+              <Skeleton className="h-20 sm:h-24 rounded-xl" />
+              <Skeleton className="h-20 sm:h-24 rounded-xl" />
+            </div>
+
+            {/* Separator */}
+            <div className="relative my-4 sm:my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-neutral-200"></div>
+              </div>
+              <div className="relative flex justify-center text-xs sm:text-sm">
+                <Skeleton className="h-5 w-28 rounded-full" />
+              </div>
+            </div>
+
+            {/* Summary Info - 3 cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-white/80">
+                <Skeleton className="h-8 w-8 sm:h-10 sm:w-10 rounded-full mb-2" />
+                <Skeleton className="h-3 w-12 mb-1" />
+                <Skeleton className="h-4 w-20" />
+              </div>
+
+              <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-white/80">
+                <Skeleton className="h-8 w-8 sm:h-10 sm:w-10 rounded-full mb-2" />
+                <Skeleton className="h-3 w-12 mb-1" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+
+              <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-white/80 col-span-2 sm:col-span-1">
+                <Skeleton className="h-8 w-8 sm:h-10 sm:w-10 rounded-full mb-2" />
+                <Skeleton className="h-3 w-16 mb-1" />
+                <Skeleton className="h-4 w-12" />
+              </div>
+            </div>
+
+            {/* Link to full page */}
+            <Skeleton className="h-10 sm:h-11 w-full rounded-xl" />
           </div>
         </div>
       </Skeleton.Card>
@@ -123,29 +297,60 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
  */
 Skeleton.Scheduler = function SkeletonScheduler() {
   return (
-    <div className="space-y-6">
-      {/* Mode Toggle */}
-      <Skeleton.Card>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Skeleton className="h-10 w-10 rounded-lg" />
+    <div className="max-w-5xl mx-auto space-y-6">
+      {/* Header Card */}
+      <Skeleton.Card className="p-6">
+        {/* Title */}
+        <Skeleton className="h-8 sm:h-9 w-64 sm:w-80 mb-6" />
+
+        {/* Status e toggle */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl bg-neutral-50 mb-4">
+          {/* ModeIndicator */}
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-6 w-6 rounded-lg" />
             <div>
-              <Skeleton className="h-5 w-32 mb-2" />
-              <Skeleton className="h-4 w-64" />
+              <Skeleton className="h-4 w-24 mb-1" />
+              <Skeleton className="h-3 w-32" />
             </div>
           </div>
-          <Skeleton className="h-12 w-24 rounded-full" />
+
+          {/* Toggle button */}
+          <Skeleton className="h-10 sm:h-11 w-full sm:w-40 rounded-xl" />
+        </div>
+
+        {/* Pulsanti Espandi/Comprimi */}
+        <div className="flex gap-3 justify-end">
+          <Skeleton className="h-9 w-32 rounded-xl" />
+          <Skeleton className="h-9 w-32 rounded-xl" />
         </div>
       </Skeleton.Card>
 
       {/* Day Schedule Cards */}
       {[...Array(7)].map((_, i) => (
-        <Skeleton.Card key={i}>
-          <Skeleton className="h-6 w-24 mb-4" />
-          <Skeleton className="h-16 w-full mb-4" />
-          <div className="space-y-3">
-            <Skeleton className="h-24" />
-            <Skeleton className="h-12 w-32" />
+        <Skeleton.Card key={i} className="overflow-hidden">
+          {/* Header - sempre visibile */}
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              {/* Day info */}
+              <div className="flex items-center gap-4 flex-1">
+                <Skeleton className="h-8 w-8 rounded-lg" />
+                <div>
+                  <Skeleton className="h-6 w-24 mb-2" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+              </div>
+
+              {/* Expand icon */}
+              <Skeleton className="h-6 w-6 rounded-lg" />
+            </div>
+
+            {/* TimeBar compatta */}
+            <div className="mt-4">
+              <div className="relative h-4 w-full bg-neutral-200 rounded-lg overflow-hidden shadow-inner">
+                <div className="absolute top-0 bottom-0 bg-gradient-to-r from-primary-400 to-accent-500" style={{ left: '20%', width: '30%' }} />
+                <div className="absolute top-0 bottom-0 bg-gradient-to-r from-primary-400 to-accent-500" style={{ left: '60%', width: '25%' }} />
+              </div>
+            </div>
           </div>
         </Skeleton.Card>
       ))}
@@ -158,16 +363,25 @@ Skeleton.Scheduler = function SkeletonScheduler() {
  */
 Skeleton.LogEntry = function SkeletonLogEntry() {
   return (
-    <div className="flex gap-4 p-4 border-b border-gray-100 last:border-0">
-      <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
-      <div className="flex-1 space-y-2">
-        <div className="flex items-center gap-2">
+    <li className="border-b border-neutral-200 pb-4 mb-4 last:border-b-0 flex items-start gap-3">
+      {/* Icon */}
+      <Skeleton className="h-8 w-8 rounded-full flex-shrink-0 mt-1" />
+
+      <div className="flex-1 min-w-0">
+        {/* User & Device Badge Row */}
+        <div className="flex items-center gap-2 mb-2 flex-wrap">
+          <Skeleton className="h-6 w-6 rounded-full" />
           <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-5 w-20 rounded-md" />
         </div>
+
+        {/* Timestamp */}
+        <Skeleton className="h-3 w-40 mb-2" />
+
+        {/* Action */}
         <Skeleton className="h-5 w-3/4" />
       </div>
-    </div>
+    </li>
   );
 };
 
@@ -176,22 +390,38 @@ Skeleton.LogEntry = function SkeletonLogEntry() {
  */
 Skeleton.LogPage = function SkeletonLogPage() {
   return (
-    <div className="space-y-6">
-      <Skeleton.Card>
-        <Skeleton className="h-8 w-48 mb-6" />
-        <div className="space-y-0">
-          {[...Array(10)].map((_, i) => (
-            <Skeleton.LogEntry key={i} />
-          ))}
+    <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <Skeleton className="h-9 w-64 mx-auto mb-2" />
+        <Skeleton className="h-5 w-80 mx-auto" />
+      </div>
+
+      {/* Filters Card */}
+      <Skeleton.Card className="p-4 sm:p-6">
+        <Skeleton className="h-4 w-40 mb-3" />
+        <div className="flex flex-wrap gap-2">
+          <Skeleton className="h-9 w-24 rounded-xl" />
+          <Skeleton className="h-9 w-32 rounded-xl" />
+          <Skeleton className="h-9 w-36 rounded-xl" />
         </div>
       </Skeleton.Card>
 
-      {/* Pagination */}
-      <div className="flex justify-center gap-2">
-        <Skeleton className="h-10 w-24" />
-        <Skeleton className="h-10 w-32" />
-        <Skeleton className="h-10 w-24" />
-      </div>
+      {/* Log Entries Card */}
+      <Skeleton.Card className="p-4 sm:p-6">
+        <ul className="space-y-3">
+          {[...Array(10)].map((_, i) => (
+            <Skeleton.LogEntry key={i} />
+          ))}
+        </ul>
+
+        {/* Pagination */}
+        <div className="mt-6 flex justify-center gap-2">
+          <Skeleton className="h-10 w-24 rounded-xl" />
+          <Skeleton className="h-10 w-32 rounded-xl" />
+          <Skeleton className="h-10 w-24 rounded-xl" />
+        </div>
+      </Skeleton.Card>
     </div>
   );
 };
@@ -204,22 +434,22 @@ Skeleton.NetatmoPage = function SkeletonNetatmoPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-8">
-        <Skeleton className="h-9 w-64 mb-2" />
-        <Skeleton className="h-5 w-96" />
+        <Skeleton className="h-9 w-64 sm:w-80 mb-2" />
+        <Skeleton className="h-5 w-80 sm:w-96" />
       </div>
 
       {/* Mode Control Card */}
       <Skeleton.Card className="p-6 mb-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <Skeleton className="h-6 w-48 mb-2" />
-            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-4 w-36" />
           </div>
-          <div className="flex gap-2">
-            <Skeleton className="h-9 w-28" />
-            <Skeleton className="h-9 w-24" />
-            <Skeleton className="h-9 w-24" />
-            <Skeleton className="h-9 w-20" />
+          <div className="flex flex-wrap gap-2">
+            <Skeleton className="h-9 w-32 rounded-xl" />
+            <Skeleton className="h-9 w-28 rounded-xl" />
+            <Skeleton className="h-9 w-28 rounded-xl" />
+            <Skeleton className="h-9 w-20 rounded-xl" />
           </div>
         </div>
       </Skeleton.Card>
@@ -236,12 +466,12 @@ Skeleton.NetatmoPage = function SkeletonNetatmoPage() {
             <Skeleton className="h-6 w-12" />
           </div>
           <div>
-            <Skeleton className="h-4 w-16 mb-2" />
+            <Skeleton className="h-4 w-20 mb-2" />
             <Skeleton className="h-6 w-12" />
           </div>
         </div>
         <div className="mt-4 pt-4 border-t border-neutral-200">
-          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-9 w-56 rounded-xl" />
         </div>
       </Skeleton.Card>
 
@@ -251,9 +481,9 @@ Skeleton.NetatmoPage = function SkeletonNetatmoPage() {
           <Skeleton.Card key={i} className="p-6">
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
-              <div>
+              <div className="flex-1 min-w-0">
                 <Skeleton className="h-6 w-32 mb-2" />
-                <Skeleton className="h-3 w-20" />
+                <Skeleton className="h-3 w-24" />
               </div>
               <Skeleton className="h-6 w-20 rounded-lg" />
             </div>
@@ -264,9 +494,9 @@ Skeleton.NetatmoPage = function SkeletonNetatmoPage() {
             </div>
             {/* Buttons */}
             <div className="grid grid-cols-3 gap-2">
-              <Skeleton className="h-9" />
-              <Skeleton className="h-9" />
-              <Skeleton className="h-9" />
+              <Skeleton className="h-9 rounded-xl" />
+              <Skeleton className="h-9 rounded-xl" />
+              <Skeleton className="h-9 rounded-xl" />
             </div>
           </Skeleton.Card>
         ))}

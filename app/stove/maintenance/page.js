@@ -105,9 +105,9 @@ export default function MaintenancePage() {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Card className="p-8 text-center">
+        <Card liquid className="p-8 text-center">
           <p className="text-neutral-600 mb-4">Accesso non autorizzato</p>
-          <Button href="/api/auth/login" variant="primary">Accedi</Button>
+          <Button liquid href="/api/auth/login" variant="primary">Accedi</Button>
         </Card>
       </div>
     );
@@ -123,7 +123,7 @@ export default function MaintenancePage() {
         </div>
 
         {/* Current Status Card */}
-        <Card glass className="p-6">
+        <Card liquid glass className="p-6">
           <h2 className="text-xl font-semibold text-neutral-800 mb-4">📊 Stato Attuale</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -151,7 +151,7 @@ export default function MaintenancePage() {
 
           {/* Reset Button */}
           <div className="mt-4 pt-4 border-t border-neutral-200">
-            <Button
+            <Button liquid
               variant="danger"
               onClick={handleResetRequest}
               disabled={isResetting || (maintenanceData?.currentHours || 0) === 0}
@@ -177,7 +177,7 @@ export default function MaintenancePage() {
         </Card>
 
         {/* Configuration Card */}
-        <Card glass className="p-6">
+        <Card liquid glass className="p-6">
           <h2 className="text-xl font-semibold text-neutral-800 mb-4">⚙️ Configurazione</h2>
 
           <div className="space-y-4">
@@ -222,7 +222,7 @@ export default function MaintenancePage() {
               </div>
             </div>
 
-            <Button
+            <Button liquid
               variant="primary"
               onClick={handleSave}
               disabled={isSaving || targetHours === maintenanceData?.targetHours}
@@ -244,7 +244,7 @@ export default function MaintenancePage() {
         </Card>
 
         {/* Info Card */}
-        <Card className="p-6 bg-info-50 border-2 border-info-200">
+        <Card liquid className="p-6 bg-info-50 border-2 border-info-200">
           <h3 className="font-semibold text-info-900 mb-2">ℹ️ Come Funziona</h3>
           <ul className="text-sm text-info-800 space-y-1">
             <li>• Il contatore aumenta automaticamente ogni minuto quando la stufa è in funzione (status WORK)</li>
@@ -258,7 +258,7 @@ export default function MaintenancePage() {
       {/* Reset Confirmation Modal */}
       {showResetConfirm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[10000] p-4">
-          <Card glass className="max-w-md w-full p-6">
+          <Card liquid glass className="max-w-md w-full p-6">
             <h2 className="text-2xl font-bold text-neutral-800 mb-4">🔄 Conferma Reset</h2>
             <p className="text-neutral-700 mb-6">
               Sei sicuro di voler azzerare il contatore di manutenzione?
@@ -275,7 +275,7 @@ export default function MaintenancePage() {
               </ul>
             </div>
             <div className="flex gap-3">
-              <Button
+              <Button liquid
                 variant="outline"
                 onClick={handleCancelReset}
                 disabled={isResetting}
@@ -283,7 +283,7 @@ export default function MaintenancePage() {
               >
                 ✕ Annulla
               </Button>
-              <Button
+              <Button liquid
                 variant="danger"
                 onClick={handleConfirmReset}
                 disabled={isResetting}

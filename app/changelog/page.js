@@ -88,7 +88,7 @@ export default function ChangelogPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <Card glass className="p-6 border-2 border-primary-200">
+      <Card liquid glass className="p-6 border-2 border-primary-200">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <div>
             <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 mb-2">📋 Changelog</h1>
@@ -157,7 +157,7 @@ export default function ChangelogPage() {
       </div>
 
       {/* Footer Info */}
-      <Card className="p-6 bg-neutral-50">
+      <Card liquid className="p-6 bg-neutral-50">
         <div className="text-center space-y-2">
           <p className="text-sm text-neutral-600">
             💡 <strong>Versionamento Semantico</strong>: MAJOR.MINOR.PATCH

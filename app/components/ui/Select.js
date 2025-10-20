@@ -9,6 +9,7 @@ export default function Select({
   value,
   onChange,
   disabled = false,
+  liquid = false,
   className = '',
   containerClassName = '',
   ...props
@@ -61,11 +62,19 @@ export default function Select({
           type="button"
           onClick={() => !disabled && setIsOpen(!isOpen)}
           disabled={disabled}
-          className={`w-full px-4 py-4 pr-12 bg-white border-2 border-neutral-300 rounded-xl text-left text-neutral-900 font-medium cursor-pointer
-            hover:border-neutral-400 hover:bg-neutral-50
-            focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:bg-white
+          className={`w-full px-4 py-4 pr-12 rounded-xl text-left font-medium cursor-pointer
+            focus:outline-none
             disabled:opacity-50 disabled:cursor-not-allowed
-            transition-all duration-200 ${isOpen ? 'ring-2 ring-primary-500 border-transparent' : ''} ${className}`}
+            transition-all duration-200
+            ${liquid
+              ? `bg-white/[0.08] backdrop-blur-2xl text-neutral-900 shadow-liquid-sm ring-1 ring-white/20 ring-inset
+                 hover:bg-white/[0.12] hover:shadow-liquid
+                 ${isOpen ? 'bg-white/[0.15] shadow-liquid ring-2 ring-primary-500/30' : ''}`
+              : `bg-white border-2 border-neutral-300 text-neutral-900
+                 hover:border-neutral-400 hover:bg-neutral-50
+                 ${isOpen ? 'ring-2 ring-primary-500 border-transparent' : ''}`
+            }
+            ${className}`}
           {...props}
         >
           {selectedOption?.label}
@@ -80,7 +89,11 @@ export default function Select({
 
         {/* Dropdown Menu */}
         {isOpen && (
-          <div className="absolute z-[100] w-full mt-2 bg-white/90 backdrop-blur-xl border border-white/40 rounded-xl shadow-glass-lg overflow-hidden animate-dropdown">
+          <div className={`absolute z-[100] w-full mt-2 rounded-xl overflow-hidden animate-dropdown
+            ${liquid
+              ? 'bg-white/[0.10] backdrop-blur-3xl shadow-liquid-lg ring-1 ring-white/20 ring-inset'
+              : 'bg-white/90 backdrop-blur-xl border border-white/40 shadow-glass-lg'
+            }`}>
             <div className="max-h-64 overflow-y-auto scrollbar-thin">
               {options.map((option) => (
                 <button
@@ -90,12 +103,16 @@ export default function Select({
                   disabled={option.disabled}
                   className={`w-full px-4 py-3 text-left font-medium transition-all duration-150
                     ${option.value === value
-                      ? 'bg-primary-50 text-primary-700 border-l-4 border-primary-500'
-                      : 'text-neutral-900 hover:bg-neutral-50 border-l-4 border-transparent'
+                      ? liquid
+                        ? 'bg-primary-500/10 text-primary-700 border-l-4 border-primary-500/50'
+                        : 'bg-primary-50 text-primary-700 border-l-4 border-primary-500'
+                      : liquid
+                        ? 'text-neutral-900 hover:bg-white/[0.08] border-l-4 border-transparent'
+                        : 'text-neutral-900 hover:bg-neutral-50 border-l-4 border-transparent'
                     }
                     ${option.disabled
                       ? 'opacity-40 cursor-not-allowed'
-                      : 'cursor-pointer active:bg-primary-100'
+                      : 'cursor-pointer'
                     }
                   `}
                 >

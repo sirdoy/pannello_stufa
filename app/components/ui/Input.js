@@ -2,6 +2,7 @@ export default function Input({
   type = 'text',
   label,
   icon,
+  liquid = false,
   className = '',
   containerClassName = '',
   ...props
@@ -16,7 +17,13 @@ export default function Input({
       )}
       <input
         type={type}
-        className={`w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl text-neutral-900 placeholder:text-neutral-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 ${className}`}
+        className={`w-full px-4 py-3 rounded-xl text-neutral-900 placeholder:text-neutral-400
+          focus:outline-none transition-all duration-200
+          ${liquid
+            ? 'bg-white/[0.08] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-white/20 ring-inset focus:bg-white/[0.12] focus:shadow-liquid focus:ring-2 focus:ring-primary-500/30'
+            : 'bg-white border border-neutral-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent'
+          }
+          ${className}`}
         {...props}
       />
     </div>

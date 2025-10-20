@@ -192,7 +192,7 @@ export default function LightsCard() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <Card className="p-4 sm:p-6 lg:p-8">
+        <Card liquid className="p-4 sm:p-6 lg:p-8">
           <div className="space-y-4">
             <div className="h-6 bg-neutral-200 rounded animate-pulse w-1/3" />
             <div className="h-4 bg-neutral-200 rounded animate-pulse w-2/3" />
@@ -206,7 +206,7 @@ export default function LightsCard() {
   if (!connected) {
     return (
       <div className="space-y-4 sm:space-y-6">
-        <Card className="p-4 sm:p-6 lg:p-8 border-2 border-warning-200 bg-warning-50">
+        <Card liquid className="p-4 sm:p-6 lg:p-8 border-2 border-warning-200 bg-warning-50">
           <div className="relative">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-warning-500 via-warning-400 to-warning-500"></div>
 
@@ -232,6 +232,7 @@ export default function LightsCard() {
 
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button
+                    liquid
                     variant="success"
                     onClick={handleAuth}
                     icon="🔗"
@@ -239,6 +240,7 @@ export default function LightsCard() {
                     Connetti Philips Hue
                   </Button>
                   <Button
+                    liquid
                     variant="outline"
                     onClick={() => router.push('/lights')}
                   >
@@ -272,6 +274,7 @@ export default function LightsCard() {
     <div className="space-y-4 sm:space-y-6">
       {error && (
         <Banner
+          liquid
           variant="error"
           icon="⚠️"
           title="Errore Connessione"
@@ -282,7 +285,7 @@ export default function LightsCard() {
       )}
 
       {/* Main Status Card */}
-      <Card className={`overflow-hidden border-2 transition-all duration-300 ${isRoomOn ? 'bg-warning-50 border-warning-200' : 'bg-neutral-50 border-neutral-200'}`}>
+      <Card liquid className={`overflow-hidden border-2 transition-all duration-300 ${isRoomOn ? 'bg-warning-50 border-warning-200' : 'bg-neutral-50 border-neutral-200'}`}>
         <div className="relative">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-warning-500 via-warning-400 to-warning-500"></div>
 
@@ -306,6 +309,7 @@ export default function LightsCard() {
             {rooms.length > 1 && (
               <div className="mb-4 sm:mb-6">
                 <Select
+                  liquid
                   label="🚪 Seleziona Stanza"
                   value={selectedRoomId || ''}
                   onChange={(e) => setSelectedRoomId(e.target.value)}
@@ -332,6 +336,7 @@ export default function LightsCard() {
                   {/* On/Off Buttons */}
                   <div className="grid grid-cols-2 gap-3 mb-4">
                     <Button
+                      liquid
                       variant={isRoomOn ? "success" : "outline"}
                       onClick={() => handleRoomToggle(selectedRoom.id, true)}
                       icon="💡"
@@ -340,6 +345,7 @@ export default function LightsCard() {
                       Accendi
                     </Button>
                     <Button
+                      liquid
                       variant={!isRoomOn ? "danger" : "outline"}
                       onClick={() => handleRoomToggle(selectedRoom.id, false)}
                       icon="🌙"
@@ -435,6 +441,7 @@ export default function LightsCard() {
                 {/* Link to full page */}
                 <div>
                   <Button
+                    liquid
                     variant="outline"
                     onClick={() => router.push('/lights')}
                     className="w-full"

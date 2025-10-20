@@ -81,27 +81,58 @@ lib/
 ### Card
 ```jsx
 <Card className="p-6">Content</Card>
-<Card glass className="p-6">Glassmorphism</Card>  // iOS 18 style
+<Card liquid className="p-6">Liquid Glass iOS 18 style</Card>
+<Card glass className="p-6">Legacy glassmorphism</Card>  // Mantenuto per compatibilità
 ```
+**Props**: `liquid={true}` applica liquid glass style, `glass={true}` legacy glassmorphism.
 
 ### Button
 ```jsx
-<Button variant="primary|secondary|success|danger|accent|outline|ghost|glass"
+<Button liquid variant="primary|secondary|success|danger|accent|outline|ghost"
         size="sm|md|lg" icon="🔥">Accendi</Button>
 ```
+**Props**: `liquid={true}` applica liquid glass style a tutte le varianti.
 
 ### Banner
 Componente riutilizzabile per alert/warnings con 4 varianti (info/warning/error/success).
-- **Props**: `variant`, `icon`, `title`, `description`, `actions`, `dismissible`, `onDismiss`
+- **Props**: `variant`, `icon`, `title`, `description`, `actions`, `dismissible`, `onDismiss`, `liquid`
 - **Supporto JSX inline** per `description` e `actions`
+- **Liquid variant**: `liquid={true}` applica liquid glass style con colori semantici
 - **Esempio**: Vedi `app/components/ui/Banner.js`
 
 ### Select
-Dropdown con glassmorphism automatico e z-[100].
+Dropdown con liquid glass style e z-[100].
 ```jsx
-<Select value={power} onChange={setPower}
+<Select liquid value={power} onChange={setPower}
         options={[{value: 1, label: 'P1'}]} disabled={!isOn} />
 ```
+**Props**: `liquid={true}` applica liquid glass a trigger button e dropdown menu.
+
+### Input
+```jsx
+<Input liquid type="text" placeholder="Inserisci valore" />
+```
+**Props**: `liquid={true}` applica liquid glass style con backdrop blur.
+
+### Liquid Glass Style Pattern
+Pattern unificato iOS 18 per componenti UI con trasparenza e blur.
+
+**Composizione base**:
+```jsx
+className="bg-white/[0.08] backdrop-blur-3xl shadow-liquid-sm ring-1 ring-white/20 ring-inset
+           relative overflow-hidden
+           before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none"
+```
+
+**Shadows disponibili** (tailwind.config.js):
+- `shadow-liquid-sm`: Piccoli elementi (buttons, input)
+- `shadow-liquid`: Elementi medi (cards, dropdowns)
+- `shadow-liquid-lg`: Elementi grandi (modals, panels)
+- `shadow-liquid-xl`: Hero sections
+
+**Z-index layers**: Contenuto con `relative z-10` sopra gradient overlay.
+
+**Quando usare**: Tutti i componenti interattivi (buttons, cards, inputs, dropdowns, mobile menu) per consistenza visiva iOS 18 style.
 
 ### Navbar
 **Architettura**: Stati separati mobile/desktop per zero interferenze
@@ -567,11 +598,13 @@ Tutti i colori hanno scala completa 50-900 (10 tonalità ciascuno):
 
 ### Card Styling Standards
 ```jsx
-<Card className="p-6">Standard</Card>              // Default
+<Card className="p-6">Standard</Card>              // Default solid
+<Card liquid className="p-6">Liquid Glass</Card>   // iOS 18 style (preferito)
 <Card className="p-8">Hero Content</Card>          // Hero sections
-<Card glass className="p-6">Glassmorphism</Card>   // Header importanti
-<Card className="p-6 bg-info-50 border-2 border-info-200">Info</Card> // Colored
+<Card glass className="p-6">Legacy Glass</Card>    // Glassmorphism legacy
+<Card className="p-6 bg-info-50 border-2 border-info-200">Info</Card> // Colored info
 ```
+**Best practice**: Usa `liquid` per UI moderna consistente, `glass` mantenuto per compatibilità.
 
 ### Background Consistenza
 **SEMPRE** usa background globale definito in `globals.css`. **MAI** override custom nelle pagine.
@@ -763,6 +796,6 @@ CRON_SECRET=your-secret-here
 
 ---
 
-**Last Updated**: 2025-10-18
-**Version**: 1.5.13
+**Last Updated**: 2025-10-20
+**Version**: 1.5.14
 **Author**: Federico Manfredi

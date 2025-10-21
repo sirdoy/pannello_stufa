@@ -54,7 +54,7 @@ export default function TimeBar({ intervals, hoveredIndex, selectedIndex, onHove
       {/* Tooltip */}
       {tooltipData && (
         <div
-          className="fixed z-50 bg-neutral-900 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-xl border border-neutral-700 pointer-events-none"
+          className="fixed z-[100] bg-neutral-900 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-xl border border-neutral-700 pointer-events-none"
           style={{
             left: `${tooltipData.x}px`,
             top: `${tooltipData.y}px`,

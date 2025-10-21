@@ -5,6 +5,23 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.6.2] - 2025-10-21
+
+### Corretto
+- **Card liquid overflow fix**: Rimosso `overflow-hidden` dal componente Card variant liquid
+  - I dropdown Select nelle device cards non vengono più clippati dai bordi della card
+  - Risolto problema homepage: dropdown nelle card ora fuoriescono correttamente senza essere tagliati
+  - Gradiente overlay `before:` continua a funzionare correttamente (non richiede overflow-hidden perché usa `inset-0`)
+  - Border radius applicati correttamente anche senza overflow-hidden
+
+## [1.6.1] - 2025-10-21
+
+### Corretto
+- **Z-index hierarchy mobile**: Risolto problema dropdown che andavano sotto altri elementi grafici su mobile
+  - `WhatsNewModal`: corretto z-index da `z-50` a `z-[1000]` (backdrop) e `z-[1001]` (content) per rispettare gerarchia documentata
+  - `TimeBar` tooltip: corretto z-index da `z-50` a `z-[100]` per consistenza con design system (tooltip = dropdown level)
+  - Ora tutti i componenti seguono correttamente la gerarchia: navbar (`z-50`) < dropdown/tooltip (`z-[100]`) < modal (`z-[1000]`/`z-[1001]`) < critical alerts (`z-[9999]`/`z-[10000]`)
+
 ## [1.6.0] - 2025-10-21
 
 ### Aggiunto

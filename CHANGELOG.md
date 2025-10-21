@@ -5,6 +5,31 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.7.0] - 2025-10-21
+
+### Aggiunto
+- **Sistema gestione preferenze dispositivi**
+  - Nuova pagina `/settings/devices` per abilitare/disabilitare dispositivi personalmente
+  - Toggle switches per ogni device con salvataggio real-time su Firebase
+  - Preferenze salvate per utente in `devicePreferences/{userId}/{deviceId}` (schema Firebase)
+  - Service layer `devicePreferencesService.js` per operazioni CRUD preferenze
+  - API routes `/api/devices/preferences` (GET/POST) per gestione preferenze
+- **Integrazione preferenze in navigazione**
+  - Homepage ora filtra dispositivi in base a preferenze utente da Firebase
+  - Navbar carica preferenze utente e mostra solo device abilitati nel menu
+  - Device disabilitati non appaiono in homepage né nel menu di navigazione
+- **Device abilitati**
+  - Tutti i dispositivi ora abilitati in `DEVICE_CONFIG`: stufa, termostato, luci Philips Hue, Sonos
+  - Placeholder UI per Sonos in homepage (future implementation)
+- **Menu Impostazioni**
+  - Aggiunto link "Gestione Dispositivi" (🏠) nel dropdown Impostazioni della navbar
+  - Descrizione: "Abilita/disabilita dispositivi"
+
+### Migliorato
+- **Pattern riutilizzabile**: sistema user preferences estendibile per altre configurazioni future
+- **UX**: configurazione dispositivi personalizzabile per ogni utente senza impattare altri utenti
+- **Performance**: filtro device lato server (homepage) e client (navbar) per ottimizzazione
+
 ## [1.6.5] - 2025-10-21
 
 ### Migliorato

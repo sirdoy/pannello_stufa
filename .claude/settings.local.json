@@ -46,7 +46,9 @@
       "Bash(wait $!)",
       "Bash(tree docs -L 2 -I 'node_modules|.next')",
       "Bash(tee build.log)",
-      "WebFetch(domain:dev.to)"
+      "WebFetch(domain:dev.to)",
+      "Bash(tee /tmp/build_output.log)",
+      "Bash(tee /tmp/build_output2.log)"
     ],
     "deny": [],
     "ask": []

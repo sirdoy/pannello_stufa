@@ -81,7 +81,9 @@ pannello-stufa/
 │   ├── log/page.js              # Storico azioni
 │   ├── errors/page.js           # Storico errori stufa
 │   ├── changelog/page.js        # Versioni app
-│   └── settings/notifications/  # Gestione notifiche push
+│   ├── settings/
+│   │   ├── notifications/       # Gestione notifiche push
+│   │   └── devices/             # Gestione dispositivi abilitati
 │
 ├── lib/                          # Business Logic
 │   ├── devices/                  # Device registry (DEVICE_CONFIG)
@@ -93,7 +95,8 @@ pannello-stufa/
 │   ├── firebase.js              # Firebase Client SDK
 │   ├── firebaseAdmin.js         # Firebase Admin SDK (push notifications)
 │   ├── notificationService.js   # FCM client-side
-│   ├── notificationPreferencesService.js  # User preferences
+│   ├── notificationPreferencesService.js  # Notification preferences
+│   ├── devicePreferencesService.js        # Device enable/disable preferences
 │   ├── version.js               # APP_VERSION, VERSION_HISTORY
 │   ├── changelogService.js      # Changelog sync Firebase
 │   ├── netatmo/                 # Netatmo integration (OAuth)
@@ -380,5 +383,5 @@ ADMIN_USER_ID=auth0|xxx
 ---
 
 **Last Updated**: 2025-10-21
-**Version**: 1.6.5
+**Version**: 1.7.0
 **Author**: Federico Manfredi

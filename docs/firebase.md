@@ -13,6 +13,7 @@ Firebase Realtime Database è utilizzato per:
 - **Cron Health**: Monitoring affidabilità cronjob
 - **External APIs**: OAuth tokens e configurazioni
 - **Push Notifications**: FCM tokens e preferenze utente
+- **Device Preferences**: Abilitazione/disabilitazione dispositivi per utente
 
 ## Schema Completo
 
@@ -98,6 +99,13 @@ firebase-root/
 │               ├── threshold80  # boolean
 │               ├── threshold90  # boolean
 │               └── threshold100 # boolean
+│
+├── devicePreferences/
+│   └── {userId}/            # Auth0 user ID
+│       ├── stove            # boolean
+│       ├── thermostat       # boolean
+│       ├── lights           # boolean
+│       └── sonos            # boolean
 │
 └── [external-api]/          # Pattern per API esterne
     ├── refresh_token        # OAuth refresh token
@@ -319,6 +327,38 @@ Dati utente per FCM tokens e preferenze notifiche.
 ```
 
 Vedi [Systems - Notifications](./systems/notifications.md) per gestione completa.
+
+## Device Preferences Schema
+
+Preferenze utente per abilitazione/disabilitazione dispositivi.
+
+```javascript
+// devicePreferences/{userId}
+{
+  stove: true,         // boolean
+  thermostat: true,    // boolean
+  lights: false,       // boolean
+  sonos: false         // boolean
+}
+```
+
+**Fields**:
+- Ogni chiave corrisponde a un `deviceId` da `DEVICE_CONFIG`
+- `true`: dispositivo abilitato (visibile in homepage e menu)
+- `false`: dispositivo disabilitato (nascosto da UI)
+
+**Defaults** (primo accesso):
+- `stove`: `true`
+- `thermostat`: `true`
+- `lights`: `false`
+- `sonos`: `false`
+
+**Implementazione**:
+- Service: `lib/devicePreferencesService.js`
+- API: `/api/devices/preferences` (GET/POST)
+- UI: `/settings/devices` (pagina gestione)
+
+**Pattern riutilizzabile**: Estendibile per altre preferenze utente (es. theme, language, layout).
 
 ## External APIs Pattern
 

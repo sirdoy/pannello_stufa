@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { getNavigationStructure } from '@/lib/devices/deviceRegistry';
+import { getNavigationStructureWithPreferences } from '@/lib/devices/deviceRegistry';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -12,12 +12,13 @@ export default function Navbar() {
   const [desktopDeviceDropdown, setDesktopDeviceDropdown] = useState(null);
   const [mobileDeviceDropdown, setMobileDeviceDropdown] = useState(null);
   const [user, setUser] = useState(null);
+  const [devicePreferences, setDevicePreferences] = useState({});
 
   const userDropdownRef = useRef(null);
   const settingsDropdownRef = useRef(null);
   const desktopDeviceRefs = useRef({});
   const pathname = usePathname();
-  const navStructure = getNavigationStructure();
+  const navStructure = getNavigationStructureWithPreferences(devicePreferences);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -84,23 +85,32 @@ export default function Navbar() {
     };
   }, [mobileMenuOpen]);
 
-  // Fetch user info
+  // Fetch user info and device preferences
   const fetchedRef = useRef(false);
   useEffect(() => {
     if (fetchedRef.current) return;
 
-    const fetchUser = async () => {
+    const fetchData = async () => {
       try {
         fetchedRef.current = true;
-        const res = await fetch('/api/user');
-        const data = await res.json();
-        if (data.user) setUser(data.user);
+
+        // Fetch user
+        const userRes = await fetch('/api/user');
+        const userData = await userRes.json();
+        if (userData.user) setUser(userData.user);
+
+        // Fetch device preferences
+        const prefsRes = await fetch('/api/devices/preferences');
+        if (prefsRes.ok) {
+          const prefsData = await prefsRes.json();
+          setDevicePreferences(prefsData.preferences || {});
+        }
       } catch (error) {
-        console.error('Errore nel recupero utente:', error);
+        console.error('Errore nel recupero dati:', error);
         fetchedRef.current = false;
       }
     };
-    fetchUser();
+    fetchData();
   }, []);
 
   const isActive = (path) => pathname === path;

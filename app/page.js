@@ -2,14 +2,15 @@ import { getSession } from '@auth0/nextjs-auth0/edge';
 import StoveCard from './components/devices/stove/StoveCard';
 import ThermostatCard from './components/devices/thermostat/ThermostatCard';
 import LightsCard from './components/devices/lights/LightsCard';
-import { getEnabledDevices } from '@/lib/devices';
+import { getEnabledDevicesForUser } from '@/lib/devicePreferencesService';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   const session = await getSession();
   const user = session?.user;
-  const enabledDevices = getEnabledDevices();
+  const userId = user?.sub;
+  const enabledDevices = await getEnabledDevicesForUser(userId);
 
   return (
     <main>
@@ -36,7 +37,18 @@ export default async function Home() {
           if (device.id === 'lights') {
             return <LightsCard key={device.id} />;
           }
-          // Future devices will be added here
+          if (device.id === 'sonos') {
+            // Placeholder - future implementation
+            return (
+              <div key={device.id} className="p-6 rounded-2xl bg-white/[0.08] backdrop-blur-2xl border border-white/20 shadow-liquid">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-3xl">{device.icon}</span>
+                  <h2 className="text-xl font-bold text-neutral-900">{device.name}</h2>
+                </div>
+                <p className="text-sm text-neutral-600">In arrivo - Integrazione Spotify + Sonos</p>
+              </div>
+            );
+          }
           return null;
         })}
       </div>

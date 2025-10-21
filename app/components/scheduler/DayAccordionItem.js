@@ -157,6 +157,7 @@ export default function DayAccordionItem({
 
           {/* Pulsante aggiungi */}
           <Button
+            liquid
             variant="success"
             icon="+"
             onClick={onAddInterval}

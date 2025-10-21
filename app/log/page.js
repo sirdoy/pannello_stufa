@@ -135,7 +135,7 @@ export default function LogPage() {
       </div>
 
       {/* Filters Card */}
-      <Card className="p-4 sm:p-6">
+      <Card liquid className="p-4 sm:p-6">
         <h3 className="text-sm font-semibold text-neutral-700 mb-3">Filtra per dispositivo</h3>
         <div className="flex flex-wrap gap-2">
           {/* All */}
@@ -143,8 +143,8 @@ export default function LogPage() {
             onClick={() => setDeviceFilter('all')}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
               deviceFilter === 'all'
-                ? 'bg-neutral-900 text-white shadow-md'
-                : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                ? 'bg-neutral-900 text-white shadow-liquid-sm'
+                : 'bg-white/[0.08] backdrop-blur-2xl text-neutral-700 hover:bg-white/[0.12] shadow-liquid-sm ring-1 ring-white/[0.15] ring-inset'
             }`}
           >
             🏠 Tutti ({deviceCounts.all})
@@ -156,8 +156,8 @@ export default function LogPage() {
               onClick={() => setDeviceFilter('stove')}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                 deviceFilter === 'stove'
-                  ? 'bg-primary-500 text-white shadow-md'
-                  : 'bg-primary-50 text-primary-700 hover:bg-primary-100'
+                  ? 'bg-primary-600 text-white shadow-liquid-sm'
+                  : 'bg-primary-500/[0.08] backdrop-blur-2xl text-primary-700 hover:bg-primary-500/[0.12] shadow-liquid-sm ring-1 ring-primary-500/20 ring-inset'
               }`}
             >
               🔥 Stufa ({deviceCounts.stove})
@@ -170,8 +170,8 @@ export default function LogPage() {
               onClick={() => setDeviceFilter('thermostat')}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                 deviceFilter === 'thermostat'
-                  ? 'bg-info-500 text-white shadow-md'
-                  : 'bg-info-50 text-info-700 hover:bg-info-100'
+                  ? 'bg-info-600 text-white shadow-liquid-sm'
+                  : 'bg-info-500/[0.08] backdrop-blur-2xl text-info-700 hover:bg-info-500/[0.12] shadow-liquid-sm ring-1 ring-info-500/20 ring-inset'
               }`}
             >
               🌡️ Termostato ({deviceCounts.thermostat})
@@ -184,8 +184,8 @@ export default function LogPage() {
               onClick={() => setDeviceFilter('lights')}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                 deviceFilter === 'lights'
-                  ? 'bg-warning-500 text-white shadow-md'
-                  : 'bg-warning-50 text-warning-700 hover:bg-warning-100'
+                  ? 'bg-warning-600 text-white shadow-liquid-sm'
+                  : 'bg-warning-500/[0.08] backdrop-blur-2xl text-warning-700 hover:bg-warning-500/[0.12] shadow-liquid-sm ring-1 ring-warning-500/20 ring-inset'
               }`}
             >
               💡 Luci ({deviceCounts.lights})
@@ -198,8 +198,8 @@ export default function LogPage() {
               onClick={() => setDeviceFilter('sonos')}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                 deviceFilter === 'sonos'
-                  ? 'bg-success-500 text-white shadow-md'
-                  : 'bg-success-50 text-success-700 hover:bg-success-100'
+                  ? 'bg-success-600 text-white shadow-liquid-sm'
+                  : 'bg-success-500/[0.08] backdrop-blur-2xl text-success-700 hover:bg-success-500/[0.12] shadow-liquid-sm ring-1 ring-success-500/20 ring-inset'
               }`}
             >
               🎵 Sonos ({deviceCounts.sonos})
@@ -209,7 +209,7 @@ export default function LogPage() {
       </Card>
 
       {/* Log Entries */}
-      <Card className="p-4 sm:p-6">
+      <Card liquid className="p-4 sm:p-6">
         {filteredLog.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-lg text-neutral-500 mb-2">Nessuna azione registrata</p>

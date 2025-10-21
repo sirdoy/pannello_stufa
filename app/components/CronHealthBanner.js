@@ -69,9 +69,9 @@ export default function CronHealthBanner({ variant = 'banner' }) {
   // Inline variant - compact design for integration inside cards
   if (variant === 'inline') {
     return (
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 bg-warning-50/80 backdrop-blur-sm rounded-xl border-2 border-warning-300">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-warning-100 border-2 border-warning-400">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 bg-warning-500/[0.08] backdrop-blur-3xl shadow-liquid ring-1 ring-warning-500/20 ring-inset rounded-xl relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-warning-500/[0.12] before:to-transparent before:pointer-events-none">
+        <div className="flex items-center gap-4 relative z-10">
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-warning-100/80 backdrop-blur-sm border-2 border-warning-400/50">
             <span className="text-2xl">⚠️</span>
           </div>
           <div className="min-w-0 flex-1">
@@ -83,14 +83,14 @@ export default function CronHealthBanner({ variant = 'banner' }) {
             </p>
           </div>
         </div>
-        <div className="flex gap-3 w-full sm:w-auto">
+        <div className="flex gap-3 w-full sm:w-auto relative z-10">
           <a
             href="https://console.cron-job.org/jobs/6061667"
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 sm:flex-initial"
           >
-            <button className="w-full px-5 py-2.5 rounded-xl text-sm font-semibold text-warning-800 bg-warning-100 hover:bg-warning-200 border-2 border-warning-400 hover:border-warning-500 transition-all duration-200 active:scale-95 whitespace-nowrap">
+            <button className="w-full px-5 py-2.5 rounded-xl text-sm font-semibold text-warning-800 bg-warning-100/80 backdrop-blur-sm hover:bg-warning-200/80 border-2 border-warning-400/50 hover:border-warning-500 transition-all duration-200 active:scale-95 whitespace-nowrap shadow-liquid-sm">
               🔧 Riavvia Cronjob ↗
             </button>
           </a>
@@ -102,6 +102,7 @@ export default function CronHealthBanner({ variant = 'banner' }) {
   // Banner variant - full banner for standalone usage
   return (
     <Banner
+      liquid
       variant="warning"
       icon="⚠️"
       title="Cronjob Non Attivo"

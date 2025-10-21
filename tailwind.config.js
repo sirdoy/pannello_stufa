@@ -137,6 +137,19 @@ module.exports = {
         '3xl': '64px',
         '4xl': '96px',
       },
+      backdropSaturate: {
+        110: '1.1',
+        125: '1.25',
+        150: '1.5',
+        175: '1.75',
+        200: '2',
+      },
+      backdropContrast: {
+        102: '1.02',
+        105: '1.05',
+        110: '1.1',
+        115: '1.15',
+      },
       backgroundImage: {
         'glass-shine': 'linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 100%)',
         'glass-border': 'linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1))',

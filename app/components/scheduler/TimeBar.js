@@ -24,7 +24,7 @@ export default function TimeBar({ intervals, hoveredIndex, selectedIndex, onHove
   return (
     <div className="relative w-full mb-8">
       {/* Barra base */}
-      <div className="relative h-8 w-full bg-neutral-200 rounded-xl overflow-hidden shadow-inner">
+      <div className="relative h-8 w-full bg-neutral-200/80 backdrop-blur-sm rounded-xl overflow-hidden shadow-liquid-sm ring-1 ring-neutral-300/50 ring-inset">
         {intervals.map((range, idx) => {
           const [startH, startM] = range.start.split(':').map(Number);
           const [endH, endM] = range.end.split(':').map(Number);
@@ -54,14 +54,14 @@ export default function TimeBar({ intervals, hoveredIndex, selectedIndex, onHove
       {/* Tooltip */}
       {tooltipData && (
         <div
-          className="fixed z-[100] bg-neutral-900 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-xl border border-neutral-700 pointer-events-none"
+          className="fixed z-[100] bg-neutral-900/95 backdrop-blur-3xl text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-liquid-xl ring-1 ring-white/10 ring-inset pointer-events-none relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.08] before:to-transparent before:pointer-events-none"
           style={{
             left: `${tooltipData.x}px`,
             top: `${tooltipData.y}px`,
             transform: 'translate(-50%, -100%)',
           }}
         >
-          <div className="space-y-1">
+          <div className="space-y-1 relative z-10">
             <div>⏰ {tooltipData.range.start} - {tooltipData.range.end}</div>
             <div className="flex gap-3">
               <span>⚡ Potenza: {tooltipData.range.power}</span>
@@ -69,8 +69,8 @@ export default function TimeBar({ intervals, hoveredIndex, selectedIndex, onHove
             </div>
           </div>
           {/* Freccia del tooltip */}
-          <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-full">
-            <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-neutral-900"></div>
+          <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-full z-10">
+            <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-neutral-900/95"></div>
           </div>
         </div>
       )}
@@ -88,13 +88,13 @@ export default function TimeBar({ intervals, hoveredIndex, selectedIndex, onHove
             return (
               <div key={idx}>
                 <span
-                  className="absolute -top-7 text-xs font-semibold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-lg border border-primary-200"
+                  className="absolute -top-7 text-xs font-semibold text-primary-600 bg-primary-500/[0.08] backdrop-blur-2xl px-2 py-0.5 rounded-lg shadow-liquid-sm ring-1 ring-primary-500/20"
                   style={{ left: `${startLeft}%`, transform: 'translateX(-50%)' }}
                 >
                   {range.start}
                 </span>
                 <span
-                  className="absolute top-10 text-xs font-semibold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-lg border border-primary-200"
+                  className="absolute top-10 text-xs font-semibold text-primary-600 bg-primary-500/[0.08] backdrop-blur-2xl px-2 py-0.5 rounded-lg shadow-liquid-sm ring-1 ring-primary-500/20"
                   style={{ left: `${endLeft}%`, transform: 'translateX(-50%)' }}
                 >
                   {range.end}

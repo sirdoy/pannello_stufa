@@ -127,23 +127,23 @@ export default function MaintenancePage() {
           <h2 className="text-xl font-semibold text-neutral-800 mb-4">📊 Stato Attuale</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white/50 rounded-lg p-4">
-              <div className="text-sm text-neutral-600 mb-1">Ore di Utilizzo</div>
-              <div className="text-2xl font-bold text-neutral-800">
+            <div className="bg-white/[0.08] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-white/[0.15] ring-inset rounded-lg p-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.12] before:to-transparent before:pointer-events-none">
+              <div className="text-sm text-neutral-600 mb-1 relative z-10">Ore di Utilizzo</div>
+              <div className="text-2xl font-bold text-neutral-800 relative z-10">
                 {formatHoursToHHMM(maintenanceData?.currentHours || 0)}
               </div>
             </div>
 
-            <div className="bg-white/50 rounded-lg p-4">
-              <div className="text-sm text-neutral-600 mb-1">Ore Target</div>
-              <div className="text-2xl font-bold text-primary-600">
+            <div className="bg-primary-500/[0.08] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-primary-500/20 ring-inset rounded-lg p-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-primary-500/[0.12] before:to-transparent before:pointer-events-none">
+              <div className="text-sm text-neutral-600 mb-1 relative z-10">Ore Target</div>
+              <div className="text-2xl font-bold text-primary-600 relative z-10">
                 {formatHoursToHHMM(maintenanceData?.targetHours || 50)}
               </div>
             </div>
 
-            <div className="bg-white/50 rounded-lg p-4">
-              <div className="text-sm text-neutral-600 mb-1">Ore Rimanenti</div>
-              <div className="text-2xl font-bold text-success-600">
+            <div className="bg-success-500/[0.08] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-success-500/20 ring-inset rounded-lg p-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-success-500/[0.12] before:to-transparent before:pointer-events-none">
+              <div className="text-sm text-neutral-600 mb-1 relative z-10">Ore Rimanenti</div>
+              <div className="text-2xl font-bold text-success-600 relative z-10">
                 {formatHoursToHHMM(Math.max(0, (maintenanceData?.targetHours || 50) - (maintenanceData?.currentHours || 0)))}
               </div>
             </div>
@@ -209,10 +209,10 @@ export default function MaintenancePage() {
                   <button
                     key={hours}
                     onClick={() => setTargetHours(hours)}
-                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 ${
                       targetHours === hours
-                        ? 'bg-primary-600 text-white'
-                        : 'bg-white/70 text-neutral-700 hover:bg-white'
+                        ? 'bg-primary-600 text-white shadow-liquid-sm'
+                        : 'bg-white/[0.08] backdrop-blur-2xl text-neutral-700 hover:bg-white/[0.12] shadow-liquid-sm ring-1 ring-white/[0.15] ring-inset'
                     }`}
                     disabled={isSaving}
                   >

@@ -228,9 +228,9 @@ export default function NotificationsSettingsPage() {
                 {devices.map((device) => (
                   <div
                     key={device.id}
-                    className="p-4 rounded-xl bg-white/[0.05] backdrop-blur-sm border border-white/10"
+                    className="p-4 rounded-xl bg-white/[0.08] backdrop-blur-3xl shadow-liquid-sm ring-1 ring-white/[0.15] ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.12] before:to-transparent before:pointer-events-none"
                   >
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start justify-between gap-4 relative z-10">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-lg">

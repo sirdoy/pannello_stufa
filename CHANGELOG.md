@@ -5,6 +5,46 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.6.4] - 2025-10-21
+
+### Aggiunto
+- **Nuova variante liquidPro per Card component**
+  - Effetto liquid glass iOS 26 enhanced con `backdrop-saturate-150` e `backdrop-contrast-105`
+  - Colori più vividi e contrasto migliorato rispetto alla variante liquid classica
+  - Applicata a StoveCard per esperienza visiva premium
+- **Backdrop filters estesi in Tailwind config**
+  - `backdropSaturate`: 110, 125, 150, 175, 200 per controllo saturazione colori
+  - `backdropContrast`: 102, 105, 110, 115 per controllo micro-contrasto
+  - Massima flessibilità per future implementazioni liquid glass
+
+### Migliorato
+- **Card component**: nuova prop `liquidPro` opzionale (liquid classico rimane disponibile)
+  - `liquidPro`: saturazione e contrasto enhanced - per componenti hero
+  - `liquid`: implementazione classica - per uso generale
+  - Backward compatible: tutti i componenti esistenti continuano a funzionare
+
+## [1.6.3] - 2025-10-21
+
+### Migliorato
+- **Uniformato stile liquid glass iOS 26 su tutti i componenti**
+  - `MaintenanceBar`: aggiornato da `bg-white/40 backdrop-blur-sm` a `bg-white/[0.08] backdrop-blur-3xl shadow-liquid ring-1 ring-white/[0.15]` con gradient overlay
+  - `CronHealthBanner`: entrambe le varianti (banner e inline) aggiornate con liquid glass completo
+  - `TimeBar`: barra base, tooltip, etichette orarie aggiornate con liquid glass (`bg-neutral-200/80 backdrop-blur-sm`, tooltip `bg-neutral-900/95 backdrop-blur-3xl`, etichette con `bg-primary-500/[0.08] backdrop-blur-2xl`)
+  - `WhatsNewModal`: modal e backdrop aggiornati (`bg-white/[0.95] backdrop-blur-3xl shadow-liquid-xl`, backdrop `bg-black/60 backdrop-blur-2xl`)
+  - `DayAccordionItem`: aggiunto `liquid` prop al button "Aggiungi intervallo"
+- **Migliorati componenti pagine con liquid glass**
+  - `Maintenance page`: inner cards (Ore Utilizzo, Ore Target, Ore Rimanenti) con liquid glass color-specific, preset buttons con liquid glass
+  - `Errors page`: error cards e filter tabs aggiornati con liquid glass (filter tabs con stati attivi/inattivi colorati)
+  - `Log page`: Card components e filter buttons (Tutti, Stufa, Termostato, Luci, Sonos) aggiornati con liquid glass
+  - `Settings/Notifications page`: device items aggiornati con liquid glass completo e gradient overlay
+- **Applicato gradient overlay consistente su tutti i componenti**
+  - Pattern uniforme `before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.12] before:to-transparent before:pointer-events-none`
+  - Profondità visiva uniforme su tutti i componenti liquid glass per consistenza iOS 26
+- **Ottimizzati z-index su tutti i componenti aggiornati**
+  - Contenuti con `relative z-10` per corretta sovrapposizione sopra gradient overlay
+  - Gradient overlay su layer inferiore (z-index implicito base)
+  - Mantenuta gerarchia design system: navbar < dropdown/tooltip < modal < critical alerts
+
 ## [1.6.2] - 2025-10-21
 
 ### Corretto

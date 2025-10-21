@@ -74,9 +74,9 @@ export default function MaintenanceBar({ maintenanceStatus }) {
   };
 
   return (
-    <div className="bg-white/40 backdrop-blur-sm rounded-xl border border-neutral-200/60 hover:bg-white/50 transition-colors overflow-hidden">
+    <div className="bg-white/[0.08] backdrop-blur-3xl shadow-liquid ring-1 ring-white/[0.15] ring-inset rounded-xl hover:bg-white/[0.12] transition-all duration-300 overflow-hidden relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.12] before:to-transparent before:pointer-events-none">
       {/* Mini Bar - Always visible */}
-      <div className="flex items-center justify-between p-4 cursor-pointer" onClick={toggleExpanded}>
+      <div className="flex items-center justify-between p-4 cursor-pointer relative z-10" onClick={toggleExpanded}>
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <span className="text-lg flex-shrink-0">🔧</span>
           <span className="font-medium text-neutral-800 flex-shrink-0">Manutenzione</span>

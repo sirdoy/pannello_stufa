@@ -60,19 +60,19 @@ export default function WhatsNewModal({ isOpen, onClose, dontShowAgain }) {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[1000] transition-opacity duration-300"
+        className="fixed inset-0 bg-black/60 backdrop-blur-2xl z-[1000] transition-opacity duration-300"
         onClick={onClose}
       />
 
       {/* Modal */}
       <div className="fixed inset-0 z-[1001] flex items-center justify-center p-4">
         <div
-          className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden transform transition-all duration-300 scale-100"
+          className="bg-white/[0.95] backdrop-blur-3xl rounded-3xl shadow-liquid-xl ring-1 ring-white/20 ring-inset max-w-2xl w-full max-h-[90vh] overflow-hidden transform transition-all duration-300 scale-100 relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.15] before:to-transparent before:pointer-events-none"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header con gradiente */}
-          <div className={`relative bg-gradient-to-r ${getVersionColor(currentVersionData.type)} p-8 text-white`}>
-            <div className="flex items-center justify-between mb-4">
+          <div className={`relative bg-gradient-to-r ${getVersionColor(currentVersionData.type)} p-8 text-white z-10`}>
+            <div className="flex items-center justify-between mb-4 relative z-10">
               <div className="flex items-center gap-3">
                 <span className="text-5xl drop-shadow-lg">{getVersionIcon(currentVersionData.type)}</span>
                 <div>
@@ -90,7 +90,7 @@ export default function WhatsNewModal({ isOpen, onClose, dontShowAgain }) {
             </div>
 
             {/* Version badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full relative z-10">
               <span className="text-sm font-semibold">Versione {APP_VERSION}</span>
               <span className="text-xs opacity-75">
                 {new Date(currentVersionData.date).toLocaleDateString('it-IT', {
@@ -103,7 +103,7 @@ export default function WhatsNewModal({ isOpen, onClose, dontShowAgain }) {
           </div>
 
           {/* Content */}
-          <div className="p-8 overflow-y-auto max-h-[calc(90vh-300px)]">
+          <div className="p-8 overflow-y-auto max-h-[calc(90vh-300px)] relative z-10">
             <h3 className="text-xl font-bold text-neutral-900 mb-4">Cosa c&apos;è di nuovo?</h3>
 
             <ul className="space-y-3">
@@ -134,7 +134,7 @@ export default function WhatsNewModal({ isOpen, onClose, dontShowAgain }) {
           </div>
 
           {/* Footer */}
-          <div className="p-6 bg-neutral-50 border-t border-neutral-200 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+          <div className="p-6 bg-neutral-50/80 backdrop-blur-sm border-t border-neutral-200/50 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between relative z-10">
             <label className="flex items-center gap-2 cursor-pointer group">
               <input
                 type="checkbox"

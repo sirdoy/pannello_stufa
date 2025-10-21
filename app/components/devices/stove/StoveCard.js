@@ -403,8 +403,8 @@ export default function StoveCard() {
         />
       )}
 
-      {/* Main Status Card - Liquid Glass */}
-      <Card liquid className={`overflow-hidden transition-all duration-500 ${statusInfo.bgColor}`}>
+      {/* Main Status Card - Liquid Glass Pro */}
+      <Card liquidPro className={`overflow-hidden transition-all duration-500 ${statusInfo.bgColor}`}>
         <div className="relative">
           {/* Top accent bar */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 via-accent-500 to-primary-500 opacity-80"></div>

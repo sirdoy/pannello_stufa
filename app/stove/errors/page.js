@@ -107,16 +107,16 @@ export default function ErrorsPage() {
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex gap-2 border-b border-neutral-200 pb-2">
+        <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => {
               setFilter('all');
               setCurrentPage(0);
             }}
-            className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
               filter === 'all'
-                ? 'bg-neutral-100 text-neutral-900'
-                : 'text-neutral-600 hover:text-neutral-900'
+                ? 'bg-neutral-900 text-white shadow-liquid-sm'
+                : 'bg-white/[0.08] backdrop-blur-2xl text-neutral-600 hover:bg-white/[0.12] shadow-liquid-sm ring-1 ring-white/[0.15] ring-inset hover:text-neutral-900'
             }`}
           >
             Tutti ({errors.length})
@@ -126,10 +126,10 @@ export default function ErrorsPage() {
               setFilter('active');
               setCurrentPage(0);
             }}
-            className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
               filter === 'active'
-                ? 'bg-primary-50 text-primary-700'
-                : 'text-neutral-600 hover:text-neutral-900'
+                ? 'bg-primary-600 text-white shadow-liquid-sm'
+                : 'bg-primary-500/[0.08] backdrop-blur-2xl text-primary-600 hover:bg-primary-500/[0.12] shadow-liquid-sm ring-1 ring-primary-500/20 ring-inset'
             }`}
           >
             Attivi ({errors.filter(e => !e.resolved).length})
@@ -139,10 +139,10 @@ export default function ErrorsPage() {
               setFilter('resolved');
               setCurrentPage(0);
             }}
-            className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
               filter === 'resolved'
-                ? 'bg-success-50 text-success-700'
-                : 'text-neutral-600 hover:text-neutral-900'
+                ? 'bg-success-600 text-white shadow-liquid-sm'
+                : 'bg-success-500/[0.08] backdrop-blur-2xl text-success-600 hover:bg-success-500/[0.12] shadow-liquid-sm ring-1 ring-success-500/20 ring-inset'
             }`}
           >
             Risolti ({errors.filter(e => e.resolved).length})
@@ -166,7 +166,7 @@ export default function ErrorsPage() {
           </Card>
         ) : (
           paginatedErrors.map((error) => (
-            <Card key={error.id} className="p-6">
+            <Card liquid key={error.id} className="p-6">
               <div className="space-y-4">
                 {/* Error Alert */}
                 <ErrorAlert

@@ -108,14 +108,54 @@ app/components/devices/
     └── LightsCard.js        # Hue lights control
 ```
 
+### Self-Contained Pattern
+
+**Principio fondamentale**: Ogni device card è **auto-contenuta** e include **tutte le informazioni** specifiche del device.
+
+**✅ CORRETTO - Dentro la card**:
+- Banner specifici del device (manutenzione, errori connessione, warning)
+- Stato e metriche del device
+- Controlli e azioni
+- Link a pagine dedicate
+
+**❌ SCORRETTO - Fuori dalla card**:
+- Banner device-specific fuori dalla card principale
+- Informazioni frammentate in più card separate
+
+**Esempio**:
+
+```jsx
+// ✅ CORRETTO - Auto-contenuto
+<Card liquid>
+  {/* Device-specific banner INSIDE */}
+  {needsMaintenance && <Banner variant="warning" title="Pulizia Richiesta" />}
+
+  {/* Status, controls, etc. */}
+  <StatusDisplay />
+  <Controls />
+</Card>
+
+// ❌ SCORRETTO - Banner fuori dalla card
+{needsMaintenance && <Banner variant="warning" />}
+<Card liquid>
+  <StatusDisplay />
+  <Controls />
+</Card>
+```
+
+**Eccezione**: Alert critici di sistema che riguardano più device o errori globali possono stare fuori dalle card.
+
+**Implementazione**: `app/components/devices/stove/StoveCard.js:376-413` (maintenance banner), `app/components/devices/thermostat/ThermostatCard.js:248-260` (error banner), `app/components/devices/lights/LightsCard.js:281-293` (error banner)
+
 ### Pattern Comune
 
 Tutte le device cards seguono lo stesso pattern:
 
 1. **Connection Check** - Verifica connessione API/servizio
 2. **Polling** - Fetch stato ogni N secondi
-3. **Controls** - Interfaccia controllo device
-4. **Link Pagina Dedicata** - Link a pagina full-featured (se esiste)
+3. **Self-Contained UI** - Banner e info device-specific dentro la card
+4. **Controls** - Interfaccia controllo device
+5. **Link Pagina Dedicata** - Link a pagina full-featured (se esiste)
 
 **Esempio: StoveCard**
 

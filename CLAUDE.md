@@ -183,6 +183,8 @@ export const DEVICE_CONFIG = {
 };
 ```
 
+**Self-Contained Pattern**: Ogni device card include **tutte** le sue informazioni (banner, status, controls) **dentro** la card principale per coerenza architetturale.
+
 📖 **Dettagli**: [Architecture](docs/architecture.md)
 
 ### Liquid Glass Style (iOS 18)
@@ -378,5 +380,5 @@ ADMIN_USER_ID=auth0|xxx
 ---
 
 **Last Updated**: 2025-10-21
-**Version**: 1.6.2
+**Version**: 1.6.5
 **Author**: Federico Manfredi

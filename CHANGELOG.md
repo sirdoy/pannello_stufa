@@ -5,6 +5,17 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.6.5] - 2025-10-21
+
+### Migliorato
+- **Device Card Self-Contained Pattern**
+  - Banner e informazioni specifiche di ciascun device ora contenute all'interno delle rispettive card
+  - StoveCard: banner pulizia manutenzione spostato all'interno del Card liquidPro
+  - ThermostatCard: banner errore connessione spostato all'interno del Card liquid
+  - LightsCard: banner errore connessione spostato all'interno del Card liquid
+  - Migliorata coerenza architetturale: ogni device card è auto-contenuta e include tutte le sue informazioni
+  - Pattern documentato in `docs/architecture.md` per consistenza sviluppi futuri
+
 ## [1.6.4] - 2025-10-21
 
 ### Aggiunto

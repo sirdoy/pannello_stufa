@@ -272,24 +272,27 @@ export default function LightsCard() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {error && (
-        <Banner
-          liquid
-          variant="error"
-          icon="⚠️"
-          title="Errore Connessione"
-          description={error}
-          dismissible
-          onDismiss={() => setError(null)}
-        />
-      )}
-
       {/* Main Status Card */}
       <Card liquid className={`overflow-hidden border-2 transition-all duration-300 ${isRoomOn ? 'bg-warning-50 border-warning-200' : 'bg-neutral-50 border-neutral-200'}`}>
         <div className="relative">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-warning-500 via-warning-400 to-warning-500"></div>
 
           <div className="p-4 sm:p-6 lg:p-8">
+            {/* Error Banner - Inside card */}
+            {error && (
+              <div className="mb-4 sm:mb-6">
+                <Banner
+                  liquid
+                  variant="error"
+                  icon="⚠️"
+                  title="Errore Connessione"
+                  description={error}
+                  dismissible
+                  onDismiss={() => setError(null)}
+                />
+              </div>
+            )}
+
             {/* Header */}
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">💡 Luci</h2>

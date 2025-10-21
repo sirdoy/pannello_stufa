@@ -356,44 +356,7 @@ export default function StoveCard() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Maintenance Cleaning Banner */}
-      {needsMaintenance && (
-        <Banner
-          liquid
-          variant="warning"
-          icon="🧹"
-          title="Pulizia Stufa Richiesta"
-          description={
-            <>
-              La stufa ha raggiunto <strong>{maintenanceStatus.currentHours.toFixed(1)} ore</strong> di utilizzo.
-              È necessario effettuare la pulizia prima di poterla riaccendere.
-            </>
-          }
-          actions={
-            <>
-              <Button
-                liquid
-                variant="success"
-                onClick={handleConfirmCleaning}
-                disabled={cleaningInProgress}
-                size="sm"
-              >
-                {cleaningInProgress ? '⏳ Conferma...' : '✓ Ho Pulito'}
-              </Button>
-              <Button
-                liquid
-                variant="outline"
-                onClick={() => router.push('/stove/maintenance')}
-                size="sm"
-              >
-                ⚙️ Impostazioni
-              </Button>
-            </>
-          }
-        />
-      )}
-
-      {/* Error Alert */}
+      {/* Error Alert - Outside card as it's a critical system message */}
       {errorCode !== 0 && (
         <ErrorAlert
           errorCode={errorCode}
@@ -410,6 +373,44 @@ export default function StoveCard() {
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 via-accent-500 to-primary-500 opacity-80"></div>
 
           <div className="p-6 sm:p-8">
+            {/* Maintenance Cleaning Banner - Inside card */}
+            {needsMaintenance && (
+              <div className="mb-6">
+                <Banner
+                  liquid
+                  variant="warning"
+                  icon="🧹"
+                  title="Pulizia Stufa Richiesta"
+                  description={
+                    <>
+                      La stufa ha raggiunto <strong>{maintenanceStatus.currentHours.toFixed(1)} ore</strong> di utilizzo.
+                      È necessario effettuare la pulizia prima di poterla riaccendere.
+                    </>
+                  }
+                  actions={
+                    <>
+                      <Button
+                        liquid
+                        variant="success"
+                        onClick={handleConfirmCleaning}
+                        disabled={cleaningInProgress}
+                        size="sm"
+                      >
+                        {cleaningInProgress ? '⏳ Conferma...' : '✓ Ho Pulito'}
+                      </Button>
+                      <Button
+                        liquid
+                        variant="outline"
+                        onClick={() => router.push('/stove/maintenance')}
+                        size="sm"
+                      >
+                        ⚙️ Impostazioni
+                      </Button>
+                    </>
+                  }
+                />
+              </div>
+            )}
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 flex items-center gap-2">

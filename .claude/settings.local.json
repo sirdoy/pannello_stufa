@@ -43,7 +43,8 @@
       "Bash(npm:*)",
       "WebFetch(domain:developers.meethue.com)",
       "WebFetch(domain:gotoguy.blog)",
-      "Bash(wait $!)"
+      "Bash(wait $!)",
+      "Bash(tree docs -L 2 -I 'node_modules|.next')"
     ],
     "deny": [],
     "ask": []

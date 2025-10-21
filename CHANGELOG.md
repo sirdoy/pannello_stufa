@@ -5,6 +5,35 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.6.0] - 2025-10-21
+
+### Aggiunto
+- **Documentazione modulare**: Ristrutturazione completa della documentazione in file tematici auto-conclusivi
+  - Creata struttura `docs/` organizzata con sottodirectory `systems/` e `setup/`
+  - 17 file tematici: quick-start, architecture, api-routes, firebase, ui-components, design-system, patterns, data-flow, versioning, testing, troubleshooting, deployment
+  - Sistemi: docs/systems/maintenance.md, monitoring.md, errors.md, notifications.md
+  - Setup guide: docs/setup/netatmo-setup.md, hue-setup.md
+- **CLAUDE.md come indice navigabile**: Trasformato da file monolitico (906 righe) a indice leggero (382 righe, -58% token usage)
+  - Quick Links per accesso rapido a sezioni più richieste
+  - Documentation Map organizzata per categoria (Getting Started, Development, Systems, Integrations, Operations)
+  - Critical Concepts con esempi codice sintetici e link approfondimenti
+  - Critical Best Practices con pattern ❌/✅ per errori comuni
+
+### Modificato
+- **File esistenti riorganizzati in docs/**:
+  - `ERRORS-DETECTION.md` → `docs/systems/errors.md`
+  - `NOTIFICATIONS-SETUP.md` → `docs/systems/notifications.md`
+  - `README-TESTING.md` → `docs/testing.md`
+  - `DEPLOY.md` → `docs/deployment.md`
+  - `NETATMO_TEST.md` → `docs/setup/netatmo-setup.md`
+  - `HUE-SETUP.md` → `docs/setup/hue-setup.md`
+
+### Migliorato
+- **Riusabilità documentazione**: Ogni file è auto-conclusivo con cross-references intelligenti ad altri file tematici
+- **Token consumption**: Documentazione parzializzabile permette AI di caricare solo sezioni necessarie
+- **Manutenibilità**: Modifiche future a singole sezioni non richiedono reload dell'intero CLAUDE.md
+- **Navigabilità**: Struttura gerarchica chiara facilita ricerca informazioni specifiche
+
 ## [1.5.15] - 2025-10-21
 
 ### Aggiunto

@@ -448,6 +448,111 @@ Sistema per monitoraggio affidabilità cronjob scheduler.
 - Data flow e testing
 - Best practices e troubleshooting
 
+## Sistema Notifiche Push 🔔
+
+**Overview**: Sistema completo notifiche push multi-dispositivo con supporto iOS PWA.
+
+**Features**:
+- Firebase Cloud Messaging (FCM) per delivery notifiche
+- Supporto iOS 16.4+ tramite PWA installation
+- Notifiche automatiche per errori stufa, azioni scheduler, soglie manutenzione
+- Gestione permessi e device registration
+- Testing via pagina settings
+
+**Architettura**:
+- **Client**: `lib/notificationService.js` - Request permissions, FCM token management, foreground notifications
+- **Server**: `lib/firebaseAdmin.js` - Send push notifications via Firebase Admin SDK
+- **Service Worker**: `public/firebase-messaging-sw.js` - Background message handler
+- **API Routes**: `/api/notifications/{test,send}` - Test e invio notifiche
+- **UI**: `app/settings/notifications/page.js` - Gestione permessi e device list
+
+**Integrazione Eventi**:
+- **Errori**: `errorMonitor.js` → `sendErrorPushNotification()` quando error !== 0
+- **Scheduler**: `/api/scheduler/check` → `sendSchedulerNotification()` per accensione/spegnimento auto
+- **Manutenzione**: `maintenanceService.js` → notifiche a 80%, 90%, 100% (una volta per livello)
+
+**Configurazione Richiesta**:
+```env
+NEXT_PUBLIC_FIREBASE_VAPID_KEY=...           # Firebase Console → Cloud Messaging → Web Push certificates
+FIREBASE_ADMIN_PROJECT_ID=...                # Service account JSON
+FIREBASE_ADMIN_CLIENT_EMAIL=...              # Service account JSON
+FIREBASE_ADMIN_PRIVATE_KEY="-----BEGIN..."  # Service account JSON (mantieni \n)
+ADMIN_USER_ID=auth0|xxx                      # Destinatario notifiche scheduler/manutenzione
+```
+
+**Firebase Schema**:
+```
+users/{userId}/fcmTokens/{token}/
+  ├─ token: "fcm-token"
+  ├─ createdAt: timestamp
+  ├─ platform: "ios"|"other"
+  └─ isPWA: boolean
+
+maintenance/
+  └─ lastNotificationLevel: 80|90|100  # Evita spam notifiche duplicate
+```
+
+**iOS Requirements**:
+- iOS 16.4+ (release Marzo 2023)
+- App installata come PWA (Add to Home Screen da Safari)
+- HTTPS connection (production)
+
+**Gestione Preferenze Utente**:
+Sistema completo di personalizzazione notifiche con toggle switches e salvataggio Firebase per utente.
+
+**Service**: `lib/notificationPreferencesService.js`
+- `getUserPreferences(userId)` - Recupera preferenze (init defaults se non esistono)
+- `updatePreferenceSection(userId, section, prefs)` - Update parziale preferenze
+- `shouldSendErrorNotification(userId, severity)` - Check se inviare errore per severità
+- `shouldSendSchedulerNotification(userId, action)` - Check se inviare scheduler per azione
+- `shouldSendMaintenanceNotification(userId, threshold)` - Check se inviare manutenzione per soglia
+- `resetPreferences(userId)` - Reset a defaults
+
+**UI**: `app/components/NotificationPreferencesPanel.js`
+- Toggle switches organizzati per categoria (Errori/Scheduler/Manutenzione)
+- Salvataggio automatico real-time
+- Integrato in `/settings/notifications`
+- Pattern riutilizzabile: master toggle + sotto-opzioni conditional rendering
+
+**Schema Preferenze**:
+```
+users/{userId}/notificationPreferences/
+  errors/
+    enabled: boolean
+    severityLevels:
+      info: false         # Default off (rumore)
+      warning: true
+      error: true
+      critical: true
+  scheduler/
+    enabled: boolean
+    ignition: boolean     # Accensione auto
+    shutdown: boolean     # Spegnimento auto
+  maintenance/
+    enabled: boolean
+    threshold80: boolean  # Promemoria 80%
+    threshold90: boolean  # Attenzione 90%
+    threshold100: boolean # Urgente 100%
+```
+
+**Integrazione**:
+- `errorMonitor.js` → Check preferenze prima `sendErrorPushNotification()`
+- `/api/scheduler/check` → Check preferenze prima invio notifiche scheduler/manutenzione
+- Fail-safe: Se errore check preferenze, invia comunque (safety-first)
+
+**Menu Impostazioni Navbar**:
+- Dropdown "⚙️ Impostazioni" in navbar (desktop + mobile)
+- Configurato in `SETTINGS_MENU` (`lib/devices/deviceTypes.js`)
+- 3 voci: Gestione Notifiche, Storico, Changelog
+- Pattern: riuso esistente dropdown device + accordion mobile
+
+**Setup completo**: 📖 Vedi `NOTIFICATIONS-SETUP.md` per:
+- Configurazione Firebase Cloud Messaging step-by-step
+- Generazione VAPID keys e Admin SDK credentials
+- Installazione PWA su iOS (guida illustrata)
+- Testing notifiche (manuale + automatiche)
+- Troubleshooting iOS e debug tools
+
 ## Data Flow Essenziale
 
 ### Polling Status (ogni 5s)
@@ -796,6 +901,6 @@ CRON_SECRET=your-secret-here
 
 ---
 
-**Last Updated**: 2025-10-20
-**Version**: 1.5.14
+**Last Updated**: 2025-10-21
+**Version**: 1.5.15
 **Author**: Federico Manfredi

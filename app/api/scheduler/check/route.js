@@ -3,6 +3,60 @@ import { db } from '@/lib/firebase';
 import { clearSemiManualMode } from '@/lib/schedulerService';
 import { canIgnite, trackUsageHours } from '@/lib/maintenanceService';
 import { STOVE_ROUTES } from '@/lib/routes';
+import { sendNotificationToUser } from '@/lib/firebaseAdmin';
+import {
+  shouldSendSchedulerNotification,
+  shouldSendMaintenanceNotification,
+} from '@/lib/notificationPreferencesService';
+
+/**
+ * Helper: Invia notifica push per azione scheduler
+ * Controlla preferenze utente prima di inviare
+ */
+async function sendSchedulerNotification(action, details = '') {
+  try {
+    // Get admin user ID from env (opzionale)
+    const adminUserId = process.env.ADMIN_USER_ID;
+
+    if (!adminUserId) {
+      console.log('⚠️ ADMIN_USER_ID non configurato - notifiche scheduler disabilitate');
+      return;
+    }
+
+    // Check user preferences
+    const actionType = action === 'IGNITE' ? 'ignition' : 'shutdown';
+    const shouldSend = await shouldSendSchedulerNotification(adminUserId, actionType);
+
+    if (!shouldSend) {
+      console.log(`⏭️ Scheduler notification skipped (user preferences): ${action}`);
+      return;
+    }
+
+    const emoji = action === 'IGNITE' ? '🔥' : action === 'SHUTDOWN' ? '🌙' : '⚙️';
+    const actionText = action === 'IGNITE' ? 'Accensione' :
+                       action === 'SHUTDOWN' ? 'Spegnimento' :
+                       action === 'POWER_CHANGE' ? 'Cambio potenza' :
+                       action === 'FAN_CHANGE' ? 'Cambio ventola' : 'Modifica';
+
+    const notification = {
+      title: `${emoji} ${actionText} Automatica`,
+      body: details || `La stufa è stata ${action === 'IGNITE' ? 'accesa' : 'spenta'} automaticamente`,
+      icon: '/icons/icon-192.png',
+      priority: 'normal',
+      data: {
+        type: 'scheduler_action',
+        action,
+        url: '/stove/scheduler',
+      },
+    };
+
+    await sendNotificationToUser(adminUserId, notification);
+    console.log(`✅ Notifica scheduler inviata: ${action}`);
+
+  } catch (error) {
+    console.error('❌ Errore invio notifica scheduler:', error);
+  }
+}
 
 export async function GET(req) {
   try {
@@ -101,6 +155,60 @@ export async function GET(req) {
     const maintenanceTrack = await trackUsageHours(currentStatus);
     if (maintenanceTrack.tracked) {
       console.log(`✅ Maintenance tracked: +${maintenanceTrack.elapsedMinutes}min → ${maintenanceTrack.newCurrentHours.toFixed(2)}h total`);
+
+      // Send maintenance notification if threshold reached
+      if (maintenanceTrack.notificationData) {
+        const { notificationLevel, percentage, remainingHours } = maintenanceTrack.notificationData;
+
+        let emoji, urgency, body, priority;
+
+        if (notificationLevel >= 100) {
+          emoji = '🚨';
+          urgency = 'URGENTE';
+          body = 'Manutenzione richiesta! L\'accensione è bloccata fino alla pulizia.';
+          priority = 'high';
+        } else if (notificationLevel >= 90) {
+          emoji = '⚠️';
+          urgency = 'Attenzione';
+          body = `Solo ${remainingHours.toFixed(1)}h rimanenti prima della pulizia richiesta`;
+          priority = 'high';
+        } else {
+          emoji = 'ℹ️';
+          urgency = 'Promemoria';
+          body = `${remainingHours.toFixed(1)}h rimanenti prima della manutenzione (${percentage.toFixed(0)}%)`;
+          priority = 'normal';
+        }
+
+        const notification = {
+          title: `${emoji} ${urgency} Manutenzione`,
+          body,
+          icon: '/icons/icon-192.png',
+          priority,
+          data: {
+            type: 'maintenance',
+            percentage: String(percentage),
+            remainingHours: String(remainingHours),
+            url: '/stove/maintenance',
+          },
+        };
+
+        const adminUserId = process.env.ADMIN_USER_ID;
+        if (adminUserId) {
+          try {
+            // Check user preferences
+            const shouldSend = await shouldSendMaintenanceNotification(adminUserId, notificationLevel);
+
+            if (shouldSend) {
+              await sendNotificationToUser(adminUserId, notification);
+              console.log(`✅ Notifica manutenzione inviata: ${notificationLevel}%`);
+            } else {
+              console.log(`⏭️ Maintenance notification skipped (user preferences): ${notificationLevel}%`);
+            }
+          } catch (error) {
+            console.error('❌ Errore invio notifica manutenzione:', error);
+          }
+        }
+      }
     }
 
     const fanRes = await fetch(`${baseUrl}${STOVE_ROUTES.getFan}`);
@@ -143,6 +251,9 @@ export async function GET(req) {
           body: JSON.stringify({source: 'scheduler'}),
         });
         changeApplied = true;
+
+        // Send notification
+        await sendSchedulerNotification('IGNITE', `Stufa accesa automaticamente alle ${ora} (P${active.power}, V${active.fan})`);
       }
       if (currentPowerLevel !== active.power) {
         await fetch(`${baseUrl}${STOVE_ROUTES.setPower}`, {
@@ -168,6 +279,9 @@ export async function GET(req) {
           body: JSON.stringify({source: 'scheduler'}),
         });
         changeApplied = true;
+
+        // Send notification
+        await sendSchedulerNotification('SHUTDOWN', `Stufa spenta automaticamente alle ${ora}`);
       }
     }
 

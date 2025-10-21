@@ -5,6 +5,67 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.5.15] - 2025-10-21
+
+### Aggiunto
+- **Sistema notifiche push completo**: Firebase Cloud Messaging per delivery notifiche su dispositivi iOS e altri
+  - Supporto iOS PWA: notifiche funzionano su iPhone con iOS 16.4+ se app installata come PWA
+  - Service worker (`firebase-messaging-sw.js`) per gestione notifiche in background quando app chiusa
+  - Client service (`lib/notificationService.js`): request permissions, FCM token management, foreground notifications
+  - Server service (`lib/firebaseAdmin.js`): Firebase Admin SDK per invio notifiche server-side
+- **Gestione preferenze notifiche per utente**: pannello completo con toggle switches organizzati per categoria
+  - Errori stufa: master toggle + sotto-opzioni per severità (INFO, WARNING, ERROR, CRITICAL)
+  - Scheduler: master toggle + sotto-opzioni per accensione/spegnimento automatico
+  - Manutenzione: master toggle + sotto-opzioni per soglie (80%, 90%, 100%)
+  - Salvataggio automatico real-time su Firebase (`users/{userId}/notificationPreferences/`)
+  - Pulsante "Ripristina Predefinite" con conferma
+- **Menu Impostazioni in navbar**: dropdown con 3 voci (desktop + mobile)
+  - 🔔 Gestione Notifiche → `/settings/notifications`
+  - 📊 Storico → `/log`
+  - ℹ️ Changelog → `/changelog`
+- **Notifiche automatiche integrate**:
+  - Errori stufa: notifica quando error !== 0 con check preferenze per severità
+  - Scheduler: notifiche accensione/spegnimento automatico con check preferenze per azione
+  - Manutenzione: notifiche a 80%, 90%, 100% utilizzo (una volta per livello) con check preferenze per soglia
+- **API routes notifiche**:
+  - POST `/api/notifications/test`: invio notifica di test all'utente corrente
+  - POST `/api/notifications/send`: invio notifica generica (uso interno/admin)
+- **Schema Firebase esteso**:
+  - `users/{userId}/fcmTokens/{token}/`: token FCM con metadata (platform, isPWA, createdAt, lastUsed)
+  - `users/{userId}/notificationPreferences/`: preferenze utente per tipo notifica
+  - `maintenance/lastNotificationLevel`: tracker per evitare spam notifiche duplicate
+- **Documentazione `NOTIFICATIONS-SETUP.md`**: guida completa 458 righe
+  - Configurazione Firebase Cloud Messaging step-by-step
+  - Generazione VAPID keys e Admin SDK credentials
+  - Installazione PWA su iOS con screenshot illustrati
+  - Testing notifiche (manuale + automatiche)
+  - Troubleshooting iOS e debug tools
+  - Gestione preferenze utente con esempi
+
+### Modificato
+- **Service `notificationPreferencesService.js`**: funzioni helper per check preferenze
+  - `getUserPreferences(userId)`: fetch preferenze con init defaults se non esistono
+  - `updatePreferenceSection(userId, section, prefs)`: update parziale preferenze
+  - `shouldSendErrorNotification(userId, severity)`: check se inviare errore per severità
+  - `shouldSendSchedulerNotification(userId, action)`: check se inviare scheduler per azione
+  - `shouldSendMaintenanceNotification(userId, threshold)`: check se inviare manutenzione per soglia
+  - `resetPreferences(userId)`: reset a defaults predefiniti
+- **Integrazione preferenze in invio notifiche**:
+  - `errorMonitor.js`: check preferenze prima `sendErrorPushNotification()`
+  - `/api/scheduler/check`: check preferenze prima notifiche scheduler/manutenzione
+  - Pattern fail-safe: se errore check preferenze, invia comunque (safety-first)
+- **Device registry**: `SETTINGS_MENU` aggiunto a `lib/devices/deviceTypes.js`
+- **Navbar**: integrato dropdown Impostazioni per desktop e mobile
+- **Rimossi duplicati**: LOG e CHANGELOG rimossi da `GLOBAL_SECTIONS` (ora in SETTINGS_MENU)
+
+### Tecnico
+- Pattern client/server separato: `notificationService.js` (client) + `firebaseAdmin.js` (server)
+- iOS detection: `isIOS()` + `isPWA()` per UX ottimizzata (banner installazione se necessario)
+- FCM token tracking: salvataggio automatico con metadata per gestione multi-dispositivo
+- Notifiche manutenzione: `lastNotificationLevel` in Firebase per evitare spam duplicate
+- Service worker foreground/background: gestione unificata notifiche app aperta/chiusa
+- Preferenze defaults: WARNING/ERROR/CRITICAL attivi, INFO disattivo (riduzione rumore)
+
 ## [1.5.14] - 2025-10-20
 
 ### Aggiunto

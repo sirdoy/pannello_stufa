@@ -8,11 +8,13 @@ import { getNavigationStructure } from '@/lib/devices/deviceRegistry';
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [settingsDropdownOpen, setSettingsDropdownOpen] = useState(false);
   const [desktopDeviceDropdown, setDesktopDeviceDropdown] = useState(null);
   const [mobileDeviceDropdown, setMobileDeviceDropdown] = useState(null);
   const [user, setUser] = useState(null);
 
   const userDropdownRef = useRef(null);
+  const settingsDropdownRef = useRef(null);
   const desktopDeviceRefs = useRef({});
   const pathname = usePathname();
   const navStructure = getNavigationStructure();
@@ -21,18 +23,24 @@ export default function Navbar() {
   useEffect(() => {
     setMobileMenuOpen(false);
     setUserDropdownOpen(false);
+    setSettingsDropdownOpen(false);
     setDesktopDeviceDropdown(null);
     setMobileDeviceDropdown(null);
   }, [pathname]);
 
   // Desktop: Click outside to close dropdowns
   useEffect(() => {
-    if (!userDropdownOpen && !desktopDeviceDropdown) return;
+    if (!userDropdownOpen && !settingsDropdownOpen && !desktopDeviceDropdown) return;
 
     const handleClickOutside = (event) => {
       // User dropdown
       if (userDropdownOpen && userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
         setUserDropdownOpen(false);
+      }
+
+      // Settings dropdown
+      if (settingsDropdownOpen && settingsDropdownRef.current && !settingsDropdownRef.current.contains(event.target)) {
+        setSettingsDropdownOpen(false);
       }
 
       // Device dropdowns
@@ -46,7 +54,7 @@ export default function Navbar() {
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [userDropdownOpen, desktopDeviceDropdown]);
+  }, [userDropdownOpen, settingsDropdownOpen, desktopDeviceDropdown]);
 
   // Escape key to close everything
   useEffect(() => {
@@ -54,6 +62,7 @@ export default function Navbar() {
       if (e.key === 'Escape') {
         setMobileMenuOpen(false);
         setUserDropdownOpen(false);
+        setSettingsDropdownOpen(false);
         setDesktopDeviceDropdown(null);
         setMobileDeviceDropdown(null);
       }
@@ -204,6 +213,66 @@ export default function Navbar() {
                 </NavLink>
               ))}
 
+              {/* Settings Dropdown */}
+              {navStructure.settings && navStructure.settings.length > 0 && (
+                <div className="relative" ref={settingsDropdownRef}>
+                  <button
+                    onClick={() => setSettingsDropdownOpen(!settingsDropdownOpen)}
+                    className={`px-3 lg:px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                      settingsDropdownOpen || navStructure.settings.some(item => isActive(item.route))
+                        ? 'bg-primary-50 text-primary-600 shadow-sm'
+                        : 'text-neutral-700 hover:bg-neutral-100'
+                    }`}
+                    aria-expanded={settingsDropdownOpen}
+                  >
+                    <span className="text-sm xl:text-base">⚙️</span>
+                    <span className="xl:inline hidden">Impostazioni</span>
+                    <svg
+                      className={`w-3.5 h-3.5 transition-transform duration-200 ${settingsDropdownOpen ? 'rotate-180' : ''}`}
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {settingsDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-64 xl:w-72 bg-white/[0.10] backdrop-blur-3xl border border-white/20 rounded-xl shadow-liquid-lg overflow-hidden z-[100] ring-1 ring-white/10 ring-inset">
+                      {navStructure.settings.map((item, idx) => (
+                        <Link
+                          key={item.id}
+                          href={item.route}
+                          className={`block px-4 py-3 text-sm xl:text-base transition-colors duration-200 ${
+                            idx !== navStructure.settings.length - 1
+                              ? 'border-b border-neutral-200/50'
+                              : ''
+                          } ${
+                            isActive(item.route)
+                              ? 'bg-primary-50 text-primary-600 font-medium'
+                              : 'text-neutral-800 hover:bg-neutral-100/50'
+                          }`}
+                          onClick={() => setSettingsDropdownOpen(false)}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">{item.icon}</span>
+                            <div className="flex-1">
+                              <div className="font-medium">{item.label}</div>
+                              {item.description && (
+                                <div className="text-xs text-neutral-600 mt-0.5">{item.description}</div>
+                              )}
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* User Dropdown */}
               {user && (
                 <div className="relative ml-2" ref={userDropdownRef}>
@@ -350,6 +419,55 @@ export default function Navbar() {
                   )}
                 </div>
               ))}
+
+              {/* Settings Section (Mobile) */}
+              {navStructure.settings && navStructure.settings.length > 0 && (
+                <div className="space-y-1 pt-3 mt-3 border-t border-white/20">
+                  <button
+                    onClick={() => setMobileDeviceDropdown(mobileDeviceDropdown === 'settings' ? null : 'settings')}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 relative overflow-hidden ${
+                      navStructure.settings.some(item => isActive(item.route))
+                        ? 'bg-primary-500/10 backdrop-blur-2xl text-primary-700 shadow-liquid-sm ring-1 ring-primary-500/20 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-primary-400/10 before:to-transparent before:pointer-events-none'
+                        : 'text-neutral-800 bg-white/[0.08] backdrop-blur-2xl hover:bg-white/[0.12] shadow-liquid-sm ring-1 ring-white/20 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none'
+                    }`}
+                  >
+                    <span className="flex items-center gap-3 relative z-10">
+                      <span className="text-lg">⚙️</span>
+                      <span>Impostazioni</span>
+                    </span>
+                    <svg
+                      className={`w-5 h-5 transition-transform duration-200 relative z-10 ${mobileDeviceDropdown === 'settings' ? 'rotate-180' : ''}`}
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {/* Settings Submenu (Mobile) */}
+                  {mobileDeviceDropdown === 'settings' && (
+                    <div className="ml-4 space-y-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                      {navStructure.settings.map(item => (
+                        <NavLink
+                          key={item.route}
+                          href={item.route}
+                          mobile
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <span className="flex items-center gap-3">
+                            <span className="text-base">{item.icon}</span>
+                            <span>{item.label}</span>
+                          </span>
+                        </NavLink>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Global Links */}
               <div className="pt-3 mt-3 border-t border-white/20 space-y-1">

@@ -6,7 +6,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { getFullSchedulerMode, clearSemiManualMode, getNextScheduledAction } from '@/lib/schedulerService';
 import { STOVE_ROUTES } from '@/lib/routes';
 import { logStoveAction, logSchedulerAction } from '@/lib/logService';
-import { logError, shouldNotify, sendErrorNotification } from '@/lib/errorMonitor';
+import { logError, shouldNotify, sendErrorNotification, sendErrorPushNotification } from '@/lib/errorMonitor';
 import { useVersion } from '@/app/context/VersionContext';
 import { getMaintenanceStatus, confirmCleaning } from '@/lib/maintenanceService';
 import Card from '../../ui/Card';
@@ -115,7 +115,13 @@ export default function StoveCard() {
         });
 
         if (shouldNotify(newErrorCode, previousErrorCode.current)) {
+          // Browser notification (immediate)
           await sendErrorNotification(newErrorCode, newErrorDescription);
+
+          // Push notification (to all user devices)
+          if (user?.sub) {
+            await sendErrorPushNotification(newErrorCode, newErrorDescription, user.sub);
+          }
         }
       }
 

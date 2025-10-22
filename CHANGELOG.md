@@ -5,6 +5,32 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.8.2] - 2025-10-22
+
+### Migliorato
+- **Ottimizzazione layout StoveCard e animazioni WebGL**
+  - Container animazione ridotto da `aspect-square` a dimensioni fisse `h-48 sm:h-56`
+  - Layout più compatto: spacing e padding ridotti per migliore integrazione visiva
+  - Armonizzati elementi stato stufa, animazione, e parametri Fan/Power
+  - File: `app/components/devices/stove/StoveCard.js:456-521`
+
+- **Shader fiocco di neve riscritto in stile cartoon Ghibli**
+  - Sostituito raymarching 3D complesso con shader 2D cartoon (stile Studio Ghibli)
+  - Dimensioni ridotte ~60% per proporzioni ottimali nel container
+  - Performance migliorate: shader 2D vs raymarching 3D (128 iterazioni)
+  - Design: centro esagonale, 6 punte principali con decorazioni laterali
+  - Effetti: 8 sparkles animati orbitanti, breathing animation delicata
+  - Palette colori azzurri freddi graduali (deepIce → shimmer)
+  - Rotazione lenta (0.6x) con floating effect (oscillazione delicata)
+  - File: `app/components/devices/stove/StoveWebGLAnimation.js:70-282`
+
+- **Tutti shader WebGL ottimizzati per container rettangolare**
+  - Zoom aspect-ratio adaptive: landscape 1.2-1.35x, portrait 1.3-1.45x
+  - Flame shader: power scale ridotto 0.65-1.05x, vertical offset dinamico migliorato
+  - Error shader: pulse ridotto, vignette adattata
+  - Animazioni sempre contenute nel canvas senza overflow
+  - File: `app/components/devices/stove/StoveWebGLAnimation.js:70-758`
+
 ## [1.8.1] - 2025-10-22
 
 ### Corretto

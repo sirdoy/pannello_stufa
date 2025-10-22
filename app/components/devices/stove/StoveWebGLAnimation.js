@@ -67,56 +67,218 @@ export default function StoveWebGLAnimation({ status = 'OFF', fanLevel = 3, powe
     // Interaction state
     let dragging = false, px = 0, py = 0, ax = 0, ay = 0;
 
-    // Vertex shader
+    // Vertex shader (fullscreen triangle)
     const vertexShaderSource = `#version 300 es
 precision highp float;
-const vec2 verts[3] = vec2[3](vec2(-1.0, -1.0), vec2(3.0, -1.0), vec2(-1.0, 3.0));
-void main() { gl_Position = vec4(verts[gl_VertexID], 0.0, 1.0); }`;
+void main(){
+  vec2 v[3];
+  v[0]=vec2(-1.0,-1.0); v[1]=vec2(3.0,-1.0); v[2]=vec2(-1.0,3.0);
+  gl_Position = vec4(v[gl_VertexID],0.0,1.0);
+}`;
 
-    // Fragment shader (raymarching snowflake)
+    // Fragment shader (Ghibli-style 2D snowflake)
     const fragmentShaderSource = `#version 300 es
 precision highp float;
 out vec4 fragColor;
-uniform vec2 uRes;
-uniform float uTime;
-uniform vec2 uDrag;
 
+uniform vec2  uRes;
+uniform float uTime;
+uniform vec2  uDrag;
+
+// Hash per noise
+float hash21(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
+
+// Smooth noise
+float noise(vec2 p){
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  vec2 u = f*f*(3.0-2.0*f);
+  return mix(
+    mix(hash21(i), hash21(i+vec2(1,0)), u.x),
+    mix(hash21(i+vec2(0,1)), hash21(i+vec2(1,1)), u.x),
+    u.y
+  );
+}
+
+// Rotazione 2D
 mat2 rot(float a){ float c=cos(a), s=sin(a); return mat2(c,-s,s,c); }
-float smin(float a, float b, float k){ float h = clamp(0.5 + 0.5*(b-a)/k, 0.0, 1.0); return mix(b, a, h) - k*h*(1.0-h); }
-float hash21(vec2 p){ return fract(sin(dot(p, vec2(41.23, 289.97)))*43758.5453); }
-float noise(vec3 p){ vec3 i = floor(p); vec3 f = fract(p); vec3 u = f*f*(3.0-2.0*f); float n000 = hash21(i.xy + 17.0*i.z); float n100 = hash21(i.xy + vec2(1.0,0.0) + 17.0*i.z); float n010 = hash21(i.xy + vec2(0.0,1.0) + 17.0*i.z); float n110 = hash21(i.xy + vec2(1.0,1.0) + 17.0*i.z); float n001 = hash21(i.xy + 17.0*(i.z+1.0)); float n101 = hash21(i.xy + vec2(1.0,0.0) + 17.0*(i.z+1.0)); float n011 = hash21(i.xy + vec2(0.0,1.0) + 17.0*(i.z+1.0)); float n111 = hash21(i.xy + vec2(1.0,1.0) + 17.0*(i.z+1.0)); float nx00 = mix(n000, n100, u.x); float nx10 = mix(n010, n110, u.x); float nx01 = mix(n001, n101, u.x); float nx11 = mix(n011, n111, u.x); float nxy0 = mix(nx00, nx10, u.y); float nxy1 = mix(nx01, nx11, u.y); return mix(nxy0, nxy1, u.z); }
-float sdHex(vec2 p, float r){ const vec3 k = vec3(-0.8660254, 0.5, 0.5773503); p = abs(p); p -= 2.0*min(dot(k.xy,p), 0.0) * k.xy; p -= vec2(clamp(p.x, -k.z*r, k.z*r), r); return length(p)*sign(p.y); }
-float sdBox(vec2 p, vec2 b){ vec2 d = abs(p)-b; return length(max(d,0.0)) + min(max(d.x,d.y),0.0); }
-float sdRhombus(vec2 p, vec2 b){ p=abs(p); float h=clamp((-2.0*min(p.x*b.x,p.y*b.y)+b.x*b.y)/(b.x*b.x+b.y*b.y),0.0,1.0); return length(p-vec2(b.x,b.y)*h)*sign(p.x*b.y+p.y*b.x-b.x*b.y); }
-vec2 pMod6(vec2 p){ float a = atan(p.y, p.x); float r = length(p); float sect = 6.0; a = mod(a+3.14159265/sect, 6.2831853/sect) - 3.14159265/sect; return vec2(cos(a), sin(a))*r; }
-float sdBranch(vec2 p){ float d = sdBox(p - vec2(0.35, 0.0), vec2(0.35, 0.015)); d = smin(d, sdRhombus(p-vec2(0.75,0.0), vec2(0.11,0.03)), 0.03); for(int i=0;i<3;i++){ float t = float(i+1)/4.0; vec2 q = p - vec2(t*0.9,0.0); float spread = mix(0.18, 0.33, t); float len = mix(0.08, 0.16, t); d = smin(d, sdRhombus(q-vec2(0.0, spread), vec2(len, 0.02)), 0.02); d = smin(d, sdRhombus(q-vec2(0.0, -spread), vec2(len, 0.02)), 0.02); } return d; }
-float sdFlake2D(vec2 p){ float dHex = sdHex(p, 0.22); float dStar = sdRhombus(p, vec2(0.12,0.03)); dStar = min(dStar, sdRhombus(rot(3.14159265/6.0)*p, vec2(0.12,0.03))); vec2 q = pMod6(p); float dBr = sdBranch(q); float d = smin(dHex, dBr, 0.04); d = min(d, dStar); return d; }
-float sdExtrude(vec3 p, float t){ float d2 = sdFlake2D(p.xy); float dz = abs(p.z) - t; return max(d2, dz); }
-float map(vec3 p){ float warp = (noise(p*6.0) - 0.5)*0.0025; p.xy += warp; return sdExtrude(p, 0.015); }
-vec3 calcNormal(vec3 p){ const float e = 0.0015; vec2 h = vec2(1.0,-1.0)*e; return normalize(vec3(map(p + vec3(h.x, h.y, h.y)) - map(p + vec3(h.y, h.y, h.x)), map(p + vec3(h.y, h.x, h.y)) - map(p + vec3(h.x, h.x, h.x)), map(p + vec3(h.y, h.y, h.x)) - map(p + vec3(h.x, h.y, h.y)))); }
-float fresnel(vec3 n, vec3 v){ return pow(1.0 - max(dot(n, -v), 0.0), 5.0); }
-vec3 skyColor(vec3 rd){ float t = clamp(0.5*rd.y + 0.5, 0.0, 1.0); return mix(vec3(0.00, 0.02, 0.08), vec3(0.06, 0.13, 0.26), t); }
+
+// Hexagon shape
+float sdHex(vec2 p, float r){
+  const vec3 k = vec3(-0.866025404, 0.5, 0.577350269);
+  p = abs(p);
+  p -= 2.0*min(dot(k.xy,p),0.0)*k.xy;
+  p -= vec2(clamp(p.x, -k.z*r, k.z*r), r);
+  return length(p)*sign(p.y);
+}
+
+// Rhombus shape (per le punte)
+float sdRhombus(vec2 p, vec2 b){
+  p = abs(p);
+  float h = clamp((-2.0*min(p.x*b.x,p.y*b.y)+b.x*b.y)/(b.x*b.x+b.y*b.y), 0.0, 1.0);
+  return length(p-vec2(b.x,b.y)*h)*sign(p.x*b.y+p.y*b.x-b.x*b.y);
+}
+
+// Circle
+float sdCircle(vec2 p, float r){
+  return length(p) - r;
+}
+
+// Ghibli-style snowflake shape (cartoon 2D)
+float sdGhibliSnowflake(vec2 p, float t){
+  // Centro esagonale
+  float d = sdHex(p, 0.12);
+
+  // 6 punte principali (simmetriche)
+  for(int i=0; i<6; i++){
+    float angle = float(i) * 3.14159265 / 3.0; // 60 gradi
+    vec2 dir = vec2(cos(angle), sin(angle));
+
+    // Punta principale - romboidale
+    vec2 pp = rot(-angle) * p;
+
+    // Corpo della punta (allungato verso esterno)
+    float mainSpike = sdRhombus(pp - vec2(0.22, 0.0), vec2(0.14, 0.025));
+    d = min(d, mainSpike);
+
+    // Piccole punte laterali (2 per lato) - stile Ghibli
+    for(int side=-1; side<=1; side+=2){
+      // Prima punta laterale (vicina al centro)
+      vec2 p1 = pp - vec2(0.15, float(side) * 0.08);
+      float spike1 = sdRhombus(p1, vec2(0.06, 0.015));
+      d = min(d, spike1);
+
+      // Seconda punta laterale (più lontana)
+      vec2 p2 = pp - vec2(0.28, float(side) * 0.12);
+      float spike2 = sdRhombus(p2, vec2(0.05, 0.012));
+      d = min(d, spike2);
+    }
+
+    // Mini decorazioni circolari (Ghibli touch)
+    float deco = sdCircle(pp - vec2(0.36, 0.0), 0.022);
+    d = min(d, deco);
+  }
+
+  // Centro decorativo (piccolo cerchio)
+  float centerDeco = sdCircle(p, 0.035);
+  d = min(d, centerDeco);
+
+  // Piccoli brillantini casuali (sparkles)
+  float sparkle = 1000.0;
+  for(int i=0; i<8; i++){
+    float fi = float(i);
+    float angle = fi * 3.14159265 / 4.0 + t * 0.3;
+    float radius = 0.25 + 0.08 * sin(t * 1.5 + fi);
+    vec2 sparklePos = vec2(cos(angle), sin(angle)) * radius;
+
+    float sparkSize = 0.015 + 0.008 * sin(t * 3.0 + fi * 0.7);
+    sparkle = min(sparkle, sdCircle(p - sparklePos, sparkSize));
+  }
+  d = min(d, sparkle);
+
+  // Noise organico per bordi irregolari (molto sottile)
+  float edgeNoise = noise(p * 30.0 + t * 0.2) * 0.008;
+  d += edgeNoise;
+
+  return d;
+}
+
+// Palette colori freddi Ghibli
+vec3 snowflakeColor(float t){
+  t = clamp(t, 0.0, 1.0);
+
+  // Colori ghiaccio cartoon
+  vec3 deepIce = vec3(0.4, 0.65, 0.85);       // Azzurro scuro
+  vec3 ice = vec3(0.55, 0.75, 0.95);          // Azzurro
+  vec3 lightIce = vec3(0.7, 0.85, 1.0);       // Azzurro chiaro
+  vec3 crystalBlue = vec3(0.85, 0.95, 1.0);   // Azzurro cristallino
+  vec3 shimmer = vec3(0.95, 0.98, 1.0);       // Bianco shimmer
+
+  vec3 col;
+  if(t < 0.2){
+    col = mix(deepIce, ice, t/0.2);
+  }
+  else if(t < 0.4){
+    col = mix(ice, lightIce, (t-0.2)/0.2);
+  }
+  else if(t < 0.65){
+    col = mix(lightIce, crystalBlue, (t-0.4)/0.25);
+  }
+  else{
+    col = mix(crystalBlue, shimmer, (t-0.65)/0.35);
+  }
+
+  return col;
+}
 
 void main(){
   vec2 uv = (gl_FragCoord.xy - 0.5*uRes) / uRes.y;
-  float t = uTime * 1.0;
-  float az = t + uDrag.x*3.14159;
-  float el = mix(0.35, 0.6, 0.5 + 0.5*sin(t*0.7)) + uDrag.y*0.6;
-  vec3 ro = vec3(1.9*cos(az), 0.6 + 0.2*sin(t*0.9), 1.9*sin(az));
-  vec3 ta = vec3(0.0);
-  vec3 ww = normalize(ta - ro);
-  vec3 uu = normalize(cross(vec3(0.0,1.0,0.0), ww));
-  vec3 vv = cross(ww, uu);
-  vec3 rd = normalize(uv.x*uu + uv.y*vv + 1.7*ww);
-  float selfRot = t*1.2 + 0.2*sin(t*0.37);
-  vec3 p = ro; float dTot = 0.0; float d; bool hit=false;
-  for(int i=0;i<128;i++){ vec3 pr = p; pr.xz = rot(selfRot) * pr.xz; pr.yz = rot(0.25*sin(t*0.5)) * pr.yz; d = map(pr); if(d < 0.0007){ hit = true; break; } dTot += d; p += rd * d; if(dTot>8.0) break; }
-  vec3 col = skyColor(rd);
-  if(hit){ vec3 pr = p; pr.xz = rot(selfRot) * pr.xz; pr.yz = rot(0.25*sin(t*0.5)) * pr.yz; vec3 n = calcNormal(pr); mat2 rY = rot(-selfRot); mat2 rX = rot(-0.25*sin(t*0.5)); n.yz = rX * n.yz; n.xz = rY * n.xz; vec3 L1 = normalize(vec3(0.7, 0.9, 0.2)); vec3 L2 = normalize(vec3(-0.5, 0.3, -0.8)); float ndl1 = max(dot(n, L1), 0.0); float ndl2 = max(dot(n, L2), 0.0); float F = fresnel(n, rd); float spec1 = pow(max(dot(reflect(-L1, n), -rd), 0.0), 48.0); float spec2 = pow(max(dot(reflect(-L2, n), -rd), 0.0), 24.0)*0.4; float thickness = exp(-8.0*abs(pr.z)); float spark = pow(max(0.0, noise(pr*45.0)), 6.0) * (0.2 + 0.8*F) * 0.35; vec3 env = skyColor(reflect(rd, n)); vec3 ice = mix(vec3(0.75,0.88,1.0), vec3(0.55,0.78,1.1), clamp(F*1.2,0.0,1.0)); vec3 lighting = 0.05*ice + 0.25*(ndl1+0.5*ndl2)*ice + 0.9*env*F + 1.4*spec1 + 0.6*spec2 + 0.25*thickness*vec3(0.4,0.7,1.0) + spark; float ao = clamp(0.6 + 0.4*sdFlake2D((rot(selfRot)*pr.xy)*1.4), 0.0, 1.0); col = mix(col, lighting, smoothstep(0.0, 0.004, thickness + 0.004)); col *= mix(0.92, 1.0, ao); }
-  float vign = smoothstep(1.2, 0.2, length(uv));
-  col *= vign;
-  col = col / (1.0 + col);
-  fragColor = vec4(pow(col, vec3(0.95)), 1.0);
+
+  // Zoom per container rettangolare (più compatto)
+  float aspectRatio = uRes.x / uRes.y;
+  if(aspectRatio > 1.0){
+    uv *= 1.35;  // Landscape
+  } else {
+    uv *= 1.45;  // Portrait
+  }
+
+  float t = uTime * 0.6;  // Rotazione lenta e delicata
+
+  // Position - con breathing animation
+  vec2 p = uv;
+
+  // Gentle breathing (espansione/contrazione)
+  float breath = 0.05 * sin(t * 1.2);
+  p /= (1.0 + breath);
+
+  // Rotazione del fiocco
+  float rotation = t * 0.5 + uDrag.x * 3.14159;
+  p = rot(rotation) * p;
+
+  // Leggera oscillazione (floating)
+  p.y += 0.02 * sin(t * 0.8);
+  p.x += 0.015 * sin(t * 1.1);
+
+  // Get distance
+  float d = sdGhibliSnowflake(p, t);
+
+  // Intensity field
+  float intensity = smoothstep(0.03, -0.01, d);
+
+  // Core brightness
+  float core = smoothstep(0.08, -0.05, d);
+  intensity = max(intensity, core);
+
+  // Apply snowflake colors
+  vec3 col = snowflakeColor(intensity);
+
+  // Dark outline (anime style)
+  float outline = smoothstep(0.012, 0.0, abs(d));
+  col = mix(col, vec3(0.2, 0.35, 0.5), outline * 0.6);
+
+  // Soft glow around snowflake
+  float glow = exp(-4.0 * max(0.0, d));
+  col += vec3(0.5, 0.7, 1.0) * glow * 0.25;
+
+  // Sparkle highlights (Ghibli touch)
+  float sparkleHighlight = pow(max(0.0, noise(p * 40.0 + t * 0.5)), 8.0);
+  col += vec3(0.8, 0.9, 1.0) * sparkleHighlight * intensity * 0.4;
+
+  // Cold ambient glow
+  float ambientGlow = exp(-2.5 * length(uv));
+  col += vec3(0.3, 0.5, 0.7) * ambientGlow * 0.15;
+
+  // Vignette
+  float vign = smoothstep(1.6, 0.3, length(uv));
+  col *= 0.5 + 0.5 * vign;
+
+  // Tone mapping
+  col = col / (1.0 + col * 0.3);
+
+  // Gamma
+  col = pow(col, vec3(0.92));
+
+  fragColor = vec4(col, 1.0);
 }`;
 
     function compileShader(source, type) {
@@ -382,29 +544,39 @@ vec3 calciferColor(float t){
 void main(){
   vec2 uv = (gl_FragCoord.xy - 0.5*uRes) / uRes.y;
 
+  // Zoom per adattarsi al nuovo container rettangolare
+  float aspectRatio = uRes.x / uRes.y;
+  if(aspectRatio > 1.0){
+    // Landscape: zoom per contenere in altezza
+    uv *= 1.15;
+  } else {
+    // Portrait o quadrato: zoom normale
+    uv *= 1.25;
+  }
+
   float fan = float(clamp(uFan, 1, 6));
   float power = float(clamp(uPower, 1, 5));
 
   // Fan controls speed (0.5x to 2.5x)
   float fanSpeed = mix(0.5, 2.5, (fan-1.0)/5.0);
 
-  // Power controls size (0.7x to 1.15x) - ridotto per evitare uscita dal canvas
-  float powerScale = mix(0.7, 1.15, (power-1.0)/4.0);
+  // Power controls size (0.65x to 1.05x) - ulteriormente ridotto per nuovo container
+  float powerScale = mix(0.65, 1.05, (power-1.0)/4.0);
 
   // Time
   float t = uTime * fanSpeed;
 
   // Position and scale
   vec2 p = uv;
-  // Offset verticale dinamico: power alto = abbasso leggermente per centrare
-  float verticalOffset = mix(0.08, 0.00, (power-1.0)/4.0);
+  // Offset verticale dinamico: power alto = abbasso per centrare
+  float verticalOffset = mix(0.12, 0.02, (power-1.0)/4.0);
   p.y += verticalOffset;
   p /= powerScale;
 
-  // Breathing animation (Calcifer bounces)
-  float breath = 0.08 * sin(t * 2.0);
+  // Breathing animation (Calcifer bounces) - ridotto
+  float breath = 0.06 * sin(t * 2.0);
   p.y -= breath;
-  p.x *= (1.0 + breath * 0.5);
+  p.x *= (1.0 + breath * 0.4);
 
   // Get distance to Calcifer
   float d = sdCalcifer(p, t, fanSpeed);
@@ -427,12 +599,12 @@ void main(){
   float glow = exp(-3.5 * max(0.0, d));
   col += vec3(1.0, 0.6, 0.2) * glow * 0.3;
 
-  // Base glow (Calcifer sits on surface)
-  float baseGlow = exp(-6.0 * length(uv - vec2(0.0, -0.35)));
+  // Base glow (Calcifer sits on surface) - adattato
+  float baseGlow = exp(-6.5 * length(uv - vec2(0.0, -0.4)));
   col += vec3(1.2, 0.5, 0.1) * baseGlow * 0.4;
 
-  // Vignette
-  float vign = smoothstep(1.2, 0.2, length(uv));
+  // Vignette - adattata al nuovo zoom
+  float vign = smoothstep(1.5, 0.3, length(uv));
   col *= 0.4 + 0.6 * vign;
 
   // Tone mapping
@@ -676,14 +848,24 @@ vec3 warningColors(float t){
 void main(){
   vec2 uv = (gl_FragCoord.xy - 0.5*uRes) / uRes.y;
 
+  // Zoom per adattarsi al nuovo container rettangolare
+  float aspectRatio = uRes.x / uRes.y;
+  if(aspectRatio > 1.0){
+    // Landscape: zoom per contenere in altezza
+    uv *= 1.2;
+  } else {
+    // Portrait o quadrato: zoom normale
+    uv *= 1.3;
+  }
+
   float t = uTime * 1.2; // Faster animation for urgency
 
-  // Position
+  // Position - adattato per nuovo container
   vec2 p = uv;
-  p.y += 0.05;
+  p.y += 0.08;
 
-  // Aggressive pulsing (warning feeling)
-  float pulse = 0.12 * sin(t * 3.5);
+  // Aggressive pulsing (warning feeling) - leggermente ridotto
+  float pulse = 0.10 * sin(t * 3.5);
   p.y -= pulse * 0.5;
   p.x *= (1.0 + pulse);
 
@@ -709,12 +891,12 @@ void main(){
   float glow = exp(-4.0 * max(0.0, d)) * glowPulse;
   col += vec3(1.2, 0.3, 0.1) * glow * 0.4;
 
-  // Base glow
-  float baseGlow = exp(-7.0 * length(uv - vec2(0.0, -0.3)));
+  // Base glow - adattato
+  float baseGlow = exp(-7.5 * length(uv - vec2(0.0, -0.35)));
   col += vec3(1.3, 0.4, 0.1) * baseGlow * 0.5;
 
-  // Vignette
-  float vign = smoothstep(1.2, 0.2, length(uv));
+  // Vignette - adattata al nuovo zoom
+  float vign = smoothstep(1.5, 0.3, length(uv));
   col *= 0.4 + 0.6 * vign;
 
   // Tone mapping

@@ -453,19 +453,19 @@ export default function StoveCard() {
                     </div>
                   )}
 
-                  {/* WebGL Animation Container - Square */}
-                  <div className="relative mb-5 z-10 w-full max-w-sm mx-auto">
-                    {/* Container quadrato con animazione */}
-                    <div className={`relative ${statusInfo.iconBg} rounded-3xl p-6 shadow-liquid ring-1 ring-white/15 ring-inset transition-all duration-500 overflow-hidden`}>
-                      {/* Subtle glow background (non-pulsing) */}
+                  {/* Status e Animation Container - Layout Ottimizzato */}
+                  <div className="relative mb-5 z-10 w-full max-w-md mx-auto">
+                    {/* Container con animazione integrata */}
+                    <div className={`relative ${statusInfo.iconBg} rounded-3xl p-5 sm:p-6 shadow-liquid ring-1 ring-white/15 ring-inset transition-all duration-500 overflow-hidden`}>
+                      {/* Subtle glow background */}
                       <div className={`absolute inset-0 ${statusInfo.iconBg} blur-2xl opacity-10`}></div>
 
-                      {/* Status Text - Sopra l'animazione */}
-                      <div className="relative z-20 text-center mb-4">
-                        <p className="text-xs font-bold text-neutral-600 uppercase tracking-[0.2em] mb-2 opacity-50">
+                      {/* Status Text - Compatto */}
+                      <div className="relative z-20 text-center mb-3">
+                        <p className="text-xs font-bold text-neutral-600 uppercase tracking-[0.2em] mb-1.5 opacity-50">
                           Stato Attuale
                         </p>
-                        <p className={`text-2xl sm:text-3xl font-black ${statusInfo.textColor} tracking-tight leading-tight`}>
+                        <p className={`text-xl sm:text-2xl font-black ${statusInfo.textColor} tracking-tight leading-tight`}>
                           {statusInfo.label}
                         </p>
                         {/* Technical status (small, subtle) */}
@@ -476,8 +476,8 @@ export default function StoveCard() {
                         )}
                       </div>
 
-                      {/* Animation - Aspect ratio quadrato */}
-                      <div className="relative z-10 w-full aspect-square flex items-center justify-center bg-gradient-to-br from-black/5 to-black/10 rounded-2xl ring-1 ring-white/10 ring-inset overflow-hidden">
+                      {/* Animation - Dimensione Ottimizzata (ridotta) */}
+                      <div className="relative z-10 w-full h-48 sm:h-56 flex items-center justify-center bg-gradient-to-br from-black/5 to-black/10 rounded-2xl ring-1 ring-white/10 ring-inset overflow-hidden">
                         <StoveWebGLAnimation
                           status={status}
                           fanLevel={fanLevel}
@@ -485,17 +485,17 @@ export default function StoveCard() {
                         />
                       </div>
 
-                      {/* Parametri Fan e Power - Sotto l'animazione */}
+                      {/* Parametri Fan e Power - Layout Compatto */}
                       {(statusUpper.includes('START') || statusUpper.includes('WORK')) && (
-                        <div className="relative z-20 mt-4 grid grid-cols-2 gap-3">
+                        <div className="relative z-20 mt-3 grid grid-cols-2 gap-2.5">
                           {/* Fan */}
-                          <div className="flex flex-col items-center justify-center p-3 bg-white/[0.08] backdrop-blur-xl rounded-xl ring-1 ring-white/10 ring-inset">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-lg">💨</span>
+                          <div className="flex flex-col items-center justify-center p-2.5 bg-white/[0.08] backdrop-blur-xl rounded-xl ring-1 ring-white/10 ring-inset">
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <span className="text-base">💨</span>
                               <p className="text-xs font-bold text-neutral-600 uppercase tracking-wider opacity-60">Fan</p>
                             </div>
                             <div className="flex items-baseline gap-1">
-                              <p className="text-xl font-black text-info-700">
+                              <p className="text-lg font-black text-info-700">
                                 {fanLevel ?? '-'}
                               </p>
                               <span className="text-xs text-neutral-500 font-semibold opacity-50">/6</span>
@@ -503,13 +503,13 @@ export default function StoveCard() {
                           </div>
 
                           {/* Power */}
-                          <div className="flex flex-col items-center justify-center p-3 bg-white/[0.08] backdrop-blur-xl rounded-xl ring-1 ring-white/10 ring-inset">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-lg">⚡</span>
+                          <div className="flex flex-col items-center justify-center p-2.5 bg-white/[0.08] backdrop-blur-xl rounded-xl ring-1 ring-white/10 ring-inset">
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <span className="text-base">⚡</span>
                               <p className="text-xs font-bold text-neutral-600 uppercase tracking-wider opacity-60">Power</p>
                             </div>
                             <div className="flex items-baseline gap-1">
-                              <p className="text-xl font-black text-accent-700">
+                              <p className="text-lg font-black text-accent-700">
                                 {powerLevel ?? '-'}
                               </p>
                               <span className="text-xs text-neutral-500 font-semibold opacity-50">/5</span>

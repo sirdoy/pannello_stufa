@@ -15,7 +15,28 @@ export default function Select({
   ...props
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [openUpward, setOpenUpward] = useState(false);
   const containerRef = useRef(null);
+  const dropdownRef = useRef(null);
+
+  // Calcola se aprire verso l'alto o verso il basso
+  useEffect(() => {
+    if (isOpen && containerRef.current && dropdownRef.current) {
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const dropdownHeight = dropdownRef.current.offsetHeight;
+      const viewportHeight = window.innerHeight;
+
+      // Spazio disponibile sotto (considerando footer di ~100px)
+      const spaceBelow = viewportHeight - containerRect.bottom - 100;
+
+      // Se non c'è spazio sufficiente sotto, apri verso l'alto
+      if (spaceBelow < dropdownHeight && containerRect.top > dropdownHeight) {
+        setOpenUpward(true);
+      } else {
+        setOpenUpward(false);
+      }
+    }
+  }, [isOpen]);
 
   // Chiudi dropdown quando clicchi fuori
   useEffect(() => {
@@ -89,11 +110,16 @@ export default function Select({
 
         {/* Dropdown Menu */}
         {isOpen && (
-          <div className={`absolute z-[100] w-full mt-2 rounded-xl overflow-hidden animate-dropdown
-            ${liquid
-              ? 'bg-white/[0.10] backdrop-blur-3xl shadow-liquid-lg ring-1 ring-white/20 ring-inset'
-              : 'bg-white/90 backdrop-blur-xl border border-white/40 shadow-glass-lg'
-            }`}>
+          <div
+            ref={dropdownRef}
+            className={`absolute z-[9000] w-full rounded-xl overflow-hidden
+              ${openUpward ? 'bottom-full mb-2' : 'top-full mt-2'}
+              ${openUpward ? 'animate-dropdown-up' : 'animate-dropdown'}
+              ${liquid
+                ? 'bg-white/[0.10] backdrop-blur-3xl shadow-liquid-lg ring-1 ring-white/20 ring-inset'
+                : 'bg-white/90 backdrop-blur-xl border border-white/40 shadow-glass-lg'
+              }`}
+          >
             <div className="max-h-64 overflow-y-auto scrollbar-thin">
               {options.map((option) => (
                 <button

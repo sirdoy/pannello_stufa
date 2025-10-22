@@ -19,6 +19,7 @@ export default function Footer({ className = '' }) {
           w-full py-4 sm:py-6 mt-auto
           bg-white/90 backdrop-blur-xl shadow-glass-lg
           border-t border-neutral-200/50
+          relative z-10
           ${className}
         `}
       >

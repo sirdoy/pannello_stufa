@@ -169,10 +169,21 @@ module.exports = {
             transform: 'translateY(0) scale(1)',
           },
         },
+        'dropdown-up': {
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(8px) scale(0.96)',
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0) scale(1)',
+          },
+        },
       },
       animation: {
         shimmer: 'shimmer 1.5s ease-in-out infinite',
         dropdown: 'dropdown 0.15s ease-out forwards',
+        'dropdown-up': 'dropdown-up 0.15s ease-out forwards',
       },
     },
   },

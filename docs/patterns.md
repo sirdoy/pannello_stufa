@@ -598,6 +598,320 @@ const PUBLIC_ROUTES = [
 
 **Implementazione**: `middleware.js:4-19`
 
+## WebGL Shader Animations Pattern
+
+Pattern per animazioni WebGL2 shader-based nelle UI React con cleanup e responsive handling.
+
+### Base Pattern (Cartoon 2D Shader)
+
+```javascript
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+
+export default function ShaderAnimation({ status, param1, param2 }) {
+  const containerRef = useRef(null);
+  const shaderCanvasRef = useRef(null);
+  const [webglError, setWebglError] = useState(false);
+
+  useEffect(() => {
+    if (!shaderCanvasRef.current) return;
+
+    const canvas = shaderCanvasRef.current;
+    const gl = canvas.getContext('webgl2', {
+      antialias: true,
+      alpha: true,
+      premultipliedAlpha: false
+    });
+
+    if (!gl) {
+      console.warn('WebGL2 not available');
+      setWebglError(true);
+      return;
+    }
+
+    let animationId;
+    let startTime = performance.now();
+    let resizeObserver;
+
+    // Vertex shader (fullscreen triangle)
+    const vertexShaderSource = `#version 300 es
+precision highp float;
+void main(){
+  vec2 v[3];
+  v[0]=vec2(-1.0,-1.0); v[1]=vec2(3.0,-1.0); v[2]=vec2(-1.0,3.0);
+  gl_Position = vec4(v[gl_VertexID],0.0,1.0);
+}`;
+
+    // Fragment shader (2D cartoon animation)
+    const fragmentShaderSource = `#version 300 es
+precision highp float;
+out vec4 fragColor;
+
+uniform vec2  uRes;
+uniform float uTime;
+uniform int   uParam1;
+uniform int   uParam2;
+
+// Your shader code here...
+
+void main(){
+  vec2 uv = (gl_FragCoord.xy - 0.5*uRes) / uRes.y;
+
+  // Aspect ratio adaptive zoom
+  float aspectRatio = uRes.x / uRes.y;
+  if(aspectRatio > 1.0){
+    uv *= 1.2;  // Landscape: zoom to fit height
+  } else {
+    uv *= 1.3;  // Portrait: normal zoom
+  }
+
+  // Animation logic...
+  fragColor = vec4(/* color */, 1.0);
+}`;
+
+    function compileShader(source, type) {
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.error('Shader error:', gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
+      }
+      return shader;
+    }
+
+    const vs = compileShader(vertexShaderSource, gl.VERTEX_SHADER);
+    const fs = compileShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
+    if (!vs || !fs) return;
+
+    const prog = gl.createProgram();
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+      console.error('Program error:', gl.getProgramInfoLog(prog));
+      return;
+    }
+
+    gl.useProgram(prog);
+
+    const uniforms = {
+      uRes: gl.getUniformLocation(prog, 'uRes'),
+      uTime: gl.getUniformLocation(prog, 'uTime'),
+      uParam1: gl.getUniformLocation(prog, 'uParam1'),
+      uParam2: gl.getUniformLocation(prog, 'uParam2')
+    };
+
+    const vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2.0);
+      const w = Math.floor(canvas.clientWidth * dpr);
+      const h = Math.floor(canvas.clientHeight * dpr);
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+        gl.viewport(0, 0, w, h);
+      }
+    }
+
+    function animate() {
+      resize();
+      const t = (performance.now() - startTime) * 0.001;
+
+      gl.uniform2f(uniforms.uRes, canvas.width, canvas.height);
+      gl.uniform1f(uniforms.uTime, t);
+      gl.uniform1i(uniforms.uParam1, param1 || 1);
+      gl.uniform1i(uniforms.uParam2, param2 || 1);
+
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      animationId = requestAnimationFrame(animate);
+    }
+
+    resize();
+
+    resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(canvas);
+
+    animate();
+
+    // Cleanup
+    return () => {
+      if (animationId) cancelAnimationFrame(animationId);
+      if (resizeObserver) resizeObserver.disconnect();
+      gl.deleteProgram(prog);
+      gl.deleteShader(vs);
+      gl.deleteShader(fs);
+      gl.deleteVertexArray(vao);
+    };
+  }, [status, param1, param2]);
+
+  if (webglError) {
+    // Fallback
+    return (
+      <div className="relative flex items-center justify-center w-full h-full">
+        <div className="text-4xl">❄️</div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative flex items-center justify-center w-full h-full"
+    >
+      <canvas
+        ref={shaderCanvasRef}
+        className="w-full h-full touch-none"
+        style={{ display: 'block' }}
+      />
+    </div>
+  );
+}
+```
+
+### Best Practices
+
+**1. Preferisci Shader 2D Cartoon vs Raymarching 3D**
+
+```glsl
+// ❌ EVITA - Raymarching 3D complesso (performance intensive)
+float map(vec3 p) { /* complex SDF operations */ }
+for(int i=0; i<128; i++){
+  d = map(p);
+  p += rd * d;
+}
+
+// ✅ PREFERISCI - 2D Signed Distance Fields (cartoon style)
+float sdShape(vec2 p) { /* simple 2D SDF */ }
+float d = sdShape(p);
+float intensity = smoothstep(0.03, -0.01, d);
+```
+
+**Vantaggi 2D**:
+- ~60% più compatto in dimensioni
+- Migliori performance (no raymarching iterations)
+- Stile cartoon più coerente con UI moderna
+- Aspect ratio adaptive più semplice
+
+**2. Aspect Ratio Adaptive Zoom**
+
+```glsl
+void main(){
+  vec2 uv = (gl_FragCoord.xy - 0.5*uRes) / uRes.y;
+
+  // Adatta zoom al container shape
+  float aspectRatio = uRes.x / uRes.y;
+  if(aspectRatio > 1.0){
+    uv *= 1.2;  // Landscape: zoom per contenere in altezza
+  } else {
+    uv *= 1.3;  // Portrait: zoom normale
+  }
+
+  // Animation sempre contenuta nel canvas
+}
+```
+
+**3. Container Sizing**
+
+```jsx
+{/* ❌ EVITA - aspect-square troppo grande */}
+<div className="w-full aspect-square">
+  <ShaderAnimation />
+</div>
+
+{/* ✅ PREFERISCI - dimensioni fisse responsive */}
+<div className="w-full h-48 sm:h-56">
+  <ShaderAnimation />
+</div>
+```
+
+**Motivazione**: Fixed height permette layout più compatto e predicibile, evita animazioni troppo grandi che escono dal viewport.
+
+**4. ResizeObserver per Canvas Responsivo**
+
+```javascript
+// ✅ SEMPRE usa ResizeObserver invece di window resize
+resizeObserver = new ResizeObserver(resize);
+resizeObserver.observe(canvas);
+
+// Cleanup
+return () => {
+  if (resizeObserver) resizeObserver.disconnect();
+};
+```
+
+**5. Device Pixel Ratio Capping**
+
+```javascript
+// ✅ Cap DPR a 2.0 per performance
+const dpr = Math.min(window.devicePixelRatio || 1, 2.0);
+```
+
+**Motivazione**: Retina displays (DPR 3-4) degradano performance. DPR 2.0 è sufficiente per qualità visiva.
+
+**6. Cleanup Completo**
+
+```javascript
+// ✅ SEMPRE cleanup tutte le risorse WebGL
+return () => {
+  if (animationId) cancelAnimationFrame(animationId);
+  if (resizeObserver) resizeObserver.disconnect();
+  gl.deleteProgram(prog);
+  gl.deleteShader(vs);
+  gl.deleteShader(fs);
+  gl.deleteVertexArray(vao);
+};
+```
+
+**7. Fallback per WebGL2 Non Disponibile**
+
+```jsx
+if (webglError) {
+  return <div className="text-4xl">❄️</div>; // Emoji fallback
+}
+```
+
+**8. Stile Cartoon Palette Graduali**
+
+```glsl
+// ✅ PREFERISCI - Palette graduale per stile cartoon fluido
+vec3 snowflakeColor(float t){
+  t = clamp(t, 0.0, 1.0);
+
+  vec3 deepIce = vec3(0.4, 0.65, 0.85);
+  vec3 ice = vec3(0.55, 0.75, 0.95);
+  vec3 lightIce = vec3(0.7, 0.85, 1.0);
+  vec3 shimmer = vec3(0.95, 0.98, 1.0);
+
+  if(t < 0.2) return mix(deepIce, ice, t/0.2);
+  if(t < 0.4) return mix(ice, lightIce, (t-0.2)/0.2);
+  return mix(lightIce, shimmer, (t-0.4)/0.6);
+}
+```
+
+**Implementazione Completa**: `app/components/devices/stove/StoveWebGLAnimation.js`
+
+### Quando Usare WebGL Shader vs Three.js
+
+**Usa WebGL Shader (preferito per UI icons)**:
+- ✅ Animazioni 2D cartoon semplici
+- ✅ Performance critica (mobile)
+- ✅ Dimensioni contenute (< 300x300px)
+- ✅ Stile flat/cartoon consistente
+
+**Usa Three.js (per scene 3D complesse)**:
+- ✅ Oggetti 3D realistici con lighting
+- ✅ Interazioni camera (orbit, zoom)
+- ✅ Scene grandi con multipli oggetti
+- ✅ Post-processing effects
+
+**Pattern Progetto**: Preferenza shader cartoon 2D per UI consistency.
+
 ## See Also
 
 - [UI Components](./ui-components.md) - Componenti base riutilizzabili

@@ -54,7 +54,7 @@ export default function TimeBar({ intervals, hoveredIndex, selectedIndex, onHove
       {/* Tooltip */}
       {tooltipData && (
         <div
-          className="fixed z-[100] bg-neutral-900/95 backdrop-blur-3xl text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-liquid-xl ring-1 ring-white/10 ring-inset pointer-events-none relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.08] before:to-transparent before:pointer-events-none"
+          className="fixed z-[9000] bg-neutral-900/95 backdrop-blur-3xl text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-liquid-xl ring-1 ring-white/10 ring-inset pointer-events-none relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.08] before:to-transparent before:pointer-events-none"
           style={{
             left: `${tooltipData.x}px`,
             top: `${tooltipData.y}px`,

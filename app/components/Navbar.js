@@ -195,7 +195,7 @@ export default function Navbar() {
 
                   {/* Desktop Dropdown Menu */}
                   {desktopDeviceDropdown === device.id && (
-                    <div className="absolute left-0 mt-2 w-48 xl:w-56 bg-white/[0.10] backdrop-blur-3xl border border-white/20 rounded-xl shadow-liquid-lg overflow-hidden z-[100] ring-1 ring-white/10 ring-inset">
+                    <div className="absolute left-0 mt-2 w-48 xl:w-56 bg-white/[0.10] backdrop-blur-3xl border border-white/20 rounded-xl shadow-liquid-lg overflow-hidden z-[9000] ring-1 ring-white/10 ring-inset">
                       {device.items.map(item => (
                         <Link
                           key={item.route}
@@ -251,7 +251,7 @@ export default function Navbar() {
                   </button>
 
                   {settingsDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-64 xl:w-72 bg-white/[0.10] backdrop-blur-3xl border border-white/20 rounded-xl shadow-liquid-lg overflow-hidden z-[100] ring-1 ring-white/10 ring-inset">
+                    <div className="absolute right-0 mt-2 w-64 xl:w-72 bg-white/[0.10] backdrop-blur-3xl border border-white/20 rounded-xl shadow-liquid-lg overflow-hidden z-[9000] ring-1 ring-white/10 ring-inset">
                       {navStructure.settings.map((item, idx) => (
                         <Link
                           key={item.id}
@@ -309,7 +309,7 @@ export default function Navbar() {
                   </button>
 
                   {userDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 xl:w-64 bg-white/[0.10] backdrop-blur-3xl border border-white/20 rounded-xl shadow-liquid-lg overflow-hidden z-[100] ring-1 ring-white/10 ring-inset">
+                    <div className="absolute right-0 mt-2 w-56 xl:w-64 bg-white/[0.10] backdrop-blur-3xl border border-white/20 rounded-xl shadow-liquid-lg overflow-hidden z-[9000] ring-1 ring-white/10 ring-inset">
                       <div className="px-4 py-3 border-b border-neutral-200/50">
                         <p className="text-xs text-neutral-500">Connesso come</p>
                         <p className="text-sm xl:text-base font-medium text-neutral-800 truncate mt-0.5">{user.name}</p>
@@ -362,13 +362,13 @@ export default function Navbar() {
         <>
           {/* Backdrop */}
           <div
-            className="fixed top-[3.5rem] sm:top-16 left-0 right-0 bottom-0 bg-black/40 backdrop-blur-md z-[100] lg:hidden"
+            className="fixed top-[3.5rem] sm:top-16 left-0 right-0 bottom-0 bg-black/40 backdrop-blur-md z-[9000] lg:hidden"
             onClick={() => setMobileMenuOpen(false)}
             aria-hidden="true"
           />
 
           {/* Mobile Menu Panel */}
-          <div className="fixed top-[3.5rem] sm:top-16 left-0 right-0 bottom-0 bg-white/[0.10] backdrop-blur-3xl z-[101] lg:hidden overflow-y-auto">
+          <div className="fixed top-[3.5rem] sm:top-16 left-0 right-0 bottom-0 bg-white/[0.10] backdrop-blur-3xl z-[9001] lg:hidden overflow-y-auto">
             <div className="px-3 sm:px-4 py-4 space-y-2">
 
               {/* User Info */}

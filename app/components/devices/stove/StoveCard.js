@@ -17,6 +17,7 @@ import ErrorAlert from '../../ui/ErrorAlert';
 import Banner from '../../ui/Banner';
 import MaintenanceBar from '../../MaintenanceBar';
 import CronHealthBanner from '../../CronHealthBanner';
+import StoveWebGLAnimation from './StoveWebGLAnimation';
 
 /**
  * StoveCard - Complete stove control for homepage
@@ -345,6 +346,7 @@ export default function StoveCard() {
     };
   };
 
+  const statusUpper = status.toUpperCase();
   const isAccesa = status?.includes('WORK') || status?.includes('START');
   const isSpenta = status?.includes('OFF') || status?.includes('ERROR') || status?.includes('WAIT');
   const needsMaintenance = maintenanceStatus?.needsCleaning || false;
@@ -367,7 +369,7 @@ export default function StoveCard() {
       )}
 
       {/* Main Status Card - Liquid Glass Pro */}
-      <Card liquidPro className={`overflow-hidden transition-all duration-500 ${statusInfo.bgColor}`}>
+      <Card liquidPro className={`overflow-visible transition-all duration-500 ${statusInfo.bgColor}`}>
         <div className="relative">
           {/* Top accent bar */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 via-accent-500 to-primary-500 opacity-80"></div>
@@ -451,32 +453,71 @@ export default function StoveCard() {
                     </div>
                   )}
 
-                  {/* Status Icon with animated background */}
-                  <div className="relative mb-5 z-10">
-                    {statusInfo.pulse && (
-                      <div className={`absolute inset-0 ${statusInfo.iconBg} rounded-full blur-3xl opacity-20 animate-pulse`}></div>
-                    )}
-                    <div className={`relative ${statusInfo.iconBg} rounded-full p-5 sm:p-6 shadow-inner-soft ring-1 ring-white/15 ring-inset transition-all duration-500 ${statusInfo.pulse ? 'animate-pulse' : ''}`}>
-                      <span className="text-6xl sm:text-7xl drop-shadow-md relative z-10">
-                        {statusInfo.icon}
-                      </span>
-                    </div>
-                  </div>
+                  {/* WebGL Animation Container - Square */}
+                  <div className="relative mb-5 z-10 w-full max-w-sm mx-auto">
+                    {/* Container quadrato con animazione */}
+                    <div className={`relative ${statusInfo.iconBg} rounded-3xl p-6 shadow-liquid ring-1 ring-white/15 ring-inset transition-all duration-500 overflow-hidden`}>
+                      {/* Subtle glow background (non-pulsing) */}
+                      <div className={`absolute inset-0 ${statusInfo.iconBg} blur-2xl opacity-10`}></div>
 
-                  {/* Status Text */}
-                  <div className="text-center relative z-10">
-                    <p className="text-xs sm:text-sm font-bold text-neutral-600 uppercase tracking-[0.2em] mb-3 opacity-50">
-                      Stato Attuale
-                    </p>
-                    <p className={`text-3xl sm:text-4xl lg:text-5xl font-black ${statusInfo.textColor} tracking-tight leading-tight`}>
-                      {statusInfo.label}
-                    </p>
-                    {/* Technical status (small, subtle) */}
-                    {statusInfo.label !== status && (
-                      <p className="text-xs text-neutral-500 mt-3 font-mono opacity-30 tracking-wide">
-                        {status}
-                      </p>
-                    )}
+                      {/* Status Text - Sopra l'animazione */}
+                      <div className="relative z-20 text-center mb-4">
+                        <p className="text-xs font-bold text-neutral-600 uppercase tracking-[0.2em] mb-2 opacity-50">
+                          Stato Attuale
+                        </p>
+                        <p className={`text-2xl sm:text-3xl font-black ${statusInfo.textColor} tracking-tight leading-tight`}>
+                          {statusInfo.label}
+                        </p>
+                        {/* Technical status (small, subtle) */}
+                        {statusInfo.label !== status && (
+                          <p className="text-xs text-neutral-500 mt-1 font-mono opacity-30 tracking-wide">
+                            {status}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Animation - Aspect ratio quadrato */}
+                      <div className="relative z-10 w-full aspect-square flex items-center justify-center bg-gradient-to-br from-black/5 to-black/10 rounded-2xl ring-1 ring-white/10 ring-inset overflow-hidden">
+                        <StoveWebGLAnimation
+                          status={status}
+                          fanLevel={fanLevel}
+                          powerLevel={powerLevel}
+                        />
+                      </div>
+
+                      {/* Parametri Fan e Power - Sotto l'animazione */}
+                      {(statusUpper.includes('START') || statusUpper.includes('WORK')) && (
+                        <div className="relative z-20 mt-4 grid grid-cols-2 gap-3">
+                          {/* Fan */}
+                          <div className="flex flex-col items-center justify-center p-3 bg-white/[0.08] backdrop-blur-xl rounded-xl ring-1 ring-white/10 ring-inset">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-lg">💨</span>
+                              <p className="text-xs font-bold text-neutral-600 uppercase tracking-wider opacity-60">Fan</p>
+                            </div>
+                            <div className="flex items-baseline gap-1">
+                              <p className="text-xl font-black text-info-700">
+                                {fanLevel ?? '-'}
+                              </p>
+                              <span className="text-xs text-neutral-500 font-semibold opacity-50">/6</span>
+                            </div>
+                          </div>
+
+                          {/* Power */}
+                          <div className="flex flex-col items-center justify-center p-3 bg-white/[0.08] backdrop-blur-xl rounded-xl ring-1 ring-white/10 ring-inset">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-lg">⚡</span>
+                              <p className="text-xs font-bold text-neutral-600 uppercase tracking-wider opacity-60">Power</p>
+                            </div>
+                            <div className="flex items-baseline gap-1">
+                              <p className="text-xl font-black text-accent-700">
+                                {powerLevel ?? '-'}
+                              </p>
+                              <span className="text-xs text-neutral-500 font-semibold opacity-50">/5</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

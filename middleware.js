@@ -14,6 +14,6 @@ export async function middleware(req) {
 
 export const config = {
   matcher: [
-    "/((?!api/auth|api/scheduler/check|api/stove|api/admin|_next|favicon.ico).*)",
+    "/((?!api/auth|api/scheduler/check|api/stove|api/admin|offline|_next|favicon.ico|icons|manifest.json|sw.js|firebase-messaging-sw.js).*)",
   ],
 };

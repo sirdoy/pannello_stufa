@@ -47,6 +47,7 @@
 - **Next.js 15.5.4**: App Router, Server/Client Components, API Routes
 - **React 19.2**: Hooks, Suspense, modern async patterns
 - **Tailwind CSS 3**: Utility-first + liquid glass iOS 18 style
+- **Three.js (r180)**: WebGL 3D rendering per animazioni interattive
 - **Firebase Realtime DB**: Scheduler, logs, versioning, push tokens
 - **Auth0**: Autenticazione sicura
 - **Thermorossi Cloud API**: Controllo stufa
@@ -382,6 +383,6 @@ ADMIN_USER_ID=auth0|xxx
 
 ---
 
-**Last Updated**: 2025-10-21
-**Version**: 1.7.0
+**Last Updated**: 2025-10-22
+**Version**: 1.8.1
 **Author**: Federico Manfredi

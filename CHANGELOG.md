@@ -5,6 +5,86 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.8.1] - 2025-10-22
+
+### Corretto
+- **Fix Auth0 redirect loop su mobile (production)**
+  - Problema: sessione Auth0 non persisteva correttamente su mobile tra navigazioni
+  - Causa: middleware intercettava route PWA (service worker, manifest, icons)
+  - Soluzione: aggiornato middleware matcher per escludere route PWA
+  - Escluse: `/offline`, `/icons/*`, `/manifest.json`, `/sw.js`, `/firebase-messaging-sw.js`
+  - File: `middleware.js:17`
+
+### Migliorato
+- **Animazione fiamma WebGL più compatta e armoniosa**
+  - Ridotta altezza lingue di fuoco: `heightVar 0.25 + 0.08` (da `0.40 + 0.22`)
+  - Movimento più fluido: `sway 0.04` (da `0.12 + 0.06`)
+  - Ridotte lingue da 6 a 3 per stile cartoon più pulito
+  - Fase sincronizzata: movimento più unificato e armonioso
+  - Base più grande (radius 0.25) per migliori proporzioni cartoon
+  - File: `app/components/devices/stove/StoveWebGLAnimation.js:282-337`
+
+### Documentazione
+- **Nuova sezione troubleshooting "Authentication (Auth0)"**
+  - Guida completa per redirect loop Auth0 su mobile
+  - Configurazione cookie settings per mobile (SameSite, rolling session)
+  - Verifica configurazione Auth0 Dashboard (Callback URLs, Web Origins)
+  - Debug logging middleware per troubleshooting
+  - Alternative solutions se problema persiste
+  - File: `docs/troubleshooting.md:41-143`
+
+## [1.8.0] - 2025-10-21
+
+### Aggiunto
+- **Sistema animazioni WebGL 3D per visualizzazione stati**
+  - Sostituita emoji statica con animazioni WebGL 3D dinamiche
+  - Componente `StoveWebGLAnimation.js` con rendering 3D dedicato
+
+  **OFF - Fiocco di Neve Rotante:**
+  - Fiocco di neve 3D con 6 bracci principali + ramificazioni laterali
+  - Centro esagonale azzurro chiaro
+  - Rotazione continua (0.5 rad/s) con movimento fluttuante
+  - 40 particelle fredde che orbitano intorno (effetto ghiacciato)
+  - Leggero pulsing scale per "respiro" del cristallo
+  - Colori azzurro ghiaccio (#b8e6f5, #e0f4ff, #d4f1ff)
+
+  **START - Fiamma Arancione:**
+  - 300 particelle arancioni animate
+  - Movimento ascendente con turbulenza sinusoidale
+  - Gradient giallo-arancio (RGB: 1, 0.4-0.8, 0-0.1)
+  - Effetto narrowing (fiamma si restringe salendo)
+  - Flicker effect per realismo
+
+  **WORK - Fiamma Rossa Intensa:**
+  - 500 particelle rosso-arancio ad alta velocità
+  - Core glow pulsante al centro (sphere geometry)
+  - Turbulenza forte e movimento rapido
+  - Gradient rosso intenso (RGB: 1, 0-0.4, 0)
+  - Additive blending per effetto luce realistico
+
+  **ERROR/ALARM - Segnale Warning:**
+  - Triangolo warning rosso (#ff3333) con bordo pulsante
+  - Punto esclamativo giallo (#ffff00) lampeggiante al centro
+  - 30 particelle arancioni (#ff6600) che pulsano radialmente
+  - Effetto pulsing sincronizzato (4 Hz triangolo, 6 Hz esclamativo)
+  - ShapeGeometry per triangolo, CircleGeometry per punto
+
+  - Canvas 100x100px integrato al posto dell'emoji nell'icona StoveCard
+
+### Cambiato
+- Emoji statiche sostituite con animazioni WebGL 3D interattive
+- Homepage bundle size: +132 kB (Three.js library)
+- First Load JS homepage: 186 kB → 318 kB (142 kB page component)
+
+### Tecnico
+- **Three.js (r180)**: libreria 3D WebGL per rendering grafica interattiva
+- Componente `StoveWebGLAnimation.js`: riutilizzabile con prop `status` e `size`
+- BufferGeometry + Float32Array per performance ottimali
+- Sistema particelle custom: snowflake geometry, flame particles, warning triangle
+- Gestione lifecycle React: cleanup automatico geometrie/materiali, flag `isRunning`
+- Animation loop 60fps con requestAnimationFrame
+- Canvas 140x140px, camera perspective (FOV 50°, z=3.5)
+
 ## [1.7.0] - 2025-10-21
 
 ### Aggiunto

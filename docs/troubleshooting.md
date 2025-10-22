@@ -38,6 +38,110 @@ find app -name "*.js" -exec grep -l "useState\|useEffect" {} \; | \
   xargs -I {} sh -c 'if [ "$(head -1 "{}" | grep -c "use client")" -eq 0 ]; then echo "{}"; fi'
 ```
 
+## Authentication (Auth0)
+
+### Redirect Loop su Mobile (Production)
+
+**Symptoms**:
+- Riesci a fare login ma quando navighi tra pagine vieni continuamente rimandato al login Auth0
+- URL passa brevemente su Auth0 e poi torna alla homepage
+- **Accade solo su mobile in produzione** (non su localhost)
+
+**Root Cause**: Session cookie non persiste correttamente su mobile browsers tra navigazioni, probabilmente per restrizioni `SameSite` o cookie flags non ottimali.
+
+**Solution**:
+
+1. **Escludi route PWA dal middleware** ✅ (già fatto in `middleware.js:17`)
+   ```javascript
+   // middleware.js
+   export const config = {
+     matcher: [
+       "/((?!api/auth|api/scheduler/check|api/stove|api/admin|offline|_next|favicon.ico|icons|manifest.json|sw.js|firebase-messaging-sw.js).*)",
+     ],
+   };
+   ```
+
+2. **Configura Auth0 cookie settings per mobile**
+
+   Aggiungi al `.env.local` (o `.env` per production):
+   ```env
+   # Auth0 Mobile-Friendly Cookie Settings
+   AUTH0_COOKIE_SAME_SITE=lax
+   AUTH0_SESSION_ROLLING=true
+   AUTH0_SESSION_ROLLING_DURATION=86400
+   AUTH0_SESSION_ABSOLUTE_DURATION=false
+   ```
+
+   **Spiegazione**:
+   - `COOKIE_SAME_SITE=lax`: Più permissivo per mobile, permette cookie su navigazione cross-site
+   - `SESSION_ROLLING=true`: Rinnova automaticamente la sessione ad ogni richiesta
+   - `SESSION_ROLLING_DURATION=86400`: Durata 24 ore
+   - `SESSION_ABSOLUTE_DURATION=false`: Nessun timeout assoluto (solo rolling)
+
+3. **Verifica configurazione Auth0 Dashboard**
+
+   Su https://manage.auth0.com → Applications → {Your App} → Settings:
+   - **Allowed Callback URLs**: Deve includere URL production + `/api/auth/callback`
+     ```
+     https://tuodominio.com/api/auth/callback
+     ```
+   - **Allowed Logout URLs**: Deve includere URL production
+     ```
+     https://tuodominio.com
+     ```
+   - **Allowed Web Origins**: Deve includere URL production
+     ```
+     https://tuodominio.com
+     ```
+
+4. **Test su mobile**
+   - Deploy con le nuove impostazioni
+   - Apri app su mobile (Safari iOS o Chrome Android)
+   - Fai login
+   - Naviga tra pagine tramite menu
+   - Verifica che non venga più rimandato al login
+
+**Debug**:
+```javascript
+// Aggiungi logging temporaneo in middleware.js per debug
+export async function middleware(req) {
+  const res = NextResponse.next();
+  const session = await getSession(req, res);
+
+  console.log('[Middleware]', {
+    path: req.nextUrl.pathname,
+    hasSession: !!session,
+    user: session?.user?.sub
+  });
+
+  if (!session || !session.user) {
+    console.log('[Middleware] Redirecting to login');
+    return NextResponse.redirect(new URL('/api/auth/login', req.url));
+  }
+
+  return res;
+}
+```
+
+**Alternative Solution** (se il problema persiste):
+
+Riduci lo scope del middleware per escludere più route:
+```javascript
+// middleware.js
+export const config = {
+  matcher: [
+    // Only protect these specific routes
+    '/',
+    '/stove/:path*',
+    '/thermostat/:path*',
+    '/lights/:path*',
+    '/settings/:path*',
+    '/log/:path*',
+    '/changelog/:path*'
+  ],
+};
+```
+
 ## Version System
 
 ### Modal "Aggiorna App" Sempre Visibile

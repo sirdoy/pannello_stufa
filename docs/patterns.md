@@ -443,12 +443,168 @@ Pattern per layout grid responsive.
 - Desktop (≥ 1024px): 3 col
 - Large (≥ 1280px): 4 col
 
+## Middleware Configuration Pattern
+
+Pattern per configurare Next.js middleware con Auth0 evitando conflitti con PWA e service workers.
+
+### Base Pattern
+
+```javascript
+// middleware.js
+import { NextResponse } from 'next/server';
+import { getSession } from '@auth0/nextjs-auth0/edge';
+
+export async function middleware(req) {
+  const res = NextResponse.next();
+  const session = await getSession(req, res);
+
+  if (!session || !session.user) {
+    return NextResponse.redirect(new URL('/api/auth/login', req.url));
+  }
+
+  return res;
+}
+
+export const config = {
+  matcher: [
+    // Exclude: API auth routes, public APIs, PWA assets, static files
+    "/((?!api/auth|api/scheduler/check|api/stove|api/admin|offline|_next|favicon.ico|icons|manifest.json|sw.js|firebase-messaging-sw.js).*)",
+  ],
+};
+```
+
+### Best Practices
+
+**1. Escludi sempre route PWA dal matcher**
+```javascript
+// ❌ WRONG - causa redirect loop su mobile
+matcher: ["/((?!api/auth|_next|favicon.ico).*)"]
+
+// ✅ CORRECT - esclude tutte le route PWA
+matcher: [
+  "/((?!api/auth|offline|_next|favicon.ico|icons|manifest.json|sw.js|firebase-messaging-sw.js).*)"
+]
+```
+
+**Motivo**: Service worker e manifest devono essere accessibili senza autenticazione, altrimenti:
+- Mobile browsers non riescono a registrare il service worker
+- PWA non può essere installata
+- Session cookie non persiste correttamente tra navigazioni
+
+**2. Escludi API pubbliche (cron, webhooks, health checks)**
+```javascript
+matcher: [
+  "/((?!api/auth|api/scheduler/check|api/admin|...).*)"
+]
+```
+
+**3. Pattern specific routes (alternativa)**
+
+Se preferisci proteggere solo route specifiche:
+```javascript
+export const config = {
+  matcher: [
+    '/',                      // Homepage
+    '/stove/:path*',          // Stove pages
+    '/thermostat/:path*',     // Thermostat pages
+    '/lights/:path*',         // Lights pages
+    '/settings/:path*',       // Settings
+    '/log/:path*',            // Log pages
+    '/changelog/:path*',      // Changelog
+  ],
+};
+```
+
+**Pro**: Più esplicito, nessun rischio di dimenticare esclusioni
+**Contro**: Richiede aggiornamento quando aggiungi nuove pagine
+
+### Debugging Middleware
+
+**Aggiungi logging temporaneo per debug**:
+```javascript
+export async function middleware(req) {
+  const res = NextResponse.next();
+  const session = await getSession(req, res);
+
+  // Debug logging
+  console.log('[Middleware]', {
+    path: req.nextUrl.pathname,
+    hasSession: !!session,
+    user: session?.user?.sub
+  });
+
+  if (!session || !session.user) {
+    console.log('[Middleware] Redirecting to login');
+    return NextResponse.redirect(new URL('/api/auth/login', req.url));
+  }
+
+  return res;
+}
+```
+
+**Verifica esclusioni**:
+```bash
+# Check if service worker is accessible without auth
+curl -I https://tuodominio.com/sw.js
+# Should return 200, not 307 redirect
+
+# Check manifest
+curl -I https://tuodominio.com/manifest.json
+# Should return 200, not 307 redirect
+```
+
+### Route Esclusioni Comuni
+
+```javascript
+// Route da SEMPRE escludere da auth middleware
+const PUBLIC_ROUTES = [
+  // Auth0
+  'api/auth',           // Auth0 routes (/login, /callback, /logout)
+
+  // PWA
+  'offline',            // Offline fallback page
+  'manifest.json',      // PWA manifest
+  'sw.js',              // Service worker
+  'firebase-messaging-sw.js',  // FCM service worker
+  'icons',              // PWA icons directory
+
+  // Next.js internals
+  '_next',              // Next.js static assets
+  'favicon.ico',        // Favicon
+
+  // Public APIs (esempi)
+  'api/scheduler/check',  // Cron endpoint (protetto da CRON_SECRET)
+  'api/admin',            // Admin endpoints (protetto da Bearer token)
+
+  // Static assets
+  '*.png',
+  '*.jpg',
+  '*.svg',
+  '*.ico',
+];
+```
+
+### Troubleshooting
+
+**Problema**: Auth0 redirect loop su mobile dopo navigazione
+**Soluzione**: Verifica che route PWA siano escluse + configura Auth0 cookie settings
+**Dettagli**: [Troubleshooting - Auth0 Redirect Loop](./troubleshooting.md#redirect-loop-su-mobile-production)
+
+**Problema**: Service worker non si registra
+**Soluzione**: Verifica che `/sw.js` risponda 200 (non 307)
+
+**Problema**: PWA non installabile
+**Soluzione**: Verifica che `/manifest.json` e `/icons/*` siano accessibili senza auth
+
+**Implementazione**: `middleware.js:4-19`
+
 ## See Also
 
 - [UI Components](./ui-components.md) - Componenti base riutilizzabili
 - [Firebase](./firebase.md) - Firebase operations patterns
 - [Testing](./testing.md) - Testing patterns
+- [Troubleshooting](./troubleshooting.md) - Common issues and solutions
 
 ---
 
-**Last Updated**: 2025-10-21
+**Last Updated**: 2025-10-22

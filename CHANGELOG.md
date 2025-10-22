@@ -5,6 +5,70 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.9.0] - 2025-10-22
+
+### Aggiunto
+- **Sandbox Mode - Sistema testing locale completo (SOLO localhost)**
+  - Ambiente di simulazione isolato per testing senza chiamate reali alla stufa
+  - Toggle attivazione sandbox in homepage (visibile solo in localhost)
+  - SandboxPanel con controllo completo: stati, potenza, ventola, temperatura, manutenzione, errori
+  - Settings avanzati: auto-progress stati, simulate delay, random errors
+  - Storico azioni: tracking ultime 100 azioni con timestamp per debugging
+  - File: `lib/sandboxService.js`, `app/components/sandbox/SandboxPanel.js`, `app/components/sandbox/SandboxToggle.js`
+
+- **Intercettazione API completa per sandbox**
+  - Wrapper functions in `stoveApi.js`: `getStoveStatus()`, `getFanLevel()`, `getPowerLevel()`
+  - Tutti endpoint API aggiornati: `status`, `getFan`, `getPower`, `ignite`, `shutdown`, `setFan`, `setPower`
+  - Conversione formato sandbox → formato API Thermorossi per compatibilità completa
+  - Flag `isSandbox: true/false` in tutte le response per identificazione modalità
+  - File: `lib/stoveApi.js`, `app/api/stove/*/route.js`
+
+- **Real-time sync Firebase per sandbox**
+  - Listener su `sandbox/stoveState` per aggiornamento immediato stato/fan/power
+  - Listener su `sandbox/error` per gestione errori simulati in tempo reale
+  - Listener su `sandbox/maintenance` per sync ore lavorate
+  - StoveCard si aggiorna istantaneamente quando cambi valori nel SandboxPanel
+  - File: `app/components/devices/stove/StoveCard.js:169-229`
+
+- **UI sandbox ottimizzata**
+  - Design purple/pink gradient con contrasto migliorato per leggibilità
+  - Sezioni strutturate con background distintivi e bordi
+  - Valori numerici enfatizzati (bold, dimensione maggiore)
+  - Badge "🧪 SANDBOX" viola in StoveCard quando modalità attiva
+  - Progress bar e indicatori visivi per manutenzione
+  - File: `app/components/sandbox/SandboxPanel.js:173-483`
+
+- **Gestione errori simulati**
+  - 5 tipi di errori configurabili: AL01-AL05 (temperatura, pressione, accensione, pellet, pulizia)
+  - Conversione automatica formato sandbox → API Thermorossi con codici numerici
+  - Badge errore e notifiche funzionano normalmente in sandbox mode
+  - File: `lib/sandboxService.js:30-36`, `lib/stoveApi.js:94-127`
+
+- **Integrazione maintenanceService con sandbox**
+  - `getMaintenanceData()` legge da `sandbox/maintenance` quando sandbox attivo
+  - Conversione formato: `hoursWorked` → `currentHours`, `maxHours` → `targetHours`
+  - MaintenanceBar funziona identicamente in sandbox e production
+  - File: `lib/maintenanceService.js:44-86`
+
+- **Documentazione sandbox completa**
+  - Nuova guida: `docs/sandbox.md` con architettura, API reference, workflows
+  - Schema Firebase sandbox documentato con esempi
+  - Best practices per testing e troubleshooting
+  - CLAUDE.md aggiornato con link e concetti generali
+  - File: `docs/sandbox.md`, `CLAUDE.md:37-38`
+
+- **Unit tests sandbox**
+  - Test per `sandboxService.js`: environment detection, stati, validazione
+  - Test per intercettazione API: mock sandbox enabled/disabled
+  - Coverage per wrapper functions: `getStoveStatus()`, `getFanLevel()`, `getPowerLevel()`
+  - File: `__tests__/sandboxService.test.js`, `__tests__/stoveApi.sandbox.test.js`
+
+### Note Tecniche
+- Sandbox disponibile SOLO in localhost (check sia client che server-side)
+- Nessun rischio di attivazione in production (guards multipli)
+- Dati sandbox isolati in Firebase path `sandbox/` separato da production
+- Backward compatible: nessun breaking change, feature addizionale per development
+
 ## [1.8.2] - 2025-10-22
 
 ### Migliorato

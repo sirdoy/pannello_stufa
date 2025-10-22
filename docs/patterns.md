@@ -277,6 +277,64 @@ export default function RealtimeComponent() {
 
 **Implementazione esempio**: `app/components/CronHealthBanner.js:25-45`
 
+### Multi-Listener Pattern
+
+Pattern per ascoltare multipli path Firebase con cleanup singolo:
+
+```javascript
+'use client';
+
+import { useState, useEffect } from 'react';
+import { ref, onValue } from 'firebase/database';
+import { db } from '@/lib/firebase';
+
+export default function MultiListenerComponent() {
+  const [state1, setState1] = useState(null);
+  const [state2, setState2] = useState(null);
+
+  useEffect(() => {
+    let unsubscribe1 = null;
+    let unsubscribe2 = null;
+
+    // Setup listeners
+    const ref1 = ref(db, 'path/to/data1');
+    unsubscribe1 = onValue(ref1, (snapshot) => {
+      if (snapshot.exists()) {
+        setState1(snapshot.val());
+      }
+    });
+
+    const ref2 = ref(db, 'path/to/data2');
+    unsubscribe2 = onValue(ref2, (snapshot) => {
+      if (snapshot.exists()) {
+        setState2(snapshot.val());
+      }
+    });
+
+    // Cleanup tutti i listeners
+    return () => {
+      if (unsubscribe1) unsubscribe1();
+      if (unsubscribe2) unsubscribe2();
+    };
+  }, []);
+
+  return (
+    <div>
+      <p>Data 1: {state1 ? JSON.stringify(state1) : 'Loading...'}</p>
+      <p>Data 2: {state2 ? JSON.stringify(state2) : 'Loading...'}</p>
+    </div>
+  );
+}
+```
+
+**Best Practices**:
+- ✅ Dichiara tutti `unsubscribe` a null all'inizio
+- ✅ Verifica `if (unsubscribe)` prima di chiamare nel cleanup
+- ✅ Un cleanup function che gestisce tutti i listener
+- ✅ Dependencies array vuoto se listener non dipendono da props/state
+
+**Implementazione esempio**: `app/components/devices/stove/StoveCard.js:169-229`
+
 ## Polling Pattern
 
 Pattern per polling periodico con cleanup.
@@ -912,6 +970,408 @@ vec3 snowflakeColor(float t){
 
 **Pattern Progetto**: Preferenza shader cartoon 2D per UI consistency.
 
+## API Wrapper Functions Pattern
+
+Pattern per intercettare chiamate API con logica condizionale (es: sandbox, mock, caching).
+
+### Pattern Base
+
+```javascript
+// lib/someApi.js
+
+/**
+ * Wrapper function che intercetta chiamate API
+ * Permette di iniettare logica custom prima della chiamata reale
+ */
+export async function getSomeData() {
+  // 1. Check condition (es: sandbox mode, offline mode, etc.)
+  if (shouldUseMockData()) {
+    const mockData = await getMockData();
+    return {
+      ...mockData,
+      isMock: true, // Flag per identificare source
+    };
+  }
+
+  // 2. Chiamata API reale
+  const response = await fetch('/api/real-endpoint');
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const data = await response.json();
+  return { ...data, isMock: false };
+}
+
+/**
+ * POST wrapper con stessa logica
+ */
+export async function updateSomeData(payload) {
+  if (shouldUseMockData()) {
+    return await updateMockData(payload);
+  }
+
+  const response = await fetch('/api/real-endpoint', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return await response.json();
+}
+```
+
+### API Routes Integration
+
+```javascript
+// app/api/some-endpoint/route.js
+import { getSomeData } from '@/lib/someApi';
+
+/**
+ * API route usa wrapper function
+ * Wrapper gestisce automaticamente mock vs real
+ */
+export async function GET() {
+  try {
+    const data = await getSomeData(); // Wrapper intercetta automaticamente
+    return Response.json(data);
+  } catch (error) {
+    return Response.json(
+      { error: error.message },
+      { status: 500 }
+    );
+  }
+}
+```
+
+### Best Practices
+
+**1. Flag di identificazione source**
+```javascript
+return {
+  ...data,
+  isMock: true,        // ✅ Flag esplicito
+  isSandbox: true,     // ✅ Flag esplicito
+  isFromCache: true,   // ✅ Flag esplicito
+};
+```
+
+**2. Condizioni environment-safe**
+```javascript
+// ✅ CORRECT - verifica ambiente prima
+if (isLocalEnvironment() && await isSandboxEnabled()) {
+  return await getMockData();
+}
+
+// ❌ WRONG - potrebbe attivare in production
+if (await isSandboxEnabled()) {
+  return await getMockData();
+}
+```
+
+**3. Formato response consistente**
+```javascript
+// ✅ CORRECT - stesso formato per mock e real
+const mockData = await getMockData();
+return {
+  Result: mockData.value,  // Converti al formato API reale
+  isMock: true,
+};
+
+// ❌ WRONG - formati inconsistenti
+return mockData;  // Formato diverso dall'API reale
+```
+
+**4. Wrapper per TUTTI gli endpoint correlati**
+```javascript
+// ✅ CORRECT - wrapper completo
+export async function getStatus() { /* wrapper */ }
+export async function ignite() { /* wrapper */ }
+export async function shutdown() { /* wrapper */ }
+
+// ❌ WRONG - solo alcuni endpoint wrappati
+export async function getStatus() { /* wrapper */ }
+const ignite = '/api/ignite';  // Direct URL
+```
+
+**Implementazione esempio**: `lib/stoveApi.js:91-256`
+
+## Environment Detection Pattern
+
+Pattern per feature disponibili solo in development/localhost.
+
+### Pattern Base
+
+```javascript
+// lib/environmentUtils.js
+
+/**
+ * Verifica se siamo in ambiente locale
+ * Check sia client che server-side
+ */
+export function isLocalEnvironment() {
+  // Server-side check
+  if (typeof window === 'undefined') {
+    return process.env.NODE_ENV === 'development';
+  }
+
+  // Client-side check
+  return (
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname === ''
+  );
+}
+
+/**
+ * Feature flag condizionale
+ */
+export async function isFeatureEnabled() {
+  // Guard: feature solo in localhost
+  if (!isLocalEnvironment()) {
+    return false;
+  }
+
+  // Check addizionale (es: Firebase flag)
+  const enabled = await checkFirebaseFlag();
+  return enabled;
+}
+```
+
+### UI Conditional Rendering
+
+```jsx
+'use client';
+
+import { useState, useEffect } from 'react';
+import { isLocalEnvironment, isFeatureEnabled } from '@/lib/environmentUtils';
+
+export default function DevOnlyFeature() {
+  const [isLocal, setIsLocal] = useState(false);
+  const [featureEnabled, setFeatureEnabled] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function checkEnvironment() {
+      const local = isLocalEnvironment();
+      setIsLocal(local);
+
+      if (local) {
+        const enabled = await isFeatureEnabled();
+        setFeatureEnabled(enabled);
+      }
+
+      setLoading(false);
+    }
+
+    checkEnvironment();
+  }, []);
+
+  // Non renderizzare se non localhost
+  if (!isLocal || loading) {
+    return null;
+  }
+
+  return (
+    <div>
+      {/* Feature visibile solo in localhost */}
+      <DevPanel enabled={featureEnabled} />
+    </div>
+  );
+}
+```
+
+### API Route Protection
+
+```javascript
+// app/api/dev-only/route.js
+import { isLocalEnvironment } from '@/lib/environmentUtils';
+
+export async function POST(req) {
+  // Guard: endpoint solo in localhost
+  if (!isLocalEnvironment()) {
+    return Response.json(
+      { error: 'Feature disponibile solo in localhost' },
+      { status: 403 }
+    );
+  }
+
+  // Logic dev-only
+  const result = await performDevAction();
+  return Response.json(result);
+}
+```
+
+### Service Layer Guards
+
+```javascript
+// lib/someService.js
+
+export async function devOnlyFunction() {
+  // Guard multipli per sicurezza
+  if (!isLocalEnvironment()) {
+    throw new Error('Feature disponibile solo in localhost');
+  }
+
+  // Logic dev-only
+  return await performAction();
+}
+```
+
+### Best Practices
+
+**1. Guards multipli per sicurezza**
+```javascript
+// ✅ CORRECT - guards a tutti i livelli
+// UI component
+if (!isLocalEnvironment()) return null;
+
+// Service layer
+if (!isLocalEnvironment()) throw new Error('...');
+
+// API route
+if (!isLocalEnvironment()) return 403;
+```
+
+**2. Check sia client che server**
+```javascript
+// ✅ CORRECT - check entrambi
+export function isLocalEnvironment() {
+  if (typeof window === 'undefined') {
+    return process.env.NODE_ENV === 'development';  // Server
+  }
+  return window.location.hostname === 'localhost';  // Client
+}
+```
+
+**3. Nessuna assunzione automatica**
+```javascript
+// ❌ WRONG - assume sviluppo se non production
+if (process.env.NODE_ENV !== 'production') {
+  // Potrebbe includere staging, test, etc.
+}
+
+// ✅ CORRECT - esplicito
+if (process.env.NODE_ENV === 'development') {
+  // Solo development
+}
+```
+
+**Implementazione esempio**: `lib/sandboxService.js:46-54`
+
+## Format Conversion Pattern
+
+Pattern per convertire dati tra formati diversi (es: sandbox → production, API A → API B).
+
+### Pattern Base
+
+```javascript
+// lib/formatConverters.js
+
+/**
+ * Converti formato A → formato B
+ */
+export function convertAToB(dataA) {
+  return {
+    fieldB1: dataA.fieldA1,
+    fieldB2: dataA.fieldA2 || 'default',
+    // Mapping esplicito
+    fieldB3: mapValue(dataA.fieldA3),
+  };
+}
+
+/**
+ * Converti formato B → formato A
+ */
+export function convertBToA(dataB) {
+  return {
+    fieldA1: dataB.fieldB1,
+    fieldA2: dataB.fieldB2,
+    fieldA3: reverseMapValue(dataB.fieldB3),
+  };
+}
+
+function mapValue(input) {
+  // Logic conversione
+  return output;
+}
+```
+
+### Integration con Wrapper Functions
+
+```javascript
+// lib/someApi.js
+import { convertMockToReal } from './formatConverters';
+
+export async function getSomeData() {
+  if (shouldUseMock()) {
+    const mockData = await getMockData();
+
+    // Converti formato mock → formato reale
+    return {
+      ...convertMockToReal(mockData),
+      isMock: true,
+    };
+  }
+
+  // Formato reale già corretto
+  const response = await fetch('/api/real');
+  const data = await response.json();
+  return { ...data, isMock: false };
+}
+```
+
+### Best Practices
+
+**1. Conversione esplicita con mapping chiaro**
+```javascript
+// ✅ CORRECT - mapping esplicito
+export function convertSandboxToProduction(sandbox) {
+  return {
+    StatusDescription: sandbox.status,       // Rinomina campo
+    Error: parseErrorCode(sandbox.error),    // Conversione tipo
+    ErrorDescription: sandbox.error?.description || '',
+  };
+}
+
+// ❌ WRONG - spread generico
+export function convert(data) {
+  return { ...data };  // Non converte nulla
+}
+```
+
+**2. Gestione campi opzionali**
+```javascript
+// ✅ CORRECT - defaults espliciti
+return {
+  required: data.value,
+  optional: data.optional || 'default',
+  nullable: data.nullable ?? null,
+};
+
+// ❌ WRONG - undefined non permessi (Firebase)
+return {
+  field: data.maybe,  // Potrebbe essere undefined
+};
+```
+
+**3. Conversioni reversibili quando possibile**
+```javascript
+// ✅ CORRECT - funzioni paired
+export function convertAToB(a) { /* ... */ }
+export function convertBToA(b) { /* ... */ }
+
+// Test roundtrip
+const original = { /* ... */ };
+const converted = convertAToB(original);
+const back = convertBToA(converted);
+assert.deepEqual(original, back);  // Dovrebbe essere uguale
+```
+
+**Implementazione esempio**: `lib/stoveApi.js:94-127`, `lib/maintenanceService.js:47-60`
+
 ## See Also
 
 - [UI Components](./ui-components.md) - Componenti base riutilizzabili
@@ -922,3 +1382,4 @@ vec3 snowflakeColor(float t){
 ---
 
 **Last Updated**: 2025-10-22
+**Version**: 1.9.0

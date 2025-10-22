@@ -1,26 +1,21 @@
-import { STUFA_API, fetchWithTimeout } from '@/lib/stoveApi';
+import { setFanLevel, getStoveStatus } from '@/lib/stoveApi';
 import { getFullSchedulerMode, setSemiManualMode, getNextScheduledChange } from '@/lib/schedulerService';
 
+/**
+ * POST /api/stove/setFan
+ * Sets the fan level
+ * Supports sandbox mode in localhost
+ */
 export async function POST(req) {
   try {
     const { level, source } = await req.json();
-    const res = await fetchWithTimeout(STUFA_API.setFan(level));
-
-    if (!res.ok) {
-      return Response.json(
-        { error: 'Failed to set fan level', details: `HTTP ${res.status}` },
-        { status: res.status }
-      );
-    }
-
-    const data = await res.json();
+    const data = await setFanLevel(level);
 
     // Attiva semi-manuale SOLO se source='manual', stufa accesa, scheduler attivo e non già in semi-manuale
     if (source === 'manual') {
       // Verifica se stufa è accesa
-      const statusRes = await fetchWithTimeout(STUFA_API.getStatus);
-      const statusData = await statusRes.json();
-      const isOn = statusData?.StatusDescription?.includes('WORK') || statusData?.StatusDescription?.includes('START');
+      const statusData = await getStoveStatus();
+      const isOn = statusData?.status?.includes('WORK') || statusData?.status?.includes('START');
 
       if (isOn) {
         const mode = await getFullSchedulerMode();

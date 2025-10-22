@@ -9,6 +9,9 @@ import { logStoveAction, logSchedulerAction } from '@/lib/logService';
 import { logError, shouldNotify, sendErrorNotification, sendErrorPushNotification } from '@/lib/errorMonitor';
 import { useVersion } from '@/app/context/VersionContext';
 import { getMaintenanceStatus, confirmCleaning } from '@/lib/maintenanceService';
+import { isSandboxEnabled, isLocalEnvironment } from '@/lib/sandboxService';
+import { ref, onValue } from 'firebase/database';
+import { db } from '@/lib/firebase';
 import Card from '../../ui/Card';
 import Button from '../../ui/Button';
 import Select from '../../ui/Select';
@@ -47,6 +50,9 @@ export default function StoveCard() {
   // Maintenance states
   const [maintenanceStatus, setMaintenanceStatus] = useState(null);
   const [cleaningInProgress, setCleaningInProgress] = useState(false);
+
+  // Sandbox mode
+  const [sandboxMode, setSandboxMode] = useState(false);
 
   const fetchFanLevel = async () => {
     try {
@@ -99,6 +105,12 @@ export default function StoveCard() {
 
   const fetchStatusAndUpdate = useCallback(async () => {
     try {
+      // Check sandbox mode
+      if (isLocalEnvironment()) {
+        const sandboxEnabled = await isSandboxEnabled();
+        setSandboxMode(sandboxEnabled);
+      }
+
       const res = await fetch(STOVE_ROUTES.status);
       const json = await res.json();
       const newStatus = json?.StatusDescription || 'sconosciuto';
@@ -153,6 +165,68 @@ export default function StoveCard() {
       pollingStartedRef.current = false;
     };
   }, [fetchStatusAndUpdate]);
+
+  // Listener Firebase per Sandbox Mode - sync real-time
+  useEffect(() => {
+    if (!isLocalEnvironment()) return;
+
+    let unsubscribeState = null;
+    let unsubscribeMaintenance = null;
+    let unsubscribeError = null;
+
+    async function setupSandboxListeners() {
+      const enabled = await isSandboxEnabled();
+
+      if (enabled) {
+        console.log('[Sandbox] Real-time sync attivo');
+
+        // Listener per stato stufa
+        const stateRef = ref(db, 'sandbox/stoveState');
+        unsubscribeState = onValue(stateRef, (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            console.log('[Sandbox] Aggiornamento stato:', data);
+            setStatus(data.status || '...');
+            setFanLevel(data.fan ?? null);
+            setPowerLevel(data.power ?? null);
+          }
+        });
+
+        // Listener per errori
+        const errorRef = ref(db, 'sandbox/error');
+        unsubscribeError = onValue(errorRef, (snapshot) => {
+          const error = snapshot.val();
+          console.log('[Sandbox] Aggiornamento errore:', error);
+          if (error) {
+            const errorCode = parseInt(error.code.replace('AL', '')) || 1;
+            setErrorCode(errorCode);
+            setErrorDescription(error.description);
+          } else {
+            setErrorCode(0);
+            setErrorDescription('');
+          }
+        });
+
+        // Listener per manutenzione
+        const maintenanceRef = ref(db, 'sandbox/maintenance');
+        unsubscribeMaintenance = onValue(maintenanceRef, async (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            console.log('[Sandbox] Aggiornamento manutenzione:', data);
+            await fetchMaintenanceStatus();
+          }
+        });
+      }
+    }
+
+    setupSandboxListeners();
+
+    return () => {
+      if (unsubscribeState) unsubscribeState();
+      if (unsubscribeError) unsubscribeError();
+      if (unsubscribeMaintenance) unsubscribeMaintenance();
+    };
+  }, [sandboxMode]);
 
   const handleManualRefresh = async () => {
     setRefreshing(true);
@@ -441,6 +515,18 @@ export default function StoveCard() {
                 )}
 
                 <div className="relative flex flex-col items-center justify-center p-8 sm:p-10 bg-white/[0.10] backdrop-blur-3xl rounded-3xl shadow-liquid hover:shadow-liquid-lg transition-all duration-500 hover:scale-[1.002] ring-1 ring-white/20 ring-inset overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/15 before:to-transparent before:pointer-events-none">
+                  {/* Sandbox Badge */}
+                  {sandboxMode && (
+                    <div className="absolute -top-2 -left-2 z-10">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-purple-500/20 rounded-full blur-lg animate-pulse"></div>
+                        <div className="relative bg-gradient-to-br from-purple-500 to-pink-600 text-white px-4 py-2 rounded-full shadow-elevated-lg ring-2 ring-white/40">
+                          <span className="text-xs sm:text-sm font-bold">🧪 SANDBOX</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Error Badge */}
                   {errorCode !== 0 && (
                     <div className="absolute -top-2 -right-2 z-10">

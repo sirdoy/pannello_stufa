@@ -34,6 +34,7 @@
 
 ### Development Workflows
 
+- **[Sandbox Mode](docs/sandbox.md)** - Testing locale senza chiamate reali alla stufa (SOLO localhost)
 - **[Versioning](docs/versioning.md)** - Semantic versioning, changelog, version enforcement
 - **[Deployment](docs/deployment.md)** - Deploy workflow, environment config, production checklist
 
@@ -368,6 +369,7 @@ ADMIN_USER_ID=auth0|xxx
 - [Hue Setup](docs/setup/hue-setup.md) - Luci integration
 
 ### Operations
+- [Sandbox Mode](docs/sandbox.md) - Testing locale senza chiamate reali
 - [Versioning](docs/versioning.md) - Version management workflow
 - [Testing](docs/testing.md) - Unit tests, coverage
 - [Deployment](docs/deployment.md) - Deploy checklist
@@ -384,5 +386,5 @@ ADMIN_USER_ID=auth0|xxx
 ---
 
 **Last Updated**: 2025-10-22
-**Version**: 1.8.2
+**Version**: 1.9.0
 **Author**: Federico Manfredi

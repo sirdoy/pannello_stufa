@@ -1,12 +1,18 @@
-import { STUFA_API, fetchWithTimeout } from '@/lib/stoveApi';
+import { igniteStove } from '@/lib/stoveApi';
 import { getFullSchedulerMode, setSemiManualMode, getNextScheduledChange } from '@/lib/schedulerService';
 import { canIgnite } from '@/lib/maintenanceService';
 
+/**
+ * POST /api/stove/ignite
+ * Ignites the stove
+ * Supports sandbox mode in localhost
+ */
 export async function POST(req) {
   try {
-    // Parse body per ottenere source
+    // Parse body per ottenere source e power
     const body = await req.json().catch(() => ({}));
     const source = body.source;
+    const power = body.power || 3;
 
     // Check maintenance status before igniting
     const maintenanceAllowed = await canIgnite();
@@ -20,16 +26,7 @@ export async function POST(req) {
       );
     }
 
-    const res = await fetchWithTimeout(STUFA_API.ignite);
-
-    if (!res.ok) {
-      return Response.json(
-        { error: 'Failed to ignite stove', details: `HTTP ${res.status}` },
-        { status: res.status }
-      );
-    }
-
-    const data = await res.json();
+    const data = await igniteStove(power);
 
     // Attiva semi-manuale SOLO se source='manual', scheduler attivo e non già in semi-manuale
     if (source === 'manual') {

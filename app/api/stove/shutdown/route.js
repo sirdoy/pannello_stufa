@@ -1,22 +1,18 @@
-import { STUFA_API, fetchWithTimeout } from '@/lib/stoveApi';
+import { shutdownStove } from '@/lib/stoveApi';
 import { getFullSchedulerMode, setSemiManualMode, getNextScheduledChange } from '@/lib/schedulerService';
 
+/**
+ * POST /api/stove/shutdown
+ * Shuts down the stove
+ * Supports sandbox mode in localhost
+ */
 export async function POST(req) {
   try {
     // Parse body per ottenere source
     const body = await req.json().catch(() => ({}));
     const source = body.source;
 
-    const res = await fetchWithTimeout(STUFA_API.shutdown);
-
-    if (!res.ok) {
-      return Response.json(
-        { error: 'Failed to shutdown stove', details: `HTTP ${res.status}` },
-        { status: res.status }
-      );
-    }
-
-    const data = await res.json();
+    const data = await shutdownStove();
 
     // Attiva semi-manuale SOLO se source='manual', scheduler attivo e non già in semi-manuale
     if (source === 'manual') {

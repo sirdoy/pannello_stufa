@@ -2,6 +2,7 @@ import { getSession } from '@auth0/nextjs-auth0/edge';
 import StoveCard from './components/devices/stove/StoveCard';
 import ThermostatCard from './components/devices/thermostat/ThermostatCard';
 import LightsCard from './components/devices/lights/LightsCard';
+import SandboxToggle from './components/sandbox/SandboxToggle';
 import { getEnabledDevicesForUser } from '@/lib/devicePreferencesService';
 
 export const dynamic = 'force-dynamic';
@@ -23,6 +24,9 @@ export default async function Home() {
           Controlla e monitora tutti i dispositivi della tua casa
         </p>
       </div>
+
+      {/* Sandbox Toggle - Solo in localhost */}
+      <SandboxToggle />
 
       {/* Devices grid - Mobile: stack, Desktop: 2 columns */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">

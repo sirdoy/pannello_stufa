@@ -1,17 +1,13 @@
-import { STUFA_API, fetchWithTimeout } from '@/lib/stoveApi';
+import { getFanLevel } from '@/lib/stoveApi';
 
+/**
+ * GET /api/stove/getFan
+ * Returns the current fan level
+ * Supports sandbox mode in localhost
+ */
 export async function GET() {
   try {
-    const res = await fetchWithTimeout(STUFA_API.getFan);
-
-    if (!res.ok) {
-      return Response.json(
-        { error: 'Failed to fetch fan level', details: `HTTP ${res.status}` },
-        { status: res.status }
-      );
-    }
-
-    const data = await res.json();
+    const data = await getFanLevel();
     return Response.json(data);
   } catch (error) {
     console.error('[Stove API] GetFan error:', error.message);

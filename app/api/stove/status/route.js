@@ -1,21 +1,13 @@
-import { STUFA_API, fetchWithTimeout } from '@/lib/stoveApi';
+import { getStoveStatus } from '@/lib/stoveApi';
 
 /**
  * GET /api/stove/status
  * Returns the current operational status of the stove
+ * Supports sandbox mode in localhost
  */
 export async function GET() {
   try {
-    const res = await fetchWithTimeout(STUFA_API.getStatus);
-
-    if (!res.ok) {
-      return Response.json(
-        { error: 'Failed to fetch stove status', details: `HTTP ${res.status}` },
-        { status: res.status }
-      );
-    }
-
-    const data = await res.json();
+    const data = await getStoveStatus();
     return Response.json(data);
   } catch (error) {
     console.error('[Stove API] Status error:', error.message);

@@ -1372,14 +1372,191 @@ assert.deepEqual(original, back);  // Dovrebbe essere uguale
 
 **Implementazione esempio**: `lib/stoveApi.js:94-127`, `lib/maintenanceService.js:47-60`
 
+## Immediate Feedback UX Pattern
+
+Pattern per feedback utente immediato e chiaro con triplo approccio: preventivo → azione → conferma.
+
+### Pattern Base
+
+**Scenario**: Azione utente che causa cambio stato sistema (es: cambio modalità scheduler)
+
+**Triplo Feedback**:
+1. **Preventivo**: Badge/banner informativo PRIMA dell'azione
+2. **Azione**: Cambio stato immediato (no attesa polling)
+3. **Conferma**: Toast notification post-azione
+
+```javascript
+'use client';
+
+import { useState } from 'react';
+import Toast from '../ui/Toast';
+
+export default function ActionComponent() {
+  const [systemMode, setSystemMode] = useState('auto');
+  const [toast, setToast] = useState(null);
+
+  const handleUserAction = async () => {
+    // 1. Call API
+    const response = await fetch('/api/action', {
+      method: 'POST',
+      body: JSON.stringify({ data: '...' })
+    });
+    const data = await response.json();
+
+    // 2. Check se cambio di stato
+    if (data.stateChanged) {
+      // 3. Update UI IMMEDIATAMENTE (no polling wait)
+      setSystemMode(data.newMode);
+
+      // 4. Toast confirmation
+      setToast({
+        message: 'Stato cambiato con successo',
+        icon: '✓',
+        variant: 'success'
+      });
+
+      // 5. Optional: verify with backend dopo delay
+      setTimeout(() => fetchLatestState(), 500);
+    }
+  };
+
+  return (
+    <>
+      {/* 1. PREVENTIVO: Informative badge */}
+      {systemMode === 'auto' && (
+        <div className="px-4 py-2 bg-info-50 rounded-lg text-sm text-info-700">
+          ℹ️ Questa azione cambierà la modalità
+        </div>
+      )}
+
+      {/* 2. AZIONE: User control */}
+      <button onClick={handleUserAction}>
+        Esegui Azione
+      </button>
+
+      {/* 3. CONFERMA: Toast feedback */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          icon={toast.icon}
+          variant={toast.variant}
+          duration={3000}
+          onDismiss={() => setToast(null)}
+        />
+      )}
+    </>
+  );
+}
+```
+
+### Best Practices
+
+**1. Badge preventivo**
+- Colore: `bg-info-50` (blu neutro, non allarmante)
+- Posizionamento: Sopra/vicino al controllo che attiverà l'azione
+- Testo: Breve e chiaro ("Questa azione farà X")
+- Condizione: Visibile solo quando rilevante
+
+**2. Aggiornamento stato immediato**
+```javascript
+// ✅ CORRECT - Update locale + verify
+if (data.modeChanged) {
+  // Immediate local update
+  setMode(data.newMode);
+  setRelatedField(data.newValue);
+
+  // Verify from backend (safety)
+  setTimeout(() => refetchFromBackend(), 500);
+}
+
+// ❌ WRONG - Wait for polling
+if (data.modeChanged) {
+  // User sees no feedback for 5-10s
+  // Bad UX
+}
+```
+
+**3. Toast notification**
+- Durata: 3000ms (3 secondi) per lettura comoda
+- Variante semantica: success (verde), warning (giallo), error (rosso)
+- Massimo 1 toast alla volta (sostituisci stato)
+- Messaggio: Max 2 righe, focus sul "cosa è successo"
+
+**4. API Response Structure**
+```javascript
+// Backend API should return enriched data
+return Response.json({
+  ...originalData,
+  stateChanged: true,      // Flag per UI
+  newMode: 'semi-manual',   // New state value
+  metadata: { /* ... */ }   // Optional context
+});
+```
+
+### Varianti Pattern
+
+**Variante 1: Feedback su modifica input**
+```javascript
+// Badge appare sopra select quando condizione attiva
+{isInAutomaticMode && (
+  <div className="mb-2 px-3 py-1.5 bg-info-50 rounded text-xs text-info-700">
+    La modifica attiverà override temporaneo
+  </div>
+)}
+
+<Select onChange={handleChange} />
+```
+
+**Variante 2: Feedback su salvataggio**
+```javascript
+const handleSave = async () => {
+  const response = await saveData();
+
+  setToast({
+    message: response.saved ? 'Salvato' : 'Errore salvataggio',
+    variant: response.saved ? 'success' : 'error'
+  });
+};
+```
+
+**Variante 3: Feedback multi-step**
+```javascript
+// Step 1: Preventivo (banner)
+// Step 2: Conferma (modal)
+// Step 3: Azione (loading)
+// Step 4: Risultato (toast)
+```
+
+### Console Logging
+
+Aggiungi console.log per debugging durante sviluppo:
+
+```javascript
+if (data.modeChanged) {
+  console.log('[Component] Mode changed:', data);
+
+  setToast({ /* ... */ });
+  // ...
+}
+```
+
+**Best practice logging**:
+- Prefix: `[ComponentName]` per filtro rapido
+- Data completa: Log l'intero oggetto per debug
+- Rimuovi in production: O usa environment check
+
+**Implementazione esempio**:
+- `app/components/devices/stove/StoveCard.js:241-305` (handleFanChange, handlePowerChange)
+- `app/api/stove/setFan/route.js:28-34` (enriched response)
+
 ## See Also
 
-- [UI Components](./ui-components.md) - Componenti base riutilizzabili
+- [UI Components](./ui-components.md) - Componenti base riutilizzabili (Toast)
 - [Firebase](./firebase.md) - Firebase operations patterns
 - [Testing](./testing.md) - Testing patterns
 - [Troubleshooting](./troubleshooting.md) - Common issues and solutions
 
 ---
 
-**Last Updated**: 2025-10-22
-**Version**: 1.9.0
+**Last Updated**: 2025-10-27
+**Version**: 1.10.0

@@ -66,6 +66,38 @@ Il pannello sandbox ti permette di:
 - Ogni azione include timestamp e parametri
 - Utile per debugging
 
+#### Test Scheduler ⏰
+
+Sezione dedicata per testare modalità scheduler e transizioni automatiche.
+
+**Visual Mode Badges**:
+- 🔧 **MANUAL**: Scheduler disattivato
+- ⏰ **AUTO**: Modalità automatica attiva
+- ⚙️ **SEMI-MANUAL**: Override temporaneo attivo
+
+**Quick Test Setup**:
+1. **Toggle Scheduler**: Attiva/disattiva modalità automatica
+2. **Crea Intervallo Test**:
+   - Imposta orario inizio/fine
+   - Seleziona potenza (1-5) e ventola (1-6)
+   - L'intervallo viene creato per il giorno corrente
+   - Lo scheduler si attiva automaticamente se non già attivo
+3. **Clear Intervallo**: Rimuove l'intervallo di test
+
+**Test Transizione Semi-Manual**:
+1. Crea un intervallo di test
+2. Metti la stufa in stato WORK
+3. Vai sulla StoveCard e modifica Fan o Power
+4. Dovresti vedere:
+   - Badge blu preventivo "ℹ️ La modifica attiverà la modalità Semi-Manuale"
+   - Toast giallo "⚙️ Modalità cambiata in Semi-Manuale"
+   - Badge modalità cambia da ⏰ AUTO a ⚙️ SEMI-MANUAL
+   - Pulsante "↩️ Torna in Automatico" appare
+
+**Controlli**:
+- **Clear Semi-Manual**: Ritorna in modalità automatica (visibile solo in semi-manual)
+- **Clear**: Cancella l'intervallo di test creato
+
 ## 🏗️ Architettura
 
 ### Intercettazione Chiamate API

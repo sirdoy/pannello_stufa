@@ -5,6 +5,37 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.10.0] - 2025-10-27
+
+### Aggiunto
+- **Toast component per notifiche UX**
+  - Componente Toast riutilizzabile con liquid glass style iOS 18
+  - Auto-dismiss configurabile (default 3s), varianti semantiche (success, warning, info, error)
+  - Animazione slideDown CSS fluida con opacity fade-in
+  - Posizionato fixed top-center per massima visibilità
+  - File: `app/components/ui/Toast.js`, `app/globals.css`
+
+- **SandboxPanel scheduler testing completo**
+  - Sezione dedicata test scheduler con visual mode badges (MANUAL/AUTO/SEMI-MANUAL)
+  - Quick setup intervalli: crea intervallo test per giorno corrente con orari/power/fan configurabili
+  - Toggle scheduler on/off, pulsante clear semi-manual
+  - Istruzioni integrate per test cambio automatico modalità
+  - File: `app/components/sandbox/SandboxPanel.js:531-660`
+
+### Modificato
+- **Transizione automatica Automatic → Semi-Manual migliorata**
+  - Rimossa condizione `if (nextChange)`: semi-manual si attiva anche senza prossimi eventi schedulati
+  - API enriched response: `setFan` e `setPower` ritornano `modeChanged` flag per notifica frontend
+  - Feedback UX triplo: badge preventivo → azione → toast conferma
+  - Badge informativo blu appare sopra select quando in modalità automatica
+  - Real-time state update: UI si aggiorna immediatamente senza aspettare Firebase
+  - File: `app/api/stove/setFan/route.js`, `app/api/stove/setPower/route.js`, `app/components/devices/stove/StoveCard.js`
+
+### Documentazione
+- Aggiunta documentazione Toast component in `docs/ui-components.md`
+- Aggiunta sezione scheduler testing in `docs/sandbox.md`
+- Aggiunto pattern "Immediate Feedback UX" in `docs/patterns.md`
+
 ## [1.9.0] - 2025-10-22
 
 ### Aggiunto

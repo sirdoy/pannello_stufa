@@ -21,10 +21,16 @@ export async function POST(req) {
         const mode = await getFullSchedulerMode();
         if (mode.enabled && !mode.semiManual) {
           const nextChange = await getNextScheduledChange();
-          if (nextChange) {
-            await setSemiManualMode(nextChange);
-            console.log('Modalità semi-manuale attivata per comando manuale di cambio ventola');
-          }
+          // Attiva semi-manuale anche senza prossimo evento (rimane attivo fino a reset manuale)
+          await setSemiManualMode(nextChange);
+          console.log('Modalità semi-manuale attivata per comando manuale di cambio ventola');
+
+          return Response.json({
+            ...data,
+            modeChanged: true,
+            newMode: 'semi-manual',
+            returnToAutoAt: nextChange
+          });
         }
       }
     }

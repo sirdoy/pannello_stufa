@@ -96,6 +96,66 @@ Componente alert/warning riutilizzabile con 4 varianti semantiche.
 
 **Implementazione**: `app/components/ui/Banner.js`
 
+## Toast
+
+Notifiche temporanee con auto-dismiss per feedback UX immediato.
+
+```jsx
+<Toast
+  message="Operazione completata"
+  icon="✓"
+  variant="success|warning|info|error"
+  duration={3000}
+  onDismiss={() => setToast(null)}
+/>
+```
+
+**Props**:
+- `message` - Testo notifica (required)
+- `icon` - Emoji/icona (default: '✓')
+- `variant` - Variante semantica (default: success)
+  - `success` - Operazioni completate (verde)
+  - `warning` - Attenzioni (giallo)
+  - `info` - Informazioni (blu)
+  - `error` - Errori (rosso)
+- `duration` - Millisecondi prima auto-dismiss (default: 3000, 0 = no auto-dismiss)
+- `onDismiss` - Callback chiamato su dismiss (auto o manuale)
+
+**Posizionamento**: Fixed top-center (`fixed top-4 left-1/2 -translate-x-1/2 z-[9999]`)
+
+**Animazione**: slideDown CSS custom con opacity fade-in (300ms ease-out)
+
+**Pattern d'uso**:
+```jsx
+const [toast, setToast] = useState(null);
+
+// Trigger toast
+setToast({
+  message: 'Salvataggio completato',
+  icon: '✓',
+  variant: 'success'
+});
+
+// Render
+{toast && (
+  <Toast
+    message={toast.message}
+    icon={toast.icon}
+    variant={toast.variant}
+    duration={3000}
+    onDismiss={() => setToast(null)}
+  />
+)}
+```
+
+**Best practice**:
+- Usa per feedback operazioni utente (salvataggio, modifica, errori)
+- Massimo 1 toast alla volta (sostituisci stato)
+- Messaggi concisi (max 2 righe)
+- Variante semantica appropriata al contesto
+
+**Implementazione**: `app/components/ui/Toast.js`, animazione in `app/globals.css`
+
 ## Select
 
 Dropdown con liquid glass style e z-index ottimizzato.

@@ -21,6 +21,7 @@ import Banner from '../../ui/Banner';
 import MaintenanceBar from '../../MaintenanceBar';
 import CronHealthBanner from '../../CronHealthBanner';
 import StoveWebGLAnimation from './StoveWebGLAnimation';
+import Toast from '../../ui/Toast';
 
 /**
  * StoveCard - Complete stove control for homepage
@@ -53,6 +54,9 @@ export default function StoveCard() {
 
   // Sandbox mode
   const [sandboxMode, setSandboxMode] = useState(false);
+
+  // Toast notification
+  const [toast, setToast] = useState(null);
 
   const fetchFanLevel = async () => {
     try {
@@ -237,20 +241,66 @@ export default function StoveCard() {
   const handleFanChange = async (e) => {
     const level = Number(e.target.value);
     setFanLevel(level);
-    await fetch(STOVE_ROUTES.setFan, {
+
+    const response = await fetch(STOVE_ROUTES.setFan, {
       method: 'POST',
       body: JSON.stringify({ level, source: 'manual' }),
     });
+
+    const data = await response.json();
+
+    // Se la modalità è cambiata, mostra notifica e aggiorna UI immediatamente
+    if (data.modeChanged) {
+      console.log('[StoveCard] Modalità cambiata in semi-manuale', data);
+
+      setToast({
+        message: 'Modalità cambiata in Semi-Manuale',
+        icon: '⚙️',
+        variant: 'warning'
+      });
+
+      // Aggiorna immediatamente lo stato locale (non aspettare Firebase)
+      setSemiManualMode(true);
+      setReturnToAutoAt(data.returnToAutoAt || null);
+      setNextScheduledAction(null);
+
+      // Poi aggiorna anche da Firebase per sicurezza
+      setTimeout(() => fetchSchedulerMode(), 500);
+    }
+
     await logStoveAction.setFan(level);
   };
 
   const handlePowerChange = async (e) => {
     const level = Number(e.target.value);
     setPowerLevel(level);
-    await fetch(STOVE_ROUTES.setPower, {
+
+    const response = await fetch(STOVE_ROUTES.setPower, {
       method: 'POST',
       body: JSON.stringify({ level, source: 'manual' }),
     });
+
+    const data = await response.json();
+
+    // Se la modalità è cambiata, mostra notifica e aggiorna UI immediatamente
+    if (data.modeChanged) {
+      console.log('[StoveCard] Modalità cambiata in semi-manuale', data);
+
+      setToast({
+        message: 'Modalità cambiata in Semi-Manuale',
+        icon: '⚙️',
+        variant: 'warning'
+      });
+
+      // Aggiorna immediatamente lo stato locale (non aspettare Firebase)
+      setSemiManualMode(true);
+      setReturnToAutoAt(data.returnToAutoAt || null);
+      setNextScheduledAction(null);
+
+      // Poi aggiorna anche da Firebase per sicurezza
+      setTimeout(() => fetchSchedulerMode(), 500);
+    }
+
     await logStoveAction.setPower(level);
   };
 
@@ -814,6 +864,15 @@ export default function StoveCard() {
             {/* Regolazioni - Visibili solo quando stufa accesa */}
             {!isSpenta && (
               <div className="space-y-4">
+                {/* Info badge quando in modalità automatica */}
+                {schedulerEnabled && !semiManualMode && (
+                  <div className="px-4 py-2.5 bg-info-500/[0.08] backdrop-blur-2xl rounded-xl text-center shadow-liquid-sm ring-1 ring-info-500/20 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-info-400/10 before:to-transparent before:pointer-events-none">
+                    <p className="text-xs sm:text-sm font-semibold text-info-700 tracking-wide relative z-10">
+                      ℹ️ La modifica attiverà la modalità Semi-Manuale
+                    </p>
+                  </div>
+                )}
+
                 <Select
                   label="💨 Livello Ventilazione"
                   value={fanLevel ?? ''}
@@ -836,6 +895,17 @@ export default function StoveCard() {
           </div>
         </div>
       </Card>
+
+      {/* Toast Notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          icon={toast.icon}
+          variant={toast.variant}
+          duration={3000}
+          onDismiss={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

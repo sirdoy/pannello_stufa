@@ -385,6 +385,6 @@ ADMIN_USER_ID=auth0|xxx
 
 ---
 
-**Last Updated**: 2025-10-27
-**Version**: 1.10.0
+**Last Updated**: 2025-11-03
+**Version**: 1.10.1
 **Author**: Federico Manfredi

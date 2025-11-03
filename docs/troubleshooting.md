@@ -40,6 +40,41 @@ find app -name "*.js" -exec grep -l "useState\|useEffect" {} \; | \
 
 ## Authentication (Auth0)
 
+### Link Menu Ricaricano Homepage su Mobile
+
+**Symptoms**:
+- Click su link del menu redirigono sempre alla homepage invece della pagina richiesta
+- Succede solo su mobile in produzione con PWA installata
+- Desktop funziona correttamente
+
+**Root Cause**: Middleware Auth0 fa redirect senza preservare URL destinazione.
+
+**Solution** ✅ (implementata v1.10.1):
+
+```javascript
+// middleware.js
+export async function middleware(req) {
+  const res = NextResponse.next();
+  const session = await getSession(req, res);
+
+  if (!session || !session.user) {
+    // Preserve the original URL to return after login
+    const loginUrl = new URL('/api/auth/login', req.url);
+    loginUrl.searchParams.set('returnTo', req.nextUrl.pathname + req.nextUrl.search);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  return res;
+}
+```
+
+**Come Funziona**:
+- Middleware salva URL destinazione in query param `returnTo`
+- Auth0 callback ritorna utente alla pagina originale dopo login
+- Risolve problema sia per sessioni scadute che per navigazione diretta
+
+---
+
 ### Redirect Loop su Mobile (Production)
 
 **Symptoms**:
@@ -470,6 +505,99 @@ useEffect(() => {
    ```
 
 **Fix**: Delete duplicate tokens from Firebase.
+
+## PWA Configuration
+
+### Shortcuts iOS Non Funzionano
+
+**Symptoms**:
+- Long-press su icona app non mostra Quick Actions
+- Shortcuts appaiono ma hanno URL vecchi/obsoleti
+
+**Solution** ✅ (implementata v1.10.1):
+
+1. **Verifica manifest.json**:
+   - Shortcuts devono avere URL corretti secondo architettura app
+   - Ogni shortcut deve avere `type: "image/png"` nelle icons
+   - Max 4 shortcuts per iOS
+
+```json
+// public/manifest.json
+"shortcuts": [
+  {
+    "name": "Controllo Stufa",
+    "short_name": "Stufa",
+    "description": "Accendi, spegni e controlla la stufa",
+    "url": "/",
+    "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+  }
+]
+```
+
+2. **Meta tag iOS** (app/layout.js):
+```html
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Stufa" />
+```
+
+3. **Display Override** per esperienza nativa:
+```json
+// public/manifest.json
+"display": "standalone",
+"display_override": ["standalone", "fullscreen"]
+```
+
+**Test**:
+- Disinstalla PWA esistente
+- Reinstalla da Safari → Share → Add to Home Screen
+- Long-press icona → verifica shortcuts
+
+---
+
+### Service Worker Cache Problemi
+
+**Symptoms**:
+- Redirect vecchi vengono cachati
+- Pagine non si aggiornano dopo deploy
+- Navigazione ritorna sempre homepage
+
+**Root Cause**: Service Worker usa strategia cache errata per navigation requests.
+
+**Solution** ✅ (implementata v1.10.1):
+
+```javascript
+// next.config.mjs - withPWA config
+runtimeCaching: [
+  {
+    // Navigation requests (HTML pages) - sempre Network First
+    urlPattern: ({ request }) => request.mode === 'navigate',
+    handler: 'NetworkFirst',
+    options: {
+      cacheName: 'pages-cache',
+      networkTimeoutSeconds: 10,
+    },
+  },
+  // ... altri patterns
+]
+```
+
+**Best Practices**:
+- **Navigation requests**: sempre `NetworkFirst` per evitare redirect cachati
+- **API calls**: `NetworkFirst` con timeout per dati real-time
+- **Static assets** (JS/CSS): `StaleWhileRevalidate` per performance
+- **Images**: `CacheFirst` per risparmio bandwidth
+
+**Force Update Service Worker**:
+```javascript
+// In browser console (development)
+navigator.serviceWorker.getRegistrations()
+  .then(registrations => {
+    registrations.forEach(reg => reg.unregister())
+  })
+  .then(() => location.reload())
+```
+
+---
 
 ## Cron Health
 

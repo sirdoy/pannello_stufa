@@ -5,6 +5,32 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.10.1] - 2025-11-03
+
+### Risolto
+- **Fix navigazione mobile**: middleware ora preserva URL destinazione con `returnTo` parameter
+  - Problema: link menu ricaricavano sempre homepage su mobile in remoto
+  - Soluzione: middleware aggiunge query param `returnTo` al redirect login Auth0
+  - File: `middleware.js:8-12`
+
+- **Service Worker ottimizzato per PWA**: aggiunta strategia `NetworkFirst` per navigation requests
+  - Previene caching inappropriato dei redirect di autenticazione
+  - Pattern dedicato per richieste HTML: `request.mode === 'navigate'`
+  - File: `next.config.mjs:41-53`
+
+### Modificato
+- **PWA shortcuts aggiornati**: URL corretti per architettura multi-device
+  - `/scheduler` → `/stove/scheduler`
+  - `/errors` → `/stove/errors`
+  - Aggiunto shortcut `/stove/maintenance`
+  - File: `public/manifest.json:62-91`
+
+- **PWA iOS ottimizzato**: migliorata esperienza nativa iPhone
+  - Aggiunto `display_override: ["standalone", "fullscreen"]`
+  - Meta tag `apple-mobile-web-app-title` per nome icona personalizzato
+  - Quick Actions iOS: 4 shortcuts ottimizzati per long-press icona home
+  - File: `public/manifest.json:8`, `app/layout.js:34-35`
+
 ## [1.10.0] - 2025-10-27
 
 ### Aggiunto

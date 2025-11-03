@@ -5,6 +5,7 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "fullscreen"],
   "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#ef4444",
@@ -61,25 +62,32 @@
   ],
   "shortcuts": [
     {
-      "name": "Accendi stufa",
-      "short_name": "Accendi",
-      "description": "Accendi la stufa",
-      "url": "/?action=ignite",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+      "name": "Controllo Stufa",
+      "short_name": "Stufa",
+      "description": "Accendi, spegni e controlla la stufa",
+      "url": "/",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
-      "name": "Pianificazione",
+      "name": "Pianificazione Stufa",
       "short_name": "Pianifica",
-      "description": "Configura orari automatici",
-      "url": "/scheduler",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+      "description": "Configura accensione automatica",
+      "url": "/stove/scheduler",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
-      "name": "Allarmi",
-      "short_name": "Allarmi",
+      "name": "Manutenzione Stufa",
+      "short_name": "Manutenzione",
+      "description": "Controlla ore utilizzo e pulizia",
+      "url": "/stove/maintenance",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Errori Stufa",
+      "short_name": "Errori",
       "description": "Visualizza storico errori",
-      "url": "/errors",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+      "url": "/stove/errors",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ],
   "categories": ["utilities", "lifestyle"],

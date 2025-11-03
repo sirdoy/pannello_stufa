@@ -60,45 +60,49 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
               <Skeleton className="h-12 w-12 rounded-xl" />
             </div>
 
-            {/* Main Status Display */}
-            <div className="space-y-4 mb-6">
-              {/* Status principale - Glassmorphism Design */}
-              <div className="relative overflow-hidden rounded-3xl">
-                <div className="relative flex flex-col items-center justify-center p-8 sm:p-10 bg-white/85 backdrop-blur-xl rounded-3xl shadow-glass ring-1 ring-white/50 ring-inset">
-                  {/* Status Icon */}
-                  <div className="relative mb-5">
-                    <Skeleton className="h-24 w-24 rounded-full" />
-                  </div>
+            {/* Main Status Display - Frame 3 Style */}
+            <div className="mb-6">
+              {/* Card interna BIANCA */}
+              <div className="relative overflow-visible rounded-3xl shadow-glass-lg bg-white/80 backdrop-blur-xl ring-1 ring-white/50 ring-inset">
+                <div className="relative p-6 sm:p-8">
+                  {/* Riquadro interno COLORATO con stato/icona/valori */}
+                  <div className="relative bg-gradient-to-b from-neutral-50 to-neutral-100 rounded-2xl p-6 sm:p-8 shadow-inner overflow-visible">
+                    {/* Layout Frame 3: Testo + Icona + Box glassmorphism sovrapposti */}
+                    <div className="relative">
+                      {/* Testo stato in alto */}
+                      <div className="text-center mb-8 sm:mb-10">
+                        <Skeleton className="h-8 w-48 mx-auto" />
+                      </div>
 
-                  {/* Status Text */}
-                  <div className="text-center w-full">
-                    <Skeleton className="h-3 w-24 mb-3 mx-auto" />
-                    <Skeleton className="h-12 w-56 mx-auto" />
-                  </div>
-                </div>
-              </div>
+                      {/* Container per icona e box glassmorphism sovrapposti */}
+                      <div className="relative flex flex-col items-center">
+                        {/* Icona grande (z-0, dietro) */}
+                        <div className="relative mb-[-40px] sm:mb-[-50px]">
+                          <Skeleton className="h-[120px] w-[120px] sm:h-[140px] sm:w-[140px] rounded-full" />
+                        </div>
 
-              {/* Ventola e Potenza - Grid responsive con Glassmorphism */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* Ventola */}
-                <div className="relative overflow-hidden rounded-2xl">
-                  <div className="relative flex flex-col items-center justify-center p-5 sm:p-6 bg-gradient-to-br from-white/80 to-info-50/40 backdrop-blur-lg rounded-2xl shadow-glass-sm ring-1 ring-white/40 ring-inset">
-                    <div className="relative mb-3">
-                      <Skeleton className="h-12 w-12 sm:h-14 sm:w-14 rounded-full" />
+                        {/* Due box glassmorphism (z-10, davanti all'icona) */}
+                        <div className="relative z-10 w-full grid grid-cols-2 gap-3 sm:gap-4 mt-4">
+                          {/* Box Ventola */}
+                          <div className="relative overflow-hidden rounded-2xl bg-white/60 backdrop-blur-xl shadow-glass-sm ring-1 ring-white/40 ring-inset">
+                            <div className="relative flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
+                              <Skeleton className="h-6 w-6 sm:h-8 sm:w-8 rounded-full mb-2" />
+                              <Skeleton className="h-3 w-12 mb-1" />
+                              <Skeleton className="h-8 w-16" />
+                            </div>
+                          </div>
+
+                          {/* Box Potenza */}
+                          <div className="relative overflow-hidden rounded-2xl bg-white/60 backdrop-blur-xl shadow-glass-sm ring-1 ring-white/40 ring-inset">
+                            <div className="relative flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
+                              <Skeleton className="h-6 w-6 sm:h-8 sm:w-8 rounded-full mb-2" />
+                              <Skeleton className="h-3 w-12 mb-1" />
+                              <Skeleton className="h-8 w-16" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <Skeleton className="h-3 w-12 mb-2" />
-                    <Skeleton className="h-8 w-16" />
-                  </div>
-                </div>
-
-                {/* Potenza */}
-                <div className="relative overflow-hidden rounded-2xl">
-                  <div className="relative flex flex-col items-center justify-center p-5 sm:p-6 bg-gradient-to-br from-white/80 to-accent-50/40 backdrop-blur-lg rounded-2xl shadow-glass-sm ring-1 ring-white/40 ring-inset">
-                    <div className="relative mb-3">
-                      <Skeleton className="h-12 w-12 sm:h-14 sm:w-14 rounded-full" />
-                    </div>
-                    <Skeleton className="h-3 w-12 mb-2" />
-                    <Skeleton className="h-8 w-16" />
                   </div>
                 </div>
               </div>

@@ -20,7 +20,7 @@ import ErrorAlert from '../../ui/ErrorAlert';
 import Banner from '../../ui/Banner';
 import MaintenanceBar from '../../MaintenanceBar';
 import CronHealthBanner from '../../CronHealthBanner';
-import StoveWebGLAnimation from './StoveWebGLAnimation';
+import GlassEffect from './GlassEffect';
 import Toast from '../../ui/Toast';
 
 /**
@@ -356,15 +356,15 @@ export default function StoveCard() {
     }
   };
 
-  // Status mapping: technical name → user-friendly display
+  // Status mapping: technical name → user-friendly display (Frame 3 style)
   const getStatusInfo = (status) => {
     if (!status) {
       return {
-        label: 'Caricamento...',
+        label: 'CARICAMENTO...',
         icon: '⏳',
-        textColor: 'text-neutral-600',
-        bgColor: 'bg-gradient-to-br from-neutral-50/80 via-neutral-100/60 to-neutral-50/80',
-        iconBg: 'bg-neutral-100/70',
+        textColor: 'text-neutral-700',
+        bgColor: 'bg-gradient-to-b from-neutral-50 to-neutral-100',
+        glassColor: '#d1d5db',
         animated: true,
       };
     }
@@ -374,11 +374,11 @@ export default function StoveCard() {
     // 🔥 WORK - In funzione
     if (statusUpper.includes('WORK')) {
       return {
-        label: 'In Funzione',
+        label: 'IN FUNZIONE',
         icon: '🔥',
-        textColor: 'text-success-700',
-        bgColor: 'bg-gradient-to-br from-success-500/[0.03] via-success-600/[0.02] to-success-500/[0.03]',
-        iconBg: 'bg-success-100/50',
+        textColor: 'text-success-800',
+        bgColor: 'bg-gradient-to-b from-success-50 to-success-100',
+        glassColor: '#d1d5db',
         animated: true,
         pulse: true,
       };
@@ -387,11 +387,11 @@ export default function StoveCard() {
     // ❄️ OFF - Spenta
     if (statusUpper.includes('OFF')) {
       return {
-        label: 'Spenta',
+        label: 'SPENTA',
         icon: '❄️',
-        textColor: 'text-neutral-600',
-        bgColor: 'bg-gradient-to-br from-neutral-500/[0.02] via-neutral-600/[0.01] to-neutral-500/[0.02]',
-        iconBg: 'bg-neutral-100/50',
+        textColor: 'text-info-700',
+        bgColor: 'bg-gradient-to-b from-sky-50 to-sky-100',
+        glassColor: '#d1d5db',
         animated: false,
       };
     }
@@ -399,11 +399,11 @@ export default function StoveCard() {
     // 🚀 START - Avvio in corso
     if (statusUpper.includes('START')) {
       return {
-        label: 'Avvio in Corso',
+        label: 'AVVIO IN CORSO',
         icon: '🚀',
         textColor: 'text-info-700',
-        bgColor: 'bg-gradient-to-br from-info-500/[0.03] via-info-600/[0.02] to-info-500/[0.03]',
-        iconBg: 'bg-info-100/50',
+        bgColor: 'bg-gradient-to-b from-info-50 to-info-100',
+        glassColor: '#d1d5db',
         animated: true,
         pulse: true,
       };
@@ -412,11 +412,11 @@ export default function StoveCard() {
     // 💤 STANDBY/WAIT - In attesa
     if (statusUpper.includes('STANDBY') || statusUpper.includes('WAIT')) {
       return {
-        label: 'In Attesa',
+        label: 'IN ATTESA',
         icon: '💤',
         textColor: 'text-warning-700',
-        bgColor: 'bg-gradient-to-br from-warning-50/80 via-warning-100/60 to-warning-50/80',
-        iconBg: 'bg-warning-100/70',
+        bgColor: 'bg-gradient-to-b from-warning-50 to-warning-100',
+        glassColor: '#d1d5db',
         animated: true,
       };
     }
@@ -424,11 +424,11 @@ export default function StoveCard() {
     // ⚠️ ERROR - Errore
     if (statusUpper.includes('ERROR') || statusUpper.includes('ALARM')) {
       return {
-        label: 'Errore',
+        label: 'ERRORE',
         icon: '⚠️',
         textColor: 'text-primary-700',
-        bgColor: 'bg-gradient-to-br from-primary-50/80 via-primary-100/60 to-primary-50/80',
-        iconBg: 'bg-primary-100/70',
+        bgColor: 'bg-gradient-to-b from-primary-50 to-primary-100',
+        glassColor: '#d1d5db',
         animated: true,
         pulse: true,
       };
@@ -437,11 +437,11 @@ export default function StoveCard() {
     // 🔄 CLEANING - Pulizia
     if (statusUpper.includes('CLEAN')) {
       return {
-        label: 'Pulizia Automatica',
+        label: 'PULIZIA',
         icon: '🔄',
         textColor: 'text-accent-700',
-        bgColor: 'bg-gradient-to-br from-accent-50/80 via-accent-100/60 to-accent-50/80',
-        iconBg: 'bg-accent-100/70',
+        bgColor: 'bg-gradient-to-b from-accent-50 to-accent-100',
+        glassColor: '#d1d5db',
         animated: true,
         pulse: true,
       };
@@ -450,22 +450,22 @@ export default function StoveCard() {
     // 🌡️ MODULATION - Modulazione
     if (statusUpper.includes('MODULATION')) {
       return {
-        label: 'Modulazione',
+        label: 'MODULAZIONE',
         icon: '🌡️',
         textColor: 'text-info-700',
-        bgColor: 'bg-gradient-to-br from-info-50/80 via-info-100/60 to-info-50/80',
-        iconBg: 'bg-info-100/70',
+        bgColor: 'bg-gradient-to-b from-info-50 to-info-100',
+        glassColor: '#d1d5db',
         animated: true,
       };
     }
 
     // Default - Stato sconosciuto
     return {
-      label: status,
+      label: status.toUpperCase(),
       icon: '❔',
-      textColor: 'text-neutral-600',
-      bgColor: 'bg-gradient-to-br from-neutral-50/80 via-neutral-100/60 to-neutral-50/80',
-      iconBg: 'bg-neutral-100/70',
+      textColor: 'text-neutral-700',
+      bgColor: 'bg-gradient-to-b from-neutral-50 to-neutral-100',
+      glassColor: '#d1d5db',
       animated: false,
     };
   };
@@ -493,7 +493,7 @@ export default function StoveCard() {
       )}
 
       {/* Main Status Card - Liquid Glass Pro */}
-      <Card liquidPro className={`overflow-visible transition-all duration-500 ${statusInfo.bgColor}`}>
+      <Card liquidPro className="overflow-visible transition-all duration-500">
         <div className="relative">
           {/* Top accent bar */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 via-accent-500 to-primary-500 opacity-80"></div>
@@ -555,23 +555,18 @@ export default function StoveCard() {
               </button>
             </div>
 
-            {/* Main Status Display - Mobile First */}
-            <div className="space-y-4 mb-6">
-              {/* Status principale - Glassmorphism Design */}
-              <div className="relative overflow-hidden rounded-3xl group">
-                {/* Background gradient animation */}
-                {statusInfo.animated && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" style={{ backgroundSize: '200% 100%' }}></div>
-                )}
-
-                <div className="relative flex flex-col items-center justify-center p-8 sm:p-10 bg-white/[0.10] backdrop-blur-3xl rounded-3xl shadow-liquid hover:shadow-liquid-lg transition-all duration-500 hover:scale-[1.002] ring-1 ring-white/20 ring-inset overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/15 before:to-transparent before:pointer-events-none">
+            {/* Main Status Display - Frame 3 Style */}
+            <div className="mb-6">
+              {/* Card principale BIANCA */}
+              <div className="relative overflow-visible rounded-3xl shadow-liquid hover:shadow-liquid-lg transition-all duration-500 bg-white/[0.08] backdrop-blur-2xl ring-1 ring-white/15 ring-inset">
+                <div className="relative p-6 sm:p-8">
                   {/* Sandbox Badge */}
                   {sandboxMode && (
-                    <div className="absolute -top-2 -left-2 z-10">
+                    <div className="absolute -top-2 -left-2 z-30">
                       <div className="relative">
                         <div className="absolute inset-0 bg-purple-500/20 rounded-full blur-lg animate-pulse"></div>
-                        <div className="relative bg-gradient-to-br from-purple-500 to-pink-600 text-white px-4 py-2 rounded-full shadow-elevated-lg ring-2 ring-white/40">
-                          <span className="text-xs sm:text-sm font-bold">🧪 SANDBOX</span>
+                        <div className="relative bg-gradient-to-br from-purple-500 to-pink-600 text-white px-3 py-1.5 rounded-full shadow-elevated-lg ring-2 ring-white/40">
+                          <span className="text-xs font-bold">🧪 SANDBOX</span>
                         </div>
                       </div>
                     </div>
@@ -579,125 +574,90 @@ export default function StoveCard() {
 
                   {/* Error Badge */}
                   {errorCode !== 0 && (
-                    <div className="absolute -top-2 -right-2 z-10">
+                    <div className="absolute -top-2 -right-2 z-30">
                       <div className="relative">
                         <div className="absolute inset-0 bg-primary-500/20 rounded-full blur-lg animate-pulse"></div>
-                        <div className="relative bg-gradient-to-br from-primary-500 to-primary-600 text-white px-4 py-2 rounded-full shadow-elevated-lg ring-2 ring-white/40">
-                          <span className="text-xs sm:text-sm font-bold">⚠️ ERR {errorCode}</span>
+                        <div className="relative bg-gradient-to-br from-primary-500 to-primary-600 text-white px-3 py-1.5 rounded-full shadow-elevated-lg ring-2 ring-white/40">
+                          <span className="text-xs font-bold">⚠️ ERR {errorCode}</span>
                         </div>
                       </div>
                     </div>
                   )}
 
-                  {/* Status e Animation Container - Layout Ottimizzato */}
-                  <div className="relative mb-5 z-10 w-full max-w-md mx-auto">
-                    {/* Container con animazione integrata */}
-                    <div className={`relative ${statusInfo.iconBg} rounded-3xl p-5 sm:p-6 shadow-liquid ring-1 ring-white/15 ring-inset transition-all duration-500 overflow-hidden`}>
-                      {/* Subtle glow background */}
-                      <div className={`absolute inset-0 ${statusInfo.iconBg} blur-2xl opacity-10`}></div>
-
-                      {/* Status Text - Compatto */}
-                      <div className="relative z-20 text-center mb-3">
-                        <p className="text-xs font-bold text-neutral-600 uppercase tracking-[0.2em] mb-1.5 opacity-50">
-                          Stato Attuale
-                        </p>
-                        <p className={`text-xl sm:text-2xl font-black ${statusInfo.textColor} tracking-tight leading-tight`}>
+                  {/* Riquadro interno COLORATO con stato/icona/valori */}
+                  <div className={`relative ${statusInfo.bgColor} rounded-2xl p-6 sm:p-8 shadow-inner-soft overflow-visible`}>
+                    {/* Layout Frame 3: Testo + Icona + Box glassmorphism sovrapposti */}
+                    <div className="relative">
+                      {/* Testo stato in alto */}
+                      <div className="text-center mb-8 sm:mb-10">
+                        <h3 className={`text-2xl sm:text-3xl font-black ${statusInfo.textColor} tracking-tight uppercase`}>
                           {statusInfo.label}
-                        </p>
-                        {/* Technical status (small, subtle) */}
-                        {statusInfo.label !== status && (
-                          <p className="text-xs text-neutral-500 mt-1 font-mono opacity-30 tracking-wide">
+                        </h3>
+                        {statusInfo.label.toUpperCase() !== status.toUpperCase() && (
+                          <p className="text-xs text-neutral-500 mt-1.5 font-mono opacity-40 tracking-wide">
                             {status}
                           </p>
                         )}
                       </div>
 
-                      {/* Animation - Dimensione Ottimizzata (ridotta) */}
-                      <div className="relative z-10 w-full h-48 sm:h-56 flex items-center justify-center bg-gradient-to-br from-black/5 to-black/10 rounded-2xl ring-1 ring-white/10 ring-inset overflow-hidden">
-                        <StoveWebGLAnimation
-                          status={status}
-                          fanLevel={fanLevel}
-                          powerLevel={powerLevel}
-                        />
-                      </div>
+                      {/* Container per icona e box glassmorphism sovrapposti */}
+                      <div className="relative flex flex-col items-center">
+                        {/* Icona grande (z-0, dietro) */}
+                        <div className={`relative mb-[-40px] sm:mb-[-50px] ${statusInfo.pulse ? 'animate-pulse' : ''}`}>
+                          <span className="text-[120px] sm:text-[140px] drop-shadow-xl inline-block" style={{ lineHeight: 1 }}>
+                            {statusInfo.icon}
+                          </span>
+                        </div>
 
-                      {/* Parametri Fan e Power - Layout Compatto */}
-                      {(statusUpper.includes('START') || statusUpper.includes('WORK')) && (
-                        <div className="relative z-20 mt-3 grid grid-cols-2 gap-2.5">
-                          {/* Fan */}
-                          <div className="flex flex-col items-center justify-center p-2.5 bg-white/[0.08] backdrop-blur-xl rounded-xl ring-1 ring-white/10 ring-inset">
-                            <div className="flex items-center gap-1.5 mb-1">
-                              <span className="text-base">💨</span>
-                              <p className="text-xs font-bold text-neutral-600 uppercase tracking-wider opacity-60">Fan</p>
-                            </div>
-                            <div className="flex items-baseline gap-1">
-                              <p className="text-lg font-black text-info-700">
-                                {fanLevel ?? '-'}
+                        {/* Due box glassmorphism (z-10, davanti all'icona) */}
+                        <div className="relative z-10 w-full grid grid-cols-2 gap-3 sm:gap-4 mt-4">
+                          {/* Box Ventola */}
+                          <div className="relative overflow-hidden rounded-2xl shadow-elevated backdrop-blur-2xl">
+                            {/* Effetto vetro WebGL */}
+                            <GlassEffect
+                              bgColor={statusInfo.glassColor}
+                              opacity={0.35}
+                            />
+                            <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
+                              <div className="flex items-center gap-1.5 mb-1.5">
+                                <span className="text-xl sm:text-2xl">💨</span>
+                              </div>
+                              <p className="text-[10px] sm:text-xs font-bold text-neutral-600 uppercase tracking-wider mb-1">
+                                Ventola
                               </p>
-                              <span className="text-xs text-neutral-500 font-semibold opacity-50">/6</span>
+                              <div className="flex items-baseline gap-0.5">
+                                <p className="text-2xl sm:text-3xl font-black text-neutral-800 leading-none">
+                                  {fanLevel ?? '-'}
+                                </p>
+                                <span className="text-sm sm:text-base text-neutral-600 font-semibold">/6</span>
+                              </div>
                             </div>
                           </div>
 
-                          {/* Power */}
-                          <div className="flex flex-col items-center justify-center p-2.5 bg-white/[0.08] backdrop-blur-xl rounded-xl ring-1 ring-white/10 ring-inset">
-                            <div className="flex items-center gap-1.5 mb-1">
-                              <span className="text-base">⚡</span>
-                              <p className="text-xs font-bold text-neutral-600 uppercase tracking-wider opacity-60">Power</p>
-                            </div>
-                            <div className="flex items-baseline gap-1">
-                              <p className="text-lg font-black text-accent-700">
-                                {powerLevel ?? '-'}
+                          {/* Box Potenza */}
+                          <div className="relative overflow-hidden rounded-2xl shadow-elevated backdrop-blur-2xl">
+                            {/* Effetto vetro WebGL */}
+                            <GlassEffect
+                              bgColor={statusInfo.glassColor}
+                              opacity={0.35}
+                            />
+                            <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
+                              <div className="flex items-center gap-1.5 mb-1.5">
+                                <span className="text-xl sm:text-2xl">⚡</span>
+                              </div>
+                              <p className="text-[10px] sm:text-xs font-bold text-neutral-600 uppercase tracking-wider mb-1">
+                                Potenza
                               </p>
-                              <span className="text-xs text-neutral-500 font-semibold opacity-50">/5</span>
+                              <div className="flex items-baseline gap-0.5">
+                                <p className="text-2xl sm:text-3xl font-black text-neutral-800 leading-none">
+                                  {powerLevel ?? '-'}
+                                </p>
+                                <span className="text-sm sm:text-base text-neutral-600 font-semibold">/5</span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Ventola e Potenza - Grid responsive con Liquid Glass */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* Ventola */}
-                <div className="group relative overflow-hidden rounded-2xl">
-                  <div className="relative flex flex-col items-center justify-center p-5 sm:p-6 bg-gradient-to-br from-white/[0.08] to-info-500/[0.05] backdrop-blur-2xl rounded-2xl shadow-liquid-sm hover:shadow-liquid transition-all duration-300 hover:scale-[1.005] ring-1 ring-white/15 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none">
-                    {/* Icon with soft glow */}
-                    <div className="relative mb-3 z-10">
-                      <div className="absolute inset-0 bg-info-400/10 rounded-full blur-xl opacity-40 group-hover:opacity-60 transition-opacity"></div>
-                      <div className="relative bg-gradient-to-br from-info-100/50 to-info-200/50 rounded-full p-3 shadow-inner-soft ring-1 ring-white/15 ring-inset">
-                        <span className="text-2xl sm:text-3xl drop-shadow-sm relative z-10">💨</span>
                       </div>
-                    </div>
-
-                    <p className="text-xs font-bold text-neutral-600 uppercase tracking-[0.15em] mb-2 opacity-50 relative z-10">Ventola</p>
-                    <div className="flex items-baseline gap-1 relative z-10">
-                      <p className="text-2xl sm:text-3xl font-black text-info-700 leading-none">
-                        {fanLevel ?? '-'}
-                      </p>
-                      <span className="text-sm sm:text-base text-neutral-500 font-semibold opacity-50">/6</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Potenza */}
-                <div className="group relative overflow-hidden rounded-2xl">
-                  <div className="relative flex flex-col items-center justify-center p-5 sm:p-6 bg-gradient-to-br from-white/[0.08] to-accent-500/[0.05] backdrop-blur-2xl rounded-2xl shadow-liquid-sm hover:shadow-liquid transition-all duration-300 hover:scale-[1.005] ring-1 ring-white/15 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none">
-                    {/* Icon with soft glow */}
-                    <div className="relative mb-3 z-10">
-                      <div className="absolute inset-0 bg-accent-400/10 rounded-full blur-xl opacity-40 group-hover:opacity-60 transition-opacity"></div>
-                      <div className="relative bg-gradient-to-br from-accent-100/50 to-accent-200/50 rounded-full p-3 shadow-inner-soft ring-1 ring-white/15 ring-inset">
-                        <span className="text-2xl sm:text-3xl drop-shadow-sm relative z-10">⚡</span>
-                      </div>
-                    </div>
-
-                    <p className="text-xs font-bold text-neutral-600 uppercase tracking-[0.15em] mb-2 opacity-50 relative z-10">Potenza</p>
-                    <div className="flex items-baseline gap-1 relative z-10">
-                      <p className="text-2xl sm:text-3xl font-black text-accent-700 leading-none">
-                        {powerLevel ?? '-'}
-                      </p>
-                      <span className="text-sm sm:text-base text-neutral-500 font-semibold opacity-50">/5</span>
                     </div>
                   </div>
                 </div>

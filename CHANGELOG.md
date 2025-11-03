@@ -5,6 +5,49 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.11.0] - 2025-11-03
+
+### Aggiunto
+- **GlassEffect component**: effetto vetro trasparente WebGL2
+  - Frosted glass pattern multi-scala con noise procedurale
+  - Distortion effect per rifrazione vetro realistica
+  - Edge highlights per riflessi bordi
+  - Fallback CSS quando WebGL2 non disponibile
+  - File: `app/components/devices/stove/GlassEffect.js`
+
+- **Documentazione stato stufa**: reference completo mapping
+  - Tabella completa stato tecnico → label → icona → colore
+  - Layout structure diagram Frame 3 style
+  - Color palette Tailwind classes
+  - File: `docs/stove-status-mapping.md`
+
+### Modificato
+- **StoveCard UI redesign completo**: nuovo layout Frame 3 style
+  - Card principale bianca (liquid glass) per uniformità app
+  - Riquadro interno colorato in base stato stufa (azzurro OFF, verde WORK, rosso ERROR)
+  - Icona emoji centrale grande (120-140px) invece animazioni 3D
+  - Box glassmorphism grigi con effetto WebGL sovrapposti all'icona
+  - Margin negativo per layering z-index (icona dietro, box davanti)
+  - Mapping colori: gradiente azzurro (sky), verde (success), blu (info), rosso (primary), arancio (warning)
+  - File: `app/components/devices/stove/StoveCard.js:359-665`
+
+- **Skeleton aggiornato**: allineato perfettamente con nuova UI
+  - Struttura Frame 3: card bianca → riquadro colorato → icona + box sovrapposti
+  - Margin negativo per simulare overlapping
+  - Box glassmorphism con min-height corretto
+  - File: `app/components/ui/Skeleton.js:63-109`
+
+### Rimosso
+- **Animazioni WebGL 3D complesse**: eliminato per performance e semplicità
+  - Rimosso `StoveWebGLAnimation.js` con shader Three.js
+  - Rimosse animazioni fiamme/fiocchi di neve raymarched
+  - Sostituito con icone statiche emoji + effetto vetro per box dati
+  - Performance migliorata: WebGL solo per trasparenza box (non rendering 3D)
+
+### Documentazione
+- Aggiornato CLAUDE.md: chiarificato uso limitato WebGL (solo effetti UI, non animazioni 3D)
+- Aggiornato patterns.md: aggiunto pattern Skeleton sempre allineato con UI
+
 ## [1.10.1] - 2025-11-03
 
 ### Risolto

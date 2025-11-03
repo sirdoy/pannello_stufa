@@ -1549,6 +1549,138 @@ if (data.modeChanged) {
 - `app/components/devices/stove/StoveCard.js:241-305` (handleFanChange, handlePowerChange)
 - `app/api/stove/setFan/route.js:28-34` (enriched response)
 
+## Skeleton UI Alignment Pattern
+
+**Pattern**: Quando modifichi l'UI di un componente, aggiorna SEMPRE il corrispondente Skeleton per mantenere il loading placeholder allineato.
+
+### ❌ Anti-Pattern
+```javascript
+// Modifichi StoveCard con nuovo layout Frame 3
+<div className="grid grid-cols-2 gap-4">
+  <BoxVentola />
+  <BoxPotenza />
+</div>
+
+// Ma NON aggiorni Skeleton.StovePanel → Utente vede layout inconsistente durante loading
+```
+
+### ✅ Pattern Corretto
+```javascript
+// 1. Modifichi StoveCard
+<div className="relative mb-[-40px]">
+  <IconaGrande />
+</div>
+<div className="relative z-10 grid grid-cols-2 gap-4">
+  <BoxGlassmorphism />
+</div>
+
+// 2. IMMEDIATAMENTE aggiorni Skeleton.StovePanel con STESSA struttura
+<div className="relative mb-[-40px]">
+  <Skeleton className="h-[120px] w-[120px]" />
+</div>
+<div className="relative z-10 grid grid-cols-2 gap-4">
+  <Skeleton className="min-h-[100px]" />
+</div>
+```
+
+### Checklist Skeleton Update
+
+Quando modifichi UI, verifica di aggiornare:
+
+1. **Struttura HTML**: Stesso numero div/container
+2. **Layout classes**: Grid, flex, gap, padding identici
+3. **Dimensioni**: Height/width coerenti (usa classi Skeleton)
+4. **Z-index e positioning**: Absolute, relative, z-10 stesso ordine
+5. **Margin negativi**: Se usi overlap, replica in Skeleton
+
+### Skeleton Components Disponibili
+
+```javascript
+// app/components/ui/Skeleton.js
+<Skeleton className="h-8 w-32" />              // Base skeleton
+
+<Skeleton.Card>...</Skeleton.Card>             // Card wrapper
+
+<Skeleton.StovePanel />                         // StoveCard homepage
+<Skeleton.ThermostatCard />                     // ThermostatCard
+<Skeleton.Scheduler />                          // Scheduler page
+<Skeleton.LogEntry />                           // Single log entry
+<Skeleton.LogPage />                            // Log page complete
+<Skeleton.NetatmoPage />                        // Netatmo dashboard
+```
+
+### Esempio Completo: StoveCard Frame 3 Update
+
+**Prima** (vecchio layout):
+```javascript
+// StoveCard.js (vecchio)
+<div className="rounded-3xl p-8">
+  <div className="rounded-full">
+    <Icon />
+  </div>
+  <div className="grid grid-cols-2">
+    <Fan />
+    <Power />
+  </div>
+</div>
+
+// Skeleton.js (vecchio)
+<div className="rounded-3xl p-8">
+  <Skeleton className="h-24 w-24 rounded-full" />
+  <div className="grid grid-cols-2">
+    <Skeleton className="h-12" />
+    <Skeleton className="h-12" />
+  </div>
+</div>
+```
+
+**Dopo** (nuovo layout Frame 3):
+```javascript
+// StoveCard.js (nuovo) - Frame 3 style
+<div className="relative flex flex-col items-center">
+  <div className="relative mb-[-40px]">  {/* Margin negativo per overlap */}
+    <span className="text-[120px]">{icon}</span>
+  </div>
+  <div className="relative z-10 grid grid-cols-2 gap-4 mt-4">
+    <BoxGlass minHeight={100} />
+    <BoxGlass minHeight={100} />
+  </div>
+</div>
+
+// Skeleton.js (nuovo) - STESSA struttura
+<div className="relative flex flex-col items-center">
+  <div className="relative mb-[-40px]">  {/* STESSO margin negativo */}
+    <Skeleton className="h-[120px] w-[120px] rounded-full" />
+  </div>
+  <div className="relative z-10 grid grid-cols-2 gap-4 mt-4">  {/* STESSO layout */}
+    <div className="min-h-[100px]">  {/* STESSA altezza minima */}
+      <Skeleton className="h-8" />
+    </div>
+    <div className="min-h-[100px]">
+      <Skeleton className="h-8" />
+    </div>
+  </div>
+</div>
+```
+
+### Performance Note
+
+- Skeleton è **sempre visibile** durante initial load (prima che arrivano dati)
+- Layout shift (CLS) se Skeleton non matcha UI = **UX negativa**
+- Test loading state: Limita network in DevTools per vedere Skeleton
+
+### Implementazione
+
+**File**:
+- `app/components/ui/Skeleton.js:48-180` (Skeleton.StovePanel)
+- `app/components/devices/stove/StoveCard.js:558-665` (StoveCard UI)
+
+**Commit checklist**:
+- [ ] Modificato componente UI
+- [ ] Aggiornato Skeleton corrispondente
+- [ ] Testato loading state (throttle network)
+- [ ] Verificato no layout shift (CLS)
+
 ## See Also
 
 - [UI Components](./ui-components.md) - Componenti base riutilizzabili (Toast)
@@ -1558,5 +1690,5 @@ if (data.modeChanged) {
 
 ---
 
-**Last Updated**: 2025-10-27
-**Version**: 1.10.0
+**Last Updated**: 2025-11-03
+**Version**: 1.11.0

@@ -6,7 +6,10 @@ export async function middleware(req) {
   const session = await getSession(req, res);
 
   if (!session || !session.user) {
-    return NextResponse.redirect(new URL('/api/auth/login', req.url));
+    // Preserve the original URL to return after login
+    const loginUrl = new URL('/api/auth/login', req.url);
+    loginUrl.searchParams.set('returnTo', req.nextUrl.pathname + req.nextUrl.search);
+    return NextResponse.redirect(loginUrl);
   }
 
   return res;

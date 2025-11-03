@@ -39,6 +39,19 @@ const withPWA = createPwaPlugin({
   },
   runtimeCaching: [
     {
+      // Navigation requests (HTML pages) - sempre Network First per evitare redirect cachati
+      urlPattern: ({ request }) => request.mode === 'navigate',
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'pages-cache',
+        expiration: {
+          maxEntries: 50,
+          maxAgeSeconds: 24 * 60 * 60, // 1 day
+        },
+        networkTimeoutSeconds: 10,
+      },
+    },
+    {
       urlPattern: /^https:\/\/wsthermorossi\.cloudwinet\.it\/.*/i,
       handler: 'NetworkFirst',
       options: {

@@ -556,36 +556,33 @@ export default function StoveCard() {
             </div>
 
             {/* Main Status Display - Frame 3 Style */}
-            <div className="mb-6">
-              {/* Card principale BIANCA */}
-              <div className="relative overflow-visible rounded-3xl shadow-liquid hover:shadow-liquid-lg transition-all duration-500 bg-white/[0.08] backdrop-blur-2xl ring-1 ring-white/15 ring-inset">
-                <div className="relative p-6 sm:p-8">
-                  {/* Sandbox Badge */}
-                  {sandboxMode && (
-                    <div className="absolute -top-2 -left-2 z-30">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-purple-500/20 rounded-full blur-lg animate-pulse"></div>
-                        <div className="relative bg-gradient-to-br from-purple-500 to-pink-600 text-white px-3 py-1.5 rounded-full shadow-elevated-lg ring-2 ring-white/40">
-                          <span className="text-xs font-bold">🧪 SANDBOX</span>
-                        </div>
-                      </div>
+            <div className="mb-6 relative">
+              {/* Sandbox Badge */}
+              {sandboxMode && (
+                <div className="absolute -top-2 -left-2 z-30">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-purple-500/20 rounded-full blur-lg animate-pulse"></div>
+                    <div className="relative bg-gradient-to-br from-purple-500 to-pink-600 text-white px-3 py-1.5 rounded-full shadow-elevated-lg ring-2 ring-white/40">
+                      <span className="text-xs font-bold">🧪 SANDBOX</span>
                     </div>
-                  )}
+                  </div>
+                </div>
+              )}
 
-                  {/* Error Badge */}
-                  {errorCode !== 0 && (
-                    <div className="absolute -top-2 -right-2 z-30">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-primary-500/20 rounded-full blur-lg animate-pulse"></div>
-                        <div className="relative bg-gradient-to-br from-primary-500 to-primary-600 text-white px-3 py-1.5 rounded-full shadow-elevated-lg ring-2 ring-white/40">
-                          <span className="text-xs font-bold">⚠️ ERR {errorCode}</span>
-                        </div>
-                      </div>
+              {/* Error Badge */}
+              {errorCode !== 0 && (
+                <div className="absolute -top-2 -right-2 z-30">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-primary-500/20 rounded-full blur-lg animate-pulse"></div>
+                    <div className="relative bg-gradient-to-br from-primary-500 to-primary-600 text-white px-3 py-1.5 rounded-full shadow-elevated-lg ring-2 ring-white/40">
+                      <span className="text-xs font-bold">⚠️ ERR {errorCode}</span>
                     </div>
-                  )}
+                  </div>
+                </div>
+              )}
 
-                  {/* Riquadro interno COLORATO con stato/icona/valori */}
-                  <div className={`relative ${statusInfo.bgColor} rounded-2xl p-6 sm:p-8 shadow-inner-soft overflow-visible`}>
+              {/* Riquadro COLORATO con stato/icona/valori */}
+              <div className={`relative ${statusInfo.bgColor} rounded-2xl p-6 sm:p-8 shadow-liquid hover:shadow-liquid-lg overflow-visible transition-all duration-500`}>
                     {/* Layout Frame 3: Testo + Icona + Box glassmorphism sovrapposti */}
                     <div className="relative">
                       {/* Testo stato in alto */}
@@ -659,8 +656,6 @@ export default function StoveCard() {
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
               </div>
             </div>
 

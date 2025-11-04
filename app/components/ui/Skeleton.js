@@ -62,13 +62,10 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
 
             {/* Main Status Display - Frame 3 Style */}
             <div className="mb-6">
-              {/* Card interna BIANCA */}
-              <div className="relative overflow-visible rounded-3xl shadow-glass-lg bg-white/80 backdrop-blur-xl ring-1 ring-white/50 ring-inset">
-                <div className="relative p-6 sm:p-8">
-                  {/* Riquadro interno COLORATO con stato/icona/valori */}
-                  <div className="relative bg-gradient-to-b from-neutral-50 to-neutral-100 rounded-2xl p-6 sm:p-8 shadow-inner overflow-visible">
-                    {/* Layout Frame 3: Testo + Icona + Box glassmorphism sovrapposti */}
-                    <div className="relative">
+              {/* Riquadro COLORATO con stato/icona/valori */}
+              <div className="relative bg-gradient-to-b from-neutral-50 to-neutral-100 rounded-2xl p-6 sm:p-8 shadow-glass-lg overflow-visible">
+                {/* Layout Frame 3: Testo + Icona + Box glassmorphism sovrapposti */}
+                <div className="relative">
                       {/* Testo stato in alto */}
                       <div className="text-center mb-8 sm:mb-10">
                         <Skeleton className="h-8 w-48 mx-auto" />
@@ -103,8 +100,6 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
               </div>
             </div>
 

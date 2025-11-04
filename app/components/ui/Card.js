@@ -3,7 +3,7 @@ export default function Card({ children, className = '', glass = false, liquid =
 
   // Liquid Pro style (iOS 26 enhanced - con saturazione e contrasto migliorati)
   // Note: overflow-hidden rimosso per permettere ai dropdown interni di fuoriuscire correttamente
-  const liquidProClasses = 'bg-white/[0.08] backdrop-blur-3xl backdrop-saturate-150 backdrop-contrast-105 shadow-liquid ring-1 ring-white/[0.15] ring-inset relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.12] before:to-transparent before:pointer-events-none';
+  const liquidProClasses = 'bg-white/[0.08] backdrop-blur-3xl backdrop-saturate-150 backdrop-contrast-105 shadow-liquid relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.12] before:to-transparent before:pointer-events-none';
 
   // Liquid glass style (iOS 26 style - ultra trasparente con blur intenso)
   // Note: overflow-hidden rimosso per permettere ai dropdown interni di fuoriuscire correttamente

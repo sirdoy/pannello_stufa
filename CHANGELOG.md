@@ -5,6 +5,20 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.11.1] - 2025-11-04
+
+### Modificato
+- **UI cleanup StoveCard**: rimosso bordo bianco per design più pulito
+  - Rimosso `ring-1 ring-white/[0.15]` dal componente Card variant liquidPro
+  - Rimosso layer wrapper intermedio (`div` bianco trasparente) nella struttura StoveCard
+  - Riquadro colorato stato ora direttamente visibile senza nesting superfluo
+  - File modificati: `app/components/ui/Card.js:6`, `app/components/devices/stove/StoveCard.js:558-660`
+
+- **Skeleton uniformato**: allineata struttura DOM
+  - Rimossa stessa struttura wrapper intermedia da `Skeleton.StovePanel`
+  - Skeleton ora perfettamente consistente con componente reale
+  - File: `app/components/ui/Skeleton.js:63-104`
+
 ## [1.11.0] - 2025-11-03
 
 ### Aggiunto

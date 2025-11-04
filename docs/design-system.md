@@ -188,6 +188,65 @@ shadow: {
 
 Vedi [UI Components - Liquid Glass Style](./ui-components.md#liquid-glass-style-pattern).
 
+## Glass Effects & Transparency
+
+Pattern per effetti glassmorphism con trasparenza e blur.
+
+### Backdrop Blur Pattern
+
+```jsx
+// Ultra-trasparente (mostra contenuto sotto)
+<div className="backdrop-blur-md bg-white/[0.01]">
+  Content
+</div>
+
+// Leggero (leggermente opaco)
+<div className="backdrop-blur-lg bg-white/5">
+  Content
+</div>
+
+// Standard (bilanciato)
+<div className="backdrop-blur-xl bg-white/10">
+  Content
+</div>
+
+// Opaco (minima trasparenza)
+<div className="backdrop-blur-2xl bg-white/20">
+  Content
+</div>
+```
+
+**Blur Levels**:
+- `backdrop-blur-sm` - 4px blur (minimo)
+- `backdrop-blur-md` - 12px blur (leggero)
+- `backdrop-blur-lg` - 16px blur (standard)
+- `backdrop-blur-xl` - 24px blur (intenso)
+- `backdrop-blur-2xl` - 40px blur (massimo)
+
+**Opacity Levels**:
+- `bg-white/[0.01]` - 1% (ultra-trasparente, mostra icone/contenuto sotto)
+- `bg-white/5` - 5% (molto trasparente)
+- `bg-white/10` - 10% (trasparente standard)
+- `bg-white/20` - 20% (semi-trasparente)
+
+**Best Practice**:
+- Usa blur intenso + opacità bassa per vedere contenuto sotto
+- Usa blur leggero + opacità alta per box leggibili
+- Combina sempre con `shadow-liquid` per profondità
+
+**Layering con WebGL**:
+```jsx
+<div className="relative backdrop-blur-md bg-white/[0.01]">
+  {/* WebGL canvas z-0 (background) */}
+  <canvas className="absolute inset-0 z-0 pointer-events-none" />
+
+  {/* Contenuto z-10 (foreground) */}
+  <div className="relative z-10">Content</div>
+</div>
+```
+
+Vedi [Patterns - WebGL Canvas Pattern](./patterns.md#webgl-canvas-pattern).
+
 ## Z-Index Layers
 
 Gerarchia z-index consistente:

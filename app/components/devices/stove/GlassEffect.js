@@ -3,14 +3,19 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * GlassEffect - WebGL frosted glass effect for data boxes
- * Creates a subtle animated transparency effect using WebGL shaders
+ * GlassEffect - Optimized WebGL liquid glass effect
+ *
+ * Effetto vetro liquido ultra-leggero che funziona con qualsiasi contenuto sottostante.
+ * Utilizza CSS backdrop-filter per il blur e WebGL solo per pattern frost animato.
  *
  * @param {Object} props
- * @param {string} props.bgColor - Background color as hex string (e.g., '#ff5500')
+ * @param {string} props.bgColor - Background color as hex string (default: '#ffffff')
  * @param {number} props.opacity - Base opacity 0-1 (default: 0.15)
  */
-export default function GlassEffect({ bgColor = '#ffffff', opacity = 0.15 }) {
+export default function GlassEffect({
+  bgColor = '#ffffff',
+  opacity = 0.15
+}) {
   const canvasRef = useRef(null);
   const [webglError, setWebglError] = useState(false);
 
@@ -18,113 +23,97 @@ export default function GlassEffect({ bgColor = '#ffffff', opacity = 0.15 }) {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const gl = canvas.getContext('webgl2', {
-      antialias: true,
+    const gl = canvas.getContext('webgl', {
+      antialias: false, // Disabilita per performance
       alpha: true,
-      premultipliedAlpha: false
+      premultipliedAlpha: false,
+      depth: false,
+      stencil: false
     });
 
     if (!gl) {
-      console.warn('WebGL2 non disponibile per effetto vetro');
       setWebglError(true);
       return;
     }
+
+    // Abilita blending per trasparenza
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     let animationId;
     let startTime = performance.now();
     let resizeObserver;
 
-    // Vertex shader (fullscreen triangle)
-    const vertexShaderSource = `#version 300 es
-precision highp float;
-void main(){
-  vec2 v[3];
-  v[0]=vec2(-1.0,-1.0); v[1]=vec2(3.0,-1.0); v[2]=vec2(-1.0,3.0);
-  gl_Position = vec4(v[gl_VertexID],0.0,1.0);
-}`;
+    // Vertex shader - fullscreen quad
+    const vertexShaderSource = `
+      attribute vec2 position;
+      void main() {
+        gl_Position = vec4(position, 0.0, 1.0);
+      }
+    `;
 
-    // Fragment shader (glassmorphism effect - più intenso)
-    const fragmentShaderSource = `#version 300 es
-precision highp float;
-out vec4 fragColor;
+    // Fragment shader - ottimizzato per performance
+    const fragmentShaderSource = `
+      precision mediump float;
 
-uniform vec2  uRes;
-uniform float uTime;
-uniform vec3  uColor;
-uniform float uOpacity;
+      uniform vec2 uRes;
+      uniform float uTime;
 
-// Simple hash for noise
-float hash21(vec2 p){
-  return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453);
-}
+      // Hash semplificato per noise
+      float hash(vec2 p) {
+        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+      }
 
-// Smooth value noise
-float noise(vec2 p){
-  vec2 i = floor(p);
-  vec2 f = fract(p);
-  vec2 u = f*f*(3.0-2.0*f);
-  return mix(
-    mix(hash21(i), hash21(i+vec2(1,0)), u.x),
-    mix(hash21(i+vec2(0,1)), hash21(i+vec2(1,1)), u.x),
-    u.y
-  );
-}
+      // Noise ottimizzato
+      float noise(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        vec2 u = f * f * (3.0 - 2.0 * f);
 
-// Frosted glass texture (più pronunciato)
-float frostPattern(vec2 uv, float time){
-  // Multi-scale noise for stronger frosted effect
-  float n = 0.0;
-  n += noise(uv * 6.0 + time * 0.08) * 0.6;
-  n += noise(uv * 12.0 - time * 0.12) * 0.3;
-  n += noise(uv * 24.0 + time * 0.06) * 0.15;
-  n += noise(uv * 48.0 - time * 0.1) * 0.075;
+        float a = hash(i);
+        float b = hash(i + vec2(1.0, 0.0));
+        float c = hash(i + vec2(0.0, 1.0));
+        float d = hash(i + vec2(1.0, 1.0));
 
-  return n;
-}
+        return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+      }
 
-void main(){
-  vec2 uv = gl_FragCoord.xy / uRes;
-  float t = uTime * 0.25;
+      // Frost pattern semplificato (3 ottave invece di 4)
+      float frost(vec2 uv, float time) {
+        float n = 0.0;
+        n += noise(uv * 6.0 + time * 0.08) * 0.6;
+        n += noise(uv * 12.0 - time * 0.12) * 0.3;
+        n += noise(uv * 24.0 + time * 0.06) * 0.1;
+        return n;
+      }
 
-  // Get frost pattern (più intenso)
-  float frost = frostPattern(uv * 3.5, t);
+      void main() {
+        vec2 uv = gl_FragCoord.xy / uRes;
 
-  // Subtle shimmer effect
-  float shimmer = sin(uv.x * 8.0 + t * 1.2) * sin(uv.y * 8.0 - t * 1.2) * 0.05;
+        // Frost pattern animato
+        float frostValue = frost(uv * 4.0, uTime * 0.25);
 
-  // Distortion effect for glass refraction
-  vec2 distortion = vec2(
-    noise(uv * 15.0 + t * 0.1),
-    noise(uv * 15.0 - t * 0.1)
-  ) * 0.01;
+        // Bianco puro per effetto glass (non usa bgColor!)
+        vec3 color = vec3(1.0);
 
-  uv += distortion;
+        // Shimmer impercettibile
+        float shimmer = sin(uv.x * 10.0 + uTime) * sin(uv.y * 10.0 - uTime) * 0.005;
 
-  // Combine with stronger alpha variation
-  float alpha = uOpacity + frost * 0.08 + shimmer;
-  alpha = clamp(alpha, 0.0, 1.0);
+        // Alpha basata solo sul frost pattern
+        // Questa è SOLO texture, non colore di sfondo
+        float alpha = frostValue * 0.03;
 
-  // Apply color with transparency
-  vec3 color = uColor;
-
-  // More pronounced brightness variation for glass depth
-  color *= 0.92 + frost * 0.16;
-
-  // Add slight edge highlights (glass reflection)
-  float edgeX = smoothstep(0.0, 0.05, uv.x) * smoothstep(1.0, 0.95, uv.x);
-  float edgeY = smoothstep(0.0, 0.05, uv.y) * smoothstep(1.0, 0.95, uv.y);
-  float edge = min(edgeX, edgeY);
-  color += vec3(1.0) * (1.0 - edge) * 0.08;
-
-  fragColor = vec4(color, alpha);
-}`;
+        gl_FragColor = vec4(color, alpha);
+      }
+    `;
 
     function compileShader(source, type) {
       const shader = gl.createShader(type);
       gl.shaderSource(shader, source);
       gl.compileShader(shader);
+
       if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        console.error('Glass shader error:', gl.getShaderInfoLog(shader));
+        console.error('GlassEffect shader error:', gl.getShaderInfoLog(shader));
         gl.deleteShader(shader);
         return null;
       }
@@ -133,50 +122,52 @@ void main(){
 
     const vs = compileShader(vertexShaderSource, gl.VERTEX_SHADER);
     const fs = compileShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
+
     if (!vs || !fs) {
       setWebglError(true);
       return;
     }
 
-    const prog = gl.createProgram();
-    gl.attachShader(prog, vs);
-    gl.attachShader(prog, fs);
-    gl.linkProgram(prog);
+    const program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
 
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
-      console.error('Glass program error:', gl.getProgramInfoLog(prog));
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.error('GlassEffect program error:', gl.getProgramInfoLog(program));
       setWebglError(true);
       return;
     }
 
-    gl.useProgram(prog);
+    gl.useProgram(program);
 
+    // Setup fullscreen quad
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
+      gl.STATIC_DRAW
+    );
+
+    const position = gl.getAttribLocation(program, 'position');
+    gl.enableVertexAttribArray(position);
+    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+
+    // Get uniform locations
     const uniforms = {
-      uRes: gl.getUniformLocation(prog, 'uRes'),
-      uTime: gl.getUniformLocation(prog, 'uTime'),
-      uColor: gl.getUniformLocation(prog, 'uColor'),
-      uOpacity: gl.getUniformLocation(prog, 'uOpacity')
+      resolution: gl.getUniformLocation(program, 'uRes'),
+      time: gl.getUniformLocation(program, 'uTime')
     };
-
-    const vao = gl.createVertexArray();
-    gl.bindVertexArray(vao);
-
-    // Parse color
-    const hexToRgb = (hex) => {
-      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-      return result ? [
-        parseInt(result[1], 16) / 255,
-        parseInt(result[2], 16) / 255,
-        parseInt(result[3], 16) / 255
-      ] : [1, 1, 1];
-    };
-
-    const colorRgb = hexToRgb(bgColor);
 
     function resize() {
+      const rect = canvas.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2.0);
-      const w = Math.floor(canvas.clientWidth * dpr);
-      const h = Math.floor(canvas.clientHeight * dpr);
+      const w = Math.floor(rect.width * dpr);
+      const h = Math.floor(rect.height * dpr);
+
+      if (w === 0 || h === 0) return;
+
       if (canvas.width !== w || canvas.height !== h) {
         canvas.width = w;
         canvas.height = h;
@@ -186,31 +177,36 @@ void main(){
 
     function animate() {
       resize();
-      const t = (performance.now() - startTime) * 0.001;
+      const currentTime = (performance.now() - startTime) * 0.001;
 
-      gl.uniform2f(uniforms.uRes, canvas.width, canvas.height);
-      gl.uniform1f(uniforms.uTime, t);
-      gl.uniform3f(uniforms.uColor, colorRgb[0], colorRgb[1], colorRgb[2]);
-      gl.uniform1f(uniforms.uOpacity, opacity);
+      // Clear con alpha 0
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
 
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
+      gl.uniform1f(uniforms.time, currentTime);
+
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       animationId = requestAnimationFrame(animate);
     }
 
-    resize();
-    resizeObserver = new ResizeObserver(resize);
-    resizeObserver.observe(canvas);
-    animate();
+    // Forza resize iniziale
+    requestAnimationFrame(() => {
+      resize();
+      resizeObserver = new ResizeObserver(resize);
+      resizeObserver.observe(canvas);
+      animate();
+    });
 
     return () => {
       if (animationId) cancelAnimationFrame(animationId);
       if (resizeObserver) resizeObserver.disconnect();
-      gl.deleteProgram(prog);
+      gl.deleteProgram(program);
       gl.deleteShader(vs);
       gl.deleteShader(fs);
-      gl.deleteVertexArray(vao);
+      gl.deleteBuffer(buffer);
     };
-  }, [bgColor, opacity]);
+  }, []);
 
   if (webglError) {
     // Fallback CSS
@@ -228,8 +224,14 @@ void main(){
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 w-full h-full"
-      style={{ display: 'block' }}
+      className="absolute inset-0 w-full h-full pointer-events-none z-0"
+      style={{
+        display: 'block',
+        width: '100%',
+        height: '100%',
+        mixBlendMode: 'overlay',
+        opacity: 0.15
+      }}
     />
   );
 }

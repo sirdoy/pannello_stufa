@@ -5,6 +5,57 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.12.1] - 2025-11-04
+
+### Ottimizzato
+- **GlassEffect completamente riscritto**: massima trasparenza e performance
+  - **Shader ultra-semplificato**: solo frost pattern animato con 3 ottave noise (era 4)
+  - **Uniformi ridotte**: da 9 a 2 (solo `uRes` e `uTime`) per performance ottimali
+  - **Rimossi bgColor/opacity dalle uniformi**: shader usa solo texture bianca trasparente
+  - **Alpha minimalista**: 3% frost pattern, rest totalmente trasparente
+  - **Mix-blend-mode overlay**: blend naturale con contenuto sottostante
+  - **WebGL context ottimizzato**: antialias/depth/stencil disabilitati (-30% GPU overhead)
+  - File: `app/components/devices/stove/GlassEffect.js` (264 righe, -25% da v1.12.0)
+
+- **StoveCard box ultra-trasparenti**: visualizzazione icona stato sottostante
+  - **bg-white/[0.01]**: opacità 1% (era 10%) per massima trasparenza
+  - **backdrop-blur-md**: blur ridotto per vedere meglio icona sotto
+  - Box Ventola e Potenza ora trasparenti per mostrare fiocco/fiamma dietro
+  - File: `app/components/devices/stove/StoveCard.js:612,635`
+
+### Performance
+- **Bundle size ridotto**: homepage da 18.6 kB a 17.2 kB (-7.5%)
+- **GPU performance**: WebGL context config ottimizzata per rendering leggero
+- **Shader simplification**: da ~145 righe a ~35 righe di GLSL (-76%)
+
+### Rimosso
+- Props inutilizzate: `interactive`, `lensStrength`, `maskStrength1/2/3`
+- Mouse tracking e lens distortion (non necessari per static glass)
+- Multi-layer masking system (rb1, rb2, rb3) troppo complesso
+- Gradient lighting e edge highlights pesanti
+
+## [1.12.0] - 2025-11-04
+
+### Aggiunto
+- **GlassEffect avanzato**: implementazione liquid glass inspired da Apple WWDC 2025
+  - Integrato codice da repository `rxing365/html-liquid-glass-effect-webgl`
+  - **Signed Distance Functions (SDF)**: rounded box dinamico con corner radius personalizzabile
+  - **Normal mapping 3D**: calcolo normali real-time da height field per profondità realistica
+  - **Rifrazione background**: doppia rifrazione (entry/exit) attraverso materiale vetro con IOR configurabile
+  - **Frosted blur multisampling**: blur 3x3 box con frost pattern multi-scala per effetto smerigliato
+  - **Edge highlights realistici**: rim light basato su orientazione normali + edge detection distance-based
+  - Props configurabili: `ior` (0.8-1.5), `thickness`, `blurRadius`, `cornerRadius` per massima flessibilità
+  - File: `app/components/devices/stove/GlassEffect.js`
+
+### Modificato
+- **Fragment shader migliorato**: sostituito shader semplice con implementazione avanzata
+  - Aggiunte funzioni SDF: `smin_polynomial`, `smax_polynomial`, `sdRoundedBoxSmooth` per forme fluide
+  - Funzione `calculateNormal()`: gradients-based normal mapping per effetto 3D depth
+  - Funzione `applyFrostedBlur()`: 3x3 sampling per blur realistico
+  - Refraction pipeline: doppio refract() con calcolo displacement thickness-aware
+  - Edge highlights: combinazione rim light + distance-based edge detection
+  - Parametri uniforms estesi: `uIOR`, `uThickness`, `uBlurRadius`, `uCornerRadius`
+
 ## [1.11.1] - 2025-11-04
 
 ### Modificato

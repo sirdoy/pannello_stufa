@@ -49,7 +49,11 @@
       "WebFetch(domain:dev.to)",
       "Bash(tee /tmp/build_output.log)",
       "Bash(tee /tmp/build_output2.log)",
-      "Bash(tee:*)"
+      "Bash(tee:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:codepen.io)",
+      "WebFetch(domain:www.grafit.agency)"
     ],
     "deny": [],
     "ask": []

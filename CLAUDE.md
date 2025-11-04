@@ -48,7 +48,7 @@
 - **Next.js 15.5.4**: App Router, Server/Client Components, API Routes
 - **React 19.2**: Hooks, Suspense, modern async patterns
 - **Tailwind CSS 3**: Utility-first + liquid glass iOS 18 style
-- **WebGL2**: Effetti UI (glassmorphism, trasparenze) tramite shader custom
+- **WebGL**: Effetti UI animati (frost patterns, texture overlays) tramite shader GLSL ottimizzati
 - **Firebase Realtime DB**: Scheduler, logs, versioning, push tokens
 - **Auth0**: Autenticazione sicura
 - **Thermorossi Cloud API**: Controllo stufa
@@ -386,5 +386,5 @@ ADMIN_USER_ID=auth0|xxx
 ---
 
 **Last Updated**: 2025-11-04
-**Version**: 1.11.1
+**Version**: 1.12.1 (patch: WebGL ottimizzazioni performance)
 **Author**: Federico Manfredi

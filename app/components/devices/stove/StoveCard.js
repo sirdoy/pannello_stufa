@@ -609,7 +609,7 @@ export default function StoveCard() {
                         {/* Due box glassmorphism (z-10, davanti all'icona) */}
                         <div className="relative z-10 w-full grid grid-cols-2 gap-3 sm:gap-4 mt-4">
                           {/* Box Ventola */}
-                          <div className="relative overflow-hidden rounded-2xl shadow-elevated backdrop-blur-2xl">
+                          <div className="relative overflow-hidden rounded-2xl shadow-elevated backdrop-blur-md bg-white/[0.01]">
                             {/* Effetto vetro WebGL */}
                             <GlassEffect
                               bgColor={statusInfo.glassColor}
@@ -632,7 +632,7 @@ export default function StoveCard() {
                           </div>
 
                           {/* Box Potenza */}
-                          <div className="relative overflow-hidden rounded-2xl shadow-elevated backdrop-blur-2xl">
+                          <div className="relative overflow-hidden rounded-2xl shadow-elevated backdrop-blur-md bg-white/[0.01]">
                             {/* Effetto vetro WebGL */}
                             <GlassEffect
                               bgColor={statusInfo.glassColor}

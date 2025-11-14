@@ -123,11 +123,11 @@ export default function Navbar() {
 
     const activeClasses = mobile
       ? active
-        ? 'bg-primary-500/10 backdrop-blur-2xl text-primary-700 shadow-liquid-sm ring-1 ring-primary-500/20 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-primary-400/10 before:to-transparent before:pointer-events-none'
-        : 'text-neutral-800 bg-white/[0.08] backdrop-blur-2xl hover:bg-white/[0.12] shadow-liquid-sm ring-1 ring-white/20 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none'
+        ? 'bg-primary-500/10 dark:bg-primary-500/20 backdrop-blur-2xl text-primary-700 dark:text-primary-400 shadow-liquid-sm ring-1 ring-primary-500/20 dark:ring-primary-500/30 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-primary-400/10 dark:before:from-primary-400/20 before:to-transparent before:pointer-events-none'
+        : 'text-neutral-800 dark:text-neutral-200 bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl hover:bg-white/[0.12] dark:hover:bg-white/[0.08] shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none'
       : active
-        ? 'bg-primary-50 text-primary-600 shadow-sm'
-        : 'text-neutral-700 hover:bg-neutral-100';
+        ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 shadow-sm'
+        : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800';
 
     return (
       <Link
@@ -142,7 +142,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="sticky top-0 z-50 w-full bg-white/[0.08] backdrop-blur-3xl border-b border-white/20 shadow-liquid">
+      <nav className="sticky top-0 z-50 w-full bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-3xl border-b border-white/20 dark:border-white/10 shadow-liquid">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16 lg:h-[4.5rem]">
 
@@ -173,8 +173,8 @@ export default function Navbar() {
                     onClick={() => setDesktopDeviceDropdown(desktopDeviceDropdown === device.id ? null : device.id)}
                     className={`flex items-center gap-1.5 px-3 xl:px-4 py-2 rounded-xl text-sm xl:text-base font-medium transition-all duration-200 ${
                       pathname.startsWith(`/${device.id}`)
-                        ? 'bg-primary-50 text-primary-600 shadow-sm'
-                        : 'text-neutral-700 hover:bg-neutral-100'
+                        ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 shadow-sm'
+                        : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800'
                     }`}
                     aria-expanded={desktopDeviceDropdown === device.id}
                   >
@@ -195,15 +195,15 @@ export default function Navbar() {
 
                   {/* Desktop Dropdown Menu */}
                   {desktopDeviceDropdown === device.id && (
-                    <div className="absolute left-0 mt-2 w-48 xl:w-56 bg-white/[0.10] backdrop-blur-3xl border border-white/20 rounded-xl shadow-liquid-lg overflow-hidden z-[9000] ring-1 ring-white/10 ring-inset">
+                    <div className="absolute left-0 mt-2 w-48 xl:w-56 bg-white/[0.10] dark:bg-white/[0.08] backdrop-blur-3xl border border-white/20 dark:border-white/10 rounded-xl shadow-liquid-lg overflow-hidden z-[9000] ring-1 ring-white/10 dark:ring-white/5 ring-inset">
                       {device.items.map(item => (
                         <Link
                           key={item.route}
                           href={item.route}
                           className={`block px-4 py-2.5 text-sm xl:text-base font-medium transition-colors duration-200 ${
                             isActive(item.route)
-                              ? 'bg-primary-50 text-primary-600'
-                              : 'text-neutral-700 hover:bg-neutral-100'
+                              ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
+                              : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800/50'
                           }`}
                           onClick={() => setDesktopDeviceDropdown(null)}
                         >
@@ -228,17 +228,17 @@ export default function Navbar() {
                 <div className="relative" ref={settingsDropdownRef}>
                   <button
                     onClick={() => setSettingsDropdownOpen(!settingsDropdownOpen)}
-                    className={`px-3 lg:px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                    className={`flex items-center gap-1.5 px-3 xl:px-4 py-2 rounded-xl text-sm xl:text-base font-medium transition-all duration-200 ${
                       settingsDropdownOpen || navStructure.settings.some(item => isActive(item.route))
-                        ? 'bg-primary-50 text-primary-600 shadow-sm'
-                        : 'text-neutral-700 hover:bg-neutral-100'
+                        ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 shadow-sm'
+                        : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800'
                     }`}
                     aria-expanded={settingsDropdownOpen}
                   >
-                    <span className="text-sm xl:text-base">⚙️</span>
+                    <span className="text-base xl:text-lg">⚙️</span>
                     <span className="xl:inline hidden">Impostazioni</span>
                     <svg
-                      className={`w-3.5 h-3.5 transition-transform duration-200 ${settingsDropdownOpen ? 'rotate-180' : ''}`}
+                      className={`w-4 h-4 transition-transform duration-200 ${settingsDropdownOpen ? 'rotate-180' : ''}`}
                       fill="none"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -251,19 +251,19 @@ export default function Navbar() {
                   </button>
 
                   {settingsDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-64 xl:w-72 bg-white/[0.10] backdrop-blur-3xl border border-white/20 rounded-xl shadow-liquid-lg overflow-hidden z-[9000] ring-1 ring-white/10 ring-inset">
+                    <div className="absolute right-0 mt-2 w-64 xl:w-72 bg-white/[0.10] dark:bg-white/[0.08] backdrop-blur-3xl border border-white/20 dark:border-white/10 rounded-xl shadow-liquid-lg overflow-hidden z-[9000] ring-1 ring-white/10 dark:ring-white/5 ring-inset">
                       {navStructure.settings.map((item, idx) => (
                         <Link
                           key={item.id}
                           href={item.route}
                           className={`block px-4 py-3 text-sm xl:text-base transition-colors duration-200 ${
                             idx !== navStructure.settings.length - 1
-                              ? 'border-b border-neutral-200/50'
+                              ? 'border-b border-neutral-200/50 dark:border-neutral-700/50'
                               : ''
                           } ${
                             isActive(item.route)
-                              ? 'bg-primary-50 text-primary-600 font-medium'
-                              : 'text-neutral-800 hover:bg-neutral-100/50'
+                              ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 font-medium'
+                              : 'text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100/50 dark:hover:bg-neutral-800/50'
                           }`}
                           onClick={() => setSettingsDropdownOpen(false)}
                         >
@@ -272,7 +272,7 @@ export default function Navbar() {
                             <div className="flex-1">
                               <div className="font-medium">{item.label}</div>
                               {item.description && (
-                                <div className="text-xs text-neutral-600 mt-0.5">{item.description}</div>
+                                <div className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">{item.description}</div>
                               )}
                             </div>
                           </div>
@@ -288,7 +288,7 @@ export default function Navbar() {
                 <div className="relative ml-2" ref={userDropdownRef}>
                   <button
                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.08] hover:bg-white/[0.12] backdrop-blur-2xl border border-white/20 text-neutral-700 shadow-liquid-sm ring-1 ring-white/10 ring-inset transition-all duration-200"
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] hover:bg-white/[0.12] dark:hover:bg-white/[0.08] backdrop-blur-2xl border border-white/20 dark:border-white/10 text-neutral-700 dark:text-neutral-300 shadow-liquid-sm ring-1 ring-white/10 dark:ring-white/5 ring-inset transition-all duration-200"
                     aria-expanded={userDropdownOpen}
                   >
                     <span className="text-sm xl:text-base">👤</span>
@@ -309,17 +309,17 @@ export default function Navbar() {
                   </button>
 
                   {userDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 xl:w-64 bg-white/[0.10] backdrop-blur-3xl border border-white/20 rounded-xl shadow-liquid-lg overflow-hidden z-[9000] ring-1 ring-white/10 ring-inset">
-                      <div className="px-4 py-3 border-b border-neutral-200/50">
-                        <p className="text-xs text-neutral-500">Connesso come</p>
-                        <p className="text-sm xl:text-base font-medium text-neutral-800 truncate mt-0.5">{user.name}</p>
+                    <div className="absolute right-0 mt-2 w-56 xl:w-64 bg-white/[0.10] dark:bg-white/[0.08] backdrop-blur-3xl border border-white/20 dark:border-white/10 rounded-xl shadow-liquid-lg overflow-hidden z-[9000] ring-1 ring-white/10 dark:ring-white/5 ring-inset">
+                      <div className="px-4 py-3 border-b border-neutral-200/50 dark:border-neutral-700/50">
+                        <p className="text-xs text-neutral-500 dark:text-neutral-400">Connesso come</p>
+                        <p className="text-sm xl:text-base font-medium text-neutral-800 dark:text-neutral-200 truncate mt-0.5">{user.name}</p>
                         {user.email && (
-                          <p className="text-xs text-neutral-500 truncate mt-1">{user.email}</p>
+                          <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate mt-1">{user.email}</p>
                         )}
                       </div>
                       <Link
                         href="/api/auth/logout"
-                        className="block px-4 py-3 text-sm xl:text-base font-medium text-primary-600 hover:bg-primary-50 transition-colors duration-200"
+                        className="block px-4 py-3 text-sm xl:text-base font-medium text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors duration-200"
                         onClick={() => setUserDropdownOpen(false)}
                       >
                         Logout
@@ -333,12 +333,12 @@ export default function Navbar() {
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 sm:p-2.5 rounded-xl hover:bg-neutral-100 transition-colors duration-200"
+              className="lg:hidden p-2 sm:p-2.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200"
               aria-label={mobileMenuOpen ? 'Chiudi menu' : 'Apri menu'}
               aria-expanded={mobileMenuOpen}
             >
               <svg
-                className="w-5 h-5 sm:w-6 sm:h-6 text-neutral-700"
+                className="w-5 h-5 sm:w-6 sm:h-6 text-neutral-700 dark:text-neutral-300"
                 fill="none"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -368,17 +368,17 @@ export default function Navbar() {
           />
 
           {/* Mobile Menu Panel */}
-          <div className="fixed top-[3.5rem] sm:top-16 left-0 right-0 bottom-0 bg-white/[0.10] backdrop-blur-3xl z-[9001] lg:hidden overflow-y-auto">
+          <div className="fixed top-[3.5rem] sm:top-16 left-0 right-0 bottom-0 bg-white/[0.10] dark:bg-white/[0.08] backdrop-blur-3xl z-[9001] lg:hidden overflow-y-auto">
             <div className="px-3 sm:px-4 py-4 space-y-2">
 
               {/* User Info */}
               {user && (
-                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-white/[0.08] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-white/20 ring-inset mb-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none">
+                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset mb-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
                   <span className="text-lg relative z-10">👤</span>
                   <div className="flex-1 min-w-0 relative z-10">
-                    <p className="text-sm font-medium truncate text-neutral-900">{user.name}</p>
+                    <p className="text-sm font-medium truncate text-neutral-900 dark:text-neutral-100">{user.name}</p>
                     {user.email && (
-                      <p className="text-xs text-neutral-600 truncate">{user.email}</p>
+                      <p className="text-xs text-neutral-600 dark:text-neutral-400 truncate">{user.email}</p>
                     )}
                   </div>
                 </div>
@@ -391,8 +391,8 @@ export default function Navbar() {
                     onClick={() => setMobileDeviceDropdown(mobileDeviceDropdown === device.id ? null : device.id)}
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 relative overflow-hidden ${
                       pathname.startsWith(`/${device.id}`)
-                        ? 'bg-primary-500/10 backdrop-blur-2xl text-primary-700 shadow-liquid-sm ring-1 ring-primary-500/20 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-primary-400/10 before:to-transparent before:pointer-events-none'
-                        : 'text-neutral-800 bg-white/[0.08] backdrop-blur-2xl hover:bg-white/[0.12] shadow-liquid-sm ring-1 ring-white/20 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none'
+                        ? 'bg-primary-500/10 dark:bg-primary-500/20 backdrop-blur-2xl text-primary-700 dark:text-primary-400 shadow-liquid-sm ring-1 ring-primary-500/20 dark:ring-primary-500/30 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-primary-400/10 dark:before:from-primary-400/20 before:to-transparent before:pointer-events-none'
+                        : 'text-neutral-800 dark:text-neutral-200 bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl hover:bg-white/[0.12] dark:hover:bg-white/[0.08] shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none'
                     }`}
                   >
                     <span className="flex items-center gap-3 relative z-10">

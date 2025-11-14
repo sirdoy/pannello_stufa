@@ -20,7 +20,7 @@ export default async function Home() {
         <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
           I tuoi dispositivi
         </h1>
-        <p className="text-sm sm:text-base text-neutral-600 mt-2">
+        <p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-400 mt-2">
           Controlla e monitora tutti i dispositivi della tua casa
         </p>
       </div>
@@ -44,12 +44,12 @@ export default async function Home() {
           if (device.id === 'sonos') {
             // Placeholder - future implementation
             return (
-              <div key={device.id} className="p-6 rounded-2xl bg-white/[0.08] backdrop-blur-2xl border border-white/20 shadow-liquid">
+              <div key={device.id} className="p-6 rounded-2xl bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl border border-white/20 dark:border-white/10 shadow-liquid">
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-3xl">{device.icon}</span>
-                  <h2 className="text-xl font-bold text-neutral-900">{device.name}</h2>
+                  <h2 className="text-xl font-bold text-neutral-900 dark:text-white">{device.name}</h2>
                 </div>
-                <p className="text-sm text-neutral-600">In arrivo - Integrazione Spotify + Sonos</p>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">In arrivo - Integrazione Spotify + Sonos</p>
               </div>
             );
           }
@@ -60,7 +60,7 @@ export default async function Home() {
       {/* Empty State */}
       {enabledDevices.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-neutral-500">Nessun dispositivo configurato</p>
+          <p className="text-neutral-500 dark:text-neutral-400">Nessun dispositivo configurato</p>
         </div>
       )}
     </main>

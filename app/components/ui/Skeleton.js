@@ -22,7 +22,7 @@
 export default function Skeleton({ className = '', ...props }) {
   return (
     <div
-      className={`bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] rounded animate-shimmer ${className}`}
+      className={`bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-neutral-700 dark:via-neutral-600 dark:to-neutral-700 bg-[length:200%_100%] rounded animate-shimmer ${className}`}
       {...props}
     />
   );
@@ -34,7 +34,7 @@ export default function Skeleton({ className = '', ...props }) {
 Skeleton.Card = function SkeletonCard({ children, className = '', ...props }) {
   return (
     <div
-      className={`bg-white rounded-2xl shadow-soft border border-neutral-200/50 backdrop-blur-sm ${className}`}
+      className={`bg-white dark:bg-neutral-800 rounded-2xl shadow-soft border border-neutral-200/50 dark:border-neutral-700/50 backdrop-blur-sm ${className}`}
       {...props}
     >
       {children}

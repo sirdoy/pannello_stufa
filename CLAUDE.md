@@ -75,8 +75,8 @@ pannello-stufa/
 │   │       ├── stove/            # StoveCard
 │   │       ├── thermostat/       # ThermostatCard
 │   │       └── lights/           # LightsCard
-│   ├── context/                  # VersionContext
-│   ├── hooks/                    # useVersionCheck
+│   ├── context/                  # VersionContext, ThemeContext
+│   ├── hooks/                    # useVersionCheck, useTheme
 │   ├── page.js                   # Homepage (multi-device grid)
 │   ├── scheduler/page.js         # Pianificazione settimanale
 │   ├── maintenance/page.js       # Configurazione manutenzione
@@ -85,7 +85,8 @@ pannello-stufa/
 │   ├── changelog/page.js        # Versioni app
 │   ├── settings/
 │   │   ├── notifications/       # Gestione notifiche push
-│   │   └── devices/             # Gestione dispositivi abilitati
+│   │   ├── devices/             # Gestione dispositivi abilitati
+│   │   └── theme/               # Tema dark/light mode
 │
 ├── lib/                          # Business Logic
 │   ├── devices/                  # Device registry (DEVICE_CONFIG)
@@ -99,6 +100,7 @@ pannello-stufa/
 │   ├── notificationService.js   # FCM client-side
 │   ├── notificationPreferencesService.js  # Notification preferences
 │   ├── devicePreferencesService.js        # Device enable/disable preferences
+│   ├── themeService.js          # Theme dark/light persistence (Firebase + localStorage)
 │   ├── version.js               # APP_VERSION, VERSION_HISTORY
 │   ├── changelogService.js      # Changelog sync Firebase
 │   ├── netatmo/                 # Netatmo integration (OAuth)
@@ -192,16 +194,22 @@ export const DEVICE_CONFIG = {
 
 📖 **Dettagli**: [Architecture](docs/architecture.md)
 
-### Liquid Glass Style (iOS 18)
+### Liquid Glass Style (iOS 18) + Dark Mode
 
-Pattern UI unificato per consistenza visiva.
+Pattern UI unificato con supporto dark mode completo.
 
 ```jsx
 <Card liquid className="p-6">Content</Card>
 <Button liquid variant="primary">Azione</Button>
 ```
 
-📖 **Dettagli**: [UI Components - Liquid Glass](docs/ui-components.md#liquid-glass-style-pattern)
+**Dark Mode**: Tema scuro con glass effect ottimizzato
+- **Attivazione**: Settings → Tema (🎨)
+- **Storage**: Firebase sync multi-device + localStorage fallback
+- **Zero flash**: Script blocking pre-hydration
+- **Palette**: Glass scuro (`bg-white/[0.05]`) + gradiente neutral-900
+
+📖 **Dettagli**: [UI Components - Dark Mode](docs/ui-components.md#-dark-mode)
 
 ### Scheduler Modes
 
@@ -386,5 +394,5 @@ ADMIN_USER_ID=auth0|xxx
 ---
 
 **Last Updated**: 2025-11-14
-**Version**: 1.13.0 (minor: Environment Separation API Tokens + Netatmo OAuth Fix)
+**Version**: 1.14.0 (minor: Dark Mode Completo con Glass Effect Scuro)
 **Author**: Federico Manfredi

@@ -25,7 +25,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="it">
+    <html lang="it" suppressHydrationWarning>
     <head>
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
       <link rel="apple-touch-icon" href="/icons/icon-192.png" />
@@ -35,8 +35,21 @@ export default function RootLayout({ children }) {
       <meta name="apple-mobile-web-app-title" content="Stufa" />
       <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       <meta name="mobile-web-app-capable" content="yes" />
+
+      {/* Theme script - blocking per evitare flash */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            try {
+              if (localStorage.getItem('pannello-stufa-theme') === 'dark') {
+                document.documentElement.classList.add('dark');
+              }
+            } catch (e) {}
+          `,
+        }}
+      />
     </head>
-    <body className="min-h-screen text-neutral-900 flex flex-col">
+    <body className="min-h-screen text-neutral-900 dark:text-neutral-100 flex flex-col" suppressHydrationWarning>
     <ClientProviders>
       <VersionEnforcer />
       <Navbar />

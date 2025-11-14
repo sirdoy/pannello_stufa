@@ -2,6 +2,8 @@
 
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { VersionProvider } from '@/app/context/VersionContext';
+import { ThemeProvider } from '@/app/context/ThemeContext';
+import ThemeScript from './ThemeScript';
 
 /**
  * Wrapper per tutti i provider client-side
@@ -10,9 +12,12 @@ import { VersionProvider } from '@/app/context/VersionContext';
 export default function ClientProviders({ children }) {
   return (
     <UserProvider>
-      <VersionProvider>
-        {children}
-      </VersionProvider>
+      <ThemeScript />
+      <ThemeProvider>
+        <VersionProvider>
+          {children}
+        </VersionProvider>
+      </ThemeProvider>
     </UserProvider>
   );
 }

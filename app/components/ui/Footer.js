@@ -17,8 +17,8 @@ export default function Footer({ className = '' }) {
       <footer
         className={`
           w-full py-4 sm:py-6 mt-auto
-          bg-white/90 backdrop-blur-xl shadow-glass-lg
-          border-t border-neutral-200/50
+          bg-white/90 dark:bg-neutral-900/90 backdrop-blur-xl shadow-glass-lg
+          border-t border-neutral-200/50 dark:border-neutral-700/50
           relative z-10
           ${className}
         `}
@@ -26,33 +26,33 @@ export default function Footer({ className = '' }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-2">
             {/* Author info */}
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-neutral-600 order-2 sm:order-1">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 order-2 sm:order-1">
               <span className="hidden sm:inline">Made with</span>
               <span className="sm:hidden">❤️ by</span>
               <span className="hidden sm:inline text-red-500 text-base animate-pulse">❤️</span>
               <span className="hidden sm:inline">by</span>
-              <strong className="text-neutral-900">{APP_AUTHOR}</strong>
+              <strong className="text-neutral-900 dark:text-neutral-100">{APP_AUTHOR}</strong>
             </div>
 
             {/* Version info */}
             <div className="flex items-center gap-2 order-1 sm:order-2">
-              <span className="hidden sm:inline text-neutral-400 text-sm">•</span>
+              <span className="hidden sm:inline text-neutral-400 dark:text-neutral-500 text-sm">•</span>
               <Link
                 href="/changelog"
                 className="
                   group flex items-center gap-1.5 px-3 py-2 sm:px-0 sm:py-0
                   rounded-xl sm:rounded-none
-                  bg-neutral-50/50 sm:bg-transparent
-                  hover:bg-neutral-100 sm:hover:bg-transparent
-                  hover:text-primary-600
+                  bg-neutral-50/50 dark:bg-neutral-800/50 sm:bg-transparent sm:dark:bg-transparent
+                  hover:bg-neutral-100 dark:hover:bg-neutral-700 sm:hover:bg-transparent sm:dark:hover:bg-transparent
+                  hover:text-primary-600 dark:hover:text-primary-400
                   transition-all duration-200
                   active:scale-95 sm:active:scale-100
                   touch-manipulation
                   relative
                 "
               >
-                <span className="text-xs sm:text-sm text-neutral-600 group-hover:text-primary-600">Versione</span>
-                <strong className="text-sm sm:text-base text-neutral-900 group-hover:text-primary-600">
+                <span className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 group-hover:text-primary-600 dark:group-hover:text-primary-400">Versione</span>
+                <strong className="text-sm sm:text-base text-neutral-900 dark:text-neutral-100 group-hover:text-primary-600 dark:group-hover:text-primary-400">
                   {APP_VERSION}
                 </strong>
                 <span className="text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200">

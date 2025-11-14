@@ -539,14 +539,14 @@ export default function StoveCard() {
             )}
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
                 <span className="text-2xl sm:text-3xl">🔥</span>
                 <span>Stufa</span>
               </h2>
               <button
                 onClick={handleManualRefresh}
                 disabled={refreshing}
-                className="group relative p-3 rounded-xl bg-white/[0.08] hover:bg-white/[0.12] backdrop-blur-2xl shadow-liquid-sm hover:shadow-liquid active:scale-[0.98] transition-all duration-300 disabled:opacity-50 ring-1 ring-white/20 ring-inset overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none"
+                className="group relative p-3 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] hover:bg-white/[0.12] dark:hover:bg-white/[0.08] backdrop-blur-2xl shadow-liquid-sm hover:shadow-liquid active:scale-[0.98] transition-all duration-300 disabled:opacity-50 ring-1 ring-white/20 dark:ring-white/10 ring-inset overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none"
                 title="Aggiorna stato"
               >
                 <span className={`text-xl inline-block relative z-10 ${refreshing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`}>
@@ -591,7 +591,7 @@ export default function StoveCard() {
                           {statusInfo.label}
                         </h3>
                         {statusInfo.label.toUpperCase() !== status.toUpperCase() && (
-                          <p className="text-xs text-neutral-500 mt-1.5 font-mono opacity-40 tracking-wide">
+                          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1.5 font-mono opacity-40 tracking-wide">
                             {status}
                           </p>
                         )}
@@ -619,14 +619,14 @@ export default function StoveCard() {
                               <div className="flex items-center gap-1.5 mb-1.5">
                                 <span className="text-xl sm:text-2xl">💨</span>
                               </div>
-                              <p className="text-[10px] sm:text-xs font-bold text-neutral-600 uppercase tracking-wider mb-1">
+                              <p className="text-[10px] sm:text-xs font-bold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider mb-1">
                                 Ventola
                               </p>
                               <div className="flex items-baseline gap-0.5">
-                                <p className="text-2xl sm:text-3xl font-black text-neutral-800 leading-none">
+                                <p className="text-2xl sm:text-3xl font-black text-neutral-800 dark:text-neutral-100 leading-none">
                                   {fanLevel ?? '-'}
                                 </p>
-                                <span className="text-sm sm:text-base text-neutral-600 font-semibold">/6</span>
+                                <span className="text-sm sm:text-base text-neutral-600 dark:text-neutral-400 font-semibold">/6</span>
                               </div>
                             </div>
                           </div>
@@ -642,14 +642,14 @@ export default function StoveCard() {
                               <div className="flex items-center gap-1.5 mb-1.5">
                                 <span className="text-xl sm:text-2xl">⚡</span>
                               </div>
-                              <p className="text-[10px] sm:text-xs font-bold text-neutral-600 uppercase tracking-wider mb-1">
+                              <p className="text-[10px] sm:text-xs font-bold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider mb-1">
                                 Potenza
                               </p>
                               <div className="flex items-baseline gap-0.5">
-                                <p className="text-2xl sm:text-3xl font-black text-neutral-800 leading-none">
+                                <p className="text-2xl sm:text-3xl font-black text-neutral-800 dark:text-neutral-100 leading-none">
                                   {powerLevel ?? '-'}
                                 </p>
-                                <span className="text-sm sm:text-base text-neutral-600 font-semibold">/5</span>
+                                <span className="text-sm sm:text-base text-neutral-600 dark:text-neutral-400 font-semibold">/5</span>
                               </div>
                             </div>
                           </div>
@@ -662,10 +662,10 @@ export default function StoveCard() {
             {/* Separator */}
             <div className="relative my-6 sm:my-8">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 to-transparent"></div>
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
               </div>
               <div className="relative flex justify-center">
-                <span className="px-4 py-1.5 bg-white/[0.10] backdrop-blur-2xl text-neutral-700 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm ring-1 ring-white/20 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 before:to-transparent before:pointer-events-none">
+                <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
                   <span className="relative z-10">Modalità Controllo</span>
                 </span>
               </div>
@@ -691,7 +691,7 @@ export default function StoveCard() {
                   }`}>
                     {schedulerEnabled && semiManualMode ? 'Semi-manuale' : schedulerEnabled ? 'Automatica' : 'Manuale'}
                   </p>
-                  <p className="text-xs sm:text-sm text-neutral-500 mt-1 break-words">
+                  <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1 break-words">
                     {schedulerEnabled && semiManualMode && returnToAutoAt ? (
                       (() => {
                         const date = new Date(returnToAutoAt);
@@ -705,7 +705,7 @@ export default function StoveCard() {
                           {nextScheduledAction.action === 'ignite' ? '🔥 Accensione' : '❄️ Spegnimento'}
                         </span>
                         {' alle '}
-                        <span className="font-medium text-neutral-700">
+                        <span className="font-medium text-neutral-700 dark:text-neutral-300">
                           {(() => {
                             const date = new Date(nextScheduledAction.timestamp);
                             const time = date.toLocaleString('it-IT', { hour: '2-digit', minute: '2-digit' });
@@ -756,7 +756,7 @@ export default function StoveCard() {
                     <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 to-transparent"></div>
                   </div>
                   <div className="relative flex justify-center">
-                    <span className="px-4 py-1.5 bg-white/[0.10] backdrop-blur-2xl text-neutral-700 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm ring-1 ring-white/20 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 before:to-transparent before:pointer-events-none">
+                    <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
                       <span className="relative z-10">Manutenzione</span>
                     </span>
                   </div>
@@ -812,7 +812,7 @@ export default function StoveCard() {
             )}
             {isSpenta && (
               <div className="mb-6 p-3 sm:p-4 bg-neutral-500/[0.08] backdrop-blur-2xl rounded-xl text-center shadow-liquid-sm ring-1 ring-neutral-400/20 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-neutral-300/10 before:to-transparent before:pointer-events-none">
-                <p className="text-xs sm:text-sm font-semibold text-neutral-600 tracking-wide relative z-10">○ Stufa spenta</p>
+                <p className="text-xs sm:text-sm font-semibold text-neutral-600 dark:text-neutral-400 tracking-wide relative z-10">○ Stufa spenta</p>
               </div>
             )}
 

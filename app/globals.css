@@ -8,7 +8,13 @@
   }
 
   body {
+    /* Light mode - gradiente chiaro neutro */
     @apply bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-200;
+  }
+
+  /* Dark mode - gradiente scuro con glass effect */
+  html.dark body {
+    @apply bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900;
   }
 }
 

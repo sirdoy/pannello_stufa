@@ -1,6 +1,33 @@
 # UI Components
 
-Componenti UI riutilizzabili con liquid glass style iOS 18.
+Componenti UI riutilizzabili con liquid glass style iOS 18 e supporto dark mode completo.
+
+## 🌙 Dark Mode
+
+Tutti i componenti UI supportano dark mode con palette ottimizzata per glass effect scuro.
+
+**Attivazione**: `/settings/theme` - Toggle light/dark con sync Firebase multi-device
+
+**Pattern Base**:
+```css
+/* Backgrounds Glass */
+bg-white/[0.08] dark:bg-white/[0.05]
+
+/* Testi */
+text-neutral-900 dark:text-white
+text-neutral-700 dark:text-neutral-300
+text-neutral-600 dark:text-neutral-400
+
+/* Borders/Rings */
+border-white/20 dark:border-white/10
+ring-white/10 dark:ring-white/5
+
+/* Primary States */
+bg-primary-50 dark:bg-primary-900/30
+text-primary-600 dark:text-primary-400
+```
+
+**Body Background**: Gradiente scuro `from-neutral-900 via-neutral-800 to-neutral-900`
 
 ## Card
 

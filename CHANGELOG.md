@@ -5,6 +5,68 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.14.0] - 2025-11-14
+
+### Aggiunto
+- **Dark Mode Completo**: implementato sistema di tema scuro/chiaro con glass effect ottimizzato
+  - **Settings Tema**: nuova pagina `/settings/theme` con toggle light/dark e preview live
+  - **Sync Multi-Device**: preferenza tema salvata su Firebase (`users/{userId}/preferences/theme`)
+  - **localStorage Fallback**: funziona anche offline o senza autenticazione
+  - **Zero Flash**: script anti-FOUC nel `<head>` applica tema prima del rendering
+  - **ThemeContext**: React Context per gestione globale tema (`app/context/ThemeContext.js`)
+  - **ThemeService**: service per persistenza (`lib/themeService.js`)
+  - **18 Unit Tests**: coverage completa themeService (tutti passano ✅)
+  - File: `lib/themeService.js`, `app/context/ThemeContext.js`, `app/components/ThemeScript.js`, `app/settings/theme/page.js`
+
+### Modificato
+- **UI Components Dark Mode**: tutti i componenti supportano dark mode
+  - **Card**: glass scuro `bg-white/[0.05]` con blur ottimizzato
+  - **Button**: tutte le varianti liquid (primary, secondary, success, danger, accent, outline, ghost, glass)
+  - **Input/Select**: label, placeholder, borders, dropdown con dark variants
+  - **Banner**: già supportava dark mode (verificato)
+  - **Skeleton**: gradiente scuro `from-neutral-700 via-neutral-600 to-neutral-700`
+  - **Footer**: testi, link, badge con dark mode
+  - **StatusBadge/ModeIndicator**: testi secondari con dark mode
+
+- **Navbar Completa**: menu navigation uniformato per dark mode
+  - Desktop dropdowns (device, settings, user)
+  - Mobile menu (panel, user info, device sections)
+  - Hamburger button
+  - Pattern uniforme: `bg-white/[0.08] dark:bg-white/[0.05]`
+
+- **Device Cards**: dark mode applicato
+  - **StoveCard**: header, separatori, box glass, tutti i testi
+  - Componenti interni aggiornati
+
+- **Layout & Global**:
+  - `app/layout.js`: script anti-FOUC + `suppressHydrationWarning`
+  - `app/globals.css`: gradiente body dark `from-neutral-900 via-neutral-800 to-neutral-900`
+  - `tailwind.config.js`: abilitato `darkMode: 'class'`
+  - `app/components/ClientProviders.js`: integrato ThemeProvider
+
+- **Documentazione**:
+  - `docs/ui-components.md`: nuova sezione "🌙 Dark Mode" con pattern e best practices
+  - `CLAUDE.md`: aggiornato con ThemeContext, themeService, /settings/theme
+
+### Pattern Dark Mode
+```css
+/* Backgrounds Glass */
+bg-white/[0.08] dark:bg-white/[0.05]
+
+/* Testi */
+text-neutral-900 dark:text-white
+text-neutral-700 dark:text-neutral-300
+text-neutral-600 dark:text-neutral-400
+
+/* Borders/Rings */
+border-white/20 dark:border-white/10
+ring-white/10 dark:ring-white/5
+
+/* Primary States */
+bg-primary-50 dark:bg-primary-900/30
+text-primary-600 dark:text-primary-400
+```
+
 ## [1.13.0] - 2025-11-14
 
 ### Aggiunto

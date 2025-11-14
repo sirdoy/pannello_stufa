@@ -15,10 +15,63 @@ Firebase Realtime Database è utilizzato per:
 - **Push Notifications**: FCM tokens e preferenze utente
 - **Device Preferences**: Abilitazione/disabilitazione dispositivi per utente
 
+## Environment Separation
+
+### Development vs Production Namespaces
+
+Per separare i dati di development da quelli di production, l'applicazione utilizza namespace Firebase differenti basati sull'ambiente:
+
+- **Production** (dominio pubblico): Dati salvati nel root Firebase
+- **Development** (localhost, 127.0.0.1, 192.168.x.x): Dati salvati sotto `dev/`
+
+#### Implementazione
+
+```javascript
+import { getEnvironmentPath } from '@/lib/environmentHelper';
+
+// In production: 'netatmo/refresh_token'
+// In development: 'dev/netatmo/refresh_token'
+const path = getEnvironmentPath('netatmo/refresh_token');
+await get(ref(db, path));
+```
+
+#### API Esterne Supportate
+
+Le seguenti integrazioni usano namespace separati:
+
+- **Netatmo** (OAuth 2.0):
+  - `netatmo/refresh_token`
+  - `netatmo/home_id`
+  - `netatmo/topology`
+  - `netatmo/currentStatus`
+  - `netatmo/deviceConfig`
+  - `netatmo/automation/*`
+
+- **Philips Hue** (OAuth 2.0 + Local API):
+  - `hue/refresh_token`
+  - `hue/username`
+  - `hue/bridge_ip`
+  - `hue/clientkey`
+
+#### Vantaggi
+
+✅ **Sicurezza**: Token di produzione non vengono sovrascritti durante testing locale
+✅ **Testing**: Sviluppatori possono testare OAuth flows senza impattare production
+✅ **Debugging**: Facile identificare e pulire dati di test
+✅ **Isolamento**: Zero rischio di conflitti tra ambienti
+
 ## Schema Completo
 
 ```
 firebase-root/
+├── dev/                    # 🆕 Development namespace (SOLO localhost)
+│   ├── netatmo/           # Development Netatmo data
+│   ├── hue/               # Development Hue data
+│   └── ...                # Altri servizi esterni
+│
+├── netatmo/               # Production Netatmo data
+├── hue/                   # Production Hue data
+│
 ├── stoveScheduler/
 │   ├── monday/              # Array [{start, end, power, fan}]
 │   ├── tuesday/

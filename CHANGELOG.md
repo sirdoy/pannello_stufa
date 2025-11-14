@@ -5,6 +5,55 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.13.0] - 2025-11-14
+
+### Aggiunto
+- **Environment Separation per API Tokens**: sistema completo di separazione dati Firebase tra development e production
+  - **Development namespace**: localhost (127.0.0.1, 192.168.x.x) usa `dev/` prefix in Firebase
+  - **Production namespace**: domini pubblici usano root paths in Firebase
+  - **Utility**: `lib/environmentHelper.js` per detection automatica ambiente
+  - **Auto-detection**: rileva ambiente da `window.location.hostname` (client) o `process.env.NODE_ENV` (server)
+  - **API supportate**: Netatmo (OAuth 2.0) e Philips Hue (OAuth 2.0 + Local API)
+  - File: `lib/environmentHelper.js`, `__tests__/lib/environmentHelper.test.js`
+
+### Modificato
+- **lib/netatmoTokenHelper.js**: aggiunto `getEnvironmentPath()` per tutti i Firebase refs
+  - `getValidAccessToken()`, `saveRefreshToken()`, `isNetatmoConnected()`, `clearNetatmoData()`
+  - Development: token salvati in `dev/netatmo/refresh_token`
+  - Production: token salvati in `netatmo/refresh_token`
+
+- **lib/netatmoService.js**: aggiunto `getEnvironmentPath()` per tutti i Firebase paths
+  - Refresh token, home_id, topology, currentStatus, deviceConfig, automation rules
+  - Completa separazione dati Netatmo tra ambienti
+
+- **lib/hue/hueTokenHelper.js**: aggiunto `getEnvironmentPath()` per tutti i Firebase refs
+  - OAuth token management ora environment-aware
+  - Development: `dev/hue/refresh_token`, Production: `hue/refresh_token`
+
+- **lib/hue/hueLocalHelper.js**: aggiornato per environment separation
+  - Bridge connection data, username, clientkey ora separati per ambiente
+
+### Fixed
+- **Netatmo OAuth callback**: corretto redirect da `/netatmo/authorized` a `/thermostat/authorized`
+  - File: `app/api/netatmo/callback/route.js`
+  - Fix error redirects: tutti ora puntano a `/thermostat?error=xxx`
+
+- **Thermostat authorized page**: corretto redirect finale da `/netatmo` a `/thermostat`
+  - File: `app/thermostat/authorized/page.js`
+  - OAuth flow ora completo: Netatmo → callback → authorized → thermostat ✅
+
+### Documentazione
+- **docs/firebase.md**: aggiunta sezione "Environment Separation"
+  - Schema Firebase completo con namespace `dev/`
+  - Implementazione pattern, API supportate, vantaggi
+  - Esempi codice per usage pattern
+
+### Vantaggi
+- ✅ **Sicurezza**: token di produzione protetti durante testing locale
+- ✅ **Testing**: sviluppatori possono testare OAuth flows senza impattare production
+- ✅ **Debugging**: facile identificare e pulire dati di test in Firebase
+- ✅ **Isolamento**: zero rischio di conflitti tra ambienti dev/prod
+
 ## [1.12.1] - 2025-11-04
 
 ### Ottimizzato

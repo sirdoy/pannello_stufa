@@ -53,7 +53,9 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:codepen.io)",
-      "WebFetch(domain:www.grafit.agency)"
+      "WebFetch(domain:www.grafit.agency)",
+      "Bash(/tmp/build_output.log)",
+      "Bash(echo:*)"
     ],
     "deny": [],
     "ask": []

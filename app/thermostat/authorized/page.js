@@ -16,12 +16,12 @@ export default function NetatmoAuthorizedPage() {
 
         setStatus('✅ Connesso con successo! Reindirizzamento...');
         await new Promise(resolve => setTimeout(resolve, 1000));
-        router.replace('/netatmo');
+        router.replace('/thermostat');
       } catch (err) {
         console.error('Error during redirect:', err);
         setStatus('❌ Errore. Reindirizzamento...');
         await new Promise(resolve => setTimeout(resolve, 2000));
-        router.replace('/netatmo');
+        router.replace('/thermostat');
       }
     }
 

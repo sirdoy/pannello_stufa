@@ -385,6 +385,6 @@ ADMIN_USER_ID=auth0|xxx
 
 ---
 
-**Last Updated**: 2025-11-04
-**Version**: 1.12.1 (patch: WebGL ottimizzazioni performance)
+**Last Updated**: 2025-11-14
+**Version**: 1.13.0 (minor: Environment Separation API Tokens + Netatmo OAuth Fix)
 **Author**: Federico Manfredi

@@ -56,34 +56,34 @@ export default function Banner({
     },
   };
 
-  // Liquid glass variants (iOS 18 style)
+  // Liquid glass variants (iOS 18 style) - WCAG AA compliant
   const liquidVariants = {
     info: {
-      bg: 'bg-info-500/10',
-      border: 'border-info-500/20',
-      titleColor: 'text-info-900',
-      descColor: 'text-info-700',
+      bg: 'bg-info-500/15 dark:bg-info-500/20',
+      border: 'border-info-500/25 dark:border-info-500/30',
+      titleColor: 'text-info-900 dark:text-info-100',
+      descColor: 'text-info-800 dark:text-info-200',
       defaultIcon: 'ℹ️',
     },
     warning: {
-      bg: 'bg-warning-500/10',
-      border: 'border-warning-500/20',
-      titleColor: 'text-warning-900',
-      descColor: 'text-warning-700',
+      bg: 'bg-warning-500/15 dark:bg-warning-500/20',
+      border: 'border-warning-500/25 dark:border-warning-500/30',
+      titleColor: 'text-warning-900 dark:text-warning-100',
+      descColor: 'text-warning-800 dark:text-warning-200',
       defaultIcon: '⚠️',
     },
     error: {
-      bg: 'bg-danger-500/10',
-      border: 'border-danger-500/20',
-      titleColor: 'text-danger-900',
-      descColor: 'text-danger-700',
+      bg: 'bg-danger-500/15 dark:bg-danger-500/20',
+      border: 'border-danger-500/25 dark:border-danger-500/30',
+      titleColor: 'text-danger-900 dark:text-danger-100',
+      descColor: 'text-danger-800 dark:text-danger-200',
       defaultIcon: '❌',
     },
     success: {
-      bg: 'bg-success-500/10',
-      border: 'border-success-500/20',
-      titleColor: 'text-success-900',
-      descColor: 'text-success-700',
+      bg: 'bg-success-500/15 dark:bg-success-500/20',
+      border: 'border-success-500/25 dark:border-success-500/30',
+      titleColor: 'text-success-900 dark:text-success-100',
+      descColor: 'text-success-800 dark:text-success-200',
       defaultIcon: '✅',
     },
   };

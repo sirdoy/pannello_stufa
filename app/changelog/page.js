@@ -88,21 +88,21 @@ export default function ChangelogPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <Card liquid glass className="p-6 border-2 border-primary-200">
+      <Card liquidPro className="p-6 sm:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 mb-2">📋 Changelog</h1>
-            <p className="text-neutral-600">Storico di tutte le versioni e modifiche dell&apos;applicazione</p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 dark:text-white mb-2">📋 Changelog</h1>
+            <p className="text-neutral-600 dark:text-neutral-400">Storico di tutte le versioni e modifiche dell&apos;applicazione</p>
           </div>
           <div className="text-left sm:text-right">
-            <p className="text-sm text-neutral-500 mb-1">Versione Corrente</p>
-            <p className="text-3xl font-bold text-primary-600">{APP_VERSION}</p>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-1">Versione Corrente</p>
+            <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">{APP_VERSION}</p>
           </div>
         </div>
 
         {/* Source indicator */}
-        <div className="mt-4 pt-4 border-t border-neutral-200">
-          <p className="text-xs text-neutral-500">
+        <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400">
             Fonte: <span className="font-semibold">{source === 'firebase' ? 'Firebase Realtime' : 'Locale'}</span>
           </p>
         </div>
@@ -111,7 +111,7 @@ export default function ChangelogPage() {
       {/* Timeline */}
       <div className="space-y-6">
         {changelog.map((version, index) => (
-          <Card key={version.version} className="overflow-hidden">
+          <Card key={version.version} liquidPro className="overflow-hidden">
             {/* Version Header */}
             <div className={`p-6 border-b-2 ${getVersionColor(version.type)}`}>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -146,8 +146,8 @@ export default function ChangelogPage() {
               <ul className="space-y-3">
                 {version.changes.map((change, changeIndex) => (
                   <li key={changeIndex} className="flex items-start gap-3">
-                    <span className="text-success-500 mt-1">✓</span>
-                    <p className="text-neutral-700 flex-1">{change}</p>
+                    <span className="text-success-500 dark:text-success-400 mt-1">✓</span>
+                    <p className="text-neutral-700 dark:text-neutral-300 flex-1">{change}</p>
                   </li>
                 ))}
               </ul>
@@ -157,12 +157,12 @@ export default function ChangelogPage() {
       </div>
 
       {/* Footer Info */}
-      <Card liquid className="p-6 bg-neutral-50">
+      <Card liquidPro className="p-6 sm:p-8 bg-neutral-50/50 dark:bg-neutral-900/20">
         <div className="text-center space-y-2">
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">
             💡 <strong>Versionamento Semantico</strong>: MAJOR.MINOR.PATCH
           </p>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400">
             MAJOR = Breaking changes • MINOR = Nuove funzionalità • PATCH = Bug fix
           </p>
         </div>

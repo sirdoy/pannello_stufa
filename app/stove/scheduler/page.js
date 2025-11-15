@@ -243,11 +243,11 @@ export default function WeeklyScheduler() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Header Card */}
-      <Card liquid className="p-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 mb-6">Pianificazione Settimanale</h1>
+      <Card liquidPro className="p-6 sm:p-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white mb-6">Pianificazione Settimanale</h1>
 
         {/* Status e toggle */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl bg-neutral-50 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-white/[0.15] dark:ring-white/[0.08] mb-4">
           <ModeIndicator
             enabled={schedulerEnabled}
             semiManual={semiManualMode}

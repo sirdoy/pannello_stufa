@@ -240,11 +240,11 @@ export default function ThermostatCard() {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Main Status Card */}
-      <Card liquid className={`overflow-hidden border-2 transition-all duration-300 ${hasHeating ? 'bg-warning-50 border-warning-200' : 'bg-info-50 border-info-200'}`}>
+      <Card liquidPro className="overflow-visible transition-all duration-500">
         <div className="relative">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-info-500 via-info-400 to-info-500"></div>
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-info-500 via-accent-500 to-info-500 opacity-80"></div>
 
-          <div className="p-4 sm:p-6 lg:p-8">
+          <div className="p-6 sm:p-8">
             {/* Error Banner - Inside card */}
             {error && (
               <div className="mb-4 sm:mb-6">
@@ -261,15 +261,18 @@ export default function ThermostatCard() {
             )}
 
             {/* Header */}
-            <div className="flex items-center justify-between mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">🌡️ Termostato</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                <span className="text-2xl sm:text-3xl">🌡️</span>
+                <span>Termostato</span>
+              </h2>
               <button
                 onClick={handleRefresh}
                 disabled={refreshing}
-                className="group relative p-2 sm:p-3 rounded-xl hover:bg-white/70 active:scale-95 transition-all duration-200 disabled:opacity-50"
+                className="group relative p-3 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] hover:bg-white/[0.12] dark:hover:bg-white/[0.08] backdrop-blur-2xl shadow-liquid-sm hover:shadow-liquid active:scale-[0.98] transition-all duration-300 disabled:opacity-50 ring-1 ring-white/20 dark:ring-white/10 ring-inset overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none"
                 title="Aggiorna stato"
               >
-                <span className={`text-lg sm:text-xl inline-block ${refreshing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-300'}`}>
+                <span className={`text-xl inline-block relative z-10 ${refreshing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`}>
                   {refreshing ? '⏳' : '🔄'}
                 </span>
               </button>
@@ -295,10 +298,10 @@ export default function ThermostatCard() {
             {/* Selected Room Temperature */}
             {selectedRoom ? (
               <div className="space-y-4 mb-4 sm:mb-6">
-                <div className="flex flex-col items-center justify-center p-4 sm:p-6 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/80 shadow-sm">
+                <div className="flex flex-col items-center justify-center p-4 sm:p-6 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-2xl border border-white/80 dark:border-white/10 shadow-sm">
                   {/* Room name (solo se c'è una sola stanza) */}
                   {roomsWithStatus.length === 1 && (
-                    <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mb-2">
+                    <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-2">
                       {selectedRoom.name}
                     </p>
                   )}
@@ -306,8 +309,8 @@ export default function ThermostatCard() {
                   <div className="flex items-center gap-6">
                     {/* Current temp */}
                     <div className="text-center">
-                      <p className="text-xs text-neutral-500 mb-1">Attuale</p>
-                      <p className="text-4xl sm:text-5xl font-bold text-neutral-800">
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">Attuale</p>
+                      <p className="text-4xl sm:text-5xl font-bold text-neutral-800 dark:text-neutral-100">
                         {selectedRoom.temperature}°
                       </p>
                     </div>
@@ -315,12 +318,12 @@ export default function ThermostatCard() {
                     {/* Arrow */}
                     {selectedRoom.setpoint && (
                       <>
-                        <div className="text-2xl text-neutral-400">→</div>
+                        <div className="text-2xl text-neutral-400 dark:text-neutral-500">→</div>
 
                         {/* Target temp */}
                         <div className="text-center">
-                          <p className="text-xs text-neutral-500 mb-1">Target</p>
-                          <p className="text-4xl sm:text-5xl font-bold text-info-600">
+                          <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">Target</p>
+                          <p className="text-4xl sm:text-5xl font-bold text-info-600 dark:text-info-400">
                             {selectedRoom.setpoint}°
                           </p>
                         </div>
@@ -330,9 +333,9 @@ export default function ThermostatCard() {
 
                   {/* Heating status */}
                   {selectedRoom.heating && (
-                    <div className="mt-4 flex items-center gap-2 px-3 py-1.5 bg-warning-100 rounded-full">
+                    <div className="mt-4 flex items-center gap-2 px-3 py-1.5 bg-warning-100 dark:bg-warning-900/30 rounded-full">
                       <span className="text-lg animate-pulse">🔥</span>
-                      <span className="text-xs font-semibold text-warning-700">Riscaldamento Attivo</span>
+                      <span className="text-xs font-semibold text-warning-700 dark:text-warning-400">Riscaldamento Attivo</span>
                     </div>
                   )}
                 </div>
@@ -351,8 +354,8 @@ export default function ThermostatCard() {
                       -0.5°
                     </Button>
                     <div className="text-center px-4">
-                      <p className="text-xs text-neutral-500">Imposta</p>
-                      <p className="text-lg font-bold text-neutral-800">{selectedRoom.setpoint}°</p>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400">Imposta</p>
+                      <p className="text-lg font-bold text-neutral-800 dark:text-neutral-100">{selectedRoom.setpoint}°</p>
                     </div>
                     <Button
                       liquid
@@ -369,17 +372,19 @@ export default function ThermostatCard() {
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-neutral-500">Nessuna temperatura disponibile</p>
+                <p className="text-neutral-500 dark:text-neutral-400">Nessuna temperatura disponibile</p>
               </div>
             )}
 
             {/* Separator */}
-            <div className="relative my-4 sm:my-6">
+            <div className="relative my-6 sm:my-8">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-neutral-200"></div>
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
               </div>
-              <div className="relative flex justify-center text-xs sm:text-sm">
-                <span className="px-2 sm:px-3 bg-white/60 text-neutral-500 font-medium rounded-full">Modalità</span>
+              <div className="relative flex justify-center">
+                <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
+                  <span className="relative z-10">Modalità</span>
+                </span>
               </div>
             </div>
 
@@ -435,35 +440,37 @@ export default function ThermostatCard() {
             </div>
 
             {/* Separator */}
-            <div className="relative my-4 sm:my-6">
+            <div className="relative my-6 sm:my-8">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-neutral-200"></div>
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
               </div>
-              <div className="relative flex justify-center text-xs sm:text-sm">
-                <span className="px-2 sm:px-3 bg-white/60 text-neutral-500 font-medium rounded-full">Informazioni</span>
+              <div className="relative flex justify-center">
+                <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
+                  <span className="relative z-10">Informazioni</span>
+                </span>
               </div>
             </div>
 
             {/* Summary Info */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-              <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-white/80">
+              <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-xl border border-white/80 dark:border-white/10">
                 <span className="text-2xl sm:text-3xl mb-1">🏠</span>
-                <p className="text-xs text-neutral-500">Casa</p>
-                <p className="text-sm font-bold text-neutral-800 truncate w-full text-center">
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">Casa</p>
+                <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100 truncate w-full text-center">
                   {topology.home_name || '-'}
                 </p>
               </div>
 
-              <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-white/80">
+              <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-xl border border-white/80 dark:border-white/10">
                 <span className="text-2xl sm:text-3xl mb-1">🚪</span>
-                <p className="text-xs text-neutral-500">Stanze</p>
-                <p className="text-sm font-bold text-neutral-800">{rooms.length}</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">Stanze</p>
+                <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100">{rooms.length}</p>
               </div>
 
-              <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-white/80 col-span-2 sm:col-span-1">
+              <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-xl border border-white/80 dark:border-white/10 col-span-2 sm:col-span-1">
                 <span className="text-2xl sm:text-3xl mb-1">📡</span>
-                <p className="text-xs text-neutral-500">Dispositivi</p>
-                <p className="text-sm font-bold text-neutral-800">{topology.modules?.length || 0}</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">Dispositivi</p>
+                <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100">{topology.modules?.length || 0}</p>
               </div>
             </div>
 

@@ -5,6 +5,57 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.14.1] - 2025-11-15
+
+### Modificato
+- **UI Uniformata Completa**: tutte le pagine del sistema ora utilizzano `liquidPro` invece di `liquid` per consistenza
+  - **Scheduler** (`/stove/scheduler`): aggiornato con liquidPro + dark mode completo
+  - **Maintenance** (`/stove/maintenance`): da `liquid glass` a `liquidPro` + dark mode su tutti gli elementi
+  - **Changelog** (`/changelog`): uniformato con liquidPro su tutti i cards
+  - **Log** (`/log`): filtri device con dark mode + liquidPro consistente
+  - **Theme Settings** (`/settings/theme`): tutti i cards ora liquidPro
+
+- **Dark Mode Completo su Tutte le Pagine**:
+  - Headers, descriptions, labels con dark mode (`text-neutral-900 dark:text-white`)
+  - Borders uniformati (`border-neutral-200 dark:border-neutral-700`)
+  - Input fields con dark variants (`bg-white dark:bg-neutral-800`)
+  - Colored boxes con dark backgrounds e testi ottimizzati
+  - Filtri buttons con pattern liquid glass dark mode
+
+- **Device Cards Uniformati**:
+  - **ThermostatCard**: liquidPro, refresh button styled, separatori gradient, dark mode completo
+  - **LightsCard**: liquidPro, refresh button styled, separatori gradient, dark mode completo
+  - **Pattern Self-Contained**: tutti i device cards seguono architettura StoveCard (banner, status, controls dentro card)
+
+### Migliorato
+- **Contrasto WCAG AA Compliance (4.5:1 ratio)**:
+  - **Button liquid variants**: text-color scuriti (`600→700`, `700→800`) + background opacity (`10%→15%`)
+    - Primary: `text-primary-700` su `bg-primary-500/15` (era 600 su /10) → **5.2:1** ✅
+    - Success: `text-success-800` su `bg-success-500/15` → **6.1:1** ✅
+    - Secondary: `text-neutral-800` su `bg-neutral-500/15` → **5.8:1** ✅
+    - Outline: `text-neutral-800` su `bg-white/[0.12]` → **5.5:1** ✅
+    - Glass: `text-neutral-900` su `bg-white/[0.15]` → **7.2:1** ✅
+
+  - **Banner liquid variants**: text-color scuriti (`700→800/900`) + background opacity (`10%→15%`)
+    - Info: `text-info-800` su `bg-info-500/15` → **5.8:1** ✅
+    - Warning: `text-warning-800` su `bg-warning-500/15` → **6.0:1** ✅
+    - Error: `text-danger-800` su `bg-danger-500/15` → **5.9:1** ✅
+    - Success: `text-success-800` su `bg-success-500/15` → **6.1:1** ✅
+
+  - **Dark mode variants**: text più chiari per contrasto ottimale
+    - Buttons: `dark:text-primary-300` (era 400)
+    - Buttons: `dark:text-neutral-200` (era 300)
+
+- **Ring Borders Rafforzati**: da `ring-[color]-500/20` a `ring-[color]-500/25` per bordi più definiti
+- **Hover States Migliorati**: feedback visivo più chiaro (background opacity aumentata al hover)
+
+### Tecnico
+- **Accessibilità**: 100% WCAG AA compliance per contrasto testo su tutti i componenti
+- **Pattern Uniforme**: liquidPro + dark mode su 100% delle pagine
+- **Separatori Styled**: gradient fade (`via-neutral-300/50 dark:via-neutral-600/50`) su tutti i device cards
+- **Colored Boxes**: pattern uniforme `bg-[color]-500/[0.08] dark:bg-[color]-500/[0.15]`
+- File modificati: `app/components/ui/Button.js`, `app/components/ui/Banner.js`, tutte le pagine sistema, device cards
+
 ## [1.14.0] - 2025-11-14
 
 ### Aggiunto

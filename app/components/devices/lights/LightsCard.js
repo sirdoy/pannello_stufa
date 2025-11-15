@@ -273,11 +273,11 @@ export default function LightsCard() {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Main Status Card */}
-      <Card liquid className={`overflow-hidden border-2 transition-all duration-300 ${isRoomOn ? 'bg-warning-50 border-warning-200' : 'bg-neutral-50 border-neutral-200'}`}>
+      <Card liquidPro className="overflow-visible transition-all duration-500">
         <div className="relative">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-warning-500 via-warning-400 to-warning-500"></div>
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-warning-500 via-accent-500 to-warning-500 opacity-80"></div>
 
-          <div className="p-4 sm:p-6 lg:p-8">
+          <div className="p-6 sm:p-8">
             {/* Error Banner - Inside card */}
             {error && (
               <div className="mb-4 sm:mb-6">
@@ -294,15 +294,18 @@ export default function LightsCard() {
             )}
 
             {/* Header */}
-            <div className="flex items-center justify-between mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">💡 Luci</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                <span className="text-2xl sm:text-3xl">💡</span>
+                <span>Luci</span>
+              </h2>
               <button
                 onClick={handleRefresh}
                 disabled={refreshing}
-                className="group relative p-2 sm:p-3 rounded-xl hover:bg-white/70 active:scale-95 transition-all duration-200 disabled:opacity-50"
+                className="group relative p-3 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] hover:bg-white/[0.12] dark:hover:bg-white/[0.08] backdrop-blur-2xl shadow-liquid-sm hover:shadow-liquid active:scale-[0.98] transition-all duration-300 disabled:opacity-50 ring-1 ring-white/20 dark:ring-white/10 ring-inset overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none"
                 title="Aggiorna stato"
               >
-                <span className={`text-lg sm:text-xl inline-block ${refreshing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-300'}`}>
+                <span className={`text-xl inline-block relative z-10 ${refreshing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`}>
                   {refreshing ? '⏳' : '🔄'}
                 </span>
               </button>
@@ -329,9 +332,9 @@ export default function LightsCard() {
             {selectedRoom ? (
               <div className="space-y-4 sm:space-y-6">
                 {/* On/Off + Brightness */}
-                <div className="p-4 sm:p-6 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/80 shadow-sm">
+                <div className="p-4 sm:p-6 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-2xl border border-white/80 dark:border-white/10 shadow-sm">
                   {roomLights.length === 1 && (
-                    <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mb-4 text-center">
+                    <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-4 text-center">
                       {selectedRoom.metadata?.name || 'Stanza'}
                     </p>
                   )}
@@ -362,10 +365,10 @@ export default function LightsCard() {
                   {isRoomOn && (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <label className="text-sm font-medium text-neutral-700">
+                        <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                           ☀️ Luminosità
                         </label>
-                        <span className="text-sm font-bold text-neutral-800">
+                        <span className="text-sm font-bold text-neutral-800 dark:text-neutral-100">
                           {avgBrightness}%
                         </span>
                       </div>
@@ -375,7 +378,7 @@ export default function LightsCard() {
                         max="100"
                         value={avgBrightness}
                         onChange={(e) => handleBrightnessChange(selectedRoom.id, e.target.value)}
-                        className="w-full h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-warning-500"
+                        className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-warning-500"
                       />
                     </div>
                   )}
@@ -384,12 +387,14 @@ export default function LightsCard() {
                 {/* Scenes */}
                 {roomScenes.length > 0 && (
                   <>
-                    <div className="relative">
+                    <div className="relative my-6 sm:my-8">
                       <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-neutral-200"></div>
+                        <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
                       </div>
-                      <div className="relative flex justify-center text-xs sm:text-sm">
-                        <span className="px-2 sm:px-3 bg-white/60 text-neutral-500 font-medium rounded-full">Scene</span>
+                      <div className="relative flex justify-center">
+                        <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
+                          <span className="relative z-10">Scene</span>
+                        </span>
                       </div>
                     </div>
 
@@ -411,33 +416,35 @@ export default function LightsCard() {
                 )}
 
                 {/* Separator */}
-                <div className="relative">
+                <div className="relative my-6 sm:my-8">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-neutral-200"></div>
+                    <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
                   </div>
-                  <div className="relative flex justify-center text-xs sm:text-sm">
-                    <span className="px-2 sm:px-3 bg-white/60 text-neutral-500 font-medium rounded-full">Informazioni</span>
+                  <div className="relative flex justify-center">
+                    <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
+                      <span className="relative z-10">Informazioni</span>
+                    </span>
                   </div>
                 </div>
 
                 {/* Summary Info */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-                  <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-white/80">
+                  <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-xl border border-white/80 dark:border-white/10">
                     <span className="text-2xl sm:text-3xl mb-1">💡</span>
-                    <p className="text-xs text-neutral-500">Luci Stanza</p>
-                    <p className="text-sm font-bold text-neutral-800">{roomLights.length}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">Luci Stanza</p>
+                    <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100">{roomLights.length}</p>
                   </div>
 
-                  <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-white/80">
+                  <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-xl border border-white/80 dark:border-white/10">
                     <span className="text-2xl sm:text-3xl mb-1">🚪</span>
-                    <p className="text-xs text-neutral-500">Stanze</p>
-                    <p className="text-sm font-bold text-neutral-800">{rooms.length}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">Stanze</p>
+                    <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100">{rooms.length}</p>
                   </div>
 
-                  <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-white/80 col-span-2 sm:col-span-1">
+                  <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-xl border border-white/80 dark:border-white/10 col-span-2 sm:col-span-1">
                     <span className="text-2xl sm:text-3xl mb-1">🎨</span>
-                    <p className="text-xs text-neutral-500">Scene</p>
-                    <p className="text-sm font-bold text-neutral-800">{scenes.length}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">Scene</p>
+                    <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100">{scenes.length}</p>
                   </div>
                 </div>
 
@@ -456,7 +463,7 @@ export default function LightsCard() {
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-neutral-500">Nessuna stanza disponibile</p>
+                <p className="text-neutral-500 dark:text-neutral-400">Nessuna stanza disponibile</p>
               </div>
             )}
           </div>

@@ -1,6 +1,6 @@
 {
   "name": "pannello-stufa",
-  "version": "1.14.1",
+  "version": "1.15.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,7 +10,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:ci": "jest --ci --coverage --maxWorkers=2"
+    "test:ci": "jest --ci --coverage --maxWorkers=2",
+    "test:e2e": "node test-e2e.mjs",
+    "test:playwright": "node test-playwright.mjs"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^3.8.0",
@@ -33,6 +35,7 @@
     "eslint-config-next": "^15.5.4",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
+    "playwright": "^1.56.1",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.1"
   }

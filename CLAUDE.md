@@ -35,6 +35,8 @@
 ### Development Workflows
 
 - **[Sandbox Mode](docs/sandbox.md)** - Testing locale senza chiamate reali alla stufa (SOLO localhost)
+- **[Testing](docs/testing.md)** - Unit tests, coverage, best practices
+- **[E2E Testing](E2E-TESTING.md)** - Playwright E2E tests per UI/UX (light/dark mode, responsive)
 - **[Versioning](docs/versioning.md)** - Semantic versioning, changelog, version enforcement
 - **[Deployment](docs/deployment.md)** - Deploy workflow, environment config, production checklist
 

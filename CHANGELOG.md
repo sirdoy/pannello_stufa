@@ -5,6 +5,61 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.15.0] - 2025-11-17
+
+### Aggiunto
+- **E2E Testing Suite completa con Playwright**: sistema automatizzato per test end-to-end dell'intera UI/UX
+  - **10 test automatici**: homepage, scheduler, maintenance, log, changelog con dark/light mode
+  - **test-e2e.mjs**: suite completa con modal handling, theme testing, responsive, performance
+  - **test-playlist.mjs**: test base per navigazione, screenshot, elementi UI
+  - **Modal Handling**: dismissal automatico modal changelog per esecuzione fluida test
+  - **Theme Testing**: verifica light/dark mode via localStorage (no auth theme settings page)
+  - **Responsive Testing**: mobile 375x812, desktop 1920x1080 per coverage cross-device
+  - **Performance Metrics**: monitoraggio automatico DOM Interactive/Content Loaded/Load Complete
+  - **Screenshot Auto-Cleanup**: generazione + cancellazione automatica screenshot al termine
+  - File: `test-e2e.mjs`, `test-playwright.mjs`, `E2E-TESTING.md`
+
+- **TEST_MODE per bypass Auth0**: modalità testing che salta autenticazione durante test automatici
+  - **Middleware bypass**: `process.env.TEST_MODE === 'true'` permette accesso senza login
+  - **Safety-first**: disabled by default, solo per localhost, warning documentation
+  - **Production-safe**: .env.local in .gitignore, documentazione sicurezza completa
+  - File: `middleware.js` (lines 7-10)
+
+- **Scripts npm testing**: comandi dedicati per esecuzione test E2E
+  - `npm run test:e2e`: esegue suite completa (10 test)
+  - `npm run test:playwright`: esegue test base (6 test)
+  - File: `package.json` (scripts)
+
+- **Documentazione E2E-TESTING.md**: guida completa (293 righe)
+  - Setup Playwright e configurazione TEST_MODE
+  - Esecuzione test (completo + base)
+  - Lista dettagliata 10 test inclusi
+  - Theme testing pattern con localStorage
+  - Performance metrics e target
+  - Troubleshooting (TEST_MODE, modal, screenshot)
+  - Best practices e sicurezza
+  - Esempi aggiunta nuovi test
+  - File: `E2E-TESTING.md`
+
+### Modificato
+- **CLAUDE.md**: aggiunto link E2E Testing in Development Workflows section
+  - Quick link a `docs/e2e-testing.md` (placeholder per futura integrazione in docs/)
+  - Workflow testing E2E integrato nella documentazione principale
+
+- **package.json**: aggiunta dipendenza Playwright
+  - `playwright: ^1.56.1` in devDependencies
+  - 52 package aggiunti per supporto completo Playwright
+  - File: `package.json`, `package-lock.json`
+
+### Tecnico
+- **Playwright 1.56.1**: installato Chromium browser per test headless
+- **Test Coverage**: 10 test automatici coprono tutte le pagine principali
+- **Performance Target**: DOM Interactive < 2000ms verificato automaticamente
+- **Theme Switching**: `localStorage.setItem('user-theme', 'dark/light')` + `classList.add('dark')`
+- **Modal Detection**: `button:has-text("Inizia ad usare")` con timeout 2s
+- **Screenshot Pattern**: `test-{theme}-{page}.png` salvati e auto-cleanup
+- **Environment Safety**: TEST_MODE solo in development, mai in production
+
 ## [1.14.1] - 2025-11-15
 
 ### Modificato

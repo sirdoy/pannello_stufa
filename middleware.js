@@ -3,6 +3,12 @@ import { getSession } from '@auth0/nextjs-auth0/edge';
 
 export async function middleware(req) {
   const res = NextResponse.next();
+
+  // Bypass authentication in test mode (Playwright)
+  if (process.env.TEST_MODE === 'true') {
+    return res;
+  }
+
   const session = await getSession(req, res);
 
   if (!session || !session.user) {

@@ -55,7 +55,8 @@
       "WebFetch(domain:codepen.io)",
       "WebFetch(domain:www.grafit.agency)",
       "Bash(/tmp/build_output.log)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(npx:*)"
     ],
     "deny": [],
     "ask": []

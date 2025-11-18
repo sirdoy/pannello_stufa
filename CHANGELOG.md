@@ -5,6 +5,41 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.15.1] - 2025-11-18
+
+### Aggiunto
+- **Script cleanup automatico Playwright**: `scripts/run-e2e-clean.sh` per pulizia automatica artifacts test
+  - Auto-cleanup dopo ogni esecuzione test E2E
+  - Rimozione automatica: `playwright-report/`, `test-results/`, `playwright/.cache/`
+  - Statistiche file generati: dimensione totale e conteggio file mostrati prima della pulizia
+  - Exit code preservato: mantiene exit code dei test per integrazione CI/CD
+  - Eseguibile direttamente: `chmod +x` applicato per esecuzione senza `bash`
+  - File: `scripts/run-e2e-clean.sh`
+
+### Modificato
+- **Scripts npm aggiornati**: `test:e2e` e `test:e2e:headed` ora eseguono cleanup automatico
+  - `test:e2e`: esegue `./scripts/run-e2e-clean.sh` (auto-cleanup)
+  - `test:e2e:headed`: esegue `./scripts/run-e2e-clean.sh --headed` (auto-cleanup)
+  - `test:e2e:clean`: comando manuale per cleanup on-demand
+  - File: `package.json`
+
+- **Gitignore esteso**: aggiunte directory Playwright per evitare commit di test artifacts
+  - `/playwright-report/`: report HTML generati dai test
+  - `/test-results/`: screenshot e trace files
+  - `/playwright/.cache/`: browser binaries cache
+  - File: `.gitignore`
+
+### Migliorato
+- **Developer experience**: progetto sempre pulito dopo esecuzione test E2E
+- **Summary report**: output dettagliato con statistiche file prima della pulizia
+- **Workflow ottimizzato**: zero passaggi manuali per cleanup artifacts
+
+### Tecnico
+- Script bash con error handling: `set -e` per stop on error
+- Argomenti test preservati: passthrough completo argomenti Playwright
+- Cleanup condizionale: solo se directory esistono (no errori se già pulite)
+- Pattern riutilizzabile: script template per altri task di cleanup
+
 ## [1.15.0] - 2025-11-17
 
 ### Aggiunto

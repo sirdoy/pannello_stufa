@@ -396,6 +396,6 @@ ADMIN_USER_ID=auth0|xxx
 
 ---
 
-**Last Updated**: 2025-11-17
-**Version**: 1.15.0 (minor: E2E Testing Suite Playwright Completa)
+**Last Updated**: 2025-11-18
+**Version**: 1.15.1 (patch: Playwright E2E Cleanup Automatico)
 **Author**: Federico Manfredi

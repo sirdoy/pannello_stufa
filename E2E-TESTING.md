@@ -17,13 +17,13 @@ npx playwright install --with-deps
 ### Test UI/UX Completi (Nuovi - Playwright Suite)
 
 ```bash
-# Esegui tutti i test UI/UX
+# Esegui tutti i test UI/UX (con cleanup automatico artifacts)
 npm run test:e2e
 
 # Esegui con UI interattiva
 npm run test:e2e:ui
 
-# Esegui in modalità headed (vedi browser)
+# Esegui in modalità headed (vedi browser, con cleanup automatico)
 npm run test:e2e:headed
 
 # Debug mode (step-by-step)
@@ -31,7 +31,12 @@ npm run test:e2e:debug
 
 # Visualizza report HTML
 npm run test:e2e:report
+
+# Pulizia manuale artifacts (se necessario)
+npm run test:e2e:clean
 ```
+
+**Cleanup Automatico**: I comandi `test:e2e` e `test:e2e:headed` eseguono automaticamente la pulizia degli artifacts generati (report, screenshots, cache) al termine dei test.
 
 ### Test E2E Legacy (con TEST_MODE)
 
@@ -169,9 +174,23 @@ TEST_MODE=true  # Solo per testing!
 TEST_MODE=false
 ```
 
-## 📸 Screenshot
+## 📸 Screenshot & Artifacts
 
-Gli screenshot vengono:
+### Cleanup Automatico
+
+I test Playwright generano diversi artifacts che vengono **automaticamente puliti** al termine dell'esecuzione:
+
+1. **playwright-report/**: Report HTML interattivi
+2. **test-results/**: Screenshot, videos, trace files
+3. **playwright/.cache/**: Browser binaries cache
+
+Il cleanup avviene automaticamente quando esegui:
+- `npm run test:e2e`
+- `npm run test:e2e:headed`
+
+### Screenshot Legacy
+
+Gli screenshot legacy (test-e2e.mjs) vengono:
 1. ✅ Generati automaticamente durante i test
 2. ✅ Salvati temporaneamente per analisi
 3. ✅ **Cancellati automaticamente** alla fine dei test
@@ -246,11 +265,16 @@ async function dismissModal(page) {
 }
 ```
 
-### "Screenshot non vengono cancellati"
+### "Artifacts non vengono cancellati"
 
-Normal behavior se il test fallisce. Puoi cancellarli manualmente:
+Il cleanup automatico viene eseguito sempre, anche se i test falliscono. Se necessario puoi pulire manualmente:
 
 ```bash
+# Pulizia automatica con npm script
+npm run test:e2e:clean
+
+# Oppure manualmente
+rm -rf playwright-report test-results playwright/.cache
 rm -f test-*.png screenshot-*.png manual-*.png
 ```
 
@@ -358,5 +382,5 @@ testsPassed++;
 
 ---
 
-**Ultima modifica**: 2025-11-17
-**Versione**: 1.14.1
+**Ultima modifica**: 2025-11-18
+**Versione**: 1.15.1

@@ -42,3 +42,8 @@ next-env.d.ts
 
 # custom
 .idea
+
+# playwright
+/playwright-report/
+/test-results/
+/playwright/.cache/

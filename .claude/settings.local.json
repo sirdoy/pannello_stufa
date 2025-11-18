@@ -4,7 +4,10 @@
       "Bash(TEST_MODE=true npm run dev:*)",
       "Bash(TEST_MODE=true npx playwright test:*)",
       "Bash(while pgrep -f 'playwright test')",
-      "Bash(do sleep 5)"
+      "Bash(do sleep 5)",
+      "Bash(chmod:*)",
+      "Bash(npm run test:e2e:clean:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

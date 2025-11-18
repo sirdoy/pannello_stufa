@@ -17,6 +17,20 @@ Sandbox Mode è un ambiente di simulazione disponibile **SOLO in localhost** che
 
 ### 1. Abilitare Sandbox Mode
 
+#### Metodo A: Via Variabile d'Ambiente (Consigliato per test E2E)
+
+```bash
+# Avvia l'app con sandbox attivo
+SANDBOX_MODE=true npm run dev
+
+# Oppure per test Playwright
+SANDBOX_MODE=true npx playwright test
+```
+
+La variabile d'ambiente `SANDBOX_MODE=true` attiva automaticamente la sandbox senza bisogno di toggle UI.
+
+#### Metodo B: Via UI Toggle (Per sviluppo manuale)
+
 1. Avvia l'app in locale: `npm run dev`
 2. Vai alla homepage (http://localhost:3000)
 3. Troverai un toggle **🧪 Sandbox Mode** in alto
@@ -192,10 +206,14 @@ import { isLocalEnvironment, isSandboxEnabled } from '@/lib/sandboxService';
 
 // Check se siamo in localhost
 if (isLocalEnvironment()) {
-  // Check se sandbox è attivo
+  // Check se sandbox è attivo (controlla sia SANDBOX_MODE env var che Firebase)
   const enabled = await isSandboxEnabled();
 }
 ```
+
+**Nota**: `isSandboxEnabled()` verifica:
+1. Prima la variabile d'ambiente `SANDBOX_MODE` (priorità per test automatici)
+2. Poi il flag Firebase `sandbox/enabled` (per toggle UI manuale)
 
 ### Toggle Sandbox
 
@@ -443,6 +461,20 @@ describe('stoveApi in production', () => {
   });
 });
 ```
+
+### Test E2E con Playwright
+
+Per eseguire test E2E completi senza chiamate reali alle API:
+
+```bash
+# Attiva sandbox via variabile d'ambiente
+SANDBOX_MODE=true npx playwright test
+
+# Oppure con npm script
+SANDBOX_MODE=true npm run test:e2e
+```
+
+Questo attiverà automaticamente la sandbox mode all'avvio dell'app, permettendo di testare tutte le funzionalità UI senza hardware reale.
 
 ## 🐛 Troubleshooting
 

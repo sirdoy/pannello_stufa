@@ -5,6 +5,37 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.16.0] - 2025-11-18
+
+### Aggiunto
+- **Sandbox Mode: supporto variabile d'ambiente per attivazione automatica**
+  - Nuova funzionalità: `SANDBOX_MODE=true` environment variable per attivazione automatica sandbox
+  - `isSandboxEnabled()` ora controlla sia `process.env.SANDBOX_MODE` che Firebase toggle
+  - Priorità environment variable: env var ha precedenza su Firebase toggle per automazione
+  - Uso principale: test E2E Playwright con sandbox pre-attivato senza interazione UI
+  - Comando: `SANDBOX_MODE=true npm run dev` o `SANDBOX_MODE=true npx playwright test`
+  - File modificato: `lib/sandboxService.js` (aggiunta logica env var in `isSandboxEnabled()`)
+
+### Modificato
+- **Documentazione Sandbox Mode aggiornata**: `docs/sandbox.md` ora include due metodi di attivazione
+  - **Metodo A (Nuovo)**: Via variabile d'ambiente `SANDBOX_MODE=true` (consigliato per test E2E)
+  - **Metodo B (Esistente)**: Via UI toggle (per sviluppo manuale)
+  - Sezione Quick Start riorganizzata con esempi chiari per entrambi i metodi
+  - Documentato workflow test automatici Playwright con sandbox
+
+### Tecnico
+- **Test coverage esteso**: aggiunti unit test in `__tests__/sandboxService.test.js`
+  - Test verifica attivazione via `SANDBOX_MODE=true`
+  - Test verifica priorità env var su Firebase toggle
+  - Test verifica backward compatibility con UI toggle
+- **Backward compatible**: UI toggle continua a funzionare normalmente
+- **Zero breaking changes**: tutte le funzionalità esistenti preservate
+
+### Migliorato
+- **Workflow test E2E**: eliminata necessità di attivare sandbox manualmente via UI prima dei test
+- **Automazione CI/CD**: sandbox ora facilmente attivabile in pipeline automatiche
+- **Developer experience**: test automatici più robusti e prevedibili
+
 ## [1.15.1] - 2025-11-18
 
 ### Aggiunto

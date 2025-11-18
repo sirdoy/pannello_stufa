@@ -397,5 +397,5 @@ ADMIN_USER_ID=auth0|xxx
 ---
 
 **Last Updated**: 2025-11-18
-**Version**: 1.15.1 (patch: Playwright E2E Cleanup Automatico)
+**Version**: 1.16.0 (minor: Sandbox Mode Environment Variable Support)
 **Author**: Federico Manfredi

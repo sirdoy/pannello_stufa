@@ -7,11 +7,33 @@ Test End-to-End per verificare UI/UX dell'applicazione con Playwright.
 ```bash
 # Playwright è già installato
 npm install
+
+# Installa browser Playwright (prima volta)
+npx playwright install --with-deps
 ```
 
 ## 🚀 Esecuzione Test
 
-### Test E2E Completo
+### Test UI/UX Completi (Nuovi - Playwright Suite)
+
+```bash
+# Esegui tutti i test UI/UX
+npm run test:e2e
+
+# Esegui con UI interattiva
+npm run test:e2e:ui
+
+# Esegui in modalità headed (vedi browser)
+npm run test:e2e:headed
+
+# Debug mode (step-by-step)
+npm run test:e2e:debug
+
+# Visualizza report HTML
+npm run test:e2e:report
+```
+
+### Test E2E Legacy (con TEST_MODE)
 
 ```bash
 # 1. Attiva TEST_MODE in .env.local
@@ -20,19 +42,67 @@ TEST_MODE=true
 # 2. Avvia dev server
 npm run dev
 
-# 3. Esegui test (in altra finestra terminale)
-npm run test:e2e
-```
-
-### Test Playwright Base
-
-```bash
+# 3. Esegui test legacy (in altra finestra terminale)
 npm run test:playwright
 ```
 
 ## 🎯 Test Inclusi
 
-### test-e2e.mjs (Test Completo)
+### 🆕 Suite UI/UX Playwright (e2e/*.spec.js)
+
+#### 🎨 Contrasto Colori (WCAG AA) - `e2e/contrast.spec.js`
+
+- ✅ Contrasto minimo 4.5:1 per testo normale
+- ✅ Contrasto minimo 3:1 per testo grande (headings)
+- ✅ Verifica su tutti gli elementi testuali (button, card, banner, link)
+- ✅ Test sia in light mode che dark mode
+- ✅ Verifica elementi critici (badge, form label, messaggi errore)
+- ✅ Utility WCAG contrast calculator in `e2e/utils/contrast.js`
+
+#### 🧩 Uniformità Componenti - `e2e/component-uniformity.spec.js`
+
+- ✅ **Button**: border radius, padding, stati hover consistenti
+- ✅ **Card**: liquid glass effect, border radius, padding, shadow/border
+- ✅ **Banner**: struttura uniforme, colori distintivi per warning/error
+- ✅ **Typography**: font family, font size, line height consistenti
+- ✅ **Spacing**: gap tra card, padding sezioni uniforme
+
+#### 📱 Responsive Design - `e2e/responsive.spec.js`
+
+- ✅ **Mobile (375px)**: card stack verticale, button touch-friendly (min 44px)
+- ✅ **Tablet (768px)**: layout adattivo, navigation visibile
+- ✅ **Desktop (1920px)**: utilizzo spazio orizzontale, content max-width
+- ✅ **Breakpoint transitions**: nessun scroll orizzontale
+- ✅ **Media**: immagini scalano correttamente, SVG visibili
+
+#### 🌓 Dark Mode & Liquid Glass - `e2e/dark-mode.spec.js`
+
+- ✅ Light/dark mode applicati correttamente
+- ✅ Theme toggle su settings page
+- ✅ Backdrop-filter blur su tutte le card
+- ✅ Background semi-trasparenti (rgba con alpha < 1)
+- ✅ Shadow o border per profondità
+- ✅ Glass effect persiste durante scroll
+- ✅ Layout preservato durante cambio tema
+- ✅ Tutte le pagine supportano dark mode
+
+#### ♿ Accessibilità (ARIA) - `e2e/accessibility.spec.js`
+
+- ✅ **ARIA labels**: button, link, form input con label
+- ✅ **Immagini** con alt text
+- ✅ **Status message** con role="status" o role="alert"
+- ✅ **Landmark navigation** (`<nav>`) e main (`<main>`)
+- ✅ **Keyboard navigation**: tab order logico, no keyboard trap
+- ✅ **Focus** visibile su elementi interattivi
+- ✅ **Modal** trap focus quando aperto
+- ✅ **Heading hierarchy** (h1 → h2 → h3, no skip)
+- ✅ **Semantic HTML**: liste con `<ul>/<ol>`, button con `<button>`
+- ✅ **Live regions** con aria-live
+- ✅ **Icone** con text alternative o aria-hidden
+
+**Totale**: 12 progetti di test (3 browser × 2 device × 2 theme)
+
+### test-e2e.mjs (Test Completo Legacy)
 
 **10 test automatici:**
 

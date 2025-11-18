@@ -37,6 +37,7 @@
 - **[Sandbox Mode](docs/sandbox.md)** - Testing locale senza chiamate reali alla stufa (SOLO localhost)
 - **[Testing](docs/testing.md)** - Unit tests, coverage, best practices
 - **[E2E Testing](E2E-TESTING.md)** - Playwright E2E tests per UI/UX (light/dark mode, responsive)
+- **[UI/UX Testing](docs/ui-ux-testing.md)** - Suite completa test Playwright (contrast WCAG AA, uniformità, accessibilità)
 - **[Versioning](docs/versioning.md)** - Semantic versioning, changelog, version enforcement
 - **[Deployment](docs/deployment.md)** - Deploy workflow, environment config, production checklist
 
@@ -395,6 +396,6 @@ ADMIN_USER_ID=auth0|xxx
 
 ---
 
-**Last Updated**: 2025-11-14
-**Version**: 1.14.0 (minor: Dark Mode Completo con Glass Effect Scuro)
+**Last Updated**: 2025-11-17
+**Version**: 1.15.0 (minor: E2E Testing Suite Playwright Completa)
 **Author**: Federico Manfredi

@@ -23,9 +23,15 @@ export default function Card({ children, className = '', glass = false, liquid =
     ? glassClasses
     : solidClasses;
 
+  const dataAttributes = {};
+  if (liquid || liquidPro) {
+    dataAttributes['data-liquid-glass'] = 'true';
+  }
+
   return (
     <div
       className={`${baseClasses} ${finalClasses} ${className}`}
+      {...dataAttributes}
       {...props}
     >
       {children}

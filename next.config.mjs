@@ -10,6 +10,9 @@ const __dirname = dirname(__filename);
 const nextConfig = {
   reactStrictMode: true,
   outputFileTracingRoot: resolve(__dirname),
+  env: {
+    NEXT_PUBLIC_TEST_MODE: process.env.TEST_MODE || 'false',
+  },
   images: {
     remotePatterns: [
       {

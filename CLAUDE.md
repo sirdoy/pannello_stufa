@@ -397,5 +397,5 @@ ADMIN_USER_ID=auth0|xxx
 ---
 
 **Last Updated**: 2025-11-18
-**Version**: 1.16.0 (minor: Sandbox Mode Environment Variable Support)
+**Version**: 1.16.1 (patch: Visual Inspection E2E Tests & Dark Mode Improvements)
 **Author**: Federico Manfredi

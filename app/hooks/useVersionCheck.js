@@ -21,6 +21,13 @@ export function useVersionCheck() {
     // Previeni double fetch in React Strict Mode
     if (fetchedRef.current) return;
 
+    // Non mostrare modal in TEST_MODE
+    if (process.env.NEXT_PUBLIC_TEST_MODE === 'true' || process.env.TEST_MODE === 'true') {
+      console.log('🧪 TEST_MODE: WhatsNew modal disabilitato');
+      fetchedRef.current = true;
+      return;
+    }
+
     const checkVersion = async () => {
       try {
         fetchedRef.current = true;

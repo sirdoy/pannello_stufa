@@ -5,6 +5,57 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.16.1] - 2025-11-18
+
+### Aggiunto
+- **Visual Inspection E2E Tests**: suite completa test Playwright per UI/UX quality assurance
+  - **Test Contrast (WCAG AA)**: verifica automatica contrasto minimo 4.5:1 per testo normale, 3:1 per headings
+  - **Test Component Uniformity**: validazione consistenza button (border-radius, padding, hover), card (liquid glass, shadow), banner (structure, colors), typography (font, size, line-height), spacing (gap, padding)
+  - **Test Responsive**: verifica layout mobile 375px (card stack, button 44px touch), tablet 768px (navigation), desktop 1920px (max-width), no scroll orizzontale
+  - **Test Dark Mode**: theme toggle funzionante, backdrop-filter blur su card, semi-transparent backgrounds, shadow/border depth, glass effect durante scroll
+  - **Test Accessibility**: ARIA labels (button, link, input), alt text immagini, keyboard navigation, focus visible, modal focus trap, heading hierarchy, semantic HTML, live regions
+  - **12 progetti test**: 3 browser (Chromium, Firefox, WebKit) × 2 device (Desktop 1920x1080, Mobile 375x667) × 2 theme (Light, Dark)
+  - File: `e2e/visual-inspection.spec.js`, `e2e/utils/contrast.js`
+
+### Modificato
+- **ThermostatCard dark mode migliorato**: visibilità aumentata per migliore leggibilità
+  - Background opacity: `dark:bg-white/[0.03]` → `dark:bg-white/[0.08]` su temperature display e summary info
+  - Mode buttons: aggiunto dark mode completo per tutti i 4 stati (schedule ⏰, away 🏃, hg ❄️, off ⏸️)
+  - Active states: background `dark:bg-{color}-900/30`, border `dark:border-{color}-600`, text `dark:text-{color}-400`
+  - Inactive states: background `dark:bg-white/[0.08]`, border `dark:border-white/10`, backdrop-blur-sm, hover `dark:hover:bg-white/[0.12]`
+  - Border uniformati: `border-2` → `border` per consistenza con design system
+  - File: `app/components/devices/thermostat/ThermostatCard.js`
+
+- **useVersionCheck TEST_MODE bypass**: modal WhatsNew disabilitata durante test automatici
+  - Check `process.env.NEXT_PUBLIC_TEST_MODE === 'true'` per bypass modal changelog
+  - Previene blocco test E2E causato da modal non dismissibile automaticamente
+  - Console log: "🧪 TEST_MODE: WhatsNew modal disabilitato"
+  - File: `app/hooks/useVersionCheck.js`
+
+- **Layout background fix**: explicit background color per consistenza dark mode
+  - Aggiunto `bg-neutral-50 dark:bg-neutral-900` al body tag
+  - Previene flash bianco durante caricamento dark mode
+  - File: `app/layout.js`
+
+- **next.config.mjs environment**: esposto TEST_MODE per client-side detection
+  - `env.NEXT_PUBLIC_TEST_MODE: process.env.TEST_MODE || 'false'`
+  - Permette componenti client di rilevare TEST_MODE per logic condizionale
+  - File: `next.config.mjs`
+
+- **E2E-TESTING.md**: aggiornata documentazione con nuova suite UI/UX
+  - Sezione "🆕 Suite UI/UX Playwright (e2e/*.spec.js)" con descrizione completa 5 categorie test
+  - Comandi esecuzione: `npm run test:e2e`, `test:e2e:ui`, `test:e2e:headed`, `test:e2e:debug`
+  - Cleanup automatico artifacts: playwright-report/, test-results/, playwright/.cache/
+  - Totale: 12 progetti test (3 browser × 2 device × 2 theme)
+  - File: `E2E-TESTING.md`
+
+### Tecnico
+- **Playwright configuration**: 12 test projects per coverage completo cross-browser e cross-theme
+- **WCAG contrast calculator**: utility `calculateContrast()` in `e2e/utils/contrast.js` per verifica automatica
+- **Test artifacts cleanup**: script automatico rimozione report/screenshots dopo esecuzione
+- **Contrast compliance**: tutti i componenti verificati per WCAG AA 4.5:1 ratio minimum
+- **Visual regression**: screenshot baseline per future comparison
+
 ## [1.16.0] - 2025-11-18
 
 ### Aggiunto

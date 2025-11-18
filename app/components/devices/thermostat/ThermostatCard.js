@@ -298,7 +298,7 @@ export default function ThermostatCard() {
             {/* Selected Room Temperature */}
             {selectedRoom ? (
               <div className="space-y-4 mb-4 sm:mb-6">
-                <div className="flex flex-col items-center justify-center p-4 sm:p-6 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-2xl border border-white/80 dark:border-white/10 shadow-sm">
+                <div className="flex flex-col items-center justify-center p-4 sm:p-6 bg-white/60 dark:bg-white/[0.08] backdrop-blur-sm rounded-2xl border border-white/80 dark:border-white/10 shadow-sm">
                   {/* Room name (solo se c'è una sola stanza) */}
                   {roomsWithStatus.length === 1 && (
                     <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-2">
@@ -392,10 +392,10 @@ export default function ThermostatCard() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
               <button
                 onClick={() => handleModeChange('schedule')}
-                className={`p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 active:scale-95 ${
+                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 ${
                   mode === 'schedule'
-                    ? 'bg-success-100 border-success-300 text-success-700'
-                    : 'bg-white/60 border-neutral-200 text-neutral-600 hover:bg-white/80'
+                    ? 'bg-success-100 dark:bg-success-900/30 border-success-300 dark:border-success-600 text-success-700 dark:text-success-400'
+                    : 'bg-white/60 dark:bg-white/[0.08] border-white/80 dark:border-white/10 text-neutral-600 dark:text-neutral-300 hover:bg-white/80 dark:hover:bg-white/[0.12] backdrop-blur-sm'
                 }`}
               >
                 <div className="text-2xl mb-1">⏰</div>
@@ -404,10 +404,10 @@ export default function ThermostatCard() {
 
               <button
                 onClick={() => handleModeChange('away')}
-                className={`p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 active:scale-95 ${
+                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 ${
                   mode === 'away'
-                    ? 'bg-warning-100 border-warning-300 text-warning-700'
-                    : 'bg-white/60 border-neutral-200 text-neutral-600 hover:bg-white/80'
+                    ? 'bg-warning-100 dark:bg-warning-900/30 border-warning-300 dark:border-warning-600 text-warning-700 dark:text-warning-400'
+                    : 'bg-white/60 dark:bg-white/[0.08] border-white/80 dark:border-white/10 text-neutral-600 dark:text-neutral-300 hover:bg-white/80 dark:hover:bg-white/[0.12] backdrop-blur-sm'
                 }`}
               >
                 <div className="text-2xl mb-1">🏃</div>
@@ -416,10 +416,10 @@ export default function ThermostatCard() {
 
               <button
                 onClick={() => handleModeChange('hg')}
-                className={`p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 active:scale-95 ${
+                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 ${
                   mode === 'hg'
-                    ? 'bg-info-100 border-info-300 text-info-700'
-                    : 'bg-white/60 border-neutral-200 text-neutral-600 hover:bg-white/80'
+                    ? 'bg-info-100 dark:bg-info-900/30 border-info-300 dark:border-info-600 text-info-700 dark:text-info-400'
+                    : 'bg-white/60 dark:bg-white/[0.08] border-white/80 dark:border-white/10 text-neutral-600 dark:text-neutral-300 hover:bg-white/80 dark:hover:bg-white/[0.12] backdrop-blur-sm'
                 }`}
               >
                 <div className="text-2xl mb-1">❄️</div>
@@ -428,10 +428,10 @@ export default function ThermostatCard() {
 
               <button
                 onClick={() => handleModeChange('off')}
-                className={`p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 active:scale-95 ${
+                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 ${
                   mode === 'off'
-                    ? 'bg-neutral-200 border-neutral-400 text-neutral-700'
-                    : 'bg-white/60 border-neutral-200 text-neutral-600 hover:bg-white/80'
+                    ? 'bg-neutral-200 dark:bg-neutral-700 border-neutral-400 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300'
+                    : 'bg-white/60 dark:bg-white/[0.08] border-white/80 dark:border-white/10 text-neutral-600 dark:text-neutral-300 hover:bg-white/80 dark:hover:bg-white/[0.12] backdrop-blur-sm'
                 }`}
               >
                 <div className="text-2xl mb-1">⏸️</div>
@@ -453,7 +453,7 @@ export default function ThermostatCard() {
 
             {/* Summary Info */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-              <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-xl border border-white/80 dark:border-white/10">
+              <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 dark:bg-white/[0.08] backdrop-blur-sm rounded-xl border border-white/80 dark:border-white/10">
                 <span className="text-2xl sm:text-3xl mb-1">🏠</span>
                 <p className="text-xs text-neutral-500 dark:text-neutral-400">Casa</p>
                 <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100 truncate w-full text-center">
@@ -461,13 +461,13 @@ export default function ThermostatCard() {
                 </p>
               </div>
 
-              <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-xl border border-white/80 dark:border-white/10">
+              <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 dark:bg-white/[0.08] backdrop-blur-sm rounded-xl border border-white/80 dark:border-white/10">
                 <span className="text-2xl sm:text-3xl mb-1">🚪</span>
                 <p className="text-xs text-neutral-500 dark:text-neutral-400">Stanze</p>
                 <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100">{rooms.length}</p>
               </div>
 
-              <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-xl border border-white/80 dark:border-white/10 col-span-2 sm:col-span-1">
+              <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 dark:bg-white/[0.08] backdrop-blur-sm rounded-xl border border-white/80 dark:border-white/10 col-span-2 sm:col-span-1">
                 <span className="text-2xl sm:text-3xl mb-1">📡</span>
                 <p className="text-xs text-neutral-500 dark:text-neutral-400">Dispositivi</p>
                 <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100">{topology.modules?.length || 0}</p>

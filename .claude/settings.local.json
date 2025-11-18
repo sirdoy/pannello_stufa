@@ -1,14 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(TEST_MODE=true npm run dev:*)",
-      "Bash(TEST_MODE=true npx playwright test:*)",
-      "Bash(while pgrep -f 'playwright test')",
-      "Bash(do sleep 5)",
-      "Bash(chmod:*)",
-      "Bash(npm run test:e2e:clean:*)",
-      "Bash(npm run build:*)",
-      "Bash(npm test:*)"
+      "Bash(SANDBOX_MODE=true TEST_MODE=true npm run dev:*)",
+      "Bash(SANDBOX_MODE=true TEST_MODE=true npx playwright test:*)",
+      "Bash(pkill:*)"
     ],
     "deny": [],
     "ask": []

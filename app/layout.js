@@ -49,7 +49,7 @@ export default function RootLayout({ children }) {
         }}
       />
     </head>
-    <body className="min-h-screen text-neutral-900 dark:text-neutral-100 flex flex-col" suppressHydrationWarning>
+    <body className="min-h-screen bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 flex flex-col" suppressHydrationWarning>
     <ClientProviders>
       <VersionEnforcer />
       <Navbar />

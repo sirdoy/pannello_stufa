@@ -22,6 +22,8 @@ export default function ThermostatCard() {
   const [status, setStatus] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedRoomId, setSelectedRoomId] = useState(null);
+  const [calibrating, setCalibrating] = useState(false);
+  const [calibrationSuccess, setCalibrationSuccess] = useState(null);
 
   const connectionCheckedRef = useRef(false);
   const pollingStartedRef = useRef(false);
@@ -114,13 +116,21 @@ export default function ThermostatCard() {
       }
 
       if (data.error) {
+        // Rate limiting error - don't show to user, just skip this poll
+        if (data.error.includes('concurrency limited')) {
+          console.warn('⚠️ Netatmo rate limit - skipping this poll');
+          return;
+        }
         throw new Error(data.error);
       }
 
       setStatus(data);
     } catch (err) {
       console.error('Errore fetch status termostato:', err);
-      setError(err.message);
+      // Don't show rate limit errors to user
+      if (!err.message.includes('concurrency limited')) {
+        setError(err.message);
+      }
     }
   }
 
@@ -166,6 +176,37 @@ export default function ThermostatCard() {
       await fetchStatus();
     } catch (err) {
       setError(err.message);
+    }
+  }
+
+  async function handleCalibrateValves() {
+    try {
+      setError(null);
+      setCalibrating(true);
+      setCalibrationSuccess(null);
+
+      const response = await fetch(NETATMO_ROUTES.calibrate, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      if (data.success) {
+        setCalibrationSuccess(true);
+        // Clear success message after 5 seconds
+        setTimeout(() => setCalibrationSuccess(null), 5000);
+      }
+    } catch (err) {
+      console.error('Errore calibrazione valvole:', err);
+      setError(`Calibrazione fallita: ${err.message}`);
+      setCalibrationSuccess(false);
+    } finally {
+      setCalibrating(false);
     }
   }
 
@@ -474,8 +515,42 @@ export default function ThermostatCard() {
               </div>
             </div>
 
-            {/* Link to full page */}
-            <div className="mt-4 sm:mt-6">
+            {/* Actions */}
+            <div className="mt-4 sm:mt-6 space-y-3">
+              {/* Calibration Success Banner */}
+              {calibrationSuccess !== null && (
+                <div className={`p-3 rounded-lg border ${
+                  calibrationSuccess
+                    ? 'bg-success-50 dark:bg-success-900/30 border-success-200 dark:border-success-600'
+                    : 'bg-error-50 dark:bg-error-900/30 border-error-200 dark:border-error-600'
+                }`}>
+                  <p className={`text-sm font-medium ${
+                    calibrationSuccess
+                      ? 'text-success-700 dark:text-success-400'
+                      : 'text-error-700 dark:text-error-400'
+                  }`}>
+                    {calibrationSuccess
+                      ? '✓ Calibrazione valvole avviata con successo'
+                      : '✗ Calibrazione fallita'
+                    }
+                  </p>
+                </div>
+              )}
+
+              {/* Calibrate Button */}
+              <Button
+                liquid
+                variant="info"
+                onClick={handleCalibrateValves}
+                disabled={calibrating}
+                className="w-full"
+                size="sm"
+                icon={calibrating ? '⏳' : '🔧'}
+              >
+                {calibrating ? 'Calibrazione in corso...' : 'Tara Valvole'}
+              </Button>
+
+              {/* Link to full page */}
               <Button
                 liquid
                 variant="outline"

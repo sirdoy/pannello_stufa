@@ -2,7 +2,7 @@ import { get, ref, set } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import { clearSemiManualMode } from '@/lib/schedulerService';
 import { canIgnite, trackUsageHours } from '@/lib/maintenanceService';
-import { STOVE_ROUTES } from '@/lib/routes';
+import { STOVE_ROUTES, NETATMO_ROUTES } from '@/lib/routes';
 import { sendNotificationToUser } from '@/lib/firebaseAdmin';
 import {
   shouldSendSchedulerNotification,
@@ -55,6 +55,71 @@ async function sendSchedulerNotification(action, details = '') {
 
   } catch (error) {
     console.error('❌ Errore invio notifica scheduler:', error);
+  }
+}
+
+/**
+ * Helper: Calibra valvole Netatmo ogni 12 ore
+ * Controlla timestamp ultima calibrazione e calibra se necessario
+ */
+async function calibrateValvesIfNeeded(baseUrl) {
+  try {
+    // Get last calibration timestamp
+    const lastCalibrationSnap = await get(ref(db, 'netatmo/lastAutoCalibration'));
+    const lastCalibration = lastCalibrationSnap.exists() ? lastCalibrationSnap.val() : null;
+
+    const now = Date.now();
+    const TWELVE_HOURS = 12 * 60 * 60 * 1000; // 12 ore in millisecondi
+
+    // Check if 12 hours have passed since last calibration
+    if (lastCalibration && (now - lastCalibration) < TWELVE_HOURS) {
+      // Not yet time for calibration
+      return {
+        calibrated: false,
+        reason: 'too_soon',
+        nextCalibration: new Date(lastCalibration + TWELVE_HOURS).toISOString(),
+      };
+    }
+
+    console.log('🔧 Avvio calibrazione automatica valvole Netatmo...');
+
+    // Call calibration endpoint
+    const response = await fetch(`${baseUrl}${NETATMO_ROUTES.calibrate}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || data.error) {
+      console.error('❌ Calibrazione automatica fallita:', data.error || response.statusText);
+      return {
+        calibrated: false,
+        reason: 'error',
+        error: data.error || response.statusText,
+      };
+    }
+
+    // Update last calibration timestamp
+    await set(ref(db, 'netatmo/lastAutoCalibration'), now);
+
+    console.log('✅ Calibrazione automatica valvole completata');
+
+    return {
+      calibrated: true,
+      timestamp: now,
+      nextCalibration: new Date(now + TWELVE_HOURS).toISOString(),
+    };
+
+  } catch (error) {
+    console.error('❌ Errore calibrazione automatica valvole:', error);
+    return {
+      calibrated: false,
+      reason: 'exception',
+      error: error.message,
+    };
   }
 }
 
@@ -145,6 +210,11 @@ export async function GET(req) {
     const baseUrl = `${req.nextUrl.protocol}//${req.headers.get('host')}`;
     console.log(baseUrl);
 
+    // Auto-calibrate Netatmo valves every 12 hours
+    const calibrationResult = await calibrateValvesIfNeeded(baseUrl);
+    if (calibrationResult.calibrated) {
+      console.log(`✅ Calibrazione automatica completata - prossima calibrazione: ${calibrationResult.nextCalibration}`);
+    }
 
     const statusRes = await fetch(`${baseUrl}${STOVE_ROUTES.status}`);
     const statusJson = await statusRes.json();

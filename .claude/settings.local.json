@@ -3,7 +3,13 @@
     "allow": [
       "Bash(SANDBOX_MODE=true TEST_MODE=true npm run dev:*)",
       "Bash(SANDBOX_MODE=true TEST_MODE=true npx playwright test:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "WebSearch",
+      "WebFetch(domain:dev.netatmo.com)",
+      "Bash(node test-calibrate.js:*)",
+      "Bash(node test-netatmo-calibrate.js:*)",
+      "Bash(TEST_MODE=true curl:*)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []

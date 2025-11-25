@@ -13,10 +13,13 @@ Tutti i componenti UI supportano dark mode con palette ottimizzata per glass eff
 /* Backgrounds Glass */
 bg-white/[0.08] dark:bg-white/[0.05]
 
+/* Internal Boxes (Standard Opacity) */
+bg-neutral-100 dark:bg-white/[0.03]  /* Temperature, info, controls - uniformato v1.17.0 */
+
 /* Testi */
 text-neutral-900 dark:text-white
 text-neutral-700 dark:text-neutral-300
-text-neutral-600 dark:text-neutral-400
+text-neutral-600 dark:text-neutral-400  /* Con dark:text-neutral-300 per contrasto migliorato */
 
 /* Borders/Rings */
 border-white/20 dark:border-white/10
@@ -28,6 +31,8 @@ text-primary-600 dark:text-primary-400
 ```
 
 **Body Background**: Gradiente scuro `from-neutral-900 via-neutral-800 to-neutral-900`
+
+**Internal Box Standard** (v1.17.0): Tutti i box interni (temperature, info, controls) usano consistentemente `dark:bg-white/[0.03]` per esperienza visiva uniforme.
 
 ## Card
 

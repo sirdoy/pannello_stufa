@@ -546,7 +546,7 @@ export default function StoveCard() {
               <button
                 onClick={handleManualRefresh}
                 disabled={refreshing}
-                className="group relative p-3 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] hover:bg-white/[0.12] dark:hover:bg-white/[0.08] backdrop-blur-2xl shadow-liquid-sm hover:shadow-liquid active:scale-[0.98] transition-all duration-300 disabled:opacity-50 ring-1 ring-white/20 dark:ring-white/10 ring-inset overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none"
+                className="group relative p-3 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] hover:bg-white/[0.12] dark:hover:bg-white/[0.08] backdrop-blur-2xl shadow-liquid-sm hover:shadow-liquid active:scale-[0.98] transition-all duration-300 disabled:opacity-50 border border-white/20 dark:border-white/10 overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none"
                 title="Aggiorna stato"
               >
                 <span className={`text-xl inline-block relative z-10 ${refreshing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`}>
@@ -665,14 +665,14 @@ export default function StoveCard() {
                 <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
               </div>
               <div className="relative flex justify-center">
-                <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
+                <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm border border-white/20 dark:border-white/10 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
                   <span className="relative z-10">Modalità Controllo</span>
                 </span>
               </div>
             </div>
 
             {/* Mode Indicator - Liquid Glass */}
-            <div className="flex flex-col gap-4 p-5 sm:p-6 bg-white/[0.08] backdrop-blur-2xl rounded-2xl shadow-liquid-sm ring-1 ring-white/15 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none">
+            <div className="flex flex-col gap-4 p-5 sm:p-6 bg-white/[0.08] backdrop-blur-2xl rounded-2xl shadow-liquid-sm border border-white/15 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none">
               <div className="flex items-center gap-3 sm:gap-4 relative z-10">
                 <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${
                   schedulerEnabled && semiManualMode ? 'bg-warning-100 border-2 border-warning-300' :
@@ -756,7 +756,7 @@ export default function StoveCard() {
                     <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 to-transparent"></div>
                   </div>
                   <div className="relative flex justify-center">
-                    <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
+                    <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm border border-white/20 dark:border-white/10 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
                       <span className="relative z-10">Manutenzione</span>
                     </span>
                   </div>
@@ -772,7 +772,7 @@ export default function StoveCard() {
                 <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 to-transparent"></div>
               </div>
               <div className="relative flex justify-center">
-                <span className="px-4 py-1.5 bg-white/[0.10] backdrop-blur-2xl text-neutral-700 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm ring-1 ring-white/20 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 before:to-transparent before:pointer-events-none">
+                <span className="px-4 py-1.5 bg-white/[0.10] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm border border-white/20 dark:border-white/10 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
                   <span className="relative z-10">Controllo</span>
                 </span>
               </div>
@@ -806,12 +806,12 @@ export default function StoveCard() {
 
             {/* Status indicator - Liquid Glass */}
             {isAccesa && (
-              <div className="mb-6 p-3 sm:p-4 bg-success-500/[0.08] backdrop-blur-2xl rounded-xl text-center shadow-liquid-sm ring-1 ring-success-500/20 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-success-400/10 before:to-transparent before:pointer-events-none">
-                <p className="text-xs sm:text-sm font-semibold text-success-700 tracking-wide relative z-10">✓ Stufa in funzione</p>
+              <div className="mb-6 p-3 sm:p-4 bg-success-500/[0.08] backdrop-blur-2xl rounded-xl text-center shadow-liquid-sm border border-success-500/20 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-success-400/10 before:to-transparent before:pointer-events-none">
+                <p className="text-xs sm:text-sm font-semibold text-success-700 dark:text-success-400 tracking-wide relative z-10">✓ Stufa in funzione</p>
               </div>
             )}
             {isSpenta && (
-              <div className="mb-6 p-3 sm:p-4 bg-neutral-500/[0.08] backdrop-blur-2xl rounded-xl text-center shadow-liquid-sm ring-1 ring-neutral-400/20 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-neutral-300/10 before:to-transparent before:pointer-events-none">
+              <div className="mb-6 p-3 sm:p-4 bg-neutral-500/[0.08] backdrop-blur-2xl rounded-xl text-center shadow-liquid-sm border border-neutral-400/20 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-neutral-300/10 before:to-transparent before:pointer-events-none">
                 <p className="text-xs sm:text-sm font-semibold text-neutral-600 dark:text-neutral-400 tracking-wide relative z-10">○ Stufa spenta</p>
               </div>
             )}
@@ -821,8 +821,8 @@ export default function StoveCard() {
               <div className="space-y-4">
                 {/* Info badge quando in modalità automatica */}
                 {schedulerEnabled && !semiManualMode && (
-                  <div className="px-4 py-2.5 bg-info-500/[0.08] backdrop-blur-2xl rounded-xl text-center shadow-liquid-sm ring-1 ring-info-500/20 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-info-400/10 before:to-transparent before:pointer-events-none">
-                    <p className="text-xs sm:text-sm font-semibold text-info-700 tracking-wide relative z-10">
+                  <div className="px-4 py-2.5 bg-info-500/[0.08] backdrop-blur-2xl rounded-xl text-center shadow-liquid-sm border border-info-500/20 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-info-400/10 before:to-transparent before:pointer-events-none">
+                    <p className="text-xs sm:text-sm font-semibold text-info-700 dark:text-info-400 tracking-wide relative z-10">
                       ℹ️ La modifica attiverà la modalità Semi-Manuale
                     </p>
                   </div>

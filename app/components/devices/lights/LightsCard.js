@@ -206,27 +206,30 @@ export default function LightsCard() {
   if (!connected) {
     return (
       <div className="space-y-4 sm:space-y-6">
-        <Card liquid className="p-4 sm:p-6 lg:p-8 border-2 border-warning-200 bg-warning-50">
+        <Card liquidPro className="overflow-visible transition-all duration-500">
           <div className="relative">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-warning-500 via-warning-400 to-warning-500"></div>
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-warning-500 via-warning-400 to-warning-500 opacity-80"></div>
 
-            <div className="space-y-4 sm:space-y-6 pt-2">
+            <div className="p-6 sm:p-8">
               {/* Header */}
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">💡 Luci</h2>
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-200 rounded-full">
-                  <span className="w-2 h-2 bg-neutral-500 rounded-full"></span>
-                  <span className="text-xs font-medium text-neutral-700">Offline</span>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                  <span className="text-2xl sm:text-3xl">💡</span>
+                  <span>Luci</span>
+                </h2>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-200 dark:bg-neutral-700 rounded-full">
+                  <span className="w-2 h-2 bg-neutral-500 dark:bg-neutral-400 rounded-full"></span>
+                  <span className="text-xs font-medium text-neutral-700 dark:text-neutral-300">Offline</span>
                 </div>
               </div>
 
               {/* Not connected message */}
               <div className="text-center py-8">
                 <div className="text-6xl mb-4">🔌</div>
-                <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+                <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-2">
                   Luci Non Connesse
                 </h3>
-                <p className="text-sm text-neutral-600 mb-6">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6">
                   Connetti il tuo account Philips Hue per controllare le luci
                 </p>
 
@@ -250,8 +253,13 @@ export default function LightsCard() {
               </div>
 
               {error && (
-                <div className="mt-4 p-3 bg-primary-50 border border-primary-200 rounded-lg">
-                  <p className="text-xs text-primary-700">⚠️ {error}</p>
+                <div className="mt-4">
+                  <Banner
+                    liquid
+                    variant="error"
+                    icon="⚠️"
+                    description={error}
+                  />
                 </div>
               )}
             </div>
@@ -302,7 +310,7 @@ export default function LightsCard() {
               <button
                 onClick={handleRefresh}
                 disabled={refreshing}
-                className="group relative p-3 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] hover:bg-white/[0.12] dark:hover:bg-white/[0.08] backdrop-blur-2xl shadow-liquid-sm hover:shadow-liquid active:scale-[0.98] transition-all duration-300 disabled:opacity-50 ring-1 ring-white/20 dark:ring-white/10 ring-inset overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none"
+                className="group relative p-3 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] hover:bg-white/[0.12] dark:hover:bg-white/[0.08] backdrop-blur-2xl shadow-liquid-sm hover:shadow-liquid active:scale-[0.98] transition-all duration-300 disabled:opacity-50 border border-white/20 dark:border-white/10 overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none"
                 title="Aggiorna stato"
               >
                 <span className={`text-xl inline-block relative z-10 ${refreshing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`}>
@@ -392,7 +400,7 @@ export default function LightsCard() {
                         <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
                       </div>
                       <div className="relative flex justify-center">
-                        <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
+                        <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm border border-white/20 dark:border-white/10 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
                           <span className="relative z-10">Scene</span>
                         </span>
                       </div>
@@ -421,7 +429,7 @@ export default function LightsCard() {
                     <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
                   </div>
                   <div className="relative flex justify-center">
-                    <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
+                    <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm border border-white/20 dark:border-white/10 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
                       <span className="relative z-10">Informazioni</span>
                     </span>
                   </div>

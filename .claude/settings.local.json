@@ -15,7 +15,9 @@
       "Bash(node -e:*)",
       "Bash(npm run build:*)",
       "Bash(npm test:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(SANDBOX_MODE=true npx playwright test:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

@@ -38,6 +38,7 @@
 - **[Testing](docs/testing.md)** - Unit tests, coverage, best practices
 - **[E2E Testing](E2E-TESTING.md)** - Playwright E2E tests per UI/UX (light/dark mode, responsive)
 - **[UI/UX Testing](docs/ui-ux-testing.md)** - Suite completa test Playwright (contrast WCAG AA, uniformità, accessibilità)
+- **[Visual Screenshots](docs/visual-screenshots.md)** - Come catturare screenshot bypassando Auth0 con TEST_MODE
 - **[Versioning](docs/versioning.md)** - Semantic versioning, changelog, version enforcement
 - **[Deployment](docs/deployment.md)** - Deploy workflow, environment config, production checklist
 
@@ -151,6 +152,10 @@ npm run start            # Production server
 npm test                 # Run all tests
 npm run test:watch       # Watch mode
 npm run test:coverage    # Coverage report
+
+# Visual Screenshots (bypass Auth0)
+SANDBOX_MODE=true TEST_MODE=true npm run dev &  # Dev server for screenshots
+SANDBOX_MODE=true TEST_MODE=true npx playwright test e2e/visual-inspection.spec.js --grep "desktop - light - loaded"
 
 # Firebase Sync
 node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require('./lib/version').VERSION_HISTORY)"

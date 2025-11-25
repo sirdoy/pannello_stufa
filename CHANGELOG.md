@@ -5,6 +5,56 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.17.0] - 2025-11-25
+
+### Modificato
+- **Visual Uniformity: disconnected states uniformati a liquid glass**
+  - ThermostatCard e LightsCard disconnected states convertiti da background solido a liquidPro
+  - Pattern consistente: tutti i device cards ora usano liquid glass anche in stato disconnesso
+  - File modificati: `app/components/devices/thermostat/ThermostatCard.js`, `app/components/devices/lights/LightsCard.js`
+
+- **Dark Mode Opacity standardizzata a 0.03**
+  - Tutti i box interni (temperature, info, controls) ora usano `dark:bg-white/[0.03]` uniformemente
+  - ThermostatCard: temperature display, summary info, controls unificati a opacity 0.03
+  - Eliminata inconsistenza opacity (prima mix di 0.03 e 0.08)
+  - Esperienza visiva coerente in dark mode su tutti i device cards
+
+- **Border standardization: ring-1 ring-inset → border**
+  - StoveCard: convertiti ring a border standard per consistenza
+  - ThermostatCard: borders uniformati (era mix di border e border-2)
+  - LightsCard: borders standardizzati
+  - Design system ora completamente consistente su tutti i componenti
+
+- **Padding unificato: p-6 sm:p-8**
+  - Rimosso terzo breakpoint `lg:p-8` per semplificazione responsive
+  - Disconnected states ora usano padding consistente con connected states
+  - Pattern responsive uniforme: base 6, small+ 8
+
+- **Dark Mode completato**
+  - StoveCard: aggiunti `dark:text-neutral-300` su testo `text-neutral-600` per miglior contrasto
+  - ThermostatCard: aggiunte dark mode classes mancanti su tutti gli elementi disconnected
+  - LightsCard: aggiunte dark mode classes mancanti su tutti gli elementi disconnected
+  - Zero elementi senza dark mode variant
+
+### Aggiunto
+- **Documentazione Visual Screenshots**: creato `docs/visual-screenshots.md`
+  - Guida completa su come bypassare Auth0 con TEST_MODE per catturare screenshot
+  - Sezioni: Problema, Soluzione TEST_MODE, Come catturare screenshot, Output, Troubleshooting
+  - Comando quick start: `SANDBOX_MODE=true TEST_MODE=true npm run dev`
+  - Documentazione integrata con Playwright visual tests
+  - File: `docs/visual-screenshots.md`
+
+- **CLAUDE.md aggiornato**
+  - Aggiunto link Visual Screenshots nella sezione Development Workflows
+  - Quick command per testing visivo: `SANDBOX_MODE=true TEST_MODE=true npm run dev`
+  - Indice aggiornato per includere nuova documentazione
+
+### Tecnico
+- **100% visual consistency**: tutti i device cards ora identici in stile liquid glass
+- **Design system refinement**: eliminata frammentazione styling tra componenti
+- **Maintainability improved**: pattern uniformi riducono complessità manutenzione
+- **Build verified**: `npm run build` completato con zero errori/warnings
+
 ## [1.16.2] - 2025-11-25
 
 ### Corretto

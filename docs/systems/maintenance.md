@@ -136,20 +136,30 @@ await trackUsageHours(status);
 ```
 
 **Logica**:
-1. Check `status === 'WORK'` → se no, skip
+1. Check `status === 'WORK' || status === 'MODULATION'` → se no, skip (entrambi sono working states)
 2. Se `lastUpdatedAt === null` → inizializza timestamp, skip tracking
 3. Calcola `elapsed = now - lastUpdatedAt` (minuti)
 4. Se `elapsed < 0.5` minuti → skip (troppo presto)
-5. Update Firebase:
+5. Update Firebase **via Transaction** (concurrency-safe):
    ```javascript
-   currentHours += elapsed / 60;
-   lastUpdatedAt = now;
-   if (currentHours >= targetHours) {
-     needsCleaning = true;
-   }
+   await runTransaction(ref(db, 'maintenance'), (current) => {
+     if (!current) return current;
+
+     const elapsed = calculateElapsed(current.lastUpdatedAt);
+     const newHours = (current.currentHours || 0) + elapsed;
+
+     return {
+       ...current,
+       currentHours: newHours,
+       lastUpdatedAt: now,
+       needsCleaning: newHours >= current.targetHours
+     };
+   });
    ```
 
 **Auto-recovery**: Se cron salta chiamate, prossima esecuzione recupera minuti persi automaticamente (elapsed time based).
+
+**Concurrency Safe**: Usa Firebase Transactions per garantire data integrity anche con multiple cron instances (Cloud Functions scalabili).
 
 **⚠️ CRITICO**: Tracking DEVE essere server-side via cron. Client-side tracking funziona SOLO se app aperta.
 
@@ -518,4 +528,4 @@ Vedi [Testing](../testing.md) per pattern completi.
 
 ---
 
-**Last Updated**: 2025-10-21
+**Last Updated**: 2025-11-25

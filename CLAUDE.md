@@ -396,6 +396,6 @@ ADMIN_USER_ID=auth0|xxx
 
 ---
 
-**Last Updated**: 2025-11-18
-**Version**: 1.16.1 (patch: Visual Inspection E2E Tests & Dark Mode Improvements)
+**Last Updated**: 2025-11-25
+**Version**: 1.16.2 (patch: Maintenance Tracking Race Conditions Fix & Firebase Transactions)
 **Author**: Federico Manfredi

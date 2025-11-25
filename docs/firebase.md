@@ -661,6 +661,50 @@ await set(ref(db, 'maintenance/lastUpdatedAt'), new Date().toISOString());
 await set(ref(db, 'maintenance/needsCleaning'), false);
 ```
 
+### 6. Transactions for Read-Modify-Write
+
+Usa `runTransaction()` per operazioni **atomiche read-modify-write** quando il valore dipende dal valore corrente.
+
+**When to Use**:
+- Incrementing/decrementing counters
+- Updating based on current value
+- Concurrent operations expected (multiple instances, cron jobs)
+
+```javascript
+import { ref, runTransaction } from 'firebase/database';
+
+// ✅ CORRECT - Atomic read-modify-write
+await runTransaction(ref(db, 'maintenance'), (current) => {
+  if (!current) return current;  // Abort if null
+
+  const elapsed = calculateElapsed(current.lastUpdatedAt);
+
+  return {
+    ...current,
+    currentHours: (current.currentHours || 0) + elapsed,
+    lastUpdatedAt: new Date().toISOString()
+  };
+});
+
+// ❌ WRONG - Race condition vulnerable
+const snapshot = await get(ref(db, 'maintenance'));
+const current = snapshot.val();
+const elapsed = calculateElapsed(current.lastUpdatedAt);
+
+await update(ref(db, 'maintenance'), {
+  currentHours: current.currentHours + elapsed,  // Race condition!
+  lastUpdatedAt: new Date().toISOString()
+});
+```
+
+**Transaction Behavior**:
+- Firebase **automatically retries** if data changes during transaction
+- Function may execute **multiple times** (must be **idempotent**)
+- Return `undefined` to abort transaction
+- Return new value to commit
+
+**Example Use Case**: Maintenance tracking con multiple cron instances (vedi `lib/maintenanceService.js`).
+
 ## See Also
 
 - [Systems](./systems/) - Sistemi che usano Firebase (maintenance, monitoring, etc.)
@@ -669,4 +713,4 @@ await set(ref(db, 'maintenance/needsCleaning'), false);
 
 ---
 
-**Last Updated**: 2025-10-21
+**Last Updated**: 2025-11-25

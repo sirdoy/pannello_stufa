@@ -5,6 +5,43 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.16.2] - 2025-11-25
+
+### Corretto
+- **Maintenance Tracking Race Conditions**: implementate Firebase Transactions per operazioni atomiche
+  - Risolti race conditions quando multiple istanze cron job eseguono tracking simultaneo
+  - Usate `runTransaction()` per garantire data integrity su `hoursUsed` updates
+  - Sistema tracking ora **concurrency-safe** anche con multiple cloud function instances
+  - File modificato: `lib/maintenanceService.js` (funzione `trackUsageHours()`)
+
+- **MODULATION State Tracking**: aggiunto supporto stato MODULATION come working state
+  - `MODULATION` ora riconosciuto come stato attivo oltre a `WORK`
+  - Tracking ore manutenzione ora accurato per entrambi gli stati di funzionamento
+  - File modificato: `lib/maintenanceService.js`
+
+### Aggiunto
+- **Comprehensive Concurrency Tests**: suite test completa per verificare atomicità operazioni
+  - 11 nuovi test concurrency in `__tests__/maintenanceService.concurrency.test.js`
+  - Test concurrent calls, race conditions, transaction retries, isolation
+  - Totale: 41 test passing (11 concurrency + 30 esistenti)
+  - Coverage: verifica comportamento corretto con chiamate simultanee
+
+- **Transaction Mocks**: estesi mock Firebase per supportare `runTransaction()`
+  - Aggiornati test esistenti in `lib/__tests__/maintenanceService.test.js`
+  - Mock `runTransaction` implementato per simulare Firebase atomic operations
+  - Tutti i 30 test esistenti aggiornati e passing
+
+### Tecnico
+- **Jest Setup Fix**: aggiunto conditional check per `window` object in `jest.setup.js`
+  - Compatibilità migliorata con Node.js test environment
+  - Previene errori "window is not defined" durante test execution
+  - File: `jest.setup.js`
+
+- **Data Integrity**: tracking ore manutenzione garantito accurato
+  - Atomic read-modify-write via Firebase Transactions
+  - Zero data loss anche con chiamate cron concorrenti
+  - Production ready per deploy scalabile
+
 ## [1.16.1] - 2025-11-18
 
 ### Aggiunto

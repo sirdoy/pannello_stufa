@@ -221,7 +221,7 @@ export async function GET(req) {
     const currentStatus = statusJson?.StatusDescription || 'unknown';
     const isOn = currentStatus.includes('WORK') || currentStatus.includes('START');
 
-    // Track maintenance hours (automatic tracking based on WORK status)
+    // Track maintenance hours (automatic tracking based on WORK/MODULATION status)
     const maintenanceTrack = await trackUsageHours(currentStatus);
     if (maintenanceTrack.tracked) {
       console.log(`✅ Maintenance tracked: +${maintenanceTrack.elapsedMinutes}min → ${maintenanceTrack.newCurrentHours.toFixed(2)}h total`);

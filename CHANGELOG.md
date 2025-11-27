@@ -5,6 +5,28 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.17.1] - 2025-11-27
+
+### Corretto
+- **Fix Semi-Auto Mode**: corretta rilevazione stato stufa negli endpoint setPower e setFan
+  - Bug risolto: modalità semi-manuale non si attivava quando utente modificava potenza/ventola
+  - Causa: codice usava `.status` (minuscolo) invece di `.StatusDescription` (maiuscolo)
+  - API Thermorossi ritorna `StatusDescription` (maiuscolo), non `status` (minuscolo)
+  - Pattern corretto: `statusData?.StatusDescription?.includes('WORK') || statusData?.StatusDescription?.includes('START')`
+  - File corretti: `app/api/stove/setFan/route.js`, `app/api/stove/setPower/route.js`
+
+### Aggiunto
+- **Test Suite Semi-Auto Mode**: creata suite completa test per validare fix
+  - 9 test in `__tests__/semiAutoMode.test.js` per verificare detection stato
+  - Test StatusDescription field detection (WORK, START, OFF)
+  - Test semi-auto activation logic con tutte le condizioni (stufa on/off, scheduler on/off, già in semi-manual, source manual/scheduler)
+  - 100% coverage comportamento semi-auto mode
+
+### Tecnico
+- **API field naming**: documentato che Thermorossi API usa PascalCase per field names (StatusDescription, ErrorDescription)
+- **Test pattern**: unit test per verificare field detection prima di test logica business
+- **Build verified**: `npm run build` completato con successo, tutti test passing
+
 ## [1.17.0] - 2025-11-25
 
 ### Modificato

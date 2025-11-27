@@ -15,7 +15,7 @@ export async function POST(req) {
     if (source === 'manual') {
       // Verifica se stufa è accesa
       const statusData = await getStoveStatus();
-      const isOn = statusData?.status?.includes('WORK') || statusData?.status?.includes('START');
+      const isOn = statusData?.StatusDescription?.includes('WORK') || statusData?.StatusDescription?.includes('START');
 
       if (isOn) {
         const mode = await getFullSchedulerMode();

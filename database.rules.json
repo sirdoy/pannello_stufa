@@ -1,0 +1,109 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "dev": {
+      ".read": false,
+      ".write": false
+    },
+
+    "cronHealth": {
+      "lastCall": {
+        ".read": true,
+        ".write": false
+      }
+    },
+
+    "stoveScheduler": {
+      "mode": {
+        ".read": true,
+        ".write": false
+      },
+      "$day": {
+        ".read": true,
+        ".write": false
+      }
+    },
+
+    "maintenance": {
+      ".read": true,
+      ".write": false
+    },
+
+    "log": {
+      ".read": true,
+      ".write": false,
+      ".indexOn": ["timestamp", "device", "source"]
+    },
+
+    "errors": {
+      ".read": true,
+      ".write": false,
+      ".indexOn": ["timestamp", "severity", "resolved"]
+    },
+
+    "changelog": {
+      ".read": true,
+      ".write": false,
+      ".indexOn": ["timestamp"]
+    },
+
+    "users": {
+      "$userId": {
+        ".read": false,
+        ".write": false,
+
+        "fcmTokens": {
+          ".indexOn": ["createdAt", "platform"]
+        },
+
+        "notificationPreferences": {
+          ".validate": false
+        }
+      }
+    },
+
+    "devicePreferences": {
+      "$userId": {
+        ".read": false,
+        ".write": false
+      }
+    },
+
+    "netatmo": {
+      ".read": false,
+      ".write": false,
+
+      "currentStatus": {
+        ".read": true,
+        ".write": false
+      },
+
+      "topology": {
+        ".read": true,
+        ".write": false
+      },
+
+      "deviceConfig": {
+        ".read": true,
+        ".write": false
+      }
+    },
+
+    "hue": {
+      ".read": false,
+      ".write": false,
+
+      "lights": {
+        ".read": true,
+        ".write": false
+      },
+
+      "groups": {
+        ".read": true,
+        ".write": false
+      }
+    }
+  }
+}

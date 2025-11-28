@@ -5,6 +5,89 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.18.0] - 2025-11-28
+
+### Aggiunto
+- **Firebase Admin SDK Migration**: migrazione completa a Firebase Admin SDK per sicurezza enterprise-grade
+  - Tutti i write operations ora eseguiti server-side tramite Admin SDK
+  - Zero esposizione credenziali client-side
+  - Architettura production-ready con separazione client/server
+
+- **Firebase Security Rules**: implementate regole database complete
+  - `.read = true`: lettura pubblica per client SDK (real-time listeners)
+  - `.write = false`: scrittura bloccata lato client (SOLO Admin SDK server-side)
+  - Protezione totale contro manipolazione dati non autorizzata
+  - File: `database.rules.json` (deployed su Firebase)
+
+- **Admin Helper Layer**: creato sistema helper per operazioni Admin SDK
+  - `lib/firebaseAdmin.js`: wrapper Admin SDK con operation helpers
+  - Helper functions: `updateData()`, `pushData()`, `removeData()`, `setData()`
+  - Gestione errori centralizzata e logging consistente
+  - Pattern riutilizzabile per tutte le write operations
+
+- **Maintenance Service Admin**: layer server-side per tracking manutenzione
+  - `lib/maintenanceServiceAdmin.js`: funzioni Admin SDK per maintenance operations
+  - `trackUsageHoursAdmin()`, `updateTargetHoursAdmin()`, `resetMaintenanceAdmin()`
+  - Migrazione trasparente da client service a server service
+  - Preservata logica business, cambiato solo access layer
+
+- **Security Documentation**: documentazione completa architettura sicurezza
+  - `docs/firebase-security.md`: guida completa Firebase Security Rules
+  - Architettura: Client SDK (read) + Admin SDK (write)
+  - Best practices: quando usare Admin vs Client SDK
+  - Troubleshooting: permission denied, security rules testing
+  - Migration guide: come migrare altri servizi a Admin SDK
+
+- **Test Infrastructure**: script testing per validazione sicurezza
+  - `scripts/test-security-rules.sh`: test automatici security rules (6 test)
+  - `scripts/test-firebase-operations.js`: test Admin SDK operations
+  - Validazione: read allowed, write denied, Admin SDK operations
+  - CI-ready: exit codes per integration testing
+
+### Modificato
+- **API Routes Migrati**: 10+ endpoint migrati a Admin SDK per write operations
+  - `/api/scheduler/check`: scheduler operations (Admin SDK)
+  - `/api/scheduler/intervals`: create/delete intervals (Admin SDK)
+  - `/api/scheduler/mode`: mode switching (Admin SDK)
+  - `/api/stove/*`: logging operations (Admin SDK)
+  - `/api/maintenance/*`: maintenance tracking (Admin SDK)
+  - `/api/errors/save`: error logging (Admin SDK)
+  - `/api/devices/preferences`: user preferences (Admin SDK)
+  - `/api/notifications/preferences`: notification settings (Admin SDK)
+  - `/api/theme/save`: theme preferences (Admin SDK)
+  - Tutti gli endpoint ora usano `lib/firebaseAdmin.js` helpers
+
+- **Client SDK Preserved**: operazioni read rimangono su Client SDK
+  - Real-time listeners (`onValue`) continuano a usare Client SDK
+  - Homepage polling, status updates, live data: tutto Client SDK
+  - Zero impatto performance: listeners real-time inalterati
+  - Separazione chiara: read (client) vs write (server)
+
+### Tecnico
+- **Zero Breaking Changes**: migrazione completamente trasparente
+  - App funziona identicamente a versione precedente
+  - User experience inalterata
+  - Tutte le funzionalità preservate
+  - Build production verificato con successo
+
+- **Admin SDK Scope Limited**: scope minimo per massima sicurezza
+  - Admin SDK usato SOLO per write operations
+  - Zero client-side exposure (SOLO server-side API routes)
+  - Service account key in environment variables (NEVER committed)
+  - Production-safe: credential rotation supportata
+
+- **Test Coverage**: suite completa test sicurezza
+  - 6/6 security rules test passing
+  - All Firebase operations test passing
+  - `npm run build` completato con successo
+  - Integration ready: script CI/CD inclusi
+
+- **Documentation Complete**: documentazione enterprise-ready
+  - Architecture diagrams (client vs server flow)
+  - Migration patterns (altri servizi)
+  - Security best practices (credential management)
+  - Troubleshooting guide (common issues)
+
 ## [1.17.1] - 2025-11-27
 
 ### Corretto

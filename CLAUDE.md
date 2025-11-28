@@ -17,6 +17,7 @@
 - **[Architecture](docs/architecture.md)** - Multi-device architecture, device registry, homepage layout
 - **[API Routes](docs/api-routes.md)** - Stove control, scheduler, external APIs patterns (OAuth 2.0)
 - **[Firebase](docs/firebase.md)** - Realtime Database schema, operations, best practices
+- **[Firebase Security](docs/firebase-security.md)** - Security Rules, Admin SDK, Client/Server separation
 - **[Data Flow](docs/data-flow.md)** - Polling, cron, OAuth, notifications flow
 
 ### UI & Design
@@ -54,6 +55,7 @@
 - **Tailwind CSS 3**: Utility-first + liquid glass iOS 18 style
 - **WebGL**: Effetti UI animati (frost patterns, texture overlays) tramite shader GLSL ottimizzati
 - **Firebase Realtime DB**: Scheduler, logs, versioning, push tokens
+- **Firebase Admin SDK**: Server-side write operations, Security Rules enforcement
 - **Auth0**: Autenticazione sicura
 - **Thermorossi Cloud API**: Controllo stufa
 - **Netatmo Energy API**: Termostato multi-room
@@ -96,11 +98,12 @@ pannello-stufa/
 │   ├── devices/                  # Device registry (DEVICE_CONFIG)
 │   ├── stoveApi.js              # Thermorossi API wrapper
 │   ├── schedulerService.js      # Scheduler logic
-│   ├── maintenanceService.js    # Maintenance tracking
+│   ├── maintenanceService.js    # Maintenance tracking (client)
+│   ├── maintenanceServiceAdmin.js  # Maintenance tracking (server Admin SDK)
 │   ├── errorMonitor.js          # Error detection
 │   ├── logService.js            # User action logging
-│   ├── firebase.js              # Firebase Client SDK
-│   ├── firebaseAdmin.js         # Firebase Admin SDK (push notifications)
+│   ├── firebase.js              # Firebase Client SDK (read operations)
+│   ├── firebaseAdmin.js         # Firebase Admin SDK (write operations)
 │   ├── notificationService.js   # FCM client-side
 │   ├── notificationPreferencesService.js  # Notification preferences
 │   ├── devicePreferencesService.js        # Device enable/disable preferences
@@ -115,6 +118,7 @@ pannello-stufa/
 │   ├── architecture.md
 │   ├── api-routes.md
 │   ├── firebase.md
+│   ├── firebase-security.md     # Security Rules, Admin SDK migration
 │   ├── ui-components.md
 │   ├── design-system.md
 │   ├── patterns.md
@@ -274,6 +278,31 @@ Sistema completo notifiche push con supporto iOS 16.4+ PWA.
 
 📖 **Dettagli**: [Versioning](docs/versioning.md)
 
+### Firebase Security (Client/Server Separation)
+
+Architettura sicurezza **enterprise-grade** con separazione Client SDK (read) / Admin SDK (write).
+
+**Security Rules**:
+- `.read = true`: Client SDK può leggere dati (real-time listeners)
+- `.write = false`: Client SDK NON può scrivere (solo Admin SDK server-side)
+
+**Pattern**:
+```javascript
+// ✅ CLIENT: Real-time listeners (read)
+onValue(ref(db, 'scheduler/mode'), (snapshot) => { ... });
+
+// ✅ SERVER: Write operations (Admin SDK)
+await updateData('scheduler/mode', { mode: 'automatic' });
+```
+
+**Benefici**:
+- Zero esposizione credenziali client-side
+- Protezione totale contro manipolazione dati non autorizzata
+- Admin SDK SOLO in API routes server-side
+- Production-safe con credential rotation
+
+📖 **Dettagli**: [Firebase Security](docs/firebase-security.md)
+
 ## 🚨 Critical Best Practices
 
 ### Firebase Operations
@@ -331,12 +360,12 @@ import { useState } from 'react';
 ## 🔗 Environment Variables
 
 ```env
-# Firebase (Client)
+# Firebase (Client SDK - read operations)
 NEXT_PUBLIC_FIREBASE_API_KEY=
 NEXT_PUBLIC_FIREBASE_DATABASE_URL=
 NEXT_PUBLIC_FIREBASE_VAPID_KEY=
 
-# Firebase (Admin - for push notifications)
+# Firebase (Admin SDK - write operations)
 FIREBASE_ADMIN_PROJECT_ID=
 FIREBASE_ADMIN_CLIENT_EMAIL=
 FIREBASE_ADMIN_PRIVATE_KEY=
@@ -372,6 +401,7 @@ ADMIN_USER_ID=auth0|xxx
 - [Patterns](docs/patterns.md) - Reusable code patterns
 - [API Routes](docs/api-routes.md) - API documentation
 - [Firebase](docs/firebase.md) - Database schema
+- [Firebase Security](docs/firebase-security.md) - Security Rules, Admin SDK
 - [Data Flow](docs/data-flow.md) - Data flows
 
 ### Systems
@@ -401,6 +431,6 @@ ADMIN_USER_ID=auth0|xxx
 
 ---
 
-**Last Updated**: 2025-11-25
-**Version**: 1.16.2 (patch: Maintenance Tracking Race Conditions Fix & Firebase Transactions)
+**Last Updated**: 2025-11-28
+**Version**: 1.18.0 (minor: Firebase Admin SDK Migration & Security Rules)
 **Author**: Federico Manfredi

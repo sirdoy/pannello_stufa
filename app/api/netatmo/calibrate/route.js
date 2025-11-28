@@ -1,5 +1,4 @@
-import { db } from '@/lib/firebase';
-import { ref, get } from 'firebase/database';
+import { adminDbGet, adminDbPush } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getSession } from '@auth0/nextjs-auth0';
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
@@ -36,13 +35,12 @@ export async function POST(request) {
     }
 
     // Get home_id from Firebase
-    const homeIdSnap = await get(ref(db, 'netatmo/home_id'));
-    if (!homeIdSnap.exists()) {
+    const homeId = await adminDbGet('netatmo/home_id');
+    if (!homeId) {
       return Response.json({
         error: 'home_id non trovato. Chiama prima /api/netatmo/homesdata'
       }, { status: 400 });
     }
-    const homeId = homeIdSnap.val();
 
     // Get homes data directly from Netatmo API to get complete schedule structure
     const homesData = await NETATMO_API.getHomesData(accessToken);
@@ -147,8 +145,7 @@ export async function POST(request) {
       source: 'manual',
     };
 
-    const { push, ref: dbRef } = await import('firebase/database');
-    await push(dbRef(db, 'log'), logEntry);
+    await adminDbPush('log', logEntry);
 
     // Track calibration in Firebase
     const calibrationEntry = {
@@ -158,7 +155,7 @@ export async function POST(request) {
       triggered_by: user.email,
       status: 'success',
     };
-    await push(dbRef(db, 'netatmo/calibrations'), calibrationEntry);
+    await adminDbPush('netatmo/calibrations', calibrationEntry);
 
     return Response.json({
       success: true,
@@ -172,7 +169,6 @@ export async function POST(request) {
 
     // Log failed calibration
     try {
-      const { push, ref: dbRef } = await import('firebase/database');
       const session = await getSession();
       const user = session?.user;
 
@@ -183,7 +179,7 @@ export async function POST(request) {
           status: 'failed',
           error: err.message,
         };
-        await push(dbRef(db, 'netatmo/calibrations'), calibrationEntry);
+        await adminDbPush('netatmo/calibrations', calibrationEntry);
       }
     } catch (logError) {
       console.error('❌ Failed to log calibration error:', logError);

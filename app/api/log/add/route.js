@@ -1,6 +1,7 @@
-import { db } from '@/lib/firebase';
-import { ref, push } from 'firebase/database';
+import { adminDbPush } from '@/lib/firebaseAdmin';
 import { getSession } from '@auth0/nextjs-auth0';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
   const body = await request.json();
@@ -22,8 +23,7 @@ export async function POST(request) {
       source: 'user', // Azioni manuali dell'utente
     };
 
-    const logRef = ref(db, 'log');
-    await push(logRef, logEntry);
+    await adminDbPush('log', logEntry);
 
     return Response.json({ success: true });
   } catch (error) {

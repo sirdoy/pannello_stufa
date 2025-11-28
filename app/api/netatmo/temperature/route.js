@@ -1,7 +1,7 @@
 // ✅ File: app/api/netatmo/temperature/route.js
 
-import { db } from '@/lib/firebase';
-import { ref, get, update } from 'firebase/database';
+
+import { adminDbGet, adminDbUpdate } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
 
@@ -23,7 +23,7 @@ export async function POST() {
     }
 
     // Step 2: recupera device_id e module_id da Firebase (o fallisce)
-    const configSnap = await get(ref(db, 'netatmo/deviceConfig'));
+    const configSnap = await adminDbGet('netatmo/deviceConfig');
     if (!configSnap.exists()) {
       return Response.json({ error: 'Configurazione dispositivo mancante' }, { status: 400 });
     }

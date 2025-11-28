@@ -1,13 +1,13 @@
-import { get, ref, set } from 'firebase/database';
-import { db } from '@/lib/firebase';
+import { adminDbGet, adminDbSet, sendNotificationToUser } from '@/lib/firebaseAdmin';
 import { clearSemiManualMode } from '@/lib/schedulerService';
-import { canIgnite, trackUsageHours } from '@/lib/maintenanceService';
+import { canIgnite, trackUsageHours } from '@/lib/maintenanceServiceAdmin';
 import { STOVE_ROUTES, NETATMO_ROUTES } from '@/lib/routes';
-import { sendNotificationToUser } from '@/lib/firebaseAdmin';
 import {
   shouldSendSchedulerNotification,
   shouldSendMaintenanceNotification,
 } from '@/lib/notificationPreferencesService';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * Helper: Invia notifica push per azione scheduler
@@ -65,8 +65,7 @@ async function sendSchedulerNotification(action, details = '') {
 async function calibrateValvesIfNeeded(baseUrl) {
   try {
     // Get last calibration timestamp
-    const lastCalibrationSnap = await get(ref(db, 'netatmo/lastAutoCalibration'));
-    const lastCalibration = lastCalibrationSnap.exists() ? lastCalibrationSnap.val() : null;
+    const lastCalibration = await adminDbGet('netatmo/lastAutoCalibration');
 
     const now = Date.now();
     const TWELVE_HOURS = 12 * 60 * 60 * 1000; // 12 ore in millisecondi
@@ -103,7 +102,7 @@ async function calibrateValvesIfNeeded(baseUrl) {
     }
 
     // Update last calibration timestamp
-    await set(ref(db, 'netatmo/lastAutoCalibration'), now);
+    await adminDbSet('netatmo/lastAutoCalibration', now);
 
     console.log('✅ Calibrazione automatica valvole completata');
 
@@ -134,7 +133,7 @@ export async function GET(req) {
     const cronHealthTimestamp = new Date().toISOString();
     console.log(`🔄 Tentativo salvataggio Firebase cronHealth/lastCall: ${cronHealthTimestamp}`);
     try {
-      await set(ref(db, 'cronHealth/lastCall'), cronHealthTimestamp);
+      await adminDbSet('cronHealth/lastCall', cronHealthTimestamp);
       console.log(`✅ Cron health updated: ${cronHealthTimestamp}`);
     } catch (error) {
       console.error('❌ ERRORE salvataggio cronHealth:', error);
@@ -142,8 +141,7 @@ export async function GET(req) {
     }
 
     // Check if scheduler mode is enabled
-    const modeSnapshot = await get(ref(db, `stoveScheduler/mode`));
-    const modeData = modeSnapshot.exists() ? modeSnapshot.val() : { enabled: false, semiManual: false };
+    const modeData = (await adminDbGet('stoveScheduler/mode')) || { enabled: false, semiManual: false };
     const schedulerEnabled = modeData.enabled;
 
     if (!schedulerEnabled) {
@@ -193,12 +191,10 @@ export async function GET(req) {
     const ora = `${timePart}:${formatter.formatToParts(now).find(p => p.type === 'minute').value}`;
     const currentMinutes = parseInt(timePart) * 60 + parseInt(formatter.formatToParts(now).find(p => p.type === 'minute').value);
 
-    const snapshot = await get(ref(db, `stoveScheduler/${giorno}`));
-    if (!snapshot.exists()) {
+    const intervals = await adminDbGet(`stoveScheduler/${giorno}`);
+    if (!intervals) {
       return Response.json({message: 'Nessuno scheduler', giorno, ora});
     }
-
-    const intervals = snapshot.val();
     const active = intervals.find(({start, end}) => {
       const [sh, sm] = start.split(':').map(Number);
       const [eh, em] = end.split(':').map(Number);

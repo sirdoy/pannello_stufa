@@ -1,5 +1,5 @@
-import { db } from '@/lib/firebase';
-import { ref, get, set } from 'firebase/database';
+
+import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
 
@@ -30,7 +30,7 @@ export async function GET() {
     const home = homesData[0]; // Usually single home
 
     // Save home_id to Firebase for future use
-    await set(ref(db, 'netatmo/home_id'), home.id);
+    await adminDbSet('netatmo/home_id', home.id);
 
     // Parse and structure data
     const rooms = NETATMO_API.parseRooms(homesData);

@@ -1,5 +1,5 @@
-import { db } from '@/lib/firebase';
-import { ref, get } from 'firebase/database';
+
+import { adminDbGet } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getSession } from '@auth0/nextjs-auth0';
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
@@ -54,7 +54,7 @@ export async function POST(request) {
     }
 
     // Get home_id from Firebase
-    const homeIdSnap = await get(ref(db, 'netatmo/home_id'));
+    const homeIdSnap = await adminDbGet('netatmo/home_id');
     if (!homeIdSnap.exists()) {
       return Response.json({
         error: 'home_id non trovato. Chiama prima /api/netatmo/homesdata'

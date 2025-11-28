@@ -51,10 +51,11 @@
 
     "users": {
       "$userId": {
-        ".read": false,
+        ".read": true,
         ".write": false,
 
         "fcmTokens": {
+          ".read": false,
           ".indexOn": ["createdAt", "platform"]
         },
 
@@ -66,7 +67,7 @@
 
     "devicePreferences": {
       "$userId": {
-        ".read": false,
+        ".read": true,
         ".write": false
       }
     },
@@ -104,6 +105,11 @@
         ".read": true,
         ".write": false
       }
+    },
+
+    "sandbox": {
+      ".read": true,
+      ".write": false
     }
   }
 }

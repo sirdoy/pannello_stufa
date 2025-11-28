@@ -1,5 +1,4 @@
 import { adminDbGet, adminDbSet, sendNotificationToUser } from '@/lib/firebaseAdmin';
-import { clearSemiManualMode } from '@/lib/schedulerService';
 import { canIgnite, trackUsageHours } from '@/lib/maintenanceServiceAdmin';
 import { STOVE_ROUTES, NETATMO_ROUTES } from '@/lib/routes';
 import {
@@ -353,7 +352,12 @@ export async function GET(req) {
 
     // Se è stato applicato un cambio e eravamo in semi-manuale, torniamo in automatico
     if (changeApplied && modeData.semiManual) {
-      await clearSemiManualMode();
+      // Clear semi-manual mode usando Admin SDK
+      await adminDbSet('stoveScheduler/mode', {
+        enabled: modeData.enabled || false,
+        semiManual: false,
+        lastUpdated: new Date().toISOString()
+      });
       console.log('Cambio scheduler applicato - modalità semi-manuale disattivata');
     }
 

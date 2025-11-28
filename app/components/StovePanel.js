@@ -3,7 +3,8 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { getFullSchedulerMode, clearSemiManualMode, getNextScheduledAction } from '@/lib/schedulerService';
+import { getFullSchedulerMode, getNextScheduledAction } from '@/lib/schedulerService';
+import { clearSemiManualMode } from '@/lib/schedulerApiClient';
 import { STOVE_ROUTES } from '@/lib/routes';
 import { logStoveAction, logNetatmoAction, logSchedulerAction } from '@/lib/logService';
 import { logError, shouldNotify, sendErrorNotification } from '@/lib/errorMonitor';
@@ -227,14 +228,20 @@ export default function StovePanel() {
   };
 
   const handleClearSemiManual = async () => {
-    await clearSemiManualMode();
-    await logSchedulerAction.clearSemiManual();
-    setSemiManualMode(false);
-    setReturnToAutoAt(null);
+    try {
+      // Call API to clear semi-manual mode (uses Admin SDK)
+      await clearSemiManualMode();
+      await logSchedulerAction.clearSemiManual();
+      setSemiManualMode(false);
+      setReturnToAutoAt(null);
 
-    // Ricarica il prossimo cambio scheduler
-    const nextAction = await getNextScheduledAction();
-    setNextScheduledAction(nextAction);
+      // Ricarica il prossimo cambio scheduler
+      const nextAction = await getNextScheduledAction();
+      setNextScheduledAction(nextAction);
+    } catch (error) {
+      console.error('Errore nella disattivazione modalità semi-manuale:', error);
+      // Optionally show error to user
+    }
   };
 
   const handleConfirmCleaning = async () => {

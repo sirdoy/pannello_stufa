@@ -1,5 +1,6 @@
 'use client';
 
+import { clearSemiManualMode } from '@/lib/schedulerApiClient';
 import { useState, useEffect } from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
@@ -23,7 +24,7 @@ import {
 import {
   getFullSchedulerMode,
   setSchedulerMode,
-  clearSemiManualMode,
+  // clearSemiManualMode removed - use API
   saveSchedule,
   getSchedule,
 } from '../../../lib/schedulerService';

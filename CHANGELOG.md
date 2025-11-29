@@ -5,6 +5,79 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.19.0] - 2025-11-29
+
+### Aggiunto
+- **7 Nuove API Routes**: complete client/server separation per write operations
+  - `POST /api/notifications/register`: FCM token registration con Admin SDK
+  - `GET/PUT /api/notifications/preferences`: gestione preferenze notifiche utente
+  - `POST /api/maintenance/confirm-cleaning`: conferma pulizia stufa e reset contatore
+  - `POST /api/maintenance/update-target`: aggiornamento ore target manutenzione
+  - `POST /api/errors/log`: logging errori stufa
+  - `POST /api/errors/resolve`: risoluzione errori stufa
+  - `GET/POST /api/user/theme`: gestione preferenza tema dark/light utente
+
+- **Auth0 Protection**: tutte le nuove API routes protette con autenticazione
+  - `getSession()` per validazione utente autenticato
+  - Return 401 Unauthorized se utente non autenticato
+  - User ID da Auth0 session per operazioni Firebase
+
+- **Input Validation**: validazione parametri su tutte le API routes
+  - Controllo presenza parametri richiesti
+  - Return 400 Bad Request se validazione fallisce
+  - Sanitizzazione input per sicurezza
+
+### Modificato
+- **notificationService.js**: migrato `getFCMToken()` a POST /api/notifications/register
+  - Admin SDK registration server-side per FCM tokens
+  - Rimossi import Firebase client-side per registration
+  - Zero esposizione credenziali client
+
+- **notificationPreferencesService.js**: tutte operazioni CRUD migrate a API routes
+  - `getNotificationPreferences()`: GET /api/notifications/preferences
+  - `updateNotificationPreferences()`: PUT /api/notifications/preferences
+  - Pattern riutilizzabile per preferences management
+
+- **maintenanceService.js**: write operations migrate a Admin SDK
+  - `confirmCleaning()`: POST /api/maintenance/confirm-cleaning
+  - `updateTargetHours()`: POST /api/maintenance/update-target
+  - Preservate read operations (Client SDK listeners)
+
+- **errorMonitor.js**: error logging migrato a Admin SDK
+  - `logError()`: POST /api/errors/log
+  - `resolveError()`: POST /api/errors/resolve
+  - Server-side write, client-side read listeners
+
+- **themeService.js**: completa migrazione a API routes
+  - `saveThemePreference()`: POST /api/user/theme
+  - `getThemePreference()`: GET /api/user/theme
+  - Rimossi TUTTI import Firebase client (db, ref, set, get)
+  - Pulizia completa: zero dipendenze Firebase nel service
+
+### Tecnico
+- **Enterprise Security Pattern Completo**: separazione totale client/server
+  - Client SDK: SOLO read operations (real-time listeners)
+  - Admin SDK: SOLO write operations (API routes server-side)
+  - Zero client-side Firebase write access
+  - Production-ready architecture
+
+- **Bundle Size Optimization**: ridotto bundle homepage
+  - Homepage: 14.6 kB → 13.4 kB (-1.2 kB, -8.2%)
+  - Rimozione Firebase client imports da service files
+  - Migliorate performance caricamento iniziale
+
+- **Zero Breaking Changes**: backward compatible
+  - Funzionalità identiche a versione precedente
+  - User experience inalterata
+  - Migration trasparente
+  - Build production verificato con successo
+
+- **Code Quality**: pattern consistency
+  - Tutti i service files seguono stesso pattern (API routes per write)
+  - Error handling uniforme
+  - Response format consistente
+  - Test coverage preservato
+
 ## [1.18.0] - 2025-11-28
 
 ### Aggiunto

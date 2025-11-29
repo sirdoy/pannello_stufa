@@ -37,7 +37,10 @@
       "Bash(done)",
       "Bash(scripts/test-simple.sh:*)",
       "Bash(bash scripts/test-simple.sh:*)",
-      "Bash(scripts/test-security-rules.sh:*)"
+      "Bash(scripts/test-security-rules.sh:*)",
+      "Bash(set -a)",
+      "Bash(source .env.local)",
+      "Bash(set +a)"
     ],
     "deny": [],
     "ask": []

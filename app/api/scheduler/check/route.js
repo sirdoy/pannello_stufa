@@ -205,16 +205,29 @@ export async function GET(req) {
     const baseUrl = `${req.nextUrl.protocol}//${req.headers.get('host')}`;
     console.log(baseUrl);
 
-    // Auto-calibrate Netatmo valves every 12 hours
-    const calibrationResult = await calibrateValvesIfNeeded(baseUrl);
-    if (calibrationResult.calibrated) {
-      console.log(`✅ Calibrazione automatica completata - prossima calibrazione: ${calibrationResult.nextCalibration}`);
-    }
+    // OPTIMIZATION: Fetch stove data in parallel with calibration (non-blocking)
+    const [statusRes, fanRes, powerRes] = await Promise.all([
+      fetch(`${baseUrl}${STOVE_ROUTES.status}`),
+      fetch(`${baseUrl}${STOVE_ROUTES.getFan}`),
+      fetch(`${baseUrl}${STOVE_ROUTES.getPower}`)
+    ]);
 
-    const statusRes = await fetch(`${baseUrl}${STOVE_ROUTES.status}`);
     const statusJson = await statusRes.json();
     const currentStatus = statusJson?.StatusDescription || 'unknown';
     const isOn = currentStatus.includes('WORK') || currentStatus.includes('START');
+
+    const fanJson = await fanRes.json();
+    const currentFanLevel = fanJson?.Result ?? 3;
+
+    const powerJson = await powerRes.json();
+    const currentPowerLevel = powerJson?.Result ?? 2;
+
+    // Auto-calibrate Netatmo valves every 12 hours (run async, don't wait)
+    calibrateValvesIfNeeded(baseUrl).then((result) => {
+      if (result.calibrated) {
+        console.log(`✅ Calibrazione automatica completata - prossima calibrazione: ${result.nextCalibration}`);
+      }
+    }).catch(err => console.error('❌ Errore calibrazione:', err));
 
     // Track maintenance hours (automatic tracking based on WORK/MODULATION status)
     const maintenanceTrack = await trackUsageHours(currentStatus);
@@ -276,13 +289,7 @@ export async function GET(req) {
       }
     }
 
-    const fanRes = await fetch(`${baseUrl}${STOVE_ROUTES.getFan}`);
-    const fanJson = await fanRes.json();
-    const currentFanLevel = fanJson?.Result ?? 3;
-
-    const powerRes = await fetch(`${baseUrl}${STOVE_ROUTES.getPower}`);
-    const powerJson = await powerRes.json();
-    const currentPowerLevel = powerJson?.Result ?? 2;
+    // Fan and power already fetched in parallel above
 
     // console.log(statusJson);
     // console.log(isOn);

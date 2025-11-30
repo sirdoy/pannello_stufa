@@ -369,8 +369,20 @@ export async function GET(req) {
       activeSchedule: active || null,
     });
   } catch (error) {
-    console.error('Errore nel cron:', error);
-    return new Response('Errore interno', {status: 500});
+    console.error('❌ Errore nel cron:', error);
+    console.error('❌ Stack trace:', error.stack);
+    console.error('❌ Error details:', {
+      message: error.message,
+      name: error.name,
+      code: error.code
+    });
+
+    // Return detailed error in development/debug
+    return Response.json({
+      error: 'Internal server error',
+      message: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    }, { status: 500 });
   }
 }
 

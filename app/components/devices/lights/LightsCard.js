@@ -6,6 +6,7 @@ import Card from '../../ui/Card';
 import Button from '../../ui/Button';
 import Select from '../../ui/Select';
 import Banner from '../../ui/Banner';
+import LoadingOverlay from '../../ui/LoadingOverlay';
 
 /**
  * LightsCard - Complete Philips Hue lights control for homepage
@@ -21,6 +22,9 @@ export default function LightsCard() {
   const [scenes, setScenes] = useState([]);
   const [selectedRoomId, setSelectedRoomId] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Loading overlay message
+  const [loadingMessage, setLoadingMessage] = useState('Caricamento...');
 
   const connectionCheckedRef = useRef(false);
   const pollingStartedRef = useRef(false);
@@ -131,6 +135,8 @@ export default function LightsCard() {
 
   async function handleRoomToggle(roomId, on) {
     try {
+      setLoadingMessage(on ? 'Accensione luci...' : 'Spegnimento luci...');
+      setRefreshing(true);
       setError(null);
       const response = await fetch(`/api/hue/rooms/${roomId}`, {
         method: 'PUT',
@@ -140,14 +146,19 @@ export default function LightsCard() {
 
       const data = await response.json();
       if (data.error) throw new Error(data.error);
+      // Aggiorna dati dopo il comando
       await fetchData();
     } catch (err) {
       setError(err.message);
+    } finally {
+      setRefreshing(false);
     }
   }
 
   async function handleBrightnessChange(roomId, brightness) {
     try {
+      setLoadingMessage('Modifica luminosità...');
+      setRefreshing(true);
       setError(null);
       const response = await fetch(`/api/hue/rooms/${roomId}`, {
         method: 'PUT',
@@ -159,14 +170,19 @@ export default function LightsCard() {
 
       const data = await response.json();
       if (data.error) throw new Error(data.error);
+      // Aggiorna dati dopo il comando
       await fetchData();
     } catch (err) {
       setError(err.message);
+    } finally {
+      setRefreshing(false);
     }
   }
 
   async function handleSceneActivate(sceneId) {
     try {
+      setLoadingMessage('Attivazione scena...');
+      setRefreshing(true);
       setError(null);
       const response = await fetch(`/api/hue/scenes/${sceneId}/activate`, {
         method: 'PUT',
@@ -174,9 +190,12 @@ export default function LightsCard() {
 
       const data = await response.json();
       if (data.error) throw new Error(data.error);
+      // Aggiorna dati dopo il comando
       await fetchData();
     } catch (err) {
       setError(err.message);
+    } finally {
+      setRefreshing(false);
     }
   }
 
@@ -280,6 +299,13 @@ export default function LightsCard() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Loading Overlay - Full page blocking */}
+      <LoadingOverlay
+        show={refreshing}
+        message={loadingMessage}
+        icon="💡"
+      />
+
       {/* Main Status Card */}
       <Card liquidPro className="overflow-visible transition-all duration-500">
         <div className="relative">
@@ -353,6 +379,7 @@ export default function LightsCard() {
                       liquid
                       variant={isRoomOn ? "success" : "outline"}
                       onClick={() => handleRoomToggle(selectedRoom.id, true)}
+                      disabled={refreshing}
                       icon="💡"
                       className="w-full"
                     >
@@ -362,6 +389,7 @@ export default function LightsCard() {
                       liquid
                       variant={!isRoomOn ? "danger" : "outline"}
                       onClick={() => handleRoomToggle(selectedRoom.id, false)}
+                      disabled={refreshing}
                       icon="🌙"
                       className="w-full"
                     >
@@ -386,7 +414,8 @@ export default function LightsCard() {
                         max="100"
                         value={avgBrightness}
                         onChange={(e) => handleBrightnessChange(selectedRoom.id, e.target.value)}
-                        className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-warning-500"
+                        disabled={refreshing}
+                        className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-warning-500 disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
                   )}
@@ -411,7 +440,8 @@ export default function LightsCard() {
                         <button
                           key={scene.id}
                           onClick={() => handleSceneActivate(scene.id)}
-                          className="p-3 sm:p-4 rounded-xl border-2 bg-white/60 border-neutral-200 text-neutral-600 hover:bg-warning-50 hover:border-warning-300 transition-all duration-200 active:scale-95"
+                          disabled={refreshing}
+                          className="p-3 sm:p-4 rounded-xl border-2 bg-white/60 border-neutral-200 text-neutral-600 hover:bg-warning-50 hover:border-warning-300 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <div className="text-2xl mb-1">🎨</div>
                           <div className="text-xs font-semibold truncate">

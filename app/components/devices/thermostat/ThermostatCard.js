@@ -8,6 +8,7 @@ import Button from '../../ui/Button';
 import Select from '../../ui/Select';
 import Skeleton from '../../ui/Skeleton';
 import Banner from '../../ui/Banner';
+import LoadingOverlay from '../../ui/LoadingOverlay';
 
 /**
  * ThermostatCard - Complete thermostat control for homepage
@@ -24,6 +25,9 @@ export default function ThermostatCard() {
   const [selectedRoomId, setSelectedRoomId] = useState(null);
   const [calibrating, setCalibrating] = useState(false);
   const [calibrationSuccess, setCalibrationSuccess] = useState(null);
+
+  // Loading overlay message
+  const [loadingMessage, setLoadingMessage] = useState('Caricamento...');
 
   const connectionCheckedRef = useRef(false);
   const pollingStartedRef = useRef(false);
@@ -143,6 +147,8 @@ export default function ThermostatCard() {
 
   async function handleModeChange(newMode) {
     try {
+      setLoadingMessage('Cambio modalità termostato...');
+      setRefreshing(true);
       setError(null);
       const response = await fetch(NETATMO_ROUTES.setThermMode, {
         method: 'POST',
@@ -152,14 +158,19 @@ export default function ThermostatCard() {
 
       const data = await response.json();
       if (data.error) throw new Error(data.error);
+      // Aggiorna status dopo il comando
       await fetchStatus();
     } catch (err) {
       setError(err.message);
+    } finally {
+      setRefreshing(false);
     }
   }
 
   async function handleTemperatureChange(roomId, temp) {
     try {
+      setLoadingMessage('Modifica temperatura...');
+      setRefreshing(true);
       setError(null);
       const response = await fetch(NETATMO_ROUTES.setRoomThermPoint, {
         method: 'POST',
@@ -173,14 +184,19 @@ export default function ThermostatCard() {
 
       const data = await response.json();
       if (data.error) throw new Error(data.error);
+      // Aggiorna status dopo il comando
       await fetchStatus();
     } catch (err) {
       setError(err.message);
+    } finally {
+      setRefreshing(false);
     }
   }
 
   async function handleCalibrateValves() {
     try {
+      setLoadingMessage('Calibrazione valvole...');
+      setRefreshing(true);
       setError(null);
       setCalibrating(true);
       setCalibrationSuccess(null);
@@ -201,12 +217,16 @@ export default function ThermostatCard() {
         // Clear success message after 5 seconds
         setTimeout(() => setCalibrationSuccess(null), 5000);
       }
+
+      // Aggiorna status dopo il comando
+      await fetchStatus();
     } catch (err) {
       console.error('Errore calibrazione valvole:', err);
       setError(`Calibrazione fallita: ${err.message}`);
       setCalibrationSuccess(false);
     } finally {
       setCalibrating(false);
+      setRefreshing(false);
     }
   }
 
@@ -288,6 +308,13 @@ export default function ThermostatCard() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Loading Overlay - Full page blocking */}
+      <LoadingOverlay
+        show={refreshing || calibrating}
+        message={loadingMessage}
+        icon="🌡️"
+      />
+
       {/* Main Status Card */}
       <Card liquidPro className="overflow-visible transition-all duration-500">
         <div className="relative">
@@ -398,6 +425,7 @@ export default function ThermostatCard() {
                       size="sm"
                       icon="➖"
                       onClick={() => handleTemperatureChange(selectedRoom.id, selectedRoom.setpoint - 0.5)}
+                      disabled={refreshing}
                       className="flex-1"
                     >
                       -0.5°
@@ -412,6 +440,7 @@ export default function ThermostatCard() {
                       size="sm"
                       icon="➕"
                       onClick={() => handleTemperatureChange(selectedRoom.id, selectedRoom.setpoint + 0.5)}
+                      disabled={refreshing}
                       className="flex-1"
                     >
                       +0.5°
@@ -441,7 +470,8 @@ export default function ThermostatCard() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
               <button
                 onClick={() => handleModeChange('schedule')}
-                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 ${
+                disabled={refreshing}
+                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
                   mode === 'schedule'
                     ? 'bg-success-100 dark:bg-success-900/30 border-success-300 dark:border-success-600 text-success-700 dark:text-success-400'
                     : 'bg-white/60 dark:bg-white/[0.08] border-white/80 dark:border-white/10 text-neutral-600 dark:text-neutral-300 hover:bg-white/80 dark:hover:bg-white/[0.12] backdrop-blur-sm'
@@ -453,7 +483,8 @@ export default function ThermostatCard() {
 
               <button
                 onClick={() => handleModeChange('away')}
-                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 ${
+                disabled={refreshing}
+                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
                   mode === 'away'
                     ? 'bg-warning-100 dark:bg-warning-900/30 border-warning-300 dark:border-warning-600 text-warning-700 dark:text-warning-400'
                     : 'bg-white/60 dark:bg-white/[0.08] border-white/80 dark:border-white/10 text-neutral-600 dark:text-neutral-300 hover:bg-white/80 dark:hover:bg-white/[0.12] backdrop-blur-sm'
@@ -465,7 +496,8 @@ export default function ThermostatCard() {
 
               <button
                 onClick={() => handleModeChange('hg')}
-                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 ${
+                disabled={refreshing}
+                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
                   mode === 'hg'
                     ? 'bg-info-100 dark:bg-info-900/30 border-info-300 dark:border-info-600 text-info-700 dark:text-info-400'
                     : 'bg-white/60 dark:bg-white/[0.08] border-white/80 dark:border-white/10 text-neutral-600 dark:text-neutral-300 hover:bg-white/80 dark:hover:bg-white/[0.12] backdrop-blur-sm'
@@ -477,7 +509,8 @@ export default function ThermostatCard() {
 
               <button
                 onClick={() => handleModeChange('off')}
-                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 ${
+                disabled={refreshing}
+                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
                   mode === 'off'
                     ? 'bg-neutral-200 dark:bg-neutral-700 border-neutral-400 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300'
                     : 'bg-white/60 dark:bg-white/[0.08] border-white/80 dark:border-white/10 text-neutral-600 dark:text-neutral-300 hover:bg-white/80 dark:hover:bg-white/[0.12] backdrop-blur-sm'

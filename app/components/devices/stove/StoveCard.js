@@ -23,6 +23,7 @@ import MaintenanceBar from '../../MaintenanceBar';
 import CronHealthBanner from '../../CronHealthBanner';
 import GlassEffect from './GlassEffect';
 import Toast from '../../ui/Toast';
+import LoadingOverlay from '../../ui/LoadingOverlay';
 
 /**
  * StoveCard - Complete stove control for homepage
@@ -58,6 +59,9 @@ export default function StoveCard() {
 
   // Toast notification
   const [toast, setToast] = useState(null);
+
+  // Loading overlay message
+  const [loadingMessage, setLoadingMessage] = useState('Caricamento...');
 
   const fetchFanLevel = async () => {
     try {
@@ -241,6 +245,8 @@ export default function StoveCard() {
 
   const handleFanChange = async (e) => {
     const level = Number(e.target.value);
+    setLoadingMessage('Modifica livello ventola...');
+    setLoading(true);
     setFanLevel(level);
 
     const response = await fetch(STOVE_ROUTES.setFan, {
@@ -264,16 +270,18 @@ export default function StoveCard() {
       setSemiManualMode(true);
       setReturnToAutoAt(data.returnToAutoAt || null);
       setNextScheduledAction(null);
-
-      // Poi aggiorna anche da Firebase per sicurezza
-      setTimeout(() => fetchSchedulerMode(), 500);
     }
 
     await logStoveAction.setFan(level);
+    // Aggiorna status dopo il comando
+    await fetchStatusAndUpdate();
+    setLoading(false);
   };
 
   const handlePowerChange = async (e) => {
     const level = Number(e.target.value);
+    setLoadingMessage('Modifica livello potenza...');
+    setLoading(true);
     setPowerLevel(level);
 
     const response = await fetch(STOVE_ROUTES.setPower, {
@@ -297,12 +305,12 @@ export default function StoveCard() {
       setSemiManualMode(true);
       setReturnToAutoAt(data.returnToAutoAt || null);
       setNextScheduledAction(null);
-
-      // Poi aggiorna anche da Firebase per sicurezza
-      setTimeout(() => fetchSchedulerMode(), 500);
     }
 
     await logStoveAction.setPower(level);
+    // Aggiorna status dopo il comando
+    await fetchStatusAndUpdate();
+    setLoading(false);
   };
 
   const fanOptions = [1, 2, 3, 4, 5, 6].map(level => ({
@@ -316,22 +324,28 @@ export default function StoveCard() {
   }));
 
   const handleIgnite = async () => {
+    setLoadingMessage('Accensione stufa...');
     setLoading(true);
     await fetch(STOVE_ROUTES.ignite, {
       method: 'POST',
       body: JSON.stringify({ source: 'manual' }),
     });
     await logStoveAction.ignite();
+    // Aggiorna status dopo il comando
+    await fetchStatusAndUpdate();
     setLoading(false);
   };
 
   const handleShutdown = async () => {
+    setLoadingMessage('Spegnimento stufa...');
     setLoading(true);
     await fetch(STOVE_ROUTES.shutdown, {
       method: 'POST',
       body: JSON.stringify({ source: 'manual' }),
     });
     await logStoveAction.shutdown();
+    // Aggiorna status dopo il comando
+    await fetchStatusAndUpdate();
     setLoading(false);
   };
 
@@ -483,6 +497,13 @@ export default function StoveCard() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Loading Overlay - Full page blocking */}
+      <LoadingOverlay
+        show={loading}
+        message={loadingMessage}
+        icon="🔥"
+      />
+
       {/* Error Alert - Outside card as it's a critical system message */}
       {errorCode !== 0 && (
         <ErrorAlert

@@ -5,6 +5,63 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.20.0] - 2025-11-30
+
+### Aggiunto
+- **LoadingOverlay Component**: componente full-page blocking con liquid glass style
+  - Overlay bloccante per feedback operazioni asincrone
+  - Animated spinner con pulse effects e loading dots
+  - Dark mode support completo (palette neutral-900)
+  - Accessibilità: `aria-live="polite"`, `aria-busy="true"` per screen readers
+  - Props customizable: `message` e `icon` per massima flessibilità
+
+- **CSS Animations**: nuove keyframes in `globals.css`
+  - `@keyframes fadeIn`: overlay fade in animation
+  - `@keyframes scaleIn`: card scale in animation
+  - Transizioni fluide per overlay entrance
+
+### Modificato
+- **StoveCard**: aggiunto loading overlay per tutte le azioni
+  - Overlay per `ignite`, `shutdown`, `setFan`, `setPower`
+  - Messaggi contestuali per ogni tipo di operazione
+  - Pattern: show overlay → send command → fetch updated status → hide overlay
+
+- **ThermostatCard**: aggiunto loading overlay per controlli termostato
+  - Overlay per `mode change`, `temperature change`, `calibration`
+  - Feedback specifici per ogni tipo di regolazione
+  - UI completamente bloccata durante operazioni
+
+- **LightsCard**: aggiunto loading overlay per controlli luci
+  - Overlay per `toggle`, `brightness adjustment`, `scene activation`
+  - Indicatori visivi durante cambio stato
+  - Prevenzione azioni multiple simultanee
+
+- **sandboxService.js**: aggiunti artificial delays per testing
+  - `sandboxIgnite/sandboxShutdown`: 1.5s delay
+  - `sandboxSetPower/sandboxSetFan`: 1s delay
+  - Testing realistico animazioni overlay in development
+
+### Tecnico
+- **Status Refresh Pattern**: implementato pattern consistente
+  - Ogni azione: show overlay → execute → refresh status → hide overlay
+  - Status aggiornato da server PRIMA di rimuovere overlay
+  - Garantita consistenza dati visualizzati
+
+- **UI Completely Blocked**: controlli disabilitati durante operazioni
+  - Overlay con `z-[9999]` per copertura totale
+  - Eventi mouse/touch bloccati durante loading
+  - Zero interferenze con azioni in corso
+
+- **Sandbox Mode Support**: overlay testabile in development
+  - Delays artificiali per simulare network latency
+  - Stesso comportamento production/development
+  - Testing completo UX loading states
+
+- **Zero Breaking Changes**: backward compatible
+  - Funzionalità esistente completamente preservata
+  - Solo aggiunto feedback UX migliorato
+  - Nessuna modifica API o comportamento core
+
 ## [1.19.0] - 2025-11-29
 
 ### Aggiunto

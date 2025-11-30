@@ -22,7 +22,7 @@
 
 ### UI & Design
 
-- **[UI Components](docs/ui-components.md)** - Card, Button, Banner, Toast, Select, Input, liquid glass pattern
+- **[UI Components](docs/ui-components.md)** - Card, Button, Banner, Toast, LoadingOverlay, Select, Input, liquid glass pattern
 - **[Design System](docs/design-system.md)** - Palette colori, typography, spacing, styling hierarchy
 - **[Patterns](docs/patterns.md)** - Dropdown/modal, collapse/expand, immediate feedback UX, Firebase listeners, polling
 
@@ -76,7 +76,7 @@ pannello-stufa/
 │   │   ├── notifications/        # Push notifications (test, send)
 │   │   └── auth/[...auth0]/      # Auth0 handler
 │   ├── components/
-│   │   ├── ui/                   # Card, Button, Banner, Toast, Select, Input, etc.
+│   │   ├── ui/                   # Card, Button, Banner, Toast, LoadingOverlay, Select, Input, etc.
 │   │   └── devices/              # Device-specific components
 │   │       ├── stove/            # StoveCard
 │   │       ├── thermostat/       # ThermostatCard

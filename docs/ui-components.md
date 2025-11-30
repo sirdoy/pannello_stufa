@@ -188,6 +188,91 @@ setToast({
 
 **Implementazione**: `app/components/ui/Toast.js`, animazione in `app/globals.css`
 
+## LoadingOverlay
+
+Overlay full-page bloccante per operazioni asincrone con liquid glass style.
+
+```jsx
+<LoadingOverlay
+  message="Accensione in corso..."
+  icon="🔥"
+/>
+```
+
+**Props**:
+- `message` - Testo descrittivo operazione (default: "Caricamento in corso...")
+- `icon` - Emoji/icona contestuale (default: "⏳")
+
+**Caratteristiche**:
+- **Full-page blocking**: overlay copre intera viewport con `z-[9999]`
+- **Liquid glass style**: backdrop-blur-3xl con bg-white/10 dark:bg-neutral-900/90
+- **Animated spinner**: rotazione continua con pulse effect
+- **Loading dots**: animazione pulsante (...) durante attesa
+- **Dark mode support**: palette neutral-900 per tema scuro
+- **Accessibility**: aria-live="polite", aria-busy="true" per screen readers
+
+**Animazioni CSS**:
+```css
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+```
+
+**Pattern d'uso**:
+```jsx
+const [isLoading, setIsLoading] = useState(false);
+
+const handleAction = async () => {
+  setIsLoading(true);
+  try {
+    await performAsyncOperation();
+    await fetchUpdatedStatus(); // Refresh status before hiding
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+return (
+  <>
+    <Button onClick={handleAction} disabled={isLoading}>
+      Esegui Azione
+    </Button>
+    {isLoading && (
+      <LoadingOverlay
+        message="Operazione in corso..."
+        icon="⚙️"
+      />
+    )}
+  </>
+);
+```
+
+**Status Refresh Pattern**:
+1. Show overlay (UI bloccata)
+2. Execute async operation
+3. Fetch updated status from server
+4. Hide overlay (solo dopo refresh)
+
+**Best practice**:
+- Usa per operazioni che modificano stato remoto (API calls)
+- Sempre refresh status PRIMA di nascondere overlay
+- Messaggi descrittivi specifici per operazione ("Accensione in corso...", "Modifica temperatura...")
+- Icone contestuali per feedback visivo chiaro
+- Previene azioni multiple simultanee (UI completamente bloccata)
+
+**Integrazione device cards**:
+- **StoveCard**: ignite, shutdown, setFan, setPower
+- **ThermostatCard**: mode change, temperature change, calibration
+- **LightsCard**: toggle, brightness, scene activation
+
+**Implementazione**: `app/components/ui/LoadingOverlay.js`, animazioni in `app/globals.css`
+
 ## Select
 
 Dropdown con liquid glass style e z-index ottimizzato.

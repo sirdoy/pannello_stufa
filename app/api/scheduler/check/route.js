@@ -9,6 +9,36 @@ import {
 export const dynamic = 'force-dynamic';
 
 /**
+ * Timeout for internal API calls (8 seconds)
+ * Reduces risk of hitting Vercel's 60s function timeout
+ */
+const INTERNAL_API_TIMEOUT = 8000;
+
+/**
+ * Fetch with timeout for internal API calls
+ * @param {string} url - URL to fetch
+ * @param {object} options - Fetch options
+ * @param {number} timeout - Timeout in milliseconds
+ * @returns {Promise<Response>}
+ */
+async function fetchWithTimeout(url, options = {}, timeout = INTERNAL_API_TIMEOUT) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('INTERNAL_API_TIMEOUT');
+    }
+    throw error;
+  }
+}
+
+/**
  * Helper: Invia notifica push per azione scheduler
  * Controlla preferenze utente prima di inviare
  */
@@ -81,8 +111,8 @@ async function calibrateValvesIfNeeded(baseUrl) {
 
     console.log('🔧 Avvio calibrazione automatica valvole Netatmo...');
 
-    // Call calibration endpoint
-    const response = await fetch(`${baseUrl}${NETATMO_ROUTES.calibrate}`, {
+    // Call calibration endpoint with timeout
+    const response = await fetchWithTimeout(`${baseUrl}${NETATMO_ROUTES.calibrate}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -205,22 +235,57 @@ export async function GET(req) {
     const baseUrl = `${req.nextUrl.protocol}//${req.headers.get('host')}`;
     console.log(baseUrl);
 
-    // OPTIMIZATION: Fetch stove data in parallel with calibration (non-blocking)
-    const [statusRes, fanRes, powerRes] = await Promise.all([
-      fetch(`${baseUrl}${STOVE_ROUTES.status}`),
-      fetch(`${baseUrl}${STOVE_ROUTES.getFan}`),
-      fetch(`${baseUrl}${STOVE_ROUTES.getPower}`)
-    ]);
+    // OPTIMIZATION: Fetch stove data in parallel with timeout and error handling
+    let currentStatus = 'unknown';
+    let isOn = false;
+    let currentFanLevel = 3; // Default safe value
+    let currentPowerLevel = 2; // Default safe value
 
-    const statusJson = await statusRes.json();
-    const currentStatus = statusJson?.StatusDescription || 'unknown';
-    const isOn = currentStatus.includes('WORK') || currentStatus.includes('START');
+    try {
+      const [statusRes, fanRes, powerRes] = await Promise.all([
+        fetchWithTimeout(`${baseUrl}${STOVE_ROUTES.status}`).catch(err => {
+          console.error('❌ Status fetch failed:', err.message);
+          return null;
+        }),
+        fetchWithTimeout(`${baseUrl}${STOVE_ROUTES.getFan}`).catch(err => {
+          console.error('❌ Fan fetch failed:', err.message);
+          return null;
+        }),
+        fetchWithTimeout(`${baseUrl}${STOVE_ROUTES.getPower}`).catch(err => {
+          console.error('❌ Power fetch failed:', err.message);
+          return null;
+        })
+      ]);
 
-    const fanJson = await fanRes.json();
-    const currentFanLevel = fanJson?.Result ?? 3;
+      // Parse status with error handling
+      if (statusRes && statusRes.ok) {
+        const statusJson = await statusRes.json();
+        currentStatus = statusJson?.StatusDescription || 'unknown';
+        isOn = currentStatus.includes('WORK') || currentStatus.includes('START');
+      } else {
+        console.warn('⚠️ Status unavailable - using defaults');
+      }
 
-    const powerJson = await powerRes.json();
-    const currentPowerLevel = powerJson?.Result ?? 2;
+      // Parse fan with error handling
+      if (fanRes && fanRes.ok) {
+        const fanJson = await fanRes.json();
+        currentFanLevel = fanJson?.Result ?? 3;
+      } else {
+        console.warn('⚠️ Fan level unavailable - using default: 3');
+      }
+
+      // Parse power with error handling
+      if (powerRes && powerRes.ok) {
+        const powerJson = await powerRes.json();
+        currentPowerLevel = powerJson?.Result ?? 2;
+      } else {
+        console.warn('⚠️ Power level unavailable - using default: 2');
+      }
+
+    } catch (error) {
+      console.error('❌ Critical error fetching stove data:', error.message);
+      // Continue with defaults - cron health is more important than stove control
+    }
 
     // Auto-calibrate Netatmo valves every 12 hours (run async, don't wait)
     calibrateValvesIfNeeded(baseUrl).then((result) => {
@@ -315,45 +380,61 @@ export async function GET(req) {
           });
         }
 
-        await fetch(`${baseUrl}${STOVE_ROUTES.ignite}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({source: 'scheduler'}),
-        });
-        changeApplied = true;
+        try {
+          await fetchWithTimeout(`${baseUrl}${STOVE_ROUTES.ignite}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({source: 'scheduler'}),
+          });
+          changeApplied = true;
 
-        // Send notification
-        await sendSchedulerNotification('IGNITE', `Stufa accesa automaticamente alle ${ora} (P${active.power}, V${active.fan})`);
+          // Send notification
+          await sendSchedulerNotification('IGNITE', `Stufa accesa automaticamente alle ${ora} (P${active.power}, V${active.fan})`);
+        } catch (error) {
+          console.error('❌ Failed to ignite stove:', error.message);
+        }
       }
       if (currentPowerLevel !== active.power) {
-        await fetch(`${baseUrl}${STOVE_ROUTES.setPower}`, {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({level: active.power, source: 'scheduler'}),
-        });
-        changeApplied = true;
+        try {
+          await fetchWithTimeout(`${baseUrl}${STOVE_ROUTES.setPower}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({level: active.power, source: 'scheduler'}),
+          });
+          changeApplied = true;
+        } catch (error) {
+          console.error('❌ Failed to set power:', error.message);
+        }
       }
       if (currentFanLevel !== active.fan) {
-        await fetch(`${baseUrl}${STOVE_ROUTES.setFan}`, {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({level: active.fan, source: 'scheduler'}),
-        });
-        changeApplied = true;
+        try {
+          await fetchWithTimeout(`${baseUrl}${STOVE_ROUTES.setFan}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({level: active.fan, source: 'scheduler'}),
+          });
+          changeApplied = true;
+        } catch (error) {
+          console.error('❌ Failed to set fan:', error.message);
+        }
       }
     } else {
       if (isOn) {
-        await fetch(`${baseUrl}${STOVE_ROUTES.shutdown}`, {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({source: 'scheduler'}),
-        });
-        changeApplied = true;
+        try {
+          await fetchWithTimeout(`${baseUrl}${STOVE_ROUTES.shutdown}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({source: 'scheduler'}),
+          });
+          changeApplied = true;
 
-        // Send notification
-        await sendSchedulerNotification('SHUTDOWN', `Stufa spenta automaticamente alle ${ora}`);
+          // Send notification
+          await sendSchedulerNotification('SHUTDOWN', `Stufa spenta automaticamente alle ${ora}`);
+        } catch (error) {
+          console.error('❌ Failed to shutdown stove:', error.message);
+        }
       }
     }
 

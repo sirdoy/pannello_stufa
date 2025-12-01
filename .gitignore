@@ -66,6 +66,7 @@ next-env.d.ts
 /public/workbox-*.js.map
 /.firebase/
 .firebase-debug.log
+*firebase-adminsdk*.json
 
 # Playwright E2E
 /playwright-report/
@@ -93,3 +94,4 @@ temp/
 *.bak
 *.swp
 *~.nib
+.env*.local

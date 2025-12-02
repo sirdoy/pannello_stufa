@@ -113,7 +113,7 @@ export default function NotificationsSettingsPage() {
             <Button
               liquid
               variant="primary"
-              onClick={() => window.location.href = '/api/auth/login'}
+              onClick={() => window.location.href = '/auth/login'}
             >
               Accedi
             </Button>

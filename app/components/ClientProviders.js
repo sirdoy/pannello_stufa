@@ -1,6 +1,6 @@
 'use client';
 
-import { UserProvider } from '@auth0/nextjs-auth0/client';
+import { Auth0Provider } from '@auth0/nextjs-auth0/client';
 import { VersionProvider } from '@/app/context/VersionContext';
 import { ThemeProvider } from '@/app/context/ThemeContext';
 import ThemeScript from './ThemeScript';
@@ -11,13 +11,13 @@ import ThemeScript from './ThemeScript';
  */
 export default function ClientProviders({ children }) {
   return (
-    <UserProvider>
+    <Auth0Provider>
       <ThemeScript />
       <ThemeProvider>
         <VersionProvider>
           {children}
         </VersionProvider>
       </ThemeProvider>
-    </UserProvider>
+    </Auth0Provider>
   );
 }

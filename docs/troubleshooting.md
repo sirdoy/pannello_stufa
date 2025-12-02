@@ -52,20 +52,16 @@ find app -name "*.js" -exec grep -l "useState\|useEffect" {} \; | \
 **Solution** ✅ (implementata v1.10.1):
 
 ```javascript
-// middleware.js
-export async function middleware(req) {
-  const res = NextResponse.next();
-  const session = await getSession(req, res);
+// middleware.js (Auth0 v4)
+import { auth0 } from '@/lib/auth0';
 
-  if (!session || !session.user) {
-    // Preserve the original URL to return after login
-    const loginUrl = new URL('/api/auth/login', req.url);
-    loginUrl.searchParams.set('returnTo', req.nextUrl.pathname + req.nextUrl.search);
-    return NextResponse.redirect(loginUrl);
-  }
+export default auth0.middleware();
 
-  return res;
-}
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.png|offline|manifest.json|icons/|sw.js|firebase-messaging-sw.js|auth/*).*)',
+  ],
+};
 ```
 
 **Come Funziona**:
@@ -116,10 +112,12 @@ export async function middleware(req) {
 3. **Verifica configurazione Auth0 Dashboard**
 
    Su https://manage.auth0.com → Applications → {Your App} → Settings:
-   - **Allowed Callback URLs**: Deve includere URL production + `/api/auth/callback`
+   - **Allowed Callback URLs**: Deve includere URL production + `/auth/callback`
      ```
-     https://tuodominio.com/api/auth/callback
+     https://tuodominio.com/auth/callback
      ```
+
+   **Note**: Auth0 v4 usa `/auth/*` invece di `/api/auth/*`
    - **Allowed Logout URLs**: Deve includere URL production
      ```
      https://tuodominio.com

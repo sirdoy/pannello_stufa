@@ -392,26 +392,51 @@ Endpoint per logging azioni utente con supporto multi-device.
 
 Vedi [Firebase - Log Schema](./firebase.md#log-schema) per struttura dati.
 
-## Auth0 API (`/api/auth/[...auth0]`)
+## Auth0 API (`/auth/*`)
 
-Handler Next.js per autenticazione Auth0.
+Auth0 v4 gestisce automaticamente le route di autenticazione tramite middleware. Non è più necessario un handler API dedicato.
+
+**Route disponibili** (gestite automaticamente):
+- `/auth/login` - Login page redirect
+- `/auth/logout` - Logout handler
+- `/auth/callback` - OAuth callback
+- `/auth/profile` - User profile endpoint
+- `/auth/access-token` - Access token endpoint
+- `/auth/backchannel-logout` - Backchannel logout handler
+
+**Setup centralizzato**:
 
 ```javascript
-// app/api/auth/[...auth0]/route.js
-import { handleAuth } from '@auth0/nextjs-auth0';
+// lib/auth0.js
+import { Auth0Client } from '@auth0/nextjs-auth0/server';
 
-export const GET = handleAuth();
+export const auth0 = new Auth0Client({
+  secret: process.env.AUTH0_SECRET,
+  baseURL: process.env.AUTH0_BASE_URL,
+  clientID: process.env.AUTH0_CLIENT_ID,
+  clientSecret: process.env.AUTH0_CLIENT_SECRET,
+});
 ```
 
-**IMPORTANTE**: NO `/edge` import per compatibilità Firebase.
+**Middleware integration**:
 
 ```javascript
-// ✅ Correct
-import { handleAuth } from '@auth0/nextjs-auth0';
+// middleware.js
+import { auth0 } from '@/lib/auth0';
 
-// ❌ Wrong - breaks Firebase
-import { handleAuth } from '@auth0/nextjs-auth0/edge';
+export default auth0.middleware();
+
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.png|offline|manifest.json|icons/|sw.js|firebase-messaging-sw.js|auth/*).*)',
+  ],
+};
 ```
+
+**Note di Migrazione da v3**:
+- `app/api/auth/[...auth0]/route.js` rimosso (non più necessario)
+- Route cambiate: `/api/auth/*` → `/auth/*`
+- Aggiornare configurazione Auth0 Dashboard con nuovi callback URLs
 
 ## Best Practices
 

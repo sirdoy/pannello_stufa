@@ -1,28 +1,37 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0/edge';
+import { auth0 } from '@/lib/auth0';
 
 export async function middleware(req) {
-  const res = NextResponse.next();
-
   // Bypass authentication in test mode (Playwright)
   if (process.env.TEST_MODE === 'true') {
-    return res;
+    return NextResponse.next();
   }
 
-  const session = await getSession(req, res);
+  // Auth0 v4: middleware automatically mounts auth routes (/auth/login, /auth/callback, etc.)
+  const authResponse = await auth0.middleware(req);
 
-  if (!session || !session.user) {
+  // If auth0.middleware returns a response, it's handling an auth route
+  if (authResponse) {
+    return authResponse;
+  }
+
+  // For non-auth routes, check if user is authenticated
+  const sessionCookie = req.cookies.get('appSession');
+
+  if (!sessionCookie) {
     // Preserve the original URL to return after login
-    const loginUrl = new URL('/api/auth/login', req.url);
+    // Note: v4 uses /auth/login instead of /api/auth/login
+    const loginUrl = new URL('/auth/login', req.url);
     loginUrl.searchParams.set('returnTo', req.nextUrl.pathname + req.nextUrl.search);
     return NextResponse.redirect(loginUrl);
   }
 
-  return res;
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    "/((?!api/auth|api/scheduler/check|api/stove|api/admin|offline|_next|favicon.ico|icons|manifest.json|sw.js|firebase-messaging-sw.js).*)",
+    // Exclude: public API routes, static files (but INCLUDE auth routes for auth0.middleware)
+    "/((?!api/scheduler/check|api/stove|api/admin|offline|_next|favicon.ico|icons|manifest.json|sw.js|firebase-messaging-sw.js).*)",
   ],
 };

@@ -1,6 +1,6 @@
 import { adminDbGet, adminDbPush } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0';
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
 
 // Force dynamic rendering for Firebase operations
@@ -20,7 +20,7 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(request) {
   try {
-    const session = await getSession();
+    const session = await auth0.getSession();
     const user = session?.user;
 
     if (!user) {
@@ -169,7 +169,7 @@ export async function POST(request) {
 
     // Log failed calibration
     try {
-      const session = await getSession();
+      const session = await auth0.getSession();
       const user = session?.user;
 
       if (user) {

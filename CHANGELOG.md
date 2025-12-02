@@ -5,6 +5,64 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.21.0] - 2025-12-02
+
+### Migrato
+- **Auth0 v4 SDK**: aggiornamento completo da `@auth0/nextjs-auth0` v3 a v4.13.1
+  - Breaking changes: percorsi auth aggiornati da `/api/auth/*` a `/auth/*`
+  - Nuove route disponibili: `/auth/profile`, `/auth/access-token`, `/auth/backchannel-logout`
+  - File modificati: 21 file per compatibilità completa (API routes, components, middleware)
+
+- **lib/auth0.js**: nuovo file centralizzato per Auth0Client
+  - Inizializzazione SDK con environment variables mapping
+  - Pattern riutilizzabile per getSession() in API routes
+  - Esportazione `auth0` instance per middleware integration
+
+- **Middleware**: aggiornato a pattern `auth0.middleware()`
+  - Gestione sessione automatica delegata completamente al middleware
+  - Matcher aggiornato per includere `/auth/*` routes
+  - Rimosse chiamate manuali `getSession()` sostituiti da middleware
+
+- **API Routes**: 18 file aggiornati da `getSession()` a `auth0.getSession()`
+  - scheduler/update, scheduler/clearSemiManual
+  - user, user/theme
+  - log/add
+  - netatmo/setroomthermpoint, netatmo/setthermmode, netatmo/calibrate
+  - maintenance/update-target, maintenance/confirm-cleaning
+  - errors/resolve, errors/log
+  - notifications/preferences, notifications/test, notifications/register, notifications/send
+  - devices/preferences
+
+- **Client Components**: `ClientProviders.js` aggiornato
+  - `UserProvider` sostituito con `Auth0Provider` (breaking change v4)
+  - Context provider per autenticazione client-side
+
+- **UI Components**: aggiornati percorsi auth in 3 componenti
+  - Navbar: `/api/auth/login` → `/auth/login`, `/api/auth/logout` → `/auth/logout`
+  - NotificationsPage: link login aggiornato
+  - MaintenancePage: link login aggiornato
+
+### Rimosso
+- **app/api/auth/[...auth0]/route.js**: eliminato handler legacy (non più necessario in v4)
+
+### Tecnico
+- **Infrastructure**: risolto `NODE_ENV=production` issue
+  - Installate devDependencies (tailwindcss) con `npm install --include=dev`
+  - Build process ottimizzato per sviluppo e produzione
+
+- **Build Cache**: cleared `.next` directory
+  - Eliminati riferimenti obsoleti ad Auth0 v3
+  - Fresh build con nuova architettura v4
+
+### Note di Migrazione
+- Aggiornare configurazione Auth0 Dashboard:
+  - **Allowed Callback URLs**: aggiungere `https://tuodominio.com/auth/callback`
+  - **Allowed Logout URLs**: verificare configurazione esistente
+  - Vecchie route `/api/auth/*` non più valide
+
+- Zero functional changes: autenticazione funziona identicamente
+- Production ready: testing completo su tutti i flussi (login, logout, session)
+
 ## [1.20.0] - 2025-11-30
 
 ### Aggiunto

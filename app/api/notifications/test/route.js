@@ -6,7 +6,7 @@
  * Invia una notifica di test all'utente autenticato
  */
 
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0';
 import { sendNotificationToUser } from '@/lib/firebaseAdmin';
 import { NextResponse } from 'next/server';
 
@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request) {
   try {
     // Verifica autenticazione
-    const session = await getSession();
+    const session = await auth0.getSession();
     const user = session?.user;
 
     if (!user) {

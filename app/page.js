@@ -1,4 +1,4 @@
-import { getSession } from '@auth0/nextjs-auth0/edge';
+import { auth0 } from '@/lib/auth0';
 import StoveCard from './components/devices/stove/StoveCard';
 import ThermostatCard from './components/devices/thermostat/ThermostatCard';
 import LightsCard from './components/devices/lights/LightsCard';
@@ -8,7 +8,7 @@ import { getEnabledDevicesForUser } from '@/lib/devicePreferencesService';
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const session = await getSession();
+  const session = await auth0.getSession();
   const user = session?.user;
   const userId = user?.sub;
   const enabledDevices = await getEnabledDevicesForUser(userId);

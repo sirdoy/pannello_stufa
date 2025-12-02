@@ -318,7 +318,7 @@ export default function Navbar() {
                         )}
                       </div>
                       <Link
-                        href="/api/auth/logout"
+                        href="/auth/logout"
                         className="block px-4 py-3 text-sm xl:text-base font-medium text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors duration-200"
                         onClick={() => setUserDropdownOpen(false)}
                       >
@@ -499,7 +499,7 @@ export default function Navbar() {
               {/* Logout */}
               <div className="pt-3 mt-3 border-t border-white/20">
                 <Link
-                  href="/api/auth/logout"
+                  href="/auth/logout"
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-primary-700 bg-primary-500/10 backdrop-blur-2xl hover:bg-primary-500/15 shadow-liquid-sm ring-1 ring-primary-500/20 ring-inset transition-all duration-200 active:scale-[0.98] relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-primary-400/10 before:to-transparent before:pointer-events-none"
                   onClick={() => setMobileMenuOpen(false)}
                 >

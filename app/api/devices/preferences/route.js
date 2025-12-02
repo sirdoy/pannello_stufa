@@ -5,7 +5,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0/edge';
+import { auth0 } from '@/lib/auth0';
 import {
   getDevicePreferences,
   updateDevicePreferences,
@@ -20,7 +20,7 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request) {
   try {
-    const session = await getSession();
+    const session = await auth0.getSession();
     const userId = session?.user?.sub;
 
     if (!userId) {
@@ -62,7 +62,7 @@ export async function GET(request) {
  */
 export async function POST(request) {
   try {
-    const session = await getSession();
+    const session = await auth0.getSession();
     const userId = session?.user?.sub;
 
     if (!userId) {

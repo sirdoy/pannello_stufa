@@ -107,7 +107,7 @@ export default function MaintenancePage() {
       <div className="min-h-screen flex items-center justify-center">
         <Card liquid className="p-8 text-center">
           <p className="text-neutral-600 mb-4">Accesso non autorizzato</p>
-          <Button liquid href="/api/auth/login" variant="primary">Accedi</Button>
+          <Button liquid href="/auth/login" variant="primary">Accedi</Button>
         </Card>
       </div>
     );

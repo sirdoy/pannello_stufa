@@ -13,7 +13,7 @@
  * }
  */
 
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { NextResponse } from 'next/server';
 
@@ -24,7 +24,7 @@ const VALID_THEMES = ['light', 'dark'];
 export async function GET(request) {
   try {
     // Verifica autenticazione
-    const session = await getSession();
+    const session = await auth0.getSession();
     const user = session?.user;
 
     if (!user) {
@@ -68,7 +68,7 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     // Verifica autenticazione
-    const session = await getSession();
+    const session = await auth0.getSession();
     const user = session?.user;
 
     if (!user) {

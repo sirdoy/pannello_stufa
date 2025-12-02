@@ -643,35 +643,41 @@ Pattern per configurare Next.js middleware con Auth0 evitando conflitti con PWA 
 import { NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0/edge';
 
-export async function middleware(req) {
-  const res = NextResponse.next();
-  const session = await getSession(req, res);
+// Auth0 v4 pattern
+import { auth0 } from '@/lib/auth0';
 
-  if (!session || !session.user) {
-    return NextResponse.redirect(new URL('/api/auth/login', req.url));
-  }
-
-  return res;
-}
+export default auth0.middleware();
 
 export const config = {
   matcher: [
-    // Exclude: API auth routes, public APIs, PWA assets, static files
-    "/((?!api/auth|api/scheduler/check|api/stove|api/admin|offline|_next|favicon.ico|icons|manifest.json|sw.js|firebase-messaging-sw.js).*)",
+    // Exclude: Auth routes, API routes, PWA assets, static files
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.png|offline|manifest.json|icons/|sw.js|firebase-messaging-sw.js|auth/*).*)',
   ],
 };
 ```
 
+**lib/auth0.js Setup**:
+```javascript
+import { Auth0Client } from '@auth0/nextjs-auth0/server';
+
+export const auth0 = new Auth0Client({
+  secret: process.env.AUTH0_SECRET,
+  baseURL: process.env.AUTH0_BASE_URL,
+  clientID: process.env.AUTH0_CLIENT_ID,
+  clientSecret: process.env.AUTH0_CLIENT_SECRET,
+});
+```
+
 ### Best Practices
 
-**1. Escludi sempre route PWA dal matcher**
+**1. Escludi sempre route PWA e auth dal matcher**
 ```javascript
 // ❌ WRONG - causa redirect loop su mobile
-matcher: ["/((?!api/auth|_next|favicon.ico).*)"]
+matcher: ["/((?!_next|favicon.ico).*)"]
 
-// ✅ CORRECT - esclude tutte le route PWA
+// ✅ CORRECT - esclude auth routes e tutte le route PWA
 matcher: [
-  "/((?!api/auth|offline|_next|favicon.ico|icons|manifest.json|sw.js|firebase-messaging-sw.js).*)"
+  '/((?!_next/static|_next/image|favicon.ico|.*\\.png|offline|manifest.json|icons/|sw.js|firebase-messaging-sw.js|auth/*).*)'
 ]
 ```
 
@@ -711,24 +717,22 @@ export const config = {
 
 **Aggiungi logging temporaneo per debug**:
 ```javascript
-export async function middleware(req) {
-  const res = NextResponse.next();
-  const session = await getSession(req, res);
+// Auth0 v4 gestisce automaticamente sessione e redirect
+import { auth0 } from '@/lib/auth0';
 
-  // Debug logging
-  console.log('[Middleware]', {
-    path: req.nextUrl.pathname,
-    hasSession: !!session,
-    user: session?.user?.sub
-  });
+export default auth0.middleware();
 
-  if (!session || !session.user) {
-    console.log('[Middleware] Redirecting to login');
-    return NextResponse.redirect(new URL('/api/auth/login', req.url));
+// Per debugging personalizzato, usa afterCallback:
+export default auth0.middleware({
+  afterCallback: async (req, session) => {
+    console.log('[Auth0 Middleware]', {
+      path: req.nextUrl.pathname,
+      hasSession: !!session,
+      user: session?.user?.sub
+    });
+    return session;
   }
-
-  return res;
-}
+});
 ```
 
 **Verifica esclusioni**:

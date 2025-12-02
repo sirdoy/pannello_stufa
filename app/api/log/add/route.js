@@ -1,5 +1,5 @@
 import { adminDbPush } from '@/lib/firebaseAdmin';
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,7 +8,7 @@ export async function POST(request) {
 
   try {
     // Recupera informazioni utente da Auth0
-    const session = await getSession();
+    const session = await auth0.getSession();
     const user = session?.user || null;
 
     const logEntry = {

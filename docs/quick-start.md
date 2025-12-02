@@ -96,8 +96,10 @@ ADMIN_USER_ID=auth0|your-user-id
 
 1. **Create Auth0 Application**: dashboard.auth0.com
 2. **Application Type**: Regular Web Application
-3. **Allowed Callback URLs**: `http://localhost:3000/api/auth/callback`
+3. **Allowed Callback URLs**: `http://localhost:3000/auth/callback`
 4. **Allowed Logout URLs**: `http://localhost:3000`
+
+**Note**: Auth0 v4 usa route `/auth/*` invece di `/api/auth/*`
 
 ## Development
 

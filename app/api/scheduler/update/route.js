@@ -4,7 +4,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request) {
   try {
     // Verifica autenticazione
-    const session = await getSession();
+    const session = await auth0.getSession();
     if (!session?.user) {
       return NextResponse.json(
         { error: 'Non autenticato' },

@@ -73,8 +73,7 @@ pannello-stufa/
 │   │   ├── scheduler/check/      # Cron endpoint + maintenance tracking
 │   │   ├── netatmo/              # Termostato API (OAuth 2.0)
 │   │   ├── hue/                  # Luci API (Local)
-│   │   ├── notifications/        # Push notifications (test, send)
-│   │   └── auth/[...auth0]/      # Auth0 handler
+│   │   └── notifications/        # Push notifications (test, send)
 │   ├── components/
 │   │   ├── ui/                   # Card, Button, Banner, Toast, LoadingOverlay, Select, Input, etc.
 │   │   └── devices/              # Device-specific components
@@ -102,6 +101,7 @@ pannello-stufa/
 │   ├── maintenanceServiceAdmin.js  # Maintenance tracking (server Admin SDK)
 │   ├── errorMonitor.js          # Error detection
 │   ├── logService.js            # User action logging
+│   ├── auth0.js                 # Auth0 Client SDK (session management)
 │   ├── firebase.js              # Firebase Client SDK (read operations)
 │   ├── firebaseAdmin.js         # Firebase Admin SDK (write operations)
 │   ├── notificationService.js   # FCM client-side

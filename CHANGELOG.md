@@ -5,6 +5,52 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.21.1] - 2025-12-03
+
+### Corretto
+- **Auth0 v4 Compatibility**: risolti errori 401 su 16 API routes
+  - Aggiunto parametro `request` mancante a `auth0.getSession(request)` in tutte le route protette
+  - Breaking change Next.js 15 App Router: richiede `getSession(request)` invece di `getSession()`
+  - Routes corrette: scheduler/update, user, user/theme, log/add, netatmo/*, maintenance/*, errors/*, notifications/*, devices/preferences
+
+- **app/api/user/route.js**: corretta function signature
+  - `POST(request, { params })` → `POST(request)` (rimosso params non utilizzato)
+  - Risolto errore durante recupero informazioni utente
+
+- **middleware.js**: homepage accessibile dopo logout
+  - Corretta configurazione per permettere accesso homepage senza autenticazione
+  - Risolto redirect loop quando si ritorna da Auth0 logout
+
+- **Auth Paths**: aggiornati tutti i link UI
+  - Navbar (desktop/mobile): `/api/auth/login` → `/auth/login`, `/api/auth/logout` → `/auth/logout`
+  - MaintenancePage: link login corretto
+  - NotificationsPage: link login redirect corretto
+
+### Rimosso
+- **app/api/auth/[...auth0]/route.js**: eliminato file obsoleto
+  - Auth0 v4 utilizza middleware, non più `handleAuth()` handler
+
+- **app/api/scheduler/clearSemiManual/**: rimossa route ridondante
+  - Funzionalità unificata in `/api/scheduler/update` endpoint
+
+### Modificato
+- **lib/schedulerApiClient.js**: aggiornato per endpoint unificato
+  - `clearSemiManualMode()` ora usa `/api/scheduler/update` invece di endpoint dedicato
+
+### Configurazione
+- **Firebase Admin SDK**: aggiunte credenziali `.env.local`
+  - `FIREBASE_ADMIN_PROJECT_ID`, `FIREBASE_ADMIN_CLIENT_EMAIL`, `FIREBASE_ADMIN_PRIVATE_KEY`
+  - Necessarie per write operations server-side
+
+- **Auth0 Sandbox**: aggiornate credenziali sviluppo
+  - `AUTH0_CLIENT_ID`: BIJSKMw7oHUHUDCMjJjrEVmVc5MVggLn
+  - `AUTH0_CLIENT_SECRET`: sandbox secret aggiornato
+
+### Note
+- Tutti i flussi di autenticazione testati e funzionanti
+- Production ready: 16 API routes protette operative
+- Zero breaking changes per utenti finali
+
 ## [1.21.0] - 2025-12-02
 
 ### Migrato

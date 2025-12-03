@@ -28,7 +28,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request) {
   try {
     // Verifica autenticazione O admin secret
-    const session = await auth0.getSession();
+    const session = await auth0.getSession(request);
     const user = session?.user;
 
     // Check admin secret da header o body

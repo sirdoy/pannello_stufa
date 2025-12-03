@@ -20,7 +20,7 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request) {
   try {
-    const session = await auth0.getSession();
+    const session = await auth0.getSession(request);
     const userId = session?.user?.sub;
 
     if (!userId) {
@@ -62,7 +62,7 @@ export async function GET(request) {
  */
 export async function POST(request) {
   try {
-    const session = await auth0.getSession();
+    const session = await auth0.getSession(request);
     const userId = session?.user?.sub;
 
     if (!userId) {

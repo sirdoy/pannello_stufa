@@ -8,7 +8,7 @@ export async function POST(request) {
 
   try {
     // Recupera informazioni utente da Auth0
-    const session = await auth0.getSession();
+    const session = await auth0.getSession(request);
     const user = session?.user || null;
 
     const logEntry = {

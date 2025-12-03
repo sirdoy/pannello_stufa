@@ -20,7 +20,7 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(request) {
   try {
-    const session = await auth0.getSession();
+    const session = await auth0.getSession(request);
     const user = session?.user;
 
     if (!user) {
@@ -169,7 +169,7 @@ export async function POST(request) {
 
     // Log failed calibration
     try {
-      const session = await auth0.getSession();
+      const session = await auth0.getSession(request);
       const user = session?.user;
 
       if (user) {

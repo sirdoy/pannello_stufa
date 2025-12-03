@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request) {
   try {
     // Verifica autenticazione
-    const session = await auth0.getSession();
+    const session = await auth0.getSession(request);
     if (!session?.user) {
       return NextResponse.json(
         { error: 'Non autenticato' },

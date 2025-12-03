@@ -431,6 +431,6 @@ ADMIN_USER_ID=auth0|xxx
 
 ---
 
-**Last Updated**: 2025-11-28
-**Version**: 1.18.0 (minor: Firebase Admin SDK Migration & Security Rules)
+**Last Updated**: 2025-12-03
+**Version**: 1.21.1 (patch: Auth0 v4 compatibility fixes)
 **Author**: Federico Manfredi

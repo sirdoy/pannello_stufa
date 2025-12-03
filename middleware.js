@@ -18,6 +18,11 @@ export async function middleware(req) {
   // For non-auth routes, check if user is authenticated
   const sessionCookie = req.cookies.get('appSession');
 
+  // Allow access to homepage without authentication (after logout)
+  if (!sessionCookie && req.nextUrl.pathname === '/') {
+    return NextResponse.next();
+  }
+
   if (!sessionCookie) {
     // Preserve the original URL to return after login
     // Note: v4 uses /auth/login instead of /api/auth/login

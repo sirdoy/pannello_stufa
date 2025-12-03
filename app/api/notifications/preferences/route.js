@@ -62,7 +62,7 @@ const DEFAULT_PREFERENCES = {
 export async function GET(request) {
   try {
     // Verifica autenticazione
-    const session = await auth0.getSession();
+    const session = await auth0.getSession(request);
     const user = session?.user;
 
     if (!user) {
@@ -108,7 +108,7 @@ export async function GET(request) {
 export async function PUT(request) {
   try {
     // Verifica autenticazione
-    const session = await auth0.getSession();
+    const session = await auth0.getSession(request);
     const user = session?.user;
 
     if (!user) {

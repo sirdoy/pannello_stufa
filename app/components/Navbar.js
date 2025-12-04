@@ -360,15 +360,15 @@ export default function Navbar() {
       {/* Mobile Menu Overlay + Content */}
       {mobileMenuOpen && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop with fade-in animation */}
           <div
-            className="fixed top-[3.5rem] sm:top-16 left-0 right-0 bottom-0 bg-black/40 backdrop-blur-md z-[9000] lg:hidden"
+            className="fixed top-[3.5rem] sm:top-16 left-0 right-0 bottom-0 bg-black/40 backdrop-blur-md z-[9000] lg:hidden animate-fadeIn"
             onClick={() => setMobileMenuOpen(false)}
             aria-hidden="true"
           />
 
-          {/* Mobile Menu Panel */}
-          <div className="fixed top-[3.5rem] sm:top-16 left-0 right-0 bottom-0 bg-white/[0.10] dark:bg-white/[0.08] backdrop-blur-3xl z-[9001] lg:hidden overflow-y-auto">
+          {/* Mobile Menu Panel with slide-in animation */}
+          <div className="fixed top-[3.5rem] sm:top-16 left-0 right-0 bottom-0 bg-white/[0.10] dark:bg-white/[0.08] backdrop-blur-3xl z-[9001] lg:hidden overflow-y-auto animate-slideInDown">
             <div className="px-3 sm:px-4 py-4 space-y-2">
 
               {/* User Info */}

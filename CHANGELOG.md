@@ -5,6 +5,49 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.22.0] - 2025-12-04
+
+### Aggiunto
+- **Page Transitions**: scroll reset automatico su ogni navigazione
+  - `window.scrollTo({ top: 0, behavior: 'instant' })` in `app/template.js`
+  - Elimina il problema di trovarsi a metà pagina dopo cambio route
+  - UX più pulita e prevedibile durante navigazione
+
+- **View Transitions API**: supporto nativo browser con fallback automatico
+  - Chrome 111+ e Edge 111+ utilizzano `document.startViewTransition()`
+  - Cross-fade fluido gestito dal browser quando disponibile
+  - Fallback elegante ad animazioni CSS custom per altri browser
+  - Zero impatto su browser non supportati
+
+- **Mobile Menu Animations**: transizioni fluide per menu hamburger
+  - Backdrop: fade-in animation 200ms (`animate-fadeIn`)
+  - Panel: slide-in dall'alto 300ms (`animate-slideInDown`)
+  - UX mobile significativamente migliorata
+
+### Migliorato
+- **Dark Mode Transitions**: transizioni smooth 300ms su cambio tema
+  - `background-color` e `color` con transizione `0.3s ease`
+  - Applicato in `lib/themeService.js` (funzione `applyThemeToDOM`)
+  - Applicato in `app/components/ThemeScript.js` (inizializzazione tema)
+  - Fade elegante tra light e dark mode invece di cambio istantaneo
+
+- **Template Transitions**: ottimizzato sistema transizioni pagina
+  - View Transitions API integrata con detection automatica supporto
+  - Fallback a animazioni CSS custom quando API non disponibile
+  - Documentazione aggiornata con feature View Transitions API
+
+### File Modificati
+- `app/template.js`: scroll reset + View Transitions API
+- `lib/themeService.js`: smooth transitions funzione `applyThemeToDOM()`
+- `app/components/ThemeScript.js`: smooth transitions init tema
+- `app/components/Navbar.js`: mobile menu animations
+
+### Note Tecniche
+- View Transitions API supportata da Chrome 111+ e Edge 111+
+- Firefox e Safari usano fallback CSS (fade + slide + scale)
+- Nessun breaking change: solo miglioramenti visivi
+- Performance ottimali: native browser features quando disponibili
+
 ## [1.21.1] - 2025-12-03
 
 ### Corretto

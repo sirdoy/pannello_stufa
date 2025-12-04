@@ -5,6 +5,29 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.22.1] - 2025-12-04
+
+### Corretto
+- **Fix Manutenzione Stufa**: rimosso blocco errato su spegnimento quando stufa necessita pulizia
+  - Spegnimento stufa ora sempre permesso (anche con `needsMaintenance=true`)
+  - Accensione rimane correttamente bloccata fino a conferma pulizia
+  - Sicurezza: previene situazioni in cui utente non può spegnere stufa accesa
+
+- **Fix Tendine Configurazione**: dropdown fan e power sempre modificabili durante manutenzione
+  - Dropdown livello ventilazione (💨) ora abilitato anche con manutenzione richiesta
+  - Dropdown livello potenza (⚡) ora abilitato anche con manutenzione richiesta
+  - UX migliorata: utente può regolare stufa accesa anche quando necessita pulizia
+
+### File Modificati
+- `app/components/devices/stove/StoveCard.js`:
+  - Linea 822: rimosso `needsMaintenance` da condizione disabled pulsante "Spegni"
+  - Linee 858, 867: rimosso prop `disabled={needsMaintenance}` da Select fan/power
+
+### Note Tecniche
+- Solo accensione stufa (`handleIgnite`) rimane bloccata con manutenzione richiesta
+- Spegnimento (`handleShutdown`) e modifica parametri sempre permessi
+- Banner pulizia richiesta rimane visibile per informare utente
+
 ## [1.22.0] - 2025-12-04
 
 ### Aggiunto

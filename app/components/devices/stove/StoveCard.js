@@ -819,7 +819,7 @@ export default function StoveCard() {
                 size="lg"
                 icon="❄️"
                 onClick={handleShutdown}
-                disabled={loading || isSpenta || needsMaintenance}
+                disabled={loading || isSpenta}
                 className="h-20 sm:h-24 text-base sm:text-lg font-bold"
               >
                 Spegni
@@ -855,7 +855,7 @@ export default function StoveCard() {
                   value={fanLevel ?? ''}
                   onChange={handleFanChange}
                   options={fanOptions}
-                  disabled={needsMaintenance}
+                  disabled={false}
                   className="text-base sm:text-lg py-3 sm:py-4"
                 />
 
@@ -864,7 +864,7 @@ export default function StoveCard() {
                   value={powerLevel ?? ''}
                   onChange={handlePowerChange}
                   options={powerOptions}
-                  disabled={needsMaintenance}
+                  disabled={false}
                   className="text-base sm:text-lg py-3 sm:py-4"
                 />
               </div>

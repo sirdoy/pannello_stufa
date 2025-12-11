@@ -1,10 +1,12 @@
+import { auth0 } from '@/lib/auth0';
 import { STUFA_API, fetchWithTimeout } from '@/lib/stoveApi';
 
 /**
  * GET /api/stove/getRoomTemperature
  * Returns the target room temperature setpoint from the stove
+ * Protected: Requires Auth0 authentication
  */
-export async function GET() {
+export const GET = auth0.withApiAuthRequired(async function getRoomTempHandler(request) {
   try {
     const res = await fetchWithTimeout(STUFA_API.getRoomTemperature);
 
@@ -32,4 +34,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-}
+});

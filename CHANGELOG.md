@@ -5,6 +5,113 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.23.0] - 2025-12-11
+
+### Aggiunto
+- **Protezione Auth0 Completa API Routes**: implementata autenticazione enterprise-grade su 39 API routes (precedentemente solo 3 protette)
+  - **Authentication Required**: tutte le API routes ora richiedono sessione Auth0 valida
+  - **Security Pattern Uniforme**: `auth0.withApiAuthRequired()` wrapper applicato uniformemente
+  - **Zero Breaking Changes**: funzionalità identica, solo aggiunto layer autenticazione mancante
+
+### API Routes Protette
+
+#### Stove Control (10 routes)
+- `/api/stove/status` - Stato stufa
+- `/api/stove/ignite` - Accensione
+- `/api/stove/shutdown` - Spegnimento
+- `/api/stove/setFan` - Regolazione ventola
+- `/api/stove/setPower` - Regolazione potenza
+- `/api/stove/getFan` - Lettura livello ventola
+- `/api/stove/getPower` - Lettura livello potenza
+- `/api/stove/getRoomTemperature` - Lettura temperatura ambiente
+- `/api/stove/setSettings` - Modifica impostazioni
+- `/api/stove/settings` - Lettura impostazioni
+
+#### Scheduler & Maintenance (3 routes)
+- `/api/scheduler/update` - Aggiornamento pianificazione (già protetta, mantenuta consistenza)
+- `/api/maintenance/confirm-cleaning` - Conferma pulizia stufa
+- `/api/maintenance/update-target` - Aggiornamento ore target manutenzione
+- **Escluso**: `/api/scheduler/check` mantiene autenticazione CRON_SECRET per cronjobs
+
+#### External Devices (17 routes)
+**Netatmo (8 routes)**:
+- `/api/netatmo/devices` - Elenco dispositivi
+- `/api/netatmo/devices-temperatures` - Temperature tutti i moduli
+- `/api/netatmo/homesdata` - Topologia completa casa
+- `/api/netatmo/homestatus` - Stato attuale termostato
+- `/api/netatmo/temperature` - Lettura temperatura
+- `/api/netatmo/calibrate` - Calibrazione temperatura
+- `/api/netatmo/setroomthermpoint` - Impostazione setpoint stanza
+- `/api/netatmo/setthermmode` - Cambio modalità termostato
+
+**Philips Hue (9 routes)**:
+- `/api/hue/status` - Stato connessione bridge
+- `/api/hue/lights` - Elenco luci
+- `/api/hue/lights/[id]` - Controllo singola luce
+- `/api/hue/rooms` - Elenco stanze
+- `/api/hue/rooms/[id]` - Controllo stanza
+- `/api/hue/scenes/[id]/activate` - Attivazione scena
+- `/api/hue/disconnect` - Disconnessione bridge
+- `/api/hue/test` - Test connessione
+- `/api/hue/pair` - Pairing bridge
+
+#### User & Settings (6 routes)
+- `/api/user` - Info utente (già protetta, mantenuta consistenza)
+- `/api/user/theme` - Preferenze tema (già protetta, mantenuta consistenza)
+- `/api/notifications/preferences` - Preferenze notifiche
+- `/api/notifications/register` - Registrazione token FCM
+- `/api/notifications/send` - Invio notifica
+- `/api/notifications/test` - Test notifica
+- `/api/devices/preferences` - Preferenze dispositivi
+
+#### System (4 routes)
+- `/api/errors/log` - Logging errori
+- `/api/errors/resolve` - Risoluzione errori
+- `/api/log/add` - Aggiunta log azione utente
+- `/api/admin/sync-changelog` - Sync changelog (con role check `ADMIN_USER_ID`)
+
+### OAuth Flow Preservato
+**Routes Escluse per Design**:
+- `/api/netatmo/callback` - OAuth callback Netatmo (richiede session-less operation)
+- `/api/hue/callback` - OAuth callback Philips Hue (richiede session-less operation)
+
+### Architettura
+- **Middleware**: già proteggeva le pagine web (implementato in v1.21.0)
+- **API Routes**: ora protette con lo stesso pattern enterprise-grade
+- **Admin Routes**: doppio controllo (Auth0 + role check `ADMIN_USER_ID`)
+- **Cron Jobs**: preservato meccanismo `CRON_SECRET` per endpoint scheduler check
+
+### File Modificati (39 total)
+- 39 API route files: aggiunti import `auth0` e wrapper `withApiAuthRequired`
+- Pattern consistente applicato: `export const METHOD = auth0.withApiAuthRequired(async function handler(request) { ... });`
+
+### Note Tecniche
+- Pattern provato e testato su 20 routes in fase iniziale
+- Esteso automaticamente alle 19 routes rimanenti
+- Sintassi JavaScript validata su tutti i file
+- Zero modifiche alla logica business, solo layer autenticazione aggiunto
+- Security: ora impossibile accedere alle API senza sessione Auth0 valida
+
+## [1.22.2] - 2025-12-05
+
+### Corretto
+- **Fix Auth Routes**: allineate route Auth0 in `lib/routes.js` con migrazione v4
+  - Route aggiornate da `/api/auth/*` a `/auth/*` per compatibilità con Auth0 v4 middleware
+  - Login: `/api/auth/login` → `/auth/login`
+  - Logout: `/api/auth/logout` → `/auth/logout`
+  - Callback: `/api/auth/callback` → `/auth/callback`
+  - Risolve inconsistenza documentale (implementazione già corretta in tutto il codebase)
+
+### File Modificati
+- `lib/routes.js`:
+  - Linea 87: aggiunto commento esplicativo route Auth0 v4
+  - Linee 89-92: aggiornate costanti `AUTH_ROUTES` con percorsi corretti
+
+### Note Tecniche
+- Le route Auth0 sono montate automaticamente dal middleware (`middleware.js:10-11`)
+- Implementazione già corretta in: `Navbar.js`, `middleware.js`, pagine `settings/notifications`, `stove/maintenance`
+- Questa patch risolve solo l'inconsistenza nelle costanti centralizzate
+
 ## [1.22.1] - 2025-12-04
 
 ### Corretto

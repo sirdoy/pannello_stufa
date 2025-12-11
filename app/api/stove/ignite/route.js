@@ -1,3 +1,4 @@
+import { auth0 } from '@/lib/auth0';
 import { igniteStove } from '@/lib/stoveApi';
 import { getFullSchedulerMode, setSemiManualMode, getNextScheduledChange } from '@/lib/schedulerService';
 import { canIgnite } from '@/lib/maintenanceService';
@@ -6,8 +7,9 @@ import { canIgnite } from '@/lib/maintenanceService';
  * POST /api/stove/ignite
  * Ignites the stove
  * Supports sandbox mode in localhost
+ * Protected: Requires Auth0 authentication
  */
-export async function POST(req) {
+export const POST = auth0.withApiAuthRequired(async function igniteHandler(req) {
   try {
     // Parse body per ottenere source e power
     const body = await req.json().catch(() => ({}));
@@ -56,4 +58,4 @@ export async function POST(req) {
       { status: 500 }
     );
   }
-}
+});

@@ -1,10 +1,12 @@
 // app/api/user/route.js (Next.js App Router)
 import { auth0 } from '@/lib/auth0';
 
-export async function GET(request) {
-  const session = await auth0.getSession(request);
-  if (!session || !session.user) {
-    return Response.json({ user: null });
-  }
-  return Response.json({ user: session.user });
-}
+/**
+ * GET /api/user
+ * Returns current authenticated user info
+ * Protected: Requires Auth0 authentication
+ */
+export const GET = auth0.withApiAuthRequired(async function getUserInfo(request) {
+  const { user } = await auth0.getSession(request);
+  return Response.json({ user });
+});

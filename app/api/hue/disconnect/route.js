@@ -1,14 +1,16 @@
 /**
  * Philips Hue Disconnect Route
  * Clear all Hue data from Firebase
+ * ✅ Protected by Auth0 authentication
  */
 
 import { NextResponse } from 'next/server';
 import { clearHueData } from '@/lib/hue/hueTokenHelper';
+import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST() {
+export const POST = auth0.withApiAuthRequired(async function handler(request) {
   try {
     await clearHueData();
     return NextResponse.json({ success: true });
@@ -19,4 +21,4 @@ export async function POST() {
       { status: 500 }
     );
   }
-}
+});

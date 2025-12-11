@@ -1,15 +1,17 @@
 /**
  * Philips Hue Bridge Pairing Route
  * Create application key (requires link button press within 30 seconds)
+ * ✅ Protected by Auth0 authentication
  */
 
 import { NextResponse } from 'next/server';
 import { createApplicationKey } from '@/lib/hue/hueApi';
 import { saveHueConnection } from '@/lib/hue/hueLocalHelper';
+import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request) {
+export const POST = auth0.withApiAuthRequired(async function handler(request) {
   try {
     const { bridgeIp, bridgeId } = await request.json();
 
@@ -59,4 +61,4 @@ export async function POST(request) {
       { status: 500 }
     );
   }
-}
+});

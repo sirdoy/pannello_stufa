@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { auth0 } from '@/lib/auth0';
 import { syncVersionHistoryToFirebase } from '@/lib/changelogService';
 import { VERSION_HISTORY } from '@/lib/version';
 
@@ -7,22 +8,16 @@ export const dynamic = 'force-dynamic';
 
 /**
  * API route per sincronizzare changelog con Firebase
- * Protetta da ADMIN_SECRET per prevenire accessi non autorizzati
- *
- * Usage:
- * curl -X POST https://your-app.vercel.app/api/admin/sync-changelog \
- *   -H "Authorization: Bearer YOUR_ADMIN_SECRET"
+ * Protected: Requires Auth0 authentication + ADMIN_USER_ID
  */
-export async function POST(request) {
+export const POST = auth0.withApiAuthRequired(async function syncChangelogHandler(request) {
   try {
-    // Verifica autorizzazione
-    const authHeader = request.headers.get('authorization');
-    const token = authHeader?.replace('Bearer ', '');
-
-    if (token !== process.env.ADMIN_SECRET) {
+    // Check admin role
+    const { user } = await auth0.getSession(request);
+    if (user.sub !== process.env.ADMIN_USER_ID) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
+        { error: 'Forbidden', message: 'Admin access required' },
+        { status: 403 }
       );
     }
 
@@ -45,18 +40,17 @@ export async function POST(request) {
       { status: 500 }
     );
   }
-}
+});
 
 // Supporta anche GET per info (senza sync)
-export async function GET(request) {
+export const GET = auth0.withApiAuthRequired(async function getChangelogInfoHandler(request) {
   try {
-    const authHeader = request.headers.get('authorization');
-    const token = authHeader?.replace('Bearer ', '');
-
-    if (token !== process.env.ADMIN_SECRET) {
+    // Check admin role
+    const { user } = await auth0.getSession(request);
+    if (user.sub !== process.env.ADMIN_USER_ID) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
+        { error: 'Forbidden', message: 'Admin access required' },
+        { status: 403 }
       );
     }
 
@@ -72,4 +66,4 @@ export async function GET(request) {
       { status: 500 }
     );
   }
-}
+});

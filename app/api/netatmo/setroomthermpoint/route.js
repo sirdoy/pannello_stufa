@@ -12,8 +12,9 @@ export const dynamic = 'force-dynamic';
  * Sets temperature setpoint for a specific room
  * Body: { room_id, mode, temp?, endtime? }
  * Mode: manual, home, max, off
+ * ✅ Protected by Auth0 authentication
  */
-export async function POST(request) {
+export const POST = auth0.withApiAuthRequired(async function handler(request) {
   try {
     const session = await auth0.getSession(request);
     const user = session?.user;
@@ -108,4 +109,4 @@ export async function POST(request) {
     console.error('Error in /api/netatmo/setroomthermpoint:', err);
     return Response.json({ error: err.message || 'Errore server' }, { status: 500 });
   }
-}
+});

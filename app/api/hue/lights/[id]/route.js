@@ -2,15 +2,17 @@
  * Philips Hue Single Light Control Route
  * GET: Fetch single light state
  * PUT: Update light state (on/off, brightness, color)
+ * ✅ Protected by Auth0 authentication
  */
 
 import { NextResponse } from 'next/server';
 import HueApi from '@/lib/hue/hueApi';
 import { getValidAccessToken } from '@/lib/hue/hueTokenHelper';
+import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request, { params }) {
+export const GET = auth0.withApiAuthRequired(async function handler(request, { params }) {
   try {
     const { id } = params;
 
@@ -41,9 +43,9 @@ export async function GET(request, { params }) {
       { status: 500 }
     );
   }
-}
+});
 
-export async function PUT(request, { params }) {
+export const PUT = auth0.withApiAuthRequired(async function handler(request, { params }) {
   try {
     const { id } = params;
     const body = await request.json();
@@ -75,4 +77,4 @@ export async function PUT(request, { params }) {
       { status: 500 }
     );
   }
-}
+});

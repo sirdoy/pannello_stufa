@@ -1,11 +1,13 @@
+import { auth0 } from '@/lib/auth0';
 import { getStoveStatus } from '@/lib/stoveApi';
 
 /**
  * GET /api/stove/status
  * Returns the current operational status of the stove
  * Supports sandbox mode in localhost
+ * Protected: Requires Auth0 authentication
  */
-export async function GET() {
+export const GET = auth0.withApiAuthRequired(async function getStatus(request) {
   try {
     const data = await getStoveStatus();
     return Response.json(data);
@@ -34,4 +36,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-}
+});

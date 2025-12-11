@@ -2,6 +2,7 @@
  * Device Preferences API
  * GET: Fetch user device preferences
  * POST: Update user device preferences
+ * ✅ Protected by Auth0 authentication
  */
 
 import { NextResponse } from 'next/server';
@@ -18,7 +19,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/devices/preferences
  * Fetch device preferences for current user
  */
-export async function GET(request) {
+export const GET = auth0.withApiAuthRequired(async function handler(request) {
   try {
     const session = await auth0.getSession(request);
     const userId = session?.user?.sub;
@@ -53,14 +54,14 @@ export async function GET(request) {
       { status: 500 }
     );
   }
-}
+});
 
 /**
  * POST /api/devices/preferences
  * Update device preferences for current user
  * Body: { preferences: { deviceId: boolean, ... } }
  */
-export async function POST(request) {
+export const POST = auth0.withApiAuthRequired(async function handler(request) {
   try {
     const session = await auth0.getSession(request);
     const userId = session?.user?.sub;
@@ -120,7 +121,7 @@ export async function POST(request) {
       { status: 500 }
     );
   }
-}
+});
 
 /**
  * Get device description for UI

@@ -1,11 +1,13 @@
+import { auth0 } from '@/lib/auth0';
 import { getFanLevel } from '@/lib/stoveApi';
 
 /**
  * GET /api/stove/getFan
  * Returns the current fan level
  * Supports sandbox mode in localhost
+ * Protected: Requires Auth0 authentication
  */
-export async function GET() {
+export const GET = auth0.withApiAuthRequired(async function getFanHandler(request) {
   try {
     const data = await getFanLevel();
     return Response.json(data);
@@ -24,4 +26,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-}
+});

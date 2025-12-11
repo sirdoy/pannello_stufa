@@ -17,8 +17,9 @@ export const dynamic = 'force-dynamic';
  * 2. The schedule is synced via synchomeschedule
  *
  * This endpoint uses method #2 to force calibration on demand.
+ * ✅ Protected by Auth0 authentication
  */
-export async function POST(request) {
+export const POST = auth0.withApiAuthRequired(async function handler(request) {
   try {
     const session = await auth0.getSession(request);
     const user = session?.user;
@@ -190,4 +191,4 @@ export async function POST(request) {
       details: err.stack,
     }, { status: 500 });
   }
-}
+});

@@ -17,6 +17,7 @@
  *     data: { ... }                   // opzionale
  *   }
  * }
+ * ✅ Protected by Auth0 authentication
  */
 
 import { auth0 } from '@/lib/auth0';
@@ -25,7 +26,7 @@ import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request) {
+export const POST = auth0.withApiAuthRequired(async function handler(request) {
   try {
     // Verifica autenticazione O admin secret
     const session = await auth0.getSession(request);
@@ -95,4 +96,4 @@ export async function POST(request) {
       { status: 500 }
     );
   }
-}
+});

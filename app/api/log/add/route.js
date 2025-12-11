@@ -3,13 +3,12 @@ import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request) {
+export const POST = auth0.withApiAuthRequired(async function addLogHandler(request) {
   const body = await request.json();
 
   try {
-    // Recupera informazioni utente da Auth0
-    const session = await auth0.getSession(request);
-    const user = session?.user || null;
+    // Recupera informazioni utente da Auth0 (auth already verified by wrapper)
+    const { user } = await auth0.getSession(request);
 
     const logEntry = {
       ...body,
@@ -30,4 +29,4 @@ export async function POST(request) {
     console.error('Errore salvataggio log:', error);
     return Response.json({ success: false, error: error.message }, { status: 500 });
   }
-}
+});

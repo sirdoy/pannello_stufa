@@ -1,15 +1,17 @@
 /**
  * Philips Hue Scene Activation Route
  * PUT: Activate a scene
+ * ✅ Protected by Auth0 authentication
  */
 
 import { NextResponse } from 'next/server';
 import HueApi from '@/lib/hue/hueApi';
 import { getValidAccessToken } from '@/lib/hue/hueTokenHelper';
+import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';
 
-export async function PUT(request, { params }) {
+export const PUT = auth0.withApiAuthRequired(async function handler(request, { params }) {
   try {
     const { id } = params;
 
@@ -40,4 +42,4 @@ export async function PUT(request, { params }) {
       { status: 500 }
     );
   }
-}
+});

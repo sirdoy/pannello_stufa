@@ -27,6 +27,7 @@
  *     }
  *   }
  * }
+ * ✅ Protected by Auth0 authentication
  */
 
 import { auth0 } from '@/lib/auth0';
@@ -59,7 +60,7 @@ const DEFAULT_PREFERENCES = {
   },
 };
 
-export async function GET(request) {
+export const GET = auth0.withApiAuthRequired(async function handler(request) {
   try {
     // Verifica autenticazione
     const session = await auth0.getSession(request);
@@ -103,9 +104,9 @@ export async function GET(request) {
       { status: 500 }
     );
   }
-}
+});
 
-export async function PUT(request) {
+export const PUT = auth0.withApiAuthRequired(async function handler(request) {
   try {
     // Verifica autenticazione
     const session = await auth0.getSession(request);
@@ -152,4 +153,4 @@ export async function PUT(request) {
       { status: 500 }
     );
   }
-}
+});

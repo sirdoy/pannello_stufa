@@ -1,11 +1,13 @@
+import { auth0 } from '@/lib/auth0';
 import { getPowerLevel } from '@/lib/stoveApi';
 
 /**
  * GET /api/stove/getPower
  * Returns the current power level
  * Supports sandbox mode in localhost
+ * Protected: Requires Auth0 authentication
  */
-export async function GET() {
+export const GET = auth0.withApiAuthRequired(async function getPowerHandler(request) {
   try {
     const data = await getPowerLevel();
     return Response.json(data);
@@ -24,4 +26,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-}
+});

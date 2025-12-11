@@ -4,6 +4,7 @@
  * POST /api/notifications/test
  *
  * Invia una notifica di test all'utente autenticato
+ * ✅ Protected by Auth0 authentication
  */
 
 import { auth0 } from '@/lib/auth0';
@@ -12,7 +13,7 @@ import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request) {
+export const POST = auth0.withApiAuthRequired(async function handler(request) {
   try {
     // Verifica autenticazione
     const session = await auth0.getSession(request);
@@ -68,4 +69,4 @@ export async function POST(request) {
       { status: 500 }
     );
   }
-}
+});

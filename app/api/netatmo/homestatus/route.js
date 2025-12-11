@@ -2,6 +2,7 @@
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
+import { auth0 } from '@/lib/auth0';
 
 // Force dynamic rendering for Firebase operations
 export const dynamic = 'force-dynamic';
@@ -10,8 +11,9 @@ export const dynamic = 'force-dynamic';
  * GET /api/netatmo/homestatus
  * Retrieves real-time status of all rooms and modules
  * Returns temperatures, setpoints, heating status
+ * ✅ Protected by Auth0 authentication
  */
-export async function GET() {
+export const GET = auth0.withApiAuthRequired(async function handler(request) {
   try {
     // ✅ Get valid access token using centralized helper (auto-refresh)
     const { accessToken, error, message } = await getValidAccessToken();
@@ -96,4 +98,4 @@ export async function GET() {
     console.error('❌ Error stack:', err.stack);
     return Response.json({ error: err.message || 'Errore server' }, { status: 500 });
   }
-}
+});

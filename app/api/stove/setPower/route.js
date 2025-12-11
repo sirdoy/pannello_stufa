@@ -1,3 +1,4 @@
+import { auth0 } from '@/lib/auth0';
 import { setPowerLevel, getStoveStatus } from '@/lib/stoveApi';
 import { getFullSchedulerMode, setSemiManualMode, getNextScheduledChange } from '@/lib/schedulerService';
 
@@ -5,8 +6,9 @@ import { getFullSchedulerMode, setSemiManualMode, getNextScheduledChange } from 
  * POST /api/stove/setPower
  * Sets the power level
  * Supports sandbox mode in localhost
+ * Protected: Requires Auth0 authentication
  */
-export async function POST(req) {
+export const POST = auth0.withApiAuthRequired(async function setPowerHandler(req) {
   try {
     const { level, source } = await req.json();
     const data = await setPowerLevel(level);
@@ -51,4 +53,4 @@ export async function POST(req) {
       { status: 500 }
     );
   }
-}
+});

@@ -1,5 +1,6 @@
 // ✅ File: app/api/netatmo/devices-temperatures/route.js
 
+import { auth0 } from '@/lib/auth0';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
 
@@ -9,8 +10,9 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/netatmo/devices-temperatures
  * Retrieves temperatures from all Netatmo devices/modules
+ * ✅ Protected by Auth0 authentication
  */
-export async function GET() {
+export const GET = auth0.withApiAuthRequired(async function handler(request) {
   try {
     // ✅ Get valid access token using centralized helper (auto-refresh)
     const { accessToken, error, message } = await getValidAccessToken();
@@ -50,4 +52,4 @@ export async function GET() {
     console.error('Errore generale Netatmo devices-temperatures:', err);
     return Response.json({ error: 'Errore server interno' }, { status: 500 });
   }
-}
+});

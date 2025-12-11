@@ -21,19 +21,8 @@ import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request) {
+export const POST = auth0.withApiAuthRequired(async function logErrorHandler(request) {
   try {
-    // Verifica autenticazione
-    const session = await auth0.getSession(request);
-    const user = session?.user;
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Non autenticato' },
-        { status: 401 }
-      );
-    }
-
     const body = await request.json();
 
     // Valida body
@@ -87,4 +76,4 @@ export async function POST(request) {
       { status: 500 }
     );
   }
-}
+});

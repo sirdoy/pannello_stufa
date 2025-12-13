@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
  * Toast - Notification component with liquid glass style
- * Auto-dismisses after specified duration
+ * Auto-dismisses after specified duration with progress indicator
  */
 export default function Toast({
   message,
@@ -14,6 +14,8 @@ export default function Toast({
   onDismiss,
   liquid = true
 }) {
+  const [progress, setProgress] = useState(100);
+
   useEffect(() => {
     if (duration && onDismiss) {
       const timer = setTimeout(() => {
@@ -22,6 +24,19 @@ export default function Toast({
       return () => clearTimeout(timer);
     }
   }, [duration, onDismiss]);
+
+  useEffect(() => {
+    if (duration === 0) return;
+
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        const next = prev - (100 / (duration / 50));
+        return next <= 0 ? 0 : next;
+      });
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, [duration]);
 
   // Liquid glass variants (iOS glassmorphism style)
   const liquidVariants = {
@@ -86,8 +101,16 @@ export default function Toast({
   const variants = liquid ? liquidVariants : solidVariants;
   const styles = variants[variant] || variants.success;
 
+  // Progress bar gradients
+  const progressGradients = {
+    success: 'from-success-500 to-success-600',
+    warning: 'from-warning-500 to-warning-600',
+    info: 'from-info-500 to-info-600',
+    error: 'from-primary-500 to-primary-600',
+  };
+
   return (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] animate-slideDown">
+    <div className="fixed top-safe-4 left-1/2 -translate-x-1/2 z-[9999] w-[calc(100%-2rem)] max-w-md animate-slideDown">
       <div className={`
         ${styles.bg} ${styles.text}
         ${liquid
@@ -129,6 +152,16 @@ export default function Toast({
           >
             <span className="text-lg">✕</span>
           </button>
+        )}
+
+        {/* Progress bar */}
+        {duration > 0 && (
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 dark:bg-white/10 overflow-hidden rounded-b-2xl">
+            <div
+              className={`h-full bg-gradient-to-r ${progressGradients[variant]} transition-all duration-50 ease-linear`}
+              style={{ width: `${progress}%` }}
+            />
+          </div>
         )}
       </div>
     </div>

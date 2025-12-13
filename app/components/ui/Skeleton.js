@@ -22,7 +22,7 @@
 export default function Skeleton({ className = '', ...props }) {
   return (
     <div
-      className={`bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-neutral-700 dark:via-neutral-600 dark:to-neutral-700 bg-[length:200%_100%] rounded animate-shimmer ${className}`}
+      className={`bg-gradient-to-r from-neutral-200 via-neutral-100 to-neutral-200 dark:from-neutral-800 dark:via-neutral-700 dark:to-neutral-800 bg-[length:200%_100%] rounded animate-shimmer ${className}`}
       {...props}
     />
   );
@@ -34,7 +34,7 @@ export default function Skeleton({ className = '', ...props }) {
 Skeleton.Card = function SkeletonCard({ children, className = '', ...props }) {
   return (
     <div
-      className={`bg-white dark:bg-neutral-800 rounded-2xl shadow-soft border border-neutral-200/50 dark:border-neutral-700/50 backdrop-blur-sm ${className}`}
+      className={`bg-white/[0.12] dark:bg-white/[0.08] backdrop-blur-3xl rounded-3xl shadow-liquid ring-1 ring-white/25 dark:ring-white/15 ring-inset ${className}`}
       {...props}
     >
       {children}
@@ -47,13 +47,13 @@ Skeleton.Card = function SkeletonCard({ children, className = '', ...props }) {
  */
 Skeleton.StovePanel = function SkeletonStovePanel() {
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6 sm:space-y-8 animate-spring-in">
       {/* Main Status Card */}
-      <Skeleton.Card className="overflow-hidden bg-gradient-to-br from-neutral-50/80 via-neutral-100/60 to-neutral-50/80 shadow-glass-lg ring-1 ring-white/20">
+      <Skeleton.Card className="overflow-hidden bg-gradient-to-br from-neutral-50/80 via-neutral-100/60 to-neutral-50/80 shadow-liquid-lg ring-1 ring-white/20 dark:ring-white/15">
         <div className="relative">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 via-accent-500 to-primary-500 opacity-80"></div>
 
-          <div className="p-6 sm:p-8">
+          <div className="p-8 sm:p-10">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <Skeleton className="h-8 w-32" />
@@ -63,7 +63,7 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
             {/* Main Status Display - Frame 3 Style */}
             <div className="mb-6">
               {/* Riquadro COLORATO con stato/icona/valori */}
-              <div className="relative bg-gradient-to-b from-neutral-50 to-neutral-100 rounded-2xl p-6 sm:p-8 shadow-glass-lg overflow-visible">
+              <div className="relative bg-gradient-to-b from-neutral-50 to-neutral-100 dark:from-neutral-900 dark:to-neutral-800 rounded-3xl p-8 sm:p-10 shadow-liquid-lg overflow-visible">
                 {/* Layout Frame 3: Testo + Icona + Box glassmorphism sovrapposti */}
                 <div className="relative">
                       {/* Testo stato in alto */}
@@ -81,7 +81,7 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
                         {/* Due box glassmorphism (z-10, davanti all'icona) */}
                         <div className="relative z-10 w-full grid grid-cols-2 gap-3 sm:gap-4 mt-4">
                           {/* Box Ventola */}
-                          <div className="relative overflow-hidden rounded-2xl bg-white/60 backdrop-blur-xl shadow-glass-sm ring-1 ring-white/40 ring-inset">
+                          <div className="relative overflow-hidden rounded-3xl bg-white/60 backdrop-blur-xl shadow-glass-sm ring-1 ring-white/40 ring-inset">
                             <div className="relative flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
                               <Skeleton className="h-6 w-6 sm:h-8 sm:w-8 rounded-full mb-2" />
                               <Skeleton className="h-3 w-12 mb-1" />
@@ -90,7 +90,7 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
                           </div>
 
                           {/* Box Potenza */}
-                          <div className="relative overflow-hidden rounded-2xl bg-white/60 backdrop-blur-xl shadow-glass-sm ring-1 ring-white/40 ring-inset">
+                          <div className="relative overflow-hidden rounded-3xl bg-white/60 backdrop-blur-xl shadow-glass-sm ring-1 ring-white/40 ring-inset">
                             <div className="relative flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
                               <Skeleton className="h-6 w-6 sm:h-8 sm:w-8 rounded-full mb-2" />
                               <Skeleton className="h-3 w-12 mb-1" />
@@ -114,7 +114,7 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
             </div>
 
             {/* Mode Indicator */}
-            <div className="flex flex-col gap-4 p-5 sm:p-6 bg-white/60 backdrop-blur-md rounded-2xl shadow-glass-sm ring-1 ring-white/40 ring-inset mb-6">
+            <div className="flex flex-col gap-4 p-5 sm:p-6 bg-white/60 backdrop-blur-md rounded-3xl shadow-glass-sm ring-1 ring-white/40 ring-inset mb-6">
               <div className="flex items-center gap-4">
                 <Skeleton className="h-14 w-14 rounded-xl" />
                 <div className="flex-1 min-w-0">
@@ -183,13 +183,13 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
  */
 Skeleton.ThermostatCard = function SkeletonThermostatCard() {
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6 sm:space-y-8 animate-spring-in">
       {/* Main Status Card */}
-      <Skeleton.Card className="overflow-hidden border-2 border-neutral-200 bg-neutral-50">
+      <Skeleton.Card className="overflow-hidden bg-neutral-50 dark:bg-neutral-900">
         <div className="relative">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-info-500 via-info-400 to-info-500"></div>
 
-          <div className="p-4 sm:p-6 lg:p-8">
+          <div className="p-8 sm:p-10">
             {/* Header */}
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <Skeleton className="h-8 w-40" />
@@ -203,7 +203,7 @@ Skeleton.ThermostatCard = function SkeletonThermostatCard() {
 
             {/* Temperature Display */}
             <div className="space-y-4 mb-4 sm:mb-6">
-              <div className="flex flex-col items-center justify-center p-4 sm:p-6 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/80 shadow-sm">
+              <div className="flex flex-col items-center justify-center p-4 sm:p-6 bg-white/60 backdrop-blur-sm rounded-3xl border border-white/80 shadow-sm">
                 <div className="flex items-center gap-6">
                   {/* Current temp */}
                   <div className="text-center">
@@ -296,11 +296,11 @@ Skeleton.ThermostatCard = function SkeletonThermostatCard() {
  */
 Skeleton.Scheduler = function SkeletonScheduler() {
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-8 animate-spring-in">
       {/* Header Card */}
-      <Skeleton.Card className="p-6">
+      <Skeleton.Card className="p-8">
         {/* Title */}
-        <Skeleton className="h-8 sm:h-9 w-64 sm:w-80 mb-6" />
+        <Skeleton className="h-8 sm:h-9 w-64 sm:w-80 mb-8" />
 
         {/* Status e toggle */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl bg-neutral-50 mb-4">
@@ -389,7 +389,7 @@ Skeleton.LogEntry = function SkeletonLogEntry() {
  */
 Skeleton.LogPage = function SkeletonLogPage() {
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8 animate-spring-in">
       {/* Header */}
       <div className="text-center mb-8">
         <Skeleton className="h-9 w-64 mx-auto mb-2" />
@@ -397,9 +397,9 @@ Skeleton.LogPage = function SkeletonLogPage() {
       </div>
 
       {/* Filters Card */}
-      <Skeleton.Card className="p-4 sm:p-6">
-        <Skeleton className="h-4 w-40 mb-3" />
-        <div className="flex flex-wrap gap-2">
+      <Skeleton.Card className="p-6 sm:p-8">
+        <Skeleton className="h-4 w-40 mb-4" />
+        <div className="flex flex-wrap gap-3">
           <Skeleton className="h-9 w-24 rounded-xl" />
           <Skeleton className="h-9 w-32 rounded-xl" />
           <Skeleton className="h-9 w-36 rounded-xl" />
@@ -407,7 +407,7 @@ Skeleton.LogPage = function SkeletonLogPage() {
       </Skeleton.Card>
 
       {/* Log Entries Card */}
-      <Skeleton.Card className="p-4 sm:p-6">
+      <Skeleton.Card className="p-6 sm:p-8">
         <ul className="space-y-3">
           {[...Array(10)].map((_, i) => (
             <Skeleton.LogEntry key={i} />
@@ -430,7 +430,7 @@ Skeleton.LogPage = function SkeletonLogPage() {
  */
 Skeleton.NetatmoPage = function SkeletonNetatmoPage() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-spring-in">
       {/* Header */}
       <div className="mb-8">
         <Skeleton className="h-9 w-64 sm:w-80 mb-2" />
@@ -438,13 +438,13 @@ Skeleton.NetatmoPage = function SkeletonNetatmoPage() {
       </div>
 
       {/* Mode Control Card */}
-      <Skeleton.Card className="p-6 mb-6">
+      <Skeleton.Card className="p-8 mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <Skeleton className="h-6 w-48 mb-2" />
             <Skeleton className="h-4 w-36" />
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3">
             <Skeleton className="h-9 w-32 rounded-xl" />
             <Skeleton className="h-9 w-28 rounded-xl" />
             <Skeleton className="h-9 w-28 rounded-xl" />
@@ -454,7 +454,7 @@ Skeleton.NetatmoPage = function SkeletonNetatmoPage() {
       </Skeleton.Card>
 
       {/* Topology Info Card */}
-      <Skeleton.Card className="p-6 mb-6">
+      <Skeleton.Card className="p-8 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <Skeleton className="h-4 w-16 mb-2" />
@@ -475,9 +475,9 @@ Skeleton.NetatmoPage = function SkeletonNetatmoPage() {
       </Skeleton.Card>
 
       {/* Rooms Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {[...Array(6)].map((_, i) => (
-          <Skeleton.Card key={i} className="p-6">
+          <Skeleton.Card key={i} className="p-8">
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1 min-w-0">

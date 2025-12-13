@@ -19,10 +19,10 @@ export default function LoadingOverlay({
       aria-busy="true"
     >
       {/* Backdrop blur */}
-      <div className="absolute inset-0 bg-neutral-900/40 dark:bg-neutral-950/60 backdrop-blur-xl" />
+      <div className="absolute inset-0 bg-neutral-900/40 dark:bg-neutral-950/60 backdrop-blur-xl will-change-[backdrop-filter] transform-gpu" />
 
       {/* Loading card - Liquid Glass */}
-      <div className="relative z-10 animate-scaleIn">
+      <div className="relative z-10 animate-spring-in will-change-transform transform-gpu">
         <div className={`
           ${liquid
             ? 'bg-white/[0.15] dark:bg-white/[0.12] backdrop-blur-3xl shadow-liquid-xl ring-1 ring-white/25 dark:ring-white/15 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/20 dark:before:from-white/15 before:to-transparent before:pointer-events-none'

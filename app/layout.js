@@ -17,9 +17,6 @@ export const metadata = {
     telephone: false,
   },
   manifest: '/manifest.json',
-};
-
-export const viewport = {
   themeColor: '#ef4444',
 };
 
@@ -50,10 +47,18 @@ export default function RootLayout({ children }) {
       />
     </head>
     <body className="min-h-screen bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 flex flex-col" suppressHydrationWarning>
+    {/* Skip to content - Accessibility */}
+    <a
+      href="#main-content"
+      className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-[10000] px-6 py-3 bg-primary-500 text-white rounded-xl shadow-liquid-lg font-semibold hover:bg-primary-600 transition-colors"
+    >
+      Salta al contenuto
+    </a>
+
     <ClientProviders>
       <VersionEnforcer />
       <Navbar />
-      <main className="flex-1 pt-6 pb-12 px-4 sm:px-6 lg:px-8">
+      <main id="main-content" className="flex-1 pt-6 pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {children}
         </div>

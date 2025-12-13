@@ -6,6 +6,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      screens: {
+        'tb': '900px',  // Tablet breakpoint
+      },
       colors: {
         // Palette moderna per app controllo stufa
         primary: {
@@ -56,6 +59,7 @@ module.exports = {
           700: '#404040',
           800: '#262626',
           900: '#171717',
+          950: '#0a0a0a',  // Dark mode profondo
         },
         success: {
           50: '#f0fdf4',
@@ -93,6 +97,49 @@ module.exports = {
           800: '#1e40af',
           900: '#1e3a8a',
         }
+      },
+      fontSize: {
+        'fluid-xs': 'clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem)',
+        'fluid-sm': 'clamp(0.875rem, 0.8rem + 0.375vw, 1rem)',
+        'fluid-base': 'clamp(1rem, 0.95rem + 0.25vw, 1.125rem)',
+        'fluid-lg': 'clamp(1.125rem, 1rem + 0.625vw, 1.5rem)',
+        'fluid-xl': 'clamp(1.25rem, 1.1rem + 0.75vw, 1.875rem)',
+        'fluid-2xl': 'clamp(1.5rem, 1.3rem + 1vw, 2.25rem)',
+        'fluid-3xl': 'clamp(1.875rem, 1.5rem + 1.875vw, 3rem)',
+        'fluid-4xl': 'clamp(2.25rem, 1.75rem + 2.5vw, 3.75rem)',
+      },
+      lineHeight: {
+        'tight': '1.1',
+        'snug': '1.25',
+        'relaxed': '1.625',
+        'loose': '1.75',
+      },
+      letterSpacing: {
+        'tighter': '-0.05em',
+        'tight': '-0.025em',
+        'wide': '0.025em',
+        'wider': '0.05em',
+        'widest': '0.1em',
+      },
+      textColor: {
+        'body': {
+          DEFAULT: 'rgb(23 23 23)', // neutral-900
+          dark: 'rgb(250 250 250)', // neutral-50
+        },
+        'body-secondary': {
+          DEFAULT: 'rgb(64 64 64)', // neutral-700
+          dark: 'rgb(212 212 212)', // neutral-300
+        },
+        'body-tertiary': {
+          DEFAULT: 'rgb(115 115 115)', // neutral-500
+          dark: 'rgb(163 163 163)', // neutral-400
+        }
+      },
+      spacing: {
+        '18': '4.5rem', // 72px
+        '22': '5.5rem', // 88px
+        '26': '6.5rem', // 104px
+        '30': '7.5rem', // 120px
       },
       borderRadius: {
         'xl': '1rem',
@@ -180,11 +227,35 @@ module.exports = {
             transform: 'translateY(0) scale(1)',
           },
         },
+        'spring-in': {
+          '0%': {
+            transform: 'scale(0.9)',
+            opacity: '0',
+          },
+          '50%': {
+            transform: 'scale(1.02)',
+            opacity: '1',
+          },
+          '100%': {
+            transform: 'scale(1)',
+            opacity: '1',
+          },
+        },
+        'bounce-subtle': {
+          '0%, 100%': {
+            transform: 'translateY(0)',
+          },
+          '50%': {
+            transform: 'translateY(-4px)',
+          },
+        },
       },
       animation: {
         shimmer: 'shimmer 1.5s ease-in-out infinite',
         dropdown: 'dropdown 0.25s ease-out forwards',
         'dropdown-up': 'dropdown-up 0.25s ease-out forwards',
+        'spring-in': 'spring-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        'bounce-subtle': 'bounce-subtle 0.6s ease-in-out',
       },
     },
   },

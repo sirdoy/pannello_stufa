@@ -72,7 +72,9 @@
       "Skill(planning-methodology)",
       "Bash(grep:*)",
       "Bash(node -c:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(timeout 15 npm run dev:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []

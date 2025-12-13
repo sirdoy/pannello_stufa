@@ -65,7 +65,9 @@
       "Bash(npx next build:*)",
       "Bash(nvm use:*)",
       "Bash(npm uninstall:*)",
-      "Bash(git clean:*)"
+      "Bash(git clean:*)",
+      "Bash(ls:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []

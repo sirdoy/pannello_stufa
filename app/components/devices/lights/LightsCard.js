@@ -225,7 +225,7 @@ export default function LightsCard() {
   if (!connected) {
     return (
       <div className="space-y-4 sm:space-y-6">
-        <Card liquidPro className="overflow-visible transition-all duration-500">
+        <Card liquid className="overflow-visible transition-all duration-500">
           <div className="relative">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-warning-500 via-warning-400 to-warning-500 opacity-80"></div>
 
@@ -307,7 +307,7 @@ export default function LightsCard() {
       />
 
       {/* Main Status Card */}
-      <Card liquidPro className="overflow-visible transition-all duration-500">
+      <Card liquid className="overflow-visible transition-all duration-500">
         <div className="relative">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-warning-500 via-accent-500 to-warning-500 opacity-80"></div>
 

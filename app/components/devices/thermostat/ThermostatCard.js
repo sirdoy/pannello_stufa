@@ -243,7 +243,7 @@ export default function ThermostatCard() {
   if (!connected) {
     return (
       <div className="space-y-4 sm:space-y-6">
-        <Card liquidPro className="overflow-visible transition-all duration-500">
+        <Card liquid className="overflow-visible transition-all duration-500">
           <div className="relative">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-info-500 via-info-400 to-info-500 opacity-80"></div>
 
@@ -316,7 +316,7 @@ export default function ThermostatCard() {
       />
 
       {/* Main Status Card */}
-      <Card liquidPro className="overflow-visible transition-all duration-500">
+      <Card liquid className="overflow-visible transition-all duration-500">
         <div className="relative">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-info-500 via-accent-500 to-info-500 opacity-80"></div>
 

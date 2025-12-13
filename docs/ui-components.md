@@ -10,8 +10,16 @@ Tutti i componenti UI supportano dark mode con palette ottimizzata per glass eff
 
 **Pattern Base**:
 ```css
-/* Backgrounds Glass */
-bg-white/[0.08] dark:bg-white/[0.05]
+/* Backgrounds Glass (Standard Containers) */
+bg-white/[0.08] dark:bg-white/[0.05]  /* Cards, base containers */
+bg-white/[0.12] dark:bg-white/[0.08]  /* Hover states */
+bg-white/[0.15] dark:bg-white/[0.12]  /* Active/loading states (LoadingOverlay) */
+
+/* Colored Glass Elements */
+bg-primary-500/15 dark:bg-primary-500/25   /* Primary glass (Toast error, Banner) */
+bg-success-500/15 dark:bg-success-500/25   /* Success glass (Toast) */
+bg-warning-500/15 dark:bg-warning-500/25   /* Warning glass (Toast) */
+bg-info-500/15 dark:bg-info-500/25         /* Info glass (Toast, buttons) */
 
 /* Internal Boxes (Standard Opacity) */
 bg-neutral-100 dark:bg-white/[0.03]  /* Temperature, info, controls - uniformato v1.17.0 */
@@ -23,7 +31,8 @@ text-neutral-600 dark:text-neutral-400  /* Con dark:text-neutral-300 per contras
 
 /* Borders/Rings */
 border-white/20 dark:border-white/10
-ring-white/10 dark:ring-white/5
+ring-white/15 dark:ring-white/08  /* Standard ring (Card liquid) */
+ring-white/20 dark:ring-white/10  /* Standard ring (altri componenti) */
 
 /* Primary States */
 bg-primary-50 dark:bg-primary-900/30
@@ -36,29 +45,29 @@ text-primary-600 dark:text-primary-400
 
 ## Card
 
-Componente container base con supporto liquid glass e legacy glassmorphism.
+Componente container base con supporto liquid glass (con saturazione/contrasto migliorati) e legacy glassmorphism.
 
 ```jsx
 <Card className="p-6">Content</Card>
-<Card liquid className="p-6">Liquid Glass iOS 18 style</Card>
+<Card liquid className="p-6">Liquid Glass iOS glassmorphism</Card>
 <Card glass className="p-6">Legacy glassmorphism</Card>  // Mantenuto per compatibilità
 ```
 
 **Props**:
-- `liquid={true}` - Applica liquid glass style
+- `liquid={true}` - Applica liquid glass style con saturazione e contrasto migliorati
 - `glass={true}` - Legacy glassmorphism
 - `className` - Classi Tailwind aggiuntive
 
 **Styling Standards**:
 ```jsx
 <Card className="p-6">Standard</Card>              // Default solid
-<Card liquid className="p-6">Liquid Glass</Card>   // iOS 18 style (preferito)
+<Card liquid className="p-6">Liquid Glass</Card>   // iOS glassmorphism (preferito)
 <Card className="p-8">Hero Content</Card>          // Hero sections
 <Card glass className="p-6">Legacy Glass</Card>    // Glassmorphism legacy
 <Card className="p-6 bg-info-50 border-2 border-info-200">Info</Card> // Colored info
 ```
 
-**Best practice**: Usa `liquid` per UI moderna consistente, `glass` mantenuto per compatibilità.
+**Best practice**: Usa `liquid` per UI moderna consistente con `backdrop-saturate-150` e `backdrop-contrast-105` automatici.
 
 **Implementazione**: `app/components/ui/Card.js`
 
@@ -130,7 +139,7 @@ Componente alert/warning riutilizzabile con 4 varianti semantiche.
 
 ## Toast
 
-Notifiche temporanee con auto-dismiss per feedback UX immediato.
+Notifiche temporanee con auto-dismiss e liquid glass style per feedback UX immediato.
 
 ```jsx
 <Toast
@@ -139,6 +148,7 @@ Notifiche temporanee con auto-dismiss per feedback UX immediato.
   variant="success|warning|info|error"
   duration={3000}
   onDismiss={() => setToast(null)}
+  liquid={true}  // Default: true
 />
 ```
 
@@ -146,16 +156,21 @@ Notifiche temporanee con auto-dismiss per feedback UX immediato.
 - `message` - Testo notifica (required)
 - `icon` - Emoji/icona (default: '✓')
 - `variant` - Variante semantica (default: success)
-  - `success` - Operazioni completate (verde)
-  - `warning` - Attenzioni (giallo)
-  - `info` - Informazioni (blu)
-  - `error` - Errori (rosso)
+  - `success` - Operazioni completate (verde glass: `bg-success-500/15 dark:bg-success-500/25`)
+  - `warning` - Attenzioni (giallo glass: `bg-warning-500/15 dark:bg-warning-500/25`)
+  - `info` - Informazioni (blu glass: `bg-info-500/15 dark:bg-info-500/25`)
+  - `error` - Errori (rosso glass: `bg-primary-500/15 dark:bg-primary-500/25`)
 - `duration` - Millisecondi prima auto-dismiss (default: 3000, 0 = no auto-dismiss)
 - `onDismiss` - Callback chiamato su dismiss (auto o manuale)
+- `liquid` - Abilita liquid glass style (default: true, false = gradient solido)
 
 **Posizionamento**: Fixed top-center (`fixed top-4 left-1/2 -translate-x-1/2 z-[9999]`)
 
 **Animazione**: slideDown CSS custom con opacity fade-in (300ms ease-out)
+
+**Styling**:
+- **Liquid mode** (default): Glass effect trasparente con colori semantici e border colorato
+- **Solid mode**: Gradient opaco tradizionale (95% opacity)
 
 **Pattern d'uso**:
 ```jsx
@@ -196,20 +211,23 @@ Overlay full-page bloccante per operazioni asincrone con liquid glass style.
 <LoadingOverlay
   message="Accensione in corso..."
   icon="🔥"
+  liquid={true}  // Default: true
 />
 ```
 
 **Props**:
 - `message` - Testo descrittivo operazione (default: "Caricamento in corso...")
 - `icon` - Emoji/icona contestuale (default: "⏳")
+- `liquid` - Abilita liquid glass style (default: true)
 
 **Caratteristiche**:
 - **Full-page blocking**: overlay copre intera viewport con `z-[9999]`
-- **Liquid glass style**: backdrop-blur-3xl con bg-white/10 dark:bg-neutral-900/90
+- **Liquid glass style** (default): `bg-white/[0.15] dark:bg-white/[0.12]` con backdrop-blur-3xl
+- **Solid fallback**: `liquid={false}` usa opacità 95% (semi-solido)
 - **Animated spinner**: rotazione continua con pulse effect
 - **Loading dots**: animazione pulsante (...) durante attesa
-- **Dark mode support**: palette neutral-900 per tema scuro
-- **Accessibility**: aria-live="polite", aria-busy="true" per screen readers
+- **Dark mode support**: palette uniforme in entrambi i modi
+- **Accessibility**: aria-live="assertive", aria-busy="true" per screen readers
 
 **Animazioni CSS**:
 ```css

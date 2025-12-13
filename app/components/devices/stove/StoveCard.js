@@ -515,7 +515,7 @@ export default function StoveCard() {
       )}
 
       {/* Main Status Card - Liquid Glass Pro */}
-      <Card liquidPro className="overflow-visible transition-all duration-500">
+      <Card liquid className="overflow-visible transition-all duration-500">
         <div className="relative">
           {/* Top accent bar */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 via-accent-500 to-primary-500 opacity-80"></div>
@@ -631,7 +631,7 @@ export default function StoveCard() {
                         {/* Due box glassmorphism (z-10, davanti all'icona) */}
                         <div className="relative z-10 w-full grid grid-cols-2 gap-3 sm:gap-4 mt-4">
                           {/* Box Ventola */}
-                          <div className="relative overflow-hidden rounded-2xl shadow-elevated backdrop-blur-md bg-white/[0.01]">
+                          <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05]">
                             {/* Effetto vetro WebGL */}
                             <GlassEffect
                               bgColor={statusInfo.glassColor}
@@ -654,7 +654,7 @@ export default function StoveCard() {
                           </div>
 
                           {/* Box Potenza */}
-                          <div className="relative overflow-hidden rounded-2xl shadow-elevated backdrop-blur-md bg-white/[0.01]">
+                          <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05]">
                             {/* Effetto vetro WebGL */}
                             <GlassEffect
                               bgColor={statusInfo.glassColor}
@@ -694,7 +694,7 @@ export default function StoveCard() {
             </div>
 
             {/* Mode Indicator - Liquid Glass */}
-            <div className="flex flex-col gap-4 p-5 sm:p-6 bg-white/[0.08] backdrop-blur-2xl rounded-2xl shadow-liquid-sm border border-white/15 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none">
+            <div className="flex flex-col gap-4 p-5 sm:p-6 bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl rounded-2xl shadow-liquid-sm border border-white/20 dark:border-white/10 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
               <div className="flex items-center gap-3 sm:gap-4 relative z-10">
                 <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${
                   schedulerEnabled && semiManualMode ? 'bg-warning-100 border-2 border-warning-300' :
@@ -707,9 +707,9 @@ export default function StoveCard() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className={`text-base sm:text-lg font-bold ${
-                    schedulerEnabled && semiManualMode ? 'text-warning-700' :
-                    schedulerEnabled ? 'text-success-700' :
-                    'text-accent-700'
+                    schedulerEnabled && semiManualMode ? 'text-warning-700 dark:text-warning-400' :
+                    schedulerEnabled ? 'text-success-700 dark:text-success-400' :
+                    'text-accent-700 dark:text-accent-400'
                   }`}>
                     {schedulerEnabled && semiManualMode ? 'Semi-manuale' : schedulerEnabled ? 'Automatica' : 'Manuale'}
                   </p>
@@ -723,7 +723,7 @@ export default function StoveCard() {
                       })()
                     ) : schedulerEnabled && nextScheduledAction ? (
                       <>
-                        <span className={`font-semibold ${nextScheduledAction.action === 'ignite' ? 'text-success-600' : 'text-primary-600'}`}>
+                        <span className={`font-semibold ${nextScheduledAction.action === 'ignite' ? 'text-success-700 dark:text-success-400' : 'text-primary-700 dark:text-primary-400'}`}>
                           {nextScheduledAction.action === 'ignite' ? '🔥 Accensione' : '❄️ Spegnimento'}
                         </span>
                         {' alle '}
@@ -736,7 +736,7 @@ export default function StoveCard() {
                           })()}
                         </span>
                         {nextScheduledAction.action === 'ignite' && (
-                          <span className="text-neutral-400 block sm:inline"> • P{nextScheduledAction.power}, V{nextScheduledAction.fan}</span>
+                          <span className="text-neutral-500 dark:text-neutral-400 block sm:inline"> • P{nextScheduledAction.power}, V{nextScheduledAction.fan}</span>
                         )}
                       </>
                     ) : schedulerEnabled ? (
@@ -751,14 +751,14 @@ export default function StoveCard() {
                 {schedulerEnabled && semiManualMode && (
                   <button
                     onClick={handleClearSemiManual}
-                    className="px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-warning-700 bg-warning-50 hover:bg-warning-100 border border-warning-200 hover:border-warning-300 transition-all duration-200 active:scale-95"
+                    className="px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-warning-700 dark:text-warning-300 bg-warning-50 dark:bg-warning-900/30 hover:bg-warning-100 dark:hover:bg-warning-900/40 border border-warning-200 dark:border-warning-700/50 hover:border-warning-300 dark:hover:border-warning-600/50 transition-all duration-200 active:scale-95"
                   >
                     ↩️ Torna in Automatico
                   </button>
                 )}
                 <button
                   onClick={() => router.push('/stove/scheduler')}
-                  className="px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-info-700 bg-info-50 hover:bg-info-100 border border-info-200 hover:border-info-300 transition-all duration-200 active:scale-95"
+                  className="px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-info-700 dark:text-info-300 bg-info-50 dark:bg-info-900/30 hover:bg-info-100 dark:hover:bg-info-900/40 border border-info-200 dark:border-info-700/50 hover:border-info-300 dark:hover:border-info-600/50 transition-all duration-200 active:scale-95"
                 >
                   Configura Pianificazione
                 </button>
@@ -828,12 +828,12 @@ export default function StoveCard() {
 
             {/* Status indicator - Liquid Glass */}
             {isAccesa && (
-              <div className="mb-6 p-3 sm:p-4 bg-success-500/[0.08] backdrop-blur-2xl rounded-xl text-center shadow-liquid-sm border border-success-500/20 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-success-400/10 before:to-transparent before:pointer-events-none">
+              <div className="mb-6 p-3 sm:p-4 bg-success-500/[0.12] dark:bg-success-500/[0.15] backdrop-blur-2xl rounded-xl text-center shadow-liquid-sm border border-success-500/25 dark:border-success-500/30 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-success-400/15 dark:before:from-success-400/20 before:to-transparent before:pointer-events-none">
                 <p className="text-xs sm:text-sm font-semibold text-success-700 dark:text-success-400 tracking-wide relative z-10">✓ Stufa in funzione</p>
               </div>
             )}
             {isSpenta && (
-              <div className="mb-6 p-3 sm:p-4 bg-neutral-500/[0.08] backdrop-blur-2xl rounded-xl text-center shadow-liquid-sm border border-neutral-400/20 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-neutral-300/10 before:to-transparent before:pointer-events-none">
+              <div className="mb-6 p-3 sm:p-4 bg-neutral-500/[0.12] dark:bg-neutral-500/[0.15] backdrop-blur-2xl rounded-xl text-center shadow-liquid-sm border border-neutral-400/25 dark:border-neutral-400/30 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-neutral-300/15 dark:before:from-neutral-300/20 before:to-transparent before:pointer-events-none">
                 <p className="text-xs sm:text-sm font-semibold text-neutral-600 dark:text-neutral-400 tracking-wide relative z-10">○ Stufa spenta</p>
               </div>
             )}
@@ -843,7 +843,7 @@ export default function StoveCard() {
               <div className="space-y-4">
                 {/* Info badge quando in modalità automatica */}
                 {schedulerEnabled && !semiManualMode && (
-                  <div className="px-4 py-2.5 bg-info-500/[0.08] backdrop-blur-2xl rounded-xl text-center shadow-liquid-sm border border-info-500/20 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-info-400/10 before:to-transparent before:pointer-events-none">
+                  <div className="px-4 py-2.5 bg-info-500/[0.12] dark:bg-info-500/[0.15] backdrop-blur-2xl rounded-xl text-center shadow-liquid-sm border border-info-500/25 dark:border-info-500/30 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-info-400/15 dark:before:from-info-400/20 before:to-transparent before:pointer-events-none">
                     <p className="text-xs sm:text-sm font-semibold text-info-700 dark:text-info-400 tracking-wide relative z-10">
                       ℹ️ La modifica attiverà la modalità Semi-Manuale
                     </p>

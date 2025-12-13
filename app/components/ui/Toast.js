@@ -11,7 +11,8 @@ export default function Toast({
   icon = '✓',
   variant = 'success',
   duration = 3000,
-  onDismiss
+  onDismiss,
+  liquid = true
 }) {
   useEffect(() => {
     if (duration && onDismiss) {
@@ -22,7 +23,40 @@ export default function Toast({
     }
   }, [duration, onDismiss]);
 
-  const variantStyles = {
+  // Liquid glass variants (iOS glassmorphism style)
+  const liquidVariants = {
+    success: {
+      bg: 'bg-success-500/15 dark:bg-success-500/25',
+      border: 'border-success-500/30 dark:border-success-500/40',
+      text: 'text-success-900 dark:text-success-100',
+      iconBg: 'bg-success-400/20 dark:bg-success-400/30',
+      ring: 'ring-success-400/30'
+    },
+    warning: {
+      bg: 'bg-warning-500/15 dark:bg-warning-500/25',
+      border: 'border-warning-500/30 dark:border-warning-500/40',
+      text: 'text-warning-900 dark:text-warning-100',
+      iconBg: 'bg-warning-400/20 dark:bg-warning-400/30',
+      ring: 'ring-warning-400/30'
+    },
+    info: {
+      bg: 'bg-info-500/15 dark:bg-info-500/25',
+      border: 'border-info-500/30 dark:border-info-500/40',
+      text: 'text-info-900 dark:text-info-100',
+      iconBg: 'bg-info-400/20 dark:bg-info-400/30',
+      ring: 'ring-info-400/30'
+    },
+    error: {
+      bg: 'bg-primary-500/15 dark:bg-primary-500/25',
+      border: 'border-primary-500/30 dark:border-primary-500/40',
+      text: 'text-primary-900 dark:text-primary-100',
+      iconBg: 'bg-primary-400/20 dark:bg-primary-400/30',
+      ring: 'ring-primary-400/30'
+    }
+  };
+
+  // Solid variants (traditional gradient style)
+  const solidVariants = {
     success: {
       bg: 'bg-gradient-to-br from-success-500/95 to-success-600/95',
       ring: 'ring-success-400/50',
@@ -49,21 +83,21 @@ export default function Toast({
     }
   };
 
-  const styles = variantStyles[variant] || variantStyles.success;
+  const variants = liquid ? liquidVariants : solidVariants;
+  const styles = variants[variant] || variants.success;
 
   return (
     <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] animate-slideDown">
       <div className={`
         ${styles.bg} ${styles.text}
-        backdrop-blur-3xl rounded-2xl shadow-elevated-lg
-        ring-2 ${styles.ring} ring-inset
+        ${liquid
+          ? `backdrop-blur-3xl rounded-2xl shadow-liquid-lg border-2 ${styles.border} ring-1 ${styles.ring} ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/15 dark:before:from-white/10 before:to-transparent before:pointer-events-none`
+          : `backdrop-blur-3xl rounded-2xl shadow-elevated-lg ring-2 ${styles.ring} ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/20 before:to-transparent before:pointer-events-none`
+        }
         px-5 py-3.5 sm:px-6 sm:py-4
         flex items-center gap-3 sm:gap-4
         min-w-[280px] sm:min-w-[320px] max-w-[90vw] sm:max-w-md
         relative overflow-hidden
-        before:absolute before:inset-0
-        before:bg-gradient-to-br before:from-white/20 before:to-transparent
-        before:pointer-events-none
       `}>
         {/* Icon */}
         <div className={`

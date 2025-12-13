@@ -38,7 +38,7 @@ export default function ModeIndicator({
       {showConfigButton && onConfigClick && (
         <button
           onClick={onConfigClick}
-          className="px-4 py-2 rounded-xl text-sm font-medium text-info-600 dark:text-info-400 hover:bg-info-50 dark:hover:bg-info-900/30 transition-colors duration-200"
+          className="px-4 py-2 rounded-xl text-sm font-medium bg-info-500/10 dark:bg-info-500/15 backdrop-blur-xl text-info-700 dark:text-info-300 hover:bg-info-500/15 dark:hover:bg-info-500/20 shadow-liquid-sm ring-1 ring-info-500/20 dark:ring-info-500/25 ring-inset transition-all duration-200"
         >
           Configura
         </button>

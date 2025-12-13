@@ -67,7 +67,12 @@
       "Bash(npm uninstall:*)",
       "Bash(git clean:*)",
       "Bash(ls:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "SlashCommand(/plan)",
+      "Skill(planning-methodology)",
+      "Bash(grep:*)",
+      "Bash(node -c:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

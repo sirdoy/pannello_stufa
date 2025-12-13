@@ -7,7 +7,8 @@
 export default function LoadingOverlay({
   show = false,
   message = 'Caricamento...',
-  icon = '⏳'
+  icon = '⏳',
+  liquid = true
 }) {
   if (!show) return null;
 
@@ -20,20 +21,19 @@ export default function LoadingOverlay({
       {/* Backdrop blur */}
       <div className="absolute inset-0 bg-neutral-900/40 dark:bg-neutral-950/60 backdrop-blur-xl" />
 
-      {/* Loading card - Liquid Glass Pro */}
+      {/* Loading card - Liquid Glass */}
       <div className="relative z-10 animate-scaleIn">
-        <div className="
-          bg-white/[0.95] dark:bg-neutral-800/[0.95]
-          backdrop-blur-3xl rounded-3xl shadow-elevated-xl
-          ring-1 ring-white/50 dark:ring-white/10 ring-inset
+        <div className={`
+          ${liquid
+            ? 'bg-white/[0.15] dark:bg-white/[0.12] backdrop-blur-3xl shadow-liquid-xl ring-1 ring-white/25 dark:ring-white/15 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/20 dark:before:from-white/15 before:to-transparent before:pointer-events-none'
+            : 'bg-white/[0.95] dark:bg-neutral-800/[0.95] backdrop-blur-3xl shadow-elevated-xl ring-1 ring-white/50 dark:ring-white/10 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 dark:before:from-white/10 before:to-transparent before:pointer-events-none'
+          }
+          rounded-3xl
           px-8 py-10 sm:px-10 sm:py-12
           flex flex-col items-center gap-5 sm:gap-6
           min-w-[280px] sm:min-w-[320px]
           relative overflow-hidden
-          before:absolute before:inset-0
-          before:bg-gradient-to-br before:from-white/40 dark:before:from-white/10 before:to-transparent
-          before:pointer-events-none
-        ">
+        `}>
           {/* Animated spinner icon */}
           <div className="relative">
             {/* Pulse ring effect */}

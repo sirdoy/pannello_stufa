@@ -38,9 +38,9 @@ export default function ErrorAlert({ errorCode, errorDescription, className = ''
         {errorDescription || errorInfo.description}
       </div>
       {showSuggestion && suggestion && (
-        <div className="mt-3 p-3 bg-white/40 backdrop-blur-sm rounded-lg border border-white/60">
-          <p className="text-sm font-medium text-neutral-700 mb-1">💡 Suggerimento:</p>
-          <p className="text-sm text-neutral-600">{suggestion}</p>
+        <div className="mt-3 p-3 bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl rounded-lg shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
+          <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 mb-1 relative z-10">💡 Suggerimento:</p>
+          <p className="text-sm text-neutral-700 dark:text-neutral-300 relative z-10">{suggestion}</p>
         </div>
       )}
     </>

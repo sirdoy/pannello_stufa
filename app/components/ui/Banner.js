@@ -20,7 +20,7 @@ export default function Banner({
   actions,
   dismissible = false,
   onDismiss,
-  liquid = false,
+  liquid = true,
   className = '',
   children,
 }) {

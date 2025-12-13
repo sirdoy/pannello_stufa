@@ -73,7 +73,7 @@ export default function ThemeSettingsPage() {
       </div>
 
       {/* Theme Selector Card */}
-      <Card liquidPro className="p-6 sm:p-8">
+      <Card liquid className="p-6 sm:p-8">
         <h2 className="text-xl font-semibold text-neutral-900 dark:text-white mb-4">
           Modalità Interfaccia
         </h2>
@@ -159,7 +159,7 @@ export default function ThemeSettingsPage() {
       </Card>
 
       {/* Preview Card */}
-      <Card liquidPro className="p-6 sm:p-8">
+      <Card liquid className="p-6 sm:p-8">
         <h2 className="text-xl font-semibold text-neutral-900 dark:text-white mb-4">
           Preview Tema Corrente
         </h2>
@@ -213,7 +213,7 @@ export default function ThemeSettingsPage() {
       </Card>
 
       {/* Info Card */}
-      <Card liquidPro className="p-6 sm:p-8 bg-info-50/50 dark:bg-info-900/10 border border-info-200 dark:border-info-800">
+      <Card liquid className="p-6 sm:p-8 bg-info-50/50 dark:bg-info-900/10 border border-info-200 dark:border-info-800">
         <div className="flex gap-3">
           <div className="text-2xl">ℹ️</div>
           <div className="flex-1">

@@ -123,7 +123,7 @@ export default function MaintenancePage() {
         </div>
 
         {/* Current Status Card */}
-        <Card liquidPro className="p-6 sm:p-8">
+        <Card liquid className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-neutral-800 dark:text-white mb-4">📊 Stato Attuale</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -177,7 +177,7 @@ export default function MaintenancePage() {
         </Card>
 
         {/* Configuration Card */}
-        <Card liquidPro className="p-6 sm:p-8">
+        <Card liquid className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-neutral-800 dark:text-white mb-4">⚙️ Configurazione</h2>
 
           <div className="space-y-4">
@@ -244,7 +244,7 @@ export default function MaintenancePage() {
         </Card>
 
         {/* Info Card */}
-        <Card liquidPro className="p-6 sm:p-8 bg-info-50/50 dark:bg-info-900/10 border border-info-200 dark:border-info-800">
+        <Card liquid className="p-6 sm:p-8 bg-info-50/50 dark:bg-info-900/10 border border-info-200 dark:border-info-800">
           <h3 className="font-semibold text-info-900 dark:text-info-300 mb-2">ℹ️ Come Funziona</h3>
           <ul className="text-sm text-info-800 dark:text-info-400 space-y-1">
             <li>• Il contatore aumenta automaticamente ogni minuto quando la stufa è in funzione (status WORK)</li>
@@ -258,7 +258,7 @@ export default function MaintenancePage() {
       {/* Reset Confirmation Modal */}
       {showResetConfirm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[10000] p-4">
-          <Card liquidPro className="max-w-md w-full p-6 sm:p-8">
+          <Card liquid className="max-w-md w-full p-6 sm:p-8">
             <h2 className="text-2xl font-bold text-neutral-800 dark:text-white mb-4">🔄 Conferma Reset</h2>
             <p className="text-neutral-700 dark:text-neutral-300 mb-6">
               Sei sicuro di voler azzerare il contatore di manutenzione?

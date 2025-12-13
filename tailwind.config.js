@@ -183,8 +183,8 @@ module.exports = {
       },
       animation: {
         shimmer: 'shimmer 1.5s ease-in-out infinite',
-        dropdown: 'dropdown 0.15s ease-out forwards',
-        'dropdown-up': 'dropdown-up 0.15s ease-out forwards',
+        dropdown: 'dropdown 0.25s ease-out forwards',
+        'dropdown-up': 'dropdown-up 0.25s ease-out forwards',
       },
     },
   },

@@ -88,7 +88,7 @@ export default function ChangelogPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <Card liquidPro className="p-6 sm:p-8">
+      <Card liquid className="p-6 sm:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <div>
             <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 dark:text-white mb-2">📋 Changelog</h1>
@@ -111,7 +111,7 @@ export default function ChangelogPage() {
       {/* Timeline */}
       <div className="space-y-6">
         {changelog.map((version, index) => (
-          <Card key={version.version} liquidPro className="overflow-hidden">
+          <Card key={version.version} liquid className="overflow-hidden">
             {/* Version Header */}
             <div className={`p-6 border-b-2 ${getVersionColor(version.type)}`}>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -157,7 +157,7 @@ export default function ChangelogPage() {
       </div>
 
       {/* Footer Info */}
-      <Card liquidPro className="p-6 sm:p-8 bg-neutral-50/50 dark:bg-neutral-900/20">
+      <Card liquid className="p-6 sm:p-8 bg-neutral-50/50 dark:bg-neutral-900/20">
         <div className="text-center space-y-2">
           <p className="text-sm text-neutral-600 dark:text-neutral-400">
             💡 <strong>Versionamento Semantico</strong>: MAJOR.MINOR.PATCH

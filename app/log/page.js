@@ -135,7 +135,7 @@ export default function LogPage() {
       </div>
 
       {/* Filters Card */}
-      <Card liquidPro className="p-4 sm:p-6">
+      <Card liquid className="p-4 sm:p-6">
         <h3 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">Filtra per dispositivo</h3>
         <div className="flex flex-wrap gap-2">
           {/* All */}
@@ -209,7 +209,7 @@ export default function LogPage() {
       </Card>
 
       {/* Log Entries */}
-      <Card liquidPro className="p-4 sm:p-6">
+      <Card liquid className="p-4 sm:p-6">
         {filteredLog.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-lg text-neutral-500 dark:text-neutral-400 mb-2">Nessuna azione registrata</p>

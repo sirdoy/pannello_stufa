@@ -126,8 +126,8 @@ export default function Navbar() {
         ? 'bg-primary-500/10 dark:bg-primary-500/20 backdrop-blur-2xl text-primary-700 dark:text-primary-400 shadow-liquid-sm ring-1 ring-primary-500/20 dark:ring-primary-500/30 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-primary-400/10 dark:before:from-primary-400/20 before:to-transparent before:pointer-events-none'
         : 'text-neutral-800 dark:text-neutral-200 bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl hover:bg-white/[0.12] dark:hover:bg-white/[0.08] shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none'
       : active
-        ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 shadow-sm'
-        : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800';
+        ? 'bg-primary-500/10 dark:bg-primary-500/20 backdrop-blur-xl text-primary-700 dark:text-primary-400 shadow-liquid-sm ring-1 ring-primary-500/20 dark:ring-primary-500/30 ring-inset'
+        : 'text-neutral-800 dark:text-neutral-200 bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-xl hover:bg-white/[0.12] dark:hover:bg-white/[0.08] shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset';
 
     return (
       <Link
@@ -173,8 +173,8 @@ export default function Navbar() {
                     onClick={() => setDesktopDeviceDropdown(desktopDeviceDropdown === device.id ? null : device.id)}
                     className={`flex items-center gap-1.5 px-3 xl:px-4 py-2 rounded-xl text-sm xl:text-base font-medium transition-all duration-200 ${
                       pathname.startsWith(`/${device.id}`)
-                        ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 shadow-sm'
-                        : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                        ? 'bg-primary-500/10 dark:bg-primary-500/20 backdrop-blur-xl text-primary-700 dark:text-primary-400 shadow-liquid-sm ring-1 ring-primary-500/20 dark:ring-primary-500/30 ring-inset'
+                        : 'bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-xl text-neutral-800 dark:text-neutral-200 hover:bg-white/[0.12] dark:hover:bg-white/[0.08] shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset'
                     }`}
                     aria-expanded={desktopDeviceDropdown === device.id}
                   >
@@ -188,6 +188,7 @@ export default function Navbar() {
                       strokeWidth="2"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
+                      aria-hidden="true"
                     >
                       <path d="M19 9l-7 7-7-7" />
                     </svg>
@@ -200,10 +201,10 @@ export default function Navbar() {
                         <Link
                           key={item.route}
                           href={item.route}
-                          className={`block px-4 py-2.5 text-sm xl:text-base font-medium transition-colors duration-200 ${
+                          className={`block px-4 py-2.5 text-sm xl:text-base font-medium transition-all duration-200 ${
                             isActive(item.route)
-                              ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
-                              : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800/50'
+                              ? 'bg-primary-500/10 dark:bg-primary-500/20 backdrop-blur-xl text-primary-700 dark:text-primary-400 shadow-liquid-sm'
+                              : 'text-neutral-800 dark:text-neutral-200 hover:bg-white/[0.08] dark:hover:bg-white/[0.05] backdrop-blur-xl'
                           }`}
                           onClick={() => setDesktopDeviceDropdown(null)}
                         >
@@ -230,8 +231,8 @@ export default function Navbar() {
                     onClick={() => setSettingsDropdownOpen(!settingsDropdownOpen)}
                     className={`flex items-center gap-1.5 px-3 xl:px-4 py-2 rounded-xl text-sm xl:text-base font-medium transition-all duration-200 ${
                       settingsDropdownOpen || navStructure.settings.some(item => isActive(item.route))
-                        ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 shadow-sm'
-                        : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                        ? 'bg-primary-500/10 dark:bg-primary-500/20 backdrop-blur-xl text-primary-700 dark:text-primary-400 shadow-liquid-sm ring-1 ring-primary-500/20 dark:ring-primary-500/30 ring-inset'
+                        : 'bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-xl text-neutral-800 dark:text-neutral-200 hover:bg-white/[0.12] dark:hover:bg-white/[0.08] shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset'
                     }`}
                     aria-expanded={settingsDropdownOpen}
                   >
@@ -245,6 +246,7 @@ export default function Navbar() {
                       strokeWidth="2"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
+                      aria-hidden="true"
                     >
                       <path d="M19 9l-7 7-7-7" />
                     </svg>
@@ -256,14 +258,14 @@ export default function Navbar() {
                         <Link
                           key={item.id}
                           href={item.route}
-                          className={`block px-4 py-3 text-sm xl:text-base transition-colors duration-200 ${
+                          className={`block px-4 py-3 text-sm xl:text-base transition-all duration-200 ${
                             idx !== navStructure.settings.length - 1
-                              ? 'border-b border-neutral-200/50 dark:border-neutral-700/50'
+                              ? 'border-b border-white/10 dark:border-white/5'
                               : ''
                           } ${
                             isActive(item.route)
-                              ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 font-medium'
-                              : 'text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100/50 dark:hover:bg-neutral-800/50'
+                              ? 'bg-primary-500/10 dark:bg-primary-500/20 backdrop-blur-xl text-primary-700 dark:text-primary-400 font-medium shadow-liquid-sm'
+                              : 'text-neutral-800 dark:text-neutral-200 hover:bg-white/[0.08] dark:hover:bg-white/[0.05] backdrop-blur-xl'
                           }`}
                           onClick={() => setSettingsDropdownOpen(false)}
                         >
@@ -303,6 +305,7 @@ export default function Navbar() {
                       strokeWidth="2"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
+                      aria-hidden="true"
                     >
                       <path d="M19 9l-7 7-7-7" />
                     </svg>
@@ -407,6 +410,7 @@ export default function Navbar() {
                       strokeWidth="2"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
+                      aria-hidden="true"
                     >
                       <path d="M19 9l-7 7-7-7" />
                     </svg>
@@ -453,6 +457,7 @@ export default function Navbar() {
                       strokeWidth="2"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
+                      aria-hidden="true"
                     >
                       <path d="M19 9l-7 7-7-7" />
                     </svg>

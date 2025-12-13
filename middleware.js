@@ -15,22 +15,19 @@ export async function middleware(req) {
     return authResponse;
   }
 
-  // For non-auth routes, check if user is authenticated
+  // For non-auth routes, verify session is valid
+  // CRITICAL: After logout, cookie may exist but be invalid/empty
   const sessionCookie = req.cookies.get('appSession');
 
-  // Allow access to homepage without authentication (after logout)
-  if (!sessionCookie && req.nextUrl.pathname === '/') {
-    return NextResponse.next();
-  }
-
-  if (!sessionCookie) {
-    // Preserve the original URL to return after login
-    // Note: v4 uses /auth/login instead of /api/auth/login
+  if (!sessionCookie || !sessionCookie.value) {
+    // No session cookie or empty cookie - redirect to login
     const loginUrl = new URL('/auth/login', req.url);
     loginUrl.searchParams.set('returnTo', req.nextUrl.pathname + req.nextUrl.search);
     return NextResponse.redirect(loginUrl);
   }
 
+  // Session cookie exists with value - allow request to proceed
+  // Note: API routes will do their own validation with withApiAuthRequired
   return NextResponse.next();
 }
 

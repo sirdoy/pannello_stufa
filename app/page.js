@@ -9,8 +9,16 @@ export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   const session = await auth0.getSession();
-  const user = session?.user;
-  const userId = user?.sub;
+
+  // CRITICAL: If no valid session, redirect to login
+  // This handles the case where cookie exists but session is invalid (e.g., after logout)
+  if (!session || !session.user) {
+    const { redirect } = await import('next/navigation');
+    redirect('/auth/login');
+  }
+
+  const user = session.user;
+  const userId = user.sub;
   const enabledDevices = await getEnabledDevicesForUser(userId);
 
   return (

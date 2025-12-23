@@ -240,6 +240,7 @@ export async function GET(req) {
     let isOn = false;
     let currentFanLevel = 3; // Default safe value
     let currentPowerLevel = 2; // Default safe value
+    let statusFetchFailed = false;
 
     try {
       const [statusRes, fanRes, powerRes] = await Promise.all([
@@ -263,7 +264,8 @@ export async function GET(req) {
         currentStatus = statusJson?.StatusDescription || 'unknown';
         isOn = currentStatus.includes('WORK') || currentStatus.includes('START');
       } else {
-        console.warn('⚠️ Status unavailable - using defaults');
+        console.warn('⚠️ Status unavailable - will skip state-changing actions for safety');
+        statusFetchFailed = true;
       }
 
       // Parse fan with error handling
@@ -284,6 +286,7 @@ export async function GET(req) {
 
     } catch (error) {
       console.error('❌ Critical error fetching stove data:', error.message);
+      statusFetchFailed = true;
       // Continue with defaults - cron health is more important than stove control
     }
 
@@ -367,6 +370,18 @@ export async function GET(req) {
 
     if (active) {
       if (!isOn) {
+        // CRITICAL: Safety check - skip ignition if status fetch failed
+        if (statusFetchFailed) {
+          console.log('⚠️ Accensione schedulata saltata - stato stufa sconosciuto (safety)');
+          return Response.json({
+            status: 'STATUS_UNAVAILABLE',
+            message: 'Accensione schedulata saltata per sicurezza - stato stufa non disponibile',
+            schedulerEnabled: true,
+            giorno,
+            ora
+          });
+        }
+
         // Check maintenance ONLY before scheduled ignition
         const maintenanceAllowed = await canIgnite();
         if (!maintenanceAllowed) {
@@ -374,6 +389,35 @@ export async function GET(req) {
           return Response.json({
             status: 'MANUTENZIONE_RICHIESTA',
             message: 'Accensione schedulata bloccata - manutenzione stufa richiesta',
+            schedulerEnabled: true,
+            giorno,
+            ora
+          });
+        }
+
+        // Double-check: Re-fetch status immediately before ignition to prevent race condition
+        try {
+          const confirmStatusRes = await fetchWithTimeout(`${baseUrl}${STOVE_ROUTES.status}`);
+          if (confirmStatusRes && confirmStatusRes.ok) {
+            const confirmJson = await confirmStatusRes.json();
+            const confirmStatus = confirmJson?.StatusDescription || 'unknown';
+            if (confirmStatus.includes('WORK') || confirmStatus.includes('START')) {
+              console.log('⚠️ Race condition detected: Stove already on (confirmed) - skipping ignition');
+              return Response.json({
+                status: 'ALREADY_ON',
+                message: 'Stufa già accesa - race condition evitato',
+                schedulerEnabled: true,
+                giorno,
+                ora
+              });
+            }
+          }
+        } catch (confirmError) {
+          console.error('❌ Confirmation status fetch failed:', confirmError.message);
+          // Safety: Skip ignition if we can't confirm status
+          return Response.json({
+            status: 'CONFIRMATION_FAILED',
+            message: 'Accensione schedulata saltata - impossibile confermare stato stufa',
             schedulerEnabled: true,
             giorno,
             ora

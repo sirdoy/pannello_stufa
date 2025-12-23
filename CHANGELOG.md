@@ -5,6 +5,38 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.26.0] - 2025-12-23
+
+### Aggiunto
+- **Scheduler UI Complete Redesign**: layout desktop a 2 colonne (header + stats), pannello edit singolo, timeline settimanale sempre visibile
+- **Real-Time Multi-Device Sync**: listener Firebase `onValue` rileva modifiche remote con notifica toast "Aggiornamento da altro dispositivo"
+- **Weekly Summary Card**: statistiche complete (ore totali, media, giorno più utilizzato, distribuzione potenza P1-P5, split weekday/weekend)
+- **Weekly Timeline Visual**: panoramica compatta 24h per tutti i 7 giorni con barre gradient power-coded e selezione rapida giorno
+- **Day Edit Panel**: pannello editing dedicato con TimeBar interattiva, lista intervalli, indicatore save real-time
+- **Duplicate Day Feature**: modal intelligente per duplicare pianificazione su altri giorni (quick actions: weekdays/weekend/all)
+- **Toast Notifications System**: feedback UX immediato per tutte le azioni (add/edit/delete/mode change/errors) con auto-dismiss 3s
+- **Confirm Dialog Component**: modal conferma eliminazione intervallo con backdrop blur, supporto ESC key, accessibility ARIA
+- **Save Status Indicator**: "💾 Salvataggio..." → "✓ Salvato" real-time durante operazioni edit con display success 1s
+- **Power/Fan Colored Badges**: badges P1-P5 con gradient blu→rosso, V1-V6 con cyan→indigo per chiarezza visiva immediata
+- **Scheduler Stats Library**: `lib/schedulerStats.js` con utility (calculateWeeklyStats, getDayTotalHours, getPowerGradient, badge classes)
+- **Lucide React Icons**: integrata libreria `lucide-react@^0.562.0` per iconografia moderna (Copy icon per duplicate)
+- **Log Action Extension**: aggiunto `logSchedulerAction.duplicateDay()` per tracking duplicazione giorni nello storico
+
+### Migliorato
+- **DayAccordionItem**: pulsante duplica giorno (icona Copy lucide-react), save status indicator inline, dark mode completo
+- **ScheduleInterval**: badges colorati power/fan inline con dropdown select, aria-label accessibility, dark mode styling
+- **Dark Mode Complete**: tutti i nuovi componenti con supporto tema scuro (WeeklySummaryCard, WeeklyTimeline, DayEditPanel, DuplicateDayModal, ConfirmDialog)
+- **UI Uniformity**: standardizzato liquid glass pattern, ring borders, hover states su tutti scheduler components
+- **Accessibility Enhanced**: aria-labels su tutti i button, dialog modal ARIA, keyboard navigation migliorata
+- **Performance**: Firebase listener debounced con finestra 2s detection per evitare update loops durante save locale
+- **UX Flow Optimized**: add interval → edit real-time → confirm delete → toast feedback → remote sync notification
+
+### Test
+- **Test Suite Expanded**: 2 nuovi test files (`DuplicateDayModal.test.js`, `ConfirmDialog.test.js`) per coverage componenti
+
+### Rimosso
+- **Visual Screenshots Cleanup**: eliminati 8 screenshot obsoleti visual-inspection (desktop/mobile/tablet light/dark)
+
 ## [1.25.0] - 2025-12-13
 
 ### Aggiunto

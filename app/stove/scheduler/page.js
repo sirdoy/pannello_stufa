@@ -2,13 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { getWeeklySchedule, getFullSchedulerMode, getNextScheduledChange } from '@/lib/schedulerService';
-import { saveSchedule, setSchedulerMode, setSemiManualMode, clearSemiManualMode } from '@/lib/schedulerApiClient';
+import { saveSchedule as apiSaveSchedule, setSchedulerMode, setSemiManualMode, clearSemiManualMode } from '@/lib/schedulerApiClient';
 import { logSchedulerAction } from '@/lib/logService';
+import { db } from '@/lib/firebase';
+import { ref, onValue } from 'firebase/database';
 import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
 import ModeIndicator from '@/app/components/ui/ModeIndicator';
 import Skeleton from '@/app/components/ui/Skeleton';
-import DayAccordionItem from '@/app/components/scheduler/DayAccordionItem';
+import Toast from '@/app/components/ui/Toast';
+import ConfirmDialog from '@/app/components/ui/ConfirmDialog';
+import WeeklyTimeline from '@/app/components/scheduler/WeeklyTimeline';
+import DayEditPanel from '@/app/components/scheduler/DayEditPanel';
+import WeeklySummaryCard from '@/app/components/scheduler/WeeklySummaryCard';
 
 const daysOfWeek = [
   'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'
@@ -25,12 +31,26 @@ export default function WeeklyScheduler() {
   const [semiManualMode, setSemiManualModeState] = useState(false);
   const [returnToAutoAt, setReturnToAutoAt] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [expandedDays, setExpandedDays] = useState(() =>
-    daysOfWeek.reduce((acc, day) => {
-      acc[day] = false; // Tutti collassati di default
-      return acc;
-    }, {})
-  );
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    day: null,
+    intervalIndex: null,
+  });
+  const [toast, setToast] = useState(null);
+  const [lastLocalSave, setLastLocalSave] = useState(null);
+  const [saveStatus, setSaveStatus] = useState({
+    isSaving: false,
+    day: null,
+  });
+  const [selectedDay, setSelectedDay] = useState('Lunedì'); // Selected day for edit panel
+
+  // Auto-select first day with intervals on load
+  useEffect(() => {
+    const firstDayWithIntervals = daysOfWeek.find(day => schedule[day] && schedule[day].length > 0);
+    if (firstDayWithIntervals) {
+      setSelectedDay(firstDayWithIntervals);
+    }
+  }, [schedule]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,6 +74,47 @@ export default function WeeklyScheduler() {
     fetchData();
   }, []);
 
+  // Feature 1: Real-Time Firebase Sync - Listen for remote changes
+  useEffect(() => {
+    const schedulerRef = ref(db, 'stoveScheduler');
+
+    const unsubscribe = onValue(schedulerRef, (snapshot) => {
+      const data = snapshot.val();
+      if (!data) return;
+
+      // Check if update is from another device (within 2s window)
+      const now = Date.now();
+      const isLocalUpdate = lastLocalSave && (now - lastLocalSave < 2000);
+
+      if (!isLocalUpdate) {
+        console.log('[Scheduler] Aggiornamento remoto ricevuto');
+
+        // Update local state with remote data
+        const remoteSchedule = daysOfWeek.reduce((acc, day) => {
+          acc[day] = sortIntervals(data[day] || []);
+          return acc;
+        }, {});
+
+        setSchedule(remoteSchedule);
+
+        // Show toast notification
+        setToast({
+          message: 'Pianificazione aggiornata da altro dispositivo',
+          icon: '🔄',
+          variant: 'info',
+        });
+      }
+    });
+
+    return () => unsubscribe();
+  }, [lastLocalSave]);
+
+  // Wrapper for saveSchedule that tracks local saves
+  const saveSchedule = async (day, intervals) => {
+    setLastLocalSave(Date.now());
+    await apiSaveSchedule(day, intervals);
+  };
+
   const addTimeRange = async (day) => {
     const daySchedule = schedule[day];
 
@@ -75,8 +136,24 @@ export default function WeeklyScheduler() {
       [day]: newSchedule,
     };
     setSchedule(updatedSchedule);
-    await saveSchedule(day, newSchedule);
-    await logSchedulerAction.addInterval(day);
+
+    try {
+      await saveSchedule(day, newSchedule);
+      await logSchedulerAction.addInterval(day);
+
+      // Feature 2: Toast notification
+      setToast({
+        message: 'Intervallo aggiunto',
+        icon: '✅',
+        variant: 'success',
+      });
+    } catch (error) {
+      setToast({
+        message: 'Errore durante il salvataggio',
+        icon: '❌',
+        variant: 'error',
+      });
+    }
   };
 
   const incrementTime = (time, minutesToAdd) => {
@@ -151,41 +228,66 @@ export default function WeeklyScheduler() {
     updated[index] = { ...updated[index], [field]: value };
 
     if (isBlur) {
-      // Al blur: applica tutte le validazioni e salva
-      if (field === 'start' || field === 'end') {
-        let { start, end } = updated[index];
+      // Feature 4: Show saving indicator
+      setSaveStatus({ isSaving: true, day });
 
-        // Validazione: end deve essere > start di almeno 15 minuti
-        if (end <= start) {
-          end = incrementTime(start, 15);
-          updated[index].end = end;
+      try {
+        // Al blur: applica tutte le validazioni e salva
+        if (field === 'start' || field === 'end') {
+          let { start, end } = updated[index];
+
+          // Validazione: end deve essere > start di almeno 15 minuti
+          if (end <= start) {
+            end = incrementTime(start, 15);
+            updated[index].end = end;
+          }
+
+          // Applica collegamento con adiacenti e rimuovi sovrapposizioni
+          updated = applyAdjacentLinksAndRemoveOverlaps(
+            updated,
+            index,
+            originalStart,
+            originalEnd,
+            field
+          );
         }
 
-        // Applica collegamento con adiacenti e rimuovi sovrapposizioni
-        updated = applyAdjacentLinksAndRemoveOverlaps(
-          updated,
-          index,
-          originalStart,
-          originalEnd,
-          field
-        );
-      }
+        // Ordina gli intervalli e salva (per tutti i campi al blur)
+        const sorted = sortIntervals(updated);
+        const updatedSchedule = { ...schedule, [day]: sorted };
+        setSchedule(updatedSchedule);
 
-      // Ordina gli intervalli e salva (per tutti i campi al blur)
-      const sorted = sortIntervals(updated);
-      const updatedSchedule = { ...schedule, [day]: sorted };
-      setSchedule(updatedSchedule);
+        await saveSchedule(day, sorted);
+        await logSchedulerAction.updateSchedule(day);
 
-      await saveSchedule(day, sorted);
-      await logSchedulerAction.updateSchedule(day);
+        // Feature 2: Toast notification
+        setToast({
+          message: 'Intervallo aggiornato',
+          icon: '💾',
+          variant: 'success',
+        });
 
-      // Se siamo in semi-manuale, aggiorna il returnToAutoAt
-      if (semiManualMode && (field === 'start' || field === 'end')) {
-        const nextChange = await getNextScheduledChange();
-        if (nextChange) {
-          await setSemiManualMode(nextChange);
-          setReturnToAutoAt(nextChange);
+        // Feature 4: Show success briefly
+        setSaveStatus({ isSaving: false, day });
+        setTimeout(() => {
+          setSaveStatus({ isSaving: false, day: null });
+        }, 1000);
+
+        // Se siamo in semi-manuale, aggiorna il returnToAutoAt
+        if (semiManualMode && (field === 'start' || field === 'end')) {
+          const nextChange = await getNextScheduledChange();
+          if (nextChange) {
+            await setSemiManualMode(nextChange);
+            setReturnToAutoAt(nextChange);
+          }
         }
+      } catch (error) {
+        setSaveStatus({ isSaving: false, day: null });
+        setToast({
+          message: 'Errore durante il salvataggio',
+          icon: '❌',
+          variant: 'error',
+        });
       }
     } else {
       // Durante onChange (non blur), aggiorna solo lo stato locale senza ordinare né validare
@@ -199,6 +301,13 @@ export default function WeeklyScheduler() {
     setSchedulerEnabled(newMode);
     await setSchedulerMode(newMode);
     await logSchedulerAction.toggleMode(newMode);
+
+    // Feature 2: Toast notification
+    setToast({
+      message: `Modalità cambiata in ${newMode ? 'Automatico' : 'Manuale'}`,
+      icon: newMode ? '⏰' : '🔧',
+      variant: 'success',
+    });
 
     // Reset semi-manual quando si cambia modalità manualmente
     if (semiManualMode) {
@@ -214,27 +323,52 @@ export default function WeeklyScheduler() {
     await logSchedulerAction.clearSemiManual();
     setSemiManualModeState(false);
     setReturnToAutoAt(null);
+
+    // Feature 2: Toast notification
+    setToast({
+      message: 'Ritorno in modalità Automatico',
+      icon: '↩️',
+      variant: 'success',
+    });
   };
 
-  const toggleDay = (day) => {
-    setExpandedDays(prev => ({
-      ...prev,
-      [day]: !prev[day]
-    }));
+  const handleRemoveIntervalRequest = (day, index) => {
+    setConfirmDialog({
+      isOpen: true,
+      day,
+      intervalIndex: index,
+    });
   };
 
-  const expandAll = () => {
-    setExpandedDays(daysOfWeek.reduce((acc, day) => {
-      acc[day] = true;
-      return acc;
-    }, {}));
+  const handleConfirmRemoveInterval = async () => {
+    const { day, intervalIndex } = confirmDialog;
+    const updated = schedule[day].filter((_, i) => i !== intervalIndex);
+    const updatedSchedule = { ...schedule, [day]: updated };
+    setSchedule(updatedSchedule);
+
+    try {
+      await saveSchedule(day, updated);
+      await logSchedulerAction.removeInterval(day, intervalIndex);
+
+      // Feature 2: Toast notification
+      setToast({
+        message: 'Intervallo eliminato',
+        icon: '🗑️',
+        variant: 'success',
+      });
+    } catch (error) {
+      setToast({
+        message: 'Errore durante l\'eliminazione',
+        icon: '❌',
+        variant: 'error',
+      });
+    }
+
+    setConfirmDialog({ isOpen: false, day: null, intervalIndex: null });
   };
 
-  const collapseAll = () => {
-    setExpandedDays(daysOfWeek.reduce((acc, day) => {
-      acc[day] = false;
-      return acc;
-    }, {}));
+  const handleCancelRemoveInterval = () => {
+    setConfirmDialog({ isOpen: false, day: null, intervalIndex: null });
   };
 
   if (loading) {
@@ -242,81 +376,99 @@ export default function WeeklyScheduler() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      {/* Header Card */}
-      <Card liquid className="p-6 sm:p-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white mb-6">Pianificazione Settimanale</h1>
+    <div className="max-w-7xl mx-auto space-y-6">
+      {/* Header Row - 2 columns on desktop */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left: Title + Mode */}
+        <Card liquid className="p-6 sm:p-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white mb-6">
+            Pianificazione Settimanale
+          </h1>
 
-        {/* Status e toggle */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-white/[0.15] dark:ring-white/[0.08] mb-4">
-          <ModeIndicator
-            enabled={schedulerEnabled}
-            semiManual={semiManualMode}
-            returnToAutoAt={returnToAutoAt}
-            showConfigButton={false}
-          />
+          {/* Mode indicator and controls */}
+          <div className="flex flex-col gap-4">
+            <ModeIndicator
+              enabled={schedulerEnabled}
+              semiManual={semiManualMode}
+              returnToAutoAt={returnToAutoAt}
+              showConfigButton={false}
+            />
 
-          <div className="flex gap-3 w-full sm:w-auto">
-            {schedulerEnabled && semiManualMode && (
-              <Button liquid
-                variant="warning"
-                onClick={handleClearSemiManual}
-                className="flex-1 sm:flex-initial"
-                icon="↩️"
+            <div className="flex gap-3">
+              {schedulerEnabled && semiManualMode && (
+                <Button
+                  liquid
+                  variant="warning"
+                  onClick={handleClearSemiManual}
+                  className="flex-1"
+                  icon="↩️"
+                  size="sm"
+                >
+                  Torna in Automatico
+                </Button>
+              )}
+              <Button
+                liquid
+                variant={schedulerEnabled ? 'danger' : 'success'}
+                onClick={toggleSchedulerMode}
+                className="flex-1"
+                size="sm"
               >
-                Torna in {schedulerEnabled ? 'Automatico' : 'Manuale'}
+                {schedulerEnabled ? 'Disattiva' : 'Attiva'}
               </Button>
-            )}
-            <Button liquid
-              variant={schedulerEnabled ? 'danger' : 'success'}
-              onClick={toggleSchedulerMode}
-              className="flex-1 sm:flex-initial"
-            >
-              {schedulerEnabled ? 'Disattiva Scheduler' : 'Attiva Scheduler'}
-            </Button>
+            </div>
           </div>
-        </div>
+        </Card>
 
-        {/* Pulsanti Espandi/Comprimi tutto */}
-        <div className="flex gap-3 justify-end">
-          <Button liquid
-            variant="ghost"
-            size="sm"
-            icon="📂"
-            onClick={expandAll}
-          >
-            Espandi tutto
-          </Button>
-          <Button liquid
-            variant="ghost"
-            size="sm"
-            icon="📁"
-            onClick={collapseAll}
-          >
-            Comprimi tutto
-          </Button>
-        </div>
+        {/* Right: Weekly Stats */}
+        <WeeklySummaryCard schedule={schedule} />
+      </div>
+
+      {/* Weekly Timeline - Always Visible */}
+      <Card liquid className="p-6">
+        <h2 className="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
+          📅 Panoramica Settimanale
+        </h2>
+        <WeeklyTimeline
+          schedule={schedule}
+          selectedDay={selectedDay}
+          onSelectDay={setSelectedDay}
+        />
       </Card>
 
-      {/* Days Cards */}
-      {daysOfWeek.map((day) => (
-        <DayAccordionItem
-          key={day}
-          day={day}
-          intervals={schedule[day]}
-          isExpanded={expandedDays[day]}
-          onToggle={() => toggleDay(day)}
-          onAddInterval={() => addTimeRange(day)}
-          onRemoveInterval={async (index) => {
-            const updated = schedule[day].filter((_, i) => i !== index);
-            const updatedSchedule = { ...schedule, [day]: updated };
-            setSchedule(updatedSchedule);
-            await saveSchedule(day, updated);
-            await logSchedulerAction.removeInterval(day, index);
-          }}
-          onChangeInterval={(index, field, value, isBlur) => handleChange(day, index, field, value, isBlur)}
+      {/* Day Edit Panel - Shows selected day */}
+      <DayEditPanel
+        day={selectedDay}
+        intervals={schedule[selectedDay] || []}
+        onAddInterval={() => addTimeRange(selectedDay)}
+        onEditInterval={(index, field, value, isBlur) => handleChange(selectedDay, index, field, value, isBlur)}
+        onDeleteInterval={(index) => handleRemoveIntervalRequest(selectedDay, index)}
+        saveStatus={saveStatus.day === selectedDay ? saveStatus : null}
+      />
+
+      {/* Confirm Delete Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title="Elimina intervallo"
+        message="Sei sicuro di voler eliminare questo intervallo? L'azione non può essere annullata."
+        confirmText="Elimina"
+        cancelText="Annulla"
+        confirmVariant="danger"
+        icon="🗑️"
+        onConfirm={handleConfirmRemoveInterval}
+        onCancel={handleCancelRemoveInterval}
+      />
+
+      {/* Toast Notifications */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          icon={toast.icon}
+          variant={toast.variant}
+          duration={3000}
+          onDismiss={() => setToast(null)}
         />
-      ))}
+      )}
     </div>
   );
 }

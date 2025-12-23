@@ -5,6 +5,7 @@ import Card from '../ui/Card';
 import Button from '../ui/Button';
 import TimeBar from './TimeBar';
 import ScheduleInterval from './ScheduleInterval';
+import { Copy } from 'lucide-react';
 
 export default function DayAccordionItem({
   day,
@@ -14,6 +15,8 @@ export default function DayAccordionItem({
   onAddInterval,
   onRemoveInterval,
   onChangeInterval,
+  onDuplicate,
+  saveStatus,
 }) {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
@@ -54,15 +57,15 @@ export default function DayAccordionItem({
       <div className="w-full">
         <button
           onClick={onToggle}
-          className="w-full p-6 flex items-center justify-between hover:bg-neutral-50 transition-colors duration-200"
+          className="w-full p-6 flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-white/[0.02] transition-colors duration-200"
         >
           <div className="flex items-center gap-4 flex-1 min-w-0">
             {/* Icona giorno e nome */}
             <div className="flex items-center gap-3 flex-shrink-0">
               <span className="text-2xl">📅</span>
               <div className="text-left">
-                <h2 className="text-xl font-bold text-neutral-900">{day}</h2>
-                <p className="text-sm text-neutral-500">
+                <h2 className="text-xl font-bold text-neutral-900 dark:text-white">{day}</h2>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400">
                   {intervals.length} {intervals.length === 1 ? 'intervallo' : 'intervalli'}
                   {intervals.length > 0 && ` • ${getTotalDuration()}h totali`}
                 </p>
@@ -72,12 +75,42 @@ export default function DayAccordionItem({
             {/* Preview compatta - solo quando collassato */}
             {!isExpanded && intervals.length > 0 && (
               <div className="hidden md:flex items-center gap-3 ml-auto mr-4">
-                <div className="text-sm font-semibold text-primary-600 bg-primary-50 px-3 py-1.5 rounded-lg border border-primary-200">
+                <div className="text-sm font-semibold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 px-3 py-1.5 rounded-lg border border-primary-200 dark:border-primary-800">
                   ⏰ {getTimeRangePreview()}
                 </div>
               </div>
             )}
+
+            {/* Feature 4: Save indicator - solo quando espanso */}
+            {isExpanded && saveStatus && (
+              <div className="ml-auto mr-4">
+                {saveStatus.isSaving ? (
+                  <span className="text-sm text-blue-500 dark:text-blue-400 animate-pulse">
+                    Salvataggio...
+                  </span>
+                ) : (
+                  <span className="text-sm text-green-600 dark:text-green-400">
+                    ✓ Salvato
+                  </span>
+                )}
+              </div>
+            )}
           </div>
+
+          {/* Feature 3: Duplicate button - solo quando espanso e ci sono intervalli */}
+          {isExpanded && intervals.length > 0 && onDuplicate && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDuplicate(day);
+              }}
+              className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-white/[0.05] transition-colors"
+              aria-label="Duplica giorno"
+              title="Duplica su altri giorni"
+            >
+              <Copy className="w-5 h-5 text-neutral-600 dark:text-neutral-400" />
+            </button>
+          )}
 
           {/* Icona expand/collapse */}
           <div className="ml-4 flex-shrink-0">
@@ -90,7 +123,7 @@ export default function DayAccordionItem({
         {/* TimeBar compatta - solo quando collassato e ci sono intervalli */}
         {!isExpanded && intervals.length > 0 && (
           <div className="px-6 pb-4">
-            <div className="relative h-4 w-full bg-neutral-200 rounded-lg overflow-hidden shadow-inner">
+            <div className="relative h-4 w-full bg-neutral-200 dark:bg-neutral-700 rounded-lg overflow-hidden shadow-inner">
               {intervals.map((range, idx) => {
                 const totalMinutes = 24 * 60;
                 const [startH, startM] = range.start.split(':').map(Number);
@@ -103,7 +136,7 @@ export default function DayAccordionItem({
                 return (
                   <div
                     key={idx}
-                    className="absolute top-0 bottom-0 bg-gradient-to-r from-primary-400 to-accent-500"
+                    className="absolute top-0 bottom-0 bg-gradient-to-r from-primary-400 to-accent-500 dark:from-primary-500 dark:to-accent-600"
                     style={{ left: `${left}%`, width: `${width}%` }}
                     title={`${range.start} - ${range.end} | ⚡${range.power} 💨${range.fan}`}
                   />
@@ -149,7 +182,7 @@ export default function DayAccordionItem({
               ))}
             </div>
           ) : (
-            <div className="text-center py-8 text-neutral-500">
+            <div className="text-center py-8 text-neutral-500 dark:text-neutral-400">
               <p className="text-lg mb-2">📭 Nessun intervallo configurato</p>
               <p className="text-sm">Aggiungi il primo intervallo per iniziare</p>
             </div>

@@ -577,7 +577,6 @@ export default function WeeklyScheduler() {
         day={selectedDay}
         intervals={schedule[selectedDay] || []}
         onAddInterval={() => addTimeRange(selectedDay)}
-        onEditInterval={(index, field, value, isBlur) => handleChange(selectedDay, index, field, value, isBlur)}
         onEditIntervalModal={(index) => handleEditIntervalRequest(selectedDay, index)}
         onDeleteInterval={(index) => handleRemoveIntervalRequest(selectedDay, index)}
         onDuplicate={handleDuplicateDay}

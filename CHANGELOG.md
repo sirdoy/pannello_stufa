@@ -5,6 +5,17 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.26.1] - 2025-12-27
+
+### Corretto
+- **Fix Cron Scheduler Auth0 Bypass**: risolto errore `STATUS_UNAVAILABLE` che impediva al cron di controllare lo stato stufa
+  - Le route `/api/stove/*` erano protette da `auth0.withApiAuthRequired()` bloccando le chiamate HTTP interne dal cron
+  - Sostituito fetch HTTP con chiamate dirette alle funzioni `lib/stoveApi.js`:
+    - `getStoveStatus()`, `getFanLevel()`, `getPowerLevel()` per lettura stato
+    - `igniteStove()`, `shutdownStove()`, `setPowerLevel()`, `setFanLevel()` per controllo stufa
+  - Il cron `/api/scheduler/check` ora bypassa completamente le route protette e chiama direttamente le API Thermorossi
+  - Risolve il problema del servizio esterno cron-job.org che riceveva risposta "Accensione schedulata saltata per sicurezza - stato stufa non disponibile"
+
 ## [1.26.0] - 2025-12-23
 
 ### Aggiunto

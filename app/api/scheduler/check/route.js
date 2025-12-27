@@ -1,10 +1,19 @@
 import { adminDbGet, adminDbSet, sendNotificationToUser } from '@/lib/firebaseAdmin';
 import { canIgnite, trackUsageHours } from '@/lib/maintenanceServiceAdmin';
-import { STOVE_ROUTES, NETATMO_ROUTES } from '@/lib/routes';
+import { NETATMO_ROUTES } from '@/lib/routes';
 import {
   shouldSendSchedulerNotification,
   shouldSendMaintenanceNotification,
 } from '@/lib/notificationPreferencesService';
+import {
+  getStoveStatus,
+  getFanLevel,
+  getPowerLevel,
+  igniteStove,
+  shutdownStove,
+  setPowerLevel,
+  setFanLevel,
+} from '@/lib/stoveApi';
 
 export const dynamic = 'force-dynamic';
 
@@ -235,7 +244,7 @@ export async function GET(req) {
     const baseUrl = `${req.nextUrl.protocol}//${req.headers.get('host')}`;
     console.log(baseUrl);
 
-    // OPTIMIZATION: Fetch stove data in parallel with timeout and error handling
+    // OPTIMIZATION: Fetch stove data in parallel - direct calls to stoveApi (no HTTP)
     let currentStatus = 'unknown';
     let isOn = false;
     let currentFanLevel = 3; // Default safe value
@@ -243,25 +252,24 @@ export async function GET(req) {
     let statusFetchFailed = false;
 
     try {
-      const [statusRes, fanRes, powerRes] = await Promise.all([
-        fetchWithTimeout(`${baseUrl}${STOVE_ROUTES.status}`).catch(err => {
+      const [statusData, fanData, powerData] = await Promise.all([
+        getStoveStatus().catch(err => {
           console.error('❌ Status fetch failed:', err.message);
           return null;
         }),
-        fetchWithTimeout(`${baseUrl}${STOVE_ROUTES.getFan}`).catch(err => {
+        getFanLevel().catch(err => {
           console.error('❌ Fan fetch failed:', err.message);
           return null;
         }),
-        fetchWithTimeout(`${baseUrl}${STOVE_ROUTES.getPower}`).catch(err => {
+        getPowerLevel().catch(err => {
           console.error('❌ Power fetch failed:', err.message);
           return null;
         })
       ]);
 
       // Parse status with error handling
-      if (statusRes && statusRes.ok) {
-        const statusJson = await statusRes.json();
-        currentStatus = statusJson?.StatusDescription || 'unknown';
+      if (statusData) {
+        currentStatus = statusData.StatusDescription || 'unknown';
         isOn = currentStatus.includes('WORK') || currentStatus.includes('START');
       } else {
         console.warn('⚠️ Status unavailable - will skip state-changing actions for safety');
@@ -269,17 +277,15 @@ export async function GET(req) {
       }
 
       // Parse fan with error handling
-      if (fanRes && fanRes.ok) {
-        const fanJson = await fanRes.json();
-        currentFanLevel = fanJson?.Result ?? 3;
+      if (fanData) {
+        currentFanLevel = fanData.Result ?? 3;
       } else {
         console.warn('⚠️ Fan level unavailable - using default: 3');
       }
 
       // Parse power with error handling
-      if (powerRes && powerRes.ok) {
-        const powerJson = await powerRes.json();
-        currentPowerLevel = powerJson?.Result ?? 2;
+      if (powerData) {
+        currentPowerLevel = powerData.Result ?? 2;
       } else {
         console.warn('⚠️ Power level unavailable - using default: 2');
       }
@@ -397,10 +403,9 @@ export async function GET(req) {
 
         // Double-check: Re-fetch status immediately before ignition to prevent race condition
         try {
-          const confirmStatusRes = await fetchWithTimeout(`${baseUrl}${STOVE_ROUTES.status}`);
-          if (confirmStatusRes && confirmStatusRes.ok) {
-            const confirmJson = await confirmStatusRes.json();
-            const confirmStatus = confirmJson?.StatusDescription || 'unknown';
+          const confirmStatusData = await getStoveStatus();
+          if (confirmStatusData) {
+            const confirmStatus = confirmStatusData.StatusDescription || 'unknown';
             if (confirmStatus.includes('WORK') || confirmStatus.includes('START')) {
               console.log('⚠️ Race condition detected: Stove already on (confirmed) - skipping ignition');
               return Response.json({
@@ -425,13 +430,7 @@ export async function GET(req) {
         }
 
         try {
-          await fetchWithTimeout(`${baseUrl}${STOVE_ROUTES.ignite}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({source: 'scheduler'}),
-          });
+          await igniteStove(active.power);
           changeApplied = true;
 
           // Send notification
@@ -442,11 +441,7 @@ export async function GET(req) {
       }
       if (currentPowerLevel !== active.power) {
         try {
-          await fetchWithTimeout(`${baseUrl}${STOVE_ROUTES.setPower}`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({level: active.power, source: 'scheduler'}),
-          });
+          await setPowerLevel(active.power);
           changeApplied = true;
         } catch (error) {
           console.error('❌ Failed to set power:', error.message);
@@ -454,11 +449,7 @@ export async function GET(req) {
       }
       if (currentFanLevel !== active.fan) {
         try {
-          await fetchWithTimeout(`${baseUrl}${STOVE_ROUTES.setFan}`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({level: active.fan, source: 'scheduler'}),
-          });
+          await setFanLevel(active.fan);
           changeApplied = true;
         } catch (error) {
           console.error('❌ Failed to set fan:', error.message);
@@ -467,11 +458,7 @@ export async function GET(req) {
     } else {
       if (isOn) {
         try {
-          await fetchWithTimeout(`${baseUrl}${STOVE_ROUTES.shutdown}`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({source: 'scheduler'}),
-          });
+          await shutdownStove();
           changeApplied = true;
 
           // Send notification

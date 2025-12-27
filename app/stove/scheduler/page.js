@@ -16,6 +16,7 @@ import WeeklyTimeline from '@/app/components/scheduler/WeeklyTimeline';
 import DayEditPanel from '@/app/components/scheduler/DayEditPanel';
 import WeeklySummaryCard from '@/app/components/scheduler/WeeklySummaryCard';
 import DuplicateDayModal from '@/app/components/scheduler/DuplicateDayModal';
+import AddIntervalModal from '@/app/components/scheduler/AddIntervalModal';
 
 const daysOfWeek = [
   'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'
@@ -40,6 +41,11 @@ export default function WeeklyScheduler() {
   const [duplicateModal, setDuplicateModal] = useState({
     isOpen: false,
     sourceDay: null,
+  });
+  const [addIntervalModal, setAddIntervalModal] = useState({
+    isOpen: false,
+    day: null,
+    suggestedStart: '00:00',
   });
   const [toast, setToast] = useState(null);
   const [lastLocalSave, setLastLocalSave] = useState(null);
@@ -118,45 +124,29 @@ export default function WeeklyScheduler() {
     await apiSaveSchedule(day, intervals);
   };
 
-  const addTimeRange = async (day) => {
+  const addTimeRange = (day) => {
     const daySchedule = schedule[day];
 
     // Trova l'ultimo intervallo in ordine temporale
     const sorted = sortIntervals(daySchedule);
     const lastEnd = sorted.length ? sorted[sorted.length - 1].end : '00:00';
 
-    if (lastEnd >= '23:59') return;
-
-    const newStart = lastEnd;
-    const newEnd = incrementTime(lastEnd, 30);
-    const newRange = { start: newStart, end: newEnd, power: 2, fan: 3 };
-
-    // Aggiungi e ordina
-    const newSchedule = sortIntervals([...daySchedule, newRange]);
-
-    const updatedSchedule = {
-      ...schedule,
-      [day]: newSchedule,
-    };
-    setSchedule(updatedSchedule);
-
-    try {
-      await saveSchedule(day, newSchedule);
-      await logSchedulerAction.addInterval(day);
-
-      // Feature 2: Toast notification
+    // Check if day is full
+    if (lastEnd >= '23:59') {
       setToast({
-        message: 'Intervallo aggiunto',
-        icon: '✅',
-        variant: 'success',
+        message: '⏰ Giornata completa - impossibile aggiungere altri intervalli',
+        icon: '⚠️',
+        variant: 'warning',
       });
-    } catch (error) {
-      setToast({
-        message: 'Errore durante il salvataggio',
-        icon: '❌',
-        variant: 'error',
-      });
+      return;
     }
+
+    // Open modal with suggested start time
+    setAddIntervalModal({
+      isOpen: true,
+      day,
+      suggestedStart: lastEnd,
+    });
   };
 
   const incrementTime = (time, minutesToAdd) => {
@@ -428,6 +418,53 @@ export default function WeeklyScheduler() {
     setDuplicateModal({ isOpen: false, sourceDay: null });
   };
 
+  const handleConfirmAddInterval = async ({ start, duration, power, fan }) => {
+    const { day } = addIntervalModal;
+
+    // Calculate end time
+    const [h, m] = start.split(':').map(Number);
+    const totalMinutes = h * 60 + m + duration;
+    const endH = String(Math.floor(totalMinutes / 60) % 24).padStart(2, '0');
+    const endM = String(totalMinutes % 60).padStart(2, '0');
+    const end = `${endH}:${endM}`;
+
+    const newRange = { start, end, power, fan };
+
+    // Add and sort
+    const daySchedule = schedule[day];
+    const newSchedule = sortIntervals([...daySchedule, newRange]);
+
+    const updatedSchedule = {
+      ...schedule,
+      [day]: newSchedule,
+    };
+    setSchedule(updatedSchedule);
+
+    try {
+      await saveSchedule(day, newSchedule);
+      await logSchedulerAction.addInterval(day);
+
+      setToast({
+        message: 'Intervallo aggiunto',
+        icon: '✅',
+        variant: 'success',
+      });
+    } catch (error) {
+      setToast({
+        message: 'Errore durante il salvataggio',
+        icon: '❌',
+        variant: 'error',
+      });
+    }
+
+    // Close modal
+    setAddIntervalModal({ isOpen: false, day: null, suggestedStart: '00:00' });
+  };
+
+  const handleCancelAddInterval = () => {
+    setAddIntervalModal({ isOpen: false, day: null, suggestedStart: '00:00' });
+  };
+
   if (loading) {
     return <Skeleton.Scheduler />;
   }
@@ -524,6 +561,15 @@ export default function WeeklyScheduler() {
         excludeDays={[duplicateModal.sourceDay]}
         onConfirm={handleConfirmDuplicate}
         onCancel={handleCancelDuplicate}
+      />
+
+      {/* Add Interval Modal */}
+      <AddIntervalModal
+        isOpen={addIntervalModal.isOpen}
+        day={addIntervalModal.day}
+        suggestedStart={addIntervalModal.suggestedStart}
+        onConfirm={handleConfirmAddInterval}
+        onCancel={handleCancelAddInterval}
       />
 
       {/* Toast Notifications */}

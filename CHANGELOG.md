@@ -5,6 +5,29 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.26.4] - 2025-12-27
+
+### Aggiunto
+- **AddIntervalModal Component**: modal personalizzato completo per aggiunta intervalli con UX avanzata
+  - **Time Picker Start**: ora inizio completamente personalizzabile (default suggerito: ultimo end time del giorno)
+  - **Duration Presets**: dropdown durata con opzioni rapide (15min, 30min, 1h, 2h) + custom personalizzata
+  - **Custom Duration Input**: campo minuti con validation (min 15, max 1440 per giornata completa)
+  - **Preview End Time**: calcolo automatico e display live dell'orario fine intervallo
+  - **Power & Fan Selectors**: badge colorati P1-P5 (blu→rosso) e V1-V6 (cyan→indigo) con dropdown selettore
+  - **Real-time Validation**: impedisce intervalli che attraversano mezzanotte, durata minima 15min
+  - **Modal UX**: backdrop blur, ESC key close, body scroll lock, click outside to close
+
+### Migliorato
+- **addTimeRange Function**: ora apre modal invece di return silenzioso quando giornata completa
+- **Toast Feedback**: nuovo warning "⏰ Giornata completa - impossibile aggiungere altri intervalli" quando lastEnd >= 23:59
+- **Accessibility**: ARIA labels (`aria-labelledby`, `aria-modal`), keyboard navigation ESC key
+- **Dark Mode**: supporto completo tema scuro per AddIntervalModal (input, select, badges, preview)
+
+### Risolto
+- **UX Bug #1**: return silenzioso quando impossibile aggiungere intervallo (ora toast warning esplicito)
+- **UX Bug #2**: nuovo intervallo sempre in coda (ora start time personalizzabile)
+- **UX Bug #3**: durata fissa 30 minuti (ora dropdown 15min/30min/1h/2h/custom)
+
 ## [1.26.3] - 2025-12-27
 
 ### Risolto

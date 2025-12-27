@@ -17,26 +17,52 @@ const DURATION_PRESETS = [
 export default function AddIntervalModal({
   isOpen,
   day,
+  mode = 'add', // 'add' or 'edit'
+  initialInterval = null, // For edit mode
   suggestedStart = '00:00',
   onConfirm,
   onCancel,
 }) {
+  const [inputMode, setInputMode] = useState('duration'); // 'duration' or 'endTime'
   const [start, setStart] = useState(suggestedStart);
+  const [end, setEnd] = useState('00:00');
   const [durationPreset, setDurationPreset] = useState(30);
   const [customMinutes, setCustomMinutes] = useState(60);
   const [power, setPower] = useState(2);
   const [fan, setFan] = useState(3);
 
-  // Update start when suggestedStart changes (e.g., when opening modal)
+  // Update state when modal opens
   useEffect(() => {
     if (isOpen) {
-      setStart(suggestedStart);
-      setDurationPreset(30);
-      setCustomMinutes(60);
-      setPower(2);
-      setFan(3);
+      if (mode === 'edit' && initialInterval) {
+        // Edit mode: precompila con dati esistenti
+        setStart(initialInterval.start);
+        setEnd(initialInterval.end);
+        setPower(initialInterval.power);
+        setFan(initialInterval.fan);
+        setInputMode('endTime'); // Default to endTime for edit
+
+        // Calculate duration for duration mode
+        const [startH, startM] = initialInterval.start.split(':').map(Number);
+        const [endH, endM] = initialInterval.end.split(':').map(Number);
+        const durationMin = (endH * 60 + endM) - (startH * 60 + startM);
+        if ([15, 30, 60, 120].includes(durationMin)) {
+          setDurationPreset(durationMin);
+        } else {
+          setDurationPreset('custom');
+          setCustomMinutes(durationMin);
+        }
+      } else {
+        // Add mode: reset to defaults
+        setStart(suggestedStart);
+        setDurationPreset(30);
+        setCustomMinutes(60);
+        setPower(2);
+        setFan(3);
+        setInputMode('duration');
+      }
     }
-  }, [isOpen, suggestedStart]);
+  }, [isOpen, mode, initialInterval, suggestedStart]);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -63,8 +89,12 @@ export default function AddIntervalModal({
 
   if (!isOpen) return null;
 
-  // Calculate end time
+  // Calculate end time based on input mode
   const calculateEnd = () => {
+    if (inputMode === 'endTime') {
+      return end;
+    }
+    // Duration mode
     const minutes = durationPreset === 'custom' ? customMinutes : durationPreset;
     const [h, m] = start.split(':').map(Number);
     const totalMinutes = h * 60 + m + minutes;
@@ -73,17 +103,20 @@ export default function AddIntervalModal({
     return `${endH}:${endM}`;
   };
 
-  const end = calculateEnd();
+  const calculatedEnd = calculateEnd();
 
   // Validation
   const isValidInterval = () => {
     if (!start) return false;
-    const minutes = durationPreset === 'custom' ? customMinutes : durationPreset;
-    if (durationPreset === 'custom' && (!customMinutes || customMinutes < 15)) return false;
+
+    if (inputMode === 'duration') {
+      const minutes = durationPreset === 'custom' ? customMinutes : durationPreset;
+      if (durationPreset === 'custom' && (!customMinutes || customMinutes < 15)) return false;
+    }
 
     // Check if end time wraps to next day (start > end means crossing midnight)
     const [startH, startM] = start.split(':').map(Number);
-    const [endH, endM] = end.split(':').map(Number);
+    const [endH, endM] = calculatedEnd.split(':').map(Number);
     const startMinutes = startH * 60 + startM;
     const endMinutes = endH * 60 + endM;
 
@@ -96,10 +129,15 @@ export default function AddIntervalModal({
   const handleConfirm = () => {
     if (!isValidInterval()) return;
 
-    const minutes = durationPreset === 'custom' ? customMinutes : durationPreset;
+    // Calculate duration from start/end
+    const [startH, startM] = start.split(':').map(Number);
+    const [endH, endM] = calculatedEnd.split(':').map(Number);
+    const duration = (endH * 60 + endM) - (startH * 60 + startM);
+
     onConfirm({
       start,
-      duration: minutes,
+      end: calculatedEnd,
+      duration,
       power,
       fan,
     });
@@ -127,8 +165,8 @@ export default function AddIntervalModal({
             id="add-interval-title"
             className="text-xl font-bold text-neutral-900 dark:text-white flex items-center gap-2"
           >
-            <span>➕</span>
-            <span>Aggiungi Intervallo - {day}</span>
+            <span>{mode === 'edit' ? '✏️' : '➕'}</span>
+            <span>{mode === 'edit' ? 'Modifica' : 'Aggiungi'} Intervallo - {day}</span>
           </h2>
           <button
             onClick={onCancel}
@@ -154,46 +192,98 @@ export default function AddIntervalModal({
             />
           </div>
 
-          {/* Duration */}
+          {/* Toggle: Duration vs End Time */}
           <div>
             <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
-              ⏱️ Durata
+              Modalità Inserimento
             </label>
-            <select
-              value={durationPreset}
-              onChange={(e) => setDurationPreset(e.target.value === 'custom' ? 'custom' : Number(e.target.value))}
-              className="w-full px-4 py-3 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-xl text-neutral-900 dark:text-white focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-600 focus:border-transparent transition-all duration-200"
-            >
-              {DURATION_PRESETS.map(preset => (
-                <option key={preset.value} value={preset.value}>
-                  {preset.label}
-                </option>
-              ))}
-            </select>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setInputMode('duration')}
+                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${
+                  inputMode === 'duration'
+                    ? 'bg-primary-500 dark:bg-primary-600 text-white shadow-md'
+                    : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                }`}
+              >
+                ⏱️ Durata
+              </button>
+              <button
+                type="button"
+                onClick={() => setInputMode('endTime')}
+                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${
+                  inputMode === 'endTime'
+                    ? 'bg-primary-500 dark:bg-primary-600 text-white shadow-md'
+                    : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                }`}
+              >
+                ⏰ Ora Fine
+              </button>
+            </div>
           </div>
 
-          {/* Custom Duration Input */}
-          {durationPreset === 'custom' && (
+          {/* Duration Mode */}
+          {inputMode === 'duration' && (
+            <>
+              <div>
+                <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
+                  ⏱️ Durata
+                </label>
+                <select
+                  value={durationPreset}
+                  onChange={(e) => setDurationPreset(e.target.value === 'custom' ? 'custom' : Number(e.target.value))}
+                  className="w-full px-4 py-3 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-xl text-neutral-900 dark:text-white focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-600 focus:border-transparent transition-all duration-200"
+                >
+                  {DURATION_PRESETS.map(preset => (
+                    <option key={preset.value} value={preset.value}>
+                      {preset.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Custom Duration Input */}
+              {durationPreset === 'custom' && (
+                <div>
+                  <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
+                    Minuti
+                  </label>
+                  <input
+                    type="number"
+                    min="15"
+                    max="1440"
+                    value={customMinutes}
+                    onChange={(e) => setCustomMinutes(Number(e.target.value))}
+                    className="w-full px-4 py-3 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-xl text-neutral-900 dark:text-white focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-600 focus:border-transparent transition-all duration-200"
+                    placeholder="Es: 90 per 1h 30min"
+                  />
+                </div>
+              )}
+            </>
+          )}
+
+          {/* End Time Mode */}
+          {inputMode === 'endTime' && (
             <div>
               <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
-                Minuti
+                ⏰ Ora fine
               </label>
               <input
-                type="number"
-                min="15"
-                max="1440"
-                value={customMinutes}
-                onChange={(e) => setCustomMinutes(Number(e.target.value))}
+                type="time"
+                value={end}
+                onChange={(e) => setEnd(e.target.value)}
                 className="w-full px-4 py-3 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-xl text-neutral-900 dark:text-white focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-600 focus:border-transparent transition-all duration-200"
-                placeholder="Es: 90 per 1h 30min"
               />
             </div>
           )}
 
           {/* End Time Preview */}
           <div className="p-4 bg-neutral-100 dark:bg-neutral-800/50 rounded-xl">
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Orario fine calcolato:</p>
-            <p className="text-2xl font-bold text-neutral-900 dark:text-white">{end}</p>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
+              {inputMode === 'duration' ? 'Orario fine calcolato:' : 'Orario fine selezionato:'}
+            </p>
+            <p className="text-2xl font-bold text-neutral-900 dark:text-white">{calculatedEnd}</p>
             {!isValidInterval() && (
               <p className="text-sm text-red-600 dark:text-red-400 mt-2">
                 ⚠️ {durationPreset === 'custom' && customMinutes < 15
@@ -274,7 +364,7 @@ export default function AddIntervalModal({
             disabled={!isValidInterval()}
             className="flex-1"
           >
-            Aggiungi Intervallo
+            {mode === 'edit' ? 'Salva Modifiche' : 'Aggiungi Intervallo'}
           </Button>
         </div>
       </Card>

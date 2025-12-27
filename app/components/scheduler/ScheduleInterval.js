@@ -1,11 +1,13 @@
 import Input from '../ui/Input';
 import Select from '../ui/Select';
 import { getPowerBadgeClass, getFanBadgeClass } from '@/lib/schedulerStats';
+import { Edit2 } from 'lucide-react';
 
 export default function ScheduleInterval({
   range,
   onRemove,
   onChange,
+  onEdit,
   isHighlighted = false,
   onMouseEnter,
   onMouseLeave,
@@ -102,15 +104,36 @@ export default function ScheduleInterval({
             </div>
           </div>
 
-          {/* Pulsante rimuovi */}
-          <button
-            onClick={onRemove}
-            className="p-3 text-xl text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-xl transition-colors duration-200 border border-primary-200 dark:border-primary-700 min-h-[44px] min-w-[44px]"
-            title="Rimuovi intervallo"
-            aria-label="Rimuovi intervallo"
-          >
-            🗑️
-          </button>
+          {/* Pulsanti azioni */}
+          <div className="flex gap-2">
+            {/* Pulsante modifica */}
+            {onEdit && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                }}
+                className="p-3 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-colors duration-200 border border-blue-200 dark:border-blue-700 min-h-[44px] min-w-[44px]"
+                title="Modifica intervallo"
+                aria-label="Modifica intervallo"
+              >
+                <Edit2 className="w-5 h-5" />
+              </button>
+            )}
+
+            {/* Pulsante rimuovi */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove();
+              }}
+              className="p-3 text-xl text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-xl transition-colors duration-200 border border-primary-200 dark:border-primary-700 min-h-[44px] min-w-[44px]"
+              title="Rimuovi intervallo"
+              aria-label="Rimuovi intervallo"
+            >
+              🗑️
+            </button>
+          </div>
         </div>
       </div>
     </div>

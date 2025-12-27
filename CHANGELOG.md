@@ -5,6 +5,20 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.26.5] - 2025-12-27
+
+### Aggiunto
+- **Toggle Durata/Ora Fine**: switch modalità inserimento (⏱️ Durata preset vs ⏰ Ora Fine diretta)
+- **Edit Mode**: AddIntervalModal supporta modalità edit per modificare intervalli esistenti
+- **Pulsante Edit**: button modifica (icona Edit2 lucide-react) in ogni ScheduleInterval
+- **Handler Edit**: `handleEditIntervalRequest` apre modal con dati precompilati
+
+### Migliorato
+- **Input Mode Auto**: edit mode seleziona automaticamente inputMode endTime
+- **Preview Dynamic**: testo cambia da "calcolato" a "selezionato" a seconda modalità
+- **Button/Title Dynamic**: conferma e titolo cambiano tra add/edit mode
+- **Click Handling**: stopPropagation su edit/remove per evitare conflitti
+
 ## [1.26.4] - 2025-12-27
 
 ### Aggiunto

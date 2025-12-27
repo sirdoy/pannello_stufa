@@ -44,7 +44,10 @@ export default function WeeklyScheduler() {
   });
   const [addIntervalModal, setAddIntervalModal] = useState({
     isOpen: false,
+    mode: 'add', // 'add' or 'edit'
     day: null,
+    index: null, // For edit mode
+    initialInterval: null, // For edit mode
     suggestedStart: '00:00',
   });
   const [toast, setToast] = useState(null);
@@ -144,8 +147,23 @@ export default function WeeklyScheduler() {
     // Open modal with suggested start time
     setAddIntervalModal({
       isOpen: true,
+      mode: 'add',
       day,
+      index: null,
+      initialInterval: null,
       suggestedStart: lastEnd,
+    });
+  };
+
+  const handleEditIntervalRequest = (day, index) => {
+    const interval = schedule[day][index];
+    setAddIntervalModal({
+      isOpen: true,
+      mode: 'edit',
+      day,
+      index,
+      initialInterval: interval,
+      suggestedStart: interval.start,
     });
   };
 
@@ -418,21 +436,22 @@ export default function WeeklyScheduler() {
     setDuplicateModal({ isOpen: false, sourceDay: null });
   };
 
-  const handleConfirmAddInterval = async ({ start, duration, power, fan }) => {
-    const { day } = addIntervalModal;
+  const handleConfirmAddInterval = async ({ start, end, duration, power, fan }) => {
+    const { day, mode, index } = addIntervalModal;
 
-    // Calculate end time
-    const [h, m] = start.split(':').map(Number);
-    const totalMinutes = h * 60 + m + duration;
-    const endH = String(Math.floor(totalMinutes / 60) % 24).padStart(2, '0');
-    const endM = String(totalMinutes % 60).padStart(2, '0');
-    const end = `${endH}:${endM}`;
-
-    const newRange = { start, end, power, fan };
-
-    // Add and sort
+    const intervalData = { start, end, power, fan };
     const daySchedule = schedule[day];
-    const newSchedule = sortIntervals([...daySchedule, newRange]);
+    let newSchedule;
+
+    if (mode === 'edit') {
+      // Edit mode: replace existing interval
+      newSchedule = [...daySchedule];
+      newSchedule[index] = intervalData;
+      newSchedule = sortIntervals(newSchedule);
+    } else {
+      // Add mode: add new interval
+      newSchedule = sortIntervals([...daySchedule, intervalData]);
+    }
 
     const updatedSchedule = {
       ...schedule,
@@ -442,13 +461,22 @@ export default function WeeklyScheduler() {
 
     try {
       await saveSchedule(day, newSchedule);
-      await logSchedulerAction.addInterval(day);
 
-      setToast({
-        message: 'Intervallo aggiunto',
-        icon: '✅',
-        variant: 'success',
-      });
+      if (mode === 'edit') {
+        await logSchedulerAction.updateSchedule(day);
+        setToast({
+          message: 'Intervallo modificato',
+          icon: '✅',
+          variant: 'success',
+        });
+      } else {
+        await logSchedulerAction.addInterval(day);
+        setToast({
+          message: 'Intervallo aggiunto',
+          icon: '✅',
+          variant: 'success',
+        });
+      }
     } catch (error) {
       setToast({
         message: 'Errore durante il salvataggio',
@@ -458,11 +486,25 @@ export default function WeeklyScheduler() {
     }
 
     // Close modal
-    setAddIntervalModal({ isOpen: false, day: null, suggestedStart: '00:00' });
+    setAddIntervalModal({
+      isOpen: false,
+      mode: 'add',
+      day: null,
+      index: null,
+      initialInterval: null,
+      suggestedStart: '00:00',
+    });
   };
 
   const handleCancelAddInterval = () => {
-    setAddIntervalModal({ isOpen: false, day: null, suggestedStart: '00:00' });
+    setAddIntervalModal({
+      isOpen: false,
+      mode: 'add',
+      day: null,
+      index: null,
+      initialInterval: null,
+      suggestedStart: '00:00',
+    });
   };
 
   if (loading) {
@@ -536,6 +578,7 @@ export default function WeeklyScheduler() {
         intervals={schedule[selectedDay] || []}
         onAddInterval={() => addTimeRange(selectedDay)}
         onEditInterval={(index, field, value, isBlur) => handleChange(selectedDay, index, field, value, isBlur)}
+        onEditIntervalModal={(index) => handleEditIntervalRequest(selectedDay, index)}
         onDeleteInterval={(index) => handleRemoveIntervalRequest(selectedDay, index)}
         onDuplicate={handleDuplicateDay}
         saveStatus={saveStatus.day === selectedDay ? saveStatus : null}
@@ -563,10 +606,12 @@ export default function WeeklyScheduler() {
         onCancel={handleCancelDuplicate}
       />
 
-      {/* Add Interval Modal */}
+      {/* Add/Edit Interval Modal */}
       <AddIntervalModal
         isOpen={addIntervalModal.isOpen}
+        mode={addIntervalModal.mode}
         day={addIntervalModal.day}
+        initialInterval={addIntervalModal.initialInterval}
         suggestedStart={addIntervalModal.suggestedStart}
         onConfirm={handleConfirmAddInterval}
         onCancel={handleCancelAddInterval}

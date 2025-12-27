@@ -6,6 +6,7 @@ import Button from '../ui/Button';
 import TimeBar from './TimeBar';
 import ScheduleInterval from './ScheduleInterval';
 import { getDayTotalHours } from '@/lib/schedulerStats';
+import { Copy } from 'lucide-react';
 
 export default function DayEditPanel({
   day,
@@ -13,6 +14,7 @@ export default function DayEditPanel({
   onAddInterval,
   onEditInterval,
   onDeleteInterval,
+  onDuplicate,
   saveStatus,
 }) {
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -53,14 +55,29 @@ export default function DayEditPanel({
           )}
         </div>
 
-        <Button
-          liquid
-          variant="success"
-          onClick={() => onAddInterval(day)}
-          icon="+"
-        >
-          Aggiungi intervallo
-        </Button>
+        <div className="flex gap-3">
+          {/* Duplicate button - only if intervals exist */}
+          {intervals.length > 0 && onDuplicate && (
+            <Button
+              liquid
+              variant="secondary"
+              onClick={() => onDuplicate(day)}
+              icon={<Copy className="w-4 h-4" />}
+              title="Duplica su altri giorni"
+            >
+              Duplica
+            </Button>
+          )}
+
+          <Button
+            liquid
+            variant="success"
+            onClick={() => onAddInterval(day)}
+            icon="+"
+          >
+            Aggiungi intervallo
+          </Button>
+        </div>
       </div>
 
       {/* Timeline visual (if intervals exist) */}

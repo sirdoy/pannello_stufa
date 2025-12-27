@@ -5,6 +5,24 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.26.2] - 2025-12-27
+
+### Completato
+- **Duplicate Day Feature Implementation**: completata implementazione funzionalità duplicazione pianificazione
+  - **DayEditPanel**: aggiunto pulsante "Duplica" con icona Copy (lucide-react) quando esistono intervalli
+  - **DuplicateDayModal**: integrato modal con quick actions (giorni feriali/weekend/tutti)
+  - **Handler Functions**: implementati `handleDuplicateDay` (apre modal), `handleConfirmDuplicate` (esegue duplicazione)
+  - **Deep Copy Logic**: duplicazione sicura con map per evitare reference issues tra giorni
+  - **Firebase Sync**: salvataggio automatico Firebase per ogni giorno duplicato
+  - **Log Tracking**: chiamata `logSchedulerAction.duplicateDay(sourceDay, targetDay)` per storico
+  - **Toast Feedback**: notifica successo "Pianificazione duplicata su N giorni" 📋
+  - **Exclude Source**: giorno sorgente automaticamente escluso dalla lista target
+  - **Error Handling**: toast errore "Errore durante la duplicazione" in caso di fallimento
+
+### Risolto
+- **NODE_ENV Production Issue**: installazione devDependencies con `npm install --include=dev`
+- **Tailwindcss Missing**: risolto errore "Cannot find module 'tailwindcss'" durante build
+
 ## [1.26.1] - 2025-12-27
 
 ### Corretto

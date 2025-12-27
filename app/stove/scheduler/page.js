@@ -15,6 +15,7 @@ import ConfirmDialog from '@/app/components/ui/ConfirmDialog';
 import WeeklyTimeline from '@/app/components/scheduler/WeeklyTimeline';
 import DayEditPanel from '@/app/components/scheduler/DayEditPanel';
 import WeeklySummaryCard from '@/app/components/scheduler/WeeklySummaryCard';
+import DuplicateDayModal from '@/app/components/scheduler/DuplicateDayModal';
 
 const daysOfWeek = [
   'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'
@@ -35,6 +36,10 @@ export default function WeeklyScheduler() {
     isOpen: false,
     day: null,
     intervalIndex: null,
+  });
+  const [duplicateModal, setDuplicateModal] = useState({
+    isOpen: false,
+    sourceDay: null,
   });
   const [toast, setToast] = useState(null);
   const [lastLocalSave, setLastLocalSave] = useState(null);
@@ -371,6 +376,60 @@ export default function WeeklyScheduler() {
     setConfirmDialog({ isOpen: false, day: null, intervalIndex: null });
   };
 
+  const handleDuplicateDay = (sourceDay) => {
+    setDuplicateModal({
+      isOpen: true,
+      sourceDay,
+    });
+  };
+
+  const handleConfirmDuplicate = async (targetDays) => {
+    const { sourceDay } = duplicateModal;
+    const sourceIntervals = schedule[sourceDay];
+
+    if (!sourceIntervals || sourceIntervals.length === 0) {
+      setDuplicateModal({ isOpen: false, sourceDay: null });
+      return;
+    }
+
+    try {
+      // Duplicate to all selected days
+      const updatedSchedule = { ...schedule };
+
+      for (const targetDay of targetDays) {
+        // Deep copy intervals to avoid reference issues
+        const duplicatedIntervals = sourceIntervals.map(interval => ({ ...interval }));
+        updatedSchedule[targetDay] = sortIntervals(duplicatedIntervals);
+
+        // Save each day to Firebase
+        await saveSchedule(targetDay, duplicatedIntervals);
+        await logSchedulerAction.duplicateDay(sourceDay, targetDay);
+      }
+
+      // Update local state
+      setSchedule(updatedSchedule);
+
+      // Show success toast
+      setToast({
+        message: `Pianificazione duplicata su ${targetDays.length} ${targetDays.length === 1 ? 'giorno' : 'giorni'}`,
+        icon: '📋',
+        variant: 'success',
+      });
+    } catch (error) {
+      setToast({
+        message: 'Errore durante la duplicazione',
+        icon: '❌',
+        variant: 'error',
+      });
+    }
+
+    setDuplicateModal({ isOpen: false, sourceDay: null });
+  };
+
+  const handleCancelDuplicate = () => {
+    setDuplicateModal({ isOpen: false, sourceDay: null });
+  };
+
   if (loading) {
     return <Skeleton.Scheduler />;
   }
@@ -443,6 +502,7 @@ export default function WeeklyScheduler() {
         onAddInterval={() => addTimeRange(selectedDay)}
         onEditInterval={(index, field, value, isBlur) => handleChange(selectedDay, index, field, value, isBlur)}
         onDeleteInterval={(index) => handleRemoveIntervalRequest(selectedDay, index)}
+        onDuplicate={handleDuplicateDay}
         saveStatus={saveStatus.day === selectedDay ? saveStatus : null}
       />
 
@@ -457,6 +517,15 @@ export default function WeeklyScheduler() {
         icon="🗑️"
         onConfirm={handleConfirmRemoveInterval}
         onCancel={handleCancelRemoveInterval}
+      />
+
+      {/* Duplicate Day Modal */}
+      <DuplicateDayModal
+        isOpen={duplicateModal.isOpen}
+        sourceDay={duplicateModal.sourceDay}
+        excludeDays={[duplicateModal.sourceDay]}
+        onConfirm={handleConfirmDuplicate}
+        onCancel={handleCancelDuplicate}
       />
 
       {/* Toast Notifications */}

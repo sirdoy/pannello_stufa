@@ -49,14 +49,6 @@ export default function WeeklyScheduler() {
   });
   const [selectedDay, setSelectedDay] = useState('Lunedì'); // Selected day for edit panel
 
-  // Auto-select first day with intervals on load
-  useEffect(() => {
-    const firstDayWithIntervals = daysOfWeek.find(day => schedule[day] && schedule[day].length > 0);
-    if (firstDayWithIntervals) {
-      setSelectedDay(firstDayWithIntervals);
-    }
-  }, [schedule]);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -67,6 +59,12 @@ export default function WeeklyScheduler() {
           return acc;
         }, {});
         setSchedule(filledData);
+
+        // Auto-select first day with intervals ONLY on initial load
+        const firstDayWithIntervals = daysOfWeek.find(day => filledData[day] && filledData[day].length > 0);
+        if (firstDayWithIntervals) {
+          setSelectedDay(firstDayWithIntervals);
+        }
 
         const mode = await getFullSchedulerMode();
         setSchedulerEnabled(mode.enabled);

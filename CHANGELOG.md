@@ -5,6 +5,15 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.26.3] - 2025-12-27
+
+### Risolto
+- **Fix Auto-Select Day Bug**: rimosso `useEffect` con dependency `[schedule]` che causava reset del giorno selezionato
+  - Il bug faceva tornare sempre al primo giorno con intervalli (di solito Lunedì) dopo ogni modifica
+  - Auto-select ora integrato nell'useEffect di caricamento iniziale (esegue solo una volta al mount)
+  - `selectedDay` rimane stabile durante edit, duplicazione e modifiche agli intervalli
+  - Risolto comportamento frustrante dove ogni modifica resettava la vista al giorno iniziale
+
 ## [1.26.2] - 2025-12-27
 
 ### Completato

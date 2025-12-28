@@ -23,13 +23,12 @@ export const GET = auth0.withApiAuthRequired(async function handler(request) {
     }
 
     // Get home_id from Firebase
-    const homeIdSnap = await adminDbGet('netatmo/home_id');
-    if (!homeIdSnap.exists()) {
+    const homeId = await adminDbGet('netatmo/home_id');
+    if (!homeId) {
       return Response.json({
         error: 'home_id non trovato. Chiama prima /api/netatmo/homesdata'
       }, { status: 400 });
     }
-    const homeId = homeIdSnap.val();
 
     // Get home status
     const homeStatus = await NETATMO_API.getHomeStatus(accessToken, homeId);
@@ -38,8 +37,7 @@ export const GET = auth0.withApiAuthRequired(async function handler(request) {
     const temperatures = NETATMO_API.extractTemperatures(homeStatus);
 
     // Get topology to enrich data with room names
-    const topologySnap = await adminDbGet('netatmo/topology');
-    const topology = topologySnap.exists() ? topologySnap.val() : null;
+    const topology = await adminDbGet('netatmo/topology');
 
     // Enrich with room names (filter out undefined values for Firebase)
     const enrichedRooms = temperatures.map(temp => {

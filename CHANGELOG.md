@@ -5,6 +5,48 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.26.7] - 2025-12-28
+
+### 🚨 CRITICAL FIXES - Netatmo Integration
+
+**Context**: Analisi completa integrazione Netatmo ha rivelato 4 bug critici che impedivano completamente funzionamento controllo termostato.
+
+#### Risolto
+
+- **CRITICAL**: Bug in `app/api/netatmo/homesdata/route.js` - Variabili `set`, `ref`, `db` undefined causavano fallimento silenzioso salvataggio topologia. Corretto con uso `adminDbSet` (già importato).
+- **CRITICAL**: Bug in `app/api/netatmo/setroomthermpoint/route.js` - Variabile `db` undefined causava crash endpoint durante logging azioni utente. Corretto con import e uso `adminDbPush`.
+- **CRITICAL**: Bug in `app/api/netatmo/setthermmode/route.js` - Stessa issue di setroomthermpoint. Corretto con import e uso `adminDbPush`.
+- **CRITICAL**: Uso inconsistente `adminDbGet` in 3 routes - Codice chiamava erroneamente `.exists()` e `.val()` su valore diretto (non snapshot). Corretto uso diretto valore.
+
+#### Aggiunto
+
+- **Tests**: 31 unit tests per Netatmo integration (`netatmoTokenHelper.test.js`, `netatmoApi.test.js`)
+  - Token refresh flow (success, failure, rotation)
+  - Invalid token handling (auto-cleanup)
+  - Network error handling
+  - API data parsing (rooms, modules, temperatures)
+  - Firebase-safe value filtering
+  - OAuth 2.0 error mapping (401 vs 500)
+- **Docs**: `docs/netatmo-fixes-2025-12-28.md` - Analisi dettagliata bug trovati, fixes applicati, architettura OAuth 2.0, testing coverage
+
+#### Sicurezza
+
+- Verificato corretto uso Firebase Admin SDK: write operations SOLO server-side (Security Rules `.write = false`)
+- Confermato separazione Client SDK (read) / Admin SDK (write)
+
+#### Impatto
+
+- **Before**: 3 endpoint termostato (homesdata, setroomthermpoint, setthermmode) completamente non funzionanti
+- **After**: Tutti endpoint ripristinati, controllo termostato completamente operativo
+
+#### Dettagli Tecnici
+
+- Root cause: Copy-paste errors da client-side a server-side code
+- Missing imports: `firebase/database` erroneamente usato invece di `firebaseAdmin`
+- API misunderstanding: `adminDbGet` ritorna valore diretto, non snapshot object
+
+---
+
 ## [1.26.5] - 2025-12-27
 
 ### Aggiunto

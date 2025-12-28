@@ -1,5 +1,5 @@
 
-import { adminDbGet } from '@/lib/firebaseAdmin';
+import { adminDbGet, adminDbPush } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
 import { auth0 } from '@/lib/auth0';
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
@@ -55,13 +55,12 @@ export const POST = auth0.withApiAuthRequired(async function handler(request) {
     }
 
     // Get home_id from Firebase
-    const homeIdSnap = await adminDbGet('netatmo/home_id');
-    if (!homeIdSnap.exists()) {
+    const homeId = await adminDbGet('netatmo/home_id');
+    if (!homeId) {
       return Response.json({
         error: 'home_id non trovato. Chiama prima /api/netatmo/homesdata'
       }, { status: 400 });
     }
-    const homeId = homeIdSnap.val();
 
     // Build request params
     const params = {
@@ -84,7 +83,7 @@ export const POST = auth0.withApiAuthRequired(async function handler(request) {
       return Response.json({ error: 'Comando non riuscito' }, { status: 500 });
     }
 
-    // Log action
+    // Log action using Admin SDK
     const logEntry = {
       action: 'netatmo_set_room_temp',
       room_id,
@@ -101,8 +100,7 @@ export const POST = auth0.withApiAuthRequired(async function handler(request) {
       source: 'manual',
     };
 
-    const { push, ref: dbRef } = await import('firebase/database');
-    await push(dbRef(db, 'log'), logEntry);
+    await adminDbPush('log', logEntry);
 
     return Response.json({ success: true });
   } catch (err) {

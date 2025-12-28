@@ -38,8 +38,8 @@ export const GET = auth0.withApiAuthRequired(async function handler(request) {
     const rooms = NETATMO_API.parseRooms(homesData);
     const modules = NETATMO_API.parseModules(homesData);
 
-    // Save topology to Firebase
-    await set(ref(db, 'netatmo/topology'), {
+    // Save topology to Firebase using Admin SDK
+    await adminDbSet('netatmo/topology', {
       home_id: home.id,
       home_name: home.name,
       rooms,

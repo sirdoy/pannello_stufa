@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useTheme } from '@/app/context/ThemeContext';
 import { THEMES } from '@/lib/themeService';
+import SettingsLayout from '@/app/components/SettingsLayout';
 import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
 import Skeleton from '@/app/components/ui/Skeleton';
@@ -37,36 +38,29 @@ export default function ThemeSettingsPage() {
   // Loading state
   if (userLoading || themeLoading) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-10 w-48" />
+      <SettingsLayout title="Tema" icon="🎨">
         <Skeleton className="h-64 w-full" />
-      </div>
+      </SettingsLayout>
     );
   }
 
   // Not authenticated
   if (!user) {
     return (
-      <div className="space-y-6">
-        <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">
-          Tema
-        </h1>
+      <SettingsLayout title="Tema" icon="🎨">
         <Card liquid>
           <p className="text-neutral-600 dark:text-neutral-400">
             Devi essere autenticato per gestire il tema.
           </p>
         </Card>
-      </div>
+      </SettingsLayout>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <SettingsLayout title="Tema" icon="🎨">
+      {/* Description */}
       <div>
-        <h1 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2">
-          🎨 Tema
-        </h1>
         <p className="text-neutral-600 dark:text-neutral-400">
           Scegli la modalità chiara o scura per l&apos;interfaccia
         </p>
@@ -226,6 +220,6 @@ export default function ThemeSettingsPage() {
           </div>
         </div>
       </Card>
-    </div>
+    </SettingsLayout>
   );
 }

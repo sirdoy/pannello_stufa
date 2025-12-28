@@ -5,6 +5,98 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.26.8] - 2025-12-28
+
+### ✨ UI/UX - Revisione Completa Sezione Impostazioni
+
+**Context**: Analisi sistematica sezione settings ha identificato 10 problemi di inconsistenza UI/UX tra Theme, Notifications e Devices pages. Risolti tutti con componenti unificati e dark mode completo.
+
+#### Aggiunto
+
+- **SettingsLayout Component** (`app/components/SettingsLayout.js`) - Layout wrapper unificato per tutte le pagine impostazioni
+  - Background gradient con dark mode support (`bg-gradient-to-br from-neutral-50 via-white to-neutral-100 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800`)
+  - Container max-width 4xl consistente per tutte le pagine
+  - Back button configurabile con `showBackButton` e `backHref` props
+  - Header standardizzato con emoji icon opzionale
+- **Toggle Component** (`app/components/ui/Toggle.js`) - Switch riutilizzabile per tutto il progetto
+  - 2 dimensioni: `sm` (h-6 w-11) e `md` (h-8 w-14)
+  - Dark mode completo con gradient primary quando attivo
+  - Accessibilità ARIA (role="switch", aria-checked, aria-label)
+  - Focus states ottimizzati (ring-2 ring-primary-500)
+  - Esportato in `ui/index.js` per riutilizzo globale
+
+#### Modificato
+
+- **Theme Page** (`app/settings/theme/page.js`) - Refactored con SettingsLayout
+  - Rimosso wrapper custom, usa SettingsLayout con icon="🎨"
+  - Dark mode aggiunto a tutti i testi e preview cards
+  - Layout consistente con altre settings pages
+- **Notifications Page** (`app/settings/notifications/page.js`) - Unificato layout e dark mode
+  - Sostituito wrapper custom full-page con SettingsLayout
+  - Device list cards: rimossi glass effects hardcoded, ora usa `<Card liquid>`
+  - Dark mode completo (backgrounds, testi, borders)
+  - Info iOS card con dark variants
+- **Devices Page** (`app/settings/devices/page.js`) - Toggle component e layout unificato
+  - Sostituito toggle switch inline con `<Toggle>` component
+  - SettingsLayout con icon="📱"
+  - Dark mode su tutti gli elementi (device cards, badges, info card)
+  - Header standardizzato (rimosso gradient text per consistenza)
+- **NotificationPreferencesPanel** (`app/components/NotificationPreferencesPanel.js`) - Refactored toggle implementation
+  - Creato `PreferenceToggle` wrapper che usa `<Toggle size="sm">`
+  - Sostituiti 10+ toggle inline con component riutilizzabile
+  - Dark mode su headers, borders, testi
+
+#### Risolto
+
+**Layout Inconsistency Issues**:
+- ❌ **BEFORE**: Theme page usa layout root (max-w-7xl), Notifications/Devices usano wrapper custom (max-w-4xl)
+- ✅ **AFTER**: Tutte le pagine usano SettingsLayout con max-w-4xl uniforme
+
+**Dark Mode Missing**:
+- ❌ **BEFORE**: Notifications/Devices hanno background gradients senza dark: variants
+- ✅ **AFTER**: Dark mode completo su backgrounds, testi, borders in tutte le pagine
+
+**Duplicate Toggle Implementations**:
+- ❌ **BEFORE**: 2 implementazioni diverse - Devices (h-8 w-14) vs NotificationPreferences (h-6 w-11)
+- ✅ **AFTER**: 1 componente Toggle riutilizzabile con size prop (sm/md)
+
+**Hardcoded Glass Effects**:
+- ❌ **BEFORE**: Device list in Notifications usa inline `bg-white/[0.08] backdrop-blur-3xl shadow-liquid-sm`
+- ✅ **AFTER**: Usa `<Card liquid>` component per consistenza
+
+**Inconsistent Back Buttons**:
+- ❌ **BEFORE**: Solo Notifications page ha back button
+- ✅ **AFTER**: Tutte le pagine hanno back button via SettingsLayout (configurabile con showBackButton prop)
+
+**Header Styling Inconsistency**:
+- ❌ **BEFORE**: Devices usa gradient text (`bg-gradient-to-r from-primary-500 to-accent-500`), altri no
+- ✅ **AFTER**: Header standardizzato con emoji + solid text (`text-neutral-900 dark:text-white`)
+
+#### Accessibility
+
+- Toggle component con ARIA attributes corretti (role, aria-checked, aria-label)
+- Focus states visibili (focus:ring-2 focus:ring-primary-500)
+- Disabled states con opacity ridotta e cursor-not-allowed
+- Labels descrittivi per screen readers
+
+#### Design System
+
+**Uniformità raggiunta**:
+| Elemento | Prima | Dopo |
+|----------|-------|------|
+| Layout | 3 pattern diversi | 1 SettingsLayout unificato |
+| Max-width | 7xl vs 4xl | 4xl consistente |
+| Dark mode | Parziale | Completo 100% |
+| Toggle | 2 implementazioni | 1 componente |
+| Back button | Solo 1 pagina | Tutte le pagine |
+| Headers | Gradient vs solid | Emoji + solid uniforme |
+
+**Files Changed**: 7 (5 modificati, 2 nuovi)
+**Problemi risolti**: 10
+**Componenti creati**: 2
+
+---
+
 ## [1.26.7] - 2025-12-28
 
 ### 🚨 CRITICAL FIXES - Netatmo Integration

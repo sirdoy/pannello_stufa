@@ -19,41 +19,27 @@ import Card from './ui/Card';
 import Button from './ui/Button';
 import Banner from './ui/Banner';
 import Skeleton from './ui/Skeleton';
+import Toggle from './ui/Toggle';
 
 /**
- * Toggle Switch Component
+ * PreferenceToggle - Wrapper for Toggle with label and description
  */
-function Toggle({ label, description, checked, onChange, disabled = false }) {
+function PreferenceToggle({ label, description, checked, onChange, disabled = false }) {
   return (
     <div className="flex items-start justify-between gap-4 py-3">
       <div className="flex-1">
-        <div className="font-medium text-neutral-800">{label}</div>
+        <div className="font-medium text-neutral-900 dark:text-white">{label}</div>
         {description && (
-          <div className="text-sm text-neutral-600 mt-0.5">{description}</div>
+          <div className="text-sm text-neutral-600 dark:text-neutral-400 mt-0.5">{description}</div>
         )}
       </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={checked}
-        onClick={() => onChange(!checked)}
+      <Toggle
+        checked={checked}
+        onChange={onChange}
         disabled={disabled}
-        className={`
-          relative inline-flex h-6 w-11 items-center rounded-full
-          transition-colors duration-200 ease-in-out
-          focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
-          disabled:opacity-50 disabled:cursor-not-allowed
-          ${checked ? 'bg-primary-600' : 'bg-neutral-300'}
-        `}
-      >
-        <span
-          className={`
-            inline-block h-4 w-4 transform rounded-full bg-white
-            transition-transform duration-200 ease-in-out
-            ${checked ? 'translate-x-6' : 'translate-x-1'}
-          `}
-        />
-      </button>
+        label={label}
+        size="sm"
+      />
     </div>
   );
 }
@@ -216,18 +202,18 @@ export default function NotificationPreferencesPanel() {
       <Card liquid className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-lg font-semibold text-neutral-800 flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
               <span>🚨</span>
               <span>Errori Stufa</span>
             </h3>
-            <p className="text-sm text-neutral-600 mt-1">
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
               Notifiche quando si verificano errori o allarmi
             </p>
           </div>
         </div>
 
-        <div className="border-t border-neutral-200 mt-4">
-          <Toggle
+        <div className="border-t border-neutral-200 dark:border-neutral-700 mt-4">
+          <PreferenceToggle
             label="Abilita notifiche errori"
             description="Ricevi notifiche per tutti gli errori della stufa"
             checked={preferences.errors?.enabled ?? true}
@@ -239,8 +225,8 @@ export default function NotificationPreferencesPanel() {
           />
 
           {preferences.errors?.enabled && (
-            <div className="ml-4 pl-4 border-l-2 border-neutral-200 space-y-1">
-              <Toggle
+            <div className="ml-4 pl-4 border-l-2 border-neutral-200 dark:border-neutral-700 space-y-1">
+              <PreferenceToggle
                 label="ℹ️ INFO"
                 description="Notifiche informative (non critiche)"
                 checked={preferences.errors?.severityLevels?.info ?? false}
@@ -254,7 +240,7 @@ export default function NotificationPreferencesPanel() {
                 disabled={isSaving}
               />
 
-              <Toggle
+              <PreferenceToggle
                 label="⚠️ WARNING"
                 description="Avvisi che richiedono attenzione"
                 checked={preferences.errors?.severityLevels?.warning ?? true}
@@ -268,7 +254,7 @@ export default function NotificationPreferencesPanel() {
                 disabled={isSaving}
               />
 
-              <Toggle
+              <PreferenceToggle
                 label="❌ ERROR"
                 description="Errori che possono influire sul funzionamento"
                 checked={preferences.errors?.severityLevels?.error ?? true}
@@ -282,7 +268,7 @@ export default function NotificationPreferencesPanel() {
                 disabled={isSaving}
               />
 
-              <Toggle
+              <PreferenceToggle
                 label="🚨 CRITICAL"
                 description="Errori critici che richiedono intervento immediato"
                 checked={preferences.errors?.severityLevels?.critical ?? true}
@@ -304,18 +290,18 @@ export default function NotificationPreferencesPanel() {
       <Card liquid className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-lg font-semibold text-neutral-800 flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
               <span>⏰</span>
               <span>Scheduler Automatico</span>
             </h3>
-            <p className="text-sm text-neutral-600 mt-1">
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
               Notifiche per azioni eseguite automaticamente dallo scheduler
             </p>
           </div>
         </div>
 
-        <div className="border-t border-neutral-200 mt-4">
-          <Toggle
+        <div className="border-t border-neutral-200 dark:border-neutral-700 mt-4">
+          <PreferenceToggle
             label="Abilita notifiche scheduler"
             description="Ricevi notifiche per azioni automatiche dello scheduler"
             checked={preferences.scheduler?.enabled ?? true}
@@ -327,8 +313,8 @@ export default function NotificationPreferencesPanel() {
           />
 
           {preferences.scheduler?.enabled && (
-            <div className="ml-4 pl-4 border-l-2 border-neutral-200 space-y-1">
-              <Toggle
+            <div className="ml-4 pl-4 border-l-2 border-neutral-200 dark:border-neutral-700 space-y-1">
+              <PreferenceToggle
                 label="🔥 Accensione automatica"
                 description="Notifica quando la stufa viene accesa dallo scheduler"
                 checked={preferences.scheduler?.ignition ?? true}
@@ -339,7 +325,7 @@ export default function NotificationPreferencesPanel() {
                 disabled={isSaving}
               />
 
-              <Toggle
+              <PreferenceToggle
                 label="🌙 Spegnimento automatico"
                 description="Notifica quando la stufa viene spenta dallo scheduler"
                 checked={preferences.scheduler?.shutdown ?? true}
@@ -358,18 +344,18 @@ export default function NotificationPreferencesPanel() {
       <Card liquid className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-lg font-semibold text-neutral-800 flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
               <span>🔧</span>
               <span>Manutenzione</span>
             </h3>
-            <p className="text-sm text-neutral-600 mt-1">
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
               Promemoria per manutenzione periodica della stufa
             </p>
           </div>
         </div>
 
-        <div className="border-t border-neutral-200 mt-4">
-          <Toggle
+        <div className="border-t border-neutral-200 dark:border-neutral-700 mt-4">
+          <PreferenceToggle
             label="Abilita notifiche manutenzione"
             description="Ricevi promemoria quando si avvicina la pulizia"
             checked={preferences.maintenance?.enabled ?? true}
@@ -381,8 +367,8 @@ export default function NotificationPreferencesPanel() {
           />
 
           {preferences.maintenance?.enabled && (
-            <div className="ml-4 pl-4 border-l-2 border-neutral-200 space-y-1">
-              <Toggle
+            <div className="ml-4 pl-4 border-l-2 border-neutral-200 dark:border-neutral-700 space-y-1">
+              <PreferenceToggle
                 label="ℹ️ Promemoria 80%"
                 description="Notifica quando raggiungi l&apos;80% delle ore utilizzo"
                 checked={preferences.maintenance?.threshold80 ?? true}
@@ -393,7 +379,7 @@ export default function NotificationPreferencesPanel() {
                 disabled={isSaving}
               />
 
-              <Toggle
+              <PreferenceToggle
                 label="⚠️ Attenzione 90%"
                 description="Notifica quando raggiungi il 90% delle ore utilizzo"
                 checked={preferences.maintenance?.threshold90 ?? true}
@@ -404,7 +390,7 @@ export default function NotificationPreferencesPanel() {
                 disabled={isSaving}
               />
 
-              <Toggle
+              <PreferenceToggle
                 label="🚨 Urgente 100%"
                 description="Notifica critica quando manutenzione richiesta (blocca accensione)"
                 checked={preferences.maintenance?.threshold100 ?? true}

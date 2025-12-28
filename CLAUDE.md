@@ -161,7 +161,7 @@ node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require(
 2. 🟠 **ALWAYS** update version after changes (`lib/version.js`, `package.json`, `CHANGELOG.md`)
 3. 🟡 **PREFER** editing existing files over creating new ones
 4. 🟢 **MAINTAIN** coding patterns → [docs/patterns.md](docs/patterns.md)
-5. 🔵 **TEST** `npm run build` before commit (user must run it, not Claude)
+5. 🔵 **NEVER** execute `npm run build` - strictly user-only command
 6. ⚡ **ALWAYS** create/update unit tests → [docs/testing.md](docs/testing.md)
 7. 📚 **UPDATE DOCS** when adding features (in `docs/`, not in CLAUDE.md)
 

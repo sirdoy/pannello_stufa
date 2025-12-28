@@ -5,6 +5,63 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.29.0] - 2025-12-28
+
+### 🔒 Security Enhancement: Middleware Authentication Upgrade
+
+**Context**: Enhanced Next.js middleware authentication from manual cookie existence checks to full Auth0 `getSession()` validation with JWT signature verification, expiration checks, and claims validation.
+
+#### Aggiunto
+
+- **Auth0 getSession() Integration** - Official SDK token validation
+  - Full JWT signature verification on every request
+  - Token expiration validation before page render
+  - Claims validation for session integrity
+  - Server-side logout detection (invalid sessions rejected)
+- **Documentation: Authentication Middleware** - New comprehensive section
+  - Added to `docs/architecture.md` (lines 425-527)
+  - Manual testing checklist (5-point verification)
+  - Defense-in-depth pattern documented
+  - TEST_MODE bypass for E2E testing explained
+
+#### Modificato
+
+- **middleware.js (lines 18-31)** - Replaced vulnerable cookie check
+  - Before: `req.cookies.get('appSession')` (only checks cookie existence)
+  - After: `await auth0.getSession(req)` (full token validation)
+  - Closes security gap: invalid/expired sessions can no longer access protected pages
+- **CLAUDE.md (line 164)** - Updated build command rule
+  - Changed: "TEST npm run build before commit (user must run it, not Claude)"
+  - To: "NEVER execute npm run build - strictly user-only command"
+
+#### Rimosso
+
+- **Manual Cookie Validation** - Insecure pattern eliminated
+  - No signature verification ❌
+  - No expiration check ❌
+  - No claims validation ❌
+  - Corrupted cookies accepted ❌
+
+#### Security Improvements
+
+| Aspect | Before (Vulnerable) | After (Secure) |
+|--------|---------------------|----------------|
+| Signature Verification | ❌ None | ✅ Full JWT verification |
+| Expiration Check | ❌ None | ✅ Token expiration validated |
+| Claims Validation | ❌ None | ✅ Claims verified |
+| Corrupted Cookies | ❌ Accepted | ✅ Rejected |
+| Server Logout | ❌ Not detected | ✅ Detected |
+
+#### Breaking Changes
+
+- **None** - Authentication flow identical, only validation enhanced
+
+#### Migration Notes
+
+- No code changes required
+- Manual testing recommended (see docs/architecture.md checklist)
+- TEST_MODE bypass preserved for E2E tests
+
 ## [1.28.0] - 2025-12-28
 
 ### 🎨 Desktop Navigation Premium Redesign + Mobile Fixes

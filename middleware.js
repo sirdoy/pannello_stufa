@@ -15,19 +15,19 @@ export async function middleware(req) {
     return authResponse;
   }
 
-  // For non-auth routes, verify session is valid
-  // CRITICAL: After logout, cookie may exist but be invalid/empty
-  const sessionCookie = req.cookies.get('appSession');
+  // For non-auth routes, validate session with Auth0
+  // CRITICAL: getSession() validates token signature, expiration, and claims
+  const session = await auth0.getSession(req);
 
-  if (!sessionCookie || !sessionCookie.value) {
-    // No session cookie or empty cookie - redirect to login
+  if (!session) {
+    // No valid session - redirect to login with returnTo parameter
     const loginUrl = new URL('/auth/login', req.url);
     loginUrl.searchParams.set('returnTo', req.nextUrl.pathname + req.nextUrl.search);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Session cookie exists with value - allow request to proceed
-  // Note: API routes will do their own validation with withApiAuthRequired
+  // Valid session exists - allow request to proceed
+  // Note: Defense-in-depth - Server Components also validate with getSession()
   return NextResponse.next();
 }
 

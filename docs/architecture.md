@@ -422,6 +422,109 @@ Context hook per enforcement versione obbligatoria.
 
 **Implementazione**: `app/context/VersionContext.js`
 
+## Authentication Middleware
+
+Pattern di autenticazione globale con validazione sessione Auth0 in middleware.
+
+**File**: `middleware.js`
+
+### Implementazione
+
+```javascript
+import { NextResponse } from 'next/server';
+import { auth0 } from '@/lib/auth0';
+
+export async function middleware(req) {
+  // Step 1: Bypass in test mode
+  if (process.env.TEST_MODE === 'true') {
+    return NextResponse.next();
+  }
+
+  // Step 2: Delega route auth ad Auth0 middleware
+  const authResponse = await auth0.middleware(req);
+  if (authResponse) {
+    return authResponse;
+  }
+
+  // Step 3: Valida sessione con Auth0
+  const session = await auth0.getSession(req);
+  if (!session) {
+    const loginUrl = new URL('/auth/login', req.url);
+    loginUrl.searchParams.set('returnTo', req.nextUrl.pathname + req.nextUrl.search);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Step 4: Consenti accesso
+  return NextResponse.next();
+}
+```
+
+### Caratteristiche Principali
+
+1. **TEST_MODE Bypass**: Permette test E2E senza autenticazione
+2. **Gestione Route Auth**: Delega `/auth/*` routes ad Auth0 SDK
+3. **Validazione Sessione**: Usa `getSession(request)` per verifica completa token
+4. **Return URL**: Preserva URL destinazione per redirect post-login
+5. **Compatibilità PWA**: Matcher esclude service workers e manifests
+
+### Defense-in-Depth
+
+Middleware fornisce **primo layer** di protezione. Validare sempre sessione in:
+
+- **Server Components**: Usa `await auth0.getSession()` prima di renderizzare
+- **API Routes**: Usa `await auth0.getSession()` prima di accesso database
+- **Server Actions**: Usa `await auth0.getSession()` prima di mutazioni
+
+**Esempio Server Component**:
+
+```javascript
+// app/dashboard/page.js
+import { auth0 } from '@/lib/auth0';
+import { redirect } from 'next/navigation';
+
+export default async function DashboardPage() {
+  const session = await auth0.getSession();
+
+  if (!session) {
+    redirect('/auth/login?returnTo=/dashboard');
+  }
+
+  // Renderizza contenuto protetto
+  return <div>Welcome, {session.user.name}!</div>;
+}
+```
+
+**Rationale**: CVE-2025-29927 ha dimostrato che protezione solo middleware è insufficiente. Validare sempre al layer dati.
+
+### Matcher Configuration
+
+```javascript
+export const config = {
+  matcher: [
+    "/((?!api/scheduler/check|api/stove|api/admin|offline|_next|favicon.ico|icons|manifest.json|sw.js|firebase-messaging-sw.js).*)",
+  ],
+};
+```
+
+**Esclude**:
+- API pubbliche (`/api/scheduler/check`, `/api/admin`, etc.)
+- Asset PWA (`/offline`, `/manifest.json`, `/sw.js`, etc.)
+- Internal Next.js (`/_next/*`, `/favicon.ico`)
+
+**Include**:
+- Tutte le route pagine (`/`, `/dashboard`, etc.)
+- Route auth (`/auth/login`, `/auth/callback`) - gestite da `auth0.middleware()`
+
+### Testing Manuale
+
+1. **Accesso non autenticato** → Redirect a login
+2. **Accesso autenticato** → Consenti accesso
+3. **Parametro returnTo** → Redirect a pagina corretta post-login
+4. **TEST_MODE** → Bypass auth nei test
+5. **Asset PWA** → Accessibili senza auth
+
+**Implementazione**: `middleware.js:1-40`
+
 ## See Also
 
 - [API Routes](./api-routes.md) - API patterns e external integrations
@@ -431,4 +534,4 @@ Context hook per enforcement versione obbligatoria.
 
 ---
 
-**Last Updated**: 2025-10-21
+**Last Updated**: 2025-12-28

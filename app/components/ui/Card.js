@@ -1,9 +1,24 @@
+/**
+ * Card Component
+ *
+ * Versatile container with liquid glass, glassmorphism, and solid variants.
+ * Supports elevation system and multiple visual styles.
+ *
+ * @param {Object} props - Component props
+ * @param {ReactNode} props.children - Card content
+ * @param {boolean} props.liquid - Apply liquid glass style (iOS glassmorphism)
+ * @param {boolean} props.glass - Apply legacy glassmorphism style
+ * @param {'flat'|'base'|'elevated'|'floating'} props.elevation - Shadow elevation level
+ * @param {'default'|'outlined'|'flat'} props.variant - Card visual variant
+ * @param {string} props.className - Additional Tailwind classes
+ */
 export default function Card({
   children,
   className = '',
   glass = false,
   liquid = false,
   elevation = 'base', // 'flat' | 'base' | 'elevated' | 'floating'
+  variant = 'default', // 'default' | 'outlined' | 'flat' (new)
   ...props
 }) {
   const baseClasses = 'rounded-3xl transition-all duration-500';
@@ -50,11 +65,24 @@ export default function Card({
     ring-1 ring-neutral-200/50 dark:ring-neutral-700/50
   `;
 
-  const finalClasses = liquid
-    ? liquidClasses
-    : glass
-    ? glassClasses
-    : solidClasses;
+  // Variant styles (new)
+  const variantStyles = {
+    default: liquid ? liquidClasses : glass ? glassClasses : solidClasses,
+    outlined: `
+      bg-transparent
+      border-2 border-neutral-200 dark:border-neutral-700
+      shadow-none
+      hover:border-neutral-300 dark:hover:border-neutral-600
+      transition-colors duration-300
+    `,
+    flat: `
+      bg-neutral-50 dark:bg-neutral-900
+      shadow-none
+      ring-1 ring-neutral-100 dark:ring-neutral-800
+    `,
+  };
+
+  const finalClasses = variantStyles[variant];
 
   const dataAttributes = {};
   if (liquid) {

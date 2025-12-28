@@ -9,6 +9,7 @@ import Select from '../../ui/Select';
 import Skeleton from '../../ui/Skeleton';
 import Banner from '../../ui/Banner';
 import LoadingOverlay from '../../ui/LoadingOverlay';
+import { Divider, Heading, Text, EmptyState } from '../../ui';
 
 /**
  * ThermostatCard - Complete thermostat control for homepage
@@ -250,10 +251,10 @@ export default function ThermostatCard() {
             <div className="p-6 sm:p-8">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                <div className="flex items-center gap-2">
                   <span className="text-2xl sm:text-3xl">🌡️</span>
-                  <span>Termostato</span>
-                </h2>
+                  <Heading level={2} size="xl">Termostato</Heading>
+                </div>
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-200 dark:bg-neutral-700 rounded-full">
                   <span className="w-2 h-2 bg-neutral-500 dark:bg-neutral-400 rounded-full"></span>
                   <span className="text-xs font-medium text-neutral-700 dark:text-neutral-300">Offline</span>
@@ -261,33 +262,30 @@ export default function ThermostatCard() {
               </div>
 
               {/* Not connected message */}
-              <div className="text-center py-8">
-                <div className="text-6xl mb-4">🔌</div>
-                <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-2">
-                  Termostato Non Connesso
-                </h3>
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6">
-                  Connetti il tuo account Netatmo per controllare il riscaldamento
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Button
-                    liquid
-                    variant="success"
-                    onClick={handleAuth}
-                    icon="🔗"
-                  >
-                    Connetti Netatmo
-                  </Button>
-                  <Button
-                    liquid
-                    variant="outline"
-                    onClick={() => router.push('/thermostat')}
-                  >
-                    Maggiori Info
-                  </Button>
-                </div>
-              </div>
+              <EmptyState
+                icon="🔌"
+                title="Termostato Non Connesso"
+                description="Connetti il tuo account Netatmo per controllare il riscaldamento"
+                action={
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Button
+                      liquid
+                      variant="success"
+                      onClick={handleAuth}
+                      icon="🔗"
+                    >
+                      Connetti Netatmo
+                    </Button>
+                    <Button
+                      liquid
+                      variant="outline"
+                      onClick={() => router.push('/thermostat')}
+                    >
+                      Maggiori Info
+                    </Button>
+                  </div>
+                }
+              />
 
               {error && (
                 <div className="mt-4">
@@ -336,22 +334,10 @@ export default function ThermostatCard() {
               </div>
             )}
 
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                <span className="text-2xl sm:text-3xl">🌡️</span>
-                <span>Termostato</span>
-              </h2>
-              <button
-                onClick={handleRefresh}
-                disabled={refreshing}
-                className="group relative p-3 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] hover:bg-white/[0.12] dark:hover:bg-white/[0.08] backdrop-blur-2xl shadow-liquid-sm hover:shadow-liquid active:scale-[0.98] transition-all duration-300 disabled:opacity-50 border border-white/20 dark:border-white/10 overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none"
-                title="Aggiorna stato"
-              >
-                <span className={`text-xl inline-block relative z-10 ${refreshing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`}>
-                  {refreshing ? '⏳' : '🔄'}
-                </span>
-              </button>
+            {/* Header - Simplified without refresh button */}
+            <div className="flex items-center gap-2 mb-6">
+              <span className="text-2xl sm:text-3xl">🌡️</span>
+              <Heading level={2} size="xl">Termostato</Heading>
             </div>
 
             {/* Room Selection */}
@@ -374,97 +360,112 @@ export default function ThermostatCard() {
             {/* Selected Room Temperature */}
             {selectedRoom ? (
               <div className="space-y-4 mb-4 sm:mb-6">
-                <div className="flex flex-col items-center justify-center p-4 sm:p-6 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-2xl border border-white/80 dark:border-white/10 shadow-sm">
+                {/* Main Temperature Display - Enhanced with gradient background */}
+                <div className={`relative rounded-2xl p-6 sm:p-8 shadow-liquid hover:shadow-liquid-lg transition-all duration-500 ${
+                  selectedRoom.heating
+                    ? 'bg-gradient-to-br from-warning-50 to-warning-100 dark:from-warning-900/20 dark:to-warning-800/20'
+                    : 'bg-gradient-to-br from-info-50 to-info-100 dark:from-info-900/20 dark:to-info-800/20'
+                }`}>
+                  {/* Heating Badge */}
+                  {selectedRoom.heating && (
+                    <div className="absolute -top-2 -right-2 z-20">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-warning-500/20 rounded-full blur-lg animate-pulse"></div>
+                        <div className="relative bg-gradient-to-br from-warning-500 to-warning-600 text-white px-3 py-1.5 rounded-full shadow-elevated-lg ring-2 ring-white/40">
+                          <span className="text-xs font-bold">🔥 ATTIVO</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Room name (solo se c'è una sola stanza) */}
                   {roomsWithStatus.length === 1 && (
-                    <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-2">
-                      {selectedRoom.name}
-                    </p>
+                    <div className="text-center mb-4">
+                      <Heading level={3} size="sm" variant="subtle" className="uppercase tracking-wider">
+                        {selectedRoom.name}
+                      </Heading>
+                    </div>
                   )}
 
-                  <div className="flex items-center gap-6">
-                    {/* Current temp */}
-                    <div className="text-center">
-                      <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">Attuale</p>
-                      <p className="text-4xl sm:text-5xl font-bold text-neutral-800 dark:text-neutral-100">
-                        {selectedRoom.temperature}°
-                      </p>
+                  {/* Temperature Display Grid */}
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    {/* Current Temperature Box */}
+                    <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.15] dark:bg-white/[0.08]">
+                      <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
+                        <Text variant="tertiary" className="mb-2 uppercase tracking-wider text-[10px] sm:text-xs font-bold">
+                          Attuale
+                        </Text>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-4xl sm:text-5xl font-black text-neutral-800 dark:text-neutral-100 leading-none">
+                            {selectedRoom.temperature}
+                          </span>
+                          <span className="text-2xl sm:text-3xl text-neutral-600 dark:text-neutral-400 font-bold">°</span>
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Arrow */}
+                    {/* Target Temperature Box */}
                     {selectedRoom.setpoint && (
-                      <>
-                        <div className="text-2xl text-neutral-400 dark:text-neutral-500">→</div>
-
-                        {/* Target temp */}
-                        <div className="text-center">
-                          <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">Target</p>
-                          <p className="text-4xl sm:text-5xl font-bold text-info-600 dark:text-info-400">
-                            {selectedRoom.setpoint}°
-                          </p>
+                      <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.15] dark:bg-white/[0.08]">
+                        <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
+                          <Text variant="tertiary" className="mb-2 uppercase tracking-wider text-[10px] sm:text-xs font-bold">
+                            Target
+                          </Text>
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-4xl sm:text-5xl font-black text-info-600 dark:text-info-400 leading-none">
+                              {selectedRoom.setpoint}
+                            </span>
+                            <span className="text-2xl sm:text-3xl text-info-500 dark:text-info-500 font-bold">°</span>
+                          </div>
                         </div>
-                      </>
+                      </div>
                     )}
                   </div>
-
-                  {/* Heating status */}
-                  {selectedRoom.heating && (
-                    <div className="mt-4 flex items-center gap-2 px-3 py-1.5 bg-warning-100 dark:bg-warning-900/30 rounded-full">
-                      <span className="text-lg animate-pulse">🔥</span>
-                      <span className="text-xs font-semibold text-warning-700 dark:text-warning-400">Riscaldamento Attivo</span>
-                    </div>
-                  )}
                 </div>
 
-                {/* Quick temperature controls */}
+                {/* Quick temperature controls - Enhanced */}
                 {selectedRoom.setpoint && (
-                  <div className="flex items-center gap-3">
-                    <Button
-                      liquid
-                      variant="outline"
-                      size="sm"
-                      icon="➖"
-                      onClick={() => handleTemperatureChange(selectedRoom.id, selectedRoom.setpoint - 0.5)}
-                      disabled={refreshing}
-                      className="flex-1"
-                    >
-                      -0.5°
-                    </Button>
-                    <div className="text-center px-4">
-                      <p className="text-xs text-neutral-500 dark:text-neutral-400">Imposta</p>
-                      <p className="text-lg font-bold text-neutral-800 dark:text-neutral-100">{selectedRoom.setpoint}°</p>
+                  <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10 p-4 sm:p-5">
+                    <div className="flex items-center gap-3">
+                      <Button
+                        liquid
+                        variant="outline"
+                        size="lg"
+                        icon="➖"
+                        onClick={() => handleTemperatureChange(selectedRoom.id, selectedRoom.setpoint - 0.5)}
+                        disabled={refreshing}
+                        className="flex-1 h-16 sm:h-18 text-lg font-bold"
+                      >
+                        -0.5°
+                      </Button>
+                      <div className="flex flex-col items-center justify-center px-4">
+                        <Text variant="tertiary" className="text-xs uppercase">Target</Text>
+                        <span className="text-2xl sm:text-3xl font-black text-info-600 dark:text-info-400">{selectedRoom.setpoint}°</span>
+                      </div>
+                      <Button
+                        liquid
+                        variant="outline"
+                        size="lg"
+                        icon="➕"
+                        onClick={() => handleTemperatureChange(selectedRoom.id, selectedRoom.setpoint + 0.5)}
+                        disabled={refreshing}
+                        className="flex-1 h-16 sm:h-18 text-lg font-bold"
+                      >
+                        +0.5°
+                      </Button>
                     </div>
-                    <Button
-                      liquid
-                      variant="outline"
-                      size="sm"
-                      icon="➕"
-                      onClick={() => handleTemperatureChange(selectedRoom.id, selectedRoom.setpoint + 0.5)}
-                      disabled={refreshing}
-                      className="flex-1"
-                    >
-                      +0.5°
-                    </Button>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="text-center py-8">
-                <p className="text-neutral-500 dark:text-neutral-400">Nessuna temperatura disponibile</p>
-              </div>
+              <EmptyState
+                icon="🌡️"
+                title="Nessuna temperatura disponibile"
+              />
             )}
 
             {/* Separator */}
-            <div className="relative my-6 sm:my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
-              </div>
-              <div className="relative flex justify-center">
-                <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm border border-white/20 dark:border-white/10 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
-                  <span className="relative z-10">Modalità</span>
-                </span>
-              </div>
-            </div>
+            <Divider label="Modalità" variant="gradient" spacing="large" />
 
             {/* Mode Control */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
@@ -522,37 +523,44 @@ export default function ThermostatCard() {
             </div>
 
             {/* Separator */}
-            <div className="relative my-6 sm:my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
-              </div>
-              <div className="relative flex justify-center">
-                <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm border border-white/20 dark:border-white/10 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
-                  <span className="relative z-10">Informazioni</span>
-                </span>
-              </div>
-            </div>
+            <Divider label="Informazioni" variant="gradient" spacing="large" />
 
-            {/* Summary Info */}
+            {/* Summary Info - Enhanced */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-              <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-xl border border-white/80 dark:border-white/10">
-                <span className="text-2xl sm:text-3xl mb-1">🏠</span>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">Casa</p>
-                <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100 truncate w-full text-center">
-                  {topology.home_name || '-'}
-                </p>
+              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10">
+                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
+                  <span className="text-3xl sm:text-4xl mb-2">🏠</span>
+                  <Text variant="tertiary" className="text-[10px] sm:text-xs uppercase tracking-wider font-bold mb-1">
+                    Casa
+                  </Text>
+                  <Heading level={4} size="sm" className="truncate w-full text-center">
+                    {topology.home_name || '-'}
+                  </Heading>
+                </div>
               </div>
 
-              <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-xl border border-white/80 dark:border-white/10">
-                <span className="text-2xl sm:text-3xl mb-1">🚪</span>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">Stanze</p>
-                <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100">{rooms.length}</p>
+              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10">
+                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
+                  <span className="text-3xl sm:text-4xl mb-2">🚪</span>
+                  <Text variant="tertiary" className="text-[10px] sm:text-xs uppercase tracking-wider font-bold mb-1">
+                    Stanze
+                  </Text>
+                  <span className="text-2xl sm:text-3xl font-black text-neutral-800 dark:text-neutral-100">
+                    {rooms.length}
+                  </span>
+                </div>
               </div>
 
-              <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-xl border border-white/80 dark:border-white/10 col-span-2 sm:col-span-1">
-                <span className="text-2xl sm:text-3xl mb-1">📡</span>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">Dispositivi</p>
-                <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100">{topology.modules?.length || 0}</p>
+              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10 col-span-2 sm:col-span-1">
+                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
+                  <span className="text-3xl sm:text-4xl mb-2">📡</span>
+                  <Text variant="tertiary" className="text-[10px] sm:text-xs uppercase tracking-wider font-bold mb-1">
+                    Dispositivi
+                  </Text>
+                  <span className="text-2xl sm:text-3xl font-black text-neutral-800 dark:text-neutral-100">
+                    {topology.modules?.length || 0}
+                  </span>
+                </div>
               </div>
             </div>
 

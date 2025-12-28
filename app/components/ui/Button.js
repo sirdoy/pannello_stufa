@@ -1,3 +1,21 @@
+/**
+ * Button Component
+ *
+ * Versatile button with liquid glass and solid variants, loading states, icon support.
+ * Supports accessibility and touch-friendly sizing (min 44px).
+ *
+ * @param {Object} props - Component props
+ * @param {ReactNode} props.children - Button text
+ * @param {'primary'|'secondary'|'success'|'danger'|'ghost'} props.variant - Button variant
+ * @param {'sm'|'md'|'lg'} props.size - Button size
+ * @param {boolean} props.disabled - Disabled state
+ * @param {boolean} props.loading - Loading state (shows spinner)
+ * @param {string} props.icon - Icon emoji/character
+ * @param {'left'|'right'} props.iconPosition - Icon position relative to text
+ * @param {boolean} props.fullWidth - Expand to full width
+ * @param {boolean} props.liquid - Apply liquid glass style
+ * @param {string} props.className - Additional Tailwind classes
+ */
 export default function Button({
   children,
   variant = 'primary',
@@ -5,6 +23,8 @@ export default function Button({
   disabled = false,
   loading = false,
   icon,
+  iconPosition = 'left',
+  fullWidth = false,
   liquid = false,
   className = '',
   ...props
@@ -47,6 +67,7 @@ export default function Button({
         ${baseClasses}
         ${disabled || loading ? disabledClasses : variantClasses[variant]}
         ${sizeClasses[size]}
+        ${fullWidth ? 'w-full' : ''}
         ${className}
       `}
       {...props}
@@ -72,8 +93,13 @@ export default function Button({
         </span>
       )}
       <span className={loading ? 'invisible' : ''}>
-        {icon && <span className="text-2xl relative z-10">{icon}</span>}
+        {icon && iconPosition === 'left' && (
+          <span className="text-2xl relative z-10">{icon}</span>
+        )}
         <span className="relative z-10">{children}</span>
+        {icon && iconPosition === 'right' && (
+          <span className="text-2xl relative z-10">{icon}</span>
+        )}
       </span>
     </button>
   );

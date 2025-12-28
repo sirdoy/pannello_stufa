@@ -1,7 +1,11 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Card from './Card';
 
 /**
  * Banner component for alerts, warnings, and informational messages
+ * Supports persistent dismissal via localStorage with dismissKey prop.
  *
  * @param {string} variant - 'info' | 'warning' | 'error' | 'success'
  * @param {string} icon - Emoji or icon to display
@@ -10,6 +14,8 @@ import Card from './Card';
  * @param {React.ReactNode} actions - Action buttons or links
  * @param {boolean} dismissible - Show dismiss button
  * @param {function} onDismiss - Dismiss handler
+ * @param {string} dismissKey - Unique key for persistent dismissal (optional)
+ * @param {boolean} liquid - Apply liquid glass style (default: true)
  * @param {string} className - Additional CSS classes
  */
 export default function Banner({
@@ -20,10 +26,42 @@ export default function Banner({
   actions,
   dismissible = false,
   onDismiss,
+  dismissKey,
   liquid = true,
   className = '',
   children,
 }) {
+  const [isDismissed, setIsDismissed] = useState(false);
+
+  // Check if banner was previously dismissed (persistent)
+  useEffect(() => {
+    if (dismissKey && typeof window !== 'undefined') {
+      const dismissed = localStorage.getItem(`banner-dismissed-${dismissKey}`);
+      if (dismissed === 'true') {
+        setIsDismissed(true);
+      }
+    }
+  }, [dismissKey]);
+
+  // Handle dismiss with optional persistence
+  const handleDismiss = () => {
+    setIsDismissed(true);
+
+    // Save to localStorage if dismissKey provided
+    if (dismissKey && typeof window !== 'undefined') {
+      localStorage.setItem(`banner-dismissed-${dismissKey}`, 'true');
+    }
+
+    // Call user-provided onDismiss callback
+    if (onDismiss) {
+      onDismiss();
+    }
+  };
+
+  // Don't render if dismissed
+  if (isDismissed) {
+    return null;
+  }
   // Solid variants (tradizionali)
   const solidVariants = {
     info: {
@@ -135,13 +173,13 @@ export default function Banner({
           </div>
 
           {/* Dismiss button */}
-          {dismissible && onDismiss && (
+          {dismissible && (
             <button
-              onClick={onDismiss}
-              className="flex-shrink-0 p-1 hover:bg-black/5 rounded-lg transition-colors"
-              aria-label="Dismiss"
+              onClick={handleDismiss}
+              className="flex-shrink-0 p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors"
+              aria-label="Dismiss banner"
             >
-              <span className="text-lg opacity-50 hover:opacity-100">✕</span>
+              <span className="text-lg opacity-50 hover:opacity-100 transition-opacity">✕</span>
             </button>
           )}
         </div>

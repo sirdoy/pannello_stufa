@@ -95,3 +95,15 @@ temp/
 *.swp
 *~.nib
 .env*.local
+
+# Claude Code workflow files
+ImplementationPlan_*.md
+ResearchPack_*.md
+QualityAnalysis_*.md
+WORKFLOW_PROGRESS_REPORT.md
+
+# PWA fallback files (auto-generated)
+/public/fallback-*.js
+
+# Claude settings (user-specific)
+.claude/settings.local.json

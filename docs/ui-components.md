@@ -638,6 +638,291 @@ Pattern per componenti con layout/stile diversi.
 - `CronHealthBanner` - banner/inline
 - `Banner` - info/warning/error/success
 
+## Layout Components (v1.31.0+)
+
+Componenti base per layout e struttura consistente.
+
+### Section
+
+Wrapper semantico per sezioni di pagina con intestazione opzionale.
+
+```jsx
+<Section
+  title="I tuoi dispositivi"
+  description="Controlla e monitora tutti i dispositivi"
+  spacing="section"  // card|inline|section (default: card)
+  action={<Button>Azione</Button>}
+>
+  {children}
+</Section>
+```
+
+**Props**:
+- `title` - Titolo sezione (Heading level 1)
+- `description` - Descrizione opzionale
+- `spacing` - Variante spacing (card/inline/section)
+- `action` - Pulsante/link azione opzionale
+- `children` - Contenuto sezione
+
+**Spacing Variants**:
+- `card` - 16px (1rem) - Contenuto compatto in cards
+- `inline` - 8px (0.5rem) - Elementi inline strettamente accoppiati
+- `section` - 32px (2rem) - Sezioni pagina principali
+
+**Implementazione**: `app/components/ui/Section.js`
+
+### Grid
+
+Sistema grid responsive con configurazione mobile/tablet/desktop e gap adattivo.
+
+```jsx
+<Grid
+  cols={{ mobile: 1, tablet: 2, desktop: 3, wide: 4 }}
+  gap="large"  // small|medium|large (default: medium)
+>
+  {items.map(item => <div key={item.id}>{item}</div>)}
+</Grid>
+```
+
+**Props**:
+- `cols` - Configurazione colonne per breakpoint
+  - `mobile` - < 768px (default: 1)
+  - `tablet` - 768px-1024px (default: 2)
+  - `desktop` - 1024px-1280px (default: 3)
+  - `wide` - > 1280px (default: 4)
+- `gap` - Spacing tra elementi (responsive, aumenta su schermi grandi)
+  - `small` - 12px → 16px → 20px (mobile → tablet → desktop)
+  - `medium` - 16px → 20px → 24px
+  - `large` - 24px → 32px → 48px
+- `children` - Elementi grid
+
+**Gap Responsive**: Il gap aumenta automaticamente su schermi più grandi per migliorare la leggibilità e il respiro visivo.
+
+**Implementazione**: `app/components/ui/Grid.js`
+
+### Container
+
+Wrapper semantico per spacing consistente.
+
+```jsx
+<Container spacing="section">
+  {children}
+</Container>
+```
+
+**Props**:
+- `spacing` - Variante spacing (card: 16px / inline: 8px / section: 32px)
+- `className` - Classi Tailwind aggiuntive
+- `children` - Contenuto
+
+**Implementazione**: `app/components/ui/Container.js`
+
+## Typography Components (v1.31.0+)
+
+Componenti tipografici semantici con supporto dark mode.
+
+### Heading
+
+Intestazioni semantiche h1-h6 con varianti di stile.
+
+```jsx
+<Heading
+  level={1}  // 1-6 (default: 2)
+  size="xl"  // sm|md|lg|xl|2xl|3xl (default: auto)
+  variant="default"  // default|gradient|subtle
+  className="custom-class"
+>
+  Titolo
+</Heading>
+```
+
+**Props**:
+- `level` - Livello semantico HTML (1-6)
+- `size` - Override dimensione testo (opzionale, auto-calcolato da level)
+- `variant` - Stile visivo
+  - `default` - Text standard
+  - `gradient` - Gradient primary→accent
+  - `subtle` - Colore attenuato (secondary)
+- `className` - Classi Tailwind aggiuntive
+- `children` - Testo/contenuto
+
+**Size Mapping** (auto da level):
+- h1 → 3xl (30px-36px)
+- h2 → 2xl (24px)
+- h3 → xl (20px)
+- h4 → lg (18px)
+- h5 → md (16px)
+- h6 → sm (14px)
+
+**Implementazione**: `app/components/ui/Heading.js`
+
+### Text
+
+Testo body con varianti semantiche.
+
+```jsx
+<Text
+  variant="body"  // body|secondary|tertiary
+  className="custom-class"
+>
+  Testo descrittivo
+</Text>
+```
+
+**Props**:
+- `variant` - Variante semantica
+  - `body` - Testo primario (text-neutral-900 dark:text-white)
+  - `secondary` - Testo secondario (text-neutral-600 dark:text-neutral-400)
+  - `tertiary` - Testo terziario (text-neutral-500 dark:text-neutral-500)
+- `className` - Classi Tailwind aggiuntive
+- `children` - Testo/contenuto
+
+**Implementazione**: `app/components/ui/Text.js`
+
+## Primitive Components (v1.31.0+)
+
+Componenti primitivi riutilizzabili.
+
+### Icon
+
+Wrapper per lucide-react icons con ARIA support.
+
+```jsx
+import { Flame } from 'lucide-react';
+
+<Icon
+  icon={Flame}
+  size={24}  // default: 16
+  label="Stufa accesa"  // Accessibilità
+  className="text-primary-500"
+/>
+```
+
+**Props**:
+- `icon` - Componente lucide-react
+- `size` - Dimensione icon (px, default: 16)
+- `label` - Label accessibilità (aria-label)
+- `className` - Classi Tailwind aggiuntive
+
+**Implementazione**: `app/components/ui/Icon.js`
+
+### Divider
+
+Separatore visivo con label opzionale.
+
+```jsx
+<Divider
+  label="Modalità"  // Opzionale
+  variant="gradient"  // solid|dashed|gradient (default: solid)
+  spacing="large"  // small|medium|large (default: medium)
+  orientation="horizontal"  // horizontal|vertical (default: horizontal)
+/>
+```
+
+**Props**:
+- `label` - Testo centrale opzionale
+- `variant` - Stile linea
+  - `solid` - Linea continua
+  - `dashed` - Linea tratteggiata
+  - `gradient` - Gradiente da trasparente
+- `spacing` - Margini verticali/orizzontali (small: 16px / medium: 24px / large: 32px)
+- `orientation` - Orientamento (horizontal/vertical)
+
+**Implementazione**: `app/components/ui/Divider.js`
+
+## Misc Components (v1.31.0+)
+
+### EmptyState
+
+Stato vuoto consistente con icon/title/description/action.
+
+```jsx
+<EmptyState
+  icon="🏠"  // Emoji o componente Icon
+  title="Nessun dispositivo"
+  description="Aggiungi dispositivi per iniziare"
+  action={<Button>Aggiungi</Button>}  // Opzionale
+/>
+```
+
+**Props**:
+- `icon` - Emoji string o componente Icon
+- `title` - Titolo principale
+- `description` - Descrizione opzionale
+- `action` - CTA opzionale (Button o link)
+
+**Implementazione**: `app/components/ui/EmptyState.js`
+
+## Usage Examples (v1.31.0+)
+
+### Homepage Layout
+
+```jsx
+<Section
+  title="I tuoi dispositivi"
+  description="Controlla e monitora tutti i dispositivi"
+  spacing="section"
+>
+  <Grid cols={{ mobile: 1, desktop: 2 }} gap="large">
+    <StoveCard />
+    <ThermostatCard />
+  </Grid>
+</Section>
+```
+
+### Card Header Pattern
+
+```jsx
+<div className="flex items-center justify-between mb-6">
+  <div className="flex items-center gap-2">
+    <span className="text-3xl">🔥</span>
+    <Heading level={2} size="xl">Stufa</Heading>
+  </div>
+  <button>Refresh</button>
+</div>
+```
+
+### Separator with Label
+
+```jsx
+<Divider label="Modalità" variant="gradient" spacing="large" />
+```
+
+### Empty State with Action
+
+```jsx
+<EmptyState
+  icon="🔌"
+  title="Termostato Non Connesso"
+  description="Connetti il tuo account Netatmo"
+  action={
+    <Button variant="success" onClick={handleAuth}>
+      Connetti Netatmo
+    </Button>
+  }
+/>
+```
+
+## Component Index Export
+
+Tutti i componenti sono esportati da `app/components/ui/index.js`:
+
+```jsx
+// Import singoli
+import { Section, Grid, Heading, Text } from './components/ui';
+
+// Import tutto
+import * as UI from './components/ui';
+<UI.Heading level={2}>Title</UI.Heading>
+```
+
+**Componenti disponibili**:
+- Layout: `Section`, `Grid`, `Container`
+- Typography: `Heading`, `Text`
+- Primitives: `Icon`, `Divider`
+- Misc: `EmptyState`
+- Existing: `Card`, `Button`, `Select`, `Banner`, `Toast`, `LoadingOverlay`, `Skeleton`, `ErrorAlert`
+
 ## See Also
 
 - [Design System](./design-system.md) - Palette colori, styling hierarchy
@@ -646,4 +931,4 @@ Pattern per componenti con layout/stile diversi.
 
 ---
 
-**Last Updated**: 2025-10-21
+**Last Updated**: 2025-12-28 (v1.31.0 - Component Library)

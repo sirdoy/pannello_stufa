@@ -1,148 +1,97 @@
-# CLAUDE.md - Pannello Stufa Documentation Index
+# CLAUDE.md - Pannello Stufa
 
 **Next.js 15 PWA** per controllo remoto stufa pellet Thermorossi via cloud API + multi-device smart home control (termostato Netatmo, luci Philips Hue).
 
-> **Documentazione Modulare**: Questo file è un indice. Consulta i file tematici in `docs/` per approfondimenti.
+> **📚 Documentazione Modulare**: Questo file è un **indice**. Tutte le informazioni dettagliate sono in `docs/`.
 
-## 🚀 Quick Links
+---
 
-- **[Quick Start](docs/quick-start.md)** - Setup progetto, installazione, primi passi
-- **[Troubleshooting](docs/troubleshooting.md)** - Problemi comuni e soluzioni
-- **[Testing](docs/testing.md)** - Unit tests, coverage, best practices
+## 📌 Meta-Documentation (IMPORTANTE!)
 
-## 📖 Core Documentation
+**Come mantenere questa struttura di documentazione:**
 
-### Architecture & Code Organization
+### 🎯 Principi Base
 
-- **[Architecture](docs/architecture.md)** - Multi-device architecture, device registry, homepage layout
-- **[API Routes](docs/api-routes.md)** - Stove control, scheduler, external APIs patterns (OAuth 2.0)
-- **[Firebase](docs/firebase.md)** - Realtime Database schema, operations, best practices
-- **[Firebase Security](docs/firebase-security.md)** - Security Rules, Admin SDK, Client/Server separation
-- **[Data Flow](docs/data-flow.md)** - Polling, cron, OAuth, notifications flow
+1. **CLAUDE.md = Indice SOLO**
+   - Massimo 200 righe
+   - Link ai file `docs/` per approfondimenti
+   - Nessuna duplicazione di contenuti
+   - Solo informazioni essenziali per orientarsi
 
-### UI & Design
+2. **docs/ = Documentazione Dettagliata**
+   - Un file per ogni argomento specifico
+   - Approfondimenti, esempi, best practices
+   - Mantieni file < 500 righe (suddividi se troppo grande)
 
-- **[UI Components](docs/ui-components.md)** - Card, Button, Banner, Toast, LoadingOverlay, Select, Input, liquid glass pattern
-- **[Design System](docs/design-system.md)** - Palette colori, typography, spacing, styling hierarchy
-- **[Patterns](docs/patterns.md)** - Dropdown/modal, collapse/expand, immediate feedback UX, Firebase listeners, polling
+3. **Quando Aggiungere Nuova Documentazione**
+   ```
+   ❌ SBAGLIATO: Aggiungere dettagli in CLAUDE.md
+   ✅ CORRETTO:
+      1. Creare/aggiornare file in docs/
+      2. Aggiungere solo link in CLAUDE.md
+   ```
 
-### Systems
+4. **Struttura Cartelle docs/**
+   ```
+   docs/
+   ├── *.md                    # Guide generali (architecture, api-routes, etc.)
+   ├── systems/                # Sistemi integrati (maintenance, notifications, etc.)
+   └── setup/                  # Setup guide esterne (netatmo, hue)
+   ```
 
-- **[Maintenance](docs/systems/maintenance.md)** - Sistema tracking ore utilizzo stufa H24
-- **[Monitoring](docs/systems/monitoring.md)** - Monitoring affidabilità cronjob scheduler
-- **[Errors](docs/systems/errors.md)** - Rilevamento e notifica errori stufa
-- **[Notifications](docs/systems/notifications.md)** - Push notifications sistema completo (FCM, iOS PWA)
+### 📝 Workflow Aggiornamento Documentazione
 
-### Development Workflows
+```bash
+# 1. Feature/fix implementata
+# 2. Aggiorna file specifico in docs/
+vim docs/api-routes.md
 
-- **[Sandbox Mode](docs/sandbox.md)** - Testing locale senza chiamate reali alla stufa (SOLO localhost)
-- **[Testing](docs/testing.md)** - Unit tests, coverage, best practices
-- **[E2E Testing](E2E-TESTING.md)** - Playwright E2E tests per UI/UX (light/dark mode, responsive)
-- **[UI/UX Testing](docs/ui-ux-testing.md)** - Suite completa test Playwright (contrast WCAG AA, uniformità, accessibilità)
-- **[Visual Screenshots](docs/visual-screenshots.md)** - Come catturare screenshot bypassando Auth0 con TEST_MODE
-- **[Versioning](docs/versioning.md)** - Semantic versioning, changelog, version enforcement
-- **[Deployment](docs/deployment.md)** - Deploy workflow, environment config, production checklist
+# 3. Se nuovo concetto importante, aggiungi link in CLAUDE.md sezione "Documentation Map"
+# 4. CLAUDE.md rimane snello (solo indice)
+```
 
-### External Integrations
+### 🔍 Come Claude Deve Usare la Documentazione
 
-- **[Netatmo Setup](docs/setup/netatmo-setup.md)** - Termostato Netatmo Energy API (OAuth 2.0)
-- **[Philips Hue Setup](docs/setup/hue-setup.md)** - Luci Philips Hue Local API
+**Prima di rispondere a domande complesse:**
+1. Consulta CLAUDE.md per orientarti
+2. Leggi il file specifico in `docs/` per i dettagli
+3. Non ripetere informazioni già documentate, dai solo il link
+
+**Esempio:**
+```
+User: "Come funziona il maintenance tracking?"
+Claude: "Il sistema di maintenance tracking funziona H24 server-side.
+        Dettagli completi: docs/systems/maintenance.md"
+```
+
+---
+
+## 🚀 Quick Start
+
+```bash
+npm install              # Installa dipendenze
+cp .env.example .env.local   # Configura environment
+npm run dev              # http://localhost:3000
+```
+
+📖 **Setup Completo**: [docs/quick-start.md](docs/quick-start.md)
+
+---
 
 ## 🛠️ Stack Tecnologico
 
-- **Next.js 15.5.4**: App Router, Server/Client Components, API Routes
-- **React 19.2**: Hooks, Suspense, modern async patterns
-- **Tailwind CSS 3**: Utility-first + liquid glass iOS 18 style
-- **WebGL**: Effetti UI animati (frost patterns, texture overlays) tramite shader GLSL ottimizzati
-- **Firebase Realtime DB**: Scheduler, logs, versioning, push tokens
-- **Firebase Admin SDK**: Server-side write operations, Security Rules enforcement
-- **Auth0**: Autenticazione sicura
-- **Thermorossi Cloud API**: Controllo stufa
-- **Netatmo Energy API**: Termostato multi-room
-- **Philips Hue Local API**: Luci smart
-- **Firebase Cloud Messaging**: Push notifications multi-device
-- **next-pwa**: Service Worker, offline support
+- **Next.js 15.5** - App Router, Server/Client Components, API Routes
+- **React 19** - Hooks, Suspense, modern patterns
+- **Tailwind CSS 3** - Utility-first + liquid glass iOS 18 style
+- **Firebase** - Realtime DB + Admin SDK (Client/Server separation)
+- **Auth0** - Autenticazione
+- **PWA** - next-pwa, Service Worker, offline support
+- **External APIs** - Thermorossi (stufa), Netatmo (termostato), Philips Hue (luci)
+- **FCM** - Push notifications multi-device
 
-## 📁 Struttura Progetto
+📖 **Architettura Dettagliata**: [docs/architecture.md](docs/architecture.md)
 
-```
-pannello-stufa/
-├── app/                          # Next.js App Router
-│   ├── api/                      # API Routes
-│   │   ├── stove/                # Stove control (status, ignite, shutdown, setFan, setPower)
-│   │   ├── scheduler/check/      # Cron endpoint + maintenance tracking
-│   │   ├── netatmo/              # Termostato API (OAuth 2.0)
-│   │   ├── hue/                  # Luci API (Local)
-│   │   └── notifications/        # Push notifications (test, send)
-│   ├── components/
-│   │   ├── ui/                   # Card, Button, Banner, Toast, LoadingOverlay, Select, Input, etc.
-│   │   └── devices/              # Device-specific components
-│   │       ├── stove/            # StoveCard
-│   │       ├── thermostat/       # ThermostatCard
-│   │       └── lights/           # LightsCard
-│   ├── context/                  # VersionContext, ThemeContext
-│   ├── hooks/                    # useVersionCheck, useTheme
-│   ├── page.js                   # Homepage (multi-device grid)
-│   ├── scheduler/page.js         # Pianificazione settimanale
-│   ├── maintenance/page.js       # Configurazione manutenzione
-│   ├── log/page.js              # Storico azioni
-│   ├── errors/page.js           # Storico errori stufa
-│   ├── changelog/page.js        # Versioni app
-│   ├── settings/
-│   │   ├── notifications/       # Gestione notifiche push
-│   │   ├── devices/             # Gestione dispositivi abilitati
-│   │   └── theme/               # Tema dark/light mode
-│
-├── lib/                          # Business Logic
-│   ├── devices/                  # Device registry (DEVICE_CONFIG)
-│   ├── stoveApi.js              # Thermorossi API wrapper
-│   ├── schedulerService.js      # Scheduler logic
-│   ├── maintenanceService.js    # Maintenance tracking (client)
-│   ├── maintenanceServiceAdmin.js  # Maintenance tracking (server Admin SDK)
-│   ├── errorMonitor.js          # Error detection
-│   ├── logService.js            # User action logging
-│   ├── auth0.js                 # Auth0 Client SDK (session management)
-│   ├── firebase.js              # Firebase Client SDK (read operations)
-│   ├── firebaseAdmin.js         # Firebase Admin SDK (write operations)
-│   ├── notificationService.js   # FCM client-side
-│   ├── notificationPreferencesService.js  # Notification preferences
-│   ├── devicePreferencesService.js        # Device enable/disable preferences
-│   ├── themeService.js          # Theme dark/light persistence (Firebase + localStorage)
-│   ├── version.js               # APP_VERSION, VERSION_HISTORY
-│   ├── changelogService.js      # Changelog sync Firebase
-│   ├── netatmo/                 # Netatmo integration (OAuth)
-│   └── hue/                     # Hue integration (Local API)
-│
-├── docs/                         # 📚 Documentazione modulare
-│   ├── quick-start.md
-│   ├── architecture.md
-│   ├── api-routes.md
-│   ├── firebase.md
-│   ├── firebase-security.md     # Security Rules, Admin SDK migration
-│   ├── ui-components.md
-│   ├── design-system.md
-│   ├── patterns.md
-│   ├── data-flow.md
-│   ├── versioning.md
-│   ├── testing.md
-│   ├── troubleshooting.md
-│   ├── deployment.md
-│   ├── systems/                 # Sistemi integrati
-│   │   ├── maintenance.md
-│   │   ├── monitoring.md
-│   │   ├── errors.md
-│   │   └── notifications.md
-│   └── setup/                   # Setup guide esterne
-│       ├── netatmo-setup.md
-│       └── hue-setup.md
-│
-├── public/
-│   ├── firebase-messaging-sw.js  # FCM service worker
-│   ├── manifest.json             # PWA manifest
-│   └── icons/                    # PWA icons
-│
-└── __tests__/                    # Jest + Testing Library
-```
+---
 
 ## ⚡ Quick Commands
 
@@ -157,215 +106,133 @@ npm test                 # Run all tests
 npm run test:watch       # Watch mode
 npm run test:coverage    # Coverage report
 
-# Visual Screenshots (bypass Auth0)
-SANDBOX_MODE=true TEST_MODE=true npm run dev &  # Dev server for screenshots
-SANDBOX_MODE=true TEST_MODE=true npx playwright test e2e/visual-inspection.spec.js --grep "desktop - light - loaded"
+# Sandbox Mode (localhost only)
+SANDBOX_MODE=true TEST_MODE=true npm run dev
 
 # Firebase Sync
 node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require('./lib/version').VERSION_HISTORY)"
-
-# Debugging
-find app -name "*.js" -exec grep -l "useState" {} \;  # Find client components
 ```
 
-## 🎯 Task Priorities
+📖 **Comandi Avanzati**: [docs/quick-start.md#commands](docs/quick-start.md)
+
+---
+
+## 📖 Documentation Map
+
+### 🎯 Getting Started
+- **[Quick Start](docs/quick-start.md)** - Setup, installazione, primi passi
+- **[Architecture](docs/architecture.md)** - Struttura progetto, multi-device pattern
+- **[Troubleshooting](docs/troubleshooting.md)** - Problemi comuni e soluzioni
+
+### 💻 Development
+- **[API Routes](docs/api-routes.md)** - Stove control, scheduler, OAuth 2.0 patterns
+- **[UI Components](docs/ui-components.md)** - Card, Button, Banner, Toast, liquid glass
+- **[Design System](docs/design-system.md)** - Colors, typography, styling hierarchy
+- **[Patterns](docs/patterns.md)** - Reusable code patterns (dropdowns, modals, etc.)
+- **[Data Flow](docs/data-flow.md)** - Polling, cron, OAuth, notifications flow
+
+### 🔥 Firebase
+- **[Firebase](docs/firebase.md)** - Realtime Database schema, operations
+- **[Firebase Security](docs/firebase-security.md)** - Security Rules, Admin SDK, Client/Server separation
+
+### 🏠 Systems
+- **[Maintenance](docs/systems/maintenance.md)** - Tracking ore utilizzo stufa H24
+- **[Monitoring](docs/systems/monitoring.md)** - Cron health monitoring
+- **[Errors](docs/systems/errors.md)** - Error detection & logging
+- **[Notifications](docs/systems/notifications.md)** - Push notifications (FCM, iOS PWA)
+
+### 🔌 External Integrations
+- **[Netatmo Setup](docs/setup/netatmo-setup.md)** - Termostato Netatmo OAuth 2.0
+- **[Hue Setup](docs/setup/hue-setup.md)** - Luci Philips Hue Local API
+
+### 🧪 Testing & Deployment
+- **[Testing](docs/testing.md)** - Unit tests, coverage, best practices
+- **[UI/UX Testing](docs/ui-ux-testing.md)** - Playwright E2E, WCAG AA compliance
+- **[Visual Screenshots](docs/visual-screenshots.md)** - Screenshot testing bypass Auth0
+- **[Sandbox Mode](docs/sandbox.md)** - Testing locale senza chiamate reali
+- **[Versioning](docs/versioning.md)** - Semantic versioning, changelog
+- **[Deployment](docs/deployment.md)** - Deploy workflow, checklist
+
+---
+
+## 🎯 Task Priorities (Per Claude)
 
 1. 🔴 **NEVER** break existing functionality
 2. 🟠 **ALWAYS** update version after changes (`lib/version.js`, `package.json`, `CHANGELOG.md`)
 3. 🟡 **PREFER** editing existing files over creating new ones
-4. 🟢 **MAINTAIN** coding patterns (vedi [Architecture](docs/architecture.md), [Patterns](docs/patterns.md))
-5. 🔵 **TEST** `npm run build` before commit
-6. ⚡ **ALWAYS** create/update unit tests ([Testing](docs/testing.md))
+4. 🟢 **MAINTAIN** coding patterns → [docs/patterns.md](docs/patterns.md)
+5. 🔵 **TEST** `npm run build` before commit (user must run it, not Claude)
+6. ⚡ **ALWAYS** create/update unit tests → [docs/testing.md](docs/testing.md)
+7. 📚 **UPDATE DOCS** when adding features (in `docs/`, not in CLAUDE.md)
 
-## 🔑 Critical Concepts
+---
+
+## 🔑 Critical Concepts (Quick Reference)
+
+Questi sono i concetti chiave del progetto. **Per dettagli completi, consulta i file linkati**.
 
 ### Multi-Device Architecture
+Registry centralizzato per dispositivi (stufa, termostato, luci). **Self-Contained Pattern**: ogni card include tutte le sue info.
+→ [docs/architecture.md](docs/architecture.md)
 
-Registry centralizzato per gestione dispositivi (stufa, termostato, luci, etc.).
-
-```javascript
-// lib/devices/deviceTypes.js
-export const DEVICE_TYPES = {
-  STOVE: 'stove',
-  THERMOSTAT: 'thermostat',
-  LIGHTS: 'lights',
-};
-
-export const DEVICE_CONFIG = {
-  [DEVICE_TYPES.STOVE]: {
-    id: 'stove',
-    name: 'Stufa',
-    icon: '🔥',
-    enabled: true,
-    // ...
-  },
-};
-```
-
-**Self-Contained Pattern**: Ogni device card include **tutte** le sue informazioni (banner, status, controls) **dentro** la card principale per coerenza architetturale.
-
-📖 **Dettagli**: [Architecture](docs/architecture.md)
-
-### Liquid Glass Style (iOS 18) + Dark Mode
-
-Pattern UI unificato con supporto dark mode completo.
-
-```jsx
-<Card liquid className="p-6">Content</Card>
-<Button liquid variant="primary">Azione</Button>
-```
-
-**Dark Mode**: Tema scuro con glass effect ottimizzato
-- **Attivazione**: Settings → Tema (🎨)
-- **Storage**: Firebase sync multi-device + localStorage fallback
-- **Zero flash**: Script blocking pre-hydration
-- **Palette**: Glass scuro (`bg-white/[0.05]`) + gradiente neutral-900
-
-📖 **Dettagli**: [UI Components - Dark Mode](docs/ui-components.md#-dark-mode)
+### Liquid Glass + Dark Mode
+Pattern UI iOS 18 con dark mode completo (Firebase sync + localStorage).
+→ [docs/ui-components.md](docs/ui-components.md), [docs/design-system.md](docs/design-system.md)
 
 ### Scheduler Modes
-
-- **Manual** 🔧: Controllo manuale completo
-- **Automatic** ⏰: Pianificazione settimanale
-- **Semi-Manual** ⚙️: Override temporaneo (ritorna auto al prossimo cambio scheduler)
-
-📖 **Dettagli**: [API Routes - Scheduler](docs/api-routes.md#scheduler-api)
+Manual (🔧), Automatic (⏰), Semi-Manual (⚙️ override temporaneo).
+→ [docs/api-routes.md](docs/api-routes.md)
 
 ### Maintenance Tracking (Server-Side H24)
-
-Tracking ore utilizzo **server-side via cron** (funziona anche app chiusa).
-
-```javascript
-// Chiamato ogni minuto da /api/scheduler/check
-await trackUsageHours(currentStatus);
-```
-
-- ✅ Blocco **solo accensione** se `needsCleaning=true`
-- ✅ Spegnimento sempre permesso
-- ✅ Notifiche push a 80%, 90%, 100%
-
-📖 **Dettagli**: [Systems - Maintenance](docs/systems/maintenance.md)
+Tracking ore utilizzo via cron (funziona anche app chiusa). Blocco accensione se `needsCleaning=true`.
+→ [docs/systems/maintenance.md](docs/systems/maintenance.md)
 
 ### OAuth 2.0 Pattern
-
 Pattern riutilizzabile per API esterne con auto-refresh token.
-
-```javascript
-const { accessToken, error, reconnect } = await getValidAccessToken();
-if (reconnect) {
-  // Show auth UI
-}
-```
-
-📖 **Dettagli**: [API Routes - OAuth Pattern](docs/api-routes.md#oauth-20-pattern)
-
-### Push Notifications (FCM + iOS PWA)
-
-Sistema completo notifiche push con supporto iOS 16.4+ PWA.
-
-- Errori stufa (severità configurabile)
-- Azioni scheduler (accensione/spegnimento auto)
-- Soglie manutenzione (80%, 90%, 100%)
-- Preferenze utente per ogni tipo notifica
-
-📖 **Dettagli**: [Systems - Notifications](docs/systems/notifications.md)
-
-### Version Enforcement
-
-- **Production**: Modal bloccante se versione locale < Firebase
-- **Development**: Disabled su localhost
-- **Polling**: Integrato in StoveCard (check ogni 5s)
-
-📖 **Dettagli**: [Versioning](docs/versioning.md)
+→ [docs/api-routes.md](docs/api-routes.md)
 
 ### Firebase Security (Client/Server Separation)
+- `.read = true`: Client SDK (real-time listeners)
+- `.write = false`: Solo Admin SDK server-side
+→ [docs/firebase-security.md](docs/firebase-security.md)
 
-Architettura sicurezza **enterprise-grade** con separazione Client SDK (read) / Admin SDK (write).
+### Push Notifications (FCM + iOS PWA)
+Errori stufa, azioni scheduler, soglie manutenzione. Preferenze utente configurabili.
+→ [docs/systems/notifications.md](docs/systems/notifications.md)
 
-**Security Rules**:
-- `.read = true`: Client SDK può leggere dati (real-time listeners)
-- `.write = false`: Client SDK NON può scrivere (solo Admin SDK server-side)
+### Version Enforcement
+Modal bloccante in production se versione locale < Firebase. Polling integrato in StoveCard.
+→ [docs/versioning.md](docs/versioning.md)
 
-**Pattern**:
-```javascript
-// ✅ CLIENT: Real-time listeners (read)
-onValue(ref(db, 'scheduler/mode'), (snapshot) => { ... });
+---
 
-// ✅ SERVER: Write operations (Admin SDK)
-await updateData('scheduler/mode', { mode: 'automatic' });
-```
-
-**Benefici**:
-- Zero esposizione credenziali client-side
-- Protezione totale contro manipolazione dati non autorizzata
-- Admin SDK SOLO in API routes server-side
-- Production-safe con credential rotation
-
-📖 **Dettagli**: [Firebase Security](docs/firebase-security.md)
-
-## 🚨 Critical Best Practices
-
-### Firebase Operations
+## 🚨 Critical Best Practices (Quick)
 
 ```javascript
-// ❌ WRONG - undefined not allowed
-await update(ref(db, 'path'), { field: undefined });
-
-// ✅ CORRECT - filter undefined
+// ✅ Firebase: filter undefined
 await update(ref(db, 'path'), filterUndefined({ field: undefined }));
-```
 
-```javascript
-// ❌ WRONG - causes phantom hours
-maintenance: {
-  lastUpdatedAt: new Date().toISOString()  // Init with timestamp
-}
-
-// ✅ CORRECT - init with null
-maintenance: {
-  lastUpdatedAt: null  // Will be set on first WORK event
-}
-```
-
-📖 **Dettagli**: [Firebase - Best Practices](docs/firebase.md#best-practices)
-
-### API Routes
-
-```javascript
-// ✅ CORRECT - force dynamic with Firebase
+// ✅ API Routes: force dynamic
 export const dynamic = 'force-dynamic';
 
-// ❌ WRONG - Firebase not compatible
-export const runtime = 'edge';
-```
-
-📖 **Dettagli**: [API Routes - Best Practices](docs/api-routes.md#best-practices)
-
-### Client Components
-
-```javascript
-'use client';  // ✅ PRIMA riga, prima degli import
-
+// ✅ Client Components: 'use client' PRIMA riga
+'use client';
 import { useState } from 'react';
 ```
 
-### Styling Hierarchy
+📖 **Best Practices Complete**: [docs/firebase.md](docs/firebase.md), [docs/api-routes.md](docs/api-routes.md), [docs/patterns.md](docs/patterns.md)
 
-1. **Tailwind Inline** (~95% codice) - Preferenza primaria
-2. **CSS Modules** (animazioni) - `Component.module.css` stessa directory
-3. **globals.css** (SOLO base) - Mantieni minimo (~13 righe)
-
-📖 **Dettagli**: [Design System](docs/design-system.md)
+---
 
 ## 🔗 Environment Variables
 
 ```env
-# Firebase (Client SDK - read operations)
+# Firebase Client SDK
 NEXT_PUBLIC_FIREBASE_API_KEY=
 NEXT_PUBLIC_FIREBASE_DATABASE_URL=
 NEXT_PUBLIC_FIREBASE_VAPID_KEY=
 
-# Firebase (Admin SDK - write operations)
+# Firebase Admin SDK
 FIREBASE_ADMIN_PROJECT_ID=
 FIREBASE_ADMIN_CLIENT_EMAIL=
 FIREBASE_ADMIN_PRIVATE_KEY=
@@ -387,50 +254,20 @@ CRON_SECRET=
 ADMIN_USER_ID=auth0|xxx
 ```
 
-📖 **Dettagli**: [Quick Start - Environment Setup](docs/quick-start.md#3-environment-setup)
-
-## 📚 Documentation Map
-
-### Getting Started
-- [Quick Start](docs/quick-start.md) - Setup, installation, first steps
-- [Architecture](docs/architecture.md) - Project structure, multi-device pattern
-
-### Development
-- [UI Components](docs/ui-components.md) - Component library
-- [Design System](docs/design-system.md) - Colors, typography, styling
-- [Patterns](docs/patterns.md) - Reusable code patterns
-- [API Routes](docs/api-routes.md) - API documentation
-- [Firebase](docs/firebase.md) - Database schema
-- [Firebase Security](docs/firebase-security.md) - Security Rules, Admin SDK
-- [Data Flow](docs/data-flow.md) - Data flows
-
-### Systems
-- [Maintenance](docs/systems/maintenance.md) - Ore utilizzo tracking
-- [Monitoring](docs/systems/monitoring.md) - Cron health monitoring
-- [Errors](docs/systems/errors.md) - Error detection & logging
-- [Notifications](docs/systems/notifications.md) - Push notifications
-
-### External Integrations
-- [Netatmo Setup](docs/setup/netatmo-setup.md) - Termostato integration
-- [Hue Setup](docs/setup/hue-setup.md) - Luci integration
-
-### Operations
-- [Sandbox Mode](docs/sandbox.md) - Testing locale senza chiamate reali
-- [Versioning](docs/versioning.md) - Version management workflow
-- [Testing](docs/testing.md) - Unit tests, coverage
-- [Deployment](docs/deployment.md) - Deploy checklist
-- [Troubleshooting](docs/troubleshooting.md) - Common issues
-
-## 🆘 Need Help?
-
-1. **Quick issue?** → [Troubleshooting](docs/troubleshooting.md)
-2. **Setup problem?** → [Quick Start](docs/quick-start.md)
-3. **API question?** → [API Routes](docs/api-routes.md)
-4. **UI question?** → [UI Components](docs/ui-components.md)
-5. **Test failing?** → [Testing](docs/testing.md)
+📖 **Setup Completo**: [docs/quick-start.md#environment-setup](docs/quick-start.md)
 
 ---
 
-**Last Updated**: 2025-12-03
-**Version**: 1.21.1 (patch: Auth0 v4 compatibility fixes)
+## 🆘 Need Help?
+
+1. **Quick issue?** → [docs/troubleshooting.md](docs/troubleshooting.md)
+2. **Setup problem?** → [docs/quick-start.md](docs/quick-start.md)
+3. **API question?** → [docs/api-routes.md](docs/api-routes.md)
+4. **UI question?** → [docs/ui-components.md](docs/ui-components.md)
+5. **Test failing?** → [docs/testing.md](docs/testing.md)
+
+---
+
+**Version**: 1.26.9
+**Last Updated**: 2025-12-28
 **Author**: Federico Manfredi

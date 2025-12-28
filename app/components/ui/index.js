@@ -1,3 +1,4 @@
+// Existing components
 export { default as Card } from './Card';
 export { default as Button } from './Button';
 export { default as Input } from './Input';
@@ -10,3 +11,22 @@ export { default as ErrorAlert, ErrorBadge } from './ErrorAlert';
 export { default as Footer } from './Footer';
 export { default as Banner } from './Banner';
 export { default as Toggle } from './Toggle';
+export { default as Toast } from './Toast';
+export { default as LoadingOverlay } from './LoadingOverlay';
+export { default as ConfirmDialog } from './ConfirmDialog';
+
+// Layout components (v1.31.0+)
+export { default as Container } from './Container';
+export { default as Grid } from './Grid';
+export { default as Section } from './Section';
+
+// Typography components (v1.31.0+)
+export { default as Heading } from './Heading';
+export { default as Text } from './Text';
+
+// Primitive components (v1.31.0+)
+export { default as Icon } from './Icon';
+export { default as Divider } from './Divider';
+
+// Misc components (v1.31.0+)
+export { default as EmptyState } from './EmptyState';

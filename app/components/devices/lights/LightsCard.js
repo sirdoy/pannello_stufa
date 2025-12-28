@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation';
 import Card from '../../ui/Card';
 import Button from '../../ui/Button';
 import Select from '../../ui/Select';
+import Skeleton from '../../ui/Skeleton';
 import Banner from '../../ui/Banner';
 import LoadingOverlay from '../../ui/LoadingOverlay';
+import { Divider, Heading, Text, EmptyState } from '../../ui';
 
 /**
  * LightsCard - Complete Philips Hue lights control for homepage
@@ -209,17 +211,7 @@ export default function LightsCard() {
   };
 
   if (loading) {
-    return (
-      <div className="space-y-4">
-        <Card liquid className="p-4 sm:p-6 lg:p-8">
-          <div className="space-y-4">
-            <div className="h-6 bg-neutral-200 rounded animate-pulse w-1/3" />
-            <div className="h-4 bg-neutral-200 rounded animate-pulse w-2/3" />
-            <div className="h-24 bg-neutral-200 rounded animate-pulse" />
-          </div>
-        </Card>
-      </div>
-    );
+    return <Skeleton.LightsCard />;
   }
 
   if (!connected) {
@@ -232,10 +224,10 @@ export default function LightsCard() {
             <div className="p-6 sm:p-8">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                <div className="flex items-center gap-2">
                   <span className="text-2xl sm:text-3xl">💡</span>
-                  <span>Luci</span>
-                </h2>
+                  <Heading level={2} size="xl">Luci</Heading>
+                </div>
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-200 dark:bg-neutral-700 rounded-full">
                   <span className="w-2 h-2 bg-neutral-500 dark:bg-neutral-400 rounded-full"></span>
                   <span className="text-xs font-medium text-neutral-700 dark:text-neutral-300">Offline</span>
@@ -243,33 +235,30 @@ export default function LightsCard() {
               </div>
 
               {/* Not connected message */}
-              <div className="text-center py-8">
-                <div className="text-6xl mb-4">🔌</div>
-                <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-2">
-                  Luci Non Connesse
-                </h3>
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6">
-                  Connetti il tuo account Philips Hue per controllare le luci
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Button
-                    liquid
-                    variant="success"
-                    onClick={handleAuth}
-                    icon="🔗"
-                  >
-                    Connetti Philips Hue
-                  </Button>
-                  <Button
-                    liquid
-                    variant="outline"
-                    onClick={() => router.push('/lights')}
-                  >
-                    Maggiori Info
-                  </Button>
-                </div>
-              </div>
+              <EmptyState
+                icon="🔌"
+                title="Luci Non Connesse"
+                description="Connetti il tuo account Philips Hue per controllare le luci"
+                action={
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Button
+                      liquid
+                      variant="success"
+                      onClick={handleAuth}
+                      icon="🔗"
+                    >
+                      Connetti Philips Hue
+                    </Button>
+                    <Button
+                      liquid
+                      variant="outline"
+                      onClick={() => router.push('/lights')}
+                    >
+                      Maggiori Info
+                    </Button>
+                  </div>
+                }
+              />
 
               {error && (
                 <div className="mt-4">
@@ -327,22 +316,10 @@ export default function LightsCard() {
               </div>
             )}
 
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                <span className="text-2xl sm:text-3xl">💡</span>
-                <span>Luci</span>
-              </h2>
-              <button
-                onClick={handleRefresh}
-                disabled={refreshing}
-                className="group relative p-3 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] hover:bg-white/[0.12] dark:hover:bg-white/[0.08] backdrop-blur-2xl shadow-liquid-sm hover:shadow-liquid active:scale-[0.98] transition-all duration-300 disabled:opacity-50 border border-white/20 dark:border-white/10 overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none"
-                title="Aggiorna stato"
-              >
-                <span className={`text-xl inline-block relative z-10 ${refreshing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`}>
-                  {refreshing ? '⏳' : '🔄'}
-                </span>
-              </button>
+            {/* Header - Simplified without refresh button */}
+            <div className="flex items-center gap-2 mb-6">
+              <span className="text-2xl sm:text-3xl">💡</span>
+              <Heading level={2} size="xl">Luci</Heading>
             </div>
 
             {/* Room Selection */}
@@ -365,23 +342,43 @@ export default function LightsCard() {
             {/* Selected Room Controls */}
             {selectedRoom ? (
               <div className="space-y-4 sm:space-y-6">
-                {/* On/Off + Brightness */}
-                <div className="p-4 sm:p-6 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-2xl border border-white/80 dark:border-white/10 shadow-sm">
+                {/* Main Control Area - Enhanced */}
+                <div className={`relative rounded-2xl p-6 sm:p-8 shadow-liquid hover:shadow-liquid-lg transition-all duration-500 ${
+                  isRoomOn
+                    ? 'bg-gradient-to-br from-warning-50 to-warning-100 dark:from-warning-900/20 dark:to-warning-800/20'
+                    : 'bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-900/20 dark:to-neutral-800/20'
+                }`}>
+                  {/* ON Badge */}
+                  {isRoomOn && (
+                    <div className="absolute -top-2 -right-2 z-20">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-warning-500/20 rounded-full blur-lg animate-pulse"></div>
+                        <div className="relative bg-gradient-to-br from-warning-500 to-warning-600 text-white px-3 py-1.5 rounded-full shadow-elevated-lg ring-2 ring-white/40">
+                          <span className="text-xs font-bold">💡 ACCESO</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Room name (solo se c'è una sola stanza) */}
                   {roomLights.length === 1 && (
-                    <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-4 text-center">
-                      {selectedRoom.metadata?.name || 'Stanza'}
-                    </p>
+                    <div className="text-center mb-6">
+                      <Heading level={3} size="sm" variant="subtle" className="uppercase tracking-wider">
+                        {selectedRoom.metadata?.name || 'Stanza'}
+                      </Heading>
+                    </div>
                   )}
 
                   {/* On/Off Buttons */}
-                  <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="grid grid-cols-2 gap-4 mb-6">
                     <Button
                       liquid
                       variant={isRoomOn ? "success" : "outline"}
                       onClick={() => handleRoomToggle(selectedRoom.id, true)}
                       disabled={refreshing}
                       icon="💡"
-                      className="w-full"
+                      size="lg"
+                      className="h-16 sm:h-20"
                     >
                       Accendi
                     </Button>
@@ -391,98 +388,148 @@ export default function LightsCard() {
                       onClick={() => handleRoomToggle(selectedRoom.id, false)}
                       disabled={refreshing}
                       icon="🌙"
-                      className="w-full"
+                      size="lg"
+                      className="h-16 sm:h-20"
                     >
                       Spegni
                     </Button>
                   </div>
 
-                  {/* Brightness Slider */}
+                  {/* Brightness Control - Enhanced with +/- buttons */}
                   {isRoomOn && (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                          ☀️ Luminosità
-                        </label>
-                        <span className="text-sm font-bold text-neutral-800 dark:text-neutral-100">
-                          {avgBrightness}%
-                        </span>
+                    <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.15] dark:bg-white/[0.08] p-4 sm:p-5">
+                      <div className="relative z-10 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xl">☀️</span>
+                            <Heading level={4} size="sm">Luminosità</Heading>
+                          </div>
+                          <span className="text-2xl sm:text-3xl font-black text-warning-600 dark:text-warning-400">
+                            {avgBrightness}%
+                          </span>
+                        </div>
+
+                        {/* Slider */}
+                        <input
+                          type="range"
+                          min="1"
+                          max="100"
+                          value={avgBrightness}
+                          onChange={(e) => handleBrightnessChange(selectedRoom.id, e.target.value)}
+                          disabled={refreshing}
+                          className="w-full h-3 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-warning-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        />
+
+                        {/* +/- Buttons */}
+                        <div className="flex items-center gap-2">
+                          <Button
+                            liquid
+                            variant="outline"
+                            size="sm"
+                            icon="➖"
+                            onClick={() => {
+                              const newValue = Math.max(1, avgBrightness - 5);
+                              handleBrightnessChange(selectedRoom.id, newValue.toString());
+                            }}
+                            disabled={refreshing || avgBrightness <= 1}
+                            className="flex-1"
+                          >
+                            -5%
+                          </Button>
+                          <Button
+                            liquid
+                            variant="outline"
+                            size="sm"
+                            icon="➕"
+                            onClick={() => {
+                              const newValue = Math.min(100, avgBrightness + 5);
+                              handleBrightnessChange(selectedRoom.id, newValue.toString());
+                            }}
+                            disabled={refreshing || avgBrightness >= 100}
+                            className="flex-1"
+                          >
+                            +5%
+                          </Button>
+                        </div>
                       </div>
-                      <input
-                        type="range"
-                        min="1"
-                        max="100"
-                        value={avgBrightness}
-                        onChange={(e) => handleBrightnessChange(selectedRoom.id, e.target.value)}
-                        disabled={refreshing}
-                        className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-warning-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                      />
                     </div>
                   )}
                 </div>
 
-                {/* Scenes */}
+                {/* Scenes - Horizontal Scroll (All scenes) */}
                 {roomScenes.length > 0 && (
                   <>
-                    <div className="relative my-6 sm:my-8">
-                      <div className="absolute inset-0 flex items-center">
-                        <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
-                      </div>
-                      <div className="relative flex justify-center">
-                        <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm border border-white/20 dark:border-white/10 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
-                          <span className="relative z-10">Scene</span>
-                        </span>
-                      </div>
-                    </div>
+                    <Divider label="Scene" variant="gradient" spacing="large" />
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-                      {roomScenes.slice(0, 6).map((scene) => (
-                        <button
-                          key={scene.id}
-                          onClick={() => handleSceneActivate(scene.id)}
-                          disabled={refreshing}
-                          className="p-3 sm:p-4 rounded-xl border-2 bg-white/60 border-neutral-200 text-neutral-600 hover:bg-warning-50 hover:border-warning-300 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <div className="text-2xl mb-1">🎨</div>
-                          <div className="text-xs font-semibold truncate">
-                            {scene.metadata?.name || 'Scena'}
-                          </div>
-                        </button>
-                      ))}
+                    {/* Scrollable container */}
+                    <div className="relative">
+                      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
+                        {roomScenes.map((scene) => (
+                          <button
+                            key={scene.id}
+                            onClick={() => handleSceneActivate(scene.id)}
+                            disabled={refreshing}
+                            className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl border-2 bg-white/60 dark:bg-white/[0.03] border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-warning-50 dark:hover:bg-warning-900/20 hover:border-warning-300 dark:hover:border-warning-600 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed snap-start"
+                          >
+                            <div className="text-3xl mb-2">🎨</div>
+                            <div className="text-xs font-semibold truncate">
+                              {scene.metadata?.name || 'Scena'}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Scroll indicator */}
+                      {roomScenes.length > 3 && (
+                        <div className="text-center mt-2">
+                          <Text variant="tertiary" className="text-xs">
+                            ← Scorri per vedere tutte le {roomScenes.length} scene →
+                          </Text>
+                        </div>
+                      )}
                     </div>
                   </>
                 )}
 
                 {/* Separator */}
-                <div className="relative my-6 sm:my-8">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
-                  </div>
-                  <div className="relative flex justify-center">
-                    <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm border border-white/20 dark:border-white/10 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
-                      <span className="relative z-10">Informazioni</span>
-                    </span>
-                  </div>
-                </div>
+                <Divider label="Informazioni" variant="gradient" spacing="large" />
 
-                {/* Summary Info */}
+                {/* Summary Info - Enhanced */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-                  <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-xl border border-white/80 dark:border-white/10">
-                    <span className="text-2xl sm:text-3xl mb-1">💡</span>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400">Luci Stanza</p>
-                    <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100">{roomLights.length}</p>
+                  <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10">
+                    <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
+                      <span className="text-3xl sm:text-4xl mb-2">💡</span>
+                      <Text variant="tertiary" className="text-[10px] sm:text-xs uppercase tracking-wider font-bold mb-1">
+                        Luci Stanza
+                      </Text>
+                      <span className="text-2xl sm:text-3xl font-black text-neutral-800 dark:text-neutral-100">
+                        {roomLights.length}
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-xl border border-white/80 dark:border-white/10">
-                    <span className="text-2xl sm:text-3xl mb-1">🚪</span>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400">Stanze</p>
-                    <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100">{rooms.length}</p>
+                  <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10">
+                    <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
+                      <span className="text-3xl sm:text-4xl mb-2">🚪</span>
+                      <Text variant="tertiary" className="text-[10px] sm:text-xs uppercase tracking-wider font-bold mb-1">
+                        Stanze
+                      </Text>
+                      <span className="text-2xl sm:text-3xl font-black text-neutral-800 dark:text-neutral-100">
+                        {rooms.length}
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="flex flex-col items-center p-3 sm:p-4 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm rounded-xl border border-white/80 dark:border-white/10 col-span-2 sm:col-span-1">
-                    <span className="text-2xl sm:text-3xl mb-1">🎨</span>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400">Scene</p>
-                    <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100">{scenes.length}</p>
+                  <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10 col-span-2 sm:col-span-1">
+                    <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
+                      <span className="text-3xl sm:text-4xl mb-2">🎨</span>
+                      <Text variant="tertiary" className="text-[10px] sm:text-xs uppercase tracking-wider font-bold mb-1">
+                        Scene
+                      </Text>
+                      <span className="text-2xl sm:text-3xl font-black text-neutral-800 dark:text-neutral-100">
+                        {scenes.length}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
@@ -500,9 +547,10 @@ export default function LightsCard() {
                 </div>
               </div>
             ) : (
-              <div className="text-center py-8">
-                <p className="text-neutral-500 dark:text-neutral-400">Nessuna stanza disponibile</p>
-              </div>
+              <EmptyState
+                icon="💡"
+                title="Nessuna stanza disponibile"
+              />
             )}
           </div>
         </div>

@@ -15,15 +15,14 @@ import { ref, onValue } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import Card from '../../ui/Card';
 import Button from '../../ui/Button';
-import Select from '../../ui/Select';
 import Skeleton from '../../ui/Skeleton';
 import ErrorAlert from '../../ui/ErrorAlert';
 import Banner from '../../ui/Banner';
 import MaintenanceBar from '../../MaintenanceBar';
 import CronHealthBanner from '../../CronHealthBanner';
-import GlassEffect from './GlassEffect';
 import Toast from '../../ui/Toast';
 import LoadingOverlay from '../../ui/LoadingOverlay';
+import { Divider, Heading, Text, EmptyState } from '../../ui';
 
 /**
  * StoveCard - Complete stove control for homepage
@@ -535,6 +534,10 @@ export default function StoveCard() {
         textColor: 'text-neutral-700',
         bgColor: 'bg-gradient-to-b from-neutral-50 to-neutral-100',
         glassColor: '#d1d5db',
+        boxBgColor: 'bg-neutral-100/90 dark:bg-neutral-800/90',
+        boxLabelColor: 'text-neutral-700 dark:text-neutral-300',
+        boxValueColor: 'text-neutral-900 dark:text-white',
+        boxSuffixColor: 'text-neutral-700 dark:text-neutral-400',
         animated: true,
       };
     }
@@ -549,6 +552,10 @@ export default function StoveCard() {
         textColor: 'text-success-800',
         bgColor: 'bg-gradient-to-b from-success-50 to-success-100',
         glassColor: '#d1d5db',
+        boxBgColor: 'bg-success-100/90 dark:bg-success-900/80',
+        boxLabelColor: 'text-success-800 dark:text-success-100',
+        boxValueColor: 'text-success-950 dark:text-white',
+        boxSuffixColor: 'text-success-700 dark:text-success-200',
         animated: true,
         pulse: true,
       };
@@ -562,6 +569,10 @@ export default function StoveCard() {
         textColor: 'text-info-700',
         bgColor: 'bg-gradient-to-b from-sky-50 to-sky-100',
         glassColor: '#d1d5db',
+        boxBgColor: 'bg-sky-100/90 dark:bg-sky-900/80',
+        boxLabelColor: 'text-sky-800 dark:text-sky-100',
+        boxValueColor: 'text-sky-950 dark:text-white',
+        boxSuffixColor: 'text-sky-700 dark:text-sky-200',
         animated: false,
       };
     }
@@ -574,6 +585,10 @@ export default function StoveCard() {
         textColor: 'text-info-700',
         bgColor: 'bg-gradient-to-b from-info-50 to-info-100',
         glassColor: '#d1d5db',
+        boxBgColor: 'bg-info-100/90 dark:bg-info-900/80',
+        boxLabelColor: 'text-info-800 dark:text-info-100',
+        boxValueColor: 'text-info-950 dark:text-white',
+        boxSuffixColor: 'text-info-700 dark:text-info-200',
         animated: true,
         pulse: true,
       };
@@ -587,6 +602,10 @@ export default function StoveCard() {
         textColor: 'text-warning-700',
         bgColor: 'bg-gradient-to-b from-warning-50 to-warning-100',
         glassColor: '#d1d5db',
+        boxBgColor: 'bg-warning-100/90 dark:bg-warning-900/80',
+        boxLabelColor: 'text-warning-800 dark:text-warning-100',
+        boxValueColor: 'text-warning-950 dark:text-white',
+        boxSuffixColor: 'text-warning-700 dark:text-warning-200',
         animated: true,
       };
     }
@@ -599,6 +618,10 @@ export default function StoveCard() {
         textColor: 'text-primary-700',
         bgColor: 'bg-gradient-to-b from-primary-50 to-primary-100',
         glassColor: '#d1d5db',
+        boxBgColor: 'bg-primary-100/90 dark:bg-primary-900/80',
+        boxLabelColor: 'text-primary-800 dark:text-primary-100',
+        boxValueColor: 'text-primary-950 dark:text-white',
+        boxSuffixColor: 'text-primary-700 dark:text-primary-200',
         animated: true,
         pulse: true,
       };
@@ -612,6 +635,10 @@ export default function StoveCard() {
         textColor: 'text-accent-700',
         bgColor: 'bg-gradient-to-b from-accent-50 to-accent-100',
         glassColor: '#d1d5db',
+        boxBgColor: 'bg-accent-100/90 dark:bg-accent-900/80',
+        boxLabelColor: 'text-accent-800 dark:text-accent-100',
+        boxValueColor: 'text-accent-950 dark:text-white',
+        boxSuffixColor: 'text-accent-700 dark:text-accent-200',
         animated: true,
         pulse: true,
       };
@@ -625,6 +652,10 @@ export default function StoveCard() {
         textColor: 'text-info-700',
         bgColor: 'bg-gradient-to-b from-info-50 to-info-100',
         glassColor: '#d1d5db',
+        boxBgColor: 'bg-info-100/90 dark:bg-info-900/80',
+        boxLabelColor: 'text-info-800 dark:text-info-100',
+        boxValueColor: 'text-info-950 dark:text-white',
+        boxSuffixColor: 'text-info-700 dark:text-info-200',
         animated: true,
       };
     }
@@ -636,6 +667,10 @@ export default function StoveCard() {
       textColor: 'text-neutral-700',
       bgColor: 'bg-gradient-to-b from-neutral-50 to-neutral-100',
       glassColor: '#d1d5db',
+      boxBgColor: 'bg-neutral-100/90 dark:bg-neutral-800/90',
+      boxLabelColor: 'text-neutral-700 dark:text-neutral-300',
+      boxValueColor: 'text-neutral-900 dark:text-white',
+      boxSuffixColor: 'text-neutral-700 dark:text-neutral-400',
       animated: false,
     };
   };
@@ -728,22 +763,10 @@ export default function StoveCard() {
               </div>
             )}
 
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                <span className="text-2xl sm:text-3xl">🔥</span>
-                <span>Stufa</span>
-              </h2>
-              <button
-                onClick={handleManualRefresh}
-                disabled={refreshing}
-                className="group relative p-3 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] hover:bg-white/[0.12] dark:hover:bg-white/[0.08] backdrop-blur-2xl shadow-liquid-sm hover:shadow-liquid active:scale-[0.98] transition-all duration-300 disabled:opacity-50 border border-white/20 dark:border-white/10 overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none"
-                title="Aggiorna stato"
-              >
-                <span className={`text-xl inline-block relative z-10 ${refreshing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`}>
-                  {refreshing ? '⏳' : '🔄'}
-                </span>
-              </button>
+            {/* Header - Simplified without refresh button */}
+            <div className="flex items-center gap-2 mb-6">
+              <span className="text-2xl sm:text-3xl">🔥</span>
+              <Heading level={2} size="xl">Stufa</Heading>
             </div>
 
             {/* Main Status Display - Frame 3 Style */}
@@ -800,47 +823,37 @@ export default function StoveCard() {
                         {/* Due box glassmorphism (z-10, davanti all'icona) */}
                         <div className="relative z-10 w-full grid grid-cols-2 gap-3 sm:gap-4 mt-4">
                           {/* Box Ventola */}
-                          <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05]">
-                            {/* Effetto vetro WebGL */}
-                            <GlassEffect
-                              bgColor={statusInfo.glassColor}
-                              opacity={0.35}
-                            />
+                          <div className={`relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl ${statusInfo.boxBgColor} border border-white/30 dark:border-white/20`}>
                             <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
                               <div className="flex items-center gap-1.5 mb-1.5">
                                 <span className="text-xl sm:text-2xl">💨</span>
                               </div>
-                              <p className="text-[10px] sm:text-xs font-bold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider mb-1">
+                              <p className={`text-[10px] sm:text-xs font-bold ${statusInfo.boxLabelColor} uppercase tracking-wider mb-1`}>
                                 Ventola
                               </p>
                               <div className="flex items-baseline gap-0.5">
-                                <p className="text-2xl sm:text-3xl font-black text-neutral-800 dark:text-neutral-100 leading-none">
+                                <p className={`text-2xl sm:text-3xl font-black ${statusInfo.boxValueColor} leading-none`}>
                                   {fanLevel ?? '-'}
                                 </p>
-                                <span className="text-sm sm:text-base text-neutral-600 dark:text-neutral-400 font-semibold">/6</span>
+                                <span className={`text-sm sm:text-base ${statusInfo.boxSuffixColor} font-semibold`}>/6</span>
                               </div>
                             </div>
                           </div>
 
                           {/* Box Potenza */}
-                          <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05]">
-                            {/* Effetto vetro WebGL */}
-                            <GlassEffect
-                              bgColor={statusInfo.glassColor}
-                              opacity={0.35}
-                            />
+                          <div className={`relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl ${statusInfo.boxBgColor} border border-white/30 dark:border-white/20`}>
                             <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
                               <div className="flex items-center gap-1.5 mb-1.5">
                                 <span className="text-xl sm:text-2xl">⚡</span>
                               </div>
-                              <p className="text-[10px] sm:text-xs font-bold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider mb-1">
+                              <p className={`text-[10px] sm:text-xs font-bold ${statusInfo.boxLabelColor} uppercase tracking-wider mb-1`}>
                                 Potenza
                               </p>
                               <div className="flex items-baseline gap-0.5">
-                                <p className="text-2xl sm:text-3xl font-black text-neutral-800 dark:text-neutral-100 leading-none">
+                                <p className={`text-2xl sm:text-3xl font-black ${statusInfo.boxValueColor} leading-none`}>
                                   {powerLevel ?? '-'}
                                 </p>
-                                <span className="text-sm sm:text-base text-neutral-600 dark:text-neutral-400 font-semibold">/5</span>
+                                <span className={`text-sm sm:text-base ${statusInfo.boxSuffixColor} font-semibold`}>/5</span>
                               </div>
                             </div>
                           </div>
@@ -850,17 +863,34 @@ export default function StoveCard() {
               </div>
             </div>
 
-            {/* Separator */}
-            <div className="relative my-6 sm:my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
-              </div>
-              <div className="relative flex justify-center">
-                <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm border border-white/20 dark:border-white/10 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
-                  <span className="relative z-10">Modalità Controllo</span>
-                </span>
-              </div>
+            {/* PRIMARY ACTIONS - Always visible */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <Button
+                liquid
+                variant={isAccesa ? "success" : "outline"}
+                size="lg"
+                icon="🔥"
+                onClick={handleIgnite}
+                disabled={loading || isAccesa || needsMaintenance}
+                className="h-20 sm:h-24 text-base sm:text-lg font-bold"
+              >
+                ACCENDI
+              </Button>
+              <Button
+                liquid
+                variant={isSpenta ? "outline" : "danger"}
+                size="lg"
+                icon="❄️"
+                onClick={handleShutdown}
+                disabled={loading || isSpenta}
+                className="h-20 sm:h-24 text-base sm:text-lg font-bold"
+              >
+                SPEGNI
+              </Button>
             </div>
+
+            {/* Separator */}
+            <Divider label="Modalità Controllo" variant="gradient" spacing="large" />
 
             {/* Mode Indicator - Liquid Glass */}
             <div className="flex flex-col gap-4 p-5 sm:p-6 bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl rounded-2xl shadow-liquid-sm border border-white/20 dark:border-white/10 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
@@ -942,101 +972,135 @@ export default function StoveCard() {
             {/* Maintenance Status */}
             {maintenanceStatus && (
               <>
-                <div className="relative my-6 sm:my-8">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 to-transparent"></div>
-                  </div>
-                  <div className="relative flex justify-center">
-                    <span className="px-4 py-1.5 bg-white/[0.10] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm border border-white/20 dark:border-white/10 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
-                      <span className="relative z-10">Manutenzione</span>
-                    </span>
-                  </div>
-                </div>
-
+                <Divider label="Manutenzione" variant="gradient" spacing="large" />
                 <MaintenanceBar maintenanceStatus={maintenanceStatus} />
               </>
             )}
 
             {/* Separator Controllo */}
-            <div className="relative my-6 sm:my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 to-transparent"></div>
-              </div>
-              <div className="relative flex justify-center">
-                <span className="px-4 py-1.5 bg-white/[0.10] backdrop-blur-2xl text-neutral-700 dark:text-neutral-300 font-semibold text-xs uppercase tracking-[0.15em] rounded-full shadow-liquid-sm border border-white/20 dark:border-white/10 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
-                  <span className="relative z-10">Controllo</span>
-                </span>
-              </div>
-            </div>
-
-            {/* Azioni On/Off - Liquid Glass Buttons */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <Button
-                liquid
-                variant="success"
-                size="lg"
-                icon="🔥"
-                onClick={handleIgnite}
-                disabled={loading || isAccesa || needsMaintenance}
-                className="h-20 sm:h-24 text-base sm:text-lg font-bold"
-              >
-                Accendi
-              </Button>
-              <Button
-                liquid
-                variant="danger"
-                size="lg"
-                icon="❄️"
-                onClick={handleShutdown}
-                disabled={loading || isSpenta}
-                className="h-20 sm:h-24 text-base sm:text-lg font-bold"
-              >
-                Spegni
-              </Button>
-            </div>
-
-            {/* Status indicator - Liquid Glass */}
-            {isAccesa && (
-              <div className="mb-6 p-3 sm:p-4 bg-success-500/[0.12] dark:bg-success-500/[0.15] backdrop-blur-2xl rounded-xl text-center shadow-liquid-sm border border-success-500/25 dark:border-success-500/30 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-success-400/15 dark:before:from-success-400/20 before:to-transparent before:pointer-events-none">
-                <p className="text-xs sm:text-sm font-semibold text-success-700 dark:text-success-400 tracking-wide relative z-10">✓ Stufa in funzione</p>
-              </div>
-            )}
-            {isSpenta && (
-              <div className="mb-6 p-3 sm:p-4 bg-neutral-500/[0.12] dark:bg-neutral-500/[0.15] backdrop-blur-2xl rounded-xl text-center shadow-liquid-sm border border-neutral-400/25 dark:border-neutral-400/30 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-neutral-300/15 dark:before:from-neutral-300/20 before:to-transparent before:pointer-events-none">
-                <p className="text-xs sm:text-sm font-semibold text-neutral-600 dark:text-neutral-400 tracking-wide relative z-10">○ Stufa spenta</p>
-              </div>
-            )}
+            <Divider label="Regolazioni" variant="gradient" spacing="large" />
 
             {/* Regolazioni - Visibili solo quando stufa accesa */}
-            {!isSpenta && (
-              <div className="space-y-4">
+            {!isSpenta ? (
+              <div className="space-y-6">
                 {/* Info badge quando in modalità automatica */}
                 {schedulerEnabled && !semiManualMode && (
-                  <div className="px-4 py-2.5 bg-info-500/[0.12] dark:bg-info-500/[0.15] backdrop-blur-2xl rounded-xl text-center shadow-liquid-sm border border-info-500/25 dark:border-info-500/30 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-info-400/15 dark:before:from-info-400/20 before:to-transparent before:pointer-events-none">
-                    <p className="text-xs sm:text-sm font-semibold text-info-700 dark:text-info-400 tracking-wide relative z-10">
-                      ℹ️ La modifica attiverà la modalità Semi-Manuale
-                    </p>
-                  </div>
+                  <Banner
+                    liquid
+                    variant="info"
+                    icon="ℹ️"
+                    description="La modifica attiverà la modalità Semi-Manuale"
+                  />
                 )}
 
-                <Select
-                  label="💨 Livello Ventilazione"
-                  value={fanLevel ?? ''}
-                  onChange={handleFanChange}
-                  options={fanOptions}
-                  disabled={false}
-                  className="text-base sm:text-lg py-3 sm:py-4"
-                />
+                {/* Ventilazione Control - Buttons +/- */}
+                <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10 p-5 sm:p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl sm:text-2xl">💨</span>
+                      <Heading level={4} size="md">Ventilazione</Heading>
+                    </div>
+                    <span className="text-3xl sm:text-4xl font-black text-neutral-800 dark:text-white">
+                      {fanLevel ?? '-'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Button
+                      liquid
+                      variant="outline"
+                      size="lg"
+                      icon="➖"
+                      onClick={() => {
+                        if (fanLevel > 1) {
+                          const newLevel = fanLevel - 1;
+                          handleFanChange({ target: { value: newLevel.toString() } });
+                        }
+                      }}
+                      disabled={!fanLevel || fanLevel <= 1}
+                      className="flex-1 h-16 sm:h-18 text-lg font-bold"
+                    >
+                      -1
+                    </Button>
+                    <div className="flex flex-col items-center justify-center px-4">
+                      <Text variant="tertiary" className="text-xs uppercase">Livello</Text>
+                      <span className="text-xl font-black">{fanLevel ?? '-'}/6</span>
+                    </div>
+                    <Button
+                      liquid
+                      variant="outline"
+                      size="lg"
+                      icon="➕"
+                      onClick={() => {
+                        if (fanLevel < 6) {
+                          const newLevel = fanLevel + 1;
+                          handleFanChange({ target: { value: newLevel.toString() } });
+                        }
+                      }}
+                      disabled={!fanLevel || fanLevel >= 6}
+                      className="flex-1 h-16 sm:h-18 text-lg font-bold"
+                    >
+                      +1
+                    </Button>
+                  </div>
+                </div>
 
-                <Select
-                  label="⚡ Livello Potenza"
-                  value={powerLevel ?? ''}
-                  onChange={handlePowerChange}
-                  options={powerOptions}
-                  disabled={false}
-                  className="text-base sm:text-lg py-3 sm:py-4"
-                />
+                {/* Potenza Control - Buttons +/- */}
+                <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10 p-5 sm:p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl sm:text-2xl">⚡</span>
+                      <Heading level={4} size="md">Potenza</Heading>
+                    </div>
+                    <span className="text-3xl sm:text-4xl font-black text-neutral-800 dark:text-white">
+                      {powerLevel ?? '-'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Button
+                      liquid
+                      variant="outline"
+                      size="lg"
+                      icon="➖"
+                      onClick={() => {
+                        if (powerLevel > 1) {
+                          const newLevel = powerLevel - 1;
+                          handlePowerChange({ target: { value: newLevel.toString() } });
+                        }
+                      }}
+                      disabled={!powerLevel || powerLevel <= 1}
+                      className="flex-1 h-16 sm:h-18 text-lg font-bold"
+                    >
+                      -1
+                    </Button>
+                    <div className="flex flex-col items-center justify-center px-4">
+                      <Text variant="tertiary" className="text-xs uppercase">Livello</Text>
+                      <span className="text-xl font-black">{powerLevel ?? '-'}/5</span>
+                    </div>
+                    <Button
+                      liquid
+                      variant="outline"
+                      size="lg"
+                      icon="➕"
+                      onClick={() => {
+                        if (powerLevel < 5) {
+                          const newLevel = powerLevel + 1;
+                          handlePowerChange({ target: { value: newLevel.toString() } });
+                        }
+                      }}
+                      disabled={!powerLevel || powerLevel >= 5}
+                      className="flex-1 h-16 sm:h-18 text-lg font-bold"
+                    >
+                      +1
+                    </Button>
+                  </div>
+                </div>
               </div>
+            ) : (
+              <EmptyState
+                icon="❄️"
+                title="Stufa Spenta"
+                description="Accendi la stufa per regolare ventilazione e potenza"
+              />
             )}
           </div>
         </div>

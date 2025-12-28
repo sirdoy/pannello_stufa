@@ -160,7 +160,7 @@ export default function StoveCard() {
     } finally {
       setInitialLoading(false);
     }
-  }, [checkVersion]);
+  }, [checkVersion, user?.sub]);
 
   useEffect(() => {
     if (pollingStartedRef.current) return;

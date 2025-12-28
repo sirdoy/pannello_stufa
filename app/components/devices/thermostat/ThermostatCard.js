@@ -72,7 +72,7 @@ export default function ThermostatCard() {
     if (roomsWithStatus.length > 0 && !selectedRoomId) {
       setSelectedRoomId(roomsWithStatus[0].id);
     }
-  }, [roomsWithStatus.length, selectedRoomId]);
+  }, [roomsWithStatus, selectedRoomId]);
 
   const selectedRoom = roomsWithStatus.find(r => r.id === selectedRoomId) || roomsWithStatus[0];
   const mode = status?.mode || 'schedule';

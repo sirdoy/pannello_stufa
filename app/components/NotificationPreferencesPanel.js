@@ -7,7 +7,7 @@
  * Salva preferenze su Firebase per utente
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import {
   getUserPreferences,
@@ -56,17 +56,9 @@ export default function NotificationPreferencesPanel() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [error, setError] = useState(null);
 
-  // Load preferences
-  useEffect(() => {
-    if (!user?.sub) {
-      setIsLoading(false);
-      return;
-    }
+  const loadPreferences = useCallback(async () => {
+    if (!user?.sub) return;
 
-    loadPreferences();
-  }, [user?.sub]);
-
-  const loadPreferences = async () => {
     try {
       setIsLoading(true);
       const prefs = await getUserPreferences(user.sub);
@@ -79,7 +71,17 @@ export default function NotificationPreferencesPanel() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?.sub]);
+
+  // Load preferences
+  useEffect(() => {
+    if (!user?.sub) {
+      setIsLoading(false);
+      return;
+    }
+
+    loadPreferences();
+  }, [user?.sub, loadPreferences]);
 
   // Save section preferences
   const saveSection = async (section, sectionPrefs) => {

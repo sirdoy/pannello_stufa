@@ -1,7 +1,7 @@
 'use client';
 
 import { clearSemiManualMode } from '@/lib/schedulerApiClient';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import Banner from '../ui/Banner';
@@ -58,26 +58,7 @@ export default function SandboxPanel() {
   const [testIntervalPower, setTestIntervalPower] = useState(3);
   const [testIntervalFan, setTestIntervalFan] = useState(3);
 
-  useEffect(() => {
-    checkEnvironment();
-  }, []);
-
-  async function checkEnvironment() {
-    const local = isLocalEnvironment();
-    setIsLocal(local);
-
-    if (local) {
-      const enabled = await isSandboxEnabled();
-      setSandboxEnabled(enabled);
-
-      if (enabled) {
-        await loadData();
-      }
-    }
-    setLoading(false);
-  }
-
-  async function loadData() {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       const [state, maint, sett, hist, schedMode] = await Promise.all([
@@ -112,7 +93,26 @@ export default function SandboxPanel() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  const checkEnvironment = useCallback(async () => {
+    const local = isLocalEnvironment();
+    setIsLocal(local);
+
+    if (local) {
+      const enabled = await isSandboxEnabled();
+      setSandboxEnabled(enabled);
+
+      if (enabled) {
+        await loadData();
+      }
+    }
+    setLoading(false);
+  }, [loadData]);
+
+  useEffect(() => {
+    checkEnvironment();
+  }, [checkEnvironment]);
 
   async function handleUpdateState(updates) {
     try {

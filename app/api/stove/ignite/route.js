@@ -2,6 +2,7 @@ import { auth0 } from '@/lib/auth0';
 import { igniteStove } from '@/lib/stoveApi';
 import { getFullSchedulerMode, setSemiManualMode, getNextScheduledChange } from '@/lib/schedulerService';
 import { canIgnite } from '@/lib/maintenanceService';
+import { updateStoveState } from '@/lib/stoveStateService';
 
 /**
  * POST /api/stove/ignite
@@ -29,6 +30,14 @@ export const POST = auth0.withApiAuthRequired(async function igniteHandler(req) 
     }
 
     const data = await igniteStove(power);
+
+    // Update Firebase state for real-time sync
+    await updateStoveState({
+      status: 'START',
+      statusDescription: 'Avvio in corso',
+      powerLevel: power,
+      source: source || 'manual',
+    });
 
     // Attiva semi-manuale SOLO se source='manual', scheduler attivo e non già in semi-manuale
     if (source === 'manual') {

@@ -63,13 +63,26 @@ export default function StoveCard() {
   // Loading overlay message
   const [loadingMessage, setLoadingMessage] = useState('Caricamento...');
 
+  // Firebase connection tracking
+  const [isFirebaseConnected, setIsFirebaseConnected] = useState(true);
+  const [usePollingFallback, setUsePollingFallback] = useState(false);
+  const lastFirebaseUpdateRef = useRef(null);
+
+  // Refs for tracking previous values (for Firebase sync on external changes)
+  const previousStatusRef = useRef(null);
+  const previousFanLevelRef = useRef(null);
+  const previousPowerLevelRef = useRef(null);
+
   const fetchFanLevel = async () => {
     try {
       const res = await fetch(STOVE_ROUTES.getFan);
       const json = await res.json();
-      setFanLevel(json?.Result ?? 3);
+      const level = json?.Result ?? 3;
+      setFanLevel(level);
+      return level;
     } catch (err) {
       console.error('Errore livello ventola:', err);
+      return null;
     }
   };
 
@@ -77,9 +90,12 @@ export default function StoveCard() {
     try {
       const res = await fetch(STOVE_ROUTES.getPower);
       const json = await res.json();
-      setPowerLevel(json?.Result ?? 2);
+      const level = json?.Result ?? 2;
+      setPowerLevel(level);
+      return level;
     } catch (err) {
       console.error('Errore livello potenza:', err);
+      return null;
     }
   };
 
@@ -149,11 +165,44 @@ export default function StoveCard() {
 
       previousErrorCode.current = newErrorCode;
 
-      await fetchFanLevel();
-      await fetchPowerLevel();
+      const newFanLevel = await fetchFanLevel();
+      const newPowerLevel = await fetchPowerLevel();
       await fetchSchedulerMode();
       await fetchMaintenanceStatus();
       await checkVersion();
+
+      // Sync to Firebase if external changes detected (manual actions, auto-shutdown, etc.)
+      const hasChanges =
+        previousStatusRef.current !== newStatus ||
+        previousFanLevelRef.current !== newFanLevel ||
+        previousPowerLevelRef.current !== newPowerLevel ||
+        previousErrorCode.current !== newErrorCode;
+
+      // Only sync if not initial load (previousStatusRef.current !== null)
+      if (hasChanges && previousStatusRef.current !== null) {
+        console.log('[StoveCard] External change detected, syncing to Firebase for multi-device updates');
+        try {
+          await fetch('/api/stove/sync-external-state', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              status: newStatus,
+              fanLevel: newFanLevel,
+              powerLevel: newPowerLevel,
+              errorCode: newErrorCode,
+              errorDescription: newErrorDescription
+            })
+          });
+        } catch (syncErr) {
+          console.error('[StoveCard] Firebase sync error (non-critical):', syncErr);
+          // Non-critical error, don't break the UI update
+        }
+      }
+
+      // Update refs for next comparison
+      previousStatusRef.current = newStatus;
+      previousFanLevelRef.current = newFanLevel;
+      previousPowerLevelRef.current = newPowerLevel;
     } catch (err) {
       console.error('Errore stato:', err);
       setStatus('errore');
@@ -162,18 +211,124 @@ export default function StoveCard() {
     }
   }, [checkVersion, user?.sub]);
 
+  // Adaptive polling (active only if Firebase fails or for validation)
   useEffect(() => {
     if (pollingStartedRef.current) return;
-    pollingStartedRef.current = true;
 
+    // Initial fetch (always)
     fetchStatusAndUpdate();
-    const interval = setInterval(fetchStatusAndUpdate, 5000);
+
+    pollingStartedRef.current = true;
+    let timeoutId = null;
+
+    const scheduleNextPoll = () => {
+      // Adaptive polling intervals:
+      // - 10s if Firebase disconnected (fallback mode)
+      // - 15s if stove is ON (more frequent to detect external changes)
+      // - 60s if stove is OFF/standby (less frequent, saves resources)
+      let interval;
+      if (usePollingFallback) {
+        interval = 10000; // Firebase disconnected
+      } else {
+        // Check if stove is actively running
+        const stoveIsOn = status !== 'spento' &&
+                          status !== 'standby' &&
+                          status !== 'errore' &&
+                          status !== '...' &&
+                          status !== 'sconosciuto';
+        interval = stoveIsOn ? 15000 : 60000; // 15s on, 60s off
+      }
+
+      timeoutId = setTimeout(() => {
+        // Only poll if:
+        // 1. Firebase is disconnected (fallback), OR
+        // 2. Last Firebase update was too old (stale data detection)
+        const now = new Date();
+        const lastUpdate = lastFirebaseUpdateRef.current;
+        const timeSinceUpdate = lastUpdate ? (now - lastUpdate) / 1000 : Infinity;
+
+        // Stale threshold adapts to polling interval
+        const staleThreshold = usePollingFallback ? 30 : (status !== 'spento' ? 30 : 90);
+
+        if (!isFirebaseConnected || timeSinceUpdate > staleThreshold || usePollingFallback) {
+          console.log(`[StoveCard] Adaptive polling (${interval}ms) - ${usePollingFallback ? 'fallback' : status !== 'spento' ? 'stove on' : 'stove off'}`);
+          fetchStatusAndUpdate();
+        }
+
+        // Schedule next poll (recursive)
+        scheduleNextPoll();
+      }, interval);
+    };
+
+    scheduleNextPoll();
 
     return () => {
-      clearInterval(interval);
+      if (timeoutId) clearTimeout(timeoutId);
       pollingStartedRef.current = false;
     };
-  }, [fetchStatusAndUpdate]);
+  }, [fetchStatusAndUpdate, isFirebaseConnected, usePollingFallback, status]);
+
+  // Firebase connection monitoring
+  useEffect(() => {
+    const connectedRef = ref(db, '.info/connected');
+
+    const unsubscribe = onValue(connectedRef, (snapshot) => {
+      const connected = snapshot.val();
+      setIsFirebaseConnected(connected);
+
+      if (!connected) {
+        console.warn('[StoveCard] Firebase disconnected, activating polling fallback');
+        setUsePollingFallback(true);
+      } else {
+        console.log('[StoveCard] Firebase connected');
+        // Keep polling fallback for 30s after reconnection to ensure sync
+        setTimeout(() => {
+          setUsePollingFallback(false);
+        }, 30000);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Firebase real-time listener for stove state
+  useEffect(() => {
+    const path = isLocalEnvironment() ? 'dev/stove/state' : 'stove/state';
+    const stateRef = ref(db, path);
+
+    const unsubscribe = onValue(
+      stateRef,
+      (snapshot) => {
+        const data = snapshot.val();
+
+        if (data) {
+          console.log('[StoveCard] Firebase state update:', data);
+
+          // Update all state from Firebase
+          if (data.status !== undefined) setStatus(data.status);
+          if (data.fanLevel !== undefined) setFanLevel(data.fanLevel);
+          if (data.powerLevel !== undefined) setPowerLevel(data.powerLevel);
+          if (data.errorCode !== undefined) setErrorCode(data.errorCode);
+          if (data.errorDescription !== undefined) setErrorDescription(data.errorDescription);
+
+          // Track last update time
+          lastFirebaseUpdateRef.current = new Date();
+
+          // Fetch related data (scheduler mode, maintenance) on state change
+          fetchSchedulerMode();
+          fetchMaintenanceStatus();
+          checkVersion();
+        }
+      },
+      (error) => {
+        console.error('[StoveCard] Firebase listener error:', error);
+        // Activate polling fallback on listener error
+        setUsePollingFallback(true);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [checkVersion]);
 
   // Listener Firebase per Sandbox Mode - sync real-time
   useEffect(() => {
@@ -559,6 +714,20 @@ export default function StoveCard() {
                 />
               </div>
             )}
+
+            {/* Firebase Connection Status */}
+            {!isFirebaseConnected && (
+              <div className="mb-6">
+                <Banner
+                  liquid
+                  variant="warning"
+                  icon="⚠️"
+                  title="Connessione Firebase Interrotta"
+                  description="Aggiornamenti in tempo reale non disponibili. Dati aggiornati ogni 10 secondi."
+                />
+              </div>
+            )}
+
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">

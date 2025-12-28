@@ -1,6 +1,7 @@
 import { auth0 } from '@/lib/auth0';
 import { shutdownStove } from '@/lib/stoveApi';
 import { getFullSchedulerMode, setSemiManualMode, getNextScheduledChange } from '@/lib/schedulerService';
+import { updateStoveState } from '@/lib/stoveStateService';
 
 /**
  * POST /api/stove/shutdown
@@ -15,6 +16,13 @@ export const POST = auth0.withApiAuthRequired(async function shutdownHandler(req
     const source = body.source;
 
     const data = await shutdownStove();
+
+    // Update Firebase state for real-time sync
+    await updateStoveState({
+      status: 'STANDBY',
+      statusDescription: 'Spegnimento...',
+      source: source || 'manual',
+    });
 
     // Attiva semi-manuale SOLO se source='manual', scheduler attivo e non già in semi-manuale
     if (source === 'manual') {

@@ -14,6 +14,7 @@ import {
   setPowerLevel,
   setFanLevel,
 } from '@/lib/stoveApi';
+import { updateStoveState } from '@/lib/stoveStateService';
 
 export const dynamic = 'force-dynamic';
 
@@ -433,6 +434,15 @@ export async function GET(req) {
           await igniteStove(active.power);
           changeApplied = true;
 
+          // Update Firebase state for real-time sync
+          await updateStoveState({
+            status: 'START',
+            statusDescription: 'Avvio automatico',
+            fanLevel: active.fan,
+            powerLevel: active.power,
+            source: 'scheduler',
+          });
+
           // Send notification
           await sendSchedulerNotification('IGNITE', `Stufa accesa automaticamente alle ${ora} (P${active.power}, V${active.fan})`);
         } catch (error) {
@@ -443,6 +453,12 @@ export async function GET(req) {
         try {
           await setPowerLevel(active.power);
           changeApplied = true;
+
+          // Update Firebase state for real-time sync
+          await updateStoveState({
+            powerLevel: active.power,
+            source: 'scheduler',
+          });
         } catch (error) {
           console.error('❌ Failed to set power:', error.message);
         }
@@ -451,6 +467,12 @@ export async function GET(req) {
         try {
           await setFanLevel(active.fan);
           changeApplied = true;
+
+          // Update Firebase state for real-time sync
+          await updateStoveState({
+            fanLevel: active.fan,
+            source: 'scheduler',
+          });
         } catch (error) {
           console.error('❌ Failed to set fan:', error.message);
         }
@@ -460,6 +482,13 @@ export async function GET(req) {
         try {
           await shutdownStove();
           changeApplied = true;
+
+          // Update Firebase state for real-time sync
+          await updateStoveState({
+            status: 'STANDBY',
+            statusDescription: 'Spegnimento automatico',
+            source: 'scheduler',
+          });
 
           // Send notification
           await sendSchedulerNotification('SHUTDOWN', `Stufa spenta automaticamente alle ${ora}`);

@@ -1,6 +1,7 @@
 import { auth0 } from '@/lib/auth0';
 import { setFanLevel, getStoveStatus } from '@/lib/stoveApi';
 import { getFullSchedulerMode, setSemiManualMode, getNextScheduledChange } from '@/lib/schedulerService';
+import { updateStoveState } from '@/lib/stoveStateService';
 
 /**
  * POST /api/stove/setFan
@@ -12,6 +13,12 @@ export const POST = auth0.withApiAuthRequired(async function setFanHandler(req) 
   try {
     const { level, source } = await req.json();
     const data = await setFanLevel(level);
+
+    // Update Firebase state for real-time sync
+    await updateStoveState({
+      fanLevel: level,
+      source: source || 'manual',
+    });
 
     // Attiva semi-manuale SOLO se source='manual', stufa accesa, scheduler attivo e non già in semi-manuale
     if (source === 'manual') {

@@ -425,11 +425,66 @@ Applicare liquid glass a:
 
 ## Navbar
 
-Navbar responsive con architettura stati separati mobile/desktop.
+Navbar responsive con architettura mobile-first e iOS-style bottom navigation.
 
-**Architettura**: Stati separati mobile/desktop per zero interferenze
-- **Desktop** (≥1024px): Links orizzontali + dropdown device + dropdown utente
-- **Mobile** (< 1024px): Hamburger button + fixed overlay menu
+**Architettura v1.27.0**: Mobile-first approach con dual navigation
+- **Desktop** (≥1024px): Top horizontal navigation con lucide-react icons + dropdown device/settings/user
+- **Mobile** (< 1024px): Top header + iOS-style bottom navigation bar + hamburger menu overlay
+
+### Mobile Bottom Navigation (NEW v1.27.0)
+
+iOS-style fixed bottom bar per thumb-friendly access alle 4 azioni principali:
+
+```jsx
+<nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-3xl border-t border-white/20 dark:border-white/10 shadow-liquid pb-safe">
+  <div className="grid grid-cols-4 gap-1 p-2">
+
+    {/* Home */}
+    <Link href="/" className="flex flex-col items-center justify-center py-2 px-3 rounded-xl">
+      <Home className="w-6 h-6 mb-1" />
+      <span className="text-xs font-medium">Home</span>
+    </Link>
+
+    {/* Scheduler */}
+    <Link href="/stove/scheduler">
+      <Calendar className="w-6 h-6 mb-1" />
+      <span className="text-xs font-medium">Scheduler</span>
+    </Link>
+
+    {/* Errors */}
+    <Link href="/stove/errors">
+      <AlertCircle className="w-6 h-6 mb-1" />
+      <span className="text-xs font-medium">Errori</span>
+    </Link>
+
+    {/* Log */}
+    <Link href="/log">
+      <Clock className="w-6 h-6 mb-1" />
+      <span className="text-xs font-medium">Storico</span>
+    </Link>
+  </div>
+</nav>
+
+{/* Spacer for fixed navigation */}
+<div className="h-16 lg:h-18" aria-hidden="true" /> {/* Top header spacer */}
+<div className="h-20 lg:hidden" aria-hidden="true" /> {/* Bottom nav spacer */}
+```
+
+**Features**:
+- Fixed positioning (`bottom-0`) per accesso costante
+- Grid 4 colonne con gap minimo
+- Touch targets 48px (py-2 px-3 = ~44px minimo)
+- Active state: `bg-primary-500/10 dark:bg-primary-500/20`
+- Lucide-react icons per chiarezza visiva
+- Safe area support: `pb-safe` per iPhone con gesture bar
+
+**Icons utilizzate**:
+- `Home` - Homepage (w-6 h-6)
+- `Calendar` - Scheduler
+- `AlertCircle` - Errori
+- `Clock` - Storico log
+
+**Mobile-First Principle**: Azioni più usate sempre accessibili con il pollice (thumb zone)
 
 ### Pattern Mobile Menu
 

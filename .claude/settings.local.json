@@ -99,7 +99,13 @@
       "Bash(npx eslint:*)",
       "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: real-time Firebase sync with adaptive polling \\(v1.30.0-v1.30.1\\)\n\nReplaces 5-second HTTP polling with Firebase Realtime Database listeners for instant\nstate updates across all devices. Implements adaptive polling to detect external changes\n\\(manual stove actions, auto-shutdown\\) and sync them to all devices within 15 seconds.\n\nKey improvements:\n- Real-time listeners: <100ms latency for app-triggered actions \\(was 0-5s\\)\n- Adaptive polling: 15s when stove ON \\(external detection\\), 60s when OFF \\(efficiency\\)\n- Multi-device sync: external changes propagate to all devices via Firebase\n- 80% request reduction when stove OFF, maintains fast detection when ON\n- Connection monitoring with automatic fallback to polling if Firebase disconnects\n\nTechnical:\n- lib/stoveStateService.js: centralized Firebase state management\n- /api/stove/sync-external-state: client-to-Firebase bridge for external changes\n- StoveCard: hybrid listeners + adaptive polling with change detection\n- 7 new tests for external sync and adaptive intervals\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(git push)",
-      "Bash(npm run type-check:*)"
+      "Bash(npm run type-check:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(npm view:*)",
+      "Bash(npm install)",
+      "Bash(npx prettier --check app/globals.css)",
+      "Bash(npx prettier --write app/globals.css)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,189 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .heading-1 {
+    @apply text-fluid-3xl font-bold leading-tight tracking-tight text-neutral-900 dark:text-white;
+  }
+
+  .heading-2 {
+    @apply text-fluid-2xl font-bold leading-snug tracking-tight text-neutral-900 dark:text-white;
+  }
+
+  .heading-3 {
+    @apply text-fluid-xl font-semibold leading-snug text-neutral-900 dark:text-white;
+  }
+
+  .body-lg {
+    @apply text-fluid-lg leading-relaxed text-neutral-900 dark:text-white;
+  }
+
+  .body {
+    @apply text-fluid-base leading-relaxed text-neutral-900 dark:text-white;
+  }
+
+  .body-sm {
+    @apply text-fluid-sm leading-relaxed text-neutral-700 dark:text-neutral-300;
+  }
+
+  .caption {
+    @apply text-fluid-xs leading-snug text-neutral-500 dark:text-neutral-400 uppercase tracking-wider;
+  }
+}
+
+@layer base {
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    /* Light mode - gradiente chiaro neutro */
+    @apply bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-200;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1, 'ss01' 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Dark mode - gradiente scuro più profondo con glass effect */
+  html.dark body {
+    @apply bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950;
+  }
+
+  /* Smooth dark mode transition */
+  * {
+    @apply transition-colors duration-300;
+  }
+
+  /* Opt-out specific elements from transition */
+  .no-transition {
+    transition: none !important;
+  }
+
+  /* Focus-visible styles per keyboard navigation */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-white dark:ring-offset-neutral-900;
+  }
+
+  /* Glass components get subtle glow instead of ring */
+  [data-liquid-glass="true"]:focus-visible {
+    @apply outline-none shadow-glow-primary;
+  }
+}
+
+@layer utilities {
+  @keyframes slideDown {
+    from {
+      transform: translate(-50%, -120%);
+      opacity: 0;
+    }
+    to {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(-10px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes slideInDown {
+    from {
+      transform: translateY(-10px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-slideDown {
+    animation: slideDown 0.3s ease-out forwards;
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.2s ease-out forwards;
+  }
+
+  .animate-fadeOut {
+    animation: fadeOut 0.2s ease-in forwards;
+  }
+
+  .animate-scaleIn {
+    animation: scaleIn 0.3s ease-out forwards;
+  }
+
+  .animate-slideUp {
+    animation: slideUp 0.2s ease-in forwards;
+  }
+
+  .animate-slideInDown {
+    animation: slideInDown 0.3s ease-out forwards;
+  }
+
+  /* Custom easing functions per transizioni più fluide */
+  .transition-page {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .transition-page-smooth {
+    transition-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+  }
+
+  /* Reduced motion support - accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Safe area inset for mobile notch/island */
+  .top-safe-4 {
+    top: calc(1rem + env(safe-area-inset-top));
+  }
+
+  .bottom-safe-6 {
+    bottom: calc(1.5rem + env(safe-area-inset-bottom));
+  }
+}

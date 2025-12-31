@@ -15,6 +15,7 @@ import { ref, onValue } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import Card from '../../ui/Card';
 import Button from '../../ui/Button';
+import ControlButton from '../../ui/ControlButton';
 import Skeleton from '../../ui/Skeleton';
 import ErrorAlert from '../../ui/ErrorAlert';
 import Banner from '../../ui/Banner';
@@ -977,130 +978,125 @@ export default function StoveCard() {
               </>
             )}
 
-            {/* Separator Controllo */}
-            <Divider label="Regolazioni" variant="gradient" spacing="large" />
+            {/* Regolazioni - Visibili SOLO quando stufa è in WORK */}
+            {status?.toUpperCase().includes('WORK') && (
+              <>
+                <Divider label="Regolazioni" variant="gradient" spacing="large" />
 
-            {/* Regolazioni - Visibili solo quando stufa accesa */}
-            {!isSpenta ? (
-              <div className="space-y-6">
-                {/* Info badge quando in modalità automatica */}
-                {schedulerEnabled && !semiManualMode && (
-                  <Banner
-                    liquid
-                    variant="info"
-                    icon="ℹ️"
-                    description="La modifica attiverà la modalità Semi-Manuale"
-                  />
-                )}
+                <div className="space-y-4">
+                  {/* Info badge quando in modalità automatica */}
+                  {schedulerEnabled && !semiManualMode && (
+                    <Banner
+                      liquid
+                      variant="info"
+                      icon="ℹ️"
+                      description="La modifica attiverà la modalità Semi-Manuale"
+                    />
+                  )}
 
-                {/* Ventilazione Control - Buttons +/- */}
-                <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10 p-5 sm:p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl sm:text-2xl">💨</span>
-                      <Heading level={4} size="md">Ventilazione</Heading>
+                  {/* Ventilazione Control - 3 Column Layout */}
+                  <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-gradient-to-br from-white/[0.12] to-white/[0.06] dark:from-white/[0.08] dark:to-white/[0.03] border border-white/30 dark:border-white/20 p-5 sm:p-6">
+                    {/* Header con icona e label */}
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-info-100 dark:bg-info-900/40 flex items-center justify-center border-2 border-info-300 dark:border-info-600/50">
+                        <span className="text-xl sm:text-2xl">💨</span>
+                      </div>
+                      <Heading level={4} size="md" className="text-neutral-800 dark:text-white">Ventilazione</Heading>
                     </div>
-                    <span className="text-3xl sm:text-4xl font-black text-neutral-800 dark:text-white">
-                      {fanLevel ?? '-'}
-                    </span>
+
+                    {/* 3 Colonne: [−] [Livello] [+] */}
+                    <div className="grid grid-cols-[1fr_auto_1fr] gap-3 sm:gap-4 items-center">
+                      {/* Bottone Meno */}
+                      <ControlButton
+                        type="decrement"
+                        variant="info"
+                        onClick={() => {
+                          if (fanLevel > 1) {
+                            const newLevel = fanLevel - 1;
+                            handleFanChange({ target: { value: newLevel.toString() } });
+                          }
+                        }}
+                        disabled={!fanLevel || fanLevel <= 1}
+                      />
+
+                      {/* Display Livello Centrale */}
+                      <div className="flex flex-col items-center justify-center px-4 sm:px-6">
+                        <Text variant="tertiary" className="text-xs sm:text-sm uppercase tracking-wide mb-1">Livello</Text>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-4xl sm:text-5xl font-black text-info-700 dark:text-info-400 leading-none">
+                            {fanLevel ?? '-'}
+                          </span>
+                          <span className="text-xl sm:text-2xl font-bold text-neutral-500 dark:text-neutral-400">/6</span>
+                        </div>
+                      </div>
+
+                      {/* Bottone Più */}
+                      <ControlButton
+                        type="increment"
+                        variant="info"
+                        onClick={() => {
+                          if (fanLevel < 6) {
+                            const newLevel = fanLevel + 1;
+                            handleFanChange({ target: { value: newLevel.toString() } });
+                          }
+                        }}
+                        disabled={!fanLevel || fanLevel >= 6}
+                      />
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Button
-                      liquid
-                      variant="outline"
-                      size="lg"
-                      icon="➖"
-                      onClick={() => {
-                        if (fanLevel > 1) {
-                          const newLevel = fanLevel - 1;
-                          handleFanChange({ target: { value: newLevel.toString() } });
-                        }
-                      }}
-                      disabled={!fanLevel || fanLevel <= 1}
-                      className="flex-1 h-16 sm:h-18 text-lg font-bold"
-                    >
-                      -1
-                    </Button>
-                    <div className="flex flex-col items-center justify-center px-4">
-                      <Text variant="tertiary" className="text-xs uppercase">Livello</Text>
-                      <span className="text-xl font-black">{fanLevel ?? '-'}/6</span>
+
+                  {/* Potenza Control - 3 Column Layout */}
+                  <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-gradient-to-br from-white/[0.12] to-white/[0.06] dark:from-white/[0.08] dark:to-white/[0.03] border border-white/30 dark:border-white/20 p-5 sm:p-6">
+                    {/* Header con icona e label */}
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-warning-100 dark:bg-warning-900/40 flex items-center justify-center border-2 border-warning-300 dark:border-warning-600/50">
+                        <span className="text-xl sm:text-2xl">⚡</span>
+                      </div>
+                      <Heading level={4} size="md" className="text-neutral-800 dark:text-white">Potenza</Heading>
                     </div>
-                    <Button
-                      liquid
-                      variant="outline"
-                      size="lg"
-                      icon="➕"
-                      onClick={() => {
-                        if (fanLevel < 6) {
-                          const newLevel = fanLevel + 1;
-                          handleFanChange({ target: { value: newLevel.toString() } });
-                        }
-                      }}
-                      disabled={!fanLevel || fanLevel >= 6}
-                      className="flex-1 h-16 sm:h-18 text-lg font-bold"
-                    >
-                      +1
-                    </Button>
+
+                    {/* 3 Colonne: [−] [Livello] [+] */}
+                    <div className="grid grid-cols-[1fr_auto_1fr] gap-3 sm:gap-4 items-center">
+                      {/* Bottone Meno */}
+                      <ControlButton
+                        type="decrement"
+                        variant="warning"
+                        onClick={() => {
+                          if (powerLevel > 1) {
+                            const newLevel = powerLevel - 1;
+                            handlePowerChange({ target: { value: newLevel.toString() } });
+                          }
+                        }}
+                        disabled={!powerLevel || powerLevel <= 1}
+                      />
+
+                      {/* Display Livello Centrale */}
+                      <div className="flex flex-col items-center justify-center px-4 sm:px-6">
+                        <Text variant="tertiary" className="text-xs sm:text-sm uppercase tracking-wide mb-1">Livello</Text>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-4xl sm:text-5xl font-black text-warning-700 dark:text-warning-400 leading-none">
+                            {powerLevel ?? '-'}
+                          </span>
+                          <span className="text-xl sm:text-2xl font-bold text-neutral-500 dark:text-neutral-400">/5</span>
+                        </div>
+                      </div>
+
+                      {/* Bottone Più */}
+                      <ControlButton
+                        type="increment"
+                        variant="warning"
+                        onClick={() => {
+                          if (powerLevel < 5) {
+                            const newLevel = powerLevel + 1;
+                            handlePowerChange({ target: { value: newLevel.toString() } });
+                          }
+                        }}
+                        disabled={!powerLevel || powerLevel >= 5}
+                      />
+                    </div>
                   </div>
                 </div>
-
-                {/* Potenza Control - Buttons +/- */}
-                <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10 p-5 sm:p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl sm:text-2xl">⚡</span>
-                      <Heading level={4} size="md">Potenza</Heading>
-                    </div>
-                    <span className="text-3xl sm:text-4xl font-black text-neutral-800 dark:text-white">
-                      {powerLevel ?? '-'}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Button
-                      liquid
-                      variant="outline"
-                      size="lg"
-                      icon="➖"
-                      onClick={() => {
-                        if (powerLevel > 1) {
-                          const newLevel = powerLevel - 1;
-                          handlePowerChange({ target: { value: newLevel.toString() } });
-                        }
-                      }}
-                      disabled={!powerLevel || powerLevel <= 1}
-                      className="flex-1 h-16 sm:h-18 text-lg font-bold"
-                    >
-                      -1
-                    </Button>
-                    <div className="flex flex-col items-center justify-center px-4">
-                      <Text variant="tertiary" className="text-xs uppercase">Livello</Text>
-                      <span className="text-xl font-black">{powerLevel ?? '-'}/5</span>
-                    </div>
-                    <Button
-                      liquid
-                      variant="outline"
-                      size="lg"
-                      icon="➕"
-                      onClick={() => {
-                        if (powerLevel < 5) {
-                          const newLevel = powerLevel + 1;
-                          handlePowerChange({ target: { value: newLevel.toString() } });
-                        }
-                      }}
-                      disabled={!powerLevel || powerLevel >= 5}
-                      className="flex-1 h-16 sm:h-18 text-lg font-bold"
-                    >
-                      +1
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <EmptyState
-                icon="❄️"
-                title="Stufa Spenta"
-                description="Accendi la stufa per regolare ventilazione e potenza"
-              />
+              </>
             )}
           </div>
         </div>

@@ -102,6 +102,73 @@ Componente pulsante con varianti semantiche e liquid glass support.
 
 **Implementazione**: `app/components/ui/Button.js`
 
+## ControlButton
+
+Bottone specializzato per controlli numerici (incremento/decremento) con feedback visivo chiaro per stato disabled.
+
+```jsx
+<ControlButton
+  type="increment|decrement"
+  variant="info|warning|success|danger|neutral"
+  size="sm|md|lg"
+  onClick={handleClick}
+  disabled={value >= max}
+/>
+```
+
+**Props**:
+- `type` - Tipo di controllo (default: `increment`)
+  - `increment` - Bottone + (plus)
+  - `decrement` - Bottone − (minus)
+- `variant` - Variante semantica (default: `info`)
+  - `info` - Blu (es. ventilazione)
+  - `warning` - Arancio (es. potenza)
+  - `success` - Verde
+  - `danger` - Rosso
+  - `neutral` - Grigio
+- `size` - Dimensione (default: `lg`)
+  - `sm` - h-12, text-2xl
+  - `md` - h-14, text-3xl
+  - `lg` - h-16/h-20, text-3xl/4xl (responsive)
+- `onClick` - Callback click
+- `disabled` - Stato disabilitato
+- `className` - Classi aggiuntive
+
+**Stati Visivi**:
+- **Enabled**: Gradient colorato, testo bianco, shadow animata, hover/active feedback
+- **Disabled**: Background grigio neutro, testo grigio chiaro, opacity-50, cursor-not-allowed
+
+**Esempio d'uso** (StoveCard regolazioni):
+```jsx
+<div className="grid grid-cols-[1fr_auto_1fr] gap-3 items-center">
+  <ControlButton
+    type="decrement"
+    variant="info"
+    onClick={() => setLevel(level - 1)}
+    disabled={level <= 1}
+  />
+
+  <div className="text-center">
+    <span className="text-4xl font-black">{level}</span>
+    <span className="text-xl">/6</span>
+  </div>
+
+  <ControlButton
+    type="increment"
+    variant="info"
+    onClick={() => setLevel(level + 1)}
+    disabled={level >= 6}
+  />
+</div>
+```
+
+**Best Practice**:
+- Usa varianti semantiche coerenti (info per aria/ventilazione, warning per energia/potenza)
+- Sempre applicare `disabled` quando raggiunto min/max per prevenire azioni invalide
+- Layout 3 colonne (`grid-cols-[1fr_auto_1fr]`) per centrare display valore tra bottoni
+
+**Implementazione**: `app/components/ui/ControlButton.js`
+
 ## Banner
 
 Componente alert/warning riutilizzabile con 4 varianti semantiche.

@@ -7,6 +7,58 @@ e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/
 
 ## [1.32.0] - 2025-12-31
 
+### ⚡ UI/UX Improvements - Settings Controls Redesign
+
+#### Aggiunto
+
+- **ControlButton Component** - New reusable UI component for numeric increment/decrement controls
+  - `app/components/ui/ControlButton.js` - Specialized button for +/- controls
+  - 5 semantic variants: info, warning, success, danger, neutral
+  - 3 size options: sm (h-12), md (h-14), lg (h-16/h-20 responsive)
+  - Clear visual distinction between enabled and disabled states
+  - Exported from `ui/index.js` for project-wide reuse
+
+- **Documentation** - Complete ControlButton documentation
+  - Added section in `docs/ui-components.md` with props, examples, and best practices
+  - Usage examples with 3-column layout pattern
+  - Semantic variant guidelines (info for air/ventilation, warning for energy/power)
+
+#### Modificato
+
+- **StoveCard Settings Section** - Complete redesign with improved UX
+  - 3-column layout: [−] [Level Display] [+] for better touch targets
+  - Conditional visibility: settings now shown ONLY when stove is in WORK status
+  - Removed duplicate level values (previously shown in top-right corner)
+  - Simplified buttons: only − and + symbols (removed "-1" and "+1" text)
+  - Code reduction: ~100 lines of duplicated button code replaced with reusable component
+
+- **Visual Feedback Enhanced**
+  - Enabled state: gradient colored backgrounds (info-500/600 blue, warning-500/600 orange)
+  - Disabled state: neutral gray background (neutral-200/800) with 50% opacity
+  - Shadow effects: shadow-lg on enabled, shadow-xl on hover, shadow-inner on active
+  - Clear cursor feedback: pointer when enabled, not-allowed when disabled
+
+#### Risolto
+
+- **Settings Always Visible Issue** - Settings section previously shown even when stove was off/standby
+  - Now correctly hidden when stove is not in WORK status
+  - Improves UX by preventing user confusion with unavailable controls
+
+#### Performance
+
+- **Code Reduction** - DRY principle applied
+  - Ventilazione control: 50 lines → 14 lines (-72%)
+  - Potenza control: 50 lines → 14 lines (-72%)
+  - Total reduction: ~72 lines of duplicated code eliminated
+  - Improved maintainability: changes centralized in single component
+
+#### Accessibilità
+
+- **Keyboard Navigation** - Proper button semantics
+  - `type="button"` prevents form submission
+  - Disabled state properly communicated to screen readers
+  - Focus states preserved for keyboard navigation
+
 ### 🎨 Tailwind CSS v4 Migration
 
 **Context**: Complete migration from Tailwind CSS v3.4.19 to v4.1.18 with CSS-first configuration. Maintains pixel-perfect design compatibility with liquid glass iOS 18 style while adopting modern CSS @theme directive.

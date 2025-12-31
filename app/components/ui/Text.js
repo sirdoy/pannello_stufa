@@ -15,9 +15,9 @@ export default function Text({
 }) {
   // Variant classes
   const variantClasses = {
-    body: 'text-base text-neutral-900 dark:text-white',
-    secondary: 'text-base text-neutral-600 dark:text-neutral-400',
-    tertiary: 'text-sm text-neutral-500 dark:text-neutral-500',
+    body: 'text-base text-neutral-900 dark:text-neutral-50',
+    secondary: 'text-base text-neutral-600 dark:text-neutral-300',
+    tertiary: 'text-sm text-neutral-500 dark:text-neutral-400',
   };
 
   const classes = `${variantClasses[variant]} ${className}`.trim();

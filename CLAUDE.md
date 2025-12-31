@@ -82,7 +82,7 @@ npm run dev              # http://localhost:3000
 
 - **Next.js 15.5** - App Router, Server/Client Components, API Routes
 - **React 19** - Hooks, Suspense, modern patterns
-- **Tailwind CSS 3** - Utility-first + liquid glass iOS 18 style
+- **Tailwind CSS 4.1** - CSS-first config with @theme directive + liquid glass iOS 18 style
 - **Firebase** - Realtime DB + Admin SDK (Client/Server separation)
 - **Auth0** - Autenticazione
 - **PWA** - next-pwa, Service Worker, offline support
@@ -162,8 +162,9 @@ node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require(
 3. 🟡 **PREFER** editing existing files over creating new ones
 4. 🟢 **MAINTAIN** coding patterns → [docs/patterns.md](docs/patterns.md)
 5. 🔵 **NEVER** execute `npm run build` - strictly user-only command
-6. ⚡ **ALWAYS** create/update unit tests → [docs/testing.md](docs/testing.md)
-7. 📚 **UPDATE DOCS** when adding features (in `docs/`, not in CLAUDE.md)
+6. 🔵 **NEVER** execute `npm install` - strictly user-only command (ask user to run it)
+7. ⚡ **ALWAYS** create/update unit tests → [docs/testing.md](docs/testing.md)
+8. 📚 **UPDATE DOCS** when adding features (in `docs/`, not in CLAUDE.md)
 
 ---
 
@@ -268,6 +269,6 @@ ADMIN_USER_ID=auth0|xxx
 
 ---
 
-**Version**: 1.26.9
+**Version**: 1.32.0
 **Last Updated**: 2025-12-28
 **Author**: Federico Manfredi

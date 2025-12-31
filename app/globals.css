@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Dark mode configuration - use class strategy */
+@variant dark (.dark &);
+
 @theme {
   /* ===== Custom Colors ===== */
   /* Primary/Danger (Red) */
@@ -193,31 +196,38 @@
 
 @layer components {
   .heading-1 {
-    @apply text-fluid-3xl font-bold leading-tight tracking-tight text-neutral-900 dark:text-white;
+    font-size: var(--font-size-fluid-3xl);
+    @apply font-bold leading-tight tracking-tight text-neutral-900 dark:text-white;
   }
 
   .heading-2 {
-    @apply text-fluid-2xl font-bold leading-snug tracking-tight text-neutral-900 dark:text-white;
+    font-size: var(--font-size-fluid-2xl);
+    @apply font-bold leading-snug tracking-tight text-neutral-900 dark:text-white;
   }
 
   .heading-3 {
-    @apply text-fluid-xl font-semibold leading-snug text-neutral-900 dark:text-white;
+    font-size: var(--font-size-fluid-xl);
+    @apply font-semibold leading-snug text-neutral-900 dark:text-white;
   }
 
   .body-lg {
-    @apply text-fluid-lg leading-relaxed text-neutral-900 dark:text-white;
+    font-size: var(--font-size-fluid-lg);
+    @apply leading-relaxed text-neutral-900 dark:text-white;
   }
 
   .body {
-    @apply text-fluid-base leading-relaxed text-neutral-900 dark:text-white;
+    font-size: var(--font-size-fluid-base);
+    @apply leading-relaxed text-neutral-900 dark:text-white;
   }
 
   .body-sm {
-    @apply text-fluid-sm leading-relaxed text-neutral-700 dark:text-neutral-300;
+    font-size: var(--font-size-fluid-sm);
+    @apply leading-relaxed text-neutral-700 dark:text-neutral-300;
   }
 
   .caption {
-    @apply text-fluid-xs leading-snug text-neutral-500 dark:text-neutral-400 uppercase tracking-wider;
+    font-size: var(--font-size-fluid-xs);
+    @apply leading-snug text-neutral-500 dark:text-neutral-400 uppercase tracking-wider;
   }
 }
 

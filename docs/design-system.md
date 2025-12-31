@@ -169,7 +169,7 @@ rounded-full   9999px
 
 ## Shadows (Liquid Glass)
 
-Custom shadows definite in `tailwind.config.js`:
+Custom shadows definite in `app/globals.css` @theme block:
 
 ```javascript
 shadow: {
@@ -305,8 +305,17 @@ z-[10001]   Critical alerts content
 
 ## Responsive Breakpoints
 
-```javascript
-// tailwind.config.js
+```css
+/* app/globals.css @theme */
+@theme {
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
+/* Default screens (Tailwind v4): */
 screens: {
   'sm': '640px',
   'md': '768px',
@@ -377,8 +386,8 @@ import styles from './Component.module.css';
 ### Decision Tree
 
 - Stile **UN** componente → CSS Module
-- Stile **PIÙ** componenti → Tailwind custom in `tailwind.config.js`
-- Stile **globale** → `globals.css` in `@layer base`
+- Stile **PIÙ** componenti → Tailwind custom in `app/globals.css` @theme block
+- Stile **globale** → `app/globals.css` in `@layer base`
 
 ## Accessibility
 

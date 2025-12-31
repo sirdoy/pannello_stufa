@@ -41,9 +41,9 @@ export default function Heading({
 
   // Variant classes
   const variantClasses = {
-    default: 'text-neutral-900 dark:text-white',
-    gradient: 'bg-gradient-to-r from-primary-600 to-accent-600 dark:from-primary-400 dark:to-accent-400 bg-clip-text text-transparent',
-    subtle: 'text-neutral-600 dark:text-neutral-400',
+    default: 'text-neutral-900 dark:text-neutral-50',
+    gradient: 'bg-gradient-to-r from-primary-600 to-accent-600 dark:from-primary-300 dark:to-accent-300 bg-clip-text text-transparent',
+    subtle: 'text-neutral-700 dark:text-neutral-300',
   };
 
   const classes = `

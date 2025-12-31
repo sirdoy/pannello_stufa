@@ -5,6 +5,81 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.32.0] - 2025-12-31
+
+### 🎨 Tailwind CSS v4 Migration
+
+**Context**: Complete migration from Tailwind CSS v3.4.19 to v4.1.18 with CSS-first configuration. Maintains pixel-perfect design compatibility with liquid glass iOS 18 style while adopting modern CSS @theme directive.
+
+#### Aggiunto
+
+- **CSS-First Configuration** - Modern @theme directive in app/globals.css
+  - Migrated 264 lines from tailwind.config.js to CSS @theme
+  - 8 color palettes as CSS custom properties (--color-primary-*, --color-accent-*, etc.)
+  - Fluid typography system (--font-size-fluid-xs through fluid-4xl)
+  - 22 custom shadows (liquid glass, glassmorphism, elevated, glow effects)
+  - Backdrop filters (blur, saturate, contrast)
+  - Custom spacing, border radius, animations
+  - Dark mode variant configuration (@variant dark (.dark &))
+
+- **New Dependencies**
+  - `tailwindcss@^4.1.18` - Latest CSS-first version
+  - `@tailwindcss/postcss@^4.1.18` - Separate PostCSS plugin (v4 breaking change)
+
+#### Modificato
+
+- **app/globals.css** - Complete configuration migration
+  - Changed `@tailwind` directives to `@import "tailwindcss"`
+  - Added @theme block with all custom design tokens
+  - Fixed @layer components to use CSS variables (font-size: var(--font-size-fluid-*))
+  - Added dark mode class strategy configuration
+
+- **postcss.config.js** - Updated plugin reference
+  - Changed from `tailwindcss: {}` to `'@tailwindcss/postcss': {}`
+
+- **app/components/ui/Heading.js** - Dark mode contrast improvements
+  - Updated variant classes for better WCAG AA compliance
+  - `default`: dark:text-neutral-50 (improved contrast)
+  - `gradient`: dark mode uses lighter shades (primary-300, accent-300)
+  - `subtle`: dark:text-neutral-300
+
+- **app/components/ui/Text.js** - Dark mode contrast improvements
+  - `body`: dark:text-neutral-50
+  - `secondary`: dark:text-neutral-300
+  - `tertiary`: dark:text-neutral-400
+
+#### Rimosso
+
+- **tailwind.config.js** - Deprecated v3 configuration file
+  - Backed up to docs/rollback/tailwind.config.v3.js for reference
+  - All configuration migrated to CSS @theme
+
+#### Risolto
+
+- **Dark Mode Configuration** - Fixed missing class strategy
+  - Added @variant dark (.dark &) to enable dark:* classes
+  - Without this, Tailwind v4 defaults to media query strategy
+  - All dark mode classes now properly generated and applied
+
+- **CSS Variable Utility Classes** - Fixed @apply errors
+  - Changed from `@apply text-fluid-3xl` to `font-size: var(--font-size-fluid-3xl)`
+  - Tailwind v4 @theme variables don't auto-generate utility classes
+  - Affects all typography classes in @layer components
+
+#### Performance
+
+- **Build Optimization**
+  - Tailwind v4 CSS engine faster than v3 JavaScript config
+  - Improved HMR (Hot Module Replacement) during development
+  - Better PostCSS integration with @tailwindcss/postcss plugin
+
+#### Documentation
+
+- **Updated References**
+  - CLAUDE.md: Stack updated to "Tailwind CSS 4.1"
+  - docs/design-system.md: References changed from tailwind.config.js to app/globals.css
+  - Migration plan and rollback procedures in docs/rollback/
+
 ## [1.30.1] - 2025-12-28
 
 ### 🔧 Adaptive Polling & External Change Detection

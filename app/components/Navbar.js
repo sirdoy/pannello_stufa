@@ -471,7 +471,6 @@ export default function Navbar() {
 
       {/* Spacer for fixed navigation */}
       <div className="h-16 lg:h-20" aria-hidden="true" />
-      <div className="h-20 lg:hidden" aria-hidden="true" />
     </>
   );
 }

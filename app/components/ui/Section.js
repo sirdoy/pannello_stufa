@@ -29,7 +29,7 @@ export default function Section({
     <section className={className}>
       {/* Header with title, description, action */}
       {(title || description || action) && (
-        <div className="mb-8 sm:mb-12">
+        <div className="mb-4 sm:mb-8">
           {/* Category indicator + title */}
           {title && (
             <>

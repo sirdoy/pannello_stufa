@@ -1,8 +1,13 @@
 'use client';
 
+import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
+
 /**
  * LoadingOverlay - Full-page blocking loading overlay
  * Liquid glass style with animated spinner
+ * Blocks page scroll when visible
+ * Uses React Portal to render at body level (fixes positioning issues)
  */
 export default function LoadingOverlay({
   show = false,
@@ -10,9 +15,23 @@ export default function LoadingOverlay({
   icon = '⏳',
   liquid = true
 }) {
+  // Block body scroll when overlay is shown
+  useEffect(() => {
+    if (show) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [show]);
+
   if (!show) return null;
 
-  return (
+  // Render using Portal to ensure fixed positioning works correctly
+  // (bypasses any parent transforms/filters that would break position: fixed)
+  const overlay = (
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center animate-fadeIn"
       aria-live="assertive"
@@ -21,12 +40,12 @@ export default function LoadingOverlay({
       {/* Backdrop blur */}
       <div className="absolute inset-0 bg-neutral-900/40 dark:bg-neutral-950/60 backdrop-blur-xl will-change-[backdrop-filter] transform-gpu" />
 
-      {/* Loading card - Liquid Glass */}
+      {/* Loading card - Opaque background for readability */}
       <div className="relative z-10 animate-spring-in will-change-transform transform-gpu">
         <div className={`
           ${liquid
-            ? 'bg-white/[0.15] dark:bg-white/[0.12] backdrop-blur-3xl shadow-liquid-xl ring-1 ring-white/25 dark:ring-white/15 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/20 dark:before:from-white/15 before:to-transparent before:pointer-events-none'
-            : 'bg-white/[0.95] dark:bg-neutral-800/[0.95] backdrop-blur-3xl shadow-elevated-xl ring-1 ring-white/50 dark:ring-white/10 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 dark:before:from-white/10 before:to-transparent before:pointer-events-none'
+            ? 'bg-white dark:bg-neutral-800 shadow-liquid-xl ring-1 ring-white/30 dark:ring-white/20 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none'
+            : 'bg-white dark:bg-neutral-800 shadow-elevated-xl ring-1 ring-white/50 dark:ring-white/10 ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 dark:before:from-white/10 before:to-transparent before:pointer-events-none'
           }
           rounded-3xl
           px-8 py-10 sm:px-10 sm:py-12
@@ -74,4 +93,6 @@ export default function LoadingOverlay({
       </div>
     </div>
   );
+
+  return createPortal(overlay, document.body);
 }

@@ -5,6 +5,49 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.32.1] - 2025-12-31
+
+### 🐛 Bug Fixes - UI Spacing & Loading Overlay
+
+#### Risolto
+
+- **Excessive Top Spacing** - Fixed duplicate navbar spacer causing huge gap on mobile
+  - Removed second `h-20 lg:hidden` spacer in Navbar.js (was causing 144px total on mobile)
+  - Mobile spacing reduced: 144px → 64px (-56%)
+  - Desktop spacing unchanged: 80px (optimal)
+
+- **Layout Padding Optimization** - Reduced excessive padding in main layout
+  - `app/layout.js`: main padding-top reduced from `pt-6` to `pt-2` (24px → 8px)
+  - Better visual balance between header and content
+
+- **Section Header Spacing** - Optimized section component margins
+  - `app/components/ui/Section.js`: reduced from `mb-8 sm:mb-12` to `mb-4 sm:mb-8`
+  - Mobile: 32px → 16px (-50%), Desktop: 48px → 32px (-33%)
+
+- **LoadingOverlay Positioning** - Fixed random position issue during operations
+  - Root cause: parent containers with CSS `transform` breaking `position: fixed`
+  - Solution: implemented React Portal to render overlay at `document.body` level
+  - Loading overlay now always perfectly centered on viewport
+
+#### Modificato
+
+- **LoadingOverlay Scroll Blocking** - Enhanced UX during async operations
+  - Added `useEffect` to set `document.body.style.overflow = 'hidden'` when overlay visible
+  - User cannot scroll or interact with page during loading
+  - Automatic cleanup on overlay dismiss
+
+- **LoadingOverlay Readability** - Improved text contrast
+  - Background changed from transparent to opaque: `bg-white dark:bg-neutral-800`
+  - Removed backdrop blur from card (kept only on page backdrop)
+  - Text now perfectly readable in both light and dark mode
+
+#### Performance
+
+- **Total Spacing Reduction**
+  - Mobile: ~168px → ~88px (-48% spacing at top of page)
+  - Desktop: ~152px → ~120px (-21% spacing at top of page)
+  - Improved first-impression UX with less wasted space
+
 ## [1.32.0] - 2025-12-31
 
 ### ⚡ UI/UX Improvements - Settings Controls Redesign

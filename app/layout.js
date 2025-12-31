@@ -61,7 +61,7 @@ export default function RootLayout({ children }) {
     <ClientProviders>
       <VersionEnforcer />
       <Navbar />
-      <main id="main-content" className="flex-1 pt-6 pb-12 px-4 sm:px-6 lg:px-8">
+      <main id="main-content" className="flex-1 pt-2 pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {children}
         </div>

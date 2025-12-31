@@ -5,6 +5,7 @@ import Card from '../ui/Card';
 import Button from '../ui/Button';
 import TimeBar from './TimeBar';
 import ScheduleInterval from './ScheduleInterval';
+import IntervalBottomSheet from './IntervalBottomSheet';
 import { getDayTotalHours } from '@/lib/schedulerStats';
 import { Copy } from 'lucide-react';
 
@@ -19,6 +20,7 @@ export default function DayEditPanel({
 }) {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const [bottomSheetData, setBottomSheetData] = useState(null);
 
   const totalHours = getDayTotalHours(intervals);
 
@@ -26,28 +28,52 @@ export default function DayEditPanel({
     setSelectedIndex(selectedIndex === index ? null : index);
   };
 
+  // Handler per apertura bottom sheet da timeline (mobile)
+  const handleTimelineIntervalClick = (index, range) => {
+    setBottomSheetData({ index, range });
+    setSelectedIndex(index); // Sincronizza con selezione
+  };
+
+  // Handler azioni bottom sheet
+  const handleBottomSheetEdit = () => {
+    if (bottomSheetData && onEditIntervalModal) {
+      onEditIntervalModal(bottomSheetData.index);
+      setBottomSheetData(null);
+    }
+  };
+
+  const handleBottomSheetDelete = () => {
+    if (bottomSheetData) {
+      onDeleteInterval(bottomSheetData.index);
+      setBottomSheetData(null);
+    }
+  };
+
   return (
-    <Card liquid className="p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <h3 className="text-2xl font-bold text-neutral-900 dark:text-white">
-            {day}
-          </h3>
-          <span className="text-sm text-neutral-600 dark:text-neutral-400">
-            {intervals.length} {intervals.length === 1 ? 'intervallo' : 'intervalli'}
-            {intervals.length > 0 && ` • ${totalHours.toFixed(1)}h totali`}
-          </span>
+    <Card liquid className="p-4 md:p-6">
+      {/* Header - mobile-first responsive */}
+      <div className="flex flex-col gap-4 mb-6 md:flex-row md:items-center md:justify-between">
+        {/* Left: Title + Info */}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-3 flex-wrap">
+            <h3 className="text-2xl font-bold text-neutral-900 dark:text-white">
+              {day}
+            </h3>
+            <span className="text-sm font-medium text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-3 py-1 rounded-full">
+              {intervals.length} {intervals.length === 1 ? 'intervallo' : 'intervalli'}
+              {intervals.length > 0 && ` • ${totalHours.toFixed(1)}h`}
+            </span>
+          </div>
 
           {/* Save indicator */}
           {saveStatus && (
-            <div className="ml-4">
+            <div className="flex items-center">
               {saveStatus.isSaving ? (
-                <span className="text-sm text-blue-500 dark:text-blue-400 animate-pulse">
+                <span className="text-sm text-blue-500 dark:text-blue-400 animate-pulse flex items-center gap-1">
                   💾 Salvataggio...
                 </span>
               ) : (
-                <span className="text-sm text-green-600 dark:text-green-400">
+                <span className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
                   ✓ Salvato
                 </span>
               )}
@@ -55,7 +81,8 @@ export default function DayEditPanel({
           )}
         </div>
 
-        <div className="flex gap-3">
+        {/* Right: Action Buttons - sempre orizzontale, icona + testo affiancati */}
+        <div className="flex gap-2 md:gap-3">
           {/* Duplicate button - only if intervals exist */}
           {intervals.length > 0 && onDuplicate && (
             <Button
@@ -64,8 +91,9 @@ export default function DayEditPanel({
               onClick={() => onDuplicate(day)}
               icon={<Copy className="w-4 h-4" />}
               title="Duplica su altri giorni"
+              aria-label="Duplica su altri giorni"
             >
-              Duplica
+              <span className="hidden sm:inline">Duplica</span>
             </Button>
           )}
 
@@ -74,8 +102,10 @@ export default function DayEditPanel({
             variant="success"
             onClick={() => onAddInterval(day)}
             icon="+"
+            title="Aggiungi intervallo"
+            aria-label="Aggiungi intervallo"
           >
-            Aggiungi intervallo
+            <span className="hidden sm:inline">Aggiungi</span>
           </Button>
         </div>
       </div>
@@ -89,6 +119,7 @@ export default function DayEditPanel({
             selectedIndex={selectedIndex}
             onHover={setHoveredIndex}
             onClick={handleIntervalClick}
+            onIntervalClick={handleTimelineIntervalClick}
             height="h-12"
           />
         </div>
@@ -125,6 +156,15 @@ export default function DayEditPanel({
           ))
         )}
       </div>
+
+      {/* Bottom Sheet Mobile */}
+      <IntervalBottomSheet
+        range={bottomSheetData?.range}
+        isOpen={!!bottomSheetData}
+        onClose={() => setBottomSheetData(null)}
+        onEdit={handleBottomSheetEdit}
+        onDelete={handleBottomSheetDelete}
+      />
     </Card>
   );
 }

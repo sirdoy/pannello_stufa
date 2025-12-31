@@ -1,10 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-export default function TimeBar({ intervals, hoveredIndex, selectedIndex, onHover, onClick }) {
+export default function TimeBar({
+  intervals,
+  hoveredIndex,
+  selectedIndex,
+  onHover,
+  onClick,
+  onIntervalClick,
+}) {
   const totalMinutes = 24 * 60;
   const [tooltipData, setTooltipData] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Mobile detection (< 768px = md breakpoint)
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleMouseEnter = (index, range, event) => {
     onHover(index);
@@ -41,18 +57,24 @@ export default function TimeBar({ intervals, hoveredIndex, selectedIndex, onHove
                 isActive
                   ? 'bg-gradient-to-r from-primary-500 to-accent-600 scale-y-110 z-10 shadow-lg'
                   : 'bg-gradient-to-r from-primary-400 to-accent-500 hover:from-primary-500 hover:to-accent-600'
-              }`}
+              } ${isMobile ? 'active:scale-y-115' : ''}`}
               style={{ left: `${left}%`, width: `${width}%` }}
-              onMouseEnter={(e) => handleMouseEnter(idx, range, e)}
-              onMouseLeave={handleMouseLeave}
-              onClick={() => onClick(idx)}
+              onMouseEnter={!isMobile ? (e) => handleMouseEnter(idx, range, e) : undefined}
+              onMouseLeave={!isMobile ? handleMouseLeave : undefined}
+              onClick={() => {
+                if (isMobile && onIntervalClick) {
+                  onIntervalClick(idx, range);
+                } else {
+                  onClick(idx);
+                }
+              }}
             />
           );
         })}
       </div>
 
-      {/* Tooltip */}
-      {tooltipData && (
+      {/* Tooltip - nascosto su mobile e se intervallo è selezionato */}
+      {tooltipData && selectedIndex === null && !isMobile && (
         <div
           className="fixed z-[9000] bg-neutral-900/95 backdrop-blur-3xl text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-liquid-xl ring-1 ring-white/10 ring-inset pointer-events-none relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.08] before:to-transparent before:pointer-events-none"
           style={{

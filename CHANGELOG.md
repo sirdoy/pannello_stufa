@@ -5,6 +5,102 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.33.0] - 2025-12-31
+
+### ⚡ UI/UX Improvements - Scheduler Mobile-First Redesign
+
+#### Aggiunto
+
+- **IntervalBottomSheet Component** - New mobile-first component for interval details
+  - `app/components/scheduler/IntervalBottomSheet.js` - Bottom sheet with liquid glass styling
+  - Slide-up animation from bottom of viewport with `slideInFromBottom` keyframe
+  - Shows complete interval info: time, duration, power gradient, fan level
+  - Action buttons: Edit, Delete, Close with touch-friendly 44px minimum height
+  - React Portal implementation for correct viewport positioning (renders at `document.body`)
+  - Scroll lock: blocks body scroll when open with automatic position restoration
+
+- **Mobile Detection in TimeBar** - Adaptive behavior based on screen width
+  - `useEffect` hook detects window width < 768px (md breakpoint)
+  - Desktop (≥768px): hover shows tooltip, click selects interval
+  - Mobile (<768px): tap opens bottom sheet instead of tooltip
+  - Prevents tooltip rendering on mobile for cleaner UX
+
+- **CSS Animation** - Smooth bottom sheet entrance
+  - Added `slideInFromBottom` keyframe in `app/globals.css`
+  - 0.3s ease-out animation from translateY(100%) to 0
+  - Applied via `.animate-slide-in-from-bottom` utility class
+
+#### Modificato
+
+- **DayEditPanel Header** - Mobile-first responsive layout redesign
+  - Mobile: vertical stack layout (`flex-col`) with generous spacing
+  - Desktop: horizontal layout (`md:flex-row`) as before
+  - Info badge: intervals count in rounded pill with background color
+  - Buttons: icon-only on small mobile (<640px), icon+text on larger screens (≥640px)
+  - Padding optimization: `p-4` on mobile, `p-6` on desktop
+  - Improved hierarchy: title prominent, badge secondary, save indicator on separate line
+
+- **TimeBar Tooltip Behavior** - Fixed visual duplication issue
+  - Tooltip now hidden when `selectedIndex !== null` (prevents overlap with selected interval)
+  - Desktop: tooltip appears on hover, hides when interval selected
+  - Mobile: tooltip never shown (bottom sheet used instead)
+
+- **Button Layout** - Always horizontal with responsive content
+  - Removed `flex-col` vertical stack on mobile
+  - Buttons always side-by-side with compact spacing
+  - Text content hidden on small screens via `<span className="hidden sm:inline">`
+  - Icon remains visible at all breakpoints
+  - "Aggiungi intervallo" abbreviated to "Aggiungi" for compactness
+
+- **DayAccordionItem Integration** - Consistent mobile behavior
+  - Same bottom sheet implementation as DayEditPanel
+  - TimeBar receives `onIntervalClick` handler
+  - Mobile tap opens bottom sheet with interval details
+  - Edit button in bottom sheet closes (no modal edit support in accordion)
+
+#### Risolto
+
+- **Tooltip/Interval Overlap** - Fixed duplicate visual information on hover
+  - Problem: tooltip appeared above already-expanded interval card
+  - Solution: tooltip hidden when `selectedIndex !== null`
+  - Desktop: clean separation between hover state and selection state
+
+- **Bottom Sheet Positioning** - Fixed incorrect positioning within parent container
+  - Problem: `position: fixed` relative to parent Card instead of viewport
+  - Root cause: parent container with `position: relative` creates stacking context
+  - Solution: React Portal renders bottom sheet at `document.body` level
+  - Result: bottom sheet always appears at bottom of viewport regardless of scroll
+
+- **Header Cramming on Mobile** - Fixed overcrowded header layout
+  - Problem: title, badge, save indicator, 2 buttons all in one horizontal row
+  - Solution: vertical stack on mobile with logical grouping
+  - Mobile layout: title+badge row → save indicator row → buttons row
+  - Desktop layout: left (title+badge+save) | right (buttons)
+
+#### Performance
+
+- **Code Reusability** - Portal pattern for viewport-level rendering
+  - IntervalBottomSheet uses `createPortal` from `react-dom`
+  - Prevents stacking context issues with nested components
+  - Consistent z-index behavior: overlay at z-[8999], sheet at z-[9000]
+
+#### Accessibilità
+
+- **Touch Targets** - iOS Human Interface Guidelines compliance
+  - Bottom sheet buttons: `min-h-[44px]` minimum touch target
+  - Icon-only buttons have `aria-label` for screen readers
+  - Button `title` attribute provides tooltip on desktop hover
+  - Modal semantics: `role="dialog"` and `aria-modal="true"`
+
+- **Keyboard Navigation** - Improved focus management
+  - Bottom sheet overlay dismissible with click
+  - Close button clearly visible in top-right corner
+  - Buttons maintain proper focus states
+
+#### Breaking Changes
+
+- None - backward compatible with existing scheduler functionality
+
 ## [1.32.1] - 2025-12-31
 
 ### 🐛 Bug Fixes - UI Spacing & Loading Overlay

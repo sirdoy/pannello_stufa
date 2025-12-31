@@ -369,6 +369,17 @@
     }
   }
 
+  @keyframes slideInFromBottom {
+    0% {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
   @keyframes spring-in {
     0% {
       transform: scale(0.9);
@@ -437,6 +448,10 @@
 
   .animate-bounce-subtle {
     animation: bounce-subtle 0.6s ease-in-out;
+  }
+
+  .animate-slide-in-from-bottom {
+    animation: slideInFromBottom 0.3s ease-out forwards;
   }
 
   /* Custom easing functions per transizioni più fluide */

@@ -5,6 +5,7 @@ import Card from '../ui/Card';
 import Button from '../ui/Button';
 import TimeBar from './TimeBar';
 import ScheduleInterval from './ScheduleInterval';
+import IntervalBottomSheet from './IntervalBottomSheet';
 import { Copy } from 'lucide-react';
 
 export default function DayAccordionItem({
@@ -20,9 +21,31 @@ export default function DayAccordionItem({
 }) {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const [bottomSheetData, setBottomSheetData] = useState(null);
 
   const handleIntervalClick = (index) => {
     setSelectedIndex(selectedIndex === index ? null : index);
+  };
+
+  // Handler per apertura bottom sheet da timeline (mobile)
+  const handleTimelineIntervalClick = (index, range) => {
+    setBottomSheetData({ index, range });
+    setSelectedIndex(index); // Sincronizza con selezione
+  };
+
+  // Handler azioni bottom sheet
+  const handleBottomSheetEdit = () => {
+    // Questo componente non supporta edit via modal, chiudi semplicemente
+    if (bottomSheetData) {
+      setBottomSheetData(null);
+    }
+  };
+
+  const handleBottomSheetDelete = () => {
+    if (bottomSheetData) {
+      onRemoveInterval(bottomSheetData.index);
+      setBottomSheetData(null);
+    }
   };
 
   // Calcola preview: orario totale coperto
@@ -162,6 +185,7 @@ export default function DayAccordionItem({
               selectedIndex={selectedIndex}
               onHover={setHoveredIndex}
               onClick={handleIntervalClick}
+              onIntervalClick={handleTimelineIntervalClick}
             />
           )}
 
@@ -200,6 +224,15 @@ export default function DayAccordionItem({
           </Button>
         </div>
       </div>
+
+      {/* Bottom Sheet Mobile */}
+      <IntervalBottomSheet
+        range={bottomSheetData?.range}
+        isOpen={!!bottomSheetData}
+        onClose={() => setBottomSheetData(null)}
+        onEdit={handleBottomSheetEdit}
+        onDelete={handleBottomSheetDelete}
+      />
     </Card>
   );
 }

@@ -1,31 +1,16 @@
 'use client';
 
-import { useEffect } from 'react';
 import { APP_VERSION, VERSION_HISTORY } from '@/lib/version';
 import Link from 'next/link';
+import Modal from './ui/Modal';
+import Card from './ui/Card';
+import Button from './ui/Button';
+import ActionButton from './ui/ActionButton';
+import { X } from 'lucide-react';
 
 export default function WhatsNewModal({ isOpen, onClose, dontShowAgain }) {
   // Prendi la versione corrente dal VERSION_HISTORY
   const currentVersionData = VERSION_HISTORY.find(v => v.version === APP_VERSION) || VERSION_HISTORY[0];
-
-  // Chiudi modal con ESC
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -57,108 +42,111 @@ export default function WhatsNewModal({ isOpen, onClose, dontShowAgain }) {
   };
 
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-2xl z-[1000] transition-opacity duration-300"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
-      <div className="fixed inset-0 z-[1001] flex items-center justify-center p-4">
-        <div
-          className="bg-white/[0.95] backdrop-blur-3xl rounded-3xl shadow-liquid-xl ring-1 ring-white/20 ring-inset max-w-2xl w-full max-h-[90vh] overflow-hidden transform transition-all duration-300 scale-100 relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.15] before:to-transparent before:pointer-events-none"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Header con gradiente */}
-          <div className={`relative bg-gradient-to-r ${getVersionColor(currentVersionData.type)} p-8 text-white z-10`}>
-            <div className="flex items-center justify-between mb-4 relative z-10">
-              <div className="flex items-center gap-3">
-                <span className="text-5xl drop-shadow-lg">{getVersionIcon(currentVersionData.type)}</span>
-                <div>
-                  <h2 className="text-3xl font-bold">Novità!</h2>
-                  <p className="text-white/90 text-sm mt-1">{getVersionTypeLabel(currentVersionData.type)}</p>
-                </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      closeOnOverlayClick={true}
+      closeOnEscape={true}
+      maxWidth="max-w-2xl"
+    >
+      <Card
+        liquid
+        className="overflow-hidden relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.15] dark:before:from-white/[0.08] before:to-transparent before:pointer-events-none"
+      >
+        {/* Header con gradiente */}
+        <div className={`relative bg-gradient-to-r ${getVersionColor(currentVersionData.type)} p-8 text-white z-10`}>
+          <div className="flex items-center justify-between mb-4 relative z-10">
+            <div className="flex items-center gap-3">
+              <span className="text-5xl drop-shadow-lg">{getVersionIcon(currentVersionData.type)}</span>
+              <div>
+                <h2 className="text-3xl font-bold">Novità!</h2>
+                <p className="text-white/90 text-sm mt-1">{getVersionTypeLabel(currentVersionData.type)}</p>
               </div>
-              <button
+            </div>
+
+            {/* Close button usando ActionButton */}
+            <div className="bg-white/20 rounded-full">
+              <ActionButton
+                icon={<X className="text-white" />}
+                variant="close"
+                size="md"
                 onClick={onClose}
-                className="p-2 hover:bg-white/20 rounded-xl transition-colors duration-200"
-                aria-label="Chiudi"
-              >
-                <span className="text-2xl">✕</span>
-              </button>
-            </div>
-
-            {/* Version badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full relative z-10">
-              <span className="text-sm font-semibold">Versione {APP_VERSION}</span>
-              <span className="text-xs opacity-75">
-                {new Date(currentVersionData.date).toLocaleDateString('it-IT', {
-                  day: '2-digit',
-                  month: 'long',
-                  year: 'numeric'
-                })}
-              </span>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="p-8 overflow-y-auto max-h-[calc(90vh-300px)] relative z-10">
-            <h3 className="text-xl font-bold text-neutral-900 mb-4">Cosa c&apos;è di nuovo?</h3>
-
-            <ul className="space-y-3">
-              {currentVersionData.changes.map((change, index) => (
-                <li key={index} className="flex items-start gap-3 group">
-                  <span className="text-success-500 mt-1 group-hover:scale-125 transition-transform duration-200">✓</span>
-                  <p className="text-neutral-700 flex-1">{change}</p>
-                </li>
-              ))}
-            </ul>
-
-            {/* Link al changelog completo */}
-            <div className="mt-6 p-4 bg-neutral-50 rounded-xl">
-              <Link
-                href="/changelog"
-                onClick={onClose}
-                className="flex items-center justify-between group hover:bg-neutral-100 p-2 rounded-lg transition-colors duration-200"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl">📋</span>
-                  <span className="text-sm font-medium text-neutral-700 group-hover:text-primary-600">
-                    Vedi changelog completo
-                  </span>
-                </div>
-                <span className="text-neutral-400 group-hover:text-primary-600 group-hover:translate-x-1 transition-all duration-200">→</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="p-6 bg-neutral-50/80 backdrop-blur-sm border-t border-neutral-200/50 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between relative z-10">
-            <label className="flex items-center gap-2 cursor-pointer group">
-              <input
-                type="checkbox"
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    dontShowAgain();
-                  }
-                }}
-                className="w-4 h-4 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
+                ariaLabel="Chiudi"
+                className="bg-transparent hover:bg-white/20 ring-0"
               />
-              <span className="text-sm text-neutral-600 group-hover:text-neutral-900">
-                Non mostrare più per questa versione
-              </span>
-            </label>
+            </div>
+          </div>
 
-            <button
-              onClick={onClose}
-              className="px-6 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl transition-colors duration-200 active:scale-95"
-            >
-              Inizia ad usare
-            </button>
+          {/* Version badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full relative z-10">
+            <span className="text-sm font-semibold">Versione {APP_VERSION}</span>
+            <span className="text-xs opacity-75">
+              {new Date(currentVersionData.date).toLocaleDateString('it-IT', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+              })}
+            </span>
           </div>
         </div>
-      </div>
-    </>
+
+        {/* Content */}
+        <div className="p-8 overflow-y-auto max-h-[calc(90vh-300px)] relative z-10">
+          <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-4">Cosa c&apos;è di nuovo?</h3>
+
+          <ul className="space-y-3">
+            {currentVersionData.changes.map((change, index) => (
+              <li key={index} className="flex items-start gap-3 group">
+                <span className="text-success-500 mt-1 group-hover:scale-125 transition-transform duration-200">✓</span>
+                <p className="text-neutral-700 dark:text-neutral-300 flex-1">{change}</p>
+              </li>
+            ))}
+          </ul>
+
+          {/* Link al changelog completo */}
+          <div className="mt-6 p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl">
+            <Link
+              href="/changelog"
+              onClick={onClose}
+              className="flex items-center justify-between group hover:bg-neutral-100 dark:hover:bg-neutral-700/50 p-2 rounded-lg transition-colors duration-200"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">📋</span>
+                <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300 group-hover:text-primary-600 dark:group-hover:text-primary-400">
+                  Vedi changelog completo
+                </span>
+              </div>
+              <span className="text-neutral-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 group-hover:translate-x-1 transition-all duration-200">→</span>
+            </Link>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-6 bg-neutral-50/80 dark:bg-neutral-800/50 backdrop-blur-sm border-t border-neutral-200/50 dark:border-neutral-700/50 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between relative z-10">
+          <label className="flex items-center gap-2 cursor-pointer group">
+            <input
+              type="checkbox"
+              onChange={(e) => {
+                if (e.target.checked) {
+                  dontShowAgain();
+                }
+              }}
+              className="w-4 h-4 text-primary-600 border-neutral-300 dark:border-neutral-600 rounded focus:ring-primary-500"
+            />
+            <span className="text-sm text-neutral-600 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-200">
+              Non mostrare più per questa versione
+            </span>
+          </label>
+
+          <Button
+            variant="primary"
+            size="md"
+            onClick={onClose}
+          >
+            Inizia ad usare
+          </Button>
+        </div>
+      </Card>
+    </Modal>
   );
 }

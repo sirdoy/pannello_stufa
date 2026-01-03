@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Button from '../ui/Button';
+import ActionButton from '../ui/ActionButton';
 import Card from '../ui/Card';
 import Modal from '../ui/Modal';
+import Input from '../ui/Input';
 import { X } from 'lucide-react';
 
 /**
@@ -107,13 +109,13 @@ export default function CreateScheduleModal({
                 Configura una nuova pianificazione settimanale
               </p>
             </div>
-            <button
+            <ActionButton
+              icon={<X />}
+              variant="close"
+              size="md"
               onClick={onCancel}
-              className="p-2 rounded-xl hover:bg-neutral-200/60 dark:hover:bg-neutral-700/60 transition-colors text-neutral-600 dark:text-neutral-400"
-              aria-label="Chiudi"
-            >
-              <X className="w-5 h-5" />
-            </button>
+              ariaLabel="Chiudi"
+            />
           </div>
 
           {/* Body */}
@@ -123,7 +125,7 @@ export default function CreateScheduleModal({
               <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
                 Nome Pianificazione <span className="text-primary-500">*</span>
               </label>
-              <input
+              <Input
                 type="text"
                 value={name}
                 onChange={(e) => {
@@ -134,7 +136,7 @@ export default function CreateScheduleModal({
                 placeholder="Es: Weekend, Inverno, Estate..."
                 maxLength={30}
                 autoFocus
-                className="w-full px-4 py-3 bg-white/60 dark:bg-neutral-800/60 backdrop-blur-xl rounded-xl border border-neutral-300/50 dark:border-neutral-600/50 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-primary-400/20 text-neutral-900 dark:text-white placeholder-neutral-500 dark:placeholder-neutral-400 transition-all outline-none"
+                liquid
               />
               {error && (
                 <p className="mt-2 text-sm text-primary-600 dark:text-primary-400 flex items-center gap-1">

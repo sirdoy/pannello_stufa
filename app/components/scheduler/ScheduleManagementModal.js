@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Button from '../ui/Button';
+import ActionButton from '../ui/ActionButton';
 import Card from '../ui/Card';
 import Modal from '../ui/Modal';
 import ConfirmDialog from '../ui/ConfirmDialog';
@@ -145,13 +146,13 @@ export default function ScheduleManagementModal({
                 Modifica, elimina o cambia pianificazione attiva
               </p>
             </div>
-            <button
+            <ActionButton
+              icon={<X />}
+              variant="close"
+              size="md"
               onClick={onClose}
-              className="p-2 rounded-xl hover:bg-neutral-200/60 dark:hover:bg-neutral-700/60 transition-colors text-neutral-600 dark:text-neutral-400"
-              aria-label="Chiudi"
-            >
-              <X className="w-5 h-5" />
-            </button>
+              ariaLabel="Chiudi"
+            />
           </div>
 
           {/* Active Schedule Section */}

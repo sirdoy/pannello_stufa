@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Button from '../ui/Button';
+import ActionButton from '../ui/ActionButton';
 import { X } from 'lucide-react';
 
 const daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
@@ -75,13 +76,13 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
           <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">
             Duplica {sourceDay}
           </h2>
-          <button
+          <ActionButton
+            icon={<X />}
+            variant="close"
+            size="md"
             onClick={onCancel}
-            className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-white/[0.05] transition-colors"
-            aria-label="Chiudi"
-          >
-            <X className="w-5 h-5 text-neutral-600 dark:text-neutral-400" />
-          </button>
+            ariaLabel="Chiudi"
+          />
         </div>
 
         {/* Description */}

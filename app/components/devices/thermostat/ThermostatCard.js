@@ -3,13 +3,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { NETATMO_ROUTES } from '@/lib/routes';
-import Card from '../../ui/Card';
-import Button from '../../ui/Button';
-import Select from '../../ui/Select';
 import Skeleton from '../../ui/Skeleton';
-import Banner from '../../ui/Banner';
-import LoadingOverlay from '../../ui/LoadingOverlay';
-import { Divider, Heading, Text, EmptyState } from '../../ui';
+import DeviceCard from '../../ui/DeviceCard';
+import RoomSelector from '../../ui/RoomSelector';
+import { Divider, Heading, Text, Button, EmptyState } from '../../ui';
 
 /**
  * ThermostatCard - Complete thermostat control for homepage
@@ -237,129 +234,51 @@ export default function ThermostatCard() {
     window.location.href = `https://api.netatmo.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read_thermostat%20write_thermostat&state=manual`;
   };
 
-  if (loading) {
-    return <Skeleton.ThermostatCard />;
-  }
+  // Build props for DeviceCard
+  const banners = error ? [{
+    variant: 'error',
+    icon: '⚠️',
+    title: 'Errore Connessione',
+    description: error,
+    dismissible: true,
+    onDismiss: () => setError(null)
+  }] : [];
 
-  if (!connected) {
-    return (
-      <div className="space-y-4 sm:space-y-6">
-        <Card liquid className="overflow-visible transition-all duration-500">
-          <div className="relative">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-info-500 via-info-400 to-info-500 opacity-80"></div>
-
-            <div className="p-6 sm:p-8">
-              {/* Header */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl sm:text-3xl">🌡️</span>
-                  <Heading level={2} size="xl">Termostato</Heading>
-                </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-200 dark:bg-neutral-700 rounded-full">
-                  <span className="w-2 h-2 bg-neutral-500 dark:bg-neutral-400 rounded-full"></span>
-                  <span className="text-xs font-medium text-neutral-700 dark:text-neutral-300">Offline</span>
-                </div>
-              </div>
-
-              {/* Not connected message */}
-              <EmptyState
-                icon="🔌"
-                title="Termostato Non Connesso"
-                description="Connetti il tuo account Netatmo per controllare il riscaldamento"
-                action={
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <Button
-                      liquid
-                      variant="success"
-                      onClick={handleAuth}
-                      icon="🔗"
-                    >
-                      Connetti Netatmo
-                    </Button>
-                    <Button
-                      liquid
-                      variant="outline"
-                      onClick={() => router.push('/thermostat')}
-                    >
-                      Maggiori Info
-                    </Button>
-                  </div>
-                }
-              />
-
-              {error && (
-                <div className="mt-4">
-                  <Banner
-                    liquid
-                    variant="error"
-                    icon="⚠️"
-                    description={error}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        </Card>
-      </div>
-    );
-  }
+  const infoBoxes = topology ? [
+    { icon: '🏠', label: 'Casa', value: topology.home_name || '-' },
+    { icon: '🚪', label: 'Stanze', value: rooms.length },
+    { icon: '📡', label: 'Dispositivi', value: topology.modules?.length || 0 },
+  ] : [];
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Loading Overlay - Full page blocking */}
-      <LoadingOverlay
-        show={refreshing || calibrating}
-        message={loadingMessage}
-        icon="🌡️"
+    <DeviceCard
+      icon="🌡️"
+      title="Termostato"
+      colorTheme="info"
+      connected={connected}
+      onConnect={handleAuth}
+      connectButtonLabel="Connetti Netatmo"
+      connectInfoRoute="/thermostat"
+      loading={loading || refreshing || calibrating}
+      loadingMessage={loadingMessage}
+      skeletonComponent={loading ? <Skeleton.ThermostatCard /> : null}
+      banners={banners}
+      infoBoxes={infoBoxes}
+      infoBoxesTitle="Informazioni"
+    >
+      {/* Room Selection */}
+      <RoomSelector
+        rooms={roomsWithStatus.map(room => ({
+          id: room.id,
+          name: room.name
+        }))}
+        selectedRoomId={selectedRoomId}
+        onChange={(e) => setSelectedRoomId(e.target.value)}
       />
 
-      {/* Main Status Card */}
-      <Card liquid className="overflow-visible transition-all duration-500">
-        <div className="relative">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-info-500 via-accent-500 to-info-500 opacity-80"></div>
-
-          <div className="p-6 sm:p-8">
-            {/* Error Banner - Inside card */}
-            {error && (
-              <div className="mb-4 sm:mb-6">
-                <Banner
-                  liquid
-                  variant="error"
-                  icon="⚠️"
-                  title="Errore Connessione"
-                  description={error}
-                  dismissible
-                  onDismiss={() => setError(null)}
-                />
-              </div>
-            )}
-
-            {/* Header - Simplified without refresh button */}
-            <div className="flex items-center gap-2 mb-6">
-              <span className="text-2xl sm:text-3xl">🌡️</span>
-              <Heading level={2} size="xl">Termostato</Heading>
-            </div>
-
-            {/* Room Selection */}
-            {roomsWithStatus.length > 1 && (
-              <div className="mb-4 sm:mb-6">
-                <Select
-                  liquid
-                  label="🚪 Seleziona Stanza"
-                  value={selectedRoomId || ''}
-                  onChange={(e) => setSelectedRoomId(e.target.value)}
-                  options={roomsWithStatus.map(room => ({
-                    value: room.id,
-                    label: room.name
-                  }))}
-                  className="text-base sm:text-lg"
-                />
-              </div>
-            )}
-
-            {/* Selected Room Temperature */}
-            {selectedRoom ? (
-              <div className="space-y-4 mb-4 sm:mb-6">
+      {/* Selected Room Temperature */}
+      {selectedRoom ? (
+        <div className="space-y-4 mb-4 sm:mb-6">
                 {/* Main Temperature Display - Enhanced with gradient background */}
                 <div className={`relative rounded-2xl p-6 sm:p-8 shadow-liquid hover:shadow-liquid-lg transition-all duration-500 ${
                   selectedRoom.heating
@@ -522,97 +441,52 @@ export default function ThermostatCard() {
               </button>
             </div>
 
-            {/* Separator */}
-            <Divider label="Informazioni" variant="gradient" spacing="large" />
-
-            {/* Summary Info - Enhanced */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10">
-                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
-                  <span className="text-3xl sm:text-4xl mb-2">🏠</span>
-                  <Text variant="tertiary" className="text-[10px] sm:text-xs uppercase tracking-wider font-bold mb-1">
-                    Casa
-                  </Text>
-                  <Heading level={4} size="sm" className="truncate w-full text-center">
-                    {topology.home_name || '-'}
-                  </Heading>
-                </div>
-              </div>
-
-              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10">
-                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
-                  <span className="text-3xl sm:text-4xl mb-2">🚪</span>
-                  <Text variant="tertiary" className="text-[10px] sm:text-xs uppercase tracking-wider font-bold mb-1">
-                    Stanze
-                  </Text>
-                  <span className="text-2xl sm:text-3xl font-black text-neutral-800 dark:text-neutral-100">
-                    {rooms.length}
-                  </span>
-                </div>
-              </div>
-
-              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10 col-span-2 sm:col-span-1">
-                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
-                  <span className="text-3xl sm:text-4xl mb-2">📡</span>
-                  <Text variant="tertiary" className="text-[10px] sm:text-xs uppercase tracking-wider font-bold mb-1">
-                    Dispositivi
-                  </Text>
-                  <span className="text-2xl sm:text-3xl font-black text-neutral-800 dark:text-neutral-100">
-                    {topology.modules?.length || 0}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="mt-4 sm:mt-6 space-y-3">
-              {/* Calibration Success Banner */}
-              {calibrationSuccess !== null && (
-                <div className={`p-3 rounded-lg border ${
-                  calibrationSuccess
-                    ? 'bg-success-50 dark:bg-success-900/30 border-success-200 dark:border-success-600'
-                    : 'bg-error-50 dark:bg-error-900/30 border-error-200 dark:border-error-600'
-                }`}>
-                  <p className={`text-sm font-medium ${
-                    calibrationSuccess
-                      ? 'text-success-700 dark:text-success-400'
-                      : 'text-error-700 dark:text-error-400'
-                  }`}>
-                    {calibrationSuccess
-                      ? '✓ Calibrazione valvole avviata con successo'
-                      : '✗ Calibrazione fallita'
-                    }
-                  </p>
-                </div>
-              )}
-
-              {/* Calibrate Button */}
-              <Button
-                liquid
-                variant="info"
-                onClick={handleCalibrateValves}
-                disabled={calibrating}
-                className="w-full"
-                size="sm"
-                icon={calibrating ? '⏳' : '🔧'}
-              >
-                {calibrating ? 'Calibrazione in corso...' : 'Tara Valvole'}
-              </Button>
-
-              {/* Link to full page */}
-              <Button
-                liquid
-                variant="outline"
-                onClick={() => router.push('/thermostat')}
-                className="w-full"
-                size="sm"
-              >
-                Vedi Tutte le Stanze →
-              </Button>
-            </div>
+      {/* Actions - Kept manual to handle calibration banner */}
+      <div className="mt-4 sm:mt-6 space-y-3">
+        {/* Calibration Success Banner */}
+        {calibrationSuccess !== null && (
+          <div className={`p-3 rounded-lg border ${
+            calibrationSuccess
+              ? 'bg-success-50 dark:bg-success-900/30 border-success-200 dark:border-success-600'
+              : 'bg-error-50 dark:bg-error-900/30 border-error-200 dark:border-error-600'
+          }`}>
+            <p className={`text-sm font-medium ${
+              calibrationSuccess
+                ? 'text-success-700 dark:text-success-400'
+                : 'text-error-700 dark:text-error-400'
+            }`}>
+              {calibrationSuccess
+                ? '✓ Calibrazione valvole avviata con successo'
+                : '✗ Calibrazione fallita'
+              }
+            </p>
           </div>
-        </div>
-      </Card>
-    </div>
+        )}
+
+        {/* Calibrate Button */}
+        <Button
+          liquid
+          variant="info"
+          onClick={handleCalibrateValves}
+          disabled={calibrating}
+          className="w-full"
+          size="sm"
+          icon={calibrating ? '⏳' : '🔧'}
+        >
+          {calibrating ? 'Calibrazione in corso...' : 'Tara Valvole'}
+        </Button>
+
+        {/* Link to full page */}
+        <Button
+          liquid
+          variant="outline"
+          onClick={() => router.push('/thermostat')}
+          className="w-full"
+          size="sm"
+        >
+          Vedi Tutte le Stanze →
+        </Button>
+      </div>
+    </DeviceCard>
   );
 }

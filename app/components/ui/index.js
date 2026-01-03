@@ -2,6 +2,7 @@
 export { default as Card } from './Card';
 export { default as Button } from './Button';
 export { default as ControlButton } from './ControlButton';
+export { default as ActionButton } from './ActionButton';
 export { default as Input } from './Input';
 export { default as Select } from './Select';
 export { default as StatusBadge } from './StatusBadge';
@@ -15,6 +16,13 @@ export { default as Toggle } from './Toggle';
 export { default as Toast } from './Toast';
 export { default as LoadingOverlay } from './LoadingOverlay';
 export { default as ConfirmDialog } from './ConfirmDialog';
+export { default as Modal } from './Modal';
+export { default as BottomSheet } from './BottomSheet';
+export { default as ProgressBar } from './ProgressBar';
+export { default as Panel } from './Panel';
+export { default as InfoBox } from './InfoBox';
+export { default as RoomSelector } from './RoomSelector';
+export { default as DeviceCard } from './DeviceCard';
 
 // Layout components (v1.31.0+)
 export { default as Container } from './Container';

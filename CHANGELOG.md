@@ -5,6 +5,355 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.37.0] - 2026-01-04
+
+### 🏠 Features - Device Card Abstraction & Refactoring
+
+#### Aggiunto
+
+- **DeviceCard Base Component** - Unified structure for OAuth device cards
+  - `app/components/ui/DeviceCard.js` - Abstract base component (~220 lines)
+  - Handles: accent bar, header, status badges, loading states, error handling, not connected state
+  - Props-driven API: icon, title, colorTheme, connected, onConnect, banners, infoBoxes, footerActions
+  - Integrated: LoadingOverlay, Toast, EmptyState, InfoBoxes grid, RoomSelector support
+  - Color themes: primary (red/pink), info (blue), warning (yellow), success (green)
+
+- **InfoBox Component** - Reusable summary statistics boxes
+  - `app/components/ui/InfoBox.js` - Icon, label, value display
+  - Used in ThermostatCard (3 boxes), LightsCard (3 boxes)
+  - Glassmorphism styling with liquid backdrop-blur
+  - Value color variants: neutral, primary, success, warning, info
+
+- **RoomSelector Component** - Multi-room device selector
+  - `app/components/ui/RoomSelector.js` - Standardized room selection dropdown
+  - Auto-hides when ≤1 room available
+  - Shared by ThermostatCard & LightsCard
+
+#### Refactoring Completato
+
+- **LightsCard Refactoring** - Complete migration to DeviceCard
+  - `app/components/devices/lights/LightsCard.js`: **561 → 430 lines (-23% code)**
+  - Replaced custom Card structure with DeviceCard component
+  - Replaced custom Select with RoomSelector component
+  - Replaced 3 custom info boxes with InfoBox components
+  - Removed duplicated: LoadingOverlay, Banner, EmptyState, header structure
+  - **-131 lines of duplicated code eliminated**
+
+- **ThermostatCard Refactoring** - Complete migration to DeviceCard
+  - `app/components/devices/thermostat/ThermostatCard.js`: **619 → 493 lines (-20% code)**
+  - Replaced custom Card structure with DeviceCard component
+  - Replaced custom Select with RoomSelector component
+  - Replaced 3 custom info boxes with InfoBox components
+  - Removed duplicated: LoadingOverlay, Banner, EmptyState, header structure
+  - **-126 lines of duplicated code eliminated**
+
+- **StoveCard Decision** - Preserved unique implementation
+  - `app/components/devices/stove/StoveCard.js`: **unchanged (1,118 lines)**
+  - DeviceCard pattern not applicable (no OAuth, no connected/disconnected state)
+  - Unique features: Firebase real-time sync, error monitoring, maintenance tracking
+  - Complex status display with 10+ states and dynamic coloring
+  - **Architecture decision**: keep specialized implementation
+
+#### Benefits Realized
+
+- **Code Deduplication**: **-257 lines across 2 device cards**
+  - Accent bar pattern: -24 lines
+  - Header structure: -12 lines
+  - Loading states: -18 lines
+  - Error handling: -24 lines
+  - Info boxes grid: -60 lines
+  - Room selector: -24 lines
+  - Not connected state: -60 lines
+  - Empty state handling: -35 lines
+
+- **Developer Experience**:
+  - **Single source of truth** for OAuth device card structure
+  - Consistent UX across Lights and Thermostat
+  - Props-driven customization (no copy-paste)
+  - Future OAuth devices: ~300 lines vs ~600 lines (-50% code)
+
+- **Architecture Pattern Established**:
+  - Reusable for future OAuth integrations (Spotify/Sonos, Security cameras, etc.)
+  - Clear distinction: DeviceCard for OAuth devices, custom cards for local devices
+  - Uniform design updates centralized in DeviceCard
+
+### 📊 Final Architecture
+
+**Before Refactoring**:
+- StoveCard: 1,118 lines (custom, local API)
+- ThermostatCard: 619 lines (duplicated patterns)
+- LightsCard: 561 lines (duplicated patterns)
+- **Total**: 2,298 lines
+
+**After Refactoring**:
+- DeviceCard (base): ~220 lines
+- InfoBox: ~50 lines
+- RoomSelector: ~45 lines
+- StoveCard: 1,118 lines (unchanged - custom)
+- ThermostatCard: 493 lines (-126 lines)
+- LightsCard: 430 lines (-131 lines)
+- **Total**: 2,356 lines (-257 duplicated lines, +315 reusable base)
+- **Net Result**: Same functionality with **-11% duplication**, +∞ reusability for future devices
+
+### 🎯 Implementation Example
+
+```jsx
+// LightsCard - Refactored (430 lines)
+<DeviceCard
+  icon="💡"
+  title="Luci"
+  colorTheme="warning"
+  connected={connected}
+  onConnect={handleAuth}
+  connectButtonLabel="Connetti Philips Hue"
+  connectInfoRoute="/lights"
+  loading={loading || refreshing}
+  skeletonComponent={loading ? <Skeleton.LightsCard /> : null}
+  banners={error ? [{ variant: 'error', ... }] : []}
+  infoBoxes={[
+    { icon: '💡', label: 'Luci Stanza', value: lights.length },
+    { icon: '🚪', label: 'Stanze', value: rooms.length },
+    { icon: '🎨', label: 'Scene', value: scenes.length }
+  ]}
+  infoBoxesTitle="Informazioni"
+  footerActions={[
+    { label: 'Tutte le Stanze e Scene →', variant: 'outline', onClick: goToFullPage }
+  ]}
+>
+  <RoomSelector rooms={rooms} selectedRoomId={selectedRoomId} onChange={setSelectedRoomId} />
+  {/* Device-specific controls */}
+</DeviceCard>
+```
+
+---
+
+## [1.36.2] - 2026-01-03
+
+### 🎨 Enhancements - Component Uniformity (MEDIUM Priority)
+
+#### Modificato
+
+- **StatusBadge Component** - Extended with floating and inline variants
+  - `app/components/ui/StatusBadge.js` - Added variant prop (default/floating/inline)
+  - Floating variant: absolute positioned badge with gradient + blur effect
+  - Inline variant: simple inline badge with color presets
+  - Color presets: primary, success, warning, danger, info, purple
+  - Position support: top-right, top-left, bottom-right, bottom-left
+  - Custom gradient support for flexible styling
+  - Reusable pattern for 5+ floating badges across StoveCard, LightsCard, ThermostatCard
+
+- **Input Component Standardization** - Replaced native inputs in scheduler modals
+  - `app/components/scheduler/AddIntervalModal.js` - 3 inputs → Input component
+    - Start time input (type="time")
+    - End time input (type="time")
+    - Custom minutes input (type="number")
+  - `app/components/scheduler/CreateScheduleModal.js` - 1 input → Input component
+    - Schedule name input (type="text" with liquid glass styling)
+  - Consistent styling across all form inputs
+  - Improved dark mode support with liquid glass variants
+
+#### Aggiunto
+
+- **Unit Tests** - Comprehensive StatusBadge variant tests
+  - `app/components/ui/__tests__/StatusBadge.variants.test.js` - 30+ test cases
+  - Tests for default, floating, and inline variants
+  - Color preset validation
+  - Position testing for floating badges
+  - Icon and text rendering validation
+
+### 📊 Metrics
+
+- **Component Reusability**: StatusBadge now supports 3 variants vs 1
+- **Form Consistency**: 100% Input component usage in modals (4/4 inputs standardized)
+- **Test Coverage**: +30 tests for StatusBadge variants
+- **Code Quality**: Eliminated 4 instances of duplicated input styling
+
+---
+
+## [1.36.1] - 2026-01-03
+
+### 🔧 Fixes - Component Uniformity (HIGH Priority)
+
+#### Modificato
+
+- **Scheduler Modals Close Buttons** - Uniformity fix for 4 modal components
+  - `app/components/scheduler/DuplicateDayModal.js` - Replaced custom close button with ActionButton
+  - `app/components/scheduler/CreateScheduleModal.js` - Replaced custom close button with ActionButton
+  - `app/components/scheduler/AddIntervalModal.js` - Replaced custom close button with ActionButton
+  - `app/components/scheduler/ScheduleManagementModal.js` - Replaced custom close button with ActionButton
+  - Consistent `variant="close"`, `size="md"` styling across all modals
+  - Improved accessibility with `ariaLabel` prop
+  - -12 lines of duplicated button code
+
+- **Maintenance Reset Modal** - Replaced custom modal with ConfirmDialog
+  - `app/stove/maintenance/page.js:248-259` - Custom modal → ConfirmDialog component
+  - Removed manual ESC key handler (delegated to ConfirmDialog)
+  - Removed manual scroll lock logic (delegated to ConfirmDialog)
+  - -40 lines of custom modal code
+  - Improved consistency with rest of application
+
+#### Rimosso
+
+- **Duplicated ESC Key Handlers** - Cleanup of manual keyboard event listeners
+  - Removed from maintenance/page.js (handled by ConfirmDialog)
+  - -8 lines of duplicated event handling code
+
+#### Deprecated
+
+- **StovePanel Component** - Marked as deprecated
+  - `app/components/StovePanel.js` - Added @deprecated JSDoc warning
+  - Replaced by `app/components/devices/stove/StoveCard.js` (v1.32.0+)
+  - Component kept for reference only, will be removed in future version
+  - Uses old design patterns (custom boxes instead of Card component)
+
+### 📊 Metrics
+
+- **Code Duplication**: Additional -60 lines of duplicated code removed
+- **Consistency**: 100% modal uniformity across scheduler (4/4 modals standardized)
+- **Accessibility**: Improved with consistent ActionButton aria-labels
+- **Maintainability**: Single source of truth for close buttons and dialogs
+
+---
+
+## [1.36.0] - 2026-01-03
+
+### 🏗️ Architecture - Component Uniformity Refactor
+
+#### Aggiunto
+
+- **ProgressBar Component** - Reusable progress indicator with gradient support
+  - `app/components/ui/ProgressBar.js` - Unified progress bar for power/fan/maintenance tracking
+  - Color variants: primary, success, warning, danger, info + custom gradient support
+  - Size variants: sm (h-2), md (h-3), lg (h-4)
+  - Label, leftContent, rightContent props for flexible layouts
+  - Animated transitions (configurable with `animated` prop)
+  - ARIA compliance with progressbar role and valuenow/valuemin/valuemax attributes
+  - Value clamping (0-100) for safety
+
+- **ActionButton Component** - Specialized icon buttons for common actions
+  - `app/components/ui/ActionButton.js` - Standardized edit/delete/close/info buttons
+  - 7 variants: edit (blue), delete (red), close (neutral), info (cyan), warning, success, primary
+  - 3 sizes: sm (p-2), md (p-3), lg (p-4) with iOS 44px minimum touch target
+  - Liquid glass styling with backdrop-blur and ring effects
+  - Supports both emoji strings and React icon components (lucide-react)
+  - Full accessibility with ariaLabel and title props
+
+- **BottomSheet Component** - Mobile-friendly bottom sheet dialog
+  - `app/components/ui/BottomSheet.js` - Portal-based modal alternative for mobile
+  - Slide-up animation with drag handle indicator
+  - Scroll lock with position restoration on close
+  - ESC key support and backdrop click-to-close (configurable)
+  - Optional title, icon, close button (all configurable)
+  - z-index management (default: 8999, customizable)
+  - Max-height (85vh) with scrollable content
+
+- **Panel Component** - Standardized settings panel container
+  - `app/components/ui/Panel.js` - Consistent layout for settings sections
+  - Extends Card component with header/content structure
+  - Optional title, description, headerAction props
+  - Border separator between header and content
+  - Liquid glass, glassmorphism, or solid variants
+  - Custom className for both container and content
+
+- **Unit Tests** - Comprehensive test coverage for new components
+  - `app/components/ui/__tests__/ProgressBar.test.js` - 25 tests (rendering, variants, sizes, clamping, animation)
+  - `app/components/ui/__tests__/ActionButton.test.js` - 31 tests (rendering, 7 variants, sizes, states, interactions, accessibility)
+  - `app/components/ui/__tests__/BottomSheet.test.js` - 17 tests (rendering, close button, handle, accessibility)
+  - `app/components/ui/__tests__/Panel.test.js` - 22 tests (rendering, styles, header, content)
+
+- **UI Library Exports** - Complete export mapping in index.js
+  - Added exports for Modal, BottomSheet, ProgressBar, ActionButton, Panel
+  - Centralized import path: `import { ProgressBar, ActionButton } from '@/app/components/ui'`
+
+#### Modificato
+
+- **ForceUpdateModal Component** - Refactored to use base components
+  - `app/components/ForceUpdateModal.js` - Replaced custom modal structure with Modal + Card + Button
+  - Removed custom button styling (100+ chars inline classes) → Button component with variant="primary"
+  - Modal configuration: `closeOnOverlayClick={false}` and `closeOnEscape={false}` for blocking behavior
+  - Dark mode support added to all text elements
+  - -60 lines of code, improved maintainability
+
+- **WhatsNewModal Component** - Standardized with base UI library
+  - `app/components/WhatsNewModal.js` - Modal + Card + Button + ActionButton components
+  - Close button: custom X button → ActionButton with variant="close"
+  - Footer button: custom inline styles → Button component
+  - Removed manual scroll lock and ESC key handling (delegated to Modal)
+  - Dark mode improvements for all sections
+  - -30 lines of code
+
+- **ScheduleInterval Component** - Unified with base components
+  - `app/components/scheduler/ScheduleInterval.js` - Card + ActionButton + ProgressBar
+  - Container: custom div with 20+ Tailwind classes → Card component with liquid prop
+  - Action buttons: custom blue/red buttons → ActionButton with edit/delete variants
+  - Power bar: custom progress HTML → ProgressBar with custom gradient from POWER_LABELS
+  - Fan bar: custom progress HTML → ProgressBar with color="info"
+  - -40 lines of duplicated HTML/CSS
+
+- **IntervalBottomSheet Component** - Refactored to use BottomSheet base
+  - `app/components/scheduler/IntervalBottomSheet.js` - BottomSheet + ProgressBar + Button
+  - Removed manual portal creation and scroll lock logic → BottomSheet handles it
+  - Removed custom backdrop, handle bar, close button → BottomSheet props
+  - Action buttons: custom styled buttons → Button component with liquid + custom blue/red variants
+  - Progress bars: ProgressBar component with gradient support
+  - -80 lines of code, significantly cleaner
+
+#### Rimosso
+
+- **Custom Modal Implementations** - Eliminated duplicate modal structures
+  - ForceUpdateModal: removed custom backdrop div, modal positioning div, custom card structure
+  - WhatsNewModal: removed custom scroll lock logic, manual ESC key handler, custom backdrop
+  - IntervalBottomSheet: removed createPortal boilerplate, manual state management for mounted/scroll
+
+- **Duplicate Progress Bar HTML** - Consolidated into ProgressBar component
+  - Removed 6 instances of custom progress bar markup across scheduler components
+  - Eliminated inconsistent gradient implementations
+  - Removed duplicate bg-neutral-200/50 track styling
+
+- **Custom Button Styling** - Replaced with ActionButton and Button components
+  - Removed 100+ character inline className strings for buttons
+  - Eliminated duplicate edit/delete button implementations (8 instances)
+  - Removed custom hover/active state management
+
+### 📊 Metrics
+
+- **Code Duplication**: -40% across modal and button implementations
+- **Lines of Code**: -190 lines removed from refactored components
+- **Test Coverage**: +95 new unit tests for base components
+- **Component Reusability**: 4 new base components used in 8+ locations
+- **Maintainability**: Centralized styling in base components (single source of truth)
+
+### 🎯 Migration Guide
+
+**For developers**: When creating new modals, buttons, or progress indicators:
+
+```jsx
+// ❌ Before (custom implementation)
+<div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose}>
+  <div className="bg-white rounded-2xl p-8">
+    <button className="w-full bg-gradient-to-r from-primary-500..." onClick={handleClick}>
+      Click me
+    </button>
+  </div>
+</div>
+
+// ✅ After (base components)
+<Modal isOpen={isOpen} onClose={onClose}>
+  <Card liquid className="p-8">
+    <Button variant="primary" fullWidth onClick={handleClick}>
+      Click me
+    </Button>
+  </Card>
+</Modal>
+```
+
+**Import pattern**:
+```jsx
+import { Modal, Card, Button, ActionButton, ProgressBar, Panel, BottomSheet } from '@/app/components/ui';
+```
+
+---
+
 ## [1.33.0] - 2025-12-31
 
 ### ⚡ UI/UX Improvements - Scheduler Mobile-First Redesign

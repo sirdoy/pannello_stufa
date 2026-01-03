@@ -1,3 +1,17 @@
+/**
+ * @deprecated DEPRECATED - DO NOT USE
+ *
+ * This component uses old design patterns and has been replaced by StoveCard.js
+ *
+ * Use app/components/devices/stove/StoveCard.js instead.
+ *
+ * This file is kept for reference only and will be removed in a future version.
+ * Last updated: v1.32.0 (2025-12-28)
+ * Superseded by: StoveCard (v1.32.0+)
+ *
+ * @see app/components/devices/stove/StoveCard.js
+ */
+
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';

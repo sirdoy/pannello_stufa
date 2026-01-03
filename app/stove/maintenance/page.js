@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
+import ConfirmDialog from '@/app/components/ui/ConfirmDialog';
 import { getMaintenanceData, updateTargetHours, confirmCleaning } from '@/lib/maintenanceService';
 import { formatHoursToHHMM } from '@/lib/formatUtils';
 
@@ -24,17 +25,6 @@ export default function MaintenancePage() {
       loadMaintenanceData();
     }
   }, [user, isLoading]);
-
-  // Close modal on Escape key
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape' && showResetConfirm) {
-        setShowResetConfirm(false);
-      }
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [showResetConfirm]);
 
   const loadMaintenanceData = async () => {
     try {
@@ -255,46 +245,18 @@ export default function MaintenancePage() {
         </Card>
       </div>
 
-      {/* Reset Confirmation Modal */}
-      {showResetConfirm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[10000] p-4">
-          <Card liquid className="max-w-md w-full p-6 sm:p-8">
-            <h2 className="text-2xl font-bold text-neutral-800 dark:text-white mb-4">🔄 Conferma Reset</h2>
-            <p className="text-neutral-700 dark:text-neutral-300 mb-6">
-              Sei sicuro di voler azzerare il contatore di manutenzione?
-            </p>
-            <div className="space-y-2 mb-6 bg-warning-50 dark:bg-warning-900/20 border border-warning-200 dark:border-warning-800 rounded-lg p-4">
-              <p className="text-sm text-warning-800 dark:text-warning-400">
-                ⚠️ Questa operazione:
-              </p>
-              <ul className="text-sm text-warning-700 dark:text-warning-400 space-y-1 ml-4">
-                <li>• Azzererà il contatore a 0.0 ore</li>
-                <li>• Registrerà la data e ora della pulizia</li>
-                <li>• Sbloccherà l&apos;accensione della stufa se era bloccata</li>
-                <li>• Creerà un log dell&apos;operazione</li>
-              </ul>
-            </div>
-            <div className="flex gap-3">
-              <Button liquid
-                variant="outline"
-                onClick={handleCancelReset}
-                disabled={isResetting}
-                className="flex-1"
-              >
-                ✕ Annulla
-              </Button>
-              <Button liquid
-                variant="danger"
-                onClick={handleConfirmReset}
-                disabled={isResetting}
-                className="flex-1"
-              >
-                {isResetting ? '⏳ Attendere...' : '✓ Conferma Reset'}
-              </Button>
-            </div>
-          </Card>
-        </div>
-      )}
+      {/* Reset Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showResetConfirm}
+        icon="🔄"
+        title="Conferma Reset"
+        message="Sei sicuro di voler azzerare il contatore di manutenzione? Questa operazione azzererà il contatore a 0.0 ore, registrerà la data e ora della pulizia, sbloccherà l'accensione della stufa se era bloccata e creerà un log dell'operazione."
+        confirmText={isResetting ? '⏳ Attendere...' : '✓ Conferma Reset'}
+        cancelText="✕ Annulla"
+        confirmVariant="danger"
+        onConfirm={handleConfirmReset}
+        onCancel={handleCancelReset}
+      />
     </>
   );
 }

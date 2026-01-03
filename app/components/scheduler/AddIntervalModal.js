@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Button from '../ui/Button';
+import ActionButton from '../ui/ActionButton';
 import Card from '../ui/Card';
+import Input from '../ui/Input';
 import { X } from 'lucide-react';
 import { getPowerBadgeClass, getFanBadgeClass } from '@/lib/schedulerStats';
 
@@ -168,29 +170,24 @@ export default function AddIntervalModal({
             <span>{mode === 'edit' ? '✏️' : '➕'}</span>
             <span>{mode === 'edit' ? 'Modifica' : 'Aggiungi'} Intervallo - {day}</span>
           </h2>
-          <button
+          <ActionButton
+            icon={<X />}
+            variant="close"
+            size="md"
             onClick={onCancel}
-            className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-white/[0.05] transition-colors"
-            aria-label="Chiudi"
-          >
-            <X className="w-5 h-5 text-neutral-600 dark:text-neutral-400" />
-          </button>
+            ariaLabel="Chiudi"
+          />
         </div>
 
         {/* Form */}
         <div className="space-y-4 mb-6">
           {/* Start Time */}
-          <div>
-            <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
-              ⏰ Ora inizio
-            </label>
-            <input
-              type="time"
-              value={start}
-              onChange={(e) => setStart(e.target.value)}
-              className="w-full px-4 py-3 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-xl text-neutral-900 dark:text-white focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-600 focus:border-transparent transition-all duration-200"
-            />
-          </div>
+          <Input
+            type="time"
+            label="⏰ Ora inizio"
+            value={start}
+            onChange={(e) => setStart(e.target.value)}
+          />
 
           {/* Toggle: Duration vs End Time */}
           <div>
@@ -245,37 +242,27 @@ export default function AddIntervalModal({
 
               {/* Custom Duration Input */}
               {durationPreset === 'custom' && (
-                <div>
-                  <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
-                    Minuti
-                  </label>
-                  <input
-                    type="number"
-                    min="15"
-                    max="1440"
-                    value={customMinutes}
-                    onChange={(e) => setCustomMinutes(Number(e.target.value))}
-                    className="w-full px-4 py-3 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-xl text-neutral-900 dark:text-white focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-600 focus:border-transparent transition-all duration-200"
-                    placeholder="Es: 90 per 1h 30min"
-                  />
-                </div>
+                <Input
+                  type="number"
+                  label="Minuti"
+                  min="15"
+                  max="1440"
+                  value={customMinutes}
+                  onChange={(e) => setCustomMinutes(Number(e.target.value))}
+                  placeholder="Es: 90 per 1h 30min"
+                />
               )}
             </>
           )}
 
           {/* End Time Mode */}
           {inputMode === 'endTime' && (
-            <div>
-              <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
-                ⏰ Ora fine
-              </label>
-              <input
-                type="time"
-                value={end}
-                onChange={(e) => setEnd(e.target.value)}
-                className="w-full px-4 py-3 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-xl text-neutral-900 dark:text-white focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-600 focus:border-transparent transition-all duration-200"
-              />
-            </div>
+            <Input
+              type="time"
+              label="⏰ Ora fine"
+              value={end}
+              onChange={(e) => setEnd(e.target.value)}
+            />
           )}
 
           {/* End Time Preview */}

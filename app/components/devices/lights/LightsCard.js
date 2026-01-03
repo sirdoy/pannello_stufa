@@ -2,13 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import Card from '../../ui/Card';
-import Button from '../../ui/Button';
-import Select from '../../ui/Select';
 import Skeleton from '../../ui/Skeleton';
-import Banner from '../../ui/Banner';
-import LoadingOverlay from '../../ui/LoadingOverlay';
-import { Divider, Heading, Text, EmptyState } from '../../ui';
+import DeviceCard from '../../ui/DeviceCard';
+import RoomSelector from '../../ui/RoomSelector';
+import { Divider, Heading, Button, EmptyState } from '../../ui';
 
 /**
  * LightsCard - Complete Philips Hue lights control for homepage
@@ -210,72 +207,28 @@ export default function LightsCard() {
     window.location.href = `https://api.meethue.com/v2/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&state=${state}&scope=${encodeURIComponent(scope)}`;
   };
 
-  if (loading) {
-    return <Skeleton.LightsCard />;
-  }
+  // Build props for DeviceCard
+  const banners = error ? [{
+    variant: 'error',
+    icon: '⚠️',
+    title: 'Errore Connessione',
+    description: error,
+    dismissible: true,
+    onDismiss: () => setError(null)
+  }] : [];
 
-  if (!connected) {
-    return (
-      <div className="space-y-4 sm:space-y-6">
-        <Card liquid className="overflow-visible transition-all duration-500">
-          <div className="relative">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-warning-500 via-warning-400 to-warning-500 opacity-80"></div>
+  const infoBoxes = selectedRoom ? [
+    { icon: '💡', label: 'Luci Stanza', value: roomLights.length },
+    { icon: '🚪', label: 'Stanze', value: rooms.length },
+    { icon: '🎨', label: 'Scene', value: scenes.length },
+  ] : [];
 
-            <div className="p-6 sm:p-8">
-              {/* Header */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl sm:text-3xl">💡</span>
-                  <Heading level={2} size="xl">Luci</Heading>
-                </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-200 dark:bg-neutral-700 rounded-full">
-                  <span className="w-2 h-2 bg-neutral-500 dark:bg-neutral-400 rounded-full"></span>
-                  <span className="text-xs font-medium text-neutral-700 dark:text-neutral-300">Offline</span>
-                </div>
-              </div>
-
-              {/* Not connected message */}
-              <EmptyState
-                icon="🔌"
-                title="Luci Non Connesse"
-                description="Connetti il tuo account Philips Hue per controllare le luci"
-                action={
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <Button
-                      liquid
-                      variant="success"
-                      onClick={handleAuth}
-                      icon="🔗"
-                    >
-                      Connetti Philips Hue
-                    </Button>
-                    <Button
-                      liquid
-                      variant="outline"
-                      onClick={() => router.push('/lights')}
-                    >
-                      Maggiori Info
-                    </Button>
-                  </div>
-                }
-              />
-
-              {error && (
-                <div className="mt-4">
-                  <Banner
-                    liquid
-                    variant="error"
-                    icon="⚠️"
-                    description={error}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        </Card>
-      </div>
-    );
-  }
+  const footerActions = selectedRoom ? [{
+    label: 'Tutte le Stanze e Scene →',
+    variant: 'outline',
+    size: 'sm',
+    onClick: () => router.push('/lights')
+  }] : [];
 
   const isRoomOn = selectedRoom?.services?.some(s => {
     const light = lights.find(l => l.id === s.rid);
@@ -287,61 +240,35 @@ export default function LightsCard() {
   ) : 0;
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Loading Overlay - Full page blocking */}
-      <LoadingOverlay
-        show={refreshing}
-        message={loadingMessage}
-        icon="💡"
+    <DeviceCard
+      icon="💡"
+      title="Luci"
+      colorTheme="warning"
+      connected={connected}
+      onConnect={handleAuth}
+      connectButtonLabel="Connetti Philips Hue"
+      connectInfoRoute="/lights"
+      loading={loading || refreshing}
+      loadingMessage={loadingMessage}
+      skeletonComponent={loading ? <Skeleton.LightsCard /> : null}
+      banners={banners}
+      infoBoxes={infoBoxes}
+      infoBoxesTitle="Informazioni"
+      footerActions={footerActions}
+    >
+      {/* Room Selection */}
+      <RoomSelector
+        rooms={rooms.map(room => ({
+          id: room.id,
+          name: room.metadata?.name || 'Stanza'
+        }))}
+        selectedRoomId={selectedRoomId}
+        onChange={(e) => setSelectedRoomId(e.target.value)}
       />
 
-      {/* Main Status Card */}
-      <Card liquid className="overflow-visible transition-all duration-500">
-        <div className="relative">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-warning-500 via-accent-500 to-warning-500 opacity-80"></div>
-
-          <div className="p-6 sm:p-8">
-            {/* Error Banner - Inside card */}
-            {error && (
-              <div className="mb-4 sm:mb-6">
-                <Banner
-                  liquid
-                  variant="error"
-                  icon="⚠️"
-                  title="Errore Connessione"
-                  description={error}
-                  dismissible
-                  onDismiss={() => setError(null)}
-                />
-              </div>
-            )}
-
-            {/* Header - Simplified without refresh button */}
-            <div className="flex items-center gap-2 mb-6">
-              <span className="text-2xl sm:text-3xl">💡</span>
-              <Heading level={2} size="xl">Luci</Heading>
-            </div>
-
-            {/* Room Selection */}
-            {rooms.length > 1 && (
-              <div className="mb-4 sm:mb-6">
-                <Select
-                  liquid
-                  label="🚪 Seleziona Stanza"
-                  value={selectedRoomId || ''}
-                  onChange={(e) => setSelectedRoomId(e.target.value)}
-                  options={rooms.map(room => ({
-                    value: room.id,
-                    label: room.metadata?.name || 'Stanza'
-                  }))}
-                  className="text-base sm:text-lg"
-                />
-              </div>
-            )}
-
-            {/* Selected Room Controls */}
-            {selectedRoom ? (
-              <div className="space-y-4 sm:space-y-6">
+      {/* Selected Room Controls */}
+      {selectedRoom ? (
+        <div className="space-y-4 sm:space-y-6">
                 {/* Main Control Area - Enhanced */}
                 <div className={`relative rounded-2xl p-6 sm:p-8 shadow-liquid hover:shadow-liquid-lg transition-all duration-500 ${
                   isRoomOn
@@ -491,70 +418,13 @@ export default function LightsCard() {
                   </>
                 )}
 
-                {/* Separator */}
-                <Divider label="Informazioni" variant="gradient" spacing="large" />
-
-                {/* Summary Info - Enhanced */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-                  <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10">
-                    <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
-                      <span className="text-3xl sm:text-4xl mb-2">💡</span>
-                      <Text variant="tertiary" className="text-[10px] sm:text-xs uppercase tracking-wider font-bold mb-1">
-                        Luci Stanza
-                      </Text>
-                      <span className="text-2xl sm:text-3xl font-black text-neutral-800 dark:text-neutral-100">
-                        {roomLights.length}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10">
-                    <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
-                      <span className="text-3xl sm:text-4xl mb-2">🚪</span>
-                      <Text variant="tertiary" className="text-[10px] sm:text-xs uppercase tracking-wider font-bold mb-1">
-                        Stanze
-                      </Text>
-                      <span className="text-2xl sm:text-3xl font-black text-neutral-800 dark:text-neutral-100">
-                        {rooms.length}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10 col-span-2 sm:col-span-1">
-                    <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
-                      <span className="text-3xl sm:text-4xl mb-2">🎨</span>
-                      <Text variant="tertiary" className="text-[10px] sm:text-xs uppercase tracking-wider font-bold mb-1">
-                        Scene
-                      </Text>
-                      <span className="text-2xl sm:text-3xl font-black text-neutral-800 dark:text-neutral-100">
-                        {scenes.length}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Link to full page */}
-                <div>
-                  <Button
-                    liquid
-                    variant="outline"
-                    onClick={() => router.push('/lights')}
-                    className="w-full"
-                    size="sm"
-                  >
-                    Tutte le Stanze e Scene →
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <EmptyState
-                icon="💡"
-                title="Nessuna stanza disponibile"
-              />
-            )}
-          </div>
         </div>
-      </Card>
-    </div>
+      ) : (
+        <EmptyState
+          icon="💡"
+          title="Nessuna stanza disponibile"
+        />
+      )}
+    </DeviceCard>
   );
 }

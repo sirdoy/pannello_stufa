@@ -5,6 +5,41 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.37.1] - 2026-01-04
+
+### 🔧 Fixed - API Timeout & Retry Logic
+
+#### Modificato
+
+- **Stove API Timeout** - Aumentato timeout da 10s a 20s per gestire risposte lente del cloud Thermorossi
+  - `lib/stoveApi.js` - `DEFAULT_TIMEOUT` ora 20000ms (era 10000ms)
+  - Risolve errore 504 "Stufa non raggiungibile" causato da latenza cloud
+
+- **Retry Logic** - Implementato retry automatico per errori di timeout
+  - `lib/stoveApi.js` - Nuova funzione `fetchWithRetry()`
+  - 3 tentativi totali: 1 iniziale + 2 retry (configurabile via `MAX_RETRIES`)
+  - Retry solo per errori di timeout (`STOVE_TIMEOUT`), non per altri errori di rete
+  - Logging dettagliato: tentativi di retry e successo/fallimento finale
+
+- **API Calls** - Tutte le chiamate ora usano retry logic
+  - `getStoveStatus()`, `igniteStove()`, `shutdownStove()`
+  - `setPowerLevel()`, `setFanLevel()`, `getFanLevel()`, `getPowerLevel()`
+  - Migliorata robustezza per connessioni instabili
+
+#### Aggiunto
+
+- **Unit Tests** - Test completi per timeout e retry
+  - `lib/__tests__/stoveApi.test.js` - +4 test per `fetchWithTimeout` e `fetchWithRetry`
+  - Test coverage: successo primo tentativo, retry con successo, fallimento dopo tutti i retry, no retry per errori non-timeout
+
+### 📊 Impatto
+
+- **User Experience**: Riduzione errori 504 per connessioni lente
+- **Robustezza**: Sistema più resiliente a latenza temporanea del cloud
+- **Performance**: Massimo 60s di attesa (20s × 3 tentativi) vs 10s precedenti
+
+---
+
 ## [1.37.0] - 2026-01-04
 
 ### 🏠 Features - Device Card Abstraction & Refactoring

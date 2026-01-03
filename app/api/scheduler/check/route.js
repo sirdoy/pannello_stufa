@@ -180,7 +180,7 @@ export async function GET(req) {
     }
 
     // Check if scheduler mode is enabled
-    const modeData = (await adminDbGet('stoveScheduler/mode')) || { enabled: false, semiManual: false };
+    const modeData = (await adminDbGet('schedules-v2/mode')) || { enabled: false, semiManual: false };
     const schedulerEnabled = modeData.enabled;
 
     if (!schedulerEnabled) {
@@ -230,7 +230,9 @@ export async function GET(req) {
     const ora = `${timePart}:${formatter.formatToParts(now).find(p => p.type === 'minute').value}`;
     const currentMinutes = parseInt(timePart) * 60 + parseInt(formatter.formatToParts(now).find(p => p.type === 'minute').value);
 
-    const intervals = await adminDbGet(`stoveScheduler/${giorno}`);
+    // Get active schedule ID
+    const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId') || 'default';
+    const intervals = await adminDbGet(`schedules-v2/schedules/${activeScheduleId}/slots/${giorno}`);
     if (!intervals) {
       return Response.json({message: 'Nessuno scheduler', giorno, ora});
     }
@@ -501,7 +503,7 @@ export async function GET(req) {
     // Se è stato applicato un cambio e eravamo in semi-manuale, torniamo in automatico
     if (changeApplied && modeData.semiManual) {
       // Clear semi-manual mode usando Admin SDK
-      await adminDbSet('stoveScheduler/mode', {
+      await adminDbSet('schedules-v2/mode', {
         enabled: modeData.enabled || false,
         semiManual: false,
         lastUpdated: new Date().toISOString()

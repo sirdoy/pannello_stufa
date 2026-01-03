@@ -3,6 +3,13 @@
 import { useState, useEffect } from 'react';
 import { getWeeklySchedule, getFullSchedulerMode, getNextScheduledChange } from '@/lib/schedulerService';
 import { saveSchedule as apiSaveSchedule, setSchedulerMode, setSemiManualMode, clearSemiManualMode } from '@/lib/schedulerApiClient';
+import {
+  getAllSchedules,
+  createSchedule,
+  updateSchedule,
+  deleteSchedule,
+  setActiveSchedule,
+} from '@/lib/schedulesApiClient';
 import { logSchedulerAction } from '@/lib/logService';
 import { db } from '@/lib/firebase';
 import { ref, onValue } from 'firebase/database';
@@ -17,6 +24,9 @@ import DayEditPanel from '@/app/components/scheduler/DayEditPanel';
 import WeeklySummaryCard from '@/app/components/scheduler/WeeklySummaryCard';
 import DuplicateDayModal from '@/app/components/scheduler/DuplicateDayModal';
 import AddIntervalModal from '@/app/components/scheduler/AddIntervalModal';
+import ScheduleSelector from '@/app/components/scheduler/ScheduleSelector';
+import CreateScheduleModal from '@/app/components/scheduler/CreateScheduleModal';
+import ScheduleManagementModal from '@/app/components/scheduler/ScheduleManagementModal';
 
 const daysOfWeek = [
   'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'
@@ -58,6 +68,34 @@ export default function WeeklyScheduler() {
   });
   const [selectedDay, setSelectedDay] = useState('Lunedì'); // Selected day for edit panel
 
+  // Multi-schedule management states
+  const [schedules, setSchedules] = useState([]);
+  const [activeScheduleId, setActiveScheduleId] = useState('default');
+  const [loadingSchedules, setLoadingSchedules] = useState(true);
+  const [createScheduleModal, setCreateScheduleModal] = useState(false);
+  const [manageSchedulesModal, setManageSchedulesModal] = useState(false);
+
+  // Load all schedules on mount
+  useEffect(() => {
+    const loadSchedules = async () => {
+      try {
+        const allSchedules = await getAllSchedules();
+        setSchedules(allSchedules.schedules || []);
+        setActiveScheduleId(allSchedules.activeScheduleId || 'default');
+      } catch (error) {
+        console.error('Error loading schedules:', error);
+        setToast({
+          message: 'Errore caricamento pianificazioni',
+          icon: '❌',
+          variant: 'error',
+        });
+      } finally {
+        setLoadingSchedules(false);
+      }
+    };
+    loadSchedules();
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -88,37 +126,55 @@ export default function WeeklyScheduler() {
 
   // Feature 1: Real-Time Firebase Sync - Listen for remote changes
   useEffect(() => {
-    const schedulerRef = ref(db, 'stoveScheduler');
+    // Listen to active schedule ID changes first
+    let scheduleSlotsUnsubscribe;
 
-    const unsubscribe = onValue(schedulerRef, (snapshot) => {
-      const data = snapshot.val();
-      if (!data) return;
+    const activeIdRef = ref(db, 'schedules-v2/activeScheduleId');
+    const activeIdUnsubscribe = onValue(activeIdRef, async (idSnapshot) => {
+      const activeId = idSnapshot.val() || 'default';
 
-      // Check if update is from another device (within 2s window)
-      const now = Date.now();
-      const isLocalUpdate = lastLocalSave && (now - lastLocalSave < 2000);
-
-      if (!isLocalUpdate) {
-        console.log('[Scheduler] Aggiornamento remoto ricevuto');
-
-        // Update local state with remote data
-        const remoteSchedule = daysOfWeek.reduce((acc, day) => {
-          acc[day] = sortIntervals(data[day] || []);
-          return acc;
-        }, {});
-
-        setSchedule(remoteSchedule);
-
-        // Show toast notification
-        setToast({
-          message: 'Pianificazione aggiornata da altro dispositivo',
-          icon: '🔄',
-          variant: 'info',
-        });
+      // Unsubscribe from previous schedule if exists
+      if (scheduleSlotsUnsubscribe) {
+        scheduleSlotsUnsubscribe();
       }
+
+      // Subscribe to active schedule's slots
+      const scheduleSlotsRef = ref(db, `schedules-v2/schedules/${activeId}/slots`);
+      scheduleSlotsUnsubscribe = onValue(scheduleSlotsRef, (slotsSnapshot) => {
+        const data = slotsSnapshot.val();
+        if (!data) return;
+
+        // Check if update is from another device (within 2s window)
+        const now = Date.now();
+        const isLocalUpdate = lastLocalSave && (now - lastLocalSave < 2000);
+
+        if (!isLocalUpdate) {
+          console.log('[Scheduler] Aggiornamento remoto ricevuto');
+
+          // Update local state with remote data
+          const remoteSchedule = daysOfWeek.reduce((acc, day) => {
+            acc[day] = sortIntervals(data[day] || []);
+            return acc;
+          }, {});
+
+          setSchedule(remoteSchedule);
+
+          // Show toast notification
+          setToast({
+            message: 'Pianificazione aggiornata da altro dispositivo',
+            icon: '🔄',
+            variant: 'info',
+          });
+        }
+      });
     });
 
-    return () => unsubscribe();
+    return () => {
+      activeIdUnsubscribe();
+      if (scheduleSlotsUnsubscribe) {
+        scheduleSlotsUnsubscribe();
+      }
+    };
   }, [lastLocalSave]);
 
   // Wrapper for saveSchedule that tracks local saves
@@ -507,6 +563,105 @@ export default function WeeklyScheduler() {
     });
   };
 
+  // Multi-schedule handlers
+  const handleSelectSchedule = async (scheduleId) => {
+    try {
+      await setActiveSchedule(scheduleId);
+      setActiveScheduleId(scheduleId);
+
+      // Reload schedule data for new active schedule
+      const data = await getWeeklySchedule();
+      const filledData = daysOfWeek.reduce((acc, day) => {
+        acc[day] = sortIntervals(data[day] || []);
+        return acc;
+      }, {});
+      setSchedule(filledData);
+
+      setToast({
+        message: 'Pianificazione attiva cambiata',
+        icon: '✅',
+        variant: 'success',
+      });
+    } catch (error) {
+      console.error('Error setting active schedule:', error);
+      setToast({
+        message: 'Errore cambio pianificazione',
+        icon: '❌',
+        variant: 'error',
+      });
+    }
+  };
+
+  const handleCreateSchedule = async ({ name, copyFromId }) => {
+    try {
+      const newSchedule = await createSchedule(name, copyFromId);
+
+      // Reload schedules list
+      const allSchedules = await getAllSchedules();
+      setSchedules(allSchedules.schedules || []);
+
+      setCreateScheduleModal(false);
+      setToast({
+        message: `Pianificazione "${name}" creata`,
+        icon: '✨',
+        variant: 'success',
+      });
+    } catch (error) {
+      console.error('Error creating schedule:', error);
+      setToast({
+        message: error.message || 'Errore creazione pianificazione',
+        icon: '❌',
+        variant: 'error',
+      });
+    }
+  };
+
+  const handleRenameSchedule = async (scheduleId, newName) => {
+    try {
+      await updateSchedule(scheduleId, { name: newName });
+
+      // Reload schedules list
+      const allSchedules = await getAllSchedules();
+      setSchedules(allSchedules.schedules || []);
+
+      setToast({
+        message: 'Nome aggiornato',
+        icon: '✅',
+        variant: 'success',
+      });
+    } catch (error) {
+      console.error('Error renaming schedule:', error);
+      setToast({
+        message: error.message || 'Errore rinomina pianificazione',
+        icon: '❌',
+        variant: 'error',
+      });
+    }
+  };
+
+  const handleDeleteSchedule = async (scheduleId) => {
+    try {
+      await deleteSchedule(scheduleId);
+
+      // Reload schedules list
+      const allSchedules = await getAllSchedules();
+      setSchedules(allSchedules.schedules || []);
+
+      setToast({
+        message: 'Pianificazione eliminata',
+        icon: '🗑️',
+        variant: 'success',
+      });
+    } catch (error) {
+      console.error('Error deleting schedule:', error);
+      setToast({
+        message: error.message || 'Errore eliminazione pianificazione',
+        icon: '❌',
+        variant: 'error',
+      });
+    }
+  };
+
   if (loading) {
     return <Skeleton.Scheduler />;
   }
@@ -520,6 +675,28 @@ export default function WeeklyScheduler() {
           <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white mb-6">
             Pianificazione Settimanale
           </h1>
+
+          {/* Schedule Selector */}
+          <div className="mb-6">
+            <ScheduleSelector
+              schedules={schedules}
+              activeScheduleId={activeScheduleId}
+              onSelectSchedule={handleSelectSchedule}
+              onCreateNew={() => setCreateScheduleModal(true)}
+              loading={loadingSchedules}
+            />
+            {/* Manage Schedules Button */}
+            <Button
+              liquid
+              variant="secondary"
+              onClick={() => setManageSchedulesModal(true)}
+              className="w-full mt-3"
+              size="sm"
+              icon="⚙️"
+            >
+              Gestisci Pianificazioni
+            </Button>
+          </div>
 
           {/* Mode indicator and controls */}
           <div className="flex flex-col gap-4">
@@ -614,6 +791,25 @@ export default function WeeklyScheduler() {
         suggestedStart={addIntervalModal.suggestedStart}
         onConfirm={handleConfirmAddInterval}
         onCancel={handleCancelAddInterval}
+      />
+
+      {/* Create Schedule Modal */}
+      <CreateScheduleModal
+        isOpen={createScheduleModal}
+        existingSchedules={schedules}
+        onConfirm={handleCreateSchedule}
+        onCancel={() => setCreateScheduleModal(false)}
+      />
+
+      {/* Manage Schedules Modal */}
+      <ScheduleManagementModal
+        isOpen={manageSchedulesModal}
+        schedules={schedules}
+        activeScheduleId={activeScheduleId}
+        onSetActive={handleSelectSchedule}
+        onRename={handleRenameSchedule}
+        onDelete={handleDeleteSchedule}
+        onClose={() => setManageSchedulesModal(false)}
       />
 
       {/* Toast Notifications */}

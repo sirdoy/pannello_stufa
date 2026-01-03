@@ -93,9 +93,105 @@ export async function POST(request) {
 
 **Implementazione**: `app/api/stove/setFan/route.js`, `app/api/stove/setPower/route.js`
 
+## Schedule Management API (`/api/schedules/*`) **NEW in v1.34.0**
+
+Multi-schedule CRUD operations. Sistema multi-configurazione con selezione attiva singola.
+
+### Firebase Structure (v2)
+
+```
+/schedules-v2
+  /schedules
+    /{scheduleId}
+      name: string
+      enabled: boolean
+      slots: { Lunedì: [...], Martedì: [...], ... }
+      createdAt: ISO timestamp
+      updatedAt: ISO timestamp
+  /activeScheduleId: string
+  /mode: { enabled, semiManual, ... }
+```
+
+### Endpoints
+
+| Endpoint | Method | Body | Returns | Note |
+|----------|--------|------|---------|------|
+| `/api/schedules` | GET | - | `[{id, name, enabled, createdAt, updatedAt, intervalCount}]` | List all (metadata) |
+| `/api/schedules` | POST | `{name, copyFromId?}` | `{success, schedule}` | Create schedule |
+| `/api/schedules/[id]` | GET | - | `{id, name, enabled, slots, ...}` | Get specific |
+| `/api/schedules/[id]` | PUT | `{name?, slots?, enabled?}` | `{success, schedule}` | Update schedule |
+| `/api/schedules/[id]` | DELETE | - | `{success, message}` | Delete schedule |
+| `/api/schedules/active` | GET | - | `{activeScheduleId}` | Get active ID |
+| `/api/schedules/active` | POST | `{scheduleId}` | `{success, activeScheduleId, scheduleName}` | Set active |
+
+### Create Schedule
+
+**From scratch**:
+```javascript
+POST /api/schedules
+Body: { name: "Weekend Mode" }
+// Creates empty schedule
+```
+
+**Copy from existing**:
+```javascript
+POST /api/schedules
+Body: {
+  name: "Vacation Mode",
+  copyFromId: "default"
+}
+// Deep clones slots from default schedule
+```
+
+### Safety Validations
+
+**Cannot delete active schedule**:
+```javascript
+DELETE /api/schedules/default
+// → 400 error if default is active
+// Must activate another schedule first
+```
+
+**Cannot delete last schedule**:
+```javascript
+DELETE /api/schedules/only-one
+// → 400 error
+// System requires at least 1 schedule
+```
+
+**Name must be unique**:
+```javascript
+POST /api/schedules
+Body: { name: "Default" }  // Already exists
+// → 400 error
+```
+
+### Switch Active Schedule
+
+Atomic operation with Firebase transaction:
+
+```javascript
+POST /api/schedules/active
+Body: { scheduleId: "weekend-mode-abc123" }
+
+// Updates /schedules-v2/activeScheduleId
+// Cron job immediately starts using new schedule
+// All clients sync within 2s (real-time listener)
+```
+
+### Migration from v1
+
+System auto-migrates `/stoveScheduler` → `/schedules-v2/schedules/default` on first API call.
+
+See [docs/multi-schedule-migration.md](./multi-schedule-migration.md) for details.
+
+---
+
 ## Scheduler API (`/api/scheduler/check`)
 
 Endpoint chiamato da cronjob ogni minuto per gestione scheduler automatico.
+
+**Updated in v1.34.0**: Now reads from active schedule path.
 
 ### Request
 

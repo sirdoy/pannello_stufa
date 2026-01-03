@@ -16,9 +16,12 @@ export const POST = auth0.withApiAuthRequired(async function updateSchedulerHand
 
     switch (operation) {
       case 'saveSchedule': {
-        // Save schedule for a specific day
+        // Save schedule for a specific day (active schedule)
         const { day, schedule } = data;
-        await adminDbSet(`stoveScheduler/${day}`, schedule);
+        const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId') || 'default';
+        await adminDbSet(`schedules-v2/schedules/${activeScheduleId}/slots/${day}`, schedule);
+        // Update schedule's updatedAt timestamp
+        await adminDbSet(`schedules-v2/schedules/${activeScheduleId}/updatedAt`, new Date().toISOString());
         return NextResponse.json({
           success: true,
           message: `Scheduler salvato per ${day}`
@@ -28,8 +31,8 @@ export const POST = auth0.withApiAuthRequired(async function updateSchedulerHand
       case 'setSchedulerMode': {
         // Enable/disable scheduler
         const { enabled } = data;
-        const currentMode = await adminDbGet('stoveScheduler/mode') || {};
-        await adminDbSet('stoveScheduler/mode', {
+        const currentMode = await adminDbGet('schedules-v2/mode') || {};
+        await adminDbSet('schedules-v2/mode', {
           ...currentMode,
           enabled,
           lastUpdated: new Date().toISOString()
@@ -43,8 +46,8 @@ export const POST = auth0.withApiAuthRequired(async function updateSchedulerHand
       case 'setSemiManualMode': {
         // Activate semi-manual mode
         const { returnToAutoAt } = data;
-        const currentMode = await adminDbGet('stoveScheduler/mode') || {};
-        await adminDbSet('stoveScheduler/mode', {
+        const currentMode = await adminDbGet('schedules-v2/mode') || {};
+        await adminDbSet('schedules-v2/mode', {
           enabled: currentMode.enabled || false,
           semiManual: true,
           semiManualActivatedAt: new Date().toISOString(),
@@ -59,8 +62,8 @@ export const POST = auth0.withApiAuthRequired(async function updateSchedulerHand
 
       case 'clearSemiManualMode': {
         // Clear semi-manual mode
-        const currentMode = await adminDbGet('stoveScheduler/mode') || {};
-        await adminDbSet('stoveScheduler/mode', {
+        const currentMode = await adminDbGet('schedules-v2/mode') || {};
+        await adminDbSet('schedules-v2/mode', {
           enabled: currentMode.enabled || false,
           semiManual: false,
           lastUpdated: new Date().toISOString()

@@ -1,6 +1,6 @@
 {
   "name": "pannello-stufa",
-  "version": "1.33.0",
+  "version": "1.35.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -17,7 +17,9 @@
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report",
     "test:e2e:clean": "rm -rf playwright-report test-results playwright/.cache",
-    "test:playwright": "node test-playwright.mjs"
+    "test:playwright": "node test-playwright.mjs",
+    "migrate:schedules": "node scripts/migrate-schedules.mjs",
+    "migrate:schedules:dry-run": "node scripts/migrate-schedules.mjs --dry-run"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^4.13.1",

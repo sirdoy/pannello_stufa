@@ -16,7 +16,7 @@ export default function Footer({ className = '' }) {
     <>
       <footer
         className={`
-          w-full py-4 sm:py-6 mt-auto
+          w-full pt-4 sm:pt-6 pb-32 lg:pb-6 mt-auto
           bg-white/90 dark:bg-neutral-900/90 backdrop-blur-xl shadow-glass-lg
           border-t border-neutral-200/50 dark:border-neutral-700/50
           relative z-10

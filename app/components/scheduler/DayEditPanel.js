@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
+import ActionButton from '../ui/ActionButton';
 import TimeBar from './TimeBar';
 import ScheduleInterval from './ScheduleInterval';
 import IntervalBottomSheet from './IntervalBottomSheet';
 import { getDayTotalHours } from '@/lib/schedulerStats';
-import { Copy } from 'lucide-react';
+import { Copy, Plus } from 'lucide-react';
 
 export default function DayEditPanel({
   day,
@@ -81,32 +82,57 @@ export default function DayEditPanel({
           )}
         </div>
 
-        {/* Right: Action Buttons - sempre orizzontale, icona + testo affiancati */}
-        <div className="flex gap-2 md:gap-3">
+        {/* Right: Action Buttons - icon-only su mobile, con testo su desktop */}
+        <div className="flex gap-2 md:gap-3 self-end md:self-auto">
           {/* Duplicate button - only if intervals exist */}
           {intervals.length > 0 && onDuplicate && (
-            <Button
-              liquid
-              variant="secondary"
-              onClick={() => onDuplicate(day)}
-              icon={<Copy className="w-4 h-4" />}
-              title="Duplica su altri giorni"
-              aria-label="Duplica su altri giorni"
-            >
-              <span className="hidden sm:inline">Duplica</span>
-            </Button>
+            <>
+              {/* Mobile: icon-only ActionButton */}
+              <ActionButton
+                icon={<Copy />}
+                variant="primary"
+                size="md"
+                onClick={() => onDuplicate(day)}
+                title="Duplica su altri giorni"
+                ariaLabel="Duplica su altri giorni"
+                className="sm:hidden"
+              />
+              {/* Desktop: Button with text */}
+              <Button
+                liquid
+                variant="secondary"
+                onClick={() => onDuplicate(day)}
+                icon={<Copy className="w-4 h-4" />}
+                className="hidden sm:flex"
+              >
+                Duplica
+              </Button>
+            </>
           )}
 
-          <Button
-            liquid
-            variant="success"
-            onClick={() => onAddInterval(day)}
-            icon="+"
-            title="Aggiungi intervallo"
-            aria-label="Aggiungi intervallo"
-          >
-            <span className="hidden sm:inline">Aggiungi</span>
-          </Button>
+          {/* Add button */}
+          <>
+            {/* Mobile: icon-only ActionButton */}
+            <ActionButton
+              icon={<Plus />}
+              variant="success"
+              size="md"
+              onClick={() => onAddInterval(day)}
+              title="Aggiungi intervallo"
+              ariaLabel="Aggiungi intervallo"
+              className="sm:hidden"
+            />
+            {/* Desktop: Button with text */}
+            <Button
+              liquid
+              variant="success"
+              onClick={() => onAddInterval(day)}
+              icon={<Plus className="w-4 h-4" />}
+              className="hidden sm:flex"
+            >
+              Aggiungi
+            </Button>
+          </>
         </div>
       </div>
 

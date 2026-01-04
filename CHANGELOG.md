@@ -5,6 +5,46 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.37.2] - 2026-01-04
+
+### 🎨 Fixed - UI Polish & Responsive Button Optimization
+
+#### Modificato
+
+- **ScheduleInterval Cards** - Ottimizzato padding e spacing per migliore leggibilità
+  - `app/components/scheduler/ScheduleInterval.js` - Aggiunto `p-4` padding interno alle card
+  - Gap verticale aumentato da `gap-4` a `gap-5` tra elementi (orario, potenza, ventola)
+  - Migliore respiro visivo nei dettagli intervalli
+
+- **Button Component** - Icon sizing proporzionale alla size del bottone
+  - `app/components/ui/Button.js` - Implementato `iconSizeClasses` responsive
+  - `sm`: 18px (era 24px), `md`: 20px (era 24px), `lg`: 24px (invariato)
+  - Migliore proporzione tra icona e testo in tutte le varianti
+
+- **Button Component** - Spacing tra icona e testo
+  - Aggiunto `flex items-center justify-center gap-2.5` (10px) allo span interno
+  - Risolto problema icone "attaccate" al testo
+  - Centratura perfetta di icona e testo
+
+- **ProgressBar Component** - Enhanced label spacing
+  - `app/components/ui/ProgressBar.js` - Gap `rightContent` aumentato a `gap-2.5`
+  - Migliore leggibilità valori "P2 Bassa", "V3 Media"
+
+- **DayEditPanel** - Mobile-optimized action buttons
+  - `app/components/scheduler/DayEditPanel.js` - Dual button layout (mobile/desktop)
+  - **Mobile** (< sm): `ActionButton` circolari compatti con solo icona (come modifica/elimina)
+  - **Desktop** (≥ sm): `Button` normale con icona + testo
+  - Consistenza visiva con altri action buttons dello scheduler
+
+### 📊 Impatto
+
+- **User Experience**: Layout più pulito e professionale nello scheduler
+- **Mobile UX**: Bottoni circolari compatti (40x40px) invece di rettangolari gonfi
+- **Consistency**: Stile uniforme tra tutti gli action buttons dell'app
+- **Readability**: Spacing ottimizzato per migliore leggibilità dei valori
+
+---
+
 ## [1.37.1] - 2026-01-04
 
 ### 🔧 Fixed - API Timeout & Retry Logic

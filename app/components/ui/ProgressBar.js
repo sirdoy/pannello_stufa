@@ -59,7 +59,7 @@ export default function ProgressBar({
           )}
 
           {/* Right side */}
-          {rightContent && <div className="flex items-center gap-2">{rightContent}</div>}
+          {rightContent && <div className="flex items-center gap-2.5">{rightContent}</div>}
         </div>
       )}
 

@@ -14,6 +14,7 @@
  * @param {'left'|'right'} props.iconPosition - Icon position relative to text
  * @param {boolean} props.fullWidth - Expand to full width
  * @param {boolean} props.liquid - Apply liquid glass style
+ * @param {boolean} props.iconOnly - Circular icon-only button (reduced padding)
  * @param {string} props.className - Additional Tailwind classes
  */
 export default function Button({
@@ -26,6 +27,7 @@ export default function Button({
   iconPosition = 'left',
   fullWidth = false,
   liquid = false,
+  iconOnly = false,
   className = '',
   ...props
 }) {
@@ -52,13 +54,31 @@ export default function Button({
   const variantClasses = liquid ? liquidVariants : solidVariants;
 
   // iOS minimum touch target: 44px
+  // Normal buttons (with text)
   const sizeClasses = {
     sm: 'px-4 py-2 text-sm min-h-[44px]',
     md: 'px-6 py-3 text-base min-h-[44px]',
     lg: 'px-8 py-4 text-lg min-h-[52px]',
   };
 
+  // Icon-only buttons (circular, reduced padding)
+  const iconOnlySizeClasses = {
+    sm: 'p-2.5 text-sm min-h-[44px] min-w-[44px]',
+    md: 'p-3 text-base min-h-[44px] min-w-[44px]',
+    lg: 'p-4 text-lg min-h-[52px] min-w-[52px]',
+  };
+
+  // Icon sizes relative to button size
+  const iconSizeClasses = {
+    sm: 'text-lg', // 18px
+    md: 'text-xl', // 20px
+    lg: 'text-2xl', // 24px
+  };
+
   const disabledClasses = 'bg-neutral-300/50 dark:bg-neutral-700/50 cursor-not-allowed hover:bg-neutral-300/50 dark:hover:bg-neutral-700/50 active:scale-100 opacity-50';
+
+  // Select appropriate size classes
+  const appliedSizeClasses = iconOnly ? iconOnlySizeClasses[size] : sizeClasses[size];
 
   return (
     <button
@@ -66,7 +86,7 @@ export default function Button({
       className={`
         ${baseClasses}
         ${disabled || loading ? disabledClasses : variantClasses[variant]}
-        ${sizeClasses[size]}
+        ${appliedSizeClasses}
         ${fullWidth ? 'w-full' : ''}
         ${className}
       `}
@@ -92,13 +112,13 @@ export default function Button({
           </svg>
         </span>
       )}
-      <span className={loading ? 'invisible' : ''}>
+      <span className={`flex items-center justify-center gap-2.5 ${loading ? 'invisible' : ''}`}>
         {icon && iconPosition === 'left' && (
-          <span className="text-2xl relative z-10">{icon}</span>
+          <span className={`${iconSizeClasses[size]} relative z-10`}>{icon}</span>
         )}
-        <span className="relative z-10">{children}</span>
+        {children && <span className="relative z-10">{children}</span>}
         {icon && iconPosition === 'right' && (
-          <span className="text-2xl relative z-10">{icon}</span>
+          <span className={`${iconSizeClasses[size]} relative z-10`}>{icon}</span>
         )}
       </span>
     </button>

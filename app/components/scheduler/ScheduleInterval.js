@@ -19,7 +19,7 @@ export default function ScheduleInterval({
   return (
     <Card
       liquid
-      className={`cursor-pointer transition-all duration-300 ${
+      className={`cursor-pointer transition-all duration-300 p-4 ${
         isHighlighted
           ? 'bg-primary-50/80 dark:bg-primary-900/30 ring-2 ring-primary-400 dark:ring-primary-600 shadow-liquid-lg scale-[1.01]'
           : ''
@@ -28,7 +28,7 @@ export default function ScheduleInterval({
       onMouseLeave={onMouseLeave}
       onClick={onClick}
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-5">
         {/* Time Range */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">

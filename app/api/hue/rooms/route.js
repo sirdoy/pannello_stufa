@@ -6,26 +6,26 @@
 
 import { NextResponse } from 'next/server';
 import HueApi from '@/lib/hue/hueApi';
-import { getValidAccessToken } from '@/lib/hue/hueTokenHelper';
+import { getHueConnection } from '@/lib/hue/hueLocalHelper';
 import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';
 
 export const GET = auth0.withApiAuthRequired(async function handler(request) {
   try {
-    // Get valid access token
-    const tokenResult = await getValidAccessToken();
+    // Get Hue connection from Firebase
+    const connection = await getHueConnection();
 
-    if (tokenResult.error) {
+    if (!connection) {
       return NextResponse.json({
-        error: tokenResult.error,
-        message: tokenResult.message,
-        reconnect: tokenResult.reconnect || false,
-      }, { status: tokenResult.reconnect ? 401 : 500 });
+        error: 'NOT_CONNECTED',
+        message: 'Hue bridge not connected. Please pair first.',
+        reconnect: true,
+      }, { status: 401 });
     }
 
     // Fetch rooms from Hue API
-    const hueApi = new HueApi(tokenResult.accessToken);
+    const hueApi = new HueApi(connection.bridgeIp, connection.username);
     const roomsResponse = await hueApi.getRooms();
     const zonesResponse = await hueApi.getZones();
 

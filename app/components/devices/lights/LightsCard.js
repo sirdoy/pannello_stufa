@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
 import RoomSelector from '../../ui/RoomSelector';
-import { Divider, Heading, Button, EmptyState } from '../../ui';
+import { Divider, Heading, Button, EmptyState, Text } from '../../ui';
+import { supportsColor } from '@/lib/hue/colorUtils';
 
 /**
  * LightsCard - Complete Philips Hue lights control for homepage
@@ -25,8 +26,17 @@ export default function LightsCard() {
   // Loading overlay message
   const [loadingMessage, setLoadingMessage] = useState('Caricamento...');
 
+  // Pairing state
+  const [pairing, setPairing] = useState(false);
+  const [pairingStep, setPairingStep] = useState(null); // 'discovering' | 'pairing' | 'success'
+  const [discoveredBridges, setDiscoveredBridges] = useState([]);
+  const [selectedBridge, setSelectedBridge] = useState(null);
+  const [pairingCountdown, setPairingCountdown] = useState(30);
+  const [pairingError, setPairingError] = useState(null);
+
   const connectionCheckedRef = useRef(false);
   const pollingStartedRef = useRef(false);
+  const pairingTimerRef = useRef(null);
 
   // Check connection on mount
   useEffect(() => {
@@ -58,12 +68,27 @@ export default function LightsCard() {
   }, [rooms, selectedRoomId]);
 
   const selectedRoom = rooms.find(r => r.id === selectedRoomId) || rooms[0];
+
+  // Extract grouped_light ID from room services
+  const getGroupedLightId = (room) => {
+    if (!room?.services) return null;
+    const groupedLight = room.services.find(s => s.rtype === 'grouped_light');
+    return groupedLight?.rid || null;
+  };
+
+  const selectedRoomGroupedLightId = getGroupedLightId(selectedRoom);
+
+  // Use 'children' instead of 'services' to get individual lights
+  // In Hue API v2: services = grouped_light/scenes, children = individual lights
   const roomLights = lights.filter(light =>
-    selectedRoom?.services?.some(s => s.rid === light.id)
+    selectedRoom?.children?.some(c => c.rid === light.id && c.rtype === 'light')
   );
   const roomScenes = scenes.filter(scene =>
     scene.group?.rid === selectedRoom?.id
   );
+
+  // Check if room has any color-capable lights
+  const hasColorLights = roomLights.some(light => supportsColor(light));
 
   async function checkConnection() {
     try {
@@ -198,24 +223,211 @@ export default function LightsCard() {
     }
   }
 
-  const handleAuth = () => {
-    const clientId = process.env.NEXT_PUBLIC_HUE_CLIENT_ID;
-    const redirectUri = process.env.NEXT_PUBLIC_HUE_REDIRECT_URI;
-    const state = Math.random().toString(36).substring(7);
-    // Scope completo: tutti i permessi disponibili
-    const scope = 'lights scenes groups devices bridge';
-    window.location.href = `https://api.meethue.com/v2/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&state=${state}&scope=${encodeURIComponent(scope)}`;
-  };
+  // FUTURE: Remote API support (OAuth flow)
+  // const handleAuth = () => {
+  //   const clientId = process.env.NEXT_PUBLIC_HUE_CLIENT_ID;
+  //   const redirectUri = process.env.NEXT_PUBLIC_HUE_REDIRECT_URI;
+  //   const state = Math.random().toString(36).substring(7);
+  //   const scope = 'lights scenes groups devices bridge';
+  //   window.location.href = `https://api.meethue.com/v2/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&state=${state}&scope=${encodeURIComponent(scope)}`;
+  // };
+
+  /**
+   * Local API Pairing Flow
+   * Step 1: Discover bridges
+   */
+  async function handleStartPairing() {
+    try {
+      setPairing(true);
+      setPairingStep('discovering');
+      setPairingError(null);
+      setError(null);
+
+      const response = await fetch('/api/hue/discover');
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      if (!data.bridges || data.bridges.length === 0) {
+        throw new Error('Nessun bridge Hue trovato sulla rete. Assicurati che il bridge sia acceso e collegato alla stessa rete Wi-Fi.');
+      }
+
+      setDiscoveredBridges(data.bridges);
+
+      // Auto-select if only one bridge
+      if (data.bridges.length === 1) {
+        setSelectedBridge(data.bridges[0]);
+        await handlePairWithBridge(data.bridges[0]);
+      } else {
+        setPairingStep('selectBridge');
+      }
+    } catch (err) {
+      console.error('Discovery error:', err);
+      setPairingError(err.message);
+      setPairing(false);
+    }
+  }
+
+  /**
+   * Step 2: Pair with selected bridge (requires button press)
+   */
+  async function handlePairWithBridge(bridge) {
+    try {
+      setPairingStep('pairing');
+      setPairingError(null);
+      setPairingCountdown(30);
+
+      // Start countdown timer
+      pairingTimerRef.current = setInterval(() => {
+        setPairingCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(pairingTimerRef.current);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      // Attempt pairing
+      const response = await fetch('/api/hue/pair', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bridgeIp: bridge.internalipaddress,
+          bridgeId: bridge.id,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (pairingTimerRef.current) {
+        clearInterval(pairingTimerRef.current);
+      }
+
+      if (data.error === 'LINK_BUTTON_NOT_PRESSED') {
+        throw new Error('Pulsante bridge non premuto. Premi il pulsante sul bridge e riprova.');
+      }
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      if (data.success) {
+        setPairingStep('success');
+        setTimeout(() => {
+          setPairing(false);
+          setPairingStep(null);
+          checkConnection();
+        }, 2000);
+      }
+    } catch (err) {
+      console.error('Pairing error:', err);
+      setPairingError(err.message);
+      if (pairingTimerRef.current) {
+        clearInterval(pairingTimerRef.current);
+      }
+    }
+  }
+
+  /**
+   * Retry pairing
+   */
+  function handleRetryPairing() {
+    if (selectedBridge) {
+      handlePairWithBridge(selectedBridge);
+    } else {
+      handleStartPairing();
+    }
+  }
+
+  /**
+   * Cancel pairing
+   */
+  function handleCancelPairing() {
+    if (pairingTimerRef.current) {
+      clearInterval(pairingTimerRef.current);
+    }
+    setPairing(false);
+    setPairingStep(null);
+    setPairingError(null);
+    setSelectedBridge(null);
+    setDiscoveredBridges([]);
+  }
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (pairingTimerRef.current) {
+        clearInterval(pairingTimerRef.current);
+      }
+    };
+  }, []);
 
   // Build props for DeviceCard
-  const banners = error ? [{
-    variant: 'error',
-    icon: '⚠️',
-    title: 'Errore Connessione',
-    description: error,
-    dismissible: true,
-    onDismiss: () => setError(null)
-  }] : [];
+  const banners = [];
+
+  // Connection error
+  if (error) {
+    banners.push({
+      variant: 'error',
+      icon: '⚠️',
+      title: 'Errore Connessione',
+      description: error,
+      dismissible: true,
+      onDismiss: () => setError(null)
+    });
+  }
+
+  // Pairing in progress
+  if (pairing && pairingStep === 'pairing') {
+    banners.push({
+      variant: 'info',
+      icon: '🔗',
+      title: `Pairing in corso... (${pairingCountdown}s)`,
+      description: 'Premi il pulsante sul bridge Hue entro 30 secondi per completare la connessione.',
+      actions: [
+        { label: 'Annulla', onClick: handleCancelPairing }
+      ]
+    });
+  }
+
+  // Pairing success
+  if (pairing && pairingStep === 'success') {
+    banners.push({
+      variant: 'success',
+      icon: '✅',
+      title: 'Pairing completato!',
+      description: 'Bridge Hue connesso con successo.'
+    });
+  }
+
+  // Pairing error
+  if (pairingError) {
+    banners.push({
+      variant: 'error',
+      icon: '⚠️',
+      title: 'Errore Pairing',
+      description: pairingError,
+      dismissible: true,
+      onDismiss: () => setPairingError(null),
+      actions: [
+        { label: 'Riprova', onClick: handleRetryPairing },
+        { label: 'Annulla', onClick: handleCancelPairing }
+      ]
+    });
+  }
+
+  // Discovering bridges
+  if (pairing && pairingStep === 'discovering') {
+    banners.push({
+      variant: 'info',
+      icon: '🔍',
+      title: 'Ricerca bridge...',
+      description: 'Ricerca bridge Hue sulla rete locale in corso...'
+    });
+  }
 
   const infoBoxes = selectedRoom ? [
     { icon: '💡', label: 'Luci Stanza', value: roomLights.length },
@@ -245,11 +457,11 @@ export default function LightsCard() {
       title="Luci"
       colorTheme="warning"
       connected={connected}
-      onConnect={handleAuth}
-      connectButtonLabel="Connetti Philips Hue"
+      onConnect={handleStartPairing}
+      connectButtonLabel="Connetti Bridge Hue"
       connectInfoRoute="/lights"
-      loading={loading || refreshing}
-      loadingMessage={loadingMessage}
+      loading={loading || refreshing || pairing}
+      loadingMessage={pairingStep === 'discovering' ? 'Ricerca bridge...' : pairingStep === 'pairing' ? `Pairing in corso... ${pairingCountdown}s` : loadingMessage}
       skeletonComponent={loading ? <Skeleton.LightsCard /> : null}
       banners={banners}
       infoBoxes={infoBoxes}
@@ -301,8 +513,8 @@ export default function LightsCard() {
                     <Button
                       liquid
                       variant={isRoomOn ? "success" : "outline"}
-                      onClick={() => handleRoomToggle(selectedRoom.id, true)}
-                      disabled={refreshing}
+                      onClick={() => handleRoomToggle(selectedRoomGroupedLightId, true)}
+                      disabled={refreshing || !selectedRoomGroupedLightId}
                       icon="💡"
                       size="lg"
                       className="h-16 sm:h-20"
@@ -312,8 +524,8 @@ export default function LightsCard() {
                     <Button
                       liquid
                       variant={!isRoomOn ? "danger" : "outline"}
-                      onClick={() => handleRoomToggle(selectedRoom.id, false)}
-                      disabled={refreshing}
+                      onClick={() => handleRoomToggle(selectedRoomGroupedLightId, false)}
+                      disabled={refreshing || !selectedRoomGroupedLightId}
                       icon="🌙"
                       size="lg"
                       className="h-16 sm:h-20"
@@ -342,8 +554,8 @@ export default function LightsCard() {
                           min="1"
                           max="100"
                           value={avgBrightness}
-                          onChange={(e) => handleBrightnessChange(selectedRoom.id, e.target.value)}
-                          disabled={refreshing}
+                          onChange={(e) => handleBrightnessChange(selectedRoomGroupedLightId, e.target.value)}
+                          disabled={refreshing || !selectedRoomGroupedLightId}
                           className="w-full h-3 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-warning-500 disabled:opacity-50 disabled:cursor-not-allowed"
                         />
 
@@ -356,9 +568,9 @@ export default function LightsCard() {
                             icon="➖"
                             onClick={() => {
                               const newValue = Math.max(1, avgBrightness - 5);
-                              handleBrightnessChange(selectedRoom.id, newValue.toString());
+                              handleBrightnessChange(selectedRoomGroupedLightId, newValue.toString());
                             }}
-                            disabled={refreshing || avgBrightness <= 1}
+                            disabled={refreshing || avgBrightness <= 1 || !selectedRoomGroupedLightId}
                             className="flex-1"
                           >
                             -5%
@@ -370,15 +582,31 @@ export default function LightsCard() {
                             icon="➕"
                             onClick={() => {
                               const newValue = Math.min(100, avgBrightness + 5);
-                              handleBrightnessChange(selectedRoom.id, newValue.toString());
+                              handleBrightnessChange(selectedRoomGroupedLightId, newValue.toString());
                             }}
-                            disabled={refreshing || avgBrightness >= 100}
+                            disabled={refreshing || avgBrightness >= 100 || !selectedRoomGroupedLightId}
                             className="flex-1"
                           >
                             +5%
                           </Button>
                         </div>
                       </div>
+                    </div>
+                  )}
+
+                  {/* Color Control Link (if available) */}
+                  {isRoomOn && hasColorLights && (
+                    <div className="mt-4">
+                      <Button
+                        liquid
+                        variant="outline"
+                        size="sm"
+                        icon="🎨"
+                        onClick={() => router.push('/lights')}
+                        className="w-full"
+                      >
+                        Controllo Colore
+                      </Button>
                     </div>
                   )}
                 </div>

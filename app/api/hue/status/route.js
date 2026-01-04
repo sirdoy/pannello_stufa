@@ -5,7 +5,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { getHueStatus } from '@/lib/hue/hueTokenHelper';
+import { getHueStatus } from '@/lib/hue/hueLocalHelper';
 import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';

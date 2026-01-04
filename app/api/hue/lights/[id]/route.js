@@ -7,28 +7,28 @@
 
 import { NextResponse } from 'next/server';
 import HueApi from '@/lib/hue/hueApi';
-import { getValidAccessToken } from '@/lib/hue/hueTokenHelper';
+import { getHueConnection } from '@/lib/hue/hueLocalHelper';
 import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';
 
 export const GET = auth0.withApiAuthRequired(async function handler(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
-    // Get valid access token
-    const tokenResult = await getValidAccessToken();
+    // Get Hue connection from Firebase
+    const connection = await getHueConnection();
 
-    if (tokenResult.error) {
+    if (!connection) {
       return NextResponse.json({
-        error: tokenResult.error,
-        message: tokenResult.message,
-        reconnect: tokenResult.reconnect || false,
-      }, { status: tokenResult.reconnect ? 401 : 500 });
+        error: 'NOT_CONNECTED',
+        message: 'Hue bridge not connected. Please pair first.',
+        reconnect: true,
+      }, { status: 401 });
     }
 
     // Fetch light from Hue API
-    const hueApi = new HueApi(tokenResult.accessToken);
+    const hueApi = new HueApi(connection.bridgeIp, connection.username);
     const response = await hueApi.getLight(id);
 
     return NextResponse.json({
@@ -47,22 +47,22 @@ export const GET = auth0.withApiAuthRequired(async function handler(request, { p
 
 export const PUT = auth0.withApiAuthRequired(async function handler(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
 
-    // Get valid access token
-    const tokenResult = await getValidAccessToken();
+    // Get Hue connection from Firebase
+    const connection = await getHueConnection();
 
-    if (tokenResult.error) {
+    if (!connection) {
       return NextResponse.json({
-        error: tokenResult.error,
-        message: tokenResult.message,
-        reconnect: tokenResult.reconnect || false,
-      }, { status: tokenResult.reconnect ? 401 : 500 });
+        error: 'NOT_CONNECTED',
+        message: 'Hue bridge not connected. Please pair first.',
+        reconnect: true,
+      }, { status: 401 });
     }
 
     // Update light state
-    const hueApi = new HueApi(tokenResult.accessToken);
+    const hueApi = new HueApi(connection.bridgeIp, connection.username);
     const response = await hueApi.setLightState(id, body);
 
     return NextResponse.json({

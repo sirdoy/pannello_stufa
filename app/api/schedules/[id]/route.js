@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
  */
 export const GET = auth0.withApiAuthRequired(async function getScheduleHandler(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const schedule = await adminDbGet(`schedules-v2/schedules/${id}`);
 
@@ -49,7 +49,7 @@ export const GET = auth0.withApiAuthRequired(async function getScheduleHandler(r
  */
 export const PUT = auth0.withApiAuthRequired(async function updateScheduleHandler(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const updates = await request.json();
 
     // Check schedule exists
@@ -115,7 +115,7 @@ export const PUT = auth0.withApiAuthRequired(async function updateScheduleHandle
  */
 export const DELETE = auth0.withApiAuthRequired(async function deleteScheduleHandler(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Validation 1: Cannot delete active schedule
     const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId');

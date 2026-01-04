@@ -1,6 +1,6 @@
 /**
- * Philips Hue Scene Activation Route
- * PUT: Activate a scene
+ * Philips Hue Scenes Route
+ * GET: Fetch all scenes
  * ✅ Protected by Auth0 authentication
  */
 
@@ -11,10 +11,8 @@ import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';
 
-export const PUT = auth0.withApiAuthRequired(async function handler(request, { params }) {
+export const GET = auth0.withApiAuthRequired(async function handler(request) {
   try {
-    const { id } = await params;
-
     // Get Hue connection from Firebase
     const connection = await getHueConnection();
 
@@ -26,17 +24,17 @@ export const PUT = auth0.withApiAuthRequired(async function handler(request, { p
       }, { status: 401 });
     }
 
-    // Activate scene
+    // Fetch scenes from Hue API
     const hueApi = new HueApi(connection.bridgeIp, connection.username);
-    const response = await hueApi.activateScene(id);
+    const response = await hueApi.getScenes();
 
     return NextResponse.json({
+      scenes: response.data || [],
       success: true,
-      data: response.data || [],
     });
 
   } catch (error) {
-    console.error('❌ Hue scene activation error:', error);
+    console.error('❌ Hue scenes fetch error:', error);
     return NextResponse.json(
       { error: error.message },
       { status: 500 }

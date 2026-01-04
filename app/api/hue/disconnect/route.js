@@ -5,14 +5,14 @@
  */
 
 import { NextResponse } from 'next/server';
-import { clearHueData } from '@/lib/hue/hueTokenHelper';
+import { clearHueConnection } from '@/lib/hue/hueLocalHelper';
 import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';
 
 export const POST = auth0.withApiAuthRequired(async function handler(request) {
   try {
-    await clearHueData();
+    await clearHueConnection();
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('❌ Hue disconnect error:', error);

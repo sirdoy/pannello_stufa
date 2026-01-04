@@ -5,6 +5,289 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.38.4] - 2026-01-04
+
+### 🔧 Fixed - Next.js 15 Async Params
+
+#### Modificato
+
+- **API Routes** - Fixed Next.js 15 breaking change for dynamic route parameters
+  - `app/api/hue/scenes/[id]/activate/route.js` - Added `await params`
+  - `app/api/hue/lights/[id]/route.js` - Added `await params` (GET + PUT)
+  - `app/api/hue/rooms/[id]/route.js` - Added `await params` (GET + PUT)
+  - `app/api/schedules/[id]/route.js` - Added `await params` (GET + PUT + DELETE)
+
+#### Problema Risolto
+
+In Next.js 15, `params` in dynamic routes became a Promise and must be awaited before accessing properties. Previous code like `const { id } = params;` now throws error:
+```
+Error: Route used `params.id`. `params` should be awaited before using its properties.
+```
+
+#### Soluzione
+
+```javascript
+// OLD (Next.js 14)
+export const PUT = async (request, { params }) => {
+  const { id } = params; // ❌ Error in Next.js 15
+}
+
+// NEW (Next.js 15)
+export const PUT = async (request, { params }) => {
+  const { id } = await params; // ✅ Fixed
+}
+```
+
+#### 📊 Impatto
+
+- **Compliance**: App now compatible with Next.js 15 dynamic routes
+- **Fixed Routes**: 4 route files, 7 total handlers (GET, PUT, DELETE)
+- **Error Resolved**: Scene activation and all dynamic routes now work without warnings
+
+---
+
+## [1.38.3] - 2026-01-04
+
+### 🎨 Features - Hue Color Control
+
+#### Aggiunto
+
+- **Philips Hue Color Control** - Color picker for color-capable lights
+  - `lib/hue/colorUtils.js` - RGB to XY CIE color conversion utilities
+    - `rgbToXY()` - Convert RGB (0-255) to Hue XY color space
+    - `hexToXY()` - Convert hex colors to XY
+    - `supportsColor()` - Check if light supports color
+    - `COLOR_PRESETS` - 10 preset colors for quick selection
+  - `lib/hue/__tests__/colorUtils.test.js` - 24 comprehensive tests (all passing)
+
+- **Color Picker UI** - `/lights` page individual light controls
+  - Grid of 10 color preset buttons (5x2 layout)
+  - Color presets: Bianco Caldo, Bianco Freddo, Rosso, Verde, Blu, Giallo, Arancione, Viola, Rosa, Ciano
+  - Visual color preview with hex background
+  - Loading state during color change
+  - Only shown for lights that support color (automatic detection)
+  - Success feedback on color change
+
+- **LightsCard Enhancement** - Homepage quick access
+  - "🎨 Controllo Colore" button when room has color-capable lights
+  - Conditional rendering based on `hasColorLights` check
+  - Direct link to `/lights` page for full color control
+
+#### Modificato
+
+- **`/app/lights/page.js`** - Added color control section
+  - Import `COLOR_PRESETS` and `supportsColor` from colorUtils
+  - `handleLightColorChange()` - Send XY coordinates to Hue API
+  - `changingColor` state for loading feedback
+  - Conditional color picker below brightness slider
+  - "🎨 Colore disponibile" badge for color-capable lights
+
+- **`/app/components/devices/lights/LightsCard.js`** - Added color detection
+  - Import `supportsColor` utility
+  - `hasColorLights` computed variable
+  - Conditional "Controllo Colore" button
+  - Router navigation to `/lights` page
+
+#### 🎨 Color Presets
+
+| Preset | Hex | XY Coordinates | Icon |
+|--------|-----|----------------|------|
+| Bianco Caldo | #FFE4B5 | (0.4448, 0.4066) | ☀️ |
+| Bianco Freddo | #F0F8FF | (0.3227, 0.329) | ❄️ |
+| Rosso | #FF0000 | (0.6915, 0.3083) | 🔴 |
+| Verde | #00FF00 | (0.17, 0.7) | 🟢 |
+| Blu | #0000FF | (0.1532, 0.0475) | 🔵 |
+| Giallo | #FFFF00 | (0.4432, 0.5154) | 🟡 |
+| Arancione | #FFA500 | (0.5614, 0.4156) | 🟠 |
+| Viola | #9400D3 | (0.2859, 0.1332) | 🟣 |
+| Rosa | #FF69B4 | (0.4338, 0.2468) | 🩷 |
+| Ciano | #00FFFF | (0.1607, 0.3423) | 🔵 |
+
+#### 📊 Impatto
+
+- **User Experience**: Controllo completo del colore per luci RGB
+- **Automatic Detection**: Solo luci con supporto colore mostrano il picker
+- **Quick Access**: Homepage mostra link se la stanza ha luci colorate
+- **Test Coverage**: 24 test per conversion utilities (100% passing)
+
+---
+
+## [1.38.2] - 2026-01-04
+
+### 🎨 Features - Hue Pages & Granular Control
+
+#### Aggiunto
+
+- **Philips Hue Pages** - 3 dedicated pages for complete Hue control
+  - `app/lights/page.js` - **Main Lights Page** with full granular control
+    - Expandable room cards with collapse/expand functionality
+    - Room-level controls: on/off buttons + brightness slider
+    - Individual light controls when expanded: per-light on/off + brightness
+    - Scene activation within each room
+    - Stats summary card: rooms/lights/scenes count
+    - Polling every 30 seconds for live updates
+    - Success/error banner feedback
+  - `app/lights/scenes/page.js` - **Scenes Page**
+    - All scenes listed with room grouping
+    - Filter by room with button selector
+    - One-click scene activation
+    - Loading states during activation
+    - Phase 2 notice for create/edit features
+  - `app/lights/automation/page.js` - **Automation Page** (Placeholder)
+    - "Coming Soon" design for Phase 2
+    - 6 planned automation features listed
+    - Links to current working features
+
+#### Modificato
+
+- **LightsCard Component** - Fixed critical bugs for Hue API v2 structure
+  - `app/components/devices/lights/LightsCard.js`
+    - Fixed: Room lights filtering now uses `children` array instead of `services`
+    - Fixed: Room controls now use `grouped_light` ID extracted from `services`
+    - Added: `getGroupedLightId()` helper to extract control endpoint ID
+    - Added: `Text` component import (was missing)
+    - Improved: Error handling for room control operations
+
+#### 🔍 Philips Hue API v2 Structure (For Reference)
+
+```javascript
+room: {
+  id: "room-uuid",
+  services: [
+    { rtype: "grouped_light", rid: "grouped-light-uuid" } // For controls
+  ],
+  children: [
+    { rtype: "light", rid: "light-uuid" } // Individual lights
+  ]
+}
+```
+
+**Key Learnings:**
+- Use `services` to find `grouped_light` ID for room-level controls
+- Use `children` to filter individual lights belonging to a room
+- Passing room ID to control endpoint = 404 error
+- Must use `grouped_light` ID from services
+
+#### 📊 Impatto
+
+- **UX**: Controllo capillare completo di luci, stanze e scene
+- **Pages**: 3 nuove pagine dedicate (lights, scenes, automation)
+- **Bug Fixes**: Room controls ora funzionano correttamente (404 fixed)
+- **Architecture**: Ready for Phase 2 (scene creation/editing)
+
+---
+
+## [1.38.1] - 2026-01-04
+
+### 🔧 Fixed - Hue Bridge Pairing SSL Error
+
+#### Modificato
+
+- **Philips Hue SSL Fix** - Added HTTPS agent to bypass self-signed certificate verification
+  - `lib/hue/hueApi.js` - Created `httpsAgent` with `rejectUnauthorized: false`
+  - Applied to `HueApi.request()` method for all API calls
+  - Applied to `createApplicationKey()` function for pairing
+  - Resolves "fetch failed" error during bridge pairing
+
+#### Problema Risolto
+
+Il bridge Philips Hue usa un certificato SSL self-signed per HTTPS locale. Node.js `fetch()` rifiuta questi certificati per default, causando errore "fetch failed" durante il pairing.
+
+#### Soluzione
+
+```javascript
+import https from 'https';
+
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false, // Accept self-signed certs
+});
+
+fetch(url, { agent: httpsAgent });
+```
+
+### 📊 Impatto
+
+- **Pairing**: Ora funziona correttamente con bridge Hue
+- **Security**: Safe per network locale (bridge stesso usa HTTPS)
+- **Compatibility**: Funziona con tutti i bridge Hue (certificati self-signed)
+
+---
+
+## [1.38.0] - 2026-01-04
+
+### 💡 Features - Philips Hue Local API Integration
+
+#### Aggiunto
+
+- **Philips Hue Integration** - Complete Local API (CLIP v2) implementation
+  - `lib/hue/hueApi.js` - HueApi class for Local API communication
+  - `lib/hue/hueLocalHelper.js` - Firebase persistence for Local API credentials
+  - `app/api/hue/discover/route.js` - Bridge discovery endpoint (NEW)
+  - `app/api/hue/pair/route.js` - Bridge pairing with button press
+  - `app/api/hue/status/route.js` - Connection status
+  - `app/api/hue/lights/route.js` - Get all lights
+  - `app/api/hue/lights/[id]/route.js` - Control single light
+  - `app/api/hue/rooms/route.js` - Get all rooms/zones
+  - `app/api/hue/rooms/[id]/route.js` - Control room lights
+  - `app/api/hue/scenes/route.js` - Get all scenes (NEW)
+  - `app/api/hue/scenes/[id]/activate/route.js` - Activate scene
+  - `app/api/hue/disconnect/route.js` - Disconnect and clear data
+
+- **LightsCard Component** - Complete UI for Hue lights control
+  - `app/components/devices/lights/LightsCard.js` - Main card component
+  - Bridge discovery and pairing flow with 30s countdown
+  - Room selection with RoomSelector component
+  - On/Off controls per room
+  - Brightness slider with ±5% buttons
+  - Horizontal scroll scene selector
+  - Polling every 30 seconds for live updates
+  - Error handling and retry logic for pairing
+
+- **Architecture** - Extensible design for future Remote API
+  - Strategy Pattern ready for Local/Remote provider switching
+  - OAuth code preserved in `lib/hue/hueTokenHelper.js` (commented, ready for future)
+  - Callback route disabled: `app/api/hue/callback/route.js.disabled`
+  - Firebase schema supports both Local and Remote API credentials
+
+#### Modificato
+
+- **Documentation** - Complete rewrite for Local API
+  - `docs/setup/hue-setup.md` - Comprehensive Local API setup guide
+  - Pairing instructions with troubleshooting
+  - Firebase security rules for Local API
+  - Future Remote API migration path documented
+
+#### Firebase Schema
+
+```
+hue/
+├── bridge_ip              # IP locale del bridge
+├── username               # Application key from pairing
+├── clientkey              # Client key (optional, for streaming)
+├── bridge_id              # Bridge unique ID
+├── connected              # boolean
+├── connected_at           # ISO timestamp
+└── updated_at             # ISO timestamp
+```
+
+### 📊 Impatto
+
+- **Setup Time**: 2 minuti (no OAuth registration required)
+- **Latency**: Minima (direct Local API communication)
+- **Security**: Firebase Admin SDK only (credentials never exposed to client)
+- **Limitation**: Works only on same Wi-Fi network as bridge
+- **Future**: Architecture ready for Remote API (VPN or OAuth cloud)
+
+### 🔧 Technical Details
+
+- **Local API**: CLIP v2 (https://{bridge_ip}/clip/v2/resource/*)
+- **Discovery**: Philips discovery service (discovery.meethue.com)
+- **Pairing**: Link button physical press (30s window)
+- **Polling**: 30s interval for live status updates
+- **Error Handling**: Automatic retry for pairing, connection errors
+
+---
+
 ## [1.37.2] - 2026-01-04
 
 ### 🎨 Fixed - UI Polish & Responsive Button Optimization

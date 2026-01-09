@@ -24,36 +24,28 @@ export const GET = auth0.withApiAuthRequired(async function handler(request) {
 
     const hueApi = new HueApi(tokenResult.accessToken);
 
-    console.log('🧪 Testing multiple Hue endpoints...');
-
     // Test 1: Bridge Home
     let bridgeHomeResult;
     try {
       bridgeHomeResult = await hueApi.getBridgeHome();
-      console.log('✅ Bridge Home: SUCCESS', bridgeHomeResult);
     } catch (err) {
       bridgeHomeResult = { error: err.message };
-      console.log('❌ Bridge Home: FAILED', err.message);
     }
 
     // Test 2: Bridge
     let bridgeResult;
     try {
       bridgeResult = await hueApi.getBridge();
-      console.log('✅ Bridge: SUCCESS', bridgeResult);
     } catch (err) {
       bridgeResult = { error: err.message };
-      console.log('❌ Bridge: FAILED', err.message);
     }
 
     // Test 3: Devices
     let devicesResult;
     try {
       devicesResult = await hueApi.getDevices();
-      console.log('✅ Devices: SUCCESS', devicesResult);
     } catch (err) {
       devicesResult = { error: err.message };
-      console.log('❌ Devices: FAILED', err.message);
     }
 
     return NextResponse.json({

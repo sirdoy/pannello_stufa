@@ -3,6 +3,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, Button, Skeleton, EmptyState, Heading, Text, Banner } from '@/app/components/ui';
+import CreateSceneModal from '@/app/components/lights/CreateSceneModal';
+import EditSceneModal from '@/app/components/lights/EditSceneModal';
+import ContextMenu from '@/app/components/ui/ContextMenu';
+import ConfirmDialog from '@/app/components/ui/ConfirmDialog';
+import Toast from '@/app/components/ui/Toast';
 
 /**
  * Scenes Page - Philips Hue scene management
@@ -19,6 +24,10 @@ export default function ScenesPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [activatingScene, setActivatingScene] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState('all');
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editingScene, setEditingScene] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [toast, setToast] = useState(null);
 
   const connectionCheckedRef = useRef(false);
 
@@ -109,6 +118,82 @@ export default function ScenesPage() {
     setRefreshing(true);
     await fetchData();
     setRefreshing(false);
+  }
+
+  async function handleCreateScene(data) {
+    try {
+      setError(null);
+
+      const response = await fetch('/api/hue/scenes/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
+
+      // Success
+      setCreateModalOpen(false);
+      await fetchData(); // Refresh scenes list
+      setToast({ message: `Scena "${data.name}" creata con successo`, variant: 'success', icon: '✅' });
+
+    } catch (err) {
+      console.error('Error creating scene:', err);
+      setError(err.message);
+    }
+  }
+
+  async function handleUpdateScene(data) {
+    try {
+      setError(null);
+
+      const { sceneId, ...updates } = data;
+
+      const response = await fetch(`/api/hue/scenes/${sceneId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
+
+      // Success
+      setEditingScene(null);
+      await fetchData(); // Refresh scenes list
+      setToast({ message: `Scena aggiornata con successo`, variant: 'success', icon: '✅' });
+
+    } catch (err) {
+      console.error('Error updating scene:', err);
+      setError(err.message);
+    }
+  }
+
+  async function handleDeleteSceneConfirmed() {
+    const scene = deleteConfirm;
+    setDeleteConfirm(null); // Close dialog immediately
+
+    try {
+      setError(null);
+
+      const response = await fetch(`/api/hue/scenes/${scene.id}`, {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
+
+      // Optimistic update - remove from local state
+      setScenes(prev => prev.filter(s => s.id !== scene.id));
+      setToast({ message: `Scena "${scene.metadata?.name}" eliminata`, variant: 'success', icon: '✅' });
+
+    } catch (err) {
+      console.error('Error deleting scene:', err);
+      setError(err.message);
+      // Re-fetch to revert optimistic update
+      await fetchData();
+    }
   }
 
   if (loading) {
@@ -209,6 +294,13 @@ export default function ScenesPage() {
 
           <div className="flex gap-2">
             <Button
+              variant="primary"
+              onClick={() => setCreateModalOpen(true)}
+              size="sm"
+            >
+              ➕ Crea Nuova Scena
+            </Button>
+            <Button
               variant="outline"
               onClick={handleRefresh}
               loading={refreshing}
@@ -261,26 +353,47 @@ export default function ScenesPage() {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {roomScenes.map(scene => (
-                <button
-                  key={scene.id}
-                  onClick={() => handleActivateScene(scene.id, scene.metadata?.name)}
-                  disabled={activatingScene === scene.id}
-                  className={`relative p-6 rounded-2xl border-2 transition-all duration-200 active:scale-95 ${
-                    activatingScene === scene.id
-                      ? 'border-warning-500 bg-warning-50 dark:bg-warning-900/20'
-                      : 'border-neutral-200 dark:border-neutral-700 bg-white/60 dark:bg-white/[0.03] hover:bg-warning-50 dark:hover:bg-warning-900/20 hover:border-warning-300 dark:hover:border-warning-600'
-                  }`}
-                >
-                  <div className="text-4xl mb-3">🎨</div>
-                  <Text className="text-sm font-semibold text-center">
-                    {scene.metadata?.name || 'Scena'}
-                  </Text>
-                  {activatingScene === scene.id && (
-                    <div className="absolute top-2 right-2">
-                      <div className="w-4 h-4 border-2 border-warning-500 border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                  )}
-                </button>
+                <div key={scene.id} className="relative">
+                  <button
+                    onClick={() => handleActivateScene(scene.id, scene.metadata?.name)}
+                    disabled={activatingScene === scene.id}
+                    className={`w-full relative p-6 rounded-2xl border-2 transition-all duration-200 active:scale-95 ${
+                      activatingScene === scene.id
+                        ? 'border-warning-500 bg-warning-50 dark:bg-warning-900/20'
+                        : 'border-neutral-200 dark:border-neutral-700 bg-white/60 dark:bg-white/[0.03] hover:bg-warning-50 dark:hover:bg-warning-900/20 hover:border-warning-300 dark:hover:border-warning-600'
+                    }`}
+                  >
+                    <div className="text-4xl mb-3">🎨</div>
+                    <Text className="text-sm font-semibold text-center">
+                      {scene.metadata?.name || 'Scena'}
+                    </Text>
+                    {activatingScene === scene.id && (
+                      <div className="absolute top-2 right-2">
+                        <div className="w-4 h-4 border-2 border-warning-500 border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    )}
+                  </button>
+
+                  {/* Context Menu */}
+                  <div className="absolute top-2 right-2" onClick={(e) => e.stopPropagation()}>
+                    <ContextMenu
+                      ariaLabel={`Azioni per ${scene.metadata?.name}`}
+                      items={[
+                        {
+                          label: 'Modifica',
+                          icon: '✏️',
+                          onClick: () => setEditingScene(scene)
+                        },
+                        {
+                          label: 'Elimina',
+                          icon: '🗑️',
+                          variant: 'danger',
+                          onClick: () => setDeleteConfirm(scene)
+                        }
+                      ]}
+                    />
+                  </div>
+                </div>
               ))}
             </div>
           </div>
@@ -288,26 +401,47 @@ export default function ScenesPage() {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {filteredScenes.map(scene => (
-            <button
-              key={scene.id}
-              onClick={() => handleActivateScene(scene.id, scene.metadata?.name)}
-              disabled={activatingScene === scene.id}
-              className={`relative p-6 rounded-2xl border-2 transition-all duration-200 active:scale-95 ${
-                activatingScene === scene.id
-                  ? 'border-warning-500 bg-warning-50 dark:bg-warning-900/20'
-                  : 'border-neutral-200 dark:border-neutral-700 bg-white/60 dark:bg-white/[0.03] hover:bg-warning-50 dark:hover:bg-warning-900/20 hover:border-warning-300 dark:hover:border-warning-600'
-              }`}
-            >
-              <div className="text-4xl mb-3">🎨</div>
-              <Text className="text-sm font-semibold text-center">
-                {scene.metadata?.name || 'Scena'}
-              </Text>
-              {activatingScene === scene.id && (
-                <div className="absolute top-2 right-2">
-                  <div className="w-4 h-4 border-2 border-warning-500 border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              )}
-            </button>
+            <div key={scene.id} className="relative">
+              <button
+                onClick={() => handleActivateScene(scene.id, scene.metadata?.name)}
+                disabled={activatingScene === scene.id}
+                className={`w-full relative p-6 rounded-2xl border-2 transition-all duration-200 active:scale-95 ${
+                  activatingScene === scene.id
+                    ? 'border-warning-500 bg-warning-50 dark:bg-warning-900/20'
+                    : 'border-neutral-200 dark:border-neutral-700 bg-white/60 dark:bg-white/[0.03] hover:bg-warning-50 dark:hover:bg-warning-900/20 hover:border-warning-300 dark:hover:border-warning-600'
+                }`}
+              >
+                <div className="text-4xl mb-3">🎨</div>
+                <Text className="text-sm font-semibold text-center">
+                  {scene.metadata?.name || 'Scena'}
+                </Text>
+                {activatingScene === scene.id && (
+                  <div className="absolute top-2 right-2">
+                    <div className="w-4 h-4 border-2 border-warning-500 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
+              </button>
+
+              {/* Context Menu */}
+              <div className="absolute top-2 right-2" onClick={(e) => e.stopPropagation()}>
+                <ContextMenu
+                  ariaLabel={`Azioni per ${scene.metadata?.name}`}
+                  items={[
+                    {
+                      label: 'Modifica',
+                      icon: '✏️',
+                      onClick: () => setEditingScene(scene)
+                    },
+                    {
+                      label: 'Elimina',
+                      icon: '🗑️',
+                      variant: 'danger',
+                      onClick: () => setDeleteConfirm(scene)
+                    }
+                  ]}
+                />
+              </div>
+            </div>
           ))}
         </div>
       )}
@@ -321,20 +455,48 @@ export default function ScenesPage() {
         />
       )}
 
-      {/* Phase 2 Notice */}
-      <Card className="p-6 mt-8 bg-info-50 dark:bg-info-900/20 border border-info-200 dark:border-info-800">
-        <div className="flex items-start gap-3">
-          <span className="text-2xl">💡</span>
-          <div>
-            <Heading level={3} size="sm" className="mb-1">
-              Fase 2: Creazione e Modifica Scene
-            </Heading>
-            <Text variant="secondary" className="text-sm">
-              Prossimamente potrai creare e modificare scene direttamente dall'app. Per ora puoi attivarle tutte le scene create nell'app Philips Hue.
-            </Text>
-          </div>
-        </div>
-      </Card>
+      {/* Create Scene Modal */}
+      <CreateSceneModal
+        isOpen={createModalOpen}
+        rooms={rooms}
+        onConfirm={handleCreateScene}
+        onCancel={() => setCreateModalOpen(false)}
+      />
+
+      {/* Edit Scene Modal */}
+      {editingScene && (
+        <EditSceneModal
+          isOpen={!!editingScene}
+          scene={editingScene}
+          rooms={rooms}
+          onConfirm={handleUpdateScene}
+          onCancel={() => setEditingScene(null)}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={!!deleteConfirm}
+        title="Elimina Scena"
+        message={`Sei sicuro di voler eliminare la scena "${deleteConfirm?.metadata?.name}"? Questa azione non può essere annullata.`}
+        confirmText="Elimina"
+        cancelText="Annulla"
+        confirmVariant="danger"
+        icon="🗑️"
+        onConfirm={handleDeleteSceneConfirmed}
+        onCancel={() => setDeleteConfirm(null)}
+      />
+
+      {/* Toast Notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          variant={toast.variant}
+          icon={toast.icon}
+          duration={3000}
+          onDismiss={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

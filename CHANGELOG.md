@@ -5,6 +5,118 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.39.0] - 2026-01-04
+
+### ✨ Feature - Gestione Completa Scene Philips Hue
+
+#### Nuovo
+
+Implementata gestione completa delle scene Philips Hue con creazione, modifica ed eliminazione direttamente dall'app.
+
+**Backend Infrastructure:**
+
+- **HueApi Methods** (`lib/hue/hueApi.js`)
+  - `createScene(name, groupRid, actions)` - Crea nuove scene con configurazioni luci
+  - `updateScene(sceneId, updates)` - Aggiorna nome e/o configurazioni esistenti
+  - `deleteScene(sceneId)` - Elimina scene dal bridge
+
+- **API Routes** (Auth0 protected, force-dynamic)
+  - `POST /api/hue/scenes/create` - Endpoint creazione scene con validazione completa
+  - `PUT /api/hue/scenes/[id]` - Aggiornamento scene (partial updates supportati)
+  - `DELETE /api/hue/scenes/[id]` - Eliminazione scene (idempotent)
+
+**UI Components:**
+
+- **CreateSceneModal** (`app/components/lights/CreateSceneModal.js`)
+  - Flow ibrido: cattura stato attuale luci + modifiche manuali
+  - Selezione stanza con fetch automatico luci
+  - Pre-popolamento con stati correnti (on/off, brightness, colore)
+  - Configurazione per-luce: toggle on/off, slider brightness, preset colori
+  - Validazione client-side: nome (1-255 chars), stanza richiesta, min 1 luce
+
+- **EditSceneModal** (`app/components/lights/EditSceneModal.js`)
+  - Carica dati scena esistente
+  - Stanza read-only (limitazione Hue API)
+  - Stesso flow ibrido di CreateSceneModal
+  - Aggiornamento nome e/o configurazioni
+
+- **ContextMenu** (`app/components/ui/ContextMenu.js`)
+  - Component reusable per menu contestuali (⋮)
+  - Click-outside e Escape key per chiusura
+  - Stoppa propagazione eventi (non attiva scene al click menu)
+  - Liquid glass styling + animazioni
+
+**Integration** (`app/lights/scenes/page.js`):
+
+- Pulsante "Crea Nuova Scena" in Summary Card
+- Context menu (edit/delete) su ogni scene card
+- Toast notifications per successo/errore operazioni
+- ConfirmDialog per conferma eliminazione
+- Optimistic UI update per delete
+- Rimosso "Phase 2 Notice" (feature completata)
+
+**Color Control:**
+
+- Preset colori XY CIE (Bianco, Rosso, Verde, Blu, Giallo)
+- Conversione automatica RGB → XY per Hue API
+- Supporto completo brightness (0-100%)
+- Detection automatica luci color vs white-only
+
+#### Validazioni
+
+**Client-Side:**
+- Nome scena: required, 1-255 caratteri, trim
+- Stanza: required (dropdown selection)
+- Luci: minimo 1 luce configurata
+- Error display inline con feedback real-time
+
+**Server-Side:**
+- Type checking (name string, groupRid string, actions array)
+- Length validation (name max 255 chars)
+- Action format validation (target.rid + action required)
+- Hue connection check
+- Hue API error parsing con messaggi user-friendly
+
+#### Error Handling
+
+- **400**: Validation failures → inline error in modal
+- **401**: Hue not connected → reconnect prompt
+- **404**: Scene not found (deleted elsewhere) → graceful handling
+- **500**: Hue API/network errors → toast notification
+
+#### Testing
+
+- **Unit Tests** (`lib/hue/__tests__/hueApiScenes.test.js`)
+  - createScene: payload structure, response handling
+  - updateScene: partial updates (name only, actions only, both)
+  - deleteScene: DELETE request, error handling
+  - Error propagation e Hue API error responses
+
+#### Files Created (6)
+
+- `app/api/hue/scenes/create/route.js`
+- `app/api/hue/scenes/[id]/route.js`
+- `app/components/lights/CreateSceneModal.js`
+- `app/components/lights/EditSceneModal.js`
+- `app/components/ui/ContextMenu.js`
+- `lib/hue/__tests__/hueApiScenes.test.js`
+
+#### Files Modified (3)
+
+- `lib/hue/hueApi.js` - Added 3 scene methods
+- `app/lights/scenes/page.js` - Complete CRUD integration
+- `package.json` - Version bump to 1.39.0
+
+#### 📊 Impact
+
+- **Functionality**: Full scene management (create/edit/delete) within app
+- **UX**: Hybrid flow - fast state capture + manual fine-tuning
+- **Consistency**: Follows all existing patterns (modals, API routes, validation)
+- **Accessibility**: Keyboard navigation, ARIA labels, screen reader support
+- **Testing**: Comprehensive unit tests for all new methods
+
+---
+
 ## [1.38.4] - 2026-01-04
 
 ### 🔧 Fixed - Next.js 15 Async Params

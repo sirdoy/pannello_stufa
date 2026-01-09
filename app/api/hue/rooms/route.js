@@ -29,18 +29,11 @@ export const GET = auth0.withApiAuthRequired(async function handler(request) {
     const roomsResponse = await hueApi.getRooms();
     const zonesResponse = await hueApi.getZones();
 
-    // DEBUG: Log raw responses
-    console.log('🔍 Hue Rooms Response:', JSON.stringify(roomsResponse, null, 2));
-    console.log('🔍 Hue Zones Response:', JSON.stringify(zonesResponse, null, 2));
-
     // Combine rooms and zones
     const rooms = [
       ...(roomsResponse.data || []),
       ...(zonesResponse.data || []),
     ];
-
-    console.log('🔍 Combined rooms count:', rooms.length);
-    console.log('🔍 First room structure:', JSON.stringify(rooms[0], null, 2));
 
     return NextResponse.json({
       rooms,

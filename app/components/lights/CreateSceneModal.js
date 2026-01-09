@@ -1,0 +1,396 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Button from '../ui/Button';
+import ActionButton from '../ui/ActionButton';
+import Card from '../ui/Card';
+import Modal from '../ui/Modal';
+import Input from '../ui/Input';
+import { X } from 'lucide-react';
+
+/**
+ * CreateSceneModal Component
+ *
+ * Hybrid flow:
+ * 1. User selects room
+ * 2. Fetches current light states for that room
+ * 3. Pre-populates form with current states
+ * 4. User can adjust on/off, brightness, color for each light
+ * 5. Saves scene with configured states
+ *
+ * @param {boolean} isOpen - Modal open state
+ * @param {Array} rooms - Array of room objects {id, metadata: {name}, services: [{rid}]}
+ * @param {Function} onConfirm - Callback with {name, groupRid, actions}
+ * @param {Function} onCancel - Callback to close modal
+ */
+export default function CreateSceneModal({
+  isOpen,
+  rooms = [],
+  onConfirm,
+  onCancel,
+}) {
+  const [name, setName] = useState('');
+  const [selectedRoom, setSelectedRoom] = useState('');
+  const [lights, setLights] = useState([]);
+  const [lightConfigs, setLightConfigs] = useState({});
+  const [loadingLights, setLoadingLights] = useState(false);
+  const [error, setError] = useState('');
+
+  // Reset state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setName('');
+      setSelectedRoom('');
+      setLights([]);
+      setLightConfigs({});
+      setError('');
+    }
+  }, [isOpen]);
+
+  // Fetch lights when room is selected
+  useEffect(() => {
+    if (selectedRoom) {
+      fetchRoomLights(selectedRoom);
+    } else {
+      setLights([]);
+      setLightConfigs({});
+    }
+  }, [selectedRoom]);
+
+  async function fetchRoomLights(roomId) {
+    try {
+      setLoadingLights(true);
+      setError('');
+
+      const response = await fetch('/api/hue/lights');
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.error);
+
+      // Filter lights for selected room
+      const selectedRoomObj = rooms.find(r => r.id === roomId);
+      const roomLights = data.lights.filter(light => {
+        // Light belongs to room if it's in room's services
+        return selectedRoomObj?.services?.some(
+          service => service.rid === light.id
+        );
+      });
+
+      setLights(roomLights);
+
+      // Pre-populate with current states (hybrid flow)
+      const initialConfigs = {};
+      roomLights.forEach(light => {
+        initialConfigs[light.id] = {
+          on: light.on?.on ?? true,
+          brightness: light.dimming?.brightness ?? 100,
+          // Color support check
+          color: light.color ? {
+            x: light.color.xy?.x ?? 0.3227,
+            y: light.color.xy?.y ?? 0.329
+          } : null
+        };
+      });
+      setLightConfigs(initialConfigs);
+
+    } catch (err) {
+      console.error('Error fetching lights:', err);
+      setError('Impossibile caricare le luci della stanza');
+    } finally {
+      setLoadingLights(false);
+    }
+  }
+
+  function handleLightToggle(lightId) {
+    setLightConfigs(prev => ({
+      ...prev,
+      [lightId]: {
+        ...prev[lightId],
+        on: !prev[lightId]?.on
+      }
+    }));
+  }
+
+  function handleBrightnessChange(lightId, brightness) {
+    setLightConfigs(prev => ({
+      ...prev,
+      [lightId]: {
+        ...prev[lightId],
+        brightness: Number(brightness)
+      }
+    }));
+  }
+
+  function handleColorChange(lightId, x, y) {
+    setLightConfigs(prev => ({
+      ...prev,
+      [lightId]: {
+        ...prev[lightId],
+        color: { x: Number(x), y: Number(y) }
+      }
+    }));
+  }
+
+  function handleConfirm() {
+    // Validation
+    const trimmedName = name.trim();
+
+    if (!trimmedName) {
+      setError('Il nome della scena è obbligatorio');
+      return;
+    }
+
+    if (trimmedName.length > 255) {
+      setError('Il nome non può superare 255 caratteri');
+      return;
+    }
+
+    if (!selectedRoom) {
+      setError('Seleziona una stanza');
+      return;
+    }
+
+    if (lights.length === 0) {
+      setError('La stanza non contiene luci');
+      return;
+    }
+
+    // Build actions array for Hue API
+    const actions = lights.map(light => {
+      const config = lightConfigs[light.id] || {};
+
+      const action = {
+        target: { rid: light.id, rtype: 'light' },
+        action: {
+          on: { on: config.on ?? true }
+        }
+      };
+
+      // Add brightness if light supports dimming
+      if (light.dimming) {
+        action.action.dimming = { brightness: config.brightness ?? 100 };
+      }
+
+      // Add color if light supports it and user set it
+      if (light.color && config.color) {
+        action.action.color = {
+          xy: {
+            x: config.color.x,
+            y: config.color.y
+          }
+        };
+      }
+
+      return action;
+    });
+
+    onConfirm({
+      name: trimmedName,
+      groupRid: selectedRoom,
+      actions
+    });
+  }
+
+  function handleKeyPress(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleConfirm();
+    }
+  }
+
+  // Color presets (XY CIE color space - standard for Hue)
+  const COLOR_PRESETS = [
+    { name: 'Bianco', x: 0.3227, y: 0.329 },
+    { name: 'Rosso', x: 0.675, y: 0.322 },
+    { name: 'Verde', x: 0.408, y: 0.517 },
+    { name: 'Blu', x: 0.168, y: 0.041 },
+    { name: 'Giallo', x: 0.4432, y: 0.5154 },
+  ];
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onCancel}
+      maxWidth="max-w-3xl"
+    >
+      <Card liquid className="animate-scale-in-center p-6 sm:p-8">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-6">
+          <div>
+            <h3 className="text-xl font-bold text-neutral-900 dark:text-white">
+              Crea Nuova Scena
+            </h3>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+              Cattura lo stato attuale delle luci o personalizza
+            </p>
+          </div>
+          <ActionButton
+            icon={<X />}
+            variant="close"
+            size="md"
+            onClick={onCancel}
+            ariaLabel="Chiudi"
+          />
+        </div>
+
+        {/* Body */}
+        <div className="space-y-6">
+          {/* Scene Name */}
+          <div>
+            <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
+              Nome Scena <span className="text-primary-500">*</span>
+            </label>
+            <Input
+              type="text"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                setError('');
+              }}
+              onKeyPress={handleKeyPress}
+              placeholder="Es: Relax serale, Lettura..."
+              maxLength={255}
+              autoFocus
+              liquid
+            />
+            <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">
+              {name.length}/255 caratteri
+            </p>
+          </div>
+
+          {/* Room Selection */}
+          <div>
+            <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
+              Stanza <span className="text-primary-500">*</span>
+            </label>
+            <select
+              value={selectedRoom}
+              onChange={(e) => {
+                setSelectedRoom(e.target.value);
+                setError('');
+              }}
+              className="w-full px-4 py-3 bg-white/60 dark:bg-neutral-800/60 backdrop-blur-xl rounded-xl border border-neutral-300/50 dark:border-neutral-600/50 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-primary-400/20 text-neutral-900 dark:text-white transition-all outline-none"
+            >
+              <option value="">Seleziona una stanza...</option>
+              {rooms.map((room) => (
+                <option key={room.id} value={room.id}>
+                  {room.metadata?.name || 'Stanza'}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Lights Configuration */}
+          {loadingLights && (
+            <div className="text-center py-4">
+              <div className="w-8 h-8 border-3 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">Caricamento luci...</p>
+            </div>
+          )}
+
+          {!loadingLights && lights.length > 0 && (
+            <div>
+              <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">
+                Configurazione Luci
+              </label>
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {lights.map(light => {
+                  const config = lightConfigs[light.id] || {};
+                  return (
+                    <div key={light.id} className="p-4 bg-white/40 dark:bg-neutral-800/40 rounded-xl border border-neutral-200/50 dark:border-neutral-700/50">
+                      {/* Light Name + Toggle */}
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-medium text-neutral-900 dark:text-white">
+                          {light.metadata?.name || 'Luce'}
+                        </span>
+                        <button
+                          onClick={() => handleLightToggle(light.id)}
+                          className={`w-12 h-6 rounded-full transition-colors ${
+                            config.on
+                              ? 'bg-warning-500'
+                              : 'bg-neutral-300 dark:bg-neutral-600'
+                          }`}
+                        >
+                          <div className={`w-5 h-5 bg-white rounded-full shadow-md transition-transform ${
+                            config.on ? 'translate-x-6' : 'translate-x-0.5'
+                          }`} />
+                        </button>
+                      </div>
+
+                      {/* Brightness Slider (if supported and on) */}
+                      {light.dimming && config.on && (
+                        <div className="mb-3">
+                          <label className="block text-xs text-neutral-600 dark:text-neutral-400 mb-1">
+                            Luminosità: {config.brightness}%
+                          </label>
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={config.brightness || 100}
+                            onChange={(e) => handleBrightnessChange(light.id, e.target.value)}
+                            className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded appearance-none cursor-pointer accent-warning-500"
+                          />
+                        </div>
+                      )}
+
+                      {/* Color Picker (if supported and on) - Simplified */}
+                      {light.color && config.on && (
+                        <div>
+                          <label className="block text-xs text-neutral-600 dark:text-neutral-400 mb-1">
+                            Colore (preset comuni)
+                          </label>
+                          <div className="grid grid-cols-5 gap-2">
+                            {COLOR_PRESETS.map(preset => (
+                              <button
+                                key={preset.name}
+                                onClick={() => handleColorChange(light.id, preset.x, preset.y)}
+                                className="p-2 rounded-lg bg-neutral-200/50 dark:bg-neutral-700/50 hover:bg-neutral-300/50 dark:hover:bg-neutral-600/50 text-xs transition-colors"
+                                title={preset.name}
+                              >
+                                {preset.name[0]}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Error Message */}
+          {error && (
+            <p className="text-sm text-primary-600 dark:text-primary-400 flex items-center gap-1">
+              <span>⚠️</span>
+              <span>{error}</span>
+            </p>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex gap-3 mt-8">
+          <Button
+            liquid
+            variant="secondary"
+            onClick={onCancel}
+            className="flex-1"
+          >
+            Annulla
+          </Button>
+          <Button
+            liquid
+            variant="primary"
+            onClick={handleConfirm}
+            className="flex-1"
+            disabled={!name.trim() || !selectedRoom || lights.length === 0 || loadingLights}
+          >
+            Crea Scena
+          </Button>
+        </div>
+      </Card>
+    </Modal>
+  );
+}

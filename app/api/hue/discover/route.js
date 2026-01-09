@@ -12,11 +12,7 @@ export const dynamic = 'force-dynamic';
 
 export const GET = auth0.withApiAuthRequired(async function handler(request) {
   try {
-    console.log('🔍 Discovering Hue bridges...');
-
     const bridges = await discoverBridges();
-
-    console.log(`✅ Found ${bridges.length} bridge(s):`, bridges);
 
     return NextResponse.json({
       success: true,

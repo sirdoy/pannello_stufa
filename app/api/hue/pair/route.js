@@ -22,15 +22,8 @@ export const POST = auth0.withApiAuthRequired(async function handler(request) {
       );
     }
 
-    console.log('🔗 Attempting to pair with bridge:', bridgeIp);
-
     // Create application key (requires link button press)
     const result = await createApplicationKey(bridgeIp);
-
-    console.log('✅ Pairing successful:', {
-      username: result.username,
-      hasClientkey: !!result.clientkey,
-    });
 
     // Save to Firebase
     await saveHueConnection(

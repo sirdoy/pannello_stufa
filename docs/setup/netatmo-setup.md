@@ -1,11 +1,195 @@
-# Test Flusso Connessione Netatmo
+# Netatmo Setup Guide
+
+## 🎯 Dual Credentials Setup (Development + Production)
+
+### Why Two Netatmo Apps?
+
+To enable seamless local development and production deployment, you need **TWO separate Netatmo OAuth applications**:
+- **Development App**: Used on `localhost` (credentials with `_DEV` suffix)
+- **Production App**: Used on production URL (base credentials)
+
+This allows you to:
+- Test locally without affecting production OAuth flow
+- Have separate rate limits for dev/prod
+- Maintain environment isolation
+
+---
+
+## 📝 Registering Netatmo Applications
+
+### Step 1: Register Development App
+
+1. Go to [Netatmo Dev Portal](https://dev.netatmo.com/apps/)
+2. Click "**Create**"
+3. Fill in application details:
+   - **App Name**: `Pannello Stufa (Development)`
+   - **Redirect URI**: `http://localhost:3001/api/netatmo/callback`
+   - **Scopes**: Select `read_thermostat`, `write_thermostat`
+4. **Save** and copy credentials:
+   - **Client ID** → Save as `NEXT_PUBLIC_NETATMO_CLIENT_ID`
+   - **Client Secret** → Save as `NETATMO_CLIENT_SECRET`
+
+### Step 2: Register Production App
+
+1. Go to [Netatmo Dev Portal](https://dev.netatmo.com/apps/)
+2. Click "**Create**" (second app)
+3. Fill in application details:
+   - **App Name**: `Pannello Stufa`
+   - **Redirect URI**: `https://your-app.vercel.app/api/netatmo/callback` (replace with actual domain)
+   - **Scopes**: Select `read_thermostat`, `write_thermostat`
+4. **Save** and copy credentials:
+   - **Client ID** → Save as `NEXT_PUBLIC_NETATMO_CLIENT_ID`
+   - **Client Secret** → Save as `NETATMO_CLIENT_SECRET`
+
+---
+
+## 🔧 Local Environment Setup (.env.local)
+
+Create or update `.env.local` with **both** credential sets:
+
+```bash
+# ==========================================
+# NETATMO DEVELOPMENT CREDENTIALS (localhost)
+# ==========================================
+NEXT_PUBLIC_NETATMO_CLIENT_ID=67ed0a6f059e1fb36100ad45
+NETATMO_CLIENT_SECRET=bZHgsdv5Uoo74uzM5eK4dJ1WA6bpWipSH
+NEXT_PUBLIC_NETATMO_REDIRECT_URI_DEV=http://localhost:3001/api/netatmo/callback
+
+# ==========================================
+# NETATMO PRODUCTION CREDENTIALS
+# ==========================================
+NEXT_PUBLIC_NETATMO_CLIENT_ID=your-prod-client-id
+NETATMO_CLIENT_SECRET=your-prod-client-secret
+NEXT_PUBLIC_NETATMO_REDIRECT_URI=https://your-app.vercel.app/api/netatmo/callback
+```
+
+**Important**: Both sets of credentials should be in `.env.local` for fallback support during local testing.
+
+---
+
+## ☁️ Vercel Environment Variables
+
+Add **ONLY production credentials** (no `_DEV` suffix) to Vercel:
+
+1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables
+2. Add the following variables:
+
+```bash
+NEXT_PUBLIC_NETATMO_CLIENT_ID=your-prod-client-id
+NETATMO_CLIENT_SECRET=your-prod-client-secret
+NEXT_PUBLIC_NETATMO_REDIRECT_URI=https://your-app.vercel.app/api/netatmo/callback
+```
+
+**Do NOT add** `_DEV` credentials to Vercel. They're localhost-only.
+
+---
+
+## ✅ Verification
+
+### Test Localhost (Development Credentials)
+
+1. Start dev server:
+   ```bash
+   npm run dev
+   ```
+
+2. Visit `http://localhost:3001/thermostat`
+
+3. Click "**Connetti con Netatmo**"
+
+4. **Check browser network tab**:
+   - OAuth URL should use `client_id` from `_DEV` credentials
+   - Redirect URI should be `http://localhost:3001/api/netatmo/callback`
+
+5. Complete OAuth flow
+
+6. **Check Firebase Console**:
+   - Token saved to `dev/netatmo/refresh_token`
+
+### Test Production
+
+1. Deploy to Vercel:
+   ```bash
+   git push origin main
+   ```
+
+2. Visit production URL `/thermostat`
+
+3. Click "**Connetti con Netatmo**"
+
+4. **Check OAuth URL**:
+   - Should use production `client_id` (no `_DEV` suffix)
+   - Redirect URI should match production domain
+
+5. Complete OAuth flow
+
+6. **Check Firebase Console**:
+   - Token saved to `netatmo/refresh_token` (no `dev/` prefix)
+
+---
+
+## 🐛 Troubleshooting
+
+### Error: "Missing NETATMO_CLIENT_ID"
+
+**Cause**: You're on localhost but development credentials are not configured.
+
+**Solutions**:
+1. Add `_DEV` credentials to `.env.local` (recommended)
+2. System will fallback to production credentials (warning logged)
+
+### Error: "Redirect URI mismatch"
+
+**Cause**: Redirect URI in Netatmo app doesn't match environment.
+
+**Check**:
+- Localhost app has `http://localhost:3001/api/netatmo/callback`
+- Production app has `https://your-actual-domain.vercel.app/api/netatmo/callback`
+- No trailing slashes
+
+### OAuth works on localhost but not production
+
+**Cause**: Vercel missing production credentials or redirect URI mismatch.
+
+**Fix**:
+1. Verify Vercel has all 3 production variables (no `_DEV` suffix)
+2. Check production app redirect URI matches deployment URL exactly
+3. Redeploy after updating Vercel environment variables
+
+### Warning: "Development credentials not found"
+
+**Cause**: System falling back to production credentials on localhost.
+
+**Action**: Not an error, but for proper dev/prod separation:
+1. Create development app in Netatmo portal
+2. Add `_DEV` credentials to `.env.local`
+
+---
+
+## 🔄 Re-authentication After Migration
+
+If you updated from single to dual credentials:
+
+1. **Clear old tokens**:
+   - Visit `/thermostat`
+   - Disconnect from Netatmo (if connected)
+
+2. **Reconnect**:
+   - Click "Connetti con Netatmo"
+   - Complete OAuth flow with new credentials
+
+3. **Verify**:
+   - Check Firebase Console for new token path
+   - Test temperature read/write
+
+---
 
 ## Setup Completato
 
 ✅ Endpoint API creati
 ✅ Componenti UI implementati
 ✅ Gestione stati (connesso/non connesso)
-✅ Variabili ambiente configurate
+✅ Dual credentials support (development + production)
 
 ## Flusso di Test
 

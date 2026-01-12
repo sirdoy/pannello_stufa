@@ -1,6 +1,7 @@
 // ✅ File: app/api/netatmo/callback/route.js
 
 import { saveRefreshToken } from '@/lib/netatmoTokenHelper';
+import { getNetatmoCredentials } from '@/lib/netatmoCredentials';
 
 // Force dynamic rendering for Firebase operations
 export const dynamic = 'force-dynamic';
@@ -15,16 +16,19 @@ export async function GET(request) {
   }
 
   try {
+    // Get environment-specific credentials
+    const credentials = getNetatmoCredentials();
+
     // Exchange authorization code for tokens
     const res = await fetch('https://api.netatmo.com/oauth2/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
-        client_id: process.env.NETATMO_CLIENT_ID,
-        client_secret: process.env.NETATMO_CLIENT_SECRET,
+        client_id: credentials.clientId,
+        client_secret: credentials.clientSecret,
         code,
-        redirect_uri: process.env.NETATMO_REDIRECT_URI,
+        redirect_uri: credentials.redirectUri,
       }),
     });
 

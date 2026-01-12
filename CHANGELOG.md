@@ -5,6 +5,50 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.41.0] - 2026-01-12
+
+### ✨ Feature - Dual Netatmo OAuth Credentials
+
+#### Nuovo
+
+**Environment-Based Credentials System:**
+- Sistema di credenziali dual environment per Netatmo OAuth
+- **Same variable names, different values** per environment (localhost vs production)
+- Hostname-based automatic detection (localhost → dev/, production → root/)
+- Domain-isolated token storage in Firebase per environment
+
+**Implementazione:**
+- `lib/netatmoCredentials.js`: Credentials resolver semplificato (150→105 righe)
+- Rimosso pattern `_DEV` suffix in favore del native env loading di Next.js
+- Next.js carica automaticamente `.env.local` per localhost, Vercel env vars per production
+- Stesse variabili (`NETATMO_CLIENT_ID`, `NETATMO_CLIENT_SECRET`, `NETATMO_REDIRECT_URI`)
+- Valori diversi per environment (development vs production Netatmo apps)
+
+**File Modificati:**
+- `lib/netatmoCredentials.js`: Drasticamente semplificato, rimossa logica fallback
+- `lib/netatmoApi.js`: Usa credentials resolver
+- `lib/netatmoTokenHelper.js`: Usa credentials resolver
+- `app/api/netatmo/callback/route.js`: Usa credentials resolver
+- `app/components/netatmo/NetatmoAuthCard.js`: Usa client credentials resolver
+- `.env.example`: Aggiornata documentazione dual credentials
+
+**Tests:**
+- `__tests__/lib/netatmoCredentials.test.js`: Riscritti 15 test (focus su validazione)
+- `__tests__/lib/netatmoTokenHelper.test.js`: Aggiornati mock per nuovo resolver
+- **46/46 test passanti** per tutta la suite Netatmo
+
+**Documentazione:**
+- `docs/setup/netatmo-setup.md`: Guida completa setup dual environment
+- `docs/api-routes.md`: Sezione credentials resolution aggiornata
+- Rimossi riferimenti a `_DEV` suffix ovunque
+
+**Benefici:**
+- ✅ Setup più semplice (nomi standard Next.js)
+- ✅ Isolamento completo token per dominio
+- ✅ Nessun fallback ambiguo
+- ✅ Codice più pulito e manutenibile
+- ✅ Pattern standard Next.js per env vars
+
 ## [1.40.2] - 2026-01-12
 
 ### 🔧 Fixes - Build Compatibility

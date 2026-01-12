@@ -614,6 +614,159 @@ NEXT_PUBLIC_[EXTERNAL_API]_REDIRECT_URI=http://localhost:3000/api/[external-api]
 - Essere registrato nella console developer API esterna
 - HTTPS in production, HTTP solo per localhost
 
+---
+
+## Netatmo Credentials Resolution
+
+### Automatic Environment Detection
+
+Il sistema Netatmo seleziona automaticamente le credenziali OAuth corrette basandosi sull'environment:
+
+| Environment | Credentials Used | Firebase Path | Detection Method |
+|-------------|------------------|---------------|------------------|
+| `localhost` | `NETATMO_*` | `dev/netatmo/` | `isDevelopment()` or `hostname === 'localhost'` |
+| Production | `NETATMO_*` | `netatmo/` | `!isDevelopment()` or `hostname !== 'localhost'` |
+
+### Resolver Logic
+
+```javascript
+import { getNetatmoCredentials } from '@/lib/netatmoCredentials';
+
+// In API route or helper (server-side)
+const credentials = getNetatmoCredentials();
+// → { clientId, clientSecret, redirectUri }
+
+// In React component (client-side)
+import { getNetatmoCredentialsClient } from '@/lib/netatmoCredentials';
+const credentials = getNetatmoCredentialsClient();
+```
+
+**Fallback Behavior**:
+- ✅ **Development**: Falls back to production credentials if dev not configured (with warning)
+- ❌ **Production**: No fallback, throws error if credentials missing
+
+### Client-Side vs Server-Side Resolution
+
+**Server-Side** (`getNetatmoCredentials()`):
+- Uses `isDevelopment()` from `environmentHelper.js`
+- Checks `process.env.NODE_ENV === 'development'`
+- Used in API routes, server components, token helpers
+
+**Client-Side** (`getNetatmoCredentialsClient()`):
+- Uses `window.location.hostname === 'localhost'`
+- Used in browser context where `process.env` not available
+- Used in React components for OAuth redirects
+
+### Environment Variables
+
+```env
+# Development (localhost): values from .env.local)
+NEXT_PUBLIC_NETATMO_CLIENT_ID_DEV=your-dev-client-id
+NETATMO_CLIENT_SECRET_DEV=your-dev-client-secret
+NEXT_PUBLIC_NETATMO_REDIRECT_URI_DEV=http://localhost:3001/api/netatmo/callback
+
+# Production credentials (add to Vercel Environment Variables)
+NEXT_PUBLIC_NETATMO_CLIENT_ID=your-prod-client-id
+NETATMO_CLIENT_SECRET=your-prod-client-secret
+NEXT_PUBLIC_NETATMO_REDIRECT_URI=https://your-app.vercel.app/api/netatmo/callback
+```
+
+### Usage Examples
+
+**API Route** (OAuth callback):
+```javascript
+import { getNetatmoCredentials } from '@/lib/netatmoCredentials';
+
+export async function GET(request) {
+  const credentials = getNetatmoCredentials();
+
+  const res = await fetch('https://api.netatmo.com/oauth2/token', {
+    method: 'POST',
+    body: new URLSearchParams({
+      grant_type: 'authorization_code',
+      client_id: credentials.clientId,
+      client_secret: credentials.clientSecret,
+      code,
+      redirect_uri: credentials.redirectUri,
+    }),
+  });
+
+  // ...
+}
+```
+
+**Client Component** (OAuth redirect):
+```javascript
+'use client';
+import { getNetatmoCredentialsClient } from '@/lib/netatmoCredentials';
+
+export default function NetatmoAuthCard() {
+  const handleConnect = () => {
+    const credentials = getNetatmoCredentialsClient();
+    const authUrl = `https://api.netatmo.com/oauth2/authorize?client_id=${credentials.clientId}&redirect_uri=${encodeURIComponent(credentials.redirectUri)}...`;
+    window.location.href = authUrl;
+  };
+
+  // ...
+}
+```
+
+**Token Helper**:
+```javascript
+import { getNetatmoCredentials } from '@/lib/netatmoCredentials';
+
+export async function getValidAccessToken() {
+  const credentials = getNetatmoCredentials();
+
+  const response = await fetch('https://api.netatmo.com/oauth2/token', {
+    method: 'POST',
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+      client_id: credentials.clientId,
+      client_secret: credentials.clientSecret,
+    }),
+  });
+
+  // ...
+}
+```
+
+### Error Handling
+
+```javascript
+try {
+  const credentials = getNetatmoCredentials();
+} catch (error) {
+  // Possible errors:
+  // - "Missing NEXT_PUBLIC_NETATMO_CLIENT_ID_DEV" (development)
+  // - "Missing NEXT_PUBLIC_NETATMO_CLIENT_ID" (production)
+  // - "Missing NETATMO_CLIENT_SECRET" (any environment)
+  // - "Missing NEXT_PUBLIC_NETATMO_REDIRECT_URI" (any environment)
+
+  console.error('Netatmo credentials error:', error.message);
+}
+```
+
+### Troubleshooting
+
+**Warning: "Development credentials not found"**
+- System falling back to production credentials on localhost
+- Action: Add `_DEV` credentials to `.env.local` for proper dev/prod separation
+
+**Error: "Missing NETATMO_CLIENT_ID"**
+- Production deployment missing credentials
+- Action: Add credentials to Vercel Environment Variables
+
+**OAuth redirect uses wrong credentials**
+- Check browser network tab: OAuth URL should show correct `client_id`
+- Development: Should use `_DEV` client_id
+- Production: Should use base client_id (no `_DEV` suffix)
+
+**For complete setup guide**, see [docs/setup/netatmo-setup.md](./setup/netatmo-setup.md).
+
+---
+
 ## See Also
 
 - [Architecture](./architecture.md) - Multi-device architecture

@@ -1,19 +1,19 @@
 'use client';
 
 import { Card, Button } from '@/app/components/ui';
+import { getNetatmoCredentialsClient } from '@/lib/netatmoCredentials';
 
 export default function NetatmoAuthCard() {
   const handleConnect = () => {
-    const clientId = process.env.NEXT_PUBLIC_NETATMO_CLIENT_ID;
-    const redirectUri = process.env.NEXT_PUBLIC_NETATMO_REDIRECT_URI;
+    const credentials = getNetatmoCredentialsClient();
     const scope = 'read_thermostat write_thermostat';
 
-    if (!clientId || !redirectUri) {
+    if (!credentials.clientId || !credentials.redirectUri) {
       alert('Configurazione Netatmo mancante. Verifica le variabili d\'ambiente.');
       return;
     }
 
-    const authUrl = `https://api.netatmo.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&state=random_state`;
+    const authUrl = `https://api.netatmo.com/oauth2/authorize?client_id=${credentials.clientId}&redirect_uri=${encodeURIComponent(credentials.redirectUri)}&scope=${encodeURIComponent(scope)}&state=random_state`;
 
     window.location.href = authUrl;
   };

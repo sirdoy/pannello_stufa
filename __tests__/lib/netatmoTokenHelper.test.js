@@ -26,14 +26,21 @@ jest.mock('@/lib/environmentHelper', () => ({
   getEnvironmentPath: (path) => `dev/${path}`,
 }));
 
+// Mock netatmo credentials resolver
+jest.mock('@/lib/netatmoCredentials', () => ({
+  getNetatmoCredentials: jest.fn(() => ({
+    clientId: 'test-client-id',
+    clientSecret: 'test-client-secret',
+    redirectUri: 'http://localhost:3001/api/netatmo/callback',
+  })),
+}));
+
 // Mock fetch
 global.fetch = jest.fn();
 
 describe('netatmoTokenHelper', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.NETATMO_CLIENT_ID = 'test-client-id';
-    process.env.NETATMO_CLIENT_SECRET = 'test-client-secret';
   });
 
   describe('getValidAccessToken', () => {

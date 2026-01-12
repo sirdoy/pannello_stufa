@@ -17,6 +17,8 @@ export default function LightsCard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [connected, setConnected] = useState(false);
+  const [connectionMode, setConnectionMode] = useState(null); // 'local' | 'remote' | 'hybrid' | 'disconnected'
+  const [remoteConnected, setRemoteConnected] = useState(false);
   const [rooms, setRooms] = useState([]);
   const [lights, setLights] = useState([]);
   const [scenes, setScenes] = useState([]);
@@ -100,12 +102,18 @@ export default function LightsCard() {
 
       if (data.connected) {
         setConnected(true);
+        setConnectionMode(data.connection_mode || 'local');
+        setRemoteConnected(data.remote_connected || false);
       } else {
         setConnected(false);
+        setConnectionMode('disconnected');
+        setRemoteConnected(false);
       }
     } catch (err) {
       console.error('Errore connessione Hue:', err);
       setConnected(false);
+      setConnectionMode('disconnected');
+      setRemoteConnected(false);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -223,14 +231,44 @@ export default function LightsCard() {
     }
   }
 
-  // FUTURE: Remote API support (OAuth flow)
-  // const handleAuth = () => {
-  //   const clientId = process.env.NEXT_PUBLIC_HUE_CLIENT_ID;
-  //   const redirectUri = process.env.NEXT_PUBLIC_HUE_REDIRECT_URI;
-  //   const state = Math.random().toString(36).substring(7);
-  //   const scope = 'lights scenes groups devices bridge';
-  //   window.location.href = `https://api.meethue.com/v2/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&state=${state}&scope=${encodeURIComponent(scope)}`;
-  // };
+  /**
+   * Remote API OAuth Flow
+   * Redirects to /api/hue/remote/authorize which handles OAuth
+   */
+  function handleRemoteAuth() {
+    setPairingError(null);
+    setError(null);
+    // Redirect to our authorize endpoint (it will handle OAuth redirect to Philips)
+    window.location.href = '/api/hue/remote/authorize';
+  }
+
+  /**
+   * Disconnect remote access
+   */
+  async function handleDisconnectRemote() {
+    try {
+      setRefreshing(true);
+      setError(null);
+
+      const response = await fetch('/api/hue/remote/disconnect', {
+        method: 'POST',
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      // Refresh connection status
+      await checkConnection();
+    } catch (err) {
+      console.error('Disconnect error:', err);
+      setError(err.message);
+    } finally {
+      setRefreshing(false);
+    }
+  }
 
   /**
    * Local API Pairing Flow
@@ -251,7 +289,9 @@ export default function LightsCard() {
       }
 
       if (!data.bridges || data.bridges.length === 0) {
-        throw new Error('Nessun bridge Hue trovato sulla rete. Assicurati che il bridge sia acceso e collegato alla stessa rete Wi-Fi.');
+        // No local bridges found - offer remote option
+        setPairingStep('noLocalBridge');
+        return;
       }
 
       setDiscoveredBridges(data.bridges);
@@ -368,6 +408,20 @@ export default function LightsCard() {
   // Build props for DeviceCard
   const banners = [];
 
+  // No local bridge found - offer remote option
+  if (pairing && pairingStep === 'noLocalBridge') {
+    banners.push({
+      variant: 'info',
+      icon: '☁️',
+      title: 'Bridge non trovato sulla rete locale',
+      description: 'Sei da remoto o il bridge non è sulla stessa rete Wi-Fi. Puoi connetterti via cloud con Philips Hue Remote API.',
+      actions: [
+        { label: '☁️ Connetti via Cloud', onClick: handleRemoteAuth, variant: 'primary' },
+        { label: 'Annulla', onClick: handleCancelPairing }
+      ]
+    });
+  }
+
   // Connection error
   if (error) {
     banners.push({
@@ -442,6 +496,27 @@ export default function LightsCard() {
     onClick: () => router.push('/lights')
   }] : [];
 
+  // Connection mode badge
+  const getConnectionModeBadge = () => {
+    if (!connected || !connectionMode) return null;
+
+    const badges = {
+      'local': { icon: '📡', text: 'Local', color: 'text-success-600 dark:text-success-400' },
+      'remote': { icon: '☁️', text: 'Cloud', color: 'text-info-600 dark:text-info-400' },
+      'hybrid': { icon: '🔄', text: 'Hybrid', color: 'text-warning-600 dark:text-warning-400' },
+    };
+
+    const badge = badges[connectionMode];
+    if (!badge) return null;
+
+    return (
+      <div className="flex items-center gap-1.5 text-xs font-semibold">
+        <span>{badge.icon}</span>
+        <span className={badge.color}>{badge.text}</span>
+      </div>
+    );
+  };
+
   const isRoomOn = selectedRoom?.services?.some(s => {
     const light = lights.find(l => l.id === s.rid);
     return light?.on?.on;
@@ -468,6 +543,13 @@ export default function LightsCard() {
       infoBoxesTitle="Informazioni"
       footerActions={footerActions}
     >
+      {/* Connection Mode Badge */}
+      {getConnectionModeBadge() && (
+        <div className="mb-4 flex items-center justify-center">
+          {getConnectionModeBadge()}
+        </div>
+      )}
+
       {/* Room Selection */}
       <RoomSelector
         rooms={rooms.map(room => ({

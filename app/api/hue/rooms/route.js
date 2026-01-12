@@ -42,6 +42,16 @@ export const GET = auth0.withApiAuthRequired(async function handler(request) {
 
   } catch (error) {
     console.error('❌ Hue rooms fetch error:', error);
+
+    // Handle network timeout (not on local network)
+    if (error.message === 'NETWORK_TIMEOUT') {
+      return NextResponse.json({
+        error: 'NOT_ON_LOCAL_NETWORK',
+        message: 'Bridge Hue non raggiungibile. Assicurati di essere sulla stessa rete locale del bridge.',
+        reconnect: false,
+      }, { status: 503 });
+    }
+
     return NextResponse.json(
       { error: error.message },
       { status: 500 }

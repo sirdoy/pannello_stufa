@@ -5,6 +5,126 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.40.1] - 2026-01-09
+
+### 🎨 UI/UX - Remote Authentication Flow
+
+#### Modificato
+
+**LightsCard Component:**
+- Aggiunto banner "Bridge non trovato" con opzione "☁️ Connetti via Cloud" quando il discovery locale fallisce (utenti da remoto)
+- Aggiunto connection mode badge visivo: 📡 Local, ☁️ Cloud, 🔄 Hybrid
+- Implementate funzioni `handleRemoteAuth()` e `handleDisconnectRemote()` per gestire OAuth flow
+- Migliore UX per utenti fuori dalla rete locale
+
+**OAuth Authorize Endpoint:**
+- Fix: costruzione dinamica del `redirect_uri` basata sull'URL della richiesta (supporta sia dev che production)
+- Migliore portabilità tra ambienti
+
+## [1.40.0] - 2026-01-09
+
+### ✨ Feature - Philips Hue Remote API (Cloud Access)
+
+#### Nuovo
+
+Implementato supporto completo per **Philips Hue Remote API** con OAuth 2.0, permettendo il controllo delle luci da remoto (fuori dalla rete locale).
+
+**Architettura Strategy Pattern:**
+- ✅ Priorità automatica: Local API (veloce, stessa rete) → Remote API (cloud, ovunque)
+- ✅ Connection modes: `local`, `remote`, `hybrid` (rilevamento automatico)
+- ✅ Fallback trasparente: se bridge locale non raggiungibile → usa Remote API
+- ✅ Zero breaking changes: utenti solo-locale non impattati
+
+**OAuth 2.0 Flow:**
+- `GET /api/hue/remote/authorize` - Inizia OAuth (redirect a Philips)
+- `GET /api/hue/remote/callback` - Callback OAuth (code → tokens)
+- `POST /api/hue/remote/disconnect` - Rimuove accesso remoto
+- CSRF protection (state validation, 10-min expiration)
+
+**Token Management (Automatico):**
+- Access token: 7 giorni (auto-refresh ad ogni chiamata API)
+- Refresh token: 112 giorni (estende validità ad ogni refresh)
+- Storage: Firebase (secure, Admin SDK only)
+- Pattern: riutilizzato da Netatmo OAuth (lib/netatmo/netatmoTokenHelper.js)
+
+**Nuovi File:**
+- `lib/hue/hueRemoteTokenHelper.js` - Gestione token OAuth (refresh automatico)
+- `lib/hue/hueRemoteApi.js` - Client Remote API (normalizzazione v1→v2)
+- `lib/hue/hueConnectionStrategy.js` - Strategy pattern (local/remote fallback)
+- `app/api/hue/remote/authorize/route.js` - Inizia OAuth
+- `app/api/hue/remote/callback/route.js` - Callback OAuth
+- `app/api/hue/remote/disconnect/route.js` - Disconnetti remote
+- `lib/hue/__tests__/hueRemoteTokenHelper.test.js` - Unit tests token helper
+
+**File Modificati:**
+- `lib/hue/hueLocalHelper.js` - Funzioni connection mode, remote token check
+- `app/api/hue/status/route.js` - Nuovo: `connection_mode`, `local_connected`, `remote_connected`
+- `app/api/hue/lights/route.js` - Esempio strategy pattern (altri route da aggiornare)
+- `.env.example` - Variabili OAuth: `NEXT_PUBLIC_HUE_APP_ID`, `NEXT_PUBLIC_HUE_CLIENT_ID`, `HUE_CLIENT_SECRET`
+
+**Performance:**
+- Local API: 50-200ms latency (priorità)
+- Remote API: 300-1000ms latency (cloud proxy)
+- Strategy overhead: <2.1s worst case (cached dopo primo check)
+
+**Documentazione:**
+- `ResearchPack_HueRemoteAPI.md` - Research completa OAuth 2.0
+- `ImplementationPlan_HueRemoteAPI.md` - Piano implementazione dettagliato
+- `IMPLEMENTATION_COMPLETE_HueRemoteAPI.md` - Summary + lavoro rimanente
+
+#### Note Tecniche
+
+**Setup Richiesto:**
+1. Registra app su https://developers.meethue.com/my-apps/
+2. Aggiungi credenziali OAuth a `.env.local`
+3. Callback URL: `http://localhost:3000/api/hue/remote/callback` (dev) o `https://tuodominio.com/api/hue/remote/callback` (prod)
+
+**Limitazioni Note:**
+- Scene creation: Remote API non completamente implementata (richiede local pairing iniziale)
+- Rate limits: 1000 req/day, 10/sec burst (no tracking built-in)
+- Bridge username: richiede pairing locale iniziale (non può essere skippato)
+
+**Backward Compatibility:**
+- ✅ Nessun breaking change
+- ✅ Utenti solo-locale: zero impatto (Remote API completamente opzionale)
+- ✅ Strategy pattern trasparente alle chiamate API
+
+## [1.39.1] - 2026-01-09
+
+### 🐛 Fix - Philips Hue Network Timeout Handling
+
+#### Risolto
+
+Gestione corretta dell'errore `NETWORK_TIMEOUT` quando l'hub Hue non è raggiungibile (es. utente fuori dalla rete locale).
+
+**Endpoints Corretti:**
+- `GET /api/hue/scenes` - Fetch scene
+- `PUT /api/hue/scenes/[id]/activate` - Attivazione scene
+- `POST /api/hue/scenes/create` - Creazione scene
+- `PUT /api/hue/scenes/[id]` - Modifica scene
+- `DELETE /api/hue/scenes/[id]` - Eliminazione scene
+- `GET /api/hue/lights` - Fetch luci
+- `GET /api/hue/lights/[id]` - Fetch singola luce
+- `PUT /api/hue/lights/[id]` - Controllo luce
+- `GET /api/hue/rooms/[id]` - Fetch stanza
+- `PUT /api/hue/rooms/[id]` - Controllo stanza
+
+**Comportamento:**
+- Prima: Errore generico 500 con messaggio `NETWORK_TIMEOUT`
+- Dopo: Risposta strutturata 503 con:
+  ```json
+  {
+    "error": "NOT_ON_LOCAL_NETWORK",
+    "message": "Bridge Hue non raggiungibile. Assicurati di essere sulla stessa rete locale del bridge.",
+    "reconnect": false
+  }
+  ```
+
+**Note Tecniche:**
+- Pattern già implementato in `/api/hue/rooms` ora esteso a tutti gli endpoints Hue
+- Status code 503 (Service Unavailable) invece di 500 per indicare problema temporaneo di rete
+- Flag `reconnect: false` previene tentativi automatici di riconnessione (problema di rete, non di autenticazione)
+
 ## [1.39.0] - 2026-01-04
 
 ### ✨ Feature - Gestione Completa Scene Philips Hue

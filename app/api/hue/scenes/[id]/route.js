@@ -112,6 +112,16 @@ export const PUT = auth0.withApiAuthRequired(async function handler(request, { p
 
   } catch (error) {
     console.error('❌ Scene update error:', error);
+
+    // Handle network timeout (not on local network)
+    if (error.message === 'NETWORK_TIMEOUT') {
+      return NextResponse.json({
+        error: 'NOT_ON_LOCAL_NETWORK',
+        message: 'Bridge Hue non raggiungibile. Assicurati di essere sulla stessa rete locale del bridge.',
+        reconnect: false,
+      }, { status: 503 });
+    }
+
     return NextResponse.json(
       { error: error.message || 'Impossibile aggiornare la scena' },
       { status: 500 }
@@ -165,6 +175,16 @@ export const DELETE = auth0.withApiAuthRequired(async function handler(request, 
 
   } catch (error) {
     console.error('❌ Scene deletion error:', error);
+
+    // Handle network timeout (not on local network)
+    if (error.message === 'NETWORK_TIMEOUT') {
+      return NextResponse.json({
+        error: 'NOT_ON_LOCAL_NETWORK',
+        message: 'Bridge Hue non raggiungibile. Assicurati di essere sulla stessa rete locale del bridge.',
+        reconnect: false,
+      }, { status: 503 });
+    }
+
     return NextResponse.json(
       { error: error.message || 'Impossibile eliminare la scena' },
       { status: 500 }

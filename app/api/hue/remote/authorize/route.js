@@ -4,18 +4,17 @@
  */
 
 import { NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0';
 import { ref, set } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
-import crypto from 'crypto';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
   try {
     // Check Auth0 authentication
-    const session = await getSession(request);
+    const session = await auth0.getSession();
     if (!session?.user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -23,8 +22,11 @@ export async function GET(request) {
       );
     }
 
-    // Generate random state for CSRF protection
-    const state = crypto.randomBytes(32).toString('hex');
+    // Generate random state for CSRF protection (Web Crypto API)
+    const state = Array.from(
+      globalThis.crypto.getRandomValues(new Uint8Array(32)),
+      (byte) => byte.toString(16).padStart(2, '0')
+    ).join('');
 
     // Save state to Firebase for validation in callback
     const stateRef = ref(db, getEnvironmentPath(`hue_oauth_state/${session.user.sub}`));

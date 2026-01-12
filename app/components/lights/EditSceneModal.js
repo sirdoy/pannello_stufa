@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Button from '../ui/Button';
 import ActionButton from '../ui/ActionButton';
 import Card from '../ui/Card';
@@ -45,16 +45,7 @@ export default function EditSceneModal({
   }, [isOpen, scene]);
 
   // Fetch lights when room is available
-  useEffect(() => {
-    if (selectedRoom) {
-      fetchRoomLights(selectedRoom);
-    } else {
-      setLights([]);
-      setLightConfigs({});
-    }
-  }, [selectedRoom]);
-
-  async function fetchRoomLights(roomId) {
+  const fetchRoomLights = useCallback(async (roomId) => {
     try {
       setLoadingLights(true);
       setError('');
@@ -95,7 +86,16 @@ export default function EditSceneModal({
     } finally {
       setLoadingLights(false);
     }
-  }
+  }, [rooms]);
+
+  useEffect(() => {
+    if (selectedRoom) {
+      fetchRoomLights(selectedRoom);
+    } else {
+      setLights([]);
+      setLightConfigs({});
+    }
+  }, [selectedRoom, fetchRoomLights]);
 
   function handleLightToggle(lightId) {
     setLightConfigs(prev => ({

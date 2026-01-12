@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, Button, Skeleton, EmptyState, Heading, Text, Banner } from '@/app/components/ui';
 import CreateSceneModal from '@/app/components/lights/CreateSceneModal';
@@ -31,37 +31,7 @@ export default function ScenesPage() {
 
   const connectionCheckedRef = useRef(false);
 
-  // Check connection on mount
-  useEffect(() => {
-    if (connectionCheckedRef.current) return;
-    connectionCheckedRef.current = true;
-    checkConnection();
-  }, []);
-
-  async function checkConnection() {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch('/api/hue/status');
-      const data = await response.json();
-
-      if (data.connected) {
-        setConnected(true);
-        await fetchData();
-      } else {
-        setConnected(false);
-      }
-    } catch (err) {
-      console.error('Errore connessione Hue:', err);
-      setConnected(false);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function fetchData() {
+  const fetchData = useCallback(async () => {
     try {
       setError(null);
 
@@ -89,7 +59,37 @@ export default function ScenesPage() {
       console.error('Errore fetch scene Hue:', err);
       setError(err.message);
     }
-  }
+  }, []);
+
+  const checkConnection = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch('/api/hue/status');
+      const data = await response.json();
+
+      if (data.connected) {
+        setConnected(true);
+        await fetchData();
+      } else {
+        setConnected(false);
+      }
+    } catch (err) {
+      console.error('Errore connessione Hue:', err);
+      setConnected(false);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchData]);
+
+  // Check connection on mount
+  useEffect(() => {
+    if (connectionCheckedRef.current) return;
+    connectionCheckedRef.current = true;
+    checkConnection();
+  }, [checkConnection]);
 
   async function handleActivateScene(sceneId, sceneName) {
     try {

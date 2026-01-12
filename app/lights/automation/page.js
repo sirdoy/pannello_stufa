@@ -132,7 +132,7 @@ export default function AutomationPage() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-success-500 font-bold">✓</span>
-                <span>Attivazione rapida delle scene create nell'app Philips Hue</span>
+                <span>Attivazione rapida delle scene create nell&apos;app Philips Hue</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-success-500 font-bold">✓</span>
@@ -140,7 +140,7 @@ export default function AutomationPage() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-warning-500 font-bold">⏳</span>
-                <span>Usa l'app ufficiale Philips Hue per automazioni avanzate temporanee</span>
+                <span>Usa l&apos;app ufficiale Philips Hue per automazioni avanzate temporanee</span>
               </li>
             </ul>
           </div>

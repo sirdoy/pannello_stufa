@@ -5,6 +5,37 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.40.2] - 2026-01-12
+
+### 🔧 Fixes - Build Compatibility
+
+#### Risolto
+
+**Auth0 v4 API Compatibility:**
+- Sostituito `getSession` deprecato con `auth0.getSession()` in 3 file Hue Remote OAuth
+- File interessati: `authorize/route.js`, `callback/route.js`, `disconnect/route.js`
+- Fix necessario per compatibilità con @auth0/nextjs-auth0 v4
+
+**Edge Runtime Compatibility:**
+- Rimosso `crypto` Node.js module incompatibile con Edge Runtime
+- Implementato Web Crypto API (`globalThis.crypto.getRandomValues()`) per generazione state CSRF
+- File: `api/hue/remote/authorize/route.js`
+
+**ESLint Warnings:**
+- Aggiunto `useCallback` per funzioni nelle dipendenze di `useEffect`
+- File: `CreateSceneModal.js`, `EditSceneModal.js`, `lights/scenes/page.js`
+- Risolti 3 warning: "React Hook useEffect has a missing dependency"
+
+**HTML Entities:**
+- Escapati apostrofi con `&apos;` in JSX
+- File: `lights/automation/page.js`
+- Fix ESLint: `react/no-unescaped-entities`
+
+**Build Status:**
+- ✅ Build passa senza errori
+- ✅ Zero warnings ESLint
+- ✅ Compatibilità Next.js 15 + Auth0 v4
+
 ## [1.40.1] - 2026-01-09
 
 ### 🎨 UI/UX - Remote Authentication Flow

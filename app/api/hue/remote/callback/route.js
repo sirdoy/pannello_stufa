@@ -4,7 +4,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0';
 import { ref, get, remove } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
@@ -20,7 +20,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request) {
   try {
     // Check Auth0 authentication
-    const session = await getSession(request);
+    const session = await auth0.getSession();
     if (!session?.user) {
       return NextResponse.redirect(new URL('/?error=unauthorized', request.url));
     }

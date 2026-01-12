@@ -4,7 +4,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0';
 import { clearRemoteTokens } from '@/lib/hue/hueRemoteTokenHelper';
 import { getHueConnection } from '@/lib/hue/hueLocalHelper';
 
@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request) {
   try {
     // Check Auth0 authentication
-    const session = await getSession(request);
+    const session = await auth0.getSession();
     if (!session?.user) {
       return NextResponse.json(
         { error: 'Unauthorized' },

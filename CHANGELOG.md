@@ -5,6 +5,55 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.42.0] - 2026-01-13
+
+### 🎯 Nuove Feature - Water Temperature & Debug Console
+
+#### Aggiunti
+
+**API Routes - Water Temperature (Boiler/Hydronic Stoves):**
+- Nuova route `getActualWaterTemperature` - lettura temperatura acqua attuale
+- Nuova route `getWaterSetTemperature` - lettura setpoint temperatura acqua
+- Nuova route `setWaterTemperature` - impostazione setpoint temperatura (30-80°C)
+- Supporto per stufe con scambiatore termico/boiler integrato
+
+**stoveApi - Water Temperature Functions:**
+- Funzione `getActualWaterTemperature()` - recupera temperatura acqua reale
+- Funzione `getWaterSetTemperature()` - recupera setpoint temperatura acqua
+- Funzione `setWaterTemperature(temp)` - imposta setpoint con validazione range
+- Endpoint aggiunti a `STUFA_API` object per consistenza
+
+**Debug Console - Thermorossi API Testing:**
+- Nuova pagina `/debug/stove` per testare chiamate API in tempo reale
+- Menu settings "Debug Stufa" (`STOVE_DEBUG`) per accesso rapido
+- Console interattiva per sviluppatori e diagnostica
+
+#### File Aggiunti
+
+- `app/api/stove/getActualWaterTemperature/route.js` - API route temperatura acqua attuale
+- `app/api/stove/getWaterSetTemperature/route.js` - API route setpoint temperatura acqua
+- `app/api/stove/setWaterTemperature/route.js` - API route impostazione setpoint
+- `app/debug/stove/page.js` - Console debug API Thermorossi
+
+#### File Modificati
+
+- `lib/stoveApi.js` - Aggiunte 3 nuove funzioni per temperatura acqua + documentazione
+- `lib/devices/deviceTypes.js` - Aggiunto menu `STOVE_DEBUG` in `SETTINGS_MENU`
+
+#### Dettagli Tecnici
+
+**Water Temperature API:**
+- Range validazione: 30-80°C (protezione hardware)
+- Retry automatico per chiamate API (fetchWithRetry)
+- No sandbox mode (feature specifica per stufe idroniche)
+- Errori con HTTP status code appropriati
+
+**Debug Console:**
+- Testing completo di tutti gli endpoint API Thermorossi
+- Visualizzazione risposte JSON in tempo reale
+- Accessibile da Settings → Debug Stufa
+- Utile per diagnostica e sviluppo
+
 ## [1.41.1] - 2026-01-13
 
 ### 🐛 Bug Fix - UI Improvements

@@ -5,6 +5,50 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.41.1] - 2026-01-13
+
+### 🐛 Bug Fix - UI Improvements
+
+#### Corretti
+
+**StoveCard - Button Colors:**
+- Bottone ACCENDI sempre verde (`variant="success"`) indipendentemente dallo stato
+- Bottone SPEGNI sempre grigio/blu (`variant="outline"`) indipendentemente dallo stato
+- Prima i colori cambiavano in base allo stato, ora riflettono sempre l'azione
+
+**MaintenanceBar - Dark Mode:**
+- Corretti colori testo per dark mode (titolo, descrizione, toggle)
+- Testo "Manutenzione" → `dark:text-white`
+- Info ore → `dark:text-neutral-300`
+- Toggle button → `dark:text-neutral-400` + `dark:hover:text-neutral-200`
+- Progress bar background → `dark:bg-neutral-700`
+- Testi espansi → `dark:text-neutral-300`
+
+**MaintenanceBar - Component Refactoring:**
+- Usato componente `Text` al posto di `<span>` custom
+- Usato `StatusBadge variant="inline"` per badge percentuale
+- Badge con icone dinamiche: 🚨 (100%), ⚠️ (80%), ⏰ (60%), ✓ (<60%)
+- Colori badge da funzione: `danger`, `warning`, `success`
+
+**ThermostatCard - Temperature Controls:**
+- Rimossi icone duplicate dai bottoni +/- temperatura
+- Prima: `icon="➖"` + testo `-0.5°` (duplicato)
+- Dopo: solo testo `− 0.5°` e `+ 0.5°`
+- Usato carattere minus (−) per tipografia corretta
+
+**Home Page - Grid Layout:**
+- Griglia dispositivi max 2 colonne su tutti gli schermi desktop
+- Aggiunto `wide: 2` al componente Grid
+- Prima: 4 colonne su schermi xl (default Grid)
+- Dopo: max 2 colonne anche su monitor grandi
+
+#### File Modificati
+
+- `app/components/devices/stove/StoveCard.js` - Colori bottoni ACCENDI/SPEGNI
+- `app/components/MaintenanceBar.js` - Dark mode + refactor componenti base
+- `app/components/devices/thermostat/ThermostatCard.js` - Icone duplicate bottoni temperatura
+- `app/page.js` - Grid layout max 2 colonne
+
 ## [1.41.0] - 2026-01-12
 
 ### ✨ Feature - Dual Netatmo OAuth Credentials

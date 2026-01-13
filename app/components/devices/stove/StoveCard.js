@@ -868,7 +868,7 @@ export default function StoveCard() {
             <div className="grid grid-cols-2 gap-4 mb-6">
               <Button
                 liquid
-                variant={isAccesa ? "success" : "outline"}
+                variant="success"
                 size="lg"
                 icon="🔥"
                 onClick={handleIgnite}
@@ -879,7 +879,7 @@ export default function StoveCard() {
               </Button>
               <Button
                 liquid
-                variant={isSpenta ? "outline" : "danger"}
+                variant="outline"
                 size="lg"
                 icon="❄️"
                 onClick={handleShutdown}

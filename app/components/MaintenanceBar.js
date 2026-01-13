@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import styles from './MaintenanceBar.module.css';
 import { formatHoursToHHMM } from '@/lib/formatUtils';
+import { Text, StatusBadge } from './ui';
 
 export default function MaintenanceBar({ maintenanceStatus }) {
   // Auto-expand quando ≥80% o user preference da localStorage
@@ -67,10 +68,17 @@ export default function MaintenanceBar({ maintenanceStatus }) {
   };
 
   const getBadgeColor = () => {
-    if (percentage >= 100) return 'bg-danger-100 border-danger-300 text-danger-700';
-    if (percentage >= 80) return 'bg-orange-100 border-orange-300 text-orange-700';
-    if (percentage >= 60) return 'bg-yellow-100 border-yellow-300 text-yellow-700';
-    return 'bg-success-100 border-success-300 text-success-700';
+    if (percentage >= 100) return 'danger';
+    if (percentage >= 80) return 'warning';
+    if (percentage >= 60) return 'warning';
+    return 'success';
+  };
+
+  const getBadgeIcon = () => {
+    if (percentage >= 100) return '🚨';
+    if (percentage >= 80) return '⚠️';
+    if (percentage >= 60) return '⏰';
+    return '✓';
   };
 
   return (
@@ -79,26 +87,30 @@ export default function MaintenanceBar({ maintenanceStatus }) {
       <div className="flex items-center justify-between p-4 cursor-pointer relative z-10" onClick={toggleExpanded}>
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <span className="text-lg flex-shrink-0">🔧</span>
-          <span className="font-medium text-neutral-800 flex-shrink-0">Manutenzione</span>
+          <Text variant="body" className="font-medium flex-shrink-0">Manutenzione</Text>
 
           {/* Badge percentuale - nascosto quando espanso */}
           {!isExpanded && (
-            <span className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${getBadgeColor()} flex-shrink-0`}>
-              {percentage.toFixed(0)}%
-            </span>
+            <StatusBadge
+              variant="inline"
+              color={getBadgeColor()}
+              icon={getBadgeIcon()}
+              text={`${percentage.toFixed(0)}%`}
+              className="flex-shrink-0"
+            />
           )}
 
           {/* Info ore compatta - nascosta su mobile e quando espanso */}
           {!isExpanded && (
-            <span className="text-xs text-neutral-600 truncate hidden sm:inline">
+            <Text variant="tertiary" className="truncate hidden sm:inline">
               {formatHoursToHHMM(currentHours)} / {formatHoursToHHMM(targetHours)}
-            </span>
+            </Text>
           )}
         </div>
 
         {/* Toggle button */}
         <button
-          className="flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-700 transition-colors flex-shrink-0"
+          className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors flex-shrink-0"
           onClick={toggleExpanded}
         >
           <span className="hidden sm:inline">
@@ -114,7 +126,7 @@ export default function MaintenanceBar({ maintenanceStatus }) {
       <div className={`${styles.collapseContent} ${isExpanded ? styles.expanded : ''}`}>
         <div className="px-4 pb-4 space-y-3">
           {/* Progress Bar */}
-          <div className="relative w-full h-3 bg-neutral-200 rounded-full overflow-hidden">
+          <div className="relative w-full h-3 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
             <div
               className={`h-full ${getBarColor()} transition-all duration-500 ease-out`}
               style={{ width: `${Math.min(100, percentage)}%` }}
@@ -128,11 +140,11 @@ export default function MaintenanceBar({ maintenanceStatus }) {
 
           {/* Info Text */}
           <div className="flex items-center justify-between">
-            <span className="text-xs text-neutral-600">
+            <Text variant="tertiary">
               {percentage >= 100
                 ? 'Pulizia richiesta!'
                 : `${formatHoursToHHMM(remainingHours)} rimanenti`}
-            </span>
+            </Text>
             <span className={`text-xs font-semibold ${getTextColor()}`}>
               {formatHoursToHHMM(currentHours)} / {formatHoursToHHMM(targetHours)}
             </span>

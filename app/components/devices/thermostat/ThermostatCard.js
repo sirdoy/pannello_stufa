@@ -350,12 +350,11 @@ export default function ThermostatCard() {
                         liquid
                         variant="outline"
                         size="lg"
-                        icon="➖"
                         onClick={() => handleTemperatureChange(selectedRoom.id, selectedRoom.setpoint - 0.5)}
                         disabled={refreshing}
                         className="flex-1 h-16 sm:h-18 text-lg font-bold"
                       >
-                        -0.5°
+                        − 0.5°
                       </Button>
                       <div className="flex flex-col items-center justify-center px-4">
                         <Text variant="tertiary" className="text-xs uppercase">Target</Text>
@@ -365,12 +364,11 @@ export default function ThermostatCard() {
                         liquid
                         variant="outline"
                         size="lg"
-                        icon="➕"
                         onClick={() => handleTemperatureChange(selectedRoom.id, selectedRoom.setpoint + 0.5)}
                         disabled={refreshing}
                         className="flex-1 h-16 sm:h-18 text-lg font-bold"
                       >
-                        +0.5°
+                        + 0.5°
                       </Button>
                     </div>
                   </div>

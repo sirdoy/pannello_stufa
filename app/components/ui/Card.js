@@ -31,23 +31,29 @@ export default function Card({
     floating: 'shadow-liquid-xl hover:shadow-[0_32px_80px_rgba(0,0,0,0.12)] transition-shadow duration-500',
   };
 
-  // Liquid glass style (iOS glassmorphism - migliorato con opacità maggiore)
-  // Note: overflow-hidden rimosso per permettere ai dropdown interni di fuoriuscire correttamente
+  // Enhanced iOS 18 Liquid Glass - Crystal Clear with Perfect Readability
+  // Multi-layer depth: base glass + vibrancy + gradient shine + inner glow
   const liquidClasses = `
-    bg-white/[0.12] dark:bg-white/[0.08]
-    backdrop-blur-2xl sm:backdrop-blur-3xl
-    backdrop-saturate-150 backdrop-contrast-105
+    bg-white/[0.15] dark:bg-white/[0.10]
+    backdrop-blur-3xl
+    backdrop-saturate-[1.8] backdrop-contrast-[1.1] backdrop-brightness-[1.05]
     ${elevationClasses[elevation]}
-    ring-1 ring-white/25 dark:ring-white/15 ring-inset
     relative
     will-change-[backdrop-filter]
     transform-gpu
-    before:absolute before:inset-0
+    isolation-isolate
+    before:absolute before:inset-0 before:rounded-[inherit]
     before:bg-gradient-to-br
-    before:from-white/[0.15] dark:before:from-white/[0.10]
-    before:via-white/[0.08] dark:before:via-white/[0.05]
+    before:from-white/[0.18] dark:before:from-white/[0.12]
+    before:via-white/[0.06] dark:before:via-white/[0.04]
     before:to-transparent
     before:pointer-events-none
+    before:z-[-1]
+    after:absolute after:inset-0 after:rounded-[inherit]
+    after:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),inset_0_-1px_0_0_rgba(0,0,0,0.05)]
+    dark:after:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),inset_0_-1px_0_0_rgba(0,0,0,0.2)]
+    after:pointer-events-none
+    after:z-[-1]
   `;
 
   // Glass style (glassmorphism classico)

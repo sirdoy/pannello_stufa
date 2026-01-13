@@ -31,15 +31,93 @@ export default function Button({
   className = '',
   ...props
 }) {
-  const baseClasses = 'font-semibold transition-all duration-200 flex items-center justify-center gap-2 rounded-3xl relative overflow-hidden transform-gpu will-change-transform';
+  const baseClasses = 'font-semibold transition-all duration-300 flex items-center justify-center gap-2 rounded-3xl relative overflow-hidden transform-gpu will-change-transform isolation-isolate';
 
-  // Liquid glass variants (iOS style) - WCAG AAA compliant - 5 core variants
+  // Enhanced iOS 18 Liquid Glass Variants - Crystal clarity with spring physics
   const liquidVariants = {
-    primary: 'bg-primary-500/15 dark:bg-primary-500/25 backdrop-blur-2xl text-primary-700 dark:text-primary-300 shadow-liquid-sm ring-1 ring-primary-500/25 dark:ring-primary-500/35 ring-inset hover:bg-primary-500/20 dark:hover:bg-primary-500/30 hover:shadow-liquid hover:scale-[1.02] active:scale-[0.97] before:absolute before:inset-0 before:bg-gradient-to-br before:from-primary-400/15 dark:before:from-primary-400/25 before:to-transparent before:pointer-events-none',
-    secondary: 'bg-neutral-500/15 dark:bg-neutral-400/15 backdrop-blur-2xl text-neutral-800 dark:text-neutral-200 shadow-liquid-sm ring-1 ring-neutral-400/25 dark:ring-neutral-500/25 ring-inset hover:bg-neutral-500/20 dark:hover:bg-neutral-400/20 hover:shadow-liquid hover:scale-[1.02] active:scale-[0.97] before:absolute before:inset-0 before:bg-gradient-to-br before:from-neutral-300/15 dark:before:from-neutral-400/15 before:to-transparent before:pointer-events-none',
-    success: 'bg-success-500/15 dark:bg-success-500/25 backdrop-blur-2xl text-success-800 dark:text-success-300 shadow-liquid-sm ring-1 ring-success-500/25 dark:ring-success-500/35 ring-inset hover:bg-success-500/20 dark:hover:bg-success-500/30 hover:shadow-liquid hover:scale-[1.02] active:scale-[0.97] before:absolute before:inset-0 before:bg-gradient-to-br before:from-success-400/15 dark:before:from-success-400/25 before:to-transparent before:pointer-events-none',
-    danger: 'bg-primary-500/15 dark:bg-primary-500/25 backdrop-blur-2xl text-primary-700 dark:text-primary-300 shadow-liquid-sm ring-1 ring-primary-500/25 dark:ring-primary-500/35 ring-inset hover:bg-primary-500/20 dark:hover:bg-primary-500/30 hover:shadow-liquid hover:scale-[1.02] active:scale-[0.97] before:absolute before:inset-0 before:bg-gradient-to-br before:from-primary-400/15 dark:before:from-primary-400/25 before:to-transparent before:pointer-events-none',
-    ghost: 'bg-transparent backdrop-blur-sm text-neutral-800 dark:text-neutral-200 hover:bg-white/[0.12] dark:hover:bg-white/[0.08] hover:scale-[1.02] active:scale-[0.97]',
+    primary: `
+      bg-primary-500/[0.18] dark:bg-primary-500/[0.28]
+      backdrop-blur-3xl backdrop-saturate-[1.8] backdrop-brightness-[1.05]
+      text-primary-800 dark:text-primary-200
+      shadow-liquid-sm
+      hover:bg-primary-500/[0.25] dark:hover:bg-primary-500/[0.35]
+      hover:shadow-liquid
+      hover:backdrop-saturate-[2]
+      active:scale-[0.96]
+      transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+      before:absolute before:inset-0 before:rounded-[inherit]
+      before:bg-gradient-to-br before:from-primary-300/[0.2] dark:before:from-primary-400/[0.3]
+      before:via-primary-400/[0.08] dark:before:via-primary-500/[0.12]
+      before:to-transparent
+      before:pointer-events-none before:z-[-1]
+      after:absolute after:inset-0 after:rounded-[inherit]
+      after:shadow-[inset_0_1px_0_rgba(255,255,255,0.25),inset_0_-1px_0_rgba(0,0,0,0.08)]
+      dark:after:shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.25)]
+      after:pointer-events-none after:z-[-1]
+    `,
+    secondary: `
+      bg-neutral-400/[0.15] dark:bg-neutral-500/[0.18]
+      backdrop-blur-3xl backdrop-saturate-[1.8] backdrop-brightness-[1.05]
+      text-neutral-900 dark:text-neutral-100
+      shadow-liquid-sm
+      hover:bg-neutral-400/[0.22] dark:hover:bg-neutral-500/[0.25]
+      hover:shadow-liquid
+      active:scale-[0.96]
+      transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+      before:absolute before:inset-0 before:rounded-[inherit]
+      before:bg-gradient-to-br before:from-neutral-300/[0.18] dark:before:from-neutral-400/[0.2]
+      before:to-transparent
+      before:pointer-events-none before:z-[-1]
+      after:absolute after:inset-0 after:rounded-[inherit]
+      after:shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-1px_0_rgba(0,0,0,0.06)]
+      dark:after:shadow-[inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-1px_0_rgba(0,0,0,0.2)]
+      after:pointer-events-none after:z-[-1]
+    `,
+    success: `
+      bg-success-500/[0.18] dark:bg-success-500/[0.28]
+      backdrop-blur-3xl backdrop-saturate-[1.8] backdrop-brightness-[1.05]
+      text-success-900 dark:text-success-200
+      shadow-liquid-sm
+      hover:bg-success-500/[0.25] dark:hover:bg-success-500/[0.35]
+      hover:shadow-liquid
+      active:scale-[0.96]
+      transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+      before:absolute before:inset-0 before:rounded-[inherit]
+      before:bg-gradient-to-br before:from-success-300/[0.2] dark:before:from-success-400/[0.3]
+      before:to-transparent
+      before:pointer-events-none before:z-[-1]
+      after:absolute after:inset-0 after:rounded-[inherit]
+      after:shadow-[inset_0_1px_0_rgba(255,255,255,0.25),inset_0_-1px_0_rgba(0,0,0,0.08)]
+      dark:after:shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.25)]
+      after:pointer-events-none after:z-[-1]
+    `,
+    danger: `
+      bg-primary-500/[0.18] dark:bg-primary-500/[0.28]
+      backdrop-blur-3xl backdrop-saturate-[1.8] backdrop-brightness-[1.05]
+      text-primary-800 dark:text-primary-200
+      shadow-liquid-sm
+      hover:bg-primary-500/[0.25] dark:hover:bg-primary-500/[0.35]
+      hover:shadow-liquid
+      active:scale-[0.96]
+      transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+      before:absolute before:inset-0 before:rounded-[inherit]
+      before:bg-gradient-to-br before:from-primary-300/[0.2] dark:before:from-primary-400/[0.3]
+      before:to-transparent
+      before:pointer-events-none before:z-[-1]
+      after:absolute after:inset-0 after:rounded-[inherit]
+      after:shadow-[inset_0_1px_0_rgba(255,255,255,0.25),inset_0_-1px_0_rgba(0,0,0,0.08)]
+      dark:after:shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.25)]
+      after:pointer-events-none after:z-[-1]
+    `,
+    ghost: `
+      bg-transparent
+      backdrop-blur-xl
+      text-neutral-900 dark:text-neutral-100
+      hover:bg-white/[0.15] dark:hover:bg-white/[0.12]
+      hover:backdrop-blur-2xl
+      active:scale-[0.96]
+      transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+    `,
   };
 
   // Solid variants (tradizionali) - 5 core variants

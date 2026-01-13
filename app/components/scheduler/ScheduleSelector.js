@@ -51,11 +51,32 @@ export default function ScheduleSelector({
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Selector Button */}
+      {/* Selector Button - Enhanced iOS 18 Liquid Glass */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={loading}
-        className="w-full min-h-[56px] px-4 py-3 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-2xl rounded-2xl shadow-liquid-sm ring-1 ring-neutral-300/40 dark:ring-neutral-600/40 ring-inset hover:shadow-liquid hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 flex items-center justify-between gap-3"
+        className="
+          w-full min-h-[56px] px-4 py-3
+          bg-white/[0.12] dark:bg-white/[0.08]
+          backdrop-blur-3xl backdrop-saturate-[1.6] backdrop-brightness-[1.05]
+          rounded-2xl shadow-liquid-sm
+          isolation-isolate
+          hover:bg-white/[0.18] dark:hover:bg-white/[0.12]
+          hover:shadow-liquid
+          hover:scale-[1.01]
+          active:scale-[0.99]
+          transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+          flex items-center justify-between gap-3
+          relative
+          before:absolute before:inset-0 before:rounded-[inherit]
+          before:bg-gradient-to-br before:from-white/[0.15] dark:before:from-white/[0.10]
+          before:to-transparent
+          before:pointer-events-none before:z-[-1]
+          after:absolute after:inset-0 after:rounded-[inherit]
+          after:shadow-[inset_0_1px_0_rgba(255,255,255,0.2),inset_0_-1px_0_rgba(0,0,0,0.05)]
+          dark:after:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.15)]
+          after:pointer-events-none after:z-[-1]
+        "
       >
         {/* Left: Active Schedule Info */}
         <div className="flex items-center gap-3 flex-1 text-left">
@@ -81,9 +102,16 @@ export default function ScheduleSelector({
         </svg>
       </button>
 
-      {/* Dropdown Menu */}
+      {/* Dropdown Menu - Enhanced iOS 18 Liquid Glass */}
       {isOpen && (
-        <div className="absolute z-50 w-full mt-2 bg-white/95 dark:bg-neutral-800/95 backdrop-blur-2xl rounded-2xl shadow-liquid-lg ring-1 ring-neutral-300/40 dark:ring-neutral-600/40 overflow-hidden animate-scale-in origin-top">
+        <div className="
+          absolute z-50 w-full mt-2
+          bg-white/[0.15] dark:bg-white/[0.10]
+          backdrop-blur-4xl backdrop-saturate-[1.8] backdrop-brightness-[1.05]
+          rounded-2xl shadow-liquid-lg
+          isolation-isolate
+          overflow-hidden animate-scale-in origin-top
+        ">
           {!hasSchedules ? (
             /* No Schedules - Migration Required */
             <div className="p-4">

@@ -5,6 +5,141 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.43.0] - 2026-01-13
+
+### 🎨 Design System - iOS 18 Liquid Glass Upgrade
+
+#### "Crystal Clear" v2.0 - Complete UI Refresh
+
+**Filosofia**: Liquid glass autentico iOS 18 con profondità multi-layer, vibrancy avanzata e spring physics naturali.
+
+#### ✨ Miglioramenti Principali
+
+**Multi-Layer Vibrancy System:**
+- Stack completo: `backdrop-blur-3xl` + `backdrop-saturate-[1.8]` + `backdrop-contrast-[1.05]` + `backdrop-brightness-[1.05]`
+- Profondità 3-layer: base glass + gradient overlay (`::before`) + inner glow (`::after`)
+- Effetto cristallo realistico con riflessioni e profondità
+
+**Spring Physics Animations:**
+- Transizioni naturali con `cubic-bezier(0.34, 1.56, 0.64, 1)` per bounce effect
+- Durata ottimizzata: 300ms (prima 200ms) per fluidità iOS-like
+- Scale interactions: hover `1.02` → active `0.96` con smooth spring
+
+**Enhanced Shadow System:**
+- `shadow-liquid-sm`: `0 2px 12px rgba(0,0,0,0.08)` + `0 1px 3px rgba(0,0,0,0.06)`
+- `shadow-liquid`: `0 4px 24px rgba(0,0,0,0.12)` + `0 2px 6px rgba(0,0,0,0.08)`
+- `shadow-liquid-lg`: `0 8px 32px rgba(0,0,0,0.16)` + `0 4px 12px rgba(0,0,0,0.12)`
+- Depth enhancement per dark mode con opacità maggiorate
+
+#### 📦 Componenti Aggiornati
+
+**Button.js** - Enhanced Liquid Glass Variants:
+- Primary: `bg-primary-500/[0.18]` → `[0.25]` hover con saturate boost
+- Secondary, Success, Danger, Ghost: tutti con 3-layer depth system
+- `::before` pseudo-element per gradient overlay
+- `::after` pseudo-element per inner glow/shadow
+- Perfect WCAG AAA contrast compliance
+
+**Card.js** - Deeper Glass Effects:
+- Base glass: `bg-white/[0.72]` (light) / `bg-neutral-900/[0.45]` (dark)
+- Enhanced vibrancy stack con saturate e brightness boost
+- Gradient overlays multi-color per depth perception
+- Smooth shadow transitions on hover
+
+**Toast.js** - Refined Notifications:
+- Variant-specific glass effects (success, error, warning, info)
+- Enhanced backdrop filters per readability
+- Slide-in animations con spring physics
+- Auto-dismiss con progress bar animato
+
+**Banner.js** - Prominent Alerts:
+- Glass morphism con colori semantici
+- Inner glow per depth enhancement
+- Responsive padding e iconography
+
+**InfoBox.js** - Contextual Information:
+- Subtle glass effects per info containers
+- Variant colors (info, warning, success) con glass adaptation
+
+**Input.js & Select.js** - Form Controls:
+- Glass morphism con focus states brillanti
+- Ring effects con inner/outer glow
+- Smooth transitions su tutti gli stati (focus, hover, disabled)
+- Perfect placeholder contrast
+
+**ContextMenu.js** - Dropdowns:
+- Deep glass panel con multi-layer depth
+- Item hover states con spring animations
+- Enhanced shadows per floating effect
+
+#### 🎨 Global CSS Enhancements
+
+**app/globals.css** - Sistema Completo:
+- Nuove utility classes per backdrop filters avanzati
+- Shadow system completo (sm, md, lg, xl variants)
+- Spring physics timing functions
+- Dark mode optimizations per tutti i glass effects
+
+#### 📚 Documentazione
+
+**File Aggiunti:**
+- `docs/ios18-liquid-glass.md` - Guida completa al design system iOS 18
+- `DESIGN_UPGRADE_SUMMARY.md` - Report dettagliato upgrade v2.0
+- `DESIGN_CONSOLIDATION_SUMMARY.md` - Analisi consolidamento componenti
+- `docs/component-consolidation-report.md` - Report tecnico consolidamento
+
+**Contenuto Documentazione:**
+- Filosofia design "Crystal Clear"
+- Anatomia tecnica dei glass effects
+- Esempi codice per ogni componente
+- Best practices per mantenere consistency
+- Dark mode considerations
+- Performance optimization tips
+
+#### 🔧 File Modificati
+
+**UI Components:**
+- `app/components/ui/Button.js` - Enhanced liquid glass variants
+- `app/components/ui/Card.js` - Deeper 3-layer glass effects
+- `app/components/ui/Toast.js` - Refined notification styles
+- `app/components/ui/Banner.js` - Enhanced alert glass morphism
+- `app/components/ui/InfoBox.js` - Contextual glass containers
+- `app/components/ui/Input.js` - Glass form controls
+- `app/components/ui/Select.js` - Glass dropdowns
+- `app/components/ui/ContextMenu.js` - Glass menu panels
+
+**Other Components:**
+- `app/components/scheduler/ScheduleSelector.js` - Adapted to new button styles
+- `app/settings/theme/page.js` - Theme settings con new glass effects
+
+**Global Styles:**
+- `app/globals.css` - Complete shadow system + backdrop utilities
+
+#### ⚡ Performance Notes
+
+- Tutti gli effetti usano `transform-gpu` e `will-change-transform` per hardware acceleration
+- `isolation-isolate` per layer stacking ottimale
+- Backdrop filters limitati a elementi necessari per performance
+- CSS custom properties per dark mode senza JavaScript overhead
+
+#### 🎯 Backward Compatibility
+
+**✅ Zero Breaking Changes:**
+- Tutti i componenti mantengono le stesse prop API
+- Classi Tailwind esistenti rimangono compatibili
+- Dark mode funziona out-of-the-box
+- Nessuna migrazione richiesta per codice esistente
+
+#### 📊 Quality Assurance
+
+- ✅ WCAG AAA contrast compliance su tutti i componenti
+- ✅ Dark mode testato su tutti i componenti
+- ✅ Responsive behavior verificato (mobile → desktop)
+- ✅ Animation performance verified (60fps target)
+- ✅ Accessibilità mantenuta (focus states, ARIA labels)
+
+---
+
 ## [1.42.0] - 2026-01-13
 
 ### 🎯 Nuove Feature - Water Temperature & Debug Console

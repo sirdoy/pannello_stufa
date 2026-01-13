@@ -38,35 +38,35 @@ export default function Toast({
     return () => clearInterval(interval);
   }, [duration]);
 
-  // Liquid glass variants (iOS glassmorphism style)
+  // Enhanced iOS 18 Liquid Glass - Floating notification with vibrancy
   const liquidVariants = {
     success: {
-      bg: 'bg-success-500/15 dark:bg-success-500/25',
-      border: 'border-success-500/30 dark:border-success-500/40',
-      text: 'text-success-900 dark:text-success-100',
-      iconBg: 'bg-success-400/20 dark:bg-success-400/30',
-      ring: 'ring-success-400/30'
+      bg: 'bg-success-500/[0.18] dark:bg-success-500/[0.28]',
+      border: 'border-success-400/[0.35] dark:border-success-500/[0.4]',
+      text: 'text-success-950 dark:text-success-50',
+      iconBg: 'bg-success-400/[0.25] dark:bg-success-400/[0.35]',
+      ring: 'ring-success-300/[0.3] dark:ring-success-400/[0.35]'
     },
     warning: {
-      bg: 'bg-warning-500/15 dark:bg-warning-500/25',
-      border: 'border-warning-500/30 dark:border-warning-500/40',
-      text: 'text-warning-900 dark:text-warning-100',
-      iconBg: 'bg-warning-400/20 dark:bg-warning-400/30',
-      ring: 'ring-warning-400/30'
+      bg: 'bg-warning-500/[0.18] dark:bg-warning-500/[0.28]',
+      border: 'border-warning-400/[0.35] dark:border-warning-500/[0.4]',
+      text: 'text-warning-950 dark:text-warning-50',
+      iconBg: 'bg-warning-400/[0.25] dark:bg-warning-400/[0.35]',
+      ring: 'ring-warning-300/[0.3] dark:ring-warning-400/[0.35]'
     },
     info: {
-      bg: 'bg-info-500/15 dark:bg-info-500/25',
-      border: 'border-info-500/30 dark:border-info-500/40',
-      text: 'text-info-900 dark:text-info-100',
-      iconBg: 'bg-info-400/20 dark:bg-info-400/30',
-      ring: 'ring-info-400/30'
+      bg: 'bg-info-500/[0.18] dark:bg-info-500/[0.28]',
+      border: 'border-info-400/[0.35] dark:border-info-500/[0.4]',
+      text: 'text-info-950 dark:text-info-50',
+      iconBg: 'bg-info-400/[0.25] dark:bg-info-400/[0.35]',
+      ring: 'ring-info-300/[0.3] dark:ring-info-400/[0.35]'
     },
     error: {
-      bg: 'bg-primary-500/15 dark:bg-primary-500/25',
-      border: 'border-primary-500/30 dark:border-primary-500/40',
-      text: 'text-primary-900 dark:text-primary-100',
-      iconBg: 'bg-primary-400/20 dark:bg-primary-400/30',
-      ring: 'ring-primary-400/30'
+      bg: 'bg-primary-500/[0.18] dark:bg-primary-500/[0.28]',
+      border: 'border-primary-400/[0.35] dark:border-primary-500/[0.4]',
+      text: 'text-primary-950 dark:text-primary-50',
+      iconBg: 'bg-primary-400/[0.25] dark:bg-primary-400/[0.35]',
+      ring: 'ring-primary-300/[0.3] dark:ring-primary-400/[0.35]'
     }
   };
 
@@ -114,13 +114,27 @@ export default function Toast({
       <div className={`
         ${styles.bg} ${styles.text}
         ${liquid
-          ? `backdrop-blur-3xl rounded-2xl shadow-liquid-lg border-2 ${styles.border} ring-1 ${styles.ring} ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/15 dark:before:from-white/10 before:to-transparent before:pointer-events-none`
-          : `backdrop-blur-3xl rounded-2xl shadow-elevated-lg ring-2 ${styles.ring} ring-inset before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/20 before:to-transparent before:pointer-events-none`
+          ? `backdrop-blur-4xl backdrop-saturate-[1.8] backdrop-brightness-[1.08]
+             rounded-3xl shadow-liquid-lg border-2 ${styles.border}
+             ring-1 ${styles.ring} ring-inset
+             isolation-isolate
+             before:absolute before:inset-0 before:rounded-[inherit]
+             before:bg-gradient-to-br before:from-white/[0.2] dark:before:from-white/[0.12]
+             before:via-white/[0.08] dark:before:via-white/[0.05]
+             before:to-transparent
+             before:pointer-events-none before:z-[-1]
+             after:absolute after:inset-0 after:rounded-[inherit]
+             after:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(0,0,0,0.08)]
+             dark:after:shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.25)]
+             after:pointer-events-none after:z-[-1]`
+          : `backdrop-blur-3xl rounded-2xl shadow-elevated-lg ring-2 ${styles.ring} ring-inset
+             before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/20 before:to-transparent before:pointer-events-none`
         }
         px-5 py-3.5 sm:px-6 sm:py-4
         flex items-center gap-3 sm:gap-4
         min-w-[280px] sm:min-w-[320px] max-w-[90vw] sm:max-w-md
         relative overflow-hidden
+        transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
       `}>
         {/* Icon */}
         <div className={`

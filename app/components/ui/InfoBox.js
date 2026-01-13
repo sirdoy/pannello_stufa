@@ -29,7 +29,27 @@ export default function InfoBox({
   };
 
   return (
-    <div className={`relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10 ${className}`}>
+    <div className={`
+      relative overflow-hidden rounded-2xl
+      bg-white/[0.12] dark:bg-white/[0.08]
+      backdrop-blur-3xl backdrop-saturate-[1.6] backdrop-brightness-[1.05]
+      shadow-liquid
+      isolation-isolate
+      transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+      hover:bg-white/[0.15] dark:hover:bg-white/[0.10]
+      hover:shadow-liquid-lg
+      hover:scale-[1.02]
+      active:scale-[0.98]
+      before:absolute before:inset-0 before:rounded-[inherit]
+      before:bg-gradient-to-br before:from-white/[0.15] dark:before:from-white/[0.10]
+      before:to-transparent
+      before:pointer-events-none before:z-[-1]
+      after:absolute after:inset-0 after:rounded-[inherit]
+      after:shadow-[inset_0_1px_0_rgba(255,255,255,0.2),inset_0_-1px_0_rgba(0,0,0,0.05)]
+      dark:after:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.15)]
+      after:pointer-events-none after:z-[-1]
+      ${className}
+    `}>
       <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
         {/* Icon */}
         <span className="text-3xl sm:text-4xl mb-2">{icon}</span>

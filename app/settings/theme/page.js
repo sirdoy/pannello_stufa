@@ -17,6 +17,7 @@ import SettingsLayout from '@/app/components/SettingsLayout';
 import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
 import Skeleton from '@/app/components/ui/Skeleton';
+import { Heading, Text } from '@/app/components/ui';
 
 export default function ThemeSettingsPage() {
   const { user, isLoading: userLoading } = useUser();
@@ -60,17 +61,15 @@ export default function ThemeSettingsPage() {
   return (
     <SettingsLayout title="Tema" icon="🎨">
       {/* Description */}
-      <div>
-        <p className="text-neutral-600 dark:text-neutral-400">
-          Scegli la modalità chiara o scura per l&apos;interfaccia
-        </p>
-      </div>
+      <Text variant="secondary">
+        Scegli la modalità chiara o scura per l&apos;interfaccia
+      </Text>
 
       {/* Theme Selector Card */}
       <Card liquid className="p-6 sm:p-8">
-        <h2 className="text-xl font-semibold text-neutral-900 dark:text-white mb-4">
+        <Heading level={2} size="lg" className="mb-4">
           Modalità Interfaccia
-        </h2>
+        </Heading>
 
         <div className="space-y-4">
           {/* Light Mode Option */}
@@ -154,9 +153,9 @@ export default function ThemeSettingsPage() {
 
       {/* Preview Card */}
       <Card liquid className="p-6 sm:p-8">
-        <h2 className="text-xl font-semibold text-neutral-900 dark:text-white mb-4">
+        <Heading level={2} size="lg" className="mb-4">
           Preview Tema Corrente
-        </h2>
+        </Heading>
 
         <div className="space-y-4">
           {/* Sample elements */}
@@ -211,12 +210,12 @@ export default function ThemeSettingsPage() {
         <div className="flex gap-3">
           <div className="text-2xl">ℹ️</div>
           <div className="flex-1">
-            <h3 className="font-semibold text-info-900 dark:text-info-300 mb-1">
+            <Heading level={3} size="md" className="mb-1 text-info-900 dark:text-info-300">
               Sincronizzazione Multi-Device
-            </h3>
-            <p className="text-sm text-info-700 dark:text-info-400">
+            </Heading>
+            <Text variant="secondary" className="text-info-700 dark:text-info-400 text-sm">
               La tua preferenza tema viene salvata su Firebase e sincronizzata automaticamente su tutti i tuoi dispositivi.
-            </p>
+            </Text>
           </div>
         </div>
       </Card>

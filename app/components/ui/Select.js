@@ -88,9 +88,15 @@ export default function Select({
             disabled:opacity-50 disabled:cursor-not-allowed
             transition-all duration-200
             ${liquid
-              ? `bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl text-neutral-900 dark:text-neutral-100 shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset
-                 hover:bg-white/[0.12] dark:hover:bg-white/[0.08] hover:shadow-liquid
-                 ${isOpen ? 'bg-white/[0.15] dark:bg-white/[0.10] shadow-liquid ring-2 ring-primary-500/30' : ''}`
+              ? `bg-white/[0.12] dark:bg-white/[0.08]
+                 backdrop-blur-3xl backdrop-saturate-[1.6] backdrop-brightness-[1.05]
+                 text-neutral-900 dark:text-white
+                 shadow-liquid-sm
+                 hover:bg-white/[0.18] dark:hover:bg-white/[0.12]
+                 hover:backdrop-saturate-[1.8]
+                 hover:shadow-liquid
+                 isolation-isolate
+                 ${isOpen ? 'bg-white/[0.18] dark:bg-white/[0.12] shadow-liquid backdrop-blur-4xl backdrop-saturate-[2]' : ''}`
               : `bg-white dark:bg-neutral-800 border-2 border-neutral-300 dark:border-neutral-600 text-neutral-900 dark:text-neutral-100
                  hover:border-neutral-400 dark:hover:border-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-700
                  ${isOpen ? 'ring-2 ring-primary-500 dark:ring-primary-400 border-transparent' : ''}`
@@ -116,7 +122,10 @@ export default function Select({
               ${openUpward ? 'bottom-full mb-2' : 'top-full mt-2'}
               ${openUpward ? 'animate-dropdown-up' : 'animate-dropdown'}
               ${liquid
-                ? 'bg-white/[0.10] dark:bg-white/[0.08] backdrop-blur-3xl shadow-liquid-lg ring-1 ring-white/20 dark:ring-white/10 ring-inset'
+                ? `bg-white/[0.15] dark:bg-white/[0.10]
+                   backdrop-blur-4xl backdrop-saturate-[1.8] backdrop-brightness-[1.05]
+                   shadow-liquid-lg
+                   isolation-isolate`
                 : 'bg-white/90 dark:bg-neutral-800/90 backdrop-blur-xl border border-white/40 dark:border-neutral-600 shadow-glass-lg'
               }`}
           >

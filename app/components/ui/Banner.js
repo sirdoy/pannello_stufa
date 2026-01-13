@@ -94,34 +94,34 @@ export default function Banner({
     },
   };
 
-  // Liquid glass variants (iOS 18 style) - WCAG AA compliant
+  // Enhanced iOS 18 Liquid Glass - Crystal clarity with color tinting
   const liquidVariants = {
     info: {
-      bg: 'bg-info-500/15 dark:bg-info-500/20',
-      border: 'border-info-500/25 dark:border-info-500/30',
-      titleColor: 'text-info-900 dark:text-info-100',
-      descColor: 'text-info-800 dark:text-info-200',
+      bg: 'bg-info-500/[0.18] dark:bg-info-500/[0.25]',
+      border: 'border-info-400/[0.3] dark:border-info-500/[0.35]',
+      titleColor: 'text-info-950 dark:text-info-50 font-bold',
+      descColor: 'text-info-900 dark:text-info-100 font-medium',
       defaultIcon: 'ℹ️',
     },
     warning: {
-      bg: 'bg-warning-500/15 dark:bg-warning-500/20',
-      border: 'border-warning-500/25 dark:border-warning-500/30',
-      titleColor: 'text-warning-900 dark:text-warning-100',
-      descColor: 'text-warning-800 dark:text-warning-200',
+      bg: 'bg-warning-500/[0.18] dark:bg-warning-500/[0.25]',
+      border: 'border-warning-400/[0.3] dark:border-warning-500/[0.35]',
+      titleColor: 'text-warning-950 dark:text-warning-50 font-bold',
+      descColor: 'text-warning-900 dark:text-warning-100 font-medium',
       defaultIcon: '⚠️',
     },
     error: {
-      bg: 'bg-danger-500/15 dark:bg-danger-500/20',
-      border: 'border-danger-500/25 dark:border-danger-500/30',
-      titleColor: 'text-danger-900 dark:text-danger-100',
-      descColor: 'text-danger-800 dark:text-danger-200',
+      bg: 'bg-danger-500/[0.18] dark:bg-danger-500/[0.25]',
+      border: 'border-danger-400/[0.3] dark:border-danger-500/[0.35]',
+      titleColor: 'text-danger-950 dark:text-danger-50 font-bold',
+      descColor: 'text-danger-900 dark:text-danger-100 font-medium',
       defaultIcon: '❌',
     },
     success: {
-      bg: 'bg-success-500/15 dark:bg-success-500/20',
-      border: 'border-success-500/25 dark:border-success-500/30',
-      titleColor: 'text-success-900 dark:text-success-100',
-      descColor: 'text-success-800 dark:text-success-200',
+      bg: 'bg-success-500/[0.18] dark:bg-success-500/[0.25]',
+      border: 'border-success-400/[0.3] dark:border-success-500/[0.35]',
+      titleColor: 'text-success-950 dark:text-success-50 font-bold',
+      descColor: 'text-success-900 dark:text-success-100 font-medium',
       defaultIcon: '✅',
     },
   };

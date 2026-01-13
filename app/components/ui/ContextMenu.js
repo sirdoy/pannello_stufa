@@ -65,9 +65,16 @@ export default function ContextMenu({ items = [], ariaLabel = 'Menu' }) {
         <MoreVertical className="w-5 h-5 text-neutral-600 dark:text-neutral-400" />
       </button>
 
-      {/* Dropdown Menu */}
+      {/* Dropdown Menu - Enhanced iOS 18 Liquid Glass */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-1 w-48 bg-white/95 dark:bg-neutral-800/95 backdrop-blur-2xl rounded-xl shadow-liquid-lg ring-1 ring-neutral-300/40 dark:ring-neutral-600/40 overflow-hidden animate-scale-in origin-top-right z-50">
+        <div className="
+          absolute right-0 top-full mt-1 w-48
+          bg-white/[0.15] dark:bg-white/[0.10]
+          backdrop-blur-4xl backdrop-saturate-[1.8] backdrop-brightness-[1.05]
+          rounded-xl shadow-liquid-lg
+          isolation-isolate
+          overflow-hidden animate-scale-in origin-top-right z-50
+        ">
           {items.map((item, index) => (
             <button
               key={index}

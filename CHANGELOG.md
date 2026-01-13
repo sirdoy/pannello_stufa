@@ -5,6 +5,76 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.44.0] - 2026-01-13
+
+### 🔄 Refactoring - Navigation Components System
+
+**Filosofia**: Componentizzazione e riutilizzo per design system coerente e manutenibile.
+
+#### ✨ Miglioramenti Principali
+
+**Componenti Riutilizzabili:**
+- `DropdownContainer` - Container dropdown desktop con liquid glass
+- `DropdownItem` - Item dropdown con hover shine effect
+- `DropdownInfoCard` - Card informativa per user dropdown
+- `MenuSection` - Sezione menu mobile con header
+- `MenuItem` - Item menu mobile con varianti (default/prominent)
+- `UserInfoCard` - Card utente con gradiente icon
+
+**Design Unificato:**
+- Trasparenza corretta: 92-95% opacità per leggibilità ottimale
+- Backdrop blur consistente: 80px su tutti i dropdown
+- Hover effects uniformi: scale(1.02) + shine gradient
+- Animazioni stagger: 40-50ms delay per entrance sequenziale
+- Stati attivi coerenti: primary-500 con opacità calibrate
+
+**Manutenibilità:**
+- Riduzione duplicazione codice: ~100 righe (-25%)
+- Single source of truth per stili navigation
+- Test suite completa (Jest + React Testing Library)
+- Documentazione esaustiva (README.md con esempi)
+
+#### 🐛 Bug Fixes
+
+**Dropdown Transparency:**
+- Fixed: Light mode `bg-white/[0.12]` → `bg-white/[0.92]` (leggibilità scarsa)
+- Fixed: Dark mode `bg-white/[0.10]` → `bg-neutral-900/[0.95]` (contrasto insufficiente)
+- Fixed: Item backgrounds per visibilità ottimale su sfondi chiari/scuri
+
+#### 📦 File Modificati/Aggiunti
+
+**Nuovi:**
+- `app/components/navigation/DropdownComponents.js` - 6 componenti base
+- `app/components/navigation/index.js` - Export centralizzato
+- `app/components/navigation/__tests__/DropdownComponents.test.js` - Test suite
+- `app/components/navigation/README.md` - Documentazione completa (400+ righe)
+
+**Refactorati:**
+- `app/components/Navbar.js` - Da 400 a 300 righe (-25%)
+  - Desktop dropdowns: Device, Settings, User
+  - Mobile menu: Device sections, Settings, User card, Logout
+
+#### 🎯 Impatto
+
+**Developer Experience:**
+- ✅ Modifiche design: 1 file invece di 5
+- ✅ Nuovi dropdown: copia-incolla componenti esistenti
+- ✅ Testing: componenti isolati testabili
+- ✅ Onboarding: README con esempi pratici
+
+**User Experience:**
+- ✅ Design visivamente coerente al 100%
+- ✅ Testo leggibile in tutti i dropdown
+- ✅ Animazioni fluide e sincronizzate
+- ✅ Performance identica (nessun overhead)
+
+**Technical Debt:**
+- ✅ Eliminata duplicazione codice navigation
+- ✅ Pattern components riutilizzabili stabilito
+- ✅ Foundation per future navigation features
+
+---
+
 ## [1.43.0] - 2026-01-13
 
 ### 🎨 Design System - iOS 18 Liquid Glass Upgrade

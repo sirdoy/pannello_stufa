@@ -5,6 +5,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getNavigationStructureWithPreferences } from '@/lib/devices/deviceRegistry';
 import { Home, Calendar, AlertCircle, Clock, Settings, User, LogOut, Menu, X, ChevronDown } from 'lucide-react';
+import {
+  DropdownContainer,
+  DropdownItem,
+  DropdownInfoCard,
+  MenuSection,
+  MenuItem,
+  UserInfoCard
+} from './navigation';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -162,22 +170,19 @@ export default function Navbar() {
                   </button>
 
                   {desktopDeviceDropdown === device.id && (
-                    <div className="absolute left-0 mt-2 w-56 bg-white/[0.10] dark:bg-white/[0.08] backdrop-blur-3xl border border-white/20 dark:border-white/10 rounded-xl shadow-liquid-lg overflow-hidden z-[9000] ring-1 ring-white/10 dark:ring-white/5 ring-inset">
-                      {device.items.map(item => (
-                        <Link
+                    <DropdownContainer className="w-64" align="left">
+                      {device.items.map((item, idx) => (
+                        <DropdownItem
                           key={item.route}
                           href={item.route}
-                          className={`block px-4 py-3 text-sm font-medium transition-all duration-200 ${
-                            isActive(item.route)
-                              ? 'bg-primary-500/10 dark:bg-primary-500/20 backdrop-blur-xl text-primary-700 dark:text-primary-400'
-                              : 'text-neutral-800 dark:text-neutral-200 hover:bg-white/[0.08] dark:hover:bg-white/[0.05] backdrop-blur-xl'
-                          }`}
+                          icon={getIconForPath(item.route)}
+                          label={item.label}
+                          isActive={isActive(item.route)}
                           onClick={() => setDesktopDeviceDropdown(null)}
-                        >
-                          {item.label}
-                        </Link>
+                          animationDelay={idx * 40}
+                        />
                       ))}
-                    </div>
+                    </DropdownContainer>
                   )}
                 </div>
               ))}
@@ -222,32 +227,20 @@ export default function Navbar() {
                   </button>
 
                   {settingsDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-72 bg-white/[0.10] dark:bg-white/[0.08] backdrop-blur-3xl border border-white/20 dark:border-white/10 rounded-xl shadow-liquid-lg overflow-hidden z-[9000] ring-1 ring-white/10 dark:ring-white/5 ring-inset">
+                    <DropdownContainer className="w-80" align="right">
                       {navStructure.settings.map((item, idx) => (
-                        <Link
+                        <DropdownItem
                           key={item.id}
                           href={item.route}
-                          className={`block px-4 py-3 text-sm transition-all duration-200 ${
-                            idx !== navStructure.settings.length - 1 ? 'border-b border-white/10 dark:border-white/5' : ''
-                          } ${
-                            isActive(item.route)
-                              ? 'bg-primary-500/10 dark:bg-primary-500/20 backdrop-blur-xl text-primary-700 dark:text-primary-400 font-medium'
-                              : 'text-neutral-800 dark:text-neutral-200 hover:bg-white/[0.08] dark:hover:bg-white/[0.05] backdrop-blur-xl'
-                          }`}
+                          icon={item.icon}
+                          label={item.label}
+                          description={item.description}
+                          isActive={isActive(item.route)}
                           onClick={() => setSettingsDropdownOpen(false)}
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="text-lg">{item.icon}</span>
-                            <div className="flex-1">
-                              <div className="font-medium">{item.label}</div>
-                              {item.description && (
-                                <div className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">{item.description}</div>
-                              )}
-                            </div>
-                          </div>
-                        </Link>
+                          animationDelay={idx * 40}
+                        />
                       ))}
-                    </div>
+                    </DropdownContainer>
                   )}
                 </div>
               )}
@@ -270,23 +263,21 @@ export default function Navbar() {
                   </button>
 
                   {userDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-64 bg-white/[0.10] dark:bg-white/[0.08] backdrop-blur-3xl border border-white/20 dark:border-white/10 rounded-xl shadow-liquid-lg overflow-hidden z-[9000] ring-1 ring-white/10 dark:ring-white/5 ring-inset">
-                      <div className="px-4 py-3 border-b border-white/10 dark:border-white/5">
-                        <p className="text-xs text-neutral-500 dark:text-neutral-400">Connesso come</p>
-                        <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 truncate mt-0.5">{user.name}</p>
-                        {user.email && (
-                          <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate mt-1">{user.email}</p>
-                        )}
-                      </div>
-                      <Link
+                    <DropdownContainer className="w-72" align="right">
+                      <DropdownInfoCard
+                        title="Connesso come"
+                        subtitle={user.name}
+                        details={user.email}
+                      />
+                      <DropdownItem
                         href="/auth/logout"
-                        className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors duration-200"
+                        icon={<LogOut className="w-5 h-5" />}
+                        label="Logout"
+                        isActive={false}
                         onClick={() => setUserDropdownOpen(false)}
-                      >
-                        <LogOut className="w-4 h-4" />
-                        <span>Logout</span>
-                      </Link>
-                    </div>
+                        className="text-primary-700 dark:text-primary-400"
+                      />
+                    </DropdownContainer>
                   )}
                 </div>
               )}
@@ -320,92 +311,70 @@ export default function Navbar() {
           />
 
           {/* Mobile Menu Panel */}
-          <div className="fixed top-16 left-0 right-0 bottom-20 bg-white/[0.10] dark:bg-white/[0.08] backdrop-blur-3xl z-[9001] lg:hidden overflow-y-auto">
-            <div className="px-4 py-4 space-y-3">
+          <div className="fixed top-16 left-0 right-0 bottom-20 bg-white/[0.92] dark:bg-neutral-900/[0.95] backdrop-blur-[80px] z-[9001] lg:hidden overflow-y-auto animate-slideInDown">
+            <div className="px-4 py-5 space-y-4">
 
               {/* User Info */}
               {user && (
-                <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset mb-4">
-                  <User className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate text-neutral-900 dark:text-neutral-100">{user.name}</p>
-                    {user.email && (
-                      <p className="text-xs text-neutral-600 dark:text-neutral-400 truncate">{user.email}</p>
-                    )}
-                  </div>
-                </div>
+                <UserInfoCard
+                  icon={User}
+                  name={user.name}
+                  email={user.email}
+                />
               )}
 
               {/* Device Sections */}
               {navStructure.devices.map(device => (
-                <div key={device.id} className="space-y-2">
-                  <div className="flex items-center gap-2 px-3 py-2">
-                    <span className="text-lg">{device.icon}</span>
-                    <span className="text-xs font-semibold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
-                      {device.name}
-                    </span>
-                  </div>
-
-                  <div className="space-y-1">
-                    {device.items.map(item => (
-                      <Link
-                        key={item.route}
-                        href={item.route}
-                        className={`block px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                          isActive(item.route)
-                            ? 'bg-primary-500/10 dark:bg-primary-500/20 backdrop-blur-2xl text-primary-700 dark:text-primary-400 shadow-liquid-sm ring-1 ring-primary-500/20 dark:ring-primary-500/30 ring-inset'
-                            : 'text-neutral-800 dark:text-neutral-200 bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl hover:bg-white/[0.12] dark:hover:bg-white/[0.08] shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset'
-                        }`}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
+                <MenuSection
+                  key={device.id}
+                  icon={device.icon}
+                  title={device.name}
+                >
+                  {device.items.map((item, idx) => (
+                    <MenuItem
+                      key={item.route}
+                      href={item.route}
+                      icon={getIconForPath(item.route)}
+                      label={item.label}
+                      isActive={isActive(item.route)}
+                      onClick={() => setMobileMenuOpen(false)}
+                      animationDelay={idx * 50}
+                    />
+                  ))}
+                </MenuSection>
               ))}
 
               {/* Settings Section */}
               {navStructure.settings && navStructure.settings.length > 0 && (
-                <div className="space-y-2 pt-3 mt-3 border-t border-white/20 dark:border-white/10">
-                  <div className="flex items-center gap-2 px-3 py-2">
-                    <Settings className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
-                    <span className="text-xs font-semibold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
-                      Impostazioni
-                    </span>
-                  </div>
-
-                  <div className="space-y-1">
-                    {navStructure.settings.map(item => (
-                      <Link
-                        key={item.route}
-                        href={item.route}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all duration-200 ${
-                          isActive(item.route)
-                            ? 'bg-primary-500/10 dark:bg-primary-500/20 backdrop-blur-2xl text-primary-700 dark:text-primary-400 shadow-liquid-sm ring-1 ring-primary-500/20 dark:ring-primary-500/30 ring-inset'
-                            : 'text-neutral-800 dark:text-neutral-200 bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl hover:bg-white/[0.12] dark:hover:bg-white/[0.08] shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset'
-                        }`}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <span className="text-base">{item.icon}</span>
-                        <span className="font-medium">{item.label}</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
+                <MenuSection
+                  icon={<Settings className="w-5 h-5" />}
+                  title="Impostazioni"
+                  hasBorder={true}
+                >
+                  {navStructure.settings.map((item, idx) => (
+                    <MenuItem
+                      key={item.route}
+                      href={item.route}
+                      icon={item.icon}
+                      label={item.label}
+                      isActive={isActive(item.route)}
+                      onClick={() => setMobileMenuOpen(false)}
+                      animationDelay={idx * 50}
+                    />
+                  ))}
+                </MenuSection>
               )}
 
               {/* Logout */}
-              <div className="pt-3 mt-3 border-t border-white/20 dark:border-white/10">
-                <Link
+              <MenuSection title="" hasBorder={true}>
+                <MenuItem
                   href="/auth/logout"
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-primary-700 dark:text-primary-400 bg-primary-500/10 dark:bg-primary-500/20 backdrop-blur-2xl hover:bg-primary-500/15 dark:hover:bg-primary-500/25 shadow-liquid-sm ring-1 ring-primary-500/20 dark:ring-primary-500/30 ring-inset transition-all duration-200"
+                  icon={<LogOut className="w-6 h-6" />}
+                  label="Logout"
                   onClick={() => setMobileMenuOpen(false)}
-                >
-                  <LogOut className="w-5 h-5" />
-                  <span>Logout</span>
-                </Link>
-              </div>
+                  variant="prominent"
+                />
+              </MenuSection>
             </div>
           </div>
         </>

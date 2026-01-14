@@ -5,6 +5,51 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.45.0] - 2026-01-14
+
+### 🎨 Redesign - Netatmo Thermostat UI
+
+**Filosofia**: Design unificato con liquid glass per coerenza visiva e migliore UX.
+
+#### ✨ Miglioramenti Principali
+
+**RoomCard Redesign:**
+- Header a due righe: nome stanza full-width + badges su riga dedicata
+- Badge dispositivo (Termostato/Valvola) e modalità separati, mai sovrapposti
+- Indicatore riscaldamento come floating badge con animazione pulse
+- Display temperatura in container glass con colori semantici
+- Bottoni con liquid glass style (Imposta, Auto, Off)
+- Sezione dispositivi con hover effects
+
+**Thermostat Page:**
+- Card modalità riscaldamento con liquid glass
+- Bottoni modalità custom (Programmato, Assenza, Antigelo, Off)
+- Info topology in box glass separati
+- Sezione errore con liquid glass styling
+
+#### 🐛 Bug Fixes
+
+- Fixed: Nome stanza troncato - ora visibile per intero con tooltip
+- Fixed: Badge sovrapposti - layout dedicato su riga separata
+- Fixed: ESLint displayName error in DropdownComponents.test.js
+- Fixed: useEffect missing dependency warning in debug/stove/page.js
+
+#### 🌙 Dark Mode
+
+- Supporto completo dark mode per tutti i componenti Netatmo
+- Badge colors con varianti dark
+- Temperature colors adattivi
+- Glass containers con opacità calibrate
+
+#### 📦 File Modificati
+
+- `app/components/netatmo/RoomCard.js` - Redesign completo
+- `app/thermostat/page.js` - Liquid glass styling
+- `app/components/navigation/__tests__/DropdownComponents.test.js` - ESLint fix
+- `app/debug/stove/page.js` - ESLint fix
+
+---
+
 ## [1.44.0] - 2026-01-13
 
 ### 🔄 Refactoring - Navigation Components System

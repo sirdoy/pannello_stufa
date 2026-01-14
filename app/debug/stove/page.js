@@ -155,6 +155,7 @@ export default function StoveDebugPage() {
   // Initial fetch
   useEffect(() => {
     fetchAllGetEndpoints();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Auto-refresh
@@ -163,6 +164,7 @@ export default function StoveDebugPage() {
       const interval = setInterval(fetchAllGetEndpoints, 5000);
       return () => clearInterval(interval);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoRefresh]);
 
   return (

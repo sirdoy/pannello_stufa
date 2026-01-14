@@ -11,11 +11,13 @@ import { User, LogOut } from 'lucide-react';
 
 // Mock next/link
 jest.mock('next/link', () => {
-  return ({ children, href, onClick, className, style }) => (
+  const MockLink = ({ children, href, onClick, className, style }) => (
     <a href={href} onClick={onClick} className={className} style={style}>
       {children}
     </a>
   );
+  MockLink.displayName = 'MockLink';
+  return MockLink;
 });
 
 describe('DropdownComponents', () => {

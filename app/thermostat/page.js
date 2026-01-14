@@ -205,17 +205,17 @@ function NetatmoContent() {
   if (!topology && error) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Card className="p-8">
-          <h2 className="text-2xl font-bold text-neutral-900 mb-4">
+        <Card liquid className="p-6 sm:p-8">
+          <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">
             Errore Connessione Netatmo
           </h2>
 
           <ErrorAlert message={error} />
 
           {/* Helpful troubleshooting info */}
-          <div className="mt-6 p-4 bg-info-50 border border-info-200 rounded-lg">
-            <p className="text-sm font-semibold text-info-900 mb-2">💡 Suggerimenti:</p>
-            <ul className="text-sm text-info-800 space-y-1 ml-4">
+          <div className="mt-6 p-4 bg-info-500/10 dark:bg-info-500/20 border border-info-500/20 dark:border-info-500/30 rounded-xl backdrop-blur-sm">
+            <p className="text-sm font-bold text-info-800 dark:text-info-300 mb-2">💡 Suggerimenti:</p>
+            <ul className="text-sm text-info-700 dark:text-info-400 space-y-1 ml-4">
               <li>• Verifica di aver completato l&apos;autenticazione Netatmo</li>
               <li>• Controlla che il tuo account Netatmo sia attivo</li>
               <li>• Assicurati di avere almeno un termostato configurato</li>
@@ -223,12 +223,13 @@ function NetatmoContent() {
             </ul>
           </div>
 
-          <div className="mt-6 flex gap-3">
-            <Button variant="primary" onClick={checkConnection}>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Button liquid variant="primary" onClick={checkConnection}>
               🔄 Riprova
             </Button>
             <Button
-              variant="outline"
+              liquid
+              variant="secondary"
               onClick={() => {
                 setConnected(false);
                 setError(null);
@@ -293,14 +294,31 @@ function NetatmoContent() {
     return 0;
   });
 
+  // Mode button styles
+  const getModeButtonClasses = (currentMode, targetMode) => {
+    const baseClasses = 'px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center gap-2';
+    const isActive = currentMode === targetMode;
+
+    const activeStyles = {
+      schedule: 'bg-success-500/20 dark:bg-success-500/30 text-success-700 dark:text-success-300 border border-success-500/30 dark:border-success-500/40 shadow-sm',
+      away: 'bg-warning-500/20 dark:bg-warning-500/30 text-warning-700 dark:text-warning-300 border border-warning-500/30 dark:border-warning-500/40 shadow-sm',
+      hg: 'bg-info-500/20 dark:bg-info-500/30 text-info-700 dark:text-info-300 border border-info-500/30 dark:border-info-500/40 shadow-sm',
+      off: 'bg-neutral-500/20 dark:bg-neutral-500/30 text-neutral-700 dark:text-neutral-300 border border-neutral-500/30 dark:border-neutral-500/40 shadow-sm',
+    };
+
+    const inactiveStyle = 'bg-white/[0.08] dark:bg-white/[0.05] text-neutral-600 dark:text-neutral-300 border border-white/20 dark:border-white/10 hover:bg-white/[0.15] dark:hover:bg-white/[0.10] backdrop-blur-sm';
+
+    return `${baseClasses} ${isActive ? activeStyles[targetMode] : inactiveStyle}`;
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-neutral-900 mb-2">
+        <h1 className="text-3xl font-bold text-neutral-100 mb-2">
           Controllo Netatmo
         </h1>
-        <p className="text-neutral-600">
+        <p className="text-neutral-300">
           Gestisci temperature e riscaldamento di tutte le stanze
         </p>
       </div>
@@ -312,14 +330,14 @@ function NetatmoContent() {
         </div>
       )}
 
-      {/* Mode Control */}
-      <Card className="p-6 mb-6">
-        <div className="flex items-center justify-between">
+      {/* Mode Control - Liquid Glass Card */}
+      <Card liquid className="p-5 sm:p-6 mb-6">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-neutral-900 mb-1">
+            <h2 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-1">
               Modalità Riscaldamento
             </h2>
-            <p className="text-sm text-neutral-600">
+            <p className="text-sm text-neutral-600 dark:text-neutral-400">
               {mode === 'schedule' && 'Programmazione attiva'}
               {mode === 'away' && 'Modalità assenza'}
               {mode === 'hg' && 'Antigelo'}
@@ -327,65 +345,66 @@ function NetatmoContent() {
             </p>
           </div>
 
-          <div className="flex gap-2">
-            <Button
-              variant={mode === 'schedule' ? 'success' : 'outline'}
+          <div className="flex flex-wrap gap-2">
+            <button
               onClick={() => handleModeChange('schedule')}
-              size="sm"
+              className={getModeButtonClasses(mode, 'schedule')}
             >
-              ⏰ Programmato
-            </Button>
-            <Button
-              variant={mode === 'away' ? 'warning' : 'outline'}
+              <span>⏰</span>
+              <span>Programmato</span>
+            </button>
+            <button
               onClick={() => handleModeChange('away')}
-              size="sm"
+              className={getModeButtonClasses(mode, 'away')}
             >
-              🏃 Assenza
-            </Button>
-            <Button
-              variant={mode === 'hg' ? 'info' : 'outline'}
+              <span>🏃</span>
+              <span>Assenza</span>
+            </button>
+            <button
               onClick={() => handleModeChange('hg')}
-              size="sm"
+              className={getModeButtonClasses(mode, 'hg')}
             >
-              ❄️ Antigelo
-            </Button>
-            <Button
-              variant={mode === 'off' ? 'danger' : 'outline'}
+              <span>❄️</span>
+              <span>Antigelo</span>
+            </button>
+            <button
               onClick={() => handleModeChange('off')}
-              size="sm"
+              className={getModeButtonClasses(mode, 'off')}
             >
-              ⏸️ Off
-            </Button>
+              <span>⏸️</span>
+              <span>Off</span>
+            </button>
           </div>
         </div>
       </Card>
 
-      {/* Topology Info */}
-      <Card className="p-6 mb-6">
+      {/* Topology Info - Liquid Glass Card */}
+      <Card liquid className="p-5 sm:p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <p className="text-sm text-neutral-600 mb-1">Casa</p>
-            <p className="text-lg font-semibold text-neutral-900">
+          <div className="p-3 rounded-xl bg-white/[0.06] dark:bg-white/[0.04] backdrop-blur-sm">
+            <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1 uppercase tracking-wide">Casa</p>
+            <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
               {topology.home_name}
             </p>
           </div>
-          <div>
-            <p className="text-sm text-neutral-600 mb-1">Stanze</p>
-            <p className="text-lg font-semibold text-neutral-900">
+          <div className="p-3 rounded-xl bg-white/[0.06] dark:bg-white/[0.04] backdrop-blur-sm">
+            <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1 uppercase tracking-wide">Stanze</p>
+            <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
               {rooms.length}
             </p>
           </div>
-          <div>
-            <p className="text-sm text-neutral-600 mb-1">Moduli</p>
-            <p className="text-lg font-semibold text-neutral-900">
+          <div className="p-3 rounded-xl bg-white/[0.06] dark:bg-white/[0.04] backdrop-blur-sm">
+            <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1 uppercase tracking-wide">Moduli</p>
+            <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
               {topology.modules?.length || 0}
             </p>
           </div>
         </div>
 
-        <div className="mt-4 pt-4 border-t border-neutral-200">
+        <div className="mt-4 pt-4 border-t border-white/10 dark:border-white/5">
           <Button
-            variant="outline"
+            liquid
+            variant="secondary"
             onClick={handleRefresh}
             loading={refreshing}
             size="sm"
@@ -408,8 +427,8 @@ function NetatmoContent() {
 
       {/* Empty State */}
       {rooms.length === 0 && (
-        <Card className="p-12 text-center">
-          <p className="text-neutral-600">
+        <Card liquid className="p-12 text-center">
+          <p className="text-neutral-600 dark:text-neutral-400">
             Nessuna stanza configurata. Aggiungi dispositivi Netatmo tramite l&apos;app ufficiale.
           </p>
         </Card>

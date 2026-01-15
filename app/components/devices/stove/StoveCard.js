@@ -819,9 +819,14 @@ export default function StoveCard() {
 
                       {/* Icon + Info Boxes Container */}
                       <div className="relative flex flex-col items-center">
-                        {/* Large Status Icon */}
+                        {/* Large Status Icon with Glow Effect */}
                         <div className={`relative mb-[-40px] sm:mb-[-50px] ${statusInfo.pulse ? 'animate-pulse-ember' : ''}`}>
-                          <span className="text-[120px] sm:text-[140px] drop-shadow-2xl inline-block" style={{ lineHeight: 1 }}>
+                          {/* Radial glow layer behind icon */}
+                          <div
+                            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 sm:w-40 sm:h-40 rounded-full blur-3xl opacity-70 ${statusInfo.bgColor}`}
+                            style={{ background: `radial-gradient(circle, currentColor 0%, transparent 70%)` }}
+                          ></div>
+                          <span className="relative text-[120px] sm:text-[140px] drop-shadow-2xl inline-block" style={{ lineHeight: 1 }}>
                             {statusInfo.icon}
                           </span>
                         </div>

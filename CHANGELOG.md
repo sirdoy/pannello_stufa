@@ -5,6 +5,14 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.49.1] - 2026-01-15
+
+### 🐛 Fix Status Icon Glow
+
+- **Radial glow effect**: Aggiunto effetto glow radiale dietro l'icona dello stato stufa
+- **Apple emoji fix**: Il glow maschera lo sfondo nero che appare su alcuni emoji Apple (🚀, 💨, etc.)
+- Glow centrato con `radial-gradient` per sfumatura morbida dal centro verso l'esterno
+
 ## [1.49.0] - 2026-01-15
 
 ### 🎨 Complete Ember Noir Migration - Final 32 Components

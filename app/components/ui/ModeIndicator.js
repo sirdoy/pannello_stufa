@@ -1,3 +1,20 @@
+import Text from './Text';
+import Button from './Button';
+
+/**
+ * ModeIndicator Component - Ember Noir Design System
+ *
+ * Displays the current scheduler mode (Manual, Automatic, Semi-Manual).
+ * Handles dark/light mode internally via Text component.
+ *
+ * @param {Object} props
+ * @param {boolean} props.enabled - Scheduler enabled state
+ * @param {boolean} props.semiManual - Semi-manual mode active
+ * @param {string} props.returnToAutoAt - ISO timestamp for auto return
+ * @param {Function} props.onConfigClick - Config button handler
+ * @param {boolean} props.showConfigButton - Show config button
+ * @param {boolean} props.compact - Compact layout
+ */
 export default function ModeIndicator({
   enabled,
   semiManual = false,
@@ -12,10 +29,11 @@ export default function ModeIndicator({
     return '🔧';
   };
 
-  const getColor = () => {
-    if (enabled && semiManual) return 'text-warning-600';
-    if (enabled) return 'text-success-600';
-    return 'text-accent-600';
+  // Ember Noir variants for Text
+  const getVariant = () => {
+    if (enabled && semiManual) return 'warning';
+    if (enabled) return 'sage';
+    return 'ember';
   };
 
   const getLabel = () => {
@@ -29,29 +47,28 @@ export default function ModeIndicator({
       <div className="flex items-center gap-2">
         <span className={compact ? 'text-xl' : 'text-2xl'}>{getIcon()}</span>
         <div>
-          <p className={`${compact ? 'text-sm' : 'text-sm'} font-semibold ${getColor()}`}>
+          <Text variant={getVariant()} size="sm" weight="semibold" as="p">
             {getLabel()}
-          </p>
-          <p className={`${compact ? 'text-xs' : 'text-xs'} text-neutral-500 dark:text-neutral-400`}>Modalità controllo</p>
+          </Text>
+          <Text variant="tertiary" size="xs" as="p">
+            Modalità controllo
+          </Text>
         </div>
       </div>
       {showConfigButton && onConfigClick && (
-        <button
-          onClick={onConfigClick}
-          className="px-4 py-2 rounded-xl text-sm font-medium bg-info-500/10 dark:bg-info-500/15 backdrop-blur-xl text-info-700 dark:text-info-300 hover:bg-info-500/15 dark:hover:bg-info-500/20 shadow-liquid-sm ring-1 ring-info-500/20 dark:ring-info-500/25 ring-inset transition-all duration-200"
-        >
+        <Button variant="ocean" size="sm" onClick={onConfigClick}>
           Configura
-        </button>
+        </Button>
       )}
       {enabled && semiManual && returnToAutoAt && (
-        <p className={`${compact ? 'text-xs ml-8' : 'text-xs'} text-neutral-500 dark:text-neutral-400 mt-2`}>
+        <Text variant="tertiary" size="xs" className={compact ? 'ml-8 mt-2' : 'mt-2'}>
           Ritorno automatico: {new Date(returnToAutoAt).toLocaleString('it-IT', {
             day: '2-digit',
             month: '2-digit',
             hour: '2-digit',
             minute: '2-digit'
           })}
-        </p>
+        </Text>
       )}
     </div>
   );

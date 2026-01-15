@@ -56,16 +56,16 @@ export default function AutomationPage() {
           ← Indietro
         </Button>
 
-        <h1 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2">
-          🤖 Automazioni Philips Hue
-        </h1>
-        <p className="text-neutral-600 dark:text-neutral-400">
+        <Heading level={1} size="2xl" className="mb-2">
+          Automazioni Philips Hue
+        </Heading>
+        <Text variant="secondary">
           Controlla automaticamente le luci in base a orari, presenza e condizioni
-        </p>
+        </Text>
       </div>
 
       {/* Coming Soon Notice */}
-      <Card className="p-8 mb-8 bg-gradient-to-br from-info-50 to-info-100 dark:from-info-900/20 dark:to-info-800/20 border-2 border-info-300 dark:border-info-700">
+      <Card className="p-8 mb-8 bg-gradient-to-br from-ocean-50 to-ocean-100 [html:not(.dark)_&]:from-ocean-50 [html:not(.dark)_&]:to-ocean-100 from-ocean-900/20 to-ocean-800/20 border-2 border-ocean-300 [html:not(.dark)_&]:border-ocean-300 border-ocean-700">
         <div className="flex flex-col items-center text-center">
           <div className="text-6xl mb-4">🚧</div>
           <Heading level={2} size="lg" className="mb-2">
@@ -125,22 +125,22 @@ export default function AutomationPage() {
             <Text variant="secondary" size="sm" className="mb-3">
               Puoi già utilizzare queste funzionalità:
             </Text>
-            <ul className="space-y-2 text-sm text-neutral-600 dark:text-neutral-400">
+            <ul className="space-y-2 text-sm">
               <li className="flex items-start gap-2">
-                <span className="text-success-500 font-bold">✓</span>
-                <span>Controllo manuale di tutte le luci e stanze</span>
+                <span className="text-sage-500 font-bold">✓</span>
+                <Text variant="secondary" size="sm" as="span">Controllo manuale di tutte le luci e stanze</Text>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-success-500 font-bold">✓</span>
-                <span>Attivazione rapida delle scene create nell&apos;app Philips Hue</span>
+                <span className="text-sage-500 font-bold">✓</span>
+                <Text variant="secondary" size="sm" as="span">Attivazione rapida delle scene create nell&apos;app Philips Hue</Text>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-success-500 font-bold">✓</span>
-                <span>Regolazione luminosità e colore per ogni stanza</span>
+                <span className="text-sage-500 font-bold">✓</span>
+                <Text variant="secondary" size="sm" as="span">Regolazione luminosità e colore per ogni stanza</Text>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-warning-500 font-bold">⏳</span>
-                <span>Usa l&apos;app ufficiale Philips Hue per automazioni avanzate temporanee</span>
+                <Text variant="secondary" size="sm" as="span">Usa l&apos;app ufficiale Philips Hue per automazioni avanzate temporanee</Text>
               </li>
             </ul>
           </div>

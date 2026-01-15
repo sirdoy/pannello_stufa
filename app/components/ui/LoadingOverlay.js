@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import Text from './Text';
 
 /**
  * LoadingOverlay Component - Ember Noir Design System
@@ -81,12 +82,12 @@ export default function LoadingOverlay({
 
           {/* Message */}
           <div className="text-center space-y-2 relative z-10">
-            <p className="text-lg sm:text-xl font-bold font-display text-slate-100 [html:not(.dark)_&]:text-slate-900">
+            <Text variant="body" size="lg" weight="bold" className="sm:text-xl">
               {message}
-            </p>
-            <p className="text-sm text-slate-400 font-display [html:not(.dark)_&]:text-slate-500">
+            </Text>
+            <Text variant="tertiary" size="sm">
               Attendere prego...
-            </p>
+            </Text>
           </div>
 
           {/* Loading dots */}

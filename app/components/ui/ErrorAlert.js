@@ -1,11 +1,14 @@
 /**
- * ErrorAlert Component
- * Displays stove errors and alarms with appropriate styling
+ * ErrorAlert Component - Ember Noir Design System
+ *
+ * Displays stove errors and alarms with appropriate styling.
+ * Uses Banner component for consistent presentation.
  */
 
 import { ERROR_SEVERITY, getErrorInfo } from '@/lib/errorMonitor';
 import Banner from './Banner';
 import Button from './Button';
+import Text from './Text';
 
 export default function ErrorAlert({ errorCode, errorDescription, className = '', onDismiss, showSuggestion = true, showDetailsButton = false }) {
   if (errorCode === 0 || !errorCode) {
@@ -38,9 +41,13 @@ export default function ErrorAlert({ errorCode, errorDescription, className = ''
         {errorDescription || errorInfo.description}
       </div>
       {showSuggestion && suggestion && (
-        <div className="mt-3 p-3 bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl rounded-lg shadow-liquid-sm ring-1 ring-white/20 dark:ring-white/10 ring-inset relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
-          <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 mb-1 relative z-10">💡 Suggerimento:</p>
-          <p className="text-sm text-neutral-700 dark:text-neutral-300 relative z-10">{suggestion}</p>
+        <div className="mt-3 p-3 bg-slate-800/40 backdrop-blur-2xl rounded-lg ring-1 ring-slate-700/50 ring-inset [html:not(.dark)_&]:bg-slate-100/60 [html:not(.dark)_&]:ring-slate-200">
+          <Text variant="secondary" size="sm" weight="medium" className="mb-1">
+            💡 Suggerimento:
+          </Text>
+          <Text variant="tertiary" size="sm">
+            {suggestion}
+          </Text>
         </div>
       )}
     </>
@@ -73,6 +80,7 @@ export default function ErrorAlert({ errorCode, errorDescription, className = ''
 
 /**
  * ErrorBadge - Compact error indicator
+ * Uses Ember Noir danger/warning palette
  */
 export function ErrorBadge({ errorCode, className = '' }) {
   if (errorCode === 0 || !errorCode) {
@@ -82,22 +90,23 @@ export function ErrorBadge({ errorCode, className = '' }) {
   const errorInfo = getErrorInfo(errorCode);
   const { severity } = errorInfo;
 
-  const getSeverityColor = () => {
+  // Ember Noir severity colors
+  const getSeverityClasses = () => {
     switch (severity) {
       case ERROR_SEVERITY.CRITICAL:
-        return 'bg-primary-500 text-white';
+        return 'bg-gradient-to-r from-danger-500 to-danger-600 text-white shadow-[0_2px_8px_rgba(239,68,68,0.3)]';
       case ERROR_SEVERITY.ERROR:
-        return 'bg-primary-400 text-white';
+        return 'bg-gradient-to-r from-danger-400 to-danger-500 text-white shadow-[0_2px_8px_rgba(239,68,68,0.25)]';
       case ERROR_SEVERITY.WARNING:
-        return 'bg-warning-500 text-white';
+        return 'bg-gradient-to-r from-warning-400 to-warning-500 text-white shadow-[0_2px_8px_rgba(234,179,8,0.25)]';
       default:
-        return 'bg-info-500 text-white';
+        return 'bg-gradient-to-r from-ocean-400 to-ocean-500 text-white shadow-[0_2px_8px_rgba(67,125,174,0.25)]';
     }
   };
 
   return (
     <span
-      className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${getSeverityColor()} ${className}`}
+      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-display ${getSeverityClasses()} ${className}`}
     >
       <span>⚠️</span>
       <span>Errore {errorCode}</span>

@@ -3,9 +3,10 @@ import Text from './Text';
 import Container from './Container';
 
 /**
- * Section Component
+ * Section Component - Ember Noir Design System
  *
  * Semantic wrapper for page sections with optional title, description, and action.
+ * Handles dark/light mode internally.
  *
  * @example
  * <Section
@@ -34,10 +35,10 @@ export default function Section({
           {title && (
             <>
               <div className="flex items-center gap-3 mb-2">
-                <div className="h-1 w-12 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full" />
-                <span className="text-sm font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">
+                <div className="h-1 w-12 bg-gradient-to-r from-ember-500 to-flame-600 rounded-full" />
+                <Text variant="tertiary" size="sm" weight="medium" uppercase tracking as="span">
                   Dashboard
-                </span>
+                </Text>
               </div>
               <div className="flex items-center justify-between gap-4 mb-3">
                 <Heading level={1} size="3xl">{title}</Heading>

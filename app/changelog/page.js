@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { getChangelogFromFirebase } from '@/lib/changelogService';
 import { VERSION_HISTORY, APP_VERSION } from '@/lib/version';
-import { Card, Skeleton } from '@/app/components/ui';
+import { Card, Skeleton, Heading, Text } from '@/app/components/ui';
 
 export default function ChangelogPage() {
   const [changelog, setChangelog] = useState([]);
@@ -61,10 +61,10 @@ export default function ChangelogPage() {
 
   const getVersionColor = (type) => {
     switch (type) {
-      case 'major': return 'bg-primary-50 border-primary-200 text-primary-700';
-      case 'minor': return 'bg-success-50 border-success-200 text-success-700';
-      case 'patch': return 'bg-info-50 border-info-200 text-info-700';
-      default: return 'bg-neutral-50 border-neutral-200 text-neutral-700';
+      case 'major': return 'bg-ember-50 [html:not(.dark)_&]:bg-ember-50 border-ember-200 [html:not(.dark)_&]:border-ember-200 text-ember-300 [html:not(.dark)_&]:text-ember-700';
+      case 'minor': return 'bg-sage-50 [html:not(.dark)_&]:bg-sage-50 border-sage-200 [html:not(.dark)_&]:border-sage-200 text-sage-300 [html:not(.dark)_&]:text-sage-700';
+      case 'patch': return 'bg-ocean-50 [html:not(.dark)_&]:bg-ocean-50 border-ocean-200 [html:not(.dark)_&]:border-ocean-200 text-ocean-300 [html:not(.dark)_&]:text-ocean-700';
+      default: return 'bg-slate-50 [html:not(.dark)_&]:bg-slate-50 border-slate-200 [html:not(.dark)_&]:border-slate-200 text-slate-300 [html:not(.dark)_&]:text-slate-700';
     }
   };
 
@@ -88,30 +88,30 @@ export default function ChangelogPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <Card liquid className="p-6 sm:p-8">
+      <Card variant="elevated" className="p-6 sm:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 dark:text-white mb-2">📋 Changelog</h1>
-            <p className="text-neutral-600 dark:text-neutral-400">Storico di tutte le versioni e modifiche dell&apos;applicazione</p>
+            <Heading level={1} size="3xl" className="mb-2">📋 Changelog</Heading>
+            <Text variant="secondary">Storico di tutte le versioni e modifiche dell&apos;applicazione</Text>
           </div>
           <div className="text-left sm:text-right">
-            <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-1">Versione Corrente</p>
-            <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">{APP_VERSION}</p>
+            <Text variant="tertiary" size="sm" className="mb-1">Versione Corrente</Text>
+            <Text variant="ember" size="3xl" weight="bold">{APP_VERSION}</Text>
           </div>
         </div>
 
         {/* Source indicator */}
-        <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
-          <p className="text-xs text-neutral-500 dark:text-neutral-400">
-            Fonte: <span className="font-semibold">{source === 'firebase' ? 'Firebase Realtime' : 'Locale'}</span>
-          </p>
+        <div className="mt-4 pt-4 border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
+          <Text variant="tertiary" size="xs">
+            Fonte: <Text as="span" variant="tertiary" size="xs" weight="semibold">{source === 'firebase' ? 'Firebase Realtime' : 'Locale'}</Text>
+          </Text>
         </div>
       </Card>
 
       {/* Timeline */}
       <div className="space-y-6">
         {changelog.map((version, index) => (
-          <Card key={version.version} liquid className="overflow-hidden">
+          <Card key={version.version} variant="default" className="overflow-hidden">
             {/* Version Header */}
             <div className={`p-6 border-b-2 ${getVersionColor(version.type)}`}>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -119,24 +119,24 @@ export default function ChangelogPage() {
                   <span className="text-3xl">{getVersionIcon(version.type)}</span>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="text-2xl font-bold">v{version.version}</h2>
+                      <Heading level={2} size="2xl">v{version.version}</Heading>
                       {index === 0 && (
-                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-primary-500 text-white">
+                        <span className="px-2 py-1 text-xs font-bold font-display rounded-full bg-gradient-to-r from-ember-500 to-flame-600 text-white shadow-ember-glow-sm">
                           LATEST
                         </span>
                       )}
                     </div>
-                    <p className="text-sm font-medium mt-1">{getVersionTypeLabel(version.type)}</p>
+                    <Text variant="secondary" size="sm" weight="medium" className="mt-1">{getVersionTypeLabel(version.type)}</Text>
                   </div>
                 </div>
                 <div className="text-left sm:text-right">
-                  <p className="text-sm font-medium text-neutral-600">
+                  <Text variant="tertiary" size="sm" weight="medium">
                     📅 {new Date(version.date).toLocaleDateString('it-IT', {
                       day: '2-digit',
                       month: 'long',
                       year: 'numeric'
                     })}
-                  </p>
+                  </Text>
                 </div>
               </div>
             </div>
@@ -146,8 +146,8 @@ export default function ChangelogPage() {
               <ul className="space-y-3">
                 {version.changes.map((change, changeIndex) => (
                   <li key={changeIndex} className="flex items-start gap-3">
-                    <span className="text-success-500 dark:text-success-400 mt-1">✓</span>
-                    <p className="text-neutral-700 dark:text-neutral-300 flex-1">{change}</p>
+                    <Text variant="sage" className="mt-1">✓</Text>
+                    <Text variant="secondary" className="flex-1">{change}</Text>
                   </li>
                 ))}
               </ul>
@@ -157,14 +157,14 @@ export default function ChangelogPage() {
       </div>
 
       {/* Footer Info */}
-      <Card liquid className="p-6 sm:p-8 bg-neutral-50/50 dark:bg-neutral-900/20">
+      <Card variant="subtle" className="p-6 sm:p-8">
         <div className="text-center space-y-2">
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">
-            💡 <strong>Versionamento Semantico</strong>: MAJOR.MINOR.PATCH
-          </p>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400">
+          <Text variant="secondary" size="sm">
+            💡 <Text as="span" variant="secondary" size="sm" weight="bold">Versionamento Semantico</Text>: MAJOR.MINOR.PATCH
+          </Text>
+          <Text variant="tertiary" size="xs">
             MAJOR = Breaking changes • MINOR = Nuove funzionalità • PATCH = Bug fix
-          </p>
+          </Text>
         </div>
       </Card>
     </div>

@@ -53,8 +53,11 @@ export default function InfoBox({
 
         {/* Label */}
         <Text
-          variant="tertiary"
-          className="text-[10px] sm:text-xs uppercase tracking-wider font-bold font-display mb-1 text-slate-400 [html:not(.dark)_&]:text-slate-500"
+          variant="label"
+          size="xs"
+          weight="bold"
+          as="span"
+          className="mb-1"
         >
           {label}
         </Text>

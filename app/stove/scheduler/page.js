@@ -672,7 +672,7 @@ export default function WeeklyScheduler() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Title + Mode */}
         <Card liquid className="p-6 sm:p-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900 mb-6">
             Pianificazione Settimanale
           </h1>
 
@@ -739,7 +739,7 @@ export default function WeeklyScheduler() {
 
       {/* Weekly Timeline - Always Visible */}
       <Card liquid className="p-6">
-        <h2 className="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
+        <h2 className="text-lg font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-900 mb-4">
           📅 Panoramica Settimanale
         </h2>
         <WeeklyTimeline

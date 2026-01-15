@@ -269,13 +269,13 @@ export default function LightsPage() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card className="p-8">
-          <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-4">
+          <Heading level={2} size="lg" className="mb-4">
             Bridge Hue Non Connesso
-          </h2>
+          </Heading>
 
-          <p className="text-neutral-600 dark:text-neutral-400 mb-6">
+          <Text variant="secondary" className="mb-6">
             Effettua il pairing con il bridge Hue dalla homepage per controllare le luci.
-          </p>
+          </Text>
 
           <Button variant="primary" onClick={() => router.push('/')}>
             ← Torna alla Homepage
@@ -298,12 +298,12 @@ export default function LightsPage() {
           ← Indietro
         </Button>
 
-        <h1 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2">
-          💡 Controllo Luci Philips Hue
-        </h1>
-        <p className="text-neutral-600 dark:text-neutral-400">
+        <Heading level={1} size="2xl" className="mb-2">
+          Controllo Luci Philips Hue
+        </Heading>
+        <Text variant="secondary">
           Gestisci stanze, luci individuali e scene
-        </p>
+        </Text>
       </div>
 
       {/* Success Banner */}
@@ -433,7 +433,7 @@ export default function LightsPage() {
                         value={avgBrightness}
                         onChange={(e) => handleBrightnessChange(groupedLightId, e.target.value)}
                         disabled={refreshing || !groupedLightId}
-                        className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-warning-500"
+                        className="w-full h-2 bg-slate-200 [html:not(.dark)_&]:bg-slate-200 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-warning-500"
                       />
                     </div>
                   )}
@@ -453,7 +453,7 @@ export default function LightsPage() {
 
                 {/* Expanded Details */}
                 {isExpanded && (
-                  <div className="p-6 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/20">
+                  <div className="p-6 border-t border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 bg-slate-50 [html:not(.dark)_&]:bg-slate-50 bg-slate-900/20">
                     {/* Individual Lights */}
                     {roomLights.length > 0 && (
                       <>
@@ -469,8 +469,8 @@ export default function LightsPage() {
                                 key={light.id}
                                 className={`p-4 rounded-xl border-2 ${
                                   lightOn
-                                    ? 'border-warning-300 dark:border-warning-600 bg-warning-50 dark:bg-warning-900/10'
-                                    : 'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800'
+                                    ? 'border-warning-300 [html:not(.dark)_&]:border-warning-300 border-warning-600 bg-warning-50 [html:not(.dark)_&]:bg-warning-50 bg-warning-900/10'
+                                    : 'border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 bg-white [html:not(.dark)_&]:bg-white bg-slate-800'
                                 }`}
                               >
                                 <div className="flex items-center justify-between mb-2">
@@ -478,7 +478,7 @@ export default function LightsPage() {
                                     <Text size="sm" weight="semibold">{light.metadata?.name || 'Luce'}</Text>
                                     {hasColor && <Text variant="tertiary" size="xs">🎨 Colore disponibile</Text>}
                                   </div>
-                                  {lightOn && <span className="text-xs text-warning-600 dark:text-warning-400">ON</span>}
+                                  {lightOn && <span className="text-xs text-warning-400 [html:not(.dark)_&]:text-warning-600">ON</span>}
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-2 mb-2">
@@ -515,7 +515,7 @@ export default function LightsPage() {
                                         value={lightBrightness}
                                         onChange={(e) => handleLightBrightnessChange(light.id, e.target.value)}
                                         disabled={refreshing}
-                                        className="w-full h-1 bg-neutral-200 dark:bg-neutral-700 rounded appearance-none cursor-pointer accent-warning-500"
+                                        className="w-full h-1 bg-slate-200 [html:not(.dark)_&]:bg-slate-200 bg-slate-700 rounded appearance-none cursor-pointer accent-warning-500"
                                       />
                                     </div>
 
@@ -529,7 +529,7 @@ export default function LightsPage() {
                                               key={preset.name}
                                               onClick={() => handleLightColorChange(light.id, preset)}
                                               disabled={changingColor === light.id}
-                                              className="relative w-full aspect-square rounded-lg border-2 border-neutral-300 dark:border-neutral-600 hover:border-neutral-500 dark:hover:border-neutral-400 transition-all active:scale-95 disabled:opacity-50"
+                                              className="relative w-full aspect-square rounded-lg border-2 border-slate-300 [html:not(.dark)_&]:border-slate-300 border-slate-600 hover:border-slate-500 [html:not(.dark)_&]:hover:border-slate-500 hover:border-slate-400 transition-all active:scale-95 disabled:opacity-50"
                                               style={{ backgroundColor: preset.hex }}
                                               title={preset.name}
                                             >
@@ -564,8 +564,8 @@ export default function LightsPage() {
                               disabled={activatingScene === scene.id}
                               className={`relative p-4 rounded-xl border-2 transition-all active:scale-95 ${
                                 activatingScene === scene.id
-                                  ? 'border-warning-500 bg-warning-50 dark:bg-warning-900/20'
-                                  : 'border-neutral-200 dark:border-neutral-700 hover:border-warning-300 dark:hover:border-warning-600'
+                                  ? 'border-warning-500 bg-warning-50 [html:not(.dark)_&]:bg-warning-50 bg-warning-900/20'
+                                  : 'border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 hover:border-warning-300 dark:hover:border-warning-600'
                               }`}
                             >
                               <div className="text-2xl mb-1">🎨</div>

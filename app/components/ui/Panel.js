@@ -1,20 +1,21 @@
 import Card from './Card';
+import Heading from './Heading';
+import Text from './Text';
 
 /**
- * Panel Component
+ * Panel Component - Ember Noir Design System
  *
  * Standardized container for settings panels and content sections.
  * Extends Card component with consistent padding and layout.
+ * Handles dark/light mode internally.
  *
  * @param {Object} props - Component props
  * @param {ReactNode} props.children - Panel content
  * @param {string} props.title - Optional panel title
  * @param {string} props.description - Optional description below title
  * @param {ReactNode} props.headerAction - Optional action button/content in header
- * @param {boolean} props.liquid - Use liquid glass style (default: true)
- * @param {boolean} props.glassmorphism - Use glassmorphism style
- * @param {boolean} props.solid - Use solid style
- * @param {string} props.className - Additional classes
+ * @param {'default'|'elevated'|'subtle'|'glass'} props.variant - Card variant
+ * @param {string} props.className - Additional layout classes
  * @param {string} props.contentClassName - Classes for content wrapper
  */
 export default function Panel({
@@ -22,34 +23,34 @@ export default function Panel({
   title,
   description,
   headerAction,
-  liquid = true,
-  glassmorphism = false,
-  solid = false,
+  variant = 'default',
   className = '',
   contentClassName = '',
+  // Legacy props - ignored
+  liquid = false,
+  glassmorphism = false,
+  solid = false,
   ...props
 }) {
+  // Map legacy props to variant
+  let resolvedVariant = variant;
+  if (liquid || glassmorphism) resolvedVariant = 'glass';
+
   return (
     <Card
-      liquid={liquid}
-      glassmorphism={glassmorphism}
-      solid={solid}
+      variant={resolvedVariant}
       className={`overflow-hidden ${className}`}
       {...props}
     >
       {/* Header (se presente title o headerAction) */}
       {(title || headerAction) && (
-        <div className="flex items-start justify-between gap-4 pb-4 border-b border-neutral-200/50 dark:border-neutral-700/50">
+        <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
           {/* Title & Description */}
           {title && (
             <div>
-              <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
-                {title}
-              </h3>
+              <Heading level={3} size="lg">{title}</Heading>
               {description && (
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-                  {description}
-                </p>
+                <Text variant="secondary" size="sm" className="mt-1">{description}</Text>
               )}
             </div>
           )}

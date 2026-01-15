@@ -5,6 +5,8 @@ import { db } from '@/lib/firebase';
 import { onValue, ref } from 'firebase/database';
 import Card from '@/app/components/ui/Card';
 import Skeleton from '@/app/components/ui/Skeleton';
+import Heading from '@/app/components/ui/Heading';
+import Text from '@/app/components/ui/Text';
 import LogEntry from '@/app/components/log/LogEntry';
 import Pagination from '@/app/components/ui/Pagination';
 import { DEVICE_CONFIG } from '@/lib/devices/deviceTypes';
@@ -130,21 +132,21 @@ export default function LogPage() {
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2">📋 Storico Azioni</h1>
-        <p className="text-neutral-600 dark:text-neutral-400">Tutte le azioni registrate nel sistema</p>
+        <Heading level={1} size="3xl" className="mb-2">📋 Storico Azioni</Heading>
+        <Text variant="secondary">Tutte le azioni registrate nel sistema</Text>
       </div>
 
       {/* Filters Card */}
-      <Card liquid className="p-4 sm:p-6">
-        <h3 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">Filtra per dispositivo</h3>
+      <Card variant="default" className="p-4 sm:p-6">
+        <Heading level={3} size="sm" className="mb-3">Filtra per dispositivo</Heading>
         <div className="flex flex-wrap gap-2">
           {/* All */}
           <button
             onClick={() => setDeviceFilter('all')}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
               deviceFilter === 'all'
-                ? 'bg-neutral-900 text-white shadow-liquid-sm'
-                : 'bg-white/[0.08] backdrop-blur-2xl text-neutral-700 hover:bg-white/[0.12] shadow-liquid-sm ring-1 ring-white/[0.15] ring-inset'
+                ? 'bg-slate-900 text-white shadow-liquid-sm'
+                : 'bg-white/[0.08] backdrop-blur-2xl text-slate-300 [html:not(.dark)_&]:text-slate-700 hover:bg-white/[0.12] shadow-liquid-sm ring-1 ring-white/[0.15] ring-inset'
             }`}
           >
             🏠 Tutti ({deviceCounts.all})
@@ -156,8 +158,8 @@ export default function LogPage() {
               onClick={() => setDeviceFilter('stove')}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                 deviceFilter === 'stove'
-                  ? 'bg-primary-600 text-white shadow-liquid-sm'
-                  : 'bg-primary-500/[0.08] dark:bg-primary-500/[0.15] backdrop-blur-2xl text-primary-700 dark:text-primary-400 hover:bg-primary-500/[0.12] dark:hover:bg-primary-500/[0.20] shadow-liquid-sm ring-1 ring-primary-500/20 dark:ring-primary-500/30 ring-inset'
+                  ? 'bg-ember-600 text-white shadow-liquid-sm'
+                  : 'bg-ember-500/[0.08] [html:not(.dark)_&]:bg-ember-500/[0.08] bg-ember-500/[0.15] backdrop-blur-2xl text-ember-400 [html:not(.dark)_&]:text-ember-700 hover:bg-ember-500/[0.12] [html:not(.dark)_&]:hover:bg-ember-500/[0.12] hover:bg-ember-500/[0.20] shadow-liquid-sm ring-1 ring-ember-500/20 [html:not(.dark)_&]:ring-ember-500/20 ring-ember-500/30 ring-inset'
               }`}
             >
               🔥 Stufa ({deviceCounts.stove})
@@ -170,8 +172,8 @@ export default function LogPage() {
               onClick={() => setDeviceFilter('thermostat')}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                 deviceFilter === 'thermostat'
-                  ? 'bg-info-600 text-white shadow-liquid-sm'
-                  : 'bg-info-500/[0.08] dark:bg-info-500/[0.15] backdrop-blur-2xl text-info-700 dark:text-info-400 hover:bg-info-500/[0.12] dark:hover:bg-info-500/[0.20] shadow-liquid-sm ring-1 ring-info-500/20 dark:ring-info-500/30 ring-inset'
+                  ? 'bg-ocean-600 text-white shadow-liquid-sm'
+                  : 'bg-ocean-500/[0.08] [html:not(.dark)_&]:bg-ocean-500/[0.08] bg-ocean-500/[0.15] backdrop-blur-2xl text-ocean-400 [html:not(.dark)_&]:text-ocean-700 hover:bg-ocean-500/[0.12] [html:not(.dark)_&]:hover:bg-ocean-500/[0.12] hover:bg-ocean-500/[0.20] shadow-liquid-sm ring-1 ring-ocean-500/20 [html:not(.dark)_&]:ring-ocean-500/20 ring-ocean-500/30 ring-inset'
               }`}
             >
               🌡️ Termostato ({deviceCounts.thermostat})
@@ -185,7 +187,7 @@ export default function LogPage() {
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                 deviceFilter === 'lights'
                   ? 'bg-warning-600 text-white shadow-liquid-sm'
-                  : 'bg-warning-500/[0.08] dark:bg-warning-500/[0.15] backdrop-blur-2xl text-warning-700 dark:text-warning-400 hover:bg-warning-500/[0.12] dark:hover:bg-warning-500/[0.20] shadow-liquid-sm ring-1 ring-warning-500/20 dark:ring-warning-500/30 ring-inset'
+                  : 'bg-warning-500/[0.08] [html:not(.dark)_&]:bg-warning-500/[0.08] bg-warning-500/[0.15] backdrop-blur-2xl text-warning-400 [html:not(.dark)_&]:text-warning-700 hover:bg-warning-500/[0.12] [html:not(.dark)_&]:hover:bg-warning-500/[0.12] hover:bg-warning-500/[0.20] shadow-liquid-sm ring-1 ring-warning-500/20 [html:not(.dark)_&]:ring-warning-500/20 ring-warning-500/30 ring-inset'
               }`}
             >
               💡 Luci ({deviceCounts.lights})
@@ -198,8 +200,8 @@ export default function LogPage() {
               onClick={() => setDeviceFilter('sonos')}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                 deviceFilter === 'sonos'
-                  ? 'bg-success-600 text-white shadow-liquid-sm'
-                  : 'bg-success-500/[0.08] dark:bg-success-500/[0.15] backdrop-blur-2xl text-success-700 dark:text-success-400 hover:bg-success-500/[0.12] dark:hover:bg-success-500/[0.20] shadow-liquid-sm ring-1 ring-success-500/20 dark:ring-success-500/30 ring-inset'
+                  ? 'bg-sage-600 text-white shadow-liquid-sm'
+                  : 'bg-sage-500/[0.08] [html:not(.dark)_&]:bg-sage-500/[0.08] bg-sage-500/[0.15] backdrop-blur-2xl text-sage-400 [html:not(.dark)_&]:text-sage-700 hover:bg-sage-500/[0.12] [html:not(.dark)_&]:hover:bg-sage-500/[0.12] hover:bg-sage-500/[0.20] shadow-liquid-sm ring-1 ring-sage-500/20 [html:not(.dark)_&]:ring-sage-500/20 ring-sage-500/30 ring-inset'
               }`}
             >
               🎵 Sonos ({deviceCounts.sonos})
@@ -209,14 +211,14 @@ export default function LogPage() {
       </Card>
 
       {/* Log Entries */}
-      <Card liquid className="p-4 sm:p-6">
+      <Card variant="default" className="p-4 sm:p-6">
         {filteredLog.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-lg text-neutral-500 dark:text-neutral-400 mb-2">Nessuna azione registrata</p>
+            <Text variant="tertiary" size="lg" className="mb-2">Nessuna azione registrata</Text>
             {deviceFilter !== 'all' && (
               <button
                 onClick={() => setDeviceFilter('all')}
-                className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                className="text-sm text-ember-400 [html:not(.dark)_&]:text-ember-600 hover:text-ember-500 [html:not(.dark)_&]:hover:text-ember-700 font-medium"
               >
                 Mostra tutti i log
               </button>

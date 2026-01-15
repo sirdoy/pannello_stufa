@@ -204,13 +204,13 @@ export default function ScenesPage() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card className="p-8">
-          <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-4">
+          <Heading level={2} size="lg" className="mb-4">
             Bridge Hue Non Connesso
-          </h2>
+          </Heading>
 
-          <p className="text-neutral-600 dark:text-neutral-400 mb-6">
+          <Text variant="secondary" className="mb-6">
             Effettua il pairing con il bridge Hue dalla homepage per gestire le scene.
-          </p>
+          </Text>
 
           <Button variant="primary" onClick={() => router.push('/')}>
             ← Torna alla Homepage
@@ -244,12 +244,12 @@ export default function ScenesPage() {
           ← Indietro
         </Button>
 
-        <h1 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2">
-          🎨 Scene Philips Hue
-        </h1>
-        <p className="text-neutral-600 dark:text-neutral-400">
+        <Heading level={1} size="2xl" className="mb-2">
+          Scene Philips Hue
+        </Heading>
+        <Text variant="secondary">
           Attiva le tue scene preferite con un click
-        </p>
+        </Text>
       </div>
 
       {/* Success Banner */}
@@ -284,12 +284,12 @@ export default function ScenesPage() {
       <Card className="p-6 mb-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-neutral-900 dark:text-white mb-1">
+            <Heading level={2} size="lg" className="mb-1">
               Scene Disponibili
-            </h2>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+            </Heading>
+            <Text variant="secondary" size="sm">
               {filteredScenes.length} {filteredScenes.length === 1 ? 'scena' : 'scene'} disponibili
-            </p>
+            </Text>
           </div>
 
           <div className="flex gap-2">
@@ -313,7 +313,7 @@ export default function ScenesPage() {
 
         {/* Room Filter */}
         {rooms.length > 1 && (
-          <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
+          <div className="mt-4 pt-4 border-t border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700">
             <Text variant="secondary" size="xs" className="mb-2">Filtra per stanza:</Text>
             <div className="flex flex-wrap gap-2">
               <Button
@@ -359,8 +359,8 @@ export default function ScenesPage() {
                     disabled={activatingScene === scene.id}
                     className={`w-full relative p-6 rounded-2xl border-2 transition-all duration-200 active:scale-95 ${
                       activatingScene === scene.id
-                        ? 'border-warning-500 bg-warning-50 dark:bg-warning-900/20'
-                        : 'border-neutral-200 dark:border-neutral-700 bg-white/60 dark:bg-white/[0.03] hover:bg-warning-50 dark:hover:bg-warning-900/20 hover:border-warning-300 dark:hover:border-warning-600'
+                        ? 'border-warning-500 bg-warning-50 [html:not(.dark)_&]:bg-warning-50 bg-warning-900/20'
+                        : 'border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 bg-white/60 [html:not(.dark)_&]:bg-white/60 bg-white/[0.03] hover:bg-warning-50 [html:not(.dark)_&]:hover:bg-warning-50 hover:bg-warning-900/20 hover:border-warning-300 [html:not(.dark)_&]:hover:border-warning-300 hover:border-warning-600'
                     }`}
                   >
                     <div className="text-4xl mb-3">🎨</div>
@@ -407,8 +407,8 @@ export default function ScenesPage() {
                 disabled={activatingScene === scene.id}
                 className={`w-full relative p-6 rounded-2xl border-2 transition-all duration-200 active:scale-95 ${
                   activatingScene === scene.id
-                    ? 'border-warning-500 bg-warning-50 dark:bg-warning-900/20'
-                    : 'border-neutral-200 dark:border-neutral-700 bg-white/60 dark:bg-white/[0.03] hover:bg-warning-50 dark:hover:bg-warning-900/20 hover:border-warning-300 dark:hover:border-warning-600'
+                    ? 'border-warning-500 bg-warning-50 [html:not(.dark)_&]:bg-warning-50 bg-warning-900/20'
+                    : 'border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 bg-white/60 [html:not(.dark)_&]:bg-white/60 bg-white/[0.03] hover:bg-warning-50 [html:not(.dark)_&]:hover:bg-warning-50 hover:bg-warning-900/20 hover:border-warning-300 [html:not(.dark)_&]:hover:border-warning-300 hover:border-warning-600'
                 }`}
               >
                 <div className="text-4xl mb-3">🎨</div>

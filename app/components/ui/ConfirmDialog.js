@@ -3,6 +3,8 @@
 import { useEffect } from 'react';
 import Button from './Button';
 import Card from './Card';
+import Heading from './Heading';
+import Text from './Text';
 
 export default function ConfirmDialog({
   isOpen,
@@ -42,31 +44,27 @@ export default function ConfirmDialog({
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 dark:bg-black/70 backdrop-blur-sm animate-fadeIn"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn [html:not(.dark)_&]:bg-slate-500/40"
       onClick={onCancel}
       role="dialog"
       aria-modal="true"
       aria-labelledby="dialog-title"
     >
       <Card
-        liquid
+        variant="elevated"
         className="max-w-md w-full p-6 animate-scaleIn"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-center mb-6">
           <div className="text-5xl mb-4">{icon}</div>
-          <h2
-            id="dialog-title"
-            className="text-xl font-bold text-neutral-900 dark:text-white mb-2"
-          >
+          <Heading level={2} size="xl" id="dialog-title" className="mb-2">
             {title}
-          </h2>
-          <p className="text-neutral-600 dark:text-neutral-400">{message}</p>
+          </Heading>
+          <Text variant="secondary">{message}</Text>
         </div>
 
         <div className="flex gap-3">
           <Button
-            liquid
             variant="ghost"
             onClick={onCancel}
             className="flex-1"
@@ -74,7 +72,6 @@ export default function ConfirmDialog({
             {cancelText}
           </Button>
           <Button
-            liquid
             variant={confirmVariant}
             onClick={onConfirm}
             className="flex-1"

@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Heading from './Heading';
+import Text from './Text';
 
 /**
  * Banner Component - Ember Noir Design System
@@ -151,25 +153,23 @@ export default function Banner({
         <div className="flex-1 min-w-0">
           {/* Title */}
           {title && (
-            <h3 className={`
-              font-display font-bold
-              ${compact ? 'text-sm' : 'text-base'}
-              ${styles.title}
-              ${description || children || actions ? 'mb-1' : ''}
-            `.trim().replace(/\s+/g, ' ')}>
+            <Heading
+              level={3}
+              size={compact ? 'sm' : 'base'}
+              className={`${styles.title} ${description || children || actions ? 'mb-1' : ''}`}
+            >
               {title}
-            </h3>
+            </Heading>
           )}
 
           {/* Description */}
           {description && (
-            <div className={`
-              ${compact ? 'text-xs' : 'text-sm'}
-              ${styles.description}
-              ${actions || children ? 'mb-3' : ''}
-            `.trim().replace(/\s+/g, ' ')}>
+            <Text
+              size={compact ? 'xs' : 'sm'}
+              className={`${styles.description} ${actions || children ? 'mb-3' : ''}`}
+            >
               {description}
-            </div>
+            </Text>
           )}
 
           {/* Custom children content */}

@@ -1,3 +1,5 @@
+import Heading from './Heading';
+
 /**
  * Card Component - Ember Noir Design System
  *
@@ -174,6 +176,7 @@ export function CardHeader({ children, className = '', ...props }) {
 
 /**
  * CardTitle - Title element for cards
+ * Uses Heading component internally for consistent typography.
  */
 export function CardTitle({ children, icon, className = '', ...props }) {
   return (
@@ -181,9 +184,7 @@ export function CardTitle({ children, icon, className = '', ...props }) {
       {icon && (
         <span className="text-2xl sm:text-3xl">{icon}</span>
       )}
-      <h2 className="font-display font-bold text-lg sm:text-xl text-slate-100 dark:text-slate-100 [html:not(.dark)_&]:text-slate-900">
-        {children}
-      </h2>
+      <Heading level={2} size="lg">{children}</Heading>
     </div>
   );
 }

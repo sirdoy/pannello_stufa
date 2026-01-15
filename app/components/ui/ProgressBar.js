@@ -1,38 +1,50 @@
+import Text from './Text';
+
 /**
- * ProgressBar Component
+ * ProgressBar Component - Ember Noir Design System
  *
  * Reusable progress indicator with gradient support and customizable styling.
  * Used for power/fan indicators, maintenance tracking, and percentage displays.
+ * Handles dark/light mode internally.
  *
  * @param {Object} props - Component props
  * @param {number} props.value - Progress value (0-100)
- * @param {string} props.gradient - Tailwind gradient classes (e.g., 'from-red-400 to-orange-500')
- * @param {string} props.color - Single color variant ('primary'|'success'|'warning'|'danger'|'info')
+ * @param {string} props.gradient - Custom Tailwind gradient classes
+ * @param {'ember'|'ocean'|'sage'|'warning'|'danger'} props.variant - Color variant
  * @param {'sm'|'md'|'lg'} props.size - Bar height
  * @param {boolean} props.animated - Enable smooth transitions
  * @param {string} props.label - Optional label above bar
  * @param {ReactNode} props.leftContent - Optional content on left (icon, text)
  * @param {ReactNode} props.rightContent - Optional content on right (value, text)
- * @param {string} props.className - Additional classes for container
+ * @param {string} props.className - Additional layout classes
  */
 export default function ProgressBar({
   value = 0,
   gradient,
-  color = 'primary',
+  variant = 'ember',
   size = 'md',
   animated = true,
   label,
   leftContent,
   rightContent,
   className = '',
+  // Legacy prop
+  color,
 }) {
-  // Color variants (se non è specificato gradient)
-  const colorVariants = {
-    primary: 'from-primary-400 via-primary-500 to-primary-600',
-    success: 'from-success-400 via-success-500 to-success-600',
+  // Map legacy color prop to variant
+  const resolvedVariant = color || variant;
+
+  // Ember Noir color variants
+  const variantGradients = {
+    ember: 'from-ember-400 via-ember-500 to-flame-600',
+    ocean: 'from-ocean-400 via-ocean-500 to-ocean-600',
+    sage: 'from-sage-400 via-sage-500 to-sage-600',
     warning: 'from-warning-400 via-warning-500 to-warning-600',
-    danger: 'from-red-400 via-red-500 to-red-600',
-    info: 'from-cyan-400 via-sky-400 to-indigo-500',
+    danger: 'from-danger-400 via-danger-500 to-danger-600',
+    // Legacy mappings
+    primary: 'from-ember-400 via-ember-500 to-flame-600',
+    success: 'from-sage-400 via-sage-500 to-sage-600',
+    info: 'from-ocean-400 via-ocean-500 to-ocean-600',
   };
 
   // Size variants
@@ -42,7 +54,7 @@ export default function ProgressBar({
     lg: 'h-4',
   };
 
-  const gradientClass = gradient || colorVariants[color];
+  const gradientClass = gradient || variantGradients[resolvedVariant] || variantGradients.ember;
   const clampedValue = Math.min(Math.max(value, 0), 100);
 
   return (
@@ -53,9 +65,7 @@ export default function ProgressBar({
           {/* Left side */}
           {leftContent && <div className="flex items-center gap-2">{leftContent}</div>}
           {label && !leftContent && (
-            <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
-              {label}
-            </span>
+            <Text variant="secondary" size="sm" weight="semibold" as="span">{label}</Text>
           )}
 
           {/* Right side */}
@@ -65,12 +75,18 @@ export default function ProgressBar({
 
       {/* Progress Bar */}
       <div
-        className={`relative bg-neutral-200/50 dark:bg-neutral-800/50 rounded-full overflow-hidden backdrop-blur-sm ${sizeClasses[size]}`}
+        className={`
+          relative rounded-full overflow-hidden backdrop-blur-sm
+          bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200/60
+          ${sizeClasses[size]}
+        `.trim().replace(/\s+/g, ' ')}
       >
         <div
-          className={`absolute inset-y-0 left-0 bg-gradient-to-r ${gradientClass} rounded-full shadow-md ${
-            animated ? 'transition-all duration-500' : ''
-          }`}
+          className={`
+            absolute inset-y-0 left-0 bg-gradient-to-r ${gradientClass}
+            rounded-full shadow-md
+            ${animated ? 'transition-all duration-500' : ''}
+          `.trim().replace(/\s+/g, ' ')}
           style={{ width: `${clampedValue}%` }}
           role="progressbar"
           aria-valuenow={clampedValue}

@@ -89,11 +89,11 @@ export default function ErrorsPage() {
       <Card liquid className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-neutral-900 flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900 flex items-center gap-3">
               <span>🚨</span>
               Storico Allarmi
             </h1>
-            <p className="text-sm text-neutral-500 mt-1">
+            <p className="text-sm text-slate-400 [html:not(.dark)_&]:text-slate-500 mt-1">
               Registro completo degli errori e allarmi della stufa
             </p>
           </div>
@@ -115,8 +115,8 @@ export default function ErrorsPage() {
             }}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
               filter === 'all'
-                ? 'bg-neutral-900 text-white shadow-liquid-sm'
-                : 'bg-white/[0.08] backdrop-blur-2xl text-neutral-600 hover:bg-white/[0.12] shadow-liquid-sm ring-1 ring-white/[0.15] ring-inset hover:text-neutral-900'
+                ? 'bg-slate-900 text-white shadow-liquid-sm'
+                : 'bg-white/[0.08] backdrop-blur-2xl text-slate-400 [html:not(.dark)_&]:text-slate-600 hover:bg-white/[0.12] shadow-liquid-sm ring-1 ring-white/[0.15] ring-inset hover:text-slate-100 [html:not(.dark)_&]:text-slate-900'
             }`}
           >
             Tutti ({errors.length})
@@ -128,8 +128,8 @@ export default function ErrorsPage() {
             }}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
               filter === 'active'
-                ? 'bg-primary-600 text-white shadow-liquid-sm'
-                : 'bg-primary-500/[0.08] backdrop-blur-2xl text-primary-600 hover:bg-primary-500/[0.12] shadow-liquid-sm ring-1 ring-primary-500/20 ring-inset'
+                ? 'bg-ember-600 text-white shadow-liquid-sm'
+                : 'bg-ember-500/[0.08] backdrop-blur-2xl text-ember-400 [html:not(.dark)_&]:text-ember-600 hover:bg-ember-500/[0.12] shadow-liquid-sm ring-1 ring-ember-500/20 ring-inset'
             }`}
           >
             Attivi ({errors.filter(e => !e.resolved).length})
@@ -141,8 +141,8 @@ export default function ErrorsPage() {
             }}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
               filter === 'resolved'
-                ? 'bg-success-600 text-white shadow-liquid-sm'
-                : 'bg-success-500/[0.08] backdrop-blur-2xl text-success-600 hover:bg-success-500/[0.12] shadow-liquid-sm ring-1 ring-success-500/20 ring-inset'
+                ? 'bg-sage-600 text-white shadow-liquid-sm'
+                : 'bg-sage-500/[0.08] backdrop-blur-2xl text-sage-400 [html:not(.dark)_&]:text-sage-600 hover:bg-sage-500/[0.12] shadow-liquid-sm ring-1 ring-sage-500/20 ring-inset'
             }`}
           >
             Risolti ({errors.filter(e => e.resolved).length})
@@ -155,10 +155,10 @@ export default function ErrorsPage() {
         {paginatedErrors.length === 0 ? (
           <Card liquid className="p-12 text-center">
             <span className="text-6xl mb-4 block">✅</span>
-            <h3 className="text-xl font-bold text-neutral-900 mb-2">
+            <h3 className="text-xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900 mb-2">
               Nessun errore trovato
             </h3>
-            <p className="text-neutral-600">
+            <p className="text-slate-400 [html:not(.dark)_&]:text-slate-600">
               {filter === 'all' && 'Non ci sono errori registrati nel sistema.'}
               {filter === 'active' && 'Non ci sono errori attivi al momento.'}
               {filter === 'resolved' && 'Non ci sono errori risolti da visualizzare.'}
@@ -175,32 +175,32 @@ export default function ErrorsPage() {
                 />
 
                 {/* Metadata */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-neutral-200">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-200 [html:not(.dark)_&]:border-slate-200">
                   <div>
-                    <p className="text-xs text-neutral-500 mb-1">Data e Ora</p>
-                    <p className="text-sm font-medium text-neutral-900">
+                    <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 mb-1">Data e Ora</p>
+                    <p className="text-sm font-medium text-slate-100 [html:not(.dark)_&]:text-slate-900">
                       {formatDate(error.timestamp)}
                     </p>
                   </div>
 
                   {error.status && (
                     <div>
-                      <p className="text-xs text-neutral-500 mb-1">Stato Stufa</p>
-                      <p className="text-sm font-medium text-neutral-900">
+                      <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 mb-1">Stato Stufa</p>
+                      <p className="text-sm font-medium text-slate-100 [html:not(.dark)_&]:text-slate-900">
                         {error.status}
                       </p>
                     </div>
                   )}
 
                   <div>
-                    <p className="text-xs text-neutral-500 mb-1">Stato</p>
+                    <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 mb-1">Stato</p>
                     <div className="flex items-center gap-2">
                       {error.resolved ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-success-100 text-success-700 rounded text-xs font-medium">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-sage-100 [html:not(.dark)_&]:bg-sage-100 text-sage-300 [html:not(.dark)_&]:text-sage-700 rounded text-xs font-medium">
                           ✓ Risolto
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-warning-100 text-warning-700 rounded text-xs font-medium">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-warning-100 [html:not(.dark)_&]:bg-warning-100 text-warning-300 [html:not(.dark)_&]:text-warning-700 rounded text-xs font-medium">
                           ⚠ Attivo
                         </span>
                       )}
@@ -209,8 +209,8 @@ export default function ErrorsPage() {
 
                   {error.resolved && error.resolvedAt && (
                     <div>
-                      <p className="text-xs text-neutral-500 mb-1">Risolto Dopo</p>
-                      <p className="text-sm font-medium text-neutral-900">
+                      <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 mb-1">Risolto Dopo</p>
+                      <p className="text-sm font-medium text-slate-100 [html:not(.dark)_&]:text-slate-900">
                         {formatDuration(error.timestamp, error.resolvedAt)}
                       </p>
                     </div>
@@ -219,7 +219,7 @@ export default function ErrorsPage() {
 
                 {/* Actions */}
                 {!error.resolved && (
-                  <div className="pt-4 border-t border-neutral-200">
+                  <div className="pt-4 border-t border-slate-200 [html:not(.dark)_&]:border-slate-200">
                     <Button liquid
                       variant="success"
                       size="sm"

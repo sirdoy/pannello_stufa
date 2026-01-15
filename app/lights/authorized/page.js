@@ -32,11 +32,11 @@ export default function HueAuthorizedPage() {
     <div className="max-w-2xl mx-auto px-4 py-16">
       <Card className="p-12 text-center">
         <div className="mb-6">
-          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-warning-100 to-warning-200 rounded-full flex items-center justify-center animate-pulse">
+          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-warning-100 to-warning-200 [html:not(.dark)_&]:from-warning-100 [html:not(.dark)_&]:to-warning-200 rounded-full flex items-center justify-center animate-pulse">
             <span className="text-3xl">💡</span>
           </div>
         </div>
-        <p className="text-lg font-medium text-neutral-900">{status}</p>
+        <p className="text-lg font-medium text-slate-100 [html:not(.dark)_&]:text-slate-900">{status}</p>
       </Card>
     </div>
   );

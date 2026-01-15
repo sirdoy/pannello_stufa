@@ -50,9 +50,9 @@ export default function ThemeSettingsPage() {
     return (
       <SettingsLayout title="Tema" icon="🎨">
         <Card liquid>
-          <p className="text-neutral-600 dark:text-neutral-400">
+          <Text variant="secondary">
             Devi essere autenticato per gestire il tema.
-          </p>
+          </Text>
         </Card>
       </SettingsLayout>
     );
@@ -80,8 +80,8 @@ export default function ThemeSettingsPage() {
               w-full p-4 rounded-lg border-2 transition-all
               flex items-center justify-between
               ${theme === THEMES.LIGHT
-                ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'
+                ? 'border-ember-500 bg-ember-50 [html:not(.dark)_&]:bg-ember-50 bg-ember-900/20'
+                : 'border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 hover:border-slate-300 [html:not(.dark)_&]:hover:border-slate-300 hover:border-slate-600'
               }
               ${isSaving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
             `}
@@ -89,16 +89,16 @@ export default function ThemeSettingsPage() {
             <div className="flex items-center gap-3">
               <div className="text-3xl">☀️</div>
               <div className="text-left">
-                <div className="font-semibold text-neutral-900 dark:text-white">
+                <Text variant="body" weight="semibold" as="div">
                   Modalità Chiara
-                </div>
-                <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                </Text>
+                <Text variant="secondary" size="sm" as="div">
                   Sfondo chiaro con elementi glass
-                </div>
+                </Text>
               </div>
             </div>
             {theme === THEMES.LIGHT && (
-              <div className="flex items-center gap-2 text-primary-600 dark:text-primary-400">
+              <div className="flex items-center gap-2 text-ember-400 [html:not(.dark)_&]:text-ember-600">
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
@@ -114,8 +114,8 @@ export default function ThemeSettingsPage() {
               w-full p-4 rounded-lg border-2 transition-all
               flex items-center justify-between
               ${theme === THEMES.DARK
-                ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'
+                ? 'border-ember-500 bg-ember-50 [html:not(.dark)_&]:bg-ember-50 bg-ember-900/20'
+                : 'border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 hover:border-slate-300 [html:not(.dark)_&]:hover:border-slate-300 hover:border-slate-600'
               }
               ${isSaving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
             `}
@@ -123,16 +123,16 @@ export default function ThemeSettingsPage() {
             <div className="flex items-center gap-3">
               <div className="text-3xl">🌙</div>
               <div className="text-left">
-                <div className="font-semibold text-neutral-900 dark:text-white">
+                <Text variant="body" weight="semibold" as="div">
                   Modalità Scura
-                </div>
-                <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                </Text>
+                <Text variant="secondary" size="sm" as="div">
                   Sfondo scuro con glass effect
-                </div>
+                </Text>
               </div>
             </div>
             {theme === THEMES.DARK && (
-              <div className="flex items-center gap-2 text-primary-600 dark:text-primary-400">
+              <div className="flex items-center gap-2 text-ember-400 [html:not(.dark)_&]:text-ember-600">
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
@@ -143,10 +143,10 @@ export default function ThemeSettingsPage() {
 
         {/* Status Message */}
         {isSaving && (
-          <div className="mt-4 p-3 bg-info-50 dark:bg-info-900/20 border border-info-200 dark:border-info-800 rounded-lg">
-            <p className="text-sm text-info-700 dark:text-info-300">
-              ⏳ Salvataggio tema in corso...
-            </p>
+          <div className="mt-4 p-3 bg-ocean-50 [html:not(.dark)_&]:bg-ocean-50 bg-ocean-900/20 border border-ocean-200 [html:not(.dark)_&]:border-ocean-200 border-ocean-800 rounded-lg">
+            <Text variant="ocean" size="sm">
+              Salvataggio tema in corso...
+            </Text>
           </div>
         )}
       </Card>
@@ -159,14 +159,14 @@ export default function ThemeSettingsPage() {
 
         <div className="space-y-4">
           {/* Sample elements */}
-          <div className="p-4 backdrop-blur-md bg-white/10 dark:bg-white/5 rounded-lg border border-white/20 dark:border-white/10">
-            <p className="text-neutral-900 dark:text-white font-medium mb-2">
+          <div className="p-4 backdrop-blur-md bg-white/10 [html:not(.dark)_&]:bg-white/10 bg-white/5 rounded-lg border border-white/20 [html:not(.dark)_&]:border-white/20 border-white/10">
+            <Text variant="body" weight="medium" className="mb-2">
               Esempio Glass Effect
-            </p>
-            <p className="text-neutral-600 dark:text-neutral-400 text-sm">
+            </Text>
+            <Text variant="secondary" size="sm">
               Questo è un esempio di come appare l&apos;effetto vetro (glass) con il tema {theme === THEMES.LIGHT ? 'chiaro' : 'scuro'}.
               Il blur e la trasparenza creano profondità visiva.
-            </p>
+            </Text>
           </div>
 
           <div className="flex gap-3 flex-wrap">
@@ -185,28 +185,28 @@ export default function ThemeSettingsPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
-              <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">Primary</p>
-              <p className="text-primary-600 dark:text-primary-400 font-semibold">Rosso</p>
+            <div className="p-3 bg-ember-50 [html:not(.dark)_&]:bg-ember-50 bg-ember-900/20 rounded-lg">
+              <Text variant="tertiary" size="xs" className="mb-1">Primary</Text>
+              <Text variant="ember" weight="semibold">Rosso</Text>
             </div>
-            <div className="p-3 bg-info-50 dark:bg-info-900/20 rounded-lg">
-              <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">Info</p>
-              <p className="text-info-600 dark:text-info-400 font-semibold">Blu</p>
+            <div className="p-3 bg-ocean-50 [html:not(.dark)_&]:bg-ocean-50 bg-ocean-900/20 rounded-lg">
+              <Text variant="tertiary" size="xs" className="mb-1">Info</Text>
+              <Text variant="ocean" weight="semibold">Blu</Text>
             </div>
-            <div className="p-3 bg-success-50 dark:bg-success-900/20 rounded-lg">
-              <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">Success</p>
-              <p className="text-success-600 dark:text-success-400 font-semibold">Verde</p>
+            <div className="p-3 bg-sage-50 [html:not(.dark)_&]:bg-sage-50 bg-sage-900/20 rounded-lg">
+              <Text variant="tertiary" size="xs" className="mb-1">Success</Text>
+              <Text variant="sage" weight="semibold">Verde</Text>
             </div>
-            <div className="p-3 bg-warning-50 dark:bg-warning-900/20 rounded-lg">
-              <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">Warning</p>
-              <p className="text-warning-600 dark:text-warning-400 font-semibold">Arancione</p>
+            <div className="p-3 bg-warning-50 [html:not(.dark)_&]:bg-warning-50 bg-warning-900/20 rounded-lg">
+              <Text variant="tertiary" size="xs" className="mb-1">Warning</Text>
+              <Text variant="warning" weight="semibold">Arancione</Text>
             </div>
           </div>
         </div>
       </Card>
 
       {/* Info Card */}
-      <Card liquid className="p-6 sm:p-8 bg-info-50/50 dark:bg-info-900/10 border border-info-200 dark:border-info-800">
+      <Card liquid className="p-6 sm:p-8 bg-ocean-50/50 [html:not(.dark)_&]:bg-ocean-50/50 bg-ocean-900/10 border border-ocean-200 [html:not(.dark)_&]:border-ocean-200 border-ocean-800">
         <div className="flex gap-3">
           <div className="text-2xl">ℹ️</div>
           <div className="flex-1">

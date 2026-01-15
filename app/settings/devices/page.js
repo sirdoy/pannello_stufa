@@ -130,7 +130,7 @@ export default function DevicesSettingsPage() {
   return (
     <SettingsLayout title="Gestione Dispositivi" icon="📱">
       {/* Description */}
-      <p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-400">
+      <p className="text-sm sm:text-base text-slate-400 [html:not(.dark)_&]:text-slate-600">
         Abilita o disabilita i dispositivi da visualizzare in homepage e nel menu
       </p>
 
@@ -148,7 +148,7 @@ export default function DevicesSettingsPage() {
 
       {/* Devices list */}
       <Card liquid className="p-6">
-        <h2 className="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
+        <h2 className="text-lg font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-900 mb-4">
           Dispositivi Disponibili
         </h2>
 
@@ -161,8 +161,8 @@ export default function DevicesSettingsPage() {
                 key={device.id}
                 className={`p-4 rounded-xl border-2 transition-all duration-200 ${
                   isEnabled
-                    ? 'border-primary-200 dark:border-primary-800 bg-primary-50/50 dark:bg-primary-900/20'
-                    : 'border-neutral-200 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/50'
+                    ? 'border-ember-200 [html:not(.dark)_&]:border-ember-200 border-ember-800 bg-ember-50/50 [html:not(.dark)_&]:bg-ember-50/50 bg-ember-900/20'
+                    : 'border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 bg-slate-50/50 [html:not(.dark)_&]:bg-slate-50/50 bg-slate-800/50'
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">
@@ -170,16 +170,16 @@ export default function DevicesSettingsPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-2xl">{device.icon}</span>
-                      <h3 className="text-base font-semibold text-neutral-900 dark:text-white">
+                      <h3 className="text-base font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-900">
                         {device.name}
                       </h3>
                       {isEnabled && (
-                        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-success-100 dark:bg-success-900/30 text-success-700 dark:text-success-300">
+                        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-sage-100 [html:not(.dark)_&]:bg-sage-100 bg-sage-900/30 text-sage-300 [html:not(.dark)_&]:text-sage-700">
                           Attivo
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-neutral-600 dark:text-neutral-400 ml-11">
+                    <p className="text-sm text-slate-400 [html:not(.dark)_&]:text-slate-600 ml-11">
                       {device.description}
                     </p>
                   </div>
@@ -203,10 +203,10 @@ export default function DevicesSettingsPage() {
         <Card liquid className="p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
             <div className="flex-1">
-              <p className="text-sm font-medium text-neutral-900 dark:text-white">
+              <p className="text-sm font-medium text-slate-100 [html:not(.dark)_&]:text-slate-900">
                 Hai modifiche non salvate
               </p>
-              <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+              <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 mt-1">
                 Salva le modifiche per applicarle alla navigazione
               </p>
             </div>
@@ -235,21 +235,21 @@ export default function DevicesSettingsPage() {
       )}
 
       {/* Info card */}
-      <Card liquid className="p-6 bg-info-50/50 dark:bg-info-900/10">
-        <h3 className="text-base font-semibold text-info-900 dark:text-info-300 mb-3">
+      <Card liquid className="p-6 bg-ocean-50/50 [html:not(.dark)_&]:bg-ocean-50/50 bg-ocean-900/10">
+        <h3 className="text-base font-semibold text-ocean-300 [html:not(.dark)_&]:text-ocean-900 mb-3">
           ℹ️ Note
         </h3>
-        <ul className="space-y-2 text-sm text-info-700 dark:text-info-400">
+        <ul className="space-y-2 text-sm text-ocean-400 [html:not(.dark)_&]:text-ocean-700">
           <li className="flex gap-2">
-            <span className="text-primary-500 dark:text-primary-400 flex-shrink-0">•</span>
+            <span className="text-ember-400 [html:not(.dark)_&]:text-ember-500 flex-shrink-0">•</span>
             <span>I dispositivi disabilitati non verranno eliminati, potrai riattivarli quando vuoi</span>
           </li>
           <li className="flex gap-2">
-            <span className="text-primary-500 dark:text-primary-400 flex-shrink-0">•</span>
+            <span className="text-ember-400 [html:not(.dark)_&]:text-ember-500 flex-shrink-0">•</span>
             <span>Le modifiche saranno visibili immediatamente dopo il salvataggio</span>
           </li>
           <li className="flex gap-2">
-            <span className="text-primary-500 dark:text-primary-400 flex-shrink-0">•</span>
+            <span className="text-ember-400 [html:not(.dark)_&]:text-ember-500 flex-shrink-0">•</span>
             <span>La configurazione è personale e non influisce sugli altri utenti</span>
           </li>
         </ul>

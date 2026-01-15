@@ -168,20 +168,20 @@ export default function StoveDebugPage() {
   }, [autoRefresh]);
 
   return (
-    <div className="min-h-screen p-4 md:p-8 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen p-4 md:p-8 bg-gradient-to-br from-slate-50 to-slate-100 [html:not(.dark)_&]:from-slate-50 [html:not(.dark)_&]:to-slate-100 from-slate-900 to-slate-800">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900">
               🔥 Stove Debug Console
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-slate-400 [html:not(.dark)_&]:text-slate-600 mt-1">
               Raw API responses from Thermorossi endpoints (no internal fields)
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+            <label className="flex items-center gap-2 text-sm text-slate-300 [html:not(.dark)_&]:text-slate-700">
               <input
                 type="checkbox"
                 checked={autoRefresh}
@@ -199,7 +199,7 @@ export default function StoveDebugPage() {
         {/* GET Endpoints Section */}
         <Card>
           <div className="p-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-2xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900 mb-4">
               📥 GET Endpoints
             </h2>
             <div className="space-y-4">
@@ -293,30 +293,30 @@ export default function StoveDebugPage() {
         {/* POST Endpoints Section */}
         <Card>
           <div className="p-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-2xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900 mb-4">
               📤 POST/Control Endpoints
             </h2>
             <div className="space-y-6">
               {/* Ignite */}
-              <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
+              <div className="border-b border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                    <h3 className="font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-900">
                       Ignite Stove
                     </h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <code className="text-xs text-gray-600 dark:text-gray-400 truncate block">
+                      <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
                         {getExternalUrl('/api/stove/ignite')}
                       </code>
                       <button
                         onClick={() => copyUrlToClipboard('/api/stove/ignite')}
-                        className="flex-shrink-0 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                        className="flex-shrink-0 p-1 hover:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-200 hover:bg-slate-700 rounded transition-colors"
                         title="Copy external URL"
                       >
                         {copiedUrl === '/api/stove/ignite' ? (
                           <Check className="w-3 h-3 text-green-500" />
                         ) : (
-                          <Copy className="w-3 h-3 text-gray-500 dark:text-gray-400" />
+                          <Copy className="w-3 h-3 text-slate-400 [html:not(.dark)_&]:text-slate-500" />
                         )}
                       </button>
                     </div>
@@ -339,25 +339,25 @@ export default function StoveDebugPage() {
               </div>
 
               {/* Shutdown */}
-              <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
+              <div className="border-b border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                    <h3 className="font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-900">
                       Shutdown Stove
                     </h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <code className="text-xs text-gray-600 dark:text-gray-400 truncate block">
+                      <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
                         {getExternalUrl('/api/stove/shutdown')}
                       </code>
                       <button
                         onClick={() => copyUrlToClipboard('/api/stove/shutdown')}
-                        className="flex-shrink-0 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                        className="flex-shrink-0 p-1 hover:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-200 hover:bg-slate-700 rounded transition-colors"
                         title="Copy external URL"
                       >
                         {copiedUrl === '/api/stove/shutdown' ? (
                           <Check className="w-3 h-3 text-green-500" />
                         ) : (
-                          <Copy className="w-3 h-3 text-gray-500 dark:text-gray-400" />
+                          <Copy className="w-3 h-3 text-slate-400 [html:not(.dark)_&]:text-slate-500" />
                         )}
                       </button>
                     </div>
@@ -379,30 +379,30 @@ export default function StoveDebugPage() {
               </div>
 
               {/* Set Power */}
-              <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
+              <div className="border-b border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                    <h3 className="font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-900">
                       Set Power Level
                     </h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <code className="text-xs text-gray-600 dark:text-gray-400 truncate block">
+                      <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
                         {getExternalUrl('/api/stove/setPower')}
                       </code>
                       <button
                         onClick={() => copyUrlToClipboard('/api/stove/setPower')}
-                        className="flex-shrink-0 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                        className="flex-shrink-0 p-1 hover:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-200 hover:bg-slate-700 rounded transition-colors"
                         title="Copy external URL"
                       >
                         {copiedUrl === '/api/stove/setPower' ? (
                           <Check className="w-3 h-3 text-green-500" />
                         ) : (
-                          <Copy className="w-3 h-3 text-gray-500 dark:text-gray-400" />
+                          <Copy className="w-3 h-3 text-slate-400 [html:not(.dark)_&]:text-slate-500" />
                         )}
                       </button>
                     </div>
                     <div className="mt-2 flex items-center gap-3">
-                      <label className="text-sm text-gray-700 dark:text-gray-300">
+                      <label className="text-sm text-slate-300 [html:not(.dark)_&]:text-slate-700">
                         Level (1-5):
                       </label>
                       <input
@@ -411,7 +411,7 @@ export default function StoveDebugPage() {
                         max="5"
                         value={powerInput}
                         onChange={(e) => setPowerInput(parseInt(e.target.value))}
-                        className="w-20 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        className="w-20 px-3 py-1 border border-slate-300 [html:not(.dark)_&]:border-slate-300 border-slate-600 rounded-lg bg-white [html:not(.dark)_&]:bg-white bg-slate-800 text-slate-100 [html:not(.dark)_&]:text-slate-900"
                       />
                     </div>
                   </div>
@@ -433,30 +433,30 @@ export default function StoveDebugPage() {
               </div>
 
               {/* Set Fan */}
-              <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
+              <div className="border-b border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                    <h3 className="font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-900">
                       Set Fan Level
                     </h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <code className="text-xs text-gray-600 dark:text-gray-400 truncate block">
+                      <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
                         {getExternalUrl('/api/stove/setFan')}
                       </code>
                       <button
                         onClick={() => copyUrlToClipboard('/api/stove/setFan')}
-                        className="flex-shrink-0 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                        className="flex-shrink-0 p-1 hover:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-200 hover:bg-slate-700 rounded transition-colors"
                         title="Copy external URL"
                       >
                         {copiedUrl === '/api/stove/setFan' ? (
                           <Check className="w-3 h-3 text-green-500" />
                         ) : (
-                          <Copy className="w-3 h-3 text-gray-500 dark:text-gray-400" />
+                          <Copy className="w-3 h-3 text-slate-400 [html:not(.dark)_&]:text-slate-500" />
                         )}
                       </button>
                     </div>
                     <div className="mt-2 flex items-center gap-3">
-                      <label className="text-sm text-gray-700 dark:text-gray-300">
+                      <label className="text-sm text-slate-300 [html:not(.dark)_&]:text-slate-700">
                         Level (1-6):
                       </label>
                       <input
@@ -465,7 +465,7 @@ export default function StoveDebugPage() {
                         max="6"
                         value={fanInput}
                         onChange={(e) => setFanInput(parseInt(e.target.value))}
-                        className="w-20 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        className="w-20 px-3 py-1 border border-slate-300 [html:not(.dark)_&]:border-slate-300 border-slate-600 rounded-lg bg-white [html:not(.dark)_&]:bg-white bg-slate-800 text-slate-100 [html:not(.dark)_&]:text-slate-900"
                       />
                     </div>
                   </div>
@@ -490,27 +490,27 @@ export default function StoveDebugPage() {
               <div className="pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                    <h3 className="font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-900">
                       Set Water Temperature (Boiler)
                     </h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <code className="text-xs text-gray-600 dark:text-gray-400 truncate block">
+                      <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
                         {getExternalUrl('/api/stove/setWaterTemperature')}
                       </code>
                       <button
                         onClick={() => copyUrlToClipboard('/api/stove/setWaterTemperature')}
-                        className="flex-shrink-0 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                        className="flex-shrink-0 p-1 hover:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-200 hover:bg-slate-700 rounded transition-colors"
                         title="Copy external URL"
                       >
                         {copiedUrl === '/api/stove/setWaterTemperature' ? (
                           <Check className="w-3 h-3 text-green-500" />
                         ) : (
-                          <Copy className="w-3 h-3 text-gray-500 dark:text-gray-400" />
+                          <Copy className="w-3 h-3 text-slate-400 [html:not(.dark)_&]:text-slate-500" />
                         )}
                       </button>
                     </div>
                     <div className="mt-2 flex items-center gap-3">
-                      <label className="text-sm text-gray-700 dark:text-gray-300">
+                      <label className="text-sm text-slate-300 [html:not(.dark)_&]:text-slate-700">
                         Temperature (30-80°C):
                       </label>
                       <input
@@ -519,7 +519,7 @@ export default function StoveDebugPage() {
                         max="80"
                         value={waterTempInput}
                         onChange={(e) => setWaterTempInput(parseInt(e.target.value))}
-                        className="w-20 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        className="w-20 px-3 py-1 border border-slate-300 [html:not(.dark)_&]:border-slate-300 border-slate-600 rounded-lg bg-white [html:not(.dark)_&]:bg-white bg-slate-800 text-slate-100 [html:not(.dark)_&]:text-slate-900"
                       />
                     </div>
                   </div>
@@ -551,23 +551,23 @@ export default function StoveDebugPage() {
  */
 function EndpointDisplay({ title, endpoint, externalUrl, response, loading, onRefresh, onCopyUrl, isCopied }) {
   return (
-    <div className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0">
+    <div className="border-b border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 pb-4 last:border-0">
       <div className="flex items-center justify-between mb-2">
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-gray-900 dark:text-white">{title}</h3>
+          <h3 className="font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-900">{title}</h3>
           <div className="flex items-center gap-2 mt-1">
-            <code className="text-xs text-gray-600 dark:text-gray-400 truncate block">
+            <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
               {externalUrl}
             </code>
             <button
               onClick={onCopyUrl}
-              className="flex-shrink-0 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+              className="flex-shrink-0 p-1 hover:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-200 hover:bg-slate-700 rounded transition-colors"
               title="Copy external URL"
             >
               {isCopied ? (
                 <Check className="w-3 h-3 text-green-500" />
               ) : (
-                <Copy className="w-3 h-3 text-gray-500 dark:text-gray-400" />
+                <Copy className="w-3 h-3 text-slate-400 [html:not(.dark)_&]:text-slate-500" />
               )}
             </button>
           </div>
@@ -586,7 +586,7 @@ function EndpointDisplay({ title, endpoint, externalUrl, response, loading, onRe
  */
 function JsonDisplay({ data }) {
   return (
-    <pre className="mt-2 p-3 bg-gray-900 dark:bg-black text-green-400 rounded-lg text-xs overflow-x-auto font-mono">
+    <pre className="mt-2 p-3 bg-slate-900 [html:not(.dark)_&]:bg-slate-900 bg-black text-green-400 rounded-lg text-xs overflow-x-auto font-mono">
       {JSON.stringify(data, null, 2)}
     </pre>
   );

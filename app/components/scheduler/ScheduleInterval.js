@@ -21,7 +21,7 @@ export default function ScheduleInterval({
       liquid
       className={`cursor-pointer transition-all duration-300 p-4 ${
         isHighlighted
-          ? 'bg-primary-50/80 dark:bg-primary-900/30 ring-2 ring-primary-400 dark:ring-primary-600 shadow-liquid-lg scale-[1.01]'
+          ? 'bg-ember-50/80 [html:not(.dark)_&]:bg-ember-900/30 ring-2 ring-ember-400 [html:not(.dark)_&]:ring-ember-600 shadow-liquid-lg scale-[1.01]'
           : ''
       }`}
       onMouseEnter={onMouseEnter}
@@ -34,10 +34,10 @@ export default function ScheduleInterval({
           <div className="flex items-center gap-3">
             <div className="text-2xl">⏰</div>
             <div>
-              <div className="text-lg font-bold text-neutral-900 dark:text-white">
+              <div className="text-lg font-bold text-slate-900 [html:not(.dark)_&]:text-white">
                 {range.start} - {range.end}
               </div>
-              <div className="text-sm text-neutral-600 dark:text-neutral-400">
+              <div className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400">
                 {(() => {
                   const [startH, startM] = range.start.split(':').map(Number);
                   const [endH, endM] = range.end.split(':').map(Number);
@@ -90,17 +90,17 @@ export default function ScheduleInterval({
           leftContent={
             <>
               <span className="text-lg">⚡</span>
-              <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+              <span className="text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300">
                 Potenza
               </span>
             </>
           }
           rightContent={
             <>
-              <span className="text-xs font-bold text-neutral-600 dark:text-neutral-400">
+              <span className="text-xs font-bold text-slate-600 [html:not(.dark)_&]:text-slate-400">
                 P{range.power}
               </span>
-              <span className="text-sm font-medium text-neutral-900 dark:text-white">
+              <span className="text-sm font-medium text-slate-900 [html:not(.dark)_&]:text-white">
                 {powerLabel.text}
               </span>
             </>
@@ -116,17 +116,17 @@ export default function ScheduleInterval({
           leftContent={
             <>
               <span className="text-lg">💨</span>
-              <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+              <span className="text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300">
                 Ventola
               </span>
             </>
           }
           rightContent={
             <>
-              <span className="text-xs font-bold text-neutral-600 dark:text-neutral-400">
+              <span className="text-xs font-bold text-slate-600 [html:not(.dark)_&]:text-slate-400">
                 V{range.fan}
               </span>
-              <span className="text-sm font-medium text-neutral-900 dark:text-white">
+              <span className="text-sm font-medium text-slate-900 [html:not(.dark)_&]:text-white">
                 {fanLabel.text}
               </span>
             </>

@@ -217,10 +217,10 @@ export default function CreateSceneModal({
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div>
-            <h3 className="text-xl font-bold text-neutral-900 dark:text-white">
+            <h3 className="text-xl font-bold text-slate-900 [html:not(.dark)_&]:text-white">
               Crea Nuova Scena
             </h3>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+            <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-1">
               Cattura lo stato attuale delle luci o personalizza
             </p>
           </div>
@@ -237,8 +237,8 @@ export default function CreateSceneModal({
         <div className="space-y-6">
           {/* Scene Name */}
           <div>
-            <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
-              Nome Scena <span className="text-primary-500">*</span>
+            <label className="block text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300 mb-2">
+              Nome Scena <span className="text-ember-500">*</span>
             </label>
             <Input
               type="text"
@@ -253,15 +253,15 @@ export default function CreateSceneModal({
               autoFocus
               liquid
             />
-            <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">
+            <p className="mt-2 text-xs text-slate-500 [html:not(.dark)_&]:text-slate-400">
               {name.length}/255 caratteri
             </p>
           </div>
 
           {/* Room Selection */}
           <div>
-            <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
-              Stanza <span className="text-primary-500">*</span>
+            <label className="block text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300 mb-2">
+              Stanza <span className="text-ember-500">*</span>
             </label>
             <select
               value={selectedRoom}
@@ -269,7 +269,7 @@ export default function CreateSceneModal({
                 setSelectedRoom(e.target.value);
                 setError('');
               }}
-              className="w-full px-4 py-3 bg-white/60 dark:bg-neutral-800/60 backdrop-blur-xl rounded-xl border border-neutral-300/50 dark:border-neutral-600/50 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-primary-400/20 text-neutral-900 dark:text-white transition-all outline-none"
+              className="w-full px-4 py-3 bg-white/60 [html:not(.dark)_&]:bg-slate-800/60 backdrop-blur-xl rounded-xl border border-slate-300/50 [html:not(.dark)_&]:border-slate-600/50 focus:border-ember-500 [html:not(.dark)_&]:focus:border-ember-400 focus:ring-2 focus:ring-ember-500/20 [html:not(.dark)_&]:focus:ring-ember-400/20 text-slate-900 [html:not(.dark)_&]:text-white transition-all outline-none"
             >
               <option value="">Seleziona una stanza...</option>
               {rooms.map((room) => (
@@ -283,32 +283,32 @@ export default function CreateSceneModal({
           {/* Lights Configuration */}
           {loadingLights && (
             <div className="text-center py-4">
-              <div className="w-8 h-8 border-3 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">Caricamento luci...</p>
+              <div className="w-8 h-8 border-3 border-ember-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+              <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400">Caricamento luci...</p>
             </div>
           )}
 
           {!loadingLights && lights.length > 0 && (
             <div>
-              <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">
+              <label className="block text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300 mb-3">
                 Configurazione Luci
               </label>
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {lights.map(light => {
                   const config = lightConfigs[light.id] || {};
                   return (
-                    <div key={light.id} className="p-4 bg-white/40 dark:bg-neutral-800/40 rounded-xl border border-neutral-200/50 dark:border-neutral-700/50">
+                    <div key={light.id} className="p-4 bg-white/40 [html:not(.dark)_&]:bg-slate-800/40 rounded-xl border border-slate-200/50 [html:not(.dark)_&]:border-slate-700/50">
                       {/* Light Name + Toggle */}
                       <div className="flex items-center justify-between mb-3">
-                        <span className="font-medium text-neutral-900 dark:text-white">
+                        <span className="font-medium text-slate-900 [html:not(.dark)_&]:text-white">
                           {light.metadata?.name || 'Luce'}
                         </span>
                         <button
                           onClick={() => handleLightToggle(light.id)}
                           className={`w-12 h-6 rounded-full transition-colors ${
                             config.on
-                              ? 'bg-warning-500'
-                              : 'bg-neutral-300 dark:bg-neutral-600'
+                              ? 'bg-flame-500'
+                              : 'bg-slate-300 [html:not(.dark)_&]:bg-slate-600'
                           }`}
                         >
                           <div className={`w-5 h-5 bg-white rounded-full shadow-md transition-transform ${
@@ -320,7 +320,7 @@ export default function CreateSceneModal({
                       {/* Brightness Slider (if supported and on) */}
                       {light.dimming && config.on && (
                         <div className="mb-3">
-                          <label className="block text-xs text-neutral-600 dark:text-neutral-400 mb-1">
+                          <label className="block text-xs text-slate-600 [html:not(.dark)_&]:text-slate-400 mb-1">
                             Luminosità: {config.brightness}%
                           </label>
                           <input
@@ -329,7 +329,7 @@ export default function CreateSceneModal({
                             max="100"
                             value={config.brightness || 100}
                             onChange={(e) => handleBrightnessChange(light.id, e.target.value)}
-                            className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded appearance-none cursor-pointer accent-warning-500"
+                            className="w-full h-2 bg-slate-200 [html:not(.dark)_&]:bg-slate-700 rounded appearance-none cursor-pointer accent-flame-500"
                           />
                         </div>
                       )}
@@ -337,7 +337,7 @@ export default function CreateSceneModal({
                       {/* Color Picker (if supported and on) - Simplified */}
                       {light.color && config.on && (
                         <div>
-                          <label className="block text-xs text-neutral-600 dark:text-neutral-400 mb-1">
+                          <label className="block text-xs text-slate-600 [html:not(.dark)_&]:text-slate-400 mb-1">
                             Colore (preset comuni)
                           </label>
                           <div className="grid grid-cols-5 gap-2">
@@ -345,7 +345,7 @@ export default function CreateSceneModal({
                               <button
                                 key={preset.name}
                                 onClick={() => handleColorChange(light.id, preset.x, preset.y)}
-                                className="p-2 rounded-lg bg-neutral-200/50 dark:bg-neutral-700/50 hover:bg-neutral-300/50 dark:hover:bg-neutral-600/50 text-xs transition-colors"
+                                className="p-2 rounded-lg bg-slate-200/50 [html:not(.dark)_&]:bg-slate-700/50 hover:bg-slate-300/50 [html:not(.dark)_&]:hover:bg-slate-600/50 text-xs transition-colors"
                                 title={preset.name}
                               >
                                 {preset.name[0]}
@@ -363,7 +363,7 @@ export default function CreateSceneModal({
 
           {/* Error Message */}
           {error && (
-            <p className="text-sm text-primary-600 dark:text-primary-400 flex items-center gap-1">
+            <p className="text-sm text-ember-600 [html:not(.dark)_&]:text-ember-400 flex items-center gap-1">
               <span>⚠️</span>
               <span>{error}</span>
             </p>

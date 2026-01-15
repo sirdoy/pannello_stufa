@@ -5,6 +5,58 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.49.0] - 2026-01-15
+
+### 🎨 Complete Ember Noir Migration - Final 32 Components
+
+**Obiettivo**: Migrazione completa di tutti i componenti rimanenti al design system Ember Noir v2.2.
+
+#### ✨ Componenti Aggiornati
+
+**Scheduler Components (8 file):**
+- `AddIntervalModal.js` - Modal aggiunta intervalli
+- `ScheduleManagementModal.js` - Gestione programmazioni
+- `DuplicateDayModal.js` - Duplicazione giorni
+- `IntervalBottomSheet.js` - Dettagli intervallo
+- `CreateScheduleModal.js`, `DayEditPanel.js`, `ScheduleInterval.js`, `ScheduleSelector.js`
+
+**Light Components (2 file):**
+- `CreateSceneModal.js` - Creazione scene luci
+- `EditSceneModal.js` - Modifica scene luci
+
+**App Modals (2 file):**
+- `WhatsNewModal.js` - Novità versione
+- `ForceUpdateModal.js` - Aggiornamento forzato
+
+**Layout Files (3 file):**
+- `app/layout.js` - Layout root con dark-first pattern
+- `app/template.js` - Template transizioni pagina
+- `SettingsLayout.js` - Layout pagine impostazioni
+
+**UI Components (4 file):**
+- `BottomSheet.js`, `ContextMenu.js`, `Pagination.js`, `Skeleton.js`
+
+**Netatmo Components (3 file):**
+- `NetatmoAuthCard.js`, `NetatmoTemperatureReport.js`, `RoomCard.js`
+
+**Navigation (1 file):**
+- `DropdownComponents.js`
+
+**Test Files (6 file):**
+- Aggiornati tutti gli assertions con nuovi color token
+
+#### 🔄 Pattern Applicati
+
+- `dark:` → `[html:not(.dark)_&]:` (dark-first design)
+- `neutral-*` → `slate-*`
+- `primary-*` → `ember-*`
+- `accent-*` → `flame-*`
+- `success-*` → `sage-*`
+- `info-*` → `ocean-*`
+- `warning-*` → `flame-*`
+
+---
+
 ## [1.46.0] - 2026-01-15
 
 ### 🌗 Full Light Mode Support - Ember Noir Design System

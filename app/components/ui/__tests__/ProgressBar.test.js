@@ -36,13 +36,13 @@ describe('ProgressBar Component', () => {
   describe('Color Variants', () => {
     test('renders primary color by default', () => {
       const { container } = render(<ProgressBar value={50} />);
-      const bar = container.querySelector('.from-primary-400');
+      const bar = container.querySelector('.from-ember-400');
       expect(bar).toBeInTheDocument();
     });
 
     test('renders success color', () => {
       const { container } = render(<ProgressBar value={50} color="success" />);
-      const bar = container.querySelector('.from-success-400');
+      const bar = container.querySelector('.from-sage-400');
       expect(bar).toBeInTheDocument();
     });
 

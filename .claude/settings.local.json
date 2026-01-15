@@ -105,7 +105,8 @@
       "Bash(npm view:*)",
       "Bash(npm install)",
       "Bash(npx prettier --check app/globals.css)",
-      "Bash(npx prettier --write app/globals.css)"
+      "Bash(npx prettier --write app/globals.css)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []

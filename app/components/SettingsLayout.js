@@ -37,7 +37,7 @@ export default function SettingsLayout({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-100 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 [html:not(.dark)_&]:from-slate-900 [html:not(.dark)_&]:via-slate-900 [html:not(.dark)_&]:to-slate-800 p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header with optional back button */}
         <div className="flex items-center gap-4">
@@ -53,7 +53,7 @@ export default function SettingsLayout({
               ← Indietro
             </Button>
           )}
-          <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 [html:not(.dark)_&]:text-white flex items-center gap-2">
             {icon && <span className="text-3xl sm:text-4xl">{icon}</span>}
             {title}
           </h1>

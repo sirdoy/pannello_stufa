@@ -49,11 +49,11 @@ export default function RootLayout({ children }) {
         }}
       />
     </head>
-    <body className="min-h-screen bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 flex flex-col" suppressHydrationWarning>
+    <body className="min-h-screen bg-slate-50 [html:not(.dark)_&]:bg-slate-900 text-slate-900 [html:not(.dark)_&]:text-slate-100 flex flex-col" suppressHydrationWarning>
     {/* Skip to content - Accessibility */}
     <a
       href="#main-content"
-      className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-[10000] px-6 py-3 bg-primary-500 text-white rounded-xl shadow-liquid-lg font-semibold hover:bg-primary-600 transition-colors"
+      className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-[10000] px-6 py-3 bg-ember-500 text-white rounded-xl shadow-liquid-lg font-semibold hover:bg-ember-600 transition-colors"
     >
       Salta al contenuto
     </a>

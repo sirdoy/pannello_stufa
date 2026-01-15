@@ -28,7 +28,7 @@ describe('ActionButton Component', () => {
     test('renders primary variant by default', () => {
       render(<ActionButton icon="✓" ariaLabel="Test" />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-primary-500/10');
+      expect(button).toHaveClass('bg-ember-500/10');
     });
 
     test('renders edit variant', () => {
@@ -48,7 +48,7 @@ describe('ActionButton Component', () => {
     test('renders close variant', () => {
       render(<ActionButton icon="✕" variant="close" ariaLabel="Close" />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-neutral-200/50');
+      expect(button).toHaveClass('bg-slate-200/50');
     });
 
     test('renders info variant', () => {
@@ -60,13 +60,13 @@ describe('ActionButton Component', () => {
     test('renders warning variant', () => {
       render(<ActionButton icon="⚠️" variant="warning" ariaLabel="Warning" />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-warning-500/10');
+      expect(button).toHaveClass('bg-flame-500/10');
     });
 
     test('renders success variant', () => {
       render(<ActionButton icon="✓" variant="success" ariaLabel="Success" />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-success-500/10');
+      expect(button).toHaveClass('bg-sage-500/10');
     });
   });
 

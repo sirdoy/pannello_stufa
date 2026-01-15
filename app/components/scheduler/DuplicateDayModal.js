@@ -65,15 +65,15 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/50 [html:not(.dark)_&]:bg-black/70 backdrop-blur-sm"
         onClick={onCancel}
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md bg-white/90 dark:bg-neutral-900/90 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-white/10 shadow-2xl p-6">
+      <div className="relative w-full max-w-md bg-white/90 [html:not(.dark)_&]:bg-slate-900/90 backdrop-blur-xl rounded-3xl border border-white/20 [html:not(.dark)_&]:border-white/10 shadow-2xl p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">
+          <h2 className="text-xl font-semibold text-slate-900 [html:not(.dark)_&]:text-white">
             Duplica {sourceDay}
           </h2>
           <ActionButton
@@ -86,7 +86,7 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
         </div>
 
         {/* Description */}
-        <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
+        <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mb-4">
           Seleziona i giorni su cui duplicare la pianificazione di {sourceDay}
         </p>
 
@@ -126,19 +126,19 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
           {availableDays.map(day => (
             <label
               key={day}
-              className="flex items-center gap-3 p-3 rounded-xl bg-neutral-50 dark:bg-white/[0.03] hover:bg-neutral-100 dark:hover:bg-white/[0.05] cursor-pointer transition-colors"
+              className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 [html:not(.dark)_&]:bg-white/[0.03] hover:bg-slate-100 [html:not(.dark)_&]:hover:bg-white/[0.05] cursor-pointer transition-colors"
             >
               <input
                 type="checkbox"
                 checked={selectedDays.includes(day)}
                 onChange={() => toggleDay(day)}
-                className="w-5 h-5 rounded border-neutral-300 dark:border-white/20 text-blue-500 focus:ring-2 focus:ring-blue-500"
+                className="w-5 h-5 rounded border-slate-300 [html:not(.dark)_&]:border-white/20 text-ocean-500 focus:ring-2 focus:ring-ocean-500"
               />
-              <span className="text-neutral-900 dark:text-white font-medium">
+              <span className="text-slate-900 [html:not(.dark)_&]:text-white font-medium">
                 {day}
               </span>
               {selectedDays.includes(day) && (
-                <span className="ml-auto text-blue-500 dark:text-blue-400">✓</span>
+                <span className="ml-auto text-ocean-500 [html:not(.dark)_&]:text-ocean-400">✓</span>
               )}
             </label>
           ))}

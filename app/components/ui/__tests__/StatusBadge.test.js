@@ -20,38 +20,38 @@ describe('StatusBadge Component', () => {
     test('applies success color for WORK status', () => {
       render(<StatusBadge status="WORK" />);
       const statusElement = screen.getByText('WORK');
-      expect(statusElement).toHaveClass('text-success-600');
+      expect(statusElement).toHaveClass('text-sage-600');
     });
 
     test('applies neutral color for OFF status', () => {
       render(<StatusBadge status="OFF" />);
       const statusElement = screen.getByText('OFF');
-      expect(statusElement).toHaveClass('text-neutral-500');
+      expect(statusElement).toHaveClass('text-slate-500');
     });
 
     test('applies warning color for STANDBY status', () => {
       render(<StatusBadge status="STANDBY" />);
       const statusElement = screen.getByText('STANDBY');
-      expect(statusElement).toHaveClass('text-warning-500');
+      expect(statusElement).toHaveClass('text-flame-500');
     });
 
     test('applies danger color for ERROR status', () => {
       render(<StatusBadge status="ERROR" />);
       const statusElement = screen.getByText('ERROR');
-      expect(statusElement).toHaveClass('text-primary-600');
+      expect(statusElement).toHaveClass('text-ember-600');
       expect(statusElement).toHaveClass('font-bold');
     });
 
     test('applies neutral color for unknown status', () => {
       render(<StatusBadge status="UNKNOWN" />);
       const statusElement = screen.getByText('UNKNOWN');
-      expect(statusElement).toHaveClass('text-neutral-500');
+      expect(statusElement).toHaveClass('text-slate-500');
     });
 
     test('applies neutral color when no status provided', () => {
       render(<StatusBadge />);
       const container = screen.getByText('❔').parentElement;
-      expect(container?.querySelector('p')).toHaveClass('text-neutral-500');
+      expect(container?.querySelector('p')).toHaveClass('text-slate-500');
     });
   });
 
@@ -143,21 +143,21 @@ describe('StatusBadge Component', () => {
       render(<StatusBadge status="WORK_MODE" />);
       expect(screen.getByText('🔥')).toBeInTheDocument();
       const statusElement = screen.getByText('WORK_MODE');
-      expect(statusElement).toHaveClass('text-success-600');
+      expect(statusElement).toHaveClass('text-sage-600');
     });
 
     test('matches status containing OFF substring', () => {
       render(<StatusBadge status="POWER_OFF" />);
       expect(screen.getByText('❄️')).toBeInTheDocument();
       const statusElement = screen.getByText('POWER_OFF');
-      expect(statusElement).toHaveClass('text-neutral-500');
+      expect(statusElement).toHaveClass('text-slate-500');
     });
 
     test('matches status containing ERROR substring', () => {
       render(<StatusBadge status="ERROR_123" />);
       expect(screen.getByText('⚠️')).toBeInTheDocument();
       const statusElement = screen.getByText('ERROR_123');
-      expect(statusElement).toHaveClass('text-primary-600');
+      expect(statusElement).toHaveClass('text-ember-600');
     });
   });
 });

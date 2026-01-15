@@ -27,44 +27,44 @@ describe('Button Component', () => {
     test('renders primary variant by default', () => {
       render(<Button>Primary</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-primary-500');
+      expect(button).toHaveClass('bg-ember-500');
     });
 
     test('renders secondary variant', () => {
       render(<Button variant="secondary">Secondary</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-neutral-200');
+      expect(button).toHaveClass('bg-slate-200');
     });
 
     test('renders success variant', () => {
       render(<Button variant="success">Success</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-success-600');
+      expect(button).toHaveClass('bg-sage-600');
     });
 
     test('renders danger variant', () => {
       render(<Button variant="danger">Danger</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-primary-500');
+      expect(button).toHaveClass('bg-ember-500');
     });
 
     test('renders accent variant', () => {
       render(<Button variant="accent">Accent</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-accent-600');
+      expect(button).toHaveClass('bg-flame-600');
     });
 
     test('renders outline variant', () => {
       render(<Button variant="outline">Outline</Button>);
       const button = screen.getByRole('button');
       expect(button).toHaveClass('border-2');
-      expect(button).toHaveClass('border-neutral-300');
+      expect(button).toHaveClass('border-slate-300');
     });
 
     test('renders ghost variant', () => {
       render(<Button variant="ghost">Ghost</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('hover:bg-neutral-100');
+      expect(button).toHaveClass('hover:bg-slate-100');
     });
 
     test('renders glass variant', () => {
@@ -112,7 +112,7 @@ describe('Button Component', () => {
       render(<Button disabled>Disabled</Button>);
       const button = screen.getByRole('button');
       expect(button).toBeDisabled();
-      expect(button).toHaveClass('bg-neutral-300');
+      expect(button).toHaveClass('bg-slate-300');
       expect(button).toHaveClass('cursor-not-allowed');
     });
 

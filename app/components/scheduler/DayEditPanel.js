@@ -57,10 +57,10 @@ export default function DayEditPanel({
         {/* Left: Title + Info */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-3 flex-wrap">
-            <h3 className="text-2xl font-bold text-neutral-900 dark:text-white">
+            <h3 className="text-2xl font-bold text-slate-900 [html:not(.dark)_&]:text-white">
               {day}
             </h3>
-            <span className="text-sm font-medium text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-3 py-1 rounded-full">
+            <span className="text-sm font-medium text-slate-600 [html:not(.dark)_&]:text-slate-400 bg-slate-100 [html:not(.dark)_&]:bg-slate-800 px-3 py-1 rounded-full">
               {intervals.length} {intervals.length === 1 ? 'intervallo' : 'intervalli'}
               {intervals.length > 0 && ` • ${totalHours.toFixed(1)}h`}
             </span>
@@ -70,11 +70,11 @@ export default function DayEditPanel({
           {saveStatus && (
             <div className="flex items-center">
               {saveStatus.isSaving ? (
-                <span className="text-sm text-blue-500 dark:text-blue-400 animate-pulse flex items-center gap-1">
+                <span className="text-sm text-blue-500 [html:not(.dark)_&]:text-blue-400 animate-pulse flex items-center gap-1">
                   💾 Salvataggio...
                 </span>
               ) : (
-                <span className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
+                <span className="text-sm text-green-600 [html:not(.dark)_&]:text-green-400 flex items-center gap-1">
                   ✓ Salvato
                 </span>
               )}
@@ -154,7 +154,7 @@ export default function DayEditPanel({
       {/* Intervals list */}
       <div className="space-y-3">
         {intervals.length === 0 ? (
-          <div className="text-center py-12 text-neutral-500 dark:text-neutral-400">
+          <div className="text-center py-12 text-slate-500 [html:not(.dark)_&]:text-slate-400">
             <div className="text-5xl mb-4">📭</div>
             <p className="text-lg mb-2">Nessun intervallo configurato per {day}</p>
             <p className="text-sm mb-4">Aggiungi il primo intervallo per iniziare</p>

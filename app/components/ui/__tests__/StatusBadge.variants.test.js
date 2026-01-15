@@ -42,7 +42,7 @@ describe('StatusBadge Variants', () => {
       const { container } = render(
         <StatusBadge variant="floating" text="ERROR" color="danger" />
       );
-      const badge = container.querySelector('.from-primary-500');
+      const badge = container.querySelector('.from-ember-500');
       expect(badge).toBeInTheDocument();
     });
 

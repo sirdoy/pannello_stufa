@@ -40,7 +40,7 @@ export default function IntervalBottomSheet({
       closeOnBackdrop={true}
     >
       {/* Durata */}
-      <div className="text-sm text-neutral-600 dark:text-neutral-400 mb-6">
+      <div className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mb-6">
         {getDuration()}
       </div>
 
@@ -54,17 +54,17 @@ export default function IntervalBottomSheet({
           leftContent={
             <>
               <span className="text-xl">⚡</span>
-              <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+              <span className="text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300">
                 Potenza
               </span>
             </>
           }
           rightContent={
             <>
-              <span className="text-xs font-bold text-neutral-600 dark:text-neutral-400">
+              <span className="text-xs font-bold text-slate-600 [html:not(.dark)_&]:text-slate-400">
                 P{range.power}
               </span>
-              <span className="text-sm font-medium text-neutral-900 dark:text-white">
+              <span className="text-sm font-medium text-slate-900 [html:not(.dark)_&]:text-white">
                 {powerLabel.text}
               </span>
             </>
@@ -82,17 +82,17 @@ export default function IntervalBottomSheet({
           leftContent={
             <>
               <span className="text-xl">💨</span>
-              <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+              <span className="text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300">
                 Ventola
               </span>
             </>
           }
           rightContent={
             <>
-              <span className="text-xs font-bold text-neutral-600 dark:text-neutral-400">
+              <span className="text-xs font-bold text-slate-600 [html:not(.dark)_&]:text-slate-400">
                 V{range.fan}
               </span>
-              <span className="text-sm font-medium text-neutral-900 dark:text-white">
+              <span className="text-sm font-medium text-slate-900 [html:not(.dark)_&]:text-white">
                 {fanLabel.text}
               </span>
             </>
@@ -110,7 +110,7 @@ export default function IntervalBottomSheet({
           icon={<Edit2 />}
           iconPosition="left"
           liquid
-          className="bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 dark:hover:bg-blue-500/30 ring-1 ring-blue-500/30 dark:ring-blue-500/40"
+          className="bg-ocean-500/10 [html:not(.dark)_&]:bg-ocean-500/20 text-ocean-600 [html:not(.dark)_&]:text-ocean-400 hover:bg-ocean-500/20 [html:not(.dark)_&]:hover:bg-ocean-500/30 ring-1 ring-ocean-500/30 [html:not(.dark)_&]:ring-ocean-500/40"
         >
           Modifica
         </Button>
@@ -123,7 +123,7 @@ export default function IntervalBottomSheet({
           icon={<Trash2 />}
           iconPosition="left"
           liquid
-          className="bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 hover:bg-red-500/20 dark:hover:bg-red-500/30 ring-1 ring-red-500/30 dark:ring-red-500/40"
+          className="bg-ember-500/10 [html:not(.dark)_&]:bg-ember-500/20 text-ember-600 [html:not(.dark)_&]:text-ember-400 hover:bg-ember-500/20 [html:not(.dark)_&]:hover:bg-ember-500/30 ring-1 ring-ember-500/30 [html:not(.dark)_&]:ring-ember-500/40"
         >
           Elimina
         </Button>

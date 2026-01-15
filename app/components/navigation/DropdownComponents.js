@@ -1,15 +1,16 @@
 'use client';
 
 import Link from 'next/link';
+import Text from '@/app/components/ui/Text';
 
 /**
- * Container per dropdown menu desktop
+ * Container per dropdown menu desktop - Ember Noir Design System
  */
 export function DropdownContainer({ children, className = '', align = 'left' }) {
   const alignmentClass = align === 'right' ? 'right-0' : 'left-0';
 
   return (
-    <div className={`absolute ${alignmentClass} mt-3 bg-white/[0.92] dark:bg-neutral-900/[0.95] backdrop-blur-[80px] border border-white/30 dark:border-white/15 rounded-2xl shadow-liquid-xl overflow-hidden z-[9000] ring-1 ring-white/20 dark:ring-white/10 ring-inset animate-dropdown ${className}`}>
+    <div className={`absolute ${alignmentClass} mt-3 bg-white/[0.92] [html:not(.dark)_&]:bg-white/[0.92] bg-slate-900/[0.95] backdrop-blur-[80px] border border-white/30 [html:not(.dark)_&]:border-white/30 border-white/15 rounded-2xl shadow-liquid-xl overflow-hidden z-[9000] ring-1 ring-white/20 [html:not(.dark)_&]:ring-white/20 ring-white/10 ring-inset animate-dropdown ${className}`}>
       <div className="p-1.5">
         {children}
       </div>
@@ -18,7 +19,7 @@ export function DropdownContainer({ children, className = '', align = 'left' }) 
 }
 
 /**
- * Item standard del dropdown con hover effects
+ * Item standard del dropdown con hover effects - Ember Noir Design System
  */
 export function DropdownItem({
   href,
@@ -30,8 +31,8 @@ export function DropdownItem({
   animationDelay = 0,
   className = ''
 }) {
-  const activeClasses = 'bg-primary-500/20 dark:bg-primary-500/30 text-primary-700 dark:text-primary-300 shadow-liquid-sm';
-  const inactiveClasses = 'text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100/80 dark:hover:bg-neutral-800/80 hover:shadow-liquid-sm hover:scale-[1.02]';
+  const activeClasses = 'bg-ember-500/20 [html:not(.dark)_&]:bg-ember-500/20 bg-ember-500/30 text-ember-700 [html:not(.dark)_&]:text-ember-700 text-ember-300 shadow-liquid-sm';
+  const inactiveClasses = 'text-slate-800 [html:not(.dark)_&]:text-slate-800 text-slate-200 hover:bg-slate-100/80 [html:not(.dark)_&]:hover:bg-slate-100/80 hover:bg-slate-800/80 hover:shadow-liquid-sm hover:scale-[1.02]';
 
   return (
     <Link
@@ -58,38 +59,38 @@ export function DropdownItem({
 }
 
 /**
- * Card info per user dropdown
+ * Card info per user dropdown - Ember Noir Design System
  */
 export function DropdownInfoCard({ title, subtitle, details, className = '' }) {
   return (
-    <div className={`px-4 py-3.5 mb-1 rounded-xl bg-neutral-100/60 dark:bg-neutral-800/60 ${className}`}>
-      <p className="text-[10px] uppercase tracking-wider font-semibold text-neutral-600 dark:text-neutral-400 mb-1.5">
+    <div className={`px-4 py-3.5 mb-1 rounded-xl bg-slate-100/60 [html:not(.dark)_&]:bg-slate-100/60 bg-slate-800/60 ${className}`}>
+      <Text variant="label" size="xs" weight="semibold" className="mb-1.5">
         {title}
-      </p>
-      <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 truncate">
+      </Text>
+      <Text variant="body" size="sm" weight="semibold" className="truncate">
         {subtitle}
-      </p>
+      </Text>
       {details && (
-        <p className="text-xs text-neutral-600 dark:text-neutral-400 truncate mt-1 opacity-80">
+        <Text variant="tertiary" size="xs" className="truncate mt-1 opacity-80">
           {details}
-        </p>
+        </Text>
       )}
     </div>
   );
 }
 
 /**
- * Sezione menu mobile con header
+ * Sezione menu mobile con header - Ember Noir Design System
  */
 export function MenuSection({ icon, title, children, hasBorder = false, className = '' }) {
   return (
-    <div className={`space-y-2 ${hasBorder ? 'pt-4 mt-4 border-t border-white/30 dark:border-white/15' : ''} ${className}`}>
+    <div className={`space-y-2 ${hasBorder ? 'pt-4 mt-4 border-t border-white/30 [html:not(.dark)_&]:border-white/30 border-white/15' : ''} ${className}`}>
       {title && (
         <div className="flex items-center gap-2 px-3 py-2">
           {icon && <span className="text-xl">{icon}</span>}
-          <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-600 dark:text-neutral-400">
+          <Text variant="label" size="xs" weight="bold" className="uppercase tracking-widest">
             {title}
-          </span>
+          </Text>
         </div>
       )}
       <div className="space-y-1.5">
@@ -100,7 +101,7 @@ export function MenuSection({ icon, title, children, hasBorder = false, classNam
 }
 
 /**
- * Item menu mobile con effetti
+ * Item menu mobile con effetti - Ember Noir Design System
  */
 export function MenuItem({
   href,
@@ -112,10 +113,10 @@ export function MenuItem({
   variant = 'default', // 'default' | 'prominent'
   className = ''
 }) {
-  const activeClasses = 'bg-primary-500/20 dark:bg-primary-500/30 text-primary-700 dark:text-primary-300 shadow-liquid-md ring-1 ring-primary-500/30 dark:ring-primary-500/40 ring-inset';
+  const activeClasses = 'bg-ember-500/20 [html:not(.dark)_&]:bg-ember-500/20 bg-ember-500/30 text-ember-700 [html:not(.dark)_&]:text-ember-700 text-ember-300 shadow-liquid-md ring-1 ring-ember-500/30 [html:not(.dark)_&]:ring-ember-500/30 ring-ember-500/40 ring-inset';
   const inactiveClasses = variant === 'prominent'
-    ? 'text-white bg-gradient-to-br from-primary-500 to-primary-600 dark:from-primary-600 dark:to-primary-700 hover:from-primary-600 hover:to-primary-700 dark:hover:from-primary-700 dark:hover:to-primary-800 shadow-liquid-lg hover:shadow-liquid-xl ring-1 ring-primary-500/50 dark:ring-primary-600/50 ring-inset'
-    : 'text-neutral-800 dark:text-neutral-200 bg-neutral-100/60 dark:bg-neutral-800/60 hover:bg-neutral-100/90 dark:hover:bg-neutral-800/90 shadow-liquid-sm ring-1 ring-white/25 dark:ring-white/15 ring-inset';
+    ? 'text-white bg-gradient-to-br from-ember-500 to-flame-600 [html:not(.dark)_&]:from-ember-500 [html:not(.dark)_&]:to-flame-600 from-ember-600 to-flame-700 hover:from-ember-600 hover:to-flame-700 [html:not(.dark)_&]:hover:from-ember-600 [html:not(.dark)_&]:hover:to-flame-700 hover:from-ember-700 hover:to-flame-800 shadow-liquid-lg hover:shadow-liquid-xl ring-1 ring-ember-500/50 [html:not(.dark)_&]:ring-ember-500/50 ring-ember-600/50 ring-inset'
+    : 'text-slate-800 [html:not(.dark)_&]:text-slate-800 text-slate-200 bg-slate-100/60 [html:not(.dark)_&]:bg-slate-100/60 bg-slate-800/60 hover:bg-slate-100/90 [html:not(.dark)_&]:hover:bg-slate-100/90 hover:bg-slate-800/90 shadow-liquid-sm ring-1 ring-white/25 [html:not(.dark)_&]:ring-white/25 ring-white/15 ring-inset';
 
   const fontClass = variant === 'prominent' ? 'font-bold' : (isActive ? 'font-semibold' : 'font-medium');
   const paddingClass = variant === 'prominent' ? 'py-4' : 'py-3.5';
@@ -141,22 +142,22 @@ export function MenuItem({
 }
 
 /**
- * Card utente per mobile menu
+ * Card utente per mobile menu - Ember Noir Design System
  */
 export function UserInfoCard({ icon: Icon, name, email, className = '' }) {
   return (
-    <div className={`flex items-center gap-3 px-4 py-4 rounded-2xl bg-neutral-100/70 dark:bg-neutral-800/70 backdrop-blur-2xl shadow-liquid-md ring-1 ring-white/25 dark:ring-white/15 ring-inset ${className}`}>
-      <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500/20 to-accent-500/20 dark:from-primary-500/30 dark:to-accent-500/30">
-        {Icon && <Icon className="w-6 h-6 text-primary-700 dark:text-primary-300" />}
+    <div className={`flex items-center gap-3 px-4 py-4 rounded-2xl bg-slate-100/70 [html:not(.dark)_&]:bg-slate-100/70 bg-slate-800/70 backdrop-blur-2xl shadow-liquid-md ring-1 ring-white/25 [html:not(.dark)_&]:ring-white/25 ring-white/15 ring-inset ${className}`}>
+      <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-ember-500/20 to-flame-500/20 [html:not(.dark)_&]:from-ember-500/20 [html:not(.dark)_&]:to-flame-500/20 from-ember-500/30 to-flame-500/30">
+        {Icon && <Icon className="w-6 h-6 text-ember-700 [html:not(.dark)_&]:text-ember-700 text-ember-300" />}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold truncate text-neutral-900 dark:text-neutral-100">
+        <Text variant="body" size="sm" weight="semibold" className="truncate">
           {name}
-        </p>
+        </Text>
         {email && (
-          <p className="text-xs text-neutral-600 dark:text-neutral-400 truncate mt-0.5 opacity-80">
+          <Text variant="tertiary" size="xs" className="truncate mt-0.5 opacity-80">
             {email}
-          </p>
+          </Text>
         )}
       </div>
     </div>

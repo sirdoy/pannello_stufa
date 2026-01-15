@@ -57,19 +57,19 @@ export default function ContextMenu({ items = [], ariaLabel = 'Menu' }) {
           e.stopPropagation(); // Prevent parent element click (e.g., scene card)
           setIsOpen(!isOpen);
         }}
-        className="p-2 rounded-lg hover:bg-neutral-200/50 dark:hover:bg-neutral-700/50 transition-colors"
+        className="p-2 rounded-lg hover:bg-slate-200/50 [html:not(.dark)_&]:hover:bg-slate-200/50 hover:bg-slate-700/50 transition-colors"
         aria-label={ariaLabel}
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
-        <MoreVertical className="w-5 h-5 text-neutral-600 dark:text-neutral-400" />
+        <MoreVertical className="w-5 h-5 text-slate-600 [html:not(.dark)_&]:text-slate-600 text-slate-400" />
       </button>
 
       {/* Dropdown Menu - Enhanced iOS 18 Liquid Glass */}
       {isOpen && (
         <div className="
           absolute right-0 top-full mt-1 w-48
-          bg-white/[0.15] dark:bg-white/[0.10]
+          bg-white/[0.15] [html:not(.dark)_&]:bg-white/[0.15] bg-white/[0.10]
           backdrop-blur-4xl backdrop-saturate-[1.8] backdrop-brightness-[1.05]
           rounded-xl shadow-liquid-lg
           isolation-isolate
@@ -82,8 +82,8 @@ export default function ContextMenu({ items = [], ariaLabel = 'Menu' }) {
               className={`w-full px-4 py-3 text-left text-sm font-medium transition-colors flex items-center gap-3
                 ${
                   item.variant === 'danger'
-                    ? 'text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20'
-                    : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100/80 dark:hover:bg-neutral-700/50'
+                    ? 'text-danger-600 [html:not(.dark)_&]:text-danger-600 text-danger-400 hover:bg-danger-50 [html:not(.dark)_&]:hover:bg-danger-50 hover:bg-danger-900/20'
+                    : 'text-slate-700 [html:not(.dark)_&]:text-slate-700 text-slate-300 hover:bg-slate-100/80 [html:not(.dark)_&]:hover:bg-slate-100/80 hover:bg-slate-700/50'
                 }
               `}
             >

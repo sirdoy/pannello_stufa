@@ -28,9 +28,9 @@ function PreferenceToggle({ label, description, checked, onChange, disabled = fa
   return (
     <div className="flex items-start justify-between gap-4 py-3">
       <div className="flex-1">
-        <div className="font-medium text-neutral-900 dark:text-white">{label}</div>
+        <div className="font-medium text-slate-900 [html:not(.dark)_&]:text-white">{label}</div>
         {description && (
-          <div className="text-sm text-neutral-600 dark:text-neutral-400 mt-0.5">{description}</div>
+          <div className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-0.5">{description}</div>
         )}
       </div>
       <Toggle
@@ -204,17 +204,17 @@ export default function NotificationPreferencesPanel() {
       <Card liquid className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-lg font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-slate-900 [html:not(.dark)_&]:text-white flex items-center gap-2">
               <span>🚨</span>
               <span>Errori Stufa</span>
             </h3>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+            <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-1">
               Notifiche quando si verificano errori o allarmi
             </p>
           </div>
         </div>
 
-        <div className="border-t border-neutral-200 dark:border-neutral-700 mt-4">
+        <div className="border-t border-slate-200 [html:not(.dark)_&]:border-slate-700 mt-4">
           <PreferenceToggle
             label="Abilita notifiche errori"
             description="Ricevi notifiche per tutti gli errori della stufa"
@@ -227,7 +227,7 @@ export default function NotificationPreferencesPanel() {
           />
 
           {preferences.errors?.enabled && (
-            <div className="ml-4 pl-4 border-l-2 border-neutral-200 dark:border-neutral-700 space-y-1">
+            <div className="ml-4 pl-4 border-l-2 border-slate-200 [html:not(.dark)_&]:border-slate-700 space-y-1">
               <PreferenceToggle
                 label="ℹ️ INFO"
                 description="Notifiche informative (non critiche)"
@@ -292,17 +292,17 @@ export default function NotificationPreferencesPanel() {
       <Card liquid className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-lg font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-slate-900 [html:not(.dark)_&]:text-white flex items-center gap-2">
               <span>⏰</span>
               <span>Scheduler Automatico</span>
             </h3>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+            <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-1">
               Notifiche per azioni eseguite automaticamente dallo scheduler
             </p>
           </div>
         </div>
 
-        <div className="border-t border-neutral-200 dark:border-neutral-700 mt-4">
+        <div className="border-t border-slate-200 [html:not(.dark)_&]:border-slate-700 mt-4">
           <PreferenceToggle
             label="Abilita notifiche scheduler"
             description="Ricevi notifiche per azioni automatiche dello scheduler"
@@ -315,7 +315,7 @@ export default function NotificationPreferencesPanel() {
           />
 
           {preferences.scheduler?.enabled && (
-            <div className="ml-4 pl-4 border-l-2 border-neutral-200 dark:border-neutral-700 space-y-1">
+            <div className="ml-4 pl-4 border-l-2 border-slate-200 [html:not(.dark)_&]:border-slate-700 space-y-1">
               <PreferenceToggle
                 label="🔥 Accensione automatica"
                 description="Notifica quando la stufa viene accesa dallo scheduler"
@@ -346,17 +346,17 @@ export default function NotificationPreferencesPanel() {
       <Card liquid className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-lg font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-slate-900 [html:not(.dark)_&]:text-white flex items-center gap-2">
               <span>🔧</span>
               <span>Manutenzione</span>
             </h3>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+            <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-1">
               Promemoria per manutenzione periodica della stufa
             </p>
           </div>
         </div>
 
-        <div className="border-t border-neutral-200 dark:border-neutral-700 mt-4">
+        <div className="border-t border-slate-200 [html:not(.dark)_&]:border-slate-700 mt-4">
           <PreferenceToggle
             label="Abilita notifiche manutenzione"
             description="Ricevi promemoria quando si avvicina la pulizia"
@@ -369,7 +369,7 @@ export default function NotificationPreferencesPanel() {
           />
 
           {preferences.maintenance?.enabled && (
-            <div className="ml-4 pl-4 border-l-2 border-neutral-200 dark:border-neutral-700 space-y-1">
+            <div className="ml-4 pl-4 border-l-2 border-slate-200 [html:not(.dark)_&]:border-slate-700 space-y-1">
               <PreferenceToggle
                 label="ℹ️ Promemoria 80%"
                 description="Notifica quando raggiungi l&apos;80% delle ore utilizzo"

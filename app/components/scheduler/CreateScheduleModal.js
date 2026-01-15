@@ -102,10 +102,10 @@ export default function CreateScheduleModal({
           {/* Header */}
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h3 className="text-xl font-bold text-neutral-900 dark:text-white">
+              <h3 className="text-xl font-bold text-slate-900 [html:not(.dark)_&]:text-white">
                 Crea Nuova Pianificazione
               </h3>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+              <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-1">
                 Configura una nuova pianificazione settimanale
               </p>
             </div>
@@ -122,8 +122,8 @@ export default function CreateScheduleModal({
           <div className="space-y-6">
             {/* Name Input */}
             <div>
-              <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
-                Nome Pianificazione <span className="text-primary-500">*</span>
+              <label className="block text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300 mb-2">
+                Nome Pianificazione <span className="text-ember-500">*</span>
               </label>
               <Input
                 type="text"
@@ -139,19 +139,19 @@ export default function CreateScheduleModal({
                 liquid
               />
               {error && (
-                <p className="mt-2 text-sm text-primary-600 dark:text-primary-400 flex items-center gap-1">
+                <p className="mt-2 text-sm text-ember-600 [html:not(.dark)_&]:text-ember-400 flex items-center gap-1">
                   <span>⚠️</span>
                   <span>{error}</span>
                 </p>
               )}
-              <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">
+              <p className="mt-2 text-xs text-slate-500 [html:not(.dark)_&]:text-slate-400">
                 {name.length}/30 caratteri
               </p>
             </div>
 
             {/* Mode Selection */}
             <div>
-              <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">
+              <label className="block text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300 mb-3">
                 Modalità Creazione
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -160,25 +160,25 @@ export default function CreateScheduleModal({
                   onClick={() => setMode('scratch')}
                   className={`p-4 rounded-xl border-2 transition-all text-left ${
                     mode === 'scratch'
-                      ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-950/30'
-                      : 'border-neutral-300/50 dark:border-neutral-600/50 hover:border-neutral-400 dark:hover:border-neutral-500'
+                      ? 'border-ember-500 bg-ember-50/50 [html:not(.dark)_&]:bg-ember-950/30'
+                      : 'border-slate-300/50 [html:not(.dark)_&]:border-slate-600/50 hover:border-slate-400 [html:not(.dark)_&]:hover:border-slate-500'
                   }`}
                 >
                   <div className="flex items-start gap-3">
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 ${
                       mode === 'scratch'
-                        ? 'border-primary-500 bg-primary-500'
-                        : 'border-neutral-400 dark:border-neutral-500'
+                        ? 'border-ember-500 bg-ember-500'
+                        : 'border-slate-400 [html:not(.dark)_&]:border-slate-500'
                     }`}>
                       {mode === 'scratch' && (
                         <div className="w-2 h-2 rounded-full bg-white" />
                       )}
                     </div>
                     <div className="flex-1">
-                      <div className="font-semibold text-neutral-900 dark:text-white text-sm">
+                      <div className="font-semibold text-slate-900 [html:not(.dark)_&]:text-white text-sm">
                         Da Zero
                       </div>
-                      <div className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+                      <div className="text-xs text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-1">
                         Inizia con una pianificazione vuota
                       </div>
                     </div>
@@ -190,25 +190,25 @@ export default function CreateScheduleModal({
                   onClick={() => setMode('copy')}
                   className={`p-4 rounded-xl border-2 transition-all text-left ${
                     mode === 'copy'
-                      ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-950/30'
-                      : 'border-neutral-300/50 dark:border-neutral-600/50 hover:border-neutral-400 dark:hover:border-neutral-500'
+                      ? 'border-ember-500 bg-ember-50/50 [html:not(.dark)_&]:bg-ember-950/30'
+                      : 'border-slate-300/50 [html:not(.dark)_&]:border-slate-600/50 hover:border-slate-400 [html:not(.dark)_&]:hover:border-slate-500'
                   }`}
                 >
                   <div className="flex items-start gap-3">
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 ${
                       mode === 'copy'
-                        ? 'border-primary-500 bg-primary-500'
-                        : 'border-neutral-400 dark:border-neutral-500'
+                        ? 'border-ember-500 bg-ember-500'
+                        : 'border-slate-400 [html:not(.dark)_&]:border-slate-500'
                     }`}>
                       {mode === 'copy' && (
                         <div className="w-2 h-2 rounded-full bg-white" />
                       )}
                     </div>
                     <div className="flex-1">
-                      <div className="font-semibold text-neutral-900 dark:text-white text-sm">
+                      <div className="font-semibold text-slate-900 [html:not(.dark)_&]:text-white text-sm">
                         Copia Esistente
                       </div>
-                      <div className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+                      <div className="text-xs text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-1">
                         Duplica una pianificazione
                       </div>
                     </div>
@@ -220,8 +220,8 @@ export default function CreateScheduleModal({
             {/* Copy From Dropdown (only when mode === 'copy') */}
             {mode === 'copy' && (
               <div className="animate-fade-in">
-                <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
-                  Copia da <span className="text-primary-500">*</span>
+                <label className="block text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300 mb-2">
+                  Copia da <span className="text-ember-500">*</span>
                 </label>
                 <select
                   value={copyFromId}
@@ -229,7 +229,7 @@ export default function CreateScheduleModal({
                     setCopyFromId(e.target.value);
                     setError('');
                   }}
-                  className="w-full px-4 py-3 bg-white/60 dark:bg-neutral-800/60 backdrop-blur-xl rounded-xl border border-neutral-300/50 dark:border-neutral-600/50 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-primary-400/20 text-neutral-900 dark:text-white transition-all outline-none"
+                  className="w-full px-4 py-3 bg-white/60 [html:not(.dark)_&]:bg-slate-800/60 backdrop-blur-xl rounded-xl border border-slate-300/50 [html:not(.dark)_&]:border-slate-600/50 focus:border-ember-500 [html:not(.dark)_&]:focus:border-ember-400 focus:ring-2 focus:ring-ember-500/20 [html:not(.dark)_&]:focus:ring-ember-400/20 text-slate-900 [html:not(.dark)_&]:text-white transition-all outline-none"
                 >
                   <option value="">Seleziona una pianificazione...</option>
                   {existingSchedules.map((schedule) => (

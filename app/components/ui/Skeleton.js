@@ -333,7 +333,7 @@ Skeleton.Scheduler = function SkeletonScheduler() {
         <Skeleton className="h-8 sm:h-9 w-64 sm:w-80 mb-8" />
 
         {/* Status e toggle */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl bg-neutral-50 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl bg-slate-100/80 [html:not(.dark)_&]:bg-slate-100/80 bg-slate-800/60 mb-4">
           {/* ModeIndicator */}
           <div className="flex items-center gap-2">
             <Skeleton className="h-6 w-6 rounded-lg" />
@@ -375,9 +375,9 @@ Skeleton.Scheduler = function SkeletonScheduler() {
 
             {/* TimeBar compatta */}
             <div className="mt-4">
-              <div className="relative h-4 w-full bg-neutral-200 rounded-lg overflow-hidden shadow-inner">
-                <div className="absolute top-0 bottom-0 bg-gradient-to-r from-primary-400 to-accent-500" style={{ left: '20%', width: '30%' }} />
-                <div className="absolute top-0 bottom-0 bg-gradient-to-r from-primary-400 to-accent-500" style={{ left: '60%', width: '25%' }} />
+              <div className="relative h-4 w-full bg-slate-200 [html:not(.dark)_&]:bg-slate-200 bg-slate-700/50 rounded-lg overflow-hidden shadow-inner">
+                <div className="absolute top-0 bottom-0 bg-gradient-to-r from-ember-400 to-flame-500" style={{ left: '20%', width: '30%' }} />
+                <div className="absolute top-0 bottom-0 bg-gradient-to-r from-ember-400 to-flame-500" style={{ left: '60%', width: '25%' }} />
               </div>
             </div>
           </div>
@@ -392,7 +392,7 @@ Skeleton.Scheduler = function SkeletonScheduler() {
  */
 Skeleton.LogEntry = function SkeletonLogEntry() {
   return (
-    <li className="border-b border-neutral-200 pb-4 mb-4 last:border-b-0 flex items-start gap-3">
+    <li className="border-b border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700/50 pb-4 mb-4 last:border-b-0 flex items-start gap-3">
       {/* Icon */}
       <Skeleton className="h-8 w-8 rounded-full flex-shrink-0 mt-1" />
 
@@ -499,7 +499,7 @@ Skeleton.NetatmoPage = function SkeletonNetatmoPage() {
             <Skeleton className="h-6 w-12" />
           </div>
         </div>
-        <div className="mt-4 pt-4 border-t border-neutral-200">
+        <div className="mt-4 pt-4 border-t border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700/50">
           <Skeleton className="h-9 w-56 rounded-xl" />
         </div>
       </Skeleton.Card>

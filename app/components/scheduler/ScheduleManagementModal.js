@@ -139,10 +139,10 @@ export default function ScheduleManagementModal({
           {/* Header */}
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h3 className="text-xl font-bold text-neutral-900 dark:text-white">
+              <h3 className="text-xl font-bold text-slate-900 [html:not(.dark)_&]:text-white">
                 Gestisci Pianificazioni
               </h3>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+              <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-1">
                 Modifica, elimina o cambia pianificazione attiva
               </p>
             </div>
@@ -158,12 +158,12 @@ export default function ScheduleManagementModal({
           {/* Active Schedule Section */}
           {activeSchedule && (
             <div className="mb-6">
-              <h4 className="text-sm font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider mb-3">
+              <h4 className="text-sm font-semibold text-slate-600 [html:not(.dark)_&]:text-slate-400 uppercase tracking-wider mb-3">
                 Pianificazione Attiva
               </h4>
-              <div className="p-4 bg-success-50/50 dark:bg-success-950/30 rounded-2xl border-2 border-success-300/50 dark:border-success-700/50">
+              <div className="p-4 bg-sage-50/50 [html:not(.dark)_&]:bg-sage-950/30 rounded-2xl border-2 border-sage-300/50 [html:not(.dark)_&]:border-sage-700/50">
                 <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-success-500 shadow-glow-success animate-pulse" />
+                  <div className="w-3 h-3 rounded-full bg-sage-500 shadow-glow-success animate-pulse" />
                   <div className="flex-1">
                     {editingId === activeSchedule.id ? (
                       <div className="space-y-2">
@@ -181,10 +181,10 @@ export default function ScheduleManagementModal({
                           }}
                           maxLength={30}
                           autoFocus
-                          className="w-full px-3 py-2 bg-white/80 dark:bg-neutral-800/80 rounded-xl border border-neutral-300/50 dark:border-neutral-600/50 text-neutral-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                          className="w-full px-3 py-2 bg-white/80 [html:not(.dark)_&]:bg-slate-800/80 rounded-xl border border-slate-300/50 [html:not(.dark)_&]:border-slate-600/50 text-slate-900 [html:not(.dark)_&]:text-white text-sm focus:outline-none focus:ring-2 focus:ring-ember-500/50"
                         />
                         {error && (
-                          <p className="text-xs text-primary-600 dark:text-primary-400">
+                          <p className="text-xs text-ember-600 [html:not(.dark)_&]:text-ember-400">
                             {error}
                           </p>
                         )}
@@ -199,12 +199,12 @@ export default function ScheduleManagementModal({
                       </div>
                     ) : (
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-success-800 dark:text-success-300">
+                        <span className="font-semibold text-sage-800 [html:not(.dark)_&]:text-sage-300">
                           {activeSchedule.name}
                         </span>
                         <button
                           onClick={() => handleStartEdit(activeSchedule)}
-                          className="p-2 rounded-lg hover:bg-success-100/60 dark:hover:bg-success-900/40 transition-colors text-success-700 dark:text-success-400"
+                          className="p-2 rounded-lg hover:bg-sage-100/60 [html:not(.dark)_&]:hover:bg-sage-900/40 transition-colors text-sage-700 [html:not(.dark)_&]:text-sage-400"
                           aria-label="Modifica nome"
                         >
                           <Pencil className="w-4 h-4" />
@@ -220,14 +220,14 @@ export default function ScheduleManagementModal({
           {/* Inactive Schedules Section */}
           {inactiveSchedules.length > 0 && (
             <div>
-              <h4 className="text-sm font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider mb-3">
+              <h4 className="text-sm font-semibold text-slate-600 [html:not(.dark)_&]:text-slate-400 uppercase tracking-wider mb-3">
                 Altre Pianificazioni
               </h4>
               <div className="space-y-3">
                 {inactiveSchedules.map((schedule) => (
                   <div
                     key={schedule.id}
-                    className="p-4 bg-white/60 dark:bg-neutral-800/60 backdrop-blur-xl rounded-2xl border border-neutral-300/40 dark:border-neutral-600/40"
+                    className="p-4 bg-white/60 [html:not(.dark)_&]:bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-slate-300/40 [html:not(.dark)_&]:border-slate-600/40"
                   >
                     {editingId === schedule.id ? (
                       <div className="space-y-2">
@@ -245,10 +245,10 @@ export default function ScheduleManagementModal({
                           }}
                           maxLength={30}
                           autoFocus
-                          className="w-full px-3 py-2 bg-white/80 dark:bg-neutral-700/80 rounded-xl border border-neutral-300/50 dark:border-neutral-600/50 text-neutral-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                          className="w-full px-3 py-2 bg-white/80 [html:not(.dark)_&]:bg-slate-700/80 rounded-xl border border-slate-300/50 [html:not(.dark)_&]:border-slate-600/50 text-slate-900 [html:not(.dark)_&]:text-white text-sm focus:outline-none focus:ring-2 focus:ring-ember-500/50"
                         />
                         {error && (
-                          <p className="text-xs text-primary-600 dark:text-primary-400">
+                          <p className="text-xs text-ember-600 [html:not(.dark)_&]:text-ember-400">
                             {error}
                           </p>
                         )}
@@ -264,15 +264,15 @@ export default function ScheduleManagementModal({
                     ) : (
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className="w-3 h-3 rounded-full bg-neutral-400 dark:bg-neutral-500" />
-                          <span className="font-semibold text-neutral-800 dark:text-neutral-200 truncate">
+                          <div className="w-3 h-3 rounded-full bg-slate-400 [html:not(.dark)_&]:bg-slate-500" />
+                          <span className="font-semibold text-slate-800 [html:not(.dark)_&]:text-slate-200 truncate">
                             {schedule.name}
                           </span>
                         </div>
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => onSetActive(schedule.id)}
-                            className="p-2 rounded-lg hover:bg-primary-100/60 dark:hover:bg-primary-900/40 transition-colors text-primary-600 dark:text-primary-400"
+                            className="p-2 rounded-lg hover:bg-ember-100/60 [html:not(.dark)_&]:hover:bg-ember-900/40 transition-colors text-ember-600 [html:not(.dark)_&]:text-ember-400"
                             aria-label="Imposta come attiva"
                             title="Imposta come attiva"
                           >
@@ -280,7 +280,7 @@ export default function ScheduleManagementModal({
                           </button>
                           <button
                             onClick={() => handleStartEdit(schedule)}
-                            className="p-2 rounded-lg hover:bg-neutral-200/60 dark:hover:bg-neutral-700/60 transition-colors text-neutral-600 dark:text-neutral-400"
+                            className="p-2 rounded-lg hover:bg-slate-200/60 [html:not(.dark)_&]:hover:bg-slate-700/60 transition-colors text-slate-600 [html:not(.dark)_&]:text-slate-400"
                             aria-label="Modifica nome"
                             title="Modifica nome"
                           >
@@ -288,7 +288,7 @@ export default function ScheduleManagementModal({
                           </button>
                           <button
                             onClick={() => handleDeleteRequest(schedule)}
-                            className="p-2 rounded-lg hover:bg-primary-100/60 dark:hover:bg-primary-900/40 transition-colors text-primary-600 dark:text-primary-400"
+                            className="p-2 rounded-lg hover:bg-ember-100/60 [html:not(.dark)_&]:hover:bg-ember-900/40 transition-colors text-ember-600 [html:not(.dark)_&]:text-ember-400"
                             aria-label="Elimina"
                             title="Elimina"
                           >
@@ -305,7 +305,7 @@ export default function ScheduleManagementModal({
 
           {schedules.length === 0 && (
             <div className="text-center py-8">
-              <p className="text-neutral-500 dark:text-neutral-400">
+              <p className="text-slate-500 [html:not(.dark)_&]:text-slate-400">
                 Nessuna pianificazione disponibile
               </p>
             </div>

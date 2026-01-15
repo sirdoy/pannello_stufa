@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Button } from '@/app/components/ui';
+import { Card, Button, Heading, Text } from '@/app/components/ui';
 import { getNetatmoCredentialsClient } from '@/lib/netatmoCredentials';
 
 export default function NetatmoAuthCard() {
@@ -23,43 +23,43 @@ export default function NetatmoAuthCard() {
       <Card className="p-8 text-center">
         {/* Icon */}
         <div className="mb-6">
-          <div className="w-20 h-20 mx-auto bg-gradient-to-br from-info-100 to-info-200 rounded-3xl flex items-center justify-center">
+          <div className="w-20 h-20 mx-auto bg-gradient-to-br from-ocean-100 [html:not(.dark)_&]:from-ocean-100 from-ocean-900/40 to-ocean-200 [html:not(.dark)_&]:to-ocean-200 to-ocean-800/40 rounded-3xl flex items-center justify-center">
             <span className="text-4xl">🌡️</span>
           </div>
         </div>
 
         {/* Title */}
-        <h2 className="text-2xl font-bold text-neutral-900 mb-3">
+        <Heading level={2} size="2xl" className="mb-3">
           Connetti Netatmo
-        </h2>
+        </Heading>
 
         {/* Description */}
-        <p className="text-neutral-600 mb-6 leading-relaxed">
+        <Text variant="secondary" className="mb-6 leading-relaxed">
           Collega il tuo account Netatmo per controllare le temperature di tutte le stanze,
           gestire le valvole termostatiche e creare automazioni intelligenti con la stufa.
-        </p>
+        </Text>
 
         {/* Features */}
-        <div className="bg-neutral-50 rounded-2xl p-6 mb-8 text-left">
-          <p className="text-sm font-semibold text-neutral-900 mb-3">
+        <div className="bg-slate-50 [html:not(.dark)_&]:bg-slate-50 bg-slate-800/60 rounded-2xl p-6 mb-8 text-left">
+          <Text variant="body" size="sm" weight="semibold" className="mb-3">
             Cosa puoi fare:
-          </p>
-          <ul className="space-y-2 text-sm text-neutral-700">
+          </Text>
+          <ul className="space-y-2 text-sm">
             <li className="flex items-start gap-2">
-              <span className="text-success-600 mt-0.5">✓</span>
-              <span>Visualizzare temperature real-time di tutte le stanze</span>
+              <span className="text-sage-600 [html:not(.dark)_&]:text-sage-600 text-sage-400 mt-0.5">✓</span>
+              <Text variant="secondary" size="sm" as="span">Visualizzare temperature real-time di tutte le stanze</Text>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-success-600 mt-0.5">✓</span>
-              <span>Controllare setpoint temperatura per ogni stanza</span>
+              <span className="text-sage-600 [html:not(.dark)_&]:text-sage-600 text-sage-400 mt-0.5">✓</span>
+              <Text variant="secondary" size="sm" as="span">Controllare setpoint temperatura per ogni stanza</Text>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-success-600 mt-0.5">✓</span>
-              <span>Gestire modalità riscaldamento globale</span>
+              <span className="text-sage-600 [html:not(.dark)_&]:text-sage-600 text-sage-400 mt-0.5">✓</span>
+              <Text variant="secondary" size="sm" as="span">Gestire modalità riscaldamento globale</Text>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-success-600 mt-0.5">✓</span>
-              <span>Creare automazioni stufa ↔ valvole (prossimamente)</span>
+              <span className="text-sage-600 [html:not(.dark)_&]:text-sage-600 text-sage-400 mt-0.5">✓</span>
+              <Text variant="secondary" size="sm" as="span">Creare automazioni stufa ↔ valvole (prossimamente)</Text>
             </li>
           </ul>
         </div>
@@ -74,10 +74,10 @@ export default function NetatmoAuthCard() {
         </Button>
 
         {/* Info */}
-        <p className="text-xs text-neutral-500 mt-6">
+        <Text variant="tertiary" size="xs" className="mt-6">
           Verrai reindirizzato al sito Netatmo per autorizzare l&apos;accesso.
           Nessuna password viene salvata, solo un token sicuro.
-        </p>
+        </Text>
       </Card>
     </div>
   );

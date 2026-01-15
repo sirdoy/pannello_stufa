@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, Button, StatusBadge } from '@/app/components/ui';
+import { Card, Button, StatusBadge, Heading, Text } from '@/app/components/ui';
 import { NETATMO_ROUTES } from '@/lib/routes';
 
 export default function RoomCard({ room, onRefresh }) {
@@ -31,21 +31,21 @@ export default function RoomCard({ room, onRefresh }) {
 
   // Temperature color coding with dark mode
   function getTempColor(temp, setpoint) {
-    if (!temp || !setpoint) return 'text-neutral-600 dark:text-neutral-400';
+    if (!temp || !setpoint) return 'text-slate-600 [html:not(.dark)_&]:text-slate-600 text-slate-400';
     const diff = temp - setpoint;
-    if (diff >= 0.5) return 'text-success-600 dark:text-success-400';
-    if (diff <= -1) return 'text-primary-600 dark:text-primary-400';
-    return 'text-warning-600 dark:text-warning-400';
+    if (diff >= 0.5) return 'text-sage-600 [html:not(.dark)_&]:text-sage-600 text-sage-400';
+    if (diff <= -1) return 'text-ember-600 [html:not(.dark)_&]:text-ember-600 text-ember-400';
+    return 'text-warning-600 [html:not(.dark)_&]:text-warning-600 text-warning-400';
   }
 
   // Mode badge config with dark mode colors
   function getModeBadge(mode) {
     const badges = {
-      manual: { text: 'Manuale', color: 'accent', icon: '✋' },
-      home: { text: 'Casa', color: 'success', icon: '🏠' },
+      manual: { text: 'Manuale', color: 'flame', icon: '✋' },
+      home: { text: 'Casa', color: 'sage', icon: '🏠' },
       max: { text: 'Max', color: 'warning', icon: '🔥' },
-      off: { text: 'Off', color: 'neutral', icon: '⏸️' },
-      schedule: { text: 'Programmato', color: 'info', icon: '⏰' },
+      off: { text: 'Off', color: 'slate', icon: '⏸️' },
+      schedule: { text: 'Programmato', color: 'ocean', icon: '⏰' },
     };
     return badges[mode] || badges.schedule;
   }
@@ -155,11 +155,11 @@ export default function RoomCard({ room, onRefresh }) {
 
   // Badge color classes with dark mode
   const badgeColors = {
-    info: 'bg-info-100 dark:bg-info-900/40 text-info-700 dark:text-info-300 border-info-200 dark:border-info-700',
-    accent: 'bg-accent-100 dark:bg-accent-900/40 text-accent-700 dark:text-accent-300 border-accent-200 dark:border-accent-700',
-    success: 'bg-success-100 dark:bg-success-900/40 text-success-700 dark:text-success-300 border-success-200 dark:border-success-700',
-    warning: 'bg-warning-100 dark:bg-warning-900/40 text-warning-700 dark:text-warning-300 border-warning-200 dark:border-warning-700',
-    neutral: 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border-neutral-200 dark:border-neutral-700',
+    ocean: 'bg-ocean-100 [html:not(.dark)_&]:bg-ocean-100 bg-ocean-900/40 text-ocean-700 [html:not(.dark)_&]:text-ocean-700 text-ocean-300 border-ocean-200 [html:not(.dark)_&]:border-ocean-200 border-ocean-700',
+    flame: 'bg-flame-100 [html:not(.dark)_&]:bg-flame-100 bg-flame-900/40 text-flame-700 [html:not(.dark)_&]:text-flame-700 text-flame-300 border-flame-200 [html:not(.dark)_&]:border-flame-200 border-flame-700',
+    sage: 'bg-sage-100 [html:not(.dark)_&]:bg-sage-100 bg-sage-900/40 text-sage-700 [html:not(.dark)_&]:text-sage-700 text-sage-300 border-sage-200 [html:not(.dark)_&]:border-sage-200 border-sage-700',
+    warning: 'bg-warning-100 [html:not(.dark)_&]:bg-warning-100 bg-warning-900/40 text-warning-700 [html:not(.dark)_&]:text-warning-700 text-warning-300 border-warning-200 [html:not(.dark)_&]:border-warning-200 border-warning-700',
+    slate: 'bg-slate-100 [html:not(.dark)_&]:bg-slate-100 bg-slate-800 text-slate-600 [html:not(.dark)_&]:text-slate-600 text-slate-300 border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700',
   };
 
   return (
@@ -185,12 +185,12 @@ export default function RoomCard({ room, onRefresh }) {
         <div className="flex items-center gap-3 mb-2">
           <span className="text-2xl flex-shrink-0">{roomInfo.icon}</span>
           <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100 truncate" title={room.name}>
+            <Heading level={3} size="lg" className="truncate" title={room.name}>
               {room.name}
-            </h3>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+            </Heading>
+            <Text variant="tertiary" size="xs">
               {roomInfo.label}
-            </p>
+            </Text>
           </div>
         </div>
 
@@ -198,20 +198,20 @@ export default function RoomCard({ room, onRefresh }) {
         <div className="flex flex-wrap items-center gap-2">
           {/* Device type badge */}
           {room.deviceType === 'thermostat' && (
-            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold border ${badgeColors.info}`}>
+            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold border ${badgeColors.ocean}`}>
               <span>🌡️</span>
               <span>Termostato</span>
             </span>
           )}
           {room.deviceType === 'valve' && (
-            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold border ${badgeColors.accent}`}>
+            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold border ${badgeColors.flame}`}>
               <span>🔧</span>
               <span>Valvola</span>
             </span>
           )}
 
           {/* Mode badge */}
-          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold border ${badgeColors[badge.color] || badgeColors.info}`}>
+          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold border ${badgeColors[badge.color] || badgeColors.ocean}`}>
             <span>{badge.icon}</span>
             <span>{badge.text}</span>
           </span>
@@ -220,51 +220,51 @@ export default function RoomCard({ room, onRefresh }) {
 
       {/* Temperature Display - Glass container */}
       {room.setpoint !== undefined ? (
-        <div className="mb-4 p-4 rounded-2xl bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-xl border border-white/10 dark:border-white/5">
+        <div className="mb-4 p-4 rounded-2xl bg-white/[0.08] [html:not(.dark)_&]:bg-white/[0.08] bg-white/[0.05] backdrop-blur-xl border border-white/10 [html:not(.dark)_&]:border-white/10 border-white/5">
           <div className="flex items-baseline gap-2">
             {room.temperature !== undefined ? (
               <>
                 <span className={`text-4xl font-black ${getTempColor(room.temperature, room.setpoint)}`}>
                   {room.temperature.toFixed(1)}°
                 </span>
-                <span className="text-neutral-400 dark:text-neutral-500 text-xl">/</span>
+                <Text variant="tertiary" size="xl" as="span">/</Text>
               </>
             ) : (
               <>
-                <span className="text-2xl font-bold text-neutral-400 dark:text-neutral-500" title="Sensore temperatura non disponibile">
+                <Text variant="tertiary" size="2xl" weight="bold" as="span" title="Sensore temperatura non disponibile">
                   --°
-                </span>
-                <span className="text-neutral-400 dark:text-neutral-500 text-xl mx-1">/</span>
+                </Text>
+                <Text variant="tertiary" size="xl" as="span" className="mx-1">/</Text>
               </>
             )}
-            <span className="text-xl font-bold text-info-600 dark:text-info-400">
+            <span className="text-xl font-bold text-ocean-600 [html:not(.dark)_&]:text-ocean-600 text-ocean-400">
               {room.setpoint.toFixed(1)}°
             </span>
           </div>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
+          <Text variant="tertiary" size="xs" className="mt-2">
             {room.temperature !== undefined ? 'Attuale / Setpoint' : 'Sensore non disponibile / Setpoint'}
-          </p>
+          </Text>
         </div>
       ) : (
-        <div className="mb-4 p-3 bg-warning-50/50 dark:bg-warning-900/20 border border-warning-200 dark:border-warning-700 rounded-xl backdrop-blur-sm">
-          <p className="text-sm text-warning-700 dark:text-warning-300 flex items-center gap-2">
+        <div className="mb-4 p-3 bg-warning-50/50 [html:not(.dark)_&]:bg-warning-50/50 bg-warning-900/20 border border-warning-200 [html:not(.dark)_&]:border-warning-200 border-warning-700 rounded-xl backdrop-blur-sm">
+          <Text variant="warning" size="sm" className="flex items-center gap-2">
             <span>⚠️</span>
             <span>Stanza non configurata o fuori linea</span>
-          </p>
+          </Text>
         </div>
       )}
 
       {/* Error Message */}
       {error && (
-        <div className="mb-4 p-3 bg-primary-50/80 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-700 rounded-xl backdrop-blur-sm">
-          <p className="text-sm text-primary-700 dark:text-primary-300">{error}</p>
+        <div className="mb-4 p-3 bg-danger-50/80 [html:not(.dark)_&]:bg-danger-50/80 bg-danger-900/30 border border-danger-200 [html:not(.dark)_&]:border-danger-200 border-danger-700 rounded-xl backdrop-blur-sm">
+          <Text variant="danger" size="sm">{error}</Text>
         </div>
       )}
 
       {/* Temperature Editor */}
       {editingTemp ? (
         <div className="space-y-3">
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.06] dark:bg-white/[0.04] backdrop-blur-sm border border-white/10">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.06] [html:not(.dark)_&]:bg-white/[0.06] bg-white/[0.04] backdrop-blur-sm border border-white/10">
             <Button
               liquid
               variant="secondary"
@@ -275,7 +275,7 @@ export default function RoomCard({ room, onRefresh }) {
               −
             </Button>
             <div className="flex-1 text-center">
-              <span className="text-3xl font-black text-info-600 dark:text-info-400">
+              <span className="text-3xl font-black text-ocean-600 [html:not(.dark)_&]:text-ocean-600 text-ocean-400">
                 {targetTemp.toFixed(1)}°
               </span>
             </div>
@@ -349,31 +349,31 @@ export default function RoomCard({ room, onRefresh }) {
 
       {/* Module Details */}
       {room.roomModules && room.roomModules.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-white/10 dark:border-white/5">
-          <p className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-2">
+        <div className="mt-4 pt-4 border-t border-white/10 [html:not(.dark)_&]:border-white/10 border-white/5">
+          <Text variant="secondary" size="xs" weight="semibold" className="mb-2">
             Dispositivi ({room.roomModules.length})
-          </p>
+          </Text>
           <div className="space-y-2">
             {room.roomModules.map(module => {
               const deviceInfo = getDeviceIcon(module);
               return (
                 <div
                   key={module.id}
-                  className="flex items-center gap-2 p-2.5 bg-white/[0.06] dark:bg-white/[0.04] backdrop-blur-sm rounded-xl border border-white/10 dark:border-white/5 transition-all duration-200 hover:bg-white/[0.10] dark:hover:bg-white/[0.08]"
+                  className="flex items-center gap-2 p-2.5 bg-white/[0.06] [html:not(.dark)_&]:bg-white/[0.06] bg-white/[0.04] backdrop-blur-sm rounded-xl border border-white/10 [html:not(.dark)_&]:border-white/10 border-white/5 transition-all duration-200 hover:bg-white/[0.10] [html:not(.dark)_&]:hover:bg-white/[0.10] hover:bg-white/[0.08]"
                 >
                   <span className="text-lg flex-shrink-0">{deviceInfo.icon}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 truncate">
+                    <Text variant="body" size="xs" weight="semibold" className="truncate">
                       {module.name}
-                    </p>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                    </Text>
+                    <Text variant="tertiary" size="xs">
                       {deviceInfo.label}
-                    </p>
+                    </Text>
                   </div>
                   {module.bridge && (
-                    <span className="text-xs text-neutral-400 dark:text-neutral-500" title="Connesso tramite bridge">
+                    <Text variant="tertiary" size="xs" as="span" title="Connesso tramite bridge">
                       🔗
-                    </span>
+                    </Text>
                   )}
                 </div>
               );

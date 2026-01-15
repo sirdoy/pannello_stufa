@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, Button } from '@/app/components/ui';
+import { Card, Button, Heading, Text } from '@/app/components/ui';
 import { NETATMO_ROUTES } from '@/lib/routes';
 
 export default function NetatmoTemperatureReport() {
@@ -96,11 +96,11 @@ export default function NetatmoTemperatureReport() {
 
   // Get temperature color
   const getTempColor = (temp, setpoint) => {
-    if (!temp || !setpoint) return 'text-neutral-600';
+    if (!temp || !setpoint) return 'text-slate-600 [html:not(.dark)_&]:text-slate-600 text-slate-400';
     const diff = temp - setpoint;
-    if (diff >= 0.5) return 'text-success-600';
-    if (diff <= -1) return 'text-primary-600';
-    return 'text-warning-600';
+    if (diff >= 0.5) return 'text-sage-600 [html:not(.dark)_&]:text-sage-600 text-sage-400';
+    if (diff <= -1) return 'text-ember-600 [html:not(.dark)_&]:text-ember-600 text-ember-400';
+    return 'text-warning-600 [html:not(.dark)_&]:text-warning-600 text-warning-400';
   };
 
   if (loading) {
@@ -109,14 +109,14 @@ export default function NetatmoTemperatureReport() {
         <div className="flex items-center gap-3 mb-4">
           <span className="text-2xl">🌡️</span>
           <div>
-            <h3 className="text-lg font-bold text-neutral-900">Netatmo Temperature</h3>
-            <p className="text-xs text-neutral-500">Caricamento...</p>
+            <Heading level={3} size="lg">Netatmo Temperature</Heading>
+            <Text variant="tertiary" size="xs">Caricamento...</Text>
           </div>
         </div>
         <div className="animate-pulse space-y-3">
-          <div className="h-12 bg-neutral-200 rounded-xl"></div>
-          <div className="h-12 bg-neutral-200 rounded-xl"></div>
-          <div className="h-12 bg-neutral-200 rounded-xl"></div>
+          <div className="h-12 bg-slate-200 [html:not(.dark)_&]:bg-slate-200 bg-slate-700/50 rounded-xl"></div>
+          <div className="h-12 bg-slate-200 [html:not(.dark)_&]:bg-slate-200 bg-slate-700/50 rounded-xl"></div>
+          <div className="h-12 bg-slate-200 [html:not(.dark)_&]:bg-slate-200 bg-slate-700/50 rounded-xl"></div>
         </div>
       </Card>
     );
@@ -124,12 +124,12 @@ export default function NetatmoTemperatureReport() {
 
   if (!connected) {
     return (
-      <Card className="p-6 bg-info-50 border-2 border-info-200">
+      <Card className="p-6 bg-ocean-50 [html:not(.dark)_&]:bg-ocean-50 bg-ocean-900/20 border-2 border-ocean-200 [html:not(.dark)_&]:border-ocean-200 border-ocean-700">
         <div className="flex items-center gap-3 mb-4">
           <span className="text-2xl">🌡️</span>
           <div className="flex-1">
-            <h3 className="text-lg font-bold text-neutral-900">Netatmo Temperature</h3>
-            <p className="text-xs text-neutral-500">Non connesso • Connetti per visualizzare le temperature</p>
+            <Heading level={3} size="lg">Netatmo Temperature</Heading>
+            <Text variant="tertiary" size="xs">Non connesso • Connetti per visualizzare le temperature</Text>
           </div>
         </div>
         <div className="flex gap-3">
@@ -171,15 +171,15 @@ export default function NetatmoTemperatureReport() {
         <div className="flex items-center gap-3">
           <span className="text-2xl">🌡️</span>
           <div>
-            <h3 className="text-lg font-bold text-neutral-900">Netatmo Temperature</h3>
-            <p className="text-xs text-neutral-500">
+            <Heading level={3} size="lg">Netatmo Temperature</Heading>
+            <Text variant="tertiary" size="xs">
               {sortedRooms.length} {sortedRooms.length === 1 ? 'stanza' : 'stanze'}
               {lastUpdate && (
-                <span className="text-neutral-400 ml-2">
+                <Text variant="tertiary" size="xs" as="span" className="ml-2">
                   • Aggiornato {Math.floor((Date.now() - lastUpdate) / 1000)}s fa
-                </span>
+                </Text>
               )}
-            </p>
+            </Text>
           </div>
         </div>
         <Button
@@ -197,7 +197,7 @@ export default function NetatmoTemperatureReport() {
           {sortedRooms.map(room => (
             <div
               key={room.room_id}
-              className="flex items-center gap-3 p-3 bg-white/60 backdrop-blur-sm rounded-xl border border-neutral-200 hover:shadow-md transition-shadow duration-200"
+              className="flex items-center gap-3 p-3 bg-white/60 [html:not(.dark)_&]:bg-white/60 bg-slate-800/60 backdrop-blur-sm rounded-xl border border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 hover:shadow-md transition-shadow duration-200"
             >
               {/* Room icon */}
               <span className="text-2xl flex-shrink-0">
@@ -207,17 +207,17 @@ export default function NetatmoTemperatureReport() {
               {/* Room info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <p className="text-sm font-semibold text-neutral-900 truncate">
+                  <Text variant="body" size="sm" weight="semibold" className="truncate">
                     {room.room_name}
-                  </p>
+                  </Text>
                   {/* Device type badge */}
                   {room.deviceType === 'thermostat' && (
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-info-100 text-info-700 flex-shrink-0" title="Termostato">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-ocean-100 [html:not(.dark)_&]:bg-ocean-100 bg-ocean-900/40 text-ocean-700 [html:not(.dark)_&]:text-ocean-700 text-ocean-300 flex-shrink-0" title="Termostato">
                       🌡️
                     </span>
                   )}
                   {room.deviceType === 'valve' && (
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-accent-100 text-accent-700 flex-shrink-0" title="Valvola">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-flame-100 [html:not(.dark)_&]:bg-flame-100 bg-flame-900/40 text-flame-700 [html:not(.dark)_&]:text-flame-700 text-flame-300 flex-shrink-0" title="Valvola">
                       🔧
                     </span>
                   )}
@@ -228,21 +228,21 @@ export default function NetatmoTemperatureReport() {
                       <span className={`text-lg font-bold ${getTempColor(room.temperature, room.setpoint)}`}>
                         {room.temperature.toFixed(1)}°
                       </span>
-                      <span className="text-xs text-neutral-400">/</span>
-                      <span className="text-sm font-medium text-neutral-500">
+                      <Text variant="tertiary" size="xs" as="span">/</Text>
+                      <Text variant="tertiary" size="sm" weight="medium" as="span">
                         {room.setpoint?.toFixed(1)}°
-                      </span>
+                      </Text>
                     </>
                   ) : room.setpoint !== undefined ? (
                     <>
-                      <span className="text-sm text-neutral-400">--°</span>
-                      <span className="text-xs text-neutral-400">/</span>
-                      <span className="text-sm font-medium text-neutral-500">
+                      <Text variant="tertiary" size="sm" as="span">--°</Text>
+                      <Text variant="tertiary" size="xs" as="span">/</Text>
+                      <Text variant="tertiary" size="sm" weight="medium" as="span">
                         {room.setpoint.toFixed(1)}°
-                      </span>
+                      </Text>
                     </>
                   ) : (
-                    <span className="text-xs text-neutral-400 italic">N/D</span>
+                    <Text variant="tertiary" size="xs" as="span" className="italic">N/D</Text>
                   )}
                 </div>
               </div>
@@ -257,17 +257,17 @@ export default function NetatmoTemperatureReport() {
           ))}
         </div>
       ) : (
-        <div className="p-8 text-center bg-neutral-50 rounded-xl border-2 border-dashed border-neutral-300">
-          <p className="text-sm text-neutral-500">
+        <div className="p-8 text-center bg-slate-50 [html:not(.dark)_&]:bg-slate-50 bg-slate-800/60 rounded-xl border-2 border-dashed border-slate-300 [html:not(.dark)_&]:border-slate-300 border-slate-600">
+          <Text variant="tertiary" size="sm">
             Nessuna stanza configurata
-          </p>
+          </Text>
         </div>
       )}
 
       {/* Error message */}
       {error && (
-        <div className="mt-4 p-3 bg-warning-50 border border-warning-200 rounded-xl">
-          <p className="text-sm text-warning-700">⚠️ {error}</p>
+        <div className="mt-4 p-3 bg-warning-50 [html:not(.dark)_&]:bg-warning-50 bg-warning-900/20 border border-warning-200 [html:not(.dark)_&]:border-warning-200 border-warning-700 rounded-xl">
+          <Text variant="warning" size="sm">⚠️ {error}</Text>
         </div>
       )}
     </Card>

@@ -26,7 +26,7 @@ describe('Card Component', () => {
       expect(card).toHaveClass('bg-white');
       expect(card).toHaveClass('shadow-soft');
       expect(card).toHaveClass('border');
-      expect(card).toHaveClass('border-neutral-200/50');
+      expect(card).toHaveClass('border-slate-200/50');
     });
   });
 

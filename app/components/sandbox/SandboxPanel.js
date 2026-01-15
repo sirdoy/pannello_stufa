@@ -257,7 +257,7 @@ export default function SandboxPanel() {
   };
 
   return (
-    <Card liquid className="p-6 space-y-6 bg-gradient-to-br from-purple-900/40 via-neutral-900/60 to-pink-900/40">
+    <Card liquid className="p-6 space-y-6 bg-gradient-to-br from-purple-900/40 via-slate-900/60 to-pink-900/40">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

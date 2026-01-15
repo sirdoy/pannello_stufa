@@ -271,12 +271,12 @@ export default function StovePanel() {
   };
 
   const getStatusBgColor = (status) => {
-    if (!status) return 'bg-neutral-50';
-    if (status.includes('WORK')) return 'bg-success-50 border-success-200';
-    if (status.includes('OFF')) return 'bg-neutral-50 border-neutral-200';
-    if (status.includes('STANDBY')) return 'bg-warning-50 border-warning-200';
-    if (status.includes('ERROR')) return 'bg-primary-50 border-primary-200';
-    return 'bg-neutral-50 border-neutral-200';
+    if (!status) return 'bg-slate-50';
+    if (status.includes('WORK')) return 'bg-sage-50 border-sage-200';
+    if (status.includes('OFF')) return 'bg-slate-50 border-slate-200';
+    if (status.includes('STANDBY')) return 'bg-flame-50 border-flame-200';
+    if (status.includes('ERROR')) return 'bg-ember-50 border-ember-200';
+    return 'bg-slate-50 border-slate-200';
   };
 
   const getStatusIcon = (status) => {
@@ -290,12 +290,12 @@ export default function StovePanel() {
   };
 
   const getStatusColor = (status) => {
-    if (!status) return 'text-neutral-500';
-    if (status.includes('WORK')) return 'text-success-600';
-    if (status.includes('OFF')) return 'text-neutral-500';
-    if (status.includes('STANDBY')) return 'text-warning-500';
-    if (status.includes('ERROR')) return 'text-primary-600';
-    return 'text-neutral-500';
+    if (!status) return 'text-slate-500';
+    if (status.includes('WORK')) return 'text-sage-600';
+    if (status.includes('OFF')) return 'text-slate-500';
+    if (status.includes('STANDBY')) return 'text-flame-500';
+    if (status.includes('ERROR')) return 'text-ember-600';
+    return 'text-slate-500';
   };
 
   const isAccesa = status?.includes('WORK') || status?.includes('START');
@@ -354,12 +354,12 @@ export default function StovePanel() {
       <Card className={`overflow-hidden border-2 transition-all duration-300 ${getStatusBgColor(status)}`}>
         <div className="relative">
           {/* Header con gradiente */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 via-accent-500 to-primary-500"></div>
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-ember-500 via-flame-500 to-ember-500"></div>
 
           <div className="p-8">
             {/* Top bar: Titolo e Refresh */}
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-neutral-900">Stato Stufa</h2>
+              <h2 className="text-2xl font-bold text-slate-900">Stato Stufa</h2>
               <button
                 onClick={handleManualRefresh}
                 disabled={refreshing}
@@ -380,8 +380,8 @@ export default function StovePanel() {
                 {errorCode !== 0 && (
                   <div className="absolute -top-2 -right-2 animate-pulse">
                     <div className="relative">
-                      <div className="absolute inset-0 bg-primary-500 rounded-full blur-md opacity-75"></div>
-                      <div className="relative bg-primary-600 text-white px-3 py-1.5 rounded-full border-2 border-white shadow-lg">
+                      <div className="absolute inset-0 bg-ember-500 rounded-full blur-md opacity-75"></div>
+                      <div className="relative bg-ember-600 text-white px-3 py-1.5 rounded-full border-2 border-white shadow-lg">
                         <span className="text-xs font-bold">⚠️ ERR {errorCode}</span>
                       </div>
                     </div>
@@ -391,7 +391,7 @@ export default function StovePanel() {
                 <div className="flex items-center gap-4 mb-2">
                   <span className="text-6xl drop-shadow-lg">{getStatusIcon(status)}</span>
                   <div className="text-left">
-                    <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mb-1">Status</p>
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Status</p>
                     <p className={`text-3xl font-bold ${getStatusColor(status)}`}>
                       {status}
                     </p>
@@ -404,15 +404,15 @@ export default function StovePanel() {
                 {/* Ventola */}
                 <div className="flex flex-col items-center justify-center p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-white/80 shadow-sm">
                   <span className="text-3xl mb-2">💨</span>
-                  <p className="text-xs text-neutral-500 font-semibold mb-1">Ventola</p>
-                  <p className="text-2xl font-bold text-info-600">{fanLevel ?? '-'}<span className="text-base text-neutral-400">/6</span></p>
+                  <p className="text-xs text-slate-500 font-semibold mb-1">Ventola</p>
+                  <p className="text-2xl font-bold text-ocean-600">{fanLevel ?? '-'}<span className="text-base text-slate-400">/6</span></p>
                 </div>
 
                 {/* Potenza */}
                 <div className="flex flex-col items-center justify-center p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-white/80 shadow-sm">
                   <span className="text-3xl mb-2">⚡</span>
-                  <p className="text-xs text-neutral-500 font-semibold mb-1">Potenza</p>
-                  <p className="text-2xl font-bold text-accent-600">{powerLevel ?? '-'}<span className="text-base text-neutral-400">/5</span></p>
+                  <p className="text-xs text-slate-500 font-semibold mb-1">Potenza</p>
+                  <p className="text-2xl font-bold text-flame-600">{powerLevel ?? '-'}<span className="text-base text-slate-400">/5</span></p>
                 </div>
               </div>
             </div>
@@ -420,20 +420,20 @@ export default function StovePanel() {
             {/* Separator */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-neutral-200"></div>
+                <div className="w-full border-t border-slate-200"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-3 bg-white/60 text-neutral-500 font-medium rounded-full">Modalità Controllo</span>
+                <span className="px-3 bg-white/60 text-slate-500 font-medium rounded-full">Modalità Controllo</span>
               </div>
             </div>
 
             {/* Mode Indicator - Redesign inline */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 bg-white/40 backdrop-blur-sm rounded-xl border border-neutral-200/60">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 bg-white/40 backdrop-blur-sm rounded-xl border border-slate-200/60">
               <div className="flex items-center gap-4">
                 <div className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                  schedulerEnabled && semiManualMode ? 'bg-warning-100 border-2 border-warning-300' :
-                  schedulerEnabled ? 'bg-success-100 border-2 border-success-300' :
-                  'bg-accent-100 border-2 border-accent-300'
+                  schedulerEnabled && semiManualMode ? 'bg-flame-100 border-2 border-flame-300' :
+                  schedulerEnabled ? 'bg-sage-100 border-2 border-sage-300' :
+                  'bg-flame-100 border-2 border-flame-300'
                 }`}>
                   <span className="text-3xl">
                     {schedulerEnabled && semiManualMode ? '⚙️' : schedulerEnabled ? '⏰' : '🔧'}
@@ -441,13 +441,13 @@ export default function StovePanel() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className={`text-lg font-bold ${
-                    schedulerEnabled && semiManualMode ? 'text-warning-700' :
-                    schedulerEnabled ? 'text-success-700' :
-                    'text-accent-700'
+                    schedulerEnabled && semiManualMode ? 'text-flame-700' :
+                    schedulerEnabled ? 'text-sage-700' :
+                    'text-flame-700'
                   }`}>
                     {schedulerEnabled && semiManualMode ? 'Modalità Semi-manuale' : schedulerEnabled ? 'Modalità Automatica' : 'Modalità Manuale'}
                   </p>
-                  <p className="text-sm text-neutral-500 mt-1">
+                  <p className="text-sm text-slate-500 mt-1">
                     {schedulerEnabled && semiManualMode && returnToAutoAt ? (
                       (() => {
                         const date = new Date(returnToAutoAt);
@@ -457,11 +457,11 @@ export default function StovePanel() {
                       })()
                     ) : schedulerEnabled && nextScheduledAction ? (
                       <>
-                        <span className={`font-semibold ${nextScheduledAction.action === 'ignite' ? 'text-success-600' : 'text-primary-600'}`}>
+                        <span className={`font-semibold ${nextScheduledAction.action === 'ignite' ? 'text-sage-600' : 'text-ember-600'}`}>
                           {nextScheduledAction.action === 'ignite' ? '🔥 Accensione' : '❄️ Spegnimento'}
                         </span>
                         {' alle '}
-                        <span className="font-medium text-neutral-700">
+                        <span className="font-medium text-slate-700">
                           {(() => {
                             const date = new Date(nextScheduledAction.timestamp);
                             const time = date.toLocaleString('it-IT', {hour: '2-digit', minute: '2-digit'});
@@ -470,7 +470,7 @@ export default function StovePanel() {
                           })()}
                         </span>
                         {nextScheduledAction.action === 'ignite' && (
-                          <span className="text-neutral-400"> • Potenza {nextScheduledAction.power}, Ventola {nextScheduledAction.fan}</span>
+                          <span className="text-slate-400"> • Potenza {nextScheduledAction.power}, Ventola {nextScheduledAction.fan}</span>
                         )}
                       </>
                     ) : schedulerEnabled ? (
@@ -485,14 +485,14 @@ export default function StovePanel() {
                 {schedulerEnabled && semiManualMode && (
                   <button
                     onClick={handleClearSemiManual}
-                    className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl text-sm font-semibold text-warning-700 bg-warning-50 hover:bg-warning-100 border border-warning-200 hover:border-warning-300 transition-all duration-200 active:scale-95 whitespace-nowrap"
+                    className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl text-sm font-semibold text-flame-700 bg-flame-50 hover:bg-flame-100 border border-flame-200 hover:border-flame-300 transition-all duration-200 active:scale-95 whitespace-nowrap"
                   >
                     ↩️ Torna in Automatico
                   </button>
                 )}
                 <button
                   onClick={() => router.push('/stove/scheduler')}
-                  className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl text-sm font-semibold text-info-700 bg-info-50 hover:bg-info-100 border border-info-200 hover:border-info-300 transition-all duration-200 active:scale-95"
+                  className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl text-sm font-semibold text-ocean-700 bg-ocean-50 hover:bg-ocean-100 border border-ocean-200 hover:border-ocean-300 transition-all duration-200 active:scale-95"
                 >
                   Configura
                 </button>
@@ -509,10 +509,10 @@ export default function StovePanel() {
               <>
                 <div className="relative my-6">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-neutral-200"></div>
+                    <div className="w-full border-t border-slate-200"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-3 bg-white/60 text-neutral-500 font-medium rounded-full">Stato Manutenzione</span>
+                    <span className="px-3 bg-white/60 text-slate-500 font-medium rounded-full">Stato Manutenzione</span>
                   </div>
                 </div>
 
@@ -528,7 +528,7 @@ export default function StovePanel() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Quick Actions */}
         <Card className="p-8">
-          <h3 className="text-2xl font-bold text-neutral-900 mb-6">⚡ Azioni Rapide</h3>
+          <h3 className="text-2xl font-bold text-slate-900 mb-6">⚡ Azioni Rapide</h3>
           <div className="grid grid-cols-2 gap-4">
             <Button
               variant="success"
@@ -554,13 +554,13 @@ export default function StovePanel() {
 
           {/* Indicatore stato azione */}
           {isAccesa && (
-            <div className="mt-4 p-3 bg-success-50 border border-success-200 rounded-xl text-center">
-              <p className="text-sm font-medium text-success-700">✓ Stufa in funzione</p>
+            <div className="mt-4 p-3 bg-sage-50 border border-sage-200 rounded-xl text-center">
+              <p className="text-sm font-medium text-sage-700">✓ Stufa in funzione</p>
             </div>
           )}
           {isSpenta && (
-            <div className="mt-4 p-3 bg-neutral-50 border border-neutral-200 rounded-xl text-center">
-              <p className="text-sm font-medium text-neutral-600">○ Stufa spenta</p>
+            <div className="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+              <p className="text-sm font-medium text-slate-600">○ Stufa spenta</p>
             </div>
           )}
         </Card>
@@ -568,7 +568,7 @@ export default function StovePanel() {
         {/* Livelli - Visibile solo quando stufa accesa */}
         {!isSpenta && (
           <Card className="p-8">
-            <h3 className="text-2xl font-bold text-neutral-900 mb-6">⚙️ Regolazioni</h3>
+            <h3 className="text-2xl font-bold text-slate-900 mb-6">⚙️ Regolazioni</h3>
 
             <div className="space-y-5">
               <Select

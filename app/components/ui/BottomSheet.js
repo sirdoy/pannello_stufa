@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import ActionButton from './ActionButton';
+import Heading from './Heading';
 
 /**
  * BottomSheet Component
@@ -86,7 +87,7 @@ export default function BottomSheet({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-neutral-900/60 backdrop-blur-sm animate-fadeIn"
+        className="fixed inset-0 bg-slate-950/60 [html:not(.dark)_&]:bg-slate-500/40 backdrop-blur-sm animate-fadeIn"
         style={{ zIndex }}
         onClick={handleBackdropClick}
         aria-hidden="true"
@@ -102,11 +103,11 @@ export default function BottomSheet({
       >
         <div
           className={`
-            bg-white/90 dark:bg-neutral-900/90
+            bg-slate-900/95 [html:not(.dark)_&]:bg-white/95
             backdrop-blur-3xl
             rounded-t-3xl
             shadow-liquid-lg
-            border-t border-neutral-300/50 dark:border-neutral-700/50
+            border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200/50
             p-6
             max-h-[85vh] overflow-y-auto
             ${className}
@@ -114,7 +115,7 @@ export default function BottomSheet({
         >
           {/* Drag Handle */}
           {showHandle && (
-            <div className="w-12 h-1.5 bg-neutral-400/50 dark:bg-neutral-600/50 rounded-full mx-auto mb-6" />
+            <div className="w-12 h-1.5 bg-slate-600/50 [html:not(.dark)_&]:bg-slate-400/50 rounded-full mx-auto mb-6" />
           )}
 
           {/* Header */}
@@ -122,15 +123,10 @@ export default function BottomSheet({
             <div className="flex items-start justify-between mb-6">
               {/* Title */}
               {title && (
-                <div>
-                  <div
-                    id="bottom-sheet-title"
-                    className="text-2xl font-bold text-neutral-900 dark:text-white flex items-center gap-2"
-                  >
-                    {icon && <span className="text-2xl">{icon}</span>}
-                    {title}
-                  </div>
-                </div>
+                <Heading level={2} size="2xl" id="bottom-sheet-title" className="flex items-center gap-2">
+                  {icon && <span className="text-2xl">{icon}</span>}
+                  {title}
+                </Heading>
               )}
 
               {/* Close Button */}

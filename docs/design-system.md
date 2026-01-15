@@ -474,34 +474,77 @@ Ember Noir is **dark-first** but fully supports light mode.
 
 ### Component Internal Styling
 
-**Base components handle dark/light mode internally:**
+**Base components handle dark/light mode internally via props - NEVER use external color classes.**
+
+#### Heading Component
 
 ```jsx
-// Heading.js - Internal variant handling
-const variantClasses = {
-  default: 'text-slate-100 [html:not(.dark)_&]:text-slate-900',
-  gradient: 'bg-gradient-to-r from-ember-500 to-flame-600 bg-clip-text text-transparent',
-  subtle: 'text-slate-400 [html:not(.dark)_&]:text-slate-600',
-};
-
-// Text.js - Internal variant handling
-const variantClasses = {
-  body: 'text-base text-slate-100 [html:not(.dark)_&]:text-slate-900',
-  secondary: 'text-base text-slate-300 [html:not(.dark)_&]:text-slate-600',
-  tertiary: 'text-sm text-slate-400 [html:not(.dark)_&]:text-slate-500',
-};
+// Props: level, size, variant, children, className (layout only)
+<Heading level={1} size="3xl" variant="gradient">Main Title</Heading>
+<Heading level={2} variant="ember">Accent Title</Heading>
+<Heading level={3} variant="ocean">Info Title</Heading>
 ```
 
-**Do NOT pass color classes externally** - use variants instead:
+**Heading variants:**
+| Variant | Dark Mode | Light Mode |
+|---------|-----------|------------|
+| `default` | slate-100 | slate-900 |
+| `gradient` | ember→flame gradient | (same) |
+| `subtle` | slate-400 | slate-600 |
+| `ember` | ember-400 | ember-700 |
+| `ocean` | ocean-300 | ocean-700 |
+| `sage` | sage-400 | sage-700 |
+| `warning` | warning-400 | warning-700 |
+| `danger` | danger-400 | danger-700 |
+| `info` | ocean-300 | ocean-800 |
+
+**Heading sizes:** `sm`, `md`, `lg`, `xl`, `2xl`, `3xl` (auto-calculated from level if not provided)
+
+#### Text Component
 
 ```jsx
-// ✅ Correct - use variant
+// Props: variant, size, weight, uppercase, tracking, mono, as, children, className (layout only)
+<Text variant="body">Primary text</Text>
+<Text variant="secondary" size="sm">Description</Text>
+<Text variant="tertiary" size="xs" uppercase>Label</Text>
+<Text variant="ocean" weight="bold">Highlighted</Text>
+<Text variant="label">AUTO UPPERCASE LABEL</Text>
+<Text as="span" mono>code_example</Text>
+```
+
+**Text variants:**
+| Variant | Dark Mode | Light Mode | Default Size |
+|---------|-----------|------------|--------------|
+| `body` | slate-100 | slate-900 | base |
+| `secondary` | slate-300 | slate-600 | base |
+| `tertiary` | slate-400 | slate-500 | sm |
+| `ember` | ember-400 | ember-600 | base |
+| `ocean` | ocean-400 | ocean-600 | base |
+| `sage` | sage-400 | sage-600 | base |
+| `warning` | warning-400 | warning-600 | base |
+| `danger` | danger-400 | danger-600 | base |
+| `info` | ocean-400 | ocean-600 | base |
+| `label` | slate-400 + uppercase | slate-500 + uppercase | xs |
+
+**Text sizes:** `xs`, `sm`, `base`, `lg`, `xl`
+**Text weights:** `normal`, `medium`, `semibold`, `bold`, `black`
+**Text modifiers:** `uppercase`, `tracking` (letter-spacing), `mono` (monospace font)
+**Text element:** `as` prop → `p` (default), `span`, `label`, `div`
+
+#### Usage Rules
+
+```jsx
+// ✅ Correct - use props for styling
 <Heading variant="subtle">Room Name</Heading>
-<Text variant="tertiary">Description</Text>
+<Text variant="tertiary" size="xs">Description</Text>
+<Text variant="ember" weight="semibold">Highlighted</Text>
 
 // ❌ Wrong - external color classes
 <Heading className="text-slate-400">Room Name</Heading>
-<Text className="text-slate-500">Description</Text>
+<Text className="text-slate-500 text-xs font-semibold">Text</Text>
+
+// ✅ className only for layout/spacing
+<Text variant="body" className="mt-4 truncate">With spacing</Text>
 ```
 
 ### Status-Based Dynamic Styling
@@ -722,4 +765,4 @@ var(--ease-out-expo)
 
 ---
 
-**Last Updated**: 2026-01 (Ember Noir v2.1 - Full Light Mode Support)
+**Last Updated**: 2026-01 (Ember Noir v2.2 - Props-Based Component Styling)

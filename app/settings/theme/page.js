@@ -210,10 +210,10 @@ export default function ThemeSettingsPage() {
         <div className="flex gap-3">
           <div className="text-2xl">ℹ️</div>
           <div className="flex-1">
-            <Heading level={3} size="md" className="mb-1 text-info-900 dark:text-info-300">
+            <Heading level={3} size="md" variant="info" className="mb-1">
               Sincronizzazione Multi-Device
             </Heading>
-            <Text variant="secondary" className="text-info-700 dark:text-info-400 text-sm">
+            <Text variant="info" size="sm">
               La tua preferenza tema viene salvata su Firebase e sincronizzata automaticamente su tutti i tuoi dispositivi.
             </Text>
           </div>

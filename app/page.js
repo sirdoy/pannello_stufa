@@ -65,7 +65,7 @@ export default async function Home() {
               // Placeholder - future implementation
               return (
                 <div key={device.id} className="animate-spring-in" style={{ animationDelay }}>
-                  <div className="p-6 rounded-3xl bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl border border-white/20 dark:border-white/10 shadow-liquid">
+                  <div className="p-6 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-white/[0.06] shadow-card [html:not(.dark)_&]:bg-white/90 [html:not(.dark)_&]:border-black/[0.06] [html:not(.dark)_&]:shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
                     <div className="flex items-center gap-3 mb-4">
                       <span className="text-3xl">{device.icon}</span>
                       <Heading level={2} size="lg">{device.name}</Heading>

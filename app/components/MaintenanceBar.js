@@ -82,12 +82,12 @@ export default function MaintenanceBar({ maintenanceStatus }) {
   };
 
   return (
-    <div className="bg-white/[0.08] backdrop-blur-3xl shadow-liquid ring-1 ring-white/[0.15] ring-inset rounded-xl hover:bg-white/[0.12] transition-all duration-300 overflow-hidden relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.12] before:to-transparent before:pointer-events-none">
+    <div className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-xl hover:bg-slate-800/80 transition-all duration-300 overflow-hidden [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200 [html:not(.dark)_&]:hover:bg-white/90">
       {/* Mini Bar - Always visible */}
       <div className="flex items-center justify-between p-4 cursor-pointer relative z-10" onClick={toggleExpanded}>
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <span className="text-lg flex-shrink-0">🔧</span>
-          <Text variant="body" className="font-medium flex-shrink-0">Manutenzione</Text>
+          <Text variant="body" weight="medium" className="flex-shrink-0">Manutenzione</Text>
 
           {/* Badge percentuale - nascosto quando espanso */}
           {!isExpanded && (
@@ -110,7 +110,7 @@ export default function MaintenanceBar({ maintenanceStatus }) {
 
         {/* Toggle button */}
         <button
-          className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors flex-shrink-0"
+          className="flex items-center gap-2 text-xs text-slate-500 hover:text-slate-200 transition-colors flex-shrink-0 [html:not(.dark)_&]:text-slate-400 [html:not(.dark)_&]:hover:text-slate-700"
           onClick={toggleExpanded}
         >
           <span className="hidden sm:inline">
@@ -126,7 +126,7 @@ export default function MaintenanceBar({ maintenanceStatus }) {
       <div className={`${styles.collapseContent} ${isExpanded ? styles.expanded : ''}`}>
         <div className="px-4 pb-4 space-y-3">
           {/* Progress Bar */}
-          <div className="relative w-full h-3 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
+          <div className="relative w-full h-3 bg-slate-700 rounded-full overflow-hidden [html:not(.dark)_&]:bg-slate-200">
             <div
               className={`h-full ${getBarColor()} transition-all duration-500 ease-out`}
               style={{ width: `${Math.min(100, percentage)}%` }}

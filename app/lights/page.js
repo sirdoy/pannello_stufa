@@ -338,15 +338,15 @@ export default function LightsPage() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="grid grid-cols-3 gap-6">
             <div>
-              <Text variant="tertiary" className="text-xs mb-1">Stanze</Text>
+              <Text variant="label" size="xs" className="mb-1">Stanze</Text>
               <Heading level={3} size="lg">{rooms.length}</Heading>
             </div>
             <div>
-              <Text variant="tertiary" className="text-xs mb-1">Luci</Text>
+              <Text variant="label" size="xs" className="mb-1">Luci</Text>
               <Heading level={3} size="lg">{lights.length}</Heading>
             </div>
             <div>
-              <Text variant="tertiary" className="text-xs mb-1">Scene</Text>
+              <Text variant="label" size="xs" className="mb-1">Scene</Text>
               <Heading level={3} size="lg">{scenes.length}</Heading>
             </div>
           </div>
@@ -386,7 +386,7 @@ export default function LightsPage() {
                       <Heading level={3} size="md" className="mb-1">
                         {room.metadata?.name || 'Stanza'}
                       </Heading>
-                      <Text variant="tertiary" className="text-xs">
+                      <Text variant="tertiary" size="xs">
                         {roomLights.length} {roomLights.length === 1 ? 'luce' : 'luci'} • {roomScenes.length} {roomScenes.length === 1 ? 'scena' : 'scene'}
                       </Text>
                     </div>
@@ -423,8 +423,8 @@ export default function LightsPage() {
                   {isOn && (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <Text variant="secondary" className="text-xs">Luminosità Stanza</Text>
-                        <Text variant="primary" className="text-sm font-bold">{avgBrightness}%</Text>
+                        <Text variant="secondary" size="xs">Luminosità Stanza</Text>
+                        <Text variant="body" size="sm" weight="bold">{avgBrightness}%</Text>
                       </div>
                       <input
                         type="range"
@@ -475,8 +475,8 @@ export default function LightsPage() {
                               >
                                 <div className="flex items-center justify-between mb-2">
                                   <div>
-                                    <Text className="text-sm font-semibold">{light.metadata?.name || 'Luce'}</Text>
-                                    {hasColor && <Text variant="tertiary" className="text-xs">🎨 Colore disponibile</Text>}
+                                    <Text size="sm" weight="semibold">{light.metadata?.name || 'Luce'}</Text>
+                                    {hasColor && <Text variant="tertiary" size="xs">🎨 Colore disponibile</Text>}
                                   </div>
                                   {lightOn && <span className="text-xs text-warning-600 dark:text-warning-400">ON</span>}
                                 </div>
@@ -505,8 +505,8 @@ export default function LightsPage() {
                                     {/* Brightness Control */}
                                     <div className="space-y-1">
                                       <div className="flex items-center justify-between">
-                                        <Text variant="tertiary" className="text-xs">Luminosità</Text>
-                                        <Text className="text-xs font-bold">{Math.round(lightBrightness)}%</Text>
+                                        <Text variant="tertiary" size="xs">Luminosità</Text>
+                                        <Text size="xs" weight="bold">{Math.round(lightBrightness)}%</Text>
                                       </div>
                                       <input
                                         type="range"
@@ -522,7 +522,7 @@ export default function LightsPage() {
                                     {/* Color Control (only if supported) */}
                                     {hasColor && (
                                       <div className="space-y-1.5">
-                                        <Text variant="tertiary" className="text-xs">Colore</Text>
+                                        <Text variant="tertiary" size="xs">Colore</Text>
                                         <div className="grid grid-cols-5 gap-1.5">
                                           {COLOR_PRESETS.map(preset => (
                                             <button
@@ -569,7 +569,7 @@ export default function LightsPage() {
                               }`}
                             >
                               <div className="text-2xl mb-1">🎨</div>
-                              <Text className="text-xs font-semibold text-center">
+                              <Text size="xs" weight="semibold" className="text-center">
                                 {scene.metadata?.name || 'Scena'}
                               </Text>
                               {activatingScene === scene.id && (

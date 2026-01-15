@@ -279,18 +279,18 @@ export default function ThermostatCard() {
       {/* Selected Room Temperature */}
       {selectedRoom ? (
         <div className="space-y-4 mb-4 sm:mb-6">
-                {/* Main Temperature Display - Ember Noir style */}
+                {/* Main Temperature Display - Ember Noir style with light mode */}
                 <div className={`relative rounded-2xl p-6 sm:p-8 transition-all duration-500 border ${
                   selectedRoom.heating
-                    ? 'bg-gradient-to-br from-ember-900/40 via-slate-900/60 to-flame-900/30 border-ember-500/40 shadow-ember-glow'
-                    : 'bg-gradient-to-br from-ocean-900/30 via-slate-900/60 to-ocean-800/20 border-ocean-500/30'
+                    ? 'bg-gradient-to-br from-ember-900/40 via-slate-900/60 to-flame-900/30 border-ember-500/40 shadow-ember-glow [html:not(.dark)_&]:from-ember-100/80 [html:not(.dark)_&]:via-ember-50/90 [html:not(.dark)_&]:to-flame-100/70 [html:not(.dark)_&]:border-ember-300 [html:not(.dark)_&]:shadow-[0_0_20px_rgba(237,111,16,0.15)]'
+                    : 'bg-gradient-to-br from-ocean-900/30 via-slate-900/60 to-ocean-800/20 border-ocean-500/30 [html:not(.dark)_&]:from-ocean-100/80 [html:not(.dark)_&]:via-ocean-50/90 [html:not(.dark)_&]:to-ocean-100/70 [html:not(.dark)_&]:border-ocean-200'
                 }`}>
-                  {/* Heating Badge */}
+                  {/* Heating Badge - with light mode */}
                   {selectedRoom.heating && (
                     <div className="absolute -top-2 -right-2 z-20">
                       <div className="relative">
-                        <div className="absolute inset-0 bg-ember-500/30 rounded-full blur-lg animate-pulse"></div>
-                        <div className="relative bg-gradient-to-br from-ember-500 to-flame-600 text-white px-3 py-1.5 rounded-full shadow-lg ring-2 ring-slate-900/50">
+                        <div className="absolute inset-0 bg-ember-500/30 rounded-full blur-lg animate-pulse [html:not(.dark)_&]:bg-ember-400/40"></div>
+                        <div className="relative bg-gradient-to-br from-ember-500 to-flame-600 text-white px-3 py-1.5 rounded-full shadow-lg ring-2 ring-slate-900/50 [html:not(.dark)_&]:ring-white/50">
                           <span className="text-xs font-bold font-display">🔥 ATTIVO</span>
                         </div>
                       </div>
@@ -311,7 +311,7 @@ export default function ThermostatCard() {
                     {/* Current Temperature Box */}
                     <div className="relative overflow-hidden rounded-2xl bg-slate-800/60 backdrop-blur-xl border border-white/10 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
                       <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
-                        <Text variant="tertiary" className="mb-2 uppercase tracking-wider text-[10px] sm:text-xs font-bold font-display">
+                        <Text variant="label" size="xs" weight="bold" className="mb-2 font-display">
                           Attuale
                         </Text>
                         <div className="flex items-baseline gap-1">
@@ -327,7 +327,7 @@ export default function ThermostatCard() {
                     {selectedRoom.setpoint && (
                       <div className="relative overflow-hidden rounded-2xl bg-ocean-900/40 backdrop-blur-xl border border-ocean-500/30 [html:not(.dark)_&]:bg-ocean-50/80 [html:not(.dark)_&]:border-ocean-200">
                         <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
-                          <Text variant="tertiary" className="mb-2 uppercase tracking-wider text-[10px] sm:text-xs font-bold text-ocean-300 font-display [html:not(.dark)_&]:text-ocean-600">
+                          <Text variant="ocean" size="xs" weight="bold" uppercase tracking className="mb-2 font-display">
                             Target
                           </Text>
                           <div className="flex items-baseline gap-1">
@@ -356,7 +356,7 @@ export default function ThermostatCard() {
                         − 0.5°
                       </Button>
                       <div className="flex flex-col items-center justify-center px-4">
-                        <Text variant="tertiary" className="text-xs uppercase font-display">Target</Text>
+                        <Text variant="label" size="xs" className="font-display">Target</Text>
                         <span className="text-2xl sm:text-3xl font-black font-display text-ocean-400 [html:not(.dark)_&]:text-ocean-600">{selectedRoom.setpoint}°</span>
                       </div>
                       <Button

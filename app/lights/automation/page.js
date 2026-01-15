@@ -106,7 +106,7 @@ export default function AutomationPage() {
               <Heading level={3} size="sm" className="mb-2">
                 {feature.title}
               </Heading>
-              <Text variant="secondary" className="text-sm">
+              <Text variant="secondary" size="sm">
                 {feature.description}
               </Text>
             </Card>
@@ -122,7 +122,7 @@ export default function AutomationPage() {
             <Heading level={3} size="sm" className="mb-2">
               Nel Frattempo...
             </Heading>
-            <Text variant="secondary" className="text-sm mb-3">
+            <Text variant="secondary" size="sm" className="mb-3">
               Puoi già utilizzare queste funzionalità:
             </Text>
             <ul className="space-y-2 text-sm text-neutral-600 dark:text-neutral-400">

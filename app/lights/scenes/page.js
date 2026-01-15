@@ -314,7 +314,7 @@ export default function ScenesPage() {
         {/* Room Filter */}
         {rooms.length > 1 && (
           <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
-            <Text variant="secondary" className="text-xs mb-2">Filtra per stanza:</Text>
+            <Text variant="secondary" size="xs" className="mb-2">Filtra per stanza:</Text>
             <div className="flex flex-wrap gap-2">
               <Button
                 variant={selectedRoom === 'all' ? 'primary' : 'outline'}
@@ -364,7 +364,7 @@ export default function ScenesPage() {
                     }`}
                   >
                     <div className="text-4xl mb-3">🎨</div>
-                    <Text className="text-sm font-semibold text-center">
+                    <Text size="sm" weight="semibold" className="text-center">
                       {scene.metadata?.name || 'Scena'}
                     </Text>
                     {activatingScene === scene.id && (
@@ -412,7 +412,7 @@ export default function ScenesPage() {
                 }`}
               >
                 <div className="text-4xl mb-3">🎨</div>
-                <Text className="text-sm font-semibold text-center">
+                <Text size="sm" weight="semibold" className="text-center">
                   {scene.metadata?.name || 'Scena'}
                 </Text>
                 {activatingScene === scene.id && (

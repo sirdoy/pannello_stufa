@@ -1024,7 +1024,7 @@ export default function StoveCard() {
 
                       {/* Display Livello Centrale */}
                       <div className="flex flex-col items-center justify-center px-4 sm:px-6">
-                        <Text variant="tertiary" className="text-xs sm:text-sm uppercase tracking-wide mb-1 font-display">Livello</Text>
+                        <Text variant="label" size="sm" className="mb-1 font-display">Livello</Text>
                         <div className="flex items-baseline gap-1">
                           <span className="text-4xl sm:text-5xl font-black font-display text-ocean-400 leading-none [html:not(.dark)_&]:text-ocean-600">
                             {fanLevel ?? '-'}
@@ -1075,7 +1075,7 @@ export default function StoveCard() {
 
                       {/* Display Livello Centrale */}
                       <div className="flex flex-col items-center justify-center px-4 sm:px-6">
-                        <Text variant="tertiary" className="text-xs sm:text-sm uppercase tracking-wide mb-1 font-display">Livello</Text>
+                        <Text variant="label" size="sm" className="mb-1 font-display">Livello</Text>
                         <div className="flex items-baseline gap-1">
                           <span className="text-4xl sm:text-5xl font-black font-display text-ember-400 leading-none [html:not(.dark)_&]:text-ember-600">
                             {powerLevel ?? '-'}

@@ -66,19 +66,19 @@ export default function CronHealthBanner({ variant = 'banner' }) {
 
   if (!showBanner) return null;
 
-  // Inline variant - compact design for integration inside cards
+  // Inline variant - compact design for integration inside cards - Ember Noir with light mode
   if (variant === 'inline') {
     return (
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 bg-warning-500/[0.08] backdrop-blur-3xl shadow-liquid ring-1 ring-warning-500/20 ring-inset rounded-xl relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-warning-500/[0.12] before:to-transparent before:pointer-events-none">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 bg-warning-900/30 backdrop-blur-xl border border-warning-500/40 rounded-xl [html:not(.dark)_&]:bg-warning-100/80 [html:not(.dark)_&]:border-warning-300">
         <div className="flex items-center gap-4 relative z-10">
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-warning-100/80 backdrop-blur-sm border-2 border-warning-400/50">
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-warning-900/40 border-2 border-warning-500/50 [html:not(.dark)_&]:bg-warning-100/80 [html:not(.dark)_&]:border-warning-300">
             <span className="text-2xl">⚠️</span>
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-base font-bold text-warning-800">
+            <p className="text-base font-bold font-display text-warning-300 [html:not(.dark)_&]:text-warning-800">
               Cronjob Non Attivo
             </p>
-            <p className="text-sm text-warning-700 mt-0.5">
+            <p className="text-sm text-warning-400 mt-0.5 [html:not(.dark)_&]:text-warning-700">
               Ultima esecuzione: <strong>{minutesSinceLastCall} minuti fa</strong> • Scheduler potrebbe non funzionare
             </p>
           </div>
@@ -90,7 +90,7 @@ export default function CronHealthBanner({ variant = 'banner' }) {
             rel="noopener noreferrer"
             className="flex-1 sm:flex-initial"
           >
-            <button className="w-full px-5 py-2.5 rounded-xl text-sm font-semibold text-warning-800 bg-warning-100/80 backdrop-blur-sm hover:bg-warning-200/80 border-2 border-warning-400/50 hover:border-warning-500 transition-all duration-200 active:scale-95 whitespace-nowrap shadow-liquid-sm">
+            <button className="w-full px-5 py-2.5 rounded-xl text-sm font-semibold font-display text-warning-300 bg-warning-900/30 hover:bg-warning-900/50 border border-warning-500/40 hover:border-warning-500/60 transition-all duration-200 active:scale-95 whitespace-nowrap [html:not(.dark)_&]:text-warning-700 [html:not(.dark)_&]:bg-warning-100/80 [html:not(.dark)_&]:hover:bg-warning-200/80 [html:not(.dark)_&]:border-warning-300 [html:not(.dark)_&]:hover:border-warning-400">
               🔧 Riavvia Cronjob ↗
             </button>
           </a>

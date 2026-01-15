@@ -496,14 +496,14 @@ export default function LightsCard() {
     onClick: () => router.push('/lights')
   }] : [];
 
-  // Connection mode badge - Ember Noir
+  // Connection mode badge - Ember Noir with light mode support
   const getConnectionModeBadge = () => {
     if (!connected || !connectionMode) return null;
 
     const badges = {
-      'local': { icon: '📡', text: 'Local', color: 'text-sage-400' },
-      'remote': { icon: '☁️', text: 'Cloud', color: 'text-ocean-400' },
-      'hybrid': { icon: '🔄', text: 'Hybrid', color: 'text-warning-400' },
+      'local': { icon: '📡', text: 'Local', color: 'text-sage-400 [html:not(.dark)_&]:text-sage-600' },
+      'remote': { icon: '☁️', text: 'Cloud', color: 'text-ocean-400 [html:not(.dark)_&]:text-ocean-600' },
+      'hybrid': { icon: '🔄', text: 'Hybrid', color: 'text-warning-400 [html:not(.dark)_&]:text-warning-600' },
     };
 
     const badge = badges[connectionMode];
@@ -563,18 +563,18 @@ export default function LightsCard() {
       {/* Selected Room Controls */}
       {selectedRoom ? (
         <div className="space-y-4 sm:space-y-6">
-                {/* Main Control Area - Ember Noir */}
+                {/* Main Control Area - Ember Noir with light mode */}
                 <div className={`relative rounded-2xl p-6 sm:p-8 transition-all duration-500 border ${
                   isRoomOn
-                    ? 'bg-gradient-to-br from-warning-900/40 via-slate-900/60 to-ember-900/30 border-warning-500/40 shadow-[0_0_30px_rgba(234,179,8,0.2)]'
-                    : 'bg-gradient-to-br from-slate-800/60 via-slate-900/70 to-slate-800/50 border-slate-600/40'
+                    ? 'bg-gradient-to-br from-warning-900/40 via-slate-900/60 to-ember-900/30 border-warning-500/40 shadow-[0_0_30px_rgba(234,179,8,0.2)] [html:not(.dark)_&]:from-warning-100/80 [html:not(.dark)_&]:via-warning-50/90 [html:not(.dark)_&]:to-ember-100/70 [html:not(.dark)_&]:border-warning-300 [html:not(.dark)_&]:shadow-[0_0_20px_rgba(234,179,8,0.15)]'
+                    : 'bg-gradient-to-br from-slate-800/60 via-slate-900/70 to-slate-800/50 border-slate-600/40 [html:not(.dark)_&]:from-slate-100/80 [html:not(.dark)_&]:via-white/90 [html:not(.dark)_&]:to-slate-100/70 [html:not(.dark)_&]:border-slate-200'
                 }`}>
-                  {/* ON Badge */}
+                  {/* ON Badge - with light mode */}
                   {isRoomOn && (
                     <div className="absolute -top-2 -right-2 z-20">
                       <div className="relative">
-                        <div className="absolute inset-0 bg-warning-500/30 rounded-full blur-lg animate-pulse"></div>
-                        <div className="relative bg-gradient-to-br from-warning-500 to-warning-600 text-white px-3 py-1.5 rounded-full shadow-lg ring-2 ring-slate-900/50">
+                        <div className="absolute inset-0 bg-warning-500/30 rounded-full blur-lg animate-pulse [html:not(.dark)_&]:bg-warning-400/40"></div>
+                        <div className="relative bg-gradient-to-br from-warning-500 to-warning-600 text-white px-3 py-1.5 rounded-full shadow-lg ring-2 ring-slate-900/50 [html:not(.dark)_&]:from-warning-500 [html:not(.dark)_&]:to-warning-600 [html:not(.dark)_&]:ring-white/50">
                           <span className="text-xs font-bold font-display">💡 ACCESO</span>
                         </div>
                       </div>
@@ -714,7 +714,7 @@ export default function LightsCard() {
                       {/* Scroll indicator */}
                       {roomScenes.length > 3 && (
                         <div className="text-center mt-2">
-                          <Text variant="tertiary" className="text-xs font-display">
+                          <Text variant="tertiary" size="xs">
                             ← Scorri per vedere tutte le {roomScenes.length} scene →
                           </Text>
                         </div>

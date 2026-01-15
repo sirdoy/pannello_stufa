@@ -2,6 +2,22 @@
 
 import { useState, useRef, useEffect } from 'react';
 
+/**
+ * Select Component - Ember Noir Design System
+ *
+ * Custom dropdown select with dark-first design.
+ *
+ * @param {Object} props
+ * @param {string} props.label - Label text
+ * @param {string} props.icon - Optional emoji icon
+ * @param {Array} props.options - Array of {value, label, disabled?}
+ * @param {string} props.value - Selected value
+ * @param {Function} props.onChange - Change handler
+ * @param {boolean} props.disabled - Disabled state
+ * @param {'default'|'ember'|'ocean'} props.variant - Color variant
+ * @param {string} props.className - Additional classes
+ * @param {string} props.containerClassName - Container classes
+ */
 export default function Select({
   label,
   icon,
@@ -9,7 +25,8 @@ export default function Select({
   value,
   onChange,
   disabled = false,
-  liquid = false,
+  variant = 'default',
+  liquid = false, // Legacy prop - ignored
   className = '',
   containerClassName = '',
   ...props
@@ -19,17 +36,14 @@ export default function Select({
   const containerRef = useRef(null);
   const dropdownRef = useRef(null);
 
-  // Calcola se aprire verso l'alto o verso il basso
+  // Calculate if dropdown should open upward
   useEffect(() => {
     if (isOpen && containerRef.current && dropdownRef.current) {
       const containerRect = containerRef.current.getBoundingClientRect();
       const dropdownHeight = dropdownRef.current.offsetHeight;
       const viewportHeight = window.innerHeight;
-
-      // Spazio disponibile sotto (considerando footer di ~100px)
       const spaceBelow = viewportHeight - containerRect.bottom - 100;
 
-      // Se non c'è spazio sufficiente sotto, apri verso l'alto
       if (spaceBelow < dropdownHeight && containerRect.top > dropdownHeight) {
         setOpenUpward(true);
       } else {
@@ -38,7 +52,7 @@ export default function Select({
     }
   }, [isOpen]);
 
-  // Chiudi dropdown quando clicchi fuori
+  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -60,7 +74,6 @@ export default function Select({
   const handleSelect = (option) => {
     if (option.disabled) return;
 
-    // Simula evento nativo per compatibilità
     const syntheticEvent = {
       target: { value: option.value }
     };
@@ -68,10 +81,32 @@ export default function Select({
     setIsOpen(false);
   };
 
+  // Variant colors - Ember Noir palette
+  const variantColors = {
+    default: {
+      selected: 'bg-ember-900/40 text-ember-300 border-ember-500/50',
+      check: 'text-ember-400',
+    },
+    ember: {
+      selected: 'bg-ember-900/40 text-ember-300 border-ember-500/50',
+      check: 'text-ember-400',
+    },
+    ocean: {
+      selected: 'bg-ocean-900/40 text-ocean-300 border-ocean-500/50',
+      check: 'text-ocean-400',
+    },
+  };
+
+  const colors = variantColors[variant] || variantColors.default;
+
   return (
     <div className={containerClassName} ref={containerRef}>
       {label && (
-        <label className="block text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-3">
+        <label className="
+          block text-sm font-bold mb-3 font-display
+          text-slate-300
+          [html:not(.dark)_&]:text-slate-700
+        ">
           {icon && <span className="mr-2">{icon}</span>}
           {label}
         </label>
@@ -83,32 +118,30 @@ export default function Select({
           type="button"
           onClick={() => !disabled && setIsOpen(!isOpen)}
           disabled={disabled}
-          className={`w-full px-4 py-4 pr-12 rounded-xl text-left font-medium cursor-pointer
+          className={`
+            w-full px-4 py-4 pr-12 rounded-xl text-left font-medium font-display cursor-pointer
+            bg-slate-800/60 backdrop-blur-xl
+            border border-slate-700/50
+            text-slate-100
             focus:outline-none
             disabled:opacity-50 disabled:cursor-not-allowed
             transition-all duration-200
-            ${liquid
-              ? `bg-white/[0.12] dark:bg-white/[0.08]
-                 backdrop-blur-3xl backdrop-saturate-[1.6] backdrop-brightness-[1.05]
-                 text-neutral-900 dark:text-white
-                 shadow-liquid-sm
-                 hover:bg-white/[0.18] dark:hover:bg-white/[0.12]
-                 hover:backdrop-saturate-[1.8]
-                 hover:shadow-liquid
-                 isolation-isolate
-                 ${isOpen ? 'bg-white/[0.18] dark:bg-white/[0.12] shadow-liquid backdrop-blur-4xl backdrop-saturate-[2]' : ''}`
-              : `bg-white dark:bg-neutral-800 border-2 border-neutral-300 dark:border-neutral-600 text-neutral-900 dark:text-neutral-100
-                 hover:border-neutral-400 dark:hover:border-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-700
-                 ${isOpen ? 'ring-2 ring-primary-500 dark:ring-primary-400 border-transparent' : ''}`
-            }
-            ${className}`}
+            hover:bg-slate-800/80 hover:border-slate-600/60
+            [html:not(.dark)_&]:bg-white/80
+            [html:not(.dark)_&]:border-slate-300/60
+            [html:not(.dark)_&]:text-slate-900
+            [html:not(.dark)_&]:hover:bg-white/90
+            [html:not(.dark)_&]:hover:border-slate-400/60
+            ${isOpen ? 'ring-2 ring-ember-500/50 border-ember-500/60' : ''}
+            ${className}
+          `.trim().replace(/\s+/g, ' ')}
           {...props}
         >
           {selectedOption?.label}
         </button>
 
-        {/* Freccia dropdown */}
-        <div className={`absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-500 dark:text-neutral-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+        {/* Dropdown Arrow */}
+        <div className={`absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 [html:not(.dark)_&]:text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
           </svg>
@@ -118,16 +151,17 @@ export default function Select({
         {isOpen && (
           <div
             ref={dropdownRef}
-            className={`absolute z-[9000] w-full rounded-xl overflow-hidden
+            className={`
+              absolute z-[9000] w-full rounded-xl overflow-hidden
               ${openUpward ? 'bottom-full mb-2' : 'top-full mt-2'}
               ${openUpward ? 'animate-dropdown-up' : 'animate-dropdown'}
-              ${liquid
-                ? `bg-white/[0.15] dark:bg-white/[0.10]
-                   backdrop-blur-4xl backdrop-saturate-[1.8] backdrop-brightness-[1.05]
-                   shadow-liquid-lg
-                   isolation-isolate`
-                : 'bg-white/90 dark:bg-neutral-800/90 backdrop-blur-xl border border-white/40 dark:border-neutral-600 shadow-glass-lg'
-              }`}
+              bg-slate-800/95 backdrop-blur-2xl
+              border border-slate-700/60
+              shadow-[0_8px_32px_rgba(0,0,0,0.4)]
+              [html:not(.dark)_&]:bg-white/95
+              [html:not(.dark)_&]:border-slate-200
+              [html:not(.dark)_&]:shadow-[0_8px_32px_rgba(0,0,0,0.15)]
+            `}
           >
             <div className="max-h-64 overflow-y-auto scrollbar-thin">
               {options.map((option) => (
@@ -136,14 +170,11 @@ export default function Select({
                   type="button"
                   onClick={() => handleSelect(option)}
                   disabled={option.disabled}
-                  className={`w-full px-4 py-3 text-left font-medium transition-all duration-150
+                  className={`
+                    w-full px-4 py-3 text-left font-medium font-display transition-all duration-150
                     ${option.value === value
-                      ? liquid
-                        ? 'bg-primary-500/10 dark:bg-primary-500/20 text-primary-700 dark:text-primary-400 border-l-4 border-primary-500/50 dark:border-primary-500/70'
-                        : 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 border-l-4 border-primary-500 dark:border-primary-400'
-                      : liquid
-                        ? 'text-neutral-900 dark:text-neutral-100 hover:bg-white/[0.08] dark:hover:bg-white/[0.05] border-l-4 border-transparent'
-                        : 'text-neutral-900 dark:text-neutral-100 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent'
+                      ? `${colors.selected} border-l-4 [html:not(.dark)_&]:bg-ember-100/80 [html:not(.dark)_&]:text-ember-700`
+                      : 'text-slate-200 hover:bg-slate-700/50 border-l-4 border-transparent [html:not(.dark)_&]:text-slate-700 [html:not(.dark)_&]:hover:bg-slate-100'
                     }
                     ${option.disabled
                       ? 'opacity-40 cursor-not-allowed'
@@ -154,7 +185,7 @@ export default function Select({
                   <div className="flex items-center justify-between">
                     <span>{option.label}</span>
                     {option.value === value && (
-                      <span className="text-primary-600">✓</span>
+                      <span className={`${colors.check} [html:not(.dark)_&]:text-ember-600`}>✓</span>
                     )}
                   </div>
                 </button>

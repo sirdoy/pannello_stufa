@@ -1,8 +1,8 @@
 /**
- * Skeleton - Loading placeholder component
+ * Skeleton Component - Ember Noir Design System
  *
  * Creates animated skeleton loaders that match the structure of content being loaded.
- * Enhanced with liquid glass design and improved shimmer animation for better UX.
+ * Dark-first design with subtle shimmer animation.
  *
  * @component
  * @example
@@ -22,11 +22,11 @@
 export default function Skeleton({ className = '', ...props }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-xl bg-neutral-200/80 dark:bg-neutral-700/50 ${className}`}
+      className={`relative overflow-hidden rounded-xl bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 ${className}`}
       {...props}
     >
       {/* Shimmer overlay effect */}
-      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/40 dark:via-white/10 to-transparent" />
+      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent [html:not(.dark)_&]:via-slate-400/40" />
     </div>
   );
 }
@@ -37,7 +37,7 @@ export default function Skeleton({ className = '', ...props }) {
 Skeleton.Card = function SkeletonCard({ children, className = '', ...props }) {
   return (
     <div
-      className={`bg-white/[0.12] dark:bg-white/[0.08] backdrop-blur-3xl rounded-3xl shadow-liquid ring-1 ring-white/25 dark:ring-white/15 ring-inset ${className}`}
+      className={`bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-slate-700/50 shadow-[0_4px_20px_rgba(0,0,0,0.3)] [html:not(.dark)_&]:bg-white/90 [html:not(.dark)_&]:border-slate-200 [html:not(.dark)_&]:shadow-[0_4px_20px_rgba(0,0,0,0.1)] ${className}`}
       {...props}
     >
       {children}
@@ -46,58 +46,46 @@ Skeleton.Card = function SkeletonCard({ children, className = '', ...props }) {
 };
 
 /**
- * Skeleton.StovePanel - Skeleton for StoveCard component (homepage stove control)
- * Updated to match new design with +/- controls, no refresh button
+ * Skeleton.StovePanel - Skeleton for StoveCard component - Ember Noir
  */
 Skeleton.StovePanel = function SkeletonStovePanel() {
   return (
     <div className="space-y-4 sm:space-y-6 animate-spring-in">
-      {/* Main Status Card */}
       <Skeleton.Card className="overflow-visible transition-all duration-500">
         <div className="relative">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 via-accent-500 to-primary-500 opacity-80"></div>
+          {/* Ember accent bar */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-ember-600 via-flame-500 to-ember-600 opacity-90"></div>
 
           <div className="p-6 sm:p-8">
-            {/* Header - Simplified (no refresh button) */}
-            <div className="flex items-center gap-2 mb-6">
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-6">
               <Skeleton className="h-8 w-8 rounded-full" />
               <Skeleton className="h-8 w-24" />
             </div>
 
-            {/* Hero Section - Giant Icon */}
+            {/* Status Display */}
             <div className="mb-6">
-              <div className="relative bg-gradient-to-b from-neutral-50 to-neutral-100 dark:from-neutral-900 dark:to-neutral-800 rounded-3xl p-8 sm:p-10 shadow-liquid-lg overflow-visible">
-                <div className="relative">
-                  {/* Status text */}
-                  <div className="text-center mb-8 sm:mb-10">
-                    <Skeleton className="h-8 w-48 mx-auto" />
+              <div className="relative bg-slate-800/60 rounded-2xl p-8 sm:p-10 border border-slate-700/50 overflow-visible [html:not(.dark)_&]:bg-slate-100/80 [html:not(.dark)_&]:border-slate-200">
+                <div className="text-center mb-8 sm:mb-10">
+                  <Skeleton className="h-8 w-48 mx-auto" />
+                </div>
+                <div className="relative flex flex-col items-center">
+                  <div className="relative mb-[-40px] sm:mb-[-50px]">
+                    <Skeleton className="h-[120px] w-[120px] sm:h-[140px] sm:w-[140px] rounded-full" />
                   </div>
-
-                  {/* Giant icon + glassmorphism boxes */}
-                  <div className="relative flex flex-col items-center">
-                    {/* Giant icon */}
-                    <div className="relative mb-[-40px] sm:mb-[-50px]">
-                      <Skeleton className="h-[120px] w-[120px] sm:h-[140px] sm:w-[140px] rounded-full" />
-                    </div>
-
-                    {/* Info boxes (Ventilation + Power) */}
-                    <div className="relative z-10 w-full grid grid-cols-2 gap-3 sm:gap-4 mt-4">
-                      {/* Ventilation box */}
-                      <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05]">
-                        <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
-                          <Skeleton className="h-6 w-6 rounded-full mb-2" />
-                          <Skeleton className="h-3 w-16 mb-1" />
-                          <Skeleton className="h-8 w-12" />
-                        </div>
+                  <div className="relative z-10 w-full grid grid-cols-2 gap-3 sm:gap-4 mt-4">
+                    <div className="relative overflow-hidden rounded-2xl bg-slate-800/60 border border-slate-700/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                      <div className="flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
+                        <Skeleton className="h-6 w-6 rounded-full mb-2" />
+                        <Skeleton className="h-3 w-16 mb-1" />
+                        <Skeleton className="h-8 w-12" />
                       </div>
-
-                      {/* Power box */}
-                      <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05]">
-                        <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
-                          <Skeleton className="h-6 w-6 rounded-full mb-2" />
-                          <Skeleton className="h-3 w-16 mb-1" />
-                          <Skeleton className="h-8 w-12" />
-                        </div>
+                    </div>
+                    <div className="relative overflow-hidden rounded-2xl bg-slate-800/60 border border-slate-700/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                      <div className="flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
+                        <Skeleton className="h-6 w-6 rounded-full mb-2" />
+                        <Skeleton className="h-3 w-16 mb-1" />
+                        <Skeleton className="h-8 w-12" />
                       </div>
                     </div>
                   </div>
@@ -105,7 +93,7 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
               </div>
             </div>
 
-            {/* PRIMARY ACTIONS - ON/OFF buttons */}
+            {/* ON/OFF buttons */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <Skeleton className="h-20 sm:h-24 rounded-xl" />
               <Skeleton className="h-20 sm:h-24 rounded-xl" />
@@ -114,7 +102,7 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
             {/* Divider */}
             <div className="relative my-6 sm:my-8">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-600/50 to-transparent"></div>
               </div>
               <div className="relative flex justify-center">
                 <Skeleton className="h-8 w-28 rounded-full" />
@@ -122,7 +110,7 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
             </div>
 
             {/* Mode Indicator */}
-            <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10 p-5 sm:p-6 mb-6">
+            <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700/50 p-5 sm:p-6 mb-6 [html:not(.dark)_&]:bg-slate-100/80 [html:not(.dark)_&]:border-slate-200">
               <div className="flex items-center gap-4 mb-4">
                 <Skeleton className="h-12 w-12 rounded-xl" />
                 <div className="flex-1 min-w-0">
@@ -133,98 +121,22 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
               <Skeleton className="h-11 w-full rounded-xl" />
             </div>
 
-            {/* Maintenance Bar */}
-            <div className="mb-6">
-              <Skeleton className="h-20 w-full rounded-2xl" />
-            </div>
-
-            {/* Divider */}
-            <div className="relative my-6 sm:my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
-              </div>
-              <div className="relative flex justify-center">
-                <Skeleton className="h-8 w-32 rounded-full" />
-              </div>
-            </div>
-
-            {/* Ventilation Control - +/- buttons */}
-            <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10 p-5 sm:p-6 mb-4">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Skeleton className="h-6 w-6 rounded-full" />
+            {/* Controls */}
+            <div className="space-y-4">
+              <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700/50 p-5 sm:p-6 [html:not(.dark)_&]:bg-slate-100/80 [html:not(.dark)_&]:border-slate-200">
+                <div className="flex items-center gap-3 mb-4">
+                  <Skeleton className="h-10 w-10 rounded-xl" />
                   <Skeleton className="h-5 w-24" />
                 </div>
-                <Skeleton className="h-10 w-10" />
-              </div>
-              <div className="flex items-center gap-3">
-                <Skeleton className="flex-1 h-16 sm:h-18 rounded-xl" />
-                <div className="flex flex-col items-center justify-center px-4">
-                  <Skeleton className="h-3 w-12 mb-1" />
-                  <Skeleton className="h-6 w-8" />
-                </div>
-                <Skeleton className="flex-1 h-16 sm:h-18 rounded-xl" />
-              </div>
-            </div>
-
-            {/* Power Control - +/- buttons */}
-            <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10 p-5 sm:p-6 mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Skeleton className="h-6 w-6 rounded-full" />
-                  <Skeleton className="h-5 w-20" />
-                </div>
-                <Skeleton className="h-10 w-10" />
-              </div>
-              <div className="flex items-center gap-3">
-                <Skeleton className="flex-1 h-16 sm:h-18 rounded-xl" />
-                <div className="flex flex-col items-center justify-center px-4">
-                  <Skeleton className="h-3 w-12 mb-1" />
-                  <Skeleton className="h-6 w-8" />
-                </div>
-                <Skeleton className="flex-1 h-16 sm:h-18 rounded-xl" />
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div className="relative my-6 sm:my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
-              </div>
-              <div className="relative flex justify-center">
-                <Skeleton className="h-8 w-36 rounded-full" />
-              </div>
-            </div>
-
-            {/* Summary Info - 3 boxes */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
-              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10">
-                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
-                  <Skeleton className="h-8 w-8 rounded-full mb-2" />
-                  <Skeleton className="h-3 w-16 mb-1" />
-                  <Skeleton className="h-6 w-20" />
+                <div className="flex items-center gap-3">
+                  <Skeleton className="flex-1 h-16 sm:h-20 rounded-xl" />
+                  <div className="flex flex-col items-center justify-center px-4">
+                    <Skeleton className="h-3 w-12 mb-1" />
+                    <Skeleton className="h-10 w-12" />
+                  </div>
+                  <Skeleton className="flex-1 h-16 sm:h-20 rounded-xl" />
                 </div>
               </div>
-              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10">
-                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
-                  <Skeleton className="h-8 w-8 rounded-full mb-2" />
-                  <Skeleton className="h-3 w-16 mb-1" />
-                  <Skeleton className="h-6 w-16" />
-                </div>
-              </div>
-              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10 col-span-2 sm:col-span-1">
-                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
-                  <Skeleton className="h-8 w-8 rounded-full mb-2" />
-                  <Skeleton className="h-3 w-16 mb-1" />
-                  <Skeleton className="h-6 w-20" />
-                </div>
-              </div>
-            </div>
-
-            {/* Action buttons */}
-            <div className="space-y-3">
-              <Skeleton className="h-11 w-full rounded-xl" />
-              <Skeleton className="h-11 w-full rounded-xl" />
             </div>
           </div>
         </div>
@@ -234,46 +146,40 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
 };
 
 /**
- * Skeleton.ThermostatCard - Skeleton for ThermostatCard component (homepage thermostat control)
- * Updated to match new design with enhanced controls, no refresh button
+ * Skeleton.ThermostatCard - Skeleton for ThermostatCard component - Ember Noir
  */
 Skeleton.ThermostatCard = function SkeletonThermostatCard() {
   return (
     <div className="space-y-4 sm:space-y-6 animate-spring-in">
-      {/* Main Status Card */}
       <Skeleton.Card className="overflow-visible transition-all duration-500">
         <div className="relative">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-info-500 via-info-400 to-info-500 opacity-80"></div>
+          {/* Ocean accent bar */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-ocean-500 via-ocean-400 to-ocean-500 opacity-90"></div>
 
           <div className="p-6 sm:p-8">
-            {/* Header - Simplified (no refresh button) */}
-            <div className="flex items-center gap-2 mb-6">
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-6">
               <Skeleton className="h-8 w-8 rounded-full" />
               <Skeleton className="h-8 w-32" />
             </div>
 
-            {/* Room Selection (if multiple rooms) */}
+            {/* Room Selection */}
             <div className="mb-4 sm:mb-6">
               <Skeleton className="h-14 sm:h-16 w-full rounded-xl" />
             </div>
 
             {/* Temperature Display */}
             <div className="space-y-4 mb-4 sm:mb-6">
-              {/* Main Temperature Display - Enhanced with gradient background */}
-              <div className="relative rounded-2xl p-6 sm:p-8 shadow-liquid bg-gradient-to-br from-info-50 to-info-100 dark:from-info-900/20 dark:to-info-800/20">
-                {/* Temperature Display Grid */}
+              <div className="relative rounded-2xl p-6 sm:p-8 bg-slate-800/60 border border-slate-700/50 [html:not(.dark)_&]:bg-slate-100/80 [html:not(.dark)_&]:border-slate-200">
                 <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                  {/* Current Temperature Box */}
-                  <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.15] dark:bg-white/[0.08]">
-                    <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
+                  <div className="relative overflow-hidden rounded-2xl bg-slate-800/60 border border-slate-700/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                    <div className="flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
                       <Skeleton className="h-3 w-16 mb-2" />
                       <Skeleton className="h-12 sm:h-14 w-16 sm:w-20" />
                     </div>
                   </div>
-
-                  {/* Target Temperature Box */}
-                  <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.15] dark:bg-white/[0.08]">
-                    <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
+                  <div className="relative overflow-hidden rounded-2xl bg-ocean-900/40 border border-ocean-500/30 [html:not(.dark)_&]:bg-ocean-50/80 [html:not(.dark)_&]:border-ocean-200">
+                    <div className="flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
                       <Skeleton className="h-3 w-16 mb-2" />
                       <Skeleton className="h-12 sm:h-14 w-16 sm:w-20" />
                     </div>
@@ -281,8 +187,8 @@ Skeleton.ThermostatCard = function SkeletonThermostatCard() {
                 </div>
               </div>
 
-              {/* Quick temperature controls - Enhanced */}
-              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10 p-4 sm:p-5">
+              {/* Temperature controls */}
+              <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700/50 p-4 sm:p-5 [html:not(.dark)_&]:bg-slate-100/80 [html:not(.dark)_&]:border-slate-200">
                 <div className="flex items-center gap-3">
                   <Skeleton className="flex-1 h-16 sm:h-18 rounded-xl" />
                   <div className="flex flex-col items-center justify-center px-4">
@@ -294,17 +200,17 @@ Skeleton.ThermostatCard = function SkeletonThermostatCard() {
               </div>
             </div>
 
-            {/* Separator */}
+            {/* Divider */}
             <div className="relative my-6 sm:my-8">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-600/50 to-transparent"></div>
               </div>
               <div className="relative flex justify-center">
                 <Skeleton className="h-8 w-28 rounded-full" />
               </div>
             </div>
 
-            {/* Mode Control - 4 buttons */}
+            {/* Mode Control */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-6">
               <Skeleton className="h-20 sm:h-24 rounded-xl" />
               <Skeleton className="h-20 sm:h-24 rounded-xl" />
@@ -312,45 +218,9 @@ Skeleton.ThermostatCard = function SkeletonThermostatCard() {
               <Skeleton className="h-20 sm:h-24 rounded-xl" />
             </div>
 
-            {/* Separator */}
-            <div className="relative my-6 sm:my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
-              </div>
-              <div className="relative flex justify-center">
-                <Skeleton className="h-8 w-32 rounded-full" />
-              </div>
-            </div>
-
-            {/* Summary Info - 3 boxes */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
-              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10">
-                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
-                  <Skeleton className="h-8 w-8 rounded-full mb-2" />
-                  <Skeleton className="h-3 w-12 mb-1" />
-                  <Skeleton className="h-6 w-20" />
-                </div>
-              </div>
-
-              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10">
-                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
-                  <Skeleton className="h-8 w-8 rounded-full mb-2" />
-                  <Skeleton className="h-3 w-12 mb-1" />
-                  <Skeleton className="h-6 w-12" />
-                </div>
-              </div>
-
-              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10 col-span-2 sm:col-span-1">
-                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
-                  <Skeleton className="h-8 w-8 rounded-full mb-2" />
-                  <Skeleton className="h-3 w-16 mb-1" />
-                  <Skeleton className="h-6 w-12" />
-                </div>
-              </div>
-            </div>
-
             {/* Actions */}
             <div className="space-y-3">
+              <Skeleton className="h-11 w-full rounded-xl" />
               <Skeleton className="h-11 w-full rounded-xl" />
             </div>
           </div>
@@ -361,85 +231,53 @@ Skeleton.ThermostatCard = function SkeletonThermostatCard() {
 };
 
 /**
- * Skeleton.LightsCard - Skeleton for LightsCard component (homepage lights control)
- * Updated to match new design with brightness controls and scrollable scenes
+ * Skeleton.LightsCard - Skeleton for LightsCard component - Ember Noir
  */
 Skeleton.LightsCard = function SkeletonLightsCard() {
   return (
     <div className="space-y-4 sm:space-y-6 animate-spring-in">
-      {/* Main Status Card */}
       <Skeleton.Card className="overflow-visible transition-all duration-500">
         <div className="relative">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-warning-500 via-warning-400 to-warning-500 opacity-80"></div>
+          {/* Warning accent bar */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-warning-500 via-warning-400 to-warning-500 opacity-90"></div>
 
           <div className="p-6 sm:p-8">
-            {/* Header - Simplified (no refresh button) */}
-            <div className="flex items-center gap-2 mb-6">
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-6">
               <Skeleton className="h-8 w-8 rounded-full" />
               <Skeleton className="h-8 w-20" />
             </div>
 
-            {/* Room Selection (if multiple rooms) */}
+            {/* Room Selection */}
             <div className="mb-4 sm:mb-6">
               <Skeleton className="h-14 sm:h-16 w-full rounded-xl" />
             </div>
 
-            {/* Lights Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
-              {/* Light 1 */}
-              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.15] dark:bg-white/[0.08] border border-white/20 dark:border-white/10">
-                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
-                  <Skeleton className="h-8 w-8 rounded-full mb-2" />
-                  <Skeleton className="h-4 w-20 mb-2" />
-                  <Skeleton className="h-6 w-6 rounded-full" />
+            {/* Main Control Area */}
+            <div className="mb-6">
+              <div className="relative rounded-2xl p-6 sm:p-8 bg-slate-800/60 border border-slate-700/50 [html:not(.dark)_&]:bg-slate-100/80 [html:not(.dark)_&]:border-slate-200">
+                {/* ON/OFF buttons */}
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <Skeleton className="h-16 sm:h-20 rounded-xl" />
+                  <Skeleton className="h-16 sm:h-20 rounded-xl" />
                 </div>
-              </div>
 
-              {/* Light 2 */}
-              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.15] dark:bg-white/[0.08] border border-white/20 dark:border-white/10">
-                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
-                  <Skeleton className="h-8 w-8 rounded-full mb-2" />
-                  <Skeleton className="h-4 w-20 mb-2" />
-                  <Skeleton className="h-6 w-6 rounded-full" />
-                </div>
-              </div>
-
-              {/* Light 3 */}
-              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.15] dark:bg-white/[0.08] border border-white/20 dark:border-white/10 col-span-2 sm:col-span-1">
-                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
-                  <Skeleton className="h-8 w-8 rounded-full mb-2" />
-                  <Skeleton className="h-4 w-20 mb-2" />
-                  <Skeleton className="h-6 w-6 rounded-full" />
-                </div>
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div className="relative my-6 sm:my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
-              </div>
-              <div className="relative flex justify-center">
-                <Skeleton className="h-8 w-28 rounded-full" />
-              </div>
-            </div>
-
-            {/* Brightness Control */}
-            <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.15] dark:bg-white/[0.08] p-4 sm:p-5 mb-6">
-              <div className="relative z-10 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Skeleton className="h-6 w-6 rounded-full" />
-                    <Skeleton className="h-5 w-24" />
+                {/* Brightness Control */}
+                <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700/50 p-4 sm:p-5 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-6 w-6 rounded-full" />
+                        <Skeleton className="h-5 w-24" />
+                      </div>
+                      <Skeleton className="h-8 w-12" />
+                    </div>
+                    <Skeleton className="h-3 w-full rounded-full" />
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="flex-1 h-10 rounded-xl" />
+                      <Skeleton className="flex-1 h-10 rounded-xl" />
+                    </div>
                   </div>
-                  <Skeleton className="h-8 w-12" />
-                </div>
-                {/* Slider */}
-                <Skeleton className="h-3 w-full rounded-full" />
-                {/* Buttons */}
-                <div className="flex items-center gap-2">
-                  <Skeleton className="flex-1 h-10 rounded-xl" />
-                  <Skeleton className="flex-1 h-10 rounded-xl" />
                 </div>
               </div>
             </div>
@@ -447,75 +285,27 @@ Skeleton.LightsCard = function SkeletonLightsCard() {
             {/* Divider */}
             <div className="relative my-6 sm:my-8">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-600/50 to-transparent"></div>
               </div>
               <div className="relative flex justify-center">
                 <Skeleton className="h-8 w-20 rounded-full" />
               </div>
             </div>
 
-            {/* Scenes - Horizontal Scroll */}
+            {/* Scenes */}
             <div className="mb-6">
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
-                {/* Scene 1 */}
-                <div className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl border-2 bg-white/60 dark:bg-white/[0.03] border-neutral-200 dark:border-neutral-700 snap-start">
-                  <Skeleton className="h-12 w-12 rounded-full mb-2 mx-auto" />
+                <div className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 snap-start [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                  <Skeleton className="h-8 w-8 rounded-full mb-2 mx-auto" />
                   <Skeleton className="h-3 w-20 mx-auto" />
                 </div>
-                {/* Scene 2 */}
-                <div className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl border-2 bg-white/60 dark:bg-white/[0.03] border-neutral-200 dark:border-neutral-700 snap-start">
-                  <Skeleton className="h-12 w-12 rounded-full mb-2 mx-auto" />
+                <div className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 snap-start [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                  <Skeleton className="h-8 w-8 rounded-full mb-2 mx-auto" />
                   <Skeleton className="h-3 w-20 mx-auto" />
                 </div>
-                {/* Scene 3 */}
-                <div className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl border-2 bg-white/60 dark:bg-white/[0.03] border-neutral-200 dark:border-neutral-700 snap-start">
-                  <Skeleton className="h-12 w-12 rounded-full mb-2 mx-auto" />
+                <div className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 snap-start [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                  <Skeleton className="h-8 w-8 rounded-full mb-2 mx-auto" />
                   <Skeleton className="h-3 w-20 mx-auto" />
-                </div>
-                {/* Scene 4 */}
-                <div className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl border-2 bg-white/60 dark:bg-white/[0.03] border-neutral-200 dark:border-neutral-700 snap-start">
-                  <Skeleton className="h-12 w-12 rounded-full mb-2 mx-auto" />
-                  <Skeleton className="h-3 w-20 mx-auto" />
-                </div>
-              </div>
-              <div className="text-center mt-2">
-                <Skeleton className="h-3 w-48 mx-auto" />
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div className="relative my-6 sm:my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-300/50 dark:via-neutral-600/50 to-transparent"></div>
-              </div>
-              <div className="relative flex justify-center">
-                <Skeleton className="h-8 w-32 rounded-full" />
-              </div>
-            </div>
-
-            {/* Summary Info - 3 boxes */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
-              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10">
-                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
-                  <Skeleton className="h-8 w-8 rounded-full mb-2" />
-                  <Skeleton className="h-3 w-12 mb-1" />
-                  <Skeleton className="h-6 w-20" />
-                </div>
-              </div>
-
-              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10">
-                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
-                  <Skeleton className="h-8 w-8 rounded-full mb-2" />
-                  <Skeleton className="h-3 w-12 mb-1" />
-                  <Skeleton className="h-6 w-12" />
-                </div>
-              </div>
-
-              <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10 col-span-2 sm:col-span-1">
-                <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
-                  <Skeleton className="h-8 w-8 rounded-full mb-2" />
-                  <Skeleton className="h-3 w-16 mb-1" />
-                  <Skeleton className="h-6 w-12" />
                 </div>
               </div>
             </div>

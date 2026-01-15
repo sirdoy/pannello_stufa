@@ -3,8 +3,16 @@
 import { useEffect, useState } from 'react';
 
 /**
- * Toast - Notification component with liquid glass style
- * Auto-dismisses after specified duration with progress indicator
+ * Toast Component - Ember Noir Design System
+ *
+ * Notification toast with auto-dismiss and progress indicator.
+ *
+ * @param {Object} props
+ * @param {string} props.message - Toast message
+ * @param {string} props.icon - Emoji icon
+ * @param {'success'|'warning'|'info'|'error'|'ember'|'ocean'|'sage'|'danger'} props.variant - Color variant
+ * @param {number} props.duration - Auto-dismiss duration in ms (0 to disable)
+ * @param {Function} props.onDismiss - Dismiss callback
  */
 export default function Toast({
   message,
@@ -12,7 +20,7 @@ export default function Toast({
   variant = 'success',
   duration = 3000,
   onDismiss,
-  liquid = true
+  liquid = true, // Legacy prop - ignored
 }) {
   const [progress, setProgress] = useState(100);
 
@@ -38,117 +46,93 @@ export default function Toast({
     return () => clearInterval(interval);
   }, [duration]);
 
-  // Enhanced iOS 18 Liquid Glass - Floating notification with vibrancy
-  const liquidVariants = {
+  // Ember Noir variant styles - with light mode support
+  const variants = {
     success: {
-      bg: 'bg-success-500/[0.18] dark:bg-success-500/[0.28]',
-      border: 'border-success-400/[0.35] dark:border-success-500/[0.4]',
-      text: 'text-success-950 dark:text-success-50',
-      iconBg: 'bg-success-400/[0.25] dark:bg-success-400/[0.35]',
-      ring: 'ring-success-300/[0.3] dark:ring-success-400/[0.35]'
+      bg: 'bg-sage-900/80 [html:not(.dark)_&]:bg-sage-50/95',
+      border: 'border-sage-500/50 [html:not(.dark)_&]:border-sage-300',
+      text: 'text-sage-100 [html:not(.dark)_&]:text-sage-800',
+      iconBg: 'bg-sage-800/60 [html:not(.dark)_&]:bg-sage-200/80',
+      progress: 'from-sage-500 to-sage-600',
+    },
+    sage: {
+      bg: 'bg-sage-900/80 [html:not(.dark)_&]:bg-sage-50/95',
+      border: 'border-sage-500/50 [html:not(.dark)_&]:border-sage-300',
+      text: 'text-sage-100 [html:not(.dark)_&]:text-sage-800',
+      iconBg: 'bg-sage-800/60 [html:not(.dark)_&]:bg-sage-200/80',
+      progress: 'from-sage-500 to-sage-600',
     },
     warning: {
-      bg: 'bg-warning-500/[0.18] dark:bg-warning-500/[0.28]',
-      border: 'border-warning-400/[0.35] dark:border-warning-500/[0.4]',
-      text: 'text-warning-950 dark:text-warning-50',
-      iconBg: 'bg-warning-400/[0.25] dark:bg-warning-400/[0.35]',
-      ring: 'ring-warning-300/[0.3] dark:ring-warning-400/[0.35]'
+      bg: 'bg-warning-900/80 [html:not(.dark)_&]:bg-warning-50/95',
+      border: 'border-warning-500/50 [html:not(.dark)_&]:border-warning-300',
+      text: 'text-warning-100 [html:not(.dark)_&]:text-warning-800',
+      iconBg: 'bg-warning-800/60 [html:not(.dark)_&]:bg-warning-200/80',
+      progress: 'from-warning-500 to-warning-600',
     },
     info: {
-      bg: 'bg-info-500/[0.18] dark:bg-info-500/[0.28]',
-      border: 'border-info-400/[0.35] dark:border-info-500/[0.4]',
-      text: 'text-info-950 dark:text-info-50',
-      iconBg: 'bg-info-400/[0.25] dark:bg-info-400/[0.35]',
-      ring: 'ring-info-300/[0.3] dark:ring-info-400/[0.35]'
+      bg: 'bg-ocean-900/80 [html:not(.dark)_&]:bg-ocean-50/95',
+      border: 'border-ocean-500/50 [html:not(.dark)_&]:border-ocean-300',
+      text: 'text-ocean-100 [html:not(.dark)_&]:text-ocean-800',
+      iconBg: 'bg-ocean-800/60 [html:not(.dark)_&]:bg-ocean-200/80',
+      progress: 'from-ocean-500 to-ocean-600',
+    },
+    ocean: {
+      bg: 'bg-ocean-900/80 [html:not(.dark)_&]:bg-ocean-50/95',
+      border: 'border-ocean-500/50 [html:not(.dark)_&]:border-ocean-300',
+      text: 'text-ocean-100 [html:not(.dark)_&]:text-ocean-800',
+      iconBg: 'bg-ocean-800/60 [html:not(.dark)_&]:bg-ocean-200/80',
+      progress: 'from-ocean-500 to-ocean-600',
     },
     error: {
-      bg: 'bg-primary-500/[0.18] dark:bg-primary-500/[0.28]',
-      border: 'border-primary-400/[0.35] dark:border-primary-500/[0.4]',
-      text: 'text-primary-950 dark:text-primary-50',
-      iconBg: 'bg-primary-400/[0.25] dark:bg-primary-400/[0.35]',
-      ring: 'ring-primary-300/[0.3] dark:ring-primary-400/[0.35]'
-    }
+      bg: 'bg-danger-900/80 [html:not(.dark)_&]:bg-danger-50/95',
+      border: 'border-danger-500/50 [html:not(.dark)_&]:border-danger-300',
+      text: 'text-danger-100 [html:not(.dark)_&]:text-danger-800',
+      iconBg: 'bg-danger-800/60 [html:not(.dark)_&]:bg-danger-200/80',
+      progress: 'from-danger-500 to-danger-600',
+    },
+    danger: {
+      bg: 'bg-danger-900/80 [html:not(.dark)_&]:bg-danger-50/95',
+      border: 'border-danger-500/50 [html:not(.dark)_&]:border-danger-300',
+      text: 'text-danger-100 [html:not(.dark)_&]:text-danger-800',
+      iconBg: 'bg-danger-800/60 [html:not(.dark)_&]:bg-danger-200/80',
+      progress: 'from-danger-500 to-danger-600',
+    },
+    ember: {
+      bg: 'bg-ember-900/80 [html:not(.dark)_&]:bg-ember-50/95',
+      border: 'border-ember-500/50 [html:not(.dark)_&]:border-ember-300',
+      text: 'text-ember-100 [html:not(.dark)_&]:text-ember-800',
+      iconBg: 'bg-ember-800/60 [html:not(.dark)_&]:bg-ember-200/80',
+      progress: 'from-ember-500 to-flame-600',
+    },
   };
 
-  // Solid variants (traditional gradient style)
-  const solidVariants = {
-    success: {
-      bg: 'bg-gradient-to-br from-success-500/95 to-success-600/95',
-      ring: 'ring-success-400/50',
-      text: 'text-white',
-      iconBg: 'bg-success-400/30'
-    },
-    warning: {
-      bg: 'bg-gradient-to-br from-warning-500/95 to-warning-600/95',
-      ring: 'ring-warning-400/50',
-      text: 'text-white',
-      iconBg: 'bg-warning-400/30'
-    },
-    info: {
-      bg: 'bg-gradient-to-br from-info-500/95 to-info-600/95',
-      ring: 'ring-info-400/50',
-      text: 'text-white',
-      iconBg: 'bg-info-400/30'
-    },
-    error: {
-      bg: 'bg-gradient-to-br from-primary-500/95 to-primary-600/95',
-      ring: 'ring-primary-400/50',
-      text: 'text-white',
-      iconBg: 'bg-primary-400/30'
-    }
-  };
-
-  const variants = liquid ? liquidVariants : solidVariants;
   const styles = variants[variant] || variants.success;
-
-  // Progress bar gradients
-  const progressGradients = {
-    success: 'from-success-500 to-success-600',
-    warning: 'from-warning-500 to-warning-600',
-    info: 'from-info-500 to-info-600',
-    error: 'from-primary-500 to-primary-600',
-  };
 
   return (
     <div className="fixed top-safe-4 left-1/2 -translate-x-1/2 z-[9999] w-[calc(100%-2rem)] max-w-md animate-slideDown">
       <div className={`
         ${styles.bg} ${styles.text}
-        ${liquid
-          ? `backdrop-blur-4xl backdrop-saturate-[1.8] backdrop-brightness-[1.08]
-             rounded-3xl shadow-liquid-lg border-2 ${styles.border}
-             ring-1 ${styles.ring} ring-inset
-             isolation-isolate
-             before:absolute before:inset-0 before:rounded-[inherit]
-             before:bg-gradient-to-br before:from-white/[0.2] dark:before:from-white/[0.12]
-             before:via-white/[0.08] dark:before:via-white/[0.05]
-             before:to-transparent
-             before:pointer-events-none before:z-[-1]
-             after:absolute after:inset-0 after:rounded-[inherit]
-             after:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(0,0,0,0.08)]
-             dark:after:shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.25)]
-             after:pointer-events-none after:z-[-1]`
-          : `backdrop-blur-3xl rounded-2xl shadow-elevated-lg ring-2 ${styles.ring} ring-inset
-             before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/20 before:to-transparent before:pointer-events-none`
-        }
+        backdrop-blur-xl
+        rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] [html:not(.dark)_&]:shadow-[0_8px_32px_rgba(0,0,0,0.12)]
+        border ${styles.border}
         px-5 py-3.5 sm:px-6 sm:py-4
         flex items-center gap-3 sm:gap-4
         min-w-[280px] sm:min-w-[320px] max-w-[90vw] sm:max-w-md
         relative overflow-hidden
-        transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+        transition-all duration-300
       `}>
         {/* Icon */}
         <div className={`
           ${styles.iconBg}
           rounded-xl p-2.5 sm:p-3
           flex-shrink-0
-          shadow-inner-soft
-          ring-1 ring-white/20 ring-inset
+          border border-white/10 [html:not(.dark)_&]:border-black/5
         `}>
           <span className="text-2xl sm:text-3xl">{icon}</span>
         </div>
 
         {/* Message */}
-        <p className="text-sm sm:text-base font-semibold leading-snug flex-1 relative z-10">
+        <p className="text-sm sm:text-base font-semibold font-display leading-snug flex-1 relative z-10">
           {message}
         </p>
 
@@ -158,7 +142,8 @@ export default function Toast({
             onClick={onDismiss}
             className="
               flex-shrink-0 p-1.5 rounded-lg
-              hover:bg-white/20 active:bg-white/30
+              hover:bg-white/10 active:bg-white/20
+              [html:not(.dark)_&]:hover:bg-black/5 [html:not(.dark)_&]:active:bg-black/10
               transition-colors duration-200
               relative z-10
             "
@@ -170,9 +155,9 @@ export default function Toast({
 
         {/* Progress bar */}
         {duration > 0 && (
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 dark:bg-white/10 overflow-hidden rounded-b-2xl">
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 [html:not(.dark)_&]:bg-black/5 overflow-hidden rounded-b-2xl">
             <div
-              className={`h-full bg-gradient-to-r ${progressGradients[variant]} transition-all duration-50 ease-linear`}
+              className={`h-full bg-gradient-to-r ${styles.progress} transition-all duration-50 ease-linear`}
               style={{ width: `${progress}%` }}
             />
           </div>

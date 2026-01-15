@@ -1,20 +1,22 @@
 'use client';
 
 /**
- * ControlButton - Increment/Decrement control button
- * Used for numeric controls with visual feedback for disabled state
+ * ControlButton - Ember Noir Design System
  *
- * @example
- * <ControlButton
- *   type="increment"
- *   variant="info"
- *   onClick={handleIncrement}
- *   disabled={value >= max}
- * />
+ * Increment/Decrement control button with warm accent styling.
+ * Used for numeric controls with visual feedback for disabled state.
+ *
+ * @param {Object} props - Component props
+ * @param {'increment'|'decrement'} props.type - Button type
+ * @param {'ember'|'ocean'|'warning'|'sage'|'danger'|'info'} props.variant - Color variant
+ * @param {boolean} props.disabled - Disabled state
+ * @param {function} props.onClick - Click handler
+ * @param {'sm'|'md'|'lg'} props.size - Button size
+ * @param {string} props.className - Additional CSS classes
  */
 export default function ControlButton({
   type = 'increment',
-  variant = 'info',
+  variant = 'ember',
   disabled = false,
   onClick,
   size = 'lg',
@@ -28,13 +30,49 @@ export default function ControlButton({
     lg: 'h-16 sm:h-20 text-3xl sm:text-4xl',
   };
 
-  // Variant color classes (enabled state)
+  // Variant color classes - Ember Noir palette
   const variantClasses = {
-    info: 'bg-gradient-to-br from-info-500 to-info-600 hover:from-info-600 hover:to-info-700',
-    warning: 'bg-gradient-to-br from-warning-500 to-warning-600 hover:from-warning-600 hover:to-warning-700',
-    success: 'bg-gradient-to-br from-success-500 to-success-600 hover:from-success-600 hover:to-success-700',
-    danger: 'bg-gradient-to-br from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700',
-    neutral: 'bg-gradient-to-br from-neutral-500 to-neutral-600 hover:from-neutral-600 hover:to-neutral-700',
+    // Primary: warm copper/amber
+    ember: `
+      bg-gradient-to-br from-ember-500 to-flame-600
+      hover:from-ember-400 hover:to-flame-500
+      shadow-ember-glow-sm hover:shadow-ember-glow
+    `,
+    // Secondary: muted ocean blue
+    ocean: `
+      bg-gradient-to-br from-ocean-500 to-ocean-600
+      hover:from-ocean-400 hover:to-ocean-500
+      shadow-[0_4px_15px_rgba(67,125,174,0.25)]
+      hover:shadow-[0_6px_20px_rgba(67,125,174,0.35)]
+    `,
+    // Warning: amber
+    warning: `
+      bg-gradient-to-br from-warning-500 to-warning-600
+      hover:from-warning-400 hover:to-warning-500
+      shadow-[0_4px_15px_rgba(234,179,8,0.25)]
+      hover:shadow-[0_6px_20px_rgba(234,179,8,0.35)]
+    `,
+    // Sage: muted green
+    sage: `
+      bg-gradient-to-br from-sage-500 to-sage-600
+      hover:from-sage-400 hover:to-sage-500
+      shadow-[0_4px_15px_rgba(96,115,96,0.25)]
+      hover:shadow-[0_6px_20px_rgba(96,115,96,0.35)]
+    `,
+    // Danger: red
+    danger: `
+      bg-gradient-to-br from-danger-500 to-danger-600
+      hover:from-danger-400 hover:to-danger-500
+      shadow-[0_4px_15px_rgba(239,68,68,0.25)]
+      hover:shadow-[0_6px_20px_rgba(239,68,68,0.35)]
+    `,
+    // Legacy: info maps to ocean
+    info: `
+      bg-gradient-to-br from-ocean-500 to-ocean-600
+      hover:from-ocean-400 hover:to-ocean-500
+      shadow-[0_4px_15px_rgba(67,125,174,0.25)]
+      hover:shadow-[0_6px_20px_rgba(67,125,174,0.35)]
+    `,
   };
 
   // Symbol based on type
@@ -42,23 +80,23 @@ export default function ControlButton({
 
   // Base classes
   const baseClasses = `
-    rounded-xl font-black
+    rounded-xl font-black font-display
     transition-all duration-200
-    shadow-lg
+    border border-white/10 [html:not(.dark)_&]:border-black/5
     ${sizeClasses[size]}
   `;
 
   // State-dependent classes
   const stateClasses = disabled
-    ? 'bg-neutral-200 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-600 cursor-not-allowed opacity-50'
-    : `${variantClasses[variant]} text-white hover:shadow-xl active:scale-95 active:shadow-inner`;
+    ? 'bg-slate-800 text-slate-600 cursor-not-allowed opacity-50 shadow-none [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:text-slate-400'
+    : `${variantClasses[variant]} text-white active:scale-95`;
 
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`${baseClasses} ${stateClasses} ${className}`}
+      className={`${baseClasses} ${stateClasses} ${className}`.trim().replace(/\s+/g, ' ')}
       {...props}
     >
       {symbol}

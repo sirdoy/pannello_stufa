@@ -1,22 +1,24 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Card from './Card';
 
 /**
- * Banner component for alerts, warnings, and informational messages
- * Supports persistent dismissal via localStorage with dismissKey prop.
+ * Banner Component - Ember Noir Design System
  *
- * @param {string} variant - 'info' | 'warning' | 'error' | 'success'
- * @param {string} icon - Emoji or icon to display
- * @param {string} title - Banner title
- * @param {string|React.ReactNode} description - Banner description/content
- * @param {React.ReactNode} actions - Action buttons or links
- * @param {boolean} dismissible - Show dismiss button
- * @param {function} onDismiss - Dismiss handler
- * @param {string} dismissKey - Unique key for persistent dismissal (optional)
- * @param {boolean} liquid - Apply liquid glass style (default: true)
- * @param {string} className - Additional CSS classes
+ * Sophisticated alert/notification banner with warm aesthetic.
+ * Supports persistent dismissal via localStorage.
+ *
+ * @param {Object} props - Component props
+ * @param {'info'|'warning'|'error'|'success'|'ember'} props.variant - Banner style
+ * @param {string} props.icon - Emoji or icon to display
+ * @param {string} props.title - Banner title
+ * @param {string|React.ReactNode} props.description - Banner content
+ * @param {React.ReactNode} props.actions - Action buttons
+ * @param {boolean} props.dismissible - Show dismiss button
+ * @param {function} props.onDismiss - Dismiss handler
+ * @param {string} props.dismissKey - Unique key for persistent dismissal
+ * @param {boolean} props.compact - Use compact layout
+ * @param {string} props.className - Additional CSS classes
  */
 export default function Banner({
   variant = 'info',
@@ -27,13 +29,15 @@ export default function Banner({
   dismissible = false,
   onDismiss,
   dismissKey,
-  liquid = true,
+  compact = false,
   className = '',
   children,
+  // Legacy props
+  liquid = true,
 }) {
   const [isDismissed, setIsDismissed] = useState(false);
 
-  // Check if banner was previously dismissed (persistent)
+  // Check persistent dismissal
   useEffect(() => {
     if (dismissKey && typeof window !== 'undefined') {
       const dismissed = localStorage.getItem(`banner-dismissed-${dismissKey}`);
@@ -43,147 +47,174 @@ export default function Banner({
     }
   }, [dismissKey]);
 
-  // Handle dismiss with optional persistence
+  // Handle dismiss
   const handleDismiss = () => {
     setIsDismissed(true);
-
-    // Save to localStorage if dismissKey provided
     if (dismissKey && typeof window !== 'undefined') {
       localStorage.setItem(`banner-dismissed-${dismissKey}`, 'true');
     }
-
-    // Call user-provided onDismiss callback
     if (onDismiss) {
       onDismiss();
     }
   };
 
-  // Don't render if dismissed
   if (isDismissed) {
     return null;
   }
-  // Solid variants (tradizionali)
-  const solidVariants = {
+
+  // Variant styles - Ember Noir aesthetic
+  const variantStyles = {
     info: {
-      bg: 'bg-info-50 dark:bg-info-900/20',
-      border: 'border-info-200 dark:border-info-800/40',
-      titleColor: 'text-info-900 dark:text-info-100',
-      descColor: 'text-info-700 dark:text-info-200',
+      container: `
+        bg-ocean-500/[0.12] dark:bg-ocean-500/[0.15]
+        border border-ocean-400/20 dark:border-ocean-500/25
+        [html:not(.dark)_&]:bg-ocean-500/[0.08]
+        [html:not(.dark)_&]:border-ocean-400/25
+      `,
+      title: 'text-ocean-200 dark:text-ocean-200 [html:not(.dark)_&]:text-ocean-800',
+      description: 'text-ocean-300 dark:text-ocean-300 [html:not(.dark)_&]:text-ocean-700',
       defaultIcon: 'ℹ️',
     },
     warning: {
-      bg: 'bg-orange-50 dark:bg-orange-900/20',
-      border: 'border-orange-300 dark:border-orange-800/40',
-      titleColor: 'text-orange-900 dark:text-orange-100',
-      descColor: 'text-orange-700 dark:text-orange-200',
+      container: `
+        bg-warning-500/[0.12] dark:bg-warning-500/[0.15]
+        border border-warning-400/20 dark:border-warning-500/25
+        [html:not(.dark)_&]:bg-warning-500/[0.08]
+        [html:not(.dark)_&]:border-warning-400/25
+      `,
+      title: 'text-warning-200 dark:text-warning-200 [html:not(.dark)_&]:text-warning-800',
+      description: 'text-warning-300 dark:text-warning-300 [html:not(.dark)_&]:text-warning-700',
       defaultIcon: '⚠️',
     },
     error: {
-      bg: 'bg-danger-50 dark:bg-danger-900/20',
-      border: 'border-danger-300 dark:border-danger-800/40',
-      titleColor: 'text-danger-900 dark:text-danger-100',
-      descColor: 'text-danger-700 dark:text-danger-200',
+      container: `
+        bg-danger-500/[0.12] dark:bg-danger-500/[0.15]
+        border border-danger-400/20 dark:border-danger-500/25
+        [html:not(.dark)_&]:bg-danger-500/[0.08]
+        [html:not(.dark)_&]:border-danger-400/25
+      `,
+      title: 'text-danger-200 dark:text-danger-200 [html:not(.dark)_&]:text-danger-800',
+      description: 'text-danger-300 dark:text-danger-300 [html:not(.dark)_&]:text-danger-700',
       defaultIcon: '❌',
     },
     success: {
-      bg: 'bg-success-50 dark:bg-success-900/20',
-      border: 'border-success-300 dark:border-success-800/40',
-      titleColor: 'text-success-900 dark:text-success-100',
-      descColor: 'text-success-700 dark:text-success-200',
+      container: `
+        bg-sage-500/[0.12] dark:bg-sage-500/[0.15]
+        border border-sage-400/20 dark:border-sage-500/25
+        [html:not(.dark)_&]:bg-sage-500/[0.08]
+        [html:not(.dark)_&]:border-sage-400/25
+      `,
+      title: 'text-sage-200 dark:text-sage-200 [html:not(.dark)_&]:text-sage-800',
+      description: 'text-sage-300 dark:text-sage-300 [html:not(.dark)_&]:text-sage-700',
       defaultIcon: '✅',
+    },
+    ember: {
+      container: `
+        bg-ember-500/[0.12] dark:bg-ember-500/[0.15]
+        border border-ember-400/20 dark:border-ember-500/25
+        shadow-ember-glow-sm
+        [html:not(.dark)_&]:bg-ember-500/[0.08]
+        [html:not(.dark)_&]:border-ember-400/25
+        [html:not(.dark)_&]:shadow-none
+      `,
+      title: 'text-ember-200 dark:text-ember-200 [html:not(.dark)_&]:text-ember-800',
+      description: 'text-ember-300 dark:text-ember-300 [html:not(.dark)_&]:text-ember-700',
+      defaultIcon: '🔥',
     },
   };
 
-  // Enhanced iOS 18 Liquid Glass - Crystal clarity with color tinting
-  const liquidVariants = {
-    info: {
-      bg: 'bg-info-500/[0.18] dark:bg-info-500/[0.25]',
-      border: 'border-info-400/[0.3] dark:border-info-500/[0.35]',
-      titleColor: 'text-info-950 dark:text-info-50 font-bold',
-      descColor: 'text-info-900 dark:text-info-100 font-medium',
-      defaultIcon: 'ℹ️',
-    },
-    warning: {
-      bg: 'bg-warning-500/[0.18] dark:bg-warning-500/[0.25]',
-      border: 'border-warning-400/[0.3] dark:border-warning-500/[0.35]',
-      titleColor: 'text-warning-950 dark:text-warning-50 font-bold',
-      descColor: 'text-warning-900 dark:text-warning-100 font-medium',
-      defaultIcon: '⚠️',
-    },
-    error: {
-      bg: 'bg-danger-500/[0.18] dark:bg-danger-500/[0.25]',
-      border: 'border-danger-400/[0.3] dark:border-danger-500/[0.35]',
-      titleColor: 'text-danger-950 dark:text-danger-50 font-bold',
-      descColor: 'text-danger-900 dark:text-danger-100 font-medium',
-      defaultIcon: '❌',
-    },
-    success: {
-      bg: 'bg-success-500/[0.18] dark:bg-success-500/[0.25]',
-      border: 'border-success-400/[0.3] dark:border-success-500/[0.35]',
-      titleColor: 'text-success-950 dark:text-success-50 font-bold',
-      descColor: 'text-success-900 dark:text-success-100 font-medium',
-      defaultIcon: '✅',
-    },
-  };
-
-  const variants = liquid ? liquidVariants : solidVariants;
-
-  const styles = variants[variant] || variants.info;
+  const styles = variantStyles[variant] || variantStyles.info;
   const displayIcon = icon || styles.defaultIcon;
 
   return (
-    <Card
-      liquid={liquid}
-      className={`${styles.bg} border-2 ${styles.border} ${className}`}
+    <div
+      className={`
+        rounded-xl
+        backdrop-blur-lg
+        transition-all duration-300
+        animate-fade-in-up
+        ${styles.container}
+        ${compact ? 'p-3' : 'p-4 sm:p-5'}
+        ${className}
+      `.trim().replace(/\s+/g, ' ')}
+      role="alert"
     >
-      <div className="p-4 sm:p-6">
-        <div className="flex items-start gap-3 sm:gap-4">
-          {/* Icon */}
-          {displayIcon && (
-            <div className="flex-shrink-0">
-              <span className="text-2xl sm:text-3xl">{displayIcon}</span>
+      <div className="flex items-start gap-3">
+        {/* Icon */}
+        {displayIcon && (
+          <div className="flex-shrink-0">
+            <span className={compact ? 'text-xl' : 'text-2xl'}>{displayIcon}</span>
+          </div>
+        )}
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          {/* Title */}
+          {title && (
+            <h3 className={`
+              font-display font-bold
+              ${compact ? 'text-sm' : 'text-base'}
+              ${styles.title}
+              ${description || children || actions ? 'mb-1' : ''}
+            `.trim().replace(/\s+/g, ' ')}>
+              {title}
+            </h3>
+          )}
+
+          {/* Description */}
+          {description && (
+            <div className={`
+              ${compact ? 'text-xs' : 'text-sm'}
+              ${styles.description}
+              ${actions || children ? 'mb-3' : ''}
+            `.trim().replace(/\s+/g, ' ')}>
+              {description}
             </div>
           )}
 
-          {/* Content */}
-          <div className="flex-1 min-w-0">
-            {/* Title */}
-            {title && (
-              <h3 className={`text-base sm:text-lg font-bold ${styles.titleColor} mb-1 sm:mb-2`}>
-                {title}
-              </h3>
-            )}
+          {/* Custom children content */}
+          {children}
 
-            {/* Description */}
-            {description && (
-              <div className={`text-sm ${styles.descColor} mb-3 sm:mb-4`}>
-                {description}
-              </div>
-            )}
-
-            {/* Children (custom content) */}
-            {children}
-
-            {/* Actions */}
-            {actions && (
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                {actions}
-              </div>
-            )}
-          </div>
-
-          {/* Dismiss button */}
-          {dismissible && (
-            <button
-              onClick={handleDismiss}
-              className="flex-shrink-0 p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors"
-              aria-label="Dismiss banner"
-            >
-              <span className="text-lg opacity-50 hover:opacity-100 transition-opacity">✕</span>
-            </button>
+          {/* Actions */}
+          {actions && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {actions}
+            </div>
           )}
         </div>
+
+        {/* Dismiss button */}
+        {dismissible && (
+          <button
+            onClick={handleDismiss}
+            className="
+              flex-shrink-0 p-1.5
+              rounded-lg
+              text-slate-400 hover:text-slate-200
+              hover:bg-white/[0.06]
+              transition-all duration-200
+              [html:not(.dark)_&]:text-slate-500
+              [html:not(.dark)_&]:hover:text-slate-700
+              [html:not(.dark)_&]:hover:bg-black/[0.04]
+            "
+            aria-label="Dismiss"
+          >
+            <svg
+              className="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        )}
       </div>
-    </Card>
+    </div>
   );
 }

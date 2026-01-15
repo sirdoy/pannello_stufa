@@ -4,15 +4,14 @@ import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
 /**
- * Modal Component - Base reusable modal
+ * Modal Component - Ember Noir Design System
  *
  * Centralized modal with:
- * - React Portal (renders at body level, fixes z-index/positioning)
+ * - React Portal (renders at body level)
  * - Scroll lock with position restoration
  * - Backdrop overlay with click-to-close
  * - Escape key to close
- * - Centered positioning with max height
- * - Smooth animations
+ * - Dark-first Ember Noir styling
  *
  * @param {Object} props
  * @param {boolean} props.isOpen - Modal open state
@@ -35,12 +34,10 @@ export default function Modal({
   // Block body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
-      // Store current scroll position
       const scrollY = window.scrollY;
       document.body.classList.add('modal-open');
       document.body.style.top = `-${scrollY}px`;
     } else {
-      // Restore scroll position
       const scrollY = document.body.style.top;
       document.body.classList.remove('modal-open');
       document.body.style.top = '';
@@ -72,7 +69,6 @@ export default function Modal({
   if (!isOpen) return null;
 
   const handleOverlayClick = (e) => {
-    // Only close if clicking directly on the container (not on content)
     if (closeOnOverlayClick && e.target === e.currentTarget) {
       onClose();
     }
@@ -85,9 +81,9 @@ export default function Modal({
       role="dialog"
       onClick={handleOverlayClick}
     >
-      {/* Backdrop blur */}
+      {/* Backdrop - Ember Noir dark/light blur */}
       <div
-        className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-slate-950/70 backdrop-blur-md [html:not(.dark)_&]:bg-slate-900/40"
         aria-hidden="true"
       />
 

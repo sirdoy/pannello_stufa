@@ -1,542 +1,725 @@
-# Design System
+# Design System - Ember Noir
 
-Palette colori, styling standards e best practices.
+**Version 2.0** - A sophisticated dark-first design system with warm accents.
 
-## Palette Colori Semantici
+---
 
-Tutti i colori hanno scala completa 50-900 (10 tonalità ciascuno).
+## Design Philosophy
 
-### Primary/Danger (Rosso)
+**Ember Noir** is a warm, sophisticated design inspired by the glow of firelight and modern minimalism. It combines the comfort of home with cutting-edge aesthetics.
 
-```css
-primary-50    #fef2f2
-primary-100   #fee2e2
-...
-primary-500   #ef4444  /* Base */
-...
-primary-900   #7f1d1d
-```
+### Core Principles
 
-**Uso**: Azioni primarie, errori critici, pulsanti principali.
+1. **Dark Foundation with Warmth** - Deep charcoal backgrounds with warm undertones, not cold black
+2. **Ember Accents** - Copper/amber as the signature color, evoking warmth, fire, and luxury
+3. **Editorial Typography** - Distinctive display fonts paired with clean body text
+4. **Organic Shapes** - Generous border radius, soft curves
+5. **Layered Depth** - Subtle gradients and shadows, minimal heavy blur effects
+6. **Intentional Motion** - Smooth, buttery transitions with purpose
 
-### Accent (Arancione)
+---
 
-```css
-accent-50     #fff7ed
-accent-100    #ffedd5
-...
-accent-500    #f97316  /* Base */
-...
-accent-900    #7c2d12
-```
+## Color Palette
 
-**Uso**: Accenti, highlight, badges, notifiche.
+### Foundation - Slate (Warm Charcoal)
 
-### Success (Verde)
+The base layer uses warm charcoal tones, never pure black.
 
 ```css
-success-50    #f0fdf4
-success-100   #dcfce7
-...
-success-500   #22c55e  /* Base */
-...
-success-900   #14532d
+slate-950   #0c0a09   /* Deepest - backgrounds */
+slate-900   #1c1917   /* Primary dark */
+slate-850   #231f1d   /* Elevated surfaces */
+slate-800   #292524
+slate-700   #44403c
+slate-600   #57534e
+slate-500   #78716c   /* Muted text */
+slate-400   #a8a29e   /* Secondary text */
+slate-300   #d6d3d1   /* Primary text (dark mode) */
+slate-200   #e7e5e4
+slate-100   #f5f5f4
+slate-50    #fafaf9   /* Light mode background */
 ```
 
-**Uso**: Successo, conferme, status positivi.
+### Ember - Signature Accent (Copper/Amber)
 
-### Warning (Giallo-Arancio)
+The warm, inviting accent color.
 
 ```css
-warning-50    #fffbeb
-warning-100   #fef3c7
-...
-warning-500   #f59e0b  /* Base */
-...
-warning-900   #78350f
+ember-50    #fef7ed
+ember-100   #fdebd3
+ember-200   #fad4a6
+ember-300   #f6b56d   /* Highlights */
+ember-400   #f18d33   /* Active states (dark) */
+ember-500   #ed6f10   /* Primary accent */
+ember-600   #de5408
+ember-700   #b83d09   /* Active states (light) */
+ember-800   #93310f
+ember-900   #782a10
 ```
 
-**Uso**: Attenzioni, alert non critici, maintenance near limit.
+**Usage**: Primary actions, active states, focus rings, brand elements.
 
-### Info (Blu)
+### Flame - High Energy (Orange-Red)
+
+For emphasis and CTAs.
 
 ```css
-info-50       #eff6ff
-info-100      #dbeafe
-...
-info-500      #3b82f6  /* Base */
-...
-info-900      #1e3a8a
+flame-50    #fff5ed
+flame-100   #ffe8d4
+flame-200   #ffcda8
+flame-300   #ffa970
+flame-400   #ff7a37
+flame-500   #fe5610   /* CTAs, power on */
+flame-600   #ef3906
+flame-700   #c62707
 ```
 
-**Uso**: Informazioni, note, device termostato.
+**Usage**: Stove "on" state, urgent actions, gradient endpoints.
 
-### Neutral (Grigio)
+### Sage - Calm Accent (Muted Green)
+
+For success and comfort states.
 
 ```css
-neutral-50    #fafafa
-neutral-100   #f5f5f5
-...
-neutral-500   #737373  /* Base */
-...
-neutral-900   #171717
+sage-50     #f6f7f6
+sage-100    #e3e7e3
+sage-200    #c7cfc7
+sage-300    #a3b0a3
+sage-400    #7d8e7d
+sage-500    #607360   /* Success actions */
+sage-600    #4c5c4c
+sage-700    #3f4b3f
 ```
 
-**Uso**: Testi, bordi, background, elementi neutrali.
+**Usage**: Success states, confirmations, "healthy" indicators.
 
-**⚠️ IMPORTANTE**: Usare SOLO `neutral-*`, MAI `gray-*`.
+### Ocean - Cool Accent (Muted Blue)
 
-## Background Globale
-
-**SEMPRE** usa background globale definito in `globals.css`. **MAI** override custom nelle pagine.
+For informational elements.
 
 ```css
-/* globals.css */
-body {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  background-attachment: fixed;
-}
+ocean-50    #f4f7fb
+ocean-100   #e7eef6
+ocean-200   #c9dbeb
+ocean-300   #9bbdda
+ocean-400   #669ac4
+ocean-500   #437dae   /* Info elements */
+ocean-600   #326392
+ocean-700   #2a5077
 ```
 
-**Consistenza**: Background gradient violetto in tutta l'app.
+**Usage**: Info banners, thermostat (cooling), links.
 
-## Typography Scale
+### Semantic Colors
 
-### Headings
+Standard semantic colors for status indicators:
+
+```css
+/* Success */
+success-500   #22c55e
+
+/* Warning */
+warning-500   #eab308
+
+/* Danger */
+danger-500    #ef4444
+
+/* Info */
+info-500      #3b82f6
+```
+
+---
+
+## Typography
+
+### Font Stack
+
+```css
+--font-display: 'Outfit', system-ui, sans-serif;
+--font-body: 'Space Grotesk', system-ui, sans-serif;
+--font-mono: 'JetBrains Mono', ui-monospace, monospace;
+```
+
+**Outfit** - Display font for headings. Geometric, modern, versatile.
+**Space Grotesk** - Body text. Clean, readable, technical feel.
+
+### Fluid Typography Scale
+
+All font sizes are fluid, adapting smoothly from mobile to desktop.
+
+```css
+--font-size-fluid-xs:   clamp(0.7rem, 0.65rem + 0.25vw, 0.8rem);
+--font-size-fluid-sm:   clamp(0.8rem, 0.75rem + 0.25vw, 0.9rem);
+--font-size-fluid-base: clamp(0.9rem, 0.85rem + 0.25vw, 1rem);
+--font-size-fluid-lg:   clamp(1rem, 0.95rem + 0.5vw, 1.25rem);
+--font-size-fluid-xl:   clamp(1.15rem, 1rem + 0.75vw, 1.5rem);
+--font-size-fluid-2xl:  clamp(1.4rem, 1.2rem + 1vw, 2rem);
+--font-size-fluid-3xl:  clamp(1.8rem, 1.5rem + 1.5vw, 2.75rem);
+--font-size-fluid-4xl:  clamp(2.25rem, 1.75rem + 2.5vw, 4rem);
+```
+
+### Typography Classes
 
 ```jsx
-<h1 className="text-4xl font-bold">H1 Title</h1>
-<h2 className="text-3xl font-bold">H2 Title</h2>
-<h3 className="text-2xl font-bold">H3 Title</h3>
-<h4 className="text-xl font-bold">H4 Title</h4>
+// Headings - Use font-display
+<h1 className="heading-1">Page Title</h1>      // ~4xl, bold
+<h2 className="heading-2">Section Title</h2>  // ~3xl, bold
+<h3 className="heading-3">Card Title</h3>     // ~2xl, semibold
+<h4 className="heading-4">Subsection</h4>     // ~xl, semibold
+
+// Body text - Uses font-body
+<p className="body-lg">Large text</p>         // ~lg, relaxed
+<p className="body">Normal text</p>           // ~base, relaxed
+<p className="body-sm">Small text</p>         // ~sm, relaxed
+<span className="caption">LABEL</span>        // ~xs, uppercase, tracked
+
+// Gradient text
+<span className="gradient-text-ember">Highlighted</span>
 ```
 
-### Body Text
-
-```jsx
-<p className="text-base">Normal text</p>
-<p className="text-sm">Small text</p>
-<p className="text-xs">Extra small</p>
-```
-
-### Font Weights
-
-- `font-normal` - Regular text (400)
-- `font-medium` - Semi-bold (500)
-- `font-semibold` - Semi-bold (600)
-- `font-bold` - Bold headings (700)
+---
 
 ## Spacing Scale
 
-Tailwind default spacing scale (4px base unit):
+Uses Tailwind's default 4px base unit + custom additions.
 
-```
-0   0px
-1   4px    (0.25rem)
-2   8px    (0.5rem)
-3   12px   (0.75rem)
-4   16px   (1rem)
-5   20px   (1.25rem)
-6   24px   (1.5rem)
-8   32px   (2rem)
-10  40px   (2.5rem)
-12  48px   (3rem)
+```css
+0    0px
+1    4px     (0.25rem)
+2    8px     (0.5rem)
+3    12px    (0.75rem)
+4    16px    (1rem)
+5    20px    (1.25rem)
+6    24px    (1.5rem)
+8    32px    (2rem)
+10   40px    (2.5rem)
+12   48px    (3rem)
+18   72px    (4.5rem)   /* Custom */
+22   88px    (5.5rem)   /* Custom */
 ```
 
-**Common usages**:
-- `gap-4` - Grid/flex gap (16px)
-- `p-6` - Card padding (24px)
-- `mb-4` - Bottom margin (16px)
-- `space-y-6` - Vertical stack spacing (24px)
+**Common usage:**
+- Card padding: `p-5 sm:p-6` (20-24px)
+- Section spacing: `space-y-4` (16px)
+- Grid gaps: `gap-4` (16px)
+
+---
 
 ## Border Radius
 
-```jsx
-rounded-none   0px
-rounded-sm     2px
-rounded        4px    /* Default */
-rounded-md     6px
-rounded-lg     8px
-rounded-xl     12px
-rounded-2xl    16px
-rounded-full   9999px
+Organic, generous curves.
+
+```css
+--radius-xs:    0.25rem   (4px)
+--radius-sm:    0.375rem  (6px)
+--radius-md:    0.5rem    (8px)
+--radius-lg:    0.75rem   (12px)
+--radius-xl:    1rem      (16px)
+--radius-2xl:   1.25rem   (20px)
+--radius-3xl:   1.5rem    (24px)   /* Cards */
+--radius-4xl:   2rem      (32px)
+--radius-pill:  9999px             /* Badges */
 ```
 
-**Common usages**:
-- `rounded-lg` - Cards, buttons (8px)
-- `rounded-full` - Badges, avatar (circle)
-- `rounded-xl` - Modals, panels (12px)
+**Standard usage:**
+- Cards: `rounded-2xl` (20px)
+- Buttons: `rounded-xl` (16px)
+- Badges: `rounded-full` (pill)
+- Input fields: `rounded-lg` (12px)
 
-## Shadows (Liquid Glass)
+---
 
-Custom shadows definite in `app/globals.css` @theme block:
+## Shadows - Ember Noir Depth System
 
-```javascript
-shadow: {
-  'liquid-sm': '0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06)',
-  'liquid': '0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.06)',
-  'liquid-lg': '0 8px 32px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.08)',
-  'liquid-xl': '0 16px 64px rgba(0,0,0,0.16), 0 8px 16px rgba(0,0,0,0.12)',
+### Base Shadows
+
+```css
+--shadow-xs:  0 1px 2px rgba(0,0,0,0.04);
+--shadow-sm:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+--shadow-md:  0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.04);
+--shadow-lg:  0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+--shadow-xl:  0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.03);
+--shadow-2xl: 0 25px 50px -12px rgba(0,0,0,0.2);
+```
+
+### Ember Glow Effects
+
+Signature warm glow for active/highlighted elements.
+
+```css
+--shadow-ember-glow:    0 0 20px rgba(237,111,16,0.15), 0 0 40px rgba(237,111,16,0.08);
+--shadow-ember-glow-sm: 0 0 10px rgba(237,111,16,0.12);
+--shadow-ember-glow-lg: 0 0 30px rgba(237,111,16,0.2), 0 0 60px rgba(237,111,16,0.1);
+```
+
+### Card Shadows
+
+Optimized for dark backgrounds.
+
+```css
+--shadow-card:          0 2px 8px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.08);
+--shadow-card-hover:    0 8px 24px rgba(0,0,0,0.16), 0 4px 8px rgba(0,0,0,0.08);
+--shadow-card-elevated: 0 16px 32px rgba(0,0,0,0.2), 0 8px 16px rgba(0,0,0,0.1);
+```
+
+### Focus Rings
+
+```css
+--shadow-focus-ember:  0 0 0 3px rgba(237,111,16,0.3);
+--shadow-focus-sage:   0 0 0 3px rgba(96,115,96,0.3);
+--shadow-focus-ocean:  0 0 0 3px rgba(67,125,174,0.3);
+--shadow-focus-danger: 0 0 0 3px rgba(239,68,68,0.3);
+```
+
+---
+
+## Component Patterns
+
+### Card
+
+```jsx
+// Default card
+<Card>Content</Card>
+
+// Elevated card (more prominent)
+<Card variant="elevated">Content</Card>
+
+// Subtle card (nested content)
+<Card variant="subtle">Content</Card>
+
+// With hover effects
+<Card hover>Interactive card</Card>
+
+// With ember glow (active state)
+<Card glow>Active card</Card>
+```
+
+**Card variants:**
+- `default` - Standard dark container
+- `elevated` - Stronger shadow, more prominent
+- `subtle` - Minimal, for nested content
+- `outlined` - Transparent with border
+- `glass` - Stronger glass effect with blur
+
+### Button
+
+```jsx
+// Primary action (ember gradient)
+<Button variant="ember">Primary Action</Button>
+
+// Secondary action (subtle)
+<Button variant="subtle">Secondary</Button>
+
+// Ghost (transparent)
+<Button variant="ghost">Ghost</Button>
+
+// Success action
+<Button variant="success">Confirm</Button>
+
+// Danger action
+<Button variant="danger">Delete</Button>
+
+// Outline
+<Button variant="outline">Outline</Button>
+
+// With icon
+<Button icon="🔥" variant="ember">Start</Button>
+
+// Sizes
+<Button size="sm">Small</Button>
+<Button size="md">Medium</Button>  // default
+<Button size="lg">Large</Button>
+
+// States
+<Button loading>Loading...</Button>
+<Button disabled>Disabled</Button>
+```
+
+### Banner
+
+```jsx
+// Info banner
+<Banner variant="info" title="Note" description="..." />
+
+// Warning banner
+<Banner variant="warning" title="Attention" description="..." />
+
+// Error banner
+<Banner variant="error" title="Error" description="..." />
+
+// Success banner
+<Banner variant="success" title="Success" description="..." />
+
+// Ember highlight banner
+<Banner variant="ember" title="Highlighted" description="..." />
+
+// Dismissible
+<Banner dismissible dismissKey="unique-key" />
+
+// Compact
+<Banner compact />
+```
+
+### StatusBadge
+
+```jsx
+// Badge (inline)
+<StatusBadge status="IN FUNZIONE" />
+
+// Display (large centered)
+<StatusBadge variant="display" status="SPENTO" size="lg" />
+
+// Dot indicator
+<StatusBadge variant="dot" status="active" pulse />
+
+// Floating (absolute positioned)
+<StatusBadge variant="floating" status="3" position="top-right" />
+
+// Manual color override
+<StatusBadge status="Custom" color="ember" />
+```
+
+**Auto-detected colors:**
+- `ember` - WORK, ON, ACTIVE
+- `neutral` - OFF, SPENTO
+- `warning` - STANDBY, WAIT
+- `danger` - ERROR
+- `ocean` - START, AVVIO
+- `sage` - SUCCESS, OK
+
+---
+
+## Animation System
+
+### Timing Functions
+
+```css
+--ease-out-expo:    cubic-bezier(0.16, 1, 0.3, 1);   /* Primary */
+--ease-out-quint:   cubic-bezier(0.22, 1, 0.36, 1);
+--ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
+--ease-spring:      cubic-bezier(0.34, 1.56, 0.64, 1);
+```
+
+### Animation Classes
+
+```jsx
+// Fade animations
+<div className="animate-fade-in">...</div>
+<div className="animate-fade-out">...</div>
+<div className="animate-fade-in-up">...</div>
+<div className="animate-fade-in-down">...</div>
+
+// Scale animations
+<div className="animate-scale-in">...</div>
+<div className="animate-scale-in-center">...</div>
+
+// Slide animations
+<div className="animate-slide-down">...</div>
+<div className="animate-slide-up">...</div>
+<div className="animate-slide-in-from-bottom">...</div>
+
+// Special effects
+<div className="animate-shimmer">...</div>           // Loading skeleton
+<div className="animate-pulse-ember">...</div>       // Ember glow pulse
+<div className="animate-glow-pulse">...</div>        // Generic glow
+<div className="animate-spring-in">...</div>         // Bouncy entrance
+
+// Dropdown animations
+<div className="animate-dropdown">...</div>
+<div className="animate-dropdown-up">...</div>
+```
+
+### Transition Guidelines
+
+- **Color transitions**: 200ms (theme switching)
+- **Hover effects**: 200ms ease-out-expo
+- **Dropdown/modal**: 250ms ease-out-expo
+- **Page transitions**: 300ms ease-out-expo
+
+---
+
+## Dark Mode / Light Mode
+
+Ember Noir is **dark-first** but fully supports light mode.
+
+### CSS Strategy
+
+```css
+/* Dark mode (default in Ember Noir) */
+.element {
+  background: rgba(28, 25, 23, 0.8);
+  color: var(--color-slate-200);
 }
+
+/* Light mode override using Tailwind arbitrary selector */
+[html:not(.dark)_&]:bg-white/90
+[html:not(.dark)_&]:text-slate-900
 ```
 
-**Uso**:
-- `shadow-liquid-sm` - Buttons, input
-- `shadow-liquid` - Cards, dropdowns
-- `shadow-liquid-lg` - Modals, panels
-- `shadow-liquid-xl` - Hero sections
+### Key Differences
 
-Vedi [UI Components - Liquid Glass Style](./ui-components.md#liquid-glass-style-pattern).
+| Property | Dark Mode | Light Mode |
+|----------|-----------|------------|
+| Background | slate-950/900 | slate-50/100 |
+| Text primary | slate-200/100 | slate-900 |
+| Text secondary | slate-400 | slate-500/600 |
+| Text tertiary | slate-500 | slate-400 |
+| Borders | white/[0.06-0.10] | slate-200/black/[0.06] |
+| Cards | slate-900/80 | white/80-90 |
+| Ember accents | ember-400 | ember-600/700 |
+| Ocean accents | ocean-400 | ocean-600/700 |
+| Sage accents | sage-400 | sage-600/700 |
+| Warning accents | warning-400 | warning-600/700 |
+| Danger accents | danger-400 | danger-600/700 |
 
-## Glass Effects & Transparency
+### Component Internal Styling
 
-Pattern per effetti glassmorphism con trasparenza e blur.
-
-### Liquid Glass Standard Pattern (2024 Update)
-
-**Pattern Standard Unificato** - Usare SEMPRE questo per consistenza:
+**Base components handle dark/light mode internally:**
 
 ```jsx
-// Container standard (Card, Box, Panel)
-<div className="
-  bg-white/[0.08] dark:bg-white/[0.05]
-  backdrop-blur-3xl
-  backdrop-saturate-150
-  backdrop-contrast-105
-  shadow-liquid
-  ring-1 ring-white/20 dark:ring-white/10 ring-inset
-  rounded-2xl
-  relative
-  before:absolute before:inset-0
-  before:bg-gradient-to-br
-  before:from-white/[0.12] dark:before:from-white/[0.08]
-  before:to-transparent
-  before:pointer-events-none
-">
-  <div className="relative z-10">Content</div>
-</div>
+// Heading.js - Internal variant handling
+const variantClasses = {
+  default: 'text-slate-100 [html:not(.dark)_&]:text-slate-900',
+  gradient: 'bg-gradient-to-r from-ember-500 to-flame-600 bg-clip-text text-transparent',
+  subtle: 'text-slate-400 [html:not(.dark)_&]:text-slate-600',
+};
 
-// Hover states
-hover:bg-white/[0.12] dark:hover:bg-white/[0.08]
-
-// Active/Focus states
-focus:bg-white/[0.15] dark:focus:bg-white/[0.12]
-
-// Colored semantic elements (Banner, Toast, Badge)
-bg-{color}-500/[0.12] dark:bg-{color}-500/[0.15]
-border-{color}-500/25 dark:border-{color}-500/30
+// Text.js - Internal variant handling
+const variantClasses = {
+  body: 'text-base text-slate-100 [html:not(.dark)_&]:text-slate-900',
+  secondary: 'text-base text-slate-300 [html:not(.dark)_&]:text-slate-600',
+  tertiary: 'text-sm text-slate-400 [html:not(.dark)_&]:text-slate-500',
+};
 ```
 
-### Backdrop Blur Pattern
+**Do NOT pass color classes externally** - use variants instead:
 
 ```jsx
-// Ultra-trasparente (NO - deprecato, usare standard 8%)
-<div className="backdrop-blur-md bg-white/[0.01]">  ❌
-  Content
-</div>
+// ✅ Correct - use variant
+<Heading variant="subtle">Room Name</Heading>
+<Text variant="tertiary">Description</Text>
 
-// Standard container (CONSIGLIATO)
-<div className="backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05]">  ✅
-  Content
-</div>
-
-// Hover state
-<div className="backdrop-blur-3xl bg-white/[0.12] dark:bg-white/[0.08]">  ✅
-  Content
-</div>
-
-// Active/Loading state
-<div className="backdrop-blur-3xl bg-white/[0.15] dark:bg-white/[0.12]">  ✅
-  Content
-</div>
+// ❌ Wrong - external color classes
+<Heading className="text-slate-400">Room Name</Heading>
+<Text className="text-slate-500">Description</Text>
 ```
 
-**Blur Levels**:
-- `backdrop-blur-sm` - 4px blur (minimo)
-- `backdrop-blur-md` - 12px blur (leggero)
-- `backdrop-blur-lg` - 16px blur (standard)
-- `backdrop-blur-xl` - 24px blur (intenso)
-- `backdrop-blur-2xl` - 40px blur (massimo)
+### Status-Based Dynamic Styling
 
-**Opacity Levels**:
-- `bg-white/[0.01]` - 1% (ultra-trasparente, mostra icone/contenuto sotto)
-- `bg-white/5` - 5% (molto trasparente)
-- `bg-white/10` - 10% (trasparente standard)
-- `bg-white/20` - 20% (semi-trasparente)
+For components with dynamic status (like StoveCard), include light mode in the status config:
 
-**Best Practice**:
-- Usa blur intenso + opacità bassa per vedere contenuto sotto
-- Usa blur leggero + opacità alta per box leggibili
-- Combina sempre con `shadow-liquid` per profondità
-
-**Layering con WebGL**:
 ```jsx
-<div className="relative backdrop-blur-md bg-white/[0.01]">
-  {/* WebGL canvas z-0 (background) */}
-  <canvas className="absolute inset-0 z-0 pointer-events-none" />
-
-  {/* Contenuto z-10 (foreground) */}
-  <div className="relative z-10">Content</div>
-</div>
+// StoveCard getStatusInfo example
+const getStatusInfo = (status) => {
+  if (status.includes('OFF')) {
+    return {
+      label: 'SPENTA',
+      icon: '❄️',
+      // Each property includes both dark and light mode
+      textColor: 'text-slate-400 [html:not(.dark)_&]:text-slate-500',
+      bgColor: 'bg-gradient-to-br from-slate-800/60 via-slate-900/70 to-slate-800/50 [html:not(.dark)_&]:from-slate-100/80 [html:not(.dark)_&]:via-white/90 [html:not(.dark)_&]:to-slate-100/70',
+      borderColor: 'border-slate-600/40 [html:not(.dark)_&]:border-slate-200',
+      boxBgColor: 'bg-slate-800/60 backdrop-blur-xl [html:not(.dark)_&]:bg-white/80',
+      boxLabelColor: 'text-slate-400 [html:not(.dark)_&]:text-slate-500',
+      boxValueColor: 'text-slate-200 [html:not(.dark)_&]:text-slate-900',
+      boxSuffixColor: 'text-slate-500 [html:not(.dark)_&]:text-slate-400',
+    };
+  }
+  // ... other statuses
+};
 ```
 
-Vedi [Patterns - WebGL Canvas Pattern](./patterns.md#webgl-canvas-pattern).
+### Semantic Color Light Mode Mappings
 
-## Z-Index Layers
+| Status | Dark Mode | Light Mode |
+|--------|-----------|------------|
+| WORK (ember) | ember-400/300/100 | ember-600/700 |
+| OFF (slate) | slate-400/200/500 | slate-500/900/400 |
+| START (ocean) | ocean-400/300/100 | ocean-600/700 |
+| STANDBY (warning) | warning-400/300/100 | warning-600/700 |
+| ERROR (danger) | danger-400/300/100 | danger-600/700 |
+| CLEAN (sage) | sage-400/300/100 | sage-600/700 |
 
-Gerarchia z-index consistente:
+### Common Patterns
 
+```jsx
+// Container with light mode
+className="bg-slate-800/50 border border-slate-700/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200"
+
+// Icon container with light mode
+className="bg-ocean-900/50 border-2 border-ocean-500/50 [html:not(.dark)_&]:bg-ocean-100/80 [html:not(.dark)_&]:border-ocean-300"
+
+// Button with light mode
+className="text-ocean-300 bg-ocean-900/30 border-ocean-500/40 [html:not(.dark)_&]:text-ocean-700 [html:not(.dark)_&]:bg-ocean-100/80 [html:not(.dark)_&]:border-ocean-300"
+
+// Gradient background with light mode
+className="bg-gradient-to-br from-ember-900/40 via-slate-900/60 to-flame-900/30 [html:not(.dark)_&]:from-ember-100/80 [html:not(.dark)_&]:via-ember-50/90 [html:not(.dark)_&]:to-flame-100/70"
 ```
-z-0         Base layer
-z-10        Elevated elements (cards)
-z-20        Sticky headers
-z-30        Fixed navigation
-z-40
-z-50        Navbar
-z-[100]     Dropdowns, tooltips
-z-[101]     Mobile menu panel
-z-[1000]    Modals backdrop
-z-[1001]    Modals content
-z-[10000]   Critical alerts backdrop
-z-[10001]   Critical alerts content
-```
 
-**Best Practice**: Usa valori predefiniti. Evita valori custom se possibile.
+---
 
 ## Responsive Breakpoints
 
 ```css
-/* app/globals.css @theme */
-@theme {
-  --breakpoint-sm: 640px;
-  --breakpoint-md: 768px;
-  --breakpoint-lg: 1024px;
-  --breakpoint-xl: 1280px;
-  --breakpoint-2xl: 1536px;
-}
-
-/* Default screens (Tailwind v4): */
-screens: {
-  'sm': '640px',
-  'md': '768px',
-  'lg': '1024px',
-  'xl': '1280px',
-  '2xl': '1536px',
-}
+sm:   640px   /* Small devices */
+md:   768px   /* Tablets */
+lg:   1024px  /* Desktop */
+xl:   1280px  /* Large desktop */
+2xl:  1536px  /* Extra large */
 ```
 
-**Common usages**:
-- `md:hidden` - Hide on tablet+
-- `lg:flex` - Show flex on desktop
-- `xl:max-w-[120px]` - Wider on large screens
-
-Vedi [UI Components - Responsive Breakpoints](./ui-components.md#responsive-breakpoints-strategy).
-
-## Styling Hierarchy
-
-1. **Tailwind Inline** (~95% codice) - Preferenza primaria
-2. **CSS Modules** (animazioni specifiche) - File `.module.css` stessa directory
-3. **globals.css** (SOLO base + stili globali) - Mantieni minimo (~13 righe)
-
-### Quando Usare
-
-**Tailwind Inline**:
+**Mobile-first approach:**
 ```jsx
-<div className="p-6 bg-white rounded-lg shadow-liquid">
-  Content
-</div>
+// Padding scales up
+<div className="p-4 sm:p-5 lg:p-6">...</div>
+
+// Grid adapts
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">...</div>
+
+// Hide/show
+<div className="hidden lg:block">Desktop only</div>
+<div className="lg:hidden">Mobile only</div>
 ```
 
-**CSS Modules** (animazioni, stati complessi):
-```css
-/* Component.module.css */
-@keyframes shimmer {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
-}
-
-.shimmer {
-  animation: shimmer 2s ease-in-out infinite;
-}
-```
-
-```jsx
-import styles from './Component.module.css';
-
-<div className={styles.shimmer}>
-  Animated content
-</div>
-```
-
-**globals.css** (solo base globali):
-```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer base {
-  body {
-    @apply text-neutral-900;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    background-attachment: fixed;
-  }
-}
-```
-
-### Decision Tree
-
-- Stile **UN** componente → CSS Module
-- Stile **PIÙ** componenti → Tailwind custom in `app/globals.css` @theme block
-- Stile **globale** → `app/globals.css` in `@layer base`
+---
 
 ## Accessibility
 
 ### Color Contrast
 
-Tutte le combinazioni colori rispettano WCAG AA:
-
-```jsx
-{/* ✅ Good contrast */}
-<div className="bg-primary-500 text-white">Text</div>
-<div className="bg-neutral-100 text-neutral-900">Text</div>
-
-{/* ❌ Poor contrast */}
-<div className="bg-warning-200 text-white">Text</div>  // Too light
-```
+All color combinations meet WCAG AA standards:
+- Normal text: 4.5:1 ratio minimum
+- Large text: 3:1 ratio minimum
 
 ### Focus States
 
-Tutti gli elementi interattivi devono avere focus visibile:
-
-```jsx
-<button className="focus:outline-none focus:ring-2 focus:ring-primary-500">
-  Button
-</button>
-```
-
-### Semantic HTML
-
-Usa sempre HTML semantico:
-
-```jsx
-{/* ✅ Semantic */}
-<nav>...</nav>
-<main>...</main>
-<article>...</article>
-
-{/* ❌ Non-semantic */}
-<div className="nav">...</div>
-<div className="main">...</div>
-```
-
-## Animation Guidelines
-
-### Durations
+All interactive elements have visible focus states using ember glow:
 
 ```css
-transition-none     0ms
-transition-fast     150ms   /* Micro-interactions */
-transition          200ms   /* Default hover/focus */
-transition-slow     300ms   /* Collapse/expand */
+*:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus-ember);
+}
 ```
 
-**Common usages**:
-- Hover states: `transition-fast` (150ms)
-- Dropdown open: `transition` (200ms)
-- Collapse/expand: `transition-slow` (300ms)
+### Touch Targets
 
-### Easing
+Minimum touch target: 44px (iOS standard)
+
+```jsx
+// Buttons have min-h-[44px] or min-h-[48px]
+<Button size="md">At least 48px tall</Button>
+```
+
+### Reduced Motion
+
+Respects user preference:
 
 ```css
-ease-linear
-ease-in
-ease-out
-ease-in-out    /* Default, most natural */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 ```
 
-**Best Practice**: Usa `ease-in-out` per transizioni naturali.
+---
 
-## Icons & Emoji
+## Migration from v1 (Liquid Glass)
 
-**Preferenza**: Emoji per icone semplici (cross-platform, zero dependencies).
+### Color Mapping
+
+| Old (v1) | New (v2) |
+|----------|----------|
+| primary-* | flame-* |
+| accent-* | ember-* |
+| neutral-* | slate-* |
+| success-* | sage-* (or success-*) |
+| info-* | ocean-* (or info-*) |
+
+### Component Props
+
+| Old | New |
+|-----|-----|
+| `liquid={true}` | `variant="glass"` |
+| `glass={true}` | `variant="glass"` |
+| `elevation="elevated"` | `variant="elevated"` |
+| `variant="primary"` | `variant="ember"` |
+| `variant="secondary"` | `variant="subtle"` |
+
+### Visual Changes
+
+- Background: Purple gradient → Warm charcoal gradient
+- Glass effects: Heavy blur → Subtle blur with depth
+- Borders: white/20 → white/[0.06] (more subtle)
+- Shadows: Blue-tinted → Neutral with ember glow
+- Typography: System fonts → Outfit + Space Grotesk
+
+---
+
+## Quick Reference
+
+### Common Patterns
 
 ```jsx
-<Button icon="🔥">Accendi</Button>
-<Card>🌡️ Termostato</Card>
+// Card with header
+<Card>
+  <CardHeader>
+    <CardTitle icon="🔥">Title</CardTitle>
+    <StatusBadge status="Active" />
+  </CardHeader>
+  <CardContent>...</CardContent>
+  <CardFooter>
+    <Button variant="ember">Action</Button>
+  </CardFooter>
+</Card>
+
+// Alert/notification
+<Banner
+  variant="warning"
+  icon="⚠️"
+  title="Attention Required"
+  description="Please check..."
+  dismissible
+/>
+
+// Status display
+<StatusBadge
+  variant="display"
+  status="IN FUNZIONE"
+  size="lg"
+  pulse
+/>
 ```
 
-**Alternative**: React Icons o Heroicons per icone complesse.
+### CSS Variables Quick Access
 
-## Dark Mode
+```css
+/* Colors */
+var(--color-ember-500)
+var(--color-slate-900)
 
-**Attualmente**: Non implementato. Background gradient fisso.
+/* Typography */
+var(--font-display)
+var(--font-body)
 
-**Future**: Sistema dark mode con Tailwind `dark:` variants.
+/* Shadows */
+var(--shadow-card)
+var(--shadow-ember-glow)
 
-## Recent Updates (December 2024)
-
-### Glassmorphism Standardization
-
-✅ **Completed** - December 13, 2024
-
-**Changes**:
-1. **Opacità Standardizzata**: Tutti i containers ora usano `bg-white/[0.08] dark:bg-white/[0.05]` (era `/[0.01]` in alcuni componenti)
-2. **Border Opacity Uniformata**: Ring borders ora `ring-white/20 dark:ring-white/10` (prima erano `/15` e `/08`)
-3. **Colored Elements Opacity**: Status badges e semantic banners ora `bg-{color}-500/[0.12] dark:bg-{color}-500/[0.15]` (prima `/08`)
-4. **Banner Default Liquid**: Banner component ora ha `liquid={true}` di default
-5. **StatusBadge Dark Mode**: Aggiunto supporto completo dark mode con `dark:` variants
-6. **Select Animation**: Dropdown animation rallentata a 250ms (era 150ms) per smoothness
-7. **SVG Accessibility**: Tutti gli SVG decorativi hanno `aria-hidden="true"`
-
-**Components Affected**:
-- ✅ Card - Ring borders standardizzati
-- ✅ StoveCard - Status box opacity + badges visibility
-- ✅ Navbar - Desktop dropdowns liquid glass uniformi
-- ✅ Banner - Default liquid prop
-- ✅ StatusBadge - Dark mode support
-- ✅ Select - Animation smoothness
-- ✅ All SVGs - aria-hidden attributes
-
-**Impact**: +23% visual consistency, +15% dark mode contrast, 100% WCAG AA compliant
-
-### Component Defaults Updated
-
-```jsx
-// Banner - BEFORE
-<Banner liquid={false} />  // Required explicit prop
-
-// Banner - NOW
-<Banner />  // Liquid glass by default ✅
-
-// StatusBadge - BEFORE
-<div className="text-success-600" />  // No dark mode
-
-// StatusBadge - NOW
-<div className="text-success-700 dark:text-success-400" />  // Dark mode support ✅
-```
-
-### Border & Ring Standard
-
-**OLD** (Inconsistent):
-```jsx
-ring-white/[0.15]  // Card
-border-white/15    // StoveCard
-ring-white/[0.08]  // Some components
-```
-
-**NEW** (Uniform):
-```jsx
-ring-1 ring-white/20 dark:ring-white/10 ring-inset  // All components ✅
-border border-white/20 dark:border-white/10        // All borders ✅
+/* Timing */
+var(--ease-out-expo)
 ```
 
 ---
 
 ## See Also
 
-- [UI Components](./ui-components.md) - Componenti con design system
-- [Patterns](./patterns.md) - Pattern styling comuni
+- [UI Components](./ui-components.md) - Component documentation
+- [Patterns](./patterns.md) - Common code patterns
+- [Architecture](./architecture.md) - App structure
 
 ---
 
-**Last Updated**: 2024-12-13 (Glassmorphism Standardization Complete)
+**Last Updated**: 2026-01 (Ember Noir v2.1 - Full Light Mode Support)

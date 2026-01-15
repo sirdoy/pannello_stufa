@@ -14,6 +14,12 @@ import {
   UserInfoCard
 } from './navigation';
 
+/**
+ * Navbar Component - Ember Noir Design System
+ *
+ * Sophisticated navigation with warm dark aesthetic.
+ * Features desktop header, mobile menu, and bottom tab bar.
+ */
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -125,25 +131,76 @@ export default function Navbar() {
     return null;
   };
 
+  // Ember Noir nav item styles
+  const navItemBase = `
+    flex items-center gap-2
+    px-4 py-2.5
+    rounded-xl
+    text-sm font-display font-medium
+    transition-all duration-200
+    min-h-[44px]
+    relative group
+  `;
+
+  const navItemActive = `
+    bg-ember-500/15 dark:bg-ember-500/15
+    text-ember-400 dark:text-ember-400
+    shadow-ember-glow-sm
+    [html:not(.dark)_&]:bg-ember-500/10
+    [html:not(.dark)_&]:text-ember-700
+    [html:not(.dark)_&]:shadow-none
+  `;
+
+  const navItemInactive = `
+    bg-white/[0.04] dark:bg-white/[0.04]
+    text-slate-300 dark:text-slate-300
+    hover:bg-white/[0.08] dark:hover:bg-white/[0.08]
+    hover:text-slate-100 dark:hover:text-slate-100
+    border border-white/[0.06] dark:border-white/[0.06]
+    hover:border-white/[0.1] dark:hover:border-white/[0.1]
+    [html:not(.dark)_&]:bg-black/[0.03]
+    [html:not(.dark)_&]:text-slate-600
+    [html:not(.dark)_&]:border-black/[0.06]
+    [html:not(.dark)_&]:hover:bg-black/[0.05]
+    [html:not(.dark)_&]:hover:text-slate-900
+  `;
+
   return (
     <>
       {/* Top Header - Desktop & Mobile */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-3xl border-b border-white/20 dark:border-white/10 shadow-liquid">
+      <header className="
+        fixed top-0 left-0 right-0 z-50
+        bg-slate-900/80 dark:bg-slate-900/80
+        backdrop-blur-xl
+        border-b border-white/[0.06] dark:border-white/[0.06]
+        shadow-card
+        [html:not(.dark)_&]:bg-white/90
+        [html:not(.dark)_&]:border-black/[0.06]
+      ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16 lg:h-20">
+          <div className="flex items-center justify-between h-16 lg:h-18">
 
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
-              <div className="text-2xl sm:text-3xl lg:text-4xl group-hover:scale-110 transition-transform duration-200">
-                🏠
+              <div className="
+                text-2xl sm:text-3xl
+                group-hover:scale-110
+                transition-transform duration-200
+              ">
+                🔥
               </div>
-              <span className="hidden sm:inline text-lg lg:text-xl font-bold bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
+              <span className="
+                hidden sm:inline
+                text-lg lg:text-xl
+                font-display font-bold
+                gradient-text-ember
+              ">
                 Smart Home
               </span>
             </Link>
 
             {/* Desktop Navigation - Hidden on mobile */}
-            <nav className="hidden lg:flex items-center gap-4">
+            <nav className="hidden lg:flex items-center gap-3">
 
               {/* Device Dropdowns */}
               {navStructure.devices.map(device => (
@@ -154,19 +211,28 @@ export default function Navbar() {
                 >
                   <button
                     onClick={() => setDesktopDeviceDropdown(desktopDeviceDropdown === device.id ? null : device.id)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 min-h-[44px] relative group hover:scale-105 ${
-                      pathname.startsWith(`/${device.id}`)
-                        ? 'bg-primary-500/10 dark:bg-primary-500/20 backdrop-blur-xl text-primary-700 dark:text-primary-400 shadow-liquid-md ring-1 ring-primary-500/20 dark:ring-primary-500/30 ring-inset'
-                        : 'bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-xl text-neutral-800 dark:text-neutral-200 hover:bg-white/[0.12] dark:hover:bg-white/[0.08] shadow-liquid-sm hover:shadow-liquid-md ring-1 ring-white/20 dark:ring-white/10 ring-inset'
-                    }`}
+                    className={`
+                      ${navItemBase}
+                      ${pathname.startsWith(`/${device.id}`) ? navItemActive : navItemInactive}
+                    `.trim().replace(/\s+/g, ' ')}
                     aria-expanded={desktopDeviceDropdown === device.id}
                   >
                     <span className="text-lg">{device.icon}</span>
                     <span>{device.name}</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${desktopDeviceDropdown === device.id ? 'rotate-180' : ''}`} aria-hidden="true" />
-                    <div className={`absolute bottom-1 left-1/2 -translate-x-1/2 h-0.5 bg-primary-500 dark:bg-primary-400 transition-all duration-300 rounded-full ${
-                      pathname.startsWith(`/${device.id}`) ? 'w-3/4' : 'w-0 group-hover:w-3/4'
-                    }`} />
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform duration-200 ${
+                        desktopDeviceDropdown === device.id ? 'rotate-180' : ''
+                      }`}
+                      aria-hidden="true"
+                    />
+                    {/* Active indicator */}
+                    <div className={`
+                      absolute -bottom-px left-1/2 -translate-x-1/2
+                      h-0.5 rounded-full
+                      bg-gradient-to-r from-ember-500 to-flame-500
+                      transition-all duration-300
+                      ${pathname.startsWith(`/${device.id}`) ? 'w-3/4 opacity-100' : 'w-0 opacity-0 group-hover:w-1/2 group-hover:opacity-50'}
+                    `} />
                   </button>
 
                   {desktopDeviceDropdown === device.id && (
@@ -192,17 +258,21 @@ export default function Navbar() {
                 <Link
                   key={item.route}
                   href={item.route}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 min-h-[44px] relative group hover:scale-105 ${
-                    isActive(item.route)
-                      ? 'bg-primary-500/10 dark:bg-primary-500/20 backdrop-blur-xl text-primary-700 dark:text-primary-400 shadow-liquid-md ring-1 ring-primary-500/20 dark:ring-primary-500/30 ring-inset'
-                      : 'bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-xl text-neutral-800 dark:text-neutral-200 hover:bg-white/[0.12] dark:hover:bg-white/[0.08] shadow-liquid-sm hover:shadow-liquid-md ring-1 ring-white/20 dark:ring-white/10 ring-inset'
-                  }`}
+                  className={`
+                    ${navItemBase}
+                    ${isActive(item.route) ? navItemActive : navItemInactive}
+                  `.trim().replace(/\s+/g, ' ')}
                 >
                   {getIconForPath(item.route)}
                   <span>{item.label}</span>
-                  <div className={`absolute bottom-1 left-1/2 -translate-x-1/2 h-0.5 bg-primary-500 dark:bg-primary-400 transition-all duration-300 rounded-full ${
-                    isActive(item.route) ? 'w-3/4' : 'w-0 group-hover:w-3/4'
-                  }`} />
+                  {/* Active indicator */}
+                  <div className={`
+                    absolute -bottom-px left-1/2 -translate-x-1/2
+                    h-0.5 rounded-full
+                    bg-gradient-to-r from-ember-500 to-flame-500
+                    transition-all duration-300
+                    ${isActive(item.route) ? 'w-3/4 opacity-100' : 'w-0 opacity-0 group-hover:w-1/2 group-hover:opacity-50'}
+                  `} />
                 </Link>
               ))}
 
@@ -211,19 +281,28 @@ export default function Navbar() {
                 <div className="relative" ref={settingsDropdownRef}>
                   <button
                     onClick={() => setSettingsDropdownOpen(!settingsDropdownOpen)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 min-h-[44px] relative group hover:scale-105 ${
-                      settingsDropdownOpen || navStructure.settings.some(item => isActive(item.route))
-                        ? 'bg-primary-500/10 dark:bg-primary-500/20 backdrop-blur-xl text-primary-700 dark:text-primary-400 shadow-liquid-md ring-1 ring-primary-500/20 dark:ring-primary-500/30 ring-inset'
-                        : 'bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-xl text-neutral-800 dark:text-neutral-200 hover:bg-white/[0.12] dark:hover:bg-white/[0.08] shadow-liquid-sm hover:shadow-liquid-md ring-1 ring-white/20 dark:ring-white/10 ring-inset'
-                    }`}
+                    className={`
+                      ${navItemBase}
+                      ${settingsDropdownOpen || navStructure.settings.some(item => isActive(item.route)) ? navItemActive : navItemInactive}
+                    `.trim().replace(/\s+/g, ' ')}
                     aria-expanded={settingsDropdownOpen}
                   >
                     <Settings className="w-5 h-5" />
                     <span>Impostazioni</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${settingsDropdownOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
-                    <div className={`absolute bottom-1 left-1/2 -translate-x-1/2 h-0.5 bg-primary-500 dark:bg-primary-400 transition-all duration-300 rounded-full ${
-                      settingsDropdownOpen || navStructure.settings.some(item => isActive(item.route)) ? 'w-3/4' : 'w-0 group-hover:w-3/4'
-                    }`} />
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform duration-200 ${
+                        settingsDropdownOpen ? 'rotate-180' : ''
+                      }`}
+                      aria-hidden="true"
+                    />
+                    {/* Active indicator */}
+                    <div className={`
+                      absolute -bottom-px left-1/2 -translate-x-1/2
+                      h-0.5 rounded-full
+                      bg-gradient-to-r from-ember-500 to-flame-500
+                      transition-all duration-300
+                      ${settingsDropdownOpen || navStructure.settings.some(item => isActive(item.route)) ? 'w-3/4 opacity-100' : 'w-0 opacity-0 group-hover:w-1/2 group-hover:opacity-50'}
+                    `} />
                   </button>
 
                   {settingsDropdownOpen && (
@@ -254,12 +333,20 @@ export default function Navbar() {
                 <div className="hidden lg:block relative" ref={userDropdownRef}>
                   <button
                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] hover:bg-white/[0.12] dark:hover:bg-white/[0.08] backdrop-blur-2xl border border-white/20 dark:border-white/10 text-neutral-700 dark:text-neutral-300 shadow-liquid-sm hover:shadow-liquid-md ring-1 ring-white/10 dark:ring-white/5 ring-inset transition-all duration-200 min-h-[44px] hover:scale-105"
+                    className={`
+                      ${navItemBase}
+                      ${navItemInactive}
+                    `.trim().replace(/\s+/g, ' ')}
                     aria-expanded={userDropdownOpen}
                   >
                     <User className="w-5 h-5" />
-                    <span className="text-sm font-medium truncate max-w-[140px]">{user.name}</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${userDropdownOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+                    <span className="truncate max-w-[140px]">{user.name}</span>
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform duration-200 ${
+                        userDropdownOpen ? 'rotate-180' : ''
+                      }`}
+                      aria-hidden="true"
+                    />
                   </button>
 
                   {userDropdownOpen && (
@@ -275,7 +362,7 @@ export default function Navbar() {
                         label="Logout"
                         isActive={false}
                         onClick={() => setUserDropdownOpen(false)}
-                        className="text-primary-700 dark:text-primary-400"
+                        className="text-flame-400 dark:text-flame-400 [html:not(.dark)_&]:text-flame-600"
                       />
                     </DropdownContainer>
                   )}
@@ -285,14 +372,24 @@ export default function Navbar() {
               {/* Mobile Hamburger Button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2.5 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] hover:bg-white/[0.12] dark:hover:bg-white/[0.08] transition-all duration-200"
+                className="
+                  lg:hidden
+                  p-2.5
+                  rounded-xl
+                  bg-white/[0.04] dark:bg-white/[0.04]
+                  border border-white/[0.06] dark:border-white/[0.06]
+                  hover:bg-white/[0.08] dark:hover:bg-white/[0.08]
+                  transition-all duration-200
+                  [html:not(.dark)_&]:bg-black/[0.03]
+                  [html:not(.dark)_&]:border-black/[0.06]
+                "
                 aria-label={mobileMenuOpen ? 'Chiudi menu' : 'Apri menu'}
                 aria-expanded={mobileMenuOpen}
               >
                 {mobileMenuOpen ? (
-                  <X className="w-6 h-6 text-neutral-700 dark:text-neutral-300" />
+                  <X className="w-6 h-6 text-slate-300 dark:text-slate-300 [html:not(.dark)_&]:text-slate-600" />
                 ) : (
-                  <Menu className="w-6 h-6 text-neutral-700 dark:text-neutral-300" />
+                  <Menu className="w-6 h-6 text-slate-300 dark:text-slate-300 [html:not(.dark)_&]:text-slate-600" />
                 )}
               </button>
             </div>
@@ -305,13 +402,27 @@ export default function Navbar() {
         <>
           {/* Backdrop */}
           <div
-            className="fixed top-16 left-0 right-0 bottom-0 bg-black/40 backdrop-blur-md z-[9000] lg:hidden"
+            className="
+              fixed top-16 left-0 right-0 bottom-0
+              bg-slate-950/60 dark:bg-slate-950/60
+              backdrop-blur-md
+              z-[9000] lg:hidden
+              [html:not(.dark)_&]:bg-slate-900/40
+            "
             onClick={() => setMobileMenuOpen(false)}
             aria-hidden="true"
           />
 
           {/* Mobile Menu Panel */}
-          <div className="fixed top-16 left-0 right-0 bottom-20 bg-white/[0.92] dark:bg-neutral-900/[0.95] backdrop-blur-[80px] z-[9001] lg:hidden overflow-y-auto animate-slideInDown">
+          <div className="
+            fixed top-16 left-0 right-0 bottom-20
+            bg-slate-900/95 dark:bg-slate-900/95
+            backdrop-blur-2xl
+            z-[9001] lg:hidden
+            overflow-y-auto
+            animate-fade-in-down
+            [html:not(.dark)_&]:bg-white/95
+          ">
             <div className="px-4 py-5 space-y-4">
 
               {/* User Info */}
@@ -380,66 +491,99 @@ export default function Navbar() {
         </>
       )}
 
-      {/* Mobile Bottom Navigation - iOS Style */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-3xl border-t border-white/20 dark:border-white/10 shadow-liquid pb-safe">
-        <div className="grid grid-cols-4 gap-4 p-3">
-
+      {/* Mobile Bottom Navigation - Ember Noir Style */}
+      <nav className="
+        fixed bottom-0 left-0 right-0 z-50 lg:hidden
+        bg-slate-900/90 dark:bg-slate-900/90
+        backdrop-blur-xl
+        border-t border-white/[0.06] dark:border-white/[0.06]
+        shadow-[0_-4px_24px_rgba(0,0,0,0.15)]
+        pb-safe
+        [html:not(.dark)_&]:bg-white/90
+        [html:not(.dark)_&]:border-black/[0.06]
+        [html:not(.dark)_&]:shadow-[0_-4px_24px_rgba(0,0,0,0.08)]
+      ">
+        <div className="grid grid-cols-4 gap-2 p-2">
           {/* Home */}
           <Link
             href="/"
-            className={`flex flex-col items-center justify-center py-3 px-2 rounded-xl min-h-[48px] transition-all duration-200 ${
-              isActive('/')
-                ? 'bg-primary-500/10 dark:bg-primary-500/20 text-primary-700 dark:text-primary-400'
-                : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
-            }`}
+            className={`
+              flex flex-col items-center justify-center
+              py-2 px-2
+              rounded-xl
+              min-h-[56px]
+              transition-all duration-200
+              ${isActive('/')
+                ? 'bg-ember-500/15 text-ember-400 shadow-ember-glow-sm [html:not(.dark)_&]:bg-ember-500/10 [html:not(.dark)_&]:text-ember-600 [html:not(.dark)_&]:shadow-none'
+                : 'text-slate-500 hover:text-slate-300 [html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700'
+              }
+            `}
           >
-            <Home className="w-6 h-6 mb-1.5" />
-            <span className="text-[10px] font-medium truncate max-w-full">Home</span>
+            <Home className="w-6 h-6 mb-1" />
+            <span className="text-[10px] font-display font-medium">Home</span>
           </Link>
 
           {/* Scheduler */}
           <Link
             href="/stove/scheduler"
-            className={`flex flex-col items-center justify-center py-3 px-2 rounded-xl min-h-[48px] transition-all duration-200 ${
-              pathname.includes('scheduler')
-                ? 'bg-primary-500/10 dark:bg-primary-500/20 text-primary-700 dark:text-primary-400'
-                : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
-            }`}
+            className={`
+              flex flex-col items-center justify-center
+              py-2 px-2
+              rounded-xl
+              min-h-[56px]
+              transition-all duration-200
+              ${pathname.includes('scheduler')
+                ? 'bg-ember-500/15 text-ember-400 shadow-ember-glow-sm [html:not(.dark)_&]:bg-ember-500/10 [html:not(.dark)_&]:text-ember-600 [html:not(.dark)_&]:shadow-none'
+                : 'text-slate-500 hover:text-slate-300 [html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700'
+              }
+            `}
           >
-            <Calendar className="w-6 h-6 mb-1.5" />
-            <span className="text-[10px] font-medium truncate max-w-full">Orari</span>
+            <Calendar className="w-6 h-6 mb-1" />
+            <span className="text-[10px] font-display font-medium">Orari</span>
           </Link>
 
           {/* Errors */}
           <Link
             href="/stove/errors"
-            className={`flex flex-col items-center justify-center py-3 px-2 rounded-xl min-h-[48px] transition-all duration-200 ${
-              pathname.includes('errors')
-                ? 'bg-primary-500/10 dark:bg-primary-500/20 text-primary-700 dark:text-primary-400'
-                : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
-            }`}
+            className={`
+              flex flex-col items-center justify-center
+              py-2 px-2
+              rounded-xl
+              min-h-[56px]
+              transition-all duration-200
+              ${pathname.includes('errors')
+                ? 'bg-ember-500/15 text-ember-400 shadow-ember-glow-sm [html:not(.dark)_&]:bg-ember-500/10 [html:not(.dark)_&]:text-ember-600 [html:not(.dark)_&]:shadow-none'
+                : 'text-slate-500 hover:text-slate-300 [html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700'
+              }
+            `}
           >
-            <AlertCircle className="w-6 h-6 mb-1.5" />
-            <span className="text-[10px] font-medium truncate max-w-full">Errori</span>
+            <AlertCircle className="w-6 h-6 mb-1" />
+            <span className="text-[10px] font-display font-medium">Errori</span>
           </Link>
 
           {/* Log */}
           <Link
             href="/log"
-            className={`flex flex-col items-center justify-center py-3 px-2 rounded-xl min-h-[48px] transition-all duration-200 ${
-              pathname.includes('log')
-                ? 'bg-primary-500/10 dark:bg-primary-500/20 text-primary-700 dark:text-primary-400'
-                : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
-            }`}
+            className={`
+              flex flex-col items-center justify-center
+              py-2 px-2
+              rounded-xl
+              min-h-[56px]
+              transition-all duration-200
+              ${pathname.includes('log')
+                ? 'bg-ember-500/15 text-ember-400 shadow-ember-glow-sm [html:not(.dark)_&]:bg-ember-500/10 [html:not(.dark)_&]:text-ember-600 [html:not(.dark)_&]:shadow-none'
+                : 'text-slate-500 hover:text-slate-300 [html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700'
+              }
+            `}
           >
-            <Clock className="w-6 h-6 mb-1.5" />
-            <span className="text-[10px] font-medium truncate max-w-full">Log</span>
+            <Clock className="w-6 h-6 mb-1" />
+            <span className="text-[10px] font-display font-medium">Log</span>
           </Link>
         </div>
       </nav>
 
       {/* Spacer for fixed navigation */}
-      <div className="h-16 lg:h-20" aria-hidden="true" />
+      <div className="h-16 lg:h-18" aria-hidden="true" />
     </>
   );
 }

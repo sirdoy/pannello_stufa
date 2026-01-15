@@ -5,6 +5,45 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.46.0] - 2026-01-15
+
+### 🌗 Full Light Mode Support - Ember Noir Design System
+
+**Obiettivo**: Supporto completo light mode per tutti i componenti dell'app.
+
+#### ✨ Nuove Funzionalità
+
+**StoveCard - Light Mode Completo:**
+- Tutti gli stati (OFF, WORK, START, STANDBY, ERROR, CLEAN, MODULATION) con colori light mode
+- Status display box con gradienti light (slate/ember/ocean/warning/danger/sage)
+- Info box (Ventola/Potenza) con sfondo bianco e bordi appropriati
+- Mode indicator con icone e testi ottimizzati per light mode
+- Bottoni azione (Torna in Auto, Configura Pianificazione) con stili light
+
+**ThermostatCard - Light Mode Completo:**
+- Box temperatura attuale/target con sfondi light
+- Bottoni modalità (Programmato, Assenza, Antigelo, Off) con light mode
+- Controlli temperatura rapidi con stili appropriati
+
+**LightsCard - Light Mode Completo:**
+- Controllo luminosità con slider e container light
+- Bottoni scene con hover states light
+- Indicatori scroll con colori appropriati
+
+**Componenti Base - Gestione Interna:**
+- `Heading.js`: varianti (default, subtle, gradient) gestiscono dark/light internamente
+- `Text.js`: varianti (body, secondary, tertiary) con colori automatici
+- Pattern: usare `variant` invece di classi colore esterne
+
+#### 📚 Documentazione
+
+- `docs/design-system.md` aggiornato con sezione Light Mode completa
+- Tabelle mapping colori dark → light
+- Pattern comuni per container, bottoni, gradienti
+- Best practices per styling interno componenti
+
+---
+
 ## [1.45.0] - 2026-01-14
 
 ### 🎨 Redesign - Netatmo Thermostat UI

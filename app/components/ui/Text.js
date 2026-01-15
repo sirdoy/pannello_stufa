@@ -1,5 +1,5 @@
 /**
- * Text Component
+ * Text Component - Ember Noir Design System
  *
  * Body text with semantic variants for hierarchy.
  *
@@ -13,11 +13,11 @@ export default function Text({
   children,
   className = ''
 }) {
-  // Variant classes
+  // Ember Noir variant classes with light mode support
   const variantClasses = {
-    body: 'text-base text-neutral-900 dark:text-neutral-50',
-    secondary: 'text-base text-neutral-600 dark:text-neutral-300',
-    tertiary: 'text-sm text-neutral-500 dark:text-neutral-400',
+    body: 'text-base text-slate-100 [html:not(.dark)_&]:text-slate-900',
+    secondary: 'text-base text-slate-300 [html:not(.dark)_&]:text-slate-600',
+    tertiary: 'text-sm text-slate-400 [html:not(.dark)_&]:text-slate-500',
   };
 
   const classes = `${variantClasses[variant]} ${className}`.trim();

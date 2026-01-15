@@ -496,21 +496,21 @@ export default function LightsCard() {
     onClick: () => router.push('/lights')
   }] : [];
 
-  // Connection mode badge
+  // Connection mode badge - Ember Noir
   const getConnectionModeBadge = () => {
     if (!connected || !connectionMode) return null;
 
     const badges = {
-      'local': { icon: '📡', text: 'Local', color: 'text-success-600 dark:text-success-400' },
-      'remote': { icon: '☁️', text: 'Cloud', color: 'text-info-600 dark:text-info-400' },
-      'hybrid': { icon: '🔄', text: 'Hybrid', color: 'text-warning-600 dark:text-warning-400' },
+      'local': { icon: '📡', text: 'Local', color: 'text-sage-400' },
+      'remote': { icon: '☁️', text: 'Cloud', color: 'text-ocean-400' },
+      'hybrid': { icon: '🔄', text: 'Hybrid', color: 'text-warning-400' },
     };
 
     const badge = badges[connectionMode];
     if (!badge) return null;
 
     return (
-      <div className="flex items-center gap-1.5 text-xs font-semibold">
+      <div className="flex items-center gap-1.5 text-xs font-semibold font-display">
         <span>{badge.icon}</span>
         <span className={badge.color}>{badge.text}</span>
       </div>
@@ -563,19 +563,19 @@ export default function LightsCard() {
       {/* Selected Room Controls */}
       {selectedRoom ? (
         <div className="space-y-4 sm:space-y-6">
-                {/* Main Control Area - Enhanced */}
-                <div className={`relative rounded-2xl p-6 sm:p-8 shadow-liquid hover:shadow-liquid-lg transition-all duration-500 ${
+                {/* Main Control Area - Ember Noir */}
+                <div className={`relative rounded-2xl p-6 sm:p-8 transition-all duration-500 border ${
                   isRoomOn
-                    ? 'bg-gradient-to-br from-warning-50 to-warning-100 dark:from-warning-900/20 dark:to-warning-800/20'
-                    : 'bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-900/20 dark:to-neutral-800/20'
+                    ? 'bg-gradient-to-br from-warning-900/40 via-slate-900/60 to-ember-900/30 border-warning-500/40 shadow-[0_0_30px_rgba(234,179,8,0.2)]'
+                    : 'bg-gradient-to-br from-slate-800/60 via-slate-900/70 to-slate-800/50 border-slate-600/40'
                 }`}>
                   {/* ON Badge */}
                   {isRoomOn && (
                     <div className="absolute -top-2 -right-2 z-20">
                       <div className="relative">
-                        <div className="absolute inset-0 bg-warning-500/20 rounded-full blur-lg animate-pulse"></div>
-                        <div className="relative bg-gradient-to-br from-warning-500 to-warning-600 text-white px-3 py-1.5 rounded-full shadow-elevated-lg ring-2 ring-white/40">
-                          <span className="text-xs font-bold">💡 ACCESO</span>
+                        <div className="absolute inset-0 bg-warning-500/30 rounded-full blur-lg animate-pulse"></div>
+                        <div className="relative bg-gradient-to-br from-warning-500 to-warning-600 text-white px-3 py-1.5 rounded-full shadow-lg ring-2 ring-slate-900/50">
+                          <span className="text-xs font-bold font-display">💡 ACCESO</span>
                         </div>
                       </div>
                     </div>
@@ -584,7 +584,7 @@ export default function LightsCard() {
                   {/* Room name (solo se c'è una sola stanza) */}
                   {roomLights.length === 1 && (
                     <div className="text-center mb-6">
-                      <Heading level={3} size="sm" variant="subtle" className="uppercase tracking-wider">
+                      <Heading level={3} size="sm" variant="subtle" className="uppercase tracking-wider font-display">
                         {selectedRoom.metadata?.name || 'Stanza'}
                       </Heading>
                     </div>
@@ -593,44 +593,42 @@ export default function LightsCard() {
                   {/* On/Off Buttons */}
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     <Button
-                      liquid
-                      variant={isRoomOn ? "success" : "outline"}
+                      variant={isRoomOn ? "success" : "subtle"}
                       onClick={() => handleRoomToggle(selectedRoomGroupedLightId, true)}
                       disabled={refreshing || !selectedRoomGroupedLightId}
                       icon="💡"
                       size="lg"
-                      className="h-16 sm:h-20"
+                      className="h-16 sm:h-20 font-display"
                     >
                       Accendi
                     </Button>
                     <Button
-                      liquid
-                      variant={!isRoomOn ? "danger" : "outline"}
+                      variant={!isRoomOn ? "danger" : "subtle"}
                       onClick={() => handleRoomToggle(selectedRoomGroupedLightId, false)}
                       disabled={refreshing || !selectedRoomGroupedLightId}
                       icon="🌙"
                       size="lg"
-                      className="h-16 sm:h-20"
+                      className="h-16 sm:h-20 font-display"
                     >
                       Spegni
                     </Button>
                   </div>
 
-                  {/* Brightness Control - Enhanced with +/- buttons */}
+                  {/* Brightness Control - Ember Noir */}
                   {isRoomOn && (
-                    <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.15] dark:bg-white/[0.08] p-4 sm:p-5">
+                    <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-4 sm:p-5 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
                       <div className="relative z-10 space-y-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span className="text-xl">☀️</span>
-                            <Heading level={4} size="sm">Luminosità</Heading>
+                            <Heading level={4} size="sm" className="font-display">Luminosità</Heading>
                           </div>
-                          <span className="text-2xl sm:text-3xl font-black text-warning-600 dark:text-warning-400">
+                          <span className="text-2xl sm:text-3xl font-black font-display text-warning-400 [html:not(.dark)_&]:text-warning-600">
                             {avgBrightness}%
                           </span>
                         </div>
 
-                        {/* Slider */}
+                        {/* Slider - Ember Noir styled */}
                         <input
                           type="range"
                           min="1"
@@ -638,14 +636,13 @@ export default function LightsCard() {
                           value={avgBrightness}
                           onChange={(e) => handleBrightnessChange(selectedRoomGroupedLightId, e.target.value)}
                           disabled={refreshing || !selectedRoomGroupedLightId}
-                          className="w-full h-3 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-warning-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full h-3 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-warning-500 disabled:opacity-50 disabled:cursor-not-allowed [html:not(.dark)_&]:bg-slate-200"
                         />
 
                         {/* +/- Buttons */}
                         <div className="flex items-center gap-2">
                           <Button
-                            liquid
-                            variant="outline"
+                            variant="subtle"
                             size="sm"
                             icon="➖"
                             onClick={() => {
@@ -653,13 +650,12 @@ export default function LightsCard() {
                               handleBrightnessChange(selectedRoomGroupedLightId, newValue.toString());
                             }}
                             disabled={refreshing || avgBrightness <= 1 || !selectedRoomGroupedLightId}
-                            className="flex-1"
+                            className="flex-1 font-display"
                           >
                             -5%
                           </Button>
                           <Button
-                            liquid
-                            variant="outline"
+                            variant="subtle"
                             size="sm"
                             icon="➕"
                             onClick={() => {
@@ -667,7 +663,7 @@ export default function LightsCard() {
                               handleBrightnessChange(selectedRoomGroupedLightId, newValue.toString());
                             }}
                             disabled={refreshing || avgBrightness >= 100 || !selectedRoomGroupedLightId}
-                            className="flex-1"
+                            className="flex-1 font-display"
                           >
                             +5%
                           </Button>
@@ -680,12 +676,11 @@ export default function LightsCard() {
                   {isRoomOn && hasColorLights && (
                     <div className="mt-4">
                       <Button
-                        liquid
-                        variant="outline"
+                        variant="subtle"
                         size="sm"
                         icon="🎨"
                         onClick={() => router.push('/lights')}
-                        className="w-full"
+                        className="w-full font-display"
                       >
                         Controllo Colore
                       </Button>
@@ -693,7 +688,7 @@ export default function LightsCard() {
                   )}
                 </div>
 
-                {/* Scenes - Horizontal Scroll (All scenes) */}
+                {/* Scenes - Horizontal Scroll - Ember Noir */}
                 {roomScenes.length > 0 && (
                   <>
                     <Divider label="Scene" variant="gradient" spacing="large" />
@@ -706,7 +701,7 @@ export default function LightsCard() {
                             key={scene.id}
                             onClick={() => handleSceneActivate(scene.id)}
                             disabled={refreshing}
-                            className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl border-2 bg-white/60 dark:bg-white/[0.03] border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-warning-50 dark:hover:bg-warning-900/20 hover:border-warning-300 dark:hover:border-warning-600 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed snap-start"
+                            className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl border bg-slate-800/50 border-slate-700/50 text-slate-300 hover:bg-warning-900/30 hover:border-warning-500/40 hover:text-warning-300 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed snap-start font-display [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200 [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:hover:bg-warning-100/80 [html:not(.dark)_&]:hover:border-warning-300 [html:not(.dark)_&]:hover:text-warning-700"
                           >
                             <div className="text-3xl mb-2">🎨</div>
                             <div className="text-xs font-semibold truncate">
@@ -719,7 +714,7 @@ export default function LightsCard() {
                       {/* Scroll indicator */}
                       {roomScenes.length > 3 && (
                         <div className="text-center mt-2">
-                          <Text variant="tertiary" className="text-xs">
+                          <Text variant="tertiary" className="text-xs font-display">
                             ← Scorri per vedere tutte le {roomScenes.length} scene →
                           </Text>
                         </div>

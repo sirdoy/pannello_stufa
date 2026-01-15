@@ -1,7 +1,8 @@
 /**
- * Heading Component
+ * Heading Component - Ember Noir Design System
  *
  * Semantic heading (h1-h6) with size and variant options.
+ * Handles dark/light mode internally.
  *
  * @example
  * <Heading level={1} size="3xl" variant="gradient">
@@ -39,17 +40,17 @@ export default function Heading({
     '3xl': 'text-3xl sm:text-4xl',    // 30px-36px
   };
 
-  // Variant classes
+  // Variant classes - Ember Noir palette with internal dark/light mode handling
   const variantClasses = {
-    default: 'text-neutral-900 dark:text-neutral-50',
-    gradient: 'bg-gradient-to-r from-primary-600 to-accent-600 dark:from-primary-300 dark:to-accent-300 bg-clip-text text-transparent',
-    subtle: 'text-neutral-700 dark:text-neutral-300',
+    default: 'text-slate-100 [html:not(.dark)_&]:text-slate-900',
+    gradient: 'bg-gradient-to-r from-ember-500 to-flame-600 bg-clip-text text-transparent',
+    subtle: 'text-slate-400 [html:not(.dark)_&]:text-slate-600',
   };
 
   const classes = `
     ${sizeClasses[finalSize]}
     ${variantClasses[variant]}
-    font-bold
+    font-bold font-display
     ${className}
   `.trim().replace(/\s+/g, ' ');
 

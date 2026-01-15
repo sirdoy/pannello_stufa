@@ -526,137 +526,145 @@ export default function StoveCard() {
     }
   };
 
-  // Status mapping: technical name → user-friendly display (Frame 3 style)
+  // Status mapping: technical name → user-friendly display (Ember Noir Design)
   const getStatusInfo = (status) => {
     if (!status) {
       return {
         label: 'CARICAMENTO...',
         icon: '⏳',
-        textColor: 'text-neutral-700',
-        bgColor: 'bg-gradient-to-b from-neutral-50 to-neutral-100',
-        glassColor: '#d1d5db',
-        boxBgColor: 'bg-neutral-100/90 dark:bg-neutral-800/90',
-        boxLabelColor: 'text-neutral-700 dark:text-neutral-300',
-        boxValueColor: 'text-neutral-900 dark:text-white',
-        boxSuffixColor: 'text-neutral-700 dark:text-neutral-400',
+        textColor: 'text-slate-400 [html:not(.dark)_&]:text-slate-500',
+        bgColor: 'bg-slate-800/60 [html:not(.dark)_&]:bg-slate-100/80',
+        borderColor: 'border-slate-700/50 [html:not(.dark)_&]:border-slate-200',
+        boxBgColor: 'bg-slate-800/80 [html:not(.dark)_&]:bg-white/80',
+        boxLabelColor: 'text-slate-400 [html:not(.dark)_&]:text-slate-500',
+        boxValueColor: 'text-slate-200 [html:not(.dark)_&]:text-slate-900',
+        boxSuffixColor: 'text-slate-500 [html:not(.dark)_&]:text-slate-400',
+        glowColor: '',
         animated: true,
       };
     }
 
     const statusUpper = status.toUpperCase();
 
-    // 🔥 WORK - In funzione
+    // 🔥 WORK - In funzione (Ember glow - warm copper/amber)
     if (statusUpper.includes('WORK')) {
       return {
         label: 'IN FUNZIONE',
         icon: '🔥',
-        textColor: 'text-success-800',
-        bgColor: 'bg-gradient-to-b from-success-50 to-success-100',
-        glassColor: '#d1d5db',
-        boxBgColor: 'bg-success-100/90 dark:bg-success-900/80',
-        boxLabelColor: 'text-success-800 dark:text-success-100',
-        boxValueColor: 'text-success-950 dark:text-white',
-        boxSuffixColor: 'text-success-700 dark:text-success-200',
+        textColor: 'text-ember-400 [html:not(.dark)_&]:text-ember-600',
+        bgColor: 'bg-gradient-to-br from-ember-900/40 via-slate-900/60 to-flame-900/30 [html:not(.dark)_&]:from-ember-100/80 [html:not(.dark)_&]:via-ember-50/90 [html:not(.dark)_&]:to-flame-100/70',
+        borderColor: 'border-ember-500/40 [html:not(.dark)_&]:border-ember-300',
+        boxBgColor: 'bg-ember-900/50 backdrop-blur-xl [html:not(.dark)_&]:bg-ember-100/80',
+        boxLabelColor: 'text-ember-300 [html:not(.dark)_&]:text-ember-600',
+        boxValueColor: 'text-ember-100 [html:not(.dark)_&]:text-ember-700',
+        boxSuffixColor: 'text-ember-400/70 [html:not(.dark)_&]:text-ember-500',
+        glowColor: 'shadow-ember-glow [html:not(.dark)_&]:shadow-[0_0_20px_rgba(237,111,16,0.15)]',
         animated: true,
         pulse: true,
       };
     }
 
-    // ❄️ OFF - Spenta
+    // ❄️ OFF - Spenta (Cool slate)
     if (statusUpper.includes('OFF')) {
       return {
         label: 'SPENTA',
         icon: '❄️',
-        textColor: 'text-info-700',
-        bgColor: 'bg-gradient-to-b from-sky-50 to-sky-100',
-        glassColor: '#d1d5db',
-        boxBgColor: 'bg-sky-100/90 dark:bg-sky-900/80',
-        boxLabelColor: 'text-sky-800 dark:text-sky-100',
-        boxValueColor: 'text-sky-950 dark:text-white',
-        boxSuffixColor: 'text-sky-700 dark:text-sky-200',
+        textColor: 'text-slate-400 [html:not(.dark)_&]:text-slate-500',
+        bgColor: 'bg-gradient-to-br from-slate-800/60 via-slate-900/70 to-slate-800/50 [html:not(.dark)_&]:from-slate-100/80 [html:not(.dark)_&]:via-white/90 [html:not(.dark)_&]:to-slate-100/70',
+        borderColor: 'border-slate-600/40 [html:not(.dark)_&]:border-slate-200',
+        boxBgColor: 'bg-slate-800/60 backdrop-blur-xl [html:not(.dark)_&]:bg-white/80',
+        boxLabelColor: 'text-slate-400 [html:not(.dark)_&]:text-slate-500',
+        boxValueColor: 'text-slate-200 [html:not(.dark)_&]:text-slate-900',
+        boxSuffixColor: 'text-slate-500 [html:not(.dark)_&]:text-slate-400',
+        glowColor: '',
         animated: false,
       };
     }
 
-    // 🚀 START - Avvio in corso
+    // 🚀 START - Avvio in corso (Ocean blue)
     if (statusUpper.includes('START')) {
       return {
         label: 'AVVIO IN CORSO',
         icon: '🚀',
-        textColor: 'text-info-700',
-        bgColor: 'bg-gradient-to-b from-info-50 to-info-100',
-        glassColor: '#d1d5db',
-        boxBgColor: 'bg-info-100/90 dark:bg-info-900/80',
-        boxLabelColor: 'text-info-800 dark:text-info-100',
-        boxValueColor: 'text-info-950 dark:text-white',
-        boxSuffixColor: 'text-info-700 dark:text-info-200',
+        textColor: 'text-ocean-400 [html:not(.dark)_&]:text-ocean-600',
+        bgColor: 'bg-gradient-to-br from-ocean-900/40 via-slate-900/60 to-ocean-800/30 [html:not(.dark)_&]:from-ocean-100/80 [html:not(.dark)_&]:via-ocean-50/90 [html:not(.dark)_&]:to-ocean-100/70',
+        borderColor: 'border-ocean-500/40 [html:not(.dark)_&]:border-ocean-300',
+        boxBgColor: 'bg-ocean-900/50 backdrop-blur-xl [html:not(.dark)_&]:bg-ocean-100/80',
+        boxLabelColor: 'text-ocean-300 [html:not(.dark)_&]:text-ocean-600',
+        boxValueColor: 'text-ocean-100 [html:not(.dark)_&]:text-ocean-700',
+        boxSuffixColor: 'text-ocean-400/70 [html:not(.dark)_&]:text-ocean-500',
+        glowColor: 'shadow-[0_0_30px_rgba(67,125,174,0.3)] [html:not(.dark)_&]:shadow-[0_0_20px_rgba(67,125,174,0.15)]',
         animated: true,
         pulse: true,
       };
     }
 
-    // 💤 STANDBY/WAIT - In attesa
+    // 💤 STANDBY/WAIT - In attesa (Warning amber)
     if (statusUpper.includes('STANDBY') || statusUpper.includes('WAIT')) {
       return {
         label: 'IN ATTESA',
         icon: '💤',
-        textColor: 'text-warning-700',
-        bgColor: 'bg-gradient-to-b from-warning-50 to-warning-100',
-        glassColor: '#d1d5db',
-        boxBgColor: 'bg-warning-100/90 dark:bg-warning-900/80',
-        boxLabelColor: 'text-warning-800 dark:text-warning-100',
-        boxValueColor: 'text-warning-950 dark:text-white',
-        boxSuffixColor: 'text-warning-700 dark:text-warning-200',
+        textColor: 'text-warning-400 [html:not(.dark)_&]:text-warning-600',
+        bgColor: 'bg-gradient-to-br from-warning-900/30 via-slate-900/60 to-warning-800/20 [html:not(.dark)_&]:from-warning-100/80 [html:not(.dark)_&]:via-warning-50/90 [html:not(.dark)_&]:to-warning-100/70',
+        borderColor: 'border-warning-500/40 [html:not(.dark)_&]:border-warning-300',
+        boxBgColor: 'bg-warning-900/40 backdrop-blur-xl [html:not(.dark)_&]:bg-warning-100/80',
+        boxLabelColor: 'text-warning-300 [html:not(.dark)_&]:text-warning-600',
+        boxValueColor: 'text-warning-100 [html:not(.dark)_&]:text-warning-700',
+        boxSuffixColor: 'text-warning-400/70 [html:not(.dark)_&]:text-warning-500',
+        glowColor: 'shadow-[0_0_20px_rgba(234,179,8,0.2)] [html:not(.dark)_&]:shadow-[0_0_15px_rgba(234,179,8,0.1)]',
         animated: true,
       };
     }
 
-    // ⚠️ ERROR - Errore
+    // ⚠️ ERROR - Errore (Danger red)
     if (statusUpper.includes('ERROR') || statusUpper.includes('ALARM')) {
       return {
         label: 'ERRORE',
         icon: '⚠️',
-        textColor: 'text-primary-700',
-        bgColor: 'bg-gradient-to-b from-primary-50 to-primary-100',
-        glassColor: '#d1d5db',
-        boxBgColor: 'bg-primary-100/90 dark:bg-primary-900/80',
-        boxLabelColor: 'text-primary-800 dark:text-primary-100',
-        boxValueColor: 'text-primary-950 dark:text-white',
-        boxSuffixColor: 'text-primary-700 dark:text-primary-200',
+        textColor: 'text-danger-400 [html:not(.dark)_&]:text-danger-600',
+        bgColor: 'bg-gradient-to-br from-danger-900/40 via-slate-900/60 to-danger-800/30 [html:not(.dark)_&]:from-danger-100/80 [html:not(.dark)_&]:via-danger-50/90 [html:not(.dark)_&]:to-danger-100/70',
+        borderColor: 'border-danger-500/50 [html:not(.dark)_&]:border-danger-300',
+        boxBgColor: 'bg-danger-900/50 backdrop-blur-xl [html:not(.dark)_&]:bg-danger-100/80',
+        boxLabelColor: 'text-danger-300 [html:not(.dark)_&]:text-danger-600',
+        boxValueColor: 'text-danger-100 [html:not(.dark)_&]:text-danger-700',
+        boxSuffixColor: 'text-danger-400/70 [html:not(.dark)_&]:text-danger-500',
+        glowColor: 'shadow-[0_0_30px_rgba(239,68,68,0.3)] [html:not(.dark)_&]:shadow-[0_0_20px_rgba(239,68,68,0.15)]',
         animated: true,
         pulse: true,
       };
     }
 
-    // 🔄 CLEANING - Pulizia
+    // 🔄 CLEANING - Pulizia (Sage green)
     if (statusUpper.includes('CLEAN')) {
       return {
         label: 'PULIZIA',
         icon: '🔄',
-        textColor: 'text-accent-700',
-        bgColor: 'bg-gradient-to-b from-accent-50 to-accent-100',
-        glassColor: '#d1d5db',
-        boxBgColor: 'bg-accent-100/90 dark:bg-accent-900/80',
-        boxLabelColor: 'text-accent-800 dark:text-accent-100',
-        boxValueColor: 'text-accent-950 dark:text-white',
-        boxSuffixColor: 'text-accent-700 dark:text-accent-200',
+        textColor: 'text-sage-400 [html:not(.dark)_&]:text-sage-600',
+        bgColor: 'bg-gradient-to-br from-sage-900/40 via-slate-900/60 to-sage-800/30 [html:not(.dark)_&]:from-sage-100/80 [html:not(.dark)_&]:via-sage-50/90 [html:not(.dark)_&]:to-sage-100/70',
+        borderColor: 'border-sage-500/40 [html:not(.dark)_&]:border-sage-300',
+        boxBgColor: 'bg-sage-900/50 backdrop-blur-xl [html:not(.dark)_&]:bg-sage-100/80',
+        boxLabelColor: 'text-sage-300 [html:not(.dark)_&]:text-sage-600',
+        boxValueColor: 'text-sage-100 [html:not(.dark)_&]:text-sage-700',
+        boxSuffixColor: 'text-sage-400/70 [html:not(.dark)_&]:text-sage-500',
+        glowColor: 'shadow-[0_0_20px_rgba(96,115,96,0.3)] [html:not(.dark)_&]:shadow-[0_0_15px_rgba(96,115,96,0.15)]',
         animated: true,
         pulse: true,
       };
     }
 
-    // 🌡️ MODULATION - Modulazione
+    // 🌡️ MODULATION - Modulazione (Ocean blue)
     if (statusUpper.includes('MODULATION')) {
       return {
         label: 'MODULAZIONE',
         icon: '🌡️',
-        textColor: 'text-info-700',
-        bgColor: 'bg-gradient-to-b from-info-50 to-info-100',
-        glassColor: '#d1d5db',
-        boxBgColor: 'bg-info-100/90 dark:bg-info-900/80',
-        boxLabelColor: 'text-info-800 dark:text-info-100',
-        boxValueColor: 'text-info-950 dark:text-white',
-        boxSuffixColor: 'text-info-700 dark:text-info-200',
+        textColor: 'text-ocean-400 [html:not(.dark)_&]:text-ocean-600',
+        bgColor: 'bg-gradient-to-br from-ocean-900/40 via-slate-900/60 to-ocean-800/30 [html:not(.dark)_&]:from-ocean-100/80 [html:not(.dark)_&]:via-ocean-50/90 [html:not(.dark)_&]:to-ocean-100/70',
+        borderColor: 'border-ocean-500/40 [html:not(.dark)_&]:border-ocean-300',
+        boxBgColor: 'bg-ocean-900/50 backdrop-blur-xl [html:not(.dark)_&]:bg-ocean-100/80',
+        boxLabelColor: 'text-ocean-300 [html:not(.dark)_&]:text-ocean-600',
+        boxValueColor: 'text-ocean-100 [html:not(.dark)_&]:text-ocean-700',
+        boxSuffixColor: 'text-ocean-400/70 [html:not(.dark)_&]:text-ocean-500',
+        glowColor: 'shadow-[0_0_20px_rgba(67,125,174,0.25)] [html:not(.dark)_&]:shadow-[0_0_15px_rgba(67,125,174,0.12)]',
         animated: true,
       };
     }
@@ -665,13 +673,14 @@ export default function StoveCard() {
     return {
       label: status.toUpperCase(),
       icon: '❔',
-      textColor: 'text-neutral-700',
-      bgColor: 'bg-gradient-to-b from-neutral-50 to-neutral-100',
-      glassColor: '#d1d5db',
-      boxBgColor: 'bg-neutral-100/90 dark:bg-neutral-800/90',
-      boxLabelColor: 'text-neutral-700 dark:text-neutral-300',
-      boxValueColor: 'text-neutral-900 dark:text-white',
-      boxSuffixColor: 'text-neutral-700 dark:text-neutral-400',
+      textColor: 'text-slate-400 [html:not(.dark)_&]:text-slate-500',
+      bgColor: 'bg-slate-800/60 [html:not(.dark)_&]:bg-slate-100/80',
+      borderColor: 'border-slate-700/50 [html:not(.dark)_&]:border-slate-200',
+      boxBgColor: 'bg-slate-800/60 backdrop-blur-xl [html:not(.dark)_&]:bg-white/80',
+      boxLabelColor: 'text-slate-400 [html:not(.dark)_&]:text-slate-500',
+      boxValueColor: 'text-slate-200 [html:not(.dark)_&]:text-slate-900',
+      boxSuffixColor: 'text-slate-500 [html:not(.dark)_&]:text-slate-400',
+      glowColor: '',
       animated: false,
     };
   };
@@ -705,18 +714,17 @@ export default function StoveCard() {
         />
       )}
 
-      {/* Main Status Card - Liquid Glass Pro */}
-      <Card liquid className="overflow-visible transition-all duration-500">
+      {/* Main Status Card - Ember Noir */}
+      <Card variant="elevated" className="overflow-visible transition-all duration-500">
         <div className="relative">
-          {/* Top accent bar */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 via-accent-500 to-primary-500 opacity-80"></div>
+          {/* Top accent bar - Ember gradient */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-ember-600 via-flame-500 to-ember-600 opacity-90"></div>
 
           <div className="p-6 sm:p-8">
             {/* Maintenance Cleaning Banner - Inside card */}
             {needsMaintenance && (
               <div className="mb-6">
                 <Banner
-                  liquid
                   variant="warning"
                   icon="🧹"
                   title="Pulizia Stufa Richiesta"
@@ -729,7 +737,6 @@ export default function StoveCard() {
                   actions={
                     <>
                       <Button
-                        liquid
                         variant="success"
                         onClick={handleConfirmCleaning}
                         disabled={cleaningInProgress}
@@ -738,7 +745,6 @@ export default function StoveCard() {
                         {cleaningInProgress ? '⏳ Conferma...' : '✓ Ho Pulito'}
                       </Button>
                       <Button
-                        liquid
                         variant="outline"
                         onClick={() => router.push('/stove/maintenance')}
                         size="sm"
@@ -755,7 +761,6 @@ export default function StoveCard() {
             {!isFirebaseConnected && (
               <div className="mb-6">
                 <Banner
-                  liquid
                   variant="warning"
                   icon="⚠️"
                   title="Connessione Firebase Interrotta"
@@ -764,21 +769,21 @@ export default function StoveCard() {
               </div>
             )}
 
-            {/* Header - Simplified without refresh button */}
-            <div className="flex items-center gap-2 mb-6">
+            {/* Header - Ember Noir style */}
+            <div className="flex items-center gap-3 mb-6">
               <span className="text-2xl sm:text-3xl">🔥</span>
-              <Heading level={2} size="xl">Stufa</Heading>
+              <Heading level={2} size="xl" className="font-display">Stufa</Heading>
             </div>
 
-            {/* Main Status Display - Frame 3 Style */}
+            {/* Main Status Display - Ember Noir Style */}
             <div className="mb-6 relative">
               {/* Sandbox Badge */}
               {sandboxMode && (
                 <div className="absolute -top-2 -left-2 z-30">
                   <div className="relative">
-                    <div className="absolute inset-0 bg-purple-500/20 rounded-full blur-lg animate-pulse"></div>
-                    <div className="relative bg-gradient-to-br from-purple-500 to-pink-600 text-white px-3 py-1.5 rounded-full shadow-elevated-lg ring-2 ring-white/40">
-                      <span className="text-xs font-bold">🧪 SANDBOX</span>
+                    <div className="absolute inset-0 bg-ocean-500/30 rounded-full blur-lg animate-pulse"></div>
+                    <div className="relative bg-gradient-to-br from-ocean-500 to-ocean-600 text-white px-3 py-1.5 rounded-full shadow-lg ring-2 ring-slate-900/50">
+                      <span className="text-xs font-bold font-display">🧪 SANDBOX</span>
                     </div>
                   </div>
                 </div>
@@ -788,52 +793,52 @@ export default function StoveCard() {
               {errorCode !== 0 && (
                 <div className="absolute -top-2 -right-2 z-30">
                   <div className="relative">
-                    <div className="absolute inset-0 bg-primary-500/20 rounded-full blur-lg animate-pulse"></div>
-                    <div className="relative bg-gradient-to-br from-primary-500 to-primary-600 text-white px-3 py-1.5 rounded-full shadow-elevated-lg ring-2 ring-white/40">
-                      <span className="text-xs font-bold">⚠️ ERR {errorCode}</span>
+                    <div className="absolute inset-0 bg-danger-500/30 rounded-full blur-lg animate-pulse"></div>
+                    <div className="relative bg-gradient-to-br from-danger-500 to-danger-600 text-white px-3 py-1.5 rounded-full shadow-lg ring-2 ring-slate-900/50">
+                      <span className="text-xs font-bold font-display">⚠️ ERR {errorCode}</span>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Riquadro COLORATO con stato/icona/valori */}
-              <div className={`relative ${statusInfo.bgColor} rounded-2xl p-6 sm:p-8 shadow-liquid hover:shadow-liquid-lg overflow-visible transition-all duration-500`}>
-                    {/* Layout Frame 3: Testo + Icona + Box glassmorphism sovrapposti */}
+              {/* Status Display Box - Ember Noir */}
+              <div className={`relative ${statusInfo.bgColor} rounded-2xl p-6 sm:p-8 ${statusInfo.glowColor} border ${statusInfo.borderColor} overflow-visible transition-all duration-500`}>
+                    {/* Layout: Status Label + Icon + Info Boxes */}
                     <div className="relative">
-                      {/* Testo stato in alto */}
+                      {/* Status Label */}
                       <div className="text-center mb-8 sm:mb-10">
-                        <h3 className={`text-2xl sm:text-3xl font-black ${statusInfo.textColor} tracking-tight uppercase`}>
+                        <h3 className={`text-2xl sm:text-3xl font-black font-display ${statusInfo.textColor} tracking-tight uppercase`}>
                           {statusInfo.label}
                         </h3>
                         {statusInfo.label.toUpperCase() !== status.toUpperCase() && (
-                          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1.5 font-mono opacity-40 tracking-wide">
+                          <p className="text-xs text-slate-500 mt-1.5 font-mono opacity-60 tracking-wide">
                             {status}
                           </p>
                         )}
                       </div>
 
-                      {/* Container per icona e box glassmorphism sovrapposti */}
+                      {/* Icon + Info Boxes Container */}
                       <div className="relative flex flex-col items-center">
-                        {/* Icona grande (z-0, dietro) */}
-                        <div className={`relative mb-[-40px] sm:mb-[-50px] ${statusInfo.pulse ? 'animate-pulse' : ''}`}>
-                          <span className="text-[120px] sm:text-[140px] drop-shadow-xl inline-block" style={{ lineHeight: 1 }}>
+                        {/* Large Status Icon */}
+                        <div className={`relative mb-[-40px] sm:mb-[-50px] ${statusInfo.pulse ? 'animate-pulse-ember' : ''}`}>
+                          <span className="text-[120px] sm:text-[140px] drop-shadow-2xl inline-block" style={{ lineHeight: 1 }}>
                             {statusInfo.icon}
                           </span>
                         </div>
 
-                        {/* Due box glassmorphism (z-10, davanti all'icona) */}
+                        {/* Two Info Boxes */}
                         <div className="relative z-10 w-full grid grid-cols-2 gap-3 sm:gap-4 mt-4">
-                          {/* Box Ventola */}
-                          <div className={`relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl ${statusInfo.boxBgColor} border border-white/30 dark:border-white/20`}>
+                          {/* Fan Level Box */}
+                          <div className={`relative overflow-hidden rounded-2xl ${statusInfo.boxBgColor} border border-white/10 [html:not(.dark)_&]:border-slate-200`}>
                             <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
                               <div className="flex items-center gap-1.5 mb-1.5">
                                 <span className="text-xl sm:text-2xl">💨</span>
                               </div>
-                              <p className={`text-[10px] sm:text-xs font-bold ${statusInfo.boxLabelColor} uppercase tracking-wider mb-1`}>
+                              <p className={`text-[10px] sm:text-xs font-bold font-display ${statusInfo.boxLabelColor} uppercase tracking-wider mb-1`}>
                                 Ventola
                               </p>
                               <div className="flex items-baseline gap-0.5">
-                                <p className={`text-2xl sm:text-3xl font-black ${statusInfo.boxValueColor} leading-none`}>
+                                <p className={`text-2xl sm:text-3xl font-black font-display ${statusInfo.boxValueColor} leading-none`}>
                                   {fanLevel ?? '-'}
                                 </p>
                                 <span className={`text-sm sm:text-base ${statusInfo.boxSuffixColor} font-semibold`}>/6</span>
@@ -841,17 +846,17 @@ export default function StoveCard() {
                             </div>
                           </div>
 
-                          {/* Box Potenza */}
-                          <div className={`relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl ${statusInfo.boxBgColor} border border-white/30 dark:border-white/20`}>
+                          {/* Power Level Box */}
+                          <div className={`relative overflow-hidden rounded-2xl ${statusInfo.boxBgColor} border border-white/10 [html:not(.dark)_&]:border-slate-200`}>
                             <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
                               <div className="flex items-center gap-1.5 mb-1.5">
                                 <span className="text-xl sm:text-2xl">⚡</span>
                               </div>
-                              <p className={`text-[10px] sm:text-xs font-bold ${statusInfo.boxLabelColor} uppercase tracking-wider mb-1`}>
+                              <p className={`text-[10px] sm:text-xs font-bold font-display ${statusInfo.boxLabelColor} uppercase tracking-wider mb-1`}>
                                 Potenza
                               </p>
                               <div className="flex items-baseline gap-0.5">
-                                <p className={`text-2xl sm:text-3xl font-black ${statusInfo.boxValueColor} leading-none`}>
+                                <p className={`text-2xl sm:text-3xl font-black font-display ${statusInfo.boxValueColor} leading-none`}>
                                   {powerLevel ?? '-'}
                                 </p>
                                 <span className={`text-sm sm:text-base ${statusInfo.boxSuffixColor} font-semibold`}>/5</span>
@@ -864,27 +869,25 @@ export default function StoveCard() {
               </div>
             </div>
 
-            {/* PRIMARY ACTIONS - Always visible */}
+            {/* PRIMARY ACTIONS - Ember Noir buttons */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <Button
-                liquid
-                variant="success"
+                variant="ember"
                 size="lg"
                 icon="🔥"
                 onClick={handleIgnite}
                 disabled={loading || isAccesa || needsMaintenance}
-                className="h-20 sm:h-24 text-base sm:text-lg font-bold"
+                className="h-20 sm:h-24 text-base sm:text-lg font-bold font-display"
               >
                 ACCENDI
               </Button>
               <Button
-                liquid
-                variant="outline"
+                variant="subtle"
                 size="lg"
                 icon="❄️"
                 onClick={handleShutdown}
                 disabled={loading || isSpenta}
-                className="h-20 sm:h-24 text-base sm:text-lg font-bold"
+                className="h-20 sm:h-24 text-base sm:text-lg font-bold font-display"
               >
                 SPEGNI
               </Button>
@@ -893,27 +896,27 @@ export default function StoveCard() {
             {/* Separator */}
             <Divider label="Modalità Controllo" variant="gradient" spacing="large" />
 
-            {/* Mode Indicator - Liquid Glass */}
-            <div className="flex flex-col gap-4 p-5 sm:p-6 bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl rounded-2xl shadow-liquid-sm border border-white/20 dark:border-white/10 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 dark:before:from-white/5 before:to-transparent before:pointer-events-none">
+            {/* Mode Indicator - Ember Noir */}
+            <div className="flex flex-col gap-4 p-5 sm:p-6 bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 relative overflow-hidden [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
               <div className="flex items-center gap-3 sm:gap-4 relative z-10">
                 <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                  schedulerEnabled && semiManualMode ? 'bg-warning-100 border-2 border-warning-300' :
-                  schedulerEnabled ? 'bg-success-100 border-2 border-success-300' :
-                  'bg-accent-100 border-2 border-accent-300'
+                  schedulerEnabled && semiManualMode ? 'bg-warning-900/40 border-2 border-warning-500/50 [html:not(.dark)_&]:bg-warning-100/80 [html:not(.dark)_&]:border-warning-300' :
+                  schedulerEnabled ? 'bg-sage-900/40 border-2 border-sage-500/50 [html:not(.dark)_&]:bg-sage-100/80 [html:not(.dark)_&]:border-sage-300' :
+                  'bg-ember-900/40 border-2 border-ember-500/50 [html:not(.dark)_&]:bg-ember-100/80 [html:not(.dark)_&]:border-ember-300'
                 }`}>
                   <span className="text-2xl sm:text-3xl">
                     {schedulerEnabled && semiManualMode ? '⚙️' : schedulerEnabled ? '⏰' : '🔧'}
                   </span>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className={`text-base sm:text-lg font-bold ${
-                    schedulerEnabled && semiManualMode ? 'text-warning-700 dark:text-warning-400' :
-                    schedulerEnabled ? 'text-success-700 dark:text-success-400' :
-                    'text-accent-700 dark:text-accent-400'
+                  <p className={`text-base sm:text-lg font-bold font-display ${
+                    schedulerEnabled && semiManualMode ? 'text-warning-400 [html:not(.dark)_&]:text-warning-600' :
+                    schedulerEnabled ? 'text-sage-400 [html:not(.dark)_&]:text-sage-600' :
+                    'text-ember-400 [html:not(.dark)_&]:text-ember-600'
                   }`}>
                     {schedulerEnabled && semiManualMode ? 'Semi-manuale' : schedulerEnabled ? 'Automatica' : 'Manuale'}
                   </p>
-                  <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1 break-words">
+                  <p className="text-xs sm:text-sm text-slate-400 [html:not(.dark)_&]:text-slate-500 mt-1 break-words">
                     {schedulerEnabled && semiManualMode && returnToAutoAt ? (
                       (() => {
                         const date = new Date(returnToAutoAt);
@@ -923,11 +926,11 @@ export default function StoveCard() {
                       })()
                     ) : schedulerEnabled && nextScheduledAction ? (
                       <>
-                        <span className={`font-semibold ${nextScheduledAction.action === 'ignite' ? 'text-success-700 dark:text-success-400' : 'text-primary-700 dark:text-primary-400'}`}>
+                        <span className={`font-semibold ${nextScheduledAction.action === 'ignite' ? 'text-ember-400 [html:not(.dark)_&]:text-ember-600' : 'text-slate-300 [html:not(.dark)_&]:text-slate-600'}`}>
                           {nextScheduledAction.action === 'ignite' ? '🔥 Accensione' : '❄️ Spegnimento'}
                         </span>
                         {' alle '}
-                        <span className="font-medium text-neutral-700 dark:text-neutral-300">
+                        <span className="font-medium text-slate-300 [html:not(.dark)_&]:text-slate-600">
                           {(() => {
                             const date = new Date(nextScheduledAction.timestamp);
                             const time = date.toLocaleString('it-IT', { hour: '2-digit', minute: '2-digit' });
@@ -936,7 +939,7 @@ export default function StoveCard() {
                           })()}
                         </span>
                         {nextScheduledAction.action === 'ignite' && (
-                          <span className="text-neutral-500 dark:text-neutral-400 block sm:inline"> • P{nextScheduledAction.power}, V{nextScheduledAction.fan}</span>
+                          <span className="text-slate-500 [html:not(.dark)_&]:text-slate-400 block sm:inline"> • P{nextScheduledAction.power}, V{nextScheduledAction.fan}</span>
                         )}
                       </>
                     ) : schedulerEnabled ? (
@@ -951,14 +954,14 @@ export default function StoveCard() {
                 {schedulerEnabled && semiManualMode && (
                   <button
                     onClick={handleClearSemiManual}
-                    className="px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-warning-700 dark:text-warning-300 bg-warning-50 dark:bg-warning-900/30 hover:bg-warning-100 dark:hover:bg-warning-900/40 border border-warning-200 dark:border-warning-700/50 hover:border-warning-300 dark:hover:border-warning-600/50 transition-all duration-200 active:scale-95"
+                    className="px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold font-display text-warning-300 bg-warning-900/30 hover:bg-warning-900/50 border border-warning-500/40 hover:border-warning-500/60 transition-all duration-200 active:scale-95 [html:not(.dark)_&]:text-warning-700 [html:not(.dark)_&]:bg-warning-100/80 [html:not(.dark)_&]:hover:bg-warning-200/80 [html:not(.dark)_&]:border-warning-300 [html:not(.dark)_&]:hover:border-warning-400"
                   >
                     ↩️ Torna in Automatico
                   </button>
                 )}
                 <button
                   onClick={() => router.push('/stove/scheduler')}
-                  className="px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-info-700 dark:text-info-300 bg-info-50 dark:bg-info-900/30 hover:bg-info-100 dark:hover:bg-info-900/40 border border-info-200 dark:border-info-700/50 hover:border-info-300 dark:hover:border-info-600/50 transition-all duration-200 active:scale-95"
+                  className="px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold font-display text-ocean-300 bg-ocean-900/30 hover:bg-ocean-900/50 border border-ocean-500/40 hover:border-ocean-500/60 transition-all duration-200 active:scale-95 [html:not(.dark)_&]:text-ocean-700 [html:not(.dark)_&]:bg-ocean-100/80 [html:not(.dark)_&]:hover:bg-ocean-200/80 [html:not(.dark)_&]:border-ocean-300 [html:not(.dark)_&]:hover:border-ocean-400"
                 >
                   Configura Pianificazione
                 </button>
@@ -987,21 +990,21 @@ export default function StoveCard() {
                   {/* Info badge quando in modalità automatica */}
                   {schedulerEnabled && !semiManualMode && (
                     <Banner
-                      liquid
                       variant="info"
                       icon="ℹ️"
                       description="La modifica attiverà la modalità Semi-Manuale"
+                      compact
                     />
                   )}
 
-                  {/* Ventilazione Control - 3 Column Layout */}
-                  <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-gradient-to-br from-white/[0.12] to-white/[0.06] dark:from-white/[0.08] dark:to-white/[0.03] border border-white/30 dark:border-white/20 p-5 sm:p-6">
-                    {/* Header con icona e label */}
+                  {/* Ventilazione Control - Ember Noir */}
+                  <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-5 sm:p-6 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                    {/* Header */}
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-info-100 dark:bg-info-900/40 flex items-center justify-center border-2 border-info-300 dark:border-info-600/50">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-ocean-900/50 flex items-center justify-center border-2 border-ocean-500/50 [html:not(.dark)_&]:bg-ocean-100/80 [html:not(.dark)_&]:border-ocean-300">
                         <span className="text-xl sm:text-2xl">💨</span>
                       </div>
-                      <Heading level={4} size="md" className="text-neutral-800 dark:text-white">Ventilazione</Heading>
+                      <Heading level={4} size="md" className="font-display">Ventilazione</Heading>
                     </div>
 
                     {/* 3 Colonne: [−] [Livello] [+] */}
@@ -1009,7 +1012,7 @@ export default function StoveCard() {
                       {/* Bottone Meno */}
                       <ControlButton
                         type="decrement"
-                        variant="info"
+                        variant="ocean"
                         onClick={() => {
                           if (fanLevel > 1) {
                             const newLevel = fanLevel - 1;
@@ -1021,19 +1024,19 @@ export default function StoveCard() {
 
                       {/* Display Livello Centrale */}
                       <div className="flex flex-col items-center justify-center px-4 sm:px-6">
-                        <Text variant="tertiary" className="text-xs sm:text-sm uppercase tracking-wide mb-1">Livello</Text>
+                        <Text variant="tertiary" className="text-xs sm:text-sm uppercase tracking-wide mb-1 font-display">Livello</Text>
                         <div className="flex items-baseline gap-1">
-                          <span className="text-4xl sm:text-5xl font-black text-info-700 dark:text-info-400 leading-none">
+                          <span className="text-4xl sm:text-5xl font-black font-display text-ocean-400 leading-none [html:not(.dark)_&]:text-ocean-600">
                             {fanLevel ?? '-'}
                           </span>
-                          <span className="text-xl sm:text-2xl font-bold text-neutral-500 dark:text-neutral-400">/6</span>
+                          <span className="text-xl sm:text-2xl font-bold text-slate-500 [html:not(.dark)_&]:text-slate-400">/6</span>
                         </div>
                       </div>
 
                       {/* Bottone Più */}
                       <ControlButton
                         type="increment"
-                        variant="info"
+                        variant="ocean"
                         onClick={() => {
                           if (fanLevel < 6) {
                             const newLevel = fanLevel + 1;
@@ -1045,14 +1048,14 @@ export default function StoveCard() {
                     </div>
                   </div>
 
-                  {/* Potenza Control - 3 Column Layout */}
-                  <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-gradient-to-br from-white/[0.12] to-white/[0.06] dark:from-white/[0.08] dark:to-white/[0.03] border border-white/30 dark:border-white/20 p-5 sm:p-6">
-                    {/* Header con icona e label */}
+                  {/* Potenza Control - Ember Noir */}
+                  <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-5 sm:p-6 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                    {/* Header */}
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-warning-100 dark:bg-warning-900/40 flex items-center justify-center border-2 border-warning-300 dark:border-warning-600/50">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-ember-900/50 flex items-center justify-center border-2 border-ember-500/50 [html:not(.dark)_&]:bg-ember-100/80 [html:not(.dark)_&]:border-ember-300">
                         <span className="text-xl sm:text-2xl">⚡</span>
                       </div>
-                      <Heading level={4} size="md" className="text-neutral-800 dark:text-white">Potenza</Heading>
+                      <Heading level={4} size="md" className="font-display">Potenza</Heading>
                     </div>
 
                     {/* 3 Colonne: [−] [Livello] [+] */}
@@ -1060,7 +1063,7 @@ export default function StoveCard() {
                       {/* Bottone Meno */}
                       <ControlButton
                         type="decrement"
-                        variant="warning"
+                        variant="ember"
                         onClick={() => {
                           if (powerLevel > 1) {
                             const newLevel = powerLevel - 1;
@@ -1072,19 +1075,19 @@ export default function StoveCard() {
 
                       {/* Display Livello Centrale */}
                       <div className="flex flex-col items-center justify-center px-4 sm:px-6">
-                        <Text variant="tertiary" className="text-xs sm:text-sm uppercase tracking-wide mb-1">Livello</Text>
+                        <Text variant="tertiary" className="text-xs sm:text-sm uppercase tracking-wide mb-1 font-display">Livello</Text>
                         <div className="flex items-baseline gap-1">
-                          <span className="text-4xl sm:text-5xl font-black text-warning-700 dark:text-warning-400 leading-none">
+                          <span className="text-4xl sm:text-5xl font-black font-display text-ember-400 leading-none [html:not(.dark)_&]:text-ember-600">
                             {powerLevel ?? '-'}
                           </span>
-                          <span className="text-xl sm:text-2xl font-bold text-neutral-500 dark:text-neutral-400">/5</span>
+                          <span className="text-xl sm:text-2xl font-bold text-slate-500 [html:not(.dark)_&]:text-slate-400">/5</span>
                         </div>
                       </div>
 
                       {/* Bottone Più */}
                       <ControlButton
                         type="increment"
-                        variant="warning"
+                        variant="ember"
                         onClick={() => {
                           if (powerLevel < 5) {
                             const newLevel = powerLevel + 1;

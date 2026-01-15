@@ -254,7 +254,7 @@ export default function ThermostatCard() {
     <DeviceCard
       icon="🌡️"
       title="Termostato"
-      colorTheme="info"
+      colorTheme="ocean"
       connected={connected}
       onConnect={handleAuth}
       connectButtonLabel="Connetti Netatmo"
@@ -279,19 +279,19 @@ export default function ThermostatCard() {
       {/* Selected Room Temperature */}
       {selectedRoom ? (
         <div className="space-y-4 mb-4 sm:mb-6">
-                {/* Main Temperature Display - Enhanced with gradient background */}
-                <div className={`relative rounded-2xl p-6 sm:p-8 shadow-liquid hover:shadow-liquid-lg transition-all duration-500 ${
+                {/* Main Temperature Display - Ember Noir style */}
+                <div className={`relative rounded-2xl p-6 sm:p-8 transition-all duration-500 border ${
                   selectedRoom.heating
-                    ? 'bg-gradient-to-br from-warning-50 to-warning-100 dark:from-warning-900/20 dark:to-warning-800/20'
-                    : 'bg-gradient-to-br from-info-50 to-info-100 dark:from-info-900/20 dark:to-info-800/20'
+                    ? 'bg-gradient-to-br from-ember-900/40 via-slate-900/60 to-flame-900/30 border-ember-500/40 shadow-ember-glow'
+                    : 'bg-gradient-to-br from-ocean-900/30 via-slate-900/60 to-ocean-800/20 border-ocean-500/30'
                 }`}>
                   {/* Heating Badge */}
                   {selectedRoom.heating && (
                     <div className="absolute -top-2 -right-2 z-20">
                       <div className="relative">
-                        <div className="absolute inset-0 bg-warning-500/20 rounded-full blur-lg animate-pulse"></div>
-                        <div className="relative bg-gradient-to-br from-warning-500 to-warning-600 text-white px-3 py-1.5 rounded-full shadow-elevated-lg ring-2 ring-white/40">
-                          <span className="text-xs font-bold">🔥 ATTIVO</span>
+                        <div className="absolute inset-0 bg-ember-500/30 rounded-full blur-lg animate-pulse"></div>
+                        <div className="relative bg-gradient-to-br from-ember-500 to-flame-600 text-white px-3 py-1.5 rounded-full shadow-lg ring-2 ring-slate-900/50">
+                          <span className="text-xs font-bold font-display">🔥 ATTIVO</span>
                         </div>
                       </div>
                     </div>
@@ -300,7 +300,7 @@ export default function ThermostatCard() {
                   {/* Room name (solo se c'è una sola stanza) */}
                   {roomsWithStatus.length === 1 && (
                     <div className="text-center mb-4">
-                      <Heading level={3} size="sm" variant="subtle" className="uppercase tracking-wider">
+                      <Heading level={3} size="sm" variant="subtle" className="uppercase tracking-wider font-display">
                         {selectedRoom.name}
                       </Heading>
                     </div>
@@ -309,32 +309,32 @@ export default function ThermostatCard() {
                   {/* Temperature Display Grid */}
                   <div className="grid grid-cols-2 gap-3 sm:gap-4">
                     {/* Current Temperature Box */}
-                    <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.15] dark:bg-white/[0.08]">
+                    <div className="relative overflow-hidden rounded-2xl bg-slate-800/60 backdrop-blur-xl border border-white/10 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
                       <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
-                        <Text variant="tertiary" className="mb-2 uppercase tracking-wider text-[10px] sm:text-xs font-bold">
+                        <Text variant="tertiary" className="mb-2 uppercase tracking-wider text-[10px] sm:text-xs font-bold font-display">
                           Attuale
                         </Text>
                         <div className="flex items-baseline gap-1">
-                          <span className="text-4xl sm:text-5xl font-black text-neutral-800 dark:text-neutral-100 leading-none">
+                          <span className="text-4xl sm:text-5xl font-black font-display text-slate-100 leading-none [html:not(.dark)_&]:text-slate-900">
                             {selectedRoom.temperature}
                           </span>
-                          <span className="text-2xl sm:text-3xl text-neutral-600 dark:text-neutral-400 font-bold">°</span>
+                          <span className="text-2xl sm:text-3xl text-slate-400 font-bold [html:not(.dark)_&]:text-slate-500">°</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Target Temperature Box */}
                     {selectedRoom.setpoint && (
-                      <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.15] dark:bg-white/[0.08]">
+                      <div className="relative overflow-hidden rounded-2xl bg-ocean-900/40 backdrop-blur-xl border border-ocean-500/30 [html:not(.dark)_&]:bg-ocean-50/80 [html:not(.dark)_&]:border-ocean-200">
                         <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
-                          <Text variant="tertiary" className="mb-2 uppercase tracking-wider text-[10px] sm:text-xs font-bold">
+                          <Text variant="tertiary" className="mb-2 uppercase tracking-wider text-[10px] sm:text-xs font-bold text-ocean-300 font-display [html:not(.dark)_&]:text-ocean-600">
                             Target
                           </Text>
                           <div className="flex items-baseline gap-1">
-                            <span className="text-4xl sm:text-5xl font-black text-info-600 dark:text-info-400 leading-none">
+                            <span className="text-4xl sm:text-5xl font-black font-display text-ocean-300 leading-none [html:not(.dark)_&]:text-ocean-600">
                               {selectedRoom.setpoint}
                             </span>
-                            <span className="text-2xl sm:text-3xl text-info-500 dark:text-info-500 font-bold">°</span>
+                            <span className="text-2xl sm:text-3xl text-ocean-400/70 font-bold [html:not(.dark)_&]:text-ocean-500">°</span>
                           </div>
                         </div>
                       </div>
@@ -342,31 +342,29 @@ export default function ThermostatCard() {
                   </div>
                 </div>
 
-                {/* Quick temperature controls - Enhanced */}
+                {/* Quick temperature controls - Ember Noir */}
                 {selectedRoom.setpoint && (
-                  <div className="relative overflow-hidden rounded-2xl shadow-liquid backdrop-blur-3xl bg-white/[0.08] dark:bg-white/[0.05] border border-white/20 dark:border-white/10 p-4 sm:p-5">
+                  <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-4 sm:p-5 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
                     <div className="flex items-center gap-3">
                       <Button
-                        liquid
-                        variant="outline"
+                        variant="subtle"
                         size="lg"
                         onClick={() => handleTemperatureChange(selectedRoom.id, selectedRoom.setpoint - 0.5)}
                         disabled={refreshing}
-                        className="flex-1 h-16 sm:h-18 text-lg font-bold"
+                        className="flex-1 h-16 sm:h-18 text-lg font-bold font-display"
                       >
                         − 0.5°
                       </Button>
                       <div className="flex flex-col items-center justify-center px-4">
-                        <Text variant="tertiary" className="text-xs uppercase">Target</Text>
-                        <span className="text-2xl sm:text-3xl font-black text-info-600 dark:text-info-400">{selectedRoom.setpoint}°</span>
+                        <Text variant="tertiary" className="text-xs uppercase font-display">Target</Text>
+                        <span className="text-2xl sm:text-3xl font-black font-display text-ocean-400 [html:not(.dark)_&]:text-ocean-600">{selectedRoom.setpoint}°</span>
                       </div>
                       <Button
-                        liquid
-                        variant="outline"
+                        variant="subtle"
                         size="lg"
                         onClick={() => handleTemperatureChange(selectedRoom.id, selectedRoom.setpoint + 0.5)}
                         disabled={refreshing}
-                        className="flex-1 h-16 sm:h-18 text-lg font-bold"
+                        className="flex-1 h-16 sm:h-18 text-lg font-bold font-display"
                       >
                         + 0.5°
                       </Button>
@@ -384,15 +382,15 @@ export default function ThermostatCard() {
             {/* Separator */}
             <Divider label="Modalità" variant="gradient" spacing="large" />
 
-            {/* Mode Control */}
+            {/* Mode Control - Ember Noir */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
               <button
                 onClick={() => handleModeChange('schedule')}
                 disabled={refreshing}
-                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed font-display ${
                   mode === 'schedule'
-                    ? 'bg-success-100 dark:bg-success-900/30 border-success-300 dark:border-success-600 text-success-700 dark:text-success-400'
-                    : 'bg-white/60 dark:bg-white/[0.08] border-white/80 dark:border-white/10 text-neutral-600 dark:text-neutral-300 hover:bg-white/80 dark:hover:bg-white/[0.12] backdrop-blur-sm'
+                    ? 'bg-sage-900/40 border-sage-500/50 text-sage-300 [html:not(.dark)_&]:bg-sage-100/80 [html:not(.dark)_&]:border-sage-300 [html:not(.dark)_&]:text-sage-700'
+                    : 'bg-slate-800/50 border-slate-700/50 text-slate-400 hover:bg-slate-800/70 hover:border-slate-600/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200 [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:hover:bg-slate-100/80'
                 }`}
               >
                 <div className="text-2xl mb-1">⏰</div>
@@ -402,10 +400,10 @@ export default function ThermostatCard() {
               <button
                 onClick={() => handleModeChange('away')}
                 disabled={refreshing}
-                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed font-display ${
                   mode === 'away'
-                    ? 'bg-warning-100 dark:bg-warning-900/30 border-warning-300 dark:border-warning-600 text-warning-700 dark:text-warning-400'
-                    : 'bg-white/60 dark:bg-white/[0.08] border-white/80 dark:border-white/10 text-neutral-600 dark:text-neutral-300 hover:bg-white/80 dark:hover:bg-white/[0.12] backdrop-blur-sm'
+                    ? 'bg-warning-900/40 border-warning-500/50 text-warning-300 [html:not(.dark)_&]:bg-warning-100/80 [html:not(.dark)_&]:border-warning-300 [html:not(.dark)_&]:text-warning-700'
+                    : 'bg-slate-800/50 border-slate-700/50 text-slate-400 hover:bg-slate-800/70 hover:border-slate-600/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200 [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:hover:bg-slate-100/80'
                 }`}
               >
                 <div className="text-2xl mb-1">🏃</div>
@@ -415,10 +413,10 @@ export default function ThermostatCard() {
               <button
                 onClick={() => handleModeChange('hg')}
                 disabled={refreshing}
-                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed font-display ${
                   mode === 'hg'
-                    ? 'bg-info-100 dark:bg-info-900/30 border-info-300 dark:border-info-600 text-info-700 dark:text-info-400'
-                    : 'bg-white/60 dark:bg-white/[0.08] border-white/80 dark:border-white/10 text-neutral-600 dark:text-neutral-300 hover:bg-white/80 dark:hover:bg-white/[0.12] backdrop-blur-sm'
+                    ? 'bg-ocean-900/40 border-ocean-500/50 text-ocean-300 [html:not(.dark)_&]:bg-ocean-100/80 [html:not(.dark)_&]:border-ocean-300 [html:not(.dark)_&]:text-ocean-700'
+                    : 'bg-slate-800/50 border-slate-700/50 text-slate-400 hover:bg-slate-800/70 hover:border-slate-600/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200 [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:hover:bg-slate-100/80'
                 }`}
               >
                 <div className="text-2xl mb-1">❄️</div>
@@ -428,10 +426,10 @@ export default function ThermostatCard() {
               <button
                 onClick={() => handleModeChange('off')}
                 disabled={refreshing}
-                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed font-display ${
                   mode === 'off'
-                    ? 'bg-neutral-200 dark:bg-neutral-700 border-neutral-400 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300'
-                    : 'bg-white/60 dark:bg-white/[0.08] border-white/80 dark:border-white/10 text-neutral-600 dark:text-neutral-300 hover:bg-white/80 dark:hover:bg-white/[0.12] backdrop-blur-sm'
+                    ? 'bg-slate-700/60 border-slate-600/60 text-slate-300 [html:not(.dark)_&]:bg-slate-200/80 [html:not(.dark)_&]:border-slate-300 [html:not(.dark)_&]:text-slate-700'
+                    : 'bg-slate-800/50 border-slate-700/50 text-slate-400 hover:bg-slate-800/70 hover:border-slate-600/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200 [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:hover:bg-slate-100/80'
                 }`}
               >
                 <div className="text-2xl mb-1">⏸️</div>
@@ -439,20 +437,16 @@ export default function ThermostatCard() {
               </button>
             </div>
 
-      {/* Actions - Kept manual to handle calibration banner */}
+      {/* Actions - Ember Noir */}
       <div className="mt-4 sm:mt-6 space-y-3">
         {/* Calibration Success Banner */}
         {calibrationSuccess !== null && (
           <div className={`p-3 rounded-lg border ${
             calibrationSuccess
-              ? 'bg-success-50 dark:bg-success-900/30 border-success-200 dark:border-success-600'
-              : 'bg-error-50 dark:bg-error-900/30 border-error-200 dark:border-error-600'
+              ? 'bg-sage-900/30 border-sage-500/40 text-sage-300 [html:not(.dark)_&]:bg-sage-50/80 [html:not(.dark)_&]:border-sage-300 [html:not(.dark)_&]:text-sage-700'
+              : 'bg-danger-900/30 border-danger-500/40 text-danger-300 [html:not(.dark)_&]:bg-danger-50/80 [html:not(.dark)_&]:border-danger-300 [html:not(.dark)_&]:text-danger-700'
           }`}>
-            <p className={`text-sm font-medium ${
-              calibrationSuccess
-                ? 'text-success-700 dark:text-success-400'
-                : 'text-error-700 dark:text-error-400'
-            }`}>
+            <p className="text-sm font-medium font-display">
               {calibrationSuccess
                 ? '✓ Calibrazione valvole avviata con successo'
                 : '✗ Calibrazione fallita'
@@ -463,8 +457,7 @@ export default function ThermostatCard() {
 
         {/* Calibrate Button */}
         <Button
-          liquid
-          variant="info"
+          variant="ocean"
           onClick={handleCalibrateValves}
           disabled={calibrating}
           className="w-full"
@@ -476,8 +469,7 @@ export default function ThermostatCard() {
 
         {/* Link to full page */}
         <Button
-          liquid
-          variant="outline"
+          variant="subtle"
           onClick={() => router.push('/thermostat')}
           className="w-full"
           size="sm"

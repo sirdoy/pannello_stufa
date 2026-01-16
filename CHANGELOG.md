@@ -5,6 +5,28 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.53.2] - 2026-01-16
+
+### 🔧 Build & Lint Warnings Fix
+
+**Obiettivo**: Eliminare warnings di build CSS e errori ESLint.
+
+#### 🐛 Fixed
+
+**CSS:**
+- Spostato `@import` Google Fonts prima di `@variant dark` in `globals.css` per rispettare CSS spec
+- Eliminato warning CSS optimization: "@import rules must precede all rules aside from @charset and @layer statements"
+
+**ESLint:**
+- Fixato errore `react/no-unescaped-entities` in `/app/debug/transitions/page.js`
+- Sostituite virgolette non escapate con `&quot;` in Text component
+
+#### 📝 Documentation
+
+- Nessuna modifica (warnings tecnici risolti)
+
+---
+
 ## [1.53.1] - 2026-01-16
 
 ### 🔧 Design System Compliance Fixes

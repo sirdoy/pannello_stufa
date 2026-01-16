@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Google Fonts - Load distinctive typography */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 /* ============================================
    EMBER NOIR DESIGN SYSTEM
    A sophisticated dark-first design with warm accents
@@ -7,9 +10,6 @@
 
 /* Dark mode configuration - class strategy */
 @variant dark (.dark &);
-
-/* Google Fonts - Load distinctive typography */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @theme {
   /* ===== EMBER NOIR COLOR PALETTE ===== */

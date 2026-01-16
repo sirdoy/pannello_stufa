@@ -214,7 +214,7 @@ export default function TransitionsDebugPage() {
       <div className="space-y-4">
         <Heading level={2}>Test su Pagine Reali</Heading>
         <Text variant="muted">
-          Clicca su una pagina per vedere la transizione "{selectedType}" in azione
+          Clicca su una pagina per vedere la transizione &quot;{selectedType}&quot; in azione
         </Text>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

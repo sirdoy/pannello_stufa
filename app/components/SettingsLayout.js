@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import Button from './ui/Button';
+import Heading from './ui/Heading';
 
 /**
  * SettingsLayout - Unified layout wrapper for all settings pages
@@ -37,7 +38,7 @@ export default function SettingsLayout({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 [html:not(.dark)_&]:from-slate-900 [html:not(.dark)_&]:via-slate-900 [html:not(.dark)_&]:to-slate-800 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 [html:not(.dark)_&]:from-slate-50 [html:not(.dark)_&]:via-white [html:not(.dark)_&]:to-slate-100 p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header with optional back button */}
         <div className="flex items-center gap-4">
@@ -53,10 +54,10 @@ export default function SettingsLayout({
               ← Indietro
             </Button>
           )}
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 [html:not(.dark)_&]:text-white flex items-center gap-2">
+          <Heading level={1} className="flex items-center gap-2">
             {icon && <span className="text-3xl sm:text-4xl">{icon}</span>}
             {title}
-          </h1>
+          </Heading>
         </div>
 
         {/* Page content */}

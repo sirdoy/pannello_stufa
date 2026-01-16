@@ -5,6 +5,141 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.50.1] - 2026-01-16
+
+### 🐛 Complete Dark Mode Unification
+
+**Obiettivo**: Eliminazione di tutti i problemi di visibilità in dark mode e anti-pattern CSS.
+
+#### 🔧 Bug Fixes
+
+**Triple Override Pattern Elimination:**
+- Eliminati tutti i pattern `text-slate-800 [html:not(.dark)_&]:text-slate-800 text-slate-200` che causavano invisibilità in dark mode
+- Applicato pattern dark-first corretto: `text-slate-200 [html:not(.dark)_&]:text-slate-800`
+
+**Component Fixes:**
+- `SettingsLayout.js` - Background completamente invertito (dark/light scambiati)
+- `Banner.js` - Rimosso mixing di `dark:` prefix con `[html:not(.dark)_&]:`
+- `Button.js` - Aumentata opacity disabled da 50% a 70% per migliore leggibilità con variant subtle
+- `settings/devices/page.js` - Corretti 4 triple override in device cards e badge
+- `maintenance/page.js` - Convertito input raw a componente Input UI
+
+**Banner Component:**
+- Enfatizzato uso prop `description` invece di `children` per stili automatici
+- La prop `description` applica colori variant-specific automaticamente
+
+#### 📚 Documentation Updates
+
+**design-system.md v2.3:**
+- Aggiunta sezione "Anti-Patterns to Avoid" con esempi
+- Documentato divieto triple override
+- Documentato divieto mixing `dark:` e `[html:not(.dark)_&]:`
+- Enfatizzate regole strict uso UI components (no raw HTML)
+- Aggiornata sezione Button con nuova opacity disabled
+- Aggiornata sezione Banner con best practices description prop
+
+#### ✨ Improvements
+
+- UI Components enforcement: NEVER use raw `<h1>-<h6>`, `<p>`, `<input>`
+- className solo per layout/spacing, MAI per colori
+- Tutti i colori gestiti via variant props
+- Pattern dark-first unificato in tutto il progetto
+
+---
+
+## [1.50.0] - 2026-01-16
+
+### 🎨 Ember Noir UI Components Migration (Phase 1)
+
+**Obiettivo**: Conversione sistematica da elementi HTML a componenti UI base (`Heading` e `Text`) seguendo il design system Ember Noir.
+
+#### ✨ Pagine Convertite
+
+**Debug Pages:**
+- `app/debug/page.js` - Debug API principale con real-time monitoring
+- `app/debug/stove/page.js` - Console debug avanzata con GET/POST endpoints
+
+**Settings Pages:**
+- `app/settings/notifications/page.js` - Gestione notifiche push FCM
+
+#### 🧩 Componenti Convertiti
+
+**Core Components:**
+- `ForceUpdateModal.js` - Modal bloccante aggiornamento versione
+- `SettingsLayout.js` - Layout unificato pagine settings
+
+#### 📚 Documentazione e Automation
+
+**Conversion Guide:**
+- `scripts/convert-ui-components.md` - Guida completa conversione
+  - Regole conversione per Heading (h1-h6)
+  - Regole conversione per Text (p, span)
+  - Mapping colori → variants
+  - Common patterns e best practices
+  - Checklist conversione
+  - Lista file rimanenti (150+) con priorità
+
+**Automation Script:**
+- `scripts/auto-convert-ui.js` - Script conversione automatica batch
+  - Auto-detect conversion needs
+  - Auto-add imports
+  - Conversione heading automatica
+  - Conversione text automatica
+  - Backup automatico pre-conversione
+  - Supporto file singoli e glob patterns
+
+#### 📊 Conversion Status
+
+- ✅ **Convertiti**: 8 file (5 pages + 3 components)
+- ⏳ **Rimanenti**: ~150 file
+- 🎯 **Priorità alta**: Homepage, device cards, scheduler, navbar
+
+#### 🔄 Pattern Conversione
+
+**Before:**
+```javascript
+<h1 className="text-3xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900">
+  Titolo
+</h1>
+<p className="text-slate-400 [html:not(.dark)_&]:text-slate-600">
+  Descrizione
+</p>
+```
+
+**After:**
+```javascript
+<Heading level={1} size="3xl" weight="bold">
+  Titolo
+</Heading>
+<Text variant="secondary">
+  Descrizione
+</Text>
+```
+
+#### 🎯 Next Steps
+
+**High Priority Files (da convertire next):**
+1. `app/page.js` - Homepage (most visible)
+2. `app/components/Navbar.js` - Navigation
+3. `app/components/devices/stove/StoveCard.js` - Card stufa principale
+4. Scheduler components (5 file)
+5. Device cards (thermostat, lights)
+
+**Usage automation script:**
+```bash
+node scripts/auto-convert-ui.js app/page.js
+node scripts/auto-convert-ui.js app/components/Navbar.js
+```
+
+#### ⚠️ Important Notes
+
+- **Manual review sempre richiesta** dopo conversione automatica
+- Layout classes (spacing, flex, grid) sempre mantenute in className
+- Color classes rimosse in favore di variant props
+- Dark mode gestito internamente dai componenti
+
+---
+
 ## [1.49.1] - 2026-01-15
 
 ### 🐛 Fix Status Icon Glow

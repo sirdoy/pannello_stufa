@@ -158,7 +158,7 @@ export default function Button({
 
   // Disabled state
   const disabledStyles = `
-    opacity-50
+    opacity-70
     cursor-not-allowed
     pointer-events-none
     hover:transform-none

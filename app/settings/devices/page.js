@@ -16,6 +16,8 @@ import Button from '@/app/components/ui/Button';
 import Banner from '@/app/components/ui/Banner';
 import Toggle from '@/app/components/ui/Toggle';
 import Skeleton from '@/app/components/ui/Skeleton';
+import Heading from '@/app/components/ui/Heading';
+import Text from '@/app/components/ui/Text';
 
 export default function DevicesSettingsPage() {
   const { user, isLoading: userLoading } = useUser();
@@ -130,9 +132,9 @@ export default function DevicesSettingsPage() {
   return (
     <SettingsLayout title="Gestione Dispositivi" icon="📱">
       {/* Description */}
-      <p className="text-sm sm:text-base text-slate-400 [html:not(.dark)_&]:text-slate-600">
+      <Text variant="tertiary" className="text-sm sm:text-base">
         Abilita o disabilita i dispositivi da visualizzare in homepage e nel menu
-      </p>
+      </Text>
 
       {/* Success message */}
       {saveSuccess && (
@@ -142,15 +144,16 @@ export default function DevicesSettingsPage() {
       )}
 
       {/* Info banner */}
-      <Banner variant="info">
-        I dispositivi disabilitati non verranno mostrati nella homepage e non appariranno nel menu di navigazione. Puoi abilitarli in qualsiasi momento da questa pagina.
-      </Banner>
+      <Banner
+        variant="info"
+        description="I dispositivi disabilitati non verranno mostrati nella homepage e non appariranno nel menu di navigazione. Puoi abilitarli in qualsiasi momento da questa pagina."
+      />
 
       {/* Devices list */}
       <Card liquid className="p-6">
-        <h2 className="text-lg font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-900 mb-4">
+        <Heading level={2} size="lg" weight="semibold" className="mb-4">
           Dispositivi Disponibili
-        </h2>
+        </Heading>
 
         <div className="space-y-4">
           {devices.map(device => {
@@ -161,27 +164,27 @@ export default function DevicesSettingsPage() {
                 key={device.id}
                 className={`p-4 rounded-xl border-2 transition-all duration-200 ${
                   isEnabled
-                    ? 'border-ember-200 [html:not(.dark)_&]:border-ember-200 border-ember-800 bg-ember-50/50 [html:not(.dark)_&]:bg-ember-50/50 bg-ember-900/20'
-                    : 'border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 bg-slate-50/50 [html:not(.dark)_&]:bg-slate-50/50 bg-slate-800/50'
+                    ? 'border-ember-600 [html:not(.dark)_&]:border-ember-400 bg-ember-950/30 [html:not(.dark)_&]:bg-ember-50/50'
+                    : 'border-slate-600 [html:not(.dark)_&]:border-slate-300 bg-white/[0.02] [html:not(.dark)_&]:bg-slate-50/50'
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">
                   {/* Device info */}
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-2xl">{device.icon}</span>
-                      <h3 className="text-base font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-900">
+                      <Text className="text-2xl">{device.icon}</Text>
+                      <Heading level={3} size="base" weight="semibold">
                         {device.name}
-                      </h3>
+                      </Heading>
                       {isEnabled && (
-                        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-sage-100 [html:not(.dark)_&]:bg-sage-100 bg-sage-900/30 text-sage-300 [html:not(.dark)_&]:text-sage-700">
+                        <Text as="span" variant="sage" size="xs" weight="medium" className="px-2 py-0.5 rounded-full bg-sage-900/30 [html:not(.dark)_&]:bg-sage-100">
                           Attivo
-                        </span>
+                        </Text>
                       )}
                     </div>
-                    <p className="text-sm text-slate-400 [html:not(.dark)_&]:text-slate-600 ml-11">
+                    <Text variant="secondary" size="sm" className="ml-11">
                       {device.description}
-                    </p>
+                    </Text>
                   </div>
 
                   {/* Toggle component */}
@@ -203,12 +206,12 @@ export default function DevicesSettingsPage() {
         <Card liquid className="p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
             <div className="flex-1">
-              <p className="text-sm font-medium text-slate-100 [html:not(.dark)_&]:text-slate-900">
+              <Text size="sm" weight="medium">
                 Hai modifiche non salvate
-              </p>
-              <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 mt-1">
+              </Text>
+              <Text variant="tertiary" size="xs" className="mt-1">
                 Salva le modifiche per applicarle alla navigazione
-              </p>
+              </Text>
             </div>
 
             <div className="flex gap-3 flex-shrink-0">
@@ -235,22 +238,22 @@ export default function DevicesSettingsPage() {
       )}
 
       {/* Info card */}
-      <Card liquid className="p-6 bg-ocean-50/50 [html:not(.dark)_&]:bg-ocean-50/50 bg-ocean-900/10">
-        <h3 className="text-base font-semibold text-ocean-300 [html:not(.dark)_&]:text-ocean-900 mb-3">
+      <Card liquid className="p-6 bg-ocean-900/10 [html:not(.dark)_&]:bg-ocean-50/50">
+        <Heading level={3} size="base" weight="semibold" variant="ocean" className="mb-3">
           ℹ️ Note
-        </h3>
-        <ul className="space-y-2 text-sm text-ocean-400 [html:not(.dark)_&]:text-ocean-700">
+        </Heading>
+        <ul className="space-y-2">
           <li className="flex gap-2">
-            <span className="text-ember-400 [html:not(.dark)_&]:text-ember-500 flex-shrink-0">•</span>
-            <span>I dispositivi disabilitati non verranno eliminati, potrai riattivarli quando vuoi</span>
+            <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
+            <Text as="span" variant="ocean" size="sm">I dispositivi disabilitati non verranno eliminati, potrai riattivarli quando vuoi</Text>
           </li>
           <li className="flex gap-2">
-            <span className="text-ember-400 [html:not(.dark)_&]:text-ember-500 flex-shrink-0">•</span>
-            <span>Le modifiche saranno visibili immediatamente dopo il salvataggio</span>
+            <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
+            <Text as="span" variant="ocean" size="sm">Le modifiche saranno visibili immediatamente dopo il salvataggio</Text>
           </li>
           <li className="flex gap-2">
-            <span className="text-ember-400 [html:not(.dark)_&]:text-ember-500 flex-shrink-0">•</span>
-            <span>La configurazione è personale e non influisce sugli altri utenti</span>
+            <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
+            <Text as="span" variant="ocean" size="sm">La configurazione è personale e non influisce sugli altri utenti</Text>
           </li>
         </ul>
       </Card>

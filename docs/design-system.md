@@ -332,33 +332,54 @@ Optimized for dark backgrounds.
 
 // States
 <Button loading>Loading...</Button>
-<Button disabled>Disabled</Button>
+<Button disabled>Disabled</Button>  // opacity-70 for better visibility
 ```
+
+**Disabled State:**
+- Opacity reduced to `70%` (not 50%) for better readability with subtle variants
+- Cursor changes to `not-allowed`
+- All hover effects disabled
+- Works well with all variants including `subtle`
 
 ### Banner
 
 ```jsx
-// Info banner
-<Banner variant="info" title="Note" description="..." />
+// Info banner - ALWAYS use description prop for styled text
+<Banner
+  variant="info"
+  title="Note"
+  description="Styled message with proper dark mode colors"
+/>
 
 // Warning banner
-<Banner variant="warning" title="Attention" description="..." />
+<Banner
+  variant="warning"
+  title="Attention"
+  description="Important warning message"
+/>
 
 // Error banner
-<Banner variant="error" title="Error" description="..." />
+<Banner variant="error" description="Error message without title" />
 
 // Success banner
-<Banner variant="success" title="Success" description="..." />
+<Banner variant="success">
+  Unstyled children text (not recommended)
+</Banner>
 
 // Ember highlight banner
 <Banner variant="ember" title="Highlighted" description="..." />
 
-// Dismissible
-<Banner dismissible dismissKey="unique-key" />
+// Dismissible with persistent storage
+<Banner dismissible dismissKey="unique-key" description="..." />
 
-// Compact
-<Banner compact />
+// Compact layout
+<Banner compact variant="info" description="..." />
 ```
+
+**Important:**
+- **Always use `description` prop** - applies proper dark/light mode colors automatically
+- Using `children` directly will NOT apply variant-specific text colors
+- `description` prop is styled with `text-{variant}-300` (dark) and `text-{variant}-700` (light)
 
 ### StatusBadge
 
@@ -456,6 +477,30 @@ Ember Noir is **dark-first** but fully supports light mode.
 [html:not(.dark)_&]:text-slate-900
 ```
 
+### ⚠️ Anti-Patterns to Avoid
+
+**Never use triple overrides** - they cause dark mode visibility issues:
+
+```jsx
+// ❌ WRONG - Triple override (property declared 3 times)
+className="text-slate-800 [html:not(.dark)_&]:text-slate-800 text-slate-200"
+className="bg-slate-100 [html:not(.dark)_&]:bg-slate-100 bg-slate-900"
+
+// ✅ CORRECT - Dark-first single declaration
+className="text-slate-200 [html:not(.dark)_&]:text-slate-800"
+className="bg-slate-900 [html:not(.dark)_&]:bg-slate-100"
+```
+
+**Never mix `dark:` prefix with `[html:not(.dark)_&]:`** - use only one pattern:
+
+```jsx
+// ❌ WRONG - Mixing patterns causes confusion
+className="bg-ocean-500/[0.12] dark:bg-ocean-500/[0.15] [html:not(.dark)_&]:bg-ocean-500/[0.08]"
+
+// ✅ CORRECT - Single pattern (dark-first)
+className="bg-ocean-500/[0.15] [html:not(.dark)_&]:bg-ocean-500/[0.08]"
+```
+
 ### Key Differences
 
 | Property | Dark Mode | Light Mode |
@@ -533,19 +578,33 @@ Ember Noir is **dark-first** but fully supports light mode.
 
 #### Usage Rules
 
+**CRITICAL: Always use UI components instead of raw HTML elements.**
+
 ```jsx
-// ✅ Correct - use props for styling
-<Heading variant="subtle">Room Name</Heading>
+// ✅ CORRECT - UI components with variant props
+<Heading level={1} variant="subtle">Page Title</Heading>
 <Text variant="tertiary" size="xs">Description</Text>
 <Text variant="ember" weight="semibold">Highlighted</Text>
+<Input label="Name" variant="ember" />
 
-// ❌ Wrong - external color classes
+// ❌ WRONG - Raw HTML elements
+<h1 className="text-slate-400">Page Title</h1>
+<p className="text-slate-500 text-xs">Description</p>
+<input className="bg-slate-800 text-slate-100" />
+
+// ❌ WRONG - External color classes on UI components
 <Heading className="text-slate-400">Room Name</Heading>
 <Text className="text-slate-500 text-xs font-semibold">Text</Text>
 
-// ✅ className only for layout/spacing
+// ✅ CORRECT - className only for layout/spacing
 <Text variant="body" className="mt-4 truncate">With spacing</Text>
+<Heading level={2} className="mb-6">With spacing</Heading>
 ```
+
+**Rules:**
+1. **NEVER use raw `<h1>`-`<h6>`, `<p>`, `<span>`, `<input>`** → Always use `Heading`, `Text`, `Input` components
+2. **NEVER add color classes to UI components** → Use `variant` prop
+3. **className is ONLY for layout** → spacing, sizing, positioning, flex/grid properties
 
 ### Status-Based Dynamic Styling
 
@@ -765,4 +824,4 @@ var(--ease-out-expo)
 
 ---
 
-**Last Updated**: 2026-01 (Ember Noir v2.2 - Props-Based Component Styling)
+**Last Updated**: 2026-01 (Ember Noir v2.3 - Complete Dark Mode Unification)

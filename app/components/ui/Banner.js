@@ -68,59 +68,48 @@ export default function Banner({
   const variantStyles = {
     info: {
       container: `
-        bg-ocean-500/[0.12] dark:bg-ocean-500/[0.15]
-        border border-ocean-400/20 dark:border-ocean-500/25
-        [html:not(.dark)_&]:bg-ocean-500/[0.08]
-        [html:not(.dark)_&]:border-ocean-400/25
+        bg-ocean-500/[0.15] [html:not(.dark)_&]:bg-ocean-500/[0.08]
+        border border-ocean-500/25 [html:not(.dark)_&]:border-ocean-400/25
       `,
-      title: 'text-ocean-200 dark:text-ocean-200 [html:not(.dark)_&]:text-ocean-800',
-      description: 'text-ocean-300 dark:text-ocean-300 [html:not(.dark)_&]:text-ocean-700',
+      title: 'text-ocean-200 [html:not(.dark)_&]:text-ocean-800',
+      description: 'text-ocean-300 [html:not(.dark)_&]:text-ocean-700',
       defaultIcon: 'ℹ️',
     },
     warning: {
       container: `
-        bg-warning-500/[0.12] dark:bg-warning-500/[0.15]
-        border border-warning-400/20 dark:border-warning-500/25
-        [html:not(.dark)_&]:bg-warning-500/[0.08]
-        [html:not(.dark)_&]:border-warning-400/25
+        bg-warning-500/[0.15] [html:not(.dark)_&]:bg-warning-500/[0.08]
+        border border-warning-500/25 [html:not(.dark)_&]:border-warning-400/25
       `,
-      title: 'text-warning-200 dark:text-warning-200 [html:not(.dark)_&]:text-warning-800',
-      description: 'text-warning-300 dark:text-warning-300 [html:not(.dark)_&]:text-warning-700',
+      title: 'text-warning-200 [html:not(.dark)_&]:text-warning-800',
+      description: 'text-warning-300 [html:not(.dark)_&]:text-warning-700',
       defaultIcon: '⚠️',
     },
     error: {
       container: `
-        bg-danger-500/[0.12] dark:bg-danger-500/[0.15]
-        border border-danger-400/20 dark:border-danger-500/25
-        [html:not(.dark)_&]:bg-danger-500/[0.08]
-        [html:not(.dark)_&]:border-danger-400/25
+        bg-danger-500/[0.15] [html:not(.dark)_&]:bg-danger-500/[0.08]
+        border border-danger-500/25 [html:not(.dark)_&]:border-danger-400/25
       `,
-      title: 'text-danger-200 dark:text-danger-200 [html:not(.dark)_&]:text-danger-800',
-      description: 'text-danger-300 dark:text-danger-300 [html:not(.dark)_&]:text-danger-700',
+      title: 'text-danger-200 [html:not(.dark)_&]:text-danger-800',
+      description: 'text-danger-300 [html:not(.dark)_&]:text-danger-700',
       defaultIcon: '❌',
     },
     success: {
       container: `
-        bg-sage-500/[0.12] dark:bg-sage-500/[0.15]
-        border border-sage-400/20 dark:border-sage-500/25
-        [html:not(.dark)_&]:bg-sage-500/[0.08]
-        [html:not(.dark)_&]:border-sage-400/25
+        bg-sage-500/[0.15] [html:not(.dark)_&]:bg-sage-500/[0.08]
+        border border-sage-500/25 [html:not(.dark)_&]:border-sage-400/25
       `,
-      title: 'text-sage-200 dark:text-sage-200 [html:not(.dark)_&]:text-sage-800',
-      description: 'text-sage-300 dark:text-sage-300 [html:not(.dark)_&]:text-sage-700',
+      title: 'text-sage-200 [html:not(.dark)_&]:text-sage-800',
+      description: 'text-sage-300 [html:not(.dark)_&]:text-sage-700',
       defaultIcon: '✅',
     },
     ember: {
       container: `
-        bg-ember-500/[0.12] dark:bg-ember-500/[0.15]
-        border border-ember-400/20 dark:border-ember-500/25
-        shadow-ember-glow-sm
-        [html:not(.dark)_&]:bg-ember-500/[0.08]
-        [html:not(.dark)_&]:border-ember-400/25
-        [html:not(.dark)_&]:shadow-none
+        bg-ember-500/[0.15] [html:not(.dark)_&]:bg-ember-500/[0.08]
+        border border-ember-500/25 [html:not(.dark)_&]:border-ember-400/25
+        shadow-ember-glow-sm [html:not(.dark)_&]:shadow-none
       `,
-      title: 'text-ember-200 dark:text-ember-200 [html:not(.dark)_&]:text-ember-800',
-      description: 'text-ember-300 dark:text-ember-300 [html:not(.dark)_&]:text-ember-700',
+      title: 'text-ember-200 [html:not(.dark)_&]:text-ember-800',
+      description: 'text-ember-300 [html:not(.dark)_&]:text-ember-700',
       defaultIcon: '🔥',
     },
   };

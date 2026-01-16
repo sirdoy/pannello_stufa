@@ -5,6 +5,45 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.52.0] - 2026-01-16
+
+### ✨ Settings Menu Hierarchy & Debug Submenu
+
+**Obiettivo**: Organizzare meglio il menu Impostazioni con supporto per submenu gerarchici e raggruppare tutte le pagine di debug in un'unica sezione.
+
+#### 🎯 Features
+
+**Submenu Support:**
+- Aggiunto supporto per submenu gerarchici in `SETTINGS_MENU`
+- Le voci possono ora contenere un array `submenu` con sottovoci
+- Rendering diversificato per desktop (dropdown) e mobile (accordion)
+
+**Debug Submenu:**
+- Creata nuova sezione "Debug" 🐛 nel menu Impostazioni
+- Sottovoci raggruppate:
+  - Debug Stufa 🔥 (`/debug`) - Console debug API Thermorossi
+  - Debug Transizioni ✨ (`/debug/transitions`) - Test transizioni cinematografiche
+
+**UI Enhancements:**
+- Desktop: Header submenu non cliccabile + voci indentate nel dropdown
+- Mobile: Separatore visivo + voci indentate nell'accordion
+- Active route detection migliorato per supportare submenu nested
+
+#### 📁 Files Modified
+
+- `lib/devices/deviceTypes.js` - Struttura SETTINGS_MENU con submenu
+- `lib/devices/deviceRegistry.js` - getSettingsMenuItems() con supporto submenu
+- `app/components/Navbar.js` - Rendering gerarchico desktop + mobile
+- `docs/architecture.md` - Documentazione aggiornata
+
+#### 🎨 UX Improvements
+
+- Organizzazione più pulita del menu Impostazioni
+- Tutte le pagine debug ora facilmente accessibili in un'unica posizione
+- Struttura scalabile per futuri submenu
+
+---
+
 ## [1.51.0] - 2026-01-16
 
 ### ✨ Cinematographic Page Transitions

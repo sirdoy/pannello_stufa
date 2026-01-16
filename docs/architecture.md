@@ -390,9 +390,19 @@ Menu dropdown in navbar per navigazione rapida tra device.
 Menu dropdown impostazioni in navbar.
 
 **Voci**:
+- Gestione Dispositivi (`/settings/devices`)
 - Gestione Notifiche (`/settings/notifications`)
+- Tema (`/settings/theme`)
 - Storico (`/log`)
 - Changelog (`/changelog`)
+- **Debug** (submenu):
+  - Debug Stufa (`/debug`)
+  - Debug Transizioni (`/debug/transitions`)
+
+**Struttura Gerarchica**:
+Il menu supporta submenu gerarchici. Le voci con `submenu` vengono renderizzate come:
+- **Desktop**: Header non cliccabile + voci indentate nel dropdown
+- **Mobile**: Header separatore + voci indentate nell'accordion
 
 **Configurazione**: `SETTINGS_MENU` in `lib/devices/deviceTypes.js`
 

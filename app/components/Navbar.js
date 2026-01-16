@@ -292,7 +292,14 @@ export default function Navbar() {
                     onClick={() => setSettingsDropdownOpen(!settingsDropdownOpen)}
                     className={`
                       ${navItemBase}
-                      ${settingsDropdownOpen || navStructure.settings.some(item => isActive(item.route)) ? navItemActive : navItemInactive}
+                      ${settingsDropdownOpen || navStructure.settings.some(item => {
+                        // Check main route or submenu routes
+                        if (item.route && isActive(item.route)) return true;
+                        if (item.submenu) {
+                          return item.submenu.some(subitem => isActive(subitem.route));
+                        }
+                        return false;
+                      }) ? navItemActive : navItemInactive}
                     `.trim().replace(/\s+/g, ' ')}
                     aria-expanded={settingsDropdownOpen}
                   >
@@ -310,23 +317,57 @@ export default function Navbar() {
                       h-0.5 rounded-full
                       bg-gradient-to-r from-ember-500 to-flame-500
                       transition-all duration-300
-                      ${settingsDropdownOpen || navStructure.settings.some(item => isActive(item.route)) ? 'w-3/4 opacity-100' : 'w-0 opacity-0 group-hover:w-1/2 group-hover:opacity-50'}
+                      ${settingsDropdownOpen || navStructure.settings.some(item => {
+                        if (item.route && isActive(item.route)) return true;
+                        if (item.submenu) {
+                          return item.submenu.some(subitem => isActive(subitem.route));
+                        }
+                        return false;
+                      }) ? 'w-3/4 opacity-100' : 'w-0 opacity-0 group-hover:w-1/2 group-hover:opacity-50'}
                     `} />
                   </button>
 
                   {settingsDropdownOpen && (
                     <DropdownContainer className="w-80" align="right">
-                      {navStructure.settings.map((item, idx) => (
-                        <DropdownItem
-                          key={item.id}
-                          href={item.route}
-                          icon={item.icon}
-                          label={item.label}
-                          description={item.description}
-                          isActive={isActive(item.route)}
-                          animationDelay={idx * 40}
-                        />
-                      ))}
+                      {navStructure.settings.map((item, idx) => {
+                        // Se l'item ha un submenu, renderizzo la struttura gerarchica
+                        if (item.submenu && item.submenu.length > 0) {
+                          return (
+                            <div key={item.id} className="space-y-1">
+                              {/* Header del submenu (non cliccabile) */}
+                              <div className="px-4 py-2 text-sm font-semibold text-slate-400 [html:not(.dark)_&]:text-slate-600 flex items-center gap-2">
+                                <span>{item.icon}</span>
+                                <span>{item.label}</span>
+                              </div>
+                              {/* Voci del submenu */}
+                              {item.submenu.map((subitem, subIdx) => (
+                                <DropdownItem
+                                  key={subitem.id}
+                                  href={subitem.route}
+                                  icon={subitem.icon}
+                                  label={subitem.label}
+                                  description={subitem.description}
+                                  isActive={isActive(subitem.route)}
+                                  animationDelay={(idx + subIdx) * 40}
+                                  className="ml-4"
+                                />
+                              ))}
+                            </div>
+                          );
+                        }
+                        // Altrimenti renderizzo normalmente
+                        return (
+                          <DropdownItem
+                            key={item.id}
+                            href={item.route}
+                            icon={item.icon}
+                            label={item.label}
+                            description={item.description}
+                            isActive={isActive(item.route)}
+                            animationDelay={idx * 40}
+                          />
+                        );
+                      })}
                     </DropdownContainer>
                   )}
                 </div>
@@ -468,16 +509,43 @@ export default function Navbar() {
                   title="Impostazioni"
                   hasBorder={true}
                 >
-                  {navStructure.settings.map((item, idx) => (
-                    <MenuItem
-                      key={item.route}
-                      href={item.route}
-                      icon={item.icon}
-                      label={item.label}
-                      isActive={isActive(item.route)}
-                      animationDelay={idx * 50}
-                    />
-                  ))}
+                  {navStructure.settings.map((item, idx) => {
+                    // Se l'item ha un submenu, renderizzo la struttura gerarchica
+                    if (item.submenu && item.submenu.length > 0) {
+                      return (
+                        <div key={item.id} className="space-y-1">
+                          {/* Header del submenu (non cliccabile) */}
+                          <div className="px-3 py-2 text-sm font-semibold text-slate-400 [html:not(.dark)_&]:text-slate-600 flex items-center gap-2">
+                            <span className="text-base">{item.icon}</span>
+                            <span>{item.label}</span>
+                          </div>
+                          {/* Voci del submenu */}
+                          {item.submenu.map((subitem, subIdx) => (
+                            <MenuItem
+                              key={subitem.id}
+                              href={subitem.route}
+                              icon={subitem.icon}
+                              label={subitem.label}
+                              isActive={isActive(subitem.route)}
+                              animationDelay={(idx + subIdx) * 50}
+                              className="ml-4"
+                            />
+                          ))}
+                        </div>
+                      );
+                    }
+                    // Altrimenti renderizzo normalmente
+                    return (
+                      <MenuItem
+                        key={item.route}
+                        href={item.route}
+                        icon={item.icon}
+                        label={item.label}
+                        isActive={isActive(item.route)}
+                        animationDelay={idx * 50}
+                      />
+                    );
+                  })}
                 </MenuSection>
               )}
 

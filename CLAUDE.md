@@ -270,6 +270,6 @@ ADMIN_USER_ID=auth0|xxx
 
 ---
 
-**Version**: 1.51.0
+**Version**: 1.52.0
 **Last Updated**: 2026-01-16
 **Author**: Federico Manfredi

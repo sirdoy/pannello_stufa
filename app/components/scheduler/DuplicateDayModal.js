@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Button from '../ui/Button';
 import ActionButton from '../ui/ActionButton';
+import Heading from '../ui/Heading';
+import Text from '../ui/Text';
 import { X } from 'lucide-react';
 
 const daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
@@ -73,9 +75,9 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
       <div className="relative w-full max-w-md bg-white/90 [html:not(.dark)_&]:bg-slate-900/90 backdrop-blur-xl rounded-3xl border border-white/20 [html:not(.dark)_&]:border-white/10 shadow-2xl p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-slate-900 [html:not(.dark)_&]:text-white">
+          <Heading level={2} size="xl" weight="semibold">
             Duplica {sourceDay}
-          </h2>
+          </Heading>
           <ActionButton
             icon={<X />}
             variant="close"
@@ -86,9 +88,9 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
         </div>
 
         {/* Description */}
-        <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mb-4">
+        <Text variant="secondary" size="sm" className="mb-4">
           Seleziona i giorni su cui duplicare la pianificazione di {sourceDay}
-        </p>
+        </Text>
 
         {/* Quick Actions */}
         <div className="flex gap-2 mb-4">
@@ -134,11 +136,11 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
                 onChange={() => toggleDay(day)}
                 className="w-5 h-5 rounded border-slate-300 [html:not(.dark)_&]:border-white/20 text-ocean-500 focus:ring-2 focus:ring-ocean-500"
               />
-              <span className="text-slate-900 [html:not(.dark)_&]:text-white font-medium">
+              <Text as="span" weight="medium">
                 {day}
-              </span>
+              </Text>
               {selectedDays.includes(day) && (
-                <span className="ml-auto text-ocean-500 [html:not(.dark)_&]:text-ocean-400">✓</span>
+                <Text as="span" variant="ocean" className="ml-auto">✓</Text>
               )}
             </label>
           ))}

@@ -807,13 +807,13 @@ export default function StoveCard() {
                     <div className="relative">
                       {/* Status Label */}
                       <div className="text-center mb-8 sm:mb-10">
-                        <h3 className={`text-2xl sm:text-3xl font-black font-display ${statusInfo.textColor} tracking-tight uppercase`}>
+                        <Heading level={3} size="3xl" weight="black" className={`${statusInfo.textColor} tracking-tight uppercase font-display`}>
                           {statusInfo.label}
-                        </h3>
+                        </Heading>
                         {statusInfo.label.toUpperCase() !== status.toUpperCase() && (
-                          <p className="text-xs text-slate-500 mt-1.5 font-mono opacity-60 tracking-wide">
+                          <Text size="xs" className="text-slate-500 mt-1.5 font-mono opacity-60 tracking-wide">
                             {status}
-                          </p>
+                          </Text>
                         )}
                       </div>
 
@@ -839,14 +839,14 @@ export default function StoveCard() {
                               <div className="flex items-center gap-1.5 mb-1.5">
                                 <span className="text-xl sm:text-2xl">💨</span>
                               </div>
-                              <p className={`text-[10px] sm:text-xs font-bold font-display ${statusInfo.boxLabelColor} uppercase tracking-wider mb-1`}>
+                              <Text weight="bold" className={`text-[10px] sm:text-xs font-display ${statusInfo.boxLabelColor} uppercase tracking-wider mb-1`}>
                                 Ventola
-                              </p>
+                              </Text>
                               <div className="flex items-baseline gap-0.5">
-                                <p className={`text-2xl sm:text-3xl font-black font-display ${statusInfo.boxValueColor} leading-none`}>
+                                <Text weight="black" className={`text-2xl sm:text-3xl font-display ${statusInfo.boxValueColor} leading-none`}>
                                   {fanLevel ?? '-'}
-                                </p>
-                                <span className={`text-sm sm:text-base ${statusInfo.boxSuffixColor} font-semibold`}>/6</span>
+                                </Text>
+                                <Text as="span" weight="semibold" className={`text-sm sm:text-base ${statusInfo.boxSuffixColor}`}>/6</Text>
                               </div>
                             </div>
                           </div>
@@ -857,14 +857,14 @@ export default function StoveCard() {
                               <div className="flex items-center gap-1.5 mb-1.5">
                                 <span className="text-xl sm:text-2xl">⚡</span>
                               </div>
-                              <p className={`text-[10px] sm:text-xs font-bold font-display ${statusInfo.boxLabelColor} uppercase tracking-wider mb-1`}>
+                              <Text weight="bold" className={`text-[10px] sm:text-xs font-display ${statusInfo.boxLabelColor} uppercase tracking-wider mb-1`}>
                                 Potenza
-                              </p>
+                              </Text>
                               <div className="flex items-baseline gap-0.5">
-                                <p className={`text-2xl sm:text-3xl font-black font-display ${statusInfo.boxValueColor} leading-none`}>
+                                <Text weight="black" className={`text-2xl sm:text-3xl font-display ${statusInfo.boxValueColor} leading-none`}>
                                   {powerLevel ?? '-'}
-                                </p>
-                                <span className={`text-sm sm:text-base ${statusInfo.boxSuffixColor} font-semibold`}>/5</span>
+                                </Text>
+                                <Text as="span" weight="semibold" className={`text-sm sm:text-base ${statusInfo.boxSuffixColor}`}>/5</Text>
                               </div>
                             </div>
                           </div>
@@ -914,14 +914,14 @@ export default function StoveCard() {
                   </span>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className={`text-base sm:text-lg font-bold font-display ${
+                  <Text weight="bold" className={`text-base sm:text-lg font-display ${
                     schedulerEnabled && semiManualMode ? 'text-warning-400 [html:not(.dark)_&]:text-warning-600' :
                     schedulerEnabled ? 'text-sage-400 [html:not(.dark)_&]:text-sage-600' :
                     'text-ember-400 [html:not(.dark)_&]:text-ember-600'
                   }`}>
                     {schedulerEnabled && semiManualMode ? 'Semi-manuale' : schedulerEnabled ? 'Automatica' : 'Manuale'}
-                  </p>
-                  <p className="text-xs sm:text-sm text-slate-400 [html:not(.dark)_&]:text-slate-500 mt-1 break-words">
+                  </Text>
+                  <Text variant="tertiary" size="sm" className="mt-1 break-words">
                     {schedulerEnabled && semiManualMode && returnToAutoAt ? (
                       (() => {
                         const date = new Date(returnToAutoAt);
@@ -931,20 +931,20 @@ export default function StoveCard() {
                       })()
                     ) : schedulerEnabled && nextScheduledAction ? (
                       <>
-                        <span className={`font-semibold ${nextScheduledAction.action === 'ignite' ? 'text-ember-400 [html:not(.dark)_&]:text-ember-600' : 'text-slate-300 [html:not(.dark)_&]:text-slate-600'}`}>
+                        <Text as="span" weight="semibold" className={nextScheduledAction.action === 'ignite' ? 'text-ember-400 [html:not(.dark)_&]:text-ember-600' : 'text-slate-300 [html:not(.dark)_&]:text-slate-600'}>
                           {nextScheduledAction.action === 'ignite' ? '🔥 Accensione' : '❄️ Spegnimento'}
-                        </span>
+                        </Text>
                         {' alle '}
-                        <span className="font-medium text-slate-300 [html:not(.dark)_&]:text-slate-600">
+                        <Text as="span" weight="medium" className="text-slate-300 [html:not(.dark)_&]:text-slate-600">
                           {(() => {
                             const date = new Date(nextScheduledAction.timestamp);
                             const time = date.toLocaleString('it-IT', { hour: '2-digit', minute: '2-digit' });
                             const day = date.toLocaleString('it-IT', { day: '2-digit', month: '2-digit' });
                             return `${time} del ${day}`;
                           })()}
-                        </span>
+                        </Text>
                         {nextScheduledAction.action === 'ignite' && (
-                          <span className="text-slate-500 [html:not(.dark)_&]:text-slate-400 block sm:inline"> • P{nextScheduledAction.power}, V{nextScheduledAction.fan}</span>
+                          <Text as="span" variant="tertiary" className="block sm:inline"> • P{nextScheduledAction.power}, V{nextScheduledAction.fan}</Text>
                         )}
                       </>
                     ) : schedulerEnabled ? (
@@ -952,7 +952,7 @@ export default function StoveCard() {
                     ) : (
                       'Controllo manuale attivo'
                     )}
-                  </p>
+                  </Text>
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">

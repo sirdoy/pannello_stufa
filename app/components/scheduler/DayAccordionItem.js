@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
+import Heading from '../ui/Heading';
+import Text from '../ui/Text';
 import TimeBar from './TimeBar';
 import ScheduleInterval from './ScheduleInterval';
 import IntervalBottomSheet from './IntervalBottomSheet';
@@ -87,11 +89,11 @@ export default function DayAccordionItem({
             <div className="flex items-center gap-3 flex-shrink-0">
               <span className="text-2xl">📅</span>
               <div className="text-left">
-                <h2 className="text-xl font-bold text-neutral-900 dark:text-white">{day}</h2>
-                <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                <Heading level={2} size="xl">{day}</Heading>
+                <Text variant="tertiary" size="sm">
                   {intervals.length} {intervals.length === 1 ? 'intervallo' : 'intervalli'}
                   {intervals.length > 0 && ` • ${getTotalDuration()}h totali`}
-                </p>
+                </Text>
               </div>
             </div>
 
@@ -206,9 +208,9 @@ export default function DayAccordionItem({
               ))}
             </div>
           ) : (
-            <div className="text-center py-8 text-neutral-500 dark:text-neutral-400">
-              <p className="text-lg mb-2">📭 Nessun intervallo configurato</p>
-              <p className="text-sm">Aggiungi il primo intervallo per iniziare</p>
+            <div className="text-center py-8">
+              <Text variant="tertiary" size="lg" className="mb-2">📭 Nessun intervallo configurato</Text>
+              <Text variant="tertiary" size="sm">Aggiungi il primo intervallo per iniziare</Text>
             </div>
           )}
 

@@ -4,6 +4,7 @@ import { POWER_LABELS, FAN_LABELS } from '@/lib/schedulerStats';
 import BottomSheet from '../ui/BottomSheet';
 import ProgressBar from '../ui/ProgressBar';
 import Button from '../ui/Button';
+import Text from '../ui/Text';
 
 export default function IntervalBottomSheet({
   range,
@@ -40,9 +41,9 @@ export default function IntervalBottomSheet({
       closeOnBackdrop={true}
     >
       {/* Durata */}
-      <div className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mb-6">
+      <Text variant="secondary" size="sm" className="mb-6">
         {getDuration()}
-      </div>
+      </Text>
 
       {/* Potenza */}
       <div className="mb-5">
@@ -53,20 +54,20 @@ export default function IntervalBottomSheet({
           animated
           leftContent={
             <>
-              <span className="text-xl">⚡</span>
-              <span className="text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300">
+              <Text as="span" className="text-xl">⚡</Text>
+              <Text as="span" variant="secondary" size="sm" weight="semibold">
                 Potenza
-              </span>
+              </Text>
             </>
           }
           rightContent={
             <>
-              <span className="text-xs font-bold text-slate-600 [html:not(.dark)_&]:text-slate-400">
+              <Text as="span" variant="tertiary" size="xs" weight="bold">
                 P{range.power}
-              </span>
-              <span className="text-sm font-medium text-slate-900 [html:not(.dark)_&]:text-white">
+              </Text>
+              <Text as="span" size="sm" weight="medium">
                 {powerLabel.text}
-              </span>
+              </Text>
             </>
           }
         />
@@ -81,20 +82,20 @@ export default function IntervalBottomSheet({
           animated
           leftContent={
             <>
-              <span className="text-xl">💨</span>
-              <span className="text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300">
+              <Text as="span" className="text-xl">💨</Text>
+              <Text as="span" variant="secondary" size="sm" weight="semibold">
                 Ventola
-              </span>
+              </Text>
             </>
           }
           rightContent={
             <>
-              <span className="text-xs font-bold text-slate-600 [html:not(.dark)_&]:text-slate-400">
+              <Text as="span" variant="tertiary" size="xs" weight="bold">
                 V{range.fan}
-              </span>
-              <span className="text-sm font-medium text-slate-900 [html:not(.dark)_&]:text-white">
+              </Text>
+              <Text as="span" size="sm" weight="medium">
                 {fanLabel.text}
-              </span>
+              </Text>
             </>
           }
         />

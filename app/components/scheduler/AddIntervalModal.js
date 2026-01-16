@@ -5,6 +5,8 @@ import Button from '../ui/Button';
 import ActionButton from '../ui/ActionButton';
 import Card from '../ui/Card';
 import Input from '../ui/Input';
+import Heading from '../ui/Heading';
+import Text from '../ui/Text';
 import { X } from 'lucide-react';
 import { getPowerBadgeClass, getFanBadgeClass } from '@/lib/schedulerStats';
 
@@ -163,13 +165,15 @@ export default function AddIntervalModal({
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2
+          <Heading
             id="add-interval-title"
-            className="text-xl font-bold text-slate-900 [html:not(.dark)_&]:text-white flex items-center gap-2"
+            level={2}
+            size="xl"
+            className="flex items-center gap-2"
           >
             <span>{mode === 'edit' ? '✏️' : '➕'}</span>
             <span>{mode === 'edit' ? 'Modifica' : 'Aggiungi'} Intervallo - {day}</span>
-          </h2>
+          </Heading>
           <ActionButton
             icon={<X />}
             variant="close"
@@ -191,31 +195,35 @@ export default function AddIntervalModal({
 
           {/* Toggle: Duration vs End Time */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300 mb-2">
+            <Text as="label" variant="secondary" size="sm" weight="semibold" className="block mb-2">
               Modalità Inserimento
-            </label>
+            </Text>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => setInputMode('duration')}
                 className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${
                   inputMode === 'duration'
-                    ? 'bg-ember-500 [html:not(.dark)_&]:bg-ember-600 text-white shadow-md'
-                    : 'bg-slate-100 [html:not(.dark)_&]:bg-slate-800 text-slate-700 [html:not(.dark)_&]:text-slate-300 hover:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-700'
+                    ? 'bg-ember-500 [html:not(.dark)_&]:bg-ember-600 shadow-md'
+                    : 'bg-slate-100 [html:not(.dark)_&]:bg-slate-800 hover:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-700'
                 }`}
               >
-                ⏱️ Durata
+                <Text as="span" className={inputMode === 'duration' ? 'text-white' : ''} variant={inputMode === 'duration' ? undefined : 'secondary'}>
+                  ⏱️ Durata
+                </Text>
               </button>
               <button
                 type="button"
                 onClick={() => setInputMode('endTime')}
                 className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${
                   inputMode === 'endTime'
-                    ? 'bg-ember-500 [html:not(.dark)_&]:bg-ember-600 text-white shadow-md'
-                    : 'bg-slate-100 [html:not(.dark)_&]:bg-slate-800 text-slate-700 [html:not(.dark)_&]:text-slate-300 hover:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-700'
+                    ? 'bg-ember-500 [html:not(.dark)_&]:bg-ember-600 shadow-md'
+                    : 'bg-slate-100 [html:not(.dark)_&]:bg-slate-800 hover:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-700'
                 }`}
               >
-                ⏰ Ora Fine
+                <Text as="span" className={inputMode === 'endTime' ? 'text-white' : ''} variant={inputMode === 'endTime' ? undefined : 'secondary'}>
+                  ⏰ Ora Fine
+                </Text>
               </button>
             </div>
           </div>
@@ -224,9 +232,9 @@ export default function AddIntervalModal({
           {inputMode === 'duration' && (
             <>
               <div>
-                <label className="block text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300 mb-2">
+                <Text as="label" variant="secondary" size="sm" weight="semibold" className="block mb-2">
                   ⏱️ Durata
-                </label>
+                </Text>
                 <select
                   value={durationPreset}
                   onChange={(e) => setDurationPreset(e.target.value === 'custom' ? 'custom' : Number(e.target.value))}
@@ -267,33 +275,33 @@ export default function AddIntervalModal({
 
           {/* End Time Preview */}
           <div className="p-4 bg-slate-100 [html:not(.dark)_&]:bg-slate-800/50 rounded-xl">
-            <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mb-1">
+            <Text variant="secondary" size="sm" className="mb-1">
               {inputMode === 'duration' ? 'Orario fine calcolato:' : 'Orario fine selezionato:'}
-            </p>
-            <p className="text-2xl font-bold text-slate-900 [html:not(.dark)_&]:text-white">{calculatedEnd}</p>
+            </Text>
+            <Text size="xl" weight="bold" className="text-2xl">{calculatedEnd}</Text>
             {!isValidInterval() && (
-              <p className="text-sm text-red-600 [html:not(.dark)_&]:text-red-400 mt-2">
+              <Text variant="danger" size="sm" className="mt-2">
                 ⚠️ {durationPreset === 'custom' && customMinutes < 15
                   ? 'Durata minima: 15 minuti'
                   : 'L\'intervallo non può attraversare la mezzanotte'}
-              </p>
+              </Text>
             )}
           </div>
 
           {/* Power & Fan */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300 mb-2">
+              <Text as="label" variant="secondary" size="sm" weight="semibold" className="block mb-2">
                 ⚡ Potenza
-              </label>
+              </Text>
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <span className={`px-2 py-1 rounded-md text-xs font-bold ${getPowerBadgeClass(power)}`}>
                     P{power}
                   </span>
-                  <span className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400">
+                  <Text as="span" variant="secondary" size="sm">
                     Livello {power}
-                  </span>
+                  </Text>
                 </div>
                 <select
                   value={power}
@@ -308,17 +316,17 @@ export default function AddIntervalModal({
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300 mb-2">
+              <Text as="label" variant="secondary" size="sm" weight="semibold" className="block mb-2">
                 💨 Ventola
-              </label>
+              </Text>
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <span className={`px-2 py-1 rounded-md text-xs font-bold ${getFanBadgeClass(fan)}`}>
                     V{fan}
                   </span>
-                  <span className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400">
+                  <Text as="span" variant="secondary" size="sm">
                     Livello {fan}
-                  </span>
+                  </Text>
                 </div>
                 <select
                   value={fan}

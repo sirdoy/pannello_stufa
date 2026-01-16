@@ -6,6 +6,8 @@ import ActionButton from '../ui/ActionButton';
 import Card from '../ui/Card';
 import Modal from '../ui/Modal';
 import Input from '../ui/Input';
+import Heading from '../ui/Heading';
+import Text from '../ui/Text';
 import { X } from 'lucide-react';
 
 /**
@@ -217,12 +219,12 @@ export default function CreateSceneModal({
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div>
-            <h3 className="text-xl font-bold text-slate-900 [html:not(.dark)_&]:text-white">
+            <Heading level={3} size="xl">
               Crea Nuova Scena
-            </h3>
-            <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-1">
+            </Heading>
+            <Text variant="secondary" size="sm" className="mt-1">
               Cattura lo stato attuale delle luci o personalizza
-            </p>
+            </Text>
           </div>
           <ActionButton
             icon={<X />}
@@ -253,9 +255,9 @@ export default function CreateSceneModal({
               autoFocus
               liquid
             />
-            <p className="mt-2 text-xs text-slate-500 [html:not(.dark)_&]:text-slate-400">
+            <Text variant="tertiary" size="xs" className="mt-2">
               {name.length}/255 caratteri
-            </p>
+            </Text>
           </div>
 
           {/* Room Selection */}
@@ -284,7 +286,7 @@ export default function CreateSceneModal({
           {loadingLights && (
             <div className="text-center py-4">
               <div className="w-8 h-8 border-3 border-ember-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-              <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400">Caricamento luci...</p>
+              <Text variant="secondary" size="sm">Caricamento luci...</Text>
             </div>
           )}
 
@@ -300,9 +302,9 @@ export default function CreateSceneModal({
                     <div key={light.id} className="p-4 bg-white/40 [html:not(.dark)_&]:bg-slate-800/40 rounded-xl border border-slate-200/50 [html:not(.dark)_&]:border-slate-700/50">
                       {/* Light Name + Toggle */}
                       <div className="flex items-center justify-between mb-3">
-                        <span className="font-medium text-slate-900 [html:not(.dark)_&]:text-white">
+                        <Text as="span" weight="medium">
                           {light.metadata?.name || 'Luce'}
-                        </span>
+                        </Text>
                         <button
                           onClick={() => handleLightToggle(light.id)}
                           className={`w-12 h-6 rounded-full transition-colors ${
@@ -363,10 +365,10 @@ export default function CreateSceneModal({
 
           {/* Error Message */}
           {error && (
-            <p className="text-sm text-ember-600 [html:not(.dark)_&]:text-ember-400 flex items-center gap-1">
+            <Text variant="ember" size="sm" className="flex items-center gap-1">
               <span>⚠️</span>
               <span>{error}</span>
-            </p>
+            </Text>
           )}
         </div>
 

@@ -6,6 +6,8 @@ import ActionButton from '../ui/ActionButton';
 import Card from '../ui/Card';
 import Modal from '../ui/Modal';
 import Input from '../ui/Input';
+import Heading from '../ui/Heading';
+import Text from '../ui/Text';
 import { X } from 'lucide-react';
 
 /**
@@ -102,12 +104,12 @@ export default function CreateScheduleModal({
           {/* Header */}
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h3 className="text-xl font-bold text-slate-900 [html:not(.dark)_&]:text-white">
+              <Heading level={3} size="xl">
                 Crea Nuova Pianificazione
-              </h3>
-              <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-1">
+              </Heading>
+              <Text variant="secondary" size="sm" className="mt-1">
                 Configura una nuova pianificazione settimanale
-              </p>
+              </Text>
             </div>
             <ActionButton
               icon={<X />}
@@ -122,9 +124,9 @@ export default function CreateScheduleModal({
           <div className="space-y-6">
             {/* Name Input */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300 mb-2">
-                Nome Pianificazione <span className="text-ember-500">*</span>
-              </label>
+              <Text as="label" variant="secondary" size="sm" weight="semibold" className="block mb-2">
+                Nome Pianificazione <Text as="span" variant="ember">*</Text>
+              </Text>
               <Input
                 type="text"
                 value={name}
@@ -139,21 +141,21 @@ export default function CreateScheduleModal({
                 liquid
               />
               {error && (
-                <p className="mt-2 text-sm text-ember-600 [html:not(.dark)_&]:text-ember-400 flex items-center gap-1">
+                <Text variant="ember" size="sm" className="mt-2 flex items-center gap-1">
                   <span>⚠️</span>
                   <span>{error}</span>
-                </p>
+                </Text>
               )}
-              <p className="mt-2 text-xs text-slate-500 [html:not(.dark)_&]:text-slate-400">
+              <Text variant="tertiary" size="xs" className="mt-2">
                 {name.length}/30 caratteri
-              </p>
+              </Text>
             </div>
 
             {/* Mode Selection */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300 mb-3">
+              <Text as="label" variant="secondary" size="sm" weight="semibold" className="block mb-3">
                 Modalità Creazione
-              </label>
+              </Text>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* From Scratch */}
                 <button
@@ -175,12 +177,12 @@ export default function CreateScheduleModal({
                       )}
                     </div>
                     <div className="flex-1">
-                      <div className="font-semibold text-slate-900 [html:not(.dark)_&]:text-white text-sm">
+                      <Text weight="semibold" size="sm">
                         Da Zero
-                      </div>
-                      <div className="text-xs text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-1">
+                      </Text>
+                      <Text variant="secondary" size="xs" className="mt-1">
                         Inizia con una pianificazione vuota
-                      </div>
+                      </Text>
                     </div>
                   </div>
                 </button>
@@ -205,12 +207,12 @@ export default function CreateScheduleModal({
                       )}
                     </div>
                     <div className="flex-1">
-                      <div className="font-semibold text-slate-900 [html:not(.dark)_&]:text-white text-sm">
+                      <Text weight="semibold" size="sm">
                         Copia Esistente
-                      </div>
-                      <div className="text-xs text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-1">
+                      </Text>
+                      <Text variant="secondary" size="xs" className="mt-1">
                         Duplica una pianificazione
-                      </div>
+                      </Text>
                     </div>
                   </div>
                 </button>
@@ -220,9 +222,9 @@ export default function CreateScheduleModal({
             {/* Copy From Dropdown (only when mode === 'copy') */}
             {mode === 'copy' && (
               <div className="animate-fade-in">
-                <label className="block text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300 mb-2">
-                  Copia da <span className="text-ember-500">*</span>
-                </label>
+                <Text as="label" variant="secondary" size="sm" weight="semibold" className="block mb-2">
+                  Copia da <Text as="span" variant="ember">*</Text>
+                </Text>
                 <select
                   value={copyFromId}
                   onChange={(e) => {

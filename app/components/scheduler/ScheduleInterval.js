@@ -3,6 +3,7 @@ import { Edit2, Trash2 } from 'lucide-react';
 import Card from '../ui/Card';
 import ActionButton from '../ui/ActionButton';
 import ProgressBar from '../ui/ProgressBar';
+import Text from '../ui/Text';
 
 export default function ScheduleInterval({
   range,
@@ -21,7 +22,7 @@ export default function ScheduleInterval({
       liquid
       className={`cursor-pointer transition-all duration-300 p-4 ${
         isHighlighted
-          ? 'bg-ember-50/80 [html:not(.dark)_&]:bg-ember-900/30 ring-2 ring-ember-400 [html:not(.dark)_&]:ring-ember-600 shadow-liquid-lg scale-[1.01]'
+          ? 'bg-ember-900/30 [html:not(.dark)_&]:bg-ember-50/80 ring-2 ring-ember-600 [html:not(.dark)_&]:ring-ember-400 shadow-liquid-lg scale-[1.01]'
           : ''
       }`}
       onMouseEnter={onMouseEnter}
@@ -32,12 +33,12 @@ export default function ScheduleInterval({
         {/* Time Range */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="text-2xl">⏰</div>
+            <Text className="text-2xl">⏰</Text>
             <div>
-              <div className="text-lg font-bold text-slate-900 [html:not(.dark)_&]:text-white">
+              <Text size="lg" weight="bold">
                 {range.start} - {range.end}
-              </div>
-              <div className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400">
+              </Text>
+              <Text variant="tertiary" size="sm">
                 {(() => {
                   const [startH, startM] = range.start.split(':').map(Number);
                   const [endH, endM] = range.end.split(':').map(Number);
@@ -48,7 +49,7 @@ export default function ScheduleInterval({
                     ? `${hours}h${minutes > 0 ? ` ${minutes}min` : ''}`
                     : `${minutes}min`;
                 })()}
-              </div>
+              </Text>
             </div>
           </div>
 
@@ -89,20 +90,20 @@ export default function ScheduleInterval({
           animated
           leftContent={
             <>
-              <span className="text-lg">⚡</span>
-              <span className="text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300">
+              <Text as="span" className="text-lg">⚡</Text>
+              <Text as="span" variant="secondary" size="sm" weight="semibold">
                 Potenza
-              </span>
+              </Text>
             </>
           }
           rightContent={
             <>
-              <span className="text-xs font-bold text-slate-600 [html:not(.dark)_&]:text-slate-400">
+              <Text as="span" variant="tertiary" size="xs" weight="bold">
                 P{range.power}
-              </span>
-              <span className="text-sm font-medium text-slate-900 [html:not(.dark)_&]:text-white">
+              </Text>
+              <Text as="span" size="sm" weight="medium">
                 {powerLabel.text}
-              </span>
+              </Text>
             </>
           }
         />
@@ -115,20 +116,20 @@ export default function ScheduleInterval({
           animated
           leftContent={
             <>
-              <span className="text-lg">💨</span>
-              <span className="text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300">
+              <Text as="span" className="text-lg">💨</Text>
+              <Text as="span" variant="secondary" size="sm" weight="semibold">
                 Ventola
-              </span>
+              </Text>
             </>
           }
           rightContent={
             <>
-              <span className="text-xs font-bold text-slate-600 [html:not(.dark)_&]:text-slate-400">
+              <Text as="span" variant="tertiary" size="xs" weight="bold">
                 V{range.fan}
-              </span>
-              <span className="text-sm font-medium text-slate-900 [html:not(.dark)_&]:text-white">
+              </Text>
+              <Text as="span" size="sm" weight="medium">
                 {fanLabel.text}
-              </span>
+              </Text>
             </>
           }
         />

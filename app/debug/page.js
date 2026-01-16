@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import Heading from '../components/ui/Heading';
+import Text from '../components/ui/Text';
 import { getErrorInfo } from '@/lib/errorMonitor';
 
 export default function DebugPage() {
@@ -56,13 +58,13 @@ export default function DebugPage() {
       <Card className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900 flex items-center gap-3">
+            <Heading level={1} className="flex items-center gap-3">
               <span>🔍</span>
               Debug API Stufa
-            </h1>
-            <p className="text-sm text-slate-400 [html:not(.dark)_&]:text-slate-500 mt-1">
+            </Heading>
+            <Text variant="tertiary" size="sm" className="mt-1">
               Visualizzazione real-time di tutti i parametri API Thermorossi
-            </p>
+            </Text>
           </div>
           <div className="flex gap-3">
             <Button
@@ -83,72 +85,72 @@ export default function DebugPage() {
 
         {/* Status Response */}
         <div className="space-y-4">
-          <h2 className="text-xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900">📊 Status API Response</h2>
+          <Heading level={2} size="xl">📊 Status API Response</Heading>
 
           {status && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Error Code */}
               <Card className={`p-4 ${status.Error !== 0 ? 'bg-ember-50 [html:not(.dark)_&]:bg-ember-50 border-2 border-ember-300 [html:not(.dark)_&]:border-ember-300' : 'bg-sage-50 [html:not(.dark)_&]:bg-sage-50 border-2 border-sage-300 [html:not(.dark)_&]:border-sage-300'}`}>
-                <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 mb-1">Error Code</p>
-                <p className={`text-3xl font-bold ${status.Error !== 0 ? 'text-ember-400 [html:not(.dark)_&]:text-ember-600' : 'text-sage-400 [html:not(.dark)_&]:text-sage-600'}`}>
+                <Text variant="tertiary" size="xs" className="mb-1">Error Code</Text>
+                <Text as="p" size="base" weight="bold" variant={status.Error !== 0 ? 'ember' : 'sage'} className="text-3xl">
                   {status.Error !== 0 ? `⚠️ ${status.Error}` : '✅ 0'}
-                </p>
+                </Text>
                 {status.Error !== 0 && errorInfo && (
                   <div className="mt-3 pt-3 border-t border-ember-200 [html:not(.dark)_&]:border-ember-200">
-                    <p className="text-sm font-semibold text-ember-300 [html:not(.dark)_&]:text-ember-800 mb-1">
+                    <Text size="sm" weight="semibold" variant="ember" className="mb-1">
                       {errorInfo.description}
-                    </p>
-                    <p className="text-xs text-ember-400 [html:not(.dark)_&]:text-ember-600">
+                    </Text>
+                    <Text size="xs" variant="ember">
                       Severity: {errorInfo.severity.toUpperCase()}
-                    </p>
+                    </Text>
                   </div>
                 )}
               </Card>
 
               {/* Error Description */}
               <Card className="p-4 bg-slate-50 [html:not(.dark)_&]:bg-slate-50 border-2 border-slate-200 [html:not(.dark)_&]:border-slate-200">
-                <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 mb-1">Error Description</p>
-                <p className="text-lg font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900">
+                <Text variant="tertiary" size="xs" className="mb-1">Error Description</Text>
+                <Text size="lg" weight="bold">
                   {status.ErrorDescription || '(vuoto)'}
-                </p>
+                </Text>
               </Card>
 
               {/* Status Code */}
               <Card className="p-4 bg-ocean-50 [html:not(.dark)_&]:bg-ocean-50 border-2 border-ocean-200 [html:not(.dark)_&]:border-ocean-200">
-                <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 mb-1">Status Code</p>
-                <p className="text-3xl font-bold text-ocean-400 [html:not(.dark)_&]:text-ocean-600">
+                <Text variant="tertiary" size="xs" className="mb-1">Status Code</Text>
+                <Text as="p" variant="ocean" weight="bold" className="text-3xl">
                   {status.Status}
-                </p>
+                </Text>
               </Card>
 
               {/* Status Description */}
               <Card className="p-4 bg-flame-50 [html:not(.dark)_&]:bg-flame-50 border-2 border-flame-200 [html:not(.dark)_&]:border-flame-200">
-                <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 mb-1">Status Description</p>
-                <p className="text-3xl font-bold text-flame-400 [html:not(.dark)_&]:text-flame-600">
+                <Text variant="tertiary" size="xs" className="mb-1">Status Description</Text>
+                <Text as="p" className="text-3xl font-bold text-flame-400 [html:not(.dark)_&]:text-flame-600">
                   {status.StatusDescription}
-                </p>
+                </Text>
               </Card>
 
               {/* Success */}
               <Card className="p-4 bg-slate-50 [html:not(.dark)_&]:bg-slate-50 border-2 border-slate-200 [html:not(.dark)_&]:border-slate-200">
-                <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 mb-1">API Success</p>
-                <p className="text-2xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900">
+                <Text variant="tertiary" size="xs" className="mb-1">API Success</Text>
+                <Text as="p" weight="bold" className="text-2xl">
                   {status.Success ? '✅ true' : '❌ false'}
-                </p>
+                </Text>
               </Card>
             </div>
           )}
 
           {/* Fan Level */}
-          <h2 className="text-xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900 mt-8">💨 Fan Level</h2>
+          <Heading level={2} size="xl" className="mt-8">💨 Fan Level</Heading>
           {fanLevel && (
             <Card className="p-4 bg-ocean-50 [html:not(.dark)_&]:bg-ocean-50 border-2 border-ocean-200 [html:not(.dark)_&]:border-ocean-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 mb-1">Current Level</p>
-                  <p className="text-3xl font-bold text-ocean-400 [html:not(.dark)_&]:text-ocean-600">
+                  <Text variant="tertiary" size="xs" className="mb-1">Current Level</Text>
+                  <Text as="p" variant="ocean" weight="bold" className="text-3xl">
                     {fanLevel.Result} / 6
-                  </p>
+                  </Text>
                 </div>
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5, 6].map(level => (
@@ -165,15 +167,15 @@ export default function DebugPage() {
           )}
 
           {/* Power Level */}
-          <h2 className="text-xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900 mt-8">⚡ Power Level</h2>
+          <Heading level={2} size="xl" className="mt-8">⚡ Power Level</Heading>
           {powerLevel && (
             <Card className="p-4 bg-flame-50 [html:not(.dark)_&]:bg-flame-50 border-2 border-flame-200 [html:not(.dark)_&]:border-flame-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 mb-1">Current Level</p>
-                  <p className="text-3xl font-bold text-flame-400 [html:not(.dark)_&]:text-flame-600">
+                  <Text variant="tertiary" size="xs" className="mb-1">Current Level</Text>
+                  <Text as="p" weight="bold" className="text-3xl text-flame-400 [html:not(.dark)_&]:text-flame-600">
                     {powerLevel.Result} / 5
-                  </p>
+                  </Text>
                 </div>
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map(level => (
@@ -190,7 +192,7 @@ export default function DebugPage() {
           )}
 
           {/* Raw JSON */}
-          <h2 className="text-xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900 mt-8">📝 Raw JSON Response</h2>
+          <Heading level={2} size="xl" className="mt-8">📝 Raw JSON Response</Heading>
           <Card className="p-4 bg-slate-900 [html:not(.dark)_&]:bg-slate-900 border-2 border-slate-700 [html:not(.dark)_&]:border-slate-700">
             <pre className="text-xs text-sage-400 font-mono overflow-auto">
               {JSON.stringify({ status, fanLevel, powerLevel }, null, 2)}
@@ -202,19 +204,19 @@ export default function DebugPage() {
             <div className="flex items-start gap-3">
               <span className="text-3xl">💡</span>
               <div>
-                <h3 className="text-lg font-bold text-warning-300 [html:not(.dark)_&]:text-warning-800 mb-2">Come Funziona il Rilevamento Errori</h3>
-                <ul className="text-sm text-warning-400 [html:not(.dark)_&]:text-warning-700 space-y-2 ml-4">
-                  <li>• <strong>Polling automatico</strong>: La homepage interroga l&apos;API ogni 5 secondi</li>
-                  <li>• <strong>Error Code</strong>: Quando diverso da 0, viene mostrato un banner rosso pulsante</li>
-                  <li>• <strong>Suggerimenti</strong>: Database con 23 codici errore comuni e soluzioni</li>
-                  <li>• <strong>Logging</strong>: Tutti gli errori vengono salvati su Firebase per storico</li>
-                  <li>• <strong>Notifiche</strong>: Browser notification per nuovi errori rilevati</li>
+                <Heading level={3} size="lg" variant="warning" className="mb-2">Come Funziona il Rilevamento Errori</Heading>
+                <ul className="space-y-2 ml-4">
+                  <li><Text size="sm" variant="warning">• <strong>Polling automatico</strong>: La homepage interroga l&apos;API ogni 5 secondi</Text></li>
+                  <li><Text size="sm" variant="warning">• <strong>Error Code</strong>: Quando diverso da 0, viene mostrato un banner rosso pulsante</Text></li>
+                  <li><Text size="sm" variant="warning">• <strong>Suggerimenti</strong>: Database con 23 codici errore comuni e soluzioni</Text></li>
+                  <li><Text size="sm" variant="warning">• <strong>Logging</strong>: Tutti gli errori vengono salvati su Firebase per storico</Text></li>
+                  <li><Text size="sm" variant="warning">• <strong>Notifiche</strong>: Browser notification per nuovi errori rilevati</Text></li>
                 </ul>
                 <div className="mt-4 p-3 bg-warning-100 [html:not(.dark)_&]:bg-warning-100 rounded-lg">
-                  <p className="text-sm font-semibold text-warning-300 [html:not(.dark)_&]:text-warning-800">
+                  <Text size="sm" weight="semibold" variant="warning">
                     ⚠️ Nota: Se il display della stufa mostra un errore ma l&apos;API riporta Error: 0,
                     significa che l&apos;errore è locale e non sincronizzato con il cloud Thermorossi.
-                  </p>
+                  </Text>
                 </div>
               </div>
             </div>
@@ -224,7 +226,7 @@ export default function DebugPage() {
 
       {/* Actions */}
       <Card className="p-6">
-        <h2 className="text-xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900 mb-4">🔗 Link Utili</h2>
+        <Heading level={2} size="xl" className="mb-4">🔗 Link Utili</Heading>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <Button variant="outline" onClick={() => window.location.href = '/'}>
             🏠 Homepage

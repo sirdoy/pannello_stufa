@@ -13,6 +13,7 @@ import {
   MenuItem,
   UserInfoCard
 } from './navigation';
+import Text from './ui/Text';
 
 /**
  * Navbar Component - Ember Noir Design System
@@ -143,8 +144,8 @@ export default function Navbar() {
   `;
 
   const navItemActive = `
-    bg-ember-500/15 dark:bg-ember-500/15
-    text-ember-400 dark:text-ember-400
+    bg-ember-500/15
+    text-ember-400
     shadow-ember-glow-sm
     [html:not(.dark)_&]:bg-ember-500/10
     [html:not(.dark)_&]:text-ember-700
@@ -152,12 +153,12 @@ export default function Navbar() {
   `;
 
   const navItemInactive = `
-    bg-white/[0.04] dark:bg-white/[0.04]
-    text-slate-300 dark:text-slate-300
-    hover:bg-white/[0.08] dark:hover:bg-white/[0.08]
-    hover:text-slate-100 dark:hover:text-slate-100
-    border border-white/[0.06] dark:border-white/[0.06]
-    hover:border-white/[0.1] dark:hover:border-white/[0.1]
+    bg-white/[0.04]
+    text-slate-300
+    hover:bg-white/[0.08]
+    hover:text-slate-100
+    border border-white/[0.06]
+    hover:border-white/[0.1]
     [html:not(.dark)_&]:bg-black/[0.03]
     [html:not(.dark)_&]:text-slate-600
     [html:not(.dark)_&]:border-black/[0.06]
@@ -170,9 +171,9 @@ export default function Navbar() {
       {/* Top Header - Desktop & Mobile */}
       <header className="
         fixed top-0 left-0 right-0 z-50
-        bg-slate-900/80 dark:bg-slate-900/80
+        bg-slate-900/80
         backdrop-blur-xl
-        border-b border-white/[0.06] dark:border-white/[0.06]
+        border-b border-white/[0.06]
         shadow-card
         [html:not(.dark)_&]:bg-white/90
         [html:not(.dark)_&]:border-black/[0.06]
@@ -189,14 +190,18 @@ export default function Navbar() {
               ">
                 🔥
               </div>
-              <span className="
-                hidden sm:inline
-                text-lg lg:text-xl
-                font-display font-bold
-                gradient-text-ember
-              ">
+              <Text
+                as="span"
+                weight="bold"
+                className="
+                  hidden sm:inline
+                  text-lg lg:text-xl
+                  font-display
+                  gradient-text-ember
+                "
+              >
                 Smart Home
-              </span>
+              </Text>
             </Link>
 
             {/* Desktop Navigation - Hidden on mobile */}
@@ -387,9 +392,9 @@ export default function Navbar() {
                 aria-expanded={mobileMenuOpen}
               >
                 {mobileMenuOpen ? (
-                  <X className="w-6 h-6 text-slate-300 dark:text-slate-300 [html:not(.dark)_&]:text-slate-600" />
+                  <X className="w-6 h-6 text-slate-300 [html:not(.dark)_&]:text-slate-600" />
                 ) : (
-                  <Menu className="w-6 h-6 text-slate-300 dark:text-slate-300 [html:not(.dark)_&]:text-slate-600" />
+                  <Menu className="w-6 h-6 text-slate-300 [html:not(.dark)_&]:text-slate-600" />
                 )}
               </button>
             </div>
@@ -404,7 +409,7 @@ export default function Navbar() {
           <div
             className="
               fixed top-16 left-0 right-0 bottom-0
-              bg-slate-950/60 dark:bg-slate-950/60
+              bg-slate-950/60
               backdrop-blur-md
               z-[9000] lg:hidden
               [html:not(.dark)_&]:bg-slate-900/40
@@ -416,7 +421,7 @@ export default function Navbar() {
           {/* Mobile Menu Panel */}
           <div className="
             fixed top-16 left-0 right-0 bottom-20
-            bg-slate-900/95 dark:bg-slate-900/95
+            bg-slate-900/95
             backdrop-blur-2xl
             z-[9001] lg:hidden
             overflow-y-auto
@@ -494,9 +499,9 @@ export default function Navbar() {
       {/* Mobile Bottom Navigation - Ember Noir Style */}
       <nav className="
         fixed bottom-0 left-0 right-0 z-50 lg:hidden
-        bg-slate-900/90 dark:bg-slate-900/90
+        bg-slate-900/90
         backdrop-blur-xl
-        border-t border-white/[0.06] dark:border-white/[0.06]
+        border-t border-white/[0.06]
         shadow-[0_-4px_24px_rgba(0,0,0,0.15)]
         pb-safe
         [html:not(.dark)_&]:bg-white/90
@@ -520,7 +525,7 @@ export default function Navbar() {
             `}
           >
             <Home className="w-6 h-6 mb-1" />
-            <span className="text-[10px] font-display font-medium">Home</span>
+            <Text as="span" weight="medium" className="text-[10px] font-display">Home</Text>
           </Link>
 
           {/* Scheduler */}
@@ -539,7 +544,7 @@ export default function Navbar() {
             `}
           >
             <Calendar className="w-6 h-6 mb-1" />
-            <span className="text-[10px] font-display font-medium">Orari</span>
+            <Text as="span" weight="medium" className="text-[10px] font-display">Orari</Text>
           </Link>
 
           {/* Errors */}
@@ -558,7 +563,7 @@ export default function Navbar() {
             `}
           >
             <AlertCircle className="w-6 h-6 mb-1" />
-            <span className="text-[10px] font-display font-medium">Errori</span>
+            <Text as="span" weight="medium" className="text-[10px] font-display">Errori</Text>
           </Link>
 
           {/* Log */}
@@ -577,7 +582,7 @@ export default function Navbar() {
             `}
           >
             <Clock className="w-6 h-6 mb-1" />
-            <span className="text-[10px] font-display font-medium">Log</span>
+            <Text as="span" weight="medium" className="text-[10px] font-display">Log</Text>
           </Link>
         </div>
       </nav>

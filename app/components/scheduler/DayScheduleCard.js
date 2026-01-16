@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
+import Heading from '../ui/Heading';
+import Text from '../ui/Text';
 import TimeBar from './TimeBar';
 import ScheduleInterval from './ScheduleInterval';
 
@@ -26,10 +28,10 @@ export default function DayScheduleCard({
         <div className="flex items-center gap-3">
           <span className="text-2xl">📅</span>
           <div>
-            <h2 className="text-xl font-bold text-neutral-900">{day}</h2>
-            <p className="text-sm text-neutral-500">
+            <Heading level={2} size="xl">{day}</Heading>
+            <Text variant="tertiary" size="sm">
               {intervals.length} {intervals.length === 1 ? 'intervallo' : 'intervalli'}
-            </p>
+            </Text>
           </div>
         </div>
       </div>

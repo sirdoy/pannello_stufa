@@ -2,6 +2,8 @@
 
 import { useMemo } from 'react';
 import Card from '../ui/Card';
+import Heading from '../ui/Heading';
+import Text from '../ui/Text';
 import { calculateWeeklyStats } from '@/lib/schedulerStats';
 
 export default function WeeklySummaryCard({ schedule }) {
@@ -20,42 +22,42 @@ export default function WeeklySummaryCard({ schedule }) {
 
   return (
     <Card liquid className="p-6">
-      <h2 className="text-lg font-semibold text-neutral-900 dark:text-white mb-4 flex items-center gap-2">
+      <Heading level={2} size="lg" weight="semibold" className="mb-4 flex items-center gap-2">
         <span>📊</span>
         <span>Riepilogo Settimanale</span>
-      </h2>
+      </Heading>
 
       {/* Main stats */}
       <div className="space-y-3 mb-6">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-neutral-600 dark:text-neutral-400">Ore totali</span>
-          <span className="font-bold text-neutral-900 dark:text-white text-lg">
+          <Text as="span" variant="secondary">Ore totali</Text>
+          <Text as="span" weight="bold" size="lg">
             {formatHours(stats.totalHours)}
-          </span>
+          </Text>
         </div>
 
         <div className="flex items-center justify-between text-sm">
-          <span className="text-neutral-600 dark:text-neutral-400">Intervalli</span>
-          <span className="font-medium text-neutral-900 dark:text-white">
+          <Text as="span" variant="secondary">Intervalli</Text>
+          <Text as="span" weight="medium">
             {stats.totalIntervals}
-          </span>
+          </Text>
         </div>
 
         {stats.totalHours > 0 && (
           <>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-neutral-600 dark:text-neutral-400">Media giornaliera</span>
-              <span className="font-medium text-neutral-900 dark:text-white">
+              <Text as="span" variant="secondary">Media giornaliera</Text>
+              <Text as="span" weight="medium">
                 {formatHours(stats.avgPerDay)}
-              </span>
+              </Text>
             </div>
 
             {stats.busiestDay && (
               <div className="flex items-center justify-between text-sm">
-                <span className="text-neutral-600 dark:text-neutral-400">Giorno più utilizzato</span>
-                <span className="font-medium text-primary-600 dark:text-primary-400">
+                <Text as="span" variant="secondary">Giorno più utilizzato</Text>
+                <Text as="span" weight="medium" className="text-primary-600 dark:text-primary-400">
                   {stats.busiestDay} ({formatHours(stats.dailyHours[stats.busiestDay])})
-                </span>
+                </Text>
               </div>
             )}
           </>
@@ -66,9 +68,9 @@ export default function WeeklySummaryCard({ schedule }) {
       {stats.totalHours > 0 && (
         <>
           <div className="border-t border-neutral-200 dark:border-neutral-700 pt-4 mb-4">
-            <h3 className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3">
+            <Heading level={3} size="sm" weight="medium" className="text-neutral-700 dark:text-neutral-300 mb-3">
               Distribuzione Potenza
-            </h3>
+            </Heading>
             <div className="space-y-2">
               {powerPercentages.filter(p => p.hours > 0).map(({ level, hours, percentage }) => (
                 <div key={level} className="flex items-center gap-2">
@@ -119,8 +121,8 @@ export default function WeeklySummaryCard({ schedule }) {
 
       {/* Empty state */}
       {stats.totalHours === 0 && (
-        <div className="text-center py-8 text-neutral-400 dark:text-neutral-500">
-          <p className="text-sm">Nessun intervallo configurato</p>
+        <div className="text-center py-8">
+          <Text variant="tertiary" size="sm">Nessun intervallo configurato</Text>
         </div>
       )}
     </Card>

@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
+import Heading from '@/app/components/ui/Heading';
+import Text from '@/app/components/ui/Text';
 import { Copy, Check } from 'lucide-react';
 import { API_KEY } from '@/lib/stoveApi';
 
@@ -173,22 +175,22 @@ export default function StoveDebugPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900">
+            <Heading level={1}>
               🔥 Stove Debug Console
-            </h1>
-            <p className="text-slate-400 [html:not(.dark)_&]:text-slate-600 mt-1">
+            </Heading>
+            <Text variant="secondary" className="mt-1">
               Raw API responses from Thermorossi endpoints (no internal fields)
-            </p>
+            </Text>
           </div>
           <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 text-sm text-slate-300 [html:not(.dark)_&]:text-slate-700">
+            <label className="flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={autoRefresh}
                 onChange={(e) => setAutoRefresh(e.target.checked)}
                 className="rounded"
               />
-              Auto-refresh (5s)
+              <Text size="sm" variant="secondary">Auto-refresh (5s)</Text>
             </label>
             <Button onClick={fetchAllGetEndpoints}>
               🔄 Refresh All
@@ -199,9 +201,9 @@ export default function StoveDebugPage() {
         {/* GET Endpoints Section */}
         <Card>
           <div className="p-6">
-            <h2 className="text-2xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900 mb-4">
+            <Heading level={2} className="mb-4">
               📥 GET Endpoints
-            </h2>
+            </Heading>
             <div className="space-y-4">
               {/* Status */}
               <EndpointDisplay
@@ -293,17 +295,17 @@ export default function StoveDebugPage() {
         {/* POST Endpoints Section */}
         <Card>
           <div className="p-6">
-            <h2 className="text-2xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900 mb-4">
+            <Heading level={2} className="mb-4">
               📤 POST/Control Endpoints
-            </h2>
+            </Heading>
             <div className="space-y-6">
               {/* Ignite */}
               <div className="border-b border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-900">
+                    <Heading level={3} size="md" weight="semibold">
                       Ignite Stove
-                    </h3>
+                    </Heading>
                     <div className="flex items-center gap-2 mt-1">
                       <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
                         {getExternalUrl('/api/stove/ignite')}
@@ -342,9 +344,9 @@ export default function StoveDebugPage() {
               <div className="border-b border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-900">
+                    <Heading level={3} size="md" weight="semibold">
                       Shutdown Stove
-                    </h3>
+                    </Heading>
                     <div className="flex items-center gap-2 mt-1">
                       <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
                         {getExternalUrl('/api/stove/shutdown')}
@@ -382,9 +384,9 @@ export default function StoveDebugPage() {
               <div className="border-b border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-900">
+                    <Heading level={3} size="md" weight="semibold">
                       Set Power Level
-                    </h3>
+                    </Heading>
                     <div className="flex items-center gap-2 mt-1">
                       <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
                         {getExternalUrl('/api/stove/setPower')}
@@ -402,9 +404,9 @@ export default function StoveDebugPage() {
                       </button>
                     </div>
                     <div className="mt-2 flex items-center gap-3">
-                      <label className="text-sm text-slate-300 [html:not(.dark)_&]:text-slate-700">
+                      <Text as="label" size="sm" variant="secondary">
                         Level (1-5):
-                      </label>
+                      </Text>
                       <input
                         type="number"
                         min="1"
@@ -436,9 +438,9 @@ export default function StoveDebugPage() {
               <div className="border-b border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-900">
+                    <Heading level={3} size="md" weight="semibold">
                       Set Fan Level
-                    </h3>
+                    </Heading>
                     <div className="flex items-center gap-2 mt-1">
                       <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
                         {getExternalUrl('/api/stove/setFan')}
@@ -456,9 +458,9 @@ export default function StoveDebugPage() {
                       </button>
                     </div>
                     <div className="mt-2 flex items-center gap-3">
-                      <label className="text-sm text-slate-300 [html:not(.dark)_&]:text-slate-700">
+                      <Text as="label" size="sm" variant="secondary">
                         Level (1-6):
-                      </label>
+                      </Text>
                       <input
                         type="number"
                         min="1"
@@ -490,9 +492,9 @@ export default function StoveDebugPage() {
               <div className="pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-900">
+                    <Heading level={3} size="md" weight="semibold">
                       Set Water Temperature (Boiler)
-                    </h3>
+                    </Heading>
                     <div className="flex items-center gap-2 mt-1">
                       <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
                         {getExternalUrl('/api/stove/setWaterTemperature')}
@@ -510,9 +512,9 @@ export default function StoveDebugPage() {
                       </button>
                     </div>
                     <div className="mt-2 flex items-center gap-3">
-                      <label className="text-sm text-slate-300 [html:not(.dark)_&]:text-slate-700">
+                      <Text as="label" size="sm" variant="secondary">
                         Temperature (30-80°C):
-                      </label>
+                      </Text>
                       <input
                         type="number"
                         min="30"
@@ -554,7 +556,7 @@ function EndpointDisplay({ title, endpoint, externalUrl, response, loading, onRe
     <div className="border-b border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 pb-4 last:border-0">
       <div className="flex items-center justify-between mb-2">
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-900">{title}</h3>
+          <Heading level={3} size="md" weight="semibold">{title}</Heading>
           <div className="flex items-center gap-2 mt-1">
             <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
               {externalUrl}

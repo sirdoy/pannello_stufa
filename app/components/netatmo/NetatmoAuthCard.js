@@ -23,7 +23,7 @@ export default function NetatmoAuthCard() {
       <Card className="p-8 text-center">
         {/* Icon */}
         <div className="mb-6">
-          <div className="w-20 h-20 mx-auto bg-gradient-to-br from-ocean-100 [html:not(.dark)_&]:from-ocean-100 from-ocean-900/40 to-ocean-200 [html:not(.dark)_&]:to-ocean-200 to-ocean-800/40 rounded-3xl flex items-center justify-center">
+          <div className="w-20 h-20 mx-auto bg-gradient-to-br from-ocean-900/40 [html:not(.dark)_&]:from-ocean-100 to-ocean-800/40 [html:not(.dark)_&]:to-ocean-200 rounded-3xl flex items-center justify-center">
             <span className="text-4xl">🌡️</span>
           </div>
         </div>
@@ -40,25 +40,25 @@ export default function NetatmoAuthCard() {
         </Text>
 
         {/* Features */}
-        <div className="bg-slate-50 [html:not(.dark)_&]:bg-slate-50 bg-slate-800/60 rounded-2xl p-6 mb-8 text-left">
+        <div className="bg-slate-800/60 [html:not(.dark)_&]:bg-slate-50 rounded-2xl p-6 mb-8 text-left">
           <Text variant="body" size="sm" weight="semibold" className="mb-3">
             Cosa puoi fare:
           </Text>
           <ul className="space-y-2 text-sm">
             <li className="flex items-start gap-2">
-              <span className="text-sage-600 [html:not(.dark)_&]:text-sage-600 text-sage-400 mt-0.5">✓</span>
+              <Text variant="sage" size="sm" as="span" className="mt-0.5">✓</Text>
               <Text variant="secondary" size="sm" as="span">Visualizzare temperature real-time di tutte le stanze</Text>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-sage-600 [html:not(.dark)_&]:text-sage-600 text-sage-400 mt-0.5">✓</span>
+              <Text variant="sage" size="sm" as="span" className="mt-0.5">✓</Text>
               <Text variant="secondary" size="sm" as="span">Controllare setpoint temperatura per ogni stanza</Text>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-sage-600 [html:not(.dark)_&]:text-sage-600 text-sage-400 mt-0.5">✓</span>
+              <Text variant="sage" size="sm" as="span" className="mt-0.5">✓</Text>
               <Text variant="secondary" size="sm" as="span">Gestire modalità riscaldamento globale</Text>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-sage-600 [html:not(.dark)_&]:text-sage-600 text-sage-400 mt-0.5">✓</span>
+              <Text variant="sage" size="sm" as="span" className="mt-0.5">✓</Text>
               <Text variant="secondary" size="sm" as="span">Creare automazioni stufa ↔ valvole (prossimamente)</Text>
             </li>
           </ul>

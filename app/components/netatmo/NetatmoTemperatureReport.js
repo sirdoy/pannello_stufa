@@ -96,11 +96,11 @@ export default function NetatmoTemperatureReport() {
 
   // Get temperature color
   const getTempColor = (temp, setpoint) => {
-    if (!temp || !setpoint) return 'text-slate-600 [html:not(.dark)_&]:text-slate-600 text-slate-400';
+    if (!temp || !setpoint) return 'text-slate-400 [html:not(.dark)_&]:text-slate-600';
     const diff = temp - setpoint;
-    if (diff >= 0.5) return 'text-sage-600 [html:not(.dark)_&]:text-sage-600 text-sage-400';
-    if (diff <= -1) return 'text-ember-600 [html:not(.dark)_&]:text-ember-600 text-ember-400';
-    return 'text-warning-600 [html:not(.dark)_&]:text-warning-600 text-warning-400';
+    if (diff >= 0.5) return 'text-sage-400 [html:not(.dark)_&]:text-sage-600';
+    if (diff <= -1) return 'text-ember-400 [html:not(.dark)_&]:text-ember-600';
+    return 'text-warning-400 [html:not(.dark)_&]:text-warning-600';
   };
 
   if (loading) {
@@ -114,9 +114,9 @@ export default function NetatmoTemperatureReport() {
           </div>
         </div>
         <div className="animate-pulse space-y-3">
-          <div className="h-12 bg-slate-200 [html:not(.dark)_&]:bg-slate-200 bg-slate-700/50 rounded-xl"></div>
-          <div className="h-12 bg-slate-200 [html:not(.dark)_&]:bg-slate-200 bg-slate-700/50 rounded-xl"></div>
-          <div className="h-12 bg-slate-200 [html:not(.dark)_&]:bg-slate-200 bg-slate-700/50 rounded-xl"></div>
+          <div className="h-12 bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 rounded-xl"></div>
+          <div className="h-12 bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 rounded-xl"></div>
+          <div className="h-12 bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 rounded-xl"></div>
         </div>
       </Card>
     );
@@ -124,7 +124,7 @@ export default function NetatmoTemperatureReport() {
 
   if (!connected) {
     return (
-      <Card className="p-6 bg-ocean-50 [html:not(.dark)_&]:bg-ocean-50 bg-ocean-900/20 border-2 border-ocean-200 [html:not(.dark)_&]:border-ocean-200 border-ocean-700">
+      <Card className="p-6 bg-ocean-900/20 [html:not(.dark)_&]:bg-ocean-50 border-2 border-ocean-700 [html:not(.dark)_&]:border-ocean-200">
         <div className="flex items-center gap-3 mb-4">
           <span className="text-2xl">🌡️</span>
           <div className="flex-1">
@@ -197,7 +197,7 @@ export default function NetatmoTemperatureReport() {
           {sortedRooms.map(room => (
             <div
               key={room.room_id}
-              className="flex items-center gap-3 p-3 bg-white/60 [html:not(.dark)_&]:bg-white/60 bg-slate-800/60 backdrop-blur-sm rounded-xl border border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 hover:shadow-md transition-shadow duration-200"
+              className="flex items-center gap-3 p-3 bg-slate-800/60 [html:not(.dark)_&]:bg-white/60 backdrop-blur-sm rounded-xl border border-slate-700 [html:not(.dark)_&]:border-slate-200 hover:shadow-md transition-shadow duration-200"
             >
               {/* Room icon */}
               <span className="text-2xl flex-shrink-0">
@@ -212,12 +212,12 @@ export default function NetatmoTemperatureReport() {
                   </Text>
                   {/* Device type badge */}
                   {room.deviceType === 'thermostat' && (
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-ocean-100 [html:not(.dark)_&]:bg-ocean-100 bg-ocean-900/40 text-ocean-700 [html:not(.dark)_&]:text-ocean-700 text-ocean-300 flex-shrink-0" title="Termostato">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-ocean-900/40 [html:not(.dark)_&]:bg-ocean-100 text-ocean-300 [html:not(.dark)_&]:text-ocean-700 flex-shrink-0" title="Termostato">
                       🌡️
                     </span>
                   )}
                   {room.deviceType === 'valve' && (
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-flame-100 [html:not(.dark)_&]:bg-flame-100 bg-flame-900/40 text-flame-700 [html:not(.dark)_&]:text-flame-700 text-flame-300 flex-shrink-0" title="Valvola">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-flame-900/40 [html:not(.dark)_&]:bg-flame-100 text-flame-300 [html:not(.dark)_&]:text-flame-700 flex-shrink-0" title="Valvola">
                       🔧
                     </span>
                   )}
@@ -257,7 +257,7 @@ export default function NetatmoTemperatureReport() {
           ))}
         </div>
       ) : (
-        <div className="p-8 text-center bg-slate-50 [html:not(.dark)_&]:bg-slate-50 bg-slate-800/60 rounded-xl border-2 border-dashed border-slate-300 [html:not(.dark)_&]:border-slate-300 border-slate-600">
+        <div className="p-8 text-center bg-slate-800/60 [html:not(.dark)_&]:bg-slate-50 rounded-xl border-2 border-dashed border-slate-600 [html:not(.dark)_&]:border-slate-300">
           <Text variant="tertiary" size="sm">
             Nessuna stanza configurata
           </Text>
@@ -266,7 +266,7 @@ export default function NetatmoTemperatureReport() {
 
       {/* Error message */}
       {error && (
-        <div className="mt-4 p-3 bg-warning-50 [html:not(.dark)_&]:bg-warning-50 bg-warning-900/20 border border-warning-200 [html:not(.dark)_&]:border-warning-200 border-warning-700 rounded-xl">
+        <div className="mt-4 p-3 bg-warning-900/20 [html:not(.dark)_&]:bg-warning-50 border border-warning-700 [html:not(.dark)_&]:border-warning-200 rounded-xl">
           <Text variant="warning" size="sm">⚠️ {error}</Text>
         </div>
       )}

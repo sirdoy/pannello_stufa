@@ -27,6 +27,7 @@ import AddIntervalModal from '@/app/components/scheduler/AddIntervalModal';
 import ScheduleSelector from '@/app/components/scheduler/ScheduleSelector';
 import CreateScheduleModal from '@/app/components/scheduler/CreateScheduleModal';
 import ScheduleManagementModal from '@/app/components/scheduler/ScheduleManagementModal';
+import Heading from '@/app/components/ui/Heading';
 
 const daysOfWeek = [
   'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'
@@ -672,9 +673,9 @@ export default function WeeklyScheduler() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Title + Mode */}
         <Card liquid className="p-6 sm:p-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900 mb-6">
+          <Heading level={1} size="3xl" weight="bold" className="mb-6">
             Pianificazione Settimanale
-          </h1>
+          </Heading>
 
           {/* Schedule Selector */}
           <div className="mb-6">
@@ -739,9 +740,9 @@ export default function WeeklyScheduler() {
 
       {/* Weekly Timeline - Always Visible */}
       <Card liquid className="p-6">
-        <h2 className="text-lg font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-900 mb-4">
+        <Heading level={2} size="lg" weight="semibold" className="mb-4">
           📅 Panoramica Settimanale
-        </h2>
+        </Heading>
         <WeeklyTimeline
           schedule={schedule}
           selectedDay={selectedDay}

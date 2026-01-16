@@ -146,7 +146,7 @@ export default function LogPage() {
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
               deviceFilter === 'all'
                 ? 'bg-slate-900 text-white shadow-liquid-sm'
-                : 'bg-white/[0.08] backdrop-blur-2xl text-slate-300 [html:not(.dark)_&]:text-slate-700 hover:bg-white/[0.12] shadow-liquid-sm ring-1 ring-white/[0.15] ring-inset'
+                : 'bg-white/[0.08] backdrop-blur-2xl text-slate-300 hover:bg-white/[0.12] shadow-liquid-sm ring-1 ring-white/[0.15] ring-inset [html:not(.dark)_&]:text-slate-700'
             }`}
           >
             🏠 Tutti ({deviceCounts.all})
@@ -159,7 +159,7 @@ export default function LogPage() {
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                 deviceFilter === 'stove'
                   ? 'bg-ember-600 text-white shadow-liquid-sm'
-                  : 'bg-ember-500/[0.08] [html:not(.dark)_&]:bg-ember-500/[0.08] bg-ember-500/[0.15] backdrop-blur-2xl text-ember-400 [html:not(.dark)_&]:text-ember-700 hover:bg-ember-500/[0.12] [html:not(.dark)_&]:hover:bg-ember-500/[0.12] hover:bg-ember-500/[0.20] shadow-liquid-sm ring-1 ring-ember-500/20 [html:not(.dark)_&]:ring-ember-500/20 ring-ember-500/30 ring-inset'
+                  : 'bg-ember-500/[0.15] backdrop-blur-2xl text-ember-400 hover:bg-ember-500/[0.20] shadow-liquid-sm ring-1 ring-ember-500/30 ring-inset [html:not(.dark)_&]:bg-ember-500/[0.08] [html:not(.dark)_&]:text-ember-700 [html:not(.dark)_&]:hover:bg-ember-500/[0.12] [html:not(.dark)_&]:ring-ember-500/20'
               }`}
             >
               🔥 Stufa ({deviceCounts.stove})
@@ -173,7 +173,7 @@ export default function LogPage() {
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                 deviceFilter === 'thermostat'
                   ? 'bg-ocean-600 text-white shadow-liquid-sm'
-                  : 'bg-ocean-500/[0.08] [html:not(.dark)_&]:bg-ocean-500/[0.08] bg-ocean-500/[0.15] backdrop-blur-2xl text-ocean-400 [html:not(.dark)_&]:text-ocean-700 hover:bg-ocean-500/[0.12] [html:not(.dark)_&]:hover:bg-ocean-500/[0.12] hover:bg-ocean-500/[0.20] shadow-liquid-sm ring-1 ring-ocean-500/20 [html:not(.dark)_&]:ring-ocean-500/20 ring-ocean-500/30 ring-inset'
+                  : 'bg-ocean-500/[0.15] backdrop-blur-2xl text-ocean-400 hover:bg-ocean-500/[0.20] shadow-liquid-sm ring-1 ring-ocean-500/30 ring-inset [html:not(.dark)_&]:bg-ocean-500/[0.08] [html:not(.dark)_&]:text-ocean-700 [html:not(.dark)_&]:hover:bg-ocean-500/[0.12] [html:not(.dark)_&]:ring-ocean-500/20'
               }`}
             >
               🌡️ Termostato ({deviceCounts.thermostat})
@@ -187,7 +187,7 @@ export default function LogPage() {
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                 deviceFilter === 'lights'
                   ? 'bg-warning-600 text-white shadow-liquid-sm'
-                  : 'bg-warning-500/[0.08] [html:not(.dark)_&]:bg-warning-500/[0.08] bg-warning-500/[0.15] backdrop-blur-2xl text-warning-400 [html:not(.dark)_&]:text-warning-700 hover:bg-warning-500/[0.12] [html:not(.dark)_&]:hover:bg-warning-500/[0.12] hover:bg-warning-500/[0.20] shadow-liquid-sm ring-1 ring-warning-500/20 [html:not(.dark)_&]:ring-warning-500/20 ring-warning-500/30 ring-inset'
+                  : 'bg-warning-500/[0.15] backdrop-blur-2xl text-warning-400 hover:bg-warning-500/[0.20] shadow-liquid-sm ring-1 ring-warning-500/30 ring-inset [html:not(.dark)_&]:bg-warning-500/[0.08] [html:not(.dark)_&]:text-warning-700 [html:not(.dark)_&]:hover:bg-warning-500/[0.12] [html:not(.dark)_&]:ring-warning-500/20'
               }`}
             >
               💡 Luci ({deviceCounts.lights})
@@ -201,7 +201,7 @@ export default function LogPage() {
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                 deviceFilter === 'sonos'
                   ? 'bg-sage-600 text-white shadow-liquid-sm'
-                  : 'bg-sage-500/[0.08] [html:not(.dark)_&]:bg-sage-500/[0.08] bg-sage-500/[0.15] backdrop-blur-2xl text-sage-400 [html:not(.dark)_&]:text-sage-700 hover:bg-sage-500/[0.12] [html:not(.dark)_&]:hover:bg-sage-500/[0.12] hover:bg-sage-500/[0.20] shadow-liquid-sm ring-1 ring-sage-500/20 [html:not(.dark)_&]:ring-sage-500/20 ring-sage-500/30 ring-inset'
+                  : 'bg-sage-500/[0.15] backdrop-blur-2xl text-sage-400 hover:bg-sage-500/[0.20] shadow-liquid-sm ring-1 ring-sage-500/30 ring-inset [html:not(.dark)_&]:bg-sage-500/[0.08] [html:not(.dark)_&]:text-sage-700 [html:not(.dark)_&]:hover:bg-sage-500/[0.12] [html:not(.dark)_&]:ring-sage-500/20'
               }`}
             >
               🎵 Sonos ({deviceCounts.sonos})

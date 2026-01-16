@@ -6,6 +6,8 @@ import ActionButton from '../ui/ActionButton';
 import Card from '../ui/Card';
 import Modal from '../ui/Modal';
 import Input from '../ui/Input';
+import Heading from '../ui/Heading';
+import Text from '../ui/Text';
 import { X } from 'lucide-react';
 
 /**
@@ -209,12 +211,12 @@ export default function EditSceneModal({
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div>
-            <h3 className="text-xl font-bold text-slate-900 [html:not(.dark)_&]:text-white">
+            <Heading level={3} size="xl">
               Modifica Scena
-            </h3>
-            <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-1">
+            </Heading>
+            <Text variant="secondary" size="sm" className="mt-1">
               Aggiorna nome e configurazione luci
-            </p>
+            </Text>
           </div>
           <ActionButton
             icon={<X />}
@@ -245,29 +247,29 @@ export default function EditSceneModal({
               autoFocus
               liquid
             />
-            <p className="mt-2 text-xs text-slate-500 [html:not(.dark)_&]:text-slate-400">
+            <Text variant="tertiary" size="xs" className="mt-2">
               {name.length}/255 caratteri
-            </p>
+            </Text>
           </div>
 
           {/* Room Selection (READ-ONLY) */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300 mb-2">
-              Stanza <span className="text-slate-500 text-xs">(non modificabile)</span>
+              Stanza <Text as="span" variant="tertiary" size="xs">(non modificabile)</Text>
             </label>
             <div className="w-full px-4 py-3 bg-slate-100/60 [html:not(.dark)_&]:bg-slate-700/60 backdrop-blur-xl rounded-xl border border-slate-300/50 [html:not(.dark)_&]:border-slate-600/50 text-slate-600 [html:not(.dark)_&]:text-slate-400 cursor-not-allowed">
               {roomName}
             </div>
-            <p className="mt-1 text-xs text-slate-500 [html:not(.dark)_&]:text-slate-400">
+            <Text variant="tertiary" size="xs" className="mt-1">
               La stanza non può essere modificata dopo la creazione della scena
-            </p>
+            </Text>
           </div>
 
           {/* Lights Configuration */}
           {loadingLights && (
             <div className="text-center py-4">
               <div className="w-8 h-8 border-3 border-ember-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-              <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400">Caricamento luci...</p>
+              <Text variant="secondary" size="sm">Caricamento luci...</Text>
             </div>
           )}
 
@@ -283,9 +285,9 @@ export default function EditSceneModal({
                     <div key={light.id} className="p-4 bg-white/40 [html:not(.dark)_&]:bg-slate-800/40 rounded-xl border border-slate-200/50 [html:not(.dark)_&]:border-slate-700/50">
                       {/* Light Name + Toggle */}
                       <div className="flex items-center justify-between mb-3">
-                        <span className="font-medium text-slate-900 [html:not(.dark)_&]:text-white">
+                        <Text as="span" weight="medium">
                           {light.metadata?.name || 'Luce'}
-                        </span>
+                        </Text>
                         <button
                           onClick={() => handleLightToggle(light.id)}
                           className={`w-12 h-6 rounded-full transition-colors ${
@@ -346,10 +348,10 @@ export default function EditSceneModal({
 
           {/* Error Message */}
           {error && (
-            <p className="text-sm text-ember-600 [html:not(.dark)_&]:text-ember-400 flex items-center gap-1">
+            <Text variant="ember" size="sm" className="flex items-center gap-1">
               <span>⚠️</span>
               <span>{error}</span>
-            </p>
+            </Text>
           )}
         </div>
 

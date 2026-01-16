@@ -4,6 +4,8 @@ import { useState } from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import ActionButton from '../ui/ActionButton';
+import Heading from '../ui/Heading';
+import Text from '../ui/Text';
 import TimeBar from './TimeBar';
 import ScheduleInterval from './ScheduleInterval';
 import IntervalBottomSheet from './IntervalBottomSheet';
@@ -57,26 +59,26 @@ export default function DayEditPanel({
         {/* Left: Title + Info */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-3 flex-wrap">
-            <h3 className="text-2xl font-bold text-slate-900 [html:not(.dark)_&]:text-white">
+            <Heading level={3} className="text-2xl">
               {day}
-            </h3>
-            <span className="text-sm font-medium text-slate-600 [html:not(.dark)_&]:text-slate-400 bg-slate-100 [html:not(.dark)_&]:bg-slate-800 px-3 py-1 rounded-full">
+            </Heading>
+            <Text as="span" variant="secondary" size="sm" weight="medium" className="bg-slate-800/60 [html:not(.dark)_&]:bg-slate-100 px-3 py-1 rounded-full">
               {intervals.length} {intervals.length === 1 ? 'intervallo' : 'intervalli'}
               {intervals.length > 0 && ` • ${totalHours.toFixed(1)}h`}
-            </span>
+            </Text>
           </div>
 
           {/* Save indicator */}
           {saveStatus && (
             <div className="flex items-center">
               {saveStatus.isSaving ? (
-                <span className="text-sm text-blue-500 [html:not(.dark)_&]:text-blue-400 animate-pulse flex items-center gap-1">
+                <Text as="span" size="sm" className="text-blue-400 [html:not(.dark)_&]:text-blue-600 animate-pulse flex items-center gap-1">
                   💾 Salvataggio...
-                </span>
+                </Text>
               ) : (
-                <span className="text-sm text-green-600 [html:not(.dark)_&]:text-green-400 flex items-center gap-1">
+                <Text as="span" size="sm" className="text-green-400 [html:not(.dark)_&]:text-green-700 flex items-center gap-1">
                   ✓ Salvato
-                </span>
+                </Text>
               )}
             </div>
           )}
@@ -154,10 +156,10 @@ export default function DayEditPanel({
       {/* Intervals list */}
       <div className="space-y-3">
         {intervals.length === 0 ? (
-          <div className="text-center py-12 text-slate-500 [html:not(.dark)_&]:text-slate-400">
+          <div className="text-center py-12">
             <div className="text-5xl mb-4">📭</div>
-            <p className="text-lg mb-2">Nessun intervallo configurato per {day}</p>
-            <p className="text-sm mb-4">Aggiungi il primo intervallo per iniziare</p>
+            <Text variant="tertiary" size="lg" className="mb-2">Nessun intervallo configurato per {day}</Text>
+            <Text variant="tertiary" size="sm" className="mb-4">Aggiungi il primo intervallo per iniziare</Text>
             <Button
               liquid
               variant="success"

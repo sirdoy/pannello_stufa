@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { getRecentErrors, resolveError } from '@/lib/errorMonitor';
 import { Card, Button, Pagination, Skeleton } from '@/app/components/ui';
 import ErrorAlert from '@/app/components/ui/ErrorAlert';
+import Heading from '@/app/components/ui/Heading';
+import Text from '@/app/components/ui/Text';
 
 export default function ErrorsPage() {
   const router = useRouter();
@@ -89,13 +91,13 @@ export default function ErrorsPage() {
       <Card liquid className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900 flex items-center gap-3">
+            <Heading level={1} size="3xl" weight="bold" className="flex items-center gap-3">
               <span>🚨</span>
               Storico Allarmi
-            </h1>
-            <p className="text-sm text-slate-400 [html:not(.dark)_&]:text-slate-500 mt-1">
+            </Heading>
+            <Text variant="tertiary" size="sm" className="mt-1">
               Registro completo degli errori e allarmi della stufa
-            </p>
+            </Text>
           </div>
           <Button liquid
             variant="outline"
@@ -116,7 +118,7 @@ export default function ErrorsPage() {
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
               filter === 'all'
                 ? 'bg-slate-900 text-white shadow-liquid-sm'
-                : 'bg-white/[0.08] backdrop-blur-2xl text-slate-400 [html:not(.dark)_&]:text-slate-600 hover:bg-white/[0.12] shadow-liquid-sm ring-1 ring-white/[0.15] ring-inset hover:text-slate-100 [html:not(.dark)_&]:text-slate-900'
+                : 'bg-white/[0.08] backdrop-blur-2xl text-slate-400 hover:bg-white/[0.12] hover:text-slate-100 shadow-liquid-sm ring-1 ring-white/[0.15] ring-inset [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:hover:text-slate-900'
             }`}
           >
             Tutti ({errors.length})
@@ -155,14 +157,14 @@ export default function ErrorsPage() {
         {paginatedErrors.length === 0 ? (
           <Card liquid className="p-12 text-center">
             <span className="text-6xl mb-4 block">✅</span>
-            <h3 className="text-xl font-bold text-slate-100 [html:not(.dark)_&]:text-slate-900 mb-2">
+            <Heading level={3} size="xl" weight="bold" className="mb-2">
               Nessun errore trovato
-            </h3>
-            <p className="text-slate-400 [html:not(.dark)_&]:text-slate-600">
+            </Heading>
+            <Text variant="tertiary">
               {filter === 'all' && 'Non ci sono errori registrati nel sistema.'}
               {filter === 'active' && 'Non ci sono errori attivi al momento.'}
               {filter === 'resolved' && 'Non ci sono errori risolti da visualizzare.'}
-            </p>
+            </Text>
           </Card>
         ) : (
           paginatedErrors.map((error) => (
@@ -175,51 +177,51 @@ export default function ErrorsPage() {
                 />
 
                 {/* Metadata */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-200 [html:not(.dark)_&]:border-slate-200">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-700 [html:not(.dark)_&]:border-slate-200">
                   <div>
-                    <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 mb-1">Data e Ora</p>
-                    <p className="text-sm font-medium text-slate-100 [html:not(.dark)_&]:text-slate-900">
+                    <Text variant="tertiary" size="xs" className="mb-1">Data e Ora</Text>
+                    <Text size="sm" weight="medium">
                       {formatDate(error.timestamp)}
-                    </p>
+                    </Text>
                   </div>
 
                   {error.status && (
                     <div>
-                      <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 mb-1">Stato Stufa</p>
-                      <p className="text-sm font-medium text-slate-100 [html:not(.dark)_&]:text-slate-900">
+                      <Text variant="tertiary" size="xs" className="mb-1">Stato Stufa</Text>
+                      <Text size="sm" weight="medium">
                         {error.status}
-                      </p>
+                      </Text>
                     </div>
                   )}
 
                   <div>
-                    <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 mb-1">Stato</p>
+                    <Text variant="tertiary" size="xs" className="mb-1">Stato</Text>
                     <div className="flex items-center gap-2">
                       {error.resolved ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-sage-100 [html:not(.dark)_&]:bg-sage-100 text-sage-300 [html:not(.dark)_&]:text-sage-700 rounded text-xs font-medium">
+                        <Text as="span" variant="sage" size="xs" weight="medium" className="inline-flex items-center gap-1 px-2 py-1 bg-sage-100 [html:not(.dark)_&]:bg-sage-100 rounded">
                           ✓ Risolto
-                        </span>
+                        </Text>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-warning-100 [html:not(.dark)_&]:bg-warning-100 text-warning-300 [html:not(.dark)_&]:text-warning-700 rounded text-xs font-medium">
+                        <Text as="span" variant="warning" size="xs" weight="medium" className="inline-flex items-center gap-1 px-2 py-1 bg-warning-100 [html:not(.dark)_&]:bg-warning-100 rounded">
                           ⚠ Attivo
-                        </span>
+                        </Text>
                       )}
                     </div>
                   </div>
 
                   {error.resolved && error.resolvedAt && (
                     <div>
-                      <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 mb-1">Risolto Dopo</p>
-                      <p className="text-sm font-medium text-slate-100 [html:not(.dark)_&]:text-slate-900">
+                      <Text variant="tertiary" size="xs" className="mb-1">Risolto Dopo</Text>
+                      <Text size="sm" weight="medium">
                         {formatDuration(error.timestamp, error.resolvedAt)}
-                      </p>
+                      </Text>
                     </div>
                   )}
                 </div>
 
                 {/* Actions */}
                 {!error.resolved && (
-                  <div className="pt-4 border-t border-slate-200 [html:not(.dark)_&]:border-slate-200">
+                  <div className="pt-4 border-t border-slate-700 [html:not(.dark)_&]:border-slate-200">
                     <Button liquid
                       variant="success"
                       size="sm"

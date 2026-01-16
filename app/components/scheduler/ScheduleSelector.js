@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Button from '../ui/Button';
+import Text from '../ui/Text';
 
 /**
  * ScheduleSelector Component
@@ -82,18 +83,18 @@ export default function ScheduleSelector({
         <div className="flex items-center gap-3 flex-1 text-left">
           <div className="w-2 h-2 rounded-full bg-sage-500 shadow-sage-glow-sm animate-pulse" />
           <div className="flex-1 min-w-0">
-            <div className="text-xs font-medium text-slate-500 [html:not(.dark)_&]:text-slate-400">
+            <Text variant="tertiary" size="xs" weight="medium">
               Pianificazione Attiva
-            </div>
-            <div className="text-base font-semibold text-slate-900 [html:not(.dark)_&]:text-white truncate">
+            </Text>
+            <Text weight="semibold" className="truncate">
               {loading ? 'Caricamento...' : activeSchedule?.name || 'Nessuna'}
-            </div>
+            </Text>
           </div>
         </div>
 
         {/* Right: Dropdown Icon */}
         <svg
-          className={`w-5 h-5 text-slate-500 [html:not(.dark)_&]:text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-5 h-5 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''} [html:not(.dark)_&]:text-slate-500`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -117,66 +118,68 @@ export default function ScheduleSelector({
             <div className="p-4">
               <div className="text-center py-4">
                 <div className="text-3xl mb-3">📅</div>
-                <p className="text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300 mb-2">
+                <Text weight="semibold" size="sm" variant="secondary" className="mb-2">
                   Nessuna pianificazione trovata
-                </p>
-                <p className="text-xs text-slate-600 [html:not(.dark)_&]:text-slate-400 mb-4">
+                </Text>
+                <Text variant="secondary" size="xs" className="mb-4">
                   Esegui la migrazione per creare la struttura v2
-                </p>
-                <div className="bg-slate-100/60 [html:not(.dark)_&]:bg-slate-700/40 rounded-xl p-3 text-left">
-                  <code className="text-xs text-slate-800 [html:not(.dark)_&]:text-slate-200 block">
+                </Text>
+                <div className="bg-slate-700/40 rounded-xl p-3 text-left [html:not(.dark)_&]:bg-slate-100/60">
+                  <Text as="code" size="xs" className="block">
                     npm run migrate:schedules
-                  </code>
+                  </Text>
                 </div>
               </div>
-              <div className="mt-3 pt-3 border-t border-slate-200/60 [html:not(.dark)_&]:border-slate-700/60">
+              <div className="mt-3 pt-3 border-t border-slate-700/60 [html:not(.dark)_&]:border-slate-200/60">
                 <button
                   onClick={() => {
                     onCreateNew();
                     setIsOpen(false);
                   }}
-                  className="w-full px-4 py-3 bg-ember-500/10 [html:not(.dark)_&]:bg-ember-500/20 hover:bg-ember-500/15 [html:not(.dark)_&]:hover:bg-ember-500/25 rounded-xl transition-all duration-150 flex items-center justify-center gap-2 text-ember-700 [html:not(.dark)_&]:text-ember-300 font-semibold text-sm"
+                  className="w-full px-4 py-3 bg-ember-500/20 hover:bg-ember-500/25 rounded-xl transition-all duration-150 flex items-center justify-center gap-2 [html:not(.dark)_&]:bg-ember-500/10 [html:not(.dark)_&]:hover:bg-ember-500/15"
                 >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-5 h-5 text-ember-300 [html:not(.dark)_&]:text-ember-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
-                  <span>Crea Prima Pianificazione</span>
+                  <Text as="span" variant="ember" size="sm" weight="semibold">
+                    Crea Prima Pianificazione
+                  </Text>
                 </button>
               </div>
             </div>
           ) : (
             <>
               {/* Active Schedule Section */}
-              <div className="p-3 border-b border-slate-200/60 [html:not(.dark)_&]:border-slate-700/60">
-                <div className="text-xs font-semibold text-slate-500 [html:not(.dark)_&]:text-slate-400 uppercase tracking-wider mb-2 px-2">
+              <div className="p-3 border-b border-slate-700/60 [html:not(.dark)_&]:border-slate-200/60">
+                <Text as="div" variant="tertiary" size="xs" weight="semibold" className="uppercase tracking-wider mb-2 px-2">
                   Attiva
-                </div>
-                <div className="px-3 py-2 bg-sage-50/50 [html:not(.dark)_&]:bg-sage-950/30 rounded-xl flex items-center gap-3">
+                </Text>
+                <div className="px-3 py-2 bg-sage-950/30 rounded-xl flex items-center gap-3 [html:not(.dark)_&]:bg-sage-50/50">
                   <div className="w-2 h-2 rounded-full bg-sage-500 shadow-sage-glow-sm" />
-                  <div className="flex-1 text-sm font-semibold text-sage-800 [html:not(.dark)_&]:text-sage-300">
+                  <Text as="div" size="sm" weight="semibold" variant="sage" className="flex-1">
                     {activeSchedule?.name}
-                  </div>
-                  <div className="text-xs text-sage-600 [html:not(.dark)_&]:text-sage-400">✓</div>
+                  </Text>
+                  <Text as="div" size="xs" variant="sage">✓</Text>
                 </div>
               </div>
 
           {/* Other Schedules Section */}
           {otherSchedules.length > 0 && (
-            <div className="p-3 border-b border-slate-200/60 [html:not(.dark)_&]:border-slate-700/60">
-              <div className="text-xs font-semibold text-slate-500 [html:not(.dark)_&]:text-slate-400 uppercase tracking-wider mb-2 px-2">
+            <div className="p-3 border-b border-slate-700/60 [html:not(.dark)_&]:border-slate-200/60">
+              <Text as="div" variant="tertiary" size="xs" weight="semibold" className="uppercase tracking-wider mb-2 px-2">
                 Disponibili
-              </div>
+              </Text>
               <div className="space-y-1">
                 {otherSchedules.map((schedule) => (
                   <button
                     key={schedule.id}
                     onClick={() => handleSelect(schedule.id)}
-                    className="w-full px-3 py-2 text-left rounded-xl hover:bg-slate-100/80 [html:not(.dark)_&]:hover:bg-slate-700/50 transition-all duration-150 flex items-center gap-3 group"
+                    className="w-full px-3 py-2 text-left rounded-xl hover:bg-slate-700/50 transition-all duration-150 flex items-center gap-3 group [html:not(.dark)_&]:hover:bg-slate-100/80"
                   >
-                    <div className="w-2 h-2 rounded-full bg-slate-300 [html:not(.dark)_&]:bg-slate-600 group-hover:bg-ember-400 [html:not(.dark)_&]:group-hover:bg-ember-500 transition-colors" />
-                    <div className="flex-1 text-sm font-medium text-slate-700 [html:not(.dark)_&]:text-slate-300 group-hover:text-slate-900 [html:not(.dark)_&]:group-hover:text-white">
+                    <div className="w-2 h-2 rounded-full bg-slate-600 group-hover:bg-ember-500 transition-colors [html:not(.dark)_&]:bg-slate-300 [html:not(.dark)_&]:group-hover:bg-ember-400" />
+                    <Text as="div" size="sm" weight="medium" variant="secondary" className="flex-1 group-hover:text-white [html:not(.dark)_&]:group-hover:text-slate-900">
                       {schedule.name}
-                    </div>
+                    </Text>
                   </button>
                 ))}
               </div>
@@ -190,12 +193,14 @@ export default function ScheduleSelector({
                     onCreateNew();
                     setIsOpen(false);
                   }}
-                  className="w-full px-4 py-3 bg-ember-500/10 [html:not(.dark)_&]:bg-ember-500/20 hover:bg-ember-500/15 [html:not(.dark)_&]:hover:bg-ember-500/25 rounded-xl transition-all duration-150 flex items-center justify-center gap-2 text-ember-700 [html:not(.dark)_&]:text-ember-300 font-semibold text-sm"
+                  className="w-full px-4 py-3 bg-ember-500/20 hover:bg-ember-500/25 rounded-xl transition-all duration-150 flex items-center justify-center gap-2 [html:not(.dark)_&]:bg-ember-500/10 [html:not(.dark)_&]:hover:bg-ember-500/15"
                 >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-5 h-5 text-ember-300 [html:not(.dark)_&]:text-ember-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
-                  <span>Crea Nuova Pianificazione</span>
+                  <Text as="span" variant="ember" size="sm" weight="semibold">
+                    Crea Nuova Pianificazione
+                  </Text>
                 </button>
               </div>
             </>

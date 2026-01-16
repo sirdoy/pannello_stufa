@@ -4,6 +4,8 @@ import { APP_VERSION } from '@/lib/version';
 import Modal from './ui/Modal';
 import Card from './ui/Card';
 import Button from './ui/Button';
+import Heading from './ui/Heading';
+import Text from './ui/Text';
 
 /**
  * Modal bloccante per forzare aggiornamento applicazione
@@ -37,39 +39,39 @@ export default function ForceUpdateModal({ show, firebaseVersion }) {
         </div>
 
         {/* Header */}
-        <h2 className="text-2xl font-bold text-slate-900 [html:not(.dark)_&]:text-white mb-4 text-center">
+        <Heading level={2} className="mb-4 text-center text-slate-900 [html:not(.dark)_&]:text-white">
           Aggiornamento Disponibile
-        </h2>
+        </Heading>
 
         {/* Content */}
         <div className="space-y-4 mb-6">
-          <p className="text-slate-700 [html:not(.dark)_&]:text-slate-300 text-center">
+          <Text className="text-center text-slate-700 [html:not(.dark)_&]:text-slate-300">
             È disponibile una nuova versione dell&apos;applicazione. Per continuare ad utilizzare il pannello è necessario aggiornare.
-          </p>
+          </Text>
 
           {/* Version info */}
           <div className="bg-slate-100 [html:not(.dark)_&]:bg-slate-800 rounded-xl p-4 space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-slate-600 [html:not(.dark)_&]:text-slate-400">
+              <Text as="span" size="sm" weight="medium" className="text-slate-600 [html:not(.dark)_&]:text-slate-400">
                 Versione attuale:
-              </span>
-              <span className="text-sm font-bold text-slate-900 [html:not(.dark)_&]:text-white">
+              </Text>
+              <Text as="span" size="sm" weight="bold" className="text-slate-900 [html:not(.dark)_&]:text-white">
                 {APP_VERSION}
-              </span>
+              </Text>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-slate-600 [html:not(.dark)_&]:text-slate-400">
+              <Text as="span" size="sm" weight="medium" className="text-slate-600 [html:not(.dark)_&]:text-slate-400">
                 Nuova versione:
-              </span>
-              <span className="text-sm font-bold text-ember-600 [html:not(.dark)_&]:text-ember-400">
+              </Text>
+              <Text as="span" size="sm" weight="bold" variant="ember">
                 {firebaseVersion}
-              </span>
+              </Text>
             </div>
           </div>
 
-          <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 text-center italic">
+          <Text size="sm" className="text-center italic text-slate-600 [html:not(.dark)_&]:text-slate-400">
             L&apos;aggiornamento richiede solo il ricaricamento della pagina.
-          </p>
+          </Text>
         </div>
 
         {/* Action button - solo questo disponibile */}

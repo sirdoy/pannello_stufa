@@ -13,12 +13,7 @@ import {
 import { logSchedulerAction } from '@/lib/logService';
 import { db } from '@/lib/firebase';
 import { ref, onValue } from 'firebase/database';
-import Card from '@/app/components/ui/Card';
-import Button from '@/app/components/ui/Button';
-import ModeIndicator from '@/app/components/ui/ModeIndicator';
-import Skeleton from '@/app/components/ui/Skeleton';
-import Toast from '@/app/components/ui/Toast';
-import ConfirmDialog from '@/app/components/ui/ConfirmDialog';
+import { Card, Button, ModeIndicator, Skeleton, Toast, ConfirmDialog, Heading } from '@/app/components/ui';
 import WeeklyTimeline from '@/app/components/scheduler/WeeklyTimeline';
 import DayEditPanel from '@/app/components/scheduler/DayEditPanel';
 import WeeklySummaryCard from '@/app/components/scheduler/WeeklySummaryCard';
@@ -27,7 +22,6 @@ import AddIntervalModal from '@/app/components/scheduler/AddIntervalModal';
 import ScheduleSelector from '@/app/components/scheduler/ScheduleSelector';
 import CreateScheduleModal from '@/app/components/scheduler/CreateScheduleModal';
 import ScheduleManagementModal from '@/app/components/scheduler/ScheduleManagementModal';
-import Heading from '@/app/components/ui/Heading';
 
 const daysOfWeek = [
   'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'
@@ -672,10 +666,12 @@ export default function WeeklyScheduler() {
       {/* Header Row - 2 columns on desktop */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Title + Mode */}
-        <Card liquid className="p-6 sm:p-8">
-          <Heading level={1} size="3xl" weight="bold" className="mb-6">
-            Pianificazione Settimanale
-          </Heading>
+        <Card variant="glass" className="p-6 sm:p-8">
+          <div className="mb-6">
+            <Heading level={1} size="3xl">
+              Pianificazione Settimanale
+            </Heading>
+          </div>
 
           {/* Schedule Selector */}
           <div className="mb-6">
@@ -688,8 +684,7 @@ export default function WeeklyScheduler() {
             />
             {/* Manage Schedules Button */}
             <Button
-              liquid
-              variant="secondary"
+              variant="subtle"
               onClick={() => setManageSchedulesModal(true)}
               className="w-full mt-3"
               size="sm"
@@ -711,7 +706,6 @@ export default function WeeklyScheduler() {
             <div className="flex gap-3">
               {schedulerEnabled && semiManualMode && (
                 <Button
-                  liquid
                   variant="warning"
                   onClick={handleClearSemiManual}
                   className="flex-1"
@@ -722,7 +716,6 @@ export default function WeeklyScheduler() {
                 </Button>
               )}
               <Button
-                liquid
                 variant={schedulerEnabled ? 'danger' : 'success'}
                 onClick={toggleSchedulerMode}
                 className="flex-1"
@@ -739,10 +732,12 @@ export default function WeeklyScheduler() {
       </div>
 
       {/* Weekly Timeline - Always Visible */}
-      <Card liquid className="p-6">
-        <Heading level={2} size="lg" weight="semibold" className="mb-4">
-          📅 Panoramica Settimanale
-        </Heading>
+      <Card variant="glass" className="p-6">
+        <div className="mb-4">
+          <Heading level={2} size="lg">
+            📅 Panoramica Settimanale
+          </Heading>
+        </div>
         <WeeklyTimeline
           schedule={schedule}
           selectedDay={selectedDay}

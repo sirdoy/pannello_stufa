@@ -5,6 +5,31 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.53.1] - 2026-01-16
+
+### 🔧 Design System Compliance Fixes
+
+**Obiettivo**: Allineare completamente homepage e scheduler al design system Ember Noir, eliminando pattern deprecati.
+
+#### 🐛 Fixed
+
+**Homepage:**
+- Sonos placeholder ora usa componenti Card (CardHeader, CardTitle, CardContent) invece di div con classi manuali
+- Aggiunti export mancanti (CardHeader, CardTitle, CardContent, CardFooter, CardDivider) a `components/ui/index.js`
+
+**Scheduler Page:**
+- Rimossa prop deprecata `liquid` da tutti i Card components (sostituita con `variant="glass"`)
+- Rimossa prop deprecata `variant="secondary"` da Button (sostituita con `variant="subtle"`)
+- Rimosso prop `weight` non valido da Heading components (gestito automaticamente)
+- Spostato spacing da `Heading className` a wrapper `<div>` per conformità design system
+- Unificati import UI components per usare barrel export da `@/app/components/ui`
+
+#### 📝 Documentation
+
+- Nessuna modifica alla documentazione (già completa)
+
+---
+
 ## [1.53.0] - 2026-01-16
 
 ### ✨ Complete Design System Showcase & Documentation

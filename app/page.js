@@ -4,7 +4,7 @@ import ThermostatCard from './components/devices/thermostat/ThermostatCard';
 import LightsCard from './components/devices/lights/LightsCard';
 import SandboxToggle from './components/sandbox/SandboxToggle';
 import { getEnabledDevicesForUser } from '@/lib/devicePreferencesService';
-import { Section, Grid, Heading, Text, Divider, EmptyState } from './components/ui';
+import { Section, Grid, Text, EmptyState, Card, CardHeader, CardTitle, CardContent } from './components/ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,13 +65,14 @@ export default async function Home() {
               // Placeholder - future implementation
               return (
                 <div key={device.id} className="animate-spring-in" style={{ animationDelay }}>
-                  <div className="p-6 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-white/[0.06] shadow-card [html:not(.dark)_&]:bg-white/90 [html:not(.dark)_&]:border-black/[0.06] [html:not(.dark)_&]:shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="text-3xl">{device.icon}</span>
-                      <Heading level={2} size="lg">{device.name}</Heading>
-                    </div>
-                    <Text variant="secondary">In arrivo - Integrazione Spotify + Sonos</Text>
-                  </div>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle icon={device.icon}>{device.name}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Text variant="secondary">In arrivo - Integrazione Spotify + Sonos</Text>
+                    </CardContent>
+                  </Card>
                 </div>
               );
             }

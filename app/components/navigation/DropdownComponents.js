@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import TransitionLink from '@/app/components/TransitionLink';
 import Text from '@/app/components/ui/Text';
 
 /**
@@ -35,7 +35,7 @@ export function DropdownItem({
   const inactiveClasses = 'text-slate-200 [html:not(.dark)_&]:text-slate-800 hover:bg-slate-800/80 [html:not(.dark)_&]:hover:bg-slate-100/80 hover:shadow-liquid-sm hover:scale-[1.02]';
 
   return (
-    <Link
+    <TransitionLink
       href={href}
       onClick={onClick}
       style={{ animationDelay: `${animationDelay}ms` }}
@@ -54,7 +54,7 @@ export function DropdownItem({
       </div>
       {/* Hover shine effect */}
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none" />
-    </Link>
+    </TransitionLink>
   );
 }
 
@@ -123,7 +123,7 @@ export function MenuItem({
   const roundingClass = variant === 'prominent' ? 'rounded-2xl' : 'rounded-xl';
 
   return (
-    <Link
+    <TransitionLink
       href={href}
       onClick={onClick}
       style={{ animationDelay: `${animationDelay}ms` }}
@@ -137,7 +137,7 @@ export function MenuItem({
       </div>
       {/* Hover shine effect */}
       <div className={`absolute inset-0 bg-gradient-to-r from-transparent ${variant === 'prominent' ? 'via-white/20' : 'via-white/10'} to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none`} />
-    </Link>
+    </TransitionLink>
   );
 }
 

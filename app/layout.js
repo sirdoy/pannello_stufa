@@ -28,6 +28,7 @@ export default function RootLayout({ children }) {
     <html lang="it" suppressHydrationWarning>
     <head>
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+      <meta name="view-transition" content="same-origin" />
       <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
       <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png" />

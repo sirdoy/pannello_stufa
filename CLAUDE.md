@@ -128,6 +128,7 @@ node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require(
 - **[API Routes](docs/api-routes.md)** - Stove control, scheduler, OAuth 2.0 patterns
 - **[UI Components](docs/ui-components.md)** - Card, Button, Banner, Toast, liquid glass
 - **[Design System](docs/design-system.md)** - Colors, typography, styling hierarchy
+- **[Page Transitions](docs/page-transitions.md)** - Cinematographic transitions, View Transitions API, 6 animation styles
 - **[Patterns](docs/patterns.md)** - Reusable code patterns (dropdowns, modals, etc.)
 - **[Data Flow](docs/data-flow.md)** - Polling, cron, OAuth, notifications flow
 
@@ -269,6 +270,6 @@ ADMIN_USER_ID=auth0|xxx
 
 ---
 
-**Version**: 1.49.1
-**Last Updated**: 2025-12-28
+**Version**: 1.51.0
+**Last Updated**: 2026-01-16
 **Author**: Federico Manfredi

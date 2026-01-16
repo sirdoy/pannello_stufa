@@ -5,6 +5,96 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.51.0] - 2026-01-16
+
+### ✨ Cinematographic Page Transitions
+
+**Obiettivo**: Sistema professionale di transizioni di pagina con View Transitions API e 6 stili cinematografici.
+
+#### 🎬 Features
+
+**PageTransitionProvider:**
+- Context React per gestione transizioni centralizzata
+- View Transitions API nativa (Chrome 111+, Safari 18+, Edge 111+)
+- CSS fallback per tutti i browser moderni
+- Direction awareness (animazioni diverse per forward/backward)
+- Hook `usePageTransition()` per controllo programmatico
+
+**6 Tipi di Transizione:**
+1. **slide-morph** - Slide + scale + blur (iOS-style, default)
+2. **fade-scale** - Zoom gentile con fade
+3. **ember-burst** - Esplosione ember glow (spettacolare!)
+4. **liquid-flow** - Flow liquido verticale
+5. **stack-lift** - Card lift con rotazione 3D
+6. **diagonal-sweep** - Wipe diagonale cinematografico
+
+**TransitionLink Component:**
+- Drop-in replacement per `Link` di Next.js
+- Tutti i props compatibili
+- Transizioni automatiche
+- Custom transition per link specifici
+
+**Integration:**
+- Navbar aggiornato con TransitionLink
+- Navigation components (DropdownItem, MenuItem)
+- Bottom navigation mobile
+- Menu behavior ottimizzato (links → menu aperto, logo → menu chiuso)
+
+**Demo Page:**
+- Pagina interattiva `/debug/transitions`
+- Test tutti i tipi di transizione in real-time
+- Esempi pratici su pagine reali
+- Status indicator live
+
+**Accessibility:**
+- Rispetta automaticamente `prefers-reduced-motion`
+- WCAG AA compliant
+- Keyboard navigation support
+
+#### 📚 Documentation
+
+**docs/page-transitions.md:**
+- Quick start guide
+- API reference completa
+- 6 transition types con esempi
+- Customization guide
+- Performance best practices
+- Browser support matrix
+- Troubleshooting
+- Migration guide
+
+#### 🎨 Design Integration
+
+- Perfetta integrazione con Ember Noir Design System
+- Ember glow effects
+- Liquid glass blur
+- Warm color palette
+- Dark/Light mode support
+
+#### 🚀 Performance
+
+- 60fps target (16.67ms/frame)
+- GPU accelerated (transform, opacity, filter)
+- No layout thrashing
+- 500ms duration (ottimale per percezione utente)
+
+#### 📦 Files Added
+
+- `app/context/PageTransitionContext.js` - Provider + hooks
+- `app/components/TransitionLink.js` - Link wrapper
+- `app/debug/transitions/page.js` - Demo page
+- `app/globals.css` - +300 righe CSS animations
+- `docs/page-transitions.md` - Documentazione completa
+
+#### 📝 Files Modified
+
+- `app/layout.js` - Meta tag View Transitions API
+- `app/components/ClientProviders.js` - PageTransitionProvider integration
+- `app/components/Navbar.js` - TransitionLink + menu behavior
+- `app/components/navigation/DropdownComponents.js` - TransitionLink integration
+
+---
+
 ## [1.50.1] - 2026-01-16
 
 ### 🐛 Complete Dark Mode Unification

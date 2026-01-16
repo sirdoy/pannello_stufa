@@ -14,6 +14,7 @@ import {
   UserInfoCard
 } from './navigation';
 import Text from './ui/Text';
+import TransitionLink from './TransitionLink';
 
 /**
  * Navbar Component - Ember Noir Design System
@@ -182,7 +183,11 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16 lg:h-18">
 
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
+            <TransitionLink
+              href="/"
+              className="flex items-center gap-3 group flex-shrink-0"
+              onClick={() => setMobileMenuOpen(false)}
+            >
               <div className="
                 text-2xl sm:text-3xl
                 group-hover:scale-110
@@ -202,7 +207,7 @@ export default function Navbar() {
               >
                 Smart Home
               </Text>
-            </Link>
+            </TransitionLink>
 
             {/* Desktop Navigation - Hidden on mobile */}
             <nav className="hidden lg:flex items-center gap-3">
@@ -249,7 +254,6 @@ export default function Navbar() {
                           icon={getIconForPath(item.route)}
                           label={item.label}
                           isActive={isActive(item.route)}
-                          onClick={() => setDesktopDeviceDropdown(null)}
                           animationDelay={idx * 40}
                         />
                       ))}
@@ -320,7 +324,6 @@ export default function Navbar() {
                           label={item.label}
                           description={item.description}
                           isActive={isActive(item.route)}
-                          onClick={() => setSettingsDropdownOpen(false)}
                           animationDelay={idx * 40}
                         />
                       ))}
@@ -366,7 +369,6 @@ export default function Navbar() {
                         icon={<LogOut className="w-5 h-5" />}
                         label="Logout"
                         isActive={false}
-                        onClick={() => setUserDropdownOpen(false)}
                         className="text-flame-400 dark:text-flame-400 [html:not(.dark)_&]:text-flame-600"
                       />
                     </DropdownContainer>
@@ -453,7 +455,6 @@ export default function Navbar() {
                       icon={getIconForPath(item.route)}
                       label={item.label}
                       isActive={isActive(item.route)}
-                      onClick={() => setMobileMenuOpen(false)}
                       animationDelay={idx * 50}
                     />
                   ))}
@@ -474,7 +475,6 @@ export default function Navbar() {
                       icon={item.icon}
                       label={item.label}
                       isActive={isActive(item.route)}
-                      onClick={() => setMobileMenuOpen(false)}
                       animationDelay={idx * 50}
                     />
                   ))}
@@ -487,7 +487,6 @@ export default function Navbar() {
                   href="/auth/logout"
                   icon={<LogOut className="w-6 h-6" />}
                   label="Logout"
-                  onClick={() => setMobileMenuOpen(false)}
                   variant="prominent"
                 />
               </MenuSection>
@@ -510,7 +509,7 @@ export default function Navbar() {
       ">
         <div className="grid grid-cols-4 gap-2 p-2">
           {/* Home */}
-          <Link
+          <TransitionLink
             href="/"
             className={`
               flex flex-col items-center justify-center
@@ -526,10 +525,10 @@ export default function Navbar() {
           >
             <Home className="w-6 h-6 mb-1" />
             <Text as="span" weight="medium" className="text-[10px] font-display">Home</Text>
-          </Link>
+          </TransitionLink>
 
           {/* Scheduler */}
-          <Link
+          <TransitionLink
             href="/stove/scheduler"
             className={`
               flex flex-col items-center justify-center
@@ -545,10 +544,10 @@ export default function Navbar() {
           >
             <Calendar className="w-6 h-6 mb-1" />
             <Text as="span" weight="medium" className="text-[10px] font-display">Orari</Text>
-          </Link>
+          </TransitionLink>
 
           {/* Errors */}
-          <Link
+          <TransitionLink
             href="/stove/errors"
             className={`
               flex flex-col items-center justify-center
@@ -564,10 +563,10 @@ export default function Navbar() {
           >
             <AlertCircle className="w-6 h-6 mb-1" />
             <Text as="span" weight="medium" className="text-[10px] font-display">Errori</Text>
-          </Link>
+          </TransitionLink>
 
           {/* Log */}
-          <Link
+          <TransitionLink
             href="/log"
             className={`
               flex flex-col items-center justify-center
@@ -583,7 +582,7 @@ export default function Navbar() {
           >
             <Clock className="w-6 h-6 mb-1" />
             <Text as="span" weight="medium" className="text-[10px] font-display">Log</Text>
-          </Link>
+          </TransitionLink>
         </div>
       </nav>
 

@@ -3,6 +3,7 @@
 import { Auth0Provider } from '@auth0/nextjs-auth0/client';
 import { VersionProvider } from '@/app/context/VersionContext';
 import { ThemeProvider } from '@/app/context/ThemeContext';
+import { PageTransitionProvider } from '@/app/context/PageTransitionContext';
 import ThemeScript from './ThemeScript';
 
 /**
@@ -14,9 +15,11 @@ export default function ClientProviders({ children }) {
     <Auth0Provider>
       <ThemeScript />
       <ThemeProvider>
-        <VersionProvider>
-          {children}
-        </VersionProvider>
+        <PageTransitionProvider>
+          <VersionProvider>
+            {children}
+          </VersionProvider>
+        </PageTransitionProvider>
       </ThemeProvider>
     </Auth0Provider>
   );

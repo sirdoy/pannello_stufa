@@ -5,6 +5,65 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.53.0] - 2026-01-16
+
+### ✨ Complete Design System Showcase & Documentation
+
+**Obiettivo**: Creare una pagina showcase completa con tutti i componenti UI del design system Ember Noir come single source of truth per lo sviluppo.
+
+#### 🎯 Features
+
+**Design System Showcase Page:**
+- Creata pagina interattiva `/debug/design-system` con tutti i componenti UI
+- Esempi live con state management funzionante (toggle, select, modal, etc.)
+- Perfect alignment tra showcase page e `docs/design-system.md`
+- Aggiunta al menu Impostazioni → Debug per facile accesso
+
+**Base Components (9):**
+- Typography: Heading + Text (tutte le varianti con dark/light mode)
+- Form Inputs: Input, Select, Toggle (con props completi)
+- StatusBadge (auto-detection + varianti + sizes)
+- Divider (solid, dashed, gradient, with/without label)
+- ProgressBar ✨ NEW (variants, sizes, custom content, animated)
+- EmptyState ✨ NEW (centered layout, icon, title, description, action)
+
+**Composed Components (6):**
+- Card (+ CardHeader, CardTitle, CardContent, CardFooter, CardDivider)
+- Banner (5 variants con critical usage notes)
+- Toast (auto-dismiss, progress bar, variants)
+- Modal (React Portal, scroll lock, Escape key)
+- ConfirmDialog ✨ NEW (danger/success variants, scroll lock)
+- BottomSheet ✨ NEW (mobile-friendly, drag handle, portal)
+- Skeleton (+ Skeleton.Card, shimmer effect)
+
+**Design Foundation:**
+- Color Palette (7 semantic colors with usage notes)
+- Spacing Scale, Border Radius, Shadow System
+- Best Practices section (critical anti-patterns)
+
+**Documentation:**
+- Documentazione tecnica completa per ProgressBar in docs/design-system.md
+- Documentazione tecnica completa per EmptyState in docs/design-system.md
+- Documentazione tecnica completa per ConfirmDialog in docs/design-system.md
+- Documentazione tecnica completa per BottomSheet in docs/design-system.md
+- Props, Styling, Features, Usage Patterns per ogni componente
+
+#### 📁 Files Modified
+
+- `app/debug/design-system/page.js` - Showcase page completa (25+ components)
+- `docs/design-system.md` - Documentazione tecnica (4 nuovi componenti)
+- `lib/devices/deviceTypes.js` - Aggiunta voce Design System a Debug submenu
+- `CLAUDE.md` - Aggiunto riferimento al design system (line 170)
+
+#### 🎨 UX Improvements
+
+- Single source of truth per componenti UI
+- Reference guide visivo per sviluppo nuove features
+- Documentazione sempre allineata con implementazione
+- Riduzione ambiguità nella scelta dei componenti
+
+---
+
 ## [1.52.0] - 2026-01-16
 
 ### ✨ Settings Menu Hierarchy & Debug Submenu

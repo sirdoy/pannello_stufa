@@ -128,6 +128,7 @@ node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require(
 - **[API Routes](docs/api-routes.md)** - Stove control, scheduler, OAuth 2.0 patterns
 - **[UI Components](docs/ui-components.md)** - Card, Button, Banner, Toast, liquid glass
 - **[Design System](docs/design-system.md)** - Colors, typography, styling hierarchy
+- **[Design System Showcase](/debug/design-system)** - Live showcase of all UI components (use as reference)
 - **[Page Transitions](docs/page-transitions.md)** - Cinematographic transitions, View Transitions API, 6 animation styles
 - **[Patterns](docs/patterns.md)** - Reusable code patterns (dropdowns, modals, etc.)
 - **[Data Flow](docs/data-flow.md)** - Polling, cron, OAuth, notifications flow
@@ -166,6 +167,7 @@ node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require(
 6. 🔵 **NEVER** execute `npm install` - strictly user-only command (ask user to run it)
 7. ⚡ **ALWAYS** create/update unit tests → [docs/testing.md](docs/testing.md)
 8. 📚 **UPDATE DOCS** when adding features (in `docs/`, not in CLAUDE.md)
+9. 🎨 **USE DESIGN SYSTEM** - Reference `/debug/design-system` when creating new pages/components
 
 ---
 

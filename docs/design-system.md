@@ -408,6 +408,786 @@ Optimized for dark backgrounds.
 - `ocean` - START, AVVIO
 - `sage` - SUCCESS, OK
 
+### Input
+
+```jsx
+// Basic input
+<Input
+  label="Email"
+  placeholder="Enter email..."
+  icon="📧"
+/>
+
+// Input with variant (focus color)
+<Input
+  label="Name"
+  variant="ember"  // default|ember|ocean
+  placeholder="Enter name..."
+/>
+
+// Input with helper text
+<Input
+  label="Password"
+  type="password"
+  helperText="Must be at least 8 characters"
+/>
+
+// Input with error
+<Input
+  label="Username"
+  error="This field is required"
+  placeholder="Enter username..."
+/>
+
+// Disabled input
+<Input
+  label="Locked Field"
+  disabled
+  value="Cannot edit"
+/>
+```
+
+**Props:**
+- `type` - Input type (text, password, email, etc.) - default: 'text'
+- `label` - Label text (optional)
+- `icon` - Emoji icon (optional)
+- `variant` - Focus ring color: 'default' | 'ember' | 'ocean' - default: 'default'
+- `error` - Error message (displays below input in red)
+- `helperText` - Helper text (displays below input in muted color)
+- `disabled` - Disabled state (opacity-50, cursor-not-allowed)
+- `className` - Additional classes for input
+- `containerClassName` - Additional classes for container
+
+**Styling:**
+- Dark mode: `bg-slate-800/60 border-slate-700/50 text-slate-100`
+- Light mode: `bg-white/80 border-slate-300/60 text-slate-900`
+- Focus: `ring-2 ring-ember-500/50 border-ember-500/60` (or ocean variant)
+- Rounded: `rounded-xl` (12px)
+- Min height: iOS touch target compliant
+
+### Toggle
+
+```jsx
+// Basic toggle
+<Toggle
+  checked={isEnabled}
+  onChange={setIsEnabled}
+  label="Enable notifications"
+/>
+
+// Toggle variants (color when checked)
+<Toggle checked={true} onChange={() => {}} label="Ember" variant="ember" />
+<Toggle checked={true} onChange={() => {}} label="Ocean" variant="ocean" />
+<Toggle checked={true} onChange={() => {}} label="Sage" variant="sage" />
+
+// Toggle sizes
+<Toggle checked={false} onChange={() => {}} label="Small" size="sm" />   // h-6 w-11
+<Toggle checked={false} onChange={() => {}} label="Medium" size="md" />  // h-8 w-14 (default)
+<Toggle checked={false} onChange={() => {}} label="Large" size="lg" />   // h-10 w-18
+
+// Disabled toggle
+<Toggle checked={false} onChange={() => {}} label="Disabled" disabled />
+```
+
+**Props:**
+- `checked` - Toggle state (boolean) - required
+- `onChange` - Change handler function(newValue) - required
+- `label` - Accessible label (required for a11y, not visible but used by screen readers)
+- `disabled` - Disabled state (opacity-50, cursor-not-allowed)
+- `size` - Size variant: 'sm' | 'md' | 'lg' - default: 'md'
+- `variant` - Color when checked: 'ember' | 'ocean' | 'sage' - default: 'ember'
+- `className` - Additional classes for layout
+
+**Styling:**
+- Checked: Gradient background (`bg-gradient-to-r from-ember-500 to-flame-600`)
+- Unchecked: `bg-slate-700` (dark) / `bg-slate-300` (light)
+- Switch handle: `bg-white` with shadow
+- Transition: `duration-200` smooth animation
+- Focus ring: `ring-2 ring-ember-500/50`
+
+### Select
+
+```jsx
+// Basic select
+<Select
+  label="Select Option"
+  icon="🎯"
+  options={[
+    { value: '1', label: 'Option 1' },
+    { value: '2', label: 'Option 2' },
+    { value: '3', label: 'Option 3' },
+    { value: '4', label: 'Disabled Option', disabled: true },
+  ]}
+  value={selectedValue}
+  onChange={(e) => setSelectedValue(e.target.value)}
+/>
+
+// Select with variant
+<Select
+  label="Ocean Select"
+  variant="ocean"
+  options={[...]}
+  value={value}
+  onChange={handler}
+/>
+
+// Disabled select
+<Select
+  label="Locked Select"
+  disabled
+  options={[...]}
+  value={value}
+  onChange={() => {}}
+/>
+```
+
+**Props:**
+- `label` - Label text (optional)
+- `icon` - Emoji icon (optional)
+- `options` - Array of `{value, label, disabled?}` objects - required
+- `value` - Selected value - required
+- `onChange` - Change handler function(syntheticEvent) - required
+- `disabled` - Disabled state (opacity-50, cursor-not-allowed)
+- `variant` - Color variant: 'default' | 'ember' | 'ocean' - default: 'default'
+- `className` - Additional classes for trigger button
+- `containerClassName` - Additional classes for container
+
+**Styling:**
+- Dark mode: `bg-slate-800/60 border-slate-700/50 text-slate-100`
+- Light mode: `bg-white/80 border-slate-300/60 text-slate-900`
+- Focus: `ring-2 ring-ember-500/50 border-ember-500/60`
+- Dropdown: `bg-slate-800/95 backdrop-blur-2xl` (dark) / `bg-white/95` (light)
+- Selected option: Colored background with checkmark
+- Border radius: `rounded-xl` (trigger + dropdown)
+
+**Features:**
+- Auto-positioning: Opens upward if insufficient space below
+- Outside click detection: Closes dropdown automatically
+- Keyboard accessible: Full ARIA support
+- Checkmark on selected option
+- Disabled option support
+- Smooth animations: `animate-dropdown` / `animate-dropdown-up`
+
+### Modal
+
+```jsx
+// Basic modal
+<Modal
+  isOpen={showModal}
+  onClose={() => setShowModal(false)}
+>
+  <Card>
+    <CardHeader>
+      <CardTitle icon="🪟">Modal Title</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <Text variant="secondary">Modal content here...</Text>
+    </CardContent>
+    <CardFooter>
+      <ButtonGroup>
+        <Button variant="ghost" onClick={onClose}>Cancel</Button>
+        <Button variant="ember" onClick={onConfirm}>Confirm</Button>
+      </ButtonGroup>
+    </CardFooter>
+  </Card>
+</Modal>
+
+// Modal with custom max width
+<Modal
+  isOpen={showModal}
+  onClose={onClose}
+  maxWidth="max-w-2xl"
+>
+  ...
+</Modal>
+
+// Modal without overlay close
+<Modal
+  isOpen={showModal}
+  onClose={onClose}
+  closeOnOverlayClick={false}
+>
+  ...
+</Modal>
+```
+
+**Props:**
+- `isOpen` - Modal visibility state (boolean) - required
+- `onClose` - Close handler function - required
+- `children` - Modal content (typically a Card component)
+- `maxWidth` - Tailwind max-width class - default: 'max-w-lg'
+- `closeOnOverlayClick` - Close on backdrop click - default: true
+- `closeOnEscape` - Close on Escape key - default: true
+
+**Features:**
+- React Portal: Renders at document body level (z-index isolation)
+- Scroll Lock: Prevents body scroll when modal is open
+- Backdrop Overlay: `bg-black/60 backdrop-blur-sm`
+- Escape Key Support: Closes modal automatically
+- Click Outside: Optional overlay click to close
+- Animations: `animate-fade-in` (backdrop) + `animate-scale-in-center` (content)
+- Accessibility: Focus trap, proper ARIA attributes
+
+**Styling:**
+- Backdrop: `fixed inset-0 bg-black/60 backdrop-blur-sm`
+- Container: `flex items-center justify-center p-4`
+- Content wrapper: `relative w-full {maxWidth}`
+- Z-index: `z-[9999]` for top-level rendering
+
+### Toast
+
+```jsx
+// Success toast
+<Toast
+  message="Operation completed successfully!"
+  variant="success"
+  duration={5000}
+  onDismiss={() => setShowToast(false)}
+/>
+
+// Warning toast (persistent)
+<Toast
+  message="Please review the settings"
+  variant="warning"
+  duration={0}  // 0 = no auto-dismiss
+  onDismiss={handleDismiss}
+/>
+
+// Custom icon
+<Toast
+  message="Custom notification"
+  icon="🎉"
+  variant="ember"
+  duration={3000}
+/>
+
+// Positioning (manual)
+<div className="fixed bottom-4 right-4 z-50 max-w-md">
+  <Toast {...props} />
+</div>
+```
+
+**Props:**
+- `message` - Toast message text - required
+- `variant` - Toast variant: 'success' | 'warning' | 'info' | 'error' | 'ember' | 'ocean' | 'sage' | 'danger' - default: 'info'
+- `icon` - Custom emoji icon (optional, auto-icon if not provided)
+- `duration` - Auto-dismiss duration in ms (0 to disable auto-dismiss) - default: 5000
+- `onDismiss` - Dismiss handler function - required
+
+**Styling:**
+- Variants map to semantic colors:
+  - `success` / `sage`: Green tones
+  - `warning`: Yellow tones
+  - `error` / `danger`: Red tones
+  - `info` / `ocean`: Blue tones
+  - `ember`: Copper/amber tones
+- Structure: `bg-{variant}-900/80 border-{variant}-500/50`
+- Border radius: `rounded-xl`
+- Animation: `animate-slide-in-from-bottom`
+- Progress bar: Auto-dismiss countdown indicator
+
+**Features:**
+- Auto Icons: ✓ (success), ⚠️ (warning), ℹ️ (info), ❌ (error), 🔥 (ember)
+- Auto-Dismiss: Configurable timer with visual progress bar
+- Manual Dismiss: Close button always available
+- Smooth Animations: Slide in from bottom + fade out
+- Z-Index: Designed for `z-50` or higher (app responsibility)
+
+**Important:**
+- Toast does NOT handle positioning - wrap in fixed container yourself
+- Common pattern: `fixed bottom-4 right-4 z-50 max-w-md`
+
+### Skeleton
+
+```jsx
+// Basic skeletons
+<Skeleton className="h-4 w-full" />
+<Skeleton className="h-4 w-3/4" />
+<Skeleton className="h-4 w-1/2" />
+
+// Card skeleton
+<Skeleton.Card className="p-6">
+  <Skeleton className="h-6 w-1/2 mb-4" />
+  <Skeleton className="h-4 w-full mb-2" />
+  <Skeleton className="h-4 w-full mb-2" />
+  <Skeleton className="h-4 w-3/4" />
+</Skeleton.Card>
+
+// Avatar skeleton
+<Skeleton className="h-16 w-16 rounded-full" />
+
+// Button skeleton
+<Skeleton className="h-12 w-32 rounded-xl" />
+```
+
+**Props:**
+- `className` - Tailwind classes for sizing and shape - required
+- Use `h-*` for height, `w-*` for width, `rounded-*` for border radius
+
+**Sub-Components:**
+- `Skeleton.Card` - Card-styled skeleton wrapper with shimmer effect
+
+**Styling:**
+- Background: `bg-slate-800/40` (dark) / `bg-slate-200/60` (light)
+- Animation: `animate-shimmer` - subtle shimmer effect
+- Border radius: Inherits from className (e.g., `rounded-full`, `rounded-xl`)
+
+**Usage Patterns:**
+```jsx
+// Text lines
+<div className="space-y-2">
+  <Skeleton className="h-4 w-full" />
+  <Skeleton className="h-4 w-3/4" />
+</div>
+
+// Card placeholder
+<Skeleton.Card className="p-6">
+  <Skeleton className="h-6 w-1/2 mb-4" />  {/* Title */}
+  <Skeleton className="h-4 w-full mb-2" />  {/* Line 1 */}
+  <Skeleton className="h-4 w-full mb-2" />  {/* Line 2 */}
+  <Skeleton className="h-4 w-3/4" />        {/* Line 3 */}
+</Skeleton.Card>
+
+// Mixed shapes
+<div className="flex gap-4">
+  <Skeleton className="h-16 w-16 rounded-full" />  {/* Avatar */}
+  <div className="flex-1 space-y-2">
+    <Skeleton className="h-4 w-full" />
+    <Skeleton className="h-4 w-3/4" />
+  </div>
+</div>
+```
+
+### Divider
+
+```jsx
+// Basic horizontal divider
+<Divider />
+
+// Variants
+<Divider variant="solid" />
+<Divider variant="dashed" />
+<Divider variant="gradient" />
+
+// With label
+<Divider label="Settings" variant="gradient" />
+<Divider label="Section" variant="solid" />
+
+// Spacing
+<Divider spacing="small" />   // my-4
+<Divider spacing="medium" />  // my-6 (default)
+<Divider spacing="large" />   // my-8
+
+// Vertical divider
+<div className="flex items-center gap-4">
+  <span>Left</span>
+  <Divider orientation="vertical" />
+  <span>Right</span>
+</div>
+```
+
+**Props:**
+- `label` - Optional label text (centered with backdrop)
+- `variant` - Visual style: 'solid' | 'dashed' | 'gradient' - default: 'solid'
+- `spacing` - Margin spacing: 'small' | 'medium' | 'large' - default: 'medium'
+- `orientation` - Direction: 'horizontal' | 'vertical' - default: 'horizontal'
+- `className` - Additional classes for container
+
+**Styling:**
+- Solid: `bg-slate-700` (dark) / `bg-slate-300` (light)
+- Dashed: `border-t-2 border-dashed border-slate-600` (dark) / `border-slate-300` (light)
+- Gradient: `bg-gradient-to-r from-transparent via-slate-600/50 to-transparent`
+- Label styling: `bg-slate-800/80 backdrop-blur-xl text-slate-300 border-slate-700/50` (dark)
+- Height: `h-px` (horizontal), `w-px` (vertical)
+
+**Features:**
+- Horizontal: Full width line with optional centered label
+- Vertical: Full height line for flex layouts
+- Label: Backdrop blur glass effect with uppercase tracking
+- Auto-spacing: Margin applied based on orientation and spacing prop
+
+**Usage Patterns:**
+```jsx
+// Section separator
+<section>
+  <Content1 />
+</section>
+<Divider variant="gradient" spacing="large" />
+<section>
+  <Content2 />
+</section>
+
+// Labeled section
+<Divider label="Account Settings" variant="gradient" />
+<AccountForm />
+
+// Vertical in toolbar
+<div className="flex items-center gap-4">
+  <Button>Action 1</Button>
+  <Divider orientation="vertical" spacing="small" />
+  <Button>Action 2</Button>
+</div>
+```
+
+### ProgressBar
+
+```jsx
+// Basic progress bar
+<ProgressBar value={75} variant="ember" label="Power" />
+
+// Progress bar with custom content
+<ProgressBar
+  value={80}
+  variant="ember"
+  leftContent={<Text variant="ember" weight="semibold" size="sm">🔥 Power</Text>}
+  rightContent={<Text variant="secondary" size="sm" weight="bold">80%</Text>}
+/>
+
+// Different variants
+<ProgressBar value={60} variant="ocean" label="Loading" />
+<ProgressBar value={85} variant="sage" label="Success" />
+<ProgressBar value={40} variant="warning" label="Warning" />
+<ProgressBar value={25} variant="danger" label="Critical" />
+
+// Different sizes
+<ProgressBar value={65} size="sm" label="Small" />   // h-2
+<ProgressBar value={65} size="md" label="Medium" />  // h-3
+<ProgressBar value={65} size="lg" label="Large" />   // h-4
+
+// With animation (smooth transitions)
+<ProgressBar value={70} animated label="Animated" />
+```
+
+**Props:**
+- `value` - Progress value (0-100) - required
+- `variant` - Color variant: 'ember' | 'ocean' | 'sage' | 'warning' | 'danger' - default: 'ember'
+- `size` - Bar height: 'sm' | 'md' | 'lg' - default: 'md'
+- `animated` - Enable smooth transitions (500ms) - default: true
+- `label` - Optional label above bar
+- `leftContent` - Optional React node on left (icon, text)
+- `rightContent` - Optional React node on right (value, text)
+- `gradient` - Custom Tailwind gradient classes (overrides variant)
+- `className` - Additional layout classes
+
+**Styling:**
+- Variants use Ember Noir palette gradients:
+  - `ember`: `from-ember-400 via-ember-500 to-flame-600`
+  - `ocean`: `from-ocean-400 via-ocean-500 to-ocean-600`
+  - `sage`: `from-sage-400 via-sage-500 to-sage-600`
+  - `warning`: `from-warning-400 via-warning-500 to-warning-600`
+  - `danger`: `from-danger-400 via-danger-500 to-danger-600`
+- Track background: `bg-slate-700/50` (dark) / `bg-slate-200/60` (light)
+- Border radius: `rounded-full`
+- Transition: `transition-all duration-500` (if animated)
+
+**Usage Patterns:**
+```jsx
+// Power indicator
+<ProgressBar
+  value={powerLevel}
+  variant="ember"
+  leftContent={<Text variant="ember" weight="semibold" size="sm">🔥 Power</Text>}
+  rightContent={<Text variant="secondary" size="sm" weight="bold">{powerLevel}%</Text>}
+/>
+
+// Maintenance tracking
+<ProgressBar
+  value={(hoursUsed / hoursLimit) * 100}
+  variant="warning"
+  leftContent={<Text variant="warning" weight="semibold" size="sm">⏱️ Maintenance</Text>}
+  rightContent={<Text variant="warning" size="sm" weight="bold">{hoursUsed}h / {hoursLimit}h</Text>}
+/>
+
+// Simple loading
+<ProgressBar value={loadingProgress} variant="ocean" label="Loading..." />
+```
+
+### EmptyState
+
+```jsx
+// Basic empty state
+<EmptyState
+  icon="🏠"
+  title="Nessun dispositivo"
+  description="Aggiungi dispositivi per iniziare."
+/>
+
+// With action button
+<EmptyState
+  icon="🔍"
+  title="Nessun risultato"
+  description="Prova a modificare i criteri di ricerca."
+  action={<Button variant="subtle" size="sm">Cancella Filtri</Button>}
+/>
+
+// With custom icon component
+<EmptyState
+  icon={<CustomIcon />}
+  title="Empty"
+  description="Description here"
+  action={<Button variant="ember">Action</Button>}
+/>
+```
+
+**Props:**
+- `icon` - Emoji string or React component for visual representation
+- `title` - Heading text (uses Heading component level 3)
+- `description` - Body text (uses Text component secondary variant)
+- `action` - Optional React node (typically a Button component)
+- `className` - Additional classes for container
+
+**Styling:**
+- Container: `text-center py-8`
+- Icon: `text-6xl mb-4` (if emoji string)
+- Title: Heading level 3, size lg, `mb-2`
+- Description: Text secondary variant, `mb-6`
+- Action: Rendered below description
+
+**Usage Patterns:**
+```jsx
+// No devices
+<EmptyState
+  icon="🏠"
+  title="Nessun dispositivo"
+  description="Aggiungi dispositivi smart per iniziare."
+  action={<Button variant="ember" icon="➕">Aggiungi Dispositivo</Button>}
+/>
+
+// No data available
+<EmptyState
+  icon="📋"
+  title="Nessun dato disponibile"
+  description="I dati verranno visualizzati qui una volta disponibili."
+/>
+
+// Search results empty
+<EmptyState
+  icon="🔍"
+  title="Nessun risultato"
+  description="Nessun elemento corrisponde ai criteri di ricerca."
+  action={<Button variant="subtle" size="sm" onClick={clearFilters}>Cancella Filtri</Button>}
+/>
+```
+
+### ConfirmDialog
+
+```jsx
+// Danger confirmation (delete action)
+<ConfirmDialog
+  isOpen={showDialog}
+  title="Conferma eliminazione"
+  message="Sei sicuro di voler eliminare questo elemento? L'azione non può essere annullata."
+  confirmText="Elimina"
+  cancelText="Annulla"
+  confirmVariant="danger"
+  icon="⚠️"
+  onConfirm={handleDelete}
+  onCancel={() => setShowDialog(false)}
+/>
+
+// Success confirmation
+<ConfirmDialog
+  isOpen={showDialog}
+  title="Conferma azione"
+  message="Procedere con questa azione?"
+  confirmText="Conferma"
+  cancelText="Annulla"
+  confirmVariant="ember"  // or 'success'
+  icon="✓"
+  onConfirm={handleConfirm}
+  onCancel={handleCancel}
+/>
+```
+
+**Props:**
+- `isOpen` - Dialog visibility state (boolean) - required
+- `title` - Dialog title - default: 'Conferma azione'
+- `message` - Confirmation message - required
+- `confirmText` - Confirm button text - default: 'Conferma'
+- `cancelText` - Cancel button text - default: 'Annulla'
+- `confirmVariant` - Confirm button variant: 'danger' | 'ember' | 'success' | etc. - default: 'danger'
+- `icon` - Icon emoji - default: '⚠️'
+- `onConfirm` - Confirm handler function - required
+- `onCancel` - Cancel handler function - required
+
+**Features:**
+- Scroll Lock: Prevents body scroll when dialog is open
+- Escape Key: Closes dialog on Escape key press
+- Backdrop Click: Closes dialog when clicking outside (calls onCancel)
+- Centered Modal: Uses Card component with elevated variant
+- Animations: `animate-fadeIn` (backdrop) + `animate-scaleIn` (content)
+- Accessibility: Proper ARIA attributes, focus management
+
+**Styling:**
+- Backdrop: `fixed inset-0 bg-slate-950/60 backdrop-blur-sm`
+- Modal: `max-w-md w-full p-6` (Card elevated variant)
+- Icon: `text-5xl mb-4` centered
+- Title: Heading level 2, size xl
+- Message: Text secondary variant
+- Buttons: Full width, side-by-side layout
+
+**Usage Patterns:**
+```jsx
+// Delete confirmation
+const [showConfirm, setShowConfirm] = useState(false);
+
+<Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
+
+<ConfirmDialog
+  isOpen={showConfirm}
+  title="Conferma eliminazione"
+  message="Questa azione è permanente. Continuare?"
+  confirmText="Elimina"
+  confirmVariant="danger"
+  onConfirm={() => {
+    handleDelete();
+    setShowConfirm(false);
+  }}
+  onCancel={() => setShowConfirm(false)}
+/>
+
+// Generic confirmation
+<ConfirmDialog
+  isOpen={showConfirm}
+  title="Conferma"
+  message="Vuoi salvare le modifiche?"
+  confirmText="Salva"
+  cancelText="Annulla"
+  confirmVariant="ember"
+  icon="💾"
+  onConfirm={handleSave}
+  onCancel={handleCancel}
+/>
+```
+
+### BottomSheet
+
+```jsx
+// Basic bottom sheet
+<BottomSheet
+  isOpen={isOpen}
+  onClose={() => setIsOpen(false)}
+  title="Bottom Sheet Title"
+  icon="📱"
+>
+  <div className="space-y-4">
+    <Text variant="secondary">Content here...</Text>
+    <Button variant="ember" className="w-full">Action</Button>
+  </div>
+</BottomSheet>
+
+// Without title and close button
+<BottomSheet
+  isOpen={isOpen}
+  onClose={onClose}
+  showCloseButton={false}
+>
+  <CustomContent />
+</BottomSheet>
+
+// No drag handle
+<BottomSheet
+  isOpen={isOpen}
+  onClose={onClose}
+  showHandle={false}
+  title="Sheet"
+>
+  <Content />
+</BottomSheet>
+
+// Prevent backdrop close
+<BottomSheet
+  isOpen={isOpen}
+  onClose={onClose}
+  closeOnBackdrop={false}
+  title="Important Action"
+>
+  <Content />
+</BottomSheet>
+```
+
+**Props:**
+- `isOpen` - Sheet visibility state (boolean) - required
+- `onClose` - Close handler function - required
+- `children` - Sheet content - required
+- `title` - Optional title header
+- `icon` - Optional emoji icon for title
+- `showCloseButton` - Show close button in header - default: true
+- `showHandle` - Show drag handle bar - default: true
+- `closeOnBackdrop` - Close when clicking backdrop - default: true
+- `className` - Additional classes for content container
+- `zIndex` - Base z-index - default: 8999
+
+**Features:**
+- React Portal: Renders at document body level (z-index isolation)
+- Scroll Lock: Prevents body scroll, preserves scroll position
+- Escape Key Support: Closes sheet on Escape key press
+- Drag Handle: Visual indicator for swipe-to-close gesture (visual only)
+- Backdrop Overlay: `bg-slate-950/60 backdrop-blur-sm`
+- Max Height: `max-h-[85vh]` with overflow-y-auto
+- Mobile-Optimized: Perfect for mobile interfaces and quick actions
+- Animations: `animate-fadeIn` (backdrop) + `animate-slide-in-from-bottom` (sheet)
+
+**Styling:**
+- Backdrop: `fixed inset-0 bg-slate-950/60 backdrop-blur-sm`
+- Sheet: `fixed inset-x-0 bottom-0 rounded-t-3xl`
+- Background: `bg-slate-900/95 backdrop-blur-3xl` (dark) / `bg-white/95` (light)
+- Border: `border-t border-slate-700/50` (dark) / `border-slate-200/50` (light)
+- Padding: `p-6`
+- Z-index: Backdrop = zIndex, Sheet = zIndex + 1
+
+**Usage Patterns:**
+```jsx
+// Quick actions menu
+const [showSheet, setShowSheet] = useState(false);
+
+<Button onClick={() => setShowSheet(true)}>Open Actions</Button>
+
+<BottomSheet
+  isOpen={showSheet}
+  onClose={() => setShowSheet(false)}
+  title="Quick Actions"
+  icon="⚡"
+>
+  <div className="space-y-2">
+    <Button variant="ember" className="w-full">Primary Action</Button>
+    <Button variant="subtle" className="w-full">Secondary Action</Button>
+    <Button variant="ghost" className="w-full" onClick={() => setShowSheet(false)}>
+      Cancel
+    </Button>
+  </div>
+</BottomSheet>
+
+// Settings panel
+<BottomSheet
+  isOpen={showSettings}
+  onClose={() => setShowSettings(false)}
+  title="Settings"
+  icon="⚙️"
+>
+  <div className="space-y-4">
+    <Input label="Name" />
+    <Select label="Option" options={[...]} />
+    <Toggle checked={enabled} onChange={setEnabled} label="Enable feature" />
+  </div>
+</BottomSheet>
+
+// Confirmation with custom z-index (above modal)
+<BottomSheet
+  isOpen={showConfirm}
+  onClose={() => setShowConfirm(false)}
+  zIndex={10000}
+  closeOnBackdrop={false}
+  title="Confirm"
+>
+  <Text variant="secondary" className="mb-4">Are you sure?</Text>
+  <ButtonGroup>
+    <Button variant="ghost" onClick={() => setShowConfirm(false)}>Cancel</Button>
+    <Button variant="danger" onClick={handleConfirm}>Confirm</Button>
+  </ButtonGroup>
+</BottomSheet>
+```
+
 ---
 
 ## Animation System
@@ -824,4 +1604,4 @@ var(--ease-out-expo)
 
 ---
 
-**Last Updated**: 2026-01 (Ember Noir v2.3 - Complete Dark Mode Unification)
+**Last Updated**: 2026-01-16 (Ember Noir v2.3 - Complete Dark Mode Unification + Form Inputs)

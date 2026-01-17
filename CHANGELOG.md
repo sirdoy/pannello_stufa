@@ -5,6 +5,36 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.53.3] - 2026-01-17
+
+### 🔧 iOS PWA Dark Mode Status Bar Fix
+
+**Obiettivo**: Risolvere il problema della status bar bianca su iOS PWA quando l'app è in dark mode.
+
+#### 🐛 Fixed
+
+**iOS PWA Status Bar:**
+- Cambiato `apple-mobile-web-app-status-bar-style` da `"default"` a `"black-translucent"` per supporto dark mode corretto
+- La status bar ora è semi-trasparente e si adatta sia a light che dark mode su iOS
+
+**Dynamic Theme Color:**
+- Aggiunto meta tag `theme-color` dinamico che cambia in base al tema attivo:
+  - Dark mode: `#0f172a` (slate-900)
+  - Light mode: `#f8fafc` (slate-50)
+- Aggiornato `themeService.applyThemeToDOM()` per sincronizzare `theme-color` quando si cambia tema
+- Aggiunto script di inizializzazione in `layout.js` per impostare `theme-color` corretto al caricamento (previene flash)
+
+**Layout Fixes:**
+- Fixata sintassi className del body: da logica invertita `[html:not(.dark)_&]` a modifiers Tailwind corretti `dark:`
+- Rimosso `themeColor` statico da `viewport` export (ora gestito dinamicamente)
+
+#### 📝 Files Changed
+
+- `app/layout.js` - Status bar style + theme-color dinamico + fix body className
+- `lib/themeService.js` - Aggiornamento theme-color in `applyThemeToDOM()`
+
+---
+
 ## [1.53.2] - 2026-01-16
 
 ### 🔧 Build & Lint Warnings Fix

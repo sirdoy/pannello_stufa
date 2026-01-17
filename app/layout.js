@@ -10,7 +10,7 @@ export const metadata = {
   applicationName: 'Pannello Stufa',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'Stufa',
   },
   formatDetection: {
@@ -20,21 +20,23 @@ export const metadata = {
 };
 
 export const viewport = {
-  themeColor: '#ef4444',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="it" suppressHydrationWarning>
     <head>
-      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
       <meta name="view-transition" content="same-origin" />
       <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
       <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-title" content="Stufa" />
-      <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       <meta name="mobile-web-app-capable" content="yes" />
 
       {/* Theme script - blocking per evitare flash */}
@@ -42,15 +44,27 @@ export default function RootLayout({ children }) {
         dangerouslySetInnerHTML={{
           __html: `
             try {
-              if (localStorage.getItem('pannello-stufa-theme') === 'dark') {
+              const isDark = localStorage.getItem('pannello-stufa-theme') === 'dark';
+              if (isDark) {
                 document.documentElement.classList.add('dark');
+              }
+              // Update theme-color based on theme
+              const themeColor = isDark ? '#0f172a' : '#f8fafc';
+              const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+              if (metaThemeColor) {
+                metaThemeColor.setAttribute('content', themeColor);
+              } else {
+                const meta = document.createElement('meta');
+                meta.name = 'theme-color';
+                meta.content = themeColor;
+                document.head.appendChild(meta);
               }
             } catch (e) {}
           `,
         }}
       />
     </head>
-    <body className="min-h-screen bg-slate-50 [html:not(.dark)_&]:bg-slate-900 text-slate-900 [html:not(.dark)_&]:text-slate-100 flex flex-col" suppressHydrationWarning>
+    <body className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex flex-col" suppressHydrationWarning>
     {/* Skip to content - Accessibility */}
     <a
       href="#main-content"

@@ -3,10 +3,6 @@
  * GET /api/hue/discover
  */
 
-import { GET } from '../route';
-import { discoverBridges } from '@/lib/hue/hueApi';
-import { NextResponse } from 'next/server';
-
 // Mock dependencies
 jest.mock('@/lib/hue/hueApi');
 jest.mock('@/lib/auth0', () => ({
@@ -14,6 +10,10 @@ jest.mock('@/lib/auth0', () => ({
     withApiAuthRequired: (handler) => handler, // Pass-through for testing
   },
 }));
+
+import { GET } from '../route';
+import { discoverBridges } from '@/lib/hue/hueApi';
+import { NextResponse } from 'next/server';
 
 describe('GET /api/hue/discover', () => {
   let mockRequest;

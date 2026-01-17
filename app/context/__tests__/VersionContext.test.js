@@ -29,16 +29,25 @@ describe('VersionContext', () => {
 
   afterAll(() => {
     // Restore original location
-    window.location = originalLocation;
+    delete window.location;
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      configurable: true,
+      value: originalLocation
+    });
   });
 
   beforeEach(() => {
     jest.clearAllMocks();
     // Reset environment mocks
     delete process.env.NODE_ENV;
-    // Mock window.location for non-local environment by default
+    // Reset location to default (example.com = non-local)
     delete window.location;
-    window.location = { hostname: 'example.com' };
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      configurable: true,
+      value: { hostname: 'example.com' }
+    });
   });
 
   describe('useVersion Hook', () => {
@@ -95,7 +104,11 @@ describe('VersionContext', () => {
 
     test('skips check on localhost hostname', async () => {
       delete window.location;
-      window.location = { hostname: 'localhost' };
+      Object.defineProperty(window, 'location', {
+        writable: true,
+        configurable: true,
+        value: { hostname: 'localhost' }
+      });
 
       const consoleLog = jest.spyOn(console, 'log').mockImplementation();
 
@@ -115,7 +128,11 @@ describe('VersionContext', () => {
 
     test('skips check on 127.0.0.1 hostname', async () => {
       delete window.location;
-      window.location = { hostname: '127.0.0.1' };
+      Object.defineProperty(window, 'location', {
+        writable: true,
+        configurable: true,
+        value: { hostname: '127.0.0.1' }
+      });
 
       const consoleLog = jest.spyOn(console, 'log').mockImplementation();
 
@@ -133,7 +150,11 @@ describe('VersionContext', () => {
 
     test('skips check on 192.168.x.x hostname', async () => {
       delete window.location;
-      window.location = { hostname: '192.168.1.100' };
+      Object.defineProperty(window, 'location', {
+        writable: true,
+        configurable: true,
+        value: { hostname: '192.168.1.100' }
+      });
 
       const consoleLog = jest.spyOn(console, 'log').mockImplementation();
 

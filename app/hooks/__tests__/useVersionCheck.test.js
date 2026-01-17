@@ -21,8 +21,15 @@ describe('useVersionCheck Hook', () => {
   });
 
   describe('Initial State', () => {
-    test('returns correct initial state', () => {
+    test('returns correct initial state', async () => {
+      getLatestVersion.mockResolvedValueOnce(null);
+
       const { result } = renderHook(() => useVersionCheck());
+
+      // Wait for initial render to complete
+      await waitFor(() => {
+        expect(result.current).not.toBeNull();
+      });
 
       expect(result.current.hasNewVersion).toBe(false);
       expect(result.current.latestVersion).toBe(null);
@@ -189,7 +196,10 @@ describe('useVersionCheck Hook', () => {
         result.current.dismissWhatsNew();
       });
 
-      expect(result.current.showWhatsNew).toBe(false);
+      await waitFor(() => {
+        expect(result.current.showWhatsNew).toBe(false);
+      });
+
       expect(localStorage.getItem('lastSeenVersion')).toBe('1.5.0');
     });
 
@@ -213,7 +223,10 @@ describe('useVersionCheck Hook', () => {
         result.current.dismissWhatsNew(true);
       });
 
-      expect(result.current.showWhatsNew).toBe(false);
+      await waitFor(() => {
+        expect(result.current.showWhatsNew).toBe(false);
+      });
+
       const dismissed = JSON.parse(localStorage.getItem('dismissedVersions'));
       expect(dismissed).toContain('1.5.0');
     });
@@ -268,7 +281,10 @@ describe('useVersionCheck Hook', () => {
         result.current.dismissBadge();
       });
 
-      expect(result.current.hasNewVersion).toBe(false);
+      await waitFor(() => {
+        expect(result.current.hasNewVersion).toBe(false);
+      });
+
       expect(localStorage.getItem('lastSeenVersion')).toBe('1.5.0');
     });
   });

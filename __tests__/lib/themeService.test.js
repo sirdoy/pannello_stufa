@@ -34,6 +34,14 @@ describe('themeService', () => {
 
     // Reset DOM
     document.documentElement.className = '';
+
+    // Mock global fetch
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ theme: 'light' }),
+      })
+    );
   });
 
   describe('THEMES constants', () => {
@@ -44,25 +52,28 @@ describe('themeService', () => {
   });
 
   describe('getThemePreference', () => {
-    it('should return Firebase theme if available', async () => {
-      const mockSnapshot = {
-        exists: () => true,
-        val: () => THEMES.DARK,
-      };
-      get.mockResolvedValue(mockSnapshot);
+    it('should return theme from API if available', async () => {
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ theme: THEMES.DARK }),
+        })
+      );
 
       const result = await getThemePreference('user123');
 
       expect(result).toBe(THEMES.DARK);
-      expect(ref).toHaveBeenCalledWith({}, 'users/user123/preferences/theme');
+      expect(global.fetch).toHaveBeenCalledWith('/api/user/theme', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       expect(localStorage.getItem('pannello-stufa-theme')).toBe(THEMES.DARK);
     });
 
-    it('should return localStorage theme if Firebase unavailable', async () => {
-      const mockSnapshot = {
-        exists: () => false,
-      };
-      get.mockResolvedValue(mockSnapshot);
+    it('should return localStorage theme if API unavailable', async () => {
+      global.fetch = jest.fn(() => Promise.reject(new Error('API error')));
       localStorage.setItem('pannello-stufa-theme', THEMES.DARK);
 
       const result = await getThemePreference('user123');
@@ -71,47 +82,50 @@ describe('themeService', () => {
     });
 
     it('should return light theme as default', async () => {
-      const mockSnapshot = {
-        exists: () => false,
-      };
-      get.mockResolvedValue(mockSnapshot);
+      global.fetch = jest.fn(() => Promise.reject(new Error('API error')));
 
       const result = await getThemePreference('user123');
 
       expect(result).toBe(THEMES.LIGHT);
-    });
-
-    it('should handle Firebase errors gracefully', async () => {
-      get.mockRejectedValue(new Error('Firebase error'));
-      localStorage.setItem('pannello-stufa-theme', THEMES.DARK);
-
-      const result = await getThemePreference('user123');
-
-      expect(result).toBe(THEMES.DARK);
     });
 
     it('should return light theme when no userId provided', async () => {
       const result = await getThemePreference(null);
 
       expect(result).toBe(THEMES.LIGHT);
-      expect(get).not.toHaveBeenCalled();
+      expect(global.fetch).not.toHaveBeenCalled();
     });
   });
 
   describe('updateThemePreference', () => {
-    it('should save theme to both Firebase and localStorage', async () => {
-      set.mockResolvedValue();
+    it('should save theme via API and localStorage', async () => {
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ success: true }),
+        })
+      );
 
       const result = await updateThemePreference('user123', THEMES.DARK);
 
       expect(result).toBe(true);
       expect(localStorage.getItem('pannello-stufa-theme')).toBe(THEMES.DARK);
-      expect(ref).toHaveBeenCalledWith({}, 'users/user123/preferences/theme');
-      expect(set).toHaveBeenCalled();
+      expect(global.fetch).toHaveBeenCalledWith('/api/user/theme', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ theme: THEMES.DARK }),
+      });
     });
 
     it('should apply theme to DOM immediately', async () => {
-      set.mockResolvedValue();
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ success: true }),
+        })
+      );
 
       await updateThemePreference('user123', THEMES.DARK);
 
@@ -129,15 +143,20 @@ describe('themeService', () => {
 
       expect(result).toBe(true);
       expect(localStorage.getItem('pannello-stufa-theme')).toBe(THEMES.DARK);
-      expect(set).not.toHaveBeenCalled();
+      expect(global.fetch).not.toHaveBeenCalled();
     });
 
-    it('should handle Firebase save errors', async () => {
-      set.mockRejectedValue(new Error('Firebase error'));
+    it('should handle API save errors', async () => {
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: false,
+          json: () => Promise.resolve({ message: 'API error' }),
+        })
+      );
 
       await expect(
         updateThemePreference('user123', THEMES.DARK)
-      ).rejects.toThrow('Firebase error');
+      ).rejects.toThrow('API error');
 
       // localStorage should still be updated (optimistic update)
       expect(localStorage.getItem('pannello-stufa-theme')).toBe(THEMES.DARK);
@@ -146,12 +165,18 @@ describe('themeService', () => {
 
   describe('toggleTheme', () => {
     it('should toggle from light to dark', async () => {
-      const mockSnapshot = {
-        exists: () => true,
-        val: () => THEMES.LIGHT,
-      };
-      get.mockResolvedValue(mockSnapshot);
-      set.mockResolvedValue();
+      // Mock getThemePreference returning light
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({ theme: THEMES.LIGHT }),
+        })
+        // Mock updateThemePreference
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({ success: true }),
+        });
 
       const result = await toggleTheme('user123');
 
@@ -159,12 +184,18 @@ describe('themeService', () => {
     });
 
     it('should toggle from dark to light', async () => {
-      const mockSnapshot = {
-        exists: () => true,
-        val: () => THEMES.DARK,
-      };
-      get.mockResolvedValue(mockSnapshot);
-      set.mockResolvedValue();
+      // Mock getThemePreference returning dark
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({ theme: THEMES.DARK }),
+        })
+        // Mock updateThemePreference
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({ success: true }),
+        });
 
       const result = await toggleTheme('user123');
 
@@ -202,11 +233,12 @@ describe('themeService', () => {
 
   describe('initializeTheme', () => {
     it('should load and apply theme', async () => {
-      const mockSnapshot = {
-        exists: () => true,
-        val: () => THEMES.DARK,
-      };
-      get.mockResolvedValue(mockSnapshot);
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ theme: THEMES.DARK }),
+        })
+      );
 
       const result = await initializeTheme('user123');
 
@@ -215,10 +247,7 @@ describe('themeService', () => {
     });
 
     it('should apply default theme if none saved', async () => {
-      const mockSnapshot = {
-        exists: () => false,
-      };
-      get.mockResolvedValue(mockSnapshot);
+      global.fetch = jest.fn(() => Promise.reject(new Error('API error')));
 
       const result = await initializeTheme('user123');
 

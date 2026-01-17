@@ -4,10 +4,26 @@
  * Tests that API calls are correctly intercepted in sandbox mode
  */
 
-import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { describe, it, expect, beforeEach } from '@jest/globals';
 
 // Mock sandboxService before importing stoveApi
 jest.mock('../lib/sandboxService', () => ({
+  STOVE_STATES: {
+    OFF: 'OFF',
+    START: 'START',
+    WORK: 'WORK',
+    CLEAN: 'CLEAN',
+    FINAL: 'FINAL',
+    ERROR: 'ERROR',
+  },
+  SANDBOX_ERRORS: {
+    NONE: null,
+    HIGH_TEMP: { code: 'AL01', description: 'Temperatura troppo alta' },
+    LOW_PRESSURE: { code: 'AL02', description: 'Pressione insufficiente' },
+    IGNITION_FAIL: { code: 'AL03', description: 'Accensione fallita' },
+    PELLET_JAM: { code: 'AL04', description: 'Inceppamento pellet' },
+    CLEANING_NEEDED: { code: 'AL05', description: 'Pulizia necessaria' },
+  },
   isLocalEnvironment: jest.fn(),
   isSandboxEnabled: jest.fn(),
   getSandboxStoveState: jest.fn(),
@@ -25,7 +41,15 @@ import {
   setFanLevel,
 } from '../lib/stoveApi';
 
-import * as sandboxService from '../lib/sandboxService';
+import {
+  isLocalEnvironment,
+  isSandboxEnabled,
+  getSandboxStoveState,
+  sandboxIgnite,
+  sandboxShutdown,
+  sandboxSetPower,
+  sandboxSetFan,
+} from '../lib/sandboxService';
 
 describe('stoveApi with sandbox', () => {
   beforeEach(() => {
@@ -34,9 +58,9 @@ describe('stoveApi with sandbox', () => {
 
   describe('getStoveStatus', () => {
     it('should use sandbox when enabled in localhost', async () => {
-      sandboxService.isLocalEnvironment.mockReturnValue(true);
-      sandboxService.isSandboxEnabled.mockResolvedValue(true);
-      sandboxService.getSandboxStoveState.mockResolvedValue({
+      isLocalEnvironment.mockReturnValue(true);
+      isSandboxEnabled.mockResolvedValue(true);
+      getSandboxStoveState.mockResolvedValue({
         status: 'WORK',
         fan: 3,
         power: 4,
@@ -45,19 +69,18 @@ describe('stoveApi with sandbox', () => {
 
       const result = await getStoveStatus();
 
-      expect(sandboxService.getSandboxStoveState).toHaveBeenCalled();
+      expect(getSandboxStoveState).toHaveBeenCalled();
       expect(result).toEqual({
-        status: 'WORK',
-        fan: 3,
-        power: 4,
-        temperature: 50,
+        StatusDescription: 'WORK',
+        Error: 0,
+        ErrorDescription: '',
         isSandbox: true,
       });
     });
 
     it('should use real API when sandbox disabled', async () => {
-      sandboxService.isLocalEnvironment.mockReturnValue(true);
-      sandboxService.isSandboxEnabled.mockResolvedValue(false);
+      isLocalEnvironment.mockReturnValue(true);
+      isSandboxEnabled.mockResolvedValue(false);
 
       // Mock fetch for real API call
       global.fetch = jest.fn(() =>
@@ -69,12 +92,12 @@ describe('stoveApi with sandbox', () => {
 
       const result = await getStoveStatus();
 
-      expect(sandboxService.getSandboxStoveState).not.toHaveBeenCalled();
+      expect(getSandboxStoveState).not.toHaveBeenCalled();
       expect(result.isSandbox).toBe(false);
     });
 
     it('should use real API in production', async () => {
-      sandboxService.isLocalEnvironment.mockReturnValue(false);
+      isLocalEnvironment.mockReturnValue(false);
 
       global.fetch = jest.fn(() =>
         Promise.resolve({
@@ -85,46 +108,46 @@ describe('stoveApi with sandbox', () => {
 
       const result = await getStoveStatus();
 
-      expect(sandboxService.isSandboxEnabled).not.toHaveBeenCalled();
+      expect(isSandboxEnabled).not.toHaveBeenCalled();
       expect(result.isSandbox).toBe(false);
     });
   });
 
   describe('igniteStove', () => {
     it('should use sandbox ignite when enabled', async () => {
-      sandboxService.isLocalEnvironment.mockReturnValue(true);
-      sandboxService.isSandboxEnabled.mockResolvedValue(true);
-      sandboxService.sandboxIgnite.mockResolvedValue({ success: true });
+      isLocalEnvironment.mockReturnValue(true);
+      isSandboxEnabled.mockResolvedValue(true);
+      sandboxIgnite.mockResolvedValue({ success: true });
 
       const result = await igniteStove(4);
 
-      expect(sandboxService.sandboxIgnite).toHaveBeenCalledWith(4);
+      expect(sandboxIgnite).toHaveBeenCalledWith(4);
       expect(result).toEqual({ success: true });
     });
   });
 
   describe('shutdownStove', () => {
     it('should use sandbox shutdown when enabled', async () => {
-      sandboxService.isLocalEnvironment.mockReturnValue(true);
-      sandboxService.isSandboxEnabled.mockResolvedValue(true);
-      sandboxService.sandboxShutdown.mockResolvedValue({ success: true });
+      isLocalEnvironment.mockReturnValue(true);
+      isSandboxEnabled.mockResolvedValue(true);
+      sandboxShutdown.mockResolvedValue({ success: true });
 
       const result = await shutdownStove();
 
-      expect(sandboxService.sandboxShutdown).toHaveBeenCalled();
+      expect(sandboxShutdown).toHaveBeenCalled();
       expect(result).toEqual({ success: true });
     });
   });
 
   describe('setPowerLevel', () => {
     it('should use sandbox setPower when enabled', async () => {
-      sandboxService.isLocalEnvironment.mockReturnValue(true);
-      sandboxService.isSandboxEnabled.mockResolvedValue(true);
-      sandboxService.sandboxSetPower.mockResolvedValue({ success: true });
+      isLocalEnvironment.mockReturnValue(true);
+      isSandboxEnabled.mockResolvedValue(true);
+      sandboxSetPower.mockResolvedValue({ success: true });
 
       const result = await setPowerLevel(3);
 
-      expect(sandboxService.sandboxSetPower).toHaveBeenCalledWith(3);
+      expect(sandboxSetPower).toHaveBeenCalledWith(3);
       expect(result).toEqual({ success: true });
     });
 
@@ -136,19 +159,19 @@ describe('stoveApi with sandbox', () => {
 
   describe('setFanLevel', () => {
     it('should use sandbox setFan when enabled', async () => {
-      sandboxService.isLocalEnvironment.mockReturnValue(true);
-      sandboxService.isSandboxEnabled.mockResolvedValue(true);
-      sandboxService.sandboxSetFan.mockResolvedValue({ success: true });
+      isLocalEnvironment.mockReturnValue(true);
+      isSandboxEnabled.mockResolvedValue(true);
+      sandboxSetFan.mockResolvedValue({ success: true });
 
       const result = await setFanLevel(2);
 
-      expect(sandboxService.sandboxSetFan).toHaveBeenCalledWith(2);
+      expect(sandboxSetFan).toHaveBeenCalledWith(2);
       expect(result).toEqual({ success: true });
     });
 
     it('should throw error for invalid fan level', async () => {
-      await expect(setFanLevel(-1)).rejects.toThrow('Ventola deve essere tra 0 e 5');
-      await expect(setFanLevel(6)).rejects.toThrow('Ventola deve essere tra 0 e 5');
+      await expect(setFanLevel(0)).rejects.toThrow('Ventola deve essere tra 1 e 6');
+      await expect(setFanLevel(7)).rejects.toThrow('Ventola deve essere tra 1 e 6');
     });
   });
 });

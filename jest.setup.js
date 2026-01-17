@@ -1,6 +1,34 @@
 // Learn more: https://github.com/testing-library/jest-dom
 require('@testing-library/jest-dom');
 
+// Polyfill for React 19 act compatibility
+// React 19 removed act from react-dom/test-utils, but testing-library still expects it
+global.IS_REACT_ACT_ENVIRONMENT = true;
+
+// Add React.act polyfill for React 19
+// Standalone implementation that doesn't create circular dependencies
+const React = require('react');
+if (!React.act) {
+  React.act = function (callback) {
+    try {
+      const result = callback();
+      // If it's a promise, wait for it
+      if (result !== null && typeof result === 'object' && typeof result.then === 'function') {
+        return result.then(
+          (value) => value,
+          (error) => {
+            throw error;
+          }
+        );
+      }
+      // Otherwise return the result directly
+      return Promise.resolve(result);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+}
+
 // Mock environment variables for testing
 process.env.NEXT_PUBLIC_FIREBASE_API_KEY = 'test-api-key';
 process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN = 'test.firebaseapp.com';
@@ -26,6 +54,7 @@ if (typeof window !== 'undefined') {
       dispatchEvent: jest.fn(),
     })),
   });
+
 }
 
 // Mock IntersectionObserver
@@ -38,6 +67,18 @@ global.IntersectionObserver = class IntersectionObserver {
   }
   unobserve() {}
 };
+
+// Polyfill Request for API route tests
+if (typeof Request === 'undefined') {
+  global.Request = class Request {
+    constructor(url, init) {
+      this.url = url;
+      this.method = init?.method || 'GET';
+      this.headers = init?.headers || {};
+      this.body = init?.body;
+    }
+  };
+}
 
 // Mock localStorage
 const localStorageMock = {
@@ -88,6 +129,20 @@ jest.mock('next/navigation', () => ({
   usePathname: jest.fn(() => '/'),
   useSearchParams: jest.fn(() => new URLSearchParams()),
   useParams: jest.fn(() => ({})),
+}));
+
+// Mock Next.js server
+jest.mock('next/server', () => ({
+  NextResponse: {
+    json: jest.fn((body, init) => {
+      const response = {
+        status: init?.status || 200,
+        headers: new Headers(init?.headers || {}),
+        json: async () => body,
+      };
+      return response;
+    }),
+  },
 }));
 
 // Reset all mocks after each test

@@ -5,6 +5,35 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.54.1] - 2026-01-17
+
+### 🧪 Test Suite Fixes & Jest Configuration Improvements
+
+**Obiettivo**: Migliorare stabilità test suite, portare al 63% i test passanti.
+
+#### 🐛 Fixed
+
+**Test Suite Fixes (9 test suites corretti):**
+- `maintenanceService.concurrency.test.js`: Aggiunti null checks per transaction snapshots e import `set` da Firebase
+- `stoveApi.sandbox.test.js`: Corretto mock setup con factory function per sandboxService
+- `stoveApi.test.js`: Aggiornato count proprietà STUFA_API da 8 a 11
+- `maintenanceService.test.js`: Migrazione a fetch API pattern con global.fetch mocks
+- `themeService.test.js`: Migrazione completa a fetch API pattern
+- `schedulerService.test.js`: Supporto schema schedules-v2 con activeScheduleId e call counting
+- `useVersionCheck.test.js`: React 19 compatibility con waitFor() dopo act()
+- `hueLocalHelper.test.js`: Aggiunti Firebase ref/set mocks in beforeEach
+- `hueRemoteTokenHelper.test.js`: Corrette URLSearchParams assertions
+
+**Jest Configuration:**
+- Aggiunto polyfill `Request` in `jest.setup.js` per API route tests
+- Migliorato mock Next.js server per supportare pattern CommonJS/ESM
+
+#### 📊 Test Results
+
+- **23/39 test suites passing** (59%, +9 rispetto a 1.54.0)
+- **400/636 tests passing** (63%)
+- Problemi rimanenti: 14 UI component tests (Next.js 15 transformer), 1 VersionContext (jsdom location mock), 1 API route (transformer issue)
+
 ## [1.54.0] - 2026-01-17
 
 ### ⬆️ Dependencies Update & Test Suite Improvements

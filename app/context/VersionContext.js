@@ -48,12 +48,7 @@ function isLocalEnvironment() {
  * Context per gestione globale stato version enforcement
  * Permette check on-demand da qualsiasi componente (es. polling status)
  */
-const VersionContext = createContext({
-  needsUpdate: false,
-  firebaseVersion: null,
-  checkVersion: async () => {},
-  isChecking: false,
-});
+const VersionContext = createContext(null);
 
 export function VersionProvider({ children }) {
   const [needsUpdate, setNeedsUpdate] = useState(false);

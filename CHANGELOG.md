@@ -5,6 +5,52 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.54.0] - 2026-01-17
+
+### ⬆️ Dependencies Update & Test Suite Improvements
+
+**Obiettivo**: Aggiornare dipendenze in modo sicuro (Firebase 12.8.0), migliorare test suite, rimuovere Playwright.
+
+#### ⬆️ Updated
+
+**Dependencies:**
+- Firebase: `12.7.0` → `12.8.0` (patch release, nessun breaking change per Realtime DB/Admin SDK)
+- baseline-browser-mapping: `2.8.32` → `2.9.15` (dev dependency)
+
+**Test Suite:**
+- Fixati 26+ unit tests (version validation, useRouter mocks, dark mode CSS classes)
+- Aggiunto mock globale Next.js navigation (`useRouter`, `usePathname`, `useSearchParams`, `useParams`)
+- Fixati test componenti UI: ActionButton, StatusBadge, ConfirmDialog, BottomSheet, DuplicateDayModal
+- Corretta validazione `type` in `VERSION_HISTORY` (cambiato `'feature'` → `'minor'`)
+
+#### ➖ Removed
+
+**Playwright E2E Framework:**
+- Rimossi packages: `playwright`, `@playwright/test`
+- Rimossi script npm: `test:e2e*`, `test:playwright`
+- Cancellati file: `e2e/`, `playwright.config.js`, `test-playwright.mjs`, `scripts/run-e2e-clean.sh`
+- Aggiornata documentazione: rimosso `docs/ui-ux-testing.md` e riferimenti in `CLAUDE.md`
+
+#### 📝 Files Changed
+
+**Dependencies:**
+- `package.json` - Aggiornate versioni Firebase, baseline-browser-mapping; rimossi Playwright
+
+**Test Fixes:**
+- `jest.setup.js` - Aggiunto mock globale Next.js navigation
+- `lib/version.js` - Fixato type 'feature' → 'minor'
+- `app/components/ui/__tests__/ActionButton.test.js` - Aggiornate classi CSS dark mode
+- `app/components/ui/__tests__/StatusBadge.variants.test.js` - Riscritto per nuova struttura
+- `app/components/ui/__tests__/ConfirmDialog.test.js` - Fixato backdrop click test
+- `app/components/ui/__tests__/BottomSheet.test.js` - Fixato drag handle selector
+- `app/components/scheduler/__tests__/DuplicateDayModal.test.js` - Fixati checkbox e checkmark
+
+**Documentation:**
+- `CLAUDE.md` - Rimosso riferimento a Playwright E2E testing
+- `docs/ui-ux-testing.md` - Rimosso completamente
+
+---
+
 ## [1.53.3] - 2026-01-17
 
 ### 🔧 iOS PWA Dark Mode Status Bar Fix

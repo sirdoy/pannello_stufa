@@ -149,7 +149,6 @@ node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require(
 
 ### 🧪 Testing & Deployment
 - **[Testing](docs/testing.md)** - Unit tests, coverage, best practices
-- **[UI/UX Testing](docs/ui-ux-testing.md)** - Playwright E2E, WCAG AA compliance
 - **[Visual Screenshots](docs/visual-screenshots.md)** - Screenshot testing bypass Auth0
 - **[Sandbox Mode](docs/sandbox.md)** - Testing locale senza chiamate reali
 - **[Versioning](docs/versioning.md)** - Semantic versioning, changelog

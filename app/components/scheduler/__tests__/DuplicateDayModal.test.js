@@ -217,7 +217,8 @@ describe('DuplicateDayModal', () => {
     // Verify weekend days are checked
     expect(screen.getByRole('checkbox', { name: /Sabato/i })).toBeChecked();
     expect(screen.getByRole('checkbox', { name: /Domenica/i })).toBeChecked();
-    expect(screen.getByRole('checkbox', { name: /Lunedì/i })).not.toBeChecked();
+    // Lunedì is excluded, so no checkbox for it
+    expect(screen.queryByRole('checkbox', { name: /Lunedì/i })).not.toBeInTheDocument();
   });
 
   it('quick action: select all', () => {
@@ -356,9 +357,11 @@ describe('DuplicateDayModal', () => {
     // Select Martedì
     fireEvent.click(screen.getByRole('checkbox', { name: /Martedì/i }));
 
-    // Checkmark should appear
+    // Checkmark should appear (✓ character with ocean variant text)
     const martediLabel = screen.getByText('Martedì').closest('label');
-    expect(martediLabel.querySelector('span.text-blue-500')).toBeInTheDocument();
+    const checkmark = martediLabel.querySelector('span.text-ocean-400, span.text-ocean-600');
+    expect(checkmark).toBeInTheDocument();
+    expect(checkmark.textContent).toBe('✓');
   });
 
   it('does not call onConfirm when no days are selected', () => {

@@ -96,8 +96,10 @@ describe('BottomSheet Component', () => {
           Content
         </BottomSheet>
       );
-      const handle = container.querySelector('.w-12.h-1\\.5');
+      // Use a more robust selector for the handle (rounded-full is unique to the handle)
+      const handle = container.querySelector('.rounded-full.mx-auto.mb-6');
       expect(handle).toBeInTheDocument();
+      expect(handle).toHaveClass('w-12');
     });
 
     test('hides drag handle when showHandle is false', () => {
@@ -106,7 +108,7 @@ describe('BottomSheet Component', () => {
           Content
         </BottomSheet>
       );
-      const handle = container.querySelector('.w-12.h-1\\.5');
+      const handle = container.querySelector('.rounded-full.mx-auto.mb-6');
       expect(handle).not.toBeInTheDocument();
     });
   });

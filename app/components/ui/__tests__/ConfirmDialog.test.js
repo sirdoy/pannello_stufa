@@ -83,7 +83,7 @@ describe('ConfirmDialog', () => {
       />
     );
 
-    const backdrop = screen.getByRole('dialog').parentElement;
+    const backdrop = screen.getByRole('dialog');
     fireEvent.click(backdrop);
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
@@ -166,8 +166,9 @@ describe('ConfirmDialog', () => {
       />
     );
 
-    const dialog = screen.getByRole('dialog');
-    fireEvent.click(dialog);
+    // Click on the heading inside the dialog content (not the backdrop)
+    const heading = screen.getByRole('heading', { name: /Conferma azione/i });
+    fireEvent.click(heading);
 
     // onCancel should NOT be called when clicking dialog content
     expect(mockOnCancel).not.toHaveBeenCalled();

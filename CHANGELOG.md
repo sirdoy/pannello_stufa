@@ -5,6 +5,26 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.55.1] - 2026-01-19
+
+### 📚 Firebase Database Rules Deployment
+
+**Obiettivo**: Documentation update for Firebase database rules deployment requirement.
+
+#### 🐛 Fixed
+
+**Firebase Rules:**
+- Fixed console error: "Index not defined, add `.indexOn`: timestamp" for `/errors` path
+- Documented Firebase database rules deployment requirement
+- Rules in `database.rules.json` already contain correct configuration (`.indexOn`: ["timestamp", "severity", "resolved"])
+- Requires deployment via `firebase deploy --only database` to take effect
+
+**Note:**
+- This is a documentation update, not a code change
+- The rules were already correct but not deployed to Firebase
+
+---
+
 ## [1.55.0] - 2026-01-19
 
 ### 🚀 Next.js 16 Upgrade & Dependencies Update

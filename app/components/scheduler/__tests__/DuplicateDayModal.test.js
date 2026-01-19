@@ -16,7 +16,7 @@ describe('DuplicateDayModal', () => {
   });
 
   it('renders nothing when isOpen is false', () => {
-    const { container } = render(
+    render(
       <DuplicateDayModal
         isOpen={false}
         sourceDay="Lunedì"
@@ -26,10 +26,12 @@ describe('DuplicateDayModal', () => {
       />
     );
 
-    expect(container.firstChild).toBeNull();
+    // Modal uses portal, so content won't be in container but in document.body
+    // When closed, modal should not render anything
+    expect(screen.queryByText('Duplica Lunedì')).not.toBeInTheDocument();
   });
 
-  it('renders modal when isOpen is true', () => {
+  it('renders modal when isOpen is true', async () => {
     render(
       <DuplicateDayModal
         isOpen={true}
@@ -40,7 +42,10 @@ describe('DuplicateDayModal', () => {
       />
     );
 
-    expect(screen.getByText('Duplica Lunedì')).toBeInTheDocument();
+    // Wait for portal to render
+    await waitFor(() => {
+      expect(screen.getByText('Duplica Lunedì')).toBeInTheDocument();
+    });
     expect(screen.getByText(/Seleziona i giorni su cui duplicare/)).toBeInTheDocument();
   });
 
@@ -327,7 +332,8 @@ describe('DuplicateDayModal', () => {
       />
     );
 
-    expect(document.body.style.overflow).toBe('hidden');
+    // Modal now uses 'modal-open' class instead of direct overflow style
+    expect(document.body.classList.contains('modal-open')).toBe(true);
 
     // Close modal
     rerender(
@@ -340,7 +346,7 @@ describe('DuplicateDayModal', () => {
       />
     );
 
-    expect(document.body.style.overflow).toBe('');
+    expect(document.body.classList.contains('modal-open')).toBe(false);
   });
 
   it('shows checkmark for selected days', () => {

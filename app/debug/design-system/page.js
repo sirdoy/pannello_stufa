@@ -9,6 +9,7 @@ import Text from '@/app/components/ui/Text';
 import Input from '@/app/components/ui/Input';
 import Select from '@/app/components/ui/Select';
 import Toggle from '@/app/components/ui/Toggle';
+import Checkbox from '@/app/components/ui/Checkbox';
 import Toast from '@/app/components/ui/Toast';
 import Modal from '@/app/components/ui/Modal';
 import Skeleton from '@/app/components/ui/Skeleton';
@@ -37,6 +38,8 @@ export default function DesignSystemPage() {
   const [showModal, setShowModal] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showBottomSheet, setShowBottomSheet] = useState(false);
+  const [checkboxState, setCheckboxState] = useState(false);
+  const [checkboxIndeterminate, setCheckboxIndeterminate] = useState(true);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 [html:not(.dark)_&]:from-slate-50 [html:not(.dark)_&]:via-white [html:not(.dark)_&]:to-slate-50">
@@ -610,6 +613,150 @@ export default function DesignSystemPage() {
                         disabled
                       />
                       <Text variant="secondary" size="sm">Disabled State</Text>
+                    </div>
+                  </div>
+                </div>
+
+                <CardDivider />
+
+                {/* Checkbox Component */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Checkbox Component</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    Props: checked, onChange, label, disabled, indeterminate, size (sm|md|lg), variant (primary|ocean|sage|ember|flame)
+                  </Text>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <Checkbox
+                        id="checkbox-1"
+                        checked={checkboxState}
+                        onChange={(e) => setCheckboxState(e.target.checked)}
+                        label="Interactive Checkbox"
+                      />
+                      <Text variant="secondary" size="sm">Default (Ocean) - Click to toggle</Text>
+                    </div>
+
+                    <div>
+                      <Text variant="tertiary" size="xs" className="mb-2">Variants</Text>
+                      <div className="flex flex-wrap gap-4">
+                        <Checkbox
+                          id="checkbox-primary"
+                          checked={true}
+                          onChange={() => {}}
+                          label="Primary"
+                          variant="primary"
+                        />
+                        <Checkbox
+                          id="checkbox-ocean"
+                          checked={true}
+                          onChange={() => {}}
+                          label="Ocean"
+                          variant="ocean"
+                        />
+                        <Checkbox
+                          id="checkbox-sage"
+                          checked={true}
+                          onChange={() => {}}
+                          label="Sage"
+                          variant="sage"
+                        />
+                        <Checkbox
+                          id="checkbox-ember"
+                          checked={true}
+                          onChange={() => {}}
+                          label="Ember"
+                          variant="ember"
+                        />
+                        <Checkbox
+                          id="checkbox-flame"
+                          checked={true}
+                          onChange={() => {}}
+                          label="Flame"
+                          variant="flame"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Text variant="tertiary" size="xs" className="mb-2">Sizes</Text>
+                      <div className="flex items-center gap-4">
+                        <Checkbox
+                          id="checkbox-sm"
+                          checked={true}
+                          onChange={() => {}}
+                          label="Small"
+                          size="sm"
+                        />
+                        <Checkbox
+                          id="checkbox-md"
+                          checked={true}
+                          onChange={() => {}}
+                          label="Medium"
+                          size="md"
+                        />
+                        <Checkbox
+                          id="checkbox-lg"
+                          checked={true}
+                          onChange={() => {}}
+                          label="Large"
+                          size="lg"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Text variant="tertiary" size="xs" className="mb-2">States</Text>
+                      <div className="flex flex-wrap gap-4">
+                        <Checkbox
+                          id="checkbox-checked"
+                          checked={true}
+                          onChange={() => {}}
+                          label="Checked"
+                        />
+                        <Checkbox
+                          id="checkbox-unchecked"
+                          checked={false}
+                          onChange={() => {}}
+                          label="Unchecked"
+                        />
+                        <Checkbox
+                          id="checkbox-indeterminate"
+                          indeterminate={checkboxIndeterminate}
+                          onChange={() => setCheckboxIndeterminate(!checkboxIndeterminate)}
+                          label="Indeterminate"
+                        />
+                        <Checkbox
+                          id="checkbox-disabled"
+                          checked={false}
+                          onChange={() => {}}
+                          label="Disabled"
+                          disabled
+                        />
+                        <Checkbox
+                          id="checkbox-disabled-checked"
+                          checked={true}
+                          onChange={() => {}}
+                          label="Disabled Checked"
+                          disabled
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Text variant="tertiary" size="xs" className="mb-2">Without Label</Text>
+                      <div className="flex items-center gap-4">
+                        <Checkbox
+                          id="checkbox-no-label-1"
+                          checked={true}
+                          onChange={() => {}}
+                        />
+                        <Checkbox
+                          id="checkbox-no-label-2"
+                          checked={false}
+                          onChange={() => {}}
+                        />
+                        <Text variant="secondary" size="sm">Use aria-label when omitting visible label</Text>
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import Button from '../ui/Button';
 import ActionButton from '../ui/ActionButton';
+import Card from '../ui/Card';
+import Modal from '../ui/Modal';
+import Checkbox from '../ui/Checkbox';
 import Heading from '../ui/Heading';
 import Text from '../ui/Text';
 import { X } from 'lucide-react';
@@ -18,20 +21,6 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
       setSelectedDays([]);
     }
   }, [isOpen]);
-
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
-
-  if (!isOpen) return null;
 
   const availableDays = daysOfWeek.filter(day => !excludeDays.includes(day));
 
@@ -64,15 +53,15 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50 [html:not(.dark)_&]:bg-black/70 backdrop-blur-sm"
-        onClick={onCancel}
-      />
-
-      {/* Modal */}
-      <div className="relative w-full max-w-md bg-white/90 [html:not(.dark)_&]:bg-slate-900/90 backdrop-blur-xl rounded-3xl border border-white/20 [html:not(.dark)_&]:border-white/10 shadow-2xl p-6">
+    <Modal
+      isOpen={isOpen}
+      onClose={onCancel}
+      maxWidth="max-w-md"
+    >
+      <Card
+        liquid
+        className="p-6 animate-scale-in-center"
+      >
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <Heading level={2} size="xl" weight="semibold">
@@ -126,23 +115,18 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
         {/* Day Selection */}
         <div className="space-y-2 mb-6 max-h-[300px] overflow-y-auto">
           {availableDays.map(day => (
-            <label
+            <div
               key={day}
-              className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 [html:not(.dark)_&]:bg-white/[0.03] hover:bg-slate-100 [html:not(.dark)_&]:hover:bg-white/[0.05] cursor-pointer transition-colors"
+              className="p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:hover:bg-slate-200 transition-colors"
             >
-              <input
-                type="checkbox"
+              <Checkbox
+                id={`day-${day}`}
                 checked={selectedDays.includes(day)}
                 onChange={() => toggleDay(day)}
-                className="w-5 h-5 rounded border-slate-300 [html:not(.dark)_&]:border-white/20 text-ocean-500 focus:ring-2 focus:ring-ocean-500"
+                label={day}
+                variant="ocean"
               />
-              <Text as="span" weight="medium">
-                {day}
-              </Text>
-              {selectedDays.includes(day) && (
-                <Text as="span" variant="ocean" className="ml-auto">✓</Text>
-              )}
-            </label>
+            </div>
           ))}
         </div>
 
@@ -166,7 +150,7 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
             Duplica {selectedDays.length > 0 && `su ${selectedDays.length} ${selectedDays.length === 1 ? 'giorno' : 'giorni'}`}
           </Button>
         </div>
-      </div>
-    </div>
+      </Card>
+    </Modal>
   );
 }

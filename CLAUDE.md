@@ -167,6 +167,9 @@ node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require(
 7. ⚡ **ALWAYS** create/update unit tests → [docs/testing.md](docs/testing.md)
 8. 📚 **UPDATE DOCS** when adding features (in `docs/`, not in CLAUDE.md)
 9. 🎨 **USE DESIGN SYSTEM** - Reference `/debug/design-system` when creating new pages/components
+10. 🎨 **DESIGN SYSTEM UPDATES** - When adding/modifying UI components, update BOTH:
+    - `/debug/design-system/page.js` (live showcase)
+    - `docs/design-system.md` (documentation)
 
 ---
 

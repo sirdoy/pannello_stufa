@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 /**
@@ -31,24 +31,45 @@ export default function Modal({
   closeOnEscape = true,
   className = '',
 }) {
+  // Store scroll position in ref to preserve it across renders
+  const scrollPositionRef = useRef(0);
+
   // Block body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
-      const scrollY = window.scrollY;
+      // Save current scroll position
+      scrollPositionRef.current = window.scrollY;
+
+      // Apply scroll lock
       document.body.classList.add('modal-open');
-      document.body.style.top = `-${scrollY}px`;
-    } else {
-      const scrollY = document.body.style.top;
+      document.body.style.top = `-${scrollPositionRef.current}px`;
+    } else if (scrollPositionRef.current > 0) {
+      // Restore scroll position BEFORE removing fixed positioning
+      // This prevents any visible scroll jump
+      const scrollY = scrollPositionRef.current;
+
+      // Remove scroll lock first
       document.body.classList.remove('modal-open');
       document.body.style.top = '';
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || '0') * -1);
-      }
+
+      // Restore scroll position instantly (no smooth scrolling)
+      // Use simple syntax for maximum browser compatibility
+      window.scrollTo(0, scrollY);
+
+      // Reset ref
+      scrollPositionRef.current = 0;
     }
 
     return () => {
-      document.body.classList.remove('modal-open');
-      document.body.style.top = '';
+      // Cleanup: always restore scroll on unmount
+      if (document.body.classList.contains('modal-open')) {
+        const scrollY = scrollPositionRef.current;
+        document.body.classList.remove('modal-open');
+        document.body.style.top = '';
+        if (scrollY > 0) {
+          window.scrollTo(0, scrollY);
+        }
+      }
     };
   }, [isOpen]);
 

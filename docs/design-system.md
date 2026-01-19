@@ -505,6 +505,59 @@ Optimized for dark backgrounds.
 - Transition: `duration-200` smooth animation
 - Focus ring: `ring-2 ring-ember-500/50`
 
+### Checkbox
+
+```jsx
+// Basic checkbox
+<Checkbox
+  id="checkbox-1"
+  checked={isChecked}
+  onChange={(e) => setIsChecked(e.target.checked)}
+  label="Accept terms"
+/>
+
+// Checkbox variants (color when checked)
+<Checkbox checked={true} onChange={() => {}} label="Ocean" variant="ocean" id="cb-ocean" />
+<Checkbox checked={true} onChange={() => {}} label="Sage" variant="sage" id="cb-sage" />
+<Checkbox checked={true} onChange={() => {}} label="Ember" variant="ember" id="cb-ember" />
+<Checkbox checked={true} onChange={() => {}} label="Flame" variant="flame" id="cb-flame" />
+<Checkbox checked={true} onChange={() => {}} label="Primary" variant="primary" id="cb-primary" />
+
+// Checkbox sizes
+<Checkbox checked={true} onChange={() => {}} label="Small" size="sm" id="cb-sm" />   // 16px
+<Checkbox checked={true} onChange={() => {}} label="Medium" size="md" id="cb-md" />  // 20px (default)
+<Checkbox checked={true} onChange={() => {}} label="Large" size="lg" id="cb-lg" />   // 24px
+
+// Indeterminate state (for "select all" scenarios)
+<Checkbox indeterminate={true} onChange={() => {}} label="Select all" id="cb-indeterminate" />
+
+// Disabled checkbox
+<Checkbox checked={false} onChange={() => {}} label="Disabled" disabled id="cb-disabled" />
+```
+
+**Props:**
+- `checked` - Checkbox state (boolean) - default: false
+- `onChange` - Change handler function(event) - required
+- `label` - Label text (displayed next to checkbox)
+- `id` - Input ID (required for label association)
+- `indeterminate` - Indeterminate state (shows minus icon instead of check)
+- `disabled` - Disabled state (opacity-50, cursor-not-allowed)
+- `size` - Size variant: 'sm' | 'md' | 'lg' - default: 'md'
+- `variant` - Color when checked: 'ocean' | 'sage' | 'ember' | 'flame' | 'primary' - default: 'ocean'
+- `name` - Input name for form submission
+- `value` - Input value for form submission
+- `className` - Additional classes for wrapper
+
+**Styling:**
+- Checked: Solid color background matching variant (e.g., `bg-ocean-500`)
+- Unchecked: `border-slate-500` (dark) / `border-slate-400` (light)
+- Check icon: White `Check` from Lucide (strokeWidth: 3)
+- Indeterminate icon: White `Minus` from Lucide
+- Label: `text-white` (dark) / `text-slate-900` (light)
+- Transition: `duration-200` smooth animation
+- Focus ring: `ring-2` with variant color at 50% opacity
+- Border radius: `rounded-md` (6px)
+
 ### Select
 
 ```jsx

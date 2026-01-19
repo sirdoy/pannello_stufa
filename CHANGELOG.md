@@ -5,6 +5,34 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.56.2] - 2026-01-19
+
+### 🔧 Scheduler Modals & Checkbox Component
+
+**Obiettivo**: Fixed scheduler modal centering using React Portal, dark mode visibility, and added Checkbox UI component to design system.
+
+#### 🐛 Fixed
+
+- **Modal centering**: `DuplicateDayModal` and `AddIntervalModal` now use standard `Modal` component with React Portal
+- **Scroll jump on modal close**: Implemented `useRef`-based scroll position restoration in Modal
+- **Dark mode colors in DuplicateDayModal**: Corrected inverted color patterns (`bg-white/[0.03]` for dark mode)
+- **Dark mode colors in AddIntervalModal**: Fixed toggle buttons, select dropdowns, and preview areas
+
+#### ✨ Added
+
+- **Checkbox UI component**: New design system component with variants (ocean, sage, ember, flame, primary) and sizes (sm, md, lg)
+- **Design system updates**: Added Checkbox to showcase page and documentation
+
+#### 📝 Files Changed
+
+- `app/components/ui/Modal.js` - Fixed scroll position management with useRef
+- `app/components/ui/Checkbox.js` - NEW: Checkbox component
+- `app/components/ui/index.js` - Added Checkbox export
+- `app/components/scheduler/DuplicateDayModal.js` - Use Modal, Checkbox, fixed dark mode
+- `app/components/scheduler/AddIntervalModal.js` - Use Modal, fixed dark mode
+- `app/debug/design-system/page.js` - Added Checkbox showcase
+- `docs/design-system.md` - Added Checkbox documentation
+
 ## [1.56.1] - 2026-01-19
 
 ### 🎨 Footer Spacing Optimization

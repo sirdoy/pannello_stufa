@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Button from '../ui/Button';
 import ActionButton from '../ui/ActionButton';
 import Card from '../ui/Card';
+import Modal from '../ui/Modal';
 import Input from '../ui/Input';
 import Heading from '../ui/Heading';
 import Text from '../ui/Text';
@@ -68,31 +69,6 @@ export default function AddIntervalModal({
     }
   }, [isOpen, mode, initialInterval, suggestedStart]);
 
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
-
-  // Close on Escape key
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape' && isOpen) {
-        onCancel();
-      }
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen, onCancel]);
-
-  if (!isOpen) return null;
-
   // Calculate end time based on input mode
   const calculateEnd = () => {
     if (inputMode === 'endTime') {
@@ -151,17 +127,14 @@ export default function AddIntervalModal({
   const fanOptions = [1, 2, 3, 4, 5, 6];
 
   return (
-    <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 [html:not(.dark)_&]:bg-black/70 backdrop-blur-sm animate-fadeIn"
-      onClick={onCancel}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="add-interval-title"
+    <Modal
+      isOpen={isOpen}
+      onClose={onCancel}
+      maxWidth="max-w-lg"
     >
       <Card
         liquid
-        className="max-w-lg w-full p-6 animate-scaleIn"
-        onClick={(e) => e.stopPropagation()}
+        className="p-6 animate-scale-in-center"
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -205,7 +178,7 @@ export default function AddIntervalModal({
                 className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${
                   inputMode === 'duration'
                     ? 'bg-ember-500 [html:not(.dark)_&]:bg-ember-600 shadow-md'
-                    : 'bg-slate-100 [html:not(.dark)_&]:bg-slate-800 hover:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-700'
+                    : 'bg-slate-800 [html:not(.dark)_&]:bg-slate-100 hover:bg-slate-700 [html:not(.dark)_&]:hover:bg-slate-200'
                 }`}
               >
                 <Text as="span" className={inputMode === 'duration' ? 'text-white' : ''} variant={inputMode === 'duration' ? undefined : 'secondary'}>
@@ -218,7 +191,7 @@ export default function AddIntervalModal({
                 className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${
                   inputMode === 'endTime'
                     ? 'bg-ember-500 [html:not(.dark)_&]:bg-ember-600 shadow-md'
-                    : 'bg-slate-100 [html:not(.dark)_&]:bg-slate-800 hover:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-700'
+                    : 'bg-slate-800 [html:not(.dark)_&]:bg-slate-100 hover:bg-slate-700 [html:not(.dark)_&]:hover:bg-slate-200'
                 }`}
               >
                 <Text as="span" className={inputMode === 'endTime' ? 'text-white' : ''} variant={inputMode === 'endTime' ? undefined : 'secondary'}>
@@ -238,7 +211,7 @@ export default function AddIntervalModal({
                 <select
                   value={durationPreset}
                   onChange={(e) => setDurationPreset(e.target.value === 'custom' ? 'custom' : Number(e.target.value))}
-                  className="w-full px-4 py-3 bg-white [html:not(.dark)_&]:bg-slate-800 border border-slate-300 [html:not(.dark)_&]:border-slate-600 rounded-xl text-slate-900 [html:not(.dark)_&]:text-white focus:ring-2 focus:ring-ember-500 [html:not(.dark)_&]:focus:ring-ember-600 focus:border-transparent transition-all duration-200"
+                  className="w-full px-4 py-3 bg-slate-800 [html:not(.dark)_&]:bg-white border border-slate-600 [html:not(.dark)_&]:border-slate-300 rounded-xl text-white [html:not(.dark)_&]:text-slate-900 focus:ring-2 focus:ring-ember-500 [html:not(.dark)_&]:focus:ring-ember-600 focus:border-transparent transition-all duration-200"
                 >
                   {DURATION_PRESETS.map(preset => (
                     <option key={preset.value} value={preset.value}>
@@ -274,7 +247,7 @@ export default function AddIntervalModal({
           )}
 
           {/* End Time Preview */}
-          <div className="p-4 bg-slate-100 [html:not(.dark)_&]:bg-slate-800/50 rounded-xl">
+          <div className="p-4 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-100 rounded-xl">
             <Text variant="secondary" size="sm" className="mb-1">
               {inputMode === 'duration' ? 'Orario fine calcolato:' : 'Orario fine selezionato:'}
             </Text>
@@ -306,7 +279,7 @@ export default function AddIntervalModal({
                 <select
                   value={power}
                   onChange={(e) => setPower(Number(e.target.value))}
-                  className="w-full px-3 py-2 bg-white [html:not(.dark)_&]:bg-slate-800 border border-slate-300 [html:not(.dark)_&]:border-slate-600 rounded-lg text-slate-900 [html:not(.dark)_&]:text-white focus:ring-2 focus:ring-ember-500 [html:not(.dark)_&]:focus:ring-ember-600 focus:border-transparent transition-all duration-200"
+                  className="w-full px-3 py-2 bg-slate-800 [html:not(.dark)_&]:bg-white border border-slate-600 [html:not(.dark)_&]:border-slate-300 rounded-lg text-white [html:not(.dark)_&]:text-slate-900 focus:ring-2 focus:ring-ember-500 [html:not(.dark)_&]:focus:ring-ember-600 focus:border-transparent transition-all duration-200"
                 >
                   {powerOptions.map(p => (
                     <option key={p} value={p}>Livello {p}</option>
@@ -331,7 +304,7 @@ export default function AddIntervalModal({
                 <select
                   value={fan}
                   onChange={(e) => setFan(Number(e.target.value))}
-                  className="w-full px-3 py-2 bg-white [html:not(.dark)_&]:bg-slate-800 border border-slate-300 [html:not(.dark)_&]:border-slate-600 rounded-lg text-slate-900 [html:not(.dark)_&]:text-white focus:ring-2 focus:ring-ember-500 [html:not(.dark)_&]:focus:ring-ember-600 focus:border-transparent transition-all duration-200"
+                  className="w-full px-3 py-2 bg-slate-800 [html:not(.dark)_&]:bg-white border border-slate-600 [html:not(.dark)_&]:border-slate-300 rounded-lg text-white [html:not(.dark)_&]:text-slate-900 focus:ring-2 focus:ring-ember-500 [html:not(.dark)_&]:focus:ring-ember-600 focus:border-transparent transition-all duration-200"
                 >
                   {fanOptions.map(f => (
                     <option key={f} value={f}>Livello {f}</option>
@@ -363,6 +336,6 @@ export default function AddIntervalModal({
           </Button>
         </div>
       </Card>
-    </div>
+    </Modal>
   );
 }

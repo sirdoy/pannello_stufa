@@ -1,22 +1,27 @@
 import Image from 'next/image';
+import Text from '@/app/components/ui/Text';
+import StatusBadge from '@/app/components/ui/StatusBadge';
 
 export default function LogEntry({ entry, formatDate, getIcon, getDeviceBadge }) {
   const deviceBadge = getDeviceBadge ? getDeviceBadge(entry.device) : null;
 
-  const badgeColorClasses = {
-    primary: 'bg-primary-100 text-primary-700 border-primary-200',
-    info: 'bg-info-100 text-info-700 border-info-200',
-    warning: 'bg-warning-100 text-warning-700 border-warning-200',
-    success: 'bg-success-100 text-success-700 border-success-200',
-    neutral: 'bg-neutral-100 text-neutral-700 border-neutral-200',
+  // Map device colors to StatusBadge colors
+  const badgeColorMap = {
+    primary: 'ember',
+    info: 'ocean',
+    warning: 'warning',
+    success: 'sage',
+    neutral: 'neutral',
   };
 
   return (
-    <li className="border-b border-neutral-200 pb-4 mb-4 last:border-b-0 flex items-start gap-3">
-      <div className="text-2xl mt-1 flex-shrink-0">{getIcon(entry.action, entry.device)}</div>
+    <li className="border-b border-slate-700/30 [html:not(.dark)_&]:border-slate-200/60 pb-4 mb-4 last:border-b-0 last:pb-0 last:mb-0 flex items-start gap-3">
+      {/* Icon */}
+      <div className="text-2xl mt-0.5 flex-shrink-0">{getIcon(entry.action, entry.device)}</div>
+
       <div className="flex-1 min-w-0">
         {/* User & Device Badge Row */}
-        <div className="flex items-center gap-2 mb-2 flex-wrap">
+        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
           {/* User Info */}
           {entry.user && (
             <div className="flex items-center gap-2">
@@ -26,44 +31,56 @@ export default function LogEntry({ entry, formatDate, getIcon, getDeviceBadge })
                   alt={entry.user.name || entry.user.email}
                   width={24}
                   height={24}
-                  className="w-6 h-6 rounded-full"
+                  className="w-6 h-6 rounded-full ring-1 ring-white/10 [html:not(.dark)_&]:ring-black/10"
                 />
               )}
-              <span className="text-sm font-semibold text-neutral-700">
+              <Text variant="body" weight="semibold" size="sm">
                 {entry.user.name || entry.user.email}
-              </span>
+              </Text>
             </div>
           )}
 
           {/* Device Badge */}
           {deviceBadge && (
-            <span
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium border ${
-                badgeColorClasses[deviceBadge.color] || badgeColorClasses.neutral
-              }`}
-            >
-              {deviceBadge.icon && <span>{deviceBadge.icon}</span>}
-              <span>{deviceBadge.label}</span>
-            </span>
+            <StatusBadge
+              status={deviceBadge.label}
+              icon={deviceBadge.icon}
+              color={badgeColorMap[deviceBadge.color] || 'neutral'}
+              size="sm"
+            />
           )}
         </div>
 
         {/* Timestamp */}
-        <div className="text-xs text-neutral-500 mb-2">{formatDate(entry.timestamp)}</div>
+        <Text variant="tertiary" size="xs" className="mb-1.5">
+          {formatDate(entry.timestamp)}
+        </Text>
 
         {/* Action */}
-        <div className="text-base font-medium text-neutral-900">
-          {entry.action}
+        <div className="flex items-baseline gap-2 flex-wrap">
+          <Text variant="body" weight="medium">
+            {entry.action}
+          </Text>
           {entry.value !== undefined && entry.value !== null && (
-            <span className="ml-2 text-primary-600 font-semibold">→ {entry.value}</span>
+            <Text variant="ember" weight="semibold">
+              → {entry.value}
+            </Text>
           )}
         </div>
 
         {/* Optional Metadata */}
         {(entry.day || entry.roomName) && (
-          <div className="text-xs text-neutral-500 mt-2 space-y-0.5">
-            {entry.day && <div>Giorno: {entry.day}</div>}
-            {entry.roomName && <div>Stanza: {entry.roomName}</div>}
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+            {entry.day && (
+              <Text variant="tertiary" size="xs">
+                📅 Giorno: <Text as="span" variant="secondary" size="xs" weight="medium">{entry.day}</Text>
+              </Text>
+            )}
+            {entry.roomName && (
+              <Text variant="tertiary" size="xs">
+                🏠 Stanza: <Text as="span" variant="secondary" size="xs" weight="medium">{entry.roomName}</Text>
+              </Text>
+            )}
           </div>
         )}
       </div>

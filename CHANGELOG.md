@@ -5,6 +5,27 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.58.0] - 2026-01-19
+
+### 🎨 Log Page Design System Update
+
+**Obiettivo**: Refactored log page to use Ember Noir design system components for consistent UI.
+
+#### 🔧 Changed
+
+- **LogEntry**: Now uses `Text` and `StatusBadge` components instead of raw HTML
+- **LogEntry**: Proper dark/light mode support with Ember Noir palette (slate, ember, ocean, etc.)
+- **Log page**: Filter buttons now use `Button` component with device-specific colors
+- **Log page**: Empty state uses `EmptyState` component
+- **Improved spacing and typography** consistency throughout
+
+#### 📝 Files Changed
+
+- `app/components/log/LogEntry.js` - Refactored with Text, StatusBadge components
+- `app/log/page.js` - Uses Button, EmptyState components for filters and empty state
+
+---
+
 ## [1.57.0] - 2026-01-19
 
 ### ✨ CardAccentBar Component

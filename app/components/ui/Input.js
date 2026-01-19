@@ -21,6 +21,7 @@ export default function Input({
   variant = 'default',
   className = '',
   containerClassName = '',
+  helperText, // Extract custom prop (not passed to DOM)
   ...props
 }) {
   // Focus ring colors - Ember Noir palette

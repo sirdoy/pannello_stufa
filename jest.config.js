@@ -15,6 +15,8 @@ const customJestConfig = {
   // Module name mapper for path aliases
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
+    // Next.js 16: Redirect internal module imports to mocked version
+    '^next/dist/server/web/exports/next-response$': '<rootDir>/__mocks__/next-server.js',
   },
 
   // Test match patterns

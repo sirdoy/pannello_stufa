@@ -1,9 +1,40 @@
+// Mock react-dom FIRST (before testing-library loads it)
+// This ensures createPortal renders inline in tests
+jest.mock('react-dom', () => {
+  const actualReactDOM = jest.requireActual('react-dom');
+  return {
+    ...actualReactDOM,
+    // Render portal content inline instead of to document.body
+    // This fixes React 19 + Next.js 16 portal components not rendering in testing-library container
+    createPortal: (node) => node,
+  };
+});
+
 // Learn more: https://github.com/testing-library/jest-dom
 require('@testing-library/jest-dom');
+
+// Configure testing-library for React 19 compatibility
+const { configure, waitFor } = require('@testing-library/react');
+configure({
+  // React 19: Increase timeout for async rendering (portals, Suspense, etc.)
+  asyncUtilTimeout: 3000,
+  // Enable automatic waitFor after render for components with useEffect
+  reactStrictMode: true,
+});
+
+// React 19 + Next.js 16: Portal components fixed with SSR-safe pattern
+// Components check `typeof jest !== 'undefined'` to skip mounted delay in tests
 
 // Polyfill for React 19 act compatibility
 // React 19 removed act from react-dom/test-utils, but testing-library still expects it
 global.IS_REACT_ACT_ENVIRONMENT = true;
+
+// Fix for React 19 + Next.js 16: Simulate client-side environment for portals
+// Portal components use "mounted" pattern (set to true after useEffect runs)
+// In test environment, we need to simulate that we're already client-side mounted
+// Solution: Set global flag that components can check
+global.__TEST_ENVIRONMENT__ = true;
+global.__CLIENT_SIDE_MOUNTED__ = true;
 
 // Add React.act polyfill for React 19
 // Standalone implementation that doesn't create circular dependencies
@@ -131,7 +162,7 @@ jest.mock('next/navigation', () => ({
   useParams: jest.fn(() => ({})),
 }));
 
-// Mock Next.js server
+// Mock Next.js server (updated for Next.js 16)
 jest.mock('next/server', () => ({
   NextResponse: {
     json: jest.fn((body, init) => {

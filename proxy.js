@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth0 } from '@/lib/auth0';
 
-export async function middleware(req) {
+export async function proxy(req) {
   // Bypass authentication in test mode (Playwright)
   if (process.env.TEST_MODE === 'true') {
     return NextResponse.next();

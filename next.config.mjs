@@ -90,6 +90,9 @@ const nextConfig = {
       },
     ],
   },
+  // Next.js 16: Enable Turbopack in dev (PWA is disabled in dev anyway)
+  // Build uses --webpack flag for PWA compatibility
+  turbopack: {},
 };
 
 export default withPWA(nextConfig);

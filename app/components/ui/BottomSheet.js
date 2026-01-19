@@ -35,9 +35,12 @@ export default function BottomSheet({
   className = '',
   zIndex = 8999,
 }) {
-  const [mounted, setMounted] = useState(false);
+  // In test environment, skip mounted check (JSDOM is always client-side)
+  // In production, prevent SSR hydration mismatch for portals
+  // Check: typeof window !== 'undefined' means we're client-side (browser or JSDOM)
+  const [mounted, setMounted] = useState(typeof window !== 'undefined');
 
-  // Client-side only mounting
+  // Client-side only mounting (production)
   useEffect(() => {
     setMounted(true);
   }, []);

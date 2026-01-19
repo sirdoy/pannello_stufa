@@ -1,7 +1,7 @@
-@import "tailwindcss";
-
-/* Google Fonts - Load distinctive typography */
+/* Google Fonts - Load distinctive typography (MUST be before Tailwind) */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
 
 /* ============================================
    EMBER NOIR DESIGN SYSTEM

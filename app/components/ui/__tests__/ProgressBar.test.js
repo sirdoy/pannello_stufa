@@ -1,6 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import ProgressBar from '../ProgressBar';
 
+// Mock Text component to avoid dependency issues
+jest.mock('../Text', () => ({
+  __esModule: true,
+  default: ({ children, as: Component = 'span', ...props }) => <Component {...props}>{children}</Component>
+}));
+
 describe('ProgressBar Component', () => {
   describe('Rendering', () => {
     test('renders progress bar', () => {
@@ -36,42 +42,43 @@ describe('ProgressBar Component', () => {
   describe('Color Variants', () => {
     test('renders primary color by default', () => {
       const { container } = render(<ProgressBar value={50} />);
-      const bar = container.querySelector('.from-ember-400');
-      expect(bar).toBeInTheDocument();
+      const bar = container.querySelector('[role="progressbar"]');
+      expect(bar).toHaveClass('from-ember-400');
     });
 
     test('renders success color', () => {
       const { container } = render(<ProgressBar value={50} color="success" />);
-      const bar = container.querySelector('.from-sage-400');
-      expect(bar).toBeInTheDocument();
+      const bar = container.querySelector('[role="progressbar"]');
+      expect(bar).toHaveClass('from-sage-400');
     });
 
     test('renders custom gradient', () => {
       const { container } = render(
         <ProgressBar value={50} gradient="from-red-400 to-orange-500" />
       );
-      const bar = container.querySelector('.from-red-400');
-      expect(bar).toBeInTheDocument();
+      const bar = container.querySelector('[role="progressbar"]');
+      expect(bar).toHaveClass('from-red-400');
     });
   });
 
   describe('Sizes', () => {
     test('renders medium size by default', () => {
       const { container } = render(<ProgressBar value={50} />);
-      const track = container.querySelector('.h-3');
-      expect(track).toBeInTheDocument();
+      const bar = container.querySelector('[role="progressbar"]');
+      // The h-3 class is on the parent container, not the progress bar itself
+      expect(bar.parentElement).toHaveClass('h-3');
     });
 
     test('renders small size', () => {
       const { container } = render(<ProgressBar value={50} size="sm" />);
-      const track = container.querySelector('.h-2');
-      expect(track).toBeInTheDocument();
+      const bar = container.querySelector('[role="progressbar"]');
+      expect(bar.parentElement).toHaveClass('h-2');
     });
 
     test('renders large size', () => {
       const { container } = render(<ProgressBar value={50} size="lg" />);
-      const track = container.querySelector('.h-4');
-      expect(track).toBeInTheDocument();
+      const bar = container.querySelector('[role="progressbar"]');
+      expect(bar.parentElement).toHaveClass('h-4');
     });
   });
 
@@ -92,13 +99,13 @@ describe('ProgressBar Component', () => {
   describe('Animation', () => {
     test('applies animation by default', () => {
       const { container } = render(<ProgressBar value={50} />);
-      const bar = container.querySelector('.transition-all');
-      expect(bar).toBeInTheDocument();
+      const bar = container.querySelector('[role="progressbar"]');
+      expect(bar).toHaveClass('transition-all');
     });
 
     test('disables animation when animated=false', () => {
       const { container } = render(<ProgressBar value={50} animated={false} />);
-      const bar = container.querySelector('[role="progressbar"]').parentElement.firstChild;
+      const bar = container.querySelector('[role="progressbar"]');
       expect(bar).not.toHaveClass('transition-all');
     });
   });

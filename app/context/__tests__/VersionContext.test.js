@@ -20,34 +20,21 @@ describe('VersionContext', () => {
     <VersionProvider>{children}</VersionProvider>
   );
 
-  let originalLocation;
-
-  beforeAll(() => {
-    // Save original location
-    originalLocation = window.location;
-  });
-
-  afterAll(() => {
-    // Restore original location
-    delete window.location;
+  // Helper to mock location hostname
+  const mockLocation = (hostname) => {
     Object.defineProperty(window, 'location', {
+      value: { hostname },
       writable: true,
       configurable: true,
-      value: originalLocation
     });
-  });
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
     // Reset environment mocks
     delete process.env.NODE_ENV;
-    // Reset location to default (example.com = non-local)
-    delete window.location;
-    Object.defineProperty(window, 'location', {
-      writable: true,
-      configurable: true,
-      value: { hostname: 'example.com' }
-    });
+    // Default to production hostname
+    mockLocation('example.com');
   });
 
   describe('useVersion Hook', () => {
@@ -103,13 +90,7 @@ describe('VersionContext', () => {
     });
 
     test('skips check on localhost hostname', async () => {
-      delete window.location;
-      Object.defineProperty(window, 'location', {
-        writable: true,
-        configurable: true,
-        value: { hostname: 'localhost' }
-      });
-
+      mockLocation('localhost');
       const consoleLog = jest.spyOn(console, 'log').mockImplementation();
 
       const { result } = renderHook(() => useVersion(), { wrapper });
@@ -127,12 +108,7 @@ describe('VersionContext', () => {
     });
 
     test('skips check on 127.0.0.1 hostname', async () => {
-      delete window.location;
-      Object.defineProperty(window, 'location', {
-        writable: true,
-        configurable: true,
-        value: { hostname: '127.0.0.1' }
-      });
+      mockLocation('127.0.0.1');
 
       const consoleLog = jest.spyOn(console, 'log').mockImplementation();
 
@@ -149,13 +125,7 @@ describe('VersionContext', () => {
     });
 
     test('skips check on 192.168.x.x hostname', async () => {
-      delete window.location;
-      Object.defineProperty(window, 'location', {
-        writable: true,
-        configurable: true,
-        value: { hostname: '192.168.1.100' }
-      });
-
+      mockLocation('192.168.1.100');
       const consoleLog = jest.spyOn(console, 'log').mockImplementation();
 
       const { result } = renderHook(() => useVersion(), { wrapper });

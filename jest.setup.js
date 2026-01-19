@@ -85,7 +85,6 @@ if (typeof window !== 'undefined') {
       dispatchEvent: jest.fn(),
     })),
   });
-
 }
 
 // Mock IntersectionObserver
@@ -163,22 +162,33 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock Next.js server (updated for Next.js 16)
+// Use mockImplementation to survive jest.clearAllMocks()
+const nextResponseJsonImpl = (body, init) => {
+  const response = {
+    status: init?.status || 200,
+    headers: new Headers(init?.headers || {}),
+    json: async () => body,
+  };
+  return response;
+};
+
+const NextResponseMock = {
+  json: jest.fn().mockImplementation(nextResponseJsonImpl),
+};
+
 jest.mock('next/server', () => ({
-  NextResponse: {
-    json: jest.fn((body, init) => {
-      const response = {
-        status: init?.status || 200,
-        headers: new Headers(init?.headers || {}),
-        json: async () => body,
-      };
-      return response;
-    }),
-  },
+  __esModule: true,
+  NextResponse: NextResponseMock,
+  default: { NextResponse: NextResponseMock },
 }));
 
 // Reset all mocks after each test
 afterEach(() => {
   jest.clearAllMocks();
+
+  // Restore NextResponse.json implementation after clearAllMocks
+  NextResponseMock.json.mockImplementation(nextResponseJsonImpl);
+
   localStorageMock.getItem.mockClear();
   localStorageMock.setItem.mockClear();
   localStorageMock.removeItem.mockClear();

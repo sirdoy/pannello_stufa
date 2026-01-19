@@ -338,3 +338,102 @@ NETATMO_REDIRECT_URI=http://localhost:3001/api/netatmo/callback
 **IMPORTANTE**:
 - Per production, cambia porta da 3001 a 3000 (o dominio reale)
 - Aggiungi redirect_uri su Netatmo Developer console
+
+---
+
+## Features Avanzate
+
+### Battery Status Display
+
+L'API `/api/netatmo/homestatus` ora restituisce informazioni complete sulle batterie di tutti i dispositivi:
+
+**Response Fields:**
+```javascript
+{
+  rooms: [...],
+  modules: [
+    {
+      id: "09:00:00:xx:xx:xx",
+      name: "Valvola Soggiorno",
+      type: "NRV",                    // NRV = valve, NATherm1 = thermostat
+      reachable: true,
+      battery_state: "full",          // "full", "high", "medium", "low", "very_low"
+      battery_level: 3213,            // Raw voltage value
+      rf_strength: 82,                // Radio signal strength
+      room_id: "123456"
+    }
+  ],
+  lowBatteryModules: [...],           // Modules with low/very_low battery
+  hasLowBattery: false,               // Quick check flag
+  hasCriticalBattery: false,          // Any very_low battery?
+}
+```
+
+**UI Indicators:**
+- Warning banner in ThermostatCard when `hasLowBattery` is true
+- Error banner when `hasCriticalBattery` is true
+- Battery info box showing count of low battery devices
+
+### Daily Automatic Valve Calibration
+
+Il cron job dello scheduler calibra automaticamente le valvole ogni **24 ore**:
+
+**Firebase Path:** `netatmo/lastAutoCalibration` (timestamp)
+
+**How it works:**
+1. Il cron `/api/scheduler/check` controlla `lastAutoCalibration`
+2. Se sono passate 24+ ore, chiama `/api/netatmo/calibrate`
+3. La calibrazione forza le valvole a ri-calibrarsi
+4. Timestamp aggiornato in Firebase
+
+**Manual Calibration:**
+```javascript
+POST /api/netatmo/calibrate
+// Requires Auth0 authentication
+// Returns: { success: true }
+```
+
+### Stove-Valve Integration (Living Room Sync)
+
+Quando la stufa si accende, la valvola del salotto viene impostata a 16C per evitare riscaldamento doppio.
+
+**Firebase Schema:**
+```javascript
+netatmo/stoveSync: {
+  enabled: boolean,           // Se attivo
+  livingRoomId: "123456",     // Room ID della stanza "salotto"
+  livingRoomName: "Salotto",  // Nome per display
+  stoveTemperature: 16,       // Temperatura quando stufa ON
+  stoveMode: boolean,         // True quando stufa ON
+  originalSetpoint: 20.5,     // Setpoint salvato per restore
+  lastSyncAt: timestamp,
+  lastSyncAction: "stove_on" | "stove_off"
+}
+```
+
+**API Endpoint:**
+```javascript
+// Get config and available rooms
+GET /api/netatmo/stove-sync
+// Returns: { config, availableRooms }
+
+// Enable sync for a room
+POST /api/netatmo/stove-sync
+{ action: "enable", roomId: "123456", roomName: "Salotto", stoveTemperature: 16 }
+
+// Disable sync
+POST /api/netatmo/stove-sync
+{ action: "disable" }
+
+// Manual sync trigger
+POST /api/netatmo/stove-sync
+{ action: "sync", stoveIsOn: true }
+```
+
+**Automatic Integration:**
+Il cron job `/api/scheduler/check` chiama automaticamente `syncLivingRoomWithStove()` quando:
+- Stufa si accende (ignite) → Salotto a 16C
+- Stufa si spegne (shutdown) → Salotto torna a schedule
+
+**UI Indicator:**
+Quando `stoveSync` e' attivo, la ThermostatCard mostra un badge "STUFA" sulla stanza del salotto.

@@ -15,6 +15,7 @@ import {
   setFanLevel,
 } from '@/lib/stoveApi';
 import { updateStoveState } from '@/lib/stoveStateService';
+import { syncLivingRoomWithStove } from '@/lib/netatmoStoveSync';
 
 export const dynamic = 'force-dynamic';
 
@@ -98,8 +99,9 @@ async function sendSchedulerNotification(action, details = '') {
 }
 
 /**
- * Helper: Calibra valvole Netatmo ogni 12 ore
+ * Helper: Calibra valvole Netatmo ogni 24 ore
  * Controlla timestamp ultima calibrazione e calibra se necessario
+ * Changed from 12h to 24h interval as per user request
  */
 async function calibrateValvesIfNeeded(baseUrl) {
   try {
@@ -107,19 +109,19 @@ async function calibrateValvesIfNeeded(baseUrl) {
     const lastCalibration = await adminDbGet('netatmo/lastAutoCalibration');
 
     const now = Date.now();
-    const TWELVE_HOURS = 12 * 60 * 60 * 1000; // 12 ore in millisecondi
+    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; // 24 ore in millisecondi
 
-    // Check if 12 hours have passed since last calibration
-    if (lastCalibration && (now - lastCalibration) < TWELVE_HOURS) {
+    // Check if 24 hours have passed since last calibration
+    if (lastCalibration && (now - lastCalibration) < TWENTY_FOUR_HOURS) {
       // Not yet time for calibration
       return {
         calibrated: false,
         reason: 'too_soon',
-        nextCalibration: new Date(lastCalibration + TWELVE_HOURS).toISOString(),
+        nextCalibration: new Date(lastCalibration + TWENTY_FOUR_HOURS).toISOString(),
       };
     }
 
-    console.log('🔧 Avvio calibrazione automatica valvole Netatmo...');
+    console.log('🔧 Avvio calibrazione automatica giornaliera valvole Netatmo...');
 
     // Call calibration endpoint with timeout
     const response = await fetchWithTimeout(`${baseUrl}${NETATMO_ROUTES.calibrate}`, {
@@ -143,12 +145,12 @@ async function calibrateValvesIfNeeded(baseUrl) {
     // Update last calibration timestamp
     await adminDbSet('netatmo/lastAutoCalibration', now);
 
-    console.log('✅ Calibrazione automatica valvole completata');
+    console.log('✅ Calibrazione automatica giornaliera valvole completata');
 
     return {
       calibrated: true,
       timestamp: now,
-      nextCalibration: new Date(now + TWELVE_HOURS).toISOString(),
+      nextCalibration: new Date(now + TWENTY_FOUR_HOURS).toISOString(),
     };
 
   } catch (error) {
@@ -299,7 +301,7 @@ export async function GET(req) {
       // Continue with defaults - cron health is more important than stove control
     }
 
-    // Auto-calibrate Netatmo valves every 12 hours (run async, don't wait)
+    // Auto-calibrate Netatmo valves every 24 hours (run async, don't wait)
     calibrateValvesIfNeeded(baseUrl).then((result) => {
       if (result.calibrated) {
         console.log(`✅ Calibrazione automatica completata - prossima calibrazione: ${result.nextCalibration}`);
@@ -447,6 +449,13 @@ export async function GET(req) {
 
           // Send notification
           await sendSchedulerNotification('IGNITE', `Stufa accesa automaticamente alle ${ora} (P${active.power}, V${active.fan})`);
+
+          // Sync living room valve with stove (set to low temp when stove is ON)
+          syncLivingRoomWithStove(true).then((result) => {
+            if (result.synced) {
+              console.log(`✅ Netatmo stove sync: Living room set to ${result.temperature}°C`);
+            }
+          }).catch(err => console.error('❌ Netatmo stove sync error:', err));
         } catch (error) {
           console.error('❌ Failed to ignite stove:', error.message);
         }
@@ -494,6 +503,13 @@ export async function GET(req) {
 
           // Send notification
           await sendSchedulerNotification('SHUTDOWN', `Stufa spenta automaticamente alle ${ora}`);
+
+          // Sync living room valve with stove (return to schedule when stove is OFF)
+          syncLivingRoomWithStove(false).then((result) => {
+            if (result.synced) {
+              console.log(`✅ Netatmo stove sync: Living room returned to schedule`);
+            }
+          }).catch(err => console.error('❌ Netatmo stove sync error:', err));
         } catch (error) {
           console.error('❌ Failed to shutdown stove:', error.message);
         }

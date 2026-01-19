@@ -9,6 +9,10 @@ import NETATMO_API, {
   parseRooms,
   parseModules,
   extractTemperatures,
+  extractModulesWithStatus,
+  getModulesWithLowBattery,
+  hasAnyCriticalBattery,
+  hasAnyLowBattery,
 } from '@/lib/netatmoApi';
 
 // Mock fetch
@@ -310,6 +314,211 @@ describe('netatmoApi', () => {
           }),
         })
       );
+    });
+  });
+
+  describe('extractModulesWithStatus', () => {
+    it('should extract modules with battery status from homestatus', () => {
+      const homeStatus = {
+        modules: [
+          {
+            id: 'valve-1',
+            type: 'NRV',
+            reachable: true,
+            battery_state: 'full',
+            battery_level: 3213,
+            rf_strength: 82,
+            bridge: 'relay-1',
+            room_id: 'room-1',
+            firmware_revision: 73,
+          },
+          {
+            id: 'valve-2',
+            type: 'NRV',
+            reachable: true,
+            battery_state: 'low',
+            battery_level: 2760,
+            rf_strength: 76,
+            bridge: 'relay-1',
+            room_id: 'room-2',
+          },
+          {
+            id: 'relay-1',
+            type: 'NAPlug',
+            reachable: true,
+            wifi_strength: 55,
+          },
+        ],
+      };
+
+      const result = extractModulesWithStatus(homeStatus);
+
+      expect(result).toHaveLength(3);
+
+      // Valve 1 - full battery
+      expect(result[0]).toEqual({
+        id: 'valve-1',
+        type: 'NRV',
+        reachable: true,
+        battery_state: 'full',
+        battery_level: 3213,
+        rf_strength: 82,
+        bridge: 'relay-1',
+        room_id: 'room-1',
+        firmware_revision: 73,
+      });
+
+      // Valve 2 - low battery
+      expect(result[1]).toEqual({
+        id: 'valve-2',
+        type: 'NRV',
+        reachable: true,
+        battery_state: 'low',
+        battery_level: 2760,
+        rf_strength: 76,
+        bridge: 'relay-1',
+        room_id: 'room-2',
+      });
+
+      // Relay - no battery (mains powered)
+      expect(result[2]).toEqual({
+        id: 'relay-1',
+        type: 'NAPlug',
+        reachable: true,
+        wifi_strength: 55,
+      });
+    });
+
+    it('should add module names from topology if available', () => {
+      const homeStatus = {
+        modules: [
+          {
+            id: 'valve-1',
+            type: 'NRV',
+            reachable: true,
+            battery_state: 'high',
+          },
+        ],
+      };
+
+      const topology = {
+        modules: [
+          { id: 'valve-1', name: 'Valvola Soggiorno' },
+        ],
+      };
+
+      const result = extractModulesWithStatus(homeStatus, topology);
+
+      expect(result[0].name).toBe('Valvola Soggiorno');
+    });
+
+    it('should handle empty modules array', () => {
+      const result = extractModulesWithStatus({ modules: [] });
+      expect(result).toEqual([]);
+    });
+
+    it('should handle missing modules property', () => {
+      const result = extractModulesWithStatus({});
+      expect(result).toEqual([]);
+    });
+
+    it('should filter out undefined values for Firebase compatibility', () => {
+      const homeStatus = {
+        modules: [
+          {
+            id: 'valve-1',
+            type: 'NRV',
+            reachable: true,
+            battery_state: undefined,
+            battery_level: undefined,
+            rf_strength: undefined,
+          },
+        ],
+      };
+
+      const result = extractModulesWithStatus(homeStatus);
+
+      expect(result[0]).not.toHaveProperty('battery_state');
+      expect(result[0]).not.toHaveProperty('battery_level');
+      expect(result[0]).not.toHaveProperty('rf_strength');
+    });
+  });
+
+  describe('getModulesWithLowBattery', () => {
+    it('should return modules with low or very_low battery', () => {
+      const modules = [
+        { id: 'v1', battery_state: 'full' },
+        { id: 'v2', battery_state: 'high' },
+        { id: 'v3', battery_state: 'medium' },
+        { id: 'v4', battery_state: 'low' },
+        { id: 'v5', battery_state: 'very_low' },
+      ];
+
+      const result = getModulesWithLowBattery(modules);
+
+      expect(result).toHaveLength(2);
+      expect(result.map(m => m.id)).toEqual(['v4', 'v5']);
+    });
+
+    it('should return empty array when no low battery modules', () => {
+      const modules = [
+        { id: 'v1', battery_state: 'full' },
+        { id: 'v2', battery_state: 'high' },
+      ];
+
+      const result = getModulesWithLowBattery(modules);
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('hasAnyCriticalBattery', () => {
+    it('should return true when any module has very_low battery', () => {
+      const modules = [
+        { id: 'v1', battery_state: 'full' },
+        { id: 'v2', battery_state: 'very_low' },
+      ];
+
+      expect(hasAnyCriticalBattery(modules)).toBe(true);
+    });
+
+    it('should return false when no module has very_low battery', () => {
+      const modules = [
+        { id: 'v1', battery_state: 'full' },
+        { id: 'v2', battery_state: 'low' },
+      ];
+
+      expect(hasAnyCriticalBattery(modules)).toBe(false);
+    });
+  });
+
+  describe('hasAnyLowBattery', () => {
+    it('should return true when any module has low battery', () => {
+      const modules = [
+        { id: 'v1', battery_state: 'full' },
+        { id: 'v2', battery_state: 'low' },
+      ];
+
+      expect(hasAnyLowBattery(modules)).toBe(true);
+    });
+
+    it('should return true when any module has very_low battery', () => {
+      const modules = [
+        { id: 'v1', battery_state: 'full' },
+        { id: 'v2', battery_state: 'very_low' },
+      ];
+
+      expect(hasAnyLowBattery(modules)).toBe(true);
+    });
+
+    it('should return false when all modules have adequate battery', () => {
+      const modules = [
+        { id: 'v1', battery_state: 'full' },
+        { id: 'v2', battery_state: 'high' },
+        { id: 'v3', battery_state: 'medium' },
+      ];
+
+      expect(hasAnyLowBattery(modules)).toBe(false);
     });
   });
 });

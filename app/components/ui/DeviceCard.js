@@ -165,13 +165,13 @@ export default function DeviceCard({
           {/* Main Content */}
           {children}
 
-          {/* Info Boxes Section */}
+          {/* Info Boxes Section - 2 Column Grid */}
           {infoBoxes.length > 0 && (
             <>
               {infoBoxesTitle && (
                 <Divider label={infoBoxesTitle} variant="gradient" spacing="large" />
               )}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+              <div className="grid grid-cols-2 gap-2.5 mb-6">
                 {infoBoxes.map((box, index) => (
                   <InfoBox
                     key={index}

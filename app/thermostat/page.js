@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { Card, Button, Skeleton, ErrorAlert, Banner, Heading, Text } from '@/app/components/ui';
 import RoomCard from '@/app/components/netatmo/RoomCard';
 import NetatmoAuthCard from '@/app/components/netatmo/NetatmoAuthCard';
+import BatteryWarning, { ModuleBatteryList } from '@/app/components/devices/thermostat/BatteryWarning';
 import { NETATMO_ROUTES } from '@/lib/routes';
 
 function NetatmoContent() {
@@ -248,20 +249,46 @@ function NetatmoContent() {
   }
 
   const rooms = topology.rooms || [];
-  const modules = topology.modules || [];
+  const topologyModules = topology.modules || [];
+
+  // Get modules with battery status from status endpoint
+  const statusModules = status?.modules || [];
+
+  // Merge topology modules with status modules to get battery info
+  const modulesWithBattery = topologyModules.map(topModule => {
+    const statusModule = statusModules.find(m => m.id === topModule.id);
+    return {
+      ...topModule,
+      // Add battery/status info from statusModules
+      battery_state: statusModule?.battery_state,
+      battery_level: statusModule?.battery_level,
+      reachable: statusModule?.reachable ?? true, // Default to true if not in status
+      rf_strength: statusModule?.rf_strength,
+    };
+  });
 
   // Map rooms with status and enrich with module info
+  // Shows ALL rooms from topology, even if offline
   const roomsWithStatus = rooms.map(room => {
     const roomStatus = status?.rooms?.find(r => r.room_id === room.id);
 
-    // Find modules for this room (exclude relays - NAPlug)
+    // Find modules for this room (exclude relays - NAPlug), with battery info
     const roomModules = room.modules?.map(moduleId => {
-      return modules.find(m => m.id === moduleId);
+      return modulesWithBattery.find(m => m.id === moduleId);
     }).filter(Boolean).filter(m => m.type !== 'NAPlug') || [];
 
     // Determine device type
     const hasThermostat = roomModules.some(m => m.type === 'NATherm1' || m.type === 'OTH');
     const hasValve = roomModules.some(m => m.type === 'NRV');
+
+    // Check if any module has battery issues
+    const hasLowBattery = roomModules.some(m =>
+      m.battery_state === 'low' || m.battery_state === 'very_low'
+    );
+    const hasCriticalBattery = roomModules.some(m => m.battery_state === 'very_low');
+
+    // Check if room is offline (no reachable modules)
+    const isOffline = roomModules.length > 0 && roomModules.every(m => m.reachable === false);
 
     return {
       ...room,
@@ -269,8 +296,11 @@ function NetatmoContent() {
       setpoint: roomStatus?.setpoint,
       mode: roomStatus?.mode,
       heating: roomStatus?.heating,
-      roomModules, // Add module details (without relays)
+      roomModules, // Add module details with battery info
       deviceType: hasThermostat ? 'thermostat' : hasValve ? 'valve' : 'unknown',
+      hasLowBattery,
+      hasCriticalBattery,
+      isOffline,
     };
   });
 
@@ -326,6 +356,16 @@ function NetatmoContent() {
       {error && (
         <div className="mb-6">
           <ErrorAlert message={error} />
+        </div>
+      )}
+
+      {/* Battery Warning Banner */}
+      {(status?.hasLowBattery || status?.hasCriticalBattery) && (
+        <div className="mb-6">
+          <BatteryWarning
+            lowBatteryModules={status?.lowBatteryModules || []}
+            hasCriticalBattery={status?.hasCriticalBattery || false}
+          />
         </div>
       )}
 
@@ -395,10 +435,17 @@ function NetatmoContent() {
           <div className="p-3 rounded-xl bg-slate-800/40 backdrop-blur-sm [html:not(.dark)_&]:bg-slate-100/60">
             <Text variant="label" size="xs" className="mb-1">Moduli</Text>
             <Text variant="body" size="lg" weight="bold">
-              {topology.modules?.length || 0}
+              {modulesWithBattery?.length || 0}
             </Text>
           </div>
         </div>
+
+        {/* Module Battery Status List */}
+        {modulesWithBattery && modulesWithBattery.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
+            <ModuleBatteryList modules={modulesWithBattery} />
+          </div>
+        )}
 
         <div className="mt-4 pt-4 border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
           <Button

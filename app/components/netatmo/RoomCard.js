@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Card, Button, StatusBadge, Heading, Text } from '@/app/components/ui';
+import { BatteryBadge } from '@/app/components/devices/thermostat/BatteryWarning';
 import { NETATMO_ROUTES } from '@/lib/routes';
 
 export default function RoomCard({ room, onRefresh }) {
@@ -162,11 +163,43 @@ export default function RoomCard({ room, onRefresh }) {
     slate: 'bg-slate-800 [html:not(.dark)_&]:bg-slate-100 text-slate-300 [html:not(.dark)_&]:text-slate-600 border-slate-700 [html:not(.dark)_&]:border-slate-200',
   };
 
+  // Get battery/offline status from room
+  const hasLowBattery = room.hasLowBattery || false;
+  const hasCriticalBattery = room.hasCriticalBattery || false;
+  const isOffline = room.isOffline || false;
+
   return (
     <Card liquid className="p-5 sm:p-6 transition-all duration-300 hover:shadow-liquid-lg relative overflow-visible">
-      {/* Heating indicator - floating badge */}
-      {isHeating && (
-        <div className="absolute -top-2 -right-2 z-20">
+      {/* Floating badges container */}
+      <div className="absolute -top-2 right-2 z-20 flex items-center gap-2">
+        {/* Battery warning badge */}
+        {(hasLowBattery || hasCriticalBattery) && (
+          <div className="relative">
+            <div className={`absolute inset-0 ${hasCriticalBattery ? 'bg-danger-500/30' : 'bg-warning-500/30'} rounded-full blur-md ${hasCriticalBattery ? 'animate-pulse' : ''}`} />
+            <div className={`relative ${hasCriticalBattery ? 'bg-gradient-to-br from-danger-500 to-danger-600' : 'bg-gradient-to-br from-warning-500 to-warning-600'} text-white px-2.5 py-1 rounded-full shadow-lg ring-2 ring-white/30`}>
+              <span className="text-xs font-bold flex items-center gap-1">
+                <span>{hasCriticalBattery ? '🪫' : '🔋'}</span>
+                <span className="hidden sm:inline">{hasCriticalBattery ? 'Critica' : 'Bassa'}</span>
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Offline badge */}
+        {isOffline && (
+          <div className="relative">
+            <div className="absolute inset-0 bg-slate-500/30 rounded-full blur-md" />
+            <div className="relative bg-gradient-to-br from-slate-500 to-slate-600 text-white px-2.5 py-1 rounded-full shadow-lg ring-2 ring-white/30">
+              <span className="text-xs font-bold flex items-center gap-1">
+                <span>📵</span>
+                <span className="hidden sm:inline">Offline</span>
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Heating indicator badge */}
+        {isHeating && (
           <div className="relative">
             <div className="absolute inset-0 bg-warning-500/30 rounded-full blur-md animate-pulse" />
             <div className="relative bg-gradient-to-br from-warning-500 to-warning-600 text-white px-2.5 py-1 rounded-full shadow-lg ring-2 ring-white/30">
@@ -176,8 +209,8 @@ export default function RoomCard({ room, onRefresh }) {
               </span>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Header - Clean two-row layout */}
       <div className="mb-4">
@@ -347,7 +380,7 @@ export default function RoomCard({ room, onRefresh }) {
         </div>
       )}
 
-      {/* Module Details */}
+      {/* Module Details with Battery Status */}
       {room.roomModules && room.roomModules.length > 0 && (
         <div className="mt-4 pt-4 border-t border-white/5 [html:not(.dark)_&]:border-white/10">
           <Text variant="secondary" size="xs" weight="semibold" className="mb-2">
@@ -356,25 +389,49 @@ export default function RoomCard({ room, onRefresh }) {
           <div className="space-y-2">
             {room.roomModules.map(module => {
               const deviceInfo = getDeviceIcon(module);
+              const isModuleOffline = module.reachable === false;
               return (
                 <div
                   key={module.id}
-                  className="flex items-center gap-2 p-2.5 bg-white/[0.04] [html:not(.dark)_&]:bg-white/[0.06] backdrop-blur-sm rounded-xl border border-white/5 [html:not(.dark)_&]:border-white/10 transition-all duration-200 hover:bg-white/[0.08] [html:not(.dark)_&]:hover:bg-white/[0.10]"
+                  className={`flex items-center gap-2 p-2.5 backdrop-blur-sm rounded-xl border transition-all duration-200 ${
+                    isModuleOffline
+                      ? 'bg-slate-800/40 [html:not(.dark)_&]:bg-slate-200/60 border-slate-600/30 [html:not(.dark)_&]:border-slate-300'
+                      : 'bg-white/[0.04] [html:not(.dark)_&]:bg-white/[0.06] border-white/5 [html:not(.dark)_&]:border-white/10 hover:bg-white/[0.08] [html:not(.dark)_&]:hover:bg-white/[0.10]'
+                  }`}
                 >
-                  <span className="text-lg flex-shrink-0">{deviceInfo.icon}</span>
+                  <span className={`text-lg flex-shrink-0 ${isModuleOffline ? 'opacity-50' : ''}`}>{deviceInfo.icon}</span>
                   <div className="flex-1 min-w-0">
-                    <Text variant="body" size="xs" weight="semibold" className="truncate">
+                    <Text variant="body" size="xs" weight="semibold" className={`truncate ${isModuleOffline ? 'opacity-60' : ''}`}>
                       {module.name}
                     </Text>
                     <Text variant="tertiary" size="xs">
                       {deviceInfo.label}
                     </Text>
                   </div>
-                  {module.bridge && (
-                    <Text variant="tertiary" size="xs" as="span" title="Connesso tramite bridge">
-                      🔗
-                    </Text>
-                  )}
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    {/* Battery badge */}
+                    {module.battery_state && (
+                      <BatteryBadge batteryState={module.battery_state} showLabel />
+                    )}
+                    {/* Show battery OK for non-critical states */}
+                    {module.battery_state && !['low', 'very_low'].includes(module.battery_state) && (
+                      <span className="text-xs text-sage-400 [html:not(.dark)_&]:text-sage-600" title={`Batteria: ${module.battery_state}`}>
+                        🔋
+                      </span>
+                    )}
+                    {/* Offline badge */}
+                    {isModuleOffline && (
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-medium bg-slate-700/60 text-slate-300 border border-slate-600/40 [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:border-slate-300">
+                        📵 Offline
+                      </span>
+                    )}
+                    {/* Bridge indicator */}
+                    {module.bridge && !isModuleOffline && (
+                      <Text variant="tertiary" size="xs" as="span" title="Connesso tramite bridge">
+                        🔗
+                      </Text>
+                    )}
+                  </div>
                 </div>
               );
             })}

@@ -5,12 +5,14 @@ import Text from './Text';
  *
  * Reusable info box with icon, label, and value display.
  * Used in device cards to show summary statistics.
+ * Supports vertical (default) and horizontal compact layouts.
  *
  * @param {Object} props
  * @param {string} props.icon - Emoji icon
  * @param {string} props.label - Label text (uppercase)
  * @param {string|number} props.value - Value to display
  * @param {'neutral'|'ember'|'ocean'|'sage'|'warning'|'danger'} props.valueColor - Color for value text
+ * @param {'vertical'|'horizontal'} props.layout - Layout orientation
  * @param {string} props.className - Additional classes
  */
 export default function InfoBox({
@@ -18,6 +20,7 @@ export default function InfoBox({
   label,
   value,
   valueColor = 'neutral',
+  layout = 'horizontal',
   className = '',
 }) {
   // Ember Noir value colors with light mode support
@@ -34,36 +37,37 @@ export default function InfoBox({
     info: 'text-ocean-400 [html:not(.dark)_&]:text-ocean-600',
   };
 
+  // Compact vertical layout optimized for 2-column grid
   return (
     <div className={`
-      relative overflow-hidden rounded-2xl
-      bg-slate-800/60 backdrop-blur-xl
-      border border-slate-700/50
+      relative overflow-hidden rounded-xl
+      bg-slate-800/50 backdrop-blur-xl
+      border border-slate-700/40
       transition-all duration-200
-      hover:bg-slate-800/80 hover:border-slate-600/60
-      [html:not(.dark)_&]:bg-white/80
+      hover:bg-slate-800/70 hover:border-slate-600/50
+      [html:not(.dark)_&]:bg-white/70
       [html:not(.dark)_&]:border-slate-200
       [html:not(.dark)_&]:hover:bg-white/90
       [html:not(.dark)_&]:hover:border-slate-300
       ${className}
     `}>
-      <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-5 min-h-[100px]">
+      <div className="relative z-10 flex flex-col items-center justify-center p-3 sm:p-4 min-h-[90px]">
         {/* Icon */}
-        <span className="text-3xl sm:text-4xl mb-2">{icon}</span>
+        <span className="text-2xl sm:text-3xl mb-1.5">{icon}</span>
 
         {/* Label */}
         <Text
           variant="label"
           size="xs"
-          weight="bold"
+          weight="medium"
           as="span"
-          className="mb-1"
+          className="mb-0.5 text-center"
         >
           {label}
         </Text>
 
         {/* Value */}
-        <span className={`text-2xl sm:text-3xl font-black font-display ${valueColors[valueColor]}`}>
+        <span className={`text-lg sm:text-xl font-bold font-display text-center leading-tight ${valueColors[valueColor]}`}>
           {value}
         </span>
       </div>

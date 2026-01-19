@@ -5,6 +5,55 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.56.0] - 2026-01-19
+
+### 🔋 Netatmo Battery Status & UI Improvements
+
+**Obiettivo**: Enhanced Netatmo integration to show all devices including offline/low battery. Redesigned UI components for better readability.
+
+#### ✨ Added
+
+**Netatmo Battery & Offline Status:**
+- Show ALL registered devices including those with dead batteries or offline
+- Battery status indicators: 🔋 (low battery), 🪫 (critical battery)
+- Offline status badges: 📵 for unreachable devices
+- BatteryWarning banner component on thermostat page header
+- Merged topology modules with status modules for complete battery/reachable info
+- RoomSelector dropdown now shows status indicators next to room names
+
+**UI Components:**
+- RoomCard floating badges for battery/offline/heating status
+- Module list in RoomCard shows individual device battery states
+
+#### 🎨 Changed
+
+**InfoBox Component:**
+- Redesigned as 2-column vertical grid layout
+- Optimized for mobile with centered icon, label, value
+- Minimum height for consistent grid appearance
+
+**ThermostatCard Mode Controls:**
+- Larger icons (text-3xl/4xl) for better visibility
+- Shorter, clearer labels: "Auto", "Away", "Gelo", "Off"
+- Active state ring for better feedback
+- Minimum height (80-90px) for uniform buttons
+
+**Tara Valvole Button:**
+- Horizontal layout with icon + text
+- Ocean color theme for better visibility
+- Larger padding for easier touch targets
+
+#### 📝 Files Changed
+
+- `app/components/ui/InfoBox.js` - 2-column vertical grid layout
+- `app/components/ui/DeviceCard.js` - Grid layout for InfoBoxes
+- `app/components/ui/RoomSelector.js` - Status indicators in options
+- `app/components/netatmo/RoomCard.js` - Battery/offline floating badges
+- `app/components/devices/thermostat/ThermostatCard.js` - Mode buttons redesign
+- `app/thermostat/page.js` - Battery warning banner, show all rooms
+
+---
+
 ## [1.55.1] - 2026-01-19
 
 ### 📚 Firebase Database Rules Deployment

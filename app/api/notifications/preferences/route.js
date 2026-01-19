@@ -60,20 +60,18 @@ const DEFAULT_PREFERENCES = {
   },
 };
 
-export const GET = auth0.withApiAuthRequired(async function handler(request) {
+export async function GET(request) {
   try {
     // Verifica autenticazione
     const session = await auth0.getSession(request);
-    const user = session?.user;
-
-    if (!user) {
+    if (!session?.user) {
       return NextResponse.json(
         { error: 'Non autenticato' },
         { status: 401 }
       );
     }
 
-    const userId = user.sub;
+    const userId = session.user.sub;
 
     // Recupera preferenze da Firebase
     const preferences = await adminDbGet(`users/${userId}/notificationPreferences`);
@@ -104,22 +102,20 @@ export const GET = auth0.withApiAuthRequired(async function handler(request) {
       { status: 500 }
     );
   }
-});
+}
 
-export const PUT = auth0.withApiAuthRequired(async function handler(request) {
+export async function PUT(request) {
   try {
     // Verifica autenticazione
     const session = await auth0.getSession(request);
-    const user = session?.user;
-
-    if (!user) {
+    if (!session?.user) {
       return NextResponse.json(
         { error: 'Non autenticato' },
         { status: 401 }
       );
     }
 
-    const userId = user.sub;
+    const userId = session.user.sub;
     const body = await request.json();
 
     // Valida body
@@ -153,4 +149,4 @@ export const PUT = auth0.withApiAuthRequired(async function handler(request) {
       { status: 500 }
     );
   }
-});
+}

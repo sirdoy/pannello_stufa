@@ -1,5 +1,6 @@
 // ✅ File: app/api/netatmo/devices-temperatures/route.js
 
+import { NextResponse } from 'next/server';
 import { auth0 } from '@/lib/auth0';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
@@ -12,8 +13,12 @@ export const dynamic = 'force-dynamic';
  * Retrieves temperatures from all Netatmo devices/modules
  * ✅ Protected by Auth0 authentication
  */
-export const GET = auth0.withApiAuthRequired(async function handler(request) {
+export async function GET(request) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
     // ✅ Get valid access token using centralized helper (auto-refresh)
     const { accessToken, error, message } = await getValidAccessToken();
     if (error) {
@@ -52,4 +57,4 @@ export const GET = auth0.withApiAuthRequired(async function handler(request) {
     console.error('Errore generale Netatmo devices-temperatures:', err);
     return Response.json({ error: 'Errore server interno' }, { status: 500 });
   }
-});
+}

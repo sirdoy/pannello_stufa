@@ -19,8 +19,13 @@ import { getWaterSetTemperature } from '@/lib/stoveApi';
 
 export const dynamic = 'force-dynamic';
 
-export const GET = auth0.withApiAuthRequired(async () => {
+export async function GET(request) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+
     const data = await getWaterSetTemperature();
     return NextResponse.json(data);
   } catch (error) {
@@ -49,4 +54,4 @@ export const GET = auth0.withApiAuthRequired(async () => {
       { status: 500 }
     );
   }
-});
+}

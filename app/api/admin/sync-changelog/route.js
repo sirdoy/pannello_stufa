@@ -10,11 +10,19 @@ export const dynamic = 'force-dynamic';
  * API route per sincronizzare changelog con Firebase
  * Protected: Requires Auth0 authentication + ADMIN_USER_ID
  */
-export const POST = auth0.withApiAuthRequired(async function syncChangelogHandler(request) {
+export async function POST(request) {
   try {
+    // Check authentication
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized', message: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
     // Check admin role
-    const { user } = await auth0.getSession(request);
-    if (user.sub !== process.env.ADMIN_USER_ID) {
+    if (session.user.sub !== process.env.ADMIN_USER_ID) {
       return NextResponse.json(
         { error: 'Forbidden', message: 'Admin access required' },
         { status: 403 }
@@ -40,14 +48,22 @@ export const POST = auth0.withApiAuthRequired(async function syncChangelogHandle
       { status: 500 }
     );
   }
-});
+}
 
 // Supporta anche GET per info (senza sync)
-export const GET = auth0.withApiAuthRequired(async function getChangelogInfoHandler(request) {
+export async function GET(request) {
   try {
+    // Check authentication
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized', message: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
     // Check admin role
-    const { user } = await auth0.getSession(request);
-    if (user.sub !== process.env.ADMIN_USER_ID) {
+    if (session.user.sub !== process.env.ADMIN_USER_ID) {
       return NextResponse.json(
         { error: 'Forbidden', message: 'Admin access required' },
         { status: 403 }
@@ -66,4 +82,4 @@ export const GET = auth0.withApiAuthRequired(async function getChangelogInfoHand
       { status: 500 }
     );
   }
-});
+}

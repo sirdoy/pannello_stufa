@@ -16,8 +16,13 @@ export const dynamic = 'force-dynamic';
  * PUT /api/hue/scenes/[id]
  * Update scene name and/or actions
  */
-export const PUT = auth0.withApiAuthRequired(async function handler(request, { params }) {
+export async function PUT(request, { params }) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+
     const { id: sceneId } = await params;
     const updates = await request.json();
 
@@ -127,14 +132,19 @@ export const PUT = auth0.withApiAuthRequired(async function handler(request, { p
       { status: 500 }
     );
   }
-});
+}
 
 /**
  * DELETE /api/hue/scenes/[id]
  * Delete scene from Hue bridge
  */
-export const DELETE = auth0.withApiAuthRequired(async function handler(request, { params }) {
+export async function DELETE(request, { params }) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+
     const { id: sceneId } = await params;
 
     // Get Hue connection from Firebase
@@ -190,4 +200,4 @@ export const DELETE = auth0.withApiAuthRequired(async function handler(request, 
       { status: 500 }
     );
   }
-});
+}

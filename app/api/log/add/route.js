@@ -1,14 +1,18 @@
+import { NextResponse } from 'next/server';
 import { adminDbPush } from '@/lib/firebaseAdmin';
 import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';
 
-export const POST = auth0.withApiAuthRequired(async function addLogHandler(request) {
-  const body = await request.json();
-
+export async function POST(request) {
   try {
-    // Recupera informazioni utente da Auth0 (auth already verified by wrapper)
-    const { user } = await auth0.getSession(request);
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+    const user = session.user;
+
+    const body = await request.json();
 
     const logEntry = {
       ...body,
@@ -29,4 +33,4 @@ export const POST = auth0.withApiAuthRequired(async function addLogHandler(reque
     console.error('Errore salvataggio log:', error);
     return Response.json({ success: false, error: error.message }, { status: 500 });
   }
-});
+}

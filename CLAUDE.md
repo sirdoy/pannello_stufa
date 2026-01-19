@@ -85,7 +85,7 @@ npm run dev              # http://localhost:3000
 - **Tailwind CSS 4.1** - CSS-first config with @theme directive + liquid glass iOS 18 style
 - **Firebase** - Realtime DB + Admin SDK (Client/Server separation)
 - **Auth0** - Autenticazione
-- **PWA** - next-pwa, Service Worker, offline support
+- **PWA** - Serwist v9, Service Worker, iOS support, offline
 - **External APIs** - Thermorossi (stufa), Netatmo (termostato), Philips Hue (luci)
 - **FCM** - Push notifications multi-device
 
@@ -146,6 +146,9 @@ node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require(
 ### 🔌 External Integrations
 - **[Netatmo Setup](docs/setup/netatmo-setup.md)** - Termostato Netatmo OAuth 2.0
 - **[Hue Setup](docs/setup/hue-setup.md)** - Luci Philips Hue Local API
+
+### 📱 PWA
+- **[PWA](docs/pwa.md)** - Serwist setup, iOS splash screens, install hook
 
 ### 🧪 Testing & Deployment
 - **[Testing](docs/testing.md)** - Unit tests, coverage, best practices
@@ -274,6 +277,6 @@ ADMIN_USER_ID=auth0|xxx
 
 ---
 
-**Version**: 1.59.0
+**Version**: 1.60.0
 **Last Updated**: 2026-01-19
 **Author**: Federico Manfredi

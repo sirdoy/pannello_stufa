@@ -12,8 +12,13 @@ import { determineConnectionMode } from '@/lib/hue/hueConnectionStrategy';
 
 export const dynamic = 'force-dynamic';
 
-export const GET = auth0.withApiAuthRequired(async function handler(request) {
+export async function GET(request) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+
     const localStatus = await getHueStatus();
     const hasRemote = await hasRemoteTokens();
     const connectionMode = await determineConnectionMode();
@@ -31,4 +36,4 @@ export const GET = auth0.withApiAuthRequired(async function handler(request) {
       { status: 500 }
     );
   }
-});
+}

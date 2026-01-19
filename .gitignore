@@ -59,11 +59,13 @@ next-env.d.ts
 *.sublime-project
 *.sublime-workspace
 
-# PWA / Service Worker
+# PWA / Service Worker (Serwist generated)
 /public/sw.js
 /public/sw.js.map
 /public/workbox-*.js
 /public/workbox-*.js.map
+/public/swe-worker*.js
+/public/swe-worker*.js.map
 /.firebase/
 .firebase-debug.log
 *firebase-adminsdk*.json

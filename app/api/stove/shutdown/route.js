@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import { auth0 } from '@/lib/auth0';
 import { shutdownStove } from '@/lib/stoveApi';
 import { getFullSchedulerMode, setSemiManualMode, getNextScheduledChange } from '@/lib/schedulerService';
@@ -9,8 +10,12 @@ import { updateStoveState } from '@/lib/stoveStateService';
  * Supports sandbox mode in localhost
  * Protected: Requires Auth0 authentication
  */
-export const POST = auth0.withApiAuthRequired(async function shutdownHandler(req) {
+export async function POST(req) {
   try {
+    const session = await auth0.getSession(req);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
     // Parse body per ottenere source
     const body = await req.json().catch(() => ({}));
     const source = body.source;
@@ -52,4 +57,4 @@ export const POST = auth0.withApiAuthRequired(async function shutdownHandler(req
       { status: 500 }
     );
   }
-});
+}

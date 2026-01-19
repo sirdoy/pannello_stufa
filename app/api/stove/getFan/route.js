@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import { auth0 } from '@/lib/auth0';
 import { getFanLevel } from '@/lib/stoveApi';
 
@@ -7,8 +8,12 @@ import { getFanLevel } from '@/lib/stoveApi';
  * Supports sandbox mode in localhost
  * Protected: Requires Auth0 authentication
  */
-export const GET = auth0.withApiAuthRequired(async function getFanHandler(request) {
+export async function GET(request) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
     const data = await getFanLevel();
     return Response.json(data);
   } catch (error) {
@@ -26,4 +31,4 @@ export const GET = auth0.withApiAuthRequired(async function getFanHandler(reques
       { status: 500 }
     );
   }
-});
+}

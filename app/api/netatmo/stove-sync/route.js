@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import { auth0 } from '@/lib/auth0';
 import { adminDbPush } from '@/lib/firebaseAdmin';
 import {
@@ -17,8 +18,12 @@ export const dynamic = 'force-dynamic';
  * Get stove sync configuration and available rooms
  * Protected by Auth0 authentication
  */
-export const GET = auth0.withApiAuthRequired(async function handler(request) {
+export async function GET(request) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
     const config = await getStoveSyncConfig();
     const availableRooms = await getAvailableRoomsForSync();
 
@@ -30,7 +35,7 @@ export const GET = auth0.withApiAuthRequired(async function handler(request) {
     console.error('Error in GET /api/netatmo/stove-sync:', err);
     return Response.json({ error: err.message || 'Errore server' }, { status: 500 });
   }
-});
+}
 
 /**
  * POST /api/netatmo/stove-sync
@@ -43,14 +48,13 @@ export const GET = auth0.withApiAuthRequired(async function handler(request) {
  *
  * Protected by Auth0 authentication
  */
-export const POST = auth0.withApiAuthRequired(async function handler(request) {
+export async function POST(request) {
   try {
     const session = await auth0.getSession(request);
-    const user = session?.user;
-
-    if (!user) {
+    if (!session?.user) {
       return Response.json({ error: 'Non autenticato' }, { status: 401 });
     }
+    const user = session.user;
 
     const body = await request.json();
     const { action } = body;
@@ -158,4 +162,4 @@ export const POST = auth0.withApiAuthRequired(async function handler(request) {
     console.error('Error in POST /api/netatmo/stove-sync:', err);
     return Response.json({ error: err.message || 'Errore server' }, { status: 500 });
   }
-});
+}

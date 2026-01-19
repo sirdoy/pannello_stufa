@@ -21,10 +21,13 @@ export const dynamic = 'force-dynamic';
 
 const VALID_THEMES = ['light', 'dark'];
 
-export const GET = auth0.withApiAuthRequired(async function getUserTheme(request) {
+export async function GET(request) {
   try {
-    // Get user info from session (auth already verified by wrapper)
-    const { user } = await auth0.getSession(request);
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+    const user = session.user;
     const userId = user.sub;
 
     // Recupera tema da Firebase
@@ -54,12 +57,15 @@ export const GET = auth0.withApiAuthRequired(async function getUserTheme(request
       { status: 500 }
     );
   }
-});
+}
 
-export const POST = auth0.withApiAuthRequired(async function updateUserTheme(request) {
+export async function POST(request) {
   try {
-    // Get user info from session (auth already verified by wrapper)
-    const { user } = await auth0.getSession(request);
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+    const user = session.user;
     const userId = user.sub;
     const body = await request.json();
 
@@ -94,4 +100,4 @@ export const POST = auth0.withApiAuthRequired(async function updateUserTheme(req
       { status: 500 }
     );
   }
-});
+}

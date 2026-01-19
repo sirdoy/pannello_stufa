@@ -5,6 +5,46 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.60.0] - 2026-01-19
+
+### PWA Enhancement with Serwist
+
+**Obiettivo**: Upgraded PWA from @ducanh2912/next-pwa to Serwist for better iOS support, added Apple splash screens, and PWA install hook.
+
+#### Changed
+
+- **PWA Library**: Migrated from `@ducanh2912/next-pwa` to Serwist v9 for modern PWA support
+- **Service Worker**: Created TypeScript service worker (`app/sw.ts`) with runtime caching strategies
+- **manifest.json**: Added iOS PWA fields (`id`, `prefer_related_applications`, `handle_links`)
+- **Icon purposes**: Separated `any` vs `maskable` for better cross-platform support
+
+#### Added
+
+- **AppleSplashScreens component**: Renders all iOS launch images (`app/components/AppleSplashScreens.js`)
+- **usePWAInstall hook**: PWA install detection and prompting (`lib/hooks/usePWAInstall.js`)
+- **tsconfig.json**: Added for TypeScript service worker support
+- **Push handlers**: Integrated in new service worker for FCM notifications
+
+#### Files Changed
+
+- `package.json` - Replaced @ducanh2912/next-pwa with serwist and @serwist/next
+- `next.config.mjs` - Updated PWA configuration for Serwist
+- `app/sw.ts` - NEW: TypeScript service worker with caching and push handlers
+- `tsconfig.json` - NEW: TypeScript configuration with Serwist types
+- `public/manifest.json` - Enhanced with iOS PWA fields
+- `app/components/AppleSplashScreens.js` - NEW: Apple splash screen component
+- `app/layout.js` - Added AppleSplashScreens import
+- `lib/hooks/usePWAInstall.js` - NEW: PWA install hook
+- `.gitignore` - Added Serwist generated files
+
+#### Notes
+
+- Existing `public/firebase-messaging-sw.js` kept for FCM compatibility
+- User must run `npm install` after pulling these changes
+- Splash screen images should be placed in `/public/splash/` directory
+
+---
+
 ## [1.59.0] - 2026-01-19
 
 ### 🔌 Multi-Device Logging Support

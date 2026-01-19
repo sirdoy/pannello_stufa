@@ -11,8 +11,13 @@ import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';
 
-export const GET = auth0.withApiAuthRequired(async function handler(request) {
+export async function GET(request) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+
     // Get Hue connection from Firebase
     const connection = await getHueConnection();
 
@@ -50,4 +55,4 @@ export const GET = auth0.withApiAuthRequired(async function handler(request) {
       { status: 500 }
     );
   }
-});
+}

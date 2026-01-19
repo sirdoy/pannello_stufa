@@ -13,11 +13,15 @@ import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
 
 export const dynamic = 'force-dynamic';
 
-export const PUT = auth0.withApiAuthRequired(async function handler(request, { params }) {
+export async function PUT(request, { params }) {
   try {
-    const { id } = await params;
     const session = await auth0.getSession(request);
-    const user = session?.user;
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+    const user = session.user;
+
+    const { id } = await params;
 
     // Get Hue connection from Firebase
     const connection = await getHueConnection();
@@ -71,4 +75,4 @@ export const PUT = auth0.withApiAuthRequired(async function handler(request, { p
       { status: 500 }
     );
   }
-});
+}

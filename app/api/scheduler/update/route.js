@@ -9,8 +9,13 @@ import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
-export const POST = auth0.withApiAuthRequired(async function updateSchedulerHandler(request) {
+export async function POST(request) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { operation, data } = body;
 
@@ -91,4 +96,4 @@ export const POST = auth0.withApiAuthRequired(async function updateSchedulerHand
       { status: 500 }
     );
   }
-});
+}

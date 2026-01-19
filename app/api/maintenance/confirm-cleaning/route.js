@@ -17,10 +17,13 @@ import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
 
 export const dynamic = 'force-dynamic';
 
-export const POST = auth0.withApiAuthRequired(async function confirmCleaningHandler(request) {
+export async function POST(request) {
   try {
-    // Get user info from session (auth already verified by wrapper)
-    const { user } = await auth0.getSession(request);
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+    const user = session.user;
     const userId = user.sub;
 
     // Recupera dati maintenance attuali
@@ -88,4 +91,4 @@ export const POST = auth0.withApiAuthRequired(async function confirmCleaningHand
       { status: 500 }
     );
   }
-});
+}

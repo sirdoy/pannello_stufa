@@ -13,18 +13,17 @@ import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export const POST = auth0.withApiAuthRequired(async function handler(request) {
+export async function POST(request) {
   try {
     // Verifica autenticazione
     const session = await auth0.getSession(request);
-    const user = session?.user;
-
-    if (!user) {
+    if (!session?.user) {
       return NextResponse.json(
         { error: 'Non autenticato' },
         { status: 401 }
       );
     }
+    const user = session.user;
 
     // Costruisci notifica di test
     const notification = {
@@ -69,4 +68,4 @@ export const POST = auth0.withApiAuthRequired(async function handler(request) {
       { status: 500 }
     );
   }
-});
+}

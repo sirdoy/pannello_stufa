@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/devices/preferences
  * Fetch device preferences for current user
  */
-export const GET = auth0.withApiAuthRequired(async function handler(request) {
+export async function GET(request) {
   try {
     const session = await auth0.getSession(request);
     const userId = session?.user?.sub;
@@ -54,14 +54,14 @@ export const GET = auth0.withApiAuthRequired(async function handler(request) {
       { status: 500 }
     );
   }
-});
+}
 
 /**
  * POST /api/devices/preferences
  * Update device preferences for current user
  * Body: { preferences: { deviceId: boolean, ... } }
  */
-export const POST = auth0.withApiAuthRequired(async function handler(request) {
+export async function POST(request) {
   try {
     const session = await auth0.getSession(request);
     const userId = session?.user?.sub;
@@ -121,7 +121,7 @@ export const POST = auth0.withApiAuthRequired(async function handler(request) {
       { status: 500 }
     );
   }
-});
+}
 
 /**
  * Get device description for UI

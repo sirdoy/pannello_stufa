@@ -20,14 +20,13 @@ export const dynamic = 'force-dynamic';
  * This endpoint uses method #2 to force calibration on demand.
  * ✅ Protected by Auth0 authentication
  */
-export const POST = auth0.withApiAuthRequired(async function handler(request) {
+export async function POST(request) {
   try {
     const session = await auth0.getSession(request);
-    const user = session?.user;
-
-    if (!user) {
+    if (!session?.user) {
       return Response.json({ error: 'Non autenticato' }, { status: 401 });
     }
+    const user = session.user;
 
     // ✅ Get valid access token using centralized helper (auto-refresh)
     const { accessToken, error, message } = await getValidAccessToken();
@@ -194,4 +193,4 @@ export const POST = auth0.withApiAuthRequired(async function handler(request) {
       details: err.stack,
     }, { status: 500 });
   }
-});
+}

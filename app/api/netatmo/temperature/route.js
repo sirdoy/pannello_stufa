@@ -1,6 +1,6 @@
 // ✅ File: app/api/netatmo/temperature/route.js
 
-
+import { NextResponse } from 'next/server';
 import { adminDbGet, adminDbUpdate } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
@@ -15,8 +15,12 @@ export const dynamic = 'force-dynamic';
  * Requires device_id and module_id in Firebase
  * ✅ Protected by Auth0 authentication
  */
-export const POST = auth0.withApiAuthRequired(async function handler(request) {
+export async function POST(request) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
     // ✅ Get valid access token using centralized helper (auto-refresh)
     const { accessToken, error, message } = await getValidAccessToken();
     if (error) {
@@ -71,4 +75,4 @@ export const POST = auth0.withApiAuthRequired(async function handler(request) {
     console.error('Errore server Netatmo temperature:', err);
     return Response.json({ error: 'Errore server interno' }, { status: 500 });
   }
-});
+}

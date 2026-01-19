@@ -14,8 +14,12 @@ export const dynamic = 'force-dynamic';
  * GET /api/schedules
  * List all schedules (metadata only, no slots)
  */
-export const GET = auth0.withApiAuthRequired(async function getSchedulesHandler() {
+export async function GET(request) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
     const schedulesData = await adminDbGet('schedules-v2/schedules');
     const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId');
 
@@ -50,7 +54,7 @@ export const GET = auth0.withApiAuthRequired(async function getSchedulesHandler(
       { status: 500 }
     );
   }
-});
+}
 
 /**
  * POST /api/schedules
@@ -58,8 +62,13 @@ export const GET = auth0.withApiAuthRequired(async function getSchedulesHandler(
  *
  * Body: { name: string, copyFromId?: string }
  */
-export const POST = auth0.withApiAuthRequired(async function createScheduleHandler(request) {
+export async function POST(request) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { name, copyFromId } = body;
 
@@ -129,7 +138,7 @@ export const POST = auth0.withApiAuthRequired(async function createScheduleHandl
       { status: 500 }
     );
   }
-});
+}
 
 /**
  * Helper: Calculate total intervals

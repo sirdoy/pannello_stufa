@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import { auth0 } from '@/lib/auth0';
 import { STUFA_API, fetchWithTimeout } from '@/lib/stoveApi';
 
@@ -6,8 +7,12 @@ import { STUFA_API, fetchWithTimeout } from '@/lib/stoveApi';
  * Returns the target room temperature setpoint from the stove
  * Protected: Requires Auth0 authentication
  */
-export const GET = auth0.withApiAuthRequired(async function getRoomTempHandler(request) {
+export async function GET(request) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
     const res = await fetchWithTimeout(STUFA_API.getRoomTemperature);
 
     if (!res.ok) {
@@ -34,4 +39,4 @@ export const GET = auth0.withApiAuthRequired(async function getRoomTempHandler(r
       { status: 500 }
     );
   }
-});
+}

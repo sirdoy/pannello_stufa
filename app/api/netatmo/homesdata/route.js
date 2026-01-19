@@ -1,4 +1,4 @@
-
+import { NextResponse } from 'next/server';
 import { auth0 } from '@/lib/auth0';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
@@ -13,8 +13,12 @@ export const dynamic = 'force-dynamic';
  * Saves home_id to Firebase for future use
  * ✅ Protected by Auth0 authentication
  */
-export const GET = auth0.withApiAuthRequired(async function handler(request) {
+export async function GET(request) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
     // ✅ Get valid access token using centralized helper (auto-refresh)
     const { accessToken, error, message } = await getValidAccessToken();
     if (error) {
@@ -59,4 +63,4 @@ export const GET = auth0.withApiAuthRequired(async function handler(request) {
     console.error('Error in /api/netatmo/homesdata:', err);
     return Response.json({ error: err.message || 'Errore server' }, { status: 500 });
   }
-});
+}

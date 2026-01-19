@@ -14,8 +14,12 @@ export const dynamic = 'force-dynamic';
  * GET /api/schedules/active
  * Get current active schedule ID
  */
-export const GET = auth0.withApiAuthRequired(async function getActiveScheduleHandler() {
+export async function GET(request) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
     const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId');
 
     if (!activeScheduleId) {
@@ -33,7 +37,7 @@ export const GET = auth0.withApiAuthRequired(async function getActiveScheduleHan
       { status: 500 }
     );
   }
-});
+}
 
 /**
  * POST /api/schedules/active
@@ -41,8 +45,13 @@ export const GET = auth0.withApiAuthRequired(async function getActiveScheduleHan
  *
  * Body: { scheduleId: string }
  */
-export const POST = auth0.withApiAuthRequired(async function setActiveScheduleHandler(request) {
+export async function POST(request) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { scheduleId } = body;
 
@@ -81,4 +90,4 @@ export const POST = auth0.withApiAuthRequired(async function setActiveScheduleHa
       { status: 500 }
     );
   }
-});
+}

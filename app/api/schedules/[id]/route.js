@@ -15,8 +15,13 @@ export const dynamic = 'force-dynamic';
  * GET /api/schedules/[id]
  * Get specific schedule with full data
  */
-export const GET = auth0.withApiAuthRequired(async function getScheduleHandler(request, { params }) {
+export async function GET(request, { params }) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+
     const { id } = await params;
 
     const schedule = await adminDbGet(`schedules-v2/schedules/${id}`);
@@ -39,7 +44,7 @@ export const GET = auth0.withApiAuthRequired(async function getScheduleHandler(r
       { status: 500 }
     );
   }
-});
+}
 
 /**
  * PUT /api/schedules/[id]
@@ -47,8 +52,13 @@ export const GET = auth0.withApiAuthRequired(async function getScheduleHandler(r
  *
  * Body: { name?, slots?, enabled? }
  */
-export const PUT = auth0.withApiAuthRequired(async function updateScheduleHandler(request, { params }) {
+export async function PUT(request, { params }) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+
     const { id } = await params;
     const updates = await request.json();
 
@@ -107,14 +117,19 @@ export const PUT = auth0.withApiAuthRequired(async function updateScheduleHandle
       { status: 500 }
     );
   }
-});
+}
 
 /**
  * DELETE /api/schedules/[id]
  * Delete schedule (with safety validations)
  */
-export const DELETE = auth0.withApiAuthRequired(async function deleteScheduleHandler(request, { params }) {
+export async function DELETE(request, { params }) {
   try {
+    const session = await auth0.getSession(request);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+
     const { id } = await params;
 
     // Validation 1: Cannot delete active schedule
@@ -162,4 +177,4 @@ export const DELETE = auth0.withApiAuthRequired(async function deleteScheduleHan
       { status: 500 }
     );
   }
-});
+}

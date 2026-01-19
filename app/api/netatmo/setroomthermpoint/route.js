@@ -15,14 +15,13 @@ export const dynamic = 'force-dynamic';
  * Mode: manual, home, max, off
  * ✅ Protected by Auth0 authentication
  */
-export const POST = auth0.withApiAuthRequired(async function handler(request) {
+export async function POST(request) {
   try {
     const session = await auth0.getSession(request);
-    const user = session?.user;
-
-    if (!user) {
+    if (!session?.user) {
       return Response.json({ error: 'Non autenticato' }, { status: 401 });
     }
+    const user = session.user;
 
     const body = await request.json();
     const { room_id, mode, temp, endtime } = body;
@@ -110,4 +109,4 @@ export const POST = auth0.withApiAuthRequired(async function handler(request) {
     console.error('Error in /api/netatmo/setroomthermpoint:', err);
     return Response.json({ error: err.message || 'Errore server' }, { status: 500 });
   }
-});
+}

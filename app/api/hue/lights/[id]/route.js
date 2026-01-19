@@ -9,6 +9,8 @@ import { NextResponse } from 'next/server';
 import HueApi from '@/lib/hue/hueApi';
 import { getHueConnection } from '@/lib/hue/hueLocalHelper';
 import { auth0 } from '@/lib/auth0';
+import { adminDbPush } from '@/lib/firebaseAdmin';
+import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,6 +61,8 @@ export const PUT = auth0.withApiAuthRequired(async function handler(request, { p
   try {
     const { id } = await params;
     const body = await request.json();
+    const session = await auth0.getSession(request);
+    const user = session?.user;
 
     // Get Hue connection from Firebase
     const connection = await getHueConnection();
@@ -74,6 +78,34 @@ export const PUT = auth0.withApiAuthRequired(async function handler(request, { p
     // Update light state
     const hueApi = new HueApi(connection.bridgeIp, connection.username);
     const response = await hueApi.setLightState(id, body);
+
+    // Log action
+    const actionDescription = body.on !== undefined
+      ? (body.on.on ? 'Luce accesa' : 'Luce spenta')
+      : body.dimming !== undefined
+        ? 'Luminosità modificata'
+        : 'Luce modificata';
+
+    const value = body.dimming?.brightness !== undefined
+      ? `${Math.round(body.dimming.brightness)}%`
+      : body.on?.on !== undefined
+        ? (body.on.on ? 'ON' : 'OFF')
+        : null;
+
+    await adminDbPush('log', {
+      action: actionDescription,
+      device: DEVICE_TYPES.LIGHTS,
+      value,
+      lightId: id,
+      timestamp: Date.now(),
+      user: user ? {
+        email: user.email,
+        name: user.name,
+        picture: user.picture,
+        sub: user.sub,
+      } : null,
+      source: 'manual',
+    });
 
     return NextResponse.json({
       success: true,

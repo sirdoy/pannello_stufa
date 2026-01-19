@@ -8,12 +8,16 @@ import { NextResponse } from 'next/server';
 import HueApi from '@/lib/hue/hueApi';
 import { getHueConnection } from '@/lib/hue/hueLocalHelper';
 import { auth0 } from '@/lib/auth0';
+import { adminDbPush } from '@/lib/firebaseAdmin';
+import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
 
 export const dynamic = 'force-dynamic';
 
 export const PUT = auth0.withApiAuthRequired(async function handler(request, { params }) {
   try {
     const { id } = await params;
+    const session = await auth0.getSession(request);
+    const user = session?.user;
 
     // Get Hue connection from Firebase
     const connection = await getHueConnection();
@@ -29,6 +33,21 @@ export const PUT = auth0.withApiAuthRequired(async function handler(request, { p
     // Activate scene
     const hueApi = new HueApi(connection.bridgeIp, connection.username);
     const response = await hueApi.activateScene(id);
+
+    // Log action
+    await adminDbPush('log', {
+      action: 'Scena attivata',
+      device: DEVICE_TYPES.LIGHTS,
+      sceneId: id,
+      timestamp: Date.now(),
+      user: user ? {
+        email: user.email,
+        name: user.name,
+        picture: user.picture,
+        sub: user.sub,
+      } : null,
+      source: 'manual',
+    });
 
     return NextResponse.json({
       success: true,

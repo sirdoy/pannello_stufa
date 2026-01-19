@@ -55,31 +55,50 @@ export default function LogPage() {
   };
 
   const getIcon = (action, device) => {
+    const actionLower = action.toLowerCase();
+
     // Device-specific icons first
     if (device === 'stove') {
-      if (action.toLowerCase().includes('accensione')) return '🔥';
-      if (action.toLowerCase().includes('spegnimento')) return '❄️';
-      if (action.toLowerCase().includes('ventola')) return '💨';
-      if (action.toLowerCase().includes('potenza')) return '⚡';
-      if (action.toLowerCase().includes('scheduler') || action.toLowerCase().includes('modalità')) return '⏰';
+      if (actionLower.includes('accensione')) return '🔥';
+      if (actionLower.includes('spegnimento')) return '❄️';
+      if (actionLower.includes('ventola') || actionLower.includes('ventilazione')) return '💨';
+      if (actionLower.includes('potenza')) return '⚡';
+      if (actionLower.includes('pulizia')) return '🧹';
+      if (actionLower.includes('scheduler') || actionLower.includes('modalità')) return '⏰';
       return '🔥'; // Default stove icon
     }
+
     if (device === 'thermostat') {
-      if (action.toLowerCase().includes('temperatura')) return '🌡️';
-      if (action.toLowerCase().includes('modalità')) return '⚙️';
+      if (actionLower.includes('temperatura')) return '🌡️';
+      if (actionLower.includes('modalità') || actionLower.includes('mode')) return '⚙️';
+      if (actionLower.includes('calibra')) return '🔧';
+      if (actionLower.includes('sincronizzazione')) return '🔄';
+      if (actionLower.includes('connessione')) return '🔗';
+      if (actionLower.includes('disconnessione')) return '🔌';
       return '🌡️'; // Default thermostat icon
     }
-    if (device === 'lights') return '💡';
+
+    if (device === 'lights') {
+      if (actionLower.includes('accesa') || actionLower.includes('on')) return '💡';
+      if (actionLower.includes('spenta') || actionLower.includes('off')) return '🌑';
+      if (actionLower.includes('luminosità') || actionLower.includes('brightness')) return '☀️';
+      if (actionLower.includes('scena')) return '🎭';
+      if (actionLower.includes('stanza')) return '🏠';
+      if (actionLower.includes('connessione')) return '🔗';
+      if (actionLower.includes('disconnessione')) return '🔌';
+      return '💡'; // Default lights icon
+    }
+
     if (device === 'sonos') return '🎵';
 
     // Legacy fallback (for old logs without device field)
-    if (action.toLowerCase().includes('accensione')) return '🔥';
-    if (action.toLowerCase().includes('spegnimento')) return '❄️';
-    if (action.toLowerCase().includes('ventola')) return '💨';
-    if (action.toLowerCase().includes('potenza')) return '⚡';
-    if (action.toLowerCase().includes('scheduler') || action.toLowerCase().includes('modalità')) return '⏰';
-    if (action.toLowerCase().includes('netatmo') || action.toLowerCase().includes('temperatura')) return '🌡️';
-    if (action.toLowerCase().includes('intervallo')) return '📅';
+    if (actionLower.includes('accensione')) return '🔥';
+    if (actionLower.includes('spegnimento')) return '❄️';
+    if (actionLower.includes('ventola')) return '💨';
+    if (actionLower.includes('potenza')) return '⚡';
+    if (actionLower.includes('scheduler') || actionLower.includes('modalità')) return '⏰';
+    if (actionLower.includes('netatmo') || actionLower.includes('temperatura')) return '🌡️';
+    if (actionLower.includes('intervallo')) return '📅';
     return '📄';
   };
 

@@ -5,6 +5,42 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.59.0] - 2026-01-19
+
+### 🔌 Multi-Device Logging Support
+
+**Obiettivo**: Extended logging system to properly track all devices (Netatmo thermostat, Hue lights) with correct device badges and icons.
+
+#### ✨ Added
+
+- **Hue API logging**: Light, room, and scene actions now logged to Firebase
+- **logHueAction helpers**: Client-side logging helpers for Hue actions in `logService.js`
+
+#### 🔧 Changed
+
+- **Netatmo API logs**: All routes now include `device: 'thermostat'` field
+- **Log page icons**: Enhanced icon mapping for thermostat (calibration 🔧, sync 🔄, connection 🔗)
+- **Log page icons**: Enhanced icon mapping for lights (on 💡, off 🌑, brightness ☀️, scenes 🎭)
+- **Netatmo actions**: Human-readable action names instead of internal codes
+
+#### 🐛 Fixed
+
+- **Netatmo logs**: Previously showed as "Sistema", now correctly show "Termostato" badge
+
+#### 📝 Files Changed
+
+- `app/api/netatmo/setthermmode/route.js` - Added device field and improved action name
+- `app/api/netatmo/setroomthermpoint/route.js` - Added device field and improved action name
+- `app/api/netatmo/calibrate/route.js` - Added device field and improved action name
+- `app/api/netatmo/stove-sync/route.js` - Added device field and improved action names
+- `app/api/hue/lights/[id]/route.js` - Added logging for light state changes
+- `app/api/hue/rooms/[id]/route.js` - Added logging for room state changes
+- `app/api/hue/scenes/[id]/activate/route.js` - Added logging for scene activation
+- `lib/logService.js` - Added logHueAction helpers
+- `app/log/page.js` - Enhanced getIcon function for multi-device support
+
+---
+
 ## [1.58.0] - 2026-01-19
 
 ### 🎨 Log Page Design System Update

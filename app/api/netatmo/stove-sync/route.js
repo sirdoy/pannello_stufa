@@ -7,6 +7,7 @@ import {
   syncLivingRoomWithStove,
   getAvailableRoomsForSync,
 } from '@/lib/netatmoStoveSync';
+import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
 
 // Force dynamic rendering for Firebase operations
 export const dynamic = 'force-dynamic';
@@ -75,7 +76,9 @@ export const POST = auth0.withApiAuthRequired(async function handler(request) {
 
         // Log action
         await adminDbPush('log', {
-          action: 'netatmo_stove_sync_enabled',
+          action: 'Sincronizzazione stufa attivata',
+          device: DEVICE_TYPES.THERMOSTAT,
+          value: roomName,
           roomId,
           roomName,
           stoveTemperature: stoveTemperature || 16,
@@ -100,7 +103,8 @@ export const POST = auth0.withApiAuthRequired(async function handler(request) {
 
         // Log action
         await adminDbPush('log', {
-          action: 'netatmo_stove_sync_disabled',
+          action: 'Sincronizzazione stufa disattivata',
+          device: DEVICE_TYPES.THERMOSTAT,
           timestamp: Date.now(),
           user: {
             email: user.email,
@@ -127,7 +131,9 @@ export const POST = auth0.withApiAuthRequired(async function handler(request) {
         // Log action
         if (syncResult.synced) {
           await adminDbPush('log', {
-            action: `netatmo_stove_sync_${stoveIsOn ? 'on' : 'off'}`,
+            action: stoveIsOn ? 'Sincronizzazione stufa ON' : 'Sincronizzazione stufa OFF',
+            device: DEVICE_TYPES.THERMOSTAT,
+            value: `${syncResult.temperature}°C`,
             roomId: syncResult.roomId,
             roomName: syncResult.roomName,
             temperature: syncResult.temperature,

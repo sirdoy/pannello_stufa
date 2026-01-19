@@ -2,6 +2,7 @@ import { adminDbGet, adminDbPush } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
 import { auth0 } from '@/lib/auth0';
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
+import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
 
 // Force dynamic rendering for Firebase operations
 export const dynamic = 'force-dynamic';
@@ -133,7 +134,9 @@ export const POST = auth0.withApiAuthRequired(async function handler(request) {
 
     // Log action
     const logEntry = {
-      action: 'netatmo_calibrate_valves',
+      action: 'Calibrazione valvole',
+      device: DEVICE_TYPES.THERMOSTAT,
+      value: currentSchedule.name || 'Unknown',
       schedule_id: currentSchedule.id,
       schedule_name: currentSchedule.name || 'Unknown',
       timestamp: Date.now(),

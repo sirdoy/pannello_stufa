@@ -6,6 +6,7 @@ import Banner from './Banner';
 import LoadingOverlay from './LoadingOverlay';
 import Toast from './Toast';
 import InfoBox from './InfoBox';
+import CardAccentBar from './CardAccentBar';
 import { Heading, Text, EmptyState, Divider } from './index';
 
 /**
@@ -93,10 +94,10 @@ export default function DeviceCard({
   // Not connected state
   if (!connected && onConnect) {
     return (
-      <Card variant="elevated" className={`overflow-visible transition-all duration-500 ${className}`}>
+      <Card variant="elevated" padding={false} className={`overflow-visible transition-all duration-500 ${className}`}>
         <div className="relative">
-          {/* Accent bar */}
-          <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${colorThemes[colorTheme]} opacity-90`} />
+          {/* Modern Accent Bar with glow effect */}
+          <CardAccentBar colorTheme={colorTheme} animated={true} size="md" />
 
           {/* Content */}
           <div className="p-6 sm:p-8">
@@ -124,10 +125,10 @@ export default function DeviceCard({
   }
 
   return (
-    <Card variant="elevated" className={`overflow-visible transition-all duration-500 ${className}`}>
+    <Card variant="elevated" padding={false} className={`overflow-visible transition-all duration-500 ${className}`}>
       <div className="relative">
-        {/* Accent bar */}
-        <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${colorThemes[colorTheme]} opacity-90`} />
+        {/* Modern Accent Bar with glow effect */}
+        <CardAccentBar colorTheme={colorTheme} animated={true} size="md" />
 
         {/* Content */}
         <div className="p-6 sm:p-8">

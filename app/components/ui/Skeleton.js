@@ -53,9 +53,6 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
     <div className="space-y-4 sm:space-y-6 animate-spring-in">
       <Skeleton.Card className="overflow-visible transition-all duration-500">
         <div className="relative">
-          {/* Ember accent bar */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-ember-600 via-flame-500 to-ember-600 opacity-90"></div>
-
           <div className="p-6 sm:p-8">
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">
@@ -153,9 +150,6 @@ Skeleton.ThermostatCard = function SkeletonThermostatCard() {
     <div className="space-y-4 sm:space-y-6 animate-spring-in">
       <Skeleton.Card className="overflow-visible transition-all duration-500">
         <div className="relative">
-          {/* Ocean accent bar */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-ocean-500 via-ocean-400 to-ocean-500 opacity-90"></div>
-
           <div className="p-6 sm:p-8">
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">
@@ -238,9 +232,6 @@ Skeleton.LightsCard = function SkeletonLightsCard() {
     <div className="space-y-4 sm:space-y-6 animate-spring-in">
       <Skeleton.Card className="overflow-visible transition-all duration-500">
         <div className="relative">
-          {/* Warning accent bar */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-warning-500 via-warning-400 to-warning-500 opacity-90"></div>
-
           <div className="p-6 sm:p-8">
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">

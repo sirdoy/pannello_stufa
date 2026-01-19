@@ -23,6 +23,7 @@ import MaintenanceBar from '../../MaintenanceBar';
 import CronHealthBanner from '../../CronHealthBanner';
 import Toast from '../../ui/Toast';
 import LoadingOverlay from '../../ui/LoadingOverlay';
+import CardAccentBar from '../../ui/CardAccentBar';
 import { Divider, Heading, Text, EmptyState } from '../../ui';
 
 /**
@@ -715,10 +716,15 @@ export default function StoveCard() {
       )}
 
       {/* Main Status Card - Ember Noir */}
-      <Card variant="elevated" className="overflow-visible transition-all duration-500">
+      <Card variant="elevated" padding={false} className="overflow-visible transition-all duration-500">
         <div className="relative">
-          {/* Top accent bar - Ember gradient */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-ember-600 via-flame-500 to-ember-600 opacity-90"></div>
+          {/* Modern Accent Bar with glow effect - pulses when stove is active */}
+          <CardAccentBar
+            colorTheme="ember"
+            animated={true}
+            pulse={isAccesa}
+            size="md"
+          />
 
           <div className="p-6 sm:p-8">
             {/* Maintenance Cleaning Banner - Inside card */}

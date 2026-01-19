@@ -1,5 +1,6 @@
 // Existing components
 export { default as Card, CardHeader, CardTitle, CardContent, CardFooter, CardDivider } from './Card';
+export { default as CardAccentBar, CardAccentCorner } from './CardAccentBar';
 export { default as Button } from './Button';
 export { default as ControlButton } from './ControlButton';
 export { default as ActionButton } from './ActionButton';

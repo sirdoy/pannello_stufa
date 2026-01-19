@@ -5,6 +5,35 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.57.0] - 2026-01-19
+
+### ✨ CardAccentBar Component
+
+**Obiettivo**: New modern accent bar component for device cards with glow effects, shimmer animation, and pulse effect for active states.
+
+#### ✨ Added
+
+- **CardAccentBar component**: Modern accent bar with glow effects, shimmer animation, and configurable themes
+- **CardAccentCorner variant**: L-shaped corner accent for refined card styling
+- **Color themes**: ember, ocean, warning, sage, danger (+ legacy mappings: primary, info, success)
+- **Configurable options**: size (sm/md/lg), animated shimmer, pulse effect for active states
+- **shimmer-vertical animation**: New CSS animation in globals.css
+
+#### 🔧 Changed
+
+- **StoveCard**: Uses CardAccentBar with pulse effect when stove is active (isAccesa)
+- **DeviceCard**: Uses CardAccentBar for thermostat and lights cards
+- **Skeleton components**: Removed accent bars (visible only when component is loaded)
+
+#### 📝 Files Changed
+
+- `app/components/ui/CardAccentBar.js` - NEW: CardAccentBar and CardAccentCorner components
+- `app/components/ui/index.js` - Added CardAccentBar export
+- `app/components/ui/DeviceCard.js` - Integrated CardAccentBar
+- `app/components/devices/stove/StoveCard.js` - Integrated CardAccentBar with pulse
+- `app/components/ui/Skeleton.js` - Removed accent bars from skeletons
+- `app/globals.css` - Added shimmer-vertical animation
+
 ## [1.56.2] - 2026-01-19
 
 ### 🔧 Scheduler Modals & Checkbox Component

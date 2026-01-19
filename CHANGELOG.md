@@ -5,6 +5,23 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.56.1] - 2026-01-19
+
+### 🎨 Footer Spacing Optimization
+
+**Obiettivo**: Fixed footer spacing for better balance with mobile bottom navbar.
+
+#### 🔧 Changed
+
+- Optimized footer padding: `pb-28` on mobile (was `pb-32`) for better navbar clearance
+- Unified gap spacing: `gap-2` consistently across all breakpoints
+- Improved footer opacity: `bg-slate-900/95` (was `/90`) for better legibility
+- Refined link padding: `py-1.5` (was `py-2`) for better visual balance
+
+#### 📝 Files Changed
+
+- `app/components/ui/Footer.js` - Optimized spacing and opacity
+
 ## [1.56.0] - 2026-01-19
 
 ### 🔋 Netatmo Battery Status & UI Improvements

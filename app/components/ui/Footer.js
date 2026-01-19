@@ -17,17 +17,17 @@ export default function Footer({ className = '' }) {
     <>
       <footer
         className={`
-          w-full pt-4 sm:pt-6 pb-32 lg:pb-6 mt-auto
-          bg-slate-900/90 backdrop-blur-xl
+          w-full pt-6 pb-28 lg:pb-8 mt-auto
+          bg-slate-900/95 backdrop-blur-xl
           border-t border-slate-700/50
           relative z-10
-          [html:not(.dark)_&]:bg-white/90
+          [html:not(.dark)_&]:bg-white/95
           [html:not(.dark)_&]:border-slate-200/50
           ${className}
         `}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-2">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
             {/* Author info */}
             <div className="flex items-center gap-2 order-2 sm:order-1">
               <Text variant="tertiary" size="sm" as="span" className="hidden sm:inline">Made with</Text>
@@ -43,7 +43,7 @@ export default function Footer({ className = '' }) {
               <Link
                 href="/changelog"
                 className="
-                  group flex items-center gap-1.5 px-3 py-2 sm:px-0 sm:py-0
+                  group flex items-center gap-1.5 px-3 py-1.5 sm:px-0 sm:py-0
                   rounded-xl sm:rounded-none
                   bg-slate-800/50 sm:bg-transparent
                   hover:bg-slate-700/50 sm:hover:bg-transparent

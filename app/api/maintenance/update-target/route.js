@@ -12,72 +12,59 @@
  * }
  */
 
-import { auth0 } from '@/lib/auth0';
+import {
+  withAuthAndErrorHandler,
+  success,
+  badRequest,
+  notFound,
+  parseJsonOrThrow,
+  validateRequired,
+} from '@/lib/core';
 import { adminDbGet, adminDbUpdate } from '@/lib/firebaseAdmin';
-import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request) {
-  try {
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
-    }
+/**
+ * POST /api/maintenance/update-target
+ * Update maintenance target hours
+ * Protected: Requires Auth0 authentication
+ */
+export const POST = withAuthAndErrorHandler(async (request) => {
+  const body = await parseJsonOrThrow(request);
+  const { targetHours } = body;
 
-    const body = await request.json();
-
-    // Valida body
-    if (!body.targetHours || typeof body.targetHours !== 'number' || body.targetHours <= 0) {
-      return NextResponse.json(
-        { error: 'targetHours deve essere un numero positivo' },
-        { status: 400 }
-      );
-    }
-
-    const { targetHours } = body;
-
-    // Recupera dati maintenance attuali
-    const maintenanceData = await adminDbGet('maintenance');
-
-    if (!maintenanceData) {
-      return NextResponse.json(
-        { error: 'Dati manutenzione non trovati' },
-        { status: 404 }
-      );
-    }
-
-    // Aggiorna target hours
-    const updates = {
-      targetHours: parseFloat(targetHours),
-    };
-
-    // Check se ore correnti >= nuova soglia
-    if (maintenanceData.currentHours >= targetHours && !maintenanceData.needsCleaning) {
-      updates.needsCleaning = true;
-      console.log(`⚠️ Soglia raggiunta: ${maintenanceData.currentHours}h >= ${targetHours}h - needsCleaning=true`);
-    }
-
-    await adminDbUpdate('maintenance', updates);
-
-    console.log(`✅ Target ore manutenzione aggiornato: ${targetHours}h`);
-
-    return NextResponse.json({
-      success: true,
-      message: 'Soglia manutenzione aggiornata',
-      targetHours,
-      currentHours: maintenanceData.currentHours,
-      needsCleaning: updates.needsCleaning || maintenanceData.needsCleaning,
-    });
-
-  } catch (error) {
-    console.error('❌ Errore aggiornamento target hours:', error);
-    return NextResponse.json(
-      {
-        error: 'UPDATE_FAILED',
-        message: error.message || 'Impossibile aggiornare soglia',
-      },
-      { status: 500 }
-    );
+  // Validate required field
+  validateRequired(targetHours, 'targetHours');
+  if (typeof targetHours !== 'number' || targetHours <= 0) {
+    return badRequest('targetHours deve essere un numero positivo');
   }
-}
+
+  // Get current maintenance data
+  const maintenanceData = await adminDbGet('maintenance');
+
+  if (!maintenanceData) {
+    return notFound('Dati manutenzione non trovati');
+  }
+
+  // Update target hours
+  const updates = {
+    targetHours: parseFloat(targetHours),
+  };
+
+  // Check if current hours >= new threshold
+  if (maintenanceData.currentHours >= targetHours && !maintenanceData.needsCleaning) {
+    updates.needsCleaning = true;
+    console.log(`Soglia raggiunta: ${maintenanceData.currentHours}h >= ${targetHours}h - needsCleaning=true`);
+  }
+
+  await adminDbUpdate('maintenance', updates);
+
+  console.log(`Target ore manutenzione aggiornato: ${targetHours}h`);
+
+  return success({
+    message: 'Soglia manutenzione aggiornata',
+    targetHours,
+    currentHours: maintenanceData.currentHours,
+    needsCleaning: updates.needsCleaning || maintenanceData.needsCleaning,
+  });
+}, 'Maintenance/UpdateTarget');

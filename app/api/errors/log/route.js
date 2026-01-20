@@ -15,70 +15,53 @@
  * }
  */
 
-import { auth0 } from '@/lib/auth0';
+import {
+  withAuthAndErrorHandler,
+  success,
+  badRequest,
+  parseJsonOrThrow,
+  validateRequired,
+  validateEnum,
+} from '@/lib/core';
 import { adminDbPush } from '@/lib/firebaseAdmin';
-import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request) {
-  try {
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
-    }
+const VALID_SEVERITIES = ['info', 'warning', 'error', 'critical'];
 
-    const body = await request.json();
+/**
+ * POST /api/errors/log
+ * Log a stove error to Firebase
+ * Protected: Requires Auth0 authentication
+ */
+export const POST = withAuthAndErrorHandler(async (request) => {
+  const body = await parseJsonOrThrow(request);
+  const { errorCode, errorDescription, severity, additionalData } = body;
 
-    // Valida body
-    if (body.errorCode === undefined || !body.errorDescription || !body.severity) {
-      return NextResponse.json(
-        { error: 'errorCode, errorDescription e severity sono richiesti' },
-        { status: 400 }
-      );
-    }
+  // Validate required fields
+  validateRequired(errorCode, 'errorCode', true); // allow 0
+  validateRequired(errorDescription, 'errorDescription');
+  validateRequired(severity, 'severity');
+  validateEnum(severity, VALID_SEVERITIES, 'severity');
 
-    const { errorCode, errorDescription, severity, additionalData } = body;
+  // Create error log
+  const errorLog = {
+    errorCode,
+    errorDescription,
+    severity,
+    timestamp: Date.now(),
+    resolved: false,
+    ...(additionalData || {}),
+  };
 
-    // Valida severity
-    const validSeverities = ['info', 'warning', 'error', 'critical'];
-    if (!validSeverities.includes(severity)) {
-      return NextResponse.json(
-        { error: `severity deve essere uno tra: ${validSeverities.join(', ')}` },
-        { status: 400 }
-      );
-    }
+  // Save to Firebase using Admin SDK
+  const errorId = await adminDbPush('errors', errorLog);
 
-    // Crea error log
-    const errorLog = {
-      errorCode,
-      errorDescription,
-      severity,
-      timestamp: Date.now(),
-      resolved: false,
-      ...(additionalData || {}),
-    };
+  console.log(`Errore stufa loggato: ${errorCode} - ${errorDescription} (${severity})`);
 
-    // Salva su Firebase usando Admin SDK
-    const errorId = await adminDbPush('errors', errorLog);
-
-    console.log(`✅ Errore stufa loggato: ${errorCode} - ${errorDescription} (${severity})`);
-
-    return NextResponse.json({
-      success: true,
-      message: 'Errore loggato con successo',
-      errorId,
-      errorLog,
-    });
-
-  } catch (error) {
-    console.error('❌ Errore logging errore stufa:', error);
-    return NextResponse.json(
-      {
-        error: 'LOG_FAILED',
-        message: error.message || 'Impossibile loggare errore',
-      },
-      { status: 500 }
-    );
-  }
-}
+  return success({
+    message: 'Errore loggato con successo',
+    errorId,
+    errorLog,
+  });
+}, 'Errors/Log');

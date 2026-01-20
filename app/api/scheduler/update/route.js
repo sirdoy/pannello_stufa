@@ -3,97 +3,83 @@
  * Gestisce tutte le operazioni di modifica scheduler
  */
 
-import { NextResponse } from 'next/server';
-import { auth0 } from '@/lib/auth0';
+import {
+  withAuthAndErrorHandler,
+  success,
+  badRequest,
+  parseJsonOrThrow,
+} from '@/lib/core';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request) {
-  try {
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+/**
+ * POST /api/scheduler/update
+ * Update scheduler settings
+ * Body: { operation, data }
+ * Protected: Requires Auth0 authentication
+ */
+export const POST = withAuthAndErrorHandler(async (request) => {
+  const body = await parseJsonOrThrow(request);
+  const { operation, data } = body;
+
+  switch (operation) {
+    case 'saveSchedule': {
+      // Save schedule for a specific day (active schedule)
+      const { day, schedule } = data;
+      const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId') || 'default';
+      await adminDbSet(`schedules-v2/schedules/${activeScheduleId}/slots/${day}`, schedule);
+      // Update schedule's updatedAt timestamp
+      await adminDbSet(`schedules-v2/schedules/${activeScheduleId}/updatedAt`, new Date().toISOString());
+      return success({
+        message: `Scheduler salvato per ${day}`
+      });
     }
 
-    const body = await request.json();
-    const { operation, data } = body;
-
-    switch (operation) {
-      case 'saveSchedule': {
-        // Save schedule for a specific day (active schedule)
-        const { day, schedule } = data;
-        const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId') || 'default';
-        await adminDbSet(`schedules-v2/schedules/${activeScheduleId}/slots/${day}`, schedule);
-        // Update schedule's updatedAt timestamp
-        await adminDbSet(`schedules-v2/schedules/${activeScheduleId}/updatedAt`, new Date().toISOString());
-        return NextResponse.json({
-          success: true,
-          message: `Scheduler salvato per ${day}`
-        });
-      }
-
-      case 'setSchedulerMode': {
-        // Enable/disable scheduler
-        const { enabled } = data;
-        const currentMode = await adminDbGet('schedules-v2/mode') || {};
-        await adminDbSet('schedules-v2/mode', {
-          ...currentMode,
-          enabled,
-          lastUpdated: new Date().toISOString()
-        });
-        return NextResponse.json({
-          success: true,
-          message: `Modalità scheduler: ${enabled ? 'attiva' : 'disattiva'}`
-        });
-      }
-
-      case 'setSemiManualMode': {
-        // Activate semi-manual mode
-        const { returnToAutoAt } = data;
-        const currentMode = await adminDbGet('schedules-v2/mode') || {};
-        await adminDbSet('schedules-v2/mode', {
-          enabled: currentMode.enabled || false,
-          semiManual: true,
-          semiManualActivatedAt: new Date().toISOString(),
-          returnToAutoAt,
-          lastUpdated: new Date().toISOString()
-        });
-        return NextResponse.json({
-          success: true,
-          message: 'Modalità semi-manuale attivata'
-        });
-      }
-
-      case 'clearSemiManualMode': {
-        // Clear semi-manual mode
-        const currentMode = await adminDbGet('schedules-v2/mode') || {};
-        await adminDbSet('schedules-v2/mode', {
-          enabled: currentMode.enabled || false,
-          semiManual: false,
-          lastUpdated: new Date().toISOString()
-        });
-        return NextResponse.json({
-          success: true,
-          message: 'Modalità semi-manuale disattivata'
-        });
-      }
-
-      default:
-        return NextResponse.json(
-          { error: `Operazione non supportata: ${operation}` },
-          { status: 400 }
-        );
+    case 'setSchedulerMode': {
+      // Enable/disable scheduler
+      const { enabled } = data;
+      const currentMode = await adminDbGet('schedules-v2/mode') || {};
+      await adminDbSet('schedules-v2/mode', {
+        ...currentMode,
+        enabled,
+        lastUpdated: new Date().toISOString()
+      });
+      return success({
+        message: `Modalita scheduler: ${enabled ? 'attiva' : 'disattiva'}`
+      });
     }
 
-  } catch (error) {
-    console.error('❌ Errore update scheduler:', error);
-    return NextResponse.json(
-      {
-        error: 'Errore nell\'aggiornamento scheduler',
-        details: error.message
-      },
-      { status: 500 }
-    );
+    case 'setSemiManualMode': {
+      // Activate semi-manual mode
+      const { returnToAutoAt } = data;
+      const currentMode = await adminDbGet('schedules-v2/mode') || {};
+      await adminDbSet('schedules-v2/mode', {
+        enabled: currentMode.enabled || false,
+        semiManual: true,
+        semiManualActivatedAt: new Date().toISOString(),
+        returnToAutoAt,
+        lastUpdated: new Date().toISOString()
+      });
+      return success({
+        message: 'Modalita semi-manuale attivata'
+      });
+    }
+
+    case 'clearSemiManualMode': {
+      // Clear semi-manual mode
+      const currentMode = await adminDbGet('schedules-v2/mode') || {};
+      await adminDbSet('schedules-v2/mode', {
+        enabled: currentMode.enabled || false,
+        semiManual: false,
+        lastUpdated: new Date().toISOString()
+      });
+      return success({
+        message: 'Modalita semi-manuale disattivata'
+      });
+    }
+
+    default:
+      return badRequest(`Operazione non supportata: ${operation}`);
   }
-}
+}, 'Scheduler/Update');

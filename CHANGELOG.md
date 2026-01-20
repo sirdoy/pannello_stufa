@@ -5,6 +5,121 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.68.0] - 2026-01-20
+
+### Backend Refactor Phase 2
+
+**Obiettivo**: Extended middleware patterns, shared helpers, centralized logging, and code cleanup for improved maintainability.
+
+#### Added
+
+- **`lib/logger.js`** - Centralized logger utility
+  - Log levels: debug, info, warn, error
+  - Special methods: success(), progress(), skip()
+  - Module-specific loggers with `createLogger('Module')`
+  - Environment-aware (production skips debug)
+
+- **`lib/maintenance/helpers.js`** - Shared maintenance utilities
+  - `shouldSendMaintenanceNotification()` extracted from duplicate implementations
+
+- **`withHueHandler`** - Specialized Hue middleware
+  - Automatically handles HUE_NOT_CONNECTED and NETWORK_TIMEOUT errors
+  - Simplifies Hue route handlers by removing inner try-catch blocks
+
+- **`withCronSecret`** - Enhanced cron authentication
+  - Now supports both query param (?secret=xxx) and header (Authorization: Bearer xxx)
+  - Backward compatible with existing cron configuration
+
+#### Changed
+
+- **`/api/scheduler/check`** - Refactored to use `withCronSecret` middleware
+  - Removed manual try-catch and auth checks
+  - Now uses `success()` helper for responses
+  - Extracted helpers: `fetchStoveData()`, `handleIgnition()`, `handleShutdown()`, etc.
+
+- **`/api/health`** - Now uses `withErrorHandler` middleware pattern
+  - Consistent with other routes
+
+- **`/api/hue/lights`** - Now uses `withHueHandler`
+  - Simplified from 42 lines to 26 lines
+  - Error handling delegated to middleware
+
+#### Removed
+
+- **`mapNetatmoError()`** - Removed unused function from `lib/core/netatmoHelpers.js`
+- Duplicate `shouldSendMaintenanceNotification()` from both `maintenanceService.js` and `maintenanceServiceAdmin.js`
+
+#### Technical Notes
+
+- Middleware now available: `withAuth`, `withErrorHandler`, `withAuthAndErrorHandler`, `withAdmin`, `withCronSecret`, `withHueHandler`
+- All middleware exports consolidated in `lib/core/index.js`
+
+---
+
+## [1.67.0] - 2026-01-20
+
+### Backend Architecture Refactoring
+
+**Obiettivo**: Complete backend restructuring for consistency across all API routes with centralized error handling, middleware, and response utilities.
+
+#### Added
+
+- **lib/core/** - Centralized backend utilities module
+  - `apiErrors.js` - Error codes, HTTP status constants, `ApiError` class with factory methods
+  - `apiResponse.js` - Consistent response utilities (`success()`, `badRequest()`, `notFound()`, `forbidden()`, etc.)
+  - `middleware.js` - Auth and error handling wrappers (`withAuth`, `withErrorHandler`, `withAuthAndErrorHandler`)
+  - `requestParser.js` - Request parsing and validation utilities (`parseJson`, `validateRequired`, `getPathParam`, etc.)
+  - `netatmoHelpers.js` - Netatmo-specific token handling (`requireNetatmoToken()`, `mapNetatmoError()`)
+  - `hueHelpers.js` - Hue-specific response helpers (`hueNotConnected()`, `hueNotOnLocalNetwork()`)
+  - `index.js` - Unified re-exports for all core utilities
+
+#### Changed
+
+- **Refactored 50+ API routes** to use new core utilities pattern:
+  - **Stove routes** (14 files): `/api/stove/*`
+  - **Netatmo routes** (12 files): `/api/netatmo/*` including camera endpoints
+  - **Hue routes** (17 files): `/api/hue/*` including remote OAuth
+  - **Schedule routes** (4 files): `/api/schedules/*`, `/api/scheduler/update`
+  - **Error routes** (2 files): `/api/errors/*`
+  - **Maintenance routes** (2 files): `/api/maintenance/*`
+  - **Notification routes** (4 files): `/api/notifications/*`
+  - **Other routes**: `/api/user/*`, `/api/devices/*`, `/api/log/*`, `/api/admin/*`, `/api/health`
+
+- **Before/After Example**:
+  ```javascript
+  // Before (~45 lines)
+  export async function GET(request) {
+    try {
+      const session = await auth0.getSession(request);
+      if (!session?.user) {
+        return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+      }
+      const data = await getStoveStatus();
+      return NextResponse.json({ success: true, ...data });
+    } catch (error) {
+      console.error('Error:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+  }
+
+  // After (~13 lines)
+  export const GET = withAuthAndErrorHandler(async () => {
+    const data = await getStoveStatus();
+    return success(data);
+  }, 'Stove/Status');
+  ```
+
+#### Technical Notes
+
+- All routes now use consistent `success: true` response format
+- Error handling centralized with log context (e.g., `'Stove/Status'`)
+- Removed duplicate auth checks across all routes
+- Validation helpers throw `ApiError` which middleware catches
+- OAuth routes (Netatmo/Hue callbacks) use `withErrorHandler` only (not `withAuthAndErrorHandler`)
+- `scheduler/check` route kept unchanged (uses CRON_SECRET, different auth pattern)
+
+---
+
 ## [1.66.0] - 2026-01-20
 
 ### Camera Live Streaming & Events Page

@@ -1,36 +1,39 @@
-import { NextResponse } from 'next/server';
+/**
+ * API Route: Add Log Entry
+ *
+ * POST /api/log/add
+ *
+ * Adds a log entry to Firebase
+ * Body: { action, device, value?, details?, ... }
+ */
+
+import { withAuthAndErrorHandler, success, parseJson } from '@/lib/core';
 import { adminDbPush } from '@/lib/firebaseAdmin';
-import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request) {
-  try {
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
-    }
-    const user = session.user;
+/**
+ * POST /api/log/add
+ * Add a log entry
+ * Protected: Requires Auth0 authentication
+ */
+export const POST = withAuthAndErrorHandler(async (request, context, session) => {
+  const user = session.user;
+  const body = await parseJson(request);
 
-    const body = await request.json();
+  const logEntry = {
+    ...body,
+    timestamp: Date.now(),
+    user: {
+      email: user.email,
+      name: user.name,
+      picture: user.picture,
+      sub: user.sub,
+    },
+    source: 'user',
+  };
 
-    const logEntry = {
-      ...body,
-      timestamp: Date.now(),
-      user: user ? {
-        email: user.email,
-        name: user.name,
-        picture: user.picture,
-        sub: user.sub, // Auth0 user ID
-      } : null,
-      source: 'user', // Azioni manuali dell'utente
-    };
+  await adminDbPush('log', logEntry);
 
-    await adminDbPush('log', logEntry);
-
-    return Response.json({ success: true });
-  } catch (error) {
-    console.error('Errore salvataggio log:', error);
-    return Response.json({ success: false, error: error.message }, { status: 500 });
-  }
-}
+  return success({});
+}, 'Log/Add');

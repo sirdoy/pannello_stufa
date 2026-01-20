@@ -172,9 +172,18 @@ const nextResponseJsonImpl = (body, init) => {
   return response;
 };
 
-const NextResponseMock = {
-  json: jest.fn().mockImplementation(nextResponseJsonImpl),
-};
+// Create NextResponse as a constructor function with static methods
+function NextResponseMock(body, init) {
+  return {
+    body,
+    status: init?.status || 200,
+    headers: new Headers(init?.headers || {}),
+    json: async () => body,
+  };
+}
+
+// Add static json method
+NextResponseMock.json = jest.fn().mockImplementation(nextResponseJsonImpl);
 
 jest.mock('next/server', () => ({
   __esModule: true,
@@ -187,7 +196,9 @@ afterEach(() => {
   jest.clearAllMocks();
 
   // Restore NextResponse.json implementation after clearAllMocks
-  NextResponseMock.json.mockImplementation(nextResponseJsonImpl);
+  if (NextResponseMock.json.mockImplementation) {
+    NextResponseMock.json.mockImplementation(nextResponseJsonImpl);
+  }
 
   localStorageMock.getItem.mockClear();
   localStorageMock.setItem.mockClear();

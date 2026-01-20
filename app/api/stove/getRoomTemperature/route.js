@@ -1,5 +1,4 @@
-import { NextResponse } from 'next/server';
-import { auth0 } from '@/lib/auth0';
+import { withAuthAndErrorHandler, success, ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core';
 import { STUFA_API, fetchWithTimeout } from '@/lib/stoveApi';
 
 /**
@@ -7,36 +6,17 @@ import { STUFA_API, fetchWithTimeout } from '@/lib/stoveApi';
  * Returns the target room temperature setpoint from the stove
  * Protected: Requires Auth0 authentication
  */
-export async function GET(request) {
-  try {
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
-    }
-    const res = await fetchWithTimeout(STUFA_API.getRoomTemperature);
+export const GET = withAuthAndErrorHandler(async () => {
+  const res = await fetchWithTimeout(STUFA_API.getRoomTemperature);
 
-    if (!res.ok) {
-      return Response.json(
-        { error: 'Failed to fetch room temperature', details: `HTTP ${res.status}` },
-        { status: res.status }
-      );
-    }
-
-    const data = await res.json();
-    return Response.json(data);
-  } catch (error) {
-    console.error('[Stove API] GetRoomTemperature error:', error.message);
-
-    if (error.message === 'STOVE_TIMEOUT') {
-      return Response.json(
-        { error: 'Stufa non raggiungibile', code: 'TIMEOUT', Result: 20 },
-        { status: 504 }
-      );
-    }
-
-    return Response.json(
-      { error: 'Errore di connessione', code: 'NETWORK_ERROR', Result: 20 },
-      { status: 500 }
+  if (!res.ok) {
+    throw new ApiError(
+      ERROR_CODES.EXTERNAL_API_ERROR,
+      `Failed to fetch room temperature: HTTP ${res.status}`,
+      HTTP_STATUS.BAD_GATEWAY
     );
   }
-}
+
+  const data = await res.json();
+  return success(data);
+}, 'Stove/GetRoomTemperature');

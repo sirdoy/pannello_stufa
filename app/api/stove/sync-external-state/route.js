@@ -5,46 +5,28 @@
  * Updates Firebase state so all devices receive real-time updates
  */
 
+import { withAuthAndErrorHandler, success, badRequest, parseJsonOrThrow, validateRequired } from '@/lib/core';
 import { updateStoveState } from '@/lib/stoveStateService';
-import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request) {
-  try {
-    // Auth0 authentication
-    const session = await auth0.getSession(request);
-    if (!session) {
-      return Response.json({ error: 'Non autenticato' }, { status: 401 });
-    }
+export const POST = withAuthAndErrorHandler(async (request) => {
+  const body = await parseJsonOrThrow(request);
 
-    const body = await request.json();
-    const { status, fanLevel, powerLevel, errorCode, errorDescription } = body;
+  // Validate required fields
+  validateRequired(body, ['status']);
 
-    // Validation
-    if (!status) {
-      return Response.json({ error: 'Campo status richiesto' }, { status: 400 });
-    }
+  const { status, fanLevel, powerLevel, errorCode, errorDescription } = body;
 
-    // Sync to Firebase for multi-device real-time updates
-    await updateStoveState({
-      status,
-      fanLevel,
-      powerLevel,
-      errorCode: errorCode ?? 0,
-      errorDescription: errorDescription ?? '',
-      source: 'external_change'
-    });
+  // Sync to Firebase for multi-device real-time updates
+  await updateStoveState({
+    status,
+    fanLevel,
+    powerLevel,
+    errorCode: errorCode ?? 0,
+    errorDescription: errorDescription ?? '',
+    source: 'external_change'
+  });
 
-    return Response.json({
-      success: true,
-      message: 'External state synced to Firebase'
-    });
-  } catch (error) {
-    console.error('[sync-external-state] Error:', error);
-    return Response.json({
-      error: 'Errore sincronizzazione Firebase',
-      details: error.message
-    }, { status: 500 });
-  }
-}
+  return success({ message: 'External state synced to Firebase' });
+}, 'Stove/SyncExternalState');

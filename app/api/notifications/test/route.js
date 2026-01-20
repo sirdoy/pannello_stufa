@@ -4,68 +4,48 @@
  * POST /api/notifications/test
  *
  * Invia una notifica di test all'utente autenticato
- * ✅ Protected by Auth0 authentication
  */
 
-import { auth0 } from '@/lib/auth0';
+import {
+  withAuthAndErrorHandler,
+  success,
+  badRequest,
+} from '@/lib/core';
 import { sendNotificationToUser } from '@/lib/firebaseAdmin';
-import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request) {
-  try {
-    // Verifica autenticazione
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Non autenticato' },
-        { status: 401 }
-      );
-    }
-    const user = session.user;
+/**
+ * POST /api/notifications/test
+ * Send a test notification to authenticated user
+ * Protected: Requires Auth0 authentication
+ */
+export const POST = withAuthAndErrorHandler(async (request, context, session) => {
+  const user = session.user;
 
-    // Costruisci notifica di test
-    const notification = {
-      title: '🧪 Notifica di Test',
-      body: 'Se vedi questo messaggio, le notifiche funzionano correttamente! 🎉',
-      icon: '/icons/icon-192.png',
-      priority: 'normal',
-      data: {
-        type: 'test',
-        url: '/settings/notifications',
-        timestamp: new Date().toISOString(),
-      },
-    };
+  // Build test notification
+  const notification = {
+    title: 'Notifica di Test',
+    body: 'Se vedi questo messaggio, le notifiche funzionano correttamente!',
+    icon: '/icons/icon-192.png',
+    priority: 'normal',
+    data: {
+      type: 'test',
+      url: '/settings/notifications',
+      timestamp: new Date().toISOString(),
+    },
+  };
 
-    // Invia notifica
-    const result = await sendNotificationToUser(user.sub, notification);
+  // Send notification
+  const result = await sendNotificationToUser(user.sub, notification);
 
-    if (result.success) {
-      return NextResponse.json({
-        success: true,
-        message: 'Notifica di test inviata',
-        sentTo: result.successCount,
-        failed: result.failureCount,
-      });
-    } else {
-      return NextResponse.json(
-        {
-          error: result.error || 'SEND_FAILED',
-          message: result.message || 'Impossibile inviare notifica',
-        },
-        { status: 400 }
-      );
-    }
-
-  } catch (error) {
-    console.error('❌ Errore API test notifica:', error);
-    return NextResponse.json(
-      {
-        error: 'INTERNAL_ERROR',
-        message: error.message || 'Errore interno del server',
-      },
-      { status: 500 }
-    );
+  if (result.success) {
+    return success({
+      message: 'Notifica di test inviata',
+      sentTo: result.successCount,
+      failed: result.failureCount,
+    });
+  } else {
+    return badRequest(result.message || 'Impossibile inviare notifica');
   }
-}
+}, 'Notifications/Test');

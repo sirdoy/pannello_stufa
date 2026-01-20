@@ -17,89 +17,59 @@
  *     data: { ... }                   // opzionale
  *   }
  * }
- * ✅ Protected by Auth0 authentication
  */
 
-import { auth0 } from '@/lib/auth0';
+import {
+  withAuthAndErrorHandler,
+  success,
+  badRequest,
+  forbidden,
+  parseJsonOrThrow,
+  validateRequired,
+} from '@/lib/core';
 import { sendNotificationToUser } from '@/lib/firebaseAdmin';
-import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request) {
-  try {
-    // Verifica autenticazione O admin secret
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Non autenticato' },
-        { status: 401 }
-      );
-    }
-    const user = session?.user;
+/**
+ * POST /api/notifications/send
+ * Send push notification to a user
+ * Protected: Requires Auth0 authentication + admin or self
+ */
+export const POST = withAuthAndErrorHandler(async (request, context, session) => {
+  const user = session.user;
 
-    // Check admin secret da header o body
-    const adminSecret = request.headers.get('x-admin-secret');
-    const body = await request.json();
-    const bodySecret = body.adminSecret;
+  // Check admin secret from header or body
+  const adminSecret = request.headers.get('x-admin-secret');
+  const body = await parseJsonOrThrow(request);
+  const bodySecret = body.adminSecret;
 
-    const isAdmin = adminSecret === process.env.ADMIN_SECRET ||
-                    bodySecret === process.env.ADMIN_SECRET;
+  const isAdmin = adminSecret === process.env.ADMIN_SECRET ||
+                  bodySecret === process.env.ADMIN_SECRET;
 
-    // Se non è admin, verifica che l'utente invii notifiche a se stesso
-    if (!isAdmin && (!user || user.sub !== body.userId)) {
-      return NextResponse.json(
-        { error: 'Non autorizzato' },
-        { status: 403 }
-      );
-    }
-
-    // Valida body
-    if (!body.userId || !body.notification) {
-      return NextResponse.json(
-        { error: 'userId e notification sono richiesti' },
-        { status: 400 }
-      );
-    }
-
-    const { userId, notification } = body;
-
-    // Valida notification
-    if (!notification.title || !notification.body) {
-      return NextResponse.json(
-        { error: 'notification.title e notification.body sono richiesti' },
-        { status: 400 }
-      );
-    }
-
-    // Invia notifica
-    const result = await sendNotificationToUser(userId, notification);
-
-    if (result.success) {
-      return NextResponse.json({
-        success: true,
-        message: 'Notifica inviata',
-        sentTo: result.successCount,
-        failed: result.failureCount,
-      });
-    } else {
-      return NextResponse.json(
-        {
-          error: result.error || 'SEND_FAILED',
-          message: result.message || 'Impossibile inviare notifica',
-        },
-        { status: 400 }
-      );
-    }
-
-  } catch (error) {
-    console.error('❌ Errore API send notifica:', error);
-    return NextResponse.json(
-      {
-        error: 'INTERNAL_ERROR',
-        message: error.message || 'Errore interno del server',
-      },
-      { status: 500 }
-    );
+  // If not admin, verify user is sending notification to themselves
+  if (!isAdmin && user.sub !== body.userId) {
+    return forbidden('Non autorizzato');
   }
-}
+
+  const { userId, notification } = body;
+
+  // Validate required fields
+  validateRequired(userId, 'userId');
+  validateRequired(notification, 'notification');
+  validateRequired(notification?.title, 'notification.title');
+  validateRequired(notification?.body, 'notification.body');
+
+  // Send notification
+  const result = await sendNotificationToUser(userId, notification);
+
+  if (result.success) {
+    return success({
+      message: 'Notifica inviata',
+      sentTo: result.successCount,
+      failed: result.failureCount,
+    });
+  } else {
+    return badRequest(result.message || 'Impossibile inviare notifica');
+  }
+}, 'Notifications/Send');

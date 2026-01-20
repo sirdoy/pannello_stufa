@@ -27,12 +27,15 @@
  *     }
  *   }
  * }
- * ✅ Protected by Auth0 authentication
  */
 
-import { auth0 } from '@/lib/auth0';
+import {
+  withAuthAndErrorHandler,
+  success,
+  parseJsonOrThrow,
+  validateRequired,
+} from '@/lib/core';
 import { adminDbGet, adminDbSet, adminDbUpdate } from '@/lib/firebaseAdmin';
-import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,93 +63,50 @@ const DEFAULT_PREFERENCES = {
   },
 };
 
-export async function GET(request) {
-  try {
-    // Verifica autenticazione
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Non autenticato' },
-        { status: 401 }
-      );
-    }
+/**
+ * GET /api/notifications/preferences
+ * Get notification preferences
+ * Protected: Requires Auth0 authentication
+ */
+export const GET = withAuthAndErrorHandler(async (request, context, session) => {
+  const userId = session.user.sub;
 
-    const userId = session.user.sub;
+  // Get preferences from Firebase
+  const preferences = await adminDbGet(`users/${userId}/notificationPreferences`);
 
-    // Recupera preferenze da Firebase
-    const preferences = await adminDbGet(`users/${userId}/notificationPreferences`);
-
-    if (preferences) {
-      return NextResponse.json({
-        success: true,
-        preferences,
-      });
-    }
-
-    // Se non esistono, inizializza con defaults
-    await adminDbSet(`users/${userId}/notificationPreferences`, DEFAULT_PREFERENCES);
-
-    return NextResponse.json({
-      success: true,
-      preferences: DEFAULT_PREFERENCES,
-      initialized: true,
-    });
-
-  } catch (error) {
-    console.error('❌ Errore recupero preferenze notifiche:', error);
-    return NextResponse.json(
-      {
-        error: 'GET_FAILED',
-        message: error.message || 'Impossibile recuperare preferenze',
-      },
-      { status: 500 }
-    );
+  if (preferences) {
+    return success({ preferences });
   }
-}
 
-export async function PUT(request) {
-  try {
-    // Verifica autenticazione
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Non autenticato' },
-        { status: 401 }
-      );
-    }
+  // If not exists, initialize with defaults
+  await adminDbSet(`users/${userId}/notificationPreferences`, DEFAULT_PREFERENCES);
 
-    const userId = session.user.sub;
-    const body = await request.json();
+  return success({
+    preferences: DEFAULT_PREFERENCES,
+    initialized: true,
+  });
+}, 'Notifications/GetPreferences');
 
-    // Valida body
-    if (!body.preferences) {
-      return NextResponse.json(
-        { error: 'preferences è richiesto' },
-        { status: 400 }
-      );
-    }
+/**
+ * PUT /api/notifications/preferences
+ * Update notification preferences
+ * Protected: Requires Auth0 authentication
+ */
+export const PUT = withAuthAndErrorHandler(async (request, context, session) => {
+  const userId = session.user.sub;
+  const body = await parseJsonOrThrow(request);
+  const { preferences } = body;
 
-    const { preferences } = body;
+  // Validate required field
+  validateRequired(preferences, 'preferences');
 
-    // Aggiorna preferenze su Firebase usando Admin SDK
-    await adminDbUpdate(`users/${userId}/notificationPreferences`, preferences);
+  // Update preferences on Firebase using Admin SDK
+  await adminDbUpdate(`users/${userId}/notificationPreferences`, preferences);
 
-    console.log(`✅ Preferenze notifiche aggiornate per user ${userId}`);
+  console.log(`Preferenze notifiche aggiornate per user ${userId}`);
 
-    return NextResponse.json({
-      success: true,
-      message: 'Preferenze aggiornate con successo',
-      preferences,
-    });
-
-  } catch (error) {
-    console.error('❌ Errore aggiornamento preferenze notifiche:', error);
-    return NextResponse.json(
-      {
-        error: 'UPDATE_FAILED',
-        message: error.message || 'Impossibile aggiornare preferenze',
-      },
-      { status: 500 }
-    );
-  }
-}
+  return success({
+    message: 'Preferenze aggiornate con successo',
+    preferences,
+  });
+}, 'Notifications/UpdatePreferences');

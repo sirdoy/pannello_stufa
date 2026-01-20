@@ -1,22 +1,29 @@
-import { NextResponse } from 'next/server';
+/**
+ * API Route: Health Check
+ *
+ * GET /api/health - Returns 200 OK if server is reachable
+ * HEAD /api/health - Lightweight connectivity check (204)
+ *
+ * Used by useOnlineStatus hook to verify connectivity.
+ * Note: No auth required for health check
+ */
+
+import { withErrorHandler, success, noContent } from '@/lib/core';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * Health Check Endpoint
- *
- * Simple endpoint used by useOnlineStatus hook to verify connectivity.
- * Returns 200 OK if the server is reachable.
- *
  * GET /api/health
+ * Returns status ok with timestamp
  */
-export async function GET() {
-  return NextResponse.json({ status: 'ok', timestamp: Date.now() });
-}
+export const GET = withErrorHandler(async () => {
+  return success({ status: 'ok', timestamp: Date.now() });
+}, 'Health/Check');
 
 /**
- * HEAD request support for lightweight connectivity check
+ * HEAD /api/health
+ * Lightweight connectivity check
  */
-export async function HEAD() {
-  return new NextResponse(null, { status: 200 });
-}
+export const HEAD = withErrorHandler(async () => {
+  return noContent();
+}, 'Health/Head');

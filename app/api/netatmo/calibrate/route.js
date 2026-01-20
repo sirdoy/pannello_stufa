@@ -1,11 +1,16 @@
+import {
+  withAuthAndErrorHandler,
+  success,
+  badRequest,
+  notFound,
+  serverError,
+  requireNetatmoToken,
+} from '@/lib/core';
 import { adminDbGet, adminDbPush } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
-import { auth0 } from '@/lib/auth0';
-import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
 
-// Force dynamic rendering for Firebase operations
 export const dynamic = 'force-dynamic';
 
 /**
@@ -19,180 +24,124 @@ export const dynamic = 'force-dynamic';
  * 2. The schedule is synced via synchomeschedule
  *
  * This endpoint uses method #2 to force calibration on demand.
- * ✅ Protected by Auth0 authentication
+ * Protected: Requires Auth0 authentication
  */
-export async function POST(request) {
-  try {
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return Response.json({ error: 'Non autenticato' }, { status: 401 });
-    }
-    const user = session.user;
+export const POST = withAuthAndErrorHandler(async (request, _context, session) => {
+  const user = session.user;
+  const accessToken = await requireNetatmoToken();
 
-    // ✅ Get valid access token using centralized helper (auto-refresh)
-    const { accessToken, error, message } = await getValidAccessToken();
-    if (error) {
-      const { status, reconnect } = handleTokenError(error);
-      return Response.json({ error: message, reconnect }, { status });
-    }
-
-    // Get home_id from Firebase (use environment-aware path)
-    const homeIdPath = getEnvironmentPath('netatmo/home_id');
-    const homeId = await adminDbGet(homeIdPath);
-    if (!homeId) {
-      return Response.json({
-        error: 'home_id non trovato. Chiama prima /api/netatmo/homesdata'
-      }, { status: 400 });
-    }
-
-    // Get homes data directly from Netatmo API to get complete schedule structure
-    const homesData = await NETATMO_API.getHomesData(accessToken);
-
-    if (!homesData || homesData.length === 0) {
-      return Response.json({
-        error: 'Nessuna casa trovata nell\'account Netatmo'
-      }, { status: 404 });
-    }
-
-    const home = homesData[0]; // Usually single home
-    const schedules = home.schedules || [];
-
-    // Find the currently selected schedule
-    const currentSchedule = schedules.find(s => s.selected === true);
-
-    if (!currentSchedule) {
-      return Response.json({
-        error: 'Nessuno schedule attivo trovato'
-      }, { status: 400 });
-    }
-
-    console.log('🔧 Triggering valve calibration via synchomeschedule');
-    console.log('🏠 Home ID:', homeId);
-    console.log('📅 Schedule ID:', currentSchedule.id);
-    console.log('📅 Schedule Name:', currentSchedule.name);
-    console.log('📋 Zones:', JSON.stringify(currentSchedule.zones, null, 2));
-    console.log('📋 Timetable:', JSON.stringify(currentSchedule.timetable, null, 2));
-
-    // Validate that zones and timetable exist
-    if (!currentSchedule.zones || !Array.isArray(currentSchedule.zones)) {
-      return Response.json({
-        error: 'Schedule zones non valido',
-        details: `zones is ${typeof currentSchedule.zones}`
-      }, { status: 400 });
-    }
-
-    if (!currentSchedule.timetable || !Array.isArray(currentSchedule.timetable)) {
-      return Response.json({
-        error: 'Schedule timetable non valido',
-        details: `timetable is ${typeof currentSchedule.timetable}`
-      }, { status: 400 });
-    }
-
-    // ALTERNATIVE APPROACH: Force calibration by switching schedules
-    // Netatmo valves calibrate automatically when schedule configuration changes
-    // We'll switch to a different schedule (if available) and back to trigger recalibration
-
-    console.log('🔧 Available schedules:', schedules.length);
-
-    if (schedules.length < 2) {
-      return Response.json({
-        error: 'Calibrazione automatica richiede almeno 2 schedule configurati',
-        details: 'Crea uno schedule secondario in Netatmo app per permettere la calibrazione'
-      }, { status: 400 });
-    }
-
-    // Find another schedule (not the current one)
-    const alternativeSchedule = schedules.find(s => s.id !== currentSchedule.id);
-
-    console.log('🔄 Switching to alternative schedule:', alternativeSchedule.name);
-
-    // Switch to alternative schedule
-    const switched1 = await NETATMO_API.switchHomeSchedule(accessToken, homeId, alternativeSchedule.id);
-
-    if (!switched1) {
-      return Response.json({
-        error: 'Errore durante cambio schedule',
-        details: 'switchhomeschedule to alternative failed'
-      }, { status: 500 });
-    }
-
-    // Wait 2 seconds
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    console.log('🔄 Switching back to original schedule:', currentSchedule.name);
-
-    // Switch back to original schedule - this triggers calibration
-    const switched2 = await NETATMO_API.switchHomeSchedule(accessToken, homeId, currentSchedule.id);
-
-    if (!switched2) {
-      return Response.json({
-        error: 'Errore durante ripristino schedule',
-        details: 'switchhomeschedule back to original failed'
-      }, { status: 500 });
-    }
-
-    console.log('✅ Valve calibration triggered successfully');
-
-    // Log action
-    const logEntry = {
-      action: 'Calibrazione valvole',
-      device: DEVICE_TYPES.THERMOSTAT,
-      value: currentSchedule.name || 'Unknown',
-      schedule_id: currentSchedule.id,
-      schedule_name: currentSchedule.name || 'Unknown',
-      timestamp: Date.now(),
-      user: {
-        email: user.email,
-        name: user.name,
-        picture: user.picture,
-        sub: user.sub,
-      },
-      source: 'manual',
-    };
-
-    await adminDbPush('log', logEntry);
-
-    // Track calibration in Firebase
-    const calibrationEntry = {
-      timestamp: Date.now(),
-      schedule_id: currentSchedule.id,
-      schedule_name: currentSchedule.name || 'Unknown',
-      triggered_by: user.email,
-      status: 'success',
-    };
-    await adminDbPush('netatmo/calibrations', calibrationEntry);
-
-    return Response.json({
-      success: true,
-      message: 'Calibrazione valvole avviata con successo',
-      schedule_name: currentSchedule.name || 'Unknown',
-      timestamp: Date.now(),
-    });
-  } catch (err) {
-    console.error('❌ Error in /api/netatmo/calibrate:', err);
-    console.error('❌ Error stack:', err.stack);
-
-    // Log failed calibration
-    try {
-      const session = await auth0.getSession(request);
-      const user = session?.user;
-
-      if (user) {
-        const calibrationEntry = {
-          timestamp: Date.now(),
-          triggered_by: user.email,
-          status: 'failed',
-          error: err.message,
-        };
-        await adminDbPush('netatmo/calibrations', calibrationEntry);
-      }
-    } catch (logError) {
-      console.error('❌ Failed to log calibration error:', logError);
-    }
-
-    return Response.json({
-      error: err.message || 'Errore server',
-      details: err.stack,
-    }, { status: 500 });
+  // Get home_id from Firebase (use environment-aware path)
+  const homeIdPath = getEnvironmentPath('netatmo/home_id');
+  const homeId = await adminDbGet(homeIdPath);
+  if (!homeId) {
+    return badRequest('home_id non trovato. Chiama prima /api/netatmo/homesdata');
   }
-}
+
+  // Get homes data directly from Netatmo API to get complete schedule structure
+  const homesData = await NETATMO_API.getHomesData(accessToken);
+
+  if (!homesData || homesData.length === 0) {
+    return notFound('Nessuna casa trovata nell\'account Netatmo');
+  }
+
+  const home = homesData[0]; // Usually single home
+  const schedules = home.schedules || [];
+
+  // Find the currently selected schedule
+  const currentSchedule = schedules.find(s => s.selected === true);
+
+  if (!currentSchedule) {
+    return badRequest('Nessuno schedule attivo trovato');
+  }
+
+  console.log('Triggering valve calibration via synchomeschedule');
+  console.log('Home ID:', homeId);
+  console.log('Schedule ID:', currentSchedule.id);
+  console.log('Schedule Name:', currentSchedule.name);
+
+  // Validate that zones and timetable exist
+  if (!currentSchedule.zones || !Array.isArray(currentSchedule.zones)) {
+    return badRequest('Schedule zones non valido', {
+      details: `zones is ${typeof currentSchedule.zones}`,
+    });
+  }
+
+  if (!currentSchedule.timetable || !Array.isArray(currentSchedule.timetable)) {
+    return badRequest('Schedule timetable non valido', {
+      details: `timetable is ${typeof currentSchedule.timetable}`,
+    });
+  }
+
+  // ALTERNATIVE APPROACH: Force calibration by switching schedules
+  // Netatmo valves calibrate automatically when schedule configuration changes
+  // We'll switch to a different schedule (if available) and back to trigger recalibration
+
+  console.log('Available schedules:', schedules.length);
+
+  if (schedules.length < 2) {
+    return badRequest('Calibrazione automatica richiede almeno 2 schedule configurati', {
+      details: 'Crea uno schedule secondario in Netatmo app per permettere la calibrazione',
+    });
+  }
+
+  // Find another schedule (not the current one)
+  const alternativeSchedule = schedules.find(s => s.id !== currentSchedule.id);
+
+  console.log('Switching to alternative schedule:', alternativeSchedule.name);
+
+  // Switch to alternative schedule
+  const switched1 = await NETATMO_API.switchHomeSchedule(accessToken, homeId, alternativeSchedule.id);
+
+  if (!switched1) {
+    return serverError('Errore durante cambio schedule');
+  }
+
+  // Wait 2 seconds
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+  console.log('Switching back to original schedule:', currentSchedule.name);
+
+  // Switch back to original schedule - this triggers calibration
+  const switched2 = await NETATMO_API.switchHomeSchedule(accessToken, homeId, currentSchedule.id);
+
+  if (!switched2) {
+    return serverError('Errore durante ripristino schedule');
+  }
+
+  console.log('Valve calibration triggered successfully');
+
+  // Log action
+  const logEntry = {
+    action: 'Calibrazione valvole',
+    device: DEVICE_TYPES.THERMOSTAT,
+    value: currentSchedule.name || 'Unknown',
+    schedule_id: currentSchedule.id,
+    schedule_name: currentSchedule.name || 'Unknown',
+    timestamp: Date.now(),
+    user: {
+      email: user.email,
+      name: user.name,
+      picture: user.picture,
+      sub: user.sub,
+    },
+    source: 'manual',
+  };
+
+  await adminDbPush('log', logEntry);
+
+  // Track calibration in Firebase
+  const calibrationEntry = {
+    timestamp: Date.now(),
+    schedule_id: currentSchedule.id,
+    schedule_name: currentSchedule.name || 'Unknown',
+    triggered_by: user.email,
+    status: 'success',
+  };
+  await adminDbPush('netatmo/calibrations', calibrationEntry);
+
+  return success({
+    message: 'Calibrazione valvole avviata con successo',
+    schedule_name: currentSchedule.name || 'Unknown',
+    timestamp: Date.now(),
+  });
+}, 'Netatmo/Calibrate');

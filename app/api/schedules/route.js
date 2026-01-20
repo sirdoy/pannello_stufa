@@ -4,8 +4,7 @@
  * POST: Create new schedule (from scratch or copy)
  */
 
-import { NextResponse } from 'next/server';
-import { auth0 } from '@/lib/auth0';
+import { withAuthAndErrorHandler, success, badRequest, notFound, parseJsonOrThrow, validateRequired } from '@/lib/core';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
@@ -14,131 +13,95 @@ export const dynamic = 'force-dynamic';
  * GET /api/schedules
  * List all schedules (metadata only, no slots)
  */
-export async function GET(request) {
-  try {
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
-    }
-    const schedulesData = await adminDbGet('schedules-v2/schedules');
-    const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId');
+export const GET = withAuthAndErrorHandler(async () => {
+  const schedulesData = await adminDbGet('schedules-v2/schedules');
+  const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId');
 
-    if (!schedulesData) {
-      return NextResponse.json({
-        schedules: [],
-        activeScheduleId: activeScheduleId || 'default'
-      });
-    }
-
-    // Map to array with metadata only
-    const schedules = Object.entries(schedulesData).map(([id, data]) => ({
-      id,
-      name: data.name,
-      enabled: data.enabled,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-      intervalCount: calculateTotalIntervals(data.slots)
-    }));
-
-    // Sort by createdAt (oldest first)
-    const sorted = schedules.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-
-    return NextResponse.json({
-      schedules: sorted,
+  if (!schedulesData) {
+    return success({
+      schedules: [],
       activeScheduleId: activeScheduleId || 'default'
     });
-  } catch (error) {
-    console.error('❌ Error fetching schedules:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch schedules', details: error.message },
-      { status: 500 }
-    );
   }
-}
+
+  // Map to array with metadata only
+  const schedules = Object.entries(schedulesData).map(([id, data]) => ({
+    id,
+    name: data.name,
+    enabled: data.enabled,
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
+    intervalCount: calculateTotalIntervals(data.slots)
+  }));
+
+  // Sort by createdAt (oldest first)
+  const sorted = schedules.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+  return success({
+    schedules: sorted,
+    activeScheduleId: activeScheduleId || 'default'
+  });
+}, 'Schedules/List');
 
 /**
  * POST /api/schedules
  * Create new schedule (from scratch or copy from existing)
- *
  * Body: { name: string, copyFromId?: string }
  */
-export async function POST(request) {
-  try {
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
-    }
+export const POST = withAuthAndErrorHandler(async (request) => {
+  const body = await parseJsonOrThrow(request);
+  const { name, copyFromId } = body;
 
-    const body = await request.json();
-    const { name, copyFromId } = body;
-
-    // Validation: name required
-    if (!name || typeof name !== 'string' || name.trim().length === 0) {
-      return NextResponse.json(
-        { error: 'Schedule name is required' },
-        { status: 400 }
-      );
-    }
-
-    // Validation: name must be unique
-    const existingSchedules = await adminDbGet('schedules-v2/schedules');
-    if (existingSchedules) {
-      const names = Object.values(existingSchedules).map(s => s.name.toLowerCase());
-      if (names.includes(name.trim().toLowerCase())) {
-        return NextResponse.json(
-          { error: 'Schedule name already exists' },
-          { status: 400 }
-        );
-      }
-    }
-
-    // Generate unique ID
-    const scheduleId = generateScheduleId(name);
-
-    const now = new Date().toISOString();
-    let slots = createEmptySlots();
-
-    // If copying from existing schedule
-    if (copyFromId) {
-      const sourceSchedule = await adminDbGet(`schedules-v2/schedules/${copyFromId}`);
-      if (!sourceSchedule) {
-        return NextResponse.json(
-          { error: `Source schedule '${copyFromId}' not found` },
-          { status: 404 }
-        );
-      }
-      // Deep copy slots
-      slots = JSON.parse(JSON.stringify(sourceSchedule.slots));
-    }
-
-    // Create new schedule
-    const newSchedule = {
-      name: name.trim(),
-      enabled: true,
-      slots,
-      createdAt: now,
-      updatedAt: now
-    };
-
-    await adminDbSet(`schedules-v2/schedules/${scheduleId}`, newSchedule);
-
-    console.log(`✅ Schedule created: ${scheduleId} (${name})`);
-
-    return NextResponse.json({
-      success: true,
-      schedule: {
-        id: scheduleId,
-        ...newSchedule
-      }
-    });
-  } catch (error) {
-    console.error('❌ Error creating schedule:', error);
-    return NextResponse.json(
-      { error: 'Failed to create schedule', details: error.message },
-      { status: 500 }
-    );
+  // Validation: name required
+  if (!name || typeof name !== 'string' || name.trim().length === 0) {
+    return badRequest('Schedule name is required');
   }
-}
+
+  // Validation: name must be unique
+  const existingSchedules = await adminDbGet('schedules-v2/schedules');
+  if (existingSchedules) {
+    const names = Object.values(existingSchedules).map(s => s.name.toLowerCase());
+    if (names.includes(name.trim().toLowerCase())) {
+      return badRequest('Schedule name already exists');
+    }
+  }
+
+  // Generate unique ID
+  const scheduleId = generateScheduleId(name);
+
+  const now = new Date().toISOString();
+  let slots = createEmptySlots();
+
+  // If copying from existing schedule
+  if (copyFromId) {
+    const sourceSchedule = await adminDbGet(`schedules-v2/schedules/${copyFromId}`);
+    if (!sourceSchedule) {
+      return notFound(`Source schedule '${copyFromId}' not found`);
+    }
+    // Deep copy slots
+    slots = JSON.parse(JSON.stringify(sourceSchedule.slots));
+  }
+
+  // Create new schedule
+  const newSchedule = {
+    name: name.trim(),
+    enabled: true,
+    slots,
+    createdAt: now,
+    updatedAt: now
+  };
+
+  await adminDbSet(`schedules-v2/schedules/${scheduleId}`, newSchedule);
+
+  console.log(`✅ Schedule created: ${scheduleId} (${name})`);
+
+  return success({
+    schedule: {
+      id: scheduleId,
+      ...newSchedule
+    }
+  });
+}, 'Schedules/Create');
 
 /**
  * Helper: Calculate total intervals

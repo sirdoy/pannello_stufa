@@ -13,91 +13,62 @@
  * }
  */
 
-import { auth0 } from '@/lib/auth0';
+import {
+  withAuthAndErrorHandler,
+  success,
+  parseJsonOrThrow,
+  validateRequired,
+  validateEnum,
+} from '@/lib/core';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
-import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
 const VALID_THEMES = ['light', 'dark'];
 
-export async function GET(request) {
-  try {
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
-    }
-    const user = session.user;
-    const userId = user.sub;
+/**
+ * GET /api/user/theme
+ * Get user theme preference
+ * Protected: Requires Auth0 authentication
+ */
+export const GET = withAuthAndErrorHandler(async (request, context, session) => {
+  const userId = session.user.sub;
 
-    // Recupera tema da Firebase
-    const theme = await adminDbGet(`users/${userId}/preferences/theme`);
+  // Get theme from Firebase
+  const theme = await adminDbGet(`users/${userId}/preferences/theme`);
 
-    if (theme) {
-      return NextResponse.json({
-        success: true,
-        theme,
-      });
-    }
-
-    // Default: light
-    return NextResponse.json({
-      success: true,
-      theme: 'light',
-      default: true,
-    });
-
-  } catch (error) {
-    console.error('❌ Errore recupero tema:', error);
-    return NextResponse.json(
-      {
-        error: 'GET_FAILED',
-        message: error.message || 'Impossibile recuperare tema',
-      },
-      { status: 500 }
-    );
+  if (theme) {
+    return success({ theme });
   }
-}
 
-export async function POST(request) {
-  try {
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
-    }
-    const user = session.user;
-    const userId = user.sub;
-    const body = await request.json();
+  // Default: light
+  return success({
+    theme: 'light',
+    default: true,
+  });
+}, 'User/GetTheme');
 
-    // Valida body
-    if (!body.theme || !VALID_THEMES.includes(body.theme)) {
-      return NextResponse.json(
-        { error: `theme deve essere uno tra: ${VALID_THEMES.join(', ')}` },
-        { status: 400 }
-      );
-    }
+/**
+ * POST /api/user/theme
+ * Update user theme preference
+ * Protected: Requires Auth0 authentication
+ */
+export const POST = withAuthAndErrorHandler(async (request, context, session) => {
+  const userId = session.user.sub;
+  const body = await parseJsonOrThrow(request);
+  const { theme } = body;
 
-    const { theme } = body;
+  // Validate
+  validateRequired(theme, 'theme');
+  validateEnum(theme, VALID_THEMES, 'theme');
 
-    // Salva tema su Firebase usando Admin SDK
-    await adminDbSet(`users/${userId}/preferences/theme`, theme);
+  // Save theme to Firebase using Admin SDK
+  await adminDbSet(`users/${userId}/preferences/theme`, theme);
 
-    console.log(`✅ Tema aggiornato per user ${userId}: ${theme}`);
+  console.log(`Tema aggiornato per user ${userId}: ${theme}`);
 
-    return NextResponse.json({
-      success: true,
-      message: 'Tema aggiornato con successo',
-      theme,
-    });
-
-  } catch (error) {
-    console.error('❌ Errore aggiornamento tema:', error);
-    return NextResponse.json(
-      {
-        error: 'UPDATE_FAILED',
-        message: error.message || 'Impossibile aggiornare tema',
-      },
-      { status: 500 }
-    );
-  }
-}
+  return success({
+    message: 'Tema aggiornato con successo',
+    theme,
+  });
+}, 'User/SetTheme');

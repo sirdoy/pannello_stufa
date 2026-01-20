@@ -12,76 +12,58 @@
  * }
  */
 
-import { auth0 } from '@/lib/auth0';
+import {
+  withAuthAndErrorHandler,
+  success,
+  notFound,
+  parseJsonOrThrow,
+  validateRequired,
+} from '@/lib/core';
 import { adminDbGet, adminDbUpdate } from '@/lib/firebaseAdmin';
-import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request) {
-  try {
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
-    }
+/**
+ * POST /api/errors/resolve
+ * Mark a stove error as resolved
+ * Protected: Requires Auth0 authentication
+ */
+export const POST = withAuthAndErrorHandler(async (request) => {
+  const body = await parseJsonOrThrow(request);
+  const { errorId } = body;
 
-    const body = await request.json();
+  // Validate required field
+  validateRequired(errorId, 'errorId');
 
-    // Valida body
-    if (!body.errorId) {
-      return NextResponse.json(
-        { error: 'errorId è richiesto' },
-        { status: 400 }
-      );
-    }
+  // Verify error exists
+  const errorData = await adminDbGet(`errors/${errorId}`);
 
-    const { errorId } = body;
-
-    // Verifica che l'errore esista
-    const errorData = await adminDbGet(`errors/${errorId}`);
-
-    if (!errorData) {
-      return NextResponse.json(
-        { error: 'Errore non trovato' },
-        { status: 404 }
-      );
-    }
-
-    // Se già risolto, ritorna success
-    if (errorData.resolved) {
-      return NextResponse.json({
-        success: true,
-        message: 'Errore già risolto',
-        errorId,
-        resolvedAt: errorData.resolvedAt,
-      });
-    }
-
-    // Marca come risolto usando Admin SDK
-    const updates = {
-      resolved: true,
-      resolvedAt: Date.now(),
-    };
-
-    await adminDbUpdate(`errors/${errorId}`, updates);
-
-    console.log(`✅ Errore stufa risolto: ${errorId} (${errorData.errorCode})`);
-
-    return NextResponse.json({
-      success: true,
-      message: 'Errore risolto con successo',
-      errorId,
-      resolvedAt: updates.resolvedAt,
-    });
-
-  } catch (error) {
-    console.error('❌ Errore risoluzione errore stufa:', error);
-    return NextResponse.json(
-      {
-        error: 'RESOLVE_FAILED',
-        message: error.message || 'Impossibile risolvere errore',
-      },
-      { status: 500 }
-    );
+  if (!errorData) {
+    return notFound('Errore non trovato');
   }
-}
+
+  // If already resolved, return success
+  if (errorData.resolved) {
+    return success({
+      message: 'Errore gia risolto',
+      errorId,
+      resolvedAt: errorData.resolvedAt,
+    });
+  }
+
+  // Mark as resolved using Admin SDK
+  const updates = {
+    resolved: true,
+    resolvedAt: Date.now(),
+  };
+
+  await adminDbUpdate(`errors/${errorId}`, updates);
+
+  console.log(`Errore stufa risolto: ${errorId} (${errorData.errorCode})`);
+
+  return success({
+    message: 'Errore risolto con successo',
+    errorId,
+    resolvedAt: updates.resolvedAt,
+  });
+}, 'Errors/Resolve');

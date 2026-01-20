@@ -2,38 +2,23 @@
  * Philips Hue Connection Status Route
  * Check if Hue is connected and return connection info
  * Includes both local and remote connection status
- * ✅ Protected by Auth0 authentication
  */
 
-import { NextResponse } from 'next/server';
-import { getHueStatus, getConnectionMode, hasRemoteTokens } from '@/lib/hue/hueLocalHelper';
-import { auth0 } from '@/lib/auth0';
+import { withAuthAndErrorHandler, success } from '@/lib/core';
+import { getHueStatus, hasRemoteTokens } from '@/lib/hue/hueLocalHelper';
 import { determineConnectionMode } from '@/lib/hue/hueConnectionStrategy';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request) {
-  try {
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
-    }
+export const GET = withAuthAndErrorHandler(async () => {
+  const localStatus = await getHueStatus();
+  const hasRemote = await hasRemoteTokens();
+  const connectionMode = await determineConnectionMode();
 
-    const localStatus = await getHueStatus();
-    const hasRemote = await hasRemoteTokens();
-    const connectionMode = await determineConnectionMode();
-
-    return NextResponse.json({
-      ...localStatus,
-      connection_mode: connectionMode,
-      local_connected: localStatus.connected,
-      remote_connected: hasRemote,
-    });
-  } catch (error) {
-    console.error('❌ Hue status error:', error);
-    return NextResponse.json(
-      { error: error.message, connected: false, connection_mode: 'disconnected' },
-      { status: 500 }
-    );
-  }
-}
+  return success({
+    ...localStatus,
+    connection_mode: connectionMode,
+    local_connected: localStatus.connected,
+    remote_connected: hasRemote,
+  });
+}, 'Hue/Status');

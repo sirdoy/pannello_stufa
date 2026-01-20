@@ -1,3 +1,23 @@
+/**
+ * API Route: Scheduler Check
+ *
+ * GET /api/scheduler/check?secret=xxx
+ *
+ * Cron job endpoint for automated stove control:
+ * - Checks scheduler mode (manual/auto/semi-manual)
+ * - Gets current stove status
+ * - Applies scheduled ignition/shutdown
+ * - Tracks maintenance hours
+ * - Syncs Netatmo valves
+ * - Sends notifications
+ *
+ * Protected: Requires CRON_SECRET
+ */
+
+import {
+  withCronSecret,
+  success,
+} from '@/lib/core';
 import { adminDbGet, adminDbSet, sendNotificationToUser } from '@/lib/firebaseAdmin';
 import { canIgnite, trackUsageHours } from '@/lib/maintenanceServiceAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
@@ -22,17 +42,17 @@ export const dynamic = 'force-dynamic';
 
 /**
  * Timeout for internal API calls (8 seconds)
- * Reduces risk of hitting Vercel's 60s function timeout
  */
 const INTERNAL_API_TIMEOUT = 8000;
 
-/**
- * Fetch with timeout for internal API calls
- * @param {string} url - URL to fetch
- * @param {object} options - Fetch options
- * @param {number} timeout - Timeout in milliseconds
- * @returns {Promise<Response>}
- */
+// =============================================================================
+// HELPER FUNCTIONS
+// =============================================================================
+
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 async function fetchWithTimeout(url, options = {}, timeout = INTERNAL_API_TIMEOUT) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -50,13 +70,8 @@ async function fetchWithTimeout(url, options = {}, timeout = INTERNAL_API_TIMEOU
   }
 }
 
-/**
- * Helper: Invia notifica push per azione scheduler
- * Controlla preferenze utente prima di inviare
- */
 async function sendSchedulerNotification(action, details = '') {
   try {
-    // Get admin user ID from env (opzionale)
     const adminUserId = process.env.ADMIN_USER_ID;
 
     if (!adminUserId) {
@@ -64,7 +79,6 @@ async function sendSchedulerNotification(action, details = '') {
       return;
     }
 
-    // Check user preferences
     const actionType = action === 'IGNITE' ? 'ignition' : 'shutdown';
     const shouldSend = await shouldSendSchedulerNotification(adminUserId, actionType);
 
@@ -99,23 +113,15 @@ async function sendSchedulerNotification(action, details = '') {
   }
 }
 
-/**
- * Helper: Calibra valvole Netatmo ogni 24 ore
- * Controlla timestamp ultima calibrazione e calibra se necessario
- * Changed from 12h to 24h interval as per user request
- */
 async function calibrateValvesIfNeeded(baseUrl) {
   try {
-    // Get last calibration timestamp (use environment-aware path)
     const calibrationPath = getEnvironmentPath('netatmo/lastAutoCalibration');
     const lastCalibration = await adminDbGet(calibrationPath);
 
     const now = Date.now();
-    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; // 24 ore in millisecondi
+    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 
-    // Check if 24 hours have passed since last calibration
     if (lastCalibration && (now - lastCalibration) < TWENTY_FOUR_HOURS) {
-      // Not yet time for calibration
       return {
         calibrated: false,
         reason: 'too_soon',
@@ -125,12 +131,9 @@ async function calibrateValvesIfNeeded(baseUrl) {
 
     console.log('🔧 Avvio calibrazione automatica giornaliera valvole Netatmo...');
 
-    // Call calibration endpoint with timeout
     const response = await fetchWithTimeout(`${baseUrl}${NETATMO_ROUTES.calibrate}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
     });
 
     const data = await response.json();
@@ -144,9 +147,7 @@ async function calibrateValvesIfNeeded(baseUrl) {
       };
     }
 
-    // Update last calibration timestamp
     await adminDbSet(calibrationPath, now);
-
     console.log('✅ Calibrazione automatica giornaliera valvole completata');
 
     return {
@@ -165,395 +166,375 @@ async function calibrateValvesIfNeeded(baseUrl) {
   }
 }
 
-export async function GET(req) {
-  try {
-    const secret = req.nextUrl.searchParams.get('secret');
-    if (secret !== process.env.CRON_SECRET) {
-      return new Response('Unauthorized', {status: 401});
-    }
+async function sendMaintenanceNotificationIfNeeded(notificationData) {
+  const { notificationLevel, percentage, remainingHours } = notificationData;
 
-    // Save cron health timestamp
-    const cronHealthTimestamp = new Date().toISOString();
-    console.log(`🔄 Tentativo salvataggio Firebase cronHealth/lastCall: ${cronHealthTimestamp}`);
+  let emoji, urgency, body, priority;
+
+  if (notificationLevel >= 100) {
+    emoji = '🚨';
+    urgency = 'URGENTE';
+    body = 'Manutenzione richiesta! L\'accensione è bloccata fino alla pulizia.';
+    priority = 'high';
+  } else if (notificationLevel >= 90) {
+    emoji = '⚠️';
+    urgency = 'Attenzione';
+    body = `Solo ${remainingHours.toFixed(1)}h rimanenti prima della pulizia richiesta`;
+    priority = 'high';
+  } else {
+    emoji = 'ℹ️';
+    urgency = 'Promemoria';
+    body = `${remainingHours.toFixed(1)}h rimanenti prima della manutenzione (${percentage.toFixed(0)}%)`;
+    priority = 'normal';
+  }
+
+  const notification = {
+    title: `${emoji} ${urgency} Manutenzione`,
+    body,
+    icon: '/icons/icon-192.png',
+    priority,
+    data: {
+      type: 'maintenance',
+      percentage: String(percentage),
+      remainingHours: String(remainingHours),
+      url: '/stove/maintenance',
+    },
+  };
+
+  const adminUserId = process.env.ADMIN_USER_ID;
+  if (adminUserId) {
     try {
-      await adminDbSet('cronHealth/lastCall', cronHealthTimestamp);
-      console.log(`✅ Cron health updated: ${cronHealthTimestamp}`);
+      const shouldSend = await shouldSendMaintenanceNotification(adminUserId, notificationLevel);
+
+      if (shouldSend) {
+        await sendNotificationToUser(adminUserId, notification);
+        console.log(`✅ Notifica manutenzione inviata: ${notificationLevel}%`);
+      } else {
+        console.log(`⏭️ Maintenance notification skipped (user preferences): ${notificationLevel}%`);
+      }
     } catch (error) {
-      console.error('❌ ERRORE salvataggio cronHealth:', error);
-      throw error;
+      console.error('❌ Errore invio notifica manutenzione:', error);
     }
-
-    // Check if scheduler mode is enabled
-    const modeData = (await adminDbGet('schedules-v2/mode')) || { enabled: false, semiManual: false };
-    const schedulerEnabled = modeData.enabled;
-
-    if (!schedulerEnabled) {
-      return Response.json({
-        status: 'MODALITA_MANUALE',
-        message: 'Scheduler disattivato - modalità manuale attiva'
-      });
-    }
-
-    // Check if in semi-manual mode
-    if (modeData.semiManual) {
-      // Verifica se è arrivato il momento di tornare in automatico
-      const returnToAutoAt = modeData.returnToAutoAt ? new Date(modeData.returnToAutoAt) : null;
-      const now = new Date();
-
-      if (returnToAutoAt && now >= returnToAutoAt) {
-        // È il momento di tornare in automatico
-        console.log('Ritorno in modalità automatica dallo stato semi-manuale');
-        // Non chiamiamo clearSemiManualMode qui, lo facciamo dopo aver applicato il cambio
-      } else {
-        // Siamo ancora in semi-manuale, non fare niente
-        return Response.json({
-          status: 'MODALITA_SEMI_MANUALE',
-          message: 'Modalità semi-manuale attiva - in attesa del prossimo cambio scheduler',
-          returnToAutoAt: modeData.returnToAutoAt
-        });
-      }
-    }
-
-    // Fuso orario Europe/Rome con Intl
-    const now = new Date();
-    const formatter = new Intl.DateTimeFormat('it-IT', {
-      timeZone: 'Europe/Rome',
-      weekday: 'long',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
-    const [dayPart, timePart] = formatter.formatToParts(now).reduce((acc, part) => {
-      if (part.type === 'weekday') acc[0] = part.value;
-      if (part.type === 'hour') acc[1] = part.value;
-      if (part.type === 'minute') acc[2] = part.value;
-      return acc;
-    }, []);
-
-    const giorno = capitalize(dayPart);
-    const ora = `${timePart}:${formatter.formatToParts(now).find(p => p.type === 'minute').value}`;
-    const currentMinutes = parseInt(timePart) * 60 + parseInt(formatter.formatToParts(now).find(p => p.type === 'minute').value);
-
-    // Get active schedule ID
-    const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId') || 'default';
-    const intervals = await adminDbGet(`schedules-v2/schedules/${activeScheduleId}/slots/${giorno}`);
-    if (!intervals) {
-      return Response.json({message: 'Nessuno scheduler', giorno, ora});
-    }
-    const active = intervals.find(({start, end}) => {
-      const [sh, sm] = start.split(':').map(Number);
-      const [eh, em] = end.split(':').map(Number);
-      const startMin = sh * 60 + sm;
-      const endMin = eh * 60 + em;
-      return currentMinutes >= startMin && currentMinutes < endMin;
-    });
-
-    const baseUrl = `${req.nextUrl.protocol}//${req.headers.get('host')}`;
-    console.log(baseUrl);
-
-    // OPTIMIZATION: Fetch stove data in parallel - direct calls to stoveApi (no HTTP)
-    let currentStatus = 'unknown';
-    let isOn = false;
-    let currentFanLevel = 3; // Default safe value
-    let currentPowerLevel = 2; // Default safe value
-    let statusFetchFailed = false;
-
-    try {
-      const [statusData, fanData, powerData] = await Promise.all([
-        getStoveStatus().catch(err => {
-          console.error('❌ Status fetch failed:', err.message);
-          return null;
-        }),
-        getFanLevel().catch(err => {
-          console.error('❌ Fan fetch failed:', err.message);
-          return null;
-        }),
-        getPowerLevel().catch(err => {
-          console.error('❌ Power fetch failed:', err.message);
-          return null;
-        })
-      ]);
-
-      // Parse status with error handling
-      if (statusData) {
-        currentStatus = statusData.StatusDescription || 'unknown';
-        isOn = currentStatus.includes('WORK') || currentStatus.includes('START');
-      } else {
-        console.warn('⚠️ Status unavailable - will skip state-changing actions for safety');
-        statusFetchFailed = true;
-      }
-
-      // Parse fan with error handling
-      if (fanData) {
-        currentFanLevel = fanData.Result ?? 3;
-      } else {
-        console.warn('⚠️ Fan level unavailable - using default: 3');
-      }
-
-      // Parse power with error handling
-      if (powerData) {
-        currentPowerLevel = powerData.Result ?? 2;
-      } else {
-        console.warn('⚠️ Power level unavailable - using default: 2');
-      }
-
-    } catch (error) {
-      console.error('❌ Critical error fetching stove data:', error.message);
-      statusFetchFailed = true;
-      // Continue with defaults - cron health is more important than stove control
-    }
-
-    // Auto-calibrate Netatmo valves every 24 hours (run async, don't wait)
-    calibrateValvesIfNeeded(baseUrl).then((result) => {
-      if (result.calibrated) {
-        console.log(`✅ Calibrazione automatica completata - prossima calibrazione: ${result.nextCalibration}`);
-      }
-    }).catch(err => console.error('❌ Errore calibrazione:', err));
-
-    // Track maintenance hours (automatic tracking based on WORK/MODULATION status)
-    const maintenanceTrack = await trackUsageHours(currentStatus);
-    if (maintenanceTrack.tracked) {
-      console.log(`✅ Maintenance tracked: +${maintenanceTrack.elapsedMinutes}min → ${maintenanceTrack.newCurrentHours.toFixed(2)}h total`);
-
-      // Send maintenance notification if threshold reached
-      if (maintenanceTrack.notificationData) {
-        const { notificationLevel, percentage, remainingHours } = maintenanceTrack.notificationData;
-
-        let emoji, urgency, body, priority;
-
-        if (notificationLevel >= 100) {
-          emoji = '🚨';
-          urgency = 'URGENTE';
-          body = 'Manutenzione richiesta! L\'accensione è bloccata fino alla pulizia.';
-          priority = 'high';
-        } else if (notificationLevel >= 90) {
-          emoji = '⚠️';
-          urgency = 'Attenzione';
-          body = `Solo ${remainingHours.toFixed(1)}h rimanenti prima della pulizia richiesta`;
-          priority = 'high';
-        } else {
-          emoji = 'ℹ️';
-          urgency = 'Promemoria';
-          body = `${remainingHours.toFixed(1)}h rimanenti prima della manutenzione (${percentage.toFixed(0)}%)`;
-          priority = 'normal';
-        }
-
-        const notification = {
-          title: `${emoji} ${urgency} Manutenzione`,
-          body,
-          icon: '/icons/icon-192.png',
-          priority,
-          data: {
-            type: 'maintenance',
-            percentage: String(percentage),
-            remainingHours: String(remainingHours),
-            url: '/stove/maintenance',
-          },
-        };
-
-        const adminUserId = process.env.ADMIN_USER_ID;
-        if (adminUserId) {
-          try {
-            // Check user preferences
-            const shouldSend = await shouldSendMaintenanceNotification(adminUserId, notificationLevel);
-
-            if (shouldSend) {
-              await sendNotificationToUser(adminUserId, notification);
-              console.log(`✅ Notifica manutenzione inviata: ${notificationLevel}%`);
-            } else {
-              console.log(`⏭️ Maintenance notification skipped (user preferences): ${notificationLevel}%`);
-            }
-          } catch (error) {
-            console.error('❌ Errore invio notifica manutenzione:', error);
-          }
-        }
-      }
-    }
-
-    // Fan and power already fetched in parallel above
-
-    // console.log(statusJson);
-    // console.log(isOn);
-    // console.log(currentFanLevel);
-    // console.log(currentPowerLevel);
-    // console.log(`Scheduler attivo: ${active ? 'SI' : 'NO'}`);
-    // console.log(`Attivo: ${JSON.stringify(active)}`);
-
-    let changeApplied = false;
-
-    if (active) {
-      if (!isOn) {
-        // CRITICAL: Safety check - skip ignition if status fetch failed
-        if (statusFetchFailed) {
-          console.log('⚠️ Accensione schedulata saltata - stato stufa sconosciuto (safety)');
-          return Response.json({
-            status: 'STATUS_UNAVAILABLE',
-            message: 'Accensione schedulata saltata per sicurezza - stato stufa non disponibile',
-            schedulerEnabled: true,
-            giorno,
-            ora
-          });
-        }
-
-        // Check maintenance ONLY before scheduled ignition
-        const maintenanceAllowed = await canIgnite();
-        if (!maintenanceAllowed) {
-          console.log('⚠️ Accensione schedulata bloccata - manutenzione richiesta');
-          return Response.json({
-            status: 'MANUTENZIONE_RICHIESTA',
-            message: 'Accensione schedulata bloccata - manutenzione stufa richiesta',
-            schedulerEnabled: true,
-            giorno,
-            ora
-          });
-        }
-
-        // Double-check: Re-fetch status immediately before ignition to prevent race condition
-        try {
-          const confirmStatusData = await getStoveStatus();
-          if (confirmStatusData) {
-            const confirmStatus = confirmStatusData.StatusDescription || 'unknown';
-            if (confirmStatus.includes('WORK') || confirmStatus.includes('START')) {
-              console.log('⚠️ Race condition detected: Stove already on (confirmed) - skipping ignition');
-              return Response.json({
-                status: 'ALREADY_ON',
-                message: 'Stufa già accesa - race condition evitato',
-                schedulerEnabled: true,
-                giorno,
-                ora
-              });
-            }
-          }
-        } catch (confirmError) {
-          console.error('❌ Confirmation status fetch failed:', confirmError.message);
-          // Safety: Skip ignition if we can't confirm status
-          return Response.json({
-            status: 'CONFIRMATION_FAILED',
-            message: 'Accensione schedulata saltata - impossibile confermare stato stufa',
-            schedulerEnabled: true,
-            giorno,
-            ora
-          });
-        }
-
-        try {
-          await igniteStove(active.power);
-          changeApplied = true;
-
-          // Update Firebase state for real-time sync
-          await updateStoveState({
-            status: 'START',
-            statusDescription: 'Avvio automatico',
-            fanLevel: active.fan,
-            powerLevel: active.power,
-            source: 'scheduler',
-          });
-
-          // Send notification
-          await sendSchedulerNotification('IGNITE', `Stufa accesa automaticamente alle ${ora} (P${active.power}, V${active.fan})`);
-
-          // Sync living room valve with stove (set to low temp when stove is ON)
-          syncLivingRoomWithStove(true).then((result) => {
-            if (result.synced) {
-              console.log(`✅ Netatmo stove sync: Living room set to ${result.temperature}°C`);
-            }
-          }).catch(err => console.error('❌ Netatmo stove sync error:', err));
-        } catch (error) {
-          console.error('❌ Failed to ignite stove:', error.message);
-        }
-      }
-      if (currentPowerLevel !== active.power) {
-        try {
-          await setPowerLevel(active.power);
-          changeApplied = true;
-
-          // Update Firebase state for real-time sync
-          await updateStoveState({
-            powerLevel: active.power,
-            source: 'scheduler',
-          });
-        } catch (error) {
-          console.error('❌ Failed to set power:', error.message);
-        }
-      }
-      if (currentFanLevel !== active.fan) {
-        try {
-          await setFanLevel(active.fan);
-          changeApplied = true;
-
-          // Update Firebase state for real-time sync
-          await updateStoveState({
-            fanLevel: active.fan,
-            source: 'scheduler',
-          });
-        } catch (error) {
-          console.error('❌ Failed to set fan:', error.message);
-        }
-      }
-    } else {
-      if (isOn) {
-        try {
-          await shutdownStove();
-          changeApplied = true;
-
-          // Update Firebase state for real-time sync
-          await updateStoveState({
-            status: 'STANDBY',
-            statusDescription: 'Spegnimento automatico',
-            source: 'scheduler',
-          });
-
-          // Send notification
-          await sendSchedulerNotification('SHUTDOWN', `Stufa spenta automaticamente alle ${ora}`);
-
-          // Sync living room valve with stove (return to schedule when stove is OFF)
-          syncLivingRoomWithStove(false).then((result) => {
-            if (result.synced) {
-              console.log(`✅ Netatmo stove sync: Living room returned to schedule`);
-            }
-          }).catch(err => console.error('❌ Netatmo stove sync error:', err));
-        } catch (error) {
-          console.error('❌ Failed to shutdown stove:', error.message);
-        }
-      }
-    }
-
-    // Se è stato applicato un cambio e eravamo in semi-manuale, torniamo in automatico
-    if (changeApplied && modeData.semiManual) {
-      // Clear semi-manual mode usando Admin SDK
-      await adminDbSet('schedules-v2/mode', {
-        enabled: modeData.enabled || false,
-        semiManual: false,
-        lastUpdated: new Date().toISOString()
-      });
-      console.log('Cambio scheduler applicato - modalità semi-manuale disattivata');
-    }
-
-    return Response.json({
-      status: active ? 'ACCESA' : 'SPENTA',
-      schedulerEnabled: true,
-      giorno,
-      ora,
-      activeSchedule: active || null,
-    });
-  } catch (error) {
-    console.error('❌ Errore nel cron:', error);
-    console.error('❌ Stack trace:', error.stack);
-    console.error('❌ Error details:', {
-      message: error.message,
-      name: error.name,
-      code: error.code
-    });
-
-    // Return detailed error in development/debug
-    return Response.json({
-      error: 'Internal server error',
-      message: error.message,
-      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    }, { status: 500 });
   }
 }
 
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
+async function fetchStoveData() {
+  let currentStatus = 'unknown';
+  let isOn = false;
+  let currentFanLevel = 3;
+  let currentPowerLevel = 2;
+  let statusFetchFailed = false;
+
+  try {
+    const [statusData, fanData, powerData] = await Promise.all([
+      getStoveStatus().catch(err => {
+        console.error('❌ Status fetch failed:', err.message);
+        return null;
+      }),
+      getFanLevel().catch(err => {
+        console.error('❌ Fan fetch failed:', err.message);
+        return null;
+      }),
+      getPowerLevel().catch(err => {
+        console.error('❌ Power fetch failed:', err.message);
+        return null;
+      })
+    ]);
+
+    if (statusData) {
+      currentStatus = statusData.StatusDescription || 'unknown';
+      isOn = currentStatus.includes('WORK') || currentStatus.includes('START');
+    } else {
+      console.warn('⚠️ Status unavailable - will skip state-changing actions for safety');
+      statusFetchFailed = true;
+    }
+
+    if (fanData) {
+      currentFanLevel = fanData.Result ?? 3;
+    } else {
+      console.warn('⚠️ Fan level unavailable - using default: 3');
+    }
+
+    if (powerData) {
+      currentPowerLevel = powerData.Result ?? 2;
+    } else {
+      console.warn('⚠️ Power level unavailable - using default: 2');
+    }
+
+  } catch (error) {
+    console.error('❌ Critical error fetching stove data:', error.message);
+    statusFetchFailed = true;
+  }
+
+  return { currentStatus, isOn, currentFanLevel, currentPowerLevel, statusFetchFailed };
 }
+
+async function handleIgnition(active, ora) {
+  try {
+    const confirmStatusData = await getStoveStatus();
+    if (confirmStatusData) {
+      const confirmStatus = confirmStatusData.StatusDescription || 'unknown';
+      if (confirmStatus.includes('WORK') || confirmStatus.includes('START')) {
+        console.log('⚠️ Race condition detected: Stove already on (confirmed) - skipping ignition');
+        return { skipped: true, reason: 'ALREADY_ON' };
+      }
+    }
+  } catch (confirmError) {
+    console.error('❌ Confirmation status fetch failed:', confirmError.message);
+    return { skipped: true, reason: 'CONFIRMATION_FAILED' };
+  }
+
+  try {
+    await igniteStove(active.power);
+
+    await updateStoveState({
+      status: 'START',
+      statusDescription: 'Avvio automatico',
+      fanLevel: active.fan,
+      powerLevel: active.power,
+      source: 'scheduler',
+    });
+
+    await sendSchedulerNotification('IGNITE', `Stufa accesa automaticamente alle ${ora} (P${active.power}, V${active.fan})`);
+
+    syncLivingRoomWithStove(true).then((result) => {
+      if (result.synced) {
+        console.log(`✅ Netatmo stove sync: Living room set to ${result.temperature}°C`);
+      }
+    }).catch(err => console.error('❌ Netatmo stove sync error:', err));
+
+    return { success: true };
+  } catch (error) {
+    console.error('❌ Failed to ignite stove:', error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+async function handleShutdown(ora) {
+  try {
+    await shutdownStove();
+
+    await updateStoveState({
+      status: 'STANDBY',
+      statusDescription: 'Spegnimento automatico',
+      source: 'scheduler',
+    });
+
+    await sendSchedulerNotification('SHUTDOWN', `Stufa spenta automaticamente alle ${ora}`);
+
+    syncLivingRoomWithStove(false).then((result) => {
+      if (result.synced) {
+        console.log(`✅ Netatmo stove sync: Living room returned to schedule`);
+      }
+    }).catch(err => console.error('❌ Netatmo stove sync error:', err));
+
+    return { success: true };
+  } catch (error) {
+    console.error('❌ Failed to shutdown stove:', error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+async function handleLevelChanges(active, currentPowerLevel, currentFanLevel) {
+  let changeApplied = false;
+
+  if (currentPowerLevel !== active.power) {
+    try {
+      await setPowerLevel(active.power);
+      await updateStoveState({ powerLevel: active.power, source: 'scheduler' });
+      changeApplied = true;
+    } catch (error) {
+      console.error('❌ Failed to set power:', error.message);
+    }
+  }
+
+  if (currentFanLevel !== active.fan) {
+    try {
+      await setFanLevel(active.fan);
+      await updateStoveState({ fanLevel: active.fan, source: 'scheduler' });
+      changeApplied = true;
+    } catch (error) {
+      console.error('❌ Failed to set fan:', error.message);
+    }
+  }
+
+  return changeApplied;
+}
+
+// =============================================================================
+// MAIN ROUTE HANDLER
+// =============================================================================
+
+/**
+ * GET /api/scheduler/check
+ * Main cron handler for scheduler automation
+ * Protected: Requires CRON_SECRET
+ */
+export const GET = withCronSecret(async (request) => {
+  // Save cron health timestamp
+  const cronHealthTimestamp = new Date().toISOString();
+  console.log(`🔄 Tentativo salvataggio Firebase cronHealth/lastCall: ${cronHealthTimestamp}`);
+
+  await adminDbSet('cronHealth/lastCall', cronHealthTimestamp);
+  console.log(`✅ Cron health updated: ${cronHealthTimestamp}`);
+
+  // Check if scheduler mode is enabled
+  const modeData = (await adminDbGet('schedules-v2/mode')) || { enabled: false, semiManual: false };
+  const schedulerEnabled = modeData.enabled;
+
+  if (!schedulerEnabled) {
+    return success({
+      status: 'MODALITA_MANUALE',
+      message: 'Scheduler disattivato - modalità manuale attiva'
+    });
+  }
+
+  // Check if in semi-manual mode
+  if (modeData.semiManual) {
+    const returnToAutoAt = modeData.returnToAutoAt ? new Date(modeData.returnToAutoAt) : null;
+    const now = new Date();
+
+    if (!returnToAutoAt || now < returnToAutoAt) {
+      return success({
+        status: 'MODALITA_SEMI_MANUALE',
+        message: 'Modalità semi-manuale attiva - in attesa del prossimo cambio scheduler',
+        returnToAutoAt: modeData.returnToAutoAt
+      });
+    }
+    console.log('Ritorno in modalità automatica dallo stato semi-manuale');
+  }
+
+  // Parse current time in Rome timezone
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat('it-IT', {
+    timeZone: 'Europe/Rome',
+    weekday: 'long',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+  const parts = formatter.formatToParts(now);
+  const dayPart = parts.find(p => p.type === 'weekday')?.value || '';
+  const hourPart = parts.find(p => p.type === 'hour')?.value || '00';
+  const minutePart = parts.find(p => p.type === 'minute')?.value || '00';
+
+  const giorno = capitalize(dayPart);
+  const ora = `${hourPart}:${minutePart}`;
+  const currentMinutes = parseInt(hourPart) * 60 + parseInt(minutePart);
+
+  // Get active schedule
+  const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId') || 'default';
+  const intervals = await adminDbGet(`schedules-v2/schedules/${activeScheduleId}/slots/${giorno}`);
+
+  if (!intervals) {
+    return success({ message: 'Nessuno scheduler', giorno, ora });
+  }
+
+  const active = intervals.find(({ start, end }) => {
+    const [sh, sm] = start.split(':').map(Number);
+    const [eh, em] = end.split(':').map(Number);
+    const startMin = sh * 60 + sm;
+    const endMin = eh * 60 + em;
+    return currentMinutes >= startMin && currentMinutes < endMin;
+  });
+
+  const baseUrl = `${request.nextUrl.protocol}//${request.headers.get('host')}`;
+
+  // Fetch stove data in parallel
+  const { currentStatus, isOn, currentFanLevel, currentPowerLevel, statusFetchFailed } = await fetchStoveData();
+
+  // Auto-calibrate Netatmo valves (async, don't wait)
+  calibrateValvesIfNeeded(baseUrl).then((result) => {
+    if (result.calibrated) {
+      console.log(`✅ Calibrazione automatica completata - prossima: ${result.nextCalibration}`);
+    }
+  }).catch(err => console.error('❌ Errore calibrazione:', err));
+
+  // Track maintenance hours
+  const maintenanceTrack = await trackUsageHours(currentStatus);
+  if (maintenanceTrack.tracked) {
+    console.log(`✅ Maintenance tracked: +${maintenanceTrack.elapsedMinutes}min → ${maintenanceTrack.newCurrentHours.toFixed(2)}h total`);
+
+    if (maintenanceTrack.notificationData) {
+      await sendMaintenanceNotificationIfNeeded(maintenanceTrack.notificationData);
+    }
+  }
+
+  let changeApplied = false;
+
+  if (active) {
+    if (!isOn) {
+      // Safety check - skip ignition if status fetch failed
+      if (statusFetchFailed) {
+        console.log('⚠️ Accensione schedulata saltata - stato stufa sconosciuto (safety)');
+        return success({
+          status: 'STATUS_UNAVAILABLE',
+          message: 'Accensione schedulata saltata per sicurezza - stato stufa non disponibile',
+          schedulerEnabled: true,
+          giorno,
+          ora
+        });
+      }
+
+      // Check maintenance before scheduled ignition
+      const maintenanceAllowed = await canIgnite();
+      if (!maintenanceAllowed) {
+        console.log('⚠️ Accensione schedulata bloccata - manutenzione richiesta');
+        return success({
+          status: 'MANUTENZIONE_RICHIESTA',
+          message: 'Accensione schedulata bloccata - manutenzione stufa richiesta',
+          schedulerEnabled: true,
+          giorno,
+          ora
+        });
+      }
+
+      const ignitionResult = await handleIgnition(active, ora);
+      if (ignitionResult.skipped) {
+        return success({
+          status: ignitionResult.reason,
+          message: ignitionResult.reason === 'ALREADY_ON'
+            ? 'Stufa già accesa - race condition evitato'
+            : 'Accensione schedulata saltata - impossibile confermare stato stufa',
+          schedulerEnabled: true,
+          giorno,
+          ora
+        });
+      }
+      if (ignitionResult.success) {
+        changeApplied = true;
+      }
+    }
+
+    // Handle power/fan level changes
+    const levelsChanged = await handleLevelChanges(active, currentPowerLevel, currentFanLevel);
+    changeApplied = changeApplied || levelsChanged;
+
+  } else {
+    // No active schedule - turn off if on
+    if (isOn) {
+      const shutdownResult = await handleShutdown(ora);
+      if (shutdownResult.success) {
+        changeApplied = true;
+      }
+    }
+  }
+
+  // If change was applied and we were in semi-manual, return to automatic
+  if (changeApplied && modeData.semiManual) {
+    await adminDbSet('schedules-v2/mode', {
+      enabled: modeData.enabled || false,
+      semiManual: false,
+      lastUpdated: new Date().toISOString()
+    });
+    console.log('Cambio scheduler applicato - modalità semi-manuale disattivata');
+  }
+
+  return success({
+    status: active ? 'ACCESA' : 'SPENTA',
+    schedulerEnabled: true,
+    giorno,
+    ora,
+    activeSchedule: active || null,
+  });
+}, 'Scheduler/Check');

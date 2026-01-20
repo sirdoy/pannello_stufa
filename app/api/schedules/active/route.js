@@ -4,8 +4,14 @@
  * POST: Set active schedule (atomic operation)
  */
 
-import { NextResponse } from 'next/server';
-import { auth0 } from '@/lib/auth0';
+import {
+  withAuthAndErrorHandler,
+  success,
+  badRequest,
+  notFound,
+  parseJsonOrThrow,
+  validateRequired,
+} from '@/lib/core';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
@@ -14,80 +20,45 @@ export const dynamic = 'force-dynamic';
  * GET /api/schedules/active
  * Get current active schedule ID
  */
-export async function GET(request) {
-  try {
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
-    }
-    const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId');
+export const GET = withAuthAndErrorHandler(async () => {
+  const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId');
 
-    if (!activeScheduleId) {
-      return NextResponse.json(
-        { error: 'No active schedule set' },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({ activeScheduleId });
-  } catch (error) {
-    console.error('❌ Error fetching active schedule ID:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch active schedule ID', details: error.message },
-      { status: 500 }
-    );
+  if (!activeScheduleId) {
+    return notFound('No active schedule set');
   }
-}
+
+  return success({ activeScheduleId });
+}, 'Schedules/GetActive');
 
 /**
  * POST /api/schedules/active
  * Set active schedule (atomic operation with validation)
- *
  * Body: { scheduleId: string }
  */
-export async function POST(request) {
-  try {
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
-    }
+export const POST = withAuthAndErrorHandler(async (request) => {
+  const body = await parseJsonOrThrow(request);
+  const { scheduleId } = body;
 
-    const body = await request.json();
-    const { scheduleId } = body;
-
-    // Validation: scheduleId required
-    if (!scheduleId || typeof scheduleId !== 'string') {
-      return NextResponse.json(
-        { error: 'Schedule ID is required' },
-        { status: 400 }
-      );
-    }
-
-    // Validation: schedule must exist
-    const schedule = await adminDbGet(`schedules-v2/schedules/${scheduleId}`);
-    if (!schedule) {
-      return NextResponse.json(
-        { error: `Schedule '${scheduleId}' does not exist` },
-        { status: 404 }
-      );
-    }
-
-    // Atomic update of active schedule ID
-    await adminDbSet('schedules-v2/activeScheduleId', scheduleId);
-
-    console.log(`✅ Active schedule changed to: ${scheduleId} (${schedule.name})`);
-
-    return NextResponse.json({
-      success: true,
-      activeScheduleId: scheduleId,
-      scheduleName: schedule.name,
-      message: `Schedule '${schedule.name}' is now active`
-    });
-  } catch (error) {
-    console.error('❌ Error setting active schedule:', error);
-    return NextResponse.json(
-      { error: 'Failed to set active schedule', details: error.message },
-      { status: 500 }
-    );
+  // Validation: scheduleId required
+  validateRequired(scheduleId, 'scheduleId');
+  if (typeof scheduleId !== 'string') {
+    return badRequest('Schedule ID must be a string');
   }
-}
+
+  // Validation: schedule must exist
+  const schedule = await adminDbGet(`schedules-v2/schedules/${scheduleId}`);
+  if (!schedule) {
+    return notFound(`Schedule '${scheduleId}' does not exist`);
+  }
+
+  // Atomic update of active schedule ID
+  await adminDbSet('schedules-v2/activeScheduleId', scheduleId);
+
+  console.log(`Active schedule changed to: ${scheduleId} (${schedule.name})`);
+
+  return success({
+    activeScheduleId: scheduleId,
+    scheduleName: schedule.name,
+    message: `Schedule '${schedule.name}' is now active`
+  });
+}, 'Schedules/SetActive');

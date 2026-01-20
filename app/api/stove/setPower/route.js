@@ -1,5 +1,4 @@
-import { NextResponse } from 'next/server';
-import { auth0 } from '@/lib/auth0';
+import { withAuthAndErrorHandler, success, parseJsonOrThrow } from '@/lib/core';
 import { setPowerLevel, getStoveStatus } from '@/lib/stoveApi';
 import { getFullSchedulerMode, setSemiManualMode, getNextScheduledChange } from '@/lib/schedulerService';
 import { updateStoveState } from '@/lib/stoveStateService';
@@ -10,59 +9,39 @@ import { updateStoveState } from '@/lib/stoveStateService';
  * Supports sandbox mode in localhost
  * Protected: Requires Auth0 authentication
  */
-export async function POST(req) {
-  try {
-    const session = await auth0.getSession(req);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
-    }
-    const { level, source } = await req.json();
-    const data = await setPowerLevel(level);
+export const POST = withAuthAndErrorHandler(async (request) => {
+  const { level, source } = await parseJsonOrThrow(request);
+  const data = await setPowerLevel(level);
 
-    // Update Firebase state for real-time sync
-    await updateStoveState({
-      powerLevel: level,
-      source: source || 'manual',
-    });
+  // Update Firebase state for real-time sync
+  await updateStoveState({
+    powerLevel: level,
+    source: source || 'manual',
+  });
 
-    // Attiva semi-manuale SOLO se source='manual', stufa accesa, scheduler attivo e non già in semi-manuale
-    if (source === 'manual') {
-      // Verifica se stufa è accesa
-      const statusData = await getStoveStatus();
-      const isOn = statusData?.StatusDescription?.includes('WORK') || statusData?.StatusDescription?.includes('START');
+  // Attiva semi-manuale SOLO se source='manual', stufa accesa, scheduler attivo e non già in semi-manuale
+  if (source === 'manual') {
+    // Verifica se stufa è accesa
+    const statusData = await getStoveStatus();
+    const isOn = statusData?.StatusDescription?.includes('WORK') || statusData?.StatusDescription?.includes('START');
 
-      if (isOn) {
-        const mode = await getFullSchedulerMode();
-        if (mode.enabled && !mode.semiManual) {
-          const nextChange = await getNextScheduledChange();
-          // Attiva semi-manuale anche senza prossimo evento (rimane attivo fino a reset manuale)
-          await setSemiManualMode(nextChange);
-          console.log('Modalità semi-manuale attivata per comando manuale di cambio potenza');
+    if (isOn) {
+      const mode = await getFullSchedulerMode();
+      if (mode.enabled && !mode.semiManual) {
+        const nextChange = await getNextScheduledChange();
+        // Attiva semi-manuale anche senza prossimo evento (rimane attivo fino a reset manuale)
+        await setSemiManualMode(nextChange);
+        console.log('Modalità semi-manuale attivata per comando manuale di cambio potenza');
 
-          return Response.json({
-            ...data,
-            modeChanged: true,
-            newMode: 'semi-manual',
-            returnToAutoAt: nextChange
-          });
-        }
+        return success({
+          ...data,
+          modeChanged: true,
+          newMode: 'semi-manual',
+          returnToAutoAt: nextChange
+        });
       }
     }
-
-    return Response.json(data);
-  } catch (error) {
-    console.error('[Stove API] SetPower error:', error.message);
-
-    if (error.message === 'STOVE_TIMEOUT') {
-      return Response.json(
-        { error: 'Stufa non raggiungibile', code: 'TIMEOUT' },
-        { status: 504 }
-      );
-    }
-
-    return Response.json(
-      { error: 'Errore di connessione', code: 'NETWORK_ERROR' },
-      { status: 500 }
-    );
   }
-}
+
+  return success(data);
+}, 'Stove/SetPower');

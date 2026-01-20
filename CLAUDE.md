@@ -260,6 +260,6 @@ ADMIN_USER_ID=auth0|xxx
 
 ---
 
-**Version**: 1.66.0
+**Version**: 1.68.0
 **Last Updated**: 2026-01-20
 

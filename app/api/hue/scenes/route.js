@@ -1,58 +1,40 @@
 /**
  * Philips Hue Scenes Route
  * GET: Fetch all scenes
- * ✅ Protected by Auth0 authentication
  */
 
-import { NextResponse } from 'next/server';
+import {
+  withAuthAndErrorHandler,
+  success,
+  hueNotConnected,
+  hueNotOnLocalNetwork,
+} from '@/lib/core';
 import HueApi from '@/lib/hue/hueApi';
 import { getHueConnection } from '@/lib/hue/hueLocalHelper';
-import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request) {
+export const GET = withAuthAndErrorHandler(async () => {
+  // Get Hue connection from Firebase
+  const connection = await getHueConnection();
+
+  if (!connection) {
+    return hueNotConnected();
+  }
+
   try {
-    const session = await auth0.getSession(request);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
-    }
-
-    // Get Hue connection from Firebase
-    const connection = await getHueConnection();
-
-    if (!connection) {
-      return NextResponse.json({
-        error: 'NOT_CONNECTED',
-        message: 'Hue bridge not connected. Please pair first.',
-        reconnect: true,
-      }, { status: 401 });
-    }
-
     // Fetch scenes from Hue API
     const hueApi = new HueApi(connection.bridgeIp, connection.username);
     const response = await hueApi.getScenes();
 
-    return NextResponse.json({
+    return success({
       scenes: response.data || [],
-      success: true,
     });
-
-  } catch (error) {
-    console.error('❌ Hue scenes fetch error:', error);
-
+  } catch (err) {
     // Handle network timeout (not on local network)
-    if (error.message === 'NETWORK_TIMEOUT') {
-      return NextResponse.json({
-        error: 'NOT_ON_LOCAL_NETWORK',
-        message: 'Bridge Hue non raggiungibile. Assicurati di essere sulla stessa rete locale del bridge.',
-        reconnect: false,
-      }, { status: 503 });
+    if (err.message === 'NETWORK_TIMEOUT') {
+      return hueNotOnLocalNetwork();
     }
-
-    return NextResponse.json(
-      { error: error.message },
-      { status: 500 }
-    );
+    throw err;
   }
-}
+}, 'Hue/Scenes');

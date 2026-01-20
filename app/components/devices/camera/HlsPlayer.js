@@ -25,9 +25,12 @@ export default function HlsPlayer({ src, poster, className = '', onError, showCo
   const [error, setError] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Detect iOS (Safari on iPhone/iPad)
-  const isIOS = typeof navigator !== 'undefined' &&
-    /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  // Detect mobile devices (iOS and Android)
+  const isMobile = typeof navigator !== 'undefined' && (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    /Android/i.test(navigator.userAgent) ||
+    (navigator.maxTouchPoints && navigator.maxTouchPoints > 2)
+  );
 
   // Handle fullscreen changes (including exit via Esc key)
   useEffect(() => {
@@ -66,34 +69,55 @@ export default function HlsPlayer({ src, poster, className = '', onError, showCo
     if (!container || !video) return;
 
     try {
-      // iOS Safari: Use video element's webkitEnterFullscreen
-      // (iOS doesn't support Fullscreen API on containers, only on video)
-      if (isIOS && video.webkitEnterFullscreen) {
-        if (!isFullscreen) {
-          video.webkitEnterFullscreen();
-        }
-        // iOS exits fullscreen via native UI, no programmatic exit needed
-        return;
-      }
+      // Check if already in fullscreen
+      const inFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
 
-      // Desktop/Android: Use container fullscreen
-      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        // Enter fullscreen
-        if (container.requestFullscreen) {
-          await container.requestFullscreen();
-        } else if (container.webkitRequestFullscreen) {
-          await container.webkitRequestFullscreen();
-        }
-      } else {
+      if (inFullscreen) {
         // Exit fullscreen
         if (document.exitFullscreen) {
           await document.exitFullscreen();
         } else if (document.webkitExitFullscreen) {
           await document.webkitExitFullscreen();
         }
+        return;
+      }
+
+      // Mobile devices: Use video element fullscreen (more reliable)
+      if (isMobile) {
+        // Try iOS Safari method first
+        if (video.webkitEnterFullscreen) {
+          video.webkitEnterFullscreen();
+          return;
+        }
+        // Try standard Fullscreen API on video element (Android)
+        if (video.requestFullscreen) {
+          await video.requestFullscreen();
+          return;
+        }
+        if (video.webkitRequestFullscreen) {
+          await video.webkitRequestFullscreen();
+          return;
+        }
+      }
+
+      // Desktop: Use container fullscreen for better UI control
+      if (container.requestFullscreen) {
+        await container.requestFullscreen();
+      } else if (container.webkitRequestFullscreen) {
+        await container.webkitRequestFullscreen();
       }
     } catch (err) {
       console.error('Fullscreen error:', err);
+      // Fallback: try video element fullscreen if container failed
+      try {
+        if (video.requestFullscreen) {
+          await video.requestFullscreen();
+        } else if (video.webkitRequestFullscreen) {
+          await video.webkitRequestFullscreen();
+        }
+      } catch (fallbackErr) {
+        console.error('Fullscreen fallback error:', fallbackErr);
+      }
     }
   };
 

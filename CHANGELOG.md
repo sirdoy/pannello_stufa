@@ -5,6 +5,19 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.69.1] - 2026-01-20
+
+### Mobile Camera Fullscreen Fix
+
+#### Fixed
+
+- **Camera live fullscreen on mobile devices** - Fullscreen now works on both iOS and Android
+  - Improved mobile device detection (iOS, Android, touch devices)
+  - Uses video element fullscreen on mobile instead of container fullscreen
+  - Added fallback chain: `webkitEnterFullscreen` → `requestFullscreen` → `webkitRequestFullscreen`
+
+---
+
 ## [1.68.1] - 2026-01-20
 
 ### iOS Camera Fullscreen Fix

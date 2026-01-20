@@ -5,6 +5,20 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.68.1] - 2026-01-20
+
+### iOS Camera Fullscreen Fix
+
+#### Fixed
+
+- **Camera live fullscreen on iOS Safari** - The fullscreen button now works on iOS
+  - iOS Safari doesn't support Fullscreen API on container elements, only on `<video>` directly
+  - Added iOS detection using user agent
+  - Uses `video.webkitEnterFullscreen()` for iOS Safari
+  - Added iOS-specific events: `webkitbeginfullscreen` and `webkitendfullscreen`
+
+---
+
 ## [1.68.0] - 2026-01-20
 
 ### Backend Refactor Phase 2

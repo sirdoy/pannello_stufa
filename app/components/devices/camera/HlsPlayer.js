@@ -25,27 +25,59 @@ export default function HlsPlayer({ src, poster, className = '', onError, showCo
   const [error, setError] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  // Detect iOS (Safari on iPhone/iPad)
+  const isIOS = typeof navigator !== 'undefined' &&
+    /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
   // Handle fullscreen changes (including exit via Esc key)
   useEffect(() => {
+    const video = videoRef.current;
+
     const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
+      setIsFullscreen(!!document.fullscreenElement || !!document.webkitFullscreenElement);
     };
+
+    // iOS Safari uses different events on the video element
+    const handleIOSFullscreenBegin = () => setIsFullscreen(true);
+    const handleIOSFullscreenEnd = () => setIsFullscreen(false);
 
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
 
+    // iOS-specific events on video element
+    if (video) {
+      video.addEventListener('webkitbeginfullscreen', handleIOSFullscreenBegin);
+      video.addEventListener('webkitendfullscreen', handleIOSFullscreenEnd);
+    }
+
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      if (video) {
+        video.removeEventListener('webkitbeginfullscreen', handleIOSFullscreenBegin);
+        video.removeEventListener('webkitendfullscreen', handleIOSFullscreenEnd);
+      }
     };
   }, []);
 
   const toggleFullscreen = async () => {
     const container = containerRef.current;
-    if (!container) return;
+    const video = videoRef.current;
+    if (!container || !video) return;
 
     try {
-      if (!document.fullscreenElement) {
+      // iOS Safari: Use video element's webkitEnterFullscreen
+      // (iOS doesn't support Fullscreen API on containers, only on video)
+      if (isIOS && video.webkitEnterFullscreen) {
+        if (!isFullscreen) {
+          video.webkitEnterFullscreen();
+        }
+        // iOS exits fullscreen via native UI, no programmatic exit needed
+        return;
+      }
+
+      // Desktop/Android: Use container fullscreen
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         // Enter fullscreen
         if (container.requestFullscreen) {
           await container.requestFullscreen();

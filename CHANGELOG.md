@@ -5,6 +5,130 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.62.0] - 2026-01-20
+
+### Advanced PWA APIs
+
+**Obiettivo**: Added Screen Wake Lock, Vibration API, Geofencing, Persistent Storage, Periodic Background Sync, and Web Share API for comprehensive PWA capabilities.
+
+#### Added
+
+- **Screen Wake Lock**: Keep screen on during active stove monitoring
+  - `lib/pwa/wakeLock.js` - Wake Lock service
+  - `lib/hooks/useWakeLock.js` - React hook for wake lock management
+- **Vibration API**: Haptic feedback for critical alerts
+  - `lib/pwa/vibration.js` - Vibration service with predefined patterns
+  - Patterns: SHORT, SUCCESS, WARNING, ERROR, CRITICAL, NOTIFICATION
+- **Geofencing**: Location-based automation for stove control
+  - `lib/pwa/geofencing.js` - Geofence service with Haversine distance calculation
+  - `lib/hooks/useGeofencing.js` - React hook for location monitoring
+  - Actions: Auto-shutdown when leaving, auto-ignite when arriving
+- **Persistent Storage**: Request persistent storage for IndexedDB
+  - `lib/pwa/persistentStorage.js` - Persistent storage request service
+  - Prevents browser from clearing cached data
+- **Periodic Background Sync**: Check stove status periodically with app closed
+  - `lib/pwa/periodicSync.js` - Periodic sync registration service
+  - `lib/hooks/usePeriodicSync.js` - React hook for periodic sync management
+  - Service Worker handler for periodic status checks
+- **Web Share API**: Share stove/thermostat status with others
+  - `lib/pwa/webShare.js` - Web Share service
+  - Share functions for stove, thermostat, device summary, and app
+
+#### Changed
+
+- **app/sw.ts**: Added Periodic Background Sync handlers and message handlers
+- **app/components/PWAInitializer.js**: Added persistent storage request on app load
+
+#### Files Added
+
+- `lib/pwa/wakeLock.js` - Screen Wake Lock service
+- `lib/pwa/vibration.js` - Vibration API service
+- `lib/pwa/geofencing.js` - Geofencing service
+- `lib/pwa/persistentStorage.js` - Persistent Storage service
+- `lib/pwa/periodicSync.js` - Periodic Background Sync service
+- `lib/pwa/webShare.js` - Web Share API service
+- `lib/hooks/useWakeLock.js` - Wake Lock hook
+- `lib/hooks/useGeofencing.js` - Geofencing hook
+- `lib/hooks/usePeriodicSync.js` - Periodic Sync hook
+- `lib/pwa/__tests__/wakeLock.test.js` - Unit tests
+- `lib/pwa/__tests__/vibration.test.js` - Unit tests
+- `lib/pwa/__tests__/geofencing.test.js` - Unit tests
+- `lib/pwa/__tests__/webShare.test.js` - Unit tests
+- `lib/pwa/__tests__/persistentStorage.test.js` - Unit tests
+
+#### Browser Support
+
+| Feature | Chrome | Firefox | Safari | Edge |
+|---------|--------|---------|--------|------|
+| Wake Lock | ✅ | ❌ | ✅ | ✅ |
+| Vibration | ✅ | ✅ | ❌ | ✅ |
+| Geolocation | ✅ | ✅ | ✅ | ✅ |
+| Persistent Storage | ✅ | ✅ | ✅ | ✅ |
+| Periodic Sync | ✅ | ❌ | ❌ | ✅ |
+| Web Share | ✅ | ✅ | ✅ | ✅ |
+
+---
+
+## [1.61.0] - 2026-01-19
+
+### Advanced PWA Features
+
+**Obiettivo**: Added Background Sync for offline commands, App Badges for notifications, and enhanced offline experience showing cached device states.
+
+#### Added
+
+- **Background Sync**: Queue stove commands (ignite, shutdown, set-power) when offline and automatically execute when connection is restored
+  - `lib/pwa/backgroundSync.js` - Background Sync service with retry logic
+  - `lib/hooks/useBackgroundSync.js` - React hook for UI integration
+  - Service Worker sync event handlers for automatic execution
+- **App Badges**: Show notification count on app icon (errors + maintenance alerts)
+  - `lib/pwa/badgeService.js` - Badge management service
+  - Service Worker badge updates on push notifications
+- **Offline State Cache**: Cache device states in IndexedDB for offline viewing
+  - `lib/pwa/offlineStateCache.js` - State caching service with formatters
+  - Service Worker intercepts API responses for automatic caching
+- **Enhanced Offline Page**: Shows cached device states instead of generic offline message
+  - Last known stove state (temperature, status, power)
+  - Last known thermostat state (temperature, setpoint)
+  - Pending command queue with sync status
+  - Stale data warnings
+- **OfflineBanner Component**: Persistent connection status indicator
+  - Shows offline duration and pending command count
+  - Reconnection success animation
+  - Synced command notifications
+- **useOnlineStatus Hook**: Connection monitoring with automatic refresh
+  - `lib/hooks/useOnlineStatus.js` - Online status detection
+- **IndexedDB Utility**: Promise-based IndexedDB wrapper
+  - `lib/pwa/indexedDB.js` - CRUD operations for PWA storage
+
+#### Changed
+
+- **app/sw.ts**: Added Background Sync handlers, badge management, device state caching, and message handlers
+- **app/offline/page.js**: Complete rewrite with cached device state display
+- **app/components/ui/index.js**: Added OfflineBanner export
+
+#### Files Added
+
+- `lib/pwa/indexedDB.js` - IndexedDB utility library
+- `lib/pwa/backgroundSync.js` - Background Sync service
+- `lib/pwa/badgeService.js` - App Badge service
+- `lib/pwa/offlineStateCache.js` - Offline state cache service
+- `lib/hooks/useOnlineStatus.js` - Online status hook
+- `lib/hooks/useBackgroundSync.js` - Background Sync hook
+- `app/components/ui/OfflineBanner.js` - Offline banner component
+- `lib/pwa/__tests__/backgroundSync.test.js` - Unit tests
+- `lib/pwa/__tests__/offlineStateCache.test.js` - Unit tests
+- `lib/hooks/__tests__/useOnlineStatus.test.js` - Unit tests
+
+#### Notes
+
+- Background Sync API has limited browser support; fallback provided for unsupported browsers
+- Badge API works on Chrome, Edge, and Safari (iOS 16.4+)
+- Device states are automatically cached by Service Worker on API responses
+- Commands are queued in IndexedDB and survive browser restart
+
+---
+
 ## [1.60.0] - 2026-01-19
 
 ### PWA Enhancement with Serwist

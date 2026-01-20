@@ -41,3 +41,6 @@ export { default as Divider } from './Divider';
 
 // Misc components (v1.31.0+)
 export { default as EmptyState } from './EmptyState';
+
+// PWA components (v1.61.0+)
+export { default as OfflineBanner } from './OfflineBanner';

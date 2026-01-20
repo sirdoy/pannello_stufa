@@ -5,6 +5,8 @@ import { VersionProvider } from '@/app/context/VersionContext';
 import { ThemeProvider } from '@/app/context/ThemeContext';
 import { PageTransitionProvider } from '@/app/context/PageTransitionContext';
 import ThemeScript from './ThemeScript';
+import { OfflineBanner } from '@/app/components/ui';
+import PWAInitializer from './PWAInitializer';
 
 /**
  * Wrapper per tutti i provider client-side
@@ -17,6 +19,8 @@ export default function ClientProviders({ children }) {
       <ThemeProvider>
         <PageTransitionProvider>
           <VersionProvider>
+            <PWAInitializer />
+            <OfflineBanner fixed showPendingCount />
             {children}
           </VersionProvider>
         </PageTransitionProvider>

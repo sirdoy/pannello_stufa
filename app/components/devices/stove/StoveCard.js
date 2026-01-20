@@ -25,6 +25,8 @@ import Toast from '../../ui/Toast';
 import LoadingOverlay from '../../ui/LoadingOverlay';
 import CardAccentBar from '../../ui/CardAccentBar';
 import { Divider, Heading, Text, EmptyState } from '../../ui';
+import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
+import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
 
 /**
  * StoveCard - Complete stove control for homepage
@@ -34,6 +36,10 @@ export default function StoveCard() {
   const router = useRouter();
   const { checkVersion } = useVersion();
   const { user } = useUser();
+
+  // PWA Background Sync
+  const { isOnline } = useOnlineStatus();
+  const { queueStoveCommand, hasPendingCommands, pendingCommands, lastSyncedCommand } = useBackgroundSync();
 
   const [status, setStatus] = useState('...');
   const [fanLevel, setFanLevel] = useState(null);
@@ -211,6 +217,21 @@ export default function StoveCard() {
       setInitialLoading(false);
     }
   }, [checkVersion, user?.sub]);
+
+  // Show toast when background sync command completes
+  useEffect(() => {
+    if (lastSyncedCommand) {
+      const actionLabels = {
+        'stove/ignite': '🔥 Stufa accesa (comando sincronizzato)',
+        'stove/shutdown': '🌙 Stufa spenta (comando sincronizzato)',
+        'stove/set-power': '⚡ Potenza impostata (comando sincronizzato)',
+      };
+      const message = actionLabels[lastSyncedCommand.endpoint] || 'Comando sincronizzato';
+      setToast({ message, variant: 'success' });
+      // Refresh status after sync
+      fetchStatusAndUpdate();
+    }
+  }, [lastSyncedCommand]);
 
   // Adaptive polling (active only if Firebase fails or for validation)
   useEffect(() => {
@@ -480,6 +501,16 @@ export default function StoveCard() {
   }));
 
   const handleIgnite = async () => {
+    // If offline, queue command for background sync
+    if (!isOnline) {
+      await queueStoveCommand('ignite', { source: 'manual' });
+      setToast({
+        message: 'Comando in coda - verrà eseguito al ritorno della connessione',
+        variant: 'warning',
+      });
+      return;
+    }
+
     setLoadingMessage('Accensione stufa...');
     setLoading(true);
     await fetch(STOVE_ROUTES.ignite, {
@@ -493,6 +524,16 @@ export default function StoveCard() {
   };
 
   const handleShutdown = async () => {
+    // If offline, queue command for background sync
+    if (!isOnline) {
+      await queueStoveCommand('shutdown', { source: 'manual' });
+      setToast({
+        message: 'Comando in coda - verrà eseguito al ritorno della connessione',
+        variant: 'warning',
+      });
+      return;
+    }
+
     setLoadingMessage('Spegnimento stufa...');
     setLoading(true);
     await fetch(STOVE_ROUTES.shutdown, {
@@ -771,6 +812,18 @@ export default function StoveCard() {
                   icon="⚠️"
                   title="Connessione Firebase Interrotta"
                   description="Aggiornamenti in tempo reale non disponibili. Dati aggiornati ogni 10 secondi."
+                />
+              </div>
+            )}
+
+            {/* Pending commands banner */}
+            {hasPendingCommands && (
+              <div className="mb-6">
+                <Banner
+                  variant="info"
+                  icon="⏳"
+                  title="Comandi in attesa"
+                  description={`${pendingCommands.length} ${pendingCommands.length === 1 ? 'comando' : 'comandi'} in coda. Verranno eseguiti al ripristino della connessione.`}
                 />
               </div>
             )}

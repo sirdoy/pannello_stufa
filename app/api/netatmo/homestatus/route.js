@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
+import { getEnvironmentPath } from '@/lib/environmentHelper';
 import { auth0 } from '@/lib/auth0';
 
 // Force dynamic rendering for Firebase operations
@@ -28,8 +29,9 @@ export async function GET(request) {
       return Response.json({ error: message, reconnect }, { status });
     }
 
-    // Get home_id from Firebase
-    const homeId = await adminDbGet('netatmo/home_id');
+    // Get home_id from Firebase (use environment-aware path)
+    const homeIdPath = getEnvironmentPath('netatmo/home_id');
+    const homeId = await adminDbGet(homeIdPath);
     if (!homeId) {
       return Response.json({
         error: 'home_id non trovato. Chiama prima /api/netatmo/homesdata'
@@ -42,14 +44,16 @@ export async function GET(request) {
     // Extract temperature data
     const temperatures = NETATMO_API.extractTemperatures(homeStatus);
 
-    // Get topology to enrich data with room/module names
-    const topology = await adminDbGet('netatmo/topology');
+    // Get topology to enrich data with room/module names (use environment-aware path)
+    const topologyPath = getEnvironmentPath('netatmo/topology');
+    const topology = await adminDbGet(topologyPath);
 
     // Extract modules with battery/status info (includes ALL devices)
     const modulesWithStatus = NETATMO_API.extractModulesWithStatus(homeStatus, topology);
 
-    // Get stove sync status for living room indicator
-    const stoveSyncData = await adminDbGet('netatmo/stoveSync');
+    // Get stove sync status for living room indicator (use environment-aware path)
+    const stoveSyncPath = getEnvironmentPath('netatmo/stoveSync');
+    const stoveSyncData = await adminDbGet(stoveSyncPath);
 
     // Enrich with room names (filter out undefined values for Firebase)
     const enrichedRooms = temperatures.map(temp => {
@@ -106,7 +110,8 @@ export async function GET(request) {
     statusToSave.hasLowBattery = hasLowBattery;
     statusToSave.hasCriticalBattery = hasCriticalBattery;
 
-    await adminDbSet('netatmo/currentStatus', statusToSave);
+    const currentStatusPath = getEnvironmentPath('netatmo/currentStatus');
+    await adminDbSet(currentStatusPath, statusToSave);
 
     const response = {
       rooms: enrichedRooms,

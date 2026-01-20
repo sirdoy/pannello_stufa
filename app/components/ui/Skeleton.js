@@ -379,6 +379,51 @@ Skeleton.Scheduler = function SkeletonScheduler() {
 };
 
 /**
+ * Skeleton.CameraCard - Skeleton for CameraCard component
+ */
+Skeleton.CameraCard = function SkeletonCameraCard() {
+  return (
+    <Skeleton.Card className="overflow-hidden">
+      <div className="p-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-8 w-8 rounded-full" />
+            <Skeleton className="h-7 w-28" />
+          </div>
+          <Skeleton className="h-6 w-16 rounded-full" />
+        </div>
+
+        {/* Toggle buttons */}
+        <div className="flex gap-2 mb-3">
+          <Skeleton className="h-8 w-20 rounded-lg" />
+          <Skeleton className="h-8 w-16 rounded-lg" />
+        </div>
+
+        {/* Video preview area */}
+        <div className="relative aspect-video bg-slate-800 [html:not(.dark)_&]:bg-slate-200 rounded-xl overflow-hidden mb-4">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Skeleton className="h-12 w-12 rounded-full" />
+          </div>
+          {/* Status badge */}
+          <Skeleton className="absolute top-2 right-2 h-6 w-14 rounded-full" />
+          {/* Fullscreen/Refresh button */}
+          <Skeleton className="absolute bottom-2 right-2 h-9 w-9 rounded-full" />
+        </div>
+
+        {/* Camera info */}
+        <div className="flex items-center gap-2 mb-4">
+          <Skeleton className="h-4 w-32" />
+        </div>
+
+        {/* Footer action */}
+        <Skeleton className="h-10 w-full rounded-xl" />
+      </div>
+    </Skeleton.Card>
+  );
+};
+
+/**
  * Skeleton.LogEntry - Skeleton for single log entry
  */
 Skeleton.LogEntry = function SkeletonLogEntry() {

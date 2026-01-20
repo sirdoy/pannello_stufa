@@ -18,6 +18,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { getFullSchedulerMode, getNextScheduledAction } from '@/lib/schedulerService';
+import { getNetatmoAuthUrl } from '@/lib/netatmoCredentials';
 import { clearSemiManualMode } from '@/lib/schedulerApiClient';
 import { STOVE_ROUTES } from '@/lib/routes';
 import { logStoveAction, logNetatmoAction, logSchedulerAction } from '@/lib/logService';
@@ -70,10 +71,8 @@ export default function StovePanel() {
 
   const handleNetatmoLogin = async () => {
     await logNetatmoAction.connect();
-    const clientId = process.env.NEXT_PUBLIC_NETATMO_CLIENT_ID;
-    const redirectUri = process.env.NEXT_PUBLIC_NETATMO_REDIRECT_URI;
-    const netatmoUrl = `https://api.netatmo.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read_thermostat&state=manual`;
-    window.location.href = netatmoUrl;
+    // Use centralized OAuth URL with all scopes
+    window.location.href = getNetatmoAuthUrl('stove');
   };
 
   const fetchFanLevel = async () => {

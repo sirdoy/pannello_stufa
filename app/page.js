@@ -1,6 +1,7 @@
 import { auth0 } from '@/lib/auth0';
 import StoveCard from './components/devices/stove/StoveCard';
 import ThermostatCard from './components/devices/thermostat/ThermostatCard';
+import CameraCard from './components/devices/camera/CameraCard';
 import LightsCard from './components/devices/lights/LightsCard';
 import SandboxToggle from './components/sandbox/SandboxToggle';
 import { getEnabledDevicesForUser } from '@/lib/devicePreferencesService';
@@ -58,6 +59,13 @@ export default async function Home() {
               return (
                 <div key={device.id} className="animate-spring-in" style={{ animationDelay }}>
                   <LightsCard />
+                </div>
+              );
+            }
+            if (device.id === 'camera') {
+              return (
+                <div key={device.id} className="animate-spring-in" style={{ animationDelay }}>
+                  <CameraCard />
                 </div>
               );
             }

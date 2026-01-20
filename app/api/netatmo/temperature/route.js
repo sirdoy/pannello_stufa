@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { adminDbGet, adminDbUpdate } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
+import { getEnvironmentPath } from '@/lib/environmentHelper';
 import { auth0 } from '@/lib/auth0';
 
 // Force dynamic rendering for Firebase operations
@@ -29,12 +30,13 @@ export async function POST(request) {
     }
 
     // Step 2: recupera device_id e module_id da Firebase (o fallisce)
-    const configSnap = await adminDbGet('netatmo/deviceConfig');
-    if (!configSnap.exists()) {
+    const deviceConfigPath = getEnvironmentPath('netatmo/deviceConfig');
+    const configData = await adminDbGet(deviceConfigPath);
+    if (!configData) {
       return Response.json({ error: 'Configurazione dispositivo mancante' }, { status: 400 });
     }
 
-    const { device_id, module_id } = configSnap.val();
+    const { device_id, module_id } = configData;
     if (!device_id || !module_id) {
       return Response.json({ error: 'device_id o module_id mancanti' }, { status: 400 });
     }
@@ -64,8 +66,8 @@ export async function POST(request) {
     }
 
     // ✅ Salva la temperatura in Firebase
-    const tempRef = ref(db, 'netatmo/temperature');
-    await update(tempRef, {
+    const temperaturePath = getEnvironmentPath('netatmo/temperature');
+    await adminDbUpdate(temperaturePath, {
       value: temperature,
       timestamp: Date.now(),
     });

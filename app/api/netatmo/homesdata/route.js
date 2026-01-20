@@ -3,6 +3,7 @@ import { auth0 } from '@/lib/auth0';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
+import { getEnvironmentPath } from '@/lib/environmentHelper';
 
 // Force dynamic rendering for Firebase operations
 export const dynamic = 'force-dynamic';
@@ -36,14 +37,17 @@ export async function GET(request) {
     const home = homesData[0]; // Usually single home
 
     // Save home_id to Firebase for future use
-    await adminDbSet('netatmo/home_id', home.id);
+    // Use environment-aware path (dev/netatmo in localhost, netatmo in production)
+    const homeIdPath = getEnvironmentPath('netatmo/home_id');
+    await adminDbSet(homeIdPath, home.id);
 
     // Parse and structure data
     const rooms = NETATMO_API.parseRooms(homesData);
     const modules = NETATMO_API.parseModules(homesData);
 
     // Save topology to Firebase using Admin SDK
-    await adminDbSet('netatmo/topology', {
+    const topologyPath = getEnvironmentPath('netatmo/topology');
+    await adminDbSet(topologyPath, {
       home_id: home.id,
       home_name: home.name,
       rooms,

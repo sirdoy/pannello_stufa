@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { NETATMO_ROUTES } from '@/lib/routes';
+import { getNetatmoAuthUrl } from '@/lib/netatmoCredentials';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
 import RoomSelector from '../../ui/RoomSelector';
@@ -273,9 +274,8 @@ export default function ThermostatCard() {
   }
 
   const handleAuth = () => {
-    const clientId = process.env.NEXT_PUBLIC_NETATMO_CLIENT_ID;
-    const redirectUri = process.env.NEXT_PUBLIC_NETATMO_REDIRECT_URI;
-    window.location.href = `https://api.netatmo.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read_thermostat%20write_thermostat&state=manual`;
+    // Use centralized OAuth URL with all scopes
+    window.location.href = getNetatmoAuthUrl('thermostat');
   };
 
   // Build props for DeviceCard

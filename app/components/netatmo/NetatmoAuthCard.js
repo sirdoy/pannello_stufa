@@ -1,21 +1,11 @@
 'use client';
 
 import { Card, Button, Heading, Text } from '@/app/components/ui';
-import { getNetatmoCredentialsClient } from '@/lib/netatmoCredentials';
+import { getNetatmoAuthUrl } from '@/lib/netatmoCredentials';
 
 export default function NetatmoAuthCard() {
   const handleConnect = () => {
-    const credentials = getNetatmoCredentialsClient();
-    const scope = 'read_thermostat write_thermostat';
-
-    if (!credentials.clientId || !credentials.redirectUri) {
-      alert('Configurazione Netatmo mancante. Verifica le variabili d\'ambiente.');
-      return;
-    }
-
-    const authUrl = `https://api.netatmo.com/oauth2/authorize?client_id=${credentials.clientId}&redirect_uri=${encodeURIComponent(credentials.redirectUri)}&scope=${encodeURIComponent(scope)}&state=random_state`;
-
-    window.location.href = authUrl;
+    window.location.href = getNetatmoAuthUrl('netatmo_auth');
   };
 
   return (
@@ -60,6 +50,10 @@ export default function NetatmoAuthCard() {
             <li className="flex items-start gap-2">
               <Text variant="sage" size="sm" as="span" className="mt-0.5">✓</Text>
               <Text variant="secondary" size="sm" as="span">Creare automazioni stufa ↔ valvole (prossimamente)</Text>
+            </li>
+            <li className="flex items-start gap-2">
+              <Text variant="sage" size="sm" as="span" className="mt-0.5">✓</Text>
+              <Text variant="secondary" size="sm" as="span">Visualizzare videocamere Welcome/Presence e eventi</Text>
             </li>
           </ul>
         </div>

@@ -5,6 +5,105 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.66.0] - 2026-01-20
+
+### Camera Live Streaming & Events Page
+
+**Obiettivo**: Enhance camera integration with HLS live video streaming, dedicated events page with virtual scrolling, and video playback.
+
+#### Added
+
+- **HLS Live Streaming**
+  - `HlsPlayer` component with hls.js for HLS stream support
+  - Native Safari HLS support with hls.js fallback for other browsers
+  - Fullscreen toggle with proper exit handling (Esc key)
+  - Auto-play with mute for live streams
+
+- **Dedicated Events Page** (`/camera/events`)
+  - `CameraEventsPage` with virtual scrolling (20 events at a time)
+  - Events grouped by date with event count per day
+  - Camera filter buttons for multi-camera setups
+  - IntersectionObserver for infinite scroll loading
+  - Total events count display in header
+
+- **Event Preview Modal** (`EventPreviewModal`)
+  - Video playback with HLS for recorded events
+  - Snapshot preview before playing video
+  - Event details: type, sub-type (person/animal/vehicle), timestamp
+  - HTML tag stripping for clean message display
+
+- **API Enhancements**
+  - `GET /api/netatmo/camera/events` - Unified events endpoint returning all events (up to 200)
+  - `getEventVideoUrl()` - Generate HLS video URL from event
+  - `getEventVideoThumbnail()` - Get video thumbnail URL
+  - `getSubTypeName()` / `getSubTypeIcon()` - Outdoor camera event subtypes
+
+#### Changed
+
+- `lib/netatmoCameraApi.js` - Added video URL helpers and sub-type functions
+- `lib/routes.js` - Added `allEvents` route for unified events fetch
+- `CameraDashboard` - Added "Vedi tutti gli eventi" navigation link
+- Event list items now show snapshot previews and play overlay for video events
+
+#### Technical Notes
+
+- Virtual scrolling approach: API returns all events (~200 max), client renders progressively
+- This avoids complex server-side pagination with Netatmo's `geteventsuntil` API limitations
+- HLS.js loaded dynamically only when needed (code splitting)
+
+---
+
+## [1.65.0] - 2026-01-20
+
+### Netatmo Camera Integration
+
+**Obiettivo**: Integrate Netatmo Security cameras (Welcome, Presence) as a new device in the smart home control panel.
+
+#### Added
+
+- **Camera Device Type**: New device in the device registry
+  - Device type: `camera` with ocean color theme
+  - Features: snapshot display, event tracking
+
+- **Camera API Wrapper** (`lib/netatmoCameraApi.js`)
+  - `getCamerasData()` - Fetch camera list from Netatmo API
+  - `getCameraEvents()` - Fetch camera events
+  - `parseCameras()` - Parse camera data with Firebase-safe filtering
+  - `parsePersons()` - Parse recognized persons
+  - `parseEvents()` - Parse camera events
+  - `getSnapshotUrl()` - Get VPN or local snapshot URL
+  - Helper functions for event types and camera types
+
+- **API Routes**
+  - `GET /api/netatmo/camera` - List all cameras with status
+  - `GET /api/netatmo/camera/[cameraId]/snapshot` - Get snapshot URL
+  - `GET /api/netatmo/camera/[cameraId]/events` - Get camera events
+
+- **UI Components**
+  - `CameraCard` - Homepage device card with snapshot preview and recent events
+  - `CameraDashboard` - Full camera page at `/camera` with camera selector and event history
+  - Camera selector for multiple cameras
+  - Event icons for person, human, animal, vehicle detection
+  - Status badges (Active/Inactive)
+
+- **OAuth Scope Update**
+  - Extended Netatmo OAuth scopes: `read_camera access_camera`
+  - Updated `NetatmoAuthCard` with camera features description
+
+#### Changed
+
+- `lib/devices/deviceTypes.js` - Added CAMERA device type with ocean color
+- `lib/routes.js` - Added camera API routes (CAMERA_ROUTES)
+- `app/page.js` - Added CameraCard rendering in homepage
+
+#### Notes
+
+- **OAuth Re-authorization Required**: Users need to re-authorize Netatmo after this update to grant camera access
+- Camera types supported: NACamera (Welcome/Indoor), NOC (Presence/Outdoor), NDB (Doorbell)
+- Event types: person, human, animal, vehicle, movement, outdoor
+
+---
+
 ## [1.64.0] - 2026-01-20
 
 ### Stove Command Center Redesign

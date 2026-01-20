@@ -1,15 +1,15 @@
 'use client';
 
 import { useState, useEffect, useRef, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Card, Button, Skeleton, ErrorAlert, Banner, Heading, Text } from '@/app/components/ui';
 import RoomCard from '@/app/components/netatmo/RoomCard';
-import NetatmoAuthCard from '@/app/components/netatmo/NetatmoAuthCard';
 import BatteryWarning, { ModuleBatteryList } from '@/app/components/devices/thermostat/BatteryWarning';
 import { NETATMO_ROUTES } from '@/lib/routes';
 
 function NetatmoContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [connected, setConnected] = useState(false);
@@ -180,26 +180,10 @@ function NetatmoContent() {
     return <Skeleton.NetatmoPage />;
   }
 
-  // Show auth card if not connected
+  // Redirect to /netatmo if not connected
   if (!connected) {
-    return (
-      <>
-        {/* Show OAuth error banner if present */}
-        {oauthError && (
-          <div className="max-w-2xl mx-auto px-4 pt-8">
-            <Banner
-              variant="error"
-              icon="❌"
-              title="Errore Connessione Netatmo"
-              description={oauthError}
-              dismissible
-              onDismiss={() => setOauthError(null)}
-            />
-          </div>
-        )}
-        <NetatmoAuthCard />
-      </>
-    );
+    router.replace('/netatmo');
+    return <Skeleton.NetatmoPage />;
   }
 
   // Show error if topology failed to load

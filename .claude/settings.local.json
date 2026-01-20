@@ -106,7 +106,18 @@
       "Bash(npm install)",
       "Bash(npx prettier --check app/globals.css)",
       "Bash(npx prettier --write app/globals.css)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "mcp__deepwiki__read_wiki_contents",
+      "mcp__deepwiki__ask_question",
+      "Bash(npx tsc:*)",
+      "Bash(git reset:*)",
+      "Bash(wc:*)",
+      "Bash(for link in \"docs/quick-start.md\" \"docs/architecture.md\" \"docs/troubleshooting.md\" \"docs/api-routes.md\" \"docs/patterns.md\" \"docs/data-flow.md\" \"docs/design-system.md\" \"docs/ui-components.md\" \"docs/ui-modal.md\" \"docs/page-transitions.md\" \"docs/ios18-liquid-glass.md\" \"docs/components/navigation.md\" \"docs/firebase.md\" \"docs/firebase-security.md\" \"docs/systems/maintenance.md\" \"docs/systems/monitoring.md\" \"docs/systems/errors.md\" \"docs/systems/notifications.md\" \"docs/setup/netatmo-setup.md\" \"docs/setup/hue-setup.md\" \"docs/pwa.md\" \"docs/testing.md\" \"docs/E2E-TESTING.md\" \"docs/visual-screenshots.md\" \"docs/sandbox.md\" \"docs/versioning.md\" \"docs/deployment.md\" \"docs/stove-status-mapping.md\" \"docs/netatmo-fixes-2025-12-28.md\" \"docs/multi-schedule-migration.md\" \"docs/component-consolidation-report.md\" \"docs/research/\" \"docs/plans/\" \"docs/reports/\" \"docs/security/\" \"docs/rollback/\")",
+      "Bash(do if [ -e \"$link\" ])",
+      "Bash(then echo \"OK: $link\")",
+      "Bash(else echo \"BROKEN: $link\")",
+      "Bash(fi)",
+      "Bash(SANDBOX_MODE=true TEST_MODE=true timeout 15 npm run dev:*)"
     ],
     "deny": [],
     "ask": []

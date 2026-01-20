@@ -2,6 +2,7 @@ import { adminDbGet, adminDbPush } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
 import { auth0 } from '@/lib/auth0';
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
+import { getEnvironmentPath } from '@/lib/environmentHelper';
 import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
 
 // Force dynamic rendering for Firebase operations
@@ -35,8 +36,9 @@ export async function POST(request) {
       return Response.json({ error: message, reconnect }, { status });
     }
 
-    // Get home_id from Firebase
-    const homeId = await adminDbGet('netatmo/home_id');
+    // Get home_id from Firebase (use environment-aware path)
+    const homeIdPath = getEnvironmentPath('netatmo/home_id');
+    const homeId = await adminDbGet(homeIdPath);
     if (!homeId) {
       return Response.json({
         error: 'home_id non trovato. Chiama prima /api/netatmo/homesdata'

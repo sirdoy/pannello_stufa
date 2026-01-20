@@ -1,5 +1,6 @@
 import { adminDbGet, adminDbSet, sendNotificationToUser } from '@/lib/firebaseAdmin';
 import { canIgnite, trackUsageHours } from '@/lib/maintenanceServiceAdmin';
+import { getEnvironmentPath } from '@/lib/environmentHelper';
 import { NETATMO_ROUTES } from '@/lib/routes';
 import {
   shouldSendSchedulerNotification,
@@ -105,8 +106,9 @@ async function sendSchedulerNotification(action, details = '') {
  */
 async function calibrateValvesIfNeeded(baseUrl) {
   try {
-    // Get last calibration timestamp
-    const lastCalibration = await adminDbGet('netatmo/lastAutoCalibration');
+    // Get last calibration timestamp (use environment-aware path)
+    const calibrationPath = getEnvironmentPath('netatmo/lastAutoCalibration');
+    const lastCalibration = await adminDbGet(calibrationPath);
 
     const now = Date.now();
     const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; // 24 ore in millisecondi
@@ -143,7 +145,7 @@ async function calibrateValvesIfNeeded(baseUrl) {
     }
 
     // Update last calibration timestamp
-    await adminDbSet('netatmo/lastAutoCalibration', now);
+    await adminDbSet(calibrationPath, now);
 
     console.log('✅ Calibrazione automatica giornaliera valvole completata');
 

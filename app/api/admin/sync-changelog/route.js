@@ -4,60 +4,110 @@
  * GET /api/admin/sync-changelog - Info (no sync)
  * POST /api/admin/sync-changelog - Sync changelog to Firebase
  *
- * Protected: Requires Auth0 authentication + ADMIN_USER_ID
+ * Protected: Requires either:
+ * - Auth0 authentication + ADMIN_USER_ID (manual use)
+ * - Bearer token matching CRON_SECRET (GitHub Actions automation)
  */
 
-import {
-  withAuthAndErrorHandler,
-  success,
-  forbidden,
-} from '@/lib/core';
+import { NextResponse } from 'next/server';
+import { auth0 } from '@/lib/auth0';
 import { syncVersionHistoryToFirebase } from '@/lib/changelogService';
 import { VERSION_HISTORY } from '@/lib/version';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * Helper to check admin access
+ * Helper to check admin access via Auth0
  */
 function isAdmin(session) {
-  return session.user.sub === process.env.ADMIN_USER_ID;
+  return session?.user?.sub === process.env.ADMIN_USER_ID;
+}
+
+/**
+ * Helper to check secret token (for GitHub Actions)
+ */
+function isValidSecretToken(request) {
+  const authHeader = request.headers.get('Authorization');
+  if (!authHeader?.startsWith('Bearer ')) return false;
+
+  const token = authHeader.substring(7);
+  return token === process.env.CRON_SECRET;
+}
+
+/**
+ * Helper to verify authorization (Auth0 session OR secret token)
+ */
+async function verifyAuthorization(request) {
+  // First check secret token (for automated sync)
+  if (isValidSecretToken(request)) {
+    return { authorized: true, method: 'token' };
+  }
+
+  // Then check Auth0 session (for manual admin use)
+  try {
+    const session = await auth0.getSession(request);
+    if (session && isAdmin(session)) {
+      return { authorized: true, method: 'auth0' };
+    }
+  } catch {
+    // Session check failed, continue
+  }
+
+  return { authorized: false };
 }
 
 /**
  * GET /api/admin/sync-changelog
  * Get changelog info without syncing
- * Protected: Requires Auth0 authentication + ADMIN
  */
-export const GET = withAuthAndErrorHandler(async (request, context, session) => {
-  if (!isAdmin(session)) {
-    return forbidden('Admin access required');
+export async function GET(request) {
+  const { authorized } = await verifyAuthorization(request);
+
+  if (!authorized) {
+    return NextResponse.json(
+      { error: 'Unauthorized', message: 'Admin access or valid token required' },
+      { status: 401 }
+    );
   }
 
-  return success({
+  return NextResponse.json({
     ready: true,
     versionsCount: VERSION_HISTORY.length,
     latestVersion: VERSION_HISTORY[0].version,
     message: 'Use POST to sync',
   });
-}, 'Admin/SyncChangelog/Info');
+}
 
 /**
  * POST /api/admin/sync-changelog
  * Sync changelog to Firebase
- * Protected: Requires Auth0 authentication + ADMIN
  */
-export const POST = withAuthAndErrorHandler(async (request, context, session) => {
-  if (!isAdmin(session)) {
-    return forbidden('Admin access required');
+export async function POST(request) {
+  const { authorized, method } = await verifyAuthorization(request);
+
+  if (!authorized) {
+    return NextResponse.json(
+      { error: 'Unauthorized', message: 'Admin access or valid token required' },
+      { status: 401 }
+    );
   }
 
-  // Sync changelog to Firebase
-  await syncVersionHistoryToFirebase(VERSION_HISTORY);
+  try {
+    // Sync changelog to Firebase
+    await syncVersionHistoryToFirebase(VERSION_HISTORY);
 
-  return success({
-    message: 'Changelog sincronizzato con successo',
-    versionsCount: VERSION_HISTORY.length,
-    latestVersion: VERSION_HISTORY[0].version,
-  });
-}, 'Admin/SyncChangelog/Sync');
+    return NextResponse.json({
+      success: true,
+      message: 'Changelog sincronizzato con successo',
+      versionsCount: VERSION_HISTORY.length,
+      latestVersion: VERSION_HISTORY[0].version,
+      authMethod: method,
+    });
+  } catch (error) {
+    console.error('Sync changelog error:', error);
+    return NextResponse.json(
+      { error: 'Sync failed', message: error.message },
+      { status: 500 }
+    );
+  }
+}

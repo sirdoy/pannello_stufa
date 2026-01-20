@@ -1,7 +1,12 @@
 #!/bin/bash
 
 # Script per sincronizzare changelog con Firebase dopo deploy
-# Usage: ./scripts/sync-changelog.sh [URL] [ADMIN_SECRET]
+# Usage: ./scripts/sync-changelog.sh [URL] [CRON_SECRET]
+#
+# Esempi:
+#   ./scripts/sync-changelog.sh                           # localhost + CRON_SECRET da env
+#   ./scripts/sync-changelog.sh http://localhost:3000     # localhost + CRON_SECRET da env
+#   source .env.local && ./scripts/sync-changelog.sh      # carica env e usa localhost
 
 # Colori per output
 GREEN='\033[0;32m'
@@ -12,27 +17,29 @@ NC='\033[0m' # No Color
 # URL dell'app (default: localhost, override con primo argomento)
 APP_URL="${1:-http://localhost:3000}"
 
-# Admin secret (da secondo argomento o env var)
-ADMIN_SECRET="${2:-$ADMIN_SECRET}"
+# Cron secret (da secondo argomento o env var)
+SECRET="${2:-$CRON_SECRET}"
 
-if [ -z "$ADMIN_SECRET" ]; then
-  echo -e "${RED}❌ Errore: ADMIN_SECRET non fornito${NC}"
-  echo "Usage: ./scripts/sync-changelog.sh [URL] [ADMIN_SECRET]"
-  echo "Oppure: export ADMIN_SECRET=your-secret && ./scripts/sync-changelog.sh [URL]"
+if [ -z "$SECRET" ]; then
+  echo -e "${RED}❌ Errore: CRON_SECRET non fornito${NC}"
+  echo ""
+  echo "Usage:"
+  echo "  source .env.local && ./scripts/sync-changelog.sh"
+  echo "  CRON_SECRET=xxx ./scripts/sync-changelog.sh [URL]"
+  echo "  ./scripts/sync-changelog.sh [URL] [SECRET]"
   exit 1
 fi
 
 echo -e "${YELLOW}🔄 Sincronizzazione changelog con Firebase...${NC}"
 echo "URL: $APP_URL"
 
-# Chiamata API
-RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$APP_URL/api/admin/sync-changelog" \
-  -H "Authorization: Bearer $ADMIN_SECRET" \
+# Chiamata API e cattura separatamente body e status
+HTTP_CODE=$(curl -s -o /tmp/sync-response.json -w "%{http_code}" -X POST "$APP_URL/api/admin/sync-changelog" \
+  -H "Authorization: Bearer $SECRET" \
   -H "Content-Type: application/json")
 
-# Estrai body e status code
-HTTP_BODY=$(echo "$RESPONSE" | head -n -1)
-HTTP_CODE=$(echo "$RESPONSE" | tail -n 1)
+HTTP_BODY=$(cat /tmp/sync-response.json 2>/dev/null)
+rm -f /tmp/sync-response.json
 
 # Verifica risposta
 if [ "$HTTP_CODE" -eq 200 ]; then

@@ -141,7 +141,7 @@ SANDBOX_MODE=true TEST_MODE=true npm run dev
 ## Task Priorities
 
 1. **NEVER** break existing functionality
-2. **ALWAYS** update version after changes (`lib/version.js`, `package.json`, `CHANGELOG.md`)
+2. **WAIT** for user confirmation before updating version (`lib/version.js`, `package.json`, `CHANGELOG.md`) - do NOT auto-update
 3. **PREFER** editing existing files over creating new ones
 4. **MAINTAIN** coding patterns -> [docs/patterns.md](docs/patterns.md)
 5. **NEVER** execute `npm run build` or `npm install`
@@ -260,6 +260,6 @@ ADMIN_USER_ID=auth0|xxx
 
 ---
 
-**Version**: 1.68.1
+**Version**: 1.69.0
 **Last Updated**: 2026-01-20
 

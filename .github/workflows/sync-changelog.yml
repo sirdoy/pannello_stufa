@@ -6,16 +6,33 @@ on:
       - main
     paths:
       - 'lib/version.js'
+  workflow_dispatch:  # Allow manual trigger
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
       - name: Wait for Vercel deployment
-        run: sleep 180  # Attendi 3 minuti per deploy
-
-      - name: Sync changelog
         run: |
-          curl -X POST ${{ secrets.VERCEL_APP_URL }}/api/admin/sync-changelog \
-            -H "Authorization: Bearer ${{ secrets.ADMIN_SECRET }}" \
-            -H "Content-Type: application/json"
+          echo "⏳ Waiting 4 minutes for Vercel deployment..."
+          sleep 240
+
+      - name: Sync changelog to Firebase
+        run: |
+          echo "🔄 Syncing changelog..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.VERCEL_APP_URL }}/api/admin/sync-changelog" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json")
+
+          HTTP_BODY=$(echo "$RESPONSE" | head -n -1)
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n 1)
+
+          echo "Response: $HTTP_BODY"
+          echo "Status: $HTTP_CODE"
+
+          if [ "$HTTP_CODE" -eq 200 ]; then
+            echo "✅ Changelog synced successfully!"
+          else
+            echo "❌ Sync failed with status $HTTP_CODE"
+            exit 1
+          fi

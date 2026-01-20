@@ -492,6 +492,107 @@ Skeleton.LogPage = function SkeletonLogPage() {
 };
 
 /**
+ * Skeleton.Changelog - Skeleton for Changelog page with timeline
+ */
+Skeleton.Changelog = function SkeletonChangelog() {
+  return (
+    <div className="space-y-8 animate-spring-in">
+      {/* Header Card */}
+      <Skeleton.Card className="overflow-hidden">
+        {/* Accent bar */}
+        <div className="h-1 bg-gradient-to-r from-ember-500/50 via-flame-500/50 to-ember-600/50" />
+
+        <div className="p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-3">
+                <Skeleton className="w-12 h-12 rounded-2xl" />
+                <div>
+                  <Skeleton className="h-7 w-32 mb-2" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+              </div>
+              <Skeleton className="h-4 w-64" />
+            </div>
+
+            {/* Version Badge */}
+            <div className="flex flex-col items-start sm:items-end gap-2">
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-12 w-28 rounded-xl" />
+              <div className="flex items-center gap-2 mt-1">
+                <Skeleton className="w-2 h-2 rounded-full" />
+                <Skeleton className="h-3 w-20" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </Skeleton.Card>
+
+      {/* Timeline */}
+      <div className="relative">
+        {/* Vertical line */}
+        <div className="absolute left-[23px] sm:left-[27px] top-8 bottom-8 w-px bg-slate-700/30 [html:not(.dark)_&]:bg-slate-200" />
+
+        <div className="space-y-6">
+          {[...Array(5)].map((_, index) => (
+            <div key={index} className="relative pl-14 sm:pl-16">
+              {/* Timeline dot */}
+              <Skeleton className="absolute left-0 top-6 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl" />
+
+              <Skeleton.Card className="overflow-hidden">
+                {/* Header */}
+                <div className="p-5 sm:p-6 bg-slate-800/30 [html:not(.dark)_&]:bg-slate-100/50 border-b border-slate-700/30 [html:not(.dark)_&]:border-slate-200/50">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="h-6 w-24" />
+                      <Skeleton className="h-6 w-20 rounded-full" />
+                      {index === 0 && <Skeleton className="h-6 w-16 rounded-full" />}
+                    </div>
+                    <Skeleton className="h-4 w-28" />
+                  </div>
+                </div>
+
+                {/* Changes List */}
+                <div className="p-5 sm:p-6 space-y-3">
+                  {[...Array(3)].map((_, changeIndex) => (
+                    <div key={changeIndex} className="flex items-start gap-3">
+                      <Skeleton className="w-5 h-5 rounded-full flex-shrink-0 mt-0.5" />
+                      <Skeleton className={`h-4 flex-1 ${changeIndex === 2 ? 'w-3/4' : 'w-full'}`} />
+                    </div>
+                  ))}
+                </div>
+              </Skeleton.Card>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer Legend */}
+      <Skeleton.Card className="p-5 sm:p-6">
+        <div className="flex items-center justify-center gap-6 mb-4">
+          <div className="flex items-center gap-2">
+            <Skeleton className="w-3 h-3 rounded-full" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+          <div className="flex items-center gap-2">
+            <Skeleton className="w-3 h-3 rounded-full" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+          <div className="flex items-center gap-2">
+            <Skeleton className="w-3 h-3 rounded-full" />
+            <Skeleton className="h-3 w-12" />
+          </div>
+        </div>
+        <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-600/30 to-transparent mb-4" />
+        <div className="flex justify-center">
+          <Skeleton className="h-3 w-56" />
+        </div>
+      </Skeleton.Card>
+    </div>
+  );
+};
+
+/**
  * Skeleton.NetatmoPage - Skeleton for Netatmo dashboard page
  */
 Skeleton.NetatmoPage = function SkeletonNetatmoPage() {

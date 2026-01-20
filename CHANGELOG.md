@@ -5,6 +5,38 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.63.0] - 2026-01-20
+
+### Stove Introduction Page
+
+**Obiettivo**: Created a dedicated stove introduction page with navigation, mode explanations, and controls overview instead of redirecting to home.
+
+#### Added
+
+- **Stove Introduction Page** (`/stove`): Complete overview of stove system
+  - Hero section with stove icon and current mode indicator
+  - Navigation cards to scheduler, maintenance, and errors pages
+  - Real-time status badges (scheduler mode, maintenance hours)
+  - Mode explanations section (Manual, Automatic, Semi-Manual)
+  - Controls overview (Power 1-5, Fan 1-6) with visual level indicators
+  - Quick actions for stove control and scheduler configuration
+  - Info section explaining how the system works
+  - Ember Noir design with glass cards and hover effects
+
+#### Changed
+
+- **app/stove/page.js**: Replaced redirect to home with full introduction page
+
+#### Technical Details
+
+- Uses ModeIndicator component for real-time scheduler mode display
+- Fetches maintenance data for status badge
+- Skeleton loading state for better UX
+- Responsive grid layout (1 column mobile, 3 columns desktop)
+- Dark mode support with Ember Noir design system
+
+---
+
 ## [1.62.0] - 2026-01-20
 
 ### Advanced PWA APIs

@@ -5,6 +5,55 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.64.0] - 2026-01-20
+
+### Stove Command Center Redesign
+
+**Obiettivo**: Redesigned stove page as immersive "Volcanic Command Center" with full control functionality from homepage plus enhanced navigation.
+
+#### Added
+
+- **Full Stove Control**: Complete control suite directly on `/stove` page
+  - Real-time status display with Firebase sync
+  - Power on/off buttons (Accendi/Spegni)
+  - Fan level control (1-6) when stove is running
+  - Power level control (1-5) when stove is running
+  - Mode indicator with Manual/Automatic/Semi-Manual states
+  - Maintenance status and cleaning confirmation
+  - Error monitoring with push notifications
+  - PWA offline command queueing (Background Sync)
+  - Sandbox mode support for development
+
+- **Immersive Visual Design**: Status-responsive atmospheric UI
+  - Full-page gradient backgrounds that change with stove status
+  - Ambient glow effects (ember, ocean, sage, warning, danger themes)
+  - Large animated status icons with blur glow effects
+  - Visual progress bars for fan/power levels
+  - Glass-morphism cards with theme-aware borders
+
+- **Quick Navigation Cards**: Feature shortcuts with live status
+  - Scheduler card with active/manual status badge
+  - Maintenance card with hours/cleaning status badge
+  - Errors card with current error status badge
+  - Hover effects with theme-colored glows
+
+#### Changed
+
+- **app/stove/page.js**: Complete rewrite from navigation hub to full control center
+  - Now includes all StoveCard functionality
+  - Status-responsive theming system
+  - Integrated MaintenanceBar and CronHealthBanner
+
+#### Technical Details
+
+- Theme system with 6 color schemes (ember, slate, ocean, warning, danger, sage)
+- Adaptive polling: 15s when on, 60s when off, 10s fallback
+- Firebase real-time listeners with connection monitoring
+- Background sync for offline PWA commands
+- 1000+ lines of production-ready code
+
+---
+
 ## [1.63.0] - 2026-01-20
 
 ### Stove Introduction Page

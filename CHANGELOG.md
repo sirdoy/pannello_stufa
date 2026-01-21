@@ -5,6 +5,37 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.76.0] - 2026-01-21
+
+### Enterprise Backend Architecture
+
+#### Added
+
+- **Repository Pattern** - Astrazione Firebase con `BaseRepository` per operazioni CRUD standardizzate
+  - `MaintenanceRepository` - operazioni path `/maintenance`
+  - `StoveStateRepository` - operazioni path `/stove/state`
+  - `ScheduleRepository` - operazioni path `/schedules-v2/schedules`
+  - `SchedulerModeRepository` - operazioni path `/schedules-v2/mode`
+
+- **Service Layer** - `StoveService` centralizza la business logic della stufa
+  - Metodi: `ignite()`, `shutdown()`, `setFan()`, `setPower()`
+  - Utilizza Repository Pattern per accesso dati
+  - Gestione errori standardizzata
+
+- **Validators Layer** - Validazione input riutilizzabile in `lib/validators/`
+  - `validateIgniteParams()`, `validateShutdownParams()`
+  - `validateSetFanParams()`, `validateSetPowerParams()`
+
+#### Changed
+
+- **API Routes semplificate** - Routes ora ~20 righe invece di ~45
+  - `/api/stove/ignite` - usa StoveService e validators
+  - `/api/stove/shutdown` - usa StoveService e validators
+  - `/api/stove/setFan` - usa StoveService e validators
+  - `/api/stove/setPower` - usa StoveService e validators
+
+---
+
 ## [1.75.2] - 2026-01-21
 
 ### Robust Netatmo Stove Sync Enforcement

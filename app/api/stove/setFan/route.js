@@ -1,7 +1,6 @@
 import { withAuthAndErrorHandler, success, parseJsonOrThrow } from '@/lib/core';
-import { setFanLevel } from '@/lib/stoveApi';
-import { getFullSchedulerMode, setSemiManualMode, getNextScheduledChange } from '@/lib/schedulerService';
-import { updateStoveState } from '@/lib/stoveStateService';
+import { validateSetFanInput } from '@/lib/validators';
+import { getStoveService } from '@/lib/services/StoveService';
 
 /**
  * POST /api/stove/setFan
@@ -10,32 +9,19 @@ import { updateStoveState } from '@/lib/stoveStateService';
  * Protected: Requires Auth0 authentication
  */
 export const POST = withAuthAndErrorHandler(async (request) => {
-  const { level, source } = await parseJsonOrThrow(request);
-  const data = await setFanLevel(level);
+  const body = await parseJsonOrThrow(request);
+  const { level, source } = validateSetFanInput(body);
 
-  // Update Firebase state for real-time sync
-  await updateStoveState({
-    fanLevel: level,
-    source: source || 'manual',
-  });
+  const stoveService = getStoveService();
+  const result = await stoveService.setFan(level, source);
 
-  // Attiva semi-manuale SOLO se source='manual', scheduler attivo e non già in semi-manuale
-  if (source === 'manual') {
-    const mode = await getFullSchedulerMode();
-    if (mode.enabled && !mode.semiManual) {
-      const nextChange = await getNextScheduledChange();
-      // Attiva semi-manuale anche senza prossimo evento (rimane attivo fino a reset manuale)
-      await setSemiManualMode(nextChange);
-      console.log('Modalità semi-manuale attivata per comando manuale di cambio ventola');
-
-      return success({
-        ...data,
-        modeChanged: true,
-        newMode: 'semi-manual',
-        returnToAutoAt: nextChange
-      });
-    }
+  // Maintain backward-compatible response format
+  if (result.modeChanged) {
+    return success({
+      ...result,
+      newMode: 'semi-manual',
+    });
   }
 
-  return success(data);
+  return success(result);
 }, 'Stove/SetFan');

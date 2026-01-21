@@ -1,8 +1,6 @@
-import { withAuthAndErrorHandler, success, maintenanceRequired, parseJson } from '@/lib/core';
-import { igniteStove } from '@/lib/stoveApi';
-import { getFullSchedulerMode, setSemiManualMode, getNextScheduledChange } from '@/lib/schedulerService';
-import { canIgnite } from '@/lib/maintenanceService';
-import { updateStoveState } from '@/lib/stoveStateService';
+import { withAuthAndErrorHandler, success, parseJson } from '@/lib/core';
+import { validateIgniteInput } from '@/lib/validators';
+import { getStoveService } from '@/lib/services/StoveService';
 
 /**
  * POST /api/stove/ignite
@@ -12,35 +10,10 @@ import { updateStoveState } from '@/lib/stoveStateService';
  */
 export const POST = withAuthAndErrorHandler(async (request) => {
   const body = await parseJson(request);
-  const source = body.source;
-  const power = body.power || 3;
+  const { power, source } = validateIgniteInput(body);
 
-  // Check maintenance status before igniting
-  const maintenanceAllowed = await canIgnite();
-  if (!maintenanceAllowed) {
-    return maintenanceRequired();
-  }
+  const stoveService = getStoveService();
+  const result = await stoveService.ignite(power, source);
 
-  const data = await igniteStove(power);
-
-  // Update Firebase state for real-time sync
-  await updateStoveState({
-    status: 'START',
-    statusDescription: 'Avvio in corso',
-    powerLevel: power,
-    source: source || 'manual',
-  });
-
-  // Attiva semi-manuale SOLO se source='manual', scheduler attivo e non già in semi-manuale
-  if (source === 'manual') {
-    const mode = await getFullSchedulerMode();
-    if (mode.enabled && !mode.semiManual) {
-      const nextChange = await getNextScheduledChange();
-      // Attiva semi-manuale anche senza prossimo evento (rimane attivo fino a reset manuale)
-      await setSemiManualMode(nextChange);
-      console.log('Modalità semi-manuale attivata per comando manuale di accensione');
-    }
-  }
-
-  return success(data);
+  return success(result);
 }, 'Stove/Ignite');

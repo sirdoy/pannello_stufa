@@ -22,6 +22,7 @@ import Button from './ui/Button';
 import Banner from './ui/Banner';
 import Skeleton from './ui/Skeleton';
 import Toggle from './ui/Toggle';
+import { Heading, Text } from './ui';
 
 /**
  * Get nested value from object using dot notation
@@ -67,12 +68,14 @@ function PreferenceToggle({ label, description, checked, onChange, disabled = fa
   return (
     <div className="flex items-start justify-between gap-4 py-3">
       <div className="flex-1">
-        <div className="font-medium text-slate-900 [html:not(.dark)_&]:text-white flex items-center gap-2">
+        <Text weight="medium" className="flex items-center gap-2">
           {icon && <span>{icon}</span>}
           <span>{label}</span>
-        </div>
+        </Text>
         {description && (
-          <div className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-0.5">{description}</div>
+          <Text variant="secondary" size="sm" className="mt-0.5">
+            {description}
+          </Text>
         )}
       </div>
       <Toggle
@@ -105,17 +108,17 @@ function CategorySection({ categoryId, config, preferences, onSave, isSaving }) 
     <Card liquid className="p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-slate-900 [html:not(.dark)_&]:text-white flex items-center gap-2">
+          <Heading level={3} size="md" className="flex items-center gap-2">
             <span>{config.icon}</span>
             <span>{config.label}</span>
-          </h3>
-          <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-1">
+          </Heading>
+          <Text variant="secondary" size="sm" className="mt-1">
             {config.description}
-          </p>
+          </Text>
         </div>
       </div>
 
-      <div className="border-t border-slate-200 [html:not(.dark)_&]:border-slate-700 mt-4">
+      <div className="border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200 mt-4">
         {/* Master Toggle */}
         {masterField && (
           <PreferenceToggle
@@ -129,7 +132,7 @@ function CategorySection({ categoryId, config, preferences, onSave, isSaving }) 
 
         {/* Sub fields (only visible when master is enabled) */}
         {isEnabled && subFields.length > 0 && (
-          <div className="ml-4 pl-4 border-l-2 border-slate-200 [html:not(.dark)_&]:border-slate-700 space-y-1">
+          <div className="ml-4 pl-4 border-l-2 border-slate-700/50 [html:not(.dark)_&]:border-slate-200 space-y-1">
             {subFields.map((field) => (
               <PreferenceToggle
                 key={field.key}

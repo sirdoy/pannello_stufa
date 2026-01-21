@@ -46,6 +46,9 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
       failed: result.failureCount,
     });
   } else {
-    return badRequest(result.message || 'Impossibile inviare notifica');
+    // Restituisci errore strutturato per gestione UI
+    return badRequest(result.message || 'Impossibile inviare notifica', {
+      errorCode: result.error || 'SEND_FAILED',
+    });
   }
 }, 'Notifications/Test');

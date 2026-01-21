@@ -149,6 +149,8 @@ SANDBOX_MODE=true TEST_MODE=true npm run dev
 6. **ALWAYS** create/update unit tests -> [docs/testing.md](docs/testing.md)
 7. **UPDATE DOCS** in `docs/`, not in CLAUDE.md
 8. **USE DESIGN SYSTEM** - Reference `/debug/design-system` for UI
+9. **NEVER** commit without explicit user request - wait for "fai commit" or similar
+10. **NEVER** push to remote - user handles all pushes manually
 
 ---
 

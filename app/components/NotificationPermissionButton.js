@@ -25,6 +25,7 @@ import {
 } from '@/lib/notificationService';
 import Button from './ui/Button';
 import Banner from './ui/Banner';
+import { Text } from './ui';
 
 export default function NotificationPermissionButton({ onSuccess, onError }) {
   const { user } = useUser();
@@ -118,12 +119,14 @@ export default function NotificationPermissionButton({ onSuccess, onError }) {
         title="iPhone/iPad rilevato"
         description={
           <div className="space-y-2">
-            <p>Per ricevere notifiche su iOS, devi prima installare l&apos;app:</p>
-            <ol className="list-decimal list-inside space-y-1 text-sm">
-              <li>Tocca il pulsante Condividi in Safari</li>
-              <li>Seleziona &quot;Aggiungi a Home&quot;</li>
-              <li>Apri l&apos;app dalla schermata Home</li>
-              <li>Ritorna qui per abilitare le notifiche</li>
+            <Text variant="warning" size="sm">
+              Per ricevere notifiche su iOS, devi prima installare l&apos;app:
+            </Text>
+            <ol className="list-decimal list-inside space-y-1">
+              <Text as="li" variant="warning" size="sm">Tocca il pulsante Condividi in Safari</Text>
+              <Text as="li" variant="warning" size="sm">Seleziona &quot;Aggiungi a Home&quot;</Text>
+              <Text as="li" variant="warning" size="sm">Apri l&apos;app dalla schermata Home</Text>
+              <Text as="li" variant="warning" size="sm">Ritorna qui per abilitare le notifiche</Text>
             </ol>
           </div>
         }
@@ -141,11 +144,13 @@ export default function NotificationPermissionButton({ onSuccess, onError }) {
         title="Notifiche bloccate"
         description={
           <div className="space-y-2">
-            <p>Hai negato il permesso per le notifiche.</p>
-            <p className="text-sm">
+            <Text variant="ember" size="sm">
+              Hai negato il permesso per le notifiche.
+            </Text>
+            <Text variant="ember" size="sm">
               Per abilitarle, vai nelle impostazioni del browser/dispositivo e
               consenti le notifiche per questo sito.
-            </p>
+            </Text>
           </div>
         }
         liquid
@@ -193,20 +198,22 @@ export default function NotificationPermissionButton({ onSuccess, onError }) {
           {isLoading ? 'Attivazione...' : 'Attiva Notifiche'}
         </Button>
 
-        <div className="text-sm text-neutral-600">
-          <p className="font-medium mb-1">Riceverai notifiche per:</p>
+        <div>
+          <Text variant="secondary" size="sm" weight="medium" className="mb-1">
+            Riceverai notifiche per:
+          </Text>
           <ul className="list-disc list-inside space-y-0.5">
-            <li>Errori critici della stufa</li>
-            <li>Azioni automatiche dello scheduler</li>
-            <li>Promemoria manutenzione</li>
+            <Text as="li" variant="secondary" size="sm">Errori critici della stufa</Text>
+            <Text as="li" variant="secondary" size="sm">Azioni automatiche dello scheduler</Text>
+            <Text as="li" variant="secondary" size="sm">Promemoria manutenzione</Text>
           </ul>
         </div>
       </div>
 
       {!user && (
-        <p className="text-sm text-warning-600">
-          ⚠️ Devi effettuare il login per abilitare le notifiche
-        </p>
+        <Text variant="warning" size="sm">
+          Devi effettuare il login per abilitare le notifiche
+        </Text>
       )}
     </div>
   );

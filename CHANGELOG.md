@@ -5,6 +5,42 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.72.3] - 2026-01-21
+
+### Notifications Page Redesign with Ember Noir
+
+#### Changed
+
+- **Notifications Settings Page** - Ridisegnata seguendo Ember Noir design system
+  - Usati componenti `Heading` e `Text` invece di HTML raw
+  - Applicato `Card liquid` consistente per tutte le sezioni
+  - Pattern dark mode corretto con `[html:not(.dark)_&]`
+  - Migliorato styling badge dispositivi e sezioni
+
+- **NotificationPreferencesPanel** - Migrazione a componenti UI base
+  - Convertiti `h3`/`p` a `Heading`/`Text`
+  - Corretto pattern dark mode (era invertito)
+  - `PreferenceToggle` usa `Text` component
+
+- **NotificationPermissionButton** - Consistenza design system
+  - Istruzioni iOS e messaggi errore usano `Text` con variant appropriati
+
+#### Fixed
+
+- **FCM imageUrl validation** - Solo URL assoluti per `notification.imageUrl`
+  - Icon relative (`/icons/icon-192.png`) non causano più errore FCM
+
+- **Service Worker in dev mode** - Bypass SW registration con Turbopack
+  - Dev mode non richiede più SW attivo per ottenere FCM token
+  - Evita errori `bad-precaching-response` in development
+
+#### Added
+
+- **Unregister API** - `/api/notifications/unregister` per disattivare notifiche
+  - DELETE endpoint per rimuovere tutti i token FCM dell'utente
+
+---
+
 ## [1.72.2] - 2026-01-21
 
 ### Debug Logging System for Remote Troubleshooting

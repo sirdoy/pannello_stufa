@@ -36,6 +36,8 @@ export default function NotificationsSettingsPage() {
   const [isReactivating, setIsReactivating] = useState(false);
   const [isDeactivating, setIsDeactivating] = useState(false);
   const [registrationError, setRegistrationError] = useState(null);
+  const [currentDeviceToken, setCurrentDeviceToken] = useState(null);
+  const [isCurrentDeviceRegistered, setIsCurrentDeviceRegistered] = useState(false);
 
   // Handler per riattivare le notifiche (ri-registra il token)
   const handleReactivate = async () => {
@@ -46,7 +48,9 @@ export default function NotificationsSettingsPage() {
     setTestResult(null);
 
     try {
-      await getFCMToken(user.sub);
+      const token = await getFCMToken(user.sub);
+      setCurrentDeviceToken(token);
+      setIsCurrentDeviceRegistered(true);
       setTestResult('success');
       setTimeout(() => setTestResult(null), 5000);
     } catch (error) {
@@ -100,23 +104,41 @@ export default function NotificationsSettingsPage() {
           ...data,
         }));
         setDevices(devicesList);
+
+        // Check if current device token is in the list
+        if (currentDeviceToken) {
+          const isRegistered = devicesList.some(
+            (d) => d.token === currentDeviceToken
+          );
+          setIsCurrentDeviceRegistered(isRegistered);
+        }
       } else {
         setDevices([]);
+        setIsCurrentDeviceRegistered(false);
       }
       setIsLoadingDevices(false);
     });
 
     return () => off(tokensRef);
-  }, [user?.sub]);
+  }, [user?.sub, currentDeviceToken]);
 
-  // Handler test notifica
+  // Handler test notifica - invia solo al dispositivo corrente se registrato
   const handleTestNotification = async () => {
     setIsSendingTest(true);
     setTestResult(null);
 
     try {
+      // Build request body - include deviceToken to send only to this device
+      const requestBody = currentDeviceToken
+        ? { deviceToken: currentDeviceToken }
+        : {};
+
       const response = await fetch('/api/notifications/test', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
@@ -219,8 +241,8 @@ export default function NotificationsSettingsPage() {
             Test Notifica
           </Heading>
           <Text variant="secondary" size="sm" className="mb-6">
-            Invia una notifica di prova per verificare che tutto funzioni
-            correttamente.
+            Invia una notifica di prova a questo dispositivo per verificare che
+            tutto funzioni correttamente.
           </Text>
 
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
@@ -229,7 +251,7 @@ export default function NotificationsSettingsPage() {
               variant={testResult === 'success' ? 'success' : 'accent'}
               size="md"
               onClick={handleTestNotification}
-              disabled={isSendingTest}
+              disabled={isSendingTest || !isCurrentDeviceRegistered}
             >
               {isSendingTest
                 ? 'Invio in corso...'
@@ -238,9 +260,16 @@ export default function NotificationsSettingsPage() {
                   : 'Invia Notifica Test'}
             </Button>
 
+            {!isCurrentDeviceRegistered && !testResult && (
+              <Text variant="warning" size="sm">
+                Registra prima questo dispositivo per inviare una notifica test
+              </Text>
+            )}
+
             {testResult === 'success' && (
               <Text variant="sage" size="sm">
-                Dovresti ricevere la notifica tra pochi secondi
+                Dovresti ricevere la notifica su questo dispositivo tra pochi
+                secondi
               </Text>
             )}
 
@@ -352,54 +381,94 @@ export default function NotificationsSettingsPage() {
               </div>
             </div>
           ) : (
-            <div className="space-y-3">
-              {devices.map((device) => (
-                <div
-                  key={device.id}
-                  className="p-4 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-100 border border-slate-700/50 [html:not(.dark)_&]:border-slate-200 rounded-xl"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-lg">
-                          {device.platform === 'ios' ? '📱' : '💻'}
-                        </span>
-                        <Text weight="medium">
-                          {device.platform === 'ios'
-                            ? 'iPhone/iPad'
-                            : 'Dispositivo'}
-                        </Text>
-                        {device.isPWA && (
-                          <span className="px-2 py-0.5 text-xs font-medium bg-sage-500/20 text-sage-400 [html:not(.dark)_&]:bg-sage-100 [html:not(.dark)_&]:text-sage-700 rounded-full">
-                            PWA
+            <div className="space-y-4">
+              {/* Device list */}
+              <div className="space-y-3">
+                {devices.map((device) => (
+                  <div
+                    key={device.id}
+                    className="p-4 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-100 border border-slate-700/50 [html:not(.dark)_&]:border-slate-200 rounded-xl"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-lg">
+                            {device.platform === 'ios' ? '📱' : '💻'}
                           </span>
+                          <Text weight="medium">
+                            {device.platform === 'ios'
+                              ? 'iPhone/iPad'
+                              : 'Dispositivo'}
+                          </Text>
+                          {device.isPWA && (
+                            <span className="px-2 py-0.5 text-xs font-medium bg-sage-500/20 text-sage-400 [html:not(.dark)_&]:bg-sage-100 [html:not(.dark)_&]:text-sage-700 rounded-full">
+                              PWA
+                            </span>
+                          )}
+                          {device.token === currentDeviceToken && (
+                            <span className="px-2 py-0.5 text-xs font-medium bg-ocean-500/20 text-ocean-400 [html:not(.dark)_&]:bg-ocean-100 [html:not(.dark)_&]:text-ocean-700 rounded-full">
+                              Questo dispositivo
+                            </span>
+                          )}
+                        </div>
+
+                        <Text size="sm" variant="secondary">
+                          Registrato:{' '}
+                          {new Date(device.createdAt).toLocaleString('it-IT', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </Text>
+
+                        {device.userAgent && (
+                          <Text
+                            size="xs"
+                            variant="tertiary"
+                            className="truncate mt-1"
+                          >
+                            {device.userAgent}
+                          </Text>
                         )}
                       </div>
-
-                      <Text size="sm" variant="secondary">
-                        Registrato:{' '}
-                        {new Date(device.createdAt).toLocaleString('it-IT', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </Text>
-
-                      {device.userAgent && (
-                        <Text
-                          size="xs"
-                          variant="tertiary"
-                          className="truncate mt-1"
-                        >
-                          {device.userAgent}
-                        </Text>
-                      )}
                     </div>
                   </div>
+                ))}
+              </div>
+
+              {/* Register current device button - always visible */}
+              <div className="pt-2 border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                  <Button
+                    liquid
+                    variant={isCurrentDeviceRegistered ? 'ghost' : 'primary'}
+                    size="sm"
+                    onClick={handleReactivate}
+                    disabled={isReactivating}
+                  >
+                    {isReactivating
+                      ? 'Registrazione...'
+                      : isCurrentDeviceRegistered
+                        ? 'Aggiorna registrazione'
+                        : 'Registra questo dispositivo'}
+                  </Button>
+                  <Text variant="tertiary" size="sm">
+                    {isCurrentDeviceRegistered
+                      ? 'Il dispositivo è già registrato'
+                      : 'Registra questo dispositivo per ricevere notifiche'}
+                  </Text>
                 </div>
-              ))}
+
+                {registrationError && (
+                  <div className="mt-3 p-3 bg-ember-500/10 [html:not(.dark)_&]:bg-ember-50 border border-ember-500/30 [html:not(.dark)_&]:border-ember-200 rounded-lg">
+                    <Text variant="ember" size="sm">
+                      {registrationError}
+                    </Text>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </Card>

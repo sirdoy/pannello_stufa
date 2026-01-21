@@ -5,6 +5,29 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.72.4] - 2026-01-21
+
+### Device Registration & Test Notifications Improvements
+
+#### Added
+
+- **Register Current Device Button** - Sempre visibile nella sezione dispositivi registrati
+  - Badge "Questo dispositivo" per identificare il device corrente
+  - Bottone per registrare nuovi dispositivi anche quando ne esistono già altri
+  - Tracking stato registrazione dispositivo corrente
+
+- **Test Notification to Current Device Only** - Le notifiche test ora arrivano solo al dispositivo che le richiede
+  - API `/api/notifications/test` accetta parametro opzionale `deviceToken`
+  - Bottone test disabilitato se dispositivo non registrato
+  - UI aggiornata con messaggio chiaro
+
+- **Enhanced Debug Logging** - Log dettagliati per troubleshooting configurazione
+  - Info ambiente: `NODE_ENV`, hostname, protocol
+  - Lista variabili `NEXT_PUBLIC_*` disponibili
+  - Messaggio esplicito su variabile mancante (`NEXT_PUBLIC_FIREBASE_VAPID_KEY`)
+
+---
+
 ## [1.72.3] - 2026-01-21
 
 ### Notifications Page Redesign with Ember Noir

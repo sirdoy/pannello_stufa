@@ -4,14 +4,20 @@
  * POST /api/notifications/test
  *
  * Invia una notifica di test all'utente autenticato
+ *
+ * Body (optional):
+ * {
+ *   deviceToken: "FCM_TOKEN_STRING"  // Se fornito, invia solo a questo dispositivo
+ * }
  */
 
 import {
   withAuthAndErrorHandler,
   success,
   badRequest,
+  parseJson,
 } from '@/lib/core';
-import { sendNotificationToUser } from '@/lib/firebaseAdmin';
+import { sendNotificationToUser, sendPushNotification } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,6 +28,10 @@ export const dynamic = 'force-dynamic';
  */
 export const POST = withAuthAndErrorHandler(async (request, context, session) => {
   const user = session.user;
+
+  // Parse optional body (empty object if no body)
+  const body = await parseJson(request, {});
+  const deviceToken = body?.deviceToken;
 
   // Build test notification
   const notification = {
@@ -36,8 +46,15 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
     },
   };
 
-  // Send notification
-  const result = await sendNotificationToUser(user.sub, notification);
+  // Send notification - to specific device if token provided, otherwise to all user devices
+  let result;
+  if (deviceToken) {
+    // Send only to the specified device
+    result = await sendPushNotification(deviceToken, notification);
+  } else {
+    // Fallback: send to all user devices
+    result = await sendNotificationToUser(user.sub, notification);
+  }
 
   if (result.success) {
     return success({

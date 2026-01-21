@@ -519,13 +519,15 @@ export default function LightsCard() {
 
   // Waiting for user to press bridge button - INSTRUCTION STEP
   if (pairing && pairingStep === 'waitingForButtonPress') {
+    const remoteApiAvailable = !!process.env.NEXT_PUBLIC_HUE_CLIENT_ID;
     banners.push({
       variant: 'warning',
       icon: '👆',
       title: 'Premi il pulsante sul Bridge Hue',
-      description: `Bridge trovato: ${selectedBridge?.internalipaddress || 'N/A'}. Premi il pulsante rotondo al centro del bridge, poi clicca "Avvia Pairing".`,
+      description: `Bridge trovato: ${selectedBridge?.internalipaddress || 'N/A'}. Premi il pulsante rotondo al centro del bridge, poi clicca "Avvia Pairing".${remoteApiAvailable ? ' Oppure connettiti via Cloud.' : ''}`,
       actions: [
         { label: '✓ Avvia Pairing', onClick: handleConfirmButtonPressed, variant: 'primary' },
+        ...(remoteApiAvailable ? [{ label: '☁️ Cloud', onClick: handleRemoteAuth }] : []),
         { label: 'Annulla', onClick: handleCancelPairing }
       ]
     });

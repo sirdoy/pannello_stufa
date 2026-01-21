@@ -5,6 +5,44 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.72.6] - 2026-01-21
+
+### Hue Remote Pairing & Token Caching for Serverless
+
+#### Added
+
+- **Remote Pairing via Cloud** - Crea username bridge senza essere sulla rete locale
+  - Nuovo endpoint `/api/hue/remote/pair` per creare username via Remote API
+  - Usa OAuth access token + pressione fisica pulsante bridge
+  - Salva username in Firebase per uso futuro
+
+- **Firebase Token Caching** - Evita race condition su Vercel serverless
+  - `access_token` e `access_token_expires_at` salvati in Firebase
+  - Condivisione token tra istanze serverless
+  - Previene refresh multipli con token single-use
+
+- **Auto-retry on 401** - HueRemoteApi refresha token automaticamente
+  - Intercetta errore 401 "Access Token expired"
+  - Chiama `forceTokenRefresh()` e ritenta la richiesta una volta
+  - Previene errori utente per token scaduti
+
+#### Changed
+
+- **UI Remote Pairing Flow** - Flusso guidato "Completa Configurazione Cloud"
+  - Banner warning quando OAuth completato ma manca username
+  - Step 1: Premi pulsante sul bridge
+  - Step 2: Clicca "Ho premuto il pulsante"
+  - Success feedback e refresh automatico
+
+#### Fixed
+
+- **Token Expired Handling** - Gestione errori migliorata
+  - Response non-JSON da Philips OAuth ora gestita correttamente
+  - 500 "unrecognizable" trattato come token invalidation
+  - Clear cache quando token invalidati
+
+---
+
 ## [1.72.5] - 2026-01-21
 
 ### Hue Remote API Improvements & Rooms Sorting

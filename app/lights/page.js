@@ -23,6 +23,18 @@ export default function LightsPage() {
   const [activatingScene, setActivatingScene] = useState(null);
   const [changingColor, setChangingColor] = useState(null);
 
+  // Connection status details
+  const [needsRemotePairing, setNeedsRemotePairing] = useState(false);
+
+  // Pairing states
+  const [pairing, setPairing] = useState(false);
+  const [pairingStep, setPairingStep] = useState(null); // 'discovering' | 'waitingForButtonPress' | 'pairing' | 'success' | 'remotePairing'
+  const [pairingError, setPairingError] = useState(null);
+  const [discoveredBridges, setDiscoveredBridges] = useState([]);
+  const [selectedBridge, setSelectedBridge] = useState(null);
+  const [pairingCountdown, setPairingCountdown] = useState(30);
+  const pairingTimerRef = useRef(null);
+
   const connectionCheckedRef = useRef(false);
   const pollingStartedRef = useRef(false);
 
@@ -57,6 +69,14 @@ export default function LightsPage() {
       const data = await response.json();
 
       setConnected(data.connected || false);
+
+      // Check if OAuth is done but username is missing (needs remote pairing)
+      // This happens when remote_connected=true but has_username=false
+      if (data.remote_connected && !data.has_username) {
+        setNeedsRemotePairing(true);
+      } else {
+        setNeedsRemotePairing(false);
+      }
     } catch (err) {
       console.error('Errore connessione Hue:', err);
       setConnected(false);
@@ -304,25 +324,411 @@ export default function LightsPage() {
     return scenes.filter(scene => scene.group?.rid === room.id);
   };
 
+  // Disconnect from Hue
+  async function handleDisconnect() {
+    if (!confirm('Disconnettere il bridge Hue? Dovrai riconnetterti per controllare le luci.')) {
+      return;
+    }
+
+    try {
+      setRefreshing(true);
+      const response = await fetch('/api/hue/disconnect', { method: 'POST' });
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setConnected(false);
+      setRooms([]);
+      setLights([]);
+      setScenes([]);
+      setSuccess('Bridge Hue disconnesso');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
+  // Start local pairing flow
+  async function handleStartPairing() {
+    try {
+      setPairing(true);
+      setPairingStep('discovering');
+      setPairingError(null);
+      setError(null);
+
+      const response = await fetch('/api/hue/discover');
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = `Errore HTTP ${response.status}`;
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          if (response.status === 401) {
+            errorMessage = 'Sessione scaduta. Ricarica la pagina.';
+          }
+        }
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      if (!data.bridges || data.bridges.length === 0) {
+        setPairingStep('noLocalBridge');
+        return;
+      }
+
+      setDiscoveredBridges(data.bridges);
+
+      if (data.bridges.length === 1) {
+        setSelectedBridge(data.bridges[0]);
+        setPairingStep('waitingForButtonPress');
+      } else {
+        setPairingStep('selectBridge');
+      }
+    } catch (err) {
+      console.error('Discovery error:', err);
+      setPairingError(err.message || 'Errore durante la ricerca del bridge');
+      setPairing(false);
+    }
+  }
+
+  // Pair with selected bridge
+  async function handlePairWithBridge(bridge) {
+    try {
+      setPairingStep('pairing');
+      setPairingError(null);
+      setPairingCountdown(30);
+
+      pairingTimerRef.current = setInterval(() => {
+        setPairingCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(pairingTimerRef.current);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      const response = await fetch('/api/hue/pair', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bridgeIp: bridge.internalipaddress,
+          bridgeId: bridge.id,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (pairingTimerRef.current) {
+        clearInterval(pairingTimerRef.current);
+      }
+
+      if (data.error === 'LINK_BUTTON_NOT_PRESSED') {
+        throw new Error('Pulsante bridge non premuto. Premi il pulsante sul bridge e riprova.');
+      }
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      if (data.success) {
+        setPairingStep('success');
+        setTimeout(() => {
+          setPairing(false);
+          setPairingStep(null);
+          checkConnection();
+        }, 2000);
+      }
+    } catch (err) {
+      console.error('Pairing error:', err);
+      setPairingError(err.message);
+      if (pairingTimerRef.current) {
+        clearInterval(pairingTimerRef.current);
+      }
+    }
+  }
+
+  function handleConfirmButtonPressed() {
+    if (selectedBridge) {
+      handlePairWithBridge(selectedBridge);
+    }
+  }
+
+  function handleCancelPairing() {
+    if (pairingTimerRef.current) {
+      clearInterval(pairingTimerRef.current);
+    }
+    setPairing(false);
+    setPairingStep(null);
+    setPairingError(null);
+    setSelectedBridge(null);
+    setDiscoveredBridges([]);
+  }
+
+  // Start remote pairing flow (for cloud connection)
+  function handleStartRemotePairing() {
+    setPairing(true);
+    setPairingStep('remotePairingWait');
+    setPairingError(null);
+  }
+
+  // Execute remote pairing (after user pressed bridge button)
+  async function handleExecuteRemotePairing() {
+    try {
+      setPairingStep('remotePairing');
+      setPairingError(null);
+
+      const response = await fetch('/api/hue/remote/pair', {
+        method: 'POST',
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        // Check for link button not pressed
+        if (data.code === 'HUE_LINK_BUTTON_NOT_PRESSED') {
+          throw new Error('Pulsante bridge non premuto. Premi il pulsante rotondo sul bridge e riprova entro 30 secondi.');
+        }
+        throw new Error(data.error);
+      }
+
+      if (data.paired) {
+        setPairingStep('success');
+        setNeedsRemotePairing(false);
+        setTimeout(() => {
+          setPairing(false);
+          setPairingStep(null);
+          checkConnection();
+        }, 2000);
+      }
+    } catch (err) {
+      console.error('Remote pairing error:', err);
+      setPairingError(err.message);
+      setPairingStep('remotePairingWait'); // Go back to wait state
+    }
+  }
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (pairingTimerRef.current) {
+        clearInterval(pairingTimerRef.current);
+      }
+    };
+  }, []);
+
   if (loading) {
     return <Skeleton.LightsCard />;
   }
 
-  if (!connected) {
+  if (!connected || needsRemotePairing) {
+    const remoteApiAvailable = !!process.env.NEXT_PUBLIC_HUE_CLIENT_ID;
+
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card className="p-8">
           <Heading level={2} size="lg" className="mb-4">
-            Bridge Hue Non Connesso
+            {needsRemotePairing ? 'Completa Configurazione Cloud' : 'Bridge Hue Non Connesso'}
           </Heading>
 
-          <Text variant="secondary" className="mb-6">
-            Effettua il pairing con il bridge Hue dalla homepage per controllare le luci.
-          </Text>
+          {/* Pairing Error */}
+          {pairingError && (
+            <Banner
+              variant="error"
+              icon="⚠️"
+              title="Errore"
+              description={pairingError}
+              dismissible
+              onDismiss={() => setPairingError(null)}
+              className="mb-4"
+            />
+          )}
 
-          <Button variant="primary" onClick={() => router.push('/')}>
-            ← Torna alla Homepage
-          </Button>
+          {/* Remote Pairing Needed - OAuth done but username missing */}
+          {needsRemotePairing && !pairing && (
+            <>
+              <Banner
+                variant="warning"
+                icon="☁️"
+                title="Account Cloud connesso - serve un ultimo passaggio"
+                description="Hai collegato il tuo account Philips Hue, ma serve creare la chiave di accesso al bridge. Premi il pulsante sul bridge Hue e clicca 'Completa Configurazione'."
+                className="mb-4"
+              />
+              <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                <Button variant="primary" onClick={handleStartRemotePairing}>
+                  👆 Completa Configurazione
+                </Button>
+                <Button variant="ghost" onClick={handleDisconnect}>
+                  🔌 Disconnetti
+                </Button>
+              </div>
+              <Text variant="tertiary" size="sm">
+                Questo passaggio è necessario solo la prima volta. Dopo, potrai controllare le luci da qualsiasi luogo.
+              </Text>
+            </>
+          )}
+
+          {/* Remote Pairing Wait - waiting for user to press button */}
+          {pairing && pairingStep === 'remotePairingWait' && (
+            <div className="mb-4">
+              <Banner
+                variant="warning"
+                icon="👆"
+                title="Premi il pulsante sul Bridge Hue"
+                description="Vai al bridge Hue e premi il pulsante rotondo al centro. Poi torna qui e clicca 'Ho premuto il pulsante'."
+                className="mb-4"
+              />
+              <div className="flex gap-3">
+                <Button variant="primary" onClick={handleExecuteRemotePairing}>
+                  ✓ Ho premuto il pulsante
+                </Button>
+                <Button variant="ghost" onClick={handleCancelPairing}>
+                  Annulla
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Remote Pairing in progress */}
+          {pairing && pairingStep === 'remotePairing' && (
+            <Banner
+              variant="info"
+              icon="🔗"
+              title="Creazione chiave di accesso..."
+              description="Attendi mentre creo la connessione con il bridge via cloud..."
+              className="mb-4"
+            />
+          )}
+
+          {/* Discovering */}
+          {pairing && pairingStep === 'discovering' && (
+            <Banner
+              variant="info"
+              icon="🔍"
+              title="Ricerca bridge..."
+              description="Ricerca bridge Hue sulla rete locale in corso..."
+              className="mb-4"
+            />
+          )}
+
+          {/* No local bridge found */}
+          {pairing && pairingStep === 'noLocalBridge' && (
+            <div className="mb-4">
+              <Banner
+                variant="warning"
+                icon="☁️"
+                title="Bridge non trovato sulla rete locale"
+                description="Sei da remoto o il bridge non è sulla stessa rete Wi-Fi. Puoi connetterti via cloud."
+                className="mb-4"
+              />
+              <div className="flex gap-3">
+                {remoteApiAvailable && (
+                  <Button
+                    variant="primary"
+                    onClick={() => window.location.href = '/api/hue/remote/authorize'}
+                  >
+                    ☁️ Connetti via Cloud
+                  </Button>
+                )}
+                <Button variant="ghost" onClick={handleCancelPairing}>
+                  Annulla
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Waiting for button press */}
+          {pairing && pairingStep === 'waitingForButtonPress' && (
+            <div className="mb-4">
+              <Banner
+                variant="warning"
+                icon="👆"
+                title="Premi il pulsante sul Bridge Hue"
+                description={`Bridge trovato: ${selectedBridge?.internalipaddress || 'N/A'}. Premi il pulsante rotondo al centro del bridge, poi clicca "Avvia Pairing".`}
+                className="mb-4"
+              />
+              <div className="flex gap-3">
+                <Button variant="primary" onClick={handleConfirmButtonPressed}>
+                  ✓ Avvia Pairing
+                </Button>
+                {remoteApiAvailable && (
+                  <Button
+                    variant="outline"
+                    onClick={() => window.location.href = '/api/hue/remote/authorize'}
+                  >
+                    ☁️ Cloud
+                  </Button>
+                )}
+                <Button variant="ghost" onClick={handleCancelPairing}>
+                  Annulla
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Pairing in progress */}
+          {pairing && pairingStep === 'pairing' && (
+            <Banner
+              variant="info"
+              icon="🔗"
+              title={`Pairing in corso... (${pairingCountdown}s)`}
+              description="Attendi mentre mi connetto al bridge..."
+              className="mb-4"
+            />
+          )}
+
+          {/* Success */}
+          {pairing && pairingStep === 'success' && (
+            <Banner
+              variant="success"
+              icon="✅"
+              title="Pairing completato!"
+              description="Bridge Hue connesso con successo."
+              className="mb-4"
+            />
+          )}
+
+          {/* Initial state - not pairing, not needsRemotePairing */}
+          {!pairing && !needsRemotePairing && (
+            <>
+              <Text variant="secondary" className="mb-6">
+                Connetti il bridge Hue per controllare le luci. Scegli la modalità di connessione:
+              </Text>
+
+              <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                <Button variant="primary" onClick={handleStartPairing}>
+                  📡 Connetti Locale
+                </Button>
+                {remoteApiAvailable && (
+                  <Button
+                    variant="outline"
+                    onClick={() => window.location.href = '/api/hue/remote/authorize'}
+                  >
+                    ☁️ Connetti via Cloud
+                  </Button>
+                )}
+              </div>
+
+              <Divider className="my-4" />
+
+              <Text variant="tertiary" size="sm">
+                <strong>Locale:</strong> Richiede di essere sulla stessa rete WiFi del bridge.<br />
+                {remoteApiAvailable && (
+                  <><strong>Cloud:</strong> Funziona da qualsiasi luogo tramite account Philips Hue.</>
+                )}
+              </Text>
+            </>
+          )}
         </Card>
       </div>
     );
@@ -332,14 +738,23 @@ export default function LightsPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-8">
-        <Button
-          variant="ghost"
-          onClick={() => router.push('/')}
-          size="sm"
-          className="mb-4"
-        >
-          ← Indietro
-        </Button>
+        <div className="flex items-center justify-between mb-4">
+          <Button
+            variant="ghost"
+            onClick={() => router.push('/')}
+            size="sm"
+          >
+            ← Indietro
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={handleDisconnect}
+            size="sm"
+            disabled={refreshing}
+          >
+            🔌 Disconnetti
+          </Button>
+        </div>
 
         <Heading level={1} size="2xl" className="mb-2">
           Controllo Luci Philips Hue

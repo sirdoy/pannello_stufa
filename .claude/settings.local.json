@@ -117,7 +117,8 @@
       "Bash(then echo \"OK: $link\")",
       "Bash(else echo \"BROKEN: $link\")",
       "Bash(fi)",
-      "Bash(SANDBOX_MODE=true TEST_MODE=true timeout 15 npm run dev:*)"
+      "Bash(SANDBOX_MODE=true TEST_MODE=true timeout 15 npm run dev:*)",
+      "Bash(vercel --version:*)"
     ],
     "deny": [],
     "ask": []

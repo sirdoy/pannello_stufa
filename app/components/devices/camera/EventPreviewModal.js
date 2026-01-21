@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal, Text, Button, Card } from '../../ui';
 import HlsPlayer from './HlsPlayer';
 import NETATMO_CAMERA_API from '@/lib/netatmoCameraApi';
+import { downloadHlsVideo } from '@/lib/hlsDownloader';
 
 /**
  * EventPreviewModal - Modal for viewing camera event video
@@ -15,7 +16,19 @@ import NETATMO_CAMERA_API from '@/lib/netatmoCameraApi';
  */
 export default function EventPreviewModal({ event, camera, onClose }) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [imageError, setImageError] = useState(false);
+  const [useFallback, setUseFallback] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState('');
+  const [downloadError, setDownloadError] = useState(null);
+
+  // Reset state when event changes
+  useEffect(() => {
+    setIsPlaying(false);
+    setUseFallback(false);
+    setIsDownloading(false);
+    setDownloadProgress('');
+    setDownloadError(null);
+  }, [event?.id]);
 
   if (!event || !camera) return null;
 
@@ -26,10 +39,41 @@ export default function EventPreviewModal({ event, camera, onClose }) {
   const snapshotUrl = NETATMO_CAMERA_API.getEventSnapshotUrl(event);
   const thumbnailUrl = NETATMO_CAMERA_API.getEventVideoThumbnail(event, camera);
   const videoUrl = NETATMO_CAMERA_API.getEventVideoUrl(event, camera);
+  const downloadUrl = NETATMO_CAMERA_API.getEventVideoDownloadUrl(event, camera);
 
-  // Use thumbnail if available, fallback to snapshot
-  const previewUrl = thumbnailUrl || snapshotUrl;
+  // Use thumbnail if available, fallback to snapshot if thumbnail fails
+  const previewUrl = useFallback ? snapshotUrl : (thumbnailUrl || snapshotUrl);
   const hasVideo = !!videoUrl;
+
+  // Download video as MP4
+  const handleDownload = async () => {
+    if (!downloadUrl || isDownloading) return;
+
+    setIsDownloading(true);
+    setDownloadError(null);
+    setDownloadProgress('Avvio download...');
+
+    try {
+      // Generate filename from event date
+      const date = new Date(event.time * 1000);
+      const filename = `video_${date.toISOString().slice(0, 10)}_${date.toTimeString().slice(0, 5).replace(':', '-')}`;
+
+      await downloadHlsVideo(downloadUrl, filename, (percent, message) => {
+        setDownloadProgress(message || `${percent}%`);
+      });
+
+      setDownloadProgress('Download completato!');
+      setTimeout(() => {
+        setIsDownloading(false);
+        setDownloadProgress('');
+      }, 2000);
+    } catch (error) {
+      console.error('Download error:', error);
+      setDownloadError('Errore durante il download');
+      setIsDownloading(false);
+      setDownloadProgress('');
+    }
+  };
 
   return (
     <Modal
@@ -95,12 +139,17 @@ export default function EventPreviewModal({ event, camera, onClose }) {
           ) : (
             <>
               {/* Preview image */}
-              {previewUrl && !imageError ? (
+              {previewUrl ? (
                 <img
                   src={previewUrl}
                   alt={`Evento ${NETATMO_CAMERA_API.getEventTypeName(event.type)}`}
                   className="w-full h-full object-contain"
-                  onError={() => setImageError(true)}
+                  onError={() => {
+                    // If thumbnail failed and we have a snapshot, try it
+                    if (!useFallback && snapshotUrl && thumbnailUrl) {
+                      setUseFallback(true);
+                    }
+                  }}
                 />
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center gap-3">
@@ -153,6 +202,19 @@ export default function EventPreviewModal({ event, camera, onClose }) {
               >
                 Torna all&apos;anteprima
               </Button>
+            )}
+            {downloadUrl && (
+              <Button
+                variant="subtle"
+                size="sm"
+                onClick={handleDownload}
+                disabled={isDownloading}
+              >
+                {isDownloading ? downloadProgress : 'Scarica video'}
+              </Button>
+            )}
+            {downloadError && (
+              <Text variant="danger" size="sm">{downloadError}</Text>
             )}
             <Button
               variant="ocean"

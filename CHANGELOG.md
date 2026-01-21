@@ -5,6 +5,24 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.73.0] - 2026-01-21
+
+### Download Video Eventi Camera
+
+#### Added
+
+- **Download video eventi** - Nuovo pulsante "Scarica video" nella modal eventi camera
+  - Download video HLS in formato `.ts` (compatibile VLC, QuickTime, iPhone)
+  - Supporto master playlist con selezione automatica qualità migliore
+  - Progress indicator durante il download dei segmenti
+- **HLS Downloader** - Nuova utility `lib/hlsDownloader.js` per download stream HLS
+
+#### Fixed
+
+- **Snapshot fallback** - Se il thumbnail video non è disponibile, ora mostra correttamente la snapshot dell'evento invece di "Anteprima non disponibile"
+
+---
+
 ## [1.72.9] - 2026-01-21
 
 ### Fix Netatmo Valve Calibration Timeout

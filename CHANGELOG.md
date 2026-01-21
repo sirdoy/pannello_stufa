@@ -5,6 +5,20 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.72.1] - 2026-01-21
+
+### Smart Stove Power Button
+
+#### Changed
+
+- **StoveCard smart button** - Applica stessa logica delle luci all'accensione stufa
+  - Stufa spenta → Mostra solo "ACCENDI" (prominente con ring effect)
+  - Stufa accesa → Mostra solo "SPEGNI"
+  - Stato transitorio (CLEANING, MODULATION) → Mostra entrambi i pulsanti
+  - UX più pulita mostrando solo l'azione rilevante
+
+---
+
 ## [1.72.0] - 2026-01-21
 
 ### Hue Local/Remote Strategy & UX Improvements

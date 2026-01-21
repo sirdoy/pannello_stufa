@@ -933,28 +933,61 @@ export default function StoveCard() {
               </div>
             </div>
 
-            {/* PRIMARY ACTIONS - Ember Noir buttons */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <Button
-                variant="ember"
-                size="lg"
-                icon="🔥"
-                onClick={handleIgnite}
-                disabled={loading || isAccesa || needsMaintenance}
-                className="h-20 sm:h-24 text-base sm:text-lg font-bold font-display"
-              >
-                ACCENDI
-              </Button>
-              <Button
-                variant="subtle"
-                size="lg"
-                icon="❄️"
-                onClick={handleShutdown}
-                disabled={loading || isSpenta}
-                className="h-20 sm:h-24 text-base sm:text-lg font-bold font-display"
-              >
-                SPEGNI
-              </Button>
+            {/* PRIMARY ACTIONS - Smart button based on state (like LightsCard) */}
+            <div className="mb-6">
+              {/* Transitional state (CLEANING, MODULATION, etc.): show both buttons */}
+              {!isAccesa && !isSpenta && (
+                <div className="grid grid-cols-2 gap-4">
+                  <Button
+                    variant="ember"
+                    size="lg"
+                    icon="🔥"
+                    onClick={handleIgnite}
+                    disabled={loading || needsMaintenance}
+                    className="h-20 sm:h-24 text-base sm:text-lg font-bold font-display"
+                  >
+                    ACCENDI
+                  </Button>
+                  <Button
+                    variant="subtle"
+                    size="lg"
+                    icon="❄️"
+                    onClick={handleShutdown}
+                    disabled={loading}
+                    className="h-20 sm:h-24 text-base sm:text-lg font-bold font-display"
+                  >
+                    SPEGNI
+                  </Button>
+                </div>
+              )}
+
+              {/* Stove is OFF: show only ACCENDI - prominent CTA */}
+              {isSpenta && (
+                <Button
+                  variant="ember"
+                  size="lg"
+                  icon="🔥"
+                  onClick={handleIgnite}
+                  disabled={loading || needsMaintenance}
+                  className="w-full h-20 sm:h-24 text-base sm:text-lg font-bold font-display ring-2 ring-ember-500/30 ring-offset-2 ring-offset-slate-900 [html:not(.dark)_&]:ring-offset-white"
+                >
+                  ACCENDI
+                </Button>
+              )}
+
+              {/* Stove is ON: show only SPEGNI */}
+              {isAccesa && (
+                <Button
+                  variant="subtle"
+                  size="lg"
+                  icon="❄️"
+                  onClick={handleShutdown}
+                  disabled={loading}
+                  className="w-full h-20 sm:h-24 text-base sm:text-lg font-bold font-display"
+                >
+                  SPEGNI
+                </Button>
+              )}
             </div>
 
             {/* Separator */}

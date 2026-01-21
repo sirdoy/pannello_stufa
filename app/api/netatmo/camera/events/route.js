@@ -8,17 +8,18 @@ export const dynamic = 'force-dynamic';
  * Returns events from all cameras
  * Query params:
  * - camera_id: Filter by specific camera (optional)
- * - size: Number of events to fetch from Netatmo (default: 200)
+ * - size: Number of events to fetch (default: 200, max: 200)
  *
- * Note: Netatmo's gethomedata API returns the most recent events.
- * For true pagination beyond ~200 events, geteventsuntil would be needed
- * but it has limitations. This endpoint returns all available events
- * and the client handles virtual scrolling.
+ * Note: Netatmo's gethomedata API returns max ~200 recent events.
+ * Client handles virtual scrolling for display.
+ *
  * Protected: Requires Auth0 authentication
  */
 export const GET = withAuthAndErrorHandler(async (request) => {
-  const { camera_id: cameraId, size: sizeParam } = parseQuery(request);
-  // Request more events from Netatmo (max ~200)
+  const params = parseQuery(request);
+  const cameraId = params.get('camera_id');
+  const sizeParam = params.get('size');
+  // Default to 200 events (max from Netatmo)
   const size = Math.min(parseInt(sizeParam || '200', 10), 200);
 
   const accessToken = await requireNetatmoToken();

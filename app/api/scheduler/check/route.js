@@ -39,7 +39,7 @@ import {
   setFanLevel,
 } from '@/lib/stoveApi';
 import { updateStoveState } from '@/lib/stoveStateService';
-import { syncLivingRoomWithStove, getStoveSyncConfig } from '@/lib/netatmoStoveSync';
+import { syncLivingRoomWithStove, enforceStoveSyncSetpoints } from '@/lib/netatmoStoveSync';
 import { calibrateValvesServer } from '@/lib/netatmoCalibrationService';
 import { proactiveTokenRefresh } from '@/lib/hue/hueRemoteTokenHelper';
 
@@ -552,19 +552,15 @@ export const GET = withCronSecret(async (_request) => {
     }
   }
 
-  // Continuous stove sync check - enforce valve temperatures based on stove state
-  // This runs on every scheduler check, not just on state changes
+  // Continuous stove sync enforcement - verify actual Netatmo setpoints, not just Firebase stoveMode
+  // This handles both state mismatches AND setpoint expiration (8-hour manual setpoints)
   try {
-    const stoveSyncConfig = await getStoveSyncConfig();
-    if (stoveSyncConfig.enabled && stoveSyncConfig.rooms?.length > 0) {
-      // If stove is ON but stoveMode is false, or stove is OFF but stoveMode is true
-      // → sync to correct state
-      if (isOn !== stoveSyncConfig.stoveMode) {
-        console.log(`🔥 Stove sync enforcement: stove ${isOn ? 'ON' : 'OFF'}, stoveMode was ${stoveSyncConfig.stoveMode}`);
-        const syncResult = await syncLivingRoomWithStove(isOn);
-        if (syncResult.synced) {
-          console.log(`✅ Stove sync enforced: ${syncResult.roomNames} ${isOn ? `set to ${syncResult.temperature}°C` : 'returned to schedule'}`);
-        }
+    const enforcementResult = await enforceStoveSyncSetpoints(isOn);
+    if (enforcementResult.enforced || enforcementResult.synced) {
+      if (enforcementResult.action === 'setpoint_enforcement') {
+        console.log(`✅ Stove sync enforcement: ${enforcementResult.fixedCount} room(s) re-synced (setpoints had drifted)`);
+      } else {
+        console.log(`✅ Stove sync enforced: ${enforcementResult.roomNames} ${isOn ? `set to ${enforcementResult.temperature}°C` : 'returned to schedule'}`);
       }
     }
   } catch (syncError) {

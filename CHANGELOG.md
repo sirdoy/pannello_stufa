@@ -5,6 +5,19 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.75.2] - 2026-01-21
+
+### Robust Netatmo Stove Sync Enforcement
+
+#### Fixed
+
+- **Setpoint enforcement now verifies actual Netatmo values** - Previously, the 8-hour manual setpoint would expire and valves would return to schedule while Firebase still showed `stoveMode: true`
+  - New `enforceStoveSyncSetpoints()` function checks actual setpoints via Netatmo API
+  - Re-applies 16°C setpoint if it has drifted (with 0.5° tolerance)
+  - Handles both state mismatches AND setpoint expiration
+
+---
+
 ## [1.75.0] - 2026-01-21
 
 ### Manual Semi-Auto Mode Activation

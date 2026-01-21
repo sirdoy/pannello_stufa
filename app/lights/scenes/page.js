@@ -54,7 +54,13 @@ export default function ScenesPage() {
       if (roomsData.error) throw new Error(roomsData.error);
 
       setScenes(scenesData.scenes || []);
-      setRooms(roomsData.rooms || []);
+      // Sort rooms with 'Casa' first, then alphabetical
+      const sortedRooms = (roomsData.rooms || []).sort((a, b) => {
+        if (a.metadata?.name === 'Casa') return -1;
+        if (b.metadata?.name === 'Casa') return 1;
+        return (a.metadata?.name || '').localeCompare(b.metadata?.name || '');
+      });
+      setRooms(sortedRooms);
     } catch (err) {
       console.error('Errore fetch scene Hue:', err);
       setError(err.message);

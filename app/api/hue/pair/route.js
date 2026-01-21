@@ -47,6 +47,13 @@ export const POST = withAuthAndErrorHandler(async (request) => {
         HTTP_STATUS.BAD_REQUEST
       );
     }
+    if (err.message === 'NETWORK_TIMEOUT' || err.code === 'ETIMEDOUT' || err.code === 'ECONNREFUSED') {
+      return error(
+        'Bridge non raggiungibile - timeout connessione. Sei sulla stessa rete del bridge?',
+        ERROR_CODES.TIMEOUT,
+        HTTP_STATUS.GATEWAY_TIMEOUT
+      );
+    }
     throw err;
   }
 }, 'Hue/Pair');

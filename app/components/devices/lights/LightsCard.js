@@ -168,7 +168,13 @@ export default function LightsCard() {
       console.log('🔍 Client - Lights received:', lightsData.lights?.length || 0);
       console.log('🔍 Client - Scenes received:', scenesData.scenes?.length || 0);
 
-      setRooms(roomsData.rooms || []);
+      // Sort rooms with 'Casa' first, then alphabetical
+      const sortedRooms = (roomsData.rooms || []).sort((a, b) => {
+        if (a.metadata?.name === 'Casa') return -1;
+        if (b.metadata?.name === 'Casa') return 1;
+        return (a.metadata?.name || '').localeCompare(b.metadata?.name || '');
+      });
+      setRooms(sortedRooms);
       setLights(lightsData.lights || []);
       setScenes(scenesData.scenes || []);
     } catch (err) {
@@ -335,6 +341,23 @@ export default function LightsCard() {
       setError(null);
 
       const response = await fetch('/api/hue/discover');
+
+      // Check for HTTP errors before parsing JSON
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = `Errore HTTP ${response.status}`;
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // Could not parse JSON, use status-based message
+          if (response.status === 401) {
+            errorMessage = 'Sessione scaduta. Ricarica la pagina.';
+          }
+        }
+        throw new Error(errorMessage);
+      }
+
       const data = await response.json();
 
       if (data.error) {
@@ -358,7 +381,7 @@ export default function LightsCard() {
       }
     } catch (err) {
       console.error('Discovery error:', err);
-      setPairingError(err.message);
+      setPairingError(err.message || 'Errore durante la ricerca del bridge');
       setPairing(false);
     }
   }
@@ -560,17 +583,28 @@ export default function LightsCard() {
     });
   }
 
-  // Pairing error
+  // Pairing error - offer Cloud option if available
   if (pairingError) {
+    const remoteApiAvailable = !!process.env.NEXT_PUBLIC_HUE_CLIENT_ID;
+    const isNetworkError = pairingError.includes('timeout') ||
+                           pairingError.includes('TIMEOUT') ||
+                           pairingError.includes('network') ||
+                           pairingError.includes('raggiungibile');
+
     banners.push({
       variant: 'error',
       icon: '⚠️',
       title: 'Errore Pairing',
-      description: pairingError,
+      description: isNetworkError && remoteApiAvailable
+        ? `${pairingError}. Sei da remoto? Prova a connetterti via Cloud.`
+        : pairingError,
       dismissible: true,
       onDismiss: () => setPairingError(null),
       actions: [
-        { label: 'Riprova', onClick: handleRetryPairing },
+        ...(isNetworkError && remoteApiAvailable
+          ? [{ label: '☁️ Connetti via Cloud', onClick: handleRemoteAuth, variant: 'primary' }]
+          : [{ label: 'Riprova', onClick: handleRetryPairing }]
+        ),
         { label: 'Annulla', onClick: handleCancelPairing }
       ]
     });

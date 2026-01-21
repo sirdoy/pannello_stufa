@@ -5,6 +5,32 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.72.5] - 2026-01-21
+
+### Hue Remote API Improvements & Rooms Sorting
+
+#### Added
+
+- **Cloud Connection Option on Timeout** - Quando il pairing locale fallisce con timeout
+  - Opzione "☁️ Connetti via Cloud" nel banner di errore
+  - Messaggio chiaro: "Bridge non raggiungibile - timeout connessione"
+  - Redirect automatico a OAuth flow per Remote API
+
+- **Better HTTP Error Handling** - Gestione errori migliorata nel flusso connessione Hue
+  - Controllo `response.ok` prima di parsare JSON
+  - Messaggi specifici per errore 401 (sessione scaduta)
+  - Fallback message se parsing JSON fallisce
+
+#### Changed
+
+- **Rooms Sorting** - Stanza "Casa" sempre per prima nella lista
+  - Applicato a `LightsCard` (dashboard)
+  - Applicato a `/lights` (pagina luci)
+  - Applicato a `/lights/scenes` (pagina scene)
+  - Ordinamento alfabetico per le altre stanze
+
+---
+
 ## [1.72.4] - 2026-01-21
 
 ### Device Registration & Test Notifications Improvements

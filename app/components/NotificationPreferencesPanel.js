@@ -4,6 +4,7 @@
  * NotificationPreferencesPanel
  *
  * Pannello di gestione preferenze notifiche con toggle switches
+ * Generato dinamicamente da NOTIFICATION_CATEGORIES_CONFIG
  * Salva preferenze su Firebase per utente
  */
 
@@ -14,6 +15,7 @@ import {
   updatePreferenceSection,
   resetPreferences,
   DEFAULT_PREFERENCES,
+  NOTIFICATION_CATEGORIES_CONFIG,
 } from '@/lib/notificationPreferencesService';
 import Card from './ui/Card';
 import Button from './ui/Button';
@@ -22,13 +24,53 @@ import Skeleton from './ui/Skeleton';
 import Toggle from './ui/Toggle';
 
 /**
+ * Get nested value from object using dot notation
+ * @param {Object} obj - Source object
+ * @param {string} path - Dot notation path (e.g., 'severityLevels.info')
+ * @returns {any}
+ */
+function getNestedValue(obj, path) {
+  if (!obj || !path) return undefined;
+  return path.split('.').reduce((acc, key) => acc?.[key], obj);
+}
+
+/**
+ * Set nested value in object using dot notation
+ * @param {Object} obj - Source object
+ * @param {string} path - Dot notation path
+ * @param {any} value - Value to set
+ * @returns {Object} New object with value set
+ */
+function setNestedValue(obj, path, value) {
+  const keys = path.split('.');
+  const result = { ...obj };
+
+  if (keys.length === 1) {
+    result[keys[0]] = value;
+    return result;
+  }
+
+  let current = result;
+  for (let i = 0; i < keys.length - 1; i++) {
+    current[keys[i]] = { ...current[keys[i]] };
+    current = current[keys[i]];
+  }
+  current[keys[keys.length - 1]] = value;
+
+  return result;
+}
+
+/**
  * PreferenceToggle - Wrapper for Toggle with label and description
  */
-function PreferenceToggle({ label, description, checked, onChange, disabled = false }) {
+function PreferenceToggle({ label, description, checked, onChange, disabled = false, icon }) {
   return (
     <div className="flex items-start justify-between gap-4 py-3">
       <div className="flex-1">
-        <div className="font-medium text-slate-900 [html:not(.dark)_&]:text-white">{label}</div>
+        <div className="font-medium text-slate-900 [html:not(.dark)_&]:text-white flex items-center gap-2">
+          {icon && <span>{icon}</span>}
+          <span>{label}</span>
+        </div>
         {description && (
           <div className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-0.5">{description}</div>
         )}
@@ -41,6 +83,68 @@ function PreferenceToggle({ label, description, checked, onChange, disabled = fa
         size="sm"
       />
     </div>
+  );
+}
+
+/**
+ * Category Section Component
+ */
+function CategorySection({ categoryId, config, preferences, onSave, isSaving }) {
+  const categoryPrefs = preferences[categoryId] || {};
+  const isEnabled = categoryPrefs.enabled ?? DEFAULT_PREFERENCES[categoryId]?.enabled ?? true;
+
+  const handleFieldChange = (fieldKey, value) => {
+    const newPrefs = setNestedValue(categoryPrefs, fieldKey, value);
+    onSave(categoryId, newPrefs);
+  };
+
+  const masterField = config.fields.find(f => f.isMaster);
+  const subFields = config.fields.filter(f => !f.isMaster);
+
+  return (
+    <Card liquid className="p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h3 className="text-lg font-semibold text-slate-900 [html:not(.dark)_&]:text-white flex items-center gap-2">
+            <span>{config.icon}</span>
+            <span>{config.label}</span>
+          </h3>
+          <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-1">
+            {config.description}
+          </p>
+        </div>
+      </div>
+
+      <div className="border-t border-slate-200 [html:not(.dark)_&]:border-slate-700 mt-4">
+        {/* Master Toggle */}
+        {masterField && (
+          <PreferenceToggle
+            label={masterField.label}
+            description={masterField.description}
+            checked={getNestedValue(categoryPrefs, masterField.key) ?? getNestedValue(DEFAULT_PREFERENCES[categoryId], masterField.key) ?? true}
+            onChange={(value) => handleFieldChange(masterField.key, value)}
+            disabled={isSaving}
+          />
+        )}
+
+        {/* Sub fields (only visible when master is enabled) */}
+        {isEnabled && subFields.length > 0 && (
+          <div className="ml-4 pl-4 border-l-2 border-slate-200 [html:not(.dark)_&]:border-slate-700 space-y-1">
+            {subFields.map((field) => (
+              <PreferenceToggle
+                key={field.key}
+                label={field.label}
+                description={field.description}
+                icon={field.icon}
+                checked={getNestedValue(categoryPrefs, field.key) ?? getNestedValue(DEFAULT_PREFERENCES[categoryId], field.key) ?? true}
+                onChange={(value) => handleFieldChange(field.key, value)}
+                disabled={isSaving}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </Card>
   );
 }
 
@@ -166,11 +270,14 @@ export default function NotificationPreferencesPanel() {
         variant="error"
         icon="⚠️"
         title="Errore Caricamento"
-        description="Impossibile caricare le preferenze. Riprova più tardi."
+        description="Impossibile caricare le preferenze. Riprova piu tardi."
         liquid
       />
     );
   }
+
+  // Categories to display in order
+  const categoryOrder = ['stove', 'errors', 'scheduler', 'maintenance', 'netatmo', 'hue', 'system'];
 
   return (
     <div className="space-y-6">
@@ -200,212 +307,22 @@ export default function NotificationPreferencesPanel() {
         />
       )}
 
-      {/* Errors Section */}
-      <Card liquid className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-lg font-semibold text-slate-900 [html:not(.dark)_&]:text-white flex items-center gap-2">
-              <span>🚨</span>
-              <span>Errori Stufa</span>
-            </h3>
-            <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-1">
-              Notifiche quando si verificano errori o allarmi
-            </p>
-          </div>
-        </div>
+      {/* Render each category */}
+      {categoryOrder.map((categoryId) => {
+        const config = NOTIFICATION_CATEGORIES_CONFIG[categoryId];
+        if (!config) return null;
 
-        <div className="border-t border-slate-200 [html:not(.dark)_&]:border-slate-700 mt-4">
-          <PreferenceToggle
-            label="Abilita notifiche errori"
-            description="Ricevi notifiche per tutti gli errori della stufa"
-            checked={preferences.errors?.enabled ?? true}
-            onChange={(value) => saveSection('errors', {
-              ...preferences.errors,
-              enabled: value,
-            })}
-            disabled={isSaving}
+        return (
+          <CategorySection
+            key={categoryId}
+            categoryId={categoryId}
+            config={config}
+            preferences={preferences}
+            onSave={saveSection}
+            isSaving={isSaving}
           />
-
-          {preferences.errors?.enabled && (
-            <div className="ml-4 pl-4 border-l-2 border-slate-200 [html:not(.dark)_&]:border-slate-700 space-y-1">
-              <PreferenceToggle
-                label="ℹ️ INFO"
-                description="Notifiche informative (non critiche)"
-                checked={preferences.errors?.severityLevels?.info ?? false}
-                onChange={(value) => saveSection('errors', {
-                  ...preferences.errors,
-                  severityLevels: {
-                    ...preferences.errors.severityLevels,
-                    info: value,
-                  },
-                })}
-                disabled={isSaving}
-              />
-
-              <PreferenceToggle
-                label="⚠️ WARNING"
-                description="Avvisi che richiedono attenzione"
-                checked={preferences.errors?.severityLevels?.warning ?? true}
-                onChange={(value) => saveSection('errors', {
-                  ...preferences.errors,
-                  severityLevels: {
-                    ...preferences.errors.severityLevels,
-                    warning: value,
-                  },
-                })}
-                disabled={isSaving}
-              />
-
-              <PreferenceToggle
-                label="❌ ERROR"
-                description="Errori che possono influire sul funzionamento"
-                checked={preferences.errors?.severityLevels?.error ?? true}
-                onChange={(value) => saveSection('errors', {
-                  ...preferences.errors,
-                  severityLevels: {
-                    ...preferences.errors.severityLevels,
-                    error: value,
-                  },
-                })}
-                disabled={isSaving}
-              />
-
-              <PreferenceToggle
-                label="🚨 CRITICAL"
-                description="Errori critici che richiedono intervento immediato"
-                checked={preferences.errors?.severityLevels?.critical ?? true}
-                onChange={(value) => saveSection('errors', {
-                  ...preferences.errors,
-                  severityLevels: {
-                    ...preferences.errors.severityLevels,
-                    critical: value,
-                  },
-                })}
-                disabled={isSaving}
-              />
-            </div>
-          )}
-        </div>
-      </Card>
-
-      {/* Scheduler Section */}
-      <Card liquid className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-lg font-semibold text-slate-900 [html:not(.dark)_&]:text-white flex items-center gap-2">
-              <span>⏰</span>
-              <span>Scheduler Automatico</span>
-            </h3>
-            <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-1">
-              Notifiche per azioni eseguite automaticamente dallo scheduler
-            </p>
-          </div>
-        </div>
-
-        <div className="border-t border-slate-200 [html:not(.dark)_&]:border-slate-700 mt-4">
-          <PreferenceToggle
-            label="Abilita notifiche scheduler"
-            description="Ricevi notifiche per azioni automatiche dello scheduler"
-            checked={preferences.scheduler?.enabled ?? true}
-            onChange={(value) => saveSection('scheduler', {
-              ...preferences.scheduler,
-              enabled: value,
-            })}
-            disabled={isSaving}
-          />
-
-          {preferences.scheduler?.enabled && (
-            <div className="ml-4 pl-4 border-l-2 border-slate-200 [html:not(.dark)_&]:border-slate-700 space-y-1">
-              <PreferenceToggle
-                label="🔥 Accensione automatica"
-                description="Notifica quando la stufa viene accesa dallo scheduler"
-                checked={preferences.scheduler?.ignition ?? true}
-                onChange={(value) => saveSection('scheduler', {
-                  ...preferences.scheduler,
-                  ignition: value,
-                })}
-                disabled={isSaving}
-              />
-
-              <PreferenceToggle
-                label="🌙 Spegnimento automatico"
-                description="Notifica quando la stufa viene spenta dallo scheduler"
-                checked={preferences.scheduler?.shutdown ?? true}
-                onChange={(value) => saveSection('scheduler', {
-                  ...preferences.scheduler,
-                  shutdown: value,
-                })}
-                disabled={isSaving}
-              />
-            </div>
-          )}
-        </div>
-      </Card>
-
-      {/* Maintenance Section */}
-      <Card liquid className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-lg font-semibold text-slate-900 [html:not(.dark)_&]:text-white flex items-center gap-2">
-              <span>🔧</span>
-              <span>Manutenzione</span>
-            </h3>
-            <p className="text-sm text-slate-600 [html:not(.dark)_&]:text-slate-400 mt-1">
-              Promemoria per manutenzione periodica della stufa
-            </p>
-          </div>
-        </div>
-
-        <div className="border-t border-slate-200 [html:not(.dark)_&]:border-slate-700 mt-4">
-          <PreferenceToggle
-            label="Abilita notifiche manutenzione"
-            description="Ricevi promemoria quando si avvicina la pulizia"
-            checked={preferences.maintenance?.enabled ?? true}
-            onChange={(value) => saveSection('maintenance', {
-              ...preferences.maintenance,
-              enabled: value,
-            })}
-            disabled={isSaving}
-          />
-
-          {preferences.maintenance?.enabled && (
-            <div className="ml-4 pl-4 border-l-2 border-slate-200 [html:not(.dark)_&]:border-slate-700 space-y-1">
-              <PreferenceToggle
-                label="ℹ️ Promemoria 80%"
-                description="Notifica quando raggiungi l&apos;80% delle ore utilizzo"
-                checked={preferences.maintenance?.threshold80 ?? true}
-                onChange={(value) => saveSection('maintenance', {
-                  ...preferences.maintenance,
-                  threshold80: value,
-                })}
-                disabled={isSaving}
-              />
-
-              <PreferenceToggle
-                label="⚠️ Attenzione 90%"
-                description="Notifica quando raggiungi il 90% delle ore utilizzo"
-                checked={preferences.maintenance?.threshold90 ?? true}
-                onChange={(value) => saveSection('maintenance', {
-                  ...preferences.maintenance,
-                  threshold90: value,
-                })}
-                disabled={isSaving}
-              />
-
-              <PreferenceToggle
-                label="🚨 Urgente 100%"
-                description="Notifica critica quando manutenzione richiesta (blocca accensione)"
-                checked={preferences.maintenance?.threshold100 ?? true}
-                onChange={(value) => saveSection('maintenance', {
-                  ...preferences.maintenance,
-                  threshold100: value,
-                })}
-                disabled={isSaving}
-              />
-            </div>
-          )}
-        </div>
-      </Card>
+        );
+      })}
 
       {/* Reset Button */}
       <div className="flex justify-end">

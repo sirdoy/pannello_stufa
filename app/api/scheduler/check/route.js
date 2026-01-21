@@ -27,6 +27,10 @@ import {
   shouldSendMaintenanceNotification,
 } from '@/lib/notificationPreferencesService';
 import {
+  triggerStoveStatusWorkServer,
+  triggerStoveUnexpectedOffServer,
+} from '@/lib/notificationTriggersServer';
+import {
   getStoveStatus,
   getFanLevel,
   getPowerLevel,
@@ -215,6 +219,107 @@ async function sendMaintenanceNotificationIfNeeded(notificationData) {
     } catch (error) {
       console.error('❌ Errore invio notifica manutenzione:', error);
     }
+  }
+}
+
+/**
+ * Send stove status WORK notification if conditions are met
+ * - Sends when stove enters WORK state
+ * - Prevents spam by checking if already notified in last 30 minutes
+ */
+async function sendStoveStatusWorkNotification(currentStatus) {
+  const adminUserId = process.env.ADMIN_USER_ID;
+  if (!adminUserId) return;
+
+  // Only notify when status is WORK (not START, which is transitional)
+  if (!currentStatus.includes('WORK')) return;
+
+  try {
+    // Check if we already notified recently (30 min cooldown)
+    const lastNotifyPath = getEnvironmentPath('scheduler/lastWorkNotification');
+    const lastNotify = await adminDbGet(lastNotifyPath);
+    const now = Date.now();
+    const THIRTY_MINUTES = 30 * 60 * 1000;
+
+    if (lastNotify && (now - lastNotify) < THIRTY_MINUTES) {
+      return; // Already notified recently
+    }
+
+    // Send notification
+    await triggerStoveStatusWorkServer(adminUserId, {
+      message: 'La stufa e ora in funzione (stato WORK)',
+    });
+    console.log('✅ Notifica stove_status_work inviata');
+
+    // Save notification timestamp
+    await adminDbSet(lastNotifyPath, now);
+
+  } catch (error) {
+    console.error('❌ Errore invio notifica stove_status_work:', error.message);
+  }
+}
+
+/**
+ * Check for unexpected stove shutdown and send notification
+ * - Detects when stove goes OFF during an active schedule interval
+ * - Only triggers if scheduler previously ignited during this interval
+ */
+async function checkAndNotifyUnexpectedOff(active, isOn, statusFetchFailed) {
+  const adminUserId = process.env.ADMIN_USER_ID;
+  if (!adminUserId) return;
+
+  // Skip if no active schedule or stove is on or status fetch failed
+  if (!active || isOn || statusFetchFailed) return;
+
+  try {
+    // Check if we ignited during this schedule interval
+    const ignitionTrackPath = getEnvironmentPath('scheduler/lastIgnitionInterval');
+    const lastIgnition = await adminDbGet(ignitionTrackPath);
+
+    if (!lastIgnition) return; // No previous ignition tracked
+
+    // Check if the last ignition was for the current interval
+    const currentInterval = `${active.start}-${active.end}`;
+    if (lastIgnition.interval !== currentInterval) return; // Different interval
+
+    // Check if we already notified for this unexpected off (1 hour cooldown)
+    const unexpectedOffPath = getEnvironmentPath('scheduler/lastUnexpectedOffNotification');
+    const lastUnexpectedNotify = await adminDbGet(unexpectedOffPath);
+    const now = Date.now();
+    const ONE_HOUR = 60 * 60 * 1000;
+
+    if (lastUnexpectedNotify && (now - lastUnexpectedNotify) < ONE_HOUR) {
+      return; // Already notified recently
+    }
+
+    // Stove was ignited in this interval but is now OFF - unexpected!
+    await triggerStoveUnexpectedOffServer(adminUserId, {
+      message: `La stufa si e spenta durante l'orario programmato (${active.start}-${active.end})`,
+    });
+    console.log('⚠️ Notifica stove_unexpected_off inviata');
+
+    // Save notification timestamp
+    await adminDbSet(unexpectedOffPath, now);
+
+  } catch (error) {
+    console.error('❌ Errore invio notifica stove_unexpected_off:', error.message);
+  }
+}
+
+/**
+ * Track ignition for unexpected off detection
+ */
+async function trackIgnitionForInterval(active) {
+  if (!active) return;
+
+  try {
+    const ignitionTrackPath = getEnvironmentPath('scheduler/lastIgnitionInterval');
+    await adminDbSet(ignitionTrackPath, {
+      interval: `${active.start}-${active.end}`,
+      timestamp: Date.now(),
+    });
+  } catch (error) {
+    console.error('❌ Errore tracking ignition interval:', error.message);
   }
 }
 
@@ -443,6 +548,16 @@ export const GET = withCronSecret(async (request) => {
   // Fetch stove data in parallel
   const { currentStatus, isOn, currentFanLevel, currentPowerLevel, statusFetchFailed } = await fetchStoveData();
 
+  // Send stove status WORK notification if conditions are met (async, don't block)
+  sendStoveStatusWorkNotification(currentStatus).catch(err =>
+    console.error('❌ Errore notifica stove_status_work:', err.message)
+  );
+
+  // Check for unexpected off and notify (async, don't block)
+  checkAndNotifyUnexpectedOff(active, isOn, statusFetchFailed).catch(err =>
+    console.error('❌ Errore check unexpected off:', err.message)
+  );
+
   // Auto-calibrate Netatmo valves (async, don't wait)
   calibrateValvesIfNeeded(baseUrl).then((result) => {
     if (result.calibrated) {
@@ -522,6 +637,8 @@ export const GET = withCronSecret(async (request) => {
       }
       if (ignitionResult.success) {
         changeApplied = true;
+        // Track this ignition for unexpected off detection
+        await trackIgnitionForInterval(active);
       }
     }
 

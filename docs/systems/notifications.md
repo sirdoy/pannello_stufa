@@ -214,6 +214,32 @@ Le preferenze sono salvate su Firebase per utente e applicate automaticamente.
 
 **Esempio**: Disattivare 80% per ricevere solo promemoria critici (90%, 100%).
 
+#### 4. Termostato Netatmo 🌡️
+
+**Master Toggle**: Abilita/disabilita tutte le notifiche Netatmo (default: OFF)
+
+**Sotto-opzioni** (se abilitato):
+- **❄️ Temperatura bassa** - Notifica quando temperatura scende (default: OFF)
+- **🔥 Temperatura alta** - Notifica quando temperatura sale (default: OFF)
+- **✅ Temperatura raggiunta** - Notifica quando target raggiunto (default: OFF)
+- **📡 Connessione persa** - Notifica quando termostato non risponde (default: ON)
+
+#### 5. Philips Hue 💡
+
+**Master Toggle**: Abilita/disabilita tutte le notifiche Hue (default: OFF)
+
+**Sotto-opzioni** (se abilitato):
+- **🎨 Scena attivata** - Notifica quando una scena viene attivata (default: OFF)
+- **📡 Connessione persa** - Notifica quando bridge non risponde (default: ON)
+
+#### 6. Sistema ⚙️
+
+**Master Toggle**: Abilita/disabilita notifiche di sistema (default: ON)
+
+**Sotto-opzioni** (se abilitato):
+- **🆕 Aggiornamenti** - Notifica nuove versioni disponibili (default: ON)
+- **🔄 Sincronizzazione offline** - Notifica comandi offline eseguiti (default: ON)
+
 ### Salvataggio Preferenze
 
 - **Automatico**: Ogni toggle viene salvato immediatamente su Firebase
@@ -247,6 +273,20 @@ users/{userId}/notificationPreferences/
     threshold80: true
     threshold90: true
     threshold100: true
+  netatmo/
+    enabled: false
+    temperatureLow: false
+    temperatureHigh: false
+    setpointReached: false
+    connectionLost: true
+  hue/
+    enabled: false
+    sceneActivated: false
+    connectionLost: true
+  system/
+    enabled: true
+    updates: true
+    offlineSync: true
 ```
 
 ### API Functions
@@ -281,8 +321,139 @@ Se si verifica un errore durante il check delle preferenze:
 
 1. **Inizia con defaults**: Usa le preferenze predefinite per una settimana
 2. **Monitora rumore**: Se troppe notifiche, disattiva INFO e WARNING
-3. **Priorità critico**: Mantieni sempre CRITICAL e threshold100 attivi
+3. **Priorita critico**: Mantieni sempre CRITICAL e threshold100 attivi
 4. **Test after changes**: Usa "Invia Test" dopo modifiche preferenze
+
+## 🎯 Sistema Trigger Notifiche
+
+Sistema centralizzato per triggerare notifiche da qualsiasi parte dell'app.
+Verifica automaticamente le preferenze utente prima dell'invio.
+
+### File
+
+- `lib/notificationTriggers.js` - Definizioni tipi e client-side trigger
+- `lib/notificationTriggersServer.js` - Server-side trigger per API routes
+- `app/api/notifications/trigger/route.js` - API endpoint
+
+### Utilizzo Client-Side
+
+```javascript
+import {
+  triggerNotification,
+  triggerStoveError,
+  triggerNetatmoAlert,
+  triggerGenericNotification
+} from '@/lib/notificationTriggers';
+
+// Trigger specifico per tipo
+await triggerStoveError('critical', {
+  errorCode: 'E01',
+  description: 'Errore critico',
+});
+
+// Trigger Netatmo
+await triggerNetatmoAlert('temperature_low', {
+  temperature: 15,
+  room: 'Soggiorno',
+});
+
+// Trigger generico (bypassa preferenze)
+await triggerGenericNotification('Titolo', 'Messaggio', {
+  url: '/custom-page',
+});
+```
+
+### Utilizzo Server-Side (API Routes)
+
+```javascript
+import {
+  triggerNotificationServer,
+  triggerStoveErrorServer,
+  triggerSchedulerActionServer,
+  triggerNotificationToAdmin,
+} from '@/lib/notificationTriggersServer';
+
+// In una API route
+export const POST = async (request) => {
+  // ... logica
+
+  // Trigger notifica con verifica preferenze
+  await triggerStoveErrorServer(userId, 'critical', {
+    errorCode: 'E01',
+    description: 'Surriscaldamento',
+  });
+
+  // Trigger a admin
+  await triggerNotificationToAdmin('maintenance_100', {
+    message: 'Manutenzione urgente richiesta',
+  });
+};
+```
+
+### Tipi di Notifica Disponibili
+
+| ID | Categoria | Descrizione |
+|----|-----------|-------------|
+| `stove_error_info` | errors | Errore informativo |
+| `stove_error_warning` | errors | Avviso stufa |
+| `stove_error_error` | errors | Errore stufa |
+| `stove_error_critical` | errors | Errore critico |
+| `scheduler_ignition` | scheduler | Accensione automatica |
+| `scheduler_shutdown` | scheduler | Spegnimento automatico |
+| `maintenance_80` | maintenance | Promemoria 80% |
+| `maintenance_90` | maintenance | Attenzione 90% |
+| `maintenance_100` | maintenance | Urgente 100% |
+| `netatmo_temperature_low` | netatmo | Temperatura bassa |
+| `netatmo_temperature_high` | netatmo | Temperatura alta |
+| `netatmo_setpoint_reached` | netatmo | Target raggiunto |
+| `netatmo_connection_lost` | netatmo | Connessione persa |
+| `hue_scene_activated` | hue | Scena attivata |
+| `hue_connection_lost` | hue | Bridge disconnesso |
+| `system_update` | system | Aggiornamento disponibile |
+| `system_offline_commands_synced` | system | Comandi sincronizzati |
+| `generic` | generic | Notifica generica |
+
+### API Endpoint
+
+**POST `/api/notifications/trigger`**
+
+```json
+{
+  "typeId": "stove_error_critical",
+  "data": {
+    "errorCode": "E01",
+    "description": "Errore critico"
+  }
+}
+```
+
+**Response (inviata)**:
+```json
+{
+  "success": true,
+  "sent": true,
+  "typeId": "stove_error_critical",
+  "sentTo": 2,
+  "failed": 0
+}
+```
+
+**Response (skippata per preferenze)**:
+```json
+{
+  "success": true,
+  "sent": false,
+  "reason": "Category 'errors' disabled",
+  "message": "Notifica non inviata (preferenze utente)"
+}
+```
+
+### Aggiungere Nuovi Tipi
+
+1. Aggiungi definizione in `lib/notificationTriggers.js` → `NOTIFICATION_TYPES`
+2. Aggiungi configurazione UI in `lib/notificationPreferencesService.js` → `NOTIFICATION_CATEGORIES_CONFIG`
+3. Aggiorna `DEFAULT_PREFERENCES` con i nuovi defaults
+4. Aggiorna sezione valida in `updatePreferenceSection()`
 
 ## 🧪 Testing
 
@@ -453,5 +624,5 @@ Per problemi o domande:
 
 ---
 
-**Last Updated**: 2025-10-20
-**Version**: 1.5.15 (con sistema gestione preferenze)
+**Last Updated**: 2026-01-21
+**Version**: 1.70.0+ (con sistema trigger notifiche centralizzato)

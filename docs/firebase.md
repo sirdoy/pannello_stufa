@@ -1,474 +1,58 @@
 # Firebase
 
-Schema Firebase Realtime Database e best practices.
+Firebase Realtime Database: schema, operazioni e sicurezza.
 
 ## Overview
 
-Firebase Realtime Database è utilizzato per:
-- **Scheduler**: Configurazione pianificazioni settimanali
-- **Maintenance**: Tracking ore utilizzo stufa
-- **Logs**: Storico azioni utente
-- **Errors**: Storico errori stufa
-- **Versioning**: Changelog e versione corrente
-- **Cron Health**: Monitoring affidabilità cronjob
-- **External APIs**: OAuth tokens e configurazioni
-- **Push Notifications**: FCM tokens e preferenze utente
-- **Device Preferences**: Abilitazione/disabilitazione dispositivi per utente
+Dati gestiti:
+- **Scheduler**: Pianificazioni settimanali
+- **Maintenance**: Tracking ore stufa
+- **Logs/Errors**: Storico azioni e errori
+- **Users**: FCM tokens, preferenze notifiche
+- **External APIs**: OAuth tokens (Netatmo, Hue)
+
+---
 
 ## Environment Separation
 
-### Development vs Production Namespaces
-
-Per separare i dati di development da quelli di production, l'applicazione utilizza namespace Firebase differenti basati sull'ambiente:
-
-- **Production** (dominio pubblico): Dati salvati nel root Firebase
-- **Development** (localhost, 127.0.0.1, 192.168.x.x): Dati salvati sotto `dev/`
-
-#### Implementazione
+Development usa namespace `dev/`:
 
 ```javascript
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 
-// In production: 'netatmo/refresh_token'
-// In development: 'dev/netatmo/refresh_token'
+// Production: 'netatmo/refresh_token'
+// Development: 'dev/netatmo/refresh_token'
 const path = getEnvironmentPath('netatmo/refresh_token');
-await get(ref(db, path));
 ```
 
-#### API Esterne Supportate
+---
 
-Le seguenti integrazioni usano namespace separati:
-
-- **Netatmo** (OAuth 2.0):
-  - `netatmo/refresh_token`
-  - `netatmo/home_id`
-  - `netatmo/topology`
-  - `netatmo/currentStatus`
-  - `netatmo/deviceConfig`
-  - `netatmo/automation/*`
-
-- **Philips Hue** (OAuth 2.0 + Local API):
-  - `hue/refresh_token`
-  - `hue/username`
-  - `hue/bridge_ip`
-  - `hue/clientkey`
-
-#### Vantaggi
-
-✅ **Sicurezza**: Token di produzione non vengono sovrascritti durante testing locale
-✅ **Testing**: Sviluppatori possono testare OAuth flows senza impattare production
-✅ **Debugging**: Facile identificare e pulire dati di test
-✅ **Isolamento**: Zero rischio di conflitti tra ambienti
-
-## Schema Completo
+## Schema
 
 ```
 firebase-root/
-├── dev/                    # 🆕 Development namespace (SOLO localhost)
-│   ├── netatmo/           # Development Netatmo data
-│   ├── hue/               # Development Hue data
-│   └── ...                # Altri servizi esterni
-│
-├── netatmo/               # Production Netatmo data
-├── hue/                   # Production Hue data
-│
+├── dev/                       # Development namespace
 ├── stoveScheduler/
-│   ├── monday/              # Array [{start, end, power, fan}]
-│   ├── tuesday/
-│   ├── wednesday/
-│   ├── thursday/
-│   ├── friday/
-│   ├── saturday/
-│   ├── sunday/
-│   └── mode/
-│       ├── enabled          # boolean
-│       ├── semiManual       # boolean
-│       └── returnToAutoAt   # ISO string UTC
-│
-├── maintenance/
-│   ├── currentHours         # float (4 decimali)
-│   ├── targetHours          # float (default 50)
-│   ├── lastCleanedAt        # ISO string UTC | null
-│   ├── needsCleaning        # boolean
-│   ├── lastUpdatedAt        # ISO string UTC | null
-│   └── lastNotificationLevel # 80|90|100 (evita spam notifiche)
-│
-├── cronHealth/
-│   └── lastCall             # ISO string UTC
-│
-├── log/
-│   └── {logId}/
-│       ├── action           # string (es. 'IGNITE')
-│       ├── device           # string (es. 'stove')
-│       ├── value            # string | null
-│       ├── timestamp        # number (Unix ms)
-│       ├── source           # 'manual' | 'scheduler'
-│       └── user/
-│           ├── sub          # Auth0 user ID
-│           ├── name
-│           └── email
-│
-├── errors/
-│   └── {errorId}/
-│       ├── errorCode        # number (0 = no error)
-│       ├── errorDescription # string
-│       ├── severity         # 'INFO'|'WARNING'|'ERROR'|'CRITICAL'
-│       ├── timestamp        # number (Unix ms)
-│       ├── resolved         # boolean
-│       ├── resolvedAt       # number (Unix ms) [opzionale]
-│       ├── status           # string (status stufa)
-│       └── source           # string (es. 'status_monitor')
-│
-├── changelog/
-│   └── {version}/           # "1_1_0" (dots → underscores)
-│       ├── version          # string "1.1.0"
-│       ├── date             # string "2025-01-15"
-│       ├── type             # 'major'|'minor'|'patch'
-│       ├── changes          # array of strings
-│       └── timestamp        # number (Unix ms)
-│
-├── users/
-│   └── {userId}/            # Auth0 user ID (es. auth0|xxx)
-│       ├── fcmTokens/
-│       │   └── {tokenHash}/
-│       │       ├── token        # FCM token
-│       │       ├── createdAt    # number (Unix ms)
-│       │       ├── platform     # 'ios'|'other'
-│       │       └── isPWA        # boolean
-│       └── notificationPreferences/
-│           ├── errors/
-│           │   ├── enabled      # boolean
-│           │   └── severityLevels/
-│           │       ├── info     # boolean (default false)
-│           │       ├── warning  # boolean (default true)
-│           │       ├── error    # boolean (default true)
-│           │       └── critical # boolean (default true)
-│           ├── scheduler/
-│           │   ├── enabled      # boolean
-│           │   ├── ignition     # boolean
-│           │   └── shutdown     # boolean
-│           └── maintenance/
-│               ├── enabled      # boolean
-│               ├── threshold80  # boolean
-│               ├── threshold90  # boolean
-│               └── threshold100 # boolean
-│
-├── devicePreferences/
-│   └── {userId}/            # Auth0 user ID
-│       ├── stove            # boolean
-│       ├── thermostat       # boolean
-│       ├── lights           # boolean
-│       └── sonos            # boolean
-│
-└── [external-api]/          # Pattern per API esterne
-    ├── refresh_token        # OAuth refresh token
-    ├── [config]/            # API config (es. home_id, device_id)
-    ├── [data]/              # Cache dati fetched
-    │   └── updated_at       # timestamp last fetch
-    └── [automation]/        # Custom automations (opzionale)
+│   ├── monday..sunday/        # [{start, end, power, fan}]
+│   └── mode/                  # enabled, semiManual, returnToAutoAt
+├── maintenance/               # currentHours, targetHours, needsCleaning, etc.
+├── cronHealth/lastCall        # ISO UTC string
+├── log/{logId}/               # action, device, timestamp, source, user
+├── errors/{errorId}/          # errorCode, severity, resolved, timestamp
+├── changelog/{version}/       # version, date, type, changes
+├── users/{userId}/
+│   ├── fcmTokens/             # FCM tokens per device
+│   └── notificationPreferences/
+├── devicePreferences/{userId}/ # stove, thermostat, lights, sonos
+├── netatmo/                   # refresh_token, home_id, topology, etc.
+└── hue/                       # refresh_token, username, bridge_ip
 ```
 
-## Scheduler Schema
+---
 
-Configurazione pianificazioni settimanali per dispositivi.
+## Operazioni Comuni
 
-### Day Intervals
-
-```javascript
-// stoveScheduler/monday (example)
-[
-  {
-    start: "08:00",  // HH:MM format
-    end: "12:00",
-    power: 4,        // 1-5
-    fan: 3           // 1-6
-  },
-  {
-    start: "18:00",
-    end: "23:00",
-    power: 5,
-    fan: 4
-  }
-]
-```
-
-**Constraints**:
-- Array di intervalli per ogni giorno
-- `start` e `end` in formato "HH:MM" (24h)
-- No overlapping intervals
-- Ordinati cronologicamente
-
-### Mode Configuration
-
-```javascript
-// stoveScheduler/mode
-{
-  enabled: true,           // Scheduler on/off
-  semiManual: false,       // Override temporaneo
-  returnToAutoAt: null     // ISO UTC string | null
-}
-```
-
-**Mode States**:
-- **Manual**: `enabled: false`
-- **Automatic**: `enabled: true, semiManual: false`
-- **Semi-Manual**: `enabled: true, semiManual: true, returnToAutoAt: <timestamp>`
-
-Vedi [Systems - Scheduler](./systems/scheduler.md) per logica completa.
-
-## Maintenance Schema
-
-Tracking ore utilizzo e gestione pulizia periodica.
-
-```javascript
-// maintenance/
-{
-  currentHours: 23.4567,        // float 4 decimali
-  targetHours: 50.0,            // float
-  lastCleanedAt: "2025-01-15T10:30:00.000Z",  // ISO UTC | null
-  needsCleaning: false,         // boolean
-  lastUpdatedAt: "2025-01-20T15:45:00.000Z",  // ISO UTC | null
-  lastNotificationLevel: 80     // 80|90|100 | null
-}
-```
-
-**Fields**:
-- `currentHours` - Ore utilizzo attuali (4 decimali precisione)
-- `targetHours` - Soglia pulizia configurabile
-- `lastCleanedAt` - Timestamp ultima pulizia (null se mai pulita)
-- `needsCleaning` - Flag blocco accensione
-- `lastUpdatedAt` - Timestamp ultimo aggiornamento tracking (CRITICO per calcolo elapsed)
-- `lastNotificationLevel` - Evita spam notifiche duplicate
-
-**Lifecycle `lastUpdatedAt`** (IMPORTANTE):
-1. **Init**: `null` (NO timestamp inizializzazione)
-2. **Primo WORK**: Inizializza timestamp senza aggiungere ore
-3. **Tracking continuo**: Calcola elapsed, aggiorna entrambi
-4. **Config change**: NON tocca `lastUpdatedAt` (evita ore fantasma)
-
-Vedi [Systems - Maintenance](./systems/maintenance.md) per dettagli completi.
-
-## Log Schema
-
-Storico azioni utente con supporto multi-device.
-
-```javascript
-// log/{logId}
-{
-  action: "IGNITE",
-  device: "stove",              // from DEVICE_TYPES
-  value: "P4",                  // optional
-  timestamp: 1705320000000,     // Unix ms
-  source: "manual",             // 'manual' | 'scheduler'
-  user: {
-    sub: "auth0|123456",
-    name: "Federico Manfredi",
-    email: "user@example.com"
-  }
-}
-```
-
-**Device Filtering**: UI supporta filtri per dispositivo (Tutti, Stufa, Termostato, Luci, Sonos).
-
-**Implementazione**: `lib/logService.js`, `app/log/page.js`
-
-## Errors Schema
-
-Storico errori dispositivi con severità e risoluzione.
-
-```javascript
-// errors/{errorId}
-{
-  errorCode: 10,                    // 0 = no error
-  errorDescription: "Allarme sicurezza fusibile termico",
-  severity: "CRITICAL",             // INFO|WARNING|ERROR|CRITICAL
-  timestamp: 1705320000000,         // Unix ms
-  resolved: false,
-  resolvedAt: null,                 // Unix ms | null
-  status: "COOL",                   // Status device quando errore verificato
-  source: "status_monitor"          // Origine rilevamento
-}
-```
-
-**Auto-resolve**: Errori con `errorCode: 0` sono auto-risolti.
-
-Vedi [Systems - Errors](./systems/errors.md) per database completo codici errore.
-
-## Changelog Schema
-
-Versioni app con semantic versioning.
-
-```javascript
-// changelog/1_4_0  (dots → underscores)
-{
-  version: "1.4.0",
-  date: "2025-01-15",
-  type: "minor",                // major|minor|patch
-  changes: [
-    "Aggiunta feature X",
-    "Fix bug Y"
-  ],
-  timestamp: 1705320000000      // Unix ms
-}
-```
-
-**Version Key**: Dots replaced with underscores (Firebase key constraint).
-
-**Sync**: Usa `syncVersionHistoryToFirebase()` per push da `lib/version.js`.
-
-Vedi [Versioning](./versioning.md) per workflow completo.
-
-## Cron Health Schema
-
-Monitoring affidabilità cronjob scheduler.
-
-```javascript
-// cronHealth/lastCall
-"2025-01-20T15:45:30.123Z"  // ISO UTC string
-```
-
-**Update**: Salvato ad ogni chiamata `/api/scheduler/check`.
-
-**Monitor**: Client-side Firebase listener + check ogni 30s.
-
-Vedi [Systems - Monitoring](./systems/monitoring.md) per dettagli.
-
-## Users Schema
-
-Dati utente per FCM tokens e preferenze notifiche.
-
-### FCM Tokens
-
-```javascript
-// users/{userId}/fcmTokens/{tokenHash}
-{
-  token: "fcm-token-string",
-  createdAt: 1705320000000,     // Unix ms
-  platform: "ios",              // 'ios' | 'other'
-  isPWA: true                   // boolean
-}
-```
-
-**Token Hash**: SHA-256 hash del token FCM (per evitare duplicati).
-
-### Notification Preferences
-
-```javascript
-// users/{userId}/notificationPreferences
-{
-  errors: {
-    enabled: true,
-    severityLevels: {
-      info: false,      // Default off (rumore)
-      warning: true,
-      error: true,
-      critical: true
-    }
-  },
-  scheduler: {
-    enabled: true,
-    ignition: true,     // Notifica accensione auto
-    shutdown: true      // Notifica spegnimento auto
-  },
-  maintenance: {
-    enabled: true,
-    threshold80: true,  // Promemoria 80%
-    threshold90: true,  // Attenzione 90%
-    threshold100: true  // Urgente 100%
-  }
-}
-```
-
-Vedi [Systems - Notifications](./systems/notifications.md) per gestione completa.
-
-## Device Preferences Schema
-
-Preferenze utente per abilitazione/disabilitazione dispositivi.
-
-```javascript
-// devicePreferences/{userId}
-{
-  stove: true,         // boolean
-  thermostat: true,    // boolean
-  lights: false,       // boolean
-  sonos: false         // boolean
-}
-```
-
-**Fields**:
-- Ogni chiave corrisponde a un `deviceId` da `DEVICE_CONFIG`
-- `true`: dispositivo abilitato (visibile in homepage e menu)
-- `false`: dispositivo disabilitato (nascosto da UI)
-
-**Defaults** (primo accesso):
-- `stove`: `true`
-- `thermostat`: `true`
-- `lights`: `false`
-- `sonos`: `false`
-
-**Implementazione**:
-- Service: `lib/devicePreferencesService.js`
-- API: `/api/devices/preferences` (GET/POST)
-- UI: `/settings/devices` (pagina gestione)
-
-**Pattern riutilizzabile**: Estendibile per altre preferenze utente (es. theme, language, layout).
-
-## External APIs Pattern
-
-Schema generico per integrazioni API esterne.
-
-```javascript
-// [external-api]/
-{
-  refresh_token: "oauth-refresh-token",  // OAuth token persistente
-
-  // Config (esempio Netatmo)
-  home_id: "xxx",
-  device_id: "xxx",
-
-  // Cache dati
-  topology: { /* cached data */ },
-  status: { /* cached data */ },
-  updated_at: 1705320000000,
-
-  // Automations (opzionale)
-  automations: {
-    rule1: { /* custom automation */ }
-  }
-}
-```
-
-**Esempio completo**: `netatmo/` per Netatmo Energy API.
-
-Vedi [API Routes - External APIs Pattern](./api-routes.md#external-apis-pattern) per implementazione.
-
-## Firebase Operations
-
-### Initialization
-
-```javascript
-// lib/firebase.js
-import { initializeApp } from 'firebase/app';
-import { getDatabase } from 'firebase/database';
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
-  // ...
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-export { db, db as database };  // Dual export pattern
-```
-
-**IMPORTANTE**:
-- ✅ Client SDK only (NO Edge runtime)
-- ✅ Dual export per compatibilità
-- ❌ NO Firebase Admin SDK client-side
-
-### Read Operations
+### Read
 
 ```javascript
 import { ref, get, onValue } from 'firebase/database';
@@ -478,239 +62,129 @@ import { db } from '@/lib/firebase';
 const snapshot = await get(ref(db, 'maintenance'));
 const data = snapshot.val();
 
-// Realtime listener
-const unsubscribe = onValue(ref(db, 'cronHealth/lastCall'), (snapshot) => {
-  const timestamp = snapshot.val();
-  // Handle update
-});
-
-// Cleanup
-return () => unsubscribe();
+// Realtime listener (con cleanup!)
+useEffect(() => {
+  const unsubscribe = onValue(ref(db, 'cronHealth/lastCall'), (snap) => {
+    setTimestamp(snap.val());
+  });
+  return () => unsubscribe();
+}, []);
 ```
 
-### Write Operations
+### Write
 
 ```javascript
 import { ref, set, update, push } from 'firebase/database';
-import { db } from '@/lib/firebase';
 
-// Set (overwrite)
-await set(ref(db, 'maintenance/needsCleaning'), true);
-
-// Update (partial)
+// Update (partial, atomico)
 await update(ref(db, 'maintenance'), {
   currentHours: 25.5,
   lastUpdatedAt: new Date().toISOString()
 });
 
 // Push (auto-generated key)
-const newLogRef = push(ref(db, 'log'));
-await set(newLogRef, {
-  action: 'IGNITE',
-  timestamp: Date.now(),
-  // ...
-});
+const newRef = push(ref(db, 'log'));
+await set(newRef, { action: 'IGNITE', timestamp: Date.now() });
 ```
 
-### Undefined Values (CRITICO)
+### Filter Undefined (CRITICO)
 
-**Firebase Realtime Database NON accetta valori `undefined`**.
+Firebase **non accetta** `undefined`:
 
 ```javascript
-// ❌ WRONG - Firebase error
-await update(ref(db, 'maintenance'), {
-  currentHours: 25.5,
-  lastCleanedAt: undefined  // ERROR!
-});
-
-// ✅ CORRECT - Filter undefined
 function filterUndefined(obj) {
   return Object.entries(obj).reduce((acc, [key, value]) => {
-    if (value !== undefined && value !== null) {
-      acc[key] = value;
-    }
+    if (value !== undefined && value !== null) acc[key] = value;
     return acc;
   }, {});
 }
 
-await update(ref(db, 'maintenance'), filterUndefined({
-  currentHours: 25.5,
-  lastCleanedAt: undefined  // Filtered out
-}));
+await update(ref(db, 'path'), filterUndefined({ field: maybeUndefined }));
 ```
 
-**Helper Pattern**: Applicare sempre `filterUndefined()` quando:
-- API esterne con campi opzionali
-- Parsing oggetti complessi
-- Form/input utente
-- Campi timestamp event-driven
-
-### Null Initialization Pattern
-
-**Pattern `null` initialization** per campi popolati da eventi futuri.
-
-```javascript
-// ✅ CORRECT - Init with null
-await set(ref(db, 'maintenance'), {
-  currentHours: 0,
-  targetHours: 50,
-  lastCleanedAt: null,      // Popolato dopo prima pulizia
-  needsCleaning: false,
-  lastUpdatedAt: null       // Popolato al primo evento WORK
-});
-
-// ❌ WRONG - Init with current timestamp
-await set(ref(db, 'maintenance'), {
-  // ...
-  lastUpdatedAt: new Date().toISOString()  // Causerebbe ore fantasma!
-});
-```
-
-**Motivazione**:
-- Previene "dati fantasma" in calcoli elapsed time
-- Distingue "mai inizializzato" da "inizializzato ma zero"
-- Evita tracking errato prima del primo evento reale
-
-**Esempio**: `lastUpdatedAt` inizia `null`, settato solo al primo status WORK.
-
-### Transactions (Atomic Operations)
-
-```javascript
-import { ref, runTransaction } from 'firebase/database';
-import { db } from '@/lib/firebase';
-
-await runTransaction(ref(db, 'maintenance/currentHours'), (currentValue) => {
-  if (currentValue === null) return 0;
-  return currentValue + 0.5;  // Increment atomically
-});
-```
-
-**Use Cases**:
-- Contatori
-- Operazioni atomiche multiple
-- Race conditions prevention
-
-## Best Practices
-
-### 1. Dynamic Rendering
-
-Force dynamic per routes con Firebase.
-
-```javascript
-// app/api/[endpoint]/route.js
-export const dynamic = 'force-dynamic';
-```
-
-### 2. NO Edge Runtime
-
-Firebase Client SDK incompatibile con Edge runtime.
-
-```javascript
-// ✅ CORRECT
-export const dynamic = 'force-dynamic';
-
-// ❌ WRONG
-export const runtime = 'edge';
-```
-
-### 3. Error Handling
-
-```javascript
-try {
-  const snapshot = await get(ref(db, 'maintenance'));
-  if (!snapshot.exists()) {
-    // Handle missing data
-    return defaultData;
-  }
-  return snapshot.val();
-} catch (error) {
-  console.error('Firebase error:', error);
-  // Handle error
-}
-```
-
-### 4. Listeners Cleanup
-
-Sempre cleanup listeners per evitare memory leaks.
-
-```javascript
-useEffect(() => {
-  const unsubscribe = onValue(ref(db, 'path'), (snapshot) => {
-    // Handle update
-  });
-
-  return () => unsubscribe();  // Cleanup!
-}, []);
-```
-
-### 5. Batch Operations
-
-Usa `update()` per multiple writes atomiche.
-
-```javascript
-// ✅ CORRECT - Single atomic operation
-await update(ref(db, 'maintenance'), {
-  currentHours: 25.5,
-  lastUpdatedAt: new Date().toISOString(),
-  needsCleaning: false
-});
-
-// ❌ WRONG - Multiple operations (race conditions)
-await set(ref(db, 'maintenance/currentHours'), 25.5);
-await set(ref(db, 'maintenance/lastUpdatedAt'), new Date().toISOString());
-await set(ref(db, 'maintenance/needsCleaning'), false);
-```
-
-### 6. Transactions for Read-Modify-Write
-
-Usa `runTransaction()` per operazioni **atomiche read-modify-write** quando il valore dipende dal valore corrente.
-
-**When to Use**:
-- Incrementing/decrementing counters
-- Updating based on current value
-- Concurrent operations expected (multiple instances, cron jobs)
+### Transactions (Atomic Read-Modify-Write)
 
 ```javascript
 import { ref, runTransaction } from 'firebase/database';
 
-// ✅ CORRECT - Atomic read-modify-write
 await runTransaction(ref(db, 'maintenance'), (current) => {
-  if (!current) return current;  // Abort if null
-
-  const elapsed = calculateElapsed(current.lastUpdatedAt);
-
+  if (!current) return current;
   return {
     ...current,
-    currentHours: (current.currentHours || 0) + elapsed,
+    currentHours: current.currentHours + elapsed,
     lastUpdatedAt: new Date().toISOString()
   };
 });
-
-// ❌ WRONG - Race condition vulnerable
-const snapshot = await get(ref(db, 'maintenance'));
-const current = snapshot.val();
-const elapsed = calculateElapsed(current.lastUpdatedAt);
-
-await update(ref(db, 'maintenance'), {
-  currentHours: current.currentHours + elapsed,  // Race condition!
-  lastUpdatedAt: new Date().toISOString()
-});
 ```
-
-**Transaction Behavior**:
-- Firebase **automatically retries** if data changes during transaction
-- Function may execute **multiple times** (must be **idempotent**)
-- Return `undefined` to abort transaction
-- Return new value to commit
-
-**Example Use Case**: Maintenance tracking con multiple cron instances (vedi `lib/maintenanceService.js`).
-
-## See Also
-
-- [Systems](./systems/) - Sistemi che usano Firebase (maintenance, monitoring, etc.)
-- [API Routes](./api-routes.md) - API routes con Firebase operations
-- [Versioning](./versioning.md) - Changelog sync Firebase
 
 ---
 
-**Last Updated**: 2025-11-25
+## Security
+
+### Architettura
+
+- **Auth**: Auth0 (NO Firebase Authentication)
+- **Client SDK**: Read operations
+- **Admin SDK**: Write operations (bypassa rules)
+- **Rules**: Block ALL client writes, allow specific reads
+
+### Dati Pubblici (Client Read)
+
+| Path | Scopo |
+|------|-------|
+| `cronHealth/lastCall` | Banner monitoring |
+| `stoveScheduler/*` | UI scheduler |
+| `maintenance` | Card manutenzione |
+| `log`, `errors` | Storico |
+| `changelog` | Version check |
+| `netatmo/currentStatus, topology` | ThermostatCard |
+| `hue/lights, groups` | LightsCard |
+
+### Dati Privati (Admin SDK Only)
+
+| Path | Sensibilità |
+|------|-------------|
+| `netatmo/refresh_token` | CRITICA |
+| `hue/refresh_token, username, clientkey` | CRITICA |
+| `users/{userId}/fcmTokens` | ALTA |
+| `users/{userId}/notificationPreferences` | MEDIA |
+| `devicePreferences/{userId}` | MEDIA |
+| `dev/*` | MEDIA |
+
+### Deploy Rules
+
+```bash
+firebase deploy --only database
+```
+
+Verifica nel **Rules Playground**:
+- `cronHealth/lastCall` READ → ALLOW
+- `users/*/fcmTokens` READ → DENY
+
+---
+
+## Best Practices
+
+1. **`dynamic = 'force-dynamic'`** per routes con Firebase
+2. **NO Edge Runtime** (SDK incompatibile)
+3. **Sempre cleanup listeners** (`return () => unsubscribe()`)
+4. **Usa `update()`** per writes atomiche (no race conditions)
+5. **`filterUndefined()`** per oggetti dinamici
+6. **Transactions** per read-modify-write
+
+---
+
+## Troubleshooting
+
+| Problema | Causa | Fix |
+|----------|-------|-----|
+| PERMISSION_DENIED (API) | Admin SDK non configurato | Verifica env vars |
+| Client non legge | Rules non deployed | `firebase deploy --only database` |
+| Write fallisce | `undefined` in payload | Usa `filterUndefined()` |
+
+---
+
+## See Also
+
+- [Systems](./systems/) - Maintenance, monitoring, notifications
+- [API Routes](./api-routes.md) - Endpoint implementations

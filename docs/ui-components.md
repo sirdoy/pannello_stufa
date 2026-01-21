@@ -1,1001 +1,237 @@
 # UI Components
 
-Componenti UI riutilizzabili con liquid glass style iOS 18 e supporto dark mode completo.
+Componenti UI con liquid glass style iOS 18 e dark mode.
 
-## 🌙 Dark Mode
-
-Tutti i componenti UI supportano dark mode con palette ottimizzata per glass effect scuro.
-
-**Attivazione**: `/settings/theme` - Toggle light/dark con sync Firebase multi-device
-
-**Pattern Base**:
-```css
-/* Backgrounds Glass (Standard Containers) */
-bg-white/[0.08] dark:bg-white/[0.05]  /* Cards, base containers */
-bg-white/[0.12] dark:bg-white/[0.08]  /* Hover states */
-bg-white/[0.15] dark:bg-white/[0.12]  /* Active/loading states (LoadingOverlay) */
-
-/* Colored Glass Elements */
-bg-primary-500/15 dark:bg-primary-500/25   /* Primary glass (Toast error, Banner) */
-bg-success-500/15 dark:bg-success-500/25   /* Success glass (Toast) */
-bg-warning-500/15 dark:bg-warning-500/25   /* Warning glass (Toast) */
-bg-info-500/15 dark:bg-info-500/25         /* Info glass (Toast, buttons) */
-
-/* Internal Boxes (Standard Opacity) */
-bg-neutral-100 dark:bg-white/[0.03]  /* Temperature, info, controls - uniformato v1.17.0 */
-
-/* Testi */
-text-neutral-900 dark:text-white
-text-neutral-700 dark:text-neutral-300
-text-neutral-600 dark:text-neutral-400  /* Con dark:text-neutral-300 per contrasto migliorato */
-
-/* Borders/Rings */
-border-white/20 dark:border-white/10
-ring-white/15 dark:ring-white/08  /* Standard ring (Card liquid) */
-ring-white/20 dark:ring-white/10  /* Standard ring (altri componenti) */
-
-/* Primary States */
-bg-primary-50 dark:bg-primary-900/30
-text-primary-600 dark:text-primary-400
-```
-
-**Body Background**: Gradiente scuro `from-neutral-900 via-neutral-800 to-neutral-900`
-
-**Internal Box Standard** (v1.17.0): Tutti i box interni (temperature, info, controls) usano consistentemente `dark:bg-white/[0.03]` per esperienza visiva uniforme.
-
-## Card
-
-Componente container base con supporto liquid glass (con saturazione/contrasto migliorati) e legacy glassmorphism.
-
-```jsx
-<Card className="p-6">Content</Card>
-<Card liquid className="p-6">Liquid Glass iOS glassmorphism</Card>
-<Card glass className="p-6">Legacy glassmorphism</Card>  // Mantenuto per compatibilità
-```
-
-**Props**:
-- `liquid={true}` - Applica liquid glass style con saturazione e contrasto migliorati
-- `glass={true}` - Legacy glassmorphism
-- `className` - Classi Tailwind aggiuntive
-
-**Styling Standards**:
-```jsx
-<Card className="p-6">Standard</Card>              // Default solid
-<Card liquid className="p-6">Liquid Glass</Card>   // iOS glassmorphism (preferito)
-<Card className="p-8">Hero Content</Card>          // Hero sections
-<Card glass className="p-6">Legacy Glass</Card>    // Glassmorphism legacy
-<Card className="p-6 bg-info-50 border-2 border-info-200">Info</Card> // Colored info
-```
-
-**Best practice**: Usa `liquid` per UI moderna consistente con `backdrop-saturate-150` e `backdrop-contrast-105` automatici.
-
-**Implementazione**: `app/components/ui/Card.js`
-
-## Button
-
-Componente pulsante con varianti semantiche e liquid glass support.
-
-```jsx
-<Button
-  liquid
-  variant="primary|secondary|success|danger|accent|outline|ghost"
-  size="sm|md|lg"
-  icon="🔥"
->
-  Accendi
-</Button>
-```
-
-**Props**:
-- `liquid={true}` - Applica liquid glass style a tutte le varianti
-- `variant` - Variante semantica (default: primary)
-  - `primary` - Azioni primarie (rosso)
-  - `secondary` - Azioni secondarie
-  - `success` - Successo/conferma (verde)
-  - `danger` - Azioni distruttive (rosso scuro)
-  - `accent` - Accenti (arancione)
-  - `outline` - Bordo senza fill
-  - `ghost` - Trasparente al hover
-- `size` - Dimensione (sm/md/lg, default: md)
-- `icon` - Emoji/icona opzionale
-- `disabled` - Stato disabilitato
-
-**Implementazione**: `app/components/ui/Button.js`
-
-## ControlButton
-
-Bottone specializzato per controlli numerici (incremento/decremento) con feedback visivo chiaro per stato disabled.
-
-```jsx
-<ControlButton
-  type="increment|decrement"
-  variant="info|warning|success|danger|neutral"
-  size="sm|md|lg"
-  onClick={handleClick}
-  disabled={value >= max}
-/>
-```
-
-**Props**:
-- `type` - Tipo di controllo (default: `increment`)
-  - `increment` - Bottone + (plus)
-  - `decrement` - Bottone − (minus)
-- `variant` - Variante semantica (default: `info`)
-  - `info` - Blu (es. ventilazione)
-  - `warning` - Arancio (es. potenza)
-  - `success` - Verde
-  - `danger` - Rosso
-  - `neutral` - Grigio
-- `size` - Dimensione (default: `lg`)
-  - `sm` - h-12, text-2xl
-  - `md` - h-14, text-3xl
-  - `lg` - h-16/h-20, text-3xl/4xl (responsive)
-- `onClick` - Callback click
-- `disabled` - Stato disabilitato
-- `className` - Classi aggiuntive
-
-**Stati Visivi**:
-- **Enabled**: Gradient colorato, testo bianco, shadow animata, hover/active feedback
-- **Disabled**: Background grigio neutro, testo grigio chiaro, opacity-50, cursor-not-allowed
-
-**Esempio d'uso** (StoveCard regolazioni):
-```jsx
-<div className="grid grid-cols-[1fr_auto_1fr] gap-3 items-center">
-  <ControlButton
-    type="decrement"
-    variant="info"
-    onClick={() => setLevel(level - 1)}
-    disabled={level <= 1}
-  />
-
-  <div className="text-center">
-    <span className="text-4xl font-black">{level}</span>
-    <span className="text-xl">/6</span>
-  </div>
-
-  <ControlButton
-    type="increment"
-    variant="info"
-    onClick={() => setLevel(level + 1)}
-    disabled={level >= 6}
-  />
-</div>
-```
-
-**Best Practice**:
-- Usa varianti semantiche coerenti (info per aria/ventilazione, warning per energia/potenza)
-- Sempre applicare `disabled` quando raggiunto min/max per prevenire azioni invalide
-- Layout 3 colonne (`grid-cols-[1fr_auto_1fr]`) per centrare display valore tra bottoni
-
-**Implementazione**: `app/components/ui/ControlButton.js`
-
-## Banner
-
-Componente alert/warning riutilizzabile con 4 varianti semantiche.
-
-```jsx
-<Banner
-  liquid
-  variant="info|warning|error|success"
-  icon="ℹ️"
-  title="Titolo"
-  description="Descrizione o JSX inline"
-  actions={<Button>Azione</Button>}
-  dismissible
-  onDismiss={() => {}}
-/>
-```
-
-**Props**:
-- `liquid={true}` - Applica liquid glass style con colori semantici
-- `variant` - Variante semantica (default: info)
-  - `info` - Informazioni (blu)
-  - `warning` - Attenzioni (giallo-arancio)
-  - `error` - Errori (rosso)
-  - `success` - Successo (verde)
-- `icon` - Emoji/icona
-- `title` - Titolo del banner
-- `description` - Descrizione (supporta JSX inline)
-- `actions` - Pulsanti azione (supporta JSX inline)
-- `dismissible` - Mostra pulsante chiusura
-- `onDismiss` - Callback chiusura
-
-**Supporto JSX inline**: Sia `description` che `actions` accettano JSX per layout complessi.
-
-**Implementazione**: `app/components/ui/Banner.js`
-
-## Toast
-
-Notifiche temporanee con auto-dismiss e liquid glass style per feedback UX immediato.
-
-```jsx
-<Toast
-  message="Operazione completata"
-  icon="✓"
-  variant="success|warning|info|error"
-  duration={3000}
-  onDismiss={() => setToast(null)}
-  liquid={true}  // Default: true
-/>
-```
-
-**Props**:
-- `message` - Testo notifica (required)
-- `icon` - Emoji/icona (default: '✓')
-- `variant` - Variante semantica (default: success)
-  - `success` - Operazioni completate (verde glass: `bg-success-500/15 dark:bg-success-500/25`)
-  - `warning` - Attenzioni (giallo glass: `bg-warning-500/15 dark:bg-warning-500/25`)
-  - `info` - Informazioni (blu glass: `bg-info-500/15 dark:bg-info-500/25`)
-  - `error` - Errori (rosso glass: `bg-primary-500/15 dark:bg-primary-500/25`)
-- `duration` - Millisecondi prima auto-dismiss (default: 3000, 0 = no auto-dismiss)
-- `onDismiss` - Callback chiamato su dismiss (auto o manuale)
-- `liquid` - Abilita liquid glass style (default: true, false = gradient solido)
-
-**Posizionamento**: Fixed top-center (`fixed top-4 left-1/2 -translate-x-1/2 z-[9999]`)
-
-**Animazione**: slideDown CSS custom con opacity fade-in (300ms ease-out)
-
-**Styling**:
-- **Liquid mode** (default): Glass effect trasparente con colori semantici e border colorato
-- **Solid mode**: Gradient opaco tradizionale (95% opacity)
-
-**Pattern d'uso**:
-```jsx
-const [toast, setToast] = useState(null);
-
-// Trigger toast
-setToast({
-  message: 'Salvataggio completato',
-  icon: '✓',
-  variant: 'success'
-});
-
-// Render
-{toast && (
-  <Toast
-    message={toast.message}
-    icon={toast.icon}
-    variant={toast.variant}
-    duration={3000}
-    onDismiss={() => setToast(null)}
-  />
-)}
-```
-
-**Best practice**:
-- Usa per feedback operazioni utente (salvataggio, modifica, errori)
-- Massimo 1 toast alla volta (sostituisci stato)
-- Messaggi concisi (max 2 righe)
-- Variante semantica appropriata al contesto
-
-**Implementazione**: `app/components/ui/Toast.js`, animazione in `app/globals.css`
-
-## LoadingOverlay
-
-Overlay full-page bloccante per operazioni asincrone con liquid glass style.
-
-```jsx
-<LoadingOverlay
-  message="Accensione in corso..."
-  icon="🔥"
-  liquid={true}  // Default: true
-/>
-```
-
-**Props**:
-- `message` - Testo descrittivo operazione (default: "Caricamento in corso...")
-- `icon` - Emoji/icona contestuale (default: "⏳")
-- `liquid` - Abilita liquid glass style (default: true)
-
-**Caratteristiche**:
-- **Full-page blocking**: overlay copre intera viewport con `z-[9999]`
-- **Liquid glass style** (default): `bg-white/[0.15] dark:bg-white/[0.12]` con backdrop-blur-3xl
-- **Solid fallback**: `liquid={false}` usa opacità 95% (semi-solido)
-- **Animated spinner**: rotazione continua con pulse effect
-- **Loading dots**: animazione pulsante (...) durante attesa
-- **Dark mode support**: palette uniforme in entrambi i modi
-- **Accessibility**: aria-live="assertive", aria-busy="true" per screen readers
-
-**Animazioni CSS**:
-```css
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes scaleIn {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-```
-
-**Pattern d'uso**:
-```jsx
-const [isLoading, setIsLoading] = useState(false);
-
-const handleAction = async () => {
-  setIsLoading(true);
-  try {
-    await performAsyncOperation();
-    await fetchUpdatedStatus(); // Refresh status before hiding
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-return (
-  <>
-    <Button onClick={handleAction} disabled={isLoading}>
-      Esegui Azione
-    </Button>
-    {isLoading && (
-      <LoadingOverlay
-        message="Operazione in corso..."
-        icon="⚙️"
-      />
-    )}
-  </>
-);
-```
-
-**Status Refresh Pattern**:
-1. Show overlay (UI bloccata)
-2. Execute async operation
-3. Fetch updated status from server
-4. Hide overlay (solo dopo refresh)
-
-**Best practice**:
-- Usa per operazioni che modificano stato remoto (API calls)
-- Sempre refresh status PRIMA di nascondere overlay
-- Messaggi descrittivi specifici per operazione ("Accensione in corso...", "Modifica temperatura...")
-- Icone contestuali per feedback visivo chiaro
-- Previene azioni multiple simultanee (UI completamente bloccata)
-
-**Integrazione device cards**:
-- **StoveCard**: ignite, shutdown, setFan, setPower
-- **ThermostatCard**: mode change, temperature change, calibration
-- **LightsCard**: toggle, brightness, scene activation
-
-**Implementazione**: `app/components/ui/LoadingOverlay.js`, animazioni in `app/globals.css`
-
-## Select
-
-Dropdown con liquid glass style e z-index ottimizzato.
-
-```jsx
-<Select
-  liquid
-  value={power}
-  onChange={setPower}
-  options={[
-    {value: 1, label: 'P1'},
-    {value: 2, label: 'P2'},
-    // ...
-  ]}
-  disabled={!isOn}
-/>
-```
-
-**Props**:
-- `liquid={true}` - Applica liquid glass a trigger button e dropdown menu
-- `value` - Valore selezionato
-- `onChange` - Callback selezione
-- `options` - Array di opzioni `{value, label}`
-- `disabled` - Stato disabilitato
-
-**Z-index**: Dropdown menu usa `z-[100]` per apparire sopra altri elementi.
-
-**Implementazione**: `app/components/ui/Select.js`
-
-## Input
-
-Input field con liquid glass style e backdrop blur.
-
-```jsx
-<Input
-  liquid
-  type="text|number|email|password"
-  placeholder="Inserisci valore"
-  value={value}
-  onChange={setValue}
-/>
-```
-
-**Props**:
-- `liquid={true}` - Applica liquid glass style con backdrop blur
-- `type` - Tipo input HTML
-- `placeholder` - Placeholder text
-- `value` - Valore controllato
-- `onChange` - Callback change
-
-**Implementazione**: `app/components/ui/Input.js`
-
-## Skeleton
-
-Componente loading placeholder con animazione pulse.
-
-```jsx
-<Skeleton className="h-6 w-full" />
-<Skeleton className="h-8 w-32" />
-```
-
-**Props**:
-- `className` - Classi Tailwind per dimensioni
-
-**Implementazione**: `app/components/ui/Skeleton.js`
-
-## Footer
-
-Footer applicazione con link e informazioni.
-
-**Implementazione**: `app/components/ui/Footer.js`
-
-## Liquid Glass Style Pattern
-
-Pattern unificato iOS 18 per componenti UI con trasparenza e blur.
-
-### Composizione Base
-
-```jsx
-className="bg-white/[0.08] backdrop-blur-3xl shadow-liquid-sm ring-1 ring-white/20 ring-inset
-           relative overflow-hidden
-           before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none"
-```
-
-**Elementi**:
-- `bg-white/[0.08]` - Trasparenza sottile
-- `backdrop-blur-3xl` - Blur intenso dello sfondo
-- `shadow-liquid-sm` - Shadow personalizzata (vedi sotto)
-- `ring-1 ring-white/20 ring-inset` - Bordo sottile interno
-- `before:bg-gradient-to-br` - Gradient overlay per effetto vetro
-
-### Shadow Variants
-
-Definite in `tailwind.config.js`:
-
-- **`shadow-liquid-sm`**: Piccoli elementi (buttons, input)
-  - `0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06)`
-
-- **`shadow-liquid`**: Elementi medi (cards, dropdowns)
-  - `0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.06)`
-
-- **`shadow-liquid-lg`**: Elementi grandi (modals, panels)
-  - `0 8px 32px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.08)`
-
-- **`shadow-liquid-xl`**: Hero sections
-  - `0 16px 64px rgba(0,0,0,0.16), 0 8px 16px rgba(0,0,0,0.12)`
-
-### Z-index Layers
-
-Pattern per gestione layer con gradient overlay:
-
-```jsx
-<div className="relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none">
-  {/* Contenuto con relative z-10 per stare sopra gradient */}
-  <div className="relative z-10">
-    Content here
-  </div>
-</div>
-```
-
-**Regola**: Contenuto deve avere `relative z-10` per apparire sopra gradient overlay.
-
-### Quando Usare
-
-Applicare liquid glass a:
-- ✅ Tutti i componenti interattivi (buttons, inputs, dropdowns)
-- ✅ Cards e containers principali
-- ✅ Mobile menu e overlay
-- ✅ Modals e panels
-
-**Obiettivo**: Consistenza visiva iOS 18 style in tutta l'app.
-
-## Navbar
-
-Navbar responsive con architettura mobile-first e iOS-style bottom navigation.
-
-**Architettura v1.27.0**: Mobile-first approach con dual navigation
-- **Desktop** (≥1024px): Top horizontal navigation con lucide-react icons + dropdown device/settings/user
-- **Mobile** (< 1024px): Top header + iOS-style bottom navigation bar + hamburger menu overlay
-
-### Mobile Bottom Navigation (NEW v1.27.0)
-
-iOS-style fixed bottom bar per thumb-friendly access alle 4 azioni principali:
-
-```jsx
-<nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-3xl border-t border-white/20 dark:border-white/10 shadow-liquid pb-safe">
-  <div className="grid grid-cols-4 gap-1 p-2">
-
-    {/* Home */}
-    <Link href="/" className="flex flex-col items-center justify-center py-2 px-3 rounded-xl">
-      <Home className="w-6 h-6 mb-1" />
-      <span className="text-xs font-medium">Home</span>
-    </Link>
-
-    {/* Scheduler */}
-    <Link href="/stove/scheduler">
-      <Calendar className="w-6 h-6 mb-1" />
-      <span className="text-xs font-medium">Scheduler</span>
-    </Link>
-
-    {/* Errors */}
-    <Link href="/stove/errors">
-      <AlertCircle className="w-6 h-6 mb-1" />
-      <span className="text-xs font-medium">Errori</span>
-    </Link>
-
-    {/* Log */}
-    <Link href="/log">
-      <Clock className="w-6 h-6 mb-1" />
-      <span className="text-xs font-medium">Storico</span>
-    </Link>
-  </div>
-</nav>
-
-{/* Spacer for fixed navigation */}
-<div className="h-16 lg:h-18" aria-hidden="true" /> {/* Top header spacer */}
-<div className="h-20 lg:hidden" aria-hidden="true" /> {/* Bottom nav spacer */}
-```
-
-**Features**:
-- Fixed positioning (`bottom-0`) per accesso costante
-- Grid 4 colonne con gap minimo
-- Touch targets 48px (py-2 px-3 = ~44px minimo)
-- Active state: `bg-primary-500/10 dark:bg-primary-500/20`
-- Lucide-react icons per chiarezza visiva
-- Safe area support: `pb-safe` per iPhone con gesture bar
-
-**Icons utilizzate**:
-- `Home` - Homepage (w-6 h-6)
-- `Calendar` - Scheduler
-- `AlertCircle` - Errori
-- `Clock` - Storico log
-
-**Mobile-First Principle**: Azioni più usate sempre accessibili con il pollice (thumb zone)
-
-### Pattern Mobile Menu
-
-```jsx
-// State management
-const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-// Body scroll lock
-useEffect(() => {
-  if (mobileMenuOpen) {
-    document.body.style.overflow = 'hidden';
-  } else {
-    document.body.style.overflow = 'unset';
-  }
-  return () => { document.body.style.overflow = 'unset'; };
-}, [mobileMenuOpen]);
-
-// Auto-close on route change
-useEffect(() => {
-  setMobileMenuOpen(false);
-}, [pathname]);
-
-// ESC key handler
-useEffect(() => {
-  const handleEsc = (e) => {
-    if (e.key === 'Escape') setMobileMenuOpen(false);
-  };
-  window.addEventListener('keydown', handleEsc);
-  return () => window.removeEventListener('keydown', handleEsc);
-}, []);
-```
-
-**Struttura**:
-- Fixed overlay: backdrop (`z-[100]`) + menu panel (`z-[101]`) sotto navbar (`z-50`)
-- Backdrop position: `fixed top-[navbar-height]` per mantenere header visibile
-- Click fuori → chiude menu (backdrop onClick)
-- Body scroll lock quando menu aperto
-- Auto-chiusura: route change + ESC key
-
-### Pattern Dropdown Desktop
-
-```jsx
-// State + ref
-const [isOpen, setIsOpen] = useState(false);
-const dropdownRef = useRef(null);
-
-// Click outside detection
-useEffect(() => {
-  const handleClickOutside = (e) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-      setIsOpen(false);
-    }
-  };
-  document.addEventListener('mousedown', handleClickOutside);
-  return () => document.removeEventListener('mousedown', handleClickOutside);
-}, []);
-
-// ESC key handler
-useEffect(() => {
-  const handleEsc = (e) => {
-    if (e.key === 'Escape') setIsOpen(false);
-  };
-  window.addEventListener('keydown', handleEsc);
-  return () => window.removeEventListener('keydown', handleEsc);
-}, []);
-
-// Auto-close on route change
-useEffect(() => {
-  setIsOpen(false);
-}, [pathname]);
-```
-
-**Chiusura**: click outside + ESC key + route change
-**Z-index**: `z-[100]` per dropdown sopra altri elementi
-
-**Implementazione completa**: `app/components/Navbar.js:89-145`
-
-## Badge Pulsante con Animazione
-
-Pattern per badge notifica con glow effect.
-
-```jsx
-{/* Badge container */}
-<div className="relative">
-  {/* Main button */}
-  <Button>Errori</Button>
-
-  {/* Badge */}
-  {hasError && (
-    <div className="absolute -top-2 -right-2">
-      {/* Blur layer for glow */}
-      <div className="absolute inset-0 bg-danger-500 rounded-full blur-sm animate-pulse" />
-      {/* Solid layer */}
-      <div className="relative bg-danger-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
-        !
-      </div>
-    </div>
-  )}
-</div>
-```
-
-**Pattern**:
-- Doppio layer (blur + solid) per glow effect
-- `animate-pulse` per attirare attenzione
-- Positioning `absolute -top-2 -right-2`
-
-**Implementazione esempio**: `app/page.js:180-195` (badge errore stufa)
-
-## Responsive Breakpoints Strategy
-
-```jsx
-// Mobile: < 768px
-<div className="md:hidden">Mobile only</div>
-
-// Tablet/Intermediate: 768px-1024px
-<div className="hidden md:flex lg:hidden">Tablet only</div>
-
-// Desktop Small: 1024px-1280px
-<div className="hidden lg:flex xl:hidden">Desktop small</div>
-
-// Desktop Large: > 1280px
-<div className="hidden xl:flex">Desktop large</div>
-```
-
-**Breakpoints**:
-- **Mobile**: < 768px (`md:hidden`)
-- **Tablet/Intermediate**: 768px-1024px (`md:flex`)
-- **Desktop Small**: 1024px-1280px (`lg:`)
-- **Desktop Large**: > 1280px (`xl:`)
-
-**Best Practice**:
-- Text truncation responsive: `max-w-[80px] xl:max-w-[120px]`
-- Dropdown/collapse elementi non-critici su mobile
-
-## Componenti con Varianti Multiple
-
-Pattern per componenti con layout/stile diversi.
-
-```jsx
-// Esempio: CronHealthBanner
-<CronHealthBanner variant="banner" />  // Default: standalone banner
-<CronHealthBanner variant="inline" />  // Integrato in card esistente
-```
-
-**Pattern**:
-- Usa prop `variant` per layout/stile diversi
-- Default variant sempre standalone
-- Varianti aggiuntive per integrazioni (inline, compact, minimal)
-
-**Esempi**:
-- `CronHealthBanner` - banner/inline
-- `Banner` - info/warning/error/success
-
-## Layout Components (v1.31.0+)
-
-Componenti base per layout e struttura consistente.
-
-### Section
-
-Wrapper semantico per sezioni di pagina con intestazione opzionale.
-
-```jsx
-<Section
-  title="I tuoi dispositivi"
-  description="Controlla e monitora tutti i dispositivi"
-  spacing="section"  // card|inline|section (default: card)
-  action={<Button>Azione</Button>}
->
-  {children}
-</Section>
-```
-
-**Props**:
-- `title` - Titolo sezione (Heading level 1)
-- `description` - Descrizione opzionale
-- `spacing` - Variante spacing (card/inline/section)
-- `action` - Pulsante/link azione opzionale
-- `children` - Contenuto sezione
-
-**Spacing Variants**:
-- `card` - 16px (1rem) - Contenuto compatto in cards
-- `inline` - 8px (0.5rem) - Elementi inline strettamente accoppiati
-- `section` - 32px (2rem) - Sezioni pagina principali
-
-**Implementazione**: `app/components/ui/Section.js`
-
-### Grid
-
-Sistema grid responsive con configurazione mobile/tablet/desktop e gap adattivo.
-
-```jsx
-<Grid
-  cols={{ mobile: 1, tablet: 2, desktop: 3, wide: 4 }}
-  gap="large"  // small|medium|large (default: medium)
->
-  {items.map(item => <div key={item.id}>{item}</div>)}
-</Grid>
-```
-
-**Props**:
-- `cols` - Configurazione colonne per breakpoint
-  - `mobile` - < 768px (default: 1)
-  - `tablet` - 768px-1024px (default: 2)
-  - `desktop` - 1024px-1280px (default: 3)
-  - `wide` - > 1280px (default: 4)
-- `gap` - Spacing tra elementi (responsive, aumenta su schermi grandi)
-  - `small` - 12px → 16px → 20px (mobile → tablet → desktop)
-  - `medium` - 16px → 20px → 24px
-  - `large` - 24px → 32px → 48px
-- `children` - Elementi grid
-
-**Gap Responsive**: Il gap aumenta automaticamente su schermi più grandi per migliorare la leggibilità e il respiro visivo.
-
-**Implementazione**: `app/components/ui/Grid.js`
-
-### Container
-
-Wrapper semantico per spacing consistente.
-
-```jsx
-<Container spacing="section">
-  {children}
-</Container>
-```
-
-**Props**:
-- `spacing` - Variante spacing (card: 16px / inline: 8px / section: 32px)
-- `className` - Classi Tailwind aggiuntive
-- `children` - Contenuto
-
-**Implementazione**: `app/components/ui/Container.js`
-
-## Typography Components (v1.31.0+)
-
-Componenti tipografici semantici con supporto dark mode.
-
-### Heading
-
-Intestazioni semantiche h1-h6 con varianti di stile.
-
-```jsx
-<Heading
-  level={1}  // 1-6 (default: 2)
-  size="xl"  // sm|md|lg|xl|2xl|3xl (default: auto)
-  variant="default"  // default|gradient|subtle
-  className="custom-class"
->
-  Titolo
-</Heading>
-```
-
-**Props**:
-- `level` - Livello semantico HTML (1-6)
-- `size` - Override dimensione testo (opzionale, auto-calcolato da level)
-- `variant` - Stile visivo
-  - `default` - Text standard
-  - `gradient` - Gradient primary→accent
-  - `subtle` - Colore attenuato (secondary)
-- `className` - Classi Tailwind aggiuntive
-- `children` - Testo/contenuto
-
-**Size Mapping** (auto da level):
-- h1 → 3xl (30px-36px)
-- h2 → 2xl (24px)
-- h3 → xl (20px)
-- h4 → lg (18px)
-- h5 → md (16px)
-- h6 → sm (14px)
-
-**Implementazione**: `app/components/ui/Heading.js`
-
-### Text
-
-Testo body con varianti semantiche.
-
-```jsx
-<Text
-  variant="body"  // body|secondary|tertiary
-  className="custom-class"
->
-  Testo descrittivo
-</Text>
-```
-
-**Props**:
-- `variant` - Variante semantica
-  - `body` - Testo primario (text-neutral-900 dark:text-white)
-  - `secondary` - Testo secondario (text-neutral-600 dark:text-neutral-400)
-  - `tertiary` - Testo terziario (text-neutral-500 dark:text-neutral-500)
-- `className` - Classi Tailwind aggiuntive
-- `children` - Testo/contenuto
-
-**Implementazione**: `app/components/ui/Text.js`
-
-## Primitive Components (v1.31.0+)
-
-Componenti primitivi riutilizzabili.
-
-### Icon
-
-Wrapper per lucide-react icons con ARIA support.
-
-```jsx
-import { Flame } from 'lucide-react';
-
-<Icon
-  icon={Flame}
-  size={24}  // default: 16
-  label="Stufa accesa"  // Accessibilità
-  className="text-primary-500"
-/>
-```
-
-**Props**:
-- `icon` - Componente lucide-react
-- `size` - Dimensione icon (px, default: 16)
-- `label` - Label accessibilità (aria-label)
-- `className` - Classi Tailwind aggiuntive
-
-**Implementazione**: `app/components/ui/Icon.js`
-
-### Divider
-
-Separatore visivo con label opzionale.
-
-```jsx
-<Divider
-  label="Modalità"  // Opzionale
-  variant="gradient"  // solid|dashed|gradient (default: solid)
-  spacing="large"  // small|medium|large (default: medium)
-  orientation="horizontal"  // horizontal|vertical (default: horizontal)
-/>
-```
-
-**Props**:
-- `label` - Testo centrale opzionale
-- `variant` - Stile linea
-  - `solid` - Linea continua
-  - `dashed` - Linea tratteggiata
-  - `gradient` - Gradiente da trasparente
-- `spacing` - Margini verticali/orizzontali (small: 16px / medium: 24px / large: 32px)
-- `orientation` - Orientamento (horizontal/vertical)
-
-**Implementazione**: `app/components/ui/Divider.js`
-
-## Misc Components (v1.31.0+)
-
-### EmptyState
-
-Stato vuoto consistente con icon/title/description/action.
-
-```jsx
-<EmptyState
-  icon="🏠"  // Emoji o componente Icon
-  title="Nessun dispositivo"
-  description="Aggiungi dispositivi per iniziare"
-  action={<Button>Aggiungi</Button>}  // Opzionale
-/>
-```
-
-**Props**:
-- `icon` - Emoji string o componente Icon
-- `title` - Titolo principale
-- `description` - Descrizione opzionale
-- `action` - CTA opzionale (Button o link)
-
-**Implementazione**: `app/components/ui/EmptyState.js`
-
-## Usage Examples (v1.31.0+)
-
-### Homepage Layout
-
-```jsx
-<Section
-  title="I tuoi dispositivi"
-  description="Controlla e monitora tutti i dispositivi"
-  spacing="section"
->
-  <Grid cols={{ mobile: 1, desktop: 2 }} gap="large">
-    <StoveCard />
-    <ThermostatCard />
-  </Grid>
-</Section>
-```
-
-### Card Header Pattern
-
-```jsx
-<div className="flex items-center justify-between mb-6">
-  <div className="flex items-center gap-2">
-    <span className="text-3xl">🔥</span>
-    <Heading level={2} size="xl">Stufa</Heading>
-  </div>
-  <button>Refresh</button>
-</div>
-```
-
-### Separator with Label
-
-```jsx
-<Divider label="Modalità" variant="gradient" spacing="large" />
-```
-
-### Empty State with Action
-
-```jsx
-<EmptyState
-  icon="🔌"
-  title="Termostato Non Connesso"
-  description="Connetti il tuo account Netatmo"
-  action={
-    <Button variant="success" onClick={handleAuth}>
-      Connetti Netatmo
-    </Button>
-  }
-/>
-```
-
-## Component Index Export
-
-Tutti i componenti sono esportati da `app/components/ui/index.js`:
-
-```jsx
-// Import singoli
-import { Section, Grid, Heading, Text } from './components/ui';
-
-// Import tutto
-import * as UI from './components/ui';
-<UI.Heading level={2}>Title</UI.Heading>
-```
-
-**Componenti disponibili**:
-- Layout: `Section`, `Grid`, `Container`
-- Typography: `Heading`, `Text`
-- Primitives: `Icon`, `Divider`
-- Misc: `EmptyState`
-- Existing: `Card`, `Button`, `Select`, `Banner`, `Toast`, `LoadingOverlay`, `Skeleton`, `ErrorAlert`
-
-## See Also
-
-- [Design System](./design-system.md) - Palette colori, styling hierarchy
-- [Patterns](./patterns.md) - Pattern riutilizzabili (modal, collapse, etc.)
-- [Architecture](./architecture.md) - Device cards pattern
+**Live preview**: `/debug/design-system`
 
 ---
 
-**Last Updated**: 2025-12-28 (v1.31.0 - Component Library)
+## Dark Mode Base
+
+```css
+/* Glass backgrounds */
+bg-white/[0.08] dark:bg-white/[0.05]   /* Cards */
+bg-white/[0.12] dark:bg-white/[0.08]   /* Hover */
+
+/* Text */
+text-neutral-900 dark:text-white       /* Primary */
+text-neutral-600 dark:text-neutral-400 /* Secondary */
+
+/* Borders */
+ring-white/15 dark:ring-white/08
+```
+
+---
+
+## Components
+
+### Card
+
+```jsx
+<Card liquid className="p-6">Content</Card>
+```
+
+| Prop | Default | Values |
+|------|---------|--------|
+| `liquid` | false | iOS glass style |
+| `glass` | false | Legacy glass |
+
+### Button
+
+```jsx
+<Button liquid variant="primary" size="md" icon="🔥">Accendi</Button>
+```
+
+| Prop | Default | Values |
+|------|---------|--------|
+| `variant` | primary | primary, secondary, success, danger, accent, outline, ghost |
+| `size` | md | sm, md, lg |
+| `liquid` | false | Glass style |
+| `icon` | - | Emoji/icon |
+| `disabled` | false | - |
+
+### ControlButton
+
+Bottone +/- per controlli numerici.
+
+```jsx
+<ControlButton type="increment" variant="info" disabled={value >= max} />
+```
+
+| Prop | Values |
+|------|--------|
+| `type` | increment, decrement |
+| `variant` | info (blu), warning (arancio), success, danger, neutral |
+| `size` | sm, md, lg |
+
+### Banner
+
+```jsx
+<Banner liquid variant="warning" title="Attenzione" description="Messaggio" />
+```
+
+| Prop | Values |
+|------|--------|
+| `variant` | info, warning, error, success |
+| `dismissible` | Show close button |
+| `actions` | JSX buttons |
+
+### Toast
+
+```jsx
+<Toast message="Operazione completata" variant="success" duration={3000} onDismiss={fn} />
+```
+
+Auto-dismiss. Position: fixed top-center.
+
+### LoadingOverlay
+
+```jsx
+<LoadingOverlay message="Caricamento..." icon="⏳" />
+```
+
+Full-page blocking overlay con glass style.
+
+### Select
+
+```jsx
+<Select liquid value={v} onChange={fn} options={[{value, label}]} />
+```
+
+Dropdown con z-index ottimizzato.
+
+### Input
+
+```jsx
+<Input liquid type="text" placeholder="..." value={v} onChange={fn} />
+```
+
+### Skeleton
+
+```jsx
+<Skeleton className="h-6 w-full" />
+```
+
+Loading placeholder con pulse animation.
+
+---
+
+## Layout Components
+
+### Section
+
+```jsx
+<Section title="Titolo" description="Desc" spacing="section">
+  {children}
+</Section>
+```
+
+Spacing: `card` (16px), `inline` (8px), `section` (32px)
+
+### Grid
+
+```jsx
+<Grid cols={{ mobile: 1, tablet: 2, desktop: 3 }} gap="large">
+  {items}
+</Grid>
+```
+
+Gap: `small`, `medium`, `large` (responsive)
+
+---
+
+## Typography
+
+### Heading
+
+```jsx
+<Heading level={2} variant="ember">Titolo</Heading>
+```
+
+| Prop | Values |
+|------|--------|
+| `level` | 1-6 (semantic h1-h6) |
+| `variant` | default, gradient, subtle, ember |
+
+### Text
+
+```jsx
+<Text variant="secondary">Descrizione</Text>
+```
+
+Variants: `body`, `secondary`, `tertiary`
+
+---
+
+## Primitives
+
+### Icon
+
+```jsx
+<Icon icon={Flame} size={24} label="Stufa" />
+```
+
+Wrapper lucide-react con ARIA support.
+
+### Divider
+
+```jsx
+<Divider label="Sezione" variant="gradient" spacing="large" />
+```
+
+Variants: `solid`, `dashed`, `gradient`
+
+### EmptyState
+
+```jsx
+<EmptyState icon="🏠" title="Nessun dispositivo" action={<Button>Aggiungi</Button>} />
+```
+
+---
+
+## Liquid Glass Pattern
+
+```jsx
+className="bg-white/[0.08] backdrop-blur-3xl shadow-liquid-sm ring-1 ring-white/20 ring-inset"
+```
+
+Shadow variants (tailwind.config.js):
+- `shadow-liquid-sm` - Buttons, inputs
+- `shadow-liquid` - Cards
+- `shadow-liquid-lg` - Modals
+
+---
+
+## Navbar
+
+Mobile-first con iOS-style bottom navigation.
+
+- **Desktop** (≥1024px): Top horizontal
+- **Mobile** (<1024px): Bottom nav + hamburger menu
+
+### Mobile Menu Pattern
+
+```jsx
+// Body scroll lock
+useEffect(() => {
+  document.body.style.overflow = mobileMenuOpen ? 'hidden' : 'unset';
+  return () => { document.body.style.overflow = 'unset'; };
+}, [mobileMenuOpen]);
+```
+
+Auto-close: route change + ESC key
+
+---
+
+## Import
+
+```jsx
+import { Section, Grid, Heading, Text, Card, Button } from '@/components/ui';
+```
+
+---
+
+## See Also
+
+- [Design System](./design-system.md) - Palette, shadows, animations
+- [Patterns](./patterns.md) - Modal, dropdown patterns

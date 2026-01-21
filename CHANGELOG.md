@@ -5,6 +5,32 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.72.2] - 2026-01-21
+
+### Debug Logging System for Remote Troubleshooting
+
+#### Added
+
+- **Debug Log API** - `/api/debug/log` per salvare/leggere log su Firebase
+  - POST per salvare log con categoria, messaggio e dati
+  - GET per leggere log recenti con filtro per categoria
+  - Nessuna autenticazione richiesta (debug pre-auth)
+
+- **Debug Logs Page** - `/debug/logs` per visualizzare log in tempo reale
+  - Filtro per categoria (notifications, fcm, general)
+  - Auto-refresh ogni 5 secondi
+  - Evidenziazione errori in rosso
+  - Espansione dati JSON per ogni log entry
+
+- **Notification Service diagnostics** - Log dettagliati per troubleshooting
+  - Log stato VAPID_KEY (exists, length, preview)
+  - Log env variables disponibili
+  - Log browser info (iOS, PWA, permission)
+  - Log ogni step del processo FCM token
+  - Log errori con stack trace
+
+---
+
 ## [1.72.1] - 2026-01-21
 
 ### Smart Stove Power Button

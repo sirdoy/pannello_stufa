@@ -1,24 +1,28 @@
-# Philips Hue Setup Guide - Local API
+# Philips Hue Setup Guide
 
-Guida completa per configurare l'integrazione Philips Hue con **Local API (CLIP v2)**.
+Guida completa per configurare l'integrazione Philips Hue con **Local API (CLIP v2)** e **Remote API (Cloud)**.
 
 ## 🎯 Panoramica
 
-Questa integrazione usa la **Local API** di Philips Hue, che comunica direttamente con il bridge sulla tua rete locale.
+Questa integrazione supporta **entrambe** le modalità di connessione:
 
-**✅ Vantaggi**:
-- Nessun account developer necessario
-- Zero configurazione OAuth
-- Latenza minima (comunicazione diretta)
-- Nessun rate limit cloud
-- Setup in 2 minuti
+### 🏠 Local API (Stesso Network)
+- Comunicazione diretta con il bridge sulla rete locale
+- Latenza minima, nessun rate limit
+- **Richiede**: Stesso network Wi-Fi del bridge
 
-**⚠️ Limitazioni**:
-- Funziona solo sulla stessa rete Wi-Fi del bridge
-- Non funziona da remoto (fuori casa)
-- Richiede accesso fisico al bridge per il pairing
+### 🌐 Remote API (Ovunque)
+- Comunicazione via cloud Philips Hue
+- Funziona da qualsiasi luogo
+- **Richiede**: OAuth 2.0 (Hue Developer Account)
 
-**💡 Nota**: Per controllo remoto, vedi [Remote API Setup](#future-remote-api-support) in fondo.
+### 🔄 Hybrid Mode (Automatico)
+- **Default consigliato**: Configura entrambe le connessioni
+- Usa Local API quando possibile (più veloce)
+- Fallback automatico a Remote API quando sei fuori casa
+- Zero configurazione manuale per lo switch
+
+**💡 Nota**: Il sistema usa `HueConnectionStrategy` per selezionare automaticamente la modalità migliore.
 
 ---
 
@@ -314,46 +318,68 @@ Ora il bridge avrà sempre lo stesso IP.
 
 ---
 
-## 9️⃣ Future: Remote API Support
+## 9️⃣ Remote API Setup (Implementato)
 
-**Architettura Estendibile**
+**Architettura Strategy Pattern**
 
-Il codice è già progettato per supportare **Remote API** in futuro (Opzione 3 - Hybrid):
-
-### Come Funzionerà (Futuro)
+Il sistema usa **Strategy Pattern** per gestire automaticamente Local e Remote API:
 
 ```
-IHueProvider (Interface)
-├── HueLocalProvider   ← Attualmente implementato
-└── HueRemoteProvider  ← Futuro (OAuth 2.0)
+HueConnectionStrategy
+├── HueApi (Local)         → https://{bridge_ip}/clip/v2/*
+└── HueRemoteApi (Remote)  → https://api.meethue.com/bridge/*
 ```
 
-### Migration Path
+### Come Funziona
 
-Quando vorrai aggiungere controllo remoto:
+1. **Verifica Local**: Controlla se il bridge è raggiungibile sulla rete locale
+2. **Fallback Remote**: Se non raggiungibile, usa la Remote API (cloud)
+3. **Automatic Switch**: Nessuna configurazione manuale necessaria
 
-1. **Decommentare OAuth code**:
-   - `lib/hue/hueTokenHelper.js` (già pronto, commentato)
-   - `app/api/hue/callback/route.js.disabled` (rinominare)
+### Setup Remote API (OAuth 2.0)
 
-2. **Setup OAuth**:
-   - Registra app su [Philips Hue Developer Portal](https://developers.meethue.com/)
-   - Ottieni Client ID e Client Secret
-   - Configura Callback URL
+#### Step 1: Registra App su Hue Developer Portal
 
-3. **Implementare Strategy Pattern**:
-   - Local API quando sei a casa (veloce)
-   - Remote API quando sei fuori (cloud)
-   - Switch automatico o manuale
+1. Vai su [Philips Hue Developer Portal](https://developers.meethue.com/)
+2. Crea account developer (gratuito)
+3. Crea nuova app:
+   - **App Name**: `Pannello Stufa` (o nome a piacere)
+   - **Callback URL**: `https://your-domain.com/api/hue/remote/callback`
+   - Per development: `http://localhost:3000/api/hue/remote/callback`
 
-4. **Environment Variables**:
-   ```bash
-   NEXT_PUBLIC_HUE_CLIENT_ID=...
-   HUE_CLIENT_SECRET=...
-   HUE_API_MODE=hybrid  # 'local' | 'remote' | 'hybrid'
-   ```
+4. Ottieni **Client ID** e **Client Secret**
 
-Per implementazione completa Remote API, vedi documentazione specifica (TODO).
+#### Step 2: Configura Environment Variables
+
+```bash
+# .env.local
+NEXT_PUBLIC_HUE_CLIENT_ID=your-client-id
+HUE_CLIENT_SECRET=your-client-secret
+```
+
+#### Step 3: Autorizza l'App
+
+1. Nell'app, vai alla sezione Hue
+2. Clicca "Connetti Remoto" (apparirà dopo aver configurato le env vars)
+3. Sarai reindirizzato al login Philips Hue
+4. Autorizza l'app
+5. Verrai riportato all'app con la connessione attiva
+
+### API Endpoints Remote
+
+| Endpoint | Descrizione |
+|----------|-------------|
+| `GET /api/hue/remote/authorize` | Inizia OAuth flow |
+| `GET /api/hue/remote/callback` | Callback OAuth |
+| `POST /api/hue/remote/disconnect` | Disconnetti Remote API |
+
+### Connection Modes
+
+Il sistema traccia la modalità di connessione in Firebase:
+
+- `local`: Solo Local API configurata
+- `remote`: Solo Remote API configurata
+- `hybrid`: Entrambe configurate, Local preferita con fallback Remote automatico
 
 ---
 
@@ -390,20 +416,27 @@ Per implementazione completa Remote API, vedi documentazione specifica (TODO).
 
 ## 🔧 Architettura Tecnica
 
-### Local API Flow
+### Strategy Pattern Flow
 
 ```
 Client (LightsCard)
     ↓
 API Route (/api/hue/*)
     ↓
-hueLocalHelper.getHueConnection()  → Firebase (bridge_ip, username)
+HueConnectionStrategy.getProvider()
     ↓
-HueApi class (bridge_ip, username)
-    ↓
-https://{bridge_ip}/clip/v2/resource/*
-    ↓
-Hue Bridge (Local Network)
+┌─────────────────────────────────────┐
+│ 1. Check local bridge reachability  │
+│    (2s timeout HTTPS request)       │
+└─────────────────────────────────────┘
+    ↓                    ↓
+ Reachable           Not Reachable
+    ↓                    ↓
+HueApi (Local)    HueRemoteApi (Cloud)
+    ↓                    ↓
+https://{bridge_ip}   https://api.meethue.com
+    ↓                    ↓
+Hue Bridge          Philips Cloud → Bridge
 ```
 
 ### Pairing Flow
@@ -434,7 +467,7 @@ Hue Bridge (Local Network)
 
 ---
 
-**Last Updated**: 2025-01-04
-**Integration Version**: 1.37.0 (Hue Local API)
-**API Version**: Hue Local API v2 (CLIP v2)
-**Architecture**: Local API with extensible design for future Remote API support
+**Last Updated**: 2026-01-21
+**Integration Version**: 1.72.0 (Hue Local + Remote API)
+**API Version**: Local API v2 (CLIP v2) + Remote API v1 (Cloud)
+**Architecture**: Strategy Pattern with automatic Local/Remote fallback

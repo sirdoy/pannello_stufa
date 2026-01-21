@@ -5,6 +5,46 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.72.0] - 2026-01-21
+
+### Hue Local/Remote Strategy & UX Improvements
+
+#### Added
+
+- **HueConnectionStrategy** - Pattern per fallback automatico Local API → Remote API
+  - Verifica raggiungibilità bridge locale (2s timeout)
+  - Fallback automatico a Remote API (Cloud) se non raggiungibile
+  - Zero configurazione manuale per lo switch
+
+- **Quick all-house control** - Accendi/spegni tutte le luci della casa
+  - Barra rapida "Tutta la Casa" prima del selettore stanze
+  - Mostra X/Y luci accese
+  - Toggle parallelo di tutte le stanze
+
+- **Smart buttons** - Mostra solo il pulsante rilevante basato sullo stato
+  - Tutte spente → Solo "Accendi" (variant ember, prominente)
+  - Tutte accese → Solo "Spegni" (variant subtle)
+  - Stato misto → Entrambi i pulsanti
+
+- **Connection mode badge** - Mostra Local/Cloud/Hybrid nella card luci
+
+- **Improved pairing UX** - Step "premi pulsante bridge" prima del pairing
+
+#### Fixed
+
+- **checkLocalBridge()** - Usa https module invece di fetch per certificati self-signed
+- **Room lights detection** - Usa `owner.rid` per match corretto in Local API (CLIP v2)
+- **Button variant** - Corretto da "warning" (inesistente) a "ember"
+
+#### Technical
+
+- `lib/hue/hueConnectionStrategy.js` - Strategy pattern con checkLocalBridge()
+- `app/api/hue/*` routes - Migrati a HueConnectionStrategy
+- `app/components/devices/lights/LightsCard.js` - All-house control, smart buttons
+- `app/lights/page.js` - Stesse migliorie della card
+
+---
+
 ## [1.70.0] - 2026-01-21
 
 ### Multi-Room Stove Sync

@@ -15,7 +15,7 @@ import {
   saveRemoteTokens,
   setConnectionMode,
 } from '@/lib/hue/hueRemoteTokenHelper';
-import { hasRemoteTokens } from '@/lib/hue/hueLocalHelper';
+import { getHueConnection } from '@/lib/hue/hueLocalHelper';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,7 +65,8 @@ export const GET = withErrorHandler(async (request) => {
   await saveRemoteTokens(tokens.refresh_token);
 
   // Determine connection mode (hybrid if local exists, remote otherwise)
-  const hasLocal = await hasRemoteTokens(); // This will be true if we just saved tokens
+  const localConnection = await getHueConnection();
+  const hasLocal = !!localConnection?.bridgeIp && !!localConnection?.username;
   const connectionMode = hasLocal ? 'hybrid' : 'remote';
   await setConnectionMode(connectionMode);
 

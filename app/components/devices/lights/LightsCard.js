@@ -30,7 +30,7 @@ export default function LightsCard() {
 
   // Pairing state
   const [pairing, setPairing] = useState(false);
-  const [pairingStep, setPairingStep] = useState(null); // 'discovering' | 'pairing' | 'success'
+  const [pairingStep, setPairingStep] = useState(null); // 'discovering' | 'waitingForButtonPress' | 'pairing' | 'success'
   const [discoveredBridges, setDiscoveredBridges] = useState([]);
   const [selectedBridge, setSelectedBridge] = useState(null);
   const [pairingCountdown, setPairingCountdown] = useState(30);
@@ -80,10 +80,14 @@ export default function LightsCard() {
 
   const selectedRoomGroupedLightId = getGroupedLightId(selectedRoom);
 
-  // Use 'children' instead of 'services' to get individual lights
-  // In Hue API v2: services = grouped_light/scenes, children = individual lights
+  // Use 'children' to get individual lights for this room
+  // In Hue API v2 (Local): children contains device IDs, light.owner.rid points to device
+  // In Hue API v2 (Remote normalized): children may contain light IDs directly
   const roomLights = lights.filter(light =>
-    selectedRoom?.children?.some(c => c.rid === light.id && c.rtype === 'light')
+    selectedRoom?.children?.some(c =>
+      c.rid === light.id || // Remote API: light ID in children
+      c.rid === light.owner?.rid // Local API: device ID in children, match via owner
+    )
   );
   const roomScenes = scenes.filter(scene =>
     scene.group?.rid === selectedRoom?.id
@@ -91,6 +95,21 @@ export default function LightsCard() {
 
   // Check if room has any color-capable lights
   const hasColorLights = roomLights.some(light => supportsColor(light));
+
+  // Get lights associated with the room via services (more reliable than children)
+  // This matches how isRoomOn calculates state
+  const serviceLights = selectedRoom?.services
+    ?.map(s => lights.find(l => l.id === s.rid))
+    .filter(Boolean) || [];
+
+  // Use serviceLights if roomLights is empty (API inconsistency between children/services)
+  const effectiveLights = roomLights.length > 0 ? roomLights : serviceLights;
+
+  // Calculate lights on/off state for better UX
+  const lightsOnCount = effectiveLights.filter(light => light?.on?.on).length;
+  const lightsOffCount = effectiveLights.length - lightsOnCount;
+  const allLightsOn = effectiveLights.length > 0 && lightsOnCount === effectiveLights.length;
+  const allLightsOff = effectiveLights.length > 0 && lightsOffCount === effectiveLights.length;
 
   async function checkConnection() {
     try {
@@ -232,6 +251,40 @@ export default function LightsCard() {
   }
 
   /**
+   * Toggle all lights in the house (all rooms at once)
+   */
+  async function handleAllLightsToggle(on) {
+    try {
+      setLoadingMessage(on ? 'Accensione tutte le luci...' : 'Spegnimento tutte le luci...');
+      setRefreshing(true);
+      setError(null);
+
+      // Get all grouped_light IDs from all rooms
+      const groupedLightIds = rooms
+        .map(room => room.services?.find(s => s.rtype === 'grouped_light')?.rid)
+        .filter(Boolean);
+
+      // Toggle all rooms in parallel
+      await Promise.all(
+        groupedLightIds.map(groupId =>
+          fetch(`/api/hue/rooms/${groupId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ on: { on } }),
+          })
+        )
+      );
+
+      // Refresh data after all commands
+      await fetchData();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
+  /**
    * Remote API OAuth Flow
    * Redirects to /api/hue/remote/authorize which handles OAuth
    */
@@ -296,10 +349,10 @@ export default function LightsCard() {
 
       setDiscoveredBridges(data.bridges);
 
-      // Auto-select if only one bridge
+      // Auto-select if only one bridge, show instructions
       if (data.bridges.length === 1) {
         setSelectedBridge(data.bridges[0]);
-        await handlePairWithBridge(data.bridges[0]);
+        setPairingStep('waitingForButtonPress');
       } else {
         setPairingStep('selectBridge');
       }
@@ -372,11 +425,30 @@ export default function LightsCard() {
   }
 
   /**
+   * User confirms they pressed the bridge button - start actual pairing
+   */
+  function handleConfirmButtonPressed() {
+    if (selectedBridge) {
+      handlePairWithBridge(selectedBridge);
+    }
+  }
+
+  /**
+   * Handle bridge selection from multiple bridges
+   */
+  function handleSelectBridge(bridge) {
+    setSelectedBridge(bridge);
+    setPairingStep('waitingForButtonPress');
+  }
+
+  /**
    * Retry pairing
    */
   function handleRetryPairing() {
     if (selectedBridge) {
-      handlePairWithBridge(selectedBridge);
+      // Go back to waiting for button press step
+      setPairingError(null);
+      setPairingStep('waitingForButtonPress');
     } else {
       handleStartPairing();
     }
@@ -419,6 +491,37 @@ export default function LightsCard() {
         { label: '☁️ Connetti via Cloud', onClick: handleRemoteAuth, variant: 'primary' },
         { label: 'Annulla', onClick: handleCancelPairing }
       ]
+    });
+  }
+
+  // Waiting for user to press bridge button - INSTRUCTION STEP
+  if (pairing && pairingStep === 'waitingForButtonPress') {
+    banners.push({
+      variant: 'warning',
+      icon: '👆',
+      title: 'Premi il pulsante sul Bridge Hue',
+      description: `Bridge trovato: ${selectedBridge?.internalipaddress || 'N/A'}. Premi il pulsante rotondo al centro del bridge, poi clicca "Avvia Pairing".`,
+      actions: [
+        { label: '✓ Avvia Pairing', onClick: handleConfirmButtonPressed, variant: 'primary' },
+        { label: 'Annulla', onClick: handleCancelPairing }
+      ]
+    });
+  }
+
+  // Bridge selection (multiple bridges found)
+  if (pairing && pairingStep === 'selectBridge' && discoveredBridges.length > 1) {
+    banners.push({
+      variant: 'info',
+      icon: '🔗',
+      title: 'Seleziona Bridge',
+      description: `Trovati ${discoveredBridges.length} bridge sulla rete. Seleziona quello da connettere.`,
+      actions: discoveredBridges.map(bridge => ({
+        label: `${bridge.internalipaddress}`,
+        onClick: () => handleSelectBridge(bridge),
+        variant: selectedBridge?.id === bridge.id ? 'primary' : 'outline'
+      })).concat([
+        { label: 'Annulla', onClick: handleCancelPairing }
+      ])
     });
   }
 
@@ -496,25 +599,17 @@ export default function LightsCard() {
     onClick: () => router.push('/lights')
   }] : [];
 
-  // Connection mode badge - Ember Noir with light mode support
-  const getConnectionModeBadge = () => {
+  // Connection mode badge for DeviceCard header
+  const getStatusBadge = () => {
     if (!connected || !connectionMode) return null;
 
     const badges = {
-      'local': { icon: '📡', text: 'Local', color: 'text-sage-400 [html:not(.dark)_&]:text-sage-600' },
-      'remote': { icon: '☁️', text: 'Cloud', color: 'text-ocean-400 [html:not(.dark)_&]:text-ocean-600' },
-      'hybrid': { icon: '🔄', text: 'Hybrid', color: 'text-warning-400 [html:not(.dark)_&]:text-warning-600' },
+      'local': { icon: '📡', label: 'Local', color: 'sage' },
+      'remote': { icon: '☁️', label: 'Cloud', color: 'ocean' },
+      'hybrid': { icon: '🔄', label: 'Hybrid', color: 'warning' },
     };
 
-    const badge = badges[connectionMode];
-    if (!badge) return null;
-
-    return (
-      <div className="flex items-center gap-1.5 text-xs font-semibold font-display">
-        <span>{badge.icon}</span>
-        <span className={badge.color}>{badge.text}</span>
-      </div>
-    );
+    return badges[connectionMode] || null;
   };
 
   const isRoomOn = selectedRoom?.services?.some(s => {
@@ -522,8 +617,15 @@ export default function LightsCard() {
     return light?.on?.on;
   }) || false;
 
-  const avgBrightness = selectedRoom ? Math.round(
-    roomLights.reduce((sum, l) => sum + (l.dimming?.brightness || 0), 0) / roomLights.length
+  // Calculate total house lights state for quick control
+  const totalLightsOn = lights.filter(l => l.on?.on).length;
+  const totalLightsOff = lights.length - totalLightsOn;
+  const allHouseLightsOn = lights.length > 0 && totalLightsOn === lights.length;
+  const allHouseLightsOff = lights.length > 0 && totalLightsOff === lights.length;
+  const hasAnyLights = lights.length > 0;
+
+  const avgBrightness = selectedRoom && effectiveLights.length > 0 ? Math.round(
+    effectiveLights.reduce((sum, l) => sum + (l.dimming?.brightness || 0), 0) / effectiveLights.length
   ) : 0;
 
   return (
@@ -538,15 +640,77 @@ export default function LightsCard() {
       loading={loading || refreshing || pairing}
       loadingMessage={pairingStep === 'discovering' ? 'Ricerca bridge...' : pairingStep === 'pairing' ? `Pairing in corso... ${pairingCountdown}s` : loadingMessage}
       skeletonComponent={loading ? <Skeleton.LightsCard /> : null}
+      statusBadge={getStatusBadge()}
       banners={banners}
       infoBoxes={infoBoxes}
       infoBoxesTitle="Informazioni"
       footerActions={footerActions}
     >
-      {/* Connection Mode Badge */}
-      {getConnectionModeBadge() && (
-        <div className="mb-4 flex items-center justify-center">
-          {getConnectionModeBadge()}
+      {/* Quick All-House Control */}
+      {hasAnyLights && (
+        <div className="mb-4 p-4 rounded-xl bg-slate-800/30 border border-slate-700/50 [html:not(.dark)_&]:bg-slate-100/80 [html:not(.dark)_&]:border-slate-200">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-xl">🏠</span>
+              <div className="min-w-0">
+                <Text size="sm" weight="semibold" className="font-display truncate">Tutta la Casa</Text>
+                <Text variant="tertiary" size="xs">{totalLightsOn}/{lights.length} accese</Text>
+              </div>
+            </div>
+
+            {/* Smart button based on state */}
+            <div className="flex-shrink-0">
+              {/* Mixed state: show both buttons compact */}
+              {!allHouseLightsOn && !allHouseLightsOff && (
+                <div className="flex gap-2">
+                  <Button
+                    variant="subtle"
+                    onClick={() => handleAllLightsToggle(true)}
+                    disabled={refreshing}
+                    size="sm"
+                    icon="💡"
+                  >
+                    Tutte
+                  </Button>
+                  <Button
+                    variant="subtle"
+                    onClick={() => handleAllLightsToggle(false)}
+                    disabled={refreshing}
+                    size="sm"
+                    icon="🌙"
+                  >
+                    Spegni
+                  </Button>
+                </div>
+              )}
+
+              {/* All off: show only "Accendi" */}
+              {allHouseLightsOff && (
+                <Button
+                  variant="ember"
+                  onClick={() => handleAllLightsToggle(true)}
+                  disabled={refreshing}
+                  size="sm"
+                  icon="💡"
+                >
+                  Accendi Tutte
+                </Button>
+              )}
+
+              {/* All on: show only "Spegni" */}
+              {allHouseLightsOn && (
+                <Button
+                  variant="subtle"
+                  onClick={() => handleAllLightsToggle(false)}
+                  disabled={refreshing}
+                  size="sm"
+                  icon="🌙"
+                >
+                  Spegni Tutte
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
@@ -590,28 +754,83 @@ export default function LightsCard() {
                     </div>
                   )}
 
-                  {/* On/Off Buttons */}
-                  <div className="grid grid-cols-2 gap-4 mb-6">
-                    <Button
-                      variant={isRoomOn ? "success" : "subtle"}
-                      onClick={() => handleRoomToggle(selectedRoomGroupedLightId, true)}
-                      disabled={refreshing || !selectedRoomGroupedLightId}
-                      icon="💡"
-                      size="lg"
-                      className="h-16 sm:h-20 font-display"
-                    >
-                      Accendi
-                    </Button>
-                    <Button
-                      variant={!isRoomOn ? "danger" : "subtle"}
-                      onClick={() => handleRoomToggle(selectedRoomGroupedLightId, false)}
-                      disabled={refreshing || !selectedRoomGroupedLightId}
-                      icon="🌙"
-                      size="lg"
-                      className="h-16 sm:h-20 font-display"
-                    >
-                      Spegni
-                    </Button>
+                  {/* Lights Status Summary */}
+                  {roomLights.length > 1 && (
+                    <div className="flex justify-center gap-4 mb-4 text-xs font-display">
+                      <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${
+                        lightsOnCount > 0
+                          ? 'bg-warning-900/40 text-warning-400 border border-warning-500/30 [html:not(.dark)_&]:bg-warning-100/80 [html:not(.dark)_&]:text-warning-700 [html:not(.dark)_&]:border-warning-300'
+                          : 'bg-slate-800/50 text-slate-500 border border-slate-700/30 [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:border-slate-200'
+                      }`}>
+                        <span>💡</span>
+                        <span className="font-semibold">{lightsOnCount} accese</span>
+                      </span>
+                      <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${
+                        lightsOffCount > 0
+                          ? 'bg-slate-800/50 text-slate-400 border border-slate-700/30 [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:border-slate-200'
+                          : 'bg-slate-800/30 text-slate-600 border border-slate-700/20 [html:not(.dark)_&]:bg-slate-50 [html:not(.dark)_&]:text-slate-400 [html:not(.dark)_&]:border-slate-100'
+                      }`}>
+                        <span>🌙</span>
+                        <span className="font-semibold">{lightsOffCount} spente</span>
+                      </span>
+                    </div>
+                  )}
+
+                  {/* On/Off Button - Show only the relevant action */}
+                  <div className="mb-6">
+                    {/* Mixed state: show both buttons */}
+                    {!allLightsOn && !allLightsOff && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <Button
+                          variant="subtle"
+                          onClick={() => handleRoomToggle(selectedRoomGroupedLightId, true)}
+                          disabled={refreshing || !selectedRoomGroupedLightId}
+                          icon="💡"
+                          size="lg"
+                          className="h-16 sm:h-20 font-display"
+                        >
+                          Accendi tutte
+                        </Button>
+                        <Button
+                          variant="subtle"
+                          onClick={() => handleRoomToggle(selectedRoomGroupedLightId, false)}
+                          disabled={refreshing || !selectedRoomGroupedLightId}
+                          icon="🌙"
+                          size="lg"
+                          className="h-16 sm:h-20 font-display"
+                        >
+                          Spegni tutte
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* All lights off: show only "Accendi" - prominent CTA */}
+                    {allLightsOff && (
+                      <Button
+                        variant="ember"
+                        onClick={() => handleRoomToggle(selectedRoomGroupedLightId, true)}
+                        disabled={refreshing || !selectedRoomGroupedLightId}
+                        icon="💡"
+                        size="lg"
+                        className="w-full h-16 sm:h-20 font-display ring-2 ring-ember-500/30 ring-offset-2 ring-offset-slate-900 [html:not(.dark)_&]:ring-offset-white"
+                      >
+                        Accendi
+                      </Button>
+                    )}
+
+                    {/* All lights on: show only "Spegni" */}
+                    {allLightsOn && (
+                      <Button
+                        variant="subtle"
+                        onClick={() => handleRoomToggle(selectedRoomGroupedLightId, false)}
+                        disabled={refreshing || !selectedRoomGroupedLightId}
+                        icon="🌙"
+                        size="lg"
+                        className="w-full h-16 sm:h-20 font-display"
+                      >
+                        Spegni
+                      </Button>
+                    )}
                   </div>
 
                   {/* Brightness Control - Ember Noir */}

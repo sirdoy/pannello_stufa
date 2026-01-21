@@ -240,6 +240,38 @@ export default function LightsPage() {
     }
   }
 
+  async function handleAllLightsToggle(on) {
+    try {
+      setRefreshing(true);
+      setError(null);
+      setSuccess(null);
+
+      // Get all grouped_light IDs from all rooms
+      const groupedLightIds = rooms
+        .map(room => room.services?.find(s => s.rtype === 'grouped_light')?.rid)
+        .filter(Boolean);
+
+      // Toggle all rooms in parallel
+      await Promise.all(
+        groupedLightIds.map(groupId =>
+          fetch(`/api/hue/rooms/${groupId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ on: { on } }),
+          })
+        )
+      );
+
+      setSuccess(on ? 'Tutte le luci accese' : 'Tutte le luci spente');
+      setTimeout(() => setSuccess(null), 2000);
+      await fetchData();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
   // Helper to get grouped_light ID
   const getGroupedLightId = (room) => {
     if (!room?.services) return null;
@@ -248,10 +280,15 @@ export default function LightsPage() {
   };
 
   // Helper to get room lights (use 'children' not 'services')
+  // Local API: children contains device IDs, match via light.owner.rid
+  // Remote API: children may contain light IDs directly
   const getRoomLights = (room) => {
     if (!room?.children || !lights.length) return [];
     return lights.filter(light =>
-      room.children.some(c => c.rid === light.id && c.rtype === 'light')
+      room.children.some(c =>
+        c.rid === light.id || // Remote API: light ID in children
+        c.rid === light.owner?.rid // Local API: device ID in children
+      )
     );
   };
 
@@ -362,6 +399,78 @@ export default function LightsPage() {
         </div>
       </Card>
 
+      {/* Quick All-House Control */}
+      {lights.length > 0 && (() => {
+        const totalLightsOn = lights.filter(l => l.on?.on).length;
+        const allHouseLightsOn = totalLightsOn === lights.length;
+        const allHouseLightsOff = totalLightsOn === 0;
+
+        return (
+          <Card className="p-6 mb-6 bg-gradient-to-br from-slate-800/40 to-slate-900/60 border-slate-700/50 [html:not(.dark)_&]:from-slate-50 [html:not(.dark)_&]:to-slate-100 [html:not(.dark)_&]:border-slate-200">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-3xl">🏠</span>
+                <div>
+                  <Heading level={2} size="md">Tutta la Casa</Heading>
+                  <Text variant="secondary" size="sm">
+                    {totalLightsOn}/{lights.length} luci accese
+                  </Text>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                {/* Mixed state: show both buttons */}
+                {!allHouseLightsOn && !allHouseLightsOff && (
+                  <>
+                    <Button
+                      variant="ember"
+                      onClick={() => handleAllLightsToggle(true)}
+                      disabled={refreshing}
+                      icon="💡"
+                    >
+                      Accendi Tutte
+                    </Button>
+                    <Button
+                      variant="subtle"
+                      onClick={() => handleAllLightsToggle(false)}
+                      disabled={refreshing}
+                      icon="🌙"
+                    >
+                      Spegni Tutte
+                    </Button>
+                  </>
+                )}
+
+                {/* All off: show only "Accendi" */}
+                {allHouseLightsOff && (
+                  <Button
+                    variant="ember"
+                    onClick={() => handleAllLightsToggle(true)}
+                    disabled={refreshing}
+                    icon="💡"
+                    className="ring-2 ring-ember-500/30 ring-offset-2 ring-offset-slate-900 [html:not(.dark)_&]:ring-offset-white"
+                  >
+                    Accendi Tutte le Luci
+                  </Button>
+                )}
+
+                {/* All on: show only "Spegni" */}
+                {allHouseLightsOn && (
+                  <Button
+                    variant="subtle"
+                    onClick={() => handleAllLightsToggle(false)}
+                    disabled={refreshing}
+                    icon="🌙"
+                  >
+                    Spegni Tutte le Luci
+                  </Button>
+                )}
+              </div>
+            </div>
+          </Card>
+        );
+      })()}
+
       {/* Rooms with detailed controls */}
       {rooms.length > 0 && (
         <div className="space-y-6 mb-8">
@@ -377,6 +486,12 @@ export default function LightsPage() {
               roomLights.reduce((sum, l) => sum + (l.dimming?.brightness || 0), 0) / roomLights.length
             ) : 0;
 
+            // Calculate lights state for smart button display
+            const lightsOnCount = roomLights.filter(l => l.on?.on).length;
+            const lightsOffCount = roomLights.length - lightsOnCount;
+            const allLightsOn = roomLights.length > 0 && lightsOnCount === roomLights.length;
+            const allLightsOff = roomLights.length > 0 && lightsOffCount === roomLights.length;
+
             return (
               <Card key={room.id} className="overflow-hidden">
                 {/* Room Header */}
@@ -388,6 +503,7 @@ export default function LightsPage() {
                       </Heading>
                       <Text variant="tertiary" size="xs">
                         {roomLights.length} {roomLights.length === 1 ? 'luce' : 'luci'} • {roomScenes.length} {roomScenes.length === 1 ? 'scena' : 'scene'}
+                        {roomLights.length > 0 && ` • ${lightsOnCount} accese`}
                       </Text>
                     </div>
                     {isOn && (
@@ -397,26 +513,60 @@ export default function LightsPage() {
                     )}
                   </div>
 
-                  {/* Room Controls */}
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <Button
-                      variant={isOn ? "success" : "outline"}
-                      onClick={() => handleRoomToggle(groupedLightId, true)}
-                      disabled={refreshing || !groupedLightId}
-                      size="sm"
-                      icon="💡"
-                    >
-                      Accendi Stanza
-                    </Button>
-                    <Button
-                      variant={!isOn ? "danger" : "outline"}
-                      onClick={() => handleRoomToggle(groupedLightId, false)}
-                      disabled={refreshing || !groupedLightId}
-                      size="sm"
-                      icon="🌙"
-                    >
-                      Spegni Stanza
-                    </Button>
+                  {/* Room Controls - Show only relevant button(s) */}
+                  <div className="mb-4">
+                    {/* Mixed state: show both buttons */}
+                    {!allLightsOn && !allLightsOff && (
+                      <div className="grid grid-cols-2 gap-3">
+                        <Button
+                          variant="subtle"
+                          onClick={() => handleRoomToggle(groupedLightId, true)}
+                          disabled={refreshing || !groupedLightId}
+                          size="sm"
+                          icon="💡"
+                        >
+                          Accendi Stanza
+                        </Button>
+                        <Button
+                          variant="subtle"
+                          onClick={() => handleRoomToggle(groupedLightId, false)}
+                          disabled={refreshing || !groupedLightId}
+                          size="sm"
+                          icon="🌙"
+                        >
+                          Spegni Stanza
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* All lights off: show only "Accendi" */}
+                    {allLightsOff && (
+                      <Button
+                        variant="ember"
+                        onClick={() => handleRoomToggle(groupedLightId, true)}
+                        disabled={refreshing || !groupedLightId}
+                        size="sm"
+                        icon="💡"
+                        fullWidth
+                        className="ring-2 ring-ember-500/30 ring-offset-2 ring-offset-white dark:ring-offset-slate-900"
+                      >
+                        Accendi Stanza
+                      </Button>
+                    )}
+
+                    {/* All lights on: show only "Spegni" */}
+                    {allLightsOn && (
+                      <Button
+                        variant="subtle"
+                        onClick={() => handleRoomToggle(groupedLightId, false)}
+                        disabled={refreshing || !groupedLightId}
+                        size="sm"
+                        icon="🌙"
+                        fullWidth
+                      >
+                        Spegni Stanza
+                      </Button>
+                    )}
                   </div>
 
                   {/* Room Brightness */}
@@ -481,23 +631,31 @@ export default function LightsPage() {
                                   {lightOn && <span className="text-xs text-warning-400 [html:not(.dark)_&]:text-warning-600">ON</span>}
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-2 mb-2">
-                                  <Button
-                                    variant={lightOn ? "success" : "outline"}
-                                    onClick={() => handleLightToggle(light.id, true)}
-                                    disabled={refreshing}
-                                    size="xs"
-                                  >
-                                    On
-                                  </Button>
-                                  <Button
-                                    variant={!lightOn ? "danger" : "outline"}
-                                    onClick={() => handleLightToggle(light.id, false)}
-                                    disabled={refreshing}
-                                    size="xs"
-                                  >
-                                    Off
-                                  </Button>
+                                {/* Show only relevant button */}
+                                <div className="mb-2">
+                                  {lightOn ? (
+                                    <Button
+                                      variant="subtle"
+                                      onClick={() => handleLightToggle(light.id, false)}
+                                      disabled={refreshing}
+                                      size="xs"
+                                      fullWidth
+                                      icon="🌙"
+                                    >
+                                      Spegni
+                                    </Button>
+                                  ) : (
+                                    <Button
+                                      variant="ember"
+                                      onClick={() => handleLightToggle(light.id, true)}
+                                      disabled={refreshing}
+                                      size="xs"
+                                      fullWidth
+                                      icon="💡"
+                                    >
+                                      Accendi
+                                    </Button>
+                                  )}
                                 </div>
 
                                 {lightOn && (

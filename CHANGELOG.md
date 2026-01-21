@@ -5,6 +5,19 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.72.7] - 2026-01-21
+
+### Hue Remote API Debug Logging
+
+#### Added
+
+- **Debug logging per HueRemoteApi** - Facilita troubleshooting connessione Remote
+  - Log baseUrl in constructor per verificare username corretto
+  - Log URL completo per ogni richiesta API
+  - Log gruppi trovati e conteggio rooms filtrate
+
+---
+
 ## [1.72.6] - 2026-01-21
 
 ### Hue Remote Pairing & Token Caching for Serverless

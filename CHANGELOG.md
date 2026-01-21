@@ -5,6 +5,27 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.72.8] - 2026-01-21
+
+### Hue Proactive Token Refresh via Cron
+
+#### Added
+
+- **Proactive token refresh** - Refresh automatico token Hue prima della scadenza
+  - Nuova funzione `proactiveTokenRefresh()` in hueRemoteTokenHelper
+  - Integrazione nel cron scheduler `/api/scheduler/check`
+  - Token rinnovato automaticamente 24h prima della scadenza
+  - Evita disconnessioni manuali e riconnessioni OAuth
+
+#### Changed
+
+- **Cleanup debug logging** - Rimossi log verbosi non più necessari
+  - HueRemoteApi: rimossi log baseUrl, URL requests, gruppi trovati
+  - hueConnectionStrategy: rimossi tutti i log verbose
+  - Mantenuti solo log di errore essenziali
+
+---
+
 ## [1.72.7] - 2026-01-21
 
 ### Hue Remote API Debug Logging

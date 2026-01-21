@@ -41,6 +41,7 @@ import {
 } from '@/lib/stoveApi';
 import { updateStoveState } from '@/lib/stoveStateService';
 import { syncLivingRoomWithStove, getStoveSyncConfig } from '@/lib/netatmoStoveSync';
+import { proactiveTokenRefresh } from '@/lib/hue/hueRemoteTokenHelper';
 
 export const dynamic = 'force-dynamic';
 
@@ -564,6 +565,14 @@ export const GET = withCronSecret(async (request) => {
       console.log(`✅ Calibrazione automatica completata - prossima: ${result.nextCalibration}`);
     }
   }).catch(err => console.error('❌ Errore calibrazione:', err));
+
+  // Proactive Hue token refresh (async, don't wait)
+  // Refreshes token if expiring within 24 hours to avoid manual reconnection
+  proactiveTokenRefresh().then((result) => {
+    if (result.refreshed) {
+      console.log('✅ Hue token refreshed proactively');
+    }
+  }).catch(err => console.error('❌ Hue token refresh error:', err.message));
 
   // Track maintenance hours
   const maintenanceTrack = await trackUsageHours(currentStatus);

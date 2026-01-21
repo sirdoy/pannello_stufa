@@ -5,6 +5,18 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.69.3] - 2026-01-21
+
+### Netatmo Token Reconnect Fix
+
+#### Fixed
+
+- **Netatmo token expiration not showing reconnection prompt** - CameraCard now correctly detects expired tokens
+  - Fixed `fromApiError()` to spread details at top level (`reconnect: true`)
+  - CameraCard now correctly detects expired tokens and shows "Connetti Netatmo" UI instead of throwing error
+
+---
+
 ## [1.69.2] - 2026-01-21
 
 ### TypeScript JSDoc Fix

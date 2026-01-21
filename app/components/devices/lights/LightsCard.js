@@ -6,7 +6,7 @@ import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
 import RoomSelector from '../../ui/RoomSelector';
 import { Divider, Heading, Button, EmptyState, Text } from '../../ui';
-import { supportsColor } from '@/lib/hue/colorUtils';
+import { supportsColor, getCurrentColorHex } from '@/lib/hue/colorUtils';
 
 /**
  * LightsCard - Complete Philips Hue lights control for homepage
@@ -27,6 +27,10 @@ export default function LightsCard() {
 
   // Loading overlay message
   const [loadingMessage, setLoadingMessage] = useState('Caricamento...');
+
+  // Local slider value for smooth dragging (avoid API calls during drag)
+  const [localBrightness, setLocalBrightness] = useState(null);
+  const isDraggingSlider = useRef(false);
 
   // Pairing state
   const [pairing, setPairing] = useState(false);
@@ -664,6 +668,148 @@ export default function LightsCard() {
     effectiveLights.reduce((sum, l) => sum + (l.dimming?.brightness || 0), 0) / effectiveLights.length
   ) : 0;
 
+  // Calculate perceived luminance of a hex color (0 = dark, 1 = bright)
+  const getLuminance = (hex) => {
+    const rgb = hex.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16) / 255) || [0, 0, 0];
+    const [r, g, b] = rgb.map(c => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+
+  // Determine if text should be light or dark based on background colors
+  const getContrastMode = (colors, brightness) => {
+    if (colors.length === 0) return 'default';
+
+    // Calculate average luminance of all colors
+    const avgLuminance = colors.reduce((sum, color) => sum + getLuminance(color), 0) / colors.length;
+
+    // Factor in brightness (higher brightness = lighter background)
+    const effectiveLuminance = avgLuminance * (brightness / 100);
+
+    // Return 'light' if background is bright (need dark text), 'dark' if background is dark (need light text)
+    return effectiveLuminance > 0.25 ? 'light' : 'dark';
+  };
+
+  // Calculate colors of ON lights for dynamic styling
+  const getRoomLightColors = () => {
+    const onLights = effectiveLights.filter(light => light?.on?.on);
+    if (onLights.length === 0) return { colors: [], avgBrightness: 0 };
+
+    const colors = onLights
+      .map(light => {
+        const hex = getCurrentColorHex(light);
+        // If no color (white/CT only), use warm white
+        return hex || '#FFE4B5';
+      })
+      .filter(Boolean);
+
+    // Remove duplicates
+    const uniqueColors = [...new Set(colors)];
+
+    // Calculate average brightness of ON lights only
+    const onBrightness = Math.round(
+      onLights.reduce((sum, l) => sum + (l.dimming?.brightness || 100), 0) / onLights.length
+    );
+
+    return { colors: uniqueColors, avgBrightness: onBrightness };
+  };
+
+  const { colors: roomColors, avgBrightness: roomOnBrightness } = getRoomLightColors();
+
+  // Generate dynamic style based on room light colors
+  const getRoomControlStyle = () => {
+    if (!isRoomOn || roomColors.length === 0) {
+      return null; // Use default static styles
+    }
+
+    // Opacity based on brightness (0.15 to 0.5 range)
+    const baseOpacity = 0.15 + (roomOnBrightness / 100) * 0.35;
+    const borderOpacity = 0.3 + (roomOnBrightness / 100) * 0.4;
+
+    if (roomColors.length === 1) {
+      // Single color - solid gradient
+      return {
+        background: `linear-gradient(135deg, ${roomColors[0]}${Math.round(baseOpacity * 255).toString(16).padStart(2, '0')} 0%, rgba(15, 23, 42, 0.6) 50%, ${roomColors[0]}${Math.round(baseOpacity * 0.5 * 255).toString(16).padStart(2, '0')} 100%)`,
+        borderColor: `${roomColors[0]}${Math.round(borderOpacity * 255).toString(16).padStart(2, '0')}`,
+        boxShadow: `0 0 ${20 + roomOnBrightness * 0.3}px ${roomColors[0]}${Math.round(baseOpacity * 0.6 * 255).toString(16).padStart(2, '0')}`,
+      };
+    }
+
+    // Multiple colors - create gradient with all colors
+    const gradientStops = roomColors.map((color, i) => {
+      const position = (i / (roomColors.length - 1)) * 100;
+      return `${color}${Math.round(baseOpacity * 255).toString(16).padStart(2, '0')} ${position}%`;
+    }).join(', ');
+
+    // Use first and last colors for border glow effect
+    const primaryColor = roomColors[0];
+    const secondaryColor = roomColors[roomColors.length - 1];
+
+    return {
+      background: `linear-gradient(135deg, ${gradientStops})`,
+      borderColor: `${primaryColor}${Math.round(borderOpacity * 255).toString(16).padStart(2, '0')}`,
+      boxShadow: `0 0 ${15 + roomOnBrightness * 0.2}px ${primaryColor}${Math.round(baseOpacity * 0.4 * 255).toString(16).padStart(2, '0')}, 0 0 ${25 + roomOnBrightness * 0.3}px ${secondaryColor}${Math.round(baseOpacity * 0.3 * 255).toString(16).padStart(2, '0')}`,
+    };
+  };
+
+  const dynamicRoomStyle = getRoomControlStyle();
+
+  // Determine contrast mode for adaptive UI
+  const contrastMode = dynamicRoomStyle ? getContrastMode(roomColors, roomOnBrightness) : 'default';
+
+  // Adaptive UI classes based on background contrast
+  // Following Ember Noir design system - use standard button variants
+  const adaptiveClasses = {
+    // For bright backgrounds (yellow, white, etc.) - use dark UI elements
+    light: {
+      heading: 'text-slate-900',
+      text: 'text-slate-700',
+      textSecondary: 'text-slate-600',
+      badge: 'bg-slate-900/90 text-white',
+      badgeGlow: 'bg-slate-900/40',
+      statusOn: 'bg-slate-900/70 text-white border border-slate-700',
+      statusOff: 'bg-white/60 text-slate-800 border border-slate-300',
+      // Use outline variant for visibility on bright backgrounds
+      buttonVariant: 'outline',
+      buttonClass: '!bg-slate-900/90 !text-white !border-slate-700 hover:!bg-slate-800',
+      slider: 'bg-slate-300 accent-slate-800',
+      brightnessPanel: 'bg-white/60 border border-slate-200/80',
+      brightnessValue: 'text-slate-900',
+    },
+    // For dark backgrounds (blue, purple, etc.) - use light UI elements
+    dark: {
+      heading: 'text-white',
+      text: 'text-slate-100',
+      textSecondary: 'text-slate-200',
+      badge: 'bg-white/95 text-slate-900',
+      badgeGlow: 'bg-white/50',
+      statusOn: 'bg-white/80 text-slate-900 border border-white/60',
+      statusOff: 'bg-slate-900/70 text-white border border-slate-500',
+      // Use outline variant for visibility on dark backgrounds
+      buttonVariant: 'outline',
+      buttonClass: '!bg-white/90 !text-slate-900 !border-white/60 hover:!bg-white',
+      slider: 'bg-slate-600 accent-white',
+      brightnessPanel: 'bg-slate-900/60 border border-slate-500/80',
+      brightnessValue: 'text-white',
+    },
+    // Default (no dynamic style) - use existing ember noir styling
+    default: {
+      heading: '',
+      text: '',
+      textSecondary: '',
+      badge: '',
+      badgeGlow: '',
+      statusOn: '',
+      statusOff: '',
+      buttonVariant: null,
+      buttonClass: '',
+      slider: '',
+      brightnessPanel: '',
+      brightnessValue: '',
+    },
+  };
+
+  const adaptive = adaptiveClasses[contrastMode];
+
   return (
     <DeviceCard
       icon="💡"
@@ -763,18 +909,29 @@ export default function LightsCard() {
       {/* Selected Room Controls */}
       {selectedRoom ? (
         <div className="space-y-4 sm:space-y-6">
-                {/* Main Control Area - Ember Noir with light mode */}
-                <div className={`relative rounded-2xl p-6 sm:p-8 transition-all duration-500 border ${
-                  isRoomOn
-                    ? 'bg-gradient-to-br from-warning-900/40 via-slate-900/60 to-ember-900/30 border-warning-500/40 shadow-[0_0_30px_rgba(234,179,8,0.2)] [html:not(.dark)_&]:from-warning-100/80 [html:not(.dark)_&]:via-warning-50/90 [html:not(.dark)_&]:to-ember-100/70 [html:not(.dark)_&]:border-warning-300 [html:not(.dark)_&]:shadow-[0_0_20px_rgba(234,179,8,0.15)]'
-                    : 'bg-gradient-to-br from-slate-800/60 via-slate-900/70 to-slate-800/50 border-slate-600/40 [html:not(.dark)_&]:from-slate-100/80 [html:not(.dark)_&]:via-white/90 [html:not(.dark)_&]:to-slate-100/70 [html:not(.dark)_&]:border-slate-200'
-                }`}>
-                  {/* ON Badge - with light mode */}
+                {/* Main Control Area - Dynamic colors based on room lights */}
+                <div
+                  className={`relative rounded-2xl p-6 sm:p-8 transition-all duration-500 border ${
+                    !dynamicRoomStyle ? (
+                      isRoomOn
+                        ? 'bg-gradient-to-br from-warning-900/40 via-slate-900/60 to-ember-900/30 border-warning-500/40 shadow-[0_0_30px_rgba(234,179,8,0.2)] [html:not(.dark)_&]:from-warning-100/80 [html:not(.dark)_&]:via-warning-50/90 [html:not(.dark)_&]:to-ember-100/70 [html:not(.dark)_&]:border-warning-300 [html:not(.dark)_&]:shadow-[0_0_20px_rgba(234,179,8,0.15)]'
+                        : 'bg-gradient-to-br from-slate-800/60 via-slate-900/70 to-slate-800/50 border-slate-600/40 [html:not(.dark)_&]:from-slate-100/80 [html:not(.dark)_&]:via-white/90 [html:not(.dark)_&]:to-slate-100/70 [html:not(.dark)_&]:border-slate-200'
+                    ) : ''
+                  }`}
+                  style={dynamicRoomStyle || {}}
+                >
+                  {/* ON Badge - adaptive to background */}
                   {isRoomOn && (
                     <div className="absolute -top-2 -right-2 z-20">
                       <div className="relative">
-                        <div className="absolute inset-0 bg-warning-500/30 rounded-full blur-lg animate-pulse [html:not(.dark)_&]:bg-warning-400/40"></div>
-                        <div className="relative bg-gradient-to-br from-warning-500 to-warning-600 text-white px-3 py-1.5 rounded-full shadow-lg ring-2 ring-slate-900/50 [html:not(.dark)_&]:from-warning-500 [html:not(.dark)_&]:to-warning-600 [html:not(.dark)_&]:ring-white/50">
+                        <div className={`absolute inset-0 rounded-full blur-lg animate-pulse ${
+                          adaptive.badgeGlow || 'bg-warning-500/30 [html:not(.dark)_&]:bg-warning-400/40'
+                        }`}></div>
+                        <div className={`relative px-3 py-1.5 rounded-full shadow-lg ring-2 ${
+                          adaptive.badge
+                            ? `${adaptive.badge} ring-current/30`
+                            : 'bg-gradient-to-br from-warning-500 to-warning-600 text-white ring-slate-900/50 [html:not(.dark)_&]:ring-white/50'
+                        }`}>
                           <span className="text-xs font-bold font-display">💡 ACCESO</span>
                         </div>
                       </div>
@@ -784,7 +941,7 @@ export default function LightsCard() {
                   {/* Room name (solo se c'è una sola stanza) */}
                   {roomLights.length === 1 && (
                     <div className="text-center mb-6">
-                      <Heading level={3} size="sm" variant="subtle" className="uppercase tracking-wider font-display">
+                      <Heading level={3} size="sm" variant={adaptive.heading ? 'default' : 'subtle'} className={`uppercase tracking-wider font-display ${adaptive.heading}`}>
                         {selectedRoom.metadata?.name || 'Stanza'}
                       </Heading>
                     </div>
@@ -793,18 +950,22 @@ export default function LightsCard() {
                   {/* Lights Status Summary */}
                   {roomLights.length > 1 && (
                     <div className="flex justify-center gap-4 mb-4 text-xs font-display">
-                      <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${
-                        lightsOnCount > 0
-                          ? 'bg-warning-900/40 text-warning-400 border border-warning-500/30 [html:not(.dark)_&]:bg-warning-100/80 [html:not(.dark)_&]:text-warning-700 [html:not(.dark)_&]:border-warning-300'
-                          : 'bg-slate-800/50 text-slate-500 border border-slate-700/30 [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:border-slate-200'
+                      <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${
+                        adaptive.statusOn
+                          ? adaptive.statusOn
+                          : (lightsOnCount > 0
+                            ? 'bg-warning-900/40 text-warning-400 border-warning-500/30 [html:not(.dark)_&]:bg-warning-100/80 [html:not(.dark)_&]:text-warning-700 [html:not(.dark)_&]:border-warning-300'
+                            : 'bg-slate-800/50 text-slate-500 border-slate-700/30 [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:border-slate-200')
                       }`}>
                         <span>💡</span>
                         <span className="font-semibold">{lightsOnCount} accese</span>
                       </span>
-                      <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${
-                        lightsOffCount > 0
-                          ? 'bg-slate-800/50 text-slate-400 border border-slate-700/30 [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:border-slate-200'
-                          : 'bg-slate-800/30 text-slate-600 border border-slate-700/20 [html:not(.dark)_&]:bg-slate-50 [html:not(.dark)_&]:text-slate-400 [html:not(.dark)_&]:border-slate-100'
+                      <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${
+                        adaptive.statusOff
+                          ? adaptive.statusOff
+                          : (lightsOffCount > 0
+                            ? 'bg-slate-800/50 text-slate-400 border-slate-700/30 [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:border-slate-200'
+                            : 'bg-slate-800/30 text-slate-600 border-slate-700/20 [html:not(.dark)_&]:bg-slate-50 [html:not(.dark)_&]:text-slate-400 [html:not(.dark)_&]:border-slate-100')
                       }`}>
                         <span>🌙</span>
                         <span className="font-semibold">{lightsOffCount} spente</span>
@@ -818,22 +979,22 @@ export default function LightsCard() {
                     {!allLightsOn && !allLightsOff && (
                       <div className="grid grid-cols-2 gap-4">
                         <Button
-                          variant="subtle"
+                          variant={adaptive.buttonVariant || 'subtle'}
                           onClick={() => handleRoomToggle(selectedRoomGroupedLightId, true)}
                           disabled={refreshing || !selectedRoomGroupedLightId}
                           icon="💡"
                           size="lg"
-                          className="h-16 sm:h-20 font-display"
+                          className={`h-16 sm:h-20 font-display ${adaptive.buttonClass}`}
                         >
                           Accendi tutte
                         </Button>
                         <Button
-                          variant="subtle"
+                          variant={adaptive.buttonVariant || 'subtle'}
                           onClick={() => handleRoomToggle(selectedRoomGroupedLightId, false)}
                           disabled={refreshing || !selectedRoomGroupedLightId}
                           icon="🌙"
                           size="lg"
-                          className="h-16 sm:h-20 font-display"
+                          className={`h-16 sm:h-20 font-display ${adaptive.buttonClass}`}
                         >
                           Spegni tutte
                         </Button>
@@ -843,12 +1004,15 @@ export default function LightsCard() {
                     {/* All lights off: show only "Accendi" - prominent CTA */}
                     {allLightsOff && (
                       <Button
-                        variant="ember"
+                        variant={adaptive.buttonVariant || 'ember'}
                         onClick={() => handleRoomToggle(selectedRoomGroupedLightId, true)}
                         disabled={refreshing || !selectedRoomGroupedLightId}
                         icon="💡"
                         size="lg"
-                        className="w-full h-16 sm:h-20 font-display ring-2 ring-ember-500/30 ring-offset-2 ring-offset-slate-900 [html:not(.dark)_&]:ring-offset-white"
+                        className={`w-full h-16 sm:h-20 font-display ${
+                          adaptive.buttonClass
+                            || 'ring-2 ring-ember-500/30 ring-offset-2 ring-offset-slate-900 [html:not(.dark)_&]:ring-offset-white'
+                        }`}
                       >
                         Accendi
                       </Button>
@@ -857,47 +1021,79 @@ export default function LightsCard() {
                     {/* All lights on: show only "Spegni" */}
                     {allLightsOn && (
                       <Button
-                        variant="subtle"
+                        variant={adaptive.buttonVariant || 'subtle'}
                         onClick={() => handleRoomToggle(selectedRoomGroupedLightId, false)}
                         disabled={refreshing || !selectedRoomGroupedLightId}
                         icon="🌙"
                         size="lg"
-                        className="w-full h-16 sm:h-20 font-display"
+                        className={`w-full h-16 sm:h-20 font-display ${adaptive.buttonClass}`}
                       >
                         Spegni
                       </Button>
                     )}
                   </div>
 
-                  {/* Brightness Control - Ember Noir */}
+                  {/* Brightness Control - Adaptive */}
                   {isRoomOn && (
-                    <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-4 sm:p-5 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                    <div className={`relative overflow-hidden rounded-2xl backdrop-blur-xl border p-4 sm:p-5 ${
+                      adaptive.brightnessPanel
+                        ? adaptive.brightnessPanel
+                        : 'bg-slate-800/50 border-slate-700/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200'
+                    }`}>
                       <div className="relative z-10 space-y-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span className="text-xl">☀️</span>
-                            <Heading level={4} size="sm" className="font-display">Luminosità</Heading>
+                            <Heading level={4} size="sm" variant={adaptive.heading ? 'default' : undefined} className={`font-display ${adaptive.heading}`}>Luminosità</Heading>
                           </div>
-                          <span className="text-2xl sm:text-3xl font-black font-display text-warning-400 [html:not(.dark)_&]:text-warning-600">
-                            {avgBrightness}%
+                          <span className={`text-2xl sm:text-3xl font-black font-display ${
+                            adaptive.brightnessValue
+                              ? adaptive.brightnessValue
+                              : 'text-warning-400 [html:not(.dark)_&]:text-warning-600'
+                          }`}>
+                            {localBrightness !== null ? localBrightness : avgBrightness}%
                           </span>
                         </div>
 
-                        {/* Slider - Ember Noir styled */}
+                        {/* Slider - Adaptive styled with local state during drag */}
                         <input
                           type="range"
                           min="1"
                           max="100"
-                          value={avgBrightness}
-                          onChange={(e) => handleBrightnessChange(selectedRoomGroupedLightId, e.target.value)}
+                          value={localBrightness !== null ? localBrightness : avgBrightness}
+                          onMouseDown={() => { isDraggingSlider.current = true; }}
+                          onTouchStart={() => { isDraggingSlider.current = true; }}
+                          onInput={(e) => {
+                            // Update local state immediately for smooth UI
+                            setLocalBrightness(parseInt(e.target.value));
+                          }}
+                          onMouseUp={(e) => {
+                            if (isDraggingSlider.current) {
+                              isDraggingSlider.current = false;
+                              handleBrightnessChange(selectedRoomGroupedLightId, e.target.value);
+                              setLocalBrightness(null);
+                            }
+                          }}
+                          onTouchEnd={(e) => {
+                            if (isDraggingSlider.current) {
+                              isDraggingSlider.current = false;
+                              const value = localBrightness !== null ? localBrightness : avgBrightness;
+                              handleBrightnessChange(selectedRoomGroupedLightId, value.toString());
+                              setLocalBrightness(null);
+                            }
+                          }}
                           disabled={refreshing || !selectedRoomGroupedLightId}
-                          className="w-full h-3 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-warning-500 disabled:opacity-50 disabled:cursor-not-allowed [html:not(.dark)_&]:bg-slate-200"
+                          className={`w-full h-3 rounded-lg appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+                            adaptive.slider
+                              ? adaptive.slider
+                              : 'bg-slate-700 accent-warning-500 [html:not(.dark)_&]:bg-slate-200'
+                          }`}
                         />
 
                         {/* +/- Buttons */}
                         <div className="flex items-center gap-2">
                           <Button
-                            variant="subtle"
+                            variant={adaptive.buttonVariant || 'subtle'}
                             size="sm"
                             icon="➖"
                             onClick={() => {
@@ -905,12 +1101,12 @@ export default function LightsCard() {
                               handleBrightnessChange(selectedRoomGroupedLightId, newValue.toString());
                             }}
                             disabled={refreshing || avgBrightness <= 1 || !selectedRoomGroupedLightId}
-                            className="flex-1 font-display"
+                            className={`flex-1 font-display ${adaptive.buttonClass}`}
                           >
                             -5%
                           </Button>
                           <Button
-                            variant="subtle"
+                            variant={adaptive.buttonVariant || 'subtle'}
                             size="sm"
                             icon="➕"
                             onClick={() => {
@@ -918,7 +1114,7 @@ export default function LightsCard() {
                               handleBrightnessChange(selectedRoomGroupedLightId, newValue.toString());
                             }}
                             disabled={refreshing || avgBrightness >= 100 || !selectedRoomGroupedLightId}
-                            className="flex-1 font-display"
+                            className={`flex-1 font-display ${adaptive.buttonClass}`}
                           >
                             +5%
                           </Button>
@@ -931,11 +1127,11 @@ export default function LightsCard() {
                   {isRoomOn && hasColorLights && (
                     <div className="mt-4">
                       <Button
-                        variant="subtle"
+                        variant={adaptive.buttonVariant || 'subtle'}
                         size="sm"
                         icon="🎨"
                         onClick={() => router.push('/lights')}
-                        className="w-full font-display"
+                        className={`w-full font-display ${adaptive.buttonClass}`}
                       >
                         Controllo Colore
                       </Button>

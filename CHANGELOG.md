@@ -5,6 +5,26 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.74.0] - 2026-01-21
+
+### Dynamic Adaptive UI for LightsCard
+
+#### Added
+
+- **Dynamic room colors** - Control panel background now reflects actual light colors in the room
+  - Gradient backgrounds using real-time light color data (single color or multi-color gradient)
+  - Brightness-aware opacity (brighter lights = more visible glow)
+  - Box shadow glow effect matching room light colors
+- **Adaptive contrast UI** - Text and buttons automatically adjust for visibility
+  - Light backgrounds (yellow, white): dark text/buttons for readability
+  - Dark backgrounds (blue, purple): light text/buttons for contrast
+  - Follows WCAG contrast guidelines for accessibility
+- **Smooth brightness slider** - Local state during drag prevents API spam
+  - Smooth visual feedback while dragging
+  - API call only on release (mouseup/touchend)
+
+---
+
 ## [1.73.1] - 2026-01-21
 
 ### Fix Semi-Automatic Mode Activation

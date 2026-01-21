@@ -9,6 +9,7 @@ import {
   disableStoveSync,
   syncLivingRoomWithStove,
   checkStoveSyncOnStatusChange,
+  enforceStoveSyncSetpoints,
 } from '@/lib/netatmoStoveSync';
 
 // Mock Firebase Admin
@@ -355,6 +356,138 @@ describe('netatmoStoveSync', () => {
       const result = await checkStoveSyncOnStatusChange('WORK_MODULATION', 'STANDBY');
 
       expect(result.synced).toBe(true);
+    });
+  });
+
+  describe('enforceStoveSyncSetpoints', () => {
+    it('should return disabled when sync is not enabled', async () => {
+      adminDbGet.mockResolvedValue({ enabled: false, rooms: [] });
+
+      const result = await enforceStoveSyncSetpoints(true);
+
+      expect(result.enforced).toBe(false);
+      expect(result.reason).toBe('disabled_or_not_configured');
+    });
+
+    it('should trigger full sync when stoveMode does not match stove state', async () => {
+      // Clear all mocks to ensure clean state
+      jest.clearAllMocks();
+
+      // stove is ON but stoveMode is false -> need full sync
+      adminDbGet.mockImplementation((path) => {
+        if (path.includes('stoveSync')) {
+          return Promise.resolve({
+            enabled: true,
+            rooms: [{ id: 'room-123', name: 'Salotto' }],
+            stoveTemperature: 16,
+            stoveMode: false, // mismatched with stoveIsOn=true!
+          });
+        }
+        if (path.includes('home_id')) {
+          return Promise.resolve('home-456');
+        }
+        return Promise.resolve(null);
+      });
+
+      getValidAccessToken.mockResolvedValue({ accessToken: 'valid-token' });
+      NETATMO_API.getHomeStatus.mockResolvedValue({
+        rooms: [{ id: 'room-123', therm_setpoint_temperature: 20 }],
+      });
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+      adminDbUpdate.mockResolvedValue();
+
+      const result = await enforceStoveSyncSetpoints(true);
+
+      expect(result.synced).toBe(true);
+      expect(result.action).toBe('stove_on');
+    });
+
+    it('should re-apply setpoints when current setpoint has drifted', async () => {
+      // Clear all mocks to ensure clean state
+      jest.clearAllMocks();
+
+      adminDbGet.mockImplementation((path) => {
+        if (path.includes('stoveSync')) {
+          return Promise.resolve({
+            enabled: true,
+            rooms: [{ id: 'room-123', name: 'Salotto' }],
+            stoveTemperature: 16,
+            stoveMode: true,
+          });
+        }
+        if (path.includes('home_id')) {
+          return Promise.resolve('home-456');
+        }
+        return Promise.resolve(null);
+      });
+
+      getValidAccessToken.mockResolvedValue({ accessToken: 'valid-token' });
+      NETATMO_API.getHomeStatus.mockResolvedValue({
+        rooms: [{ id: 'room-123', therm_setpoint_temperature: 20 }], // drifted from 16!
+      });
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+      adminDbUpdate.mockResolvedValue();
+
+      const result = await enforceStoveSyncSetpoints(true);
+
+      expect(result.enforced).toBe(true);
+      expect(result.action).toBe('setpoint_enforcement');
+      expect(result.fixedCount).toBe(1);
+      expect(NETATMO_API.setRoomThermpoint).toHaveBeenCalledWith(
+        'valid-token',
+        expect.objectContaining({
+          home_id: 'home-456',
+          room_id: 'room-123',
+          mode: 'manual',
+          temp: 16,
+        })
+      );
+    });
+
+    it('should re-apply setpoints when room setpoint is undefined (not found in Netatmo response)', async () => {
+      adminDbGet.mockResolvedValueOnce({
+        enabled: true,
+        rooms: [{ id: 'room-123', name: 'Salotto' }],
+        stoveTemperature: 16,
+        stoveMode: true,
+      });
+      adminDbGet.mockResolvedValueOnce('home-456');
+
+      getValidAccessToken.mockResolvedValue({ accessToken: 'valid-token' });
+      // Room not found in Netatmo response
+      NETATMO_API.getHomeStatus.mockResolvedValue({
+        rooms: [{ id: 'other-room', therm_setpoint_temperature: 20 }],
+      });
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+      adminDbUpdate.mockResolvedValue();
+
+      const result = await enforceStoveSyncSetpoints(true);
+
+      // Should re-apply because we can't verify the setpoint
+      expect(result.enforced).toBe(true);
+      expect(result.action).toBe('setpoint_enforcement');
+      expect(result.fixedCount).toBe(1);
+    });
+
+    it('should not re-apply when setpoint is correct (within tolerance)', async () => {
+      adminDbGet.mockResolvedValueOnce({
+        enabled: true,
+        rooms: [{ id: 'room-123', name: 'Salotto' }],
+        stoveTemperature: 16,
+        stoveMode: true,
+      });
+      adminDbGet.mockResolvedValueOnce('home-456');
+
+      getValidAccessToken.mockResolvedValue({ accessToken: 'valid-token' });
+      NETATMO_API.getHomeStatus.mockResolvedValue({
+        rooms: [{ id: 'room-123', therm_setpoint_temperature: 16.3 }], // within 0.5° tolerance
+      });
+
+      const result = await enforceStoveSyncSetpoints(true);
+
+      expect(result.enforced).toBe(false);
+      expect(result.reason).toBe('setpoints_correct');
+      expect(NETATMO_API.setRoomThermpoint).not.toHaveBeenCalled();
     });
   });
 });

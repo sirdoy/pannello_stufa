@@ -36,7 +36,7 @@ import {
   setFanLevel,
 } from '@/lib/stoveApi';
 import { updateStoveState } from '@/lib/stoveStateService';
-import { syncLivingRoomWithStove } from '@/lib/netatmoStoveSync';
+import { syncLivingRoomWithStove, getStoveSyncConfig } from '@/lib/netatmoStoveSync';
 
 export const dynamic = 'force-dynamic';
 
@@ -299,7 +299,7 @@ async function handleIgnition(active, ora) {
 
     syncLivingRoomWithStove(true).then((result) => {
       if (result.synced) {
-        console.log(`✅ Netatmo stove sync: Living room set to ${result.temperature}°C`);
+        console.log(`✅ Netatmo stove sync: ${result.roomNames || 'Rooms'} set to ${result.temperature}°C`);
       }
     }).catch(err => console.error('❌ Netatmo stove sync error:', err));
 
@@ -324,7 +324,7 @@ async function handleShutdown(ora) {
 
     syncLivingRoomWithStove(false).then((result) => {
       if (result.synced) {
-        console.log(`✅ Netatmo stove sync: Living room returned to schedule`);
+        console.log(`✅ Netatmo stove sync: ${result.roomNames || 'Rooms'} returned to schedule`);
       }
     }).catch(err => console.error('❌ Netatmo stove sync error:', err));
 
@@ -458,6 +458,25 @@ export const GET = withCronSecret(async (request) => {
     if (maintenanceTrack.notificationData) {
       await sendMaintenanceNotificationIfNeeded(maintenanceTrack.notificationData);
     }
+  }
+
+  // Continuous stove sync check - enforce valve temperatures based on stove state
+  // This runs on every scheduler check, not just on state changes
+  try {
+    const stoveSyncConfig = await getStoveSyncConfig();
+    if (stoveSyncConfig.enabled && stoveSyncConfig.rooms?.length > 0) {
+      // If stove is ON but stoveMode is false, or stove is OFF but stoveMode is true
+      // → sync to correct state
+      if (isOn !== stoveSyncConfig.stoveMode) {
+        console.log(`🔥 Stove sync enforcement: stove ${isOn ? 'ON' : 'OFF'}, stoveMode was ${stoveSyncConfig.stoveMode}`);
+        const syncResult = await syncLivingRoomWithStove(isOn);
+        if (syncResult.synced) {
+          console.log(`✅ Stove sync enforced: ${syncResult.roomNames} ${isOn ? `set to ${syncResult.temperature}°C` : 'returned to schedule'}`);
+        }
+      }
+    }
+  } catch (syncError) {
+    console.error('❌ Stove sync enforcement error:', syncError.message);
   }
 
   let changeApplied = false;

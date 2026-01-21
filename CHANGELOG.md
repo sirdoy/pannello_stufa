@@ -5,6 +5,40 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.70.0] - 2026-01-21
+
+### Multi-Room Stove Sync
+
+#### Added
+
+- **Multi-room Netatmo stove sync** - Valvole Salotto e Ingresso sincronizzate con la stufa
+  - Quando stufa in WORK → valvole impostate a 16°C per evitare doppio riscaldamento
+  - Quando stufa si spegne → valvole tornano alla programmazione Netatmo
+  - Supporto array di stanze (non più solo singola stanza)
+  - Badge "🔥 Stufa" su ThermostatCard (home) e RoomCard (thermostat page)
+
+- **Continuous stove sync enforcement** - Lo scheduler controlla costantemente lo stato
+  - Sync su ogni esecuzione cron, non solo sui cambi di stato
+  - Se stufa ON e stoveMode=false → applica sync
+  - Se stufa OFF e stoveMode=true → ripristina programmazione
+
+#### Fixed
+
+- **validateRequired() dual pattern support** - Supporta entrambi i pattern
+  - `validateRequired(value, 'fieldName')` - validazione singolo valore
+  - `validateRequired(object, ['field1', 'field2'])` - validazione campi oggetto
+
+#### Technical
+
+- `lib/netatmoStoveSync.js` - Riscritto per supportare array di stanze
+- `app/api/netatmo/stove-sync/route.js` - API aggiornata per multi-room
+- `app/api/netatmo/homestatus/route.js` - Flag stoveSync su tutte le stanze sincronizzate
+- `app/api/scheduler/check/route.js` - Continuous enforcement ogni cron run
+- `app/components/netatmo/RoomCard.js` - Badge "Stufa" aggiunto
+- `lib/core/requestParser.js` - validateRequired() supporta entrambi i pattern
+
+---
+
 ## [1.69.3] - 2026-01-21
 
 ### Netatmo Token Reconnect Fix

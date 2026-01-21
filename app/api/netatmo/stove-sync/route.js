@@ -55,13 +55,27 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
 
   switch (action) {
     case 'enable': {
-      const { roomId, roomName, stoveTemperature } = body;
-      validateRequired(roomId, 'roomId');
-      validateRequired(roomName, 'roomName');
+      // Support both single room (legacy) and multiple rooms (new)
+      let rooms = body.rooms;
+      const stoveTemperature = body.stoveTemperature || 16;
 
-      await enableStoveSync(roomId, roomName, stoveTemperature || 16);
+      if (!rooms) {
+        // Legacy single-room API
+        const { roomId, roomName } = body;
+        validateRequired(roomId, 'roomId');
+        validateRequired(roomName, 'roomName');
+        rooms = [{ id: roomId, name: roomName }];
+      }
+
+      if (!Array.isArray(rooms) || rooms.length === 0) {
+        return badRequest('rooms must be a non-empty array or provide roomId/roomName');
+      }
+
+      await enableStoveSync(rooms, stoveTemperature);
+      const roomNames = rooms.map(r => r.name).join(', ');
+
       result = {
-        message: `Stove sync enabled for "${roomName}"`,
+        message: `Stove sync enabled for: ${roomNames}`,
         config: await getStoveSyncConfig(),
       };
 
@@ -69,10 +83,9 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
       await adminDbPush('log', {
         action: 'Sincronizzazione stufa attivata',
         device: DEVICE_TYPES.THERMOSTAT,
-        value: roomName,
-        roomId,
-        roomName,
-        stoveTemperature: stoveTemperature || 16,
+        value: roomNames,
+        rooms: rooms.map(r => ({ id: r.id, name: r.name })),
+        stoveTemperature,
         timestamp: Date.now(),
         user: {
           email: user.email,
@@ -122,9 +135,9 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
         await adminDbPush('log', {
           action: stoveIsOn ? 'Sincronizzazione stufa ON' : 'Sincronizzazione stufa OFF',
           device: DEVICE_TYPES.THERMOSTAT,
-          value: `${syncResult.temperature}°C`,
-          roomId: syncResult.roomId,
-          roomName: syncResult.roomName,
+          value: syncResult.temperature ? `${syncResult.temperature}°C` : syncResult.roomNames,
+          rooms: syncResult.rooms,
+          roomNames: syncResult.roomNames,
           temperature: syncResult.temperature,
           timestamp: Date.now(),
           user: {

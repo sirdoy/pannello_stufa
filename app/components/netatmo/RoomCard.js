@@ -163,10 +163,11 @@ export default function RoomCard({ room, onRefresh }) {
     slate: 'bg-slate-800 [html:not(.dark)_&]:bg-slate-100 text-slate-300 [html:not(.dark)_&]:text-slate-600 border-slate-700 [html:not(.dark)_&]:border-slate-200',
   };
 
-  // Get battery/offline status from room
+  // Get battery/offline/stoveSync status from room
   const hasLowBattery = room.hasLowBattery || false;
   const hasCriticalBattery = room.hasCriticalBattery || false;
   const isOffline = room.isOffline || false;
+  const stoveSync = room.stoveSync || false;
 
   return (
     <Card liquid className="p-5 sm:p-6 transition-all duration-300 hover:shadow-liquid-lg relative overflow-visible">
@@ -206,6 +207,19 @@ export default function RoomCard({ room, onRefresh }) {
               <span className="text-xs font-bold flex items-center gap-1">
                 <span>🔥</span>
                 <span className="hidden sm:inline">Attivo</span>
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Stove sync indicator badge - shown when stove is ON and controlling this valve */}
+        {stoveSync && (
+          <div className="relative">
+            <div className="absolute inset-0 bg-ember-500/30 rounded-full blur-md" />
+            <div className="relative bg-gradient-to-br from-ember-500 to-flame-600 text-white px-2.5 py-1 rounded-full shadow-lg ring-2 ring-white/30">
+              <span className="text-xs font-bold flex items-center gap-1">
+                <span>🔥</span>
+                <span className="hidden sm:inline">Stufa</span>
               </span>
             </div>
           </div>

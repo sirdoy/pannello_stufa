@@ -62,10 +62,15 @@ export const GET = withAuthAndErrorHandler(async () => {
       enriched.heating = temp.heating;
     }
 
-    // Add stove sync indicator for living room
-    if (stoveSyncData?.enabled && stoveSyncData?.livingRoomId === temp.room_id && stoveSyncData?.stoveMode) {
+    // Add stove sync indicator for all synced rooms
+    const syncedRoomIds = stoveSyncData?.rooms?.map(r => r.id) || [];
+    // Also check legacy single-room format for backward compatibility
+    if (stoveSyncData?.livingRoomId && !syncedRoomIds.includes(stoveSyncData.livingRoomId)) {
+      syncedRoomIds.push(stoveSyncData.livingRoomId);
+    }
+    if (stoveSyncData?.enabled && stoveSyncData?.stoveMode && syncedRoomIds.includes(temp.room_id)) {
       enriched.stoveSync = true;
-      enriched.stoveSyncSetpoint = 16;
+      enriched.stoveSyncSetpoint = stoveSyncData?.stoveTemperature || 16;
     }
 
     return enriched;

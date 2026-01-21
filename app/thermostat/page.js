@@ -280,6 +280,8 @@ function NetatmoContent() {
       setpoint: roomStatus?.setpoint,
       mode: roomStatus?.mode,
       heating: roomStatus?.heating,
+      stoveSync: roomStatus?.stoveSync || false,
+      stoveSyncSetpoint: roomStatus?.stoveSyncSetpoint,
       roomModules, // Add module details with battery info
       deviceType: hasThermostat ? 'thermostat' : hasValve ? 'valve' : 'unknown',
       hasLowBattery,

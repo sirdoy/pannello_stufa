@@ -36,10 +36,9 @@ export const POST = withAuthAndErrorHandler(async (request) => {
     const mode = await getFullSchedulerMode();
     if (mode.enabled && !mode.semiManual) {
       const nextChange = await getNextScheduledChange();
-      if (nextChange) {
-        await setSemiManualMode(nextChange);
-        console.log('Modalità semi-manuale attivata per comando manuale di accensione');
-      }
+      // Attiva semi-manuale anche senza prossimo evento (rimane attivo fino a reset manuale)
+      await setSemiManualMode(nextChange);
+      console.log('Modalità semi-manuale attivata per comando manuale di accensione');
     }
   }
 

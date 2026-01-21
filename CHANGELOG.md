@@ -5,6 +5,20 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.73.1] - 2026-01-21
+
+### Fix Semi-Automatic Mode Activation
+
+#### Fixed
+
+- **Semi-manual mode consistency** - Unified logic across all stove endpoints (ignite, shutdown, setPower, setFan)
+  - All manual commands now activate semi-manual mode when scheduler is in automatic mode
+  - Removed inconsistent `if (nextChange)` check that prevented activation without scheduled events
+  - Removed unnecessary stove status check (`isOn`) from setPower/setFan - semi-manual activates regardless of stove state
+- **Updated tests** - Aligned `semiAutoMode.test.js` with new unified logic
+
+---
+
 ## [1.73.0] - 2026-01-21
 
 ### Download Video Eventi Camera

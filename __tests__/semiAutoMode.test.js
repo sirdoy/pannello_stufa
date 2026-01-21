@@ -114,12 +114,7 @@ describe('Semi-Auto Mode Activation', () => {
 
   describe('Semi-Auto mode activation logic', () => {
     it('should activate semi-auto when all conditions are met', async () => {
-      // Setup: stufa accesa, scheduler attivo, non in semi-manual
-      getStoveStatus.mockResolvedValue({
-        StatusDescription: 'WORK',
-        Error: 0,
-      });
-
+      // Setup: scheduler attivo, non in semi-manual
       getFullSchedulerMode.mockResolvedValue({
         enabled: true,
         semiManual: false,
@@ -127,14 +122,11 @@ describe('Semi-Auto Mode Activation', () => {
 
       getNextScheduledChange.mockResolvedValue('2025-11-27T18:30:00.000Z');
 
-      // Simula la logica del route setPower/setFan
+      // Simula la logica delle route stove (ignite, shutdown, setPower, setFan)
       const source = 'manual';
-      const statusData = await getStoveStatus();
-      const isOn = statusData?.StatusDescription?.includes('WORK') ||
-                   statusData?.StatusDescription?.includes('START');
 
       let modeChanged = false;
-      if (source === 'manual' && isOn) {
+      if (source === 'manual') {
         const mode = await getFullSchedulerMode();
         if (mode.enabled && !mode.semiManual) {
           const nextChange = await getNextScheduledChange();
@@ -147,50 +139,42 @@ describe('Semi-Auto Mode Activation', () => {
       expect(setSemiManualMode).toHaveBeenCalledWith('2025-11-27T18:30:00.000Z');
     });
 
-    it('should NOT activate semi-auto when stove is OFF', async () => {
-      getStoveStatus.mockResolvedValue({
-        StatusDescription: 'OFF',
-        Error: 0,
-      });
-
+    it('should activate semi-auto even when stove is OFF (manual command)', async () => {
+      // Il semi-manuale si attiva per qualsiasi comando manuale,
+      // indipendentemente dallo stato attuale della stufa
       getFullSchedulerMode.mockResolvedValue({
         enabled: true,
         semiManual: false,
       });
 
+      getNextScheduledChange.mockResolvedValue('2025-11-27T18:30:00.000Z');
+
       const source = 'manual';
-      const statusData = await getStoveStatus();
-      const isOn = statusData?.StatusDescription?.includes('WORK') ||
-                   statusData?.StatusDescription?.includes('START');
 
       let modeChanged = false;
-      if (source === 'manual' && isOn) {
-        await setSemiManualMode();
-        modeChanged = true;
+      if (source === 'manual') {
+        const mode = await getFullSchedulerMode();
+        if (mode.enabled && !mode.semiManual) {
+          const nextChange = await getNextScheduledChange();
+          await setSemiManualMode(nextChange);
+          modeChanged = true;
+        }
       }
 
-      expect(modeChanged).toBe(false);
-      expect(setSemiManualMode).not.toHaveBeenCalled();
+      expect(modeChanged).toBe(true);
+      expect(setSemiManualMode).toHaveBeenCalled();
     });
 
     it('should NOT activate semi-auto when scheduler is disabled', async () => {
-      getStoveStatus.mockResolvedValue({
-        StatusDescription: 'WORK',
-        Error: 0,
-      });
-
       getFullSchedulerMode.mockResolvedValue({
         enabled: false, // Scheduler disabilitato
         semiManual: false,
       });
 
       const source = 'manual';
-      const statusData = await getStoveStatus();
-      const isOn = statusData?.StatusDescription?.includes('WORK') ||
-                   statusData?.StatusDescription?.includes('START');
 
       let modeChanged = false;
-      if (source === 'manual' && isOn) {
+      if (source === 'manual') {
         const mode = await getFullSchedulerMode();
         if (mode.enabled && !mode.semiManual) {
           await setSemiManualMode();
@@ -203,23 +187,15 @@ describe('Semi-Auto Mode Activation', () => {
     });
 
     it('should NOT activate semi-auto when already in semi-manual', async () => {
-      getStoveStatus.mockResolvedValue({
-        StatusDescription: 'WORK',
-        Error: 0,
-      });
-
       getFullSchedulerMode.mockResolvedValue({
         enabled: true,
         semiManual: true, // Già in semi-manual
       });
 
       const source = 'manual';
-      const statusData = await getStoveStatus();
-      const isOn = statusData?.StatusDescription?.includes('WORK') ||
-                   statusData?.StatusDescription?.includes('START');
 
       let modeChanged = false;
-      if (source === 'manual' && isOn) {
+      if (source === 'manual') {
         const mode = await getFullSchedulerMode();
         if (mode.enabled && !mode.semiManual) {
           await setSemiManualMode();
@@ -232,23 +208,15 @@ describe('Semi-Auto Mode Activation', () => {
     });
 
     it('should NOT activate semi-auto when source is not manual (scheduler action)', async () => {
-      getStoveStatus.mockResolvedValue({
-        StatusDescription: 'WORK',
-        Error: 0,
-      });
-
       getFullSchedulerMode.mockResolvedValue({
         enabled: true,
         semiManual: false,
       });
 
       const source = 'scheduler'; // Azione automatica
-      const statusData = await getStoveStatus();
-      const isOn = statusData?.StatusDescription?.includes('WORK') ||
-                   statusData?.StatusDescription?.includes('START');
 
       let modeChanged = false;
-      if (source === 'manual' && isOn) {
+      if (source === 'manual') {
         await setSemiManualMode();
         modeChanged = true;
       }

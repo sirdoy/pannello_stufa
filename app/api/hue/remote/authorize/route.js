@@ -42,13 +42,13 @@ export const GET = withErrorHandler(async (request) => {
   ).join('');
 
   // Save state to Firebase for validation in callback
-  // Sanitize user ID for Firebase path (replace special chars like | with _)
+  // Use state value as key to prevent overwrites from multiple OAuth flows
   const sanitizedUserId = session.user.sub.replace(/[.#$/\[\]|]/g, '_');
-  const envPath = getEnvironmentPath(`hue_oauth_state/${sanitizedUserId}`);
+  const envPath = getEnvironmentPath(`hue_oauth_state/${state}`);
   console.log('💾 [Hue OAuth] Saving state to Firebase path:', envPath);
   const stateRef = ref(db, envPath);
   await set(stateRef, {
-    state,
+    user_id: sanitizedUserId,
     created_at: new Date().toISOString(),
     expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(), // 10 minutes
   });

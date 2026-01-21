@@ -52,28 +52,27 @@ export const GET = withErrorHandler(async (request) => {
   }
 
   // Validate state (CSRF protection)
-  // Sanitize user ID for Firebase path (replace special chars like | with _)
-  const sanitizedUserId = session.user.sub.replace(/[.#$/\[\]|]/g, '_');
-  const envPath = getEnvironmentPath(`hue_oauth_state/${sanitizedUserId}`);
+  // State is stored with itself as key, so we can look it up directly
+  const envPath = getEnvironmentPath(`hue_oauth_state/${state}`);
   console.log('🔍 [Hue OAuth Callback] Looking for state at:', envPath);
   const stateRef = ref(db, envPath);
   const stateSnapshot = await get(stateRef);
 
   if (!stateSnapshot.exists()) {
-    console.error('❌ [Hue OAuth Callback] State not found in Firebase');
+    console.error('❌ [Hue OAuth Callback] State not found in Firebase - may have been used or expired');
     return NextResponse.redirect(new URL('/?error=invalid_state', request.url));
   }
 
   const savedState = stateSnapshot.val();
   console.log('✅ [Hue OAuth Callback] State found in Firebase');
-  console.log('🔍 [Hue OAuth Callback] Expected state:', savedState.state?.substring(0, 16) + '...');
-  console.log('🔍 [Hue OAuth Callback] Received state:', state?.substring(0, 16) + '...');
+  console.log('🔍 [Hue OAuth Callback] State user_id:', savedState.user_id);
 
-  if (savedState.state !== state) {
-    console.error('❌ [Hue OAuth Callback] State mismatch - possible double-click or expired auth');
-    // Clean up invalid state
+  // Verify the state belongs to this user (CSRF protection)
+  const sanitizedUserId = session.user.sub.replace(/[.#$/\[\]|]/g, '_');
+  if (savedState.user_id !== sanitizedUserId) {
+    console.error('❌ [Hue OAuth Callback] State belongs to different user');
     await remove(stateRef);
-    return NextResponse.redirect(new URL('/?error=state_mismatch', request.url));
+    return NextResponse.redirect(new URL('/?error=state_user_mismatch', request.url));
   }
 
   // Check state expiration (10 minutes)

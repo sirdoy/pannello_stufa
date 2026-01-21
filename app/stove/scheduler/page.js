@@ -394,6 +394,44 @@ export default function WeeklyScheduler() {
     });
   };
 
+  const handleActivateSemiManual = async () => {
+    try {
+      // Calculate next scheduled change
+      const nextChange = await getNextScheduledChange();
+
+      if (!nextChange) {
+        // No scheduled intervals found
+        setToast({
+          message: 'Nessun intervallo programmato. Configura la pianificazione prima di attivare la modalità semi-automatica.',
+          icon: '⚠️',
+          variant: 'warning',
+        });
+        return;
+      }
+
+      // Activate semi-manual mode (API also enables scheduler)
+      await setSemiManualMode(nextChange);
+      setSchedulerEnabled(true);
+      setSemiManualModeState(true);
+      setReturnToAutoAt(nextChange);
+
+      await logSchedulerAction.toggleMode(true);
+
+      setToast({
+        message: 'Modalità Semi-Automatica attivata',
+        icon: '⚙️',
+        variant: 'success',
+      });
+    } catch (error) {
+      console.error('Error activating semi-manual mode:', error);
+      setToast({
+        message: 'Errore nell\'attivazione della modalità semi-automatica',
+        icon: '❌',
+        variant: 'error',
+      });
+    }
+  };
+
   const handleRemoveIntervalRequest = (day, index) => {
     setConfirmDialog({
       isOpen: true,
@@ -713,6 +751,17 @@ export default function WeeklyScheduler() {
                   size="sm"
                 >
                   Torna in Automatico
+                </Button>
+              )}
+              {!schedulerEnabled && (
+                <Button
+                  variant="ember"
+                  onClick={handleActivateSemiManual}
+                  className="flex-1"
+                  icon="⚙️"
+                  size="sm"
+                >
+                  Semi-Auto
                 </Button>
               )}
               <Button

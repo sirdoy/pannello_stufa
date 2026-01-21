@@ -52,10 +52,10 @@ export const POST = withAuthAndErrorHandler(async (request) => {
 
     case 'setSemiManualMode': {
       // Activate semi-manual mode
+      // Note: semiManual requires scheduler to be enabled, so we force enabled: true
       const { returnToAutoAt } = data;
-      const currentMode = await adminDbGet('schedules-v2/mode') || {};
       await adminDbSet('schedules-v2/mode', {
-        enabled: currentMode.enabled || false,
+        enabled: true,
         semiManual: true,
         semiManualActivatedAt: new Date().toISOString(),
         returnToAutoAt,

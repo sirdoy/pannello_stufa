@@ -5,6 +5,25 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.75.0] - 2026-01-21
+
+### Manual Semi-Auto Mode Activation
+
+#### Added
+
+- **Semi-Auto button on scheduler page** - New button to manually activate semi-automatic mode when scheduler is disabled
+  - Visible only when scheduler is in Manual mode
+  - Calculates next scheduled change and sets `returnToAutoAt` timestamp
+  - Shows warning if no intervals are configured
+
+#### Changed
+
+- **setSemiManualMode now forces enabled: true** - Semi-manual mode requires scheduler to be active
+  - Updated both API route (`/api/scheduler/update`) and service (`lib/schedulerService.js`)
+  - Eliminates race conditions and ensures atomic state change
+
+---
+
 ## [1.74.0] - 2026-01-21
 
 ### Dynamic Adaptive UI for LightsCard

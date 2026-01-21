@@ -26,6 +26,21 @@ import { adminDbSet } from '@/lib/firebaseAdmin';
 export const dynamic = 'force-dynamic';
 
 /**
+ * Sanitize FCM token for use as Firebase key
+ * Firebase paths cannot contain: . $ # [ ] /
+ * FCM tokens often contain colons and other special characters
+ */
+function sanitizeFirebaseKey(token) {
+  return token
+    .replace(/\./g, '_DOT_')
+    .replace(/\$/g, '_DOL_')
+    .replace(/#/g, '_HSH_')
+    .replace(/\[/g, '_LBR_')
+    .replace(/\]/g, '_RBR_')
+    .replace(/\//g, '_SLS_');
+}
+
+/**
  * POST /api/notifications/register
  * Register FCM token for user
  * Protected: Requires Auth0 authentication
@@ -48,7 +63,8 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
     isPWA: isPWA || false,
   };
 
-  await adminDbSet(`users/${userId}/fcmTokens/${token}`, tokenData);
+  const tokenKey = sanitizeFirebaseKey(token);
+  await adminDbSet(`users/${userId}/fcmTokens/${tokenKey}`, tokenData);
 
   console.log(`FCM token registrato per user ${userId}`);
 

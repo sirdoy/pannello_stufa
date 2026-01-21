@@ -42,7 +42,9 @@ export const GET = withErrorHandler(async (request) => {
   ).join('');
 
   // Save state to Firebase for validation in callback
-  const envPath = getEnvironmentPath(`hue_oauth_state/${session.user.sub}`);
+  // Sanitize user ID for Firebase path (replace special chars like | with _)
+  const sanitizedUserId = session.user.sub.replace(/[.#$/\[\]|]/g, '_');
+  const envPath = getEnvironmentPath(`hue_oauth_state/${sanitizedUserId}`);
   console.log('💾 [Hue OAuth] Saving state to Firebase path:', envPath);
   const stateRef = ref(db, envPath);
   await set(stateRef, {

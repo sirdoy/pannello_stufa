@@ -21,7 +21,6 @@ import {
 import { adminDbGet, adminDbSet, sendNotificationToUser } from '@/lib/firebaseAdmin';
 import { canIgnite, trackUsageHours } from '@/lib/maintenanceServiceAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
-import { NETATMO_ROUTES } from '@/lib/routes';
 import {
   shouldSendSchedulerNotification,
   shouldSendMaintenanceNotification,
@@ -41,14 +40,10 @@ import {
 } from '@/lib/stoveApi';
 import { updateStoveState } from '@/lib/stoveStateService';
 import { syncLivingRoomWithStove, getStoveSyncConfig } from '@/lib/netatmoStoveSync';
+import { calibrateValvesServer } from '@/lib/netatmoCalibrationService';
 import { proactiveTokenRefresh } from '@/lib/hue/hueRemoteTokenHelper';
 
 export const dynamic = 'force-dynamic';
-
-/**
- * Timeout for internal API calls (8 seconds)
- */
-const INTERNAL_API_TIMEOUT = 8000;
 
 // =============================================================================
 // HELPER FUNCTIONS
@@ -56,23 +51,6 @@ const INTERNAL_API_TIMEOUT = 8000;
 
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-async function fetchWithTimeout(url, options = {}, timeout = INTERNAL_API_TIMEOUT) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-  try {
-    const response = await fetch(url, { ...options, signal: controller.signal });
-    clearTimeout(timeoutId);
-    return response;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    if (error.name === 'AbortError') {
-      throw new Error('INTERNAL_API_TIMEOUT');
-    }
-    throw error;
-  }
 }
 
 async function sendSchedulerNotification(action, details = '') {
@@ -118,47 +96,39 @@ async function sendSchedulerNotification(action, details = '') {
   }
 }
 
-async function calibrateValvesIfNeeded(baseUrl) {
+async function calibrateValvesIfNeeded() {
   try {
     const calibrationPath = getEnvironmentPath('netatmo/lastAutoCalibration');
     const lastCalibration = await adminDbGet(calibrationPath);
 
     const now = Date.now();
-    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+    const TWELVE_HOURS = 12 * 60 * 60 * 1000;
 
-    if (lastCalibration && (now - lastCalibration) < TWENTY_FOUR_HOURS) {
+    if (lastCalibration && (now - lastCalibration) < TWELVE_HOURS) {
       return {
         calibrated: false,
         reason: 'too_soon',
-        nextCalibration: new Date(lastCalibration + TWENTY_FOUR_HOURS).toISOString(),
+        nextCalibration: new Date(lastCalibration + TWELVE_HOURS).toISOString(),
       };
     }
 
-    console.log('🔧 Avvio calibrazione automatica giornaliera valvole Netatmo...');
+    console.log('🔧 Avvio calibrazione automatica valvole Netatmo (ogni 12h)...');
 
-    const response = await fetchWithTimeout(`${baseUrl}${NETATMO_ROUTES.calibrate}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    });
+    // Call service directly instead of HTTP request
+    const result = await calibrateValvesServer();
 
-    const data = await response.json();
-
-    if (!response.ok || data.error) {
-      console.error('❌ Calibrazione automatica fallita:', data.error || response.statusText);
-      return {
-        calibrated: false,
-        reason: 'error',
-        error: data.error || response.statusText,
-      };
+    if (!result.calibrated) {
+      console.error('❌ Calibrazione automatica fallita:', result.error || result.reason);
+      return result;
     }
 
     await adminDbSet(calibrationPath, now);
-    console.log('✅ Calibrazione automatica giornaliera valvole completata');
+    console.log('✅ Calibrazione automatica valvole completata');
 
     return {
       calibrated: true,
       timestamp: now,
-      nextCalibration: new Date(now + TWENTY_FOUR_HOURS).toISOString(),
+      nextCalibration: new Date(now + TWELVE_HOURS).toISOString(),
     };
 
   } catch (error) {
@@ -476,7 +446,7 @@ async function handleLevelChanges(active, currentPowerLevel, currentFanLevel) {
  * Main cron handler for scheduler automation
  * Protected: Requires CRON_SECRET
  */
-export const GET = withCronSecret(async (request) => {
+export const GET = withCronSecret(async (_request) => {
   // Save cron health timestamp
   const cronHealthTimestamp = new Date().toISOString();
   console.log(`🔄 Tentativo salvataggio Firebase cronHealth/lastCall: ${cronHealthTimestamp}`);
@@ -544,8 +514,6 @@ export const GET = withCronSecret(async (request) => {
     return currentMinutes >= startMin && currentMinutes < endMin;
   });
 
-  const baseUrl = `${request.nextUrl.protocol}//${request.headers.get('host')}`;
-
   // Fetch stove data in parallel
   const { currentStatus, isOn, currentFanLevel, currentPowerLevel, statusFetchFailed } = await fetchStoveData();
 
@@ -559,8 +527,8 @@ export const GET = withCronSecret(async (request) => {
     console.error('❌ Errore check unexpected off:', err.message)
   );
 
-  // Auto-calibrate Netatmo valves (async, don't wait)
-  calibrateValvesIfNeeded(baseUrl).then((result) => {
+  // Auto-calibrate Netatmo valves every 12h (async, don't wait)
+  calibrateValvesIfNeeded().then((result) => {
     if (result.calibrated) {
       console.log(`✅ Calibrazione automatica completata - prossima: ${result.nextCalibration}`);
     }

@@ -5,6 +5,23 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.72.9] - 2026-01-21
+
+### Fix Netatmo Valve Calibration Timeout
+
+#### Fixed
+
+- **Calibrazione valvole timeout** - Il cron chiamava `/api/netatmo/calibrate` via HTTP, ma quell'endpoint richiede Auth0 authentication, causando timeout ogni minuto
+  - Creato nuovo service `netatmoCalibrationService.js` per chiamata diretta server-side
+  - Rimosso fetch HTTP e `fetchWithTimeout` non più necessari
+  - Calibrazione ora funziona correttamente senza errori
+
+#### Changed
+
+- **Intervallo calibrazione** - Ridotto da 24h a 12h per maggiore reattività valvole
+
+---
+
 ## [1.72.8] - 2026-01-21
 
 ### Hue Proactive Token Refresh via Cron

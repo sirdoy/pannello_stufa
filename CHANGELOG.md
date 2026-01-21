@@ -5,6 +5,19 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.69.2] - 2026-01-21
+
+### TypeScript JSDoc Fix
+
+#### Fixed
+
+- **TypeScript build error in middleware.js** - Generic `{Function}` type in JSDoc annotations
+  - Replaced `@param {Function}` with specific function signatures `(request: any, context: any, session: any) => Promise<any>`
+  - Fixed `@returns {Function}` with proper callable types
+  - Resolves "Type 'Function' does not satisfy the constraint" error
+
+---
+
 ## [1.69.1] - 2026-01-20
 
 ### Mobile Camera Fullscreen Fix

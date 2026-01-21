@@ -99,6 +99,7 @@ SANDBOX_MODE=true TEST_MODE=true npm run dev
 |------|-----------|
 | [setup/netatmo-setup.md](docs/setup/netatmo-setup.md) | Netatmo OAuth 2.0 setup |
 | [setup/hue-setup.md](docs/setup/hue-setup.md) | Philips Hue Local API |
+| [setup/fritzbox-setup.md](docs/setup/fritzbox-setup.md) | 🔮 Fritz!Box TR-064 (Future) |
 
 ### PWA
 

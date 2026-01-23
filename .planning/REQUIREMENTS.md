@@ -104,13 +104,57 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (To be filled by roadmapper) | | |
+| TOKEN-01 | Phase 1 | Pending |
+| TOKEN-02 | Phase 1 | Pending |
+| TOKEN-03 | Phase 1 | Pending |
+| TOKEN-04 | Phase 1 | Pending |
+| TOKEN-05 | Phase 1 | Pending |
+| TOKEN-06 | Phase 1 | Pending |
+| MONITOR-01 | Phase 2 | Pending |
+| MONITOR-02 | Phase 2 | Pending |
+| MONITOR-03 | Phase 2 | Pending |
+| MONITOR-04 | Phase 2 | Pending |
+| MONITOR-05 | Phase 2 | Pending |
+| MONITOR-06 | Phase 2 | Pending |
+| PREF-01 | Phase 3 | Pending |
+| PREF-02 | Phase 3 | Pending |
+| PREF-03 | Phase 3 | Pending |
+| PREF-04 | Phase 3 | Pending |
+| PREF-05 | Phase 3 | Pending |
+| HIST-01 | Phase 4 | Pending |
+| HIST-02 | Phase 4 | Pending |
+| HIST-03 | Phase 4 | Pending |
+| HIST-04 | Phase 4 | Pending |
+| HIST-05 | Phase 4 | Pending |
+| DEVICE-01 | Phase 4 | Pending |
+| DEVICE-02 | Phase 4 | Pending |
+| DEVICE-03 | Phase 4 | Pending |
+| DEVICE-04 | Phase 4 | Pending |
+| TEST-01 | Phase 5 | Pending |
+| TEST-02 | Phase 5 | Pending |
+| TEST-03 | Phase 5 | Pending |
+| TEST-04 | Phase 5 | Pending |
+| INFRA-01 | Phase 2, Phase 4 | Pending |
+| INFRA-02 | Phase 1 | Pending |
+| INFRA-03 | Phase 3 | Pending |
+| INFRA-04 | Phase 2 | Pending |
+| INFRA-05 | Phase 2, Phase 4 | Pending |
+| INFRA-06 | Phase 5 | Pending |
 
 **Coverage:**
 - v1 requirements: 31 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 31 ⚠️
+- Mapped to phases: 31 (100%)
+- Unmapped: 0
+
+**Phase Distribution:**
+- Phase 1 (Token Lifecycle Foundation): 7 requirements (TOKEN-01 to TOKEN-06, INFRA-02)
+- Phase 2 (Production Monitoring Infrastructure): 9 requirements (MONITOR-01 to MONITOR-06, INFRA-01, INFRA-04, INFRA-05)
+- Phase 3 (User Preferences & Control): 6 requirements (PREF-01 to PREF-05, INFRA-03)
+- Phase 4 (Notification History & Devices): 11 requirements (HIST-01 to HIST-05, DEVICE-01 to DEVICE-04, INFRA-01, INFRA-05)
+- Phase 5 (Automation & Testing): 5 requirements (TEST-01 to TEST-04, INFRA-06)
+
+**Note:** INFRA requirements are cross-cutting and mapped to multiple phases where implemented.
 
 ---
 *Requirements defined: 2026-01-23*
-*Last updated: 2026-01-23 after initial definition*
+*Last updated: 2026-01-23 after roadmap creation (traceability complete)*

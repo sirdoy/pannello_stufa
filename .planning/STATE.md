@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-23)
 ## Current Position
 
 Phase: 1 of 5 (Token Lifecycle Foundation)
-Plan: 4 of 6 in current phase (01-01, 01-02, 01-03, 01-04 complete)
+Plan: 5 of 6 in current phase (01-01, 01-02, 01-03, 01-04, 01-05 complete)
 Status: In progress
-Last activity: 2026-01-23 - Completed 01-03-PLAN.md (Token Registration Enhancement)
+Last activity: 2026-01-23 - Completed 01-05-PLAN.md (Invalid Token Cleanup)
 
-Progress: [██████░░░░] ~67% Phase 1 (4 plans executed: 01-01, 01-02, 01-03, 01-04)
+Progress: [████████░░] ~83% Phase 1 (5 plans executed: 01-01, 01-02, 01-03, 01-04, 01-05)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 5.9 min
-- Total execution time: 0.40 hours
+- Total plans completed: 5
+- Average duration: 6.7 min
+- Total execution time: 0.56 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 | 4 | 23.6 min | 5.9 min |
+| 1 | 5 | 33.6 min | 6.7 min |
 
 **Recent Trend:**
-- Last plan: 01-03 (8.6 min)
-- Previous: 01-04 (7.8 min), 01-02 (2.6 min), 01-01 (4.6 min)
+- Last plan: 01-05 (10.0 min)
+- Previous: 01-03 (8.6 min), 01-04 (7.8 min), 01-02 (2.6 min)
 - Trend: Consistent execution, on track
 
 *Updated after each plan completion*
@@ -57,6 +57,9 @@ Recent decisions affecting current work:
 - **Plan 01-04:** 30-day token refresh threshold per Firebase recommendations
 - **Plan 01-04:** Explicit deleteToken before getToken for clean lifecycle
 - **Plan 01-04:** Preserve deviceId across refresh to prevent duplicate device entries
+- **Plan 01-05:** Remove invalid tokens asynchronously on FCM send errors
+- **Plan 01-05:** Use 90-day threshold for stale token cleanup
+- **Plan 01-05:** Batch database updates for cleanup efficiency
 
 ### Pending Todos
 
@@ -70,14 +73,15 @@ None yet.
 - All phases depend on Phase 1 success - no shortcuts
 
 **Technical Debt:**
-- cleanupOldTokens() currently disabled (lines 480-483 in lib/notificationService.js)
-- Must implement cleanup with Admin SDK write access
-- Token accumulation confirmed in existing Firebase data
+- ~~cleanupOldTokens() currently disabled~~ ✅ RESOLVED in 01-05
+- ✅ Cleanup implemented with Admin SDK in /api/notifications/cleanup
+- ✅ Real-time invalid token detection working
+- Ready for cron-job.org integration
 
 ## Session Continuity
 
 Last session: 2026-01-23 (plan execution)
-Stopped at: Completed 01-03-PLAN.md execution - Token Registration Enhancement with device deduplication
+Stopped at: Completed 01-05-PLAN.md execution - Invalid Token Cleanup with real-time detection and scheduled cleanup
 Resume file: None
 
 ---

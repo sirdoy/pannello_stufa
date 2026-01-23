@@ -30,10 +30,15 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User registers 3 different devices (phone, tablet, desktop) and receives broadcast notification on all 3
   4. Admin dashboard shows max 3-5 active tokens per user (no accumulation of stale tokens)
   5. Token older than 30 days automatically refreshes on next app launch
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- [ ] TBD during planning
+- [ ] 01-01-PLAN.md — Token storage foundation (IndexedDB + localStorage dual persistence)
+- [ ] 01-02-PLAN.md — Device fingerprinting (UA parsing and device identification)
+- [ ] 01-03-PLAN.md — Token registration enhancement (device deduplication)
+- [ ] 01-04-PLAN.md — Token refresh logic (30-day startup check)
+- [ ] 01-05-PLAN.md — Invalid token cleanup (real-time detection + cleanup API)
+- [ ] 01-06-PLAN.md — Integration and verification checkpoint
 
 ### Phase 2: Production Monitoring Infrastructure
 **Goal**: Complete visibility into notification delivery - track sent/delivered/failed with error logging
@@ -102,7 +107,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Token Lifecycle Foundation | 0/TBD | Not started | - |
+| 1. Token Lifecycle Foundation | 0/6 | Planned | - |
 | 2. Production Monitoring Infrastructure | 0/TBD | Not started | - |
 | 3. User Preferences & Control | 0/TBD | Not started | - |
 | 4. Notification History & Devices | 0/TBD | Not started | - |
@@ -110,5 +115,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 ---
 *Roadmap created: 2026-01-23*
+*Phase 1 planned: 2026-01-23 (6 plans in 4 waves)*
 *Depth: comprehensive (5 phases derived from requirements)*
 *Coverage: 31/31 v1 requirements mapped (100%)*

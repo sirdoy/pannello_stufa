@@ -50,15 +50,16 @@ Plans:
   3. Admin clicks "Send Test" button, selects device, receives notification within 5 seconds with delivery confirmation
   4. Dashboard charts visualize delivery trends for last 7 days using Recharts
   5. Delivery rate drops below 85%, admin receives alert notification within 1 minute
-**Plans**: 6 plans
+**Plans**: 7 plans (6 original + 1 gap closure)
 
 Plans:
-- [ ] 02-01-PLAN.md — Dependencies and notification logging foundation (Firestore + recharts + date-fns)
-- [ ] 02-02-PLAN.md — Error logging infrastructure (FCM error tracking + API)
-- [ ] 02-03-PLAN.md — Dashboard page with delivery metrics and device list
-- [ ] 02-04-PLAN.md — Test notification panel with device selection and templates
-- [ ] 02-05-PLAN.md — Recharts visualization (7-day delivery trends chart)
-- [ ] 02-06-PLAN.md — Rate alerting and phase verification checkpoint
+- [x] 02-01-PLAN.md — Dependencies and notification logging foundation (Firestore + recharts + date-fns)
+- [x] 02-02-PLAN.md — Error logging infrastructure (FCM error tracking + API)
+- [x] 02-03-PLAN.md — Dashboard page with delivery metrics and device list
+- [x] 02-04-PLAN.md — Test notification panel with device selection and templates
+- [x] 02-05-PLAN.md — Recharts visualization (7-day delivery trends chart)
+- [x] 02-06-PLAN.md — Rate alerting and phase verification checkpoint
+- [ ] 02-07-PLAN.md — Gap closure: device list API missing status and tokenPrefix fields
 
 ### Phase 3: User Preferences & Control
 **Goal**: Users control notification behavior - enable/disable types, set quiet hours, prevent spam
@@ -113,7 +114,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Token Lifecycle Foundation | 6/6 | Complete | 2026-01-24 |
-| 2. Production Monitoring Infrastructure | 0/6 | Planned | - |
+| 2. Production Monitoring Infrastructure | 6/7 | Gap closure | - |
 | 3. User Preferences & Control | 0/TBD | Not started | - |
 | 4. Notification History & Devices | 0/TBD | Not started | - |
 | 5. Automation & Testing | 0/TBD | Not started | - |

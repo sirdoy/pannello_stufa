@@ -48,12 +48,17 @@ Plans:
   1. Admin dashboard displays delivery rate percentage with target indicator (85%+ = green)
   2. Failed notification appears in error log with timestamp, FCM error code, and device identifier
   3. Admin clicks "Send Test" button, selects device, receives notification within 5 seconds with delivery confirmation
-  4. Delivery rate drops below 85%, admin receives alert notification within 1 minute
-  5. Dashboard charts visualize delivery trends for last 7 days using Recharts
-**Plans**: TBD
+  4. Dashboard charts visualize delivery trends for last 7 days using Recharts
+  5. Delivery rate drops below 85%, admin receives alert notification within 1 minute
+**Plans**: 6 plans
 
 Plans:
-- [ ] TBD during planning
+- [ ] 02-01-PLAN.md — Dependencies and notification logging foundation (Firestore + recharts + date-fns)
+- [ ] 02-02-PLAN.md — Error logging infrastructure (FCM error tracking + API)
+- [ ] 02-03-PLAN.md — Dashboard page with delivery metrics and device list
+- [ ] 02-04-PLAN.md — Test notification panel with device selection and templates
+- [ ] 02-05-PLAN.md — Recharts visualization (7-day delivery trends chart)
+- [ ] 02-06-PLAN.md — Rate alerting and phase verification checkpoint
 
 ### Phase 3: User Preferences & Control
 **Goal**: Users control notification behavior - enable/disable types, set quiet hours, prevent spam
@@ -107,8 +112,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Token Lifecycle Foundation | 6/6 | ✅ Complete | 2026-01-24 |
-| 2. Production Monitoring Infrastructure | 0/TBD | Not started | - |
+| 1. Token Lifecycle Foundation | 6/6 | Complete | 2026-01-24 |
+| 2. Production Monitoring Infrastructure | 0/6 | Planned | - |
 | 3. User Preferences & Control | 0/TBD | Not started | - |
 | 4. Notification History & Devices | 0/TBD | Not started | - |
 | 5. Automation & Testing | 0/TBD | Not started | - |
@@ -117,5 +122,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 *Roadmap created: 2026-01-23*
 *Phase 1 planned: 2026-01-23 (6 plans in 4 waves)*
 *Phase 1 executed: 2026-01-24 (48.6 min total, all success criteria verified)*
+*Phase 2 planned: 2026-01-24 (6 plans in 4 waves)*
 *Depth: comprehensive (5 phases derived from requirements)*
 *Coverage: 31/31 v1 requirements mapped (100%)*

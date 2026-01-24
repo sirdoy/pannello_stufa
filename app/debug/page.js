@@ -227,7 +227,7 @@ export default function DebugPage() {
       {/* Actions */}
       <Card className="p-6">
         <Heading level={2} size="xl" className="mb-4">🔗 Link Utili</Heading>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           <Button variant="outline" onClick={() => window.location.href = '/'}>
             🏠 Homepage
           </Button>
@@ -236,6 +236,9 @@ export default function DebugPage() {
           </Button>
           <Button variant="outline" onClick={() => window.location.href = '/log'}>
             📝 Log Azioni
+          </Button>
+          <Button variant="outline" onClick={() => window.location.href = '/debug/notifications'}>
+            🔔 Notifications
           </Button>
         </div>
       </Card>

@@ -351,8 +351,8 @@ export default function NotificationsDashboard() {
           🔗 Quick Actions
         </Heading>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <Button variant="outline" onClick={() => (window.location.href = '/api/notifications/test')}>
-            🧪 Send Test Notification
+          <Button variant="ember" onClick={() => (window.location.href = '/debug/notifications/test')}>
+            📤 Send Test Notification
           </Button>
           <Button variant="outline" onClick={() => (window.location.href = '/debug')}>
             🏠 Back to Debug Home

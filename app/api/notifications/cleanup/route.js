@@ -107,12 +107,39 @@ export async function POST(request) {
       await db.ref().update(updates);
     }
 
-    console.log(`✅ Cleanup complete: removed ${removed} of ${scanned} tokens`);
+    console.log(`✅ Token cleanup complete: removed ${removed} of ${scanned} tokens`);
+
+    // Cleanup old error logs (30 days retention per 02-CONTEXT.md)
+    const ERROR_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
+    const errorCutoff = new Date(now - ERROR_RETENTION_MS).toISOString();
+
+    const errorsRef = db.ref('notificationErrors');
+    const errorsSnapshot = await errorsRef.once('value');
+
+    let errorsRemoved = 0;
+    if (errorsSnapshot.exists()) {
+      const errorUpdates = {};
+      errorsSnapshot.forEach(errorSnap => {
+        const error = errorSnap.val();
+        if (error.timestamp && error.timestamp < errorCutoff) {
+          errorUpdates[`notificationErrors/${errorSnap.key}`] = null;
+          errorsRemoved++;
+        }
+      });
+
+      if (Object.keys(errorUpdates).length > 0) {
+        await db.ref().update(errorUpdates);
+      }
+    }
+
+    console.log(`✅ Error cleanup complete: removed ${errorsRemoved} old error logs`);
+    console.log(`✅ Cleanup complete: removed ${removed} tokens and ${errorsRemoved} error logs`);
 
     return Response.json({
       success: true,
       removed,
       scanned,
+      errorsRemoved,
       timestamp: new Date().toISOString(),
     });
 

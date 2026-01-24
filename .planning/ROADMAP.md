@@ -12,7 +12,7 @@ Production-grade push notification system for PWA smart home control. Fixes crit
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Token Lifecycle Foundation** - Fix critical persistence bug, token refresh, cleanup
+- [x] **Phase 1: Token Lifecycle Foundation** - Fix critical persistence bug, token refresh, cleanup
 - [ ] **Phase 2: Production Monitoring Infrastructure** - Delivery tracking, error logging, admin dashboard
 - [ ] **Phase 3: User Preferences & Control** - Granular notification settings, DND hours, rate limiting
 - [ ] **Phase 4: Notification History & Devices** - In-app inbox, device management, history UI
@@ -33,12 +33,12 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 6 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Token storage foundation (IndexedDB + localStorage dual persistence)
-- [ ] 01-02-PLAN.md — Device fingerprinting (UA parsing and device identification)
-- [ ] 01-03-PLAN.md — Token registration enhancement (device deduplication)
-- [ ] 01-04-PLAN.md — Token refresh logic (30-day startup check)
-- [ ] 01-05-PLAN.md — Invalid token cleanup (real-time detection + cleanup API)
-- [ ] 01-06-PLAN.md — Integration and verification checkpoint
+- [x] 01-01-PLAN.md — Token storage foundation (IndexedDB + localStorage dual persistence)
+- [x] 01-02-PLAN.md — Device fingerprinting (UA parsing and device identification)
+- [x] 01-03-PLAN.md — Token registration enhancement (device deduplication)
+- [x] 01-04-PLAN.md — Token refresh logic (30-day startup check)
+- [x] 01-05-PLAN.md — Invalid token cleanup (real-time detection + cleanup API)
+- [x] 01-06-PLAN.md — Integration and verification checkpoint
 
 ### Phase 2: Production Monitoring Infrastructure
 **Goal**: Complete visibility into notification delivery - track sent/delivered/failed with error logging
@@ -107,7 +107,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Token Lifecycle Foundation | 0/6 | Planned | - |
+| 1. Token Lifecycle Foundation | 6/6 | ✅ Complete | 2026-01-24 |
 | 2. Production Monitoring Infrastructure | 0/TBD | Not started | - |
 | 3. User Preferences & Control | 0/TBD | Not started | - |
 | 4. Notification History & Devices | 0/TBD | Not started | - |
@@ -116,5 +116,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 ---
 *Roadmap created: 2026-01-23*
 *Phase 1 planned: 2026-01-23 (6 plans in 4 waves)*
+*Phase 1 executed: 2026-01-24 (48.6 min total, all success criteria verified)*
 *Depth: comprehensive (5 phases derived from requirements)*
 *Coverage: 31/31 v1 requirements mapped (100%)*

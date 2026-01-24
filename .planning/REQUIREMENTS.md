@@ -9,12 +9,12 @@ Requirements for production-grade push notification system. Each maps to roadmap
 
 ### Token Management
 
-- [ ] **TOKEN-01**: Token FCM persiste automaticamente dopo chiusura browser e riavvio
-- [ ] **TOKEN-02**: Sistema verifica validità token all'avvio app e lo rigenera se necessario (refresh mensile minimo)
-- [ ] **TOKEN-03**: Token invalidati vengono automaticamente rimossi dal database (on FCM NotRegistered error)
-- [ ] **TOKEN-04**: Cleanup automatico token inattivi > 90 giorni (stale token detection)
-- [ ] **TOKEN-05**: Supporto multi-device: utente riceve notifiche su tutti i dispositivi registrati
-- [ ] **TOKEN-06**: Device fingerprinting: ogni dispositivo identificato univocamente (hash userAgent + platform)
+- [x] **TOKEN-01**: Token FCM persiste automaticamente dopo chiusura browser e riavvio
+- [x] **TOKEN-02**: Sistema verifica validità token all'avvio app e lo rigenera se necessario (refresh mensile minimo)
+- [x] **TOKEN-03**: Token invalidati vengono automaticamente rimossi dal database (on FCM NotRegistered error)
+- [x] **TOKEN-04**: Cleanup automatico token inattivi > 90 giorni (stale token detection)
+- [x] **TOKEN-05**: Supporto multi-device: utente riceve notifiche su tutti i dispositivi registrati
+- [x] **TOKEN-06**: Device fingerprinting: ogni dispositivo identificato univocamente (hash userAgent + platform)
 
 ### Monitoring & Observability
 
@@ -58,7 +58,7 @@ Requirements for production-grade push notification system. Each maps to roadmap
 ### Integration & Infrastructure
 
 - [ ] **INFRA-01**: Firestore per notification history (queries complesse)
-- [ ] **INFRA-02**: Realtime Database per FCM tokens (bassa latency)
+- [x] **INFRA-02**: Realtime Database per FCM tokens (bassa latency)
 - [ ] **INFRA-03**: React Hook Form + Zod per validation preferences
 - [ ] **INFRA-04**: Recharts per dashboard visualizations
 - [ ] **INFRA-05**: date-fns per timestamp formatting
@@ -104,12 +104,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TOKEN-01 | Phase 1 | Pending |
-| TOKEN-02 | Phase 1 | Pending |
-| TOKEN-03 | Phase 1 | Pending |
-| TOKEN-04 | Phase 1 | Pending |
-| TOKEN-05 | Phase 1 | Pending |
-| TOKEN-06 | Phase 1 | Pending |
+| TOKEN-01 | Phase 1 | Complete |
+| TOKEN-02 | Phase 1 | Complete |
+| TOKEN-03 | Phase 1 | Complete |
+| TOKEN-04 | Phase 1 | Complete |
+| TOKEN-05 | Phase 1 | Complete |
+| TOKEN-06 | Phase 1 | Complete |
 | MONITOR-01 | Phase 2 | Pending |
 | MONITOR-02 | Phase 2 | Pending |
 | MONITOR-03 | Phase 2 | Pending |
@@ -135,7 +135,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEST-03 | Phase 5 | Pending |
 | TEST-04 | Phase 5 | Pending |
 | INFRA-01 | Phase 2, Phase 4 | Pending |
-| INFRA-02 | Phase 1 | Pending |
+| INFRA-02 | Phase 1 | Complete |
 | INFRA-03 | Phase 3 | Pending |
 | INFRA-04 | Phase 2 | Pending |
 | INFRA-05 | Phase 2, Phase 4 | Pending |

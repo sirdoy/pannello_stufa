@@ -7,7 +7,11 @@
  *
  * Body (optional):
  * {
- *   deviceToken: "FCM_TOKEN_STRING"  // Se fornito, invia solo a questo dispositivo
+ *   deviceToken?: string,      // Specific device
+ *   template?: string,         // Template name
+ *   customTitle?: string,      // Custom title (overrides template)
+ *   customBody?: string,       // Custom body (overrides template)
+ *   broadcast?: boolean        // Send to all devices
  * }
  */
 
@@ -17,9 +21,31 @@ import {
   badRequest,
   parseJson,
 } from '@/lib/core';
-import { sendNotificationToUser, sendPushNotification } from '@/lib/firebaseAdmin';
+import { sendNotificationToUser, sendPushNotification, adminDbGet } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
+
+// Predefined notification templates
+const TEMPLATES = {
+  error_alert: {
+    title: 'Errore Stufa',
+    body: 'Attenzione: rilevato errore nel sistema. Verifica lo stato della stufa.',
+    priority: 'high',
+    type: 'error'
+  },
+  scheduler_success: {
+    title: 'Accensione Completata',
+    body: 'La stufa e stata accesa automaticamente dallo scheduler.',
+    priority: 'normal',
+    type: 'scheduler'
+  },
+  maintenance_reminder: {
+    title: 'Promemoria Manutenzione',
+    body: 'E il momento di effettuare la pulizia ordinaria della stufa.',
+    priority: 'normal',
+    type: 'maintenance'
+  }
+};
 
 /**
  * POST /api/notifications/test
@@ -28,44 +54,88 @@ export const dynamic = 'force-dynamic';
  */
 export const POST = withAuthAndErrorHandler(async (request, context, session) => {
   const user = session.user;
+  const sentAt = new Date().toISOString();
 
   // Parse optional body (empty object if no body)
   const body = await parseJson(request, {});
-  const deviceToken = body?.deviceToken;
+  const { deviceToken, template, customTitle, customBody, broadcast } = body;
 
-  // Build test notification
+  // Build notification from template or custom values
+  let notificationConfig;
+
+  if (template && TEMPLATES[template]) {
+    // Use template values
+    notificationConfig = TEMPLATES[template];
+  } else {
+    // Use custom or default values
+    notificationConfig = {
+      title: 'Notifica di Test',
+      body: 'Se vedi questo messaggio, le notifiche funzionano correttamente!',
+      priority: 'normal',
+      type: 'test'
+    };
+  }
+
+  // Custom title/body override template
   const notification = {
-    title: 'Notifica di Test',
-    body: 'Se vedi questo messaggio, le notifiche funzionano correttamente!',
+    title: customTitle || notificationConfig.title,
+    body: customBody || notificationConfig.body,
     icon: '/icons/icon-192.png',
-    priority: 'normal',
+    priority: notificationConfig.priority,
     data: {
-      type: 'test',
+      type: notificationConfig.type,
       url: '/settings/notifications',
-      timestamp: new Date().toISOString(),
+      timestamp: sentAt,
     },
   };
 
-  // Send notification - to specific device if token provided, otherwise to all user devices
+  // Determine target devices
   let result;
+  let targetDevices = 0;
+
   if (deviceToken) {
-    // Send only to the specified device
-    result = await sendPushNotification(deviceToken, notification);
+    // Send to specific device
+    targetDevices = 1;
+    result = await sendPushNotification(deviceToken, notification, user.sub);
   } else {
-    // Fallback: send to all user devices
+    // Broadcast to all user devices (default if neither deviceToken nor broadcast specified)
+    const tokensData = await adminDbGet(`users/${user.sub}/fcmTokens`);
+    targetDevices = tokensData ? Object.keys(tokensData).length : 0;
     result = await sendNotificationToUser(user.sub, notification);
+  }
+
+  // Build delivery trace
+  const trace = {
+    sentAt,
+    targetDevices,
+    template: template || null,
+    deliveryResults: {
+      successCount: result.successCount || 0,
+      failureCount: result.failureCount || 0,
+      errors: []
+    }
+  };
+
+  // Extract errors if any
+  if (result.failureCount > 0 && result.responses) {
+    trace.deliveryResults.errors = result.responses
+      .filter(r => !r.success)
+      .map(r => ({
+        tokenPrefix: r.error?.message?.substring(0, 20) || 'unknown',
+        errorCode: r.error?.code || 'unknown'
+      }));
   }
 
   if (result.success) {
     return success({
-      message: 'Notifica di test inviata',
-      sentTo: result.successCount,
-      failed: result.failureCount,
+      message: 'Test notification sent',
+      trace
     });
   } else {
-    // Restituisci errore strutturato per gestione UI
+    // Return error with trace
     return badRequest(result.message || 'Impossibile inviare notifica', {
       errorCode: result.error || 'SEND_FAILED',
+      trace
     });
   }
 }, 'Notifications/Test');

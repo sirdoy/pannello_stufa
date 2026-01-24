@@ -5,34 +5,35 @@
 See: .planning/PROJECT.md (updated 2026-01-23)
 
 **Core value:** Dispositivi riconosciuti automaticamente dopo riavvio browser, notifiche arrivano sempre (100% delivery rate).
-**Current focus:** Phase 1 - Token Lifecycle Foundation
+**Current focus:** Phase 2 - Production Monitoring Infrastructure
 
 ## Current Position
 
-Phase: 1 of 5 (Token Lifecycle Foundation)
-Plan: 6 of 6 in current phase (ALL COMPLETE)
-Status: Phase 1 complete - ready for verification
-Last activity: 2026-01-24 - Completed 01-06-PLAN.md (Integration and Verification Checkpoint)
+Phase: 2 of 5 (Production Monitoring Infrastructure)
+Plan: 2 of 6 in current phase
+Status: In progress
+Last activity: 2026-01-24 - Completed 02-02-PLAN.md (Error Logging Infrastructure)
 
-Progress: [██████████] 100% Phase 1 (6 plans executed: 01-01, 01-02, 01-03, 01-04, 01-05, 01-06)
+Progress: [██████████████████████░░] 33.3% Phase 2 (2 plans executed: 02-01, 02-02)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 8.1 min
-- Total execution time: 0.81 hours
+- Total plans completed: 8
+- Average duration: 7.2 min
+- Total execution time: 0.97 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 6 | 48.6 min | 8.1 min |
+| 2 | 2 | 10.4 min | 5.2 min |
 
 **Recent Trend:**
-- Last plan: 01-06 (15.0 min - includes critical bug fixes)
-- Previous: 01-05 (10.0 min), 01-04 (7.8 min), 01-03 (8.6 min)
-- Trend: Phase 1 complete, all success criteria verified
+- Last plan: 02-02 (5.4 min - error logging infrastructure)
+- Previous: 02-01 (5.0 min), 01-06 (15.0 min), 01-05 (10.0 min)
+- Trend: Phase 2 maintaining fast execution, infrastructure tasks efficient
 
 *Updated after each plan completion*
 
@@ -65,6 +66,10 @@ Recent decisions affecting current work:
 - **Plan 01-06:** Register service worker in PWAInitializer on app load
 - **Plan 01-06:** Setup foreground notification listener globally in PWAInitializer
 - **Plan 01-06:** Real Firebase credentials in service worker (env vars unavailable in SW context)
+- **Plan 02-01:** Use Firestore (not Realtime Database) for structured notification logs with querying
+- **Plan 02-01:** Non-blocking logging: never block notification send on logging failure
+- **Plan 02-01:** Truncate notification body to 200 chars to prevent doc size bloat
+- **Plan 02-01:** Track FCM errors with tokenPrefix (first 20 chars) for debugging without exposing full token
 
 ### Pending Todos
 

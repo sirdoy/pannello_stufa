@@ -5,6 +5,7 @@ import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
+import DeliveryChart from './components/DeliveryChart';
 
 /**
  * Notifications Dashboard
@@ -20,6 +21,7 @@ import Text from '@/app/components/ui/Text';
 export default function NotificationsDashboard() {
   const [stats, setStats] = useState(null);
   const [devices, setDevices] = useState([]);
+  const [trends, setTrends] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -31,18 +33,20 @@ export default function NotificationsDashboard() {
     setError(null);
 
     try {
-      const [statsRes, devicesRes] = await Promise.all([
+      const [statsRes, devicesRes, trendsRes] = await Promise.all([
         fetch('/api/notifications/stats'),
         fetch('/api/notifications/devices'),
+        fetch('/api/notifications/trends?days=7'),
       ]);
 
-      if (!statsRes.ok || !devicesRes.ok) {
+      if (!statsRes.ok || !devicesRes.ok || !trendsRes.ok) {
         throw new Error('Failed to fetch dashboard data');
       }
 
-      const [statsData, devicesData] = await Promise.all([
+      const [statsData, devicesData, trendsData] = await Promise.all([
         statsRes.json(),
         devicesRes.json(),
+        trendsRes.json(),
       ]);
 
       if (statsData.success) {
@@ -51,6 +55,10 @@ export default function NotificationsDashboard() {
 
       if (devicesData.success) {
         setDevices(devicesData.devices);
+      }
+
+      if (trendsData.success) {
+        setTrends(trendsData.trends);
       }
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
@@ -116,6 +124,15 @@ export default function NotificationsDashboard() {
     if (days === 1) return 'Yesterday';
     if (days < 7) return `${days} days ago`;
     return date.toLocaleDateString();
+  };
+
+  /**
+   * Get trend icon and color
+   */
+  const getTrendIcon = (trend) => {
+    if (trend === 'improving') return { icon: '↗', color: 'sage' };
+    if (trend === 'declining') return { icon: '↘', color: 'ember' };
+    return { icon: '→', color: 'secondary' };
   };
 
   return (
@@ -205,6 +222,41 @@ export default function NotificationsDashboard() {
             </Text>
           </Card>
         </div>
+      )}
+
+      {/* 7-Day Delivery Trends */}
+      {trends && !loading && (
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <Heading level={2} size="xl">
+              📈 7-Day Delivery Trends
+            </Heading>
+            <div className="flex gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <Text variant="tertiary" size="xs">Total:</Text>
+                <Text weight="semibold" size="sm">
+                  {trends.summary.totalNotifications}
+                </Text>
+              </div>
+              <div className="flex items-center gap-2">
+                <Text variant="tertiary" size="xs">Avg Rate:</Text>
+                <Text weight="semibold" size="sm">
+                  {trends.summary.averageDeliveryRate}%
+                </Text>
+              </div>
+              <div className="flex items-center gap-2">
+                <Text
+                  variant={getTrendIcon(trends.summary.trend).color}
+                  weight="semibold"
+                  size="sm"
+                >
+                  {getTrendIcon(trends.summary.trend).icon} {trends.summary.trend}
+                </Text>
+              </div>
+            </div>
+          </div>
+          <DeliveryChart data={trends.daily} loading={loading} />
+        </Card>
       )}
 
       {/* Error Summary */}

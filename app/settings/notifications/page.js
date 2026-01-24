@@ -18,6 +18,8 @@ import {
   isNotificationSupported,
   getNotificationPermission,
   getFCMToken,
+  initializeNotifications,
+  checkStoredToken,
 } from '@/lib/notificationService';
 import SettingsLayout from '@/app/components/SettingsLayout';
 import Card from '@/app/components/ui/Card';
@@ -38,6 +40,33 @@ export default function NotificationsSettingsPage() {
   const [registrationError, setRegistrationError] = useState(null);
   const [currentDeviceToken, setCurrentDeviceToken] = useState(null);
   const [isCurrentDeviceRegistered, setIsCurrentDeviceRegistered] = useState(false);
+
+  // Load existing token on mount and check for 30-day refresh
+  useEffect(() => {
+    if (!user?.sub) return;
+
+    const loadExistingToken = async () => {
+      try {
+        // Initialize notifications - checks for existing token and refreshes if >30 days
+        const result = await initializeNotifications(user.sub);
+
+        if (result.hasToken && result.token) {
+          setCurrentDeviceToken(result.token);
+          console.log('[NotificationsPage] Token loaded from storage:', {
+            hasToken: result.hasToken,
+            wasRefreshed: result.wasRefreshed,
+            permissionStatus: result.permissionStatus,
+          });
+        } else {
+          console.log('[NotificationsPage] No stored token found');
+        }
+      } catch (error) {
+        console.error('[NotificationsPage] Error loading token:', error);
+      }
+    };
+
+    loadExistingToken();
+  }, [user?.sub]);
 
   // Handler per riattivare le notifiche (ri-registra il token)
   const handleReactivate = async () => {

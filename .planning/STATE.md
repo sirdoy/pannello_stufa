@@ -70,6 +70,10 @@ Recent decisions affecting current work:
 - **Plan 02-01:** Non-blocking logging: never block notification send on logging failure
 - **Plan 02-01:** Truncate notification body to 200 chars to prevent doc size bloat
 - **Plan 02-01:** Track FCM errors with tokenPrefix (first 20 chars) for debugging without exposing full token
+- **Plan 02-02:** Fire-and-forget error tracking pattern prevents blocking notification sends
+- **Plan 02-02:** Error logs stored in notificationErrors/{pushKey} in Firebase RTDB
+- **Plan 02-02:** 30-day retention policy for error logs with automatic cleanup
+- **Plan 02-02:** Device context enriched via lookupDeviceIdForToken() helper
 
 ### Pending Todos
 
@@ -93,9 +97,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-24 (phase execution and verification)
-Stopped at: Completed Phase 1 execution - all 6 plans complete, human verification passed
+Last session: 2026-01-24 (phase execution)
+Stopped at: Completed 02-02-PLAN.md (Error Logging Infrastructure)
 Resume file: None
 
 ---
-*Next step: Phase 1 verification by gsd-verifier, then plan Phase 2*
+*Next step: Continue Phase 2 execution with plan 02-03*

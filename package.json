@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^4.13.1",
+    "date-fns": "^4.1.0",
     "dexie": "^4.2.1",
     "firebase": "^12.8.0",
     "firebase-admin": "^13.6.0",
@@ -24,6 +25,7 @@
     "next": "^16.1.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "recharts": "^2.15.0",
     "ua-parser-js": "^2.0.8"
   },
   "devDependencies": {

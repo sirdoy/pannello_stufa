@@ -15,14 +15,14 @@ importScripts('https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging-com
 
 // Firebase configuration (same as client config)
 // NOTA: Le variabili env non sono disponibili qui, usiamo valori hardcoded
-// Questi valori sono public e safe per essere esposti
+// Questi valori sono public e safe per essere esposti (NEXT_PUBLIC_*)
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY", // Verrà sostituito da build process
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
+  apiKey: "AIzaSyABYIVE_ITsYKfpb2LanNpa7KNEK619t8Q",
+  authDomain: "pannellostufa.firebaseapp.com",
+  projectId: "pannellostufa",
+  storageBucket: "pannellostufa.firebasestorage.app",
+  messagingSenderId: "170058221044",
+  appId: "1:170058221044:web:88a3a8bcd5e3c67cb9a5a1",
 };
 
 // Initialize Firebase in service worker

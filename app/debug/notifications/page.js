@@ -22,6 +22,7 @@ export default function NotificationsDashboard() {
   const [stats, setStats] = useState(null);
   const [devices, setDevices] = useState([]);
   const [trends, setTrends] = useState(null);
+  const [alertInfo, setAlertInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -51,6 +52,7 @@ export default function NotificationsDashboard() {
 
       if (statsData.success) {
         setStats(statsData.stats);
+        setAlertInfo(statsData.stats.alerting);
       }
 
       if (devicesData.success) {
@@ -256,6 +258,73 @@ export default function NotificationsDashboard() {
             </div>
           </div>
           <DeliveryChart data={trends.daily} loading={loading} />
+        </Card>
+      )}
+
+      {/* Rate Alerting Status */}
+      {stats && !loading && (
+        <Card className={`p-6 ${
+          stats.notifications.deliveryRate < 85
+            ? 'bg-warning-50 [html:not(.dark)_&]:bg-warning-50 border-2 border-warning-200 [html:not(.dark)_&]:border-warning-300'
+            : 'bg-slate-50 [html:not(.dark)_&]:bg-slate-50 border border-slate-200 [html:not(.dark)_&]:border-slate-200'
+        }`}>
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-2xl">🔔</span>
+            <Heading level={2} size="xl">
+              Rate Alerting
+            </Heading>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+            <div>
+              <Text variant="tertiary" size="xs" className="mb-2">
+                Current Delivery Rate
+              </Text>
+              <Text
+                size="2xl"
+                weight="bold"
+                variant={getDeliveryRateColor(stats.notifications.deliveryRate)}
+              >
+                {stats.notifications.deliveryRate.toFixed(1)}%
+              </Text>
+              <Text variant="tertiary" size="xs" className="mt-1">
+                {stats.notifications.deliveryRate >= 85 ? 'Above threshold ✓' : 'Below threshold ⚠️'}
+              </Text>
+            </div>
+
+            <div>
+              <Text variant="tertiary" size="xs" className="mb-2">
+                Last Alert Sent
+              </Text>
+              <Text size="lg" weight="medium">
+                {alertInfo?.lastAlertSent
+                  ? formatDate(alertInfo.lastAlertSent)
+                  : 'Never'}
+              </Text>
+              {alertInfo?.lastAlertRate && (
+                <Text variant="tertiary" size="xs" className="mt-1">
+                  Alert rate: {alertInfo.lastAlertRate}%
+                </Text>
+              )}
+            </div>
+          </div>
+
+          <div className="p-4 rounded-lg bg-white/[0.04] [html:not(.dark)_&]:bg-black/[0.04] border border-white/[0.06] [html:not(.dark)_&]:border-black/[0.06]">
+            <Text variant="tertiary" size="sm" className="mb-2">
+              ℹ️ About Rate Alerting
+            </Text>
+            <Text variant="secondary" size="xs">
+              Automatic alerts are sent when delivery rate drops below 85%. Alerts are rate-limited to max 1 per hour to prevent alert fatigue.
+            </Text>
+            <div className="mt-3 pt-3 border-t border-white/[0.06] [html:not(.dark)_&]:border-black/[0.06]">
+              <Text variant="tertiary" size="xs">
+                <strong>Endpoint:</strong> POST /api/notifications/check-rate
+              </Text>
+              <Text variant="tertiary" size="xs" className="mt-1">
+                <strong>Setup:</strong> Schedule with cron-job.org for automated monitoring
+              </Text>
+            </div>
+          </div>
         </Card>
       )}
 

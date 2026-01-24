@@ -22,7 +22,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { getDeliveryStats } from '@/lib/notificationLogger';
+import { getDeliveryStats, getLastRateAlertInfo } from '@/lib/notificationLogger';
 import { adminDbGet } from '@/lib/firebaseAdmin';
 import { subHours, subDays } from 'date-fns';
 
@@ -117,6 +117,9 @@ export async function GET(request) {
       byPlatform: devicesByPlatform,
     };
 
+    // Get rate alert info
+    const alertInfo = await getLastRateAlertInfo();
+
     // Build response
     const stats = {
       period,
@@ -128,6 +131,10 @@ export async function GET(request) {
       },
       errors: errorStats,
       devices: deviceStats,
+      alerting: alertInfo ? {
+        lastAlertSent: alertInfo.lastAlertSent?.toISOString() || null,
+        lastAlertRate: alertInfo.deliveryRate || null,
+      } : null,
     };
 
     return NextResponse.json({

@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Card, Button, Skeleton, ErrorAlert, Banner, Heading, Text } from '@/app/components/ui';
 import RoomCard from '@/app/components/netatmo/RoomCard';
 import BatteryWarning, { ModuleBatteryList } from '@/app/components/devices/thermostat/BatteryWarning';
+import StoveSyncPanel from '@/app/components/netatmo/StoveSyncPanel';
 import { NETATMO_ROUTES } from '@/lib/routes';
 
 function NetatmoContent() {
@@ -402,6 +403,11 @@ function NetatmoContent() {
           </div>
         </div>
       </Card>
+
+      {/* Stove-Thermostat Sync Configuration */}
+      <div className="mb-6">
+        <StoveSyncPanel onSyncComplete={fetchStatus} />
+      </div>
 
       {/* Topology Info - Liquid Glass Card */}
       <Card variant="glass" className="p-5 sm:p-6 mb-6">

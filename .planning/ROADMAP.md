@@ -68,13 +68,18 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. User disables "Scheduler" notifications in settings, scheduler events no longer trigger push (other types still work)
   2. User sets DND hours 22:00-08:00 in timezone Europe/Rome, receives no notifications during those hours
-  3. Scheduler fires 3 events within 4 minutes, user receives only 1 notification (rate limit: max 1 per category per 5 min)
+  3. Scheduler fires 3 events within 4 minutes, user receives only 1 notification (rate limit: max 1 per type per 5 min)
   4. User updates preferences on phone, immediately sees same settings on tablet (cross-device sync)
-  5. New user sees only CRITICAL and ERROR notifications enabled by default (conservative defaults)
-**Plans**: TBD
+  5. New user sees Alerts + System enabled by default (balanced approach per CONTEXT.md)
+**Plans**: 6 plans
 
 Plans:
-- [ ] TBD during planning
+- [ ] 03-01-PLAN.md — Dependencies + Zod schema (react-hook-form, zod, @hookform/resolvers)
+- [ ] 03-02-PLAN.md — Settings UI form with React Hook Form + category toggles + DND inputs
+- [ ] 03-03-PLAN.md — Firestore real-time sync hook (useNotificationPreferences)
+- [ ] 03-04-PLAN.md — Server-side filtering (type toggles, DND hours, CRITICAL bypass)
+- [ ] 03-05-PLAN.md — Rate limiting logic (per-type windows, in-memory Map)
+- [ ] 03-06-PLAN.md — Integration and verification checkpoint
 
 ### Phase 4: Notification History & Devices
 **Goal**: Users see notification history in-app and manage registered devices
@@ -115,7 +120,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Token Lifecycle Foundation | 6/6 | Complete | 2026-01-24 |
 | 2. Production Monitoring Infrastructure | 7/7 | Complete | 2026-01-24 |
-| 3. User Preferences & Control | 0/TBD | Not started | - |
+| 3. User Preferences & Control | 0/6 | Planned | - |
 | 4. Notification History & Devices | 0/TBD | Not started | - |
 | 5. Automation & Testing | 0/TBD | Not started | - |
 
@@ -127,3 +132,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 *Phase 2 executed: 2026-01-24 (7 plans total including 1 gap closure, all success criteria verified)*
 *Depth: comprehensive (5 phases derived from requirements)*
 *Coverage: 31/31 v1 requirements mapped (100%)*
+*Phase 3 planned: 2026-01-25 (6 plans in 4 waves)*

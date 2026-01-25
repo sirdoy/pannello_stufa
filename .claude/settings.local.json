@@ -118,7 +118,12 @@
       "Bash(else echo \"BROKEN: $link\")",
       "Bash(fi)",
       "Bash(SANDBOX_MODE=true TEST_MODE=true timeout 15 npm run dev:*)",
-      "Bash(vercel --version:*)"
+      "Bash(vercel --version:*)",
+      "Bash(npx firebase:*)",
+      "Bash(firebase database:get:*)",
+      "Bash(npx -y firebase-tools database:get:*)",
+      "Bash(git status:*)",
+      "Bash(du -sh:*)"
     ],
     "deny": [],
     "ask": []

@@ -5,6 +5,49 @@ Tutte le modifiche importanti a questo progetto verranno documentate in questo f
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/lang/it/).
 
+## [1.77.0] - 2026-01-25
+
+### Stove-Thermostat Sync UI & Auto-Refresh
+
+#### Added
+
+- **StoveSyncPanel Component** - Nuovo pannello UI in `/thermostat` per configurare l'interconnessione stufa-termostato
+  - Toggle enable/disable sincronizzazione
+  - Multi-room selection: selezione precisa delle stanze da sincronizzare
+  - Configurazione temperatura setpoint (default 16°C)
+  - Riepilogo configurazione attiva con stato corrente
+  - Design liquid glass coerente con design system Ember Noir
+
+- **Pulsante "Sincronizza Ora"** - Sync immediato senza aspettare il cronjob (5 min)
+  - Rileva automaticamente stato stufa (WORK/START/STANDBY/OFF)
+  - Chiama API `/api/netatmo/stove-sync` con `action: 'sync'`
+  - Mostra banner feedback con risultato dettagliato
+  - Auto-refresh dati Netatmo dopo 2 secondi (delay per propagazione API)
+
+- **Auto-refresh dopo sync** - Callback `onSyncComplete` aggiornato automaticamente
+  - Refresh dopo "Sincronizza Ora"
+  - Refresh dopo "Salva modifiche" configurazione
+  - Refresh dopo "Disabilita" sincronizzazione
+  - Delay 2s per permettere propagazione API Netatmo
+
+- **Enhanced logging** - Debug logging dettagliato per troubleshooting
+  - Log parametri setRoomThermpoint in `lib/netatmoApi.js`
+  - Log risposta API Netatmo completa
+  - Log dettagli per ogni stanza sincronizzata in `lib/netatmoStoveSync.js`
+
+#### Fixed
+
+- **Build errors** - Risolti import mancanti che bloccavano `npm run build`
+  - `app/api/notifications/trends/route.js:23` - importava da `@/lib/apiMiddleware` (inesistente) → `@/lib/core`
+  - `app/api/notifications/preferences-v2/route.js:16,29,59` - usava `ensureFirebaseAdmin()` (non esportata) → `getAdminFirestore()` che auto-inizializza
+
+#### Changed
+
+- **StoveSyncPanel now accepts callback prop** - `onSyncComplete` per refresh dati parent
+- **Thermostat page passes fetchStatus callback** - Permette auto-refresh dopo sync
+
+---
+
 ## [1.76.0] - 2026-01-21
 
 ### Enterprise Backend Architecture

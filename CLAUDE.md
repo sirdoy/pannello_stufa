@@ -59,4 +59,4 @@ export const dynamic = 'force-dynamic';
 
 ---
 
-**v1.77.0** | 2026-01-24
+**v1.77.0** | 2026-01-25

@@ -555,6 +555,7 @@ export const GET = withCronSecret(async (_request) => {
   // Continuous stove sync enforcement - verify actual Netatmo setpoints, not just Firebase stoveMode
   // This handles both state mismatches AND setpoint expiration (8-hour manual setpoints)
   try {
+    console.log(`🔥 Stove sync check: isOn=${isOn}, status=${currentStatus}`);
     const enforcementResult = await enforceStoveSyncSetpoints(isOn);
     if (enforcementResult.enforced || enforcementResult.synced) {
       if (enforcementResult.action === 'setpoint_enforcement') {
@@ -562,6 +563,8 @@ export const GET = withCronSecret(async (_request) => {
       } else {
         console.log(`✅ Stove sync enforced: ${enforcementResult.roomNames} ${isOn ? `set to ${enforcementResult.temperature}°C` : 'returned to schedule'}`);
       }
+    } else {
+      console.log(`🔥 Stove sync: no action needed (reason: ${enforcementResult.reason})`);
     }
   } catch (syncError) {
     console.error('❌ Stove sync enforcement error:', syncError.message);

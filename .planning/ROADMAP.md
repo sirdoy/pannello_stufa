@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Token Lifecycle Foundation** - Fix critical persistence bug, token refresh, cleanup
 - [x] **Phase 2: Production Monitoring Infrastructure** - Delivery tracking, error logging, admin dashboard
-- [ ] **Phase 3: User Preferences & Control** - Granular notification settings, DND hours, rate limiting
+- [x] **Phase 3: User Preferences & Control** - Granular notification settings, DND hours, rate limiting
 - [ ] **Phase 4: Notification History & Devices** - In-app inbox, device management, history UI
 - [ ] **Phase 5: Automation & Testing** - Scheduled cleanup, E2E tests, polish
 
@@ -74,12 +74,12 @@ Plans:
 **Plans**: 6 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Dependencies + Zod schema (react-hook-form, zod, @hookform/resolvers)
-- [ ] 03-02-PLAN.md — Settings UI form with React Hook Form + category toggles + DND inputs
-- [ ] 03-03-PLAN.md — Firestore real-time sync hook (useNotificationPreferences)
-- [ ] 03-04-PLAN.md — Server-side filtering (type toggles, DND hours, CRITICAL bypass)
-- [ ] 03-05-PLAN.md — Rate limiting logic (per-type windows, in-memory Map)
-- [ ] 03-06-PLAN.md — Integration and verification checkpoint
+- [x] 03-01-PLAN.md — Dependencies + Zod schema (react-hook-form, zod, @hookform/resolvers)
+- [x] 03-02-PLAN.md — Settings UI form with React Hook Form + category toggles + DND inputs
+- [x] 03-03-PLAN.md — Firestore real-time sync hook (useNotificationPreferences)
+- [x] 03-04-PLAN.md — Server-side filtering (type toggles, DND hours, CRITICAL bypass)
+- [x] 03-05-PLAN.md — Rate limiting logic (per-type windows, in-memory Map)
+- [x] 03-06-PLAN.md — Integration and verification checkpoint
 
 ### Phase 4: Notification History & Devices
 **Goal**: Users see notification history in-app and manage registered devices
@@ -133,3 +133,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 *Depth: comprehensive (5 phases derived from requirements)*
 *Coverage: 31/31 v1 requirements mapped (100%)*
 *Phase 3 planned: 2026-01-25 (6 plans in 4 waves)*
+*Phase 3 executed: 2026-01-25 (6 plans, all success criteria technically verified, goal achieved)*

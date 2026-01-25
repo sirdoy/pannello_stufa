@@ -180,15 +180,19 @@ export default function NotificationsSettingsPage() {
   }, [user?.sub, currentDeviceToken]);
 
   // Handler test notifica - invia solo al dispositivo corrente se registrato
-  const handleTestNotification = async () => {
+  const handleTestNotification = async (broadcastToAll = false) => {
     setIsSendingTest(true);
     setTestResult(null);
 
     try {
-      // Build request body - include deviceToken to send only to this device
-      const requestBody = currentDeviceToken
-        ? { deviceToken: currentDeviceToken }
-        : {};
+      // Build request body
+      // - If broadcastToAll: send empty body (API sends to all devices)
+      // - Otherwise: include deviceToken to send only to this device
+      const requestBody = broadcastToAll
+        ? {}
+        : currentDeviceToken
+          ? { deviceToken: currentDeviceToken }
+          : {};
 
       const response = await fetch('/api/notifications/test', {
         method: 'POST',
@@ -314,46 +318,74 @@ export default function NotificationsSettingsPage() {
       {permission === 'granted' && isSupported && (
         <Card liquid className="p-6 sm:p-8">
           <Heading level={2} size="lg" className="mb-2">
-            Test Notifica
+            Test Notifiche
           </Heading>
           <Text variant="secondary" size="sm" className="mb-6">
-            Invia una notifica di prova a questo dispositivo per verificare che
-            tutto funzioni correttamente.
+            Invia notifiche di prova per testare il sistema e le preferenze Phase 3 (filtri, rate limits, DND).
           </Text>
 
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <Button
-              liquid
-              variant={testResult === 'success' ? 'success' : 'accent'}
-              size="md"
-              onClick={handleTestNotification}
-              disabled={isSendingTest || !isCurrentDeviceRegistered}
-            >
-              {isSendingTest
-                ? 'Invio in corso...'
-                : testResult === 'success'
-                  ? 'Notifica inviata!'
-                  : 'Invia Notifica Test'}
-            </Button>
+          <div className="flex flex-col gap-4">
+            {/* Test dispositivo corrente */}
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+              <Button
+                liquid
+                variant={testResult === 'success' ? 'success' : 'accent'}
+                size="md"
+                onClick={() => handleTestNotification(false)}
+                disabled={isSendingTest || !isCurrentDeviceRegistered}
+              >
+                {isSendingTest
+                  ? 'Invio in corso...'
+                  : testResult === 'success'
+                    ? 'Notifica inviata!'
+                    : 'Test Questo Dispositivo'}
+              </Button>
 
-            {!isCurrentDeviceRegistered && !testResult && (
-              <Text variant="warning" size="sm">
-                Registra prima questo dispositivo per inviare una notifica test
-              </Text>
-            )}
+              {!isCurrentDeviceRegistered && !testResult && (
+                <Text variant="warning" size="sm">
+                  Registra prima questo dispositivo per il test singolo
+                </Text>
+              )}
 
-            {testResult === 'success' && (
-              <Text variant="sage" size="sm">
-                Dovresti ricevere la notifica su questo dispositivo tra pochi
-                secondi
-              </Text>
-            )}
+              {testResult === 'success' && (
+                <Text variant="sage" size="sm">
+                  Notifica inviata! Controlla il dispositivo tra pochi secondi
+                </Text>
+              )}
 
-            {testResult === 'error' && (
-              <Text variant="ember" size="sm">
-                Errore durante l&apos;invio della notifica
-              </Text>
-            )}
+              {testResult === 'error' && (
+                <Text variant="ember" size="sm">
+                  Errore durante l&apos;invio della notifica
+                </Text>
+              )}
+            </div>
+
+            {/* Test tutti i dispositivi */}
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center border-t border-ash-700 pt-4">
+              <Button
+                liquid
+                variant="secondary"
+                size="md"
+                onClick={() => handleTestNotification(true)}
+                disabled={isSendingTest || devices.length === 0}
+              >
+                {isSendingTest
+                  ? 'Invio in corso...'
+                  : `Test Tutti i Dispositivi (${devices.length})`}
+              </Button>
+
+              {devices.length === 0 && (
+                <Text variant="warning" size="sm">
+                  Nessun dispositivo registrato
+                </Text>
+              )}
+
+              {devices.length > 0 && !isSendingTest && (
+                <Text variant="secondary" size="sm">
+                  Invia a {devices.length} {devices.length === 1 ? 'dispositivo' : 'dispositivi'} registrati
+                </Text>
+              )}
+            </div>
 
             {testResult === 'no_tokens' && (
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">

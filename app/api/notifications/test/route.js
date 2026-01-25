@@ -25,25 +25,37 @@ import { sendNotificationToUser, sendPushNotification, adminDbGet } from '@/lib/
 
 export const dynamic = 'force-dynamic';
 
-// Predefined notification templates
+// Predefined notification templates (using Phase 3 type names)
 const TEMPLATES = {
   error_alert: {
-    title: 'Errore Stufa',
+    title: '❌ Errore Stufa',
     body: 'Attenzione: rilevato errore nel sistema. Verifica lo stato della stufa.',
     priority: 'high',
-    type: 'error'
+    type: 'ERROR' // Phase 3 type name
   },
   scheduler_success: {
-    title: 'Accensione Completata',
+    title: '🔥 Accensione Completata',
     body: 'La stufa e stata accesa automaticamente dallo scheduler.',
     priority: 'normal',
-    type: 'scheduler'
+    type: 'scheduler_success' // Phase 3 type name
   },
   maintenance_reminder: {
-    title: 'Promemoria Manutenzione',
+    title: '🔧 Promemoria Manutenzione',
     body: 'E il momento di effettuare la pulizia ordinaria della stufa.',
     priority: 'normal',
-    type: 'maintenance'
+    type: 'maintenance' // Phase 3 type name
+  },
+  critical_test: {
+    title: '🚨 Test CRITICAL',
+    body: 'Notifica CRITICAL di test - bypassa DND e ha rate limit 5/min',
+    priority: 'high',
+    type: 'CRITICAL' // Phase 3 type name - bypasses DND
+  },
+  status_test: {
+    title: 'ℹ️ Test Status',
+    body: 'Notifica Status di test - categoria Routine (disabled by default)',
+    priority: 'normal',
+    type: 'status' // Phase 3 type name - Routine category
   }
 };
 

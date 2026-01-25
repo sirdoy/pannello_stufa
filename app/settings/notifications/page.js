@@ -27,6 +27,7 @@ import Button from '@/app/components/ui/Button';
 import { Heading, Text } from '@/app/components/ui';
 import NotificationPermissionButton from '@/app/components/NotificationPermissionButton';
 import NotificationPreferencesPanel from '@/app/components/NotificationPreferencesPanel';
+import NotificationSettingsForm from './NotificationSettingsForm';
 import Skeleton from '@/app/components/ui/Skeleton';
 
 export default function NotificationsSettingsPage() {
@@ -40,6 +41,12 @@ export default function NotificationsSettingsPage() {
   const [registrationError, setRegistrationError] = useState(null);
   const [currentDeviceToken, setCurrentDeviceToken] = useState(null);
   const [isCurrentDeviceRegistered, setIsCurrentDeviceRegistered] = useState(false);
+
+  // State for notification preferences form
+  const [preferences, setPreferences] = useState(null);
+  const [isLoadingPreferences, setIsLoadingPreferences] = useState(true);
+  const [isSavingPreferences, setIsSavingPreferences] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Load existing token on mount and check for 30-day refresh
   useEffect(() => {
@@ -115,6 +122,53 @@ export default function NotificationsSettingsPage() {
       setIsDeactivating(false);
     }
   };
+
+  // Handler for saving notification preferences
+  const handleSavePreferences = async (data) => {
+    setIsSavingPreferences(true);
+    try {
+      // Placeholder for Firestore sync (will be implemented in 03-03)
+      console.log('[NotificationsPage] Saving preferences:', data);
+
+      // Simulate save delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Update local state
+      setPreferences(data);
+
+      // Show success message
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (error) {
+      console.error('[NotificationsPage] Error saving preferences:', error);
+      alert('Errore salvataggio preferenze: ' + error.message);
+    } finally {
+      setIsSavingPreferences(false);
+    }
+  };
+
+  // Load preferences on mount (placeholder - will use Firestore in 03-03)
+  useEffect(() => {
+    if (!user?.sub) {
+      setIsLoadingPreferences(false);
+      return;
+    }
+
+    // Simulate loading from Firestore
+    const loadPreferences = async () => {
+      try {
+        console.log('[NotificationsPage] Loading preferences for user:', user.sub);
+        // Placeholder - will fetch from Firestore in 03-03
+        // For now, just mark as loaded (form will use defaults)
+        setIsLoadingPreferences(false);
+      } catch (error) {
+        console.error('[NotificationsPage] Error loading preferences:', error);
+        setIsLoadingPreferences(false);
+      }
+    };
+
+    loadPreferences();
+  }, [user?.sub]);
 
   // Load dispositivi registrati
   useEffect(() => {
@@ -251,16 +305,35 @@ export default function NotificationsSettingsPage() {
 
       {/* Preferenze Notifiche */}
       {permission === 'granted' && isSupported && (
-        <Card liquid className="p-6 sm:p-8">
-          <Heading level={2} size="lg" className="mb-2">
-            Preferenze Notifiche
-          </Heading>
-          <Text variant="secondary" size="sm" className="mb-6">
-            Scegli quali notifiche ricevere. Le preferenze sono salvate
-            automaticamente.
-          </Text>
-          <NotificationPreferencesPanel />
-        </Card>
+        <>
+          <div className="space-y-2">
+            <Heading level={2} size="lg">
+              Preferenze Notifiche
+            </Heading>
+            <Text variant="secondary" size="sm">
+              Scegli quali notifiche ricevere e quando. Le preferenze sono salvate per questo account.
+            </Text>
+          </div>
+
+          {/* Success Banner */}
+          {saveSuccess && (
+            <Card liquid className="p-4 bg-sage-500/10 [html:not(.dark)_&]:bg-sage-50 border border-sage-500/30 [html:not(.dark)_&]:border-sage-200">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">✅</span>
+                <Text variant="sage" weight="medium">
+                  Preferenze salvate con successo!
+                </Text>
+              </div>
+            </Card>
+          )}
+
+          <NotificationSettingsForm
+            initialValues={preferences}
+            onSubmit={handleSavePreferences}
+            isLoading={isLoadingPreferences}
+            isSaving={isSavingPreferences}
+          />
+        </>
       )}
 
       {/* Test Notifica */}

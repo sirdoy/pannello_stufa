@@ -101,6 +101,7 @@ export default function NotificationSettingsForm({
     control,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isDirty },
     reset,
   } = useForm({
@@ -205,24 +206,40 @@ export default function NotificationSettingsForm({
               </Text>
             </div>
             <Controller
-              name="dndWindows.0.enabled"
+              name="dndWindows"
               control={control}
-              render={({ field }) => (
-                <Toggle
-                  checked={field.value ?? false}
-                  onChange={(value) => {
-                    if (value && dndWindows.length === 0) {
-                      // Create first DND window
-                      field.onChange(true);
-                    } else {
-                      field.onChange(value);
-                    }
-                  }}
-                  label="Enable DND"
-                  disabled={isSaving}
-                  size="sm"
-                />
-              )}
+              render={({ field }) => {
+                const isEnabled = field.value?.[0]?.enabled ?? false;
+                return (
+                  <Toggle
+                    checked={isEnabled}
+                    onChange={(value) => {
+                      if (value && field.value.length === 0) {
+                        // Create first DND window with defaults
+                        field.onChange([{
+                          id: crypto.randomUUID(),
+                          startTime: '22:00',
+                          endTime: '08:00',
+                          enabled: true,
+                        }]);
+                      } else if (value) {
+                        // Enable existing window
+                        const updated = [...field.value];
+                        updated[0] = { ...updated[0], enabled: true };
+                        field.onChange(updated);
+                      } else {
+                        // Disable existing window
+                        const updated = [...field.value];
+                        updated[0] = { ...updated[0], enabled: false };
+                        field.onChange(updated);
+                      }
+                    }}
+                    label="Enable DND"
+                    disabled={isSaving}
+                    size="sm"
+                  />
+                );
+              }}
             />
           </div>
 

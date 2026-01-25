@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-23)
 ## Current Position
 
 Phase: 3 of 5 (User Preferences & Control)
-Plan: 3 of 7 in current phase
+Plan: 4 of 7 in current phase
 Status: In progress
-Last activity: 2026-01-25 - Completed 03-03-PLAN.md (Firestore Real-Time Sync Hook)
+Last activity: 2026-01-25 - Completed 03-04-PLAN.md (Server-Side Notification Filtering)
 
-Progress: [███████████████████████████████████████████░░░░░] 3/7 Phase 3 (plans executed: 03-01, 03-02, 03-03)
+Progress: [█████████████████████████████████████████████████████░░] 4/7 Phase 3 (plans executed: 03-01, 03-02, 03-03, 03-04)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
-- Average duration: 5.6 min
-- Total execution time: 1.49 hours
+- Total plans completed: 17
+- Average duration: 5.7 min
+- Total execution time: 1.64 hours
 
 **By Phase:**
 
@@ -29,15 +29,15 @@ Progress: [███████████████████████
 |-------|-------|-------|----------|
 | 1 | 6 | 48.6 min | 8.1 min |
 | 2 | 7 | 26.9 min | 3.8 min |
-| 3 | 3 | 14.0 min | 4.7 min |
+| 3 | 4 | 24.0 min | 6.0 min |
 
 **Recent Trend:**
-- Last plan: 03-03 (8.0 min - Firestore real-time sync hook)
-- Previous: 03-02 (3.5 min), 03-01 (2.5 min), 02-07 (1.0 min)
-- Trend: Phase 3 progressing steadily - avg 4.7 min/plan
+- Last plan: 03-04 (10.0 min - Server-side notification filtering)
+- Previous: 03-03 (8.0 min), 03-02 (3.5 min), 03-01 (2.5 min)
+- Trend: Phase 3 progressing - avg 6.0 min/plan, slightly higher than Phase 2 (3.8 min)
 
 **Phase 2 Complete:** All 7 plans executed (including gap closure), 51/51 must-haves verified (100%) ✅
-**Phase 3 Progress:** 3/7 plans complete (43%)
+**Phase 3 Progress:** 4/7 plans complete (57%)
 
 *Updated after each plan completion*
 
@@ -107,6 +107,10 @@ Recent decisions affecting current work:
 - **Plan 03-03:** Auto-write defaults for new users on first load
 - **Plan 03-03:** Version increment on each save for future conflict detection
 - **Plan 03-03:** Cleanup function mandatory to prevent memory leaks (RESEARCH.md Pitfall #1)
+- **Plan 03-04:** CRITICAL notifications bypass DND hours (per CONTEXT.md decision)
+- **Plan 03-04:** Fail-safe filtering: allow notification if Firestore read fails (better unwanted than missed critical)
+- **Plan 03-04:** Per-device DND: each token filtered independently based on deviceId match
+- **Plan 03-04:** Disabled notification types return FILTERED error with reason for debugging
 
 ### Pending Todos
 
@@ -124,16 +128,17 @@ Recent decisions affecting current work:
 - ⚠️ **Firestore Rules Required:** Must configure security rules for `users/{userId}/settings/notifications` before production
   - Example: `allow read, write: if request.auth.uid == userId;`
   - Without rules: all preference operations will fail with permission denied
-- 🔜 **DND Filtering Logic:** Next step (03-04) - implement server-side filtering using preferences
-- 🔜 **Rate Limiting Logic:** Following step (03-05) - implement in-memory rate limiter
+- ✅ **DND Filtering Logic:** Complete (03-04) - server-side filtering with type toggles and DND windows
+- 🔜 **Rate Limiting Logic:** Next step (03-05) - implement in-memory rate limiter
 
 **Technical Debt:**
 - None from Phase 3 so far - clean implementation
 
 ## Session Continuity
 
-Stopped at: Completed 03-03-PLAN.md - Firestore real-time sync hook
+Last session: 2026-01-25 15:31:24 UTC
+Stopped at: Completed 03-04-PLAN.md - Server-side notification filtering
 Resume file: None
 
 ---
-*Next step: Phase 3 - Continue with 03-04 (DND Window Filtering) and 03-05 (Rate Limiting)*
+*Next step: Phase 3 - Continue with 03-05 (Rate Limiting) and beyond*

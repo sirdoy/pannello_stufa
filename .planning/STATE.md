@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-23)
 ## Current Position
 
 Phase: 4 of 5 (Notification History & Devices)
-Plan: 2 of 6 (Device Management Endpoints)
+Plan: 4 of 6 (Device Management UI)
 Status: In Progress
-Last activity: 2026-01-25 - Completed 04-02-PLAN.md (Device Management Endpoints)
+Last activity: 2026-01-25 - Completed 04-04-PLAN.md (Device Management UI)
 
-Progress: [█████████████████████████████████████████████████████████░░░░] 20/24 (83%)
+Progress: [████████████████████████████████████████████████████████████░] 22/24 (92%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
-- Average duration: 5.6 min
-- Total execution time: 1.89 hours
+- Total plans completed: 22
+- Average duration: 5.5 min
+- Total execution time: 2.01 hours
 
 **By Phase:**
 
@@ -30,16 +30,16 @@ Progress: [███████████████████████
 | 1 | 6 | 48.6 min | 8.1 min |
 | 2 | 7 | 26.9 min | 3.8 min |
 | 3 | 6 | 34.0 min | 5.7 min |
-| 4 | 2 | 5.5 min | 2.8 min |
+| 4 | 4 | 15.5 min | 3.9 min |
 
 **Recent Trend:**
-- Last plan: 04-02 (3.0 min - Device Management Endpoints)
-- Previous: 04-01 (2.5 min), 03-06 (3.5 min), 03-05 (10.0 min)
-- Trend: Phase 4 maintaining excellent velocity - 2.8 min avg (fastest phase)
+- Last plan: 04-04 (5.0 min - Device Management UI)
+- Previous: 04-03 (7.0 min), 04-02 (3.0 min), 04-01 (2.5 min)
+- Trend: Phase 4 progressing well - 3.9 min avg (second fastest phase)
 
 **Phase 2 Complete:** All 7 plans executed (including gap closure), 51/51 must-haves verified (100%) ✅
 **Phase 3 Complete:** All 6 plans executed, 5/5 success criteria technically verified, goal achieved ✅
-**Phase 4 In Progress:** 2/6 plans complete, API layer for device management ready
+**Phase 4 In Progress:** 4/6 plans complete, device management UI ready
 
 *Updated after each plan completion*
 
@@ -128,6 +128,10 @@ Recent decisions affecting current work:
 - **Plan 04-02:** Trim displayName to prevent whitespace-only names
 - **Plan 04-02:** Return 404 for both 'not found' and 'unauthorized' to prevent user enumeration
 - **Plan 04-02:** Use await context.params for Next.js 15 dynamic route compatibility
+- **Plan 04-04:** Inline editing triggered by clicking device name (no separate edit button)
+- **Plan 04-04:** Optimistic updates with rollback on failure for instant feedback
+- **Plan 04-04:** Confirmation dialog before removal prevents accidental deletions
+- **Plan 04-04:** Current device cannot be removed (prevents self-lockout)
 
 ### Pending Todos
 
@@ -156,19 +160,20 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-01-25 19:15:50 UTC
-Stopped at: Completed 04-02-PLAN.md (Device Management Endpoints)
+Last session: 2026-01-25 19:29:41 UTC
+Stopped at: Completed 04-04-PLAN.md (Device Management UI)
 Resume file: None (plan complete)
 Commits in this session:
-- 687ed29: feat(04-01): create notification history service with pagination (includes device endpoints)
-- 5198d24: feat(04-01): create notification history API endpoint
-- c89512c: feat(04-01): add Firestore composite indexes for notification queries
+- 995789d: feat(04-04): create DeviceListItem component
+- 8405642: feat(04-04): create device management page
+- 5329563: feat(04-04): add navigation links to history and devices pages
 
 **Next Steps:**
-1. Continue with Phase 4 Plan 03 (Device Management UI)
-2. Test device naming: `curl -X PATCH "http://localhost:3000/api/notifications/devices/[tokenKey]" -d '{"displayName":"Kitchen iPad"}'`
-3. Test device removal: `curl -X DELETE "http://localhost:3000/api/notifications/devices/[tokenKey]"`
-4. Deploy Firestore indexes when ready: `firebase deploy --only firestore:indexes`
+1. Continue with Phase 4 Plan 05 or 06 (remaining plans)
+2. Test device management UI: Visit `/settings/notifications/devices`
+3. Test inline rename: Click device name, type new name, press Enter
+4. Test device removal: Click "Rimuovi" button, confirm dialog
+5. Deploy Firestore indexes when ready: `firebase deploy --only firestore:indexes`
 
 ---
-*Next step: Continue Phase 4 Plan 03 (Device Management UI)*
+*Next step: Continue Phase 4 Plan 05 or 06*

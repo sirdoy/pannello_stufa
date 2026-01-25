@@ -12,8 +12,7 @@
 
 import { withAuthAndErrorHandler, success, parseJsonOrThrow } from '@/lib/core';
 import { getDefaultPreferences } from '@/lib/schemas/notificationPreferences';
-import { getFirestore } from 'firebase-admin/firestore';
-import { ensureFirebaseAdmin } from '@/lib/firebaseAdmin';
+import { getAdminFirestore } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,9 +24,8 @@ export const dynamic = 'force-dynamic';
 export const GET = withAuthAndErrorHandler(async (request, context, session) => {
   const userId = session.user.sub;
 
-  // Ensure Firebase Admin is initialized
-  ensureFirebaseAdmin();
-  const db = getFirestore();
+  // Get Admin Firestore instance (auto-initializes)
+  const db = getAdminFirestore();
 
   // Get preferences from Firestore using Admin SDK
   const docRef = db.collection('users').doc(userId).collection('settings').doc('notifications');
@@ -55,9 +53,8 @@ export const PUT = withAuthAndErrorHandler(async (request, context, session) => 
   const userId = session.user.sub;
   const body = await parseJsonOrThrow(request);
 
-  // Ensure Firebase Admin is initialized
-  ensureFirebaseAdmin();
-  const db = getFirestore();
+  // Get Admin Firestore instance (auto-initializes)
+  const db = getAdminFirestore();
 
   // Prepare update with metadata
   const update = {

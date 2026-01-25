@@ -20,7 +20,7 @@ import { NextResponse } from 'next/server';
 import { getAdminFirestore } from '@/lib/firebaseAdmin';
 import { Timestamp } from 'firebase-admin/firestore';
 import { startOfDay, format, eachDayOfInterval, subDays } from 'date-fns';
-import { withAuthAndErrorHandler } from '@/lib/apiMiddleware';
+import { withAuthAndErrorHandler } from '@/lib/core';
 
 export const dynamic = 'force-dynamic';
 

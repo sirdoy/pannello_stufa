@@ -137,6 +137,17 @@ jest.mock('firebase/database', () => ({
   limitToLast: jest.fn(),
 }));
 
+jest.mock('firebase/firestore', () => ({
+  getFirestore: jest.fn(),
+  collection: jest.fn(),
+  doc: jest.fn(),
+  getDoc: jest.fn(),
+  setDoc: jest.fn(),
+  updateDoc: jest.fn(),
+  deleteDoc: jest.fn(),
+  onSnapshot: jest.fn(),
+}));
+
 // Mock Auth0
 jest.mock('@auth0/nextjs-auth0', () => ({
   getSession: jest.fn(),

@@ -3,17 +3,16 @@
 /**
  * NotificationPreferencesPanel
  *
- * Pannello di gestione preferenze notifiche con toggle switches
- * Generato dinamicamente da NOTIFICATION_CATEGORIES_CONFIG
- * Salva preferenze su Firebase per utente
+ * Pannello di gestione preferenze notifiche con toggle switches.
+ * Uses real-time Firestore sync via useNotificationPreferences hook.
+ * Changes propagate instantly across devices.
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 import {
-  getUserPreferences,
   updatePreferenceSection,
-  resetPreferences,
   DEFAULT_PREFERENCES,
   NOTIFICATION_CATEGORIES_CONFIG,
 } from '@/lib/notificationPreferencesService';
@@ -157,54 +156,40 @@ function CategorySection({ categoryId, config, preferences, onSave, isSaving }) 
 export default function NotificationPreferencesPanel() {
   const { user, isLoading: userLoading } = useUser();
 
-  const [preferences, setPreferences] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+  // Use real-time Firestore sync hook
+  const {
+    prefs: preferences,
+    loading: isLoading,
+    error: hookError,
+    isSaving: hookSaving,
+    savePreferences,
+    resetToDefaults,
+  } = useNotificationPreferences(user?.sub);
+
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [error, setError] = useState(null);
 
-  const loadPreferences = useCallback(async () => {
-    if (!user?.sub) return;
-
-    try {
-      setIsLoading(true);
-      const prefs = await getUserPreferences(user.sub);
-      setPreferences(prefs);
-    } catch (err) {
-      console.error('Error loading preferences:', err);
-      setError('Errore caricamento preferenze');
-      // Fallback a defaults
-      setPreferences(DEFAULT_PREFERENCES);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user?.sub]);
-
-  // Load preferences
+  // Sync hook error to local error state
   useEffect(() => {
-    if (!user?.sub) {
-      setIsLoading(false);
-      return;
+    if (hookError) {
+      setError('Errore sincronizzazione preferenze');
     }
+  }, [hookError]);
 
-    loadPreferences();
-  }, [user?.sub, loadPreferences]);
-
-  // Save section preferences
+  // Save section preferences using real-time sync
   const saveSection = async (section, sectionPrefs) => {
     if (!user?.sub) return;
 
-    setIsSaving(true);
     setError(null);
 
     try {
-      await updatePreferenceSection(user.sub, section, sectionPrefs);
-
-      // Update local state
-      setPreferences(prev => ({
-        ...prev,
+      // Update via Firestore - hook will sync automatically
+      const updatedPrefs = {
+        ...preferences,
         [section]: sectionPrefs,
-      }));
+      };
+
+      await savePreferences(updatedPrefs);
 
       // Show success message
       setSaveSuccess(true);
@@ -213,29 +198,23 @@ export default function NotificationPreferencesPanel() {
     } catch (err) {
       console.error('Error saving preferences:', err);
       setError('Errore salvataggio preferenze');
-    } finally {
-      setIsSaving(false);
     }
   };
 
-  // Reset to defaults
+  // Reset to defaults using real-time sync
   const handleReset = async () => {
     if (!user?.sub) return;
     if (!confirm('Ripristinare tutte le preferenze ai valori predefiniti?')) return;
 
-    setIsSaving(true);
     setError(null);
 
     try {
-      await resetPreferences(user.sub);
-      setPreferences(DEFAULT_PREFERENCES);
+      await resetToDefaults();
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2000);
     } catch (err) {
       console.error('Error resetting preferences:', err);
       setError('Errore ripristino preferenze');
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -322,7 +301,7 @@ export default function NotificationPreferencesPanel() {
             config={config}
             preferences={preferences}
             onSave={saveSection}
-            isSaving={isSaving}
+            isSaving={hookSaving}
           />
         );
       })}
@@ -334,7 +313,7 @@ export default function NotificationPreferencesPanel() {
           variant="ghost"
           size="sm"
           onClick={handleReset}
-          disabled={isSaving}
+          disabled={hookSaving}
           icon="↻"
         >
           Ripristina Predefinite

@@ -592,6 +592,52 @@ export default function NotificationsSettingsPage() {
         </Card>
       )}
 
+      {/* Notification History Link */}
+      <Card liquid className="p-4 sm:p-6">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="text-xl flex-shrink-0">📬</div>
+            <div className="min-w-0">
+              <Text weight="medium">Cronologia Notifiche</Text>
+              <Text variant="tertiary" size="sm">
+                Visualizza tutte le notifiche inviate
+              </Text>
+            </div>
+          </div>
+          <Button
+            liquid
+            variant="ghost"
+            size="sm"
+            onClick={() => (window.location.href = '/settings/notifications/history')}
+          >
+            Apri
+          </Button>
+        </div>
+      </Card>
+
+      {/* Device Management Link */}
+      <Card liquid className="p-4 sm:p-6">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="text-xl flex-shrink-0">📱</div>
+            <div className="min-w-0">
+              <Text weight="medium">Gestione Dispositivi</Text>
+              <Text variant="tertiary" size="sm">
+                Rinomina o rimuovi dispositivi registrati
+              </Text>
+            </div>
+          </div>
+          <Button
+            liquid
+            variant="ghost"
+            size="sm"
+            onClick={() => (window.location.href = '/settings/notifications/devices')}
+          >
+            Apri
+          </Button>
+        </div>
+      </Card>
+
       {/* Info iOS */}
       <Card
         liquid

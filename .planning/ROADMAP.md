@@ -91,10 +91,14 @@ Plans:
   3. User views device list, sees 3 registered devices with names ("Kitchen iPad", "Bedroom Phone", "Office Laptop")
   4. User clicks "Remove" on stale tablet device, device disappears from list and stops receiving notifications
   5. Notification older than 90 days automatically deleted from history (GDPR compliance)
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] TBD during planning
+- [ ] 04-01-PLAN.md — History API endpoint + Firestore pagination
+- [ ] 04-02-PLAN.md — Device management APIs (naming + removal)
+- [ ] 04-03-PLAN.md — Notification history UI with infinite scroll and filters
+- [ ] 04-04-PLAN.md — Device management UI with rename/remove capabilities
+- [ ] 04-05-PLAN.md — Integration and verification checkpoint
 
 ### Phase 5: Automation & Testing
 **Goal**: Zero-touch token hygiene with automated cleanup and comprehensive E2E tests
@@ -120,8 +124,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Token Lifecycle Foundation | 6/6 | Complete | 2026-01-24 |
 | 2. Production Monitoring Infrastructure | 7/7 | Complete | 2026-01-24 |
-| 3. User Preferences & Control | 0/6 | Planned | - |
-| 4. Notification History & Devices | 0/TBD | Not started | - |
+| 3. User Preferences & Control | 6/6 | Complete | 2026-01-25 |
+| 4. Notification History & Devices | 0/5 | Planned | - |
 | 5. Automation & Testing | 0/TBD | Not started | - |
 
 ---
@@ -134,3 +138,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 *Coverage: 31/31 v1 requirements mapped (100%)*
 *Phase 3 planned: 2026-01-25 (6 plans in 4 waves)*
 *Phase 3 executed: 2026-01-25 (6 plans, all success criteria technically verified, goal achieved)*
+*Phase 4 planned: 2026-01-25 (5 plans in 3 waves)*

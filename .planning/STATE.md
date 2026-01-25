@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-23)
 
 **Core value:** Dispositivi riconosciuti automaticamente dopo riavvio browser, notifiche arrivano sempre (100% delivery rate).
-**Current focus:** Phase 2 - Production Monitoring Infrastructure
+**Current focus:** Phase 3 - User Preferences & Control
 
 ## Current Position
 
-Phase: 2 of 5 (Production Monitoring Infrastructure)
-Plan: 7 of 7 in current phase
-Status: **PHASE COMPLETE & VERIFIED** ✅
-Last activity: 2026-01-24 - Phase 2 verified complete (51/51 must-haves, 100%)
+Phase: 3 of 5 (User Preferences & Control)
+Plan: 1 of N in current phase
+Status: In progress
+Last activity: 2026-01-25 - Completed 03-01-PLAN.md (Foundation - Dependencies & Schema)
 
-Progress: [█████████████████████████████████████] 100% Phase 2 (7 plans executed: 02-01, 02-02, 02-03, 02-04, 02-05, 02-06, 02-07)
+Progress: [██████████████████████████████████████░] 93% Overall (14/15 plans executed: Phase 1: 6/6, Phase 2: 7/7, Phase 3: 1/N)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
-- Average duration: 5.4 min
-- Total execution time: 1.20 hours
+- Total plans completed: 14
+- Average duration: 5.2 min
+- Total execution time: 1.24 hours
 
 **By Phase:**
 
@@ -29,13 +29,15 @@ Progress: [███████████████████████
 |-------|-------|-------|----------|
 | 1 | 6 | 48.6 min | 8.1 min |
 | 2 | 7 | 26.9 min | 3.8 min |
+| 3 | 1 | 2.4 min | 2.4 min |
 
 **Recent Trend:**
-- Last plan: 02-07 (1.0 min - gap closure, device API fields)
-- Previous: 02-06 (2.9 min), 02-05 (2.9 min), 02-04 (6.3 min)
-- Trend: Phase 2 completed efficiently - avg 3.8 min/plan, 53% faster than Phase 1
+- Last plan: 03-01 (2.4 min - dependencies & Zod schema)
+- Previous: 02-07 (1.0 min), 02-06 (2.9 min), 02-05 (2.9 min)
+- Trend: Phase 3 started efficiently - 2.4 min for foundation setup
 
 **Phase 2 Complete:** All 7 plans executed (including gap closure), 51/51 must-haves verified (100%) ✅
+**Phase 3 In Progress:** 1 plan executed (foundation dependencies & schema)
 
 *Updated after each plan completion*
 
@@ -96,10 +98,13 @@ Recent decisions affecting current work:
 - **Plan 02-07:** Status thresholds: active (<7 days), stale (>30 days), unknown (no data)
 - **Plan 02-07:** Token prefix: first 20 characters for dashboard display without exposing full token
 - **Plan 02-07:** id field matches tokenKey for React key prop uniqueness
+- **Plan 03-01:** Use Zod 3.x stable (not 4.x beta) to avoid error handling issues
+- **Plan 03-01:** Balanced default preferences: Alerts + System enabled, Routine opt-in
+- **Plan 03-01:** React Hook Form 7.x + Zod 3.x + @hookform/resolvers for type-safe form validation
 
 ### Pending Todos
 
-None yet.
+- User must run `npm install` to install new dependencies (react-hook-form, zod, @hookform/resolvers)
 
 ### Blockers/Concerns
 
@@ -119,9 +124,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-24 (phase execution + gap closure + verification)
-Stopped at: Phase 2 complete - 7 plans executed, 51/51 must-haves verified (100%)
+Last session: 2026-01-25 (plan execution)
+Stopped at: Phase 3 plan 03-01 complete - Dependencies & Schema ready
 Resume file: None
 
 ---
-*Next step: Phase 3 - User Preferences & Control (planning pending)*
+*Next step: Continue Phase 3 - User Preferences & Control (Settings UI, Server Filtering, etc.)*

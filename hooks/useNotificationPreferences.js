@@ -1,8 +1,8 @@
 /**
  * useNotificationPreferences Hook
  *
- * Real-time Firestore sync for notification preferences.
- * Provides instant cross-device updates via onSnapshot listener.
+ * Real-time RTDB sync for notification preferences.
+ * Provides instant cross-device updates via onValue listener.
  *
  * Critical: ALWAYS returns cleanup function to prevent memory leaks
  * (per RESEARCH.md Pitfall #1)
@@ -12,8 +12,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { getFirestore } from 'firebase/firestore';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { ref, onValue, off } from 'firebase/database';
 import { getDefaultPreferences } from '@/lib/schemas/notificationPreferences';
 
 /**
@@ -41,7 +41,7 @@ export function useNotificationPreferences(userId) {
   const [error, setError] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Real-time listener setup
+  // Real-time listener setup (Firebase RTDB)
   useEffect(() => {
     // Guard: no userId
     if (!userId) {
@@ -50,34 +50,23 @@ export function useNotificationPreferences(userId) {
       return;
     }
 
-    // Get Firestore instance
-    let db;
-    try {
-      db = getFirestore();
-    } catch (err) {
-      console.error('[useNotificationPreferences] Firestore init error:', err);
-      setError(err);
-      setLoading(false);
-      return;
-    }
+    // RTDB reference: users/{userId}/settings/notifications
+    const prefsRef = ref(db, `users/${userId}/settings/notifications`);
 
-    // Document reference: users/{userId}/settings/notifications
-    const docRef = doc(db, 'users', userId, 'settings', 'notifications');
+    console.log('[useNotificationPreferences] Setting up RTDB listener for user:', userId);
 
-    console.log('[useNotificationPreferences] Setting up listener for user:', userId);
-
-    // Setup real-time listener with onSnapshot
-    const unsubscribe = onSnapshot(
-      docRef,
+    // Setup real-time listener with onValue
+    const unsubscribe = onValue(
+      prefsRef,
       (snapshot) => {
-        console.log('[useNotificationPreferences] Snapshot received:', {
+        console.log('[useNotificationPreferences] RTDB snapshot received:', {
           exists: snapshot.exists(),
           userId,
         });
 
         if (snapshot.exists()) {
-          // Document exists - use stored preferences
-          const data = snapshot.data();
+          // Preferences exist - use stored data
+          const data = snapshot.val();
           setPrefs(data);
           setLoading(false);
           setError(null);
@@ -89,12 +78,12 @@ export function useNotificationPreferences(userId) {
           setLoading(false);
           setError(null);
 
-          // NOTE: Defaults will be written to Firestore on first save via API
+          // NOTE: Defaults will be written to RTDB on first save via API
           // No need to write immediately - avoids client-side permission issues
         }
       },
       (err) => {
-        console.error('[useNotificationPreferences] Listener error:', err);
+        console.error('[useNotificationPreferences] RTDB listener error:', err);
         setError(err);
         setLoading(false);
 
@@ -104,10 +93,10 @@ export function useNotificationPreferences(userId) {
     );
 
     // CRITICAL: Cleanup function to prevent memory leak
-    // Per RESEARCH.md Pitfall #1 - always return unsubscribe
+    // Per RESEARCH.md Pitfall #1 - always detach listener
     return () => {
-      console.log('[useNotificationPreferences] Cleaning up listener for user:', userId);
-      unsubscribe();
+      console.log('[useNotificationPreferences] Cleaning up RTDB listener for user:', userId);
+      off(prefsRef, 'value', unsubscribe);
     };
   }, [userId]); // Re-subscribe if userId changes
 

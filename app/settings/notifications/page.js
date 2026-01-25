@@ -208,9 +208,13 @@ export default function NotificationsSettingsPage() {
         setTestResult('success');
         setTimeout(() => setTestResult(null), 5000);
       } else {
-        // Gestisci errore specifico "no tokens"
+        // Gestisci errori specifici
         if (data.errorCode === 'NO_TOKENS') {
           setTestResult('no_tokens');
+        } else if (data.error?.includes('Rate limit exceeded')) {
+          // Rate limit hit - informational, not an error
+          setTestResult('rate_limited');
+          setTimeout(() => setTestResult(null), 5000);
         } else {
           throw new Error(data.error || 'Errore invio notifica test');
         }
@@ -356,6 +360,12 @@ export default function NotificationsSettingsPage() {
               {testResult === 'error' && (
                 <Text variant="ember" size="sm">
                   Errore durante l&apos;invio della notifica
+                </Text>
+              )}
+
+              {testResult === 'rate_limited' && (
+                <Text variant="copper" size="sm">
+                  ⏱️ Rate limit: troppi test ravvicinati. Attendi qualche secondo.
                 </Text>
               )}
             </div>

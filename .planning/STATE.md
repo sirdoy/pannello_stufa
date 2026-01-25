@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-23)
 ## Current Position
 
 Phase: 3 of 5 (User Preferences & Control)
-Plan: 4 of 7 in current phase
+Plan: 5 of 7 in current phase
 Status: In progress
-Last activity: 2026-01-25 - Completed 03-04-PLAN.md (Server-Side Notification Filtering)
+Last activity: 2026-01-25 - Completed 03-05-PLAN.md (Rate Limiting)
 
-Progress: [█████████████████████████████████████████████████████░░] 4/7 Phase 3 (plans executed: 03-01, 03-02, 03-03, 03-04)
+Progress: [███████████████████████████████████████████████████████████░] 5/7 Phase 3 (plans executed: 03-01, 03-02, 03-03, 03-04, 03-05)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
-- Average duration: 5.7 min
-- Total execution time: 1.64 hours
+- Total plans completed: 18
+- Average duration: 5.9 min
+- Total execution time: 1.81 hours
 
 **By Phase:**
 
@@ -29,15 +29,15 @@ Progress: [███████████████████████
 |-------|-------|-------|----------|
 | 1 | 6 | 48.6 min | 8.1 min |
 | 2 | 7 | 26.9 min | 3.8 min |
-| 3 | 4 | 24.0 min | 6.0 min |
+| 3 | 5 | 34.0 min | 6.8 min |
 
 **Recent Trend:**
-- Last plan: 03-04 (10.0 min - Server-side notification filtering)
-- Previous: 03-03 (8.0 min), 03-02 (3.5 min), 03-01 (2.5 min)
-- Trend: Phase 3 progressing - avg 6.0 min/plan, slightly higher than Phase 2 (3.8 min)
+- Last plan: 03-05 (10.0 min - Rate Limiting)
+- Previous: 03-04 (10.0 min), 03-03 (8.0 min), 03-02 (3.5 min)
+- Trend: Phase 3 progressing - avg 6.8 min/plan, slightly higher than Phase 2 (3.8 min) but consistent
 
 **Phase 2 Complete:** All 7 plans executed (including gap closure), 51/51 must-haves verified (100%) ✅
-**Phase 3 Progress:** 4/7 plans complete (57%)
+**Phase 3 Progress:** 5/7 plans complete (71%)
 
 *Updated after each plan completion*
 
@@ -111,6 +111,10 @@ Recent decisions affecting current work:
 - **Plan 03-04:** Fail-safe filtering: allow notification if Firestore read fails (better unwanted than missed critical)
 - **Plan 03-04:** Per-device DND: each token filtered independently based on deviceId match
 - **Plan 03-04:** Disabled notification types return FILTERED error with reason for debugging
+- **Plan 03-05:** Rate limits scoped to notification TYPE, not category (scheduler_success, ERROR, etc.)
+- **Plan 03-05:** CRITICAL notifications have higher rate limit (5 per min vs 1 per 5 min for routine)
+- **Plan 03-05:** In-memory storage with 5-minute cleanup interval prevents memory leaks
+- **Plan 03-05:** Three-stage filter chain order: Type enabled → Rate limit → DND windows
 
 ### Pending Todos
 
@@ -129,16 +133,16 @@ Recent decisions affecting current work:
   - Example: `allow read, write: if request.auth.uid == userId;`
   - Without rules: all preference operations will fail with permission denied
 - ✅ **DND Filtering Logic:** Complete (03-04) - server-side filtering with type toggles and DND windows
-- 🔜 **Rate Limiting Logic:** Next step (03-05) - implement in-memory rate limiter
+- ✅ **Rate Limiting Logic:** Complete (03-05) - in-memory rate limiter with per-type windows, success criteria #3 verified
 
 **Technical Debt:**
 - None from Phase 3 so far - clean implementation
 
 ## Session Continuity
 
-Last session: 2026-01-25 15:31:24 UTC
-Stopped at: Completed 03-04-PLAN.md - Server-side notification filtering
+Last session: 2026-01-25 15:59:44 UTC
+Stopped at: Completed 03-05-PLAN.md - Rate Limiting
 Resume file: None
 
 ---
-*Next step: Phase 3 - Continue with 03-05 (Rate Limiting) and beyond*
+*Next step: Phase 3 - Continue with 03-06 (User Preferences API) and beyond*

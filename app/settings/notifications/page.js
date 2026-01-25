@@ -29,6 +29,7 @@ import NotificationPermissionButton from '@/app/components/NotificationPermissio
 import NotificationPreferencesPanel from '@/app/components/NotificationPreferencesPanel';
 import NotificationSettingsForm from './NotificationSettingsForm';
 import Skeleton from '@/app/components/ui/Skeleton';
+import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 
 export default function NotificationsSettingsPage() {
   const { user, isLoading: userLoading } = useUser();
@@ -42,10 +43,16 @@ export default function NotificationsSettingsPage() {
   const [currentDeviceToken, setCurrentDeviceToken] = useState(null);
   const [isCurrentDeviceRegistered, setIsCurrentDeviceRegistered] = useState(false);
 
-  // State for notification preferences form
-  const [preferences, setPreferences] = useState(null);
-  const [isLoadingPreferences, setIsLoadingPreferences] = useState(true);
-  const [isSavingPreferences, setIsSavingPreferences] = useState(false);
+  // Notification preferences - managed by hook with Firestore sync
+  const {
+    prefs: preferences,
+    loading: isLoadingPreferences,
+    error: preferencesError,
+    isSaving: isSavingPreferences,
+    savePreferences,
+  } = useNotificationPreferences(user?.sub);
+
+  // Success banner state
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Load existing token on mount and check for 30-day refresh
@@ -125,16 +132,8 @@ export default function NotificationsSettingsPage() {
 
   // Handler for saving notification preferences
   const handleSavePreferences = async (data) => {
-    setIsSavingPreferences(true);
     try {
-      // Placeholder for Firestore sync (will be implemented in 03-03)
-      console.log('[NotificationsPage] Saving preferences:', data);
-
-      // Simulate save delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // Update local state
-      setPreferences(data);
+      await savePreferences(data);
 
       // Show success message
       setSaveSuccess(true);
@@ -142,33 +141,8 @@ export default function NotificationsSettingsPage() {
     } catch (error) {
       console.error('[NotificationsPage] Error saving preferences:', error);
       alert('Errore salvataggio preferenze: ' + error.message);
-    } finally {
-      setIsSavingPreferences(false);
     }
   };
-
-  // Load preferences on mount (placeholder - will use Firestore in 03-03)
-  useEffect(() => {
-    if (!user?.sub) {
-      setIsLoadingPreferences(false);
-      return;
-    }
-
-    // Simulate loading from Firestore
-    const loadPreferences = async () => {
-      try {
-        console.log('[NotificationsPage] Loading preferences for user:', user.sub);
-        // Placeholder - will fetch from Firestore in 03-03
-        // For now, just mark as loaded (form will use defaults)
-        setIsLoadingPreferences(false);
-      } catch (error) {
-        console.error('[NotificationsPage] Error loading preferences:', error);
-        setIsLoadingPreferences(false);
-      }
-    };
-
-    loadPreferences();
-  }, [user?.sub]);
 
   // Load dispositivi registrati
   useEffect(() => {

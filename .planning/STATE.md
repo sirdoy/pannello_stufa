@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-23)
 ## Current Position
 
 Phase: 3 of 5 (User Preferences & Control)
-Plan: 5 of 7 in current phase
-Status: In progress
-Last activity: 2026-01-25 - Completed 03-05-PLAN.md (Rate Limiting)
+Plan: 6 of 6 in current phase
+Status: Paused at checkpoint (03-06 Task 2/3 - awaiting user verification)
+Last activity: 2026-01-25 - Started 03-06-PLAN.md (Integration Checkpoint), paused for urgent work
 
-Progress: [███████████████████████████████████████████████████████████░] 5/7 Phase 3 (plans executed: 03-01, 03-02, 03-03, 03-04, 03-05)
+Progress: [█████████████████████████████████████████████████████████████] 5.5/6 Phase 3 (plans executed: 03-01 through 03-05, 03-06 partial)
 
 ## Performance Metrics
 
@@ -115,6 +115,9 @@ Recent decisions affecting current work:
 - **Plan 03-05:** CRITICAL notifications have higher rate limit (5 per min vs 1 per 5 min for routine)
 - **Plan 03-05:** In-memory storage with 5-minute cleanup interval prevents memory leaks
 - **Plan 03-05:** Three-stage filter chain order: Type enabled → Rate limit → DND windows
+- **Plan 03-06:** Use API endpoint (/api/notifications/preferences-v2) with Admin SDK for preference saves (bypasses Firestore rules)
+- **Plan 03-06:** Client-side onSnapshot listener for real-time sync, server-side writes via API
+- **Plan 03-06:** Firestore rules not required for testing - Admin SDK handles all writes
 
 ### Pending Todos
 
@@ -129,20 +132,32 @@ Recent decisions affecting current work:
 - ✅ Production monitoring infrastructure complete
 
 **Phase 3 Active Concerns:**
-- ⚠️ **Firestore Rules Required:** Must configure security rules for `users/{userId}/settings/notifications` before production
-  - Example: `allow read, write: if request.auth.uid == userId;`
-  - Without rules: all preference operations will fail with permission denied
+- ⚠️ **Firestore Rules Required for Production:** Currently using Admin SDK bypass via API endpoint
+  - Production deployment needs: `allow read, write: if request.auth.uid == userId;`
+  - Client writes disabled, all saves via `/api/notifications/preferences-v2`
+  - This is acceptable for testing but should migrate to client-side writes + rules in production
 - ✅ **DND Filtering Logic:** Complete (03-04) - server-side filtering with type toggles and DND windows
 - ✅ **Rate Limiting Logic:** Complete (03-05) - in-memory rate limiter with per-type windows, success criteria #3 verified
+- ⏸️ **Integration Verification:** Paused at checkpoint (03-06) - needs user testing of 5 success criteria
 
 **Technical Debt:**
-- None from Phase 3 so far - clean implementation
+- Firestore client writes disabled (using API workaround) - should add security rules for production
 
 ## Session Continuity
 
-Last session: 2026-01-25 15:59:44 UTC
-Stopped at: Completed 03-05-PLAN.md - Rate Limiting
-Resume file: None
+Last session: 2026-01-25 16:30:00 UTC
+Stopped at: 03-06-PLAN.md Task 2/3 (checkpoint awaiting user verification)
+Resume file: .planning/RESUME-03-06.md
+Commits during pause:
+- bda1103: feat(03-06): wire all Phase 3 components
+- 2077c94: fix(03-06): use API endpoint for preferences save (bypass Firestore rules)
+
+**To Resume Work on Phase 3:**
+1. Read .planning/RESUME-03-06.md for full context
+2. Run `npm run dev` to start server
+3. Execute 5 verification tests (documented in RESUME file)
+4. Run `/gsd:execute-phase 3` - orchestrator will continue from 03-06 checkpoint
+5. Report test results when prompted
 
 ---
-*Next step: Phase 3 - Continue with 03-06 (User Preferences API) and beyond*
+*Next step: Resume Phase 3 verification OR start new urgent work*

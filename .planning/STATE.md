@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-23)
 ## Current Position
 
 Phase: 3 of 5 (User Preferences & Control)
-Plan: 1 of N in current phase
+Plan: 3 of 7 in current phase
 Status: In progress
-Last activity: 2026-01-25 - Completed 03-01-PLAN.md (Foundation - Dependencies & Schema)
+Last activity: 2026-01-25 - Completed 03-03-PLAN.md (Firestore Real-Time Sync Hook)
 
-Progress: [██████████████████████████████████████░] 93% Overall (14/15 plans executed: Phase 1: 6/6, Phase 2: 7/7, Phase 3: 1/N)
+Progress: [███████████████████████████████████████████░░░░░] 3/7 Phase 3 (plans executed: 03-01, 03-02, 03-03)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
-- Average duration: 5.2 min
-- Total execution time: 1.24 hours
+- Total plans completed: 16
+- Average duration: 5.6 min
+- Total execution time: 1.49 hours
 
 **By Phase:**
 
@@ -29,15 +29,15 @@ Progress: [███████████████████████
 |-------|-------|-------|----------|
 | 1 | 6 | 48.6 min | 8.1 min |
 | 2 | 7 | 26.9 min | 3.8 min |
-| 3 | 1 | 2.4 min | 2.4 min |
+| 3 | 3 | 14.0 min | 4.7 min |
 
 **Recent Trend:**
-- Last plan: 03-01 (2.4 min - dependencies & Zod schema)
-- Previous: 02-07 (1.0 min), 02-06 (2.9 min), 02-05 (2.9 min)
-- Trend: Phase 3 started efficiently - 2.4 min for foundation setup
+- Last plan: 03-03 (8.0 min - Firestore real-time sync hook)
+- Previous: 03-02 (3.5 min), 03-01 (2.5 min), 02-07 (1.0 min)
+- Trend: Phase 3 progressing steadily - avg 4.7 min/plan
 
 **Phase 2 Complete:** All 7 plans executed (including gap closure), 51/51 must-haves verified (100%) ✅
-**Phase 3 In Progress:** 1 plan executed (foundation dependencies & schema)
+**Phase 3 Progress:** 3/7 plans complete (43%)
 
 *Updated after each plan completion*
 
@@ -101,6 +101,12 @@ Recent decisions affecting current work:
 - **Plan 03-01:** Use Zod 3.x stable (not 4.x beta) to avoid error handling issues
 - **Plan 03-01:** Balanced default preferences: Alerts + System enabled, Routine opt-in
 - **Plan 03-01:** React Hook Form 7.x + Zod 3.x + @hookform/resolvers for type-safe form validation
+- **Plan 03-02:** Progressive disclosure: Basic mode (category toggles) vs Advanced mode (per-type + DND + rate limits)
+- **Plan 03-02:** React Hook Form mode: 'onBlur' for better UX than 'onChange'
+- **Plan 03-03:** Firestore path: users/{userId}/settings/notifications for preferences
+- **Plan 03-03:** Auto-write defaults for new users on first load
+- **Plan 03-03:** Version increment on each save for future conflict detection
+- **Plan 03-03:** Cleanup function mandatory to prevent memory leaks (RESEARCH.md Pitfall #1)
 
 ### Pending Todos
 
@@ -108,25 +114,26 @@ Recent decisions affecting current work:
 
 ### Blockers/Concerns
 
-**Phase 1 Status:**
+**Phase 1 & 2 Status:**
 - ✅ Token persistence bug FIXED - tokens survive browser restarts
 - ✅ All 8 pitfalls from research addressed
-- ✅ All Phase 1 success criteria verified
-- ✅ Foundation solid - ready for Phase 2
+- ✅ All Phase 1 & 2 success criteria verified
+- ✅ Production monitoring infrastructure complete
+
+**Phase 3 Active Concerns:**
+- ⚠️ **Firestore Rules Required:** Must configure security rules for `users/{userId}/settings/notifications` before production
+  - Example: `allow read, write: if request.auth.uid == userId;`
+  - Without rules: all preference operations will fail with permission denied
+- 🔜 **DND Filtering Logic:** Next step (03-04) - implement server-side filtering using preferences
+- 🔜 **Rate Limiting Logic:** Following step (03-05) - implement in-memory rate limiter
 
 **Technical Debt:**
-- ~~cleanupOldTokens() currently disabled~~ ✅ RESOLVED in 01-05
-- ✅ Cleanup implemented with Admin SDK in /api/notifications/cleanup
-- ✅ Real-time invalid token detection working
-- ✅ Service worker properly configured and registered
-- ✅ Foreground notifications working
-- Ready for cron-job.org integration in Phase 5
+- None from Phase 3 so far - clean implementation
 
 ## Session Continuity
 
-Last session: 2026-01-25 (plan execution)
-Stopped at: Phase 3 plan 03-01 complete - Dependencies & Schema ready
+Stopped at: Completed 03-03-PLAN.md - Firestore real-time sync hook
 Resume file: None
 
 ---
-*Next step: Continue Phase 3 - User Preferences & Control (Settings UI, Server Filtering, etc.)*
+*Next step: Phase 3 - Continue with 03-04 (DND Window Filtering) and 03-05 (Rate Limiting)*

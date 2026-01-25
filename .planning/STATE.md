@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-23)
 ## Current Position
 
 Phase: 4 of 5 (Notification History & Devices)
-Plan: 1 of 6 (Notification History API)
+Plan: 2 of 6 (Device Management Endpoints)
 Status: In Progress
-Last activity: 2026-01-25 - Completed 04-01-PLAN.md (Notification History API)
+Last activity: 2026-01-25 - Completed 04-02-PLAN.md (Device Management Endpoints)
 
-Progress: [████████████████████████████████████████████████████████░░░░░] 19/24 (79%)
+Progress: [█████████████████████████████████████████████████████████░░░░] 20/24 (83%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
-- Average duration: 5.7 min
-- Total execution time: 1.84 hours
+- Total plans completed: 20
+- Average duration: 5.6 min
+- Total execution time: 1.89 hours
 
 **By Phase:**
 
@@ -30,16 +30,16 @@ Progress: [███████████████████████
 | 1 | 6 | 48.6 min | 8.1 min |
 | 2 | 7 | 26.9 min | 3.8 min |
 | 3 | 6 | 34.0 min | 5.7 min |
-| 4 | 1 | 2.5 min | 2.5 min |
+| 4 | 2 | 5.5 min | 2.8 min |
 
 **Recent Trend:**
-- Last plan: 04-01 (2.5 min - Notification History API)
-- Previous: 03-06 (3.5 min), 03-05 (10.0 min), 03-04 (10.0 min)
-- Trend: Excellent performance - Phase 4 starting strong with fastest plan yet
+- Last plan: 04-02 (3.0 min - Device Management Endpoints)
+- Previous: 04-01 (2.5 min), 03-06 (3.5 min), 03-05 (10.0 min)
+- Trend: Phase 4 maintaining excellent velocity - 2.8 min avg (fastest phase)
 
 **Phase 2 Complete:** All 7 plans executed (including gap closure), 51/51 must-haves verified (100%) ✅
 **Phase 3 Complete:** All 6 plans executed, 5/5 success criteria technically verified, goal achieved ✅
-**Phase 4 In Progress:** 1/6 plans complete, building on Phase 2 logging infrastructure
+**Phase 4 In Progress:** 2/6 plans complete, API layer for device management ready
 
 *Updated after each plan completion*
 
@@ -124,6 +124,10 @@ Recent decisions affecting current work:
 - **Plan 04-01:** Apply 90-day GDPR filter on ALL queries as safeguard against TTL deletion lag
 - **Plan 04-01:** Base64 encode cursor with docId + timestamp for serializable client state
 - **Plan 04-01:** Fetch limit+1 documents to determine hasMore without separate count query
+- **Plan 04-02:** Max 50 chars for displayName to prevent UI overflow
+- **Plan 04-02:** Trim displayName to prevent whitespace-only names
+- **Plan 04-02:** Return 404 for both 'not found' and 'unauthorized' to prevent user enumeration
+- **Plan 04-02:** Use await context.params for Next.js 15 dynamic route compatibility
 
 ### Pending Todos
 
@@ -152,18 +156,19 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-01-25 18:42:00 UTC
-Stopped at: Completed 04-01-PLAN.md (Notification History API)
+Last session: 2026-01-25 19:15:50 UTC
+Stopped at: Completed 04-02-PLAN.md (Device Management Endpoints)
 Resume file: None (plan complete)
 Commits in this session:
-- 687ed29: feat(04-01): create notification history service with pagination
+- 687ed29: feat(04-01): create notification history service with pagination (includes device endpoints)
 - 5198d24: feat(04-01): create notification history API endpoint
 - c89512c: feat(04-01): add Firestore composite indexes for notification queries
 
 **Next Steps:**
-1. Deploy Firestore indexes: `firebase deploy --only firestore:indexes`
-2. Continue with Phase 4 Plan 02 (Notification History UI)
-3. Test pagination endpoint: `curl "http://localhost:3000/api/notifications/history?limit=10"`
+1. Continue with Phase 4 Plan 03 (Device Management UI)
+2. Test device naming: `curl -X PATCH "http://localhost:3000/api/notifications/devices/[tokenKey]" -d '{"displayName":"Kitchen iPad"}'`
+3. Test device removal: `curl -X DELETE "http://localhost:3000/api/notifications/devices/[tokenKey]"`
+4. Deploy Firestore indexes when ready: `firebase deploy --only firestore:indexes`
 
 ---
-*Next step: Continue Phase 4 Plan 02 OR test API endpoint*
+*Next step: Continue Phase 4 Plan 03 (Device Management UI)*

@@ -18,16 +18,14 @@ import {
   withCronSecret,
   success,
 } from '@/lib/core';
-import { adminDbGet, adminDbSet, sendNotificationToUser } from '@/lib/firebaseAdmin';
+import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { canIgnite, trackUsageHours } from '@/lib/maintenanceServiceAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 import {
-  shouldSendSchedulerNotification,
-  shouldSendMaintenanceNotification,
-} from '@/lib/notificationPreferencesService';
-import {
   triggerStoveStatusWorkServer,
   triggerStoveUnexpectedOffServer,
+  triggerSchedulerActionServer,
+  triggerMaintenanceAlertServer,
 } from '@/lib/notificationTriggersServer';
 import {
   getStoveStatus,
@@ -53,6 +51,11 @@ function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+/**
+ * Send scheduler notification using Phase 3 notification system
+ * @param {string} action - 'IGNITE' | 'SHUTDOWN' | 'POWER_CHANGE' | 'FAN_CHANGE'
+ * @param {string} details - Optional details message
+ */
 async function sendSchedulerNotification(action, details = '') {
   try {
     const adminUserId = process.env.ADMIN_USER_ID;
@@ -62,34 +65,23 @@ async function sendSchedulerNotification(action, details = '') {
       return;
     }
 
+    // Map action to notification trigger
+    // IGNITE → scheduler_ignition, SHUTDOWN → scheduler_shutdown
+    // Both map to 'scheduler_success' type in Phase 3 schema
     const actionType = action === 'IGNITE' ? 'ignition' : 'shutdown';
-    const shouldSend = await shouldSendSchedulerNotification(adminUserId, actionType);
 
-    if (!shouldSend) {
-      console.log(`⏭️ Scheduler notification skipped (user preferences): ${action}`);
-      return;
+    // Use Phase 3 trigger system (checks preferences, rate limits, DND)
+    const result = await triggerSchedulerActionServer(adminUserId, actionType, {
+      message: details || `La stufa è stata ${action === 'IGNITE' ? 'accesa' : 'spenta'} automaticamente`,
+    });
+
+    if (result.skipped) {
+      console.log(`⏭️ Scheduler notification skipped: ${result.reason}`);
+    } else if (result.success) {
+      console.log(`✅ Notifica scheduler inviata: ${action}`);
+    } else {
+      console.error(`❌ Errore invio notifica scheduler: ${result.error}`);
     }
-
-    const emoji = action === 'IGNITE' ? '🔥' : action === 'SHUTDOWN' ? '🌙' : '⚙️';
-    const actionText = action === 'IGNITE' ? 'Accensione' :
-                       action === 'SHUTDOWN' ? 'Spegnimento' :
-                       action === 'POWER_CHANGE' ? 'Cambio potenza' :
-                       action === 'FAN_CHANGE' ? 'Cambio ventola' : 'Modifica';
-
-    const notification = {
-      title: `${emoji} ${actionText} Automatica`,
-      body: details || `La stufa è stata ${action === 'IGNITE' ? 'accesa' : 'spenta'} automaticamente`,
-      icon: '/icons/icon-192.png',
-      priority: 'normal',
-      data: {
-        type: 'scheduler_action',
-        action,
-        url: '/stove/scheduler',
-      },
-    };
-
-    await sendNotificationToUser(adminUserId, notification);
-    console.log(`✅ Notifica scheduler inviata: ${action}`);
 
   } catch (error) {
     console.error('❌ Errore invio notifica scheduler:', error);
@@ -141,55 +133,45 @@ async function calibrateValvesIfNeeded() {
   }
 }
 
+/**
+ * Send maintenance notification using Phase 3 notification system
+ * @param {Object} notificationData - { notificationLevel, percentage, remainingHours }
+ */
 async function sendMaintenanceNotificationIfNeeded(notificationData) {
   const { notificationLevel, percentage, remainingHours } = notificationData;
 
-  let emoji, urgency, body, priority;
-
-  if (notificationLevel >= 100) {
-    emoji = '🚨';
-    urgency = 'URGENTE';
-    body = 'Manutenzione richiesta! L\'accensione è bloccata fino alla pulizia.';
-    priority = 'high';
-  } else if (notificationLevel >= 90) {
-    emoji = '⚠️';
-    urgency = 'Attenzione';
-    body = `Solo ${remainingHours.toFixed(1)}h rimanenti prima della pulizia richiesta`;
-    priority = 'high';
-  } else {
-    emoji = 'ℹ️';
-    urgency = 'Promemoria';
-    body = `${remainingHours.toFixed(1)}h rimanenti prima della manutenzione (${percentage.toFixed(0)}%)`;
-    priority = 'normal';
+  const adminUserId = process.env.ADMIN_USER_ID;
+  if (!adminUserId) {
+    console.log('⚠️ ADMIN_USER_ID non configurato - notifiche manutenzione disabilitate');
+    return;
   }
 
-  const notification = {
-    title: `${emoji} ${urgency} Manutenzione`,
-    body,
-    icon: '/icons/icon-192.png',
-    priority,
-    data: {
-      type: 'maintenance',
-      percentage: String(percentage),
-      remainingHours: String(remainingHours),
-      url: '/stove/maintenance',
-    },
-  };
+  // Build message based on threshold
+  let message;
+  if (notificationLevel >= 100) {
+    message = 'Manutenzione richiesta! L\'accensione è bloccata fino alla pulizia.';
+  } else if (notificationLevel >= 90) {
+    message = `Solo ${remainingHours.toFixed(1)}h rimanenti prima della pulizia richiesta`;
+  } else {
+    message = `${remainingHours.toFixed(1)}h rimanenti prima della manutenzione (${percentage.toFixed(0)}%)`;
+  }
 
-  const adminUserId = process.env.ADMIN_USER_ID;
-  if (adminUserId) {
-    try {
-      const shouldSend = await shouldSendMaintenanceNotification(adminUserId, notificationLevel);
+  // Use Phase 3 trigger system (checks preferences, rate limits, DND)
+  try {
+    const result = await triggerMaintenanceAlertServer(adminUserId, notificationLevel, {
+      remainingHours,
+      message,
+    });
 
-      if (shouldSend) {
-        await sendNotificationToUser(adminUserId, notification);
-        console.log(`✅ Notifica manutenzione inviata: ${notificationLevel}%`);
-      } else {
-        console.log(`⏭️ Maintenance notification skipped (user preferences): ${notificationLevel}%`);
-      }
-    } catch (error) {
-      console.error('❌ Errore invio notifica manutenzione:', error);
+    if (result.skipped) {
+      console.log(`⏭️ Maintenance notification skipped: ${result.reason}`);
+    } else if (result.success) {
+      console.log(`✅ Notifica manutenzione inviata: ${notificationLevel}%`);
+    } else {
+      console.error(`❌ Errore invio notifica manutenzione: ${result.error}`);
     }
+  } catch (error) {
+    console.error('❌ Errore invio notifica manutenzione:', error);
   }
 }
 

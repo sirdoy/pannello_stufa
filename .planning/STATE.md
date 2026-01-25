@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-23)
 
 **Core value:** Dispositivi riconosciuti automaticamente dopo riavvio browser, notifiche arrivano sempre (100% delivery rate).
-**Current focus:** Phase 3 - User Preferences & Control
+**Current focus:** Phase 4 - Notification History & Devices
 
 ## Current Position
 
-Phase: 3 of 5 (User Preferences & Control)
-Plan: COMPLETE - all 6 plans executed
-Status: Phase 3 Complete ✅ (goal verified, ready for Phase 4)
-Last activity: 2026-01-25 - Completed 03-06 integration checkpoint, verified phase goal
+Phase: 4 of 5 (Notification History & Devices)
+Plan: 1 of 6 (Notification History API)
+Status: In Progress
+Last activity: 2026-01-25 - Completed 04-01-PLAN.md (Notification History API)
 
-Progress: [█████████████████████████████████████████████████████████████] 6/6 Phase 3 COMPLETE ✅
+Progress: [████████████████████████████████████████████████████████░░░░░] 19/24 (79%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
-- Average duration: 5.9 min
-- Total execution time: 1.81 hours
+- Total plans completed: 19
+- Average duration: 5.7 min
+- Total execution time: 1.84 hours
 
 **By Phase:**
 
@@ -29,15 +29,17 @@ Progress: [███████████████████████
 |-------|-------|-------|----------|
 | 1 | 6 | 48.6 min | 8.1 min |
 | 2 | 7 | 26.9 min | 3.8 min |
-| 3 | 5 | 34.0 min | 6.8 min |
+| 3 | 6 | 34.0 min | 5.7 min |
+| 4 | 1 | 2.5 min | 2.5 min |
 
 **Recent Trend:**
-- Last plan: 03-05 (10.0 min - Rate Limiting)
-- Previous: 03-04 (10.0 min), 03-03 (8.0 min), 03-02 (3.5 min)
-- Trend: Phase 3 progressing - avg 6.8 min/plan, slightly higher than Phase 2 (3.8 min) but consistent
+- Last plan: 04-01 (2.5 min - Notification History API)
+- Previous: 03-06 (3.5 min), 03-05 (10.0 min), 03-04 (10.0 min)
+- Trend: Excellent performance - Phase 4 starting strong with fastest plan yet
 
 **Phase 2 Complete:** All 7 plans executed (including gap closure), 51/51 must-haves verified (100%) ✅
 **Phase 3 Complete:** All 6 plans executed, 5/5 success criteria technically verified, goal achieved ✅
+**Phase 4 In Progress:** 1/6 plans complete, building on Phase 2 logging infrastructure
 
 *Updated after each plan completion*
 
@@ -118,46 +120,50 @@ Recent decisions affecting current work:
 - **Plan 03-06:** Use API endpoint (/api/notifications/preferences-v2) with Admin SDK for preference saves (bypasses Firestore rules)
 - **Plan 03-06:** Client-side onSnapshot listener for real-time sync, server-side writes via API
 - **Plan 03-06:** Firestore rules not required for testing - Admin SDK handles all writes
+- **Plan 04-01:** Use Firestore cursor-based pagination (not offset) for O(1) performance per page
+- **Plan 04-01:** Apply 90-day GDPR filter on ALL queries as safeguard against TTL deletion lag
+- **Plan 04-01:** Base64 encode cursor with docId + timestamp for serializable client state
+- **Plan 04-01:** Fetch limit+1 documents to determine hasMore without separate count query
 
 ### Pending Todos
 
 - User must run `npm install` to install new dependencies (react-hook-form, zod, @hookform/resolvers)
+- **Deploy Firestore indexes** for Phase 4: Run `firebase deploy --only firestore:indexes` OR wait for auto-creation via console link
 
 ### Blockers/Concerns
 
-**Phase 1 & 2 Status:**
-- ✅ Token persistence bug FIXED - tokens survive browser restarts
-- ✅ All 8 pitfalls from research addressed
-- ✅ All Phase 1 & 2 success criteria verified
+**Phase 1 & 2 & 3 Status:**
+- ✅ All phases 1-3 complete with success criteria verified
+- ✅ Token persistence, monitoring, and preferences infrastructure operational
 - ✅ Production monitoring infrastructure complete
 
-**Phase 3 Active Concerns:**
-- ⚠️ **Firestore Rules Required for Production:** Currently using Admin SDK bypass via API endpoint
-  - Production deployment needs: `allow read, write: if request.auth.uid == userId;`
-  - Client writes disabled, all saves via `/api/notifications/preferences-v2`
-  - This is acceptable for testing but should migrate to client-side writes + rules in production
-- ✅ **DND Filtering Logic:** Complete (03-04) - server-side filtering with type toggles and DND windows
-- ✅ **Rate Limiting Logic:** Complete (03-05) - in-memory rate limiter with per-type windows, success criteria #3 verified
-- ⏸️ **Integration Verification:** Paused at checkpoint (03-06) - needs user testing of 5 success criteria
+**Phase 4 Active Concerns:**
+- ⚠️ **Firestore Indexes Not Deployed:** `firestore.indexes.json` created but not deployed
+  - Queries will work but may be slow without indexes
+  - First filtered query will log Firebase Console link for manual index creation
+  - OR deploy via CLI: `firebase deploy --only firestore:indexes`
+- ⚠️ **No Firestore TTL Policy:** 90-day GDPR filter applied in queries but no auto-cleanup configured
+  - Consider adding TTL policy in future plan for automatic deletion
+  - Current implementation safe with manual query filtering
 
 **Technical Debt:**
 - Firestore client writes disabled (using API workaround) - should add security rules for production
+- No Firestore TTL policy configured (manual cleanup or future enhancement)
 
 ## Session Continuity
 
-Last session: 2026-01-25 16:30:00 UTC
-Stopped at: 03-06-PLAN.md Task 2/3 (checkpoint awaiting user verification)
-Resume file: .planning/RESUME-03-06.md
-Commits during pause:
-- bda1103: feat(03-06): wire all Phase 3 components
-- 2077c94: fix(03-06): use API endpoint for preferences save (bypass Firestore rules)
+Last session: 2026-01-25 18:42:00 UTC
+Stopped at: Completed 04-01-PLAN.md (Notification History API)
+Resume file: None (plan complete)
+Commits in this session:
+- 687ed29: feat(04-01): create notification history service with pagination
+- 5198d24: feat(04-01): create notification history API endpoint
+- c89512c: feat(04-01): add Firestore composite indexes for notification queries
 
-**To Resume Work on Phase 3:**
-1. Read .planning/RESUME-03-06.md for full context
-2. Run `npm run dev` to start server
-3. Execute 5 verification tests (documented in RESUME file)
-4. Run `/gsd:execute-phase 3` - orchestrator will continue from 03-06 checkpoint
-5. Report test results when prompted
+**Next Steps:**
+1. Deploy Firestore indexes: `firebase deploy --only firestore:indexes`
+2. Continue with Phase 4 Plan 02 (Notification History UI)
+3. Test pagination endpoint: `curl "http://localhost:3000/api/notifications/history?limit=10"`
 
 ---
-*Next step: Resume Phase 3 verification OR start new urgent work*
+*Next step: Continue Phase 4 Plan 02 OR test API endpoint*

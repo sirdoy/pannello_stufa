@@ -18,28 +18,51 @@ export default function TestNotificationPage() {
   const [template, setTemplate] = useState('custom');
   const [customTitle, setCustomTitle] = useState('');
   const [customBody, setCustomBody] = useState('');
+  const [priority, setPriority] = useState('normal');
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState(null);
 
   // Template definitions (match API)
   const templates = {
-    custom: { title: '', body: '', description: 'Write your own message' },
+    custom: { title: '', body: '', description: 'Write your own message', defaultPriority: 'normal' },
     error_alert: {
       title: 'Errore Stufa',
       body: 'Attenzione: rilevato errore nel sistema. Verifica lo stato della stufa.',
-      description: 'Error alert with high priority'
+      description: 'Error alert with high priority',
+      defaultPriority: 'high'
     },
     scheduler_success: {
       title: 'Accensione Completata',
       body: 'La stufa e stata accesa automaticamente dallo scheduler.',
-      description: 'Scheduler success notification'
+      description: 'Scheduler success notification',
+      defaultPriority: 'normal'
     },
     maintenance_reminder: {
       title: 'Promemoria Manutenzione',
       body: 'E il momento di effettuare la pulizia ordinaria della stufa.',
-      description: 'Maintenance reminder'
+      description: 'Maintenance reminder',
+      defaultPriority: 'normal'
+    },
+    critical_test: {
+      title: 'Test CRITICAL',
+      body: 'Notifica CRITICAL di test - bypassa DND',
+      description: 'CRITICAL priority (bypasses DND hours)',
+      defaultPriority: 'high'
+    },
+    low_priority_test: {
+      title: 'Test LOW Priority',
+      body: 'Notifica LOW priority di test',
+      description: 'LOW priority notification',
+      defaultPriority: 'low'
     }
   };
+
+  // Priority options
+  const priorities = [
+    { value: 'high', label: 'HIGH - Urgent alerts', description: 'Bypasses some rate limits' },
+    { value: 'normal', label: 'NORMAL - Standard', description: 'Default priority' },
+    { value: 'low', label: 'LOW - Informational', description: 'Can be delayed' }
+  ];
 
   // Fetch devices on mount
   useEffect(() => {
@@ -57,6 +80,13 @@ export default function TestNotificationPage() {
       console.error('Error fetching devices:', err);
     } finally {
       setLoadingDevices(false);
+    }
+  };
+
+  const handleTemplateChange = (newTemplate) => {
+    setTemplate(newTemplate);
+    if (templates[newTemplate]?.defaultPriority) {
+      setPriority(templates[newTemplate].defaultPriority);
     }
   };
 
@@ -81,6 +111,9 @@ export default function TestNotificationPage() {
       } else {
         body.template = template;
       }
+
+      // Priority
+      body.priority = priority;
 
       const response = await fetch('/api/notifications/test', {
         method: 'POST',
@@ -199,7 +232,7 @@ export default function TestNotificationPage() {
             <Text variant="tertiary" size="sm" className="mb-2">Template</Text>
             <select
               value={template}
-              onChange={(e) => setTemplate(e.target.value)}
+              onChange={(e) => handleTemplateChange(e.target.value)}
               className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-lg text-slate-200 focus:border-ember-500 focus:ring-1 focus:ring-ember-500"
               data-testid="test-template"
             >
@@ -249,6 +282,29 @@ export default function TestNotificationPage() {
               </div>
             </>
           )}
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <Heading level={2} size="lg" className="mb-4">Priority Level</Heading>
+        <div className="space-y-3">
+          {priorities.map(p => (
+            <label key={p.value} className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="radio"
+                name="priority"
+                value={p.value}
+                checked={priority === p.value}
+                onChange={(e) => setPriority(e.target.value)}
+                className="w-4 h-4 mt-1 text-ember-500 focus:ring-ember-500 bg-slate-800 border-white/20"
+                data-testid={`priority-${p.value}`}
+              />
+              <div>
+                <Text weight="medium">{p.label}</Text>
+                <Text variant="tertiary" size="xs">{p.description}</Text>
+              </div>
+            </label>
+          ))}
         </div>
       </Card>
 

@@ -12,11 +12,11 @@ import {
   success,
   error as errorResponse,
 } from '@/lib/core';
+import { getNotificationHistory } from '@/lib/notificationHistoryService';
 import {
-  getNotificationHistory,
   isValidNotificationType,
   isValidNotificationStatus,
-} from '@/lib/notificationHistoryService';
+} from '@/lib/notificationValidation';
 
 export const dynamic = 'force-dynamic';
 

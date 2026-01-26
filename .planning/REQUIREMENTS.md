@@ -130,16 +130,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DEVICE-02 | Phase 4 | Pending |
 | DEVICE-03 | Phase 4 | Pending |
 | DEVICE-04 | Phase 4 | Pending |
-| TEST-01 | Phase 5 | Pending |
-| TEST-02 | Phase 5 | Pending |
-| TEST-03 | Phase 5 | Pending |
-| TEST-04 | Phase 5 | Pending |
+| TEST-01 | Phase 5 | Complete |
+| TEST-02 | Phase 5 | Complete |
+| TEST-03 | Phase 5 | Complete |
+| TEST-04 | Phase 5 | Complete |
 | INFRA-01 | Phase 2, Phase 4 | Complete (Phase 2) |
 | INFRA-02 | Phase 1 | Complete |
 | INFRA-03 | Phase 3 | Pending |
 | INFRA-04 | Phase 2 | Complete |
 | INFRA-05 | Phase 2, Phase 4 | Complete (Phase 2) |
-| INFRA-06 | Phase 5 | Pending |
+| INFRA-06 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 31 total

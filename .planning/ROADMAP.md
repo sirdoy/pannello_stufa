@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Token Lifecycle Foundation** - Fix critical persistence bug, token refresh, cleanup
 - [x] **Phase 2: Production Monitoring Infrastructure** - Delivery tracking, error logging, admin dashboard
 - [x] **Phase 3: User Preferences & Control** - Granular notification settings, DND hours, rate limiting
-- [ ] **Phase 4: Notification History & Devices** - In-app inbox, device management, history UI
+- [x] **Phase 4: Notification History & Devices** - In-app inbox, device management, history UI
 - [ ] **Phase 5: Automation & Testing** - Scheduled cleanup, E2E tests, polish
 
 ## Phase Details
@@ -94,11 +94,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — History API endpoint + Firestore pagination
-- [ ] 04-02-PLAN.md — Device management APIs (naming + removal)
-- [ ] 04-03-PLAN.md — Notification history UI with infinite scroll and filters
-- [ ] 04-04-PLAN.md — Device management UI with rename/remove capabilities
-- [ ] 04-05-PLAN.md — Integration and verification checkpoint
+- [x] 04-01-PLAN.md — History API endpoint + Firestore pagination
+- [x] 04-02-PLAN.md — Device management APIs (naming + removal)
+- [x] 04-03-PLAN.md — Notification history UI with infinite scroll and filters
+- [x] 04-04-PLAN.md — Device management UI with rename/remove capabilities
+- [x] 04-05-PLAN.md — Integration and verification checkpoint
 
 ### Phase 5: Automation & Testing
 **Goal**: Zero-touch token hygiene with automated cleanup and comprehensive E2E tests
@@ -125,7 +125,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Token Lifecycle Foundation | 6/6 | Complete | 2026-01-24 |
 | 2. Production Monitoring Infrastructure | 7/7 | Complete | 2026-01-24 |
 | 3. User Preferences & Control | 6/6 | Complete | 2026-01-25 |
-| 4. Notification History & Devices | 0/5 | Planned | - |
+| 4. Notification History & Devices | 5/5 | Complete | 2026-01-26 |
 | 5. Automation & Testing | 0/TBD | Not started | - |
 
 ---
@@ -139,3 +139,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 *Phase 3 planned: 2026-01-25 (6 plans in 4 waves)*
 *Phase 3 executed: 2026-01-25 (6 plans, all success criteria technically verified, goal achieved)*
 *Phase 4 planned: 2026-01-25 (5 plans in 3 waves)*
+*Phase 4 executed: 2026-01-26 (5 plans, 17.5 min total, all success criteria verified)*

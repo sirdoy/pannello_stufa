@@ -368,6 +368,15 @@ export default function TestNotificationPage() {
                       </div>
                     )}
 
+                    {result.success && (
+                      <div className="mt-3 pt-3 border-t border-white/10">
+                        <Text variant="tertiary" size="xs" className="flex items-center gap-2">
+                          <span>📝</span>
+                          Logged to notification history
+                        </Text>
+                      </div>
+                    )}
+
                     {result.trace.deliveryResults.errors?.length > 0 && (
                       <div className="mt-3 pt-3 border-t border-white/10">
                         <Text variant="tertiary" size="xs" className="mb-2">Errors:</Text>
@@ -391,6 +400,32 @@ export default function TestNotificationPage() {
           </div>
         </Card>
       )}
+
+      {/* Test History Info */}
+      <Card className="p-6 bg-slate-800/30 border border-white/5">
+        <div className="flex items-start gap-3">
+          <span className="text-xl">💡</span>
+          <div>
+            <Heading level={3} size="md" className="mb-2">
+              About Test Notifications
+            </Heading>
+            <div className="space-y-2">
+              <Text size="sm" variant="secondary">
+                Test notifications are logged like production notifications and appear in
+                <a href="/settings/notifications/history" className="text-ember-400 hover:underline ml-1">
+                  Notification History
+                </a>.
+              </Text>
+              <Text size="sm" variant="secondary">
+                Use CRITICAL priority to test DND bypass - CRITICAL notifications ignore quiet hours.
+              </Text>
+              <Text size="sm" variant="secondary">
+                Bulk testing (All Devices) sends to every registered device for the current user.
+              </Text>
+            </div>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 }

@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-23)
 ## Current Position
 
 Phase: 5 of 5 (Automation & Testing)
-Plan: 2 of 6 (HMAC-Secured Cron Webhook)
+Plan: 1 of 5 (Playwright Infrastructure Setup)
 Status: In progress
-Last activity: 2026-01-26 - Completed 05-02-PLAN.md
+Last activity: 2026-01-26 - Completed 05-01-PLAN.md
 
-Progress: [██████████████████████████████████████████████████████████████████░░] 26/30 (87%)
+Progress: [█████████████████████████████████████████████████████████████████░░░] 25/29 (86%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 26
-- Average duration: 5.1 min
-- Total execution time: 2.22 hours
+- Total plans completed: 25
+- Average duration: 5.2 min
+- Total execution time: 2.17 hours
 
 **By Phase:**
 
@@ -31,17 +31,17 @@ Progress: [███████████████████████
 | 2 | 7 | 26.9 min | 3.8 min |
 | 3 | 6 | 34.0 min | 5.7 min |
 | 4 | 5 | 17.5 min | 3.5 min |
-| 5 | 2 | 6.1 min | 3.0 min |
+| 5 | 1 | 4.7 min | 4.7 min |
 
 **Recent Trend:**
-- Last plan: 05-02 (2.1 min - HMAC Cron Webhook)
-- Previous: 05-01 (4.0 min - Playwright Setup), 04-05 (2.5 min), 04-04 (3.0 min)
-- Trend: Phase 5 trending fast - 3.0 min avg (matching Phase 4 pace)
+- Last plan: 05-01 (4.7 min - Playwright Setup)
+- Previous: 04-05 (2.5 min), 04-04 (3.0 min), 04-03 (5.5 min), 04-02 (3.0 min)
+- Trend: Phase 5 starts at 4.7 min (mid-range pace)
 
 **Phase 2 Complete:** All 7 plans executed (including gap closure), 51/51 must-haves verified (100%) ✅
 **Phase 3 Complete:** All 6 plans executed, 5/5 success criteria technically verified, goal achieved ✅
 **Phase 4 Complete:** All 5 plans executed, 5/5 success criteria verified, notification history and device management operational ✅
-**Phase 5 In Progress:** 2/6 plans complete (33%), Playwright installed, HMAC webhook created
+**Phase 5 In Progress:** 1/5 plans complete (20%), Playwright infrastructure ready
 
 *Updated after each plan completion*
 
@@ -134,18 +134,17 @@ Recent decisions affecting current work:
 - **Plan 04-03:** Max 200 notifications to prevent memory issues (per RESEARCH.md Pitfall #3)
 - **Plan 04-03:** Filter changes reset list and cursor for clean state
 - **Plan 04-03:** Italian locale (it from date-fns) for relative timestamps
-- **Plan 05-01:** Use Playwright 1.58+ with Next.js integration for E2E testing
-- **Plan 05-01:** Configure 4-shard matrix in GitHub Actions for parallel execution (<5 min budget)
-- **Plan 05-02:** Use HMAC-SHA256 signature verification for webhook security (more appropriate than Bearer token)
-- **Plan 05-02:** Pre-compute HMAC signature for static body '{}' (cron-job.org limitation)
-- **Plan 05-02:** Use crypto.timingSafeEqual for signature comparison (prevents timing attacks)
+- **Plan 05-01:** Use Playwright 1.52 for cross-browser E2E testing (Chromium, Firefox, WebKit)
+- **Plan 05-01:** Page Object Model pattern for maintainability and selector encapsulation
+- **Plan 05-01:** data-testid attributes for stable selectors (immune to UI changes)
+- **Plan 05-01:** Mock Push API in fixtures to prevent real FCM calls during tests
+- **Plan 05-01:** Production webServer (npm run build + npm run start) required for Serwist SW testing
 
 ### Pending Todos
 
 - User must run `npm install` to install new dependencies (react-hook-form, zod, @hookform/resolvers, @playwright/test)
+- User must run `npx playwright install chromium firefox webkit` to install Playwright browsers
 - **Deploy Firestore indexes** for Phase 4: Run `firebase deploy --only firestore:indexes` OR wait for auto-creation via console link
-- **Configure cron-job.org**: Follow `docs/cron-cleanup-setup.md` to set up weekly token cleanup
-- **Set CRON_WEBHOOK_SECRET**: Add environment variable to Vercel for webhook security
 
 ### Blockers/Concerns
 
@@ -167,35 +166,42 @@ Recent decisions affecting current work:
   - Current implementation safe with manual query filtering
 
 **Phase 5 Status:**
-- ✅ Playwright 1.58 installed and configured with Next.js integration
-- ✅ HMAC-secured webhook endpoint created at /api/cron/cleanup-tokens
-- ⚠️ **Cron-job.org not configured**: User must manually set up weekly cron job (documented in setup guide)
-- ⚠️ **CRON_WEBHOOK_SECRET not set**: User must add to Vercel environment variables before webhook works
+- ✅ Playwright 1.52 installed and configured with production webServer
+- ✅ Page Object Model classes created for admin pages (notifications, history, settings)
+- ✅ Authentication and notification permission fixtures with Push API mocking
+- ✅ IndexedDB helpers for token persistence testing
+- ✅ data-testid attributes added to 15+ UI elements
+- ⚠️ **Playwright browsers not installed**: User must run `npx playwright install chromium firefox webkit`
+- ⚠️ **Auth0 authentication not yet mocked**: authenticated.ts fixture has placeholder for future enhancement
+- ⚠️ **No E2E test specs yet**: Infrastructure ready, tests will be authored in Plan 05-03
 
 **Technical Debt:**
 - Firestore client writes disabled (using API workaround) - should add security rules for production
 - No Firestore TTL policy configured (manual cleanup or Phase 5 enhancement)
 - Firestore indexes need deployment for optimal query performance
-- Pre-computed HMAC signature requires manual regeneration if secret rotates
 
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 05-02-PLAN.md (HMAC-Secured Cron Webhook)
+Stopped at: Completed 05-01-PLAN.md (Playwright Infrastructure Setup)
 Resume file: None
 Commits in this session:
-- 4c363ff: feat(05-02): create HMAC-secured cron webhook endpoint
-- 2ea5d73: docs(05-02): document CRON_WEBHOOK_SECRET environment variable
-- 5923a4e: docs(05-02): create cron cleanup setup documentation
+- 5bc7480: chore(05-01): install Playwright and configure for E2E testing
+- ba856db: feat(05-01): create Page Objects, fixtures, and IndexedDB helpers
+- cc37c6f: feat(05-01): add data-testid attributes to UI components for E2E testing
+- Documentation: 05-01-SUMMARY.md created
 
 **Next Steps:**
-1. **Phase 5 Progress: 2/6 plans complete** (33%)
-2. User must configure cron-job.org (follow `docs/cron-cleanup-setup.md`)
-3. User must set CRON_WEBHOOK_SECRET in Vercel environment variables
-4. Ready for Plan 05-03: Core E2E Tests (token persistence, service worker lifecycle)
+1. **Phase 5 Progress: 1/5 plans complete** (20%)
+2. User must run `npm install` to install @playwright/test
+3. User must run `npx playwright install chromium firefox webkit` to install browsers
+4. Ready for Plan 05-02: HMAC-Secured Cron Webhook for automated token cleanup
 5. Features available:
-   - `/api/cron/cleanup-tokens` - HMAC-secured webhook for automated token cleanup
-   - Documentation: `docs/cron-cleanup-setup.md` - Complete setup guide
+   - E2E testing infrastructure with Playwright 1.52
+   - Page Objects: AdminNotifications, NotificationHistory, Settings
+   - Fixtures: authenticated.ts, notifications.ts
+   - IndexedDB helpers: db-helpers.ts for token persistence testing
+   - Stable data-testid selectors on all interactive UI elements
 
 ---
-*Next step: Plan 05-03 - Core E2E Tests (token persistence, service worker lifecycle)*
+*Next step: Plan 05-02 - HMAC-Secured Cron Webhook*

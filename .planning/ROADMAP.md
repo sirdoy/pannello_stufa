@@ -85,11 +85,12 @@ Plans:
   3. System enforces 60-second minimum polling interval and tracks 500 calls/hour limit
   4. Schedule data caches in Firebase with 5-minute TTL to avoid rate limiting
   5. OAuth token refresh works atomically without invalidating active sessions
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 06-01: TBD
-- [ ] 06-02: TBD
+- [ ] 06-01: Firebase-based cache service with 5-minute TTL
+- [ ] 06-02: Per-user Netatmo API rate limiter (400/500 calls/hour)
+- [ ] 06-03: Schedule API routes (GET list, POST switch)
 
 #### Phase 7: Stove Health Monitoring Backend
 **Goal**: Automated stove health checks and monitoring infrastructure via cron
@@ -165,7 +166,7 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10
 | 3. User Preferences & Control | v1.0 | 5/5 | Complete | 2026-01-25 |
 | 4. History & Device Management UI | v1.0 | 7/7 | Complete | 2026-01-25 |
 | 5. Automation & Testing | v1.0 | 5/5 | Complete | 2026-01-26 |
-| 6. Netatmo Schedule API Infrastructure | v2.0 | 0/TBD | Not started | - |
+| 6. Netatmo Schedule API Infrastructure | v2.0 | 0/3 | Planned | - |
 | 7. Stove Health Monitoring Backend | v2.0 | 0/TBD | Not started | - |
 | 8. Stove-Thermostat Integration Correction | v2.0 | 0/TBD | Not started | - |
 | 9. Schedule Management UI | v2.0 | 0/TBD | Not started | - |

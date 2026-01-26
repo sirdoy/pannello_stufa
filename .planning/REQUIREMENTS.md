@@ -35,18 +35,18 @@ Requirements for production-grade push notification system. Each maps to roadmap
 
 ### Notification History
 
-- [ ] **HIST-01**: Storage cronologia notifiche in Firestore (30-90 giorni retention)
-- [ ] **HIST-02**: UI in-app inbox: utente vede cronologia notifiche ricevute
-- [ ] **HIST-03**: Paginazione: infinite scroll con 50 items per pagina
-- [ ] **HIST-04**: Filtri: per data, tipo notifica, delivery status
-- [ ] **HIST-05**: Auto-cleanup notifiche > 90 giorni per GDPR compliance
+- [x] **HIST-01**: Storage cronologia notifiche in Firestore (30-90 giorni retention)
+- [x] **HIST-02**: UI in-app inbox: utente vede cronologia notifiche ricevute
+- [x] **HIST-03**: Paginazione: infinite scroll con 50 items per pagina
+- [x] **HIST-04**: Filtri: per data, tipo notifica, delivery status
+- [x] **HIST-05**: Auto-cleanup notifiche > 90 giorni per GDPR compliance
 
 ### Device Management
 
-- [ ] **DEVICE-01**: Device naming: utente può etichettare dispositivi ("Kitchen iPad", "Bedroom Phone")
-- [ ] **DEVICE-02**: Device status tracking: stato Active/Invalid/Revoked visibile in UI
-- [ ] **DEVICE-03**: Remove device: utente può de-registrare dispositivo specifico
-- [ ] **DEVICE-04**: Device list UI: utente vede tutti dispositivi registrati con last-used timestamp
+- [x] **DEVICE-01**: Device naming: utente può etichettare dispositivi ("Kitchen iPad", "Bedroom Phone")
+- [x] **DEVICE-02**: Device status tracking: stato Active/Invalid/Revoked visibile in UI
+- [x] **DEVICE-03**: Remove device: utente può de-registrare dispositivo specifico
+- [x] **DEVICE-04**: Device list UI: utente vede tutti dispositivi registrati con last-used timestamp
 
 ### Testing & Validation
 
@@ -57,11 +57,11 @@ Requirements for production-grade push notification system. Each maps to roadmap
 
 ### Integration & Infrastructure
 
-- [ ] **INFRA-01**: Firestore per notification history (queries complesse)
+- [x] **INFRA-01**: Firestore per notification history (queries complesse)
 - [x] **INFRA-02**: Realtime Database per FCM tokens (bassa latency)
 - [ ] **INFRA-03**: React Hook Form + Zod per validation preferences
 - [ ] **INFRA-04**: Recharts per dashboard visualizations
-- [ ] **INFRA-05**: date-fns per timestamp formatting
+- [x] **INFRA-05**: date-fns per timestamp formatting
 - [ ] **INFRA-06**: Cron job settimanale per token cleanup automation
 
 ## v2 Requirements

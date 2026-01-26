@@ -1,8 +1,8 @@
-# Pannello Stufa - Sistema Notifiche Push
+# Pannello Stufa - Smart Home Control PWA
 
 ## What This Is
 
-Sistema completo e affidabile di notifiche push per la PWA "Pannello Stufa" (smart home control: stufa Thermorossi, termostato Netatmo, luci Philips Hue). Sistema production-ready con token persistence, delivery monitoring, user preferences, notification history, device management, e automated testing.
+PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (con gestione schedule complete), luci Philips Hue. Include sistema notifiche push production-ready, monitoring automatico stufa, e integrazioni intelligenti tra dispositivi.
 
 ## Core Value
 
@@ -27,6 +27,16 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Cron webhook configuration (cron-job.org account setup, 15-30 min)
 - Firestore index deployment (`firebase deploy --only firestore:indexes`)
 - E2E test execution validation (local build + test run)
+
+## Current Milestone: v2.0 Netatmo Complete Control & Stove Monitoring
+
+**Goal:** Controllo completo del termostato Netatmo con gestione schedule settimanali e monitoring automatico della stufa per rilevare anomalie.
+
+**Target features:**
+- **Netatmo Schedule Management:** Visualizzare, creare, modificare, eliminare programmazioni settimanali (CRUD completo)
+- **Stove-Thermostat Integration Fix:** Override temporaneo setpoint (non modificare schedule) quando stufa accende/spegne
+- **Stove Health Monitoring:** Cron job per verificare connessione, stato atteso vs reale, errori/anomalie, coordinazione con Netatmo
+- **Alerting:** Dashboard warnings + notifiche push (sistema v1.0) per problemi rilevati
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -99,16 +109,15 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-**Next Milestone Goals:**
+**v2.0 Goals (In Definition):**
 
-(To be defined with `/gsd:new-milestone` - questioning → research → requirements → roadmap)
+Target features identified:
+- Netatmo schedule management (visualizzare, creare, modificare, eliminare)
+- Stove-thermostat integration correction (setpoint override, not schedule modification)
+- Stove health monitoring via cron (health check, state verification, error detection)
+- Alerting system (dashboard + push notifications)
 
-Potential areas for v1.1/v2.0:
-- Advanced analytics (real-time dashboard, engagement metrics)
-- Rich media notifications (images, videos)
-- Interactive notification actions (buttons, quick reply)
-- Performance optimizations (Redis for rate limiting)
-- Enhanced E2E test coverage (Auth0 mock improvements)
+Requirements to be defined through research → requirements → roadmap cycle.
 
 ### Out of Scope
 
@@ -175,5 +184,5 @@ Potential areas for v1.1/v2.0:
 - **Deployment**: Vercel (current hosting platform)
 
 ---
-*Last updated: 2026-01-26 after v1.0 milestone*
-*Next: Define v1.1/v2.0 requirements with `/gsd:new-milestone`*
+*Last updated: 2026-01-26 after starting v2.0 milestone*
+*Next: Research → Requirements → Roadmap for v2.0*

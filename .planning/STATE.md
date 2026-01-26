@@ -2,19 +2,20 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-01-23)
+See: .planning/PROJECT.md (updated 2026-01-26)
 
 **Core value:** Dispositivi riconosciuti automaticamente dopo riavvio browser, notifiche arrivano sempre (100% delivery rate).
-**Current focus:** Phase 5 - Automation & Testing
+**Current focus:** Milestone v2.0 - Netatmo Complete Control & Stove Monitoring
 
 ## Current Position
 
-Phase: 5 of 5 (Automation & Testing)
-Plan: 5 of 5 (All plans complete)
-Status: Complete (operational gaps remain)
-Last activity: 2026-01-26 - Phase 5 verification complete
+Milestone: v2.0 (Netatmo Complete Control & Stove Monitoring)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-01-26 - Milestone v2.0 started
 
-Progress: [█████████████████████████████████████████████████████████████████████] 29/29 (100%)
+Progress: Milestone initialization in progress
 
 ## Performance Metrics
 

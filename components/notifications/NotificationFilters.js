@@ -35,6 +35,7 @@ export default function NotificationFilters({
           onChange={(e) => onTypeChange(e.target.value)}
           options={TYPE_OPTIONS}
           label="Tipo"
+          data-testid="history-filter"
         />
       </div>
 

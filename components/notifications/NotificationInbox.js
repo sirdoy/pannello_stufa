@@ -197,7 +197,7 @@ export default function NotificationInbox() {
           next={() => fetchNotifications(false)}
           hasMore={hasMore}
           loader={
-            <div className="p-4 text-center">
+            <div className="p-4 text-center" data-testid="load-more">
               <Text variant="secondary" size="sm">Caricamento...</Text>
             </div>
           }
@@ -212,7 +212,7 @@ export default function NotificationInbox() {
           }
           scrollableTarget="notification-scroll-container"
         >
-          <div className="divide-y divide-slate-700/50 [html:not(.dark)_&]:divide-slate-200">
+          <div className="divide-y divide-slate-700/50 [html:not(.dark)_&]:divide-slate-200" data-testid="notification-list">
             {notifications.map(notification => (
               <NotificationItem
                 key={notification.id}

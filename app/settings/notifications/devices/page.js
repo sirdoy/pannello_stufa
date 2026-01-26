@@ -168,7 +168,7 @@ export default function DeviceManagementPage() {
           </div>
         </Card>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-3" data-testid="device-list">
           {devices.map(device => (
             <DeviceListItem
               key={device.tokenKey}

@@ -57,7 +57,7 @@ export default function NotificationItem({ notification }) {
   const statusStyle = getStatusStyle(notification.status);
 
   return (
-    <div className="p-4 border-b border-slate-700/50 [html:not(.dark)_&]:border-slate-200 last:border-b-0">
+    <div className="p-4 border-b border-slate-700/50 [html:not(.dark)_&]:border-slate-200 last:border-b-0" data-testid="notification-item">
       <div className="flex items-start gap-3">
         {/* Icon */}
         <span className="text-2xl flex-shrink-0">{getTypeIcon(notification.type)}</span>

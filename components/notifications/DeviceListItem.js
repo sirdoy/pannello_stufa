@@ -134,7 +134,7 @@ export default function DeviceListItem({
   };
 
   return (
-    <div className="p-4 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50 border border-slate-700/50 [html:not(.dark)_&]:border-slate-200 rounded-xl">
+    <div className="p-4 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50 border border-slate-700/50 [html:not(.dark)_&]:border-slate-200 rounded-xl" data-testid="device-item">
       <div className="flex flex-col sm:flex-row sm:items-start gap-4">
         {/* Device info */}
         <div className="flex-1 min-w-0">
@@ -159,6 +159,7 @@ export default function DeviceListItem({
                     if (e.key === 'Escape') handleCancel();
                   }}
                   className="flex-1"
+                  data-testid="device-name-input"
                 />
                 <Button
                   variant="primary"
@@ -243,6 +244,7 @@ export default function DeviceListItem({
             onClick={handleRemove}
             disabled={isRemoving || isCurrentDevice}
             className="text-ember-400 hover:text-ember-300 [html:not(.dark)_&]:text-ember-600 [html:not(.dark)_&]:hover:text-ember-700"
+            data-testid="remove-device"
           >
             {isRemoving ? 'Rimozione...' : 'Rimuovi'}
           </Button>

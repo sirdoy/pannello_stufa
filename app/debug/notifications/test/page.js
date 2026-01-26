@@ -146,6 +146,7 @@ export default function TestNotificationPage() {
                 checked={targetMode === 'all'}
                 onChange={(e) => setTargetMode(e.target.value)}
                 className="w-4 h-4 text-ember-500 focus:ring-ember-500"
+                data-testid="target-all"
               />
               <Text>All Devices ({devices.length})</Text>
             </label>
@@ -158,6 +159,7 @@ export default function TestNotificationPage() {
                 checked={targetMode === 'specific'}
                 onChange={(e) => setTargetMode(e.target.value)}
                 className="w-4 h-4 text-ember-500 focus:ring-ember-500"
+                data-testid="target-specific"
               />
               <Text>Specific Device</Text>
             </label>
@@ -174,6 +176,7 @@ export default function TestNotificationPage() {
                   value={selectedDevice || ''}
                   onChange={(e) => setSelectedDevice(e.target.value)}
                   className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-lg text-slate-200 focus:border-ember-500 focus:ring-1 focus:ring-ember-500"
+                  data-testid="device-selector"
                 >
                   <option value="">Select a device</option>
                   {devices.map((device) => (
@@ -198,6 +201,7 @@ export default function TestNotificationPage() {
               value={template}
               onChange={(e) => setTemplate(e.target.value)}
               className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-lg text-slate-200 focus:border-ember-500 focus:ring-1 focus:ring-ember-500"
+              data-testid="test-template"
             >
               {Object.entries(templates).map(([key, tpl]) => (
                 <option key={key} value={key}>
@@ -228,6 +232,7 @@ export default function TestNotificationPage() {
                   onChange={(e) => setCustomTitle(e.target.value)}
                   placeholder="Enter notification title"
                   className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-lg text-slate-200 placeholder-slate-500 focus:border-ember-500 focus:ring-1 focus:ring-ember-500"
+                  data-testid="custom-title"
                 />
               </div>
 
@@ -239,6 +244,7 @@ export default function TestNotificationPage() {
                   placeholder="Enter notification body"
                   rows={4}
                   className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-lg text-slate-200 placeholder-slate-500 focus:border-ember-500 focus:ring-1 focus:ring-ember-500"
+                  data-testid="custom-body"
                 />
               </div>
             </>
@@ -254,13 +260,14 @@ export default function TestNotificationPage() {
           onClick={handleSend}
           disabled={!isFormValid() || sending}
           loading={sending}
+          data-testid="send-test-notification"
         >
           {sending ? 'Sending...' : 'Send Test Notification'}
         </Button>
       </Card>
 
       {result && (
-        <Card className={`p-6 border-2 ${result.success ? 'border-sage-500/30' : 'border-danger-500/30'}`}>
+        <Card className={`p-6 border-2 ${result.success ? 'border-sage-500/30' : 'border-danger-500/30'}`} data-testid="delivery-status">
           <div className="flex items-start gap-3">
             <span className="text-3xl">{result.success ? '✅' : '❌'}</span>
             <div className="flex-1">

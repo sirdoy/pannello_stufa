@@ -1,261 +1,343 @@
-# Feature Research: Production-Grade PWA Push Notifications
+# Feature Landscape: Netatmo Schedule Management & Stove Monitoring
 
-**Domain:** PWA Push Notification System Enhancement
-**Researched:** 2026-01-23
-**Confidence:** HIGH
+**Domain:** Smart Home PWA - Thermostat Control + Appliance Monitoring
+**Researched:** 2026-01-26
+**Confidence:** MEDIUM-HIGH
 
-## Feature Landscape
+---
 
-### Table Stakes (Users Expect These)
+## Executive Summary
 
-Features users assume exist. Missing these = system feels incomplete.
+This research examines standard features for thermostat schedule management (like Netatmo's official app) and stove monitoring capabilities. The goal is to provide complete Netatmo schedule control and comprehensive stove health monitoring without breaking existing v1.0 push notification infrastructure.
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| **Token Auto-Recovery** | Tokens must persist across browser restarts without manual re-subscription | LOW | Service worker handles persistence, but requires restart detection logic |
-| **Invalid Token Cleanup** | System must detect and remove broken tokens automatically | LOW | FCM returns error codes (UNREGISTERED, INVALID_ARGUMENT) for invalid tokens |
-| **Multi-Device Support** | Users expect notifications on all their logged-in devices | MEDIUM | Requires user-to-tokens mapping (1:N relationship) in database |
-| **Basic Delivery Status** | Admin needs to know if notifications were sent successfully | MEDIUM | FCM provides send confirmation via HTTP response codes |
-| **Error Logging** | System must log failed deliveries for debugging | LOW | Essential for troubleshooting token/delivery issues |
-| **Permission Handling** | Clear UI for requesting notification permission contextually | LOW | Browser native permission API, requires thoughtful UX timing |
-| **Test Send Capability** | Admins need to test notifications before sending to all users | LOW | Simple admin form to send to specific tokens or user IDs |
+**Key Findings:**
+- Netatmo schedule management requires CRUD operations on weekly schedules with time-temperature pairings
+- Temporary overrides (manual boost) must NOT modify schedules - they are time-limited setpoint adjustments
+- Stove monitoring focuses on health status, error detection, and performance metrics
+- User expectations are set by Netatmo's official Home + Control app (2026)
 
-### Differentiators (Competitive Advantage)
+---
 
-Features that set the product apart. Not required, but valuable.
+## Table Stakes Features
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| **Real-Time Delivery Dashboard** | Live monitoring of notification delivery metrics (sends, receives, opens) | HIGH | Requires FCM Data API integration + BigQuery export + WebSocket updates |
-| **Granular User Preferences** | Per-notification-type controls (scheduler events, errors, maintenance, etc.) | MEDIUM | Users control which notification types they receive, improves satisfaction |
-| **Notification History UI** | In-app inbox showing past notifications user received | MEDIUM | Stores notification copies in Firebase, allows users to review missed alerts |
-| **Stale Token Detection** | Automatic identification of inactive devices (>30 days) | MEDIUM | Timestamp-based staleness tracking prevents wasted sends |
-| **Active Device List** | Dashboard showing which devices are registered per user | LOW | Simple query of tokens table with last-updated timestamps |
-| **Scheduled Token Cleanup** | Automated daily/weekly job to remove expired tokens (>270 days) | LOW | Firebase Cloud Function on schedule, improves data hygiene |
-| **Device Naming** | Users can label devices ("Kitchen iPad", "Bedroom Phone") | LOW | Enhances UX for multi-device management |
-| **Do Not Disturb Hours** | Per-user quiet hours when notifications are suppressed | MEDIUM | Requires server-side scheduling logic to respect user timezone |
-| **Notification Categories** | Visual grouping in history (Errors, Scheduler, Maintenance) | LOW | Metadata tagging + filtering UI |
-| **Delivery Rate Trends** | Historical charts showing delivery success over time | HIGH | Requires data warehouse (BigQuery) + visualization library |
+Features users expect from Netatmo schedule management and stove monitoring. Missing these = product feels incomplete.
 
-### Anti-Features (Commonly Requested, Often Problematic)
+### Netatmo Schedule Management
 
-Features that seem good but create problems.
+| Feature | Why Expected | Complexity | Dependencies | Notes |
+|---------|--------------|------------|--------------|-------|
+| **View Current Schedule** | Users need to see active weekly schedule with all time/temp pairs | Medium | Netatmo API, parsing schedule format | Netatmo stores schedules as daily time slices with named temperature sets (Comfort/Eco/Night) |
+| **Create New Schedule** | Users want custom schedules beyond defaults (Away, Home, Custom) | High | Form validation, time conflict detection | Must handle 7-day weekly structure with multiple periods per day |
+| **Edit Existing Schedule** | Users need to adjust times/temperatures without recreating from scratch | High | Schedule modification API, conflict resolution | Official app uses mobile-only editing (WebApp read-only as of 2024) |
+| **Delete Custom Schedule** | Users want to remove unused schedules | Low | Netatmo delete API | Cannot delete system schedules (Away, Comfort) |
+| **Switch Active Schedule** | Users expect one-tap schedule switching (Home → Away → Custom) | Medium | Netatmo setThermMode API | Equivalent to official app's schedule picker |
+| **Temporary Override (Manual Boost)** | Users need "set to 22°C for 3 hours" WITHOUT modifying schedule | Medium | Netatmo setpoint override with duration | Default 3h duration, configurable 5min-12h. Must NOT alter schedule. |
+| **View Schedule Zones** | Multi-zone setups (valves) need per-room schedule visibility | High | Netatmo room/valve API | Official app shows room-by-room temperature targets |
 
-| Feature | Why Requested | Why Problematic | Alternative |
-|---------|---------------|-----------------|-------------|
-| **Real-Time Read Receipts** | "I want to know exactly when user saw it" | Requires constant client polling or WebSocket connections, drains battery, privacy concerns | Use "Opens" metric from FCM (triggered when user taps notification) |
-| **Unlimited History Retention** | "Keep all notifications forever" | Database bloat, slow queries, privacy liability (GDPR concerns) | Retain 30-90 days max, provide export feature if needed |
-| **Per-Device Custom Sounds** | "Let users pick notification sound per device" | Browser API limitations (no custom sounds on web), iOS PWA restrictions | Use browser default sounds, focus on notification content quality |
-| **Silent Background Sync** | "Update data silently without notifying user" | iOS PWA doesn't support silent push, defeats notification purpose | Use visible notifications with actionable content |
-| **Notification Editing** | "Let admins edit notifications after sending" | FCM doesn't support message recall/editing once delivered | Focus on test sends and preview before sending |
-| **Guaranteed Delivery** | "Retry forever until delivered" | Messages can be lost (device offline >4 weeks, TTL expired), creates false expectations | Set realistic TTL (7 days), log delivery failures, surface in dashboard |
+### Stove Monitoring
+
+| Feature | Why Expected | Complexity | Dependencies | Notes |
+|---------|--------------|------------|--------------|-------|
+| **Current Health Status** | Users need at-a-glance "stove is OK/Warning/Critical" | Low | Existing `/api/stove/status` | Already partially implemented via error detection |
+| **Error History Log** | Users want to see past errors with timestamps | Medium | Firebase error logging (already exists) | v1.0 has notification history - extend to stove-specific errors |
+| **Connection Status** | Users need "stufa online/offline" indicator | Low | `/api/stove/status` timeout detection | Simple last-seen timestamp logic |
+| **Operating Hours Tracker** | Users expect "45h since last cleaning" display | Low | Existing maintenance system | Already implemented in v1.0 (`docs/systems/maintenance.md`) |
+| **Performance Metrics** | Users want flame level, pellet consumption, temperature readings | Medium | Parse stove API response | Thermorossi API provides detailed telemetry |
+| **Maintenance Alerts** | Users expect visual warnings when cleaning needed | Low | Existing v1.0 maintenance banner | Already implemented in `StoveCard.js` (self-contained pattern) |
+
+---
+
+## Differentiators
+
+Features that set this PWA apart from just using official Netatmo app or basic stove control. Not expected, but highly valued.
+
+### Smart Integration Features
+
+| Feature | Value Proposition | Complexity | Dependencies | Notes |
+|---------|-------------------|------------|--------------|-------|
+| **Stove-Thermostat Coordination** | When stove ignites, temporarily boost Netatmo setpoint by +2°C for faster warmup | High | Netatmo override API, stove state tracking | USER EXPLICITLY REQUESTED: "stufa accende → override Netatmo setpoint temporarily (not modify schedule)" |
+| **Unified Schedule Dashboard** | Single page showing both Netatmo schedule + stove scheduler side-by-side | Medium | Data aggregation from both systems | Saves context switching between device cards |
+| **Schedule Conflict Detection** | Warn if stove scheduler overlaps with Netatmo schedule changes | Medium | Parse both schedules, detect time collisions | Prevents "stove heating while thermostat set to away mode" |
+| **Energy Usage Correlation** | Show stove pellet consumption vs. Netatmo heating patterns | High | Historical data analysis, charting | Requires data retention period (30+ days) |
+| **Voice of System** | Natural language summary: "Tomorrow: 7am heat to 20°C, stove auto-start at 6:30am" | Medium | Schedule parsing, UI text generation | Makes complex schedules human-readable |
+| **Schedule Templates** | Pre-built templates: "Winter Weekdays", "Weekend Lazy", "Vacation Mode" | Medium | Template storage, schedule generation | Reduces friction for common scenarios |
+
+### Advanced Monitoring
+
+| Feature | Value Proposition | Complexity | Dependencies | Notes |
+|---------|-------------------|------------|--------------|-------|
+| **Predictive Maintenance** | "Based on usage, cleaning needed in 3 days" | High | Historical data, ML/heuristics | Requires 90+ days operating data |
+| **Performance Degradation Detection** | "Flame efficiency down 15% vs. baseline" | High | Baseline establishment, statistical analysis | Identifies issues before errors occur |
+| **Health Score Dashboard** | Single 0-100 score combining all stove metrics | Medium | Scoring algorithm, data normalization | Easy mental model for non-technical users |
+| **Notification Intelligence** | "You usually clean at 50h, send reminder at 45h next time?" | High | User behavior analysis, adaptive thresholds | Personalizes notifications over time |
+
+---
+
+## Anti-Features
+
+Features to explicitly NOT build. Common mistakes in smart home integration projects.
+
+| Anti-Feature | Why Avoid | What to Do Instead |
+|--------------|-----------|-------------------|
+| **Schedule Modification for Temporary Changes** | Netatmo's official behavior: temporary overrides (manual boost) do NOT modify schedules. Modifying schedule for "just today" creates permanent changes users forget about. | Use Netatmo's setpoint override with duration (5min-12h). Let schedule resume automatically after duration expires. |
+| **Real-Time WebSocket for Stove Status** | Overkill complexity. Thermorossi API requires polling anyway. WebSocket adds server cost + connection management. | Continue existing 5-second polling pattern in `StoveCard.js`. Good enough for monitoring use case. |
+| **In-App Schedule Editor with Visual Timeline** | Extremely complex UI (drag-drop, conflict resolution, responsive design). Official Netatmo app already does this well. | Provide CRUD operations via forms. Link to official app for visual editing: "For advanced editing, use Netatmo app". |
+| **Duplicate Netatmo's Entire Feature Set** | Scope creep. This PWA focuses on unified control, not replacing official apps. | Pick 80/20 features: schedule switching, temporary overrides, viewing. Defer: geofencing, multi-home, advanced automation. |
+| **Stove Remote Firmware Updates** | Dangerous. Thermorossi doesn't expose this API for safety reasons. Bricking stove via bad update = liability. | Monitor firmware version, notify user if update available, link to official Thermorossi resources. |
+| **Historical Data Warehousing** | Requires BigQuery/data pipeline infrastructure. Overkill for single-user PWA. | Use Firebase Firestore 90-day retention (already implemented in v1.0). Defer advanced analytics to v3+. |
+| **Netatmo Schedule Sync to Multiple Homes** | Netatmo accounts can have multiple homes. Managing multi-home scope adds 3x complexity. | Scope to single home (primary home) for v2.0. Defer multi-home support to v3+ if needed. |
+
+---
 
 ## Feature Dependencies
 
+**Critical Path for Schedule Management:**
 ```
-Token Management (Core)
-    └──requires──> FCM Token Storage (exists)
-                       └──requires──> User Authentication (exists)
-
-Token Auto-Recovery
-    └──requires──> Token Management
-
-Stale Token Detection
-    └──requires──> Token Management with Timestamps
-    └──enhances──> Scheduled Token Cleanup
-
-Multi-Device Support
-    └──requires──> User-to-Tokens Mapping (1:N)
-    └──enhances──> Active Device List
-
-Monitoring Dashboard
-    └──requires──> Delivery Status Tracking
-    └──requires──> Error Logging
-    └──enhances──> Delivery Rate Trends (optional visualization)
-
-Notification Preferences
-    └──requires──> Notification Type Metadata (tag each notification)
-    └──conflicts──> Guaranteed Delivery (can't force send if user disabled type)
-
-Notification History
-    └──requires──> History Storage (Firebase collection)
-    └──enhances──> Notification Categories (filtering)
-    └──requires──> Delivery Status Tracking (to show delivered/failed)
-
-Test Send Capability
-    └──requires──> Basic Send Infrastructure (exists)
-    └──requires──> Token Lookup by User ID
-
-Do Not Disturb Hours
-    └──requires──> User Preferences Storage
-    └──requires──> Server-Side Scheduling Logic
-    └──conflicts──> Critical Error Notifications (may need override)
+1. Netatmo Token Refresh (already implemented v1.0)
+   ↓
+2. Fetch Schedules API
+   ↓
+3. Display Current Schedule (Read-Only)
+   ↓
+4. Schedule Switching (Change active schedule)
+   ↓
+5. Temporary Override (Manual boost)
+   ↓
+6. Create/Edit/Delete Schedules (Full CRUD)
 ```
 
-### Dependency Notes
+**Critical Path for Stove Monitoring:**
+```
+1. Current Status Display (already implemented)
+   ↓
+2. Connection Status Indicator
+   ↓
+3. Error History from Firebase (extend v1.0 notification history)
+   ↓
+4. Performance Metrics Dashboard
+   ↓
+5. Maintenance Tracking (already implemented)
+```
 
-- **Token Management is foundational**: All features depend on robust token lifecycle management
-- **Monitoring requires FCM API integration**: Dashboard and trends need FCM Data API + optional BigQuery
-- **History creates storage burden**: Must design retention policy upfront to avoid bloat
-- **Preferences add complexity**: Each notification send must check user preferences before delivery
-- **Do Not Disturb needs timezone awareness**: Server must respect user's local time, not UTC
+**Integration Dependency:**
+```
+Stove Ignition Event (existing scheduler)
+   ↓
+Detect Ignition in StoveCard polling
+   ↓
+Trigger Netatmo Temporary Override (+2°C for 2h)
+   ↓
+Log action to Firebase
+   ↓
+Send notification (v1.0 system) "Stove started, boosting thermostat"
+```
 
-## MVP Definition
+**Architectural Constraints:**
+- Netatmo schedule data must be cached in Firebase (avoid API rate limits)
+- Cache invalidation on user-initiated edits
+- Stove monitoring must NOT break existing 5s polling pattern
+- All new features must respect existing device card self-contained pattern
 
-### Launch With (Milestone v1)
+---
 
-Minimum viable enhancement — production-ready token management and monitoring.
+## MVP Recommendation (v2.0 Scope)
 
-- [x] **Token Auto-Recovery** — Already partially implemented, needs browser restart detection
-- [ ] **Invalid Token Cleanup** — Essential for data hygiene, prevents failed sends
-- [ ] **Multi-Device Support** — Users have multiple devices, must support all
-- [ ] **Basic Delivery Status** — Track send success/failure per message
-- [ ] **Error Logging** — Store failed deliveries in Firebase for debugging
-- [ ] **Active Device List** — Simple admin view of registered devices per user
-- [ ] **Test Send Capability** — Admin panel to send test notifications by user ID or token
+### Must-Have (Phase 1-3)
 
-**Why these?** Core reliability features. System is not production-ready without them.
+**Netatmo Schedule - Read & Switch:**
+1. View current active schedule (table format: day, time ranges, temperatures)
+2. List all available schedules (default: Away, Home, Custom1, Custom2)
+3. Switch active schedule (one-tap from dropdown)
+4. Temporary override ("Boost to 22°C for 3 hours")
 
-### Add After Validation (v1.1-v1.3)
+**Stove Monitoring - Enhanced Visibility:**
+1. Connection status indicator (online/offline/last-seen)
+2. Error history page (extend notification history, filter by stove errors)
+3. Health status summary (OK/Warning/Critical with icon)
+4. Performance metrics card (flame level, pellet rate, temps)
 
-Features to add once core is stable and validated.
+**Integration (Differentiator):**
+1. Stove ignition → auto-boost Netatmo setpoint (+2°C, 2h duration)
+2. Unified control page (stove + thermostat controls side-by-side)
 
-- [ ] **Granular User Preferences** — Add once we see which notification types annoy users most
-- [ ] **Notification History UI** — Add when users request "I missed a notification, can't find it"
-- [ ] **Stale Token Detection** — Add when we see delivery failures from inactive devices
-- [ ] **Scheduled Token Cleanup** — Automate once stale detection is working manually
-- [ ] **Device Naming** — Add when users complain about not knowing which device to disable
+### Defer to Post-MVP (v2.1+)
 
-**Triggers:**
-- User preferences: After 2 weeks of usage, survey which notifications feel spammy
-- History: After first user complaint about missed notifications
-- Stale detection: After 30 days of production usage, analyze token age distribution
+**Netatmo Schedule - Write Operations:**
+- Create new custom schedule
+- Edit existing schedule time/temp pairs
+- Delete custom schedules
+- Multi-zone schedule management
 
-### Future Consideration (v2+)
+**Advanced Monitoring:**
+- Predictive maintenance
+- Performance degradation detection
+- Health score dashboard
+- Energy correlation analysis
 
-Features to defer until product-market fit is established.
+**Rationale for Deferral:**
+- Schedule editing is HIGH complexity (conflict detection, validation, multi-day UI)
+- Official Netatmo app already provides excellent schedule editor
+- Read + switch + temporary override covers 80% of daily use cases
+- Can validate demand before investing in complex edit UI
 
-- [ ] **Real-Time Delivery Dashboard** — High complexity, defer until monitoring needs are clear
-- [ ] **Delivery Rate Trends** — Requires BigQuery setup, defer until data volume justifies cost
-- [ ] **Do Not Disturb Hours** — Nice-to-have, defer until users request quiet hours
-- [ ] **Notification Categories** — Defer until history has enough volume to warrant filtering
+---
 
-**Why defer:**
-- Real-time dashboard: HIGH effort, unclear if value justifies cost at current scale
-- Trends: Need 90+ days of data to show meaningful trends
-- DND hours: Edge case, most users manage via OS-level settings
-- Categories: Only useful with large history volume (100+ notifications)
+## User Expectations: "Like Official App"
 
-## Feature Prioritization Matrix
+Based on Netatmo's Home + Control app (2026) research findings:
 
-| Feature | User Value | Implementation Cost | Priority | Milestone |
-|---------|------------|---------------------|----------|-----------|
-| Token Auto-Recovery | HIGH | LOW | P1 | v1 |
-| Invalid Token Cleanup | HIGH | LOW | P1 | v1 |
-| Multi-Device Support | HIGH | MEDIUM | P1 | v1 |
-| Error Logging | HIGH | LOW | P1 | v1 |
-| Basic Delivery Status | HIGH | MEDIUM | P1 | v1 |
-| Active Device List | MEDIUM | LOW | P1 | v1 |
-| Test Send Capability | HIGH | LOW | P1 | v1 |
-| Granular User Preferences | HIGH | MEDIUM | P2 | v1.1 |
-| Notification History UI | MEDIUM | MEDIUM | P2 | v1.1 |
-| Stale Token Detection | MEDIUM | MEDIUM | P2 | v1.2 |
-| Scheduled Token Cleanup | MEDIUM | LOW | P2 | v1.2 |
-| Device Naming | LOW | LOW | P2 | v1.3 |
-| Real-Time Delivery Dashboard | MEDIUM | HIGH | P3 | v2 |
-| Delivery Rate Trends | LOW | HIGH | P3 | v2 |
-| Do Not Disturb Hours | LOW | MEDIUM | P3 | v2 |
-| Notification Categories | LOW | LOW | P3 | v2 |
+### What "Like Official App" Means
 
-**Priority key:**
-- **P1 (Must have)**: Core reliability, blocks production readiness
-- **P2 (Should have)**: Improves UX significantly, add within 1-2 months post-launch
-- **P3 (Nice to have)**: Polish features, add based on user feedback
+**Schedule Management:**
+- See weekly schedule with named periods (Comfort 20°C, Eco 17°C, Night 15°C)
+- Switch between saved schedules (typically 3-5 schedules per home)
+- Set temporary override with duration picker (5min - 12h)
+- Anticipation function: schedule shows target temperature + "starts heating 30min before"
 
-## Production System Characteristics
+**Multi-Room Support:**
+- If user has Smart Radiator Valves, show per-room temperature targets
+- Support individual valve schedule overrides
+- Display "whole home" vs "this room only" controls
 
-Based on research of industry-standard PWA push notification systems (Firebase, MoEngage, OneSignal, Braze), production-grade systems exhibit these patterns:
+**Eco-Assist (Optional - defer):**
+- Geofencing to reduce heating when away (requires location permission)
+- "Nobody home" detection with auto-away mode
+- This is advanced - official app took years to perfect this
 
-### Token Management Excellence
-- Automatic token refresh on app launch (monthly minimum)
-- Timestamp tracking for staleness detection (>30 days = stale)
-- Immediate removal of invalid tokens on FCM error responses
-- User-to-tokens 1:N mapping for multi-device support
+### What Users DON'T Expect
 
-### Monitoring & Observability
-- Delivery rate tracking (sent, received, opened)
-- Error logging with categorization (invalid token, network failure, etc.)
-- Active device counts per user
-- Historical trend data (requires BigQuery for scale)
+- Real-time collaboration (multi-user editing same schedule simultaneously)
+- Native mobile app performance (PWA has inherent latency)
+- Offline schedule editing (requires API connection)
+- Sub-15-minute schedule granularity (Netatmo uses 30min blocks)
 
-### User Control & Privacy
-- Granular per-notification-type preferences (not just on/off)
-- Contextual permission requests (never on page load)
-- Clear explanation of what notifications user will receive
-- Easy opt-out at any time
+---
 
-### Administrative Tools
-- Test send capability to specific users/devices
-- Notification history with delivery status
-- Device management (view, label, remove)
-- Debugging tools (token lookup, send logs)
+## Implementation Notes
 
-### Quality Metrics (Industry Benchmarks)
-- **Delivery rate**: 85-95% for active devices
-- **Open rate**: 3-15% depending on relevance (4.6% Android avg, 3.4% iOS avg)
-- **Opt-in rate**: 45-90% (context matters)
-- **Frequency**: <5 notifications per week per user
-- **Token refresh**: Monthly minimum
-- **Stale threshold**: 30 days of inactivity
-- **Token expiry**: 270 days (FCM automatic on Android)
+### Netatmo API Key Findings
 
-## Competitor Feature Analysis
+From research + existing codebase:
 
-| Feature | Firebase (Reference) | OneSignal | Braze | Our Approach |
-|---------|---------------------|-----------|-------|--------------|
-| Multi-Device | Device groups or manual token lists | Automatic per user | Automatic per user | Manual user-to-tokens mapping |
-| Token Cleanup | Manual with error code monitoring | Automatic | Automatic | Semi-automatic (scheduled function) |
-| Preferences | Not provided (app-level) | Granular per-category | Granular + smart defaults | Granular per-type (Scheduler, Errors, etc.) |
-| History | BigQuery export only | 30-day retention | 90-day retention | 30-day retention in Firebase |
-| Monitoring | Console + Data API + BigQuery | Real-time dashboard | Real-time + trends | Basic dashboard (v1), real-time deferred (v2) |
-| Testing | Manual via API/Console | Built-in test panel | Built-in + AB testing | Simple admin test panel |
-| DND Hours | Not provided | Per-user timezone-aware | Per-user + smart timing | Deferred to v2 |
+**Available Endpoints:**
+- `GET /api/homesdata` - Fetch all schedules, homes, rooms
+- `POST /api/setroomthermpoint` - Temporary setpoint override
+- `POST /api/setthermmode` - Switch active schedule (schedule_id parameter)
+- `POST /api/switchhomeschedule` - Change schedule for entire home
+- `POST /api/createnewhomeschedule` - Create custom schedule (complex payload)
+- `POST /api/deletehomeschedule` - Remove custom schedule
 
-**Our Philosophy**: Start with Firebase's robust primitives, add enterprise features (preferences, history) where they provide clear user value, defer complex features (real-time dashboards) until scale demands them.
+**Token Management:**
+- Already implemented in v1.0: `lib/netatmo/tokenHelper.js`
+- Auto-refresh working, stores tokens in Firebase
+- No changes needed for v2.0
+
+**Rate Limiting:**
+- Netatmo allows 50 requests/10 seconds per user
+- Cache schedule data in Firebase (update every 5 minutes)
+- Invalidate cache on user edit actions
+
+### Stove API Key Findings
+
+From project context + Thermorossi research:
+
+**Thermorossi iControl Features:**
+- Remote on/off control
+- Check operating status and alarms
+- Remote temperature adjustment
+- Set operating hours on daily/weekly basis
+
+**Available Data Points:**
+- Status (ON/OFF/ERROR)
+- Current temperature
+- Target temperature
+- Flame level (1-5)
+- Pellet consumption rate
+- Error codes (AL PE = pellets empty, etc.)
+- Operating hours
+
+**Alert Types:**
+- AL PE: Temperature drop below 42°C (pellets empty)
+- Connection lost (timeout after 30s no response)
+- Critical errors (requires immediate action)
+
+### UI/UX Patterns from Research
+
+**Smart Thermostat Override Patterns:**
+- **Temporary Hold** - Override until next scheduled period (most common)
+- **Hold Until Time** - Override until user-specified time
+- **Permanent Hold** - Override until manually cancelled (rare)
+
+**Best Practice:** Default to temporary hold (until next schedule period). Provide "Hold Until" time picker as advanced option.
+
+**Dashboard Visualization:**
+- Use Recharts (already in project for v1.0 delivery trends)
+- 7-day temperature history (Netatmo + stove correlation)
+- Operating hours bar chart (weekly pattern)
+- Error frequency over time (spike detection)
+
+---
+
+## Complexity Assessment
+
+| Feature Category | Complexity | Estimated Effort | Risk Level |
+|------------------|------------|------------------|------------|
+| View schedules (read-only) | Medium | 2-3 plans | Low |
+| Switch active schedule | Medium | 1-2 plans | Low |
+| Temporary override | Medium | 2 plans | Medium (duration logic) |
+| Create/edit schedules | High | 4-5 plans | High (validation, conflicts) |
+| Multi-zone support | High | 3-4 plans | High (API complexity) |
+| Stove monitoring dashboard | Medium | 2-3 plans | Low |
+| Error history integration | Low | 1 plan | Low (extend v1.0) |
+| Stove-Netatmo coordination | High | 3-4 plans | Medium (event detection) |
+| Performance metrics | Medium | 2 plans | Low |
+
+**Total Estimated Plans for MVP:** 12-15 plans
+**Total Estimated Plans for Full Feature Set:** 25-30 plans
+
+---
+
+## Confidence Assessment
+
+| Area | Confidence | Source | Notes |
+|------|------------|--------|-------|
+| Netatmo official features | HIGH | Netatmo helpcenter docs, Home + Control app release notes | Well-documented official sources |
+| Schedule management UX | MEDIUM | WebSearch (community discussions, manufacturer docs) | Best practices established, but PWA-specific patterns require iteration |
+| Temporary override behavior | HIGH | Official Netatmo documentation | Explicitly documented: manual boost ≠ schedule modification |
+| Stove monitoring expectations | MEDIUM | Thermorossi iControl docs, pellet stove forums | Features documented, but user expectations vary |
+| Integration patterns | LOW | Inference from project goals | Novel feature (stove-thermostat coordination) - user feedback will validate |
+| Multi-zone complexity | MEDIUM | Netatmo API docs | API supports it, but UI patterns need research flag |
+
+**Areas Needing Phase-Specific Research:**
+- Phase N (Schedule Editor): UI/UX patterns for mobile schedule editing with conflict detection
+- Phase N+1 (Multi-Zone): Best practices for displaying/controlling individual radiator valves
+- Phase N+2 (Predictive Maintenance): Statistical models for pellet stove performance baseline
+
+---
 
 ## Sources
 
-### Firebase Official Documentation (HIGH confidence)
-- [Best practices for FCM registration token management](https://firebase.google.com/docs/cloud-messaging/manage-tokens) — Updated Jan 15, 2026
-- [Understanding message delivery](https://firebase.google.com/docs/cloud-messaging/understand-delivery) — Updated Jan 8, 2026
-- [Send messages to device groups](https://firebase.google.com/docs/cloud-messaging/device-group) — FCM official guide
-- [Audit logging for Firebase Cloud Messaging](https://firebase.google.com/support/guides/cloud-audit-logging/firebase-cloud-messaging) — Updated Jan 8, 2026
+**Netatmo Official Documentation:**
+- [How to modify the weekly schedule](https://helpcenter.netatmo.com/hc/en-us/articles/360011029999-How-to-modify-the-weekly-schedule-how-to-apply-different-temperatures-room-by-room)
+- [Management of weekly schedules in webapp](https://helpcenter.netatmo.com/hc/en-us/articles/20207602209938-Management-of-the-weekly-schedules-in-the-new-webapp)
+- [Home + Control App announcement](https://helpcenter.netatmo.com/hc/en-us/articles/29359036428690-Home-Control-App-a-complete-new-experience-to-manage-your-heating-and-more)
+- [Netatmo 2026 product launch (Matter support)](https://homekitnews.com/2026/01/23/netatmo-launches-new-thermostat-and-smart-radiator-valve-w-matter/)
 
-### PWA Best Practices (HIGH confidence)
-- [MDN: Re-engageable Notifications and Push APIs](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Tutorials/js13kGames/Re-engageable_Notifications_Push) — Authoritative PWA guide
+**Thermostat Best Practices:**
+- [Honeywell: Bypassing thermostat schedules](https://www.honeywellhome.com/blogs/support/how-do-i-bypass-the-schedule-on-the-th2210dh-th2110dh-th2210dv-th2110dv-thermostat)
+- [Trane: Temporary override using Hold](https://support.tranehome.com/hc/en-us/articles/4403191244813-How-To-Temporarily-Override-Schedules-Using-Hold)
 
-### Industry Research & Patterns (MEDIUM confidence)
-- [The Complete Guide to PWA Push Notifications](https://www.analyticsinsight.net/tech-news/the-complete-guide-to-pwa-push-notifications-features-best-practices-installation-steps) — 2026 guide
-- [Using Push Notifications in PWAs: The Complete Guide](https://www.magicbell.com/blog/using-push-notifications-in-pwas) — Production patterns
-- [Push Notification Metrics: Measuring ROI](https://www.moengage.com/blog/push-notification-metrics/) — Industry benchmarks
-- [14 Push Notification Best Practices for 2026](https://reteno.com/blog/push-notification-best-practices-ultimate-guide-for-2026) — Current practices
-- [Push Notification Tracking: Complete Guide](https://www.engagelab.com/blog/tracking-push-notifications) — Metrics and tools
+**Stove Monitoring:**
+- [Thermorossi iControl remote monitoring](https://www.thermorossi.com/5/316/en/products/Extra/iControl)
+- [Signs your pellet stove needs repair](https://www.hbenergy.com/blog/heating-service/signs-your-pellet-stove-needs-repair-what-to-look-for/)
+- [Pellet stove health monitoring trends](https://www.blackmoosechimney.com/pellet-appliances-need-inspections-just-like-wood/)
 
-### Token Lifecycle (MEDIUM confidence)
-- [Managing Cloud Messaging Tokens](https://firebase.blog/posts/2023/04/managing-cloud-messaging-tokens/) — Firebase official blog
-- [Lifecycle of Push Notification based Device Tokens](https://medium.com/@chunilalkukreja/lifecycle-of-fcm-device-tokens-61681bb6fbcf) — Token lifecycle patterns
-- [Firebase Push Tokens Are Device-Specific](https://dev.to/sangwoo_rhie/firebase-push-tokens-are-device-specific-not-user-specific-a-critical-refactoring-ppi) — Critical concept
-
-### User Preferences & UX (MEDIUM confidence)
-- [Notification UX: How To Design For A Better Experience](https://userpilot.com/blog/notification-ux/) — UX patterns
-- [Privacy UX: Better Notifications And Permission Requests](https://www.smashingmagazine.com/2019/04/privacy-better-notifications-ux-permission-requests/) — Permission best practices
-
-### Testing & History (LOW-MEDIUM confidence)
-- [Notification Center Developer Guide](https://developers.moengage.com/hc/en-us/articles/4403878923284-Notification-Center) — History UI patterns
-- [Test Push Notification Online](https://a2z.tools/push-notification-tester) — Testing tools
-- [Expo Push Notification Sandbox](https://github.com/expo/push-notification-sandbox) — Testing reference
+**Smart Home Monitoring 2026:**
+- [Smart home health monitoring trends](https://smarthomewizards.com/smart-home-trends-to-look-for/)
+- [Home Assistant 2026.1 dashboard features](https://www.home-assistant.io/blog/2026/01/07/release-20261)
+- [Energy monitoring best practices](https://www.vivint.com/resources/article/energy-monitoring)
 
 ---
-*Feature research for: PWA Push Notification System Enhancement*
-*Researched: 2026-01-23*
-*Confidence: HIGH (Firebase official docs) | MEDIUM (industry patterns) | LOW (testing tools)*
+
+**Research completed:** 2026-01-26
+**Next step:** Requirements definition from this feature landscape

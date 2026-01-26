@@ -1,468 +1,240 @@
 # Project Research Summary
 
-**Project:** Production-Grade PWA Push Notifications Enhancement
-**Domain:** PWA Push Notification System (Firebase Cloud Messaging)
-**Researched:** 2026-01-23
+**Project:** Pannello Stufa v2.0 - Netatmo Schedule Management & Stove Monitoring
+**Domain:** Smart Home PWA Integration (Thermostat Control + Appliance Monitoring)
+**Researched:** 2026-01-26
 **Confidence:** HIGH
 
 ## Executive Summary
 
-This project enhances an existing PWA notification system to achieve production-grade reliability. The current implementation has FCM integration but suffers from critical token persistence issues after browser restarts. Research reveals this is a well-understood problem with documented solutions: robust token lifecycle management, delivery monitoring, and user preference controls.
+v2.0 extends Pannello Stufa with comprehensive Netatmo thermostat schedule management and enhanced stove health monitoring. Research reveals this domain is well-understood with established patterns, but has critical integration pitfalls that must be avoided. The existing v1.0 architecture is fundamentally sound — **zero new npm dependencies are needed**. All features can be implemented by extending existing patterns: Vercel Cron for monitoring, React Context API for state, date-fns v4 for timezones, and the existing Netatmo API wrapper for schedule operations.
 
-The recommended approach builds incrementally on the existing Firebase stack. No migrations needed - we ADD capabilities (token refresh, history tracking, monitoring) to current FCM setup. Core technologies are already in place (Next.js 16, Firebase 12.8.0, Serwist 9.0). New additions are lightweight (Recharts for dashboards, React Hook Form + Zod for preferences, Firestore for history storage alongside existing Realtime DB for tokens).
+The recommended approach follows a backend-first strategy: establish API infrastructure and monitoring logic before building UI, test each integration independently, and avoid the most common pitfall — confusing temporary setpoint overrides with permanent schedule modifications. The existing `netatmoStoveSync.js` already uses the correct pattern (temporary overrides via `setRoomThermpoint`), so the architectural foundation is solid.
 
-Key risk is the foundational token persistence bug. If not fixed first, all enhancement features will be undermined by unreliable delivery. Research shows this requires: startup token checking, monthly refresh cadence, timestamp tracking, and stale token cleanup. Fix the foundation before building features. Secondary risk is iOS PWA permission state lies - mitigate with test notifications and delivery monitoring.
+Key risks center on Netatmo API rate limiting (500 calls/hour per user), OAuth token lifecycle management (refresh token rotation), and alert fatigue from over-monitoring. Mitigation requires aggressive caching (5-minute TTL in Firebase), atomic token refresh with transaction semantics, and intelligent alert deduplication (3+ consecutive failures before notification). The existing v1.0 notification system and Firebase infrastructure provide the foundation to handle these concerns.
 
 ## Key Findings
 
 ### Recommended Stack
 
-Existing stack is current and production-ready - no changes needed. Research focused on identifying what to ADD, not replace.
+**Zero new dependencies required.** The v1.0 stack handles 95% of v2.0 requirements out of the box. Three key findings: (1) The existing `lib/netatmoApi.js` wrapper already implements all schedule CRUD endpoints (`createSchedule`, `switchHomeSchedule`, `syncHomeSchedule`), (2) Vercel Cron infrastructure extends naturally to stove monitoring without new services, (3) date-fns v4 has native timezone support via `TZDate`, eliminating the need for date-fns-tz.
 
-**Core technologies (keep existing):**
-- Next.js 16.1.0 - App Router framework, current version
-- Firebase Client SDK 12.8.0 - FCM messaging, already integrated
-- Firebase Admin SDK 13.6.0 - Server-side operations, fully compatible
-- Serwist 9.0 - Service Worker management, PWA infrastructure
-- Auth0 4.13.1 - Authentication, session management
+**Core technologies (no changes):**
+- **Next.js 16.1.0 + React 19.2.0**: App Router for schedule UI, API routes for CRUD — existing patterns extend naturally
+- **Firebase Admin/Client SDK**: Schedule caching (RTDB), token storage (RTDB), notification history (Firestore) — additive schema, no migrations
+- **Vercel Cron**: Extend existing `/api/scheduler/check` endpoint with stove health monitoring — same 1-minute frequency, same secret validation
+- **date-fns v4.1.0**: Native timezone support via `TZDate` for Europe/Rome schedule parsing — no third-party timezone library needed
+- **React Hook Form 7.54.2 + Zod 3.24.2**: Schedule editor form validation — same pattern as v1.0 notification preferences
+- **React Context API**: Thermostat schedule state management — matches existing `VersionContext` pattern, zero new state library
 
-**New additions (required):**
-- Firestore - Notification history storage with better querying than Realtime DB (complex filters by date/type/status)
-- Recharts 2.x - Dashboard charts/graphs (shadcn/ui official choice, SVG-based, dark mode via CSS variables)
-- date-fns 4.1.0 - Date utilities (tree-shakeable, 1.6KB per function vs 66KB Moment.js)
-- React Hook Form 7.54.0 + Zod 3.24.0 - Preference forms (shadcn/ui documented pattern, type-safe validation)
-- Playwright 1.49.0 - Service Worker E2E testing (Jest mocks insufficient for SW lifecycle)
-
-**New additions (optional):**
-- react-hot-toast 2.4.1 - In-app notification toasts (2KB, lightweight)
-- clsx + tailwind-merge - Conditional Tailwind classes (standard pattern)
-- fcm-push-cli - Automated FCM testing in CI/CD
-
-**Total added bundle size:** ~120KB (minimal impact)
+**What NOT to add:**
+- **node-cron**: Incompatible with Vercel serverless (requires long-running process)
+- **Zustand**: Context API sufficient for <10 schedules, team already familiar
+- **date-fns-tz**: Redundant, v4 has built-in timezone support
 
 ### Expected Features
 
-Research analyzed industry-standard PWA notification systems (Firebase, MoEngage, OneSignal) to identify table stakes vs differentiators.
+Research shows users expect feature parity with Netatmo's official Home + Control app (2026) for schedule management, combined with stove monitoring capabilities comparable to Thermorossi's iControl interface. Critical distinction: temporary overrides (manual boost) must NOT modify schedules — they're time-limited setpoint adjustments that expire automatically.
 
 **Must have (table stakes):**
-- Token Auto-Recovery - Persist across browser restarts without manual re-subscription
-- Invalid Token Cleanup - Automatic detection and removal on FCM error codes
-- Multi-Device Support - Users expect notifications on all logged-in devices (1:N user-to-tokens mapping)
-- Basic Delivery Status - Track send success/failure for debugging
-- Error Logging - Store failed deliveries in Firebase
-- Permission Handling - Contextual UI for requesting permission (not on page load)
-- Test Send Capability - Admin panel for testing before production sends
+- **View current active schedule**: Weekly timetable with time/temp pairs, zone breakdowns
+- **Switch active schedule**: One-tap between saved schedules (Home, Away, Custom)
+- **Temporary override**: "Boost to 22°C for 3 hours" without modifying schedule
+- **Stove health status**: At-a-glance OK/Warning/Critical indicator
+- **Connection monitoring**: Online/offline detection with last-seen timestamp
+- **Error history**: Past errors with timestamps (extend v1.0 notification history)
+- **Maintenance alerts**: Visual warnings when cleaning needed (already implemented)
 
-**Should have (competitive advantage):**
-- Granular User Preferences - Per-notification-type controls (scheduler, errors, maintenance)
-- Notification History UI - In-app inbox for past notifications
-- Stale Token Detection - Identify inactive devices (>30 days)
-- Active Device List - Dashboard showing registered devices per user
-- Scheduled Token Cleanup - Automated job removing expired tokens (>270 days)
-- Device Naming - Users label devices ("Kitchen iPad", "Bedroom Phone")
-- Do Not Disturb Hours - Per-user quiet hours with timezone awareness
+**Should have (competitive differentiators):**
+- **Stove-thermostat coordination**: Stove ignites → temporarily boost Netatmo setpoint (+2°C for 2h) via override, NOT schedule modification
+- **Unified control dashboard**: Single page showing stove + thermostat side-by-side
+- **Schedule conflict detection**: Warn if stove scheduler overlaps with thermostat schedule changes
+- **Performance metrics**: Flame level, pellet consumption rate, temperature trends
 
 **Defer (v2+):**
-- Real-Time Delivery Dashboard - HIGH complexity, requires BigQuery + WebSocket updates
-- Delivery Rate Trends - Needs 90+ days data volume to show meaningful trends
-- Notification Categories - Only useful with large history volume (100+ notifications)
+- **Create/edit custom schedules**: HIGH complexity (time conflict detection, multi-day UI, validation) — official Netatmo app already provides excellent editor
+- **Multi-zone management**: Complex UI patterns, requires per-valve API calls
+- **Predictive maintenance**: Requires 90+ days operating data, ML/heuristics
+- **Energy correlation analysis**: Requires historical data warehousing infrastructure
 
-**Industry benchmarks:**
-- Delivery rate: 85-95% for active devices
-- Open rate: 3-15% (4.6% Android avg, 3.4% iOS avg)
-- Opt-in rate: 45-90% (context-dependent)
-- Frequency: <5 notifications per week per user
-- Token refresh: Monthly minimum
-- Stale threshold: 30 days inactivity
+**Rationale for MVP scope:** Read + switch + temporary override covers 80% of daily use cases. Full schedule editor is complex and users already have Netatmo's official app. Validate demand before investing in elaborate CRUD UI.
 
 ### Architecture Approach
 
-Standard production PWA notification architecture uses layered Repository Pattern aligned with existing codebase structure.
+Extend existing v1.0 patterns with three new service layers: `NetatmoScheduleService` for schedule CRUD with caching, `StoveMonitorService` for health checks and drift detection, and enhanced `NetatmoStoveSync` coordination logic. Architecture follows established repository pattern (service → repository → Firebase) with cache-aside strategy (5-min TTL) to avoid Netatmo rate limits.
 
 **Major components:**
+1. **NetatmoScheduleService** — Schedule CRUD operations with cache-aside pattern, 5-minute TTL in Firebase RTDB, invalidation on writes
+2. **StoveMonitorService** — Health checks (connection status, unexpected shutdowns, sync drift), runs in cron every minute, logs to `monitoring/` Firebase path
+3. **API Routes (`/api/netatmo/schedules/*`)** — REST endpoints for schedule management (GET list, POST create, PUT update, DELETE), thin controllers delegating to service layer
+4. **Enhanced Cron Logic** — Extend `/api/scheduler/check` with stove health monitoring, thermostat-stove sync enforcement, dead man's switch heartbeat
+5. **ThermostatScheduleContext** — React Context for client-side schedule state (matches existing `VersionContext` pattern), realtime Firebase listeners
 
-1. **Token Lifecycle Service** - Business logic for token registration, refresh, cleanup (new)
-   - Sanitize token as Firebase key (existing pattern in code)
-   - Check for existing token before creating duplicate
-   - Track timestamps (createdAt, lastUsed) for staleness detection
-   - Cleanup stale tokens via scheduled job or manual trigger
-
-2. **Notification History Service** - Audit trail for all sent notifications (new)
-   - Log every notification with delivery result
-   - Store in Firestore (better querying than Realtime DB for filtering)
-   - Support pagination (limit 50, cursor-based for infinite scroll)
-   - Update daily stats for monitoring dashboard
-
-3. **Preference-Aware Trigger Service** - Check user preferences before every send (extends existing)
-   - Resolve notification typeId to category + field
-   - Query user preferences from Firebase
-   - Fail-safe: send critical notifications even if preference check fails
-   - Log history after successful send
-
-4. **Repository Layer** - Data access with Admin SDK (extends existing BaseRepository pattern)
-   - NotificationTokenRepository - CRUD for FCM tokens in Realtime DB
-   - NotificationHistoryRepository - CRUD for history in Firestore
-   - Consistent with StoveStateRepository, MaintenanceRepository patterns
-   - Automatic undefined filtering (Firebase requirement)
-
-**Data flow:**
-- Client: Request permission → Get FCM token → POST /api/notifications/register
-- Server: Validate session → TokenService.registerToken → TokenRepository.createToken → Firebase
-- Trigger: Event occurs → TriggerService.trigger → Check preferences → Send via Admin SDK → Log history
-- Monitor: Admin opens dashboard → Fetch stats → Aggregate from history → Display charts
-
-**Scaling considerations:**
-- 0-1k users: Current architecture sufficient, weekly manual cleanup
-- 1k-10k users: Add pagination, daily cron cleanup, database indexes
-- 10k-100k users: Cloud Functions, monitor FCM quota (1M free/month), batch sends
-- 100k+ users: Shard history by month, migrate to Firestore for queries, rate limiting
+**Key architectural decisions:**
+- **NEVER modify schedules programmatically** — Only users via UI. Automation uses temporary setpoint overrides with `mode='manual'` and `endtime`
+- **Service layer abstraction** — Separate business logic (services) from data access (repositories) and transport (API routes) for testability
+- **Cache-aside with TTL** — Cache Netatmo API responses in Firebase (5 min), invalidate on write, avoid rate limits (500/hour)
+- **Fire-and-forget for non-critical tasks** — Cron executes blocking scheduler logic, then fires async tasks (valve calibration, token refresh, notifications)
+- **Polling with exponential backoff** — Client polls monitoring state every 60s, doubles backoff on error (max 5 min)
 
 ### Critical Pitfalls
 
-Research identified 8 major pitfalls with 100% focus on token persistence as foundational issue.
+Research identified 6 CRITICAL pitfalls and 4 MODERATE pitfalls. Top failures come from Netatmo API rate limiting (changed behavior in 2026 with multi-user apps), OAuth token rotation invalidating old refresh tokens, and confusing setpoint overrides with schedule modifications.
 
-1. **FCM Tokens Not Persisting After Browser Restart** (CRITICAL)
-   - Current bug: Token obtained once but not recovered on browser restart
-   - Fix: Startup token check, monthly refresh, timestamp tracking, service worker persistence
-   - Warning signs: "Worked once then stopped", NotRegistered errors, token accumulation
-   - Address: Phase 1 - foundational fix before any features
+1. **Netatmo Rate Limiting (CRITICAL)** — 500 calls/hour per user, but shared OAuth apps get lower limits. Avoid: Poll thermostat at 60s (not 5s like stove), cache schedules in Firebase (5-min TTL), batch multi-room operations, track API call count with 80% warning threshold
+2. **Setpoint Override vs Schedule Modification (CRITICAL)** — Using `switchSchedule` API instead of `setThermpoint` for temporary overrides corrupts user schedules permanently. Avoid: NEVER modify schedules programmatically, use `setThermpoint` with `mode='manual'` and `endtime`, visual UI indicators for "Override active until 18:00"
+3. **OAuth Token Refresh Rotation (CRITICAL)** — Netatmo rotates BOTH access_token AND refresh_token on every refresh, old tokens immediately invalidated. Avoid: Always save new refresh_token from response, use Firebase transaction for atomic updates, deduplicate concurrent refresh attempts with in-memory lock
+4. **Cron Silent Failures (CRITICAL)** — Cron job stops running but no alerts triggered, monitoring fails silently for hours. Avoid: Store `lastRunAt` timestamp in Firebase (heartbeat), dead man's switch alerts if >10 minutes, log every execution with status, trigger admin notification on failure
+5. **State Sync Race Conditions (CRITICAL)** — Stove state changes rapidly, multiple sources modify thermostat simultaneously, final state unpredictable. Avoid: Debounce stove state changes (2 minutes stable before sync), timestamp-based conflict resolution, user override priority (don't auto-sync for 30 min after manual change)
+6. **Alert Fatigue (CRITICAL)** — 50 notifications/hour from transient issues, user disables all alerts at OS level. Avoid: Alert deduplication (max 1 per 30 min for same issue), only alert on 3+ consecutive failures (not transient), severity-based rate limiting (CRITICAL: 10/hour, ERROR: 5/hour, WARNING: 1/hour)
 
-2. **Service Worker Scope and Registration Timing Issues** (CRITICAL)
-   - Multiple SWs conflict (Serwist + Firebase), wrong scope, MIME type errors
-   - Fix: Merge Firebase handlers into Serwist SW, verify Content-Type, user gesture requirement
-   - Warning signs: 404 on SW registration, text/html MIME type, production vs dev inconsistency
-   - Address: Phase 1 & 2 - fix registration, then merge SWs
-
-3. **iOS PWA Permission State Lies** (HIGH)
-   - Notification.permission returns incorrect state after iOS Settings changes
-   - Fix: Don't trust permission alone, add test notification, monitor delivery failures
-   - Warning signs: Permission granted but delivery fails (iOS only)
-   - Address: Phase 2 - delivery monitoring and test feature
-
-4. **Token Accumulation Without Cleanup** (HIGH)
-   - Existing code has cleanup commented out (lines 483-510), accumulates stale tokens
-   - Fix: Server-side cleanup API with Admin SDK, remove on NotRegistered error, age-based (>90 days)
-   - Warning signs: 10+ tokens per user, increasing send time, high NotRegistered errors
-   - Address: Phase 1 - implement cleanup immediately
-
-5. **No Delivery Monitoring = Silent Failures** (HIGH)
-   - Only tracking FCM send success, not actual delivery or display
-   - Fix: Track Sent/Delivered/Displayed separately, client-side delivery reporting, message ID correlation
-   - Warning signs: "Never received" but server shows "sent successfully", high Sends but low Impressions
-   - Address: Phase 2 - build monitoring before scaling
-
-6. **Ignoring Notification Preferences = Notification Fatigue** (MEDIUM)
-   - Too many notifications lead to OS-level disable, losing critical alert capability
-   - Fix: Conservative defaults (CRITICAL + ERROR only), rate limiting (1 per category per 5 min)
-   - Warning signs: Users disable at OS level shortly after enabling
-   - Address: Phase 2 rate limiting, Phase 3 enhanced preferences
-
-7. **Service Worker Update Conflicts** (MEDIUM)
-   - New SW waits forever if user never closes tabs, causing stale notification handlers
-   - Fix: skipWaiting() with caution, update check on focus, reload prompt to user
-   - Warning signs: "Waiting to activate" SW never activates, different behaviors after deployment
-   - Address: Phase 2 - SW update detection
-
-8. **Multi-Device Synchronization Race Conditions** (MEDIUM)
-   - Device A disables notifications but Device B/C not updated, inconsistent delivery
-   - Fix: Device identification (hash of userAgent), token status field (active/invalid/revoked)
-   - Warning signs: "Works on phone but not tablet", duplicate tokens, race condition errors
-   - Address: Phase 1 device ID, Phase 3 device management UI
+**Moderate pitfalls:** Schedule CRUD without validation (overlapping time slots), polling frequency trade-offs (battery vs responsiveness), multi-room coordination partial failures (some rooms sync, others don't), environment variable confusion (dev vs prod credentials mixed).
 
 ## Implications for Roadmap
 
-Based on research, recommended 4-phase structure prioritizing foundation before features.
+Based on research dependencies and architectural constraints, recommend **5 phases** following backend-first approach. Foundation phases (1-2) establish API infrastructure and monitoring logic independently of UI complexity. Integration phase (3) is the critical risk area where setpoint override semantics must be correct. UI phases (4-5) consume stable backend APIs.
 
-### Phase 1: Token Lifecycle Fixes (FOUNDATION)
-**Rationale:** Critical bug fix - all features depend on reliable token persistence. Research shows this is root cause of current issues.
-
-**Delivers:**
-- Startup token checking (detect existing valid token before requesting new)
-- Token refresh logic (monthly minimum, triggered on app launch if >7 days old)
-- Timestamp tracking (createdAt, lastUsed, lastRefreshed)
-- Stale token cleanup API (remove tokens with lastUsed >90 days)
-- Device identification (hash of userAgent + platform)
-- Token deduplication (check if device already registered)
-
-**Addresses features:**
-- Token Auto-Recovery (table stakes)
-- Invalid Token Cleanup (table stakes)
-- Multi-Device Support foundation (table stakes)
-
-**Avoids pitfalls:**
-- Pitfall 1: FCM Tokens Not Persisting (CRITICAL fix)
-- Pitfall 4: Token Accumulation (implement cleanup commented out in code)
-- Pitfall 8: Multi-Device Race Conditions (add device ID)
-
-**Implementation:**
-- NotificationTokenRepository (extends BaseRepository)
-- NotificationTokenService (business logic)
-- /api/notifications/cleanup route (requires Admin SDK write access)
-- Service worker token refresh listener
-
-**Success criteria:**
-- Token persists across browser restart (manual test)
-- Max 3-5 tokens per user (1 per device type)
-- Token age tracked, cleanup removes >90 day tokens
-- No NotRegistered errors in FCM logs
-
-**Research flag:** STANDARD PATTERNS - Well-documented FCM token management, skip phase research
-
-### Phase 2: Production Infrastructure (MONITORING)
-**Rationale:** Can't scale without visibility. Must detect silent failures before they become widespread.
+### Phase 1: Netatmo Schedule API Infrastructure
+**Rationale:** Backend-first allows testing schedule operations independently of UI complexity. Establishes cache-aside pattern, rate limiting, and token refresh logic that all later phases depend on.
 
 **Delivers:**
-- Notification history storage (Firestore collection)
-- NotificationHistoryService (audit logging)
-- Delivery status tracking (sent/delivered/displayed)
-- Basic monitoring dashboard (admin-only)
-- Test notification feature (user self-verification)
-- Service worker update detection
-- Rate limiting (1 notification per category per 5 minutes)
+- `NetatmoScheduleService` with schedule CRUD operations
+- Firebase caching layer (5-min TTL, invalidation on writes)
+- API routes (`/api/netatmo/schedules/*`) with validation
+- Rate limiter (500 calls/hour tracking with 80% warning)
+- Atomic token refresh with transaction semantics
 
-**Uses from STACK.md:**
-- Firestore for history (better querying than Realtime DB)
-- Recharts for basic delivery charts
-- date-fns for timestamp display
+**Addresses:** Table stakes feature "View current schedule", avoids Pitfall #1 (rate limiting) and Pitfall #3 (token refresh)
 
-**Implements architecture:**
-- NotificationHistoryRepository
-- NotificationHistoryService
-- /api/notifications/history (get user history)
-- /api/notifications/stats (admin metrics)
-- MonitoringPanel component (admin conditional UI)
-- TestPanel component (admin testing tools)
+**Avoids:** Netatmo rate limit violations, token rotation issues, unbatched API calls
 
-**Addresses features:**
-- Basic Delivery Status (table stakes)
-- Error Logging (table stakes)
-- Test Send Capability (table stakes)
-- Stale Token Detection (differentiator)
+**Research Flag:** LOW — Netatmo API well-documented, existing wrapper has all endpoints
 
-**Avoids pitfalls:**
-- Pitfall 5: No Delivery Monitoring (build visibility)
-- Pitfall 3: iOS Permission State Lies (test notification mitigates)
-- Pitfall 6: Notification Fatigue (rate limiting prevents spam)
-- Pitfall 7: Service Worker Update Conflicts (add update detection)
-
-**Success criteria:**
-- All notifications logged to history with delivery result
-- Admin dashboard shows delivery rate (target 85%+)
-- Test notification button works for all users
-- Rate limiting prevents >1 notification per category per 5 minutes
-
-**Research flag:** STANDARD PATTERNS - Firestore queries and monitoring dashboards well-documented
-
-### Phase 3: User Features (UX ENHANCEMENT)
-**Rationale:** Foundation solid, monitoring in place, now enhance user experience and control.
+### Phase 2: Stove Health Monitoring Backend
+**Rationale:** Monitoring logic informs alert UI requirements. Implementing backend first reveals which metrics matter and what alert thresholds make sense before building dashboard.
 
 **Delivers:**
-- Granular preference controls (per notification type)
-- Preference form with validation (React Hook Form + Zod)
-- Notification history UI (user-facing inbox)
-- Active device list (user sees registered devices)
-- Device naming (user labels devices)
-- Pagination for history (infinite scroll)
+- `StoveMonitorService` with health checks, drift detection, connection monitoring
+- Firebase `monitoring/` schema (currentHealth, issues log, cron heartbeat)
+- Cron integration in `/api/scheduler/check` with dead man's switch
+- Alert evaluation logic (deduplication, severity-based rate limiting)
+- Execution logging with heartbeat tracking
 
-**Uses from STACK.md:**
-- React Hook Form + Zod for preferences (shadcn/ui pattern)
-- date-fns for relative timestamps ("2 hours ago")
-- Recharts for user-level charts (optional)
+**Addresses:** Table stakes features (health status, connection monitoring, error history), avoids Pitfall #4 (cron silent failures) and Pitfall #6 (alert fatigue)
 
-**Implements architecture:**
-- HistoryPanel component
-- Enhanced PreferencesPanel
-- Device management UI
-- /api/notifications/preferences updates
+**Avoids:** Silent monitoring failures, notification spam, missing dead man's switch
 
-**Addresses features:**
-- Granular User Preferences (differentiator)
-- Notification History UI (differentiator)
-- Active Device List (differentiator)
-- Device Naming (differentiator)
+**Research Flag:** LOW — Standard monitoring patterns, existing cron infrastructure extends naturally
 
-**Avoids pitfalls:**
-- Pitfall 6: Notification Fatigue (granular controls give user power)
-- Pitfall 8: Multi-Device Synchronization (device management UI)
-
-**Success criteria:**
-- Users can disable specific notification types
-- History shows last 50 notifications with pagination
-- Users can name and remove devices
-- Preferences validated client and server-side (Zod schema)
-
-**Research flag:** STANDARD PATTERNS - React Hook Form + Zod well-documented
-
-### Phase 4: Automation & Polish (OPTIMIZATION)
-**Rationale:** Manual processes work, now automate for hands-off operation.
+### Phase 3: Stove-Thermostat Integration Correction
+**Rationale:** Fix the critical semantic distinction between temporary overrides and schedule modifications. This is the highest-risk phase — getting it wrong corrupts user schedules permanently.
 
 **Delivers:**
-- Scheduled token cleanup (weekly cron)
-- Automated stale token detection job
-- Notification categories (visual grouping)
-- Enhanced monitoring charts
-- Playwright E2E tests for service worker
+- Verify `NetatmoStoveSync.syncLivingRoomWithStove()` uses setpoint override (already correct)
+- Continuous enforcement logic in cron (re-apply overrides if drifted)
+- Debouncing (2 minutes stable stove state before sync)
+- User override detection (manual thermostat changes block auto-sync for 30 min)
+- State machine tracking (idle → pending → synced → user_override)
 
-**Uses from STACK.md:**
-- Playwright for SW testing
-- fcm-push-cli for CI/CD testing (optional)
+**Addresses:** Differentiator feature (stove-thermostat coordination), avoids Pitfall #2 (setpoint vs schedule confusion) and Pitfall #5 (race conditions)
 
-**Implements architecture:**
-- Cron job for cleanup (/api/cron/cleanup-tokens)
-- Automated staleness detection
-- Category filtering in history
-- E2E test suite
+**Avoids:** Permanent schedule corruption, rapid state oscillation, fighting user manual changes
 
-**Addresses features:**
-- Scheduled Token Cleanup (differentiator)
-- Notification Categories (defer-but-easy)
+**Research Flag:** MEDIUM — Existing code already correct but needs verification, debouncing and conflict resolution are novel
 
-**Success criteria:**
-- Cleanup runs weekly automatically
-- E2E tests verify token persistence across browser restart
-- Categories filter history effectively
-- Zero manual intervention needed for token hygiene
+### Phase 4: Schedule Management UI
+**Rationale:** UI depends on stable backend from Phase 1. Focus on read-only display + schedule switching first, defer complex schedule editor to post-MVP.
 
-**Research flag:** STANDARD PATTERNS - Cron jobs and Playwright well-documented
+**Delivers:**
+- `ThermostatScheduleContext` (React Context matching VersionContext pattern)
+- Schedule display components (weekly timetable, zone breakdown)
+- Schedule selector dropdown in ThermostatCard
+- Temporary override form ("Boost to 22°C for 3 hours")
+- Form validation with React Hook Form + Zod
+
+**Addresses:** Table stakes features (view schedule, switch schedule, temporary override)
+
+**Avoids:** Complex schedule editor UI (defer to official Netatmo app)
+
+**Research Flag:** LOW — Standard form patterns, existing v1.0 form components reusable
+
+### Phase 5: Monitoring Dashboard & Alerts UI
+**Rationale:** UI depends on monitoring backend from Phase 2. Dashboard surfaces INFO/WARNING in UI without notifications, alerts trigger for CRITICAL/ERROR only.
+
+**Delivers:**
+- `StoveMonitorBanner` component for health alerts
+- Monitoring history dashboard (execution log, issue timeline)
+- New notification triggers (`triggerStoveConnectionLostServer`, `triggerStoveDriftServer`)
+- Per-room sync status display
+- Cron health visualization (last run, execution duration trends)
+
+**Addresses:** Table stakes features (maintenance alerts, error history), differentiator (unified control dashboard)
+
+**Avoids:** Alert fatigue by surfacing low-severity issues in UI only
+
+**Research Flag:** LOW — Extend existing v1.0 notification system, standard dashboard patterns
 
 ### Phase Ordering Rationale
 
-**Why this order:**
-1. **Phase 1 first:** Token persistence bug is foundational. Without reliable tokens, all features fail. Research shows this is root cause.
-2. **Phase 2 before Phase 3:** Need monitoring to validate Phase 1 fixes working. Can't build user features without knowing delivery is reliable.
-3. **Phase 3 before Phase 4:** Manual processes prove value before automation. User features validated before investing in automation.
-4. **Phase 4 last:** Automation polishes stable system. Safe to automate only after manual processes proven.
-
-**Dependencies identified:**
-- All phases depend on Phase 1 token persistence
-- Phase 3 user history depends on Phase 2 history storage
-- Phase 4 automation depends on Phase 1 cleanup API existing
-- Monitoring (Phase 2) informs preference defaults (Phase 3)
-
-**Architecture alignment:**
-- Phase 1 builds repository + service layer (foundation)
-- Phase 2 builds API routes + admin UI (infrastructure)
-- Phase 3 builds user-facing UI (features)
-- Phase 4 adds automation (optimization)
-
-**Pitfall avoidance:**
-- Phase 1 fixes 3 critical pitfalls before proceeding
-- Phase 2 addresses silent failure risk before scaling
-- Phase 3 prevents notification fatigue with controls
-- Phase 4 eliminates manual toil
+- **Backend-first reduces UI rework risk** — Testing schedule API operations independently (Phase 1) surfaces edge cases before UI is built. Monitoring logic (Phase 2) informs what alerts actually matter.
+- **Critical integration isolated** — Phase 3 focuses solely on setpoint override semantics, the highest-risk area. Separating from UI allows thorough testing of state machine logic.
+- **Dependency chain respected** — Phase 4 (Schedule UI) requires Phase 1 (API infrastructure). Phase 5 (Monitoring UI) requires Phase 2 (Monitoring backend). Integration (Phase 3) is independent and can be parallelized.
+- **MVP scope validated** — Deferring schedule editor to post-MVP (not in phases 1-5) allows validating demand before investing 10-12 hours in complex form UI. Official Netatmo app already provides excellent editor.
 
 ### Research Flags
 
-**Phases with STANDARD PATTERNS (skip phase research):**
-- Phase 1: Token Lifecycle - Firebase token management extensively documented
-- Phase 2: Production Infrastructure - Firestore queries and monitoring dashboards well-covered
-- Phase 3: User Features - React Hook Form + Zod official patterns from shadcn/ui
-- Phase 4: Automation - Cron jobs and Playwright testing well-documented
+**Phases likely needing deeper research:**
+- **Phase 3 (Stove-Thermostat Integration)** — Novel coordination patterns, debouncing and conflict resolution strategies need validation. Existing code appears correct but multi-room atomicity and rollback need research.
 
-**Verdict:** All phases use well-established patterns. No phase needs `/gsd:research-phase` during planning.
+**Phases with standard patterns (skip research-phase):**
+- **Phase 1 (Netatmo API Infrastructure)** — Well-documented API, existing wrapper has all endpoints, cache-aside is standard pattern
+- **Phase 2 (Monitoring Backend)** — Standard monitoring patterns, existing cron infrastructure, Firebase schema is additive
+- **Phase 4 (Schedule UI)** — React Context, React Hook Form, form validation — all standard patterns with v1.0 precedents
+- **Phase 5 (Monitoring UI)** — Dashboard components, notification triggers — extend existing v1.0 notification system
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Existing stack current (verified Jan 2026). New additions from official docs (Firebase, shadcn/ui). Version compatibility verified. |
-| Features | HIGH | Based on Firebase official docs + analysis of 3 major competitors (OneSignal, MoEngage, Braze). Industry benchmarks from multiple sources. |
-| Architecture | HIGH | Patterns align with existing codebase (Repository Pattern verified in code). Firebase FCM architecture from official docs. Scaling guidance from Firebase blog. |
-| Pitfalls | HIGH | Token persistence bug confirmed in existing code. iOS issues documented in Apple Developer Forums. FCM pitfalls from Firebase official best practices. |
+| Stack | HIGH | All technologies verified in current codebase, zero new dependencies needed, existing patterns extend naturally |
+| Features | HIGH | Netatmo official docs + Thermorossi API well-documented, user expectations clear from 2026 Home + Control app research |
+| Architecture | HIGH | Existing v1.0 patterns (repository, cache-aside, fire-and-forget) apply directly, service layer abstraction is standard |
+| Pitfalls | HIGH | Netatmo community discussions reveal consistent failure patterns (rate limiting, token rotation, schedule confusion), documented with official sources |
 
 **Overall confidence:** HIGH
 
-Research based on:
-- Official documentation (Firebase, Apple Developer, MDN) updated Jan 2026
-- Existing codebase analysis (confirmed patterns, identified commented-out cleanup code)
-- Industry best practices (Firebase blog, established PWA patterns)
-- Community validation (GitHub issues, developer forums for iOS-specific issues)
+All four research files are based on verified sources: official Netatmo API documentation, existing codebase analysis (v1.0 implementation patterns), 2026 web research for monitoring best practices, and community issue discussions revealing real-world failure modes. The recommendation to use existing infrastructure (zero new dependencies) is validated by line-by-line analysis of current code showing all necessary capabilities already present.
 
 ### Gaps to Address
 
-No critical gaps requiring resolution before planning. Minor areas needing validation during implementation:
+**Multi-room atomicity during partial failures:** Phase 3 needs research on rollback strategies when 3 rooms configured but API call fails for room #2 after room #1 succeeds. Research suggests batch operations or transaction pattern, but Netatmo API documentation doesn't specify batch endpoints for setpoint operations. **Resolution:** During Phase 3 planning, run `/gsd:research-phase "Multi-room thermostat setpoint coordination"` to investigate Netatmo API batch capabilities and rollback patterns.
 
-**Token refresh frequency:**
-- Research shows "monthly minimum" but doesn't specify optimal cadence
-- Plan: Start with weekly refresh, monitor delivery rate, adjust if needed
-- Validation: Phase 2 monitoring will reveal if weekly sufficient
+**Adaptive polling strategy for background PWA:** Phase 1 recommends 60s foreground / 5min background polling, but iOS PWA background behavior is inconsistent (sometimes stops polling entirely). **Resolution:** Phase 4 implementation should test Page Visibility API behavior on iOS Safari 17+ and adjust polling strategy based on actual background execution patterns.
 
-**iOS PWA permission state:**
-- Research confirms iOS lies about permission state but solutions vary
-- Plan: Implement test notification + delivery monitoring (multi-layered approach)
-- Validation: Phase 2 test panel will confirm if iOS users can self-verify
+**Alert deduplication tuning:** Phase 2 proposes 3+ consecutive failures before alerting, but optimal threshold depends on failure frequency distribution (not available until system runs in production). **Resolution:** Start conservative (3 failures), log alert evaluation decisions to Firebase, adjust threshold based on 7-day production data.
 
-**Service worker merge complexity:**
-- Research shows Serwist + Firebase can coexist but merge preferred
-- Plan: Phase 1 uses coexistence, Phase 2 evaluates merge necessity
-- Validation: If no conflicts in Phase 1, defer merge to Phase 4 polish
-
-**Firestore vs Realtime DB cost:**
-- Research recommends Firestore for history but didn't analyze cost at scale
-- Plan: Start with Firestore, 30-day retention, monitor costs in Phase 2
-- Validation: If costs exceed budget, reduce retention to 7 days
-
-**Rate limiting values:**
-- Research suggests "1 notification per category per 5 minutes" but not validated for this domain
-- Plan: Start conservative (5 min), adjust based on Phase 2 monitoring feedback
-- Validation: User feedback + delivery patterns in Phase 2 will inform tuning
+**Schedule cache invalidation timing:** 5-minute TTL balances freshness vs rate limits, but if user edits schedule in official Netatmo app, PWA shows stale data for up to 5 minutes. **Resolution:** Phase 4 UI should have manual refresh button for schedule list, consider reducing TTL to 2 minutes if rate limit headroom exists after 30-day monitoring.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-
-**Firebase Official Documentation:**
-- [FCM Token Management Best Practices](https://firebase.google.com/docs/cloud-messaging/manage-tokens) - Updated Jan 15, 2026
-- [Understanding Message Delivery](https://firebase.google.com/docs/cloud-messaging/understand-delivery) - Updated Jan 8, 2026
-- [FCM Architectural Overview](https://firebase.google.com/docs/cloud-messaging/fcm-architecture)
-- [Choose a Database: Firestore vs Realtime DB](https://firebase.google.com/docs/database/rtdb-vs-firestore) - Updated Jan 22, 2026
-- [Firestore Data Model](https://firebase.google.com/docs/firestore/data-model) - Updated Jan 22, 2026
-
-**shadcn/ui Official Documentation:**
-- [Chart Component](https://ui.shadcn.com/docs/components/chart) - Recharts integration
-- [React Hook Form Pattern](https://ui.shadcn.com/docs/forms/react-hook-form) - Zod validation
-
-**Apple Developer:**
-- [Sending Web Push Notifications](https://developer.apple.com/documentation/usernotifications/sending-web-push-notifications-in-web-apps-and-browsers)
-
-**MDN Web Docs:**
-- [Re-engageable Notifications and Push APIs](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Tutorials/js13kGames/Re-engageable_Notifications_Push)
+- **Current codebase** (`lib/netatmoApi.js`, `lib/netatmoStoveSync.js`, `/api/scheduler/check/route.js`) — Verified existing implementation patterns, API wrapper functions, service architecture
+- **Netatmo Developer Documentation** (dev.netatmo.com) — Energy API, schedule management endpoints, OAuth flow, rate limiting policies
+- **Vercel Cron Documentation** (vercel.com/docs/cron-jobs) — Serverless cron patterns, function duration limits, secret validation
+- **date-fns v4 Documentation** (date-fns.org) — TZDate timezone support, format functions, v4 migration guide
 
 ### Secondary (MEDIUM confidence)
+- **Netatmo Community Helpcenter** — Rate limiting discussions (error 26), token refresh issues, schedule vs override confusion patterns
+- **Home Assistant Netatmo Integration** (github.com/home-assistant/core) — Issue #158845 on rate limits, community integration patterns
+- **Thermorossi iControl Documentation** — Available monitoring features, error codes, performance metrics
+- **2026 Cron Monitoring Guides** (dev.to, betterstack.com) — Dead man's switch patterns, execution logging, health check endpoints
+- **Smart Home Best Practices** (Energy.gov, SmartHomeWizards) — Thermostat programming patterns, override semantics, alert fatigue reduction
 
-**Firebase Blog:**
-- [Managing Cloud Messaging Tokens](https://firebase.blog/posts/2023/04/managing-cloud-messaging-tokens/) - Token lifecycle patterns
-- [Understanding FCM Delivery Rates](https://firebase.blog/posts/2024/07/understand-fcm-delivery-rates/) - Android delivery metrics
-
-**Industry Guides:**
-- [Scalable Notification System for PWA Using FCM](https://amal-krishna.medium.com/scalable-notification-system-for-a-pwa-using-fcm-6a4b8aa093af) - Architecture patterns
-- [How To Build Robust Push Notifications for PWAs](https://yundrox.dev/posts/claritybox/how-to-build-robust-pwa-push-notification/) - Best practices
-- [Push Notification Metrics: Measuring ROI](https://www.moengage.com/blog/push-notification-metrics/) - Industry benchmarks (4.6% Android, 3.4% iOS open rates)
-
-**Community Patterns:**
-- [Lifecycle of FCM Device Tokens](https://medium.com/@chunilalkukreja/lifecycle-of-fcm-device-tokens-61681bb6fbcf) - Token lifecycle
-- [Firebase Push Tokens Are Device-Specific](https://dev.to/sangwoo_rhie/firebase-push-tokens-are-device-specific-not-user-specific-a-critical-refactoring-ppi) - Critical concept validation
-
-### Tertiary (LOW confidence, used for validation only)
-
-**Testing Tools:**
-- [FCM Test Online](https://fcmtest.com/) - Manual testing
-- [fcm-push-cli on GitHub](https://github.com/tastydev/fcm-push-cli) - CLI testing
-
-**Known Issues (GitHub/Forums):**
-- [FCM Push notifications stop working on PWA](https://developer.apple.com/forums/thread/745759) - Apple Developer Forums (iOS bug)
-- [Firebase Service Worker Registration Issues](https://github.com/firebase/flutterfire/issues/12586) - GitHub (MIME type errors)
-- [PWA Notification Permission Not Persistent on iOS](https://github.com/odoo/odoo/issues/165822) - GitHub (iOS permission state bug)
-
-### Existing Codebase Analysis
-
-**Files examined:**
-- lib/notificationService.js (lines 24-26: VAPID key loading, lines 211-214: dev mode SW handling, lines 290-292: device fingerprinting)
-- app/api/notifications/register/route.js (lines 483-510: commented-out cleanup code requiring Admin SDK migration)
-- Current patterns: Repository Pattern (StoveStateRepository, MaintenanceRepository), filterUndefined for Firebase writes, withAuthAndErrorHandler for API routes
+### Tertiary (LOW confidence — needs validation)
+- **Distributed systems race condition patterns** (Medium articles) — Timestamp-based conflict resolution, state machine approaches
+- **IoT monitoring trends** (UptimeRobot, Netdata blogs) — 2026 monitoring patterns, polling vs webhooks trade-offs
 
 ---
-
-*Research completed: 2026-01-23*
-*Ready for roadmap: YES*
-*Next step: Roadmapper agent can use this summary to structure milestone phases*
+*Research completed: 2026-01-26*
+*Ready for roadmap: yes*
+*Total research files synthesized: 4 (STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md)*

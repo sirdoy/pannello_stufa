@@ -84,12 +84,34 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
+| SCHED-01 | Phase 6, 9 | Pending |
+| SCHED-02 | Phase 6, 9 | Pending |
+| SCHED-03 | Phase 9 | Pending |
+| SCHED-04 | Phase 6 | Pending |
+| SCHED-05 | Phase 6 | Pending |
+| SCHED-06 | Phase 6 | Pending |
+| INTEG-01 | Phase 8 | Pending |
+| INTEG-02 | Phase 8 | Pending |
+| INTEG-03 | Phase 8 | Pending |
+| INTEG-04 | Phase 8 | Pending |
+| INTEG-05 | Phase 8 | Pending |
+| MONITOR-01 | Phase 7, 10 | Pending |
+| MONITOR-02 | Phase 7 | Pending |
+| MONITOR-03 | Phase 7 | Pending |
+| MONITOR-04 | Phase 7, 10 | Pending |
+| MONITOR-05 | Phase 7, 10 | Pending |
+| INFRA-01 | Phase 6 | Pending |
+| INFRA-02 | Phase 6 | Pending |
+| INFRA-03 | Phase 7 | Pending |
+| INFRA-04 | Phase 7 | Pending |
+| INFRA-05 | Phase 7 | Pending |
+| INFRA-06 | Phase 8 | Pending |
 
 **Coverage:**
-- v2.0 requirements: 21 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 21 ⚠️
+- v2.0 requirements: 22 total
+- Mapped to phases: 22 (100%)
+- Unmapped: 0 ✅
 
 ---
 *Requirements defined: 2026-01-26*
-*Last updated: 2026-01-26 after initial definition*
+*Last updated: 2026-01-26 after roadmap creation*

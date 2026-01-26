@@ -10,7 +10,7 @@ import { Page } from '@playwright/test';
 /**
  * Clear IndexedDB database
  */
-export async function clearIndexedDB(page: Page, dbName: string = 'DeviceRegistry'): Promise<void> {
+export async function clearIndexedDB(page: Page, dbName: string = 'fcmTokenDB'): Promise<void> {
   await page.evaluate((name) => {
     return indexedDB.deleteDatabase(name);
   }, dbName);
@@ -22,13 +22,21 @@ export async function clearIndexedDB(page: Page, dbName: string = 'DeviceRegistr
 export async function getTokenFromIndexedDB(page: Page): Promise<string | null> {
   return await page.evaluate(async () => {
     try {
-      // Import Dexie database
-      const { db } = await import('/lib/db.js');
+      // Open fcmTokenDB database (as per Plan 05-03 Decision #1)
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const request = indexedDB.open('fcmTokenDB');
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
 
-      // Get the first device (or last device)
-      const device = await db.devices.orderBy('id').last();
-
-      return device?.fcmToken || null;
+      // Get current token from 'tokens' object store
+      return new Promise<string | null>((resolve) => {
+        const tx = db.transaction('tokens', 'readonly');
+        const store = tx.objectStore('tokens');
+        const getRequest = store.get('current');
+        getRequest.onsuccess = () => resolve(getRequest.result?.token || null);
+        getRequest.onerror = () => resolve(null);
+      });
     } catch (error) {
       console.error('Error reading from IndexedDB:', error);
       return null;
@@ -42,9 +50,19 @@ export async function getTokenFromIndexedDB(page: Page): Promise<string | null> 
 export async function getDeviceIdFromIndexedDB(page: Page): Promise<string | null> {
   return await page.evaluate(async () => {
     try {
-      const { db } = await import('/lib/db.js');
-      const device = await db.devices.orderBy('id').last();
-      return device?.deviceId || null;
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const request = indexedDB.open('fcmTokenDB');
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+
+      return new Promise<string | null>((resolve) => {
+        const tx = db.transaction('tokens', 'readonly');
+        const store = tx.objectStore('tokens');
+        const getRequest = store.get('current');
+        getRequest.onsuccess = () => resolve(getRequest.result?.deviceId || null);
+        getRequest.onerror = () => resolve(null);
+      });
     } catch (error) {
       console.error('Error reading device ID from IndexedDB:', error);
       return null;
@@ -67,15 +85,26 @@ export async function verifyTokenPersistence(
 }
 
 /**
- * Get all devices from IndexedDB
+ * Get all tokens from IndexedDB
  */
-export async function getAllDevices(page: Page): Promise<any[]> {
+export async function getAllTokens(page: Page): Promise<any[]> {
   return await page.evaluate(async () => {
     try {
-      const { db } = await import('/lib/db.js');
-      return await db.devices.toArray();
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const request = indexedDB.open('fcmTokenDB');
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+
+      return new Promise<any[]>((resolve) => {
+        const tx = db.transaction('tokens', 'readonly');
+        const store = tx.objectStore('tokens');
+        const getAllRequest = store.getAll();
+        getAllRequest.onsuccess = () => resolve(getAllRequest.result || []);
+        getAllRequest.onerror = () => resolve([]);
+      });
     } catch (error) {
-      console.error('Error reading all devices from IndexedDB:', error);
+      console.error('Error reading all tokens from IndexedDB:', error);
       return [];
     }
   });

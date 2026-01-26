@@ -11,7 +11,8 @@
  *   template?: string,         // Template name
  *   customTitle?: string,      // Custom title (overrides template)
  *   customBody?: string,       // Custom body (overrides template)
- *   broadcast?: boolean        // Send to all devices
+ *   broadcast?: boolean,       // Send to all devices
+ *   priority?: string          // Priority override (high, normal, low)
  * }
  */
 
@@ -51,10 +52,10 @@ const TEMPLATES = {
     priority: 'high',
     type: 'CRITICAL' // Phase 3 type name - bypasses DND
   },
-  status_test: {
-    title: 'ℹ️ Test Status',
-    body: 'Notifica Status di test - categoria Routine (disabled by default)',
-    priority: 'normal',
+  low_priority_test: {
+    title: 'ℹ️ Test LOW Priority',
+    body: 'Notifica LOW priority di test - subject to all rate limits',
+    priority: 'low',
     type: 'status' // Phase 3 type name - Routine category
   }
 };
@@ -70,7 +71,7 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
 
   // Parse optional body (empty object if no body)
   const body = await parseJson(request, {});
-  const { deviceToken, template, customTitle, customBody, broadcast } = body;
+  const { deviceToken, template, customTitle, customBody, broadcast, priority } = body;
 
   // Build notification from template or custom values
   let notificationConfig;
@@ -89,15 +90,20 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
   }
 
   // Custom title/body override template
+  // Priority from request overrides template
+  const finalPriority = priority || notificationConfig.priority;
+
   const notification = {
     title: customTitle || notificationConfig.title,
     body: customBody || notificationConfig.body,
     icon: '/icons/icon-192.png',
-    priority: notificationConfig.priority,
+    priority: finalPriority,
     data: {
       type: notificationConfig.type,
+      priority: finalPriority, // Include in data for filtering
       url: '/settings/notifications',
       timestamp: sentAt,
+      isTest: true // Mark as test notification for history filtering
     },
   };
 

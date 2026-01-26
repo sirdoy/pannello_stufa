@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-23)
 
 **Core value:** Dispositivi riconosciuti automaticamente dopo riavvio browser, notifiche arrivano sempre (100% delivery rate).
-**Current focus:** Phase 4 - Notification History & Devices
+**Current focus:** Phase 5 - Automation & Testing
 
 ## Current Position
 
-Phase: 4 of 5 (Notification History & Devices)
-Plan: 5 of 5 (Integration and Verification Checkpoint)
-Status: Complete
-Last activity: 2026-01-26 - Completed 04-05-PLAN.md (Phase 4 Verification)
+Phase: 5 of 5 (Automation & Testing)
+Plan: 2 of 6 (HMAC-Secured Cron Webhook)
+Status: In progress
+Last activity: 2026-01-26 - Completed 05-02-PLAN.md
 
-Progress: [███████████████████████████████████████████████████████████████░] 24/24 (100%)
+Progress: [██████████████████████████████████████████████████████████████████░░] 26/30 (87%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 24
-- Average duration: 5.3 min
-- Total execution time: 2.12 hours
+- Total plans completed: 26
+- Average duration: 5.1 min
+- Total execution time: 2.22 hours
 
 **By Phase:**
 
@@ -31,15 +31,17 @@ Progress: [███████████████████████
 | 2 | 7 | 26.9 min | 3.8 min |
 | 3 | 6 | 34.0 min | 5.7 min |
 | 4 | 5 | 17.5 min | 3.5 min |
+| 5 | 2 | 6.1 min | 3.0 min |
 
 **Recent Trend:**
-- Last plan: 04-05 (2.5 min - Phase 4 Verification)
-- Previous: 04-04 (3.0 min), 04-03 (5.5 min), 04-02 (3.0 min)
-- Trend: Phase 4 complete with excellent velocity - 3.5 min avg (fastest phase)
+- Last plan: 05-02 (2.1 min - HMAC Cron Webhook)
+- Previous: 05-01 (4.0 min - Playwright Setup), 04-05 (2.5 min), 04-04 (3.0 min)
+- Trend: Phase 5 trending fast - 3.0 min avg (matching Phase 4 pace)
 
 **Phase 2 Complete:** All 7 plans executed (including gap closure), 51/51 must-haves verified (100%) ✅
 **Phase 3 Complete:** All 6 plans executed, 5/5 success criteria technically verified, goal achieved ✅
 **Phase 4 Complete:** All 5 plans executed, 5/5 success criteria verified, notification history and device management operational ✅
+**Phase 5 In Progress:** 2/6 plans complete (33%), Playwright installed, HMAC webhook created
 
 *Updated after each plan completion*
 
@@ -132,11 +134,18 @@ Recent decisions affecting current work:
 - **Plan 04-03:** Max 200 notifications to prevent memory issues (per RESEARCH.md Pitfall #3)
 - **Plan 04-03:** Filter changes reset list and cursor for clean state
 - **Plan 04-03:** Italian locale (it from date-fns) for relative timestamps
+- **Plan 05-01:** Use Playwright 1.58+ with Next.js integration for E2E testing
+- **Plan 05-01:** Configure 4-shard matrix in GitHub Actions for parallel execution (<5 min budget)
+- **Plan 05-02:** Use HMAC-SHA256 signature verification for webhook security (more appropriate than Bearer token)
+- **Plan 05-02:** Pre-compute HMAC signature for static body '{}' (cron-job.org limitation)
+- **Plan 05-02:** Use crypto.timingSafeEqual for signature comparison (prevents timing attacks)
 
 ### Pending Todos
 
-- User must run `npm install` to install new dependencies (react-hook-form, zod, @hookform/resolvers)
+- User must run `npm install` to install new dependencies (react-hook-form, zod, @hookform/resolvers, @playwright/test)
 - **Deploy Firestore indexes** for Phase 4: Run `firebase deploy --only firestore:indexes` OR wait for auto-creation via console link
+- **Configure cron-job.org**: Follow `docs/cron-cleanup-setup.md` to set up weekly token cleanup
+- **Set CRON_WEBHOOK_SECRET**: Add environment variable to Vercel for webhook security
 
 ### Blockers/Concerns
 
@@ -157,28 +166,36 @@ Recent decisions affecting current work:
   - Consider adding TTL policy in future plan for automatic deletion
   - Current implementation safe with manual query filtering
 
+**Phase 5 Status:**
+- ✅ Playwright 1.58 installed and configured with Next.js integration
+- ✅ HMAC-secured webhook endpoint created at /api/cron/cleanup-tokens
+- ⚠️ **Cron-job.org not configured**: User must manually set up weekly cron job (documented in setup guide)
+- ⚠️ **CRON_WEBHOOK_SECRET not set**: User must add to Vercel environment variables before webhook works
+
 **Technical Debt:**
 - Firestore client writes disabled (using API workaround) - should add security rules for production
 - No Firestore TTL policy configured (manual cleanup or Phase 5 enhancement)
 - Firestore indexes need deployment for optimal query performance
+- Pre-computed HMAC signature requires manual regeneration if secret rotates
 
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 04-05-PLAN.md (Phase 4 Verification)
-Resume file: None (phase complete)
+Stopped at: Completed 05-02-PLAN.md (HMAC-Secured Cron Webhook)
+Resume file: None
 Commits in this session:
-- 060e506: test(04-05): verify Phase 4 API endpoints structure
-- Documentation updates pending
+- 4c363ff: feat(05-02): create HMAC-secured cron webhook endpoint
+- 2ea5d73: docs(05-02): document CRON_WEBHOOK_SECRET environment variable
+- 5923a4e: docs(05-02): create cron cleanup setup documentation
 
 **Next Steps:**
-1. **Phase 4 Complete** - All success criteria verified ✅
-2. Optional: Deploy Firestore indexes: `firebase deploy --only firestore:indexes`
-3. Optional: Add Firestore TTL policy for automatic 90-day cleanup
-4. Ready for Phase 5: Automation & Testing
+1. **Phase 5 Progress: 2/6 plans complete** (33%)
+2. User must configure cron-job.org (follow `docs/cron-cleanup-setup.md`)
+3. User must set CRON_WEBHOOK_SECRET in Vercel environment variables
+4. Ready for Plan 05-03: Core E2E Tests (token persistence, service worker lifecycle)
 5. Features available:
-   - `/settings/notifications/history` - Notification history with infinite scroll
-   - `/settings/notifications/devices` - Device management with naming/removal
+   - `/api/cron/cleanup-tokens` - HMAC-secured webhook for automated token cleanup
+   - Documentation: `docs/cron-cleanup-setup.md` - Complete setup guide
 
 ---
-*Next step: Begin Phase 5 planning (Automation & Testing)*
+*Next step: Plan 05-03 - Core E2E Tests (token persistence, service worker lifecycle)*

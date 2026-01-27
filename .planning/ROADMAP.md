@@ -118,11 +118,14 @@ Plans:
   3. System applies 2-minute debouncing before triggering setpoint override (avoid rapid cycles)
   4. Multi-room thermostat zones coordinate properly when stove is active
   5. Alert deduplication prevents notification spam (max 1 per alert type per 30 minutes)
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 08-01: TBD
-- [ ] 08-02: TBD
+- [ ] 08-01: Coordination state service and user preferences with Zod schema
+- [ ] 08-02: Debounce timer and global notification throttle services
+- [ ] 08-03: User intent detection and schedule-aware pause calculation
+- [ ] 08-04: Coordination orchestrator and enhanced netatmoStoveSync
+- [ ] 08-05: Cron endpoint and Firestore event logging
 
 #### Phase 9: Schedule Management UI
 **Goal**: User interface for viewing, switching schedules, and creating temporary overrides
@@ -168,6 +171,6 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10
 | 5. Automation & Testing | v1.0 | 5/5 | Complete | 2026-01-26 |
 | 6. Netatmo Schedule API Infrastructure | v2.0 | 3/3 | Complete | 2026-01-27 |
 | 7. Stove Health Monitoring Backend | v2.0 | 2/2 | Complete | 2026-01-27 |
-| 8. Stove-Thermostat Integration Correction | v2.0 | 0/TBD | Not started | - |
+| 8. Stove-Thermostat Integration Correction | v2.0 | 0/5 | Not started | - |
 | 9. Schedule Management UI | v2.0 | 0/TBD | Not started | - |
 | 10. Monitoring Dashboard & Alerts UI | v2.0 | 0/TBD | Not started | - |

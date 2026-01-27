@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-26)
 ## Current Position
 
 Phase: 8 of 10 (Stove-Thermostat Integration Correction)
-Plan: 1 of 4 complete
+Plan: 3 of 5 complete
 Status: In progress
-Last activity: 2026-01-27 — Completed 08-01-PLAN.md (foundation infrastructure)
+Last activity: 2026-01-27 — Completed 08-03-PLAN.md (user intent detection and pause calculator)
 
-Progress: [████████░░░░░░░░░░░░] 37/TBD plans complete (v1.0: 29 plans, v2.0: 8 plans)
+Progress: [████████░░░░░░░░░░░░] 39/TBD plans complete (v1.0: 29 plans, v2.0: 10 plans)
 
 ## Performance Metrics
 
@@ -39,13 +39,16 @@ Progress: [████████░░░░░░░░░░░░] 37/TBD 
 |-------|-------|-------|----------|
 | 6. Netatmo Schedule API | 3/3 | 16.0 min | 5.3 min |
 | 7. Health Monitoring Backend | 2/2 | 9.0 min | 4.5 min |
-| 8. Stove-Thermostat Integration | 1/4 | 5.4 min | 5.4 min |
+| 8. Stove-Thermostat Integration | 3/5 | 14.7 min | 4.9 min |
 
 **Recent Trend:**
 - v1.0 completed successfully with consistent velocity
 - v2.0 Phase 6 COMPLETE: 3 plans in 16 minutes (5.3 min/plan average)
 - v2.0 Phase 7 COMPLETE: 2 plans in 9 minutes (4.5 min/plan average)
-- v2.0 Phase 8 IN PROGRESS: 1 plan in 5.4 minutes (foundation infrastructure)
+- v2.0 Phase 8 IN PROGRESS: 3 plans in 14.7 minutes (4.9 min/plan average)
+  - 08-01: 5.4 min (foundation infrastructure)
+  - 08-02: 4.6 min (notification throttle)
+  - 08-03: 4.7 min (user intent and pause calculator)
 
 ## Accumulated Context
 
@@ -80,6 +83,14 @@ Recent decisions affecting current work:
 - v2.0 (08-01): Preferences stored at coordination/preferences/{userId} (per-user configuration)
 - v2.0 (08-01): Boost range constrained to 0.5-5°C with default 2°C (sensible heating adjustments)
 - v2.0 (08-01): Version tracking on preferences enables conflict detection across devices
+- v2.0 (08-02): 2-minute debounce for stove ON events (prevents premature coordination)
+- v2.0 (08-02): 30-second retry timer for early shutoff (handles quick stove restarts)
+- v2.0 (08-02): Global 30-minute notification throttle across ALL coordination events (not per-type like rateLimiter.js)
+- v2.0 (08-02): In-memory timer storage (timers don't persist across restarts, but pendingDebounce flag does)
+- v2.0 (08-03): 0.5°C setpoint tolerance prevents false positives from Netatmo API rounding
+- v2.0 (08-03): Pause until next schedule slot (not fixed duration) respects user workflow
+- v2.0 (08-03): Non-standard modes (away, hg, off) always indicate user intent
+- v2.0 (08-03): UTC timestamps for schedule calculations match Netatmo API convention
 
 ### Pending Todos
 
@@ -106,8 +117,8 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-01-27T13:26:00Z
-Stopped at: Completed 08-01-PLAN.md (foundation infrastructure)
+Last session: 2026-01-27T13:33:36Z
+Stopped at: Completed 08-02-PLAN.md (coordination logic services)
 Resume file: None
 
-**Next action:** Execute 08-02-PLAN.md (coordination logic service)
+**Next action:** Execute 08-03-PLAN.md (coordination logic implementation)

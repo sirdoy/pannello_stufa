@@ -2,13 +2,13 @@
 
 ## Milestones
 
-- ✅ **v1.0 Push Notifications System** - Phases 1-5 (shipped 2026-01-26)
-- 🚧 **v2.0 Netatmo Complete Control & Stove Monitoring** - Phases 6-10 (in progress)
+- **v1.0 Push Notifications System** - Phases 1-5 (shipped 2026-01-26)
+- **v2.0 Netatmo Complete Control & Stove Monitoring** - Phases 6-10 (in progress)
 
 ## Phases
 
 <details>
-<summary>✅ v1.0 Push Notifications System (Phases 1-5) - SHIPPED 2026-01-26</summary>
+<summary>v1.0 Push Notifications System (Phases 1-5) - SHIPPED 2026-01-26</summary>
 
 ### Phase 1: Token Management & Persistence
 **Goal**: Token FCM persiste automaticamente dopo chiusura browser
@@ -71,7 +71,7 @@ Plans:
 
 </details>
 
-### 🚧 v2.0 Netatmo Complete Control & Stove Monitoring (In Progress)
+### v2.0 Netatmo Complete Control & Stove Monitoring (In Progress)
 
 **Milestone Goal:** Controllo completo del termostato Netatmo con gestione schedule settimanali e monitoring automatico della stufa per rilevare anomalie.
 
@@ -137,11 +137,14 @@ Plans:
   2. User can switch between pre-configured schedules via dropdown selector
   3. User can create temporary override (manual boost) with duration picker (5 min to 12 hours)
   4. Schedule UI clearly distinguishes between permanent schedules and temporary overrides
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 09-01: TBD
-- [ ] 09-02: TBD
+- [ ] 09-01-PLAN.md — Schedule data hooks and helper utilities
+- [ ] 09-02-PLAN.md — Weekly timeline visualization component
+- [ ] 09-03-PLAN.md — Schedule page and selector dropdown
+- [ ] 09-04-PLAN.md — Manual override bottom sheet with duration/temperature pickers
+- [ ] 09-05-PLAN.md — Active override badge and navigation integration
 
 #### Phase 10: Monitoring Dashboard & Alerts UI
 **Goal**: Dashboard for stove health status with visual indicators and push notification alerts
@@ -173,5 +176,5 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10
 | 6. Netatmo Schedule API Infrastructure | v2.0 | 3/3 | Complete | 2026-01-27 |
 | 7. Stove Health Monitoring Backend | v2.0 | 2/2 | Complete | 2026-01-27 |
 | 8. Stove-Thermostat Integration Correction | v2.0 | 6/6 | Complete | 2026-01-27 |
-| 9. Schedule Management UI | v2.0 | 0/TBD | Not started | - |
+| 9. Schedule Management UI | v2.0 | 0/5 | Planned | - |
 | 10. Monitoring Dashboard & Alerts UI | v2.0 | 0/TBD | Not started | - |

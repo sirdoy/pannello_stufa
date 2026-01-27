@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-26)
 ## Current Position
 
 Phase: 9 of 10 (Schedule Management UI) — IN PROGRESS
-Plan: 1 of 4 complete
+Plan: 2 of 4 complete
 Status: In progress
-Last activity: 2026-01-27 — Completed 09-01-PLAN.md (schedule data hooks & helpers)
+Last activity: 2026-01-27 — Completed 09-02-PLAN.md (weekly timeline visualization)
 
-Progress: [█████████░░░░░░░░░░░] 43/TBD plans complete (v1.0: 29 plans, v2.0: 14 plans)
+Progress: [█████████░░░░░░░░░░░] 44/TBD plans complete (v1.0: 29 plans, v2.0: 15 plans)
 
 ## Performance Metrics
 
@@ -40,7 +40,7 @@ Progress: [█████████░░░░░░░░░░░] 43/TBD 
 | 6. Netatmo Schedule API | 3/3 | 16.0 min | 5.3 min |
 | 7. Health Monitoring Backend | 2/2 | 9.0 min | 4.5 min |
 | 8. Stove-Thermostat Integration | 6/6 | 30.6 min | 5.1 min |
-| 9. Schedule Management UI | 1/4 | 12.0 min | 12.0 min |
+| 9. Schedule Management UI | 2/4 | 14.2 min | 7.1 min |
 
 **Recent Trend:**
 - v1.0 completed successfully with consistent velocity
@@ -110,6 +110,10 @@ Recent decisions affecting current work:
 - v2.0 (09-01): m_offset parsed as minutes from Monday 00:00, not per-day (Netatmo week-based offset)
 - v2.0 (09-01): Cyan-yellow-red gradient for colorblind accessibility (avoids red-green confusion)
 - v2.0 (09-01): Hook tests follow project pattern (module structure verification, not full integration)
+- v2.0 (09-02): Horizontal scroll for timeline (not vertical) - better mobile UX for day-view scanning
+- v2.0 (09-02): Temperature text always visible - accessibility over aesthetics
+- v2.0 (09-02): 40px minimum slot width - WCAG 2.1 touch target compliance
+- v2.0 (09-02): Memoized parseTimelineSlots - prevents re-renders on scroll
 
 ### Pending Todos
 
@@ -130,7 +134,7 @@ Recent decisions affecting current work:
 - ✅ Phase 6 (Netatmo Schedule API): COMPLETE - 3 plans
 - ✅ Phase 7 (Health Monitoring Backend): COMPLETE - 2 plans
 - ✅ Phase 8 (Stove-Thermostat Integration): COMPLETE - 6 plans
-- 🟡 Phase 9 (Schedule Management UI): IN PROGRESS - 1/4 plans complete
+- 🟡 Phase 9 (Schedule Management UI): IN PROGRESS - 2/4 plans complete
 - 🔜 Phase 10 (Deployment & Documentation): FINAL
 
 **v2.0 Research Flags:**
@@ -144,7 +148,7 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 09-01-PLAN.md (schedule data hooks & helpers)
+Stopped at: Completed 09-02-PLAN.md (weekly timeline visualization)
 Resume file: None
 
-**Next action:** Continue Phase 9 with 09-02-PLAN.md (weekly timeline UI component)
+**Next action:** Continue Phase 9 with 09-03-PLAN.md (schedule switcher UI)

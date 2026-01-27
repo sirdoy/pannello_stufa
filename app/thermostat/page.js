@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Card, Button, Skeleton, ErrorAlert, Banner, Heading, Text } from '@/app/components/ui';
 import RoomCard from '@/app/components/netatmo/RoomCard';
 import BatteryWarning, { ModuleBatteryList } from '@/app/components/devices/thermostat/BatteryWarning';
 import StoveSyncPanel from '@/app/components/netatmo/StoveSyncPanel';
 import { NETATMO_ROUTES } from '@/lib/routes';
+import { Calendar } from 'lucide-react';
 
 function NetatmoContent() {
   const searchParams = useSearchParams();
@@ -402,6 +404,35 @@ function NetatmoContent() {
             </button>
           </div>
         </div>
+      </Card>
+
+      {/* Schedule Management Link */}
+      <Card variant="glass" className="p-5 sm:p-6 mb-6">
+        <Link
+          href="/schedule"
+          className="flex items-center justify-between group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="
+              w-10 h-10 rounded-xl
+              bg-ember-500/20 flex items-center justify-center
+              group-hover:bg-ember-500/30 transition-colors
+            ">
+              <Calendar className="text-ember-400" size={20} />
+            </div>
+            <div>
+              <Heading level={3} size="lg">
+                Programmazione
+              </Heading>
+              <Text variant="secondary" size="sm">
+                Visualizza e gestisci le programmazioni settimanali
+              </Text>
+            </div>
+          </div>
+          <Button variant="ghost" size="sm" className="group-hover:text-ember-400">
+            Apri →
+          </Button>
+        </Link>
       </Card>
 
       {/* Stove-Thermostat Sync Configuration */}

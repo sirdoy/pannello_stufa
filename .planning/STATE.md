@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-26)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 8 - Stove-Thermostat Integration Correction (COMPLETE)
+**Current focus:** Phase 9 - Schedule Management UI (COMPLETE)
 
 ## Current Position
 
 Phase: 9 of 10 (Schedule Management UI) — COMPLETE
-Plan: 4 of 4 complete
-Status: Phase complete
-Last activity: 2026-01-27 — Completed 09-04-PLAN.md (manual override UI)
+Plan: 5 of 5 complete
+Status: Phase complete, ready for Phase 10 (Deployment)
+Last activity: 2026-01-27 — Completed 09-05-PLAN.md (active override badge & navigation)
 
-Progress: [█████████░░░░░░░░░░░] 46/TBD plans complete (v1.0: 29 plans, v2.0: 17 plans)
+Progress: [█████████░░░░░░░░░░░] 47/TBD plans complete (v1.0: 29 plans, v2.0: 18 plans)
 
 ## Performance Metrics
 
@@ -40,7 +40,7 @@ Progress: [█████████░░░░░░░░░░░] 46/TBD 
 | 6. Netatmo Schedule API | 3/3 | 16.0 min | 5.3 min |
 | 7. Health Monitoring Backend | 2/2 | 9.0 min | 4.5 min |
 | 8. Stove-Thermostat Integration | 6/6 | 30.6 min | 5.1 min |
-| 9. Schedule Management UI | 4/4 | 22.6 min | 5.7 min |
+| 9. Schedule Management UI | 5/5 | 30.6 min | 6.1 min |
 
 **Recent Trend:**
 - v1.0 completed successfully with consistent velocity
@@ -53,11 +53,12 @@ Progress: [█████████░░░░░░░░░░░] 46/TBD 
   - 08-04: 3.8 min (boost mode and setpoint restoration)
   - 08-04b: 6.4 min (coordination orchestrator)
   - 08-05: 5.7 min (cron endpoint and event logging)
-- v2.0 Phase 9 COMPLETE: 4 plans in 22.6 minutes (5.7 min/plan average)
+- v2.0 Phase 9 COMPLETE: 5 plans in 30.6 minutes (6.1 min/plan average)
   - 09-01: 5.8 min (schedule data hooks & helpers)
   - 09-02: 7.1 min (weekly timeline visualization)
   - 09-03: 4.3 min (schedule switcher UI)
   - 09-04: 5.4 min (manual override UI)
+  - 09-05: 8.0 min (active override badge & navigation)
 
 ## Accumulated Context
 
@@ -127,6 +128,9 @@ Recent decisions affecting current work:
 - v2.0 (09-04): Auto-select first room and pre-fill current setpoint for UX
 - v2.0 (09-04): Success feedback (1.5s) before sheet closes
 - v2.0 (09-04): endtime calculated in SECONDS (not milliseconds) per Netatmo API
+- v2.0 (09-05): Tap badge opens confirmation dialog (prevents accidental cancellation)
+- v2.0 (09-05): homestatus API enhanced to include endtime field (badge shows remaining time)
+- v2.0 (09-05): Schedule link before StoveSyncPanel (logical grouping: schedule → sync → rooms)
 
 ### Pending Todos
 
@@ -147,7 +151,7 @@ Recent decisions affecting current work:
 - ✅ Phase 6 (Netatmo Schedule API): COMPLETE - 3 plans
 - ✅ Phase 7 (Health Monitoring Backend): COMPLETE - 2 plans
 - ✅ Phase 8 (Stove-Thermostat Integration): COMPLETE - 6 plans
-- ✅ Phase 9 (Schedule Management UI): COMPLETE - 4 plans
+- ✅ Phase 9 (Schedule Management UI): COMPLETE - 5 plans
 - 🔜 Phase 10 (Deployment & Documentation): FINAL
 
 **v2.0 Research Flags:**
@@ -161,7 +165,7 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 09-04-PLAN.md (manual override UI)
+Stopped at: Completed 09-05-PLAN.md (active override badge & navigation)
 Resume file: None
 
-**Next action:** Begin Phase 10 (Deployment & Documentation)
+**Next action:** Phase 9 COMPLETE. Ready for Phase 10 (Deployment & Documentation)

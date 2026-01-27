@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-26)
 ## Current Position
 
 Phase: 6 of 10 (Netatmo Schedule API Infrastructure)
-Plan: Ready to plan Phase 6
-Status: Ready to plan
-Last activity: 2026-01-26 — v2.0 roadmap created, ready to start Phase 6
+Plan: 2 of 3 (Rate Limiter) — COMPLETE
+Status: In progress
+Last activity: 2026-01-27 — Completed 06-02-PLAN.md (Rate Limiter)
 
-Progress: [██████░░░░░░░░░░░░░░] 29/TBD plans complete (v1.0 shipped: 29 plans, v2.0: TBD)
+Progress: [██████░░░░░░░░░░░░░░] 31/TBD plans complete (v1.0: 29 plans, v2.0: 2 plans)
 
 ## Performance Metrics
 
@@ -33,11 +33,15 @@ Progress: [██████░░░░░░░░░░░░░░] 29/TBD 
 | 4. History & Device Mgmt | 5 | 17.5 min | 3.5 min |
 | 5. Automation & Testing | 5 | 14.3 min | 4.8 min |
 
+**v2.0 Progress (Phase 6):**
+
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| 6. Netatmo Schedule API | 2/3 | 7.0 min | 3.5 min |
+
 **Recent Trend:**
 - v1.0 completed successfully with consistent velocity
-- Ready to begin v2.0 execution
-
-*Metrics will be updated as v2.0 phases execute*
+- v2.0 execution: Phase 6 Plans 1-2 complete, averaging 3.5 min/plan
 
 ## Accumulated Context
 
@@ -53,6 +57,8 @@ Recent decisions affecting current work:
 - v2.0: Backend-first approach recommended (establish APIs before UI)
 - v2.0: Temporary setpoint overrides (not schedule modifications) for stove-thermostat coordination
 - v2.0: Zero new npm dependencies - existing v1.0 stack handles all requirements
+- v2.0 (06-01): 5-minute TTL balances schedule freshness with API rate limit prevention (500 calls/hour)
+- v2.0 (06-01): Timestamp-based cache validation follows netatmoTokenHelper.js pattern
 
 ### Pending Todos
 
@@ -78,8 +84,8 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-01-26
-Stopped at: v2.0 roadmap creation complete, ready to plan Phase 6
+Last session: 2026-01-27
+Stopped at: Completed 06-01-PLAN.md (Cache Infrastructure)
 Resume file: None
 
-**Next action:** Run `/gsd:plan-phase 6` to begin Netatmo Schedule API Infrastructure planning
+**Next action:** Continue with Phase 6 Plan 2 (Schedule Fetcher Service)

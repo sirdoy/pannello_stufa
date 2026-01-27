@@ -10,6 +10,8 @@ import {
   syncLivingRoomWithStove,
   checkStoveSyncOnStatusChange,
   enforceStoveSyncSetpoints,
+  setRoomsToBoostMode,
+  restoreRoomSetpoints,
 } from '@/lib/netatmoStoveSync';
 
 // Mock Firebase Admin
@@ -488,6 +490,544 @@ describe('netatmoStoveSync', () => {
       expect(result.enforced).toBe(false);
       expect(result.reason).toBe('setpoints_correct');
       expect(NETATMO_API.setRoomThermpoint).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('setRoomsToBoostMode', () => {
+    it('should apply boost correctly (20°C + 2°C = 22°C)', async () => {
+      NETATMO_API.getHomeStatus.mockResolvedValue({
+        rooms: [{ id: 'room-123', therm_setpoint_temperature: 20 }],
+      });
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+
+      const config = {
+        homeId: 'home-456',
+        rooms: [{ id: 'room-123', name: 'Salotto' }],
+        accessToken: 'valid-token',
+      };
+
+      const result = await setRoomsToBoostMode(config, 2, {});
+
+      expect(result.success).toBe(true);
+      expect(result.appliedSetpoints['room-123']).toEqual({
+        roomName: 'Salotto',
+        previous: 20,
+        applied: 22,
+        capped: false,
+      });
+      expect(result.previousSetpoints['room-123']).toBe(20);
+      expect(result.cappedRooms).toEqual([]);
+    });
+
+    it('should cap at 30°C when boost would exceed (29°C + 2°C = 30°C not 31°C)', async () => {
+      NETATMO_API.getHomeStatus.mockResolvedValue({
+        rooms: [{ id: 'room-123', therm_setpoint_temperature: 29 }],
+      });
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+
+      const config = {
+        homeId: 'home-456',
+        rooms: [{ id: 'room-123', name: 'Salotto' }],
+        accessToken: 'valid-token',
+      };
+
+      const result = await setRoomsToBoostMode(config, 2, {});
+
+      expect(result.success).toBe(true);
+      expect(result.appliedSetpoints['room-123']).toEqual({
+        roomName: 'Salotto',
+        previous: 29,
+        applied: 30,
+        capped: true,
+      });
+      expect(result.cappedRooms).toEqual(['Salotto']);
+    });
+
+    it('should store previous setpoints correctly', async () => {
+      NETATMO_API.getHomeStatus.mockResolvedValue({
+        rooms: [{ id: 'room-123', therm_setpoint_temperature: 21 }],
+      });
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+
+      const config = {
+        homeId: 'home-456',
+        rooms: [{ id: 'room-123', name: 'Salotto' }],
+        accessToken: 'valid-token',
+      };
+
+      const result = await setRoomsToBoostMode(config, 2, {});
+
+      expect(result.previousSetpoints['room-123']).toBe(21);
+    });
+
+    it('should not overwrite existing previousSetpoints entry', async () => {
+      NETATMO_API.getHomeStatus.mockResolvedValue({
+        rooms: [{ id: 'room-123', therm_setpoint_temperature: 21 }],
+      });
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+
+      const config = {
+        homeId: 'home-456',
+        rooms: [{ id: 'room-123', name: 'Salotto' }],
+        accessToken: 'valid-token',
+      };
+
+      const existingPrevious = { 'room-123': 19 };
+      const result = await setRoomsToBoostMode(config, 2, existingPrevious);
+
+      // Should keep original previous setpoint (19), not overwrite with current (21)
+      expect(result.previousSetpoints['room-123']).toBe(19);
+    });
+
+    it('should handle multiple rooms correctly', async () => {
+      NETATMO_API.getHomeStatus.mockResolvedValue({
+        rooms: [
+          { id: 'room-123', therm_setpoint_temperature: 20 },
+          { id: 'room-456', therm_setpoint_temperature: 22 },
+          { id: 'room-789', therm_setpoint_temperature: 18 },
+        ],
+      });
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+
+      const config = {
+        homeId: 'home-456',
+        rooms: [
+          { id: 'room-123', name: 'Salotto' },
+          { id: 'room-456', name: 'Camera' },
+          { id: 'room-789', name: 'Studio' },
+        ],
+        accessToken: 'valid-token',
+      };
+
+      const result = await setRoomsToBoostMode(config, 2, {});
+
+      expect(result.success).toBe(true);
+      expect(Object.keys(result.appliedSetpoints)).toHaveLength(3);
+      expect(result.appliedSetpoints['room-123'].applied).toBe(22);
+      expect(result.appliedSetpoints['room-456'].applied).toBe(24);
+      expect(result.appliedSetpoints['room-789'].applied).toBe(20);
+    });
+
+    it('should return capped flag for rooms hitting limit', async () => {
+      NETATMO_API.getHomeStatus.mockResolvedValue({
+        rooms: [
+          { id: 'room-123', therm_setpoint_temperature: 29 },
+          { id: 'room-456', therm_setpoint_temperature: 20 },
+        ],
+      });
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+
+      const config = {
+        homeId: 'home-456',
+        rooms: [
+          { id: 'room-123', name: 'Salotto' },
+          { id: 'room-456', name: 'Camera' },
+        ],
+        accessToken: 'valid-token',
+      };
+
+      const result = await setRoomsToBoostMode(config, 2, {});
+
+      expect(result.appliedSetpoints['room-123'].capped).toBe(true);
+      expect(result.appliedSetpoints['room-456'].capped).toBe(false);
+    });
+
+    it('should return cappedRooms array with room names', async () => {
+      NETATMO_API.getHomeStatus.mockResolvedValue({
+        rooms: [
+          { id: 'room-123', therm_setpoint_temperature: 28.5 },
+          { id: 'room-456', therm_setpoint_temperature: 29 },
+        ],
+      });
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+
+      const config = {
+        homeId: 'home-456',
+        rooms: [
+          { id: 'room-123', name: 'Salotto' },
+          { id: 'room-456', name: 'Camera' },
+        ],
+        accessToken: 'valid-token',
+      };
+
+      const result = await setRoomsToBoostMode(config, 2, {});
+
+      expect(result.cappedRooms).toContain('Salotto');
+      expect(result.cappedRooms).toContain('Camera');
+      expect(result.cappedRooms).toHaveLength(2);
+    });
+
+    it('should handle API errors gracefully (per-room failure does not block others)', async () => {
+      NETATMO_API.getHomeStatus.mockResolvedValue({
+        rooms: [
+          { id: 'room-123', therm_setpoint_temperature: 20 },
+          { id: 'room-456', therm_setpoint_temperature: 21 },
+          { id: 'room-789', therm_setpoint_temperature: 19 },
+        ],
+      });
+
+      // Middle room fails
+      NETATMO_API.setRoomThermpoint.mockImplementation((token, params) => {
+        if (params.room_id === 'room-456') {
+          return Promise.resolve(false); // API returns false
+        }
+        return Promise.resolve(true);
+      });
+
+      const config = {
+        homeId: 'home-456',
+        rooms: [
+          { id: 'room-123', name: 'Salotto' },
+          { id: 'room-456', name: 'Camera' },
+          { id: 'room-789', name: 'Studio' },
+        ],
+        accessToken: 'valid-token',
+      };
+
+      const result = await setRoomsToBoostMode(config, 2, {});
+
+      expect(result.success).toBe(true); // Some succeeded
+      expect(result.appliedSetpoints['room-123']).toBeDefined();
+      expect(result.appliedSetpoints['room-456']).toBeUndefined(); // Failed room not in results
+      expect(result.appliedSetpoints['room-789']).toBeDefined();
+    });
+  });
+
+  describe('restoreRoomSetpoints', () => {
+    it('should restore to previous setpoint when available', async () => {
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+
+      const config = {
+        homeId: 'home-456',
+        rooms: [{ id: 'room-123', name: 'Salotto' }],
+        accessToken: 'valid-token',
+      };
+
+      const previousSetpoints = { 'room-123': 20 };
+      const result = await restoreRoomSetpoints(config, previousSetpoints);
+
+      expect(result.success).toBe(true);
+      expect(result.restoredRooms).toHaveLength(1);
+      expect(result.restoredRooms[0]).toEqual({
+        roomId: 'room-123',
+        roomName: 'Salotto',
+        restoredTo: 20,
+        hadPrevious: true,
+      });
+
+      expect(NETATMO_API.setRoomThermpoint).toHaveBeenCalledWith(
+        'valid-token',
+        expect.objectContaining({
+          home_id: 'home-456',
+          room_id: 'room-123',
+          mode: 'manual',
+          temp: 20,
+        })
+      );
+    });
+
+    it('should return to schedule (home mode) when no previous setpoint', async () => {
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+
+      const config = {
+        homeId: 'home-456',
+        rooms: [{ id: 'room-123', name: 'Salotto' }],
+        accessToken: 'valid-token',
+      };
+
+      const result = await restoreRoomSetpoints(config, {});
+
+      expect(result.success).toBe(true);
+      expect(result.restoredRooms).toHaveLength(1);
+      expect(result.restoredRooms[0]).toEqual({
+        roomId: 'room-123',
+        roomName: 'Salotto',
+        restoredTo: 'schedule',
+        hadPrevious: false,
+      });
+
+      expect(NETATMO_API.setRoomThermpoint).toHaveBeenCalledWith(
+        'valid-token',
+        expect.objectContaining({
+          home_id: 'home-456',
+          room_id: 'room-123',
+          mode: 'home',
+        })
+      );
+    });
+
+    it('should handle mixed scenarios (some rooms have previous, some do not)', async () => {
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+
+      const config = {
+        homeId: 'home-456',
+        rooms: [
+          { id: 'room-123', name: 'Salotto' },
+          { id: 'room-456', name: 'Camera' },
+        ],
+        accessToken: 'valid-token',
+      };
+
+      const previousSetpoints = { 'room-123': 21 }; // Only room-123 has previous
+      const result = await restoreRoomSetpoints(config, previousSetpoints);
+
+      expect(result.success).toBe(true);
+      expect(result.restoredRooms).toHaveLength(2);
+      expect(result.restoredRooms[0]).toMatchObject({
+        roomId: 'room-123',
+        restoredTo: 21,
+        hadPrevious: true,
+      });
+      expect(result.restoredRooms[1]).toMatchObject({
+        roomId: 'room-456',
+        restoredTo: 'schedule',
+        hadPrevious: false,
+      });
+    });
+
+    it('should handle multiple rooms correctly', async () => {
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+
+      const config = {
+        homeId: 'home-456',
+        rooms: [
+          { id: 'room-123', name: 'Salotto' },
+          { id: 'room-456', name: 'Camera' },
+          { id: 'room-789', name: 'Studio' },
+        ],
+        accessToken: 'valid-token',
+      };
+
+      const previousSetpoints = {
+        'room-123': 20,
+        'room-456': 22,
+        'room-789': 19,
+      };
+      const result = await restoreRoomSetpoints(config, previousSetpoints);
+
+      expect(result.success).toBe(true);
+      expect(result.restoredRooms).toHaveLength(3);
+      expect(NETATMO_API.setRoomThermpoint).toHaveBeenCalledTimes(3);
+    });
+
+    it('should handle API errors gracefully (per-room failure does not block others)', async () => {
+      // First room fails, second succeeds
+      NETATMO_API.setRoomThermpoint.mockImplementation((token, params) => {
+        if (params.room_id === 'room-123') {
+          return Promise.resolve(false); // Fail
+        }
+        return Promise.resolve(true); // Succeed
+      });
+
+      const config = {
+        homeId: 'home-456',
+        rooms: [
+          { id: 'room-123', name: 'Salotto' },
+          { id: 'room-456', name: 'Camera' },
+        ],
+        accessToken: 'valid-token',
+      };
+
+      const previousSetpoints = { 'room-123': 20, 'room-456': 22 };
+      const result = await restoreRoomSetpoints(config, previousSetpoints);
+
+      expect(result.success).toBe(true); // At least one succeeded
+      expect(result.restoredRooms).toHaveLength(1); // Only successful room
+      expect(result.restoredRooms[0].roomId).toBe('room-456');
+    });
+
+    it('should use Promise.allSettled pattern for graceful degradation', async () => {
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+
+      const config = {
+        homeId: 'home-456',
+        rooms: [
+          { id: 'room-123', name: 'Salotto' },
+          { id: 'room-456', name: 'Camera' },
+        ],
+        accessToken: 'valid-token',
+      };
+
+      const previousSetpoints = { 'room-123': 20, 'room-456': 22 };
+      const result = await restoreRoomSetpoints(config, previousSetpoints);
+
+      // If one room fails, others should still process
+      expect(result.success).toBe(true);
+      expect(result.restoredRooms.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('Multi-Zone Coordination Edge Cases', () => {
+    it('should apply boost to multiple zones independently', async () => {
+      NETATMO_API.getHomeStatus.mockResolvedValue({
+        rooms: [
+          { id: 'room-123', therm_setpoint_temperature: 19 },
+          { id: 'room-456', therm_setpoint_temperature: 20 },
+          { id: 'room-789', therm_setpoint_temperature: 21 },
+        ],
+      });
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+
+      const config = {
+        homeId: 'home-456',
+        rooms: [
+          { id: 'room-123', name: 'Salotto' },
+          { id: 'room-456', name: 'Camera' },
+          { id: 'room-789', name: 'Studio' },
+        ],
+        accessToken: 'valid-token',
+      };
+
+      const result = await setRoomsToBoostMode(config, 2, {});
+
+      expect(result.success).toBe(true);
+      expect(result.appliedSetpoints['room-123'].applied).toBe(21);
+      expect(result.appliedSetpoints['room-456'].applied).toBe(22);
+      expect(result.appliedSetpoints['room-789'].applied).toBe(23);
+    });
+
+    it('should handle partial zone failure gracefully', async () => {
+      NETATMO_API.getHomeStatus.mockResolvedValue({
+        rooms: [
+          { id: 'room-123', therm_setpoint_temperature: 20 },
+          { id: 'room-456', therm_setpoint_temperature: 21 },
+          { id: 'room-789', therm_setpoint_temperature: 19 },
+        ],
+      });
+
+      // Middle room API call fails
+      NETATMO_API.setRoomThermpoint.mockImplementation((token, params) => {
+        if (params.room_id === 'room-456') {
+          return Promise.resolve(false);
+        }
+        return Promise.resolve(true);
+      });
+
+      const config = {
+        homeId: 'home-456',
+        rooms: [
+          { id: 'room-123', name: 'Salotto' },
+          { id: 'room-456', name: 'Camera' },
+          { id: 'room-789', name: 'Studio' },
+        ],
+        accessToken: 'valid-token',
+      };
+
+      const result = await setRoomsToBoostMode(config, 2, {});
+
+      expect(result.success).toBe(true); // Others succeeded
+      expect(result.appliedSetpoints['room-123']).toBeDefined();
+      expect(result.appliedSetpoints['room-456']).toBeUndefined(); // Failed
+      expect(result.appliedSetpoints['room-789']).toBeDefined();
+    });
+
+    it('should respect per-zone boost configuration', async () => {
+      NETATMO_API.getHomeStatus.mockResolvedValue({
+        rooms: [
+          { id: 'room-123', therm_setpoint_temperature: 20 },
+          { id: 'room-456', therm_setpoint_temperature: 20 },
+          { id: 'room-789', therm_setpoint_temperature: 20 },
+        ],
+      });
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+
+      // Apply different boost to each room
+      const config1 = {
+        homeId: 'home-456',
+        rooms: [{ id: 'room-123', name: 'Salotto' }],
+        accessToken: 'valid-token',
+      };
+      const result1 = await setRoomsToBoostMode(config1, 2, {});
+
+      const config2 = {
+        homeId: 'home-456',
+        rooms: [{ id: 'room-456', name: 'Camera' }],
+        accessToken: 'valid-token',
+      };
+      const result2 = await setRoomsToBoostMode(config2, 3, {});
+
+      const config3 = {
+        homeId: 'home-456',
+        rooms: [{ id: 'room-789', name: 'Studio' }],
+        accessToken: 'valid-token',
+      };
+      const result3 = await setRoomsToBoostMode(config3, 1.5, {});
+
+      expect(result1.appliedSetpoints['room-123'].applied).toBe(22);
+      expect(result2.appliedSetpoints['room-456'].applied).toBe(23);
+      expect(result3.appliedSetpoints['room-789'].applied).toBe(21.5);
+    });
+
+    it('should restore multiple zones correctly', async () => {
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+
+      const config = {
+        homeId: 'home-456',
+        rooms: [
+          { id: 'room-123', name: 'Salotto' },
+          { id: 'room-456', name: 'Camera' },
+          { id: 'room-789', name: 'Studio' },
+        ],
+        accessToken: 'valid-token',
+      };
+
+      const previousSetpoints = {
+        'room-123': 19,
+        'room-456': 21,
+        // room-789 has no previous (will return to schedule)
+      };
+
+      const result = await restoreRoomSetpoints(config, previousSetpoints);
+
+      expect(result.success).toBe(true);
+      expect(result.restoredRooms).toHaveLength(3);
+      expect(result.restoredRooms[0]).toMatchObject({
+        roomId: 'room-123',
+        restoredTo: 19,
+        hadPrevious: true,
+      });
+      expect(result.restoredRooms[1]).toMatchObject({
+        roomId: 'room-456',
+        restoredTo: 21,
+        hadPrevious: true,
+      });
+      expect(result.restoredRooms[2]).toMatchObject({
+        roomId: 'room-789',
+        restoredTo: 'schedule',
+        hadPrevious: false,
+      });
+    });
+
+    it('should handle all zones at 30°C cap', async () => {
+      NETATMO_API.getHomeStatus.mockResolvedValue({
+        rooms: [
+          { id: 'room-123', therm_setpoint_temperature: 29 },
+          { id: 'room-456', therm_setpoint_temperature: 29 },
+          { id: 'room-789', therm_setpoint_temperature: 29 },
+        ],
+      });
+      NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+
+      const config = {
+        homeId: 'home-456',
+        rooms: [
+          { id: 'room-123', name: 'Salotto' },
+          { id: 'room-456', name: 'Camera' },
+          { id: 'room-789', name: 'Studio' },
+        ],
+        accessToken: 'valid-token',
+      };
+
+      const result = await setRoomsToBoostMode(config, 2, {});
+
+      expect(result.success).toBe(true);
+      expect(result.appliedSetpoints['room-123'].applied).toBe(30);
+      expect(result.appliedSetpoints['room-456'].applied).toBe(30);
+      expect(result.appliedSetpoints['room-789'].applied).toBe(30);
+      expect(result.appliedSetpoints['room-123'].capped).toBe(true);
+      expect(result.appliedSetpoints['room-456'].capped).toBe(true);
+      expect(result.appliedSetpoints['room-789'].capped).toBe(true);
+      expect(result.cappedRooms).toEqual(['Salotto', 'Camera', 'Studio']);
     });
   });
 });

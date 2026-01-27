@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-26)
 ## Current Position
 
 Phase: 9 of 10 (Schedule Management UI) — IN PROGRESS
-Plan: 2 of 4 complete
+Plan: 3 of 4 complete
 Status: In progress
-Last activity: 2026-01-27 — Completed 09-02-PLAN.md (weekly timeline visualization)
+Last activity: 2026-01-27 — Completed 09-03-PLAN.md (schedule switcher UI)
 
-Progress: [█████████░░░░░░░░░░░] 44/TBD plans complete (v1.0: 29 plans, v2.0: 15 plans)
+Progress: [█████████░░░░░░░░░░░] 45/TBD plans complete (v1.0: 29 plans, v2.0: 16 plans)
 
 ## Performance Metrics
 
@@ -40,7 +40,7 @@ Progress: [█████████░░░░░░░░░░░] 44/TBD 
 | 6. Netatmo Schedule API | 3/3 | 16.0 min | 5.3 min |
 | 7. Health Monitoring Backend | 2/2 | 9.0 min | 4.5 min |
 | 8. Stove-Thermostat Integration | 6/6 | 30.6 min | 5.1 min |
-| 9. Schedule Management UI | 2/4 | 14.2 min | 7.1 min |
+| 9. Schedule Management UI | 3/4 | 17.2 min | 5.7 min |
 
 **Recent Trend:**
 - v1.0 completed successfully with consistent velocity
@@ -114,6 +114,9 @@ Recent decisions affecting current work:
 - v2.0 (09-02): Temperature text always visible - accessibility over aesthetics
 - v2.0 (09-02): 40px minimum slot width - WCAG 2.1 touch target compliance
 - v2.0 (09-02): Memoized parseTimelineSlots - prevents re-renders on scroll
+- v2.0 (09-03): Two-step schedule change (select → apply) prevents accidental switches
+- v2.0 (09-03): Back button navigates to /thermostat page
+- v2.0 (09-03): Manual override section placeholder for Plan 09-04
 
 ### Pending Todos
 
@@ -134,7 +137,7 @@ Recent decisions affecting current work:
 - ✅ Phase 6 (Netatmo Schedule API): COMPLETE - 3 plans
 - ✅ Phase 7 (Health Monitoring Backend): COMPLETE - 2 plans
 - ✅ Phase 8 (Stove-Thermostat Integration): COMPLETE - 6 plans
-- 🟡 Phase 9 (Schedule Management UI): IN PROGRESS - 2/4 plans complete
+- 🟡 Phase 9 (Schedule Management UI): IN PROGRESS - 3/4 plans complete
 - 🔜 Phase 10 (Deployment & Documentation): FINAL
 
 **v2.0 Research Flags:**
@@ -148,7 +151,7 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 09-02-PLAN.md (weekly timeline visualization)
+Stopped at: Completed 09-03-PLAN.md (schedule switcher UI)
 Resume file: None
 
-**Next action:** Continue Phase 9 with 09-03-PLAN.md (schedule switcher UI)
+**Next action:** Continue Phase 9 with 09-04-PLAN.md (manual override UI)

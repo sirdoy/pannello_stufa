@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-26)
 ## Current Position
 
 Phase: 8 of 10 (Stove-Thermostat Integration Correction)
-Plan: 3 of 5 complete
+Plan: 4 of 5 complete
 Status: In progress
-Last activity: 2026-01-27 — Completed 08-03-PLAN.md (user intent detection and pause calculator)
+Last activity: 2026-01-27 — Completed 08-04-PLAN.md (boost mode and setpoint restoration)
 
-Progress: [████████░░░░░░░░░░░░] 39/TBD plans complete (v1.0: 29 plans, v2.0: 10 plans)
+Progress: [████████░░░░░░░░░░░░] 40/TBD plans complete (v1.0: 29 plans, v2.0: 11 plans)
 
 ## Performance Metrics
 
@@ -39,16 +39,17 @@ Progress: [████████░░░░░░░░░░░░] 39/TBD 
 |-------|-------|-------|----------|
 | 6. Netatmo Schedule API | 3/3 | 16.0 min | 5.3 min |
 | 7. Health Monitoring Backend | 2/2 | 9.0 min | 4.5 min |
-| 8. Stove-Thermostat Integration | 3/5 | 14.7 min | 4.9 min |
+| 8. Stove-Thermostat Integration | 4/5 | 18.5 min | 4.6 min |
 
 **Recent Trend:**
 - v1.0 completed successfully with consistent velocity
 - v2.0 Phase 6 COMPLETE: 3 plans in 16 minutes (5.3 min/plan average)
 - v2.0 Phase 7 COMPLETE: 2 plans in 9 minutes (4.5 min/plan average)
-- v2.0 Phase 8 IN PROGRESS: 3 plans in 14.7 minutes (4.9 min/plan average)
+- v2.0 Phase 8 IN PROGRESS: 4 plans in 18.5 minutes (4.6 min/plan average)
   - 08-01: 5.4 min (foundation infrastructure)
   - 08-02: 4.6 min (notification throttle)
   - 08-03: 4.7 min (user intent and pause calculator)
+  - 08-04: 3.8 min (boost mode and setpoint restoration)
 
 ## Accumulated Context
 
@@ -91,6 +92,10 @@ Recent decisions affecting current work:
 - v2.0 (08-03): Pause until next schedule slot (not fixed duration) respects user workflow
 - v2.0 (08-03): Non-standard modes (away, hg, off) always indicate user intent
 - v2.0 (08-03): UTC timestamps for schedule calculations match Netatmo API convention
+- v2.0 (08-04): setRoomsToBoostMode applies configurable boost (+N°C) instead of fixed low temperature
+- v2.0 (08-04): 30°C maximum cap prevents excessive heating (safety limit)
+- v2.0 (08-04): restoreRoomSetpoints restores previous setpoint (not schedule) preserving user manual adjustments
+- v2.0 (08-04): Promise.allSettled for multi-room operations (per-room failures don't block others)
 
 ### Pending Todos
 
@@ -117,8 +122,8 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-01-27T13:47:01Z
-Stopped at: Completed 08-03-PLAN.md (user intent detection and pause calculator)
+Last session: 2026-01-27T13:41:24Z
+Stopped at: Completed 08-04-PLAN.md (boost mode and setpoint restoration)
 Resume file: None
 
-**Next action:** Execute 08-04-PLAN.md (coordination logic service integration)
+**Next action:** Execute 08-05-PLAN.md (orchestrator integration - final plan in phase 8)

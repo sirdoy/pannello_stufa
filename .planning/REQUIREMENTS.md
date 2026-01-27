@@ -90,11 +90,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCHED-04 | Phase 6 | Complete |
 | SCHED-05 | Phase 6 | Complete |
 | SCHED-06 | Phase 6 | Complete |
-| INTEG-01 | Phase 8 | Pending |
-| INTEG-02 | Phase 8 | Pending |
-| INTEG-03 | Phase 8 | Pending |
-| INTEG-04 | Phase 8 | Pending |
-| INTEG-05 | Phase 8 | Pending |
+| INTEG-01 | Phase 8 | Complete |
+| INTEG-02 | Phase 8 | Complete |
+| INTEG-03 | Phase 8 | Complete |
+| INTEG-04 | Phase 8 | Complete |
+| INTEG-05 | Phase 8 | Complete |
 | MONITOR-01 | Phase 7, 10 | Pending |
 | MONITOR-02 | Phase 7 | Complete |
 | MONITOR-03 | Phase 7 | Complete |
@@ -105,7 +105,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-03 | Phase 7 | Complete |
 | INFRA-04 | Phase 7 | Complete |
 | INFRA-05 | Phase 7 | Complete |
-| INFRA-06 | Phase 8 | Pending |
+| INFRA-06 | Phase 8 | Complete |
 
 **Coverage:**
 - v2.0 requirements: 22 total

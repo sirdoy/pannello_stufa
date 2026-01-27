@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-26)
 ## Current Position
 
 Phase: 6 of 10 (Netatmo Schedule API Infrastructure)
-Plan: 2 of 3 (Rate Limiter) — COMPLETE
-Status: In progress
-Last activity: 2026-01-27 — Completed 06-02-PLAN.md (Rate Limiter)
+Plan: 3 of 3 (Schedule API Service) — COMPLETE
+Status: Phase complete
+Last activity: 2026-01-27 — Completed 06-03-PLAN.md (Schedule API Service)
 
-Progress: [██████░░░░░░░░░░░░░░] 31/TBD plans complete (v1.0: 29 plans, v2.0: 2 plans)
+Progress: [██████░░░░░░░░░░░░░░] 32/TBD plans complete (v1.0: 29 plans, v2.0: 3 plans)
 
 ## Performance Metrics
 
@@ -37,11 +37,11 @@ Progress: [██████░░░░░░░░░░░░░░] 31/TBD 
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 6. Netatmo Schedule API | 2/3 | 7.0 min | 3.5 min |
+| 6. Netatmo Schedule API | 3/3 | 16.0 min | 5.3 min |
 
 **Recent Trend:**
 - v1.0 completed successfully with consistent velocity
-- v2.0 execution: Phase 6 Plans 1-2 complete, averaging 3.5 min/plan
+- v2.0 Phase 6 COMPLETE: 3 plans in 16 minutes (5.3 min/plan average)
 
 ## Accumulated Context
 
@@ -61,6 +61,9 @@ Recent decisions affecting current work:
 - v2.0 (06-01): Timestamp-based cache validation follows netatmoTokenHelper.js pattern
 - v2.0 (06-02): Conservative 400 calls/hour limit (100 buffer) prevents Netatmo 429 errors
 - v2.0 (06-02): In-memory Map storage with 2-hour retention matches existing rateLimiter.js pattern
+- v2.0 (06-03): Control operations (POST) never cached - only read operations use cache
+- v2.0 (06-03): Cache invalidation after schedule switch ensures frontend consistency
+- v2.0 (06-03): Integration tests focus on service integration to avoid auth0 mocking complexity
 
 ### Pending Todos
 
@@ -87,7 +90,7 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 06-02-PLAN.md (Rate Limiter)
+Stopped at: Completed 06-03-PLAN.md (Schedule API Service)
 Resume file: None
 
-**Next action:** Continue with Phase 6 Plan 3 (Schedule API Service)
+**Next action:** Phase 6 complete. Ready for Phase 7 (Netatmo Room State Management) or Phase 9 (Schedule Management UI)

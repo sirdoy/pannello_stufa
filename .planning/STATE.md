@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-26)
 ## Current Position
 
 Phase: 7 of 10 (Stove Health Monitoring Backend) — IN PROGRESS
-Plan: 1 of TBD complete
+Plan: 2 of TBD complete
 Status: In progress
-Last activity: 2026-01-27 — Completed 07-01-PLAN.md
+Last activity: 2026-01-27 — Completed 07-02-PLAN.md
 
-Progress: [███████░░░░░░░░░░░░░] 33/TBD plans complete (v1.0: 29 plans, v2.0: 4 plans)
+Progress: [███████░░░░░░░░░░░░░] 34/TBD plans complete (v1.0: 29 plans, v2.0: 5 plans)
 
 ## Performance Metrics
 
@@ -38,12 +38,12 @@ Progress: [███████░░░░░░░░░░░░░] 33/TBD 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 6. Netatmo Schedule API | 3/3 | 16.0 min | 5.3 min |
-| 7. Health Monitoring Backend | 1/TBD | 5.0 min | 5.0 min |
+| 7. Health Monitoring Backend | 2/TBD | 9.0 min | 4.5 min |
 
 **Recent Trend:**
 - v1.0 completed successfully with consistent velocity
 - v2.0 Phase 6 COMPLETE: 3 plans in 16 minutes (5.3 min/plan average)
-- v2.0 Phase 7 started: Plan 01 complete in 5 minutes
+- v2.0 Phase 7 in progress: Plans 01-02 complete in 9 minutes (4.5 min/plan average)
 
 ## Accumulated Context
 
@@ -70,11 +70,16 @@ Recent decisions affecting current work:
 - v2.0 (07-01): STARTING states have 15-min grace period (avoid false alerts during stove startup)
 - v2.0 (07-01): Firestore parent/subcollection structure (aggregated queries + detailed drill-down)
 - v2.0 (07-01): Fire-and-forget logging pattern (Firestore errors don't block health checks)
+- v2.0 (07-02): 10-minute threshold for dead man's switch (10 missed cron runs = admin alert)
+- v2.0 (07-02): updateDeadManSwitch() runs FIRST before any processing (proves cron ran even if health check fails)
+- v2.0 (07-02): Environment validation logs warnings but continues (partial functionality better than complete failure)
+- v2.0 (07-02): Firestore logging uses fire-and-forget (health check execution more important than logging)
 
 ### Pending Todos
 
 **Operational Setup (v1.0 shipped, pending deployment):**
-- Cron webhook configuration required (cron-job.org account setup, 15-30 min)
+- Scheduler cron configuration required (cron-job.org account setup, 15-30 min)
+- Health monitoring cron configuration required (separate endpoint, 1-min frequency)
 - Firestore indexes need manual deployment: `firebase deploy --only firestore:indexes`
 
 ### Blockers/Concerns
@@ -96,7 +101,7 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 07-01-PLAN.md
+Stopped at: Completed 07-02-PLAN.md
 Resume file: None
 
-**Next action:** Continue Phase 7 with plan 07-02 (Cron Endpoint) or plan next phase
+**Next action:** Continue Phase 7 with remaining plans or proceed to Phase 8 planning

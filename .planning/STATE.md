@@ -12,9 +12,9 @@ See: .planning/PROJECT.md (updated 2026-01-26)
 Phase: 8 of 10 (Stove-Thermostat Integration Correction)
 Plan: 5 of 5 complete
 Status: Phase complete
-Last activity: 2026-01-27 — Completed 08-04b-PLAN.md (coordination orchestrator)
+Last activity: 2026-01-27 — Completed 08-05-PLAN.md (cron endpoint and event logging)
 
-Progress: [████████░░░░░░░░░░░░] 41/TBD plans complete (v1.0: 29 plans, v2.0: 12 plans)
+Progress: [████████░░░░░░░░░░░░] 42/TBD plans complete (v1.0: 29 plans, v2.0: 13 plans)
 
 ## Performance Metrics
 
@@ -39,18 +39,19 @@ Progress: [████████░░░░░░░░░░░░] 41/TBD 
 |-------|-------|-------|----------|
 | 6. Netatmo Schedule API | 3/3 | 16.0 min | 5.3 min |
 | 7. Health Monitoring Backend | 2/2 | 9.0 min | 4.5 min |
-| 8. Stove-Thermostat Integration | 5/5 | 24.9 min | 5.0 min |
+| 8. Stove-Thermostat Integration | 6/6 | 30.6 min | 5.1 min |
 
 **Recent Trend:**
 - v1.0 completed successfully with consistent velocity
 - v2.0 Phase 6 COMPLETE: 3 plans in 16 minutes (5.3 min/plan average)
 - v2.0 Phase 7 COMPLETE: 2 plans in 9 minutes (4.5 min/plan average)
-- v2.0 Phase 8 COMPLETE: 5 plans in 24.9 minutes (5.0 min/plan average)
+- v2.0 Phase 8 COMPLETE: 6 plans in 30.6 minutes (5.1 min/plan average)
   - 08-01: 5.4 min (foundation infrastructure)
   - 08-02: 4.6 min (notification throttle)
   - 08-03: 4.7 min (user intent and pause calculator)
   - 08-04: 3.8 min (boost mode and setpoint restoration)
   - 08-04b: 6.4 min (coordination orchestrator)
+  - 08-05: 5.7 min (cron endpoint and event logging)
 
 ## Accumulated Context
 
@@ -102,12 +103,16 @@ Recent decisions affecting current work:
 - v2.0 (08-04b): Explicit object property syntax for ESM compatibility (pausedUntil: pausedUntil vs shorthand)
 - v2.0 (08-04b): Italian-localized coordination notifications match existing language
 - v2.0 (08-04b): Graceful schedule fetch degradation (1-hour default pause if Netatmo API fails)
+- v2.0 (08-05): Fire-and-forget Firestore logging pattern (coordination failures don't block logging)
+- v2.0 (08-05): Single coordinationEvents collection (flat structure sufficient for coordination event volume)
+- v2.0 (08-05): Cron endpoint logs summary events only (orchestrator logs all decision points)
 
 ### Pending Todos
 
 **Operational Setup (v1.0 shipped, pending deployment):**
 - Scheduler cron configuration required (cron-job.org account setup, 15-30 min)
 - Health monitoring cron configuration required (separate endpoint, 1-min frequency)
+- Coordination cron configuration required (/api/coordination/enforce, 1-min frequency)
 - Firestore indexes need manual deployment: `firebase deploy --only firestore:indexes`
 
 ### Blockers/Concerns
@@ -120,7 +125,7 @@ Recent decisions affecting current work:
 **v2.0 Status:**
 - ✅ Phase 6 (Netatmo Schedule API): COMPLETE - 3 plans
 - ✅ Phase 7 (Health Monitoring Backend): COMPLETE - 2 plans
-- ✅ Phase 8 (Stove-Thermostat Integration): COMPLETE - 5 plans
+- ✅ Phase 8 (Stove-Thermostat Integration): COMPLETE - 6 plans
 - 🔜 Phase 9 (Device Management UI): NEXT
 - 🔜 Phase 10 (Deployment & Documentation): FINAL
 
@@ -134,8 +139,8 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-01-27T13:50:36Z
-Stopped at: Completed 08-04b-PLAN.md (coordination orchestrator)
+Last session: 2026-01-27T14:58:23Z
+Stopped at: Completed 08-05-PLAN.md (cron endpoint and event logging)
 Resume file: None
 
 **Next action:** Phase 8 complete. Ready for Phase 9 (Device Management UI) or operational deployment.

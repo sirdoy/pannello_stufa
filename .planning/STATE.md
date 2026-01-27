@@ -59,6 +59,8 @@ Recent decisions affecting current work:
 - v2.0: Zero new npm dependencies - existing v1.0 stack handles all requirements
 - v2.0 (06-01): 5-minute TTL balances schedule freshness with API rate limit prevention (500 calls/hour)
 - v2.0 (06-01): Timestamp-based cache validation follows netatmoTokenHelper.js pattern
+- v2.0 (06-02): Conservative 400 calls/hour limit (100 buffer) prevents Netatmo 429 errors
+- v2.0 (06-02): In-memory Map storage with 2-hour retention matches existing rateLimiter.js pattern
 
 ### Pending Todos
 
@@ -85,7 +87,7 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 06-01-PLAN.md (Cache Infrastructure)
+Stopped at: Completed 06-02-PLAN.md (Rate Limiter)
 Resume file: None
 
-**Next action:** Continue with Phase 6 Plan 2 (Schedule Fetcher Service)
+**Next action:** Continue with Phase 6 Plan 3 (Schedule API Service)

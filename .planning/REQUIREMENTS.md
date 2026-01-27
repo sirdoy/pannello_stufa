@@ -12,9 +12,9 @@ Requirements for milestone v2.0: Netatmo Complete Control & Stove Monitoring
 - [ ] **SCHED-01**: User can view current active weekly schedule with day/time/temperature slots
 - [ ] **SCHED-02**: User can switch between pre-configured Netatmo schedules via dropdown selector
 - [ ] **SCHED-03**: User can create temporary override (manual boost) with duration picker (5 min - 12 hours)
-- [ ] **SCHED-04**: System caches schedule data with 5-minute TTL to avoid API rate limiting
-- [ ] **SCHED-05**: System enforces 60-second minimum polling interval for schedule updates
-- [ ] **SCHED-06**: System tracks Netatmo API calls and enforces 500 calls/hour per user limit
+- [x] **SCHED-04**: System caches schedule data with 5-minute TTL to avoid API rate limiting
+- [x] **SCHED-05**: System enforces 60-second minimum polling interval for schedule updates
+- [x] **SCHED-06**: System tracks Netatmo API calls and enforces 500 calls/hour per user limit
 
 ### Stove-Thermostat Integration
 
@@ -34,8 +34,8 @@ Requirements for milestone v2.0: Netatmo Complete Control & Stove Monitoring
 
 ### Supporting Infrastructure
 
-- [ ] **INFRA-01**: System tracks Netatmo API call count per user with Redis or in-memory store
-- [ ] **INFRA-02**: System refreshes OAuth tokens atomically (access + refresh token rotation)
+- [x] **INFRA-01**: System tracks Netatmo API call count per user with Redis or in-memory store
+- [x] **INFRA-02**: System refreshes OAuth tokens atomically (access + refresh token rotation)
 - [ ] **INFRA-03**: System logs every cron execution with timestamp, duration, and status
 - [ ] **INFRA-04**: System implements dead man's switch (alerts if cron hasn't run in 10+ minutes)
 - [ ] **INFRA-05**: System validates environment variables on startup (dev vs prod Netatmo credentials)
@@ -87,9 +87,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCHED-01 | Phase 6, 9 | Pending |
 | SCHED-02 | Phase 6, 9 | Pending |
 | SCHED-03 | Phase 9 | Pending |
-| SCHED-04 | Phase 6 | Pending |
-| SCHED-05 | Phase 6 | Pending |
-| SCHED-06 | Phase 6 | Pending |
+| SCHED-04 | Phase 6 | Complete |
+| SCHED-05 | Phase 6 | Complete |
+| SCHED-06 | Phase 6 | Complete |
 | INTEG-01 | Phase 8 | Pending |
 | INTEG-02 | Phase 8 | Pending |
 | INTEG-03 | Phase 8 | Pending |
@@ -100,8 +100,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MONITOR-03 | Phase 7 | Pending |
 | MONITOR-04 | Phase 7, 10 | Pending |
 | MONITOR-05 | Phase 7, 10 | Pending |
-| INFRA-01 | Phase 6 | Pending |
-| INFRA-02 | Phase 6 | Pending |
+| INFRA-01 | Phase 6 | Complete |
+| INFRA-02 | Phase 6 | Complete |
 | INFRA-03 | Phase 7 | Pending |
 | INFRA-04 | Phase 7 | Pending |
 | INFRA-05 | Phase 7 | Pending |
@@ -114,4 +114,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-26*
-*Last updated: 2026-01-26 after roadmap creation*
+*Last updated: 2026-01-27 after Phase 6 completion*

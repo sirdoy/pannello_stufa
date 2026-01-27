@@ -1,15 +1,23 @@
 'use client';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, Heading, Text, Button, Skeleton, ErrorAlert } from '@/app/components/ui';
 import { useScheduleData } from '@/lib/hooks/useScheduleData';
+import { useRoomStatus } from '@/lib/hooks/useRoomStatus';
 import ScheduleSelector from './components/ScheduleSelector';
 import WeeklyTimeline from './components/WeeklyTimeline';
+import ManualOverrideSheet from './components/ManualOverrideSheet';
+import ActiveOverrideBadge from './components/ActiveOverrideBadge';
 import { ArrowLeft, RefreshCw, Calendar, Flame } from 'lucide-react';
 
 function ScheduleContent() {
   const router = useRouter();
   const { schedules, activeSchedule, loading, error, refetch } = useScheduleData();
+  const { rooms, refetch: refetchRooms } = useRoomStatus();
+  const [showOverrideSheet, setShowOverrideSheet] = useState(false);
+
+  // Find rooms with active override
+  const roomsWithOverride = rooms.filter(r => r.mode === 'manual');
 
   if (loading) {
     return <Skeleton.SchedulePage />;
@@ -90,7 +98,29 @@ function ScheduleContent() {
         <WeeklyTimeline schedule={activeSchedule} />
       </Card>
 
-      {/* Manual override link */}
+      {/* Active overrides section */}
+      {roomsWithOverride.length > 0 && (
+        <Card variant="elevated" className="p-5 sm:p-6 mb-6">
+          <Heading level={3} size="lg" className="flex items-center gap-2 mb-4">
+            <Flame className="text-ember-400" />
+            Override Attivi
+          </Heading>
+          <div className="space-y-2">
+            {roomsWithOverride.map(room => (
+              <ActiveOverrideBadge
+                key={room.id}
+                room={room}
+                onCancelled={() => {
+                  refetchRooms();
+                  refetch(); // Also refresh schedules
+                }}
+              />
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Manual override button */}
       <Card variant="elevated" className="p-5 sm:p-6">
         <div className="flex items-center justify-between">
           <div>
@@ -104,16 +134,22 @@ function ScheduleContent() {
           </div>
           <Button
             variant="ember"
-            onClick={() => {
-              // Will be implemented in Plan 04
-              // Opens ManualOverrideSheet
-              console.log('TODO: Open override sheet');
-            }}
+            onClick={() => setShowOverrideSheet(true)}
           >
             Boost
           </Button>
         </div>
       </Card>
+
+      {/* Override sheet */}
+      <ManualOverrideSheet
+        isOpen={showOverrideSheet}
+        onClose={() => setShowOverrideSheet(false)}
+        onOverrideCreated={() => {
+          refetchRooms();
+          refetch();
+        }}
+      />
     </div>
   );
 }

@@ -670,3 +670,38 @@ Skeleton.NetatmoPage = function SkeletonNetatmoPage() {
     </div>
   );
 };
+
+/**
+ * Skeleton.SchedulePage - Skeleton for Schedule management page
+ */
+Skeleton.SchedulePage = function SkeletonSchedulePage() {
+  return (
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+      {/* Header */}
+      <div className="mb-6">
+        <div className="h-6 w-24 bg-slate-700/50 rounded mb-4 animate-pulse" />
+        <div className="h-10 w-64 bg-slate-700/50 rounded mb-2 animate-pulse" />
+        <div className="h-5 w-96 bg-slate-700/50 rounded animate-pulse" />
+      </div>
+
+      {/* Selector card */}
+      <div className="bg-slate-800/50 rounded-2xl p-6 mb-6">
+        <div className="h-5 w-32 bg-slate-700/50 rounded mb-2 animate-pulse" />
+        <div className="h-12 w-full bg-slate-700/50 rounded-xl animate-pulse" />
+      </div>
+
+      {/* Timeline card */}
+      <div className="bg-slate-800/50 rounded-2xl p-6">
+        <div className="h-6 w-48 bg-slate-700/50 rounded mb-4 animate-pulse" />
+        <div className="space-y-2">
+          {Array(7).fill(null).map((_, i) => (
+            <div key={i} className="flex gap-2">
+              <div className="w-12 h-12 bg-slate-700/50 rounded animate-pulse" />
+              <div className="flex-1 h-12 bg-slate-700/50 rounded animate-pulse" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};

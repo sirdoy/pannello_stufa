@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-26)
 
 ## Current Position
 
-Phase: 8 of 10 (Stove-Thermostat Integration Correction) — COMPLETE
-Plan: 6 of 6 complete
-Status: Complete
-Last activity: 2026-01-27 — Phase 8 verified and complete
+Phase: 9 of 10 (Schedule Management UI) — IN PROGRESS
+Plan: 1 of 4 complete
+Status: In progress
+Last activity: 2026-01-27 — Completed 09-01-PLAN.md (schedule data hooks & helpers)
 
-Progress: [████████░░░░░░░░░░░░] 42/TBD plans complete (v1.0: 29 plans, v2.0: 13 plans)
+Progress: [█████████░░░░░░░░░░░] 43/TBD plans complete (v1.0: 29 plans, v2.0: 14 plans)
 
 ## Performance Metrics
 
@@ -33,13 +33,14 @@ Progress: [████████░░░░░░░░░░░░] 42/TBD 
 | 4. History & Device Mgmt | 5 | 17.5 min | 3.5 min |
 | 5. Automation & Testing | 5 | 14.3 min | 4.8 min |
 
-**v2.0 Progress (Phases 6-8):**
+**v2.0 Progress (Phases 6-9):**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 6. Netatmo Schedule API | 3/3 | 16.0 min | 5.3 min |
 | 7. Health Monitoring Backend | 2/2 | 9.0 min | 4.5 min |
 | 8. Stove-Thermostat Integration | 6/6 | 30.6 min | 5.1 min |
+| 9. Schedule Management UI | 1/4 | 12.0 min | 12.0 min |
 
 **Recent Trend:**
 - v1.0 completed successfully with consistent velocity
@@ -106,6 +107,9 @@ Recent decisions affecting current work:
 - v2.0 (08-05): Fire-and-forget Firestore logging pattern (coordination failures don't block logging)
 - v2.0 (08-05): Single coordinationEvents collection (flat structure sufficient for coordination event volume)
 - v2.0 (08-05): Cron endpoint logs summary events only (orchestrator logs all decision points)
+- v2.0 (09-01): m_offset parsed as minutes from Monday 00:00, not per-day (Netatmo week-based offset)
+- v2.0 (09-01): Cyan-yellow-red gradient for colorblind accessibility (avoids red-green confusion)
+- v2.0 (09-01): Hook tests follow project pattern (module structure verification, not full integration)
 
 ### Pending Todos
 
@@ -126,7 +130,7 @@ Recent decisions affecting current work:
 - ✅ Phase 6 (Netatmo Schedule API): COMPLETE - 3 plans
 - ✅ Phase 7 (Health Monitoring Backend): COMPLETE - 2 plans
 - ✅ Phase 8 (Stove-Thermostat Integration): COMPLETE - 6 plans
-- 🔜 Phase 9 (Device Management UI): NEXT
+- 🟡 Phase 9 (Schedule Management UI): IN PROGRESS - 1/4 plans complete
 - 🔜 Phase 10 (Deployment & Documentation): FINAL
 
 **v2.0 Research Flags:**
@@ -140,7 +144,7 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Phase 8 complete and verified
+Stopped at: Completed 09-01-PLAN.md (schedule data hooks & helpers)
 Resume file: None
 
-**Next action:** Proceed to Phase 9 planning (Schedule Management UI)
+**Next action:** Continue Phase 9 with 09-02-PLAN.md (weekly timeline UI component)

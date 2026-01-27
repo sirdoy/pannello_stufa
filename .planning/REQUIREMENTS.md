@@ -9,9 +9,9 @@ Requirements for milestone v2.0: Netatmo Complete Control & Stove Monitoring
 
 ### Netatmo Schedule Management
 
-- [ ] **SCHED-01**: User can view current active weekly schedule with day/time/temperature slots
-- [ ] **SCHED-02**: User can switch between pre-configured Netatmo schedules via dropdown selector
-- [ ] **SCHED-03**: User can create temporary override (manual boost) with duration picker (5 min - 12 hours)
+- [x] **SCHED-01**: User can view current active weekly schedule with day/time/temperature slots
+- [x] **SCHED-02**: User can switch between pre-configured Netatmo schedules via dropdown selector
+- [x] **SCHED-03**: User can create temporary override (manual boost) with duration picker (5 min - 12 hours)
 - [x] **SCHED-04**: System caches schedule data with 5-minute TTL to avoid API rate limiting
 - [x] **SCHED-05**: System enforces 60-second minimum polling interval for schedule updates
 - [x] **SCHED-06**: System tracks Netatmo API calls and enforces 500 calls/hour per user limit
@@ -84,9 +84,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCHED-01 | Phase 6, 9 | Pending |
-| SCHED-02 | Phase 6, 9 | Pending |
-| SCHED-03 | Phase 9 | Pending |
+| SCHED-01 | Phase 6, 9 | Complete |
+| SCHED-02 | Phase 6, 9 | Complete |
+| SCHED-03 | Phase 9 | Complete |
 | SCHED-04 | Phase 6 | Complete |
 | SCHED-05 | Phase 6 | Complete |
 | SCHED-06 | Phase 6 | Complete |
@@ -114,4 +114,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-26*
-*Last updated: 2026-01-27 after Phase 7 completion*
+*Last updated: 2026-01-27 after Phase 9 completion*

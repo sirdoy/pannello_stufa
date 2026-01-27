@@ -61,6 +61,9 @@ export const GET = withAuthAndErrorHandler(async () => {
     if (temp.heating !== undefined && temp.heating !== null) {
       enriched.heating = temp.heating;
     }
+    if (temp.endtime !== undefined && temp.endtime !== null) {
+      enriched.endtime = temp.endtime;
+    }
 
     // Add stove sync indicator for all synced rooms
     const syncedRoomIds = stoveSyncData?.rooms?.map(r => r.id) || [];

@@ -102,11 +102,11 @@ Plans:
   3. System logs all monitoring events to Firestore with timestamp and status
   4. Dead man's switch alerts if cron hasn't executed in 10+ minutes
   5. Cron execution logs include timestamp, duration, and success/failure status
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 07-01: TBD
-- [ ] 07-02: TBD
+- [ ] 07-01-PLAN.md — Health check core logic and Firestore logging service
+- [ ] 07-02-PLAN.md — Cron endpoint, dead man's switch, environment validation
 
 #### Phase 8: Stove-Thermostat Integration Correction
 **Goal**: Verify and enhance stove-thermostat coordination using temporary setpoint overrides (not schedule modifications)
@@ -167,7 +167,7 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10
 | 4. History & Device Management UI | v1.0 | 7/7 | Complete | 2026-01-25 |
 | 5. Automation & Testing | v1.0 | 5/5 | Complete | 2026-01-26 |
 | 6. Netatmo Schedule API Infrastructure | v2.0 | 3/3 | Complete | 2026-01-27 |
-| 7. Stove Health Monitoring Backend | v2.0 | 0/TBD | Not started | - |
+| 7. Stove Health Monitoring Backend | v2.0 | 0/2 | Planned | - |
 | 8. Stove-Thermostat Integration Correction | v2.0 | 0/TBD | Not started | - |
 | 9. Schedule Management UI | v2.0 | 0/TBD | Not started | - |
 | 10. Monitoring Dashboard & Alerts UI | v2.0 | 0/TBD | Not started | - |

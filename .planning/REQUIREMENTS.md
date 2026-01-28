@@ -125,13 +125,70 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (To be filled by roadmapper) | | |
+| INFRA-01 | Phase 11 | Pending |
+| INFRA-02 | Phase 11 | Pending |
+| INFRA-03 | Phase 11 | Pending |
+| INFRA-04 | Phase 11 | Pending |
+| INFRA-05 | Phase 11 | Pending |
+| INFRA-06 | Phase 11 | Pending |
+| COMP-03 | Phase 12 | Pending |
+| COMP-04 | Phase 12 | Pending |
+| COMP-05 | Phase 12 | Pending |
+| COMP-06 | Phase 12 | Pending |
+| COMP-07 | Phase 12 | Pending |
+| COMP-08 | Phase 12 | Pending |
+| COMP-01 | Phase 13 | Pending |
+| COMP-02 | Phase 13 | Pending |
+| COMP-09 | Phase 13 | Pending |
+| COMP-10 | Phase 13 | Pending |
+| COMP-11 | Phase 13 | Pending |
+| COMP-12 | Phase 13 | Pending |
+| FEED-01 | Phase 14 | Pending |
+| FEED-02 | Phase 14 | Pending |
+| FEED-03 | Phase 14 | Pending |
+| FEED-04 | Phase 14 | Pending |
+| FEED-05 | Phase 14 | Pending |
+| FEED-06 | Phase 14 | Pending |
+| FEED-07 | Phase 14 | Pending |
+| LAYOUT-01 | Phase 14 | Pending |
+| LAYOUT-02 | Phase 14 | Pending |
+| LAYOUT-03 | Phase 14 | Pending |
+| LAYOUT-04 | Phase 14 | Pending |
+| DOMAIN-01 | Phase 15 | Pending |
+| DOMAIN-02 | Phase 15 | Pending |
+| DOMAIN-03 | Phase 15 | Pending |
+| DOMAIN-04 | Phase 15 | Pending |
+| DOMAIN-05 | Phase 15 | Pending |
+| DOMAIN-06 | Phase 15 | Pending |
+| PAGE-01 | Phase 16 | Pending |
+| PAGE-02 | Phase 16 | Pending |
+| PAGE-03 | Phase 16 | Pending |
+| PAGE-04 | Phase 16 | Pending |
+| PAGE-05 | Phase 16 | Pending |
+| PAGE-06 | Phase 16 | Pending |
+| PAGE-07 | Phase 16 | Pending |
+| PAGE-08 | Phase 16 | Pending |
+| PAGE-09 | Phase 16 | Pending |
+| PAGE-10 | Phase 16 | Pending |
+| A11Y-01 | Phase 17 | Pending |
+| A11Y-02 | Phase 17 | Pending |
+| A11Y-03 | Phase 17 | Pending |
+| A11Y-04 | Phase 17 | Pending |
+| A11Y-05 | Phase 17 | Pending |
+| A11Y-06 | Phase 17 | Pending |
+| A11Y-07 | Phase 17 | Pending |
+| A11Y-08 | Phase 17 | Pending |
+| DOC-01 | Phase 18 | Pending |
+| DOC-02 | Phase 18 | Pending |
+| DOC-03 | Phase 18 | Pending |
+| DOC-04 | Phase 18 | Pending |
+| DOC-05 | Phase 18 | Pending |
 
 **Coverage:**
 - v3.0 requirements: 48 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 48 ⚠️
+- Mapped to phases: 48 (100%)
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-28*
-*Last updated: 2026-01-28 after initial definition*
+*Last updated: 2026-01-28 after roadmap creation*

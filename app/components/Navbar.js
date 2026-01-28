@@ -264,7 +264,7 @@ export default function Navbar() {
               ))}
 
               {/* Global Links */}
-              {navStructure.global.map(item => (
+              {navStructure.global && navStructure.global.map(item => (
                 <Link
                   key={item.route}
                   href={item.route}
@@ -502,6 +502,25 @@ export default function Navbar() {
                   ))}
                 </MenuSection>
               ))}
+
+              {/* Global Navigation Section */}
+              {navStructure.global && navStructure.global.length > 0 && (
+                <MenuSection
+                  title=""
+                  hasBorder={true}
+                >
+                  {navStructure.global.map((item, idx) => (
+                    <MenuItem
+                      key={item.route}
+                      href={item.route}
+                      icon={getIconForPath(item.route)}
+                      label={item.label}
+                      isActive={isActive(item.route)}
+                      animationDelay={idx * 50}
+                    />
+                  ))}
+                </MenuSection>
+              )}
 
               {/* Settings Section */}
               {navStructure.settings && navStructure.settings.length > 0 && (

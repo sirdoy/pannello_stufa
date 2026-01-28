@@ -98,6 +98,59 @@ global.IntersectionObserver = class IntersectionObserver {
   unobserve() {}
 };
 
+// Mock Pointer Capture API (required for Radix UI Select)
+// JSDOM doesn't support Pointer Capture API, so we need to polyfill it
+if (typeof window !== 'undefined' && typeof Element !== 'undefined') {
+  Element.prototype.hasPointerCapture = Element.prototype.hasPointerCapture || function() {
+    return false;
+  };
+  Element.prototype.setPointerCapture = Element.prototype.setPointerCapture || function() {};
+  Element.prototype.releasePointerCapture = Element.prototype.releasePointerCapture || function() {};
+  Element.prototype.scrollIntoView = Element.prototype.scrollIntoView || function() {};
+}
+
+// Mock ResizeObserver (required for Radix UI positioning)
+global.ResizeObserver = class ResizeObserver {
+  constructor(callback) {
+    this.callback = callback;
+  }
+  disconnect() {}
+  observe() {}
+  unobserve() {}
+};
+
+// Mock DOMRect (required for Radix floating UI)
+global.DOMRect = global.DOMRect || class DOMRect {
+  constructor(x = 0, y = 0, width = 0, height = 0) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.top = y;
+    this.right = x + width;
+    this.bottom = y + height;
+    this.left = x;
+  }
+  static fromRect(other) {
+    return new DOMRect(other.x, other.y, other.width, other.height);
+  }
+  toJSON() {
+    return { x: this.x, y: this.y, width: this.width, height: this.height };
+  }
+};
+
+// Mock getBoundingClientRect to return a valid DOMRect
+if (typeof Element !== 'undefined') {
+  const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
+  Element.prototype.getBoundingClientRect = function() {
+    try {
+      return originalGetBoundingClientRect.call(this);
+    } catch {
+      return new DOMRect(0, 0, 0, 0);
+    }
+  };
+}
+
 // Polyfill Request for API route tests
 if (typeof Request === 'undefined') {
   global.Request = class Request {

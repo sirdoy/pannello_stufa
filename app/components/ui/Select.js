@@ -1,24 +1,279 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { forwardRef, useId } from 'react';
+import * as SelectPrimitive from '@radix-ui/react-select';
+import { cva } from 'class-variance-authority';
+import { Check, ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils/cn';
 
 /**
  * Select Component - Ember Noir Design System
  *
- * Custom dropdown select with dark-first design.
+ * Accessible dropdown select built on Radix UI primitives.
+ * Supports both simple API (options array) and compound component pattern.
+ *
+ * @example
+ * // Simple API (backwards compatible)
+ * <Select
+ *   label="Choose mode"
+ *   options={[
+ *     { value: 'auto', label: 'Automatic' },
+ *     { value: 'manual', label: 'Manual' },
+ *   ]}
+ *   value={mode}
+ *   onChange={(e) => setMode(e.target.value)}
+ * />
+ *
+ * @example
+ * // Compound component pattern (advanced)
+ * <SelectRoot value={mode} onValueChange={setMode}>
+ *   <SelectTrigger>
+ *     <SelectValue placeholder="Select..." />
+ *   </SelectTrigger>
+ *   <SelectContent>
+ *     <SelectItem value="auto">Automatic</SelectItem>
+ *     <SelectItem value="manual">Manual</SelectItem>
+ *   </SelectContent>
+ * </SelectRoot>
+ */
+
+// CVA variants for trigger
+const selectTriggerVariants = cva(
+  [
+    // Base styles
+    'flex items-center justify-between w-full rounded-xl font-medium font-display cursor-pointer',
+    'bg-slate-800/60 backdrop-blur-xl border border-slate-700/50',
+    'text-slate-100 placeholder:text-slate-500',
+    'transition-all duration-200',
+    // Focus ring - ember glow
+    'focus:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50',
+    'focus-visible:border-ember-500/60',
+    // Hover
+    'hover:bg-slate-800/80 hover:border-slate-600/60',
+    // Disabled
+    'disabled:opacity-50 disabled:cursor-not-allowed',
+    // Light mode
+    '[html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-300/60',
+    '[html:not(.dark)_&]:text-slate-900 [html:not(.dark)_&]:placeholder:text-slate-400',
+    '[html:not(.dark)_&]:hover:bg-white/90 [html:not(.dark)_&]:hover:border-slate-400/60',
+  ],
+  {
+    variants: {
+      variant: {
+        default: '',
+        ember: 'data-[state=open]:ring-2 data-[state=open]:ring-ember-500/50 data-[state=open]:border-ember-500/60',
+        ocean: 'data-[state=open]:ring-2 data-[state=open]:ring-ocean-500/50 data-[state=open]:border-ocean-500/60',
+      },
+      size: {
+        sm: 'px-3 py-2 text-sm',
+        md: 'px-4 py-4 text-base',
+        lg: 'px-5 py-5 text-lg',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'md',
+    },
+  }
+);
+
+// CVA variants for items
+const selectItemVariants = cva(
+  [
+    'relative flex items-center px-4 py-3 cursor-pointer select-none',
+    'font-medium font-display transition-colors duration-150',
+    'outline-none',
+    // Hover/highlighted state
+    'data-[highlighted]:bg-slate-700/50',
+    '[html:not(.dark)_&]:data-[highlighted]:bg-slate-100',
+    // Disabled state
+    'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+  ],
+  {
+    variants: {
+      variant: {
+        default: [
+          'text-slate-200 [html:not(.dark)_&]:text-slate-700',
+          'data-[state=checked]:bg-ember-900/40 data-[state=checked]:text-ember-300',
+          '[html:not(.dark)_&]:data-[state=checked]:bg-ember-100/80 [html:not(.dark)_&]:data-[state=checked]:text-ember-700',
+        ],
+        ember: [
+          'text-slate-200 [html:not(.dark)_&]:text-slate-700',
+          'data-[state=checked]:bg-ember-900/40 data-[state=checked]:text-ember-300',
+          '[html:not(.dark)_&]:data-[state=checked]:bg-ember-100/80 [html:not(.dark)_&]:data-[state=checked]:text-ember-700',
+        ],
+        ocean: [
+          'text-slate-200 [html:not(.dark)_&]:text-slate-700',
+          'data-[state=checked]:bg-ocean-900/40 data-[state=checked]:text-ocean-300',
+          '[html:not(.dark)_&]:data-[state=checked]:bg-ocean-100/80 [html:not(.dark)_&]:data-[state=checked]:text-ocean-700',
+        ],
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+);
+
+/**
+ * SelectRoot - Root component (wraps Radix Select.Root)
+ */
+const SelectRoot = SelectPrimitive.Root;
+SelectRoot.displayName = 'SelectRoot';
+
+/**
+ * SelectTrigger - Trigger button for the select
+ */
+const SelectTrigger = forwardRef(({
+  className,
+  children,
+  variant = 'default',
+  size = 'md',
+  ...props
+}, ref) => (
+  <SelectPrimitive.Trigger
+    ref={ref}
+    className={cn(selectTriggerVariants({ variant, size }), className)}
+    {...props}
+  >
+    {children}
+    <SelectPrimitive.Icon asChild>
+      <ChevronDown
+        className={cn(
+          'h-5 w-5 text-slate-400 transition-transform duration-200 shrink-0 ml-2',
+          '[html:not(.dark)_&]:text-slate-500'
+        )}
+      />
+    </SelectPrimitive.Icon>
+  </SelectPrimitive.Trigger>
+));
+SelectTrigger.displayName = 'SelectTrigger';
+
+/**
+ * SelectValue - Display selected value
+ */
+const SelectValue = SelectPrimitive.Value;
+SelectValue.displayName = 'SelectValue';
+
+/**
+ * SelectContent - Dropdown content container
+ */
+const SelectContent = forwardRef(({
+  className,
+  children,
+  position = 'popper',
+  sideOffset = 4,
+  ...props
+}, ref) => (
+  <SelectPrimitive.Portal>
+    <SelectPrimitive.Content
+      ref={ref}
+      position={position}
+      sideOffset={sideOffset}
+      className={cn(
+        // Base styles
+        'relative z-50 max-h-64 min-w-32 overflow-hidden rounded-xl',
+        // Background and border
+        'bg-slate-800/95 backdrop-blur-2xl border border-slate-700/60',
+        'shadow-lg',
+        // Light mode
+        '[html:not(.dark)_&]:bg-white/95 [html:not(.dark)_&]:border-slate-200',
+        '[html:not(.dark)_&]:shadow-lg',
+        // Animation
+        'data-[state=open]:animate-in data-[state=closed]:animate-out',
+        'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+        'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+        'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2',
+        'data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+        className
+      )}
+      {...props}
+    >
+      <SelectPrimitive.Viewport className="p-1">
+        {children}
+      </SelectPrimitive.Viewport>
+    </SelectPrimitive.Content>
+  </SelectPrimitive.Portal>
+));
+SelectContent.displayName = 'SelectContent';
+
+/**
+ * SelectItem - Individual option item
+ */
+const SelectItem = forwardRef(({
+  className,
+  children,
+  variant = 'default',
+  ...props
+}, ref) => (
+  <SelectPrimitive.Item
+    ref={ref}
+    className={cn(selectItemVariants({ variant }), 'pr-10', className)}
+    {...props}
+  >
+    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+    <SelectPrimitive.ItemIndicator className="absolute right-3 flex items-center justify-center">
+      <Check className="h-4 w-4 text-ember-400 [html:not(.dark)_&]:text-ember-600" />
+    </SelectPrimitive.ItemIndicator>
+  </SelectPrimitive.Item>
+));
+SelectItem.displayName = 'SelectItem';
+
+/**
+ * SelectGroup - Group of related items
+ */
+const SelectGroup = SelectPrimitive.Group;
+SelectGroup.displayName = 'SelectGroup';
+
+/**
+ * SelectLabel - Label for a group
+ */
+const SelectLabel = forwardRef(({ className, ...props }, ref) => (
+  <SelectPrimitive.Label
+    ref={ref}
+    className={cn(
+      'px-4 py-2 text-sm font-semibold text-slate-400',
+      '[html:not(.dark)_&]:text-slate-500',
+      className
+    )}
+    {...props}
+  />
+));
+SelectLabel.displayName = 'SelectLabel';
+
+/**
+ * SelectSeparator - Visual separator between items
+ */
+const SelectSeparator = forwardRef(({ className, ...props }, ref) => (
+  <SelectPrimitive.Separator
+    ref={ref}
+    className={cn(
+      '-mx-1 my-1 h-px bg-slate-700/50',
+      '[html:not(.dark)_&]:bg-slate-200',
+      className
+    )}
+    {...props}
+  />
+));
+SelectSeparator.displayName = 'SelectSeparator';
+
+/**
+ * Simple Select API - Backwards compatible wrapper
  *
  * @param {Object} props
  * @param {string} props.label - Label text
  * @param {string} props.icon - Optional emoji icon
  * @param {Array} props.options - Array of {value, label, disabled?}
- * @param {string} props.value - Selected value
- * @param {Function} props.onChange - Change handler
+ * @param {string|number} props.value - Selected value
+ * @param {Function} props.onChange - Change handler (receives synthetic event)
  * @param {boolean} props.disabled - Disabled state
  * @param {'default'|'ember'|'ocean'} props.variant - Color variant
- * @param {string} props.className - Additional classes
+ * @param {boolean} props.searchable - Searchable mode (logs warning, not supported)
+ * @param {string} props.placeholder - Placeholder text
+ * @param {string} props.className - Additional classes for trigger
  * @param {string} props.containerClassName - Container classes
  */
-export default function Select({
+function Select({
   label,
   icon,
   options = [],
@@ -26,174 +281,96 @@ export default function Select({
   onChange,
   disabled = false,
   variant = 'default',
-  liquid = false, // Legacy prop - ignored
+  searchable = false,
+  placeholder = 'Select...',
   className = '',
   containerClassName = '',
+  // eslint-disable-next-line no-unused-vars
+  liquid = false, // Legacy prop - ignored
   ...props
 }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [openUpward, setOpenUpward] = useState(false);
-  const containerRef = useRef(null);
-  const dropdownRef = useRef(null);
+  const labelId = useId();
 
-  // Calculate if dropdown should open upward
-  useEffect(() => {
-    if (isOpen && containerRef.current && dropdownRef.current) {
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const dropdownHeight = dropdownRef.current.offsetHeight;
-      const viewportHeight = window.innerHeight;
-      const spaceBelow = viewportHeight - containerRect.bottom - 100;
+  // Warn about searchable prop
+  if (searchable && typeof console !== 'undefined') {
+    console.warn(
+      'Select: searchable={true} is not supported with Radix Select. ' +
+      'Use Combobox pattern for searchable dropdowns. ' +
+      'Radix Select provides built-in typeahead (type first letter to jump to matching option).'
+    );
+  }
 
-      if (spaceBelow < dropdownHeight && containerRect.top > dropdownHeight) {
-        setOpenUpward(true);
-      } else {
-        setOpenUpward(false);
-      }
-    }
-  }, [isOpen]);
+  // Convert value to string for Radix (handles number values)
+  const stringValue = value !== undefined && value !== null ? String(value) : undefined;
 
-  // Close dropdown on outside click
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen]);
-
-  const selectedOption = options.find(opt => opt.value === value) || options[0];
-
-  const handleSelect = (option) => {
-    if (option.disabled) return;
+  // Handle value change - wrap in synthetic event for backwards compatibility
+  const handleValueChange = (newValue) => {
+    // Find the original value type from options
+    const option = options.find(opt => String(opt.value) === newValue);
+    const originalValue = option ? option.value : newValue;
 
     const syntheticEvent = {
-      target: { value: option.value }
+      target: { value: originalValue }
     };
     onChange?.(syntheticEvent);
-    setIsOpen(false);
   };
-
-  // Variant colors - Ember Noir palette
-  const variantColors = {
-    default: {
-      selected: 'bg-ember-900/40 text-ember-300 border-ember-500/50',
-      check: 'text-ember-400',
-    },
-    ember: {
-      selected: 'bg-ember-900/40 text-ember-300 border-ember-500/50',
-      check: 'text-ember-400',
-    },
-    ocean: {
-      selected: 'bg-ocean-900/40 text-ocean-300 border-ocean-500/50',
-      check: 'text-ocean-400',
-    },
-  };
-
-  const colors = variantColors[variant] || variantColors.default;
 
   return (
-    <div className={containerClassName} ref={containerRef}>
+    <div className={containerClassName}>
       {label && (
-        <label className="
-          block text-sm font-bold mb-3 font-display
-          text-slate-300
-          [html:not(.dark)_&]:text-slate-700
-        ">
+        <label
+          id={labelId}
+          className={cn(
+            'block text-sm font-bold mb-3 font-display',
+            'text-slate-300 [html:not(.dark)_&]:text-slate-700'
+          )}
+        >
           {icon && <span className="mr-2">{icon}</span>}
           {label}
         </label>
       )}
 
-      <div className="relative">
-        {/* Trigger Button */}
-        <button
-          type="button"
-          onClick={() => !disabled && setIsOpen(!isOpen)}
-          disabled={disabled}
-          className={`
-            w-full px-4 py-4 pr-12 rounded-xl text-left font-medium font-display cursor-pointer
-            bg-slate-800/60 backdrop-blur-xl
-            border border-slate-700/50
-            text-slate-100
-            focus:outline-none
-            disabled:opacity-50 disabled:cursor-not-allowed
-            transition-all duration-200
-            hover:bg-slate-800/80 hover:border-slate-600/60
-            [html:not(.dark)_&]:bg-white/80
-            [html:not(.dark)_&]:border-slate-300/60
-            [html:not(.dark)_&]:text-slate-900
-            [html:not(.dark)_&]:hover:bg-white/90
-            [html:not(.dark)_&]:hover:border-slate-400/60
-            ${isOpen ? 'ring-2 ring-ember-500/50 border-ember-500/60' : ''}
-            ${className}
-          `.trim().replace(/\s+/g, ' ')}
-          {...props}
+      <SelectRoot
+        value={stringValue}
+        onValueChange={handleValueChange}
+        disabled={disabled}
+        {...props}
+      >
+        <SelectTrigger
+          variant={variant}
+          className={className}
+          aria-labelledby={label ? labelId : undefined}
         >
-          {selectedOption?.label}
-        </button>
-
-        {/* Dropdown Arrow */}
-        <div className={`absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 [html:not(.dark)_&]:text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-
-        {/* Dropdown Menu */}
-        {isOpen && (
-          <div
-            ref={dropdownRef}
-            className={`
-              absolute z-[9000] w-full rounded-xl overflow-hidden
-              ${openUpward ? 'bottom-full mb-2' : 'top-full mt-2'}
-              ${openUpward ? 'animate-dropdown-up' : 'animate-dropdown'}
-              bg-slate-800/95 backdrop-blur-2xl
-              border border-slate-700/60
-              shadow-[0_8px_32px_rgba(0,0,0,0.4)]
-              [html:not(.dark)_&]:bg-white/95
-              [html:not(.dark)_&]:border-slate-200
-              [html:not(.dark)_&]:shadow-[0_8px_32px_rgba(0,0,0,0.15)]
-            `}
-          >
-            <div className="max-h-64 overflow-y-auto scrollbar-thin">
-              {options.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => handleSelect(option)}
-                  disabled={option.disabled}
-                  className={`
-                    w-full px-4 py-3 text-left font-medium font-display transition-all duration-150
-                    ${option.value === value
-                      ? `${colors.selected} border-l-4 [html:not(.dark)_&]:bg-ember-100/80 [html:not(.dark)_&]:text-ember-700`
-                      : 'text-slate-200 hover:bg-slate-700/50 border-l-4 border-transparent [html:not(.dark)_&]:text-slate-700 [html:not(.dark)_&]:hover:bg-slate-100'
-                    }
-                    ${option.disabled
-                      ? 'opacity-40 cursor-not-allowed'
-                      : 'cursor-pointer'
-                    }
-                  `}
-                >
-                  <div className="flex items-center justify-between">
-                    <span>{option.label}</span>
-                    {option.value === value && (
-                      <span className={`${colors.check} [html:not(.dark)_&]:text-ember-600`}>✓</span>
-                    )}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem
+              key={option.value}
+              value={String(option.value)}
+              disabled={option.disabled}
+              variant={variant}
+            >
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </SelectRoot>
     </div>
   );
 }
+
+// Named exports for compound component pattern
+export {
+  SelectRoot,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+  SelectGroup,
+  SelectLabel,
+  SelectSeparator,
+};
+
+// Default export for simple API
+export default Select;

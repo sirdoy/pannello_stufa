@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 12 of 18 (Core Interactive Components)
-Plan: 1 of 5 in current phase
+Plan: 3 of 5 in current phase
 Status: In progress
-Last activity: 2026-01-28 - Completed 12-01-PLAN.md (Checkbox + Switch)
+Last activity: 2026-01-28 - Completed 12-03-PLAN.md (Input Enhancement + Slider)
 
-Progress: [█████████████░░░░░] 63.3% (11 phases + 1 plan complete)
+Progress: [█████████████░░░░░] 66.7% (11 phases + 3 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 54 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 4 plans)
-- Average duration: ~4.8 min per plan
-- Total execution time: ~4.5 hours across 3 milestones
+- Total plans completed: 56 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 6 plans)
+- Average duration: ~5.0 min per plan
+- Total execution time: ~4.7 hours across 3 milestones
 
 **By Milestone:**
 
@@ -29,14 +29,14 @@ Progress: [█████████████░░░░░] 63.3% (11 pha
 |-----------|--------|-------|----------|
 | v1.0 Push Notifications | 5 | 29 | 4 days (2026-01-23 -> 2026-01-26) |
 | v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 -> 2026-01-28) |
-| v3.0 Design System | 8 | 4 | In progress |
+| v3.0 Design System | 8 | 6 | In progress |
 
 **Recent Trend:**
 - Milestone velocity improving (v2.0 shipped in 1/3 the time of v1.0)
-- Plan complexity stable (4.8 min average)
-- Phase 12 in progress (1/5 plans)
+- Plan complexity stable (~5 min average)
+- Phase 12 in progress (3/5 plans)
 
-*Updated after 12-01 completion*
+*Updated after 12-03 completion*
 
 ## Accumulated Context
 
@@ -60,6 +60,10 @@ Recent decisions affecting current work:
 - **12-01: Switch uses duration-250 for smooth animation per CONTEXT decision**
 - **12-01: Toggle.js deprecated - re-exports Switch for backwards compatibility**
 - **12-01: focus-visible:ring-ember-500/50 for all form controls (ember glow)**
+- **12-03: Input clearable/showCount are opt-in props (not default)**
+- **12-03: Real-time validation runs on every change (immediate feedback)**
+- **12-03: Slider accepts number, converts to array internally (simpler API)**
+- **12-03: Slider aria-label passed to Thumb, not Root (axe compliance)**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -77,6 +81,8 @@ Key architectural patterns from v1.0 + v2.0:
 - Light mode overrides: Same token name, different value via html:not(.dark)
 - CVA variants: `cva(baseClasses, { variants: { size, variant }, defaultVariants })` for component variants
 - Radix primitive wrapping: Import as `* as Primitive`, wrap Root/Indicator/Thumb with cn()
+- Input validation: `validate` prop for real-time `(value) => errorString | null`
+- Slider API: Accept number, convert to array for Radix, unwrap on callback
 
 ### Pending Todos
 
@@ -88,7 +94,7 @@ Key architectural patterns from v1.0 + v2.0:
 
 ### Blockers/Concerns
 
-None. Phase 12 plan 01 complete with all tasks executed successfully.
+None. Phase 12 plan 03 complete with all tasks executed successfully.
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
@@ -97,6 +103,6 @@ None. Phase 12 plan 01 complete with all tasks executed successfully.
 ## Session Continuity
 
 Last session: 2026-01-28
-Stopped at: Completed 12-01-PLAN.md (Checkbox + Switch)
+Stopped at: Completed 12-03-PLAN.md (Input Enhancement + Slider)
 Resume file: None
-Next step: Execute 12-02-PLAN.md (RadioGroup)
+Next step: Execute 12-04-PLAN.md (Select Enhancement)

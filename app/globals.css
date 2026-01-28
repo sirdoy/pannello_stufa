@@ -162,6 +162,48 @@
   --color-neutral-900: var(--color-slate-900);
   --color-neutral-950: var(--color-slate-950);
 
+  /* ===== SEMANTIC TOKEN ALIASES ===== */
+  /* These map design intentions to specific color values */
+  /* Use these in components for consistent theming */
+
+  /* Background tokens */
+  --color-bg-primary: var(--color-slate-950);
+  --color-bg-secondary: var(--color-slate-900);
+  --color-bg-surface: var(--color-slate-850);
+  --color-bg-elevated: var(--color-slate-800);
+  --color-bg-muted: var(--color-slate-700);
+
+  /* Text tokens */
+  --color-text-primary: var(--color-slate-100);
+  --color-text-secondary: var(--color-slate-200);
+  --color-text-tertiary: var(--color-slate-300);
+  --color-text-muted: var(--color-slate-400);
+  --color-text-disabled: var(--color-slate-500);
+
+  /* Border tokens */
+  --color-border-default: rgba(255, 255, 255, 0.06);
+  --color-border-hover: rgba(255, 255, 255, 0.1);
+  --color-border-focus: rgba(255, 255, 255, 0.15);
+  --color-border-muted: rgba(255, 255, 255, 0.04);
+
+  /* Accent tokens (map to ember for primary actions) */
+  --color-accent-primary: var(--color-ember-500);
+  --color-accent-primary-hover: var(--color-ember-400);
+  --color-accent-primary-active: var(--color-ember-600);
+
+  /* Interactive state tokens */
+  --color-interactive-hover: rgba(255, 255, 255, 0.06);
+  --color-interactive-active: rgba(255, 255, 255, 0.1);
+  --color-interactive-selected: rgba(237, 111, 16, 0.15);
+
+  /* Focus ring tokens */
+  --color-focus-ring: rgba(237, 111, 16, 0.5);
+  --color-focus-ring-offset: var(--color-slate-900);
+
+  /* Overlay tokens */
+  --color-overlay-backdrop: rgba(12, 10, 9, 0.8);
+  --color-overlay-scrim: rgba(0, 0, 0, 0.5);
+
   /* ===== TYPOGRAPHY ===== */
 
   /* Font Families */
@@ -333,6 +375,41 @@
   html:not(.dark) ::-webkit-scrollbar-thumb:hover {
     background: var(--color-slate-400);
     background-clip: padding-box;
+  }
+
+  /* ===== LIGHT MODE SEMANTIC OVERRIDES ===== */
+  html:not(.dark) {
+    /* Background overrides */
+    --color-bg-primary: var(--color-slate-50);
+    --color-bg-secondary: var(--color-slate-100);
+    --color-bg-surface: var(--color-slate-200);
+    --color-bg-elevated: white;
+    --color-bg-muted: var(--color-slate-300);
+
+    /* Text overrides */
+    --color-text-primary: var(--color-slate-900);
+    --color-text-secondary: var(--color-slate-800);
+    --color-text-tertiary: var(--color-slate-700);
+    --color-text-muted: var(--color-slate-600);
+    --color-text-disabled: var(--color-slate-400);
+
+    /* Border overrides */
+    --color-border-default: rgba(0, 0, 0, 0.06);
+    --color-border-hover: rgba(0, 0, 0, 0.1);
+    --color-border-focus: rgba(0, 0, 0, 0.15);
+    --color-border-muted: rgba(0, 0, 0, 0.04);
+
+    /* Interactive overrides */
+    --color-interactive-hover: rgba(0, 0, 0, 0.04);
+    --color-interactive-active: rgba(0, 0, 0, 0.08);
+    --color-interactive-selected: rgba(237, 111, 16, 0.1);
+
+    /* Focus ring overrides */
+    --color-focus-ring-offset: var(--color-slate-50);
+
+    /* Overlay overrides */
+    --color-overlay-backdrop: rgba(250, 250, 249, 0.9);
+    --color-overlay-scrim: rgba(0, 0, 0, 0.3);
   }
 }
 

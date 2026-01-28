@@ -140,11 +140,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 09-01-PLAN.md — Schedule data hooks and helper utilities
-- [ ] 09-02-PLAN.md — Weekly timeline visualization component
-- [ ] 09-03-PLAN.md — Schedule page and selector dropdown
-- [ ] 09-04-PLAN.md — Manual override bottom sheet with duration/temperature pickers
-- [ ] 09-05-PLAN.md — Active override badge and navigation integration
+- [x] 09-01-PLAN.md — Schedule data hooks and helper utilities
+- [x] 09-02-PLAN.md — Weekly timeline visualization component
+- [x] 09-03-PLAN.md — Schedule page and selector dropdown
+- [x] 09-04-PLAN.md — Manual override bottom sheet with duration/temperature pickers
+- [x] 09-05-PLAN.md — Active override badge and navigation integration
 
 #### Phase 10: Monitoring Dashboard & Alerts UI
 **Goal**: Dashboard for stove health status with visual indicators and push notification alerts
@@ -155,11 +155,13 @@ Plans:
   2. Dashboard displays monitoring status with last check time and status indicator
   3. System triggers push notifications for critical health issues (connection lost, unexpected state)
   4. Monitoring history shows past 7 days of cron execution logs and issues
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 10-01: TBD
-- [ ] 10-02: TBD
+- [ ] 10-01-PLAN.md — API routes for health monitoring (logs, stats, DMS status)
+- [ ] 10-02-PLAN.md — Status cards (connection status, dead man's switch panel)
+- [ ] 10-03-PLAN.md — Timeline & event components (infinite scroll, filters, expandable items)
+- [ ] 10-04-PLAN.md — Monitoring page & navigation integration
 
 ## Progress
 
@@ -177,4 +179,4 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10
 | 7. Stove Health Monitoring Backend | v2.0 | 2/2 | Complete | 2026-01-27 |
 | 8. Stove-Thermostat Integration Correction | v2.0 | 6/6 | Complete | 2026-01-27 |
 | 9. Schedule Management UI | v2.0 | 5/5 | Complete | 2026-01-27 |
-| 10. Monitoring Dashboard & Alerts UI | v2.0 | 0/TBD | Not started | - |
+| 10. Monitoring Dashboard & Alerts UI | v2.0 | 0/4 | Not started | - |

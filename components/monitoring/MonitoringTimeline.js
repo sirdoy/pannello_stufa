@@ -47,17 +47,17 @@ export default function MonitoringTimeline() {
       const data = await res.json();
 
       if (resetList) {
-        setEvents(data.logs);
+        setEvents(data.events);
       } else {
-        setEvents(prev => [...prev, ...data.logs]);
+        setEvents(prev => [...prev, ...data.events]);
       }
 
       setCursor(data.cursor);
 
       // Check if we've hit max or no more data
       const totalAfter = resetList
-        ? data.logs.length
-        : events.length + data.logs.length;
+        ? data.events.length
+        : events.length + data.events.length;
 
       setHasMore(data.hasMore && totalAfter < MAX_EVENTS);
       setError(null);

@@ -31,11 +31,16 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Firestore index deployment (`firebase deploy --only firestore:indexes`)
 - Token cleanup cron configuration (from v1.0)
 
-## Next Milestone Goals
+## Current Milestone: v3.0 Design System Evolution
 
-**Status:** Planning phase - requirements and roadmap TBD
+**Goal:** Establish a complete, consistent, and accessible UI component library based on evolved Ember Noir design system, then systematically apply it across all application pages for visual consistency and professional polish.
 
-Run `/gsd:new-milestone` to start next milestone cycle with questioning → research → requirements → roadmap.
+**Target features:**
+- Complete UI component library (all components from documentation)
+- Enhanced Ember Noir v2 (improved contrast, accessibility, modern patterns)
+- Consistent application across all pages (dashboard, stove, thermostat, lights, camera, monitoring)
+- WCAG AA accessibility compliance
+- Comprehensive component testing
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -140,15 +145,15 @@ Run `/gsd:new-milestone` to start next milestone cycle with questioning → rese
 
 ### Active
 
-**Next Milestone (TBD):**
+**v3.0 Milestone (In Planning):**
 
-Requirements to be defined through `/gsd:new-milestone` cycle (questioning → research → requirements → roadmap).
+Requirements being defined through research → requirements → roadmap cycle.
 
-Potential areas for future development:
-- Full schedule CRUD (create, edit, delete custom schedules)
-- Enhanced monitoring (error code parsing, performance metrics)
-- Integration enhancements (configurable boost amounts, learning algorithms)
-- Additional smart home device integrations
+**Focus areas:**
+- Complete UI component library following Ember Noir v2 evolution
+- Consistent visual design across all pages
+- Enhanced accessibility (WCAG AA)
+- Professional polish and modern UI patterns
 
 ### Out of Scope
 
@@ -215,5 +220,5 @@ Potential areas for future development:
 - **Deployment**: Vercel (current hosting platform)
 
 ---
-*Last updated: 2026-01-28 after completing v2.0 milestone*
-*Next: Start next milestone with `/gsd:new-milestone`*
+*Last updated: 2026-01-28 after starting v3.0 milestone (Design System Evolution)*
+*Next: Research → Requirements → Roadmap*

@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-28)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v2.0 Milestone Shipped - Planning next milestone
+**Current focus:** v3.0 Milestone Started - Design System Evolution
 
 ## Current Position
 
-Phase: N/A — Milestone complete
+Phase: Research phase
 Plan: N/A
-Status: v2.0 milestone complete, ready for next milestone
-Last activity: 2026-01-28 — v2.0 milestone archived and shipped
+Status: Researching design system ecosystem
+Last activity: 2026-01-28 — v3.0 milestone started (Design System Evolution)
 
-Progress: [████████████████████] v1.0: 29/29 plans, v2.0: 21/21 plans (100% complete)
+Progress: [████████████████████] v1.0: 29/29 plans, v2.0: 21/21 plans (100% complete), v3.0: 0/? plans
 
 ## Performance Metrics
 
@@ -105,14 +105,15 @@ Key architectural patterns from v1.0 + v2.0:
 - Warning: DMS polling continues when page backgrounded (Phase 10, should use Page Visibility API)
 - Coordination orchestrator bypasses Netatmo rate limiter (low risk - documented)
 
-**Next Milestone:**
-- Status: Planning phase - awaiting `/gsd:new-milestone`
-- Requirements: TBD through questioning → research → requirements → roadmap cycle
+**v3.0 Milestone (In Progress):**
+- Status: Research phase
+- Focus: Design System Evolution & UI Consistency
+- Target: Complete component library + consistent application across all pages
 
 ## Session Continuity
 
 Last session: 2026-01-28
-Stopped at: v2.0 milestone complete and archived
+Stopped at: v3.0 milestone research phase started
 Resume file: None
 
-**Next action:** Start next milestone with `/gsd:new-milestone`
+**Next action:** Complete research → define requirements → create roadmap

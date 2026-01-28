@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 12 of 18 (Core Interactive Components)
-Plan: 3 of 5 in current phase
+Plan: 3 of 5 in current phase (plans 01-03 complete)
 Status: In progress
-Last activity: 2026-01-28 - Completed 12-03-PLAN.md (Input Enhancement + Slider)
+Last activity: 2026-01-28 - Completed 12-02-PLAN.md (RadioGroup + Select)
 
 Progress: [█████████████░░░░░] 66.7% (11 phases + 3 plans complete)
 
@@ -60,6 +60,9 @@ Recent decisions affecting current work:
 - **12-01: Switch uses duration-250 for smooth animation per CONTEXT decision**
 - **12-01: Toggle.js deprecated - re-exports Switch for backwards compatibility**
 - **12-01: focus-visible:ring-ember-500/50 for all form controls (ember glow)**
+- **12-02: JSDOM polyfills for Radix UI (hasPointerCapture, scrollIntoView, ResizeObserver, DOMRect)**
+- **12-02: Select backwards-compatible API (options array, onChange synthetic event)**
+- **12-02: Number value preservation in Select onChange wrapper**
 - **12-03: Input clearable/showCount are opt-in props (not default)**
 - **12-03: Real-time validation runs on every change (immediate feedback)**
 - **12-03: Slider accepts number, converts to array internally (simpler API)**
@@ -94,7 +97,7 @@ Key architectural patterns from v1.0 + v2.0:
 
 ### Blockers/Concerns
 
-None. Phase 12 plan 03 complete with all tasks executed successfully.
+None. Phase 12 plan 02 complete with all tasks executed successfully.
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
@@ -103,6 +106,6 @@ None. Phase 12 plan 03 complete with all tasks executed successfully.
 ## Session Continuity
 
 Last session: 2026-01-28
-Stopped at: Completed 12-03-PLAN.md (Input Enhancement + Slider)
+Stopped at: Completed 12-02-PLAN.md (RadioGroup + Select)
 Resume file: None
-Next step: Execute 12-04-PLAN.md (Select Enhancement)
+Next step: Execute 12-04-PLAN.md or 12-05-PLAN.md (remaining Phase 12 plans)

@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-01-28)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 11 - Foundation & Tooling (v3.0 Design System Evolution)
+**Current focus:** Phase 12 - Core Interactive Components (v3.0 Design System Evolution)
 
 ## Current Position
 
-Phase: 11 of 18 (Foundation & Tooling)
-Plan: 3 of 3 in current phase (COMPLETE)
-Status: Phase 11 complete
-Last activity: 2026-01-28 - Completed 11-03-PLAN.md (ESLint + Semantic Tokens)
+Phase: 12 of 18 (Core Interactive Components)
+Plan: 1 of 5 in current phase
+Status: In progress
+Last activity: 2026-01-28 - Completed 12-01-PLAN.md (Checkbox + Switch)
 
-Progress: [█████████████░░░░░] 61.1% (10 phases + 3 plans complete)
+Progress: [█████████████░░░░░] 63.3% (11 phases + 1 plan complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 53 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 3 plans)
+- Total plans completed: 54 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 4 plans)
 - Average duration: ~4.8 min per plan
 - Total execution time: ~4.5 hours across 3 milestones
 
@@ -29,14 +29,14 @@ Progress: [█████████████░░░░░] 61.1% (10 pha
 |-----------|--------|-------|----------|
 | v1.0 Push Notifications | 5 | 29 | 4 days (2026-01-23 -> 2026-01-26) |
 | v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 -> 2026-01-28) |
-| v3.0 Design System | 8 | 3 | In progress |
+| v3.0 Design System | 8 | 4 | In progress |
 
 **Recent Trend:**
 - Milestone velocity improving (v2.0 shipped in 1/3 the time of v1.0)
 - Plan complexity stable (4.8 min average)
-- Phase 11 complete (3/3 plans)
+- Phase 12 in progress (1/5 plans)
 
-*Updated after 11-03 completion*
+*Updated after 12-01 completion*
 
 ## Accumulated Context
 
@@ -56,6 +56,10 @@ Recent decisions affecting current work:
 - **11-03: eslint-plugin-tailwindcss v4 beta (only version supporting Tailwind v4)**
 - **11-03: Native eslint-config-next flat config (FlatCompat caused circular reference)**
 - **11-03: Warn mode for no-arbitrary-value (gradual cleanup)**
+- **12-01: Radix CheckboxPrimitive for full WAI-ARIA compliance**
+- **12-01: Switch uses duration-250 for smooth animation per CONTEXT decision**
+- **12-01: Toggle.js deprecated - re-exports Switch for backwards compatibility**
+- **12-01: focus-visible:ring-ember-500/50 for all form controls (ember glow)**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -71,6 +75,8 @@ Key architectural patterns from v1.0 + v2.0:
 - Global axe matcher: toHaveNoViolations available in all tests via jest.setup.js
 - Semantic token naming: `{purpose}-{variant}` (bg-primary, text-muted, border-default)
 - Light mode overrides: Same token name, different value via html:not(.dark)
+- CVA variants: `cva(baseClasses, { variants: { size, variant }, defaultVariants })` for component variants
+- Radix primitive wrapping: Import as `* as Primitive`, wrap Root/Indicator/Thumb with cn()
 
 ### Pending Todos
 
@@ -82,7 +88,7 @@ Key architectural patterns from v1.0 + v2.0:
 
 ### Blockers/Concerns
 
-None. Phase 11 complete with all 3 plans executed successfully.
+None. Phase 12 plan 01 complete with all tasks executed successfully.
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
@@ -91,6 +97,6 @@ None. Phase 11 complete with all 3 plans executed successfully.
 ## Session Continuity
 
 Last session: 2026-01-28
-Stopped at: Completed 11-03-PLAN.md (ESLint + Semantic Tokens)
+Stopped at: Completed 12-01-PLAN.md (Checkbox + Switch)
 Resume file: None
-Next step: Begin Phase 12 (Button Component)
+Next step: Execute 12-02-PLAN.md (RadioGroup)

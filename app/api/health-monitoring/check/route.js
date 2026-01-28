@@ -22,6 +22,11 @@ import { updateDeadManSwitch } from '@/lib/healthDeadManSwitch';
 import { checkUserStoveHealth } from '@/lib/healthMonitoring';
 import { logHealthCheckRun } from '@/lib/healthLogger';
 import { validateHealthMonitoringEnv } from '@/lib/envValidator';
+import { triggerHealthMonitoringAlertServer } from '@/lib/notificationTriggersServer';
+import {
+  shouldSendCoordinationNotification,
+  recordNotificationSent,
+} from '@/lib/coordinationNotificationThrottle';
 
 export const dynamic = 'force-dynamic';
 
@@ -67,7 +72,68 @@ export const GET = withCronSecret(async (request) => {
     console.error('Failed to log health check:', err)
   );
 
-  // 6. Prepare response
+  // 6. Trigger notifications for critical issues (with throttling)
+  const notificationPromises = [];
+
+  for (const result of results) {
+    if (result.status !== 'fulfilled') continue;
+
+    const { userId, connectionStatus, stateMismatch } = result.value;
+
+    // Check throttle BEFORE attempting to send
+    const throttleCheck = shouldSendCoordinationNotification(userId);
+    if (!throttleCheck.allowed) {
+      console.log(`⏱️ Health alert throttled for ${userId} (wait ${throttleCheck.waitSeconds}s)`);
+      continue;
+    }
+
+    // Connection lost (offline or error status)
+    if (connectionStatus === 'offline' || connectionStatus === 'error') {
+      notificationPromises.push(
+        triggerHealthMonitoringAlertServer(userId, 'connection_lost', {
+          message: connectionStatus === 'offline'
+            ? 'La stufa non risponde (timeout). Verifica la connessione.'
+            : 'Errore di connessione alla stufa. Verifica il sistema.',
+        }).then(() => recordNotificationSent(userId))
+      );
+      continue; // Don't send multiple notifications per user
+    }
+
+    // State mismatch detected
+    if (stateMismatch?.detected) {
+      if (stateMismatch.reason === 'stove_error') {
+        // Stove error (AL code)
+        notificationPromises.push(
+          triggerHealthMonitoringAlertServer(userId, 'stove_error', {
+            errorCode: stateMismatch.actual.replace('ERROR (AL', '').replace(')', ''),
+            errorDescription: stateMismatch.errorDescription,
+            message: `Errore stufa: ${stateMismatch.actual}`,
+          }).then(() => recordNotificationSent(userId))
+        );
+      } else {
+        // State mismatch (should_be_on, should_be_off, netatmo_heating_stove_off)
+        notificationPromises.push(
+          triggerHealthMonitoringAlertServer(userId, 'state_mismatch', {
+            expected: stateMismatch.expected,
+            actual: stateMismatch.actual,
+            reason: stateMismatch.reason,
+            message: `Anomalia: stufa dovrebbe essere ${stateMismatch.expected} ma e ${stateMismatch.actual}`,
+          }).then(() => recordNotificationSent(userId))
+        );
+      }
+    }
+  }
+
+  // Fire-and-forget notifications (don't block response)
+  if (notificationPromises.length > 0) {
+    Promise.allSettled(notificationPromises).then(results => {
+      const sent = results.filter(r => r.status === 'fulfilled').length;
+      const failed = results.filter(r => r.status === 'rejected').length;
+      console.log(`📬 Health alerts sent: ${sent} success, ${failed} failed`);
+    });
+  }
+
+  // 7. Prepare response
   const successCount = results.filter(r => r.status === 'fulfilled').length;
   const failureCount = results.filter(r => r.status === 'rejected').length;
   const mismatches = results
@@ -78,8 +144,8 @@ export const GET = withCronSecret(async (request) => {
       actual: r.value.stateMismatch.actual,
     }));
 
-  // 7. Log summary
-  console.log(`✅ Health check complete: ${successCount}/${users.length} users, ${mismatches.length} mismatches`);
+  // 8. Log summary
+  console.log(`✅ Health check complete: ${successCount}/${users.length} users, ${mismatches.length} mismatches, ${notificationPromises.length} alerts triggered`);
 
   return success({
     checked: users.length,

@@ -143,10 +143,12 @@ Plans:
   4. User can enter text in Input component with error states and validation feedback
   5. User can select from dropdown using accessible Select with search capability
   6. User can adjust temperature/brightness using accessible Slider with range support
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 12-01: TBD
+- [ ] 12-01-PLAN.md — Checkbox + Switch (Radix primitives with CVA)
+- [ ] 12-02-PLAN.md — RadioGroup + Select (selection patterns)
+- [ ] 12-03-PLAN.md — Input + Slider (value input controls)
 
 #### Phase 13: Foundation Refactoring
 **Goal**: Refactor existing foundation components to use CVA and consistent patterns
@@ -267,7 +269,7 @@ Phases execute in numeric order: 11 → 12 → 13 → 14 → 15 → 16 → 17 �
 | 9. Schedule Management UI | v2.0 | 4/4 | Complete | 2026-01-28 |
 | 10. Monitoring Dashboard & Alerts | v2.0 | 5/5 | Complete | 2026-01-28 |
 | 11. Foundation & Tooling | v3.0 | 3/3 | Complete | 2026-01-28 |
-| 12. Core Interactive Components | v3.0 | 0/TBD | Not started | - |
+| 12. Core Interactive Components | v3.0 | 0/3 | Planned | - |
 | 13. Foundation Refactoring | v3.0 | 0/TBD | Not started | - |
 | 14. Feedback & Layout Components | v3.0 | 0/TBD | Not started | - |
 | 15. Smart Home Components Refactor | v3.0 | 0/TBD | Not started | - |

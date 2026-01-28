@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-26)
 ## Current Position
 
 Phase: 10 of 10 (Monitoring Dashboard & Alerts UI) — IN PROGRESS
-Plan: 3 of TBD complete
-Status: Phase 10 in progress, timeline components complete
-Last activity: 2026-01-28 — Completed 10-03-PLAN.md (monitoring timeline components)
+Plan: 2 of TBD complete
+Status: Phase 10 in progress, status card components complete
+Last activity: 2026-01-28 — Completed 10-02-PLAN.md (status card components)
 
-Progress: [█████████░░░░░░░░░░░] 50/TBD plans complete (v1.0: 29 plans, v2.0: 21 plans)
+Progress: [█████████░░░░░░░░░░░] 49/TBD plans complete (v1.0: 29 plans, v2.0: 20 plans)
 
 ## Performance Metrics
 
@@ -41,7 +41,7 @@ Progress: [█████████░░░░░░░░░░░] 50/TBD 
 | 7. Health Monitoring Backend | 2/2 | 9.0 min | 4.5 min |
 | 8. Stove-Thermostat Integration | 6/6 | 30.6 min | 5.1 min |
 | 9. Schedule Management UI | 5/5 | 30.6 min | 6.1 min |
-| 10. Monitoring Dashboard & Alerts UI | 3/TBD | 5.4 min | 1.8 min |
+| 10. Monitoring Dashboard & Alerts UI | 2/TBD | 4.75 min | 2.4 min |
 
 **Recent Trend:**
 - v1.0 completed successfully with consistent velocity
@@ -60,10 +60,9 @@ Progress: [█████████░░░░░░░░░░░] 50/TBD 
   - 09-03: 4.3 min (schedule switcher UI)
   - 09-04: 5.4 min (manual override UI)
   - 09-05: 8.0 min (active override badge & navigation)
-- v2.0 Phase 10 IN PROGRESS: 3 plans in 5.4 minutes (1.8 min/plan average)
+- v2.0 Phase 10 IN PROGRESS: 2 plans in 4.75 minutes (2.4 min/plan average)
   - 10-01: 1.8 min (health monitoring API routes)
-  - 10-02: skipped (dashboard layout reserved for wave 3)
-  - 10-03: 1.8 min (monitoring timeline components)
+  - 10-02: 2.95 min (status card components)
 
 ## Accumulated Context
 
@@ -141,6 +140,10 @@ Recent decisions affecting current work:
 - v2.0 (10-01): Stats endpoint supports 1-30 days range for dashboard flexibility
 - v2.0 (10-01): Dead man's switch endpoint for 30-second frontend polling
 - v2.0 (10-01): Direct Firestore queries for cursor support (getRecentHealthLogs doesn't support cursors)
+- v2.0 (10-02): Status thresholds: >=95% online, >=80% degraded, <80% offline (industry-standard uptime metrics)
+- v2.0 (10-02): Color + icon dual encoding for accessibility (WCAG 2.1 compliance, not color-only)
+- v2.0 (10-02): Skeleton placeholders over spinners (shows layout structure, better perceived performance)
+- v2.0 (10-02): Italian localized messages match project language (Sistema attivo, Cron mai eseguito)
 - v2.0 (10-03): MAX_EVENTS = 200 memory safeguard matches MAX_NOTIFICATIONS constant
 - v2.0 (10-03): Filter changes reset cursor and refetch from beginning (NotificationInbox pattern)
 - v2.0 (10-03): Accordion expansion on tap for compact mobile UX
@@ -166,7 +169,7 @@ Recent decisions affecting current work:
 - ✅ Phase 7 (Health Monitoring Backend): COMPLETE - 2 plans
 - ✅ Phase 8 (Stove-Thermostat Integration): COMPLETE - 6 plans
 - ✅ Phase 9 (Schedule Management UI): COMPLETE - 5 plans
-- 🔄 Phase 10 (Monitoring Dashboard & Alerts UI): IN PROGRESS - 3 plans complete
+- 🔄 Phase 10 (Monitoring Dashboard & Alerts UI): IN PROGRESS - 2 plans complete
 
 **v2.0 Research Flags:**
 - Phases 9, 10: Standard patterns, existing infrastructure extends naturally
@@ -179,7 +182,7 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-01-28
-Stopped at: Completed 10-03-PLAN.md (monitoring timeline components)
+Stopped at: Completed 10-02-PLAN.md (status card components)
 Resume file: None
 
-**Next action:** Continue Phase 10 with dashboard integration and stats cards
+**Next action:** Continue Phase 10 with monitoring timeline components and dashboard page

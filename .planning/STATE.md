@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-26)
 ## Current Position
 
 Phase: 10 of 10 (Monitoring Dashboard & Alerts UI) — IN PROGRESS
-Plan: 4 of TBD complete
-Status: Phase 10 in progress, monitoring dashboard page complete
-Last activity: 2026-01-28 — Completed 10-04-PLAN.md (monitoring dashboard & navigation)
+Plan: 5 of TBD complete
+Status: Phase 10 in progress, health alert notifications wired
+Last activity: 2026-01-28 — Completed 10-05-PLAN.md (health alert notification wiring)
 
-Progress: [█████████░░░░░░░░░░░] 51/TBD plans complete (v1.0: 29 plans, v2.0: 22 plans)
+Progress: [█████████░░░░░░░░░░░] 52/TBD plans complete (v1.0: 29 plans, v2.0: 23 plans)
 
 ## Performance Metrics
 
@@ -41,7 +41,7 @@ Progress: [█████████░░░░░░░░░░░] 51/TBD 
 | 7. Health Monitoring Backend | 2/2 | 9.0 min | 4.5 min |
 | 8. Stove-Thermostat Integration | 6/6 | 30.6 min | 5.1 min |
 | 9. Schedule Management UI | 5/5 | 30.6 min | 6.1 min |
-| 10. Monitoring Dashboard & Alerts UI | 2/TBD | 4.75 min | 2.4 min |
+| 10. Monitoring Dashboard & Alerts UI | 5/TBD | 31.05 min | 6.2 min |
 
 **Recent Trend:**
 - v1.0 completed successfully with consistent velocity
@@ -60,11 +60,12 @@ Progress: [█████████░░░░░░░░░░░] 51/TBD 
   - 09-03: 4.3 min (schedule switcher UI)
   - 09-04: 5.4 min (manual override UI)
   - 09-05: 8.0 min (active override badge & navigation)
-- v2.0 Phase 10 IN PROGRESS: 4 plans in 26.65 minutes (6.7 min/plan average)
+- v2.0 Phase 10 IN PROGRESS: 5 plans in 31.05 minutes (6.2 min/plan average)
   - 10-01: 1.8 min (health monitoring API routes)
   - 10-02: 2.95 min (status card components)
   - 10-03: 11.0 min (monitoring timeline components)
   - 10-04: 11.0 min (monitoring dashboard page & navigation)
+  - 10-05: 4.4 min (health alert notification wiring)
 
 ## Accumulated Context
 
@@ -154,6 +155,9 @@ Recent decisions affecting current work:
 - v2.0 (10-04): 30-second DMS polling interval balances responsiveness with API load
 - v2.0 (10-04): max-h-[600px] timeline scroll container prevents infinite page height
 - v2.0 (10-04): Global navigation section positioned between devices and settings in mobile menu
+- v2.0 (10-05): Fire-and-forget notification pattern prevents blocking cron response
+- v2.0 (10-05): Throttle-before-send pattern avoids unnecessary async overhead for skipped notifications
+- v2.0 (10-05): Reuse coordination throttle for health alerts (both are system events, one 30-min window)
 
 ### Pending Todos
 
@@ -188,7 +192,7 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-01-28
-Stopped at: Completed 10-04-PLAN.md (monitoring dashboard page & navigation)
+Stopped at: Completed 10-05-PLAN.md (health alert notification wiring)
 Resume file: None
 
-**Next action:** Continue Phase 10 with alert settings UI (10-05 or next plan)
+**Next action:** Continue Phase 10 with next plan (alert settings UI or other monitoring features)

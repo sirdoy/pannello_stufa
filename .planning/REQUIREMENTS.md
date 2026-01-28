@@ -18,28 +18,28 @@ Requirements for milestone v2.0: Netatmo Complete Control & Stove Monitoring
 
 ### Stove-Thermostat Integration
 
-- [ ] **INTEG-01**: System verifies existing setpoint override behavior works correctly (stufa ignition → Netatmo temporary boost)
-- [ ] **INTEG-02**: Temporary setpoint override preserves underlying schedule (no schedule modification)
-- [ ] **INTEG-03**: System coordinates multi-room thermostat zones when stove is active
-- [ ] **INTEG-04**: System detects user manual thermostat changes and pauses automation (respect user intent)
-- [ ] **INTEG-05**: System applies 2-minute debouncing before triggering setpoint override (avoid rapid cycles)
+- [x] **INTEG-01**: System verifies existing setpoint override behavior works correctly (stufa ignition → Netatmo temporary boost)
+- [x] **INTEG-02**: Temporary setpoint override preserves underlying schedule (no schedule modification)
+- [x] **INTEG-03**: System coordinates multi-room thermostat zones when stove is active
+- [x] **INTEG-04**: System detects user manual thermostat changes and pauses automation (respect user intent)
+- [x] **INTEG-05**: System applies 2-minute debouncing before triggering setpoint override (avoid rapid cycles)
 
 ### Stove Health Monitoring
 
-- [ ] **MONITOR-01**: User can view stove connection status (online/offline/last-seen) in dashboard
-- [ ] **MONITOR-02**: System verifies stove is in expected state every cron cycle (scheduled ON → actually running)
-- [ ] **MONITOR-03**: System checks stove-thermostat coordination is working (detects drift between expected and actual)
-- [ ] **MONITOR-04**: System logs monitoring events to Firestore with timestamp and status
-- [ ] **MONITOR-05**: System displays monitoring status in dashboard (last check time, status indicator)
+- [x] **MONITOR-01**: User can view stove connection status (online/offline/last-seen) in dashboard
+- [x] **MONITOR-02**: System verifies stove is in expected state every cron cycle (scheduled ON → actually running)
+- [x] **MONITOR-03**: System checks stove-thermostat coordination is working (detects drift between expected and actual)
+- [x] **MONITOR-04**: System logs monitoring events to Firestore with timestamp and status
+- [x] **MONITOR-05**: System displays monitoring status in dashboard (last check time, status indicator)
 
 ### Supporting Infrastructure
 
 - [x] **INFRA-01**: System tracks Netatmo API call count per user with Redis or in-memory store
 - [x] **INFRA-02**: System refreshes OAuth tokens atomically (access + refresh token rotation)
-- [ ] **INFRA-03**: System logs every cron execution with timestamp, duration, and status
-- [ ] **INFRA-04**: System implements dead man's switch (alerts if cron hasn't run in 10+ minutes)
-- [ ] **INFRA-05**: System validates environment variables on startup (dev vs prod Netatmo credentials)
-- [ ] **INFRA-06**: System enforces alert deduplication (max 1 notification per alert type per 30 minutes)
+- [x] **INFRA-03**: System logs every cron execution with timestamp, duration, and status
+- [x] **INFRA-04**: System implements dead man's switch (alerts if cron hasn't run in 10+ minutes)
+- [x] **INFRA-05**: System validates environment variables on startup (dev vs prod Netatmo credentials)
+- [x] **INFRA-06**: System enforces alert deduplication (max 1 notification per alert type per 30 minutes)
 
 ## Future Requirements (v2.1+)
 
@@ -95,11 +95,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INTEG-03 | Phase 8 | Complete |
 | INTEG-04 | Phase 8 | Complete |
 | INTEG-05 | Phase 8 | Complete |
-| MONITOR-01 | Phase 7, 10 | Pending |
+| MONITOR-01 | Phase 7, 10 | Complete |
 | MONITOR-02 | Phase 7 | Complete |
 | MONITOR-03 | Phase 7 | Complete |
-| MONITOR-04 | Phase 7, 10 | Pending |
-| MONITOR-05 | Phase 7, 10 | Pending |
+| MONITOR-04 | Phase 7, 10 | Complete |
+| MONITOR-05 | Phase 7, 10 | Complete |
 | INFRA-01 | Phase 6 | Complete |
 | INFRA-02 | Phase 6 | Complete |
 | INFRA-03 | Phase 7 | Complete |
@@ -114,4 +114,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-26*
-*Last updated: 2026-01-27 after Phase 9 completion*
+*Last updated: 2026-01-28 after Phase 10 completion (v2.0 milestone complete)*

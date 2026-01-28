@@ -162,7 +162,7 @@ Plans:
 - [x] 10-02-PLAN.md — Status cards (connection status, dead man's switch panel)
 - [x] 10-03-PLAN.md — Timeline & event components (infinite scroll, filters, expandable items)
 - [x] 10-04-PLAN.md — Monitoring page & navigation integration
-- [ ] 10-05-PLAN.md — Health alert notification wiring (gap closure)
+- [x] 10-05-PLAN.md — Health alert notification wiring (gap closure)
 
 ## Progress
 
@@ -180,4 +180,4 @@ Phases execute in numeric order: 6 -> 7 -> 8 -> 9 -> 10
 | 7. Stove Health Monitoring Backend | v2.0 | 2/2 | Complete | 2026-01-27 |
 | 8. Stove-Thermostat Integration Correction | v2.0 | 6/6 | Complete | 2026-01-27 |
 | 9. Schedule Management UI | v2.0 | 5/5 | Complete | 2026-01-27 |
-| 10. Monitoring Dashboard & Alerts UI | v2.0 | 4/5 | In Progress | - |
+| 10. Monitoring Dashboard & Alerts UI | v2.0 | 5/5 | Complete | 2026-01-28 |

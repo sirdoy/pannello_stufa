@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-26)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 10 - Monitoring Dashboard & Alerts UI (IN PROGRESS)
+**Current focus:** v2.0 Milestone Complete - All 5 phases done
 
 ## Current Position
 
-Phase: 10 of 10 (Monitoring Dashboard & Alerts UI) — IN PROGRESS
-Plan: 5 of TBD complete
-Status: Phase 10 in progress, health alert notifications wired
-Last activity: 2026-01-28 — Completed 10-05-PLAN.md (health alert notification wiring)
+Phase: 10 of 10 (Monitoring Dashboard & Alerts UI) — COMPLETE
+Plan: 5 of 5 complete
+Status: Phase 10 verified and complete
+Last activity: 2026-01-28 — Completed Phase 10 (monitoring dashboard & alerts UI)
 
-Progress: [█████████░░░░░░░░░░░] 52/TBD plans complete (v1.0: 29 plans, v2.0: 23 plans)
+Progress: [████████████████████] 52/52 plans complete (v1.0: 29 plans, v2.0: 23 plans)
 
 ## Performance Metrics
 
@@ -41,7 +41,7 @@ Progress: [█████████░░░░░░░░░░░] 52/TBD 
 | 7. Health Monitoring Backend | 2/2 | 9.0 min | 4.5 min |
 | 8. Stove-Thermostat Integration | 6/6 | 30.6 min | 5.1 min |
 | 9. Schedule Management UI | 5/5 | 30.6 min | 6.1 min |
-| 10. Monitoring Dashboard & Alerts UI | 5/TBD | 31.05 min | 6.2 min |
+| 10. Monitoring Dashboard & Alerts UI | 5/5 | 31.4 min | 6.3 min |
 
 **Recent Trend:**
 - v1.0 completed successfully with consistent velocity
@@ -60,11 +60,12 @@ Progress: [█████████░░░░░░░░░░░] 52/TBD 
   - 09-03: 4.3 min (schedule switcher UI)
   - 09-04: 5.4 min (manual override UI)
   - 09-05: 8.0 min (active override badge & navigation)
-- v2.0 Phase 10 IN PROGRESS: 5 plans in 31.05 minutes (6.2 min/plan average)
+- v2.0 Phase 10 COMPLETE: 5 plans in 31.4 minutes (6.3 min/plan average)
   - 10-01: 1.8 min (health monitoring API routes)
   - 10-02: 2.95 min (status card components)
   - 10-03: 11.0 min (monitoring timeline components)
   - 10-04: 11.0 min (monitoring dashboard page & navigation)
+  - 10-05: 4.4 min (health alert notification wiring - gap closure)
   - 10-05: 4.4 min (health alert notification wiring)
 
 ## Accumulated Context
@@ -155,6 +156,10 @@ Recent decisions affecting current work:
 - v2.0 (10-04): 30-second DMS polling interval balances responsiveness with API load
 - v2.0 (10-04): max-h-[600px] timeline scroll container prevents infinite page height
 - v2.0 (10-04): Global navigation section positioned between devices and settings in mobile menu
+- v2.0 (10-05): Three health alert types (connection_lost, state_mismatch, stove_error) with Italian localization
+- v2.0 (10-05): Reuses coordination throttle service (30-minute window) for health alert deduplication
+- v2.0 (10-05): Fire-and-forget notification pattern (Promise.allSettled without await) doesn't block cron
+- v2.0 (10-05): Throttle check happens BEFORE creating notification promises (efficient pattern)
 - v2.0 (10-05): Fire-and-forget notification pattern prevents blocking cron response
 - v2.0 (10-05): Throttle-before-send pattern avoids unnecessary async overhead for skipped notifications
 - v2.0 (10-05): Reuse coordination throttle for health alerts (both are system events, one 30-min window)
@@ -179,7 +184,7 @@ Recent decisions affecting current work:
 - ✅ Phase 7 (Health Monitoring Backend): COMPLETE - 2 plans
 - ✅ Phase 8 (Stove-Thermostat Integration): COMPLETE - 6 plans
 - ✅ Phase 9 (Schedule Management UI): COMPLETE - 5 plans
-- 🔄 Phase 10 (Monitoring Dashboard & Alerts UI): IN PROGRESS - 2 plans complete
+- ✅ Phase 10 (Monitoring Dashboard & Alerts UI): COMPLETE - 5 plans (1 gap closure)
 
 **v2.0 Research Flags:**
 - Phases 9, 10: Standard patterns, existing infrastructure extends naturally
@@ -192,7 +197,7 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-01-28
-Stopped at: Completed 10-05-PLAN.md (health alert notification wiring)
+Stopped at: Completed Phase 10 (all 5 phases of v2.0 milestone complete)
 Resume file: None
 
-**Next action:** Continue Phase 10 with next plan (alert settings UI or other monitoring features)
+**Next action:** Audit v2.0 milestone completion (/gsd:audit-milestone)

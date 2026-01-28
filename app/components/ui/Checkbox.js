@@ -1,22 +1,109 @@
 'use client';
 
 import { forwardRef } from 'react';
+import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 import { Check, Minus } from 'lucide-react';
+import { cva } from 'class-variance-authority';
+import { cn } from '@/lib/utils/cn';
+
+/**
+ * Checkbox Variants - CVA Configuration
+ *
+ * Size: sm (16px), md (20px), lg (24px)
+ * Variant: primary, ember, ocean, sage, flame
+ */
+const checkboxVariants = cva(
+  // Base classes
+  [
+    'rounded-md border-2 transition-all duration-200',
+    'flex items-center justify-center',
+    'outline-none cursor-pointer',
+    // Focus ring - ember glow
+    'focus-visible:ring-2 focus-visible:ring-ember-500/50',
+    'focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
+    '[html:not(.dark)_&]:focus-visible:ring-offset-slate-50',
+    // Disabled state
+    'disabled:opacity-50 disabled:cursor-not-allowed',
+    // Base border (unchecked)
+    'border-slate-500 [html:not(.dark)_&]:border-slate-400',
+  ],
+  {
+    variants: {
+      size: {
+        sm: 'h-4 w-4',
+        md: 'h-5 w-5',
+        lg: 'h-6 w-6',
+      },
+      variant: {
+        primary: [
+          'hover:border-ember-400 [html:not(.dark)_&]:hover:border-ember-500',
+          'data-[state=checked]:bg-ember-500 data-[state=checked]:border-ember-500',
+          'data-[state=indeterminate]:bg-ember-500 data-[state=indeterminate]:border-ember-500',
+          '[html:not(.dark)_&]:data-[state=checked]:bg-ember-600 [html:not(.dark)_&]:data-[state=checked]:border-ember-600',
+          '[html:not(.dark)_&]:data-[state=indeterminate]:bg-ember-600 [html:not(.dark)_&]:data-[state=indeterminate]:border-ember-600',
+        ],
+        ember: [
+          'hover:border-ember-400 [html:not(.dark)_&]:hover:border-ember-500',
+          'data-[state=checked]:bg-ember-500 data-[state=checked]:border-ember-500',
+          'data-[state=indeterminate]:bg-ember-500 data-[state=indeterminate]:border-ember-500',
+          '[html:not(.dark)_&]:data-[state=checked]:bg-ember-600 [html:not(.dark)_&]:data-[state=checked]:border-ember-600',
+          '[html:not(.dark)_&]:data-[state=indeterminate]:bg-ember-600 [html:not(.dark)_&]:data-[state=indeterminate]:border-ember-600',
+        ],
+        ocean: [
+          'hover:border-ocean-400 [html:not(.dark)_&]:hover:border-ocean-500',
+          'data-[state=checked]:bg-ocean-500 data-[state=checked]:border-ocean-500',
+          'data-[state=indeterminate]:bg-ocean-500 data-[state=indeterminate]:border-ocean-500',
+          '[html:not(.dark)_&]:data-[state=checked]:bg-ocean-600 [html:not(.dark)_&]:data-[state=checked]:border-ocean-600',
+          '[html:not(.dark)_&]:data-[state=indeterminate]:bg-ocean-600 [html:not(.dark)_&]:data-[state=indeterminate]:border-ocean-600',
+        ],
+        sage: [
+          'hover:border-sage-400 [html:not(.dark)_&]:hover:border-sage-500',
+          'data-[state=checked]:bg-sage-500 data-[state=checked]:border-sage-500',
+          'data-[state=indeterminate]:bg-sage-500 data-[state=indeterminate]:border-sage-500',
+          '[html:not(.dark)_&]:data-[state=checked]:bg-sage-600 [html:not(.dark)_&]:data-[state=checked]:border-sage-600',
+          '[html:not(.dark)_&]:data-[state=indeterminate]:bg-sage-600 [html:not(.dark)_&]:data-[state=indeterminate]:border-sage-600',
+        ],
+        flame: [
+          'hover:border-flame-400 [html:not(.dark)_&]:hover:border-flame-500',
+          'data-[state=checked]:bg-flame-500 data-[state=checked]:border-flame-500',
+          'data-[state=indeterminate]:bg-flame-500 data-[state=indeterminate]:border-flame-500',
+          '[html:not(.dark)_&]:data-[state=checked]:bg-flame-600 [html:not(.dark)_&]:data-[state=checked]:border-flame-600',
+          '[html:not(.dark)_&]:data-[state=indeterminate]:bg-flame-600 [html:not(.dark)_&]:data-[state=indeterminate]:border-flame-600',
+        ],
+      },
+    },
+    defaultVariants: {
+      size: 'md',
+      variant: 'ocean',
+    },
+  }
+);
+
+/**
+ * Icon size mapping for checkbox indicators
+ */
+const iconSizes = {
+  sm: 'h-3 w-3',
+  md: 'h-3.5 w-3.5',
+  lg: 'h-4 w-4',
+};
 
 /**
  * Checkbox Component - Ember Noir Design System
  *
- * A styled checkbox with liquid glass aesthetics and full dark mode support.
+ * Accessible checkbox built on Radix UI primitives with CVA variants.
+ * Supports checked, unchecked, and indeterminate states with full keyboard navigation.
  *
  * @param {Object} props
- * @param {boolean} props.checked - Checked state
- * @param {boolean} props.indeterminate - Indeterminate state (overrides checked)
- * @param {Function} props.onChange - Change handler
+ * @param {boolean|'indeterminate'} props.checked - Checked state (true, false, or 'indeterminate')
+ * @param {boolean} props.indeterminate - Indeterminate state (legacy prop, converts to checked='indeterminate')
+ * @param {Function} props.onCheckedChange - Radix change handler (receives boolean | 'indeterminate')
+ * @param {Function} props.onChange - Legacy change handler (backwards compatibility)
  * @param {boolean} props.disabled - Disabled state
  * @param {ReactNode} props.label - Optional label text
- * @param {string} props.variant - Color variant: 'primary' | 'sage' | 'ocean' | 'ember' | 'flame'
- * @param {string} props.size - Size: 'sm' | 'md' | 'lg'
- * @param {string} props.className - Additional classes for wrapper
+ * @param {'sm'|'md'|'lg'} props.size - Size variant
+ * @param {'primary'|'ember'|'ocean'|'sage'|'flame'} props.variant - Color variant
+ * @param {string} props.className - Additional classes for the checkbox
  * @param {string} props.id - Input id (for label association)
  * @param {string} props.name - Input name
  * @param {string} props.value - Input value
@@ -25,12 +112,13 @@ const Checkbox = forwardRef(function Checkbox(
   {
     checked = false,
     indeterminate = false,
-    onChange,
+    onCheckedChange,
+    onChange, // backwards compatibility
     disabled = false,
     label,
-    variant = 'ocean',
     size = 'md',
-    className = '',
+    variant = 'ocean',
+    className,
     id,
     name,
     value,
@@ -38,135 +126,74 @@ const Checkbox = forwardRef(function Checkbox(
   },
   ref
 ) {
-  // Size classes
-  const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-5 h-5',
-    lg: 'w-6 h-6',
+  // Convert indeterminate boolean prop to Radix format
+  const radixChecked = indeterminate ? 'indeterminate' : checked;
+
+  // Handle change with backwards compatibility
+  const handleCheckedChange = (newChecked) => {
+    if (onCheckedChange) {
+      onCheckedChange(newChecked);
+    }
+    // Legacy onChange support - simulate event-like object
+    if (onChange) {
+      onChange({
+        target: {
+          checked: newChecked === true,
+          indeterminate: newChecked === 'indeterminate',
+          name,
+          value,
+        },
+      });
+    }
   };
 
-  const iconSizeClasses = {
-    sm: 'w-3 h-3',
-    md: 'w-3.5 h-3.5',
-    lg: 'w-4 h-4',
-  };
+  const checkboxElement = (
+    <CheckboxPrimitive.Root
+      ref={ref}
+      id={id}
+      name={name}
+      value={value}
+      checked={radixChecked}
+      onCheckedChange={handleCheckedChange}
+      disabled={disabled}
+      className={cn(checkboxVariants({ size, variant }), className)}
+      {...props}
+    >
+      <CheckboxPrimitive.Indicator className="text-white">
+        {radixChecked === 'indeterminate' ? (
+          <Minus className={iconSizes[size]} strokeWidth={3} />
+        ) : (
+          <Check className={iconSizes[size]} strokeWidth={3} />
+        )}
+      </CheckboxPrimitive.Indicator>
+    </CheckboxPrimitive.Root>
+  );
 
-  // Variant classes - Dark mode first (default), light mode with [html:not(.dark)_&]
-  const variantClasses = {
-    primary: {
-      border: 'border-slate-500 [html:not(.dark)_&]:border-slate-400',
-      checked: 'bg-ember-500 border-ember-500 [html:not(.dark)_&]:bg-ember-600 [html:not(.dark)_&]:border-ember-600',
-      hover: 'hover:border-ember-400 [html:not(.dark)_&]:hover:border-ember-500',
-      focus: 'focus-visible:ring-2 focus-visible:ring-ember-500/50 [html:not(.dark)_&]:focus-visible:ring-ember-600/50',
-    },
-    sage: {
-      border: 'border-slate-500 [html:not(.dark)_&]:border-slate-400',
-      checked: 'bg-sage-500 border-sage-500 [html:not(.dark)_&]:bg-sage-600 [html:not(.dark)_&]:border-sage-600',
-      hover: 'hover:border-sage-400 [html:not(.dark)_&]:hover:border-sage-500',
-      focus: 'focus-visible:ring-2 focus-visible:ring-sage-500/50 [html:not(.dark)_&]:focus-visible:ring-sage-600/50',
-    },
-    ocean: {
-      border: 'border-slate-500 [html:not(.dark)_&]:border-slate-400',
-      checked: 'bg-ocean-500 border-ocean-500 [html:not(.dark)_&]:bg-ocean-600 [html:not(.dark)_&]:border-ocean-600',
-      hover: 'hover:border-ocean-400 [html:not(.dark)_&]:hover:border-ocean-500',
-      focus: 'focus-visible:ring-2 focus-visible:ring-ocean-500/50 [html:not(.dark)_&]:focus-visible:ring-ocean-600/50',
-    },
-    ember: {
-      border: 'border-slate-500 [html:not(.dark)_&]:border-slate-400',
-      checked: 'bg-ember-500 border-ember-500 [html:not(.dark)_&]:bg-ember-600 [html:not(.dark)_&]:border-ember-600',
-      hover: 'hover:border-ember-400 [html:not(.dark)_&]:hover:border-ember-500',
-      focus: 'focus-visible:ring-2 focus-visible:ring-ember-500/50 [html:not(.dark)_&]:focus-visible:ring-ember-600/50',
-    },
-    flame: {
-      border: 'border-slate-500 [html:not(.dark)_&]:border-slate-400',
-      checked: 'bg-flame-500 border-flame-500 [html:not(.dark)_&]:bg-flame-600 [html:not(.dark)_&]:border-flame-600',
-      hover: 'hover:border-flame-400 [html:not(.dark)_&]:hover:border-flame-500',
-      focus: 'focus-visible:ring-2 focus-visible:ring-flame-500/50 [html:not(.dark)_&]:focus-visible:ring-flame-600/50',
-    },
-  };
-
-  const v = variantClasses[variant] || variantClasses.ocean;
-  const isChecked = indeterminate || checked;
-
-  const checkboxClasses = `
-    ${sizeClasses[size]}
-    appearance-none
-    rounded-md
-    border-2
-    ${isChecked ? v.checked : v.border}
-    ${!disabled && v.hover}
-    ${v.focus}
-    transition-all
-    duration-200
-    cursor-pointer
-    disabled:opacity-50
-    disabled:cursor-not-allowed
-    flex
-    items-center
-    justify-center
-    outline-none
-  `.trim().replace(/\s+/g, ' ');
-
-  const wrapperClasses = `
-    inline-flex
-    items-center
-    gap-2
-    ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-    ${className}
-  `.trim().replace(/\s+/g, ' ');
-
-  const content = (
-    <>
-      <div className="relative">
-        <input
-          ref={ref}
-          type="checkbox"
-          id={id}
-          name={name}
-          value={value}
-          checked={checked}
-          onChange={onChange}
-          disabled={disabled}
-          className="sr-only peer"
-          {...props}
-        />
-        <div className={checkboxClasses}>
-          {isChecked && (
-            <span className="text-white">
-              {indeterminate ? (
-                <Minus className={iconSizeClasses[size]} strokeWidth={3} />
-              ) : (
-                <Check className={iconSizeClasses[size]} strokeWidth={3} />
-              )}
-            </span>
-          )}
-        </div>
-      </div>
-      {label && (
+  // Wrap with label if provided
+  if (label) {
+    return (
+      <div
+        className={cn(
+          'inline-flex items-center gap-2',
+          disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+        )}
+      >
+        {checkboxElement}
         <label
           htmlFor={id}
-          className={`
-            text-sm
-            font-medium
-            text-white
-            [html:not(.dark)_&]:text-slate-900
-            select-none
-            ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
-          `.trim().replace(/\s+/g, ' ')}
+          className={cn(
+            'text-sm font-medium select-none',
+            'text-white [html:not(.dark)_&]:text-slate-900',
+            disabled ? 'cursor-not-allowed' : 'cursor-pointer'
+          )}
         >
           {label}
         </label>
-      )}
-    </>
-  );
-
-  // If there's a label, wrap in a label element
-  if (label) {
-    return <div className={wrapperClasses}>{content}</div>;
+      </div>
+    );
   }
 
-  // Otherwise, just return the checkbox
-  return <div className={wrapperClasses}>{content}</div>;
+  return checkboxElement;
 });
 
 export default Checkbox;

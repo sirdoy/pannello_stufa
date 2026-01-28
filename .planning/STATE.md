@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-01-26)
+See: .planning/PROJECT.md (updated 2026-01-28)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v2.0 Milestone Complete - All 5 phases done
+**Current focus:** v2.0 Milestone Shipped - Planning next milestone
 
 ## Current Position
 
-Phase: 10 of 10 (Monitoring Dashboard & Alerts UI) — COMPLETE
-Plan: 5 of 5 complete
-Status: Phase 10 verified and complete
-Last activity: 2026-01-28 — Completed Phase 10 (monitoring dashboard & alerts UI)
+Phase: N/A — Milestone complete
+Plan: N/A
+Status: v2.0 milestone complete, ready for next milestone
+Last activity: 2026-01-28 — v2.0 milestone archived and shipped
 
-Progress: [████████████████████] 52/52 plans complete (v1.0: 29 plans, v2.0: 23 plans)
+Progress: [████████████████████] v1.0: 29/29 plans, v2.0: 21/21 plans (100% complete)
 
 ## Performance Metrics
 
@@ -72,132 +72,47 @@ Progress: [████████████████████] 52/52 p
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
+All milestone decisions logged in PROJECT.md Key Decisions table.
 
-- v1.0: Dual persistence (IndexedDB + localStorage) prevents token loss across browser restarts
-- v1.0: Firebase Realtime Database for tokens, Firestore for notification history
-- v1.0: In-memory rate limiting sufficient for single-instance deployment (consider Redis for v2 multi-instance)
-- v1.0: HMAC-secured cron webhook for security without API key rotation
-- v2.0: Backend-first approach recommended (establish APIs before UI)
-- v2.0: Temporary setpoint overrides (not schedule modifications) for stove-thermostat coordination
-- v2.0: Zero new npm dependencies - existing v1.0 stack handles all requirements
-- v2.0 (06-01): 5-minute TTL balances schedule freshness with API rate limit prevention (500 calls/hour)
-- v2.0 (06-01): Timestamp-based cache validation follows netatmoTokenHelper.js pattern
-- v2.0 (06-02): Conservative 400 calls/hour limit (100 buffer) prevents Netatmo 429 errors
-- v2.0 (06-02): In-memory Map storage with 2-hour retention matches existing rateLimiter.js pattern
-- v2.0 (06-03): Control operations (POST) never cached - only read operations use cache
-- v2.0 (06-03): Cache invalidation after schedule switch ensures frontend consistency
-- v2.0 (06-03): Integration tests focus on service integration to avoid auth0 mocking complexity
-- v2.0 (07-01): Promise.allSettled for parallel API fetching with graceful degradation (health checks tolerate partial failures)
-- v2.0 (07-01): STARTING states have 15-min grace period (avoid false alerts during stove startup)
-- v2.0 (07-01): Firestore parent/subcollection structure (aggregated queries + detailed drill-down)
-- v2.0 (07-01): Fire-and-forget logging pattern (Firestore errors don't block health checks)
-- v2.0 (07-02): 10-minute threshold for dead man's switch (10 missed cron runs = admin alert)
-- v2.0 (07-02): updateDeadManSwitch() runs FIRST before any processing (proves cron ran even if health check fails)
-- v2.0 (07-02): Environment validation logs warnings but continues (partial functionality better than complete failure)
-- v2.0 (07-02): Firestore logging uses fire-and-forget (health check execution more important than logging)
-- v2.0 (08-01): State stored at coordination/state in RTDB (single shared state for coordination logic)
-- v2.0 (08-01): Preferences stored at coordination/preferences/{userId} (per-user configuration)
-- v2.0 (08-01): Boost range constrained to 0.5-5°C with default 2°C (sensible heating adjustments)
-- v2.0 (08-01): Version tracking on preferences enables conflict detection across devices
-- v2.0 (08-02): 2-minute debounce for stove ON events (prevents premature coordination)
-- v2.0 (08-02): 30-second retry timer for early shutoff (handles quick stove restarts)
-- v2.0 (08-02): Global 30-minute notification throttle across ALL coordination events (not per-type like rateLimiter.js)
-- v2.0 (08-02): In-memory timer storage (timers don't persist across restarts, but pendingDebounce flag does)
-- v2.0 (08-03): 0.5°C setpoint tolerance prevents false positives from Netatmo API rounding
-- v2.0 (08-03): Pause until next schedule slot (not fixed duration) respects user workflow
-- v2.0 (08-03): Non-standard modes (away, hg, off) always indicate user intent
-- v2.0 (08-03): UTC timestamps for schedule calculations match Netatmo API convention
-- v2.0 (08-04): setRoomsToBoostMode applies configurable boost (+N°C) instead of fixed low temperature
-- v2.0 (08-04): 30°C maximum cap prevents excessive heating (safety limit)
-- v2.0 (08-04): restoreRoomSetpoints restores previous setpoint (not schedule) preserving user manual adjustments
-- v2.0 (08-04): Promise.allSettled for multi-room operations (per-room failures don't block others)
-- v2.0 (08-04b): processCoordinationCycle orchestrates complete workflow (state → intent → debounce → action → notification)
-- v2.0 (08-04b): Zone-specific boost amounts override default boost preference
-- v2.0 (08-04b): Explicit object property syntax for ESM compatibility (pausedUntil: pausedUntil vs shorthand)
-- v2.0 (08-04b): Italian-localized coordination notifications match existing language
-- v2.0 (08-04b): Graceful schedule fetch degradation (1-hour default pause if Netatmo API fails)
-- v2.0 (08-05): Fire-and-forget Firestore logging pattern (coordination failures don't block logging)
-- v2.0 (08-05): Single coordinationEvents collection (flat structure sufficient for coordination event volume)
-- v2.0 (08-05): Cron endpoint logs summary events only (orchestrator logs all decision points)
-- v2.0 (09-01): m_offset parsed as minutes from Monday 00:00, not per-day (Netatmo week-based offset)
-- v2.0 (09-01): Cyan-yellow-red gradient for colorblind accessibility (avoids red-green confusion)
-- v2.0 (09-01): Hook tests follow project pattern (module structure verification, not full integration)
-- v2.0 (09-02): Horizontal scroll for timeline (not vertical) - better mobile UX for day-view scanning
-- v2.0 (09-02): Temperature text always visible - accessibility over aesthetics
-- v2.0 (09-02): 40px minimum slot width - WCAG 2.1 touch target compliance
-- v2.0 (09-02): Memoized parseTimelineSlots - prevents re-renders on scroll
-- v2.0 (09-03): Two-step schedule change (select → apply) prevents accidental switches
-- v2.0 (09-03): Back button navigates to /thermostat page
-- v2.0 (09-03): Manual override section placeholder for Plan 09-04
-- v2.0 (09-04): Logarithmic scale for duration picker (5min to 12h) with snap-to-nice-values
-- v2.0 (09-04): Temperature picker uses +/- buttons with 0.5°C steps for precision
-- v2.0 (09-04): Auto-select first room and pre-fill current setpoint for UX
-- v2.0 (09-04): Success feedback (1.5s) before sheet closes
-- v2.0 (09-04): endtime calculated in SECONDS (not milliseconds) per Netatmo API
-- v2.0 (09-05): Tap badge opens confirmation dialog (prevents accidental cancellation)
-- v2.0 (09-05): homestatus API enhanced to include endtime field (badge shows remaining time)
-- v2.0 (09-05): Schedule link before StoveSyncPanel (logical grouping: schedule → sync → rooms)
-- v2.0 (10-01): Cursor-based pagination using document IDs (same pattern as notifications/history)
-- v2.0 (10-01): 7-day default filter for logs (balances relevance with completeness)
-- v2.0 (10-01): Stats endpoint supports 1-30 days range for dashboard flexibility
-- v2.0 (10-01): Dead man's switch endpoint for 30-second frontend polling
-- v2.0 (10-01): Direct Firestore queries for cursor support (getRecentHealthLogs doesn't support cursors)
-- v2.0 (10-02): Status thresholds: >=95% online, >=80% degraded, <80% offline (industry-standard uptime metrics)
-- v2.0 (10-02): Color + icon dual encoding for accessibility (WCAG 2.1 compliance, not color-only)
-- v2.0 (10-02): Skeleton placeholders over spinners (shows layout structure, better perceived performance)
-- v2.0 (10-02): Italian localized messages match project language (Sistema attivo, Cron mai eseguito)
-- v2.0 (10-03): MAX_EVENTS = 200 memory safeguard matches MAX_NOTIFICATIONS constant
-- v2.0 (10-03): Filter changes reset cursor and refetch from beginning (NotificationInbox pattern)
-- v2.0 (10-03): Accordion expansion on tap for compact mobile UX
-- v2.0 (10-03): Italian date-fns locale for relative timestamps
-- v2.0 (10-04): Monitoring added to GLOBAL_SECTIONS (cross-cutting concern, not device-specific)
-- v2.0 (10-04): 30-second DMS polling interval balances responsiveness with API load
-- v2.0 (10-04): max-h-[600px] timeline scroll container prevents infinite page height
-- v2.0 (10-04): Global navigation section positioned between devices and settings in mobile menu
-- v2.0 (10-05): Three health alert types (connection_lost, state_mismatch, stove_error) with Italian localization
-- v2.0 (10-05): Reuses coordination throttle service (30-minute window) for health alert deduplication
-- v2.0 (10-05): Fire-and-forget notification pattern (Promise.allSettled without await) doesn't block cron
-- v2.0 (10-05): Throttle check happens BEFORE creating notification promises (efficient pattern)
-- v2.0 (10-05): Fire-and-forget notification pattern prevents blocking cron response
-- v2.0 (10-05): Throttle-before-send pattern avoids unnecessary async overhead for skipped notifications
-- v2.0 (10-05): Reuse coordination throttle for health alerts (both are system events, one 30-min window)
+Key architectural patterns from v1.0 + v2.0:
+- Dual persistence strategy (IndexedDB + localStorage) for token survival
+- Firebase RTDB for real-time state, Firestore for historical queries
+- HMAC-secured cron webhooks for security without key rotation
+- Fire-and-forget logging pattern (don't block critical operations)
+- Promise.allSettled for parallel operations with graceful degradation
+- Global 30-minute notification throttle across system events
+- Conservative API rate limits with safety buffers
+- Temporary setpoint overrides (mode='manual') preserve underlying schedules
+- Schedule-aware pause calculations respect user workflow
 
 ### Pending Todos
 
-**Operational Setup (v1.0 shipped, pending deployment):**
-- Scheduler cron configuration required (cron-job.org account setup, 15-30 min)
-- Health monitoring cron configuration required (separate endpoint, 1-min frequency)
-- Coordination cron configuration required (/api/coordination/enforce, 1-min frequency)
-- Firestore indexes need manual deployment: `firebase deploy --only firestore:indexes`
+**Operational Setup (v1.0 + v2.0 shipped, pending deployment):**
+- Scheduler cron configuration (cron-job.org account, 15-30 min)
+- Health monitoring cron (1-min frequency): `/api/health-monitoring/check`
+- Coordination cron (1-min frequency): `/api/coordination/enforce`
+- Firestore indexes: `firebase deploy --only firestore:indexes`
 
 ### Blockers/Concerns
 
-**v1.0 Status:**
-- ✅ All 5 phases complete (29 plans executed)
-- ✅ All 31 v1.0 requirements satisfied (100%)
+**v1.0 + v2.0 Status:**
+- ✅ All 50 plans complete (v1.0: 29, v2.0: 21)
+- ✅ All 53 requirements satisfied (v1.0: 31, v2.0: 22) (100%)
 - ⚠️ Operational setup pending (cron configuration, Firestore indexes)
 
-**v2.0 Status:**
-- ✅ Phase 6 (Netatmo Schedule API): COMPLETE - 3 plans
-- ✅ Phase 7 (Health Monitoring Backend): COMPLETE - 2 plans
-- ✅ Phase 8 (Stove-Thermostat Integration): COMPLETE - 6 plans
-- ✅ Phase 9 (Schedule Management UI): COMPLETE - 5 plans
-- ✅ Phase 10 (Monitoring Dashboard & Alerts UI): COMPLETE - 5 plans (1 gap closure)
+**Known Tech Debt:**
+- TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
+- Warning: DMS polling continues when page backgrounded (Phase 10, should use Page Visibility API)
+- Coordination orchestrator bypasses Netatmo rate limiter (low risk - documented)
 
-**v2.0 Research Flags:**
-- Phases 9, 10: Standard patterns, existing infrastructure extends naturally
-
-**Coverage (v2.0):**
-- Total v2.0 requirements: 22
-- Mapped to phases: 22 (100%)
-- No orphaned requirements
+**Next Milestone:**
+- Status: Planning phase - awaiting `/gsd:new-milestone`
+- Requirements: TBD through questioning → research → requirements → roadmap cycle
 
 ## Session Continuity
 
 Last session: 2026-01-28
-Stopped at: Completed Phase 10 (all 5 phases of v2.0 milestone complete)
+Stopped at: v2.0 milestone complete and archived
 Resume file: None
 
-**Next action:** Audit v2.0 milestone completion (/gsd:audit-milestone)
+**Next action:** Start next milestone with `/gsd:new-milestone`

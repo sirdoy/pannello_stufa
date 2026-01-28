@@ -10,41 +10,40 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v1.0 (shipped 2026-01-26)
-**Status:** Production-ready, operational setup pending
+**Version:** v2.0 (shipped 2026-01-28)
+**Status:** Production-ready with complete Netatmo control and monitoring
 
-**Shipped Capabilities:**
-- ✅ Token persistence across browser restarts (dual persistence: IndexedDB + localStorage)
-- ✅ Multi-device support with device fingerprinting
+**Shipped Capabilities (v1.0 + v2.0):**
+- ✅ Push notification system with token persistence and multi-device support
 - ✅ Admin dashboard with delivery metrics and 7-day trends
 - ✅ User preferences with type toggles, DND hours, rate limiting
-- ✅ Notification history with infinite scroll and filters
-- ✅ Device management UI with rename/remove capabilities
-- ✅ Comprehensive E2E test suite (32 tests, 3 browsers)
-- ✅ CI/CD integration with GitHub Actions
+- ✅ Notification history with infinite scroll and device management
+- ✅ Comprehensive E2E test suite (32 tests, 3 browsers) with CI/CD integration
+- ✅ Netatmo schedule management (view, switch, manual overrides)
+- ✅ Automated stove health monitoring with dead man's switch
+- ✅ Intelligent stove-thermostat coordination with user intent detection
+- ✅ Monitoring dashboard with connection status, timeline, and push alerts
+- ✅ Complete schedule UI with 7-day timeline and override management
 
 **Operational Setup Required:**
-- Cron webhook configuration (cron-job.org account setup, 15-30 min)
+- Cron webhook configuration for health monitoring (1-min frequency)
+- Cron webhook configuration for coordination enforcement (1-min frequency)
 - Firestore index deployment (`firebase deploy --only firestore:indexes`)
-- E2E test execution validation (local build + test run)
+- Token cleanup cron configuration (from v1.0)
 
-## Current Milestone: v2.0 Netatmo Complete Control & Stove Monitoring
+## Next Milestone Goals
 
-**Goal:** Controllo completo del termostato Netatmo con gestione schedule settimanali e monitoring automatico della stufa per rilevare anomalie.
+**Status:** Planning phase - requirements and roadmap TBD
 
-**Target features:**
-- **Netatmo Schedule Management:** Visualizzare, creare, modificare, eliminare programmazioni settimanali (CRUD completo)
-- **Stove-Thermostat Integration Fix:** Override temporaneo setpoint (non modificare schedule) quando stufa accende/spegne
-- **Stove Health Monitoring:** Cron job per verificare connessione, stato atteso vs reale, errori/anomalie, coordinazione con Netatmo
-- **Alerting:** Dashboard warnings + notifiche push (sistema v1.0) per problemi rilevati
+Run `/gsd:new-milestone` to start next milestone cycle with questioning → research → requirements → roadmap.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
-- Firebase (Realtime Database for tokens, Firestore for history)
+- Firebase (Realtime Database for tokens/cache, Firestore for history)
 - Auth0 for authentication
 - Playwright for E2E testing
 - Recharts for visualization
-- ~70,000 lines TypeScript/JavaScript
+- ~73,000 lines TypeScript/JavaScript
 
 ## Requirements
 
@@ -107,17 +106,49 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ Notifiche per eventi scheduler e alert errori
 - ✓ API send notification
 
+**v2.0 Shipped (2026-01-28):**
+
+**Netatmo Schedule Management:**
+- ✓ **SCHED-01**: View active weekly schedule with day/time/temperature slots — v2.0 (Phase 6, 9)
+- ✓ **SCHED-02**: Switch between pre-configured schedules via dropdown — v2.0 (Phase 6, 9)
+- ✓ **SCHED-03**: Create temporary override with duration picker (5-720 min) — v2.0 (Phase 9)
+- ✓ **SCHED-04**: Cache schedule data with 5-minute TTL — v2.0 (Phase 6)
+- ✓ **SCHED-05**: Enforce 60-second minimum polling interval — v2.0 (Phase 6)
+- ✓ **SCHED-06**: Track 500 calls/hour Netatmo API limit — v2.0 (Phase 6)
+
+**Stove-Thermostat Integration:**
+- ✓ **INTEG-01**: Verify setpoint override behavior (temporary boost) — v2.0 (Phase 8)
+- ✓ **INTEG-02**: Temporary override preserves schedule — v2.0 (Phase 8)
+- ✓ **INTEG-03**: Coordinate multi-room thermostat zones — v2.0 (Phase 8)
+- ✓ **INTEG-04**: Detect user manual changes, pause automation — v2.0 (Phase 8)
+- ✓ **INTEG-05**: 2-minute debouncing before override — v2.0 (Phase 8)
+
+**Stove Health Monitoring:**
+- ✓ **MONITOR-01**: View stove connection status in dashboard — v2.0 (Phase 7, 10)
+- ✓ **MONITOR-02**: Verify stove in expected state (cron checks) — v2.0 (Phase 7)
+- ✓ **MONITOR-03**: Check stove-thermostat coordination — v2.0 (Phase 7)
+- ✓ **MONITOR-04**: Log monitoring events to Firestore — v2.0 (Phase 7, 10)
+- ✓ **MONITOR-05**: Display monitoring status in dashboard — v2.0 (Phase 7, 10)
+
+**Supporting Infrastructure:**
+- ✓ **INFRA-01**: Track Netatmo API calls per user — v2.0 (Phase 6)
+- ✓ **INFRA-02**: Atomic OAuth token refresh — v2.0 (Phase 6)
+- ✓ **INFRA-03**: Log cron execution with timestamp/duration — v2.0 (Phase 7)
+- ✓ **INFRA-04**: Dead man's switch (10+ min threshold) — v2.0 (Phase 7)
+- ✓ **INFRA-05**: Validate environment variables on startup — v2.0 (Phase 7)
+- ✓ **INFRA-06**: Alert deduplication (30-minute throttle) — v2.0 (Phase 8)
+
 ### Active
 
-**v2.0 Goals (In Definition):**
+**Next Milestone (TBD):**
 
-Target features identified:
-- Netatmo schedule management (visualizzare, creare, modificare, eliminare)
-- Stove-thermostat integration correction (setpoint override, not schedule modification)
-- Stove health monitoring via cron (health check, state verification, error detection)
-- Alerting system (dashboard + push notifications)
+Requirements to be defined through `/gsd:new-milestone` cycle (questioning → research → requirements → roadmap).
 
-Requirements to be defined through research → requirements → roadmap cycle.
+Potential areas for future development:
+- Full schedule CRUD (create, edit, delete custom schedules)
+- Enhanced monitoring (error code parsing, performance metrics)
+- Integration enhancements (configurable boost amounts, learning algorithms)
+- Additional smart home device integrations
 
 ### Out of Scope
 
@@ -184,5 +215,5 @@ Requirements to be defined through research → requirements → roadmap cycle.
 - **Deployment**: Vercel (current hosting platform)
 
 ---
-*Last updated: 2026-01-26 after starting v2.0 milestone*
-*Next: Research → Requirements → Roadmap for v2.0*
+*Last updated: 2026-01-28 after completing v2.0 milestone*
+*Next: Start next milestone with `/gsd:new-milestone`*

@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-26)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 9 - Schedule Management UI (COMPLETE)
+**Current focus:** Phase 10 - Monitoring Dashboard & Alerts UI (IN PROGRESS)
 
 ## Current Position
 
-Phase: 9 of 10 (Schedule Management UI) — COMPLETE
-Plan: 5 of 5 complete
-Status: Phase complete, ready for Phase 10 (Deployment)
-Last activity: 2026-01-27 — Completed 09-05-PLAN.md (active override badge & navigation)
+Phase: 10 of 10 (Monitoring Dashboard & Alerts UI) — IN PROGRESS
+Plan: 1 of TBD complete
+Status: Phase 10 started, monitoring API routes complete
+Last activity: 2026-01-28 — Completed 10-01-PLAN.md (health monitoring API routes)
 
-Progress: [█████████░░░░░░░░░░░] 47/TBD plans complete (v1.0: 29 plans, v2.0: 18 plans)
+Progress: [█████████░░░░░░░░░░░] 48/TBD plans complete (v1.0: 29 plans, v2.0: 19 plans)
 
 ## Performance Metrics
 
@@ -33,7 +33,7 @@ Progress: [█████████░░░░░░░░░░░] 47/TBD 
 | 4. History & Device Mgmt | 5 | 17.5 min | 3.5 min |
 | 5. Automation & Testing | 5 | 14.3 min | 4.8 min |
 
-**v2.0 Progress (Phases 6-9):**
+**v2.0 Progress (Phases 6-10):**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
@@ -41,6 +41,7 @@ Progress: [█████████░░░░░░░░░░░] 47/TBD 
 | 7. Health Monitoring Backend | 2/2 | 9.0 min | 4.5 min |
 | 8. Stove-Thermostat Integration | 6/6 | 30.6 min | 5.1 min |
 | 9. Schedule Management UI | 5/5 | 30.6 min | 6.1 min |
+| 10. Monitoring Dashboard & Alerts UI | 1/TBD | 1.8 min | 1.8 min |
 
 **Recent Trend:**
 - v1.0 completed successfully with consistent velocity
@@ -59,6 +60,8 @@ Progress: [█████████░░░░░░░░░░░] 47/TBD 
   - 09-03: 4.3 min (schedule switcher UI)
   - 09-04: 5.4 min (manual override UI)
   - 09-05: 8.0 min (active override badge & navigation)
+- v2.0 Phase 10 STARTED: 1 plan in 1.8 minutes
+  - 10-01: 1.8 min (health monitoring API routes)
 
 ## Accumulated Context
 
@@ -131,6 +134,11 @@ Recent decisions affecting current work:
 - v2.0 (09-05): Tap badge opens confirmation dialog (prevents accidental cancellation)
 - v2.0 (09-05): homestatus API enhanced to include endtime field (badge shows remaining time)
 - v2.0 (09-05): Schedule link before StoveSyncPanel (logical grouping: schedule → sync → rooms)
+- v2.0 (10-01): Cursor-based pagination using document IDs (same pattern as notifications/history)
+- v2.0 (10-01): 7-day default filter for logs (balances relevance with completeness)
+- v2.0 (10-01): Stats endpoint supports 1-30 days range for dashboard flexibility
+- v2.0 (10-01): Dead man's switch endpoint for 30-second frontend polling
+- v2.0 (10-01): Direct Firestore queries for cursor support (getRecentHealthLogs doesn't support cursors)
 
 ### Pending Todos
 
@@ -152,7 +160,7 @@ Recent decisions affecting current work:
 - ✅ Phase 7 (Health Monitoring Backend): COMPLETE - 2 plans
 - ✅ Phase 8 (Stove-Thermostat Integration): COMPLETE - 6 plans
 - ✅ Phase 9 (Schedule Management UI): COMPLETE - 5 plans
-- 🔜 Phase 10 (Deployment & Documentation): FINAL
+- 🔄 Phase 10 (Monitoring Dashboard & Alerts UI): IN PROGRESS - 1 plan complete
 
 **v2.0 Research Flags:**
 - Phases 9, 10: Standard patterns, existing infrastructure extends naturally
@@ -164,8 +172,8 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-01-27
-Stopped at: Completed 09-05-PLAN.md (active override badge & navigation)
+Last session: 2026-01-28
+Stopped at: Completed 10-01-PLAN.md (health monitoring API routes)
 Resume file: None
 
-**Next action:** Phase 9 COMPLETE. Ready for Phase 10 (Deployment & Documentation)
+**Next action:** Continue Phase 10 with monitoring dashboard UI components

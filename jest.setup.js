@@ -216,3 +216,40 @@ afterEach(() => {
   localStorageMock.removeItem.mockClear();
   localStorageMock.clear.mockClear();
 });
+
+// ===== ACCESSIBILITY TESTING (jest-axe) =====
+// Import and extend jest-axe matchers for a11y assertions
+const { toHaveNoViolations, configureAxe } = require('jest-axe');
+expect.extend(toHaveNoViolations);
+
+// Configure axe for better test stability in JSDOM
+// Note: Color contrast checks are disabled because JSDOM doesn't compute styles accurately
+const configuredAxe = configureAxe({
+  rules: {
+    // Disable rules that have known issues in JSDOM
+    'color-contrast': { enabled: false },
+  },
+});
+
+// Export configured axe for test files that need custom configuration
+global.axe = configuredAxe;
+
+// Helper for jest-axe with fake timers (axe-core uses setTimeout internally)
+// Usage: await runAxeWithRealTimers(container)
+global.runAxeWithRealTimers = async (container) => {
+  // If fake timers are active, temporarily switch to real timers
+  const isUsingFakeTimers = typeof jest !== 'undefined' && jest.isFakeTimers && jest.isFakeTimers();
+
+  if (isUsingFakeTimers) {
+    jest.useRealTimers();
+  }
+
+  const { axe } = require('jest-axe');
+  const results = await axe(container);
+
+  if (isUsingFakeTimers) {
+    jest.useFakeTimers();
+  }
+
+  return results;
+};

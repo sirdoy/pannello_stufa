@@ -1,240 +1,235 @@
-# Project Research Summary
+# Project Research Summary - Design System Evolution
 
-**Project:** Pannello Stufa v2.0 - Netatmo Schedule Management & Stove Monitoring
-**Domain:** Smart Home PWA Integration (Thermostat Control + Appliance Monitoring)
-**Researched:** 2026-01-26
+**Project:** Pannello Stufa v3.0 Design System Evolution
+**Domain:** PWA Component Library & Design System Completion
+**Researched:** 2026-01-28
 **Confidence:** HIGH
 
 ## Executive Summary
 
-v2.0 extends Pannello Stufa with comprehensive Netatmo thermostat schedule management and enhanced stove health monitoring. Research reveals this domain is well-understood with established patterns, but has critical integration pitfalls that must be avoided. The existing v1.0 architecture is fundamentally sound — **zero new npm dependencies are needed**. All features can be implemented by extending existing patterns: Vercel Cron for monitoring, React Context API for state, date-fns v4 for timezones, and the existing Netatmo API wrapper for schedule operations.
+Pannello Stufa requires a production-grade design system built on **custom components using Radix UI primitives** with **Atomic Design methodology** (Atoms → Molecules → Organisms). The current system has 12 foundational components but lacks complex interactive patterns (Dialog, Dropdown, Slider, Tooltip) and consistent accessibility implementation.
 
-The recommended approach follows a backend-first strategy: establish API infrastructure and monitoring logic before building UI, test each integration independently, and avoid the most common pitfall — confusing temporary setpoint overrides with permanent schedule modifications. The existing `netatmoStoveSync.js` already uses the correct pattern (temporary overrides via `setRoomThermpoint`), so the architectural foundation is solid.
+The recommended approach combines **headless UI primitives for complex patterns** (Radix provides battle-tested accessibility, focus management, keyboard navigation) with **custom-built simple components** controlled via class-variance-authority for type-safe variant APIs. This gives full control over Ember Noir v2 styling while avoiding 100+ hours of accessibility edge case development. Bundle impact: ~68KB gzipped for complete primitive set versus 500KB+ for full UI frameworks that would conflict with existing design system.
 
-Key risks center on Netatmo API rate limiting (500 calls/hour per user), OAuth token lifecycle management (refresh token rotation), and alert fatigue from over-monitoring. Mitigation requires aggressive caching (5-minute TTL in Firebase), atomic token refresh with transaction semantics, and intelligent alert deduplication (3+ consecutive failures before notification). The existing v1.0 notification system and Firebase infrastructure provide the foundation to handle these concerns.
+**Critical risks:** Partial adoption (inconsistent UI), accessibility regressions (keyboard nav/focus management), dark mode token failures (hard-coded colors), and performance degradation (bundle bloat from poor tree-shaking). Mitigation: establish ESLint enforcement, comprehensive jest-axe testing, semantic design tokens only, and bundle size budgets with CI gates.
 
 ## Key Findings
 
 ### Recommended Stack
 
-**Zero new dependencies required.** The v1.0 stack handles 95% of v2.0 requirements out of the box. Three key findings: (1) The existing `lib/netatmoApi.js` wrapper already implements all schedule CRUD endpoints (`createSchedule`, `switchHomeSchedule`, `syncHomeSchedule`), (2) Vercel Cron infrastructure extends naturally to stove monitoring without new services, (3) date-fns v4 has native timezone support via `TZDate`, eliminating the need for date-fns-tz.
+**Foundation:** Radix UI primitives for complex patterns + CVA for variant management + jest-axe for accessibility testing.
 
-**Core technologies (no changes):**
-- **Next.js 16.1.0 + React 19.2.0**: App Router for schedule UI, API routes for CRUD — existing patterns extend naturally
-- **Firebase Admin/Client SDK**: Schedule caching (RTDB), token storage (RTDB), notification history (Firestore) — additive schema, no migrations
-- **Vercel Cron**: Extend existing `/api/scheduler/check` endpoint with stove health monitoring — same 1-minute frequency, same secret validation
-- **date-fns v4.1.0**: Native timezone support via `TZDate` for Europe/Rome schedule parsing — no third-party timezone library needed
-- **React Hook Form 7.54.2 + Zod 3.24.2**: Schedule editor form validation — same pattern as v1.0 notification preferences
-- **React Context API**: Thermostat schedule state management — matches existing `VersionContext` pattern, zero new state library
+**Core technologies:**
+- **@radix-ui/react-dialog** (v1.1.4): Modal/Dialog components — handles focus trapping, ESC close, backdrop, portal rendering, ARIA patterns you shouldn't build from scratch
+- **@radix-ui/react-dropdown-menu** (v2.1.4): Dropdown menus — keyboard navigation (arrows, typeahead), nested menus, collision detection
+- **@radix-ui/react-select** (v2.1.8): Custom select dropdowns — native select has poor styling, Radix provides accessible alternative with search/multi-select
+- **@radix-ui/react-tooltip** (v2.1.8): Tooltips — positioning engine, viewport collision detection, keyboard triggers
+- **@radix-ui/react-slider** (implied): Range controls — essential for temperature/brightness but missing from current system
+- **class-variance-authority** (v0.7.1): Type-safe variant APIs — standardizes your existing ad-hoc variant logic, provides autocomplete, works seamlessly with Tailwind
+- **clsx + tailwind-merge** (v2.1.1 + v2.7.0): Conditional class merging + conflict resolution — canonical "cn utility" pattern (25KB total)
+- **jest-axe + @axe-core/react** (v10.0.0 + v4.10.2): Automated accessibility testing — catches ~70% of WCAG violations, runtime console warnings in dev
+- **lucide-react** (v0.562.0 KEEP): Icon system already installed — 1,500+ consistent icons, tree-shakable, correct choice verified
 
 **What NOT to add:**
-- **node-cron**: Incompatible with Vercel serverless (requires long-running process)
-- **Zustand**: Context API sufficient for <10 schedules, team already familiar
-- **date-fns-tz**: Redundant, v4 has built-in timezone support
+- Full UI frameworks (MUI, Chakra): 500KB-2MB, fight Tailwind, override Ember Noir design system
+- Storybook (defer post-milestone): 100+ dependencies, React 19 compatibility issues, single-developer project already has `/debug/design-system` page
+- Tailwind v4 migration: Zero functional benefit, configuration paradigm change (JS → CSS), current setup already exposes CSS variables
+- CSS-in-JS (Styled Components, Emotion): Runtime cost, conflicts with Tailwind, Server Components compatibility issues
+- Animation libraries (Framer Motion): 40KB, existing Tailwind animations + Radix hooks sufficient
 
 ### Expected Features
 
-Research shows users expect feature parity with Netatmo's official Home + Control app (2026) for schedule management, combined with stove monitoring capabilities comparable to Thermorossi's iControl interface. Critical distinction: temporary overrides (manual boost) must NOT modify schedules — they're time-limited setpoint adjustments that expire automatically.
-
 **Must have (table stakes):**
-- **View current active schedule**: Weekly timetable with time/temp pairs, zone breakdowns
-- **Switch active schedule**: One-tap between saved schedules (Home, Away, Custom)
-- **Temporary override**: "Boost to 22°C for 3 hours" without modifying schedule
-- **Stove health status**: At-a-glance OK/Warning/Critical indicator
-- **Connection monitoring**: Online/offline detection with last-seen timestamp
-- **Error history**: Past errors with timestamps (extend v1.0 notification history)
-- **Maintenance alerts**: Visual warnings when cleaning needed (already implemented)
+- **Checkbox** — form controls for preferences (LOW effort, missing)
+- **Switch** — better mobile UX for toggles (LOW effort, missing)
+- **Slider** — essential for temperature/brightness controls (MEDIUM effort, missing)
+- **Modal/Dialog** — pattern exists but no reusable component (MEDIUM effort, critical)
+- **Toast System** — upgrade existing to support queue + positioning + types (MEDIUM effort, partially implemented)
+- **Tooltip** — contextual help for controls (MEDIUM effort, missing)
+- **Keyboard Navigation** — full keyboard accessibility, logical tab order (MEDIUM effort, needs audit)
+- **Touch Targets** — 44px minimum across all interactive elements (LOW effort, needs audit)
+- **Focus Management** — visible ember-glow indicators in all themes (LOW effort, needs consistency)
 
-**Should have (competitive differentiators):**
-- **Stove-thermostat coordination**: Stove ignites → temporarily boost Netatmo setpoint (+2°C for 2h) via override, NOT schedule modification
-- **Unified control dashboard**: Single page showing stove + thermostat side-by-side
-- **Schedule conflict detection**: Warn if stove scheduler overlaps with thermostat schedule changes
-- **Performance metrics**: Flame level, pellet consumption rate, temperature trends
+**Should have (competitive):**
+- **StatusCard** — unify stove/thermostat/Hue patterns (MEDIUM effort, inconsistent)
+- **DeviceCard** — consistent device display component (MEDIUM effort, inconsistent)
+- **Badge** — generic variant extracted from StatusBadge (LOW effort)
+- **Radio Group** — mutually exclusive options (MEDIUM effort, upcoming settings)
+- **Tabs** — organize dense settings screens (MEDIUM effort, useful but not blocking)
+- **Reduced Motion** — respect prefers-reduced-motion (LOW effort, partially implemented)
 
 **Defer (v2+):**
-- **Create/edit custom schedules**: HIGH complexity (time conflict detection, multi-day UI, validation) — official Netatmo app already provides excellent editor
-- **Multi-zone management**: Complex UI patterns, requires per-valve API calls
-- **Predictive maintenance**: Requires 90+ days operating data, ML/heuristics
-- **Energy correlation analysis**: Requires historical data warehousing infrastructure
-
-**Rationale for MVP scope:** Read + switch + temporary override covers 80% of daily use cases. Full schedule editor is complex and users already have Netatmo's official app. Validate demand before investing in elaborate CRUD UI.
+- **Accordion** — collapsible sections (MEDIUM effort, nice-to-have)
+- **Combobox** — searchable select (HIGH effort, not needed unless device list grows)
+- **Command Palette** — power user ⌘K navigation (HIGH effort, not essential for smart home)
+- **Drag-and-Drop** — reorder devices, customize layout (HIGH effort, customization milestone)
+- **Gauge Display** — radial gauge for temperature/humidity (MEDIUM effort, visual enhancement)
+- **Chart Component** — time series data visualization (HIGH effort, belongs in analytics milestone)
 
 ### Architecture Approach
 
-Extend existing v1.0 patterns with three new service layers: `NetatmoScheduleService` for schedule CRUD with caching, `StoveMonitorService` for health checks and drift detection, and enhanced `NetatmoStoveSync` coordination logic. Architecture follows established repository pattern (service → repository → Firebase) with cache-aside strategy (5-min TTL) to avoid Netatmo rate limits.
+**Atomic Design with Server-First Client Islands:** Four-tier hierarchy (Atoms → Molecules → Organisms → Templates) with clear dependency flow. Components default to Server Components, mark `'use client'` only where necessary.
 
 **Major components:**
-1. **NetatmoScheduleService** — Schedule CRUD operations with cache-aside pattern, 5-minute TTL in Firebase RTDB, invalidation on writes
-2. **StoveMonitorService** — Health checks (connection status, unexpected shutdowns, sync drift), runs in cron every minute, logs to `monitoring/` Firebase path
-3. **API Routes (`/api/netatmo/schedules/*`)** — REST endpoints for schedule management (GET list, POST create, PUT update, DELETE), thin controllers delegating to service layer
-4. **Enhanced Cron Logic** — Extend `/api/scheduler/check` with stove health monitoring, thermostat-stove sync enforcement, dead man's switch heartbeat
-5. **ThermostatScheduleContext** — React Context for client-side schedule state (matches existing `VersionContext` pattern), realtime Firebase listeners
+1. **Foundation Layer (Atoms)** — Icon, Text, Heading, Divider — no dependencies, semantic HTML, zero client-side logic
+2. **Core Components (Atoms)** — Button, Badge, Input, Card, Skeleton — depend on Foundation, minimal props (<10), composition over configuration
+3. **Form Controls (Molecules)** — Checkbox, Switch, Slider, Select, Radio Group — depend on Core + Radix primitives, WCAG AA compliance mandatory
+4. **Feedback Components (Molecules)** — Banner, Toast, Modal/Dialog, Tooltip — depend on Core + Layout, focus management, ARIA attributes
+5. **Layout Components (Molecules)** — Section, Grid, Tabs — depend on Foundation, responsive breakpoints (375px, 768px, 1024px, 1920px)
+6. **Smart Home Components (Organisms)** — StatusBadge, ControlButton, StatusCard, DeviceCard, TimelineItem — depend on Core + Layout, real-time status indicators
 
-**Key architectural decisions:**
-- **NEVER modify schedules programmatically** — Only users via UI. Automation uses temporary setpoint overrides with `mode='manual'` and `endtime`
-- **Service layer abstraction** — Separate business logic (services) from data access (repositories) and transport (API routes) for testability
-- **Cache-aside with TTL** — Cache Netatmo API responses in Firebase (5 min), invalidate on write, avoid rate limits (500/hour)
-- **Fire-and-forget for non-critical tasks** — Cron executes blocking scheduler logic, then fires async tasks (valve calibration, token refresh, notifications)
-- **Polling with exponential backoff** — Client polls monitoring state every 60s, doubles backoff on error (max 5 min)
+**Key patterns:**
+- **Flat-File Open Code:** Copy components into codebase (not npm dependencies) — shadcn/ui philosophy of owned source code
+- **Design Token Foundation:** All colors from CSS variables (`var(--color-bg-surface)`), never hard-coded hex — semantic tokens enable dark mode
+- **CVA Variant API:** Standardized variant management — replaces manual switch statements, provides type-safety and autocomplete
+- **Bottom-Up Build Order:** Foundation → Core → Form Controls → Feedback → Smart Home — respect dependency hierarchy
 
 ### Critical Pitfalls
 
-Research identified 6 CRITICAL pitfalls and 4 MODERATE pitfalls. Top failures come from Netatmo API rate limiting (changed behavior in 2026 with multi-user apps), OAuth token rotation invalidating old refresh tokens, and confusing setpoint overrides with schedule modifications.
+1. **Partial Component Adoption (CRITICAL)** — Some pages use design system, others use inline styles/old components. After 6 months only 40% adoption. **Prevention:** Create Storybook catalog, ESLint rules blocking old imports, migration tracker spreadsheet, code review checklist, 80%+ adoption target. **Warning signs:** New PRs contain inline styles, multiple button implementations, developers asking "how do I..." for existing patterns.
 
-1. **Netatmo Rate Limiting (CRITICAL)** — 500 calls/hour per user, but shared OAuth apps get lower limits. Avoid: Poll thermostat at 60s (not 5s like stove), cache schedules in Firebase (5-min TTL), batch multi-room operations, track API call count with 80% warning threshold
-2. **Setpoint Override vs Schedule Modification (CRITICAL)** — Using `switchSchedule` API instead of `setThermpoint` for temporary overrides corrupts user schedules permanently. Avoid: NEVER modify schedules programmatically, use `setThermpoint` with `mode='manual'` and `endtime`, visual UI indicators for "Override active until 18:00"
-3. **OAuth Token Refresh Rotation (CRITICAL)** — Netatmo rotates BOTH access_token AND refresh_token on every refresh, old tokens immediately invalidated. Avoid: Always save new refresh_token from response, use Firebase transaction for atomic updates, deduplicate concurrent refresh attempts with in-memory lock
-4. **Cron Silent Failures (CRITICAL)** — Cron job stops running but no alerts triggered, monitoring fails silently for hours. Avoid: Store `lastRunAt` timestamp in Firebase (heartbeat), dead man's switch alerts if >10 minutes, log every execution with status, trigger admin notification on failure
-5. **State Sync Race Conditions (CRITICAL)** — Stove state changes rapidly, multiple sources modify thermostat simultaneously, final state unpredictable. Avoid: Debounce stove state changes (2 minutes stable before sync), timestamp-based conflict resolution, user override priority (don't auto-sync for 30 min after manual change)
-6. **Alert Fatigue (CRITICAL)** — 50 notifications/hour from transient issues, user disables all alerts at OS level. Avoid: Alert deduplication (max 1 per 30 min for same issue), only alert on 3+ consecutive failures (not transient), severity-based rate limiting (CRITICAL: 10/hour, ERROR: 5/hour, WARNING: 1/hour)
+2. **Accessibility Regressions (CRITICAL)** — Using `<div onClick>` instead of `<button>`, missing focus traps in modals, broken keyboard navigation, color contrast failures. **Prevention:** Semantic HTML first, WCAG AA checklist before merge, keyboard testing (tab through every component), focus management (modals trap focus), jest-axe + manual screen reader testing. **Warning signs:** Can't tab to interactive elements, Lighthouse accessibility <90, screen reader announces incorrectly.
 
-**Moderate pitfalls:** Schedule CRUD without validation (overlapping time slots), polling frequency trade-offs (battery vs responsiveness), multi-room coordination partial failures (some rooms sync, others don't), environment variable confusion (dev vs prod credentials mixed).
+3. **Dark Mode Token Mistakes (CRITICAL)** — Hard-coded hex values break theme switching, flash of unstyled content, white text on white background in dark mode. **Prevention:** Semantic design tokens (`--color-bg-surface` not `--color-gray-100`), CSS variables only (never hex), ESLint blocking hex values, contrast testing both themes. **Warning signs:** `grep -r "#[0-9a-f]{6}"` returns >20 results, dark mode toggle doesn't affect all components, FOUC on load.
+
+4. **Component API Over-Engineering (HIGH)** — 847-line Button with 35 props trying to handle every edge case. **Prevention:** Start minimal (one use case), max 10 props rule, composition over configuration (separate IconButton, ButtonWithIcon), YAGNI principle (only add features when 3+ real use cases exist). **Warning signs:** Component >200 lines, developers say "I don't know which props to use", documentation longer than code.
+
+5. **Performance Regressions (HIGH)** — Bundle grows from 150KB to 450KB, importing entire icon library (500 icons for 3 used), no tree-shaking. **Prevention:** Named imports only, tree-shakeable exports, lazy load heavy components, bundle analysis before/after, zero-runtime CSS (Tailwind not CSS-in-JS), 200KB performance budget in CI. **Warning signs:** Webpack bundle size warnings, Lighthouse performance score decreases, mobile users report "app feels slow".
 
 ## Implications for Roadmap
 
-Based on research dependencies and architectural constraints, recommend **5 phases** following backend-first approach. Foundation phases (1-2) establish API infrastructure and monitoring logic independently of UI complexity. Integration phase (3) is the critical risk area where setpoint override semantics must be correct. UI phases (4-5) consume stable backend APIs.
+Based on research, suggested 5-phase structure following bottom-up dependency hierarchy and risk mitigation:
 
-### Phase 1: Netatmo Schedule API Infrastructure
-**Rationale:** Backend-first allows testing schedule operations independently of UI complexity. Establishes cache-aside pattern, rate limiting, and token refresh logic that all later phases depend on.
+### Phase 1: Foundation & Tooling (Week 1-2)
+**Rationale:** Establish infrastructure before building components — prevents token mistakes, enforces consistency from day one
+**Delivers:** CVA utility, jest-axe setup, design token audit, ESLint rules, component adoption tracker
+**Addresses:** Critical pitfalls #3 (dark mode tokens), #1 (partial adoption prevention)
+**Avoids:** Building components without consistency/accessibility framework
+**Research needs:** None — well-documented patterns
+**Dependencies:** None (sets foundation for all subsequent phases)
 
-**Delivers:**
-- `NetatmoScheduleService` with schedule CRUD operations
-- Firebase caching layer (5-min TTL, invalidation on writes)
-- API routes (`/api/netatmo/schedules/*`) with validation
-- Rate limiter (500 calls/hour tracking with 80% warning)
-- Atomic token refresh with transaction semantics
+### Phase 2: Core Interactive Components (Week 3-4)
+**Rationale:** Close functional gaps with most-needed components first — Checkbox, Switch, Slider, Modal essential for settings/controls
+**Delivers:** 6 missing table-stakes components (Checkbox, Switch, Slider, Modal/Dialog, enhanced Toast, Tooltip)
+**Uses:** Radix primitives (Dialog, Switch, Checkbox, Tooltip, Slider)
+**Implements:** Form Controls + Feedback Molecules from architecture
+**Addresses:** Must-have features, accessibility requirements (WCAG AA)
+**Avoids:** Building complex patterns from scratch (pitfall #2)
+**Research needs:** None — Radix provides documented patterns
+**Dependencies:** Phase 1 (needs CVA + testing infrastructure)
 
-**Addresses:** Table stakes feature "View current schedule", avoids Pitfall #1 (rate limiting) and Pitfall #3 (token refresh)
+### Phase 3: Consistency Refactoring (Week 5-6)
+**Rationale:** Unify inconsistent patterns now that tooling exists — StatusCard/DeviceCard appear 8+ times with variations
+**Delivers:** Standardized StatusCard, DeviceCard, Badge, Radio Group components
+**Addresses:** Should-have features, code duplication reduction
+**Avoids:** Over-engineering (pitfall #4) — these are refinements of existing patterns
+**Research needs:** None — refactoring existing code
+**Dependencies:** Phase 2 (may use Dialog/Toast in cards)
 
-**Avoids:** Netatmo rate limit violations, token rotation issues, unbatched API calls
+### Phase 4: Accessibility & Performance Audit (Week 7-8)
+**Rationale:** Systematic validation after components built — catch regressions before production deployment
+**Delivers:** Keyboard navigation audit, touch target audit, reduced motion wrapper, bundle size optimization
+**Addresses:** Must-have accessibility patterns, performance budget enforcement
+**Avoids:** Accessibility regressions (pitfall #2), performance degradation (pitfall #5)
+**Research needs:** None — testing/auditing phase
+**Dependencies:** Phases 2-3 (needs all components built)
 
-**Research Flag:** LOW — Netatmo API well-documented, existing wrapper has all endpoints
-
-### Phase 2: Stove Health Monitoring Backend
-**Rationale:** Monitoring logic informs alert UI requirements. Implementing backend first reveals which metrics matter and what alert thresholds make sense before building dashboard.
-
-**Delivers:**
-- `StoveMonitorService` with health checks, drift detection, connection monitoring
-- Firebase `monitoring/` schema (currentHealth, issues log, cron heartbeat)
-- Cron integration in `/api/scheduler/check` with dead man's switch
-- Alert evaluation logic (deduplication, severity-based rate limiting)
-- Execution logging with heartbeat tracking
-
-**Addresses:** Table stakes features (health status, connection monitoring, error history), avoids Pitfall #4 (cron silent failures) and Pitfall #6 (alert fatigue)
-
-**Avoids:** Silent monitoring failures, notification spam, missing dead man's switch
-
-**Research Flag:** LOW — Standard monitoring patterns, existing cron infrastructure extends naturally
-
-### Phase 3: Stove-Thermostat Integration Correction
-**Rationale:** Fix the critical semantic distinction between temporary overrides and schedule modifications. This is the highest-risk phase — getting it wrong corrupts user schedules permanently.
-
-**Delivers:**
-- Verify `NetatmoStoveSync.syncLivingRoomWithStove()` uses setpoint override (already correct)
-- Continuous enforcement logic in cron (re-apply overrides if drifted)
-- Debouncing (2 minutes stable stove state before sync)
-- User override detection (manual thermostat changes block auto-sync for 30 min)
-- State machine tracking (idle → pending → synced → user_override)
-
-**Addresses:** Differentiator feature (stove-thermostat coordination), avoids Pitfall #2 (setpoint vs schedule confusion) and Pitfall #5 (race conditions)
-
-**Avoids:** Permanent schedule corruption, rapid state oscillation, fighting user manual changes
-
-**Research Flag:** MEDIUM — Existing code already correct but needs verification, debouncing and conflict resolution are novel
-
-### Phase 4: Schedule Management UI
-**Rationale:** UI depends on stable backend from Phase 1. Focus on read-only display + schedule switching first, defer complex schedule editor to post-MVP.
-
-**Delivers:**
-- `ThermostatScheduleContext` (React Context matching VersionContext pattern)
-- Schedule display components (weekly timetable, zone breakdown)
-- Schedule selector dropdown in ThermostatCard
-- Temporary override form ("Boost to 22°C for 3 hours")
-- Form validation with React Hook Form + Zod
-
-**Addresses:** Table stakes features (view schedule, switch schedule, temporary override)
-
-**Avoids:** Complex schedule editor UI (defer to official Netatmo app)
-
-**Research Flag:** LOW — Standard form patterns, existing v1.0 form components reusable
-
-### Phase 5: Monitoring Dashboard & Alerts UI
-**Rationale:** UI depends on monitoring backend from Phase 2. Dashboard surfaces INFO/WARNING in UI without notifications, alerts trigger for CRITICAL/ERROR only.
-
-**Delivers:**
-- `StoveMonitorBanner` component for health alerts
-- Monitoring history dashboard (execution log, issue timeline)
-- New notification triggers (`triggerStoveConnectionLostServer`, `triggerStoveDriftServer`)
-- Per-room sync status display
-- Cron health visualization (last run, execution duration trends)
-
-**Addresses:** Table stakes features (maintenance alerts, error history), differentiator (unified control dashboard)
-
-**Avoids:** Alert fatigue by surfacing low-severity issues in UI only
-
-**Research Flag:** LOW — Extend existing v1.0 notification system, standard dashboard patterns
+### Phase 5: Documentation & Adoption (Week 9-10)
+**Rationale:** Document everything, track migration, achieve 80%+ adoption target — prevents partial adoption failure
+**Delivers:** Updated Storybook (or `/debug/design-system`), migration tracker showing 80%+ pages using design system, deprecated component removal
+**Addresses:** Documentation debt (pitfall #7), partial adoption prevention (pitfall #1)
+**Avoids:** Components exist but unused, knowledge locked in developer's head
+**Research needs:** None — documentation/cleanup phase
+**Dependencies:** Phases 1-4 (needs complete component library)
 
 ### Phase Ordering Rationale
 
-- **Backend-first reduces UI rework risk** — Testing schedule API operations independently (Phase 1) surfaces edge cases before UI is built. Monitoring logic (Phase 2) informs what alerts actually matter.
-- **Critical integration isolated** — Phase 3 focuses solely on setpoint override semantics, the highest-risk area. Separating from UI allows thorough testing of state machine logic.
-- **Dependency chain respected** — Phase 4 (Schedule UI) requires Phase 1 (API infrastructure). Phase 5 (Monitoring UI) requires Phase 2 (Monitoring backend). Integration (Phase 3) is independent and can be parallelized.
-- **MVP scope validated** — Deferring schedule editor to post-MVP (not in phases 1-5) allows validating demand before investing 10-12 hours in complex form UI. Official Netatmo app already provides excellent editor.
+- **Foundation first:** Design tokens, CVA, testing infrastructure prevent mistakes in all subsequent phases (addresses pitfalls #3, #2)
+- **Core components second:** Close functional gaps before refactoring — avoid premature optimization
+- **Consistency third:** Refactor with tooling in place — CVA standardizes variant APIs, jest-axe catches accessibility regressions
+- **Audit fourth:** Test systematically after build phase — catch issues before production
+- **Documentation last:** Document complete system — Storybook with all components and examples
+
+**Dependency chain:**
+- Phase 2 depends on Phase 1 (needs CVA + testing)
+- Phase 3 depends on Phase 2 (may compose Dialog/Toast in cards)
+- Phase 4 depends on Phases 2-3 (tests complete component set)
+- Phase 5 depends on Phases 1-4 (documents complete system)
 
 ### Research Flags
 
-**Phases likely needing deeper research:**
-- **Phase 3 (Stove-Thermostat Integration)** — Novel coordination patterns, debouncing and conflict resolution strategies need validation. Existing code appears correct but multi-room atomicity and rollback need research.
-
 **Phases with standard patterns (skip research-phase):**
-- **Phase 1 (Netatmo API Infrastructure)** — Well-documented API, existing wrapper has all endpoints, cache-aside is standard pattern
-- **Phase 2 (Monitoring Backend)** — Standard monitoring patterns, existing cron infrastructure, Firebase schema is additive
-- **Phase 4 (Schedule UI)** — React Context, React Hook Form, form validation — all standard patterns with v1.0 precedents
-- **Phase 5 (Monitoring UI)** — Dashboard components, notification triggers — extend existing v1.0 notification system
+- **Phase 1:** Design token management well-documented (Tailwind + CVA canonical pattern)
+- **Phase 2:** Radix UI official docs provide complete implementation examples with accessibility guidance
+- **Phase 3:** Refactoring existing code (no new patterns)
+- **Phase 4:** Accessibility/performance auditing uses standard tooling (jest-axe, Lighthouse, bundle-analyzer)
+- **Phase 5:** Documentation/migration uses established patterns (Storybook or existing `/debug/design-system`)
+
+**No phases need `/gsd:research-phase`** — All patterns are industry-standard with comprehensive documentation from Radix UI, CVA, Tailwind, and WCAG 2.2 specifications.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All technologies verified in current codebase, zero new dependencies needed, existing patterns extend naturally |
-| Features | HIGH | Netatmo official docs + Thermorossi API well-documented, user expectations clear from 2026 Home + Control app research |
-| Architecture | HIGH | Existing v1.0 patterns (repository, cache-aside, fire-and-forget) apply directly, service layer abstraction is standard |
-| Pitfalls | HIGH | Netatmo community discussions reveal consistent failure patterns (rate limiting, token rotation, schedule confusion), documented with official sources |
+| Stack | HIGH | Radix UI is industry standard (1,500+ production apps), verified with official docs and ecosystem consensus. CVA + clsx + tailwind-merge canonical pattern (7M+ weekly downloads). jest-axe v10.0.0 confirmed current, verified React 19 compatibility. |
+| Features | MEDIUM-HIGH | Foundation components verified with shadcn/ui, Radix UI, Material UI, Carbon Design System. Smart home patterns inferred from Home Assistant 2026.1, ThingsBoard, general IoT best practices (no official "smart home design system" exists). Complexity estimates based on Radix primitives + typical React development. |
+| Architecture | HIGH | Atomic Design methodology verified from Brad Frost (original author) and 2026 Next.js best practices. Server-first client islands confirmed Next.js 15 App Router canonical pattern. Component hierarchy validated against shadcn/ui architecture (most successful implementation of this pattern). |
+| Pitfalls | MEDIUM-HIGH | Design system adoption failures well-documented in recent 2025-2026 sources (Figr, Knapsack, Netguru). Accessibility standards verified with WCAG 2.2 official requirements. Performance optimization validated with framework-specific 2026 guides. Some component API design relies on general best practices rather than project-specific verification. |
 
 **Overall confidence:** HIGH
 
-All four research files are based on verified sources: official Netatmo API documentation, existing codebase analysis (v1.0 implementation patterns), 2026 web research for monitoring best practices, and community issue discussions revealing real-world failure modes. The recommendation to use existing infrastructure (zero new dependencies) is validated by line-by-line analysis of current code showing all necessary capabilities already present.
-
 ### Gaps to Address
 
-**Multi-room atomicity during partial failures:** Phase 3 needs research on rollback strategies when 3 rooms configured but API call fails for room #2 after room #1 succeeds. Research suggests batch operations or transaction pattern, but Netatmo API documentation doesn't specify batch endpoints for setpoint operations. **Resolution:** During Phase 3 planning, run `/gsd:research-phase "Multi-room thermostat setpoint coordination"` to investigate Netatmo API batch capabilities and rollback patterns.
+**Gap: Smart home component patterns** — No canonical "IoT design system" specification exists. StatusCard, DeviceCard, TimelineItem patterns inferred from observing Home Assistant, ThingsBoard, Grafana. **Resolution:** Build minimal viable components in Phase 2, validate with user testing, iterate based on feedback. Pattern extraction (Phase 3) happens after seeing actual usage.
 
-**Adaptive polling strategy for background PWA:** Phase 1 recommends 60s foreground / 5min background polling, but iOS PWA background behavior is inconsistent (sometimes stops polling entirely). **Resolution:** Phase 4 implementation should test Page Visibility API behavior on iOS Safari 17+ and adjust polling strategy based on actual background execution patterns.
+**Gap: Storybook vs `/debug/design-system`** — Recommendation defers Storybook due to React 19 compatibility issues and single-developer context. **Resolution:** Phase 5 documents components in existing `/debug/design-system` page with comprehensive examples. Revisit Storybook post-milestone if team grows or visual regression testing becomes priority.
 
-**Alert deduplication tuning:** Phase 2 proposes 3+ consecutive failures before alerting, but optimal threshold depends on failure frequency distribution (not available until system runs in production). **Resolution:** Start conservative (3 failures), log alert evaluation decisions to Firebase, adjust threshold based on 7-day production data.
+**Gap: Component adoption enforcement** — ESLint rules can block old imports but can't force design system usage in new code. **Resolution:** Phase 5 includes migration tracker (spreadsheet showing adoption %), code review checklist, and team training. Set 80%+ adoption goal, allocate cleanup sprint if needed.
 
-**Schedule cache invalidation timing:** 5-minute TTL balances freshness vs rate limits, but if user edits schedule in official Netatmo app, PWA shows stale data for up to 5 minutes. **Resolution:** Phase 4 UI should have manual refresh button for schedule list, consider reducing TTL to 2 minutes if rate limit headroom exists after 30-day monitoring.
+**Gap: Manual accessibility testing coverage** — jest-axe catches ~70% of WCAG violations, 30% require manual testing (color contrast in JSDOM, screen reader compatibility). **Resolution:** Phase 4 includes manual keyboard navigation testing and spot-checks with VoiceOver/NVDA. Full WCAG AA certification audit deferred to post-milestone if compliance critical.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- **Current codebase** (`lib/netatmoApi.js`, `lib/netatmoStoveSync.js`, `/api/scheduler/check/route.js`) — Verified existing implementation patterns, API wrapper functions, service architecture
-- **Netatmo Developer Documentation** (dev.netatmo.com) — Energy API, schedule management endpoints, OAuth flow, rate limiting policies
-- **Vercel Cron Documentation** (vercel.com/docs/cron-jobs) — Serverless cron patterns, function duration limits, secret validation
-- **date-fns v4 Documentation** (date-fns.org) — TZDate timezone support, format functions, v4 migration guide
+
+**Stack Research:**
+- [Radix UI Official Documentation](https://www.radix-ui.com/primitives) — Component primitives, accessibility patterns
+- [Headless UI vs Radix: Which One is Better in 2025?](https://www.subframe.com/tips/headless-ui-vs-radix) — Comparative analysis
+- [Class Variance Authority Official Documentation](https://cva.style/docs) — Variant API patterns
+- [jest-axe npm](https://www.npmjs.com/package/jest-axe) — Version 10.0.0 verification
+- [Tailwind CSS v4.0](https://tailwindcss.com/blog/tailwindcss-v4) — Design tokens, configuration
+
+**Features Research:**
+- [shadcn/ui Component Library](https://ui.shadcn.com/) — Foundation component inventory
+- [Radix UI Primitives Releases](https://www.radix-ui.com/primitives/docs/overview/releases) — Component coverage
+- [Carbon Design System — Accessibility](https://carbondesignsystem.com/guidelines/accessibility/overview/) — WCAG patterns
+- [Home Assistant 2026.1 Release](https://www.home-assistant.io/blog/2026/01/07/release-20261) — Smart home dashboard patterns
+
+**Architecture Research:**
+- [Atomic Design Methodology by Brad Frost](https://atomicdesign.bradfrost.com/chapter-2/) — Original specification
+- [Next.js 15 App Router Architecture](https://www.yogijs.tech/blog/nextjs-project-architecture-app-router) — Server-first patterns
+- [Building the Ultimate Design System (2026)](https://medium.com/@padmacnu/building-the-ultimate-design-system-a-complete-architecture-guide-for-2026-6dfcab0e9999) — Component organization
+
+**Pitfalls Research:**
+- [Why Design Systems Fail | Knapsack](https://www.knapsack.cloud/blog/why-design-systems-fail) — Adoption patterns
+- [Design System Adoption Pitfalls](https://www.netguru.com/blog/design-system-adoption-pitfalls) — Common failures
+- [Accessibility in Design Systems](https://www.supernova.io/blog/accessibility-in-design-systems-a-comprehensive-approach-through-documentation-and-assets) — WCAG integration
+- [Dark Mode with Design Tokens in Tailwind CSS](https://www.richinfante.com/2024/10/21/tailwind-dark-mode-design-tokens-themes-css) — Token management
 
 ### Secondary (MEDIUM confidence)
-- **Netatmo Community Helpcenter** — Rate limiting discussions (error 26), token refresh issues, schedule vs override confusion patterns
-- **Home Assistant Netatmo Integration** (github.com/home-assistant/core) — Issue #158845 on rate limits, community integration patterns
-- **Thermorossi iControl Documentation** — Available monitoring features, error codes, performance metrics
-- **2026 Cron Monitoring Guides** (dev.to, betterstack.com) — Dead man's switch patterns, execution logging, health check endpoints
-- **Smart Home Best Practices** (Energy.gov, SmartHomeWizards) — Thermostat programming patterns, override semantics, alert fatigue reduction
 
-### Tertiary (LOW confidence — needs validation)
-- **Distributed systems race condition patterns** (Medium articles) — Timestamp-based conflict resolution, state machine approaches
-- **IoT monitoring trends** (UptimeRobot, Netdata blogs) — 2026 monitoring patterns, polling vs webhooks trade-offs
+- [15 Best React UI Libraries for 2026](https://www.builder.io/blog/react-component-libraries-2026) — Ecosystem comparison
+- [React UI libraries in 2025](https://makersden.io/blog/react-ui-libs-2025-comparing-shadcn-radix-mantine-mui-chakra) — Framework analysis
+- [Smart Home Dashboard Design (DevelopEx)](https://developex.com/blog/smart-home-dashboard-ux-design/) — IoT UX patterns
+- [Component API Design Guidelines](https://alanbsmith.medium.com/component-api-design-3ff378458511) — Best practices
+
+### Tertiary (LOW confidence, needs validation)
+
+- Smart home component patterns (StatusCard, DeviceCard) — Inferred from multiple dashboard examples, no canonical specification
+- Complexity estimates (1-2 hours LOW, 3-5 hours MEDIUM, 6-10 hours HIGH) — Based on Radix primitives + typical React development, not project-specific timing
 
 ---
-*Research completed: 2026-01-26*
+*Research completed: 2026-01-28*
 *Ready for roadmap: yes*
-*Total research files synthesized: 4 (STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md)*
+*Suggested phases: 5 (Foundation → Core Components → Consistency → Audit → Documentation)*
+*Research needs: None (all phases use well-documented patterns)*

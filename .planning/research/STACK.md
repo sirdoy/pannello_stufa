@@ -1,693 +1,458 @@
-# Technology Stack: v2.0 Netatmo Schedule Management & Stove Monitoring
+# Technology Stack - Design System & Component Library
 
-**Project:** Pannello Stufa v2.0
-**Researched:** 2026-01-26
-**Focus:** Netatmo schedule CRUD + stove monitoring cron additions
+**Project:** Pannello Stufa
+**Milestone:** Complete UI Component Library & Design Consistency
+**Researched:** 2026-01-28
+**Overall confidence:** HIGH
+
+---
 
 ## Executive Summary
 
-v2.0 adds Netatmo schedule management UI and enhanced stove monitoring. The existing stack handles 95% of requirements. Only **three new dependencies** needed: none. The existing infrastructure (Vercel Cron, date-fns, Firebase) covers all new features.
+For completing Pannello Stufa's design system and component library, the recommended approach is a **custom component library built on Radix UI primitives** with enhanced tooling for consistency and accessibility. This builds on your existing Tailwind CSS foundation and Ember Noir v2 design system without introducing bloated UI frameworks.
 
-**Key findings:**
-- Netatmo schedule CRUD fully supported by existing `netatmoApi.js` wrapper (already has `createSchedule`, `switchHomeSchedule`, `syncHomeSchedule`)
-- Vercel Cron (already configured in `vercel.json`) extends to stove monitoring without new infrastructure
-- React Context API (already used for VersionContext) handles thermostat schedule state
-- date-fns v4.1.0 (already installed) provides timezone support for schedule parsing
-
-**Stack philosophy:** Extend existing patterns, avoid new dependencies.
+**Key decision:** Use Radix UI primitives for complex interactive components (Dialog, Dropdown, Select, Tooltip) while building simpler components (Button, Card, Input) from scratch. This gives you full control over styling while leveraging battle-tested accessibility and keyboard navigation for complex patterns.
 
 ---
 
-## Core Stack (No Changes)
+## Recommended Stack
 
-The v1.0 stack remains unchanged. All capabilities needed for v2.0 already exist.
+### Component Primitives
 
-| Technology | Current Version | Purpose | v2.0 Usage |
-|------------|-----------------|---------|------------|
-| Next.js | 16.1.0 | App Router, API routes | Schedule UI + API |
-| React | 19.2.0 | UI framework | Schedule editor components |
-| Firebase Admin | 13.6.0 | Server-side DB operations | Schedule storage |
-| Firebase Client | 12.8.0 | Client-side DB reads | Schedule display |
-| date-fns | 4.1.0 | Date manipulation | Timezone parsing, schedule validation |
-| React Hook Form | 7.54.2 | Form state | Schedule editor form |
-| Zod | 3.24.2 | Validation schemas | Schedule slot validation |
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| **@radix-ui/react-dialog** | ^1.1.4 | Modal, Dialog components | Best-in-class accessibility, focus management, scroll locking, portal rendering. Handles complex ARIA patterns you shouldn't build from scratch. |
+| **@radix-ui/react-dropdown-menu** | ^2.1.4 | Dropdown menus, context menus | Keyboard navigation, nested menus, typeahead support built-in. Critical for accessible navigation patterns. |
+| **@radix-ui/react-select** | ^2.1.8 | Custom select dropdowns | Native `<select>` has poor styling options. Radix provides accessible custom selects with search, multi-select support. |
+| **@radix-ui/react-tooltip** | ^1.1.8 | Tooltips, popovers | Proper positioning, collision detection, portal rendering. Handles edge cases (viewport boundaries, nested triggers). |
+| **@radix-ui/react-checkbox** | ^1.1.4 | Checkbox with indeterminate state | Already have basic Checkbox component, but Radix handles indeterminate state and proper ARIA attributes. |
+| **@radix-ui/react-switch** | ^1.1.4 | Toggle switches | Similar to your Toggle component but with enhanced accessibility and animation hooks. |
 
----
+**Rationale:** Radix UI is the industry standard for headless components in 2026. It provides 1,500+ production apps' worth of edge case handling, accessibility testing, and cross-browser compatibility. Unlike Headless UI (focused on Tailwind Labs ecosystem), Radix offers more component variety and better TypeScript support. React Aria is more verbose and requires deeper accessibility knowledge to implement correctly.
 
-## Netatmo API Integration (Existing)
-
-**Library:** `lib/netatmoApi.js` (already implemented)
-
-### Schedule Management Endpoints (Already Available)
-
-| API Function | Netatmo Endpoint | Purpose | Status |
-|--------------|------------------|---------|--------|
-| `createSchedule()` | `createnewhomeschedule` | Create new schedule | ✅ Implemented |
-| `switchHomeSchedule()` | `switchhomeschedule` | Activate schedule | ✅ Implemented |
-| `syncHomeSchedule()` | `synchomeschedule` | Update/sync schedule | ✅ Implemented |
-| `getHomesData()` | `homesdata` | Read schedules topology | ✅ Implemented |
-
-**Source verification:** Current codebase (`lib/netatmoApi.js:181-250`) implements all CRUD operations.
-
-**Confidence:** HIGH - Verified in codebase, no additional API wrapper needed.
-
-### What v2.0 Adds
-
-NOT new libraries, but new **usage patterns** of existing API:
-
-```javascript
-// NEW: Schedule UI calls existing API functions
-import { createSchedule, switchHomeSchedule } from '@/lib/netatmoApi';
-
-// Create schedule (existing function)
-const scheduleId = await createSchedule(accessToken, {
-  home_id: homeId,
-  schedule_name: 'Custom Week',
-  zones: [...],
-  timetable: [...]
-});
-
-// Switch to schedule (existing function)
-await switchHomeSchedule(accessToken, homeId, scheduleId);
-```
-
-**No new npm packages required.** All Netatmo schedule operations use existing wrapper.
-
----
-
-## Cron Infrastructure (Extend Existing)
-
-**Current:** Vercel Cron configured in `vercel.json` for `/api/scheduler/check`
-**v2.0 Need:** Add stove health monitoring to same cron endpoint
-
-### Vercel Cron Configuration
-
-```json
-{
-  "crons": [
-    {
-      "path": "/api/scheduler/check",
-      "schedule": "* * * * *"
-    }
-  ]
-}
-```
-
-**Current behavior:** Runs every minute, calls `/api/scheduler/check?secret=xxx`
-
-**v2.0 behavior:** Same endpoint adds stove health checks (no infrastructure change)
-
-### Why NOT node-cron or BullMQ
-
-| Option | Why NOT |
-|--------|---------|
-| `node-cron` (npm) | Requires long-running Node.js process. Vercel is serverless (process dies after request). node-cron attaches to event loop which doesn't exist in serverless. **INCOMPATIBLE** |
-| BullMQ + Redis | Requires external Redis instance (cost + complexity). Overkill for simple health checks. 95% of use cases covered by Vercel Cron. |
-| GitHub Actions | External service, requires separate auth, slower invocation (30s+ overhead). Vercel Cron is native, 0 latency. |
-
-**Recommendation:** Extend existing Vercel Cron endpoint.
-
-**Confidence:** HIGH - Verified with [Vercel Cron documentation](https://vercel.com/docs/cron-jobs) and [serverless limitations research](https://yagyaraj234.medium.com/running-cron-jobs-in-nextjs-guide-for-serverful-and-stateless-server-542dd0db0c4c).
-
-### Cron Pattern for v2.0
-
-```javascript
-// app/api/scheduler/check/route.js (EXTEND existing)
-export const GET = withCronSecret(async () => {
-  // EXISTING: Scheduler automation (v1.0)
-  await handleSchedulerLogic();
-
-  // NEW: Stove health monitoring (v2.0)
-  await monitorStoveHealth();
-
-  // NEW: Thermostat-stove sync verification (v2.0)
-  await verifyThermostatSync();
-
-  return success({ ... });
-});
-```
-
-**No new API route.** Extend existing `/api/scheduler/check` with additional checks.
-
-**Rationale:**
-- Already runs every minute (perfect frequency)
-- Already has maintenance tracking infrastructure
-- Already has notification system integration
-- Adding health checks is < 50 LOC
-
----
-
-## State Management (React Context API)
-
-**Current:** `app/context/VersionContext.js` uses React Context for global version state
-**v2.0 Need:** Thermostat schedule state (active schedule, room setpoints, sync status)
-
-### Why Context API (Not Zustand)
-
-| Consideration | Context API | Zustand | Decision |
-|---------------|-------------|---------|----------|
-| Already used | ✅ Yes | ❌ No | Consistency |
-| Bundle size | 0 KB (built-in) | ~1 KB | Lightweight |
-| Complexity | Low | Medium | Simple use case |
-| Performance | Sufficient for < 10 schedules | Better for 100+ items | Our scale: 5-10 schedules |
-| Learning curve | Zero (team familiar) | New library | Velocity |
-
-**Recommendation:** React Context API for `ThermostatScheduleContext`
-
-**Confidence:** MEDIUM - Context API performance concerns at scale, but [2026 research](https://dev.to/saiful7778/using-react-context-api-in-nextjs-15-for-global-state-management-379h) confirms adequate for < 50 state updates/minute.
-
-### Implementation Pattern
-
-```javascript
-// app/context/ThermostatScheduleContext.js
-'use client';
-
-import { createContext, useContext, useState, useEffect } from 'react';
-import { ref, onValue } from 'firebase/database';
-import { db } from '@/lib/firebase';
-
-const ThermostatScheduleContext = createContext();
-
-export function ThermostatScheduleProvider({ children }) {
-  const [activeSchedule, setActiveSchedule] = useState(null);
-  const [schedules, setSchedules] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Subscribe to Netatmo schedule data
-    const unsubscribe = onValue(ref(db, 'netatmo/schedules'), (snap) => {
-      setSchedules(snap.val() || []);
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  return (
-    <ThermostatScheduleContext.Provider value={{ activeSchedule, schedules, loading }}>
-      {children}
-    </ThermostatScheduleContext.Provider>
-  );
-}
-
-export const useThermostatSchedule = () => useContext(ThermostatScheduleContext);
-```
-
-**Usage in components:**
-
-```javascript
-// app/components/devices/thermostat/ScheduleSelector.js
-'use client';
-
-import { useThermostatSchedule } from '@/app/context/ThermostatScheduleContext';
-
-export default function ScheduleSelector() {
-  const { schedules, activeSchedule } = useThermostatSchedule();
-  // Render schedule dropdown
-}
-```
-
-**Rationale:** Matches existing `VersionContext` pattern, zero new dependencies, sufficient performance.
-
----
-
-## Date/Time Handling (Existing)
-
-**Library:** date-fns v4.1.0 (already installed)
-
-### Native Timezone Support (v4 Feature)
-
-date-fns v4 (released 2024) includes **native timezone support** via `@date-fns/tz` and `TZDate`:
-
-```javascript
-import { TZDate } from 'date-fns';
-import { format } from 'date-fns';
-
-// Parse Netatmo schedule time in Europe/Rome timezone
-const scheduleStart = new TZDate('2026-01-26T08:00:00', 'Europe/Rome');
-const formatted = format(scheduleStart, 'HH:mm');
-// → "08:00"
-```
-
-**v2.0 Usage:**
-- Parse Netatmo schedule timetables (UTC timestamps → local time)
-- Validate schedule slot overlaps in user timezone
-- Display schedule times in Europe/Rome (stove location)
-
-**Why NOT date-fns-tz (third-party):**
-- date-fns v4 has built-in timezone support
-- date-fns-tz is for v2/v3 only
-- No additional dependency needed
-
-**Confidence:** HIGH - Verified with [date-fns v4 documentation](https://date-fns.org/docs/Getting-Started) and [TZDate guide](https://github.com/date-fns/date-fns/blob/main/docs/timeZones.md).
-
-### Existing date-fns Usage in v1.0
-
-Project already uses date-fns extensively:
-- `formatDistanceToNow()` for notification timestamps
-- `format()` for log display
-- `parseISO()` for Firebase date parsing
-
-**v2.0 adds:** `TZDate` for timezone-aware schedule parsing (same library, new function).
-
----
-
-## Firebase Schema Extensions
-
-### Netatmo Schedules Storage
-
-```
-firebase-root/
-├── netatmo/
-│   ├── schedules/              # NEW: Netatmo schedules cache
-│   │   ├── {schedule_id}/
-│   │   │   ├── name            # "Weekday Morning"
-│   │   │   ├── zones           # [...zone definitions]
-│   │   │   ├── timetable       # [...time slots]
-│   │   │   └── lastSynced      # ISO timestamp
-│   ├── activeScheduleId        # NEW: Currently active schedule
-│   ├── stoveSync/              # NEW: Stove-thermostat sync state
-│   │   ├── enabled             # true/false
-│   │   ├── targetRoomId        # Netatmo room ID
-│   │   ├── overrideTemp        # 21°C when stove ON
-│   │   └── lastSync            # ISO timestamp
-│   ├── health/                 # NEW: Thermostat health monitoring
-│   │   ├── lastCheck           # ISO timestamp
-│   │   ├── batteryLow          # true/false
-│   │   └── moduleStatuses      # {...module health}
-```
-
-**No schema migration needed.** New paths are additive, existing data unchanged.
-
-**Storage strategy:**
-- Read schedules: Client SDK (realtime updates in UI)
-- Write schedules: Admin SDK (API routes only)
-- Cron health checks: Admin SDK (server-side monitoring)
-
-**Rationale:** Follows existing Firebase security pattern (client reads, server writes).
-
----
-
-## Form Validation (Existing)
-
-**Libraries:** React Hook Form v7.54.2 + Zod v3.24.2 (already installed)
-
-### Schedule Editor Validation
-
-```typescript
-// lib/validation/scheduleSchema.ts (NEW file, existing libraries)
-import { z } from 'zod';
-
-export const scheduleSlotSchema = z.object({
-  start: z.string().regex(/^([0-1]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format'),
-  end: z.string().regex(/^([0-1]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format'),
-  temperature: z.number().min(15).max(28),
-  mode: z.enum(['comfort', 'eco', 'away']),
-}).refine(
-  (data) => {
-    // Validate end > start
-    const [startH, startM] = data.start.split(':').map(Number);
-    const [endH, endM] = data.end.split(':').map(Number);
-    return (endH * 60 + endM) > (startH * 60 + startM);
-  },
-  { message: 'End time must be after start time' }
-);
-
-export const netatmoScheduleSchema = z.object({
-  name: z.string().min(1).max(50),
-  zones: z.array(z.object({
-    name: z.string(),
-    rooms: z.array(z.string()),
-    temperature: z.number().min(15).max(28),
-  })),
-  timetable: z.array(z.object({
-    day: z.number().min(0).max(6), // 0=Monday, 6=Sunday
-    slots: z.array(scheduleSlotSchema),
-  })),
-});
-```
-
-**Usage in schedule editor:**
-
-```typescript
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { netatmoScheduleSchema } from '@/lib/validation/scheduleSchema';
-
-function ScheduleEditorForm() {
-  const { register, handleSubmit, formState: { errors } } = useForm({
-    resolver: zodResolver(netatmoScheduleSchema),
-  });
-
-  // Form UI
-}
-```
-
-**Confidence:** HIGH - Same pattern as v1.0 notification preferences form (`app/settings/notifications/page.js`).
-
----
-
-## What NOT to Add
-
-| Technology | Why NOT Needed |
-|------------|----------------|
-| Zustand | Context API sufficient for < 10 schedules, already have pattern |
-| date-fns-tz | date-fns v4 has native timezone support |
-| node-cron | Incompatible with Vercel serverless |
-| BullMQ + Redis | Overkill for health checks, adds cost + complexity |
-| Axios | Existing `fetch()` API wrapper sufficient |
-| React Query | Firebase realtime listeners already provide caching |
-| Moment.js | Deprecated, date-fns already installed |
-| Luxon | Unnecessary, date-fns v4 covers all use cases |
-
----
-
-## Deployment Considerations
-
-### Vercel Configuration (Extend Existing)
-
-**Current `vercel.json`:**
-
-```json
-{
-  "functions": {
-    "app/api/scheduler/check/route.js": {
-      "maxDuration": 60
-    }
-  }
-}
-```
-
-**v2.0 additions:** None needed. Existing 60s timeout sufficient for:
-- Scheduler logic (~2s)
-- Stove health check (~1s)
-- Thermostat API calls (~2s)
-- Total: ~5s (90% margin)
-
-**Cron secret:** Already configured in environment variables (`CRON_SECRET`). Reuse for stove monitoring.
-
-### Firebase Rules (No Changes)
-
-Existing security rules already handle new paths:
-
-```javascript
-// database.rules.json (CURRENT - no changes needed)
-{
-  "rules": {
-    "netatmo": {
-      ".read": "auth != null",
-      ".write": false  // Admin SDK only
-    }
-  }
-}
-```
-
-New `netatmo/schedules`, `netatmo/stoveSync`, `netatmo/health` paths inherit parent rules.
-
-**Rationale:** Client reads cached schedules, API routes (Admin SDK) write via Netatmo API.
-
-### Edge Runtime (Still Incompatible)
-
-**Important:** Firebase Admin SDK remains **incompatible** with Vercel Edge Runtime.
-
-**Current approach:** Force Node.js runtime with `export const dynamic = 'force-dynamic'`
-
-**Alternative researched:**
-- `next-firebase-auth-edge` (authentication only, no Firestore/RTDB)
-- `firebase-admin-rest` (REST API wrapper, adds latency)
-
-**Decision:** Continue Node.js runtime. Edge compatibility not critical for API routes with < 100 req/min.
-
-**Confidence:** HIGH - [Verified incompatibility](https://github.com/firebase/firebase-admin-node/issues/1801) still present in 2026.
-
----
-
-## Development Setup
-
-### Environment Variables (Additions)
-
-```env
-# EXISTING (v1.0 - no changes)
-NEXT_PUBLIC_NETATMO_CLIENT_ID=xxx
-NEXT_PUBLIC_NETATMO_REDIRECT_URI=http://localhost:3000/api/netatmo/callback
-NETATMO_CLIENT_SECRET=xxx
-NETATMO_CLIENT_ID_DEV=xxx (for localhost)
-NETATMO_CLIENT_SECRET_DEV=xxx (for localhost)
-
-# NEW (v2.0)
-NETATMO_DEFAULT_SCHEDULE_NAME="Default Schedule"  # Fallback if no schedule active
-STOVE_HEALTH_CHECK_INTERVAL=60  # Seconds between health checks (cron frequency)
-```
-
-**Rationale:**
-- Reuse existing Netatmo OAuth credentials
-- Add configuration for default behaviors
-
-### Local Development
-
-**Cron testing:**
-
+**Install only what you need:**
 ```bash
-# Current pattern (v1.0)
-curl "http://localhost:3000/api/scheduler/check?secret=your-cron-secret"
-
-# Same pattern for v2.0 (extended logic, same endpoint)
+npm install @radix-ui/react-dialog @radix-ui/react-dropdown-menu @radix-ui/react-select @radix-ui/react-tooltip
 ```
 
-**No new testing tools needed.** Vercel Cron endpoints are HTTP routes (test with curl/Postman).
+**Note:** Do NOT install the unified `radix-ui` package (v1.4.3). Use individual `@radix-ui/react-*` packages for tree-shaking and version control.
 
----
+### Component Variant Management
 
-## Migration Strategy
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| **class-variance-authority** | ^0.7.1 | Type-safe variant APIs | Consolidates classname logic, provides autocomplete for variants, works seamlessly with Tailwind. Your existing components use ad-hoc variant logic - CVA standardizes this pattern. |
+| **clsx** | ^2.1.1 | Conditional class merging | Lightweight (228B), handles conditional classes and arrays. Industry standard utility. |
+| **tailwind-merge** | ^2.7.0 | Tailwind class conflict resolution | Prevents class conflicts when merging dynamic classes (e.g., `bg-red-500` overriding `bg-blue-500`). Essential for component composition. |
 
-### Phase 1: Netatmo Schedule UI (Read-Only)
+**Rationale:** These three libraries form the canonical "cn utility" pattern popularized by shadcn/ui. CVA provides the variant API (replacing your manual switch statements), clsx handles conditionals, tailwind-merge prevents class conflicts. Combined bundle size: ~25KB. Alternative approaches (styled-components, CSS Modules) don't integrate well with Tailwind's utility-first philosophy.
 
-**Add:**
-- `ThermostatScheduleContext` (Context API, 0 new deps)
-- Schedule display components (React, existing)
-- Firebase schema for schedule caching (extend `netatmo/`)
+**Implementation pattern:**
+```typescript
+// lib/utils.ts
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
-**Test:**
-- Fetch schedules from Netatmo API
-- Display in UI with timezone formatting (date-fns TZDate)
-- Cache in Firebase for offline access
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
-### Phase 2: Schedule CRUD Operations
+// components/ui/Button.tsx
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '@/lib/utils';
 
-**Add:**
-- Schedule editor form (React Hook Form + Zod, existing)
-- API routes calling `createSchedule()`, `switchHomeSchedule()` (existing functions)
-- Validation schemas (Zod, existing)
+const buttonVariants = cva(
+  'rounded-xl font-medium transition-colors', // base
+  {
+    variants: {
+      variant: {
+        ember: 'bg-ember-400 text-white hover:bg-ember-500',
+        ghost: 'bg-transparent text-slate-200 hover:bg-white/5',
+        outline: 'border border-white/10 hover:border-ember-400',
+      },
+      size: {
+        sm: 'h-9 px-3 text-sm',
+        md: 'h-11 px-4',
+        lg: 'h-13 px-6 text-lg',
+      },
+    },
+    defaultVariants: {
+      variant: 'ember',
+      size: 'md',
+    },
+  }
+);
+```
 
-**Test:**
-- Create new schedule
-- Switch active schedule
-- Edit existing schedule
-- Delete schedule (with confirmation)
+### Icon Library
 
-### Phase 3: Stove-Thermostat Integration
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| **lucide-react** | ^0.562.0 (KEEP) | Icon system | Already installed. 1,500+ consistent, modern icons. Tree-shakable, 22.1KB bundle size. Superior to react-icons (50K+ icons but inconsistent styles) and Heroicons (only 300 icons). No change needed. |
 
-**Add:**
-- `syncStoveWithThermostat()` logic in cron endpoint (extend existing)
-- Setpoint override API (`setRoomThermpoint()` already exists)
-- Sync state tracking in Firebase (`netatmo/stoveSync`)
+**Rationale:** You already have lucide-react v0.562.0. This is the correct choice for 2026. Lucide offers the best balance of variety (1,500+ icons), consistency (24x24 grid), bundle size (tree-shakable), and Tailwind integration. React Icons has too much inconsistency across icon packs. Heroicons is too limited for a full app. Stick with Lucide.
 
-**Test:**
-- Stove ON → thermostat setpoint overrides to 21°C
-- Stove OFF → thermostat returns to schedule
-- Manual thermostat changes preserved until next stove state change
+### Accessibility Testing
 
-### Phase 4: Health Monitoring
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| **jest-axe** | ^10.0.0 | Automated a11y testing | Integrates axe-core (industry standard) with Jest. Catches ~70% of WCAG violations automatically. Required for WCAG AA compliance goal. |
+| **@axe-core/react** | ^4.10.2 | Runtime accessibility auditing (dev only) | Shows a11y violations in browser console during development. Helps catch issues before tests. Dev-only bundle, zero production cost. |
 
-**Add:**
-- `monitorStoveHealth()` in cron endpoint (extend existing)
-- Battery status checks (Netatmo `extractModulesWithStatus()` already exists)
-- Health alerts (notification system already exists)
+**Rationale:** jest-axe is the standard for automated accessibility testing in React. Version 10.0.0 (released March 2025) includes axe-core 4.10.2. Important limitation: ~30% of barriers require manual testing (color contrast in JSDOM, screen reader compatibility). Use jest-axe for automated gates, manual WCAG audits for compliance certification.
 
-**Test:**
-- Low battery detection
-- Connection loss alerts
-- Health dashboard display
+**Setup:**
+```bash
+npm install --save-dev jest-axe @axe-core/react
+```
 
----
+```typescript
+// jest.setup.js
+import 'jest-axe/extend-expect';
 
-## Performance Considerations
+// app/layout.tsx (dev only)
+if (process.env.NODE_ENV !== 'production') {
+  import('@axe-core/react').then((axe) => {
+    axe.default(React, ReactDOM, 1000);
+  });
+}
+```
 
-### API Rate Limits
+### Component Documentation (OPTIONAL)
 
-**Netatmo API limits:**
-- 50 requests per 10 seconds per user
-- 500 requests per hour per user
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| **Storybook** | ^10.0.1 | Component catalog & testing | Industry standard for component documentation. Storybook 10 supports React 19 and Next.js 15. Includes accessibility addon for component-level auditing. |
 
-**v2.0 usage estimate:**
-- Schedule read: 1 req every page load (~10/hour)
-- Schedule write: 1 req per edit (~5/hour)
-- Health check: 1 req per minute (60/hour)
-- Total: ~75 req/hour
+**Recommendation:** **DEFER to post-milestone.** Here's why:
 
-**Margin:** 85% headroom (well under 500/hour limit)
+**Arguments FOR Storybook:**
+- Interactive component playground
+- Visual regression testing capabilities
+- Built-in accessibility addon
+- Team documentation
 
-**Mitigation:**
-- Cache schedules in Firebase (reduce reads)
-- Batch health checks (single `getHomeStatus()` call)
-- Rate limit schedule edits client-side (1 per 5s)
+**Arguments AGAINST (for this milestone):**
+- Setup complexity with Next.js 15 + React 19 (ongoing compatibility issues)
+- Adds 100+ dependencies
+- You already have `/debug/design-system` page showing components
+- Your project is single-developer (less documentation need)
+- Testing priority is unit tests (Jest) and E2E (Playwright), not visual regression
 
-### Firebase Realtime Database
+**If you choose to add Storybook later:**
+```bash
+npx storybook@latest init --builder webpack5
+```
+Use Webpack builder (not Vite) for Next.js compatibility. Expect 30-60 minutes setup time for Next.js 15 + React 19 configuration.
 
-**Current usage (v1.0):**
-- 50 MB storage
-- 1 GB/month bandwidth
-- 100K simultaneous connections (1 user = never an issue)
+### Design Token Management
 
-**v2.0 additions:**
-- Schedule cache: +5 MB (5-10 schedules × 500 KB JSON)
-- Health data: +1 MB (module statuses)
-- Total: 56 MB (44% of free tier 100 MB)
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| **Tailwind CSS v4.x** | N/A (future) | CSS-first design tokens | NOT RECOMMENDED for this milestone. V4 changes configuration paradigm from JS to CSS (`@theme` directive). Your tailwind.config.ts works. Migration provides zero functional benefit for milestone goals. |
 
-**Confidence:** HIGH - No scale concerns for single-user PWA.
+**Rationale:** Tailwind CSS v4 introduced `@theme` directive for CSS-first design tokens. This is conceptually cleaner (design tokens in CSS, not JS) but requires migration effort. Your existing Tailwind v4.1.18 configuration already exposes design tokens as CSS variables. The v4 `@theme` migration provides no new functionality for your milestone (component library completion). Defer to v5 or major redesign.
+
+**Current approach (KEEP):**
+```typescript
+// tailwind.config.ts
+export default {
+  theme: {
+    extend: {
+      colors: {
+        ember: { 400: '#f18d33', 500: '#ed6f10', 700: '#b83d09' },
+        // ... automatically becomes CSS variables
+      },
+    },
+  },
+};
+```
 
 ---
 
 ## Alternatives Considered
 
-### Netatmo SDK Options
-
-| Option | Version | Status | Decision |
-|--------|---------|--------|----------|
-| Official Netatmo SDK | N/A | Doesn't exist | Built custom wrapper |
-| `node-red-contrib-netatmo-energy` | N/A | Node-RED only | Not applicable |
-| Custom wrapper (`lib/netatmoApi.js`) | Current | ✅ Working | **KEEP** |
-
-**Rationale:** Official SDK doesn't exist. Custom wrapper already implements all needed endpoints.
-
-### Cron Solutions Comparison
-
-| Solution | Cost | Complexity | Latency | Decision |
-|----------|------|------------|---------|----------|
-| Vercel Cron | Free (included) | Low | 0ms | **SELECTED** |
-| GitHub Actions | Free | Medium | 30s+ | Rejected (slow) |
-| cron-job.org | Free tier | Low | 10s | Rejected (external) |
-| AWS EventBridge | $1/month | High | 5s | Rejected (cost) |
-| BullMQ + Redis | $15/month | Very High | 0ms | Rejected (overkill) |
-
-**Confidence:** HIGH - Vercel Cron is native, zero-cost, zero-latency solution.
-
-### State Management Comparison
-
-| Library | Bundle Size | Complexity | Team Familiarity | Decision |
-|---------|------------|------------|------------------|----------|
-| Context API | 0 KB | Low | High (already used) | **SELECTED** |
-| Zustand | 1.1 KB | Medium | None | Rejected |
-| Redux Toolkit | 11 KB | High | None | Rejected |
-| Jotai | 2.9 KB | Medium | None | Rejected |
-| Valtio | 3.8 KB | Medium | None | Rejected |
-
-**Rationale:** Context API matches existing patterns, zero new dependencies, sufficient performance for use case.
+| Category | Recommended | Alternative | Why Not |
+|----------|-------------|-------------|---------|
+| **Component Primitives** | Radix UI | Headless UI | Smaller component set (no Slider, Accordion, Progress). Less TypeScript support. Tailwind Labs ecosystem lock-in. |
+| **Component Primitives** | Radix UI | React Aria | More verbose API. Requires deeper a11y knowledge. Steeper learning curve. Better for design system teams, overkill for single app. |
+| **Component Primitives** | Radix UI | Build everything from scratch | Massive time investment. High risk of a11y bugs. Keyboard navigation edge cases. Not worth it for complex components (Dialog, Dropdown). |
+| **Full UI Framework** | N/A | shadcn/ui | Copy-paste component library built ON Radix. You already have components and design system. Would create conflicts with existing Button, Card, etc. |
+| **Full UI Framework** | N/A | Material UI / Chakra UI | Pre-styled components fight Tailwind. Bundle size explosion (500KB+). Design system lock-in. You want Ember Noir, not Material Design. |
+| **Variant Management** | CVA | Tailwind Variants (beta) | Official Tailwind solution still in beta. CVA is production-proven (7.2M weekly downloads). Better TypeScript DX. |
+| **Icon Library** | Lucide (keep) | React Icons | 50K+ icons but inconsistent styles across packs (Font Awesome, Material, Bootstrap mixed). Larger bundle if not careful with imports. |
+| **Icon Library** | Lucide (keep) | Heroicons | Only 300 icons. Too limited for full app. Great for Tailwind marketing sites, insufficient for complex PWA. |
+| **Testing** | jest-axe | Playwright Accessibility | E2E accessibility testing. Slower, more brittle. Use for critical user flows, not component-level testing. |
+| **Documentation** | `/debug/design-system` | Storybook | 100+ dependencies, setup complexity. Overkill for single-developer project with existing design system page. |
 
 ---
 
-## Risk Assessment
+## Installation
 
-### High Risk: Netatmo API Changes
+### Required (Core Libraries)
 
-**Risk:** Netatmo deprecates schedule endpoints
-**Likelihood:** Low (API stable since 2020)
-**Impact:** High (core feature broken)
-**Mitigation:**
-- Monitor Netatmo developer announcements
-- Cache schedules in Firebase (graceful degradation)
-- Fallback to read-only mode if CRUD fails
+```bash
+# Component primitives
+npm install @radix-ui/react-dialog @radix-ui/react-dropdown-menu @radix-ui/react-select @radix-ui/react-tooltip @radix-ui/react-checkbox @radix-ui/react-switch
 
-### Medium Risk: Cron Reliability
+# Variant management
+npm install class-variance-authority clsx tailwind-merge
 
-**Risk:** Vercel Cron misses invocations (99.9% SLA)
-**Likelihood:** Low (0.1% downtime)
-**Impact:** Medium (health checks delayed)
-**Mitigation:**
-- Track `cronHealth/lastCall` timestamp
-- Alert if > 5 minutes since last call
-- Manual health check button in UI
+# Accessibility testing (dev)
+npm install --save-dev jest-axe @axe-core/react
+```
 
-### Low Risk: Date/Time Edge Cases
+**Total additions:** 10 packages (~250KB production bundle, ~5MB node_modules)
 
-**Risk:** Timezone bugs (DST transitions, leap seconds)
-**Likelihood:** Medium (DST happens 2x/year)
-**Impact:** Low (schedule times off by 1 hour)
-**Mitigation:**
-- Use date-fns TZDate (handles DST automatically)
-- Test schedule logic during DST transition dates
-- Store all times in UTC, display in Europe/Rome
+### Optional (Deferred)
 
-### Low Risk: Firebase Storage Growth
-
-**Risk:** Schedule history fills database
-**Likelihood:** Low (5-10 schedules max)
-**Impact:** Low (still under free tier)
-**Mitigation:**
-- Auto-cleanup schedules older than 90 days
-- Compress schedule JSON before storage
-- Monitor Firebase usage dashboard
+```bash
+# Storybook (if needed later)
+npx storybook@latest init --builder webpack5
+```
 
 ---
 
-## Success Metrics
+## Integration Checklist
 
-### Performance Targets
+After installation, integrate with existing codebase:
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Schedule load time | < 500ms | Time to display schedules in UI |
-| Schedule save time | < 2s | API call + Firebase sync |
-| Cron execution time | < 5s | Total time for health checks |
-| Netatmo API calls | < 75/hour | Rate limit compliance |
-| Bundle size increase | < 5 KB | New code without new deps |
-
-### Reliability Targets
-
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Schedule sync accuracy | 100% | No missed setpoint changes |
-| Health check uptime | 99.9% | Cron invocations per day |
-| Schedule edit success rate | 95%+ | Successful Netatmo API writes |
-| Timezone accuracy | 100% | DST transition handling |
+- [ ] Create `lib/utils.ts` with `cn` utility (clsx + tailwind-merge)
+- [ ] Add jest-axe to `jest.setup.js`
+- [ ] Add `@axe-core/react` to `app/layout.tsx` (dev only)
+- [ ] Refactor existing Button component to use CVA
+- [ ] Build Dialog component with `@radix-ui/react-dialog`
+- [ ] Build Dropdown component with `@radix-ui/react-dropdown-menu`
+- [ ] Build enhanced Select component with `@radix-ui/react-select`
+- [ ] Build Tooltip component with `@radix-ui/react-tooltip`
+- [ ] Add accessibility tests for all interactive components
+- [ ] Update `/debug/design-system` page with new components
 
 ---
 
-## Conclusion
+## Migration Strategy
 
-**v2.0 requires ZERO new npm dependencies.** All features implemented by:
+### Phase 1: Foundation (Milestone 11 - Weeks 1-2)
+1. Install core dependencies (Radix primitives, CVA, utils)
+2. Create `cn` utility and CVA patterns
+3. Set up jest-axe and @axe-core/react
+4. Write accessibility test patterns
 
-1. **Extending existing Netatmo API wrapper** (`lib/netatmoApi.js`)
-2. **Extending existing Vercel Cron endpoint** (`/api/scheduler/check`)
-3. **Using existing date-fns v4** (native timezone support)
-4. **Using existing React Context API** (matches `VersionContext` pattern)
-5. **Using existing React Hook Form + Zod** (form validation)
-6. **Using existing Firebase Admin/Client SDKs** (storage)
+### Phase 2: Refactor Existing (Milestone 11 - Week 3)
+5. Migrate Button to CVA variants
+6. Migrate Card to CVA variants
+7. Enhance existing Checkbox with Radix primitives
+8. Enhance existing Toggle with Radix Switch
 
-**Total new dependencies:** 0
-**Total stack changes:** Extend existing patterns
-**Estimated bundle size increase:** < 3 KB (new UI components only)
+### Phase 3: New Components (Milestone 11 - Week 4)
+9. Build Dialog component (Radix)
+10. Build Dropdown component (Radix)
+11. Build enhanced Select component (Radix)
+12. Build Tooltip component (Radix)
 
-**Confidence:** HIGH - All technologies verified in current codebase, Netatmo API endpoints tested, Vercel Cron pattern validated.
+### Phase 4: Testing & Documentation (Milestone 11 - Week 5)
+13. Write unit tests for all components
+14. Add accessibility tests with jest-axe
+15. Update design system documentation page
+16. Manual WCAG AA audit
+
+---
+
+## What NOT to Add
+
+**Avoid these common traps:**
+
+1. **Full UI frameworks** (MUI, Chakra, Ant Design)
+   - **Why not:** Pre-styled components conflict with Ember Noir design system. Massive bundle sizes (500KB-2MB). You'd spend more time overriding their styles than building from scratch.
+
+2. **Tailwind CSS v4 migration**
+   - **Why not:** Zero functional benefit for milestone goals. Configuration paradigm change (JS → CSS) requires full config rewrite. Your current setup already exposes CSS variables. Defer to Tailwind v5 or major redesign.
+
+3. **Storybook (for now)**
+   - **Why not:** 100+ dependencies, 30-60 minute setup, ongoing React 19 compatibility issues. You have `/debug/design-system` page. Single-developer project doesn't need visual documentation tool. Add post-milestone if team grows.
+
+4. **CSS-in-JS libraries** (Styled Components, Emotion)
+   - **Why not:** Conflicts with Tailwind utility-first approach. Runtime performance cost. Server Components compatibility issues. Tailwind + CVA provides type-safe styling without CSS-in-JS overhead.
+
+5. **Animation libraries** (Framer Motion, React Spring)
+   - **Why not:** Your design system already has `animate-fade-in`, `animate-scale-in`, etc. Tailwind CSS animations + Radix animation hooks are sufficient. Framer Motion is 40KB. Only add if complex animation choreography needed (not in milestone scope).
+
+6. **Form libraries** (React Hook Form is already installed)
+   - **Why not:** You already have `react-hook-form` v7.54.2 and `zod` v3.24.2. This is the correct stack for form validation. No changes needed.
+
+7. **State management beyond React** (Zustand, Jotai, Redux)
+   - **Why not:** Design system components should be stateless or use local React state. If you need global state for app logic, that's separate from component library scope. You already have Firebase for shared state.
+
+---
+
+## Performance Considerations
+
+**Bundle Size Impact:**
+
+| Addition | Production Size | Notes |
+|----------|----------------|-------|
+| @radix-ui/react-dialog | ~15KB | Tree-shakable per component |
+| @radix-ui/react-dropdown-menu | ~18KB | Includes nested menu logic |
+| @radix-ui/react-select | ~20KB | Most complex primitive |
+| @radix-ui/react-tooltip | ~8KB | Positioning engine |
+| class-variance-authority | ~2KB | Tiny API surface |
+| clsx | ~0.2KB | Ultra-lightweight |
+| tailwind-merge | ~5KB | Class conflict resolution |
+| **TOTAL** | **~68KB** | Gzipped estimate |
+
+**Runtime Performance:**
+
+- Radix components use React Portals (no layout thrashing)
+- CVA compiles variants at build time (zero runtime cost)
+- clsx and tailwind-merge are micro-optimized (< 1ms)
+- No CSS-in-JS runtime (Tailwind is build-time)
+
+**Comparison to alternatives:**
+
+- Material UI: ~500KB (7x larger)
+- Chakra UI: ~350KB (5x larger)
+- Ant Design: ~1.2MB (18x larger)
+- Building from scratch: 0KB but 100+ hours development + ongoing maintenance
+
+---
+
+## Testing Strategy
+
+### Unit Tests (Jest + Testing Library)
+
+```typescript
+// Button.test.tsx
+import { render, screen } from '@testing-library/react';
+import { axe, toHaveNoViolations } from 'jest-axe';
+import { Button } from './Button';
+
+expect.extend(toHaveNoViolations);
+
+describe('Button', () => {
+  it('renders with correct variant', () => {
+    render(<Button variant="ember">Click me</Button>);
+    expect(screen.getByRole('button')).toHaveClass('bg-ember-400');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<Button>Click me</Button>);
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+});
+```
+
+### E2E Tests (Playwright - already configured)
+
+```typescript
+// dialog.spec.ts
+import { test, expect } from '@playwright/test';
+
+test('dialog keyboard navigation', async ({ page }) => {
+  await page.goto('/dashboard');
+  await page.click('button[aria-label="Settings"]');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('[role="dialog"]')).not.toBeVisible();
+});
+```
+
+### Accessibility Audits
+
+1. **Automated (jest-axe):** Catches 70% of WCAG violations
+2. **Runtime (axe-core/react):** Dev-time console warnings
+3. **Manual:** Keyboard navigation, screen reader testing (NVDA/JAWS/VoiceOver)
+4. **Tools:** Lighthouse (built into Chrome DevTools), axe DevTools extension
+
+---
+
+## TypeScript Integration
+
+All recommended libraries have excellent TypeScript support:
+
+```typescript
+// Full type inference
+import { cva, type VariantProps } from 'class-variance-authority';
+import * as Dialog from '@radix-ui/react-dialog';
+
+const buttonVariants = cva(/* ... */);
+
+interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  // Additional props
+}
+
+// Radix exports all types
+interface DialogProps extends Dialog.DialogProps {
+  // Extended props
+}
+```
+
+**No @types packages needed** - all libraries ship with native TypeScript definitions.
+
+---
+
+## Confidence Assessment
+
+| Area | Confidence | Reason |
+|------|------------|--------|
+| **Radix UI Recommendation** | HIGH | Industry standard, 1,500+ production apps, verified with official docs and ecosystem consensus. No alternative matches accessibility + DX. |
+| **CVA + clsx + tailwind-merge** | HIGH | Canonical pattern from shadcn/ui. 7M+ weekly downloads. Source code reviewed. Zero controversy in 2026 Tailwind ecosystem. |
+| **Lucide (keep existing)** | HIGH | Already installed, correct choice verified against alternatives. No change needed. |
+| **jest-axe** | HIGH | Version 10.0.0 confirmed current. Verified integration with Jest 30 and React 19. Official documentation reviewed. |
+| **Storybook deferral** | MEDIUM | React 19 + Next.js 15 compatibility issues documented in GitHub issues. Conservative recommendation given single-developer context. |
+| **Tailwind v4 deferral** | MEDIUM | Low confidence on migration urgency. V4 `@theme` directive is conceptually better but functionally equivalent to current setup. Risk vs. reward calculation. |
 
 ---
 
 ## Sources
 
-### Official Documentation
-- [Vercel Cron Jobs](https://vercel.com/docs/cron-jobs)
-- [Netatmo Energy API](https://dev.netatmo.com/apidocumentation/energy)
-- [date-fns v4 timezone support](https://github.com/date-fns/date-fns/blob/main/docs/timeZones.md)
-- [Next.js 15 App Router](https://nextjs.org/docs)
+**Radix UI vs Headless UI:**
+- [Headless UI vs Radix: Which One is Better in 2025?](https://www.subframe.com/tips/headless-ui-vs-radix)
+- [15 Best React UI Libraries for 2026](https://www.builder.io/blog/react-component-libraries-2026)
+- [React UI libraries in 2025: Comparing shadcn/ui, Radix, Mantine, MUI, Chakra & more](https://makersden.io/blog/react-ui-libs-2025-comparing-shadcn-radix-mantine-mui-chakra)
 
-### Research Sources
-- [Cron Jobs in Next.js: Serverless vs Serverful](https://yagyaraj234.medium.com/running-cron-jobs-in-nextjs-guide-for-serverful-and-stateless-server-542dd0db0c4c)
-- [Testing Next.js Cron Jobs Locally](https://medium.com/@quentinmousset/testing-next-js-cron-jobs-locally-my-journey-from-frustration-to-solution-6ffb2e774d7a)
-- [Using React Context API in Next.js 15](https://dev.to/saiful7778/using-react-context-api-in-nextjs-15-for-global-state-management-379h)
-- [Next.js App Router State Management](https://www.pronextjs.dev/tutorials/state-management)
-- [Firebase Admin SDK Edge Runtime Limitations](https://github.com/firebase/firebase-admin-node/issues/1801)
-- [Netatmo API Schedule Management](https://github-wiki-see.page/m/Homemade-Disaster/ioBroker.netatmo-energy/wiki/API-requests)
+**React Aria & Accessibility:**
+- [React Aria Official Documentation](https://react-aria.adobe.com/)
+- [Prioritising Accessibility in React and Next.js Applications](https://medium.com/@alexnjoroge/prioritising-accessibility-in-react-and-next-js-applications-9d68b5184df0)
+- [App Router: Improving Accessibility | Next.js](https://nextjs.org/learn/dashboard-app/improving-accessibility)
+
+**Icon Libraries:**
+- [5 Best Icon Libraries for React Projects Using shadcn/ui and Tailwind CSS](https://www.shadcndesign.com/blog/5-best-icon-libraries-for-shadcn-ui)
+- [Best React Icon Libraries for 2026](https://mighil.com/best-react-icon-libraries)
+- [Lucide Icons Official Documentation](https://lucide.dev/guide/comparison)
+
+**Accessibility Testing:**
+- [How to test for accessibility with axe-core in Next.js and React](https://larsmagnus.co/blog/how-to-test-for-accessibility-with-axe-core-in-next-js-and-react)
+- [jest-axe - npm](https://www.npmjs.com/package/jest-axe)
+- [How to Test React Applications for Accessibility with axe-core](https://oneuptime.com/blog/post/2026-01-15-test-react-accessibility-axe-core/view)
+
+**Storybook:**
+- [Storybook for Next.js with Webpack](https://storybook.js.org/docs/get-started/frameworks/nextjs)
+- [Storybook error with latest NextJS 15 release and React 19 RC](https://github.com/ixartz/Next-js-Boilerplate/issues/322)
+
+**Class Variance Authority:**
+- [Class Variance Authority Official Documentation](https://cva.style/docs)
+- [class-variance-authority - npm](https://www.npmjs.com/package/class-variance-authority)
+- [CVA vs. Tailwind Variants: Choosing the Right Tool for Your Design System](https://dev.to/webdevlapani/cva-vs-tailwind-variants-choosing-the-right-tool-for-your-design-system-12am)
+
+**clsx + tailwind-merge:**
+- [Mastering Tailwind CSS: Overcome Styling Conflicts with Tailwind Merge and clsx](https://dev.to/sheraz4194/mastering-tailwind-css-overcome-styling-conflicts-with-tailwind-merge-and-clsx-1dol)
+- [tailwind-merge - npm](https://www.npmjs.com/package/tailwind-merge)
+
+**Tailwind CSS v4:**
+- [Tailwind CSS v4.0](https://tailwindcss.com/blog/tailwindcss-v4)
+- [Tailwind CSS 4 with Next.js 15: Design Tokens, Container Queries & Theming at Scale](https://medium.com/@sureshdotariya/tailwind-css-4-with-next-js-15-design-tokens-container-queries-theming-at-scale-1d2d0de179ce)
+
+**Testing Library + React 19:**
+- [@testing-library/react - npm](https://www.npmjs.com/package/@testing-library/react)
+- [the "@testing-library/react" not integrate with react @19.0.0](https://github.com/testing-library/react-testing-library/issues/1368)
+
+**Radix UI Versions:**
+- [Releases – Radix Primitives](https://www.radix-ui.com/primitives/docs/overview/releases)
+- [@radix-ui/react-primitive - npm](https://www.npmjs.com/package/@radix-ui/react-primitive)
 
 ---
 
-**Last Updated:** 2026-01-26
-**Next Review:** After Phase 1 implementation (schedule UI)
+**Last updated:** 2026-01-28
+**Next review:** After Phase 1 implementation (validate bundle sizes, DX)

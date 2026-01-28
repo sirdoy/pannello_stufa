@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-26)
 ## Current Position
 
 Phase: 10 of 10 (Monitoring Dashboard & Alerts UI) — IN PROGRESS
-Plan: 2 of TBD complete
-Status: Phase 10 in progress, status card components complete
-Last activity: 2026-01-28 — Completed 10-02-PLAN.md (status card components)
+Plan: 4 of TBD complete
+Status: Phase 10 in progress, monitoring dashboard page complete
+Last activity: 2026-01-28 — Completed 10-04-PLAN.md (monitoring dashboard & navigation)
 
-Progress: [█████████░░░░░░░░░░░] 49/TBD plans complete (v1.0: 29 plans, v2.0: 20 plans)
+Progress: [█████████░░░░░░░░░░░] 51/TBD plans complete (v1.0: 29 plans, v2.0: 22 plans)
 
 ## Performance Metrics
 
@@ -60,9 +60,11 @@ Progress: [█████████░░░░░░░░░░░] 49/TBD 
   - 09-03: 4.3 min (schedule switcher UI)
   - 09-04: 5.4 min (manual override UI)
   - 09-05: 8.0 min (active override badge & navigation)
-- v2.0 Phase 10 IN PROGRESS: 2 plans in 4.75 minutes (2.4 min/plan average)
+- v2.0 Phase 10 IN PROGRESS: 4 plans in 26.65 minutes (6.7 min/plan average)
   - 10-01: 1.8 min (health monitoring API routes)
   - 10-02: 2.95 min (status card components)
+  - 10-03: 11.0 min (monitoring timeline components)
+  - 10-04: 11.0 min (monitoring dashboard page & navigation)
 
 ## Accumulated Context
 
@@ -148,6 +150,10 @@ Recent decisions affecting current work:
 - v2.0 (10-03): Filter changes reset cursor and refetch from beginning (NotificationInbox pattern)
 - v2.0 (10-03): Accordion expansion on tap for compact mobile UX
 - v2.0 (10-03): Italian date-fns locale for relative timestamps
+- v2.0 (10-04): Monitoring added to GLOBAL_SECTIONS (cross-cutting concern, not device-specific)
+- v2.0 (10-04): 30-second DMS polling interval balances responsiveness with API load
+- v2.0 (10-04): max-h-[600px] timeline scroll container prevents infinite page height
+- v2.0 (10-04): Global navigation section positioned between devices and settings in mobile menu
 
 ### Pending Todos
 
@@ -182,7 +188,7 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-01-28
-Stopped at: Completed 10-02-PLAN.md (status card components)
+Stopped at: Completed 10-04-PLAN.md (monitoring dashboard page & navigation)
 Resume file: None
 
-**Next action:** Continue Phase 10 with monitoring timeline components and dashboard page
+**Next action:** Continue Phase 10 with alert settings UI (10-05 or next plan)

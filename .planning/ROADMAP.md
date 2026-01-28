@@ -115,20 +115,22 @@
 
 **Milestone Goal:** Establish complete, consistent, accessible UI component library based on evolved Ember Noir design system, then systematically apply it across all application pages for visual consistency and professional polish.
 
-#### Phase 11: Foundation & Tooling
+#### Phase 11: Foundation & Tooling ✓
 **Goal**: Establish infrastructure for type-safe, accessible component development
 **Depends on**: Nothing (starts v3.0)
 **Requirements**: INFRA-01, INFRA-02, INFRA-03, INFRA-04, INFRA-05, INFRA-06
 **Success Criteria** (what must be TRUE):
-  1. All components use CVA for type-safe variant APIs with autocomplete support
-  2. Radix UI primitives are installed and accessible for complex interactive patterns
-  3. All new components pass jest-axe automated accessibility tests
-  4. ESLint blocks hard-coded colors, enforcing design token usage
-  5. Design tokens are centralized and exposed as CSS variables for theming
-**Plans**: TBD
+  1. ✓ CVA installed for type-safe variant APIs with autocomplete support
+  2. ✓ Radix UI primitives are installed and accessible for complex interactive patterns
+  3. ✓ All new components pass jest-axe automated accessibility tests
+  4. ✓ ESLint warns on hard-coded colors, enforcing design token usage
+  5. ✓ Design tokens are centralized and exposed as CSS variables for theming
+**Plans**: 3 plans (complete)
 
 Plans:
-- [ ] 11-01: TBD
+- [x] 11-01: CVA + cn() utility (clsx, tailwind-merge)
+- [x] 11-02: Radix UI + jest-axe accessibility testing
+- [x] 11-03: ESLint token enforcement + semantic design tokens
 
 #### Phase 12: Core Interactive Components
 **Goal**: Deliver missing table-stakes form controls with Radix UI accessibility
@@ -264,7 +266,7 @@ Phases execute in numeric order: 11 → 12 → 13 → 14 → 15 → 16 → 17 �
 | 8. Stove-Thermostat Coordination | v2.0 | 5/5 | Complete | 2026-01-27 |
 | 9. Schedule Management UI | v2.0 | 4/4 | Complete | 2026-01-28 |
 | 10. Monitoring Dashboard & Alerts | v2.0 | 5/5 | Complete | 2026-01-28 |
-| 11. Foundation & Tooling | v3.0 | 0/TBD | Not started | - |
+| 11. Foundation & Tooling | v3.0 | 3/3 | Complete | 2026-01-28 |
 | 12. Core Interactive Components | v3.0 | 0/TBD | Not started | - |
 | 13. Foundation Refactoring | v3.0 | 0/TBD | Not started | - |
 | 14. Feedback & Layout Components | v3.0 | 0/TBD | Not started | - |

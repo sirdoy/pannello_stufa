@@ -9,12 +9,12 @@ Requirements for establishing complete, consistent, accessible UI component libr
 
 ### Design System Infrastructure
 
-- [ ] **INFRA-01**: Install and configure CVA (class-variance-authority) for type-safe component variants
-- [ ] **INFRA-02**: Install Radix UI primitives (Dialog, Dropdown, Select, Tooltip, Slider, Checkbox, Switch)
-- [ ] **INFRA-03**: Set up jest-axe for automated accessibility testing
-- [ ] **INFRA-04**: Configure ESLint rules to enforce design token usage (block hard-coded colors)
-- [ ] **INFRA-05**: Create utility functions (clsx, tailwind-merge, cn helper)
-- [ ] **INFRA-06**: Audit and centralize design tokens using Tailwind v4 @theme directive
+- [x] **INFRA-01**: Install and configure CVA (class-variance-authority) for type-safe component variants
+- [x] **INFRA-02**: Install Radix UI primitives (Dialog, Dropdown, Select, Tooltip, Slider, Checkbox, Switch)
+- [x] **INFRA-03**: Set up jest-axe for automated accessibility testing
+- [x] **INFRA-04**: Configure ESLint rules to enforce design token usage (block hard-coded colors)
+- [x] **INFRA-05**: Create utility functions (clsx, tailwind-merge, cn helper)
+- [x] **INFRA-06**: Audit and centralize design tokens using Tailwind v4 @theme directive
 
 ### Foundation Components (Primitives)
 
@@ -125,12 +125,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | Phase 11 | Pending |
-| INFRA-02 | Phase 11 | Pending |
-| INFRA-03 | Phase 11 | Pending |
-| INFRA-04 | Phase 11 | Pending |
-| INFRA-05 | Phase 11 | Pending |
-| INFRA-06 | Phase 11 | Pending |
+| INFRA-01 | Phase 11 | Complete |
+| INFRA-02 | Phase 11 | Complete |
+| INFRA-03 | Phase 11 | Complete |
+| INFRA-04 | Phase 11 | Complete |
+| INFRA-05 | Phase 11 | Complete |
+| INFRA-06 | Phase 11 | Complete |
 | COMP-03 | Phase 12 | Pending |
 | COMP-04 | Phase 12 | Pending |
 | COMP-05 | Phase 12 | Pending |

@@ -194,26 +194,26 @@ Plans:
 - [x] 14-06-PLAN.md — PageLayout + DashboardLayout with collapsible sidebar
 - [x] 14-07-PLAN.md — Section + Grid CVA enhancements
 
-#### Phase 15: Smart Home Components Refactor
+#### Phase 15: Smart Home Components Refactor ✓
 **Goal**: Standardize domain-specific smart home components with unified APIs
 **Depends on**: Phase 13, Phase 14
 **Requirements**: DOMAIN-01, DOMAIN-02, DOMAIN-03, DOMAIN-04, DOMAIN-05, DOMAIN-06
 **Success Criteria** (what must be TRUE):
-  1. All device status displays use standardized StatusCard component with unified API
-  2. All device controls use standardized DeviceCard component with consistent structure
-  3. All status indicators use standardized Badge component with pulse animation
-  4. All increment/decrement controls use standardized ControlButton component
-  5. All connection states use unified ConnectionStatus component (online/offline/connecting)
-  6. All health indicators use unified HealthIndicator component (ok/warning/error/critical)
-**Plans**: 6 plans in 2 waves
+  1. ✓ All device status displays use standardized StatusCard component with unified API
+  2. ✓ All device controls use standardized DeviceCard component with consistent structure
+  3. ✓ All status indicators use standardized Badge component with pulse animation
+  4. ✓ All increment/decrement controls use standardized ControlButton component
+  5. ✓ All connection states use unified ConnectionStatus component (online/offline/connecting)
+  6. ✓ All health indicators use unified HealthIndicator component (ok/warning/error/critical)
+**Plans**: 6 plans (complete)
 
 Plans:
-- [ ] 15-01-PLAN.md — useLongPress hook + ControlButton CVA refactor
-- [ ] 15-02-PLAN.md — Badge component with CVA and pulse animation
-- [ ] 15-03-PLAN.md — ConnectionStatus + HealthIndicator components
-- [ ] 15-04-PLAN.md — SmartHomeCard base component with namespace pattern
-- [ ] 15-05-PLAN.md — StatusCard extending SmartHomeCard
-- [ ] 15-06-PLAN.md — DeviceCard refactor with backwards compatibility
+- [x] 15-01-PLAN.md — useLongPress hook + ControlButton CVA refactor
+- [x] 15-02-PLAN.md — Badge component with CVA and pulse animation
+- [x] 15-03-PLAN.md — ConnectionStatus + HealthIndicator components
+- [x] 15-04-PLAN.md — SmartHomeCard base component with namespace pattern
+- [x] 15-05-PLAN.md — StatusCard extending SmartHomeCard
+- [x] 15-06-PLAN.md — DeviceCard refactor with backwards compatibility
 
 #### Phase 16: Page Migration & Application
 **Goal**: Apply design system to all application pages for visual consistency
@@ -289,7 +289,7 @@ Phases execute in numeric order: 11 → 12 → 13 → 14 → 15 → 16 → 17 �
 | 12. Core Interactive Components | v3.0 | 3/3 | Complete | 2026-01-28 |
 | 13. Foundation Refactoring | v3.0 | 7/7 | Complete | 2026-01-29 |
 | 14. Feedback & Layout Components | v3.0 | 7/7 | Complete | 2026-01-29 |
-| 15. Smart Home Components Refactor | v3.0 | 0/6 | Not started | - |
+| 15. Smart Home Components Refactor | v3.0 | 6/6 | Complete | 2026-01-29 |
 | 16. Page Migration & Application | v3.0 | 0/TBD | Not started | - |
 | 17. Accessibility & Testing | v3.0 | 0/TBD | Not started | - |
 | 18. Documentation & Polish | v3.0 | 0/TBD | Not started | - |

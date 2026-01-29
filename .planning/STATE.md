@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 16 of 18 (Page Migration & Application)
-Plan: 2 of 11 in phase 16
+Plan: 4 of 11 in phase 16
 Status: In progress
-Last activity: 2026-01-29 - Completed 16-02-PLAN.md (Stove page design system migration)
+Last activity: 2026-01-29 - Completed 16-04-PLAN.md (Lights page design system migration)
 
-Progress: [█████████████████░░░] 89.0% (81 plans complete)
+Progress: [█████████████████░░░] 90.2% (84 plans complete)
 
 ## Performance Metrics
 
@@ -34,9 +34,9 @@ Progress: [█████████████████░░░] 89.0% (
 **Recent Trend:**
 - Milestone velocity improving (v2.0 shipped in 1/3 the time of v1.0)
 - Plan complexity stable (~5 min average)
-- Phase 16 in progress (2/11 plans complete)
+- Phase 16 in progress (4/11 plans complete)
 
-*Updated after 16-02 completion (Stove page migration)*
+*Updated after 16-04 completion (Lights page migration)*
 
 ## Accumulated Context
 
@@ -130,6 +130,9 @@ Recent decisions affecting current work:
 - **16-01: spacing='lg' for main page sections (Dashboard pattern)**
 - **16-02: Badge variant mapping for stove page status indicators (sage/neutral, warning/ocean, danger/neutral)**
 - **16-02: Button variant='warning' for mode return action, variant='outline' for navigation**
+- **16-04: Slider onChange receives number directly (not array) per 12-03 API**
+- **16-04: Badge ember variant with pulse for room ACCESO, without pulse for light ON**
+- **16-04: cn() for conditional card borders (on/off states)**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -170,6 +173,8 @@ Key architectural patterns from v1.0 + v2.0:
 - **DeviceCard Badge integration: statusBadge converted to Badge internally with CVA styling**
 - **ControlButton integration: onChange with Math.max/min bounds checking for safe range**
 - **Page title pattern: Section level={1} for h1 accessibility, level={2} for sub-sections**
+- **Slider brightness pattern: value/onChange with number API, aria-label per control**
+- **Badge status pattern: ember with pulse for major status, ember without pulse for inline indicators**
 
 ### Pending Todos
 
@@ -189,7 +194,7 @@ None. Phase 16 in progress.
 
 ## Session Continuity
 
-Last session: 2026-01-29 16:09 UTC
-Stopped at: Completed 16-02-PLAN.md (Stove page migration)
+Last session: 2026-01-29 16:19 UTC
+Stopped at: Completed 16-04-PLAN.md (Lights page migration)
 Resume file: None
-Next step: Continue Phase 16 (16-03 Thermostat page migration)
+Next step: Continue Phase 16 Wave 2 (16-05 Settings, 16-06 Scheduler, etc.)

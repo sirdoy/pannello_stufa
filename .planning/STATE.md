@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 13 of 18 (Foundation Refactoring) - IN PROGRESS
-Plan: 1 of 5 in phase 13 (COMPLETE)
-Status: Plan 13-01 complete
-Last activity: 2026-01-29 - Completed 13-01-PLAN.md (Button CVA refactor)
+Plan: 2 of 5 in phase 13 (COMPLETE)
+Status: Plan 13-02 complete
+Last activity: 2026-01-29 - Completed 13-02-PLAN.md (Card CVA refactor)
 
-Progress: [██████████████░░░░] 68.4% (13 phases in progress)
+Progress: [██████████████░░░░] 70.0% (13 phases in progress)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 57 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 7 plans)
-- Average duration: ~4.8 min per plan
-- Total execution time: ~4.8 hours across 3 milestones
+- Total plans completed: 58 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 8 plans)
+- Average duration: ~4.7 min per plan
+- Total execution time: ~4.9 hours across 3 milestones
 
 **By Milestone:**
 
@@ -29,14 +29,14 @@ Progress: [██████████████░░░░] 68.4% (13 pha
 |-----------|--------|-------|----------|
 | v1.0 Push Notifications | 5 | 29 | 4 days (2026-01-23 -> 2026-01-26) |
 | v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 -> 2026-01-28) |
-| v3.0 Design System | 8 | 7 | In progress |
+| v3.0 Design System | 8 | 8 | In progress |
 
 **Recent Trend:**
 - Milestone velocity improving (v2.0 shipped in 1/3 the time of v1.0)
 - Plan complexity stable (~5 min average)
-- Phase 13 started (1/5 plans complete)
+- Phase 13 in progress (2/5 plans complete)
 
-*Updated after 13-01 completion*
+*Updated after 13-02 completion*
 
 ## Accumulated Context
 
@@ -70,6 +70,10 @@ Recent decisions affecting current work:
 - **13-01: Remove legacy Button props entirely (no backwards compatibility)**
 - **13-01: Button.Icon defaults to ghost variant**
 - **13-01: Compound variants for iconOnly sizing**
+- **13-02: Namespace pattern (Card.Header) over separate imports for better DX**
+- **13-02: forwardRef on all Card sub-components for composability**
+- **13-02: No backwards compatibility for legacy Card props (liquid, glass, elevation)**
+- **13-02: Boolean variants (hover, glow, padding) via CVA for cleaner API**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -89,8 +93,11 @@ Key architectural patterns from v1.0 + v2.0:
 - Radix primitive wrapping: Import as `* as Primitive`, wrap Root/Indicator/Thumb with cn()
 - Input validation: `validate` prop for real-time `(value) => errorString | null`
 - Slider API: Accept number, convert to array for Radix, unwrap on callback
-- Namespace components: `Component.Sub` pattern for compound components (Button.Icon, Button.Group)
+- Namespace components: `Component.Sub` pattern for compound components (Button.Icon, Button.Group, Card.Header)
 - buttonVariants export: Allow external styling with CVA variant function
+- cardVariants export: Allow external styling with CVA variant function
+- Namespace compound pattern: `Card.Header = CardHeader; export both for tree-shaking`
+- CVA boolean variants: `{ true: [...], false: [] }` pattern for hover/glow/padding
 
 ### Pending Todos
 
@@ -102,7 +109,7 @@ Key architectural patterns from v1.0 + v2.0:
 
 ### Blockers/Concerns
 
-None. Phase 13 in progress with plan 01 complete.
+None. Phase 13 in progress with plans 01-02 complete.
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
@@ -111,6 +118,6 @@ None. Phase 13 in progress with plan 01 complete.
 ## Session Continuity
 
 Last session: 2026-01-29
-Stopped at: Completed 13-01-PLAN.md (Button CVA refactor with 42 tests)
+Stopped at: Completed 13-02-PLAN.md (Card CVA refactor with 49 tests)
 Resume file: None
-Next step: Continue Phase 13 (13-02 Card, 13-03 Label, 13-04 StatusBadge, 13-05 LoadingSpinner)
+Next step: Continue Phase 13 (13-03 Label, 13-04 StatusBadge, 13-05 LoadingSpinner)

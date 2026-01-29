@@ -1,7 +1,7 @@
 'use client';
 
 import Card, { CardHeader, CardTitle, CardContent, CardFooter, CardDivider } from '@/app/components/ui/Card';
-import Button, { IconButton, ButtonGroup } from '@/app/components/ui/Button';
+import Button, { ButtonIcon, ButtonGroup } from '@/app/components/ui/Button';
 import Banner from '@/app/components/ui/Banner';
 import StatusBadge from '@/app/components/ui/StatusBadge';
 import Heading from '@/app/components/ui/Heading';
@@ -214,8 +214,8 @@ export default function DesignSystemPage() {
                     <Button icon="🔥" variant="ember">Start Stove</Button>
                     <Button icon="❄️" variant="subtle" iconPosition="right">Turn Off</Button>
                     <Button icon="🔥" variant="ember" iconOnly size="md" />
-                    <IconButton icon="⚙️" label="Settings" variant="ghost" />
-                    <IconButton icon="❌" label="Close" variant="danger" size="sm" />
+                    <ButtonIcon icon="⚙️" label="Settings" variant="ghost" />
+                    <ButtonIcon icon="❌" label="Close" variant="danger" size="sm" />
                   </div>
                 </div>
 

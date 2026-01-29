@@ -51,3 +51,7 @@ export { default as OfflineBanner } from './OfflineBanner';
 
 // Tooltip (v3.0+)
 export { default as Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from './Tooltip';
+
+// Feedback components (v3.0+)
+export { default as Spinner, spinnerVariants } from './Spinner';
+export { default as Progress, progressVariants } from './Progress';

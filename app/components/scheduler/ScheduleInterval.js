@@ -19,7 +19,7 @@ export default function ScheduleInterval({
 
   return (
     <Card
-      liquid
+      variant="glass"
       className={`cursor-pointer transition-all duration-300 p-4 ${
         isHighlighted
           ? 'bg-ember-900/30 [html:not(.dark)_&]:bg-ember-50/80 ring-2 ring-ember-600 [html:not(.dark)_&]:ring-ember-400 shadow-liquid-lg scale-[1.01]'

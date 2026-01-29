@@ -135,7 +135,7 @@ export default function ScheduleManagementModal({
         closeOnEscape={false} // Custom escape handler above
       >
         <Card
-          liquid
+          variant="glass"
           className="animate-scale-in-center p-6 sm:p-8"
         >
           {/* Header */}

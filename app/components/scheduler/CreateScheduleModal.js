@@ -98,7 +98,7 @@ export default function CreateScheduleModal({
       maxWidth="max-w-lg"
     >
       <Card
-        liquid
+        variant="glass"
         className="animate-scale-in-center p-6 sm:p-8"
       >
           {/* Header */}

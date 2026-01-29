@@ -133,7 +133,7 @@ export default function AddIntervalModal({
       maxWidth="max-w-lg"
     >
       <Card
-        liquid
+        variant="glass"
         className="p-6 animate-scale-in-center"
       >
         {/* Header */}

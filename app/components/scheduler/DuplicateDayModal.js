@@ -59,7 +59,7 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
       maxWidth="max-w-md"
     >
       <Card
-        liquid
+        variant="glass"
         className="p-6 animate-scale-in-center"
       >
         {/* Header */}

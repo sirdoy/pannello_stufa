@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, Button, Skeleton, EmptyState, Heading, Text, Divider, Banner, Slider, Badge } from '@/app/components/ui';
 import { COLOR_PRESETS, supportsColor } from '@/lib/hue/colorUtils';
+import { cn } from '@/lib/utils/cn';
 
 /**
  * Lights Page - Complete Philips Hue control
@@ -1022,7 +1023,7 @@ export default function LightsPage() {
 
                 {/* Expanded Details */}
                 {isExpanded && (
-                  <div className="p-6 border-t border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 bg-slate-50 [html:not(.dark)_&]:bg-slate-50 bg-slate-900/20">
+                  <div className="p-6 border-t border-slate-700 bg-slate-900/20 [html:not(.dark)_&]:border-slate-200 [html:not(.dark)_&]:bg-slate-50">
                     {/* Individual Lights */}
                     {roomLights.length > 0 && (
                       <>
@@ -1036,11 +1037,12 @@ export default function LightsPage() {
                             return (
                               <div
                                 key={light.id}
-                                className={`p-4 rounded-xl border-2 ${
+                                className={cn(
+                                  "p-4 rounded-xl border-2 transition-colors",
                                   lightOn
-                                    ? 'border-warning-300 [html:not(.dark)_&]:border-warning-300 border-warning-600 bg-warning-50 [html:not(.dark)_&]:bg-warning-50 bg-warning-900/10'
-                                    : 'border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 bg-white [html:not(.dark)_&]:bg-white bg-slate-800'
-                                }`}
+                                    ? "border-warning-500/50 bg-warning-500/10"
+                                    : "border-slate-700 bg-slate-800 [html:not(.dark)_&]:border-slate-200 [html:not(.dark)_&]:bg-white"
+                                )}
                               >
                                 <div className="flex items-center justify-between mb-2">
                                   <div>
@@ -1106,7 +1108,7 @@ export default function LightsPage() {
                                               key={preset.name}
                                               onClick={() => handleLightColorChange(light.id, preset)}
                                               disabled={changingColor === light.id}
-                                              className="relative w-full aspect-square rounded-lg border-2 border-slate-300 [html:not(.dark)_&]:border-slate-300 border-slate-600 hover:border-slate-500 [html:not(.dark)_&]:hover:border-slate-500 hover:border-slate-400 transition-all active:scale-95 disabled:opacity-50"
+                                              className="relative w-full aspect-square rounded-lg border-2 border-slate-600 hover:border-slate-400 transition-all active:scale-95 disabled:opacity-50 [html:not(.dark)_&]:border-slate-300 [html:not(.dark)_&]:hover:border-slate-500"
                                               style={{ backgroundColor: preset.hex }}
                                               title={preset.name}
                                             >
@@ -1139,11 +1141,12 @@ export default function LightsPage() {
                               key={scene.id}
                               onClick={() => handleActivateScene(scene.id, scene.metadata?.name)}
                               disabled={activatingScene === scene.id}
-                              className={`relative p-4 rounded-xl border-2 transition-all active:scale-95 ${
+                              className={cn(
+                                "relative p-4 rounded-xl border-2 transition-all active:scale-95",
                                 activatingScene === scene.id
-                                  ? 'border-warning-500 bg-warning-50 [html:not(.dark)_&]:bg-warning-50 bg-warning-900/20'
-                                  : 'border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 hover:border-warning-300 dark:hover:border-warning-600'
-                              }`}
+                                  ? "border-warning-500 bg-warning-500/10"
+                                  : "border-slate-700 hover:border-warning-500/50 [html:not(.dark)_&]:border-slate-200 [html:not(.dark)_&]:hover:border-warning-400"
+                              )}
                             >
                               <div className="text-2xl mb-1">🎨</div>
                               <Text size="xs" weight="semibold" className="text-center">

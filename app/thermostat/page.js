@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Card, Button, Skeleton, ErrorAlert, Banner, Heading, Text } from '@/app/components/ui';
+import { Card, Button, Skeleton, ErrorAlert, Banner, Heading, Text, Grid } from '@/app/components/ui';
 import RoomCard from '@/app/components/netatmo/RoomCard';
 import BatteryWarning, { ModuleBatteryList } from '@/app/components/devices/thermostat/BatteryWarning';
 import StoveSyncPanel from '@/app/components/netatmo/StoveSyncPanel';
@@ -312,21 +312,32 @@ function NetatmoContent() {
     return 0;
   });
 
-  // Mode button styles
-  const getModeButtonClasses = (currentMode, targetMode) => {
-    const baseClasses = 'px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center gap-2';
-    const isActive = currentMode === targetMode;
-
-    const activeStyles = {
-      schedule: 'bg-sage-500/20 [html:not(.dark)_&]:bg-sage-500/20 bg-sage-500/30 text-sage-300 [html:not(.dark)_&]:text-sage-700 border border-sage-500/30 [html:not(.dark)_&]:border-sage-500/30 border-sage-500/40 shadow-sm',
-      away: 'bg-warning-500/20 [html:not(.dark)_&]:bg-warning-500/20 bg-warning-500/30 text-warning-300 [html:not(.dark)_&]:text-warning-700 border border-warning-500/30 [html:not(.dark)_&]:border-warning-500/30 border-warning-500/40 shadow-sm',
-      hg: 'bg-ocean-500/20 [html:not(.dark)_&]:bg-ocean-500/20 bg-ocean-500/30 text-ocean-300 [html:not(.dark)_&]:text-ocean-700 border border-ocean-500/30 [html:not(.dark)_&]:border-ocean-500/30 border-ocean-500/40 shadow-sm',
-      off: 'bg-slate-500/20 [html:not(.dark)_&]:bg-slate-500/20 bg-slate-500/30 text-slate-300 [html:not(.dark)_&]:text-slate-700 border border-slate-500/30 [html:not(.dark)_&]:border-slate-500/30 border-slate-500/40 shadow-sm',
-    };
-
-    const inactiveStyle = 'bg-white/[0.08] [html:not(.dark)_&]:bg-white/[0.08] bg-white/[0.05] text-slate-300 [html:not(.dark)_&]:text-slate-600 border border-white/20 [html:not(.dark)_&]:border-white/20 border-white/10 hover:bg-white/[0.15] [html:not(.dark)_&]:hover:bg-white/[0.15] hover:bg-white/[0.10] backdrop-blur-sm';
-
-    return `${baseClasses} ${isActive ? activeStyles[targetMode] : inactiveStyle}`;
+  // Mode button configuration - mapped to Button component variants with custom active state overrides
+  const modeConfig = {
+    schedule: {
+      label: 'Programmato',
+      icon: '\u23F0',
+      // Active: sage-tinted background
+      activeClassName: 'bg-sage-500/20 text-sage-300 border border-sage-500/40 shadow-sm [html:not(.dark)_&]:bg-sage-500/20 [html:not(.dark)_&]:text-sage-700 [html:not(.dark)_&]:border-sage-500/30',
+    },
+    away: {
+      label: 'Assenza',
+      icon: '\uD83C\uDFC3',
+      // Active: warning-tinted background
+      activeClassName: 'bg-warning-500/20 text-warning-300 border border-warning-500/40 shadow-sm [html:not(.dark)_&]:bg-warning-500/20 [html:not(.dark)_&]:text-warning-700 [html:not(.dark)_&]:border-warning-500/30',
+    },
+    hg: {
+      label: 'Antigelo',
+      icon: '\u2744\uFE0F',
+      // Active: ocean-tinted background
+      activeClassName: 'bg-ocean-500/20 text-ocean-300 border border-ocean-500/40 shadow-sm [html:not(.dark)_&]:bg-ocean-500/20 [html:not(.dark)_&]:text-ocean-700 [html:not(.dark)_&]:border-ocean-500/30',
+    },
+    off: {
+      label: 'Off',
+      icon: '\u23F8\uFE0F',
+      // Active: slate/subtle background
+      activeClassName: 'bg-slate-500/20 text-slate-300 border border-slate-500/40 shadow-sm [html:not(.dark)_&]:bg-slate-500/20 [html:not(.dark)_&]:text-slate-700 [html:not(.dark)_&]:border-slate-500/30',
+    },
   };
 
   return (
@@ -374,34 +385,22 @@ function NetatmoContent() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => handleModeChange('schedule')}
-              className={getModeButtonClasses(mode, 'schedule')}
-            >
-              <span>⏰</span>
-              <span>Programmato</span>
-            </button>
-            <button
-              onClick={() => handleModeChange('away')}
-              className={getModeButtonClasses(mode, 'away')}
-            >
-              <span>🏃</span>
-              <span>Assenza</span>
-            </button>
-            <button
-              onClick={() => handleModeChange('hg')}
-              className={getModeButtonClasses(mode, 'hg')}
-            >
-              <span>❄️</span>
-              <span>Antigelo</span>
-            </button>
-            <button
-              onClick={() => handleModeChange('off')}
-              className={getModeButtonClasses(mode, 'off')}
-            >
-              <span>⏸️</span>
-              <span>Off</span>
-            </button>
+            {['schedule', 'away', 'hg', 'off'].map((targetMode) => {
+              const config = modeConfig[targetMode];
+              const isActive = mode === targetMode;
+              return (
+                <Button
+                  key={targetMode}
+                  variant={isActive ? 'subtle' : 'ghost'}
+                  onClick={() => handleModeChange(targetMode)}
+                  size="sm"
+                  className={isActive ? config.activeClassName : undefined}
+                >
+                  <span>{config.icon}</span>
+                  <span>{config.label}</span>
+                </Button>
+              );
+            })}
           </div>
         </div>
       </Card>

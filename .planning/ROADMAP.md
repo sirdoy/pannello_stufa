@@ -2,14 +2,14 @@
 
 ## Milestones
 
-- ✅ **v1.0 Push Notifications System** - Phases 1-5 (shipped 2026-01-26)
-- ✅ **v2.0 Netatmo Complete Control & Stove Monitoring** - Phases 6-10 (shipped 2026-01-28)
-- 🚧 **v3.0 Design System Evolution** - Phases 11-18 (in progress)
+- v1.0 Push Notifications System - Phases 1-5 (shipped 2026-01-26)
+- v2.0 Netatmo Complete Control & Stove Monitoring - Phases 6-10 (shipped 2026-01-28)
+- v3.0 Design System Evolution - Phases 11-18 (in progress)
 
 ## Phases
 
 <details>
-<summary>✅ v1.0 Push Notifications System (Phases 1-5) - SHIPPED 2026-01-26</summary>
+<summary>v1.0 Push Notifications System (Phases 1-5) - SHIPPED 2026-01-26</summary>
 
 ### Phase 1: Token Persistence
 **Goal**: Fix token persistence across browser restarts
@@ -63,7 +63,7 @@
 </details>
 
 <details>
-<summary>✅ v2.0 Netatmo Complete Control & Stove Monitoring (Phases 6-10) - SHIPPED 2026-01-28</summary>
+<summary>v2.0 Netatmo Complete Control & Stove Monitoring (Phases 6-10) - SHIPPED 2026-01-28</summary>
 
 ### Phase 6: Netatmo Schedule Infrastructure
 **Goal**: Foundation for schedule management with caching and rate limiting
@@ -87,7 +87,7 @@
 **Goal**: Intelligent coordination with user intent detection
 **Plans**: 5 plans
 - [x] 08-01: 2-minute debouncing logic
-- [x] 08-02: User intent detection (0.5°C tolerance)
+- [x] 08-02: User intent detection (0.5C tolerance)
 - [x] 08-03: Schedule-aware pause calculation
 - [x] 08-04: Multi-zone support
 - [x] 08-05: Alert deduplication (30-min throttle)
@@ -111,20 +111,20 @@
 
 </details>
 
-### 🚧 v3.0 Design System Evolution (In Progress)
+### v3.0 Design System Evolution (In Progress)
 
 **Milestone Goal:** Establish complete, consistent, accessible UI component library based on evolved Ember Noir design system, then systematically apply it across all application pages for visual consistency and professional polish.
 
-#### Phase 11: Foundation & Tooling ✓
+#### Phase 11: Foundation & Tooling
 **Goal**: Establish infrastructure for type-safe, accessible component development
 **Depends on**: Nothing (starts v3.0)
 **Requirements**: INFRA-01, INFRA-02, INFRA-03, INFRA-04, INFRA-05, INFRA-06
 **Success Criteria** (what must be TRUE):
-  1. ✓ CVA installed for type-safe variant APIs with autocomplete support
-  2. ✓ Radix UI primitives are installed and accessible for complex interactive patterns
-  3. ✓ All new components pass jest-axe automated accessibility tests
-  4. ✓ ESLint warns on hard-coded colors, enforcing design token usage
-  5. ✓ Design tokens are centralized and exposed as CSS variables for theming
+  1. CVA installed for type-safe variant APIs with autocomplete support
+  2. Radix UI primitives are installed and accessible for complex interactive patterns
+  3. All new components pass jest-axe automated accessibility tests
+  4. ESLint warns on hard-coded colors, enforcing design token usage
+  5. Design tokens are centralized and exposed as CSS variables for theming
 **Plans**: 3 plans (complete)
 
 Plans:
@@ -132,17 +132,17 @@ Plans:
 - [x] 11-02: Radix UI + jest-axe accessibility testing
 - [x] 11-03: ESLint token enforcement + semantic design tokens
 
-#### Phase 12: Core Interactive Components ✓
+#### Phase 12: Core Interactive Components
 **Goal**: Deliver missing table-stakes form controls with Radix UI accessibility
 **Depends on**: Phase 11
 **Requirements**: COMP-03, COMP-04, COMP-05, COMP-06, COMP-07, COMP-08
 **Success Criteria** (what must be TRUE):
-  1. ✓ User can select options using accessible Checkbox with keyboard navigation and indeterminate state
-  2. ✓ User can toggle settings using accessible Switch with smooth animation
-  3. ✓ User can select single option from Radio Group with keyboard navigation
-  4. ✓ User can enter text in Input component with error states and validation feedback
-  5. ✓ User can select from dropdown using accessible Select with search capability
-  6. ✓ User can adjust temperature/brightness using accessible Slider with range support
+  1. User can select options using accessible Checkbox with keyboard navigation and indeterminate state
+  2. User can toggle settings using accessible Switch with smooth animation
+  3. User can select single option from Radio Group with keyboard navigation
+  4. User can enter text in Input component with error states and validation feedback
+  5. User can select from dropdown using accessible Select with search capability
+  6. User can adjust temperature/brightness using accessible Slider with range support
 **Plans**: 3 plans (complete)
 
 Plans:
@@ -150,73 +150,73 @@ Plans:
 - [x] 12-02: RadioGroup + Select (selection patterns)
 - [x] 12-03: Input + Slider (value input controls)
 
-#### Phase 13: Foundation Refactoring ✓
+#### Phase 13: Foundation Refactoring
 **Goal**: Refactor existing foundation components to use CVA and consistent patterns
 **Depends on**: Phase 11
 **Requirements**: COMP-01, COMP-02, COMP-09, COMP-10, COMP-11, COMP-12
 **Success Criteria** (what must be TRUE):
-  1. ✓ Button component has type-safe CVA variants (ember, subtle, success, danger, outline, ghost)
-  2. ✓ Card component has liquid glass variants with proper composition pattern (Card.Header, Card.Title, etc.)
-  3. ✓ All form controls properly associate with Label component for accessibility
-  4. ✓ Divider component supports solid, dashed, and gradient variants
-  5. ✓ Heading and Text components implement complete typography system with all variants
+  1. Button component has type-safe CVA variants (ember, subtle, success, danger, outline, ghost)
+  2. Card component has liquid glass variants with proper composition pattern (Card.Header, Card.Title, etc.)
+  3. All form controls properly associate with Label component for accessibility
+  4. Divider component supports solid, dashed, and gradient variants
+  5. Heading and Text components implement complete typography system with all variants
 **Plans**: 7 plans in 2 waves (complete)
 
 Plans:
-- [x] 13-01-PLAN.md — Button CVA refactor with namespace pattern (Button.Icon, Button.Group)
-- [x] 13-02-PLAN.md — Card CVA refactor with namespace pattern (Card.Header, Card.Title, etc.)
-- [x] 13-03-PLAN.md — Label component (Radix primitive) + Divider CVA refactor
-- [x] 13-04-PLAN.md — Heading + Text CVA refactor with typography system
-- [x] 13-05-PLAN.md — Migrate legacy Button props across codebase
-- [x] 13-06-PLAN.md — Migrate legacy Card liquid prop across codebase
-- [x] 13-07-PLAN.md — Gap closure: migrate remaining scheduler Card liquid props
+- [x] 13-01-PLAN.md: Button CVA refactor with namespace pattern (Button.Icon, Button.Group)
+- [x] 13-02-PLAN.md: Card CVA refactor with namespace pattern (Card.Header, Card.Title, etc.)
+- [x] 13-03-PLAN.md: Label component (Radix primitive) + Divider CVA refactor
+- [x] 13-04-PLAN.md: Heading + Text CVA refactor with typography system
+- [x] 13-05-PLAN.md: Migrate legacy Button props across codebase
+- [x] 13-06-PLAN.md: Migrate legacy Card liquid prop across codebase
+- [x] 13-07-PLAN.md: Gap closure: migrate remaining scheduler Card liquid props
 
-#### Phase 14: Feedback & Layout Components ✓
+#### Phase 14: Feedback & Layout Components
 **Goal**: Deliver complete feedback and layout system for complex UI patterns
 **Depends on**: Phase 12, Phase 13
 **Requirements**: FEED-01, FEED-02, FEED-03, FEED-04, FEED-05, FEED-06, FEED-07, LAYOUT-01, LAYOUT-02, LAYOUT-03, LAYOUT-04
 **Success Criteria** (what must be TRUE):
-  1. ✓ User can interact with Modal/Dialog with focus trap, ESC close, and accessible ARIA patterns
-  2. ✓ User receives contextual help via Tooltip with keyboard trigger support
-  3. ✓ User sees Toast notifications with dismiss, auto-dismiss, and proper stacking behavior
-  4. ✓ User sees Spinner/Loading states and Progress indicators during async operations
-  5. ✓ User sees Empty State components with helpful guidance when no data exists
-  6. ✓ All pages use consistent PageLayout and DashboardLayout components
-  7. ✓ Sections and Grid components provide consistent spacing and responsive behavior
+  1. User can interact with Modal/Dialog with focus trap, ESC close, and accessible ARIA patterns
+  2. User receives contextual help via Tooltip with keyboard trigger support
+  3. User sees Toast notifications with dismiss, auto-dismiss, and proper stacking behavior
+  4. User sees Spinner/Loading states and Progress indicators during async operations
+  5. User sees Empty State components with helpful guidance when no data exists
+  6. All pages use consistent PageLayout and DashboardLayout components
+  7. Sections and Grid components provide consistent spacing and responsive behavior
 **Plans**: 7 plans in 2 waves (complete)
 
 Plans:
-- [x] 14-01-PLAN.md — Modal/Dialog with Radix Dialog + CVA sizes + mobile bottom sheet
-- [x] 14-02-PLAN.md — Tooltip with Radix Tooltip primitive
-- [x] 14-03-PLAN.md — Toast system with Radix Toast + provider pattern + stacking
-- [x] 14-04-PLAN.md — Spinner + Progress with Radix Progress
-- [x] 14-05-PLAN.md — EmptyState + Banner CVA standardization
-- [x] 14-06-PLAN.md — PageLayout + DashboardLayout with collapsible sidebar
-- [x] 14-07-PLAN.md — Section + Grid CVA enhancements
+- [x] 14-01-PLAN.md: Modal/Dialog with Radix Dialog + CVA sizes + mobile bottom sheet
+- [x] 14-02-PLAN.md: Tooltip with Radix Tooltip primitive
+- [x] 14-03-PLAN.md: Toast system with Radix Toast + provider pattern + stacking
+- [x] 14-04-PLAN.md: Spinner + Progress with Radix Progress
+- [x] 14-05-PLAN.md: EmptyState + Banner CVA standardization
+- [x] 14-06-PLAN.md: PageLayout + DashboardLayout with collapsible sidebar
+- [x] 14-07-PLAN.md: Section + Grid CVA enhancements
 
-#### Phase 15: Smart Home Components Refactor ✓
+#### Phase 15: Smart Home Components Refactor
 **Goal**: Standardize domain-specific smart home components with unified APIs
 **Depends on**: Phase 13, Phase 14
 **Requirements**: DOMAIN-01, DOMAIN-02, DOMAIN-03, DOMAIN-04, DOMAIN-05, DOMAIN-06
 **Success Criteria** (what must be TRUE):
-  1. ✓ All device status displays use standardized StatusCard component with unified API
-  2. ✓ All device controls use standardized DeviceCard component with consistent structure
-  3. ✓ All status indicators use standardized Badge component with pulse animation
-  4. ✓ All increment/decrement controls use standardized ControlButton component
-  5. ✓ All connection states use unified ConnectionStatus component (online/offline/connecting)
-  6. ✓ All health indicators use unified HealthIndicator component (ok/warning/error/critical)
+  1. All device status displays use standardized StatusCard component with unified API
+  2. All device controls use standardized DeviceCard component with consistent structure
+  3. All status indicators use standardized Badge component with pulse animation
+  4. All increment/decrement controls use standardized ControlButton component
+  5. All connection states use unified ConnectionStatus component (online/offline/connecting)
+  6. All health indicators use unified HealthIndicator component (ok/warning/error/critical)
 **Plans**: 9 plans (complete)
 
 Plans:
-- [x] 15-01-PLAN.md — useLongPress hook + ControlButton CVA refactor
-- [x] 15-02-PLAN.md — Badge component with CVA and pulse animation
-- [x] 15-03-PLAN.md — ConnectionStatus + HealthIndicator components
-- [x] 15-04-PLAN.md — SmartHomeCard base component with namespace pattern
-- [x] 15-05-PLAN.md — StatusCard extending SmartHomeCard
-- [x] 15-06-PLAN.md — DeviceCard refactor with backwards compatibility
-- [x] 15-07-PLAN.md — Gap closure: Fix home page Grid props
-- [x] 15-08-PLAN.md — Gap closure: Integrate ControlButton into LightsCard
-- [x] 15-09-PLAN.md — Gap closure: Add Phase 15 components to design system page
+- [x] 15-01-PLAN.md: useLongPress hook + ControlButton CVA refactor
+- [x] 15-02-PLAN.md: Badge component with CVA and pulse animation
+- [x] 15-03-PLAN.md: ConnectionStatus + HealthIndicator components
+- [x] 15-04-PLAN.md: SmartHomeCard base component with namespace pattern
+- [x] 15-05-PLAN.md: StatusCard extending SmartHomeCard
+- [x] 15-06-PLAN.md: DeviceCard refactor with backwards compatibility
+- [x] 15-07-PLAN.md: Gap closure: Fix home page Grid props
+- [x] 15-08-PLAN.md: Gap closure: Integrate ControlButton into LightsCard
+- [x] 15-09-PLAN.md: Gap closure: Add Phase 15 components to design system page
 
 #### Phase 16: Page Migration & Application
 **Goal**: Apply design system to all application pages for visual consistency
@@ -233,10 +233,18 @@ Plans:
   8. Settings page uses new form components (Input, Select, Switch, Checkbox)
   9. Schedule UI uses new calendar and override components
   10. Admin pages use new dashboard layout and data display components
-**Plans**: TBD
+**Plans**: 9 plans in 5 waves
 
 Plans:
-- [ ] 16-01: TBD
+- [ ] 16-01-PLAN.md: Complete Dashboard page migration (audit and cleanup)
+- [ ] 16-02-PLAN.md: Complete Stove page migration (Button cleanup, preserve theming)
+- [ ] 16-03-PLAN.md: Thermostat page mode buttons and Grid migration
+- [ ] 16-04-PLAN.md: Lights page Slider, Badge, and styling migration
+- [ ] 16-05-PLAN.md: Monitoring page layout migration (Section, Grid)
+- [ ] 16-06-PLAN.md: Schedule page verification and cleanup
+- [ ] 16-07-PLAN.md: Notifications settings Banner and Badge migration
+- [ ] 16-08-PLAN.md: Design system page PageLayout wrapper
+- [ ] 16-09-PLAN.md: Final verification and human review checkpoint
 
 #### Phase 17: Accessibility & Testing
 **Goal**: Ensure WCAG AA compliance and comprehensive accessibility testing
@@ -274,7 +282,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 11 → 12 → 13 → 14 → 15 → 16 → 17 → 18
+Phases execute in numeric order: 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -293,6 +301,6 @@ Phases execute in numeric order: 11 → 12 → 13 → 14 → 15 → 16 → 17 �
 | 13. Foundation Refactoring | v3.0 | 7/7 | Complete | 2026-01-29 |
 | 14. Feedback & Layout Components | v3.0 | 7/7 | Complete | 2026-01-29 |
 | 15. Smart Home Components Refactor | v3.0 | 9/9 | Complete | 2026-01-29 |
-| 16. Page Migration & Application | v3.0 | 0/TBD | Not started | - |
+| 16. Page Migration & Application | v3.0 | 0/9 | Planned | - |
 | 17. Accessibility & Testing | v3.0 | 0/TBD | Not started | - |
 | 18. Documentation & Polish | v3.0 | 0/TBD | Not started | - |

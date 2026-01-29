@@ -204,6 +204,38 @@ describe('Section', () => {
     });
   });
 
+  describe('Heading Level', () => {
+    it('renders h2 by default', () => {
+      render(<Section title="Title">Content</Section>);
+      const heading = screen.getByRole('heading', { level: 2 });
+      expect(heading).toBeInTheDocument();
+    });
+
+    it('renders h1 when level={1}', () => {
+      render(<Section title="Main Title" level={1}>Content</Section>);
+      const heading = screen.getByRole('heading', { level: 1 });
+      expect(heading).toBeInTheDocument();
+    });
+
+    it('uses 3xl size for h1', () => {
+      render(<Section title="Main Title" level={1}>Content</Section>);
+      const heading = screen.getByRole('heading', { level: 1 });
+      expect(heading).toHaveClass('text-3xl');
+    });
+
+    it('uses 2xl size for h2 (default)', () => {
+      render(<Section title="Section Title">Content</Section>);
+      const heading = screen.getByRole('heading', { level: 2 });
+      expect(heading).toHaveClass('text-2xl');
+    });
+
+    it('renders custom heading level (h3)', () => {
+      render(<Section title="Sub Title" level={3}>Content</Section>);
+      const heading = screen.getByRole('heading', { level: 3 });
+      expect(heading).toBeInTheDocument();
+    });
+  });
+
   describe('Accessibility', () => {
     it('has no accessibility violations', async () => {
       const { container } = render(
@@ -224,6 +256,16 @@ describe('Section', () => {
           action={<Button>Action</Button>}
           spacing="lg"
         >
+          Content
+        </Section>
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    it('has no accessibility violations with h1 level', async () => {
+      const { container } = render(
+        <Section title="Page Title" level={1}>
           Content
         </Section>
       );

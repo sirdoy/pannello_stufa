@@ -14,7 +14,7 @@ import { getMaintenanceStatus, confirmCleaning } from '@/lib/maintenanceService'
 import { isSandboxEnabled, isLocalEnvironment } from '@/lib/sandboxService';
 import { ref, onValue } from 'firebase/database';
 import { db } from '@/lib/firebase';
-import { Card, Button, ControlButton, Skeleton, Banner, Heading, Text, Divider, Toast, LoadingOverlay } from '@/app/components/ui';
+import { Card, Button, ControlButton, Skeleton, Banner, Heading, Text, Divider, Toast, LoadingOverlay, Badge } from '@/app/components/ui';
 import MaintenanceBar from '@/app/components/MaintenanceBar';
 import CronHealthBanner from '@/app/components/CronHealthBanner';
 import ErrorAlert from '@/app/components/ui/ErrorAlert';
@@ -791,19 +791,21 @@ export default function StovePage() {
                 {/* Mode Action Buttons */}
                 <div className="flex flex-wrap gap-2 mt-4">
                   {schedulerEnabled && semiManualMode && (
-                    <button
+                    <Button
+                      variant="warning"
+                      size="sm"
                       onClick={handleClearSemiManual}
-                      className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-warning-300 bg-warning-900/30 hover:bg-warning-900/50 border border-warning-500/40 transition-all active:scale-95"
                     >
                       ↩️ Torna Automatico
-                    </button>
+                    </Button>
                   )}
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => router.push('/stove/scheduler')}
-                    className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-ocean-300 bg-ocean-900/30 hover:bg-ocean-900/50 border border-ocean-500/40 transition-all active:scale-95"
                   >
                     📅 Pianificazione
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -920,13 +922,12 @@ export default function StovePage() {
                       Orari accensione automatica
                     </Text>
                     <div className="mt-3">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                        schedulerEnabled
-                          ? 'bg-sage-500/20 text-sage-400'
-                          : 'bg-slate-500/20 text-slate-400'
-                      }`}>
+                      <Badge
+                        variant={schedulerEnabled ? 'sage' : 'neutral'}
+                        size="sm"
+                      >
                         {schedulerEnabled ? '⏰ Attivo' : '🔧 Manuale'}
-                      </span>
+                      </Badge>
                     </div>
                   </div>
                 </div>
@@ -949,16 +950,15 @@ export default function StovePage() {
                     </Text>
                     {maintenanceStatus && (
                       <div className="mt-3">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                          maintenanceStatus.needsCleaning
-                            ? 'bg-warning-500/20 text-warning-400'
-                            : 'bg-ocean-500/20 text-ocean-400'
-                        }`}>
+                        <Badge
+                          variant={maintenanceStatus.needsCleaning ? 'warning' : 'ocean'}
+                          size="sm"
+                        >
                           {maintenanceStatus.needsCleaning
                             ? '⚠️ Pulizia richiesta'
                             : `⏱️ ${formatHoursToHHMM(maintenanceStatus.currentHours || 0)}`
                           }
-                        </span>
+                        </Badge>
                       </div>
                     )}
                   </div>
@@ -981,13 +981,12 @@ export default function StovePage() {
                       Errori e diagnostica
                     </Text>
                     <div className="mt-3">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                        errorCode !== 0
-                          ? 'bg-danger-500/20 text-danger-400'
-                          : 'bg-slate-500/20 text-slate-400'
-                      }`}>
+                      <Badge
+                        variant={errorCode !== 0 ? 'danger' : 'neutral'}
+                        size="sm"
+                      >
                         {errorCode !== 0 ? `⚠️ Errore ${errorCode}` : '✓ Nessun errore'}
-                      </span>
+                      </Badge>
                     </div>
                   </div>
                 </div>

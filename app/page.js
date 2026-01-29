@@ -29,7 +29,8 @@ export default async function Home() {
       <Section
         title="I tuoi dispositivi"
         description="Controlla e monitora tutti i dispositivi della tua casa in tempo reale"
-        spacing="section"
+        spacing="lg"
+        level={1}
       >
         {/* Sandbox Toggle - Solo in localhost */}
         <SandboxToggle />

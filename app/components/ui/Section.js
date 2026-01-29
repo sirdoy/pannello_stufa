@@ -40,13 +40,29 @@ const headerSpacingMap = {
  *
  * Semantic wrapper for page sections with optional title, description, and action.
  *
+ * @param {string} title - Section title (rendered as Heading)
+ * @param {string} subtitle - Optional subtitle above title
+ * @param {string} description - Optional description below title
+ * @param {'none'|'sm'|'md'|'lg'} spacing - Vertical padding variant
+ * @param {1|2|3|4|5|6} level - Heading level for accessibility (default: 2)
+ * @param {ReactNode} action - Optional action slot (usually Button)
+ * @param {string} as - Semantic element (default: 'section')
+ *
  * @example
+ * // Main page section with h1
  * <Section
  *   title="I tuoi dispositivi"
  *   description="Controlla e monitora tutti i dispositivi"
  *   spacing="lg"
+ *   level={1}
  *   action={<Button>Azione</Button>}
  * >
+ *   {children}
+ * </Section>
+ *
+ * @example
+ * // Sub-section with default h2
+ * <Section title="Settings" spacing="md">
  *   {children}
  * </Section>
  */
@@ -55,6 +71,7 @@ export default function Section({
   subtitle,
   description,
   spacing = 'md',
+  level = 2,
   action,
   children,
   as: Component = 'section',
@@ -67,7 +84,7 @@ export default function Section({
     <Component className={cn(sectionVariants({ spacing }), className)} {...props}>
       {/* Header with title, description, action */}
       {hasHeader && (
-        <div className={headerSpacingMap[spacing]}>
+        <div className={headerSpacingMap[spacing] || headerSpacingMap.md}>
           {/* Category indicator + subtitle */}
           {(subtitle || title) && (
             <div className="flex items-center gap-3 mb-2">
@@ -84,7 +101,7 @@ export default function Section({
           {(title || action) && (
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-2">
               {title && (
-                <Heading level={2} size="2xl">
+                <Heading level={level} size={level === 1 ? '3xl' : '2xl'}>
                   {title}
                 </Heading>
               )}

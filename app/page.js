@@ -35,7 +35,7 @@ export default async function Home() {
         <SandboxToggle />
 
         {/* Devices grid using new Grid component */}
-        <Grid cols={{ mobile: 1, desktop: 2, wide: 2 }} gap="large">
+        <Grid cols={2} gap="lg">
           {enabledDevices.map((device, index) => {
             // Staggered entrance animation wrapper
             const animationDelay = `${index * 100}ms`;

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, Button, Skeleton, EmptyState, Heading, Text, Divider, Banner } from '@/app/components/ui';
+import { Card, Button, Skeleton, EmptyState, Heading, Text, Divider, Banner, Slider, Badge } from '@/app/components/ui';
 import { COLOR_PRESETS, supportsColor } from '@/lib/hue/colorUtils';
 
 /**
@@ -997,14 +997,14 @@ export default function LightsPage() {
                         <Text variant="secondary" size="xs">Luminosità Stanza</Text>
                         <Text variant="body" size="sm" weight="bold">{avgBrightness}%</Text>
                       </div>
-                      <input
-                        type="range"
-                        min="1"
-                        max="100"
+                      <Slider
                         value={avgBrightness}
-                        onChange={(e) => handleBrightnessChange(groupedLightId, e.target.value)}
+                        min={1}
+                        max={100}
+                        step={1}
+                        onChange={(value) => handleBrightnessChange(groupedLightId, value)}
                         disabled={refreshing || !groupedLightId}
-                        className="w-full h-2 bg-slate-200 [html:not(.dark)_&]:bg-slate-200 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-warning-500"
+                        aria-label={`Luminosita stanza ${room.metadata?.name}`}
                       />
                     </div>
                   )}
@@ -1087,14 +1087,14 @@ export default function LightsPage() {
                                         <Text variant="tertiary" size="xs">Luminosità</Text>
                                         <Text size="xs" weight="bold">{Math.round(lightBrightness)}%</Text>
                                       </div>
-                                      <input
-                                        type="range"
-                                        min="1"
-                                        max="100"
+                                      <Slider
                                         value={lightBrightness}
-                                        onChange={(e) => handleLightBrightnessChange(light.id, e.target.value)}
+                                        min={1}
+                                        max={100}
+                                        step={1}
+                                        onChange={(value) => handleLightBrightnessChange(light.id, value)}
                                         disabled={refreshing}
-                                        className="w-full h-1 bg-slate-200 [html:not(.dark)_&]:bg-slate-200 bg-slate-700 rounded appearance-none cursor-pointer accent-warning-500"
+                                        aria-label={`Luminosita ${light.metadata?.name}`}
                                       />
                                     </div>
 

@@ -1,26 +1,133 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { cva } from 'class-variance-authority';
+import { cn } from '@/lib/utils/cn';
+import { X, Info, AlertTriangle, AlertCircle, CheckCircle, Flame } from 'lucide-react';
 import Heading from './Heading';
 import Text from './Text';
+
+/**
+ * Banner Variants - CVA Configuration
+ *
+ * Variant: info, warning, error, success, ember
+ * Compact: true, false
+ */
+export const bannerVariants = cva(
+  // Base classes
+  [
+    'rounded-xl backdrop-blur-lg',
+    'transition-all duration-300',
+    'animate-fade-in-up',
+    'border',
+  ],
+  {
+    variants: {
+      variant: {
+        info: [
+          'bg-ocean-500/[0.15] [html:not(.dark)_&]:bg-ocean-500/[0.08]',
+          'border-ocean-500/25 [html:not(.dark)_&]:border-ocean-400/25',
+        ],
+        warning: [
+          'bg-warning-500/[0.15] [html:not(.dark)_&]:bg-warning-500/[0.08]',
+          'border-warning-500/25 [html:not(.dark)_&]:border-warning-400/25',
+        ],
+        error: [
+          'bg-danger-500/[0.15] [html:not(.dark)_&]:bg-danger-500/[0.08]',
+          'border-danger-500/25 [html:not(.dark)_&]:border-danger-400/25',
+        ],
+        success: [
+          'bg-sage-500/[0.15] [html:not(.dark)_&]:bg-sage-500/[0.08]',
+          'border-sage-500/25 [html:not(.dark)_&]:border-sage-400/25',
+        ],
+        ember: [
+          'bg-ember-500/[0.15] [html:not(.dark)_&]:bg-ember-500/[0.08]',
+          'border-ember-500/25 [html:not(.dark)_&]:border-ember-400/25',
+          'shadow-ember-glow-sm [html:not(.dark)_&]:shadow-none',
+        ],
+      },
+      compact: {
+        true: 'p-3',
+        false: 'p-4 sm:p-5',
+      },
+    },
+    defaultVariants: {
+      variant: 'info',
+      compact: false,
+    },
+  }
+);
+
+/**
+ * Text color variants per banner type
+ */
+const textVariants = {
+  info: {
+    title: 'text-ocean-200 [html:not(.dark)_&]:text-ocean-800',
+    description: 'text-ocean-300 [html:not(.dark)_&]:text-ocean-700',
+    icon: 'text-ocean-400 [html:not(.dark)_&]:text-ocean-600',
+  },
+  warning: {
+    title: 'text-warning-200 [html:not(.dark)_&]:text-warning-800',
+    description: 'text-warning-300 [html:not(.dark)_&]:text-warning-700',
+    icon: 'text-warning-400 [html:not(.dark)_&]:text-warning-600',
+  },
+  error: {
+    title: 'text-danger-200 [html:not(.dark)_&]:text-danger-800',
+    description: 'text-danger-300 [html:not(.dark)_&]:text-danger-700',
+    icon: 'text-danger-400 [html:not(.dark)_&]:text-danger-600',
+  },
+  success: {
+    title: 'text-sage-200 [html:not(.dark)_&]:text-sage-800',
+    description: 'text-sage-300 [html:not(.dark)_&]:text-sage-700',
+    icon: 'text-sage-400 [html:not(.dark)_&]:text-sage-600',
+  },
+  ember: {
+    title: 'text-ember-200 [html:not(.dark)_&]:text-ember-800',
+    description: 'text-ember-300 [html:not(.dark)_&]:text-ember-700',
+    icon: 'text-ember-400 [html:not(.dark)_&]:text-ember-600',
+  },
+};
+
+/**
+ * Icon mapping per variant (lucide icons)
+ */
+const iconMap = {
+  info: Info,
+  warning: AlertTriangle,
+  error: AlertCircle,
+  success: CheckCircle,
+  ember: Flame,
+};
 
 /**
  * Banner Component - Ember Noir Design System
  *
  * Sophisticated alert/notification banner with warm aesthetic.
  * Supports persistent dismissal via localStorage.
+ * Uses CVA for variant and compact styling.
  *
  * @param {Object} props - Component props
  * @param {'info'|'warning'|'error'|'success'|'ember'} props.variant - Banner style
- * @param {string} props.icon - Emoji or icon to display
+ * @param {string|ReactNode} props.icon - Custom icon (overrides default)
  * @param {string} props.title - Banner title
- * @param {string|React.ReactNode} props.description - Banner content
- * @param {React.ReactNode} props.actions - Action buttons
+ * @param {string|ReactNode} props.description - Banner content
+ * @param {ReactNode} props.actions - Action buttons
  * @param {boolean} props.dismissible - Show dismiss button
  * @param {function} props.onDismiss - Dismiss handler
  * @param {string} props.dismissKey - Unique key for persistent dismissal
  * @param {boolean} props.compact - Use compact layout
  * @param {string} props.className - Additional CSS classes
+ * @param {ReactNode} props.children - Additional content
+ *
+ * @example
+ * <Banner
+ *   variant="warning"
+ *   title="Connection Lost"
+ *   description="Attempting to reconnect..."
+ *   dismissible
+ *   onDismiss={() => console.log('dismissed')}
+ * />
  */
 export default function Banner({
   variant = 'info',
@@ -34,8 +141,6 @@ export default function Banner({
   compact = false,
   className = '',
   children,
-  // Legacy props
-  liquid = true,
 }) {
   const [isDismissed, setIsDismissed] = useState(false);
 
@@ -64,79 +169,37 @@ export default function Banner({
     return null;
   }
 
-  // Variant styles - Ember Noir aesthetic
-  const variantStyles = {
-    info: {
-      container: `
-        bg-ocean-500/[0.15] [html:not(.dark)_&]:bg-ocean-500/[0.08]
-        border border-ocean-500/25 [html:not(.dark)_&]:border-ocean-400/25
-      `,
-      title: 'text-ocean-200 [html:not(.dark)_&]:text-ocean-800',
-      description: 'text-ocean-300 [html:not(.dark)_&]:text-ocean-700',
-      defaultIcon: 'ℹ️',
-    },
-    warning: {
-      container: `
-        bg-warning-500/[0.15] [html:not(.dark)_&]:bg-warning-500/[0.08]
-        border border-warning-500/25 [html:not(.dark)_&]:border-warning-400/25
-      `,
-      title: 'text-warning-200 [html:not(.dark)_&]:text-warning-800',
-      description: 'text-warning-300 [html:not(.dark)_&]:text-warning-700',
-      defaultIcon: '⚠️',
-    },
-    error: {
-      container: `
-        bg-danger-500/[0.15] [html:not(.dark)_&]:bg-danger-500/[0.08]
-        border border-danger-500/25 [html:not(.dark)_&]:border-danger-400/25
-      `,
-      title: 'text-danger-200 [html:not(.dark)_&]:text-danger-800',
-      description: 'text-danger-300 [html:not(.dark)_&]:text-danger-700',
-      defaultIcon: '❌',
-    },
-    success: {
-      container: `
-        bg-sage-500/[0.15] [html:not(.dark)_&]:bg-sage-500/[0.08]
-        border border-sage-500/25 [html:not(.dark)_&]:border-sage-400/25
-      `,
-      title: 'text-sage-200 [html:not(.dark)_&]:text-sage-800',
-      description: 'text-sage-300 [html:not(.dark)_&]:text-sage-700',
-      defaultIcon: '✅',
-    },
-    ember: {
-      container: `
-        bg-ember-500/[0.15] [html:not(.dark)_&]:bg-ember-500/[0.08]
-        border border-ember-500/25 [html:not(.dark)_&]:border-ember-400/25
-        shadow-ember-glow-sm [html:not(.dark)_&]:shadow-none
-      `,
-      title: 'text-ember-200 [html:not(.dark)_&]:text-ember-800',
-      description: 'text-ember-300 [html:not(.dark)_&]:text-ember-700',
-      defaultIcon: '🔥',
-    },
-  };
+  // Get variant-specific styles
+  const validVariant = textVariants[variant] ? variant : 'info';
+  const styles = textVariants[validVariant];
 
-  const styles = variantStyles[variant] || variantStyles.info;
-  const displayIcon = icon || styles.defaultIcon;
+  // Get icon component or custom icon
+  const IconComponent = iconMap[validVariant];
+  const iconSize = compact ? 20 : 24;
 
   return (
     <div
-      className={`
-        rounded-xl
-        backdrop-blur-lg
-        transition-all duration-300
-        animate-fade-in-up
-        ${styles.container}
-        ${compact ? 'p-3' : 'p-4 sm:p-5'}
-        ${className}
-      `.trim().replace(/\s+/g, ' ')}
+      className={cn(
+        bannerVariants({ variant: validVariant, compact }),
+        className
+      )}
       role="alert"
     >
       <div className="flex items-start gap-3">
         {/* Icon */}
-        {displayIcon && (
-          <div className="flex-shrink-0">
-            <span className={compact ? 'text-xl' : 'text-2xl'}>{displayIcon}</span>
-          </div>
-        )}
+        <div className={cn('flex-shrink-0', styles.icon)} aria-hidden="true">
+          {icon !== undefined ? (
+            // Custom icon (string emoji or ReactNode)
+            typeof icon === 'string' ? (
+              <span className={compact ? 'text-xl' : 'text-2xl'}>{icon}</span>
+            ) : (
+              icon
+            )
+          ) : (
+            // Default lucide icon
+            <IconComponent size={iconSize} strokeWidth={2} />
+          )}
+        </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
@@ -145,7 +208,10 @@ export default function Banner({
             <Heading
               level={3}
               size={compact ? 'sm' : 'base'}
-              className={`${styles.title} ${description || children || actions ? 'mb-1' : ''}`}
+              className={cn(
+                styles.title,
+                (description || children || actions) && 'mb-1'
+              )}
             >
               {title}
             </Heading>
@@ -155,7 +221,10 @@ export default function Banner({
           {description && (
             <Text
               size={compact ? 'xs' : 'sm'}
-              className={`${styles.description} ${actions || children ? 'mb-3' : ''}`}
+              className={cn(
+                styles.description,
+                (actions || children) && 'mb-3'
+              )}
             >
               {description}
             </Text>
@@ -176,34 +245,24 @@ export default function Banner({
         {dismissible && (
           <button
             onClick={handleDismiss}
-            className="
-              flex-shrink-0 p-1.5
-              rounded-lg
-              text-slate-400 hover:text-slate-200
-              hover:bg-white/[0.06]
-              transition-all duration-200
-              [html:not(.dark)_&]:text-slate-500
-              [html:not(.dark)_&]:hover:text-slate-700
-              [html:not(.dark)_&]:hover:bg-black/[0.04]
-            "
+            className={cn(
+              'flex-shrink-0 p-1.5',
+              'rounded-lg',
+              'text-slate-400 hover:text-slate-200',
+              'hover:bg-white/[0.06]',
+              'transition-all duration-200',
+              '[html:not(.dark)_&]:text-slate-500',
+              '[html:not(.dark)_&]:hover:text-slate-700',
+              '[html:not(.dark)_&]:hover:bg-black/[0.04]'
+            )}
             aria-label="Dismiss"
           >
-            <svg
-              className="w-4 h-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
+            <X size={16} aria-hidden="true" />
           </button>
         )}
       </div>
     </div>
   );
 }
+
+export { Banner };

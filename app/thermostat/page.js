@@ -441,7 +441,7 @@ function NetatmoContent() {
 
       {/* Topology Info - Liquid Glass Card */}
       <Card variant="glass" className="p-5 sm:p-6 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Grid cols={3} gap="sm" className="md:grid-cols-3">
           <div className="p-3 rounded-xl bg-slate-800/40 backdrop-blur-sm [html:not(.dark)_&]:bg-slate-100/60">
             <Text variant="label" size="xs" className="mb-1">Casa</Text>
             <Text variant="body" size="lg" weight="bold">
@@ -460,7 +460,7 @@ function NetatmoContent() {
               {modulesWithBattery?.length || 0}
             </Text>
           </div>
-        </div>
+        </Grid>
 
         {/* Module Battery Status List */}
         {modulesWithBattery && modulesWithBattery.length > 0 && (
@@ -482,7 +482,7 @@ function NetatmoContent() {
       </Card>
 
       {/* Rooms Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <Grid cols={3} gap="md">
         {sortedRooms.map(room => (
           <RoomCard
             key={room.id}
@@ -490,7 +490,7 @@ function NetatmoContent() {
             onRefresh={fetchStatus}
           />
         ))}
-      </div>
+      </Grid>
 
       {/* Empty State */}
       {rooms.length === 0 && (

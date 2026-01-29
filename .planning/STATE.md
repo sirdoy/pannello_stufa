@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-28)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 15 - Smart Home Components (v3.0 Design System Evolution)
+**Current focus:** Phase 15 - Smart Home Components (v3.0 Design System Evolution) - COMPLETE
 
 ## Current Position
 
 Phase: 15 of 18 (Smart Home Components)
-Plan: 4 of 6 in phase 15
-Status: In progress
-Last activity: 2026-01-29 - Completed 15-04-PLAN.md (SmartHomeCard)
+Plan: 6 of 6 in phase 15
+Status: Phase 15 complete
+Last activity: 2026-01-29 - Completed 15-06-PLAN.md (DeviceCard Refactor)
 
-Progress: [███████████████████░] 94.9% (74 plans complete)
+Progress: [███████████████████░] 96.2% (76 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 74 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 24 plans)
+- Total plans completed: 76 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 26 plans)
 - Average duration: ~4.5 min per plan
-- Total execution time: ~5.5 hours across 3 milestones
+- Total execution time: ~5.7 hours across 3 milestones
 
 **By Milestone:**
 
@@ -29,14 +29,14 @@ Progress: [███████████████████░] 94.9% (
 |-----------|--------|-------|----------|
 | v1.0 Push Notifications | 5 | 29 | 4 days (2026-01-23 -> 2026-01-26) |
 | v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 -> 2026-01-28) |
-| v3.0 Design System | 8 | 23 | In progress |
+| v3.0 Design System | 8 | 26 | In progress |
 
 **Recent Trend:**
 - Milestone velocity improving (v2.0 shipped in 1/3 the time of v1.0)
 - Plan complexity stable (~5 min average)
-- Phase 15 in progress (4/6 plans done)
+- Phase 15 complete (6/6 plans done)
 
-*Updated after 15-04 completion*
+*Updated after 15-06 completion*
 
 ## Accumulated Context
 
@@ -116,6 +116,10 @@ Recent decisions affecting current work:
 - **15-04: Icon aria-hidden='true' for decorative device icons in SmartHomeCard**
 - **15-04: Loading overlay z-10 for proper stacking within cards**
 - **15-04: CardAccentBar animation disabled when card disabled**
+- **15-06: DeviceCard backwards compatibility maintained (all legacy props work)**
+- **15-06: DeviceCard uses Badge for statusBadge (CVA integration)**
+- **15-06: Pulse animation for ember, sage, primary, success statusBadge colors**
+- **15-06: LoadingOverlay separate from SmartHomeCard isLoading for full-page blocking**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -152,6 +156,8 @@ Key architectural patterns from v1.0 + v2.0:
 - **HealthIndicator icons: CheckCircle2 (ok), AlertTriangle (warning), XCircle (error), AlertOctagon (critical)**
 - **SmartHomeCard composition: Card + CardAccentBar internally, padding handled by content wrapper**
 - **SmartHomeCard size variants: compact (p-3 sm:p-4) for dashboard, default (p-5 sm:p-6) for full view**
+- **DeviceCard legacy prop preservation: Maintain all existing props while adding new API**
+- **DeviceCard Badge integration: statusBadge converted to Badge internally with CVA styling**
 
 ### Pending Todos
 
@@ -163,7 +169,7 @@ Key architectural patterns from v1.0 + v2.0:
 
 ### Blockers/Concerns
 
-None. Phase 15 in progress.
+None. Phase 15 complete.
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
@@ -171,7 +177,7 @@ None. Phase 15 in progress.
 
 ## Session Continuity
 
-Last session: 2026-01-29 14:20 UTC
-Stopped at: Completed 15-04-PLAN.md (SmartHomeCard)
+Last session: 2026-01-29 15:35 UTC
+Stopped at: Completed 15-06-PLAN.md (DeviceCard Refactor)
 Resume file: None
-Next step: Continue Phase 15 (15-05 through 15-06)
+Next step: Continue to Phase 16 (planned for Pages)

@@ -62,3 +62,5 @@ export { default as DashboardLayout, useSidebar, sidebarVariants, mainContentVar
 
 // Smart home components (v3.0+)
 export { default as Badge, badgeVariants } from './Badge';
+export { default as ConnectionStatus, connectionStatusVariants, dotVariants } from './ConnectionStatus';
+export { default as HealthIndicator, healthIndicatorVariants } from './HealthIndicator';

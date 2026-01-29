@@ -194,7 +194,7 @@ Plans:
 - [x] 14-06-PLAN.md — PageLayout + DashboardLayout with collapsible sidebar
 - [x] 14-07-PLAN.md — Section + Grid CVA enhancements
 
-#### Phase 15: Smart Home Components Refactor
+#### Phase 15: Smart Home Components Refactor ✓
 **Goal**: Standardize domain-specific smart home components with unified APIs
 **Depends on**: Phase 13, Phase 14
 **Requirements**: DOMAIN-01, DOMAIN-02, DOMAIN-03, DOMAIN-04, DOMAIN-05, DOMAIN-06
@@ -202,10 +202,10 @@ Plans:
   1. ✓ All device status displays use standardized StatusCard component with unified API
   2. ✓ All device controls use standardized DeviceCard component with consistent structure
   3. ✓ All status indicators use standardized Badge component with pulse animation
-  4. All increment/decrement controls use standardized ControlButton component
+  4. ✓ All increment/decrement controls use standardized ControlButton component
   5. ✓ All connection states use unified ConnectionStatus component (online/offline/connecting)
   6. ✓ All health indicators use unified HealthIndicator component (ok/warning/error/critical)
-**Plans**: 9 plans
+**Plans**: 9 plans (complete)
 
 Plans:
 - [x] 15-01-PLAN.md — useLongPress hook + ControlButton CVA refactor
@@ -214,9 +214,9 @@ Plans:
 - [x] 15-04-PLAN.md — SmartHomeCard base component with namespace pattern
 - [x] 15-05-PLAN.md — StatusCard extending SmartHomeCard
 - [x] 15-06-PLAN.md — DeviceCard refactor with backwards compatibility
-- [ ] 15-07-PLAN.md — Gap closure: Fix home page Grid props
-- [ ] 15-08-PLAN.md — Gap closure: Integrate ControlButton into LightsCard
-- [ ] 15-09-PLAN.md — Gap closure: Add Phase 15 components to design system page
+- [x] 15-07-PLAN.md — Gap closure: Fix home page Grid props
+- [x] 15-08-PLAN.md — Gap closure: Integrate ControlButton into LightsCard
+- [x] 15-09-PLAN.md — Gap closure: Add Phase 15 components to design system page
 
 #### Phase 16: Page Migration & Application
 **Goal**: Apply design system to all application pages for visual consistency
@@ -292,7 +292,7 @@ Phases execute in numeric order: 11 → 12 → 13 → 14 → 15 → 16 → 17 �
 | 12. Core Interactive Components | v3.0 | 3/3 | Complete | 2026-01-28 |
 | 13. Foundation Refactoring | v3.0 | 7/7 | Complete | 2026-01-29 |
 | 14. Feedback & Layout Components | v3.0 | 7/7 | Complete | 2026-01-29 |
-| 15. Smart Home Components Refactor | v3.0 | 6/9 | In progress | - |
+| 15. Smart Home Components Refactor | v3.0 | 9/9 | Complete | 2026-01-29 |
 | 16. Page Migration & Application | v3.0 | 0/TBD | Not started | - |
 | 17. Accessibility & Testing | v3.0 | 0/TBD | Not started | - |
 | 18. Documentation & Polish | v3.0 | 0/TBD | Not started | - |

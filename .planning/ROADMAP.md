@@ -205,10 +205,15 @@ Plans:
   4. All increment/decrement controls use standardized ControlButton component
   5. All connection states use unified ConnectionStatus component (online/offline/connecting)
   6. All health indicators use unified HealthIndicator component (ok/warning/error/critical)
-**Plans**: TBD
+**Plans**: 6 plans in 2 waves
 
 Plans:
-- [ ] 15-01: TBD
+- [ ] 15-01-PLAN.md — useLongPress hook + ControlButton CVA refactor
+- [ ] 15-02-PLAN.md — Badge component with CVA and pulse animation
+- [ ] 15-03-PLAN.md — ConnectionStatus + HealthIndicator components
+- [ ] 15-04-PLAN.md — SmartHomeCard base component with namespace pattern
+- [ ] 15-05-PLAN.md — StatusCard extending SmartHomeCard
+- [ ] 15-06-PLAN.md — DeviceCard refactor with backwards compatibility
 
 #### Phase 16: Page Migration & Application
 **Goal**: Apply design system to all application pages for visual consistency
@@ -284,7 +289,7 @@ Phases execute in numeric order: 11 → 12 → 13 → 14 → 15 → 16 → 17 �
 | 12. Core Interactive Components | v3.0 | 3/3 | Complete | 2026-01-28 |
 | 13. Foundation Refactoring | v3.0 | 7/7 | Complete | 2026-01-29 |
 | 14. Feedback & Layout Components | v3.0 | 7/7 | Complete | 2026-01-29 |
-| 15. Smart Home Components Refactor | v3.0 | 0/TBD | Not started | - |
+| 15. Smart Home Components Refactor | v3.0 | 0/6 | Not started | - |
 | 16. Page Migration & Application | v3.0 | 0/TBD | Not started | - |
 | 17. Accessibility & Testing | v3.0 | 0/TBD | Not started | - |
 | 18. Documentation & Polish | v3.0 | 0/TBD | Not started | - |

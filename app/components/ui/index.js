@@ -59,3 +59,6 @@ export { default as Progress, progressVariants } from './Progress';
 // Page layout components (v3.0+)
 export { default as PageLayout, pageLayoutVariants, PageHeader, PageContent, PageFooter } from './PageLayout';
 export { default as DashboardLayout, useSidebar, sidebarVariants, mainContentVariants } from './DashboardLayout';
+
+// Smart home components (v3.0+)
+export { default as Badge, badgeVariants } from './Badge';

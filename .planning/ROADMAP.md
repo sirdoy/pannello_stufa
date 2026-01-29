@@ -160,7 +160,7 @@ Plans:
   3. All form controls properly associate with Label component for accessibility
   4. Divider component supports solid, dashed, and gradient variants
   5. Heading and Text components implement complete typography system with all variants
-**Plans**: 6 plans in 2 waves
+**Plans**: 7 plans in 2 waves
 
 Plans:
 - [x] 13-01-PLAN.md — Button CVA refactor with namespace pattern (Button.Icon, Button.Group)
@@ -168,7 +168,8 @@ Plans:
 - [x] 13-03-PLAN.md — Label component (Radix primitive) + Divider CVA refactor
 - [x] 13-04-PLAN.md — Heading + Text CVA refactor with typography system
 - [x] 13-05-PLAN.md — Migrate legacy Button props across codebase
-- [ ] 13-06-PLAN.md — Migrate legacy Card liquid prop across codebase (gap closure)
+- [x] 13-06-PLAN.md — Migrate legacy Card liquid prop across codebase
+- [ ] 13-07-PLAN.md — Gap closure: migrate remaining scheduler Card liquid props
 
 #### Phase 14: Feedback & Layout Components
 **Goal**: Deliver complete feedback and layout system for complex UI patterns
@@ -275,7 +276,7 @@ Phases execute in numeric order: 11 → 12 → 13 → 14 → 15 → 16 → 17 �
 | 10. Monitoring Dashboard & Alerts | v2.0 | 5/5 | Complete | 2026-01-28 |
 | 11. Foundation & Tooling | v3.0 | 3/3 | Complete | 2026-01-28 |
 | 12. Core Interactive Components | v3.0 | 3/3 | Complete | 2026-01-28 |
-| 13. Foundation Refactoring | v3.0 | 5/6 | In Progress | - |
+| 13. Foundation Refactoring | v3.0 | 6/7 | In Progress | - |
 | 14. Feedback & Layout Components | v3.0 | 0/TBD | Not started | - |
 | 15. Smart Home Components Refactor | v3.0 | 0/TBD | Not started | - |
 | 16. Page Migration & Application | v3.0 | 0/TBD | Not started | - |

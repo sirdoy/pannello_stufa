@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 15 of 18 (Smart Home Components Refactor) - Gap Closure
-Plan: 8 of 9 in phase 15 (gap closure plans 07-09)
+Plan: 7-8 of 9 in phase 15 (gap closure plans 07-09)
 Status: Executing gap closure wave 1
-Last activity: 2026-01-29 - Completed 15-08-PLAN.md (LightsCard ControlButton)
+Last activity: 2026-01-29 - Completed 15-07-PLAN.md (Grid props fix), 15-08-PLAN.md (LightsCard ControlButton)
 
-Progress: [███████████████████░] 94.8% (78 plans complete)
+Progress: [███████████████████░] 95.1% (79 plans complete)
 
 ## Performance Metrics
 
@@ -120,6 +120,8 @@ Recent decisions affecting current work:
 - **15-06: DeviceCard uses Badge for statusBadge (CVA integration)**
 - **15-06: Pulse animation for ember, sage, primary, success statusBadge colors**
 - **15-06: LoadingOverlay separate from SmartHomeCard isLoading for full-page blocking**
+- **15-07: Grid CVA accepts numeric cols (1-6), not objects**
+- **15-07: Grid CVA gap variants: none/sm/md/lg (not "large")**
 - **15-08: ControlButton step=5 matches original 5% brightness increment**
 - **15-08: onChange(delta) uses delta to calculate new bounded value with Math.max/min**
 
@@ -180,7 +182,7 @@ None. Phase 15 complete. Ready for Phase 16.
 
 ## Session Continuity
 
-Last session: 2026-01-29 15:49 UTC
-Stopped at: Completed 15-08-PLAN.md (LightsCard ControlButton)
+Last session: 2026-01-29 15:21 UTC
+Stopped at: Completed 15-07-PLAN.md (Grid props fix)
 Resume file: None
 Next step: Execute 15-09-PLAN.md (remaining gap closure)

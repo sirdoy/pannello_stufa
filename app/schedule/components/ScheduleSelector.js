@@ -76,7 +76,7 @@ export default function ScheduleSelector({
         {/* Apply button - only show when selection changed */}
         {hasChanged && (
           <Button
-            variant="primary"
+            variant="ember"
             onClick={handleSwitch}
             loading={switching}
             icon={switching ? <RefreshCw className="animate-spin" /> : <Check />}

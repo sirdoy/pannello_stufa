@@ -316,8 +316,7 @@ export default function ScheduleManagementModal({
           {/* Footer */}
           <div className="mt-6">
             <Button
-              liquid
-              variant="secondary"
+              variant="subtle"
               onClick={onClose}
               className="w-full"
             >

@@ -224,10 +224,9 @@ export default function DevicesSettingsPage() {
                 Annulla
               </Button>
               <Button
-                variant="primary"
+                variant="ember"
                 onClick={handleSave}
                 disabled={isSaving}
-                liquid
                 className="flex-1 sm:flex-initial"
               >
                 {isSaving ? 'Salvataggio...' : 'Salva modifiche'}

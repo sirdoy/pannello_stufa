@@ -270,15 +270,13 @@ export default function SandboxPanel() {
         </div>
         <div className="flex gap-2">
           <Button
-            liquid
-            variant="secondary"
+            variant="subtle"
             size="sm"
             onClick={() => setShowHistory(!showHistory)}
           >
             {showHistory ? 'Nascondi' : 'Mostra'} History
           </Button>
           <Button
-            liquid
             variant="danger"
             size="sm"
             onClick={handleResetSandbox}
@@ -315,8 +313,7 @@ export default function SandboxPanel() {
           {Object.values(STOVE_STATES).map((state) => (
             <Button
               key={state}
-              liquid
-              variant={stoveState?.status === state ? 'primary' : 'secondary'}
+              variant={stoveState?.status === state ? 'ember' : 'subtle'}
               size="sm"
               onClick={() => handleUpdateState({ status: state })}
               className="text-xs"
@@ -342,8 +339,7 @@ export default function SandboxPanel() {
             />
             <span className="text-white font-bold w-8 text-center text-lg">{newPower}</span>
             <Button
-              liquid
-              variant="primary"
+              variant="ember"
               size="sm"
               onClick={() => handleUpdateState({ power: newPower })}
             >
@@ -365,8 +361,7 @@ export default function SandboxPanel() {
             />
             <span className="text-white font-bold w-8 text-center text-lg">{newFan}</span>
             <Button
-              liquid
-              variant="primary"
+              variant="ember"
               size="sm"
               onClick={() => handleUpdateState({ fan: newFan })}
             >
@@ -389,8 +384,7 @@ export default function SandboxPanel() {
             className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white font-bold"
           />
           <Button
-            liquid
-            variant="primary"
+            variant="ember"
             size="sm"
             onClick={() => handleUpdateState({ temperature: newTemperature })}
           >
@@ -425,16 +419,14 @@ export default function SandboxPanel() {
             placeholder="Ore lavorate"
           />
           <Button
-            liquid
-            variant="primary"
+            variant="ember"
             size="sm"
             onClick={handleUpdateHours}
           >
             Set Ore
           </Button>
           <Button
-            liquid
-            variant="secondary"
+            variant="subtle"
             size="sm"
             onClick={handleResetMaintenance}
           >
@@ -461,8 +453,7 @@ export default function SandboxPanel() {
 
         <div className="grid grid-cols-2 gap-2">
           <Button
-            liquid
-            variant="secondary"
+            variant="subtle"
             size="sm"
             onClick={() => handleSetError('NONE')}
           >
@@ -473,8 +464,7 @@ export default function SandboxPanel() {
             return (
               <Button
                 key={key}
-                liquid
-                variant="secondary"
+                variant="subtle"
                 size="sm"
                 onClick={() => handleSetError(key)}
                 className="text-xs"
@@ -555,8 +545,7 @@ export default function SandboxPanel() {
         {/* Toggle Scheduler */}
         <div className="flex gap-2">
           <Button
-            liquid
-            variant={schedulerMode.enabled ? 'success' : 'secondary'}
+            variant={schedulerMode.enabled ? 'success' : 'subtle'}
             size="sm"
             onClick={handleToggleScheduler}
             className="flex-1"
@@ -565,12 +554,11 @@ export default function SandboxPanel() {
           </Button>
           {schedulerMode.enabled && schedulerMode.semiManual && (
             <Button
-              liquid
-              variant="warning"
+              variant="outline"
               size="sm"
               onClick={handleClearSemiManual}
             >
-              ↩️ Clear Semi-Manual
+              Clear Semi-Manual
             </Button>
           )}
         </div>
@@ -629,8 +617,7 @@ export default function SandboxPanel() {
 
           <div className="flex gap-2">
             <Button
-              liquid
-              variant="primary"
+              variant="ember"
               size="sm"
               onClick={handleCreateTestInterval}
               className="flex-1"
@@ -638,8 +625,7 @@ export default function SandboxPanel() {
               ✓ Crea Intervallo Test
             </Button>
             <Button
-              liquid
-              variant="secondary"
+              variant="subtle"
               size="sm"
               onClick={handleClearTestInterval}
             >

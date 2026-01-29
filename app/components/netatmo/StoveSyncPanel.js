@@ -401,8 +401,7 @@ export default function StoveSyncPanel({ onSyncComplete }) {
             </Text>
             <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.04] [html:not(.dark)_&]:bg-white/[0.06] backdrop-blur-sm border border-white/10">
               <Button
-                liquid
-                variant="secondary"
+                variant="subtle"
                 size="sm"
                 onClick={() => handleTemperatureChange(-0.5)}
                 disabled={saving || stoveTemperature <= 5}
@@ -416,8 +415,7 @@ export default function StoveSyncPanel({ onSyncComplete }) {
                 </span>
               </div>
               <Button
-                liquid
-                variant="secondary"
+                variant="subtle"
                 size="sm"
                 onClick={() => handleTemperatureChange(0.5)}
                 disabled={saving || stoveTemperature >= 30}
@@ -506,10 +504,9 @@ export default function StoveSyncPanel({ onSyncComplete }) {
             Annulla
           </Button>
           <Button
-            variant="primary"
+            variant="ember"
             onClick={handleSave}
             disabled={saving || (enabled && selectedRoomIds.length === 0)}
-            liquid
             className="flex-1"
           >
             {saving ? 'Salvataggio...' : 'Salva modifiche'}
@@ -521,10 +518,9 @@ export default function StoveSyncPanel({ onSyncComplete }) {
       {config?.enabled && !hasChanges && (
         <div className="mt-4">
           <Button
-            variant="ocean"
+            variant="outline"
             onClick={handleSyncNow}
             disabled={syncing}
-            liquid
             className="w-full"
           >
             {syncing ? '⏳ Sincronizzazione in corso...' : '🔄 Sincronizza Ora'}

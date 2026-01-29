@@ -375,16 +375,14 @@ export default function CreateSceneModal({
         {/* Footer */}
         <div className="flex gap-3 mt-8">
           <Button
-            liquid
-            variant="secondary"
+            variant="subtle"
             onClick={onCancel}
             className="flex-1"
           >
             Annulla
           </Button>
           <Button
-            liquid
-            variant="primary"
+            variant="ember"
             onClick={handleConfirm}
             className="flex-1"
             disabled={!name.trim() || !selectedRoom || lights.length === 0 || loadingLights}

@@ -104,13 +104,12 @@ export default function IntervalBottomSheet({
       {/* Action Buttons */}
       <div className="flex gap-3">
         <Button
-          variant="primary"
+          variant="outline"
           size="md"
           fullWidth
           onClick={onEdit}
           icon={<Edit2 />}
           iconPosition="left"
-          liquid
           className="bg-ocean-500/10 [html:not(.dark)_&]:bg-ocean-500/20 text-ocean-600 [html:not(.dark)_&]:text-ocean-400 hover:bg-ocean-500/20 [html:not(.dark)_&]:hover:bg-ocean-500/30 ring-1 ring-ocean-500/30 [html:not(.dark)_&]:ring-ocean-500/40"
         >
           Modifica
@@ -123,7 +122,6 @@ export default function IntervalBottomSheet({
           onClick={onDelete}
           icon={<Trash2 />}
           iconPosition="left"
-          liquid
           className="bg-ember-500/10 [html:not(.dark)_&]:bg-ember-500/20 text-ember-600 [html:not(.dark)_&]:text-ember-400 hover:bg-ember-500/20 [html:not(.dark)_&]:hover:bg-ember-500/30 ring-1 ring-ember-500/30 [html:not(.dark)_&]:ring-ember-500/40"
         >
           Elimina

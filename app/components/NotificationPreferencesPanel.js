@@ -309,7 +309,6 @@ export default function NotificationPreferencesPanel() {
       {/* Reset Button */}
       <div className="flex justify-end">
         <Button
-          liquid
           variant="ghost"
           size="sm"
           onClick={handleReset}

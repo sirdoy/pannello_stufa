@@ -93,8 +93,7 @@ export default function DeviceManagementPage() {
             Devi effettuare il login per gestire i dispositivi
           </Text>
           <Button
-            liquid
-            variant="primary"
+            variant="ember"
             onClick={() => (window.location.href = '/auth/login')}
           >
             Accedi

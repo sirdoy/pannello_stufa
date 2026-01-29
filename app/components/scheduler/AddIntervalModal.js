@@ -318,15 +318,13 @@ export default function AddIntervalModal({
         {/* Actions */}
         <div className="flex gap-3">
           <Button
-            liquid
-            variant="secondary"
+            variant="subtle"
             onClick={onCancel}
             className="flex-1"
           >
             Annulla
           </Button>
           <Button
-            liquid
             variant="success"
             onClick={handleConfirm}
             disabled={!isValidInterval()}

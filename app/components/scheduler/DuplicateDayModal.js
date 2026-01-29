@@ -84,8 +84,7 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
         {/* Quick Actions */}
         <div className="flex gap-2 mb-4">
           <Button
-            liquid
-            variant="secondary"
+            variant="subtle"
             size="sm"
             onClick={selectWeekdays}
             className="flex-1"
@@ -93,8 +92,7 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
             Giorni feriali
           </Button>
           <Button
-            liquid
-            variant="secondary"
+            variant="subtle"
             size="sm"
             onClick={selectWeekend}
             className="flex-1"
@@ -102,8 +100,7 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
             Weekend
           </Button>
           <Button
-            liquid
-            variant="secondary"
+            variant="subtle"
             size="sm"
             onClick={selectAll}
             className="flex-1"
@@ -133,16 +130,14 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
         {/* Actions */}
         <div className="flex gap-3">
           <Button
-            liquid
-            variant="secondary"
+            variant="subtle"
             onClick={onCancel}
             className="flex-1"
           >
             Annulla
           </Button>
           <Button
-            liquid
-            variant="primary"
+            variant="ember"
             onClick={handleConfirm}
             disabled={selectedDays.length === 0}
             className="flex-1"

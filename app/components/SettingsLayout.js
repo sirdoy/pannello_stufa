@@ -44,7 +44,6 @@ export default function SettingsLayout({
         <div className="flex items-center gap-4">
           {showBackButton && (
             <Button
-              liquid
               variant="ghost"
               size="sm"
               onClick={handleBack}

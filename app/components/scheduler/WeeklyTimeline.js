@@ -112,9 +112,8 @@ export default function WeeklyTimeline({ schedule, selectedDay, onSelectDay }) {
             {/* Select button */}
             <div className="w-20 flex-shrink-0">
               <Button
-                liquid
                 size="sm"
-                variant={isSelected ? 'primary' : 'ghost'}
+                variant={isSelected ? 'ember' : 'ghost'}
                 onClick={() => onSelectDay(day)}
                 className="w-full"
               >

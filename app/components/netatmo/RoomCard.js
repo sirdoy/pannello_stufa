@@ -313,8 +313,7 @@ export default function RoomCard({ room, onRefresh }) {
         <div className="space-y-3">
           <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.04] [html:not(.dark)_&]:bg-white/[0.06] backdrop-blur-sm border border-white/10">
             <Button
-              liquid
-              variant="secondary"
+              variant="subtle"
               size="sm"
               onClick={() => setTargetTemp(Math.max(5, targetTemp - 0.5))}
               className="w-12 h-12"
@@ -327,8 +326,7 @@ export default function RoomCard({ room, onRefresh }) {
               </span>
             </div>
             <Button
-              liquid
-              variant="secondary"
+              variant="subtle"
               size="sm"
               onClick={() => setTargetTemp(Math.min(30, targetTemp + 0.5))}
               className="w-12 h-12"
@@ -338,7 +336,6 @@ export default function RoomCard({ room, onRefresh }) {
           </div>
           <div className="flex gap-2">
             <Button
-              liquid
               variant="success"
               onClick={() => setTemperature(targetTemp)}
               loading={loading}
@@ -348,8 +345,7 @@ export default function RoomCard({ room, onRefresh }) {
               ✓ Conferma
             </Button>
             <Button
-              liquid
-              variant="secondary"
+              variant="subtle"
               onClick={() => setEditingTemp(false)}
               disabled={loading}
               size="sm"
@@ -362,8 +358,7 @@ export default function RoomCard({ room, onRefresh }) {
       ) : (
         <div className="grid grid-cols-3 gap-2">
           <Button
-            liquid
-            variant="primary"
+            variant="ember"
             onClick={() => setEditingTemp(true)}
             disabled={loading || !hasSetpoint}
             size="sm"
@@ -372,7 +367,6 @@ export default function RoomCard({ room, onRefresh }) {
             🎯 Imposta
           </Button>
           <Button
-            liquid
             variant="success"
             onClick={setModeHome}
             disabled={loading || !hasSetpoint}
@@ -382,7 +376,6 @@ export default function RoomCard({ room, onRefresh }) {
             🏠 Auto
           </Button>
           <Button
-            liquid
             variant="ghost"
             onClick={setModeOff}
             disabled={loading || !hasSetpoint}

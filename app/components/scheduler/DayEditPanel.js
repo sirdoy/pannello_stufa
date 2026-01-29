@@ -101,8 +101,7 @@ export default function DayEditPanel({
               />
               {/* Desktop: Button with text */}
               <Button
-                liquid
-                variant="secondary"
+                variant="subtle"
                 onClick={() => onDuplicate(day)}
                 icon={<Copy className="w-4 h-4" />}
                 className="hidden sm:flex"
@@ -126,7 +125,6 @@ export default function DayEditPanel({
             />
             {/* Desktop: Button with text */}
             <Button
-              liquid
               variant="success"
               onClick={() => onAddInterval(day)}
               icon={<Plus className="w-4 h-4" />}
@@ -161,7 +159,6 @@ export default function DayEditPanel({
             <Text variant="tertiary" size="lg" className="mb-2">Nessun intervallo configurato per {day}</Text>
             <Text variant="tertiary" size="sm" className="mb-4">Aggiungi il primo intervallo per iniziare</Text>
             <Button
-              liquid
               variant="success"
               onClick={() => onAddInterval(day)}
               icon="+"

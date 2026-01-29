@@ -33,8 +33,7 @@ export default function NotificationHistoryPage() {
             Devi effettuare il login per visualizzare la cronologia
           </Text>
           <Button
-            liquid
-            variant="primary"
+            variant="ember"
             onClick={() => (window.location.href = '/auth/login')}
           >
             Accedi

@@ -171,28 +171,28 @@ Plans:
 - [x] 13-06-PLAN.md — Migrate legacy Card liquid prop across codebase
 - [x] 13-07-PLAN.md — Gap closure: migrate remaining scheduler Card liquid props
 
-#### Phase 14: Feedback & Layout Components
+#### Phase 14: Feedback & Layout Components ✓
 **Goal**: Deliver complete feedback and layout system for complex UI patterns
 **Depends on**: Phase 12, Phase 13
 **Requirements**: FEED-01, FEED-02, FEED-03, FEED-04, FEED-05, FEED-06, FEED-07, LAYOUT-01, LAYOUT-02, LAYOUT-03, LAYOUT-04
 **Success Criteria** (what must be TRUE):
-  1. User can interact with Modal/Dialog with focus trap, ESC close, and accessible ARIA patterns
-  2. User receives contextual help via Tooltip with keyboard trigger support
-  3. User sees Toast notifications with dismiss, auto-dismiss, and proper stacking behavior
-  4. User sees Spinner/Loading states and Progress indicators during async operations
-  5. User sees Empty State components with helpful guidance when no data exists
-  6. All pages use consistent PageLayout and DashboardLayout components
-  7. Sections and Grid components provide consistent spacing and responsive behavior
-**Plans**: 7 plans in 2 waves
+  1. ✓ User can interact with Modal/Dialog with focus trap, ESC close, and accessible ARIA patterns
+  2. ✓ User receives contextual help via Tooltip with keyboard trigger support
+  3. ✓ User sees Toast notifications with dismiss, auto-dismiss, and proper stacking behavior
+  4. ✓ User sees Spinner/Loading states and Progress indicators during async operations
+  5. ✓ User sees Empty State components with helpful guidance when no data exists
+  6. ✓ All pages use consistent PageLayout and DashboardLayout components
+  7. ✓ Sections and Grid components provide consistent spacing and responsive behavior
+**Plans**: 7 plans in 2 waves (complete)
 
 Plans:
-- [ ] 14-01-PLAN.md — Modal/Dialog with Radix Dialog + CVA sizes + mobile bottom sheet
-- [ ] 14-02-PLAN.md — Tooltip with Radix Tooltip primitive
-- [ ] 14-03-PLAN.md — Toast system with Radix Toast + provider pattern + stacking
-- [ ] 14-04-PLAN.md — Spinner + Progress with Radix Progress
-- [ ] 14-05-PLAN.md — EmptyState + Banner CVA standardization
-- [ ] 14-06-PLAN.md — PageLayout + DashboardLayout with collapsible sidebar
-- [ ] 14-07-PLAN.md — Section + Grid CVA enhancements
+- [x] 14-01-PLAN.md — Modal/Dialog with Radix Dialog + CVA sizes + mobile bottom sheet
+- [x] 14-02-PLAN.md — Tooltip with Radix Tooltip primitive
+- [x] 14-03-PLAN.md — Toast system with Radix Toast + provider pattern + stacking
+- [x] 14-04-PLAN.md — Spinner + Progress with Radix Progress
+- [x] 14-05-PLAN.md — EmptyState + Banner CVA standardization
+- [x] 14-06-PLAN.md — PageLayout + DashboardLayout with collapsible sidebar
+- [x] 14-07-PLAN.md — Section + Grid CVA enhancements
 
 #### Phase 15: Smart Home Components Refactor
 **Goal**: Standardize domain-specific smart home components with unified APIs
@@ -283,7 +283,7 @@ Phases execute in numeric order: 11 → 12 → 13 → 14 → 15 → 16 → 17 �
 | 11. Foundation & Tooling | v3.0 | 3/3 | Complete | 2026-01-28 |
 | 12. Core Interactive Components | v3.0 | 3/3 | Complete | 2026-01-28 |
 | 13. Foundation Refactoring | v3.0 | 7/7 | Complete | 2026-01-29 |
-| 14. Feedback & Layout Components | v3.0 | 0/7 | Planned | - |
+| 14. Feedback & Layout Components | v3.0 | 7/7 | Complete | 2026-01-29 |
 | 15. Smart Home Components Refactor | v3.0 | 0/TBD | Not started | - |
 | 16. Page Migration & Application | v3.0 | 0/TBD | Not started | - |
 | 17. Accessibility & Testing | v3.0 | 0/TBD | Not started | - |

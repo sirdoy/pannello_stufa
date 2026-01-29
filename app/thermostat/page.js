@@ -201,15 +201,14 @@ function NetatmoContent() {
           <ErrorAlert message={error} />
 
           {/* Helpful troubleshooting info */}
-          <div className="mt-6 p-4 bg-ocean-500/15 border border-ocean-500/25 rounded-xl backdrop-blur-sm [html:not(.dark)_&]:bg-ocean-500/10 [html:not(.dark)_&]:border-ocean-500/20">
-            <Text variant="ocean" size="sm" weight="bold" className="mb-2">💡 Suggerimenti:</Text>
-            <ul className="space-y-1 ml-4">
-              <Text as="li" variant="ocean" size="sm">• Verifica di aver completato l&apos;autenticazione Netatmo</Text>
-              <Text as="li" variant="ocean" size="sm">• Controlla che il tuo account Netatmo sia attivo</Text>
-              <Text as="li" variant="ocean" size="sm">• Assicurati di avere almeno un termostato configurato</Text>
-              <Text as="li" variant="ocean" size="sm">• Se il problema persiste, prova a disconnettere e riconnettere</Text>
+          <Banner variant="info" icon="💡" title="Suggerimenti:" className="mt-6">
+            <ul className="space-y-1 ml-1 mt-2">
+              <Text as="li" size="sm">Verifica di aver completato l&apos;autenticazione Netatmo</Text>
+              <Text as="li" size="sm">Controlla che il tuo account Netatmo sia attivo</Text>
+              <Text as="li" size="sm">Assicurati di avere almeno un termostato configurato</Text>
+              <Text as="li" size="sm">Se il problema persiste, prova a disconnettere e riconnettere</Text>
             </ul>
-          </div>
+          </Banner>
 
           <div className="mt-6 flex flex-wrap gap-3">
             <Button variant="ember" onClick={checkConnection}>

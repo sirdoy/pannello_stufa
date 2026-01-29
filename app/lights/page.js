@@ -928,9 +928,7 @@ export default function LightsPage() {
                       </Text>
                     </div>
                     {isOn && (
-                      <div className="px-3 py-1 bg-warning-500 text-white text-xs font-bold rounded-full">
-                        ACCESO
-                      </div>
+                      <Badge variant="ember" pulse>ACCESO</Badge>
                     )}
                   </div>
 
@@ -1049,7 +1047,7 @@ export default function LightsPage() {
                                     <Text size="sm" weight="semibold">{light.metadata?.name || 'Luce'}</Text>
                                     {hasColor && <Text variant="tertiary" size="xs">🎨 Colore disponibile</Text>}
                                   </div>
-                                  {lightOn && <span className="text-xs text-warning-400 [html:not(.dark)_&]:text-warning-600">ON</span>}
+                                  {lightOn && <Badge variant="ember" size="sm">ON</Badge>}
                                 </div>
 
                                 {/* Show only relevant button */}

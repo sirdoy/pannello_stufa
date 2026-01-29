@@ -18,6 +18,12 @@ import ProgressBar from '@/app/components/ui/ProgressBar';
 import EmptyState from '@/app/components/ui/EmptyState';
 import ConfirmDialog from '@/app/components/ui/ConfirmDialog';
 import BottomSheet from '@/app/components/ui/BottomSheet';
+import Badge from '@/app/components/ui/Badge';
+import ConnectionStatus from '@/app/components/ui/ConnectionStatus';
+import HealthIndicator from '@/app/components/ui/HealthIndicator';
+import SmartHomeCard from '@/app/components/ui/SmartHomeCard';
+import StatusCard from '@/app/components/ui/StatusCard';
+import ControlButton from '@/app/components/ui/ControlButton';
 import { useState } from 'react';
 
 /**
@@ -455,6 +461,202 @@ export default function DesignSystemPage() {
               </div>
             </CardContent>
           </Card>
+        </Section>
+
+        {/* Badge Component (v3.0+) */}
+        <Section title="Badge (CVA)" icon="🏷️" docs="docs/design-system.md#badge">
+          <Card>
+            <CardContent>
+              <div className="space-y-6">
+                {/* Variants */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Badge Variants</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    Props: variant (ember|sage|ocean|warning|danger|neutral), size (sm|md|lg), pulse, icon
+                  </Text>
+                  <div className="flex flex-wrap gap-3">
+                    <Badge variant="ember">Ember</Badge>
+                    <Badge variant="sage">Sage</Badge>
+                    <Badge variant="ocean">Ocean</Badge>
+                    <Badge variant="warning">Warning</Badge>
+                    <Badge variant="danger">Danger</Badge>
+                    <Badge variant="neutral">Neutral</Badge>
+                  </div>
+                </div>
+
+                <CardDivider />
+
+                {/* Sizes */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Sizes</Text>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Badge variant="ember" size="sm">Small</Badge>
+                    <Badge variant="ember" size="md">Medium</Badge>
+                    <Badge variant="ember" size="lg">Large</Badge>
+                  </div>
+                </div>
+
+                <CardDivider />
+
+                {/* Pulse Animation */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Pulse Animation</Text>
+                  <Text variant="tertiary" size="sm" className="mb-3">
+                    Use pulse=true for active states (ember, sage, primary, success)
+                  </Text>
+                  <div className="flex flex-wrap gap-3">
+                    <Badge variant="ember" pulse>Active</Badge>
+                    <Badge variant="sage" pulse>Online</Badge>
+                    <Badge variant="neutral">Inactive</Badge>
+                  </div>
+                </div>
+
+                <CardDivider />
+
+                {/* With Icon */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">With Icon</Text>
+                  <div className="flex flex-wrap gap-3">
+                    <Badge variant="ember" icon="🔥">Heating</Badge>
+                    <Badge variant="sage" icon="✓">Connected</Badge>
+                    <Badge variant="warning" icon="⚠️">Warning</Badge>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </Section>
+
+        {/* Smart Home Components (v3.0+) */}
+        <Section title="Smart Home Components" icon="🏠" docs="docs/design-system.md#smart-home">
+          <div className="space-y-6">
+            {/* ConnectionStatus */}
+            <Card>
+              <CardContent>
+                <Text variant="label" size="xs" className="mb-3">ConnectionStatus</Text>
+                <Text variant="tertiary" size="sm" className="mb-4">
+                  Props: status (online|offline|connecting|unknown), size (sm|md|lg), label, showDot
+                </Text>
+                <div className="flex flex-wrap gap-6">
+                  <ConnectionStatus status="online" />
+                  <ConnectionStatus status="offline" />
+                  <ConnectionStatus status="connecting" />
+                  <ConnectionStatus status="unknown" />
+                </div>
+                <div className="mt-4 flex flex-wrap gap-6">
+                  <ConnectionStatus status="online" size="sm" />
+                  <ConnectionStatus status="online" size="md" />
+                  <ConnectionStatus status="online" size="lg" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* HealthIndicator */}
+            <Card>
+              <CardContent>
+                <Text variant="label" size="xs" className="mb-3">HealthIndicator</Text>
+                <Text variant="tertiary" size="sm" className="mb-4">
+                  Props: status (ok|warning|error|critical), size (sm|md|lg), label, showIcon, pulse
+                </Text>
+                <div className="flex flex-wrap gap-6">
+                  <HealthIndicator status="ok" />
+                  <HealthIndicator status="warning" />
+                  <HealthIndicator status="error" />
+                  <HealthIndicator status="critical" />
+                </div>
+                <div className="mt-4 flex flex-wrap gap-6">
+                  <HealthIndicator status="critical" pulse label="Sistema critico" />
+                  <HealthIndicator status="warning" label="Manutenzione richiesta" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* SmartHomeCard */}
+            <Card>
+              <CardContent>
+                <Text variant="label" size="xs" className="mb-3">SmartHomeCard</Text>
+                <Text variant="tertiary" size="sm" className="mb-4">
+                  Base card for device controls. Props: icon, title, size (compact|default), colorTheme, isLoading, error, disabled.
+                  Namespace: SmartHomeCard.Header, SmartHomeCard.Status, SmartHomeCard.Controls
+                </Text>
+              </CardContent>
+            </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <SmartHomeCard icon="🌡️" title="Thermostat" colorTheme="ember">
+                <SmartHomeCard.Status>
+                  <Badge variant="ember" pulse>Riscaldamento</Badge>
+                </SmartHomeCard.Status>
+                <SmartHomeCard.Controls>
+                  <Text variant="secondary">22°C → 24°C</Text>
+                </SmartHomeCard.Controls>
+              </SmartHomeCard>
+
+              <SmartHomeCard icon="💡" title="Luci" colorTheme="sage" size="compact">
+                <SmartHomeCard.Status>
+                  <Badge variant="sage">Accese</Badge>
+                </SmartHomeCard.Status>
+                <SmartHomeCard.Controls>
+                  <Text variant="secondary" size="sm">3 luci attive</Text>
+                </SmartHomeCard.Controls>
+              </SmartHomeCard>
+            </div>
+
+            {/* StatusCard */}
+            <Card>
+              <CardContent>
+                <Text variant="label" size="xs" className="mb-3">StatusCard</Text>
+                <Text variant="tertiary" size="sm" className="mb-4">
+                  Extends SmartHomeCard with integrated Badge and ConnectionStatus.
+                  Props: status, statusVariant, connectionStatus
+                </Text>
+              </CardContent>
+            </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <StatusCard
+                icon="🔥"
+                title="Stufa"
+                status="In funzione"
+                statusVariant="ember"
+                connectionStatus="online"
+                colorTheme="ember"
+              />
+              <StatusCard
+                icon="📹"
+                title="Camera"
+                status="Spenta"
+                statusVariant="neutral"
+                connectionStatus="offline"
+                colorTheme="ocean"
+                size="compact"
+              />
+            </div>
+
+            {/* ControlButton */}
+            <Card>
+              <CardContent>
+                <Text variant="label" size="xs" className="mb-3">ControlButton</Text>
+                <Text variant="tertiary" size="sm" className="mb-4">
+                  Increment/decrement button with long-press support and haptic feedback.
+                  Props: type (increment|decrement), variant, size, step, onChange, longPressDelay, longPressInterval, haptic
+                </Text>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <ControlButton type="decrement" size="sm" variant="subtle" onChange={() => {}} />
+                    <Text variant="secondary">Value</Text>
+                    <ControlButton type="increment" size="sm" variant="subtle" onChange={() => {}} />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <ControlButton type="decrement" size="md" variant="ember" onChange={() => {}} />
+                    <Text variant="ember" weight="bold">22°C</Text>
+                    <ControlButton type="increment" size="md" variant="ember" onChange={() => {}} />
+                  </div>
+                </div>
+                <Text variant="tertiary" size="xs" className="mt-3">
+                  Long-press: hold button to continuously increment/decrement
+                </Text>
+              </CardContent>
+            </Card>
+          </div>
         </Section>
 
         {/* Form Inputs */}

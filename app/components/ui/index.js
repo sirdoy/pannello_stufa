@@ -65,3 +65,4 @@ export { default as Badge, badgeVariants } from './Badge';
 export { default as ConnectionStatus, connectionStatusVariants, dotVariants } from './ConnectionStatus';
 export { default as HealthIndicator, healthIndicatorVariants } from './HealthIndicator';
 export { default as SmartHomeCard, smartHomeCardVariants, SmartHomeCardHeader, SmartHomeCardStatus, SmartHomeCardControls } from './SmartHomeCard';
+export { default as StatusCard } from './StatusCard';

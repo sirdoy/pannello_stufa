@@ -49,7 +49,7 @@ export default function ThemeSettingsPage() {
   if (!user) {
     return (
       <SettingsLayout title="Tema" icon="🎨">
-        <Card liquid>
+        <Card variant="glass">
           <Text variant="secondary">
             Devi essere autenticato per gestire il tema.
           </Text>
@@ -66,7 +66,7 @@ export default function ThemeSettingsPage() {
       </Text>
 
       {/* Theme Selector Card */}
-      <Card liquid className="p-6 sm:p-8">
+      <Card variant="glass" className="p-6 sm:p-8">
         <Heading level={2} size="lg" className="mb-4">
           Modalità Interfaccia
         </Heading>
@@ -152,7 +152,7 @@ export default function ThemeSettingsPage() {
       </Card>
 
       {/* Preview Card */}
-      <Card liquid className="p-6 sm:p-8">
+      <Card variant="glass" className="p-6 sm:p-8">
         <Heading level={2} size="lg" className="mb-4">
           Preview Tema Corrente
         </Heading>
@@ -206,7 +206,7 @@ export default function ThemeSettingsPage() {
       </Card>
 
       {/* Info Card */}
-      <Card liquid className="p-6 sm:p-8 bg-ocean-50/50 [html:not(.dark)_&]:bg-ocean-50/50 bg-ocean-900/10 border border-ocean-200 [html:not(.dark)_&]:border-ocean-200 border-ocean-800">
+      <Card variant="glass" className="p-6 sm:p-8 bg-ocean-50/50 [html:not(.dark)_&]:bg-ocean-50/50 bg-ocean-900/10 border border-ocean-200 [html:not(.dark)_&]:border-ocean-200 border-ocean-800">
         <div className="flex gap-3">
           <div className="text-2xl">ℹ️</div>
           <div className="flex-1">

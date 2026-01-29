@@ -245,7 +245,7 @@ export default function NotificationsSettingsPage() {
   if (!user) {
     return (
       <SettingsLayout title="Notifiche" icon="🔔">
-        <Card liquid className="p-8 text-center">
+        <Card variant="glass" className="p-8 text-center">
           <div className="text-6xl mb-4">🔐</div>
           <Heading level={2} size="xl" className="mb-2">
             Autenticazione Richiesta
@@ -270,7 +270,7 @@ export default function NotificationsSettingsPage() {
   return (
     <SettingsLayout title="Notifiche" icon="🔔">
       {/* Stato Permessi */}
-      <Card liquid className="p-6 sm:p-8">
+      <Card variant="glass" className="p-6 sm:p-8">
         <Heading level={2} size="lg" className="mb-4">
           Stato Notifiche
         </Heading>
@@ -298,7 +298,7 @@ export default function NotificationsSettingsPage() {
 
           {/* Success Banner */}
           {saveSuccess && (
-            <Card liquid className="p-4 bg-sage-500/10 [html:not(.dark)_&]:bg-sage-50 border border-sage-500/30 [html:not(.dark)_&]:border-sage-200">
+            <Card variant="glass" className="p-4 bg-sage-500/10 [html:not(.dark)_&]:bg-sage-50 border border-sage-500/30 [html:not(.dark)_&]:border-sage-200">
               <div className="flex items-center gap-3">
                 <span className="text-2xl">✅</span>
                 <Text variant="sage" weight="medium">
@@ -319,7 +319,7 @@ export default function NotificationsSettingsPage() {
 
       {/* Test Notifica */}
       {permission === 'granted' && isSupported && (
-        <Card liquid className="p-6 sm:p-8">
+        <Card variant="glass" className="p-6 sm:p-8">
           <Heading level={2} size="lg" className="mb-2">
             Test Notifiche
           </Heading>
@@ -415,7 +415,7 @@ export default function NotificationsSettingsPage() {
 
       {/* Dispositivi Registrati */}
       {permission === 'granted' && (
-        <Card liquid className="p-6 sm:p-8">
+        <Card variant="glass" className="p-6 sm:p-8">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <Heading level={2} size="lg">
@@ -586,7 +586,7 @@ export default function NotificationsSettingsPage() {
       )}
 
       {/* Notification History Link */}
-      <Card liquid className="p-4 sm:p-6">
+      <Card variant="glass" className="p-4 sm:p-6">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <div className="text-xl flex-shrink-0">📬</div>
@@ -608,7 +608,7 @@ export default function NotificationsSettingsPage() {
       </Card>
 
       {/* Device Management Link */}
-      <Card liquid className="p-4 sm:p-6">
+      <Card variant="glass" className="p-4 sm:p-6">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <div className="text-xl flex-shrink-0">📱</div>
@@ -631,7 +631,7 @@ export default function NotificationsSettingsPage() {
 
       {/* Info iOS */}
       <Card
-        liquid
+        variant="glass"
         className="p-6 sm:p-8 bg-ocean-500/10 [html:not(.dark)_&]:bg-ocean-50 border-2 border-ocean-500/30 [html:not(.dark)_&]:border-ocean-200"
       >
         <div className="flex gap-4">
@@ -682,7 +682,7 @@ export default function NotificationsSettingsPage() {
       </Card>
 
       {/* Debug Logs Link */}
-      <Card liquid className="p-4 sm:p-6">
+      <Card variant="glass" className="p-4 sm:p-6">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <div className="text-xl flex-shrink-0">🔍</div>

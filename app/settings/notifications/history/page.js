@@ -24,7 +24,7 @@ export default function NotificationHistoryPage() {
   if (!user) {
     return (
       <SettingsLayout title="Cronologia Notifiche" icon="📬">
-        <Card liquid className="p-8 text-center">
+        <Card variant="glass" className="p-8 text-center">
           <div className="text-6xl mb-4">🔐</div>
           <Heading level={2} size="xl" className="mb-2">
             Autenticazione Richiesta
@@ -59,7 +59,7 @@ export default function NotificationHistoryPage() {
       </div>
 
       {/* Back link */}
-      <Card liquid className="p-4 mt-6">
+      <Card variant="glass" className="p-4 mt-6">
         <div className="flex items-center justify-between">
           <Text variant="secondary" size="sm">
             Torna alle impostazioni notifiche

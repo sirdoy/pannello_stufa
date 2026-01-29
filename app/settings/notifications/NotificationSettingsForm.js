@@ -141,7 +141,7 @@ export default function NotificationSettingsForm({
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
       {/* Notification Type Categories */}
       {Object.entries(CATEGORY_CONFIG).map(([categoryId, category]) => (
-        <Card key={categoryId} liquid className="p-6">
+        <Card key={categoryId} variant="glass" className="p-6">
           <div className="flex items-center gap-3 mb-4">
             <span className="text-2xl">{category.icon}</span>
             <div>
@@ -183,7 +183,7 @@ export default function NotificationSettingsForm({
       ))}
 
       {/* DND Hours Section */}
-      <Card liquid className="p-6">
+      <Card variant="glass" className="p-6">
         <div className="flex items-center gap-3 mb-4">
           <span className="text-2xl">🌙</span>
           <div>
@@ -306,7 +306,7 @@ export default function NotificationSettingsForm({
       </Card>
 
       {/* Progressive Disclosure - Advanced Settings */}
-      <Card liquid className="p-6">
+      <Card variant="glass" className="p-6">
         <button
           type="button"
           onClick={() => setShowAdvanced(!showAdvanced)}

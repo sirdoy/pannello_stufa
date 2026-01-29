@@ -84,7 +84,7 @@ export default function DeviceManagementPage() {
   if (!user) {
     return (
       <SettingsLayout title="Dispositivi Notifiche" icon="📱">
-        <Card liquid className="p-8 text-center">
+        <Card variant="glass" className="p-8 text-center">
           <div className="text-6xl mb-4">🔐</div>
           <Heading level={2} size="xl" className="mb-2">
             Autenticazione Richiesta
@@ -107,7 +107,7 @@ export default function DeviceManagementPage() {
   if (error && devices.length === 0) {
     return (
       <SettingsLayout title="Dispositivi Notifiche" icon="📱">
-        <Card liquid className="p-8 text-center">
+        <Card variant="glass" className="p-8 text-center">
           <div className="text-6xl mb-4">❌</div>
           <Heading level={2} size="xl" className="mb-2">
             Errore
@@ -151,7 +151,7 @@ export default function DeviceManagementPage() {
 
       {/* Device list or empty state */}
       {devices.length === 0 ? (
-        <Card liquid className="p-8">
+        <Card variant="glass" className="p-8">
           <EmptyState
             icon="📱"
             title="Nessun dispositivo registrato"
@@ -195,7 +195,7 @@ export default function DeviceManagementPage() {
       )}
 
       {/* Back link */}
-      <Card liquid className="p-4 mt-6">
+      <Card variant="glass" className="p-4 mt-6">
         <div className="flex items-center justify-between">
           <Text variant="secondary" size="sm">
             Torna alle impostazioni notifiche

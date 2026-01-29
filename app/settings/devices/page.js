@@ -150,7 +150,7 @@ export default function DevicesSettingsPage() {
       />
 
       {/* Devices list */}
-      <Card liquid className="p-6">
+      <Card variant="glass" className="p-6">
         <Heading level={2} size="lg" weight="semibold" className="mb-4">
           Dispositivi Disponibili
         </Heading>
@@ -203,7 +203,7 @@ export default function DevicesSettingsPage() {
 
       {/* Action buttons */}
       {hasChanges && (
-        <Card liquid className="p-4 sm:p-6">
+        <Card variant="glass" className="p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
             <div className="flex-1">
               <Text size="sm" weight="medium">
@@ -237,7 +237,7 @@ export default function DevicesSettingsPage() {
       )}
 
       {/* Info card */}
-      <Card liquid className="p-6 bg-ocean-900/10 [html:not(.dark)_&]:bg-ocean-50/50">
+      <Card variant="glass" className="p-6 bg-ocean-900/10 [html:not(.dark)_&]:bg-ocean-50/50">
         <Heading level={3} size="base" weight="semibold" variant="ocean" className="mb-3">
           ℹ️ Note
         </Heading>

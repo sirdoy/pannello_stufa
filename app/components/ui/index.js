@@ -47,3 +47,6 @@ export { default as EmptyState } from './EmptyState';
 
 // PWA components (v1.61.0+)
 export { default as OfflineBanner } from './OfflineBanner';
+
+// Tooltip (v3.0+)
+export { default as Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from './Tooltip';

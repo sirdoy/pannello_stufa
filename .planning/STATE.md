@@ -125,6 +125,9 @@ Recent decisions affecting current work:
 - **15-08: ControlButton step=5 matches original 5% brightness increment**
 - **15-08: onChange(delta) uses delta to calculate new bounded value with Math.max/min**
 - **15-09: Design system showcase includes all Phase 15 components**
+- **16-01: Section level prop defaults to 2 (h2), pages set level={1} for h1 accessibility**
+- **16-01: Section size='3xl' for level 1, '2xl' for level 2+ (visual hierarchy)**
+- **16-01: spacing='lg' for main page sections (Dashboard pattern)**
 - **16-02: Badge variant mapping for stove page status indicators (sage/neutral, warning/ocean, danger/neutral)**
 - **16-02: Button variant='warning' for mode return action, variant='outline' for navigation**
 
@@ -166,6 +169,7 @@ Key architectural patterns from v1.0 + v2.0:
 - **DeviceCard legacy prop preservation: Maintain all existing props while adding new API**
 - **DeviceCard Badge integration: statusBadge converted to Badge internally with CVA styling**
 - **ControlButton integration: onChange with Math.max/min bounds checking for safe range**
+- **Page title pattern: Section level={1} for h1 accessibility, level={2} for sub-sections**
 
 ### Pending Todos
 

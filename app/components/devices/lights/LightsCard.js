@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
 import RoomSelector from '../../ui/RoomSelector';
-import { Divider, Heading, Button, EmptyState, Text } from '../../ui';
+import { Divider, Heading, Button, ControlButton, EmptyState, Text } from '../../ui';
 import { supportsColor, getCurrentColorHex } from '@/lib/hue/colorUtils';
 
 /**

@@ -153,17 +153,21 @@ Plans:
 #### Phase 13: Foundation Refactoring
 **Goal**: Refactor existing foundation components to use CVA and consistent patterns
 **Depends on**: Phase 11
-**Requirements**: COMP-01, COMP-02, COMP-09, COMP-10, COMP-11, COMP-12, COMP-13
+**Requirements**: COMP-01, COMP-02, COMP-09, COMP-10, COMP-11, COMP-12
 **Success Criteria** (what must be TRUE):
-  1. Button component has type-safe CVA variants (primary, secondary, success, danger, outline, ghost)
-  2. Card component has liquid glass variants with proper composition pattern
+  1. Button component has type-safe CVA variants (ember, subtle, success, danger, outline, ghost)
+  2. Card component has liquid glass variants with proper composition pattern (Card.Header, Card.Title, etc.)
   3. All form controls properly associate with Label component for accessibility
   4. Divider component supports solid, dashed, and gradient variants
   5. Heading and Text components implement complete typography system with all variants
-**Plans**: TBD
+**Plans**: 5 plans in 2 waves
 
 Plans:
-- [ ] 13-01: TBD
+- [ ] 13-01-PLAN.md — Button CVA refactor with namespace pattern (Button.Icon, Button.Group)
+- [ ] 13-02-PLAN.md — Card CVA refactor with namespace pattern (Card.Header, Card.Title, etc.)
+- [ ] 13-03-PLAN.md — Label component (Radix primitive) + Divider CVA refactor
+- [ ] 13-04-PLAN.md — Heading + Text CVA refactor with typography system
+- [ ] 13-05-PLAN.md — Migrate legacy Button props across codebase
 
 #### Phase 14: Feedback & Layout Components
 **Goal**: Deliver complete feedback and layout system for complex UI patterns

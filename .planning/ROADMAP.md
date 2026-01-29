@@ -221,23 +221,24 @@ Plans:
 #### Phase 16: Page Migration & Application
 **Goal**: Apply design system to all application pages for visual consistency
 **Depends on**: Phase 15
-**Requirements**: PAGE-01, PAGE-02, PAGE-03, PAGE-04, PAGE-05, PAGE-06, PAGE-07, PAGE-08, PAGE-09, PAGE-10
+**Requirements**: PAGE-01, PAGE-02, PAGE-03, PAGE-04, PAGE-06, PAGE-07, PAGE-08, PAGE-09, PAGE-10
 **Success Criteria** (what must be TRUE):
   1. Dashboard page uses new layout and device card components
   2. Stove page uses new DeviceCard and StatusCard components
   3. Thermostat page uses new form controls and schedule components
   4. Lights page uses new Slider and color picker components
-  5. Camera page uses new layout and status components
-  6. Monitoring dashboard uses new timeline and status components
-  7. Notifications page uses new list and badge components
-  8. Settings page uses new form components (Input, Select, Switch, Checkbox)
-  9. Schedule UI uses new calendar and override components
-  10. Admin pages use new dashboard layout and data display components
-**Plans**: 9 plans in 5 waves
+  5. Monitoring dashboard uses new timeline and status components
+  6. Notifications page uses new list and badge components
+  7. Settings pages use new form components (Input, Select, Switch, Checkbox)
+  8. Schedule UI uses new calendar and override components
+  9. Admin pages use new dashboard layout and data display components
+**Plans**: 11 plans in 5 waves
+
+Note: PAGE-05 (Camera page) does not exist in current codebase - requirement removed.
 
 Plans:
-- [ ] 16-01-PLAN.md: Complete Dashboard page migration (audit and cleanup)
-- [ ] 16-02-PLAN.md: Complete Stove page migration (Button cleanup, preserve theming)
+- [ ] 16-01-PLAN.md: Dashboard page migration (audit and cleanup)
+- [ ] 16-02-PLAN.md: Stove page migration (Button, Badge cleanup, preserve theming)
 - [ ] 16-03-PLAN.md: Thermostat page mode buttons and Grid migration
 - [ ] 16-04-PLAN.md: Lights page Slider, Badge, and styling migration
 - [ ] 16-05-PLAN.md: Monitoring page layout migration (Section, Grid)
@@ -245,6 +246,8 @@ Plans:
 - [ ] 16-07-PLAN.md: Notifications settings Banner and Badge migration
 - [ ] 16-08-PLAN.md: Design system page PageLayout wrapper
 - [ ] 16-09-PLAN.md: Final verification and human review checkpoint
+- [ ] 16-10-PLAN.md: Settings pages (devices, theme) migration
+- [ ] 16-11-PLAN.md: Admin/Debug pages migration (main, logs, transitions)
 
 #### Phase 17: Accessibility & Testing
 **Goal**: Ensure WCAG AA compliance and comprehensive accessibility testing
@@ -301,6 +304,6 @@ Phases execute in numeric order: 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18
 | 13. Foundation Refactoring | v3.0 | 7/7 | Complete | 2026-01-29 |
 | 14. Feedback & Layout Components | v3.0 | 7/7 | Complete | 2026-01-29 |
 | 15. Smart Home Components Refactor | v3.0 | 9/9 | Complete | 2026-01-29 |
-| 16. Page Migration & Application | v3.0 | 0/9 | Planned | - |
+| 16. Page Migration & Application | v3.0 | 0/11 | Planned | - |
 | 17. Accessibility & Testing | v3.0 | 0/TBD | Not started | - |
 | 18. Documentation & Polish | v3.0 | 0/TBD | Not started | - |

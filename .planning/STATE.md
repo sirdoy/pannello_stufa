@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-28)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 15 - Smart Home Components (v3.0 Design System Evolution) - COMPLETE
+**Current focus:** Phase 15 - Smart Home Components (v3.0 Design System Evolution) - Gap Closure
 
 ## Current Position
 
-Phase: 15 of 18 (Smart Home Components Refactor) - COMPLETE
-Plan: 6 of 6 in phase 15
-Status: Phase 15 complete
-Last activity: 2026-01-29 - Completed Phase 15 (Smart Home Components Refactor)
+Phase: 15 of 18 (Smart Home Components Refactor) - Gap Closure
+Plan: 8 of 9 in phase 15 (gap closure plans 07-09)
+Status: Executing gap closure wave 1
+Last activity: 2026-01-29 - Completed 15-08-PLAN.md (LightsCard ControlButton)
 
-Progress: [███████████████████░] 93.6% (77 plans complete)
+Progress: [███████████████████░] 94.8% (78 plans complete)
 
 ## Performance Metrics
 
@@ -120,6 +120,8 @@ Recent decisions affecting current work:
 - **15-06: DeviceCard uses Badge for statusBadge (CVA integration)**
 - **15-06: Pulse animation for ember, sage, primary, success statusBadge colors**
 - **15-06: LoadingOverlay separate from SmartHomeCard isLoading for full-page blocking**
+- **15-08: ControlButton step=5 matches original 5% brightness increment**
+- **15-08: onChange(delta) uses delta to calculate new bounded value with Math.max/min**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -158,6 +160,7 @@ Key architectural patterns from v1.0 + v2.0:
 - **SmartHomeCard size variants: compact (p-3 sm:p-4) for dashboard, default (p-5 sm:p-6) for full view**
 - **DeviceCard legacy prop preservation: Maintain all existing props while adding new API**
 - **DeviceCard Badge integration: statusBadge converted to Badge internally with CVA styling**
+- **ControlButton integration: onChange with Math.max/min bounds checking for safe range**
 
 ### Pending Todos
 
@@ -177,7 +180,7 @@ None. Phase 15 complete. Ready for Phase 16.
 
 ## Session Continuity
 
-Last session: 2026-01-29 15:25 UTC
-Stopped at: Completed Phase 15 (Smart Home Components Refactor)
+Last session: 2026-01-29 15:49 UTC
+Stopped at: Completed 15-08-PLAN.md (LightsCard ControlButton)
 Resume file: None
-Next step: Begin Phase 16 (Page Migration & Application)
+Next step: Execute 15-09-PLAN.md (remaining gap closure)

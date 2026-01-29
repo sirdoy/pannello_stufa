@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 15 of 18 (Smart Home Components)
-Plan: 2 of 6 in phase 15
+Plan: 3 of 6 in phase 15
 Status: In progress
-Last activity: 2026-01-29 - Completed 15-02-PLAN.md (Badge Component)
+Last activity: 2026-01-29 - Completed 15-03-PLAN.md (Status Components)
 
-Progress: [██████████████████░] 92.3% (72 plans complete)
+Progress: [██████████████████░] 93.6% (73 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 72 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 22 plans)
+- Total plans completed: 73 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 23 plans)
 - Average duration: ~4.5 min per plan
 - Total execution time: ~5.5 hours across 3 milestones
 
@@ -29,14 +29,14 @@ Progress: [██████████████████░] 92.3% (72 
 |-----------|--------|-------|----------|
 | v1.0 Push Notifications | 5 | 29 | 4 days (2026-01-23 -> 2026-01-26) |
 | v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 -> 2026-01-28) |
-| v3.0 Design System | 8 | 22 | In progress |
+| v3.0 Design System | 8 | 23 | In progress |
 
 **Recent Trend:**
 - Milestone velocity improving (v2.0 shipped in 1/3 the time of v1.0)
 - Plan complexity stable (~5 min average)
-- Phase 15 started (2/6 plans done)
+- Phase 15 in progress (3/6 plans done)
 
-*Updated after 15-02 completion*
+*Updated after 15-03 completion*
 
 ## Accumulated Context
 
@@ -109,6 +109,9 @@ Recent decisions affecting current work:
 - **14-07: Props spread to support data-testid and other attributes**
 - **15-02: Pulse animation via CVA boolean variant (pulse: { true: 'animate-glow-pulse' })**
 - **15-02: Badge neutral variant as default (inactive state first, active explicitly set)**
+- **15-03: Separate dotVariants CVA for ConnectionStatus dot styling**
+- **15-03: forwardRef pattern for status indicator components**
+- **15-03: Italian status labels (Online, Offline, Connessione..., OK, Attenzione, Errore, Critico)**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -141,6 +144,8 @@ Key architectural patterns from v1.0 + v2.0:
 - **Polymorphic component pattern: as prop with Component alias**
 - **CVA spacing pattern: none/sm/md/lg with responsive classes**
 - **Badge CVA pattern: badgeVariants with variant/size/pulse for status indicators**
+- **Status components pattern: role='status' + aria-live='polite' for accessibility**
+- **HealthIndicator icons: CheckCircle2 (ok), AlertTriangle (warning), XCircle (error), AlertOctagon (critical)**
 
 ### Pending Todos
 
@@ -160,7 +165,7 @@ None. Phase 15 in progress.
 
 ## Session Continuity
 
-Last session: 2026-01-29 14:12 UTC
-Stopped at: Completed 15-02-PLAN.md (Badge Component)
+Last session: 2026-01-29 14:13 UTC
+Stopped at: Completed 15-03-PLAN.md (Status Components)
 Resume file: None
-Next step: Continue Phase 15 (15-03 through 15-06)
+Next step: Continue Phase 15 (15-04 through 15-06)

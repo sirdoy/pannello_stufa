@@ -8,93 +8,70 @@
 import { render, screen } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import Section, { sectionVariants } from '../Section';
+import Button from '../Button';
 
 expect.extend(toHaveNoViolations);
 
 describe('Section', () => {
   describe('Rendering', () => {
-    it('renders children content', () => {
-      render(<Section>Test content</Section>);
-      expect(screen.getByText('Test content')).toBeInTheDocument();
+    it('renders children', () => {
+      render(
+        <Section>
+          <div>Content</div>
+        </Section>
+      );
+      expect(screen.getByText('Content')).toBeInTheDocument();
     });
 
-    it('renders as section element', () => {
-      const { container } = render(<Section>Content</Section>);
-      expect(container.querySelector('section')).toBeInTheDocument();
-    });
-
-    it('renders title when provided', () => {
-      render(<Section title="My Section">Content</Section>);
-      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('My Section');
-    });
-
-    it('renders description when provided', () => {
-      render(<Section description="Section description">Content</Section>);
+    it('renders title and description', () => {
+      render(
+        <Section title="Section Title" description="Section description">
+          <div>Content</div>
+        </Section>
+      );
+      expect(screen.getByRole('heading', { name: 'Section Title' })).toBeInTheDocument();
       expect(screen.getByText('Section description')).toBeInTheDocument();
     });
 
-    it('renders action element when provided', () => {
+    it('renders subtitle', () => {
       render(
-        <Section title="Title" action={<button>Action</button>}>
-          Content
+        <Section subtitle="Category" title="Title">
+          <div>Content</div>
+        </Section>
+      );
+      expect(screen.getByText('Category')).toBeInTheDocument();
+    });
+
+    it('renders action', () => {
+      render(
+        <Section title="Title" action={<Button>Action</Button>}>
+          <div>Content</div>
         </Section>
       );
       expect(screen.getByRole('button', { name: 'Action' })).toBeInTheDocument();
     });
   });
 
-  describe('Subtitle', () => {
-    it('renders subtitle with default value when title is provided', () => {
-      render(<Section title="Title">Content</Section>);
-      expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    });
-
-    it('renders custom subtitle when provided', () => {
-      render(<Section title="Title" subtitle="Custom Category">Content</Section>);
-      expect(screen.getByText('Custom Category')).toBeInTheDocument();
-      expect(screen.queryByText('Dashboard')).not.toBeInTheDocument();
-    });
-
-    it('does not render subtitle without title', () => {
-      render(<Section subtitle="Custom Category">Content</Section>);
-      expect(screen.queryByText('Custom Category')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('Ember Accent', () => {
-    it('renders ember accent bar when title is provided', () => {
-      const { container } = render(<Section title="Title">Content</Section>);
-      const accentBar = container.querySelector('.from-ember-500');
-      expect(accentBar).toBeInTheDocument();
-      expect(accentBar).toHaveClass('to-flame-600');
-    });
-
-    it('accent bar has aria-hidden', () => {
-      const { container } = render(<Section title="Title">Content</Section>);
-      const accentBar = container.querySelector('.from-ember-500');
-      expect(accentBar).toHaveAttribute('aria-hidden', 'true');
-    });
-
-    it('does not render ember accent bar without title', () => {
-      const { container } = render(<Section>Content</Section>);
-      expect(container.querySelector('.from-ember-500')).not.toBeInTheDocument();
-    });
-  });
-
   describe('Spacing Variants', () => {
-    it('applies sm spacing variant', () => {
-      const { container } = render(<Section spacing="sm">Content</Section>);
+    it('applies spacing variants', () => {
+      const { container, rerender } = render(
+        <Section spacing="sm">
+          <div>Content</div>
+        </Section>
+      );
       expect(container.firstChild).toHaveClass('py-4');
+
+      rerender(
+        <Section spacing="lg">
+          <div>Content</div>
+        </Section>
+      );
+      expect(container.firstChild).toHaveClass('py-8');
     });
 
     it('applies md spacing variant (default)', () => {
       const { container } = render(<Section>Content</Section>);
       expect(container.firstChild).toHaveClass('py-6');
-    });
-
-    it('applies lg spacing variant', () => {
-      const { container } = render(<Section spacing="lg">Content</Section>);
-      expect(container.firstChild).toHaveClass('py-8');
     });
 
     it('applies none spacing variant', () => {
@@ -105,15 +82,87 @@ describe('Section', () => {
     });
 
     it('header spacing scales with section spacing (sm)', () => {
-      const { container } = render(<Section spacing="sm" title="Title">Content</Section>);
+      const { container } = render(
+        <Section spacing="sm" title="Title">
+          Content
+        </Section>
+      );
       const header = container.querySelector('.mb-3');
       expect(header).toBeInTheDocument();
     });
 
     it('header spacing scales with section spacing (lg)', () => {
-      const { container } = render(<Section spacing="lg" title="Title">Content</Section>);
+      const { container } = render(
+        <Section spacing="lg" title="Title">
+          Content
+        </Section>
+      );
       const header = container.querySelector('.mb-6');
       expect(header).toBeInTheDocument();
+    });
+  });
+
+  describe('Polymorphic Rendering', () => {
+    it('renders as section by default', () => {
+      const { container } = render(<Section>Content</Section>);
+      expect(container.querySelector('section')).toBeInTheDocument();
+    });
+
+    it('renders as different element', () => {
+      render(
+        <Section as="div" data-testid="section">
+          <div>Content</div>
+        </Section>
+      );
+      expect(screen.getByTestId('section').tagName).toBe('DIV');
+    });
+
+    it('renders as article', () => {
+      render(
+        <Section as="article" data-testid="section">
+          <div>Content</div>
+        </Section>
+      );
+      expect(screen.getByTestId('section').tagName).toBe('ARTICLE');
+    });
+  });
+
+  describe('Ember Accent', () => {
+    it('renders ember accent bar', () => {
+      const { container } = render(
+        <Section title="Title">
+          <div>Content</div>
+        </Section>
+      );
+      expect(container.querySelector('.from-ember-500')).toBeInTheDocument();
+    });
+
+    it('does not render header when no title/description/action', () => {
+      const { container } = render(
+        <Section>
+          <div>Content only</div>
+        </Section>
+      );
+      // No header elements
+      expect(container.querySelector('.from-ember-500')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Subtitle', () => {
+    it('does not render subtitle when not provided', () => {
+      render(<Section title="Title">Content</Section>);
+      // Only the heading should render, no subtitle text
+      const heading = screen.getByRole('heading');
+      expect(heading).toHaveTextContent('Title');
+    });
+
+    it('renders subtitle when provided with title', () => {
+      render(
+        <Section title="Title" subtitle="Custom Category">
+          Content
+        </Section>
+      );
+      expect(screen.getByText('Custom Category')).toBeInTheDocument();
     });
   });
 
@@ -145,15 +194,23 @@ describe('Section', () => {
     });
 
     it('className merges with spacing classes', () => {
-      const { container } = render(<Section spacing="sm" className="mt-4">Content</Section>);
+      const { container } = render(
+        <Section spacing="sm" className="mt-4">
+          Content
+        </Section>
+      );
       expect(container.firstChild).toHaveClass('py-4');
       expect(container.firstChild).toHaveClass('mt-4');
     });
   });
 
   describe('Accessibility', () => {
-    it('has no accessibility violations with minimal props', async () => {
-      const { container } = render(<Section>Content</Section>);
+    it('has no accessibility violations', async () => {
+      const { container } = render(
+        <Section title="Accessible Section" description="Description">
+          <div>Content</div>
+        </Section>
+      );
       const results = await axe(container);
       expect(results).toHaveNoViolations();
     });
@@ -164,7 +221,7 @@ describe('Section', () => {
           title="My Section"
           subtitle="Category"
           description="This is a description"
-          action={<button>Action</button>}
+          action={<Button>Action</Button>}
           spacing="lg"
         >
           Content

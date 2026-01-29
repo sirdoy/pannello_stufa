@@ -88,7 +88,13 @@ skipped: 11
   reason: "User reported: Build Error - Export IconButton doesn't exist in target module. Did you mean ButtonIcon?"
   severity: blocker
   test: 1
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "design-system/page.js imports IconButton but Button.js exports ButtonIcon (renamed in 13-01 refactor)"
+  artifacts:
+    - path: "app/debug/design-system/page.js"
+      issue: "Line 4: imports IconButton instead of ButtonIcon"
+    - path: "app/components/ui/Button.js"
+      issue: "Line 285: exports ButtonIcon (correct name after 13-01)"
+  missing:
+    - "Update import from IconButton to ButtonIcon in design-system/page.js"
+    - "Update any usages of IconButton to ButtonIcon in the file"
   debug_session: ""

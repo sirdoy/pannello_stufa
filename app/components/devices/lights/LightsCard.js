@@ -1090,34 +1090,32 @@ export default function LightsCard() {
                           }`}
                         />
 
-                        {/* +/- Buttons */}
+                        {/* +/- Buttons with long-press support */}
                         <div className="flex items-center gap-2">
-                          <Button
+                          <ControlButton
+                            type="decrement"
                             variant={adaptive.buttonVariant || 'subtle'}
                             size="sm"
-                            icon="➖"
-                            onClick={() => {
-                              const newValue = Math.max(1, avgBrightness - 5);
+                            step={5}
+                            onChange={(delta) => {
+                              const newValue = Math.max(1, avgBrightness + delta);
                               handleBrightnessChange(selectedRoomGroupedLightId, newValue.toString());
                             }}
                             disabled={refreshing || avgBrightness <= 1 || !selectedRoomGroupedLightId}
-                            className={`flex-1 font-display ${adaptive.buttonClass}`}
-                          >
-                            -5%
-                          </Button>
-                          <Button
+                            className={`flex-1 ${adaptive.buttonClass}`}
+                          />
+                          <ControlButton
+                            type="increment"
                             variant={adaptive.buttonVariant || 'subtle'}
                             size="sm"
-                            icon="➕"
-                            onClick={() => {
-                              const newValue = Math.min(100, avgBrightness + 5);
+                            step={5}
+                            onChange={(delta) => {
+                              const newValue = Math.min(100, avgBrightness + delta);
                               handleBrightnessChange(selectedRoomGroupedLightId, newValue.toString());
                             }}
                             disabled={refreshing || avgBrightness >= 100 || !selectedRoomGroupedLightId}
-                            className={`flex-1 font-display ${adaptive.buttonClass}`}
-                          >
-                            +5%
-                          </Button>
+                            className={`flex-1 ${adaptive.buttonClass}`}
+                          />
                         </div>
                       </div>
                     </div>

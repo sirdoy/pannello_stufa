@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-01-28)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 15 - Smart Home Components (v3.0 Design System Evolution) - COMPLETE
+**Current focus:** Phase 16 - Page Migration & Application (v3.0 Design System Evolution) - IN PROGRESS
 
 ## Current Position
 
-Phase: 15 of 18 (Smart Home Components Refactor) - COMPLETE
-Plan: 9 of 9 in phase 15 (gap closure complete)
-Status: Phase 15 complete
-Last activity: 2026-01-29 - Completed 15-09-PLAN.md (Design system showcase update)
+Phase: 16 of 18 (Page Migration & Application)
+Plan: 2 of 11 in phase 16
+Status: In progress
+Last activity: 2026-01-29 - Completed 16-02-PLAN.md (Stove page design system migration)
 
-Progress: [███████████████████░] 96.3% (80 plans complete)
+Progress: [█████████████████░░░] 89.0% (81 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 80 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 30 plans)
+- Total plans completed: 81 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 31 plans)
 - Average duration: ~4.5 min per plan
 - Total execution time: ~6 hours across 3 milestones
 
@@ -34,9 +34,9 @@ Progress: [███████████████████░] 96.3% (
 **Recent Trend:**
 - Milestone velocity improving (v2.0 shipped in 1/3 the time of v1.0)
 - Plan complexity stable (~5 min average)
-- Phase 15 complete (9/9 plans including 3 gap closure)
+- Phase 16 in progress (2/11 plans complete)
 
-*Updated after 15-09 completion (gap closure complete)*
+*Updated after 16-02 completion (Stove page migration)*
 
 ## Accumulated Context
 
@@ -125,6 +125,8 @@ Recent decisions affecting current work:
 - **15-08: ControlButton step=5 matches original 5% brightness increment**
 - **15-08: onChange(delta) uses delta to calculate new bounded value with Math.max/min**
 - **15-09: Design system showcase includes all Phase 15 components**
+- **16-02: Badge variant mapping for stove page status indicators (sage/neutral, warning/ocean, danger/neutral)**
+- **16-02: Button variant='warning' for mode return action, variant='outline' for navigation**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -175,7 +177,7 @@ Key architectural patterns from v1.0 + v2.0:
 
 ### Blockers/Concerns
 
-None. Phase 15 complete. Ready for Phase 16.
+None. Phase 16 in progress.
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
@@ -183,7 +185,7 @@ None. Phase 15 complete. Ready for Phase 16.
 
 ## Session Continuity
 
-Last session: 2026-01-29 16:40 UTC
-Stopped at: Phase 15 verified PASSED (6/6 criteria, all gaps closed)
+Last session: 2026-01-29 16:09 UTC
+Stopped at: Completed 16-02-PLAN.md (Stove page migration)
 Resume file: None
-Next step: Begin Phase 16 (Page Migration & Application)
+Next step: Continue Phase 16 (16-03 Thermostat page migration)

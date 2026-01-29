@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 15 of 18 (Smart Home Components)
-Plan: 3 of 6 in phase 15
+Plan: 4 of 6 in phase 15
 Status: In progress
-Last activity: 2026-01-29 - Completed 15-03-PLAN.md (Status Components)
+Last activity: 2026-01-29 - Completed 15-04-PLAN.md (SmartHomeCard)
 
-Progress: [██████████████████░] 93.6% (73 plans complete)
+Progress: [███████████████████░] 94.9% (74 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 73 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 23 plans)
+- Total plans completed: 74 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 24 plans)
 - Average duration: ~4.5 min per plan
 - Total execution time: ~5.5 hours across 3 milestones
 
@@ -34,9 +34,9 @@ Progress: [██████████████████░] 93.6% (73 
 **Recent Trend:**
 - Milestone velocity improving (v2.0 shipped in 1/3 the time of v1.0)
 - Plan complexity stable (~5 min average)
-- Phase 15 in progress (3/6 plans done)
+- Phase 15 in progress (4/6 plans done)
 
-*Updated after 15-03 completion*
+*Updated after 15-04 completion*
 
 ## Accumulated Context
 
@@ -112,6 +112,10 @@ Recent decisions affecting current work:
 - **15-03: Separate dotVariants CVA for ConnectionStatus dot styling**
 - **15-03: forwardRef pattern for status indicator components**
 - **15-03: Italian status labels (Online, Offline, Connessione..., OK, Attenzione, Errore, Critico)**
+- **15-04: SmartHomeCard namespace sub-components (Header, Status, Controls) for semantic card areas**
+- **15-04: Icon aria-hidden='true' for decorative device icons in SmartHomeCard**
+- **15-04: Loading overlay z-10 for proper stacking within cards**
+- **15-04: CardAccentBar animation disabled when card disabled**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -146,6 +150,8 @@ Key architectural patterns from v1.0 + v2.0:
 - **Badge CVA pattern: badgeVariants with variant/size/pulse for status indicators**
 - **Status components pattern: role='status' + aria-live='polite' for accessibility**
 - **HealthIndicator icons: CheckCircle2 (ok), AlertTriangle (warning), XCircle (error), AlertOctagon (critical)**
+- **SmartHomeCard composition: Card + CardAccentBar internally, padding handled by content wrapper**
+- **SmartHomeCard size variants: compact (p-3 sm:p-4) for dashboard, default (p-5 sm:p-6) for full view**
 
 ### Pending Todos
 
@@ -165,7 +171,7 @@ None. Phase 15 in progress.
 
 ## Session Continuity
 
-Last session: 2026-01-29 14:13 UTC
-Stopped at: Completed 15-03-PLAN.md (Status Components)
+Last session: 2026-01-29 14:20 UTC
+Stopped at: Completed 15-04-PLAN.md (SmartHomeCard)
 Resume file: None
-Next step: Continue Phase 15 (15-04 through 15-06)
+Next step: Continue Phase 15 (15-05 through 15-06)

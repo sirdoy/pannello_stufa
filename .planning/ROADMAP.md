@@ -183,10 +183,16 @@ Plans:
   5. User sees Empty State components with helpful guidance when no data exists
   6. All pages use consistent PageLayout and DashboardLayout components
   7. Sections and Grid components provide consistent spacing and responsive behavior
-**Plans**: TBD
+**Plans**: 7 plans in 2 waves
 
 Plans:
-- [ ] 14-01: TBD
+- [ ] 14-01-PLAN.md — Modal/Dialog with Radix Dialog + CVA sizes + mobile bottom sheet
+- [ ] 14-02-PLAN.md — Tooltip with Radix Tooltip primitive
+- [ ] 14-03-PLAN.md — Toast system with Radix Toast + provider pattern + stacking
+- [ ] 14-04-PLAN.md — Spinner + Progress with Radix Progress
+- [ ] 14-05-PLAN.md — EmptyState + Banner CVA standardization
+- [ ] 14-06-PLAN.md — PageLayout + DashboardLayout with collapsible sidebar
+- [ ] 14-07-PLAN.md — Section + Grid CVA enhancements
 
 #### Phase 15: Smart Home Components Refactor
 **Goal**: Standardize domain-specific smart home components with unified APIs
@@ -277,7 +283,7 @@ Phases execute in numeric order: 11 → 12 → 13 → 14 → 15 → 16 → 17 �
 | 11. Foundation & Tooling | v3.0 | 3/3 | Complete | 2026-01-28 |
 | 12. Core Interactive Components | v3.0 | 3/3 | Complete | 2026-01-28 |
 | 13. Foundation Refactoring | v3.0 | 7/7 | Complete | 2026-01-29 |
-| 14. Feedback & Layout Components | v3.0 | 0/TBD | Not started | - |
+| 14. Feedback & Layout Components | v3.0 | 0/7 | Planned | - |
 | 15. Smart Home Components Refactor | v3.0 | 0/TBD | Not started | - |
 | 16. Page Migration & Application | v3.0 | 0/TBD | Not started | - |
 | 17. Accessibility & Testing | v3.0 | 0/TBD | Not started | - |

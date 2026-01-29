@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-28)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 14 - Feedback & Layout Components (v3.0 Design System Evolution)
+**Current focus:** Phase 14 - Feedback & Layout Components (v3.0 Design System Evolution) - COMPLETE
 
 ## Current Position
 
-Phase: 14 of 18 (Feedback & Layout Components) - IN PROGRESS
-Plan: 6 of 7 in phase 14
-Status: Executing Phase 14 plans
-Last activity: 2026-01-29 - Completed 14-06-PLAN.md (PageLayout and DashboardLayout)
+Phase: 14 of 18 (Feedback & Layout Components) - COMPLETE
+Plan: 7 of 7 in phase 14
+Status: Phase 14 complete
+Last activity: 2026-01-29 - Completed 14-07-PLAN.md (Section and Grid CVA)
 
-Progress: [█████████████████░░] 90.3% (70 plans complete)
+Progress: [██████████████████░] 91.0% (71 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 64 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 14 plans)
+- Total plans completed: 71 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 21 plans)
 - Average duration: ~4.6 min per plan
-- Total execution time: ~5.0 hours across 3 milestones
+- Total execution time: ~5.4 hours across 3 milestones
 
 **By Milestone:**
 
@@ -29,14 +29,14 @@ Progress: [█████████████████░░] 90.3% (70 
 |-----------|--------|-------|----------|
 | v1.0 Push Notifications | 5 | 29 | 4 days (2026-01-23 -> 2026-01-26) |
 | v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 -> 2026-01-28) |
-| v3.0 Design System | 8 | 13 | In progress |
+| v3.0 Design System | 8 | 21 | In progress |
 
 **Recent Trend:**
 - Milestone velocity improving (v2.0 shipped in 1/3 the time of v1.0)
 - Plan complexity stable (~5 min average)
-- Phase 13 COMPLETE (8/8 plans done, including gap closure plans)
+- Phase 14 COMPLETE (7/7 plans done)
 
-*Updated after 13-08 completion*
+*Updated after 14-07 completion*
 
 ## Accumulated Context
 
@@ -103,6 +103,10 @@ Recent decisions affecting current work:
 - **14-06: PageLayout uses slot pattern (header, footer props) instead of children-based structure**
 - **14-06: SidebarContext default values (no throw on outside use)**
 - **14-06: DashboardLayout 7 namespace sub-components for maximum composability**
+- **14-07: Section level={2} size='2xl' for h2 semantic heading**
+- **14-07: Subtitle optional (no default value) for flexible usage**
+- **14-07: Grid 'as' prop enables ul/ol/nav semantic patterns**
+- **14-07: Props spread to support data-testid and other attributes**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -132,6 +136,8 @@ Key architectural patterns from v1.0 + v2.0:
 - **Button migration pattern: variant="ember" for primary, variant="subtle" for secondary**
 - **Complete codebase migration over partial (ensure no legacy props remain)**
 - **Card migration pattern: variant="glass" for glass/liquid effect**
+- **Polymorphic component pattern: as prop with Component alias**
+- **CVA spacing pattern: none/sm/md/lg with responsive classes**
 
 ### Pending Todos
 
@@ -143,7 +149,7 @@ Key architectural patterns from v1.0 + v2.0:
 
 ### Blockers/Concerns
 
-None. Phase 13 complete. Ready for Phase 14.
+None. Phase 14 complete. Ready for Phase 15.
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
@@ -151,7 +157,7 @@ None. Phase 13 complete. Ready for Phase 14.
 
 ## Session Continuity
 
-Last session: 2026-01-29 14:06 UTC
-Stopped at: Completed 14-06-PLAN.md (PageLayout and DashboardLayout)
+Last session: 2026-01-29 14:32 UTC
+Stopped at: Completed 14-07-PLAN.md (Section and Grid CVA)
 Resume file: None
-Next step: Continue Phase 14 plan 14-07
+Next step: Begin Phase 15 (Smart Home Components)

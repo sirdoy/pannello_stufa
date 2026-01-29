@@ -55,3 +55,7 @@ export { default as Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } f
 // Feedback components (v3.0+)
 export { default as Spinner, spinnerVariants } from './Spinner';
 export { default as Progress, progressVariants } from './Progress';
+
+// Page layout components (v3.0+)
+export { default as PageLayout, pageLayoutVariants, PageHeader, PageContent, PageFooter } from './PageLayout';
+export { default as DashboardLayout, useSidebar, sidebarVariants, mainContentVariants } from './DashboardLayout';

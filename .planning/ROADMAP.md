@@ -150,17 +150,17 @@ Plans:
 - [x] 12-02: RadioGroup + Select (selection patterns)
 - [x] 12-03: Input + Slider (value input controls)
 
-#### Phase 13: Foundation Refactoring
+#### Phase 13: Foundation Refactoring ✓
 **Goal**: Refactor existing foundation components to use CVA and consistent patterns
 **Depends on**: Phase 11
 **Requirements**: COMP-01, COMP-02, COMP-09, COMP-10, COMP-11, COMP-12
 **Success Criteria** (what must be TRUE):
-  1. Button component has type-safe CVA variants (ember, subtle, success, danger, outline, ghost)
-  2. Card component has liquid glass variants with proper composition pattern (Card.Header, Card.Title, etc.)
-  3. All form controls properly associate with Label component for accessibility
-  4. Divider component supports solid, dashed, and gradient variants
-  5. Heading and Text components implement complete typography system with all variants
-**Plans**: 7 plans in 2 waves
+  1. ✓ Button component has type-safe CVA variants (ember, subtle, success, danger, outline, ghost)
+  2. ✓ Card component has liquid glass variants with proper composition pattern (Card.Header, Card.Title, etc.)
+  3. ✓ All form controls properly associate with Label component for accessibility
+  4. ✓ Divider component supports solid, dashed, and gradient variants
+  5. ✓ Heading and Text components implement complete typography system with all variants
+**Plans**: 7 plans in 2 waves (complete)
 
 Plans:
 - [x] 13-01-PLAN.md — Button CVA refactor with namespace pattern (Button.Icon, Button.Group)
@@ -169,7 +169,7 @@ Plans:
 - [x] 13-04-PLAN.md — Heading + Text CVA refactor with typography system
 - [x] 13-05-PLAN.md — Migrate legacy Button props across codebase
 - [x] 13-06-PLAN.md — Migrate legacy Card liquid prop across codebase
-- [ ] 13-07-PLAN.md — Gap closure: migrate remaining scheduler Card liquid props
+- [x] 13-07-PLAN.md — Gap closure: migrate remaining scheduler Card liquid props
 
 #### Phase 14: Feedback & Layout Components
 **Goal**: Deliver complete feedback and layout system for complex UI patterns
@@ -276,7 +276,7 @@ Phases execute in numeric order: 11 → 12 → 13 → 14 → 15 → 16 → 17 �
 | 10. Monitoring Dashboard & Alerts | v2.0 | 5/5 | Complete | 2026-01-28 |
 | 11. Foundation & Tooling | v3.0 | 3/3 | Complete | 2026-01-28 |
 | 12. Core Interactive Components | v3.0 | 3/3 | Complete | 2026-01-28 |
-| 13. Foundation Refactoring | v3.0 | 6/7 | In Progress | - |
+| 13. Foundation Refactoring | v3.0 | 7/7 | Complete | 2026-01-29 |
 | 14. Feedback & Layout Components | v3.0 | 0/TBD | Not started | - |
 | 15. Smart Home Components Refactor | v3.0 | 0/TBD | Not started | - |
 | 16. Page Migration & Application | v3.0 | 0/TBD | Not started | - |

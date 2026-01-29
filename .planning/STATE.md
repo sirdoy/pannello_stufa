@@ -130,6 +130,9 @@ Recent decisions affecting current work:
 - **16-01: spacing='lg' for main page sections (Dashboard pattern)**
 - **16-02: Badge variant mapping for stove page status indicators (sage/neutral, warning/ocean, danger/neutral)**
 - **16-02: Button variant='warning' for mode return action, variant='outline' for navigation**
+- **16-03: Mode buttons use Button with variant='subtle'/'ghost' + custom activeClassName for mode-specific colors**
+- **16-03: Grid cols={3} with className override for md breakpoint (topology info needs 3 cols at md)**
+- **16-03: Banner variant='info' replaces custom div styling for troubleshooting boxes**
 - **16-04: Slider onChange receives number directly (not array) per 12-03 API**
 - **16-04: Badge ember variant with pulse for room ACCESO, without pulse for light ON**
 - **16-04: cn() for conditional card borders (on/off states)**
@@ -175,6 +178,9 @@ Key architectural patterns from v1.0 + v2.0:
 - **Page title pattern: Section level={1} for h1 accessibility, level={2} for sub-sections**
 - **Slider brightness pattern: value/onChange with number API, aria-label per control**
 - **Badge status pattern: ember with pulse for major status, ember without pulse for inline indicators**
+- **Button variant override pattern: Use className to override variant colors while keeping Button base styling**
+- **Grid breakpoint override pattern: Pass className='md:grid-cols-X' when default responsive pattern doesn't match**
+- **Banner for help boxes pattern: Use Banner component with children for complex help/info content**
 
 ### Pending Todos
 
@@ -194,7 +200,7 @@ None. Phase 16 in progress.
 
 ## Session Continuity
 
-Last session: 2026-01-29 16:19 UTC
-Stopped at: Completed 16-04-PLAN.md (Lights page migration)
+Last session: 2026-01-29 16:17 UTC
+Stopped at: Completed 16-03-PLAN.md (Thermostat page migration)
 Resume file: None
 Next step: Continue Phase 16 Wave 2 (16-05 Settings, 16-06 Scheduler, etc.)

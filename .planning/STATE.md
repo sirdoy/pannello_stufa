@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 
 ## Current Position
 
-Phase: 14 of 18 (Feedback & Layout Components) - NOT STARTED
-Plan: 0 of TBD in phase 14
-Status: Ready to plan Phase 14
-Last activity: 2026-01-29 - Completed Phase 13-08 (Gap closure: ButtonIcon import fix)
+Phase: 14 of 18 (Feedback & Layout Components) - IN PROGRESS
+Plan: 2 of 7 in phase 14
+Status: Executing Phase 14 plans
+Last activity: 2026-01-29 - Completed 14-02-PLAN.md (Tooltip component)
 
-Progress: [████████████████░░░] 83.3% (15 phases complete)
+Progress: [████████████████░░░] 85.7% (66 plans complete)
 
 ## Performance Metrics
 
@@ -86,6 +86,9 @@ Recent decisions affecting current work:
 - **13-06: Complete migration pattern (all legacy props removed in single phase)**
 - **13-07: Gap closure for 5 scheduler files missed in 13-06**
 - **13-08: Gap closure for ButtonIcon import in design-system page**
+- **14-02: Tooltip delay 400ms/300ms for show/skip, 4px sideOffset default**
+- **14-02: Arrow included by default in TooltipContent**
+- **14-02: Skip JSDOM mouse leave test (Radix handles internally)**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -134,7 +137,7 @@ None. Phase 13 complete. Ready for Phase 14.
 
 ## Session Continuity
 
-Last session: 2026-01-29
-Stopped at: Completed Phase 13-08 (Gap closure: ButtonIcon import fix)
+Last session: 2026-01-29 09:50 UTC
+Stopped at: Completed 14-02-PLAN.md (Tooltip component)
 Resume file: None
-Next step: Begin Phase 14 (Feedback & Layout Components) planning
+Next step: Continue Phase 14 plans (14-03 through 14-07)

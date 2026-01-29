@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 15-smart-home-components
 source: [15-01-SUMMARY.md, 15-02-SUMMARY.md, 15-03-SUMMARY.md, 15-04-SUMMARY.md, 15-05-SUMMARY.md, 15-06-SUMMARY.md]
 started: 2026-01-29T15:30:00Z
@@ -84,9 +84,15 @@ skipped: 7
   reason: "User reported: le luci hanno i bottoni della luminosita solo nella home e il +/- prende effetto solo quando rilascio il pulsante"
   severity: major
   test: 1
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "LightsCard uses Button component with onClick, not ControlButton with long-press support. ControlButton was created in 15-01 but never integrated into LightsCard."
+  artifacts:
+    - path: "app/components/devices/lights/LightsCard.js"
+      issue: "Lines 1096-1121: brightness +/- uses Button with onClick, not ControlButton with onChange"
+    - path: "app/components/ui/ControlButton.js"
+      issue: "Component exists with useLongPress hook but is not used in LightsCard"
+  missing:
+    - "Replace Button with ControlButton for brightness +/- controls in LightsCard"
+    - "Use onChange prop instead of onClick for continuous adjustment"
   debug_session: ""
 
 - truth: "Badge pulse animation visible in design system page for ember/sage variants"
@@ -111,7 +117,13 @@ skipped: 7
   reason: "User reported: la pagina home si vede spaginata, sembra non avere piu il containere o la griglia"
   severity: major
   test: 9
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "Grid component accepts numeric cols (1-6), but app/page.js passes object { mobile: 1, desktop: 2, wide: 2 }. Also gap='large' should be gap='lg'. Grid CVA variants don't support object syntax for cols."
+  artifacts:
+    - path: "app/page.js"
+      issue: "Line 38: <Grid cols={{ mobile: 1, desktop: 2, wide: 2 }} gap='large'> - invalid props"
+    - path: "app/components/ui/Grid.js"
+      issue: "cols variant only accepts numbers 1-6, gap variant uses 'none'|'sm'|'md'|'lg' not 'large'"
+  missing:
+    - "Change cols={{ mobile: 1, desktop: 2, wide: 2 }} to cols={2}"
+    - "Change gap='large' to gap='lg'"
   debug_session: ""

@@ -28,7 +28,7 @@ function ScheduleContent() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <ErrorAlert message={error} />
         <div className="mt-4">
-          <Button variant="secondary" onClick={refetch}>
+          <Button variant="subtle" onClick={refetch}>
             <RefreshCw size={16} className="mr-2" />
             Riprova
           </Button>

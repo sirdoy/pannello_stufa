@@ -99,7 +99,7 @@ export default function ErrorsPage() {
               Registro completo degli errori e allarmi della stufa
             </Text>
           </div>
-          <Button liquid
+          <Button
             variant="outline"
             icon="🏠"
             onClick={() => router.push('/')}
@@ -222,7 +222,7 @@ export default function ErrorsPage() {
                 {/* Actions */}
                 {!error.resolved && (
                   <div className="pt-4 border-t border-slate-700 [html:not(.dark)_&]:border-slate-200">
-                    <Button liquid
+                    <Button
                       variant="success"
                       size="sm"
                       icon="✓"

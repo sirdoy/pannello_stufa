@@ -212,11 +212,11 @@ function NetatmoContent() {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <Button variant="primary" onClick={checkConnection}>
+            <Button variant="ember" onClick={checkConnection}>
               🔄 Riprova
             </Button>
             <Button
-              variant="secondary"
+              variant="subtle"
               onClick={() => {
                 setConnected(false);
                 setError(null);
@@ -472,7 +472,7 @@ function NetatmoContent() {
 
         <div className="mt-4 pt-4 border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
           <Button
-            variant="secondary"
+            variant="subtle"
             onClick={handleRefresh}
             loading={refreshing}
             size="sm"

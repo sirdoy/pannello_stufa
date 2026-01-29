@@ -218,7 +218,7 @@ export default function ScenesPage() {
             Effettua il pairing con il bridge Hue dalla homepage per gestire le scene.
           </Text>
 
-          <Button variant="primary" onClick={() => router.push('/')}>
+          <Button variant="ember" onClick={() => router.push('/')}>
             ← Torna alla Homepage
           </Button>
         </Card>

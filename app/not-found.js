@@ -11,7 +11,7 @@ export default function NotFound() {
           description="La pagina che stai cercando non esiste o è stata spostata."
           action={
             <Link href="/" className="block w-full">
-              <Button liquid variant="primary" className="w-full">
+              <Button variant="ember" className="w-full">
                 🏠 Torna alla Home
               </Button>
             </Link>

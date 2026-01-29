@@ -191,10 +191,10 @@ export default function ScheduleManagementModal({
                           </Text>
                         )}
                         <div className="flex gap-2">
-                          <Button liquid variant="success" size="sm" onClick={() => handleSaveEdit(activeSchedule.id)}>
+                          <Button variant="success" size="sm" onClick={() => handleSaveEdit(activeSchedule.id)}>
                             Salva
                           </Button>
-                          <Button liquid variant="secondary" size="sm" onClick={handleCancelEdit}>
+                          <Button variant="subtle" size="sm" onClick={handleCancelEdit}>
                             Annulla
                           </Button>
                         </div>
@@ -255,10 +255,10 @@ export default function ScheduleManagementModal({
                           </Text>
                         )}
                         <div className="flex gap-2">
-                          <Button liquid variant="success" size="sm" onClick={() => handleSaveEdit(schedule.id)}>
+                          <Button variant="success" size="sm" onClick={() => handleSaveEdit(schedule.id)}>
                             Salva
                           </Button>
-                          <Button liquid variant="secondary" size="sm" onClick={handleCancelEdit}>
+                          <Button variant="subtle" size="sm" onClick={handleCancelEdit}>
                             Annulla
                           </Button>
                         </div>

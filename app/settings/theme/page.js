@@ -170,10 +170,10 @@ export default function ThemeSettingsPage() {
           </div>
 
           <div className="flex gap-3 flex-wrap">
-            <Button variant="primary" size="sm">
+            <Button variant="ember" size="sm">
               Primario
             </Button>
-            <Button variant="secondary" size="sm">
+            <Button variant="subtle" size="sm">
               Secondario
             </Button>
             <Button variant="success" size="sm">

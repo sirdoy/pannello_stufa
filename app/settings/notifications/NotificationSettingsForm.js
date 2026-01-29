@@ -393,10 +393,9 @@ export default function NotificationSettingsForm({
         </Text>
         <Button
           type="submit"
-          variant="primary"
+          variant="ember"
           size="md"
           disabled={!isDirty || isSaving}
-          liquid
         >
           {isSaving ? 'Saving...' : 'Save Preferences'}
         </Button>

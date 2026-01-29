@@ -116,7 +116,7 @@ export default function DeviceManagementPage() {
           <Text variant="secondary" className="mb-6">
             {error}
           </Text>
-          <Button variant="secondary" onClick={fetchDevices}>
+          <Button variant="subtle" onClick={fetchDevices}>
             Riprova
           </Button>
         </Card>

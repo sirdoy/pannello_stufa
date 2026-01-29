@@ -188,8 +188,7 @@ export default function NotificationPermissionButton({ onSuccess, onError }) {
 
       <div className="flex flex-col sm:flex-row gap-4 items-start">
         <Button
-          liquid
-          variant="primary"
+          variant="ember"
           size="md"
           onClick={handleRequestPermission}
           disabled={isLoading || !user}

@@ -100,7 +100,7 @@ export default function MaintenancePage() {
       <div className="min-h-screen flex items-center justify-center">
         <Card liquid className="p-8 text-center">
           <Text variant="tertiary" className="mb-4">Accesso non autorizzato</Text>
-          <Button liquid href="/auth/login" variant="primary">Accedi</Button>
+          <Button href="/auth/login" variant="ember">Accedi</Button>
         </Card>
       </div>
     );
@@ -144,7 +144,7 @@ export default function MaintenancePage() {
 
           {/* Reset Button */}
           <div className="mt-4 pt-4 border-t border-slate-700 [html:not(.dark)_&]:border-slate-200">
-            <Button liquid
+            <Button
               variant="danger"
               onClick={handleResetRequest}
               disabled={isResetting || (maintenanceData?.currentHours || 0) === 0}
@@ -214,8 +214,8 @@ export default function MaintenancePage() {
               </div>
             </div>
 
-            <Button liquid
-              variant="primary"
+            <Button
+              variant="ember"
               onClick={handleSave}
               disabled={isSaving || targetHours === maintenanceData?.targetHours}
               className="w-full"

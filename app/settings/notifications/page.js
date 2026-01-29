@@ -254,8 +254,7 @@ export default function NotificationsSettingsPage() {
             Devi effettuare il login per gestire le notifiche
           </Text>
           <Button
-            liquid
-            variant="primary"
+            variant="ember"
             onClick={() => (window.location.href = '/auth/login')}
           >
             Accedi
@@ -332,8 +331,7 @@ export default function NotificationsSettingsPage() {
             {/* Test dispositivo corrente */}
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
               <Button
-                liquid
-                variant={testResult === 'success' ? 'success' : 'accent'}
+                variant={testResult === 'success' ? 'success' : 'ember'}
                 size="md"
                 onClick={() => handleTestNotification(false)}
                 disabled={isSendingTest || !isCurrentDeviceRegistered}
@@ -373,8 +371,7 @@ export default function NotificationsSettingsPage() {
             {/* Test tutti i dispositivi */}
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center border-t border-ash-700 pt-4">
               <Button
-                liquid
-                variant="secondary"
+                variant="subtle"
                 size="md"
                 onClick={() => handleTestNotification(true)}
                 disabled={isSendingTest || devices.length === 0}
@@ -403,8 +400,7 @@ export default function NotificationsSettingsPage() {
                   Dispositivo non registrato
                 </Text>
                 <Button
-                  liquid
-                  variant="primary"
+                  variant="ember"
                   size="sm"
                   onClick={handleReactivate}
                   disabled={isReactivating}
@@ -433,7 +429,6 @@ export default function NotificationsSettingsPage() {
             </div>
             {devices.length > 0 && (
               <Button
-                liquid
                 variant="ghost"
                 size="sm"
                 onClick={handleDeactivate}
@@ -472,8 +467,7 @@ export default function NotificationsSettingsPage() {
               {/* Register button */}
               <div className="flex flex-col gap-3">
                 <Button
-                  liquid
-                  variant="primary"
+                  variant="ember"
                   size="md"
                   onClick={handleReactivate}
                   disabled={isReactivating}
@@ -560,8 +554,7 @@ export default function NotificationsSettingsPage() {
               <div className="pt-2 border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                   <Button
-                    liquid
-                    variant={isCurrentDeviceRegistered ? 'ghost' : 'primary'}
+                    variant={isCurrentDeviceRegistered ? 'ghost' : 'ember'}
                     size="sm"
                     onClick={handleReactivate}
                     disabled={isReactivating}
@@ -605,7 +598,6 @@ export default function NotificationsSettingsPage() {
             </div>
           </div>
           <Button
-            liquid
             variant="ghost"
             size="sm"
             onClick={() => (window.location.href = '/settings/notifications/history')}
@@ -628,7 +620,6 @@ export default function NotificationsSettingsPage() {
             </div>
           </div>
           <Button
-            liquid
             variant="ghost"
             size="sm"
             onClick={() => (window.location.href = '/settings/notifications/devices')}
@@ -703,7 +694,6 @@ export default function NotificationsSettingsPage() {
             </div>
           </div>
           <Button
-            liquid
             variant="ghost"
             size="sm"
             onClick={() => (window.location.href = '/debug/logs')}

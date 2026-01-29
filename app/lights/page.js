@@ -565,7 +565,7 @@ export default function LightsPage() {
                 className="mb-4"
               />
               <div className="flex flex-col sm:flex-row gap-3 mb-4">
-                <Button variant="primary" onClick={handleStartRemotePairing}>
+                <Button variant="ember" onClick={handleStartRemotePairing}>
                   👆 Completa Configurazione
                 </Button>
                 <Button variant="ghost" onClick={handleDisconnect}>
@@ -589,7 +589,7 @@ export default function LightsPage() {
                 className="mb-4"
               />
               <div className="flex gap-3">
-                <Button variant="primary" onClick={handleExecuteRemotePairing}>
+                <Button variant="ember" onClick={handleExecuteRemotePairing}>
                   ✓ Ho premuto il pulsante
                 </Button>
                 <Button variant="ghost" onClick={handleCancelPairing}>
@@ -658,7 +658,7 @@ export default function LightsPage() {
                 className="mb-4"
               />
               <div className="flex gap-3">
-                <Button variant="primary" onClick={handleConfirmButtonPressed}>
+                <Button variant="ember" onClick={handleConfirmButtonPressed}>
                   ✓ Avvia Pairing
                 </Button>
                 {remoteApiAvailable && (
@@ -706,7 +706,7 @@ export default function LightsPage() {
               </Text>
 
               <div className="flex flex-col sm:flex-row gap-3 mb-6">
-                <Button variant="primary" onClick={handleStartPairing}>
+                <Button variant="ember" onClick={handleStartPairing}>
                   📡 Connetti Locale
                 </Button>
                 {remoteApiAvailable && (

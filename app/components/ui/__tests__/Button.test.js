@@ -1,130 +1,200 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import Button from '../Button';
+import { axe } from 'jest-axe';
+import Button, { buttonVariants, ButtonIcon, ButtonGroup } from '../Button';
 
 describe('Button Component', () => {
-  describe('Rendering', () => {
-    test('renders button with children', () => {
-      render(<Button>Click me</Button>);
-      expect(screen.getByRole('button', { name: /click me/i })).toBeInTheDocument();
+  describe('Accessibility', () => {
+    test('ember variant has no accessibility violations', async () => {
+      const { container } = render(<Button variant="ember">Ember</Button>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
     });
 
-    test('renders with icon', () => {
-      render(<Button icon="🔥">Fire</Button>);
-      const button = screen.getByRole('button');
-      expect(button).toHaveTextContent('🔥');
-      expect(button).toHaveTextContent('Fire');
+    test('subtle variant has no accessibility violations', async () => {
+      const { container } = render(<Button variant="subtle">Subtle</Button>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
     });
 
-    test('applies custom className', () => {
-      render(<Button className="custom-class">Test</Button>);
-      const button = screen.getByRole('button');
-      expect(button).toHaveClass('custom-class');
+    test('ghost variant has no accessibility violations', async () => {
+      const { container } = render(<Button variant="ghost">Ghost</Button>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test('success variant has no accessibility violations', async () => {
+      const { container } = render(<Button variant="success">Success</Button>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test('danger variant has no accessibility violations', async () => {
+      const { container } = render(<Button variant="danger">Danger</Button>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test('outline variant has no accessibility violations', async () => {
+      const { container } = render(<Button variant="outline">Outline</Button>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test('disabled state has no accessibility violations', async () => {
+      const { container } = render(<Button disabled>Disabled</Button>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test('loading state has no accessibility violations', async () => {
+      const { container } = render(<Button loading>Loading</Button>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test('iconOnly with aria-label has no accessibility violations', async () => {
+      const { container } = render(
+        <Button iconOnly icon="X" aria-label="Close" />
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
     });
   });
 
-  describe('Variants', () => {
-    test('renders primary variant by default', () => {
-      render(<Button>Primary</Button>);
+  describe('CVA Variants', () => {
+    test('default variant is ember with gradient classes', () => {
+      render(<Button>Default</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-ember-500');
+      expect(button).toHaveClass('bg-gradient-to-br');
+      expect(button).toHaveClass('from-ember-500');
     });
 
-    test('renders secondary variant', () => {
-      render(<Button variant="secondary">Secondary</Button>);
+    test('ember variant renders with gradient', () => {
+      render(<Button variant="ember">Ember</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-slate-200');
+      expect(button).toHaveClass('bg-gradient-to-br');
+      expect(button).toHaveClass('from-ember-500');
+      expect(button).toHaveClass('via-ember-600');
+      expect(button).toHaveClass('to-flame-600');
     });
 
-    test('renders success variant', () => {
-      render(<Button variant="success">Success</Button>);
+    test('subtle variant renders with glass effect', () => {
+      render(<Button variant="subtle">Subtle</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-sage-600');
+      expect(button).toHaveClass('bg-white/[0.06]');
+      expect(button).toHaveClass('border');
     });
 
-    test('renders danger variant', () => {
-      render(<Button variant="danger">Danger</Button>);
-      const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-ember-500');
-    });
-
-    test('renders accent variant', () => {
-      render(<Button variant="accent">Accent</Button>);
-      const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-flame-600');
-    });
-
-    test('renders outline variant', () => {
-      render(<Button variant="outline">Outline</Button>);
-      const button = screen.getByRole('button');
-      expect(button).toHaveClass('border-2');
-      expect(button).toHaveClass('border-slate-300');
-    });
-
-    test('renders ghost variant', () => {
+    test('ghost variant renders transparent', () => {
       render(<Button variant="ghost">Ghost</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('hover:bg-slate-100');
+      expect(button).toHaveClass('bg-transparent');
+      expect(button).toHaveClass('text-slate-300');
     });
 
-    test('renders glass variant', () => {
-      render(<Button variant="glass">Glass</Button>);
+    test('success variant renders with sage gradient', () => {
+      render(<Button variant="success">Success</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-white/70');
-      expect(button).toHaveClass('backdrop-blur-xl');
+      expect(button).toHaveClass('bg-gradient-to-br');
+      expect(button).toHaveClass('from-sage-500');
     });
-  });
 
-  describe('Sizes', () => {
-    test('renders medium size by default', () => {
-      render(<Button>Medium</Button>);
+    test('danger variant renders with danger gradient', () => {
+      render(<Button variant="danger">Danger</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('px-6');
-      expect(button).toHaveClass('py-3');
-      expect(button).toHaveClass('text-base');
+      expect(button).toHaveClass('bg-gradient-to-br');
+      expect(button).toHaveClass('from-danger-500');
     });
 
-    test('renders small size', () => {
+    test('outline variant renders with border', () => {
+      render(<Button variant="outline">Outline</Button>);
+      const button = screen.getByRole('button');
+      expect(button).toHaveClass('bg-transparent');
+      expect(button).toHaveClass('border-2');
+      expect(button).toHaveClass('border-ember-500/40');
+    });
+
+    test('size sm applies correct min-h class', () => {
       render(<Button size="sm">Small</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('px-3');
-      expect(button).toHaveClass('py-2');
+      expect(button).toHaveClass('min-h-[44px]');
       expect(button).toHaveClass('text-sm');
     });
 
-    test('renders large size', () => {
+    test('size md applies correct min-h class', () => {
+      render(<Button size="md">Medium</Button>);
+      const button = screen.getByRole('button');
+      expect(button).toHaveClass('min-h-[48px]');
+      expect(button).toHaveClass('text-base');
+    });
+
+    test('size lg applies correct min-h class', () => {
       render(<Button size="lg">Large</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('px-6');
-      expect(button).toHaveClass('py-4');
+      expect(button).toHaveClass('min-h-[56px]');
       expect(button).toHaveClass('text-lg');
+    });
+
+    test('fullWidth applies w-full class', () => {
+      render(<Button fullWidth>Full Width</Button>);
+      const button = screen.getByRole('button');
+      expect(button).toHaveClass('w-full');
+    });
+
+    test('iconOnly applies rounded-full class', () => {
+      render(
+        <Button iconOnly icon="X" aria-label="Close">
+          Close
+        </Button>
+      );
+      const button = screen.getByRole('button');
+      expect(button).toHaveClass('rounded-full');
+    });
+  });
+
+  describe('Compound Variants', () => {
+    test('iconOnly + size sm has min-w-[44px]', () => {
+      render(<Button iconOnly size="sm" icon="X" aria-label="Close" />);
+      const button = screen.getByRole('button');
+      expect(button).toHaveClass('min-w-[44px]');
+      expect(button).toHaveClass('p-2.5');
+    });
+
+    test('iconOnly + size md has min-w-[48px]', () => {
+      render(<Button iconOnly size="md" icon="X" aria-label="Close" />);
+      const button = screen.getByRole('button');
+      expect(button).toHaveClass('min-w-[48px]');
+      expect(button).toHaveClass('p-3');
+    });
+
+    test('iconOnly + size lg has min-w-[56px]', () => {
+      render(<Button iconOnly size="lg" icon="X" aria-label="Close" />);
+      const button = screen.getByRole('button');
+      expect(button).toHaveClass('min-w-[56px]');
+      expect(button).toHaveClass('p-4');
     });
   });
 
   describe('States', () => {
-    test('is enabled by default', () => {
-      render(<Button>Enabled</Button>);
-      const button = screen.getByRole('button');
-      expect(button).not.toBeDisabled();
-    });
-
-    test('can be disabled', () => {
+    test('disabled renders with opacity class', () => {
       render(<Button disabled>Disabled</Button>);
       const button = screen.getByRole('button');
       expect(button).toBeDisabled();
-      expect(button).toHaveClass('bg-slate-300');
-      expect(button).toHaveClass('cursor-not-allowed');
+      expect(button).toHaveClass('disabled:opacity-50');
     });
 
-    test('is disabled when loading', () => {
+    test('loading shows spinner and disables button', () => {
       render(<Button loading>Loading</Button>);
       const button = screen.getByRole('button');
       expect(button).toBeDisabled();
+      // Spinner SVG should be present
+      expect(button.querySelector('svg.animate-spin')).toBeInTheDocument();
+      // Content should be invisible
+      expect(button.querySelector('.invisible')).toBeInTheDocument();
     });
-  });
 
-  describe('Interactions', () => {
-    test('handles click events', async () => {
+    test('click handlers fire correctly', async () => {
       const handleClick = jest.fn();
       const user = userEvent.setup();
 
@@ -135,7 +205,7 @@ describe('Button Component', () => {
       expect(handleClick).toHaveBeenCalledTimes(1);
     });
 
-    test('does not trigger click when disabled', async () => {
+    test('click handlers do not fire when disabled', async () => {
       const handleClick = jest.fn();
       const user = userEvent.setup();
 
@@ -150,7 +220,7 @@ describe('Button Component', () => {
       expect(handleClick).not.toHaveBeenCalled();
     });
 
-    test('does not trigger click when loading', async () => {
+    test('click handlers do not fire when loading', async () => {
       const handleClick = jest.fn();
       const user = userEvent.setup();
 
@@ -166,21 +236,108 @@ describe('Button Component', () => {
     });
   });
 
-  describe('Accessibility', () => {
-    test('forwards additional props to button element', () => {
+  describe('Focus Ring', () => {
+    test('has focus-visible:ring-2 class', () => {
+      render(<Button>Focus Test</Button>);
+      const button = screen.getByRole('button');
+      expect(button).toHaveClass('focus-visible:ring-2');
+    });
+
+    test('has focus-visible:ring-ember-500/50 class for ember glow', () => {
+      render(<Button>Focus Test</Button>);
+      const button = screen.getByRole('button');
+      expect(button).toHaveClass('focus-visible:ring-ember-500/50');
+    });
+  });
+
+  describe('Namespace Components', () => {
+    test('Button.Icon renders with iconOnly and aria-label', async () => {
+      const { container } = render(
+        <Button.Icon icon="X" aria-label="Close" />
+      );
+      const button = screen.getByRole('button');
+      expect(button).toHaveClass('rounded-full');
+      expect(button).toHaveAttribute('aria-label', 'Close');
+      // A11y check
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test('Button.Icon uses ghost variant by default', () => {
+      render(<Button.Icon icon="X" aria-label="Close" />);
+      const button = screen.getByRole('button');
+      expect(button).toHaveClass('bg-transparent');
+    });
+
+    test('Button.Group renders with role="group"', async () => {
+      const { container } = render(
+        <Button.Group>
+          <Button>One</Button>
+          <Button>Two</Button>
+        </Button.Group>
+      );
+      const group = screen.getByRole('group');
+      expect(group).toBeInTheDocument();
+      expect(group).toHaveClass('flex');
+      expect(group).toHaveClass('gap-2');
+      // A11y check
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+  });
+
+  describe('Icon and Content', () => {
+    test('renders with icon on left by default', () => {
+      render(<Button icon="X">Fire</Button>);
+      const button = screen.getByRole('button');
+      expect(button).toHaveTextContent('X');
+      expect(button).toHaveTextContent('Fire');
+    });
+
+    test('renders with icon on right when iconPosition="right"', () => {
       render(
-        <Button type="submit" aria-label="Submit form">
-          Submit
+        <Button icon="X" iconPosition="right">
+          Fire
         </Button>
       );
       const button = screen.getByRole('button');
-      expect(button).toHaveAttribute('type', 'submit');
-      expect(button).toHaveAttribute('aria-label', 'Submit form');
+      expect(button).toHaveTextContent('X');
+      expect(button).toHaveTextContent('Fire');
     });
 
-    test('maintains semantic button role', () => {
-      render(<Button>Test</Button>);
-      expect(screen.getByRole('button')).toBeInTheDocument();
+    test('applies custom className', () => {
+      render(<Button className="custom-class">Test</Button>);
+      const button = screen.getByRole('button');
+      expect(button).toHaveClass('custom-class');
+    });
+  });
+
+  describe('Ref Forwarding', () => {
+    test('forwards ref to button element', () => {
+      const ref = { current: null };
+      render(<Button ref={ref}>Ref Test</Button>);
+      expect(ref.current).toBeInstanceOf(HTMLButtonElement);
+    });
+
+    test('ButtonIcon forwards ref', () => {
+      const ref = { current: null };
+      render(<Button.Icon ref={ref} icon="X" aria-label="Close" />);
+      expect(ref.current).toBeInstanceOf(HTMLButtonElement);
+    });
+  });
+
+  describe('Exports', () => {
+    test('buttonVariants is exported', () => {
+      expect(buttonVariants).toBeDefined();
+      expect(typeof buttonVariants).toBe('function');
+    });
+
+    test('ButtonIcon is exported', () => {
+      expect(ButtonIcon).toBeDefined();
+    });
+
+    test('ButtonGroup is exported', () => {
+      expect(ButtonGroup).toBeDefined();
     });
   });
 });

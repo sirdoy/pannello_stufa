@@ -88,7 +88,7 @@ export default function ErrorsPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <Card liquid className="p-6">
+      <Card variant="glass" className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <Heading level={1} size="3xl" weight="bold" className="flex items-center gap-3">
@@ -155,7 +155,7 @@ export default function ErrorsPage() {
       {/* Errors List */}
       <div className="space-y-4">
         {paginatedErrors.length === 0 ? (
-          <Card liquid className="p-12 text-center">
+          <Card variant="glass" className="p-12 text-center">
             <span className="text-6xl mb-4 block">✅</span>
             <Heading level={3} size="xl" weight="bold" className="mb-2">
               Nessun errore trovato
@@ -168,7 +168,7 @@ export default function ErrorsPage() {
           </Card>
         ) : (
           paginatedErrors.map((error) => (
-            <Card liquid key={error.id} className="p-6">
+            <Card variant="glass" key={error.id} className="p-6">
               <div className="space-y-4">
                 {/* Error Alert */}
                 <ErrorAlert
@@ -240,7 +240,7 @@ export default function ErrorsPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <Card liquid className="p-4">
+        <Card variant="glass" className="p-4">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

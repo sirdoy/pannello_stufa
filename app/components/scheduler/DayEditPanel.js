@@ -53,7 +53,7 @@ export default function DayEditPanel({
   };
 
   return (
-    <Card liquid className="p-4 md:p-6">
+    <Card variant="glass" className="p-4 md:p-6">
       {/* Header - mobile-first responsive */}
       <div className="flex flex-col gap-4 mb-6 md:flex-row md:items-center md:justify-between">
         {/* Left: Title + Info */}

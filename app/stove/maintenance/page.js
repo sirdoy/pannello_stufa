@@ -98,7 +98,7 @@ export default function MaintenancePage() {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Card liquid className="p-8 text-center">
+        <Card variant="glass" className="p-8 text-center">
           <Text variant="tertiary" className="mb-4">Accesso non autorizzato</Text>
           <Button href="/auth/login" variant="ember">Accedi</Button>
         </Card>
@@ -116,7 +116,7 @@ export default function MaintenancePage() {
         </div>
 
         {/* Current Status Card */}
-        <Card liquid className="p-6 sm:p-8">
+        <Card variant="glass" className="p-6 sm:p-8">
           <Heading level={2} size="xl" weight="semibold" className="mb-4">📊 Stato Attuale</Heading>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -170,7 +170,7 @@ export default function MaintenancePage() {
         </Card>
 
         {/* Configuration Card */}
-        <Card liquid className="p-6 sm:p-8">
+        <Card variant="glass" className="p-6 sm:p-8">
           <Heading level={2} size="xl" weight="semibold" className="mb-4">⚙️ Configurazione</Heading>
 
           <div className="space-y-4">
@@ -236,7 +236,7 @@ export default function MaintenancePage() {
         </Card>
 
         {/* Info Card */}
-        <Card liquid className="p-6 sm:p-8 bg-ocean-50/50 [html:not(.dark)_&]:bg-ocean-50/50 bg-ocean-900/10 border border-ocean-200 [html:not(.dark)_&]:border-ocean-200 border-ocean-800">
+        <Card variant="glass" className="p-6 sm:p-8 bg-ocean-50/50 [html:not(.dark)_&]:bg-ocean-50/50 bg-ocean-900/10 border border-ocean-200 [html:not(.dark)_&]:border-ocean-200 border-ocean-800">
           <Heading level={3} weight="semibold" variant="ocean" className="mb-2">ℹ️ Come Funziona</Heading>
           <ul className="space-y-1">
             <Text as="li" variant="ocean" size="sm">• Il contatore aumenta automaticamente ogni minuto quando la stufa è in funzione (status WORK)</Text>

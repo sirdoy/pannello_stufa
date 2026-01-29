@@ -321,7 +321,7 @@ export default function StoveSyncPanel({ onSyncComplete }) {
 
   if (loading) {
     return (
-      <Card liquid className="p-6">
+      <Card variant="glass" className="p-6">
         <Skeleton className="h-64" />
       </Card>
     );
@@ -333,7 +333,7 @@ export default function StoveSyncPanel({ onSyncComplete }) {
     .join(', ');
 
   return (
-    <Card liquid className="p-6">
+    <Card variant="glass" className="p-6">
       {/* Header */}
       <div className="mb-6">
         <Heading level={2} size="xl" className="flex items-center gap-2 mb-2">

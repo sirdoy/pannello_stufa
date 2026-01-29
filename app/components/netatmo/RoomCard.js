@@ -170,7 +170,7 @@ export default function RoomCard({ room, onRefresh }) {
   const stoveSync = room.stoveSync || false;
 
   return (
-    <Card liquid className="p-5 sm:p-6 transition-all duration-300 hover:shadow-liquid-lg relative overflow-visible">
+    <Card variant="glass" className="p-5 sm:p-6 transition-all duration-300 hover:shadow-liquid-lg relative overflow-visible">
       {/* Floating badges container */}
       <div className="absolute -top-2 right-2 z-20 flex items-center gap-2">
         {/* Battery warning badge */}

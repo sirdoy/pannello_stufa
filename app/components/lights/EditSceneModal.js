@@ -207,7 +207,7 @@ export default function EditSceneModal({
       onClose={onCancel}
       maxWidth="max-w-3xl"
     >
-      <Card liquid className="animate-scale-in-center p-6 sm:p-8">
+      <Card variant="glass" className="animate-scale-in-center p-6 sm:p-8">
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div>

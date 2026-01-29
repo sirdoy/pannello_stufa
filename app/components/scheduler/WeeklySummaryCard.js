@@ -21,7 +21,7 @@ export default function WeeklySummaryCard({ schedule }) {
   }));
 
   return (
-    <Card liquid className="p-6">
+    <Card variant="glass" className="p-6">
       <Heading level={2} size="lg" weight="semibold" className="mb-4 flex items-center gap-2">
         <span>📊</span>
         <span>Riepilogo Settimanale</span>

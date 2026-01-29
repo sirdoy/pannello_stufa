@@ -104,7 +104,7 @@ function CategorySection({ categoryId, config, preferences, onSave, isSaving }) 
   const subFields = config.fields.filter(f => !f.isMaster);
 
   return (
-    <Card liquid className="p-6">
+    <Card variant="glass" className="p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
           <Heading level={3} size="md" className="flex items-center gap-2">
@@ -221,7 +221,7 @@ export default function NotificationPreferencesPanel() {
   // Loading state
   if (userLoading || isLoading) {
     return (
-      <Card liquid className="p-6">
+      <Card variant="glass" className="p-6">
         <div className="space-y-4">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-24 w-full" />

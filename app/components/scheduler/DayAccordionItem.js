@@ -77,7 +77,7 @@ export default function DayAccordionItem({
   };
 
   return (
-    <Card liquid className="overflow-hidden">
+    <Card variant="glass" className="overflow-hidden">
       {/* Header - sempre visibile */}
       <div className="w-full">
         <button

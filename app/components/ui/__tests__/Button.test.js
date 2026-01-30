@@ -250,6 +250,143 @@ describe('Button Component', () => {
     });
   });
 
+  describe('Keyboard Navigation', () => {
+    test('can be focused via Tab key', async () => {
+      const user = userEvent.setup();
+      render(<Button>Focusable</Button>);
+
+      const button = screen.getByRole('button');
+      await user.tab();
+      expect(button).toHaveFocus();
+    });
+
+    test('activates with Enter key', async () => {
+      const handleClick = jest.fn();
+      const user = userEvent.setup();
+
+      render(<Button onClick={handleClick}>Enter Test</Button>);
+      const button = screen.getByRole('button');
+
+      button.focus();
+      expect(button).toHaveFocus();
+
+      await user.keyboard('{Enter}');
+      expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+
+    test('activates with Space key', async () => {
+      const handleClick = jest.fn();
+      const user = userEvent.setup();
+
+      render(<Button onClick={handleClick}>Space Test</Button>);
+      const button = screen.getByRole('button');
+
+      button.focus();
+      expect(button).toHaveFocus();
+
+      await user.keyboard(' ');
+      expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+
+    test('Tab navigates between multiple buttons', async () => {
+      const user = userEvent.setup();
+      render(
+        <>
+          <Button>First</Button>
+          <Button>Second</Button>
+          <Button>Third</Button>
+        </>
+      );
+
+      const buttons = screen.getAllByRole('button');
+
+      await user.tab();
+      expect(buttons[0]).toHaveFocus();
+
+      await user.tab();
+      expect(buttons[1]).toHaveFocus();
+
+      await user.tab();
+      expect(buttons[2]).toHaveFocus();
+    });
+
+    test('disabled button is skipped in tab order', async () => {
+      const user = userEvent.setup();
+      render(
+        <>
+          <Button>First</Button>
+          <Button disabled>Disabled</Button>
+          <Button>Third</Button>
+        </>
+      );
+
+      const buttons = screen.getAllByRole('button');
+
+      await user.tab();
+      expect(buttons[0]).toHaveFocus();
+
+      await user.tab();
+      // Should skip disabled button and go to third
+      expect(buttons[2]).toHaveFocus();
+    });
+
+    test('Enter does not activate disabled button', async () => {
+      const handleClick = jest.fn();
+      const user = userEvent.setup();
+
+      render(
+        <Button onClick={handleClick} disabled>
+          Disabled
+        </Button>
+      );
+
+      const button = screen.getByRole('button');
+      // Force focus for testing (disabled buttons don't receive focus naturally)
+      button.focus();
+
+      await user.keyboard('{Enter}');
+      expect(handleClick).not.toHaveBeenCalled();
+    });
+
+    test('Space does not activate disabled button', async () => {
+      const handleClick = jest.fn();
+      const user = userEvent.setup();
+
+      render(
+        <Button onClick={handleClick} disabled>
+          Disabled
+        </Button>
+      );
+
+      const button = screen.getByRole('button');
+      // Force focus for testing (disabled buttons don't receive focus naturally)
+      button.focus();
+
+      await user.keyboard(' ');
+      expect(handleClick).not.toHaveBeenCalled();
+    });
+
+    test('loading button is skipped in tab order', async () => {
+      const user = userEvent.setup();
+      render(
+        <>
+          <Button>First</Button>
+          <Button loading>Loading</Button>
+          <Button>Third</Button>
+        </>
+      );
+
+      const buttons = screen.getAllByRole('button');
+
+      await user.tab();
+      expect(buttons[0]).toHaveFocus();
+
+      await user.tab();
+      // Should skip loading button (which is disabled) and go to third
+      expect(buttons[2]).toHaveFocus();
+    });
+  });
+
   describe('Namespace Components', () => {
     test('Button.Icon renders with iconOnly and aria-label', async () => {
       const { container } = render(

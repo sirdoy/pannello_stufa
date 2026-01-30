@@ -148,6 +148,9 @@ Recent decisions affecting current work:
 - **16-10: Badge variant='sage' size='sm' for device active indicator**
 - **16-10: Banner variant='info' compact for theme saving status**
 - **16-10: Theme selection buttons are styled divs (radio-button pattern, not action buttons)**
+- **16-08: PageLayout wrapper for design system showcase**
+- **16-08: SectionShowcase helper renamed to avoid Section import conflict**
+- **16-08: Tooltip.Provider wrapper required for tooltip context in demos**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -212,7 +215,7 @@ None. Phase 16 in progress.
 
 ## Session Continuity
 
-Last session: 2026-01-30 09:13 UTC
-Stopped at: Completed 16-10-PLAN.md (Settings devices/theme pages migration)
+Last session: 2026-01-30 08:12 UTC
+Stopped at: Completed 16-08-PLAN.md (Design system page migration)
 Resume file: None
-Next step: Complete Phase 16 with 16-11 (final page migrations)
+Next step: Continue Phase 16 (16-09 next)

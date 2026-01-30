@@ -86,7 +86,7 @@ describe('Tooltip', () => {
     });
   });
 
-  describe('Keyboard Interaction', () => {
+  describe('Keyboard Navigation', () => {
     it('shows content on focus', async () => {
       const user = userEvent.setup();
 
@@ -142,6 +142,78 @@ describe('Tooltip', () => {
       await waitFor(
         () => {
           expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+        },
+        { timeout: 1000 }
+      );
+    });
+
+    it('trigger is focusable via keyboard (userEvent.tab)', async () => {
+      const user = userEvent.setup();
+
+      renderWithProvider(
+        <>
+          <button>Before</button>
+          <Tooltip content="Tab test tooltip">
+            <button>Tooltip trigger</button>
+          </Tooltip>
+          <button>After</button>
+        </>
+      );
+
+      // Tab to first button
+      await user.tab();
+      expect(screen.getByRole('button', { name: 'Before' })).toHaveFocus();
+
+      // Tab to tooltip trigger
+      await user.tab();
+      expect(screen.getByRole('button', { name: 'Tooltip trigger' })).toHaveFocus();
+
+      // Tooltip should appear
+      await waitFor(
+        () => {
+          expect(screen.getByRole('tooltip')).toBeInTheDocument();
+        },
+        { timeout: 1000 }
+      );
+
+      // Tab to next button
+      await user.tab();
+      expect(screen.getByRole('button', { name: 'After' })).toHaveFocus();
+
+      // Tooltip should disappear
+      await waitFor(
+        () => {
+          expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+        },
+        { timeout: 1000 }
+      );
+    });
+
+    it('Shift+Tab reverse navigates to trigger', async () => {
+      const user = userEvent.setup();
+
+      renderWithProvider(
+        <>
+          <Tooltip content="Reverse tab tooltip">
+            <button>Tooltip trigger</button>
+          </Tooltip>
+          <button>After button</button>
+        </>
+      );
+
+      // Tab to trigger, then to after button
+      await user.tab();
+      await user.tab();
+      expect(screen.getByRole('button', { name: 'After button' })).toHaveFocus();
+
+      // Shift+Tab back to tooltip trigger
+      await user.keyboard('{Shift>}{Tab}{/Shift}');
+      expect(screen.getByRole('button', { name: 'Tooltip trigger' })).toHaveFocus();
+
+      // Tooltip should appear on focus
+      await waitFor(
+        () => {
+          expect(screen.getByRole('tooltip')).toBeInTheDocument();
         },
         { timeout: 1000 }
       );

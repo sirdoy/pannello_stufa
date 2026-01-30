@@ -272,6 +272,64 @@ describe('Modal Component', () => {
         expect(screen.getByTestId('btn-first')).toHaveFocus();
       });
     });
+
+    test('Shift+Tab reverse cycles through focusable elements (Focus Trap)', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <Modal isOpen={true} onClose={jest.fn()}>
+          <Modal.Title>Focus Trap Test</Modal.Title>
+          <button data-testid="btn-first">First</button>
+          <button data-testid="btn-second">Second</button>
+          <button data-testid="btn-third">Third</button>
+        </Modal>
+      );
+
+      // Wait for initial focus on first button
+      await waitFor(() => {
+        expect(screen.getByTestId('btn-first')).toHaveFocus();
+      });
+
+      // Shift+Tab should wrap to last element (focus trap in reverse)
+      await user.keyboard('{Shift>}{Tab}{/Shift}');
+      await waitFor(() => {
+        expect(screen.getByTestId('btn-third')).toHaveFocus();
+      });
+    });
+
+    test('Enter key activates close button', async () => {
+      const handleClose = jest.fn();
+      const user = userEvent.setup();
+
+      render(<TestModal onClose={handleClose} />);
+
+      // Wait for close button to be focused (first focusable element)
+      await waitFor(() => {
+        expect(screen.getByTestId('modal-close-x')).toHaveFocus();
+      });
+
+      // Press Enter to activate the button
+      await user.keyboard('{Enter}');
+
+      expect(handleClose).toHaveBeenCalledTimes(1);
+    });
+
+    test('Space key activates close button', async () => {
+      const handleClose = jest.fn();
+      const user = userEvent.setup();
+
+      render(<TestModal onClose={handleClose} />);
+
+      // Wait for close button to be focused
+      await waitFor(() => {
+        expect(screen.getByTestId('modal-close-x')).toHaveFocus();
+      });
+
+      // Press Space to activate the button
+      await user.keyboard(' ');
+
+      expect(handleClose).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('Mobile Bottom Sheet (CSS Classes)', () => {

@@ -367,7 +367,7 @@ export default function NotificationsSettingsPage() {
             </div>
 
             {/* Test tutti i dispositivi */}
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center border-t border-ash-700 pt-4">
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center border-t border-default pt-4">
               <Button
                 variant="subtle"
                 size="md"
@@ -477,10 +477,7 @@ export default function NotificationsSettingsPage() {
               {/* Device list */}
               <div className="space-y-3">
                 {devices.map((device) => (
-                  <div
-                    key={device.id}
-                    className="p-4 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-100 border border-slate-700/50 [html:not(.dark)_&]:border-slate-200 rounded-xl"
-                  >
+                  <Card key={device.id} className="p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
@@ -522,12 +519,12 @@ export default function NotificationsSettingsPage() {
                         )}
                       </div>
                     </div>
-                  </div>
+                  </Card>
                 ))}
               </div>
 
               {/* Register current device button - always visible */}
-              <div className="pt-2 border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
+              <div className="pt-2 border-t border-default">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                   <Button
                     variant={isCurrentDeviceRegistered ? 'ghost' : 'ember'}

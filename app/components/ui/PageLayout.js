@@ -13,8 +13,9 @@ import Text from './Text';
  * padding: none, sm, md, lg
  */
 const pageLayoutVariants = cva(
-  // Base classes
-  'min-h-screen flex flex-col',
+  // Base classes - no min-h-screen since body already handles it
+  // no padding since layout.js main already provides px-4 sm:px-6 lg:px-8
+  'flex flex-col',
   {
     variants: {
       maxWidth: {
@@ -23,7 +24,9 @@ const pageLayoutVariants = cva(
         lg: 'max-w-screen-lg',
         xl: 'max-w-screen-xl',
         '2xl': 'max-w-screen-2xl',
+        '7xl': 'max-w-7xl',
         full: 'max-w-full',
+        none: '', // No max-width constraint
       },
       padding: {
         none: '',
@@ -33,8 +36,8 @@ const pageLayoutVariants = cva(
       },
     },
     defaultVariants: {
-      maxWidth: 'xl',
-      padding: 'md',
+      maxWidth: 'none', // Don't constrain by default - layout.js already does max-w-7xl
+      padding: 'none', // Don't add padding by default - layout.js main already has it
     },
   }
 );

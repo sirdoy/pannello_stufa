@@ -142,9 +142,11 @@ describe('PageLayout', () => {
       expect(container.firstChild).toHaveClass('max-w-screen-lg');
     });
 
-    it('applies xl maxWidth (default)', () => {
+    it('applies no maxWidth by default (layout.js handles it)', () => {
       const { container } = render(<PageLayout>Content</PageLayout>);
-      expect(container.firstChild).toHaveClass('max-w-screen-xl');
+      // Default is 'none' - no max-width constraint since layout.js handles max-w-7xl
+      expect(container.firstChild).not.toHaveClass('max-w-screen-xl');
+      expect(container.firstChild).not.toHaveClass('max-w-screen-lg');
     });
 
     it('applies 2xl maxWidth', () => {
@@ -169,9 +171,10 @@ describe('PageLayout', () => {
       expect(container.firstChild).toHaveClass('px-4');
     });
 
-    it('applies md padding (default)', () => {
+    it('applies no padding by default (layout.js handles it)', () => {
       const { container } = render(<PageLayout>Content</PageLayout>);
-      expect(container.firstChild).toHaveClass('px-4');
+      // Default is 'none' - no padding since layout.js main already provides px-4 sm:px-6 lg:px-8
+      expect(container.firstChild).not.toHaveClass('px-4');
     });
 
     it('applies lg padding', () => {

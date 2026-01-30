@@ -126,4 +126,49 @@ describe('Spinner', () => {
       expect(container.querySelector('[data-testid="spinner-svg"]')).toBeInTheDocument();
     });
   });
+
+  describe('Reduced Motion', () => {
+    /**
+     * Spinner animation behavior with reduced motion:
+     *
+     * The Spinner uses CSS animation (animate-spin) which is automatically
+     * handled by the global CSS rule in globals.css:
+     *
+     * @media (prefers-reduced-motion: reduce) {
+     *   *, ::before, ::after {
+     *     animation-duration: 0.01ms !important;
+     *     animation-iteration-count: 1 !important;
+     *   }
+     * }
+     *
+     * This means:
+     * - Animation class is always present in the DOM
+     * - CSS reduces animation to near-instant when user prefers reduced motion
+     * - Spinner remains visible (essential loading feedback)
+     *
+     * JSDOM cannot test CSS media query computed styles, so we verify:
+     * 1. Animation class is present (CSS will handle reduction)
+     * 2. Component remains visible (essential feedback preserved)
+     */
+
+    it('has animate-spin class for CSS-based animation', () => {
+      const { container } = render(<Spinner />);
+      expect(container.querySelector('svg')).toHaveClass('animate-spin');
+    });
+
+    it('remains visible regardless of motion preference (essential feedback)', () => {
+      // Spinner provides essential loading feedback - must always be visible
+      // Motion preference only affects animation speed, not visibility
+      const { container } = render(<Spinner />);
+      expect(container.querySelector('svg')).toBeInTheDocument();
+      expect(container.querySelector('svg')).toBeVisible();
+    });
+
+    it('maintains role="status" for screen reader announcement', () => {
+      // Essential: Screen readers announce loading state even without animation
+      render(<Spinner label="Loading content" />);
+      const spinner = screen.getByRole('status');
+      expect(spinner).toHaveAttribute('aria-label', 'Loading content');
+    });
+  });
 });

@@ -197,4 +197,64 @@ describe('Progress', () => {
       expect(screen.getByTestId('custom-progress')).toBeInTheDocument();
     });
   });
+
+  describe('Reduced Motion', () => {
+    /**
+     * Progress animation behavior with reduced motion:
+     *
+     * The Progress uses CSS animation (animate-progress-indeterminate) for
+     * indeterminate state, which is handled by globals.css:
+     *
+     * @media (prefers-reduced-motion: reduce) {
+     *   *, ::before, ::after {
+     *     animation-duration: 0.01ms !important;
+     *     animation-iteration-count: 1 !important;
+     *   }
+     * }
+     *
+     * This means:
+     * - Animation class is always present for indeterminate state
+     * - CSS reduces animation to near-instant for reduced motion preference
+     * - Progress bar remains visible (essential loading feedback)
+     * - Determinate state has no animation (just width transition)
+     *
+     * JSDOM cannot test CSS media query computed styles, so we verify:
+     * 1. Animation classes are present when appropriate
+     * 2. Component remains visible (essential feedback preserved)
+     */
+
+    // Helper to get the indicator element
+    const getIndicator = (container) => container.querySelector('[role="progressbar"] > div');
+
+    it('indeterminate state has animation class (CSS handles reduction)', () => {
+      const { container } = render(<Progress />);
+      const indicator = getIndicator(container);
+      expect(indicator).toHaveClass('animate-progress-indeterminate');
+    });
+
+    it('determinate state has no animation class (only width transition)', () => {
+      const { container } = render(<Progress value={50} />);
+      const indicator = getIndicator(container);
+      expect(indicator).not.toHaveClass('animate-progress-indeterminate');
+      // Width transition provides visual feedback without animation
+      expect(indicator).toHaveClass('transition-all');
+    });
+
+    it('remains visible regardless of motion preference (essential feedback)', () => {
+      // Progress provides essential loading feedback - must always be visible
+      const { container } = render(<Progress value={75} />);
+      const progressbar = screen.getByRole('progressbar');
+      expect(progressbar).toBeInTheDocument();
+      expect(progressbar).toBeVisible();
+      expect(getIndicator(container)).toBeInTheDocument();
+    });
+
+    it('indeterminate state remains visible with aria attributes', () => {
+      // Essential: Progress bar visible and announced even without animation
+      render(<Progress indeterminate label="Loading data" />);
+      const progressbar = screen.getByRole('progressbar');
+      expect(progressbar).toHaveAttribute('aria-label', 'Loading data');
+      expect(progressbar).not.toHaveAttribute('aria-valuenow'); // Indeterminate
+    });
+  });
 });

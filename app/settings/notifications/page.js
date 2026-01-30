@@ -24,7 +24,7 @@ import {
 import SettingsLayout from '@/app/components/SettingsLayout';
 import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
-import { Heading, Text } from '@/app/components/ui';
+import { Heading, Text, Banner, Badge } from '@/app/components/ui';
 import NotificationPermissionButton from '@/app/components/NotificationPermissionButton';
 import NotificationPreferencesPanel from '@/app/components/NotificationPreferencesPanel';
 import NotificationSettingsForm from './NotificationSettingsForm';
@@ -298,14 +298,12 @@ export default function NotificationsSettingsPage() {
 
           {/* Success Banner */}
           {saveSuccess && (
-            <Card variant="glass" className="p-4 bg-sage-500/10 [html:not(.dark)_&]:bg-sage-50 border border-sage-500/30 [html:not(.dark)_&]:border-sage-200">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">✅</span>
-                <Text variant="sage" weight="medium">
-                  Preferenze salvate con successo!
-                </Text>
-              </div>
-            </Card>
+            <Banner
+              variant="success"
+              title="Preferenze salvate con successo!"
+              dismissible
+              onDismiss={() => setSaveSuccess(false)}
+            />
           )}
 
           <NotificationSettingsForm
@@ -448,21 +446,11 @@ export default function NotificationsSettingsPage() {
           ) : devices.length === 0 ? (
             <div className="space-y-4">
               {/* Warning: No devices registered */}
-              <div className="p-4 bg-warning-500/10 [html:not(.dark)_&]:bg-warning-50 border border-warning-500/30 [html:not(.dark)_&]:border-warning-200 rounded-xl">
-                <div className="flex items-start gap-3">
-                  <div className="text-2xl">⚠️</div>
-                  <div>
-                    <Text variant="warning" weight="medium" className="mb-1">
-                      Nessun dispositivo registrato
-                    </Text>
-                    <Text variant="secondary" size="sm">
-                      Il permesso notifiche è attivo ma questo dispositivo non è
-                      registrato. Registra il dispositivo per ricevere
-                      notifiche.
-                    </Text>
-                  </div>
-                </div>
-              </div>
+              <Banner
+                variant="warning"
+                title="Nessun dispositivo registrato"
+                description="Il permesso notifiche è attivo ma questo dispositivo non è registrato. Registra il dispositivo per ricevere notifiche."
+              />
 
               {/* Register button */}
               <div className="flex flex-col gap-3">
@@ -478,17 +466,11 @@ export default function NotificationsSettingsPage() {
                 </Button>
 
                 {registrationError && (
-                  <div className="p-3 bg-ember-500/10 [html:not(.dark)_&]:bg-ember-50 border border-ember-500/30 [html:not(.dark)_&]:border-ember-200 rounded-lg">
-                    <Text variant="ember" size="sm">
-                      {registrationError}
-                    </Text>
-                  </div>
+                  <Banner variant="error" description={registrationError} compact />
                 )}
 
                 {testResult === 'success' && (
-                  <Text variant="sage" size="sm">
-                    Dispositivo registrato con successo!
-                  </Text>
+                  <Banner variant="success" title="Dispositivo registrato con successo!" compact />
                 )}
               </div>
             </div>
@@ -573,11 +555,7 @@ export default function NotificationsSettingsPage() {
                 </div>
 
                 {registrationError && (
-                  <div className="mt-3 p-3 bg-ember-500/10 [html:not(.dark)_&]:bg-ember-50 border border-ember-500/30 [html:not(.dark)_&]:border-ember-200 rounded-lg">
-                    <Text variant="ember" size="sm">
-                      {registrationError}
-                    </Text>
-                  </div>
+                  <Banner variant="error" description={registrationError} compact className="mt-3" />
                 )}
               </div>
             </div>

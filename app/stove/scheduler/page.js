@@ -860,12 +860,13 @@ export default function WeeklyScheduler() {
       {/* Toast Notifications */}
       {toast && (
         <Toast
-          message={toast.message}
-          icon={toast.icon}
           variant={toast.variant}
+          open={!!toast}
+          onOpenChange={(open) => !open && setToast(null)}
           duration={3000}
-          onDismiss={() => setToast(null)}
-        />
+        >
+          {toast.message}
+        </Toast>
       )}
     </div>
   );

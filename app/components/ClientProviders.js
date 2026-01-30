@@ -4,6 +4,7 @@ import { Auth0Provider } from '@auth0/nextjs-auth0/client';
 import { VersionProvider } from '@/app/context/VersionContext';
 import { ThemeProvider } from '@/app/context/ThemeContext';
 import { PageTransitionProvider } from '@/app/context/PageTransitionContext';
+import { ToastProvider } from '@/app/components/ui';
 import ThemeScript from './ThemeScript';
 import { OfflineBanner } from '@/app/components/ui';
 import PWAInitializer from './PWAInitializer';
@@ -19,9 +20,11 @@ export default function ClientProviders({ children }) {
       <ThemeProvider>
         <PageTransitionProvider>
           <VersionProvider>
-            <PWAInitializer />
-            <OfflineBanner fixed showPendingCount />
-            {children}
+            <ToastProvider>
+              <PWAInitializer />
+              <OfflineBanner fixed showPendingCount />
+              {children}
+            </ToastProvider>
           </VersionProvider>
         </PageTransitionProvider>
       </ThemeProvider>

@@ -674,6 +674,148 @@ export default function DesignSystemPage() {
           </div>
         </SectionShowcase>
 
+        {/* Layout Components (v3.0+) */}
+        <SectionShowcase title="Layout Components" icon="📐" docs="docs/design-system.md#layout">
+          <div className="space-y-6">
+            {/* PageLayout */}
+            <Card>
+              <CardContent>
+                <Text variant="label" size="xs" className="mb-3">PageLayout</Text>
+                <Text variant="tertiary" size="sm" className="mb-4">
+                  Consistent page structure with header, content, and footer slots.
+                  Props: header (slot), footer (slot), maxWidth (sm|md|lg|xl|2xl|full), padding (none|sm|md|lg), centered
+                </Text>
+                <Banner
+                  variant="info"
+                  description="This page uses PageLayout for consistent structure. See the page wrapper implementation."
+                  compact
+                />
+              </CardContent>
+            </Card>
+
+            {/* Section */}
+            <Card>
+              <CardContent>
+                <Text variant="label" size="xs" className="mb-3">Section</Text>
+                <Text variant="tertiary" size="sm" className="mb-4">
+                  Semantic section wrapper with title, description, and optional action.
+                  Props: title, subtitle, description, spacing (none|sm|md|lg), level (1-6), action, as
+                </Text>
+              </CardContent>
+            </Card>
+            <Section
+              title="Example Section"
+              description="This demonstrates the Section component with title and description"
+              spacing="sm"
+              level={3}
+              action={<Button variant="subtle" size="sm">Action</Button>}
+            >
+              <Card variant="subtle">
+                <CardContent>
+                  <Text variant="secondary" size="sm">
+                    Section provides consistent styling for page sections with gradient accent bar, responsive title/action layout, and configurable spacing.
+                  </Text>
+                </CardContent>
+              </Card>
+            </Section>
+
+            {/* Grid */}
+            <Card>
+              <CardContent>
+                <Text variant="label" size="xs" className="mb-3">Grid</Text>
+                <Text variant="tertiary" size="sm" className="mb-4">
+                  Responsive grid system with predefined column patterns.
+                  Props: cols (1-6), gap (none|sm|md|lg), as (element type)
+                </Text>
+                <div className="mt-4">
+                  <Text variant="tertiary" size="xs" className="mb-2">3-column grid</Text>
+                  <Grid cols={3} gap="sm">
+                    <Card variant="subtle" className="p-4"><Text variant="secondary" size="sm">Item 1</Text></Card>
+                    <Card variant="subtle" className="p-4"><Text variant="secondary" size="sm">Item 2</Text></Card>
+                    <Card variant="subtle" className="p-4"><Text variant="secondary" size="sm">Item 3</Text></Card>
+                  </Grid>
+                </div>
+                <div className="mt-4">
+                  <Text variant="tertiary" size="xs" className="mb-2">2-column grid</Text>
+                  <Grid cols={2} gap="md">
+                    <Card variant="subtle" className="p-4"><Text variant="secondary" size="sm">Left</Text></Card>
+                    <Card variant="subtle" className="p-4"><Text variant="secondary" size="sm">Right</Text></Card>
+                  </Grid>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Tooltip */}
+            <Card>
+              <CardContent>
+                <Text variant="label" size="xs" className="mb-3">Tooltip</Text>
+                <Text variant="tertiary" size="sm" className="mb-4">
+                  Radix-based tooltip with Ember Noir styling. Accessible with keyboard and screen reader support.
+                  Props: content, side (top|right|bottom|left), open, onOpenChange
+                </Text>
+                <Tooltip.Provider>
+                  <div className="flex flex-wrap gap-4">
+                    <Tooltip content="Tooltip on top">
+                      <Button variant="subtle" size="sm">Hover me (top)</Button>
+                    </Tooltip>
+                    <Tooltip content="Tooltip on right" side="right">
+                      <Button variant="subtle" size="sm">Hover me (right)</Button>
+                    </Tooltip>
+                    <Tooltip content="Tooltip on bottom" side="bottom">
+                      <Button variant="subtle" size="sm">Hover me (bottom)</Button>
+                    </Tooltip>
+                    <Tooltip content="Tooltip on left" side="left">
+                      <Button variant="subtle" size="sm">Hover me (left)</Button>
+                    </Tooltip>
+                  </div>
+                </Tooltip.Provider>
+                <Text variant="tertiary" size="xs" className="mt-3">
+                  Features: 400ms show delay, 300ms skip delay, arrow indicator, keyboard accessible
+                </Text>
+              </CardContent>
+            </Card>
+
+            {/* Spinner */}
+            <Card>
+              <CardContent>
+                <Text variant="label" size="xs" className="mb-3">Spinner</Text>
+                <Text variant="tertiary" size="sm" className="mb-4">
+                  Animated loading indicator with accessible SVG. Use inside buttons or as standalone.
+                  Props: size (xs|sm|md|lg|xl), variant (ember|white|current|muted), label
+                </Text>
+                <div className="flex flex-wrap items-center gap-6">
+                  <div className="flex flex-col items-center gap-2">
+                    <Spinner size="xs" />
+                    <Text variant="tertiary" size="xs">xs</Text>
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <Spinner size="sm" />
+                    <Text variant="tertiary" size="xs">sm</Text>
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <Spinner size="md" />
+                    <Text variant="tertiary" size="xs">md</Text>
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <Spinner size="lg" />
+                    <Text variant="tertiary" size="xs">lg</Text>
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <Spinner size="xl" />
+                    <Text variant="tertiary" size="xs">xl</Text>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-4 mt-4">
+                  <Spinner variant="ember" label="Loading" />
+                  <Spinner variant="white" label="Loading" />
+                  <Spinner variant="muted" label="Loading" />
+                  <Text variant="tertiary" size="xs">Variants: ember, white, muted</Text>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </SectionShowcase>
+
         {/* Form Inputs */}
         <SectionShowcase title="Form Inputs" icon="📝" docs="docs/design-system.md#form-inputs">
           <Card>

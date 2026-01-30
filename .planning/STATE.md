@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 18 of 18 (Documentation Polish)
-Plan: 2 of 4 in phase 18
+Plan: 3 of 4 in phase 18
 Status: In progress
-Last activity: 2026-01-30 - Completed 18-02-PLAN.md (Component Documentation Data)
+Last activity: 2026-01-30 - Completed 18-03-PLAN.md (Design System Showcase Integration)
 
-Progress: [███████████████████░] 99.5% (97 plans complete)
+Progress: [███████████████████░] 99.6% (98 plans complete)
 
 ## Performance Metrics
 
@@ -34,9 +34,9 @@ Progress: [███████████████████░] 99.5% (
 **Recent Trend:**
 - Milestone velocity improving (v2.0 shipped in 1/3 the time of v1.0)
 - Plan complexity stable (~5 min average)
-- Phase 18 in progress (2/4 plans)
+- Phase 18 in progress (3/4 plans)
 
-*Updated after 18-02 completion (Component Documentation Data)*
+*Updated after 18-03 completion (Design System Showcase Integration)*
 
 ## Accumulated Context
 
@@ -184,6 +184,10 @@ Recent decisions affecting current work:
 - **18-02: Single file for all component metadata (component-docs.js)**
 - **18-02: Italian default labels documented for ConnectionStatus and HealthIndicator**
 - **18-02: ControlButton keyboard triggers single step only (long-press uses mouse events)**
+- **18-03: PropTable shown for all documented components**
+- **18-03: CodeBlock for components with complex usage patterns**
+- **18-03: AccessibilitySection for interactive components only (not presentational Badge)**
+- **18-03: Documentation integration pattern: PropTable + optional CodeBlock + optional AccessibilitySection**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -276,6 +280,6 @@ None - Phase 18 in progress.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 18-02-PLAN.md (Component Documentation Data)
+Stopped at: Completed 18-03-PLAN.md (Design System Showcase Integration)
 Resume file: None - ready for next plan
-Next step: Execute 18-03-PLAN.md (if exists) or continue phase 18
+Next step: Execute 18-04-PLAN.md (final plan of phase 18)

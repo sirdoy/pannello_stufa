@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 16 of 18 (Page Migration & Application)
-Plan: 6 of 11 in phase 16
+Plan: 10 of 11 in phase 16
 Status: In progress
-Last activity: 2026-01-30 - Completed 16-06-PLAN.md (Schedule page design system migration)
+Last activity: 2026-01-30 - Completed 16-10-PLAN.md (Settings devices/theme pages migration)
 
-Progress: [██████████████████░░] 90.9% (86 plans complete)
+Progress: [███████████████████░] 91.3% (87 plans complete)
 
 ## Performance Metrics
 
@@ -34,9 +34,9 @@ Progress: [██████████████████░░] 90.9% (
 **Recent Trend:**
 - Milestone velocity improving (v2.0 shipped in 1/3 the time of v1.0)
 - Plan complexity stable (~5 min average)
-- Phase 16 in progress (6/11 plans complete)
+- Phase 16 in progress (10/11 plans complete)
 
-*Updated after 16-06 completion (Schedule page migration)*
+*Updated after 16-10 completion (Settings devices/theme pages migration)*
 
 ## Accumulated Context
 
@@ -140,6 +140,9 @@ Recent decisions affecting current work:
 - **16-05: aria-hidden='true' on decorative icons for accessibility**
 - **16-05: role='region' + aria-label + tabIndex={0} for scrollable containers**
 - **16-06: variant='secondary' is invalid Button variant - must use subtle for secondary actions**
+- **16-10: Badge variant='sage' size='sm' for device active indicator**
+- **16-10: Banner variant='info' compact for theme saving status**
+- **16-10: Theme selection buttons are styled divs (radio-button pattern, not action buttons)**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -204,7 +207,7 @@ None. Phase 16 in progress.
 
 ## Session Continuity
 
-Last session: 2026-01-30 08:05 UTC
-Stopped at: Completed 16-06-PLAN.md (Schedule page migration)
+Last session: 2026-01-30 09:13 UTC
+Stopped at: Completed 16-10-PLAN.md (Settings devices/theme pages migration)
 Resume file: None
-Next step: Continue Phase 16 Wave 3 (16-07 Settings, 16-08, etc.)
+Next step: Complete Phase 16 with 16-11 (final page migrations)

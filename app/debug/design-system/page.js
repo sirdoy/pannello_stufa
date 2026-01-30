@@ -890,6 +890,19 @@ export default function DesignSystemPage() {
                       value="Cannot edit"
                     />
                   </div>
+                  <div className="mt-4">
+                    <Text variant="tertiary" size="xs" className="mb-2">Props Reference</Text>
+                    <PropTable props={componentDocs.Input.props} />
+                  </div>
+                  <div className="mt-4">
+                    <Text variant="tertiary" size="xs" className="mb-2">Usage</Text>
+                    <CodeBlock code={componentDocs.Input.codeExample} />
+                  </div>
+                  <AccessibilitySection
+                    keyboard={componentDocs.Input.keyboard}
+                    aria={componentDocs.Input.aria}
+                    screenReader={componentDocs.Input.screenReader}
+                  />
                 </div>
 
                 <CardDivider />
@@ -934,6 +947,19 @@ export default function DesignSystemPage() {
                       onChange={() => {}}
                     />
                   </div>
+                  <div className="mt-4">
+                    <Text variant="tertiary" size="xs" className="mb-2">Props Reference</Text>
+                    <PropTable props={componentDocs.Select.props} />
+                  </div>
+                  <div className="mt-4">
+                    <Text variant="tertiary" size="xs" className="mb-2">Usage</Text>
+                    <CodeBlock code={componentDocs.Select.codeExample} />
+                  </div>
+                  <AccessibilitySection
+                    keyboard={componentDocs.Select.keyboard}
+                    aria={componentDocs.Select.aria}
+                    screenReader={componentDocs.Select.screenReader}
+                  />
                 </div>
 
                 <CardDivider />
@@ -1002,6 +1028,19 @@ export default function DesignSystemPage() {
                       <Text variant="secondary" size="sm">Disabled State</Text>
                     </div>
                   </div>
+                  <div className="mt-4">
+                    <Text variant="tertiary" size="xs" className="mb-2">Props Reference</Text>
+                    <PropTable props={componentDocs.Switch.props} />
+                  </div>
+                  <div className="mt-4">
+                    <Text variant="tertiary" size="xs" className="mb-2">Usage</Text>
+                    <CodeBlock code={componentDocs.Switch.codeExample} />
+                  </div>
+                  <AccessibilitySection
+                    keyboard={componentDocs.Switch.keyboard}
+                    aria={componentDocs.Switch.aria}
+                    screenReader={componentDocs.Switch.screenReader}
+                  />
                 </div>
 
                 <CardDivider />
@@ -1145,6 +1184,19 @@ export default function DesignSystemPage() {
                         <Text variant="secondary" size="sm">Use aria-label when omitting visible label</Text>
                       </div>
                     </div>
+                    <div className="mt-4">
+                      <Text variant="tertiary" size="xs" className="mb-2">Props Reference</Text>
+                      <PropTable props={componentDocs.Checkbox.props} />
+                    </div>
+                    <div className="mt-4">
+                      <Text variant="tertiary" size="xs" className="mb-2">Usage</Text>
+                      <CodeBlock code={componentDocs.Checkbox.codeExample} />
+                    </div>
+                    <AccessibilitySection
+                      keyboard={componentDocs.Checkbox.keyboard}
+                      aria={componentDocs.Checkbox.aria}
+                      screenReader={componentDocs.Checkbox.screenReader}
+                    />
                   </div>
                 </div>
               </div>

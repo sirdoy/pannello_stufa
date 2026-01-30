@@ -5,6 +5,8 @@ import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import Heading from '../../components/ui/Heading';
 import Text from '../../components/ui/Text';
+import PageLayout from '../../components/ui/PageLayout';
+import Banner from '../../components/ui/Banner';
 
 export default function DebugLogsPage() {
   const [logs, setLogs] = useState([]);
@@ -58,7 +60,8 @@ export default function DebugLogsPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <PageLayout maxWidth="4xl">
+      <div className="space-y-6">
       <Card className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -104,9 +107,9 @@ export default function DebugLogsPage() {
         {/* Logs List */}
         <div className="space-y-3">
           {logs.length === 0 ? (
-            <Card className="p-6 bg-slate-50 dark:bg-slate-800/50 text-center">
+            <Card className="p-6 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50 text-center">
               <Text variant="tertiary">
-                Nessun log trovato per la categoria "{category}"
+                Nessun log trovato per la categoria &quot;{category}&quot;
               </Text>
               <Text variant="tertiary" size="sm" className="mt-2">
                 Prova ad attivare le notifiche da mobile per generare log
@@ -118,10 +121,10 @@ export default function DebugLogsPage() {
                 key={log.id || index}
                 className={`p-4 ${
                   log.message.includes('Errore')
-                    ? 'border-l-4 border-l-ember-500 bg-ember-50/30 dark:bg-ember-950/20'
+                    ? 'border-l-4 border-l-ember-500 bg-ember-500/10 [html:not(.dark)_&]:bg-ember-50'
                     : log.message.includes('successo')
-                    ? 'border-l-4 border-l-sage-500 bg-sage-50/30 dark:bg-sage-950/20'
-                    : 'bg-slate-50 dark:bg-slate-800/30'
+                    ? 'border-l-4 border-l-sage-500 bg-sage-500/10 [html:not(.dark)_&]:bg-sage-50'
+                    : 'bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50'
                 }`}
               >
                 <div className="flex justify-between items-start mb-2">
@@ -156,22 +159,18 @@ export default function DebugLogsPage() {
       </Card>
 
       {/* Info */}
-      <Card className="p-6 bg-ocean-50 dark:bg-ocean-950/30 border-2 border-ocean-200 dark:border-ocean-800">
-        <div className="flex items-start gap-3">
-          <span className="text-2xl">💡</span>
-          <div>
-            <Heading level={3} size="lg" variant="ocean" className="mb-2">
-              Come Usare il Debug
-            </Heading>
-            <ul className="space-y-2 ml-4">
-              <li><Text size="sm" variant="secondary">• <strong>Notifiche</strong>: Quando attivi notifiche da mobile, vedrai i log qui</Text></li>
-              <li><Text size="sm" variant="secondary">• <strong>VAPID_KEY</strong>: Verifica che il campo "VAPID_KEY_exists" sia true</Text></li>
-              <li><Text size="sm" variant="secondary">• <strong>Auto-refresh</strong>: Attiva mentre testi da mobile</Text></li>
-              <li><Text size="sm" variant="secondary">• <strong>Errori</strong>: Evidenziati in rosso con dettagli completi</Text></li>
-            </ul>
-          </div>
-        </div>
-      </Card>
+      <Banner
+        variant="info"
+        icon="💡"
+        title="Come Usare il Debug"
+      >
+        <ul className="space-y-2 ml-4 mt-2">
+          <li><Text size="sm" className="text-ocean-300 [html:not(.dark)_&]:text-ocean-700">• <strong>Notifiche</strong>: Quando attivi notifiche da mobile, vedrai i log qui</Text></li>
+          <li><Text size="sm" className="text-ocean-300 [html:not(.dark)_&]:text-ocean-700">• <strong>VAPID_KEY</strong>: Verifica che il campo &quot;VAPID_KEY_exists&quot; sia true</Text></li>
+          <li><Text size="sm" className="text-ocean-300 [html:not(.dark)_&]:text-ocean-700">• <strong>Auto-refresh</strong>: Attiva mentre testi da mobile</Text></li>
+          <li><Text size="sm" className="text-ocean-300 [html:not(.dark)_&]:text-ocean-700">• <strong>Errori</strong>: Evidenziati in rosso con dettagli completi</Text></li>
+        </ul>
+      </Banner>
 
       {/* Back Links */}
       <Card className="p-6">
@@ -190,6 +189,7 @@ export default function DebugLogsPage() {
           </Button>
         </div>
       </Card>
-    </div>
+      </div>
+    </PageLayout>
   );
 }

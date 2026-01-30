@@ -24,16 +24,23 @@ import HealthIndicator from '@/app/components/ui/HealthIndicator';
 import SmartHomeCard from '@/app/components/ui/SmartHomeCard';
 import StatusCard from '@/app/components/ui/StatusCard';
 import ControlButton from '@/app/components/ui/ControlButton';
+import PageLayout from '@/app/components/ui/PageLayout';
+import Section from '@/app/components/ui/Section';
+import Grid from '@/app/components/ui/Grid';
+import Tooltip from '@/app/components/ui/Tooltip';
+import Spinner from '@/app/components/ui/Spinner';
 import { useState } from 'react';
 
 /**
- * Design System Showcase Page - Ember Noir v2.3
+ * Design System Showcase Page - Ember Noir v3.0
  *
  * **IMPORTANT**: This page is the SINGLE SOURCE OF TRUTH for UI components.
  * Always reference this page when creating new pages or components.
  *
  * This page exactly mirrors the documentation in docs/design-system.md.
  * Any changes to the design system MUST be reflected in both places.
+ *
+ * Updated for Phase 16 migration - now uses PageLayout for consistent structure.
  *
  * @see docs/design-system.md for complete technical documentation
  */
@@ -49,25 +56,33 @@ export default function DesignSystemPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 [html:not(.dark)_&]:from-slate-50 [html:not(.dark)_&]:via-white [html:not(.dark)_&]:to-slate-50">
-      <div className="max-w-7xl mx-auto p-6 space-y-8 pb-24">
-        {/* Header */}
-        <div className="text-center space-y-4 mb-12">
-          <Heading level={1} variant="gradient">
-            Ember Noir Design System
-          </Heading>
-          <Text variant="secondary" size="lg" className="max-w-2xl mx-auto">
-            A sophisticated dark-first design system with warm accents. Version 2.3.
-          </Text>
-          <Banner
-            variant="ember"
-            title="Reference Guide"
-            description="This page mirrors docs/design-system.md exactly. Use this as your primary reference when building features."
-            compact
-          />
-        </div>
+      <PageLayout
+        maxWidth="2xl"
+        padding="lg"
+        header={
+          <PageLayout.Header className="text-center pt-6 pb-8">
+            <Heading level={1} variant="gradient">
+              Ember Noir Design System
+            </Heading>
+            <Text variant="secondary" size="lg" className="max-w-2xl mx-auto mt-4">
+              A sophisticated dark-first design system with warm accents. Version 3.0.
+            </Text>
+            <div className="mt-6">
+              <Banner
+                variant="ember"
+                title="Reference Guide"
+                description="This page mirrors docs/design-system.md exactly. Updated for Phase 16 migration. Use this as your primary reference when building features."
+                compact
+              />
+            </div>
+          </PageLayout.Header>
+        }
+        className="pb-24"
+      >
+        <div className="space-y-8">
 
         {/* Typography */}
-        <Section title="Typography" icon="📝" docs="docs/design-system.md#typography">
+        <SectionShowcase title="Typography" icon="📝" docs="docs/design-system.md#typography">
           <Card>
             <CardContent>
               {/* Headings */}
@@ -127,10 +142,10 @@ export default function DesignSystemPage() {
               </div>
             </CardContent>
           </Card>
-        </Section>
+        </SectionShowcase>
 
         {/* Colors */}
-        <Section title="Color Palette" icon="🎨" docs="docs/design-system.md#color-palette">
+        <SectionShowcase title="Color Palette" icon="🎨" docs="docs/design-system.md#color-palette">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <ColorSwatch
               name="Ember (Primary)"
@@ -175,10 +190,10 @@ export default function DesignSystemPage() {
               usage="Backgrounds, text hierarchy, borders"
             />
           </div>
-        </Section>
+        </SectionShowcase>
 
         {/* Buttons */}
-        <Section title="Buttons" icon="🔘" docs="docs/design-system.md#button">
+        <SectionShowcase title="Buttons" icon="🔘" docs="docs/design-system.md#button">
           <Card>
             <CardContent>
               {/* Variants */}
@@ -253,10 +268,10 @@ export default function DesignSystemPage() {
               </div>
             </CardContent>
           </Card>
-        </Section>
+        </SectionShowcase>
 
         {/* Cards */}
-        <Section title="Cards" icon="🃏" docs="docs/design-system.md#card">
+        <SectionShowcase title="Cards" icon="🃏" docs="docs/design-system.md#card">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card variant="default">
               <CardHeader>
@@ -335,10 +350,10 @@ export default function DesignSystemPage() {
               </ButtonGroup>
             </CardFooter>
           </Card>
-        </Section>
+        </SectionShowcase>
 
         {/* Banners */}
-        <Section title="Banners" icon="📢" docs="docs/design-system.md#banner">
+        <SectionShowcase title="Banners" icon="📢" docs="docs/design-system.md#banner">
           <div className="space-y-4">
             <Banner
               variant="info"
@@ -376,10 +391,10 @@ export default function DesignSystemPage() {
               ⚠️ CRITICAL: Always use description prop! Using children directly will NOT apply variant colors.
             </Text>
           </div>
-        </Section>
+        </SectionShowcase>
 
         {/* Status Badges */}
-        <Section title="Status Badges" icon="🏷️" docs="docs/design-system.md#statusbadge">
+        <SectionShowcase title="Status Badges" icon="🏷️" docs="docs/design-system.md#statusbadge">
           <Card>
             <CardContent>
               <div className="space-y-6">
@@ -461,10 +476,10 @@ export default function DesignSystemPage() {
               </div>
             </CardContent>
           </Card>
-        </Section>
+        </SectionShowcase>
 
         {/* Badge Component (v3.0+) */}
-        <Section title="Badge (CVA)" icon="🏷️" docs="docs/design-system.md#badge">
+        <SectionShowcase title="Badge (CVA)" icon="🏷️" docs="docs/design-system.md#badge">
           <Card>
             <CardContent>
               <div className="space-y-6">
@@ -525,10 +540,10 @@ export default function DesignSystemPage() {
               </div>
             </CardContent>
           </Card>
-        </Section>
+        </SectionShowcase>
 
         {/* Smart Home Components (v3.0+) */}
-        <Section title="Smart Home Components" icon="🏠" docs="docs/design-system.md#smart-home">
+        <SectionShowcase title="Smart Home Components" icon="🏠" docs="docs/design-system.md#smart-home">
           <div className="space-y-6">
             {/* ConnectionStatus */}
             <Card>
@@ -657,10 +672,10 @@ export default function DesignSystemPage() {
               </CardContent>
             </Card>
           </div>
-        </Section>
+        </SectionShowcase>
 
         {/* Form Inputs */}
-        <Section title="Form Inputs" icon="📝" docs="docs/design-system.md#form-inputs">
+        <SectionShowcase title="Form Inputs" icon="📝" docs="docs/design-system.md#form-inputs">
           <Card>
             <CardContent>
               <div className="space-y-8">
@@ -965,10 +980,10 @@ export default function DesignSystemPage() {
               </div>
             </CardContent>
           </Card>
-        </Section>
+        </SectionShowcase>
 
         {/* Progress Bar */}
-        <Section title="Progress Bar" icon="📊" docs="docs/design-system.md#progressbar">
+        <SectionShowcase title="Progress Bar" icon="📊" docs="docs/design-system.md#progressbar">
           <Card>
             <CardContent>
               <div className="space-y-6">
@@ -1039,10 +1054,10 @@ export default function DesignSystemPage() {
               </div>
             </CardContent>
           </Card>
-        </Section>
+        </SectionShowcase>
 
         {/* Modal & Overlays */}
-        <Section title="Modal & Overlays" icon="🪟" docs="docs/design-system.md#modal">
+        <SectionShowcase title="Modal & Overlays" icon="🪟" docs="docs/design-system.md#modal">
           <Card>
             <CardContent>
               <div className="space-y-6">
@@ -1153,10 +1168,10 @@ export default function DesignSystemPage() {
               </div>
             </CardContent>
           </Card>
-        </Section>
+        </SectionShowcase>
 
         {/* Toast Notifications */}
-        <Section title="Toast Notifications" icon="🔔" docs="docs/design-system.md#toast">
+        <SectionShowcase title="Toast Notifications" icon="🔔" docs="docs/design-system.md#toast">
           <Card>
             <CardContent>
               <div className="space-y-6">
@@ -1201,10 +1216,10 @@ export default function DesignSystemPage() {
               </div>
             </CardContent>
           </Card>
-        </Section>
+        </SectionShowcase>
 
         {/* Loading States */}
-        <Section title="Loading States" icon="⏳" docs="docs/design-system.md#skeleton">
+        <SectionShowcase title="Loading States" icon="⏳" docs="docs/design-system.md#skeleton">
           <Card>
             <CardContent>
               <div className="space-y-6">
@@ -1244,10 +1259,10 @@ export default function DesignSystemPage() {
               </div>
             </CardContent>
           </Card>
-        </Section>
+        </SectionShowcase>
 
         {/* Empty States */}
-        <Section title="Empty States" icon="📭" docs="docs/design-system.md#emptystate">
+        <SectionShowcase title="Empty States" icon="📭" docs="docs/design-system.md#emptystate">
           <Card>
             <CardContent>
               <div className="space-y-6">
@@ -1289,10 +1304,10 @@ export default function DesignSystemPage() {
               </div>
             </CardContent>
           </Card>
-        </Section>
+        </SectionShowcase>
 
         {/* Dividers */}
-        <Section title="Dividers" icon="➖" docs="docs/design-system.md#divider">
+        <SectionShowcase title="Dividers" icon="➖" docs="docs/design-system.md#divider">
           <Card>
             <CardContent>
               <div className="space-y-8">
@@ -1329,10 +1344,10 @@ export default function DesignSystemPage() {
               </div>
             </CardContent>
           </Card>
-        </Section>
+        </SectionShowcase>
 
         {/* Spacing Scale */}
-        <Section title="Spacing Scale" icon="📏" docs="docs/design-system.md#spacing-scale">
+        <SectionShowcase title="Spacing Scale" icon="📏" docs="docs/design-system.md#spacing-scale">
           <Card>
             <CardContent>
               <div className="space-y-4">
@@ -1358,10 +1373,10 @@ export default function DesignSystemPage() {
               </div>
             </CardContent>
           </Card>
-        </Section>
+        </SectionShowcase>
 
         {/* Border Radius */}
-        <Section title="Border Radius" icon="⭕" docs="docs/design-system.md#border-radius">
+        <SectionShowcase title="Border Radius" icon="⭕" docs="docs/design-system.md#border-radius">
           <Card>
             <CardContent>
               <Text variant="label" size="xs" className="mb-4">Organic, Generous Curves</Text>
@@ -1383,10 +1398,10 @@ export default function DesignSystemPage() {
               </div>
             </CardContent>
           </Card>
-        </Section>
+        </SectionShowcase>
 
         {/* Shadows */}
-        <Section title="Shadow System" icon="🌑" docs="docs/design-system.md#shadows---ember-noir-depth-system">
+        <SectionShowcase title="Shadow System" icon="🌑" docs="docs/design-system.md#shadows---ember-noir-depth-system">
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card className="shadow-card">
@@ -1421,10 +1436,10 @@ export default function DesignSystemPage() {
               </Card>
             </div>
           </div>
-        </Section>
+        </SectionShowcase>
 
         {/* Best Practices */}
-        <Section title="Critical Best Practices" icon="✅" docs="docs/design-system.md#usage-rules">
+        <SectionShowcase title="Critical Best Practices" icon="✅" docs="docs/design-system.md#usage-rules">
           <Card>
             <CardContent>
               <div className="space-y-4">
@@ -1467,7 +1482,7 @@ export default function DesignSystemPage() {
               </div>
             </CardContent>
           </Card>
-        </Section>
+        </SectionShowcase>
 
         {/* Footer */}
         <Card variant="subtle" className="mt-12">
@@ -1478,28 +1493,29 @@ export default function DesignSystemPage() {
                 <Text as="span" variant="ocean" weight="semibold">docs/design-system.md</Text>
               </Text>
               <Text variant="tertiary" size="xs">
-                Ember Noir Design System v2.3 - Complete Dark Mode Unification + Form Inputs
+                Ember Noir Design System v3.0 - Complete Phase 14-16 Components
               </Text>
               <Text variant="tertiary" size="xs">
-                Last Updated: 2026-01-16
+                Last Updated: 2026-01-30
               </Text>
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      </PageLayout>
     </div>
   );
 }
 
 /**
- * Section wrapper with title and optional docs link
+ * Section wrapper with title and optional docs link (showcase-specific variant)
  */
-function Section({ title, icon, docs, children }) {
+function SectionShowcase({ title, icon, docs, children }) {
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-3xl">{icon}</span>
+          <span className="text-3xl" aria-hidden="true">{icon}</span>
           <Heading level={2} variant="gradient">{title}</Heading>
         </div>
         {docs && (

@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { axe } from 'jest-axe';
 import ControlButton, { controlButtonVariants } from '../ControlButton';
 
@@ -379,6 +380,69 @@ describe('ControlButton Component', () => {
       const button = screen.getByRole('button');
       // Uses minus sign (Unicode 2212)
       expect(button.textContent).toMatch(/[−-]/);
+    });
+  });
+
+  describe('Keyboard Navigation', () => {
+    beforeEach(() => {
+      jest.useRealTimers();
+    });
+
+    test('button can receive focus via Tab', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <>
+          <button>Before</button>
+          <ControlButton onChange={() => {}} />
+        </>
+      );
+
+      const beforeButton = screen.getByRole('button', { name: 'Before' });
+      const controlButton = screen.getByRole('button', { name: /incrementa|decrementa/i });
+
+      beforeButton.focus();
+      await user.tab();
+
+      expect(controlButton).toHaveFocus();
+    });
+
+    test('button element is natively focusable', () => {
+      render(<ControlButton onChange={() => {}} />);
+      const button = screen.getByRole('button');
+
+      button.focus();
+
+      expect(button).toHaveFocus();
+    });
+
+    test('disabled button is skipped in tab order', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <>
+          <button>Before</button>
+          <ControlButton disabled onChange={() => {}} />
+          <button>After</button>
+        </>
+      );
+
+      const beforeButton = screen.getByRole('button', { name: 'Before' });
+      const afterButton = screen.getByRole('button', { name: 'After' });
+
+      beforeButton.focus();
+      await user.tab();
+
+      // Should skip disabled ControlButton and focus After
+      expect(afterButton).toHaveFocus();
+    });
+
+    test('button is a native button element with type="button"', () => {
+      render(<ControlButton onChange={() => {}} />);
+      const button = screen.getByRole('button');
+
+      expect(button.tagName).toBe('BUTTON');
+      expect(button).toHaveAttribute('type', 'button');
     });
   });
 

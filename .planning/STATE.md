@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-01-28)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 17 - Accessibility Testing (v3.0 Design System Evolution)
+**Current focus:** Phase 18 - Documentation Polish (v3.0 Design System Evolution)
 
 ## Current Position
 
-Phase: 17 of 18 (Accessibility Testing)
-Plan: 7 of 7 in phase 17 (COMPLETE)
-Status: Phase 17 COMPLETE
-Last activity: 2026-01-30 - Completed 17-07-PLAN.md (Comprehensive Accessibility Test Suite)
+Phase: 18 of 18 (Documentation Polish)
+Plan: 1 of 4 in phase 18
+Status: In progress
+Last activity: 2026-01-30 - Completed 18-01-PLAN.md (Documentation Infrastructure)
 
-Progress: [███████████████████░] 99.0% (95 plans complete)
+Progress: [███████████████████░] 99.0% (96 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 94 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 44 plans)
+- Total plans completed: 96 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 46 plans)
 - Average duration: ~4.5 min per plan
 - Total execution time: ~7.0 hours across 3 milestones
 
@@ -29,14 +29,14 @@ Progress: [███████████████████░] 99.0% (
 |-----------|--------|-------|----------|
 | v1.0 Push Notifications | 5 | 29 | 4 days (2026-01-23 -> 2026-01-26) |
 | v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 -> 2026-01-28) |
-| v3.0 Design System | 8 | 40 | In progress (Phase 17 in progress) |
+| v3.0 Design System | 8 | 50 | In progress (Phase 18 in progress) |
 
 **Recent Trend:**
 - Milestone velocity improving (v2.0 shipped in 1/3 the time of v1.0)
 - Plan complexity stable (~5 min average)
-- Phase 17 COMPLETE (7/7 plans)
+- Phase 18 in progress (1/4 plans)
 
-*Updated after 17-07 completion (Comprehensive Accessibility Test Suite)*
+*Updated after 18-01 completion (Documentation Infrastructure)*
 
 ## Accumulated Context
 
@@ -177,6 +177,10 @@ Recent decisions affecting current work:
 - **17-07: Button.Icon uses aria-label prop (not label prop)**
 - **17-07: Touch target verification via class checks (min-h-[44px], min-w-[44px])**
 - **17-07: Animation reduction verified via CSS globals.css @media prefers-reduced-motion**
+- **18-01: vscDarkPlus theme for syntax highlighting (VS Code Dark+ aesthetic)**
+- **18-01: Copy button uses ghost variant with visual feedback (2s timeout)**
+- **18-01: PropTable required props marked with asterisk**
+- **18-01: ComponentDemo responsive grid: code left/bottom, preview right/top**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -242,6 +246,10 @@ Key architectural patterns from v1.0 + v2.0:
 - **Variant loop test pattern: test.each for all variants/sizes in single describe block**
 - **Focus ring verification pattern: expect(element).toHaveClass('focus-visible:ring-ember-500/50')**
 - **Touch target verification pattern: expect(button).toHaveClass('min-h-[44px]')**
+- **Documentation component pattern: CodeBlock for code display with copy functionality**
+- **PropTable pattern: { name, type, default, description, required } object structure**
+- **AccessibilitySection pattern: { keyboard, aria, screenReader } props for a11y docs**
+- **ComponentDemo pattern: side-by-side code/preview in responsive grid**
 
 ### Pending Todos
 
@@ -253,7 +261,7 @@ Key architectural patterns from v1.0 + v2.0:
 
 ### Blockers/Concerns
 
-None - Phase 17 COMPLETE.
+None - Phase 18 in progress.
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
@@ -262,6 +270,6 @@ None - Phase 17 COMPLETE.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 17-07-PLAN.md (Comprehensive Accessibility Test Suite)
-Resume file: None - Phase 17 complete
-Next step: Phase 18 planning (if exists) or v3.0 milestone complete
+Stopped at: Completed 18-01-PLAN.md (Documentation Infrastructure)
+Resume file: .planning/phases/18-documentation-polish/18-02-PLAN.md
+Next step: Execute 18-02-PLAN.md (Typography Showcase)

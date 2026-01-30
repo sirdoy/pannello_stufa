@@ -26,7 +26,7 @@ const SidebarContext = createContext({
  * @example
  * const { collapsed, toggle } = useSidebar();
  */
-export function useSidebar() {
+function useSidebar() {
   const context = useContext(SidebarContext);
   if (!context) {
     throw new Error('useSidebar must be used within a DashboardLayout');

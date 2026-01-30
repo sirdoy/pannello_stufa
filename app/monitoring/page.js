@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Heading, Text, Button } from '@/app/components/ui';
+import { Heading, Button, Section, Grid } from '@/app/components/ui';
 import ConnectionStatusCard from '@/components/monitoring/ConnectionStatusCard';
 import DeadManSwitchPanel from '@/components/monitoring/DeadManSwitchPanel';
 import MonitoringTimeline from '@/components/monitoring/MonitoringTimeline';
@@ -54,8 +54,8 @@ export default function MonitoringPage() {
   }, []);
 
   return (
-    <div className="space-y-6 p-4">
-      {/* Header with back button */}
+    <div className="p-4 space-y-6">
+      {/* Header with back button and page title */}
       <div className="flex items-center gap-4">
         <Button
           variant="ghost"
@@ -66,28 +66,37 @@ export default function MonitoringPage() {
           Home
         </Button>
         <div className="flex items-center gap-3">
-          <Activity className="text-ember-400" size={32} />
+          <Activity className="text-ember-400" size={32} aria-hidden="true" />
           <Heading level={1} variant="ember">
             Health Monitoring
           </Heading>
         </div>
       </div>
 
-      {/* Status cards grid (2 columns on md+) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <ConnectionStatusCard stats={stats} />
-        <DeadManSwitchPanel status={dmsStatus} />
-      </div>
+      {/* Status cards section */}
+      <Section spacing="none" as="div">
+        <Grid cols={2} gap="md" className="md:grid-cols-2">
+          <ConnectionStatusCard stats={stats} />
+          <DeadManSwitchPanel status={dmsStatus} />
+        </Grid>
+      </Section>
 
-      {/* Event timeline (full width) */}
-      <section>
-        <Heading level={2} variant="subtle" className="mb-4">
-          Cronologia Eventi (7 giorni)
-        </Heading>
-        <div id="monitoring-scroll-container" className="max-h-[600px] overflow-y-auto">
+      {/* Event timeline section */}
+      <Section
+        title="Cronologia Eventi (7 giorni)"
+        level={2}
+        spacing="none"
+      >
+        <div
+          id="monitoring-scroll-container"
+          className="max-h-[600px] overflow-y-auto"
+          role="region"
+          aria-label="Cronologia eventi"
+          tabIndex={0}
+        >
           <MonitoringTimeline />
         </div>
-      </section>
+      </Section>
     </div>
   );
 }

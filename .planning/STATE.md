@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 16 of 18 (Page Migration & Application)
-Plan: 5 of 11 in phase 16
+Plan: 6 of 11 in phase 16
 Status: In progress
-Last activity: 2026-01-30 - Completed 16-05-PLAN.md (Monitoring page design system migration)
+Last activity: 2026-01-30 - Completed 16-06-PLAN.md (Schedule page design system migration)
 
-Progress: [█████████████████░░░] 90.5% (85 plans complete)
+Progress: [██████████████████░░] 90.9% (86 plans complete)
 
 ## Performance Metrics
 
@@ -34,9 +34,9 @@ Progress: [█████████████████░░░] 90.5% (
 **Recent Trend:**
 - Milestone velocity improving (v2.0 shipped in 1/3 the time of v1.0)
 - Plan complexity stable (~5 min average)
-- Phase 16 in progress (5/11 plans complete)
+- Phase 16 in progress (6/11 plans complete)
 
-*Updated after 16-04 completion (Lights page migration)*
+*Updated after 16-06 completion (Schedule page migration)*
 
 ## Accumulated Context
 
@@ -139,6 +139,7 @@ Recent decisions affecting current work:
 - **16-05: Section spacing='none' for grid wrappers (Grid provides gap)**
 - **16-05: aria-hidden='true' on decorative icons for accessibility**
 - **16-05: role='region' + aria-label + tabIndex={0} for scrollable containers**
+- **16-06: variant='secondary' is invalid Button variant - must use subtle for secondary actions**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -204,6 +205,6 @@ None. Phase 16 in progress.
 ## Session Continuity
 
 Last session: 2026-01-30 08:05 UTC
-Stopped at: Completed 16-05-PLAN.md (Monitoring page migration)
+Stopped at: Completed 16-06-PLAN.md (Schedule page migration)
 Resume file: None
-Next step: Continue Phase 16 Wave 3 (16-06 Settings, 16-07 Scheduler, etc.)
+Next step: Continue Phase 16 Wave 3 (16-07 Settings, 16-08, etc.)

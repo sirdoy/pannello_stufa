@@ -6,6 +6,7 @@
  * and composition with Card. Uses jest-axe for automated a11y detection.
  */
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import { createRef } from 'react';
 import SmartHomeCard, {
@@ -72,6 +73,99 @@ describe('SmartHomeCard', () => {
       );
       const results = await axe(container);
       expect(results).toHaveNoViolations();
+    });
+
+    it('has no a11y violations with loading state', async () => {
+      const { container } = render(
+        <SmartHomeCard isLoading>
+          <p>Loading content</p>
+        </SmartHomeCard>
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    it('icon has aria-hidden="true" for decorative purpose', () => {
+      const { container } = render(
+        <SmartHomeCard icon="🔥" title="Thermostat">
+          <p>Content</p>
+        </SmartHomeCard>
+      );
+      const iconSpan = container.querySelector('span[aria-hidden="true"]');
+      expect(iconSpan).toBeInTheDocument();
+      expect(iconSpan).toHaveTextContent('🔥');
+    });
+  });
+
+  describe('Keyboard Navigation', () => {
+    it('interactive buttons within card are focusable via Tab', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <>
+          <button>Before</button>
+          <SmartHomeCard icon="💡" title="Lights">
+            <SmartHomeCard.Controls>
+              <button>Turn On</button>
+              <button>Turn Off</button>
+            </SmartHomeCard.Controls>
+          </SmartHomeCard>
+          <button>After</button>
+        </>
+      );
+
+      const beforeButton = screen.getByRole('button', { name: 'Before' });
+      beforeButton.focus();
+
+      // Tab to first control button
+      await user.tab();
+      expect(screen.getByRole('button', { name: 'Turn On' })).toHaveFocus();
+
+      // Tab to second control button
+      await user.tab();
+      expect(screen.getByRole('button', { name: 'Turn Off' })).toHaveFocus();
+
+      // Tab to after button
+      await user.tab();
+      expect(screen.getByRole('button', { name: 'After' })).toHaveFocus();
+    });
+
+    it('Enter key activates buttons within card', async () => {
+      const user = userEvent.setup();
+      const onClick = jest.fn();
+
+      render(
+        <SmartHomeCard icon="💡" title="Lights">
+          <SmartHomeCard.Controls>
+            <button onClick={onClick}>Toggle</button>
+          </SmartHomeCard.Controls>
+        </SmartHomeCard>
+      );
+
+      const toggleButton = screen.getByRole('button', { name: 'Toggle' });
+      toggleButton.focus();
+      await user.keyboard('{Enter}');
+
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('Space key activates buttons within card', async () => {
+      const user = userEvent.setup();
+      const onClick = jest.fn();
+
+      render(
+        <SmartHomeCard icon="💡" title="Lights">
+          <SmartHomeCard.Controls>
+            <button onClick={onClick}>Toggle</button>
+          </SmartHomeCard.Controls>
+        </SmartHomeCard>
+      );
+
+      const toggleButton = screen.getByRole('button', { name: 'Toggle' });
+      toggleButton.focus();
+      await user.keyboard(' ');
+
+      expect(onClick).toHaveBeenCalledTimes(1);
     });
   });
 

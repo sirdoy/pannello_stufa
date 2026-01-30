@@ -6,6 +6,7 @@
  * integration with SmartHomeCard, Badge, HealthIndicator, and accessibility.
  */
 import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import { createRef } from 'react';
 import DeviceCard from '../DeviceCard';
@@ -79,6 +80,176 @@ describe('DeviceCard', () => {
       );
       const results = await axe(container);
       expect(results).toHaveNoViolations();
+    });
+
+    it('has no a11y violations with all props combined', async () => {
+      const { container } = render(
+        <DeviceCard
+          icon="🔥"
+          title="Test Device"
+          colorTheme="ember"
+          statusBadge={{ label: 'Active', color: 'ember' }}
+          healthStatus="ok"
+          banners={[{ variant: 'info', title: 'Info', description: 'Description' }]}
+        >
+          <p>Content</p>
+        </DeviceCard>
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    it('icon has aria-hidden for decorative purpose', () => {
+      const { container } = render(
+        <DeviceCard icon="🔥" title="Test Device">
+          <p>Content</p>
+        </DeviceCard>
+      );
+      const iconSpan = container.querySelector('span[aria-hidden="true"]');
+      expect(iconSpan).toBeInTheDocument();
+      expect(iconSpan).toHaveTextContent('🔥');
+    });
+
+    it('healthStatus indicator uses role="status" for screen readers', () => {
+      render(
+        <DeviceCard icon="🔥" title="Test Device" healthStatus="ok">
+          <p>Content</p>
+        </DeviceCard>
+      );
+      const statusIndicator = screen.getByRole('status');
+      expect(statusIndicator).toBeInTheDocument();
+    });
+  });
+
+  describe('Keyboard Navigation', () => {
+    it('footer action buttons are focusable via Tab', async () => {
+      const user = userEvent.setup();
+      const handleClick = jest.fn();
+
+      render(
+        <>
+          <button>Before</button>
+          <DeviceCard
+            icon="🔥"
+            title="Stufa"
+            footerActions={[
+              { label: 'Details', variant: 'subtle', onClick: handleClick },
+              { label: 'Settings', variant: 'subtle', onClick: handleClick },
+            ]}
+          >
+            <p>Content</p>
+          </DeviceCard>
+          <button>After</button>
+        </>
+      );
+
+      const beforeButton = screen.getByRole('button', { name: 'Before' });
+      beforeButton.focus();
+
+      // Tab to first footer action
+      await user.tab();
+      expect(screen.getByRole('button', { name: 'Details' })).toHaveFocus();
+
+      // Tab to second footer action
+      await user.tab();
+      expect(screen.getByRole('button', { name: 'Settings' })).toHaveFocus();
+
+      // Tab to after button
+      await user.tab();
+      expect(screen.getByRole('button', { name: 'After' })).toHaveFocus();
+    });
+
+    it('Enter key activates footer action buttons', async () => {
+      const user = userEvent.setup();
+      const onClick = jest.fn();
+
+      render(
+        <DeviceCard
+          icon="🔥"
+          title="Stufa"
+          footerActions={[
+            { label: 'Details', variant: 'subtle', onClick },
+          ]}
+        >
+          <p>Content</p>
+        </DeviceCard>
+      );
+
+      const detailsButton = screen.getByRole('button', { name: 'Details' });
+      detailsButton.focus();
+      await user.keyboard('{Enter}');
+
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('Space key activates footer action buttons', async () => {
+      const user = userEvent.setup();
+      const onClick = jest.fn();
+
+      render(
+        <DeviceCard
+          icon="🔥"
+          title="Stufa"
+          footerActions={[
+            { label: 'Settings', variant: 'subtle', onClick },
+          ]}
+        >
+          <p>Content</p>
+        </DeviceCard>
+      );
+
+      const settingsButton = screen.getByRole('button', { name: 'Settings' });
+      settingsButton.focus();
+      await user.keyboard(' ');
+
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('connect button is focusable when not connected', async () => {
+      const user = userEvent.setup();
+      const onConnect = jest.fn();
+
+      render(
+        <>
+          <button>Before</button>
+          <DeviceCard
+            icon="🔥"
+            title="Stufa"
+            connected={false}
+            onConnect={onConnect}
+            connectButtonLabel="Connetti"
+          />
+          <button>After</button>
+        </>
+      );
+
+      const beforeButton = screen.getByRole('button', { name: 'Before' });
+      beforeButton.focus();
+
+      // Tab to connect button
+      await user.tab();
+      expect(screen.getByRole('button', { name: 'Connetti' })).toHaveFocus();
+    });
+
+    it('Enter key activates connect button', async () => {
+      const user = userEvent.setup();
+      const onConnect = jest.fn();
+
+      render(
+        <DeviceCard
+          icon="🔥"
+          title="Stufa"
+          connected={false}
+          onConnect={onConnect}
+          connectButtonLabel="Connetti"
+        />
+      );
+
+      const connectButton = screen.getByRole('button', { name: 'Connetti' });
+      connectButton.focus();
+      await user.keyboard('{Enter}');
+
+      expect(onConnect).toHaveBeenCalledTimes(1);
     });
   });
 

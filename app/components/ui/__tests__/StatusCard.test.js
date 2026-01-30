@@ -54,6 +54,81 @@ describe('StatusCard', () => {
       const results = await axe(container);
       expect(results).toHaveNoViolations();
     });
+
+    it('has no a11y violations with all status variants', async () => {
+      const variants = ['ember', 'sage', 'ocean', 'warning', 'danger', 'neutral'];
+
+      for (const variant of variants) {
+        const { container } = render(
+          <StatusCard
+            icon="🌡️"
+            title="Thermostat"
+            status="Status"
+            statusVariant={variant}
+          >
+            <p>Content</p>
+          </StatusCard>
+        );
+        const results = await axe(container);
+        expect(results).toHaveNoViolations();
+      }
+    });
+
+    it('icon has aria-hidden for decorative purpose', () => {
+      const { container } = render(
+        <StatusCard icon="🌡️" title="Thermostat" status="Active">
+          <p>Content</p>
+        </StatusCard>
+      );
+      const iconSpan = container.querySelector('span[aria-hidden="true"]');
+      expect(iconSpan).toBeInTheDocument();
+      expect(iconSpan).toHaveTextContent('🌡️');
+    });
+
+    it('status badge text is visible and accessible', () => {
+      render(
+        <StatusCard status="Heating" statusVariant="ember">
+          <p>Content</p>
+        </StatusCard>
+      );
+      // Status text should be visible to screen readers (not just color)
+      const statusBadge = screen.getByText('Heating');
+      expect(statusBadge).toBeInTheDocument();
+      expect(statusBadge).toBeVisible();
+    });
+
+    it('connection status is announced via role="status"', () => {
+      render(
+        <StatusCard connectionStatus="online">
+          <p>Content</p>
+        </StatusCard>
+      );
+      const connectionStatusElement = screen.getByRole('status');
+      expect(connectionStatusElement).toBeInTheDocument();
+      expect(connectionStatusElement).toHaveAttribute('aria-live', 'polite');
+    });
+
+    it('value content is announced to screen readers', () => {
+      render(
+        <StatusCard icon="🌡️" title="Temperature" status="Active">
+          <p>Current value: 22°C</p>
+        </StatusCard>
+      );
+      // Value should be accessible text content
+      expect(screen.getByText('Current value: 22°C')).toBeInTheDocument();
+    });
+
+    it('card heading uses proper semantic level', () => {
+      render(
+        <StatusCard icon="🌡️" title="Thermostat" status="Active">
+          <p>Content</p>
+        </StatusCard>
+      );
+      const heading = screen.getByRole('heading', { name: 'Thermostat' });
+      expect(heading).toBeInTheDocument();
+      // Heading level 2 (from SmartHomeCard)
+      expect(heading.tagName).toBe('H2');
+    });
   });
 
   describe('Status Badge', () => {

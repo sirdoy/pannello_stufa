@@ -14,6 +14,7 @@ import SettingsLayout from '@/app/components/SettingsLayout';
 import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
 import Banner from '@/app/components/ui/Banner';
+import Badge from '@/app/components/ui/Badge';
 import Toggle from '@/app/components/ui/Toggle';
 import Skeleton from '@/app/components/ui/Skeleton';
 import Heading from '@/app/components/ui/Heading';
@@ -177,9 +178,7 @@ export default function DevicesSettingsPage() {
                         {device.name}
                       </Heading>
                       {isEnabled && (
-                        <Text as="span" variant="sage" size="xs" weight="medium" className="px-2 py-0.5 rounded-full bg-sage-900/30 [html:not(.dark)_&]:bg-sage-100">
-                          Attivo
-                        </Text>
+                        <Badge variant="sage" size="sm">Attivo</Badge>
                       )}
                     </div>
                     <Text variant="secondary" size="sm" className="ml-11">

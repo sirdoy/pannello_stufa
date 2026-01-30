@@ -4,7 +4,8 @@ import { useState } from 'react';
 import TransitionLink from '@/app/components/TransitionLink';
 import { usePageTransition, TRANSITION_TYPES } from '@/app/context/PageTransitionContext';
 import { ArrowLeft, Sparkles, Zap, Waves, Layers, Slash } from 'lucide-react';
-import { Heading, Text } from '@/app/components/ui';
+import { Heading, Text, Card, Banner } from '@/app/components/ui';
+import PageLayout from '@/app/components/ui/PageLayout';
 
 /**
  * Transitions Demo Page - Test cinematographic page transitions
@@ -76,7 +77,8 @@ export default function TransitionsDebugPage() {
   ];
 
   return (
-    <div className="space-y-8">
+    <PageLayout maxWidth="4xl">
+      <div className="space-y-8">
       {/* Header */}
       <div className="space-y-4">
         <TransitionLink
@@ -98,13 +100,7 @@ export default function TransitionsDebugPage() {
       </div>
 
       {/* Current Status */}
-      <div className="
-        card-ember
-        p-6
-        border-2
-        border-ember-500/20
-        shadow-ember-glow-sm
-      ">
+      <Card glow className="p-6 border-2 border-ember-500/20">
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <div className={`
@@ -131,7 +127,7 @@ export default function TransitionsDebugPage() {
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Transition Types */}
       <div className="space-y-4">
@@ -271,30 +267,29 @@ export default function TransitionsDebugPage() {
       </div>
 
       {/* Browser Support Info */}
-      <div className="card-subtle p-6 space-y-3">
-        <div className="flex items-center gap-2">
-          <div className="text-xl">ℹ️</div>
-          <Text weight="semibold">Browser Support</Text>
-        </div>
-
-        <div className="space-y-2 text-sm">
-          <Text variant="muted">
+      <Banner
+        variant="info"
+        icon="ℹ️"
+        title="Browser Support"
+      >
+        <div className="space-y-2 text-sm mt-2">
+          <Text className="text-ocean-300 [html:not(.dark)_&]:text-ocean-700">
             <strong className="text-ember-400">View Transitions API nativa:</strong> Chrome 111+, Edge 111+, Safari 18+
           </Text>
-          <Text variant="muted">
+          <Text className="text-ocean-300 [html:not(.dark)_&]:text-ocean-700">
             <strong className="text-ember-400">CSS Fallback:</strong> Tutti i browser moderni
           </Text>
-          <Text variant="muted">
-            <strong className="text-ember-400">Accessibilità:</strong> Rispetta automaticamente prefers-reduced-motion
+          <Text className="text-ocean-300 [html:not(.dark)_&]:text-ocean-700">
+            <strong className="text-ember-400">Accessibilita:</strong> Rispetta automaticamente prefers-reduced-motion
           </Text>
         </div>
-      </div>
+      </Banner>
 
       {/* Implementation Example */}
       <div className="space-y-4">
         <Heading level={2}>Come Usare</Heading>
 
-        <div className="card-subtle p-6 space-y-4">
+        <Card variant="subtle" className="p-6 space-y-4">
           <div>
             <Text weight="semibold" className="mb-2 text-ember-400">
               1. Import TransitionLink
@@ -343,8 +338,9 @@ setTransitionType(TRANSITION_TYPES.EMBER_BURST);`}
               </code>
             </pre>
           </div>
-        </div>
+        </Card>
       </div>
-    </div>
+      </div>
+    </PageLayout>
   );
 }

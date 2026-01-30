@@ -63,7 +63,7 @@ function ScheduleContent() {
           </div>
 
           <Button
-            variant="secondary"
+            variant="subtle"
             size="sm"
             onClick={refetch}
             icon={<RefreshCw size={16} />}

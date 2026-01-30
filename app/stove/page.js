@@ -538,7 +538,7 @@ export default function StovePage() {
 
   if (initialLoading) {
     return (
-      <div className="min-h-screen bg-slate-950">
+      <div className="flex-1 bg-slate-950">
         <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
           <Skeleton className="h-[500px] rounded-3xl" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -556,7 +556,7 @@ export default function StovePage() {
   // ─────────────────────────────────────────────────────────────
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${theme.bg} transition-all duration-1000`}>
+    <div className={`flex-1 bg-gradient-to-br ${theme.bg} transition-all duration-1000`}>
       {/* Loading Overlay */}
       <LoadingOverlay show={loading} message={loadingMessage} icon="🔥" />
 

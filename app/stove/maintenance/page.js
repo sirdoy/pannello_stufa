@@ -89,7 +89,7 @@ export default function MaintenancePage() {
 
   if (isLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex-1 flex items-center justify-center">
         <Text variant="tertiary">Caricamento...</Text>
       </div>
     );
@@ -97,7 +97,7 @@ export default function MaintenancePage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex-1 flex items-center justify-center">
         <Card variant="glass" className="p-8 text-center">
           <Text variant="tertiary" className="mb-4">Accesso non autorizzato</Text>
           <Button href="/auth/login" variant="ember">Accedi</Button>

@@ -170,7 +170,7 @@ export default function StoveDebugPage() {
   }, [autoRefresh]);
 
   return (
-    <div className="min-h-screen p-4 md:p-8 bg-gradient-to-br from-slate-50 to-slate-100 [html:not(.dark)_&]:from-slate-50 [html:not(.dark)_&]:to-slate-100 from-slate-900 to-slate-800">
+    <div className="flex-1 p-4 md:p-8 bg-gradient-to-br from-slate-50 to-slate-100 [html:not(.dark)_&]:from-slate-50 [html:not(.dark)_&]:to-slate-100 from-slate-900 to-slate-800">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

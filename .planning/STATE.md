@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Planning next milestone
+**Current focus:** v3.1 Design System Compliance
 
 ## Current Position
 
-Phase: None - between milestones
-Plan: N/A
-Status: Ready to plan next milestone
-Last activity: 2026-01-30 — v3.0 Design System Evolution milestone complete
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-01-30 — Milestone v3.1 started
 
-Progress: [████████████████████] 100% (102 plans complete across 3 milestones)
+Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (v3.1 Design System Compliance)
 
 ## Performance Metrics
 
@@ -76,6 +76,6 @@ None - v3.0 milestone complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: v3.0 milestone archived
+Stopped at: Milestone v3.1 started, defining requirements
 Resume file: None
-Next step: `/gsd:new-milestone` to start v3.1 or v4.0
+Next step: Complete requirements definition, then `/gsd:plan-phase 19`

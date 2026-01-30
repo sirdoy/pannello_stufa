@@ -142,15 +142,16 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-**Next Milestone (TBD):**
+**v3.1 Design System Compliance (Current Milestone):**
 
-No active milestone. Run `/gsd:new-milestone` to start next planning cycle.
+**Goal:** Achieve 100% design system compliance across all pages and components — eliminate all raw HTML elements, inline Tailwind, and inconsistent patterns.
 
-**Potential focus areas for v3.1+:**
-- Advanced components (Tabs, Accordion, Command Palette, Data Table)
-- Form validation library integration (React Hook Form + Zod)
-- Animation library (Framer Motion)
-- Virtual scrolling for large lists
+**Target:**
+- Replace all raw `<button>` elements with Button component
+- Replace all raw `<input type="range">` with Slider component
+- Standardize device card components (StoveCard, ThermostatCard, LightsCard)
+- Eliminate inline conditional styling in favor of CVA variants
+- Ensure visual consistency across all pages
 
 **v3.0 Design System Evolution (Shipped 2026-01-30):**
 - ✓ Complete UI component library (25+ components)
@@ -239,5 +240,4 @@ No active milestone. Run `/gsd:new-milestone` to start next planning cycle.
 - **Deployment**: Vercel (current hosting platform)
 
 ---
-*Last updated: 2026-01-30 after v3.0 milestone (Design System Evolution)*
-*Next: `/gsd:new-milestone` to start v3.1 or v4.0*
+*Last updated: 2026-01-30 after v3.1 milestone started (Design System Compliance)*

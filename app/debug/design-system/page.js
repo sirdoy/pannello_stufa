@@ -55,7 +55,6 @@ export default function DesignSystemPage() {
   const [checkboxIndeterminate, setCheckboxIndeterminate] = useState(true);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 [html:not(.dark)_&]:from-slate-50 [html:not(.dark)_&]:via-white [html:not(.dark)_&]:to-slate-50">
       <PageLayout
         maxWidth="2xl"
         padding="lg"
@@ -1645,7 +1644,6 @@ export default function DesignSystemPage() {
         </Card>
         </div>
       </PageLayout>
-    </div>
   );
 }
 

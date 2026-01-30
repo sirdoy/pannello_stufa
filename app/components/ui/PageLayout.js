@@ -176,8 +176,8 @@ const PageLayout = forwardRef(function PageLayout(
   {
     header,
     footer,
-    maxWidth = 'xl',
-    padding = 'md',
+    maxWidth, // Default handled by CVA: 'none'
+    padding, // Default handled by CVA: 'none'
     centered = true,
     className,
     children,

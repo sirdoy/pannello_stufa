@@ -221,6 +221,29 @@ describe('Select Component', () => {
   });
 
   describe('Keyboard Navigation', () => {
+    test('trigger receives focus via Tab', async () => {
+      const user = userEvent.setup();
+      render(
+        <div>
+          <button>Before</button>
+          <Select
+            options={mockOptions}
+            value={1}
+            onChange={jest.fn()}
+          />
+        </div>
+      );
+
+      // Focus the first button
+      screen.getByText('Before').focus();
+
+      // Tab to the select trigger
+      await user.tab();
+
+      const trigger = screen.getByRole('combobox');
+      expect(trigger).toHaveFocus();
+    });
+
     test('opens dropdown with Space key', async () => {
       const user = userEvent.setup();
       render(
@@ -284,7 +307,7 @@ describe('Select Component', () => {
       });
     });
 
-    test('navigates options with Arrow keys', async () => {
+    test('navigates options with ArrowDown key', async () => {
       const user = userEvent.setup();
       render(
         <Select
@@ -310,6 +333,157 @@ describe('Select Component', () => {
         // At least one option should exist
         expect(options.length).toBeGreaterThan(0);
       });
+    });
+
+    test('navigates options with ArrowUp key', async () => {
+      const user = userEvent.setup();
+      render(
+        <Select
+          options={mockOptions}
+          value={3}
+          onChange={jest.fn()}
+        />
+      );
+
+      // Open dropdown
+      await user.click(screen.getByRole('combobox'));
+
+      await waitFor(() => {
+        expect(screen.getByRole('listbox')).toBeInTheDocument();
+      });
+
+      // Arrow up should highlight previous option
+      await user.keyboard('{ArrowUp}');
+
+      // Options should still be visible
+      await waitFor(() => {
+        const options = screen.getAllByRole('option');
+        expect(options.length).toBe(3);
+      });
+    });
+
+    test('selects option with Enter key', async () => {
+      const onChange = jest.fn();
+      const user = userEvent.setup();
+      render(
+        <Select
+          options={mockOptions}
+          value={1}
+          onChange={onChange}
+        />
+      );
+
+      // Open dropdown
+      const trigger = screen.getByRole('combobox');
+      trigger.focus();
+      await user.keyboard('{Enter}');
+
+      await waitFor(() => {
+        expect(screen.getByRole('listbox')).toBeInTheDocument();
+      });
+
+      // Navigate to Option 2
+      await user.keyboard('{ArrowDown}');
+
+      // Select with Enter
+      await user.keyboard('{Enter}');
+
+      // Dropdown should close and onChange called
+      await waitFor(() => {
+        expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+      });
+      expect(onChange).toHaveBeenCalled();
+    });
+
+    test('disabled select is skipped in tab order', async () => {
+      const user = userEvent.setup();
+      render(
+        <div>
+          <button>Before</button>
+          <Select
+            options={mockOptions}
+            value={1}
+            onChange={jest.fn()}
+            disabled
+          />
+          <button>After</button>
+        </div>
+      );
+
+      // Focus the first button
+      screen.getByText('Before').focus();
+
+      // Tab should skip the disabled select and go to After
+      await user.tab();
+
+      expect(screen.getByText('After')).toHaveFocus();
+    });
+
+    test('disabled option is not selectable via keyboard', async () => {
+      const onChange = jest.fn();
+      const user = userEvent.setup();
+      const optionsWithDisabled = [
+        { value: 1, label: 'Option 1' },
+        { value: 2, label: 'Option 2', disabled: true },
+        { value: 3, label: 'Option 3' },
+      ];
+
+      render(
+        <Select
+          options={optionsWithDisabled}
+          value={1}
+          onChange={onChange}
+        />
+      );
+
+      // Open dropdown
+      await user.click(screen.getByRole('combobox'));
+
+      await waitFor(() => {
+        expect(screen.getByRole('listbox')).toBeInTheDocument();
+      });
+
+      // Try to navigate to and select disabled option
+      await user.keyboard('{ArrowDown}');
+      await user.keyboard('{Enter}');
+
+      // onChange should not be called with disabled option value
+      // (Radix skips disabled options in navigation)
+      const calls = onChange.mock.calls;
+      for (const call of calls) {
+        expect(call[0]?.target?.value).not.toBe(2);
+      }
+    });
+
+    test('focus returns to trigger after Escape', async () => {
+      const user = userEvent.setup();
+      render(
+        <Select
+          options={mockOptions}
+          value={1}
+          onChange={jest.fn()}
+        />
+      );
+
+      const trigger = screen.getByRole('combobox');
+      trigger.focus();
+
+      // Open dropdown
+      await user.keyboard('{Enter}');
+
+      await waitFor(() => {
+        expect(screen.getByRole('listbox')).toBeInTheDocument();
+      });
+
+      // Close with Escape
+      await user.keyboard('{Escape}');
+
+      await waitFor(() => {
+        expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+      });
+
+      // Focus should return to trigger
+      expect(trigger).toHaveFocus();
     });
   });
 

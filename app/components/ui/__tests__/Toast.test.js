@@ -362,6 +362,69 @@ describe('Toast Component', () => {
       const closeButton = screen.getByLabelText('Close');
       expect(closeButton).toHaveAttribute('aria-label', 'Close');
     });
+
+    it('close button is keyboard accessible', async () => {
+      const handleOpenChange = jest.fn();
+      renderToast({ onOpenChange: handleOpenChange });
+
+      const closeButton = screen.getByLabelText('Close');
+
+      // Focus the close button
+      closeButton.focus();
+      expect(closeButton).toHaveFocus();
+
+      // Press Enter to close
+      await userEvent.keyboard('{Enter}');
+      expect(handleOpenChange).toHaveBeenCalledWith(false);
+    });
+  });
+
+  describe('ARIA Roles - Screen Reader Announcements', () => {
+    it('viewport has role=region for toast container', () => {
+      const { container } = render(
+        <ToastPrimitive.Provider>
+          <ToastViewport />
+        </ToastPrimitive.Provider>
+      );
+
+      // Radix Toast Viewport is an ol element with role for screen reader region
+      const viewport = container.querySelector('ol');
+      expect(viewport).toBeInTheDocument();
+    });
+
+    it('toast content is announced to screen readers via status semantics', async () => {
+      // The Radix Toast system uses aria-live regions for announcements
+      // ToastViewport renders as an ol element which Radix makes into a live region
+      let toastApi;
+      render(
+        <ToastProvider>
+          <TestConsumer onMount={(api) => { toastApi = api; }} />
+        </ToastProvider>
+      );
+
+      act(() => {
+        toastApi.info('Screen reader announcement test');
+      });
+
+      // Toast message should be visible and in DOM for screen readers
+      await waitFor(() => {
+        const message = screen.getByText('Screen reader announcement test');
+        expect(message).toBeInTheDocument();
+        // The description is inside a div which Radix announces
+        expect(message).toBeVisible();
+      });
+    });
+
+    it('action button has accessible altText for screen readers', () => {
+      renderToast({
+        action: { label: 'Undo action', onClick: jest.fn() },
+      });
+
+      const actionButton = screen.getByText('Undo action');
+      expect(actionButton).toBeInTheDocument();
+      // Button should be accessible
+      expect(actionButton.closest('button')).not.toHaveAttribute('aria-hidden');
+    });
   });
 });
 

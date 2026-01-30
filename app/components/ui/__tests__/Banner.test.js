@@ -339,6 +339,15 @@ describe('Banner', () => {
       expect(iconWrapper).toBeInTheDocument();
     });
 
+    it('dismiss button icon is aria-hidden for screen readers', () => {
+      const { container } = render(
+        <Banner title="Test" dismissible />
+      );
+      const dismissButton = screen.getByLabelText('Dismiss');
+      const svg = dismissButton.querySelector('svg');
+      expect(svg).toHaveAttribute('aria-hidden', 'true');
+    });
+
     it('has no accessibility violations with info variant', async () => {
       const { container } = render(
         <Banner
@@ -377,6 +386,82 @@ describe('Banner', () => {
         const results = await axe(container);
         expect(results).toHaveNoViolations();
       }
+    });
+  });
+
+  describe('Keyboard Accessibility', () => {
+    it('dismiss button is keyboard accessible with Enter', async () => {
+      const handleDismiss = jest.fn();
+      const user = userEvent.setup();
+
+      render(
+        <Banner
+          title="Keyboard Test"
+          dismissible
+          onDismiss={handleDismiss}
+        />
+      );
+
+      const dismissButton = screen.getByLabelText('Dismiss');
+      dismissButton.focus();
+      expect(dismissButton).toHaveFocus();
+
+      await user.keyboard('{Enter}');
+      expect(handleDismiss).toHaveBeenCalledTimes(1);
+    });
+
+    it('dismiss button is keyboard accessible with Space', async () => {
+      const handleDismiss = jest.fn();
+      const user = userEvent.setup();
+
+      render(
+        <Banner
+          title="Space Key Test"
+          dismissible
+          onDismiss={handleDismiss}
+        />
+      );
+
+      const dismissButton = screen.getByLabelText('Dismiss');
+      dismissButton.focus();
+      expect(dismissButton).toHaveFocus();
+
+      await user.keyboard(' ');
+      expect(handleDismiss).toHaveBeenCalledTimes(1);
+    });
+
+    it('dismiss button can be focused via Tab', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <>
+          <button>Before</button>
+          <Banner title="Tab Test" dismissible />
+        </>
+      );
+
+      // Tab to first button
+      await user.tab();
+      expect(screen.getByRole('button', { name: 'Before' })).toHaveFocus();
+
+      // Tab to dismiss button
+      await user.tab();
+      expect(screen.getByLabelText('Dismiss')).toHaveFocus();
+    });
+  });
+
+  describe('ARIA Roles', () => {
+    it('uses role="alert" for important notifications', () => {
+      render(<Banner title="Alert Test" variant="error" />);
+      const alert = screen.getByRole('alert');
+      expect(alert).toBeInTheDocument();
+    });
+
+    it('has role="alert" which announces to screen readers', () => {
+      render(<Banner title="Screen Reader Test" />);
+      // role="alert" automatically triggers screen reader announcement
+      const alert = screen.getByRole('alert');
+      expect(alert).toContainElement(screen.getByText('Screen Reader Test'));
     });
   });
 

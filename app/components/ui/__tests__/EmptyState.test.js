@@ -6,6 +6,7 @@
  * Uses jest-axe for automated a11y violation detection.
  */
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import EmptyState from '../EmptyState';
 import Button from '../Button';
@@ -115,6 +116,18 @@ describe('EmptyState', () => {
       expect(iconWrapper).toHaveTextContent('🏠');
     });
 
+    it('ReactNode icon wrapper has aria-hidden', () => {
+      const { container } = render(
+        <EmptyState
+          icon={<span data-testid="svg-icon">SVG</span>}
+          title="Test"
+        />
+      );
+      const iconWrapper = container.querySelector('[aria-hidden="true"]');
+      expect(iconWrapper).toBeInTheDocument();
+      expect(iconWrapper).toContainElement(screen.getByTestId('svg-icon'));
+    });
+
     it('uses semantic heading for title', () => {
       render(<EmptyState title="Empty State Title" />);
       const heading = screen.getByRole('heading', { level: 3 });
@@ -144,6 +157,66 @@ describe('EmptyState', () => {
       const { container } = render(<EmptyState icon="📭" />);
       const results = await axe(container);
       expect(results).toHaveNoViolations();
+    });
+
+    it('has no accessibility violations with all size variants', async () => {
+      const sizes = ['sm', 'md', 'lg'];
+
+      for (const size of sizes) {
+        const { container } = render(
+          <EmptyState
+            icon="🏠"
+            title={`${size} size`}
+            description="Test description"
+            size={size}
+          />
+        );
+        const results = await axe(container);
+        expect(results).toHaveNoViolations();
+      }
+    });
+  });
+
+  describe('Action Button Keyboard Accessibility', () => {
+    it('action button is keyboard accessible', async () => {
+      const handleClick = jest.fn();
+      const user = userEvent.setup();
+
+      render(
+        <EmptyState
+          title="Empty"
+          action={<Button onClick={handleClick}>Add Item</Button>}
+        />
+      );
+
+      const actionButton = screen.getByRole('button', { name: 'Add Item' });
+
+      // Tab to button
+      await user.tab();
+      expect(actionButton).toHaveFocus();
+
+      // Press Enter to activate
+      await user.keyboard('{Enter}');
+      expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('action button can be activated with Space', async () => {
+      const handleClick = jest.fn();
+      const user = userEvent.setup();
+
+      render(
+        <EmptyState
+          title="Empty"
+          action={<Button onClick={handleClick}>Create</Button>}
+        />
+      );
+
+      const actionButton = screen.getByRole('button', { name: 'Create' });
+      actionButton.focus();
+      expect(actionButton).toHaveFocus();
+
+      await user.keyboard(' ');
+      expect(handleClick).toHaveBeenCalledTimes(1);
     });
   });
 

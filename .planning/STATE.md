@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-01-28)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 16 - Page Migration & Application (v3.0 Design System Evolution) - COMPLETE
+**Current focus:** Phase 17 - Accessibility Testing (v3.0 Design System Evolution)
 
 ## Current Position
 
-Phase: 16 of 18 (Page Migration & Application) - VERIFIED COMPLETE
-Plan: 11 of 11 in phase 16 (COMPLETE)
-Status: Phase verified, ready for Phase 17
-Last activity: 2026-01-30 - Completed 16-09 final verification with human review
+Phase: 17 of 18 (Accessibility Testing)
+Plan: 1 of 7 in phase 17 (COMPLETE)
+Status: In progress
+Last activity: 2026-01-30 - Completed 17-01-PLAN.md (Reduced Motion Foundation)
 
-Progress: [████████████████████] 92.5% (88 plans complete)
+Progress: [█████████████████░░░] 93.7% (89 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 88 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 38 plans)
+- Total plans completed: 89 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 39 plans)
 - Average duration: ~4.5 min per plan
 - Total execution time: ~6.5 hours across 3 milestones
 
@@ -29,14 +29,14 @@ Progress: [████████████████████] 92.5% (
 |-----------|--------|-------|----------|
 | v1.0 Push Notifications | 5 | 29 | 4 days (2026-01-23 -> 2026-01-26) |
 | v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 -> 2026-01-28) |
-| v3.0 Design System | 8 | 38 | In progress (Phase 16 complete) |
+| v3.0 Design System | 8 | 39 | In progress (Phase 17 started) |
 
 **Recent Trend:**
 - Milestone velocity improving (v2.0 shipped in 1/3 the time of v1.0)
 - Plan complexity stable (~5 min average)
-- Phase 16 complete (11/11 plans)
+- Phase 17 started (1/7 plans complete)
 
-*Updated after 16-11 completion (Admin/Debug pages migration)*
+*Updated after 17-01 completion (Reduced Motion Foundation)*
 
 ## Accumulated Context
 
@@ -154,6 +154,9 @@ Recent decisions affecting current work:
 - **16-11: Card glow for status indicator in transitions page**
 - **16-11: Banner info variant for help sections in debug pages**
 - **16-11: Design tokens: bg-{color}-500/10 for dark, bg-{color}-50 for light**
+- **17-01: SSR defaults to reduced motion (true) for accessibility safety**
+- **17-01: Query for no-preference instead of reduce for simpler logic**
+- **17-01: CSS handles animation reduction; useReducedMotion hook for JS logic changes**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -200,6 +203,9 @@ Key architectural patterns from v1.0 + v2.0:
 - **Grid breakpoint override pattern: Pass className='md:grid-cols-X' when default responsive pattern doesn't match**
 - **Banner for help boxes pattern: Use Banner component with children for complex help/info content**
 - **Debug page layout: PageLayout maxWidth='4xl' with space-y-6 content wrapper**
+- **useReducedMotion pattern: typeof window check for SSR, matchMedia listener for updates**
+- **Reduced motion testing: verify animation classes present, document CSS handles reduction**
+- **Essential feedback preservation: components remain visible regardless of motion preference**
 
 ### Pending Todos
 
@@ -211,7 +217,7 @@ Key architectural patterns from v1.0 + v2.0:
 
 ### Blockers/Concerns
 
-16-09 verification pending - layout/color fixes applied, awaiting user approval.
+None - Phase 17 progressing normally.
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
@@ -220,6 +226,6 @@ Key architectural patterns from v1.0 + v2.0:
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Phase 16 complete and verified
-Resume file: N/A (phase complete)
-Next step: /gsd:discuss-phase 17 or /gsd:plan-phase 17
+Stopped at: Completed 17-01-PLAN.md (Reduced Motion Foundation)
+Resume file: .planning/phases/17-accessibility-testing/17-02-PLAN.md
+Next step: Execute 17-02 (Keyboard Navigation - Button)

@@ -37,7 +37,7 @@ export default function EventFilters({
           onChange={(e) => onTypeChange(e.target.value)}
           options={TYPE_OPTIONS}
           label="Tipo evento"
-          liquid
+          variant="glass"
         />
       </div>
 
@@ -48,7 +48,7 @@ export default function EventFilters({
           onChange={(e) => onSeverityChange(e.target.value)}
           options={SEVERITY_OPTIONS}
           label="Severita"
-          liquid
+          variant="glass"
         />
       </div>
 

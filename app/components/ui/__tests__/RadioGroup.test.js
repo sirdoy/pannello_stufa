@@ -116,8 +116,188 @@ describe('RadioGroup Component', () => {
   });
 
   describe('Keyboard Navigation', () => {
+    test('Tab focuses the selected option', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <RadioGroup defaultValue="b">
+          <RadioGroupItem value="a" label="Option A" />
+          <RadioGroupItem value="b" label="Option B" />
+          <RadioGroupItem value="c" label="Option C" />
+        </RadioGroup>
+      );
+
+      await user.tab();
+      const optionB = screen.getByRole('radio', { name: 'Option B' });
+      expect(optionB).toHaveFocus();
+    });
+
+    test('Tab focuses first option when none selected', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <RadioGroup>
+          <RadioGroupItem value="a" label="Option A" />
+          <RadioGroupItem value="b" label="Option B" />
+          <RadioGroupItem value="c" label="Option C" />
+        </RadioGroup>
+      );
+
+      await user.tab();
+      const optionA = screen.getByRole('radio', { name: 'Option A' });
+      expect(optionA).toHaveFocus();
+    });
+
+    test('ArrowDown moves focus to next option', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <RadioGroup defaultValue="a">
+          <RadioGroupItem value="a" label="Option A" />
+          <RadioGroupItem value="b" label="Option B" />
+          <RadioGroupItem value="c" label="Option C" />
+        </RadioGroup>
+      );
+
+      await user.tab();
+      await user.keyboard('{ArrowDown}');
+
+      // Radix RadioGroup moves focus on arrow key navigation
+      const optionB = screen.getByRole('radio', { name: 'Option B' });
+      expect(optionB).toHaveFocus();
+    });
+
+    test('ArrowUp moves focus to previous option', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <RadioGroup defaultValue="c">
+          <RadioGroupItem value="a" label="Option A" />
+          <RadioGroupItem value="b" label="Option B" />
+          <RadioGroupItem value="c" label="Option C" />
+        </RadioGroup>
+      );
+
+      await user.tab();
+      await user.keyboard('{ArrowUp}');
+
+      const optionB = screen.getByRole('radio', { name: 'Option B' });
+      expect(optionB).toHaveFocus();
+    });
+
+    test('ArrowDown wraps from last to first option', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <RadioGroup defaultValue="c">
+          <RadioGroupItem value="a" label="Option A" />
+          <RadioGroupItem value="b" label="Option B" />
+          <RadioGroupItem value="c" label="Option C" />
+        </RadioGroup>
+      );
+
+      await user.tab();
+      await user.keyboard('{ArrowDown}');
+
+      // Should wrap to first option
+      const optionA = screen.getByRole('radio', { name: 'Option A' });
+      expect(optionA).toHaveFocus();
+    });
+
+    test('ArrowUp wraps from first to last option', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <RadioGroup defaultValue="a">
+          <RadioGroupItem value="a" label="Option A" />
+          <RadioGroupItem value="b" label="Option B" />
+          <RadioGroupItem value="c" label="Option C" />
+        </RadioGroup>
+      );
+
+      await user.tab();
+      await user.keyboard('{ArrowUp}');
+
+      // Should wrap to last option
+      const optionC = screen.getByRole('radio', { name: 'Option C' });
+      expect(optionC).toHaveFocus();
+    });
+
+    test('ArrowDown skips disabled options', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <RadioGroup defaultValue="a">
+          <RadioGroupItem value="a" label="Option A" />
+          <RadioGroupItem value="b" label="Option B" disabled />
+          <RadioGroupItem value="c" label="Option C" />
+        </RadioGroup>
+      );
+
+      await user.tab();
+      await user.keyboard('{ArrowDown}');
+
+      // Should skip disabled B and focus C
+      const optionC = screen.getByRole('radio', { name: 'Option C' });
+      expect(optionC).toHaveFocus();
+    });
+
+    test('ArrowUp skips disabled options', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <RadioGroup defaultValue="c">
+          <RadioGroupItem value="a" label="Option A" />
+          <RadioGroupItem value="b" label="Option B" disabled />
+          <RadioGroupItem value="c" label="Option C" />
+        </RadioGroup>
+      );
+
+      await user.tab();
+      await user.keyboard('{ArrowUp}');
+
+      // Should skip disabled B and focus A
+      const optionA = screen.getByRole('radio', { name: 'Option A' });
+      expect(optionA).toHaveFocus();
+    });
+
+    test('ArrowRight works for horizontal orientation', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <RadioGroup defaultValue="a" orientation="horizontal">
+          <RadioGroupItem value="a" label="Option A" />
+          <RadioGroupItem value="b" label="Option B" />
+          <RadioGroupItem value="c" label="Option C" />
+        </RadioGroup>
+      );
+
+      await user.tab();
+      await user.keyboard('{ArrowRight}');
+
+      const optionB = screen.getByRole('radio', { name: 'Option B' });
+      expect(optionB).toHaveFocus();
+    });
+
+    test('ArrowLeft works for horizontal orientation', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <RadioGroup defaultValue="c" orientation="horizontal">
+          <RadioGroupItem value="a" label="Option A" />
+          <RadioGroupItem value="b" label="Option B" />
+          <RadioGroupItem value="c" label="Option C" />
+        </RadioGroup>
+      );
+
+      await user.tab();
+      await user.keyboard('{ArrowLeft}');
+
+      const optionB = screen.getByRole('radio', { name: 'Option B' });
+      expect(optionB).toHaveFocus();
+    });
+
     test('has proper tabindex for keyboard navigation', () => {
-      // Radix RadioGroup items have tabindex attributes for keyboard navigation
       render(
         <RadioGroup defaultValue="b">
           <RadioGroupItem value="a" label="Option A" />
@@ -134,39 +314,6 @@ describe('RadioGroup Component', () => {
       expect(optionA).toHaveAttribute('tabindex');
       expect(optionB).toHaveAttribute('tabindex');
       expect(optionC).toHaveAttribute('tabindex');
-    });
-
-    test('receives keyboard events when focused', async () => {
-      const user = userEvent.setup();
-
-      render(
-        <RadioGroup defaultValue="a">
-          <RadioGroupItem value="a" label="Option A" />
-          <RadioGroupItem value="b" label="Option B" />
-        </RadioGroup>
-      );
-
-      // Tab into the group - should focus the selected item
-      await user.tab();
-      const optionA = screen.getByRole('radio', { name: 'Option A' });
-      expect(optionA).toHaveFocus();
-    });
-
-    test('can select with click after tabbing', async () => {
-      const onValueChange = jest.fn();
-      const user = userEvent.setup();
-
-      render(
-        <RadioGroup value="a" onValueChange={onValueChange}>
-          <RadioGroupItem value="a" label="Option A" />
-          <RadioGroupItem value="b" label="Option B" />
-        </RadioGroup>
-      );
-
-      // Tab to focus, then click on B
-      await user.tab();
-      await user.click(screen.getByLabelText('Option B'));
-      expect(onValueChange).toHaveBeenCalledWith('b');
     });
   });
 

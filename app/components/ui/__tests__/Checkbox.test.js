@@ -55,38 +55,88 @@ describe('Checkbox', () => {
     });
   });
 
-  describe('Keyboard Interaction', () => {
-    it('should toggle with Space key', async () => {
+  describe('Keyboard Navigation', () => {
+    it('can be focused via Tab key', async () => {
+      render(<Checkbox aria-label="Focusable" />);
+
+      const checkbox = screen.getByRole('checkbox');
+
+      await userEvent.tab();
+      expect(checkbox).toHaveFocus();
+    });
+
+    it('toggles with Space key', async () => {
       const handleChange = jest.fn();
       render(
-        <Checkbox
-          aria-label="Toggle me"
-          onCheckedChange={handleChange}
-        />
+        <Checkbox aria-label="Toggle me" onCheckedChange={handleChange} />
       );
 
       const checkbox = screen.getByRole('checkbox');
       checkbox.focus();
       expect(checkbox).toHaveFocus();
 
-      // Press Space to toggle
       await userEvent.keyboard(' ');
       expect(handleChange).toHaveBeenCalledWith(true);
     });
 
-    it('should be focusable for keyboard navigation', async () => {
+    it('toggles from checked to unchecked with Space key', async () => {
+      const handleChange = jest.fn();
       render(
-        <Checkbox aria-label="Focusable" />
+        <Checkbox
+          aria-label="Checked toggle"
+          checked
+          onCheckedChange={handleChange}
+        />
       );
 
       const checkbox = screen.getByRole('checkbox');
+      checkbox.focus();
 
-      // Tab to focus
-      await userEvent.tab();
-      expect(checkbox).toHaveFocus();
+      await userEvent.keyboard(' ');
+      expect(handleChange).toHaveBeenCalledWith(false);
     });
 
-    it('should not toggle when disabled', async () => {
+    it('Tab navigates between multiple checkboxes', async () => {
+      render(
+        <>
+          <Checkbox aria-label="First" />
+          <Checkbox aria-label="Second" />
+          <Checkbox aria-label="Third" />
+        </>
+      );
+
+      const checkboxes = screen.getAllByRole('checkbox');
+
+      await userEvent.tab();
+      expect(checkboxes[0]).toHaveFocus();
+
+      await userEvent.tab();
+      expect(checkboxes[1]).toHaveFocus();
+
+      await userEvent.tab();
+      expect(checkboxes[2]).toHaveFocus();
+    });
+
+    it('disabled checkbox is skipped in tab order', async () => {
+      render(
+        <>
+          <Checkbox aria-label="First" />
+          <Checkbox aria-label="Disabled" disabled />
+          <Checkbox aria-label="Third" />
+        </>
+      );
+
+      const checkboxes = screen.getAllByRole('checkbox');
+
+      await userEvent.tab();
+      expect(checkboxes[0]).toHaveFocus();
+
+      await userEvent.tab();
+      // Should skip disabled checkbox and go to third
+      expect(checkboxes[2]).toHaveFocus();
+    });
+
+    it('does not toggle disabled checkbox with Space', async () => {
       const handleChange = jest.fn();
       render(
         <Checkbox
@@ -97,8 +147,23 @@ describe('Checkbox', () => {
       );
 
       const checkbox = screen.getByRole('checkbox');
+      checkbox.focus();
 
-      // Try to click
+      await userEvent.keyboard(' ');
+      expect(handleChange).not.toHaveBeenCalled();
+    });
+
+    it('does not toggle disabled checkbox with click', async () => {
+      const handleChange = jest.fn();
+      render(
+        <Checkbox
+          aria-label="Disabled"
+          disabled
+          onCheckedChange={handleChange}
+        />
+      );
+
+      const checkbox = screen.getByRole('checkbox');
       fireEvent.click(checkbox);
       expect(handleChange).not.toHaveBeenCalled();
     });

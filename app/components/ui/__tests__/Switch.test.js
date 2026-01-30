@@ -45,41 +45,101 @@ describe('Switch', () => {
     });
   });
 
-  describe('Keyboard Interaction', () => {
-    it('should toggle with Space key', async () => {
+  describe('Keyboard Navigation', () => {
+    it('can be focused via Tab key', async () => {
+      render(<Switch label="Focusable" />);
+
+      const switchElement = screen.getByRole('switch');
+
+      await userEvent.tab();
+      expect(switchElement).toHaveFocus();
+    });
+
+    it('toggles with Space key', async () => {
       const handleChange = jest.fn();
-      render(
-        <Switch label="Toggle me" onCheckedChange={handleChange} />
-      );
+      render(<Switch label="Toggle me" onCheckedChange={handleChange} />);
 
       const switchElement = screen.getByRole('switch');
       switchElement.focus();
       expect(switchElement).toHaveFocus();
 
-      // Press Space to toggle
       await userEvent.keyboard(' ');
       expect(handleChange).toHaveBeenCalledWith(true);
     });
 
-    it('should be focusable for keyboard navigation', async () => {
-      render(<Switch label="Focusable" />);
+    it('toggles from checked to unchecked with Space key', async () => {
+      const handleChange = jest.fn();
+      render(
+        <Switch label="Checked toggle" checked onCheckedChange={handleChange} />
+      );
 
       const switchElement = screen.getByRole('switch');
+      switchElement.focus();
 
-      // Tab to focus
-      await userEvent.tab();
-      expect(switchElement).toHaveFocus();
+      await userEvent.keyboard(' ');
+      expect(handleChange).toHaveBeenCalledWith(false);
     });
 
-    it('should not toggle when disabled', async () => {
+    it('Tab navigates between multiple switches', async () => {
+      render(
+        <>
+          <Switch label="First" />
+          <Switch label="Second" />
+          <Switch label="Third" />
+        </>
+      );
+
+      const switches = screen.getAllByRole('switch');
+
+      await userEvent.tab();
+      expect(switches[0]).toHaveFocus();
+
+      await userEvent.tab();
+      expect(switches[1]).toHaveFocus();
+
+      await userEvent.tab();
+      expect(switches[2]).toHaveFocus();
+    });
+
+    it('disabled switch is skipped in tab order', async () => {
+      render(
+        <>
+          <Switch label="First" />
+          <Switch label="Disabled" disabled />
+          <Switch label="Third" />
+        </>
+      );
+
+      const switches = screen.getAllByRole('switch');
+
+      await userEvent.tab();
+      expect(switches[0]).toHaveFocus();
+
+      await userEvent.tab();
+      // Should skip disabled switch and go to third
+      expect(switches[2]).toHaveFocus();
+    });
+
+    it('does not toggle disabled switch with Space', async () => {
       const handleChange = jest.fn();
       render(
         <Switch label="Disabled" disabled onCheckedChange={handleChange} />
       );
 
       const switchElement = screen.getByRole('switch');
+      switchElement.focus();
 
-      // Try to click
+      await userEvent.keyboard(' ');
+      expect(handleChange).not.toHaveBeenCalled();
+    });
+
+    it('does not toggle disabled switch with click', async () => {
+      const handleChange = jest.fn();
+      render(
+        <Switch label="Disabled" disabled onCheckedChange={handleChange} />
+      );
+
+      const switchElement = screen.getByRole('switch');
       fireEvent.click(switchElement);
       expect(handleChange).not.toHaveBeenCalled();
     });

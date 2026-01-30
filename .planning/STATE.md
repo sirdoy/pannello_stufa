@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 17 of 18 (Accessibility Testing)
-Plan: 6 of 7 in phase 17 (COMPLETE)
-Status: In progress
-Last activity: 2026-01-30 - Completed 17-06-PLAN.md (Smart Home Components Accessibility)
+Plan: 7 of 7 in phase 17 (COMPLETE)
+Status: Phase 17 COMPLETE
+Last activity: 2026-01-30 - Completed 17-07-PLAN.md (Comprehensive Accessibility Test Suite)
 
-Progress: [███████████████████░] 98.9% (94 plans complete)
+Progress: [███████████████████░] 99.0% (95 plans complete)
 
 ## Performance Metrics
 
@@ -34,9 +34,9 @@ Progress: [███████████████████░] 98.9% (
 **Recent Trend:**
 - Milestone velocity improving (v2.0 shipped in 1/3 the time of v1.0)
 - Plan complexity stable (~5 min average)
-- Phase 17 progressing (6/7 plans complete)
+- Phase 17 COMPLETE (7/7 plans)
 
-*Updated after 17-06 completion (Smart Home Components Accessibility)*
+*Updated after 17-07 completion (Comprehensive Accessibility Test Suite)*
 
 ## Accumulated Context
 
@@ -173,6 +173,10 @@ Recent decisions affecting current work:
 - **17-06: ConnectionStatus/HealthIndicator already had complete accessibility tests (no changes needed)**
 - **17-06: SmartHomeCard/DeviceCard keyboard tests focus on interactive elements within cards**
 - **17-06: StatusCard tests verify status badge visibility and connection status announcements**
+- **17-07: Select axe tests disable aria-required-parent rule (JSDOM portal artifact)**
+- **17-07: Button.Icon uses aria-label prop (not label prop)**
+- **17-07: Touch target verification via class checks (min-h-[44px], min-w-[44px])**
+- **17-07: Animation reduction verified via CSS globals.css @media prefers-reduced-motion**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -234,6 +238,10 @@ Key architectural patterns from v1.0 + v2.0:
 - **Smart home card keyboard pattern: Tab navigates through interactive elements within cards**
 - **Status indicator pattern: role='status' + aria-live='polite' for screen reader announcements**
 - **Button activation pattern: Enter and Space keys trigger onClick handlers**
+- **Comprehensive axe suite pattern: Group tests by component category (Form, Feedback, Layout, Smart Home)**
+- **Variant loop test pattern: test.each for all variants/sizes in single describe block**
+- **Focus ring verification pattern: expect(element).toHaveClass('focus-visible:ring-ember-500/50')**
+- **Touch target verification pattern: expect(button).toHaveClass('min-h-[44px]')**
 
 ### Pending Todos
 
@@ -245,7 +253,7 @@ Key architectural patterns from v1.0 + v2.0:
 
 ### Blockers/Concerns
 
-None - Phase 17 progressing normally.
+None - Phase 17 COMPLETE.
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
@@ -254,6 +262,6 @@ None - Phase 17 progressing normally.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 17-06-PLAN.md (Smart Home Components Accessibility)
-Resume file: .planning/phases/17-accessibility-testing/17-07-PLAN.md
-Next step: Execute 17-07 (Integration Tests and Axe-Core Automation)
+Stopped at: Completed 17-07-PLAN.md (Comprehensive Accessibility Test Suite)
+Resume file: None - Phase 17 complete
+Next step: Phase 18 planning (if exists) or v3.0 milestone complete

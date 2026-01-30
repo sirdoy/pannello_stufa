@@ -74,6 +74,25 @@ describe('Slider Component', () => {
   });
 
   describe('Keyboard Interaction', () => {
+    test('thumb receives focus via Tab', async () => {
+      const user = userEvent.setup();
+      render(
+        <div>
+          <button>Before</button>
+          <Slider aria-label="Volume" defaultValue={50} />
+        </div>
+      );
+
+      // Focus the first button
+      screen.getByText('Before').focus();
+
+      // Tab to the slider thumb
+      await user.tab();
+
+      const slider = screen.getByRole('slider');
+      expect(slider).toHaveFocus();
+    });
+
     test('Arrow Right increases value', async () => {
       const handleChange = jest.fn();
       render(
@@ -124,6 +143,44 @@ describe('Slider Component', () => {
       fireEvent.keyDown(slider, { key: 'ArrowDown' });
 
       expect(handleChange).toHaveBeenCalledWith(49);
+    });
+
+    test('Home key sets value to minimum', async () => {
+      const handleChange = jest.fn();
+      render(
+        <Slider
+          aria-label="Volume"
+          defaultValue={50}
+          min={0}
+          max={100}
+          onChange={handleChange}
+        />
+      );
+
+      const slider = screen.getByRole('slider');
+      slider.focus();
+      fireEvent.keyDown(slider, { key: 'Home' });
+
+      expect(handleChange).toHaveBeenCalledWith(0);
+    });
+
+    test('End key sets value to maximum', async () => {
+      const handleChange = jest.fn();
+      render(
+        <Slider
+          aria-label="Volume"
+          defaultValue={50}
+          min={0}
+          max={100}
+          onChange={handleChange}
+        />
+      );
+
+      const slider = screen.getByRole('slider');
+      slider.focus();
+      fireEvent.keyDown(slider, { key: 'End' });
+
+      expect(handleChange).toHaveBeenCalledWith(100);
     });
 
     test('respects step value', async () => {
@@ -181,6 +238,107 @@ describe('Slider Component', () => {
 
       const slider2 = screen.getByRole('slider');
       expect(slider2).toHaveAttribute('aria-valuenow', '0');
+    });
+
+    test('PageUp increases value by larger step', async () => {
+      const handleChange = jest.fn();
+      render(
+        <Slider
+          aria-label="Volume"
+          defaultValue={50}
+          min={0}
+          max={100}
+          onChange={handleChange}
+        />
+      );
+
+      const slider = screen.getByRole('slider');
+      slider.focus();
+      fireEvent.keyDown(slider, { key: 'PageUp' });
+
+      // Radix slider PageUp increases by 10% of range by default
+      expect(handleChange).toHaveBeenCalledWith(60);
+    });
+
+    test('PageDown decreases value by larger step', async () => {
+      const handleChange = jest.fn();
+      render(
+        <Slider
+          aria-label="Volume"
+          defaultValue={50}
+          min={0}
+          max={100}
+          onChange={handleChange}
+        />
+      );
+
+      const slider = screen.getByRole('slider');
+      slider.focus();
+      fireEvent.keyDown(slider, { key: 'PageDown' });
+
+      // Radix slider PageDown decreases by 10% of range by default
+      expect(handleChange).toHaveBeenCalledWith(40);
+    });
+  });
+
+  describe('Tab Order', () => {
+    test('disabled slider is skipped in tab order', async () => {
+      const user = userEvent.setup();
+      render(
+        <div>
+          <button>Before</button>
+          <Slider aria-label="Volume" disabled />
+          <button>After</button>
+        </div>
+      );
+
+      // Focus the first button
+      screen.getByText('Before').focus();
+
+      // Tab should skip the disabled slider and go to After
+      await user.tab();
+
+      expect(screen.getByText('After')).toHaveFocus();
+    });
+
+    test('Tab moves focus to next element after slider', async () => {
+      const user = userEvent.setup();
+      render(
+        <div>
+          <Slider aria-label="Volume" defaultValue={50} />
+          <button>After</button>
+        </div>
+      );
+
+      // Focus the slider
+      const slider = screen.getByRole('slider');
+      slider.focus();
+      expect(slider).toHaveFocus();
+
+      // Tab to next element
+      await user.tab();
+
+      expect(screen.getByText('After')).toHaveFocus();
+    });
+
+    test('Shift+Tab moves focus to previous element', async () => {
+      const user = userEvent.setup();
+      render(
+        <div>
+          <button>Before</button>
+          <Slider aria-label="Volume" defaultValue={50} />
+        </div>
+      );
+
+      // Focus the slider
+      const slider = screen.getByRole('slider');
+      slider.focus();
+      expect(slider).toHaveFocus();
+
+      // Shift+Tab to previous element
+      await user.tab({ shift: true });
+
+      expect(screen.getByText('Before')).toHaveFocus();
     });
   });
 

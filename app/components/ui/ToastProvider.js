@@ -98,8 +98,8 @@ export function ToastProvider({ children }) {
 
   return (
     <ToastContext.Provider value={{ toast, dismiss, dismissAll, success, error, warning, info }}>
-      {children}
       <ToastPrimitive.Provider swipeDirection="right">
+        {children}
         {visibleToasts.map((t) => (
           <Toast
             key={t.id}

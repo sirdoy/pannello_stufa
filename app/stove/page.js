@@ -538,14 +538,12 @@ export default function StovePage() {
 
   if (initialLoading) {
     return (
-      <div className="flex-1 bg-slate-950">
-        <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
-          <Skeleton className="h-[500px] rounded-3xl" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-32 rounded-2xl" />
-            ))}
-          </div>
+      <div className="space-y-8">
+        <Skeleton className="h-[500px] rounded-3xl" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-32 rounded-2xl" />
+          ))}
         </div>
       </div>
     );
@@ -556,15 +554,18 @@ export default function StovePage() {
   // ─────────────────────────────────────────────────────────────
 
   return (
-    <div className={`flex-1 bg-gradient-to-br ${theme.bg} transition-all duration-1000`}>
+    <div className="relative">
+      {/* Full-screen ambient gradient overlay */}
+      <div className={`fixed inset-0 -z-10 bg-gradient-to-br ${theme.bg} transition-all duration-1000`} />
+
+      {/* Ambient Glow Effect */}
+      <div className={`fixed inset-0 -z-10 pointer-events-none transition-all duration-1000 ${theme.glow}`} />
+
       {/* Loading Overlay */}
       <LoadingOverlay show={loading} message={loadingMessage} icon="🔥" />
 
-      {/* Ambient Glow Effect */}
-      <div className={`fixed inset-0 pointer-events-none transition-all duration-1000 ${theme.glow}`} />
-
       {/* Main Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 py-6 sm:py-8 space-y-6 sm:space-y-8">
+      <div className="relative space-y-6 sm:space-y-8">
 
         {/* ═══════════════════════════════════════════════════════════
             HERO SECTION - Status Display

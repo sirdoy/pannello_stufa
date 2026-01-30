@@ -420,9 +420,7 @@ export default function NotificationsSettingsPage() {
                 Dispositivi Registrati
               </Heading>
               {devices.length > 0 && (
-                <span className="px-2.5 py-1 text-xs font-semibold bg-ocean-500/20 text-ocean-400 [html:not(.dark)_&]:bg-ocean-100 [html:not(.dark)_&]:text-ocean-700 rounded-full">
-                  {devices.length}
-                </span>
+                <Badge variant="ocean" size="sm">{devices.length}</Badge>
               )}
             </div>
             {devices.length > 0 && (
@@ -495,14 +493,10 @@ export default function NotificationsSettingsPage() {
                               : 'Dispositivo'}
                           </Text>
                           {device.isPWA && (
-                            <span className="px-2 py-0.5 text-xs font-medium bg-sage-500/20 text-sage-400 [html:not(.dark)_&]:bg-sage-100 [html:not(.dark)_&]:text-sage-700 rounded-full">
-                              PWA
-                            </span>
+                            <Badge variant="sage" size="sm">PWA</Badge>
                           )}
                           {device.token === currentDeviceToken && (
-                            <span className="px-2 py-0.5 text-xs font-medium bg-ocean-500/20 text-ocean-400 [html:not(.dark)_&]:bg-ocean-100 [html:not(.dark)_&]:text-ocean-700 rounded-full">
-                              Questo dispositivo
-                            </span>
+                            <Badge variant="ocean" size="sm">Questo dispositivo</Badge>
                           )}
                         </div>
 

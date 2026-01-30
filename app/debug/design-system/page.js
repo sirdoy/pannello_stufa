@@ -30,6 +30,10 @@ import Grid from '@/app/components/ui/Grid';
 import Tooltip from '@/app/components/ui/Tooltip';
 import Spinner from '@/app/components/ui/Spinner';
 import { useState } from 'react';
+import CodeBlock from './components/CodeBlock';
+import PropTable from './components/PropTable';
+import AccessibilitySection from './components/AccessibilitySection';
+import { componentDocs } from './data/component-docs';
 
 /**
  * Design System Showcase Page - Ember Noir v3.0
@@ -264,6 +268,31 @@ export default function DesignSystemPage() {
                     <Button variant="ember">Confirm</Button>
                   </ButtonGroup>
                 </div>
+
+                <CardDivider />
+
+                {/* API Reference */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">API Reference</Text>
+                  <PropTable props={componentDocs.Button.props} />
+                </div>
+
+                <CardDivider />
+
+                {/* Code Example */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Code Example</Text>
+                  <CodeBlock code={componentDocs.Button.codeExample} />
+                </div>
+
+                <CardDivider />
+
+                {/* Accessibility */}
+                <AccessibilitySection
+                  keyboard={componentDocs.Button.keyboard}
+                  aria={componentDocs.Button.aria}
+                  screenReader={componentDocs.Button.screenReader}
+                />
               </div>
             </CardContent>
           </Card>

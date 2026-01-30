@@ -71,6 +71,7 @@ const Input = forwardRef(function Input(
     icon,
     variant: externalVariant = 'default',
     error: externalError,
+    helperText, // Destructure to prevent passing to DOM (not yet implemented, but documented)
     clearable = false,
     showCount = false,
     validate,

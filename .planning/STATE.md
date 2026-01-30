@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 17 of 18 (Accessibility Testing)
-Plan: 1 of 7 in phase 17 (COMPLETE)
+Plan: 3 of 7 in phase 17 (COMPLETE)
 Status: In progress
-Last activity: 2026-01-30 - Completed 17-01-PLAN.md (Reduced Motion Foundation)
+Last activity: 2026-01-30 - Completed 17-03-PLAN.md (Form Controls Keyboard Navigation)
 
-Progress: [█████████████████░░░] 93.7% (89 plans complete)
+Progress: [██████████████████░░] 95.8% (91 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 89 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 39 plans)
+- Total plans completed: 91 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 41 plans)
 - Average duration: ~4.5 min per plan
-- Total execution time: ~6.5 hours across 3 milestones
+- Total execution time: ~6.8 hours across 3 milestones
 
 **By Milestone:**
 
@@ -34,9 +34,9 @@ Progress: [█████████████████░░░] 93.7% (
 **Recent Trend:**
 - Milestone velocity improving (v2.0 shipped in 1/3 the time of v1.0)
 - Plan complexity stable (~5 min average)
-- Phase 17 started (1/7 plans complete)
+- Phase 17 progressing (3/7 plans complete)
 
-*Updated after 17-01 completion (Reduced Motion Foundation)*
+*Updated after 17-03 completion (Form Controls Keyboard Navigation)*
 
 ## Accumulated Context
 
@@ -157,6 +157,10 @@ Recent decisions affecting current work:
 - **17-01: SSR defaults to reduced motion (true) for accessibility safety**
 - **17-01: Query for no-preference instead of reduce for simpler logic**
 - **17-01: CSS handles animation reduction; useReducedMotion hook for JS logic changes**
+- **17-03: Tab focus test pattern: render with button Before, user.tab(), expect element toHaveFocus()**
+- **17-03: Tab skip test pattern: disabled element between two buttons, Tab should skip**
+- **17-03: Readonly vs disabled distinction: readonly receives focus but blocks editing**
+- **17-03: Slider Home/End keys for min/max, PageUp/PageDown for 10% steps**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -206,6 +210,8 @@ Key architectural patterns from v1.0 + v2.0:
 - **useReducedMotion pattern: typeof window check for SSR, matchMedia listener for updates**
 - **Reduced motion testing: verify animation classes present, document CSS handles reduction**
 - **Essential feedback preservation: components remain visible regardless of motion preference**
+- **Keyboard navigation test pattern: Tab focus, arrow keys, Enter selection, Escape close**
+- **Disabled tab order pattern: disabled elements skipped, readonly elements receive focus**
 
 ### Pending Todos
 
@@ -226,6 +232,6 @@ None - Phase 17 progressing normally.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 17-01-PLAN.md (Reduced Motion Foundation)
-Resume file: .planning/phases/17-accessibility-testing/17-02-PLAN.md
-Next step: Execute 17-02 (Keyboard Navigation - Button)
+Stopped at: Completed 17-03-PLAN.md (Form Controls Keyboard Navigation)
+Resume file: .planning/phases/17-accessibility-testing/17-04-PLAN.md
+Next step: Execute 17-04 (Focus Management)

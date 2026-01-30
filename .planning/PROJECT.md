@@ -10,10 +10,10 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v2.0 (shipped 2026-01-28)
-**Status:** Production-ready with complete Netatmo control and monitoring
+**Version:** v3.0 (shipped 2026-01-30)
+**Status:** Production-ready with complete design system and accessible UI components
 
-**Shipped Capabilities (v1.0 + v2.0):**
+**Shipped Capabilities (v1.0 + v2.0 + v3.0):**
 - ✅ Push notification system with token persistence and multi-device support
 - ✅ Admin dashboard with delivery metrics and 7-day trends
 - ✅ User preferences with type toggles, DND hours, rate limiting
@@ -24,6 +24,12 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✅ Intelligent stove-thermostat coordination with user intent detection
 - ✅ Monitoring dashboard with connection status, timeline, and push alerts
 - ✅ Complete schedule UI with 7-day timeline and override management
+- ✅ **Complete UI component library** (25+ components with CVA type-safe variants)
+- ✅ **Radix UI accessibility primitives** (Checkbox, Switch, RadioGroup, Select, Slider, Dialog, Tooltip, Toast)
+- ✅ **Design token system** (semantic CSS variables, @theme directive, ESLint enforcement)
+- ✅ **Full page migration** (all pages use consistent design system components)
+- ✅ **WCAG AA accessibility** (172 axe tests, 436 keyboard navigation tests)
+- ✅ **Interactive documentation** (/debug/design-system with PropTable, examples)
 
 **Operational Setup Required:**
 - Cron webhook configuration for health monitoring (1-min frequency)
@@ -31,24 +37,15 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Firestore index deployment (`firebase deploy --only firestore:indexes`)
 - Token cleanup cron configuration (from v1.0)
 
-## Current Milestone: v3.0 Design System Evolution
-
-**Goal:** Establish a complete, consistent, and accessible UI component library based on evolved Ember Noir design system, then systematically apply it across all application pages for visual consistency and professional polish.
-
-**Target features:**
-- Complete UI component library (all components from documentation)
-- Enhanced Ember Noir v2 (improved contrast, accessibility, modern patterns)
-- Consistent application across all pages (dashboard, stove, thermostat, lights, camera, monitoring)
-- WCAG AA accessibility compliance
-- Comprehensive component testing
-
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
 - Firebase (Realtime Database for tokens/cache, Firestore for history)
 - Auth0 for authentication
 - Playwright for E2E testing
 - Recharts for visualization
-- ~73,000 lines TypeScript/JavaScript
+- CVA (class-variance-authority) for type-safe component variants
+- Radix UI primitives for accessible interactions
+- ~104,000 lines JavaScript
 
 ## Requirements
 
@@ -145,15 +142,22 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-**v3.0 Milestone (In Planning):**
+**Next Milestone (TBD):**
 
-Requirements being defined through research → requirements → roadmap cycle.
+No active milestone. Run `/gsd:new-milestone` to start next planning cycle.
 
-**Focus areas:**
-- Complete UI component library following Ember Noir v2 evolution
-- Consistent visual design across all pages
-- Enhanced accessibility (WCAG AA)
-- Professional polish and modern UI patterns
+**Potential focus areas for v3.1+:**
+- Advanced components (Tabs, Accordion, Command Palette, Data Table)
+- Form validation library integration (React Hook Form + Zod)
+- Animation library (Framer Motion)
+- Virtual scrolling for large lists
+
+**v3.0 Design System Evolution (Shipped 2026-01-30):**
+- ✓ Complete UI component library (25+ components)
+- ✓ CVA type-safe variants across all components
+- ✓ Radix UI primitives for accessibility
+- ✓ WCAG AA compliance verified
+- ✓ All pages migrated to design system
 
 ### Out of Scope
 
@@ -176,26 +180,41 @@ Requirements being defined through research → requirements → roadmap cycle.
 - Firestore per notification history
 - Auth0 per autenticazione
 - Service Worker (Serwist) per offline capability
-- Multi-device smart home control (stufa, termostato, luci, camera)
-- ~70,000 lines TypeScript/JavaScript
+- Multi-device smart home control (stufa, termostato, luci)
+- CVA + Radix UI design system (25+ components)
+- ~104,000 lines JavaScript
+
+**v3.0 Milestone (2026-01-28 → 2026-01-30):**
+- 8 phases executed (52 plans total)
+- 48/48 requirements satisfied (100%)
+- Complete UI component library with type-safe variants
+- Radix UI primitives for all interactive components
+- WCAG AA accessibility verified (172 axe tests)
+- All application pages migrated to design system
+- Interactive documentation at /debug/design-system
+
+**v2.0 Milestone (2026-01-27 → 2026-01-28):**
+- 5 phases executed (21 plans total)
+- 22/22 requirements satisfied (100%)
+- Netatmo schedule management complete
+- Stove health monitoring operational
+- Stove-thermostat coordination working
 
 **v1.0 Milestone (2026-01-23 → 2026-01-26):**
 - 5 phases executed (29 plans total)
 - 31/31 requirements satisfied (100%)
-- Browser restart token persistence bug FIXED
-- Complete delivery visibility implemented
-- User control over notification behavior
-- Comprehensive E2E test coverage
-- Production-ready with operational setup pending
+- Push notification system complete
+- E2E test coverage comprehensive
 
 **Known Issues:**
 - Cron automation not operational (requires cron-job.org setup)
 - Rate limiter in-memory only (consider Redis for multi-instance)
 - Auth0 mock in E2E tests is placeholder
 - Firestore indexes require manual deployment
+- Label component not exported from barrel (low impact)
 
 **User Feedback:**
-- None yet (v1.0 just shipped, awaiting operational deployment)
+- None yet (awaiting operational deployment)
 
 ## Key Decisions
 
@@ -220,5 +239,5 @@ Requirements being defined through research → requirements → roadmap cycle.
 - **Deployment**: Vercel (current hosting platform)
 
 ---
-*Last updated: 2026-01-28 after starting v3.0 milestone (Design System Evolution)*
-*Next: Research → Requirements → Roadmap*
+*Last updated: 2026-01-30 after v3.0 milestone (Design System Evolution)*
+*Next: `/gsd:new-milestone` to start v3.1 or v4.0*

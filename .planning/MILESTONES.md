@@ -4,6 +4,44 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 
 ---
 
+## v3.0 Design System Evolution (Shipped: 2026-01-30)
+
+**Delivered:** Complete, consistent, and accessible UI component library based on evolved Ember Noir design system, systematically applied across all application pages for visual consistency and professional polish.
+
+**Phases completed:** 11-18 (52 plans total)
+
+**Key accomplishments:**
+
+- Complete UI component library with 25+ production-ready components using CVA type-safe variants (Button, Card, Modal, Toast, Slider, Checkbox, Switch, Select, RadioGroup, etc.)
+- Radix UI accessibility foundation for all interactive components with proper keyboard navigation, focus management, and ARIA patterns
+- Comprehensive accessibility testing infrastructure with 172 jest-axe tests, 436 keyboard navigation tests, WCAG AA verified
+- Design token system with semantic CSS variables via @theme directive, ESLint enforcement, and consistent Ember Noir styling
+- Full application migration of all pages (Dashboard, Stove, Thermostat, Lights, Monitoring, Settings, Admin) to design system components
+- Documentation infrastructure with interactive design system page, PropTable, CodeBlock, AccessibilitySection components, and comprehensive markdown docs
+
+**Stats:**
+
+- 52 plans executed across 8 phases
+- 48/48 v3.0 requirements satisfied (100%)
+- 250 files changed (+48,039 insertions, -2,634 deletions)
+- ~104,000 lines of JavaScript codebase
+- 1,361+ component tests passing
+- 3 days from phase 11 start to completion (2026-01-28 → 2026-01-30)
+- 194 git commits with atomic, well-documented changes
+
+**Git range:** `feat(11-01)` → `feat(18-04)`
+
+**Archives:**
+- [Roadmap](milestones/v3.0-ROADMAP.md)
+- [Requirements](milestones/v3.0-REQUIREMENTS.md)
+- [Audit](milestones/v3.0-MILESTONE-AUDIT.md)
+
+**Tech debt:** Label component not exported from barrel (low impact, used internally).
+
+**What's next:** Design system establishes solid foundation for future development. Consider v3.1 for advanced components (Tabs, Accordion, Command Palette, Data Table) or v4.0 for new feature work.
+
+---
+
 ## v2.0 Netatmo Complete Control & Stove Monitoring (Shipped: 2026-01-28)
 
 **Delivered:** Complete Netatmo thermostat control with weekly schedule management, automated stove health monitoring via cron, intelligent stove-thermostat coordination with user intent detection, and comprehensive monitoring dashboard with push notification alerts.

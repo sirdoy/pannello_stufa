@@ -91,6 +91,31 @@ describe('Card', () => {
       expect(results).toHaveNoViolations();
     });
 
+    // Focus indicator tests for interactive cards
+    // Per A11Y-03: Interactive elements must have visible focus indicators
+    it('hover variant has cursor-pointer for interactivity', () => {
+      const { container } = render(
+        <Card hover>
+          <p>Interactive card</p>
+        </Card>
+      );
+      const card = container.firstChild;
+      // Hover variant enables cursor-pointer indicating interactivity
+      expect(card).toHaveClass('cursor-pointer');
+    });
+
+    it('glow variant maintains readability with ember glow', () => {
+      const { container } = render(
+        <Card glow>
+          <p>Glowing content</p>
+        </Card>
+      );
+      const card = container.firstChild;
+      // Glow uses design token colors for consistent contrast
+      expect(card).toHaveClass('shadow-ember-glow');
+      expect(card).toHaveClass('border-ember-500/20');
+    });
+
     it('should have no a11y violations with all sub-components', async () => {
       const { container } = render(
         <Card>

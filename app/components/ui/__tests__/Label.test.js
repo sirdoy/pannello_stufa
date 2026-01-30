@@ -48,6 +48,38 @@ describe('Label', () => {
       const results = await axe(container);
       expect(results).toHaveNoViolations();
     });
+
+    // Label-input association tests (A11Y-03: Semantic HTML)
+    it('associates correctly with input via htmlFor', () => {
+      render(
+        <div>
+          <Label htmlFor="test-email">Email</Label>
+          <input id="test-email" type="email" />
+        </div>
+      );
+      const label = screen.getByText('Email');
+      expect(label).toHaveAttribute('for', 'test-email');
+    });
+
+    it('required label shows asterisk via CSS pseudo-element', () => {
+      render(<Label variant="required">Required Field</Label>);
+      const label = screen.getByText('Required Field');
+      // Required variant uses ::after pseudo-element for asterisk
+      expect(label).toHaveClass("after:content-['*']");
+      expect(label).toHaveClass('after:text-ember-500');
+      expect(label).toHaveClass('after:ml-0.5');
+    });
+
+    it('should have no a11y violations with all sizes', async () => {
+      const sizes = ['sm', 'md', 'lg'];
+      for (const size of sizes) {
+        const { container } = render(
+          <Label size={size}>{size} Label</Label>
+        );
+        const results = await axe(container);
+        expect(results).toHaveNoViolations();
+      }
+    });
   });
 
   describe('CVA Variants', () => {

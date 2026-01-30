@@ -4,7 +4,7 @@
 
 - v1.0 Push Notifications System - Phases 1-5 (shipped 2026-01-26)
 - v2.0 Netatmo Complete Control & Stove Monitoring - Phases 6-10 (shipped 2026-01-28)
-- v3.0 Design System Evolution - Phases 11-18 (in progress)
+- v3.0 Design System Evolution - Phases 11-18 (shipped 2026-01-30)
 
 ## Phases
 
@@ -111,7 +111,10 @@
 
 </details>
 
-### v3.0 Design System Evolution (In Progress)
+<details>
+<summary>v3.0 Design System Evolution (Phases 11-18) - SHIPPED 2026-01-30</summary>
+
+### v3.0 Design System Evolution
 
 **Milestone Goal:** Establish complete, consistent, accessible UI component library based on evolved Ember Noir design system, then systematically apply it across all application pages for visual consistency and professional polish.
 
@@ -286,10 +289,12 @@ Plans:
 **Plans**: 4 plans in 2 waves
 
 Plans:
-- [ ] 18-01-PLAN.md: Documentation infrastructure (CodeBlock, PropTable, AccessibilitySection components)
-- [ ] 18-02-PLAN.md: Component metadata (component-docs.js with props, keyboard, ARIA)
-- [ ] 18-03-PLAN.md: Integrate documentation into design-system page
-- [ ] 18-04-PLAN.md: Update docs/design-system.md and create docs/accessibility.md
+- [x] 18-01-PLAN.md: Documentation infrastructure (CodeBlock, PropTable, AccessibilitySection components)
+- [x] 18-02-PLAN.md: Component metadata (component-docs.js with props, keyboard, ARIA)
+- [x] 18-03-PLAN.md: Integrate documentation into design-system page
+- [x] 18-04-PLAN.md: Update docs/design-system.md and create docs/accessibility.md
+
+</details>
 
 ## Progress
 
@@ -315,4 +320,4 @@ Phases execute in numeric order: 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18
 | 15. Smart Home Components Refactor | v3.0 | 9/9 | Complete | 2026-01-29 |
 | 16. Page Migration & Application | v3.0 | 11/11 | Complete | 2026-01-30 |
 | 17. Accessibility & Testing | v3.0 | 7/7 | Complete | 2026-01-30 |
-| 18. Documentation & Polish | v3.0 | 0/4 | Not started | - |
+| 18. Documentation & Polish | v3.0 | 4/4 | Complete | 2026-01-30 |

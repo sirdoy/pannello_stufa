@@ -316,7 +316,7 @@ function Select({
   };
 
   return (
-    <div className={containerClassName}>
+    <div className={containerClassName} suppressHydrationWarning>
       {label && (
         <label
           id={labelId}
@@ -324,6 +324,7 @@ function Select({
             'block text-sm font-bold mb-3 font-display',
             'text-slate-300 [html:not(.dark)_&]:text-slate-700'
           )}
+          suppressHydrationWarning
         >
           {icon && <span className="mr-2">{icon}</span>}
           {label}

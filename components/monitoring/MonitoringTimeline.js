@@ -103,7 +103,7 @@ export default function MonitoringTimeline() {
           onTypeChange={handleTypeChange}
           onSeverityChange={handleSeverityChange}
         />
-        <Card liquid>
+        <Card variant="glass">
           <div className="divide-y divide-slate-700/50 [html:not(.dark)_&]:divide-slate-200">
             {[1, 2, 3].map(i => (
               <div key={i} className="p-4">
@@ -128,7 +128,7 @@ export default function MonitoringTimeline() {
           onTypeChange={handleTypeChange}
           onSeverityChange={handleSeverityChange}
         />
-        <Card liquid className="p-8 text-center">
+        <Card variant="glass" className="p-8 text-center">
           <Text variant="ember" size="lg" className="mb-2">
             {error}
           </Text>
@@ -147,7 +147,7 @@ export default function MonitoringTimeline() {
           onTypeChange={handleTypeChange}
           onSeverityChange={handleSeverityChange}
         />
-        <Card liquid className="p-8">
+        <Card variant="glass" className="p-8">
           <EmptyState
             icon="📊"
             title={isFiltered ? 'Nessun evento trovato' : 'Nessun evento'}
@@ -171,7 +171,7 @@ export default function MonitoringTimeline() {
         onSeverityChange={handleSeverityChange}
       />
 
-      <Card liquid className="overflow-hidden">
+      <Card variant="glass" className="overflow-hidden">
         <InfiniteScroll
           dataLength={events.length}
           next={() => fetchEvents(false)}

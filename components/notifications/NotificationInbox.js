@@ -114,7 +114,7 @@ export default function NotificationInbox() {
           onClear={handleClearFilters}
           isFiltered={isFiltered}
         />
-        <Card liquid>
+        <Card variant="glass">
           <div className="divide-y divide-slate-700/50 [html:not(.dark)_&]:divide-slate-200">
             {[1, 2, 3].map(i => (
               <div key={i} className="p-4">
@@ -141,11 +141,11 @@ export default function NotificationInbox() {
           onClear={handleClearFilters}
           isFiltered={isFiltered}
         />
-        <Card liquid className="p-8 text-center">
+        <Card variant="glass" className="p-8 text-center">
           <Text variant="ember" size="lg" className="mb-2">
             {error}
           </Text>
-          <Button variant="secondary" onClick={() => fetchNotifications(true)}>
+          <Button variant="subtle" onClick={() => fetchNotifications(true)}>
             Riprova
           </Button>
         </Card>
@@ -165,7 +165,7 @@ export default function NotificationInbox() {
           onClear={handleClearFilters}
           isFiltered={isFiltered}
         />
-        <Card liquid className="p-8">
+        <Card variant="glass" className="p-8">
           <EmptyState
             icon="🔔"
             title={isFiltered ? 'Nessuna notifica trovata' : 'Nessuna notifica'}
@@ -191,7 +191,7 @@ export default function NotificationInbox() {
         isFiltered={isFiltered}
       />
 
-      <Card liquid className="overflow-hidden">
+      <Card variant="glass" className="overflow-hidden">
         <InfiniteScroll
           dataLength={notifications.length}
           next={() => fetchNotifications(false)}

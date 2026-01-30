@@ -161,6 +161,7 @@ Recent decisions affecting current work:
 - **17-03: Tab skip test pattern: disabled element between two buttons, Tab should skip**
 - **17-03: Readonly vs disabled distinction: readonly receives focus but blocks editing**
 - **17-03: Slider Home/End keys for min/max, PageUp/PageDown for 10% steps**
+- **17-02: RadioGroup arrow tests check focus only (not selection) due to JSDOM limitation with Radix auto-select**
 - **17-04: Focus trap tests verify both forward and reverse Tab cycling**
 - **17-04: Enter and Space key activation tests for close/dismiss buttons**
 - **17-04: Toast ARIA roles tested via viewport region semantics**

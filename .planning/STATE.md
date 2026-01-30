@@ -140,6 +140,11 @@ Recent decisions affecting current work:
 - **16-05: aria-hidden='true' on decorative icons for accessibility**
 - **16-05: role='region' + aria-label + tabIndex={0} for scrollable containers**
 - **16-06: variant='secondary' is invalid Button variant - must use subtle for secondary actions**
+- **16-07: Banner variant='success' with dismissible for save confirmation**
+- **16-07: Banner variant='error' compact for inline error messages**
+- **16-07: Badge variant='ocean' for device count, Badge variant='sage' for PWA indicator**
+- **16-07: Card component for device list items (replaces inline bg/border styling)**
+- **16-07: border-default token for dividers (eliminates light mode overrides)**
 - **16-10: Badge variant='sage' size='sm' for device active indicator**
 - **16-10: Banner variant='info' compact for theme saving status**
 - **16-10: Theme selection buttons are styled divs (radio-button pattern, not action buttons)**

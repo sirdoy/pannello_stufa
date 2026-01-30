@@ -274,19 +274,22 @@ Plans:
 - [x] 17-07-PLAN.md: Comprehensive accessibility.test.js + verification checkpoint
 
 #### Phase 18: Documentation & Polish
-**Goal**: Complete component documentation and migration guide
+**Goal**: Complete component documentation with interactive examples and accessibility guide
 **Depends on**: Phase 17
-**Requirements**: DOC-01, DOC-02, DOC-03, DOC-04, DOC-05
+**Requirements**: DOC-01, DOC-02, DOC-04, DOC-05 (DOC-03 migration guide NOT needed per user decision)
 **Success Criteria** (what must be TRUE):
-  1. /debug/design-system page displays all components with interactive examples
+  1. /debug/design-system page displays components with interactive code examples (copy-to-clipboard)
   2. All components have documented APIs (props, variants, usage examples)
-  3. Migration guide exists showing how to convert old patterns to new components
-  4. docs/design-system.md documents new Ember Noir v2 patterns and best practices
-  5. Each component documents its accessibility features and keyboard interactions
-**Plans**: TBD
+  3. docs/design-system.md documents v3.0 patterns and best practices
+  4. docs/accessibility.md provides centralized accessibility reference
+  5. Each interactive component documents keyboard navigation and ARIA attributes
+**Plans**: 4 plans in 2 waves
 
 Plans:
-- [ ] 18-01: TBD
+- [ ] 18-01-PLAN.md: Documentation infrastructure (CodeBlock, PropTable, AccessibilitySection components)
+- [ ] 18-02-PLAN.md: Component metadata (component-docs.js with props, keyboard, ARIA)
+- [ ] 18-03-PLAN.md: Integrate documentation into design-system page
+- [ ] 18-04-PLAN.md: Update docs/design-system.md and create docs/accessibility.md
 
 ## Progress
 
@@ -312,4 +315,4 @@ Phases execute in numeric order: 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18
 | 15. Smart Home Components Refactor | v3.0 | 9/9 | Complete | 2026-01-29 |
 | 16. Page Migration & Application | v3.0 | 11/11 | Complete | 2026-01-30 |
 | 17. Accessibility & Testing | v3.0 | 7/7 | Complete | 2026-01-30 |
-| 18. Documentation & Polish | v3.0 | 0/TBD | Not started | - |
+| 18. Documentation & Polish | v3.0 | 0/4 | Not started | - |

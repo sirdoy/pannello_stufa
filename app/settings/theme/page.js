@@ -16,6 +16,7 @@ import { THEMES } from '@/lib/themeService';
 import SettingsLayout from '@/app/components/SettingsLayout';
 import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
+import Banner from '@/app/components/ui/Banner';
 import Skeleton from '@/app/components/ui/Skeleton';
 import { Heading, Text } from '@/app/components/ui';
 
@@ -143,11 +144,9 @@ export default function ThemeSettingsPage() {
 
         {/* Status Message */}
         {isSaving && (
-          <div className="mt-4 p-3 bg-ocean-50 [html:not(.dark)_&]:bg-ocean-50 bg-ocean-900/20 border border-ocean-200 [html:not(.dark)_&]:border-ocean-200 border-ocean-800 rounded-lg">
-            <Text variant="ocean" size="sm">
-              Salvataggio tema in corso...
-            </Text>
-          </div>
+          <Banner variant="info" compact className="mt-4">
+            Salvataggio tema in corso...
+          </Banner>
         )}
       </Card>
 

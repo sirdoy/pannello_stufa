@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-28)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 16 - Page Migration & Application (v3.0 Design System Evolution) - IN PROGRESS
+**Current focus:** Phase 16 - Page Migration & Application (v3.0 Design System Evolution) - COMPLETE
 
 ## Current Position
 
 Phase: 16 of 18 (Page Migration & Application)
-Plan: 10 of 11 in phase 16
-Status: In progress
-Last activity: 2026-01-30 - Completed 16-10-PLAN.md (Settings devices/theme pages migration)
+Plan: 11 of 11 in phase 16 (COMPLETE)
+Status: Phase complete
+Last activity: 2026-01-30 - Completed 16-11-PLAN.md (Admin/Debug pages migration)
 
-Progress: [███████████████████░] 91.3% (87 plans complete)
+Progress: [████████████████████] 92.5% (88 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 81 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 31 plans)
+- Total plans completed: 88 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 38 plans)
 - Average duration: ~4.5 min per plan
-- Total execution time: ~6 hours across 3 milestones
+- Total execution time: ~6.5 hours across 3 milestones
 
 **By Milestone:**
 
@@ -29,14 +29,14 @@ Progress: [███████████████████░] 91.3% (
 |-----------|--------|-------|----------|
 | v1.0 Push Notifications | 5 | 29 | 4 days (2026-01-23 -> 2026-01-26) |
 | v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 -> 2026-01-28) |
-| v3.0 Design System | 8 | 30 | In progress |
+| v3.0 Design System | 8 | 38 | In progress (Phase 16 complete) |
 
 **Recent Trend:**
 - Milestone velocity improving (v2.0 shipped in 1/3 the time of v1.0)
 - Plan complexity stable (~5 min average)
-- Phase 16 in progress (10/11 plans complete)
+- Phase 16 complete (11/11 plans)
 
-*Updated after 16-10 completion (Settings devices/theme pages migration)*
+*Updated after 16-11 completion (Admin/Debug pages migration)*
 
 ## Accumulated Context
 
@@ -151,6 +151,9 @@ Recent decisions affecting current work:
 - **16-08: PageLayout wrapper for design system showcase**
 - **16-08: SectionShowcase helper renamed to avoid Section import conflict**
 - **16-08: Tooltip.Provider wrapper required for tooltip context in demos**
+- **16-11: Card glow for status indicator in transitions page**
+- **16-11: Banner info variant for help sections in debug pages**
+- **16-11: Design tokens: bg-{color}-500/10 for dark, bg-{color}-50 for light**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -196,6 +199,7 @@ Key architectural patterns from v1.0 + v2.0:
 - **Button variant override pattern: Use className to override variant colors while keeping Button base styling**
 - **Grid breakpoint override pattern: Pass className='md:grid-cols-X' when default responsive pattern doesn't match**
 - **Banner for help boxes pattern: Use Banner component with children for complex help/info content**
+- **Debug page layout: PageLayout maxWidth='4xl' with space-y-6 content wrapper**
 
 ### Pending Todos
 
@@ -207,7 +211,7 @@ Key architectural patterns from v1.0 + v2.0:
 
 ### Blockers/Concerns
 
-None. Phase 16 in progress.
+None. Phase 16 complete.
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
@@ -215,7 +219,7 @@ None. Phase 16 in progress.
 
 ## Session Continuity
 
-Last session: 2026-01-30 08:12 UTC
-Stopped at: Completed 16-08-PLAN.md (Design system page migration)
+Last session: 2026-01-30 08:15 UTC
+Stopped at: Completed 16-11-PLAN.md (Admin/Debug pages migration - Phase 16 COMPLETE)
 Resume file: None
-Next step: Continue Phase 16 (16-09 next)
+Next step: Phase 17 or v3.0 milestone release

@@ -265,13 +265,13 @@ Plans:
 **Plans**: 7 plans in 3 waves
 
 Plans:
-- [ ] 17-01-PLAN.md: useReducedMotion hook + Spinner/Progress reduced motion tests
-- [ ] 17-02-PLAN.md: Keyboard navigation tests for Button, Checkbox, Switch, RadioGroup
-- [ ] 17-03-PLAN.md: Keyboard navigation tests for Select, Slider, Input
-- [ ] 17-04-PLAN.md: Accessibility tests for Modal, Tooltip, Toast, Banner, EmptyState
-- [ ] 17-05-PLAN.md: Accessibility tests for Card, Badge, Label, Divider, Heading, Text
-- [ ] 17-06-PLAN.md: Accessibility tests for smart home components
-- [ ] 17-07-PLAN.md: Comprehensive accessibility.test.js + verification checkpoint
+- [x] 17-01-PLAN.md: useReducedMotion hook + Spinner/Progress reduced motion tests
+- [x] 17-02-PLAN.md: Keyboard navigation tests for Button, Checkbox, Switch, RadioGroup
+- [x] 17-03-PLAN.md: Keyboard navigation tests for Select, Slider, Input
+- [x] 17-04-PLAN.md: Accessibility tests for Modal, Tooltip, Toast, Banner, EmptyState
+- [x] 17-05-PLAN.md: Accessibility tests for Card, Badge, Label, Divider, Heading, Text
+- [x] 17-06-PLAN.md: Accessibility tests for smart home components
+- [x] 17-07-PLAN.md: Comprehensive accessibility.test.js + verification checkpoint
 
 #### Phase 18: Documentation & Polish
 **Goal**: Complete component documentation and migration guide
@@ -311,5 +311,5 @@ Phases execute in numeric order: 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18
 | 14. Feedback & Layout Components | v3.0 | 7/7 | Complete | 2026-01-29 |
 | 15. Smart Home Components Refactor | v3.0 | 9/9 | Complete | 2026-01-29 |
 | 16. Page Migration & Application | v3.0 | 11/11 | Complete | 2026-01-30 |
-| 17. Accessibility & Testing | v3.0 | 0/7 | Planned | - |
+| 17. Accessibility & Testing | v3.0 | 7/7 | Complete | 2026-01-30 |
 | 18. Documentation & Polish | v3.0 | 0/TBD | Not started | - |

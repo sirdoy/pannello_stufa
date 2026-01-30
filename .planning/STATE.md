@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 17 of 18 (Accessibility Testing)
-Plan: 3 of 7 in phase 17 (COMPLETE)
+Plan: 4 of 7 in phase 17 (COMPLETE)
 Status: In progress
-Last activity: 2026-01-30 - Completed 17-03-PLAN.md (Form Controls Keyboard Navigation)
+Last activity: 2026-01-30 - Completed 17-04-PLAN.md (Feedback Components Accessibility)
 
-Progress: [██████████████████░░] 95.8% (91 plans complete)
+Progress: [██████████████████░░] 96.8% (92 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 91 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 41 plans)
+- Total plans completed: 92 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 42 plans)
 - Average duration: ~4.5 min per plan
-- Total execution time: ~6.8 hours across 3 milestones
+- Total execution time: ~6.9 hours across 3 milestones
 
 **By Milestone:**
 
@@ -29,14 +29,14 @@ Progress: [██████████████████░░] 95.8% (
 |-----------|--------|-------|----------|
 | v1.0 Push Notifications | 5 | 29 | 4 days (2026-01-23 -> 2026-01-26) |
 | v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 -> 2026-01-28) |
-| v3.0 Design System | 8 | 39 | In progress (Phase 17 started) |
+| v3.0 Design System | 8 | 40 | In progress (Phase 17 in progress) |
 
 **Recent Trend:**
 - Milestone velocity improving (v2.0 shipped in 1/3 the time of v1.0)
 - Plan complexity stable (~5 min average)
-- Phase 17 progressing (3/7 plans complete)
+- Phase 17 progressing (4/7 plans complete)
 
-*Updated after 17-03 completion (Form Controls Keyboard Navigation)*
+*Updated after 17-04 completion (Feedback Components Accessibility)*
 
 ## Accumulated Context
 
@@ -161,6 +161,10 @@ Recent decisions affecting current work:
 - **17-03: Tab skip test pattern: disabled element between two buttons, Tab should skip**
 - **17-03: Readonly vs disabled distinction: readonly receives focus but blocks editing**
 - **17-03: Slider Home/End keys for min/max, PageUp/PageDown for 10% steps**
+- **17-04: Focus trap tests verify both forward and reverse Tab cycling**
+- **17-04: Enter and Space key activation tests for close/dismiss buttons**
+- **17-04: Toast ARIA roles tested via viewport region semantics**
+- **17-04: Banner keyboard accessibility tests for Tab navigation**
 
 Key architectural patterns from v1.0 + v2.0:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
@@ -212,6 +216,10 @@ Key architectural patterns from v1.0 + v2.0:
 - **Essential feedback preservation: components remain visible regardless of motion preference**
 - **Keyboard navigation test pattern: Tab focus, arrow keys, Enter selection, Escape close**
 - **Disabled tab order pattern: disabled elements skipped, readonly elements receive focus**
+- **Focus trap testing pattern: Tab cycles forward, Shift+Tab cycles backward within container**
+- **Keyboard activation testing pattern: focus element, keyboard press, verify callback**
+- **ARIA role testing pattern: verify container roles and screen reader semantics**
+- **Icon aria-hidden pattern: decorative icons marked aria-hidden=true**
 
 ### Pending Todos
 
@@ -232,6 +240,6 @@ None - Phase 17 progressing normally.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 17-03-PLAN.md (Form Controls Keyboard Navigation)
-Resume file: .planning/phases/17-accessibility-testing/17-04-PLAN.md
-Next step: Execute 17-04 (Focus Management)
+Stopped at: Completed 17-04-PLAN.md (Feedback Components Accessibility)
+Resume file: .planning/phases/17-accessibility-testing/17-05-PLAN.md
+Next step: Execute 17-05 (Status/Indicator Components)

@@ -565,6 +565,14 @@ export default function DesignSystemPage() {
                     <Badge variant="warning" icon="⚠️">Warning</Badge>
                   </div>
                 </div>
+
+                <CardDivider />
+
+                {/* Props Reference */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Props Reference</Text>
+                  <PropTable props={componentDocs.Badge.props} />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -591,6 +599,14 @@ export default function DesignSystemPage() {
                   <ConnectionStatus status="online" size="md" />
                   <ConnectionStatus status="online" size="lg" />
                 </div>
+                <div className="mt-4">
+                  <PropTable props={componentDocs.ConnectionStatus.props} />
+                </div>
+                <AccessibilitySection
+                  keyboard={componentDocs.ConnectionStatus.keyboard}
+                  aria={componentDocs.ConnectionStatus.aria}
+                  screenReader={componentDocs.ConnectionStatus.screenReader}
+                />
               </CardContent>
             </Card>
 
@@ -611,6 +627,14 @@ export default function DesignSystemPage() {
                   <HealthIndicator status="critical" pulse label="Sistema critico" />
                   <HealthIndicator status="warning" label="Manutenzione richiesta" />
                 </div>
+                <div className="mt-4">
+                  <PropTable props={componentDocs.HealthIndicator.props} />
+                </div>
+                <AccessibilitySection
+                  keyboard={componentDocs.HealthIndicator.keyboard}
+                  aria={componentDocs.HealthIndicator.aria}
+                  screenReader={componentDocs.HealthIndicator.screenReader}
+                />
               </CardContent>
             </Card>
 
@@ -643,6 +667,20 @@ export default function DesignSystemPage() {
                 </SmartHomeCard.Controls>
               </SmartHomeCard>
             </div>
+            <Card variant="subtle">
+              <CardContent>
+                <PropTable props={componentDocs.SmartHomeCard.props} />
+                <div className="mt-4">
+                  <Text variant="tertiary" size="xs" className="mb-2">Usage</Text>
+                  <CodeBlock code={componentDocs.SmartHomeCard.codeExample} />
+                </div>
+                <AccessibilitySection
+                  keyboard={componentDocs.SmartHomeCard.keyboard}
+                  aria={componentDocs.SmartHomeCard.aria}
+                  screenReader={componentDocs.SmartHomeCard.screenReader}
+                />
+              </CardContent>
+            </Card>
 
             {/* StatusCard */}
             <Card>
@@ -673,6 +711,16 @@ export default function DesignSystemPage() {
                 size="compact"
               />
             </div>
+            <Card variant="subtle">
+              <CardContent>
+                <PropTable props={componentDocs.StatusCard.props} />
+                <AccessibilitySection
+                  keyboard={componentDocs.StatusCard.keyboard}
+                  aria={componentDocs.StatusCard.aria}
+                  screenReader={componentDocs.StatusCard.screenReader}
+                />
+              </CardContent>
+            </Card>
 
             {/* ControlButton */}
             <Card>
@@ -697,6 +745,18 @@ export default function DesignSystemPage() {
                 <Text variant="tertiary" size="xs" className="mt-3">
                   Long-press: hold button to continuously increment/decrement
                 </Text>
+                <div className="mt-4">
+                  <PropTable props={componentDocs.ControlButton.props} />
+                </div>
+                <div className="mt-4">
+                  <Text variant="tertiary" size="xs" className="mb-2">Usage</Text>
+                  <CodeBlock code={componentDocs.ControlButton.codeExample} />
+                </div>
+                <AccessibilitySection
+                  keyboard={componentDocs.ControlButton.keyboard}
+                  aria={componentDocs.ControlButton.aria}
+                  screenReader={componentDocs.ControlButton.screenReader}
+                />
               </CardContent>
             </Card>
           </div>
@@ -1316,6 +1376,14 @@ export default function DesignSystemPage() {
                       </CardFooter>
                     </Card>
                   </Modal>
+                  <div className="mt-4">
+                    <PropTable props={componentDocs.Modal.props} />
+                  </div>
+                  <AccessibilitySection
+                    keyboard={componentDocs.Modal.keyboard}
+                    aria={componentDocs.Modal.aria}
+                    screenReader={componentDocs.Modal.screenReader}
+                  />
                 </div>
 
                 <CardDivider />
@@ -1434,6 +1502,14 @@ export default function DesignSystemPage() {
                       </div>
                     </div>
                   </div>
+                  <div className="mt-4">
+                    <PropTable props={componentDocs.Toast.props} />
+                  </div>
+                  <AccessibilitySection
+                    keyboard={componentDocs.Toast.keyboard}
+                    aria={componentDocs.Toast.aria}
+                    screenReader={componentDocs.Toast.screenReader}
+                  />
                 </div>
               </div>
             </CardContent>

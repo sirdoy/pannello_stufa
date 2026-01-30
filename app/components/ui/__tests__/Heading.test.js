@@ -71,6 +71,48 @@ describe('Heading', () => {
       const results = await axe(container);
       expect(results).toHaveNoViolations();
     });
+
+    // Semantic heading levels (A11Y-03: Semantic HTML)
+    // Headings must render correct semantic level for document structure
+    it('renders with heading role at correct level', () => {
+      const { rerender } = render(<Heading level={1}>Title</Heading>);
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
+
+      rerender(<Heading level={2}>Title</Heading>);
+      expect(screen.getByRole('heading', { level: 2 })).toBeInTheDocument();
+
+      rerender(<Heading level={3}>Title</Heading>);
+      expect(screen.getByRole('heading', { level: 3 })).toBeInTheDocument();
+
+      rerender(<Heading level={4}>Title</Heading>);
+      expect(screen.getByRole('heading', { level: 4 })).toBeInTheDocument();
+
+      rerender(<Heading level={5}>Title</Heading>);
+      expect(screen.getByRole('heading', { level: 5 })).toBeInTheDocument();
+
+      rerender(<Heading level={6}>Title</Heading>);
+      expect(screen.getByRole('heading', { level: 6 })).toBeInTheDocument();
+    });
+
+    // Design token contrast (A11Y-04)
+    // Heading uses design tokens that ensure WCAG 2.1 AA contrast
+    it('uses design token colors ensuring readable contrast', () => {
+      render(<Heading variant="default">Default</Heading>);
+      const heading = screen.getByRole('heading');
+      // text-slate-100 on dark bg provides sufficient contrast
+      expect(heading).toHaveClass('text-slate-100');
+    });
+
+    it('should have no a11y violations with all sizes', async () => {
+      const sizes = ['sm', 'md', 'lg', 'xl', '2xl', '3xl'];
+      for (const size of sizes) {
+        const { container } = render(
+          <Heading size={size}>{size} Heading</Heading>
+        );
+        const results = await axe(container);
+        expect(results).toHaveNoViolations();
+      }
+    });
   });
 
   describe('Semantic HTML', () => {

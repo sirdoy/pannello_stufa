@@ -46,6 +46,34 @@ describe('Divider', () => {
       const divider = screen.getByRole('separator');
       expect(divider).toHaveAttribute('aria-orientation', 'vertical');
     });
+
+    // All variants pass axe (A11Y-07: ARIA roles)
+    it('should have no a11y violations for solid variant', async () => {
+      const { container } = render(<Divider variant="solid" />);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    it('should have no a11y violations for dashed variant', async () => {
+      const { container } = render(<Divider variant="dashed" />);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    it('should have no a11y violations for gradient variant', async () => {
+      const { container } = render(<Divider variant="gradient" />);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    // Screen reader context (A11Y-03: Semantic HTML)
+    it('provides orientation context for screen readers', () => {
+      const { rerender } = render(<Divider orientation="horizontal" />);
+      expect(screen.getByRole('separator')).toHaveAttribute('aria-orientation', 'horizontal');
+
+      rerender(<Divider orientation="vertical" />);
+      expect(screen.getByRole('separator')).toHaveAttribute('aria-orientation', 'vertical');
+    });
   });
 
   describe('CVA Variants', () => {

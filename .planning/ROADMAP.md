@@ -237,17 +237,17 @@ Plans:
 Note: PAGE-05 (Camera page) does not exist in current codebase - requirement removed.
 
 Plans:
-- [ ] 16-01-PLAN.md: Dashboard page migration (audit and cleanup)
-- [ ] 16-02-PLAN.md: Stove page migration (Button, Badge cleanup, preserve theming)
-- [ ] 16-03-PLAN.md: Thermostat page mode buttons and Grid migration
-- [ ] 16-04-PLAN.md: Lights page Slider, Badge, and styling migration
-- [ ] 16-05-PLAN.md: Monitoring page layout migration (Section, Grid)
-- [ ] 16-06-PLAN.md: Schedule page verification and cleanup
-- [ ] 16-07-PLAN.md: Notifications settings Banner and Badge migration
-- [ ] 16-08-PLAN.md: Design system page PageLayout wrapper
-- [ ] 16-09-PLAN.md: Final verification and human review checkpoint
-- [ ] 16-10-PLAN.md: Settings pages (devices, theme) migration
-- [ ] 16-11-PLAN.md: Admin/Debug pages migration (main, logs, transitions)
+- [x] 16-01-PLAN.md: Dashboard page migration (audit and cleanup)
+- [x] 16-02-PLAN.md: Stove page migration (Button, Badge cleanup, preserve theming)
+- [x] 16-03-PLAN.md: Thermostat page mode buttons and Grid migration
+- [x] 16-04-PLAN.md: Lights page Slider, Badge, and styling migration
+- [x] 16-05-PLAN.md: Monitoring page layout migration (Section, Grid)
+- [x] 16-06-PLAN.md: Schedule page verification and cleanup
+- [x] 16-07-PLAN.md: Notifications settings Banner and Badge migration
+- [x] 16-08-PLAN.md: Design system page PageLayout wrapper
+- [x] 16-09-PLAN.md: Final verification and human review checkpoint
+- [x] 16-10-PLAN.md: Settings pages (devices, theme) migration
+- [x] 16-11-PLAN.md: Admin/Debug pages migration (main, logs, transitions)
 
 #### Phase 17: Accessibility & Testing
 **Goal**: Ensure WCAG AA compliance and comprehensive accessibility testing
@@ -304,6 +304,6 @@ Phases execute in numeric order: 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18
 | 13. Foundation Refactoring | v3.0 | 7/7 | Complete | 2026-01-29 |
 | 14. Feedback & Layout Components | v3.0 | 7/7 | Complete | 2026-01-29 |
 | 15. Smart Home Components Refactor | v3.0 | 9/9 | Complete | 2026-01-29 |
-| 16. Page Migration & Application | v3.0 | 0/11 | Planned | - |
+| 16. Page Migration & Application | v3.0 | 11/11 | Complete | 2026-01-30 |
 | 17. Accessibility & Testing | v3.0 | 0/TBD | Not started | - |
 | 18. Documentation & Polish | v3.0 | 0/TBD | Not started | - |

@@ -1,7 +1,7 @@
 # Requirements: Pannello Stufa v3.1
 
 **Defined:** 2026-01-30
-**Core Value:** 100% design system compliance — every UI element uses design system components
+**Core Value:** 100% design system compliance - every UI element uses design system components
 
 ## v3.1 Requirements
 
@@ -51,7 +51,7 @@ Requirements for design system compliance milestone. Each maps to roadmap phases
 
 | Feature | Reason |
 |---------|--------|
-| Advanced components (Tabs, Accordion) | Different milestone focus — this is compliance, not new features |
+| Advanced components (Tabs, Accordion) | Different milestone focus - this is compliance, not new features |
 | Form validation library | Different milestone focus |
 | Animation library | Different milestone focus |
 | New component development | Only using existing v3.0 components |
@@ -86,8 +86,8 @@ Requirements for design system compliance milestone. Each maps to roadmap phases
 **Coverage:**
 - v3.1 requirements: 22 total
 - Mapped to phases: 22
-- Unmapped: 0 ✓
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-30*
-*Last updated: 2026-01-30 after initial definition*
+*Last updated: 2026-01-30 after roadmap creation*

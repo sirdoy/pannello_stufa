@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v3.1 Design System Compliance
+**Current focus:** v3.1 Design System Compliance - Phase 19 (StoveCard)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-01-30 — Milestone v3.1 started
+Phase: 19 of 24 (StoveCard Compliance)
+Plan: 0 of 2 in current phase
+Status: Ready to plan
+Last activity: 2026-01-30 - Roadmap created for v3.1 milestone
 
-Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (v3.1 Design System Compliance)
+Progress: [████████████████████░░░░] 85% (102/115 plans - v1.0+v2.0+v3.0 complete, v3.1 starting)
 
 ## Performance Metrics
 
@@ -27,16 +27,17 @@ Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (v3.
 
 | Milestone | Phases | Plans | Duration |
 |-----------|--------|-------|----------|
-| v1.0 Push Notifications | 5 | 29 | 4 days (2026-01-23 → 2026-01-26) |
-| v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 → 2026-01-28) |
-| v3.0 Design System | 8 | 52 | 3 days (2026-01-28 → 2026-01-30) |
+| v1.0 Push Notifications | 5 | 29 | 4 days (2026-01-23 - 2026-01-26) |
+| v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 - 2026-01-28) |
+| v3.0 Design System | 8 | 52 | 3 days (2026-01-28 - 2026-01-30) |
+| v3.1 Compliance | 6 | 13 | Starting |
 
 **Recent Trend:**
 - Milestone velocity stable (v3.0 was largest milestone yet with 52 plans)
 - Plan complexity stable (~5 min average)
-- All 3 milestones shipped: v1.0 (29 plans), v2.0 (21 plans), v3.0 (52 plans)
+- v3.1 scoped as lighter compliance milestone (13 plans vs 52 in v3.0)
 
-*Updated after v3.0 milestone completion*
+*Updated after v3.1 roadmap creation*
 
 ## Accumulated Context
 
@@ -66,7 +67,7 @@ Key architectural patterns from v1.0 + v2.0 + v3.0:
 
 ### Blockers/Concerns
 
-None - v3.0 milestone complete.
+None - ready to start v3.1 compliance work.
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
@@ -76,6 +77,6 @@ None - v3.0 milestone complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Milestone v3.1 started, defining requirements
+Stopped at: v3.1 roadmap created with 6 phases (19-24) and 13 plans
 Resume file: None
-Next step: Complete requirements definition, then `/gsd:plan-phase 19`
+Next step: `/gsd:plan-phase 19` to create detailed plan for StoveCard compliance

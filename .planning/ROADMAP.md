@@ -5,6 +5,7 @@
 - v1.0 Push Notifications System - Phases 1-5 (shipped 2026-01-26)
 - v2.0 Netatmo Complete Control & Stove Monitoring - Phases 6-10 (shipped 2026-01-28)
 - v3.0 Design System Evolution - Phases 11-18 (shipped 2026-01-30)
+- v3.1 Design System Compliance - Phases 19-24 (in progress)
 
 ## Phases
 
@@ -296,10 +297,103 @@ Plans:
 
 </details>
 
+### v3.1 Design System Compliance (In Progress)
+
+**Milestone Goal:** Achieve 100% design system compliance across all device cards and pages. Every raw HTML element (buttons, inputs) replaced with design system components. All styling uses CVA variants instead of inline/hard-coded values.
+
+#### Phase 19: StoveCard Compliance
+**Goal**: Replace all raw HTML elements in StoveCard with design system components
+**Depends on**: Phase 18
+**Requirements**: STOVE-01, STOVE-02, STOVE-03, STOVE-04
+**Success Criteria** (what must be TRUE):
+  1. User sees scheduler mode buttons (Manuale/Automatico/Semi) rendered using Button component with consistent styling
+  2. User sees "Torna in Automatico" action rendered using Button component
+  3. Stove status info uses CVA variants for consistent status styling across states
+  4. Status display uses standardized StatusCard or Badge components
+**Plans**: TBD
+
+Plans:
+- [ ] 19-01: StoveCard Button component migration (scheduler modes + actions)
+- [ ] 19-02: StoveCard status display CVA refactor
+
+#### Phase 20: ThermostatCard Compliance
+**Goal**: Replace all raw HTML elements in ThermostatCard with design system components
+**Depends on**: Phase 19
+**Requirements**: THERM-01, THERM-02, THERM-03, THERM-04
+**Success Criteria** (what must be TRUE):
+  1. User sees mode selection grid buttons rendered using Button component with proper variants
+  2. User sees calibrate action button rendered using Button component
+  3. Mode buttons use consistent ButtonGroup or variant pattern for visual grouping
+  4. Temperature display uses standardized component pattern with consistent typography
+**Plans**: TBD
+
+Plans:
+- [ ] 20-01: ThermostatCard Button component migration (mode grid + calibrate)
+- [ ] 20-02: ThermostatCard temperature display standardization
+
+#### Phase 21: LightsCard Compliance
+**Goal**: Replace all raw HTML elements in LightsCard with design system components
+**Depends on**: Phase 20
+**Requirements**: LIGHT-01, LIGHT-02, LIGHT-03, LIGHT-04
+**Success Criteria** (what must be TRUE):
+  1. User can adjust brightness using design system Slider component with proper styling
+  2. User sees scene buttons rendered using Button component with consistent variants
+  3. Adaptive styling (based on light state) uses CVA variants instead of inline styles
+  4. Brightness panel uses standardized component pattern with consistent layout
+**Plans**: TBD
+
+Plans:
+- [ ] 21-01: LightsCard Slider migration (replace raw input range)
+- [ ] 21-02: LightsCard Button migration (scene buttons + CVA adaptive styling)
+
+#### Phase 22: CameraCard Compliance
+**Goal**: Replace all raw HTML elements in camera components with design system components
+**Depends on**: Phase 21
+**Requirements**: CAM-01, CAM-02, CAM-03
+**Success Criteria** (what must be TRUE):
+  1. CameraCard interactive elements use Button component with proper styling
+  2. EventPreviewModal close and navigation buttons use Button component
+  3. HlsPlayer controls use Button component for play/pause/fullscreen actions
+**Plans**: TBD
+
+Plans:
+- [ ] 22-01: CameraCard and EventPreviewModal Button migration
+- [ ] 22-02: HlsPlayer Button migration for player controls
+
+#### Phase 23: Thermostat Page Compliance
+**Goal**: Replace all raw HTML elements on thermostat page with design system components
+**Depends on**: Phase 22
+**Requirements**: PAGE-01, PAGE-02, PAGE-03
+**Success Criteria** (what must be TRUE):
+  1. User sees mode buttons on thermostat page rendered using Button component variants
+  2. User sees info boxes using standardized InfoBox or Card component
+  3. Thermostat page wrapped in PageLayout for consistent page structure
+**Plans**: TBD
+
+Plans:
+- [ ] 23-01: Thermostat page Button migration (mode buttons)
+- [ ] 23-02: Thermostat page InfoBox + PageLayout wrapper
+
+#### Phase 24: Verification & Polish
+**Goal**: Verify complete design system compliance across all device components
+**Depends on**: Phase 23
+**Requirements**: VERIFY-01, VERIFY-02, VERIFY-03, VERIFY-04
+**Success Criteria** (what must be TRUE):
+  1. All device cards pass ESLint with no hard-coded color warnings
+  2. Zero raw `<button>` elements remain in device components (all use Button)
+  3. Zero raw `<input>` elements remain in device components (all use Input/Slider/etc)
+  4. Visual inspection confirms consistent styling across all device cards
+**Plans**: TBD
+
+Plans:
+- [ ] 24-01: ESLint verification and hard-coded color cleanup
+- [ ] 24-02: Raw element elimination verification
+- [ ] 24-03: Visual consistency verification and final polish
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18
+Phases execute in numeric order: 19 -> 20 -> 21 -> 22 -> 23 -> 24
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -321,3 +415,9 @@ Phases execute in numeric order: 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18
 | 16. Page Migration & Application | v3.0 | 11/11 | Complete | 2026-01-30 |
 | 17. Accessibility & Testing | v3.0 | 7/7 | Complete | 2026-01-30 |
 | 18. Documentation & Polish | v3.0 | 4/4 | Complete | 2026-01-30 |
+| 19. StoveCard Compliance | v3.1 | 0/2 | Not started | - |
+| 20. ThermostatCard Compliance | v3.1 | 0/2 | Not started | - |
+| 21. LightsCard Compliance | v3.1 | 0/2 | Not started | - |
+| 22. CameraCard Compliance | v3.1 | 0/2 | Not started | - |
+| 23. Thermostat Page Compliance | v3.1 | 0/2 | Not started | - |
+| 24. Verification & Polish | v3.1 | 0/3 | Not started | - |

@@ -8,8 +8,9 @@ import { cn } from '@/lib/utils/cn';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
 import RoomSelector from '../../ui/RoomSelector';
-import { Divider, Heading, Text, Button, EmptyState } from '../../ui';
+import { Divider, Heading, Text, Button, EmptyState, Spinner, Select } from '../../ui';
 import BatteryWarning, { ModuleBatteryList } from './BatteryWarning';
+import { useScheduleData } from '@/lib/hooks/useScheduleData';
 
 /**
  * ThermostatCard - Complete thermostat control for homepage
@@ -32,8 +33,20 @@ export default function ThermostatCard() {
   // Loading overlay message
   const [loadingMessage, setLoadingMessage] = useState('Caricamento...');
 
+  // Schedule management
+  const { schedules, activeSchedule, loading: scheduleLoading, refetch: refetchSchedules } = useScheduleData();
+  const [switchingSchedule, setSwitchingSchedule] = useState(false);
+  const [selectedScheduleId, setSelectedScheduleId] = useState(null);
+
   const connectionCheckedRef = useRef(false);
   const pollingStartedRef = useRef(false);
+
+  // Sync selectedScheduleId with activeSchedule
+  useEffect(() => {
+    if (activeSchedule && !selectedScheduleId) {
+      setSelectedScheduleId(activeSchedule.id);
+    }
+  }, [activeSchedule, selectedScheduleId]);
 
   // Check connection on mount
   useEffect(() => {
@@ -274,6 +287,33 @@ export default function ThermostatCard() {
     }
   }
 
+  async function handleScheduleChange(scheduleId) {
+    if (!scheduleId || scheduleId === activeSchedule?.id) return;
+
+    try {
+      setSwitchingSchedule(true);
+      setLoadingMessage('Cambio programmazione...');
+      setError(null);
+
+      const response = await fetch(NETATMO_ROUTES.schedules, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scheduleId }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Errore cambio programmazione');
+
+      // Refetch schedules to update active
+      await refetchSchedules();
+      setSelectedScheduleId(scheduleId);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSwitchingSchedule(false);
+    }
+  }
+
   const handleAuth = () => {
     // Use centralized OAuth URL with all scopes
     window.location.href = getNetatmoAuthUrl('thermostat');
@@ -340,7 +380,7 @@ export default function ThermostatCard() {
       onConnect={handleAuth}
       connectButtonLabel="Connetti Netatmo"
       connectInfoRoute="/thermostat"
-      loading={loading || refreshing || calibrating}
+      loading={loading || refreshing || calibrating || switchingSchedule}
       loadingMessage={loadingMessage}
       skeletonComponent={loading ? <Skeleton.ThermostatCard /> : null}
       banners={banners}
@@ -578,6 +618,53 @@ export default function ThermostatCard() {
                   </Button>
                 );
               })}
+            </div>
+
+            {/* Schedule Section */}
+            <div className="mt-5 sm:mt-6">
+              <Divider label="Programmazione" variant="gradient" spacing="large" />
+
+              <div className="mt-4 space-y-3">
+                {scheduleLoading ? (
+                  <div className="flex items-center justify-center py-4">
+                    <Spinner size="sm" />
+                  </div>
+                ) : schedules.length > 0 ? (
+                  <>
+                    <div className="flex items-end gap-3">
+                      <div className="flex-1">
+                        <label className="block mb-1.5">
+                          <Text variant="label" size="sm">Programmazione attiva</Text>
+                        </label>
+                        <Select
+                          value={selectedScheduleId || activeSchedule?.id || ''}
+                          onChange={(e) => {
+                            setSelectedScheduleId(e.target.value);
+                            handleScheduleChange(e.target.value);
+                          }}
+                          options={schedules.map(s => ({
+                            value: s.id,
+                            label: s.name,
+                          }))}
+                          disabled={switchingSchedule || refreshing}
+                        />
+                      </div>
+                    </div>
+
+                    {activeSchedule && selectedScheduleId === activeSchedule.id && (
+                      <div className="flex items-center gap-2">
+                        <Text variant="sage" size="sm">
+                          ✓ "{activeSchedule.name}" attiva
+                        </Text>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <Text variant="tertiary" size="sm">
+                    Nessuna programmazione disponibile
+                  </Text>
+                )}
+              </div>
             </div>
 
             {/* Calibrate Button - More prominent */}

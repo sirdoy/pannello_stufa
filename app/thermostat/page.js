@@ -222,7 +222,9 @@ function NetatmoContent() {
             </Button>
             <Button
               variant="subtle"
-              onClick={() => {
+              onClick={async () => {
+                // ✅ Clear token from Firebase before reconnecting
+                await fetch(NETATMO_ROUTES.disconnect, { method: 'POST' });
                 setConnected(false);
                 setError(null);
                 setTopology(null);

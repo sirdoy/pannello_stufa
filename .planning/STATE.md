@@ -74,9 +74,17 @@ None - ready to continue v3.1 compliance work.
 - Warning: DMS polling continues when page backgrounded (Phase 10, should use Page Visibility API)
 - Label component not exported from barrel (low impact, Phase 13)
 
+## Quick Tasks
+
+Quick tasks are completed outside the main roadmap and don't affect phase progress.
+
+| Task | Description | Status | Completed | Commits |
+|------|-------------|--------|-----------|---------|
+| 001 | Thermostat schedule view/edit in card | ✅ Complete | 2026-01-31 | c537828, 876a547 |
+
 ## Session Continuity
 
 Last session: 2026-01-31
-Stopped at: Phase 21 verified (LightsCard Compliance) - 4/4 must-haves passed
+Stopped at: Quick task 001 complete (Thermostat schedule selector in homepage card)
 Resume file: None
 Next step: `/gsd:plan-phase 22` to create detailed plan for CameraCard compliance

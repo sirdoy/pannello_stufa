@@ -31,7 +31,6 @@ export default function LightsCard() {
 
   // Local slider value for smooth dragging (avoid API calls during drag)
   const [localBrightness, setLocalBrightness] = useState(null);
-  const isDraggingSlider = useRef(false);
 
   // Pairing state
   const [pairing, setPairing] = useState(false);

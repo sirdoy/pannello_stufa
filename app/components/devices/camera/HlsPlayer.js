@@ -262,23 +262,14 @@ export default function HlsPlayer({ src, poster, className = '', onError, showCo
 
       {/* Fullscreen button - only show when not using native controls */}
       {!loading && !error && !showControls && (
-        <button
+        <Button.Icon
+          icon={isFullscreen ? <Minimize className="w-5 h-5 text-white" /> : <Maximize className="w-5 h-5 text-white" />}
           onClick={toggleFullscreen}
-          className="absolute bottom-2 right-2 p-2 rounded-full bg-slate-900/70 backdrop-blur-sm hover:bg-slate-800/90 transition-colors z-20"
-          title={isFullscreen ? 'Esci da schermo intero' : 'Schermo intero'}
-        >
-          {isFullscreen ? (
-            // Exit fullscreen icon
-            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          ) : (
-            // Enter fullscreen icon
-            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-            </svg>
-          )}
-        </button>
+          variant="ghost"
+          size="sm"
+          aria-label={isFullscreen ? 'Esci da schermo intero' : 'Schermo intero'}
+          className="absolute bottom-2 right-2 bg-slate-900/70 backdrop-blur-sm hover:bg-slate-800/90 z-20"
+        />
       )}
     </div>
   );

@@ -1,50 +1,43 @@
 'use client';
-import { tempToColor } from '@/lib/utils/scheduleHelpers';
+import { getZoneColor } from '@/lib/utils/scheduleHelpers';
 
 /**
- * TimelineSlot - Single temperature slot in timeline
+ * TimelineSlot - Single zone slot in timeline
  *
- * @param {number} temperature - Target temperature in °C
+ * @param {number} zoneType - Netatmo zone type (0=Comfort, 1=Night, 5=Away, 8=Comfort+)
+ * @param {string} zoneName - Name of the zone
  * @param {string} startTime - Formatted start time (e.g., "08:00")
  * @param {string} endTime - Formatted end time
  * @param {number} widthPercent - Slot width as percentage of day (0-100)
- * @param {string} zoneName - Name of the temperature zone
- * @param {boolean} showTime - Show time labels (default: false, only on hover/focus)
  */
 export default function TimelineSlot({
-  temperature,
+  zoneType,
+  zoneName,
   startTime,
   endTime,
   widthPercent,
-  zoneName,
-  showTime = false,
 }) {
-  const bgColor = tempToColor(temperature);
-
-  // Determine text color based on temperature (dark text for light backgrounds)
-  // Hot temps (>20°C) use dark backgrounds, need white text
-  // Cold temps (<18°C) use lighter backgrounds, need dark text
-  const textColor = temperature >= 19 ? 'text-white' : 'text-slate-900';
+  const zoneColor = getZoneColor(zoneType);
 
   return (
     <div
-      className={`
+      className="
         h-12 flex items-center justify-center
         text-xs font-semibold
-        ${textColor}
         transition-all duration-200
         hover:scale-y-110 hover:z-10
         group relative
         min-w-[40px]
-      `}
+      "
       style={{
         width: `${widthPercent}%`,
-        backgroundColor: bgColor,
+        backgroundColor: zoneColor.bg,
+        color: zoneColor.text,
       }}
-      title={`${zoneName}: ${temperature}°C (${startTime}-${endTime})`}
+      title={`${zoneName} (${startTime}-${endTime})`}
     >
-      {/* Always show temperature */}
-      <span>{temperature}°</span>
+      {/* Show zone name */}
+      <span className="truncate px-1">{zoneName}</span>
 
       {/* Time tooltip on hover */}
       <div className="

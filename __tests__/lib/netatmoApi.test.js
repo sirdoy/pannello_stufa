@@ -727,11 +727,14 @@ describe('netatmoApi', () => {
       expect(result).toHaveLength(1);
       expect(result[0].zones).toHaveLength(3);
 
-      // First zone - single room, should extract temp from rooms_temp[0]
+      // First zone - single room, average of [21] = 21
       expect(result[0].zones[0]).toHaveProperty('temp', 21);
+      expect(result[0].zones[0]).toHaveProperty('rooms_temp');
 
-      // Second zone - multi-room, should extract temp from rooms_temp[0] (first room)
-      expect(result[0].zones[1]).toHaveProperty('temp', 14);
+      // Second zone - multi-room, average of [14, 16] = 15
+      expect(result[0].zones[1]).toHaveProperty('temp', 15);
+      expect(result[0].zones[1]).toHaveProperty('rooms_temp');
+      expect(result[0].zones[1].rooms_temp).toHaveLength(2);
 
       // Third zone - Away with no rooms, should NOT have temp property
       expect(result[0].zones[2]).not.toHaveProperty('temp');

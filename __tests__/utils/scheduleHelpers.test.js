@@ -4,6 +4,8 @@ import {
   formatTimeFromMinutes,
   formatDuration,
   DAY_NAMES,
+  ZONE_COLORS,
+  getZoneColor,
 } from '@/lib/utils/scheduleHelpers';
 
 describe('scheduleHelpers', () => {
@@ -18,8 +20,8 @@ describe('scheduleHelpers', () => {
     it('should parse timetable with m_offset correctly', () => {
       const schedule = {
         zones: [
-          { id: 1, name: 'Comfort', temp: 20 },
-          { id: 2, name: 'Night', temp: 17 },
+          { id: 1, name: 'Comfort', type: 0 },
+          { id: 2, name: 'Night', type: 1 },
         ],
         timetable: [
           { m_offset: 0, zone_id: 2 }, // Monday 00:00 - Night
@@ -31,7 +33,6 @@ describe('scheduleHelpers', () => {
       const slots = parseTimelineSlots(schedule);
 
       // Last slot spans to end of week (10080 min), creating segments for each remaining day
-      // Monday 22:00-24:00, Tuesday-Sunday full days = 9 slots total
       expect(slots.length).toBeGreaterThanOrEqual(3);
 
       // First slot: Monday 00:00-07:00 (Night)
@@ -39,7 +40,7 @@ describe('scheduleHelpers', () => {
         day: 0, // Monday
         startMinutes: 0,
         endMinutes: 420,
-        temperature: 17,
+        zoneType: 1,
         zoneName: 'Night',
       });
       expect(slots[0].durationPercent).toBeCloseTo((420 / 1440) * 100);
@@ -49,7 +50,7 @@ describe('scheduleHelpers', () => {
         day: 0,
         startMinutes: 420,
         endMinutes: 1320,
-        temperature: 20,
+        zoneType: 0,
         zoneName: 'Comfort',
       });
       expect(slots[1].durationPercent).toBeCloseTo((900 / 1440) * 100);
@@ -59,20 +60,20 @@ describe('scheduleHelpers', () => {
         day: 0,
         startMinutes: 1320,
         endMinutes: 1440,
-        temperature: 17,
+        zoneType: 1,
         zoneName: 'Night',
       });
 
       // Remaining days should all be Night zones
       slots.slice(3).forEach(slot => {
-        expect(slot.temperature).toBe(17);
+        expect(slot.zoneType).toBe(1);
         expect(slot.zoneName).toBe('Night');
       });
     });
 
     it('should calculate day index correctly from m_offset', () => {
       const schedule = {
-        zones: [{ id: 1, name: 'Comfort', temp: 20 }],
+        zones: [{ id: 1, name: 'Comfort', type: 0 }],
         timetable: [
           { m_offset: 0, zone_id: 1 }, // Monday (day 0)
           { m_offset: 1440, zone_id: 1 }, // Tuesday (day 1)
@@ -90,7 +91,7 @@ describe('scheduleHelpers', () => {
 
     it('should handle slots spanning multiple days', () => {
       const schedule = {
-        zones: [{ id: 1, name: 'Comfort', temp: 20 }],
+        zones: [{ id: 1, name: 'Comfort', type: 0 }],
         timetable: [
           { m_offset: 1200, zone_id: 1 }, // Monday 20:00
           { m_offset: 3000, zone_id: 1 }, // Wednesday 02:00 (spans 2+ days)
@@ -115,7 +116,7 @@ describe('scheduleHelpers', () => {
 
     it('should skip slots with missing zones', () => {
       const schedule = {
-        zones: [{ id: 1, name: 'Comfort', temp: 20 }],
+        zones: [{ id: 1, name: 'Comfort', type: 0 }],
         timetable: [
           { m_offset: 0, zone_id: 1 },
           { m_offset: 420, zone_id: 999 }, // Zone doesn't exist
@@ -128,43 +129,57 @@ describe('scheduleHelpers', () => {
       expect(slots[0].zoneName).toBe('Comfort');
     });
 
-    it('should skip zones without temp property', () => {
+    it('should include all zone types including Away', () => {
       const schedule = {
         zones: [
-          { id: 1, name: 'Comfort', temp: 20 },
-          { id: 2, name: 'Away', type: 5 }, // No temp property (like parseSchedules filtered)
-          { id: 3, name: 'Night', temp: 17 },
+          { id: 1, name: 'Comfort', type: 0 },
+          { id: 2, name: 'Away', type: 5 },
+          { id: 3, name: 'Night', type: 1 },
         ],
         timetable: [
           { m_offset: 0, zone_id: 1 }, // Comfort
-          { m_offset: 420, zone_id: 2 }, // Away (no temp) - should be skipped
-          { m_offset: 1320, zone_id: 3 }, // Night (has temp)
+          { m_offset: 420, zone_id: 2 }, // Away
+          { m_offset: 1320, zone_id: 3 }, // Night
         ],
       };
 
       const slots = parseTimelineSlots(schedule);
 
-      // Should have slots for Comfort and Night, but skip Away
-      // All slots should have temperature property
+      // Should have slots for all zones including Away
       expect(slots.length).toBeGreaterThan(0);
+
+      // Check all zone types are present
+      const zoneTypes = new Set(slots.map(s => s.zoneType));
+      expect(zoneTypes.has(0)).toBe(true); // Comfort
+      expect(zoneTypes.has(5)).toBe(true); // Away
+      expect(zoneTypes.has(1)).toBe(true); // Night
+
+      // All slots should have zoneType
       slots.forEach(slot => {
-        expect(slot.temperature).toBeDefined();
-        expect(slot.temperature).not.toBeNull();
-        expect(slot.zoneName).not.toBe('Away');
+        expect(slot.zoneType).toBeDefined();
+        expect(slot.zoneName).toBeDefined();
       });
+    });
+  });
 
-      // First slot should be Comfort
-      expect(slots[0]).toMatchObject({
-        day: 0,
-        startMinutes: 0,
-        endMinutes: 420,
-        temperature: 20,
-        zoneName: 'Comfort',
-      });
+  describe('getZoneColor', () => {
+    it('should return correct colors for known zone types', () => {
+      expect(getZoneColor(0)).toBe(ZONE_COLORS[0]); // Comfort
+      expect(getZoneColor(1)).toBe(ZONE_COLORS[1]); // Night
+      expect(getZoneColor(5)).toBe(ZONE_COLORS[5]); // Away
+      expect(getZoneColor(8)).toBe(ZONE_COLORS[8]); // Comfort+
+    });
 
-      // No slot should reference the Away zone
-      const awaySlots = slots.filter(s => s.zoneName === 'Away');
-      expect(awaySlots).toHaveLength(0);
+    it('should return default color for unknown zone types', () => {
+      expect(getZoneColor(99)).toBe(ZONE_COLORS.default);
+      expect(getZoneColor(undefined)).toBe(ZONE_COLORS.default);
+    });
+
+    it('should have bg and text properties', () => {
+      const color = getZoneColor(0);
+      expect(color).toHaveProperty('bg');
+      expect(color).toHaveProperty('text');
+      expect(color).toHaveProperty('name');
     });
   });
 

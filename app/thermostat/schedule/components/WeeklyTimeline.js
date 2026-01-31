@@ -71,11 +71,11 @@ export default function WeeklyTimeline({ schedule, className = '' }) {
                   slotsByDay[dayIndex].map((slot, slotIndex) => (
                     <TimelineSlot
                       key={`${dayIndex}-${slotIndex}`}
-                      temperature={slot.temperature}
+                      zoneType={slot.zoneType}
+                      zoneName={slot.zoneName}
                       startTime={formatTimeFromMinutes(slot.startMinutes)}
                       endTime={formatTimeFromMinutes(slot.endMinutes)}
                       widthPercent={slot.durationPercent}
-                      zoneName={slot.zoneName}
                     />
                   ))
                 ) : (

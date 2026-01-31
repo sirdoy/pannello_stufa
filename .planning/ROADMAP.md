@@ -343,8 +343,8 @@ Plans:
 **Plans**: 2 plans in 1 wave
 
 Plans:
-- [ ] 21-01-PLAN.md — Slider migration (replace raw input range with design system Slider)
-- [ ] 21-02-PLAN.md — Scene Button migration (replace raw buttons with Button component)
+- [x] 21-01-PLAN.md — Slider migration (replace raw input range with design system Slider)
+- [x] 21-02-PLAN.md — Scene Button migration (replace raw buttons with Button component)
 
 #### Phase 22: CameraCard Compliance
 **Goal**: Replace all raw HTML elements in camera components with design system components
@@ -417,7 +417,7 @@ Phases execute in numeric order: 19 -> 20 -> 21 -> 22 -> 23 -> 24
 | 18. Documentation & Polish | v3.0 | 4/4 | Complete | 2026-01-30 |
 | 19. StoveCard Compliance | v3.1 | 2/2 | Complete | 2026-01-31 |
 | 20. ThermostatCard Compliance | v3.1 | 2/2 | Complete | 2026-01-31 |
-| 21. LightsCard Compliance | v3.1 | 0/2 | In progress | - |
+| 21. LightsCard Compliance | v3.1 | 2/2 | Complete | 2026-01-31 |
 | 22. CameraCard Compliance | v3.1 | 0/2 | Not started | - |
 | 23. Thermostat Page Compliance | v3.1 | 0/2 | Not started | - |
 | 24. Verification & Polish | v3.1 | 0/3 | Not started | - |

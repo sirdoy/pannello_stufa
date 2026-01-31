@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v3.1 Design System Compliance - Phase 21 (LightsCard)
+**Current focus:** v3.1 Design System Compliance - Phase 22 (CameraCard)
 
 ## Current Position
 
-Phase: 21 of 24 (LightsCard Compliance)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-01-31 - Completed 21-02-PLAN.md (Scene Buttons Compliance - verification only)
+Phase: 22 of 24 (CameraCard Compliance)
+Plan: 0 of 2 in current phase
+Status: Ready to plan
+Last activity: 2026-01-31 - Phase 21 complete (LightsCard Compliance verified 4/4 must-haves)
 
 Progress: [████████████████████░░░░] 94% (108/115 plans - v1.0+v2.0+v3.0+Phase 19+Phase 20+Phase 21 complete)
 
@@ -67,7 +67,7 @@ Key architectural patterns from v1.0 + v2.0 + v3.0:
 
 ### Blockers/Concerns
 
-None - ready to start v3.1 compliance work.
+None - ready to continue v3.1 compliance work.
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
@@ -77,6 +77,6 @@ None - ready to start v3.1 compliance work.
 ## Session Continuity
 
 Last session: 2026-01-31
-Stopped at: Phase 21 complete (LightsCard Compliance) - verified 4/4 must-haves for scene buttons
+Stopped at: Phase 21 verified (LightsCard Compliance) - 4/4 must-haves passed
 Resume file: None
-Next step: `/gsd:plan-phase 22` to create detailed plan for ScheduleCard compliance
+Next step: `/gsd:plan-phase 22` to create detailed plan for CameraCard compliance

@@ -598,25 +598,17 @@ export default function ThermostatCard() {
                 </div>
               )}
 
-              <button
+              <Button
+                variant="subtle"
                 onClick={handleCalibrateValves}
-                disabled={calibrating}
-                className="
-                  w-full flex items-center justify-center gap-2.5
-                  px-4 py-3.5 rounded-xl
-                  bg-ocean-900/40 border border-ocean-500/40
-                  hover:bg-ocean-900/60 hover:border-ocean-400/50
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  transition-all duration-200
-                  [html:not(.dark)_&]:bg-ocean-50/80 [html:not(.dark)_&]:border-ocean-200
-                  [html:not(.dark)_&]:hover:bg-ocean-100/90 [html:not(.dark)_&]:hover:border-ocean-300
-                "
+                loading={calibrating}
+                fullWidth
+                size="md"
+                icon={calibrating ? undefined : '🔧'}
+                className="bg-ocean-900/40 border-ocean-500/40 hover:bg-ocean-900/60 hover:border-ocean-400/50 [html:not(.dark)_&]:bg-ocean-50/80 [html:not(.dark)_&]:border-ocean-200 [html:not(.dark)_&]:hover:bg-ocean-100/90 [html:not(.dark)_&]:hover:border-ocean-300 text-ocean-300 [html:not(.dark)_&]:text-ocean-700"
               >
-                <span className="text-xl">{calibrating ? '⏳' : '🔧'}</span>
-                <span className="text-sm font-bold font-display text-ocean-300 [html:not(.dark)_&]:text-ocean-700">
-                  {calibrating ? 'Calibrazione...' : 'Tara Valvole'}
-                </span>
-              </button>
+                {calibrating ? 'Calibrazione...' : 'Tara Valvole'}
+              </Button>
             </div>
 
       {/* Actions */}

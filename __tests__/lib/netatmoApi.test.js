@@ -8,6 +8,7 @@ import NETATMO_API, {
   getHomesData,
   parseRooms,
   parseModules,
+  parseSchedules,
   extractTemperatures,
   extractModulesWithStatus,
   getModulesWithLowBattery,
@@ -519,6 +520,159 @@ describe('netatmoApi', () => {
       ];
 
       expect(hasAnyLowBattery(modules)).toBe(false);
+    });
+  });
+
+  describe('parseSchedules', () => {
+    it('should parse schedules with zones and timetable', () => {
+      const homesData = [
+        {
+          schedules: [
+            {
+              id: 'schedule-1',
+              name: 'Casa',
+              type: 'therm',
+              selected: true,
+              zones: [
+                {
+                  id: 0,
+                  name: 'Comfort',
+                  type: 0,
+                  rooms: ['room-1', 'room-2'],
+                  temp: 21,
+                },
+                {
+                  id: 1,
+                  name: 'Notte',
+                  type: 1,
+                  rooms: ['room-1'],
+                  temp: 18,
+                },
+              ],
+              timetable: [
+                { m_offset: 420, zone_id: 0 },
+                { m_offset: 1320, zone_id: 1 },
+              ],
+            },
+          ],
+        },
+      ];
+
+      const result = parseSchedules(homesData);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual({
+        id: 'schedule-1',
+        name: 'Casa',
+        type: 'therm',
+        selected: true,
+        zones: [
+          {
+            id: 0,
+            name: 'Comfort',
+            type: 0,
+            rooms: ['room-1', 'room-2'],
+            temp: 21,
+          },
+          {
+            id: 1,
+            name: 'Notte',
+            type: 1,
+            rooms: ['room-1'],
+            temp: 18,
+          },
+        ],
+        timetable: [
+          { m_offset: 420, zone_id: 0 },
+          { m_offset: 1320, zone_id: 1 },
+        ],
+      });
+    });
+
+    it('should filter out undefined temp values for Firebase compatibility', () => {
+      const homesData = [
+        {
+          schedules: [
+            {
+              id: 'schedule-1',
+              name: 'Casa',
+              type: 'therm',
+              selected: true,
+              zones: [
+                {
+                  id: 0,
+                  name: 'Comfort',
+                  type: 0,
+                  rooms: ['room-1'],
+                  temp: 21,
+                },
+                {
+                  id: 1,
+                  name: 'Away',
+                  type: 5,
+                  rooms: [],
+                  temp: undefined, // Some zone types don't have temp
+                },
+              ],
+            },
+          ],
+        },
+      ];
+
+      const result = parseSchedules(homesData);
+
+      expect(result).toHaveLength(1);
+      expect(result[0].zones).toHaveLength(2);
+
+      // First zone should have temp
+      expect(result[0].zones[0]).toHaveProperty('temp', 21);
+
+      // Second zone should NOT have temp property (undefined filtered out)
+      expect(result[0].zones[1]).not.toHaveProperty('temp');
+      expect(result[0].zones[1]).toEqual({
+        id: 1,
+        name: 'Away',
+        type: 5,
+        rooms: [],
+      });
+    });
+
+    it('should handle schedules without zones or timetable', () => {
+      const homesData = [
+        {
+          schedules: [
+            {
+              id: 'schedule-1',
+              name: 'Simple',
+              type: 'therm',
+              selected: false,
+            },
+          ],
+        },
+      ];
+
+      const result = parseSchedules(homesData);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual({
+        id: 'schedule-1',
+        name: 'Simple',
+        type: 'therm',
+        selected: false,
+      });
+      expect(result[0]).not.toHaveProperty('zones');
+      expect(result[0]).not.toHaveProperty('timetable');
+    });
+
+    it('should handle empty homes data', () => {
+      const result = parseSchedules([]);
+      expect(result).toEqual([]);
+    });
+
+    it('should handle null or missing schedules', () => {
+      const homesData = [{ schedules: null }];
+      const result = parseSchedules(homesData);
+      expect(result).toEqual([]);
     });
   });
 });

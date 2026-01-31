@@ -415,7 +415,7 @@ function NetatmoContent() {
       {/* Schedule Management Link */}
       <Card variant="glass" className="p-5 sm:p-6 mb-6">
         <Link
-          href="/schedule"
+          href="/thermostat/schedule"
           className="flex items-center justify-between group"
         >
           <div className="flex items-center gap-3">

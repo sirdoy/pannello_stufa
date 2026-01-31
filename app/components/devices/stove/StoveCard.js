@@ -1422,12 +1422,13 @@ export default function StoveCard() {
       {/* Toast Notification */}
       {toast && (
         <Toast
-          message={toast.message}
-          icon={toast.icon}
           variant={toast.variant}
           duration={3000}
-          onDismiss={() => setToast(null)}
-        />
+          open={!!toast}
+          onOpenChange={(open) => !open && setToast(null)}
+        >
+          {toast.message}
+        </Toast>
       )}
     </div>
   );

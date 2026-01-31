@@ -674,5 +674,67 @@ describe('netatmoApi', () => {
       const result = parseSchedules(homesData);
       expect(result).toEqual([]);
     });
+
+    it('should extract temp from multi-room structure (rooms_temp array)', () => {
+      const homesData = [
+        {
+          schedules: [
+            {
+              id: 'schedule-1',
+              name: 'Casa',
+              type: 'therm',
+              selected: true,
+              zones: [
+                {
+                  id: 0,
+                  name: 'Comfort',
+                  type: 0,
+                  rooms: [
+                    { id: '2678939675', therm_setpoint_temperature: 21 },
+                  ],
+                  rooms_temp: [
+                    { room_id: '2678939675', temp: 21 },
+                  ],
+                },
+                {
+                  id: 1,
+                  name: 'Notte',
+                  type: 1,
+                  rooms: [
+                    { id: '2678939675', therm_setpoint_temperature: 14 },
+                    { id: '3297508638', therm_setpoint_temperature: 16 },
+                  ],
+                  rooms_temp: [
+                    { room_id: '2678939675', temp: 14 },
+                    { room_id: '3297508638', temp: 16 },
+                  ],
+                },
+                {
+                  id: 5,
+                  name: 'Away',
+                  type: 5,
+                  rooms: [],
+                  rooms_temp: [],
+                },
+              ],
+            },
+          ],
+        },
+      ];
+
+      const result = parseSchedules(homesData);
+
+      expect(result).toHaveLength(1);
+      expect(result[0].zones).toHaveLength(3);
+
+      // First zone - single room, should extract temp from rooms_temp[0]
+      expect(result[0].zones[0]).toHaveProperty('temp', 21);
+
+      // Second zone - multi-room, should extract temp from rooms_temp[0] (first room)
+      expect(result[0].zones[1]).toHaveProperty('temp', 14);
+
+      // Third zone - Away with no rooms, should NOT have temp property
+      expect(result[0].zones[2]).not.toHaveProperty('temp');
+    });
   });
 });

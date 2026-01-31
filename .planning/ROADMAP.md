@@ -325,11 +325,11 @@ Plans:
   2. User sees calibrate action button rendered using Button component
   3. Mode buttons use consistent ButtonGroup or variant pattern for visual grouping
   4. Temperature display uses standardized component pattern with consistent typography
-**Plans**: TBD
+**Plans**: 2 plans in 1 wave
 
 Plans:
-- [ ] 20-01: ThermostatCard Button component migration (mode grid + calibrate)
-- [ ] 20-02: ThermostatCard temperature display standardization
+- [ ] 20-01-PLAN.md — Button migration for mode grid (4 buttons) and calibrate action
+- [ ] 20-02-PLAN.md — Temperature display verification and data-component standardization
 
 #### Phase 21: LightsCard Compliance
 **Goal**: Replace all raw HTML elements in LightsCard with design system components

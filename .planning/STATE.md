@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v3.1 Design System Compliance - Phase 20 (ThermostatCard)
+**Current focus:** v3.1 Design System Compliance - Phase 21 (LightsCard)
 
 ## Current Position
 
-Phase: 20 of 24 (ThermostatCard Compliance)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-01-31 - Completed 20-01-PLAN.md (Button Compliance)
+Phase: 21 of 24 (LightsCard Compliance)
+Plan: 0 of 2 in current phase
+Status: Ready to plan
+Last activity: 2026-01-31 - Phase 20 complete (ThermostatCard Compliance verified 11/11 must-haves)
 
 Progress: [████████████████████░░░░] 92% (106/115 plans - v1.0+v2.0+v3.0+Phase 19+Phase 20 complete)
 
@@ -77,6 +77,6 @@ None - ready to start v3.1 compliance work.
 ## Session Continuity
 
 Last session: 2026-01-31
-Stopped at: Completed 20-01-PLAN.md (Button Compliance)
+Stopped at: Phase 20 complete (ThermostatCard Compliance) - verified 11/11 must-haves
 Resume file: None
-Next step: Phase 20 complete - ready for Phase 21
+Next step: `/gsd:plan-phase 21` to create detailed plan for LightsCard compliance

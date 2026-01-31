@@ -328,8 +328,8 @@ Plans:
 **Plans**: 2 plans in 1 wave
 
 Plans:
-- [ ] 20-01-PLAN.md — Button migration for mode grid (4 buttons) and calibrate action
-- [ ] 20-02-PLAN.md — Temperature display verification and data-component standardization
+- [x] 20-01-PLAN.md — Button migration for mode grid (4 buttons) and calibrate action
+- [x] 20-02-PLAN.md — Temperature display verification and data-component standardization
 
 #### Phase 21: LightsCard Compliance
 **Goal**: Replace all raw HTML elements in LightsCard with design system components
@@ -416,7 +416,7 @@ Phases execute in numeric order: 19 -> 20 -> 21 -> 22 -> 23 -> 24
 | 17. Accessibility & Testing | v3.0 | 7/7 | Complete | 2026-01-30 |
 | 18. Documentation & Polish | v3.0 | 4/4 | Complete | 2026-01-30 |
 | 19. StoveCard Compliance | v3.1 | 2/2 | Complete | 2026-01-31 |
-| 20. ThermostatCard Compliance | v3.1 | 0/2 | Not started | - |
+| 20. ThermostatCard Compliance | v3.1 | 2/2 | Complete | 2026-01-31 |
 | 21. LightsCard Compliance | v3.1 | 0/2 | Not started | - |
 | 22. CameraCard Compliance | v3.1 | 0/2 | Not started | - |
 | 23. Thermostat Page Compliance | v3.1 | 0/2 | Not started | - |

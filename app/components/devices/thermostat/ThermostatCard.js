@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { NETATMO_ROUTES } from '@/lib/routes';
 import { getNetatmoAuthUrl } from '@/lib/netatmoCredentials';
+import { cn } from '@/lib/utils/cn';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
 import RoomSelector from '../../ui/RoomSelector';
@@ -451,7 +452,10 @@ export default function ThermostatCard() {
                   )}
 
                   {/* Temperature Display Grid */}
-                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                  <div
+                    className="grid grid-cols-2 gap-3 sm:gap-4"
+                    data-component="temperature-display"
+                  >
                     {/* Current Temperature Box */}
                     <div className="relative overflow-hidden rounded-2xl bg-slate-800/60 backdrop-blur-xl border border-white/10 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
                       <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
@@ -552,21 +556,16 @@ export default function ThermostatCard() {
                 };
 
                 return (
-                  <button
+                  <Button
                     key={id}
+                    variant="subtle"
                     onClick={() => handleModeChange(id)}
                     disabled={refreshing}
-                    className={`
-                      flex flex-col items-center justify-center
-                      p-3 sm:p-4 rounded-2xl border
-                      transition-all duration-200 active:scale-95
-                      disabled:opacity-50 disabled:cursor-not-allowed
-                      min-h-[80px] sm:min-h-[90px]
-                      ${isActive
-                        ? colorStyles[color]
-                        : 'bg-slate-800/40 border-slate-700/40 hover:bg-slate-800/60 hover:border-slate-600/50 [html:not(.dark)_&]:bg-white/70 [html:not(.dark)_&]:border-slate-200 [html:not(.dark)_&]:hover:bg-slate-100/80'
-                      }
-                    `}
+                    aria-pressed={isActive}
+                    className={cn(
+                      "flex-col min-h-[80px] sm:min-h-[90px]",
+                      isActive && colorStyles[color]
+                    )}
                   >
                     <span className="text-3xl sm:text-4xl mb-1.5">{icon}</span>
                     <span className={`text-xs sm:text-sm font-bold font-display ${
@@ -576,7 +575,7 @@ export default function ThermostatCard() {
                     }`}>
                       {label}
                     </span>
-                  </button>
+                  </Button>
                 );
               })}
             </div>

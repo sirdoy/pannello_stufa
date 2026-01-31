@@ -768,6 +768,119 @@ export default function StoveCard() {
     };
   };
 
+  /**
+   * Get status display properties using CVA variants
+   * Returns variant names for Badge and health status for HealthIndicator
+   */
+  const getStatusDisplay = (status) => {
+    if (!status) {
+      return {
+        label: 'CARICAMENTO...',
+        icon: '',
+        variant: 'neutral',
+        pulse: true,
+        health: 'ok',
+        animated: true
+      };
+    }
+
+    const s = status.toUpperCase();
+
+    // WORK - In funzione (Ember)
+    if (s.includes('WORK')) {
+      return {
+        label: 'IN FUNZIONE',
+        icon: '',
+        variant: 'ember',
+        pulse: true,
+        health: 'ok',
+        animated: true
+      };
+    }
+
+    // OFF - Spenta (Neutral)
+    if (s.includes('OFF')) {
+      return {
+        label: 'SPENTA',
+        icon: '',
+        variant: 'neutral',
+        pulse: false,
+        health: 'ok',
+        animated: false
+      };
+    }
+
+    // START - Avvio in corso (Ocean)
+    if (s.includes('START')) {
+      return {
+        label: 'AVVIO IN CORSO',
+        icon: '',
+        variant: 'ocean',
+        pulse: true,
+        health: 'ok',
+        animated: true
+      };
+    }
+
+    // STANDBY/WAIT - In attesa (Warning)
+    if (s.includes('STANDBY') || s.includes('WAIT')) {
+      return {
+        label: 'IN ATTESA',
+        icon: '',
+        variant: 'warning',
+        pulse: true,
+        health: 'warning',
+        animated: true
+      };
+    }
+
+    // ERROR/ALARM - Errore (Danger)
+    if (s.includes('ERROR') || s.includes('ALARM')) {
+      return {
+        label: 'ERRORE',
+        icon: '',
+        variant: 'danger',
+        pulse: true,
+        health: 'error',
+        animated: true
+      };
+    }
+
+    // CLEAN - Pulizia (Sage)
+    if (s.includes('CLEAN')) {
+      return {
+        label: 'PULIZIA',
+        icon: '',
+        variant: 'sage',
+        pulse: true,
+        health: 'ok',
+        animated: true
+      };
+    }
+
+    // MODULATION - Modulazione (Ocean)
+    if (s.includes('MODULATION')) {
+      return {
+        label: 'MODULAZIONE',
+        icon: '',
+        variant: 'ocean',
+        pulse: true,
+        health: 'ok',
+        animated: true
+      };
+    }
+
+    // Default - Stato sconosciuto
+    return {
+      label: status.toUpperCase(),
+      icon: '',
+      variant: 'neutral',
+      pulse: false,
+      health: 'ok',
+      animated: false
+    };
+  };
+
   const statusUpper = status.toUpperCase();
   const isAccesa = status?.includes('WORK') || status?.includes('START');
   const isSpenta = status?.includes('OFF') || status?.includes('ERROR') || status?.includes('WAIT');

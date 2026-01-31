@@ -127,6 +127,45 @@ describe('scheduleHelpers', () => {
       expect(slots).toHaveLength(1);
       expect(slots[0].zoneName).toBe('Comfort');
     });
+
+    it('should skip zones without temp property', () => {
+      const schedule = {
+        zones: [
+          { id: 1, name: 'Comfort', temp: 20 },
+          { id: 2, name: 'Away', type: 5 }, // No temp property (like parseSchedules filtered)
+          { id: 3, name: 'Night', temp: 17 },
+        ],
+        timetable: [
+          { m_offset: 0, zone_id: 1 }, // Comfort
+          { m_offset: 420, zone_id: 2 }, // Away (no temp) - should be skipped
+          { m_offset: 1320, zone_id: 3 }, // Night (has temp)
+        ],
+      };
+
+      const slots = parseTimelineSlots(schedule);
+
+      // Should have slots for Comfort and Night, but skip Away
+      // All slots should have temperature property
+      expect(slots.length).toBeGreaterThan(0);
+      slots.forEach(slot => {
+        expect(slot.temperature).toBeDefined();
+        expect(slot.temperature).not.toBeNull();
+        expect(slot.zoneName).not.toBe('Away');
+      });
+
+      // First slot should be Comfort
+      expect(slots[0]).toMatchObject({
+        day: 0,
+        startMinutes: 0,
+        endMinutes: 420,
+        temperature: 20,
+        zoneName: 'Comfort',
+      });
+
+      // No slot should reference the Away zone
+      const awaySlots = slots.filter(s => s.zoneName === 'Away');
+      expect(awaySlots).toHaveLength(0);
+    });
   });
 
   describe('tempToColor', () => {

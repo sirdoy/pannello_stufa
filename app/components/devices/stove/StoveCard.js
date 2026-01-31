@@ -769,6 +769,22 @@ export default function StoveCard() {
   };
 
   /**
+   * Map CVA variants to glow/shadow effects for status box
+   * Preserves elaborate visual design while using design system tokens
+   */
+  const getStatusGlow = (variant) => {
+    const glows = {
+      ember: 'shadow-ember-glow',
+      sage: 'shadow-[0_0_20px_rgba(96,115,96,0.3)]',
+      ocean: 'shadow-[0_0_30px_rgba(67,125,174,0.3)]',
+      warning: 'shadow-[0_0_20px_rgba(234,179,8,0.2)]',
+      danger: 'shadow-[0_0_30px_rgba(239,68,68,0.3)]',
+      neutral: ''
+    };
+    return glows[variant] || '';
+  };
+
+  /**
    * Get status display properties using CVA variants
    * Returns variant names for Badge and health status for HealthIndicator
    */
@@ -1033,7 +1049,7 @@ export default function StoveCard() {
               )}
 
               {/* Status Display Box - Ember Noir */}
-              <div className={`relative ${statusInfo.bgColor} rounded-2xl p-6 sm:p-8 ${statusInfo.glowColor} border ${statusInfo.borderColor} overflow-visible transition-all duration-500`}>
+              <div className={`relative ${statusInfo.bgColor} rounded-2xl p-6 sm:p-8 ${statusInfo.glowColor} border ${statusInfo.borderColor} overflow-visible transition-all duration-500`} data-status-variant={statusDisplay.variant}>
                     {/* Layout: Status Label + Icon + Info Boxes */}
                     <div className="relative">
                       {/* Status Label */}

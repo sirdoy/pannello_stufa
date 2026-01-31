@@ -354,11 +354,11 @@ Plans:
   1. CameraCard interactive elements use Button component with proper styling
   2. EventPreviewModal close and navigation buttons use Button component
   3. HlsPlayer controls use Button component for play/pause/fullscreen actions
-**Plans**: TBD
+**Plans**: 2 plans in 1 wave
 
 Plans:
-- [ ] 22-01: CameraCard and EventPreviewModal Button migration
-- [ ] 22-02: HlsPlayer Button migration for player controls
+- [ ] 22-01-PLAN.md — CameraCard refresh + EventPreviewModal close/play Button migration
+- [ ] 22-02-PLAN.md — HlsPlayer fullscreen toggle Button.Icon migration
 
 #### Phase 23: Thermostat Page Compliance
 **Goal**: Replace all raw HTML elements on thermostat page with design system components

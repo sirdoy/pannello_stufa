@@ -310,11 +310,11 @@ Plans:
   2. User sees "Torna in Automatico" action rendered using Button component
   3. Stove status info uses CVA variants for consistent status styling across states
   4. Status display uses standardized StatusCard or Badge components
-**Plans**: TBD
+**Plans**: 2 plans in 1 wave
 
 Plans:
-- [ ] 19-01: StoveCard Button component migration (scheduler modes + actions)
-- [ ] 19-02: StoveCard status display CVA refactor
+- [ ] 19-01-PLAN.md — Button migration for mode action buttons (Torna in Automatico, Configura Pianificazione)
+- [ ] 19-02-PLAN.md — Status display CVA refactor with Badge and HealthIndicator
 
 #### Phase 20: ThermostatCard Compliance
 **Goal**: Replace all raw HTML elements in ThermostatCard with design system components
@@ -415,7 +415,7 @@ Phases execute in numeric order: 19 -> 20 -> 21 -> 22 -> 23 -> 24
 | 16. Page Migration & Application | v3.0 | 11/11 | Complete | 2026-01-30 |
 | 17. Accessibility & Testing | v3.0 | 7/7 | Complete | 2026-01-30 |
 | 18. Documentation & Polish | v3.0 | 4/4 | Complete | 2026-01-30 |
-| 19. StoveCard Compliance | v3.1 | 0/2 | Not started | - |
+| 19. StoveCard Compliance | v3.1 | 0/2 | Planned | - |
 | 20. ThermostatCard Compliance | v3.1 | 0/2 | Not started | - |
 | 21. LightsCard Compliance | v3.1 | 0/2 | Not started | - |
 | 22. CameraCard Compliance | v3.1 | 0/2 | Not started | - |

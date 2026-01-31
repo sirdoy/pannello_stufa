@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
 import RoomSelector from '../../ui/RoomSelector';
-import { Divider, Heading, Button, ControlButton, EmptyState, Text } from '../../ui';
+import { Divider, Heading, Button, ControlButton, EmptyState, Text, Slider } from '../../ui';
+import { cn } from '@/lib/utils/cn';
 import { supportsColor, getCurrentColorHex } from '@/lib/hue/colorUtils';
 
 /**
@@ -1055,39 +1056,27 @@ export default function LightsCard() {
                           </span>
                         </div>
 
-                        {/* Slider - Adaptive styled with local state during drag */}
-                        <input
-                          type="range"
-                          min="1"
-                          max="100"
+                        {/* Slider - Design system component with commit-on-release pattern */}
+                        <Slider
                           value={localBrightness !== null ? localBrightness : avgBrightness}
-                          onMouseDown={() => { isDraggingSlider.current = true; }}
-                          onTouchStart={() => { isDraggingSlider.current = true; }}
-                          onInput={(e) => {
-                            // Update local state immediately for smooth UI
-                            setLocalBrightness(parseInt(e.target.value));
+                          onChange={(value) => {
+                            // Update local state during drag for smooth UI
+                            setLocalBrightness(value);
                           }}
-                          onMouseUp={(e) => {
-                            if (isDraggingSlider.current) {
-                              isDraggingSlider.current = false;
-                              handleBrightnessChange(selectedRoomGroupedLightId, e.target.value);
-                              setLocalBrightness(null);
-                            }
+                          onValueCommit={(value) => {
+                            // Commit to API on release (Radix onValueCommit)
+                            handleBrightnessChange(selectedRoomGroupedLightId, value.toString());
+                            setLocalBrightness(null);
                           }}
-                          onTouchEnd={(e) => {
-                            if (isDraggingSlider.current) {
-                              isDraggingSlider.current = false;
-                              const value = localBrightness !== null ? localBrightness : avgBrightness;
-                              handleBrightnessChange(selectedRoomGroupedLightId, value.toString());
-                              setLocalBrightness(null);
-                            }
-                          }}
+                          min={1}
+                          max={100}
+                          variant="ember"
                           disabled={refreshing || !selectedRoomGroupedLightId}
-                          className={`w-full h-3 rounded-lg appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+                          aria-label="Luminosita"
+                          className={cn(
+                            'w-full',
                             adaptive.slider
-                              ? adaptive.slider
-                              : 'bg-slate-700 accent-warning-500 [html:not(.dark)_&]:bg-slate-200'
-                          }`}
+                          )}
                         />
 
                         {/* +/- Buttons with long-press support */}
@@ -1146,17 +1135,19 @@ export default function LightsCard() {
                     <div className="relative">
                       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
                         {roomScenes.map((scene) => (
-                          <button
+                          <Button
                             key={scene.id}
+                            variant="subtle"
                             onClick={() => handleSceneActivate(scene.id)}
                             disabled={refreshing}
-                            className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl border bg-slate-800/50 border-slate-700/50 text-slate-300 hover:bg-warning-900/30 hover:border-warning-500/40 hover:text-warning-300 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed snap-start font-display [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200 [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:hover:bg-warning-100/80 [html:not(.dark)_&]:hover:border-warning-300 [html:not(.dark)_&]:hover:text-warning-700"
+                            aria-label={`Attiva scena ${scene.metadata?.name || 'Scena'}`}
+                            className="flex-shrink-0 w-32 sm:w-36 !p-4 flex-col !h-auto snap-start"
                           >
-                            <div className="text-3xl mb-2">🎨</div>
-                            <div className="text-xs font-semibold truncate">
+                            <span className="text-3xl mb-2" aria-hidden="true">🎨</span>
+                            <span className="text-xs font-semibold truncate w-full text-center">
                               {scene.metadata?.name || 'Scena'}
-                            </div>
-                          </button>
+                            </span>
+                          </Button>
                         ))}
                       </div>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Play } from 'lucide-react';
 import { Modal, Text, Button, Card } from '../../ui';
 import HlsPlayer from './HlsPlayer';
 import NETATMO_CAMERA_API from '@/lib/netatmoCameraApi';
@@ -162,16 +162,16 @@ export default function EventPreviewModal({ event, camera, onClose }) {
 
               {/* Play button overlay */}
               {hasVideo && (
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => setIsPlaying(true)}
-                  className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-colors group"
+                  className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40 rounded-none group"
+                  aria-label="Riproduci video"
                 >
                   <div className="w-20 h-20 rounded-full bg-white/90 group-hover:bg-white flex items-center justify-center shadow-lg transition-all group-hover:scale-110">
-                    <svg className="w-10 h-10 text-slate-900 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
+                    <Play className="w-10 h-10 text-slate-900 ml-1" fill="currentColor" />
                   </div>
-                </button>
+                </Button>
               )}
             </>
           )}

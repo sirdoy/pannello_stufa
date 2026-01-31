@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 import { Modal, Text, Button, Card } from '../../ui';
 import HlsPlayer from './HlsPlayer';
 import NETATMO_CAMERA_API from '@/lib/netatmoCameraApi';
@@ -114,15 +115,14 @@ export default function EventPreviewModal({ event, camera, onClose }) {
               )}
             </div>
           </div>
-          <button
+          <Button.Icon
+            icon={<X className="w-6 h-6" />}
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-slate-800 [html:not(.dark)_&]:hover:bg-slate-100 transition-colors"
-            title="Chiudi"
-          >
-            <svg className="w-6 h-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+            variant="ghost"
+            size="md"
+            aria-label="Chiudi"
+            className="text-slate-400 hover:bg-slate-800 [html:not(.dark)_&]:hover:bg-slate-100"
+          />
         </div>
 
         {/* Video/Preview area */}

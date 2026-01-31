@@ -357,8 +357,8 @@ Plans:
 **Plans**: 2 plans in 1 wave
 
 Plans:
-- [ ] 22-01-PLAN.md — CameraCard refresh + EventPreviewModal close/play Button migration
-- [ ] 22-02-PLAN.md — HlsPlayer fullscreen toggle Button.Icon migration
+- [x] 22-01-PLAN.md — CameraCard refresh + EventPreviewModal close/play Button migration
+- [x] 22-02-PLAN.md — HlsPlayer fullscreen toggle Button.Icon migration
 
 #### Phase 23: Thermostat Page Compliance
 **Goal**: Replace all raw HTML elements on thermostat page with design system components
@@ -418,6 +418,6 @@ Phases execute in numeric order: 19 -> 20 -> 21 -> 22 -> 23 -> 24
 | 19. StoveCard Compliance | v3.1 | 2/2 | Complete | 2026-01-31 |
 | 20. ThermostatCard Compliance | v3.1 | 2/2 | Complete | 2026-01-31 |
 | 21. LightsCard Compliance | v3.1 | 2/2 | Complete | 2026-01-31 |
-| 22. CameraCard Compliance | v3.1 | 0/2 | Not started | - |
+| 22. CameraCard Compliance | v3.1 | 2/2 | Complete | 2026-01-31 |
 | 23. Thermostat Page Compliance | v3.1 | 0/2 | Not started | - |
 | 24. Verification & Polish | v3.1 | 0/3 | Not started | - |

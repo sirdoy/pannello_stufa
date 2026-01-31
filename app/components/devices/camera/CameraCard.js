@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { RefreshCw } from 'lucide-react';
 import { CAMERA_ROUTES, NETATMO_ROUTES } from '@/lib/routes';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
@@ -319,15 +320,14 @@ export default function CameraCard() {
 
         {/* Refresh button overlay (only in snapshot mode) */}
         {!isLiveMode && (
-          <button
+          <Button.Icon
+            icon={<RefreshCw className={`w-4 h-4 text-white ${refreshing ? 'animate-spin' : ''}`} />}
             onClick={handleRefresh}
-            className="absolute bottom-2 right-2 p-2 rounded-full bg-slate-900/70 backdrop-blur-sm hover:bg-slate-800/90 transition-colors"
-            title="Aggiorna snapshot"
-          >
-            <svg className={`w-4 h-4 text-white ${refreshing ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-          </button>
+            variant="ghost"
+            size="sm"
+            aria-label="Aggiorna snapshot"
+            className="absolute bottom-2 right-2 bg-slate-900/70 backdrop-blur-sm hover:bg-slate-800/90"
+          />
         )}
       </div>
 

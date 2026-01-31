@@ -24,7 +24,7 @@ import CronHealthBanner from '../../CronHealthBanner';
 import Toast from '../../ui/Toast';
 import LoadingOverlay from '../../ui/LoadingOverlay';
 import CardAccentBar from '../../ui/CardAccentBar';
-import { Divider, Heading, Text, EmptyState } from '../../ui';
+import { Divider, Heading, Text, EmptyState, Badge, HealthIndicator } from '../../ui';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
 
@@ -556,6 +556,47 @@ export default function StoveCard() {
     setNextScheduledAction(nextAction);
   };
 
+  const handleSetManualMode = async () => {
+    // Use existing API: operation setSchedulerMode with enabled: false
+    await fetch('/api/scheduler/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        operation: 'setSchedulerMode',
+        data: { enabled: false }
+      })
+    });
+    setSchedulerEnabled(false);
+    setSemiManualMode(false);
+  };
+
+  const handleSetAutomaticMode = async () => {
+    // Use existing API: operation clearSemiManualMode then setSchedulerMode
+    await fetch('/api/scheduler/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        operation: 'setSchedulerMode',
+        data: { enabled: true }
+      })
+    });
+    // Clear semi-manual if active
+    if (semiManualMode) {
+      await fetch('/api/scheduler/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          operation: 'clearSemiManualMode',
+          data: {}
+        })
+      });
+    }
+    setSchedulerEnabled(true);
+    setSemiManualMode(false);
+    const nextAction = await getNextScheduledAction();
+    setNextScheduledAction(nextAction);
+  };
+
   const handleConfirmCleaning = async () => {
     setCleaningInProgress(true);
     try {
@@ -1006,14 +1047,39 @@ export default function StoveCard() {
                   </span>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <Text weight="bold" className={`text-base sm:text-lg font-display ${
-                    schedulerEnabled && semiManualMode ? 'text-warning-400 [html:not(.dark)_&]:text-warning-600' :
-                    schedulerEnabled ? 'text-sage-400 [html:not(.dark)_&]:text-sage-600' :
-                    'text-ember-400 [html:not(.dark)_&]:text-ember-600'
-                  }`}>
-                    {schedulerEnabled && semiManualMode ? 'Semi-manuale' : schedulerEnabled ? 'Automatica' : 'Manuale'}
+                  <Text variant="tertiary" size="sm" className="mb-2">
+                    Modalità
                   </Text>
-                  <Text variant="tertiary" size="sm" className="mt-1 break-words">
+                  <Button.Group className="w-full sm:w-auto">
+                    <Button
+                      variant={!schedulerEnabled ? 'ember' : 'subtle'}
+                      size="sm"
+                      onClick={handleSetManualMode}
+                      aria-pressed={!schedulerEnabled}
+                      className="flex-1 sm:flex-none"
+                    >
+                      Manuale
+                    </Button>
+                    <Button
+                      variant={schedulerEnabled && !semiManualMode ? 'ember' : 'subtle'}
+                      size="sm"
+                      onClick={handleSetAutomaticMode}
+                      aria-pressed={schedulerEnabled && !semiManualMode}
+                      className="flex-1 sm:flex-none"
+                    >
+                      Automatica
+                    </Button>
+                    <Button
+                      variant={schedulerEnabled && semiManualMode ? 'ember' : 'subtle'}
+                      size="sm"
+                      disabled
+                      aria-pressed={schedulerEnabled && semiManualMode}
+                      className="flex-1 sm:flex-none cursor-not-allowed"
+                    >
+                      Semi-man.
+                    </Button>
+                  </Button.Group>
+                  <Text variant="tertiary" size="sm" className="mt-2 break-words">
                     {schedulerEnabled && semiManualMode && returnToAutoAt ? (
                       (() => {
                         const date = new Date(returnToAutoAt);
@@ -1049,19 +1115,23 @@ export default function StoveCard() {
               </div>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 {schedulerEnabled && semiManualMode && (
-                  <button
+                  <Button
+                    variant="ember"
+                    size="sm"
                     onClick={handleClearSemiManual}
-                    className="px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold font-display text-warning-300 bg-warning-900/30 hover:bg-warning-900/50 border border-warning-500/40 hover:border-warning-500/60 transition-all duration-200 active:scale-95 [html:not(.dark)_&]:text-warning-700 [html:not(.dark)_&]:bg-warning-100/80 [html:not(.dark)_&]:hover:bg-warning-200/80 [html:not(.dark)_&]:border-warning-300 [html:not(.dark)_&]:hover:border-warning-400"
+                    aria-label="Torna alla modalita automatica"
                   >
-                    ↩️ Torna in Automatico
-                  </button>
+                    Torna in Automatico
+                  </Button>
                 )}
-                <button
+                <Button
+                  variant="subtle"
+                  size="sm"
                   onClick={() => router.push('/stove/scheduler')}
-                  className="px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold font-display text-ocean-300 bg-ocean-900/30 hover:bg-ocean-900/50 border border-ocean-500/40 hover:border-ocean-500/60 transition-all duration-200 active:scale-95 [html:not(.dark)_&]:text-ocean-700 [html:not(.dark)_&]:bg-ocean-100/80 [html:not(.dark)_&]:hover:bg-ocean-200/80 [html:not(.dark)_&]:border-ocean-300 [html:not(.dark)_&]:hover:border-ocean-400"
+                  aria-label="Vai alle impostazioni di pianificazione"
                 >
                   Configura Pianificazione
-                </button>
+                </Button>
               </div>
             </div>
 

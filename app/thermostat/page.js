@@ -70,6 +70,13 @@ function NetatmoContent() {
     };
   }, [topology]);
 
+  // Redirect to /netatmo if not connected (must be in useEffect to avoid setState-in-render)
+  useEffect(() => {
+    if (!loading && !connected) {
+      router.replace('/netatmo');
+    }
+  }, [loading, connected, router]);
+
   async function checkConnection() {
     try {
       setLoading(true);
@@ -183,9 +190,8 @@ function NetatmoContent() {
     return <Skeleton.NetatmoPage />;
   }
 
-  // Redirect to /netatmo if not connected
+  // Show skeleton while redirecting (redirect happens in useEffect above)
   if (!connected) {
-    router.replace('/netatmo');
     return <Skeleton.NetatmoPage />;
   }
 

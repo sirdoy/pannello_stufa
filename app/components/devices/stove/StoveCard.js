@@ -886,6 +886,7 @@ export default function StoveCard() {
   const isSpenta = status?.includes('OFF') || status?.includes('ERROR') || status?.includes('WAIT');
   const needsMaintenance = maintenanceStatus?.needsCleaning || false;
   const statusInfo = getStatusInfo(status);
+  const statusDisplay = getStatusDisplay(status);
 
   if (initialLoading) {
     return <Skeleton.StovePanel />;
@@ -983,9 +984,26 @@ export default function StoveCard() {
             )}
 
             {/* Header - Ember Noir style */}
-            <div className="flex items-center gap-3 mb-6">
-              <span className="text-2xl sm:text-3xl">🔥</span>
-              <Heading level={2} size="xl" className="font-display">Stufa</Heading>
+            <div className="flex items-center justify-between gap-3 mb-6">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl sm:text-3xl">🔥</span>
+                <Heading level={2} size="xl" className="font-display">Stufa</Heading>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant={statusDisplay.variant}
+                  pulse={statusDisplay.pulse}
+                  size="sm"
+                >
+                  {statusDisplay.label}
+                </Badge>
+                <HealthIndicator
+                  status={statusDisplay.health}
+                  size="sm"
+                  showIcon={true}
+                  label=""
+                />
+              </div>
             </div>
 
             {/* Main Status Display - Ember Noir Style */}

@@ -5,20 +5,13 @@
 
 import { getValidAccessToken, isNetatmoConnected, handleTokenError } from '@/lib/netatmoTokenHelper';
 
-// Mock Firebase
-jest.mock('@/lib/firebase', () => ({
-  db: {},
-}));
+// Mock Firebase Admin SDK
+const mockAdminDbGet = jest.fn();
+const mockAdminDbSet = jest.fn();
 
-// Mock Firebase database functions
-const mockGet = jest.fn();
-const mockSet = jest.fn();
-const mockRef = jest.fn();
-
-jest.mock('firebase/database', () => ({
-  ref: (...args) => mockRef(...args),
-  get: (...args) => mockGet(...args),
-  set: (...args) => mockSet(...args),
+jest.mock('@/lib/firebaseAdmin', () => ({
+  adminDbGet: (...args) => mockAdminDbGet(...args),
+  adminDbSet: (...args) => mockAdminDbSet(...args),
 }));
 
 // Mock environment helper
@@ -45,9 +38,7 @@ describe('netatmoTokenHelper', () => {
 
   describe('getValidAccessToken', () => {
     it('should return error when no refresh token exists', async () => {
-      mockGet.mockResolvedValue({
-        exists: () => false,
-      });
+      mockAdminDbGet.mockResolvedValue(null);
 
       const result = await getValidAccessToken();
 
@@ -57,15 +48,13 @@ describe('netatmoTokenHelper', () => {
     });
 
     it('should exchange refresh token for access token successfully', async () => {
-      mockGet.mockResolvedValue({
-        exists: () => true,
-        val: () => 'test-refresh-token',
-      });
+      mockAdminDbGet.mockResolvedValue('test-refresh-token');
 
       global.fetch.mockResolvedValue({
         json: async () => ({
           access_token: 'test-access-token',
           refresh_token: 'new-refresh-token',
+          expires_in: 10800,
         }),
       });
 
@@ -74,14 +63,11 @@ describe('netatmoTokenHelper', () => {
       expect(result.accessToken).toBe('test-access-token');
       expect(result.error).toBeNull();
       // Verify token was updated in Firebase
-      expect(mockSet).toHaveBeenCalled();
+      expect(mockAdminDbSet).toHaveBeenCalled();
     });
 
     it('should handle invalid_grant error and clear token', async () => {
-      mockGet.mockResolvedValue({
-        exists: () => true,
-        val: () => 'expired-refresh-token',
-      });
+      mockAdminDbGet.mockResolvedValue('expired-refresh-token');
 
       global.fetch.mockResolvedValue({
         json: async () => ({
@@ -95,14 +81,12 @@ describe('netatmoTokenHelper', () => {
       expect(result.accessToken).toBeNull();
       expect(result.error).toBe('TOKEN_EXPIRED');
       // Verify token was cleared from Firebase
-      expect(mockSet).toHaveBeenCalled();
+      expect(mockAdminDbSet).toHaveBeenCalledWith('dev/netatmo/refresh_token', null);
+      expect(mockAdminDbSet).toHaveBeenCalledWith('dev/netatmo/access_token_cache', null);
     });
 
     it('should handle network errors gracefully', async () => {
-      mockGet.mockResolvedValue({
-        exists: () => true,
-        val: () => 'test-refresh-token',
-      });
+      mockAdminDbGet.mockResolvedValue('test-refresh-token');
 
       global.fetch.mockRejectedValue(new Error('Network error'));
 
@@ -116,29 +100,25 @@ describe('netatmoTokenHelper', () => {
     it('should NOT update refresh token if Netatmo returns same token', async () => {
       const refreshToken = 'test-refresh-token';
 
-      mockGet.mockResolvedValue({
-        exists: () => true,
-        val: () => refreshToken,
-      });
+      mockAdminDbGet.mockResolvedValue(refreshToken);
 
       global.fetch.mockResolvedValue({
         json: async () => ({
           access_token: 'test-access-token',
           refresh_token: refreshToken, // Same token
+          expires_in: 10800,
         }),
       });
 
       await getValidAccessToken();
 
-      // set should NOT be called because token didn't change
-      expect(mockSet).not.toHaveBeenCalled();
+      // adminDbSet should be called ONCE for access_token_cache, but NOT for refresh_token
+      expect(mockAdminDbSet).toHaveBeenCalledTimes(1);
+      expect(mockAdminDbSet).toHaveBeenCalledWith('dev/netatmo/access_token_cache', expect.any(Object));
     });
 
     it('should handle missing access_token in response', async () => {
-      mockGet.mockResolvedValue({
-        exists: () => true,
-        val: () => 'test-refresh-token',
-      });
+      mockAdminDbGet.mockResolvedValue('test-refresh-token');
 
       global.fetch.mockResolvedValue({
         json: async () => ({
@@ -156,10 +136,7 @@ describe('netatmoTokenHelper', () => {
 
   describe('isNetatmoConnected', () => {
     it('should return true when refresh token exists', async () => {
-      mockGet.mockResolvedValue({
-        exists: () => true,
-        val: () => 'test-refresh-token',
-      });
+      mockAdminDbGet.mockResolvedValue('test-refresh-token');
 
       const result = await isNetatmoConnected();
 
@@ -167,9 +144,7 @@ describe('netatmoTokenHelper', () => {
     });
 
     it('should return false when refresh token does not exist', async () => {
-      mockGet.mockResolvedValue({
-        exists: () => false,
-      });
+      mockAdminDbGet.mockResolvedValue(null);
 
       const result = await isNetatmoConnected();
 
@@ -177,10 +152,7 @@ describe('netatmoTokenHelper', () => {
     });
 
     it('should return false when refresh token is null', async () => {
-      mockGet.mockResolvedValue({
-        exists: () => true,
-        val: () => null,
-      });
+      mockAdminDbGet.mockResolvedValue(null);
 
       const result = await isNetatmoConnected();
 
@@ -188,7 +160,7 @@ describe('netatmoTokenHelper', () => {
     });
 
     it('should handle errors gracefully', async () => {
-      mockGet.mockRejectedValue(new Error('Firebase error'));
+      mockAdminDbGet.mockRejectedValue(new Error('Firebase error'));
 
       const result = await isNetatmoConnected();
 

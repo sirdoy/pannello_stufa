@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Text } from '../../ui';
+import { Maximize, Minimize } from 'lucide-react';
+import { Text, Button } from '../../ui';
 
 /**
  * HlsPlayer - Video player for HLS streams (Netatmo cameras)

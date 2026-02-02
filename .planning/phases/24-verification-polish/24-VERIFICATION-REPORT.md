@@ -283,6 +283,74 @@ The design system provides replacements for all common input types:
 
 ---
 
+## ESLint Configuration Audit
+
+### tailwindcss/no-arbitrary-value Rule
+
+**Status:** warn
+**Location:** `eslint.config.mjs`
+
+```javascript
+// From eslint.config.mjs
+{
+  name: "tailwindcss/design-tokens",
+  plugins: {
+    tailwindcss,
+  },
+  settings: {
+    tailwindcss: {
+      config: {},  // Tailwind v4 uses CSS @theme directive
+    },
+  },
+  rules: {
+    // Block arbitrary color values - enforce design tokens
+    "tailwindcss/no-arbitrary-value": ["warn", {
+      ignoredProperties: [
+        "content",           // CSS content property
+        "grid-template-columns", // Grid layouts
+        "grid-template-rows",    // Grid layouts
+        "animation",         // Custom animations
+        "box-shadow",        // Complex shadows
+      ],
+    }],
+    // ... other rules
+  },
+}
+```
+
+### Ignored Properties
+
+| Property | Reason | Working |
+|----------|--------|---------|
+| `content` | CSS content for pseudo-elements | N/A |
+| `grid-template-columns` | Complex grid layouts | PARTIAL* |
+| `grid-template-rows` | Complex grid layouts | YES |
+| `animation` | Custom animations | YES |
+| `box-shadow` | Complex shadow effects | PARTIAL* |
+
+*PARTIAL: The underlying CSS property is ignored, but Tailwind shorthand classes (`grid-cols-[...]`, `shadow-[...]`) with complex selectors may still trigger warnings.
+
+### Assessment
+
+**Configuration is adequate for detecting hard-coded colors.**
+
+The rule correctly:
+- Flags `text-[#...]`, `bg-[#...]`, `border-[#...]` patterns (none found)
+- Allows legitimate layout customizations via ignoredProperties
+
+**Observations:**
+1. Rule level is "warn" (not "error") - appropriate for gradual enforcement
+2. Color properties (`color`, `background-color`, `border-color`) are NOT in ignored list - correctly enforced
+3. Shadow and grid shorthand edge cases exist but don't affect color compliance
+
+### Recommendation
+
+Current configuration is sufficient for VERIFY-01 verification. For stricter enforcement, consider:
+- Promoting to "error" level after confirming no regressions
+- Adding `min-height`, `margin`, `font-size` to ignoredProperties to reduce noise
+
+---
+
 ## Notes
 
 - All device components successfully migrated to design system components

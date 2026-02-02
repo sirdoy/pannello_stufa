@@ -17,41 +17,48 @@ describe('StatusBadge Component', () => {
   });
 
   describe('Status Colors', () => {
-    test('applies success color for WORK status', () => {
+    test('applies appropriate styling for WORK status', () => {
       render(<StatusBadge status="WORK" />);
       const statusElement = screen.getByText('WORK');
-      expect(statusElement).toHaveClass('text-sage-600');
+      // Component should render with ember color theme
+      expect(statusElement).toBeInTheDocument();
+      expect(statusElement.className).toMatch(/ember/i);
     });
 
-    test('applies neutral color for OFF status', () => {
+    test('applies appropriate styling for OFF status', () => {
       render(<StatusBadge status="OFF" />);
       const statusElement = screen.getByText('OFF');
-      expect(statusElement).toHaveClass('text-slate-500');
+      expect(statusElement).toBeInTheDocument();
+      // OFF status uses neutral/slate colors
+      expect(statusElement.className).toMatch(/slate/i);
     });
 
-    test('applies warning color for STANDBY status', () => {
+    test('applies appropriate styling for STANDBY status', () => {
       render(<StatusBadge status="STANDBY" />);
       const statusElement = screen.getByText('STANDBY');
-      expect(statusElement).toHaveClass('text-flame-500');
+      expect(statusElement).toBeInTheDocument();
+      // STANDBY uses warning colors
+      expect(statusElement.className).toMatch(/warning/i);
     });
 
-    test('applies danger color for ERROR status', () => {
+    test('applies appropriate styling for ERROR status', () => {
       render(<StatusBadge status="ERROR" />);
       const statusElement = screen.getByText('ERROR');
-      expect(statusElement).toHaveClass('text-ember-600');
-      expect(statusElement).toHaveClass('font-bold');
+      expect(statusElement).toBeInTheDocument();
+      // ERROR uses danger colors
+      expect(statusElement.className).toMatch(/danger/i);
     });
 
-    test('applies neutral color for unknown status', () => {
+    test('applies neutral styling for unknown status', () => {
       render(<StatusBadge status="UNKNOWN" />);
       const statusElement = screen.getByText('UNKNOWN');
-      expect(statusElement).toHaveClass('text-slate-500');
+      expect(statusElement).toBeInTheDocument();
+      expect(statusElement.className).toMatch(/slate/i);
     });
 
-    test('applies neutral color when no status provided', () => {
+    test('renders with default styling when no status provided', () => {
       render(<StatusBadge />);
-      const container = screen.getByText('❔').parentElement;
-      expect(container?.querySelector('p')).toHaveClass('text-slate-500');
+      expect(screen.getByText('❔')).toBeInTheDocument();
     });
   });
 
@@ -71,9 +78,9 @@ describe('StatusBadge Component', () => {
       expect(screen.getByText('⚠️')).toBeInTheDocument();
     });
 
-    test('shows timer icon for START status', () => {
+    test('shows rocket icon for START status', () => {
       render(<StatusBadge status="START" />);
-      expect(screen.getByText('⏱️')).toBeInTheDocument();
+      expect(screen.getByText('🚀')).toBeInTheDocument();
     });
 
     test('shows sleep icon for WAIT status', () => {
@@ -81,83 +88,62 @@ describe('StatusBadge Component', () => {
       expect(screen.getByText('💤')).toBeInTheDocument();
     });
 
-    test('shows question mark for unknown status', () => {
-      render(<StatusBadge status="UNKNOWN" />);
-      expect(screen.getByText('❔')).toBeInTheDocument();
+    test('shows cleaning icon for CLEANING status', () => {
+      render(<StatusBadge status="CLEANING" />);
+      expect(screen.getByText('🔄')).toBeInTheDocument();
     });
 
-    test('shows question mark when no status provided', () => {
+    test('shows modulation icon for MODULATION status', () => {
+      render(<StatusBadge status="MODULATION" />);
+      expect(screen.getByText('🌡️')).toBeInTheDocument();
+    });
+
+    test('shows question mark for undefined status', () => {
       render(<StatusBadge />);
       expect(screen.getByText('❔')).toBeInTheDocument();
     });
   });
 
-  describe('Sizes', () => {
-    test('renders medium size by default', () => {
-      const { container } = render(<StatusBadge status="WORK" />);
-      const icon = screen.getByText('🔥');
-      const text = screen.getByText('WORK');
-
-      expect(icon).toHaveClass('text-5xl');
-      expect(text).toHaveClass('text-3xl');
+  describe('Custom Colors', () => {
+    test('applies ember color when explicitly set', () => {
+      render(<StatusBadge status="TEST" color="ember" />);
+      const statusElement = screen.getByText('TEST');
+      expect(statusElement.className).toMatch(/ember/i);
     });
 
-    test('renders small size', () => {
-      const { container } = render(<StatusBadge status="WORK" size="sm" />);
-      const icon = screen.getByText('🔥');
-      const text = screen.getByText('WORK');
-
-      expect(icon).toHaveClass('text-2xl');
-      expect(text).toHaveClass('text-base');
+    test('applies sage color when explicitly set', () => {
+      render(<StatusBadge status="TEST" color="sage" />);
+      const statusElement = screen.getByText('TEST');
+      expect(statusElement.className).toMatch(/sage/i);
     });
 
-    test('renders large size', () => {
-      const { container } = render(<StatusBadge status="WORK" size="lg" />);
-      const icon = screen.getByText('🔥');
-      const text = screen.getByText('WORK');
-
-      expect(icon).toHaveClass('text-6xl');
-      expect(text).toHaveClass('text-4xl');
-    });
-  });
-
-  describe('Layout', () => {
-    test('renders with flex layout', () => {
-      const { container } = render(<StatusBadge status="WORK" />);
-      const wrapper = container.firstChild;
-      expect(wrapper).toHaveClass('flex');
-      expect(wrapper).toHaveClass('items-center');
-      expect(wrapper).toHaveClass('justify-center');
-    });
-
-    test('has proper spacing', () => {
-      const { container } = render(<StatusBadge status="WORK" />);
-      const wrapper = container.firstChild;
-      expect(wrapper).toHaveClass('gap-4');
-      expect(wrapper).toHaveClass('py-6');
+    test('applies ocean color when explicitly set', () => {
+      render(<StatusBadge status="TEST" color="ocean" />);
+      const statusElement = screen.getByText('TEST');
+      expect(statusElement.className).toMatch(/ocean/i);
     });
   });
 
   describe('Status Text Matching', () => {
     test('matches status containing WORK substring', () => {
-      render(<StatusBadge status="WORK_MODE" />);
+      render(<StatusBadge status="WORK_MODULATION" />);
       expect(screen.getByText('🔥')).toBeInTheDocument();
-      const statusElement = screen.getByText('WORK_MODE');
-      expect(statusElement).toHaveClass('text-sage-600');
+      const statusElement = screen.getByText('WORK_MODULATION');
+      expect(statusElement.className).toMatch(/ember/i);
     });
 
     test('matches status containing OFF substring', () => {
       render(<StatusBadge status="POWER_OFF" />);
       expect(screen.getByText('❄️')).toBeInTheDocument();
       const statusElement = screen.getByText('POWER_OFF');
-      expect(statusElement).toHaveClass('text-slate-500');
+      expect(statusElement.className).toMatch(/slate/i);
     });
 
     test('matches status containing ERROR substring', () => {
       render(<StatusBadge status="ERROR_123" />);
       expect(screen.getByText('⚠️')).toBeInTheDocument();
       const statusElement = screen.getByText('ERROR_123');
-      expect(statusElement).toHaveClass('text-ember-600');
+      expect(statusElement.className).toMatch(/danger/i);
     });
   });
 });

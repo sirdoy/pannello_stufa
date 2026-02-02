@@ -22,8 +22,9 @@ global.fetch = jest.fn();
 describe('netatmoApi', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.NETATMO_CLIENT_ID = 'test-client-id';
+    process.env.NEXT_PUBLIC_NETATMO_CLIENT_ID = 'test-client-id';
     process.env.NETATMO_CLIENT_SECRET = 'test-client-secret';
+    process.env.NEXT_PUBLIC_NETATMO_REDIRECT_URI = 'http://localhost:3000/api/netatmo/callback';
   });
 
   describe('getAccessToken', () => {

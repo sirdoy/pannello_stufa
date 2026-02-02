@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import { getLatestVersion } from '@/lib/changelogService';
 import { APP_VERSION } from '@/lib/version';
+import { isDevelopment } from '@/lib/environmentHelper';
 
 /**
  * Confronta due versioni semantiche (MAJOR.MINOR.PATCH)
@@ -26,25 +27,6 @@ function compareVersions(v1, v2) {
 }
 
 /**
- * Verifica se siamo in ambiente locale
- * @returns {boolean} true se in development locale
- */
-function isLocalEnvironment() {
-  // Check NODE_ENV
-  if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
-    return true;
-  }
-
-  // Check hostname (browser)
-  if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-    return hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.');
-  }
-
-  return false;
-}
-
-/**
  * Context per gestione globale stato version enforcement
  * Permette check on-demand da qualsiasi componente (es. polling status)
  */
@@ -64,7 +46,7 @@ export function VersionProvider({ children }) {
     if (isChecking) return;
 
     // Non mostrare modal bloccante in ambiente locale
-    if (isLocalEnvironment()) {
+    if (isDevelopment()) {
       console.log('🔧 Ambiente locale: versioning enforcement disabilitato');
       return;
     }

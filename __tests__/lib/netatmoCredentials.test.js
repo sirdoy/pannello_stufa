@@ -124,7 +124,7 @@ describe('netatmoCredentials', () => {
   });
 
   describe('getNetatmoCredentialsClient (browser-side)', () => {
-    it('returns credentials when all environment variables are set', () => {
+    it('returns only public credentials (no clientSecret for security)', () => {
       // Setup: Complete credentials
       process.env.NEXT_PUBLIC_NETATMO_CLIENT_ID = 'client-abc';
       process.env.NETATMO_CLIENT_SECRET = 'secret-def';
@@ -133,12 +133,13 @@ describe('netatmoCredentials', () => {
       // Execute
       const credentials = getNetatmoCredentialsClient();
 
-      // Assert: All fields present
+      // Assert: Only public fields (no clientSecret)
       expect(credentials).toEqual({
         clientId: 'client-abc',
-        clientSecret: 'secret-def',
         redirectUri: 'https://app.vercel.app/callback',
       });
+      // Verify clientSecret is NOT exposed to client
+      expect(credentials.clientSecret).toBeUndefined();
     });
 
     it('throws error if credentials are missing', () => {
@@ -150,7 +151,7 @@ describe('netatmoCredentials', () => {
       );
     });
 
-    it('returns same result as server-side function', () => {
+    it('returns subset of server-side credentials (public only)', () => {
       // Setup: Complete credentials
       process.env.NEXT_PUBLIC_NETATMO_CLIENT_ID = 'client-same';
       process.env.NETATMO_CLIENT_SECRET = 'secret-same';
@@ -160,8 +161,12 @@ describe('netatmoCredentials', () => {
       const serverCredentials = getNetatmoCredentials();
       const clientCredentials = getNetatmoCredentialsClient();
 
-      // Assert: Both return same values
-      expect(clientCredentials).toEqual(serverCredentials);
+      // Assert: Client has subset of server credentials (public fields only)
+      expect(clientCredentials.clientId).toEqual(serverCredentials.clientId);
+      expect(clientCredentials.redirectUri).toEqual(serverCredentials.redirectUri);
+      // clientSecret should only be in server credentials
+      expect(serverCredentials.clientSecret).toBeDefined();
+      expect(clientCredentials.clientSecret).toBeUndefined();
     });
   });
 

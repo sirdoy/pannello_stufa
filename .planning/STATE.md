@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Phase: 25 of 29 (Weather Foundation)
-Plan: 1 of ~4 plans complete
+Plan: 2 of ~4 plans complete
 Status: In progress
-Last activity: 2026-02-02 — Completed 25-01-PLAN.md (Weather API Infrastructure)
+Last activity: 2026-02-02 — Completed 25-02-PLAN.md (Geolocation & Location Service)
 
-Progress: [█░░░░░░░░░░░░░░░░░░░░░░░░] ~6% (v3.2 milestone - 1/17 estimated plans)
+Progress: [██░░░░░░░░░░░░░░░░░░░░░░░] ~12% (v3.2 milestone - 2/17 estimated plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 116 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 52 plans, v3.1: 13 plans, v3.2: 1 plan)
-- Average duration: ~4.1 min per plan
-- Total execution time: ~7.92 hours across 5 milestones
+- Total plans completed: 117 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 52 plans, v3.1: 13 plans, v3.2: 2 plans)
+- Average duration: ~4.0 min per plan
+- Total execution time: ~7.95 hours across 5 milestones
 
 **By Milestone:**
 
@@ -31,12 +31,12 @@ Progress: [█░░░░░░░░░░░░░░░░░░░░░░
 | v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 - 2026-01-28) |
 | v3.0 Design System | 8 | 52 | 3 days (2026-01-28 - 2026-01-30) |
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
-| v3.2 Weather & Dashboard | 5 | 1 | In progress (2026-02-02 - present) |
+| v3.2 Weather & Dashboard | 5 | 2 | In progress (2026-02-02 - present) |
 
 **Recent Trend:**
 - All 4 previous milestones complete: 115 plans total
-- v3.2 estimated at ~17 plans across 5 phases, 1 complete
-- Weather foundation: Open-Meteo API integration with stale-while-revalidate cache (2min)
+- v3.2 estimated at ~17 plans across 5 phases, 2 complete
+- Weather foundation: API infrastructure + geolocation/location services (4min total)
 
 *Updated after v3.2 roadmap creation*
 
@@ -67,6 +67,9 @@ Key architectural patterns from previous milestones:
 - Firebase RTDB for dashboard preferences (not localStorage - iOS eviction)
 - Menu-based reordering (up/down buttons, not drag-drop)
 - Browser Geolocation API with 10s timeout for iOS PWA
+- Single shared location for entire app (stored at /config/location, not per-user)
+- Geolocation error codes distinguish permission denied vs timeout vs unavailable
+- Location API returns 404 LOCATION_NOT_SET when not configured
 
 ### Pending Todos
 
@@ -88,6 +91,6 @@ None — starting fresh milestone.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Completed 25-01-PLAN.md (Weather API Infrastructure)
+Stopped at: Completed 25-02-PLAN.md (Geolocation & Location Service)
 Resume file: None
-Next step: Continue Phase 25 Weather Foundation (weather UI, geolocation handling)
+Next step: Continue Phase 25 Weather Foundation (weather UI, settings integration)

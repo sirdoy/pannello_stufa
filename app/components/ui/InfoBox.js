@@ -11,7 +11,7 @@ import Text from './Text';
  * @param {string} props.icon - Emoji icon
  * @param {string} props.label - Label text (uppercase)
  * @param {string|number} props.value - Value to display
- * @param {'neutral'|'ember'|'ocean'|'sage'|'warning'|'danger'} props.valueColor - Color for value text
+ * @param {'neutral'|'ember'|'ocean'|'sage'|'warning'|'danger'} props.variant - Color variant for value text
  * @param {'vertical'|'horizontal'} props.layout - Layout orientation
  * @param {string} props.className - Additional classes
  */
@@ -19,22 +19,18 @@ export default function InfoBox({
   icon,
   label,
   value,
-  valueColor = 'neutral',
+  variant = 'neutral',
   layout = 'horizontal',
   className = '',
 }) {
-  // Ember Noir value colors with light mode support
-  const valueColors = {
+  // Ember Noir variant colors with light mode support
+  const variantClasses = {
     neutral: 'text-slate-100 [html:not(.dark)_&]:text-slate-900',
     ember: 'text-ember-400 [html:not(.dark)_&]:text-ember-600',
     ocean: 'text-ocean-400 [html:not(.dark)_&]:text-ocean-600',
     sage: 'text-sage-400 [html:not(.dark)_&]:text-sage-600',
     warning: 'text-warning-400 [html:not(.dark)_&]:text-warning-600',
     danger: 'text-danger-400 [html:not(.dark)_&]:text-danger-600',
-    // Legacy mappings
-    primary: 'text-ember-400 [html:not(.dark)_&]:text-ember-600',
-    success: 'text-sage-400 [html:not(.dark)_&]:text-sage-600',
-    info: 'text-ocean-400 [html:not(.dark)_&]:text-ocean-600',
   };
 
   // Compact vertical layout optimized for 2-column grid
@@ -67,7 +63,7 @@ export default function InfoBox({
         </Text>
 
         {/* Value */}
-        <span className={`text-lg sm:text-xl font-bold font-display text-center leading-tight ${valueColors[valueColor]}`}>
+        <span className={`text-lg sm:text-xl font-bold font-display text-center leading-tight ${variantClasses[variant]}`}>
           {value}
         </span>
       </div>

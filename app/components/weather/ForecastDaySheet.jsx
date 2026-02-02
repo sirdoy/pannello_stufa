@@ -13,8 +13,8 @@
 import BottomSheet from '@/app/components/ui/BottomSheet';
 import { Text } from '@/app/components/ui';
 import { WeatherIcon } from './WeatherIcon';
-import { formatTemperature, getUVIndexLabel, formatWindSpeed } from './weatherHelpers';
-import { Sunrise, Sunset, Droplets, Wind, Sun } from 'lucide-react';
+import { formatTemperature, getUVIndexLabel, formatWindSpeed, getAirQualityLabel } from './weatherHelpers';
+import { Sunrise, Sunset, Droplets, Wind, Sun, Leaf } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { it } from 'date-fns/locale';
 
@@ -157,6 +157,15 @@ export function ForecastDaySheet({ day, isOpen, onClose }) {
           </div>
           <Text size="lg">{day.precipChance ?? 0}%</Text>
         </div>
+
+        {/* Air Quality */}
+        <StatCard
+          icon={Leaf}
+          iconColor="text-green-400"
+          label="Qualita aria"
+          value={day.airQuality ?? 'N/D'}
+          subLabel={day.airQuality ? getAirQualityLabel(day.airQuality) : undefined}
+        />
       </div>
 
       {/* Sunrise/Sunset - only show if data available */}

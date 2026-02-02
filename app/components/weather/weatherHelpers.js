@@ -126,3 +126,36 @@ export function getPrecipitationLabel(percent) {
     return 'Pioggia prevista';
   }
 }
+
+/**
+ * Get Italian Air Quality Index (AQI) severity label
+ * Uses European AQI scale (0-100+)
+ * @param {number} aqi - Air Quality Index value
+ * @returns {string} Italian severity label
+ *
+ * @example
+ * getAirQualityLabel(15) // "Buona"
+ * getAirQualityLabel(35) // "Discreta"
+ * getAirQualityLabel(55) // "Moderata"
+ * getAirQualityLabel(75) // "Scarsa"
+ * getAirQualityLabel(90) // "Molto scarsa"
+ */
+export function getAirQualityLabel(aqi) {
+  if (aqi === null || aqi === undefined || isNaN(aqi)) {
+    return '';
+  }
+
+  if (aqi <= 20) {
+    return 'Buona';
+  } else if (aqi <= 40) {
+    return 'Discreta';
+  } else if (aqi <= 60) {
+    return 'Moderata';
+  } else if (aqi <= 80) {
+    return 'Scarsa';
+  } else if (aqi <= 100) {
+    return 'Molto scarsa';
+  } else {
+    return 'Pessima';
+  }
+}

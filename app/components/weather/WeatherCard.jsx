@@ -100,7 +100,10 @@ export function WeatherCard({
   }
 
   // Data state - render full weather card
-  const { current, cachedAt, stale } = weatherData;
+  const { current, forecast, cachedAt, stale } = weatherData;
+
+  // First forecast day is today - used for min/max/UV in current conditions
+  const todayForecast = forecast && forecast.length > 0 ? forecast[0] : null;
 
   return (
     <SmartHomeCard
@@ -125,6 +128,7 @@ export function WeatherCard({
         {/* Current conditions */}
         <CurrentConditions
           current={current}
+          todayForecast={todayForecast}
           indoorTemp={indoorTemp}
         />
 

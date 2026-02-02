@@ -19,5 +19,6 @@ export {
   getTemperatureComparison,
   formatWindSpeed,
   getUVIndexLabel,
-  getPrecipitationLabel
+  getPrecipitationLabel,
+  getAirQualityLabel,
 } from './weatherHelpers';

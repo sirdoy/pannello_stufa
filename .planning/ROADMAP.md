@@ -371,8 +371,8 @@ Plans:
 **Plans**: 2 plans in 1 wave
 
 Plans:
-- [ ] 23-01-PLAN.md — Button colorScheme prop + thermostat page mode button migration
-- [ ] 23-02-PLAN.md — InfoBox variant prop + PageLayout wrapper migration
+- [x] 23-01-PLAN.md — Button colorScheme prop + thermostat page mode button migration
+- [x] 23-02-PLAN.md — InfoBox variant prop + PageLayout wrapper migration
 
 #### Phase 24: Verification & Polish
 **Goal**: Verify complete design system compliance across all device components
@@ -419,5 +419,5 @@ Phases execute in numeric order: 19 -> 20 -> 21 -> 22 -> 23 -> 24
 | 20. ThermostatCard Compliance | v3.1 | 2/2 | Complete | 2026-01-31 |
 | 21. LightsCard Compliance | v3.1 | 2/2 | Complete | 2026-01-31 |
 | 22. CameraCard Compliance | v3.1 | 2/2 | Complete | 2026-01-31 |
-| 23. Thermostat Page Compliance | v3.1 | 0/2 | Planned | - |
+| 23. Thermostat Page Compliance | v3.1 | 2/2 | Complete | 2026-02-02 |
 | 24. Verification & Polish | v3.1 | 0/3 | Not started | - |

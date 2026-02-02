@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v3.1 Design System Compliance - Phase 23 (Thermostat Page)
+**Current focus:** v3.1 Design System Compliance - Phase 24 (Verification & Polish)
 
 ## Current Position
 
-Phase: 23 of 24 (Thermostat Page Compliance)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-02 - Completed 23-02 (InfoBox variant API, thermostat page PageLayout migration)
+Phase: 24 of 24 (Verification & Polish)
+Plan: 0 of 3 in current phase
+Status: Ready to plan
+Last activity: 2026-02-02 - Phase 23 complete (Thermostat Page Compliance verified 6/6 must-haves)
 
 Progress: [████████████████████░░░░] 97% (112/115 plans - v1.0+v2.0+v3.0+Phase 19+Phase 20+Phase 21+Phase 22+Phase 23 complete)
 

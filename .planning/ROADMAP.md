@@ -383,12 +383,12 @@ Plans:
   2. Zero raw `<button>` elements remain in device components (all use Button)
   3. Zero raw `<input>` elements remain in device components (all use Input/Slider/etc)
   4. Visual inspection confirms consistent styling across all device cards
-**Plans**: 3 plans in 2 waves
+**Plans**: 3 plans (complete)
 
 Plans:
-- [ ] 24-01-PLAN.md — ESLint verification for device components (VERIFY-01)
-- [ ] 24-02-PLAN.md — Raw element elimination verification (VERIFY-02, VERIFY-03)
-- [ ] 24-03-PLAN.md — Visual consistency checkpoint and final report (VERIFY-04)
+- [x] 24-01-PLAN.md — ESLint verification for device components (VERIFY-01)
+- [x] 24-02-PLAN.md — Raw element elimination verification (VERIFY-02, VERIFY-03)
+- [x] 24-03-PLAN.md — Visual consistency checkpoint and final report (VERIFY-04)
 
 ## Progress
 
@@ -420,4 +420,4 @@ Phases execute in numeric order: 19 -> 20 -> 21 -> 22 -> 23 -> 24
 | 21. LightsCard Compliance | v3.1 | 2/2 | Complete | 2026-01-31 |
 | 22. CameraCard Compliance | v3.1 | 2/2 | Complete | 2026-01-31 |
 | 23. Thermostat Page Compliance | v3.1 | 2/2 | Complete | 2026-02-02 |
-| 24. Verification & Polish | v3.1 | 0/3 | Not started | - |
+| 24. Verification & Polish | v3.1 | 3/3 | Complete | 2026-02-02 |

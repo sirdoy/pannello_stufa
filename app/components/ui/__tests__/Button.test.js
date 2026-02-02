@@ -463,6 +463,100 @@ describe('Button Component', () => {
     });
   });
 
+  describe('colorScheme Compound Variants', () => {
+    test('subtle + sage applies tinted background', () => {
+      render(
+        <Button variant="subtle" colorScheme="sage">
+          Test
+        </Button>
+      );
+      const button = screen.getByRole('button');
+      expect(button).toHaveClass('bg-sage-500/20');
+      expect(button).toHaveClass('text-sage-300');
+      expect(button).toHaveClass('border-sage-500/40');
+    });
+
+    test('subtle + ocean applies ocean tinting', () => {
+      render(
+        <Button variant="subtle" colorScheme="ocean">
+          Test
+        </Button>
+      );
+      const button = screen.getByRole('button');
+      expect(button).toHaveClass('bg-ocean-500/20');
+      expect(button).toHaveClass('text-ocean-300');
+      expect(button).toHaveClass('border-ocean-500/40');
+    });
+
+    test('subtle + warning applies warning tinting', () => {
+      render(
+        <Button variant="subtle" colorScheme="warning">
+          Test
+        </Button>
+      );
+      const button = screen.getByRole('button');
+      expect(button).toHaveClass('bg-warning-500/20');
+      expect(button).toHaveClass('text-warning-300');
+      expect(button).toHaveClass('border-warning-500/40');
+    });
+
+    test('subtle + slate applies slate tinting', () => {
+      render(
+        <Button variant="subtle" colorScheme="slate">
+          Test
+        </Button>
+      );
+      const button = screen.getByRole('button');
+      expect(button).toHaveClass('bg-slate-500/20');
+      expect(button).toHaveClass('text-slate-300');
+      expect(button).toHaveClass('border-slate-500/40');
+    });
+
+    test('ghost + colorScheme applies text color', () => {
+      render(
+        <Button variant="ghost" colorScheme="sage">
+          Test
+        </Button>
+      );
+      const button = screen.getByRole('button');
+      expect(button).toHaveClass('text-sage-300');
+      expect(button).toHaveClass('hover:bg-sage-500/10');
+    });
+
+    test('colorScheme without variant uses default (ember) - colorScheme ignored', () => {
+      render(<Button colorScheme="sage">Test</Button>);
+      const button = screen.getByRole('button');
+      // Should still have ember gradient
+      expect(button).toHaveClass('bg-gradient-to-br');
+      expect(button).toHaveClass('from-ember-500');
+      // Should NOT have sage colors
+      expect(button).not.toHaveClass('bg-sage-500/20');
+    });
+
+    test('colorScheme has no effect on ember variant', () => {
+      render(
+        <Button variant="ember" colorScheme="sage">
+          Test
+        </Button>
+      );
+      const button = screen.getByRole('button');
+      // Should still have ember gradient
+      expect(button).toHaveClass('from-ember-500');
+      // Should NOT have sage colors
+      expect(button).not.toHaveClass('bg-sage-500/20');
+    });
+
+    test('accessibility for subtle+colorScheme combination', async () => {
+      const { container } = render(
+        <Button variant="subtle" colorScheme="sage">
+          Test
+        </Button>
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+  });
+
   describe('Exports', () => {
     test('buttonVariants is exported', () => {
       expect(buttonVariants).toBeDefined();

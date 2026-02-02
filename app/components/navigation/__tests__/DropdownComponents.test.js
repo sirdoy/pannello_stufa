@@ -73,7 +73,8 @@ describe('DropdownComponents', () => {
           isActive={true}
         />
       );
-      expect(container.querySelector('a')).toHaveClass('bg-primary-500/20');
+      // Design system uses ember color for active state
+      expect(container.querySelector('a').className).toMatch(/bg-ember-500/);
     });
   });
 

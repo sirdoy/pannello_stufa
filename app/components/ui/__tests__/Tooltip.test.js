@@ -52,37 +52,30 @@ describe('Tooltip', () => {
       expect(screen.getByRole('tooltip')).toHaveTextContent('Hello tooltip');
     });
 
-    // Skip: JSDOM doesn't properly simulate mouse leave events for Radix Tooltip
-    // This behavior is tested by Radix UI itself. Our component correctly passes
-    // props to Radix, which handles the hide logic internally.
-    it.skip('hides content when mouse leaves', async () => {
-      const user = userEvent.setup();
-
-      renderWithProvider(
-        <Tooltip content="Disappearing tooltip">
+    it('hides content when controlled state changes to closed', () => {
+      // Test hide behavior using controlled mode since JSDOM doesn't properly
+      // simulate mouse leave events for Radix Tooltip
+      const { rerender } = renderWithProvider(
+        <Tooltip content="Disappearing tooltip" open>
           <button>Hover me</button>
         </Tooltip>
       );
 
-      const trigger = screen.getByRole('button', { name: 'Hover me' });
+      // Verify tooltip is visible when open=true
+      expect(screen.getByRole('tooltip')).toBeInTheDocument();
+      expect(screen.getByRole('tooltip')).toHaveTextContent('Disappearing tooltip');
 
-      // Show tooltip
-      await user.hover(trigger);
-      await waitFor(
-        () => {
-          expect(screen.getByRole('tooltip')).toBeInTheDocument();
-        },
-        { timeout: 1000 }
+      // Close tooltip via controlled state
+      rerender(
+        <TooltipProvider>
+          <Tooltip content="Disappearing tooltip" open={false}>
+            <button>Hover me</button>
+          </Tooltip>
+        </TooltipProvider>
       );
 
-      // Hide tooltip - use pointer events to properly trigger mouse leave
-      await user.pointer({ target: document.body });
-      await waitFor(
-        () => {
-          expect(trigger).toHaveAttribute('data-state', 'closed');
-        },
-        { timeout: 1000 }
-      );
+      // Tooltip should disappear
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
     });
   });
 

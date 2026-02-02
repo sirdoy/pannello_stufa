@@ -110,14 +110,13 @@ describe('Panel Component', () => {
     });
 
     test('hides header when no title or headerAction', () => {
-      const { container } = render(
+      render(
         <Panel>
           <div>Content</div>
         </Panel>
       );
-      // Header should not be rendered (no border-b class in container)
-      const hasBorderBottom = container.innerHTML.includes('border-b');
-      expect(hasBorderBottom).toBe(false);
+      // Header should not be rendered - no heading element when no title
+      expect(screen.queryByRole('heading')).not.toBeInTheDocument();
     });
 
     test('renders title and description together', () => {

@@ -8,21 +8,24 @@ describe('ModeIndicator Component', () => {
       render(<ModeIndicator enabled={false} />);
       expect(screen.getByText('Manuale')).toBeInTheDocument();
       expect(screen.getByText('🔧')).toBeInTheDocument();
-      expect(screen.getByText('Manuale')).toHaveClass('text-accent-600');
+      // Design system uses ember variant for manual mode
+      expect(screen.getByText('Manuale').className).toMatch(/text-ember/);
     });
 
     test('displays automatic mode when enabled is true', () => {
       render(<ModeIndicator enabled={true} />);
       expect(screen.getByText('Automatica')).toBeInTheDocument();
       expect(screen.getByText('⏰')).toBeInTheDocument();
-      expect(screen.getByText('Automatica')).toHaveClass('text-success-600');
+      // Design system uses sage variant for automatic mode
+      expect(screen.getByText('Automatica').className).toMatch(/text-sage/);
     });
 
     test('displays semi-manual mode when enabled and semiManual are true', () => {
       render(<ModeIndicator enabled={true} semiManual={true} />);
       expect(screen.getByText('Semi-manuale')).toBeInTheDocument();
       expect(screen.getByText('⚙️')).toBeInTheDocument();
-      expect(screen.getByText('Semi-manuale')).toHaveClass('text-warning-600');
+      // Design system uses warning variant for semi-manual mode
+      expect(screen.getByText('Semi-manuale').className).toMatch(/text-warning/);
     });
   });
 
@@ -159,32 +162,32 @@ describe('ModeIndicator Component', () => {
         name: 'Manual mode',
         props: { enabled: false },
         expectedIcon: '🔧',
-        expectedColor: 'text-accent-600',
+        expectedColorPattern: /text-ember/,
         expectedLabel: 'Manuale'
       },
       {
         name: 'Automatic mode',
         props: { enabled: true, semiManual: false },
         expectedIcon: '⏰',
-        expectedColor: 'text-success-600',
+        expectedColorPattern: /text-sage/,
         expectedLabel: 'Automatica'
       },
       {
         name: 'Semi-manual mode',
         props: { enabled: true, semiManual: true },
         expectedIcon: '⚙️',
-        expectedColor: 'text-warning-600',
+        expectedColorPattern: /text-warning/,
         expectedLabel: 'Semi-manuale'
       }
     ];
 
-    testCases.forEach(({ name, props, expectedIcon, expectedColor, expectedLabel }) => {
+    testCases.forEach(({ name, props, expectedIcon, expectedColorPattern, expectedLabel }) => {
       test(`displays correct icon, color, and label for ${name}`, () => {
         render(<ModeIndicator {...props} />);
 
         expect(screen.getByText(expectedIcon)).toBeInTheDocument();
         expect(screen.getByText(expectedLabel)).toBeInTheDocument();
-        expect(screen.getByText(expectedLabel)).toHaveClass(expectedColor);
+        expect(screen.getByText(expectedLabel).className).toMatch(expectedColorPattern);
       });
     });
   });

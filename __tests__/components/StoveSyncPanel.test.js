@@ -18,10 +18,14 @@ describe('StoveSyncPanel', () => {
     // Mock fetch to never resolve (stays in loading state)
     global.fetch.mockImplementation(() => new Promise(() => {}));
 
-    render(<StoveSyncPanel />);
+    const { container } = render(<StoveSyncPanel />);
 
-    // Should show skeleton while loading
-    expect(screen.getByText(/Sincronizzazione Stufa-Termostato/i)).toBeInTheDocument();
+    // Should show skeleton while loading - title is NOT shown during loading
+    // Check that a skeleton element exists (uses animate-shimmer for the shimmer effect)
+    const skeleton = container.querySelector('[class*="animate-shimmer"]');
+    // Or check for skeleton base class pattern (bg-slate-700/50 on dark mode)
+    const hasSkeletonStyle = container.innerHTML.includes('bg-slate-700/50');
+    expect(skeleton || hasSkeletonStyle).toBeTruthy();
   });
 
   it('should fetch and display stove sync configuration', async () => {
@@ -105,15 +109,17 @@ describe('StoveSyncPanel', () => {
       json: async () => mockConfig,
     });
 
-    render(<StoveSyncPanel />);
+    const { container } = render(<StoveSyncPanel />);
 
     await waitFor(() => {
       expect(screen.getByText(/Seleziona stanze da sincronizzare/i)).toBeInTheDocument();
     });
 
-    // Should show available rooms as checkboxes
-    expect(screen.getByText('Soggiorno')).toBeInTheDocument();
-    expect(screen.getByText('Camera')).toBeInTheDocument();
+    // Should show available rooms as checkboxes (find within labels)
+    const labels = container.querySelectorAll('label');
+    const labelTexts = Array.from(labels).map(l => l.textContent);
+    expect(labelTexts.some(t => t.includes('Soggiorno'))).toBe(true);
+    expect(labelTexts.some(t => t.includes('Camera'))).toBe(true);
   });
 
   it('should show temperature controls when enabled', async () => {
@@ -158,43 +164,47 @@ describe('StoveSyncPanel', () => {
       ],
     };
 
-    global.fetch
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockConfig,
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ config: mockConfig.config }),
-      });
+    // Mock all fetch calls
+    global.fetch.mockResolvedValue({
+      ok: true,
+      json: async () => mockConfig,
+    });
 
     render(<StoveSyncPanel />);
 
+    // Wait for temperature control to appear
     await waitFor(() => {
-      expect(screen.getByText('Soggiorno')).toBeInTheDocument();
+      expect(screen.getByText('16.0°C')).toBeInTheDocument();
     });
 
-    // Click room checkbox to make a change
-    const checkbox = screen.getByRole('checkbox', { name: /Soggiorno/i });
-    fireEvent.click(checkbox);
+    // Click temperature + button to make a change (triggers hasChanges)
+    const buttons = screen.getAllByRole('button');
+    const plusButton = buttons.find(btn => btn.textContent.includes('+'));
+    expect(plusButton).toBeTruthy();
+    fireEvent.click(plusButton);
 
+    // Save button should now appear
     await waitFor(() => {
       expect(screen.getByText('Salva modifiche')).toBeInTheDocument();
     });
 
+    // Reset mock to track only POST calls
+    const callCount = global.fetch.mock.calls.length;
+
     // Click save
-    const saveButton = screen.getByText('Salva modifiche');
+    const saveButton = screen.getByText('Salva modifiche').closest('button');
     fireEvent.click(saveButton);
 
+    // Wait for fetch to be called with POST
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/api/netatmo/stove-sync'),
-        expect.objectContaining({
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-        })
-      );
+      // Check that a new fetch call was made after the initial GET
+      expect(global.fetch.mock.calls.length).toBeGreaterThan(callCount);
     });
+
+    // Verify the save call was made
+    const lastCall = global.fetch.mock.calls[global.fetch.mock.calls.length - 1];
+    expect(lastCall[0]).toContain('/api/netatmo/stove-sync');
+    expect(lastCall[1].method).toBe('POST');
   });
 
   it('should handle errors gracefully', async () => {

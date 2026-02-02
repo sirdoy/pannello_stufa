@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v3.1 complete — Planning next milestone
+**Current focus:** v3.2 Dashboard Customization & Weather
 
 ## Current Position
 
-Phase: Complete
-Plan: N/A
-Status: Ready for next milestone
-Last activity: 2026-02-02 — v3.1 milestone complete
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-02 — Milestone v3.2 started
 
-Progress: [█████████████████████████] 100% (115/115 plans - v1.0+v2.0+v3.0+v3.1 complete)
+Progress: [░░░░░░░░░░░░░░░░░░░░░░░░░] 0% (v3.2 requirements phase)
 
 ## Performance Metrics
 
@@ -87,6 +87,6 @@ Quick tasks are completed outside the main roadmap and don't affect phase progre
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: v3.1 milestone archived
+Stopped at: v3.2 milestone started, defining requirements
 Resume file: None
-Next step: Run `/gsd:new-milestone` to start next milestone
+Next step: Complete requirements definition and create roadmap

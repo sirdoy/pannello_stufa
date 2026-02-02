@@ -8,6 +8,15 @@ PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (co
 
 I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
+## Current Milestone: v3.2 Dashboard Customization & Weather
+
+**Goal:** Permettere all'utente di personalizzare l'ordine dei componenti in home e aggiungere informazioni meteo con posizione configurabile.
+
+**Target features:**
+- Dashboard layout customization via menu ordine nelle impostazioni
+- Componente meteo con condizioni attuali e previsioni 3-5 giorni
+- Impostazioni posizione con geolocalizzazione + override manuale
+
 ## Current State
 
 **Version:** v3.1 (shipped 2026-02-02)
@@ -145,7 +154,12 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-No active requirements — awaiting next milestone definition.
+**v3.2 Dashboard Customization & Weather (In Progress):**
+- Dashboard layout personalizzabile via menu impostazioni
+- Componente meteo con temperatura, umidità, vento, condizioni
+- Previsioni meteo 3-5 giorni
+- Impostazioni posizione con geolocalizzazione automatica
+- Override manuale posizione (città/indirizzo)
 
 **v3.1 Design System Compliance (Shipped 2026-02-02):**
 - ✓ All raw `<button>` elements replaced with Button component — v3.1
@@ -249,4 +263,4 @@ No active requirements — awaiting next milestone definition.
 - **Deployment**: Vercel (current hosting platform)
 
 ---
-*Last updated: 2026-02-02 after v3.1 milestone complete (Design System Compliance)*
+*Last updated: 2026-02-02 after v3.2 milestone started (Dashboard Customization & Weather)*

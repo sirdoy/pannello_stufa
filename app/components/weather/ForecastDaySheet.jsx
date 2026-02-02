@@ -1,0 +1,187 @@
+'use client';
+
+/**
+ * ForecastDaySheet Component
+ *
+ * Bottom sheet modal with detailed forecast for a selected day.
+ * Shows temperature range, condition, and extended stats (UV, humidity, wind, etc.)
+ *
+ * @see BottomSheet - Base modal component
+ * @see ForecastDayCard - Cards that open this sheet on tap
+ */
+
+import BottomSheet from '@/app/components/ui/BottomSheet';
+import { Text } from '@/app/components/ui';
+import { WeatherIcon } from './WeatherIcon';
+import { formatTemperature, getUVIndexLabel, formatWindSpeed } from './weatherHelpers';
+import { Sunrise, Sunset, Droplets, Wind, Sun } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
+import { it } from 'date-fns/locale';
+
+/**
+ * Format full day title (e.g., "Lunedi 3 Febbraio")
+ * @param {string} dateStr - ISO date string
+ * @returns {string} Formatted full date
+ */
+function formatFullDate(dateStr) {
+  try {
+    const date = parseISO(dateStr);
+    const dayName = format(date, 'EEEE', { locale: it });
+    const dayNum = format(date, 'd');
+    const month = format(date, 'MMMM', { locale: it });
+    // Capitalize first letter
+    const capitalizedDay = dayName.charAt(0).toUpperCase() + dayName.slice(1);
+    const capitalizedMonth = month.charAt(0).toUpperCase() + month.slice(1);
+    return `${capitalizedDay} ${dayNum} ${capitalizedMonth}`;
+  } catch {
+    return dateStr;
+  }
+}
+
+/**
+ * Stat card component for extended stats grid
+ */
+function StatCard({ icon: Icon, iconColor, label, value, subLabel }) {
+  return (
+    <div className="p-4 bg-slate-800/40 rounded-xl [html:not(.dark)_&]:bg-slate-100/80">
+      <div className="flex items-center gap-2 mb-1">
+        <Icon className={`w-4 h-4 ${iconColor}`} />
+        <Text variant="tertiary" size="xs">{label}</Text>
+      </div>
+      <Text size="lg">{value}</Text>
+      {subLabel && (
+        <Text variant="secondary" size="xs">{subLabel}</Text>
+      )}
+    </div>
+  );
+}
+
+/**
+ * ForecastDaySheet Component
+ *
+ * @param {Object} props
+ * @param {Object|null} props.day - Forecast day data (null when closed)
+ * @param {boolean} props.isOpen - Sheet visibility
+ * @param {Function} props.onClose - Close handler
+ *
+ * @example
+ * <ForecastDaySheet
+ *   day={selectedDay}
+ *   isOpen={isSheetOpen}
+ *   onClose={() => setIsSheetOpen(false)}
+ * />
+ */
+export function ForecastDaySheet({ day, isOpen, onClose }) {
+  // Don't render anything if no day is selected
+  if (!day) {
+    return null;
+  }
+
+  const title = formatFullDate(day.date);
+
+  return (
+    <BottomSheet
+      isOpen={isOpen}
+      onClose={onClose}
+      title={title}
+      showCloseButton={true}
+      showHandle={true}
+    >
+      {/* Temperature range - prominent display */}
+      <div className="text-center mb-6">
+        <div className="flex items-center justify-center gap-4">
+          <div>
+            <Text variant="tertiary" size="xs" className="mb-1">Max</Text>
+            <Text size="xl" weight="bold" className="text-ember-400 text-3xl">
+              {formatTemperature(day.tempMax)}°
+            </Text>
+          </div>
+          <div className="w-px h-12 bg-slate-700/50 [html:not(.dark)_&]:bg-slate-300/50" />
+          <div>
+            <Text variant="tertiary" size="xs" className="mb-1">Min</Text>
+            <Text size="xl" weight="bold" className="text-ocean-400 text-3xl">
+              {formatTemperature(day.tempMin)}°
+            </Text>
+          </div>
+        </div>
+      </div>
+
+      {/* Condition description with icon */}
+      <div className="text-center mb-6">
+        <WeatherIcon
+          code={day.weatherCode}
+          size={48}
+          className="mx-auto mb-2 text-ocean-400"
+        />
+        <Text size="lg">
+          {day.condition?.description || 'Condizioni meteo'}
+        </Text>
+      </div>
+
+      {/* Extended stats grid - 2 columns */}
+      <div className="grid grid-cols-2 gap-4">
+        {/* UV Index */}
+        <StatCard
+          icon={Sun}
+          iconColor="text-warning-400"
+          label="Indice UV"
+          value={day.uvIndex ?? 'N/D'}
+          subLabel={day.uvIndex ? getUVIndexLabel(day.uvIndex) : undefined}
+        />
+
+        {/* Humidity */}
+        <StatCard
+          icon={Droplets}
+          iconColor="text-ocean-400"
+          label="Umidita"
+          value={day.humidity !== undefined ? `${day.humidity}%` : 'N/D'}
+        />
+
+        {/* Wind Speed */}
+        <StatCard
+          icon={Wind}
+          iconColor="text-slate-400"
+          label="Vento"
+          value={day.windSpeed !== undefined ? formatWindSpeed(day.windSpeed) : 'N/D'}
+        />
+
+        {/* Precipitation */}
+        <div className="p-4 bg-slate-800/40 rounded-xl [html:not(.dark)_&]:bg-slate-100/80">
+          <div className="flex items-center gap-2 mb-1">
+            <Droplets
+              className="w-4 h-4 text-ocean-400"
+              fill="currentColor"
+              strokeWidth={0}
+            />
+            <Text variant="tertiary" size="xs">Precipitazioni</Text>
+          </div>
+          <Text size="lg">{day.precipChance ?? 0}%</Text>
+        </div>
+      </div>
+
+      {/* Sunrise/Sunset - only show if data available */}
+      {(day.sunrise || day.sunset) && (
+        <div className="grid grid-cols-2 gap-4 mt-4">
+          {day.sunrise && (
+            <StatCard
+              icon={Sunrise}
+              iconColor="text-warning-400"
+              label="Alba"
+              value={day.sunrise}
+            />
+          )}
+          {day.sunset && (
+            <StatCard
+              icon={Sunset}
+              iconColor="text-ember-400"
+              label="Tramonto"
+              value={day.sunset}
+            />
+          )}
+        </div>
+      )}
+    </BottomSheet>
+  );
+}
+
+export default ForecastDaySheet;

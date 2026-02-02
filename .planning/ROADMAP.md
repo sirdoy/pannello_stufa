@@ -383,12 +383,12 @@ Plans:
   2. Zero raw `<button>` elements remain in device components (all use Button)
   3. Zero raw `<input>` elements remain in device components (all use Input/Slider/etc)
   4. Visual inspection confirms consistent styling across all device cards
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 24-01: ESLint verification and hard-coded color cleanup
-- [ ] 24-02: Raw element elimination verification
-- [ ] 24-03: Visual consistency verification and final polish
+- [ ] 24-01-PLAN.md — ESLint verification for device components (VERIFY-01)
+- [ ] 24-02-PLAN.md — Raw element elimination verification (VERIFY-02, VERIFY-03)
+- [ ] 24-03-PLAN.md — Visual consistency checkpoint and final report (VERIFY-04)
 
 ## Progress
 

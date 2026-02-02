@@ -2,17 +2,17 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-01-30)
+See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v3.1 Design System Compliance - Phase 24 (Verification & Polish)
+**Current focus:** v3.1 complete — Planning next milestone
 
 ## Current Position
 
-Phase: 24 of 24 (Verification & Polish)
-Plan: 3 of 3 in current phase
-Status: Phase complete
-Last activity: 2026-02-02 - Completed 24-03-PLAN.md (VERIFY-04 visual consistency: badge migration, 4 commits, 8m)
+Phase: Complete
+Plan: N/A
+Status: Ready for next milestone
+Last activity: 2026-02-02 — v3.1 milestone complete
 
 Progress: [█████████████████████████] 100% (115/115 plans - v1.0+v2.0+v3.0+v3.1 complete)
 
@@ -30,13 +30,12 @@ Progress: [███████████████████████
 | v1.0 Push Notifications | 5 | 29 | 4 days (2026-01-23 - 2026-01-26) |
 | v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 - 2026-01-28) |
 | v3.0 Design System | 8 | 52 | 3 days (2026-01-28 - 2026-01-30) |
-| v3.1 Compliance | 6 | 13 | 3 days (2026-01-31 - 2026-02-02) |
+| v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
 
 **Recent Trend:**
-- Milestone velocity stable (v3.0 was largest milestone yet with 52 plans)
-- Plan complexity stable (~5 min average)
-- v3.1 completed as lighter compliance milestone (13 plans vs 52 in v3.0)
 - All 4 milestones complete: 115 plans total
+- v3.1 completed as lighter compliance milestone (13 plans vs 52 in v3.0)
+- 100% design system compliance achieved
 
 *Updated after v3.1 completion*
 
@@ -47,7 +46,7 @@ Progress: [███████████████████████
 Decisions are logged in PROJECT.md Key Decisions table.
 Full decision log available in milestone archives.
 
-Key architectural patterns from v1.0 + v2.0 + v3.0:
+Key architectural patterns from v1.0 + v2.0 + v3.0 + v3.1:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
 - Firebase RTDB for real-time state, Firestore for historical queries
 - HMAC-secured cron webhooks for security without key rotation
@@ -57,6 +56,8 @@ Key architectural patterns from v1.0 + v2.0 + v3.0:
 - CVA for type-safe component variants (including compound variants for colorScheme)
 - Radix UI for accessible interactive components
 - Namespace component pattern (Card.Header, Button.Icon)
+- Button colorScheme compound variant for mode-specific styling
+- InfoBox variant prop for API consistency with Badge
 
 ### Pending Todos
 
@@ -68,7 +69,7 @@ Key architectural patterns from v1.0 + v2.0 + v3.0:
 
 ### Blockers/Concerns
 
-None - v3.1 milestone complete.
+None — v3.1 milestone complete.
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
@@ -81,11 +82,11 @@ Quick tasks are completed outside the main roadmap and don't affect phase progre
 
 | Task | Description | Status | Completed | Commits |
 |------|-------------|--------|-----------|---------|
-| 001 | Thermostat schedule view/edit in card | ✅ Complete | 2026-01-31 | c537828, 876a547 |
+| 001 | Thermostat schedule view/edit in card | Complete | 2026-01-31 | c537828, 876a547 |
 
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Completed 24-03-PLAN.md (v3.1 milestone complete)
+Stopped at: v3.1 milestone archived
 Resume file: None
-Next step: v3.1 Design System Compliance milestone complete. Ready for next milestone.
+Next step: Run `/gsd:new-milestone` to start next milestone

@@ -10,10 +10,10 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v3.0 (shipped 2026-01-30)
-**Status:** Production-ready with complete design system and accessible UI components
+**Version:** v3.1 (shipped 2026-02-02)
+**Status:** Production-ready with 100% design system compliance
 
-**Shipped Capabilities (v1.0 + v2.0 + v3.0):**
+**Shipped Capabilities (v1.0 + v2.0 + v3.0 + v3.1):**
 - ✅ Push notification system with token persistence and multi-device support
 - ✅ Admin dashboard with delivery metrics and 7-day trends
 - ✅ User preferences with type toggles, DND hours, rate limiting
@@ -30,6 +30,9 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✅ **Full page migration** (all pages use consistent design system components)
 - ✅ **WCAG AA accessibility** (172 axe tests, 436 keyboard navigation tests)
 - ✅ **Interactive documentation** (/debug/design-system with PropTable, examples)
+- ✅ **100% design system compliance** (all device cards use Button, Slider, Badge components)
+- ✅ **Zero raw HTML elements** in device components (no raw `<button>` or `<input>`)
+- ✅ **CVA variants everywhere** (colorScheme prop, InfoBox variant, adaptive styling)
 
 **Operational Setup Required:**
 - Cron webhook configuration for health monitoring (1-min frequency)
@@ -142,16 +145,14 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-**v3.1 Design System Compliance (Current Milestone):**
+No active requirements — awaiting next milestone definition.
 
-**Goal:** Achieve 100% design system compliance across all pages and components — eliminate all raw HTML elements, inline Tailwind, and inconsistent patterns.
-
-**Target:**
-- Replace all raw `<button>` elements with Button component
-- Replace all raw `<input type="range">` with Slider component
-- Standardize device card components (StoveCard, ThermostatCard, LightsCard)
-- Eliminate inline conditional styling in favor of CVA variants
-- Ensure visual consistency across all pages
+**v3.1 Design System Compliance (Shipped 2026-02-02):**
+- ✓ All raw `<button>` elements replaced with Button component — v3.1
+- ✓ All raw `<input type="range">` replaced with Slider component — v3.1
+- ✓ Device cards standardized (StoveCard, ThermostatCard, LightsCard, CameraCard) — v3.1
+- ✓ Inline conditional styling replaced with CVA variants — v3.1
+- ✓ Visual consistency verified across all pages — v3.1
 
 **v3.0 Design System Evolution (Shipped 2026-01-30):**
 - ✓ Complete UI component library (25+ components)
@@ -184,6 +185,14 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Multi-device smart home control (stufa, termostato, luci)
 - CVA + Radix UI design system (25+ components)
 - ~104,000 lines JavaScript
+
+**v3.1 Milestone (2026-01-30 → 2026-02-02):**
+- 6 phases executed (13 plans total)
+- 22/22 requirements satisfied (100%)
+- All device cards 100% design system compliant
+- Zero raw HTML elements in device components
+- CVA variants for all conditional styling
+- Button colorScheme prop for mode-specific coloring
 
 **v3.0 Milestone (2026-01-28 → 2026-01-30):**
 - 8 phases executed (52 plans total)
@@ -240,4 +249,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Deployment**: Vercel (current hosting platform)
 
 ---
-*Last updated: 2026-01-30 after v3.1 milestone started (Design System Compliance)*
+*Last updated: 2026-02-02 after v3.1 milestone complete (Design System Compliance)*

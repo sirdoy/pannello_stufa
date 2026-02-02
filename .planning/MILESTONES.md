@@ -4,6 +4,42 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 
 ---
 
+## v3.1 Design System Compliance (Shipped: 2026-02-02)
+
+**Delivered:** 100% design system compliance across all device cards and pages — every raw HTML element replaced with design system components, all styling using CVA variants.
+
+**Phases completed:** 19-24 (13 plans total)
+
+**Key accomplishments:**
+
+- StoveCard fully compliant with Button.Group for mode buttons, CVA-based status display with Badge and HealthIndicator
+- ThermostatCard fully compliant with Button component for mode grid, temperature display verified using Text component patterns
+- LightsCard fully compliant with Slider component replacing raw `<input type="range">`, scene buttons migrated to Button
+- CameraCard fully compliant with Button.Icon for all interactive elements (refresh, close, play, fullscreen)
+- Thermostat page migrated to PageLayout with InfoBox components, Button colorScheme prop added for consistent mode button styling
+- Complete verification: zero raw `<button>` or `<input>` elements, ESLint clean, visual consistency verified with 10 badge migrations
+
+**Stats:**
+
+- 13 plans executed across 6 phases
+- 22/22 v3.1 requirements satisfied (100%)
+- 159 files changed (+25,027 insertions, -1,179 deletions)
+- 128 git commits with atomic, well-documented changes
+- 4 days from phase 19 start to completion (2026-01-30 → 2026-02-02)
+
+**Git range:** `feat(19-01)` → `feat(24)`
+
+**Archives:**
+- [Roadmap](milestones/v3.1-ROADMAP.md)
+- [Requirements](milestones/v3.1-REQUIREMENTS.md)
+- [Audit](milestones/v3.1-MILESTONE-AUDIT.md)
+
+**Tech debt:** None accumulated during v3.1.
+
+**What's next:** Design system is now 100% compliant. Consider v4.0 for new feature work (advanced components like Tabs, Accordion, Command Palette) or operational improvements.
+
+---
+
 ## v3.0 Design System Evolution (Shipped: 2026-01-30)
 
 **Delivered:** Complete, consistent, and accessible UI component library based on evolved Ember Noir design system, systematically applied across all application pages for visual consistency and professional polish.

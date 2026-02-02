@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, Button, StatusBadge, Heading, Text } from '@/app/components/ui';
+import { Card, Button, StatusBadge, Heading, Text, Badge } from '@/app/components/ui';
 import { BatteryBadge } from '@/app/components/devices/thermostat/BatteryWarning';
 import { NETATMO_ROUTES } from '@/lib/routes';
 
@@ -175,54 +175,35 @@ export default function RoomCard({ room, onRefresh }) {
       <div className="absolute -top-2 right-2 z-20 flex items-center gap-2">
         {/* Battery warning badge */}
         {(hasLowBattery || hasCriticalBattery) && (
-          <div className="relative">
-            <div className={`absolute inset-0 ${hasCriticalBattery ? 'bg-danger-500/30' : 'bg-warning-500/30'} rounded-full blur-md ${hasCriticalBattery ? 'animate-pulse' : ''}`} />
-            <div className={`relative ${hasCriticalBattery ? 'bg-gradient-to-br from-danger-500 to-danger-600' : 'bg-gradient-to-br from-warning-500 to-warning-600'} text-white px-2.5 py-1 rounded-full shadow-lg ring-2 ring-white/30`}>
-              <span className="text-xs font-bold flex items-center gap-1">
-                <span>{hasCriticalBattery ? '🪫' : '🔋'}</span>
-                <span className="hidden sm:inline">{hasCriticalBattery ? 'Critica' : 'Bassa'}</span>
-              </span>
-            </div>
-          </div>
+          <Badge
+            variant={hasCriticalBattery ? 'danger' : 'warning'}
+            size="sm"
+            pulse={hasCriticalBattery}
+            icon={<span>{hasCriticalBattery ? '🪫' : '🔋'}</span>}
+          >
+            <span className="hidden sm:inline">{hasCriticalBattery ? 'Critica' : 'Bassa'}</span>
+          </Badge>
         )}
 
         {/* Offline badge */}
         {isOffline && (
-          <div className="relative">
-            <div className="absolute inset-0 bg-slate-500/30 rounded-full blur-md" />
-            <div className="relative bg-gradient-to-br from-slate-500 to-slate-600 text-white px-2.5 py-1 rounded-full shadow-lg ring-2 ring-white/30">
-              <span className="text-xs font-bold flex items-center gap-1">
-                <span>📵</span>
-                <span className="hidden sm:inline">Offline</span>
-              </span>
-            </div>
-          </div>
+          <Badge variant="neutral" size="sm" icon={<span>📵</span>}>
+            <span className="hidden sm:inline">Offline</span>
+          </Badge>
         )}
 
         {/* Heating indicator badge */}
         {isHeating && (
-          <div className="relative">
-            <div className="absolute inset-0 bg-warning-500/30 rounded-full blur-md animate-pulse" />
-            <div className="relative bg-gradient-to-br from-warning-500 to-warning-600 text-white px-2.5 py-1 rounded-full shadow-lg ring-2 ring-white/30">
-              <span className="text-xs font-bold flex items-center gap-1">
-                <span>🔥</span>
-                <span className="hidden sm:inline">Attivo</span>
-              </span>
-            </div>
-          </div>
+          <Badge variant="ember" size="sm" pulse icon={<span>🔥</span>}>
+            <span className="hidden sm:inline">Attivo</span>
+          </Badge>
         )}
 
         {/* Stove sync indicator badge - shown when stove is ON and controlling this valve */}
         {stoveSync && (
-          <div className="relative">
-            <div className="absolute inset-0 bg-ember-500/30 rounded-full blur-md" />
-            <div className="relative bg-gradient-to-br from-ember-500 to-flame-600 text-white px-2.5 py-1 rounded-full shadow-lg ring-2 ring-white/30">
-              <span className="text-xs font-bold flex items-center gap-1">
-                <span>🔥</span>
-                <span className="hidden sm:inline">Stufa</span>
-              </span>
-            </div>
-          </div>
+          <Badge variant="warning" size="sm" icon={<span>🔥</span>}>
+            <span className="hidden sm:inline">Stufa</span>
+          </Badge>
         )}
       </div>
 

@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils/cn';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
 import RoomSelector from '../../ui/RoomSelector';
-import { Divider, Heading, Text, Button, EmptyState, Spinner, Select } from '../../ui';
+import { Divider, Heading, Text, Button, EmptyState, Spinner, Select, Badge } from '../../ui';
 import BatteryWarning, { ModuleBatteryList } from './BatteryWarning';
 import { useScheduleData } from '@/lib/hooks/useScheduleData';
 
@@ -456,23 +456,17 @@ export default function ThermostatCard() {
                   <div className="relative rounded-2xl p-6 sm:p-8 transition-all duration-500 border bg-gradient-to-br from-slate-800/60 via-slate-900/70 to-slate-800/50 border-slate-600/40 [html:not(.dark)_&]:from-slate-200/80 [html:not(.dark)_&]:via-slate-100/90 [html:not(.dark)_&]:to-slate-200/70 [html:not(.dark)_&]:border-slate-300">
                     {/* Offline Badge */}
                     <div className="absolute -top-2 -right-2 z-20">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-slate-500/30 rounded-full blur-lg"></div>
-                        <div className="relative bg-gradient-to-br from-slate-500 to-slate-600 text-white px-3 py-1.5 rounded-full shadow-lg ring-2 ring-slate-900/50 [html:not(.dark)_&]:ring-white/50">
-                          <span className="text-xs font-bold font-display">📵 OFFLINE</span>
-                        </div>
-                      </div>
+                      <Badge variant="neutral" size="sm" icon={<span>📵</span>}>
+                        OFFLINE
+                      </Badge>
                     </div>
 
                     {/* Battery warning if critical */}
                     {selectedRoom.hasCriticalBattery && (
                       <div className="absolute -top-2 -left-2 z-20">
-                        <div className="relative">
-                          <div className="absolute inset-0 bg-danger-500/30 rounded-full blur-lg animate-pulse"></div>
-                          <div className="relative bg-gradient-to-br from-danger-500 to-danger-600 text-white px-3 py-1.5 rounded-full shadow-lg ring-2 ring-slate-900/50 [html:not(.dark)_&]:ring-white/50">
-                            <span className="text-xs font-bold font-display">🪫 BATTERIA</span>
-                          </div>
-                        </div>
+                        <Badge variant="danger" size="sm" pulse icon={<span>🪫</span>}>
+                          BATTERIA
+                        </Badge>
                       </div>
                     )}
 
@@ -509,24 +503,18 @@ export default function ThermostatCard() {
                   {/* Heating Badge - with light mode */}
                   {selectedRoom.heating && (
                     <div className="absolute -top-2 -right-2 z-20">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-ember-500/30 rounded-full blur-lg animate-pulse [html:not(.dark)_&]:bg-ember-400/40"></div>
-                        <div className="relative bg-gradient-to-br from-ember-500 to-flame-600 text-white px-3 py-1.5 rounded-full shadow-lg ring-2 ring-slate-900/50 [html:not(.dark)_&]:ring-white/50">
-                          <span className="text-xs font-bold font-display">🔥 ATTIVO</span>
-                        </div>
-                      </div>
+                      <Badge variant="ember" size="sm" pulse icon={<span>🔥</span>}>
+                        ATTIVO
+                      </Badge>
                     </div>
                   )}
 
                   {/* Stove Sync Badge - shows when living room is synced with stove */}
                   {selectedRoom.stoveSync && (
                     <div className={`absolute -top-2 ${selectedRoom.heating ? '-left-2' : '-right-2'} z-20`}>
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-warning-500/30 rounded-full blur-lg [html:not(.dark)_&]:bg-warning-400/40"></div>
-                        <div className="relative bg-gradient-to-br from-warning-500 to-warning-600 text-white px-3 py-1.5 rounded-full shadow-lg ring-2 ring-slate-900/50 [html:not(.dark)_&]:ring-white/50">
-                          <span className="text-xs font-bold font-display">🔥 STUFA</span>
-                        </div>
-                      </div>
+                      <Badge variant="warning" size="sm" icon={<span>🔥</span>}>
+                        STUFA
+                      </Badge>
                     </div>
                   )}
 

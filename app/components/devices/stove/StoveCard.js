@@ -1027,24 +1027,18 @@ export default function StoveCard() {
               {/* Sandbox Badge */}
               {sandboxMode && (
                 <div className="absolute -top-2 -left-2 z-30">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-ocean-500/30 rounded-full blur-lg animate-pulse"></div>
-                    <div className="relative bg-gradient-to-br from-ocean-500 to-ocean-600 text-white px-3 py-1.5 rounded-full shadow-lg ring-2 ring-slate-900/50">
-                      <span className="text-xs font-bold font-display">🧪 SANDBOX</span>
-                    </div>
-                  </div>
+                  <Badge variant="ocean" size="sm" pulse icon={<span>🧪</span>}>
+                    SANDBOX
+                  </Badge>
                 </div>
               )}
 
               {/* Error Badge */}
               {errorCode !== 0 && (
                 <div className="absolute -top-2 -right-2 z-30">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-danger-500/30 rounded-full blur-lg animate-pulse"></div>
-                    <div className="relative bg-gradient-to-br from-danger-500 to-danger-600 text-white px-3 py-1.5 rounded-full shadow-lg ring-2 ring-slate-900/50">
-                      <span className="text-xs font-bold font-display">⚠️ ERR {errorCode}</span>
-                    </div>
-                  </div>
+                  <Badge variant="danger" size="sm" pulse icon={<span>⚠️</span>}>
+                    ERR {errorCode}
+                  </Badge>
                 </div>
               )}
 

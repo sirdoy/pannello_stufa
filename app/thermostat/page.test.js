@@ -25,18 +25,34 @@ jest.mock('@/lib/routes', () => ({
 }));
 
 // Mock UI components to avoid complex rendering
-jest.mock('@/app/components/ui', () => ({
-  Card: ({ children }) => <div data-testid="card">{children}</div>,
-  Button: ({ children, onClick }) => <button onClick={onClick}>{children}</button>,
-  Skeleton: {
-    NetatmoPage: () => <div data-testid="skeleton">Loading...</div>,
-  },
-  ErrorAlert: ({ message }) => <div data-testid="error">{message}</div>,
-  Banner: ({ children }) => <div>{children}</div>,
-  Heading: ({ children }) => <h1>{children}</h1>,
-  Text: ({ children }) => <span>{children}</span>,
-  Grid: ({ children }) => <div>{children}</div>,
-}));
+jest.mock('@/app/components/ui', () => {
+  const MockPageLayout = ({ children, header }) => (
+    <div data-testid="page-layout">
+      {header}
+      {children}
+    </div>
+  );
+  MockPageLayout.Header = ({ title, description }) => (
+    <header data-testid="page-header">
+      <h1>{title}</h1>
+      <p>{description}</p>
+    </header>
+  );
+  return {
+    Card: ({ children }) => <div data-testid="card">{children}</div>,
+    Button: ({ children, onClick }) => <button onClick={onClick}>{children}</button>,
+    Skeleton: {
+      NetatmoPage: () => <div data-testid="skeleton">Loading...</div>,
+    },
+    ErrorAlert: ({ message }) => <div data-testid="error">{message}</div>,
+    Banner: ({ children }) => <div>{children}</div>,
+    Heading: ({ children }) => <h1>{children}</h1>,
+    Text: ({ children }) => <span>{children}</span>,
+    Grid: ({ children }) => <div>{children}</div>,
+    InfoBox: ({ title, children }) => <div data-testid="info-box"><strong>{title}</strong>{children}</div>,
+    PageLayout: MockPageLayout,
+  };
+});
 
 jest.mock('@/app/components/netatmo/RoomCard', () => {
   return function RoomCard() {

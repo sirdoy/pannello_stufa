@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic';
  * {
  *   success: true,
  *   current: { temperature, feelsLike, humidity, windSpeed, condition, units },
- *   forecast: [{ date, tempMax, tempMin, condition }, ...],
+ *   forecast: [{ date, tempMax, tempMin, condition, weatherCode }, ...],
  *   cachedAt: timestamp,
  *   stale: boolean
  * }
@@ -67,6 +67,7 @@ export const GET = withAuthAndErrorHandler(async (request) => {
       tempMax: data.daily.temperature_2m_max[i],
       tempMin: data.daily.temperature_2m_min[i],
       condition: interpretWeatherCode(data.daily.weather_code[i]),
+      weatherCode: data.daily.weather_code[i],
     }));
 
     // Return enriched response

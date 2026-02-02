@@ -37,7 +37,7 @@ Plans:
 ### Phase 26: Weather Component
 **Goal**: Users can view weather information in a card matching the existing design system
 **Depends on**: Phase 25 (API route must exist)
-**Requirements**: WEATHER-01, WEATHER-02, WEATHER-03, WEATHER-04, WEATHER-05, WEATHER-06, WEATHER-07, WEATHER-08, WEATHER-09, WEATHER-10
+**Requirements**: WEATHER-01, WEATHER-02, WEATHER-03, WEATHER-04, WEATHER-05, WEATHER-06, WEATHER-07, WEATHER-08, WEATHER-10
 **Success Criteria** (what must be TRUE):
   1. User can see current temperature and "feels like" temperature in WeatherCard
   2. User can see weather condition icon representing current conditions
@@ -56,7 +56,7 @@ Plans:
 ### Phase 27: Location Settings
 **Goal**: Users can configure their home location for weather display
 **Depends on**: Phase 25 (geolocation utility), Phase 26 (WeatherCard shows location)
-**Requirements**: LOC-01, LOC-02, LOC-03, LOC-04, LOC-05, LOC-06, INFRA-03
+**Requirements**: LOC-01, LOC-02, LOC-03, LOC-04, LOC-05, LOC-06, INFRA-03, WEATHER-09
 **Success Criteria** (what must be TRUE):
   1. User can navigate to location settings page from settings menu
   2. User can type city name and see autocomplete suggestions
@@ -64,6 +64,7 @@ Plans:
   4. User sees appropriate error message when geolocation fails
   5. User's location preference persists across browser sessions
   6. WeatherCard displays the configured location name
+  7. User sees temperature trend indicator (rising/falling arrow) when hourly data is available
 **Plans**: TBD
 
 Plans:
@@ -124,9 +125,12 @@ All 26 v3.2 requirements are mapped:
 | Category | Requirements | Phase |
 |----------|--------------|-------|
 | Infrastructure | INFRA-01, INFRA-04 | 25 |
-| Weather Display | WEATHER-01 to WEATHER-10 | 26 |
+| Weather Display | WEATHER-01 to WEATHER-08, WEATHER-10 | 26 |
+| Weather Trends | WEATHER-09 | 27 |
 | Location Settings | LOC-01 to LOC-06, INFRA-03 | 27 |
 | Dashboard Customization | DASH-01 to DASH-04, INFRA-02 | 28 |
 | Home Integration | DASH-05, DASH-06 | 29 |
 
 **Coverage: 26/26 requirements mapped**
+
+**Note:** WEATHER-09 (temperature trend indicator) deferred to Phase 27 because it requires hourly historical data for meaningful comparison. Phase 27 will add hourly data fetching alongside location settings.

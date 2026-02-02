@@ -110,12 +110,60 @@ export const buttonVariants = cva(
         true: 'rounded-full',
         false: '',
       },
+      colorScheme: {
+        sage: [],
+        ocean: [],
+        warning: [],
+        slate: [],
+      },
     },
     compoundVariants: [
       // iconOnly + size interactions for correct padding and min-width
       { iconOnly: true, size: 'sm', className: 'p-2.5 min-w-[44px] px-0' },
       { iconOnly: true, size: 'md', className: 'p-3 min-w-[48px] px-0' },
       { iconOnly: true, size: 'lg', className: 'p-4 min-w-[56px] px-0' },
+      // subtle + colorScheme compound variants
+      {
+        variant: 'subtle',
+        colorScheme: 'sage',
+        className: 'bg-sage-500/20 text-sage-300 border border-sage-500/40 shadow-sm [html:not(.dark)_&]:bg-sage-500/20 [html:not(.dark)_&]:text-sage-700 [html:not(.dark)_&]:border-sage-500/30',
+      },
+      {
+        variant: 'subtle',
+        colorScheme: 'ocean',
+        className: 'bg-ocean-500/20 text-ocean-300 border border-ocean-500/40 shadow-sm [html:not(.dark)_&]:bg-ocean-500/20 [html:not(.dark)_&]:text-ocean-700 [html:not(.dark)_&]:border-ocean-500/30',
+      },
+      {
+        variant: 'subtle',
+        colorScheme: 'warning',
+        className: 'bg-warning-500/20 text-warning-300 border border-warning-500/40 shadow-sm [html:not(.dark)_&]:bg-warning-500/20 [html:not(.dark)_&]:text-warning-700 [html:not(.dark)_&]:border-warning-500/30',
+      },
+      {
+        variant: 'subtle',
+        colorScheme: 'slate',
+        className: 'bg-slate-500/20 text-slate-300 border border-slate-500/40 shadow-sm [html:not(.dark)_&]:bg-slate-500/20 [html:not(.dark)_&]:text-slate-700 [html:not(.dark)_&]:border-slate-500/30',
+      },
+      // ghost + colorScheme compound variants
+      {
+        variant: 'ghost',
+        colorScheme: 'sage',
+        className: 'text-sage-300 hover:bg-sage-500/10 [html:not(.dark)_&]:text-sage-700 [html:not(.dark)_&]:hover:bg-sage-500/10',
+      },
+      {
+        variant: 'ghost',
+        colorScheme: 'ocean',
+        className: 'text-ocean-300 hover:bg-ocean-500/10 [html:not(.dark)_&]:text-ocean-700 [html:not(.dark)_&]:hover:bg-ocean-500/10',
+      },
+      {
+        variant: 'ghost',
+        colorScheme: 'warning',
+        className: 'text-warning-300 hover:bg-warning-500/10 [html:not(.dark)_&]:text-warning-700 [html:not(.dark)_&]:hover:bg-warning-500/10',
+      },
+      {
+        variant: 'ghost',
+        colorScheme: 'slate',
+        className: 'text-slate-300 hover:bg-slate-500/10 [html:not(.dark)_&]:text-slate-700 [html:not(.dark)_&]:hover:bg-slate-500/10',
+      },
     ],
     defaultVariants: {
       variant: 'ember',
@@ -151,6 +199,7 @@ const iconSizes = {
  * @param {'left'|'right'} props.iconPosition - Icon position relative to text
  * @param {boolean} props.fullWidth - Expand to full width
  * @param {boolean} props.iconOnly - Circular icon-only button
+ * @param {'sage'|'ocean'|'warning'|'slate'} props.colorScheme - Color tinting for subtle/ghost variants (optional)
  * @param {string} props.className - Additional Tailwind classes
  */
 const Button = forwardRef(function Button(
@@ -164,6 +213,7 @@ const Button = forwardRef(function Button(
     iconPosition = 'left',
     fullWidth = false,
     iconOnly = false,
+    colorScheme,
     className,
     ...props
   },
@@ -174,7 +224,7 @@ const Button = forwardRef(function Button(
       ref={ref}
       disabled={disabled || loading}
       className={cn(
-        buttonVariants({ variant, size, fullWidth, iconOnly }),
+        buttonVariants({ variant, size, fullWidth, iconOnly, colorScheme }),
         className
       )}
       {...props}

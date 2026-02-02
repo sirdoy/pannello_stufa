@@ -45,13 +45,13 @@ Plans:
   4. User sees skeleton loading state while weather fetches
   5. User sees error state with retry button when fetch fails
   6. User can compare outdoor temperature with indoor thermostat reading
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 26-01: WeatherCard component structure
-- [ ] 26-02: Current conditions display
-- [ ] 26-03: 5-day forecast display
-- [ ] 26-04: Loading and error states
+- [ ] 26-01-PLAN.md — WeatherIcon component and weather helpers (WMO code mapping, temperature formatting)
+- [ ] 26-02-PLAN.md — WeatherCard core with CurrentConditions and Skeleton.WeatherCard
+- [ ] 26-03-PLAN.md — ForecastRow, ForecastDayCard, and ForecastDaySheet with bottom sheet details
+- [ ] 26-04-PLAN.md — Barrel export, integration, and visual verification
 
 ### Phase 27: Location Settings
 **Goal**: Users can configure their home location for weather display
@@ -112,7 +112,7 @@ Phases execute in numeric order: 25 -> 26 -> 27 -> 28 -> 29
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 25. Weather Foundation | 3/3 | ✓ Complete | 2026-02-02 |
-| 26. Weather Component | 0/4 | Ready to plan | - |
+| 26. Weather Component | 0/4 | Ready to execute | - |
 | 27. Location Settings | 0/4 | Not started | - |
 | 28. Dashboard Customization | 0/4 | Not started | - |
 | 29. Home Page Integration | 0/2 | Not started | - |

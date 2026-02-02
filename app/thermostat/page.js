@@ -319,31 +319,27 @@ function NetatmoContent() {
     return 0;
   });
 
-  // Mode button configuration - mapped to Button component variants with custom active state overrides
+  // Mode button configuration - using colorScheme prop for declarative tinting
   const modeConfig = {
     schedule: {
       label: 'Programmato',
       icon: '\u23F0',
-      // Active: sage-tinted background
-      activeClassName: 'bg-sage-500/20 text-sage-300 border border-sage-500/40 shadow-sm [html:not(.dark)_&]:bg-sage-500/20 [html:not(.dark)_&]:text-sage-700 [html:not(.dark)_&]:border-sage-500/30',
+      colorScheme: 'sage',
     },
     away: {
       label: 'Assenza',
       icon: '\uD83C\uDFC3',
-      // Active: warning-tinted background
-      activeClassName: 'bg-warning-500/20 text-warning-300 border border-warning-500/40 shadow-sm [html:not(.dark)_&]:bg-warning-500/20 [html:not(.dark)_&]:text-warning-700 [html:not(.dark)_&]:border-warning-500/30',
+      colorScheme: 'warning',
     },
     hg: {
       label: 'Antigelo',
       icon: '\u2744\uFE0F',
-      // Active: ocean-tinted background
-      activeClassName: 'bg-ocean-500/20 text-ocean-300 border border-ocean-500/40 shadow-sm [html:not(.dark)_&]:bg-ocean-500/20 [html:not(.dark)_&]:text-ocean-700 [html:not(.dark)_&]:border-ocean-500/30',
+      colorScheme: 'ocean',
     },
     off: {
       label: 'Off',
       icon: '\u23F8\uFE0F',
-      // Active: slate/subtle background
-      activeClassName: 'bg-slate-500/20 text-slate-300 border border-slate-500/40 shadow-sm [html:not(.dark)_&]:bg-slate-500/20 [html:not(.dark)_&]:text-slate-700 [html:not(.dark)_&]:border-slate-500/30',
+      colorScheme: 'slate',
     },
   };
 
@@ -399,9 +395,9 @@ function NetatmoContent() {
                 <Button
                   key={targetMode}
                   variant={isActive ? 'subtle' : 'ghost'}
+                  colorScheme={config.colorScheme}
                   onClick={() => handleModeChange(targetMode)}
                   size="sm"
-                  className={isActive ? config.activeClassName : undefined}
                 >
                   <span>{config.icon}</span>
                   <span>{config.label}</span>

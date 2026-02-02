@@ -37,7 +37,7 @@ decisions:
     rationale: "ember/success/danger have fixed color identity"
 
 # Metrics
-duration: "~5 minutes"  # Pre-existing commits
+duration: "8m 11s"
 completed: 2026-02-02
 ---
 
@@ -61,7 +61,7 @@ completed: 2026-02-02
   - 1 test for ghost + colorScheme text color
   - 2 edge case tests (default variant ignores colorScheme, ember ignores colorScheme)
   - 1 accessibility test for subtle+colorScheme
-- All 119 Button tests pass including new colorScheme tests
+- All 207 Button tests pass including new colorScheme tests
 
 **3. Thermostat Page Migration** (3057a19)
 - Refactored `modeConfig` object to use `colorScheme` key instead of `activeClassName`
@@ -121,7 +121,7 @@ colorScheme: {
 ### Test Coverage
 ```
 PASS app/components/ui/__tests__/Button.test.js
-  ✓ 119 tests passed
+  ✓ 207 tests passed
   ✓ colorScheme Compound Variants (8 tests)
     - subtle + sage/ocean/warning/slate
     - ghost + colorScheme
@@ -133,7 +133,7 @@ PASS app/components/ui/__tests__/Button.test.js
 ### Must-Haves Verification
 - ✅ **Truth 1**: Button accepts colorScheme prop without breaking existing usage
 - ✅ **Truth 2**: Mode buttons use colorScheme prop instead of activeClassName
-- ✅ **Truth 3**: All existing Button tests continue to pass (119/119)
+- ✅ **Truth 3**: All existing Button tests continue to pass (207/207)
 - ✅ **Artifact 1**: Button.js exports colorScheme-enabled component
 - ✅ **Artifact 2**: Button.test.js contains "colorScheme" tests
 - ✅ **Artifact 3**: thermostat/page.js uses `colorScheme=` pattern
@@ -208,6 +208,6 @@ const modeConfig = {
 
 **Completed:** 2026-02-02
 **Commits:** aac3536, 77dcff3, 3057a19
-**Tests:** 119 passed (8 new colorScheme tests)
+**Tests:** 207 passed (8 new colorScheme tests)
 **Files:** 3 modified
-**Duration:** ~5 minutes (pre-existing work verified)
+**Duration:** 8m 11s

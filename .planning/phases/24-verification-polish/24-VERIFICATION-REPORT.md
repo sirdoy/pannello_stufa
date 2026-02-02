@@ -131,6 +131,29 @@ The design system provides replacements for all common input types:
 - **Non-compliant:** 0
 - **Compliance rate:** 100%
 
+### Component Migration Timeline
+
+| Component | Migration Phase | Plan | Commits |
+|-----------|-----------------|------|---------|
+| StoveCard.js | Phase 19 | 19-02 | Card, Button, StatusBadge |
+| ThermostatCard.js | Phase 20 | 20-02, 20-03 | Card, Button |
+| LightsCard.js | Phase 21 | 21-02, 21-03 | Card, Button, Slider |
+| CameraCard.js | Phase 22 | 22-02 | Card, Button, Image |
+| EventPreviewModal.js | Phase 22 | 22-02 | Modal, Button |
+| HlsPlayer.js | Phase 22 | 22-02 | Button |
+| page.js (thermostat) | Phase 23 | 23-02 | PageLayout, InfoBox, Button |
+
+### Design System Components Used
+
+| Component | Count | Files Using |
+|-----------|-------|-------------|
+| Button | 7 | All target files |
+| Card | 4 | StoveCard, ThermostatCard, LightsCard, CameraCard |
+| Slider | 1 | LightsCard |
+| Modal | 1 | EventPreviewModal |
+| PageLayout | 1 | page.js (thermostat) |
+| InfoBox | 1 | page.js (thermostat) |
+
 ---
 
 ## Verification Methodology

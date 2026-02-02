@@ -9,12 +9,15 @@
  * @see CONTEXT.md - Apple Weather widget style with current + forecast
  */
 
+import { useState } from 'react';
 import { SmartHomeCard, Badge, Button, Text } from '@/app/components/ui';
 import { CloudSun, CloudOff, RefreshCw } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 import Skeleton from '@/app/components/ui/Skeleton';
 import { CurrentConditions } from './CurrentConditions';
+import { ForecastRow } from './ForecastRow';
+import { ForecastDaySheet } from './ForecastDaySheet';
 
 /**
  * WeatherCard - Weather display with loading/error/data states
@@ -25,8 +28,6 @@ import { CurrentConditions } from './CurrentConditions';
  * @param {boolean} props.isLoading - Show skeleton state
  * @param {Error|null} props.error - Error object for error state
  * @param {function} props.onRetry - Callback when retry button clicked
- * @param {function} props.onForecastDayClick - Callback when forecast day is clicked
- * @param {React.ReactNode} props.children - Additional content (e.g., ForecastRow from Plan 03)
  *
  * @example
  * <WeatherCard
@@ -35,9 +36,7 @@ import { CurrentConditions } from './CurrentConditions';
  *   isLoading={false}
  *   error={null}
  *   onRetry={() => refetch()}
- * >
- *   <ForecastRow forecast={data.forecast} />
- * </WeatherCard>
+ * />
  */
 export function WeatherCard({
   weatherData = null,
@@ -45,9 +44,10 @@ export function WeatherCard({
   isLoading = false,
   error = null,
   onRetry = () => {},
-  onForecastDayClick = () => {},
-  children,
 }) {
+  // State for selected forecast day (opens detail sheet)
+  const [selectedDay, setSelectedDay] = useState(null);
+
   // Loading state - render skeleton
   if (isLoading) {
     return <Skeleton.WeatherCard />;
@@ -122,12 +122,28 @@ export function WeatherCard({
       </SmartHomeCard.Status>
 
       <SmartHomeCard.Controls>
+        {/* Current conditions */}
         <CurrentConditions
           current={current}
           indoorTemp={indoorTemp}
         />
-        {/* ForecastRow and other children from Plan 03 */}
-        {children}
+
+        {/* Forecast row */}
+        {weatherData.forecast && weatherData.forecast.length > 0 && (
+          <div className="mt-6 pt-6 border-t border-slate-700/30 [html:not(.dark)_&]:border-slate-200/50">
+            <ForecastRow
+              forecast={weatherData.forecast}
+              onDayClick={setSelectedDay}
+            />
+          </div>
+        )}
+
+        {/* Forecast day detail sheet */}
+        <ForecastDaySheet
+          day={selectedDay}
+          isOpen={!!selectedDay}
+          onClose={() => setSelectedDay(null)}
+        />
       </SmartHomeCard.Controls>
     </SmartHomeCard>
   );

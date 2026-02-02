@@ -313,6 +313,72 @@ Skeleton.LightsCard = function SkeletonLightsCard() {
 };
 
 /**
+ * Skeleton.WeatherCard - Skeleton for WeatherCard component - Ember Noir
+ */
+Skeleton.WeatherCard = function SkeletonWeatherCard() {
+  return (
+    <div className="space-y-4 sm:space-y-6 animate-spring-in">
+      <Skeleton.Card className="overflow-visible transition-all duration-500">
+        <div className="relative">
+          <div className="p-6 sm:p-8">
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-6">
+              <Skeleton className="h-8 w-8 rounded-full" />
+              <Skeleton className="h-8 w-20" />
+            </div>
+
+            {/* Status badge */}
+            <div className="mb-4">
+              <Skeleton className="h-6 w-40 rounded-full" />
+            </div>
+
+            {/* Current conditions - main display */}
+            <div className="mb-6">
+              <div className="flex items-start gap-4 mb-4">
+                {/* Weather icon */}
+                <Skeleton className="h-16 w-16 rounded-full flex-shrink-0" />
+                {/* Temperature + condition */}
+                <div className="flex-1">
+                  <Skeleton className="h-12 w-24 mb-2" />
+                  <Skeleton className="h-5 w-40 mb-1" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+              </div>
+
+              {/* Weather details grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="flex flex-col items-center p-3 bg-slate-800/40 rounded-xl [html:not(.dark)_&]:bg-slate-100/80">
+                    <Skeleton className="h-5 w-5 rounded-full mb-2" />
+                    <Skeleton className="h-3 w-12 mb-1" />
+                    <Skeleton className="h-4 w-10" />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Forecast row */}
+            <div className="flex gap-3 overflow-x-hidden pb-2">
+              {[...Array(5)].map((_, i) => (
+                <div
+                  key={i}
+                  className="flex-shrink-0 w-20 p-3 rounded-xl bg-slate-800/40 [html:not(.dark)_&]:bg-slate-100/80"
+                >
+                  <Skeleton className="h-3 w-10 mx-auto mb-2" />
+                  <Skeleton className="h-8 w-8 rounded-full mx-auto mb-2" />
+                  <Skeleton className="h-4 w-12 mx-auto mb-1" />
+                  <Skeleton className="h-3 w-8 mx-auto" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Skeleton.Card>
+    </div>
+  );
+};
+
+/**
  * Skeleton.Scheduler - Skeleton for Scheduler page
  */
 Skeleton.Scheduler = function SkeletonScheduler() {

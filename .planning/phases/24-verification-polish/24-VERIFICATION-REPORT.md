@@ -100,6 +100,16 @@ No matches found
 - **Total raw `<input>` elements found:** 0
 - **All form inputs use Input/Slider components from design system**
 
+### Input Type Coverage
+
+The design system provides replacements for all common input types:
+
+| HTML Input Type | Design System Replacement | Used In |
+|-----------------|--------------------------|---------|
+| `<input type="range">` | Slider component | LightsCard.js |
+| `<input type="text">` | Input component | (none needed in scope) |
+| `<input type="number">` | Input component | (none needed in scope) |
+
 ---
 
 ## Component Inventory Matrix

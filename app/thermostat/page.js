@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Card, Button, Skeleton, ErrorAlert, Banner, Heading, Text, Grid } from '@/app/components/ui';
+import { Card, Button, Skeleton, ErrorAlert, Banner, Heading, Text, Grid, InfoBox, PageLayout } from '@/app/components/ui';
 import RoomCard from '@/app/components/netatmo/RoomCard';
 import BatteryWarning, { ModuleBatteryList } from '@/app/components/devices/thermostat/BatteryWarning';
 import StoveSyncPanel from '@/app/components/netatmo/StoveSyncPanel';
@@ -198,7 +198,7 @@ function NetatmoContent() {
   // Show error if topology failed to load
   if (!topology && error) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <PageLayout maxWidth="7xl">
         <Card variant="elevated" className="p-6 sm:p-8">
           <Heading level={2} size="2xl" className="mb-4">
             Errore Connessione Netatmo
@@ -234,7 +234,7 @@ function NetatmoContent() {
             </Button>
           </div>
         </Card>
-      </div>
+      </PageLayout>
     );
   }
 
@@ -344,17 +344,15 @@ function NetatmoContent() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <Heading level={1} size="3xl" className="mb-2">
-          Controllo Netatmo
-        </Heading>
-        <Text variant="secondary">
-          Gestisci temperature e riscaldamento di tutte le stanze
-        </Text>
-      </div>
-
+    <PageLayout
+      maxWidth="7xl"
+      header={
+        <PageLayout.Header
+          title="Controllo Netatmo"
+          description="Gestisci temperature e riscaldamento di tutte le stanze"
+        />
+      }
+    >
       {/* Error Alert */}
       {error && (
         <div className="mb-6">
@@ -445,24 +443,24 @@ function NetatmoContent() {
       {/* Topology Info - Liquid Glass Card */}
       <Card variant="glass" className="p-5 sm:p-6 mb-6">
         <Grid cols={3} gap="sm" className="md:grid-cols-3">
-          <div className="p-3 rounded-xl bg-slate-800/40 backdrop-blur-sm [html:not(.dark)_&]:bg-slate-100/60">
-            <Text variant="label" size="xs" className="mb-1">Casa</Text>
-            <Text variant="body" size="lg" weight="bold">
-              {topology.home_name}
-            </Text>
-          </div>
-          <div className="p-3 rounded-xl bg-slate-800/40 backdrop-blur-sm [html:not(.dark)_&]:bg-slate-100/60">
-            <Text variant="label" size="xs" className="mb-1">Stanze</Text>
-            <Text variant="body" size="lg" weight="bold">
-              {rooms.length}
-            </Text>
-          </div>
-          <div className="p-3 rounded-xl bg-slate-800/40 backdrop-blur-sm [html:not(.dark)_&]:bg-slate-100/60">
-            <Text variant="label" size="xs" className="mb-1">Moduli</Text>
-            <Text variant="body" size="lg" weight="bold">
-              {modulesWithBattery?.length || 0}
-            </Text>
-          </div>
+          <InfoBox
+            icon="🏠"
+            label="Casa"
+            value={topology.home_name}
+            variant="neutral"
+          />
+          <InfoBox
+            icon="🚪"
+            label="Stanze"
+            value={rooms.length}
+            variant="neutral"
+          />
+          <InfoBox
+            icon="📡"
+            label="Moduli"
+            value={modulesWithBattery?.length || 0}
+            variant="neutral"
+          />
         </Grid>
 
         {/* Module Battery Status List */}
@@ -503,7 +501,7 @@ function NetatmoContent() {
           </Text>
         </Card>
       )}
-    </div>
+    </PageLayout>
   );
 }
 

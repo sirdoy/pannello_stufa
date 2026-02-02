@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Phase: 26 of 29 (Weather Component)
-Plan: 3/4 plans complete
-Status: In progress
-Last activity: 2026-02-02 — Completed 26-03-PLAN.md (Forecast Components)
+Plan: 4/4 plans complete
+Status: Phase complete
+Last activity: 2026-02-02 — Completed 26-04-PLAN.md (Integration)
 
-Progress: [███████░░░░░░░░░░░░░░░░░░] 35% (v3.2 milestone - 6/17 estimated plans)
+Progress: [████████░░░░░░░░░░░░░░░░░] 41% (v3.2 milestone - 7/17 estimated plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 118 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 52 plans, v3.1: 13 plans, v3.2: 3 plans)
+- Total plans completed: 119 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 52 plans, v3.1: 13 plans, v3.2: 4 plans)
 - Average duration: ~3.9 min per plan
 - Total execution time: ~7.98 hours across 5 milestones
 
@@ -31,15 +31,16 @@ Progress: [███████░░░░░░░░░░░░░░░░
 | v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 - 2026-01-28) |
 | v3.0 Design System | 8 | 52 | 3 days (2026-01-28 - 2026-01-30) |
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
-| v3.2 Weather & Dashboard | 5 | 6 | In progress (2026-02-02 - present) |
+| v3.2 Weather & Dashboard | 5 | 7 | In progress (2026-02-02 - present) |
 
 **Recent Trend:**
 - All 4 previous milestones complete: 115 plans total
-- v3.2 estimated at ~17 plans across 5 phases, 6 complete
+- v3.2 estimated at ~17 plans across 5 phases, 7 complete
 - Weather foundation: API infrastructure + geolocation/location + dashboard preferences (6min total)
 - Weather component plan 01: WeatherIcon + utilities (2min)
 - Weather component plan 02: WeatherCard + CurrentConditions + Skeleton (2min)
 - Weather component plan 03: ForecastRow + ForecastDayCard + ForecastDaySheet (3min)
+- Weather component plan 04: Integration + barrel export (7min)
 
 *Updated after v3.2 roadmap creation*
 
@@ -82,6 +83,9 @@ Key architectural patterns from previous milestones:
 - First forecast day always marked as "Oggi" (index === 0)
 - Precipitation badge threshold: > 10% to avoid visual noise
 - Missing extended stats show "N/D" (non disponibile)
+- Barrel export pattern for weather components (import from @/app/components/weather)
+- Today min/max displayed next to current temperature with ember/ocean colors
+- Air quality uses European AQI scale (0-100+) with Italian labels
 
 ### Pending Todos
 
@@ -102,7 +106,7 @@ None — starting fresh milestone.
 
 ## Session Continuity
 
-Last session: 2026-02-02T17:15:00Z
-Stopped at: Completed 26-03-PLAN.md (Forecast Components)
+Last session: 2026-02-02T17:22:00Z
+Stopped at: Completed 26-04-PLAN.md (Integration) - Phase 26 complete
 Resume file: None
-Next step: Execute 26-04-PLAN.md (Integration)
+Next step: Phase 27 planning (Dashboard Customization) or Location Settings integration

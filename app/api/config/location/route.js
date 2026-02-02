@@ -1,0 +1,94 @@
+/**
+ * Location Configuration API
+ *
+ * GET  /api/config/location - Get current app-wide location
+ * POST /api/config/location - Set app-wide location
+ *
+ * All authenticated users can read and write the location.
+ * This is a shared configuration for the entire app.
+ */
+
+import { withAuthAndErrorHandler, success, badRequest, error } from '@/lib/core';
+import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
+import { getEnvironmentPath } from '@/lib/environmentHelper';
+
+// Force dynamic rendering (Firebase Admin SDK requires Node.js runtime)
+export const dynamic = 'force-dynamic';
+
+/**
+ * GET /api/config/location
+ * Returns current configured location or 404 if not set
+ *
+ * Response:
+ *   200: { location: { latitude, longitude, name, updatedAt } }
+ *   404: { error: 'Location not configured', code: 'LOCATION_NOT_SET' }
+ */
+export const GET = withAuthAndErrorHandler(async () => {
+  const locationPath = getEnvironmentPath('config/location');
+  const location = await adminDbGet(locationPath);
+
+  if (!location) {
+    return error('Location not configured', 'LOCATION_NOT_SET', 404);
+  }
+
+  return success({ location });
+}, 'Config/Location');
+
+/**
+ * POST /api/config/location
+ * Set app-wide location with coordinate validation
+ *
+ * Body:
+ *   {
+ *     latitude: number,    // Required: -90 to 90
+ *     longitude: number,   // Required: -180 to 180
+ *     name?: string        // Optional: location name/address
+ *   }
+ *
+ * Response:
+ *   200: { message: 'Location updated', location: {...} }
+ *   400: { error: '...validation error...', code: 'VALIDATION_ERROR' }
+ */
+export const POST = withAuthAndErrorHandler(async (request) => {
+  const body = await request.json();
+  const { latitude, longitude, name } = body;
+
+  // Validate required fields
+  if (latitude === undefined || longitude === undefined) {
+    return badRequest('latitude and longitude are required');
+  }
+
+  // Parse and validate coordinates
+  const lat = parseFloat(latitude);
+  const lon = parseFloat(longitude);
+
+  if (isNaN(lat) || isNaN(lon)) {
+    return badRequest('latitude and longitude must be valid numbers');
+  }
+
+  if (lat < -90 || lat > 90) {
+    return badRequest('latitude must be between -90 and 90');
+  }
+
+  if (lon < -180 || lon > 180) {
+    return badRequest('longitude must be between -180 and 180');
+  }
+
+  // Save to Firebase
+  const locationPath = getEnvironmentPath('config/location');
+  await adminDbSet(locationPath, {
+    latitude: lat,
+    longitude: lon,
+    name: name || null,
+    updatedAt: Date.now(),
+  });
+
+  return success({
+    message: 'Location updated',
+    location: {
+      latitude: lat,
+      longitude: lon,
+      name: name || null,
+    },
+  });
+}, 'Config/Location');

@@ -1496,4 +1496,13 @@
   .shadow-glow-warning {
     box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.3);
   }
+
+  /* Hide scrollbar for horizontal scroll containers */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
 }

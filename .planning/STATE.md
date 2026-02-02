@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v3.2 Dashboard Customization & Weather - Phase 25 Weather Foundation
+**Current focus:** v3.2 Dashboard Customization & Weather - Phase 26 Weather Component
 
 ## Current Position
 
-Phase: 25 of 29 (Weather Foundation)
-Plan: 3 of ~4 plans complete
-Status: In progress
-Last activity: 2026-02-02 — Completed 25-03-PLAN.md (Dashboard Preferences & Weather Cache Tests)
+Phase: 25 of 29 (Weather Foundation) ✓ COMPLETE
+Plan: 3/3 plans complete
+Status: Phase 25 complete, ready for Phase 26
+Last activity: 2026-02-02 — Phase 25 verified and complete
 
-Progress: [███░░░░░░░░░░░░░░░░░░░░░░] ~18% (v3.2 milestone - 3/17 estimated plans)
+Progress: [████░░░░░░░░░░░░░░░░░░░░░] 20% (v3.2 milestone - 1/5 phases, 3/17 estimated plans)
 
 ## Performance Metrics
 
@@ -93,6 +93,6 @@ None — starting fresh milestone.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Completed 25-03-PLAN.md (Dashboard Preferences & Weather Cache Tests)
+Stopped at: Phase 25 Weather Foundation complete
 Resume file: None
-Next step: Continue Phase 25 Weather Foundation (weather UI, settings integration)
+Next step: `/gsd:discuss-phase 26` to plan Weather Component

@@ -10,7 +10,7 @@ v3.2 adds weather display and dashboard customization to the Pannello Stufa PWA.
 
 ## Phases
 
-- [ ] **Phase 25: Weather Foundation** - API route, geolocation utility, preferences service
+- [x] **Phase 25: Weather Foundation** - API route, geolocation utility, preferences service ✓
 - [ ] **Phase 26: Weather Component** - WeatherCard UI with current conditions and forecast
 - [ ] **Phase 27: Location Settings** - Settings page for home location configuration
 - [ ] **Phase 28: Dashboard Customization** - Settings page for card order and visibility
@@ -30,9 +30,9 @@ v3.2 adds weather display and dashboard customization to the Pannello Stufa PWA.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 25-01-PLAN.md — Weather API client (Open-Meteo wrapper), cache utility, forecast route
-- [ ] 25-02-PLAN.md — Geolocation utility with iOS fallback, location service for Firebase
-- [ ] 25-03-PLAN.md — Dashboard preferences service, dashboard API route, weather cache tests
+- [x] 25-01-PLAN.md — Weather API client (Open-Meteo wrapper), cache utility, forecast route
+- [x] 25-02-PLAN.md — Geolocation utility with iOS fallback, location service for Firebase
+- [x] 25-03-PLAN.md — Dashboard preferences service, dashboard API route, weather cache tests
 
 ### Phase 26: Weather Component
 **Goal**: Users can view weather information in a card matching the existing design system
@@ -111,8 +111,8 @@ Phases execute in numeric order: 25 -> 26 -> 27 -> 28 -> 29
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 25. Weather Foundation | 0/3 | Ready to execute | - |
-| 26. Weather Component | 0/4 | Not started | - |
+| 25. Weather Foundation | 3/3 | ✓ Complete | 2026-02-02 |
+| 26. Weather Component | 0/4 | Ready to plan | - |
 | 27. Location Settings | 0/4 | Not started | - |
 | 28. Dashboard Customization | 0/4 | Not started | - |
 | 29. Home Page Integration | 0/2 | Not started | - |

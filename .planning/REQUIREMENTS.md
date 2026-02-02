@@ -40,10 +40,10 @@ Requirements for Dashboard Customization & Weather milestone.
 
 ### Infrastructure
 
-- [ ] **INFRA-01**: Weather API route fetches from Open-Meteo with 15-min cache
+- [x] **INFRA-01**: Weather API route fetches from Open-Meteo with 15-min cache
 - [ ] **INFRA-02**: Dashboard preferences stored in Firebase RTDB (not localStorage)
 - [ ] **INFRA-03**: Location settings stored in Firebase RTDB
-- [ ] **INFRA-04**: Geolocation has 10-second timeout with iOS PWA fallback
+- [x] **INFRA-04**: Geolocation has 10-second timeout with iOS PWA fallback
 
 ## Future Requirements
 
@@ -104,10 +104,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DASH-04 | Phase 28 | Pending |
 | DASH-05 | Phase 29 | Pending |
 | DASH-06 | Phase 29 | Pending |
-| INFRA-01 | Phase 25 | Pending |
+| INFRA-01 | Phase 25 | Complete |
 | INFRA-02 | Phase 28 | Pending |
 | INFRA-03 | Phase 27 | Pending |
-| INFRA-04 | Phase 25 | Pending |
+| INFRA-04 | Phase 25 | Complete |
 
 **Coverage:**
 - v3.2 requirements: 26 total

@@ -51,7 +51,10 @@ export default function CameraCard() {
     }
   }, [selectedCameraId]);
 
-  async function fetchCameras() {
+  async function fetchCameras(retryCount = 0) {
+    const MAX_RETRIES = 1;
+    const RETRY_DELAY_MS = 1500;
+
     try {
       setLoading(true);
       setError(null);
@@ -61,6 +64,12 @@ export default function CameraCard() {
       const data = await response.json();
 
       if (data.reconnect) {
+        // Token issue - retry once in case token was just refreshed
+        if (retryCount < MAX_RETRIES) {
+          console.log(`⏳ Camera token issue, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+          return fetchCameras(retryCount + 1);
+        }
         setConnected(false);
         setNeedsReauth(false);
         setError('Richiesta autorizzazione camera');
@@ -73,7 +82,7 @@ export default function CameraCard() {
         if (errorLower.includes('invalid access token') ||
             errorLower.includes('access_denied') ||
             errorLower.includes('insufficient scope')) {
-          // Token exists but doesn't have camera permissions
+          // Token exists but doesn't have camera permissions - no retry needed
           setConnected(false);
           setNeedsReauth(true);
           setError('Autorizzazione videocamere mancante');
@@ -94,10 +103,17 @@ export default function CameraCard() {
           errorMsg.includes('insufficient scope')) {
         setNeedsReauth(true);
         setError('Autorizzazione videocamere mancante');
+        setConnected(false);
       } else {
+        // Retry on network errors
+        if (retryCount < MAX_RETRIES) {
+          console.log(`⏳ Camera fetch error, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+          return fetchCameras(retryCount + 1);
+        }
         setError(err.message);
+        setConnected(false);
       }
-      setConnected(false);
     } finally {
       setLoading(false);
     }

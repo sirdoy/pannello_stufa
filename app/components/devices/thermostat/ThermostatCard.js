@@ -135,15 +135,33 @@ export default function ThermostatCard() {
   const mode = status?.mode || 'schedule';
   const hasHeating = roomsWithStatus.some(r => r.heating);
 
-  async function checkConnection() {
+  async function checkConnection(retryCount = 0) {
+    const MAX_RETRIES = 1;
+    const RETRY_DELAY_MS = 1500;
+
     try {
       setLoading(true);
       setError(null);
+
+      // Show retry message on subsequent attempts
+      if (retryCount > 0) {
+        setLoadingMessage('Riconnessione in corso...');
+      } else {
+        setLoadingMessage('Caricamento...');
+      }
 
       const response = await fetch(NETATMO_ROUTES.homesData);
       const data = await response.json();
 
       if (data.reconnect) {
+        // Token expired/invalid - retry once in case token was just refreshed
+        if (retryCount < MAX_RETRIES) {
+          console.log(`⏳ Token issue detected, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+          setLoadingMessage('Verifica token in corso...');
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+          return checkConnection(retryCount + 1);
+        }
+        // All retries exhausted - show reconnect UI
         setConnected(false);
         setError(data.error);
         return;
@@ -153,18 +171,36 @@ export default function ThermostatCard() {
         setConnected(true);
         setTopology(data);
       } else {
+        // Other error - retry once for transient issues
+        if (retryCount < MAX_RETRIES && !data.reconnect) {
+          console.log(`⏳ Connection error, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+          setLoadingMessage('Nuovo tentativo...');
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+          return checkConnection(retryCount + 1);
+        }
         setConnected(false);
       }
     } catch (err) {
       console.error('Errore connessione termostato:', err);
+      // Retry on network errors
+      if (retryCount < MAX_RETRIES) {
+        console.log(`⏳ Network error, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+        setLoadingMessage('Nuovo tentativo...');
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+        return checkConnection(retryCount + 1);
+      }
       setConnected(false);
       setError(err.message);
     } finally {
       setLoading(false);
+      setLoadingMessage('Caricamento...');
     }
   }
 
-  async function fetchStatus() {
+  async function fetchStatus(retryCount = 0) {
+    const MAX_RETRIES = 1;
+    const RETRY_DELAY_MS = 1500;
+
     try {
       setError(null);
 
@@ -172,6 +208,12 @@ export default function ThermostatCard() {
       const data = await response.json();
 
       if (data.reconnect) {
+        // Token issue during polling - retry once before disconnecting
+        if (retryCount < MAX_RETRIES) {
+          console.log(`⏳ Status fetch token issue, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+          return fetchStatus(retryCount + 1);
+        }
         setConnected(false);
         return;
       }
@@ -188,6 +230,12 @@ export default function ThermostatCard() {
       setStatus(data);
     } catch (err) {
       console.error('Errore fetch status termostato:', err);
+      // Retry on network errors (but not rate limit)
+      if (retryCount < MAX_RETRIES && !err.message.includes('concurrency limited')) {
+        console.log(`⏳ Status fetch error, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+        return fetchStatus(retryCount + 1);
+      }
       // Don't show rate limit errors to user
       if (!err.message.includes('concurrency limited')) {
         setError(err.message);

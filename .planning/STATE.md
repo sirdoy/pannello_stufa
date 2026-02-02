@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v3.2 Dashboard Customization & Weather
+**Current focus:** v3.2 Dashboard Customization & Weather - Phase 25 Weather Foundation
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-02-02 — Milestone v3.2 started
+Phase: 25 of 29 (Weather Foundation)
+Plan: Ready to plan
+Status: Ready to plan Phase 25
+Last activity: 2026-02-02 — Roadmap created for v3.2
 
-Progress: [░░░░░░░░░░░░░░░░░░░░░░░░░] 0% (v3.2 requirements phase)
+Progress: [░░░░░░░░░░░░░░░░░░░░░░░░░] 0% (v3.2 milestone)
 
 ## Performance Metrics
 
@@ -31,13 +31,14 @@ Progress: [░░░░░░░░░░░░░░░░░░░░░░░
 | v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 - 2026-01-28) |
 | v3.0 Design System | 8 | 52 | 3 days (2026-01-28 - 2026-01-30) |
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
+| v3.2 Weather & Dashboard | 5 | TBD | Starting 2026-02-02 |
 
 **Recent Trend:**
-- All 4 milestones complete: 115 plans total
-- v3.1 completed as lighter compliance milestone (13 plans vs 52 in v3.0)
-- 100% design system compliance achieved
+- All 4 previous milestones complete: 115 plans total
+- v3.2 estimated at ~17 plans across 5 phases
+- Weather foundation starts infrastructure for new feature category
 
-*Updated after v3.1 completion*
+*Updated after v3.2 roadmap creation*
 
 ## Accumulated Context
 
@@ -46,7 +47,7 @@ Progress: [░░░░░░░░░░░░░░░░░░░░░░░
 Decisions are logged in PROJECT.md Key Decisions table.
 Full decision log available in milestone archives.
 
-Key architectural patterns from v1.0 + v2.0 + v3.0 + v3.1:
+Key architectural patterns from previous milestones:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
 - Firebase RTDB for real-time state, Firestore for historical queries
 - HMAC-secured cron webhooks for security without key rotation
@@ -56,12 +57,16 @@ Key architectural patterns from v1.0 + v2.0 + v3.0 + v3.1:
 - CVA for type-safe component variants (including compound variants for colorScheme)
 - Radix UI for accessible interactive components
 - Namespace component pattern (Card.Header, Button.Icon)
-- Button colorScheme compound variant for mode-specific styling
-- InfoBox variant prop for API consistency with Badge
+
+**v3.2 Decisions (from research):**
+- Open-Meteo API for weather (free, no API key required)
+- Firebase RTDB for dashboard preferences (not localStorage - iOS eviction)
+- Menu-based reordering (up/down buttons, not drag-drop)
+- Browser Geolocation API with 10s timeout for iOS PWA
 
 ### Pending Todos
 
-**Operational Setup (v1.0 + v2.0 shipped, pending deployment):**
+**Operational Setup (from previous milestones, pending deployment):**
 - Scheduler cron configuration (cron-job.org account, 15-30 min)
 - Health monitoring cron (1-min frequency): `/api/health-monitoring/check`
 - Coordination cron (1-min frequency): `/api/coordination/enforce`
@@ -69,24 +74,16 @@ Key architectural patterns from v1.0 + v2.0 + v3.0 + v3.1:
 
 ### Blockers/Concerns
 
-None — v3.1 milestone complete.
+None — starting fresh milestone.
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
 - Warning: DMS polling continues when page backgrounded (Phase 10, should use Page Visibility API)
 - Label component not exported from barrel (low impact, Phase 13)
 
-## Quick Tasks
-
-Quick tasks are completed outside the main roadmap and don't affect phase progress.
-
-| Task | Description | Status | Completed | Commits |
-|------|-------------|--------|-----------|---------|
-| 001 | Thermostat schedule view/edit in card | Complete | 2026-01-31 | c537828, 876a547 |
-
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: v3.2 milestone started, defining requirements
+Stopped at: v3.2 roadmap created, ready to plan Phase 25
 Resume file: None
-Next step: Complete requirements definition and create roadmap
+Next step: `/gsd:plan-phase 25` to plan Weather Foundation

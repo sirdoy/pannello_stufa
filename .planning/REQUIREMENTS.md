@@ -82,38 +82,38 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| WEATHER-01 | TBD | Pending |
-| WEATHER-02 | TBD | Pending |
-| WEATHER-03 | TBD | Pending |
-| WEATHER-04 | TBD | Pending |
-| WEATHER-05 | TBD | Pending |
-| WEATHER-06 | TBD | Pending |
-| WEATHER-07 | TBD | Pending |
-| WEATHER-08 | TBD | Pending |
-| WEATHER-09 | TBD | Pending |
-| WEATHER-10 | TBD | Pending |
-| LOC-01 | TBD | Pending |
-| LOC-02 | TBD | Pending |
-| LOC-03 | TBD | Pending |
-| LOC-04 | TBD | Pending |
-| LOC-05 | TBD | Pending |
-| LOC-06 | TBD | Pending |
-| DASH-01 | TBD | Pending |
-| DASH-02 | TBD | Pending |
-| DASH-03 | TBD | Pending |
-| DASH-04 | TBD | Pending |
-| DASH-05 | TBD | Pending |
-| DASH-06 | TBD | Pending |
-| INFRA-01 | TBD | Pending |
-| INFRA-02 | TBD | Pending |
-| INFRA-03 | TBD | Pending |
-| INFRA-04 | TBD | Pending |
+| WEATHER-01 | Phase 26 | Pending |
+| WEATHER-02 | Phase 26 | Pending |
+| WEATHER-03 | Phase 26 | Pending |
+| WEATHER-04 | Phase 26 | Pending |
+| WEATHER-05 | Phase 26 | Pending |
+| WEATHER-06 | Phase 26 | Pending |
+| WEATHER-07 | Phase 26 | Pending |
+| WEATHER-08 | Phase 26 | Pending |
+| WEATHER-09 | Phase 26 | Pending |
+| WEATHER-10 | Phase 26 | Pending |
+| LOC-01 | Phase 27 | Pending |
+| LOC-02 | Phase 27 | Pending |
+| LOC-03 | Phase 27 | Pending |
+| LOC-04 | Phase 27 | Pending |
+| LOC-05 | Phase 27 | Pending |
+| LOC-06 | Phase 27 | Pending |
+| DASH-01 | Phase 28 | Pending |
+| DASH-02 | Phase 28 | Pending |
+| DASH-03 | Phase 28 | Pending |
+| DASH-04 | Phase 28 | Pending |
+| DASH-05 | Phase 29 | Pending |
+| DASH-06 | Phase 29 | Pending |
+| INFRA-01 | Phase 25 | Pending |
+| INFRA-02 | Phase 28 | Pending |
+| INFRA-03 | Phase 27 | Pending |
+| INFRA-04 | Phase 25 | Pending |
 
 **Coverage:**
 - v3.2 requirements: 26 total
-- Mapped to phases: 0
-- Unmapped: 26 (pending roadmap creation)
+- Mapped to phases: 26
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after initial definition*
+*Last updated: 2026-02-02 after roadmap creation*

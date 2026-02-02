@@ -368,11 +368,11 @@ Plans:
   1. User sees mode buttons on thermostat page rendered using Button component variants
   2. User sees info boxes using standardized InfoBox or Card component
   3. Thermostat page wrapped in PageLayout for consistent page structure
-**Plans**: TBD
+**Plans**: 2 plans in 1 wave
 
 Plans:
-- [ ] 23-01: Thermostat page Button migration (mode buttons)
-- [ ] 23-02: Thermostat page InfoBox + PageLayout wrapper
+- [ ] 23-01-PLAN.md — Button colorScheme prop + thermostat page mode button migration
+- [ ] 23-02-PLAN.md — InfoBox variant prop + PageLayout wrapper migration
 
 #### Phase 24: Verification & Polish
 **Goal**: Verify complete design system compliance across all device components
@@ -419,5 +419,5 @@ Phases execute in numeric order: 19 -> 20 -> 21 -> 22 -> 23 -> 24
 | 20. ThermostatCard Compliance | v3.1 | 2/2 | Complete | 2026-01-31 |
 | 21. LightsCard Compliance | v3.1 | 2/2 | Complete | 2026-01-31 |
 | 22. CameraCard Compliance | v3.1 | 2/2 | Complete | 2026-01-31 |
-| 23. Thermostat Page Compliance | v3.1 | 0/2 | Not started | - |
+| 23. Thermostat Page Compliance | v3.1 | 0/2 | Planned | - |
 | 24. Verification & Polish | v3.1 | 0/3 | Not started | - |

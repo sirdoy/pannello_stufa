@@ -3,14 +3,14 @@
 /**
  * ForecastDaySheet Component
  *
- * Bottom sheet modal with detailed forecast for a selected day.
+ * Modal with detailed forecast for a selected day.
  * Shows temperature range, condition, and extended stats (UV, humidity, wind, etc.)
  *
- * @see BottomSheet - Base modal component
- * @see ForecastDayCard - Cards that open this sheet on tap
+ * @see Modal - Base modal component
+ * @see ForecastDayCard - Cards that open this modal on tap
  */
 
-import BottomSheet from '@/app/components/ui/BottomSheet';
+import Modal from '@/app/components/ui/Modal';
 import { Text } from '@/app/components/ui';
 import { WeatherIcon } from './WeatherIcon';
 import { formatTemperature, getUVIndexLabel, formatWindSpeed, getAirQualityLabel } from './weatherHelpers';
@@ -61,14 +61,14 @@ function StatCard({ icon: Icon, iconColor, label, value, subLabel }) {
  *
  * @param {Object} props
  * @param {Object|null} props.day - Forecast day data (null when closed)
- * @param {boolean} props.isOpen - Sheet visibility
+ * @param {boolean} props.isOpen - Modal visibility
  * @param {Function} props.onClose - Close handler
  *
  * @example
  * <ForecastDaySheet
  *   day={selectedDay}
- *   isOpen={isSheetOpen}
- *   onClose={() => setIsSheetOpen(false)}
+ *   isOpen={isModalOpen}
+ *   onClose={() => setIsModalOpen(false)}
  * />
  */
 export function ForecastDaySheet({ day, isOpen, onClose }) {
@@ -80,13 +80,11 @@ export function ForecastDaySheet({ day, isOpen, onClose }) {
   const title = formatFullDate(day.date);
 
   return (
-    <BottomSheet
-      isOpen={isOpen}
-      onClose={onClose}
-      title={title}
-      showCloseButton={true}
-      showHandle={true}
-    >
+    <Modal isOpen={isOpen} onClose={onClose} size="sm">
+      <Modal.Header>
+        <Modal.Title>{title}</Modal.Title>
+        <Modal.Close />
+      </Modal.Header>
       {/* Temperature range - prominent display */}
       <div className="text-center mb-6">
         <div className="flex items-center justify-center gap-4">
@@ -189,7 +187,7 @@ export function ForecastDaySheet({ day, isOpen, onClose }) {
           )}
         </div>
       )}
-    </BottomSheet>
+    </Modal>
   );
 }
 

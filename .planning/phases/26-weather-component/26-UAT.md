@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 26-weather-component
 source: [26-01-SUMMARY.md, 26-02-SUMMARY.md, 26-03-SUMMARY.md, 26-04-SUMMARY.md]
 started: 2026-02-03T09:00:00Z
@@ -80,13 +80,21 @@ skipped: 1
   reason: "User reported: voglio che occupino la larghezza della card"
   severity: minor
   test: 6
-  artifacts: []
-  missing: []
+  root_cause: "ForecastRow uses flex with overflow-x-auto and fixed-width cards (w-20). Need CSS Grid with equal columns."
+  artifacts:
+    - path: "app/components/weather/ForecastRow.jsx"
+      issue: "Uses flex layout with fixed-width scrollable cards"
+  missing:
+    - "Change to grid-cols-5 layout so days fill available width"
 
 - truth: "Forecast day details open in a modal"
   status: failed
   reason: "User reported: usa modal invece di bottom sheet"
   severity: minor
   test: 8
-  artifacts: []
-  missing: []
+  root_cause: "ForecastDaySheet uses BottomSheet component instead of Modal"
+  artifacts:
+    - path: "app/components/weather/ForecastDaySheet.jsx"
+      issue: "Imports and renders BottomSheet, should use Modal"
+  missing:
+    - "Replace BottomSheet with Modal component"

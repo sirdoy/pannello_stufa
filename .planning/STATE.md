@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 
 ## Current Position
 
-Phase: 28 of 29 (Dashboard Customization)
-Plan: 2/2 plans complete
+Phase: 29 of 29 (Home Page Integration)
+Plan: 1/1 plans complete
 Status: Phase complete
-Last activity: 2026-02-03 — Completed 28-02-PLAN.md (Dashboard Settings Page UI)
+Last activity: 2026-02-03 — Completed 29-01-PLAN.md (Home Page Integration)
 
-Progress: [████████████░░░░░░░░░░░░░] 59% (v3.2 milestone - 12/17 estimated plans)
+Progress: [█████████████░░░░░░░░░░░░] 62% (v3.2 milestone - 13/17 estimated plans)
 
 ## Performance Metrics
 
@@ -35,7 +35,7 @@ Progress: [████████████░░░░░░░░░░░
 
 **Recent Trend:**
 - All 4 previous milestones complete: 115 plans total
-- v3.2 estimated at ~17 plans across 5 phases, 12 complete
+- v3.2 estimated at ~17 plans across 5 phases, 13 complete
 - Weather foundation: API infrastructure + geolocation/location + dashboard preferences (6min total)
 - Weather component plan 01: WeatherIcon + utilities (2min)
 - Weather component plan 02: WeatherCard + CurrentConditions + Skeleton (2min)
@@ -46,8 +46,9 @@ Progress: [████████████░░░░░░░░░░░
 - Location settings plan 03: Location Display & Trend (3min)
 - Dashboard customization plan 01: Per-user preferences infrastructure (3min)
 - Dashboard customization plan 02: Settings page UI (4min)
+- Home page integration plan 01: WeatherCardWrapper + card registry (2min)
 
-*Updated after 28-02 completion*
+*Updated after 29-01 completion*
 
 ## Accumulated Context
 
@@ -100,6 +101,9 @@ Key architectural patterns from previous milestones:
 - Per-user dashboard preferences via users/${userId}/dashboardPreferences path
 - User paths do not need getEnvironmentPath (already isolated by userId)
 - Icon field in DEFAULT_CARD_ORDER for settings UI display
+- Card component registry pattern: CARD_COMPONENTS maps card IDs to React components
+- Server-side preferences fetch via adminDbGet (faster than API route for Server Components)
+- Client wrapper pattern for cards needing real-time data (WeatherCardWrapper)
 
 ### Pending Todos
 
@@ -111,7 +115,7 @@ Key architectural patterns from previous milestones:
 
 ### Blockers/Concerns
 
-None — Phase 28 complete. Ready for Phase 29 (Home Page Integration).
+None — Phase 29 complete. v3.2 milestone home page integration complete.
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
@@ -120,7 +124,7 @@ None — Phase 28 complete. Ready for Phase 29 (Home Page Integration).
 
 ## Session Continuity
 
-Last session: 2026-02-03T12:49:00Z
-Stopped at: Completed 28-02-PLAN.md (Dashboard Settings Page UI)
+Last session: 2026-02-03T13:00:00Z
+Stopped at: Completed 29-01-PLAN.md (Home Page Integration)
 Resume file: None
-Next step: Execute Phase 29 (Home Page Integration)
+Next step: v3.2 milestone review / next milestone planning

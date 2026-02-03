@@ -13,8 +13,9 @@
 import Modal from '@/app/components/ui/Modal';
 import { Text } from '@/app/components/ui';
 import { WeatherIcon } from './WeatherIcon';
-import { formatTemperature, getUVIndexLabel, formatWindSpeed, getAirQualityLabel } from './weatherHelpers';
-import { Sunrise, Sunset, Droplets, Wind, Sun, Leaf } from 'lucide-react';
+import { formatTemperature, getUVIndexLabel, formatWindSpeed, getAirQualityLabel, getPressureLabel } from './weatherHelpers';
+import { HourlyForecast } from './HourlyForecast';
+import { Sunrise, Sunset, Droplets, Wind, Sun, Leaf, Gauge } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { it } from 'date-fns/locale';
 
@@ -63,15 +64,21 @@ function StatCard({ icon: Icon, iconColor, label, value, subLabel }) {
  * @param {Object|null} props.day - Forecast day data (null when closed)
  * @param {boolean} props.isOpen - Modal visibility
  * @param {Function} props.onClose - Close handler
+ * @param {Object|null} props.hourly - Hourly forecast data (only for today)
+ * @param {boolean} props.isToday - Whether this is today's forecast
+ * @param {number|null} props.pressure - Current atmospheric pressure in hPa (only for today)
  *
  * @example
  * <ForecastDaySheet
  *   day={selectedDay}
  *   isOpen={isModalOpen}
  *   onClose={() => setIsModalOpen(false)}
+ *   hourly={hourlyData}
+ *   isToday={true}
+ *   pressure={1015}
  * />
  */
-export function ForecastDaySheet({ day, isOpen, onClose }) {
+export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday = false, pressure = null }) {
   // Don't render anything if no day is selected
   if (!day) {
     return null;
@@ -164,6 +171,17 @@ export function ForecastDaySheet({ day, isOpen, onClose }) {
           value={day.airQuality ?? 'N/D'}
           subLabel={day.airQuality ? getAirQualityLabel(day.airQuality) : undefined}
         />
+
+        {/* Pressure - only for today */}
+        {isToday && pressure !== null && (
+          <StatCard
+            icon={Gauge}
+            iconColor="text-slate-400"
+            label="Pressione"
+            value={`${Math.round(pressure)} hPa`}
+            subLabel={getPressureLabel(pressure)}
+          />
+        )}
       </div>
 
       {/* Sunrise/Sunset - only show if data available */}
@@ -185,6 +203,16 @@ export function ForecastDaySheet({ day, isOpen, onClose }) {
               value={day.sunset}
             />
           )}
+        </div>
+      )}
+
+      {/* Hourly forecast - only for today */}
+      {isToday && hourly && (
+        <div className="mt-6 pt-4 border-t border-slate-700/30 [html:not(.dark)_&]:border-slate-200/50">
+          <Text variant="secondary" size="sm" weight="medium" className="mb-3">
+            Previsioni orarie
+          </Text>
+          <HourlyForecast hourly={hourly} />
         </div>
       )}
     </Modal>

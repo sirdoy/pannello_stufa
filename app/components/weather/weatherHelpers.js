@@ -161,6 +161,33 @@ export function getAirQualityLabel(aqi) {
 }
 
 /**
+ * Get Italian atmospheric pressure label with weather indication
+ * Standard sea level pressure is ~1013.25 hPa
+ * @param {number} pressure - Atmospheric pressure in hPa
+ * @returns {string} Italian label with weather indication
+ *
+ * @example
+ * getPressureLabel(995) // "Bassa"
+ * getPressureLabel(1008) // "Normale"
+ * getPressureLabel(1025) // "Alta"
+ */
+export function getPressureLabel(pressure) {
+  if (pressure === null || pressure === undefined || isNaN(pressure)) {
+    return '';
+  }
+
+  if (pressure < 1000) {
+    return 'Bassa'; // Low pressure - often clouds/rain
+  } else if (pressure < 1013) {
+    return 'Normale'; // Slightly below average
+  } else if (pressure <= 1020) {
+    return 'Normale'; // Normal range
+  } else {
+    return 'Alta'; // High pressure - stable/clear weather
+  }
+}
+
+/**
  * Calculate temperature trend from hourly data
  * Compares recent hours to determine if temp is rising, falling, or stable
  *

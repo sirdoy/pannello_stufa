@@ -163,6 +163,9 @@ export function WeatherCard({
           day={selectedDay}
           isOpen={!!selectedDay}
           onClose={() => setSelectedDay(null)}
+          hourly={hourly}
+          isToday={selectedDay?.date === todayForecast?.date}
+          pressure={current?.pressure}
         />
       </SmartHomeCard.Controls>
     </SmartHomeCard>

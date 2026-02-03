@@ -10,7 +10,7 @@
  */
 
 import { Text } from '@/app/components/ui';
-import { Droplets, Wind, Sun, Thermometer, Gauge, Eye, ArrowUp, ArrowDown, Leaf, TrendingUp, TrendingDown } from 'lucide-react';
+import { Droplets, Wind, Sun, Thermometer, Gauge, Eye, ArrowUp, ArrowDown, Leaf, TrendingUp, TrendingDown, Sunrise, Sunset } from 'lucide-react';
 import WeatherIcon, { getWeatherLabel } from './WeatherIcon';
 import {
   formatTemperature,
@@ -18,6 +18,7 @@ import {
   formatWindSpeed,
   getUVIndexLabel,
   getAirQualityLabel,
+  getPressureLabel,
   getTemperatureTrend,
 } from './weatherHelpers';
 
@@ -178,12 +179,14 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
 
   // Pressure (if available)
   if (current.pressure !== null && current.pressure !== undefined) {
+    const pressureLabel = getPressureLabel(current.pressure);
     details.push({
       key: 'pressure',
       icon: <Gauge className="w-5 h-5" />,
       iconColor: 'text-slate-400',
       label: 'Pressione',
       value: `${Math.round(current.pressure)} hPa`,
+      sublabel: pressureLabel || null,
     });
   }
 
@@ -275,6 +278,24 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
               sublabel={detail.sublabel}
             />
           ))}
+        </div>
+      )}
+
+      {/* Sunrise/Sunset row - compact horizontal display */}
+      {todayForecast && (todayForecast.sunrise || todayForecast.sunset) && (
+        <div className="flex items-center justify-center gap-6 pt-3 mt-3 border-t border-slate-700/20 [html:not(.dark)_&]:border-slate-200/30">
+          {todayForecast.sunrise && (
+            <div className="flex items-center gap-2">
+              <Sunrise className="w-4 h-4 text-warning-400" />
+              <Text variant="secondary" size="sm">{todayForecast.sunrise}</Text>
+            </div>
+          )}
+          {todayForecast.sunset && (
+            <div className="flex items-center gap-2">
+              <Sunset className="w-4 h-4 text-ember-400" />
+              <Text variant="secondary" size="sm">{todayForecast.sunset}</Text>
+            </div>
+          )}
         </div>
       )}
     </div>

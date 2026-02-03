@@ -97,11 +97,15 @@ export const GET = withAuthAndErrorHandler(async (request) => {
       windSpeed: data.daily.wind_speed_10m_max?.[i] ?? null,
       sunrise: formatTime(data.daily.sunrise?.[i]),
       sunset: formatTime(data.daily.sunset?.[i]),
+      airQuality: i === 0 ? airQuality : null, // Only today has AQI data
     }));
 
-    // Extract hourly temperatures for trend calculation
-    const hourlyTemps = data.hourly?.temperature_2m || [];
+    // Extract hourly data for trend calculation and detailed forecast
     const hourlyTimes = data.hourly?.time || [];
+    const hourlyTemps = data.hourly?.temperature_2m || [];
+    const hourlyWeatherCodes = data.hourly?.weather_code || [];
+    const hourlyPrecipProbs = data.hourly?.precipitation_probability || [];
+    const hourlyWindSpeeds = data.hourly?.wind_speed_10m || [];
 
     // Return enriched response
     return success({
@@ -119,6 +123,9 @@ export const GET = withAuthAndErrorHandler(async (request) => {
       hourly: {
         times: hourlyTimes,
         temperatures: hourlyTemps,
+        weatherCodes: hourlyWeatherCodes,
+        precipProbabilities: hourlyPrecipProbs,
+        windSpeeds: hourlyWindSpeeds,
       },
       cachedAt,
       stale,

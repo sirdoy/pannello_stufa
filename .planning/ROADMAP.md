@@ -30,12 +30,12 @@ This milestone adds 8 advanced UI components to the Ember Noir design system: Ta
   3. User can switch between tabs by clicking and using arrow keys
   4. Screen reader announces tab role, selection state, and panel association
   5. Tabs work in both horizontal and vertical orientations
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 30-01: Popover component with CVA variants and accessibility
-- [ ] 30-02: Tabs compound component with keyboard navigation
-- [ ] 30-03: Apply Tabs to thermostat page (Schedule/Manual/History)
+- [ ] 30-01-PLAN.md - Popover component with CVA variants and accessibility (Wave 1)
+- [ ] 30-02-PLAN.md - Tabs compound component with sliding indicator (Wave 1)
+- [ ] 30-03-PLAN.md - Apply Tabs to thermostat page (Schedule/Manual/History) (Wave 2)
 
 ---
 
@@ -155,7 +155,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 30. Foundation Components | 0/3 | Not started | - |
+| 30. Foundation Components | 0/3 | Planned | - |
 | 31. Expandable Components | 0/3 | Not started | - |
 | 32. Action Components | 0/3 | Not started | - |
 | 33. Dialog Patterns | 0/3 | Not started | - |
@@ -168,5 +168,6 @@ Plans:
 ---
 
 *Roadmap created: 2026-02-03*
+*Phase 30 planned: 2026-02-03*
 *Milestone: v4.0 Advanced UI Components*
 *Requirements coverage: 55/55 (100%)*

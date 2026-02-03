@@ -1,883 +1,1022 @@
-# Architecture Research: Netatmo Schedule Management & Stove Monitoring
+# Architecture Research: Advanced UI Components
 
-**Domain:** Smart home PWA with thermostat control and IoT monitoring
-**Researched:** 2026-01-26
-**Confidence:** HIGH
-
----
-
-## Integration Context
-
-**Existing Architecture (v1.0):**
-- Next.js 15.5 App Router (Server Components + API Routes)
-- Firebase Realtime Database (device state, tokens, scheduler)
-- Firestore (notification history)
-- Service Worker (Serwist - offline capability)
-- Repository Pattern (services abstract data access)
-- Vercel deployment (serverless functions)
-
-**v2.0 Additions:**
-- Netatmo schedule CRUD operations (API integration)
-- Stove health monitoring (cron-based)
-- Thermostat-stove coordination (setpoint override, not schedule modification)
-- Alert generation (reuses v1.0 notification system)
+**Domain:** Design System Extension
+**Researched:** 2026-02-03
+**Overall confidence:** HIGH
 
 ---
 
-## Recommended Architecture
+## Executive Summary
 
-### System Overview
+This research documents architecture patterns for integrating 8 advanced UI components (Tabs, Accordion, Data Table, Command Palette, Context Menu, Popover, Sheet, Dialog) into the existing Ember Noir design system.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                      CLIENT LAYER                                │
-├─────────────────────────────────────────────────────────────────┤
-│  ┌────────────┐  ┌────────────────┐  ┌─────────────┐            │
-│  │ StoveCard  │  │ ThermostatCard │  │ AlertBanner │            │
-│  │ (polling)  │  │ (polling)      │  │ (polling)   │            │
-│  └─────┬──────┘  └────────┬───────┘  └──────┬──────┘            │
-│        │ 5s               │ 30s             │ 60s               │
-├────────┴──────────────────┴─────────────────┴───────────────────┤
-│                      API ROUTES LAYER                            │
-├─────────────────────────────────────────────────────────────────┤
-│  /api/stove/*          /api/netatmo/*        /api/scheduler/*   │
-│  ┌──────────────┐      ┌──────────────┐      ┌──────────────┐  │
-│  │ Status       │      │ HomeStatus   │      │ Check (cron) │  │
-│  │ Ignite       │      │ Schedules    │      │ Update       │  │
-│  │ Shutdown     │      │ SetThermPoint│      └──────┬───────┘  │
-│  └──────┬───────┘      └──────┬───────┘             │          │
-│         │                     │                     │          │
-├─────────┴─────────────────────┴─────────────────────┴──────────┤
-│                      SERVICE LAYER                               │
-├─────────────────────────────────────────────────────────────────┤
-│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────┐  │
-│  │ StoveAPI         │  │ NetatmoAPI       │  │ MonitorSvc   │  │
-│  │ - getStatus()    │  │ - getHomeStatus()│  │ - checkHealth│  │
-│  │ - ignite()       │  │ - getSchedules() │  │ - detectDrift│  │
-│  │ - shutdown()     │  │ - setSchedule()  │  │ - syncState  │  │
-│  └──────────────────┘  └──────┬───────────┘  └──────────────┘  │
-│                                │                                 │
-│  ┌─────────────────────────────┴──────────────────┐             │
-│  │ NetatmoStoveSync                                │             │
-│  │ - syncLivingRoomWithStove(isOn)                │             │
-│  │ - enforceStoveSyncSetpoints(isOn)              │             │
-│  │ - setRoomsToStoveMode()                        │             │
-│  │ - setRoomsToSchedule()                         │             │
-│  └────────────────────────────────────────────────┘             │
-│                                                                  │
-├─────────────────────────────────────────────────────────────────┤
-│                      DATA LAYER                                  │
-├─────────────────────────────────────────────────────────────────┤
-│  Firebase Realtime DB:           Firestore:         External:   │
-│  ┌──────────────────────┐        ┌────────────┐   ┌─────────┐  │
-│  │ netatmo/             │        │ notifHist/ │   │ Netatmo │  │
-│  │  - refresh_token     │        │ (history)  │   │ API     │  │
-│  │  - home_id           │        └────────────┘   │         │  │
-│  │  - topology          │                         │ Stove   │  │
-│  │  - currentStatus     │                         │ API     │  │
-│  │  - stoveSync         │                         └─────────┘  │
-│  │  - schedules (new)   │                                      │
-│  │ cronHealth/          │                                      │
-│  │  - lastCall          │                                      │
-│  │ monitoring/ (new)    │                                      │
-│  │  - stoveHealth       │                                      │
-│  │  - syncDrift         │                                      │
-│  └──────────────────────┘                                      │
-└─────────────────────────────────────────────────────────────────┘
-```
+**Key finding:** The codebase has established patterns that MUST be followed:
 
-### Cron Job Architecture (Vercel Compatible)
+1. **Compound component pattern** with namespace attachment (e.g., `Modal.Header`, `Card.Title`)
+2. **CVA variants** for type-safe styling with dark/light mode support
+3. **Radix primitives** as the foundation for accessible, interactive components
+4. **'use client' directive** only for interactive components; server-compatible wrappers where possible
+5. **Dual export pattern**: both named exports and namespace-attached subcomponents
 
-```
-External Scheduler (cron-job.org)
-         │ 1 min interval
-         │ GET /api/scheduler/check?secret=xxx
-         ↓
-┌─────────────────────────────────────────┐
-│ /api/scheduler/check (Serverless Fn)    │
-│ ───────────────────────────────────────  │
-│ 1. Health check (cronHealth/lastCall)   │
-│ 2. Stove status fetch                   │
-│ 3. Netatmo status fetch                 │
-│ 4. Compare actual vs expected           │
-│ 5. Detect anomalies                     │
-│ 6. Execute scheduler actions            │
-│ 7. Sync thermostat-stove                │
-│ 8. Track maintenance hours              │
-│ 9. Send alerts if needed                │
-└────────────┬────────────────────────────┘
-             │
-             ↓
-    ┌───────────────────┐
-    │ Parallel Tasks    │
-    │ (fire-and-forget) │
-    ├───────────────────┤
-    │ - Valve calibr.   │
-    │ - Token refresh   │
-    │ - Notifications   │
-    └───────────────────┘
-```
-
-**Rationale:**
-- **External scheduler required:** Vercel serverless functions don't run continuously (no Node.js cron within function)
-- **1-minute interval:** Balances responsiveness with Vercel execution limits (10-second max function duration)
-- **HMAC-secured webhook:** `?secret=xxx` with timing-safe comparison prevents unauthorized cron execution
-- **Parallel tasks:** Non-blocking operations (valve calibration, token refresh) don't delay critical scheduler logic
-
-**References:**
-- [Vercel Cron Example](https://vercel.com/templates/next.js/vercel-cron)
-- [Securing Vercel Cron Routes](https://codingcat.dev/post/how-to-secure-vercel-cron-job-routes-in-next-js-14-app-router)
+The existing Modal, Card, Select, and Tooltip components provide authoritative templates for new components.
 
 ---
 
-## Component Responsibilities
+## Component File Structure
 
-| Component | Responsibility | Location | Implementation |
-|-----------|---------------|----------|----------------|
-| **ThermostatCard** | Display current temps/setpoints, schedule selector | `app/components/devices/thermostat/` | Client component with 30s polling |
-| **ScheduleManager** | CRUD UI for Netatmo schedules | `app/components/netatmo/` (NEW) | Client component with form validation |
-| **StoveMonitorBanner** | Display health alerts (connection loss, unexpected off) | `app/components/monitoring/` (NEW) | Client component polling monitoring state |
-| **NetatmoScheduleService** | Fetch/save schedules from Netatmo API | `lib/` (NEW) | Server-side service |
-| **NetatmoScheduleRepository** | Abstract Firebase storage for schedule cache | `lib/` (NEW) | Repository pattern |
-| **StoveMonitorService** | Health check logic, drift detection | `lib/` (NEW) | Server-side service |
-| **NetatmoStoveSync** | Thermostat-stove coordination (setpoint override) | `lib/netatmoStoveSync.js` (EXISTS) | Server-side service |
-| **NotificationTriggers** | Alert generation for anomalies | `lib/notificationTriggersServer.js` (EXISTS) | v1.0 notification system |
+All new components follow the established flat structure in `app/components/ui/`:
+
+```
+app/components/ui/
+├── index.js                    # Barrel exports (update for each new component)
+├── tabs.js                     # Tabs component (Radix-based)
+├── accordion.js                # Accordion component (Radix-based)
+├── data-table.js               # Data Table wrapper (TanStack Table)
+├── data-table-columns.js       # Column definition helpers
+├── command.js                  # Command Palette (cmdk-based)
+├── context-menu.js             # Context Menu (Radix-based, replaces current)
+├── popover.js                  # Popover (already have Radix, needs component)
+├── sheet.js                    # Sheet/Side Panel (Dialog variant)
+└── __tests__/
+    ├── tabs.test.js
+    ├── accordion.test.js
+    ├── data-table.test.js
+    ├── command.test.js
+    ├── context-menu.test.js
+    ├── popover.test.js
+    └── sheet.test.js
+```
+
+**Rationale:** The codebase uses flat structure with single files per component (not nested folders). Tests go in `__tests__/` subdirectory. This matches existing patterns for Card.js, Modal.js, Select.js.
 
 ---
 
-## New Components for v2.0
+## Composition Patterns
 
-### 1. NetatmoScheduleService (NEW)
+### Pattern 1: Compound Components with Namespace (Primary Pattern)
 
-**Purpose:** Manages Netatmo schedule operations (CRUD) with caching.
+This is the **established pattern** in this codebase. All new components MUST follow it.
 
-**Key Methods:**
-```javascript
-// lib/netatmoScheduleService.js
+```jsx
+// Example: Tabs (following Modal.js pattern)
+'use client';
 
-export async function getSchedules(homeId) {
-  // 1. Check cache (Firebase RTDB netatmo/schedules)
-  // 2. If stale (>5 min), fetch from Netatmo API
-  // 3. Update cache
-  // 4. Return schedules array
-}
+import * as TabsPrimitive from '@radix-ui/react-tabs';
+import { forwardRef } from 'react';
+import { cva } from 'class-variance-authority';
+import { cn } from '@/lib/utils/cn';
 
-export async function getSchedule(homeId, scheduleId) {
-  // Fetch single schedule details
-  // Returns: { id, name, timetable, zones }
-}
+// CVA variants
+const tabsTriggerVariants = cva([...], { variants: {...} });
 
-export async function createSchedule(homeId, name, timetable, zones) {
-  // POST to Netatmo API /api/setthermmode
-  // Invalidate cache
-  // Return new schedule ID
-}
-
-export async function updateSchedule(homeId, scheduleId, updates) {
-  // PUT to Netatmo API
-  // Invalidate cache
-}
-
-export async function deleteSchedule(homeId, scheduleId) {
-  // DELETE via Netatmo API
-  // Validation: cannot delete active schedule
-  // Invalidate cache
-}
-
-export async function setActiveSchedule(homeId, scheduleId) {
-  // POST to Netatmo API /api/setthermmode
-  // { schedule_id: scheduleId }
-}
-```
-
-**Caching Strategy:**
-- Cache schedules in Firebase RTDB: `netatmo/schedules/cache`
-- TTL: 5 minutes (balances freshness with API rate limits)
-- Invalidate on write operations (create/update/delete)
-- Cache structure: `{ schedules: [...], lastFetchedAt: timestamp }`
-
-**Error Handling:**
-- Token refresh on 401 (use existing `getValidAccessToken()`)
-- Retry with exponential backoff (max 3 attempts)
-- Return `{ success, error, reconnect }` pattern (existing convention)
-
-### 2. StoveMonitorService (NEW)
-
-**Purpose:** Continuous monitoring of stove health and thermostat coordination.
-
-**Key Methods:**
-```javascript
-// lib/stoveMonitorService.js
-
-export async function checkStoveHealth(stoveStatus, netatmoStatus) {
-  // Called from /api/scheduler/check every minute
-
-  // Check 1: Stove API connectivity
-  if (!stoveStatus) {
-    return { healthy: false, issue: 'CONNECTION_LOST', severity: 'critical' };
-  }
-
-  // Check 2: Unexpected OFF during scheduled ON period
-  const activeSchedule = getActiveScheduleSlot();
-  if (activeSchedule && !stoveStatus.isOn) {
-    return { healthy: false, issue: 'UNEXPECTED_OFF', severity: 'warning' };
-  }
-
-  // Check 3: Thermostat-stove coordination drift
-  const driftDetected = await detectStoveSyncDrift(stoveStatus.isOn, netatmoStatus);
-  if (driftDetected) {
-    return { healthy: false, issue: 'SYNC_DRIFT', severity: 'info' };
-  }
-
-  return { healthy: true };
-}
-
-export async function detectStoveSyncDrift(stoveIsOn, netatmoStatus) {
-  // Compare Firebase stoveSync.stoveMode with actual Netatmo setpoints
-  const config = await getStoveSyncConfig();
-  if (!config.enabled) return false;
-
-  for (const room of config.rooms) {
-    const actualSetpoint = netatmoStatus.rooms.find(r => r.id === room.id)?.setpoint;
-    const expectedSetpoint = stoveIsOn ? config.stoveTemperature : null;
-
-    if (stoveIsOn && Math.abs(actualSetpoint - expectedSetpoint) > 0.5) {
-      return true; // Drift detected
-    }
-  }
-
-  return false;
-}
-
-export async function logMonitoringIssue(issue) {
-  // Save to Firebase: monitoring/issues/{timestamp}
-  await adminDbSet(`monitoring/issues/${Date.now()}`, {
-    ...issue,
-    timestamp: Date.now(),
-    resolved: false,
-  });
-
-  // Trigger notification via v1.0 system
-  await triggerMonitoringAlertServer(userId, issue);
-}
-```
-
-**Monitoring State Storage (Firebase RTDB):**
-```javascript
-monitoring/
-  lastCheck: timestamp,
-  currentHealth: { healthy, issue, severity },
-  issues/
-    {timestamp}: { issue, severity, resolved, resolvedAt }
-```
-
-**Integration with Existing Cron:**
-- Add `checkStoveHealth()` call to `/api/scheduler/check`
-- Execute after scheduler actions (non-blocking)
-- Store result in Firebase for client polling
-
-### 3. Schedule CRUD API Routes (NEW)
-
-**File Structure:**
-```
-app/api/netatmo/schedules/
-  route.js              # GET (list), POST (create)
-  [scheduleId]/
-    route.js            # GET (detail), PUT (update), DELETE
-  active/
-    route.js            # GET (current), POST (set active)
-```
-
-**GET /api/netatmo/schedules:**
-```javascript
-// Returns list of schedule metadata
-export const GET = withAuthAndErrorHandler(async () => {
-  const homeId = await getHomeId();
-  const schedules = await NetatmoScheduleService.getSchedules(homeId);
-
-  return success({
-    schedules: schedules.map(s => ({
-      id: s.id,
-      name: s.name,
-      type: s.type, // 'therm', 'custom'
-      selected: s.selected, // boolean - is active
-    }))
-  });
+// Subcomponents
+const TabsList = forwardRef(function TabsList({ className, ...props }, ref) {
+  return <TabsPrimitive.List ref={ref} className={cn(...)} {...props} />;
 });
-```
 
-**POST /api/netatmo/schedules:**
-```javascript
-// Create new schedule
-export const POST = withAuthAndErrorHandler(async (request) => {
-  const { name, timetable, zones } = await request.json();
+const TabsTrigger = forwardRef(function TabsTrigger({ className, ...props }, ref) {
+  return <TabsPrimitive.Trigger ref={ref} className={cn(...)} {...props} />;
+});
 
-  // Validation
-  if (!name || !timetable) {
-    return badRequest('name and timetable required');
-  }
+const TabsContent = forwardRef(function TabsContent({ className, ...props }, ref) {
+  return <TabsPrimitive.Content ref={ref} className={cn(...)} {...props} />;
+});
 
-  const homeId = await getHomeId();
-  const newSchedule = await NetatmoScheduleService.createSchedule(
-    homeId, name, timetable, zones
+// Main component with simple API
+function Tabs({ defaultValue, children, ...props }) {
+  return (
+    <TabsPrimitive.Root defaultValue={defaultValue} {...props}>
+      {children}
+    </TabsPrimitive.Root>
   );
-
-  return success({ schedule: newSchedule });
-});
-```
-
-**PUT /api/netatmo/schedules/[scheduleId]:**
-```javascript
-// Update existing schedule
-export const PUT = withAuthAndErrorHandler(async (request, { params }) => {
-  const { scheduleId } = params;
-  const updates = await request.json();
-
-  const homeId = await getHomeId();
-  await NetatmoScheduleService.updateSchedule(homeId, scheduleId, updates);
-
-  return success({ updated: true });
-});
-```
-
-**DELETE /api/netatmo/schedules/[scheduleId]:**
-```javascript
-// Delete schedule (validation: cannot delete active)
-export const DELETE = withAuthAndErrorHandler(async (request, { params }) => {
-  const { scheduleId } = params;
-
-  const homeId = await getHomeId();
-  const activeScheduleId = await NetatmoScheduleService.getActiveScheduleId(homeId);
-
-  if (scheduleId === activeScheduleId) {
-    return badRequest('Cannot delete active schedule');
-  }
-
-  await NetatmoScheduleService.deleteSchedule(homeId, scheduleId);
-  return success({ deleted: true });
-});
-```
-
----
-
-## Data Flow
-
-### Netatmo Schedule Management Flow
-
-```
-[User: Create Schedule]
-         ↓
-[ScheduleManager Component]
-         ↓ POST /api/netatmo/schedules
-         ↓ { name, timetable, zones }
-[API Route: /api/netatmo/schedules/route.js]
-         ↓
-[NetatmoScheduleService.createSchedule()]
-         ↓ POST https://api.netatmo.com/api/setthermmode
-[Netatmo API]
-         ↓ 200 OK
-[NetatmoScheduleService]
-         ↓ Invalidate cache
-         ↓ Save to Firebase: netatmo/schedules/cache
-[Firebase RTDB]
-         ↓ success response
-[Client] ← Schedule created
-```
-
-### Stove Monitoring Flow (Cron)
-
-```
-[External Cron: every 1 minute]
-         ↓ GET /api/scheduler/check?secret=xxx
-[Cron Route: /api/scheduler/check/route.js]
-         ↓
-    ┌────┴─────┬──────────┬────────────┐
-    ↓          ↓          ↓            ↓
-[getStove   [getNetatmo [getActive   [check
- Status()]   Status()]   Schedule()]  Maintenance]
-    ↓          ↓          ↓            ↓
-    └────┬─────┴──────────┴────────────┘
-         ↓
-[StoveMonitorService.checkStoveHealth()]
-         ↓
-    Decision tree:
-    ┌─────────────────────────────────┐
-    │ Issue detected?                 │
-    │ ├─ CONNECTION_LOST → alert      │
-    │ ├─ UNEXPECTED_OFF → alert       │
-    │ ├─ SYNC_DRIFT → enforce sync    │
-    │ └─ HEALTHY → log & continue     │
-    └─────────────────────────────────┘
-         ↓
-[Save monitoring/currentHealth to Firebase]
-         ↓
-[Client polls monitoring/currentHealth every 60s]
-         ↓
-[StoveMonitorBanner displays alert if unhealthy]
-```
-
-### Thermostat-Stove Coordination Flow (Corrected)
-
-**Problem (v1.0):** When stove turns ON, `syncLivingRoomWithStove()` was modifying Netatmo schedules, causing permanent changes.
-
-**Solution (v2.0):** Use **temporary setpoint override** instead of schedule modification.
-
-```
-[Stove: Status changes to WORK]
-         ↓
-[Cron detects state change]
-         ↓
-[NetatmoStoveSync.syncLivingRoomWithStove(isOn=true)]
-         ↓
-    ┌───┴────────────────────────────────────────┐
-    │ For each configured room:                  │
-    │ 1. Get current setpoint (save to Firebase) │
-    │ 2. Call Netatmo setRoomThermpoint()        │
-    │    - mode: 'manual'                        │
-    │    - temp: 16°C                            │
-    │    - endtime: now + 8 hours                │
-    │ 3. Update Firebase stoveSync.stoveMode     │
-    └────────────────────────────────────────────┘
-         ↓
-[Netatmo applies manual setpoint for 8 hours]
-         ↓
-[After 8 hours OR stove shutdown]
-         ↓
-[NetatmoStoveSync.setRoomsToSchedule()]
-         ↓
-    ┌───┴────────────────────────────────┐
-    │ For each configured room:          │
-    │ Call Netatmo setRoomThermpoint()   │
-    │    - mode: 'home' (follow schedule)│
-    └────────────────────────────────────┘
-         ↓
-[Netatmo returns to schedule setpoints]
-```
-
-**Key Architectural Decision:**
-- **NEVER modify Netatmo schedules** programmatically (only user via UI)
-- **Use mode='manual' with endtime** for temporary overrides (max 8 hours)
-- **Continuous enforcement:** Cron re-checks actual setpoints every minute and re-applies if drifted (handles 8-hour expiration)
-
----
-
-## Integration Points
-
-### With Existing Components
-
-| Existing Component | Integration | Changes Required |
-|-------------------|-------------|------------------|
-| `/api/scheduler/check` | Add stove monitoring calls after scheduler logic | Add `StoveMonitorService.checkStoveHealth()` call |
-| `ThermostatCard` | Add schedule selector dropdown | Add state for active schedule, dropdown UI |
-| `NetatmoStoveSync` | No changes (already uses setpoint override) | None - architecture is correct |
-| `NotificationTriggers` | Add new trigger types | Add `triggerStoveConnectionLostServer()`, `triggerStoveDriftServer()` |
-| Firebase RTDB Schema | Add paths for schedules cache, monitoring | Add `netatmo/schedules/cache`, `monitoring/` |
-
-### New Components to Create
-
-| Component | Type | Purpose | Priority |
-|-----------|------|---------|----------|
-| `NetatmoScheduleService` | Service | Schedule CRUD with caching | HIGH |
-| `StoveMonitorService` | Service | Health checks, drift detection | HIGH |
-| `/api/netatmo/schedules/*` | API Routes | Schedule CRUD endpoints | HIGH |
-| `ScheduleManager` | UI Component | Schedule management interface | MEDIUM |
-| `StoveMonitorBanner` | UI Component | Display health alerts | MEDIUM |
-
----
-
-## Architectural Patterns
-
-### Pattern 1: Service Layer Abstraction
-
-**What:** Separate business logic (services) from data access (repositories) and transport (API routes).
-
-**When to use:** When domain logic is complex and needs to be reused across multiple endpoints.
-
-**Example:**
-```javascript
-// API Route (thin controller)
-export const GET = withAuthAndErrorHandler(async () => {
-  const schedules = await NetatmoScheduleService.getSchedules(homeId);
-  return success({ schedules });
-});
-
-// Service Layer (business logic)
-export async function getSchedules(homeId) {
-  const cached = await NetatmoScheduleRepository.getCached(homeId);
-  if (cached && !isStale(cached)) {
-    return cached.schedules;
-  }
-
-  const fresh = await NetatmoAPI.getSchedules(homeId);
-  await NetatmoScheduleRepository.saveCached(homeId, fresh);
-  return fresh;
 }
 
-// Repository Layer (data access)
-export async function getCached(homeId) {
-  const path = getEnvironmentPath(`netatmo/schedules/${homeId}/cache`);
-  return await adminDbGet(path);
+// CRITICAL: Attach namespace components
+Tabs.List = TabsList;
+Tabs.Trigger = TabsTrigger;
+Tabs.Content = TabsContent;
+
+// Named exports for tree-shaking
+export { Tabs, TabsList, TabsTrigger, TabsContent };
+export default Tabs;
+```
+
+**Usage:**
+```jsx
+<Tabs defaultValue="tab1">
+  <Tabs.List>
+    <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
+    <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
+  </Tabs.List>
+  <Tabs.Content value="tab1">Content 1</Tabs.Content>
+  <Tabs.Content value="tab2">Content 2</Tabs.Content>
+</Tabs>
+```
+
+### Pattern 2: Simple Wrapper + Compound (Dual API)
+
+For backward compatibility, provide both simple and compound APIs (see Select.js, Tooltip.js).
+
+```jsx
+// Simple API (quick usage)
+<Accordion items={[
+  { trigger: 'Section 1', content: 'Content 1' },
+  { trigger: 'Section 2', content: 'Content 2' },
+]} />
+
+// Compound API (full control)
+<Accordion type="single" collapsible>
+  <Accordion.Item value="item-1">
+    <Accordion.Trigger>Section 1</Accordion.Trigger>
+    <Accordion.Content>Content 1</Accordion.Content>
+  </Accordion.Item>
+</Accordion>
+```
+
+---
+
+## Server/Client Boundaries
+
+| Component | Root | List/Trigger | Content | Rationale |
+|-----------|------|--------------|---------|-----------|
+| **Tabs** | Client | Client | Server-safe* | Triggers manage state; Content can render server content |
+| **Accordion** | Client | Client | Server-safe* | Triggers manage expand/collapse state |
+| **Data Table** | Client | - | - | TanStack hooks require client |
+| **Command** | Client | Client | Client | All interactive (search, filtering, keyboard) |
+| **Context Menu** | Client | Client | Client | Event handlers throughout |
+| **Popover** | Client | Client | Client | Positioning requires client-side calculation |
+| **Sheet** | Client | Client | Client | Modal behavior, animations |
+| **Dialog** | Client | Client | Client | Already exists as Modal.js |
+
+*Server-safe means the Content component CAN render Server Components as children, but the component itself needs 'use client' for Radix functionality.
+
+**Key insight:** In Next.js App Router, 'use client' at the component level doesn't prevent Server Component children. The pattern:
+
+```jsx
+// tabs.js - 'use client' at top
+// But content can receive server components:
+
+// page.tsx (server)
+import { Tabs } from '@/app/components/ui';
+import { ServerDataDisplay } from './ServerDataDisplay'; // Server Component
+
+export default function Page() {
+  return (
+    <Tabs defaultValue="data">
+      <Tabs.List>
+        <Tabs.Trigger value="data">Data</Tabs.Trigger>
+      </Tabs.List>
+      <Tabs.Content value="data">
+        <ServerDataDisplay /> {/* This renders on server! */}
+      </Tabs.Content>
+    </Tabs>
+  );
 }
 ```
 
-**Trade-offs:**
-- ✅ Testable (mock repository in service tests)
-- ✅ Reusable (service used by multiple API routes)
-- ❌ More files (3 layers instead of 1 monolithic route)
+---
 
-**Existing Usage:** `netatmoService.js`, `stoveStateService.js`
+## CVA Integration Pattern
 
-### Pattern 2: Cache-Aside with TTL
+All components use CVA for type-safe variants. Follow the Modal.js and Card.js patterns:
 
-**What:** Cache external API responses in Firebase RTDB with expiration timestamp.
-
-**When to use:** External API has rate limits OR response is expensive to compute.
-
-**Example:**
-```javascript
-export async function getSchedules(homeId) {
-  const cached = await adminDbGet(`netatmo/schedules/${homeId}/cache`);
-
-  const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-  if (cached && (Date.now() - cached.lastFetchedAt) < CACHE_TTL) {
-    return cached.schedules; // Cache hit
+```jsx
+// 1. Define variants with dark/light mode support
+const tabsTriggerVariants = cva(
+  [
+    // Base classes
+    'px-4 py-2 font-medium font-display rounded-lg',
+    'transition-colors duration-200',
+    // Dark mode (default)
+    'text-slate-400 hover:text-slate-200',
+    'data-[state=active]:text-ember-400 data-[state=active]:bg-ember-900/30',
+    // Light mode override
+    '[html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:hover:text-slate-800',
+    '[html:not(.dark)_&]:data-[state=active]:text-ember-600',
+    '[html:not(.dark)_&]:data-[state=active]:bg-ember-100',
+  ],
+  {
+    variants: {
+      variant: {
+        default: '',
+        ember: 'data-[state=active]:border-b-2 data-[state=active]:border-ember-500',
+        underline: 'border-b-2 border-transparent data-[state=active]:border-slate-200',
+      },
+      size: {
+        sm: 'px-3 py-1.5 text-sm',
+        md: 'px-4 py-2 text-base',
+        lg: 'px-5 py-3 text-lg',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'md',
+    },
   }
+);
 
-  // Cache miss - fetch from API
-  const fresh = await NETATMO_API.getSchedules(accessToken, homeId);
-  await adminDbSet(`netatmo/schedules/${homeId}/cache`, {
-    schedules: fresh,
-    lastFetchedAt: Date.now(),
+// 2. Export variants for external composition
+export { tabsTriggerVariants };
+
+// 3. Use in component
+const TabsTrigger = forwardRef(function TabsTrigger(
+  { className, variant, size, ...props },
+  ref
+) {
+  return (
+    <TabsPrimitive.Trigger
+      ref={ref}
+      className={cn(tabsTriggerVariants({ variant, size }), className)}
+      {...props}
+    />
+  );
+});
+```
+
+**Critical pattern:** Light mode uses `[html:not(.dark)_&]:` prefix (not `.light` class). This matches the existing design system.
+
+---
+
+## Component-Specific Architecture
+
+### 1. Tabs
+
+**Package:** `@radix-ui/react-tabs` (already installed v1.1.12)
+
+```jsx
+// tabs.js structure
+export const tabsListVariants = cva([...]);
+export const tabsTriggerVariants = cva([...]);
+export const tabsContentVariants = cva([...]);
+
+function Tabs({ defaultValue, value, onValueChange, children, ...props }) {...}
+const TabsList = forwardRef(function TabsList({...}) {...});
+const TabsTrigger = forwardRef(function TabsTrigger({...}) {...});
+const TabsContent = forwardRef(function TabsContent({...}) {...});
+
+Tabs.List = TabsList;
+Tabs.Trigger = TabsTrigger;
+Tabs.Content = TabsContent;
+
+export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants, tabsTriggerVariants };
+export default Tabs;
+```
+
+**Variants to support:**
+- `variant`: default, ember, underline, pills
+- `size`: sm, md, lg
+- `orientation`: horizontal, vertical
+
+---
+
+### 2. Accordion
+
+**Package:** `@radix-ui/react-accordion` (NOT installed - needs adding)
+
+```jsx
+// accordion.js structure
+export const accordionVariants = cva([...]);
+export const accordionItemVariants = cva([...]);
+export const accordionTriggerVariants = cva([...]);
+export const accordionContentVariants = cva([...]);
+
+function Accordion({ type = 'single', collapsible = true, items, children, ...props }) {
+  // Support both simple API (items prop) and compound API (children)
+  if (items) {
+    return (
+      <AccordionPrimitive.Root type={type} collapsible={collapsible} {...props}>
+        {items.map((item, i) => (
+          <AccordionItem key={i} value={\`item-\${i}\`}>
+            <AccordionTrigger>{item.trigger}</AccordionTrigger>
+            <AccordionContent>{item.content}</AccordionContent>
+          </AccordionItem>
+        ))}
+      </AccordionPrimitive.Root>
+    );
+  }
+  return (
+    <AccordionPrimitive.Root type={type} collapsible={collapsible} {...props}>
+      {children}
+    </AccordionPrimitive.Root>
+  );
+}
+
+const AccordionItem = forwardRef(function AccordionItem({...}) {...});
+const AccordionTrigger = forwardRef(function AccordionTrigger({...}) {...});
+const AccordionContent = forwardRef(function AccordionContent({...}) {...});
+
+Accordion.Item = AccordionItem;
+Accordion.Trigger = AccordionTrigger;
+Accordion.Content = AccordionContent;
+
+export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };
+export default Accordion;
+```
+
+**Radix features to expose:**
+- `type`: 'single' | 'multiple'
+- `collapsible`: boolean (for single type)
+- `defaultValue` / `value` / `onValueChange`: controlled/uncontrolled
+
+---
+
+### 3. Data Table
+
+**Package:** `@tanstack/react-table` (needs installing)
+
+**Architecture:** Data Table is a complex component that wraps TanStack Table with Ember Noir styling.
+
+```jsx
+// data-table.js - Client component (TanStack requires hooks)
+'use client';
+
+import { useState } from 'react';
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  flexRender,
+} from '@tanstack/react-table';
+import { cn } from '@/lib/utils/cn';
+
+function DataTable({
+  data,
+  columns,
+  pagination = true,
+  sorting = true,
+  filtering = false,
+  className,
+  ...props
+}) {
+  const [sortingState, setSortingState] = useState([]);
+  const [columnFilters, setColumnFilters] = useState([]);
+
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    ...(sorting && { getSortedRowModel: getSortedRowModel(), onSortingChange: setSortingState }),
+    ...(filtering && { getFilteredRowModel: getFilteredRowModel(), onColumnFiltersChange: setColumnFilters }),
+    ...(pagination && { getPaginationRowModel: getPaginationRowModel() }),
+    state: { sorting: sortingState, columnFilters },
   });
 
-  return fresh;
+  return (
+    <div className={cn('rounded-2xl border border-white/[0.06] overflow-hidden', className)}>
+      <table className="w-full">
+        <DataTableHeader table={table} />
+        <DataTableBody table={table} />
+      </table>
+      {pagination && <DataTablePagination table={table} />}
+    </div>
+  );
+}
+
+// Subcomponents for customization
+const DataTableHeader = ({ table }) => {...};
+const DataTableBody = ({ table }) => {...};
+const DataTableRow = forwardRef(({...}) => {...});
+const DataTableCell = forwardRef(({...}) => {...});
+const DataTablePagination = ({ table }) => {...};
+
+DataTable.Header = DataTableHeader;
+DataTable.Body = DataTableBody;
+DataTable.Row = DataTableRow;
+DataTable.Cell = DataTableCell;
+DataTable.Pagination = DataTablePagination;
+
+export { DataTable, DataTableHeader, DataTableBody, DataTableRow, DataTableCell, DataTablePagination };
+export default DataTable;
+```
+
+**Usage pattern (following shadcn/ui architecture):**
+
+```jsx
+// columns.tsx - Client component for column definitions
+'use client';
+import { createColumnHelper } from '@tanstack/react-table';
+
+const columnHelper = createColumnHelper();
+export const columns = [
+  columnHelper.accessor('name', { header: 'Name' }),
+  columnHelper.accessor('status', { header: 'Status', cell: (info) => <Badge>{info.getValue()}</Badge> }),
+];
+
+// page.tsx - Server component fetches data
+import { DataTable } from '@/app/components/ui';
+import { columns } from './columns';
+
+export default async function Page() {
+  const data = await fetchData(); // Server-side fetch
+  return <DataTable data={data} columns={columns} />;
 }
 ```
 
-**Trade-offs:**
-- ✅ Reduces API calls (avoids rate limits)
-- ✅ Faster response times (Firebase < 50ms vs API 300-500ms)
-- ❌ Stale data risk (5-min window where changes aren't reflected)
-- ❌ Cache invalidation complexity (must invalidate on writes)
+---
 
-**Mitigation:** Invalidate cache on write operations (create/update/delete schedule).
+### 4. Command Palette
 
-### Pattern 3: Fire-and-Forget for Non-Critical Tasks
+**Package:** `cmdk` (needs installing)
 
-**What:** Execute non-blocking operations asynchronously without awaiting completion.
+**Architecture:** Command wraps cmdk with Ember Noir styling and keyboard shortcut handling.
 
-**When to use:** Operation is not critical to user response OR has independent failure handling.
+```jsx
+// command.js
+'use client';
 
-**Example:**
-```javascript
-// In /api/scheduler/check
-export const GET = withCronSecret(async () => {
-  // Critical path - blocking
-  const stoveStatus = await getStoveStatus();
-  const scheduleAction = await executeSchedulerLogic(stoveStatus);
+import { Command as CommandPrimitive } from 'cmdk';
+import { forwardRef, useEffect, useState } from 'react';
+import { cva } from 'class-variance-authority';
+import { cn } from '@/lib/utils/cn';
+import { Search } from 'lucide-react';
 
-  // Non-critical - fire-and-forget
-  calibrateValvesIfNeeded().catch(err => console.error('Calibration failed:', err));
-  proactiveTokenRefresh().catch(err => console.error('Token refresh failed:', err));
-  sendNotifications(scheduleAction).catch(err => console.error('Notification failed:', err));
+const commandVariants = cva([
+  'flex flex-col w-full overflow-hidden rounded-2xl',
+  'bg-slate-900/95 backdrop-blur-3xl',
+  'border border-white/[0.08]',
+  '[html:not(.dark)_&]:bg-white/95 [html:not(.dark)_&]:border-slate-200',
+]);
 
-  return success({ status: scheduleAction });
-});
-```
+function Command({ className, ...props }) {
+  return (
+    <CommandPrimitive
+      className={cn(commandVariants(), className)}
+      {...props}
+    />
+  );
+}
 
-**Trade-offs:**
-- ✅ Fast response (critical path completes quickly)
-- ✅ Isolated failures (non-critical task failure doesn't block main flow)
-- ❌ No error propagation to client (failures logged but not returned)
-- ❌ Harder to debug (errors happen after response sent)
-
-**Existing Usage:** Valve calibration, Hue token refresh in scheduler cron (lines 512-525 of `/api/scheduler/check`)
-
-### Pattern 4: Polling with Exponential Backoff for Client State
-
-**What:** Client polls server for state updates with increasing interval on error.
-
-**When to use:** No WebSocket/SSE support AND state changes are infrequent.
-
-**Example:**
-```javascript
-// Client component
-export default function StoveMonitorBanner() {
-  const [health, setHealth] = useState(null);
-  const [backoff, setBackoff] = useState(60000); // Start at 60s
-
+// Dialog variant (Cmd+K triggered)
+function CommandDialog({ open, onOpenChange, children }) {
   useEffect(() => {
-    const fetchHealth = async () => {
-      try {
-        const res = await fetch('/api/monitoring/health');
-        const data = await res.json();
-        setHealth(data);
-        setBackoff(60000); // Reset on success
-      } catch (err) {
-        console.error('Health fetch failed:', err);
-        setBackoff(prev => Math.min(prev * 2, 300000)); // Max 5 min
+    const down = (e) => {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        onOpenChange(!open);
       }
     };
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
+  }, [open, onOpenChange]);
 
-    fetchHealth();
-    const interval = setInterval(fetchHealth, backoff);
-    return () => clearInterval(interval);
-  }, [backoff]);
-
-  // Render alert if unhealthy
+  return (
+    <Modal isOpen={open} onClose={() => onOpenChange(false)} size="lg">
+      <Command>{children}</Command>
+    </Modal>
+  );
 }
+
+const CommandInput = forwardRef(({...}) => {...});
+const CommandList = forwardRef(({...}) => {...});
+const CommandEmpty = forwardRef(({...}) => {...});
+const CommandGroup = forwardRef(({...}) => {...});
+const CommandItem = forwardRef(({...}) => {...});
+const CommandSeparator = forwardRef(({...}) => {...});
+const CommandShortcut = ({...}) => {...};
+
+Command.Dialog = CommandDialog;
+Command.Input = CommandInput;
+Command.List = CommandList;
+Command.Empty = CommandEmpty;
+Command.Group = CommandGroup;
+Command.Item = CommandItem;
+Command.Separator = CommandSeparator;
+Command.Shortcut = CommandShortcut;
+
+export { Command, CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandSeparator, CommandShortcut };
+export default Command;
 ```
-
-**Trade-offs:**
-- ✅ Simple (no WebSocket infrastructure)
-- ✅ Works with Vercel serverless (no persistent connections)
-- ❌ Delayed updates (60s latency for state changes)
-- ❌ Increased server load (all clients polling)
-
-**Recommendation:** 60s interval for monitoring state (changes are infrequent). Use 5s for stove status (existing pattern).
 
 ---
 
-## Scaling Considerations
+### 5. Context Menu (Replacement)
 
-| Scale | Architecture Adjustments |
-|-------|--------------------------|
-| **0-10 users** (current) | Current architecture sufficient. Single Vercel instance handles polling. Firebase RTDB free tier (10GB/month) adequate. |
-| **10-100 users** | Consider Redis for rate limiting (currently in-memory). Move to Firestore for schedule cache (better querying). Add Sentry for error monitoring. |
-| **100+ users** | Unlikely for personal smart home app. If reached: WebSocket for real-time updates, CDN for static assets, database read replicas. |
+**Package:** `@radix-ui/react-context-menu` (NOT installed - needs adding)
 
-### Bottlenecks
+The current `ContextMenu.js` is a custom implementation. Replace with Radix for full accessibility:
 
-**1. Netatmo API Rate Limits (first bottleneck)**
-- **Problem:** Netatmo API has undocumented rate limits (~60 req/min per user)
-- **Solution:** Cache-aside pattern with 5-min TTL (already planned)
-- **Monitoring:** Log 429 responses, alert on repeated failures
+```jsx
+// context-menu.js (replaces current implementation)
+'use client';
 
-**2. Vercel Function Execution Time (second bottleneck)**
-- **Problem:** Scheduler cron can timeout if stove API is slow (10s max)
-- **Solution:** Parallel requests with Promise.all (already implemented in scheduler)
-- **Monitoring:** Track cron execution time in Firebase, alert if >8s
+import * as ContextMenuPrimitive from '@radix-ui/react-context-menu';
+import { forwardRef } from 'react';
+import { cva } from 'class-variance-authority';
+import { cn } from '@/lib/utils/cn';
+import { Check, ChevronRight, Circle } from 'lucide-react';
 
-**3. Firebase RTDB Write Throughput (unlikely bottleneck)**
-- **Problem:** RTDB has 1000 writes/sec limit
-- **Current Usage:** ~60 writes/min (1/sec) from cron + client updates
-- **Solution:** No action needed unless adding 100+ concurrent users
+const contextMenuContentVariants = cva([
+  'min-w-[12rem] overflow-hidden rounded-xl p-1',
+  'bg-slate-800/95 backdrop-blur-2xl',
+  'border border-slate-700/60',
+  'shadow-lg',
+  '[html:not(.dark)_&]:bg-white/95 [html:not(.dark)_&]:border-slate-200',
+  'animate-in fade-in-0 zoom-in-95',
+]);
+
+function ContextMenu({ children, ...props }) {
+  return <ContextMenuPrimitive.Root {...props}>{children}</ContextMenuPrimitive.Root>;
+}
+
+const ContextMenuTrigger = ContextMenuPrimitive.Trigger;
+const ContextMenuContent = forwardRef(({...}) => {...});
+const ContextMenuItem = forwardRef(({...}) => {...});
+const ContextMenuCheckboxItem = forwardRef(({...}) => {...});
+const ContextMenuRadioItem = forwardRef(({...}) => {...});
+const ContextMenuLabel = forwardRef(({...}) => {...});
+const ContextMenuSeparator = forwardRef(({...}) => {...});
+const ContextMenuSubTrigger = forwardRef(({...}) => {...});
+const ContextMenuSubContent = forwardRef(({...}) => {...});
+
+ContextMenu.Trigger = ContextMenuTrigger;
+ContextMenu.Content = ContextMenuContent;
+ContextMenu.Item = ContextMenuItem;
+// ... etc
+
+export { ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem, ... };
+export default ContextMenu;
+```
+
+**Migration:** The current ContextMenu uses a simple items array. Provide backward-compatible API:
+
+```jsx
+// Simple API (backward compatible)
+<ContextMenu items={[
+  { label: 'Edit', icon: 'pencil', onClick: handleEdit },
+  { label: 'Delete', icon: 'trash', onClick: handleDelete, variant: 'danger' },
+]} />
+
+// Compound API (full Radix features)
+<ContextMenu>
+  <ContextMenu.Trigger>
+    <div>Right-click me</div>
+  </ContextMenu.Trigger>
+  <ContextMenu.Content>
+    <ContextMenu.Item onSelect={handleEdit}>Edit</ContextMenu.Item>
+    <ContextMenu.Separator />
+    <ContextMenu.Item onSelect={handleDelete} variant="danger">Delete</ContextMenu.Item>
+  </ContextMenu.Content>
+</ContextMenu>
+```
 
 ---
 
-## Anti-Patterns
+### 6. Popover
 
-### Anti-Pattern 1: Modifying Netatmo Schedules Programmatically
+**Package:** `@radix-ui/react-popover` (already installed v1.1.14)
 
-**What people do:** Call Netatmo `setthermmode` to modify schedule timetable when stove turns on/off.
+The package is installed but no component exists. Create one:
 
-**Why it's wrong:**
-- Permanent changes to user-defined schedules
-- Loses original schedule configuration
-- Conflicts with user edits (race conditions)
-- Netatmo schedule has limited slots (can't infinitely add/remove)
+```jsx
+// popover.js
+'use client';
 
-**Do this instead:** Use **temporary manual setpoint override** with `mode='manual'` and `endtime`.
+import * as PopoverPrimitive from '@radix-ui/react-popover';
+import { forwardRef } from 'react';
+import { cva } from 'class-variance-authority';
+import { cn } from '@/lib/utils/cn';
+import { X } from 'lucide-react';
 
-**Implementation:**
-```javascript
-// ❌ WRONG - modifies schedule
-await NETATMO_API.setSchedule(homeId, scheduleId, {
-  timetable: modifiedTimetable // Permanent change!
+const popoverContentVariants = cva([
+  'z-50 w-72 rounded-xl p-4',
+  'bg-slate-800/95 backdrop-blur-2xl',
+  'border border-slate-700/60',
+  'shadow-lg outline-none',
+  '[html:not(.dark)_&]:bg-white/95 [html:not(.dark)_&]:border-slate-200',
+  'data-[state=open]:animate-in data-[state=closed]:animate-out',
+  'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+  'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+  'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2',
+  'data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+]);
+
+function Popover({ children, ...props }) {
+  return <PopoverPrimitive.Root {...props}>{children}</PopoverPrimitive.Root>;
+}
+
+const PopoverTrigger = PopoverPrimitive.Trigger;
+const PopoverAnchor = PopoverPrimitive.Anchor;
+const PopoverClose = PopoverPrimitive.Close;
+
+const PopoverContent = forwardRef(function PopoverContent(
+  { className, align = 'center', sideOffset = 4, ...props },
+  ref
+) {
+  return (
+    <PopoverPrimitive.Portal>
+      <PopoverPrimitive.Content
+        ref={ref}
+        align={align}
+        sideOffset={sideOffset}
+        className={cn(popoverContentVariants(), className)}
+        {...props}
+      />
+    </PopoverPrimitive.Portal>
+  );
 });
 
-// ✅ CORRECT - temporary override
-await NETATMO_API.setRoomThermpoint(accessToken, {
-  home_id: homeId,
-  room_id: roomId,
-  mode: 'manual',
-  temp: 16,
-  endtime: Math.floor(Date.now() / 1000) + (8 * 60 * 60), // 8 hours
+Popover.Trigger = PopoverTrigger;
+Popover.Anchor = PopoverAnchor;
+Popover.Content = PopoverContent;
+Popover.Close = PopoverClose;
+
+export { Popover, PopoverTrigger, PopoverAnchor, PopoverContent, PopoverClose, popoverContentVariants };
+export default Popover;
+```
+
+---
+
+### 7. Sheet (Side Panel)
+
+**Package:** `@radix-ui/react-dialog` (already installed - reuse)
+
+Sheet is a Dialog variant that slides in from the side. Use the existing Dialog primitive:
+
+```jsx
+// sheet.js
+'use client';
+
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { forwardRef } from 'react';
+import { cva } from 'class-variance-authority';
+import { cn } from '@/lib/utils/cn';
+import { X } from 'lucide-react';
+
+const sheetContentVariants = cva(
+  [
+    'fixed z-50 gap-4 p-6',
+    'bg-slate-900/95 backdrop-blur-3xl',
+    'border-slate-700/50',
+    'shadow-xl',
+    '[html:not(.dark)_&]:bg-white/95 [html:not(.dark)_&]:border-slate-200',
+    'transition-all duration-300 ease-out',
+  ],
+  {
+    variants: {
+      side: {
+        top: 'inset-x-0 top-0 border-b data-[state=open]:animate-slide-in-from-top data-[state=closed]:animate-slide-out-to-top',
+        bottom: 'inset-x-0 bottom-0 border-t data-[state=open]:animate-slide-in-from-bottom data-[state=closed]:animate-slide-out-to-bottom',
+        left: 'inset-y-0 left-0 h-full w-3/4 max-w-sm border-r data-[state=open]:animate-slide-in-from-left data-[state=closed]:animate-slide-out-to-left',
+        right: 'inset-y-0 right-0 h-full w-3/4 max-w-sm border-l data-[state=open]:animate-slide-in-from-right data-[state=closed]:animate-slide-out-to-right',
+      },
+    },
+    defaultVariants: {
+      side: 'right',
+    },
+  }
+);
+
+function Sheet({ open, onOpenChange, children, ...props }) {
+  return (
+    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange} {...props}>
+      {children}
+    </DialogPrimitive.Root>
+  );
+}
+
+const SheetTrigger = DialogPrimitive.Trigger;
+
+const SheetOverlay = forwardRef(function SheetOverlay({ className, ...props }, ref) {
+  return (
+    <DialogPrimitive.Overlay
+      ref={ref}
+      className={cn(
+        'fixed inset-0 z-50',
+        'bg-slate-950/70 [html:not(.dark)_&]:bg-slate-900/40',
+        'backdrop-blur-sm',
+        'data-[state=open]:animate-fade-in data-[state=closed]:animate-fade-out',
+        className
+      )}
+      {...props}
+    />
+  );
 });
 
-// Later: return to schedule
-await NETATMO_API.setRoomThermpoint(accessToken, {
-  home_id: homeId,
-  room_id: roomId,
-  mode: 'home', // Follow schedule
+const SheetContent = forwardRef(function SheetContent(
+  { className, children, side = 'right', ...props },
+  ref
+) {
+  return (
+    <DialogPrimitive.Portal>
+      <SheetOverlay />
+      <DialogPrimitive.Content
+        ref={ref}
+        className={cn(sheetContentVariants({ side }), className)}
+        {...props}
+      >
+        {children}
+        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-lg p-2 hover:bg-white/[0.06]">
+          <X className="h-5 w-5" />
+          <span className="sr-only">Close</span>
+        </DialogPrimitive.Close>
+      </DialogPrimitive.Content>
+    </DialogPrimitive.Portal>
+  );
+});
+
+const SheetHeader = forwardRef(function SheetHeader({ className, ...props }, ref) {
+  return <div ref={ref} className={cn('flex flex-col space-y-2 mb-6', className)} {...props} />;
+});
+
+const SheetTitle = DialogPrimitive.Title;
+const SheetDescription = DialogPrimitive.Description;
+const SheetFooter = forwardRef(function SheetFooter({ className, ...props }, ref) {
+  return <div ref={ref} className={cn('flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6', className)} {...props} />;
+});
+
+Sheet.Trigger = SheetTrigger;
+Sheet.Content = SheetContent;
+Sheet.Header = SheetHeader;
+Sheet.Title = SheetTitle;
+Sheet.Description = SheetDescription;
+Sheet.Footer = SheetFooter;
+
+export { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, sheetContentVariants };
+export default Sheet;
+```
+
+---
+
+### 8. Dialog (Already Exists)
+
+The existing Modal.js IS the Dialog component. No new component needed. Consider:
+
+1. **Export alias in index.js:**
+   ```jsx
+   export { default as Dialog } from './Modal'; // Alias for discoverability
+   ```
+
+2. **Add description subcomponent** (already exists as Modal.Description)
+
+3. **Consider renaming** Modal to Dialog for consistency with Radix naming (breaking change - defer to user decision)
+
+---
+
+## Build Order (Dependency-Based)
+
+Components should be built in this order based on dependencies:
+
+| Order | Component | Dependencies | Rationale |
+|-------|-----------|--------------|-----------|
+| 1 | **Popover** | None (Radix installed) | Foundation for Tooltip, DropdownMenu patterns |
+| 2 | **Tabs** | None (Radix installed) | Simple, high-value, establishes patterns |
+| 3 | **Accordion** | Need to install Radix | Similar to Tabs, extends patterns |
+| 4 | **Sheet** | Reuses Modal/Dialog | Variant of existing component |
+| 5 | **Context Menu** | Need to install Radix | Replaces existing implementation |
+| 6 | **Command** | Need to install cmdk, uses Modal | Depends on Modal for dialog variant |
+| 7 | **Data Table** | Need to install TanStack, uses all above | Most complex, may use Popover for filters |
+
+**Packages to install:**
+```bash
+# Phase 1: Accordion and Context Menu
+npm install @radix-ui/react-accordion @radix-ui/react-context-menu
+
+# Phase 2: Command Palette
+npm install cmdk
+
+# Phase 3: Data Table
+npm install @tanstack/react-table
+```
+
+---
+
+## Integration with Existing Components
+
+### With Device Cards
+
+```jsx
+// Using Tabs in device settings
+<DeviceCard icon="fire" title="Stufa">
+  <Tabs defaultValue="status">
+    <Tabs.List>
+      <Tabs.Trigger value="status">Stato</Tabs.Trigger>
+      <Tabs.Trigger value="schedule">Programma</Tabs.Trigger>
+      <Tabs.Trigger value="settings">Impostazioni</Tabs.Trigger>
+    </Tabs.List>
+    <Tabs.Content value="status">
+      <StatusDisplay />
+    </Tabs.Content>
+    <Tabs.Content value="schedule">
+      <ScheduleEditor />
+    </Tabs.Content>
+  </Tabs>
+</DeviceCard>
+```
+
+### With DashboardLayout
+
+```jsx
+// Sheet for mobile navigation / settings panel
+<DashboardLayout>
+  <Sheet>
+    <Sheet.Trigger asChild>
+      <Button variant="ghost" size="icon">
+        <Menu />
+      </Button>
+    </Sheet.Trigger>
+    <Sheet.Content side="left">
+      <NavigationMenu />
+    </Sheet.Content>
+  </Sheet>
+</DashboardLayout>
+```
+
+### With Command for Global Search
+
+```jsx
+// In layout.tsx
+<Command.Dialog open={open} onOpenChange={setOpen}>
+  <Command.Input placeholder="Cerca dispositivi, azioni..." />
+  <Command.List>
+    <Command.Empty>Nessun risultato.</Command.Empty>
+    <Command.Group heading="Dispositivi">
+      <Command.Item onSelect={() => navigate('/stove')}>
+        Stufa
+      </Command.Item>
+      <Command.Item onSelect={() => navigate('/thermostat')}>
+        Termostato
+      </Command.Item>
+    </Command.Group>
+    <Command.Group heading="Azioni">
+      <Command.Item onSelect={() => toggleStove()}>
+        Accendi Stufa
+        <Command.Shortcut>Cmd+S</Command.Shortcut>
+      </Command.Item>
+    </Command.Group>
+  </Command.List>
+</Command.Dialog>
+```
+
+---
+
+## Index.js Update Template
+
+After implementing all components, update `app/components/ui/index.js`:
+
+```jsx
+// ... existing exports ...
+
+// Tabs (v3.x+)
+export { default as Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants, tabsTriggerVariants } from './tabs';
+
+// Accordion (v3.x+)
+export { default as Accordion, AccordionItem, AccordionTrigger, AccordionContent, accordionVariants } from './accordion';
+
+// Data Table (v3.x+)
+export { default as DataTable, DataTableHeader, DataTableBody, DataTableRow, DataTableCell, DataTablePagination } from './data-table';
+
+// Command Palette (v3.x+)
+export { default as Command, CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandSeparator, CommandShortcut } from './command';
+
+// Context Menu - updated (v3.x+)
+export { default as ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem, ContextMenuSeparator } from './context-menu';
+
+// Popover (v3.x+)
+export { default as Popover, PopoverTrigger, PopoverContent, PopoverAnchor, PopoverClose, popoverContentVariants } from './popover';
+
+// Sheet (v3.x+)
+export { default as Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, sheetContentVariants } from './sheet';
+
+// Dialog alias (v3.x+)
+export { default as Dialog } from './Modal';
+```
+
+---
+
+## Anti-Patterns to Avoid
+
+### 1. Creating Nested Folder Structure
+```
+// WRONG - codebase uses flat structure
+src/components/ui/tabs/
+├── index.ts
+├── tabs.tsx
+└── tabs.types.ts
+
+// CORRECT - follow existing pattern
+app/components/ui/
+├── tabs.js
+└── __tests__/tabs.test.js
+```
+
+### 2. Using .tsx Extensions
+```jsx
+// WRONG - codebase uses .js
+tabs.tsx
+
+// CORRECT
+tabs.js
+```
+
+### 3. Forgetting Namespace Attachment
+```jsx
+// WRONG - missing namespace
+export { Tabs, TabsList, TabsTrigger };
+export default Tabs;
+
+// CORRECT - attach to namespace
+Tabs.List = TabsList;
+Tabs.Trigger = TabsTrigger;
+export { Tabs, TabsList, TabsTrigger };
+export default Tabs;
+```
+
+### 4. Missing Dark/Light Mode Support
+```jsx
+// WRONG - dark mode only
+'bg-slate-800 text-slate-200'
+
+// CORRECT - both modes
+'bg-slate-800 text-slate-200 [html:not(.dark)_&]:bg-white [html:not(.dark)_&]:text-slate-800'
+```
+
+### 5. Missing forwardRef
+```jsx
+// WRONG - no ref forwarding
+function TabsTrigger({ className, ...props }) {
+  return <TabsPrimitive.Trigger className={cn(...)} {...props} />;
+}
+
+// CORRECT - always forward refs for primitives
+const TabsTrigger = forwardRef(function TabsTrigger({ className, ...props }, ref) {
+  return <TabsPrimitive.Trigger ref={ref} className={cn(...)} {...props} />;
 });
 ```
 
-**Reference:** Existing implementation in `netatmoStoveSync.js` (lines 199-225, 298-302)
+---
 
-### Anti-Pattern 2: Blocking Cron Execution on Non-Critical Tasks
+## Accessibility Checklist
 
-**What people do:** Await all operations in cron handler, including optional tasks like valve calibration.
+All components must follow existing accessibility patterns (see Modal.js, Select.js):
 
-**Why it's wrong:**
-- Increases function execution time (risk of 10s timeout)
-- Non-critical failure blocks entire cron job
-- User experience degrades (delayed scheduler actions)
+- [ ] Radix primitives handle ARIA attributes automatically
+- [ ] Focus management works correctly (focus trap for modals/sheets)
+- [ ] Keyboard navigation works (Tab, Arrow keys, Escape)
+- [ ] Screen reader announcements are meaningful
+- [ ] Visible focus indicators use ember glow ring
+- [ ] Reduced motion respected (motion-reduce: variant)
+- [ ] Touch targets are at least 44px (mobile)
 
-**Do this instead:** Fire-and-forget for non-critical tasks.
+---
 
-**Implementation:**
-```javascript
-// ❌ WRONG
-export const GET = async () => {
-  await executeSchedulerLogic();
-  await calibrateValves(); // Blocks even if optional
-  await refreshTokens();
-  await sendNotifications();
-  return success();
-};
+## Testing Patterns
 
-// ✅ CORRECT
-export const GET = async () => {
-  await executeSchedulerLogic(); // Critical - block
+Follow existing test structure in `__tests__/`:
 
-  // Non-critical - fire-and-forget
-  calibrateValves().catch(err => console.error('Calibration:', err));
-  refreshTokens().catch(err => console.error('Token refresh:', err));
-  sendNotifications().catch(err => console.error('Notifications:', err));
+```jsx
+// __tests__/tabs.test.js
+import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Tabs } from '../tabs';
 
-  return success();
-};
-```
+describe('Tabs', () => {
+  it('renders with default tab selected', () => {
+    render(
+      <Tabs defaultValue="tab1">
+        <Tabs.List>
+          <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
+          <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
+        </Tabs.List>
+        <Tabs.Content value="tab1">Content 1</Tabs.Content>
+        <Tabs.Content value="tab2">Content 2</Tabs.Content>
+      </Tabs>
+    );
 
-**Reference:** Existing implementation in scheduler cron (lines 512-525)
-
-### Anti-Pattern 3: Client-Side State Tracking for Server Actions
-
-**What people do:** Track scheduler state (is auto mode on?) in client component state.
-
-**Why it's wrong:**
-- State desync between client and server (cron operates independently)
-- Page refresh loses state
-- Multiple clients show different states
-
-**Do this instead:** Single source of truth in Firebase, client reads only.
-
-**Implementation:**
-```javascript
-// ❌ WRONG
-const [autoMode, setAutoMode] = useState(false);
-const toggleMode = async () => {
-  setAutoMode(!autoMode); // Optimistic update
-  await fetch('/api/scheduler/mode', { method: 'POST' });
-};
-
-// ✅ CORRECT
-const [autoMode, setAutoMode] = useState(null);
-useEffect(() => {
-  const unsubscribe = onValue(ref(db, 'schedules-v2/mode'), (snap) => {
-    setAutoMode(snap.val()?.enabled);
+    expect(screen.getByRole('tab', { name: 'Tab 1' })).toHaveAttribute('data-state', 'active');
+    expect(screen.getByText('Content 1')).toBeVisible();
+    expect(screen.queryByText('Content 2')).not.toBeInTheDocument();
   });
-  return () => unsubscribe();
-}, []);
 
-const toggleMode = async () => {
-  await fetch('/api/scheduler/mode', { method: 'POST' });
-  // State updates via Firebase listener automatically
-};
+  it('switches tabs on click', async () => {
+    const user = userEvent.setup();
+    // ... test implementation
+  });
+
+  it('supports keyboard navigation', async () => {
+    // ... test arrow key navigation
+  });
+});
 ```
-
-**Reference:** Existing pattern in `StoveCard.js` (Firebase listener for maintenance state)
-
----
-
-## Build Order Recommendation
-
-Based on architectural dependencies and feature priorities:
-
-### Phase 1: Foundation - Netatmo Schedule Infrastructure
-**Goal:** Lay groundwork for schedule operations without UI.
-
-**Components:**
-1. `NetatmoScheduleService` - Core CRUD logic
-2. `NetatmoScheduleRepository` - Firebase caching
-3. `/api/netatmo/schedules/*` - API routes
-4. **Test:** Postman calls to API routes, verify caching
-
-**Rationale:** Backend-first allows testing independently of UI complexity.
-
-**Estimated Effort:** 1 task (6-8 hours)
-
-### Phase 2: Stove Monitoring Backend
-**Goal:** Detect and log health issues, no UI alerts yet.
-
-**Components:**
-1. `StoveMonitorService` - Health checks, drift detection
-2. Monitoring state in Firebase (`monitoring/`)
-3. Integration with `/api/scheduler/check` cron
-4. **Test:** Force connection loss, verify logging
-
-**Rationale:** Monitoring backend informs alert UI requirements.
-
-**Estimated Effort:** 1 task (6-8 hours)
-
-### Phase 3: Thermostat-Stove Integration Correction
-**Goal:** Fix schedule modification bug, use setpoint override.
-
-**Components:**
-1. Update `NetatmoStoveSync.syncLivingRoomWithStove()` (if needed - already correct)
-2. Add `enforceStoveSyncSetpoints()` to cron (already exists, verify behavior)
-3. Add continuous enforcement logic
-4. **Test:** Stove on/off transitions, verify Netatmo schedules unchanged
-
-**Rationale:** Critical bug fix before adding more features.
-
-**Estimated Effort:** 1 task (4-6 hours) - mostly verification
-
-### Phase 4: Schedule Management UI
-**Goal:** User can create/edit/delete Netatmo schedules.
-
-**Components:**
-1. `ScheduleManager` component - CRUD UI
-2. Schedule selector in `ThermostatCard`
-3. Form validation (React Hook Form + Zod)
-4. **Test:** Create schedule, verify in Netatmo app
-
-**Rationale:** UI depends on stable backend from Phase 1.
-
-**Estimated Effort:** 2 tasks (10-12 hours) - complex forms
-
-### Phase 5: Monitoring UI & Alerts
-**Goal:** Display health status and send alerts.
-
-**Components:**
-1. `StoveMonitorBanner` component - Alert display
-2. New notification triggers (`triggerStoveConnectionLostServer`, etc.)
-3. Dashboard for monitoring history
-4. **Test:** Force connection loss, verify alert + notification
-
-**Rationale:** UI depends on monitoring backend from Phase 2.
-
-**Estimated Effort:** 2 tasks (8-10 hours)
 
 ---
 
 ## Sources
 
-**Netatmo API Integration:**
-- [Netatmo Developer Documentation](https://dev.netatmo.com/apidocumentation) - Official API reference
-- [Netatmo Energy API](https://dev.netatmo.com/apidocumentation/energy) - Schedule management endpoints
-- [Home Assistant Netatmo Integration](https://www.home-assistant.io/integrations/netatmo/) - Community integration patterns
-
-**Cron Job Architecture:**
-- [Vercel Cron Job Example](https://vercel.com/templates/next.js/vercel-cron) - Official Next.js cron pattern
-- [Cron Jobs in Next.js: Serverless vs Serverful](https://yagyaraj234.medium.com/running-cron-jobs-in-nextjs-guide-for-serverful-and-stateless-server-542dd0db0c4c) - Serverless cron architecture
-- [Securing Vercel Cron Routes](https://codingcat.dev/post/how-to-secure-vercel-cron-job-routes-in-next-js-14-app-router) - HMAC webhook security
-- [Testing Next.js Cron Jobs Locally](https://medium.com/@quentinmousset/testing-next-js-cron-jobs-locally-my-journey-from-frustration-to-solution-6ffb2e774d7a) - Local development patterns
-
-**IoT Monitoring:**
-- [Polling vs Webhooks](https://www.merge.dev/blog/webhooks-vs-polling) - Architecture comparison
-- [The Ultimate Guide to IoT Monitoring in 2026](https://uptimerobot.com/knowledge-hub/devops/iot-monitoring/) - Monitoring patterns
-- [IoT Monitoring Challenges](https://www.netdata.cloud/blog/iot-monitoring-challenges/) - Common pitfalls
-
-**Existing Codebase:**
-- `app/api/scheduler/check/route.js` - Current cron implementation (HIGH confidence)
-- `lib/netatmoStoveSync.js` - Thermostat-stove coordination service (HIGH confidence)
-- `lib/netatmoService.js` - Netatmo state management patterns (HIGH confidence)
-- `docs/architecture.md` - Repository pattern, multi-device architecture (HIGH confidence)
+- [Radix UI Accordion Documentation](https://www.radix-ui.com/primitives/docs/components/accordion)
+- [Radix UI Collapsible Documentation](https://www.radix-ui.com/primitives/docs/components/collapsible)
+- [Radix UI Context Menu Documentation](https://www.radix-ui.com/primitives/docs/components/context-menu)
+- [Radix UI Dropdown Menu Documentation](https://www.radix-ui.com/primitives/docs/components/dropdown-menu)
+- [Radix UI Popover Documentation](https://www.radix-ui.com/primitives/docs/components/popover)
+- [Radix UI Dialog Documentation](https://www.radix-ui.com/primitives/docs/components/dialog)
+- [Radix UI Server-Side Rendering Guide](https://www.radix-ui.com/primitives/docs/guides/server-side-rendering)
+- [cmdk GitHub Repository](https://cmdk.paco.me/)
+- [shadcn/ui Command Component](https://www.shadcn.io/ui/command)
+- [TanStack Table Documentation](https://tanstack.com/table/latest)
+- [shadcn/ui Data Table Pattern](https://ui.shadcn.com/docs/components/data-table)
 
 ---
 
-*Architecture research for: Netatmo Schedule Management & Stove Monitoring*
-*Researched: 2026-01-26*
-*Confidence: HIGH (existing codebase analysis + 2026 web research)*
+*Researched: 2026-02-03*
+*Confidence: HIGH - patterns derived from existing codebase analysis*

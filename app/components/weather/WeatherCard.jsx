@@ -23,7 +23,8 @@ import { ForecastDaySheet } from './ForecastDaySheet';
  * WeatherCard - Weather display with loading/error/data states
  *
  * @param {Object} props
- * @param {Object|null} props.weatherData - Weather response from API with { current, forecast, cachedAt, stale }
+ * @param {Object|null} props.weatherData - Weather response from API with { current, forecast, hourly, cachedAt, stale }
+ * @param {string|null} props.locationName - Optional location name to display in header (e.g., "Milano")
  * @param {number|null} props.indoorTemp - Optional indoor temperature for comparison
  * @param {boolean} props.isLoading - Show skeleton state
  * @param {Error|null} props.error - Error object for error state
@@ -32,6 +33,7 @@ import { ForecastDaySheet } from './ForecastDaySheet';
  * @example
  * <WeatherCard
  *   weatherData={data}
+ *   locationName="Milano"
  *   indoorTemp={20.5}
  *   isLoading={false}
  *   error={null}
@@ -40,6 +42,7 @@ import { ForecastDaySheet } from './ForecastDaySheet';
  */
 export function WeatherCard({
   weatherData = null,
+  locationName = null,
   indoorTemp = null,
   isLoading = false,
   error = null,
@@ -100,7 +103,7 @@ export function WeatherCard({
   }
 
   // Data state - render full weather card
-  const { current, forecast, cachedAt, stale } = weatherData;
+  const { current, forecast, hourly, cachedAt, stale } = weatherData;
 
   // First forecast day is today - used for min/max/UV in current conditions
   const todayForecast = forecast && forecast.length > 0 ? forecast[0] : null;
@@ -108,7 +111,7 @@ export function WeatherCard({
   return (
     <SmartHomeCard
       icon={<CloudSun className="w-6 h-6 sm:w-8 sm:h-8" />}
-      title="Meteo"
+      title={locationName ? `Meteo - ${locationName}` : 'Meteo'}
       colorTheme="ocean"
     >
       <SmartHomeCard.Status>
@@ -129,6 +132,7 @@ export function WeatherCard({
         <CurrentConditions
           current={current}
           todayForecast={todayForecast}
+          hourlyTemperatures={hourly?.temperatures}
           indoorTemp={indoorTemp}
         />
 

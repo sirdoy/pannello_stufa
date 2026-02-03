@@ -10,7 +10,7 @@
  */
 
 import { Text } from '@/app/components/ui';
-import { Droplets, Wind, Sun, Thermometer, Gauge, Eye, ArrowUp, ArrowDown, Leaf } from 'lucide-react';
+import { Droplets, Wind, Sun, Thermometer, Gauge, Eye, ArrowUp, ArrowDown, Leaf, TrendingUp, TrendingDown } from 'lucide-react';
 import WeatherIcon, { getWeatherLabel } from './WeatherIcon';
 import {
   formatTemperature,
@@ -18,6 +18,7 @@ import {
   formatWindSpeed,
   getUVIndexLabel,
   getAirQualityLabel,
+  getTemperatureTrend,
 } from './weatherHelpers';
 
 /**
@@ -66,6 +67,7 @@ function WeatherDetailCell({ icon, iconColor = 'text-ocean-400', label, value, s
  * @param {number} props.todayForecast.tempMax - Today's high temperature
  * @param {number} props.todayForecast.tempMin - Today's low temperature
  * @param {number} [props.todayForecast.uvIndex] - Today's UV index
+ * @param {number[]|null} props.hourlyTemperatures - Array of hourly temperatures for trend calculation
  * @param {number|null} props.indoorTemp - Optional indoor temperature for comparison
  *
  * @example
@@ -78,10 +80,11 @@ function WeatherDetailCell({ icon, iconColor = 'text-ocean-400', label, value, s
  *     condition: { description: 'Parzialmente nuvoloso', code: 2 }
  *   }}
  *   todayForecast={{ tempMax: 22.5, tempMin: 12.3, uvIndex: 5 }}
+ *   hourlyTemperatures={[15, 16, 17, 18, 19, 20, 21]}
  *   indoorTemp={20.5}
  * />
  */
-export function CurrentConditions({ current, todayForecast = null, indoorTemp = null }) {
+export function CurrentConditions({ current, todayForecast = null, hourlyTemperatures = null, indoorTemp = null }) {
   if (!current) {
     return null;
   }
@@ -107,6 +110,9 @@ export function CurrentConditions({ current, todayForecast = null, indoorTemp = 
   const comparisonText = indoorTemp !== null
     ? getTemperatureComparison(temperature, indoorTemp)
     : null;
+
+  // Calculate temperature trend from hourly data
+  const trend = getTemperatureTrend(hourlyTemperatures);
 
   // Build details array (only include items with data)
   const details = [];
@@ -216,6 +222,17 @@ export function CurrentConditions({ current, todayForecast = null, indoorTemp = 
             >
               {formatTemperature(temperature)}°
             </Text>
+            {/* Temperature trend indicator */}
+            {trend === 'rising' && (
+              <span className="flex items-center" title="In aumento">
+                <TrendingUp className="w-4 h-4 text-ember-400" />
+              </span>
+            )}
+            {trend === 'falling' && (
+              <span className="flex items-center" title="In diminuzione">
+                <TrendingDown className="w-4 h-4 text-ocean-400" />
+              </span>
+            )}
             {/* Today's min/max */}
             {todayForecast && (
               <div className="flex items-center gap-2 text-sm">

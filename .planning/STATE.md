@@ -9,17 +9,17 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 
 ## Current Position
 
-Phase: 27 of 29 (Location Settings) - COMPLETE
-Plan: 3/3 plans complete
-Status: Phase complete
-Last activity: 2026-02-03 — Completed 27-03-PLAN.md (Location Display & Temperature Trend)
+Phase: 28 of 29 (Dashboard Customization)
+Plan: 1/2 plans complete
+Status: In progress
+Last activity: 2026-02-03 — Completed 28-01-PLAN.md (Per-user Dashboard Preferences Infrastructure)
 
-Progress: [██████████░░░░░░░░░░░░░░░] 53% (v3.2 milestone - 10/17 estimated plans)
+Progress: [███████████░░░░░░░░░░░░░░] 56% (v3.2 milestone - 11/17 estimated plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 122 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 52 plans, v3.1: 13 plans, v3.2: 7 plans)
+- Total plans completed: 123 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 52 plans, v3.1: 13 plans, v3.2: 8 plans)
 - Average duration: ~3.9 min per plan
 - Total execution time: ~8.13 hours across 5 milestones
 
@@ -31,11 +31,11 @@ Progress: [██████████░░░░░░░░░░░░░
 | v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 - 2026-01-28) |
 | v3.0 Design System | 8 | 52 | 3 days (2026-01-28 - 2026-01-30) |
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
-| v3.2 Weather & Dashboard | 5 | 10 | In progress (2026-02-02 - present) |
+| v3.2 Weather & Dashboard | 5 | 11 | In progress (2026-02-02 - present) |
 
 **Recent Trend:**
 - All 4 previous milestones complete: 115 plans total
-- v3.2 estimated at ~17 plans across 5 phases, 10 complete
+- v3.2 estimated at ~17 plans across 5 phases, 11 complete
 - Weather foundation: API infrastructure + geolocation/location + dashboard preferences (6min total)
 - Weather component plan 01: WeatherIcon + utilities (2min)
 - Weather component plan 02: WeatherCard + CurrentConditions + Skeleton (2min)
@@ -44,8 +44,9 @@ Progress: [██████████░░░░░░░░░░░░░
 - Location settings plan 01: Geocoding infrastructure (3min)
 - Location settings plan 02: Location Settings UI (parallel)
 - Location settings plan 03: Location Display & Trend (3min)
+- Dashboard customization plan 01: Per-user preferences infrastructure (3min)
 
-*Updated after 27-03 completion*
+*Updated after 28-01 completion*
 
 ## Accumulated Context
 
@@ -95,6 +96,9 @@ Key architectural patterns from previous milestones:
 - 6-hour past + 1-hour forecast for temperature trend analysis
 - 1 degree celsius threshold for meaningful trend change
 - 3-hour window comparison algorithm for trend smoothing
+- Per-user dashboard preferences via users/${userId}/dashboardPreferences path
+- User paths do not need getEnvironmentPath (already isolated by userId)
+- Icon field in DEFAULT_CARD_ORDER for settings UI display
 
 ### Pending Todos
 
@@ -106,7 +110,7 @@ Key architectural patterns from previous milestones:
 
 ### Blockers/Concerns
 
-None — Phase 27 complete. Ready for Phase 28.
+None — Plan 28-01 complete. Ready for 28-02 (Settings Page UI).
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
@@ -115,7 +119,7 @@ None — Phase 27 complete. Ready for Phase 28.
 
 ## Session Continuity
 
-Last session: 2026-02-03T10:39:00Z
-Stopped at: Completed 27-03-PLAN.md (Location Display & Temperature Trend)
+Last session: 2026-02-03T12:30:00Z
+Stopped at: Completed 28-01-PLAN.md (Per-user Dashboard Preferences Infrastructure)
 Resume file: None
-Next step: Plan Phase 28 (Dashboard Customization) - requires /gsd:plan-phase 28
+Next step: Execute 28-02-PLAN.md (Dashboard Settings Page UI)

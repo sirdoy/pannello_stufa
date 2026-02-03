@@ -96,11 +96,10 @@ Plans:
   2. Home page hides cards user has disabled
   3. WeatherCard appears in the card list and can be reordered like other cards
   4. New users see sensible default card order
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 29-01: Home page card rendering from preferences
-- [ ] 29-02: WeatherCard integration into card list
+- [ ] 29-01-PLAN.md — WeatherCardWrapper + home page card rendering from dashboard preferences
 
 ## Progress
 
@@ -113,7 +112,7 @@ Phases execute in numeric order: 25 -> 26 -> 27 -> 28 -> 29
 | 26. Weather Component | 4/4 | ✓ Complete | 2026-02-02 |
 | 27. Location Settings | 3/3 | ✓ Complete | 2026-02-03 |
 | 28. Dashboard Customization | 2/2 | ✓ Complete | 2026-02-03 |
-| 29. Home Page Integration | 0/2 | Not started | - |
+| 29. Home Page Integration | 0/1 | Not started | - |
 
 ## Requirement Coverage
 

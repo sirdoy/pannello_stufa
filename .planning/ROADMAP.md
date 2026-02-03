@@ -6,7 +6,7 @@ v3.2 adds weather display and dashboard customization to the Pannello Stufa PWA.
 
 ## Milestones
 
-- **v3.2 Dashboard Customization & Weather** - Phases 25-29 (in progress)
+- **v3.2 Dashboard Customization & Weather** - Phases 25-29 ✓
 
 ## Phases
 
@@ -14,7 +14,7 @@ v3.2 adds weather display and dashboard customization to the Pannello Stufa PWA.
 - [x] **Phase 26: Weather Component** - WeatherCard UI with current conditions and forecast ✓
 - [x] **Phase 27: Location Settings** - Settings page for home location configuration ✓
 - [x] **Phase 28: Dashboard Customization** - Settings page for card order and visibility ✓
-- [ ] **Phase 29: Home Page Integration** - Render cards in saved order with WeatherCard
+- [x] **Phase 29: Home Page Integration** - Render cards in saved order with WeatherCard ✓
 
 ## Phase Details
 
@@ -99,7 +99,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 29-01-PLAN.md — WeatherCardWrapper + home page card rendering from dashboard preferences
+- [x] 29-01-PLAN.md — WeatherCardWrapper + home page card rendering from dashboard preferences
 
 ## Progress
 
@@ -112,7 +112,7 @@ Phases execute in numeric order: 25 -> 26 -> 27 -> 28 -> 29
 | 26. Weather Component | 4/4 | ✓ Complete | 2026-02-02 |
 | 27. Location Settings | 3/3 | ✓ Complete | 2026-02-03 |
 | 28. Dashboard Customization | 2/2 | ✓ Complete | 2026-02-03 |
-| 29. Home Page Integration | 0/1 | Not started | - |
+| 29. Home Page Integration | 1/1 | ✓ Complete | 2026-02-03 |
 
 ## Requirement Coverage
 

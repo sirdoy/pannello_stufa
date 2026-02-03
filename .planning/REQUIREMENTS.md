@@ -9,16 +9,16 @@ Requirements for Dashboard Customization & Weather milestone.
 
 ### Weather Component
 
-- [ ] **WEATHER-01**: User can view current temperature and "feels like" temperature
-- [ ] **WEATHER-02**: User can see weather condition icon (sunny, cloudy, rain, snow, etc.)
-- [ ] **WEATHER-03**: User can view current humidity percentage
-- [ ] **WEATHER-04**: User can view current wind speed
-- [ ] **WEATHER-05**: User can view 5-day forecast with high/low temperatures
-- [ ] **WEATHER-06**: User sees loading skeleton while weather data is fetching
-- [ ] **WEATHER-07**: User sees error state with retry option when weather fetch fails
-- [ ] **WEATHER-08**: User can see "Updated X minutes ago" timestamp
+- [x] **WEATHER-01**: User can view current temperature and "feels like" temperature
+- [x] **WEATHER-02**: User can see weather condition icon (sunny, cloudy, rain, snow, etc.)
+- [x] **WEATHER-03**: User can view current humidity percentage
+- [x] **WEATHER-04**: User can view current wind speed
+- [x] **WEATHER-05**: User can view 5-day forecast with high/low temperatures
+- [x] **WEATHER-06**: User sees loading skeleton while weather data is fetching
+- [x] **WEATHER-07**: User sees error state with retry option when weather fetch fails
+- [x] **WEATHER-08**: User can see "Updated X minutes ago" timestamp
 - [x] **WEATHER-09**: User can see temperature trend indicator (rising/falling arrow)
-- [ ] **WEATHER-10**: User can compare outdoor temperature with indoor thermostat temperature
+- [x] **WEATHER-10**: User can compare outdoor temperature with indoor thermostat temperature
 
 ### Location Settings
 
@@ -35,8 +35,8 @@ Requirements for Dashboard Customization & Weather milestone.
 - [x] **DASH-02**: User can reorder cards using up/down buttons
 - [x] **DASH-03**: User can toggle card visibility (show/hide)
 - [x] **DASH-04**: User's card order persists across sessions (Firebase)
-- [ ] **DASH-05**: Home page renders cards in user's saved order
-- [ ] **DASH-06**: Weather card appears in home page card list (reorderable like other cards)
+- [x] **DASH-05**: Home page renders cards in user's saved order
+- [x] **DASH-06**: Weather card appears in home page card list (reorderable like other cards)
 
 ### Infrastructure
 
@@ -82,16 +82,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| WEATHER-01 | Phase 26 | Pending |
-| WEATHER-02 | Phase 26 | Pending |
-| WEATHER-03 | Phase 26 | Pending |
-| WEATHER-04 | Phase 26 | Pending |
-| WEATHER-05 | Phase 26 | Pending |
-| WEATHER-06 | Phase 26 | Pending |
-| WEATHER-07 | Phase 26 | Pending |
-| WEATHER-08 | Phase 26 | Pending |
+| WEATHER-01 | Phase 26 | Complete |
+| WEATHER-02 | Phase 26 | Complete |
+| WEATHER-03 | Phase 26 | Complete |
+| WEATHER-04 | Phase 26 | Complete |
+| WEATHER-05 | Phase 26 | Complete |
+| WEATHER-06 | Phase 26 | Complete |
+| WEATHER-07 | Phase 26 | Complete |
+| WEATHER-08 | Phase 26 | Complete |
 | WEATHER-09 | Phase 27 | Complete |
-| WEATHER-10 | Phase 26 | Pending |
+| WEATHER-10 | Phase 26 | Complete |
 | LOC-01 | Phase 27 | Complete |
 | LOC-02 | Phase 27 | Complete |
 | LOC-03 | Phase 27 | Complete |
@@ -102,8 +102,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DASH-02 | Phase 28 | Complete |
 | DASH-03 | Phase 28 | Complete |
 | DASH-04 | Phase 28 | Complete |
-| DASH-05 | Phase 29 | Pending |
-| DASH-06 | Phase 29 | Pending |
+| DASH-05 | Phase 29 | Complete |
+| DASH-06 | Phase 29 | Complete |
 | INFRA-01 | Phase 25 | Complete |
 | INFRA-02 | Phase 28 | Complete |
 | INFRA-03 | Phase 27 | Complete |
@@ -116,4 +116,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-03 after Phase 28 completion*
+*Last updated: 2026-02-03 after Phase 29 completion*

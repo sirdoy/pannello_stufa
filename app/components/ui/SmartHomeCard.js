@@ -128,6 +128,7 @@ const SmartHomeCardControls = forwardRef(function SmartHomeCardControls(
  * @param {boolean} props.error - Show error state
  * @param {string} props.errorMessage - Error message to display
  * @param {boolean} props.disabled - Disabled state with opacity
+ * @param {ReactNode} props.headerActions - Actions to display in the header (e.g., refresh button)
  *
  * @example
  * <SmartHomeCard icon="🔥" title="Thermostat" colorTheme="ember">
@@ -151,6 +152,7 @@ const SmartHomeCard = forwardRef(function SmartHomeCard(
     error = false,
     errorMessage,
     disabled = false,
+    headerActions = null,
     ...props
   },
   ref
@@ -179,7 +181,7 @@ const SmartHomeCard = forwardRef(function SmartHomeCard(
       {/* Content wrapper with padding */}
       <div className={paddingClasses}>
         {/* Header with icon + title (only if provided) */}
-        {(icon || title) && (
+        {(icon || title || headerActions) && (
           <SmartHomeCardHeader>
             {icon && (
               <span className="text-2xl sm:text-3xl" aria-hidden="true">
@@ -190,6 +192,11 @@ const SmartHomeCard = forwardRef(function SmartHomeCard(
               <Heading level={2} size={size === 'compact' ? 'md' : 'xl'}>
                 {title}
               </Heading>
+            )}
+            {headerActions && (
+              <div className="ml-auto">
+                {headerActions}
+              </div>
             )}
           </SmartHomeCardHeader>
         )}

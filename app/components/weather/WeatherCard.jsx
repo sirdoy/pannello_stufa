@@ -14,6 +14,7 @@ import { SmartHomeCard, Badge, Button, Text } from '@/app/components/ui';
 import { CloudSun, CloudOff, RefreshCw } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
+import { cn } from '@/lib/utils/cn';
 import Skeleton from '@/app/components/ui/Skeleton';
 import { CurrentConditions } from './CurrentConditions';
 import { ForecastRow } from './ForecastRow';
@@ -29,6 +30,8 @@ import { ForecastDaySheet } from './ForecastDaySheet';
  * @param {boolean} props.isLoading - Show skeleton state
  * @param {Error|null} props.error - Error object for error state
  * @param {function} props.onRetry - Callback when retry button clicked
+ * @param {function} props.onRefresh - Callback when refresh button clicked
+ * @param {boolean} props.isRefreshing - Show refresh loading state
  *
  * @example
  * <WeatherCard
@@ -38,6 +41,8 @@ import { ForecastDaySheet } from './ForecastDaySheet';
  *   isLoading={false}
  *   error={null}
  *   onRetry={() => refetch()}
+ *   onRefresh={() => handleRefresh()}
+ *   isRefreshing={false}
  * />
  */
 export function WeatherCard({
@@ -47,6 +52,8 @@ export function WeatherCard({
   isLoading = false,
   error = null,
   onRetry = () => {},
+  onRefresh = () => {},
+  isRefreshing = false,
 }) {
   // State for selected forecast day (opens detail sheet)
   const [selectedDay, setSelectedDay] = useState(null);
@@ -113,19 +120,24 @@ export function WeatherCard({
       icon={<CloudSun className="w-6 h-6 sm:w-8 sm:h-8" />}
       title={locationName ? `Meteo - ${locationName}` : 'Meteo'}
       colorTheme="ocean"
+      headerActions={
+        <Button.Icon
+          icon={<RefreshCw className={cn("w-4 h-4", isRefreshing && "animate-spin")} />}
+          variant="ghost"
+          size="sm"
+          onClick={onRefresh}
+          disabled={isRefreshing}
+          aria-label="Aggiorna meteo"
+        />
+      }
     >
-      <SmartHomeCard.Status>
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="ocean" size="sm" suppressHydrationWarning>
-            Aggiornato {formatDistanceToNow(new Date(cachedAt), { addSuffix: true, locale: it })}
+      {stale && (
+        <SmartHomeCard.Status>
+          <Badge variant="warning" size="sm">
+            Aggiornamento in corso...
           </Badge>
-          {stale && (
-            <Badge variant="warning" size="sm">
-              Aggiornamento in corso...
-            </Badge>
-          )}
-        </div>
-      </SmartHomeCard.Status>
+        </SmartHomeCard.Status>
+      )}
 
       <SmartHomeCard.Controls>
         {/* Current conditions */}

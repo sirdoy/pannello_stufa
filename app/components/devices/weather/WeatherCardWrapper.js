@@ -24,6 +24,7 @@ export default function WeatherCardWrapper() {
   const [weatherData, setWeatherData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Memoized weather fetch function
   const fetchWeather = useCallback(async (lat, lon) => {
@@ -71,6 +72,18 @@ export default function WeatherCardWrapper() {
     }
   };
 
+  // Refresh handler - manual refresh with loading state
+  const handleRefresh = async () => {
+    if (location?.latitude && location?.longitude) {
+      setIsRefreshing(true);
+      try {
+        await fetchWeather(location.latitude, location.longitude);
+      } finally {
+        setIsRefreshing(false);
+      }
+    }
+  };
+
   return (
     <WeatherCard
       weatherData={weatherData}
@@ -78,6 +91,8 @@ export default function WeatherCardWrapper() {
       isLoading={isLoading}
       error={error}
       onRetry={handleRetry}
+      onRefresh={handleRefresh}
+      isRefreshing={isRefreshing}
     />
   );
 }

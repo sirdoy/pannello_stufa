@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 Phase: 30 of 36 (Foundation Components)
 Plan: Ready to plan
 Status: Ready to plan
-Last activity: 2026-02-03 — Roadmap created for v4.0
+Last activity: 2026-02-03 — Completed quick task 002: Weather data cron + manual refresh
 
 Progress: [░░░░░░░░░░░░░░░░░░░░░░░░░] 0% (0/21 plans)
 
@@ -61,6 +61,12 @@ None — Ready to begin v4.0.
 
 **Known Tech Debt:**
 - Label component not exported from barrel (low impact)
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 002 | Weather data cron + manual refresh | 2026-02-03 | 5ff4c93 | [002-weather-data-cron-manual-refresh](./quick/002-weather-data-cron-manual-refresh/) |
 
 ## Session Continuity
 

@@ -3,11 +3,22 @@ import StoveCard from './components/devices/stove/StoveCard';
 import ThermostatCard from './components/devices/thermostat/ThermostatCard';
 import CameraCard from './components/devices/camera/CameraCard';
 import LightsCard from './components/devices/lights/LightsCard';
+import WeatherCardWrapper from './components/devices/weather/WeatherCardWrapper';
 import SandboxToggle from './components/sandbox/SandboxToggle';
-import { getEnabledDevicesForUser } from '@/lib/devicePreferencesService';
-import { Section, Grid, Text, EmptyState, Card, CardHeader, CardTitle, CardContent } from './components/ui';
+import { adminDbGet } from '@/lib/firebaseAdmin';
+import { DEFAULT_CARD_ORDER } from '@/lib/services/dashboardPreferencesService';
+import { Section, Grid, EmptyState } from './components/ui';
 
 export const dynamic = 'force-dynamic';
+
+// Card component registry - maps card IDs to React components
+const CARD_COMPONENTS = {
+  stove: StoveCard,
+  thermostat: ThermostatCard,
+  weather: WeatherCardWrapper,
+  lights: LightsCard,
+  camera: CameraCard,
+};
 
 export default async function Home() {
   const session = await auth0.getSession();
@@ -21,7 +32,14 @@ export default async function Home() {
 
   const user = session.user;
   const userId = user.sub;
-  const enabledDevices = await getEnabledDevicesForUser(userId);
+
+  // Fetch dashboard preferences server-side
+  const dashboardPath = `users/${userId}/dashboardPreferences`;
+  const preferences = await adminDbGet(dashboardPath);
+  const cardOrder = preferences?.cardOrder || DEFAULT_CARD_ORDER;
+
+  // Filter to only visible cards
+  const visibleCards = cardOrder.filter(card => card.visible !== false);
 
   return (
     <main>
@@ -37,60 +55,24 @@ export default async function Home() {
 
         {/* Devices grid using new Grid component */}
         <Grid cols={2} gap="lg">
-          {enabledDevices.map((device, index) => {
-            // Staggered entrance animation wrapper
-            const animationDelay = `${index * 100}ms`;
+          {visibleCards.map((card, index) => {
+            const CardComponent = CARD_COMPONENTS[card.id];
+            if (!CardComponent) return null;
 
-            // Render device-specific card
-            if (device.id === 'stove') {
-              return (
-                <div key={device.id} className="animate-spring-in" style={{ animationDelay }}>
-                  <StoveCard />
-                </div>
-              );
-            }
-            if (device.id === 'thermostat') {
-              return (
-                <div key={device.id} className="animate-spring-in" style={{ animationDelay }}>
-                  <ThermostatCard />
-                </div>
-              );
-            }
-            if (device.id === 'lights') {
-              return (
-                <div key={device.id} className="animate-spring-in" style={{ animationDelay }}>
-                  <LightsCard />
-                </div>
-              );
-            }
-            if (device.id === 'camera') {
-              return (
-                <div key={device.id} className="animate-spring-in" style={{ animationDelay }}>
-                  <CameraCard />
-                </div>
-              );
-            }
-            if (device.id === 'sonos') {
-              // Placeholder - future implementation
-              return (
-                <div key={device.id} className="animate-spring-in" style={{ animationDelay }}>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle icon={device.icon}>{device.name}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <Text variant="secondary">In arrivo - Integrazione Spotify + Sonos</Text>
-                    </CardContent>
-                  </Card>
-                </div>
-              );
-            }
-            return null;
+            return (
+              <div
+                key={card.id}
+                className="animate-spring-in"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <CardComponent />
+              </div>
+            );
           })}
         </Grid>
 
         {/* Empty State using new EmptyState component */}
-        {enabledDevices.length === 0 && (
+        {visibleCards.length === 0 && (
           <EmptyState
             icon="🏠"
             title="Nessun dispositivo configurato"

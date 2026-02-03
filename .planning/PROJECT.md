@@ -200,9 +200,24 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-(No active requirements - next milestone not started)
+**Current Milestone: v4.0 Advanced UI Components**
 
-Run `/gsd:new-milestone` to define requirements for next milestone.
+**Goal:** Add advanced UI components to the design system (Tabs, Accordion, Data Table, Command Palette, Context Menu, Popover, Sheet, Dialogs) with micro-interactions and apply them across all application pages.
+
+**Target features:**
+- Tabs/TabGroup component for organized content sections
+- Accordion/Collapsible for expandable device details
+- Data Table for interactive history, logs, schedules
+- Command Palette (⌘K) for power user navigation
+- Context Menu for contextual device actions
+- Popover/Dropdown for device options menus
+- Sheet/Drawer for mobile-friendly bottom modals
+- Confirmation Dialog and Form Modal patterns
+- Quick actions on device cards
+- Status details with expandable views
+- Micro-interactions (animations, transitions, visual feedback)
+
+**Strategy:** Build each component as Server Component (JSX) where possible, apply immediately across codebase before moving to next component.
 
 ### Out of Scope
 
@@ -307,4 +322,4 @@ Run `/gsd:new-milestone` to define requirements for next milestone.
 - **Deployment**: Vercel (current hosting platform)
 
 ---
-*Last updated: 2026-02-03 after v3.2 milestone shipped (Dashboard Customization & Weather)*
+*Last updated: 2026-02-03 after v4.0 milestone started (Advanced UI Components)*

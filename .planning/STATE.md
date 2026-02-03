@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v3.2 Dashboard Customization & Weather - Phase 28 Dashboard Customization
+**Current focus:** v3.2 Dashboard Customization & Weather - Phase 29 Home Page Integration
 
 ## Current Position
 
@@ -19,7 +19,7 @@ Progress: [████████████░░░░░░░░░░░
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 123 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 52 plans, v3.1: 13 plans, v3.2: 8 plans)
+- Total plans completed: 124 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 52 plans, v3.1: 13 plans, v3.2: 12 plans)
 - Average duration: ~3.9 min per plan
 - Total execution time: ~8.13 hours across 5 milestones
 
@@ -31,11 +31,11 @@ Progress: [████████████░░░░░░░░░░░
 | v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 - 2026-01-28) |
 | v3.0 Design System | 8 | 52 | 3 days (2026-01-28 - 2026-01-30) |
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
-| v3.2 Weather & Dashboard | 5 | 11 | In progress (2026-02-02 - present) |
+| v3.2 Weather & Dashboard | 5 | 12 | In progress (2026-02-02 - present) |
 
 **Recent Trend:**
 - All 4 previous milestones complete: 115 plans total
-- v3.2 estimated at ~17 plans across 5 phases, 11 complete
+- v3.2 estimated at ~17 plans across 5 phases, 12 complete
 - Weather foundation: API infrastructure + geolocation/location + dashboard preferences (6min total)
 - Weather component plan 01: WeatherIcon + utilities (2min)
 - Weather component plan 02: WeatherCard + CurrentConditions + Skeleton (2min)

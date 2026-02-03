@@ -31,17 +31,17 @@ Requirements for Dashboard Customization & Weather milestone.
 
 ### Dashboard Customization
 
-- [ ] **DASH-01**: User can access dashboard layout settings page
-- [ ] **DASH-02**: User can reorder cards using up/down buttons
-- [ ] **DASH-03**: User can toggle card visibility (show/hide)
-- [ ] **DASH-04**: User's card order persists across sessions (Firebase)
+- [x] **DASH-01**: User can access dashboard layout settings page
+- [x] **DASH-02**: User can reorder cards using up/down buttons
+- [x] **DASH-03**: User can toggle card visibility (show/hide)
+- [x] **DASH-04**: User's card order persists across sessions (Firebase)
 - [ ] **DASH-05**: Home page renders cards in user's saved order
 - [ ] **DASH-06**: Weather card appears in home page card list (reorderable like other cards)
 
 ### Infrastructure
 
 - [x] **INFRA-01**: Weather API route fetches from Open-Meteo with 15-min cache
-- [ ] **INFRA-02**: Dashboard preferences stored in Firebase RTDB (not localStorage)
+- [x] **INFRA-02**: Dashboard preferences stored in Firebase RTDB (not localStorage)
 - [x] **INFRA-03**: Location settings stored in Firebase RTDB
 - [x] **INFRA-04**: Geolocation has 10-second timeout with iOS PWA fallback
 
@@ -98,14 +98,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LOC-04 | Phase 27 | Complete |
 | LOC-05 | Phase 27 | Complete |
 | LOC-06 | Phase 27 | Complete |
-| DASH-01 | Phase 28 | Pending |
-| DASH-02 | Phase 28 | Pending |
-| DASH-03 | Phase 28 | Pending |
-| DASH-04 | Phase 28 | Pending |
+| DASH-01 | Phase 28 | Complete |
+| DASH-02 | Phase 28 | Complete |
+| DASH-03 | Phase 28 | Complete |
+| DASH-04 | Phase 28 | Complete |
 | DASH-05 | Phase 29 | Pending |
 | DASH-06 | Phase 29 | Pending |
 | INFRA-01 | Phase 25 | Complete |
-| INFRA-02 | Phase 28 | Pending |
+| INFRA-02 | Phase 28 | Complete |
 | INFRA-03 | Phase 27 | Complete |
 | INFRA-04 | Phase 25 | Complete |
 
@@ -116,4 +116,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-03 after Phase 27 completion*
+*Last updated: 2026-02-03 after Phase 28 completion*

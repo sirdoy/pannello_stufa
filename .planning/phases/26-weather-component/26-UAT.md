@@ -1,5 +1,5 @@
 ---
-status: diagnosed
+status: complete
 phase: 26-weather-component
 source: [26-01-SUMMARY.md, 26-02-SUMMARY.md, 26-03-SUMMARY.md, 26-04-SUMMARY.md]
 started: 2026-02-03T09:00:00Z
@@ -34,9 +34,7 @@ result: pass
 
 ### 6. 5-Day Forecast Row
 expected: Horizontal scrollable row shows 5 days. Each day shows day name (Lun, Mar, etc.), weather icon, high/low temps. First day labeled "Oggi".
-result: issue
-reported: "voglio che occupino la larghezza della card"
-severity: minor
+result: pass (fixed - now fills card width)
 
 ### 7. Forecast Horizontal Scroll
 expected: Forecast row scrolls horizontally with snap behavior. Right edge shows fade gradient indicating more content. Momentum scrolling works smoothly.
@@ -44,10 +42,8 @@ result: skipped
 reason: User wants forecast days to fill card width instead of scrolling
 
 ### 8. Tap Day for Details
-expected: Tapping a forecast day card opens a bottom sheet with full details: date, temperature range, weather icon, extended stats (UV, humidity, wind, precipitation).
-result: issue
-reported: "usa modal invece di bottom sheet"
-severity: minor
+expected: Tapping a forecast day card opens a modal with full details: date, temperature range, weather icon, extended stats (UV, humidity, wind, precipitation).
+result: pass (fixed - now uses modal)
 
 ### 9. Air Quality Display
 expected: Air quality shows with European AQI scale label in Italian (Buona, Discreta, Moderata, etc.) when data is available.
@@ -68,8 +64,8 @@ result: pass
 ## Summary
 
 total: 12
-passed: 9
-issues: 2
+passed: 11
+issues: 0
 pending: 0
 skipped: 1
 

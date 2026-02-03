@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v3.2 Dashboard Customization & Weather - Phase 27 Location Settings
+**Current focus:** v3.2 Dashboard Customization & Weather - Phase 28 Dashboard Customization
 
 ## Current Position
 
-Phase: 27 of 29 (Location Settings)
-Plan: 1/3 plans complete
-Status: In progress
-Last activity: 2026-02-03 — Completed 27-01-PLAN.md (Geocoding Infrastructure)
+Phase: 27 of 29 (Location Settings) - COMPLETE
+Plan: 3/3 plans complete
+Status: Phase complete
+Last activity: 2026-02-03 — Completed 27-03-PLAN.md (Location Display & Temperature Trend)
 
-Progress: [████████░░░░░░░░░░░░░░░░░] 44% (v3.2 milestone - 8/17 estimated plans)
+Progress: [██████████░░░░░░░░░░░░░░░] 53% (v3.2 milestone - 10/17 estimated plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 120 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 52 plans, v3.1: 13 plans, v3.2: 5 plans)
+- Total plans completed: 122 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 52 plans, v3.1: 13 plans, v3.2: 7 plans)
 - Average duration: ~3.9 min per plan
-- Total execution time: ~8.03 hours across 5 milestones
+- Total execution time: ~8.13 hours across 5 milestones
 
 **By Milestone:**
 
@@ -31,19 +31,21 @@ Progress: [████████░░░░░░░░░░░░░░░
 | v2.0 Netatmo Control | 5 | 21 | 1.4 days (2026-01-27 - 2026-01-28) |
 | v3.0 Design System | 8 | 52 | 3 days (2026-01-28 - 2026-01-30) |
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
-| v3.2 Weather & Dashboard | 5 | 8 | In progress (2026-02-02 - present) |
+| v3.2 Weather & Dashboard | 5 | 10 | In progress (2026-02-02 - present) |
 
 **Recent Trend:**
 - All 4 previous milestones complete: 115 plans total
-- v3.2 estimated at ~17 plans across 5 phases, 8 complete
+- v3.2 estimated at ~17 plans across 5 phases, 10 complete
 - Weather foundation: API infrastructure + geolocation/location + dashboard preferences (6min total)
 - Weather component plan 01: WeatherIcon + utilities (2min)
 - Weather component plan 02: WeatherCard + CurrentConditions + Skeleton (2min)
 - Weather component plan 03: ForecastRow + ForecastDayCard + ForecastDaySheet (3min)
 - Weather component plan 04: Integration + barrel export (7min)
 - Location settings plan 01: Geocoding infrastructure (3min)
+- Location settings plan 02: Location Settings UI (parallel)
+- Location settings plan 03: Location Display & Trend (3min)
 
-*Updated after 27-01 completion*
+*Updated after 27-03 completion*
 
 ## Accumulated Context
 
@@ -90,6 +92,9 @@ Key architectural patterns from previous milestones:
 - Graceful degradation for geocoding: return empty results on API failure
 - fetchWithRetry pattern for external API resilience (3 attempts, exponential backoff)
 - useDebounce hook with 300ms default for search input
+- 6-hour past + 1-hour forecast for temperature trend analysis
+- 1 degree celsius threshold for meaningful trend change
+- 3-hour window comparison algorithm for trend smoothing
 
 ### Pending Todos
 
@@ -101,7 +106,7 @@ Key architectural patterns from previous milestones:
 
 ### Blockers/Concerns
 
-None — location settings phase progressing smoothly.
+None — Phase 27 complete. Ready for Phase 28.
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
@@ -110,7 +115,7 @@ None — location settings phase progressing smoothly.
 
 ## Session Continuity
 
-Last session: 2026-02-03T10:32:49Z
-Stopped at: Completed 27-01-PLAN.md (Geocoding Infrastructure)
+Last session: 2026-02-03T10:39:00Z
+Stopped at: Completed 27-03-PLAN.md (Location Display & Temperature Trend)
 Resume file: None
-Next step: Execute 27-02-PLAN.md (Location Settings UI)
+Next step: Execute Phase 28 (Dashboard Customization) or Phase 29 (Weather Integration)

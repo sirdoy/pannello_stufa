@@ -1,27 +1,27 @@
 /**
  * Dashboard Preferences API Route
  *
- * Server-side operations for dashboard customization.
+ * Server-side operations for per-user dashboard customization.
  * Handles GET (read) and POST (update) operations.
+ * Each user has their own preferences stored at users/${userId}/dashboardPreferences.
  *
- * GET  /api/config/dashboard - Get current preferences
- * POST /api/config/dashboard - Update preferences
+ * GET  /api/config/dashboard - Get current user's preferences
+ * POST /api/config/dashboard - Update current user's preferences
  */
 
 import { withAuthAndErrorHandler, success, badRequest } from '@/lib/core';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
-import { getEnvironmentPath } from '@/lib/environmentHelper';
 
 /**
  * Default card order for new users
  * Must match client-side constant
  */
 const DEFAULT_CARD_ORDER = [
-  { id: 'stove', label: 'Stufa', visible: true },
-  { id: 'thermostat', label: 'Termostato', visible: true },
-  { id: 'weather', label: 'Meteo', visible: true },
-  { id: 'lights', label: 'Luci', visible: true },
-  { id: 'camera', label: 'Telecamera', visible: true },
+  { id: 'stove', label: 'Stufa', icon: '🔥', visible: true },
+  { id: 'thermostat', label: 'Termostato', icon: '🌡️', visible: true },
+  { id: 'weather', label: 'Meteo', icon: '☀️', visible: true },
+  { id: 'lights', label: 'Luci', icon: '💡', visible: true },
+  { id: 'camera', label: 'Telecamera', icon: '📹', visible: true },
 ];
 
 /**
@@ -33,17 +33,19 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/config/dashboard
  *
- * Returns dashboard preferences or defaults
+ * Returns current user's dashboard preferences or defaults.
+ * User ID is extracted from Auth0 session.
  *
  * Response:
  * {
  *   preferences: {
- *     cardOrder: [{ id, label, visible }, ...]
+ *     cardOrder: [{ id, label, icon, visible }, ...]
  *   }
  * }
  */
-export const GET = withAuthAndErrorHandler(async () => {
-  const dashboardPath = getEnvironmentPath('config/dashboard');
+export const GET = withAuthAndErrorHandler(async (request, context, session) => {
+  const userId = session.user.sub;
+  const dashboardPath = `users/${userId}/dashboardPreferences`;
   const preferences = await adminDbGet(dashboardPath);
 
   // Return stored or defaults
@@ -55,13 +57,14 @@ export const GET = withAuthAndErrorHandler(async () => {
 /**
  * POST /api/config/dashboard
  *
- * Save dashboard preferences
+ * Save dashboard preferences for the current user.
+ * User ID is extracted from Auth0 session.
  *
  * Request body:
  * {
  *   cardOrder: [
- *     { id: 'stove', label: 'Stufa', visible: true },
- *     { id: 'weather', label: 'Meteo', visible: false },
+ *     { id: 'stove', label: 'Stufa', icon: '🔥', visible: true },
+ *     { id: 'weather', label: 'Meteo', icon: '☀️', visible: false },
  *     ...
  *   ]
  * }
@@ -72,7 +75,8 @@ export const GET = withAuthAndErrorHandler(async () => {
  *   preferences: { cardOrder: [...] }
  * }
  */
-export const POST = withAuthAndErrorHandler(async (request) => {
+export const POST = withAuthAndErrorHandler(async (request, context, session) => {
+  const userId = session.user.sub;
   const body = await request.json();
   const { cardOrder } = body;
 
@@ -91,8 +95,8 @@ export const POST = withAuthAndErrorHandler(async (request) => {
     }
   }
 
-  // Save to Firebase
-  const dashboardPath = getEnvironmentPath('config/dashboard');
+  // Save to user-specific Firebase path
+  const dashboardPath = `users/${userId}/dashboardPreferences`;
   await adminDbSet(dashboardPath, {
     cardOrder,
     updatedAt: Date.now(),

@@ -1,0 +1,172 @@
+# Roadmap: Pannello Stufa v4.0 Advanced UI Components
+
+## Overview
+
+This milestone adds 8 advanced UI components to the Ember Noir design system: Tabs, Accordion, Data Table, Command Palette, Context Menu, Popover, Sheet, and enhanced Dialog patterns. The approach builds from foundation (already-installed Radix primitives) through increasingly complex components, with immediate application after each component is built. The milestone concludes with a micro-interactions system and application-wide integration to ensure consistent UX across all pages.
+
+## Milestones
+
+- **v4.0 Advanced UI Components** - Phases 30-36 (current)
+
+## Phases
+
+- [ ] **Phase 30: Foundation Components** - Popover and Tabs (zero new dependencies)
+- [ ] **Phase 31: Expandable Components** - Accordion and Sheet (new Radix packages)
+- [ ] **Phase 32: Action Components** - Context Menu and Command Palette (mobile critical)
+- [ ] **Phase 33: Dialog Patterns** - Confirmation and Form Modal
+- [ ] **Phase 34: Data Table** - Full-featured sortable, filterable, paginated table
+- [ ] **Phase 35: Micro-interactions** - CSS animation system with reduced motion support
+- [ ] **Phase 36: Application Integration** - Quick actions and application-wide rollout
+
+## Phase Details
+
+### Phase 30: Foundation Components
+**Goal**: Establish component patterns with Popover and Tabs using already-installed Radix primitives
+**Depends on**: Nothing (first phase of v4.0)
+**Requirements**: POPV-01, POPV-02, POPV-03, POPV-04, POPV-05, TABS-01, TABS-02, TABS-03, TABS-04, TABS-05
+**Success Criteria** (what must be TRUE):
+  1. User can click trigger to open/close Popover and it positions correctly within viewport
+  2. User can navigate Popover with keyboard (Escape closes, focus trapped)
+  3. User can switch between tabs by clicking and using arrow keys
+  4. Screen reader announces tab role, selection state, and panel association
+  5. Tabs work in both horizontal and vertical orientations
+**Plans**: TBD
+
+Plans:
+- [ ] 30-01: Popover component with CVA variants and accessibility
+- [ ] 30-02: Tabs compound component with keyboard navigation
+- [ ] 30-03: Apply Tabs to thermostat page (Schedule/Manual/History)
+
+---
+
+### Phase 31: Expandable Components
+**Goal**: Add Accordion and Sheet components for expandable content and mobile-friendly panels
+**Depends on**: Phase 30 (uses established patterns)
+**Requirements**: ACCR-01, ACCR-02, ACCR-03, ACCR-04, ACCR-05, SHEE-01, SHEE-02, SHEE-03, SHEE-04, SHEE-05
+**Success Criteria** (what must be TRUE):
+  1. User can expand/collapse Accordion sections with click or Enter/Space
+  2. Accordion supports both single-open and multiple-open modes with smooth animation
+  3. Sheet slides in from edge with backdrop and can be closed via backdrop click or Escape
+  4. Focus is trapped within Sheet and returns to trigger on close
+  5. Screen reader announces expanded/collapsed state via aria-expanded
+**Plans**: TBD
+
+Plans:
+- [ ] 31-01: Accordion component with animation and modes
+- [ ] 31-02: Sheet component extending Modal foundation
+- [ ] 31-03: Apply Accordion to device details and Sheet to mobile forms
+
+---
+
+### Phase 32: Action Components
+**Goal**: Add Context Menu and Command Palette for quick actions and power-user navigation
+**Depends on**: Phase 31 (Modal foundation for Command Palette)
+**Requirements**: CTXM-01, CTXM-02, CTXM-03, CTXM-04, CTXM-05, CTXM-06, CMDK-01, CMDK-02, CMDK-03, CMDK-04, CMDK-05, CMDK-06
+**Success Criteria** (what must be TRUE):
+  1. User can open Context Menu via right-click (desktop) or long-press (mobile)
+  2. Context Menu positions within viewport and supports keyboard navigation
+  3. User can open Command Palette with Cmd+K/Ctrl+K from any page
+  4. Command Palette supports fuzzy search with arrow key navigation and Enter to execute
+  5. Both components close on Escape and restore focus correctly
+**Plans**: TBD
+
+Plans:
+- [ ] 32-01: Context Menu component with mobile long-press support
+- [ ] 32-02: Command Palette with cmdk integration
+- [ ] 32-03: Apply Context Menu to device cards
+
+---
+
+### Phase 33: Dialog Patterns
+**Goal**: Create standardized Confirmation Dialog and Form Modal patterns
+**Depends on**: Phase 30 (Popover patterns), existing Modal foundation
+**Requirements**: DLGC-01, DLGC-02, DLGC-03, DLGF-01, DLGF-02, DLGF-03
+**Success Criteria** (what must be TRUE):
+  1. Confirmation Dialog has cancel/confirm buttons with focus on cancel (safe default)
+  2. Destructive actions use danger styling on confirm button
+  3. Form Modal integrates with React Hook Form validation
+  4. Form Modal shows loading state during submit and validation errors inline
+**Plans**: TBD
+
+Plans:
+- [ ] 33-01: ConfirmationDialog component with danger variant
+- [ ] 33-02: FormModal component with validation integration
+- [ ] 33-03: Apply dialogs to destructive actions (delete device, clear history)
+
+---
+
+### Phase 34: Data Table
+**Goal**: Build full-featured Data Table with sorting, filtering, selection, and pagination
+**Depends on**: Phase 30 (Popover for filters), Phase 32 (Context Menu for row actions)
+**Requirements**: DTBL-01, DTBL-02, DTBL-03, DTBL-04, DTBL-05, DTBL-06, DTBL-07, DTBL-08, DTBL-09
+**Success Criteria** (what must be TRUE):
+  1. User can sort columns by clicking headers with visual direction indicators
+  2. User can select rows via checkbox and navigate cells with arrow keys
+  3. User can filter columns and paginate through large datasets
+  4. User can expand rows to see additional details
+  5. Table is responsive (horizontal scroll on mobile) with proper ARIA announcements
+**Plans**: TBD
+
+Plans:
+- [ ] 34-01: DataTable base with sorting and ARIA
+- [ ] 34-02: DataTable selection, filtering, and pagination
+- [ ] 34-03: DataTable row expansion and responsive behavior
+- [ ] 34-04: Apply DataTable to notification history
+
+---
+
+### Phase 35: Micro-interactions
+**Goal**: Implement polished CSS animation system with reduced motion support
+**Depends on**: Phases 30-34 (components to animate)
+**Requirements**: ANIM-01, ANIM-02, ANIM-03, ANIM-04
+**Success Criteria** (what must be TRUE):
+  1. Components use polished CSS transitions with consistent ease curves
+  2. List/grid items have stagger animation effects
+  3. Interactive elements use spring physics for natural feel
+  4. All animations respect prefers-reduced-motion (disabled or reduced)
+**Plans**: TBD
+
+Plans:
+- [ ] 35-01: Animation utilities and CSS custom properties
+- [ ] 35-02: Apply micro-interactions to existing components
+
+---
+
+### Phase 36: Application Integration
+**Goal**: Add quick actions to device cards and ensure consistent component usage across all pages
+**Depends on**: All previous phases (uses all components)
+**Requirements**: QACT-01, QACT-02, QACT-03, APPL-01, APPL-02, APPL-03, APPL-04, APPL-05, APPL-06, APPL-07, APPL-08
+**Success Criteria** (what must be TRUE):
+  1. Device cards have visible quick action icon buttons
+  2. Device cards support context menu on right-click/long-press
+  3. Quick actions are consistent across all device types (Stove, Thermostat, Lights, Camera)
+  4. Command Palette accessible from any page with relevant commands
+  5. All pages use new components consistently (verified via audit)
+**Plans**: TBD
+
+Plans:
+- [ ] 36-01: Quick actions infrastructure for device cards
+- [ ] 36-02: Command Palette global commands and navigation
+- [ ] 36-03: Application-wide audit and component consistency
+
+---
+
+## Progress
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 30. Foundation Components | 0/3 | Not started | - |
+| 31. Expandable Components | 0/3 | Not started | - |
+| 32. Action Components | 0/3 | Not started | - |
+| 33. Dialog Patterns | 0/3 | Not started | - |
+| 34. Data Table | 0/4 | Not started | - |
+| 35. Micro-interactions | 0/2 | Not started | - |
+| 36. Application Integration | 0/3 | Not started | - |
+
+**Total:** 0/21 plans (0%)
+
+---
+
+*Roadmap created: 2026-02-03*
+*Milestone: v4.0 Advanced UI Components*
+*Requirements coverage: 55/55 (100%)*

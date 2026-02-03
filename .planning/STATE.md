@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-03)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Milestone v4.0 Advanced UI Components — defining requirements
+**Current focus:** Milestone v4.0 Advanced UI Components — Phase 30 Foundation Components
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-02-03 — Milestone v4.0 started
+Phase: 30 of 36 (Foundation Components)
+Plan: Ready to plan
+Status: Ready to plan
+Last activity: 2026-02-03 — Roadmap created for v4.0
 
-Progress: [░░░░░░░░░░░░░░░░░░░░░░░░░] 0% (v4.0 requirements phase)
+Progress: [░░░░░░░░░░░░░░░░░░░░░░░░░] 0% (0/21 plans)
 
 ## Performance Metrics
 
@@ -32,49 +32,39 @@ Progress: [░░░░░░░░░░░░░░░░░░░░░░░
 | v3.0 Design System | 8 | 52 | 3 days (2026-01-28 - 2026-01-30) |
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
 | v3.2 Weather & Dashboard | 5 | 13 | 2 days (2026-02-02 - 2026-02-03) |
+| v4.0 Advanced UI | 7 | 21 | In progress |
 
 ## Accumulated Context
 
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-Full decision log available in milestone archives.
 
-Key architectural patterns from all milestones:
-- Dual persistence strategy (IndexedDB + localStorage) for token survival
-- Firebase RTDB for real-time state, Firestore for historical queries
-- HMAC-secured cron webhooks for security without key rotation
-- Fire-and-forget logging pattern (don't block critical operations)
-- Global 30-minute notification throttle across system events
-- cn() pattern for Tailwind class composition
+Key patterns from previous milestones:
 - CVA for type-safe component variants (including compound variants)
 - Radix UI for accessible interactive components
 - Namespace component pattern (Card.Header, Button.Icon)
-- Open-Meteo API for weather (free, no API key)
+- cn() pattern for Tailwind class composition
 - Per-user Firebase preferences at users/${userId} path
-- Card component registry pattern for easy extension
-- Server-side preferences fetch for performance
 
 ### Pending Todos
 
 **Operational Setup (from previous milestones, pending deployment):**
-- Scheduler cron configuration (cron-job.org account, 15-30 min)
-- Health monitoring cron (1-min frequency): `/api/health-monitoring/check`
-- Coordination cron (1-min frequency): `/api/coordination/enforce`
-- Firestore indexes: `firebase deploy --only firestore:indexes`
+- Scheduler cron configuration (cron-job.org account)
+- Health monitoring cron (1-min frequency)
+- Coordination cron (1-min frequency)
+- Firestore indexes deployment
 
 ### Blockers/Concerns
 
-None — Milestone v3.2 complete and archived.
+None — Ready to begin v4.0.
 
 **Known Tech Debt:**
-- TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
-- Warning: DMS polling continues when page backgrounded (Phase 10, should use Page Visibility API)
-- Label component not exported from barrel (low impact, Phase 13)
+- Label component not exported from barrel (low impact)
 
 ## Session Continuity
 
 Last session: 2026-02-03
-Stopped at: Defining v4.0 requirements
+Stopped at: Roadmap created for v4.0 Advanced UI Components
 Resume file: None
-Next step: Complete requirements definition and roadmap creation
+Next step: `/gsd:plan-phase 30` to plan Foundation Components phase

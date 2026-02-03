@@ -137,74 +137,74 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TABS-01 | TBD | Pending |
-| TABS-02 | TBD | Pending |
-| TABS-03 | TBD | Pending |
-| TABS-04 | TBD | Pending |
-| TABS-05 | TBD | Pending |
-| ACCR-01 | TBD | Pending |
-| ACCR-02 | TBD | Pending |
-| ACCR-03 | TBD | Pending |
-| ACCR-04 | TBD | Pending |
-| ACCR-05 | TBD | Pending |
-| DTBL-01 | TBD | Pending |
-| DTBL-02 | TBD | Pending |
-| DTBL-03 | TBD | Pending |
-| DTBL-04 | TBD | Pending |
-| DTBL-05 | TBD | Pending |
-| DTBL-06 | TBD | Pending |
-| DTBL-07 | TBD | Pending |
-| DTBL-08 | TBD | Pending |
-| DTBL-09 | TBD | Pending |
-| CMDK-01 | TBD | Pending |
-| CMDK-02 | TBD | Pending |
-| CMDK-03 | TBD | Pending |
-| CMDK-04 | TBD | Pending |
-| CMDK-05 | TBD | Pending |
-| CMDK-06 | TBD | Pending |
-| CTXM-01 | TBD | Pending |
-| CTXM-02 | TBD | Pending |
-| CTXM-03 | TBD | Pending |
-| CTXM-04 | TBD | Pending |
-| CTXM-05 | TBD | Pending |
-| CTXM-06 | TBD | Pending |
-| POPV-01 | TBD | Pending |
-| POPV-02 | TBD | Pending |
-| POPV-03 | TBD | Pending |
-| POPV-04 | TBD | Pending |
-| POPV-05 | TBD | Pending |
-| SHEE-01 | TBD | Pending |
-| SHEE-02 | TBD | Pending |
-| SHEE-03 | TBD | Pending |
-| SHEE-04 | TBD | Pending |
-| SHEE-05 | TBD | Pending |
-| DLGC-01 | TBD | Pending |
-| DLGC-02 | TBD | Pending |
-| DLGC-03 | TBD | Pending |
-| DLGF-01 | TBD | Pending |
-| DLGF-02 | TBD | Pending |
-| DLGF-03 | TBD | Pending |
-| ANIM-01 | TBD | Pending |
-| ANIM-02 | TBD | Pending |
-| ANIM-03 | TBD | Pending |
-| ANIM-04 | TBD | Pending |
-| QACT-01 | TBD | Pending |
-| QACT-02 | TBD | Pending |
-| QACT-03 | TBD | Pending |
-| APPL-01 | TBD | Pending |
-| APPL-02 | TBD | Pending |
-| APPL-03 | TBD | Pending |
-| APPL-04 | TBD | Pending |
-| APPL-05 | TBD | Pending |
-| APPL-06 | TBD | Pending |
-| APPL-07 | TBD | Pending |
-| APPL-08 | TBD | Pending |
+| TABS-01 | Phase 30 | Pending |
+| TABS-02 | Phase 30 | Pending |
+| TABS-03 | Phase 30 | Pending |
+| TABS-04 | Phase 30 | Pending |
+| TABS-05 | Phase 30 | Pending |
+| ACCR-01 | Phase 31 | Pending |
+| ACCR-02 | Phase 31 | Pending |
+| ACCR-03 | Phase 31 | Pending |
+| ACCR-04 | Phase 31 | Pending |
+| ACCR-05 | Phase 31 | Pending |
+| DTBL-01 | Phase 34 | Pending |
+| DTBL-02 | Phase 34 | Pending |
+| DTBL-03 | Phase 34 | Pending |
+| DTBL-04 | Phase 34 | Pending |
+| DTBL-05 | Phase 34 | Pending |
+| DTBL-06 | Phase 34 | Pending |
+| DTBL-07 | Phase 34 | Pending |
+| DTBL-08 | Phase 34 | Pending |
+| DTBL-09 | Phase 34 | Pending |
+| CMDK-01 | Phase 32 | Pending |
+| CMDK-02 | Phase 32 | Pending |
+| CMDK-03 | Phase 32 | Pending |
+| CMDK-04 | Phase 32 | Pending |
+| CMDK-05 | Phase 32 | Pending |
+| CMDK-06 | Phase 32 | Pending |
+| CTXM-01 | Phase 32 | Pending |
+| CTXM-02 | Phase 32 | Pending |
+| CTXM-03 | Phase 32 | Pending |
+| CTXM-04 | Phase 32 | Pending |
+| CTXM-05 | Phase 32 | Pending |
+| CTXM-06 | Phase 32 | Pending |
+| POPV-01 | Phase 30 | Pending |
+| POPV-02 | Phase 30 | Pending |
+| POPV-03 | Phase 30 | Pending |
+| POPV-04 | Phase 30 | Pending |
+| POPV-05 | Phase 30 | Pending |
+| SHEE-01 | Phase 31 | Pending |
+| SHEE-02 | Phase 31 | Pending |
+| SHEE-03 | Phase 31 | Pending |
+| SHEE-04 | Phase 31 | Pending |
+| SHEE-05 | Phase 31 | Pending |
+| DLGC-01 | Phase 33 | Pending |
+| DLGC-02 | Phase 33 | Pending |
+| DLGC-03 | Phase 33 | Pending |
+| DLGF-01 | Phase 33 | Pending |
+| DLGF-02 | Phase 33 | Pending |
+| DLGF-03 | Phase 33 | Pending |
+| ANIM-01 | Phase 35 | Pending |
+| ANIM-02 | Phase 35 | Pending |
+| ANIM-03 | Phase 35 | Pending |
+| ANIM-04 | Phase 35 | Pending |
+| QACT-01 | Phase 36 | Pending |
+| QACT-02 | Phase 36 | Pending |
+| QACT-03 | Phase 36 | Pending |
+| APPL-01 | Phase 36 | Pending |
+| APPL-02 | Phase 36 | Pending |
+| APPL-03 | Phase 36 | Pending |
+| APPL-04 | Phase 36 | Pending |
+| APPL-05 | Phase 36 | Pending |
+| APPL-06 | Phase 36 | Pending |
+| APPL-07 | Phase 36 | Pending |
+| APPL-08 | Phase 36 | Pending |
 
 **Coverage:**
 - v4.0 requirements: 55 total
-- Mapped to phases: 0
-- Unmapped: 55
+- Mapped to phases: 55
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-03*
-*Last updated: 2026-02-03 after initial definition*
+*Last updated: 2026-02-03 after roadmap creation*

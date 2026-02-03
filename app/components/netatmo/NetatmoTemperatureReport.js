@@ -40,8 +40,10 @@ export default function NetatmoTemperatureReport() {
           topologyRoom?.modules?.includes(m.id)
         ) || [];
 
-        // Filter out relay modules (NAPlug)
-        const filteredModules = modules.filter(m => m.type !== 'NAPlug');
+        // Filter out relay modules (NAPlug) and cameras (NACamera, NOC)
+        const filteredModules = modules.filter(m =>
+          m.type !== 'NAPlug' && m.type !== 'NACamera' && m.type !== 'NOC'
+        );
 
         // Determine device type priority
         const hasThermostat = filteredModules.some(m => m.type === 'NATherm1' || m.type === 'OTH');
@@ -52,6 +54,9 @@ export default function NetatmoTemperatureReport() {
           modules: filteredModules,
           deviceType: hasThermostat ? 'thermostat' : hasValve ? 'valve' : 'unknown',
         };
+      }).filter(room => {
+        // Only include rooms with thermostat or valve devices
+        return room.deviceType === 'thermostat' || room.deviceType === 'valve';
       });
 
       setConnected(true);

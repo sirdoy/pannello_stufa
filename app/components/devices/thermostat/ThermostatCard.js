@@ -89,10 +89,10 @@ export default function ThermostatCard() {
   const roomsWithStatus = rooms.map(room => {
     const roomStatus = status?.rooms?.find(r => r.room_id === room.id);
 
-    // Find modules for this room to check if offline
+    // Find modules for this room to check if offline (exclude relays and cameras)
     const roomModules = room.modules?.map(moduleId =>
       modulesWithStatus.find(m => m.id === moduleId)
-    ).filter(Boolean).filter(m => m.type !== 'NAPlug') || [];
+    ).filter(Boolean).filter(m => m.type !== 'NAPlug' && m.type !== 'NACamera' && m.type !== 'NOC') || [];
 
     // Check if room is offline (all modules unreachable)
     const isOffline = roomModules.length > 0 && roomModules.every(m => m.reachable === false);
@@ -102,6 +102,11 @@ export default function ThermostatCard() {
       m.battery_state === 'low' || m.battery_state === 'very_low'
     );
     const hasCriticalBattery = roomModules.some(m => m.battery_state === 'very_low');
+
+    // Determine device type
+    const hasThermostat = roomModules.some(m => m.type === 'NATherm1' || m.type === 'OTH');
+    const hasValve = roomModules.some(m => m.type === 'NRV');
+    const deviceType = hasThermostat ? 'thermostat' : hasValve ? 'valve' : 'unknown';
 
     return {
       ...room,
@@ -115,8 +120,13 @@ export default function ThermostatCard() {
       hasLowBattery,
       hasCriticalBattery,
       roomModules,
+      deviceType,
     };
-  }); // Removed filter - show ALL rooms including offline
+  }).filter(room => {
+    // Only show rooms that have at least one thermostat or valve device
+    // Exclude rooms with only cameras or no thermostat/valve modules
+    return room.deviceType === 'thermostat' || room.deviceType === 'valve';
+  });
 
   // Get battery/module info
   const modules = status?.modules || [];
@@ -414,8 +424,8 @@ export default function ThermostatCard() {
 
   const infoBoxes = topology ? [
     { icon: '🏠', label: 'Casa', value: topology.home_name || '-' },
-    { icon: '🚪', label: 'Stanze', value: rooms.length },
-    { icon: '📡', label: 'Dispositivi', value: topology.modules?.length || 0 },
+    { icon: '🚪', label: 'Stanze', value: roomsWithStatus.length },
+    { icon: '📡', label: 'Dispositivi', value: modulesWithStatus.filter(m => m.type !== 'NAPlug' && m.type !== 'NACamera' && m.type !== 'NOC').length },
     ...(hasLowBattery ? [{ icon: hasCriticalBattery ? '🪫' : '🔋', label: 'Batteria', value: `${lowBatteryModules.length} bassa` }] : []),
   ] : [];
 

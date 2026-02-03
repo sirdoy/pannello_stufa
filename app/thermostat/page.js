@@ -266,10 +266,10 @@ function NetatmoContent() {
   const roomsWithStatus = rooms.map(room => {
     const roomStatus = status?.rooms?.find(r => r.room_id === room.id);
 
-    // Find modules for this room (exclude relays - NAPlug), with battery info
+    // Find modules for this room (exclude relays - NAPlug and cameras - NACamera, NOC), with battery info
     const roomModules = room.modules?.map(moduleId => {
       return modulesWithBattery.find(m => m.id === moduleId);
-    }).filter(Boolean).filter(m => m.type !== 'NAPlug') || [];
+    }).filter(Boolean).filter(m => m.type !== 'NAPlug' && m.type !== 'NACamera' && m.type !== 'NOC') || [];
 
     // Determine device type
     const hasThermostat = roomModules.some(m => m.type === 'NATherm1' || m.type === 'OTH');
@@ -298,7 +298,16 @@ function NetatmoContent() {
       hasCriticalBattery,
       isOffline,
     };
+  }).filter(room => {
+    // Only show rooms that have at least one thermostat or valve device
+    // Exclude rooms with only cameras or no thermostat/valve modules
+    return room.deviceType === 'thermostat' || room.deviceType === 'valve';
   });
+
+  // Count only thermostat/valve modules (exclude cameras and relays)
+  const filteredModulesCount = modulesWithBattery.filter(m =>
+    m.type !== 'NAPlug' && m.type !== 'NACamera' && m.type !== 'NOC'
+  ).length;
 
   // Sort rooms: thermostats first, then valves, then by temperature availability
   const sortedRooms = roomsWithStatus.sort((a, b) => {
@@ -452,13 +461,13 @@ function NetatmoContent() {
           <InfoBox
             icon="🚪"
             label="Stanze"
-            value={rooms.length}
+            value={roomsWithStatus.length}
             variant="neutral"
           />
           <InfoBox
             icon="📡"
             label="Moduli"
-            value={modulesWithBattery?.length || 0}
+            value={filteredModulesCount}
             variant="neutral"
           />
         </Grid>

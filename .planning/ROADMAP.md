@@ -81,13 +81,11 @@ Plans:
   2. User can reorder cards using up/down buttons
   3. User can toggle card visibility (show/hide each card)
   4. User's card order and visibility preferences persist across sessions
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 28-01: Dashboard layout settings page
-- [ ] 28-02: Card reorder functionality
-- [ ] 28-03: Card visibility toggles
-- [ ] 28-04: Firebase persistence
+- [ ] 28-01-PLAN.md — Per-user infrastructure: refactor API + service for user-specific storage, add menu item
+- [ ] 28-02-PLAN.md — Dashboard settings page with reorder and visibility controls
 
 ### Phase 29: Home Page Integration
 **Goal**: Home page renders cards according to user's saved preferences
@@ -114,7 +112,7 @@ Phases execute in numeric order: 25 -> 26 -> 27 -> 28 -> 29
 | 25. Weather Foundation | 3/3 | ✓ Complete | 2026-02-02 |
 | 26. Weather Component | 4/4 | ✓ Complete | 2026-02-02 |
 | 27. Location Settings | 3/3 | ✓ Complete | 2026-02-03 |
-| 28. Dashboard Customization | 0/4 | Ready to plan | - |
+| 28. Dashboard Customization | 0/2 | Ready to execute | - |
 | 29. Home Page Integration | 0/2 | Not started | - |
 
 ## Requirement Coverage

@@ -17,17 +17,17 @@ Requirements for Dashboard Customization & Weather milestone.
 - [ ] **WEATHER-06**: User sees loading skeleton while weather data is fetching
 - [ ] **WEATHER-07**: User sees error state with retry option when weather fetch fails
 - [ ] **WEATHER-08**: User can see "Updated X minutes ago" timestamp
-- [ ] **WEATHER-09**: User can see temperature trend indicator (rising/falling arrow)
+- [x] **WEATHER-09**: User can see temperature trend indicator (rising/falling arrow)
 - [ ] **WEATHER-10**: User can compare outdoor temperature with indoor thermostat temperature
 
 ### Location Settings
 
-- [ ] **LOC-01**: User can manually enter city name in settings
-- [ ] **LOC-02**: User sees autocomplete suggestions when typing city name
-- [ ] **LOC-03**: User can click "Use my location" to auto-detect position
-- [ ] **LOC-04**: User sees appropriate error message when geolocation fails (especially iOS PWA)
-- [ ] **LOC-05**: User's location preference persists across sessions (Firebase)
-- [ ] **LOC-06**: User can see current location name displayed in weather card
+- [x] **LOC-01**: User can manually enter city name in settings
+- [x] **LOC-02**: User sees autocomplete suggestions when typing city name
+- [x] **LOC-03**: User can click "Use my location" to auto-detect position
+- [x] **LOC-04**: User sees appropriate error message when geolocation fails (especially iOS PWA)
+- [x] **LOC-05**: User's location preference persists across sessions (Firebase)
+- [x] **LOC-06**: User can see current location name displayed in weather card
 
 ### Dashboard Customization
 
@@ -42,7 +42,7 @@ Requirements for Dashboard Customization & Weather milestone.
 
 - [x] **INFRA-01**: Weather API route fetches from Open-Meteo with 15-min cache
 - [ ] **INFRA-02**: Dashboard preferences stored in Firebase RTDB (not localStorage)
-- [ ] **INFRA-03**: Location settings stored in Firebase RTDB
+- [x] **INFRA-03**: Location settings stored in Firebase RTDB
 - [x] **INFRA-04**: Geolocation has 10-second timeout with iOS PWA fallback
 
 ## Future Requirements
@@ -90,14 +90,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WEATHER-06 | Phase 26 | Pending |
 | WEATHER-07 | Phase 26 | Pending |
 | WEATHER-08 | Phase 26 | Pending |
-| WEATHER-09 | Phase 26 | Pending |
+| WEATHER-09 | Phase 27 | Complete |
 | WEATHER-10 | Phase 26 | Pending |
-| LOC-01 | Phase 27 | Pending |
-| LOC-02 | Phase 27 | Pending |
-| LOC-03 | Phase 27 | Pending |
-| LOC-04 | Phase 27 | Pending |
-| LOC-05 | Phase 27 | Pending |
-| LOC-06 | Phase 27 | Pending |
+| LOC-01 | Phase 27 | Complete |
+| LOC-02 | Phase 27 | Complete |
+| LOC-03 | Phase 27 | Complete |
+| LOC-04 | Phase 27 | Complete |
+| LOC-05 | Phase 27 | Complete |
+| LOC-06 | Phase 27 | Complete |
 | DASH-01 | Phase 28 | Pending |
 | DASH-02 | Phase 28 | Pending |
 | DASH-03 | Phase 28 | Pending |
@@ -106,7 +106,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DASH-06 | Phase 29 | Pending |
 | INFRA-01 | Phase 25 | Complete |
 | INFRA-02 | Phase 28 | Pending |
-| INFRA-03 | Phase 27 | Pending |
+| INFRA-03 | Phase 27 | Complete |
 | INFRA-04 | Phase 25 | Complete |
 
 **Coverage:**
@@ -116,4 +116,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after roadmap creation*
+*Last updated: 2026-02-03 after Phase 27 completion*

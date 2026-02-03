@@ -118,4 +118,4 @@ None — Phase 27 complete. Ready for Phase 28.
 Last session: 2026-02-03T10:39:00Z
 Stopped at: Completed 27-03-PLAN.md (Location Display & Temperature Trend)
 Resume file: None
-Next step: Execute Phase 28 (Dashboard Customization) or Phase 29 (Weather Integration)
+Next step: Plan Phase 28 (Dashboard Customization) - requires /gsd:plan-phase 28

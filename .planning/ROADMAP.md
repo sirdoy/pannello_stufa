@@ -11,7 +11,7 @@ v3.2 adds weather display and dashboard customization to the Pannello Stufa PWA.
 ## Phases
 
 - [x] **Phase 25: Weather Foundation** - API route, geolocation utility, preferences service ✓
-- [ ] **Phase 26: Weather Component** - WeatherCard UI with current conditions and forecast
+- [x] **Phase 26: Weather Component** - WeatherCard UI with current conditions and forecast ✓
 - [ ] **Phase 27: Location Settings** - Settings page for home location configuration
 - [ ] **Phase 28: Dashboard Customization** - Settings page for card order and visibility
 - [ ] **Phase 29: Home Page Integration** - Render cards in saved order with WeatherCard
@@ -48,10 +48,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 26-01-PLAN.md — WeatherIcon component and weather helpers (WMO code mapping, temperature formatting)
-- [ ] 26-02-PLAN.md — WeatherCard core with CurrentConditions and Skeleton.WeatherCard
-- [ ] 26-03-PLAN.md — ForecastRow, ForecastDayCard, and ForecastDaySheet with bottom sheet details
-- [ ] 26-04-PLAN.md — Barrel export, integration, and visual verification
+- [x] 26-01-PLAN.md — WeatherIcon component and weather helpers (WMO code mapping, temperature formatting)
+- [x] 26-02-PLAN.md — WeatherCard core with CurrentConditions and Skeleton.WeatherCard
+- [x] 26-03-PLAN.md — ForecastRow, ForecastDayCard, and ForecastDaySheet with bottom sheet details
+- [x] 26-04-PLAN.md — Barrel export, integration, and visual verification
 
 ### Phase 27: Location Settings
 **Goal**: Users can configure their home location for weather display
@@ -65,13 +65,12 @@ Plans:
   5. User's location preference persists across browser sessions
   6. WeatherCard displays the configured location name
   7. User sees temperature trend indicator (rising/falling arrow) when hourly data is available
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 27-01: Location settings page
-- [ ] 27-02: City autocomplete with Open-Meteo Geocoding
-- [ ] 27-03: Geolocation button with error handling
-- [ ] 27-04: Firebase persistence and WeatherCard integration
+- [ ] 27-01-PLAN.md — Geocoding API routes and useDebounce hook
+- [ ] 27-02-PLAN.md — Location settings page with city search and geolocation
+- [ ] 27-03-PLAN.md — WeatherCard location display and temperature trend indicator
 
 ### Phase 28: Dashboard Customization
 **Goal**: Users can personalize their home page card layout
@@ -113,8 +112,8 @@ Phases execute in numeric order: 25 -> 26 -> 27 -> 28 -> 29
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 25. Weather Foundation | 3/3 | ✓ Complete | 2026-02-02 |
-| 26. Weather Component | 0/4 | Ready to execute | - |
-| 27. Location Settings | 0/4 | Not started | - |
+| 26. Weather Component | 4/4 | ✓ Complete | 2026-02-02 |
+| 27. Location Settings | 0/3 | Ready to execute | - |
 | 28. Dashboard Customization | 0/4 | Not started | - |
 | 29. Home Page Integration | 0/2 | Not started | - |
 

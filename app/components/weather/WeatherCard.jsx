@@ -70,7 +70,7 @@ export function WeatherCard({
               variant="outline"
               size="sm"
               onClick={onRetry}
-              leftIcon={<RefreshCw className="w-4 h-4" />}
+              icon={<RefreshCw className="w-4 h-4" />}
             >
               Riprova
             </Button>
@@ -113,7 +113,7 @@ export function WeatherCard({
     >
       <SmartHomeCard.Status>
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="ocean" size="sm">
+          <Badge variant="ocean" size="sm" suppressHydrationWarning>
             Aggiornato {formatDistanceToNow(new Date(cachedAt), { addSuffix: true, locale: it })}
           </Badge>
           {stale && (

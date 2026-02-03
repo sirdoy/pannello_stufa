@@ -70,6 +70,10 @@ export const GET = withAuthAndErrorHandler(async (request) => {
       weatherCode: data.daily.weather_code[i],
     }));
 
+    // Extract hourly temperatures for trend calculation
+    const hourlyTemps = data.hourly?.temperature_2m || [];
+    const hourlyTimes = data.hourly?.time || [];
+
     // Return enriched response
     return success({
       current: {
@@ -81,6 +85,10 @@ export const GET = withAuthAndErrorHandler(async (request) => {
         units: data.current_units,
       },
       forecast: dailyForecast,
+      hourly: {
+        times: hourlyTimes,
+        temperatures: hourlyTemps,
+      },
       cachedAt,
       stale,
     });

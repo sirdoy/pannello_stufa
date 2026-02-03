@@ -159,3 +159,40 @@ export function getAirQualityLabel(aqi) {
     return 'Pessima';
   }
 }
+
+/**
+ * Calculate temperature trend from hourly data
+ * Compares recent hours to determine if temp is rising, falling, or stable
+ *
+ * @param {number[]} temperatures - Array of hourly temperatures (oldest to newest)
+ * @returns {'rising' | 'falling' | 'stable' | null} Trend direction or null if insufficient data
+ *
+ * @example
+ * getTemperatureTrend([15, 16, 17, 18, 19, 20, 21]) // 'rising'
+ * getTemperatureTrend([21, 20, 19, 18, 17, 16, 15]) // 'falling'
+ * getTemperatureTrend([18, 18, 18, 18, 18, 18, 18]) // 'stable'
+ */
+export function getTemperatureTrend(temperatures) {
+  // Need at least 3 data points for meaningful trend
+  if (!temperatures || temperatures.length < 3) {
+    return null;
+  }
+
+  // Compare average of last 3 hours to average of first 3 hours
+  const recentHours = temperatures.slice(-3);
+  const earlierHours = temperatures.slice(0, 3);
+
+  const recentAvg = recentHours.reduce((a, b) => a + b, 0) / recentHours.length;
+  const earlierAvg = earlierHours.reduce((a, b) => a + b, 0) / earlierHours.length;
+
+  const diff = recentAvg - earlierAvg;
+
+  // Threshold: 1°C change considered meaningful
+  if (diff > 1) {
+    return 'rising';
+  } else if (diff < -1) {
+    return 'falling';
+  } else {
+    return 'stable';
+  }
+}

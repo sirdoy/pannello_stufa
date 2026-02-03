@@ -21,4 +21,5 @@ export {
   getUVIndexLabel,
   getPrecipitationLabel,
   getAirQualityLabel,
+  getTemperatureTrend,
 } from './weatherHelpers';

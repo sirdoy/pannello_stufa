@@ -8,21 +8,12 @@ PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (co
 
 I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-## Current Milestone: v3.2 Dashboard Customization & Weather
-
-**Goal:** Permettere all'utente di personalizzare l'ordine dei componenti in home e aggiungere informazioni meteo con posizione configurabile.
-
-**Target features:**
-- Dashboard layout customization via menu ordine nelle impostazioni
-- Componente meteo con condizioni attuali e previsioni 3-5 giorni
-- Impostazioni posizione con geolocalizzazione + override manuale
-
 ## Current State
 
-**Version:** v3.1 (shipped 2026-02-02)
-**Status:** Production-ready with 100% design system compliance
+**Version:** v3.2 (shipped 2026-02-03)
+**Status:** Production-ready with weather display and dashboard customization
 
-**Shipped Capabilities (v1.0 + v2.0 + v3.0 + v3.1):**
+**Shipped Capabilities (v1.0 + v2.0 + v3.0 + v3.1 + v3.2):**
 - ✅ Push notification system with token persistence and multi-device support
 - ✅ Admin dashboard with delivery metrics and 7-day trends
 - ✅ User preferences with type toggles, DND hours, rate limiting
@@ -42,6 +33,11 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✅ **100% design system compliance** (all device cards use Button, Slider, Badge components)
 - ✅ **Zero raw HTML elements** in device components (no raw `<button>` or `<input>`)
 - ✅ **CVA variants everywhere** (colorScheme prop, InfoBox variant, adaptive styling)
+- ✅ **Weather display** with Open-Meteo API (15-min cache, Italian translations, 5-day forecast)
+- ✅ **WeatherCard UI** (current conditions, forecast scroll, indoor/outdoor comparison, trend indicators)
+- ✅ **Location settings** (city autocomplete, geolocation with iOS PWA handling, Firebase persistence)
+- ✅ **Dashboard customization** (card reorder/hide, per-user Firebase preferences)
+- ✅ **Dynamic home page** (renders cards in user's saved order with registry pattern)
 
 **Operational Setup Required:**
 - Cron webhook configuration for health monitoring (1-min frequency)
@@ -152,14 +148,12 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ **INFRA-05**: Validate environment variables on startup — v2.0 (Phase 7)
 - ✓ **INFRA-06**: Alert deduplication (30-minute throttle) — v2.0 (Phase 8)
 
-### Active
-
-**v3.2 Dashboard Customization & Weather (In Progress):**
-- Dashboard layout personalizzabile via menu impostazioni
-- Componente meteo con temperatura, umidità, vento, condizioni
-- Previsioni meteo 3-5 giorni
-- Impostazioni posizione con geolocalizzazione automatica
-- Override manuale posizione (città/indirizzo)
+**v3.0 Design System Evolution (Shipped 2026-01-30):**
+- ✓ Complete UI component library (25+ components with CVA variants) — v3.0
+- ✓ Radix UI accessibility primitives for all interactive components — v3.0
+- ✓ WCAG AA compliance verified (172 axe tests, 436 keyboard tests) — v3.0
+- ✓ All application pages migrated to design system — v3.0
+- ✓ Interactive documentation at /debug/design-system — v3.0
 
 **v3.1 Design System Compliance (Shipped 2026-02-02):**
 - ✓ All raw `<button>` elements replaced with Button component — v3.1
@@ -168,12 +162,47 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ Inline conditional styling replaced with CVA variants — v3.1
 - ✓ Visual consistency verified across all pages — v3.1
 
-**v3.0 Design System Evolution (Shipped 2026-01-30):**
-- ✓ Complete UI component library (25+ components)
-- ✓ CVA type-safe variants across all components
-- ✓ Radix UI primitives for accessibility
-- ✓ WCAG AA compliance verified
-- ✓ All pages migrated to design system
+**v3.2 Dashboard Customization & Weather (Shipped 2026-02-03):**
+
+**Weather Display:**
+- ✓ **WEATHER-01**: Current temperature and "feels like" — v3.2 (Phase 26)
+- ✓ **WEATHER-02**: Weather condition icon (sunny, cloudy, rain, snow) — v3.2 (Phase 26)
+- ✓ **WEATHER-03**: Current humidity percentage — v3.2 (Phase 26)
+- ✓ **WEATHER-04**: Current wind speed — v3.2 (Phase 26)
+- ✓ **WEATHER-05**: 5-day forecast with high/low temperatures — v3.2 (Phase 26)
+- ✓ **WEATHER-06**: Loading skeleton while weather fetches — v3.2 (Phase 26)
+- ✓ **WEATHER-07**: Error state with retry option — v3.2 (Phase 26)
+- ✓ **WEATHER-08**: "Updated X minutes ago" timestamp — v3.2 (Phase 26)
+- ✓ **WEATHER-09**: Temperature trend indicator (rising/falling) — v3.2 (Phase 27)
+- ✓ **WEATHER-10**: Indoor/outdoor temperature comparison — v3.2 (Phase 26)
+
+**Location Settings:**
+- ✓ **LOC-01**: Manual city entry in settings — v3.2 (Phase 27)
+- ✓ **LOC-02**: Autocomplete suggestions when typing — v3.2 (Phase 27)
+- ✓ **LOC-03**: "Use my location" geolocation — v3.2 (Phase 27)
+- ✓ **LOC-04**: Geolocation error handling (iOS PWA) — v3.2 (Phase 27)
+- ✓ **LOC-05**: Location persistence in Firebase — v3.2 (Phase 27)
+- ✓ **LOC-06**: Location name in WeatherCard — v3.2 (Phase 27)
+
+**Dashboard Customization:**
+- ✓ **DASH-01**: Dashboard layout settings page — v3.2 (Phase 28)
+- ✓ **DASH-02**: Reorder cards using up/down buttons — v3.2 (Phase 28)
+- ✓ **DASH-03**: Toggle card visibility (show/hide) — v3.2 (Phase 28)
+- ✓ **DASH-04**: Card order persists in Firebase — v3.2 (Phase 28)
+- ✓ **DASH-05**: Home page renders cards in saved order — v3.2 (Phase 29)
+- ✓ **DASH-06**: Weather card reorderable like other cards — v3.2 (Phase 29)
+
+**Infrastructure:**
+- ✓ **INFRA-01**: Weather API with Open-Meteo, 15-min cache — v3.2 (Phase 25)
+- ✓ **INFRA-02**: Dashboard preferences in Firebase RTDB — v3.2 (Phase 28)
+- ✓ **INFRA-03**: Location settings in Firebase RTDB — v3.2 (Phase 27)
+- ✓ **INFRA-04**: Geolocation 10-second timeout — v3.2 (Phase 25)
+
+### Active
+
+(No active requirements - next milestone not started)
+
+Run `/gsd:new-milestone` to define requirements for next milestone.
 
 ### Out of Scope
 
@@ -199,6 +228,15 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Multi-device smart home control (stufa, termostato, luci)
 - CVA + Radix UI design system (25+ components)
 - ~104,000 lines JavaScript
+
+**v3.2 Milestone (2026-02-02 → 2026-02-03):**
+- 5 phases executed (13 plans total)
+- 26/26 requirements satisfied (100%)
+- Weather API with Open-Meteo (15-min cache, stale-while-revalidate)
+- WeatherCard with forecast, trends, indoor/outdoor comparison
+- Location settings with geocoding and geolocation
+- Dashboard customization with per-user preferences
+- Home page dynamic card rendering with registry pattern
 
 **v3.1 Milestone (2026-01-30 → 2026-02-02):**
 - 6 phases executed (13 plans total)
@@ -253,6 +291,12 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 | HMAC-secured cron webhook | Security without API key rotation | ✓ Good — Timing-safe comparison prevents attacks (v1.0) |
 | Breaking changes OK | Permette refactoring completo senza vincoli legacy | ✓ Good — Enabled dual persistence implementation (v1.0) |
 | Firebase FCM retained | Già integrato, multi-platform support, affidabile | ✓ Good — Leveraged existing infrastructure (v1.0) |
+| Open-Meteo API | Free, no API key, reliable, comprehensive data | ✓ Good — Weather infrastructure operational (v3.2) |
+| In-memory weather cache | Simple for single-instance, 15-min TTL sufficient | ✓ Good — Fast responses, no Redis needed (v3.2) |
+| Per-user dashboard prefs | Proper isolation, Firebase RTDB consistency | ✓ Good — Users have independent preferences (v3.2) |
+| Menu-based card reorder | Simpler, more accessible than drag-drop | ✓ Good — Works on all devices (v3.2) |
+| Server-side prefs fetch | Faster than API route for Server Components | ✓ Good — Reduced latency on home page (v3.2) |
+| Card component registry | Easy extension, clean code, reduced lines | ✓ Good — Adding cards is trivial (v3.2) |
 
 ## Constraints
 
@@ -263,4 +307,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Deployment**: Vercel (current hosting platform)
 
 ---
-*Last updated: 2026-02-02 after v3.2 milestone started (Dashboard Customization & Weather)*
+*Last updated: 2026-02-03 after v3.2 milestone shipped (Dashboard Customization & Weather)*

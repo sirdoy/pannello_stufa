@@ -4,6 +4,42 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 
 ---
 
+## v3.2 Dashboard Customization & Weather (Shipped: 2026-02-03)
+
+**Delivered:** Weather display with Open-Meteo API and dashboard customization allowing users to personalize their home page card order and visibility.
+
+**Phases completed:** 25-29 (13 plans total)
+
+**Key accomplishments:**
+
+- Weather API infrastructure with Open-Meteo wrapper, 15-minute cache with stale-while-revalidate, and Italian WMO code translations (26 weather descriptions)
+- Complete WeatherCard UI with current conditions, 5-day horizontal scroll forecast, indoor/outdoor temperature comparison, skeleton loading, and error states
+- Location settings with city autocomplete search via geocoding, browser geolocation with 10s timeout and iOS PWA error handling, Firebase persistence
+- Temperature trend indicators showing rising/falling arrows based on 6-hour historical analysis with 1°C threshold
+- Dashboard customization settings page with up/down card reordering and visibility toggles, per-user Firebase persistence
+- Home page dynamic rendering from user preferences with registry pattern for easy card extension, server-side fetch for performance
+
+**Stats:**
+
+- 13 plans executed across 5 phases
+- 26/26 v3.2 requirements satisfied (100%)
+- 76 files changed (+13,760 insertions, -173 deletions)
+- 73 git commits with atomic, well-documented changes
+- 2 days from phase 25 start to completion (2026-02-02 → 2026-02-03)
+
+**Git range:** `docs(25)` → `docs(29)`
+
+**Archives:**
+- [Roadmap](milestones/v3.2-ROADMAP.md)
+- [Requirements](milestones/v3.2-REQUIREMENTS.md)
+- [Audit](milestones/v3.2-MILESTONE-AUDIT.md)
+
+**Tech debt:** None accumulated during v3.2.
+
+**What's next:** Weather and dashboard customization complete. Consider v3.3 for weather enhancements (hourly forecast, alerts) or v4.0 for new feature work (weather-based automation, drag-drop reordering).
+
+---
+
 ## v3.1 Design System Compliance (Shipped: 2026-02-02)
 
 **Delivered:** 100% design system compliance across all device cards and pages — every raw HTML element replaced with design system components, all styling using CVA variants.

@@ -2,26 +2,26 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-02)
+See: .planning/PROJECT.md (updated 2026-02-03)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v3.2 Dashboard Customization & Weather - Phase 29 Home Page Integration
+**Current focus:** Milestone v3.2 complete — ready for next milestone
 
 ## Current Position
 
-Phase: 29 of 29 (Home Page Integration)
-Plan: 1/1 plans complete
-Status: Milestone complete
-Last activity: 2026-02-03 — Completed 29-01-PLAN.md (Home Page Integration)
+Phase: 29 of 29 (complete)
+Plan: N/A
+Status: Milestone v3.2 shipped
+Last activity: 2026-02-03 — v3.2 Dashboard Customization & Weather archived
 
-Progress: [█████████████████████████] 100% (v3.2 milestone - 13/13 plans)
+Progress: [█████████████████████████] 100% (v3.2 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 128 (v1.0: 29 plans, v2.0: 21 plans, v3.0: 52 plans, v3.1: 13 plans, v3.2: 13 plans)
+- Total plans completed: 128 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13)
 - Average duration: ~3.9 min per plan
-- Total execution time: ~8.13 hours across 5 milestones
+- Total execution time: ~8.3 hours across 5 milestones
 
 **By Milestone:**
 
@@ -33,23 +33,6 @@ Progress: [███████████████████████
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
 | v3.2 Weather & Dashboard | 5 | 13 | 2 days (2026-02-02 - 2026-02-03) |
 
-**Recent Trend:**
-- All 5 milestones complete: 128 plans total
-- v3.2 complete: 13 plans across 5 phases
-- Weather foundation: API infrastructure + geolocation/location + dashboard preferences (6min total)
-- Weather component plan 01: WeatherIcon + utilities (2min)
-- Weather component plan 02: WeatherCard + CurrentConditions + Skeleton (2min)
-- Weather component plan 03: ForecastRow + ForecastDayCard + ForecastDaySheet (3min)
-- Weather component plan 04: Integration + barrel export (7min)
-- Location settings plan 01: Geocoding infrastructure (3min)
-- Location settings plan 02: Location Settings UI (parallel)
-- Location settings plan 03: Location Display & Trend (3min)
-- Dashboard customization plan 01: Per-user preferences infrastructure (3min)
-- Dashboard customization plan 02: Settings page UI (4min)
-- Home page integration plan 01: WeatherCardWrapper + card registry (2min)
-
-*Updated after 29-01 completion*
-
 ## Accumulated Context
 
 ### Decisions
@@ -57,53 +40,20 @@ Progress: [███████████████████████
 Decisions are logged in PROJECT.md Key Decisions table.
 Full decision log available in milestone archives.
 
-Key architectural patterns from previous milestones:
+Key architectural patterns from all milestones:
 - Dual persistence strategy (IndexedDB + localStorage) for token survival
 - Firebase RTDB for real-time state, Firestore for historical queries
 - HMAC-secured cron webhooks for security without key rotation
 - Fire-and-forget logging pattern (don't block critical operations)
 - Global 30-minute notification throttle across system events
 - cn() pattern for Tailwind class composition
-- CVA for type-safe component variants (including compound variants for colorScheme)
+- CVA for type-safe component variants (including compound variants)
 - Radix UI for accessible interactive components
 - Namespace component pattern (Card.Header, Button.Icon)
-
-**v3.2 Decisions (from research + execution):**
-- Open-Meteo API for weather (free, no API key required)
-- In-memory cache with 15-minute TTL (no Redis needed for single-instance)
-- Stale-while-revalidate pattern: return stale data immediately, refresh in background
-- 4-decimal coordinate precision for cache keys (~11m accuracy)
-- Italian weather descriptions via WMO_CODES mapping (0-99)
-- Firebase RTDB for dashboard preferences (not localStorage - iOS eviction)
-- Menu-based reordering (up/down buttons, not drag-drop)
-- Browser Geolocation API with 10s timeout for iOS PWA
-- Single shared location for entire app (stored at /config/location, not per-user)
-- Geolocation error codes distinguish permission denied vs timeout vs unavailable
-- Location API returns 404 LOCATION_NOT_SET when not configured
-- Dashboard preferences service pattern: get/set/subscribe for real-time updates
-- DEFAULT_CARD_ORDER includes 5 cards (stove, thermostat, weather, lights, camera)
-- Lucide icons with filled style (fill=currentColor, strokeWidth=0) for weather
-- Day/night icon variants: Sun/Moon for clear, CloudSun/CloudMoon for partly cloudy
-- Temperature formatting returns string with one decimal for consistent display
-- Horizontal snap scroll pattern: snap-x snap-mandatory + flex-shrink-0 + snap-start
-- First forecast day always marked as "Oggi" (index === 0)
-- Precipitation badge threshold: > 10% to avoid visual noise
-- Missing extended stats show "N/D" (non disponibile)
-- Barrel export pattern for weather components (import from @/app/components/weather)
-- Today min/max displayed next to current temperature with ember/ocean colors
-- Air quality uses European AQI scale (0-100+) with Italian labels
-- Graceful degradation for geocoding: return empty results on API failure
-- fetchWithRetry pattern for external API resilience (3 attempts, exponential backoff)
-- useDebounce hook with 300ms default for search input
-- 6-hour past + 1-hour forecast for temperature trend analysis
-- 1 degree celsius threshold for meaningful trend change
-- 3-hour window comparison algorithm for trend smoothing
-- Per-user dashboard preferences via users/${userId}/dashboardPreferences path
-- User paths do not need getEnvironmentPath (already isolated by userId)
-- Icon field in DEFAULT_CARD_ORDER for settings UI display
-- Card component registry pattern: CARD_COMPONENTS maps card IDs to React components
-- Server-side preferences fetch via adminDbGet (faster than API route for Server Components)
-- Client wrapper pattern for cards needing real-time data (WeatherCardWrapper)
+- Open-Meteo API for weather (free, no API key)
+- Per-user Firebase preferences at users/${userId} path
+- Card component registry pattern for easy extension
+- Server-side preferences fetch for performance
 
 ### Pending Todos
 
@@ -115,7 +65,7 @@ Key architectural patterns from previous milestones:
 
 ### Blockers/Concerns
 
-None — Milestone v3.2 complete. Ready for audit.
+None — Milestone v3.2 complete and archived.
 
 **Known Tech Debt:**
 - TODO: Track STARTING state entry time for grace period (Phase 7, low priority)
@@ -124,7 +74,7 @@ None — Milestone v3.2 complete. Ready for audit.
 
 ## Session Continuity
 
-Last session: 2026-02-03T13:00:00Z
-Stopped at: Completed 29-01-PLAN.md (Home Page Integration)
+Last session: 2026-02-03
+Stopped at: v3.2 milestone archived
 Resume file: None
-Next step: Audit milestone v3.2
+Next step: Run `/gsd:new-milestone` to start next milestone

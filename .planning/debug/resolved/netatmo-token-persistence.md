@@ -1,8 +1,8 @@
 ---
-status: resolved
+status: verifying
 trigger: "netatmo-token-persistence"
 created: 2026-01-31T10:00:00Z
-updated: 2026-01-31T10:30:00Z
+updated: 2026-01-31T10:25:00Z
 ---
 
 ## Current Focus

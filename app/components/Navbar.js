@@ -643,9 +643,7 @@ export default function Navbar() {
             <div className={`grid ${gridCols} gap-2 p-2`}>
               {quickActions.map((action) => {
                 const IconComponent = action.icon;
-                const isActiveRoute = action.href === '/'
-                  ? isActive('/')
-                  : pathname.includes(action.href.split('/').filter(Boolean)[0]);
+                const isActiveRoute = isActive(action.href);
 
                 return (
                   <TransitionLink

@@ -17,11 +17,11 @@ Requirements for Advanced UI Components milestone. Each maps to roadmap phases.
 
 ### Accordion
 
-- [ ] **ACCR-01**: User can expand/collapse sections by clicking header
-- [ ] **ACCR-02**: User can toggle sections with Enter/Space keys
-- [ ] **ACCR-03**: Expanded state communicated via aria-expanded
-- [ ] **ACCR-04**: Accordion supports single-open and multiple-open modes
-- [ ] **ACCR-05**: Collapse/expand has smooth height animation
+- [x] **ACCR-01**: User can expand/collapse sections by clicking header
+- [x] **ACCR-02**: User can toggle sections with Enter/Space keys
+- [x] **ACCR-03**: Expanded state communicated via aria-expanded
+- [x] **ACCR-04**: Accordion supports single-open and multiple-open modes
+- [x] **ACCR-05**: Collapse/expand has smooth height animation
 
 ### Data Table
 
@@ -63,11 +63,11 @@ Requirements for Advanced UI Components milestone. Each maps to roadmap phases.
 
 ### Sheet/Drawer
 
-- [ ] **SHEE-01**: Sheet slides in from edge (bottom/right)
-- [ ] **SHEE-02**: Backdrop appears and click closes sheet
-- [ ] **SHEE-03**: Escape closes sheet
-- [ ] **SHEE-04**: Focus trapped within sheet
-- [ ] **SHEE-05**: Focus returns to trigger on close
+- [x] **SHEE-01**: Sheet slides in from edge (bottom/right)
+- [x] **SHEE-02**: Backdrop appears and click closes sheet
+- [x] **SHEE-03**: Escape closes sheet
+- [x] **SHEE-04**: Focus trapped within sheet
+- [x] **SHEE-05**: Focus returns to trigger on close
 
 ### Dialog Patterns
 
@@ -142,11 +142,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TABS-03 | Phase 30 | Complete |
 | TABS-04 | Phase 30 | Complete |
 | TABS-05 | Phase 30 | Complete |
-| ACCR-01 | Phase 31 | Pending |
-| ACCR-02 | Phase 31 | Pending |
-| ACCR-03 | Phase 31 | Pending |
-| ACCR-04 | Phase 31 | Pending |
-| ACCR-05 | Phase 31 | Pending |
+| ACCR-01 | Phase 31 | Complete |
+| ACCR-02 | Phase 31 | Complete |
+| ACCR-03 | Phase 31 | Complete |
+| ACCR-04 | Phase 31 | Complete |
+| ACCR-05 | Phase 31 | Complete |
 | DTBL-01 | Phase 34 | Pending |
 | DTBL-02 | Phase 34 | Pending |
 | DTBL-03 | Phase 34 | Pending |
@@ -173,11 +173,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | POPV-03 | Phase 30 | Complete |
 | POPV-04 | Phase 30 | Complete |
 | POPV-05 | Phase 30 | Complete |
-| SHEE-01 | Phase 31 | Pending |
-| SHEE-02 | Phase 31 | Pending |
-| SHEE-03 | Phase 31 | Pending |
-| SHEE-04 | Phase 31 | Pending |
-| SHEE-05 | Phase 31 | Pending |
+| SHEE-01 | Phase 31 | Complete |
+| SHEE-02 | Phase 31 | Complete |
+| SHEE-03 | Phase 31 | Complete |
+| SHEE-04 | Phase 31 | Complete |
+| SHEE-05 | Phase 31 | Complete |
 | DLGC-01 | Phase 33 | Pending |
 | DLGC-02 | Phase 33 | Pending |
 | DLGC-03 | Phase 33 | Pending |

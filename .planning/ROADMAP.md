@@ -68,12 +68,12 @@ Plans:
   3. User can open Command Palette with Cmd+K/Ctrl+K from any page
   4. Command Palette supports fuzzy search with arrow key navigation and Enter to execute
   5. Both components close on Escape and restore focus correctly
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 32-01: Context Menu component with mobile long-press support
-- [ ] 32-02: Command Palette with cmdk integration
-- [ ] 32-03: Apply Context Menu to device cards
+- [ ] 32-01-PLAN.md - RightClickMenu component with Radix Context Menu (Wave 1)
+- [ ] 32-02-PLAN.md - CommandPalette with cmdk integration and Kbd component (Wave 1)
+- [ ] 32-03-PLAN.md - Add Action Components to design system page (Wave 2)
 
 ---
 
@@ -157,7 +157,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 30. Foundation Components | 3/3 | Complete | 2026-02-04 |
 | 31. Expandable Components | 3/3 | Complete | 2026-02-04 |
-| 32. Action Components | 0/3 | Not started | - |
+| 32. Action Components | 0/3 | Planned | - |
 | 33. Dialog Patterns | 0/3 | Not started | - |
 | 34. Data Table | 0/4 | Not started | - |
 | 35. Micro-interactions | 0/2 | Not started | - |
@@ -172,5 +172,6 @@ Plans:
 *Phase 30 completed: 2026-02-04*
 *Phase 31 planned: 2026-02-04*
 *Phase 31 completed: 2026-02-04*
+*Phase 32 planned: 2026-02-04*
 *Milestone: v4.0 Advanced UI Components*
 *Requirements coverage: 55/55 (100%)*

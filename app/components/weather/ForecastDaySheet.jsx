@@ -163,14 +163,16 @@ export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday 
           <Text size="lg">{day.precipChance ?? 0}%</Text>
         </div>
 
-        {/* Air Quality */}
-        <StatCard
-          icon={Leaf}
-          iconColor="text-green-400"
-          label="Qualita aria"
-          value={day.airQuality ?? 'N/D'}
-          subLabel={day.airQuality ? getAirQualityLabel(day.airQuality) : undefined}
-        />
+        {/* Air Quality - only show when data is available */}
+        {day.airQuality != null && (
+          <StatCard
+            icon={Leaf}
+            iconColor="text-green-400"
+            label="Qualita aria"
+            value={day.airQuality}
+            subLabel={getAirQualityLabel(day.airQuality)}
+          />
+        )}
 
         {/* Pressure - only for today */}
         {isToday && pressure !== null && (

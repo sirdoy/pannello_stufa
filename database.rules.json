@@ -42,18 +42,8 @@
       },
 
       "hue": {
-        ".read": false,
-        ".write": false,
-
-        "lights": {
-          ".read": true,
-          ".write": false
-        },
-
-        "groups": {
-          ".read": true,
-          ".write": false
-        }
+        ".read": true,
+        ".write": false
       }
     },
 
@@ -166,18 +156,8 @@
     },
 
     "hue": {
-      ".read": false,
-      ".write": false,
-
-      "lights": {
-        ".read": true,
-        ".write": false
-      },
-
-      "groups": {
-        ".read": true,
-        ".write": false
-      }
+      ".read": true,
+      ".write": false
     },
 
     "sandbox": {

@@ -58,7 +58,7 @@ function ScheduleContent() {
               Programmazione
             </Heading>
             <Text variant="secondary" className="mt-1">
-              Visualizza e gestisci le programmazioni settimanali del termostato
+              Vista dettagliata delle programmazioni settimanali
             </Text>
           </div>
 

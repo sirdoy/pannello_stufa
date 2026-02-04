@@ -67,6 +67,10 @@ export { default as Accordion, AccordionItem, AccordionTrigger, AccordionContent
 // RightClickMenu (v4.0+)
 export { default as RightClickMenu, RightClickMenuTrigger, RightClickMenuContent, RightClickMenuItem, RightClickMenuCheckboxItem, RightClickMenuSeparator, RightClickMenuLabel, RightClickMenuGroup } from './RightClickMenu';
 
+// Command Palette (v4.0+)
+export { default as CommandPalette } from './CommandPalette';
+export { default as Kbd } from './Kbd';
+
 // Feedback components (v3.0+)
 export { default as Spinner, spinnerVariants } from './Spinner';
 export { default as Progress, progressVariants } from './Progress';

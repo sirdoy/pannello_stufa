@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 32 of 36 (Action Components)
-Plan: Ready to plan
-Status: Phase 31 verified, ready for Phase 32
-Last activity: 2026-02-04 — Phase 31 Expandable Components verified and complete
+Plan: 01 of 03 (RightClickMenu)
+Status: Plan 01 complete, ready for Plan 02
+Last activity: 2026-02-04 — Completed 32-01-PLAN.md (RightClickMenu component)
 
-Progress: [██████░░░░░░░░░░░░░░░░░░░] 29% (6/21 plans)
+Progress: [███████░░░░░░░░░░░░░░░░░░] 33% (7/21 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 131 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 6)
+- Total plans completed: 132 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 7)
 - Average duration: ~3.9 min per plan
-- Total execution time: ~8.6 hours across 5 milestones
+- Total execution time: ~8.8 hours across 5 milestones
 
 **By Milestone:**
 
@@ -43,7 +43,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 Key patterns from previous milestones:
 - CVA for type-safe component variants (including compound variants)
 - Radix UI for accessible interactive components
-- Namespace component pattern (Card.Header, Button.Icon, Tabs.List, Accordion.Item, Sheet.Content)
+- Namespace component pattern (Card.Header, Button.Icon, Tabs.List, Accordion.Item, Sheet.Content, RightClickMenu.Item)
 - cn() pattern for Tailwind class composition
 - Sheet open/onOpenChange API for uncontrolled mode support (vs Modal isOpen/onClose)
 - Per-user Firebase preferences at users/${userId} path
@@ -53,6 +53,7 @@ Key patterns from previous milestones:
 - Content slot pattern for wrapper components (scheduleContent, manualContent, historyContent)
 - Radix CSS variables for height animation (--radix-accordion-content-height)
 - getMobileQuickActions pattern for device-aware mobile navigation (priority: stove > thermostat > lights)
+- useContextMenuLongPress hook separate from useLongPress (single trigger vs repeat)
 
 ### Pending Todos
 
@@ -84,6 +85,6 @@ None — v4.0 progressing well.
 ## Session Continuity
 
 Last session: 2026-02-04
-Stopped at: Completed quick-008 (Active devices filter only)
+Stopped at: Completed 32-01-PLAN.md (RightClickMenu component)
 Resume file: None
-Next step: Continue Phase 31 with 31-03-PLAN.md (Collapsible component) or `/gsd:discuss-phase 32` for Action Components
+Next step: Execute 32-02-PLAN.md (Command Palette)

@@ -43,7 +43,7 @@
 
       "hue": {
         ".read": true,
-        ".write": false
+        ".write": true
       }
     },
 
@@ -157,7 +157,7 @@
 
     "hue": {
       ".read": true,
-      ".write": false
+      ".write": true
     },
 
     "sandbox": {

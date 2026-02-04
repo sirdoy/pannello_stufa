@@ -10,9 +10,7 @@ import { cn } from '@/lib/utils/cn';
  * Features:
  * - Three tabs: Schedule, Manual, History
  * - Icons for each tab (Calendar, Sliders, Clock)
- * - Responsive positioning:
- *   - Mobile: fixed to bottom of screen (thumb-friendly)
- *   - Desktop: static position below header
+ * - Tabs positioned at top on both mobile and desktop
  * - Default tab: Schedule
  *
  * @param {Object} props
@@ -37,51 +35,37 @@ export function ThermostatTabs({
       onValueChange={onTabChange}
       className={cn('flex flex-col', className)}
     >
-      {/* Tab list - responsive positioning */}
-      <div
-        className={cn(
-          // Mobile: fixed bottom (thumb zone)
-          'max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-40',
-          'max-md:bg-slate-900/95 [html:not(.dark)_&]:max-md:bg-white/95',
-          'max-md:backdrop-blur-xl',
-          'max-md:border-t max-md:border-white/[0.06]',
-          '[html:not(.dark)_&]:max-md:border-black/[0.06]',
-          'max-md:pb-[env(safe-area-inset-bottom)]',
-          // Desktop: normal flow
-          'md:static md:bg-transparent md:border-0 md:pb-0',
-        )}
-      >
-        <Tabs.List className="max-md:justify-around md:justify-start">
-          <Tabs.Trigger
-            value="schedule"
-            icon={<Calendar className="w-5 h-5" />}
-          >
-            Schedule
-          </Tabs.Trigger>
-          <Tabs.Trigger
-            value="manual"
-            icon={<SlidersHorizontal className="w-5 h-5" />}
-          >
-            Manual
-          </Tabs.Trigger>
-          <Tabs.Trigger
-            value="history"
-            icon={<Clock className="w-5 h-5" />}
-          >
-            History
-          </Tabs.Trigger>
-        </Tabs.List>
-      </div>
+      {/* Tab list - at top for both mobile and desktop */}
+      <Tabs.List className="justify-start mb-4">
+        <Tabs.Trigger
+          value="schedule"
+          icon={<Calendar className="w-5 h-5" />}
+        >
+          Schedule
+        </Tabs.Trigger>
+        <Tabs.Trigger
+          value="manual"
+          icon={<SlidersHorizontal className="w-5 h-5" />}
+        >
+          Manual
+        </Tabs.Trigger>
+        <Tabs.Trigger
+          value="history"
+          icon={<Clock className="w-5 h-5" />}
+        >
+          History
+        </Tabs.Trigger>
+      </Tabs.List>
 
-      {/* Content panels - add bottom padding on mobile for fixed tabs */}
-      <div className="max-md:pb-20 md:pb-0">
-        <Tabs.Content value="schedule" className="pt-4">
+      {/* Content panels */}
+      <div>
+        <Tabs.Content value="schedule">
           {scheduleContent}
         </Tabs.Content>
-        <Tabs.Content value="manual" className="pt-4">
+        <Tabs.Content value="manual">
           {manualContent}
         </Tabs.Content>
-        <Tabs.Content value="history" className="pt-4">
+        <Tabs.Content value="history">
           {historyContent}
         </Tabs.Content>
       </div>

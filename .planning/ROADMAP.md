@@ -49,12 +49,12 @@ Plans:
   3. Sheet slides in from edge with backdrop and can be closed via backdrop click or Escape
   4. Focus is trapped within Sheet and returns to trigger on close
   5. Screen reader announces expanded/collapsed state via aria-expanded
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 31-01: Accordion component with animation and modes
-- [ ] 31-02: Sheet component extending Modal foundation
-- [ ] 31-03: Apply Accordion to device details and Sheet to mobile forms
+- [ ] 31-01-PLAN.md - Accordion component with animation and modes (Wave 1)
+- [ ] 31-02-PLAN.md - Sheet component extending Modal foundation (Wave 1)
+- [ ] 31-03-PLAN.md - Apply Accordion and Sheet to design system page (Wave 2)
 
 ---
 
@@ -156,7 +156,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 30. Foundation Components | 3/3 | Complete | 2026-02-04 |
-| 31. Expandable Components | 0/3 | Not started | - |
+| 31. Expandable Components | 0/3 | Planned | - |
 | 32. Action Components | 0/3 | Not started | - |
 | 33. Dialog Patterns | 0/3 | Not started | - |
 | 34. Data Table | 0/4 | Not started | - |
@@ -170,5 +170,6 @@ Plans:
 *Roadmap created: 2026-02-03*
 *Phase 30 planned: 2026-02-03*
 *Phase 30 completed: 2026-02-04*
+*Phase 31 planned: 2026-02-04*
 *Milestone: v4.0 Advanced UI Components*
 *Requirements coverage: 55/55 (100%)*

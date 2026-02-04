@@ -6,6 +6,7 @@ import ActionButton from '../ui/ActionButton';
 import Card from '../ui/Card';
 import Modal from '../ui/Modal';
 import ConfirmDialog from '../ui/ConfirmDialog';
+import Input from '../ui/Input';
 import Heading from '../ui/Heading';
 import Text from '../ui/Text';
 import { X, Pencil, Trash2, CheckCircle } from 'lucide-react';
@@ -169,7 +170,7 @@ export default function ScheduleManagementModal({
                   <div className="flex-1">
                     {editingId === activeSchedule.id ? (
                       <div className="space-y-2">
-                        <input
+                        <Input
                           type="text"
                           value={editName}
                           onChange={(e) => {
@@ -183,13 +184,9 @@ export default function ScheduleManagementModal({
                           }}
                           maxLength={30}
                           autoFocus
-                          className="w-full px-3 py-2 bg-slate-800/80 rounded-xl border border-slate-600/50 text-white text-sm focus:outline-none focus:ring-2 focus:ring-ember-500/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-300/50 [html:not(.dark)_&]:text-slate-900"
+                          size="sm"
+                          error={error}
                         />
-                        {error && (
-                          <Text variant="ember" size="xs">
-                            {error}
-                          </Text>
-                        )}
                         <div className="flex gap-2">
                           <Button variant="success" size="sm" onClick={() => handleSaveEdit(activeSchedule.id)}>
                             Salva
@@ -204,13 +201,13 @@ export default function ScheduleManagementModal({
                         <Text as="span" weight="semibold" variant="sage">
                           {activeSchedule.name}
                         </Text>
-                        <button
+                        <ActionButton
+                          icon={<Pencil />}
+                          variant="primary"
+                          size="sm"
                           onClick={() => handleStartEdit(activeSchedule)}
-                          className="p-2 rounded-lg hover:bg-sage-900/40 transition-colors text-sage-400 [html:not(.dark)_&]:hover:bg-sage-100/60 [html:not(.dark)_&]:text-sage-700"
-                          aria-label="Modifica nome"
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </button>
+                          ariaLabel="Modifica nome"
+                        />
                       </div>
                     )}
                   </div>
@@ -233,7 +230,7 @@ export default function ScheduleManagementModal({
                   >
                     {editingId === schedule.id ? (
                       <div className="space-y-2">
-                        <input
+                        <Input
                           type="text"
                           value={editName}
                           onChange={(e) => {
@@ -247,13 +244,9 @@ export default function ScheduleManagementModal({
                           }}
                           maxLength={30}
                           autoFocus
-                          className="w-full px-3 py-2 bg-slate-700/80 rounded-xl border border-slate-600/50 text-white text-sm focus:outline-none focus:ring-2 focus:ring-ember-500/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-300/50 [html:not(.dark)_&]:text-slate-900"
+                          size="sm"
+                          error={error}
                         />
-                        {error && (
-                          <Text variant="ember" size="xs">
-                            {error}
-                          </Text>
-                        )}
                         <div className="flex gap-2">
                           <Button variant="success" size="sm" onClick={() => handleSaveEdit(schedule.id)}>
                             Salva
@@ -272,30 +265,30 @@ export default function ScheduleManagementModal({
                           </Text>
                         </div>
                         <div className="flex items-center gap-1">
-                          <button
+                          <ActionButton
+                            icon={<CheckCircle />}
+                            variant="success"
+                            size="sm"
                             onClick={() => onSetActive(schedule.id)}
-                            className="p-2 rounded-lg hover:bg-ember-900/40 transition-colors text-ember-400 [html:not(.dark)_&]:hover:bg-ember-100/60 [html:not(.dark)_&]:text-ember-600"
-                            aria-label="Imposta come attiva"
+                            ariaLabel="Imposta come attiva"
                             title="Imposta come attiva"
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                          </button>
-                          <button
+                          />
+                          <ActionButton
+                            icon={<Pencil />}
+                            variant="primary"
+                            size="sm"
                             onClick={() => handleStartEdit(schedule)}
-                            className="p-2 rounded-lg hover:bg-slate-700/60 transition-colors text-slate-400 [html:not(.dark)_&]:hover:bg-slate-200/60 [html:not(.dark)_&]:text-slate-600"
-                            aria-label="Modifica nome"
+                            ariaLabel="Modifica nome"
                             title="Modifica nome"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
+                          />
+                          <ActionButton
+                            icon={<Trash2 />}
+                            variant="danger"
+                            size="sm"
                             onClick={() => handleDeleteRequest(schedule)}
-                            className="p-2 rounded-lg hover:bg-ember-900/40 transition-colors text-ember-400 [html:not(.dark)_&]:hover:bg-ember-100/60 [html:not(.dark)_&]:text-ember-600"
-                            aria-label="Elimina"
+                            ariaLabel="Elimina"
                             title="Elimina"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          />
                         </div>
                       </div>
                     )}

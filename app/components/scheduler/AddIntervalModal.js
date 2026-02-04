@@ -6,8 +6,10 @@ import ActionButton from '../ui/ActionButton';
 import Card from '../ui/Card';
 import Modal from '../ui/Modal';
 import Input from '../ui/Input';
+import Select from '../ui/Select';
 import Heading from '../ui/Heading';
 import Text from '../ui/Text';
+import { Tabs, TabsList, TabsTrigger } from '../ui/Tabs';
 import { X } from 'lucide-react';
 import { getPowerBadgeClass, getFanBadgeClass } from '@/lib/schedulerStats';
 
@@ -171,55 +173,31 @@ export default function AddIntervalModal({
             <Text as="label" variant="secondary" size="sm" weight="semibold" className="block mb-2">
               Modalità Inserimento
             </Text>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setInputMode('duration')}
-                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${
-                  inputMode === 'duration'
-                    ? 'bg-ember-500 [html:not(.dark)_&]:bg-ember-600 shadow-md'
-                    : 'bg-slate-800 [html:not(.dark)_&]:bg-slate-100 hover:bg-slate-700 [html:not(.dark)_&]:hover:bg-slate-200'
-                }`}
-              >
-                <Text as="span" className={inputMode === 'duration' ? 'text-white' : ''} variant={inputMode === 'duration' ? undefined : 'secondary'}>
+            <Tabs value={inputMode} onValueChange={setInputMode} className="w-full">
+              <TabsList className="w-full">
+                <TabsTrigger value="duration" className="flex-1">
                   ⏱️ Durata
-                </Text>
-              </button>
-              <button
-                type="button"
-                onClick={() => setInputMode('endTime')}
-                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${
-                  inputMode === 'endTime'
-                    ? 'bg-ember-500 [html:not(.dark)_&]:bg-ember-600 shadow-md'
-                    : 'bg-slate-800 [html:not(.dark)_&]:bg-slate-100 hover:bg-slate-700 [html:not(.dark)_&]:hover:bg-slate-200'
-                }`}
-              >
-                <Text as="span" className={inputMode === 'endTime' ? 'text-white' : ''} variant={inputMode === 'endTime' ? undefined : 'secondary'}>
+                </TabsTrigger>
+                <TabsTrigger value="endTime" className="flex-1">
                   ⏰ Ora Fine
-                </Text>
-              </button>
-            </div>
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
 
           {/* Duration Mode */}
           {inputMode === 'duration' && (
             <>
-              <div>
-                <Text as="label" variant="secondary" size="sm" weight="semibold" className="block mb-2">
-                  ⏱️ Durata
-                </Text>
-                <select
-                  value={durationPreset}
-                  onChange={(e) => setDurationPreset(e.target.value === 'custom' ? 'custom' : Number(e.target.value))}
-                  className="w-full px-4 py-3 bg-slate-800 [html:not(.dark)_&]:bg-white border border-slate-600 [html:not(.dark)_&]:border-slate-300 rounded-xl text-white [html:not(.dark)_&]:text-slate-900 focus:ring-2 focus:ring-ember-500 [html:not(.dark)_&]:focus:ring-ember-600 focus:border-transparent transition-all duration-200"
-                >
-                  {DURATION_PRESETS.map(preset => (
-                    <option key={preset.value} value={preset.value}>
-                      {preset.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <Select
+                label="⏱️ Durata"
+                value={durationPreset}
+                onChange={(e) => setDurationPreset(e.target.value === 'custom' ? 'custom' : Number(e.target.value))}
+                options={DURATION_PRESETS.map(preset => ({
+                  value: preset.value,
+                  label: preset.label,
+                }))}
+                variant="ember"
+              />
 
               {/* Custom Duration Input */}
               {durationPreset === 'custom' && (
@@ -264,53 +242,45 @@ export default function AddIntervalModal({
           {/* Power & Fan */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Text as="label" variant="secondary" size="sm" weight="semibold" className="block mb-2">
-                ⚡ Potenza
-              </Text>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className={`px-2 py-1 rounded-md text-xs font-bold ${getPowerBadgeClass(power)}`}>
-                    P{power}
-                  </span>
-                  <Text as="span" variant="secondary" size="sm">
-                    Livello {power}
-                  </Text>
-                </div>
-                <select
-                  value={power}
-                  onChange={(e) => setPower(Number(e.target.value))}
-                  className="w-full px-3 py-2 bg-slate-800 [html:not(.dark)_&]:bg-white border border-slate-600 [html:not(.dark)_&]:border-slate-300 rounded-lg text-white [html:not(.dark)_&]:text-slate-900 focus:ring-2 focus:ring-ember-500 [html:not(.dark)_&]:focus:ring-ember-600 focus:border-transparent transition-all duration-200"
-                >
-                  {powerOptions.map(p => (
-                    <option key={p} value={p}>Livello {p}</option>
-                  ))}
-                </select>
+              <div className="flex items-center gap-2 mb-2">
+                <span className={`px-2 py-1 rounded-md text-xs font-bold ${getPowerBadgeClass(power)}`}>
+                  P{power}
+                </span>
+                <Text as="span" variant="secondary" size="sm">
+                  Livello {power}
+                </Text>
               </div>
+              <Select
+                label="⚡ Potenza"
+                value={power}
+                onChange={(e) => setPower(Number(e.target.value))}
+                options={powerOptions.map(p => ({
+                  value: p,
+                  label: `Livello ${p}`,
+                }))}
+                variant="ember"
+              />
             </div>
 
             <div>
-              <Text as="label" variant="secondary" size="sm" weight="semibold" className="block mb-2">
-                💨 Ventola
-              </Text>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className={`px-2 py-1 rounded-md text-xs font-bold ${getFanBadgeClass(fan)}`}>
-                    V{fan}
-                  </span>
-                  <Text as="span" variant="secondary" size="sm">
-                    Livello {fan}
-                  </Text>
-                </div>
-                <select
-                  value={fan}
-                  onChange={(e) => setFan(Number(e.target.value))}
-                  className="w-full px-3 py-2 bg-slate-800 [html:not(.dark)_&]:bg-white border border-slate-600 [html:not(.dark)_&]:border-slate-300 rounded-lg text-white [html:not(.dark)_&]:text-slate-900 focus:ring-2 focus:ring-ember-500 [html:not(.dark)_&]:focus:ring-ember-600 focus:border-transparent transition-all duration-200"
-                >
-                  {fanOptions.map(f => (
-                    <option key={f} value={f}>Livello {f}</option>
-                  ))}
-                </select>
+              <div className="flex items-center gap-2 mb-2">
+                <span className={`px-2 py-1 rounded-md text-xs font-bold ${getFanBadgeClass(fan)}`}>
+                  V{fan}
+                </span>
+                <Text as="span" variant="secondary" size="sm">
+                  Livello {fan}
+                </Text>
               </div>
+              <Select
+                label="💨 Ventola"
+                value={fan}
+                onChange={(e) => setFan(Number(e.target.value))}
+                options={fanOptions.map(f => ({
+                  value: f,
+                  label: `Livello ${f}`,
+                }))}
+                variant="ocean"
+              />
             </div>
           </div>
         </div>

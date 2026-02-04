@@ -6,6 +6,8 @@ import ActionButton from '../ui/ActionButton';
 import Card from '../ui/Card';
 import Modal from '../ui/Modal';
 import Input from '../ui/Input';
+import Select from '../ui/Select';
+import { RadioGroup, RadioGroupItem } from '../ui/RadioGroup';
 import Heading from '../ui/Heading';
 import Text from '../ui/Text';
 import { X } from 'lucide-react';
@@ -156,90 +158,43 @@ export default function CreateScheduleModal({
               <Text as="label" variant="secondary" size="sm" weight="semibold" className="block mb-3">
                 Modalità Creazione
               </Text>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* From Scratch */}
-                <button
-                  onClick={() => setMode('scratch')}
-                  className={`p-4 rounded-xl border-2 transition-all text-left ${
-                    mode === 'scratch'
-                      ? 'border-ember-500 bg-ember-50/50 [html:not(.dark)_&]:bg-ember-950/30'
-                      : 'border-slate-300/50 [html:not(.dark)_&]:border-slate-600/50 hover:border-slate-400 [html:not(.dark)_&]:hover:border-slate-500'
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 ${
-                      mode === 'scratch'
-                        ? 'border-ember-500 bg-ember-500'
-                        : 'border-slate-400 [html:not(.dark)_&]:border-slate-500'
-                    }`}>
-                      {mode === 'scratch' && (
-                        <div className="w-2 h-2 rounded-full bg-white" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <Text weight="semibold" size="sm">
-                        Da Zero
-                      </Text>
-                      <Text variant="secondary" size="xs" className="mt-1">
-                        Inizia con una pianificazione vuota
-                      </Text>
-                    </div>
-                  </div>
-                </button>
-
-                {/* Copy Existing */}
-                <button
-                  onClick={() => setMode('copy')}
-                  className={`p-4 rounded-xl border-2 transition-all text-left ${
-                    mode === 'copy'
-                      ? 'border-ember-500 bg-ember-50/50 [html:not(.dark)_&]:bg-ember-950/30'
-                      : 'border-slate-300/50 [html:not(.dark)_&]:border-slate-600/50 hover:border-slate-400 [html:not(.dark)_&]:hover:border-slate-500'
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 ${
-                      mode === 'copy'
-                        ? 'border-ember-500 bg-ember-500'
-                        : 'border-slate-400 [html:not(.dark)_&]:border-slate-500'
-                    }`}>
-                      {mode === 'copy' && (
-                        <div className="w-2 h-2 rounded-full bg-white" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <Text weight="semibold" size="sm">
-                        Copia Esistente
-                      </Text>
-                      <Text variant="secondary" size="xs" className="mt-1">
-                        Duplica una pianificazione
-                      </Text>
-                    </div>
-                  </div>
-                </button>
-              </div>
+              <RadioGroup
+                value={mode}
+                onValueChange={setMode}
+                variant="ember"
+                className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+              >
+                <RadioGroupItem
+                  value="scratch"
+                  label="Da Zero"
+                  description="Inizia con una pianificazione vuota"
+                />
+                <RadioGroupItem
+                  value="copy"
+                  label="Copia Esistente"
+                  description="Duplica una pianificazione"
+                />
+              </RadioGroup>
             </div>
 
             {/* Copy From Dropdown (only when mode === 'copy') */}
             {mode === 'copy' && (
               <div className="animate-fade-in">
-                <Text as="label" variant="secondary" size="sm" weight="semibold" className="block mb-2">
-                  Copia da <Text as="span" variant="ember">*</Text>
-                </Text>
-                <select
+                <Select
+                  label="Copia da"
+                  icon="📋"
                   value={copyFromId}
                   onChange={(e) => {
                     setCopyFromId(e.target.value);
                     setError('');
                   }}
-                  className="w-full px-4 py-3 bg-white/60 [html:not(.dark)_&]:bg-slate-800/60 backdrop-blur-xl rounded-xl border border-slate-300/50 [html:not(.dark)_&]:border-slate-600/50 focus:border-ember-500 [html:not(.dark)_&]:focus:border-ember-400 focus:ring-2 focus:ring-ember-500/20 [html:not(.dark)_&]:focus:ring-ember-400/20 text-slate-900 [html:not(.dark)_&]:text-white transition-all outline-none"
-                >
-                  <option value="">Seleziona una pianificazione...</option>
-                  {existingSchedules.map((schedule) => (
-                    <option key={schedule.id} value={schedule.id}>
-                      {schedule.name}
-                    </option>
-                  ))}
-                </select>
+                  placeholder="Seleziona una pianificazione..."
+                  options={existingSchedules.map((schedule) => ({
+                    value: schedule.id,
+                    label: schedule.name,
+                  }))}
+                  variant="ember"
+                />
               </div>
             )}
           </div>

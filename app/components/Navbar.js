@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getNavigationStructureWithPreferences } from '@/lib/devices/deviceRegistry';
-import { Home, Calendar, AlertCircle, Clock, Settings, User, LogOut, Menu, X, ChevronDown, Activity } from 'lucide-react';
+import { Home, Calendar, AlertCircle, Clock, Settings, User, LogOut, Menu, X, ChevronDown, Activity, Lightbulb } from 'lucide-react';
 import {
   DropdownContainer,
   DropdownItem,
@@ -15,6 +15,46 @@ import {
 } from './navigation';
 import Text from './ui/Text';
 import TransitionLink from './TransitionLink';
+
+/**
+ * Get mobile bottom nav quick actions based on enabled devices
+ * Max 4 items: Home + device-specific actions + Log
+ * Priority: Stove > Thermostat > Lights
+ *
+ * @param {object} navStructure - Navigation structure with devices
+ * @returns {Array} Array of { href, icon, label }
+ */
+export function getMobileQuickActions(navStructure) {
+  const actions = [];
+
+  // Always: Home
+  actions.push({ href: '/', icon: Home, label: 'Home' });
+
+  // Check which devices are enabled
+  const devices = navStructure.devices || [];
+  const hasStove = devices.some(d => d.id === 'stove');
+  const hasThermostat = devices.some(d => d.id === 'thermostat');
+  const hasLights = devices.some(d => d.id === 'lights');
+
+  // Priority 1: Stove (Orari + Errori)
+  if (hasStove) {
+    actions.push({ href: '/stove/scheduler', icon: Calendar, label: 'Orari' });
+    actions.push({ href: '/stove/errors', icon: AlertCircle, label: 'Errori' });
+  }
+  // Priority 2: Thermostat only (Programmazione)
+  else if (hasThermostat) {
+    actions.push({ href: '/thermostat/schedule', icon: Calendar, label: 'Programmazione' });
+  }
+  // Priority 3: Lights only (Scene)
+  else if (hasLights) {
+    actions.push({ href: '/lights/scenes', icon: Lightbulb, label: 'Scene' });
+  }
+
+  // Always: Log (last position)
+  actions.push({ href: '/log', icon: Clock, label: 'Log' });
+
+  return actions.slice(0, 4); // Max 4 items
+}
 
 /**
  * Navbar Component - Ember Noir Design System
@@ -595,83 +635,42 @@ export default function Navbar() {
         [html:not(.dark)_&]:border-black/[0.06]
         [html:not(.dark)_&]:shadow-[0_-4px_24px_rgba(0,0,0,0.08)]
       ">
-        <div className="grid grid-cols-4 gap-2 p-2">
-          {/* Home */}
-          <TransitionLink
-            href="/"
-            className={`
-              flex flex-col items-center justify-center
-              py-2 px-2
-              rounded-xl
-              min-h-[56px]
-              transition-all duration-200
-              ${isActive('/')
-                ? 'bg-ember-500/15 text-ember-400 shadow-ember-glow-sm [html:not(.dark)_&]:bg-ember-500/10 [html:not(.dark)_&]:text-ember-600 [html:not(.dark)_&]:shadow-none'
-                : 'text-slate-500 hover:text-slate-300 [html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700'
-              }
-            `}
-          >
-            <Home className="w-6 h-6 mb-1" />
-            <Text as="span" weight="medium" className="text-[10px] font-display">Home</Text>
-          </TransitionLink>
+        {(() => {
+          const quickActions = getMobileQuickActions(navStructure);
+          const gridCols = quickActions.length === 3 ? 'grid-cols-3' : 'grid-cols-4';
 
-          {/* Scheduler */}
-          <TransitionLink
-            href="/stove/scheduler"
-            className={`
-              flex flex-col items-center justify-center
-              py-2 px-2
-              rounded-xl
-              min-h-[56px]
-              transition-all duration-200
-              ${pathname.includes('scheduler')
-                ? 'bg-ember-500/15 text-ember-400 shadow-ember-glow-sm [html:not(.dark)_&]:bg-ember-500/10 [html:not(.dark)_&]:text-ember-600 [html:not(.dark)_&]:shadow-none'
-                : 'text-slate-500 hover:text-slate-300 [html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700'
-              }
-            `}
-          >
-            <Calendar className="w-6 h-6 mb-1" />
-            <Text as="span" weight="medium" className="text-[10px] font-display">Orari</Text>
-          </TransitionLink>
+          return (
+            <div className={`grid ${gridCols} gap-2 p-2`}>
+              {quickActions.map((action) => {
+                const IconComponent = action.icon;
+                const isActiveRoute = action.href === '/'
+                  ? isActive('/')
+                  : pathname.includes(action.href.split('/').filter(Boolean)[0]);
 
-          {/* Errors */}
-          <TransitionLink
-            href="/stove/errors"
-            className={`
-              flex flex-col items-center justify-center
-              py-2 px-2
-              rounded-xl
-              min-h-[56px]
-              transition-all duration-200
-              ${pathname.includes('errors')
-                ? 'bg-ember-500/15 text-ember-400 shadow-ember-glow-sm [html:not(.dark)_&]:bg-ember-500/10 [html:not(.dark)_&]:text-ember-600 [html:not(.dark)_&]:shadow-none'
-                : 'text-slate-500 hover:text-slate-300 [html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700'
-              }
-            `}
-          >
-            <AlertCircle className="w-6 h-6 mb-1" />
-            <Text as="span" weight="medium" className="text-[10px] font-display">Errori</Text>
-          </TransitionLink>
-
-          {/* Log */}
-          <TransitionLink
-            href="/log"
-            className={`
-              flex flex-col items-center justify-center
-              py-2 px-2
-              rounded-xl
-              min-h-[56px]
-              transition-all duration-200
-              ${pathname.includes('log')
-                ? 'bg-ember-500/15 text-ember-400 shadow-ember-glow-sm [html:not(.dark)_&]:bg-ember-500/10 [html:not(.dark)_&]:text-ember-600 [html:not(.dark)_&]:shadow-none'
-                : 'text-slate-500 hover:text-slate-300 [html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700'
-              }
-            `}
-          >
-            <Clock className="w-6 h-6 mb-1" />
-            <Text as="span" weight="medium" className="text-[10px] font-display">Log</Text>
-          </TransitionLink>
-        </div>
+                return (
+                  <TransitionLink
+                    key={action.href}
+                    href={action.href}
+                    className={`
+                      flex flex-col items-center justify-center
+                      py-2 px-2
+                      rounded-xl
+                      min-h-[56px]
+                      transition-all duration-200
+                      ${isActiveRoute
+                        ? 'bg-ember-500/15 text-ember-400 shadow-ember-glow-sm [html:not(.dark)_&]:bg-ember-500/10 [html:not(.dark)_&]:text-ember-600 [html:not(.dark)_&]:shadow-none'
+                        : 'text-slate-500 hover:text-slate-300 [html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700'
+                      }
+                    `}
+                  >
+                    <IconComponent className="w-6 h-6 mb-1" />
+                    <Text as="span" weight="medium" className="text-[10px] font-display">{action.label}</Text>
+                  </TransitionLink>
+                );
+              })}
+            </div>
+          );
+        })()}
       </nav>
 
       {/* Spacer for fixed navigation */}

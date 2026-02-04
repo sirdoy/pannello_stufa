@@ -1557,6 +1557,137 @@ export default function DesignSystemPage() {
           </Card>
         </SectionShowcase>
 
+        {/* Sheet Component */}
+        <SectionShowcase title="Sheet" icon="📋" docs="app/components/ui/Sheet.js">
+          <Card>
+            <CardContent>
+              <div className="space-y-6">
+                {/* Trigger Buttons */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Sheet Sides</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    Sheet slides in from edge. Common patterns: bottom (mobile), right (detail panel), left (nav)
+                  </Text>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <Button variant="subtle" onClick={() => setBottomSheetOpen(true)}>
+                      Bottom Sheet
+                    </Button>
+                    <Button variant="subtle" onClick={() => setRightSheetOpen(true)}>
+                      Right Sheet
+                    </Button>
+                    <Button variant="subtle" onClick={() => setLeftSheetOpen(true)}>
+                      Left Sheet
+                    </Button>
+                    <Button variant="subtle" onClick={() => setTopSheetOpen(true)}>
+                      Top Sheet
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Bottom Sheet */}
+                <Sheet open={bottomSheetOpen} onOpenChange={setBottomSheetOpen}>
+                  <Sheet.Content side="bottom" size="md">
+                    <Sheet.Header>
+                      <Sheet.Title>Impostazioni Stufa</Sheet.Title>
+                      <Sheet.Description>
+                        Configura i parametri della tua stufa
+                      </Sheet.Description>
+                    </Sheet.Header>
+                    <div className="space-y-4 py-4">
+                      <div className="flex items-center justify-between">
+                        <Text>Temperatura target</Text>
+                        <Text className="text-ember-400">22°C</Text>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Text>Modalita</Text>
+                        <Text className="text-ember-400">Automatica</Text>
+                      </div>
+                    </div>
+                    <Sheet.Footer>
+                      <Button variant="subtle" onClick={() => setBottomSheetOpen(false)}>
+                        Annulla
+                      </Button>
+                      <Button variant="ember" onClick={() => setBottomSheetOpen(false)}>
+                        Salva
+                      </Button>
+                    </Sheet.Footer>
+                  </Sheet.Content>
+                </Sheet>
+
+                {/* Right Sheet */}
+                <Sheet open={rightSheetOpen} onOpenChange={setRightSheetOpen}>
+                  <Sheet.Content side="right" size="md">
+                    <Sheet.Header>
+                      <Sheet.Title>Dettagli Dispositivo</Sheet.Title>
+                      <Sheet.Description>Stufa Thermorossi</Sheet.Description>
+                    </Sheet.Header>
+                    <div className="space-y-4 py-4">
+                      <div>
+                        <Text variant="body-sm" className="text-slate-400">Stato</Text>
+                        <Text className="text-sage-400">Online</Text>
+                      </div>
+                      <div>
+                        <Text variant="body-sm" className="text-slate-400">Temperatura</Text>
+                        <Text className="text-3xl font-display">21°C</Text>
+                      </div>
+                      <div>
+                        <Text variant="body-sm" className="text-slate-400">Ore di funzionamento</Text>
+                        <Text>1,234h</Text>
+                      </div>
+                    </div>
+                  </Sheet.Content>
+                </Sheet>
+
+                {/* Left Sheet */}
+                <Sheet open={leftSheetOpen} onOpenChange={setLeftSheetOpen}>
+                  <Sheet.Content side="left" size="sm">
+                    <Sheet.Header>
+                      <Sheet.Title>Menu</Sheet.Title>
+                    </Sheet.Header>
+                    <nav className="space-y-2 py-4">
+                      <Button variant="ghost" className="w-full justify-start">Dashboard</Button>
+                      <Button variant="ghost" className="w-full justify-start">Dispositivi</Button>
+                      <Button variant="ghost" className="w-full justify-start">Impostazioni</Button>
+                      <Button variant="ghost" className="w-full justify-start">Aiuto</Button>
+                    </nav>
+                  </Sheet.Content>
+                </Sheet>
+
+                {/* Top Sheet */}
+                <Sheet open={topSheetOpen} onOpenChange={setTopSheetOpen}>
+                  <Sheet.Content side="top" size="sm">
+                    <Sheet.Header>
+                      <Sheet.Title>Notifica</Sheet.Title>
+                      <Sheet.Description>
+                        La stufa ha completato il ciclo di riscaldamento.
+                      </Sheet.Description>
+                    </Sheet.Header>
+                    <Sheet.Footer>
+                      <Button variant="ember" onClick={() => setTopSheetOpen(false)}>
+                        OK
+                      </Button>
+                    </Sheet.Footer>
+                  </Sheet.Content>
+                </Sheet>
+
+                <CardDivider />
+
+                {/* Features */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Features</Text>
+                  <div className="space-y-2">
+                    <Text variant="tertiary" size="sm">Built on: Radix Dialog primitive with focus trap</Text>
+                    <Text variant="tertiary" size="sm">Sizes: sm, md, lg (width for left/right, height for top/bottom)</Text>
+                    <Text variant="tertiary" size="sm">Close: ESC key, backdrop click, close button</Text>
+                    <Text variant="tertiary" size="sm">iOS: Safe area padding on bottom sheet (pb-safe)</Text>
+                    <Text variant="tertiary" size="sm">Animation: Slide from edge with backdrop fade</Text>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </SectionShowcase>
+
         {/* Toast Notifications */}
         <SectionShowcase title="Toast Notifications" icon="🔔" docs="docs/design-system.md#toast">
           <Card>

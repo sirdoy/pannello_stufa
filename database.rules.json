@@ -7,6 +7,13 @@
       ".read": false,
       ".write": false,
 
+      "config": {
+        "location": {
+          ".read": true,
+          ".write": false
+        }
+      },
+
       "stove": {
         "state": {
           ".read": true,
@@ -176,6 +183,13 @@
     "sandbox": {
       ".read": true,
       ".write": false
+    },
+
+    "config": {
+      "location": {
+        ".read": true,
+        ".write": false
+      }
     }
   }
 }

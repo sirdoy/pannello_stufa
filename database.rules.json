@@ -26,6 +26,23 @@
       }
     },
 
+    "schedules-v2": {
+      "activeScheduleId": {
+        ".read": true,
+        ".write": false
+      },
+      "mode": {
+        ".read": true,
+        ".write": false
+      },
+      "schedules": {
+        "$scheduleId": {
+          ".read": true,
+          ".write": false
+        }
+      }
+    },
+
     "maintenance": {
       ".read": true,
       ".write": false

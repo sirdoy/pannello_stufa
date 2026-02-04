@@ -39,8 +39,8 @@ function RoomSelector({ rooms, selectedRoomId, onChange, disabled }) {
       >
         <option value="">Seleziona stanza...</option>
         {rooms.map((room) => (
-          <option key={room.id} value={room.id}>
-            {room.name} ({room.temperature?.toFixed(1) || '--'}°C)
+          <option key={room.room_id} value={room.room_id}>
+            {room.room_name} ({room.temperature?.toFixed(1) || '--'}°C)
           </option>
         ))}
       </select>
@@ -319,7 +319,7 @@ export default function PidAutomationPanel() {
   };
 
   // Get selected room for temperature display
-  const selectedRoom = rooms.find((r) => String(r.id) === String(targetRoomId));
+  const selectedRoom = rooms.find((r) => String(r.room_id) === String(targetRoomId));
 
   // Loading state
   if (userLoading || loading) {

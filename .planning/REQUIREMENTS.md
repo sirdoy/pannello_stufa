@@ -9,11 +9,11 @@ Requirements for Advanced UI Components milestone. Each maps to roadmap phases.
 
 ### Tabs
 
-- [ ] **TABS-01**: User can switch between tabs using click/tap
-- [ ] **TABS-02**: User can navigate tabs with arrow keys (left/right for horizontal)
-- [ ] **TABS-03**: Active tab is visually distinct with focus indicator
-- [ ] **TABS-04**: Screen reader announces tab role and selection state
-- [ ] **TABS-05**: Tabs support both horizontal and vertical orientation
+- [x] **TABS-01**: User can switch between tabs using click/tap
+- [x] **TABS-02**: User can navigate tabs with arrow keys (left/right for horizontal)
+- [x] **TABS-03**: Active tab is visually distinct with focus indicator
+- [x] **TABS-04**: Screen reader announces tab role and selection state
+- [x] **TABS-05**: Tabs support both horizontal and vertical orientation
 
 ### Accordion
 
@@ -37,29 +37,29 @@ Requirements for Advanced UI Components milestone. Each maps to roadmap phases.
 
 ### Command Palette
 
-- [ ] **CMDK-01**: User can open palette with Cmd+K (Mac) or Ctrl+K (Windows)
-- [ ] **CMDK-02**: User can search commands with fuzzy matching
-- [ ] **CMDK-03**: User can navigate results with arrow keys
-- [ ] **CMDK-04**: User can execute command with Enter
-- [ ] **CMDK-05**: Palette shows recent commands
-- [ ] **CMDK-06**: Escape closes palette and returns focus
+- [x] **CMDK-01**: User can open palette with Cmd+K (Mac) or Ctrl+K (Windows)
+- [x] **CMDK-02**: User can search commands with fuzzy matching
+- [x] **CMDK-03**: User can navigate results with arrow keys
+- [x] **CMDK-04**: User can execute command with Enter
+- [x] **CMDK-05**: Palette shows recent commands
+- [x] **CMDK-06**: Escape closes palette and returns focus
 
 ### Context Menu
 
-- [ ] **CTXM-01**: User can open menu via right-click on desktop
-- [ ] **CTXM-02**: User can open menu via long-press on mobile
-- [ ] **CTXM-03**: User can navigate menu items with arrow keys
-- [ ] **CTXM-04**: User can select item with Enter
-- [ ] **CTXM-05**: Escape closes menu
-- [ ] **CTXM-06**: Menu positions within viewport (collision detection)
+- [x] **CTXM-01**: User can open menu via right-click on desktop
+- [x] **CTXM-02**: User can open menu via long-press on mobile
+- [x] **CTXM-03**: User can navigate menu items with arrow keys
+- [x] **CTXM-04**: User can select item with Enter
+- [x] **CTXM-05**: Escape closes menu
+- [x] **CTXM-06**: Menu positions within viewport (collision detection)
 
 ### Popover
 
-- [ ] **POPV-01**: User can open popover by clicking trigger
-- [ ] **POPV-02**: Popover positions automatically (top/bottom/left/right)
-- [ ] **POPV-03**: Click outside closes popover
-- [ ] **POPV-04**: Escape closes popover
-- [ ] **POPV-05**: Focus trapped within popover when open
+- [x] **POPV-01**: User can open popover by clicking trigger
+- [x] **POPV-02**: Popover positions automatically (top/bottom/left/right)
+- [x] **POPV-03**: Click outside closes popover
+- [x] **POPV-04**: Escape closes popover
+- [x] **POPV-05**: Focus trapped within popover when open
 
 ### Sheet/Drawer
 
@@ -71,12 +71,12 @@ Requirements for Advanced UI Components milestone. Each maps to roadmap phases.
 
 ### Dialog Patterns
 
-- [ ] **DLGC-01**: Confirmation dialog has cancel/confirm buttons
-- [ ] **DLGC-02**: Destructive actions use danger styling
-- [ ] **DLGC-03**: Focus starts on cancel button (safe default)
-- [ ] **DLGF-01**: Form modal integrates with form validation
-- [ ] **DLGF-02**: Form modal shows loading state during submit
-- [ ] **DLGF-03**: Form modal displays validation errors inline
+- [x] **DLGC-01**: Confirmation dialog has cancel/confirm buttons
+- [x] **DLGC-02**: Destructive actions use danger styling
+- [x] **DLGC-03**: Focus starts on cancel button (safe default)
+- [x] **DLGF-01**: Form modal integrates with form validation
+- [x] **DLGF-02**: Form modal shows loading state during submit
+- [x] **DLGF-03**: Form modal displays validation errors inline
 
 ### Micro-interactions
 
@@ -156,18 +156,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DTBL-07 | Phase 34 | Pending |
 | DTBL-08 | Phase 34 | Pending |
 | DTBL-09 | Phase 34 | Pending |
-| CMDK-01 | Phase 32 | Pending |
-| CMDK-02 | Phase 32 | Pending |
-| CMDK-03 | Phase 32 | Pending |
-| CMDK-04 | Phase 32 | Pending |
-| CMDK-05 | Phase 32 | Pending |
-| CMDK-06 | Phase 32 | Pending |
-| CTXM-01 | Phase 32 | Pending |
-| CTXM-02 | Phase 32 | Pending |
-| CTXM-03 | Phase 32 | Pending |
-| CTXM-04 | Phase 32 | Pending |
-| CTXM-05 | Phase 32 | Pending |
-| CTXM-06 | Phase 32 | Pending |
+| CMDK-01 | Phase 32 | Complete |
+| CMDK-02 | Phase 32 | Complete |
+| CMDK-03 | Phase 32 | Complete |
+| CMDK-04 | Phase 32 | Complete |
+| CMDK-05 | Phase 32 | Complete |
+| CMDK-06 | Phase 32 | Complete |
+| CTXM-01 | Phase 32 | Complete |
+| CTXM-02 | Phase 32 | Complete |
+| CTXM-03 | Phase 32 | Complete |
+| CTXM-04 | Phase 32 | Complete |
+| CTXM-05 | Phase 32 | Complete |
+| CTXM-06 | Phase 32 | Complete |
 | POPV-01 | Phase 30 | Complete |
 | POPV-02 | Phase 30 | Complete |
 | POPV-03 | Phase 30 | Complete |
@@ -178,12 +178,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SHEE-03 | Phase 31 | Complete |
 | SHEE-04 | Phase 31 | Complete |
 | SHEE-05 | Phase 31 | Complete |
-| DLGC-01 | Phase 33 | Pending |
-| DLGC-02 | Phase 33 | Pending |
-| DLGC-03 | Phase 33 | Pending |
-| DLGF-01 | Phase 33 | Pending |
-| DLGF-02 | Phase 33 | Pending |
-| DLGF-03 | Phase 33 | Pending |
+| DLGC-01 | Phase 33 | Complete |
+| DLGC-02 | Phase 33 | Complete |
+| DLGC-03 | Phase 33 | Complete |
+| DLGF-01 | Phase 33 | Complete |
+| DLGF-02 | Phase 33 | Complete |
+| DLGF-03 | Phase 33 | Complete |
 | ANIM-01 | Phase 35 | Pending |
 | ANIM-02 | Phase 35 | Pending |
 | ANIM-03 | Phase 35 | Pending |
@@ -207,4 +207,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-03*
-*Last updated: 2026-02-04 after Phase 30 completion*
+*Last updated: 2026-02-04 after Phase 33 completion*

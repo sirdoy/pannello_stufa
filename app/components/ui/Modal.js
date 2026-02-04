@@ -2,6 +2,7 @@
 
 import { forwardRef } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 import { X } from 'lucide-react';
@@ -98,6 +99,10 @@ ModalOverlay.displayName = 'ModalOverlay';
 
 /**
  * Modal Content - Main content container with size variants
+ *
+ * Includes a VisuallyHidden fallback title for accessibility when
+ * Modal.Title is not used by consumers (e.g., when using custom Heading components).
+ * This prevents Radix's "DialogContent requires a DialogTitle" console warning.
  */
 const ModalContent = forwardRef(function ModalContent(
   { className, size, children, ...props },
@@ -109,6 +114,10 @@ const ModalContent = forwardRef(function ModalContent(
       className={cn(contentVariants({ size }), className)}
       {...props}
     >
+      {/* Fallback accessible title - hidden from view but available to screen readers */}
+      <VisuallyHidden.Root asChild>
+        <DialogPrimitive.Title>Dialog</DialogPrimitive.Title>
+      </VisuallyHidden.Root>
       {children}
     </DialogPrimitive.Content>
   );

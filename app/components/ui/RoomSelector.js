@@ -5,10 +5,10 @@ import Select from './Select';
  *
  * Reusable room selector for multi-room devices.
  * Shows only when multiple rooms are available.
- * Includes visual indicators for offline/battery status.
+ * Includes visual indicators for offline/battery/heating status.
  *
  * @param {Object} props
- * @param {Array} props.rooms - Array of room objects {id, name, isOffline?, hasLowBattery?, hasCriticalBattery?}
+ * @param {Array} props.rooms - Array of room objects {id, name, isOffline?, hasLowBattery?, hasCriticalBattery?, heating?}
  * @param {string} props.selectedRoomId - Currently selected room ID
  * @param {Function} props.onChange - Change handler (receives event)
  * @param {string} props.icon - Icon emoji (default: 🚪)
@@ -39,6 +39,8 @@ export default function RoomSelector({
       statusIndicator = ' 🪫';
     } else if (room.hasLowBattery) {
       statusIndicator = ' 🔋';
+    } else if (room.heating) {
+      statusIndicator = ' 🔥';
     }
 
     return {

@@ -452,23 +452,10 @@ export default function ThermostatCard() {
       infoBoxes={infoBoxes}
       infoBoxesTitle="Informazioni"
     >
-      {/* Room Selection - includes status indicators */}
-      <RoomSelector
-        rooms={roomsWithStatus.map(room => ({
-          id: room.id,
-          name: room.name,
-          isOffline: room.isOffline,
-          hasLowBattery: room.hasLowBattery,
-          hasCriticalBattery: room.hasCriticalBattery,
-        }))}
-        selectedRoomId={selectedRoomId}
-        onChange={(e) => setSelectedRoomId(e.target.value)}
-      />
-
       {/* Active Devices List - Shows only actively heating rooms */}
       {activeRooms.length > 0 && (
-        <div className="mt-5 sm:mt-6">
-          <Divider label="Dispositivi Attivi" variant="gradient" spacing="large" />
+        <div className="mb-4 sm:mb-5">
+          <Divider label="Dispositivi Attivi" variant="gradient" spacing="medium" />
 
           <div className="mt-4 flex flex-wrap gap-2">
             {activeRooms.map((room) => {
@@ -493,6 +480,20 @@ export default function ThermostatCard() {
           </div>
         </div>
       )}
+
+      {/* Room Selection - includes status indicators */}
+      <RoomSelector
+        rooms={roomsWithStatus.map(room => ({
+          id: room.id,
+          name: room.name,
+          isOffline: room.isOffline,
+          hasLowBattery: room.hasLowBattery,
+          hasCriticalBattery: room.hasCriticalBattery,
+          heating: room.heating,
+        }))}
+        selectedRoomId={selectedRoomId}
+        onChange={(e) => setSelectedRoomId(e.target.value)}
+      />
 
       {/* Selected Room Temperature */}
       {selectedRoom ? (

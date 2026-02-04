@@ -12,7 +12,7 @@ This milestone adds 8 advanced UI components to the Ember Noir design system: Ta
 
 - [x] **Phase 30: Foundation Components** - Popover and Tabs (zero new dependencies)
 - [x] **Phase 31: Expandable Components** - Accordion and Sheet (new Radix packages)
-- [ ] **Phase 32: Action Components** - Context Menu and Command Palette (mobile critical)
+- [x] **Phase 32: Action Components** - Context Menu and Command Palette (mobile critical)
 - [ ] **Phase 33: Dialog Patterns** - Confirmation and Form Modal
 - [ ] **Phase 34: Data Table** - Full-featured sortable, filterable, paginated table
 - [ ] **Phase 35: Micro-interactions** - CSS animation system with reduced motion support
@@ -61,7 +61,7 @@ Plans:
 ### Phase 32: Action Components
 **Goal**: Add Context Menu and Command Palette for quick actions and power-user navigation
 **Depends on**: Phase 31 (Modal foundation for Command Palette)
-**Requirements**: CTXM-01, CTXM-02, CTXM-03, CTXM-04, CTXM-05, CTXM-06, CMDK-01, CMDK-02, CMDK-03, CMDK-04, CMDK-05, CMDK-06
+**Requirements**: CTXM-01, CTXM-02, CTXM-03, CTXM-04, CTXM-05, CTXM-06, CMDK-01, CMDK-02, CMDK-03, CMDK-04, CMDK-06 (CMDK-05 deferred per user decision: no recent commands)
 **Success Criteria** (what must be TRUE):
   1. User can open Context Menu via right-click (desktop) or long-press (mobile)
   2. Context Menu positions within viewport and supports keyboard navigation
@@ -71,9 +71,9 @@ Plans:
 **Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 32-01-PLAN.md - RightClickMenu component with Radix Context Menu (Wave 1)
-- [ ] 32-02-PLAN.md - CommandPalette with cmdk integration and Kbd component (Wave 1)
-- [ ] 32-03-PLAN.md - Add Action Components to design system page (Wave 2)
+- [x] 32-01-PLAN.md - RightClickMenu component with Radix Context Menu (Wave 1)
+- [x] 32-02-PLAN.md - CommandPalette with cmdk integration and Kbd component (Wave 1)
+- [x] 32-03-PLAN.md - Add Action Components to design system page (Wave 2)
 
 ---
 
@@ -157,13 +157,13 @@ Plans:
 |-------|----------------|--------|-----------|
 | 30. Foundation Components | 3/3 | Complete | 2026-02-04 |
 | 31. Expandable Components | 3/3 | Complete | 2026-02-04 |
-| 32. Action Components | 0/3 | Planned | - |
+| 32. Action Components | 3/3 | Complete | 2026-02-04 |
 | 33. Dialog Patterns | 0/3 | Not started | - |
 | 34. Data Table | 0/4 | Not started | - |
 | 35. Micro-interactions | 0/2 | Not started | - |
 | 36. Application Integration | 0/3 | Not started | - |
 
-**Total:** 6/21 plans (29%)
+**Total:** 9/21 plans (43%)
 
 ---
 
@@ -173,5 +173,6 @@ Plans:
 *Phase 31 planned: 2026-02-04*
 *Phase 31 completed: 2026-02-04*
 *Phase 32 planned: 2026-02-04*
+*Phase 32 completed: 2026-02-04*
 *Milestone: v4.0 Advanced UI Components*
 *Requirements coverage: 55/55 (100%)*

@@ -1004,6 +1004,37 @@
   .animate-progress-indeterminate {
     animation: progress-indeterminate 1.5s ease-in-out infinite;
   }
+
+  /* Accordion expand/collapse animations */
+  @keyframes accordion-down {
+    from {
+      height: 0;
+      opacity: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+      opacity: 1;
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+      opacity: 1;
+    }
+    to {
+      height: 0;
+      opacity: 0;
+    }
+  }
+
+  .animate-accordion-down {
+    animation: accordion-down 0.3s var(--ease-out-expo) forwards;
+  }
+
+  .animate-accordion-up {
+    animation: accordion-up 0.2s ease-in;
+  }
 }
 
 /* ===== UTILITY CLASSES ===== */

@@ -49,7 +49,7 @@ export default function EventFilters({
           onChange={(e) => handleTypeChange(e.target.value)}
           options={TYPE_OPTIONS}
           label="Tipo evento"
-          variant="glass"
+          variant="default"
         />
       </div>
 
@@ -60,7 +60,7 @@ export default function EventFilters({
           onChange={(e) => handleSeverityChange(e.target.value)}
           options={SEVERITY_OPTIONS}
           label="Severita"
-          variant="glass"
+          variant="default"
         />
       </div>
 

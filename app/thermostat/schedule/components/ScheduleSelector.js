@@ -69,7 +69,6 @@ export default function ScheduleSelector({
             onChange={(e) => setSelectedId(e.target.value)}
             options={options}
             disabled={switching || schedules.length === 0}
-            liquid
           />
         </div>
 

@@ -124,7 +124,6 @@ export default function ManualOverrideSheet({
               onChange={(e) => handleRoomChange(e.target.value)}
               options={roomOptions}
               disabled={roomsLoading || submitting}
-              liquid
             />
             {selectedRoom && (
               <Text variant="tertiary" size="xs" className="mt-1">

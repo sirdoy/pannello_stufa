@@ -205,7 +205,6 @@ describe('CommandPalette', () => {
     });
 
     it('search is case-insensitive', async () => {
-      const user = userEvent.setup();
       render(
         <CommandPalette
           open={true}
@@ -215,13 +214,15 @@ describe('CommandPalette', () => {
       );
 
       const input = screen.getByPlaceholderText('Type a command or search...');
-      await user.type(input, 'DASHBOARD');
+      // Use fireEvent for faster input (userEvent.type is slow)
+      fireEvent.change(input, { target: { value: 'DASHBOARD' } });
 
-      expect(screen.getByText('Dashboard')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Dashboard')).toBeInTheDocument();
+      });
     });
 
     it('clearing input shows all items', async () => {
-      const user = userEvent.setup();
       render(
         <CommandPalette
           open={true}
@@ -232,15 +233,18 @@ describe('CommandPalette', () => {
 
       const input = screen.getByPlaceholderText('Type a command or search...');
 
-      // Type to filter
-      await user.type(input, 'dash');
+      // Type to filter (use fireEvent for speed)
+      fireEvent.change(input, { target: { value: 'dash' } });
+
       // Clear input
-      await user.clear(input);
+      fireEvent.change(input, { target: { value: '' } });
 
       // All items should be visible again
-      expect(screen.getByText('Dashboard')).toBeInTheDocument();
-      expect(screen.getByText('Settings')).toBeInTheDocument();
-      expect(screen.getByText('Ignite Stove')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Dashboard')).toBeInTheDocument();
+        expect(screen.getByText('Settings')).toBeInTheDocument();
+        expect(screen.getByText('Ignite Stove')).toBeInTheDocument();
+      });
     });
   });
 
@@ -328,7 +332,6 @@ describe('CommandPalette', () => {
     });
 
     it('navigation wraps with loop prop', async () => {
-      const user = userEvent.setup();
       const commands = [
         {
           heading: 'Test',
@@ -348,15 +351,18 @@ describe('CommandPalette', () => {
       );
 
       // cmdk with loop prop allows wrapping navigation
-      // Navigate multiple times - should continue working without getting stuck
-      await user.keyboard('{ArrowDown}');
-      await user.keyboard('{ArrowDown}');
-      await user.keyboard('{ArrowDown}');
-      await user.keyboard('{ArrowDown}');
+      // Navigate multiple times using fireEvent (faster than userEvent)
+      const input = screen.getByPlaceholderText('Type a command or search...');
+      fireEvent.keyDown(input, { key: 'ArrowDown' });
+      fireEvent.keyDown(input, { key: 'ArrowDown' });
+      fireEvent.keyDown(input, { key: 'ArrowDown' });
+      fireEvent.keyDown(input, { key: 'ArrowDown' });
 
       // After wrapping, some item should still be selected (loop is working)
-      const selectedItem = document.querySelector('[data-selected="true"]');
-      expect(selectedItem).toBeInTheDocument();
+      await waitFor(() => {
+        const selectedItem = document.querySelector('[data-selected="true"]');
+        expect(selectedItem).toBeInTheDocument();
+      });
     });
 
     it('first item is selected by default when palette opens', async () => {
@@ -368,9 +374,11 @@ describe('CommandPalette', () => {
         />
       );
 
-      // cmdk auto-selects first item when palette opens
-      const selectedItem = document.querySelector('[data-selected="true"]');
-      expect(selectedItem).toBeInTheDocument();
+      // cmdk auto-selects first item when palette opens (may need a tick)
+      await waitFor(() => {
+        const selectedItem = document.querySelector('[data-selected="true"]');
+        expect(selectedItem).toBeInTheDocument();
+      });
     });
   });
 
@@ -801,12 +809,13 @@ describe('CommandPaletteProvider', () => {
         fireEvent.keyDown(document, { key: 'k', metaKey: true });
       });
 
-      // Wait for palette to open and check for navigation commands
+      // Wait for palette to open first
       await waitFor(() => {
-        expect(screen.getByText('Dashboard')).toBeInTheDocument();
-      }, { timeout: 5000 });
+        expect(screen.getByPlaceholderText('Type a command or search...')).toBeInTheDocument();
+      });
 
-      // Check other navigation commands
+      // Then check for navigation commands
+      expect(screen.getByText('Dashboard')).toBeInTheDocument();
       expect(screen.getByText('Thermostat')).toBeInTheDocument();
     });
 

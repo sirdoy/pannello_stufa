@@ -7,8 +7,9 @@ import { Card, Button, Skeleton, ErrorAlert, Banner, Heading, Text, Grid, InfoBo
 import RoomCard from '@/app/components/netatmo/RoomCard';
 import BatteryWarning, { ModuleBatteryList } from '@/app/components/devices/thermostat/BatteryWarning';
 import StoveSyncPanel from '@/app/components/netatmo/StoveSyncPanel';
+import ThermostatTabs from './components/ThermostatTabs';
 import { NETATMO_ROUTES } from '@/lib/routes';
-import { Calendar } from 'lucide-react';
+import { Calendar, Clock } from 'lucide-react';
 
 function NetatmoContent() {
   const searchParams = useSearchParams();
@@ -362,14 +363,14 @@ function NetatmoContent() {
         />
       }
     >
-      {/* Error Alert */}
+      {/* Error Alert - above tabs */}
       {error && (
         <div className="mb-6">
           <ErrorAlert message={error} />
         </div>
       )}
 
-      {/* Battery Warning Banner */}
+      {/* Battery Warning Banner - above tabs */}
       {(status?.hasLowBattery || status?.hasCriticalBattery) && (
         <div className="mb-6">
           <BatteryWarning
@@ -379,137 +380,160 @@ function NetatmoContent() {
         </div>
       )}
 
-      {/* Mode Control - Liquid Glass Card */}
-      <Card variant="glass" className="p-5 sm:p-6 mb-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <Heading level={2} size="xl" className="mb-1">
-              Modalità Riscaldamento
-            </Heading>
-            <Text variant="tertiary" size="sm">
-              {mode === 'schedule' && 'Programmazione attiva'}
-              {mode === 'away' && 'Modalità assenza'}
-              {mode === 'hg' && 'Antigelo'}
-              {mode === 'off' && 'Spento'}
-            </Text>
-          </div>
+      <ThermostatTabs
+        defaultValue="schedule"
+        scheduleContent={
+          <>
+            {/* Mode Control - Liquid Glass Card */}
+            <Card variant="glass" className="p-5 sm:p-6 mb-6">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div>
+                  <Heading level={2} size="xl" className="mb-1">
+                    Modalita Riscaldamento
+                  </Heading>
+                  <Text variant="tertiary" size="sm">
+                    {mode === 'schedule' && 'Programmazione attiva'}
+                    {mode === 'away' && 'Modalita assenza'}
+                    {mode === 'hg' && 'Antigelo'}
+                    {mode === 'off' && 'Spento'}
+                  </Text>
+                </div>
 
-          <div className="flex flex-wrap gap-2">
-            {['schedule', 'away', 'hg', 'off'].map((targetMode) => {
-              const config = modeConfig[targetMode];
-              const isActive = mode === targetMode;
-              return (
+                <div className="flex flex-wrap gap-2">
+                  {['schedule', 'away', 'hg', 'off'].map((targetMode) => {
+                    const config = modeConfig[targetMode];
+                    const isActive = mode === targetMode;
+                    return (
+                      <Button
+                        key={targetMode}
+                        variant={isActive ? 'subtle' : 'ghost'}
+                        colorScheme={config.colorScheme}
+                        onClick={() => handleModeChange(targetMode)}
+                        size="sm"
+                      >
+                        <span>{config.icon}</span>
+                        <span>{config.label}</span>
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
+            </Card>
+
+            {/* Schedule Management Link */}
+            <Card variant="glass" className="p-5 sm:p-6 mb-6">
+              <Link
+                href="/thermostat/schedule"
+                className="flex items-center justify-between group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="
+                    w-10 h-10 rounded-xl
+                    bg-ember-500/20 flex items-center justify-center
+                    group-hover:bg-ember-500/30 transition-colors
+                  ">
+                    <Calendar className="text-ember-400" size={20} />
+                  </div>
+                  <div>
+                    <Heading level={3} size="lg">
+                      Programmazione
+                    </Heading>
+                    <Text variant="secondary" size="sm">
+                      Visualizza e gestisci le programmazioni settimanali
+                    </Text>
+                  </div>
+                </div>
+                <Button variant="ghost" size="sm" className="group-hover:text-ember-400">
+                  Apri
+                </Button>
+              </Link>
+            </Card>
+
+            {/* Topology Info - Liquid Glass Card */}
+            <Card variant="glass" className="p-5 sm:p-6">
+              <Grid cols={3} gap="sm" className="md:grid-cols-3">
+                <InfoBox
+                  icon="🏠"
+                  label="Casa"
+                  value={topology.home_name}
+                  variant="neutral"
+                />
+                <InfoBox
+                  icon="🚪"
+                  label="Stanze"
+                  value={roomsWithStatus.length}
+                  variant="neutral"
+                />
+                <InfoBox
+                  icon="📡"
+                  label="Moduli"
+                  value={filteredModulesCount}
+                  variant="neutral"
+                />
+              </Grid>
+
+              {/* Module Battery Status List */}
+              {modulesWithBattery && modulesWithBattery.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
+                  <ModuleBatteryList modules={modulesWithBattery} />
+                </div>
+              )}
+
+              <div className="mt-4 pt-4 border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
                 <Button
-                  key={targetMode}
-                  variant={isActive ? 'subtle' : 'ghost'}
-                  colorScheme={config.colorScheme}
-                  onClick={() => handleModeChange(targetMode)}
+                  variant="subtle"
+                  onClick={handleRefresh}
+                  loading={refreshing}
                   size="sm"
                 >
-                  <span>{config.icon}</span>
-                  <span>{config.label}</span>
+                  Aggiorna Configurazione
                 </Button>
-              );
-            })}
-          </div>
-        </div>
-      </Card>
-
-      {/* Schedule Management Link */}
-      <Card variant="glass" className="p-5 sm:p-6 mb-6">
-        <Link
-          href="/thermostat/schedule"
-          className="flex items-center justify-between group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="
-              w-10 h-10 rounded-xl
-              bg-ember-500/20 flex items-center justify-center
-              group-hover:bg-ember-500/30 transition-colors
-            ">
-              <Calendar className="text-ember-400" size={20} />
+              </div>
+            </Card>
+          </>
+        }
+        manualContent={
+          <>
+            {/* Stove Sync Panel */}
+            <div className="mb-6">
+              <StoveSyncPanel onSyncComplete={fetchStatus} />
             </div>
-            <div>
+
+            {/* Rooms Grid */}
+            <Grid cols={3} gap="md">
+              {sortedRooms.map(room => (
+                <RoomCard
+                  key={room.id}
+                  room={room}
+                  onRefresh={fetchStatus}
+                />
+              ))}
+            </Grid>
+
+            {/* Empty State */}
+            {rooms.length === 0 && (
+              <Card variant="default" className="p-12 text-center">
+                <Text variant="tertiary">
+                  Nessuna stanza configurata. Aggiungi dispositivi Netatmo tramite l&apos;app ufficiale.
+                </Text>
+              </Card>
+            )}
+          </>
+        }
+        historyContent={
+          <Card variant="glass" className="p-8 text-center">
+            <div className="flex flex-col items-center gap-4">
+              <Clock className="w-12 h-12 text-slate-400" />
               <Heading level={3} size="lg">
-                Programmazione
+                Storico Temperature
               </Heading>
-              <Text variant="secondary" size="sm">
-                Visualizza e gestisci le programmazioni settimanali
+              <Text variant="secondary">
+                Lo storico delle temperature sara disponibile in un prossimo aggiornamento.
               </Text>
             </div>
-          </div>
-          <Button variant="ghost" size="sm" className="group-hover:text-ember-400">
-            Apri →
-          </Button>
-        </Link>
-      </Card>
-
-      {/* Stove-Thermostat Sync Configuration */}
-      <div className="mb-6">
-        <StoveSyncPanel onSyncComplete={fetchStatus} />
-      </div>
-
-      {/* Topology Info - Liquid Glass Card */}
-      <Card variant="glass" className="p-5 sm:p-6 mb-6">
-        <Grid cols={3} gap="sm" className="md:grid-cols-3">
-          <InfoBox
-            icon="🏠"
-            label="Casa"
-            value={topology.home_name}
-            variant="neutral"
-          />
-          <InfoBox
-            icon="🚪"
-            label="Stanze"
-            value={roomsWithStatus.length}
-            variant="neutral"
-          />
-          <InfoBox
-            icon="📡"
-            label="Moduli"
-            value={filteredModulesCount}
-            variant="neutral"
-          />
-        </Grid>
-
-        {/* Module Battery Status List */}
-        {modulesWithBattery && modulesWithBattery.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
-            <ModuleBatteryList modules={modulesWithBattery} />
-          </div>
-        )}
-
-        <div className="mt-4 pt-4 border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
-          <Button
-            variant="subtle"
-            onClick={handleRefresh}
-            loading={refreshing}
-            size="sm"
-          >
-            🔄 Aggiorna Configurazione
-          </Button>
-        </div>
-      </Card>
-
-      {/* Rooms Grid */}
-      <Grid cols={3} gap="md">
-        {sortedRooms.map(room => (
-          <RoomCard
-            key={room.id}
-            room={room}
-            onRefresh={fetchStatus}
-          />
-        ))}
-      </Grid>
-
-      {/* Empty State */}
-      {rooms.length === 0 && (
-        <Card variant="default" className="p-12 text-center">
-          <Text variant="tertiary">
-            Nessuna stanza configurata. Aggiungi dispositivi Netatmo tramite l&apos;app ufficiale.
-          </Text>
-        </Card>
-      )}
+          </Card>
+        }
+      />
     </PageLayout>
   );
 }

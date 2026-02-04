@@ -35,20 +35,21 @@ export default function ErrorAlert({ errorCode, errorDescription, className = ''
   const config = getSeverityConfig();
 
   // Build description with suggestion if available
+  // Use <span> with block display to avoid <div> inside <p> hydration error
   const fullDescription = (
     <>
-      <div className="font-semibold mb-2">
+      <span className="block font-semibold mb-2">
         {errorDescription || errorInfo.description}
-      </div>
+      </span>
       {showSuggestion && suggestion && (
-        <div className="mt-3 p-3 bg-slate-800/40 backdrop-blur-2xl rounded-lg ring-1 ring-slate-700/50 ring-inset [html:not(.dark)_&]:bg-slate-100/60 [html:not(.dark)_&]:ring-slate-200">
-          <Text variant="secondary" size="sm" weight="medium" className="mb-1">
+        <span className="block mt-3 p-3 bg-slate-800/40 backdrop-blur-2xl rounded-lg ring-1 ring-slate-700/50 ring-inset [html:not(.dark)_&]:bg-slate-100/60 [html:not(.dark)_&]:ring-slate-200">
+          <span className="block mb-1 text-sm font-medium text-slate-300 [html:not(.dark)_&]:text-slate-600">
             💡 Suggerimento:
-          </Text>
-          <Text variant="tertiary" size="sm">
+          </span>
+          <span className="block text-sm text-slate-400 [html:not(.dark)_&]:text-slate-500">
             {suggestion}
-          </Text>
-        </div>
+          </span>
+        </span>
       )}
     </>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useState, useCallback } from 'react';
+import { forwardRef, useState, useCallback, useRef } from 'react';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
@@ -195,9 +195,9 @@ function Popover({
     [isControlled, onOpenChange]
   );
 
-  // Hover mode handlers
-  const openTimeoutRef = { current: null };
-  const closeTimeoutRef = { current: null };
+  // Hover mode handlers - use refs to persist across renders
+  const openTimeoutRef = useRef(null);
+  const closeTimeoutRef = useRef(null);
 
   const handleMouseEnter = useCallback(() => {
     if (closeTimeoutRef.current) {

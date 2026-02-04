@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getRecentErrors, resolveError } from '@/lib/errorMonitor';
-import { Card, Button, Pagination, Skeleton } from '@/app/components/ui';
+import { Card, Button, Pagination, Skeleton, Badge } from '@/app/components/ui';
 import ErrorAlert from '@/app/components/ui/ErrorAlert';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
@@ -109,47 +109,30 @@ export default function ErrorsPage() {
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex gap-2 flex-wrap">
-          <button
-            onClick={() => {
-              setFilter('all');
-              setCurrentPage(0);
-            }}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-              filter === 'all'
-                ? 'bg-slate-900 text-white shadow-liquid-sm'
-                : 'bg-white/[0.08] backdrop-blur-2xl text-slate-400 hover:bg-white/[0.12] hover:text-slate-100 shadow-liquid-sm ring-1 ring-white/[0.15] ring-inset [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:hover:text-slate-900'
-            }`}
+        <Button.Group>
+          <Button
+            variant={filter === 'all' ? 'subtle' : 'ghost'}
+            size="sm"
+            onClick={() => { setFilter('all'); setCurrentPage(0); }}
           >
             Tutti ({errors.length})
-          </button>
-          <button
-            onClick={() => {
-              setFilter('active');
-              setCurrentPage(0);
-            }}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-              filter === 'active'
-                ? 'bg-ember-600 text-white shadow-liquid-sm'
-                : 'bg-ember-500/[0.08] backdrop-blur-2xl text-ember-400 [html:not(.dark)_&]:text-ember-600 hover:bg-ember-500/[0.12] shadow-liquid-sm ring-1 ring-ember-500/20 ring-inset'
-            }`}
+          </Button>
+          <Button
+            variant={filter === 'active' ? 'ember' : 'outline'}
+            size="sm"
+            onClick={() => { setFilter('active'); setCurrentPage(0); }}
           >
             Attivi ({errors.filter(e => !e.resolved).length})
-          </button>
-          <button
-            onClick={() => {
-              setFilter('resolved');
-              setCurrentPage(0);
-            }}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-              filter === 'resolved'
-                ? 'bg-sage-600 text-white shadow-liquid-sm'
-                : 'bg-sage-500/[0.08] backdrop-blur-2xl text-sage-400 [html:not(.dark)_&]:text-sage-600 hover:bg-sage-500/[0.12] shadow-liquid-sm ring-1 ring-sage-500/20 ring-inset'
-            }`}
+          </Button>
+          <Button
+            variant={filter === 'resolved' ? 'success' : 'ghost'}
+            colorScheme={filter !== 'resolved' ? 'sage' : undefined}
+            size="sm"
+            onClick={() => { setFilter('resolved'); setCurrentPage(0); }}
           >
             Risolti ({errors.filter(e => e.resolved).length})
-          </button>
-        </div>
+          </Button>
+        </Button.Group>
       </Card>
 
       {/* Errors List */}
@@ -198,13 +181,9 @@ export default function ErrorsPage() {
                     <Text variant="tertiary" size="xs" className="mb-1">Stato</Text>
                     <div className="flex items-center gap-2">
                       {error.resolved ? (
-                        <Text as="span" variant="sage" size="xs" weight="medium" className="inline-flex items-center gap-1 px-2 py-1 bg-sage-100 [html:not(.dark)_&]:bg-sage-100 rounded">
-                          ✓ Risolto
-                        </Text>
+                        <Badge variant="sage" size="sm" icon="✓">Risolto</Badge>
                       ) : (
-                        <Text as="span" variant="warning" size="xs" weight="medium" className="inline-flex items-center gap-1 px-2 py-1 bg-warning-100 [html:not(.dark)_&]:bg-warning-100 rounded">
-                          ⚠ Attivo
-                        </Text>
+                        <Badge variant="warning" size="sm" icon="⚠">Attivo</Badge>
                       )}
                     </div>
                   </div>

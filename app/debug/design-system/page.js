@@ -91,6 +91,59 @@ export default function DesignSystemPage() {
       >
         <div className="space-y-8">
 
+        {/* Table of Contents */}
+        <Card variant="elevated">
+          <CardHeader>
+            <CardTitle>
+              <span className="mr-2">📑</span>
+              Indice
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <nav className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              {[
+                { icon: '📝', title: 'Typography', anchor: 'typography' },
+                { icon: '🎨', title: 'Color Palette', anchor: 'color-palette' },
+                { icon: '🔘', title: 'Buttons', anchor: 'buttons' },
+                { icon: '🃏', title: 'Cards', anchor: 'cards' },
+                { icon: '📢', title: 'Banners', anchor: 'banners' },
+                { icon: '🏷️', title: 'Status Badges', anchor: 'status-badges' },
+                { icon: '🏷️', title: 'Badge (CVA)', anchor: 'badge-cva' },
+                { icon: '🏠', title: 'Smart Home', anchor: 'smart-home-components' },
+                { icon: '📐', title: 'Layout', anchor: 'layout-components' },
+                { icon: '📝', title: 'Form Inputs', anchor: 'form-inputs' },
+                { icon: '📊', title: 'Progress Bar', anchor: 'progress-bar' },
+                { icon: '🪟', title: 'Modal & Overlays', anchor: 'modal-overlays' },
+                { icon: '🪗', title: 'Accordion', anchor: 'accordion' },
+                { icon: '📋', title: 'Sheet', anchor: 'sheet' },
+                { icon: '🔔', title: 'Toast', anchor: 'toast-notifications' },
+                { icon: '⏳', title: 'Loading States', anchor: 'loading-states' },
+                { icon: '🌤️', title: 'Weather Icons', anchor: 'weather-icons' },
+                { icon: '📭', title: 'Empty States', anchor: 'empty-states' },
+                { icon: '➖', title: 'Dividers', anchor: 'dividers' },
+                { icon: '📏', title: 'Spacing Scale', anchor: 'spacing-scale' },
+                { icon: '⭕', title: 'Border Radius', anchor: 'border-radius' },
+                { icon: '🌑', title: 'Shadow System', anchor: 'shadow-system' },
+                { icon: '✅', title: 'Best Practices', anchor: 'critical-best-practices' },
+              ].map(({ icon, title, anchor }) => (
+                <a
+                  key={anchor}
+                  href={`#${anchor}`}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm
+                    text-slate-300 hover:text-ember-400
+                    bg-white/[0.02] hover:bg-white/[0.06]
+                    [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:hover:text-ember-600
+                    [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:hover:bg-slate-200
+                    transition-colors duration-200"
+                >
+                  <span aria-hidden="true">{icon}</span>
+                  <span className="truncate">{title}</span>
+                </a>
+              ))}
+            </nav>
+          </CardContent>
+        </Card>
+
         {/* Typography */}
         <SectionShowcase title="Typography" icon="📝" docs="docs/design-system.md#typography">
           <Card>
@@ -2239,8 +2292,11 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
  * Section wrapper with title and optional docs link (showcase-specific variant)
  */
 function SectionShowcase({ title, icon, docs, children }) {
+  // Generate anchor ID from title (lowercase, replace spaces with dashes)
+  const anchorId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
   return (
-    <section className="space-y-4">
+    <section id={anchorId} className="space-y-4 scroll-mt-24">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="text-3xl" aria-hidden="true">{icon}</span>

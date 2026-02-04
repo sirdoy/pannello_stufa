@@ -10,6 +10,7 @@ import {
 import { cva } from 'class-variance-authority';
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
+import Checkbox from './Checkbox';
 
 /**
  * DataTable Variants - CVA Configuration
@@ -107,6 +108,9 @@ function SortIndicator({ isSorted, direction }) {
  * @param {string} [props.className] - Additional CSS classes for the table
  * @param {Function} [props.onRowClick] - Callback when a row is clicked
  * @param {Function} [props.getRowId] - Custom function to get row ID
+ * @param {'none'|'single'|'multi'} [props.selectionMode='none'] - Row selection mode
+ * @param {Function} [props.onSelectionChange] - Callback when selection changes (selectedRowIds: Record<string, boolean>) => void
+ * @param {Object} [props.selectedRows] - Controlled selection state (Record<string, boolean>)
  *
  * @example
  * // Basic usage
@@ -148,16 +152,88 @@ const DataTable = forwardRef(function DataTable(
     className,
     onRowClick,
     getRowId,
+    selectionMode = 'none',
+    onSelectionChange,
+    selectedRows: controlledSelectedRows,
     ...props
   },
   ref
 ) {
   // CRITICAL: Memoize data and columns to prevent infinite re-renders
   const data = useMemo(() => dataProp ?? [], [dataProp]);
-  const columns = useMemo(() => columnsProp ?? [], [columnsProp]);
+  const baseColumns = useMemo(() => columnsProp ?? [], [columnsProp]);
 
   // Sorting state
   const [sorting, setSorting] = useState([]);
+
+  // Selection state (internal for uncontrolled mode)
+  const [internalRowSelection, setInternalRowSelection] = useState({});
+
+  // Use controlled or internal selection state
+  const isSelectionControlled = controlledSelectedRows !== undefined;
+  const rowSelection = isSelectionControlled ? controlledSelectedRows : internalRowSelection;
+
+  // Handle selection change
+  const handleRowSelectionChange = useCallback(
+    (updaterOrValue) => {
+      const newSelection =
+        typeof updaterOrValue === 'function'
+          ? updaterOrValue(rowSelection)
+          : updaterOrValue;
+
+      if (!isSelectionControlled) {
+        setInternalRowSelection(newSelection);
+      }
+
+      if (onSelectionChange) {
+        onSelectionChange(newSelection);
+      }
+    },
+    [isSelectionControlled, rowSelection, onSelectionChange]
+  );
+
+  // Create selection column when selectionMode !== 'none'
+  const selectionColumn = useMemo(() => {
+    if (selectionMode === 'none') return null;
+
+    return {
+      id: 'select',
+      header: ({ table }) =>
+        selectionMode === 'multi' ? (
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected()}
+            indeterminate={table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected()}
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all rows"
+            size="sm"
+          />
+        ) : null,
+      cell: ({ row }) => (
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="flex items-center justify-center"
+        >
+          <Checkbox
+            checked={row.getIsSelected()}
+            disabled={!row.getCanSelect()}
+            onCheckedChange={row.toggleSelected}
+            aria-label={`Select row ${row.id}`}
+            size="sm"
+          />
+        </div>
+      ),
+      size: 40,
+      enableSorting: false,
+    };
+  }, [selectionMode]);
+
+  // Merge selection column with user columns
+  const columns = useMemo(() => {
+    if (selectionColumn) {
+      return [selectionColumn, ...baseColumns];
+    }
+    return baseColumns;
+  }, [selectionColumn, baseColumns]);
 
   // Row click handler
   const handleRowClick = useCallback(
@@ -175,8 +251,12 @@ const DataTable = forwardRef(function DataTable(
     columns,
     state: {
       sorting,
+      rowSelection,
     },
     onSortingChange: setSorting,
+    onRowSelectionChange: handleRowSelectionChange,
+    enableRowSelection: selectionMode !== 'none',
+    enableMultiRowSelection: selectionMode === 'multi',
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getRowId: getRowId,
@@ -210,7 +290,8 @@ const DataTable = forwardRef(function DataTable(
                     className={cn(
                       'px-4 text-left text-sm font-semibold text-slate-300',
                       'border-b border-white/[0.06]',
-                      canSort && 'cursor-pointer select-none'
+                      canSort && 'cursor-pointer select-none',
+                      header.id === 'select' && 'w-10 px-2 text-center'
                     )}
                   >
                     {header.isPlaceholder ? null : canSort ? (
@@ -252,7 +333,7 @@ const DataTable = forwardRef(function DataTable(
             <tr role="row">
               <td
                 role="cell"
-                colSpan={columns.length}
+                colSpan={table.getAllColumns().length}
                 className="px-4 py-8 text-center text-slate-400"
               >
                 No data available
@@ -267,7 +348,8 @@ const DataTable = forwardRef(function DataTable(
                   'border-b border-white/[0.06] last:border-b-0',
                   'text-slate-200',
                   'hover:bg-white/[0.02] transition-colors',
-                  onRowClick && 'cursor-pointer'
+                  onRowClick && 'cursor-pointer',
+                  row.getIsSelected() && 'bg-ember-500/10'
                 )}
                 onClick={() => handleRowClick(row)}
               >
@@ -275,7 +357,10 @@ const DataTable = forwardRef(function DataTable(
                   <td
                     key={cell.id}
                     role="cell"
-                    className="px-4 text-sm"
+                    className={cn(
+                      'px-4 text-sm',
+                      cell.column.id === 'select' && 'w-10 px-2'
+                    )}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>

@@ -29,6 +29,8 @@ import Section from '@/app/components/ui/Section';
 import Grid from '@/app/components/ui/Grid';
 import Tooltip from '@/app/components/ui/Tooltip';
 import Spinner from '@/app/components/ui/Spinner';
+import Accordion from '@/app/components/ui/Accordion';
+import Sheet from '@/app/components/ui/Sheet';
 import { WeatherIcon, getWeatherLabel } from '@/app/components/weather/WeatherIcon';
 import { useState } from 'react';
 import CodeBlock from './components/CodeBlock';
@@ -58,6 +60,10 @@ export default function DesignSystemPage() {
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [checkboxState, setCheckboxState] = useState(false);
   const [checkboxIndeterminate, setCheckboxIndeterminate] = useState(true);
+  const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
+  const [rightSheetOpen, setRightSheetOpen] = useState(false);
+  const [leftSheetOpen, setLeftSheetOpen] = useState(false);
+  const [topSheetOpen, setTopSheetOpen] = useState(false);
 
   return (
       <PageLayout
@@ -1455,6 +1461,96 @@ export default function DesignSystemPage() {
                   <Text variant="tertiary" size="sm" className="mt-3">
                     Features: React Portal, scroll lock, drag handle, Escape key, backdrop blur, max-h-[85vh]
                   </Text>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </SectionShowcase>
+
+        {/* Accordion Component */}
+        <SectionShowcase title="Accordion" icon="🪗" docs="app/components/ui/Accordion.js">
+          <Card>
+            <CardContent>
+              <div className="space-y-6">
+                {/* Single Mode */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Single Mode (FAQ Pattern)</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    type="single" - Only one item open at a time. Collapsible allows closing all.
+                  </Text>
+                  <Accordion type="single" collapsible defaultValue="faq-1">
+                    <Accordion.Item value="faq-1">
+                      <Accordion.Trigger>Come posso programmare la stufa?</Accordion.Trigger>
+                      <Accordion.Content>
+                        Puoi programmare la stufa usando la sezione Schedule nel pannello di
+                        controllo. Imposta orari e temperature per ogni giorno della settimana.
+                      </Accordion.Content>
+                    </Accordion.Item>
+                    <Accordion.Item value="faq-2">
+                      <Accordion.Trigger>Cosa significa "needsCleaning"?</Accordion.Trigger>
+                      <Accordion.Content>
+                        La stufa richiede manutenzione quando ha funzionato per il numero
+                        di ore configurato. L'accensione automatica viene bloccata fino
+                        alla pulizia.
+                      </Accordion.Content>
+                    </Accordion.Item>
+                    <Accordion.Item value="faq-3">
+                      <Accordion.Trigger>Come funziona il termostato?</Accordion.Trigger>
+                      <Accordion.Content>
+                        Il termostato Netatmo si collega via WiFi e permette di controllare
+                        la temperatura ambiente. Supporta modalita manuale, programmata e
+                        assente.
+                      </Accordion.Content>
+                    </Accordion.Item>
+                  </Accordion>
+                </div>
+
+                <CardDivider />
+
+                {/* Multiple Mode */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Multiple Mode (Info Sections)</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    type="multiple" - Multiple items can be open simultaneously
+                  </Text>
+                  <Accordion type="multiple" defaultValue={['info-1', 'info-2']}>
+                    <Accordion.Item value="info-1">
+                      <Accordion.Trigger>Informazioni dispositivo</Accordion.Trigger>
+                      <Accordion.Content>
+                        Modello: Thermorossi 1000<br/>
+                        Firmware: v2.4.1<br/>
+                        Ultima connessione: Oggi, 10:30
+                      </Accordion.Content>
+                    </Accordion.Item>
+                    <Accordion.Item value="info-2">
+                      <Accordion.Trigger>Statistiche di utilizzo</Accordion.Trigger>
+                      <Accordion.Content>
+                        Ore totali: 1,234h<br/>
+                        Consumo pellet: ~500kg/stagione<br/>
+                        Efficienza: 92%
+                      </Accordion.Content>
+                    </Accordion.Item>
+                    <Accordion.Item value="info-3">
+                      <Accordion.Trigger>Manutenzione programmata</Accordion.Trigger>
+                      <Accordion.Content>
+                        Prossima pulizia: tra 48 ore<br/>
+                        Ultimo servizio: 2026-01-15
+                      </Accordion.Content>
+                    </Accordion.Item>
+                  </Accordion>
+                </div>
+
+                <CardDivider />
+
+                {/* Features */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Features</Text>
+                  <div className="space-y-2">
+                    <Text variant="tertiary" size="sm">Keyboard: Arrow keys navigate, Enter/Space toggle, Home/End jump</Text>
+                    <Text variant="tertiary" size="sm">Animation: Smooth height with Radix CSS variables (--radix-accordion-content-height)</Text>
+                    <Text variant="tertiary" size="sm">Accessibility: aria-expanded, aria-controls, focus ring</Text>
+                    <Text variant="tertiary" size="sm">Touch: 48px minimum height for mobile</Text>
+                  </div>
                 </div>
               </div>
             </CardContent>

@@ -134,10 +134,11 @@ await runTransaction(ref(db, 'maintenance'), (current) => {
 |------|-------|
 | `cronHealth/lastCall` | Banner monitoring |
 | `stoveScheduler/*` | UI scheduler |
+| `stove/state` | Stove real-time state |
 | `maintenance` | Card manutenzione |
 | `log`, `errors` | Storico |
 | `changelog` | Version check |
-| `netatmo/currentStatus, topology` | ThermostatCard |
+| `netatmo/currentStatus, topology, deviceConfig` | ThermostatCard |
 | `hue/lights, groups` | LightsCard |
 
 ### Dati Privati (Admin SDK Only)
@@ -149,7 +150,8 @@ await runTransaction(ref(db, 'maintenance'), (current) => {
 | `users/{userId}/fcmTokens` | ALTA |
 | `users/{userId}/notificationPreferences` | MEDIA |
 | `devicePreferences/{userId}` | MEDIA |
-| `dev/*` | MEDIA |
+
+**Note**: `dev/*` namespace mirrors production structure with same read/write rules
 
 ### Deploy Rules
 

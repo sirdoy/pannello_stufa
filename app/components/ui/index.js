@@ -64,6 +64,9 @@ export { default as Sheet, SheetTrigger, SheetContent, SheetHeader, SheetFooter,
 // Accordion (v4.0+)
 export { default as Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './Accordion';
 
+// RightClickMenu (v4.0+)
+export { default as RightClickMenu, RightClickMenuTrigger, RightClickMenuContent, RightClickMenuItem, RightClickMenuCheckboxItem, RightClickMenuSeparator, RightClickMenuLabel, RightClickMenuGroup } from './RightClickMenu';
+
 // Feedback components (v3.0+)
 export { default as Spinner, spinnerVariants } from './Spinner';
 export { default as Progress, progressVariants } from './Progress';

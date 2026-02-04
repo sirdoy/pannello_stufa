@@ -71,10 +71,11 @@ None — Ready to begin v4.0.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 002 | Weather data cron + manual refresh | 2026-02-03 | 5ff4c93 | [002-weather-data-cron-manual-refresh](./quick/002-weather-data-cron-manual-refresh/) |
+| 003 | iOS PWA haptic feedback + viewport optimizations | 2026-02-04 | c38be8d | [003-ios-pwa-haptic-siri-shortcuts](./quick/003-ios-pwa-haptic-siri-shortcuts/) |
 
 ## Session Continuity
 
 Last session: 2026-02-04
-Stopped at: Phase 30 verified and complete
+Stopped at: Completed quick task 003 (iOS PWA haptic + viewport optimizations)
 Resume file: None
 Next step: `/gsd:discuss-phase 31` or `/gsd:plan-phase 31` for Expandable Components (Accordion + Sheet)

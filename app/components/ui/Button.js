@@ -3,6 +3,7 @@
 import { forwardRef } from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
+import { useHaptic } from '@/app/hooks/useHaptic';
 
 /**
  * Button Variants - CVA Configuration
@@ -200,6 +201,8 @@ const iconSizes = {
  * @param {boolean} props.fullWidth - Expand to full width
  * @param {boolean} props.iconOnly - Circular icon-only button
  * @param {'sage'|'ocean'|'warning'|'slate'} props.colorScheme - Color tinting for subtle/ghost variants (optional)
+ * @param {boolean} props.haptic - Enable haptic feedback on click (default: true)
+ * @param {'short'|'success'|'warning'|'error'} props.hapticPattern - Haptic pattern override (default: based on variant)
  * @param {string} props.className - Additional Tailwind classes
  */
 const Button = forwardRef(function Button(
@@ -214,11 +217,32 @@ const Button = forwardRef(function Button(
     fullWidth = false,
     iconOnly = false,
     colorScheme,
+    haptic = true,
+    hapticPattern,
     className,
+    onClick,
     ...props
   },
   ref
 ) {
+  // Determine haptic pattern based on variant if not explicitly provided
+  const resolvedHapticPattern = hapticPattern || (() => {
+    if (variant === 'danger') return 'warning';
+    if (variant === 'success' || variant === 'ember') return 'short';
+    return 'short';
+  })();
+
+  // Initialize haptic feedback
+  const hapticFeedback = useHaptic(resolvedHapticPattern);
+
+  // Wrap onClick to include haptic feedback
+  const handleClick = (e) => {
+    if (haptic && !disabled && !loading) {
+      hapticFeedback.trigger();
+    }
+    onClick?.(e);
+  };
+
   return (
     <button
       ref={ref}
@@ -227,6 +251,7 @@ const Button = forwardRef(function Button(
         buttonVariants({ variant, size, fullWidth, iconOnly, colorScheme }),
         className
       )}
+      onClick={handleClick}
       {...props}
     >
       {/* Loading spinner overlay */}

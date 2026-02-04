@@ -5,7 +5,49 @@
 
     "dev": {
       ".read": false,
-      ".write": false
+      ".write": false,
+
+      "stove": {
+        "state": {
+          ".read": true,
+          ".write": false
+        }
+      },
+
+      "netatmo": {
+        ".read": false,
+        ".write": false,
+
+        "currentStatus": {
+          ".read": true,
+          ".write": false
+        },
+
+        "topology": {
+          ".read": true,
+          ".write": false
+        },
+
+        "deviceConfig": {
+          ".read": true,
+          ".write": false
+        }
+      },
+
+      "hue": {
+        ".read": false,
+        ".write": false,
+
+        "lights": {
+          ".read": true,
+          ".write": false
+        },
+
+        "groups": {
+          ".read": true,
+          ".write": false
+        }
+      }
     },
 
     "cronHealth": {
@@ -40,6 +82,13 @@
           ".read": true,
           ".write": false
         }
+      }
+    },
+
+    "stove": {
+      "state": {
+        ".read": true,
+        ".write": false
       }
     },
 

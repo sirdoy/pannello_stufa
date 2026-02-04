@@ -31,8 +31,13 @@ import Tooltip from '@/app/components/ui/Tooltip';
 import Spinner from '@/app/components/ui/Spinner';
 import Accordion from '@/app/components/ui/Accordion';
 import Sheet from '@/app/components/ui/Sheet';
+import RightClickMenu from '@/app/components/ui/RightClickMenu';
+import CommandPalette from '@/app/components/ui/CommandPalette';
+import Kbd from '@/app/components/ui/Kbd';
+import { useContextMenuLongPress, longPressPreventSelection } from '@/app/hooks/useContextMenuLongPress';
 import { WeatherIcon, getWeatherLabel } from '@/app/components/weather/WeatherIcon';
 import { useState } from 'react';
+import { Home, Settings, Power, Moon, Edit, Trash2, Copy, Share } from 'lucide-react';
 import CodeBlock from './components/CodeBlock';
 import PropTable from './components/PropTable';
 import AccessibilitySection from './components/AccessibilitySection';
@@ -64,6 +69,8 @@ export default function DesignSystemPage() {
   const [rightSheetOpen, setRightSheetOpen] = useState(false);
   const [leftSheetOpen, setLeftSheetOpen] = useState(false);
   const [topSheetOpen, setTopSheetOpen] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [menuCheckboxState, setMenuCheckboxState] = useState(false);
 
   return (
       <PageLayout
@@ -116,6 +123,7 @@ export default function DesignSystemPage() {
                 { icon: '🪟', title: 'Modal & Overlays', anchor: 'modal-overlays' },
                 { icon: '🪗', title: 'Accordion', anchor: 'accordion' },
                 { icon: '📋', title: 'Sheet', anchor: 'sheet' },
+                { icon: '🎯', title: 'Action Components', anchor: 'action-components' },
                 { icon: '🔔', title: 'Toast', anchor: 'toast-notifications' },
                 { icon: '⏳', title: 'Loading States', anchor: 'loading-states' },
                 { icon: '🌤️', title: 'Weather Icons', anchor: 'weather-icons' },
@@ -1735,6 +1743,140 @@ export default function DesignSystemPage() {
                     <Text variant="tertiary" size="sm">iOS: Safe area padding on bottom sheet (pb-safe)</Text>
                     <Text variant="tertiary" size="sm">Animation: Slide from edge with backdrop fade</Text>
                   </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </SectionShowcase>
+
+        {/* Action Components */}
+        <SectionShowcase title="Action Components" icon="🎯" docs="app/components/ui/RightClickMenu.js">
+          <Card>
+            <CardContent>
+              <Text variant="secondary" className="mb-6">
+                Context menus and command palettes for quick actions and power-user navigation.
+              </Text>
+
+              {/* Kbd Component */}
+              <div className="mb-8">
+                <Text variant="label" size="xs" className="mb-3">Kbd (Keyboard Shortcut)</Text>
+                <div className="flex flex-wrap gap-4 mb-4">
+                  <Kbd>Cmd+K</Kbd>
+                  <Kbd>Ctrl+K</Kbd>
+                  <Kbd>Enter</Kbd>
+                  <Kbd>Esc</Kbd>
+                  <Kbd>Arrow Down</Kbd>
+                </div>
+                <Text variant="tertiary" size="sm">
+                  Display keyboard shortcuts with consistent styling. Monospace font, bordered appearance.
+                </Text>
+              </div>
+
+              <CardDivider />
+
+              {/* RightClickMenu Component */}
+              <div className="mb-8 mt-6">
+                <Text variant="label" size="xs" className="mb-3">RightClickMenu (Context Menu)</Text>
+                <Text variant="tertiary" size="sm" className="mb-4">
+                  Built on Radix Context Menu. Right-click on desktop, long-press on mobile.
+                </Text>
+                <RightClickMenu>
+                  <RightClickMenu.Trigger asChild>
+                    <div className="
+                      p-8 rounded-xl border-2 border-dashed border-slate-700
+                      [html:not(.dark)_&]:border-slate-300
+                      text-center cursor-context-menu
+                      hover:border-ember-500/50 transition-colors
+                    ">
+                      <Text variant="secondary">Right-click here (desktop) or long-press (mobile)</Text>
+                    </div>
+                  </RightClickMenu.Trigger>
+                  <RightClickMenu.Content>
+                    <RightClickMenu.Label>Actions</RightClickMenu.Label>
+                    <RightClickMenu.Item icon={<Edit className="w-4 h-4" />}>
+                      Edit
+                    </RightClickMenu.Item>
+                    <RightClickMenu.Item icon={<Copy className="w-4 h-4" />}>
+                      Duplicate
+                    </RightClickMenu.Item>
+                    <RightClickMenu.Item icon={<Share className="w-4 h-4" />}>
+                      Share
+                    </RightClickMenu.Item>
+                    <RightClickMenu.Separator />
+                    <RightClickMenu.CheckboxItem
+                      checked={menuCheckboxState}
+                      onCheckedChange={setMenuCheckboxState}
+                      icon={<Power className="w-4 h-4" />}
+                    >
+                      Auto Mode
+                    </RightClickMenu.CheckboxItem>
+                    <RightClickMenu.Separator />
+                    <RightClickMenu.Item icon={<Trash2 className="w-4 h-4" />}>
+                      Delete
+                    </RightClickMenu.Item>
+                  </RightClickMenu.Content>
+                </RightClickMenu>
+
+                <div className="mt-4 space-y-2">
+                  <Text variant="label" size="xs">Features:</Text>
+                  <ul className="list-disc list-inside text-slate-400 text-sm space-y-1 [html:not(.dark)_&]:text-slate-600">
+                    <li>Right-click trigger (desktop)</li>
+                    <li>Long-press trigger (mobile) with scale animation</li>
+                    <li>Keyboard navigation (arrows, Enter, Escape)</li>
+                    <li>Checkable items for toggle states</li>
+                    <li>Haptic feedback on mobile</li>
+                  </ul>
+                </div>
+              </div>
+
+              <CardDivider />
+
+              {/* CommandPalette Component */}
+              <div className="mt-6">
+                <Text variant="label" size="xs" className="mb-3">CommandPalette</Text>
+                <Text variant="tertiary" size="sm" className="mb-4">
+                  Built on cmdk library with fuzzy search. Global Cmd+K/Ctrl+K shortcut support.
+                </Text>
+                <div className="flex flex-wrap items-center gap-4 mb-4">
+                  <Button variant="ember" onClick={() => setCommandPaletteOpen(true)}>
+                    Open Command Palette
+                  </Button>
+                  <Text variant="secondary" size="sm">
+                    or press <Kbd>Cmd+K</Kbd>
+                  </Text>
+                </div>
+
+                <CommandPalette
+                  open={commandPaletteOpen}
+                  onOpenChange={setCommandPaletteOpen}
+                  commands={[
+                    {
+                      heading: 'Navigation',
+                      items: [
+                        { id: 'demo-home', label: 'Dashboard', icon: <Home className="w-4 h-4" />, shortcut: 'Cmd+D', onSelect: () => console.log('Navigate home') },
+                        { id: 'demo-settings', label: 'Settings', icon: <Settings className="w-4 h-4" />, shortcut: 'Cmd+,', onSelect: () => console.log('Navigate settings') },
+                      ]
+                    },
+                    {
+                      heading: 'Actions',
+                      items: [
+                        { id: 'demo-power', label: 'Toggle Power', icon: <Power className="w-4 h-4" />, onSelect: () => console.log('Toggle power') },
+                        { id: 'demo-theme', label: 'Toggle Theme', icon: <Moon className="w-4 h-4" />, onSelect: () => console.log('Toggle theme') },
+                      ]
+                    },
+                  ]}
+                />
+
+                <div className="mt-4 space-y-2">
+                  <Text variant="label" size="xs">Features:</Text>
+                  <ul className="list-disc list-inside text-slate-400 text-sm space-y-1 [html:not(.dark)_&]:text-slate-600">
+                    <li>Global <Kbd>Cmd+K</Kbd> / <Kbd>Ctrl+K</Kbd> shortcut</li>
+                    <li>Fuzzy search filtering</li>
+                    <li>Arrow key navigation with wrapping</li>
+                    <li>Grouped commands with section headers</li>
+                    <li>Full-screen on mobile</li>
+                    <li>Haptic feedback on selection</li>
+                  </ul>
                 </div>
               </div>
             </CardContent>

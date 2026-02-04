@@ -60,11 +60,24 @@ Multi-schedule CRUD con selezione attiva singola.
 
 ## Scheduler Cron (`/api/scheduler/check`)
 
-Chiamato ogni minuto per automazione stufa.
+Unified cron endpoint - chiamato ogni minuto per automazione completa.
 
 ```bash
 GET /api/scheduler/check?secret=<CRON_SECRET>
 ```
+
+**Gestisce (tutto in un'unica route):**
+
+| Job | Intervallo | Firebase Path |
+|-----|------------|---------------|
+| Scheduler stufa | Ogni minuto | `schedules-v2/` |
+| Calibrazione valvole Netatmo | Ogni 12 ore | `netatmo/lastAutoCalibration` |
+| Sync Netatmo | Ogni minuto | - |
+| Tracking manutenzione | Ogni minuto | `maintenance/` |
+| Notifiche | Event-driven | - |
+| Hue token refresh | Proactive (24h before expiry) | `hue/tokens/` |
+| **Weather refresh** | **Ogni 30 minuti** | **`cron/lastWeatherRefresh`** |
+| **Token cleanup FCM** | **Ogni 7 giorni** | **`cron/lastTokenCleanup`** |
 
 **Workflow**:
 1. Verifica CRON_SECRET
@@ -72,6 +85,9 @@ GET /api/scheduler/check?secret=<CRON_SECRET>
 3. Check mode (manual/auto/semi-manual)
 4. Se auto: esegue azioni schedule con `source='scheduler'`
 5. Track usage: `trackUsageHours(status)`
+6. Async jobs: calibrazione, weather refresh, token cleanup (non bloccanti)
+
+**Pattern interval-based jobs**: Ogni job legge `lastExecution` da Firebase, confronta con intervallo configurato, esegue solo se necessario, salva nuovo timestamp.
 
 **CRITICO**: Tracking ore è server-side, non client-side.
 
@@ -232,4 +248,4 @@ NEXT_PUBLIC_[API]_REDIRECT_URI=http://localhost:3000/api/[api]/callback
 
 ---
 
-**Last Updated**: 2026-01-21
+**Last Updated**: 2026-02-04

@@ -1,10 +1,4 @@
 {
-  "crons": [
-    {
-      "path": "/api/cron/weather?secret=${CRON_SECRET}",
-      "schedule": "*/30 * * * *"
-    }
-  ],
   "functions": {
     "app/api/scheduler/check/route.js": {
       "maxDuration": 60

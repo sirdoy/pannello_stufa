@@ -18,7 +18,7 @@ import {
   withCronSecret,
   success,
 } from '@/lib/core';
-import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
+import { adminDbGet, adminDbSet, adminDbUpdate, getAdminDatabase } from '@/lib/firebaseAdmin';
 import { canIgnite, trackUsageHours } from '@/lib/maintenanceServiceAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 import {
@@ -40,6 +40,8 @@ import { updateStoveState } from '@/lib/stoveStateService';
 import { syncLivingRoomWithStove, enforceStoveSyncSetpoints } from '@/lib/netatmoStoveSync';
 import { calibrateValvesServer } from '@/lib/netatmoCalibrationService';
 import { proactiveTokenRefresh } from '@/lib/hue/hueRemoteTokenHelper';
+import { fetchWeatherForecast } from '@/lib/openMeteo';
+import { saveWeatherToCache } from '@/lib/weatherCacheService';
 
 export const dynamic = 'force-dynamic';
 
@@ -127,6 +129,191 @@ async function calibrateValvesIfNeeded() {
     console.error('❌ Errore calibrazione automatica valvole:', error);
     return {
       calibrated: false,
+      reason: 'exception',
+      error: error.message,
+    };
+  }
+}
+
+/**
+ * Refresh weather data if interval has passed (every 30 minutes)
+ * Following same pattern as calibrateValvesIfNeeded()
+ */
+async function refreshWeatherIfNeeded() {
+  try {
+    const lastRefreshPath = getEnvironmentPath('cron/lastWeatherRefresh');
+    const lastRefresh = await adminDbGet(lastRefreshPath);
+
+    const now = Date.now();
+    const THIRTY_MINUTES = 30 * 60 * 1000;
+
+    if (lastRefresh && (now - lastRefresh) < THIRTY_MINUTES) {
+      return {
+        refreshed: false,
+        reason: 'too_soon',
+        nextRefresh: new Date(lastRefresh + THIRTY_MINUTES).toISOString(),
+      };
+    }
+
+    console.log('🌤️ Avvio refresh automatico weather (ogni 30 min)...');
+
+    // Read location from Firebase
+    const locationPath = getEnvironmentPath('config/location');
+    const location = await adminDbGet(locationPath);
+
+    if (!location || !location.latitude || !location.longitude) {
+      console.warn('⚠️ Weather refresh skipped: location not configured');
+      return {
+        refreshed: false,
+        reason: 'no_location',
+      };
+    }
+
+    const { latitude, longitude, name } = location;
+
+    // Fetch weather forecast from Open-Meteo
+    const weatherData = await fetchWeatherForecast(latitude, longitude);
+
+    // Save to Firebase cache
+    await saveWeatherToCache(latitude, longitude, weatherData);
+
+    // Update last refresh timestamp
+    await adminDbSet(lastRefreshPath, now);
+
+    console.log(`✅ Weather refresh completato per ${name || 'Unknown'}`);
+
+    return {
+      refreshed: true,
+      timestamp: now,
+      location: { latitude, longitude, name },
+      nextRefresh: new Date(now + THIRTY_MINUTES).toISOString(),
+    };
+
+  } catch (error) {
+    console.error('❌ Errore refresh weather:', error);
+    return {
+      refreshed: false,
+      reason: 'exception',
+      error: error.message,
+    };
+  }
+}
+
+/**
+ * Cleanup stale FCM tokens if interval has passed (every 7 days)
+ * Following same pattern as calibrateValvesIfNeeded()
+ */
+async function cleanupTokensIfNeeded() {
+  try {
+    const lastCleanupPath = getEnvironmentPath('cron/lastTokenCleanup');
+    const lastCleanup = await adminDbGet(lastCleanupPath);
+
+    const now = Date.now();
+    const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+
+    if (lastCleanup && (now - lastCleanup) < SEVEN_DAYS) {
+      return {
+        cleaned: false,
+        reason: 'too_soon',
+        nextCleanup: new Date(lastCleanup + SEVEN_DAYS).toISOString(),
+      };
+    }
+
+    console.log('🧹 Avvio cleanup automatico token FCM (ogni 7 giorni)...');
+
+    const db = getAdminDatabase();
+
+    // Constants
+    const STALE_THRESHOLD_MS = 90 * 24 * 60 * 60 * 1000; // 90 days
+    const ERROR_RETENTION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+    // Step 1: Cleanup stale FCM tokens
+    const usersRef = db.ref('users');
+    const snapshot = await usersRef.once('value');
+
+    let tokensScanned = 0;
+    let tokensRemoved = 0;
+    const tokenUpdates = {};
+
+    if (snapshot.exists()) {
+      snapshot.forEach(userSnap => {
+        const userId = userSnap.key;
+        const tokens = userSnap.child('fcmTokens').val() || {};
+
+        Object.entries(tokens).forEach(([tokenKey, tokenData]) => {
+          tokensScanned++;
+          const data = tokenData;
+
+          // Use lastUsed if available, otherwise fall back to createdAt
+          const lastActivity = data.lastUsed || data.createdAt;
+
+          if (!lastActivity) {
+            // No timestamp - consider stale
+            tokenUpdates[`users/${userId}/fcmTokens/${tokenKey}`] = null;
+            tokensRemoved++;
+            console.log(`[Cleanup] Removing token without timestamp (user ${userId})`);
+            return;
+          }
+
+          const lastActivityTime = new Date(lastActivity).getTime();
+          const age = now - lastActivityTime;
+
+          if (age > STALE_THRESHOLD_MS) {
+            tokenUpdates[`users/${userId}/fcmTokens/${tokenKey}`] = null;
+            tokensRemoved++;
+            const ageDays = Math.floor(age / (24 * 60 * 60 * 1000));
+            console.log(`[Cleanup] Removing stale token (${ageDays} days old, user ${userId})`);
+          }
+        });
+      });
+
+      // Apply token deletions in single batch update
+      if (Object.keys(tokenUpdates).length > 0) {
+        await db.ref().update(tokenUpdates);
+      }
+    }
+
+    // Step 2: Cleanup old error logs (30 days retention)
+    const errorCutoff = new Date(now - ERROR_RETENTION_MS).toISOString();
+    const errorsRef = db.ref('notificationErrors');
+    const errorsSnapshot = await errorsRef.once('value');
+
+    let errorsRemoved = 0;
+    const errorUpdates = {};
+
+    if (errorsSnapshot.exists()) {
+      errorsSnapshot.forEach(errorSnap => {
+        const error = errorSnap.val();
+        if (error?.timestamp && error.timestamp < errorCutoff) {
+          errorUpdates[`notificationErrors/${errorSnap.key}`] = null;
+          errorsRemoved++;
+        }
+      });
+
+      // Apply error deletions in single batch update
+      if (Object.keys(errorUpdates).length > 0) {
+        await db.ref().update(errorUpdates);
+      }
+    }
+
+    // Update last cleanup timestamp
+    await adminDbSet(lastCleanupPath, now);
+
+    console.log(`✅ Token cleanup completato: ${tokensRemoved}/${tokensScanned} tokens, ${errorsRemoved} errors rimossi`);
+
+    return {
+      cleaned: true,
+      timestamp: now,
+      tokensRemoved,
+      tokensScanned,
+      errorsRemoved,
+      nextCleanup: new Date(now + SEVEN_DAYS).toISOString(),
+    };
+
+  } catch (error) {
+    console.error('❌ Errore cleanup token:', error);
+    return {
+      cleaned: false,
       reason: 'exception',
       error: error.message,
     };
@@ -515,6 +702,20 @@ export const GET = withCronSecret(async (_request) => {
       console.log(`✅ Calibrazione automatica completata - prossima: ${result.nextCalibration}`);
     }
   }).catch(err => console.error('❌ Errore calibrazione:', err));
+
+  // Weather refresh every 30 minutes (async, don't wait)
+  refreshWeatherIfNeeded().then((result) => {
+    if (result.refreshed) {
+      console.log(`✅ Weather refresh completato - prossimo: ${result.nextRefresh}`);
+    }
+  }).catch(err => console.error('❌ Errore weather refresh:', err.message));
+
+  // Token cleanup every 7 days (async, don't wait)
+  cleanupTokensIfNeeded().then((result) => {
+    if (result.cleaned) {
+      console.log(`✅ Token cleanup completato - prossimo: ${result.nextCleanup}`);
+    }
+  }).catch(err => console.error('❌ Errore token cleanup:', err.message));
 
   // Proactive Hue token refresh (async, don't wait)
   // Refreshes token if expiring within 24 hours to avoid manual reconnection

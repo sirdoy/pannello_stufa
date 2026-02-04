@@ -78,10 +78,11 @@ None — v4.0 progressing well.
 | 004 | Dynamic mobile nav + complete debug submenu | 2026-02-04 | 65333a5 | [004-menu-mobile-first-review-routes](./quick/004-menu-mobile-first-review-routes/) |
 | 005 | Thermostat card active device indicator | 2026-02-04 | 1a77f7f | [005-thermostat-card-active-indicator](./quick/005-thermostat-card-active-indicator/) |
 | 006 | Netatmo thermostat/valve control tests | 2026-02-04 | 1f9a4e8 | [006-thermostat-valves-commands-check](./quick/006-thermostat-valves-commands-check/) |
+| 007 | Thermostat active devices list | 2026-02-04 | ecfdd3d | [007-thermostat-active-devices-list](./quick/007-thermostat-active-devices-list/) |
 
 ## Session Continuity
 
 Last session: 2026-02-04
-Stopped at: Completed quick-006 (Netatmo thermostat/valve control tests)
+Stopped at: Completed quick-007 (Thermostat active devices list)
 Resume file: None
 Next step: Continue Phase 31 with 31-03-PLAN.md (Collapsible component) or `/gsd:discuss-phase 32` for Action Components

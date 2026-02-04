@@ -13,7 +13,7 @@ import {
 import { logSchedulerAction } from '@/lib/logService';
 import { db } from '@/lib/firebase';
 import { ref, onValue } from 'firebase/database';
-import { Card, Button, ModeIndicator, Skeleton, Toast, ConfirmDialog, Heading } from '@/app/components/ui';
+import { Card, Button, ModeIndicator, Skeleton, Toast, ConfirmDialog, Heading, PageLayout } from '@/app/components/ui';
 import WeeklyTimeline from '@/app/components/scheduler/WeeklyTimeline';
 import DayEditPanel from '@/app/components/scheduler/DayEditPanel';
 import WeeklySummaryCard from '@/app/components/scheduler/WeeklySummaryCard';
@@ -700,17 +700,19 @@ export default function WeeklyScheduler() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <PageLayout
+      maxWidth="7xl"
+      header={
+        <PageLayout.Header
+          title="Pianificazione Settimanale"
+          description="Gestisci gli orari di accensione automatica della stufa"
+        />
+      }
+    >
       {/* Header Row - 2 columns on desktop */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left: Title + Mode */}
+        {/* Left: Mode and Schedule Selector */}
         <Card variant="glass" className="p-6 sm:p-8">
-          <div className="mb-6">
-            <Heading level={1} size="3xl">
-              Pianificazione Settimanale
-            </Heading>
-          </div>
-
           {/* Schedule Selector */}
           <div className="mb-6">
             <ScheduleSelector
@@ -868,6 +870,6 @@ export default function WeeklyScheduler() {
           {toast.message}
         </Toast>
       )}
-    </div>
+    </PageLayout>
   );
 }

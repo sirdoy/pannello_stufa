@@ -17,6 +17,8 @@ import Divider from '@/app/components/ui/Divider';
 import ProgressBar from '@/app/components/ui/ProgressBar';
 import EmptyState from '@/app/components/ui/EmptyState';
 import ConfirmDialog from '@/app/components/ui/ConfirmDialog';
+import ConfirmationDialog from '@/app/components/ui/ConfirmationDialog';
+import FormModal from '@/app/components/ui/FormModal';
 import BottomSheet from '@/app/components/ui/BottomSheet';
 import Badge from '@/app/components/ui/Badge';
 import ConnectionStatus from '@/app/components/ui/ConnectionStatus';
@@ -37,6 +39,8 @@ import Kbd from '@/app/components/ui/Kbd';
 import { useContextMenuLongPress, longPressPreventSelection } from '@/app/hooks/useContextMenuLongPress';
 import { WeatherIcon, getWeatherLabel } from '@/app/components/weather/WeatherIcon';
 import { useState } from 'react';
+import { z } from 'zod';
+import { Controller } from 'react-hook-form';
 import { Home, Settings, Power, Moon, Edit, Trash2, Copy, Share } from 'lucide-react';
 import CodeBlock from './components/CodeBlock';
 import PropTable from './components/PropTable';
@@ -71,6 +75,39 @@ export default function DesignSystemPage() {
   const [topSheetOpen, setTopSheetOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [menuCheckboxState, setMenuCheckboxState] = useState(false);
+  // Dialog Patterns states
+  const [showConfirmDefault, setShowConfirmDefault] = useState(false);
+  const [showConfirmDanger, setShowConfirmDanger] = useState(false);
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [isConfirmingDefault, setIsConfirmingDefault] = useState(false);
+  const [isConfirmingDanger, setIsConfirmingDanger] = useState(false);
+
+  // Demo schema for FormModal
+  const demoFormSchema = z.object({
+    name: z.string().min(1, 'Name is required').max(50, 'Name too long'),
+    email: z.string().email('Invalid email address'),
+  });
+
+  // ConfirmationDialog demo handlers
+  const handleConfirmDefault = async () => {
+    setIsConfirmingDefault(true);
+    await new Promise(r => setTimeout(r, 1500)); // Simulate async
+    setIsConfirmingDefault(false);
+    setShowConfirmDefault(false);
+  };
+
+  const handleConfirmDanger = async () => {
+    setIsConfirmingDanger(true);
+    await new Promise(r => setTimeout(r, 1500));
+    setIsConfirmingDanger(false);
+    setShowConfirmDanger(false);
+  };
+
+  // FormModal demo handler
+  const handleFormSubmit = async (data) => {
+    await new Promise(r => setTimeout(r, 1500)); // Simulate API call
+    console.log('Form submitted:', data);
+  };
 
   return (
       <PageLayout
@@ -132,6 +169,7 @@ export default function DesignSystemPage() {
                 { icon: '📏', title: 'Spacing Scale', anchor: 'spacing-scale' },
                 { icon: '⭕', title: 'Border Radius', anchor: 'border-radius' },
                 { icon: '🌑', title: 'Shadow System', anchor: 'shadow-system' },
+                { icon: '💬', title: 'Dialog Patterns', anchor: 'dialog-patterns' },
                 { icon: '✅', title: 'Best Practices', anchor: 'critical-best-practices' },
               ].map(({ icon, title, anchor }) => (
                 <a
@@ -2360,6 +2398,150 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
               </Card>
             </div>
           </div>
+        </SectionShowcase>
+
+        {/* Dialog Patterns */}
+        <SectionShowcase title="Dialog Patterns" icon="💬" docs="app/components/ui/ConfirmationDialog.js">
+          <Card>
+            <CardContent>
+              <div className="space-y-6">
+                {/* ConfirmationDialog Component */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">ConfirmationDialog Component (v4.0)</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    Radix-based confirmation dialog with smart focus management. Props: isOpen, onClose, onConfirm, title, description, confirmLabel, cancelLabel, variant (default|danger), loading
+                  </Text>
+
+                  <div className="space-y-4">
+                    <div>
+                      <Text variant="tertiary" size="xs" className="mb-2">Focus Management</Text>
+                      <Text variant="secondary" size="sm" className="mb-3">
+                        Default variant focuses Confirm button. Danger variant focuses Cancel button for safer UX.
+                      </Text>
+                      <div className="flex flex-wrap gap-3">
+                        <Button variant="ember" onClick={() => setShowConfirmDefault(true)}>
+                          Default Confirmation
+                        </Button>
+                        <Button variant="danger" onClick={() => setShowConfirmDanger(true)}>
+                          Danger Confirmation
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <Text variant="tertiary" size="xs" className="mb-2">Features</Text>
+                      <ul className="list-disc list-inside space-y-1 text-sm text-slate-400">
+                        <li>Smart focus: Cancel for danger, Confirm for default</li>
+                        <li>Loading state blocks ESC and backdrop click</li>
+                        <li>Danger variant uses outline styling (not solid red)</li>
+                        <li>Mobile bottom sheet mode (max-sm breakpoint)</li>
+                        <li>Async onConfirm support with loading spinner</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <CardDivider />
+
+                {/* FormModal Component */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">FormModal Component (v4.0)</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    Modal with React Hook Form integration via render prop. Props: isOpen, onClose, onSubmit, title, description, validationSchema (Zod), defaultValues, submitLabel, cancelLabel, successMessage, size
+                  </Text>
+
+                  <div className="space-y-4">
+                    <div>
+                      <Text variant="tertiary" size="xs" className="mb-2">Validation Features</Text>
+                      <Text variant="secondary" size="sm" className="mb-3">
+                        Hybrid validation: onBlur for touched fields, summary on submit. Error display at top and inline.
+                      </Text>
+                      <Button variant="ocean" onClick={() => setShowFormModal(true)}>
+                        Open Form Modal
+                      </Button>
+                    </div>
+
+                    <div>
+                      <Text variant="tertiary" size="xs" className="mb-2">Features</Text>
+                      <ul className="list-disc list-inside space-y-1 text-sm text-slate-400">
+                        <li>Render prop pattern: {`{({ control, formState }) => ...}`}</li>
+                        <li>Hybrid validation timing (onBlur + onChange after error)</li>
+                        <li>Error summary at top + inline field errors</li>
+                        <li>Shake animation on invalid fields during submit</li>
+                        <li>Success checkmark overlay for 800ms before auto-close</li>
+                        <li>Loading state with disabled fields and prevented close</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Dialog Components */}
+          <ConfirmationDialog
+            isOpen={showConfirmDefault}
+            onClose={() => setShowConfirmDefault(false)}
+            onConfirm={handleConfirmDefault}
+            title="Confirm Action"
+            description="Are you sure you want to proceed with this action?"
+            confirmLabel="Proceed"
+            loading={isConfirmingDefault}
+          />
+
+          <ConfirmationDialog
+            isOpen={showConfirmDanger}
+            onClose={() => setShowConfirmDanger(false)}
+            onConfirm={handleConfirmDanger}
+            title="Delete Item?"
+            description="This action cannot be undone. The item will be permanently removed."
+            confirmLabel="Delete"
+            variant="danger"
+            loading={isConfirmingDanger}
+          />
+
+          <FormModal
+            isOpen={showFormModal}
+            onClose={() => setShowFormModal(false)}
+            onSubmit={handleFormSubmit}
+            title="Add New Item"
+            description="Fill in the details below"
+            validationSchema={demoFormSchema}
+            defaultValues={{ name: '', email: '' }}
+            successMessage="Item added successfully!"
+          >
+            {({ control }) => (
+              <div className="space-y-4">
+                <Controller
+                  name="name"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <Input
+                      label="Name"
+                      placeholder="Enter name"
+                      {...field}
+                      error={fieldState.error?.message}
+                      data-field="name"
+                    />
+                  )}
+                />
+                <Controller
+                  name="email"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <Input
+                      label="Email"
+                      type="email"
+                      placeholder="user@example.com"
+                      {...field}
+                      error={fieldState.error?.message}
+                      data-field="email"
+                    />
+                  )}
+                />
+              </div>
+            )}
+          </FormModal>
         </SectionShowcase>
 
         {/* Best Practices */}

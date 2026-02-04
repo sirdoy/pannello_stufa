@@ -1,10 +1,31 @@
 'use client';
 
+/**
+ * @deprecated Use ConfirmationDialog instead.
+ * This component will be removed in a future version.
+ * Migration: Replace ConfirmDialog with ConfirmationDialog from '@/app/components/ui'
+ *
+ * Old API: <ConfirmDialog isOpen onConfirm onCancel title message />
+ * New API: <ConfirmationDialog isOpen onClose onConfirm title description />
+ *
+ * Key differences:
+ * - onCancel -> onClose
+ * - message -> description
+ * - confirmVariant -> variant ("danger" | "default")
+ * - Smart focus management (Cancel focused for danger, Confirm for default)
+ * - Loading state protection (blocks ESC and backdrop click)
+ *
+ * @see /debug/design-system#dialog-patterns for examples
+ */
+
 import { useEffect } from 'react';
 import Button from './Button';
 import Card from './Card';
 import Heading from './Heading';
 import Text from './Text';
+
+// Deprecation warning (development only)
+let hasWarnedDeprecation = false;
 
 export default function ConfirmDialog({
   isOpen,
@@ -17,6 +38,17 @@ export default function ConfirmDialog({
   onCancel,
   icon = '⚠️',
 }) {
+  // Emit deprecation warning once in development
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development' && !hasWarnedDeprecation) {
+      hasWarnedDeprecation = true;
+      console.warn(
+        '[DEPRECATED] ConfirmDialog is deprecated. Use ConfirmationDialog instead. ' +
+        'See: /debug/design-system#dialog-patterns'
+      );
+    }
+  }, []);
+
   // Prevent body scroll when dialog is open
   useEffect(() => {
     if (isOpen) {

@@ -213,6 +213,7 @@ export default function Navbar() {
       {/* Top Header - Desktop & Mobile */}
       <header className="
         fixed top-0 left-0 right-0 z-50
+        pt-[env(safe-area-inset-top)]
         bg-slate-900/80
         backdrop-blur-xl
         border-b border-white/[0.06]
@@ -492,7 +493,8 @@ export default function Navbar() {
           {/* Backdrop */}
           <div
             className="
-              fixed top-16 left-0 right-0 bottom-0
+              fixed left-0 right-0 bottom-0
+              top-[calc(4rem+env(safe-area-inset-top))]
               bg-slate-950/60
               backdrop-blur-md
               z-[9000] lg:hidden
@@ -504,7 +506,8 @@ export default function Navbar() {
 
           {/* Mobile Menu Panel */}
           <div className="
-            fixed top-16 left-0 right-0 bottom-20
+            fixed left-0 right-0 bottom-20
+            top-[calc(4rem+env(safe-area-inset-top))]
             bg-slate-900/95
             backdrop-blur-2xl
             z-[9001] lg:hidden
@@ -671,8 +674,8 @@ export default function Navbar() {
         })()}
       </nav>
 
-      {/* Spacer for fixed navigation */}
-      <div className="h-16 lg:h-18" aria-hidden="true" />
+      {/* Spacer for fixed navigation (includes safe-area for PWA) */}
+      <div className="h-[calc(4rem+env(safe-area-inset-top))] lg:h-[calc(4.5rem+env(safe-area-inset-top))]" aria-hidden="true" />
     </>
   );
 }

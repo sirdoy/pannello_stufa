@@ -3,18 +3,9 @@
 import { forwardRef, useCallback } from 'react';
 import { Command } from 'cmdk';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+import * as VisuallyHiddenPrimitive from '@radix-ui/react-visually-hidden';
 import { cn } from '@/lib/utils/cn';
 import Kbd from './Kbd';
-
-/**
- * VisuallyHidden - Accessible visually hidden content
- * Used for screen reader text that shouldn't be visible
- */
-function VisuallyHidden({ children }) {
-  return (
-    <span className="sr-only">{children}</span>
-  );
-}
 
 /**
  * CommandPalette Component - Ember Noir Design System v4.0
@@ -94,12 +85,12 @@ const CommandPalette = forwardRef(function CommandPalette(
       {...props}
     >
       {/* Accessibility: Visually hidden title and description for screen readers */}
-      <DialogPrimitive.Title asChild>
-        <VisuallyHidden>Command Palette</VisuallyHidden>
-      </DialogPrimitive.Title>
-      <DialogPrimitive.Description asChild>
-        <VisuallyHidden>Search for commands, navigate to pages, or execute actions</VisuallyHidden>
-      </DialogPrimitive.Description>
+      <VisuallyHiddenPrimitive.Root asChild>
+        <DialogPrimitive.Title>Command Palette</DialogPrimitive.Title>
+      </VisuallyHiddenPrimitive.Root>
+      <VisuallyHiddenPrimitive.Root asChild>
+        <DialogPrimitive.Description>Search for commands, navigate to pages, or execute actions</DialogPrimitive.Description>
+      </VisuallyHiddenPrimitive.Root>
 
       {/* Overlay with blur+dim (match Sheet/Modal pattern) */}
       <div

@@ -52,6 +52,7 @@ Key patterns from previous milestones:
 - Responsive position switching (max-md:fixed + md:static) for mobile-bottom/desktop-top tabs
 - Content slot pattern for wrapper components (scheduleContent, manualContent, historyContent)
 - Radix CSS variables for height animation (--radix-accordion-content-height)
+- getMobileQuickActions pattern for device-aware mobile navigation (priority: stove > thermostat > lights)
 
 ### Pending Todos
 
@@ -74,6 +75,7 @@ None — v4.0 progressing well.
 |---|-------------|------|--------|-----------|
 | 002 | Weather data cron + manual refresh | 2026-02-03 | 5ff4c93 | [002-weather-data-cron-manual-refresh](./quick/002-weather-data-cron-manual-refresh/) |
 | 003 | iOS PWA haptic feedback + viewport optimizations | 2026-02-04 | c38be8d | [003-ios-pwa-haptic-siri-shortcuts](./quick/003-ios-pwa-haptic-siri-shortcuts/) |
+| 004 | Dynamic mobile nav + complete debug submenu | 2026-02-04 | 65333a5 | [004-menu-mobile-first-review-routes](./quick/004-menu-mobile-first-review-routes/) |
 
 ## Session Continuity
 

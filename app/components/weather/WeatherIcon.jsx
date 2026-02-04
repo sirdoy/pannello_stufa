@@ -126,8 +126,6 @@ export default function WeatherIcon({
     <IconComponent
       size={size}
       className={className}
-      fill="currentColor"
-      strokeWidth={0}
       aria-label={label}
       role="img"
     />

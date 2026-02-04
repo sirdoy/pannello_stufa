@@ -22,4 +22,5 @@ export {
   getPrecipitationLabel,
   getAirQualityLabel,
   getTemperatureTrend,
+  isSnowCode,
 } from './weatherHelpers';

@@ -101,29 +101,50 @@ export function getUVIndexLabel(uvIndex) {
 }
 
 /**
+ * Check if a WMO weather code represents snow precipitation
+ * @param {number} weatherCode - WMO weather code (0-99)
+ * @returns {boolean} True if the code represents snow
+ *
+ * Snow codes: 71-77 (snow), 85-86 (snow showers)
+ */
+export function isSnowCode(weatherCode) {
+  return (weatherCode >= 71 && weatherCode <= 77) || (weatherCode >= 85 && weatherCode <= 86);
+}
+
+/**
  * Get precipitation chance description in Italian
+ * Now accepts optional weatherCode to distinguish between rain and snow
+ *
  * @param {number} percent - Precipitation probability (0-100)
+ * @param {number} [weatherCode] - Optional WMO weather code to determine precipitation type
  * @returns {string|null} Italian description or null if too low to mention
  *
  * @example
  * getPrecipitationLabel(5) // null
  * getPrecipitationLabel(30) // "Possibile pioggia"
- * getPrecipitationLabel(60) // "Probabile pioggia"
- * getPrecipitationLabel(85) // "Pioggia prevista"
+ * getPrecipitationLabel(60, 71) // "Probabile neve" (snow code)
+ * getPrecipitationLabel(85, 63) // "Pioggia prevista" (rain code)
  */
-export function getPrecipitationLabel(percent) {
+export function getPrecipitationLabel(percent, weatherCode = null) {
   if (percent === null || percent === undefined || isNaN(percent)) {
     return null;
   }
 
   if (percent <= 10) {
     return null; // Don't show for very low probability
-  } else if (percent <= 40) {
-    return 'Possibile pioggia';
+  }
+
+  // Determine precipitation type based on weather code
+  const isSnow = weatherCode !== null && isSnowCode(weatherCode);
+  const precipType = isSnow ? 'neve' : 'pioggia';
+  const capitalizedType = isSnow ? 'Neve' : 'Pioggia';
+
+  if (percent <= 40) {
+    return `Possibile ${precipType}`;
   } else if (percent <= 70) {
-    return 'Probabile pioggia';
+    return `Probabile ${precipType}`;
   } else {
-    return 'Pioggia prevista';
+    return `${capitalizedType} prevista`;
   }
 }
 

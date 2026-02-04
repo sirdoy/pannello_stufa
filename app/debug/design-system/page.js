@@ -29,6 +29,7 @@ import Section from '@/app/components/ui/Section';
 import Grid from '@/app/components/ui/Grid';
 import Tooltip from '@/app/components/ui/Tooltip';
 import Spinner from '@/app/components/ui/Spinner';
+import { WeatherIcon, getWeatherLabel } from '@/app/components/weather/WeatherIcon';
 import { useState } from 'react';
 import CodeBlock from './components/CodeBlock';
 import PropTable from './components/PropTable';
@@ -1559,6 +1560,209 @@ export default function DesignSystemPage() {
           </Card>
         </SectionShowcase>
 
+        {/* Weather Icons */}
+        <SectionShowcase title="Weather Icons" icon="🌤️" docs="app/components/weather/WeatherIcon.jsx">
+          <Card>
+            <CardContent>
+              <div className="space-y-6">
+                {/* Overview */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">WeatherIcon Component</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    Maps WMO weather codes (0-99) to Lucide React icons. Supports day/night variants.
+                    Props: code, isNight, size, className
+                  </Text>
+                </div>
+
+                <CardDivider />
+
+                {/* Clear and Clouds */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Clear Sky and Clouds</Text>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <WeatherIconDemo code={0} label="Sereno" />
+                    <WeatherIconDemo code={1} label="Prevalentemente sereno" />
+                    <WeatherIconDemo code={2} label="Parzialmente nuvoloso" />
+                    <WeatherIconDemo code={3} label="Coperto" />
+                  </div>
+                </div>
+
+                <CardDivider />
+
+                {/* Day vs Night */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Day vs Night Variants</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    Use isNight=true to show moon-based icons for clear/partly cloudy conditions
+                  </Text>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <WeatherIconDemo code={0} label="Day - Clear" isNight={false} />
+                    <WeatherIconDemo code={0} label="Night - Clear" isNight={true} />
+                    <WeatherIconDemo code={2} label="Day - Partly cloudy" isNight={false} />
+                    <WeatherIconDemo code={2} label="Night - Partly cloudy" isNight={true} />
+                  </div>
+                </div>
+
+                <CardDivider />
+
+                {/* Fog */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Fog</Text>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <WeatherIconDemo code={45} label="Nebbia" />
+                    <WeatherIconDemo code={48} label="Nebbia con brina" />
+                  </div>
+                </div>
+
+                <CardDivider />
+
+                {/* Drizzle */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Drizzle (Pioviggine)</Text>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <WeatherIconDemo code={51} label="Pioviggine leggera" />
+                    <WeatherIconDemo code={53} label="Pioviggine moderata" />
+                    <WeatherIconDemo code={55} label="Pioviggine intensa" />
+                    <WeatherIconDemo code={56} label="Pioviggine gelata" />
+                  </div>
+                </div>
+
+                <CardDivider />
+
+                {/* Rain */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Rain (Pioggia)</Text>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <WeatherIconDemo code={61} label="Pioggia leggera" />
+                    <WeatherIconDemo code={63} label="Pioggia moderata" />
+                    <WeatherIconDemo code={65} label="Pioggia intensa" />
+                    <WeatherIconDemo code={66} label="Pioggia gelata" />
+                  </div>
+                </div>
+
+                <CardDivider />
+
+                {/* Snow */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Snow (Neve)</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    WMO codes 71-77, 85-86 map to CloudSnow icon
+                  </Text>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <WeatherIconDemo code={71} label="Neve leggera" />
+                    <WeatherIconDemo code={73} label="Neve moderata" />
+                    <WeatherIconDemo code={75} label="Neve intensa" />
+                    <WeatherIconDemo code={77} label="Granuli di neve" />
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+                    <WeatherIconDemo code={85} label="Rovesci neve leggeri" />
+                    <WeatherIconDemo code={86} label="Rovesci neve intensi" />
+                  </div>
+                </div>
+
+                <CardDivider />
+
+                {/* Showers */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Showers (Rovesci)</Text>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <WeatherIconDemo code={80} label="Rovesci leggeri" />
+                    <WeatherIconDemo code={81} label="Rovesci moderati" />
+                    <WeatherIconDemo code={82} label="Rovesci violenti" />
+                  </div>
+                </div>
+
+                <CardDivider />
+
+                {/* Thunderstorm */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Thunderstorm (Temporale)</Text>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <WeatherIconDemo code={95} label="Temporale" />
+                    <WeatherIconDemo code={96} label="Temporale grandine" />
+                    <WeatherIconDemo code={99} label="Temporale grandine forte" />
+                  </div>
+                </div>
+
+                <CardDivider />
+
+                {/* Sizes */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Icon Sizes</Text>
+                  <div className="flex items-end gap-6">
+                    <div className="flex flex-col items-center gap-2">
+                      <WeatherIcon code={0} size={16} className="text-ocean-400" />
+                      <Text variant="tertiary" size="xs">16px</Text>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <WeatherIcon code={0} size={24} className="text-ocean-400" />
+                      <Text variant="tertiary" size="xs">24px</Text>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <WeatherIcon code={0} size={32} className="text-ocean-400" />
+                      <Text variant="tertiary" size="xs">32px</Text>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <WeatherIcon code={0} size={48} className="text-ocean-400" />
+                      <Text variant="tertiary" size="xs">48px</Text>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <WeatherIcon code={0} size={64} className="text-ocean-400" />
+                      <Text variant="tertiary" size="xs">64px</Text>
+                    </div>
+                  </div>
+                </div>
+
+                <CardDivider />
+
+                {/* WMO Code Reference */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">WMO Code Reference</Text>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-slate-700/30">
+                          <th className="text-left py-2 px-3"><Text variant="tertiary" size="xs">Code</Text></th>
+                          <th className="text-left py-2 px-3"><Text variant="tertiary" size="xs">Range</Text></th>
+                          <th className="text-left py-2 px-3"><Text variant="tertiary" size="xs">Condition</Text></th>
+                          <th className="text-left py-2 px-3"><Text variant="tertiary" size="xs">Icon</Text></th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-700/20">
+                        <tr><td className="py-2 px-3"><Text mono size="xs">0-3</Text></td><td className="py-2 px-3"><Text size="xs" variant="secondary">Clear to Overcast</Text></td><td className="py-2 px-3"><Text size="xs">Sereno → Coperto</Text></td><td className="py-2 px-3"><WeatherIcon code={0} size={16} className="text-warning-400" /></td></tr>
+                        <tr><td className="py-2 px-3"><Text mono size="xs">45-48</Text></td><td className="py-2 px-3"><Text size="xs" variant="secondary">Fog</Text></td><td className="py-2 px-3"><Text size="xs">Nebbia</Text></td><td className="py-2 px-3"><WeatherIcon code={45} size={16} className="text-slate-400" /></td></tr>
+                        <tr><td className="py-2 px-3"><Text mono size="xs">51-57</Text></td><td className="py-2 px-3"><Text size="xs" variant="secondary">Drizzle</Text></td><td className="py-2 px-3"><Text size="xs">Pioviggine</Text></td><td className="py-2 px-3"><WeatherIcon code={51} size={16} className="text-ocean-400" /></td></tr>
+                        <tr><td className="py-2 px-3"><Text mono size="xs">61-67</Text></td><td className="py-2 px-3"><Text size="xs" variant="secondary">Rain</Text></td><td className="py-2 px-3"><Text size="xs">Pioggia</Text></td><td className="py-2 px-3"><WeatherIcon code={61} size={16} className="text-ocean-400" /></td></tr>
+                        <tr><td className="py-2 px-3"><Text mono size="xs">71-77</Text></td><td className="py-2 px-3"><Text size="xs" variant="secondary">Snow</Text></td><td className="py-2 px-3"><Text size="xs">Neve</Text></td><td className="py-2 px-3"><WeatherIcon code={71} size={16} className="text-slate-200" /></td></tr>
+                        <tr><td className="py-2 px-3"><Text mono size="xs">80-82</Text></td><td className="py-2 px-3"><Text size="xs" variant="secondary">Rain Showers</Text></td><td className="py-2 px-3"><Text size="xs">Rovesci</Text></td><td className="py-2 px-3"><WeatherIcon code={80} size={16} className="text-ocean-400" /></td></tr>
+                        <tr><td className="py-2 px-3"><Text mono size="xs">85-86</Text></td><td className="py-2 px-3"><Text size="xs" variant="secondary">Snow Showers</Text></td><td className="py-2 px-3"><Text size="xs">Rovesci neve</Text></td><td className="py-2 px-3"><WeatherIcon code={85} size={16} className="text-slate-200" /></td></tr>
+                        <tr><td className="py-2 px-3"><Text mono size="xs">95-99</Text></td><td className="py-2 px-3"><Text size="xs" variant="secondary">Thunderstorm</Text></td><td className="py-2 px-3"><Text size="xs">Temporale</Text></td><td className="py-2 px-3"><WeatherIcon code={95} size={16} className="text-warning-400" /></td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <CardDivider />
+
+                {/* Code Example */}
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Usage Example</Text>
+                  <CodeBlock code={`import { WeatherIcon, getWeatherLabel } from '@/app/components/weather';
+
+// Basic usage
+<WeatherIcon code={71} size={32} className="text-ocean-400" />
+
+// Night variant
+<WeatherIcon code={0} isNight={true} size={24} />
+
+// Get weather label
+const label = getWeatherLabel(71); // "Neve leggera"`} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </SectionShowcase>
+
         {/* Empty States */}
         <SectionShowcase title="Empty States" icon="📭" docs="docs/design-system.md#emptystate">
           <Card>
@@ -1849,5 +2053,18 @@ function ColorSwatch({ name, description, colors, usage }) {
         </Text>
       </CardContent>
     </Card>
+  );
+}
+
+/**
+ * Weather icon demo with code and label
+ */
+function WeatherIconDemo({ code, label, isNight = false }) {
+  return (
+    <div className="flex flex-col items-center gap-2 p-3 bg-slate-800/40 rounded-xl [html:not(.dark)_&]:bg-slate-100/80">
+      <WeatherIcon code={code} isNight={isNight} size={32} className="text-ocean-400" />
+      <Text variant="tertiary" size="xs" className="text-center">{label}</Text>
+      <Text mono size="xs" variant="secondary">WMO: {code}</Text>
+    </div>
   );
 }

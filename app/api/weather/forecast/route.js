@@ -85,20 +85,26 @@ export const GET = withAuthAndErrorHandler(async (request) => {
     const airQuality = airQualityResult?.current?.european_aqi ?? null;
 
     // Enrich daily forecast with interpreted codes and extended data
-    const dailyForecast = data.daily.time.map((date, i) => ({
-      date,
-      tempMax: data.daily.temperature_2m_max[i],
-      tempMin: data.daily.temperature_2m_min[i],
-      condition: interpretWeatherCode(data.daily.weather_code[i]),
-      weatherCode: data.daily.weather_code[i],
-      uvIndex: data.daily.uv_index_max?.[i] ?? null,
-      precipChance: data.daily.precipitation_probability_max?.[i] ?? null,
-      humidity: data.daily.relative_humidity_2m_max?.[i] ?? null,
-      windSpeed: data.daily.wind_speed_10m_max?.[i] ?? null,
-      sunrise: formatTime(data.daily.sunrise?.[i]),
-      sunset: formatTime(data.daily.sunset?.[i]),
-      airQuality: i === 0 ? airQuality : null, // Only today has AQI data
-    }));
+    const dailyForecast = data.daily.time.map((date, i) => {
+      const code = data.daily.weather_code[i];
+      return {
+        date,
+        tempMax: data.daily.temperature_2m_max[i],
+        tempMin: data.daily.temperature_2m_min[i],
+        condition: {
+          ...interpretWeatherCode(code),
+          code,
+        },
+        weatherCode: code, // Keep for backwards compatibility
+        uvIndex: data.daily.uv_index_max?.[i] ?? null,
+        precipChance: data.daily.precipitation_probability_max?.[i] ?? null,
+        humidity: data.daily.relative_humidity_2m_max?.[i] ?? null,
+        windSpeed: data.daily.wind_speed_10m_max?.[i] ?? null,
+        sunrise: formatTime(data.daily.sunrise?.[i]),
+        sunset: formatTime(data.daily.sunset?.[i]),
+        airQuality: i === 0 ? airQuality : null, // Only today has AQI data
+      };
+    });
 
     // Extract hourly data for trend calculation and detailed forecast
     const hourlyTimes = data.hourly?.time || [];
@@ -115,7 +121,10 @@ export const GET = withAuthAndErrorHandler(async (request) => {
         humidity: data.current.relative_humidity_2m,
         windSpeed: data.current.wind_speed_10m,
         pressure: data.current.surface_pressure ?? null,
-        condition: currentCondition,
+        condition: {
+          ...currentCondition,
+          code: data.current.weather_code,
+        },
         airQuality,
         units: data.current_units,
       },

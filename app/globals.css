@@ -306,6 +306,11 @@
     min-height: 100vh;
   }
 
+  /* iOS touch optimization - prevent 300ms tap delay */
+  button, a, input, select, textarea {
+    touch-action: manipulation;
+  }
+
   /* Light mode - Warm cream background */
   html:not(.dark) body {
     background: linear-gradient(
@@ -1015,6 +1020,14 @@
   }
 
   /* Safe area insets for mobile */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
   .top-safe-4 {
     top: calc(1rem + env(safe-area-inset-top));
   }

@@ -234,11 +234,11 @@ ModalClose.displayName = 'ModalClose';
  * @param {string} props.maxWidth - Legacy: custom max-width class (use size prop instead)
  * @param {string} props.className - Additional classes for content
  */
-function Modal({ isOpen, onClose, children, size = 'md', maxWidth, className, closeOnOverlayClick, ...props }) {
+function Modal({ isOpen, onClose, children, size = 'md', maxWidth, className, closeOnOverlayClick, closeOnEscape, ...props }) {
   // Support legacy maxWidth prop by merging into className
   // This allows existing code using maxWidth="max-w-lg" to continue working
   const mergedClassName = cn(maxWidth, className);
-  // Note: closeOnOverlayClick is destructured to prevent it from being spread to DOM
+  // Note: closeOnOverlayClick and closeOnEscape are destructured to prevent them from being spread to DOM
 
   return (
     <DialogPrimitive.Root open={isOpen} onOpenChange={(open) => !open && onClose?.()}>

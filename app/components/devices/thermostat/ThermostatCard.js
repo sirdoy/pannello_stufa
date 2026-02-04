@@ -145,6 +145,13 @@ export default function ThermostatCard() {
   const mode = status?.mode || 'schedule';
   const hasHeating = roomsWithStatus.some(r => r.heating);
 
+  // Filter only active rooms (heating or setpoint > temperature)
+  const activeRooms = roomsWithStatus.filter(room => {
+    if (room.isOffline) return false;
+    return room.heating === true ||
+           (room.setpoint && room.temperature && room.setpoint > room.temperature);
+  });
+
   async function checkConnection(retryCount = 0) {
     const MAX_RETRIES = 1;
     const RETRY_DELAY_MS = 1500;
@@ -458,42 +465,34 @@ export default function ThermostatCard() {
         onChange={(e) => setSelectedRoomId(e.target.value)}
       />
 
-      {/* Active Devices List - Shows all rooms at a glance */}
-      <div className="mt-5 sm:mt-6">
-        <Divider label="Dispositivi Attivi" variant="gradient" spacing="large" />
+      {/* Active Devices List - Shows only actively heating rooms */}
+      {activeRooms.length > 0 && (
+        <div className="mt-5 sm:mt-6">
+          <Divider label="Dispositivi Attivi" variant="gradient" spacing="large" />
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          {roomsWithStatus.map((room) => {
-            // Determine if room is active
-            const isActive = room.heating === true ||
-                             (room.setpoint && room.temperature && room.setpoint > room.temperature);
+          <div className="mt-4 flex flex-wrap gap-2">
+            {activeRooms.map((room) => {
+              // Device type icon
+              const deviceIcon = room.deviceType === 'valve' ? '🔧' : room.deviceType === 'thermostat' ? '🌡️' : '📡';
 
-            // Device type icon
-            const deviceIcon = room.deviceType === 'valve' ? '🔧' : room.deviceType === 'thermostat' ? '🌡️' : '📡';
-
-            return (
-              <div
-                key={room.id}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all",
-                  room.isOffline
-                    ? "bg-slate-900/40 border-slate-700/30 text-slate-500 [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:border-slate-400 [html:not(.dark)_&]:text-slate-500 opacity-60"
-                    : isActive
-                    ? "bg-ember-900/40 border-ember-500/40 text-ember-300 [html:not(.dark)_&]:bg-ember-100 [html:not(.dark)_&]:border-ember-300 [html:not(.dark)_&]:text-ember-700"
-                    : "bg-slate-800/40 border-slate-600/30 text-slate-300 [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:border-slate-300 [html:not(.dark)_&]:text-slate-600"
-                )}
-                title={`${room.name} - ${room.isOffline ? 'Offline' : isActive ? 'Attivo' : 'Standby'}`}
-              >
-                <span>{room.isOffline ? '📵' : deviceIcon}</span>
-                <span>{room.name}</span>
-                {isActive && !room.isOffline && (
+              return (
+                <div
+                  key={room.id}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all",
+                    "bg-ember-900/40 border-ember-500/40 text-ember-300 [html:not(.dark)_&]:bg-ember-100 [html:not(.dark)_&]:border-ember-300 [html:not(.dark)_&]:text-ember-700"
+                  )}
+                  title={`${room.name} - Attivo`}
+                >
+                  <span>{deviceIcon}</span>
+                  <span>{room.name}</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-ember-400 animate-pulse" />
-                )}
-              </div>
-            );
-          })}
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Selected Room Temperature */}
       {selectedRoom ? (

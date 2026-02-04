@@ -52,6 +52,12 @@ export { default as OfflineBanner } from './OfflineBanner';
 // Tooltip (v3.0+)
 export { default as Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from './Tooltip';
 
+// Popover (v4.0+)
+export { default as Popover, PopoverTrigger, PopoverContent, PopoverClose, PopoverArrow } from './Popover';
+
+// Tabs (v4.0+)
+export { default as Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
+
 // Feedback components (v3.0+)
 export { default as Spinner, spinnerVariants } from './Spinner';
 export { default as Progress, progressVariants } from './Progress';

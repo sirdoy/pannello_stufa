@@ -15,7 +15,7 @@ import { X } from 'lucide-react';
  * - ESC key to close (Radix onEscapeKeyDown)
  * - Backdrop click to close (Radix onPointerDownOutside)
  * - Size variants (sm, md, lg, xl, full)
- * - Mobile bottom sheet behavior (max-sm breakpoint)
+ * - Centered modal on all screen sizes (desktop and mobile)
  * - Accessible by default (role="dialog", aria-modal, focus management)
  *
  * @example
@@ -56,18 +56,12 @@ const contentVariants = cva(
     'shadow-card-elevated',
     'focus:outline-none',
     'overflow-y-auto',
-    // Desktop: centered
+    // Centered on all screen sizes (desktop and mobile)
     'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2',
     'rounded-3xl max-h-[85vh]',
     // Animation
     'data-[state=open]:animate-scale-in-center',
     'data-[state=closed]:animate-fade-out',
-    // Mobile bottom sheet override (max-sm = < 640px)
-    'max-sm:left-0 max-sm:right-0 max-sm:bottom-0 max-sm:top-auto',
-    'max-sm:translate-x-0 max-sm:translate-y-0',
-    'max-sm:rounded-t-3xl max-sm:rounded-b-none',
-    'max-sm:max-h-[85vh] max-sm:w-full max-sm:max-w-none',
-    'max-sm:data-[state=open]:animate-slide-in-from-bottom',
   ],
   {
     variants: {

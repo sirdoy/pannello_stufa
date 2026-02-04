@@ -332,25 +332,24 @@ describe('Modal Component', () => {
     });
   });
 
-  describe('Mobile Bottom Sheet (CSS Classes)', () => {
-    test('applies bottom sheet classes for mobile viewport', () => {
+  describe('Centered Modal (All Screen Sizes)', () => {
+    test('applies centered positioning classes', () => {
       render(<TestModal />);
       const dialog = screen.getByRole('dialog');
 
-      // Check for mobile-specific classes
-      expect(dialog).toHaveClass('max-sm:bottom-0');
-      expect(dialog).toHaveClass('max-sm:rounded-t-3xl');
-      expect(dialog).toHaveClass('max-sm:rounded-b-none');
+      // Check for centered positioning classes
+      expect(dialog).toHaveClass('left-1/2');
+      expect(dialog).toHaveClass('top-1/2');
+      expect(dialog).toHaveClass('-translate-x-1/2');
+      expect(dialog).toHaveClass('-translate-y-1/2');
     });
 
-    test('has slide-in-from-bottom animation class for mobile', () => {
+    test('has rounded corners on all sides', () => {
       render(<TestModal />);
       const dialog = screen.getByRole('dialog');
 
-      // Check for mobile animation class
-      expect(dialog).toHaveClass(
-        'max-sm:data-[state=open]:animate-slide-in-from-bottom'
-      );
+      // Check for full rounded corners (not split top/bottom)
+      expect(dialog).toHaveClass('rounded-3xl');
     });
   });
 

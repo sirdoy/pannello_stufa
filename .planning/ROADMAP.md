@@ -86,12 +86,12 @@ Plans:
   2. Destructive actions use danger styling on confirm button
   3. Form Modal integrates with React Hook Form validation
   4. Form Modal shows loading state during submit and validation errors inline
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 33-01: ConfirmationDialog component with danger variant
-- [ ] 33-02: FormModal component with validation integration
-- [ ] 33-03: Apply dialogs to destructive actions (delete device, clear history)
+- [ ] 33-01-PLAN.md - ConfirmationDialog component with danger variant (Wave 1)
+- [ ] 33-02-PLAN.md - FormModal component with validation integration (Wave 1)
+- [ ] 33-03-PLAN.md - Add Dialog Patterns to design system page (Wave 2)
 
 ---
 
@@ -158,7 +158,7 @@ Plans:
 | 30. Foundation Components | 3/3 | Complete | 2026-02-04 |
 | 31. Expandable Components | 3/3 | Complete | 2026-02-04 |
 | 32. Action Components | 3/3 | Complete | 2026-02-04 |
-| 33. Dialog Patterns | 0/3 | Not started | - |
+| 33. Dialog Patterns | 0/3 | Planned | - |
 | 34. Data Table | 0/4 | Not started | - |
 | 35. Micro-interactions | 0/2 | Not started | - |
 | 36. Application Integration | 0/3 | Not started | - |
@@ -174,5 +174,6 @@ Plans:
 *Phase 31 completed: 2026-02-04*
 *Phase 32 planned: 2026-02-04*
 *Phase 32 completed: 2026-02-04*
+*Phase 33 planned: 2026-02-04*
 *Milestone: v4.0 Advanced UI Components*
 *Requirements coverage: 55/55 (100%)*

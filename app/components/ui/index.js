@@ -87,3 +87,6 @@ export { default as ConnectionStatus, connectionStatusVariants, dotVariants } fr
 export { default as HealthIndicator, healthIndicatorVariants } from './HealthIndicator';
 export { default as SmartHomeCard, smartHomeCardVariants, SmartHomeCardHeader, SmartHomeCardStatus, SmartHomeCardControls } from './SmartHomeCard';
 export { default as StatusCard } from './StatusCard';
+
+// DataTable (v4.0+)
+export { default as DataTable, dataTableVariants } from './DataTable';

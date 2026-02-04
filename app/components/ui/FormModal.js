@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useEffect, useState, useRef, useCallback } from 'react';
+import { forwardRef, useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, Check, X } from 'lucide-react';
@@ -159,11 +159,19 @@ const FormModal = forwardRef(function FormModal(
   const [hasSubmitted, setHasSubmitted] = useState(false);
   // Ref for triggering shake animation
   const formRef = useRef(null);
+  // Ref to track previous isOpen state for reset logic
+  const wasOpenRef = useRef(false);
+
+  // Memoize resolver to prevent re-initialization on every render
+  const resolver = useMemo(
+    () => (validationSchema ? zodResolver(validationSchema) : undefined),
+    [validationSchema]
+  );
 
   // Initialize React Hook Form
   const form = useForm({
     defaultValues,
-    resolver: validationSchema ? zodResolver(validationSchema) : undefined,
+    resolver,
     mode: 'onBlur', // Validate on blur for touched fields
     reValidateMode: 'onChange', // After first error, validate on change
   });
@@ -182,14 +190,16 @@ const FormModal = forwardRef(function FormModal(
   const { errors, isSubmitting } = rhfFormState;
   const isLoading = formState === 'submitting' || isSubmitting;
 
-  // Reset form when modal opens
+  // Reset form when modal opens (not when it's already open)
   useEffect(() => {
-    if (isOpen) {
+    // Only reset when transitioning from closed to open
+    if (isOpen && !wasOpenRef.current) {
       reset(defaultValues);
       setFormState('idle');
       setHasSubmitted(false);
     }
-  }, [isOpen, reset, defaultValues]);
+    wasOpenRef.current = isOpen;
+  }, [isOpen, reset]); // Note: defaultValues intentionally excluded to prevent infinite loop
 
   // Handle close with loading prevention
   const handleClose = useCallback(() => {
@@ -198,10 +208,10 @@ const FormModal = forwardRef(function FormModal(
   }, [isLoading, onClose]);
 
   // Trigger shake animation on invalid fields
-  const triggerShakeAnimation = useCallback(() => {
+  const triggerShakeAnimation = useCallback((validationErrors) => {
     if (!formRef.current) return;
 
-    const errorFields = Object.keys(errors);
+    const errorFields = Object.keys(validationErrors || errors);
     errorFields.forEach((fieldName) => {
       const field = formRef.current.querySelector(`[data-field="${fieldName}"]`);
       if (field) {
@@ -246,7 +256,7 @@ const FormModal = forwardRef(function FormModal(
     setHasSubmitted(true);
 
     // Trigger shake animation on invalid fields
-    triggerShakeAnimation();
+    triggerShakeAnimation(validationErrors);
 
     // Focus first error field
     const firstErrorField = Object.keys(validationErrors)[0];

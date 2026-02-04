@@ -42,6 +42,7 @@ import { calibrateValvesServer } from '@/lib/netatmoCalibrationService';
 import { proactiveTokenRefresh } from '@/lib/hue/hueRemoteTokenHelper';
 import { fetchWeatherForecast } from '@/lib/openMeteo';
 import { saveWeatherToCache } from '@/lib/weatherCacheService';
+import { PIDController } from '@/lib/utils/pidController';
 
 export const dynamic = 'force-dynamic';
 
@@ -606,6 +607,145 @@ async function handleLevelChanges(active, currentPowerLevel, currentFanLevel) {
   return changeApplied;
 }
 
+/**
+ * Run PID automation if enabled
+ *
+ * Adjusts stove power level based on living room temperature vs thermostat setpoint
+ * using a PID controller algorithm.
+ *
+ * @param {boolean} isOn - Whether stove is currently ON
+ * @param {number} currentPowerLevel - Current stove power level (1-5)
+ * @param {boolean} semiManual - Whether scheduler is in semi-manual mode
+ * @param {boolean} schedulerEnabled - Whether scheduler is enabled
+ * @returns {Object} - { skipped, reason } or { adjusted, from, to, temperature, setpoint }
+ */
+async function runPidAutomationIfEnabled(isOn, currentPowerLevel, semiManual, schedulerEnabled) {
+  try {
+    // Skip if stove is not ON
+    if (!isOn) {
+      return { skipped: true, reason: 'stove_off' };
+    }
+
+    // Skip if not in automatic mode (semi-manual or manual)
+    if (semiManual || !schedulerEnabled) {
+      return { skipped: true, reason: 'not_auto_mode' };
+    }
+
+    // Get admin user ID for single-user system
+    const adminUserId = process.env.ADMIN_USER_ID;
+    if (!adminUserId) {
+      return { skipped: true, reason: 'no_admin_user' };
+    }
+
+    // Read PID config from Firebase
+    const pidConfig = await adminDbGet(`users/${adminUserId}/pidAutomation`);
+    if (!pidConfig || !pidConfig.enabled) {
+      return { skipped: true, reason: 'pid_disabled' };
+    }
+
+    // Read Netatmo current status from Firebase cache
+    const netatmoStatus = await adminDbGet('netatmo/currentStatus');
+    if (!netatmoStatus || !netatmoStatus.rooms) {
+      return { skipped: true, reason: 'no_netatmo_data' };
+    }
+
+    // Find target room
+    const targetRoomId = pidConfig.targetRoomId;
+    if (!targetRoomId) {
+      return { skipped: true, reason: 'no_target_room' };
+    }
+
+    const rooms = Object.values(netatmoStatus.rooms);
+    const targetRoom = rooms.find(r => String(r.id) === String(targetRoomId));
+    if (!targetRoom) {
+      return { skipped: true, reason: 'room_not_found' };
+    }
+
+    // Get measured temperature and setpoint
+    const measured = targetRoom.temperature;
+    const setpoint = targetRoom.setpoint;
+
+    if (typeof measured !== 'number' || typeof setpoint !== 'number') {
+      return { skipped: true, reason: 'no_temperature_data' };
+    }
+
+    // Read PID state from Firebase (integral, prevError, lastRun)
+    const pidStatePath = getEnvironmentPath('pidAutomation/state');
+    const pidState = await adminDbGet(pidStatePath);
+
+    // Calculate time delta in minutes
+    const now = Date.now();
+    let dt = 5; // Default 5 minutes (cron interval)
+    if (pidState && pidState.lastRun) {
+      dt = (now - pidState.lastRun) / 60000; // Convert ms to minutes
+      // Clamp dt to reasonable range (1-30 minutes)
+      dt = Math.max(1, Math.min(30, dt));
+    }
+
+    // Instantiate PID controller with config gains
+    const pid = new PIDController({
+      kp: pidConfig.kp ?? 0.5,
+      ki: pidConfig.ki ?? 0.1,
+      kd: pidConfig.kd ?? 0.05,
+      outputMin: 1,
+      outputMax: 5,
+      integralMax: 10,
+    });
+
+    // Restore state from previous run
+    if (pidState) {
+      pid.setState({
+        integral: pidState.integral ?? 0,
+        prevError: pidState.prevError ?? 0,
+        initialized: pidState.initialized ?? false,
+      });
+    }
+
+    // Compute target power level
+    const targetPower = pid.compute(setpoint, measured, dt);
+
+    // Save updated PID state
+    const newState = pid.getState();
+    await adminDbSet(pidStatePath, {
+      integral: newState.integral,
+      prevError: newState.prevError,
+      initialized: newState.initialized,
+      lastRun: now,
+    });
+
+    // Check if power level needs adjustment
+    if (targetPower !== currentPowerLevel) {
+      console.log(`🎯 PID: ${measured.toFixed(1)}°C -> ${setpoint.toFixed(1)}°C target, power ${currentPowerLevel} -> ${targetPower}`);
+
+      // Apply new power level
+      await setPowerLevel(targetPower);
+      await updateStoveState({ powerLevel: targetPower, source: 'pid_automation' });
+
+      return {
+        adjusted: true,
+        from: currentPowerLevel,
+        to: targetPower,
+        temperature: measured,
+        setpoint: setpoint,
+        roomName: targetRoom.name,
+      };
+    }
+
+    return {
+      adjusted: false,
+      reason: 'no_change_needed',
+      currentPower: currentPowerLevel,
+      targetPower,
+      temperature: measured,
+      setpoint: setpoint,
+    };
+
+  } catch (error) {
+    console.error('❌ PID automation error:', error.message);
+    return { skipped: true, reason: 'exception', error: error.message };
+  }
+}
+
 // =============================================================================
 // MAIN ROUTE HANDLER
 // =============================================================================
@@ -801,9 +941,23 @@ export const GET = withCronSecret(async (_request) => {
       }
     }
 
-    // Handle power/fan level changes
+    // Handle power/fan level changes (from schedule)
     const levelsChanged = await handleLevelChanges(active, currentPowerLevel, currentFanLevel);
     changeApplied = changeApplied || levelsChanged;
+
+    // Run PID automation if enabled (async, don't block main flow)
+    // This may override the scheduled power level based on temperature feedback
+    runPidAutomationIfEnabled(isOn, currentPowerLevel, modeData.semiManual, schedulerEnabled)
+      .then((result) => {
+        if (result.adjusted) {
+          console.log(`🎯 PID automation: adjusted power from ${result.from} to ${result.to} (${result.roomName}: ${result.temperature}°C -> ${result.setpoint}°C)`);
+        } else if (result.skipped) {
+          console.log(`🎯 PID automation: skipped (${result.reason})`);
+        } else {
+          console.log(`🎯 PID automation: no change needed (power=${result.currentPower}, temp=${result.temperature}°C, setpoint=${result.setpoint}°C)`);
+        }
+      })
+      .catch(err => console.error('❌ PID automation error:', err.message));
 
   } else {
     // No active schedule - turn off if on

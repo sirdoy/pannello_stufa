@@ -58,6 +58,12 @@ export { default as Popover, PopoverTrigger, PopoverContent, PopoverClose, Popov
 // Tabs (v4.0+)
 export { default as Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
 
+// Sheet (v4.0+)
+export { default as Sheet, SheetTrigger, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription, SheetClose } from './Sheet';
+
+// Accordion (v4.0+)
+export { default as Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './Accordion';
+
 // Feedback components (v3.0+)
 export { default as Spinner, spinnerVariants } from './Spinner';
 export { default as Progress, progressVariants } from './Progress';

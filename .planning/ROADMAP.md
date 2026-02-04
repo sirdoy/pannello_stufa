@@ -10,7 +10,7 @@ This milestone adds 8 advanced UI components to the Ember Noir design system: Ta
 
 ## Phases
 
-- [ ] **Phase 30: Foundation Components** - Popover and Tabs (zero new dependencies)
+- [x] **Phase 30: Foundation Components** - Popover and Tabs (zero new dependencies)
 - [ ] **Phase 31: Expandable Components** - Accordion and Sheet (new Radix packages)
 - [ ] **Phase 32: Action Components** - Context Menu and Command Palette (mobile critical)
 - [ ] **Phase 33: Dialog Patterns** - Confirmation and Form Modal
@@ -33,9 +33,9 @@ This milestone adds 8 advanced UI components to the Ember Noir design system: Ta
 **Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 30-01-PLAN.md - Popover component with CVA variants and accessibility (Wave 1)
-- [ ] 30-02-PLAN.md - Tabs compound component with sliding indicator (Wave 1)
-- [ ] 30-03-PLAN.md - Apply Tabs to thermostat page (Schedule/Manual/History) (Wave 2)
+- [x] 30-01-PLAN.md - Popover component with CVA variants and accessibility (Wave 1)
+- [x] 30-02-PLAN.md - Tabs compound component with sliding indicator (Wave 1)
+- [x] 30-03-PLAN.md - Apply Tabs to thermostat page (Schedule/Manual/History) (Wave 2)
 
 ---
 
@@ -155,7 +155,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 30. Foundation Components | 0/3 | Planned | - |
+| 30. Foundation Components | 3/3 | Complete | 2026-02-04 |
 | 31. Expandable Components | 0/3 | Not started | - |
 | 32. Action Components | 0/3 | Not started | - |
 | 33. Dialog Patterns | 0/3 | Not started | - |
@@ -163,11 +163,12 @@ Plans:
 | 35. Micro-interactions | 0/2 | Not started | - |
 | 36. Application Integration | 0/3 | Not started | - |
 
-**Total:** 0/21 plans (0%)
+**Total:** 3/21 plans (14%)
 
 ---
 
 *Roadmap created: 2026-02-03*
 *Phase 30 planned: 2026-02-03*
+*Phase 30 completed: 2026-02-04*
 *Milestone: v4.0 Advanced UI Components*
 *Requirements coverage: 55/55 (100%)*

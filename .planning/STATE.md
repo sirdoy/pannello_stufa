@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-03)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Milestone v4.0 Advanced UI Components — Phase 30 Foundation Components
+**Current focus:** Milestone v4.0 Advanced UI Components — Phase 31 Expandable Components
 
 ## Current Position
 
-Phase: 30 of 36 (Foundation Components)
-Plan: 3 of 3 complete
-Status: Phase 30 complete
-Last activity: 2026-02-04 — Completed 30-03-PLAN.md (ThermostatTabs application)
+Phase: 31 of 36 (Expandable Components)
+Plan: Ready to plan
+Status: Phase 30 verified, ready for Phase 31
+Last activity: 2026-02-04 — Phase 30 Foundation Components verified and complete
 
 Progress: [███░░░░░░░░░░░░░░░░░░░░░░] 14% (3/21 plans)
 
@@ -75,6 +75,6 @@ None — Ready to begin v4.0.
 ## Session Continuity
 
 Last session: 2026-02-04
-Stopped at: Completed 30-03-PLAN.md (ThermostatTabs application) - Phase 30 complete
+Stopped at: Phase 30 verified and complete
 Resume file: None
-Next step: Begin Phase 31 (Advanced Interactions)
+Next step: `/gsd:discuss-phase 31` or `/gsd:plan-phase 31` for Expandable Components (Accordion + Sheet)

@@ -365,7 +365,7 @@ const DataTable = forwardRef(function DataTable(
     onExpandedChange: setExpanded,
     enableRowSelection: selectionMode !== 'none',
     enableMultiRowSelection: selectionMode === 'multi',
-    getRowCanExpand: getRowCanExpand,
+    getRowCanExpand: enableExpansion ? (getRowCanExpand || (() => true)) : undefined,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: enableFiltering ? getFilteredRowModel() : undefined,
@@ -567,7 +567,7 @@ const DataTable = forwardRef(function DataTable(
                 index={index}
                 extraColumns={extraColumnsCount}
                 renderExpandedContent={renderExpandedContent}
-                onRowClick={handleRowClick}
+                onRowClick={onRowClick ? handleRowClick : undefined}
               />
             ))
           )}
@@ -667,6 +667,7 @@ const DataTable = forwardRef(function DataTable(
             </div>
           )}
           </div>
+        )}
         </div>
 
         {/* Right fade gradient scroll indicator */}

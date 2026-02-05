@@ -581,6 +581,359 @@ describe('DataTable', () => {
     });
   });
 
+  describe('Row Expansion', () => {
+    it('shows expand icon column when enableExpansion is true', () => {
+      render(
+        <DataTable data={mockData} columns={mockColumns} enableExpansion />
+      );
+
+      // Should have 3 column headers (expand + name + status)
+      const headers = screen.getAllByRole('columnheader');
+      expect(headers).toHaveLength(3);
+    });
+
+    it('does not show expand icon column when enableExpansion is false', () => {
+      render(
+        <DataTable data={mockData} columns={mockColumns} enableExpansion={false} />
+      );
+
+      // Should have 2 column headers (name + status)
+      const headers = screen.getAllByRole('columnheader');
+      expect(headers).toHaveLength(2);
+    });
+
+    it('clicking row toggles expansion', async () => {
+      const user = userEvent.setup();
+      render(
+        <DataTable data={mockData} columns={mockColumns} enableExpansion />
+      );
+
+      // Get first data row (skip header)
+      const rows = screen.getAllByRole('row');
+      const firstDataRow = rows[1];
+
+      // Initially not expanded
+      expect(firstDataRow).toHaveAttribute('aria-expanded', 'false');
+
+      // Click to expand
+      await user.click(firstDataRow);
+
+      // Should be expanded
+      expect(firstDataRow).toHaveAttribute('aria-expanded', 'true');
+
+      // Expansion row should be visible with data
+      const expansionRows = document.querySelectorAll('[data-expansion-row]');
+      expect(expansionRows).toHaveLength(1);
+    });
+
+    it('chevron rotates when row is expanded', async () => {
+      const user = userEvent.setup();
+      render(
+        <DataTable data={mockData} columns={mockColumns} enableExpansion />
+      );
+
+      // Find expand button
+      const expandButtons = screen.getAllByRole('button', { name: /expand row/i });
+      const firstExpandButton = expandButtons[0];
+
+      // Initially not rotated
+      const chevron = firstExpandButton.querySelector('svg');
+      expect(chevron).not.toHaveClass('rotate-90');
+
+      // Click to expand
+      await user.click(firstExpandButton);
+
+      // Chevron should be rotated
+      expect(chevron).toHaveClass('rotate-90');
+    });
+
+    it('renderExpandedContent shows custom content', async () => {
+      const user = userEvent.setup();
+      const renderExpandedContent = (row) => (
+        <div data-testid="custom-content">Custom: {row.original.name}</div>
+      );
+
+      render(
+        <DataTable
+          data={mockData}
+          columns={mockColumns}
+          enableExpansion
+          renderExpandedContent={renderExpandedContent}
+        />
+      );
+
+      // Get first data row and expand
+      const rows = screen.getAllByRole('row');
+      await user.click(rows[1]);
+
+      // Custom content should be visible
+      expect(screen.getByTestId('custom-content')).toBeInTheDocument();
+      expect(screen.getByText(/Custom: Alpha/i)).toBeInTheDocument();
+    });
+
+    it('shows default JSON content when no renderExpandedContent provided', async () => {
+      const user = userEvent.setup();
+      render(
+        <DataTable data={mockData} columns={mockColumns} enableExpansion />
+      );
+
+      // Get first data row and expand
+      const rows = screen.getAllByRole('row');
+      await user.click(rows[1]);
+
+      // Should show JSON representation
+      const expansionRow = document.querySelector('[data-expansion-row]');
+      expect(expansionRow).toHaveTextContent('"name"');
+      expect(expansionRow).toHaveTextContent('"Alpha"');
+    });
+
+    it('getRowCanExpand controls which rows can expand', () => {
+      const getRowCanExpand = (row) => row.original.status === 'active';
+
+      render(
+        <DataTable
+          data={mockData}
+          columns={mockColumns}
+          enableExpansion
+          getRowCanExpand={getRowCanExpand}
+        />
+      );
+
+      // Only active rows should have expand button
+      const expandButtons = screen.queryAllByRole('button', { name: /expand row/i });
+      expect(expandButtons.length).toBe(1); // Only 'Alpha' is active
+    });
+
+    it('expand button click does not trigger row click', async () => {
+      const user = userEvent.setup();
+      const onRowClick = jest.fn();
+
+      render(
+        <DataTable
+          data={mockData}
+          columns={mockColumns}
+          enableExpansion
+          onRowClick={onRowClick}
+        />
+      );
+
+      // Click expand button
+      const expandButtons = screen.getAllByRole('button', { name: /expand row/i });
+      await user.click(expandButtons[0]);
+
+      // Row click should not be triggered due to stopPropagation
+      expect(onRowClick).not.toHaveBeenCalled();
+    });
+
+    it('aria-expanded reflects expansion state', async () => {
+      const user = userEvent.setup();
+      render(
+        <DataTable data={mockData} columns={mockColumns} enableExpansion />
+      );
+
+      const rows = screen.getAllByRole('row');
+      const firstDataRow = rows[1];
+
+      // Initially collapsed
+      expect(firstDataRow).toHaveAttribute('aria-expanded', 'false');
+
+      // Expand
+      await user.click(firstDataRow);
+      expect(firstDataRow).toHaveAttribute('aria-expanded', 'true');
+
+      // Collapse
+      await user.click(firstDataRow);
+      expect(firstDataRow).toHaveAttribute('aria-expanded', 'false');
+    });
+  });
+
+  describe('Keyboard Navigation', () => {
+    it('first row has tabIndex 0, others have tabIndex -1', () => {
+      render(
+        <DataTable data={mockData} columns={mockColumns} enableExpansion />
+      );
+
+      const rows = screen.getAllByRole('row').slice(1); // Skip header
+
+      expect(rows[0]).toHaveAttribute('tabIndex', '0');
+      expect(rows[1]).toHaveAttribute('tabIndex', '-1');
+      expect(rows[2]).toHaveAttribute('tabIndex', '-1');
+    });
+
+    it('ArrowDown moves focus to next row', async () => {
+      const user = userEvent.setup();
+      render(
+        <DataTable data={mockData} columns={mockColumns} enableExpansion />
+      );
+
+      const rows = screen.getAllByRole('row').slice(1); // Skip header
+
+      // Focus first row
+      rows[0].focus();
+      expect(rows[0]).toHaveFocus();
+
+      // Press ArrowDown
+      await user.keyboard('{ArrowDown}');
+
+      // Second row should be focused
+      expect(rows[1]).toHaveFocus();
+    });
+
+    it('ArrowUp moves focus to previous row', async () => {
+      const user = userEvent.setup();
+      render(
+        <DataTable data={mockData} columns={mockColumns} enableExpansion />
+      );
+
+      const rows = screen.getAllByRole('row').slice(1); // Skip header
+
+      // Focus second row
+      rows[1].focus();
+      expect(rows[1]).toHaveFocus();
+
+      // Press ArrowUp
+      await user.keyboard('{ArrowUp}');
+
+      // First row should be focused
+      expect(rows[0]).toHaveFocus();
+    });
+
+    it('Enter key toggles expansion', async () => {
+      const user = userEvent.setup();
+      render(
+        <DataTable data={mockData} columns={mockColumns} enableExpansion />
+      );
+
+      const rows = screen.getAllByRole('row').slice(1);
+      const firstDataRow = rows[0];
+
+      // Focus and press Enter
+      firstDataRow.focus();
+      await user.keyboard('{Enter}');
+
+      // Should be expanded
+      expect(firstDataRow).toHaveAttribute('aria-expanded', 'true');
+
+      // Press Enter again
+      await user.keyboard('{Enter}');
+
+      // Should be collapsed
+      expect(firstDataRow).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('Space key toggles selection', async () => {
+      const user = userEvent.setup();
+      render(
+        <DataTable data={mockData} columns={mockColumns} selectionMode="multi" enableExpansion />
+      );
+
+      const rows = screen.getAllByRole('row').slice(1);
+      const firstDataRow = rows[0];
+
+      // Focus and press Space
+      firstDataRow.focus();
+      await user.keyboard('{ }');
+
+      // Row should be selected (indicated by background class)
+      expect(firstDataRow).toHaveClass('bg-ember-500/10');
+    });
+
+    it('arrow keys skip expansion content rows', async () => {
+      const user = userEvent.setup();
+      render(
+        <DataTable data={mockData} columns={mockColumns} enableExpansion />
+      );
+
+      const rows = screen.getAllByRole('row').slice(1);
+      const firstDataRow = rows[0];
+
+      // Focus first row and expand it
+      firstDataRow.focus();
+      await user.keyboard('{Enter}');
+
+      // Verify expanded
+      expect(firstDataRow).toHaveAttribute('aria-expanded', 'true');
+
+      // Press ArrowDown
+      await user.keyboard('{ArrowDown}');
+
+      // Should skip expansion row and go to next data row
+      const allRows = screen.getAllByRole('row').slice(1);
+      const secondDataRow = allRows.find((row) =>
+        row.getAttribute('aria-expanded') !== null &&
+        row !== firstDataRow
+      );
+
+      expect(secondDataRow).toHaveFocus();
+    });
+  });
+
+  describe('Responsive Scrolling', () => {
+    it('scroll container has overflow-x-auto', () => {
+      const { container } = render(
+        <DataTable data={mockData} columns={mockColumns} />
+      );
+
+      const scrollContainer = container.querySelector('.overflow-x-auto');
+      expect(scrollContainer).toBeInTheDocument();
+      expect(scrollContainer).toHaveClass('overflow-x-auto');
+    });
+
+    it('table has min-w-full to prevent column squeezing', () => {
+      const { container } = render(
+        <DataTable data={mockData} columns={mockColumns} />
+      );
+
+      const table = container.querySelector('table');
+      expect(table).toHaveClass('min-w-full');
+    });
+
+    it('fade indicator appears when content overflows', async () => {
+      const { container } = render(
+        <DataTable data={mockData} columns={mockColumns} />
+      );
+
+      // Find scroll container
+      const scrollContainer = container.querySelector('.overflow-x-auto');
+
+      // Mock scrollable state
+      Object.defineProperty(scrollContainer, 'scrollWidth', {
+        value: 1000,
+        configurable: true,
+      });
+      Object.defineProperty(scrollContainer, 'clientWidth', {
+        value: 500,
+        configurable: true,
+      });
+      Object.defineProperty(scrollContainer, 'scrollLeft', {
+        value: 0,
+        configurable: true,
+        writable: true,
+      });
+
+      // Trigger scroll event to update indicator
+      await userEvent.setup();
+      scrollContainer.dispatchEvent(new Event('scroll'));
+
+      // Wait for state update
+      await screen.findByRole('table');
+
+      // Check for fade indicator
+      const fadeIndicator = container.querySelector('.pointer-events-none');
+      expect(fadeIndicator).toBeInTheDocument();
+    });
+
+    it('scrollbar styling classes applied', () => {
+      const { container } = render(
+        <DataTable data={mockData} columns={mockColumns} />
+      );
+
+      const scrollContainer = container.querySelector('.overflow-x-auto');
+      expect(scrollContainer).toHaveClass('scrollbar-thin');
+      expect(scrollContainer).toHaveClass('scrollbar-thumb-slate-700');
+    });
+  });
+
   describe('Pagination', () => {
     // Generate larger dataset for pagination testing
     const largeMockData = Array.from({ length: 25 }, (_, i) => ({

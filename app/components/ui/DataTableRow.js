@@ -103,7 +103,7 @@ export function DataTableRow({
           'border-b border-white/[0.06] last:border-b-0',
           'text-slate-200',
           'hover:bg-white/[0.02] transition-colors',
-          canExpand && 'cursor-pointer',
+          (canExpand || onRowClick) && 'cursor-pointer',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ember-500/50',
           row.getIsSelected() && 'bg-ember-500/10',
           isExpanded && 'border-b-0'

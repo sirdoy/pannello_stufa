@@ -39,7 +39,7 @@ export default function DeadManSwitchPanel({ status, error, onRetry }) {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between w-full">
-            <Heading level={3} variant="subtle">
+            <Heading level={2} variant="subtle">
               Cron Health
             </Heading>
             <div className="flex items-center gap-2">
@@ -96,7 +96,7 @@ export default function DeadManSwitchPanel({ status, error, onRetry }) {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between w-full">
-            <Heading level={3} variant="subtle">
+            <Heading level={2} variant="subtle">
               Cron Health
             </Heading>
             <div className="flex items-center gap-2">
@@ -131,7 +131,7 @@ export default function DeadManSwitchPanel({ status, error, onRetry }) {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between w-full">
-            <Heading level={3} variant="subtle">
+            <Heading level={2} variant="subtle">
               Cron Health
             </Heading>
             <div className="flex items-center gap-2">
@@ -170,7 +170,7 @@ export default function DeadManSwitchPanel({ status, error, onRetry }) {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between w-full">
-            <Heading level={3} variant="subtle">
+            <Heading level={2} variant="subtle">
               Cron Health
             </Heading>
             <div className="flex items-center gap-2">

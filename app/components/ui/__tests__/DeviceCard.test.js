@@ -3,13 +3,14 @@
  * DeviceCard Component Tests
  *
  * Tests backwards compatibility with legacy props, new API props,
- * integration with SmartHomeCard, Badge, HealthIndicator, and accessibility.
+ * integration with SmartHomeCard, Badge, HealthIndicator, context menu, and accessibility.
  */
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import { createRef } from 'react';
 import DeviceCard from '../DeviceCard';
+import { Settings, RefreshCw } from 'lucide-react';
 
 expect.extend(toHaveNoViolations);
 
@@ -713,6 +714,62 @@ describe('DeviceCard', () => {
       );
       const badge = container.querySelector('.animate-glow-pulse');
       expect(badge).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Context Menu (v4.0)', () => {
+    it('renders without context menu when contextMenuItems is empty', () => {
+      const { container } = render(
+        <DeviceCard icon="🔥" title="Stufa" contextMenuItems={[]}>
+          <p>Content</p>
+        </DeviceCard>
+      );
+      // Should not have RightClickMenu trigger wrapper
+      const triggerWrapper = container.querySelector('[data-radix-popper-content-wrapper]');
+      expect(triggerWrapper).not.toBeInTheDocument();
+    });
+
+    it('renders with context menu when contextMenuItems is provided', () => {
+      const mockOnSelect = jest.fn();
+      const contextMenuItems = [
+        { icon: <Settings className="w-4 h-4" />, label: 'Impostazioni', onSelect: mockOnSelect },
+        { separator: true },
+        { icon: <RefreshCw className="w-4 h-4" />, label: 'Aggiorna', onSelect: mockOnSelect },
+      ];
+
+      const { container } = render(
+        <DeviceCard icon="🔥" title="Stufa" contextMenuItems={contextMenuItems}>
+          <p>Content</p>
+        </DeviceCard>
+      );
+
+      // Card should still render
+      expect(screen.getByText('Stufa')).toBeInTheDocument();
+      expect(screen.getByText('Content')).toBeInTheDocument();
+    });
+
+    it('maintains backwards compatibility without contextMenuItems', () => {
+      render(
+        <DeviceCard icon="🔥" title="Stufa">
+          <p>Content</p>
+        </DeviceCard>
+      );
+      expect(screen.getByText('Stufa')).toBeInTheDocument();
+      expect(screen.getByText('Content')).toBeInTheDocument();
+    });
+
+    it('has no a11y violations with context menu', async () => {
+      const contextMenuItems = [
+        { icon: <Settings className="w-4 h-4" />, label: 'Impostazioni', onSelect: () => {} },
+      ];
+
+      const { container } = render(
+        <DeviceCard icon="🔥" title="Stufa" contextMenuItems={contextMenuItems}>
+          <p>Content</p>
+        </DeviceCard>
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
     });
   });
 });

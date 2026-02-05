@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef } from 'react';
+import { forwardRef, useState } from 'react';
 import { cn } from '@/lib/utils/cn';
 import SmartHomeCard from './SmartHomeCard';
 import Button from './Button';
@@ -10,6 +10,8 @@ import LoadingOverlay from './LoadingOverlay';
 import Toast from './Toast';
 import InfoBox from './InfoBox';
 import HealthIndicator from './HealthIndicator';
+import RightClickMenu from './RightClickMenu';
+import { useContextMenuLongPress, longPressPreventSelection } from '@/app/hooks/useContextMenuLongPress';
 import { Heading, EmptyState, Divider } from './index';
 
 /**
@@ -45,6 +47,10 @@ import { Heading, EmptyState, Divider } from './index';
  * @param {'compact'|'default'} props.size - Card size variant
  * @param {'ok'|'warning'|'error'|'critical'} props.healthStatus - Health indicator status
  * @param {boolean} props.isLoading - Alias for loading (new API consistency)
+ *
+ * Context Menu Props (v4.0):
+ * @param {Array<{icon: ReactNode, label: string, onSelect: Function, disabled?: boolean, separator?: boolean}>} props.contextMenuItems - Menu items for right-click/long-press
+ * @param {Function} props.onContextMenu - Optional callback when context menu opens (for state sync)
  */
 const DeviceCard = forwardRef(function DeviceCard(
   {
@@ -73,10 +79,19 @@ const DeviceCard = forwardRef(function DeviceCard(
     size = 'default',
     healthStatus,
     isLoading,
+    // Context menu props (v4.0)
+    contextMenuItems = [],
+    onContextMenu,
     ...props
   },
   ref
 ) {
+  // Context menu state
+  const [contextMenuOpen, setContextMenuOpen] = useState(false);
+  const { bind: longPressBind, isPressed } = useContextMenuLongPress(() => {
+    setContextMenuOpen(true);
+    onContextMenu?.();
+  });
   // Map legacy color names to new names
   const normalizeColorTheme = (theme) => {
     const colorMap = {
@@ -157,103 +172,144 @@ const DeviceCard = forwardRef(function DeviceCard(
   // Check if there are error banners
   const hasErrorBanner = banners.some(b => b.variant === 'error');
 
+  // Check if context menu is enabled
+  const hasContextMenu = contextMenuItems && contextMenuItems.length > 0;
+
+  // Card content (shared between with/without context menu)
+  const cardContent = (
+    <SmartHomeCard
+      ref={ref}
+      icon={icon}
+      title={title}
+      size={size}
+      colorTheme={normalizedColorTheme}
+      isLoading={false} // We handle loading separately with LoadingOverlay
+      error={hasErrorBanner}
+      disabled={!connected}
+      className={cn('relative', className)}
+      {...props}
+    >
+      {/* Status area with Badge and HealthIndicator */}
+      {(statusBadge || healthStatus) && (
+        <SmartHomeCard.Status className="flex items-center justify-between mb-4 -mt-2">
+          {/* Legacy statusBadge support - convert to new Badge */}
+          {statusBadge && (
+            <Badge
+              variant={mapStatusBadgeVariant(statusBadge.color)}
+              pulse={shouldPulse(statusBadge.color)}
+              icon={statusBadge.icon ? <span>{statusBadge.icon}</span> : null}
+            >
+              {statusBadge.label}
+            </Badge>
+          )}
+
+          {/* New HealthIndicator (if provided) */}
+          {healthStatus && (
+            <HealthIndicator status={healthStatus} />
+          )}
+        </SmartHomeCard.Status>
+      )}
+
+      {/* Banners (legacy support) */}
+      {banners.map((banner, index) => (
+        <div key={index} className="mb-4">
+          <Banner
+            variant={banner.variant}
+            icon={banner.icon}
+            title={banner.title}
+            description={banner.description}
+            dismissible={banner.dismissible}
+            onDismiss={banner.onDismiss}
+          />
+        </div>
+      ))}
+
+      {/* Main content */}
+      {children}
+
+      {/* Info boxes section (legacy support) */}
+      {infoBoxes.length > 0 && (
+        <>
+          {infoBoxesTitle && (
+            <Divider label={infoBoxesTitle} variant="gradient" spacing="large" />
+          )}
+          <div className="grid grid-cols-2 gap-2.5 mb-6">
+            {infoBoxes.map((box, index) => (
+              <InfoBox
+                key={index}
+                icon={box.icon}
+                label={box.label}
+                value={box.value}
+                valueColor={box.valueColor}
+              />
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Footer actions using SmartHomeCard.Controls */}
+      {footerActions.length > 0 && (
+        <SmartHomeCard.Controls className="mt-4 sm:mt-6">
+          {footerActions.map((action, index) => (
+            <Button
+              key={index}
+              variant={action.variant || 'subtle'}
+              className="w-full"
+              size={action.size}
+              onClick={action.onClick}
+              {...action}
+            >
+              {action.label}
+            </Button>
+          ))}
+        </SmartHomeCard.Controls>
+      )}
+
+      {/* Loading Overlay */}
+      <LoadingOverlay
+        show={isLoadingState}
+        message={loadingMessage}
+        icon={icon}
+      />
+    </SmartHomeCard>
+  );
+
   return (
     <>
-      <SmartHomeCard
-        ref={ref}
-        icon={icon}
-        title={title}
-        size={size}
-        colorTheme={normalizedColorTheme}
-        isLoading={false} // We handle loading separately with LoadingOverlay
-        error={hasErrorBanner}
-        disabled={!connected}
-        className={cn('relative', className)}
-        {...props}
-      >
-        {/* Status area with Badge and HealthIndicator */}
-        {(statusBadge || healthStatus) && (
-          <SmartHomeCard.Status className="flex items-center justify-between mb-4 -mt-2">
-            {/* Legacy statusBadge support - convert to new Badge */}
-            {statusBadge && (
-              <Badge
-                variant={mapStatusBadgeVariant(statusBadge.color)}
-                pulse={shouldPulse(statusBadge.color)}
-                icon={statusBadge.icon ? <span>{statusBadge.icon}</span> : null}
-              >
-                {statusBadge.label}
-              </Badge>
-            )}
-
-            {/* New HealthIndicator (if provided) */}
-            {healthStatus && (
-              <HealthIndicator status={healthStatus} />
-            )}
-          </SmartHomeCard.Status>
-        )}
-
-        {/* Banners (legacy support) */}
-        {banners.map((banner, index) => (
-          <div key={index} className="mb-4">
-            <Banner
-              variant={banner.variant}
-              icon={banner.icon}
-              title={banner.title}
-              description={banner.description}
-              dismissible={banner.dismissible}
-              onDismiss={banner.onDismiss}
-            />
-          </div>
-        ))}
-
-        {/* Main content */}
-        {children}
-
-        {/* Info boxes section (legacy support) */}
-        {infoBoxes.length > 0 && (
-          <>
-            {infoBoxesTitle && (
-              <Divider label={infoBoxesTitle} variant="gradient" spacing="large" />
-            )}
-            <div className="grid grid-cols-2 gap-2.5 mb-6">
-              {infoBoxes.map((box, index) => (
-                <InfoBox
-                  key={index}
-                  icon={box.icon}
-                  label={box.label}
-                  value={box.value}
-                  valueColor={box.valueColor}
-                />
-              ))}
+      {hasContextMenu ? (
+        <RightClickMenu open={contextMenuOpen} onOpenChange={setContextMenuOpen}>
+          <RightClickMenu.Trigger asChild>
+            <div
+              {...longPressBind()}
+              style={{
+                ...longPressPreventSelection,
+                transform: isPressed ? 'scale(0.98)' : 'scale(1)',
+                transition: 'transform 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+              }}
+            >
+              {cardContent}
             </div>
-          </>
-        )}
-
-        {/* Footer actions using SmartHomeCard.Controls */}
-        {footerActions.length > 0 && (
-          <SmartHomeCard.Controls className="mt-4 sm:mt-6">
-            {footerActions.map((action, index) => (
-              <Button
-                key={index}
-                variant={action.variant || 'subtle'}
-                className="w-full"
-                size={action.size}
-                onClick={action.onClick}
-                {...action}
-              >
-                {action.label}
-              </Button>
+          </RightClickMenu.Trigger>
+          <RightClickMenu.Content>
+            {contextMenuItems.map((item, index) => (
+              item.separator ? (
+                <RightClickMenu.Separator key={index} />
+              ) : (
+                <RightClickMenu.Item
+                  key={item.label}
+                  icon={item.icon}
+                  onSelect={item.onSelect}
+                  disabled={item.disabled}
+                >
+                  {item.label}
+                </RightClickMenu.Item>
+              )
             ))}
-          </SmartHomeCard.Controls>
-        )}
-
-        {/* Loading Overlay */}
-        <LoadingOverlay
-          show={isLoadingState}
-          message={loadingMessage}
-          icon={icon}
-        />
-      </SmartHomeCard>
+          </RightClickMenu.Content>
+        </RightClickMenu>
+      ) : (
+        cardContent
+      )}
 
       {/* Toast Notification - rendered outside SmartHomeCard */}
       {toast?.show && (

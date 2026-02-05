@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 36 of 36 (Application Integration) — In progress
-Plan: 02 of 04 complete
+Plan: 01 of 04 complete
 Status: Continuing Phase 36
-Last activity: 2026-02-05 — Completed 36-02-PLAN.md (Command Palette Device Commands)
+Last activity: 2026-02-05 — Completed 36-01-PLAN.md (Device Card Quick Actions & Context Menu)
 
-Progress: [█████████████████████░░░] 88% (22/24 plans)
+Progress: [████████████████████░░░░] 84% (21/24 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 150 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 22)
+- Total plans completed: 149 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 21)
 - Average duration: ~4.0 min per plan
 - Total execution time: ~9.5 hours across 5 milestones
 
@@ -80,9 +80,9 @@ Key patterns from previous milestones:
 - Reduced motion: selective :not() exclusions preserve functional animations
 - Spring easing (--ease-spring-subtle) for polished indicator movement in Tabs
 - Stagger wrapper div pattern for animating third-party components (DeviceListItem)
-- Device commands module pattern (lib/commands/deviceCommands.js) for Command Palette
-- API action helpers with source tracking (executeStoveAction, executeThermostatAction)
-- Room-navigation pattern for commands requiring device selection
+- DeviceCard contextMenuItems prop for declarative context menu
+- RightClickMenu wrapper pattern for device cards with long-press mobile support
+- Button.Icon quick actions pattern with conditional visibility based on device state
 
 ### Pending Todos
 
@@ -116,7 +116,7 @@ None — v4.0 progressing well.
 
 ## Session Continuity
 
-Last session: 2026-02-05 15:49 UTC
-Stopped at: Completed 36-02-PLAN.md (Command Palette Device Commands)
+Last session: 2026-02-05 15:50 UTC
+Stopped at: Completed 36-01-PLAN.md (Device Card Quick Actions & Context Menu)
 Resume file: None
-Next step: Continue with 36-03-PLAN.md or 36-04-PLAN.md
+Next step: Continue with 36-02-PLAN.md (Command Palette Device Commands)

@@ -4,11 +4,14 @@
  * Unified Debug Page
  *
  * Consolidates debug tools into tabbed interface:
- * - Stufa: API debug for Thermorossi stove
- * - Transizioni: Page transitions demo
+ * - Stufa: Full API debug for Thermorossi stove (GET/POST endpoints)
+ * - Netatmo: Thermostat and valve API testing
+ * - Hue: Philips Hue lights and scenes API
+ * - Weather: Weather forecast API
+ * - Firebase: Database health and config endpoints
+ * - Scheduler: Cron and automation endpoints
  * - Log: Firebase debug logs
  * - Notifiche: Notifications dashboard
- * - Meteo: Weather card test
  *
  * Design System remains at /debug/design-system (documentation)
  */
@@ -23,182 +26,15 @@ import Text from '@/app/components/ui/Text';
 import Banner from '@/app/components/ui/Banner';
 import Skeleton from '@/app/components/ui/Skeleton';
 import PageLayout from '@/app/components/ui/PageLayout';
-import { Flame, Sparkles, FileText, Bell, Cloud, Palette } from 'lucide-react';
-import { getErrorInfo } from '@/lib/errorMonitor';
+import { Flame, Thermometer, Lightbulb, Cloud, Database, Clock, FileText, Bell, Palette, RefreshCw } from 'lucide-react';
 
-// ============================================================================
-// STUFA CONTENT - Debug API Thermorossi
-// ============================================================================
-function StufaContent() {
-  const [status, setStatus] = useState(null);
-  const [fanLevel, setFanLevel] = useState(null);
-  const [powerLevel, setPowerLevel] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [autoRefresh, setAutoRefresh] = useState(false);
-
-  const fetchAllData = async () => {
-    setLoading(true);
-    try {
-      const [statusRes, fanRes, powerRes] = await Promise.all([
-        fetch('/api/stove/status'),
-        fetch('/api/stove/getFan'),
-        fetch('/api/stove/getPower'),
-      ]);
-
-      const [statusData, fanData, powerData] = await Promise.all([
-        statusRes.json(),
-        fanRes.json(),
-        powerRes.json(),
-      ]);
-
-      setStatus(statusData);
-      setFanLevel(fanData);
-      setPowerLevel(powerData);
-    } catch (err) {
-      console.error('Error fetching data:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAllData();
-  }, []);
-
-  useEffect(() => {
-    if (autoRefresh) {
-      const interval = setInterval(fetchAllData, 3000);
-      return () => clearInterval(interval);
-    }
-  }, [autoRefresh]);
-
-  const errorInfo = status?.Error ? getErrorInfo(status.Error) : null;
-
-  return (
-    <div className="space-y-6 mt-6">
-      <div className="flex items-center justify-between">
-        <Text variant="tertiary" size="sm">
-          Visualizzazione real-time di tutti i parametri API Thermorossi
-        </Text>
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={fetchAllData} disabled={loading}>
-            {loading ? '⏳' : '🔄'} Aggiorna
-          </Button>
-          <Button
-            variant={autoRefresh ? 'success' : 'outline'}
-            onClick={() => setAutoRefresh(!autoRefresh)}
-          >
-            {autoRefresh ? '⏸️ Stop' : '▶️ Auto'} (3s)
-          </Button>
-        </div>
-      </div>
-
-      {status && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Error Code */}
-          <Card className={`p-4 ${status.Error !== 0 ? 'bg-ember-500/10 [html:not(.dark)_&]:bg-ember-50 border-2 border-ember-500/30' : 'bg-sage-500/10 [html:not(.dark)_&]:bg-sage-50 border-2 border-sage-500/30'}`}>
-            <Text variant="tertiary" size="xs" className="mb-1">Error Code</Text>
-            <Text as="p" size="base" weight="bold" variant={status.Error !== 0 ? 'ember' : 'sage'} className="text-3xl">
-              {status.Error !== 0 ? `⚠️ ${status.Error}` : '✅ 0'}
-            </Text>
-            {status.Error !== 0 && errorInfo && (
-              <div className="mt-3 pt-3 border-t border-ember-500/30">
-                <Text size="sm" weight="semibold" variant="ember" className="mb-1">
-                  {errorInfo.description}
-                </Text>
-                <Text size="xs" variant="ember">
-                  Severity: {errorInfo.severity.toUpperCase()}
-                </Text>
-              </div>
-            )}
-          </Card>
-
-          {/* Status Code */}
-          <Card className="p-4 bg-ocean-500/10 [html:not(.dark)_&]:bg-ocean-50 border-2 border-ocean-500/30">
-            <Text variant="tertiary" size="xs" className="mb-1">Status</Text>
-            <Text as="p" variant="ocean" weight="bold" className="text-3xl">
-              {status.Status} - {status.StatusDescription}
-            </Text>
-          </Card>
-        </div>
-      )}
-
-      {/* Fan & Power Levels */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {fanLevel && (
-          <Card className="p-4 bg-ocean-500/10 [html:not(.dark)_&]:bg-ocean-50 border-2 border-ocean-500/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <Text variant="tertiary" size="xs" className="mb-1">💨 Fan Level</Text>
-                <Text as="p" variant="ocean" weight="bold" className="text-3xl">
-                  {fanLevel.Result} / 6
-                </Text>
-              </div>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5, 6].map(level => (
-                  <div
-                    key={level}
-                    className={`w-3 h-12 rounded ${level <= fanLevel.Result ? 'bg-ocean-500' : 'bg-slate-700 [html:not(.dark)_&]:bg-slate-200'}`}
-                  />
-                ))}
-              </div>
-            </div>
-          </Card>
-        )}
-
-        {powerLevel && (
-          <Card className="p-4 bg-flame-500/10 [html:not(.dark)_&]:bg-flame-50 border-2 border-flame-500/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <Text variant="tertiary" size="xs" className="mb-1">⚡ Power Level</Text>
-                <Text as="p" weight="bold" className="text-3xl text-flame-400 [html:not(.dark)_&]:text-flame-600">
-                  {powerLevel.Result} / 5
-                </Text>
-              </div>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map(level => (
-                  <div
-                    key={level}
-                    className={`w-4 h-14 rounded ${level <= powerLevel.Result ? 'bg-flame-500' : 'bg-slate-700 [html:not(.dark)_&]:bg-slate-200'}`}
-                  />
-                ))}
-              </div>
-            </div>
-          </Card>
-        )}
-      </div>
-
-      {/* Raw JSON */}
-      <Card className="p-4 bg-slate-950 [html:not(.dark)_&]:bg-slate-900 border-2 border-slate-700">
-        <Text variant="tertiary" size="xs" className="mb-2">📝 Raw JSON Response</Text>
-        <pre className="text-xs text-sage-400 font-mono overflow-auto max-h-64">
-          {JSON.stringify({ status, fanLevel, powerLevel }, null, 2)}
-        </pre>
-      </Card>
-    </div>
-  );
-}
-
-// ============================================================================
-// TRANSIZIONI CONTENT - Page Transitions Demo
-// ============================================================================
-function TransizioniContent() {
-  return (
-    <div className="space-y-6 mt-6">
-      <Banner variant="info" icon="✨" title="Demo Transizioni">
-        <Text size="sm" className="text-ocean-300 [html:not(.dark)_&]:text-ocean-700 mt-2">
-          Per testare le transizioni cinematografiche, visita la pagina dedicata con esempi interattivi.
-        </Text>
-      </Banner>
-      <Button
-        variant="ember"
-        onClick={() => window.location.href = '/debug/transitions'}
-      >
-        🎬 Apri Demo Transizioni
-      </Button>
-    </div>
-  );
-}
+// API Tab Components
+import StoveTab from '@/app/debug/components/tabs/StoveTab';
+import NetatmoTab from '@/app/debug/components/tabs/NetatmoTab';
+import HueTab from '@/app/debug/components/tabs/HueTab';
+import WeatherTab from '@/app/debug/components/tabs/WeatherTab';
+import FirebaseTab from '@/app/debug/components/tabs/FirebaseTab';
+import SchedulerTab from '@/app/debug/components/tabs/SchedulerTab';
 
 // ============================================================================
 // LOG CONTENT - Debug Logs
@@ -422,27 +258,6 @@ function NotificheContent() {
 }
 
 // ============================================================================
-// METEO CONTENT - Weather Test
-// ============================================================================
-function MeteoContent() {
-  return (
-    <div className="space-y-6 mt-6">
-      <Banner variant="info" icon="🌤️" title="Test Meteo">
-        <Text size="sm" className="text-ocean-300 [html:not(.dark)_&]:text-ocean-700 mt-2">
-          Testa il componente WeatherCard con diversi stati (loading, error, data).
-        </Text>
-      </Banner>
-      <Button
-        variant="ember"
-        onClick={() => window.location.href = '/debug/weather-test'}
-      >
-        ☀️ Apri Test Meteo
-      </Button>
-    </div>
-  );
-}
-
-// ============================================================================
 // MAIN PAGE
 // ============================================================================
 function DebugPageContent() {
@@ -450,48 +265,137 @@ function DebugPageContent() {
   const router = useRouter();
 
   const currentTab = searchParams.get('tab') || 'stufa';
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleTabChange = (value) => {
     router.push(`/debug?tab=${value}`, { scroll: false });
   };
 
+  const handleManualRefresh = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Tab shortcuts (1-8)
+      if (e.key >= '1' && e.key <= '8' && !e.metaKey && !e.ctrlKey) {
+        const tabs = ['stufa', 'netatmo', 'hue', 'weather', 'firebase', 'scheduler', 'log', 'notifiche'];
+        const index = parseInt(e.key) - 1;
+        if (tabs[index]) {
+          e.preventDefault();
+          handleTabChange(tabs[index]);
+        }
+      }
+      // Refresh shortcut (Cmd+R or Ctrl+R)
+      if ((e.metaKey || e.ctrlKey) && e.key === 'r') {
+        e.preventDefault();
+        handleManualRefresh();
+      }
+      // Auto-refresh toggle (A)
+      if (e.key === 'a' && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
+        setAutoRefresh(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   return (
-    <PageLayout maxWidth="4xl">
+    <PageLayout maxWidth="6xl">
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        {/* Header */}
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <Heading level={1} className="flex items-center gap-3">
               <span>🐛</span>
-              Debug Tools
+              API Debug Console
             </Heading>
             <Text variant="tertiary" size="sm" className="mt-1">
-              Strumenti di debug e testing per la smart home
+              Debug e test di tutti gli endpoint API
             </Text>
           </div>
-          <Button
-            variant="outline"
-            onClick={() => window.location.href = '/debug/design-system'}
-          >
-            <Palette size={18} className="mr-2" />
-            Design System
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={handleManualRefresh}
+              title="Cmd+R"
+            >
+              <RefreshCw size={18} className="mr-2" />
+              Refresh
+            </Button>
+            <Button
+              variant={autoRefresh ? 'success' : 'outline'}
+              onClick={() => setAutoRefresh(!autoRefresh)}
+              title="Press A"
+            >
+              {autoRefresh ? '⏸️ Stop' : '▶️ Auto'} (5s)
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => window.location.href = '/debug/design-system'}
+            >
+              <Palette size={18} className="mr-2" />
+              Design System
+            </Button>
+          </div>
+        </div>
+
+        {/* Keyboard shortcuts hint */}
+        <div className="flex flex-wrap gap-2 text-xs text-slate-500 [html:not(.dark)_&]:text-slate-600">
+          <span className="px-2 py-1 bg-slate-800 [html:not(.dark)_&]:bg-slate-100 rounded">1-8: Switch tabs</span>
+          <span className="px-2 py-1 bg-slate-800 [html:not(.dark)_&]:bg-slate-100 rounded">Cmd+R: Refresh</span>
+          <span className="px-2 py-1 bg-slate-800 [html:not(.dark)_&]:bg-slate-100 rounded">A: Auto-refresh</span>
         </div>
 
         <Card variant="glass" className="p-6">
           <Tabs value={currentTab} onValueChange={handleTabChange}>
             <Tabs.List overflow="scroll">
               <Tabs.Trigger value="stufa" icon={<Flame size={18} />}>Stufa</Tabs.Trigger>
-              <Tabs.Trigger value="transizioni" icon={<Sparkles size={18} />}>Transizioni</Tabs.Trigger>
+              <Tabs.Trigger value="netatmo" icon={<Thermometer size={18} />}>Netatmo</Tabs.Trigger>
+              <Tabs.Trigger value="hue" icon={<Lightbulb size={18} />}>Hue</Tabs.Trigger>
+              <Tabs.Trigger value="weather" icon={<Cloud size={18} />}>Weather</Tabs.Trigger>
+              <Tabs.Trigger value="firebase" icon={<Database size={18} />}>Firebase</Tabs.Trigger>
+              <Tabs.Trigger value="scheduler" icon={<Clock size={18} />}>Scheduler</Tabs.Trigger>
               <Tabs.Trigger value="log" icon={<FileText size={18} />}>Log</Tabs.Trigger>
               <Tabs.Trigger value="notifiche" icon={<Bell size={18} />}>Notifiche</Tabs.Trigger>
-              <Tabs.Trigger value="meteo" icon={<Cloud size={18} />}>Meteo</Tabs.Trigger>
             </Tabs.List>
 
-            <Tabs.Content value="stufa"><StufaContent /></Tabs.Content>
-            <Tabs.Content value="transizioni"><TransizioniContent /></Tabs.Content>
+            <Tabs.Content value="stufa">
+              <div className="mt-6">
+                <StoveTab autoRefresh={autoRefresh} refreshTrigger={refreshTrigger} />
+              </div>
+            </Tabs.Content>
+            <Tabs.Content value="netatmo">
+              <div className="mt-6">
+                <NetatmoTab autoRefresh={autoRefresh} refreshTrigger={refreshTrigger} />
+              </div>
+            </Tabs.Content>
+            <Tabs.Content value="hue">
+              <div className="mt-6">
+                <HueTab autoRefresh={autoRefresh} refreshTrigger={refreshTrigger} />
+              </div>
+            </Tabs.Content>
+            <Tabs.Content value="weather">
+              <div className="mt-6">
+                <WeatherTab autoRefresh={autoRefresh} refreshTrigger={refreshTrigger} />
+              </div>
+            </Tabs.Content>
+            <Tabs.Content value="firebase">
+              <div className="mt-6">
+                <FirebaseTab autoRefresh={autoRefresh} refreshTrigger={refreshTrigger} />
+              </div>
+            </Tabs.Content>
+            <Tabs.Content value="scheduler">
+              <div className="mt-6">
+                <SchedulerTab autoRefresh={autoRefresh} refreshTrigger={refreshTrigger} />
+              </div>
+            </Tabs.Content>
             <Tabs.Content value="log"><LogContent /></Tabs.Content>
             <Tabs.Content value="notifiche"><NotificheContent /></Tabs.Content>
-            <Tabs.Content value="meteo"><MeteoContent /></Tabs.Content>
           </Tabs>
         </Card>
       </div>
@@ -502,7 +406,7 @@ function DebugPageContent() {
 export default function DebugPage() {
   return (
     <Suspense fallback={
-      <PageLayout maxWidth="4xl">
+      <PageLayout maxWidth="6xl">
         <Skeleton className="h-64 w-full" />
       </PageLayout>
     }>

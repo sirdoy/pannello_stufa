@@ -1,12 +1,124 @@
 'use client';
 
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { useState, useEffect, useMemo } from 'react';
+import { format } from 'date-fns';
+import { it } from 'date-fns/locale';
 import SettingsLayout from '@/app/components/SettingsLayout';
-import { Card, Button, Heading, Text, Skeleton } from '@/app/components/ui';
-import NotificationInbox from '@/components/notifications/NotificationInbox';
+import { Card, Button, Heading, Text, Skeleton, EmptyState, Badge, DataTable } from '@/app/components/ui';
+
+/**
+ * Get Italian label for notification type
+ */
+const getTypeLabel = (type) => {
+  const labels = {
+    error: 'Errore',
+    scheduler: 'Scheduler',
+    maintenance: 'Manutenzione',
+    test: 'Test',
+    generic: 'Sistema',
+  };
+  return labels[type] || type;
+};
 
 export default function NotificationHistoryPage() {
   const { user, isLoading: userLoading } = useUser();
+  const [notifications, setNotifications] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch all notifications (client-side pagination)
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchNotifications = async () => {
+      try {
+        setIsLoading(true);
+        const res = await fetch('/api/notifications/history?limit=100');
+
+        if (!res.ok) {
+          throw new Error('Errore nel caricamento delle notifiche');
+        }
+
+        const data = await res.json();
+        setNotifications(data.notifications || []);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching notifications:', err);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchNotifications();
+  }, [user]);
+
+  // Column definitions
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: 'timestamp',
+        header: 'Data',
+        cell: ({ getValue }) => {
+          const date = new Date(getValue());
+          return format(date, 'dd/MM/yyyy HH:mm', { locale: it });
+        },
+        sortingFn: 'datetime',
+      },
+      {
+        accessorKey: 'type',
+        header: 'Tipo',
+        cell: ({ getValue }) => {
+          const type = getValue();
+          const variants = {
+            scheduler: 'ocean',
+            error: 'danger',
+            maintenance: 'warning',
+            test: 'neutral',
+            generic: 'neutral',
+          };
+          return (
+            <Badge variant={variants[type] || 'neutral'}>
+              {getTypeLabel(type)}
+            </Badge>
+          );
+        },
+        filterFn: 'equals',
+      },
+      {
+        accessorKey: 'status',
+        header: 'Stato',
+        cell: ({ getValue }) => {
+          const status = getValue();
+          const variants = {
+            sent: 'ocean',
+            delivered: 'sage',
+            failed: 'danger',
+          };
+          const labels = {
+            sent: 'Inviata',
+            delivered: 'Consegnata',
+            failed: 'Fallita',
+          };
+          return (
+            <Badge variant={variants[status] || 'neutral'}>
+              {labels[status] || status}
+            </Badge>
+          );
+        },
+        filterFn: 'equals',
+      },
+      {
+        accessorKey: 'title',
+        header: 'Titolo',
+        cell: ({ getValue }) => (
+          <Text className="max-w-[200px] truncate">{getValue()}</Text>
+        ),
+      },
+    ],
+    []
+  );
 
   // Loading state
   if (userLoading) {
@@ -53,10 +165,65 @@ export default function NotificationHistoryPage() {
         </Text>
       </div>
 
-      {/* Notification inbox with infinite scroll */}
-      <div id="notification-scroll-container" className="max-h-[70vh] overflow-y-auto">
-        <NotificationInbox />
-      </div>
+      {/* Error state */}
+      {error && (
+        <Card variant="glass" className="p-8 text-center mb-6">
+          <Text variant="ember" size="lg" className="mb-2">
+            {error}
+          </Text>
+          <Button variant="subtle" onClick={() => window.location.reload()}>
+            Riprova
+          </Button>
+        </Card>
+      )}
+
+      {/* Loading state */}
+      {isLoading && (
+        <Card variant="glass" className="p-8">
+          <Skeleton className="h-96 w-full rounded-xl" />
+        </Card>
+      )}
+
+      {/* Empty state */}
+      {!isLoading && !error && notifications.length === 0 && (
+        <Card variant="glass" className="p-8">
+          <EmptyState
+            icon="🔔"
+            title="Nessuna notifica trovata"
+            description="Le notifiche inviate appariranno qui"
+          />
+        </Card>
+      )}
+
+      {/* Data table */}
+      {!isLoading && !error && notifications.length > 0 && (
+        <Card variant="glass" className="overflow-hidden">
+          <DataTable
+            data={notifications}
+            columns={columns}
+            density="compact"
+            enableFiltering
+            enablePagination
+            enableExpansion
+            pageSize={25}
+            pageSizeOptions={[25, 50, 100]}
+            showRowCount
+            getRowId={(row) => row.id}
+            renderExpandedContent={(row) => (
+              <div className="space-y-2 p-4">
+                <Text variant="secondary" size="sm">
+                  <strong>Messaggio:</strong> {row.original.body}
+                </Text>
+                {row.original.deviceId && (
+                  <Text variant="secondary" size="sm">
+                    <strong>Dispositivo:</strong> {row.original.deviceId}
+                  </Text>
+                )}
+              </div>
+            )}
+          />
+        </Card>
+      )}
 
       {/* Back link */}
       <Card variant="glass" className="p-4 mt-6">

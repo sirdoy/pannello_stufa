@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { Power, Plus, Minus, Fan, Settings, Activity, RefreshCw } from 'lucide-react';
 import { getFullSchedulerMode, getNextScheduledAction } from '@/lib/schedulerService';
 import { clearSemiManualMode } from '@/lib/schedulerApiClient';
 import { STOVE_ROUTES } from '@/lib/routes';
@@ -24,9 +25,11 @@ import CronHealthBanner from '../../CronHealthBanner';
 import Toast from '../../ui/Toast';
 import LoadingOverlay from '../../ui/LoadingOverlay';
 import CardAccentBar from '../../ui/CardAccentBar';
+import RightClickMenu from '../../ui/RightClickMenu';
 import { Divider, Heading, Text, EmptyState, Badge, HealthIndicator } from '../../ui';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
+import { useContextMenuLongPress, longPressPreventSelection } from '@/app/hooks/useContextMenuLongPress';
 
 /**
  * StoveCard - Complete stove control for homepage
@@ -904,6 +907,32 @@ export default function StoveCard() {
   const statusInfo = getStatusInfo(status);
   const statusDisplay = getStatusDisplay(status);
 
+  // Context menu state and long-press support
+  const [contextMenuOpen, setContextMenuOpen] = useState(false);
+  const { bind: longPressBind, isPressed } = useContextMenuLongPress(() => {
+    setContextMenuOpen(true);
+  });
+
+  // Context menu items for extended actions
+  const stoveContextMenuItems = [
+    {
+      icon: <Settings className="w-4 h-4" />,
+      label: 'Impostazioni Stufa',
+      onSelect: () => router.push('/stove/settings'),
+    },
+    {
+      icon: <Activity className="w-4 h-4" />,
+      label: 'Log Attivita',
+      onSelect: () => router.push('/stove/logs'),
+    },
+    { separator: true },
+    {
+      icon: <RefreshCw className="w-4 h-4" />,
+      label: 'Aggiorna Stato',
+      onSelect: handleManualRefresh,
+    },
+  ];
+
   if (initialLoading) {
     return <Skeleton.StovePanel />;
   }
@@ -927,16 +956,26 @@ export default function StoveCard() {
         />
       )}
 
-      {/* Main Status Card - Ember Noir */}
-      <Card variant="elevated" padding={false} className="overflow-visible transition-all duration-500">
-        <div className="relative">
-          {/* Modern Accent Bar with glow effect - pulses when stove is active */}
-          <CardAccentBar
-            colorTheme="ember"
-            animated={true}
-            pulse={isAccesa}
-            size="md"
-          />
+      {/* Main Status Card - Ember Noir with Context Menu */}
+      <RightClickMenu open={contextMenuOpen} onOpenChange={setContextMenuOpen}>
+        <RightClickMenu.Trigger asChild>
+          <div
+            {...longPressBind()}
+            style={{
+              ...longPressPreventSelection,
+              transform: isPressed ? 'scale(0.98)' : 'scale(1)',
+              transition: 'transform 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
+          >
+            <Card variant="elevated" padding={false} className="overflow-visible transition-all duration-500">
+              <div className="relative">
+                {/* Modern Accent Bar with glow effect - pulses when stove is active */}
+                <CardAccentBar
+                  colorTheme="ember"
+                  animated={true}
+                  pulse={isAccesa}
+                  size="md"
+                />
 
           <div className="p-6 sm:p-8">
             {/* Maintenance Cleaning Banner - Inside card */}
@@ -1112,6 +1151,56 @@ export default function StoveCard() {
                         </div>
                       </div>
                     </div>
+              </div>
+
+              {/* Quick Actions Bar - Always visible */}
+              <div className="flex items-center justify-center gap-3 mt-4">
+                {/* Power Toggle */}
+                <Button.Icon
+                  icon={<Power className="w-5 h-5" />}
+                  aria-label={isAccesa ? "Spegni Stufa" : "Accendi Stufa"}
+                  variant={isAccesa ? 'ember' : 'subtle'}
+                  size="md"
+                  onClick={isAccesa ? handleShutdown : handleIgnite}
+                  disabled={loading || (!isAccesa && needsMaintenance)}
+                />
+
+                {/* Power Level Controls (only when stove is in WORK mode) */}
+                {status?.toUpperCase().includes('WORK') && (
+                  <div className="flex items-center gap-1 px-2 py-1 rounded-xl bg-slate-800/50 border border-slate-700/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                    <Button.Icon
+                      icon={<Minus className="w-4 h-4" />}
+                      aria-label="Diminuisci Potenza"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handlePowerChange({ target: { value: (powerLevel - 1).toString() }})}
+                      disabled={loading || !powerLevel || powerLevel <= 1}
+                    />
+                    <span className="text-sm font-bold text-ember-400 [html:not(.dark)_&]:text-ember-600 w-6 text-center">{powerLevel}</span>
+                    <Button.Icon
+                      icon={<Plus className="w-4 h-4" />}
+                      aria-label="Aumenta Potenza"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handlePowerChange({ target: { value: (powerLevel + 1).toString() }})}
+                      disabled={loading || !powerLevel || powerLevel >= 5}
+                    />
+                  </div>
+                )}
+
+                {/* Fan Control (only when stove is in WORK mode) */}
+                {status?.toUpperCase().includes('WORK') && (
+                  <Button.Icon
+                    icon={<Fan className="w-5 h-5" />}
+                    aria-label="Regola Ventola"
+                    variant="subtle"
+                    size="md"
+                    onClick={() => {
+                      // Scroll to fan control section
+                      document.querySelector('[data-control="fan"]')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                  />
+                )}
               </div>
             </div>
 
@@ -1306,7 +1395,7 @@ export default function StoveCard() {
                   )}
 
                   {/* Ventilazione Control - Ember Noir */}
-                  <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-5 sm:p-6 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                  <div data-control="fan" className="relative overflow-hidden rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-5 sm:p-6 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
                     {/* Header */}
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-ocean-900/50 flex items-center justify-center border-2 border-ocean-500/50 [html:not(.dark)_&]:bg-ocean-100/80 [html:not(.dark)_&]:border-ocean-300">
@@ -1410,8 +1499,27 @@ export default function StoveCard() {
               </>
             )}
           </div>
-        </div>
-      </Card>
+              </div>
+            </Card>
+          </div>
+        </RightClickMenu.Trigger>
+        <RightClickMenu.Content>
+          {stoveContextMenuItems.map((item, index) => (
+            item.separator ? (
+              <RightClickMenu.Separator key={index} />
+            ) : (
+              <RightClickMenu.Item
+                key={item.label}
+                icon={item.icon}
+                onSelect={item.onSelect}
+                disabled={item.disabled}
+              >
+                {item.label}
+              </RightClickMenu.Item>
+            )
+          ))}
+        </RightClickMenu.Content>
+      </RightClickMenu>
 
       {/* Toast Notification */}
       {toast && (

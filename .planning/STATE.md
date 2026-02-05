@@ -107,7 +107,7 @@ None — v4.0 progressing well.
 | 008 | Active devices filter only | 2026-02-04 | 66b2bb6 | [008-active-devices-filter-only](./quick/008-active-devices-filter-only/) |
 | 010 | Stove-thermostat PID automation | 2026-02-04 | 707fcb1 | [010-stove-thermostat-pid-automation](./quick/010-stove-thermostat-pid-automation/) |
 | 011 | Settings tabs unification | 2026-02-05 | 601c3da | [011-refactor-settings-tabs-unification](./quick/011-refactor-settings-tabs-unification/) |
-| 012 | API debug console with tabs | 2026-02-05 | c51d570 | [012-debug-page-component-tabs-with-api-testi](./quick/012-debug-page-component-tabs-with-api-testi/) |
+| 012 | API debug console with tabs | 2026-02-05 | 34aaa52 | [012-debug-page-component-tabs-with-api-testi](./quick/012-debug-page-component-tabs-with-api-testi/) |
 
 ## Session Continuity
 

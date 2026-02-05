@@ -144,12 +144,12 @@ Plans:
   3. Quick actions are consistent across all device types (Stove, Thermostat, Lights, Camera)
   4. Command Palette accessible from any page with relevant commands
   5. All pages use new components consistently (verified via audit)
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 36-01: Quick actions infrastructure for device cards
-- [ ] 36-02: Command Palette global commands and navigation
-- [ ] 36-03: Application-wide audit and component consistency
+- [ ] 36-01-PLAN.md - Quick actions and context menu for device cards (Wave 1)
+- [ ] 36-02-PLAN.md - Command Palette global commands and navigation (Wave 1)
+- [ ] 36-03-PLAN.md - Application-wide audit and component consistency (Wave 2)
 
 ---
 
@@ -163,7 +163,7 @@ Plans:
 | 33. Dialog Patterns | 3/3 | Complete | 2026-02-04 |
 | 34. Data Table | 4/4 | Complete | 2026-02-05 |
 | 35. Micro-interactions | 4/4 | Complete | 2026-02-05 |
-| 36. Application Integration | 0/3 | Not started | - |
+| 36. Application Integration | 0/3 | Planned | - |
 
 **Total:** 20/24 plans (83%)
 
@@ -182,5 +182,6 @@ Plans:
 *Phase 34 completed: 2026-02-05*
 *Phase 35 planned: 2026-02-05*
 *Phase 35 completed: 2026-02-05*
+*Phase 36 planned: 2026-02-05*
 *Milestone: v4.0 Advanced UI Components*
 *Requirements coverage: 55/55 (100%)*

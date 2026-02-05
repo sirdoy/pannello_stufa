@@ -1,12 +1,13 @@
 'use client';
 
-import { forwardRef, useMemo, useState, useCallback } from 'react';
+import { forwardRef, useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
   getSortedRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
+  getExpandedRowModel,
   flexRender,
 } from '@tanstack/react-table';
 import { cva } from 'class-variance-authority';
@@ -16,6 +17,7 @@ import Checkbox from './Checkbox';
 import Button from './Button';
 import Text from './Text';
 import DataTableToolbar from './DataTableToolbar';
+import DataTableRow from './DataTableRow';
 
 /**
  * DataTable Variants - CVA Configuration
@@ -124,6 +126,9 @@ function SortIndicator({ isSorted, direction }) {
  * @param {Function} [props.onPageChange] - Callback when page changes
  * @param {Array} [props.bulkActions] - Bulk actions for toolbar { id, label, variant?, icon? }
  * @param {Function} [props.onBulkAction] - Callback for bulk actions (actionId, selectedRows) => void
+ * @param {boolean} [props.enableExpansion=false] - Enable row expansion
+ * @param {Function} [props.renderExpandedContent] - Custom expansion content renderer (row) => ReactNode
+ * @param {Function} [props.getRowCanExpand] - Function to determine if row can expand (row) => boolean
  *
  * @example
  * // Basic usage
@@ -176,6 +181,9 @@ const DataTable = forwardRef(function DataTable(
     onPageChange,
     bulkActions = [],
     onBulkAction,
+    enableExpansion = false,
+    renderExpandedContent,
+    getRowCanExpand,
     ...props
   },
   ref
@@ -200,6 +208,13 @@ const DataTable = forwardRef(function DataTable(
   // Selection state (internal for uncontrolled mode)
   const [internalRowSelection, setInternalRowSelection] = useState({});
 
+  // Expansion state
+  const [expanded, setExpanded] = useState({});
+
+  // Responsive scroll indicator state
+  const [showScrollIndicator, setShowScrollIndicator] = useState(false);
+  const scrollContainerRef = useRef(null);
+
   // Use controlled or internal selection state
   const isSelectionControlled = controlledSelectedRows !== undefined;
   const rowSelection = isSelectionControlled ? controlledSelectedRows : internalRowSelection;
@@ -222,6 +237,37 @@ const DataTable = forwardRef(function DataTable(
     },
     [isSelectionControlled, rowSelection, onSelectionChange]
   );
+
+  // Create expansion column when enableExpansion is true
+  const expansionColumn = useMemo(() => {
+    if (!enableExpansion) return null;
+
+    return {
+      id: 'expand',
+      header: () => null,
+      cell: ({ row }) =>
+        row.getCanExpand() ? (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              row.toggleExpanded();
+            }}
+            aria-label={row.getIsExpanded() ? 'Collapse row' : 'Expand row'}
+            className="p-1 hover:bg-white/[0.05] rounded transition-colors"
+          >
+            <ChevronRight
+              className={cn(
+                'w-4 h-4 transition-transform text-slate-400',
+                row.getIsExpanded() && 'rotate-90 text-ember-400'
+              )}
+              aria-hidden="true"
+            />
+          </button>
+        ) : null,
+      size: 40,
+      enableSorting: false,
+    };
+  }, [enableExpansion]);
 
   // Create selection column when selectionMode !== 'none'
   const selectionColumn = useMemo(() => {
@@ -258,13 +304,16 @@ const DataTable = forwardRef(function DataTable(
     };
   }, [selectionMode]);
 
-  // Merge selection column with user columns
+  // Merge expansion, selection, and user columns
   const columns = useMemo(() => {
-    if (selectionColumn) {
-      return [selectionColumn, ...baseColumns];
-    }
-    return baseColumns;
-  }, [selectionColumn, baseColumns]);
+    const extraColumns = [];
+    if (selectionColumn) extraColumns.push(selectionColumn);
+    if (expansionColumn) extraColumns.push(expansionColumn);
+    return [...extraColumns, ...baseColumns];
+  }, [selectionColumn, expansionColumn, baseColumns]);
+
+  // Count extra columns for DataTableRow
+  const extraColumnsCount = (selectionColumn ? 1 : 0) + (expansionColumn ? 1 : 0);
 
   // Row click handler
   const handleRowClick = useCallback(
@@ -306,18 +355,22 @@ const DataTable = forwardRef(function DataTable(
       columnFilters,
       globalFilter,
       pagination,
+      expanded,
     },
     onSortingChange: setSorting,
     onRowSelectionChange: handleRowSelectionChange,
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
     onPaginationChange: handlePaginationChange,
+    onExpandedChange: setExpanded,
     enableRowSelection: selectionMode !== 'none',
     enableMultiRowSelection: selectionMode === 'multi',
+    getRowCanExpand: getRowCanExpand,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: enableFiltering ? getFilteredRowModel() : undefined,
     getPaginationRowModel: enablePagination ? getPaginationRowModel() : undefined,
+    getExpandedRowModel: enableExpansion ? getExpandedRowModel() : undefined,
     getRowId: getRowId,
   });
 
@@ -383,6 +436,28 @@ const DataTable = forwardRef(function DataTable(
     (key) => rowSelection[key]
   ).length;
 
+  // Responsive scroll indicator effect
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const checkScroll = () => {
+      const canScrollRight =
+        container.scrollWidth > container.clientWidth &&
+        container.scrollLeft < container.scrollWidth - container.clientWidth - 5;
+      setShowScrollIndicator(canScrollRight);
+    };
+
+    checkScroll();
+    container.addEventListener('scroll', checkScroll);
+    window.addEventListener('resize', checkScroll);
+
+    return () => {
+      container.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, []);
+
   return (
     <div ref={ref} className={cn('space-y-4', className)} {...props}>
       {/* Toolbar */}
@@ -397,11 +472,22 @@ const DataTable = forwardRef(function DataTable(
         />
       )}
 
-      {/* Table Container */}
-      <div className="overflow-x-auto rounded-2xl border border-white/[0.06]">
-        <table
-        className={cn(dataTableVariants({ density, striped, stickyHeader }))}
-      >
+      {/* Table Container with responsive scroll */}
+      <div className="relative">
+        <div
+          ref={scrollContainerRef}
+          className={cn(
+            'overflow-x-auto rounded-2xl border border-white/[0.06]',
+            'scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent',
+            '-webkit-overflow-scrolling-touch'
+          )}
+        >
+          <table
+            className={cn(
+              dataTableVariants({ density, striped, stickyHeader }),
+              'min-w-full'
+            )}
+          >
         <thead className="bg-slate-800/50 border-b border-white/[0.06]">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id} role="row">
@@ -419,10 +505,15 @@ const DataTable = forwardRef(function DataTable(
                       'px-4 text-left text-sm font-semibold text-slate-300',
                       'border-b border-white/[0.06]',
                       canSort && 'cursor-pointer select-none',
-                      header.id === 'select' && 'w-10 px-2 text-center'
+                      (header.id === 'select' || header.id === 'expand') && 'w-10 px-2 text-center'
                     )}
                   >
-                    {header.isPlaceholder ? null : canSort ? (
+                    {header.isPlaceholder ? null : (header.id === 'expand' || header.id === 'select') ? (
+                      flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )
+                    ) : canSort ? (
                       <button
                         type="button"
                         className="inline-flex items-center w-full hover:text-slate-100 transition-colors"
@@ -468,40 +559,24 @@ const DataTable = forwardRef(function DataTable(
               </td>
             </tr>
           ) : (
-            table.getRowModel().rows.map((row) => (
-              <tr
+            table.getRowModel().rows.map((row, index) => (
+              <DataTableRow
                 key={row.id}
-                role="row"
-                className={cn(
-                  'border-b border-white/[0.06] last:border-b-0',
-                  'text-slate-200',
-                  'hover:bg-white/[0.02] transition-colors',
-                  onRowClick && 'cursor-pointer',
-                  row.getIsSelected() && 'bg-ember-500/10'
-                )}
-                onClick={() => handleRowClick(row)}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    role="cell"
-                    className={cn(
-                      'px-4 text-sm',
-                      cell.column.id === 'select' && 'w-10 px-2'
-                    )}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
+                row={row}
+                columns={baseColumns}
+                index={index}
+                extraColumns={extraColumnsCount}
+                renderExpandedContent={renderExpandedContent}
+                onRowClick={handleRowClick}
+              />
             ))
           )}
         </tbody>
       </table>
 
-      {/* Pagination */}
-      {enablePagination && pageCount > 1 && (
-        <div className="flex items-center justify-center gap-4 py-4 border-t border-white/[0.06]">
+        {/* Pagination */}
+        {enablePagination && pageCount > 1 && (
+          <div className="flex items-center justify-center gap-4 py-4 border-t border-white/[0.06]">
           {/* ARIA live region for screen readers */}
           <div role="status" aria-live="polite" className="sr-only">
             Page {pageIndex + 1} of {pageCount}. Showing rows {startRow} to {endRow} of {totalRows}.
@@ -591,8 +666,19 @@ const DataTable = forwardRef(function DataTable(
               </select>
             </div>
           )}
+          </div>
         </div>
-      )}
+
+        {/* Right fade gradient scroll indicator */}
+        {showScrollIndicator && (
+          <div
+            className="absolute top-0 right-0 bottom-0 w-8 pointer-events-none rounded-r-2xl"
+            style={{
+              background: 'linear-gradient(to left, rgb(15 23 42), transparent)',
+            }}
+            aria-hidden="true"
+          />
+        )}
       </div>
     </div>
   );

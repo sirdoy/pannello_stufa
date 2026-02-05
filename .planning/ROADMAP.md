@@ -26,9 +26,9 @@
 **Plans:** 3 plans
 
 Plans:
-- [ ] 37-01-PLAN.md — Configuration verification, jsconfig removal, ESLint TypeScript setup
-- [ ] 37-02-PLAN.md — Firebase and API type definitions
-- [ ] 37-03-PLAN.md — Component props and configuration types
+- [x] 37-01-PLAN.md — Configuration verification, jsconfig removal, ESLint TypeScript setup
+- [x] 37-02-PLAN.md — Firebase and API type definitions
+- [x] 37-03-PLAN.md — Component props and configuration types
 
 **Requirements covered:**
 - SETUP-01: TypeScript installato e configurato (tsconfig.json)
@@ -187,7 +187,7 @@ Plans:
 
 | Phase | Status | Plans | Completion |
 |-------|--------|-------|------------|
-| 37 - TypeScript Foundation | Planned | 3 plans | 0% |
+| 37 - TypeScript Foundation | ✓ Complete | 3/3 | 100% |
 | 38 - Library Migration | Pending | 0/? | 0% |
 | 39 - UI Components Migration | Pending | 0/? | 0% |
 | 40 - API Routes Migration | Pending | 0/? | 0% |

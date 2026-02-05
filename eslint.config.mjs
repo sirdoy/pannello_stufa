@@ -1,9 +1,13 @@
 import nextConfig from "eslint-config-next";
+import nextTypescript from "eslint-config-next/typescript";
 import tailwindcss from "eslint-plugin-tailwindcss";
 
 const eslintConfig = [
-  // Next.js config (native flat config format in Next.js 16+)
+  // Next.js base config (native flat config format in Next.js 16+)
   ...nextConfig,
+
+  // TypeScript rules from Next.js
+  ...nextTypescript,
 
   // Tailwind CSS design token enforcement
   {

@@ -656,7 +656,8 @@ async function runPidAutomationIfEnabled(isOn, currentPowerLevel, semiManual, sc
     }
 
     const rooms = Object.values(netatmoStatus.rooms);
-    const targetRoom = rooms.find(r => String(r.id) === String(targetRoomId));
+    // Note: netatmo/currentStatus saves rooms with room_id field, not id
+    const targetRoom = rooms.find(r => String(r.room_id) === String(targetRoomId));
     if (!targetRoom) {
       return { skipped: true, reason: 'room_not_found' };
     }

@@ -19,7 +19,7 @@ export const badgeVariants = cva(
     'font-display font-semibold',
     'rounded-full',
     'border',
-    'transition-all duration-200',
+    'transition-all duration-[var(--duration-fast)]',
   ],
   {
     variants: {

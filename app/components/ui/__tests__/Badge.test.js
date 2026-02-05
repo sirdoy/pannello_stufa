@@ -191,7 +191,7 @@ describe('Badge', () => {
       expect(badge).toHaveClass('rounded-full');
       expect(badge).toHaveClass('border');
       expect(badge).toHaveClass('transition-all');
-      expect(badge).toHaveClass('duration-200');
+      expect(badge).toHaveClass('duration-[var(--duration-fast)]');
     });
   });
 

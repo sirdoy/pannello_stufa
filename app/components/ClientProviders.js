@@ -8,6 +8,7 @@ import { ToastProvider } from '@/app/components/ui';
 import ThemeScript from './ThemeScript';
 import { OfflineBanner } from '@/app/components/ui';
 import PWAInitializer from './PWAInitializer';
+import AxeDevtools from './AxeDevtools';
 
 /**
  * Wrapper per tutti i provider client-side
@@ -21,6 +22,7 @@ export default function ClientProviders({ children }) {
         <PageTransitionProvider>
           <VersionProvider>
             <ToastProvider>
+              <AxeDevtools />
               <PWAInitializer />
               <OfflineBanner fixed showPendingCount />
               {children}

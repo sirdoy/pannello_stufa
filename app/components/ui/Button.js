@@ -16,7 +16,9 @@ export const buttonVariants = cva(
   [
     'font-display font-semibold',
     'rounded-xl',
-    'transition-all duration-200',
+    'transition-all',
+    'duration-[var(--duration-smooth)]',
+    'ease-[var(--ease-move)]',
     'flex items-center justify-center gap-2.5',
     'relative overflow-hidden',
     'select-none',
@@ -25,8 +27,10 @@ export const buttonVariants = cva(
     'focus-visible:ring-2 focus-visible:ring-ember-500/50',
     'focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
     '[html:not(.dark)_&]:focus-visible:ring-offset-slate-50',
-    // Active state
+    // Active state - spring physics for responsive feel
     'active:scale-[0.97]',
+    'active:duration-[var(--duration-fast)]',
+    'active:ease-[var(--ease-spring-subtle)]',
     // Disabled state
     'disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none',
   ],
@@ -41,6 +45,7 @@ export const buttonVariants = cva(
           'hover:from-ember-400 hover:via-ember-500 hover:to-flame-500',
           'hover:shadow-[0_4px_16px_rgba(237,111,16,0.35),0_2px_4px_rgba(0,0,0,0.1)]',
           'hover:-translate-y-0.5',
+          'hover:ease-[var(--ease-spring-subtle)]',
         ],
         // Secondary action - Subtle glass
         subtle: [
@@ -50,6 +55,7 @@ export const buttonVariants = cva(
           'hover:bg-white/[0.1]',
           'hover:border-white/[0.12]',
           'hover:-translate-y-0.5',
+          'hover:ease-[var(--ease-spring-subtle)]',
           '[html:not(.dark)_&]:bg-black/[0.04]',
           '[html:not(.dark)_&]:text-slate-700',
           '[html:not(.dark)_&]:border-black/[0.08]',
@@ -74,6 +80,7 @@ export const buttonVariants = cva(
           'hover:from-sage-400 hover:via-sage-500 hover:to-sage-600',
           'hover:shadow-[0_4px_16px_rgba(96,115,96,0.35)]',
           'hover:-translate-y-0.5',
+          'hover:ease-[var(--ease-spring-subtle)]',
         ],
         // Danger action - Red
         danger: [
@@ -83,6 +90,7 @@ export const buttonVariants = cva(
           'hover:from-danger-400 hover:via-danger-500 hover:to-danger-600',
           'hover:shadow-[0_4px_16px_rgba(239,68,68,0.35)]',
           'hover:-translate-y-0.5',
+          'hover:ease-[var(--ease-spring-subtle)]',
         ],
         // Outline - Border only
         outline: [
@@ -92,6 +100,7 @@ export const buttonVariants = cva(
           'hover:bg-ember-500/10',
           'hover:border-ember-500/60',
           'hover:-translate-y-0.5',
+          'hover:ease-[var(--ease-spring-subtle)]',
           '[html:not(.dark)_&]:text-ember-600',
           '[html:not(.dark)_&]:border-ember-500/50',
           '[html:not(.dark)_&]:hover:bg-ember-500/10',

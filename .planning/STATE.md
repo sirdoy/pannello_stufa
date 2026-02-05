@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-02-03)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Milestone v4.0 Advanced UI Components — Phase 34 Data Table
+**Current focus:** Milestone v4.0 Advanced UI Components — Phase 35 Micro-interactions
 
 ## Current Position
 
-Phase: 34 of 36 (Data Table)
-Plan: 04 of 04 complete
-Status: Phase complete
-Last activity: 2026-02-05 — Completed 34-04-PLAN.md (DataTable demo and documentation)
+Phase: 35 of 36 (Micro-interactions)
+Plan: 01 of 04 complete
+Status: In progress
+Last activity: 2026-02-05 — Completed 35-01-PLAN.md (Animation Token Foundation)
 
-Progress: [████████████████░░░░░░░░░░] 76% (16/21 plans)
+Progress: [█████████████████░░░░░░░░░] 81% (17/21 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 139 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 14)
+- Total plans completed: 140 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 15)
 - Average duration: ~4.0 min per plan
 - Total execution time: ~9.4 hours across 5 milestones
 
@@ -75,6 +75,9 @@ Key patterns from previous milestones:
 - DataTableRow component pattern for expandable rows
 - Horizontal scroll detection with fade gradient indicator
 - Expansion content skipping via data-expansion-row attribute
+- CSS animation tokens in @theme block (--duration-*, --ease-*, --stagger-*)
+- Stagger animation via calc() with --stagger-index custom property
+- Reduced motion: selective :not() exclusions preserve functional animations
 
 ### Pending Todos
 
@@ -107,7 +110,7 @@ None — v4.0 progressing well.
 
 ## Session Continuity
 
-Last session: 2026-02-05 08:12 UTC
-Stopped at: Completed 34-04-PLAN.md (DataTable demo and documentation)
+Last session: 2026-02-05 08:54 UTC
+Stopped at: Completed 35-01-PLAN.md (Animation Token Foundation)
 Resume file: None
-Next step: Phase 34 complete - ready for Phase 35 (Advanced Form Components)
+Next step: Continue with 35-02-PLAN.md (Component Animation Enhancement)

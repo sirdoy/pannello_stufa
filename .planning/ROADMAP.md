@@ -23,6 +23,13 @@
 
 **Goal:** TypeScript is configured and core type definitions are ready for migration.
 
+**Plans:** 3 plans
+
+Plans:
+- [ ] 37-01-PLAN.md — Configuration verification, jsconfig removal, ESLint TypeScript setup
+- [ ] 37-02-PLAN.md — Firebase and API type definitions
+- [ ] 37-03-PLAN.md — Component props and configuration types
+
 **Requirements covered:**
 - SETUP-01: TypeScript installato e configurato (tsconfig.json)
 - SETUP-02: allowJs abilitato per migrazione incrementale
@@ -48,6 +55,8 @@
 
 **Goal:** All library files in lib/ are converted to TypeScript with proper typing.
 
+**Plans:** (created by /gsd:plan-phase)
+
 **Requirements covered:**
 - LIB-01: Tutti i file lib/ convertiti a .ts (62 file)
 - LIB-02: Hooks convertiti a .ts (lib/hooks/, app/hooks/)
@@ -67,6 +76,8 @@
 ### Phase 39: UI Components Migration
 
 **Goal:** All UI components are converted to TypeScript with typed props.
+
+**Plans:** (created by /gsd:plan-phase)
 
 **Requirements covered:**
 - COMP-01: Design system components convertiti a .tsx (64 file)
@@ -88,6 +99,8 @@
 
 **Goal:** All API routes are converted to TypeScript with typed request/response.
 
+**Plans:** (created by /gsd:plan-phase)
+
 **Requirements covered:**
 - API-01: Tutti gli API routes convertiti a .ts (~80 file)
 - API-02: Request/Response types per ogni endpoint
@@ -107,6 +120,8 @@
 
 **Goal:** All pages, layouts, and providers are converted to TypeScript.
 
+**Plans:** (created by /gsd:plan-phase)
+
 **Requirements covered:**
 - PAGE-01: Layout e page files convertiti a .tsx
 - PAGE-02: Context providers convertiti a .tsx
@@ -125,6 +140,8 @@
 ### Phase 42: Test Migration
 
 **Goal:** All test files are converted to TypeScript and passing.
+
+**Plans:** (created by /gsd:plan-phase)
 
 **Requirements covered:**
 - TEST-01: Test files lib/ convertiti a .ts
@@ -147,6 +164,8 @@
 
 **Goal:** TypeScript migration is complete with passing build and zero JS files.
 
+**Plans:** (created by /gsd:plan-phase)
+
 **Requirements covered:**
 - VERIFY-01: `npm run build` completa senza errori
 - VERIFY-02: `tsc --noEmit` passa (type check)
@@ -168,7 +187,7 @@
 
 | Phase | Status | Plans | Completion |
 |-------|--------|-------|------------|
-| 37 - TypeScript Foundation | Pending | 0/? | 0% |
+| 37 - TypeScript Foundation | Planned | 3 plans | 0% |
 | 38 - Library Migration | Pending | 0/? | 0% |
 | 39 - UI Components Migration | Pending | 0/? | 0% |
 | 40 - API Routes Migration | Pending | 0/? | 0% |

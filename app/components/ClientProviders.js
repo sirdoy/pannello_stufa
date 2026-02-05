@@ -9,6 +9,7 @@ import ThemeScript from './ThemeScript';
 import { OfflineBanner } from '@/app/components/ui';
 import PWAInitializer from './PWAInitializer';
 import AxeDevtools from './AxeDevtools';
+import CommandPaletteProvider from './layout/CommandPaletteProvider';
 
 /**
  * Wrapper per tutti i provider client-side
@@ -22,10 +23,12 @@ export default function ClientProviders({ children }) {
         <PageTransitionProvider>
           <VersionProvider>
             <ToastProvider>
-              <AxeDevtools />
-              <PWAInitializer />
-              <OfflineBanner fixed showPendingCount />
-              {children}
+              <CommandPaletteProvider>
+                <AxeDevtools />
+                <PWAInitializer />
+                <OfflineBanner fixed showPendingCount />
+                {children}
+              </CommandPaletteProvider>
             </ToastProvider>
           </VersionProvider>
         </PageTransitionProvider>

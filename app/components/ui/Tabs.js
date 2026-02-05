@@ -83,7 +83,7 @@ const triggerVariants = cva(
     'font-display font-medium text-sm',
     'text-slate-400 hover:text-slate-200',
     '[html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:hover:text-slate-900',
-    'transition-colors duration-200',
+    'transition-colors duration-[var(--duration-fast)]',
     // Focus ring
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50 focus-visible:ring-inset',
     // Active state
@@ -150,9 +150,9 @@ const TabsList = forwardRef(function TabsList(
         className={cn(
           'absolute bg-ember-500',
           '[html:not(.dark)_&]:bg-ember-700',
-          'transition-all duration-300',
-          // Use ease-out-expo for smooth deceleration
-          '[transition-timing-function:cubic-bezier(0.16,1,0.3,1)]',
+          'transition-all duration-[var(--duration-smooth)]',
+          // Use spring easing with subtle overshoot for polished feel
+          'ease-[var(--ease-spring-subtle)]',
           'motion-reduce:transition-none',
           orientation === 'horizontal'
             ? 'bottom-0 h-0.5'

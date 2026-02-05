@@ -90,3 +90,4 @@ export { default as StatusCard } from './StatusCard';
 
 // DataTable (v4.0+)
 export { default as DataTable, dataTableVariants } from './DataTable';
+export { default as DataTableToolbar } from './DataTableToolbar';

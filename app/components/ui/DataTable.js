@@ -5,12 +5,17 @@ import {
   useReactTable,
   getCoreRowModel,
   getSortedRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
   flexRender,
 } from '@tanstack/react-table';
 import { cva } from 'class-variance-authority';
-import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import Checkbox from './Checkbox';
+import Button from './Button';
+import Text from './Text';
+import DataTableToolbar from './DataTableToolbar';
 
 /**
  * DataTable Variants - CVA Configuration
@@ -111,6 +116,14 @@ function SortIndicator({ isSorted, direction }) {
  * @param {'none'|'single'|'multi'} [props.selectionMode='none'] - Row selection mode
  * @param {Function} [props.onSelectionChange] - Callback when selection changes (selectedRowIds: Record<string, boolean>) => void
  * @param {Object} [props.selectedRows] - Controlled selection state (Record<string, boolean>)
+ * @param {boolean} [props.enableFiltering=false] - Enable global and column filtering
+ * @param {boolean} [props.enablePagination=false] - Enable pagination
+ * @param {number} [props.pageSize=10] - Default page size
+ * @param {number[]} [props.pageSizeOptions=[10,25,50,100]] - Page size options for dropdown
+ * @param {boolean} [props.showRowCount=true] - Show "Showing X-Y of Z" text
+ * @param {Function} [props.onPageChange] - Callback when page changes
+ * @param {Array} [props.bulkActions] - Bulk actions for toolbar { id, label, variant?, icon? }
+ * @param {Function} [props.onBulkAction] - Callback for bulk actions (actionId, selectedRows) => void
  *
  * @example
  * // Basic usage
@@ -155,6 +168,14 @@ const DataTable = forwardRef(function DataTable(
     selectionMode = 'none',
     onSelectionChange,
     selectedRows: controlledSelectedRows,
+    enableFiltering = false,
+    enablePagination = false,
+    pageSize: defaultPageSize = 10,
+    pageSizeOptions = [10, 25, 50, 100],
+    showRowCount = true,
+    onPageChange,
+    bulkActions = [],
+    onBulkAction,
     ...props
   },
   ref
@@ -165,6 +186,16 @@ const DataTable = forwardRef(function DataTable(
 
   // Sorting state
   const [sorting, setSorting] = useState([]);
+
+  // Filtering state
+  const [columnFilters, setColumnFilters] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+
+  // Pagination state
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: defaultPageSize,
+  });
 
   // Selection state (internal for uncontrolled mode)
   const [internalRowSelection, setInternalRowSelection] = useState({});
@@ -245,6 +276,26 @@ const DataTable = forwardRef(function DataTable(
     [onRowClick]
   );
 
+  // Handle pagination change with callback
+  const handlePaginationChange = useCallback(
+    (updaterOrValue) => {
+      setPagination((prev) => {
+        const newPagination =
+          typeof updaterOrValue === 'function'
+            ? updaterOrValue(prev)
+            : updaterOrValue;
+
+        // Call onPageChange callback if provided and page changed
+        if (onPageChange && newPagination.pageIndex !== prev.pageIndex) {
+          onPageChange(newPagination.pageIndex);
+        }
+
+        return newPagination;
+      });
+    },
+    [onPageChange]
+  );
+
   // Initialize TanStack Table
   const table = useReactTable({
     data,
@@ -252,26 +303,103 @@ const DataTable = forwardRef(function DataTable(
     state: {
       sorting,
       rowSelection,
+      columnFilters,
+      globalFilter,
+      pagination,
     },
     onSortingChange: setSorting,
     onRowSelectionChange: handleRowSelectionChange,
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: handlePaginationChange,
     enableRowSelection: selectionMode !== 'none',
     enableMultiRowSelection: selectionMode === 'multi',
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: enableFiltering ? getFilteredRowModel() : undefined,
+    getPaginationRowModel: enablePagination ? getPaginationRowModel() : undefined,
     getRowId: getRowId,
   });
 
+  // Pagination helpers
+  const pageIndex = table.getState().pagination.pageIndex;
+  const pageSize = table.getState().pagination.pageSize;
+  const pageCount = table.getPageCount();
+  const totalRows = table.getFilteredRowModel().rows.length;
+  const startRow = pageIndex * pageSize + 1;
+  const endRow = Math.min((pageIndex + 1) * pageSize, totalRows);
+
+  // Generate page numbers (max 5 visible with ellipsis)
+  const getPageNumbers = useCallback(() => {
+    const pages = [];
+    const maxVisiblePages = 5;
+
+    if (pageCount <= maxVisiblePages) {
+      // Show all pages if total pages <= 5
+      for (let i = 0; i < pageCount; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Always show first page
+      pages.push(0);
+
+      // Calculate start and end of visible range
+      let start = Math.max(1, pageIndex - 1);
+      let end = Math.min(pageCount - 2, pageIndex + 1);
+
+      // Adjust range if at edges
+      if (pageIndex <= 2) {
+        end = 3;
+      } else if (pageIndex >= pageCount - 3) {
+        start = pageCount - 4;
+      }
+
+      // Add ellipsis before middle pages if needed
+      if (start > 1) {
+        pages.push('ellipsis-start');
+      }
+
+      // Add middle pages
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      // Add ellipsis after middle pages if needed
+      if (end < pageCount - 2) {
+        pages.push('ellipsis-end');
+      }
+
+      // Always show last page
+      pages.push(pageCount - 1);
+    }
+
+    return pages;
+  }, [pageIndex, pageCount]);
+
+  const pageNumbers = getPageNumbers();
+
+  // Count selected rows for bulk actions
+  const selectedRowCount = Object.keys(rowSelection).filter(
+    (key) => rowSelection[key]
+  ).length;
+
   return (
-    <div
-      ref={ref}
-      className={cn(
-        'overflow-x-auto rounded-2xl border border-white/[0.06]',
-        className
+    <div ref={ref} className={cn('space-y-4', className)} {...props}>
+      {/* Toolbar */}
+      {enableFiltering && (
+        <DataTableToolbar
+          table={table}
+          globalFilter={globalFilter}
+          onGlobalFilterChange={setGlobalFilter}
+          showBulkActions={selectionMode !== 'none' && selectedRowCount > 0}
+          bulkActions={bulkActions}
+          onBulkAction={onBulkAction}
+        />
       )}
-      {...props}
-    >
-      <table
+
+      {/* Table Container */}
+      <div className="overflow-x-auto rounded-2xl border border-white/[0.06]">
+        <table
         className={cn(dataTableVariants({ density, striped, stickyHeader }))}
       >
         <thead className="bg-slate-800/50 border-b border-white/[0.06]">
@@ -370,6 +498,102 @@ const DataTable = forwardRef(function DataTable(
           )}
         </tbody>
       </table>
+
+      {/* Pagination */}
+      {enablePagination && pageCount > 1 && (
+        <div className="flex items-center justify-center gap-4 py-4 border-t border-white/[0.06]">
+          {/* ARIA live region for screen readers */}
+          <div role="status" aria-live="polite" className="sr-only">
+            Page {pageIndex + 1} of {pageCount}. Showing rows {startRow} to {endRow} of {totalRows}.
+          </div>
+
+          {/* Visual row count */}
+          {showRowCount && totalRows > 0 && (
+            <Text variant="secondary" size="sm">
+              Showing {startRow}-{endRow} of {totalRows}
+            </Text>
+          )}
+
+          {/* Page navigation buttons */}
+          <nav className="flex gap-1" aria-label="Pagination">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+              aria-label="Go to previous page"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+
+            {/* Page numbers */}
+            {pageNumbers.map((page, idx) =>
+              typeof page === 'string' ? (
+                <span
+                  key={page}
+                  className="flex items-center justify-center w-8 h-8 text-slate-500"
+                  aria-hidden="true"
+                >
+                  ...
+                </span>
+              ) : (
+                <Button
+                  key={page}
+                  variant={page === pageIndex ? 'ember' : 'ghost'}
+                  size="sm"
+                  onClick={() => table.setPageIndex(page)}
+                  aria-current={page === pageIndex ? 'page' : undefined}
+                  aria-label={`Go to page ${page + 1}`}
+                  className="min-w-[32px]"
+                >
+                  {page + 1}
+                </Button>
+              )
+            )}
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+              aria-label="Go to next page"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </nav>
+
+          {/* Rows per page selector */}
+          {pageSizeOptions && pageSizeOptions.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Text variant="secondary" size="sm" as="label" htmlFor="page-size">
+                Rows:
+              </Text>
+              <select
+                id="page-size"
+                value={pageSize}
+                onChange={(e) => table.setPageSize(Number(e.target.value))}
+                className={cn(
+                  'px-2 py-1 rounded-lg text-sm',
+                  'bg-slate-800/60 text-slate-200',
+                  'border border-slate-700/50',
+                  'focus:outline-none focus-visible:ring-2',
+                  'focus-visible:ring-ember-500/50',
+                  '[html:not(.dark)_&]:bg-white/80',
+                  '[html:not(.dark)_&]:text-slate-700',
+                  '[html:not(.dark)_&]:border-slate-300/60'
+                )}
+              >
+                {pageSizeOptions.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
+      )}
+      </div>
     </div>
   );
 });

@@ -244,9 +244,8 @@ describe('DataTable', () => {
         <DataTable data={mockData} columns={mockColumns} className="mt-4" />
       );
       const wrapper = container.firstChild;
-      // Default classes
-      expect(wrapper).toHaveClass('overflow-x-auto');
-      expect(wrapper).toHaveClass('rounded-2xl');
+      // Default class (space-y-4 for layout)
+      expect(wrapper).toHaveClass('space-y-4');
       // Custom class
       expect(wrapper).toHaveClass('mt-4');
     });
@@ -322,20 +321,21 @@ describe('DataTable', () => {
       const ref = createRef();
       render(<DataTable ref={ref} data={mockData} columns={mockColumns} />);
       expect(ref.current.tagName).toBe('DIV');
-      expect(ref.current).toHaveClass('overflow-x-auto');
+      expect(ref.current).toHaveClass('space-y-4');
     });
   });
 
   describe('Base Classes', () => {
-    it('wrapper has base styling classes', () => {
+    it('table container has base styling classes', () => {
       const { container } = render(
         <DataTable data={mockData} columns={mockColumns} />
       );
-      const wrapper = container.firstChild;
-      expect(wrapper).toHaveClass('overflow-x-auto');
-      expect(wrapper).toHaveClass('rounded-2xl');
-      expect(wrapper).toHaveClass('border');
-      expect(wrapper).toHaveClass('border-white/[0.06]');
+      // Table container is child of wrapper
+      const tableContainer = container.querySelector('.overflow-x-auto');
+      expect(tableContainer).toBeInTheDocument();
+      expect(tableContainer).toHaveClass('rounded-2xl');
+      expect(tableContainer).toHaveClass('border');
+      expect(tableContainer).toHaveClass('border-white/[0.06]');
     });
 
     it('table has base classes from CVA', () => {
@@ -447,6 +447,261 @@ describe('DataTable', () => {
       expect(within(statusHeader).queryByRole('button')).not.toBeInTheDocument();
       // Non-sortable column should not have aria-sort
       expect(statusHeader).not.toHaveAttribute('aria-sort');
+    });
+  });
+
+  describe('Row Selection', () => {
+    it('shows checkbox column when selectionMode is multi', () => {
+      render(
+        <DataTable data={mockData} columns={mockColumns} selectionMode="multi" />
+      );
+
+      // Should have 3 column headers (select + name + status)
+      const headers = screen.getAllByRole('columnheader');
+      expect(headers).toHaveLength(3);
+
+      // Check for select-all checkbox
+      expect(screen.getByRole('checkbox', { name: /select all/i })).toBeInTheDocument();
+    });
+
+    it('shows checkbox column when selectionMode is single', () => {
+      render(
+        <DataTable data={mockData} columns={mockColumns} selectionMode="single" />
+      );
+
+      // Should have row checkboxes (one per row)
+      const checkboxes = screen.getAllByRole('checkbox');
+      expect(checkboxes).toHaveLength(3); // One per data row (no select-all for single)
+    });
+
+    it('does not show checkbox column when selectionMode is none', () => {
+      render(
+        <DataTable data={mockData} columns={mockColumns} selectionMode="none" />
+      );
+
+      // No checkboxes
+      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+    });
+
+    it('calls onSelectionChange when row is selected', async () => {
+      const user = userEvent.setup();
+      const onSelectionChange = jest.fn();
+
+      render(
+        <DataTable
+          data={mockData}
+          columns={mockColumns}
+          selectionMode="multi"
+          onSelectionChange={onSelectionChange}
+        />
+      );
+
+      // Click first row checkbox
+      const checkboxes = screen.getAllByRole('checkbox');
+      await user.click(checkboxes[1]); // Skip select-all
+
+      expect(onSelectionChange).toHaveBeenCalled();
+    });
+
+    it('checkbox click does not trigger row click', async () => {
+      const user = userEvent.setup();
+      const onRowClick = jest.fn();
+
+      render(
+        <DataTable
+          data={mockData}
+          columns={mockColumns}
+          selectionMode="multi"
+          onRowClick={onRowClick}
+        />
+      );
+
+      // Click first row checkbox
+      const checkboxes = screen.getAllByRole('checkbox');
+      await user.click(checkboxes[1]); // Skip select-all
+
+      // Row click should not be triggered due to stopPropagation
+      expect(onRowClick).not.toHaveBeenCalled();
+    });
+
+    it('selected rows have highlighted background', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <DataTable data={mockData} columns={mockColumns} selectionMode="multi" />
+      );
+
+      // Click first row checkbox
+      const checkboxes = screen.getAllByRole('checkbox');
+      await user.click(checkboxes[1]); // Select first data row
+
+      // Get data rows and check first one is selected
+      const rows = screen.getAllByRole('row').slice(1);
+      expect(rows[0]).toHaveClass('bg-ember-500/10');
+    });
+  });
+
+  describe('Filtering', () => {
+    it('shows toolbar when enableFiltering is true', () => {
+      render(
+        <DataTable data={mockData} columns={mockColumns} enableFiltering />
+      );
+
+      // Search input should be present
+      expect(screen.getByPlaceholderText('Search...')).toBeInTheDocument();
+    });
+
+    it('does not show toolbar when enableFiltering is false', () => {
+      render(
+        <DataTable data={mockData} columns={mockColumns} enableFiltering={false} />
+      );
+
+      // Search input should not be present
+      expect(screen.queryByPlaceholderText('Search...')).not.toBeInTheDocument();
+    });
+
+    it('filters rows when global filter is typed', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <DataTable data={mockData} columns={mockColumns} enableFiltering />
+      );
+
+      // Type in search input
+      const searchInput = screen.getByPlaceholderText('Search...');
+      await user.type(searchInput, 'Alpha');
+
+      // Wait for debounce
+      await new Promise((resolve) => setTimeout(resolve, 350));
+
+      // Only Alpha should be visible
+      expect(screen.getByText('Alpha')).toBeInTheDocument();
+      expect(screen.queryByText('Beta')).not.toBeInTheDocument();
+      expect(screen.queryByText('Gamma')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Pagination', () => {
+    // Generate larger dataset for pagination testing
+    const largeMockData = Array.from({ length: 25 }, (_, i) => ({
+      id: String(i + 1),
+      name: `Item ${i + 1}`,
+      status: i % 2 === 0 ? 'active' : 'pending',
+    }));
+
+    it('shows pagination when enablePagination is true and multiple pages', () => {
+      render(
+        <DataTable
+          data={largeMockData}
+          columns={mockColumns}
+          enablePagination
+          pageSize={10}
+        />
+      );
+
+      // Pagination nav should be present
+      expect(screen.getByRole('navigation', { name: /pagination/i })).toBeInTheDocument();
+
+      // Should show "Showing 1-10 of 25"
+      expect(screen.getByText(/Showing 1-10 of 25/i)).toBeInTheDocument();
+    });
+
+    it('does not show pagination when all data fits on one page', () => {
+      render(
+        <DataTable
+          data={mockData} // Only 3 items
+          columns={mockColumns}
+          enablePagination
+          pageSize={10}
+        />
+      );
+
+      // Pagination nav should not be present (3 items < 10 page size)
+      expect(screen.queryByRole('navigation', { name: /pagination/i })).not.toBeInTheDocument();
+    });
+
+    it('navigates to next page when clicking next button', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <DataTable
+          data={largeMockData}
+          columns={mockColumns}
+          enablePagination
+          pageSize={10}
+        />
+      );
+
+      // Click next page button
+      const nextButton = screen.getByRole('button', { name: /next page/i });
+      await user.click(nextButton);
+
+      // Should now show page 2
+      expect(screen.getByText(/Showing 11-20 of 25/i)).toBeInTheDocument();
+    });
+
+    it('shows page number buttons', () => {
+      render(
+        <DataTable
+          data={largeMockData}
+          columns={mockColumns}
+          enablePagination
+          pageSize={10}
+        />
+      );
+
+      // Should show page 1, 2, 3 buttons
+      expect(screen.getByRole('button', { name: /page 1/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /page 2/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /page 3/i })).toBeInTheDocument();
+    });
+
+    it('highlights current page button', () => {
+      render(
+        <DataTable
+          data={largeMockData}
+          columns={mockColumns}
+          enablePagination
+          pageSize={10}
+        />
+      );
+
+      // Page 1 button should have aria-current="page"
+      const page1Button = screen.getByRole('button', { name: /page 1/i });
+      expect(page1Button).toHaveAttribute('aria-current', 'page');
+    });
+
+    it('has ARIA live region for page changes', () => {
+      render(
+        <DataTable
+          data={largeMockData}
+          columns={mockColumns}
+          enablePagination
+          pageSize={10}
+        />
+      );
+
+      // Should have sr-only live region
+      const liveRegion = document.querySelector('[aria-live="polite"]');
+      expect(liveRegion).toBeInTheDocument();
+      expect(liveRegion).toHaveClass('sr-only');
+    });
+
+    it('shows rows per page selector', () => {
+      render(
+        <DataTable
+          data={largeMockData}
+          columns={mockColumns}
+          enablePagination
+          pageSize={10}
+          pageSizeOptions={[10, 25, 50]}
+        />
+      );
+
+      // Should have page size select
+      const pageSelect = screen.getByRole('combobox');
+      expect(pageSelect).toBeInTheDocument();
+      expect(pageSelect).toHaveValue('10');
     });
   });
 });

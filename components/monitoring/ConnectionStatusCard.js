@@ -1,10 +1,11 @@
 'use client';
 
-import { CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
+import { CheckCircle, AlertTriangle, XCircle, RefreshCw } from 'lucide-react';
 import Card, { CardHeader } from '@/app/components/ui/Card';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 import StatusBadge from '@/app/components/ui/StatusBadge';
+import Button from '@/app/components/ui/Button';
 
 /**
  * Connection Status Card Component
@@ -20,8 +21,51 @@ import StatusBadge from '@/app/components/ui/StatusBadge';
  * @param {number} props.stats.failedChecks - Failed checks count
  * @param {number} props.stats.mismatchCount - State mismatch count
  * @param {string} props.stats.successRate - Success rate percentage (e.g., "99.5")
+ * @param {string|null} props.error - Error message if fetch failed
+ * @param {Function} props.onRetry - Callback to retry fetching stats
  */
-export default function ConnectionStatusCard({ stats }) {
+export default function ConnectionStatusCard({ stats, error, onRetry }) {
+  // Error state
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between w-full">
+            <Heading level={3} variant="subtle">
+              Stove Connection
+            </Heading>
+            <div className="flex items-center gap-2">
+              <XCircle className="w-4 h-4 text-danger-400" />
+              <StatusBadge status="error" variant="badge" color="danger" />
+            </div>
+          </div>
+        </CardHeader>
+        <div className="flex items-start gap-3 p-4 bg-danger-500/10 border border-danger-500/20 rounded-lg">
+          <XCircle className="w-5 h-5 text-danger-400 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <Text variant="danger" weight="medium">
+              Errore nel caricamento
+            </Text>
+            <Text variant="secondary" size="sm" className="mt-1">
+              {error}
+            </Text>
+            {onRetry && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onRetry}
+                icon={<RefreshCw size={14} />}
+                className="mt-3"
+              >
+                Riprova
+              </Button>
+            )}
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
   // Loading state
   if (!stats) {
     return (

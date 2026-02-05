@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Heading, Button, Section, Grid } from '@/app/components/ui';
 import ConnectionStatusCard from '@/components/monitoring/ConnectionStatusCard';
@@ -11,22 +11,36 @@ import { ArrowLeft, Activity } from 'lucide-react';
 export default function MonitoringPage() {
   const router = useRouter();
   const [stats, setStats] = useState(null);
+  const [statsError, setStatsError] = useState(null);
   const [dmsStatus, setDmsStatus] = useState(null);
+  const [dmsError, setDmsError] = useState(null);
+
+  // Refs for retry functions (avoids re-creating on each render)
+  const fetchStatsRef = useRef(null);
+  const fetchDMSRef = useRef(null);
 
   // Fetch stats on mount
   useEffect(() => {
     async function fetchStats() {
       try {
+        setStatsError(null);
         const res = await fetch('/api/health-monitoring/stats?days=7');
         if (res.ok) {
           const data = await res.json();
           setStats(data);
+        } else {
+          // Handle non-200 responses
+          const errorData = await res.json().catch(() => ({}));
+          setStatsError(errorData.error || `Errore ${res.status}`);
         }
       } catch (error) {
         console.error('Error fetching stats:', error);
+        setStatsError('Errore di connessione');
       }
     }
 
+    // Store ref for retry
+    fetchStatsRef.current = fetchStats;
     fetchStats();
   }, []);
 
@@ -34,15 +48,24 @@ export default function MonitoringPage() {
   useEffect(() => {
     async function fetchDMS() {
       try {
+        setDmsError(null);
         const res = await fetch('/api/health-monitoring/dead-man-switch');
         if (res.ok) {
           const data = await res.json();
           setDmsStatus(data);
+        } else {
+          // Handle non-200 responses
+          const errorData = await res.json().catch(() => ({}));
+          setDmsError(errorData.error || `Errore ${res.status}`);
         }
       } catch (error) {
         console.error('Error fetching DMS status:', error);
+        setDmsError('Errore di connessione');
       }
     }
+
+    // Store ref for retry
+    fetchDMSRef.current = fetchDMS;
 
     // Initial fetch
     fetchDMS();
@@ -52,6 +75,10 @@ export default function MonitoringPage() {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Retry handlers
+  const handleStatsRetry = () => fetchStatsRef.current?.();
+  const handleDMSRetry = () => fetchDMSRef.current?.();
 
   return (
     <div className="p-4 space-y-6">
@@ -76,8 +103,8 @@ export default function MonitoringPage() {
       {/* Status cards section */}
       <Section spacing="none" as="div">
         <Grid cols={2} gap="md" className="md:grid-cols-2">
-          <ConnectionStatusCard stats={stats} />
-          <DeadManSwitchPanel status={dmsStatus} />
+          <ConnectionStatusCard stats={stats} error={statsError} onRetry={handleStatsRetry} />
+          <DeadManSwitchPanel status={dmsStatus} error={dmsError} onRetry={handleDMSRetry} />
         </Grid>
       </Section>
 

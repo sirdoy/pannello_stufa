@@ -124,11 +124,11 @@ Plans:
   2. List/grid items have stagger animation effects
   3. Interactive elements use spring physics for natural feel
   4. All animations respect prefers-reduced-motion (disabled or reduced)
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 35-01: Animation utilities and CSS custom properties
-- [ ] 35-02: Apply micro-interactions to existing components
+- [ ] 35-01-PLAN.md - Animation tokens and stagger system foundation (Wave 1)
+- [ ] 35-02-PLAN.md - Apply animation tokens to core components (Wave 2)
 
 ---
 
@@ -160,7 +160,7 @@ Plans:
 | 32. Action Components | 3/3 | Complete | 2026-02-04 |
 | 33. Dialog Patterns | 3/3 | Complete | 2026-02-04 |
 | 34. Data Table | 4/4 | Complete | 2026-02-05 |
-| 35. Micro-interactions | 0/2 | Not started | - |
+| 35. Micro-interactions | 0/2 | Planned | - |
 | 36. Application Integration | 0/3 | Not started | - |
 
 **Total:** 16/21 plans (76%)
@@ -178,5 +178,6 @@ Plans:
 *Phase 33 completed: 2026-02-04*
 *Phase 34 planned: 2026-02-04*
 *Phase 34 completed: 2026-02-05*
+*Phase 35 planned: 2026-02-05*
 *Milestone: v4.0 Advanced UI Components*
 *Requirements coverage: 55/55 (100%)*

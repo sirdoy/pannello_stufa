@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 37 - TypeScript Foundation
-Plan: —
-Status: Ready to plan
-Last activity: 2026-02-05 — Roadmap created for v5.0 milestone
+Plan: 02 of ? (Core Type Definitions)
+Status: In progress
+Last activity: 2026-02-05 — Completed 37-02-PLAN.md (Core Type Definitions)
 
-Progress: [░░░░░░░░░░░░░░░░░░░░░░░░] 0%
+Progress: [██░░░░░░░░░░░░░░░░░░░░░░] 8% (2 plans done)
 
 ## Milestone Overview
 
@@ -25,7 +25,7 @@ Progress: [░░░░░░░░░░░░░░░░░░░░░░░
 
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
-| 37 | TypeScript Foundation | 8 | Pending |
+| 37 | TypeScript Foundation | 8 | In progress (2/8) |
 | 38 | Library Migration | 4 | Pending |
 | 39 | UI Components Migration | 3 | Pending |
 | 40 | API Routes Migration | 3 | Pending |
@@ -50,7 +50,7 @@ Progress: [░░░░░░░░░░░░░░░░░░░░░░░
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
 | v3.2 Weather & Dashboard | 5 | 13 | 2 days (2026-02-02 - 2026-02-03) |
 | v4.0 Advanced UI | 7 | 24 | 2 days (2026-02-04 - 2026-02-05) |
-| v5.0 TypeScript Migration | 7 | 0/? | In progress |
+| v5.0 TypeScript Migration | 7 | 2/? | In progress |
 
 ## Accumulated Context
 
@@ -83,10 +83,18 @@ Key patterns from previous milestones preserved for v5.0 migration:
 
 ### Blockers/Concerns
 
-None — roadmap created, ready to plan Phase 37.
+None — Phase 37 in progress.
 
 **Known Tech Debt:**
 - Label component not exported from barrel (low impact)
+
+### TypeScript Migration Patterns (v5.0)
+
+From 37-02:
+- Barrel export pattern: @/types, @/types/firebase, @/types/api
+- Type guards: isApiSuccess(), isApiError()
+- Union types for constrained values (StoveStatus, ErrorCode)
+- Interface extension for API responses
 
 ### Quick Tasks Completed
 
@@ -106,6 +114,6 @@ None — roadmap created, ready to plan Phase 37.
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: Roadmap created for v5.0 milestone
+Stopped at: Completed 37-02-PLAN.md (Core Type Definitions)
 Resume file: None
-Next step: `/gsd:plan-phase 37` to plan TypeScript Foundation phase
+Next step: Execute 37-03-PLAN.md (lib/core migration)

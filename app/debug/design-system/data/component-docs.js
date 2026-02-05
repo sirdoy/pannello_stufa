@@ -946,6 +946,94 @@ const handleChange = (delta) => {
   />
 </div>`,
   },
+
+  DataTable: {
+    name: 'DataTable',
+    description: 'Full-featured data table built on TanStack Table with sorting, filtering, pagination, selection, and expansion',
+    category: 'Layout',
+    props: [
+      { name: 'data', type: 'Array<T>', required: true, description: 'Array of data objects' },
+      { name: 'columns', type: 'Array<ColumnDef>', required: true, description: 'TanStack Table column definitions' },
+      { name: 'density', type: "'compact'|'default'|'relaxed'", default: "'default'", description: 'Row height variant (32px, 48px, 64px)' },
+      { name: 'striped', type: 'boolean', default: 'false', description: 'Alternating row background' },
+      { name: 'enableSorting', type: 'boolean', default: 'true', description: 'Enable column sorting' },
+      { name: 'enableFiltering', type: 'boolean', default: 'false', description: 'Enable global search and column filters' },
+      { name: 'enablePagination', type: 'boolean', default: 'false', description: 'Enable pagination controls' },
+      { name: 'enableSelection', type: 'boolean', default: 'false', description: 'Enable row selection with checkboxes' },
+      { name: 'enableExpansion', type: 'boolean', default: 'false', description: 'Enable row expansion on click' },
+      { name: 'pageSize', type: 'number', default: '10', description: 'Initial rows per page' },
+      { name: 'pageSizeOptions', type: 'number[]', default: '[10, 25, 50, 100]', description: 'Page size dropdown options' },
+      { name: 'showRowCount', type: 'boolean', default: 'false', description: 'Show "Showing X-Y of Z" text' },
+      { name: 'getRowId', type: '(row: T) => string', default: 'undefined', description: 'Custom row ID function' },
+      { name: 'onSelectionChange', type: '(selectedRows: T[]) => void', default: 'undefined', description: 'Selection change callback' },
+      { name: 'renderExpandedContent', type: '(row: Row<T>) => ReactNode', default: 'undefined', description: 'Render function for expanded content' },
+      { name: 'className', type: 'string', default: "''", description: 'Additional table classes' },
+    ],
+    keyboard: [
+      { key: 'Tab', action: 'Navigate to table, then first row' },
+      { key: 'ArrowDown', action: 'Move focus to next row' },
+      { key: 'ArrowUp', action: 'Move focus to previous row' },
+      { key: 'Enter', action: 'Expand/collapse focused row (if expansion enabled)' },
+      { key: 'Space', action: 'Toggle row selection (if selection enabled)' },
+      { key: 'Escape', action: 'Clear search input (when focused)' },
+    ],
+    aria: [
+      { attr: 'role="table"', description: 'Semantic table structure' },
+      { attr: 'role="row"', description: 'On each table row' },
+      { attr: 'role="columnheader"', description: 'On header cells' },
+      { attr: 'role="cell"', description: 'On data cells' },
+      { attr: 'aria-sort', description: 'Three-state cycle: "ascending", "descending", "none"' },
+      { attr: 'aria-expanded', description: 'On expandable rows' },
+      { attr: 'tabindex', description: 'Roving tabindex pattern (0 on active row, -1 on others)' },
+      { attr: 'aria-live="polite"', description: 'On selection/pagination status' },
+    ],
+    screenReader: 'Announces as "Table with N rows". Sorting/selection changes announced via aria-live regions. Column headers announce sort state.',
+    codeExample: `const columns = useMemo(() => [
+  {
+    accessorKey: 'name',
+    header: 'Name',
+    sortingFn: 'alphanumeric',
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ getValue }) => <Badge variant="sage">{getValue()}</Badge>,
+    filterFn: 'equals',
+  },
+  {
+    accessorKey: 'createdAt',
+    header: 'Created',
+    cell: ({ getValue }) => format(new Date(getValue()), 'dd/MM/yyyy'),
+    sortingFn: 'datetime',
+  },
+], []);
+
+<DataTable
+  data={notifications}
+  columns={columns}
+  density="compact"
+  enableFiltering
+  enablePagination
+  enableExpansion
+  pageSize={25}
+  pageSizeOptions={[25, 50, 100]}
+  showRowCount
+  getRowId={(row) => row.id}
+  renderExpandedContent={(row) => (
+    <div className="p-4">
+      <Text>{row.original.details}</Text>
+    </div>
+  )}
+/>
+
+{/* With selection */}
+<DataTable
+  data={data}
+  columns={columns}
+  enableSelection
+  onSelectionChange={(rows) => console.log('Selected:', rows)}
+/>`,
+  },
 };
 
 /**

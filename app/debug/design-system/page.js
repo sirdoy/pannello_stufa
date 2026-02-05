@@ -36,9 +36,10 @@ import Sheet from '@/app/components/ui/Sheet';
 import RightClickMenu from '@/app/components/ui/RightClickMenu';
 import CommandPalette from '@/app/components/ui/CommandPalette';
 import Kbd from '@/app/components/ui/Kbd';
+import DataTable from '@/app/components/ui/DataTable';
 import { useContextMenuLongPress, longPressPreventSelection } from '@/app/hooks/useContextMenuLongPress';
 import { WeatherIcon, getWeatherLabel } from '@/app/components/weather/WeatherIcon';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { z } from 'zod';
 import { Controller } from 'react-hook-form';
 import { Home, Settings, Power, Moon, Edit, Trash2, Copy, Share } from 'lucide-react';
@@ -170,6 +171,7 @@ export default function DesignSystemPage() {
                 { icon: '⭕', title: 'Border Radius', anchor: 'border-radius' },
                 { icon: '🌑', title: 'Shadow System', anchor: 'shadow-system' },
                 { icon: '💬', title: 'Dialog Patterns', anchor: 'dialog-patterns' },
+                { icon: '📊', title: 'Data Table', anchor: 'data-table' },
                 { icon: '✅', title: 'Best Practices', anchor: 'critical-best-practices' },
               ].map(({ icon, title, anchor }) => (
                 <a
@@ -2544,6 +2546,57 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
           </FormModal>
         </SectionShowcase>
 
+        {/* Data Table */}
+        <SectionShowcase title="Data Table" icon="📊" docs="app/components/ui/DataTable.js">
+          <Card>
+            <CardContent>
+              <div className="space-y-6">
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">DataTable Component (v4.0)</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    Full-featured data table built on TanStack Table with sorting, filtering, pagination, selection, and row expansion. Supports roving tabindex keyboard navigation.
+                  </Text>
+                </div>
+
+                <div>
+                  <Text variant="tertiary" size="xs" className="mb-3">Basic Table</Text>
+                  <DataTableDemo />
+                </div>
+
+                <CardDivider />
+
+                <div>
+                  <Text variant="tertiary" size="xs" className="mb-2">Features</Text>
+                  <ul className="list-disc list-inside space-y-1 text-sm text-slate-400">
+                    <li>Sorting: Click column headers (three-state cycle: asc → desc → none)</li>
+                    <li>Filtering: Global search + column-specific filters with removable chips</li>
+                    <li>Pagination: Configurable page size with ellipsis algorithm (max 5 visible pages)</li>
+                    <li>Selection: Checkbox column with bulk actions toolbar</li>
+                    <li>Expansion: Click row to expand, custom content rendering</li>
+                    <li>Responsive: Horizontal scroll with fade gradient indicator</li>
+                    <li>Density: Compact (32px), Default (48px), Relaxed (64px) row heights</li>
+                    <li>Keyboard: Roving tabindex (ArrowUp/Down, Enter to expand, Space to select)</li>
+                  </ul>
+                </div>
+
+                <CardDivider />
+
+                <div>
+                  <Text variant="tertiary" size="xs" className="mb-3">Accessibility</Text>
+                  <AccessibilitySection componentName="DataTable" />
+                </div>
+
+                <CardDivider />
+
+                <div>
+                  <Text variant="tertiary" size="xs" className="mb-3">Props</Text>
+                  <PropTable componentName="DataTable" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </SectionShowcase>
+
         {/* Best Practices */}
         <SectionShowcase title="Critical Best Practices" icon="✅" docs="docs/design-system.md#usage-rules">
           <Card>
@@ -2609,6 +2662,110 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
         </Card>
         </div>
       </PageLayout>
+  );
+}
+
+/**
+ * DataTable Demo Component
+ */
+function DataTableDemo() {
+  // Sample data
+  const sampleData = useMemo(() => [
+    { id: '1', name: 'Thermostat Living Room', type: 'thermostat', status: 'online', lastUpdate: new Date('2026-02-05T08:00:00Z') },
+    { id: '2', name: 'Stove Main', type: 'stove', status: 'online', lastUpdate: new Date('2026-02-05T07:45:00Z') },
+    { id: '3', name: 'Lights Bedroom', type: 'lights', status: 'offline', lastUpdate: new Date('2026-02-04T22:30:00Z') },
+    { id: '4', name: 'Sensor Kitchen', type: 'sensor', status: 'online', lastUpdate: new Date('2026-02-05T08:05:00Z') },
+    { id: '5', name: 'Camera Garage', type: 'camera', status: 'offline', lastUpdate: new Date('2026-02-03T15:20:00Z') },
+  ], []);
+
+  // Column definitions
+  const columns = useMemo(() => [
+    {
+      accessorKey: 'name',
+      header: 'Device Name',
+      cell: ({ getValue }) => (
+        <Text weight="medium">{getValue()}</Text>
+      ),
+    },
+    {
+      accessorKey: 'type',
+      header: 'Type',
+      cell: ({ getValue }) => {
+        const type = getValue();
+        const variants = {
+          thermostat: 'ember',
+          stove: 'ember',
+          lights: 'sage',
+          sensor: 'ocean',
+          camera: 'neutral',
+        };
+        return (
+          <Badge variant={variants[type] || 'neutral'}>
+            {type}
+          </Badge>
+        );
+      },
+      filterFn: 'equals',
+    },
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      cell: ({ getValue }) => {
+        const status = getValue();
+        return (
+          <Badge variant={status === 'online' ? 'sage' : 'neutral'}>
+            {status}
+          </Badge>
+        );
+      },
+      filterFn: 'equals',
+    },
+    {
+      accessorKey: 'lastUpdate',
+      header: 'Last Update',
+      cell: ({ getValue }) => {
+        const date = new Date(getValue());
+        return (
+          <Text variant="secondary" size="sm">
+            {date.toLocaleString('it-IT', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </Text>
+        );
+      },
+      sortingFn: 'datetime',
+    },
+  ], []);
+
+  return (
+    <DataTable
+      data={sampleData}
+      columns={columns}
+      density="compact"
+      enableFiltering
+      enablePagination
+      enableExpansion
+      pageSize={5}
+      showRowCount
+      getRowId={(row) => row.id}
+      renderExpandedContent={(row) => (
+        <div className="p-4 space-y-2">
+          <Text variant="secondary" size="sm">
+            <strong>Device ID:</strong> {row.original.id}
+          </Text>
+          <Text variant="secondary" size="sm">
+            <strong>Full Name:</strong> {row.original.name}
+          </Text>
+          <Text variant="secondary" size="sm">
+            <strong>Type:</strong> {row.original.type}
+          </Text>
+        </div>
+      )}
+    />
   );
 }
 

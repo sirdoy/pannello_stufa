@@ -61,7 +61,7 @@ const triggerVariants = cva([
   // Hover state
   'hover:text-ember-400 [html:not(.dark)_&]:hover:text-ember-700',
   // Transition
-  'transition-colors duration-200',
+  'transition-colors duration-[var(--duration-fast)]',
   // Focus ring
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50 focus-visible:ring-inset',
   // Disabled state
@@ -119,8 +119,8 @@ const AccordionTrigger = forwardRef(function AccordionTrigger(
           className={cn(
             'h-4 w-4 shrink-0',
             'text-slate-400 [html:not(.dark)_&]:text-slate-500',
-            // Rotate chevron when open - smooth transition
-            'transition-transform duration-300',
+            // Rotate chevron when open - smooth transition with animation token
+            'transition-transform duration-[var(--duration-smooth)]',
             'group-data-[state=open]:rotate-180',
             // Reduced motion support
             'motion-reduce:transition-none'

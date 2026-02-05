@@ -12,7 +12,7 @@ import {
   validateRequired,
 } from '@/lib/core';
 import {
-  getDevicePreferences,
+  getDevicePreferencesAdmin,
   updateDevicePreferences,
 } from '@/lib/devicePreferencesService';
 import { DEVICE_CONFIG } from '@/lib/devices/deviceTypes';
@@ -26,7 +26,8 @@ export const dynamic = 'force-dynamic';
 export const GET = withAuthAndErrorHandler(async (request, context, session) => {
   const userId = session.user.sub;
 
-  const preferences = await getDevicePreferences(userId);
+  // Use Admin SDK version since this is server-side code
+  const preferences = await getDevicePreferencesAdmin(userId);
 
   // Also return device config for UI rendering
   const devices = Object.values(DEVICE_CONFIG).map(device => ({

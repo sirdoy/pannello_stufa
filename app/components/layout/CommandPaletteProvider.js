@@ -1,18 +1,18 @@
 'use client';
 
-import { useState, useEffect, useCallback, createContext, useContext } from 'react';
+import { useState, useEffect, useCallback, useMemo, createContext, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import CommandPalette from '@/app/components/ui/CommandPalette';
+import { getDeviceCommands } from '@/lib/commands/deviceCommands';
 import {
   Home,
   Settings,
   Thermometer,
-  Power,
-  PowerOff,
-  Moon,
-  Sun,
   Flame,
   Lightbulb,
+  Camera,
+  Bug,
+  RefreshCw,
 } from 'lucide-react';
 
 /**
@@ -63,87 +63,78 @@ export default function CommandPaletteProvider({ children, commands: customComma
   const router = useRouter();
 
   /**
-   * Default commands organized by group (user decision from CONTEXT.md)
-   * - Navigation: Dashboard, Settings, Thermostat
-   * - Device Actions: Stove ignite/off (placeholders)
-   * - Settings: Toggle dark mode (placeholder)
+   * Build complete command set
+   * - Navigation commands
+   * - Device commands (from deviceCommands.js)
+   * - Global actions
    */
-  const defaultCommands = [
+  const defaultCommands = useMemo(() => [
+    // Navigation
     {
-      heading: 'Navigation',
+      heading: 'Navigazione',
       items: [
         {
           id: 'nav-home',
           label: 'Dashboard',
           icon: <Home className="w-4 h-4" />,
-          shortcut: 'Cmd+D',
+          shortcut: '⌘D',
           onSelect: () => router.push('/'),
         },
         {
-          id: 'nav-settings',
-          label: 'Settings',
-          icon: <Settings className="w-4 h-4" />,
-          shortcut: 'Cmd+,',
-          onSelect: () => router.push('/settings'),
-        },
-        {
-          id: 'nav-thermostat',
-          label: 'Thermostat',
-          icon: <Thermometer className="w-4 h-4" />,
-          onSelect: () => router.push('/thermostat'),
-        },
-        {
           id: 'nav-stove',
-          label: 'Stove Control',
+          label: 'Stufa',
           icon: <Flame className="w-4 h-4" />,
           onSelect: () => router.push('/stove'),
         },
         {
+          id: 'nav-thermostat',
+          label: 'Termostato',
+          icon: <Thermometer className="w-4 h-4" />,
+          onSelect: () => router.push('/thermostat'),
+        },
+        {
           id: 'nav-lights',
-          label: 'Lights',
+          label: 'Luci',
           icon: <Lightbulb className="w-4 h-4" />,
           onSelect: () => router.push('/lights'),
         },
+        {
+          id: 'nav-camera',
+          label: 'Videocamera',
+          icon: <Camera className="w-4 h-4" />,
+          onSelect: () => router.push('/camera'),
+        },
+        {
+          id: 'nav-settings',
+          label: 'Impostazioni',
+          icon: <Settings className="w-4 h-4" />,
+          shortcut: '⌘,',
+          onSelect: () => router.push('/settings'),
+        },
+        {
+          id: 'nav-debug',
+          label: 'Debug',
+          icon: <Bug className="w-4 h-4" />,
+          onSelect: () => router.push('/debug'),
+        },
       ],
     },
+    // Device commands from module
+    ...getDeviceCommands(),
+    // Global actions
     {
-      heading: 'Device Actions',
+      heading: 'Azioni',
       items: [
         {
-          id: 'stove-ignite',
-          label: 'Ignite Stove',
-          icon: <Power className="w-4 h-4" />,
-          // Placeholder - actual implementation in Phase 36
-          onSelect: () => {
-            console.log('[CommandPalette] Ignite stove action - implement in Phase 36');
-          },
-        },
-        {
-          id: 'stove-off',
-          label: 'Turn Off Stove',
-          icon: <PowerOff className="w-4 h-4" />,
-          // Placeholder - actual implementation in Phase 36
-          onSelect: () => {
-            console.log('[CommandPalette] Turn off stove action - implement in Phase 36');
-          },
+          id: 'action-refresh',
+          label: 'Aggiorna Pagina',
+          icon: <RefreshCw className="w-4 h-4" />,
+          shortcut: '⌘R',
+          onSelect: () => window.location.reload(),
         },
       ],
     },
-    {
-      heading: 'Settings',
-      items: [
-        {
-          id: 'toggle-theme',
-          label: 'Toggle Dark Mode',
-          icon: <Moon className="w-4 h-4" />,
-          // Placeholder - actual implementation depends on theme provider
-          onSelect: () => {
-            console.log('[CommandPalette] Toggle dark mode - implement based on theme system');
-          },
-        },
-      ],
-    },
-  ];
+  ], [router]);
 
   // Merge custom commands with defaults if provided
   const commands = customCommands || defaultCommands;

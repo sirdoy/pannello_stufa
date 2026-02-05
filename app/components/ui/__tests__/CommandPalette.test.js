@@ -814,12 +814,14 @@ describe('CommandPaletteProvider', () => {
         expect(screen.getByPlaceholderText('Type a command or search...')).toBeInTheDocument();
       });
 
-      // Then check for navigation commands
+      // Then check for navigation commands (Italian labels)
       expect(screen.getByText('Dashboard')).toBeInTheDocument();
-      expect(screen.getByText('Thermostat')).toBeInTheDocument();
+      // Use role to get specific option, not the group heading
+      expect(screen.getByRole('option', { name: /Termostato/i })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: /Impostazioni/i })).toBeInTheDocument();
     });
 
-    it('renders default device action commands', async () => {
+    it('renders device commands from deviceCommands module', async () => {
       render(
         <CommandPaletteProvider>
           <div>App Content</div>
@@ -832,12 +834,13 @@ describe('CommandPaletteProvider', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('Ignite Stove')).toBeInTheDocument();
-        expect(screen.getByText('Turn Off Stove')).toBeInTheDocument();
+        // Stove commands (Italian labels)
+        expect(screen.getByText('Accendi Stufa')).toBeInTheDocument();
+        expect(screen.getByText('Spegni Stufa')).toBeInTheDocument();
       });
     });
 
-    it('renders settings commands', async () => {
+    it('renders thermostat and lights commands', async () => {
       render(
         <CommandPaletteProvider>
           <div>App Content</div>
@@ -850,7 +853,10 @@ describe('CommandPaletteProvider', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('Toggle Dark Mode')).toBeInTheDocument();
+        // Thermostat commands
+        expect(screen.getByText('Modalita Automatica')).toBeInTheDocument();
+        // Lights commands
+        expect(screen.getByText('Accendi Tutte le Luci')).toBeInTheDocument();
       });
     });
   });

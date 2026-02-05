@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 34 of 36 (Data Table)
-Plan: 01 of 04 complete
+Plan: 02 of 04 complete
 Status: In progress
-Last activity: 2026-02-04 — Completed 34-01-PLAN.md (DataTable base component)
+Last activity: 2026-02-05 — Completed 34-02-PLAN.md (Selection, filtering, pagination)
 
-Progress: [█████████████░░░░░░░░░░░░░░] 62% (13/21 plans)
+Progress: [██████████████░░░░░░░░░░░░░] 67% (14/21 plans)
 
 ## Performance Metrics
 
@@ -66,6 +66,11 @@ Key patterns from previous milestones:
 - TanStack Table useReactTable pattern with getCoreRowModel and getSortedRowModel
 - aria-sort three-state cycle (asc -> desc -> none) for sortable table headers
 - CVA variants for table density (compact/default/relaxed row heights)
+- Checkbox stopPropagation pattern to prevent row click conflicts
+- Debounced search input (300ms) for performance optimization
+- Controlled/uncontrolled state pattern for row selection
+- ARIA live regions for screen reader announcements (selection, pagination)
+- Page number ellipsis algorithm (max 5 visible pages)
 
 ### Pending Todos
 
@@ -97,7 +102,7 @@ None — v4.0 progressing well.
 
 ## Session Continuity
 
-Last session: 2026-02-04 18:33 UTC
-Stopped at: Completed 34-01-PLAN.md (DataTable base component)
+Last session: 2026-02-05 07:53 UTC
+Stopped at: Completed 34-02-PLAN.md (Selection, filtering, pagination)
 Resume file: None
-Next step: /gsd:execute-phase 34 plan 02 for Filtering & Selection
+Next step: /gsd:execute-phase 34 plan 03 for Column Filters

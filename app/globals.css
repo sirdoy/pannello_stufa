@@ -277,6 +277,25 @@
   --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
+  /* ===== ANIMATION TIMING TOKENS ===== */
+
+  /* Duration tokens - semantic naming */
+  --duration-instant: 0ms;      /* Reduced motion fallback */
+  --duration-fast: 150ms;       /* Hover/focus states */
+  --duration-smooth: 300ms;     /* Enter/exit, most animations */
+  --duration-slow: 500ms;       /* Complex transforms */
+
+  /* Ease curve tokens - named by use case */
+  --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);      /* ease-out-expo - responsive feel */
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);          /* ease-in-quad - quick departure */
+  --ease-move: cubic-bezier(0.4, 0, 0.2, 1);        /* ease-in-out - smooth repositioning */
+  --ease-spring-subtle: cubic-bezier(0.34, 1.1, 0.64, 1); /* 5% overshoot for polish */
+
+  /* Stagger timing tokens */
+  --stagger-fast: 30ms;   /* Dense lists (20+ items) */
+  --stagger-base: 50ms;   /* Standard lists (10-15 items) */
+  --stagger-slow: 80ms;   /* Hero grids (3-6 items) */
+
   /* ===== BREAKPOINTS ===== */
   --breakpoint-tb: 900px;
 }
@@ -995,6 +1014,36 @@
     animation: scaleIn 0.3s ease-out forwards;
   }
 
+  /* ===== STAGGER ANIMATION SYSTEM ===== */
+
+  /* Stagger item - use with style={{ '--stagger-index': index }} */
+  .stagger-item {
+    animation: stagger-fade-in var(--duration-smooth) var(--ease-enter) both;
+    animation-delay: calc(var(--stagger-index, 0) * var(--stagger-base));
+  }
+
+  /* Stagger variants */
+  .stagger-item-fast {
+    animation: stagger-fade-in var(--duration-smooth) var(--ease-enter) both;
+    animation-delay: calc(var(--stagger-index, 0) * var(--stagger-fast));
+  }
+
+  .stagger-item-slow {
+    animation: stagger-fade-in var(--duration-smooth) var(--ease-enter) both;
+    animation-delay: calc(var(--stagger-index, 0) * var(--stagger-slow));
+  }
+
+  @keyframes stagger-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   /* Progress indeterminate animation */
   @keyframes progress-indeterminate {
     0% { transform: translateX(-100%); }
@@ -1050,13 +1099,54 @@
 
 /* ===== UTILITY CLASSES ===== */
 @layer utilities {
-  /* Reduced motion support */
+  /* Reduced motion support - per user accessibility decision */
   @media (prefers-reduced-motion: reduce) {
-    *,
+    /* Decorative animations - disable completely (instant state changes) */
+    .animate-fade-in,
+    .animate-fade-out,
+    .animate-fade-in-up,
+    .animate-fade-in-down,
+    .animate-scale-in,
+    .animate-scale-in-center,
+    .animate-slide-down,
+    .animate-slide-up,
+    .animate-slide-in-from-bottom,
+    .animate-slideInDown,
+    .animate-dropdown,
+    .animate-dropdown-up,
+    .animate-spring-in,
+    .animate-bounce-subtle,
+    .animate-slideDown,
+    .animate-fadeIn,
+    .animate-fadeOut,
+    .animate-scaleIn,
+    .animate-accordion-down,
+    .animate-accordion-up,
+    .stagger-item,
+    .stagger-item-fast,
+    .stagger-item-slow {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+
+    /* Stagger delays - remove to show all items instantly */
+    [style*="--stagger-index"] {
+      animation-delay: 0ms !important;
+    }
+
+    /* Functional animations - KEEP ORIGINAL (loading spinners, progress, shimmer) */
+    /* These are excluded from the above rules and retain their normal animation */
+    /* .animate-spin, .animate-shimmer, .animate-pulse-ember, .animate-progress-indeterminate */
+    /* No changes needed - they keep working as normal */
+
+    /* Shake animation - keep for error feedback (functional) */
+    /* .animate-shake keeps original duration */
+
+    /* General transitions - instant state changes */
+    *:not(.animate-spin):not(.animate-shimmer):not(.animate-shimmer-vertical):not(.animate-pulse-ember):not(.animate-glow-pulse):not(.animate-progress-indeterminate),
     *::before,
     *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
   }

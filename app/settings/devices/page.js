@@ -157,17 +157,18 @@ export default function DevicesSettingsPage() {
         </Heading>
 
         <div className="space-y-4">
-          {devices.map(device => {
+          {devices.map((device, index) => {
             const isEnabled = preferences[device.id] === true;
 
             return (
               <div
                 key={device.id}
-                className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                className={`stagger-item p-4 rounded-xl border-2 transition-all duration-200 ${
                   isEnabled
                     ? 'border-ember-600 [html:not(.dark)_&]:border-ember-400 bg-ember-950/30 [html:not(.dark)_&]:bg-ember-50/50'
                     : 'border-slate-600 [html:not(.dark)_&]:border-slate-300 bg-white/[0.02] [html:not(.dark)_&]:bg-slate-50/50'
                 }`}
+                style={{ '--stagger-index': index }}
               >
                 <div className="flex items-start justify-between gap-4">
                   {/* Device info */}

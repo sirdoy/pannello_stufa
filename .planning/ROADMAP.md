@@ -15,7 +15,7 @@ This milestone adds 8 advanced UI components to the Ember Noir design system: Ta
 - [x] **Phase 32: Action Components** - Context Menu and Command Palette (mobile critical)
 - [x] **Phase 33: Dialog Patterns** - Confirmation and Form Modal
 - [x] **Phase 34: Data Table** - Full-featured sortable, filterable, paginated table
-- [ ] **Phase 35: Micro-interactions** - CSS animation system with reduced motion support
+- [x] **Phase 35: Micro-interactions** - CSS animation system with reduced motion support
 - [ ] **Phase 36: Application Integration** - Quick actions and application-wide rollout
 
 ## Phase Details
@@ -124,11 +124,13 @@ Plans:
   2. List/grid items have stagger animation effects
   3. Interactive elements use spring physics for natural feel
   4. All animations respect prefers-reduced-motion (disabled or reduced)
-**Plans**: 2 plans in 2 waves
+**Plans**: 4 plans in 3 waves
 
 Plans:
-- [ ] 35-01-PLAN.md - Animation tokens and stagger system foundation (Wave 1)
-- [ ] 35-02-PLAN.md - Apply animation tokens to core components (Wave 2)
+- [x] 35-01-PLAN.md - Animation tokens and stagger system foundation (Wave 1)
+- [x] 35-02-PLAN.md - Button, Card, Switch with animation tokens (Wave 2)
+- [x] 35-03-PLAN.md - Badge, Tabs, Accordion with animation tokens (Wave 2)
+- [x] 35-04-PLAN.md - Device list stagger animations (Wave 3)
 
 ---
 
@@ -160,10 +162,10 @@ Plans:
 | 32. Action Components | 3/3 | Complete | 2026-02-04 |
 | 33. Dialog Patterns | 3/3 | Complete | 2026-02-04 |
 | 34. Data Table | 4/4 | Complete | 2026-02-05 |
-| 35. Micro-interactions | 0/2 | Planned | - |
+| 35. Micro-interactions | 4/4 | Complete | 2026-02-05 |
 | 36. Application Integration | 0/3 | Not started | - |
 
-**Total:** 16/21 plans (76%)
+**Total:** 20/24 plans (83%)
 
 ---
 
@@ -179,5 +181,6 @@ Plans:
 *Phase 34 planned: 2026-02-04*
 *Phase 34 completed: 2026-02-05*
 *Phase 35 planned: 2026-02-05*
+*Phase 35 completed: 2026-02-05*
 *Milestone: v4.0 Advanced UI Components*
 *Requirements coverage: 55/55 (100%)*

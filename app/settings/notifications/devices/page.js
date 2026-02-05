@@ -168,14 +168,19 @@ export default function DeviceManagementPage() {
         </Card>
       ) : (
         <div className="space-y-3" data-testid="device-list">
-          {devices.map(device => (
-            <DeviceListItem
+          {devices.map((device, index) => (
+            <div
               key={device.tokenKey}
-              device={device}
-              isCurrentDevice={device.token === currentToken}
-              onUpdate={handleDeviceUpdate}
-              onRemove={handleDeviceRemove}
-            />
+              className="stagger-item"
+              style={{ '--stagger-index': index }}
+            >
+              <DeviceListItem
+                device={device}
+                isCurrentDevice={device.token === currentToken}
+                onUpdate={handleDeviceUpdate}
+                onRemove={handleDeviceRemove}
+              />
+            </div>
           ))}
         </div>
       )}

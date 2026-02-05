@@ -2,17 +2,17 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-03)
+See: .planning/PROJECT.md (updated 2026-02-05)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Milestone v4.0 Advanced UI Components — Phase 36 Application Integration
+**Current focus:** v4.0 Advanced UI Components shipped. Ready for next milestone.
 
 ## Current Position
 
-Phase: 36 of 36 (Application Integration) — COMPLETE
-Plan: 03 of 03 complete
-Status: Phase 36 complete - v4.0 Advanced UI milestone finished
-Last activity: 2026-02-05 — Completed 36-03-PLAN.md (Accessibility Audit & Consistency Check)
+Phase: 36 of 36 complete
+Plan: All complete
+Status: v4.0 milestone SHIPPED
+Last activity: 2026-02-05 — v4.0 milestone archived
 
 Progress: [████████████████████████] 100% (24/24 plans)
 
@@ -40,51 +40,20 @@ Progress: [███████████████████████
 
 Decisions are logged in PROJECT.md Key Decisions table.
 
-Key patterns from previous milestones:
-- CVA for type-safe component variants (including compound variants)
-- Radix UI for accessible interactive components
-- Namespace component pattern (Card.Header, Button.Icon, Tabs.List, Accordion.Item, Sheet.Content, RightClickMenu.Item)
-- cn() pattern for Tailwind class composition
-- Sheet open/onOpenChange API for uncontrolled mode support (vs Modal isOpen/onClose)
+Key patterns from v4.0:
+- Namespace component pattern (Tabs.List, Accordion.Item, Sheet.Content, RightClickMenu.Item)
 - cmdk Dialog pattern for Command Palette with fuzzy search
 - Global keyboard shortcut handler with e.preventDefault() for Cmd+K/Ctrl+K
 - VisuallyHidden pattern for accessible dialog title/description
-- Per-user Firebase preferences at users/${userId} path
-- TabsContext pattern for child-to-parent state communication (indicator positioning)
-- Hover trigger mode via wrapper div with onMouseEnter/onMouseLeave (Popover)
-- Responsive position switching (max-md:fixed + md:static) for mobile-bottom/desktop-top tabs
-- Content slot pattern for wrapper components (scheduleContent, manualContent, historyContent)
-- Radix CSS variables for height animation (--radix-accordion-content-height)
-- getMobileQuickActions pattern for device-aware mobile navigation (priority: stove > thermostat > lights)
-- useContextMenuLongPress hook separate from useLongPress (single trigger vs repeat)
-- Smart focus management for confirmation dialogs (Cancel for danger, Confirm for default)
-- Loading state protection pattern (blocks ESC and backdrop click)
-- Render prop pattern for form fields in modals (FormModal children)
-- Hybrid validation timing (onBlur + onChange after error) per CONTEXT.md
-- Shake animation for validation error feedback (data-field attribute selector)
-- Deprecation pattern: @deprecated JSDoc + console.warn once in useEffect (dev only)
+- useContextMenuLongPress hook (500ms threshold) for mobile context menu
 - TanStack Table useReactTable pattern with getCoreRowModel and getSortedRowModel
 - aria-sort three-state cycle (asc -> desc -> none) for sortable table headers
-- CVA variants for table density (compact/default/relaxed row heights)
-- Checkbox stopPropagation pattern to prevent row click conflicts
-- Debounced search input (300ms) for performance optimization
-- Controlled/uncontrolled state pattern for row selection
-- ARIA live regions for screen reader announcements (selection, pagination)
-- Page number ellipsis algorithm (max 5 visible pages)
-- Roving tabindex pattern for keyboard navigation (first row tabIndex=0, others -1)
-- DataTableRow component pattern for expandable rows
-- Horizontal scroll detection with fade gradient indicator
-- Expansion content skipping via data-expansion-row attribute
+- Roving tabindex pattern for keyboard navigation
 - CSS animation tokens in @theme block (--duration-*, --ease-*, --stagger-*)
 - Stagger animation via calc() with --stagger-index custom property
 - Reduced motion: selective :not() exclusions preserve functional animations
-- Spring easing (--ease-spring-subtle) for polished indicator movement in Tabs
-- Stagger wrapper div pattern for animating third-party components (DeviceListItem)
 - DeviceCard contextMenuItems prop for declarative context menu
-- RightClickMenu wrapper pattern for device cards with long-press mobile support
-- Button.Icon quick actions pattern with conditional visibility based on device state
-- AxeDevtools client wrapper pattern for runtime accessibility auditing (dev only)
-- CopyUrlButton accessible sub-component pattern with aria-label
+- Button.Icon quick actions pattern with conditional visibility
 
 ### Pending Todos
 
@@ -96,7 +65,7 @@ Key patterns from previous milestones:
 
 ### Blockers/Concerns
 
-None — v4.0 progressing well.
+None — v4.0 complete.
 
 **Known Tech Debt:**
 - Label component not exported from barrel (low impact)
@@ -118,7 +87,7 @@ None — v4.0 progressing well.
 
 ## Session Continuity
 
-Last session: 2026-02-05 15:56 UTC
-Stopped at: Completed 36-03-PLAN.md (Accessibility Audit & Consistency Check)
+Last session: 2026-02-05
+Stopped at: v4.0 milestone archived and shipped
 Resume file: None
-Next step: v4.0 Advanced UI milestone complete. Ready for next milestone or deployment.
+Next step: Run `/gsd:new-milestone` to start next milestone

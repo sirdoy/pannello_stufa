@@ -10,10 +10,10 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v3.2 (shipped 2026-02-03)
-**Status:** Production-ready with weather display and dashboard customization
+**Version:** v4.0 (shipped 2026-02-05)
+**Status:** Production-ready with advanced UI components
 
-**Shipped Capabilities (v1.0 + v2.0 + v3.0 + v3.1 + v3.2):**
+**Shipped Capabilities (v1.0 + v2.0 + v3.0 + v3.1 + v3.2 + v4.0):**
 - ✅ Push notification system with token persistence and multi-device support
 - ✅ Admin dashboard with delivery metrics and 7-day trends
 - ✅ User preferences with type toggles, DND hours, rate limiting
@@ -38,6 +38,13 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✅ **Location settings** (city autocomplete, geolocation with iOS PWA handling, Firebase persistence)
 - ✅ **Dashboard customization** (card reorder/hide, per-user Firebase preferences)
 - ✅ **Dynamic home page** (renders cards in user's saved order with registry pattern)
+- ✅ **Advanced UI components** (12 new: Popover, Tabs, Accordion, Sheet, RightClickMenu, CommandPalette, Kbd, ConfirmationDialog, FormModal, DataTable, DataTableToolbar, DataTableRow)
+- ✅ **Command Palette (Cmd+K)** with fuzzy search and device commands
+- ✅ **Context Menu on all device cards** (right-click desktop, long-press mobile)
+- ✅ **Quick actions on device cards** (power toggle, temperature/brightness controls)
+- ✅ **Full-featured DataTable** (sorting, filtering, pagination, row expansion, keyboard navigation)
+- ✅ **CSS animation system** (duration/ease/stagger tokens with reduced motion support)
+- ✅ **419+ component tests** for v4.0 components
 
 **Operational Setup Required:**
 - Cron webhook configuration for health monitoring (1-min frequency)
@@ -198,26 +205,94 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ **INFRA-03**: Location settings in Firebase RTDB — v3.2 (Phase 27)
 - ✓ **INFRA-04**: Geolocation 10-second timeout — v3.2 (Phase 25)
 
+**v4.0 Advanced UI Components (Shipped 2026-02-05):**
+
+**Tabs:**
+- ✓ **TABS-01**: User can switch between tabs using click/tap — v4.0 (Phase 30)
+- ✓ **TABS-02**: User can navigate tabs with arrow keys — v4.0 (Phase 30)
+- ✓ **TABS-03**: Active tab is visually distinct with focus indicator — v4.0 (Phase 30)
+- ✓ **TABS-04**: Screen reader announces tab role and selection state — v4.0 (Phase 30)
+- ✓ **TABS-05**: Tabs support horizontal and vertical orientation — v4.0 (Phase 30)
+
+**Accordion:**
+- ✓ **ACCR-01**: User can expand/collapse sections by clicking header — v4.0 (Phase 31)
+- ✓ **ACCR-02**: User can toggle sections with Enter/Space keys — v4.0 (Phase 31)
+- ✓ **ACCR-03**: Expanded state communicated via aria-expanded — v4.0 (Phase 31)
+- ✓ **ACCR-04**: Accordion supports single-open and multiple-open modes — v4.0 (Phase 31)
+- ✓ **ACCR-05**: Collapse/expand has smooth height animation — v4.0 (Phase 31)
+
+**Data Table:**
+- ✓ **DTBL-01**: User can sort columns by clicking header — v4.0 (Phase 34)
+- ✓ **DTBL-02**: Sort direction indicated visually (asc/desc icons) — v4.0 (Phase 34)
+- ✓ **DTBL-03**: User can select rows via checkbox — v4.0 (Phase 34)
+- ✓ **DTBL-04**: User can navigate cells with arrow keys — v4.0 (Phase 34)
+- ✓ **DTBL-05**: User can filter columns via filter controls — v4.0 (Phase 34)
+- ✓ **DTBL-06**: User can paginate large datasets — v4.0 (Phase 34)
+- ✓ **DTBL-07**: User can expand rows to see details — v4.0 (Phase 34)
+- ✓ **DTBL-08**: Screen reader announces sort state and selection — v4.0 (Phase 34)
+- ✓ **DTBL-09**: Table is responsive (horizontal scroll on mobile) — v4.0 (Phase 34)
+
+**Command Palette:**
+- ✓ **CMDK-01**: User can open palette with Cmd+K (Mac) or Ctrl+K (Windows) — v4.0 (Phase 32)
+- ✓ **CMDK-02**: User can search commands with fuzzy matching — v4.0 (Phase 32)
+- ✓ **CMDK-03**: User can navigate results with arrow keys — v4.0 (Phase 32)
+- ✓ **CMDK-04**: User can execute command with Enter — v4.0 (Phase 32)
+- ✓ **CMDK-06**: Escape closes palette and returns focus — v4.0 (Phase 32)
+
+**Context Menu:**
+- ✓ **CTXM-01**: User can open menu via right-click on desktop — v4.0 (Phase 32)
+- ✓ **CTXM-02**: User can open menu via long-press on mobile — v4.0 (Phase 32)
+- ✓ **CTXM-03**: User can navigate menu items with arrow keys — v4.0 (Phase 32)
+- ✓ **CTXM-04**: User can select item with Enter — v4.0 (Phase 32)
+- ✓ **CTXM-05**: Escape closes menu — v4.0 (Phase 32)
+- ✓ **CTXM-06**: Menu positions within viewport (collision detection) — v4.0 (Phase 32)
+
+**Popover:**
+- ✓ **POPV-01**: User can open popover by clicking trigger — v4.0 (Phase 30)
+- ✓ **POPV-02**: Popover positions automatically (top/bottom/left/right) — v4.0 (Phase 30)
+- ✓ **POPV-03**: Click outside closes popover — v4.0 (Phase 30)
+- ✓ **POPV-04**: Escape closes popover — v4.0 (Phase 30)
+- ✓ **POPV-05**: Focus trapped within popover when open — v4.0 (Phase 30)
+
+**Sheet/Drawer:**
+- ✓ **SHEE-01**: Sheet slides in from edge (bottom/right) — v4.0 (Phase 31)
+- ✓ **SHEE-02**: Backdrop appears and click closes sheet — v4.0 (Phase 31)
+- ✓ **SHEE-03**: Escape closes sheet — v4.0 (Phase 31)
+- ✓ **SHEE-04**: Focus trapped within sheet — v4.0 (Phase 31)
+- ✓ **SHEE-05**: Focus returns to trigger on close — v4.0 (Phase 31)
+
+**Dialog Patterns:**
+- ✓ **DLGC-01**: Confirmation dialog has cancel/confirm buttons — v4.0 (Phase 33)
+- ✓ **DLGC-02**: Destructive actions use danger styling — v4.0 (Phase 33)
+- ✓ **DLGC-03**: Focus starts on cancel button (safe default) — v4.0 (Phase 33)
+- ✓ **DLGF-01**: Form modal integrates with form validation — v4.0 (Phase 33)
+- ✓ **DLGF-02**: Form modal shows loading state during submit — v4.0 (Phase 33)
+- ✓ **DLGF-03**: Form modal displays validation errors inline — v4.0 (Phase 33)
+
+**Micro-interactions:**
+- ✓ **ANIM-01**: Components use polished CSS transitions (ease curves) — v4.0 (Phase 35)
+- ✓ **ANIM-02**: Stagger effects on list/grid items — v4.0 (Phase 35)
+- ✓ **ANIM-03**: Spring physics for interactive elements — v4.0 (Phase 35)
+- ✓ **ANIM-04**: Reduced motion respected (prefers-reduced-motion) — v4.0 (Phase 35)
+
+**Quick Actions:**
+- ✓ **QACT-01**: Device cards have visible quick action icon buttons — v4.0 (Phase 36)
+- ✓ **QACT-02**: Device cards support context menu on right-click/long-press — v4.0 (Phase 36)
+- ✓ **QACT-03**: Quick actions are consistent across all device types — v4.0 (Phase 36)
+
+**Application Integration:**
+- ✓ **APPL-01**: Tabs used on thermostat page (Schedule/Manual/History) — v4.0 (Phase 36)
+- ✓ **APPL-02**: Accordion used for expandable device details — v4.0 (Phase 36)
+- ✓ **APPL-03**: Data Table used for notification history — v4.0 (Phase 36)
+- ✓ **APPL-04**: Command Palette accessible from any page — v4.0 (Phase 36)
+- ✓ **APPL-05**: Context Menu on all device cards — v4.0 (Phase 36)
+- ✓ **APPL-06**: Sheet used for mobile-friendly forms — v4.0 (Phase 36)
+- ✓ **APPL-07**: Confirmation Dialog for destructive actions — v4.0 (Phase 36)
+- ✓ **APPL-08**: All pages use new components consistently — v4.0 (Phase 36)
+
 ### Active
 
-**Current Milestone: v4.0 Advanced UI Components**
-
-**Goal:** Add advanced UI components to the design system (Tabs, Accordion, Data Table, Command Palette, Context Menu, Popover, Sheet, Dialogs) with micro-interactions and apply them across all application pages.
-
-**Target features:**
-- Tabs/TabGroup component for organized content sections
-- Accordion/Collapsible for expandable device details
-- Data Table for interactive history, logs, schedules
-- Command Palette (⌘K) for power user navigation
-- Context Menu for contextual device actions
-- Popover/Dropdown for device options menus
-- Sheet/Drawer for mobile-friendly bottom modals
-- Confirmation Dialog and Form Modal patterns
-- Quick actions on device cards
-- Status details with expandable views
-- Micro-interactions (animations, transitions, visual feedback)
-
-**Strategy:** Build each component as Server Component (JSX) where possible, apply immediately across codebase before moving to next component.
+No active requirements. Run `/gsd:new-milestone` to start next milestone.
 
 ### Out of Scope
 
@@ -241,8 +316,17 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Auth0 per autenticazione
 - Service Worker (Serwist) per offline capability
 - Multi-device smart home control (stufa, termostato, luci)
-- CVA + Radix UI design system (25+ components)
+- CVA + Radix UI design system (37+ components)
 - ~104,000 lines JavaScript
+
+**v4.0 Milestone (2026-02-04 → 2026-02-05):**
+- 7 phases executed (24 plans total)
+- 55/55 requirements satisfied (100%)
+- 12 new advanced UI components (Popover, Tabs, Accordion, Sheet, RightClickMenu, CommandPalette, Kbd, ConfirmationDialog, FormModal, DataTable, DataTableToolbar, DataTableRow)
+- Command Palette with fuzzy search and device commands
+- Context menus on all device cards with quick actions
+- CSS animation token system with reduced motion support
+- 419+ new component tests
 
 **v3.2 Milestone (2026-02-02 → 2026-02-03):**
 - 5 phases executed (13 plans total)
@@ -322,4 +406,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Deployment**: Vercel (current hosting platform)
 
 ---
-*Last updated: 2026-02-03 after v4.0 milestone started (Advanced UI Components)*
+*Last updated: 2026-02-05 after v4.0 milestone completed (Advanced UI Components)*

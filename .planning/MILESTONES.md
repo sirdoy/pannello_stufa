@@ -4,6 +4,42 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 
 ---
 
+## v4.0 Advanced UI Components (Shipped: 2026-02-05)
+
+**Delivered:** 12 advanced UI components (Popover, Tabs, Accordion, Sheet, RightClickMenu, CommandPalette, Kbd, ConfirmationDialog, FormModal, DataTable, DataTableToolbar, DataTableRow) with CSS animation system and application-wide integration including quick actions on all device cards.
+
+**Phases completed:** 30-36 (24 plans total)
+
+**Key accomplishments:**
+
+- Foundation UI components: Popover with CVA variants, Tabs compound component with sliding indicator, applied to thermostat page
+- Expandable components: Accordion with single/multiple modes, Sheet sliding panels for mobile-friendly forms
+- Action components: RightClickMenu with mobile long-press, CommandPalette (Cmd+K) with fuzzy search and device commands
+- Dialog patterns: ConfirmationDialog with danger variant, FormModal with React Hook Form integration
+- Full-featured DataTable: TanStack Table with sorting, filtering, pagination, row expansion, keyboard navigation
+- CSS animation token system: Duration/ease/stagger tokens, reduced motion accessibility support
+- Application integration: Quick actions on all device cards, context menus, axe-core accessibility auditing
+
+**Stats:**
+
+- 24 plans executed across 7 phases
+- 55/55 v4.0 requirements satisfied (100%)
+- 419+ component tests
+- 2 days from phase 30 start to completion (2026-02-04 → 2026-02-05)
+
+**Git range:** `feat(30-01)` → `docs(36)`
+
+**Archives:**
+- [Roadmap](milestones/v4.0-ROADMAP.md)
+- [Requirements](milestones/v4.0-REQUIREMENTS.md)
+- [Audit](milestones/v4.0-MILESTONE-AUDIT.md)
+
+**Tech debt:** None accumulated during v4.0.
+
+**What's next:** Advanced UI components complete. Design system now has all major component patterns. Consider v4.1 for advanced features (nested submenus, swipe gestures) or v5.0 for new feature work.
+
+---
+
 ## v3.2 Dashboard Customization & Weather (Shipped: 2026-02-03)
 
 **Delivered:** Weather display with Open-Meteo API and dashboard customization allowing users to personalize their home page card order and visibility.

@@ -5,6 +5,7 @@ import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 import Button from '@/app/components/ui/Button';
 import Tabs from '@/app/components/ui/Tabs';
+import Badge from '@/app/components/ui/Badge';
 import StoveTab from './components/tabs/StoveTab';
 import NetatmoTab from './components/tabs/NetatmoTab';
 import HueTab from './components/tabs/HueTab';
@@ -16,6 +17,9 @@ export default function ApiDebugPage() {
   const [activeTab, setActiveTab] = useState('stove');
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [lastRefresh, setLastRefresh] = useState(null);
+
+  // Detect environment
+  const isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
 
   // Read tab from URL hash on mount
   useEffect(() => {
@@ -66,9 +70,14 @@ export default function ApiDebugPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <Heading level={1} variant="ember">
-              🔌 API Debug Console
-            </Heading>
+            <div className="flex items-center gap-3">
+              <Heading level={1} variant="ember">
+                🔌 API Debug Console
+              </Heading>
+              <Badge variant={isDev ? 'ocean' : 'ember'} size="sm">
+                {isDev ? 'DEV' : 'PROD'}
+              </Badge>
+            </div>
             <Text variant="secondary" className="mt-1">
               Test all system components and monitor live API responses
             </Text>

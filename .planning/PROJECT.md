@@ -8,6 +8,17 @@ PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (co
 
 I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
+## Current Milestone: v5.0 TypeScript Migration
+
+**Goal:** Migrate entire codebase from JavaScript to TypeScript with pragmatic approach — convert all .js/.jsx to .ts/.tsx, use `any` where needed, focus on completing migration.
+
+**Target features:**
+- TypeScript configuration with allowJs for gradual migration
+- All 572 JS/JSX files converted to TS/TSX
+- Basic type definitions for core utilities and shared types
+- Tests migrated alongside source files
+- Build passing with TypeScript compiler
+
 ## Current State
 
 **Version:** v4.0 (shipped 2026-02-05)
@@ -60,7 +71,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Recharts for visualization
 - CVA (class-variance-authority) for type-safe component variants
 - Radix UI primitives for accessible interactions
-- ~104,000 lines JavaScript
+- ~104,000 lines JavaScript → TypeScript (v5.0 migration)
 
 ## Requirements
 
@@ -292,7 +303,9 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-No active requirements. Run `/gsd:new-milestone` to start next milestone.
+**v5.0 TypeScript Migration (In Progress):**
+
+Requirements to be defined after research/scoping phase.
 
 ### Out of Scope
 
@@ -406,4 +419,4 @@ No active requirements. Run `/gsd:new-milestone` to start next milestone.
 - **Deployment**: Vercel (current hosting platform)
 
 ---
-*Last updated: 2026-02-05 after v4.0 milestone completed (Advanced UI Components)*
+*Last updated: 2026-02-05 after v5.0 milestone started (TypeScript Migration)*

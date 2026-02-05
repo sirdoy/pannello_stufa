@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-05)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v4.0 Advanced UI Components shipped. Ready for next milestone.
+**Current focus:** v5.0 TypeScript Migration — convert 572 JS/JSX files to TS/TSX
 
 ## Current Position
 
-Phase: 36 of 36 complete
-Plan: All complete
-Status: v4.0 milestone SHIPPED
-Last activity: 2026-02-05 — v4.0 milestone archived
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-05 — Milestone v5.0 started
 
-Progress: [████████████████████████] 100% (24/24 plans)
+Progress: [░░░░░░░░░░░░░░░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -40,7 +40,7 @@ Progress: [███████████████████████
 
 Decisions are logged in PROJECT.md Key Decisions table.
 
-Key patterns from v4.0:
+Key patterns from previous milestones preserved for v5.0 migration:
 - Namespace component pattern (Tabs.List, Accordion.Item, Sheet.Content, RightClickMenu.Item)
 - cmdk Dialog pattern for Command Palette with fuzzy search
 - Global keyboard shortcut handler with e.preventDefault() for Cmd+K/Ctrl+K
@@ -65,7 +65,7 @@ Key patterns from v4.0:
 
 ### Blockers/Concerns
 
-None — v4.0 complete.
+None — defining v5.0 requirements.
 
 **Known Tech Debt:**
 - Label component not exported from barrel (low impact)
@@ -88,6 +88,6 @@ None — v4.0 complete.
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: v4.0 milestone archived and shipped
+Stopped at: Defining v5.0 requirements
 Resume file: None
-Next step: Run `/gsd:new-milestone` to start next milestone
+Next step: Complete requirements definition and create roadmap

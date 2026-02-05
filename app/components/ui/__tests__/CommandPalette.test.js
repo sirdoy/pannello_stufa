@@ -860,4 +860,125 @@ describe('CommandPaletteProvider', () => {
       });
     });
   });
+
+  describe('Device Commands Integration', () => {
+    it('renders stove commands when searching', async () => {
+      const user = userEvent.setup();
+      render(
+        <CommandPaletteProvider>
+          <div>App Content</div>
+        </CommandPaletteProvider>
+      );
+
+      // Open palette
+      act(() => {
+        fireEvent.keyDown(document, { key: 'k', metaKey: true });
+      });
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText('Type a command or search...')).toBeInTheDocument();
+      });
+
+      // Type in search
+      const input = screen.getByPlaceholderText('Type a command or search...');
+      await user.type(input, 'accendi');
+
+      expect(screen.getByText('Accendi Stufa')).toBeInTheDocument();
+    });
+
+    it('calls onSelect when device command is executed', async () => {
+      const mockOnSelect = jest.fn();
+      const commands = [
+        {
+          heading: 'Stufa',
+          items: [
+            { id: 'stove-ignite', label: 'Accendi Stufa', onSelect: mockOnSelect },
+          ],
+        },
+      ];
+
+      render(
+        <CommandPalette open={true} onOpenChange={() => {}} commands={commands} />
+      );
+
+      const item = screen.getByText('Accendi Stufa');
+      await userEvent.click(item);
+
+      expect(mockOnSelect).toHaveBeenCalled();
+    });
+
+    it('displays keyboard shortcuts when provided', async () => {
+      render(
+        <CommandPaletteProvider>
+          <div>App Content</div>
+        </CommandPaletteProvider>
+      );
+
+      // Open palette
+      act(() => {
+        fireEvent.keyDown(document, { key: 'k', metaKey: true });
+      });
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText('Type a command or search...')).toBeInTheDocument();
+      });
+
+      // Check for keyboard shortcuts (from device commands)
+      expect(screen.getByText('⌘⇧S')).toBeInTheDocument(); // Stove ignite shortcut
+      expect(screen.getByText('⌘⇧L')).toBeInTheDocument(); // Lights all on shortcut
+    });
+
+    it('filters device commands by search term', async () => {
+      const user = userEvent.setup();
+      render(
+        <CommandPaletteProvider>
+          <div>App Content</div>
+        </CommandPaletteProvider>
+      );
+
+      // Open palette
+      act(() => {
+        fireEvent.keyDown(document, { key: 'k', metaKey: true });
+      });
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText('Type a command or search...')).toBeInTheDocument();
+      });
+
+      // Search for "luci"
+      const input = screen.getByPlaceholderText('Type a command or search...');
+      await user.type(input, 'luci');
+
+      // Lights commands should be visible
+      expect(screen.getByText('Accendi Tutte le Luci')).toBeInTheDocument();
+      expect(screen.getByText('Spegni Tutte le Luci')).toBeInTheDocument();
+    });
+
+    it('renders all command groups with headings', async () => {
+      render(
+        <CommandPaletteProvider>
+          <div>App Content</div>
+        </CommandPaletteProvider>
+      );
+
+      // Open palette
+      act(() => {
+        fireEvent.keyDown(document, { key: 'k', metaKey: true });
+      });
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText('Type a command or search...')).toBeInTheDocument();
+      });
+
+      // Check for group headings (use data-value attribute to identify group containers)
+      const groups = document.querySelectorAll('[cmdk-group]');
+      const groupNames = Array.from(groups).map(g => g.getAttribute('data-value'));
+
+      expect(groupNames).toContain('Navigazione');
+      expect(groupNames).toContain('Stufa');
+      expect(groupNames).toContain('Termostato');
+      expect(groupNames).toContain('Luci');
+      expect(groupNames).toContain('Azioni');
+    });
+  });
 });

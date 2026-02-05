@@ -25,15 +25,15 @@ Requirements for Advanced UI Components milestone. Each maps to roadmap phases.
 
 ### Data Table
 
-- [ ] **DTBL-01**: User can sort columns by clicking header
-- [ ] **DTBL-02**: Sort direction indicated visually (asc/desc icons)
-- [ ] **DTBL-03**: User can select rows via checkbox
-- [ ] **DTBL-04**: User can navigate cells with arrow keys
-- [ ] **DTBL-05**: User can filter columns via filter controls
-- [ ] **DTBL-06**: User can paginate large datasets
-- [ ] **DTBL-07**: User can expand rows to see details
-- [ ] **DTBL-08**: Screen reader announces sort state and selection
-- [ ] **DTBL-09**: Table is responsive (horizontal scroll on mobile)
+- [x] **DTBL-01**: User can sort columns by clicking header
+- [x] **DTBL-02**: Sort direction indicated visually (asc/desc icons)
+- [x] **DTBL-03**: User can select rows via checkbox
+- [x] **DTBL-04**: User can navigate cells with arrow keys
+- [x] **DTBL-05**: User can filter columns via filter controls
+- [x] **DTBL-06**: User can paginate large datasets
+- [x] **DTBL-07**: User can expand rows to see details
+- [x] **DTBL-08**: Screen reader announces sort state and selection
+- [x] **DTBL-09**: Table is responsive (horizontal scroll on mobile)
 
 ### Command Palette
 
@@ -80,27 +80,27 @@ Requirements for Advanced UI Components milestone. Each maps to roadmap phases.
 
 ### Micro-interactions
 
-- [ ] **ANIM-01**: Components use polished CSS transitions (ease curves)
-- [ ] **ANIM-02**: Stagger effects on list/grid items
-- [ ] **ANIM-03**: Spring physics for interactive elements
-- [ ] **ANIM-04**: Reduced motion respected (prefers-reduced-motion)
+- [x] **ANIM-01**: Components use polished CSS transitions (ease curves)
+- [x] **ANIM-02**: Stagger effects on list/grid items
+- [x] **ANIM-03**: Spring physics for interactive elements
+- [x] **ANIM-04**: Reduced motion respected (prefers-reduced-motion)
 
 ### Quick Actions
 
-- [ ] **QACT-01**: Device cards have visible quick action icon buttons
-- [ ] **QACT-02**: Device cards support context menu on right-click/long-press
-- [ ] **QACT-03**: Quick actions are consistent across all device types
+- [x] **QACT-01**: Device cards have visible quick action icon buttons
+- [x] **QACT-02**: Device cards support context menu on right-click/long-press
+- [x] **QACT-03**: Quick actions are consistent across all device types
 
 ### Application
 
-- [ ] **APPL-01**: Tabs used on thermostat page (Schedule/Manual/History)
-- [ ] **APPL-02**: Accordion used for expandable device details
-- [ ] **APPL-03**: Data Table used for notification history
-- [ ] **APPL-04**: Command Palette accessible from any page
-- [ ] **APPL-05**: Context Menu on all device cards
-- [ ] **APPL-06**: Sheet used for mobile-friendly forms
-- [ ] **APPL-07**: Confirmation Dialog for destructive actions
-- [ ] **APPL-08**: All pages use new components consistently
+- [x] **APPL-01**: Tabs used on thermostat page (Schedule/Manual/History)
+- [x] **APPL-02**: Accordion used for expandable device details
+- [x] **APPL-03**: Data Table used for notification history
+- [x] **APPL-04**: Command Palette accessible from any page
+- [x] **APPL-05**: Context Menu on all device cards
+- [x] **APPL-06**: Sheet used for mobile-friendly forms
+- [x] **APPL-07**: Confirmation Dialog for destructive actions
+- [x] **APPL-08**: All pages use new components consistently
 
 ## Future Requirements
 
@@ -147,15 +147,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ACCR-03 | Phase 31 | Complete |
 | ACCR-04 | Phase 31 | Complete |
 | ACCR-05 | Phase 31 | Complete |
-| DTBL-01 | Phase 34 | Pending |
-| DTBL-02 | Phase 34 | Pending |
-| DTBL-03 | Phase 34 | Pending |
-| DTBL-04 | Phase 34 | Pending |
-| DTBL-05 | Phase 34 | Pending |
-| DTBL-06 | Phase 34 | Pending |
-| DTBL-07 | Phase 34 | Pending |
-| DTBL-08 | Phase 34 | Pending |
-| DTBL-09 | Phase 34 | Pending |
+| DTBL-01 | Phase 34 | Complete |
+| DTBL-02 | Phase 34 | Complete |
+| DTBL-03 | Phase 34 | Complete |
+| DTBL-04 | Phase 34 | Complete |
+| DTBL-05 | Phase 34 | Complete |
+| DTBL-06 | Phase 34 | Complete |
+| DTBL-07 | Phase 34 | Complete |
+| DTBL-08 | Phase 34 | Complete |
+| DTBL-09 | Phase 34 | Complete |
 | CMDK-01 | Phase 32 | Complete |
 | CMDK-02 | Phase 32 | Complete |
 | CMDK-03 | Phase 32 | Complete |
@@ -184,21 +184,21 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DLGF-01 | Phase 33 | Complete |
 | DLGF-02 | Phase 33 | Complete |
 | DLGF-03 | Phase 33 | Complete |
-| ANIM-01 | Phase 35 | Pending |
-| ANIM-02 | Phase 35 | Pending |
-| ANIM-03 | Phase 35 | Pending |
-| ANIM-04 | Phase 35 | Pending |
-| QACT-01 | Phase 36 | Pending |
-| QACT-02 | Phase 36 | Pending |
-| QACT-03 | Phase 36 | Pending |
-| APPL-01 | Phase 36 | Pending |
-| APPL-02 | Phase 36 | Pending |
-| APPL-03 | Phase 36 | Pending |
-| APPL-04 | Phase 36 | Pending |
-| APPL-05 | Phase 36 | Pending |
-| APPL-06 | Phase 36 | Pending |
-| APPL-07 | Phase 36 | Pending |
-| APPL-08 | Phase 36 | Pending |
+| ANIM-01 | Phase 35 | Complete |
+| ANIM-02 | Phase 35 | Complete |
+| ANIM-03 | Phase 35 | Complete |
+| ANIM-04 | Phase 35 | Complete |
+| QACT-01 | Phase 36 | Complete |
+| QACT-02 | Phase 36 | Complete |
+| QACT-03 | Phase 36 | Complete |
+| APPL-01 | Phase 36 | Complete |
+| APPL-02 | Phase 36 | Complete |
+| APPL-03 | Phase 36 | Complete |
+| APPL-04 | Phase 36 | Complete |
+| APPL-05 | Phase 36 | Complete |
+| APPL-06 | Phase 36 | Complete |
+| APPL-07 | Phase 36 | Complete |
+| APPL-08 | Phase 36 | Complete |
 
 **Coverage:**
 - v4.0 requirements: 55 total
@@ -207,4 +207,5 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-03*
-*Last updated: 2026-02-04 after Phase 33 completion*
+*Last updated: 2026-02-05 after Phase 36 completion*
+*All v4.0 requirements complete*

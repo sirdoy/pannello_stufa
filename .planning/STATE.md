@@ -103,10 +103,11 @@ None — v4.0 progressing well.
 | 007 | Thermostat active devices list | 2026-02-04 | ecfdd3d | [007-thermostat-active-devices-list](./quick/007-thermostat-active-devices-list/) |
 | 008 | Active devices filter only | 2026-02-04 | 66b2bb6 | [008-active-devices-filter-only](./quick/008-active-devices-filter-only/) |
 | 010 | Stove-thermostat PID automation | 2026-02-04 | 707fcb1 | [010-stove-thermostat-pid-automation](./quick/010-stove-thermostat-pid-automation/) |
+| 011 | Settings tabs unification | 2026-02-05 | 601c3da | [011-refactor-settings-tabs-unification](./quick/011-refactor-settings-tabs-unification/) |
 
 ## Session Continuity
 
-Last session: 2026-02-05 08:02 UTC
-Stopped at: Completed 34-03-PLAN.md (Row expansion, keyboard navigation)
+Last session: 2026-02-05 08:07 UTC
+Stopped at: Completed quick task 011 (Settings tabs unification)
 Resume file: None
 Next step: /gsd:execute-phase 34 plan 04 for DataTable Demo

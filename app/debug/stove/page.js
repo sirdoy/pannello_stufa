@@ -309,17 +309,11 @@ export default function StoveDebugPage() {
                       <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
                         {getExternalUrl('/api/stove/ignite')}
                       </code>
-                      <button
+                      <CopyUrlButton
                         onClick={() => copyUrlToClipboard('/api/stove/ignite')}
-                        className="flex-shrink-0 p-1 hover:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-200 hover:bg-slate-700 rounded transition-colors"
-                        title="Copy external URL"
-                      >
-                        {copiedUrl === '/api/stove/ignite' ? (
-                          <Check className="w-3 h-3 text-green-500" />
-                        ) : (
-                          <Copy className="w-3 h-3 text-slate-400 [html:not(.dark)_&]:text-slate-500" />
-                        )}
-                      </button>
+                        isCopied={copiedUrl === '/api/stove/ignite'}
+                        label="Copia URL Ignite"
+                      />
                     </div>
                   </div>
                   <Button
@@ -350,17 +344,11 @@ export default function StoveDebugPage() {
                       <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
                         {getExternalUrl('/api/stove/shutdown')}
                       </code>
-                      <button
+                      <CopyUrlButton
                         onClick={() => copyUrlToClipboard('/api/stove/shutdown')}
-                        className="flex-shrink-0 p-1 hover:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-200 hover:bg-slate-700 rounded transition-colors"
-                        title="Copy external URL"
-                      >
-                        {copiedUrl === '/api/stove/shutdown' ? (
-                          <Check className="w-3 h-3 text-green-500" />
-                        ) : (
-                          <Copy className="w-3 h-3 text-slate-400 [html:not(.dark)_&]:text-slate-500" />
-                        )}
-                      </button>
+                        isCopied={copiedUrl === '/api/stove/shutdown'}
+                        label="Copia URL Shutdown"
+                      />
                     </div>
                   </div>
                   <Button
@@ -390,17 +378,11 @@ export default function StoveDebugPage() {
                       <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
                         {getExternalUrl('/api/stove/setPower')}
                       </code>
-                      <button
+                      <CopyUrlButton
                         onClick={() => copyUrlToClipboard('/api/stove/setPower')}
-                        className="flex-shrink-0 p-1 hover:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-200 hover:bg-slate-700 rounded transition-colors"
-                        title="Copy external URL"
-                      >
-                        {copiedUrl === '/api/stove/setPower' ? (
-                          <Check className="w-3 h-3 text-green-500" />
-                        ) : (
-                          <Copy className="w-3 h-3 text-slate-400 [html:not(.dark)_&]:text-slate-500" />
-                        )}
-                      </button>
+                        isCopied={copiedUrl === '/api/stove/setPower'}
+                        label="Copia URL Set Power"
+                      />
                     </div>
                     <div className="mt-2 flex items-center gap-3">
                       <Text as="label" size="sm" variant="secondary">
@@ -444,17 +426,11 @@ export default function StoveDebugPage() {
                       <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
                         {getExternalUrl('/api/stove/setFan')}
                       </code>
-                      <button
+                      <CopyUrlButton
                         onClick={() => copyUrlToClipboard('/api/stove/setFan')}
-                        className="flex-shrink-0 p-1 hover:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-200 hover:bg-slate-700 rounded transition-colors"
-                        title="Copy external URL"
-                      >
-                        {copiedUrl === '/api/stove/setFan' ? (
-                          <Check className="w-3 h-3 text-green-500" />
-                        ) : (
-                          <Copy className="w-3 h-3 text-slate-400 [html:not(.dark)_&]:text-slate-500" />
-                        )}
-                      </button>
+                        isCopied={copiedUrl === '/api/stove/setFan'}
+                        label="Copia URL Set Fan"
+                      />
                     </div>
                     <div className="mt-2 flex items-center gap-3">
                       <Text as="label" size="sm" variant="secondary">
@@ -498,17 +474,11 @@ export default function StoveDebugPage() {
                       <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
                         {getExternalUrl('/api/stove/setWaterTemperature')}
                       </code>
-                      <button
+                      <CopyUrlButton
                         onClick={() => copyUrlToClipboard('/api/stove/setWaterTemperature')}
-                        className="flex-shrink-0 p-1 hover:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-200 hover:bg-slate-700 rounded transition-colors"
-                        title="Copy external URL"
-                      >
-                        {copiedUrl === '/api/stove/setWaterTemperature' ? (
-                          <Check className="w-3 h-3 text-green-500" />
-                        ) : (
-                          <Copy className="w-3 h-3 text-slate-400 [html:not(.dark)_&]:text-slate-500" />
-                        )}
-                      </button>
+                        isCopied={copiedUrl === '/api/stove/setWaterTemperature'}
+                        label="Copia URL Set Water Temperature"
+                      />
                     </div>
                     <div className="mt-2 flex items-center gap-3">
                       <Text as="label" size="sm" variant="secondary">
@@ -547,6 +517,22 @@ export default function StoveDebugPage() {
 }
 
 /**
+ * Copy URL button component with proper accessibility
+ */
+function CopyUrlButton({ onClick, isCopied, label = "Copia URL" }) {
+  return (
+    <Button.Icon
+      icon={isCopied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+      onClick={onClick}
+      variant="ghost"
+      size="sm"
+      aria-label={isCopied ? "URL copiato" : label}
+      className={isCopied ? "text-green-500" : "text-slate-400 [html:not(.dark)_&]:text-slate-500"}
+    />
+  );
+}
+
+/**
  * Component to display a GET endpoint with its response
  */
 function EndpointDisplay({ title, endpoint, externalUrl, response, loading, onRefresh, onCopyUrl, isCopied }) {
@@ -559,17 +545,7 @@ function EndpointDisplay({ title, endpoint, externalUrl, response, loading, onRe
             <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
               {externalUrl}
             </code>
-            <button
-              onClick={onCopyUrl}
-              className="flex-shrink-0 p-1 hover:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-200 hover:bg-slate-700 rounded transition-colors"
-              title="Copy external URL"
-            >
-              {isCopied ? (
-                <Check className="w-3 h-3 text-green-500" />
-              ) : (
-                <Copy className="w-3 h-3 text-slate-400 [html:not(.dark)_&]:text-slate-500" />
-              )}
-            </button>
+            <CopyUrlButton onClick={onCopyUrl} isCopied={isCopied} label={`Copia URL ${title}`} />
           </div>
         </div>
         <Button onClick={onRefresh} loading={loading} size="sm">

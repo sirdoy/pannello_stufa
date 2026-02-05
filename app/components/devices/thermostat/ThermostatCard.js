@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { Power, Plus, Minus, Calendar, Home, Snowflake, Settings, RefreshCw } from 'lucide-react';
 import { NETATMO_ROUTES } from '@/lib/routes';
 import { getNetatmoAuthUrl } from '@/lib/netatmoCredentials';
 import { cn } from '@/lib/utils/cn';
@@ -436,6 +437,26 @@ export default function ThermostatCard() {
     ...(hasLowBattery ? [{ icon: hasCriticalBattery ? '🪫' : '🔋', label: 'Batteria', value: `${lowBatteryModules.length} bassa` }] : []),
   ] : [];
 
+  // Context menu items for extended actions
+  const thermostatContextMenuItems = connected ? [
+    {
+      icon: <Settings className="w-4 h-4" />,
+      label: 'Impostazioni Termostato',
+      onSelect: () => router.push('/thermostat/settings'),
+    },
+    {
+      icon: <Calendar className="w-4 h-4" />,
+      label: 'Programmazioni',
+      onSelect: () => router.push('/thermostat/schedules'),
+    },
+    { separator: true },
+    {
+      icon: <RefreshCw className="w-4 h-4" />,
+      label: 'Aggiorna',
+      onSelect: handleRefresh,
+    },
+  ] : [];
+
   return (
     <DeviceCard
       icon="🌡️"
@@ -451,6 +472,7 @@ export default function ThermostatCard() {
       banners={banners}
       infoBoxes={infoBoxes}
       infoBoxesTitle="Informazioni"
+      contextMenuItems={thermostatContextMenuItems}
     >
       {/* Active Devices List - Shows only actively heating rooms */}
       {activeRooms.length > 0 && (
@@ -644,6 +666,52 @@ export default function ThermostatCard() {
                     </div>
                   )}
                 </div>
+                )}
+
+                {/* Quick Actions Bar - Icon buttons */}
+                {!selectedRoom.isOffline && (
+                  <div className="flex items-center justify-center gap-3 mt-4">
+                    {/* Temperature Adjustment */}
+                    {selectedRoom.setpoint && (
+                      <div className="flex items-center gap-1 px-2 py-1 rounded-xl bg-slate-800/50 border border-slate-700/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                        <Button.Icon
+                          icon={<Minus className="w-4 h-4" />}
+                          aria-label="Diminuisci Temperatura"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleTemperatureChange(selectedRoom.id, selectedRoom.setpoint - 0.5)}
+                          disabled={refreshing || selectedRoom.setpoint <= 15}
+                        />
+                        <span className="text-sm font-bold text-ocean-400 [html:not(.dark)_&]:text-ocean-600 w-10 text-center">{selectedRoom.setpoint}°</span>
+                        <Button.Icon
+                          icon={<Plus className="w-4 h-4" />}
+                          aria-label="Aumenta Temperatura"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleTemperatureChange(selectedRoom.id, selectedRoom.setpoint + 0.5)}
+                          disabled={refreshing || selectedRoom.setpoint >= 30}
+                        />
+                      </div>
+                    )}
+
+                    {/* Mode Quick Cycle */}
+                    <Button.Icon
+                      icon={mode === 'schedule' ? <Calendar className="w-5 h-5" /> :
+                            mode === 'away' ? <Home className="w-5 h-5" /> :
+                            mode === 'hg' ? <Snowflake className="w-5 h-5" /> :
+                            <Power className="w-5 h-5" />}
+                      aria-label={`Modalita attuale: ${mode}. Clicca per cambiare`}
+                      variant="subtle"
+                      size="md"
+                      onClick={() => {
+                        // Cycle: schedule -> away -> hg -> off -> schedule
+                        const modes = ['schedule', 'away', 'hg', 'off'];
+                        const nextIndex = (modes.indexOf(mode) + 1) % modes.length;
+                        handleModeChange(modes[nextIndex]);
+                      }}
+                      disabled={refreshing}
+                    />
+                  </div>
                 )}
 
                 {/* Quick temperature controls - Ember Noir */}

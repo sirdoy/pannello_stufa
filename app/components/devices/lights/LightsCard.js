@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { Power, Sun, Palette, Settings, RefreshCw } from 'lucide-react';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
 import RoomSelector from '../../ui/RoomSelector';
@@ -810,6 +811,26 @@ export default function LightsCard() {
 
   const adaptive = adaptiveClasses[contrastMode];
 
+  // Context menu items for extended actions
+  const lightsContextMenuItems = connected ? [
+    {
+      icon: <Settings className="w-4 h-4" />,
+      label: 'Impostazioni Luci',
+      onSelect: () => router.push('/lights/settings'),
+    },
+    {
+      icon: <Palette className="w-4 h-4" />,
+      label: 'Controllo Colore',
+      onSelect: () => router.push('/lights'),
+    },
+    { separator: true },
+    {
+      icon: <RefreshCw className="w-4 h-4" />,
+      label: 'Aggiorna',
+      onSelect: handleRefresh,
+    },
+  ] : [];
+
   return (
     <DeviceCard
       icon="💡"
@@ -827,6 +848,7 @@ export default function LightsCard() {
       infoBoxes={infoBoxes}
       infoBoxesTitle="Informazioni"
       footerActions={footerActions}
+      contextMenuItems={lightsContextMenuItems}
     >
       {/* Quick All-House Control */}
       {hasAnyLights && (
@@ -905,6 +927,39 @@ export default function LightsCard() {
         selectedRoomId={selectedRoomId}
         onChange={(e) => setSelectedRoomId(e.target.value)}
       />
+
+      {/* Quick Actions Bar */}
+      {selectedRoom && (
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <Button.Icon
+            icon={<Power className="w-5 h-5" />}
+            aria-label={isRoomOn ? "Spegni Luci" : "Accendi Luci"}
+            variant={isRoomOn ? 'ember' : 'subtle'}
+            size="md"
+            onClick={() => handleRoomToggle(selectedRoomGroupedLightId, !isRoomOn)}
+            disabled={refreshing || !selectedRoomGroupedLightId}
+          />
+          {isRoomOn && (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800/50 border border-slate-700/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+              <Sun className="w-4 h-4 text-warning-400 [html:not(.dark)_&]:text-warning-600" />
+              <Slider
+                value={localBrightness !== null ? localBrightness : avgBrightness}
+                onChange={(value) => setLocalBrightness(value)}
+                onValueCommit={(value) => {
+                  handleBrightnessChange(selectedRoomGroupedLightId, value.toString());
+                  setLocalBrightness(null);
+                }}
+                min={1}
+                max={100}
+                variant="ember"
+                className="w-24"
+                aria-label="Luminosita"
+                disabled={refreshing || !selectedRoomGroupedLightId}
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Selected Room Controls */}
       {selectedRoom ? (

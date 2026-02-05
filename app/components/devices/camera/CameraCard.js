@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Camera, Video, Image, Activity, Settings } from 'lucide-react';
 import { CAMERA_ROUTES, NETATMO_ROUTES } from '@/lib/routes';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
@@ -230,6 +230,26 @@ export default function CameraCard() {
     );
   }
 
+  // Context menu items for extended actions
+  const cameraContextMenuItems = [
+    {
+      icon: <Activity className="w-4 h-4" />,
+      label: 'Eventi Camera',
+      onSelect: () => router.push('/camera/events'),
+    },
+    {
+      icon: <Settings className="w-4 h-4" />,
+      label: 'Impostazioni',
+      onSelect: () => router.push('/camera/settings'),
+    },
+    { separator: true },
+    {
+      icon: <RefreshCw className="w-4 h-4" />,
+      label: 'Aggiorna',
+      onSelect: handleRefresh,
+    },
+  ];
+
   return (
     <DeviceCard
       icon="📹"
@@ -245,7 +265,29 @@ export default function CameraCard() {
           onClick: () => router.push('/camera'),
         },
       ]}
+      contextMenuItems={cameraContextMenuItems}
     >
+      {/* Quick Actions */}
+      <div className="flex items-center justify-center gap-3 mb-4">
+        <Button.Icon
+          icon={<Camera className="w-5 h-5" />}
+          aria-label="Cattura Snapshot"
+          variant="subtle"
+          size="md"
+          onClick={() => fetchSnapshot(selectedCameraId)}
+          disabled={snapshotLoading || !selectedCameraId}
+        />
+        {selectedCamera?.status === 'on' && (
+          <Button.Icon
+            icon={isLiveMode ? <Image className="w-5 h-5" /> : <Video className="w-5 h-5" />}
+            aria-label={isLiveMode ? "Mostra Snapshot" : "Mostra Live"}
+            variant="subtle"
+            size="md"
+            onClick={() => setIsLiveMode(!isLiveMode)}
+          />
+        )}
+      </div>
+
       {/* Camera selector if multiple */}
       {cameras.length > 1 && (
         <div className="flex gap-2 mb-4 overflow-x-auto pb-2 -mx-2 px-2">

@@ -661,12 +661,16 @@ async function runPidAutomationIfEnabled(isOn, currentPowerLevel, semiManual, sc
       return { skipped: true, reason: 'room_not_found' };
     }
 
-    // Get measured temperature and setpoint
+    // Get measured temperature and manual setpoint from config
     const measured = targetRoom.temperature;
-    const setpoint = targetRoom.setpoint;
+    const setpoint = pidConfig.manualSetpoint ?? 20; // Use manual setpoint from config
 
-    if (typeof measured !== 'number' || typeof setpoint !== 'number') {
+    if (typeof measured !== 'number') {
       return { skipped: true, reason: 'no_temperature_data' };
+    }
+
+    if (typeof setpoint !== 'number' || setpoint < 15 || setpoint > 25) {
+      return { skipped: true, reason: 'invalid_setpoint' };
     }
 
     // Read PID state from Firebase (integral, prevError, lastRun)

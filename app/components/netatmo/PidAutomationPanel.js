@@ -49,9 +49,117 @@ function RoomSelector({ rooms, selectedRoomId, onChange, disabled }) {
 }
 
 /**
+ * Manual Setpoint Input Component
+ */
+function ManualSetpointInput({ value, onChange, disabled }) {
+  const MIN_TEMP = 15;
+  const MAX_TEMP = 25;
+  const STEP = 0.5;
+
+  const handleSliderChange = (e) => {
+    onChange(parseFloat(e.target.value));
+  };
+
+  const handleInputChange = (e) => {
+    const newValue = parseFloat(e.target.value);
+    if (!isNaN(newValue) && newValue >= MIN_TEMP && newValue <= MAX_TEMP) {
+      onChange(newValue);
+    }
+  };
+
+  const handleIncrement = () => {
+    const newValue = Math.min(MAX_TEMP, value + STEP);
+    onChange(newValue);
+  };
+
+  const handleDecrement = () => {
+    const newValue = Math.max(MIN_TEMP, value - STEP);
+    onChange(newValue);
+  };
+
+  return (
+    <div className="space-y-4">
+      <Text weight="semibold" size="sm">
+        Setpoint target
+      </Text>
+
+      {/* Slider */}
+      <div className="px-1">
+        <input
+          type="range"
+          min={MIN_TEMP}
+          max={MAX_TEMP}
+          step={STEP}
+          value={value}
+          onChange={handleSliderChange}
+          disabled={disabled}
+          className="w-full h-2 rounded-lg appearance-none cursor-pointer
+                     bg-slate-700 [html:not(.dark)_&]:bg-slate-200
+                     accent-ember-500
+                     disabled:opacity-50 disabled:cursor-not-allowed"
+        />
+        <div className="flex justify-between mt-1">
+          <Text variant="tertiary" size="xs">{MIN_TEMP}°C</Text>
+          <Text variant="tertiary" size="xs">{MAX_TEMP}°C</Text>
+        </div>
+      </div>
+
+      {/* Numeric input with +/- buttons */}
+      <div className="flex items-center justify-center gap-3">
+        <button
+          type="button"
+          onClick={handleDecrement}
+          disabled={disabled || value <= MIN_TEMP}
+          className="w-10 h-10 rounded-full bg-slate-700/60 [html:not(.dark)_&]:bg-slate-200
+                     text-white [html:not(.dark)_&]:text-slate-900
+                     hover:bg-slate-600 [html:not(.dark)_&]:hover:bg-slate-300
+                     disabled:opacity-50 disabled:cursor-not-allowed
+                     transition-colors text-xl font-bold"
+        >
+          −
+        </button>
+        <div className="relative">
+          <input
+            type="number"
+            min={MIN_TEMP}
+            max={MAX_TEMP}
+            step={STEP}
+            value={value}
+            onChange={handleInputChange}
+            disabled={disabled}
+            className="w-24 px-3 py-2 text-center text-2xl font-bold rounded-xl
+                       bg-slate-800/60 [html:not(.dark)_&]:bg-white/80
+                       border border-ember-500/50
+                       text-ember-400 [html:not(.dark)_&]:text-ember-600
+                       focus:ring-2 focus:ring-ember-500/50
+                       disabled:opacity-50 disabled:cursor-not-allowed
+                       [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          />
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-ember-400/60 text-sm">
+            °C
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={handleIncrement}
+          disabled={disabled || value >= MAX_TEMP}
+          className="w-10 h-10 rounded-full bg-slate-700/60 [html:not(.dark)_&]:bg-slate-200
+                     text-white [html:not(.dark)_&]:text-slate-900
+                     hover:bg-slate-600 [html:not(.dark)_&]:hover:bg-slate-300
+                     disabled:opacity-50 disabled:cursor-not-allowed
+                     transition-colors text-xl font-bold"
+        >
+          +
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Temperature Display Component
  */
-function TemperatureDisplay({ room }) {
+function TemperatureDisplay({ room, manualSetpoint }) {
   if (!room) {
     return (
       <div className="p-4 rounded-xl bg-white/[0.04] [html:not(.dark)_&]:bg-white/[0.06] backdrop-blur-sm border border-white/10">
@@ -61,6 +169,9 @@ function TemperatureDisplay({ room }) {
       </div>
     );
   }
+
+  // Use manual setpoint for calculations
+  const targetSetpoint = manualSetpoint;
 
   return (
     <div className="p-4 rounded-xl bg-white/[0.04] [html:not(.dark)_&]:bg-white/[0.06] backdrop-blur-sm border border-white/10">
@@ -72,21 +183,28 @@ function TemperatureDisplay({ room }) {
           </Text>
         </div>
         <div className="text-right">
-          <Text variant="secondary" size="sm">Setpoint termostato</Text>
+          <Text variant="secondary" size="sm">Target PID</Text>
           <Text weight="bold" className="text-2xl text-ember-400 [html:not(.dark)_&]:text-ember-600">
-            {room.setpoint?.toFixed(1) || '--'}°C
+            {targetSetpoint?.toFixed(1) || '--'}°C
           </Text>
         </div>
       </div>
-      {room.temperature && room.setpoint && (
+      {room.temperature && targetSetpoint && (
         <div className="mt-3 pt-3 border-t border-white/10">
           <Text variant="tertiary" size="xs">
-            Differenza: {(room.setpoint - room.temperature).toFixed(1)}°C
-            {room.temperature < room.setpoint
+            Differenza: {(targetSetpoint - room.temperature).toFixed(1)}°C
+            {room.temperature < targetSetpoint
               ? ' (sotto target - aumenta potenza)'
-              : room.temperature > room.setpoint
+              : room.temperature > targetSetpoint
                 ? ' (sopra target - diminuisce potenza)'
                 : ' (a target)'}
+          </Text>
+        </div>
+      )}
+      {room.setpoint && room.setpoint !== targetSetpoint && (
+        <div className="mt-2">
+          <Text variant="tertiary" size="xs">
+            Setpoint Netatmo: {room.setpoint.toFixed(1)}°C (ignorato)
           </Text>
         </div>
       )}
@@ -195,6 +313,7 @@ export default function PidAutomationPanel() {
   // Config state
   const [enabled, setEnabled] = useState(false);
   const [targetRoomId, setTargetRoomId] = useState(null);
+  const [manualSetpoint, setManualSetpoint] = useState(20);
   const [kp, setKp] = useState(0.5);
   const [ki, setKi] = useState(0.1);
   const [kd, setKd] = useState(0.05);
@@ -231,6 +350,7 @@ export default function PidAutomationPanel() {
         const unsubscribe = subscribeToPidConfig(user.sub, (config) => {
           setEnabled(config.enabled);
           setTargetRoomId(config.targetRoomId);
+          setManualSetpoint(config.manualSetpoint ?? 20);
           setKp(config.kp ?? 0.5);
           setKi(config.ki ?? 0.1);
           setKd(config.kd ?? 0.05);
@@ -264,6 +384,12 @@ export default function PidAutomationPanel() {
     setSuccess(false);
   };
 
+  const handleSetpointChange = (value) => {
+    setManualSetpoint(value);
+    setHasChanges(true);
+    setSuccess(false);
+  };
+
   const handleGainChange = (gain, value) => {
     if (gain === 'kp') setKp(value);
     else if (gain === 'ki') setKi(value);
@@ -289,6 +415,7 @@ export default function PidAutomationPanel() {
       await setPidConfig(user.sub, {
         enabled,
         targetRoomId,
+        manualSetpoint,
         kp,
         ki,
         kd,
@@ -310,6 +437,7 @@ export default function PidAutomationPanel() {
     if (originalConfig) {
       setEnabled(originalConfig.enabled);
       setTargetRoomId(originalConfig.targetRoomId);
+      setManualSetpoint(originalConfig.manualSetpoint ?? 20);
       setKp(originalConfig.kp ?? 0.5);
       setKi(originalConfig.ki ?? 0.1);
       setKd(originalConfig.kd ?? 0.05);
@@ -335,7 +463,7 @@ export default function PidAutomationPanel() {
     return (
       <Card variant="glass" className="p-6">
         <Text variant="secondary">
-          Devi essere autenticato per configurare l'automazione PID.
+          Devi essere autenticato per configurare l&apos;automazione PID.
         </Text>
       </Card>
     );
@@ -404,9 +532,18 @@ export default function PidAutomationPanel() {
             />
           </div>
 
+          {/* Manual Setpoint Input */}
+          <div className="mb-6 p-4 rounded-xl bg-white/[0.04] [html:not(.dark)_&]:bg-white/[0.06] backdrop-blur-sm border border-ember-500/30">
+            <ManualSetpointInput
+              value={manualSetpoint}
+              onChange={handleSetpointChange}
+              disabled={saving}
+            />
+          </div>
+
           {/* Temperature Display */}
           <div className="mb-6">
-            <TemperatureDisplay room={selectedRoom} />
+            <TemperatureDisplay room={selectedRoom} manualSetpoint={manualSetpoint} />
           </div>
 
           {/* Advanced Settings */}
@@ -462,7 +599,7 @@ export default function PidAutomationPanel() {
           </li>
           <li>
             <Text variant="tertiary" size="xs">
-              - Confronta con il setpoint del termostato
+              - Confronta con il setpoint target impostato manualmente
             </Text>
           </li>
           <li>
@@ -472,7 +609,7 @@ export default function PidAutomationPanel() {
           </li>
           <li>
             <Text variant="tertiary" size="xs">
-              - L'algoritmo PID evita oscillazioni eccessive
+              - L&apos;algoritmo PID evita oscillazioni eccessive
             </Text>
           </li>
         </ul>

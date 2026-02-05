@@ -15,7 +15,8 @@ const switchTrackVariants = cva(
   // Base classes
   [
     'relative inline-flex items-center rounded-full',
-    'transition-all duration-250',
+    'transition-all duration-[var(--duration-smooth)]',
+    'ease-[var(--ease-move)]',
     'outline-none cursor-pointer',
     // Focus ring - ember glow
     'focus-visible:ring-2 focus-visible:ring-ember-500/50',
@@ -64,7 +65,8 @@ const switchThumbVariants = cva(
   // Base classes - all sizes share these
   [
     'block rounded-full bg-white shadow-lg',
-    'transition-transform duration-250',
+    'transition-transform duration-[var(--duration-smooth)]',
+    'ease-[var(--ease-spring)]',
     // Start position (unchecked)
     'translate-x-0.5',
   ],

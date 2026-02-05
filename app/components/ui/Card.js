@@ -17,7 +17,9 @@ export const cardVariants = cva(
   // Base classes
   [
     'rounded-2xl',
-    'transition-all duration-300',
+    'transition-all',
+    'duration-[var(--duration-smooth)]',
+    'ease-[var(--ease-move)]',
     'relative',
     'overflow-hidden',
   ],
@@ -51,6 +53,7 @@ export const cardVariants = cva(
         true: [
           'hover:shadow-card-hover hover:-translate-y-0.5 cursor-pointer',
           'hover:border-white/[0.1]',
+          'hover:ease-[var(--ease-spring-subtle)]',
           '[html:not(.dark)_&]:hover:shadow-[0_12px_32px_rgba(0,0,0,0.15)]',
           '[html:not(.dark)_&]:hover:border-black/[0.1]',
         ],

@@ -208,17 +208,19 @@ describe('Switch', () => {
   });
 
   describe('Animation', () => {
-    it('has 250ms transition duration class on track', () => {
+    it('has animation token duration class on track', () => {
       render(<Switch label="Animated" />);
       const switchElement = screen.getByRole('switch');
-      expect(switchElement).toHaveClass('duration-250');
+      expect(switchElement).toHaveClass('duration-[var(--duration-smooth)]');
+      expect(switchElement).toHaveClass('ease-[var(--ease-move)]');
     });
 
-    it('has 250ms transition duration class on thumb', () => {
+    it('has animation token duration and spring easing on thumb', () => {
       const { container } = render(<Switch label="Animated" />);
       // The thumb is the span inside the switch
       const thumb = container.querySelector('[data-state]')?.querySelector('span');
-      expect(thumb).toHaveClass('duration-250');
+      expect(thumb).toHaveClass('duration-[var(--duration-smooth)]');
+      expect(thumb).toHaveClass('ease-[var(--ease-spring)]');
     });
   });
 

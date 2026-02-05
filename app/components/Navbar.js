@@ -136,7 +136,7 @@ export default function Navbar() {
     };
   }, [mobileMenuOpen]);
 
-  // Fetch user info and device preferences
+  // Fetch user info and device config
   const fetchedRef = useRef(false);
   useEffect(() => {
     if (fetchedRef.current) return;
@@ -149,10 +149,16 @@ export default function Navbar() {
         const userData = await userRes.json();
         if (userData.user) setUser(userData.user);
 
-        const prefsRes = await fetch('/api/devices/preferences');
-        if (prefsRes.ok) {
-          const prefsData = await prefsRes.json();
-          setDevicePreferences(prefsData.preferences || {});
+        // Use unified config endpoint
+        const configRes = await fetch('/api/devices/config');
+        if (configRes.ok) {
+          const configData = await configRes.json();
+          // Convert enabledDevices array to preferences object for navbar
+          const prefs = {};
+          (configData.enabledDevices || []).forEach(id => {
+            prefs[id] = true;
+          });
+          setDevicePreferences(prefs);
         }
       } catch (error) {
         console.error('Errore nel recupero dati:', error);

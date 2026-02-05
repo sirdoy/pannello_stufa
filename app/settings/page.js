@@ -3,11 +3,10 @@
 /**
  * Unified Settings Page
  *
- * Consolidates 4 settings pages into a single tabbed interface:
+ * Consolidates settings into a single tabbed interface:
  * - Theme (Aspetto)
  * - Location (Posizione)
- * - Dashboard (Personalizza home)
- * - Devices (Gestione Dispositivi)
+ * - Devices (Dispositivi) - unified device + dashboard settings
  *
  * Complex pages (Notifications, Thermostat) remain separate.
  */
@@ -21,14 +20,13 @@ import SettingsLayout from '@/app/components/SettingsLayout';
 import Tabs from '@/app/components/ui/Tabs';
 import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
-import Switch from '@/app/components/ui/Switch';
 import Toggle from '@/app/components/ui/Toggle';
 import Banner from '@/app/components/ui/Banner';
 import Badge from '@/app/components/ui/Badge';
 import Skeleton from '@/app/components/ui/Skeleton';
 import { Heading, Text } from '@/app/components/ui';
 import LocationSearch from '@/app/components/LocationSearch';
-import { Palette, MapPin, LayoutGrid, Smartphone, ChevronUp, ChevronDown } from 'lucide-react';
+import { Palette, MapPin, Smartphone, ChevronUp, ChevronDown } from 'lucide-react';
 
 /**
  * ThemeContent - Extracted from theme/page.js
@@ -343,258 +341,109 @@ function LocationContent() {
   );
 }
 
-/**
- * DashboardContent - Extracted from dashboard/page.js
- */
-function DashboardContent() {
-  const { user } = useUser();
-  const [cards, setCards] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState(null);
-
-  // Fetch current preferences on mount
-  useEffect(() => {
-    const fetchPreferences = async () => {
-      try {
-        const response = await fetch('/api/config/dashboard');
-        if (response.ok) {
-          const data = await response.json();
-          setCards(data.preferences.cardOrder || []);
-        }
-      } catch (err) {
-        console.error('Error fetching dashboard preferences:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (user) {
-      fetchPreferences();
-    } else {
-      setIsLoading(false);
-    }
-  }, [user]);
-
-  // Move card up in the list
-  const moveUp = (index) => {
-    if (index === 0) return;
-    setCards((prev) => {
-      const newCards = [...prev];
-      [newCards[index - 1], newCards[index]] = [
-        newCards[index],
-        newCards[index - 1],
-      ];
-      return newCards;
-    });
-  };
-
-  // Move card down in the list
-  const moveDown = (index) => {
-    if (index === cards.length - 1) return;
-    setCards((prev) => {
-      const newCards = [...prev];
-      [newCards[index], newCards[index + 1]] = [
-        newCards[index + 1],
-        newCards[index],
-      ];
-      return newCards;
-    });
-  };
-
-  // Toggle card visibility
-  const toggleVisibility = (index, newVisible) => {
-    setCards((prev) =>
-      prev.map((card, i) =>
-        i === index ? { ...card, visible: newVisible } : card
-      )
-    );
-  };
-
-  // Save preferences to server
-  const handleSave = async () => {
-    setIsSaving(true);
-    setSaveMessage(null);
-
-    try {
-      const response = await fetch('/api/config/dashboard', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cardOrder: cards }),
-      });
-
-      if (response.ok) {
-        setSaveMessage({ type: 'success', text: 'Preferenze salvate!' });
-        setTimeout(() => setSaveMessage(null), 3000);
-      } else {
-        const data = await response.json();
-        setSaveMessage({
-          type: 'error',
-          text: data.error || 'Errore durante il salvataggio',
-        });
-      }
-    } catch (err) {
-      setSaveMessage({ type: 'error', text: 'Errore di connessione' });
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  if (isLoading) {
-    return <Skeleton className="h-64 w-full" />;
-  }
-
-  return (
-    <div className="space-y-6 mt-6">
-      {/* Card list */}
-      <div className="space-y-3">
-        {cards.map((card, index) => (
-          <Card
-            key={card.id}
-            variant="glass"
-            padding={false}
-            className={`p-4 ${card.visible ? '' : 'opacity-60'}`}
-          >
-            <div className="flex items-center justify-between">
-              {/* Left: Icon + Label + Badge */}
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{card.icon}</span>
-                <div className="flex items-center gap-2">
-                  <Text className="font-medium">{card.label}</Text>
-                  {!card.visible && (
-                    <Badge variant="neutral" size="sm">
-                      Nascosto
-                    </Badge>
-                  )}
-                </div>
-              </div>
-
-              {/* Right: Switch + Up/Down buttons */}
-              <div className="flex items-center gap-4">
-                <Switch
-                  checked={card.visible}
-                  onCheckedChange={(checked) => toggleVisibility(index, checked)}
-                  variant="ember"
-                  size="sm"
-                  label={`Mostra ${card.label}`}
-                />
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    iconOnly
-                    disabled={index === 0}
-                    onClick={() => moveUp(index)}
-                    aria-label={`Sposta ${card.label} su`}
-                  >
-                    <ChevronUp size={20} />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    iconOnly
-                    disabled={index === cards.length - 1}
-                    onClick={() => moveDown(index)}
-                    aria-label={`Sposta ${card.label} giù`}
-                  >
-                    <ChevronDown size={20} />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      {/* Save section */}
-      <div className="flex justify-end mt-6">
-        <Button
-          variant="ember"
-          onClick={handleSave}
-          loading={isSaving}
-          disabled={isSaving}
-        >
-          Salva
-        </Button>
-      </div>
-
-      {/* Save feedback */}
-      {saveMessage && (
-        <Banner
-          variant={saveMessage.type === 'success' ? 'success' : 'error'}
-          compact
-          className="mt-4"
-        >
-          {saveMessage.text}
-        </Banner>
-      )}
-    </div>
-  );
-}
 
 /**
- * DevicesContent - Extracted from devices/page.js
+ * UnifiedDevicesContent - Unified device settings
+ * Single toggle controls visibility (navbar for hardware, homepage for all)
+ * Order controls homepage card position
  */
-function DevicesContent() {
+function UnifiedDevicesContent() {
   const { user } = useUser();
   const router = useRouter();
   const [devices, setDevices] = useState([]);
-  const [preferences, setPreferences] = useState({});
+  const [originalDevices, setOriginalDevices] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Load device preferences
+  // Load device config
   useEffect(() => {
     if (!user?.sub) {
       setIsLoading(false);
       return;
     }
 
-    fetchDevicePreferences();
+    fetchDeviceConfig();
   }, [user?.sub]);
 
-  const fetchDevicePreferences = async () => {
+  const fetchDeviceConfig = async () => {
     try {
-      const response = await fetch('/api/devices/preferences');
+      const response = await fetch('/api/devices/config');
 
       if (!response.ok) {
-        throw new Error('Errore nel caricamento delle preferenze');
+        throw new Error('Errore nel caricamento della configurazione');
       }
 
       const data = await response.json();
       setDevices(data.devices);
-      setPreferences(data.preferences);
+      setOriginalDevices(JSON.parse(JSON.stringify(data.devices)));
       setIsLoading(false);
     } catch (error) {
-      console.error('Error fetching device preferences:', error);
+      console.error('Error fetching device config:', error);
       setIsLoading(false);
     }
   };
 
-  // Toggle device
-  const handleToggleDevice = (deviceId) => {
-    const newPreferences = {
-      ...preferences,
-      [deviceId]: !preferences[deviceId],
-    };
-    setPreferences(newPreferences);
-    setHasChanges(true);
-    setSaveSuccess(false);
+  // Check if there are unsaved changes
+  useEffect(() => {
+    const changed = JSON.stringify(devices) !== JSON.stringify(originalDevices);
+    setHasChanges(changed);
+    if (changed) setSaveSuccess(false);
+  }, [devices, originalDevices]);
+
+  // Toggle device visibility
+  const handleToggleVisible = (deviceId) => {
+    setDevices(prev =>
+      prev.map(d =>
+        d.id === deviceId ? { ...d, visible: !d.visible } : d
+      )
+    );
   };
 
-  // Save preferences
+  // Move device up in order
+  const moveUp = (index) => {
+    if (index === 0) return;
+    setDevices(prev => {
+      const newDevices = [...prev];
+      [newDevices[index - 1], newDevices[index]] = [
+        newDevices[index],
+        newDevices[index - 1],
+      ];
+      return newDevices.map((d, i) => ({ ...d, order: i }));
+    });
+  };
+
+  // Move device down in order
+  const moveDown = (index) => {
+    if (index === devices.length - 1) return;
+    setDevices(prev => {
+      const newDevices = [...prev];
+      [newDevices[index], newDevices[index + 1]] = [
+        newDevices[index + 1],
+        newDevices[index],
+      ];
+      return newDevices.map((d, i) => ({ ...d, order: i }));
+    });
+  };
+
+  // Save config
   const handleSave = async () => {
     setIsSaving(true);
 
     try {
-      const response = await fetch('/api/devices/preferences', {
+      const payload = {
+        devices: devices.map(d => ({
+          id: d.id,
+          visible: d.visible,
+          order: d.order,
+        })),
+      };
+
+      const response = await fetch('/api/devices/config', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ preferences }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -602,6 +451,7 @@ function DevicesContent() {
         throw new Error(data.error || 'Errore nel salvataggio');
       }
 
+      setOriginalDevices(JSON.parse(JSON.stringify(devices)));
       setHasChanges(false);
       setSaveSuccess(true);
 
@@ -611,16 +461,16 @@ function DevicesContent() {
       }, 1000);
 
     } catch (error) {
-      console.error('Error saving preferences:', error);
+      console.error('Error saving config:', error);
       alert('Errore nel salvataggio: ' + error.message);
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Reset to defaults
+  // Reset to original
   const handleReset = () => {
-    fetchDevicePreferences();
+    setDevices(JSON.parse(JSON.stringify(originalDevices)));
     setHasChanges(false);
     setSaveSuccess(false);
   };
@@ -633,65 +483,85 @@ function DevicesContent() {
     <div className="space-y-6 mt-6">
       {/* Description */}
       <Text variant="tertiary" className="text-sm sm:text-base">
-        Abilita o disabilita i dispositivi da visualizzare in homepage e nel menu
+        Scegli quali dispositivi mostrare e in che ordine
       </Text>
 
       {/* Success message */}
       {saveSuccess && (
         <Banner variant="success">
-          Preferenze salvate con successo! La pagina verrà aggiornata...
+          Configurazione salvata! La pagina verrà aggiornata...
         </Banner>
       )}
 
-      {/* Info banner */}
-      <Banner
-        variant="info"
-        description="I dispositivi disabilitati non verranno mostrati nella homepage e non appariranno nel menu di navigazione. Puoi abilitarli in qualsiasi momento da questa pagina."
-      />
-
       {/* Devices list */}
-      <Card variant="glass" className="p-6">
-        <Heading level={2} size="lg" weight="semibold" className="mb-4">
-          Dispositivi Disponibili
-        </Heading>
-
-        <div className="space-y-4">
-          {devices.map(device => {
-            const isEnabled = preferences[device.id] === true;
+      <Card variant="glass" className="p-4 sm:p-6">
+        <div className="space-y-3">
+          {devices.map((device, index) => {
+            const isVisible = device.visible;
 
             return (
               <div
                 key={device.id}
-                className={`p-4 rounded-xl border-2 transition-all duration-200 ${
-                  isEnabled
-                    ? 'border-ember-600 [html:not(.dark)_&]:border-ember-400 bg-ember-950/30 [html:not(.dark)_&]:bg-ember-50/50'
-                    : 'border-slate-600 [html:not(.dark)_&]:border-slate-300 bg-white/[0.02] [html:not(.dark)_&]:bg-slate-50/50'
+                className={`p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 ${
+                  isVisible
+                    ? 'border-ember-600/50 [html:not(.dark)_&]:border-ember-300 bg-ember-950/10 [html:not(.dark)_&]:bg-ember-50/30'
+                    : 'border-slate-700/30 [html:not(.dark)_&]:border-slate-200 bg-slate-900/20 [html:not(.dark)_&]:bg-slate-100/50 opacity-60'
                 }`}
               >
-                <div className="flex items-start justify-between gap-4">
-                  {/* Device info */}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <Text className="text-2xl">{device.icon}</Text>
-                      <Heading level={3} size="base" weight="semibold">
-                        {device.name}
-                      </Heading>
-                      {isEnabled && (
-                        <Badge variant="sage" size="sm">Attivo</Badge>
-                      )}
+                <div className="flex items-center justify-between gap-2 sm:gap-4">
+                  {/* Left: Icon + Name + Description + Badges */}
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <span className="text-2xl flex-shrink-0">{device.icon}</span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Text weight="semibold" className="truncate">{device.name}</Text>
+                        {device.isDisplayOnly && (
+                          <Badge variant="ocean" size="sm">solo home</Badge>
+                        )}
+                        {!device.hasHomepageCard && (
+                          <Badge variant="neutral" size="sm">solo menu</Badge>
+                        )}
+                      </div>
+                      <Text variant="tertiary" size="xs" className="hidden sm:block truncate">
+                        {device.description}
+                      </Text>
                     </div>
-                    <Text variant="secondary" size="sm" className="ml-11">
-                      {device.description}
-                    </Text>
                   </div>
 
-                  {/* Toggle component */}
-                  <Toggle
-                    checked={isEnabled}
-                    onChange={() => handleToggleDevice(device.id)}
-                    label={`${isEnabled ? 'Disabilita' : 'Abilita'} ${device.name}`}
-                    size="md"
-                  />
+                  {/* Right: Toggle + Order buttons */}
+                  <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                    {/* Visibility toggle */}
+                    <Toggle
+                      checked={isVisible}
+                      onChange={() => handleToggleVisible(device.id)}
+                      label={`${isVisible ? 'Nascondi' : 'Mostra'} ${device.name}`}
+                      size="md"
+                    />
+
+                    {/* Order buttons */}
+                    <div className="flex items-center gap-0.5">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        iconOnly
+                        disabled={index === 0}
+                        onClick={() => moveUp(index)}
+                        aria-label={`Sposta ${device.name} su`}
+                      >
+                        <ChevronUp size={18} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        iconOnly
+                        disabled={index === devices.length - 1}
+                        onClick={() => moveDown(index)}
+                        aria-label={`Sposta ${device.name} giù`}
+                      >
+                        <ChevronDown size={18} />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             );
@@ -708,7 +578,7 @@ function DevicesContent() {
                 Hai modifiche non salvate
               </Text>
               <Text variant="tertiary" size="xs" className="mt-1">
-                Salva le modifiche per applicarle alla navigazione
+                Salva per applicare le modifiche
               </Text>
             </div>
 
@@ -735,22 +605,34 @@ function DevicesContent() {
       )}
 
       {/* Info card */}
-      <Card variant="glass" className="p-6 bg-ocean-900/10 [html:not(.dark)_&]:bg-ocean-50/50">
+      <Card variant="glass" className="p-4 sm:p-6 bg-ocean-900/10 [html:not(.dark)_&]:bg-ocean-50/50">
         <Heading level={3} size="base" weight="semibold" variant="ocean" className="mb-3">
-          ℹ️ Note
+          ℹ️ Come funziona
         </Heading>
         <ul className="space-y-2">
           <li className="flex gap-2">
             <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
-            <Text as="span" variant="ocean" size="sm">I dispositivi disabilitati non verranno eliminati, potrai riattivarli quando vuoi</Text>
+            <Text as="span" variant="ocean" size="sm">
+              Il toggle controlla la visibilità del dispositivo (menu e homepage)
+            </Text>
           </li>
           <li className="flex gap-2">
             <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
-            <Text as="span" variant="ocean" size="sm">Le modifiche saranno visibili immediatamente dopo il salvataggio</Text>
+            <Text as="span" variant="ocean" size="sm">
+              Usa le frecce per riordinare i dispositivi nella homepage
+            </Text>
           </li>
           <li className="flex gap-2">
             <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
-            <Text as="span" variant="ocean" size="sm">La configurazione è personale e non influisce sugli altri utenti</Text>
+            <Text as="span" variant="ocean" size="sm">
+              <strong>solo home</strong>: il dispositivo appare solo nella homepage (es. Meteo)
+            </Text>
+          </li>
+          <li className="flex gap-2">
+            <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
+            <Text as="span" variant="ocean" size="sm">
+              <strong>solo menu</strong>: il dispositivo appare solo nel menu (es. Sonos)
+            </Text>
           </li>
         </ul>
       </Card>
@@ -798,14 +680,12 @@ function SettingsPageContent() {
         <Tabs.List>
           <Tabs.Trigger value="aspetto" icon={<Palette size={18} />}>Aspetto</Tabs.Trigger>
           <Tabs.Trigger value="posizione" icon={<MapPin size={18} />}>Posizione</Tabs.Trigger>
-          <Tabs.Trigger value="dashboard" icon={<LayoutGrid size={18} />}>Dashboard</Tabs.Trigger>
           <Tabs.Trigger value="dispositivi" icon={<Smartphone size={18} />}>Dispositivi</Tabs.Trigger>
         </Tabs.List>
 
         <Tabs.Content value="aspetto"><ThemeContent /></Tabs.Content>
         <Tabs.Content value="posizione"><LocationContent /></Tabs.Content>
-        <Tabs.Content value="dashboard"><DashboardContent /></Tabs.Content>
-        <Tabs.Content value="dispositivi"><DevicesContent /></Tabs.Content>
+        <Tabs.Content value="dispositivi"><UnifiedDevicesContent /></Tabs.Content>
       </Tabs>
     </SettingsLayout>
   );

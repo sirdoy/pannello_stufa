@@ -5,8 +5,10 @@ import CameraCard from './components/devices/camera/CameraCard';
 import LightsCard from './components/devices/lights/LightsCard';
 import WeatherCardWrapper from './components/devices/weather/WeatherCardWrapper';
 import SandboxToggle from './components/sandbox/SandboxToggle';
-import { adminDbGet } from '@/lib/firebaseAdmin';
-import { DEFAULT_CARD_ORDER } from '@/lib/services/dashboardPreferencesService';
+import {
+  getUnifiedDeviceConfigAdmin,
+  getVisibleDashboardCards,
+} from '@/lib/services/unifiedDeviceConfigService';
 import { Section, Grid, EmptyState } from './components/ui';
 
 export const dynamic = 'force-dynamic';
@@ -33,13 +35,11 @@ export default async function Home() {
   const user = session.user;
   const userId = user.sub;
 
-  // Fetch dashboard preferences server-side
-  const dashboardPath = `users/${userId}/dashboardPreferences`;
-  const preferences = await adminDbGet(dashboardPath);
-  const cardOrder = preferences?.cardOrder || DEFAULT_CARD_ORDER;
+  // Fetch unified device config server-side (with automatic migration)
+  const deviceConfig = await getUnifiedDeviceConfigAdmin(userId);
 
-  // Filter to only visible cards
-  const visibleCards = cardOrder.filter(card => card.visible !== false);
+  // Get visible dashboard cards (enabled && dashboardVisible, sorted by order)
+  const visibleCards = getVisibleDashboardCards(deviceConfig);
 
   return (
     <main>

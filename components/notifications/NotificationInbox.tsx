@@ -34,7 +34,7 @@ export default function NotificationInbox() {
   const [typeFilter, setTypeFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  const isFiltered = typeFilter || statusFilter;
+  const isFiltered = !!(typeFilter || statusFilter);
 
   // Fetch notifications
   const fetchNotifications = useCallback(async (resetList = false) => {

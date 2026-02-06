@@ -957,7 +957,7 @@ export default function StoveCard() {
       )}
 
       {/* Main Status Card - Ember Noir with Context Menu */}
-      <RightClickMenu open={contextMenuOpen} onOpenChange={setContextMenuOpen as any}>
+      <RightClickMenu>
         <RightClickMenu.Trigger asChild>
           <div
             {...longPressBind()}
@@ -1087,7 +1087,7 @@ export default function StoveCard() {
                     <div className="relative">
                       {/* Status Label */}
                       <div className="text-center mb-8 sm:mb-10">
-                        <Heading level={3} size="3xl" weight="bold" className={`${statusInfo.textColor} tracking-tight uppercase font-display`}>
+                        <Heading level={3} size="3xl" className={`${statusInfo.textColor} tracking-tight uppercase font-display font-bold`}>
                           {statusInfo.label}
                         </Heading>
                         {statusInfo.label.toUpperCase() !== status.toUpperCase() && (
@@ -1156,50 +1156,58 @@ export default function StoveCard() {
               {/* Quick Actions Bar - Always visible */}
               <div className="flex items-center justify-center gap-3 mt-4">
                 {/* Power Toggle */}
-                <Button.Icon
-                  icon={<Power className="w-5 h-5" />}
+                <Button
                   aria-label={isAccesa ? "Spegni Stufa" : "Accendi Stufa"}
                   variant={isAccesa ? 'ember' : 'subtle'}
                   size="md"
                   onClick={isAccesa ? handleShutdown : handleIgnite}
                   disabled={loading || (!isAccesa && needsMaintenance)}
-                />
+                  className="p-3"
+                >
+                  <Power className="w-5 h-5" />
+                </Button>
 
                 {/* Power Level Controls (only when stove is in WORK mode) */}
                 {status?.toUpperCase().includes('WORK') && (
                   <div className="flex items-center gap-1 px-2 py-1 rounded-xl bg-slate-800/50 border border-slate-700/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
-                    <Button.Icon
-                      icon={<Minus className="w-4 h-4" />}
+                    <Button
                       aria-label="Diminuisci Potenza"
                       variant="ghost"
                       size="sm"
                       onClick={() => handlePowerChange({ target: { value: (powerLevel - 1).toString() }})}
                       disabled={loading || !powerLevel || powerLevel <= 1}
-                    />
+                      className="p-2"
+                    >
+                      <Minus className="w-4 h-4" />
+                    </Button>
                     <span className="text-sm font-bold text-ember-400 [html:not(.dark)_&]:text-ember-600 w-6 text-center">{powerLevel}</span>
-                    <Button.Icon
-                      icon={<Plus className="w-4 h-4" />}
+                    <Button
                       aria-label="Aumenta Potenza"
                       variant="ghost"
                       size="sm"
                       onClick={() => handlePowerChange({ target: { value: (powerLevel + 1).toString() }})}
                       disabled={loading || !powerLevel || powerLevel >= 5}
-                    />
+                      className="p-2"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
                   </div>
                 )}
 
                 {/* Fan Control (only when stove is in WORK mode) */}
                 {status?.toUpperCase().includes('WORK') && (
-                  <Button.Icon
-                    icon={<Fan className="w-5 h-5" />}
+                  <Button
                     aria-label="Regola Ventola"
                     variant="subtle"
                     size="md"
+                    className="p-3"
                     onClick={() => {
                       // Scroll to fan control section
                       document.querySelector('[data-control="fan"]')?.scrollIntoView({ behavior: 'smooth' });
                     }}
-                  />
+                  >
+                    <Fan className="w-5 h-5" />
+                  </Button>
                 )}
               </div>
             </div>
@@ -1505,16 +1513,16 @@ export default function StoveCard() {
         </RightClickMenu.Trigger>
         <RightClickMenu.Content>
           {stoveContextMenuItems.map((item, index) => (
-            item.separator ? (
+            'separator' in item && item.separator ? (
               <RightClickMenu.Separator key={index} />
             ) : (
               <RightClickMenu.Item
-                key={item.label}
-                icon={item.icon}
-                onSelect={item.onSelect}
-                disabled={item.disabled}
+                key={'label' in item ? item.label : index}
+                icon={'icon' in item ? item.icon : undefined}
+                onSelect={'onSelect' in item ? item.onSelect : undefined}
+                disabled={'disabled' in item ? (item.disabled as boolean) : undefined}
               >
-                {item.label}
+                {'label' in item && item.label}
               </RightClickMenu.Item>
             )
           ))}

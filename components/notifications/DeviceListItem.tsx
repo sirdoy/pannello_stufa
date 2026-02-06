@@ -174,18 +174,17 @@ export default function DeviceListItem({
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
                   placeholder="Nome dispositivo"
-                  size="sm"
                   maxLength={50}
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleSave();
                     if (e.key === 'Escape') handleCancel();
                   }}
-                  className="flex-1"
+                  className="flex-1 text-sm"
                   data-testid="device-name-input"
                 />
                 <Button
-                  variant="primary"
+                  variant="ember"
                   size="sm"
                   onClick={handleSave}
                   disabled={isSaving}

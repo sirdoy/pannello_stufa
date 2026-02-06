@@ -9,6 +9,7 @@ import { downloadHlsVideo } from '@/lib/hlsDownloader';
 
 interface CameraEvent {
   id?: string;
+  camera_id?: string;
   video_id?: string;
   snapshot?: { url?: string };
   type: string;
@@ -55,10 +56,10 @@ export default function EventPreviewModal({ event, camera, onClose }: EventPrevi
   const stripHtml = (html: string | undefined): string | null => html?.replace(/<[^>]*>/g, '') || null;
 
   // Get URLs
-  const snapshotUrl = NETATMO_CAMERA_API.getEventSnapshotUrl(event);
-  const thumbnailUrl = NETATMO_CAMERA_API.getEventVideoThumbnail(event, camera);
-  const videoUrl = NETATMO_CAMERA_API.getEventVideoUrl(event, camera);
-  const downloadUrl = NETATMO_CAMERA_API.getEventVideoDownloadUrl(event, camera);
+  const snapshotUrl = NETATMO_CAMERA_API.getEventSnapshotUrl(event as any);
+  const thumbnailUrl = NETATMO_CAMERA_API.getEventVideoThumbnail(event as any, camera as any);
+  const videoUrl = NETATMO_CAMERA_API.getEventVideoUrl(event as any, camera as any);
+  const downloadUrl = NETATMO_CAMERA_API.getEventVideoDownloadUrl(event as any, camera as any);
 
   // Use thumbnail if available, fallback to snapshot if thumbnail fails
   const previewUrl = useFallback ? snapshotUrl : (thumbnailUrl || snapshotUrl);
@@ -74,10 +75,10 @@ export default function EventPreviewModal({ event, camera, onClose }: EventPrevi
 
     try {
       // Generate filename from event date
-      const date = new Date(event.time * 1000);
+      const date = new Date(Number(event.time) * 1000);
       const filename = `video_${date.toISOString().slice(0, 10)}_${date.toTimeString().slice(0, 5).replace(':', '-')}`;
 
-      await downloadHlsVideo(downloadUrl, filename, (percent, message) => {
+      await downloadHlsVideo(downloadUrl, filename, (percent: number, message?: string) => {
         setDownloadProgress(message || `${percent}%`);
       });
 
@@ -106,17 +107,17 @@ export default function EventPreviewModal({ event, camera, onClose }: EventPrevi
           <div className="flex items-center gap-3">
             <span className="text-2xl">
               {event.sub_type
-                ? NETATMO_CAMERA_API.getSubTypeIcon(event.sub_type)
+                ? NETATMO_CAMERA_API.getSubTypeIcon(parseInt(event.sub_type, 10))
                 : NETATMO_CAMERA_API.getEventIcon(event.type)}
             </span>
             <div>
               <Text variant="body" weight="semibold">
                 {event.sub_type
-                  ? NETATMO_CAMERA_API.getSubTypeName(event.sub_type)
+                  ? NETATMO_CAMERA_API.getSubTypeName(parseInt(event.sub_type, 10))
                   : NETATMO_CAMERA_API.getEventTypeName(event.type)}
               </Text>
               <Text variant="tertiary" size="sm">
-                {new Date(event.time * 1000).toLocaleString('it-IT', {
+                {new Date(Number(event.time) * 1000).toLocaleString('it-IT', {
                   weekday: 'long',
                   day: '2-digit',
                   month: 'long',
@@ -134,7 +135,7 @@ export default function EventPreviewModal({ event, camera, onClose }: EventPrevi
             </div>
           </div>
           <Button.Icon
-            icon={<X className="w-6 h-6" />}
+            icon={<X className="w-6 h-6" /> as any}
             onClick={onClose}
             variant="ghost"
             size="md"
@@ -235,7 +236,7 @@ export default function EventPreviewModal({ event, camera, onClose }: EventPrevi
               <Text variant="danger" size="sm">{downloadError}</Text>
             )}
             <Button
-              variant="ocean"
+              variant="ember"
               size="sm"
               onClick={onClose}
             >

@@ -59,6 +59,7 @@ export default function EventFilters({
           onChange={handleTypeChange}
           options={TYPE_OPTIONS}
           label="Tipo evento"
+          icon="📊"
           variant="default"
         />
       </div>
@@ -70,6 +71,7 @@ export default function EventFilters({
           onChange={handleSeverityChange}
           options={SEVERITY_OPTIONS}
           label="Severita"
+          icon="⚠️"
           variant="default"
         />
       </div>

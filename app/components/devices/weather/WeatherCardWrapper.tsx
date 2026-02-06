@@ -119,7 +119,7 @@ export default function WeatherCardWrapper() {
 
   return (
     <WeatherCard
-      weatherData={weatherData}
+      weatherData={weatherData as any}
       locationName={location?.name || null}
       isLoading={isLoading}
       error={error}

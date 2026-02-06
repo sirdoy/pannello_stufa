@@ -60,6 +60,7 @@ export default function NotificationFilters({
           onChange={handleTypeChange}
           options={TYPE_OPTIONS}
           label="Tipo"
+          icon="🔔"
           data-testid="history-filter"
         />
       </div>
@@ -71,6 +72,7 @@ export default function NotificationFilters({
           onChange={handleStatusChange}
           options={STATUS_OPTIONS}
           label="Stato"
+          icon="📮"
         />
       </div>
 

@@ -59,9 +59,9 @@ export default function ConnectionStatusCard({ stats, error, onRetry }: Connecti
                 variant="ghost"
                 size="sm"
                 onClick={onRetry}
-                icon={<RefreshCw size={14} />}
-                className="mt-3"
+                className="mt-3 flex items-center gap-2"
               >
+                <RefreshCw size={14} />
                 Riprova
               </Button>
             )}

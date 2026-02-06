@@ -36,6 +36,14 @@ export default function ThermostatCard() {
 
   // Schedule management
   const { schedules, activeSchedule, loading: scheduleLoading, refetch: refetchSchedules } = useScheduleData();
+
+  // Type assertion for schedules data (from useScheduleData hook)
+  interface ScheduleItem {
+    id: string;
+    name: string;
+  }
+  const typedSchedules = schedules as ScheduleItem[];
+  const typedActiveSchedule = activeSchedule as ScheduleItem | undefined;
   const [switchingSchedule, setSwitchingSchedule] = useState(false);
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);
 
@@ -44,7 +52,7 @@ export default function ThermostatCard() {
 
   // Sync selectedScheduleId with activeSchedule
   useEffect(() => {
-    if (activeSchedule && !selectedScheduleId && (activeSchedule as any).id) {
+    if (typedActiveSchedule && !selectedScheduleId && (activeSchedule as any).id) {
       setSelectedScheduleId((activeSchedule as any).id);
     }
   }, [activeSchedule, selectedScheduleId]);
@@ -353,8 +361,8 @@ export default function ThermostatCard() {
     }
   }
 
-  async function handleScheduleChange(scheduleId) {
-    if (!scheduleId || scheduleId === activeSchedule?.id) return;
+  async function handleScheduleChange(scheduleId: string) {
+    if (!scheduleId || scheduleId === typedActiveSchedule?.id) return;
 
     try {
       setSwitchingSchedule(true);
@@ -472,7 +480,7 @@ export default function ThermostatCard() {
       banners={banners}
       infoBoxes={infoBoxes}
       infoBoxesTitle="Informazioni"
-      contextMenuItems={thermostatContextMenuItems}
+      contextMenuItems={thermostatContextMenuItems as any}
     >
       {/* Active Devices List - Shows only actively heating rooms */}
       {activeRooms.length > 0 && (
@@ -674,35 +682,36 @@ export default function ThermostatCard() {
                     {/* Temperature Adjustment */}
                     {selectedRoom.setpoint && (
                       <div className="flex items-center gap-1 px-2 py-1 rounded-xl bg-slate-800/50 border border-slate-700/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
-                        <Button.Icon
-                          icon={<Minus className="w-4 h-4" />}
+                        <Button
                           aria-label="Diminuisci Temperatura"
                           variant="ghost"
                           size="sm"
                           onClick={() => handleTemperatureChange(selectedRoom.id, selectedRoom.setpoint - 0.5)}
                           disabled={refreshing || selectedRoom.setpoint <= 15}
-                        />
+                          className="p-2"
+                        >
+                          <Minus className="w-4 h-4" />
+                        </Button>
                         <span className="text-sm font-bold text-ocean-400 [html:not(.dark)_&]:text-ocean-600 w-10 text-center">{selectedRoom.setpoint}°</span>
-                        <Button.Icon
-                          icon={<Plus className="w-4 h-4" />}
+                        <Button
                           aria-label="Aumenta Temperatura"
                           variant="ghost"
                           size="sm"
                           onClick={() => handleTemperatureChange(selectedRoom.id, selectedRoom.setpoint + 0.5)}
                           disabled={refreshing || selectedRoom.setpoint >= 30}
-                        />
+                          className="p-2"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </Button>
                       </div>
                     )}
 
                     {/* Mode Quick Cycle */}
-                    <Button.Icon
-                      icon={mode === 'schedule' ? <Calendar className="w-5 h-5" /> :
-                            mode === 'away' ? <Home className="w-5 h-5" /> :
-                            mode === 'hg' ? <Snowflake className="w-5 h-5" /> :
-                            <Power className="w-5 h-5" />}
+                    <Button
                       aria-label={`Modalita attuale: ${mode}. Clicca per cambiare`}
                       variant="subtle"
                       size="md"
+                      className="p-3"
                       onClick={() => {
                         // Cycle: schedule -> away -> hg -> off -> schedule
                         const modes = ['schedule', 'away', 'hg', 'off'];
@@ -710,7 +719,12 @@ export default function ThermostatCard() {
                         handleModeChange(modes[nextIndex]);
                       }}
                       disabled={refreshing}
-                    />
+                    >
+                      {mode === 'schedule' ? <Calendar className="w-5 h-5" /> :
+                       mode === 'away' ? <Home className="w-5 h-5" /> :
+                       mode === 'hg' ? <Snowflake className="w-5 h-5" /> :
+                       <Power className="w-5 h-5" />}
+                    </Button>
                   </div>
                 )}
 
@@ -820,12 +834,14 @@ export default function ThermostatCard() {
                           <Text variant="label" size="sm">Programmazione attiva</Text>
                         </label>
                         <Select
-                          value={selectedScheduleId || activeSchedule?.id || ''}
+                          label="Programmazione"
+                          icon="📅"
+                          value={selectedScheduleId || typedActiveSchedule?.id || ''}
                           onChange={(e) => {
                             setSelectedScheduleId(e.target.value);
                             handleScheduleChange(e.target.value);
                           }}
-                          options={schedules.map(s => ({
+                          options={typedSchedules.map(s => ({
                             value: s.id,
                             label: s.name,
                           }))}
@@ -834,10 +850,10 @@ export default function ThermostatCard() {
                       </div>
                     </div>
 
-                    {activeSchedule && selectedScheduleId === activeSchedule.id && (
+                    {typedActiveSchedule && selectedScheduleId === typedActiveSchedule.id && (
                       <div className="flex items-center gap-2">
                         <Text variant="sage" size="sm">
-                          ✓ "{activeSchedule.name}" attiva
+                          ✓ "{typedActiveSchedule.name}" attiva
                         </Text>
                       </div>
                     )}

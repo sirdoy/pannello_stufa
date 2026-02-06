@@ -81,7 +81,7 @@ function PreferenceToggle({ label, description, checked, onChange, disabled = fa
       </div>
       <Toggle
         checked={checked}
-        onChange={onChange}
+        onCheckedChange={onChange}
         disabled={disabled}
         label={label}
         size="sm"
@@ -250,7 +250,6 @@ export default function NotificationPreferencesPanel() {
         icon="🔐"
         title="Autenticazione Richiesta"
         description="Devi effettuare il login per gestire le preferenze notifiche"
-        liquid
       />
     );
   }
@@ -263,7 +262,6 @@ export default function NotificationPreferencesPanel() {
         icon="⚠️"
         title="Errore Caricamento"
         description="Impossibile caricare le preferenze. Riprova piu tardi."
-        liquid
       />
     );
   }
@@ -282,7 +280,6 @@ export default function NotificationPreferencesPanel() {
           description="Preferenze aggiornate con successo"
           dismissible
           onDismiss={() => setSaveSuccess(false)}
-          liquid
         />
       )}
 
@@ -295,7 +292,6 @@ export default function NotificationPreferencesPanel() {
           description={error}
           dismissible
           onDismiss={() => setError(null)}
-          liquid
         />
       )}
 

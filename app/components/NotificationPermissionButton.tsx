@@ -34,7 +34,7 @@ interface NotificationPermissionButtonProps {
 
 export default function NotificationPermissionButton({ onSuccess, onError }: NotificationPermissionButtonProps) {
   const { user } = useUser();
-  const [permission, setPermission] = useState<NotificationPermission>('default');
+  const [permission, setPermission] = useState<NotificationPermission | 'unsupported'>('default');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [supported, setSupported] = useState(true);
@@ -50,6 +50,7 @@ export default function NotificationPermissionButton({ onSuccess, onError }: Not
 
     if (!isSupported) {
       setError('Le notifiche non sono supportate su questo dispositivo');
+      setPermission('unsupported');
       return;
     }
 
@@ -103,14 +104,13 @@ export default function NotificationPermissionButton({ onSuccess, onError }: Not
   };
 
   // Render: Notifiche non supportate
-  if (!supported) {
+  if (!supported || permission === 'unsupported') {
     return (
       <Banner
         variant="info"
         icon="ℹ️"
         title="Notifiche non disponibili"
         description="Il tuo browser/dispositivo non supporta le notifiche push"
-        liquid
       />
     );
   }
@@ -135,7 +135,6 @@ export default function NotificationPermissionButton({ onSuccess, onError }: Not
             </ol>
           </div>
         }
-        liquid
       />
     );
   }
@@ -158,7 +157,6 @@ export default function NotificationPermissionButton({ onSuccess, onError }: Not
             </Text>
           </div>
         }
-        liquid
       />
     );
   }
@@ -171,7 +169,6 @@ export default function NotificationPermissionButton({ onSuccess, onError }: Not
         icon="✅"
         title="Notifiche attive"
         description="Riceverai notifiche per errori stufa, scheduler e manutenzione"
-        liquid
       />
     );
   }
@@ -187,7 +184,6 @@ export default function NotificationPermissionButton({ onSuccess, onError }: Not
           description={error}
           dismissible
           onDismiss={() => setError(null)}
-          liquid
         />
       )}
 

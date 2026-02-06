@@ -59,7 +59,7 @@ export default function TransitionLink({
   ...restProps
 }: TransitionLinkProps) {
   const router = useRouter();
-  const { startTransition, setTransitionType } = usePageTransition();
+  const { startTransition, setTransitionType } = usePageTransition() as any;
 
   const handleClick = async (e: MouseEvent<HTMLAnchorElement>) => {
     // Call custom onClick if provided
@@ -89,7 +89,7 @@ export default function TransitionLink({
     }
 
     // Start transition and navigate
-    await startTransition(async () => {
+    startTransition(() => {
       if (replace) {
         router.replace(href.toString());
       } else {

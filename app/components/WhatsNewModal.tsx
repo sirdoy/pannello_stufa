@@ -76,7 +76,7 @@ export default function WhatsNewModal({ isOpen, onClose, dontShowAgain }: WhatsN
             <div className="bg-white/20 rounded-full">
               <ActionButton
                 icon={<X className="text-white" />}
-                variant="close"
+                variant="ghost"
                 size="md"
                 onClick={onClose}
                 ariaLabel="Chiudi"

@@ -83,7 +83,7 @@ export default function MaintenanceBar({ maintenanceStatus }: MaintenanceBarProp
     if (percentage >= 100) return 'danger';
     if (percentage >= 80) return 'warning';
     if (percentage >= 60) return 'warning';
-    return 'success';
+    return 'sage';
   };
 
   const getBadgeIcon = () => {
@@ -104,8 +104,8 @@ export default function MaintenanceBar({ maintenanceStatus }: MaintenanceBarProp
           {/* Badge percentuale - nascosto quando espanso */}
           {!isExpanded && (
             <StatusBadge
-              variant="inline"
-              color={getBadgeColor()}
+              variant="badge"
+              color={getBadgeColor() as 'ember' | 'sage' | 'ocean' | 'warning' | 'danger' | 'neutral'}
               icon={getBadgeIcon()}
               text={`${percentage.toFixed(0)}%`}
               className="flex-shrink-0"

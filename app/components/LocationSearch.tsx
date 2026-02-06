@@ -309,7 +309,7 @@ export default function LocationSearch({
 
       {/* Error display */}
       {error && (
-        <Banner variant="danger" compact className="mt-4">
+        <Banner variant="error" compact className="mt-4">
           {error}
         </Banner>
       )}

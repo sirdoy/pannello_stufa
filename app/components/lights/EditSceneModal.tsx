@@ -259,7 +259,7 @@ export default function EditSceneModal({
           </div>
           <ActionButton
             icon={<X />}
-            variant="close"
+            variant="ghost"
             size="md"
             onClick={onCancel}
             ariaLabel="Chiudi"
@@ -284,7 +284,6 @@ export default function EditSceneModal({
               placeholder="Es: Relax serale, Lettura..."
               maxLength={255}
               autoFocus
-              liquid
             />
             <Text variant="tertiary" size="xs" className="mt-2">
               {name.length}/255 caratteri

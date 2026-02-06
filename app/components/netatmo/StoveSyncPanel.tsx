@@ -366,7 +366,7 @@ export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) 
       {/* Error Banner */}
       {error && (
         <div className="mb-4">
-          <Banner variant="danger">{error}</Banner>
+          <Banner variant="error">{error}</Banner>
         </div>
       )}
 
@@ -401,7 +401,7 @@ export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) 
           </div>
           <Toggle
             checked={enabled}
-            onChange={handleEnabledToggle}
+            onCheckedChange={handleEnabledToggle}
             disabled={saving}
             label="Abilita sincronizzazione"
             size="md"
@@ -514,7 +514,7 @@ export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) 
       {hasChanges && (
         <div className="flex gap-3">
           <Button
-            variant="neutral"
+            variant="subtle"
             onClick={handleReset}
             disabled={saving}
             className="flex-1"

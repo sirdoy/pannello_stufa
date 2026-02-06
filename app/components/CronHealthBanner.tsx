@@ -106,7 +106,6 @@ export default function CronHealthBanner({ variant = 'banner' }: CronHealthBanne
   // Banner variant - full banner for standalone usage
   return (
     <Banner
-      liquid
       variant="warning"
       icon="⚠️"
       title="Cronjob Non Attivo"
@@ -122,7 +121,7 @@ export default function CronHealthBanner({ variant = 'banner' }: CronHealthBanne
           target="_blank"
           rel="noopener noreferrer"
         >
-          <Button variant="accent" size="md">
+          <Button variant="ember" size="md">
             🔧 Riavvia Cronjob ↗
           </Button>
         </a>

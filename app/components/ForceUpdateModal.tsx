@@ -35,7 +35,7 @@ export default function ForceUpdateModal({ show, firebaseVersion }: ForceUpdateM
       maxWidth="max-w-md"
       className="z-[10000]"
     >
-      <Card solid className="p-8 border-4 border-ember-500">
+      <Card className="p-8 border-4 border-ember-500">
         {/* Icon warning */}
         <div className="flex justify-center mb-6">
           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-ember-500 to-flame-500 flex items-center justify-center animate-pulse">
@@ -81,7 +81,7 @@ export default function ForceUpdateModal({ show, firebaseVersion }: ForceUpdateM
 
         {/* Action button - solo questo disponibile */}
         <Button
-          variant="primary"
+          variant="ember"
           size="lg"
           fullWidth
           onClick={handleReload}

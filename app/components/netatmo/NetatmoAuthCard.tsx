@@ -60,7 +60,7 @@ export default function NetatmoAuthCard() {
 
         {/* Connect Button */}
         <Button
-          variant="primary"
+          variant="ember"
           onClick={handleConnect}
           className="w-full sm:w-auto px-8"
         >

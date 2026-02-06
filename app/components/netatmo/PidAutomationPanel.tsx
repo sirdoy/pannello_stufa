@@ -609,7 +609,7 @@ export default function PidAutomationPanel() {
       {/* Error Banner */}
       {error && (
         <div className="mb-4">
-          <Banner variant="danger">{error}</Banner>
+          <Banner variant="error">{error}</Banner>
         </div>
       )}
 
@@ -687,7 +687,7 @@ export default function PidAutomationPanel() {
       {hasChanges && (
         <div className="flex gap-3">
           <Button
-            variant="neutral"
+            variant="subtle"
             onClick={handleReset}
             disabled={saving}
             className="flex-1"

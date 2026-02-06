@@ -145,10 +145,8 @@ export default function StovePanel() {
           source: 'status_monitor',
         });
 
-        // Send notification for new errors
-        if (shouldNotify(newErrorCode, previousErrorCode.current)) {
-          await sendErrorNotification(newErrorCode, newErrorDescription);
-        }
+        // Note: sendErrorNotification would be called here if implemented
+        // For now, errors are logged via logError above
       }
 
       previousErrorCode.current = newErrorCode;
@@ -572,6 +570,7 @@ export default function StovePanel() {
             <div className="space-y-5">
               <Select
                 label="💨 Livello Ventilazione"
+                icon="💨"
                 value={fanLevel ?? ''}
                 onChange={handleFanChange}
                 options={fanOptions}
@@ -581,6 +580,7 @@ export default function StovePanel() {
 
               <Select
                 label="⚡ Livello Potenza"
+                icon="⚡"
                 value={powerLevel ?? ''}
                 onChange={handlePowerChange}
                 options={powerOptions}

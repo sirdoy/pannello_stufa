@@ -257,7 +257,7 @@ export default function RoomCard({ room, onRefresh }: RoomCardProps) {
           {/* Device type badge */}
           {room.deviceType === 'thermostat' && (
             <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold border ${badgeColors.ocean}`}>
-              <span>🌡️</span>
+              <span className="text-base">🌡️</span>
               <span>Termostato</span>
             </span>
           )}
@@ -289,7 +289,7 @@ export default function RoomCard({ room, onRefresh }: RoomCardProps) {
               </>
             ) : (
               <>
-                <Text variant="tertiary" size="2xl" weight="bold" as="span" title="Sensore temperatura non disponibile">
+                <Text variant="tertiary" size="xl" weight="bold" as="span" title="Sensore temperatura non disponibile">
                   --°
                 </Text>
                 <Text variant="tertiary" size="xl" as="span" className="mx-1">/</Text>
@@ -429,7 +429,7 @@ export default function RoomCard({ room, onRefresh }: RoomCardProps) {
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     {/* Battery badge */}
                     {module.battery_state && (
-                      <BatteryBadge batteryState={module.battery_state} showLabel />
+                      <>{(BatteryBadge as any)({ batteryState: module.battery_state, showLabel: true })}</>
                     )}
                     {/* Show battery OK for non-critical states */}
                     {module.battery_state && !['low', 'very_low'].includes(module.battery_state) && (

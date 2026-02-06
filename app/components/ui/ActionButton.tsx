@@ -1,3 +1,15 @@
+import type { ReactNode, ButtonHTMLAttributes } from 'react';
+
+/**
+ * ActionButton Component Props
+ */
+export interface ActionButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  icon: ReactNode;
+  variant?: 'ember' | 'ocean' | 'sage' | 'warning' | 'danger' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  ariaLabel?: string;
+}
+
 /**
  * ActionButton Component - Ember Noir Design System
  *
@@ -25,7 +37,7 @@ export default function ActionButton({
   disabled = false,
   className = '',
   ...props
-}) {
+}: ActionButtonProps) {
   // Ember Noir color variants with light mode support
   const variants = {
     ember: `

@@ -1,4 +1,21 @@
 /**
+ * StatusBadge Component Props
+ */
+export interface StatusBadgeProps {
+  status?: string;
+  icon?: string;
+  variant?: 'display' | 'badge' | 'dot' | 'floating';
+  size?: 'sm' | 'md' | 'lg';
+  color?: 'ember' | 'sage' | 'ocean' | 'warning' | 'danger' | 'neutral';
+  position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
+  pulse?: boolean;
+  className?: string;
+  // Legacy props
+  text?: string;
+  gradient?: string;
+}
+
+/**
  * StatusBadge Component - Ember Noir Design System
  *
  * Versatile status indicator with multiple display variants.
@@ -26,7 +43,7 @@ export default function StatusBadge({
   // Legacy props
   text,
   gradient,
-}) {
+}: StatusBadgeProps) {
   // Auto-detect status color based on status text
   const getAutoColor = (status) => {
     if (!status) return 'neutral';

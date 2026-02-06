@@ -1,5 +1,18 @@
+import type { HTMLAttributes } from 'react';
 import Text from './Text';
 import Button from './Button';
+
+/**
+ * ModeIndicator Component Props
+ */
+export interface ModeIndicatorProps extends HTMLAttributes<HTMLDivElement> {
+  enabled: boolean;
+  semiManual?: boolean;
+  returnToAutoAt?: string | null;
+  onConfigClick?: () => void;
+  showConfigButton?: boolean;
+  compact?: boolean;
+}
 
 /**
  * ModeIndicator Component - Ember Noir Design System
@@ -22,7 +35,8 @@ export default function ModeIndicator({
   onConfigClick,
   showConfigButton = true,
   compact = false,
-}) {
+  ...props
+}: ModeIndicatorProps) {
   const getIcon = () => {
     if (enabled && semiManual) return '⚙️';
     if (enabled) return '⏰';
@@ -30,7 +44,7 @@ export default function ModeIndicator({
   };
 
   // Ember Noir variants for Text
-  const getVariant = () => {
+  const getVariant = (): 'warning' | 'sage' | 'ember' => {
     if (enabled && semiManual) return 'warning';
     if (enabled) return 'sage';
     return 'ember';
@@ -43,7 +57,7 @@ export default function ModeIndicator({
   };
 
   return (
-    <div className={`flex items-center justify-between ${compact ? 'gap-2' : ''}`}>
+    <div className={`flex items-center justify-between ${compact ? 'gap-2' : ''}`} {...props}>
       <div className="flex items-center gap-2">
         <span className={compact ? 'text-xl' : 'text-2xl'}>{getIcon()}</span>
         <div>
@@ -56,7 +70,7 @@ export default function ModeIndicator({
         </div>
       </div>
       {showConfigButton && onConfigClick && (
-        <Button variant="ocean" size="sm" onClick={onConfigClick}>
+        <Button variant="ember" size="sm" onClick={onConfigClick}>
           Configura
         </Button>
       )}

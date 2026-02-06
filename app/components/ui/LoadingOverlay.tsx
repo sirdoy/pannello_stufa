@@ -5,6 +5,16 @@ import { createPortal } from 'react-dom';
 import Text from './Text';
 
 /**
+ * LoadingOverlay Component Props
+ */
+export interface LoadingOverlayProps {
+  show?: boolean;
+  message?: string;
+  icon?: string;
+  liquid?: boolean; // Legacy prop - ignored
+}
+
+/**
  * LoadingOverlay Component - Ember Noir Design System
  *
  * Full-page blocking loading overlay with dark-first styling.
@@ -21,7 +31,7 @@ export default function LoadingOverlay({
   message = 'Caricamento...',
   icon = '⏳',
   liquid = true, // Legacy prop - ignored
-}) {
+}: LoadingOverlayProps) {
   // Block body scroll when overlay is shown
   useEffect(() => {
     if (show) {

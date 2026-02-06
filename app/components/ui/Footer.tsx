@@ -1,12 +1,18 @@
 'use client';
 
+import type { HTMLAttributes } from 'react';
 import Link from 'next/link';
 import { APP_VERSION, APP_AUTHOR } from '@/lib/version';
 import { useVersionCheck } from '@/app/hooks/useVersionCheck';
 import WhatsNewModal from '../WhatsNewModal';
 import Text from './Text';
 
-export default function Footer({ className = '' }) {
+/**
+ * Footer Component Props
+ */
+export interface FooterProps extends HTMLAttributes<HTMLElement> {}
+
+export default function Footer({ className = '', ...props }: FooterProps) {
   const { hasNewVersion, showWhatsNew, dismissWhatsNew, dismissBadge } = useVersionCheck();
 
   const handleBadgeClick = () => {
@@ -25,6 +31,7 @@ export default function Footer({ className = '' }) {
           [html:not(.dark)_&]:border-slate-200/50
           ${className}
         `}
+        {...props}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2">

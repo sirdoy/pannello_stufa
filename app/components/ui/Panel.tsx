@@ -1,6 +1,24 @@
+import type { ReactNode, ComponentPropsWithoutRef } from 'react';
 import Card from './Card';
 import Heading from './Heading';
 import Text from './Text';
+
+/**
+ * Panel Component Props
+ */
+export interface PanelProps {
+  children: ReactNode;
+  title?: string;
+  description?: string;
+  headerAction?: ReactNode;
+  variant?: 'default' | 'elevated' | 'subtle' | 'glass';
+  className?: string;
+  contentClassName?: string;
+  // Legacy props - ignored
+  liquid?: boolean;
+  glassmorphism?: boolean;
+  solid?: boolean;
+}
 
 /**
  * Panel Component - Ember Noir Design System
@@ -31,7 +49,7 @@ export default function Panel({
   glassmorphism = false,
   solid = false,
   ...props
-}) {
+}: PanelProps) {
   // Map legacy props to variant
   let resolvedVariant = variant;
   if (liquid || glassmorphism) resolvedVariant = 'glass';
@@ -40,7 +58,6 @@ export default function Panel({
     <Card
       variant={resolvedVariant}
       className={`overflow-hidden ${className}`}
-      {...props}
     >
       {/* Header (se presente title o headerAction) */}
       {(title || headerAction) && (

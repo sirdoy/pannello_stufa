@@ -1,4 +1,21 @@
+import type { ReactNode, HTMLAttributes } from 'react';
 import Text from './Text';
+
+/**
+ * ProgressBar Component Props
+ */
+export interface ProgressBarProps extends HTMLAttributes<HTMLDivElement> {
+  value?: number;
+  gradient?: string;
+  variant?: 'ember' | 'ocean' | 'sage' | 'warning' | 'danger' | 'primary' | 'success' | 'info';
+  size?: 'sm' | 'md' | 'lg';
+  animated?: boolean;
+  label?: string;
+  leftContent?: ReactNode;
+  rightContent?: ReactNode;
+  // Legacy prop
+  color?: string;
+}
 
 /**
  * ProgressBar Component - Ember Noir Design System
@@ -30,12 +47,13 @@ export default function ProgressBar({
   className = '',
   // Legacy prop
   color,
-}) {
+  ...props
+}: ProgressBarProps) {
   // Map legacy color prop to variant
   const resolvedVariant = color || variant;
 
   // Ember Noir color variants
-  const variantGradients = {
+  const variantGradients: Record<string, string> = {
     ember: 'from-ember-400 via-ember-500 to-flame-600',
     ocean: 'from-ocean-400 via-ocean-500 to-ocean-600',
     sage: 'from-sage-400 via-sage-500 to-sage-600',
@@ -48,7 +66,7 @@ export default function ProgressBar({
   };
 
   // Size variants
-  const sizeClasses = {
+  const sizeClasses: Record<string, string> = {
     sm: 'h-2',
     md: 'h-3',
     lg: 'h-4',
@@ -58,7 +76,7 @@ export default function ProgressBar({
   const clampedValue = Math.min(Math.max(value, 0), 100);
 
   return (
-    <div className={className}>
+    <div className={className} {...props}>
       {/* Label & Content Row */}
       {(label || leftContent || rightContent) && (
         <div className="flex items-center justify-between mb-2">
@@ -90,8 +108,8 @@ export default function ProgressBar({
           style={{ width: `${clampedValue}%` }}
           role="progressbar"
           aria-valuenow={clampedValue}
-          aria-valuemin="0"
-          aria-valuemax="100"
+          aria-valuemin={0}
+          aria-valuemax={100}
         />
       </div>
     </div>

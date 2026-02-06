@@ -1,6 +1,17 @@
 'use client';
 
 /**
+ * CardAccentBar Component Props
+ */
+export interface CardAccentBarProps {
+  colorTheme?: 'ember' | 'ocean' | 'warning' | 'sage' | 'danger';
+  animated?: boolean;
+  pulse?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}
+
+/**
  * CardAccentBar Component - Ember Noir Design System
  *
  * Modern accent bar with glow effects and shimmer animation.
@@ -18,7 +29,7 @@ export default function CardAccentBar({
   pulse = false,
   size = 'md',
   className = '',
-}) {
+}: CardAccentBarProps) {
   // Color theme configurations - Ember Noir palette
   const themes = {
     ember: {

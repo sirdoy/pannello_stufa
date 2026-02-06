@@ -5,12 +5,33 @@
  * Uses Banner component for consistent presentation.
  */
 
+import type { ReactNode } from 'react';
 import { ERROR_SEVERITY, getErrorInfo } from '@/lib/errorMonitor';
 import Banner from './Banner';
 import Button from './Button';
 import Text from './Text';
 
-export default function ErrorAlert({ errorCode, errorDescription, className = '', onDismiss, showSuggestion = true, showDetailsButton = false }) {
+/**
+ * ErrorAlert Component Props
+ */
+export interface ErrorAlertProps {
+  errorCode: number;
+  errorDescription?: string;
+  className?: string;
+  onDismiss?: () => void;
+  showSuggestion?: boolean;
+  showDetailsButton?: boolean;
+}
+
+/**
+ * ErrorBadge Component Props
+ */
+export interface ErrorBadgeProps {
+  errorCode: number;
+  className?: string;
+}
+
+export default function ErrorAlert({ errorCode, errorDescription, className = '', onDismiss, showSuggestion = true, showDetailsButton = false }: ErrorAlertProps) {
   if (errorCode === 0 || !errorCode) {
     return null;
   }
@@ -19,7 +40,7 @@ export default function ErrorAlert({ errorCode, errorDescription, className = ''
   const { severity, suggestion } = errorInfo;
 
   // Map severity to Banner variant and icon
-  const getSeverityConfig = () => {
+  const getSeverityConfig = (): { variant: 'error' | 'warning' | 'info'; icon: string } => {
     switch (severity) {
       case ERROR_SEVERITY.CRITICAL:
         return { variant: 'error', icon: '🚨' };
@@ -36,7 +57,7 @@ export default function ErrorAlert({ errorCode, errorDescription, className = ''
 
   // Build description with suggestion if available
   // Use <span> with block display to avoid <div> inside <p> hydration error
-  const fullDescription = (
+  const fullDescription: ReactNode = (
     <>
       <span className="block font-semibold mb-2">
         {errorDescription || errorInfo.description}
@@ -74,8 +95,12 @@ export default function ErrorAlert({ errorCode, errorDescription, className = ''
       actions={actions}
       dismissible={!!onDismiss}
       onDismiss={onDismiss}
+      dismissKey=""
+      compact={false}
       className={className}
-    />
+    >
+      {/* Banner children required but unused */}
+    </Banner>
   );
 }
 
@@ -83,7 +108,7 @@ export default function ErrorAlert({ errorCode, errorDescription, className = ''
  * ErrorBadge - Compact error indicator
  * Uses Ember Noir danger/warning palette
  */
-export function ErrorBadge({ errorCode, className = '' }) {
+export function ErrorBadge({ errorCode, className = '' }: ErrorBadgeProps) {
   if (errorCode === 0 || !errorCode) {
     return null;
   }

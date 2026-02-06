@@ -1,4 +1,16 @@
+import type { HTMLAttributes } from 'react';
 import Text from './Text';
+
+/**
+ * InfoBox Component Props
+ */
+export interface InfoBoxProps extends HTMLAttributes<HTMLDivElement> {
+  icon: string;
+  label: string;
+  value: string | number;
+  variant?: 'neutral' | 'ember' | 'ocean' | 'sage' | 'warning' | 'danger';
+  layout?: 'vertical' | 'horizontal';
+}
 
 /**
  * InfoBox Component - Ember Noir Design System
@@ -22,9 +34,10 @@ export default function InfoBox({
   variant = 'neutral',
   layout = 'horizontal',
   className = '',
-}) {
+  ...props
+}: InfoBoxProps) {
   // Ember Noir variant colors with light mode support
-  const variantClasses = {
+  const variantClasses: Record<string, string> = {
     neutral: 'text-slate-100 [html:not(.dark)_&]:text-slate-900',
     ember: 'text-ember-400 [html:not(.dark)_&]:text-ember-600',
     ocean: 'text-ocean-400 [html:not(.dark)_&]:text-ocean-600',
@@ -46,7 +59,7 @@ export default function InfoBox({
       [html:not(.dark)_&]:hover:bg-white/90
       [html:not(.dark)_&]:hover:border-slate-300
       ${className}
-    `}>
+    `} {...props}>
       <div className="relative z-10 flex flex-col items-center justify-center p-3 sm:p-4 min-h-[90px]">
         {/* Icon */}
         <span className="text-2xl sm:text-3xl mb-1.5">{icon}</span>

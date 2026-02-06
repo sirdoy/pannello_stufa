@@ -6,6 +6,15 @@ import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
 import Text from './Text';
 
 /**
+ * OfflineBanner Component Props
+ */
+export interface OfflineBannerProps {
+  showPendingCount?: boolean;
+  fixed?: boolean;
+  className?: string;
+}
+
+/**
  * OfflineBanner Component
  *
  * Shows a persistent banner when the device is offline.
@@ -33,7 +42,7 @@ export default function OfflineBanner({
   showPendingCount = true,
   fixed = false,
   className = '',
-}) {
+}: OfflineBannerProps) {
   const { isOnline, wasOffline, offlineSince } = useOnlineStatus();
   const { pendingCount, lastSyncedCommand } = useBackgroundSync();
   const [showReconnected, setShowReconnected] = useState(false);
@@ -94,12 +103,12 @@ export default function OfflineBanner({
 
   // Synced command notification
   if (lastSyncedCommand) {
-    const actionLabels = {
+    const actionLabels: Record<string, string> = {
       'stove/ignite': '🔥 Stufa accesa',
       'stove/shutdown': '🌙 Stufa spenta',
       'stove/set-power': '⚡ Potenza impostata',
     };
-    const label = actionLabels[lastSyncedCommand.endpoint] || 'Comando eseguito';
+    const label = actionLabels[(lastSyncedCommand as { endpoint?: string }).endpoint || ''] || 'Comando eseguito';
 
     return (
       <div

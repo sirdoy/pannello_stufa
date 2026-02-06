@@ -7,17 +7,17 @@
 import https from 'https';
 import HueApi from './hueApi';
 import HueRemoteApi from './hueRemoteApi';
-import { getHueConnection, getUsername, hasRemoteTokens } from './hueLocalHelper';
+import { getHueConnection, getUsername, hasRemoteTokens, type ConnectionMode } from './hueLocalHelper';
 import { getValidRemoteAccessToken, setConnectionMode } from './hueRemoteTokenHelper';
 
 /**
  * Check if local bridge is reachable
  * Uses https module with rejectUnauthorized: false for self-signed certs
- * @param {string} bridgeIp
- * @param {number} timeout - Timeout in milliseconds (default: 2000)
- * @returns {Promise<boolean>}
+ * @param bridgeIp - Bridge IP address
+ * @param timeout - Timeout in milliseconds (default: 2000)
+ * @returns True if bridge is reachable
  */
-async function checkLocalBridge(bridgeIp, timeout = 2000) {
+async function checkLocalBridge(bridgeIp: string, timeout = 2000): Promise<boolean> {
   if (!bridgeIp) return false;
 
   return new Promise((resolve) => {
@@ -48,9 +48,9 @@ async function checkLocalBridge(bridgeIp, timeout = 2000) {
 
 /**
  * Determine current connection mode based on availability
- * @returns {Promise<'local' | 'remote' | 'hybrid' | 'disconnected'>}
+ * @returns Connection mode
  */
-export async function determineConnectionMode() {
+export async function determineConnectionMode(): Promise<ConnectionMode> {
   try {
     const connection = await getHueConnection();
     const hasLocal = !!connection?.bridgeIp && !!connection?.username;
@@ -87,10 +87,10 @@ export async function determineConnectionMode() {
 export class HueConnectionStrategy {
   /**
    * Get provider based on availability (priority: local > remote)
-   * @returns {Promise<HueApi | HueRemoteApi>}
-   * @throws {Error} If no connection available
+   * @returns Hue API provider instance
+   * @throws Error if no connection available
    */
-  static async getProvider() {
+  static async getProvider(): Promise<HueApi | HueRemoteApi> {
     try {
       // Try local first (fastest, no rate limits)
       const localConnection = await getHueConnection();
@@ -130,17 +130,17 @@ export class HueConnectionStrategy {
       // Neither local nor remote available
       throw new Error('HUE_NOT_CONNECTED: No Hue connection available (local or remote)');
     } catch (error) {
-      console.error('❌ [Hue Strategy] Error:', error.message);
+      console.error('❌ [Hue Strategy] Error:', (error as Error).message);
       throw error;
     }
   }
 
   /**
    * Get provider with explicit mode (for testing or manual override)
-   * @param {'local' | 'remote'} mode
-   * @returns {Promise<HueApi | HueRemoteApi>}
+   * @param mode - 'local' or 'remote'
+   * @returns Hue API provider instance
    */
-  static async getProviderForMode(mode) {
+  static async getProviderForMode(mode: 'local' | 'remote'): Promise<HueApi | HueRemoteApi> {
     if (mode === 'local') {
       const localConnection = await getHueConnection();
       if (!localConnection?.bridgeIp || !localConnection?.username) {

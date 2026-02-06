@@ -12,12 +12,41 @@ import { forceTokenRefresh } from './hueRemoteTokenHelper';
 
 const HUE_REMOTE_BASE_URL = 'https://api.meethue.com';
 
+interface V1Light {
+  id: string;
+  name?: string;
+  state?: {
+    on?: boolean;
+    bri?: number;
+    xy?: [number, number];
+    ct?: number;
+  };
+}
+
+interface V1Group {
+  id: string;
+  name?: string;
+  type?: string;
+  lights?: string[];
+}
+
+interface V1Scene {
+  id: string;
+  name?: string;
+  group?: string;
+}
+
 /**
  * Hue Remote API Client
  * Pattern: Similar to HueApi (local), but uses cloud endpoints
  */
 class HueRemoteApi {
-  constructor(username, accessToken) {
+  private username: string;
+  private accessToken: string;
+  private baseUrl: string;
+  private headers: Record<string, string>;
+
+  constructor(username: string, accessToken: string) {
     this.username = username;
     this.accessToken = accessToken;
     this.baseUrl = `${HUE_REMOTE_BASE_URL}/bridge/${username}`;
@@ -30,12 +59,12 @@ class HueRemoteApi {
   /**
    * Update access token (used after token refresh)
    */
-  updateAccessToken(newToken) {
+  updateAccessToken(newToken: string): void {
     this.accessToken = newToken;
     this.headers['Authorization'] = `Bearer ${newToken}`;
   }
 
-  async request(endpoint, options = {}, isRetry = false) {
+  async request(endpoint: string, options: RequestInit = {}, isRetry = false): Promise<unknown> {
     const url = `${this.baseUrl}${endpoint}`;
 
     const response = await fetch(url, {
@@ -48,7 +77,7 @@ class HueRemoteApi {
 
     if (!response.ok) {
       const errorText = await response.text();
-      let error;
+      let error: { errors?: Array<{ description?: string }>; error_description?: string; message?: string };
       try {
         error = JSON.parse(errorText);
       } catch {
@@ -92,10 +121,10 @@ class HueRemoteApi {
 
   /**
    * Normalize v1 light to v2 format
-   * @param {object} v1Light - Remote API light (v1 format)
-   * @returns {object} Normalized light (v2 format)
+   * @param v1Light - Remote API light (v1 format)
+   * @returns Normalized light (v2 format)
    */
-  _normalizeLightV1toV2(v1Light) {
+  _normalizeLightV1toV2(v1Light: V1Light): Record<string, unknown> {
     return {
       id: v1Light.id,
       type: 'light',
@@ -128,10 +157,10 @@ class HueRemoteApi {
 
   /**
    * Normalize v1 group to v2 format
-   * @param {object} v1Group - Remote API group (v1 format)
-   * @returns {object} Normalized room (v2 format)
+   * @param v1Group - Remote API group (v1 format)
+   * @returns Normalized room (v2 format)
    */
-  _normalizeGroupV1toV2(v1Group) {
+  _normalizeGroupV1toV2(v1Group: V1Group): Record<string, unknown> {
     return {
       id: v1Group.id,
       type: 'room',
@@ -151,10 +180,10 @@ class HueRemoteApi {
 
   /**
    * Normalize v1 scene to v2 format
-   * @param {object} v1Scene - Remote API scene (v1 format)
-   * @returns {object} Normalized scene (v2 format)
+   * @param v1Scene - Remote API scene (v1 format)
+   * @returns Normalized scene (v2 format)
    */
-  _normalizeSceneV1toV2(v1Scene) {
+  _normalizeSceneV1toV2(v1Scene: V1Scene): Record<string, unknown> {
     return {
       id: v1Scene.id,
       type: 'scene',
@@ -173,8 +202,8 @@ class HueRemoteApi {
   /**
    * Get all lights
    */
-  async getLights() {
-    const response = await this.request('/lights');
+  async getLights(): Promise<{ data: Record<string, unknown>[] }> {
+    const response = await this.request('/lights') as Record<string, V1Light>;
 
     // Normalize v1 → v2 format
     const normalized = Object.entries(response).map(([id, light]) =>
@@ -187,35 +216,36 @@ class HueRemoteApi {
   /**
    * Get single light
    */
-  async getLight(lightId) {
-    const response = await this.request(`/lights/${lightId}`);
+  async getLight(lightId: string): Promise<{ data: Record<string, unknown>[] }> {
+    const response = await this.request(`/lights/${lightId}`) as V1Light;
     const normalized = this._normalizeLightV1toV2({ ...response, id: lightId });
     return { data: [normalized] };
   }
 
   /**
    * Control light (on/off, brightness, color)
-   * @param {string} lightId
-   * @param {object} state - v2 format: { on: { on: true }, dimming: { brightness: 50 }, ... }
+   * @param lightId - Light ID
+   * @param state - v2 format: { on: { on: true }, dimming: { brightness: 50 }, ... }
    */
-  async setLightState(lightId, state) {
+  async setLightState(lightId: string, state: Record<string, unknown>): Promise<unknown> {
     // Convert v2 state format to v1 format
-    const v1State = {};
+    const v1State: Record<string, unknown> = {};
 
     if (state.on !== undefined) {
-      v1State.on = state.on.on;
+      v1State.on = (state.on as { on: boolean }).on;
     }
 
     if (state.dimming !== undefined) {
-      v1State.bri = Math.round((state.dimming.brightness / 100) * 254);
+      v1State.bri = Math.round(((state.dimming as { brightness: number }).brightness / 100) * 254);
     }
 
-    if (state.color?.xy !== undefined) {
-      v1State.xy = [state.color.xy.x, state.color.xy.y];
+    if ((state.color as { xy?: { x: number; y: number } })?.xy !== undefined) {
+      const xy = (state.color as { xy: { x: number; y: number } }).xy;
+      v1State.xy = [xy.x, xy.y];
     }
 
-    if (state.color_temperature?.mirek !== undefined) {
-      v1State.ct = state.color_temperature.mirek;
+    if ((state.color_temperature as { mirek?: number })?.mirek !== undefined) {
+      v1State.ct = (state.color_temperature as { mirek: number }).mirek;
     }
 
     return this.request(`/lights/${lightId}/state`, {
@@ -229,8 +259,8 @@ class HueRemoteApi {
   /**
    * Get all rooms (groups)
    */
-  async getRooms() {
-    const response = await this.request('/groups');
+  async getRooms(): Promise<{ data: Record<string, unknown>[] }> {
+    const response = await this.request('/groups') as Record<string, V1Group>;
 
     // Filter only rooms (type 'Room')
     const rooms = Object.entries(response)
@@ -243,8 +273,8 @@ class HueRemoteApi {
   /**
    * Get all zones (groups)
    */
-  async getZones() {
-    const response = await this.request('/groups');
+  async getZones(): Promise<{ data: Record<string, unknown>[] }> {
+    const response = await this.request('/groups') as Record<string, V1Group>;
 
     // Filter only zones (type 'Zone')
     const zones = Object.entries(response)
@@ -258,31 +288,32 @@ class HueRemoteApi {
    * Get grouped light (room/zone aggregated state)
    * Note: Remote API doesn't have /grouped_light resource, use /groups
    */
-  async getGroupedLight(groupId) {
-    const response = await this.request(`/groups/${groupId}`);
+  async getGroupedLight(groupId: string): Promise<{ data: Record<string, unknown>[] }> {
+    const response = await this.request(`/groups/${groupId}`) as V1Group;
     const normalized = this._normalizeGroupV1toV2({ ...response, id: groupId });
     return { data: [normalized] };
   }
 
   /**
    * Control room/zone lights together
-   * @param {string} groupId
-   * @param {object} state - v2 format
+   * @param groupId - Group ID
+   * @param state - v2 format
    */
-  async setGroupedLightState(groupId, state) {
+  async setGroupedLightState(groupId: string, state: Record<string, unknown>): Promise<unknown> {
     // Convert v2 state format to v1 format
-    const v1State = {};
+    const v1State: Record<string, unknown> = {};
 
     if (state.on !== undefined) {
-      v1State.on = state.on.on;
+      v1State.on = (state.on as { on: boolean }).on;
     }
 
     if (state.dimming !== undefined) {
-      v1State.bri = Math.round((state.dimming.brightness / 100) * 254);
+      v1State.bri = Math.round(((state.dimming as { brightness: number }).brightness / 100) * 254);
     }
 
-    if (state.color?.xy !== undefined) {
-      v1State.xy = [state.color.xy.x, state.color.xy.y];
+    if ((state.color as { xy?: { x: number; y: number } })?.xy !== undefined) {
+      const xy = (state.color as { xy: { x: number; y: number } }).xy;
+      v1State.xy = [xy.x, xy.y];
     }
 
     return this.request(`/groups/${groupId}/action`, {
@@ -296,8 +327,8 @@ class HueRemoteApi {
   /**
    * Get all scenes
    */
-  async getScenes() {
-    const response = await this.request('/scenes');
+  async getScenes(): Promise<{ data: Record<string, unknown>[] }> {
+    const response = await this.request('/scenes') as Record<string, V1Scene>;
 
     const normalized = Object.entries(response).map(([id, scene]) =>
       this._normalizeSceneV1toV2({ ...scene, id })
@@ -310,9 +341,9 @@ class HueRemoteApi {
    * Activate scene
    * Note: Remote API v1 activates scenes via /groups/{groupId}/action with scene parameter
    */
-  async activateScene(sceneId) {
+  async activateScene(sceneId: string): Promise<unknown> {
     // Get scene to find its group
-    const sceneResponse = await this.request(`/scenes/${sceneId}`);
+    const sceneResponse = await this.request(`/scenes/${sceneId}`) as V1Scene;
     const groupId = sceneResponse.group;
 
     if (!groupId) {
@@ -331,7 +362,7 @@ class HueRemoteApi {
    * Create new scene
    * Note: Remote API scene creation is less documented, implement basic version
    */
-  async createScene(name, groupId, lightstates) {
+  async createScene(name: string, groupId: string, lightstates?: Record<string, unknown>): Promise<unknown> {
     return this.request('/scenes', {
       method: 'POST',
       body: JSON.stringify({
@@ -347,7 +378,7 @@ class HueRemoteApi {
   /**
    * Update existing scene
    */
-  async updateScene(sceneId, updates) {
+  async updateScene(sceneId: string, updates: Record<string, unknown>): Promise<unknown> {
     return this.request(`/scenes/${sceneId}`, {
       method: 'PUT',
       body: JSON.stringify(updates),
@@ -357,7 +388,7 @@ class HueRemoteApi {
   /**
    * Delete scene
    */
-  async deleteScene(sceneId) {
+  async deleteScene(sceneId: string): Promise<unknown> {
     return this.request(`/scenes/${sceneId}`, {
       method: 'DELETE',
     });
@@ -369,10 +400,10 @@ class HueRemoteApi {
    * Get all devices (lights, sensors, etc.)
    * Note: Remote API v1 doesn't have /devices, combine lights + sensors
    */
-  async getDevices() {
+  async getDevices(): Promise<{ lights: number; sensors: number }> {
     const [lights, sensors] = await Promise.all([
-      this.request('/lights'),
-      this.request('/sensors').catch(() => ({})),
+      this.request('/lights') as Promise<Record<string, unknown>>,
+      this.request('/sensors').catch(() => ({})) as Promise<Record<string, unknown>>,
     ]);
 
     return {
@@ -384,7 +415,7 @@ class HueRemoteApi {
   /**
    * Get bridge info
    */
-  async getBridge() {
+  async getBridge(): Promise<unknown> {
     return this.request('/config');
   }
 }

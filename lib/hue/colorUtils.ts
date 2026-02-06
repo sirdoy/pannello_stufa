@@ -5,14 +5,39 @@
  * https://developers.meethue.com/develop/hue-api/lights-api/#color_gets_more_complicated
  */
 
+export interface XYColor {
+  x: number;
+  y: number;
+}
+
+export interface RGBColor {
+  r: number;
+  g: number;
+  b: number;
+}
+
+export interface ColorPreset {
+  name: string;
+  hex: string;
+  xy: XYColor;
+  icon: string;
+}
+
+interface HueLight {
+  color?: {
+    gamut?: unknown;
+    xy?: XYColor;
+  };
+}
+
 /**
  * Convert RGB (0-255) to XY CIE color space
- * @param {number} red - Red value (0-255)
- * @param {number} green - Green value (0-255)
- * @param {number} blue - Blue value (0-255)
- * @returns {{x: number, y: number}} XY coordinates in CIE color space
+ * @param red - Red value (0-255)
+ * @param green - Green value (0-255)
+ * @param blue - Blue value (0-255)
+ * @returns XY coordinates in CIE color space
  */
-export function rgbToXY(red, green, blue) {
+export function rgbToXY(red: number, green: number, blue: number): XYColor {
   // Normalize RGB values to 0-1
   let r = red / 255;
   let g = green / 255;
@@ -46,10 +71,10 @@ export function rgbToXY(red, green, blue) {
 
 /**
  * Convert hex color to XY CIE
- * @param {string} hex - Hex color (e.g., '#FF5733' or 'FF5733')
- * @returns {{x: number, y: number}} XY coordinates
+ * @param hex - Hex color (e.g., '#FF5733' or 'FF5733')
+ * @returns XY coordinates
  */
-export function hexToXY(hex) {
+export function hexToXY(hex: string): XYColor {
   // Remove # if present
   hex = hex.replace('#', '');
 
@@ -65,7 +90,7 @@ export function hexToXY(hex) {
  * Preset colors for quick selection
  * Common colors with their XY CIE coordinates pre-calculated
  */
-export const COLOR_PRESETS = [
+export const COLOR_PRESETS: ColorPreset[] = [
   {
     name: 'Bianco Caldo',
     hex: '#FFE4B5',
@@ -130,19 +155,19 @@ export const COLOR_PRESETS = [
 
 /**
  * Check if a light supports color
- * @param {object} light - Hue light object from API
- * @returns {boolean} True if light supports color
+ * @param light - Hue light object from API
+ * @returns True if light supports color
  */
-export function supportsColor(light) {
+export function supportsColor(light: HueLight): boolean {
   return !!(light?.color?.gamut || light?.color?.xy);
 }
 
 /**
  * Get current color as hex (approximate)
- * @param {object} light - Hue light object
- * @returns {string|null} Hex color or null if no color
+ * @param light - Hue light object
+ * @returns Hex color or null if no color
  */
-export function getCurrentColorHex(light) {
+export function getCurrentColorHex(light: HueLight): string | null {
   if (!light?.color?.xy) return null;
 
   const { x, y } = light.color.xy;

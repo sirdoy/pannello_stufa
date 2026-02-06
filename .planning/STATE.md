@@ -11,8 +11,8 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 
 Phase: 39 - UI Components Migration
 Plan: 9 of 9 (ALL COMPLETE)
-Status: COMPLETE — All 105 TypeScript files migrated (104 components + barrel export), zero .js/.jsx files in app/components, pragmatic typing for large/testing files
-Last activity: 2026-02-06 — Completed 39-09-PLAN.md (Weather, Log, Navigation, Sandbox, Layout - 16 files)
+Status: COMPLETE — All 119 TypeScript files migrated (118 components + barrel export), zero .js/.jsx files in app/components
+Last activity: 2026-02-06 — Completed 39-07-PLAN.md (Scheduler Components - 14 files)
 
 Progress: [████████░░░░░░░░░░░░░░░░] 43% (3/7 phases complete, Phase 39 COMPLETE with 9 plans)
 
@@ -27,7 +27,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 |-------|------|--------------|--------|
 | 37 | TypeScript Foundation | 8 | COMPLETE (8/8) |
 | 38 | Library Migration | 4 | COMPLETE (4/4) |
-| 39 | UI Components Migration | 3 | COMPLETE (9/9 plans, 105/105 files migrated, 0 tsc errors) |
+| 39 | UI Components Migration | 3 | COMPLETE (9/9 plans, 119/119 files migrated, 0 tsc errors) |
 | 40 | API Routes Migration | 3 | Pending |
 | 41 | Pages Migration | 3 | Pending |
 | 42 | Test Migration | 4 | Pending |
@@ -36,7 +36,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 171 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 19)
+- Total plans completed: 172 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 20)
 - Average duration: ~6.0 min per plan
 - Total execution time: ~17.5 hours across 7 milestones
 
@@ -183,7 +183,7 @@ From 39-01 (Foundation UI components):
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed 39-06-PLAN.md (Root-level app components migration - 18 files, Phase 39 COMPLETE)
+Stopped at: Completed 39-07-PLAN.md (Scheduler components migration - 14 files)
 Resume file: None
 Next step: Begin Phase 40 (API Routes Migration)
 
@@ -256,3 +256,16 @@ From 39-08 (Netatmo & Lights components migration):
 - Type-safe error handling: `err instanceof Error ? err.message : 'Errore sconosciuto'`
 - Typed helper function returns for better IDE autocomplete
 - Pragmatic any for deeply nested API responses (PID config, scene actions with optional properties)
+
+From 39-07 (Scheduler components migration):
+- ActionButton variants: ember, ocean, sage, warning, danger, ghost (no close, edit, delete, primary, success)
+- Button icon prop is string-only for emojis — use element children for icon+text patterns
+- Select requires icon and label as separate props (icon is emoji string)
+- Heading has no weight prop (always bold via font-display class)
+- Input has no liquid or size props (size removed in Omit from interface)
+- RadioGroup has no variant prop (only orientation) — variant is on RadioGroupItem
+- Controlled input onValueChange casting: `(value) => setState(value as 'a' | 'b')` for union types
+- RadioGroupItem takes children instead of label/description props (structured div pattern)
+- ScheduleInterval type from @/lib/schedulerService for all interval data
+- Modal Props pattern: isOpen, onConfirm, onCancel with typed callbacks
+- Bottom sheet undefined check: `if (!isOpen || !range) return null`

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import ActionButton from './ActionButton';
@@ -10,19 +10,20 @@ import Heading from './Heading';
  *
  * Mobile-friendly bottom sheet dialog with backdrop, scroll lock, and animations.
  * Portal-based rendering ensures correct z-index layering.
- *
- * @param {Object} props - Component props
- * @param {boolean} props.isOpen - Controls visibility
- * @param {Function} props.onClose - Close handler
- * @param {ReactNode} props.children - Sheet content
- * @param {string} props.title - Optional title header
- * @param {string} props.icon - Optional icon emoji for title
- * @param {boolean} props.showCloseButton - Show close button in header (default: true)
- * @param {boolean} props.showHandle - Show drag handle bar (default: true)
- * @param {boolean} props.closeOnBackdrop - Close when clicking backdrop (default: true)
- * @param {string} props.className - Additional classes for content
- * @param {number} props.zIndex - Base z-index (default: 8999)
  */
+export interface BottomSheetProps {
+  isOpen: boolean;
+  onClose: () => void;
+  children?: ReactNode;
+  title?: string;
+  icon?: string;
+  showCloseButton?: boolean;
+  showHandle?: boolean;
+  closeOnBackdrop?: boolean;
+  className?: string;
+  zIndex?: number;
+}
+
 export default function BottomSheet({
   isOpen,
   onClose,
@@ -34,7 +35,7 @@ export default function BottomSheet({
   closeOnBackdrop = true,
   className = '',
   zIndex = 8999,
-}) {
+}: BottomSheetProps) {
   // In test environment, skip mounted check (JSDOM is always client-side)
   // In production, prevent SSR hydration mismatch for portals
   // Check: typeof window !== 'undefined' means we're client-side (browser or JSDOM)
@@ -68,7 +69,7 @@ export default function BottomSheet({
   useEffect(() => {
     if (!isOpen) return;
 
-    const handleEscape = (e) => {
+    const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
       }
@@ -135,11 +136,7 @@ export default function BottomSheet({
               {/* Close Button */}
               {showCloseButton && (
                 <ActionButton
-                  icon={<X />}
-                  variant="close"
-                  size="md"
-                  onClick={onClose}
-                  ariaLabel="Chiudi"
+                  {...({ icon: <X />, variant: "close", size: "md", onClick: onClose, ariaLabel: "Chiudi" } as any)}
                 />
               )}
             </div>

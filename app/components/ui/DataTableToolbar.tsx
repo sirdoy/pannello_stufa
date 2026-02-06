@@ -1,12 +1,26 @@
 'use client';
 
-import { forwardRef, useState, useEffect, useCallback, useRef } from 'react';
+import { forwardRef, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import Input from './Input';
 import Badge from './Badge';
 import Button from './Button';
 import Text from './Text';
+import type { Table } from '@tanstack/react-table';
+
+export interface DataTableToolbarProps<TData> {
+  table: Table<TData>;
+  globalFilter?: string;
+  onGlobalFilterChange?: (value: string) => void;
+  searchPlaceholder?: string;
+  showSearch?: boolean;
+  showBulkActions?: boolean;
+  onBulkAction?: (action: string, selectedRows: any) => void;
+  bulkActions?: any[];
+  className?: string;
+  [key: string]: any;
+}
 
 /**
  * DataTableToolbar Component
@@ -36,17 +50,19 @@ import Text from './Text';
  *   onBulkAction={(action, rows) => handleBulkAction(action, rows)}
  * />
  */
-const DataTableToolbar = forwardRef(function DataTableToolbar(
+const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(function DataTableToolbar(
   {
     table,
     globalFilter = '',
     onGlobalFilterChange,
+    showSearch = true,
+    searchPlaceholder = 'Search...',
     showBulkActions = false,
     onBulkAction,
     bulkActions = [],
-    className,
+    className = '',
     ...props
-  },
+  }: DataTableToolbarProps<any>,
   ref
 ) {
   // Debounced search state
@@ -172,7 +188,7 @@ const DataTableToolbar = forwardRef(function DataTableToolbar(
 
           {/* Bulk action buttons */}
           <div className="flex items-center gap-2">
-            {bulkActions.map((action) => (
+            {Array.isArray(bulkActions) && bulkActions.map((action: any) => (
               <Button
                 key={action.id}
                 variant={action.variant || 'subtle'}

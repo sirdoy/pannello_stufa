@@ -1,3 +1,5 @@
+import type { ReactNode, HTMLAttributes } from 'react';
+
 /**
  * Skeleton Component - Ember Noir Design System
  *
@@ -15,11 +17,12 @@
  *   <Skeleton className="h-4 w-full mb-2" />
  *   <Skeleton className="h-4 w-3/4" />
  * </Skeleton.Card>
- *
- * @param {string} [className] - Additional Tailwind classes for sizing/spacing
- * @param {object} [props] - Additional HTML attributes
  */
-export default function Skeleton({ className = '', ...props }) {
+export interface SkeletonProps extends HTMLAttributes<HTMLDivElement> {
+  className?: string;
+}
+
+export default function Skeleton({ className = '', ...props }: SkeletonProps) {
   return (
     <div
       className={`relative overflow-hidden rounded-xl bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 ${className}`}
@@ -34,7 +37,11 @@ export default function Skeleton({ className = '', ...props }) {
 /**
  * Skeleton.Card - Skeleton wrapper that mimics Card component
  */
-Skeleton.Card = function SkeletonCard({ children, className = '', ...props }) {
+interface SkeletonCardProps extends HTMLAttributes<HTMLDivElement> {
+  children?: ReactNode;
+}
+
+Skeleton.Card = function SkeletonCard({ children, className = '', ...props }: SkeletonCardProps) {
   return (
     <div
       className={`bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-slate-700/50 shadow-[0_4px_20px_rgba(0,0,0,0.3)] [html:not(.dark)_&]:bg-white/90 [html:not(.dark)_&]:border-slate-200 [html:not(.dark)_&]:shadow-[0_4px_20px_rgba(0,0,0,0.1)] ${className}`}

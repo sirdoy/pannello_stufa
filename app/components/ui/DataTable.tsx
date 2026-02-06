@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useMemo, useState, useCallback, useEffect, useRef } from 'react';
+import { forwardRef, useMemo, useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
@@ -9,10 +9,34 @@ import {
   getPaginationRowModel,
   getExpandedRowModel,
   flexRender,
+  type ColumnDef,
+  type SortingState,
+  type ColumnFiltersState,
+  type Row,
 } from '@tanstack/react-table';
-import { cva } from 'class-variance-authority';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
+
+export interface DataTableProps<TData> {
+  columns: ColumnDef<TData>[];
+  data: TData[];
+  variant?: 'default' | 'compact' | 'striped';
+  showPagination?: boolean;
+  pageSize?: number;
+  showSearch?: boolean;
+  searchPlaceholder?: string;
+  renderExpandedContent?: (row: Row<TData>) => ReactNode;
+  onRowClick?: (row: Row<TData>) => void;
+  enableSorting?: boolean;
+  enableFiltering?: boolean;
+  enableSelection?: boolean;
+  enableExpanding?: boolean;
+  initialSorting?: SortingState;
+  initialFilters?: ColumnFiltersState;
+  className?: string;
+  [key: string]: any;
+}
 import Checkbox from './Checkbox';
 import Button from './Button';
 import Text from './Text';
@@ -160,7 +184,7 @@ function SortIndicator({ isSorted, direction }) {
  *   onRowClick={(row) => console.log(row.original)}
  * />
  */
-const DataTable = forwardRef(function DataTable(
+const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataTable(
   {
     data: dataProp,
     columns: columnsProp,
@@ -640,7 +664,7 @@ const DataTable = forwardRef(function DataTable(
           {/* Rows per page selector */}
           {pageSizeOptions && pageSizeOptions.length > 0 && (
             <div className="flex items-center gap-2">
-              <Text variant="secondary" size="sm" as="label" htmlFor="page-size">
+              <Text {...({ variant: "secondary", size: "sm", as: "label", htmlFor: "page-size" } as any)}>
                 Rows:
               </Text>
               <select

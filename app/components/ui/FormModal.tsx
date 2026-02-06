@@ -1,12 +1,30 @@
 'use client';
 
-import { forwardRef, useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import { forwardRef, useEffect, useState, useRef, useCallback, useMemo, type ReactNode } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, Check, X } from 'lucide-react';
 import Modal from './Modal';
 import Button from './Button';
 import { cn } from '@/lib/utils/cn';
+
+export interface FormModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: any) => Promise<void> | void;
+  title: string;
+  description?: string;
+  fields: any[];
+  initialValues?: any;
+  schema?: any;
+  submitLabel?: string;
+  cancelLabel?: string;
+  icon?: ReactNode;
+  showSuccessOverlay?: boolean;
+  successMessage?: string;
+  className?: string;
+  [key: string]: any;
+}
 
 /**
  * FormModal Component - Ember Noir Design System
@@ -66,7 +84,7 @@ import { cn } from '@/lib/utils/cn';
 function ErrorSummary({ errors }) {
   const errorList = Object.entries(errors).map(([field, error]) => ({
     field,
-    message: error?.message || 'Invalid value',
+    message: (error as any)?.message || 'Invalid value',
   }));
 
   if (errorList.length === 0) return null;
@@ -101,7 +119,7 @@ function ErrorSummary({ errors }) {
 /**
  * Internal SuccessOverlay component - brief checkmark before close
  */
-function SuccessOverlay({ message }) {
+function SuccessOverlay({ message }: { message?: string }) {
   return (
     <div
       className={cn(
@@ -134,7 +152,7 @@ function SuccessOverlay({ message }) {
 /**
  * FormModal main component
  */
-const FormModal = forwardRef(function FormModal(
+const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
   {
     isOpen,
     onClose,
@@ -278,12 +296,7 @@ const FormModal = forwardRef(function FormModal(
 
   return (
     <Modal
-      ref={ref}
-      isOpen={isOpen}
-      onClose={handleClose}
-      size={size}
-      className={cn('relative', className)}
-      {...props}
+      {...({ ref, isOpen, onClose: handleClose, size, className: cn('relative', className), ...props } as any)}
     >
       <Modal.Header>
         <Modal.Title>{title}</Modal.Title>

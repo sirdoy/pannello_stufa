@@ -1,37 +1,39 @@
 'use client';
 
 import { ChevronRight } from 'lucide-react';
-import { flexRender } from '@tanstack/react-table';
+import { flexRender, type Row, type ColumnDef } from '@tanstack/react-table';
 import { cn } from '@/lib/utils/cn';
 import Text from './Text';
+import type { ReactNode } from 'react';
 
 /**
  * DataTableRow Component
  *
  * Renders a table row with expansion support and keyboard navigation.
  * Uses roving tabindex pattern for accessible keyboard navigation.
- *
- * @param {Object} props - Component props
- * @param {Object} props.row - TanStack Row instance
- * @param {Array} props.columns - Column definitions
- * @param {number} props.index - Row index (for roving tabindex)
- * @param {Function} [props.renderExpandedContent] - Custom expansion content renderer (row) => ReactNode
- * @param {number} [props.extraColumns=0] - Number of extra columns (select, expand, etc.)
- * @param {Function} [props.onRowClick] - Callback when row is clicked
  */
-export function DataTableRow({
+export interface DataTableRowProps<TData> {
+  row: Row<TData>;
+  columns: ColumnDef<TData>[];
+  index: number;
+  renderExpandedContent?: (row: Row<TData>) => ReactNode;
+  extraColumns?: number;
+  onRowClick?: (row: Row<TData>) => void;
+}
+
+export function DataTableRow<TData>({
   row,
   columns,
   index,
   renderExpandedContent,
   extraColumns = 0,
   onRowClick,
-}) {
+}: DataTableRowProps<TData>) {
   /**
    * Keyboard navigation handler
    * Implements roving tabindex pattern with arrow keys, Enter, and Space
    */
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTableRowElement>) => {
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
@@ -40,7 +42,7 @@ export function DataTableRow({
         if (nextRow?.getAttribute('data-expansion-row')) {
           nextRow = nextRow.nextElementSibling;
         }
-        nextRow?.focus();
+        (nextRow as HTMLElement | null)?.focus();
         break;
 
       case 'ArrowUp':
@@ -50,7 +52,7 @@ export function DataTableRow({
         if (prevRow?.getAttribute('data-expansion-row')) {
           prevRow = prevRow.previousElementSibling;
         }
-        prevRow?.focus();
+        (prevRow as HTMLElement | null)?.focus();
         break;
 
       case 'Enter':

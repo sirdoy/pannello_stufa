@@ -1,12 +1,26 @@
 'use client';
 
-import { forwardRef, useRef, useEffect } from 'react';
+import { forwardRef, useRef, useEffect, type ReactNode, type ComponentPropsWithoutRef } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
-import { cva } from 'class-variance-authority';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 import { AlertTriangle } from 'lucide-react';
 import Button from './Button';
+
+export interface ConfirmationDialogProps extends ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm?: () => void | Promise<void>;
+  onCancel?: () => void;
+  title: string;
+  description?: ReactNode;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  variant?: 'default' | 'danger';
+  loading?: boolean;
+  icon?: ReactNode;
+}
 
 /**
  * ConfirmationDialog Component - Ember Noir Design System v4.0
@@ -114,7 +128,7 @@ const confirmButtonVariants = cva([], {
  * @param {boolean} props.loading - Loading state (default: false)
  * @param {ReactNode} props.icon - Custom icon (defaults to AlertTriangle for danger)
  */
-const ConfirmationDialog = forwardRef(function ConfirmationDialog(
+const ConfirmationDialog = forwardRef<HTMLDivElement, ConfirmationDialogProps>(function ConfirmationDialog(
   {
     isOpen,
     onClose,
@@ -132,8 +146,8 @@ const ConfirmationDialog = forwardRef(function ConfirmationDialog(
   },
   ref
 ) {
-  const cancelButtonRef = useRef(null);
-  const confirmButtonRef = useRef(null);
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
+  const confirmButtonRef = useRef<HTMLButtonElement>(null);
 
   // Handle cancel action
   const handleCancel = () => {

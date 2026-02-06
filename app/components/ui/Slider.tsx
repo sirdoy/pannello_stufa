@@ -7,25 +7,37 @@ import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 
+type SliderPrimitivePropsBase = React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>;
+
+export type SliderProps = Omit<SliderPrimitivePropsBase, 'value' | 'defaultValue' | 'onValueChange' | 'min' | 'max' | 'step' | 'disabled'> &
+  VariantProps<typeof rangeVariants> & {
+    /** Current value (number for single, array for range) */
+    value?: number | number[];
+    /** Initial value */
+    defaultValue?: number | number[];
+    /** Callback with new value */
+    onValueChange?: (value: number | number[]) => void;
+    /** Alias for onValueChange (simpler API) */
+    onChange?: (value: number | number[]) => void;
+    /** Minimum value (default: 0) */
+    min?: number;
+    /** Maximum value (default: 100) */
+    max?: number;
+    /** Step increment (default: 1) */
+    step?: number;
+    /** Disabled state */
+    disabled?: boolean;
+    /** Enable dual-thumb range selection */
+    range?: boolean;
+    /** Show value tooltip while dragging */
+    showTooltip?: boolean;
+  };
+
 /**
  * Slider Component - Ember Noir Design System
  *
  * Accessible range slider built on Radix UI Slider primitive.
  * Supports single value, range mode, and optional tooltip.
- *
- * @param {Object} props
- * @param {number|number[]} props.value - Current value (number for single, array for range)
- * @param {number|number[]} props.defaultValue - Initial value
- * @param {function} props.onValueChange - Callback with new value
- * @param {function} props.onChange - Alias for onValueChange (simpler API)
- * @param {number} props.min - Minimum value (default: 0)
- * @param {number} props.max - Maximum value (default: 100)
- * @param {number} props.step - Step increment (default: 1)
- * @param {boolean} props.range - Enable dual-thumb range selection
- * @param {boolean} props.showTooltip - Show value tooltip while dragging
- * @param {boolean} props.disabled - Disabled state
- * @param {'ember'|'ocean'|'sage'} props.variant - Color variant
- * @param {string} props.className - Additional classes
  */
 
 // Range fill variants
@@ -70,7 +82,7 @@ const thumbVariants = cva(
   }
 );
 
-const Slider = forwardRef(function Slider(
+const Slider = forwardRef<HTMLSpanElement, SliderProps>(function Slider(
   {
     value: valueProp,
     defaultValue: defaultValueProp,

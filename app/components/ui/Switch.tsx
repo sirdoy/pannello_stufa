@@ -95,23 +95,27 @@ const switchThumbVariants = cva(
   }
 );
 
+type SwitchPrimitivePropsBase = React.ComponentPropsWithoutRef<typeof SwitchPrimitive.Root>;
+
+export type SwitchProps = Omit<SwitchPrimitivePropsBase, 'checked' | 'onCheckedChange'> &
+  VariantProps<typeof switchTrackVariants> & {
+    /** Checked state */
+    checked?: boolean;
+    /** Radix change handler (receives boolean) */
+    onCheckedChange?: (checked: boolean) => void;
+    /** Legacy change handler (backwards compatibility) */
+    onChange?: (checked: boolean) => void;
+    /** Accessible label (sets aria-label) */
+    label?: string;
+  };
+
 /**
  * Switch Component - Ember Noir Design System
  *
  * Accessible toggle switch built on Radix UI primitives with CVA variants.
  * Supports smooth 250ms animation and full keyboard navigation.
- *
- * @param {Object} props
- * @param {boolean} props.checked - Checked state
- * @param {Function} props.onCheckedChange - Radix change handler (receives boolean)
- * @param {Function} props.onChange - Legacy change handler (backwards compatibility)
- * @param {boolean} props.disabled - Disabled state
- * @param {'sm'|'md'|'lg'} props.size - Size variant
- * @param {'ember'|'ocean'|'sage'} props.variant - Color variant when checked
- * @param {string} props.className - Additional classes for the switch
- * @param {string} props.label - Accessible label (sets aria-label)
  */
-const Switch = forwardRef(function Switch(
+const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch(
   {
     checked = false,
     onCheckedChange,

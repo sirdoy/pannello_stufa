@@ -123,10 +123,14 @@ const selectItemVariants = cva(
 const SelectRoot = SelectPrimitive.Root;
 SelectRoot.displayName = 'SelectRoot';
 
+export interface SelectTriggerProps
+  extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>,
+    VariantProps<typeof selectTriggerVariants> {}
+
 /**
  * SelectTrigger - Trigger button for the select
  */
-const SelectTrigger = forwardRef(({
+const SelectTrigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(({
   className,
   children,
   variant = 'default',
@@ -157,10 +161,13 @@ SelectTrigger.displayName = 'SelectTrigger';
 const SelectValue = SelectPrimitive.Value;
 SelectValue.displayName = 'SelectValue';
 
+export interface SelectContentProps
+  extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content> {}
+
 /**
  * SelectContent - Dropdown content container
  */
-const SelectContent = forwardRef(({
+const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(({
   className,
   children,
   position = 'popper',
@@ -199,10 +206,14 @@ const SelectContent = forwardRef(({
 ));
 SelectContent.displayName = 'SelectContent';
 
+export interface SelectItemProps
+  extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>,
+    VariantProps<typeof selectItemVariants> {}
+
 /**
  * SelectItem - Individual option item
  */
-const SelectItem = forwardRef(({
+const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(({
   className,
   children,
   variant = 'default',
@@ -227,10 +238,13 @@ SelectItem.displayName = 'SelectItem';
 const SelectGroup = SelectPrimitive.Group;
 SelectGroup.displayName = 'SelectGroup';
 
+export interface SelectLabelProps
+  extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label> {}
+
 /**
  * SelectLabel - Label for a group
  */
-const SelectLabel = forwardRef(({ className, ...props }, ref) => (
+const SelectLabel = forwardRef<HTMLDivElement, SelectLabelProps>(({ className, ...props }, ref) => (
   <SelectPrimitive.Label
     ref={ref}
     className={cn(
@@ -243,10 +257,13 @@ const SelectLabel = forwardRef(({ className, ...props }, ref) => (
 ));
 SelectLabel.displayName = 'SelectLabel';
 
+export interface SelectSeparatorProps
+  extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator> {}
+
 /**
  * SelectSeparator - Visual separator between items
  */
-const SelectSeparator = forwardRef(({ className, ...props }, ref) => (
+const SelectSeparator = forwardRef<HTMLDivElement, SelectSeparatorProps>(({ className, ...props }, ref) => (
   <SelectPrimitive.Separator
     ref={ref}
     className={cn(
@@ -259,21 +276,33 @@ const SelectSeparator = forwardRef(({ className, ...props }, ref) => (
 ));
 SelectSeparator.displayName = 'SelectSeparator';
 
+export interface SelectProps extends Omit<React.ComponentPropsWithoutRef<typeof SelectPrimitive.Root>, 'value' | 'onValueChange'> {
+  /** Label text */
+  label?: string;
+  /** Optional emoji icon */
+  icon?: string;
+  /** Array of {value, label, disabled?} */
+  options?: Array<{ value: string | number; label: string; disabled?: boolean }>;
+  /** Selected value */
+  value?: string | number;
+  /** Change handler (receives synthetic event) */
+  onChange?: (event: { target: { value: string | number } }) => void;
+  /** Color variant */
+  variant?: 'default' | 'ember' | 'ocean';
+  /** Searchable mode (logs warning, not supported) */
+  searchable?: boolean;
+  /** Placeholder text */
+  placeholder?: string;
+  /** Additional classes for trigger */
+  className?: string;
+  /** Container classes */
+  containerClassName?: string;
+  /** Legacy prop - ignored */
+  liquid?: boolean;
+}
+
 /**
  * Simple Select API - Backwards compatible wrapper
- *
- * @param {Object} props
- * @param {string} props.label - Label text
- * @param {string} props.icon - Optional emoji icon
- * @param {Array} props.options - Array of {value, label, disabled?}
- * @param {string|number} props.value - Selected value
- * @param {Function} props.onChange - Change handler (receives synthetic event)
- * @param {boolean} props.disabled - Disabled state
- * @param {'default'|'ember'|'ocean'} props.variant - Color variant
- * @param {boolean} props.searchable - Searchable mode (logs warning, not supported)
- * @param {string} props.placeholder - Placeholder text
- * @param {string} props.className - Additional classes for trigger
- * @param {string} props.containerClassName - Container classes
  */
 function Select({
   label,
@@ -340,7 +369,7 @@ function Select({
         {...props}
       >
         <SelectTrigger
-          variant={variant}
+          variant={variant as 'default' | 'ember' | 'ocean'}
           className={className}
           aria-labelledby={label ? labelId : undefined}
         >
@@ -352,7 +381,7 @@ function Select({
               key={option.value}
               value={String(option.value)}
               disabled={option.disabled}
-              variant={variant}
+              variant={variant as 'default' | 'ember' | 'ocean'}
             >
               {option.label}
             </SelectItem>

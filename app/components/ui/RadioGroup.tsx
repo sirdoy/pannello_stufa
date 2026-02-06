@@ -107,10 +107,14 @@ const radioIndicatorVariants = cva(
   }
 );
 
+export interface RadioGroupProps
+  extends React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>,
+    VariantProps<typeof radioGroupVariants> {}
+
 /**
  * RadioGroup Root Component
  */
-const RadioGroup = forwardRef(({
+const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(({
   className,
   orientation = 'vertical',
   ...props
@@ -124,18 +128,21 @@ const RadioGroup = forwardRef(({
 ));
 RadioGroup.displayName = 'RadioGroup';
 
+export interface RadioGroupItemProps
+  extends React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>,
+    VariantProps<typeof radioItemVariants> {
+  /** Label text (optional, can use children instead) */
+  label?: React.ReactNode;
+  /** Children as alternative to label */
+  children?: React.ReactNode;
+  /** Additional classes for the wrapper */
+  className?: string;
+}
+
 /**
  * RadioGroupItem Component
- *
- * @param {Object} props
- * @param {string} props.value - Unique value for this option (required)
- * @param {string} props.label - Label text (optional, can use children instead)
- * @param {boolean} props.disabled - Disabled state
- * @param {'ember'|'ocean'|'sage'} props.variant - Color variant
- * @param {'sm'|'md'|'lg'} props.size - Size variant
- * @param {string} props.className - Additional classes for the wrapper
  */
-const RadioGroupItem = forwardRef(({
+const RadioGroupItem = forwardRef<HTMLButtonElement, RadioGroupItemProps>(({
   className,
   label,
   children,
@@ -180,11 +187,16 @@ const RadioGroupItem = forwardRef(({
 });
 RadioGroupItem.displayName = 'RadioGroupItem';
 
+// Type the RadioGroup namespace with sub-component
+type RadioGroupComponent = React.ForwardRefExoticComponent<RadioGroupProps & React.RefAttributes<HTMLDivElement>> & {
+  Item: typeof RadioGroupItem;
+};
+
 // Attach Item as a compound component
-RadioGroup.Item = RadioGroupItem;
+(RadioGroup as RadioGroupComponent).Item = RadioGroupItem;
 
 // Named exports for direct import
 export { RadioGroup, RadioGroupItem };
 
 // Default export with compound pattern
-export default RadioGroup;
+export default RadioGroup as RadioGroupComponent;

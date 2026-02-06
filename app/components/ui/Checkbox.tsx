@@ -92,27 +92,35 @@ const iconSizes = {
   lg: 'h-4 w-4',
 };
 
+type CheckboxPrimitivePropsBase = React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>;
+
+export type CheckboxProps = Omit<CheckboxPrimitivePropsBase, 'checked' | 'onCheckedChange'> &
+  VariantProps<typeof checkboxVariants> & {
+    /** Checked state (true, false, or 'indeterminate') */
+    checked?: boolean | 'indeterminate';
+    /** Indeterminate state (legacy prop, converts to checked='indeterminate') */
+    indeterminate?: boolean;
+    /** Radix change handler (receives boolean | 'indeterminate') */
+    onCheckedChange?: (checked: boolean | 'indeterminate') => void;
+    /** Legacy change handler (backwards compatibility) */
+    onChange?: (event: { target: { checked: boolean; indeterminate: boolean; name?: string; value?: string } }) => void;
+    /** Optional label text */
+    label?: React.ReactNode;
+    /** Input id (for label association) */
+    id?: string;
+    /** Input name */
+    name?: string;
+    /** Input value */
+    value?: string;
+  };
+
 /**
  * Checkbox Component - Ember Noir Design System
  *
  * Accessible checkbox built on Radix UI primitives with CVA variants.
  * Supports checked, unchecked, and indeterminate states with full keyboard navigation.
- *
- * @param {Object} props
- * @param {boolean|'indeterminate'} props.checked - Checked state (true, false, or 'indeterminate')
- * @param {boolean} props.indeterminate - Indeterminate state (legacy prop, converts to checked='indeterminate')
- * @param {Function} props.onCheckedChange - Radix change handler (receives boolean | 'indeterminate')
- * @param {Function} props.onChange - Legacy change handler (backwards compatibility)
- * @param {boolean} props.disabled - Disabled state
- * @param {ReactNode} props.label - Optional label text
- * @param {'sm'|'md'|'lg'} props.size - Size variant
- * @param {'primary'|'ember'|'ocean'|'sage'|'flame'} props.variant - Color variant
- * @param {string} props.className - Additional classes for the checkbox
- * @param {string} props.id - Input id (for label association)
- * @param {string} props.name - Input name
- * @param {string} props.value - Input value
  */
-const Checkbox = forwardRef(function Checkbox(
+const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(function Checkbox(
   {
     checked = false,
     indeterminate = false,

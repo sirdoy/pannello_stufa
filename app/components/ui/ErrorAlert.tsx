@@ -98,9 +98,8 @@ export default function ErrorAlert({ errorCode, errorDescription, className = ''
       dismissKey=""
       compact={false}
       className={className}
-    >
-      {/* Banner children required but unused */}
-    </Banner>
+      {...({} as any)}
+    />
   );
 }
 

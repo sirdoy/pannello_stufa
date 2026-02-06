@@ -150,6 +150,13 @@ From 38-09 (React hooks):
 - CSSProperties typing for style constants with 'as const'
 - LongPressEventType.Pointer handles both mouse and touch events
 
+From 38-12 (Firebase unknown type access):
+- Firebase get().val() and adminDbGet() always cast to typed interface (never leave as unknown)
+- Firebase messaging priority uses literal types 'high' | 'normal' not string
+- TokenRecord interface for FCM token data with index signature for flexibility
+- Type guards for PromiseSettledResult discriminated unions
+- Index signature [key: string]: unknown for flexible data structures
+
 From 38-13 (Record conversion & Promise types):
 - Double assertion for Firebase writes: (data as unknown as Record<string, unknown>)
 - Index signatures on API params for generic Record<string, unknown> casting
@@ -177,3 +184,13 @@ Last session: 2026-02-06 11:15 UTC
 Stopped at: Completed 38-13-PLAN.md (Record conversion & Promise type fixes)
 Resume file: None
 Next step: Continue gap closure plans for remaining tsc errors
+
+From 38-10 (Type definitions gap closure):
+- Type narrowing with 'in' operator for discriminated unions: if ('property' in object)
+- Readonly array casting for includes checks: (array as readonly string[]).includes(value)
+- Query<DocumentData, DocumentData> for Firestore query variable type after where() chains
+- Widen literal unions to string when storing human-readable messages
+- Import shared types instead of duplicating (NetatmoSchedule from netatmoApi)
+
+**Phase 38 gap closure update (2026-02-06):**
+All gap closure plans complete. TypeScript error count reduced from 252 to 0 through plans 38-10, 38-11, 38-12, 38-13.

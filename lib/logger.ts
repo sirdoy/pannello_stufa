@@ -19,7 +19,9 @@
  *   log.success('Task completed');
  */
 
-const LOG_LEVELS = {
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+
+const LOG_LEVELS: Record<LogLevel, number> = {
   debug: 0,
   info: 1,
   warn: 2,
@@ -32,7 +34,7 @@ const MIN_LOG_LEVEL = process.env.NODE_ENV === 'production' ? LOG_LEVELS.info : 
 /**
  * Format log message with context
  */
-function formatMessage(context, message) {
+function formatMessage(context: string | null, message: string): string {
   if (context) {
     return `[${context}] ${message}`;
   }
@@ -40,16 +42,29 @@ function formatMessage(context, message) {
 }
 
 /**
- * Create a logger instance with optional context
- * @param {string} context - Module/context name for log prefix
- * @returns {Object} Logger instance
+ * Logger instance interface
  */
-export function createLogger(context = null) {
+export interface Logger {
+  debug(message: string, ...args: unknown[]): void;
+  info(message: string, ...args: unknown[]): void;
+  warn(message: string, ...args: unknown[]): void;
+  error(message: string, ...args: unknown[]): void;
+  success(message: string, ...args: unknown[]): void;
+  progress(message: string, ...args: unknown[]): void;
+  skip(message: string, ...args: unknown[]): void;
+}
+
+/**
+ * Create a logger instance with optional context
+ * @param context - Module/context name for log prefix
+ * @returns Logger instance
+ */
+export function createLogger(context: string | null = null): Logger {
   return {
     /**
      * Debug level - development only
      */
-    debug(message, ...args) {
+    debug(message: string, ...args: unknown[]): void {
       if (LOG_LEVELS.debug >= MIN_LOG_LEVEL) {
         console.log(formatMessage(context, message), ...args);
       }
@@ -58,7 +73,7 @@ export function createLogger(context = null) {
     /**
      * Info level - general information
      */
-    info(message, ...args) {
+    info(message: string, ...args: unknown[]): void {
       if (LOG_LEVELS.info >= MIN_LOG_LEVEL) {
         console.log(formatMessage(context, message), ...args);
       }
@@ -67,7 +82,7 @@ export function createLogger(context = null) {
     /**
      * Warning level - potential issues
      */
-    warn(message, ...args) {
+    warn(message: string, ...args: unknown[]): void {
       if (LOG_LEVELS.warn >= MIN_LOG_LEVEL) {
         console.warn(`⚠️ ${formatMessage(context, message)}`, ...args);
       }
@@ -76,7 +91,7 @@ export function createLogger(context = null) {
     /**
      * Error level - errors and failures
      */
-    error(message, ...args) {
+    error(message: string, ...args: unknown[]): void {
       if (LOG_LEVELS.error >= MIN_LOG_LEVEL) {
         console.error(`❌ ${formatMessage(context, message)}`, ...args);
       }
@@ -85,7 +100,7 @@ export function createLogger(context = null) {
     /**
      * Success indicator - for completed operations
      */
-    success(message, ...args) {
+    success(message: string, ...args: unknown[]): void {
       if (LOG_LEVELS.info >= MIN_LOG_LEVEL) {
         console.log(`✅ ${formatMessage(context, message)}`, ...args);
       }
@@ -94,7 +109,7 @@ export function createLogger(context = null) {
     /**
      * Progress indicator - for ongoing operations
      */
-    progress(message, ...args) {
+    progress(message: string, ...args: unknown[]): void {
       if (LOG_LEVELS.info >= MIN_LOG_LEVEL) {
         console.log(`🔄 ${formatMessage(context, message)}`, ...args);
       }
@@ -103,7 +118,7 @@ export function createLogger(context = null) {
     /**
      * Skip indicator - for skipped operations
      */
-    skip(message, ...args) {
+    skip(message: string, ...args: unknown[]): void {
       if (LOG_LEVELS.info >= MIN_LOG_LEVEL) {
         console.log(`⏭️ ${formatMessage(context, message)}`, ...args);
       }
@@ -114,6 +129,6 @@ export function createLogger(context = null) {
 /**
  * Default logger instance (no context)
  */
-export const logger = createLogger();
+export const logger: Logger = createLogger();
 
 export default logger;

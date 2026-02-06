@@ -1,4 +1,5 @@
 import { Auth0Client } from '@auth0/nextjs-auth0/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // Auth0 v4 configuration
 // Map existing env vars to v4 expected names
@@ -22,7 +23,7 @@ const auth0Config = {
       httpOnly: true,
       // secure: false for localhost, true for production
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'lax' as const,
       path: '/',
     }
   },
@@ -48,6 +49,11 @@ const auth0Config = {
 
 export const auth0 = new Auth0Client(auth0Config);
 
+/** Route context interface */
+interface RouteContext {
+  params: Promise<Record<string, string>>;
+}
+
 /**
  * Wrapper for App Router API routes that require authentication.
  * Fixes TypeScript compatibility issue with auth0.withApiAuthRequired.
@@ -56,27 +62,27 @@ export const auth0 = new Auth0Client(auth0Config);
  *   export const GET = withAuth(async (request) => { ... });
  *   export const POST = withAuth(async (request) => { ... });
  *
- * @param {function} handler - Async function that receives NextRequest
- * @returns {function} - Wrapped handler compatible with App Router
+ * @param handler - Async function that receives NextRequest
+ * @returns Wrapped handler compatible with App Router
  */
-export function withAuth(handler) {
-  return async function wrappedHandler(request, context) {
+export function withAuth(
+  handler: (request: NextRequest, context: RouteContext) => Promise<NextResponse>
+): (request: NextRequest, context: RouteContext) => Promise<NextResponse> {
+  return async function wrappedHandler(request: NextRequest, context: RouteContext): Promise<NextResponse> {
     try {
       const session = await auth0.getSession(request);
       if (!session?.user) {
-        const { NextResponse } = await import('next/server');
         return NextResponse.json(
           { error: 'Unauthorized', message: 'Authentication required' },
           { status: 401 }
         );
       }
       // Attach session to request for convenience
-      request.auth = session;
+      (request as NextRequest & { auth?: unknown }).auth = session;
       return handler(request, context);
     } catch (error) {
-      const { NextResponse } = await import('next/server');
       return NextResponse.json(
-        { error: 'Authentication error', message: error.message },
+        { error: 'Authentication error', message: (error as Error).message },
         { status: 401 }
       );
     }

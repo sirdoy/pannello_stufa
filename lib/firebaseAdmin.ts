@@ -10,10 +10,10 @@
  * - Admin SDK BYPASSA Firebase Security Rules
  */
 
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getMessaging } from 'firebase-admin/messaging';
-import { getDatabase } from 'firebase-admin/database';
-import { getFirestore } from 'firebase-admin/firestore';
+import { initializeApp, getApps, cert, App } from 'firebase-admin/app';
+import { getMessaging, Messaging } from 'firebase-admin/messaging';
+import { getDatabase, Database } from 'firebase-admin/database';
+import { getFirestore, Firestore } from 'firebase-admin/firestore';
 import { logNotification } from './notificationLogger.js';
 import { filterNotificationByPreferences, getFilterMessage } from './notificationFilter.js';
 import { getDefaultPreferences } from './schemas/notificationPreferences.js';
@@ -28,7 +28,7 @@ const INVALID_TOKEN_ERRORS = [
 /**
  * Inizializza Firebase Admin SDK (singleton)
  */
-function initializeFirebaseAdmin() {
+function initializeFirebaseAdmin(): App {
   // Se già inizializzato, return existing app
   if (getApps().length > 0) {
     return getApps()[0];
@@ -66,18 +66,16 @@ function initializeFirebaseAdmin() {
 
 /**
  * Get Admin Database instance
- * @returns {Database} Firebase Admin Database instance
  */
-export function getAdminDatabase() {
+export function getAdminDatabase(): Database {
   initializeFirebaseAdmin();
   return getDatabase();
 }
 
 /**
  * Get Admin Firestore instance
- * @returns {Firestore} Firebase Admin Firestore instance
  */
-export function getAdminFirestore() {
+export function getAdminFirestore(): Firestore {
   initializeFirebaseAdmin();
   return getFirestore();
 }
@@ -88,10 +86,10 @@ export function getAdminFirestore() {
 
 /**
  * Read data from Firebase (Admin SDK)
- * @param {string} path - Database path (es. 'maintenance' o 'users/123/fcmTokens')
- * @returns {Promise<any>} Data at path or null if not exists
+ * @param path - Database path (es. 'maintenance' o 'users/123/fcmTokens')
+ * @returns Data at path or null if not exists
  */
-export async function adminDbGet(path) {
+export async function adminDbGet(path: string): Promise<unknown> {
   const db = getAdminDatabase();
   const snapshot = await db.ref(path).once('value');
   return snapshot.val();
@@ -99,31 +97,31 @@ export async function adminDbGet(path) {
 
 /**
  * Write data to Firebase (Admin SDK) - OVERWRITES existing data
- * @param {string} path - Database path
- * @param {any} data - Data to write
+ * @param path - Database path
+ * @param data - Data to write
  */
-export async function adminDbSet(path, data) {
+export async function adminDbSet(path: string, data: unknown): Promise<void> {
   const db = getAdminDatabase();
   await db.ref(path).set(data);
 }
 
 /**
  * Update data in Firebase (Admin SDK) - MERGES with existing data
- * @param {string} path - Database path
- * @param {Object} updates - Object with fields to update
+ * @param path - Database path
+ * @param updates - Object with fields to update
  */
-export async function adminDbUpdate(path, updates) {
+export async function adminDbUpdate(path: string, updates: Record<string, unknown>): Promise<void> {
   const db = getAdminDatabase();
   await db.ref(path).update(updates);
 }
 
 /**
  * Push new data to Firebase list (Admin SDK)
- * @param {string} path - Database path
- * @param {any} data - Data to push
- * @returns {Promise<string>} Generated key
+ * @param path - Database path
+ * @param data - Data to push
+ * @returns Generated key
  */
-export async function adminDbPush(path, data) {
+export async function adminDbPush(path: string, data: unknown): Promise<string | null> {
   const db = getAdminDatabase();
   const ref = db.ref(path).push();
   await ref.set(data);
@@ -132,9 +130,9 @@ export async function adminDbPush(path, data) {
 
 /**
  * Delete data from Firebase (Admin SDK)
- * @param {string} path - Database path
+ * @param path - Database path
  */
-export async function adminDbRemove(path) {
+export async function adminDbRemove(path: string): Promise<void> {
   const db = getAdminDatabase();
   await db.ref(path).remove();
 }

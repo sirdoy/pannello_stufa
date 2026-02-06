@@ -1,6 +1,6 @@
-import { initializeApp, getApps } from 'firebase/app';
-import { getDatabase } from 'firebase/database';
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
+import { getDatabase, Database } from 'firebase/database';
+import { getFirestore, Firestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,9 +12,9 @@ const firebaseConfig = {
   databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL, // 👈 AGGIUNTO!
 };
 
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const db = getDatabase(app);
-const firestore = getFirestore(app);
+const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const db: Database = getDatabase(app);
+const firestore: Firestore = getFirestore(app);
 
 // Export app instance (necessaria per Firebase Messaging)
 // Export both Realtime Database and Firestore

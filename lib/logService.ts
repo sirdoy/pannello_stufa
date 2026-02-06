@@ -8,14 +8,19 @@ import { DEVICE_TYPES } from './devices/deviceTypes';
 
 /**
  * Log a user action
- * @param {string} action - Description of the action (e.g., 'Accensione', 'Set ventola')
- * @param {string} device - Device type (from DEVICE_TYPES: 'stove', 'thermostat', 'lights', 'sonos')
- * @param {*} value - Optional value associated with the action (e.g., fan level, power level)
- * @param {object} metadata - Optional additional metadata
+ * @param action - Description of the action (e.g., 'Accensione', 'Set ventola')
+ * @param device - Device type (from DEVICE_TYPES: 'stove', 'thermostat', 'lights', 'sonos')
+ * @param value - Optional value associated with the action (e.g., fan level, power level)
+ * @param metadata - Optional additional metadata
  */
-export async function logUserAction(action, device, value = null, metadata = {}) {
+export async function logUserAction(
+  action: string,
+  device: string,
+  value: string | number | null = null,
+  metadata: Record<string, unknown> = {}
+): Promise<void> {
   try {
-    const logData = {
+    const logData: Record<string, unknown> = {
       action,
       device,
       ...(value !== null && { value }),
@@ -42,59 +47,59 @@ export async function logUserAction(action, device, value = null, metadata = {})
  * Log stove control actions
  */
 export const logStoveAction = {
-  ignite: () => logUserAction('Accensione stufa', DEVICE_TYPES.STOVE),
-  shutdown: () => logUserAction('Spegnimento stufa', DEVICE_TYPES.STOVE),
-  setFan: (level) => logUserAction('Modifica ventilazione', DEVICE_TYPES.STOVE, level),
-  setPower: (level) => logUserAction('Modifica potenza', DEVICE_TYPES.STOVE, level),
+  ignite: (): Promise<void> => logUserAction('Accensione stufa', DEVICE_TYPES.STOVE),
+  shutdown: (): Promise<void> => logUserAction('Spegnimento stufa', DEVICE_TYPES.STOVE),
+  setFan: (level: number): Promise<void> => logUserAction('Modifica ventilazione', DEVICE_TYPES.STOVE, level),
+  setPower: (level: number): Promise<void> => logUserAction('Modifica potenza', DEVICE_TYPES.STOVE, level),
 };
 
 /**
  * Log scheduler actions (stove scheduler)
  */
 export const logSchedulerAction = {
-  toggleMode: (enabled) => logUserAction(
+  toggleMode: (enabled: boolean): Promise<void> => logUserAction(
     enabled ? 'Attivazione modalità automatica' : 'Attivazione modalità manuale',
     DEVICE_TYPES.STOVE
   ),
-  updateSchedule: (day) => logUserAction('Modifica scheduler', DEVICE_TYPES.STOVE, null, { day }),
-  addInterval: (day) => logUserAction('Aggiunto intervallo scheduler', DEVICE_TYPES.STOVE, null, { day }),
-  removeInterval: (day, index) => logUserAction('Rimosso intervallo scheduler', DEVICE_TYPES.STOVE, null, { day, intervalIndex: index }),
-  clearSemiManual: () => logUserAction('Disattivazione modalità semi-manuale', DEVICE_TYPES.STOVE),
-  duplicateDay: (sourceDay, targetDay) => logUserAction('Duplicato giorno scheduler', DEVICE_TYPES.STOVE, null, { sourceDay, targetDay }),
+  updateSchedule: (day: string): Promise<void> => logUserAction('Modifica scheduler', DEVICE_TYPES.STOVE, null, { day }),
+  addInterval: (day: string): Promise<void> => logUserAction('Aggiunto intervallo scheduler', DEVICE_TYPES.STOVE, null, { day }),
+  removeInterval: (day: string, index: number): Promise<void> => logUserAction('Rimosso intervallo scheduler', DEVICE_TYPES.STOVE, null, { day, intervalIndex: index }),
+  clearSemiManual: (): Promise<void> => logUserAction('Disattivazione modalità semi-manuale', DEVICE_TYPES.STOVE),
+  duplicateDay: (sourceDay: string, targetDay: string): Promise<void> => logUserAction('Duplicato giorno scheduler', DEVICE_TYPES.STOVE, null, { sourceDay, targetDay }),
 };
 
 /**
  * Log Netatmo/Thermostat actions
  */
 export const logNetatmoAction = {
-  connect: () => logUserAction('Connessione Netatmo', DEVICE_TYPES.THERMOSTAT),
-  disconnect: () => logUserAction('Disconnessione Netatmo', DEVICE_TYPES.THERMOSTAT),
-  setRoomTemperature: (roomName, temperature) => logUserAction(
+  connect: (): Promise<void> => logUserAction('Connessione Netatmo', DEVICE_TYPES.THERMOSTAT),
+  disconnect: (): Promise<void> => logUserAction('Disconnessione Netatmo', DEVICE_TYPES.THERMOSTAT),
+  setRoomTemperature: (roomName: string, temperature: number): Promise<void> => logUserAction(
     'Modifica temperatura stanza',
     DEVICE_TYPES.THERMOSTAT,
     temperature,
     { roomName }
   ),
-  setMode: (mode) => logUserAction('Cambio modalità termostato', DEVICE_TYPES.THERMOSTAT, mode),
+  setMode: (mode: string): Promise<void> => logUserAction('Cambio modalità termostato', DEVICE_TYPES.THERMOSTAT, mode),
 };
 
 /**
  * Log Philips Hue/Lights actions
  */
 export const logHueAction = {
-  connect: () => logUserAction('Connessione Hue', DEVICE_TYPES.LIGHTS),
-  disconnect: () => logUserAction('Disconnessione Hue', DEVICE_TYPES.LIGHTS),
-  lightOn: (lightName) => logUserAction('Luce accesa', DEVICE_TYPES.LIGHTS, 'ON', { lightName }),
-  lightOff: (lightName) => logUserAction('Luce spenta', DEVICE_TYPES.LIGHTS, 'OFF', { lightName }),
-  setBrightness: (lightName, brightness) => logUserAction(
+  connect: (): Promise<void> => logUserAction('Connessione Hue', DEVICE_TYPES.LIGHTS),
+  disconnect: (): Promise<void> => logUserAction('Disconnessione Hue', DEVICE_TYPES.LIGHTS),
+  lightOn: (lightName: string): Promise<void> => logUserAction('Luce accesa', DEVICE_TYPES.LIGHTS, 'ON', { lightName }),
+  lightOff: (lightName: string): Promise<void> => logUserAction('Luce spenta', DEVICE_TYPES.LIGHTS, 'OFF', { lightName }),
+  setBrightness: (lightName: string, brightness: number): Promise<void> => logUserAction(
     'Luminosità modificata',
     DEVICE_TYPES.LIGHTS,
     `${brightness}%`,
     { lightName }
   ),
-  roomOn: (roomName) => logUserAction('Stanza accesa', DEVICE_TYPES.LIGHTS, 'ON', { roomName }),
-  roomOff: (roomName) => logUserAction('Stanza spenta', DEVICE_TYPES.LIGHTS, 'OFF', { roomName }),
-  activateScene: (sceneName) => logUserAction('Scena attivata', DEVICE_TYPES.LIGHTS, sceneName),
+  roomOn: (roomName: string): Promise<void> => logUserAction('Stanza accesa', DEVICE_TYPES.LIGHTS, 'ON', { roomName }),
+  roomOff: (roomName: string): Promise<void> => logUserAction('Stanza spenta', DEVICE_TYPES.LIGHTS, 'OFF', { roomName }),
+  activateScene: (sceneName: string): Promise<void> => logUserAction('Scena attivata', DEVICE_TYPES.LIGHTS, sceneName),
 };
 
 const logService = {

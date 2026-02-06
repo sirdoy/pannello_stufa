@@ -17,10 +17,31 @@
  * - User preferences can override defaults
  */
 
+/** Rate limit configuration */
+export interface RateLimitConfig {
+  windowMinutes: number;
+  maxPerWindow: number;
+}
+
+/** Rate limit check result */
+export interface RateLimitResult {
+  allowed: boolean;
+  suppressedCount: number;
+  nextAllowedIn: number;
+}
+
+/** Rate limit status for debugging/UI */
+export interface RateLimitStatus {
+  currentCount: number;
+  maxAllowed: number;
+  windowMinutes: number;
+  nextResetIn: number;
+}
+
 // In-memory storage: Map<string, number[]>
 // Key format: "userId:notificationType"
 // Value: Array of timestamps (ms) when notifications were sent
-const recentSends = new Map();
+const recentSends = new Map<string, number[]>();
 
 /**
  * Default rate limits per notification type
@@ -30,7 +51,7 @@ const recentSends = new Map();
  * - windowMinutes: Time window for rate limiting
  * - maxPerWindow: Maximum notifications allowed in window
  */
-const DEFAULT_RATE_LIMITS = {
+const DEFAULT_RATE_LIMITS: Record<string, RateLimitConfig> = {
   // CRITICAL: Higher limit (allow rapid alerts for critical issues)
   CRITICAL: { windowMinutes: 1, maxPerWindow: 5 },
 
@@ -59,15 +80,16 @@ const DEFAULT_RATE_LIMITS = {
 /**
  * Check if notification is allowed by rate limit
  *
- * @param {string} userId - User ID (Auth0 sub)
- * @param {string} notifType - Notification type (e.g., 'scheduler_success', 'CRITICAL')
- * @param {Object|null} customLimits - Optional custom limits { windowMinutes, maxPerWindow }
- * @returns {Object} Result object:
- *   - allowed: boolean - Whether notification is allowed
- *   - suppressedCount: number - How many notifications in current window
- *   - nextAllowedIn: number - Seconds until next notification allowed (0 if allowed)
+ * @param userId - User ID (Auth0 sub)
+ * @param notifType - Notification type (e.g., 'scheduler_success', 'CRITICAL')
+ * @param customLimits - Optional custom limits { windowMinutes, maxPerWindow }
+ * @returns Result object with allowed status and timing info
  */
-export function checkRateLimit(userId, notifType, customLimits = null) {
+export function checkRateLimit(
+  userId: string,
+  notifType: string,
+  customLimits: RateLimitConfig | null = null
+): RateLimitResult {
   const key = `${userId}:${notifType}`;
   const now = Date.now();
 
@@ -118,10 +140,10 @@ export function checkRateLimit(userId, notifType, customLimits = null) {
  * Clear all rate limit entries for a user
  * Useful for testing and user-requested reset
  *
- * @param {string} userId - User ID to clear
- * @returns {number} Number of entries cleared
+ * @param userId - User ID to clear
+ * @returns Number of entries cleared
  */
-export function clearRateLimitForUser(userId) {
+export function clearRateLimitForUser(userId: string): number {
   let clearedCount = 0;
 
   for (const key of recentSends.keys()) {
@@ -139,15 +161,11 @@ export function clearRateLimitForUser(userId) {
  * Get current rate limit status for a user+type
  * Useful for debugging and UI display
  *
- * @param {string} userId - User ID
- * @param {string} notifType - Notification type
- * @returns {Object} Status object:
- *   - currentCount: number - Current notifications in window
- *   - maxAllowed: number - Max allowed in window
- *   - windowMinutes: number - Window duration
- *   - nextResetIn: number - Seconds until window resets (0 if empty)
+ * @param userId - User ID
+ * @param notifType - Notification type
+ * @returns Status object with counts and timing
  */
-export function getRateLimitStatus(userId, notifType) {
+export function getRateLimitStatus(userId: string, notifType: string): RateLimitStatus {
   const key = `${userId}:${notifType}`;
   const now = Date.now();
 
@@ -176,7 +194,7 @@ export function getRateLimitStatus(userId, notifType) {
  * Removes entries older than max retention period (1 hour)
  * Runs every 5 minutes
  */
-function cleanupOldEntries() {
+function cleanupOldEntries(): void {
   const now = Date.now();
   const maxAge = 60 * 60 * 1000; // 1 hour max retention
   let totalCleaned = 0;

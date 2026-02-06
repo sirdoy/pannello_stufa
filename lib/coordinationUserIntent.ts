@@ -104,7 +104,7 @@ export async function detectUserIntent(
       }
 
       // Check 2: Mode changed to non-standard (away, hg, off)
-      if (NON_STANDARD_MODES.includes(currentMode)) {
+      if ((NON_STANDARD_MODES as readonly string[]).includes(currentMode)) {
         changes.push({
           roomId: room.id,
           roomName: room.name || roomId,

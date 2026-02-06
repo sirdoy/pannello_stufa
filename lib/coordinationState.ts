@@ -27,7 +27,7 @@ export interface CoordinationState {
   stoveOn: boolean;
   automationPaused: boolean;
   pausedUntil: number | null;
-  pauseReason: 'manual_setpoint_change' | 'manual_mode_change' | null;
+  pauseReason: string | null;
   lastStateChange: number;
   pendingDebounce: boolean;
   debounceStartedAt: number | null;

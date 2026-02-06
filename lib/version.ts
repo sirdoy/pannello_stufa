@@ -21,6 +21,8 @@ export interface VersionEntry {
   description?: string;
   type?: string;
   changes: string[];
+  breaking?: boolean;
+  tags?: string[];
 }
 
 export interface VersionInfo {
@@ -559,7 +561,7 @@ export const VERSION_HISTORY: VersionEntry[] = [
       'Removed all Playwright configuration files and scripts',
       'Updated documentation to remove Playwright references',
     ],
-    breaking: [],
+    
   },
   {
     version: '1.53.3',
@@ -574,7 +576,7 @@ export const VERSION_HISTORY: VersionEntry[] = [
       'Added theme-color initialization script in layout.js to prevent flash',
       'Fixed body className dark mode syntax from inverted logic to correct dark: modifiers',
     ],
-    breaking: [],
+    
   },
   {
     version: '1.53.2',
@@ -587,7 +589,7 @@ export const VERSION_HISTORY: VersionEntry[] = [
       'Fixed ESLint react/no-unescaped-entities in transitions debug page (replaced quotes with &quot;)',
       'Build warnings eliminated (CSS optimization warning resolved)',
     ],
-    breaking: [],
+    
   },
   {
     version: '1.53.1',
@@ -604,7 +606,7 @@ export const VERSION_HISTORY: VersionEntry[] = [
       'Unified UI component imports to use barrel export',
       'Added missing CardHeader, CardTitle, CardContent exports to index.js',
     ],
-    breaking: [],
+    
   },
   {
     version: '1.53.0',

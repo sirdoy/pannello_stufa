@@ -21,6 +21,8 @@
  * m_offset: Minutes from Monday 00:00 (week-relative)
  */
 
+import type { NetatmoSchedule } from './netatmoApi';
+
 /**
  * Default pause duration when schedule unavailable (1 hour)
  */
@@ -46,14 +48,6 @@ interface ScheduleZone {
   id: number;
   name: string;
   temp: number;
-}
-
-/**
- * Netatmo schedule
- */
-interface NetatmoSchedule {
-  timetable: TimetableEntry[];
-  zones?: ScheduleZone[];
 }
 
 /**

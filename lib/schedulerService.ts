@@ -368,7 +368,7 @@ export const getFullSchedulerMode = async (): Promise<SchedulerMode> => {
     }
   } catch (error) {
     console.error('Errore nel recupero modalità scheduler completa:', error);
-    return { enabled: false, semiManual: false };
+    return { enabled: false, semiManual: false, lastUpdated: new Date().toISOString() };
   }
 };
 

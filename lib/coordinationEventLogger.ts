@@ -27,7 +27,7 @@
  */
 
 import { getAdminFirestore } from './firebaseAdmin.js';
-import { Timestamp } from 'firebase-admin/firestore';
+import { Timestamp, Query, DocumentData } from 'firebase-admin/firestore';
 import { subDays } from 'date-fns';
 
 /**
@@ -45,7 +45,7 @@ type CoordinationEventType =
 /**
  * Coordination action
  */
-type CoordinationAction = 'applied' | 'restored' | 'paused' | 'skipped' | 'debouncing';
+type CoordinationAction = 'applied' | 'restored' | 'paused' | 'skipped' | 'debouncing' | 'no_change' | 'capped' | 'retry_timer' | 'throttled';
 
 /**
  * Coordination event data
@@ -132,7 +132,7 @@ export async function getRecentCoordinationEvents(
   try {
     const db = getAdminFirestore();
 
-    let query = db.collection('coordinationEvents');
+    let query: Query<DocumentData, DocumentData> = db.collection('coordinationEvents');
 
     // Apply user filter if specified
     if (options.userId) {

@@ -5,7 +5,7 @@
  */
 
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
-import type { ErrorCode } from '@/types/api';
+import type { ErrorCode, HttpStatus } from '@/types/api';
 import { ApiError, ERROR_CODES } from './apiErrors';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { triggerNetatmoAlertServer } from '@/lib/notificationTriggersServer';
@@ -52,10 +52,11 @@ async function sendNetatmoConnectionLostNotification(): Promise<void> {
  * @throws ApiError if token is invalid or refresh fails
  */
 export async function requireNetatmoToken(): Promise<string> {
-  const { accessToken, error, message } = await getValidAccessToken();
+  const result = await getValidAccessToken();
 
-  if (error) {
-    const { status, reconnect } = handleTokenError(error);
+  if (result.error) {
+    const { status, reconnect } = handleTokenError(result.error);
+    const errorMessage = 'message' in result ? result.message : 'Token Netatmo non valido';
 
     // Send notification if reconnect is required (async, don't block)
     if (reconnect) {
@@ -66,11 +67,11 @@ export async function requireNetatmoToken(): Promise<string> {
 
     throw new ApiError(
       (reconnect ? ERROR_CODES.NETATMO_RECONNECT_REQUIRED : ERROR_CODES.NETATMO_TOKEN_INVALID) as ErrorCode,
-      message || 'Token Netatmo non valido',
-      status,
+      errorMessage,
+      status as HttpStatus,
       reconnect ? { reconnect: true } : null
     );
   }
 
-  return accessToken;
+  return result.accessToken;
 }

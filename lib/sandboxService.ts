@@ -363,7 +363,7 @@ export async function getSandboxMaintenance() {
     return getSandboxMaintenance();
   }
 
-  return snapshot.val() as SandboxConfig;
+  return snapshot.val() as SandboxMaintenance;
 }
 
 /**
@@ -444,7 +444,7 @@ export async function getSandboxSettings() {
     return getSandboxSettings();
   }
 
-  return snapshot.val() as SandboxConfig;
+  return snapshot.val() as SandboxConfig['settings'];
 }
 
 /**

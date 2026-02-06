@@ -26,13 +26,14 @@ import { logCoordinationEvent } from './coordinationEventLogger.js';
  * Coordination cycle result
  */
 interface CoordinationResult {
-  action: 'skipped' | 'paused' | 'debouncing' | 'applied' | 'restored' | 'no_change';
+  action: 'skipped' | 'paused' | 'debouncing' | 'applied' | 'restored' | 'no_change' | 'capped' | 'retry_timer' | 'throttled';
   reason: string;
   pausedUntil?: number;
   remainingMs?: number;
   delayMs?: number;
   rooms?: Array<Record<string, unknown>>;
   notificationSent?: boolean;
+  stoveOn?: boolean;
   [key: string]: unknown;
 }
 
@@ -107,8 +108,9 @@ export async function processCoordinationCycle(
         // Get schedule for pause calculation
         let pauseUntil = Date.now() + (60 * 60 * 1000); // Default: 1 hour
         try {
-          const schedules = await NETATMO_API.getThermSchedules(accessToken, homeId);
-          const activeSchedule = schedules?.find(s => s.selected);
+          const homes = await NETATMO_API.getHomesData(accessToken);
+          const home = homes.find(h => h.id === homeId);
+          const activeSchedule = home?.schedules?.find(s => s.selected);
           if (activeSchedule) {
             const pauseResult = calculatePauseUntil(Date.now(), activeSchedule);
             pauseUntil = pauseResult.pauseUntil;
@@ -268,6 +270,7 @@ export async function processCoordinationCycle(
   // No state change
   return {
     action: 'no_change',
+    reason: 'no change needed',
     stoveOn,
   };
 }

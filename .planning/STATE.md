@@ -91,6 +91,8 @@ Key patterns from previous milestones preserved for v5.0 migration:
 
 **Known Tech Debt:**
 - Label component not exported from barrel (low impact)
+- 5 Radix form components need TypeScript typing (Checkbox, Switch, Slider, Select, RadioGroup) - 71 tsc errors
+- Phase 39-02 partially complete - follow-up work needed
 
 ### TypeScript Migration Patterns (v5.0)
 
@@ -184,9 +186,9 @@ From 39-01 (Foundation UI components):
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed 39-01-PLAN.md (23 foundation UI components migrated to TypeScript)
+Stopped at: Completed 39-02-PLAN.md (9/14 form/interaction components fully typed, 5 Radix pending)
 Resume file: None
-Next step: Continue with 39-02 (interactive components like Button, Input, Select)
+Next step: Complete 39-02 remaining types (Checkbox, Switch, Slider, Select, RadioGroup) or proceed to 39-03
 
 From 38-10 (Type definitions gap closure):
 - Type narrowing with 'in' operator for discriminated unions: if ('property' in object)
@@ -197,3 +199,12 @@ From 38-10 (Type definitions gap closure):
 
 **Phase 38 gap closure update (2026-02-06):**
 All gap closure plans complete. TypeScript error count reduced from 252 to 0 through plans 38-10, 38-11, 38-12, 38-13.
+
+From 39-02 (Form/interaction components):
+- VariantProps<typeof xxxVariants> for CVA variant typing
+- ComponentPropsWithoutRef<typeof RadixPrimitive.Root> for Radix components
+- Omit<HTMLAttributes, 'conflictingProp'> to avoid conflicts (type, onChange, size)
+- Namespace sub-component typing: type ButtonComponent = typeof Button & { Icon: ..., Group: ... }
+- Type assertions for sub-component attachment: (Button as ButtonComponent).Icon = ButtonIcon
+- Synthetic event typing: React.ChangeEvent<HTMLInputElement> for controlled/uncontrolled patterns
+- Partial migration documentation: Track pending work as deviation when time-constrained

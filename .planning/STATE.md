@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 38 - Library Migration
-Plan: 04 of 9 (Complete)
+Plan: 03 of 9 (Complete)
 Status: In progress
-Last activity: 2026-02-06 — Completed 38-04-PLAN.md (Repositories, schemas, validators)
+Last activity: 2026-02-06 — Completed 38-03-PLAN.md (Core infrastructure migration)
 
 Progress: [████░░░░░░░░░░░░░░░░░░░░] 14% (1/7 phases complete)
 
@@ -26,7 +26,7 @@ Progress: [████░░░░░░░░░░░░░░░░░░░
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
 | 37 | TypeScript Foundation | 8 | COMPLETE (8/8) |
-| 38 | Library Migration | 4 | In progress (4/9 plans) |
+| 38 | Library Migration | 4 | In progress (3/9 plans) |
 | 39 | UI Components Migration | 3 | Pending |
 | 40 | API Routes Migration | 3 | Pending |
 | 41 | Pages Migration | 3 | Pending |
@@ -36,9 +36,9 @@ Progress: [████░░░░░░░░░░░░░░░░░░░
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 156 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 4)
-- Average duration: ~4.5 min per plan
-- Total execution time: ~11.5 hours across 7 milestones
+- Total plans completed: 157 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 5)
+- Average duration: ~5.2 min per plan
+- Total execution time: ~13.6 hours across 7 milestones
 
 **By Milestone:**
 
@@ -114,6 +114,12 @@ From 38-02 (PWA utilities):
 - Local interface declarations for experimental Web APIs (SyncManager, PeriodicSyncManager)
 - Global Navigator augmentation for Badge API (setAppBadge?, clearAppBadge?)
 - Browser API wrappers with explicit return types and built-in DOM type usage
+
+From 38-03 (Core infrastructure):
+- Firebase SDK built-in types preferred over custom wrappers
+- adminDbGet returns unknown (not generic) - forces explicit casting for safety
+- Overloaded validation functions for object vs single-value patterns
+- Interface-first middleware typing with route handler type aliases
 
 From 38-04 (Repositories, schemas, validators, devices):
 - Generic repository pattern: BaseRepository<T> with type-safe CRUD operations

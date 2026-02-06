@@ -23,10 +23,10 @@ Requirements for TypeScript migration. Each maps to roadmap phases.
 
 ### Library Migration
 
-- [ ] **LIB-01**: Tutti i file lib/ convertiti a .ts (62 file)
-- [ ] **LIB-02**: Hooks convertiti a .ts (lib/hooks/, app/hooks/)
-- [ ] **LIB-03**: Utilities e helpers tipizzati
-- [ ] **LIB-04**: Services e repositories tipizzati
+- [x] **LIB-01**: Tutti i file lib/ convertiti a .ts (62 file)
+- [x] **LIB-02**: Hooks convertiti a .ts (lib/hooks/, app/hooks/)
+- [x] **LIB-03**: Utilities e helpers tipizzati
+- [x] **LIB-04**: Services e repositories tipizzati
 
 ### UI Components Migration
 
@@ -99,7 +99,7 @@ Deferred to v5.1 or later — post-migration type improvements:
 | LIB-01 | Phase 38 | Complete |
 | LIB-02 | Phase 38 | Complete |
 | LIB-03 | Phase 38 | Complete |
-| LIB-04 | Phase 38 | Gaps (252 tsc errors) |
+| LIB-04 | Phase 38 | Complete |
 | COMP-01 | Phase 39 | Pending |
 | COMP-02 | Phase 39 | Pending |
 | COMP-03 | Phase 39 | Pending |
@@ -125,4 +125,4 @@ Deferred to v5.1 or later — post-migration type improvements:
 
 ---
 *Requirements defined: 2026-02-05*
-*Last updated: 2026-02-05 after initial definition*
+*Last updated: 2026-02-06 — Phase 38 requirements complete*

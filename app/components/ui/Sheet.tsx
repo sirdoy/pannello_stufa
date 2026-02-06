@@ -1,7 +1,9 @@
 'use client';
 
+import type React from 'react';
 import { forwardRef } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 import { X } from 'lucide-react';
@@ -128,24 +130,33 @@ const contentVariants = cva(
 /**
  * Sheet Overlay - Background overlay with blur
  */
-const SheetOverlay = forwardRef(function SheetOverlay({ className, ...props }, ref) {
-  return (
-    <DialogPrimitive.Overlay
-      ref={ref}
-      className={cn(overlayVariants(), className)}
-      {...props}
-    />
-  );
-});
+export interface SheetOverlayProps
+  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay> {}
+
+const SheetOverlay = forwardRef<React.ElementRef<typeof DialogPrimitive.Overlay>, SheetOverlayProps>(
+  function SheetOverlay({ className, ...props }, ref) {
+    return (
+      <DialogPrimitive.Overlay
+        ref={ref}
+        className={cn(overlayVariants(), className)}
+        {...props}
+      />
+    );
+  }
+);
 SheetOverlay.displayName = 'SheetOverlay';
 
 /**
  * Sheet Content - Main content container with side variants
  */
-const SheetContent = forwardRef(function SheetContent(
-  { className, side = 'bottom', size = 'md', showCloseButton = true, children, ...props },
-  ref
-) {
+export interface SheetContentProps
+  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>,
+    VariantProps<typeof contentVariants> {
+  showCloseButton?: boolean;
+}
+
+const SheetContent = forwardRef<React.ElementRef<typeof DialogPrimitive.Content>, SheetContentProps>(
+  function SheetContent({ className, side = 'bottom', size = 'md', showCloseButton = true, children, ...props }, ref) {
   return (
     <DialogPrimitive.Portal>
       <SheetOverlay />
@@ -180,86 +191,99 @@ SheetContent.displayName = 'SheetContent';
 /**
  * Sheet Header - Container for title and description
  */
-const SheetHeader = forwardRef(function SheetHeader({ className, children, ...props }, ref) {
-  return (
-    <div
-      ref={ref}
-      className={cn('flex flex-col space-y-2 mb-4', className)}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-});
+export interface SheetHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+const SheetHeader = forwardRef<HTMLDivElement, SheetHeaderProps>(
+  function SheetHeader({ className, children, ...props }, ref) {
+    return (
+      <div
+        ref={ref}
+        className={cn('flex flex-col space-y-2 mb-4', className)}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
 SheetHeader.displayName = 'SheetHeader';
 
 /**
  * Sheet Footer - Container for action buttons
  */
-const SheetFooter = forwardRef(function SheetFooter({ className, children, ...props }, ref) {
-  return (
-    <div
-      ref={ref}
-      className={cn('flex items-center justify-end gap-3 mt-6', className)}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-});
+export interface SheetFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+const SheetFooter = forwardRef<HTMLDivElement, SheetFooterProps>(
+  function SheetFooter({ className, children, ...props }, ref) {
+    return (
+      <div
+        ref={ref}
+        className={cn('flex items-center justify-end gap-3 mt-6', className)}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
 SheetFooter.displayName = 'SheetFooter';
 
 /**
  * Sheet Title - Accessible title (Radix DialogTitle)
  */
-const SheetTitle = forwardRef(function SheetTitle({ className, children, ...props }, ref) {
-  return (
-    <DialogPrimitive.Title
-      ref={ref}
-      className={cn(
-        'text-xl font-display font-semibold',
-        'text-slate-100 [html:not(.dark)_&]:text-slate-900',
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </DialogPrimitive.Title>
-  );
-});
+export interface SheetTitleProps
+  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title> {}
+
+const SheetTitle = forwardRef<React.ElementRef<typeof DialogPrimitive.Title>, SheetTitleProps>(
+  function SheetTitle({ className, children, ...props }, ref) {
+    return (
+      <DialogPrimitive.Title
+        ref={ref}
+        className={cn(
+          'text-xl font-display font-semibold',
+          'text-slate-100 [html:not(.dark)_&]:text-slate-900',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </DialogPrimitive.Title>
+    );
+  }
+);
 SheetTitle.displayName = 'SheetTitle';
 
 /**
  * Sheet Description - Accessible description (Radix DialogDescription)
  */
-const SheetDescription = forwardRef(function SheetDescription(
-  { className, children, ...props },
-  ref
-) {
-  return (
-    <DialogPrimitive.Description
-      ref={ref}
-      className={cn(
-        'text-sm text-slate-400 [html:not(.dark)_&]:text-slate-600',
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </DialogPrimitive.Description>
-  );
-});
+export interface SheetDescriptionProps
+  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description> {}
+
+const SheetDescription = forwardRef<React.ElementRef<typeof DialogPrimitive.Description>, SheetDescriptionProps>(
+  function SheetDescription({ className, children, ...props }, ref) {
+    return (
+      <DialogPrimitive.Description
+        ref={ref}
+        className={cn(
+          'text-sm text-slate-400 [html:not(.dark)_&]:text-slate-600',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </DialogPrimitive.Description>
+    );
+  }
+);
 SheetDescription.displayName = 'SheetDescription';
 
 /**
  * Sheet - Main component wrapping DialogRoot
- *
- * @param {Object} props
- * @param {boolean} props.open - Sheet open state (controlled)
- * @param {Function} props.onOpenChange - Callback when open state changes
- * @param {ReactNode} props.children - Sheet content (includes Trigger and Content)
  */
-function Sheet({ open, onOpenChange, children, ...props }) {
+export interface SheetProps
+  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Root> {}
+
+function Sheet({ open, onOpenChange, children, ...props }: SheetProps) {
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange} {...props}>
       {children}
@@ -274,14 +298,25 @@ SheetTrigger.displayName = 'SheetTrigger';
 const SheetClose = DialogPrimitive.Close;
 SheetClose.displayName = 'SheetClose';
 
+// Namespace type
+type SheetComponent = typeof Sheet & {
+  Trigger: typeof SheetTrigger;
+  Content: typeof SheetContent;
+  Header: typeof SheetHeader;
+  Footer: typeof SheetFooter;
+  Title: typeof SheetTitle;
+  Description: typeof SheetDescription;
+  Close: typeof SheetClose;
+};
+
 // Attach namespace components
-Sheet.Trigger = SheetTrigger;
-Sheet.Content = SheetContent;
-Sheet.Header = SheetHeader;
-Sheet.Footer = SheetFooter;
-Sheet.Title = SheetTitle;
-Sheet.Description = SheetDescription;
-Sheet.Close = SheetClose;
+(Sheet as SheetComponent).Trigger = SheetTrigger;
+(Sheet as SheetComponent).Content = SheetContent;
+(Sheet as SheetComponent).Header = SheetHeader;
+(Sheet as SheetComponent).Footer = SheetFooter;
+(Sheet as SheetComponent).Title = SheetTitle;
+(Sheet as SheetComponent).Description = SheetDescription;
+(Sheet as SheetComponent).Close = SheetClose;
 
 // Named exports for tree-shaking
 export {
@@ -296,4 +331,4 @@ export {
 };
 
 // Default export
-export default Sheet;
+export default Sheet as SheetComponent;

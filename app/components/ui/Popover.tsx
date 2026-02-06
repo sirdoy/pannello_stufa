@@ -1,7 +1,9 @@
 'use client';
 
+import type React from 'react';
 import { forwardRef, useState, useCallback, useRef } from 'react';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
+import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 
@@ -75,42 +77,45 @@ const arrowVariants = cva([
 /**
  * PopoverArrow - Arrow indicator pointing to trigger
  */
-const PopoverArrow = forwardRef(function PopoverArrow({ className, ...props }, ref) {
-  return (
-    <PopoverPrimitive.Arrow
-      ref={ref}
-      className={cn(arrowVariants(), className)}
-      {...props}
-    />
-  );
-});
+export interface PopoverArrowProps
+  extends React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Arrow> {}
+
+const PopoverArrow = forwardRef<React.ElementRef<typeof PopoverPrimitive.Arrow>, PopoverArrowProps>(
+  function PopoverArrow({ className, ...props }, ref) {
+    return (
+      <PopoverPrimitive.Arrow
+        ref={ref}
+        className={cn(arrowVariants(), className)}
+        {...props}
+      />
+    );
+  }
+);
 PopoverArrow.displayName = 'PopoverArrow';
 
 /**
  * PopoverContent - Styled content container with Portal
- *
- * @param {Object} props
- * @param {ReactNode} props.children - Popover content
- * @param {'sm'|'md'|'lg'} props.size - Size variant
- * @param {'top'|'right'|'bottom'|'left'} props.side - Preferred side
- * @param {'start'|'center'|'end'} props.align - Alignment relative to trigger
- * @param {number} props.sideOffset - Distance from trigger (px)
- * @param {boolean} props.arrow - Show arrow indicator
- * @param {string} props.className - Additional classes
  */
-const PopoverContent = forwardRef(function PopoverContent(
-  {
-    className,
-    size,
-    side = 'bottom',
-    align = 'center',
-    sideOffset = 4,
-    arrow = false,
-    children,
-    ...props
-  },
-  ref
-) {
+export interface PopoverContentProps
+  extends React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>,
+    VariantProps<typeof contentVariants> {
+  arrow?: boolean;
+}
+
+const PopoverContent = forwardRef<React.ElementRef<typeof PopoverPrimitive.Content>, PopoverContentProps>(
+  function PopoverContent(
+    {
+      className,
+      size,
+      side = 'bottom',
+      align = 'center',
+      sideOffset = 4,
+      arrow = false,
+      children,
+      ...props
+    },
+    ref
+  ) {
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
@@ -138,38 +143,44 @@ PopoverTrigger.displayName = 'PopoverTrigger';
 /**
  * PopoverClose - Close button primitive
  */
-const PopoverClose = forwardRef(function PopoverClose({ className, children, ...props }, ref) {
-  return (
-    <PopoverPrimitive.Close
-      ref={ref}
-      className={cn(
-        'p-2 rounded-xl',
-        'text-slate-400 hover:text-slate-200',
-        '[html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700',
-        'hover:bg-white/[0.06] [html:not(.dark)_&]:hover:bg-black/[0.04]',
-        'transition-colors duration-200',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50',
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </PopoverPrimitive.Close>
-  );
-});
+export interface PopoverCloseProps
+  extends React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Close> {}
+
+const PopoverClose = forwardRef<React.ElementRef<typeof PopoverPrimitive.Close>, PopoverCloseProps>(
+  function PopoverClose({ className, children, ...props }, ref) {
+    return (
+      <PopoverPrimitive.Close
+        ref={ref}
+        className={cn(
+          'p-2 rounded-xl',
+          'text-slate-400 hover:text-slate-200',
+          '[html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700',
+          'hover:bg-white/[0.06] [html:not(.dark)_&]:hover:bg-black/[0.04]',
+          'transition-colors duration-200',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </PopoverPrimitive.Close>
+    );
+  }
+);
 PopoverClose.displayName = 'PopoverClose';
 
 /**
  * Popover - Root component with optional hover trigger mode
- *
- * @param {Object} props
- * @param {'click'|'hover'} props.triggerMode - Trigger mode (default: click)
- * @param {number} props.openDelay - Delay before opening on hover (ms, default: 200)
- * @param {number} props.closeDelay - Delay before closing on hover (ms, default: 100)
- * @param {boolean} props.open - Controlled open state
- * @param {function} props.onOpenChange - Callback when open state changes
- * @param {ReactNode} props.children - Popover.Trigger and Popover.Content
  */
+export interface PopoverProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Root>, 'open'> {
+  triggerMode?: 'click' | 'hover';
+  openDelay?: number;
+  closeDelay?: number;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
 function Popover({
   children,
   triggerMode = 'click',
@@ -178,7 +189,7 @@ function Popover({
   open: controlledOpen,
   onOpenChange,
   ...props
-}) {
+}: PopoverProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
 
   // Determine if we're in controlled mode
@@ -186,7 +197,7 @@ function Popover({
   const isOpen = isControlled ? controlledOpen : uncontrolledOpen;
 
   const handleOpenChange = useCallback(
-    (newOpen) => {
+    (newOpen: boolean) => {
       if (!isControlled) {
         setUncontrolledOpen(newOpen);
       }
@@ -196,8 +207,8 @@ function Popover({
   );
 
   // Hover mode handlers - use refs to persist across renders
-  const openTimeoutRef = useRef(null);
-  const closeTimeoutRef = useRef(null);
+  const openTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleMouseEnter = useCallback(() => {
     if (closeTimeoutRef.current) {
@@ -250,11 +261,19 @@ function Popover({
   );
 }
 
+// Namespace type
+type PopoverComponent = typeof Popover & {
+  Trigger: typeof PopoverTrigger;
+  Content: typeof PopoverContent;
+  Close: typeof PopoverClose;
+  Arrow: typeof PopoverArrow;
+};
+
 // Attach namespace components
-Popover.Trigger = PopoverTrigger;
-Popover.Content = PopoverContent;
-Popover.Close = PopoverClose;
-Popover.Arrow = PopoverArrow;
+(Popover as PopoverComponent).Trigger = PopoverTrigger;
+(Popover as PopoverComponent).Content = PopoverContent;
+(Popover as PopoverComponent).Close = PopoverClose;
+(Popover as PopoverComponent).Arrow = PopoverArrow;
 
 // Named exports for tree-shaking
 export {
@@ -266,4 +285,4 @@ export {
 };
 
 // Default export for backwards compatibility
-export default Popover;
+export default Popover as PopoverComponent;

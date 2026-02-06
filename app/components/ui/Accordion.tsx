@@ -1,5 +1,6 @@
 'use client';
 
+import type React from 'react';
 import { forwardRef } from 'react';
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import { cva } from 'class-variance-authority';
@@ -82,20 +83,22 @@ const contentVariants = cva([
 /**
  * AccordionItem - Individual accordion section wrapper
  */
-const AccordionItem = forwardRef(function AccordionItem(
-  { className, children, ...props },
-  ref
-) {
-  return (
-    <AccordionPrimitive.Item
-      ref={ref}
-      className={cn(itemVariants(), className)}
-      {...props}
-    >
-      {children}
-    </AccordionPrimitive.Item>
-  );
-});
+export interface AccordionItemProps
+  extends React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item> {}
+
+const AccordionItem = forwardRef<React.ElementRef<typeof AccordionPrimitive.Item>, AccordionItemProps>(
+  function AccordionItem({ className, children, ...props }, ref) {
+    return (
+      <AccordionPrimitive.Item
+        ref={ref}
+        className={cn(itemVariants(), className)}
+        {...props}
+      >
+        {children}
+      </AccordionPrimitive.Item>
+    );
+  }
+);
 AccordionItem.displayName = 'AccordionItem';
 
 /**
@@ -103,34 +106,36 @@ AccordionItem.displayName = 'AccordionItem';
  *
  * Includes rotating chevron indicator that rotates 180deg when open.
  */
-const AccordionTrigger = forwardRef(function AccordionTrigger(
-  { className, children, ...props },
-  ref
-) {
-  return (
-    <AccordionPrimitive.Header className="flex">
-      <AccordionPrimitive.Trigger
-        ref={ref}
-        className={cn(triggerVariants(), className)}
-        {...props}
-      >
-        {children}
-        <ChevronDown
-          className={cn(
-            'h-4 w-4 shrink-0',
-            'text-slate-400 [html:not(.dark)_&]:text-slate-500',
-            // Rotate chevron when open - smooth transition with animation token
-            'transition-transform duration-[var(--duration-smooth)]',
-            'group-data-[state=open]:rotate-180',
-            // Reduced motion support
-            'motion-reduce:transition-none'
-          )}
-          aria-hidden="true"
-        />
-      </AccordionPrimitive.Trigger>
-    </AccordionPrimitive.Header>
-  );
-});
+export interface AccordionTriggerProps
+  extends React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger> {}
+
+const AccordionTrigger = forwardRef<React.ElementRef<typeof AccordionPrimitive.Trigger>, AccordionTriggerProps>(
+  function AccordionTrigger({ className, children, ...props }, ref) {
+    return (
+      <AccordionPrimitive.Header className="flex">
+        <AccordionPrimitive.Trigger
+          ref={ref}
+          className={cn(triggerVariants(), className)}
+          {...props}
+        >
+          {children}
+          <ChevronDown
+            className={cn(
+              'h-4 w-4 shrink-0',
+              'text-slate-400 [html:not(.dark)_&]:text-slate-500',
+              // Rotate chevron when open - smooth transition with animation token
+              'transition-transform duration-[var(--duration-smooth)]',
+              'group-data-[state=open]:rotate-180',
+              // Reduced motion support
+              'motion-reduce:transition-none'
+            )}
+            aria-hidden="true"
+          />
+        </AccordionPrimitive.Trigger>
+      </AccordionPrimitive.Header>
+    );
+  }
+);
 AccordionTrigger.displayName = 'AccordionTrigger';
 
 /**
@@ -138,56 +143,40 @@ AccordionTrigger.displayName = 'AccordionTrigger';
  *
  * Uses inner padding div to avoid margin/padding animation issues.
  */
-const AccordionContent = forwardRef(function AccordionContent(
-  { className, children, ...props },
-  ref
-) {
-  return (
-    <AccordionPrimitive.Content
-      ref={ref}
-      className={cn(contentVariants(), className)}
-      {...props}
-    >
-      {/* Inner div for padding - avoids animation glitches with margin */}
-      <div className="px-4 pb-4">
-        {children}
-      </div>
-    </AccordionPrimitive.Content>
-  );
-});
+export interface AccordionContentProps
+  extends React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content> {}
+
+const AccordionContent = forwardRef<React.ElementRef<typeof AccordionPrimitive.Content>, AccordionContentProps>(
+  function AccordionContent({ className, children, ...props }, ref) {
+    return (
+      <AccordionPrimitive.Content
+        ref={ref}
+        className={cn(contentVariants(), className)}
+        {...props}
+      >
+        {/* Inner div for padding - avoids animation glitches with margin */}
+        <div className="px-4 pb-4">
+          {children}
+        </div>
+      </AccordionPrimitive.Content>
+    );
+  }
+);
 AccordionContent.displayName = 'AccordionContent';
 
 /**
  * Accordion - Root component with single/multiple modes
- *
- * @param {Object} props
- * @param {ReactNode} props.children - AccordionItem children
- * @param {'single'|'multiple'} props.type - Expansion mode (default: 'single')
- * @param {boolean} props.collapsible - Allow closing all items in single mode
- * @param {string|string[]} props.defaultValue - Initially open item(s)
- * @param {string|string[]} props.value - Controlled open item(s)
- * @param {Function} props.onValueChange - Callback when open items change
- * @param {string} props.className - Additional classes
  */
+export type AccordionProps = React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Root>;
+
 function Accordion({
   children,
-  type = 'single',
-  collapsible = false,
-  defaultValue,
-  value,
-  onValueChange,
   className,
   ...props
-}) {
-  // Radix requires different prop names for single vs multiple
-  const rootProps = type === 'single'
-    ? { type, collapsible, defaultValue, value, onValueChange }
-    : { type, defaultValue, value, onValueChange };
-
+}: AccordionProps) {
   return (
     <AccordionPrimitive.Root
       className={cn('w-full', className)}
-      {...rootProps}
       {...props}
     >
       {children}
@@ -195,13 +184,20 @@ function Accordion({
   );
 }
 
+// Namespace type
+type AccordionComponent = typeof Accordion & {
+  Item: typeof AccordionItem;
+  Trigger: typeof AccordionTrigger;
+  Content: typeof AccordionContent;
+};
+
 // Attach namespace components
-Accordion.Item = AccordionItem;
-Accordion.Trigger = AccordionTrigger;
-Accordion.Content = AccordionContent;
+(Accordion as AccordionComponent).Item = AccordionItem;
+(Accordion as AccordionComponent).Trigger = AccordionTrigger;
+(Accordion as AccordionComponent).Content = AccordionContent;
 
 // Named exports for tree-shaking
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };
 
 // Default export for backwards compatibility
-export default Accordion;
+export default Accordion as AccordionComponent;

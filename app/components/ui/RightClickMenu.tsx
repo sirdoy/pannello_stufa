@@ -1,5 +1,6 @@
 'use client';
 
+import type React from 'react';
 import { forwardRef } from 'react';
 import * as ContextMenuPrimitive from '@radix-ui/react-context-menu';
 import { cva } from 'class-variance-authority';
@@ -120,16 +121,17 @@ const checkboxIndicatorVariants = cva([
 /**
  * RightClickMenuContent - Menu content container with styling
  */
-const RightClickMenuContent = forwardRef(function RightClickMenuContent(
-  { className, children, sideOffset = 5, alignOffset = 0, ...props },
-  ref
-) {
+export interface RightClickMenuContentProps
+  extends React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Content> {}
+
+const RightClickMenuContent = forwardRef<
+  React.ElementRef<typeof ContextMenuPrimitive.Content>,
+  RightClickMenuContentProps
+>(function RightClickMenuContent({ className, children, ...props }, ref) {
   return (
     <ContextMenuPrimitive.Portal>
       <ContextMenuPrimitive.Content
         ref={ref}
-        sideOffset={sideOffset}
-        alignOffset={alignOffset}
         className={cn(contentVariants(), className)}
         {...props}
       >
@@ -142,16 +144,16 @@ RightClickMenuContent.displayName = 'RightClickMenuContent';
 
 /**
  * RightClickMenuItem - Individual menu item
- *
- * @param {ReactNode} icon - Icon element to display (required per design system)
- * @param {ReactNode} children - Item text content
- * @param {boolean} disabled - Whether item is disabled
- * @param {Function} onSelect - Callback when item is selected
  */
-const RightClickMenuItem = forwardRef(function RightClickMenuItem(
-  { className, icon, children, ...props },
-  ref
-) {
+export interface RightClickMenuItemProps
+  extends React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Item> {
+  icon?: React.ReactNode;
+}
+
+const RightClickMenuItem = forwardRef<
+  React.ElementRef<typeof ContextMenuPrimitive.Item>,
+  RightClickMenuItemProps
+>(function RightClickMenuItem({ className, icon, children, ...props }, ref) {
   return (
     <ContextMenuPrimitive.Item
       ref={ref}
@@ -171,15 +173,16 @@ RightClickMenuItem.displayName = 'RightClickMenuItem';
 
 /**
  * RightClickMenuCheckboxItem - Toggleable menu item
- *
- * @param {ReactNode} icon - Icon element to display
- * @param {boolean} checked - Whether item is checked
- * @param {Function} onCheckedChange - Callback when checked state changes
  */
-const RightClickMenuCheckboxItem = forwardRef(function RightClickMenuCheckboxItem(
-  { className, icon, children, checked, ...props },
-  ref
-) {
+export interface RightClickMenuCheckboxItemProps
+  extends React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.CheckboxItem> {
+  icon?: React.ReactNode;
+}
+
+const RightClickMenuCheckboxItem = forwardRef<
+  React.ElementRef<typeof ContextMenuPrimitive.CheckboxItem>,
+  RightClickMenuCheckboxItemProps
+>(function RightClickMenuCheckboxItem({ className, icon, children, checked, ...props }, ref) {
   return (
     <ContextMenuPrimitive.CheckboxItem
       ref={ref}
@@ -204,10 +207,13 @@ RightClickMenuCheckboxItem.displayName = 'RightClickMenuCheckboxItem';
 /**
  * RightClickMenuSeparator - Visual separator between items
  */
-const RightClickMenuSeparator = forwardRef(function RightClickMenuSeparator(
-  { className, ...props },
-  ref
-) {
+export interface RightClickMenuSeparatorProps
+  extends React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Separator> {}
+
+const RightClickMenuSeparator = forwardRef<
+  React.ElementRef<typeof ContextMenuPrimitive.Separator>,
+  RightClickMenuSeparatorProps
+>(function RightClickMenuSeparator({ className, ...props }, ref) {
   return (
     <ContextMenuPrimitive.Separator
       ref={ref}
@@ -221,10 +227,13 @@ RightClickMenuSeparator.displayName = 'RightClickMenuSeparator';
 /**
  * RightClickMenuLabel - Non-interactive label/header
  */
-const RightClickMenuLabel = forwardRef(function RightClickMenuLabel(
-  { className, children, ...props },
-  ref
-) {
+export interface RightClickMenuLabelProps
+  extends React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Label> {}
+
+const RightClickMenuLabel = forwardRef<
+  React.ElementRef<typeof ContextMenuPrimitive.Label>,
+  RightClickMenuLabelProps
+>(function RightClickMenuLabel({ className, children, ...props }, ref) {
   return (
     <ContextMenuPrimitive.Label
       ref={ref}
@@ -240,10 +249,13 @@ RightClickMenuLabel.displayName = 'RightClickMenuLabel';
 /**
  * RightClickMenuGroup - Group wrapper for related items
  */
-const RightClickMenuGroup = forwardRef(function RightClickMenuGroup(
-  { className, children, ...props },
-  ref
-) {
+export interface RightClickMenuGroupProps
+  extends React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Group> {}
+
+const RightClickMenuGroup = forwardRef<
+  React.ElementRef<typeof ContextMenuPrimitive.Group>,
+  RightClickMenuGroupProps
+>(function RightClickMenuGroup({ className, children, ...props }, ref) {
   return (
     <ContextMenuPrimitive.Group
       ref={ref}
@@ -264,15 +276,11 @@ RightClickMenuTrigger.displayName = 'RightClickMenuTrigger';
 
 /**
  * RightClickMenu - Root component
- *
- * @param {Object} props
- * @param {ReactNode} props.children - Menu content (Trigger and Content)
- * @param {boolean} props.open - Controlled open state
- * @param {Function} props.onOpenChange - Callback when open state changes
- * @param {string} props.dir - Reading direction ('ltr' | 'rtl')
- * @param {boolean} props.modal - Whether menu is modal (default: true)
  */
-function RightClickMenu({ children, ...props }) {
+export interface RightClickMenuProps
+  extends React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Root> {}
+
+function RightClickMenu({ children, ...props }: RightClickMenuProps) {
   return (
     <ContextMenuPrimitive.Root {...props}>
       {children}
@@ -280,14 +288,25 @@ function RightClickMenu({ children, ...props }) {
   );
 }
 
+// Namespace type
+type RightClickMenuComponent = typeof RightClickMenu & {
+  Trigger: typeof RightClickMenuTrigger;
+  Content: typeof RightClickMenuContent;
+  Item: typeof RightClickMenuItem;
+  CheckboxItem: typeof RightClickMenuCheckboxItem;
+  Separator: typeof RightClickMenuSeparator;
+  Label: typeof RightClickMenuLabel;
+  Group: typeof RightClickMenuGroup;
+};
+
 // Attach namespace components
-RightClickMenu.Trigger = RightClickMenuTrigger;
-RightClickMenu.Content = RightClickMenuContent;
-RightClickMenu.Item = RightClickMenuItem;
-RightClickMenu.CheckboxItem = RightClickMenuCheckboxItem;
-RightClickMenu.Separator = RightClickMenuSeparator;
-RightClickMenu.Label = RightClickMenuLabel;
-RightClickMenu.Group = RightClickMenuGroup;
+(RightClickMenu as RightClickMenuComponent).Trigger = RightClickMenuTrigger;
+(RightClickMenu as RightClickMenuComponent).Content = RightClickMenuContent;
+(RightClickMenu as RightClickMenuComponent).Item = RightClickMenuItem;
+(RightClickMenu as RightClickMenuComponent).CheckboxItem = RightClickMenuCheckboxItem;
+(RightClickMenu as RightClickMenuComponent).Separator = RightClickMenuSeparator;
+(RightClickMenu as RightClickMenuComponent).Label = RightClickMenuLabel;
+(RightClickMenu as RightClickMenuComponent).Group = RightClickMenuGroup;
 
 // Named exports for tree-shaking
 export {
@@ -302,4 +321,4 @@ export {
 };
 
 // Default export
-export default RightClickMenu;
+export default RightClickMenu as RightClickMenuComponent;

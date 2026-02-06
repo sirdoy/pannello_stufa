@@ -41,6 +41,17 @@ export interface Schedule {
 }
 
 /**
+ * Firebase raw data shape for schedule metadata
+ */
+interface ScheduleRawData {
+  name: string;
+  enabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+  slots: Record<string, unknown[]>;
+}
+
+/**
  * Get all schedules (metadata only, no slots)
  */
 export async function getAllSchedules(): Promise<ScheduleMetadata[]> {
@@ -50,7 +61,7 @@ export async function getAllSchedules(): Promise<ScheduleMetadata[]> {
       return [];
     }
 
-    const schedulesData = snapshot.val();
+    const schedulesData = snapshot.val() as Record<string, ScheduleRawData>;
     const schedules = Object.entries(schedulesData).map(([id, data]) => ({
       id,
       name: data.name,
@@ -61,7 +72,7 @@ export async function getAllSchedules(): Promise<ScheduleMetadata[]> {
     }));
 
     // Sort by createdAt (oldest first)
-    return schedules.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    return schedules.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   } catch (error) {
     console.error('Error fetching all schedules:', error);
     return [];
@@ -151,7 +162,7 @@ export function subscribeToAllSchedules(callback: (schedules: ScheduleMetadata[]
       return;
     }
 
-    const schedulesData = snapshot.val();
+    const schedulesData = snapshot.val() as Record<string, ScheduleRawData>;
     const schedules = Object.entries(schedulesData).map(([id, data]) => ({
       id,
       name: data.name,
@@ -162,7 +173,7 @@ export function subscribeToAllSchedules(callback: (schedules: ScheduleMetadata[]
     }));
 
     // Sort by createdAt
-    const sorted = schedules.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    const sorted = schedules.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
     callback(sorted);
   });
 }

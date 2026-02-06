@@ -152,38 +152,46 @@ export async function isConnected() {
 }
 
 /**
+ * Firebase Netatmo home data shape
+ */
+interface NetatmoHomeData {
+  rooms?: Array<Record<string, unknown>>;
+  modules?: Array<Record<string, unknown>>;
+}
+
+/**
  * Get room by ID from topology
  */
 export async function getRoomById(roomId) {
-  const topology = await getTopology();
+  const topology = await getTopology() as NetatmoHomeData | null;
   if (!topology?.rooms) return null;
-  return topology.rooms.find(r => r.id === roomId);
+  return topology.rooms.find((r: any) => r.id === roomId);
 }
 
 /**
  * Get module by ID from topology
  */
 export async function getModuleById(moduleId) {
-  const topology = await getTopology();
+  const topology = await getTopology() as NetatmoHomeData | null;
   if (!topology?.modules) return null;
-  return topology.modules.find(m => m.id === moduleId);
+  return topology.modules.find((m: any) => m.id === moduleId);
 }
 
 /**
  * Get all rooms with current temperatures
  */
 export async function getRoomsWithTemperatures() {
-  const topology = await getTopology();
-  const status = await getCurrentStatus();
+  const topology = await getTopology() as NetatmoHomeData | null;
+  const status = await getCurrentStatus() as NetatmoHomeData | null;
 
   if (!topology?.rooms || !status?.rooms) return [];
 
-  return topology.rooms.map(room => {
-    const roomStatus = status.rooms.find(r => r.room_id === room.id);
+  return topology.rooms.map((room: any) => {
+    const roomStatus = status.rooms?.find((r: any) => r.room_id === room.id);
     return {
       ...room,
-      temperature: roomStatus?.temperature,
-      setpoint: roomStatus?.setpoint,
+      temperature: roomStatus?.temperature as number | undefined,
+      setpoint: roomStatus?.setpoint as number | undefined,
       mode: roomStatus?.mode,
       heating: roomStatus?.heating,
     };
@@ -215,7 +223,7 @@ export async function isAnyRoomHeating() {
  */
 export async function getAverageTemperature() {
   const rooms = await getRoomsWithTemperatures();
-  const temps = rooms.map(r => r.temperature).filter(t => t !== undefined);
+  const temps = rooms.map((r: any) => r.temperature as number | undefined).filter((t): t is number => t !== undefined);
   if (temps.length === 0) return null;
   return temps.reduce((sum, t) => sum + t, 0) / temps.length;
 }

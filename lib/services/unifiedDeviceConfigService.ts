@@ -117,9 +117,9 @@ export async function getUnifiedDeviceConfigAdmin(userId) {
   }
 
   try {
-    const existingConfig = await adminDbGet(`users/${userId}/deviceConfig`);
+    const existingConfig = await adminDbGet(`users/${userId}/deviceConfig`) as { version?: number } & Record<string, unknown> | null;
 
-    if (existingConfig && existingConfig.version >= CONFIG_VERSION) {
+    if (existingConfig && (existingConfig.version ?? 0) >= CONFIG_VERSION) {
       return existingConfig;
     }
 
@@ -187,7 +187,7 @@ async function migrateFromOldFormat(userId, existingConfig) {
 
   // Migrate from v1 (separate Firebase paths)
   const oldDevicePrefs = await adminDbGet(`devicePreferences/${userId}`) || {};
-  const oldDashboardPrefs = await adminDbGet(`users/${userId}/dashboardPreferences`) || {};
+  const oldDashboardPrefs = await adminDbGet(`users/${userId}/dashboardPreferences`) as { cardOrder?: Array<{ id: string; visible?: boolean }> } | null || {};
   const oldCardOrder = oldDashboardPrefs.cardOrder || [];
 
   const devices = [];

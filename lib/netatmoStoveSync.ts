@@ -52,26 +52,46 @@ interface StoveSyncConfig {
 }
 
 /**
+ * Firebase raw data shape for sync config (includes legacy fields)
+ */
+interface SyncConfigData {
+  livingRoomId?: string;
+  livingRoomName?: string;
+  rooms?: StoveSyncRoom[];
+  originalSetpoint?: number;
+  enabled?: boolean;
+  stoveTemperature?: number;
+  stoveMode?: boolean;
+  lastSyncAt?: number | null;
+  lastSyncAction?: 'stove_on' | 'stove_off' | null;
+  [key: string]: unknown;
+}
+
+/**
  * Get stove sync configuration from Firebase
  */
 export async function getStoveSyncConfig(): Promise<StoveSyncConfig> {
   const stoveSyncPath = getEnvironmentPath('netatmo/stoveSync');
-  const config = await adminDbGet(stoveSyncPath);
+  const configData = await adminDbGet(stoveSyncPath) as SyncConfigData | null;
 
   // Handle migration from single room to multi-room
-  if (config && config.livingRoomId && !config.rooms) {
+  if (configData && configData.livingRoomId && !configData.rooms) {
     // Migrate old format to new format
     return {
-      ...config,
+      enabled: configData.enabled ?? false,
       rooms: [{
-        id: config.livingRoomId,
-        name: config.livingRoomName,
-        originalSetpoint: config.originalSetpoint,
+        id: configData.livingRoomId,
+        name: configData.livingRoomName || 'Living Room',
+        originalSetpoint: configData.originalSetpoint || 20,
       }],
+      stoveTemperature: configData.stoveTemperature ?? DEFAULT_STOVE_TEMPERATURE,
+      stoveMode: configData.stoveMode ?? false,
+      lastSyncAt: configData.lastSyncAt ?? null,
+      lastSyncAction: configData.lastSyncAction ?? null,
     };
   }
 
-  return config || {
+  return configData as StoveSyncConfig || {
     enabled: false,
     rooms: [],
     stoveTemperature: DEFAULT_STOVE_TEMPERATURE,
@@ -215,7 +235,7 @@ async function setRoomsToStoveMode(config) {
   }
 
   // Get current setpoints to save for later
-  const homeStatus = await NETATMO_API.getHomeStatus(accessToken, homeId);
+  const homeStatus = await NETATMO_API.getHomeStatus(accessToken, homeId as string);
 
   // Set manual temperature with 8 hour duration
   const endtime = Math.floor(Date.now() / 1000) + MANUAL_SETPOINT_DURATION;
@@ -239,8 +259,8 @@ async function setRoomsToStoveMode(config) {
 
       // Set room to stove temperature
       const success = await NETATMO_API.setRoomThermpoint(accessToken, {
-        home_id: homeId,
-        room_id: room.id,
+        home_id: homeId as string,
+        room_id: room.id as string,
         mode: 'manual',
         temp: config.stoveTemperature,
         endtime,
@@ -318,8 +338,8 @@ async function setRoomsToSchedule(rooms) {
     try {
       // Set room to home mode (follow schedule)
       const success = await NETATMO_API.setRoomThermpoint(accessToken, {
-        home_id: homeId,
-        room_id: room.id,
+        home_id: homeId as string,
+        room_id: room.id as string,
         mode: 'home',
       });
 
@@ -395,7 +415,7 @@ export async function enforceStoveSyncSetpoints(stoveIsOn) {
       return { enforced: false, reason: 'no_home_id' };
     }
 
-    const homeStatus = await NETATMO_API.getHomeStatus(accessToken, homeId);
+    const homeStatus = await NETATMO_API.getHomeStatus(accessToken, homeId as string);
 
     // Check each synced room for setpoint drift
     const roomsNeedingFix = [];
@@ -434,8 +454,8 @@ export async function enforceStoveSyncSetpoints(stoveIsOn) {
       for (const room of roomsNeedingFix) {
         try {
           const success = await NETATMO_API.setRoomThermpoint(accessToken, {
-            home_id: homeId,
-            room_id: room.id,
+            home_id: homeId as string,
+            room_id: room.id as string,
             mode: 'manual',
             temp: config.stoveTemperature,
             endtime,
@@ -681,7 +701,7 @@ export async function checkStoveSyncOnStatusChange(currentStatus, previousStatus
  */
 export async function getAvailableRoomsForSync() {
   const topologyPath = getEnvironmentPath('netatmo/topology');
-  const topology = await adminDbGet(topologyPath);
+  const topology = await adminDbGet(topologyPath) as { rooms?: Array<{ id: string; name: string; type: string }> } | null;
   if (!topology?.rooms) {
     return [];
   }

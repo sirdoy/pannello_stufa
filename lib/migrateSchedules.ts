@@ -21,6 +21,25 @@ export interface MigrationOptions {
 }
 
 /**
+ * Firebase scheduler mode data shape
+ */
+interface SchedulerModeData {
+  mode?: string;
+  enabled?: boolean;
+  semiManual?: boolean;
+  lastUpdated?: number;
+  [key: string]: unknown;
+}
+
+/**
+ * Firebase schedule data shape
+ */
+interface ScheduleData {
+  slots?: Record<string, unknown[]>;
+  [key: string]: unknown;
+}
+
+/**
  * Migration result
  */
 export interface MigrationResult {
@@ -63,7 +82,7 @@ export async function migrateSchedulesToV2({ dryRun = false }: MigrationOptions 
 
     // Step 2: Read all v1 data (read-only, never delete)
     console.log('📖 Reading v1 data from /stoveScheduler...');
-    const v1Data = await adminDbGet('stoveScheduler');
+    const v1Data = await adminDbGet('stoveScheduler') as Record<string, unknown> | null;
 
     if (!v1Data) {
       console.log('⚠️  No v1 data found - creating fresh v2 structure');
@@ -116,12 +135,13 @@ export async function migrateSchedulesToV2({ dryRun = false }: MigrationOptions 
     }
 
     // Step 6: Migrate mode settings
-    if (v1Data.mode) {
+    const modeData = v1Data.mode as SchedulerModeData | undefined;
+    if (modeData) {
       if (dryRun) {
-        console.log('⚙️  [DRY RUN] Would migrate mode settings:', v1Data.mode);
+        console.log('⚙️  [DRY RUN] Would migrate mode settings:', modeData);
       } else {
         console.log('⚙️  Migrating mode settings...');
-        await adminDbSet('schedules-v2/mode', v1Data.mode);
+        await adminDbSet('schedules-v2/mode', modeData);
       }
     } else {
       // Create default mode
@@ -241,7 +261,7 @@ async function verifyMigration(originalSlots: Record<string, unknown[]>, origina
 
   try {
     // Check default schedule exists
-    const defaultSchedule = await adminDbGet('schedules-v2/schedules/default');
+    const defaultSchedule = await adminDbGet('schedules-v2/schedules/default') as ScheduleData | null;
     if (!defaultSchedule) {
       errors.push('Default schedule not found in v2');
       return { success: false, errors };
@@ -256,7 +276,7 @@ async function verifyMigration(originalSlots: Record<string, unknown[]>, origina
     // Verify slots integrity
     for (const day of DAYS_OF_WEEK) {
       const v1Intervals = originalSlots[day] || [];
-      const v2Intervals = defaultSchedule.slots[day] || [];
+      const v2Intervals = defaultSchedule.slots?.[day] || [];
 
       if (v1Intervals.length !== v2Intervals.length) {
         errors.push(`Day ${day}: interval count mismatch (v1: ${v1Intervals.length}, v2: ${v2Intervals.length})`);

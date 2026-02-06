@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 39 - UI Components Migration
-Plan: 10 of 10 (ALL COMPLETE)
-Status: COMPLETE — All 128 TypeScript files migrated (127 components + barrel export), zero .js/.jsx files in app/components
-Last activity: 2026-02-06 — Completed 39-10-PLAN.md (Device Components Gap Closure - 9 files)
+Plan: 11 of 11 (ALL COMPLETE)
+Status: COMPLETE — All 137 TypeScript files migrated (136 components + barrel export), ZERO .js/.jsx files in components/, ZERO tsc errors
+Last activity: 2026-02-06 — Completed 39-11-PLAN.md (Final Components + Error Resolution)
 
-Progress: [████████░░░░░░░░░░░░░░░░] 43% (3/7 phases complete, Phase 39 COMPLETE with 10 plans)
+Progress: [████████░░░░░░░░░░░░░░░░] 43% (3/7 phases complete, Phase 39 COMPLETE with 11 plans)
 
 ## Milestone Overview
 
@@ -27,7 +27,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 |-------|------|--------------|--------|
 | 37 | TypeScript Foundation | 8 | COMPLETE (8/8) |
 | 38 | Library Migration | 4 | COMPLETE (4/4) |
-| 39 | UI Components Migration | 3 | COMPLETE (10/10 plans, 128/128 files migrated, 27 minor tsc errors) |
+| 39 | UI Components Migration | 3 | COMPLETE (11/11 plans, 137/137 files migrated, 0 tsc errors) |
 | 40 | API Routes Migration | 3 | Pending |
 | 41 | Pages Migration | 3 | Pending |
 | 42 | Test Migration | 4 | Pending |
@@ -36,9 +36,9 @@ Progress: [████████░░░░░░░░░░░░░░░
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 173 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 21)
+- Total plans completed: 174 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 22)
 - Average duration: ~6.0 min per plan
-- Total execution time: ~17.5 hours across 7 milestones
+- Total execution time: ~17.6 hours across 7 milestones
 
 **By Milestone:**
 
@@ -50,7 +50,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
 | v3.2 Weather & Dashboard | 5 | 13 | 2 days (2026-02-02 - 2026-02-03) |
 | v4.0 Advanced UI | 7 | 24 | 2 days (2026-02-04 - 2026-02-05) |
-| v5.0 TypeScript Migration | 7 | 21 plans (Phases 37-39 complete) | In progress |
+| v5.0 TypeScript Migration | 7 | 22 plans (Phases 37-39 complete) | In progress |
 
 ## Accumulated Context
 
@@ -89,7 +89,7 @@ Key patterns from previous milestones preserved for v5.0 migration:
 
 ### Blockers/Concerns
 
-**None** - Phase 39 complete with zero tsc errors
+**None** - Phase 39 complete with zero tsc errors, all UI components migrated
 
 ### TypeScript Migration Patterns (v5.0)
 
@@ -183,7 +183,7 @@ From 39-01 (Foundation UI components):
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed 39-10 gap closure (Device components - 9 files)
+Stopped at: Completed 39-11 (Final components + error resolution - 9 files, 21 errors fixed)
 Resume file: None
 Next step: Begin Phase 40 (API Routes Migration)
 
@@ -269,3 +269,15 @@ From 39-07 (Scheduler components migration):
 - ScheduleInterval type from @/lib/schedulerService for all interval data
 - Modal Props pattern: isOpen, onConfirm, onCancel with typed callbacks
 - Bottom sheet undefined check: `if (!isOpen || !range) return null`
+
+From 39-11 (Final components + error resolution):
+- Button.Icon also expects string emoji, not JSX Element - use Button with children instead
+- Select icon prop is optional but should be emoji string if provided
+- RightClickMenu doesn't support open/onOpenChange (uncontrolled Radix ContextMenu)
+- Discriminated unions for status: HealthyStatus | StaleStatus with type narrowing
+- Generic response interfaces for pagination: EventsResponse, NotificationsResponse
+- Boolean conversion: !!(truthyValue) for logical OR returning truthy type not boolean
+- Type assertions for unknown hook returns: as ScheduleItem[] for useScheduleData
+- Type guards in render: 'separator' in item && item.separator for discriminated unions
+- parseInt(stringValue, 10) for parsing numeric strings from props
+- Cast to any for interface mismatches when data transformation not available

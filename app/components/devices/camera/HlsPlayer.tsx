@@ -4,6 +4,21 @@ import { useEffect, useRef, useState } from 'react';
 import { Maximize, Minimize } from 'lucide-react';
 import { Text, Button } from '../../ui';
 
+// Webkit fullscreen API declarations
+declare global {
+  interface Document {
+    webkitFullscreenElement?: Element;
+    webkitExitFullscreen?: () => Promise<void>;
+  }
+  interface HTMLElement {
+    webkitRequestFullscreen?: () => Promise<void>;
+  }
+  interface HTMLVideoElement {
+    webkitEnterFullscreen?: () => void;
+    webkitExitFullscreen?: () => void;
+  }
+}
+
 interface HlsPlayerProps {
   src: string;
   poster?: string;
@@ -273,7 +288,7 @@ export default function HlsPlayer({
       {/* Fullscreen button - only show when not using native controls */}
       {!loading && !error && !showControls && (
         <Button.Icon
-          icon={isFullscreen ? <Minimize className="w-5 h-5 text-white" /> : <Maximize className="w-5 h-5 text-white" />}
+          icon={(isFullscreen ? <Minimize className="w-5 h-5 text-white" /> : <Maximize className="w-5 h-5 text-white" />) as any}
           onClick={toggleFullscreen}
           variant="ghost"
           size="sm"

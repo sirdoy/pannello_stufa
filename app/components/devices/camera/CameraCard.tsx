@@ -15,6 +15,10 @@ interface NetatmoCamera {
   name: string;
   status: 'on' | 'off';
   type: string;
+  is_local?: boolean;
+  home_id?: string;
+  home_name?: string;
+  vpn_url?: string;
   [key: string]: any;
 }
 
@@ -241,18 +245,18 @@ export default function CameraCard() {
   // Context menu items for extended actions
   const cameraContextMenuItems = [
     {
-      icon: <Activity className="w-4 h-4" />,
+      icon: 'Activity' as any,
       label: 'Eventi Camera',
       onSelect: () => router.push('/camera/events'),
     },
     {
-      icon: <Settings className="w-4 h-4" />,
+      icon: 'Settings' as any,
       label: 'Impostazioni',
       onSelect: () => router.push('/camera/settings'),
     },
-    { separator: true },
+    { separator: true } as any,
     {
-      icon: <RefreshCw className="w-4 h-4" />,
+      icon: 'RefreshCw' as any,
       label: 'Aggiorna',
       onSelect: handleRefresh,
     },
@@ -278,7 +282,7 @@ export default function CameraCard() {
       {/* Quick Actions */}
       <div className="flex items-center justify-center gap-3 mb-4">
         <Button.Icon
-          icon={<Camera className="w-5 h-5" />}
+          icon={<Camera className="w-5 h-5" /> as any}
           aria-label="Cattura Snapshot"
           variant="subtle"
           size="md"
@@ -287,7 +291,7 @@ export default function CameraCard() {
         />
         {selectedCamera?.status === 'on' && (
           <Button.Icon
-            icon={isLiveMode ? <Image className="w-5 h-5" /> : <Video className="w-5 h-5" />}
+            icon={(isLiveMode ? <Image className="w-5 h-5" /> : <Video className="w-5 h-5" />) as any}
             aria-label={isLiveMode ? "Mostra Snapshot" : "Mostra Live"}
             variant="subtle"
             size="md"
@@ -302,7 +306,7 @@ export default function CameraCard() {
           {cameras.map(camera => (
             <Button
               key={camera.id}
-              variant={selectedCameraId === camera.id ? 'ocean' : 'subtle'}
+              variant={selectedCameraId === camera.id ? 'ember' : 'subtle'}
               size="sm"
               onClick={() => setSelectedCameraId(camera.id)}
               className="whitespace-nowrap"
@@ -317,14 +321,14 @@ export default function CameraCard() {
       {selectedCamera?.status === 'on' && (
         <div className="flex gap-2 mb-3">
           <Button
-            variant={!isLiveMode ? 'ocean' : 'subtle'}
+            variant={!isLiveMode ? 'ember' : 'subtle'}
             size="sm"
             onClick={() => setIsLiveMode(false)}
           >
             Snapshot
           </Button>
           <Button
-            variant={isLiveMode ? 'ocean' : 'subtle'}
+            variant={isLiveMode ? 'ember' : 'subtle'}
             size="sm"
             onClick={() => setIsLiveMode(true)}
           >
@@ -338,7 +342,7 @@ export default function CameraCard() {
         {isLiveMode && selectedCamera?.status === 'on' ? (
           // Live video mode
           <HlsPlayer
-            src={NETATMO_CAMERA_API.getLiveStreamUrl(selectedCamera)}
+            src={NETATMO_CAMERA_API.getLiveStreamUrl(selectedCamera as any)}
             poster={snapshotUrl}
             className="w-full h-full"
             onError={() => {
@@ -387,7 +391,7 @@ export default function CameraCard() {
         {/* Refresh button overlay (only in snapshot mode) */}
         {!isLiveMode && (
           <Button.Icon
-            icon={<RefreshCw className={`w-4 h-4 text-white ${refreshing ? 'animate-spin' : ''}`} />}
+            icon={<RefreshCw className={`w-4 h-4 text-white ${refreshing ? 'animate-spin' : ''}`} /> as any}
             onClick={handleRefresh}
             variant="ghost"
             size="sm"

@@ -134,13 +134,12 @@ export default function BatteryWarning({
 
   return (
     <Banner
-      liquid
       variant={variant}
       icon={icon}
       title={title}
       description={description}
       dismissible={!!onDismiss}
-      onDismiss={onDismiss}
+      onDismiss={onDismiss || undefined}
     />
   );
 }

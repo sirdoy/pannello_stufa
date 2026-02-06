@@ -90,9 +90,20 @@ Plans:
 
 ### Phase 39: UI Components Migration
 
-**Goal:** All UI components are converted to TypeScript with typed props.
+**Goal:** All ~119 UI components (64 design system + 55 application) are converted to TypeScript with typed props.
 
-**Plans:** (created by /gsd:plan-phase)
+**Plans:** 9 plans
+
+Plans:
+- [ ] 39-01-PLAN.md — Foundation UI components (23 simple typography, layout, feedback components)
+- [ ] 39-02-PLAN.md — Form and interaction UI components (14 buttons, inputs, selects)
+- [ ] 39-03-PLAN.md — Namespace and Radix UI wrapper components (12 complex namespace components)
+- [ ] 39-04-PLAN.md — Domain-specific and complex UI components (14 SmartHomeCard, DataTable, Skeleton, etc.)
+- [ ] 39-05-PLAN.md — Design system barrel export update (index.js to index.ts)
+- [ ] 39-06-PLAN.md — Root-level application components (18 Navbar, StovePanel, providers, etc.)
+- [ ] 39-07-PLAN.md — Scheduler components (14 schedule management components)
+- [ ] 39-08-PLAN.md — Netatmo and Lights components (7 thermostat and Hue components)
+- [ ] 39-09-PLAN.md — Weather, log, navigation, sandbox, layout components (16 remaining app components)
 
 **Requirements covered:**
 - COMP-01: Design system components convertiti a .tsx (64 file)
@@ -101,7 +112,7 @@ Plans:
 
 **Success criteria:**
 1. All 64 design system components in components/ui/ have .tsx extension
-2. All ~50 application components have .tsx extension
+2. All ~55 application components have .tsx extension
 3. Every component exports a Props interface or type
 4. Component prop errors are caught at compile time (invalid prop shows TypeScript error)
 5. `tsc --noEmit` passes on components/ directory with no errors
@@ -204,7 +215,7 @@ Plans:
 |-------|--------|-------|------------|
 | 37 - TypeScript Foundation | ✓ Complete | 3/3 | 100% |
 | 38 - Library Migration | ✓ Complete | 13/13 | 100% |
-| 39 - UI Components Migration | Pending | 0/? | 0% |
+| 39 - UI Components Migration | Planned | 0/9 | 0% |
 | 40 - API Routes Migration | Pending | 0/? | 0% |
 | 41 - Pages Migration | Pending | 0/? | 0% |
 | 42 - Test Migration | Pending | 0/? | 0% |
@@ -212,4 +223,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-02-05*
-*Last updated: 2026-02-06 — Phase 38 complete (gap closure verified)*
+*Last updated: 2026-02-06 — Phase 39 planned (9 plans in 4 waves)*

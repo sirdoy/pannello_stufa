@@ -9,6 +9,26 @@ import TimeBar from './TimeBar';
 import ScheduleInterval from './ScheduleInterval';
 import IntervalBottomSheet from './IntervalBottomSheet';
 import { Copy } from 'lucide-react';
+import type { ScheduleInterval as ScheduleIntervalType } from '@/lib/schedulerService';
+
+export interface DayAccordionItemProps {
+  day: string;
+  intervals: ScheduleIntervalType[];
+  isExpanded: boolean;
+  onToggle: () => void;
+  onAddInterval: () => void;
+  onRemoveInterval: (index: number) => void;
+  onChangeInterval: (index: number, field: string, value: string | number, isBlur?: boolean) => void;
+  onDuplicate?: (day: string) => void;
+  saveStatus?: {
+    isSaving: boolean;
+  };
+}
+
+interface BottomSheetData {
+  index: number;
+  range: ScheduleIntervalType;
+}
 
 export default function DayAccordionItem({
   day,
@@ -20,17 +40,17 @@ export default function DayAccordionItem({
   onChangeInterval,
   onDuplicate,
   saveStatus,
-}) {
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [selectedIndex, setSelectedIndex] = useState(null);
-  const [bottomSheetData, setBottomSheetData] = useState(null);
+}: DayAccordionItemProps) {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [bottomSheetData, setBottomSheetData] = useState<BottomSheetData | null>(null);
 
-  const handleIntervalClick = (index) => {
+  const handleIntervalClick = (index: number) => {
     setSelectedIndex(selectedIndex === index ? null : index);
   };
 
   // Handler per apertura bottom sheet da timeline (mobile)
-  const handleTimelineIntervalClick = (index, range) => {
+  const handleTimelineIntervalClick = (index: number, range: ScheduleIntervalType) => {
     setBottomSheetData({ index, range });
     setSelectedIndex(index); // Sincronizza con selezione
   };

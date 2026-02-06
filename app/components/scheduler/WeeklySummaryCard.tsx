@@ -5,12 +5,17 @@ import Card from '../ui/Card';
 import Heading from '../ui/Heading';
 import Text from '../ui/Text';
 import { calculateWeeklyStats } from '@/lib/schedulerStats';
+import type { WeeklySchedule } from '@/lib/schedulerService';
 
-export default function WeeklySummaryCard({ schedule }) {
+export interface WeeklySummaryCardProps {
+  schedule: WeeklySchedule;
+}
+
+export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) {
   const stats = useMemo(() => calculateWeeklyStats(schedule), [schedule]);
 
   // Format hours with 1 decimal
-  const formatHours = (hours) => hours.toFixed(1) + 'h';
+  const formatHours = (hours: number) => hours.toFixed(1) + 'h';
 
   // Calculate power distribution percentages
   const totalPowerHours = Object.values(stats.powerDistribution).reduce((sum, h) => sum + h, 0);
@@ -22,7 +27,7 @@ export default function WeeklySummaryCard({ schedule }) {
 
   return (
     <Card variant="glass" className="p-6">
-      <Heading level={2} size="lg" weight="semibold" className="mb-4 flex items-center gap-2">
+      <Heading level={2} size="lg" className="mb-4 flex items-center gap-2">
         <span>📊</span>
         <span>Riepilogo Settimanale</span>
       </Heading>
@@ -68,7 +73,7 @@ export default function WeeklySummaryCard({ schedule }) {
       {stats.totalHours > 0 && (
         <>
           <div className="border-t border-neutral-200 dark:border-neutral-700 pt-4 mb-4">
-            <Heading level={3} size="sm" weight="medium" className="text-neutral-700 dark:text-neutral-300 mb-3">
+            <Heading level={3} size="sm" className="text-neutral-700 dark:text-neutral-300 mb-3">
               Distribuzione Potenza
             </Heading>
             <div className="space-y-2">
@@ -129,8 +134,8 @@ export default function WeeklySummaryCard({ schedule }) {
   );
 }
 
-function getPowerBarClass(level) {
-  const classes = {
+function getPowerBarClass(level: number): string {
+  const classes: Record<number, string> = {
     1: 'bg-blue-500 dark:bg-blue-400',
     2: 'bg-green-500 dark:bg-green-400',
     3: 'bg-yellow-500 dark:bg-yellow-400',

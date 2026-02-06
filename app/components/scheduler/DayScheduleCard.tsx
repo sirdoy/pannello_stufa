@@ -7,6 +7,15 @@ import Heading from '../ui/Heading';
 import Text from '../ui/Text';
 import TimeBar from './TimeBar';
 import ScheduleInterval from './ScheduleInterval';
+import type { ScheduleInterval as ScheduleIntervalType } from '@/lib/schedulerService';
+
+export interface DayScheduleCardProps {
+  day: string;
+  intervals: ScheduleIntervalType[];
+  onAddInterval: () => void;
+  onRemoveInterval: (index: number) => void;
+  onChangeInterval: (index: number, field: string, value: string | number, isBlur?: boolean) => void;
+}
 
 export default function DayScheduleCard({
   day,
@@ -14,11 +23,11 @@ export default function DayScheduleCard({
   onAddInterval,
   onRemoveInterval,
   onChangeInterval,
-}) {
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [selectedIndex, setSelectedIndex] = useState(null);
+}: DayScheduleCardProps) {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  const handleIntervalClick = (index) => {
+  const handleIntervalClick = (index: number) => {
     setSelectedIndex(selectedIndex === index ? null : index);
   };
 

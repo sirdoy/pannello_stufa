@@ -1,6 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import type { ScheduleInterval } from '@/lib/schedulerService';
+
+export interface TimeBarProps {
+  intervals: ScheduleInterval[];
+  hoveredIndex: number | null;
+  selectedIndex: number | null;
+  onHover: (index: number | null) => void;
+  onClick: (index: number) => void;
+  onIntervalClick?: (index: number, range: ScheduleInterval) => void;
+  height?: string;
+}
+
+interface TooltipData {
+  range: ScheduleInterval;
+  x: number;
+  y: number;
+}
 
 export default function TimeBar({
   intervals,
@@ -9,9 +26,9 @@ export default function TimeBar({
   onHover,
   onClick,
   onIntervalClick,
-}) {
+}: TimeBarProps) {
   const totalMinutes = 24 * 60;
-  const [tooltipData, setTooltipData] = useState(null);
+  const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
   // Mobile detection (< 768px = md breakpoint)
@@ -22,7 +39,7 @@ export default function TimeBar({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const handleMouseEnter = (index, range, event) => {
+  const handleMouseEnter = (index: number, range: ScheduleInterval, event: React.MouseEvent<HTMLDivElement>) => {
     onHover(index);
     const rect = event.currentTarget.getBoundingClientRect();
     setTooltipData({

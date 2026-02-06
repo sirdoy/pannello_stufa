@@ -11,6 +11,24 @@ import ScheduleInterval from './ScheduleInterval';
 import IntervalBottomSheet from './IntervalBottomSheet';
 import { getDayTotalHours } from '@/lib/schedulerStats';
 import { Copy, Plus } from 'lucide-react';
+import type { ScheduleInterval as ScheduleIntervalType } from '@/lib/schedulerService';
+
+export interface DayEditPanelProps {
+  day: string;
+  intervals: ScheduleIntervalType[];
+  onAddInterval: (day: string) => void;
+  onEditIntervalModal?: (index: number) => void;
+  onDeleteInterval: (index: number) => void;
+  onDuplicate?: (day: string) => void;
+  saveStatus?: {
+    isSaving: boolean;
+  };
+}
+
+interface BottomSheetData {
+  index: number;
+  range: ScheduleIntervalType;
+}
 
 export default function DayEditPanel({
   day,
@@ -20,19 +38,19 @@ export default function DayEditPanel({
   onDeleteInterval,
   onDuplicate,
   saveStatus,
-}) {
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [selectedIndex, setSelectedIndex] = useState(null);
-  const [bottomSheetData, setBottomSheetData] = useState(null);
+}: DayEditPanelProps) {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [bottomSheetData, setBottomSheetData] = useState<BottomSheetData | null>(null);
 
   const totalHours = getDayTotalHours(intervals);
 
-  const handleIntervalClick = (index) => {
+  const handleIntervalClick = (index: number) => {
     setSelectedIndex(selectedIndex === index ? null : index);
   };
 
   // Handler per apertura bottom sheet da timeline (mobile)
-  const handleTimelineIntervalClick = (index, range) => {
+  const handleTimelineIntervalClick = (index: number, range: ScheduleIntervalType) => {
     setBottomSheetData({ index, range });
     setSelectedIndex(index); // Sincronizza con selezione
   };
@@ -92,7 +110,7 @@ export default function DayEditPanel({
               {/* Mobile: icon-only ActionButton */}
               <ActionButton
                 icon={<Copy />}
-                variant="primary"
+                variant="ember"
                 size="md"
                 onClick={() => onDuplicate(day)}
                 title="Duplica su altri giorni"
@@ -103,9 +121,9 @@ export default function DayEditPanel({
               <Button
                 variant="subtle"
                 onClick={() => onDuplicate(day)}
-                icon={<Copy className="w-4 h-4" />}
                 className="hidden sm:flex"
               >
+                <Copy className="w-4 h-4 mr-2" />
                 Duplica
               </Button>
             </>
@@ -116,7 +134,7 @@ export default function DayEditPanel({
             {/* Mobile: icon-only ActionButton */}
             <ActionButton
               icon={<Plus />}
-              variant="success"
+              variant="sage"
               size="md"
               onClick={() => onAddInterval(day)}
               title="Aggiungi intervallo"
@@ -127,9 +145,9 @@ export default function DayEditPanel({
             <Button
               variant="success"
               onClick={() => onAddInterval(day)}
-              icon={<Plus className="w-4 h-4" />}
               className="hidden sm:flex"
             >
+              <Plus className="w-4 h-4 mr-2" />
               Aggiungi
             </Button>
           </>

@@ -2,11 +2,18 @@
 
 import { getDayTotalHours, getPowerGradient } from '@/lib/schedulerStats';
 import Button from '../ui/Button';
+import type { WeeklySchedule } from '@/lib/schedulerService';
 
 const daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
 const dayShortNames = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 
-export default function WeeklyTimeline({ schedule, selectedDay, onSelectDay }) {
+export interface WeeklyTimelineProps {
+  schedule: WeeklySchedule;
+  selectedDay: string;
+  onSelectDay: (day: string) => void;
+}
+
+export default function WeeklyTimeline({ schedule, selectedDay, onSelectDay }: WeeklyTimelineProps) {
   return (
     <div className="space-y-2">
       {daysOfWeek.map((day, dayIndex) => {

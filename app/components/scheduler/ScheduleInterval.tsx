@@ -4,6 +4,18 @@ import Card from '../ui/Card';
 import ActionButton from '../ui/ActionButton';
 import ProgressBar from '../ui/ProgressBar';
 import Text from '../ui/Text';
+import type { ScheduleInterval as ScheduleIntervalType } from '@/lib/schedulerService';
+
+export interface ScheduleIntervalProps {
+  range: ScheduleIntervalType;
+  onRemove: () => void;
+  onEdit?: () => void;
+  onChange?: (field: string, value: string | number, isBlur?: boolean) => void;
+  isHighlighted?: boolean;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+  onClick?: () => void;
+}
 
 export default function ScheduleInterval({
   range,
@@ -13,7 +25,7 @@ export default function ScheduleInterval({
   onMouseEnter,
   onMouseLeave,
   onClick,
-}) {
+}: ScheduleIntervalProps) {
   const powerLabel = POWER_LABELS[range.power];
   const fanLabel = FAN_LABELS[range.fan];
 
@@ -58,7 +70,7 @@ export default function ScheduleInterval({
             {onEdit && (
               <ActionButton
                 icon={<Edit2 />}
-                variant="edit"
+                variant="ocean"
                 size="md"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -70,7 +82,7 @@ export default function ScheduleInterval({
             )}
             <ActionButton
               icon={<Trash2 />}
-              variant="delete"
+              variant="danger"
               size="md"
               onClick={(e) => {
                 e.stopPropagation();

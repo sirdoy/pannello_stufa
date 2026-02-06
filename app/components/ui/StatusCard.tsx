@@ -1,8 +1,8 @@
 'use client';
 
-import { forwardRef } from 'react';
+import { forwardRef, type ReactNode, type ComponentPropsWithoutRef } from 'react';
 import { cn } from '@/lib/utils/cn';
-import SmartHomeCard from './SmartHomeCard';
+import SmartHomeCard, { type SmartHomeCardProps } from './SmartHomeCard';
 import Badge from './Badge';
 import ConnectionStatus from './ConnectionStatus';
 
@@ -11,21 +11,6 @@ import ConnectionStatus from './ConnectionStatus';
  *
  * Specialized card for displaying read-only device status information.
  * Extends SmartHomeCard with integrated Badge and ConnectionStatus components.
- *
- * @param {Object} props - Component props
- * @param {ReactNode} props.children - Additional custom content
- * @param {string} props.className - Additional CSS classes
- * @param {ReactNode} props.icon - Device icon (emoji or lucide icon)
- * @param {string} props.title - Card title
- * @param {'compact'|'default'} props.size - Card size variant
- * @param {'ember'|'ocean'|'sage'|'warning'|'danger'} props.colorTheme - Color for accent bar
- * @param {boolean} props.isLoading - Show loading overlay
- * @param {boolean} props.error - Show error state
- * @param {string} props.errorMessage - Error message to display
- * @param {boolean} props.disabled - Disabled state with opacity
- * @param {string} props.status - Status text to display in Badge
- * @param {'ember'|'sage'|'ocean'|'warning'|'danger'|'neutral'} props.statusVariant - Badge color variant
- * @param {'online'|'offline'|'connecting'|'unknown'} props.connectionStatus - Connection state
  *
  * @example
  * // Basic status display
@@ -49,7 +34,13 @@ import ConnectionStatus from './ConnectionStatus';
  *   <p>2 lights active</p>
  * </StatusCard>
  */
-const StatusCard = forwardRef(function StatusCard(
+export interface StatusCardProps extends Omit<SmartHomeCardProps, 'headerActions'> {
+  status?: string;
+  statusVariant?: 'ember' | 'sage' | 'ocean' | 'warning' | 'danger' | 'neutral';
+  connectionStatus?: 'online' | 'offline' | 'connecting' | 'unknown';
+}
+
+const StatusCard = forwardRef<HTMLDivElement, StatusCardProps>(function StatusCard(
   {
     children,
     className,

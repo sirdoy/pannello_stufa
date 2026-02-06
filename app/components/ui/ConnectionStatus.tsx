@@ -1,7 +1,7 @@
 'use client';
 
-import { forwardRef } from 'react';
-import { cva } from 'class-variance-authority';
+import { forwardRef, type ComponentPropsWithoutRef } from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 
 /**
@@ -61,7 +61,7 @@ export const dotVariants = cva(
 /**
  * Default status labels in Italian
  */
-const statusLabels = {
+const statusLabels: Record<string, string> = {
   online: 'Online',
   offline: 'Offline',
   connecting: 'Connessione...',
@@ -74,13 +74,6 @@ const statusLabels = {
  * Displays device connection state with a status dot and text label.
  * Uses CVA for variant styling and proper accessibility with aria-live.
  *
- * @param {Object} props - Component props
- * @param {'online'|'offline'|'connecting'|'unknown'} props.status - Connection status
- * @param {'sm'|'md'|'lg'} props.size - Display size
- * @param {string} props.label - Override default label text
- * @param {boolean} props.showDot - Show status dot (default: true)
- * @param {string} props.className - Additional CSS classes
- *
  * @example
  * <ConnectionStatus status="online" />
  *
@@ -90,7 +83,14 @@ const statusLabels = {
  * @example
  * <ConnectionStatus status="offline" label="Dispositivo disconnesso" />
  */
-const ConnectionStatus = forwardRef(function ConnectionStatus(
+export interface ConnectionStatusProps
+  extends ComponentPropsWithoutRef<'span'>,
+    VariantProps<typeof connectionStatusVariants> {
+  label?: string;
+  showDot?: boolean;
+}
+
+const ConnectionStatus = forwardRef<HTMLSpanElement, ConnectionStatusProps>(function ConnectionStatus(
   {
     status = 'unknown',
     size = 'md',

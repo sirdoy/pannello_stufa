@@ -1,7 +1,7 @@
 'use client';
 
-import { forwardRef, createContext, useContext, useState, useCallback } from 'react';
-import { cva } from 'class-variance-authority';
+import { forwardRef, createContext, useContext, useState, useCallback, type ReactNode, type ComponentPropsWithoutRef, type Dispatch, type SetStateAction } from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 
 /**
@@ -9,24 +9,34 @@ import { cn } from '@/lib/utils/cn';
  *
  * Provides collapsed state and toggle function to child components.
  */
-const SidebarContext = createContext({
-  collapsed: false,
-  setCollapsed: () => {},
-  toggle: () => {},
-  isMobile: false,
-  mobileOpen: false,
-  setMobileOpen: () => {},
-  toggleMobile: () => {},
-});
+interface SidebarContextValue {
+  collapsed: boolean;
+  setCollapsed: Dispatch<SetStateAction<boolean>>;
+  toggle: () => void;
+  mobileOpen: boolean;
+  setMobileOpen: Dispatch<SetStateAction<boolean>>;
+  toggleMobile: () => void;
+}
+
+const SidebarContext = createContext<SidebarContextValue | undefined>(undefined);
 
 /**
  * useSidebar Hook - Access sidebar context
  *
- * @returns {Object} Sidebar context values
+ * @returns Sidebar context values
  * @example
  * const { collapsed, toggle } = useSidebar();
  */
-function useSidebar() {
+export interface UseSidebarReturn {
+  collapsed: boolean;
+  setCollapsed: Dispatch<SetStateAction<boolean>>;
+  toggle: () => void;
+  mobileOpen: boolean;
+  setMobileOpen: Dispatch<SetStateAction<boolean>>;
+  toggleMobile: () => void;
+}
+
+function useSidebar(): UseSidebarReturn {
   const context = useContext(SidebarContext);
   if (!context) {
     throw new Error('useSidebar must be used within a DashboardLayout');
@@ -88,7 +98,11 @@ const mainContentVariants = cva(
 /**
  * Sidebar Component - Left navigation panel
  */
-const Sidebar = forwardRef(function Sidebar(
+export interface SidebarProps extends ComponentPropsWithoutRef<'aside'> {
+  children?: ReactNode;
+}
+
+const Sidebar = forwardRef<HTMLElement, SidebarProps>(function Sidebar(
   { className, children, ...props },
   ref
 ) {
@@ -138,7 +152,11 @@ function MobileOverlay() {
 /**
  * SidebarHeader Component - Top section of sidebar
  */
-const SidebarHeader = forwardRef(function SidebarHeader(
+export interface SidebarHeaderProps extends ComponentPropsWithoutRef<'div'> {
+  children?: ReactNode;
+}
+
+const SidebarHeader = forwardRef<HTMLDivElement, SidebarHeaderProps>(function SidebarHeader(
   { className, children, ...props },
   ref
 ) {
@@ -162,7 +180,11 @@ const SidebarHeader = forwardRef(function SidebarHeader(
 /**
  * SidebarContent Component - Scrollable content area
  */
-const SidebarContent = forwardRef(function SidebarContent(
+export interface SidebarContentProps extends ComponentPropsWithoutRef<'nav'> {
+  children?: ReactNode;
+}
+
+const SidebarContent = forwardRef<HTMLElement, SidebarContentProps>(function SidebarContent(
   { className, children, ...props },
   ref
 ) {
@@ -180,7 +202,11 @@ const SidebarContent = forwardRef(function SidebarContent(
 /**
  * SidebarFooter Component - Bottom section of sidebar
  */
-const SidebarFooter = forwardRef(function SidebarFooter(
+export interface SidebarFooterProps extends ComponentPropsWithoutRef<'div'> {
+  children?: ReactNode;
+}
+
+const SidebarFooter = forwardRef<HTMLDivElement, SidebarFooterProps>(function SidebarFooter(
   { className, children, ...props },
   ref
 ) {
@@ -204,7 +230,9 @@ const SidebarFooter = forwardRef(function SidebarFooter(
 /**
  * SidebarToggle Component - Button to toggle collapse state
  */
-const SidebarToggle = forwardRef(function SidebarToggle(
+export interface SidebarToggleProps extends ComponentPropsWithoutRef<'button'> {}
+
+const SidebarToggle = forwardRef<HTMLButtonElement, SidebarToggleProps>(function SidebarToggle(
   { className, ...props },
   ref
 ) {
@@ -248,7 +276,9 @@ const SidebarToggle = forwardRef(function SidebarToggle(
 /**
  * MobileMenuButton Component - Button to open mobile sidebar
  */
-const MobileMenuButton = forwardRef(function MobileMenuButton(
+export interface MobileMenuButtonProps extends ComponentPropsWithoutRef<'button'> {}
+
+const MobileMenuButton = forwardRef<HTMLButtonElement, MobileMenuButtonProps>(function MobileMenuButton(
   { className, ...props },
   ref
 ) {
@@ -301,7 +331,11 @@ const MobileMenuButton = forwardRef(function MobileMenuButton(
 /**
  * MainContent Component - Main content area
  */
-const MainContent = forwardRef(function MainContent(
+export interface MainContentProps extends ComponentPropsWithoutRef<'div'> {
+  children?: ReactNode;
+}
+
+const MainContent = forwardRef<HTMLDivElement, MainContentProps>(function MainContent(
   { className, children, ...props },
   ref
 ) {
@@ -325,12 +359,6 @@ const MainContent = forwardRef(function MainContent(
  * Dashboard layout with collapsible sidebar and responsive behavior.
  * Provides SidebarContext for child components to access collapse state.
  *
- * @param {Object} props - Component props
- * @param {boolean} props.defaultCollapsed - Initial collapsed state
- * @param {ReactNode} props.sidebar - Sidebar content (typically DashboardLayout.Sidebar)
- * @param {ReactNode} props.children - Main content
- * @param {string} props.className - Additional classes for the wrapper
- *
  * @example
  * <DashboardLayout
  *   sidebar={
@@ -346,7 +374,25 @@ const MainContent = forwardRef(function MainContent(
  *   <DashboardLayout.Main>Content</DashboardLayout.Main>
  * </DashboardLayout>
  */
-const DashboardLayout = forwardRef(function DashboardLayout(
+export interface DashboardLayoutProps extends ComponentPropsWithoutRef<'div'> {
+  defaultCollapsed?: boolean;
+  sidebar?: ReactNode;
+  children?: ReactNode;
+}
+
+type DashboardLayoutComponent = React.ForwardRefExoticComponent<
+  DashboardLayoutProps & React.RefAttributes<HTMLDivElement>
+> & {
+  Sidebar: typeof Sidebar;
+  SidebarHeader: typeof SidebarHeader;
+  SidebarContent: typeof SidebarContent;
+  SidebarFooter: typeof SidebarFooter;
+  SidebarToggle: typeof SidebarToggle;
+  MobileMenuButton: typeof MobileMenuButton;
+  Main: typeof MainContent;
+};
+
+const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(function DashboardLayout(
   {
     defaultCollapsed = false,
     sidebar,
@@ -391,13 +437,13 @@ const DashboardLayout = forwardRef(function DashboardLayout(
 });
 
 // Attach sub-components for namespace pattern
-DashboardLayout.Sidebar = Sidebar;
-DashboardLayout.SidebarHeader = SidebarHeader;
-DashboardLayout.SidebarContent = SidebarContent;
-DashboardLayout.SidebarFooter = SidebarFooter;
-DashboardLayout.SidebarToggle = SidebarToggle;
-DashboardLayout.MobileMenuButton = MobileMenuButton;
-DashboardLayout.Main = MainContent;
+(DashboardLayout as DashboardLayoutComponent).Sidebar = Sidebar;
+(DashboardLayout as DashboardLayoutComponent).SidebarHeader = SidebarHeader;
+(DashboardLayout as DashboardLayoutComponent).SidebarContent = SidebarContent;
+(DashboardLayout as DashboardLayoutComponent).SidebarFooter = SidebarFooter;
+(DashboardLayout as DashboardLayoutComponent).SidebarToggle = SidebarToggle;
+(DashboardLayout as DashboardLayoutComponent).MobileMenuButton = MobileMenuButton;
+(DashboardLayout as DashboardLayoutComponent).Main = MainContent;
 
 export {
   DashboardLayout,

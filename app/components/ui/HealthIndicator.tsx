@@ -1,9 +1,9 @@
 'use client';
 
-import { forwardRef } from 'react';
-import { cva } from 'class-variance-authority';
+import { forwardRef, type ComponentPropsWithoutRef } from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
-import { CheckCircle2, AlertTriangle, XCircle, AlertOctagon } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, XCircle, AlertOctagon, type LucideIcon } from 'lucide-react';
 
 /**
  * HealthIndicator CVA variants for external styling access
@@ -36,7 +36,7 @@ export const healthIndicatorVariants = cva(
 /**
  * Icon mapping per status (lucide-react)
  */
-const iconMap = {
+const iconMap: Record<string, LucideIcon> = {
   ok: CheckCircle2,
   warning: AlertTriangle,
   error: XCircle,
@@ -46,7 +46,7 @@ const iconMap = {
 /**
  * Icon sizes per component size
  */
-const iconSizes = {
+const iconSizes: Record<string, number> = {
   sm: 14,
   md: 16,
   lg: 20,
@@ -55,7 +55,7 @@ const iconSizes = {
 /**
  * Default status labels in Italian
  */
-const statusLabels = {
+const statusLabels: Record<string, string> = {
   ok: 'OK',
   warning: 'Attenzione',
   error: 'Errore',
@@ -68,14 +68,6 @@ const statusLabels = {
  * Displays health status with an appropriate severity icon and text label.
  * Uses CVA for variant styling and lucide-react icons.
  *
- * @param {Object} props - Component props
- * @param {'ok'|'warning'|'error'|'critical'} props.status - Health status
- * @param {'sm'|'md'|'lg'} props.size - Display size
- * @param {string} props.label - Override default label text
- * @param {boolean} props.showIcon - Show status icon (default: true)
- * @param {boolean} props.pulse - Enable pulse animation for critical states (default: false)
- * @param {string} props.className - Additional CSS classes
- *
  * @example
  * <HealthIndicator status="ok" />
  *
@@ -85,7 +77,15 @@ const statusLabels = {
  * @example
  * <HealthIndicator status="warning" label="Manutenzione richiesta" />
  */
-const HealthIndicator = forwardRef(function HealthIndicator(
+export interface HealthIndicatorProps
+  extends ComponentPropsWithoutRef<'span'>,
+    VariantProps<typeof healthIndicatorVariants> {
+  label?: string;
+  showIcon?: boolean;
+  pulse?: boolean;
+}
+
+const HealthIndicator = forwardRef<HTMLSpanElement, HealthIndicatorProps>(function HealthIndicator(
   {
     status = 'ok',
     size = 'md',

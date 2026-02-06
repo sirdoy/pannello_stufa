@@ -1,11 +1,24 @@
 'use client';
 
-import { forwardRef, useCallback } from 'react';
+import { forwardRef, useCallback, type ReactNode, type ComponentPropsWithoutRef } from 'react';
 import { Command } from 'cmdk';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import * as VisuallyHiddenPrimitive from '@radix-ui/react-visually-hidden';
 import { cn } from '@/lib/utils/cn';
 import Kbd from './Kbd';
+
+interface CommandItem {
+  id: string;
+  label: string;
+  icon?: ReactNode;
+  shortcut?: string;
+  onSelect?: () => void;
+}
+
+interface CommandGroup {
+  heading?: string;
+  items?: CommandItem[];
+}
 
 /**
  * CommandPalette Component - Ember Noir Design System v4.0
@@ -37,15 +50,15 @@ import Kbd from './Kbd';
  *   }
  * ];
  * <CommandPalette open={open} onOpenChange={setOpen} commands={commands} />
- *
- * @param {Object} props
- * @param {boolean} props.open - Whether the palette is open
- * @param {Function} props.onOpenChange - Callback when open state should change
- * @param {Array} props.commands - Array of command groups with heading and items
- * @param {string} [props.placeholder] - Input placeholder text
- * @param {string} [props.className] - Additional CSS classes
  */
-const CommandPalette = forwardRef(function CommandPalette(
+export interface CommandPaletteProps extends Omit<ComponentPropsWithoutRef<typeof Command.Dialog>, 'children'> {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  commands?: CommandGroup[];
+  placeholder?: string;
+}
+
+const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function CommandPalette(
   {
     open,
     onOpenChange,
@@ -59,7 +72,7 @@ const CommandPalette = forwardRef(function CommandPalette(
   /**
    * Handle command selection with haptic feedback
    */
-  const handleSelect = useCallback((callback) => {
+  const handleSelect = useCallback((callback?: () => void) => {
     // Execute the command
     if (typeof callback === 'function') {
       callback();

@@ -1,8 +1,8 @@
 'use client';
 
-import { forwardRef, useState } from 'react';
+import { forwardRef, useState, type ReactNode, type CSSProperties } from 'react';
 import { cn } from '@/lib/utils/cn';
-import SmartHomeCard from './SmartHomeCard';
+import SmartHomeCard, { type SmartHomeCardProps } from './SmartHomeCard';
 import Button from './Button';
 import Banner from './Banner';
 import Badge from './Badge';
@@ -14,45 +14,85 @@ import RightClickMenu from './RightClickMenu';
 import { useContextMenuLongPress, longPressPreventSelection } from '@/app/hooks/useContextMenuLongPress';
 import { Heading, EmptyState, Divider } from './index';
 
+export interface ContextMenuItem {
+  icon?: ReactNode;
+  label: string;
+  onSelect?: () => void;
+  disabled?: boolean;
+  separator?: boolean;
+}
+
+interface StatusBadge {
+  label: string;
+  color: string;
+  icon?: ReactNode;
+}
+
+interface BannerItem {
+  variant: 'info' | 'success' | 'warning' | 'error';
+  icon?: any;
+  title?: string;
+  description?: any;
+  dismissible?: boolean;
+  onDismiss?: () => void;
+  [key: string]: any; // Allow additional Banner props
+}
+
+interface InfoBoxItem {
+  icon?: ReactNode;
+  label: string;
+  value: ReactNode;
+  valueColor?: string;
+}
+
+interface FooterAction {
+  label: string;
+  variant?: 'ember' | 'ocean' | 'sage' | 'danger' | 'subtle' | 'ghost' | 'success' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+  onClick?: () => void;
+  [key: string]: any;
+}
+
+interface ToastNotification {
+  show: boolean;
+  message?: string;
+  type?: 'success' | 'error' | 'info' | 'warning';
+  [key: string]: any; // Allow additional Toast props
+}
+
 /**
  * DeviceCard Component - Ember Noir Design System
  *
  * Device control card extending SmartHomeCard with controls area.
  * Maintains backwards compatibility with existing usages while integrating
  * Badge, HealthIndicator, and SmartHomeCard base.
- *
- * Legacy Props (backwards compatibility):
- * @param {string} props.icon - Device icon emoji
- * @param {string} props.title - Device title
- * @param {'ember'|'ocean'|'warning'|'sage'|'primary'|'info'|'success'|'danger'} props.colorTheme - Color theme for accent bar
- * @param {boolean} props.connected - Connection status
- * @param {string} props.connectionError - Connection error message
- * @param {Function} props.onConnect - Connect button handler
- * @param {string} props.connectButtonLabel - Connect button text
- * @param {string} props.connectInfoRoute - Route for "Maggiori Info" button
- * @param {boolean} props.loading - Loading state
- * @param {string} props.loadingMessage - Loading overlay message
- * @param {ReactNode} props.skeletonComponent - Skeleton component for initial load
- * @param {Object} props.statusBadge - Status badge {label, color, icon}
- * @param {Array} props.banners - Array of banner objects {variant, icon, title, description, dismissible, onDismiss}
- * @param {ReactNode} props.children - Main content area
- * @param {Array} props.infoBoxes - Array of info box objects {icon, label, value, valueColor}
- * @param {string} props.infoBoxesTitle - Section title for info boxes
- * @param {Array} props.footerActions - Array of button objects {label, variant, onClick, ...props}
- * @param {Object} props.toast - Toast notification {show, message, type}
- * @param {Function} props.onToastClose - Toast close handler
- * @param {string} props.className - Additional classes
- *
- * New Props (v3.0 API):
- * @param {'compact'|'default'} props.size - Card size variant
- * @param {'ok'|'warning'|'error'|'critical'} props.healthStatus - Health indicator status
- * @param {boolean} props.isLoading - Alias for loading (new API consistency)
- *
- * Context Menu Props (v4.0):
- * @param {Array<{icon: ReactNode, label: string, onSelect: Function, disabled?: boolean, separator?: boolean}>} props.contextMenuItems - Menu items for right-click/long-press
- * @param {Function} props.onContextMenu - Optional callback when context menu opens (for state sync)
  */
-const DeviceCard = forwardRef(function DeviceCard(
+export interface DeviceCardProps extends Omit<SmartHomeCardProps, 'headerActions' | 'colorTheme'> {
+  colorTheme?: 'ember' | 'ocean' | 'warning' | 'sage' | 'danger' | 'primary' | 'info' | 'success';
+  // Legacy props (backwards compatibility)
+  connected?: boolean;
+  connectionError?: string | null;
+  onConnect?: () => void;
+  connectButtonLabel?: string;
+  connectInfoRoute?: string;
+  loading?: boolean;
+  loadingMessage?: string;
+  skeletonComponent?: ReactNode;
+  statusBadge?: StatusBadge;
+  banners?: BannerItem[];
+  infoBoxes?: InfoBoxItem[];
+  infoBoxesTitle?: string;
+  footerActions?: FooterAction[];
+  toast?: ToastNotification;
+  onToastClose?: () => void;
+  // New props (v3.0 API)
+  healthStatus?: 'ok' | 'warning' | 'error' | 'critical';
+  // Context menu props (v4.0)
+  contextMenuItems?: ContextMenuItem[];
+  onContextMenu?: () => void;
+}
+
+const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCard(
   {
     // Legacy props (backwards compatibility)
     icon,
@@ -86,27 +126,25 @@ const DeviceCard = forwardRef(function DeviceCard(
   },
   ref
 ) {
-  // Context menu state
-  const [contextMenuOpen, setContextMenuOpen] = useState(false);
+  // Context menu state - trigger callback when long-pressed
   const { bind: longPressBind, isPressed } = useContextMenuLongPress(() => {
-    setContextMenuOpen(true);
     onContextMenu?.();
   });
   // Map legacy color names to new names
-  const normalizeColorTheme = (theme) => {
-    const colorMap = {
+  const normalizeColorTheme = (theme: string): 'ember' | 'ocean' | 'sage' | 'warning' | 'danger' => {
+    const colorMap: Record<string, 'ember' | 'ocean' | 'sage' | 'warning' | 'danger'> = {
       primary: 'ember',
       info: 'ocean',
       success: 'sage',
     };
-    return colorMap[theme] || theme;
+    return (colorMap[theme] || theme) as 'ember' | 'ocean' | 'sage' | 'warning' | 'danger';
   };
 
-  const normalizedColorTheme = normalizeColorTheme(colorTheme);
+  const normalizedColorTheme = normalizeColorTheme(colorTheme || 'ember');
 
   // Map legacy statusBadge color to new Badge variant
-  const mapStatusBadgeVariant = (color) => {
-    const variantMap = {
+  const mapStatusBadgeVariant = (color: string): 'ember' | 'ocean' | 'sage' | 'warning' | 'danger' | 'neutral' => {
+    const variantMap: Record<string, 'ember' | 'ocean' | 'sage' | 'warning' | 'danger' | 'neutral'> = {
       neutral: 'neutral',
       ember: 'ember',
       ocean: 'ocean',
@@ -118,11 +156,11 @@ const DeviceCard = forwardRef(function DeviceCard(
       success: 'sage',
       info: 'ocean',
     };
-    return variantMap[color] || 'neutral';
+    return (variantMap[color] || 'neutral') as 'ember' | 'ocean' | 'sage' | 'warning' | 'danger' | 'neutral';
   };
 
   // Determine if badge should pulse (active states)
-  const shouldPulse = (color) => {
+  const shouldPulse = (color: string) => {
     const pulseColors = ['ember', 'sage', 'primary', 'success'];
     return pulseColors.includes(color);
   };
@@ -170,7 +208,7 @@ const DeviceCard = forwardRef(function DeviceCard(
   }
 
   // Check if there are error banners
-  const hasErrorBanner = banners.some(b => b.variant === 'error');
+  const hasErrorBanner = banners.some((b) => b.variant === 'error');
 
   // Check if context menu is enabled
   const hasContextMenu = contextMenuItems && contextMenuItems.length > 0;
@@ -213,14 +251,7 @@ const DeviceCard = forwardRef(function DeviceCard(
       {/* Banners (legacy support) */}
       {banners.map((banner, index) => (
         <div key={index} className="mb-4">
-          <Banner
-            variant={banner.variant}
-            icon={banner.icon}
-            title={banner.title}
-            description={banner.description}
-            dismissible={banner.dismissible}
-            onDismiss={banner.onDismiss}
-          />
+          <Banner {...(banner as any)} />
         </div>
       ))}
 
@@ -237,10 +268,7 @@ const DeviceCard = forwardRef(function DeviceCard(
             {infoBoxes.map((box, index) => (
               <InfoBox
                 key={index}
-                icon={box.icon}
-                label={box.label}
-                value={box.value}
-                valueColor={box.valueColor}
+                {...(box as any)}
               />
             ))}
           </div>
@@ -253,11 +281,8 @@ const DeviceCard = forwardRef(function DeviceCard(
           {footerActions.map((action, index) => (
             <Button
               key={index}
-              variant={action.variant || 'subtle'}
+              {...(action as any)}
               className="w-full"
-              size={action.size}
-              onClick={action.onClick}
-              {...action}
             >
               {action.label}
             </Button>
@@ -269,7 +294,7 @@ const DeviceCard = forwardRef(function DeviceCard(
       <LoadingOverlay
         show={isLoadingState}
         message={loadingMessage}
-        icon={icon}
+        icon={icon as any}
       />
     </SmartHomeCard>
   );
@@ -277,12 +302,12 @@ const DeviceCard = forwardRef(function DeviceCard(
   return (
     <>
       {hasContextMenu ? (
-        <RightClickMenu open={contextMenuOpen} onOpenChange={setContextMenuOpen}>
+        <RightClickMenu>
           <RightClickMenu.Trigger asChild>
             <div
               {...longPressBind()}
               style={{
-                ...longPressPreventSelection,
+                ...(longPressPreventSelection as CSSProperties),
                 transform: isPressed ? 'scale(0.98)' : 'scale(1)',
                 transition: 'transform 150ms cubic-bezier(0.4, 0, 0.2, 1)',
               }}
@@ -313,11 +338,7 @@ const DeviceCard = forwardRef(function DeviceCard(
 
       {/* Toast Notification - rendered outside SmartHomeCard */}
       {toast?.show && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={onToastClose}
-        />
+        <Toast {...(toast as any)} onClose={onToastClose} />
       )}
     </>
   );

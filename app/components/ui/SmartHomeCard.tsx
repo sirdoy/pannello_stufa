@@ -1,7 +1,7 @@
 'use client';
 
-import { forwardRef } from 'react';
-import { cva } from 'class-variance-authority';
+import { forwardRef, type ReactNode, type ComponentPropsWithoutRef } from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 import Card from './Card';
 import CardAccentBar from './CardAccentBar';
@@ -46,12 +46,12 @@ export const smartHomeCardVariants = cva(
 
 /**
  * SmartHomeCardHeader - Header section with icon and title
- *
- * @param {Object} props - Component props
- * @param {ReactNode} props.children - Header content
- * @param {string} props.className - Additional CSS classes
  */
-const SmartHomeCardHeader = forwardRef(function SmartHomeCardHeader(
+export interface SmartHomeCardHeaderProps extends ComponentPropsWithoutRef<'div'> {
+  children?: ReactNode;
+}
+
+const SmartHomeCardHeader = forwardRef<HTMLDivElement, SmartHomeCardHeaderProps>(function SmartHomeCardHeader(
   { children, className, ...props },
   ref
 ) {
@@ -68,12 +68,12 @@ const SmartHomeCardHeader = forwardRef(function SmartHomeCardHeader(
 
 /**
  * SmartHomeCardStatus - Status area for badges and connection status
- *
- * @param {Object} props - Component props
- * @param {ReactNode} props.children - Status content (badges, indicators)
- * @param {string} props.className - Additional CSS classes
  */
-const SmartHomeCardStatus = forwardRef(function SmartHomeCardStatus(
+export interface SmartHomeCardStatusProps extends ComponentPropsWithoutRef<'div'> {
+  children?: ReactNode;
+}
+
+const SmartHomeCardStatus = forwardRef<HTMLDivElement, SmartHomeCardStatusProps>(function SmartHomeCardStatus(
   { children, className, ...props },
   ref
 ) {
@@ -90,12 +90,12 @@ const SmartHomeCardStatus = forwardRef(function SmartHomeCardStatus(
 
 /**
  * SmartHomeCardControls - Controls area for buttons, sliders, etc.
- *
- * @param {Object} props - Component props
- * @param {ReactNode} props.children - Control elements
- * @param {string} props.className - Additional CSS classes
  */
-const SmartHomeCardControls = forwardRef(function SmartHomeCardControls(
+export interface SmartHomeCardControlsProps extends ComponentPropsWithoutRef<'div'> {
+  children?: ReactNode;
+}
+
+const SmartHomeCardControls = forwardRef<HTMLDivElement, SmartHomeCardControlsProps>(function SmartHomeCardControls(
   { children, className, ...props },
   ref
 ) {
@@ -117,19 +117,6 @@ const SmartHomeCardControls = forwardRef(function SmartHomeCardControls(
  * Provides consistent structure with header, status, and controls areas.
  * Uses Card internally with CardAccentBar for theming.
  *
- * @param {Object} props - Component props
- * @param {ReactNode} props.children - Main content
- * @param {string} props.className - Additional CSS classes
- * @param {ReactNode} props.icon - Device icon (emoji or lucide icon)
- * @param {string} props.title - Card title
- * @param {'compact'|'default'} props.size - Card size variant
- * @param {'ember'|'ocean'|'sage'|'warning'|'danger'} props.colorTheme - Color for accent bar
- * @param {boolean} props.isLoading - Show loading overlay
- * @param {boolean} props.error - Show error state
- * @param {string} props.errorMessage - Error message to display
- * @param {boolean} props.disabled - Disabled state with opacity
- * @param {ReactNode} props.headerActions - Actions to display in the header (e.g., refresh button)
- *
  * @example
  * <SmartHomeCard icon="🔥" title="Thermostat" colorTheme="ember">
  *   <SmartHomeCard.Status>
@@ -140,7 +127,28 @@ const SmartHomeCardControls = forwardRef(function SmartHomeCardControls(
  *   </SmartHomeCard.Controls>
  * </SmartHomeCard>
  */
-const SmartHomeCard = forwardRef(function SmartHomeCard(
+export interface SmartHomeCardProps
+  extends ComponentPropsWithoutRef<'div'>,
+    VariantProps<typeof smartHomeCardVariants> {
+  children?: ReactNode;
+  icon?: ReactNode;
+  title?: string;
+  isLoading?: boolean;
+  error?: boolean;
+  errorMessage?: string;
+  disabled?: boolean;
+  headerActions?: ReactNode;
+}
+
+type SmartHomeCardComponent = React.ForwardRefExoticComponent<
+  SmartHomeCardProps & React.RefAttributes<HTMLDivElement>
+> & {
+  Header: typeof SmartHomeCardHeader;
+  Status: typeof SmartHomeCardStatus;
+  Controls: typeof SmartHomeCardControls;
+};
+
+const SmartHomeCard = forwardRef<HTMLDivElement, SmartHomeCardProps>(function SmartHomeCard(
   {
     children,
     className,
@@ -203,9 +211,7 @@ const SmartHomeCard = forwardRef(function SmartHomeCard(
 
         {/* Error state */}
         {error && errorMessage && (
-          <Banner variant="error" compact className="mb-4">
-            {errorMessage}
-          </Banner>
+          <Banner {...({ variant: "error", compact: true, className: "mb-4", children: errorMessage } as any)} />
         )}
 
         {/* Loading overlay */}
@@ -223,15 +229,18 @@ const SmartHomeCard = forwardRef(function SmartHomeCard(
 });
 
 // Attach namespace sub-components
-SmartHomeCard.Header = SmartHomeCardHeader;
-SmartHomeCard.Status = SmartHomeCardStatus;
-SmartHomeCard.Controls = SmartHomeCardControls;
+(SmartHomeCard as SmartHomeCardComponent).Header = SmartHomeCardHeader;
+(SmartHomeCard as SmartHomeCardComponent).Status = SmartHomeCardStatus;
+(SmartHomeCard as SmartHomeCardComponent).Controls = SmartHomeCardControls;
+
+// Export with proper type
+const SmartHomeCardWithNamespace = SmartHomeCard as SmartHomeCardComponent;
 
 // Export both named and default
 export {
-  SmartHomeCard,
+  SmartHomeCardWithNamespace as SmartHomeCard,
   SmartHomeCardHeader,
   SmartHomeCardStatus,
   SmartHomeCardControls,
 };
-export default SmartHomeCard;
+export default SmartHomeCardWithNamespace;

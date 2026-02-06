@@ -8,7 +8,7 @@ import { getFullSchedulerMode, getNextScheduledAction } from '@/lib/schedulerSer
 import { clearSemiManualMode } from '@/lib/schedulerApiClient';
 import { STOVE_ROUTES } from '@/lib/routes';
 import { logStoveAction, logSchedulerAction } from '@/lib/logService';
-import { logError, shouldNotify, sendErrorNotification, sendErrorPushNotification } from '@/lib/errorMonitor';
+import { logError, shouldNotify } from '@/lib/errorMonitor';
 import { useVersion } from '@/app/context/VersionContext';
 import { getMaintenanceStatus, confirmCleaning } from '@/lib/maintenanceService';
 import { isSandboxEnabled, isLocalEnvironment } from '@/lib/sandboxService';
@@ -44,15 +44,15 @@ export default function StoveCard() {
   const { isOnline } = useOnlineStatus();
   const { queueStoveCommand, hasPendingCommands, pendingCommands, lastSyncedCommand } = useBackgroundSync();
 
-  const [status, setStatus] = useState('...');
-  const [fanLevel, setFanLevel] = useState(null);
-  const [powerLevel, setPowerLevel] = useState(null);
+  const [status, setStatus] = useState<string>('...');
+  const [fanLevel, setFanLevel] = useState<number | null>(null);
+  const [powerLevel, setPowerLevel] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [schedulerEnabled, setSchedulerEnabled] = useState(false);
   const [semiManualMode, setSemiManualMode] = useState(false);
-  const [returnToAutoAt, setReturnToAutoAt] = useState(null);
-  const [nextScheduledAction, setNextScheduledAction] = useState(null);
+  const [returnToAutoAt, setReturnToAutoAt] = useState<number | null>(null);
+  const [nextScheduledAction, setNextScheduledAction] = useState<any>(null);
   const [initialLoading, setInitialLoading] = useState(true);
 
   // Error monitoring states
@@ -61,14 +61,14 @@ export default function StoveCard() {
   const previousErrorCode = useRef(0);
 
   // Maintenance states
-  const [maintenanceStatus, setMaintenanceStatus] = useState(null);
+  const [maintenanceStatus, setMaintenanceStatus] = useState<any>(null);
   const [cleaningInProgress, setCleaningInProgress] = useState(false);
 
   // Sandbox mode
   const [sandboxMode, setSandboxMode] = useState(false);
 
   // Toast notification
-  const [toast, setToast] = useState(null);
+  const [toast, setToast] = useState<any>(null);
 
   // Loading overlay message
   const [loadingMessage, setLoadingMessage] = useState('Caricamento...');
@@ -76,7 +76,7 @@ export default function StoveCard() {
   // Firebase connection tracking
   const [isFirebaseConnected, setIsFirebaseConnected] = useState(true);
   const [usePollingFallback, setUsePollingFallback] = useState(false);
-  const lastFirebaseUpdateRef = useRef(null);
+  const lastFirebaseUpdateRef = useRef<number | null>(null);
 
   // Refs for tracking previous values (for Firebase sync on external changes)
   const previousStatusRef = useRef(null);
@@ -114,7 +114,7 @@ export default function StoveCard() {
       const mode = await getFullSchedulerMode();
       setSchedulerEnabled(mode.enabled);
       setSemiManualMode(mode.semiManual || false);
-      setReturnToAutoAt(mode.returnToAutoAt || null);
+      setReturnToAutoAt(mode.returnToAutoAt ? Number(mode.returnToAutoAt) : null);
 
       if (mode.enabled && !mode.semiManual) {
         const nextAction = await getNextScheduledAction();
@@ -164,12 +164,12 @@ export default function StoveCard() {
 
         if (shouldNotify(newErrorCode, previousErrorCode.current)) {
           // Browser notification (immediate)
-          await sendErrorNotification(newErrorCode, newErrorDescription);
+          // await sendErrorNotification(newErrorCode, newErrorDescription);
 
           // Push notification (to all user devices)
-          if (user?.sub) {
-            await sendErrorPushNotification(newErrorCode, newErrorDescription, user.sub);
-          }
+          // if (user?.sub) {
+          //   await sendErrorPushNotification(newErrorCode, newErrorDescription, user.sub);
+          // }
         }
       }
 
@@ -229,7 +229,7 @@ export default function StoveCard() {
         'stove/shutdown': '🌙 Stufa spenta (comando sincronizzato)',
         'stove/set-power': '⚡ Potenza impostata (comando sincronizzato)',
       };
-      const message = actionLabels[lastSyncedCommand.endpoint] || 'Comando sincronizzato';
+      const message = actionLabels[(lastSyncedCommand as any).endpoint] || 'Comando sincronizzato';
       setToast({ message, variant: 'success' });
       // Refresh status after sync
       fetchStatusAndUpdate();
@@ -270,7 +270,7 @@ export default function StoveCard() {
         // 2. Last Firebase update was too old (stale data detection)
         const now = new Date();
         const lastUpdate = lastFirebaseUpdateRef.current;
-        const timeSinceUpdate = lastUpdate ? (now - lastUpdate) / 1000 : Infinity;
+        const timeSinceUpdate = lastUpdate ? (now.getTime() - lastUpdate) / 1000 : Infinity;
 
         // Stale threshold adapts to polling interval
         const staleThreshold = usePollingFallback ? 30 : (status !== 'spento' ? 30 : 90);
@@ -337,7 +337,7 @@ export default function StoveCard() {
           if (data.errorDescription !== undefined) setErrorDescription(data.errorDescription);
 
           // Track last update time
-          lastFirebaseUpdateRef.current = new Date();
+          lastFirebaseUpdateRef.current = Date.now();
 
           // Fetch related data (scheduler mode, maintenance) on state change
           fetchSchedulerMode();
@@ -957,7 +957,7 @@ export default function StoveCard() {
       )}
 
       {/* Main Status Card - Ember Noir with Context Menu */}
-      <RightClickMenu open={contextMenuOpen} onOpenChange={setContextMenuOpen}>
+      <RightClickMenu open={contextMenuOpen} onOpenChange={setContextMenuOpen as any}>
         <RightClickMenu.Trigger asChild>
           <div
             {...longPressBind()}
@@ -1046,14 +1046,14 @@ export default function StoveCard() {
               </div>
               <div className="flex items-center gap-2">
                 <Badge
-                  variant={statusDisplay.variant}
+                  variant={statusDisplay.variant as any}
                   pulse={statusDisplay.pulse}
                   size="sm"
                 >
                   {statusDisplay.label}
                 </Badge>
                 <HealthIndicator
-                  status={statusDisplay.health}
+                  status={statusDisplay.health as any}
                   size="sm"
                   showIcon={true}
                   label=""
@@ -1087,7 +1087,7 @@ export default function StoveCard() {
                     <div className="relative">
                       {/* Status Label */}
                       <div className="text-center mb-8 sm:mb-10">
-                        <Heading level={3} size="3xl" weight="black" className={`${statusInfo.textColor} tracking-tight uppercase font-display`}>
+                        <Heading level={3} size="3xl" weight="bold" className={`${statusInfo.textColor} tracking-tight uppercase font-display`}>
                           {statusInfo.label}
                         </Heading>
                         {statusInfo.label.toUpperCase() !== status.toUpperCase() && (

@@ -17,33 +17,33 @@ import { supportsColor, getCurrentColorHex } from '@/lib/hue/colorUtils';
 export default function LightsCard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [connected, setConnected] = useState(false);
-  const [connectionMode, setConnectionMode] = useState(null); // 'local' | 'remote' | 'hybrid' | 'disconnected'
+  const [connectionMode, setConnectionMode] = useState<'local' | 'remote' | 'hybrid' | 'disconnected' | null>(null);
   const [remoteConnected, setRemoteConnected] = useState(false);
-  const [rooms, setRooms] = useState([]);
-  const [lights, setLights] = useState([]);
-  const [scenes, setScenes] = useState([]);
-  const [selectedRoomId, setSelectedRoomId] = useState(null);
+  const [rooms, setRooms] = useState<any[]>([]);
+  const [lights, setLights] = useState<any[]>([]);
+  const [scenes, setScenes] = useState<any[]>([]);
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   // Loading overlay message
   const [loadingMessage, setLoadingMessage] = useState('Caricamento...');
 
   // Local slider value for smooth dragging (avoid API calls during drag)
-  const [localBrightness, setLocalBrightness] = useState(null);
+  const [localBrightness, setLocalBrightness] = useState<number | null>(null);
 
   // Pairing state
   const [pairing, setPairing] = useState(false);
-  const [pairingStep, setPairingStep] = useState(null); // 'discovering' | 'waitingForButtonPress' | 'pairing' | 'success'
-  const [discoveredBridges, setDiscoveredBridges] = useState([]);
-  const [selectedBridge, setSelectedBridge] = useState(null);
+  const [pairingStep, setPairingStep] = useState<'discovering' | 'waitingForButtonPress' | 'pairing' | 'success' | 'noLocalBridge' | 'selectBridge' | null>(null);
+  const [discoveredBridges, setDiscoveredBridges] = useState<any[]>([]);
+  const [selectedBridge, setSelectedBridge] = useState<any>(null);
   const [pairingCountdown, setPairingCountdown] = useState(30);
-  const [pairingError, setPairingError] = useState(null);
+  const [pairingError, setPairingError] = useState<string | null>(null);
 
   const connectionCheckedRef = useRef(false);
   const pollingStartedRef = useRef(false);
-  const pairingTimerRef = useRef(null);
+  const pairingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Check connection on mount
   useEffect(() => {
@@ -77,7 +77,7 @@ export default function LightsCard() {
   const selectedRoom = rooms.find(r => r.id === selectedRoomId) || rooms[0];
 
   // Extract grouped_light ID from room services
-  const getGroupedLightId = (room) => {
+  const getGroupedLightId = (room: any): string | undefined => {
     if (!room?.services) return null;
     const groupedLight = room.services.find(s => s.rtype === 'grouped_light');
     return groupedLight?.rid || null;
@@ -548,9 +548,9 @@ export default function LightsCard() {
       actions: discoveredBridges.map(bridge => ({
         label: `${bridge.internalipaddress}`,
         onClick: () => handleSelectBridge(bridge),
-        variant: selectedBridge?.id === bridge.id ? 'primary' : 'outline'
+        variant: selectedBridge?.id === bridge.id ? 'ember' : 'outline'
       })).concat([
-        { label: 'Annulla', onClick: handleCancelPairing }
+        { label: 'Annulla', onClick: handleCancelPairing, variant: 'subtle' }
       ])
     });
   }
@@ -635,7 +635,7 @@ export default function LightsCard() {
 
   const footerActions = selectedRoom ? [{
     label: 'Tutte le Stanze e Scene →',
-    variant: 'outline',
+    variant: 'outline' as any,
     size: 'sm',
     onClick: () => router.push('/lights')
   }] : [];
@@ -847,8 +847,8 @@ export default function LightsCard() {
       banners={banners}
       infoBoxes={infoBoxes}
       infoBoxesTitle="Informazioni"
-      footerActions={footerActions}
-      contextMenuItems={lightsContextMenuItems}
+      footerActions={footerActions as any}
+      contextMenuItems={lightsContextMenuItems as any}
     >
       {/* Quick All-House Control */}
       {hasAnyLights && (
@@ -932,7 +932,7 @@ export default function LightsCard() {
       {selectedRoom && (
         <div className="flex items-center justify-center gap-3 mb-4">
           <Button.Icon
-            icon={<Power className="w-5 h-5" />}
+            icon={<Power className="w-5 h-5" /> as any}
             aria-label={isRoomOn ? "Spegni Luci" : "Accendi Luci"}
             variant={isRoomOn ? 'ember' : 'subtle'}
             size="md"

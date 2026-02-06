@@ -21,14 +21,14 @@ import { useScheduleData } from '@/lib/hooks/useScheduleData';
 export default function ThermostatCard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [connected, setConnected] = useState(false);
-  const [topology, setTopology] = useState(null);
-  const [status, setStatus] = useState(null);
+  const [topology, setTopology] = useState<any>(null);
+  const [status, setStatus] = useState<any>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedRoomId, setSelectedRoomId] = useState(null);
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   const [calibrating, setCalibrating] = useState(false);
-  const [calibrationSuccess, setCalibrationSuccess] = useState(null);
+  const [calibrationSuccess, setCalibrationSuccess] = useState<boolean | null>(null);
   const [batteryWarningDismissed, setBatteryWarningDismissed] = useState(false);
 
   // Loading overlay message
@@ -37,15 +37,15 @@ export default function ThermostatCard() {
   // Schedule management
   const { schedules, activeSchedule, loading: scheduleLoading, refetch: refetchSchedules } = useScheduleData();
   const [switchingSchedule, setSwitchingSchedule] = useState(false);
-  const [selectedScheduleId, setSelectedScheduleId] = useState(null);
+  const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);
 
   const connectionCheckedRef = useRef(false);
   const pollingStartedRef = useRef(false);
 
   // Sync selectedScheduleId with activeSchedule
   useEffect(() => {
-    if (activeSchedule && !selectedScheduleId) {
-      setSelectedScheduleId(activeSchedule.id);
+    if (activeSchedule && !selectedScheduleId && (activeSchedule as any).id) {
+      setSelectedScheduleId((activeSchedule as any).id);
     }
   }, [activeSchedule, selectedScheduleId]);
 
@@ -295,7 +295,7 @@ export default function ThermostatCard() {
       setLoadingMessage('Modifica temperatura...');
       setRefreshing(true);
       setError(null);
-      const response = await fetch(NETATMO_ROUTES.setRoomThermPoint, {
+      const response = await fetch((NETATMO_ROUTES as any).setRoomThermpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

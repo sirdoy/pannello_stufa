@@ -1,5 +1,7 @@
 'use client';
 
+import type { ReactNode, HTMLAttributes } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 import { forwardRef } from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
@@ -98,6 +100,13 @@ export const badgeVariants = cva(
 );
 
 /**
+ * Badge Component Props
+ */
+export interface BadgeProps extends HTMLAttributes<HTMLSpanElement>, VariantProps<typeof badgeVariants> {
+  icon?: ReactNode;
+}
+
+/**
  * Badge Component
  *
  * Status indicator with CVA variants and optional pulse animation.
@@ -123,7 +132,7 @@ export const badgeVariants = cva(
  * // Custom styling
  * <Badge variant="ocean" size="lg" className="mt-2">Starting</Badge>
  */
-const Badge = forwardRef(function Badge(
+const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
   { children, icon, variant, size, pulse, className, ...props },
   ref
 ) {

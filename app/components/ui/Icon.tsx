@@ -1,3 +1,15 @@
+import type { LucideIcon } from 'lucide-react';
+import type { ComponentPropsWithoutRef } from 'react';
+
+/**
+ * Icon Component Props
+ */
+export interface IconProps extends Omit<ComponentPropsWithoutRef<'svg'>, 'size'> {
+  icon: LucideIcon;
+  size?: number;
+  label?: string;
+}
+
 /**
  * Icon Component
  *
@@ -12,13 +24,15 @@ export default function Icon({
   icon: IconComponent,
   size = 16,
   label,
-  className = ''
-}) {
+  className = '',
+  ...props
+}: IconProps) {
   return (
     <IconComponent
       size={size}
       aria-label={label}
       className={className}
+      {...props}
     />
   );
 }

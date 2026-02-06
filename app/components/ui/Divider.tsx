@@ -1,5 +1,7 @@
 'use client';
 
+import type { HTMLAttributes } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 import { forwardRef } from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
@@ -53,6 +55,15 @@ const spacingClasses = {
 };
 
 /**
+ * Divider Component Props
+ */
+export interface DividerProps extends HTMLAttributes<HTMLDivElement>, VariantProps<typeof dividerVariants> {
+  label?: string;
+  spacing?: 'small' | 'medium' | 'large';
+  orientation?: 'horizontal' | 'vertical';
+}
+
+/**
  * Divider Component - Ember Noir Design System
  *
  * Visual separator with optional label and variant styles.
@@ -68,7 +79,7 @@ const spacingClasses = {
  * @example
  * <Divider label="Section" variant="gradient" spacing="large" />
  */
-const Divider = forwardRef(function Divider(
+const Divider = forwardRef<HTMLDivElement, DividerProps>(function Divider(
   {
     label,
     variant = 'solid',
@@ -142,6 +153,8 @@ const Divider = forwardRef(function Divider(
     </div>
   );
 });
+
+Divider.displayName = 'Divider';
 
 export { Divider, dividerVariants };
 export default Divider;

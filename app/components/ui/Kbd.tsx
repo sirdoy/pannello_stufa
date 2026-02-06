@@ -1,6 +1,14 @@
 'use client';
 
+import type { ReactNode, HTMLAttributes } from 'react';
 import { cn } from '@/lib/utils/cn';
+
+/**
+ * Kbd Component Props
+ */
+export interface KbdProps extends HTMLAttributes<HTMLElement> {
+  children: ReactNode;
+}
 
 /**
  * Kbd Component - Ember Noir Design System v4.0
@@ -29,7 +37,7 @@ import { cn } from '@/lib/utils/cn';
  * @param {ReactNode} props.children - The shortcut text to display
  * @param {string} [props.className] - Additional CSS classes to apply
  */
-function Kbd({ children, className, ...props }) {
+function Kbd({ children, className, ...props }: KbdProps) {
   return (
     <kbd
       className={cn(

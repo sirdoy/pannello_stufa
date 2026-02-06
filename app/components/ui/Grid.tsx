@@ -1,3 +1,5 @@
+import type { ReactNode, ElementType, HTMLAttributes } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 
@@ -34,6 +36,14 @@ export const gridVariants = cva(
 );
 
 /**
+ * Grid Component Props
+ */
+export interface GridProps extends HTMLAttributes<HTMLElement>, VariantProps<typeof gridVariants> {
+  children: ReactNode;
+  as?: ElementType;
+}
+
+/**
  * Grid Component - Responsive grid system
  *
  * Simplified API with predefined responsive column patterns.
@@ -43,6 +53,7 @@ export const gridVariants = cva(
  * // Simple: auto-responsive 3 columns
  * <Grid cols={3}>{items}</Grid>
  *
+ * @example
  * // Custom: manual breakpoint control
  * <Grid className="grid-cols-1 md:grid-cols-2 xl:grid-cols-4">{items}</Grid>
  */
@@ -53,7 +64,7 @@ export default function Grid({
   className = '',
   as: Component = 'div',
   ...props
-}) {
+}: GridProps) {
   return (
     <Component className={cn(gridVariants({ cols, gap }), className)} {...props}>
       {children}

@@ -1,5 +1,7 @@
 'use client';
 
+import type { SVGAttributes } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 
@@ -32,6 +34,13 @@ export const spinnerVariants = cva(
 );
 
 /**
+ * Spinner Component Props
+ */
+export interface SpinnerProps extends Omit<SVGAttributes<SVGSVGElement>, 'size'>, VariantProps<typeof spinnerVariants> {
+  label?: string;
+}
+
+/**
  * Spinner - Animated loading indicator
  *
  * Accessible SVG spinner with customizable size and color variants.
@@ -57,7 +66,7 @@ export default function Spinner({
   className,
   label = 'Loading',
   ...props
-}) {
+}: SpinnerProps) {
   return (
     <svg
       className={cn(spinnerVariants({ size, variant }), className)}

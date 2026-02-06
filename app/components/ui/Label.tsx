@@ -1,5 +1,7 @@
 'use client';
 
+import type { ElementRef, ComponentPropsWithoutRef } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 import { forwardRef } from 'react';
 import * as LabelPrimitive from '@radix-ui/react-label';
 import { cva } from 'class-variance-authority';
@@ -48,6 +50,11 @@ const labelVariants = cva(
 );
 
 /**
+ * Label Component Props
+ */
+export interface LabelProps extends ComponentPropsWithoutRef<typeof LabelPrimitive.Root>, VariantProps<typeof labelVariants> {}
+
+/**
  * Label Component - Ember Noir Design System
  *
  * Accessible label built on Radix UI Label primitive with CVA variants.
@@ -60,13 +67,15 @@ const labelVariants = cva(
  * @param {string} props.className - Additional classes
  * @param {ReactNode} props.children - Label text content
  */
-const Label = forwardRef(({ className, size, variant, ...props }, ref) => (
-  <LabelPrimitive.Root
-    ref={ref}
-    className={cn(labelVariants({ size, variant }), className)}
-    {...props}
-  />
-));
+const Label = forwardRef<ElementRef<typeof LabelPrimitive.Root>, LabelProps>(
+  ({ className, size, variant, ...props }, ref) => (
+    <LabelPrimitive.Root
+      ref={ref}
+      className={cn(labelVariants({ size, variant }), className)}
+      {...props}
+    />
+  )
+);
 
 Label.displayName = 'Label';
 

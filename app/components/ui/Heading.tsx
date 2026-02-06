@@ -1,5 +1,7 @@
 'use client';
 
+import type { HTMLAttributes } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 import { forwardRef } from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
@@ -45,7 +47,7 @@ const headingVariants = cva(
 );
 
 // Level to size auto-mapping
-const sizeMapping = {
+const sizeMapping: Record<number, '3xl' | '2xl' | 'xl' | 'lg' | 'md' | 'sm'> = {
   1: '3xl',  // 30px-36px
   2: '2xl',  // 24px-30px
   3: 'xl',   // 20px-24px
@@ -53,6 +55,13 @@ const sizeMapping = {
   5: 'md',   // 16px
   6: 'sm',   // 14px
 };
+
+/**
+ * Heading Component Props
+ */
+export interface HeadingProps extends HTMLAttributes<HTMLHeadingElement>, VariantProps<typeof headingVariants> {
+  level?: 1 | 2 | 3 | 4 | 5 | 6;
+}
 
 /**
  * Heading Component - Ember Noir Design System
@@ -71,7 +80,7 @@ const sizeMapping = {
  * <Heading level={1} size="3xl" variant="gradient">Main Title</Heading>
  * <Heading level={3} variant="ocean">Info Title</Heading>
  */
-const Heading = forwardRef(function Heading(
+const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Heading(
   {
     level = 2,
     size,
@@ -82,7 +91,7 @@ const Heading = forwardRef(function Heading(
   },
   ref
 ) {
-  const Tag = `h${level}`;
+  const Tag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   const finalSize = size || sizeMapping[level] || 'md';
 
   return (
@@ -95,6 +104,8 @@ const Heading = forwardRef(function Heading(
     </Tag>
   );
 });
+
+Heading.displayName = 'Heading';
 
 export { Heading, headingVariants };
 export default Heading;

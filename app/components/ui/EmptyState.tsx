@@ -1,5 +1,7 @@
 'use client';
 
+import type { ReactNode, HTMLAttributes } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 import Heading from './Heading';
@@ -30,7 +32,7 @@ export const emptyStateVariants = cva(
 /**
  * Icon size mapping relative to container size
  */
-const iconSizeMap = {
+const iconSizeMap: Record<string, string> = {
   sm: 'text-4xl',
   md: 'text-6xl',
   lg: 'text-7xl',
@@ -39,11 +41,21 @@ const iconSizeMap = {
 /**
  * Heading size mapping relative to container size
  */
-const headingSizeMap = {
-  sm: 'base',
+const headingSizeMap: Record<string, 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'> = {
+  sm: 'md',
   md: 'lg',
   lg: 'xl',
 };
+
+/**
+ * EmptyState Component Props
+ */
+export interface EmptyStateProps extends HTMLAttributes<HTMLDivElement>, VariantProps<typeof emptyStateVariants> {
+  icon?: string | ReactNode;
+  title?: string;
+  description?: string;
+  action?: ReactNode;
+}
 
 /**
  * EmptyState Component - Ember Noir Design System
@@ -82,19 +94,20 @@ export default function EmptyState({
   action,
   size = 'md',
   className = '',
-}) {
+  ...props
+}: EmptyStateProps) {
   return (
-    <div className={cn(emptyStateVariants({ size }), className)}>
+    <div className={cn(emptyStateVariants({ size }), className)} {...props}>
       {/* Icon */}
       {icon && (
-        <div className={iconSizeMap[size]} aria-hidden="true">
+        <div className={iconSizeMap[size || 'md']} aria-hidden="true">
           {typeof icon === 'string' ? icon : icon}
         </div>
       )}
 
       {/* Title */}
       {title && (
-        <Heading level={3} size={headingSizeMap[size]}>
+        <Heading level={3} size={headingSizeMap[size || 'md']}>
           {title}
         </Heading>
       )}

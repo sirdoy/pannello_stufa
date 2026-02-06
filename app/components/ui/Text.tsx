@@ -1,5 +1,7 @@
 'use client';
 
+import type { ElementType, HTMLAttributes } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 import { forwardRef } from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
@@ -54,7 +56,7 @@ const textVariants = cva(
 );
 
 // Default sizes per variant (backwards compatibility)
-const defaultSizes = {
+const defaultSizes: Record<string, 'xs' | 'sm' | 'base' | 'lg' | 'xl'> = {
   body: 'base',
   secondary: 'base',
   tertiary: 'sm',
@@ -66,6 +68,16 @@ const defaultSizes = {
   info: 'base',
   label: 'xs',
 };
+
+/**
+ * Text Component Props
+ */
+export interface TextProps extends HTMLAttributes<HTMLElement>, VariantProps<typeof textVariants> {
+  uppercase?: boolean;
+  tracking?: boolean;
+  mono?: boolean;
+  as?: ElementType;
+}
 
 /**
  * Text Component - Ember Noir Design System
@@ -93,7 +105,7 @@ const defaultSizes = {
  * // Wrong - external color classes
  * <Text className="text-slate-400">Text</Text>
  */
-const Text = forwardRef(function Text(
+const Text = forwardRef<HTMLElement, TextProps>(function Text(
   {
     variant = 'body',
     size,
@@ -109,7 +121,7 @@ const Text = forwardRef(function Text(
   ref
 ) {
   const Tag = as;
-  const finalSize = size || defaultSizes[variant] || 'base';
+  const finalSize = size || defaultSizes[variant || 'body'] || 'base';
 
   // Build utility classes
   const utilityClasses = [
@@ -133,6 +145,8 @@ const Text = forwardRef(function Text(
     </Tag>
   );
 });
+
+Text.displayName = 'Text';
 
 export { Text, textVariants };
 export default Text;

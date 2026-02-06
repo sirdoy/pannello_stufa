@@ -1,3 +1,13 @@
+import type { ReactNode, HTMLAttributes } from 'react';
+
+/**
+ * Container Component Props
+ */
+export interface ContainerProps extends HTMLAttributes<HTMLDivElement> {
+  spacing?: 'card' | 'inline' | 'section';
+  children: ReactNode;
+}
+
 /**
  * Container Component
  *
@@ -11,8 +21,9 @@
 export default function Container({
   spacing = 'card',
   children,
-  className = ''
-}) {
+  className = '',
+  ...props
+}: ContainerProps) {
   // Spacing variants
   const spacingClasses = {
     card: 'space-y-4',       // 16px - Compact content in cards
@@ -21,7 +32,7 @@ export default function Container({
   };
 
   return (
-    <div className={`${spacingClasses[spacing]} ${className}`.trim()}>
+    <div className={`${spacingClasses[spacing]} ${className}`.trim()} {...props}>
       {children}
     </div>
   );

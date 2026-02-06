@@ -1,3 +1,5 @@
+import type { ReactNode, ElementType, HTMLAttributes } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 import Heading from './Heading';
@@ -28,12 +30,25 @@ export const sectionVariants = cva(
 /**
  * Header spacing relative to section spacing
  */
-const headerSpacingMap = {
+const headerSpacingMap: Record<string, string> = {
   none: 'mb-2',
   sm: 'mb-3 sm:mb-4',
   md: 'mb-4 sm:mb-6',
   lg: 'mb-6 sm:mb-8',
 };
+
+/**
+ * Section Component Props
+ */
+export interface SectionProps extends HTMLAttributes<HTMLElement>, VariantProps<typeof sectionVariants> {
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  level?: 1 | 2 | 3 | 4 | 5 | 6;
+  action?: ReactNode;
+  children?: ReactNode;
+  as?: ElementType;
+}
 
 /**
  * Section Component - Ember Noir Design System
@@ -77,7 +92,7 @@ export default function Section({
   as: Component = 'section',
   className = '',
   ...props
-}) {
+}: SectionProps) {
   const hasHeader = title || subtitle || description || action;
 
   return (

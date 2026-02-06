@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 39 - UI Components Migration
-Plan: 6 of 6 (ALL COMPLETE)
-Status: COMPLETE — All 82 TypeScript files migrated (81 components + barrel export), zero .js files in root, pragmatic typing for large files
-Last activity: 2026-02-06 — Completed 39-06-PLAN.md (Root-level app components migration - 18 files)
+Plan: 8 of 8 (ALL COMPLETE)
+Status: COMPLETE — All 89 TypeScript files migrated (88 components + barrel export), zero .js files, pragmatic typing for large files (PidAutomationPanel 710 lines, StoveSyncPanel 564 lines)
+Last activity: 2026-02-06 — Completed 39-08-PLAN.md (Netatmo & Lights components migration - 7 files)
 
-Progress: [████████░░░░░░░░░░░░░░░░] 43% (3/7 phases complete, Phase 39 COMPLETE with 6 plans)
+Progress: [████████░░░░░░░░░░░░░░░░] 43% (3/7 phases complete, Phase 39 COMPLETE with 8 plans)
 
 ## Milestone Overview
 
@@ -27,7 +27,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 |-------|------|--------------|--------|
 | 37 | TypeScript Foundation | 8 | COMPLETE (8/8) |
 | 38 | Library Migration | 4 | COMPLETE (4/4) |
-| 39 | UI Components Migration | 3 | COMPLETE (6/6 plans, 82/82 files migrated, pragmatic typing) |
+| 39 | UI Components Migration | 3 | COMPLETE (8/8 plans, 89/89 files migrated, pragmatic typing) |
 | 40 | API Routes Migration | 3 | Pending |
 | 41 | Pages Migration | 3 | Pending |
 | 42 | Test Migration | 4 | Pending |
@@ -36,9 +36,9 @@ Progress: [████████░░░░░░░░░░░░░░░
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 170 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 18)
+- Total plans completed: 171 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 19)
 - Average duration: ~6.0 min per plan
-- Total execution time: ~17.4 hours across 7 milestones
+- Total execution time: ~17.5 hours across 7 milestones
 
 **By Milestone:**
 
@@ -50,7 +50,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
 | v3.2 Weather & Dashboard | 5 | 13 | 2 days (2026-02-02 - 2026-02-03) |
 | v4.0 Advanced UI | 7 | 24 | 2 days (2026-02-04 - 2026-02-05) |
-| v5.0 TypeScript Migration | 7 | 18 plans (Phases 37-39 complete) | In progress |
+| v5.0 TypeScript Migration | 7 | 19 plans (Phases 37-39 complete) | In progress |
 
 ## Accumulated Context
 
@@ -247,3 +247,12 @@ From 39-06 (Root-level app components migration):
 - Interface-first for sub-components in large files (PreferenceToggle, CategorySection)
 - NotificationPermission built-in TypeScript type for permission states
 - ReactNode for children props across all provider components
+
+From 39-08 (Netatmo & Lights components migration):
+- Pragmatic typing for 700+ line files: PidAutomationPanel (710 lines), StoveSyncPanel (564 lines)
+- Type the "edges" (props, handlers) instead of entire data flow for complex components
+- Record<string, T> for typed object maps (POWER_LABELS, lightConfigs)
+- Default objects prevent property access errors: `|| { on: true, brightness: 100, color: null }`
+- Type-safe error handling: `err instanceof Error ? err.message : 'Errore sconosciuto'`
+- Typed helper function returns for better IDE autocomplete
+- Pragmatic any for deeply nested API responses (PID config, scene actions with optional properties)

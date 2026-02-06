@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 38 - Library Migration
-Plan: 02 of 9
+Plan: 01 of 9 (Complete)
 Status: In progress
-Last activity: 2026-02-06 — Completed 38-02-PLAN.md (PWA utilities)
+Last activity: 2026-02-06 — Completed 38-01-PLAN.md (Leaf utilities migration)
 
 Progress: [████░░░░░░░░░░░░░░░░░░░░] 14% (1/7 phases complete)
 
@@ -36,9 +36,9 @@ Progress: [████░░░░░░░░░░░░░░░░░░░
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 152 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24)
+- Total plans completed: 153 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 1)
 - Average duration: ~4.0 min per plan
-- Total execution time: ~10 hours across 6 milestones
+- Total execution time: ~10 hours across 7 milestones
 
 **By Milestone:**
 
@@ -50,7 +50,7 @@ Progress: [████░░░░░░░░░░░░░░░░░░░
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
 | v3.2 Weather & Dashboard | 5 | 13 | 2 days (2026-02-02 - 2026-02-03) |
 | v4.0 Advanced UI | 7 | 24 | 2 days (2026-02-04 - 2026-02-05) |
-| v5.0 TypeScript Migration | 7 | 3/? | In progress |
+| v5.0 TypeScript Migration | 7 | 1/9 plans | In progress |
 
 ## Accumulated Context
 
@@ -67,6 +67,12 @@ Key patterns from previous milestones preserved for v5.0 migration:
 - TanStack Table useReactTable pattern with getCoreRowModel and getSortedRowModel
 - aria-sort three-state cycle (asc -> desc -> none) for sortable table headers
 - Roving tabindex pattern for keyboard navigation
+
+**Phase 38-01 decisions:**
+- Use git mv for file renaming to preserve git history
+- Interface-first approach: define interfaces before typing functions
+- Use 'as const' for route objects and enums for literal type inference
+- Prefer unknown over any for type-safe handling of dynamic data
 - CSS animation tokens in @theme block (--duration-*, --ease-*, --stagger-*)
 - Stagger animation via calc() with --stagger-index custom property
 - Reduced motion: selective :not() exclusions preserve functional animations
@@ -83,7 +89,7 @@ Key patterns from previous milestones preserved for v5.0 migration:
 
 ### Blockers/Concerns
 
-None — Phase 37 in progress.
+None — Phase 38 in progress.
 
 **Known Tech Debt:**
 - Label component not exported from barrel (low impact)
@@ -96,6 +102,12 @@ From 37-02, 37-03:
 - Union types for constrained values (StoveStatus, ErrorCode, Size, ColorScheme)
 - Interface extension for API responses
 - Mixin interfaces for shared props (WithChildren, WithDisabled, WithLoading)
+
+From 38-01 (Leaf utilities):
+- git mv preserves git history for better blame tracking
+- 'as const' for route definitions and enums enables literal type inference
+- Explicit return types on all exported functions for API clarity
+- Unknown over any for flexible JSON structures (Record<string, unknown[]>)
 
 From 38-02 (PWA utilities):
 - Generic IndexedDB wrapper with type parameters (<T>) for type-safe data retrieval
@@ -121,6 +133,6 @@ From 38-02 (PWA utilities):
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed 38-02-PLAN.md (PWA utilities migration)
+Stopped at: Completed 38-01-PLAN.md (Leaf utilities migration)
 Resume file: None
-Next step: Continue Phase 38 Library Migration (7 more plans remaining)
+Next step: Continue Phase 38 Library Migration (8 more plans remaining)

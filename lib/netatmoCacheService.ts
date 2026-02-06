@@ -22,15 +22,37 @@ import { getEnvironmentPath } from '@/lib/environmentHelper';
 export const CACHE_TTL_MS = 5 * 60 * 1000;
 
 // ============================================
+// TYPES
+// ============================================
+
+/** Cache entry stored in Firebase */
+interface CacheEntry<T> {
+  data: T;
+  cached_at: number;
+}
+
+/** Cache result from cache */
+interface CacheHit<T> {
+  data: T;
+  source: 'cache';
+  age_seconds: number;
+}
+
+/** Cache result from API */
+interface CacheMiss<T> {
+  data: T;
+  source: 'api';
+}
+
+/** Cache result union */
+export type CacheResult<T> = CacheHit<T> | CacheMiss<T>;
+
+// ============================================
 // CACHE OPERATIONS
 // ============================================
 
 /**
  * Get cached data or fetch fresh data if cache is invalid
- *
- * @param {string} cacheKey - Cache key identifier (e.g., 'schedule/home_id')
- * @param {Function} fetchFn - Async function to fetch fresh data on cache miss
- * @returns {Promise<{data: any, source: 'cache'|'api', age_seconds?: number}>}
  *
  * @example
  * const result = await getCached('schedule/12345', async () => {
@@ -41,13 +63,16 @@ export const CACHE_TTL_MS = 5 * 60 * 1000;
  *   console.log(`Cache hit (age: ${result.age_seconds}s)`);
  * }
  */
-export async function getCached(cacheKey, fetchFn) {
+export async function getCached<T>(
+  cacheKey: string,
+  fetchFn: () => Promise<T>
+): Promise<CacheResult<T>> {
   try {
     // Build environment-aware Firebase path
     const cachePath = getEnvironmentPath(`netatmo/cache/${cacheKey}`);
 
     // Attempt to read cached data
-    const cached = await adminDbGet(cachePath);
+    const cached = await adminDbGet(cachePath) as CacheEntry<T> | null;
 
     // Validate cache entry
     if (cached && cached.data && cached.cached_at) {
@@ -97,14 +122,11 @@ export async function getCached(cacheKey, fetchFn) {
  * Invalidate cache entry
  * Useful for manual cache busting after mutations
  *
- * @param {string} cacheKey - Cache key to invalidate
- * @returns {Promise<boolean>} True if successful
- *
  * @example
  * // After updating schedule via API
  * await invalidateCache('schedule/12345');
  */
-export async function invalidateCache(cacheKey) {
+export async function invalidateCache(cacheKey: string): Promise<boolean> {
   try {
     const cachePath = getEnvironmentPath(`netatmo/cache/${cacheKey}`);
 

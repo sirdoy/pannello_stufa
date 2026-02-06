@@ -10,10 +10,222 @@ import { getNetatmoCredentials } from './netatmoCredentials';
 const NETATMO_API_BASE = 'https://api.netatmo.com';
 const NETATMO_OAUTH_URL = `${NETATMO_API_BASE}/oauth2/token`;
 
+// ============================================================================
+// TYPES - Netatmo API Data Structures
+// ============================================================================
+
+/** Netatmo Home */
+export interface NetatmoHome {
+  id: string;
+  name?: string;
+  rooms?: NetatmoRoom[];
+  modules?: NetatmoModule[];
+  schedules?: NetatmoSchedule[];
+}
+
+/** Netatmo Room */
+export interface NetatmoRoom {
+  id: string;
+  name: string;
+  type: string;
+  module_ids?: string[];
+  therm_setpoint_temperature?: number;
+  therm_measured_temperature?: number;
+  therm_setpoint_mode?: string;
+  heating_power_request?: number;
+  therm_setpoint_end_time?: number;
+}
+
+/** Netatmo Module */
+export interface NetatmoModule {
+  id: string;
+  name: string;
+  type: string;
+  bridge?: string;
+  room_id?: string;
+  battery_state?: string;
+  battery_level?: number;
+  rf_strength?: number;
+  wifi_strength?: number;
+  reachable?: boolean;
+  firmware_revision?: number;
+  boiler_status?: boolean;
+}
+
+/** Netatmo Schedule Zone */
+export interface NetatmoZone {
+  id: number;
+  name: string;
+  type: number;
+  rooms?: unknown[];
+  temp?: number;
+  rooms_temp?: Array<{ room_id: string; temp: number }>;
+}
+
+/** Netatmo Schedule Timetable Slot */
+export interface NetatmoTimetableSlot {
+  m_offset: number;
+  zone_id: number;
+}
+
+/** Netatmo Schedule */
+export interface NetatmoSchedule {
+  id: string;
+  name: string;
+  type?: string;
+  selected?: boolean;
+  zones?: NetatmoZone[];
+  timetable?: NetatmoTimetableSlot[];
+}
+
+/** Netatmo Home Status */
+export interface NetatmoHomeStatus {
+  rooms?: NetatmoRoom[];
+  modules?: NetatmoModule[];
+}
+
+/** Parsed Room (cleaned for Firebase) */
+export interface ParsedRoom {
+  id: string;
+  name: string;
+  type: string;
+  modules: string[];
+  setpoint?: number;
+}
+
+/** Parsed Module (cleaned for Firebase) */
+export interface ParsedModule {
+  id: string;
+  name?: string;
+  type: string;
+  bridge?: string;
+  room_id?: string;
+  battery_state?: string;
+  battery_level?: number;
+  rf_strength?: number;
+  wifi_strength?: number;
+  reachable: boolean;
+  firmware_revision?: number;
+  boiler_status?: boolean;
+}
+
+/** Parsed Schedule (cleaned for Firebase) */
+export interface ParsedSchedule {
+  id: string;
+  name: string;
+  type: string;
+  selected: boolean;
+  zones?: Array<{
+    id: number;
+    name: string;
+    type: number;
+    rooms: unknown[];
+    temp?: number;
+    rooms_temp?: Array<{ room_id: string; temp: number }>;
+  }>;
+  timetable?: Array<{
+    m_offset: number;
+    zone_id: number;
+  }>;
+}
+
+/** Room Temperature Data */
+export interface RoomTemperature {
+  room_id: string;
+  temperature?: number;
+  setpoint?: number;
+  mode?: string;
+  heating: boolean;
+  endtime?: number;
+}
+
+/** Request Options */
+interface RequestOptions {
+  method?: string;
+  headers?: Record<string, string>;
+  body?: Record<string, unknown>;
+}
+
+/** API Response */
+interface NetatmoApiResponse {
+  status?: string;
+  body?: {
+    homes?: NetatmoHome[];
+    home?: NetatmoHomeStatus;
+    schedule_id?: string;
+    [key: string]: unknown;
+  };
+  error?: {
+    message?: string;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
+
+/** Token Response */
+interface TokenResponse {
+  access_token?: string;
+  [key: string]: unknown;
+}
+
+/** Set Room Thermpoint Params */
+export interface SetRoomThermpointParams {
+  home_id: string;
+  room_id: string;
+  mode: 'manual' | 'home' | 'max' | 'off';
+  temp?: number | string;
+  endtime?: number;
+}
+
+/** Set Therm Mode Params */
+export interface SetThermModeParams {
+  home_id: string;
+  mode: 'schedule' | 'away' | 'hg' | 'off';
+  endtime?: number;
+}
+
+/** Create Schedule Params */
+export interface CreateScheduleParams {
+  home_id: string;
+  schedule_name: string;
+  zones: unknown[];
+  timetable: unknown[];
+}
+
+/** Sync Home Schedule Params */
+export interface SyncHomeScheduleParams {
+  home_id: string;
+  schedule_id?: string;
+  schedule_name?: string;
+  zones?: unknown[];
+  timetable?: unknown[];
+}
+
+/** Get Room Measure Params */
+export interface GetRoomMeasureParams {
+  home_id: string;
+  room_id: string;
+  scale: 'max' | '30min' | '1hour' | '3hours' | '1day' | '1week' | '1month';
+  type: 'temperature' | 'sp_temperature' | 'min_temp' | 'max_temp' | 'date_min_temp';
+  date_begin?: number;
+  date_end?: number;
+  limit?: number;
+  optimize?: boolean;
+}
+
+/** Topology Data (for module name resolution) */
+export interface TopologyData {
+  modules?: Array<{ id: string; name: string }>;
+}
+
+// ============================================================================
+// AUTH
+// ============================================================================
+
 /**
  * Get access token from refresh token
  */
-async function getAccessToken(refreshToken) {
+async function getAccessToken(refreshToken: string): Promise<string> {
   const credentials = getNetatmoCredentials();
 
   const response = await fetch(NETATMO_OAUTH_URL, {
@@ -27,7 +239,7 @@ async function getAccessToken(refreshToken) {
     }),
   });
 
-  const data = await response.json();
+  const data = await response.json() as TokenResponse;
 
   if (!data.access_token) {
     throw new Error(`Failed to get access token: ${JSON.stringify(data)}`);
@@ -39,30 +251,30 @@ async function getAccessToken(refreshToken) {
 /**
  * Make authenticated API request
  */
-async function makeRequest(endpoint, accessToken, options = {}) {
+async function makeRequest(endpoint: string, accessToken: string, options: RequestOptions = {}): Promise<NetatmoApiResponse> {
   const url = `${NETATMO_API_BASE}/api/${endpoint}`;
   const method = options.method || 'GET';
-  const headers = {
+  const headers: Record<string, string> = {
     Authorization: `Bearer ${accessToken}`,
     ...options.headers,
   };
 
-  const config = {
+  const config: RequestInit = {
     method,
     headers,
   };
 
   if (options.body) {
     if (method === 'POST') {
-      config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
-      config.body = new URLSearchParams(options.body);
+      config.headers = { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' };
+      config.body = new URLSearchParams(options.body as Record<string, string>);
     } else {
       config.body = JSON.stringify(options.body);
     }
   }
 
   const response = await fetch(url, config);
-  const data = await response.json();
+  const data = await response.json() as NetatmoApiResponse;
 
   if (data.error) {
     throw new Error(`Netatmo API Error: ${data.error.message || JSON.stringify(data.error)}`);
@@ -79,7 +291,7 @@ async function makeRequest(endpoint, accessToken, options = {}) {
  * Get homes data - complete topology (homes, rooms, modules)
  * Returns: home_id, room structures, module associations
  */
-async function getHomesData(accessToken) {
+async function getHomesData(accessToken: string): Promise<NetatmoHome[]> {
   const data = await makeRequest('homesdata', accessToken);
   return data.body?.homes || [];
 }
@@ -87,16 +299,15 @@ async function getHomesData(accessToken) {
 /**
  * Get device list - all Netatmo devices
  */
-async function getDeviceList(accessToken) {
+async function getDeviceList(accessToken: string): Promise<Record<string, unknown>> {
   const data = await makeRequest('devicelist', accessToken);
   return data.body || {};
 }
 
 /**
  * Get home status - real-time status of all rooms and modules
- * Params: { home_id }
  */
-async function getHomeStatus(accessToken, homeId) {
+async function getHomeStatus(accessToken: string, homeId: string): Promise<NetatmoHomeStatus> {
   const data = await makeRequest('homestatus', accessToken, {
     method: 'POST',
     body: { home_id: homeId },
@@ -106,9 +317,8 @@ async function getHomeStatus(accessToken, homeId) {
 
 /**
  * Get thermostat state - specific device/module state
- * Params: { device_id, module_id }
  */
-async function getThermState(accessToken, deviceId, moduleId) {
+async function getThermState(accessToken: string, deviceId: string, moduleId: string): Promise<Record<string, unknown>> {
   const data = await makeRequest('getthermstate', accessToken, {
     method: 'POST',
     body: { device_id: deviceId, module_id: moduleId },
@@ -118,16 +328,15 @@ async function getThermState(accessToken, deviceId, moduleId) {
 
 /**
  * Get room measure - historical temperature data
- * Params: { home_id, room_id, scale, type, date_begin, date_end, limit, optimize }
  * Scale: max (30min), 30min, 1hour, 3hours, 1day, 1week, 1month
  * Type: temperature, sp_temperature, min_temp, max_temp, date_min_temp
  */
-async function getRoomMeasure(accessToken, params) {
+async function getRoomMeasure(accessToken: string, params: GetRoomMeasureParams): Promise<unknown[]> {
   const data = await makeRequest('getroommeasure', accessToken, {
     method: 'POST',
-    body: params,
+    body: params as Record<string, unknown>,
   });
-  return data.body || [];
+  return (data.body as unknown[]) || [];
 }
 
 // ============================================================================
@@ -136,23 +345,22 @@ async function getRoomMeasure(accessToken, params) {
 
 /**
  * Set room temperature setpoint
- * Params: { home_id, room_id, mode, temp?, endtime? }
  * Mode: manual, home, max, off
  * Temp: target temperature (manual mode)
  * Endtime: UNIX timestamp when to return to schedule (manual mode)
  */
-async function setRoomThermpoint(accessToken, params) {
+async function setRoomThermpoint(accessToken: string, params: SetRoomThermpointParams): Promise<boolean> {
   // Ensure temp is a float for Netatmo API
   const normalizedParams = {
     ...params,
-    temp: params.temp !== undefined ? parseFloat(params.temp) : undefined,
+    temp: params.temp !== undefined ? parseFloat(params.temp.toString()) : undefined,
   };
 
   console.log('🌡️ Calling Netatmo setRoomThermpoint API:', normalizedParams);
 
   const data = await makeRequest('setroomthermpoint', accessToken, {
     method: 'POST',
-    body: normalizedParams,
+    body: normalizedParams as Record<string, unknown>,
   });
 
   console.log('🌡️ Netatmo API response:', data);
@@ -162,23 +370,21 @@ async function setRoomThermpoint(accessToken, params) {
 
 /**
  * Set thermostat mode for entire home
- * Params: { home_id, mode, endtime? }
  * Mode: schedule, away, hg (frost guard), off
  * Endtime: UNIX timestamp (for away/hg modes)
  */
-async function setThermMode(accessToken, params) {
+async function setThermMode(accessToken: string, params: SetThermModeParams): Promise<boolean> {
   const data = await makeRequest('setthermmode', accessToken, {
     method: 'POST',
-    body: params,
+    body: params as Record<string, unknown>,
   });
   return data.status === 'ok';
 }
 
 /**
  * Switch home schedule
- * Params: { home_id, schedule_id }
  */
-async function switchHomeSchedule(accessToken, homeId, scheduleId) {
+async function switchHomeSchedule(accessToken: string, homeId: string, scheduleId: string): Promise<boolean> {
   const data = await makeRequest('switchhomeschedule', accessToken, {
     method: 'POST',
     body: { home_id: homeId, schedule_id: scheduleId },
@@ -188,21 +394,19 @@ async function switchHomeSchedule(accessToken, homeId, scheduleId) {
 
 /**
  * Create new schedule
- * Params: { home_id, schedule_name, zones, timetable }
  */
-async function createSchedule(accessToken, params) {
+async function createSchedule(accessToken: string, params: CreateScheduleParams): Promise<string | undefined> {
   const data = await makeRequest('createnewhomeschedule', accessToken, {
     method: 'POST',
-    body: params,
+    body: params as Record<string, unknown>,
   });
   return data.body?.schedule_id;
 }
 
 /**
  * Rename home
- * Params: { home_id, name }
  */
-async function renameHome(accessToken, homeId, name) {
+async function renameHome(accessToken: string, homeId: string, name: string): Promise<boolean> {
   const data = await makeRequest('renamehome', accessToken, {
     method: 'POST',
     body: { home_id: homeId, name },
@@ -212,7 +416,6 @@ async function renameHome(accessToken, homeId, name) {
 
 /**
  * Sync home schedule - triggers valve calibration
- * Params: { home_id, schedule_id?, schedule_name?, zones?, timetable? }
  * This endpoint syncs the current schedule and triggers calibration on all valves
  * If schedule_id is not provided, uses the currently active schedule
  *
@@ -220,9 +423,9 @@ async function renameHome(accessToken, homeId, name) {
  * - zones and timetable must be passed as JSON strings for URLSearchParams
  * - schedule_name is REQUIRED when schedule_id is provided
  */
-async function syncHomeSchedule(accessToken, params) {
+async function syncHomeSchedule(accessToken: string, params: SyncHomeScheduleParams): Promise<boolean> {
   // Convert zones and timetable arrays to JSON strings for URLSearchParams
-  const bodyParams = {
+  const bodyParams: Record<string, string> = {
     home_id: params.home_id,
   };
 
@@ -257,12 +460,12 @@ async function syncHomeSchedule(accessToken, params) {
  * Parse rooms from homesdata response
  * Filters out undefined values to prevent Firebase errors
  */
-function parseRooms(homesData) {
+function parseRooms(homesData: NetatmoHome[]): ParsedRoom[] {
   if (!homesData || homesData.length === 0) return [];
 
   const home = homesData[0]; // Usually single home
   return (home.rooms || []).map(room => {
-    const parsed = {
+    const parsed: ParsedRoom = {
       id: room.id,
       name: room.name,
       type: room.type,
@@ -282,15 +485,16 @@ function parseRooms(homesData) {
  * Parse modules from homesdata response
  * Filters out undefined values to prevent Firebase errors
  */
-function parseModules(homesData) {
+function parseModules(homesData: NetatmoHome[]): ParsedModule[] {
   if (!homesData || homesData.length === 0) return [];
 
   const home = homesData[0];
   return (home.modules || []).map(module => {
-    const parsed = {
+    const parsed: ParsedModule = {
       id: module.id,
       name: module.name,
       type: module.type,
+      reachable: module.reachable ?? false,
     };
 
     // Only add optional properties if they're defined
@@ -308,14 +512,14 @@ function parseModules(homesData) {
 /**
  * Extract temperatures from homestatus response
  */
-function extractTemperatures(homeStatus) {
+function extractTemperatures(homeStatus: NetatmoHomeStatus): RoomTemperature[] {
   const rooms = homeStatus.rooms || [];
   return rooms.map(room => ({
     room_id: room.id,
     temperature: room.therm_measured_temperature,
     setpoint: room.therm_setpoint_temperature,
     mode: room.therm_setpoint_mode,
-    heating: room.heating_power_request > 0,
+    heating: (room.heating_power_request || 0) > 0,
     endtime: room.therm_setpoint_end_time, // UNIX timestamp when manual override ends
   }));
 }
@@ -323,8 +527,8 @@ function extractTemperatures(homeStatus) {
 /**
  * Check if valves are open in room
  */
-function isHeatingActive(room) {
-  return room.heating_power_request > 0;
+function isHeatingActive(room: NetatmoRoom): boolean {
+  return (room.heating_power_request || 0) > 0;
 }
 
 /**
@@ -341,11 +545,11 @@ function isHeatingActive(room) {
  *
  * Battery states: "full", "high", "medium", "low", "very_low"
  */
-function extractModulesWithStatus(homeStatus, topology = null) {
+function extractModulesWithStatus(homeStatus: NetatmoHomeStatus, topology: TopologyData | null = null): ParsedModule[] {
   const modules = homeStatus.modules || [];
 
   return modules.map(module => {
-    const parsed = {
+    const parsed: ParsedModule = {
       id: module.id,
       type: module.type,
       reachable: module.reachable ?? false,
@@ -405,7 +609,7 @@ function extractModulesWithStatus(homeStatus, topology = null) {
  * Get modules with low or critical battery
  * Returns modules with battery_state "low" or "very_low"
  */
-function getModulesWithLowBattery(modules) {
+function getModulesWithLowBattery(modules: ParsedModule[]): ParsedModule[] {
   return modules.filter(module =>
     module.battery_state === 'low' || module.battery_state === 'very_low'
   );
@@ -414,14 +618,14 @@ function getModulesWithLowBattery(modules) {
 /**
  * Check if any module has critical battery (very_low)
  */
-function hasAnyCriticalBattery(modules) {
+function hasAnyCriticalBattery(modules: ParsedModule[]): boolean {
   return modules.some(module => module.battery_state === 'very_low');
 }
 
 /**
  * Check if any module has low battery (low or very_low)
  */
-function hasAnyLowBattery(modules) {
+function hasAnyLowBattery(modules: ParsedModule[]): boolean {
   return modules.some(module =>
     module.battery_state === 'low' || module.battery_state === 'very_low'
   );
@@ -432,13 +636,13 @@ function hasAnyLowBattery(modules) {
  * Extracts schedule metadata: id, name, type, selected (active), zones, timetable
  * Filters out undefined values to prevent Firebase errors
  */
-function parseSchedules(homesData) {
+function parseSchedules(homesData: NetatmoHome[]): ParsedSchedule[] {
   if (!homesData || homesData.length === 0) return [];
 
   const home = homesData[0]; // Usually single home
 
   return (home.schedules || []).map(schedule => {
-    const parsed = {
+    const parsed: ParsedSchedule = {
       id: schedule.id,
       name: schedule.name,
       type: schedule.type || 'therm', // 'therm', 'cooling', etc.
@@ -448,7 +652,14 @@ function parseSchedules(homesData) {
     // Only add optional properties if they're defined
     if (schedule.zones && Array.isArray(schedule.zones)) {
       parsed.zones = schedule.zones.map(zone => {
-        const zoneData = {
+        const zoneData: {
+          id: number;
+          name: string;
+          type: number;
+          rooms: unknown[];
+          temp?: number;
+          rooms_temp?: Array<{ room_id: string; temp: number }>;
+        } = {
           id: zone.id,
           name: zone.name,
           type: zone.type,
@@ -472,9 +683,10 @@ function parseSchedules(homesData) {
           zoneData.rooms_temp = zone.rooms_temp;
         } else if (zone.rooms && Array.isArray(zone.rooms) && zone.rooms.length > 0) {
           // Fallback: calculate average from therm_setpoint_temperature
-          const validTemps = zone.rooms
+          const roomsWithTemp = zone.rooms as Array<{ therm_setpoint_temperature?: number }>;
+          const validTemps = roomsWithTemp
             .map(r => r.therm_setpoint_temperature)
-            .filter(t => t !== undefined && t !== null && !isNaN(t));
+            .filter(t => t !== undefined && t !== null && !isNaN(t)) as number[];
           if (validTemps.length > 0) {
             zoneData.temp = Math.round(validTemps.reduce((sum, t) => sum + t, 0) / validTemps.length * 10) / 10;
           }

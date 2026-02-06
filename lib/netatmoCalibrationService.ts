@@ -8,18 +8,43 @@
  * Netatmo valves to recalibrate automatically.
  */
 
-import { adminDbGet, adminDbSet, adminDbPush } from '@/lib/firebaseAdmin';
+import { adminDbGet, adminDbPush } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getValidAccessToken } from '@/lib/netatmoTokenHelper';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 
+/** Calibration result - success */
+interface CalibrationSuccess {
+  calibrated: true;
+  schedule_name: string;
+  timestamp: number;
+  note?: string;
+}
+
+/** Calibration result - failure */
+interface CalibrationFailure {
+  calibrated: false;
+  reason: 'auth_error' | 'no_home_id' | 'no_homes' | 'no_schedule' | 'insufficient_schedules' | 'switch_failed' | 'no_homes_after' | 'restore_failed';
+  error: string;
+}
+
+/** Calibration result */
+export type CalibrationResult = CalibrationSuccess | CalibrationFailure;
+
+/** Calibration log entry */
+interface CalibrationEntry {
+  timestamp: number;
+  schedule_id: string;
+  schedule_name: string;
+  triggered_by: string;
+  status: string;
+}
+
 /**
  * Calibrate Netatmo valves by switching schedules
  * This is the server-side version that can be called directly from cron
- *
- * @returns {Promise<Object>} Calibration result
  */
-export async function calibrateValvesServer() {
+export async function calibrateValvesServer(): Promise<CalibrationResult> {
   // Get valid access token
   const { accessToken, error: tokenError } = await getValidAccessToken();
   if (tokenError) {
@@ -32,7 +57,7 @@ export async function calibrateValvesServer() {
 
   // Get home_id from Firebase
   const homeIdPath = getEnvironmentPath('netatmo/home_id');
-  const homeId = await adminDbGet(homeIdPath);
+  const homeId = await adminDbGet(homeIdPath) as string | null;
   if (!homeId) {
     return {
       calibrated: false,
@@ -75,6 +100,14 @@ export async function calibrateValvesServer() {
 
   // Find alternative schedule
   const alternativeSchedule = schedules.find(s => s.id !== currentSchedule.id);
+
+  if (!alternativeSchedule) {
+    return {
+      calibrated: false,
+      reason: 'no_schedule',
+      error: 'Nessuno schedule alternativo trovato',
+    };
+  }
 
   console.log(`🔄 Switching to schedule: ${alternativeSchedule.name}`);
 
@@ -129,7 +162,7 @@ export async function calibrateValvesServer() {
   }
 
   // Log calibration
-  const calibrationEntry = {
+  const calibrationEntry: CalibrationEntry = {
     timestamp: Date.now(),
     schedule_id: currentSchedule.id,
     schedule_name: currentSchedule.name || 'Unknown',

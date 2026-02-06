@@ -67,7 +67,7 @@ export async function checkPeriodicSyncPermission(): Promise<PermissionState | '
   try {
     const status = await navigator.permissions.query({
       name: 'periodic-background-sync',
-    } as PermissionDescriptor);
+    } as unknown as PermissionDescriptor);
     return status.state as PermissionState;
   } catch {
     return 'not-supported';

@@ -50,7 +50,7 @@ export async function updateDeadManSwitch(): Promise<boolean> {
  */
 export async function checkDeadManSwitch(): Promise<DeadManSwitchStatus> {
   try {
-    const lastCheck = await adminDbGet(DEAD_MAN_SWITCH_PATH);
+    const lastCheck = await adminDbGet(DEAD_MAN_SWITCH_PATH) as string | null;
 
     // Never run - no timestamp recorded
     if (!lastCheck) {
@@ -71,7 +71,7 @@ export async function checkDeadManSwitch(): Promise<DeadManSwitchStatus> {
         stale: true,
         elapsed,
         reason: 'timeout',
-        lastCheck,
+        lastCheck: lastCheck as string,
       };
     }
 
@@ -79,7 +79,7 @@ export async function checkDeadManSwitch(): Promise<DeadManSwitchStatus> {
     return {
       stale: false,
       elapsed,
-      lastCheck,
+      lastCheck: lastCheck as string,
     };
   } catch (error) {
     console.error('❌ Error checking dead man\'s switch:', error);

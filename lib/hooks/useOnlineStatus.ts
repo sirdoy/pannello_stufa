@@ -26,7 +26,7 @@ import { useState, useEffect, useCallback } from 'react';
  *   return <ReconnectedBanner />;
  * }
  */
-export function useOnlineStatus(): { isOnline: boolean; wasOffline: boolean; lastOnlineAt: Date | null; offlineSince: Date | null; checkConnection: () => Promise<void> } {
+export function useOnlineStatus(): { isOnline: boolean; wasOffline: boolean; lastOnlineAt: Date | null; offlineSince: Date | null; checkConnection: () => Promise<boolean> } {
   const [isOnline, setIsOnline] = useState<boolean>(true);
   const [wasOffline, setWasOffline] = useState(false);
   const [lastOnlineAt, setLastOnlineAt] = useState(null);

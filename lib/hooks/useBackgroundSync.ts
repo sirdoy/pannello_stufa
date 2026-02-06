@@ -44,12 +44,14 @@ export interface UseBackgroundSyncReturn {
   pendingCount: number;
   isProcessing: boolean;
   lastSyncedCommand: unknown | null;
-  queueStoveCommand: (action: string, body?: Record<string, unknown>) => Promise<void>;
+  hasPendingCommands: boolean;
+  hasFailedCommands: boolean;
+  queueStoveCommand: (action: string, body?: Record<string, unknown>) => Promise<number>;
   refreshCommands: () => Promise<void>;
-  retryFailedCommand: (id: string) => Promise<void>;
+  retryCommand: (id: string) => Promise<void>;
   cancelCommand: (id: string) => Promise<void>;
-  clearAllFailed: () => Promise<void>;
-  processQueue: () => Promise<void>;
+  clearFailedCommands: () => Promise<void>;
+  triggerSync: () => Promise<void>;
 }
 
 export function useBackgroundSync(): UseBackgroundSyncReturn {

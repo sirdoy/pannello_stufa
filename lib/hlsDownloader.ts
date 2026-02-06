@@ -79,7 +79,7 @@ function parseM3u8(m3u8Content: string, baseUrl: string): string[] {
  * @param {function} onProgress - Progress callback (0-100)
  * @returns {Promise<Blob>} MP4 blob
  */
-export async function downloadHlsAsMP4(hlsUrl, onProgress = () => {}) {
+export async function downloadHlsAsMP4(hlsUrl: string, onProgress: (percent: number, message: string) => void = () => {}) {
   // Step 1: Fetch the m3u8 playlist
   onProgress(0, 'Caricamento playlist...');
 
@@ -166,7 +166,7 @@ export async function downloadHlsAsMP4(hlsUrl, onProgress = () => {}) {
  * @param {string} filename - Desired filename (without extension)
  * @param {function} onProgress - Progress callback (percent, message)
  */
-export async function downloadHlsVideo(hlsUrl, filename, onProgress = () => {}) {
+export async function downloadHlsVideo(hlsUrl: string, filename: string, onProgress: (percent: number, message: string) => void = () => {}) {
   try {
     const blob = await downloadHlsAsMP4(hlsUrl, onProgress);
 

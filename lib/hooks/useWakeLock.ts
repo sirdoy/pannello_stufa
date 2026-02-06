@@ -21,7 +21,7 @@ import {
  *   {isLocked ? 'Allow screen sleep' : 'Keep screen on'}
  * </button>
  */
-export function useWakeLock(): { isLocked: boolean; isSupported: boolean; lock: () => Promise<void>; unlock: () => Promise<void> } {
+export function useWakeLock(): { isLocked: boolean; isSupported: boolean; lock: () => Promise<boolean>; unlock: () => Promise<boolean>; toggle: () => Promise<boolean> } {
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [isSupported, setIsSupported] = useState<boolean>(false);
 

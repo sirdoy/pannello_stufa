@@ -25,7 +25,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
  *   return <p>Tap Share then "Add to Home Screen"</p>;
  * }
  */
-export function usePWAInstall(): { isInstalled: boolean; isInstallable: boolean; isIOS: boolean; promptInstall: () => Promise<void>; dismissInstall: () => void } {
+export function usePWAInstall(): { isInstalled: boolean; isInstallable: boolean; isIOS: boolean; isDismissed: boolean; promptInstall: () => Promise<{ outcome: any; error?: any }>; dismissInstall: () => void } {
   const [isInstalled, setIsInstalled] = useState<boolean>(false);
   const [isInstallable, setIsInstallable] = useState<boolean>(false);
   const [isIOS, setIsIOS] = useState(false);
@@ -43,7 +43,7 @@ export function usePWAInstall(): { isInstalled: boolean; isInstallable: boolean;
       const isStandalone =
         window.matchMedia('(display-mode: standalone)').matches ||
         window.matchMedia('(display-mode: fullscreen)').matches ||
-        window.navigator.standalone === true; // iOS Safari
+        (window.navigator as any).standalone === true; // iOS Safari
 
       setIsInstalled(isStandalone);
     };

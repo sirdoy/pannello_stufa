@@ -29,7 +29,8 @@ export abstract class BaseRepository<T = unknown> {
    */
   async get(subPath: string = ''): Promise<T | null> {
     const fullPath = this.resolvePath(subPath);
-    return adminDbGet(fullPath);
+    const data = await adminDbGet(fullPath);
+    return data as T;
   }
 
   /**

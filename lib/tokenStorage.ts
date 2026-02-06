@@ -15,6 +15,8 @@ interface TokenStorageRecord {
   lastUsed: string;
   deviceId: string | null;
   deviceInfo: Record<string, unknown> | null;
+  platform?: string;
+  isPWA?: boolean;
 }
 
 // Initialize IndexedDB via Dexie

@@ -110,13 +110,13 @@ export function getStoveCommands(): CommandGroup {
         label: 'Accendi Stufa',
         icon: <Power className="w-4 h-4" />,
         shortcut: '⌘⇧S',
-        onSelect: () => executeStoveAction('ignite'),
+        onSelect: async () => { await executeStoveAction('ignite'); },
       },
       {
         id: 'stove-shutdown',
         label: 'Spegni Stufa',
         icon: <PowerOff className="w-4 h-4" />,
-        onSelect: () => executeStoveAction('shutdown'),
+        onSelect: async () => { await executeStoveAction('shutdown'); },
       },
       {
         id: 'stove-power-up',
@@ -186,19 +186,19 @@ export function getThermostatCommands(): CommandGroup {
         id: 'thermo-mode-schedule',
         label: 'Modalita Automatica',
         icon: <Calendar className="w-4 h-4" />,
-        onSelect: () => executeThermostatAction('set-therm-mode', { mode: 'schedule' }),
+        onSelect: async () => { await executeThermostatAction('set-therm-mode', { mode: 'schedule' }); },
       },
       {
         id: 'thermo-mode-away',
         label: 'Modalita Away',
         icon: <Home className="w-4 h-4" />,
-        onSelect: () => executeThermostatAction('set-therm-mode', { mode: 'away' }),
+        onSelect: async () => { await executeThermostatAction('set-therm-mode', { mode: 'away' }); },
       },
       {
         id: 'thermo-mode-hg',
         label: 'Modalita Antigelo',
         icon: <Snowflake className="w-4 h-4" />,
-        onSelect: () => executeThermostatAction('set-therm-mode', { mode: 'hg' }),
+        onSelect: async () => { await executeThermostatAction('set-therm-mode', { mode: 'hg' }); },
       },
       {
         id: 'thermo-temp-up',

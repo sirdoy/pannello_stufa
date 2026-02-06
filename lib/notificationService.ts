@@ -86,7 +86,7 @@ export function isPWA() {
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
 
   // Check se app è stata aggiunta a home screen (iOS Safari)
-  const isIOSStandalone = window.navigator.standalone === true;
+  const isIOSStandalone = (window.navigator as unknown as { standalone?: boolean }).standalone === true;
 
   return isStandalone || isIOSStandalone;
 }
@@ -242,7 +242,7 @@ export async function getFCMToken(userId) {
             sw.addEventListener('statechange', () => {
               if (sw.state === 'activated') {
                 clearTimeout(timeout);
-                resolve();
+                resolve(undefined);
               }
             });
           });
@@ -266,9 +266,10 @@ export async function getFCMToken(userId) {
     ]);
 
     if (registration) {
+      const regData = registration as ServiceWorkerRegistration;
       await debugLog('Service worker ready', {
-        scope: registration.scope,
-        active: !!registration.active,
+        scope: regData.scope,
+        active: !!regData.active,
       });
     } else {
       await debugLog('Proceeding without SW registration (dev mode)');
@@ -278,9 +279,9 @@ export async function getFCMToken(userId) {
     await debugLog('Getting FCM token...', { vapidKeyLength: vapidKey.length, hasRegistration: !!registration });
 
     // Build options - serviceWorkerRegistration è opzionale in dev mode
-    const getTokenOptions = { vapidKey };
+    const getTokenOptions: { vapidKey: string; serviceWorkerRegistration?: ServiceWorkerRegistration } = { vapidKey };
     if (registration) {
-      getTokenOptions.serviceWorkerRegistration = registration;
+      getTokenOptions.serviceWorkerRegistration = registration as ServiceWorkerRegistration;
     }
 
     const token = await getToken(messaging, getTokenOptions);
@@ -491,7 +492,7 @@ export async function getUserFCMTokens(userId) {
 
     if (!snapshot.exists()) return [];
 
-    const tokensData = snapshot.val();
+    const tokensData = snapshot.val() as Record<string, { token: string }>;
     return Object.values(tokensData).map(t => t.token);
 
   } catch (error) {

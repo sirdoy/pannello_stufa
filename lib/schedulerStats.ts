@@ -129,11 +129,11 @@ export function calculateWeeklyStats(schedule: WeeklySchedule): WeeklyStats {
   // Find busiest day
   if (Object.keys(stats.dailyHours).length > 0) {
     stats.busiestDay = Object.keys(stats.dailyHours)
-      .reduce((a, b) => stats.dailyHours[a] > stats.dailyHours[b] ? a : b);
+      .reduce((a, b) => (stats.dailyHours[a] as number) > (stats.dailyHours[b] as number) ? a : b);
   }
 
   // Calculate average per day
-  const daysWithIntervals = Object.values(stats.dailyHours).filter(h => h > 0).length;
+  const daysWithIntervals = Object.values(stats.dailyHours).filter((h): h is number => (h as number) > 0).length;
   stats.avgPerDay = daysWithIntervals > 0 ? stats.totalHours / daysWithIntervals : 0;
 
   return stats;

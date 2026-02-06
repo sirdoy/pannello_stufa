@@ -75,7 +75,7 @@ export async function checkUserStoveHealth(userId: string): Promise<HealthCheck>
   return {
     userId,
     timestamp,
-    stoveStatus,
+    stoveStatus: (stoveResult.status === 'fulfilled' && stoveStatus?.StatusDescription) || 'unknown',
     stoveError,
     expectedState,
     netatmoDemand,
@@ -292,7 +292,7 @@ async function getNetatmoHeatingDemand() {
     }
 
     // Get Netatmo access token from Firebase RTDB
-    const tokenData = await adminDbGet('netatmo/accessToken');
+    const tokenData = await adminDbGet('netatmo/accessToken') as { token?: string } | null;
 
     if (!tokenData || !tokenData.token) {
       console.log('⚠️ Netatmo token not available - skipping demand check');

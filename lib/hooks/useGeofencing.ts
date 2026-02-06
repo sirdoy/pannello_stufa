@@ -35,7 +35,7 @@ import {
  *   onArriveHome: () => igniteStove(),
  * });
  */
-export function useGeofencing(options: Record<string, unknown> = {}): unknown {
+export function useGeofencing(options: { checkInterval?: number; onLeaveHome?: () => void; onArriveHome?: () => void } = {}): unknown {
   const {
     checkInterval = 5 * 60 * 1000, // 5 minutes
     onLeaveHome,
@@ -125,7 +125,7 @@ export function useGeofencing(options: Record<string, unknown> = {}): unknown {
     checkLocation();
 
     // Set up interval for periodic checks
-    const intervalId = setInterval(checkLocation, checkInterval);
+    const intervalId = setInterval(checkLocation, checkInterval as number);
 
     return () => {
       clearInterval(intervalId);

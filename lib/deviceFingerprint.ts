@@ -46,6 +46,7 @@ export interface DeviceInfo {
   screenWidth: number | null;
   screenHeight: number | null;
   timezone: string | null;
+  [key: string]: unknown;
 }
 
 /**

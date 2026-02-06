@@ -138,6 +138,15 @@ export async function adminDbRemove(path: string): Promise<void> {
 }
 
 /**
+ * Token record from Firebase
+ */
+interface TokenRecord {
+  token: string;
+  deviceId: string;
+  [key: string]: unknown;
+}
+
+/**
  * Look up deviceId for a given FCM token
  * Used to enrich error logs with device context
  *
@@ -159,8 +168,9 @@ async function lookupDeviceIdForToken(token) {
       const tokens = userSnap.child('fcmTokens').val() || {};
 
       Object.entries(tokens).forEach(([tokenKey, tokenData]) => {
-        if (tokenData.token === token && tokenData.deviceId) {
-          result = { userId, deviceId: tokenData.deviceId };
+        const typedTokenData = tokenData as TokenRecord;
+        if (typedTokenData.token === token && typedTokenData.deviceId) {
+          result = { userId, deviceId: typedTokenData.deviceId };
         }
       });
     });
@@ -235,7 +245,8 @@ async function removeInvalidToken(invalidToken) {
       const tokens = userSnap.child('fcmTokens').val() || {};
 
       Object.entries(tokens).forEach(([tokenKey, tokenData]) => {
-        if (tokenData.token === invalidToken) {
+        const typedTokenData = tokenData as TokenRecord;
+        if (typedTokenData.token === invalidToken) {
           updates[`users/${userId}/fcmTokens/${tokenKey}`] = null;
           console.log(`🗑️ Removing invalid token for user ${userId}`);
         }
@@ -306,10 +317,10 @@ export async function sendPushNotification(tokens, notification, userId = null) 
       },
       data: notification.data || {},
       android: {
-        priority: notification.priority === 'high' ? 'high' : 'normal',
+        priority: (notification.priority === 'high' ? 'high' : 'normal') as 'high' | 'normal',
         notification: {
           channelId: 'default',
-          priority: notification.priority === 'high' ? 'high' : 'default',
+          priority: (notification.priority === 'high' ? 'high' : 'default') as 'high' | 'default',
           defaultSound: true,
           defaultVibrateTimings: true,
         },

@@ -109,7 +109,7 @@ export async function checkAndRefreshToken(userId) {
     }
 
     // Step 3: Get new token
-    const getTokenOptions = { vapidKey };
+    const getTokenOptions: { vapidKey: string; serviceWorkerRegistration?: ServiceWorkerRegistration } = { vapidKey };
     if (registration?.active) {
       getTokenOptions.serviceWorkerRegistration = registration;
     }
@@ -223,7 +223,8 @@ export async function forceTokenRefresh(userId) {
   if (stored) {
     // Modify stored data to force refresh
     await saveToken(stored.token, {
-      ...stored,
+      deviceId: stored.deviceId,
+      deviceInfo: stored.deviceInfo,
       createdAt: new Date(0).toISOString(), // Very old date
     });
   }

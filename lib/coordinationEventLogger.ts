@@ -26,7 +26,7 @@
  * NOTE: Fire-and-forget pattern - logging failures don't throw (don't block coordination flow)
  */
 
-import { getAdminFirestore } from './firebaseAdmin.js';
+import { getAdminFirestore } from './firebaseAdmin';
 import { Timestamp, Query, DocumentData } from 'firebase-admin/firestore';
 import { subDays } from 'date-fns';
 

@@ -14,7 +14,7 @@
  * imported by API routes, which are already server-side.
  */
 
-import { getAdminFirestore } from './firebaseAdmin.js';
+import { getAdminFirestore } from './firebaseAdmin';
 import { Timestamp, QueryDocumentSnapshot, DocumentData } from 'firebase-admin/firestore';
 
 /**

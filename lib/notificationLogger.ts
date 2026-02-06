@@ -22,7 +22,7 @@
  * imported by API routes and firebaseAdmin.js, which are already server-side.
  */
 
-import { getAdminFirestore } from './firebaseAdmin.js';
+import { getAdminFirestore } from './firebaseAdmin';
 import { Timestamp, Query, DocumentData } from 'firebase-admin/firestore';
 import { subHours } from 'date-fns';
 

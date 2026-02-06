@@ -18,7 +18,7 @@
  * - DND last: More complex (per-device timezone checks)
  */
 
-import { checkRateLimit } from './rateLimiter.js';
+import { checkRateLimit } from './rateLimiter';
 
 /**
  * Filter notification based on user preferences

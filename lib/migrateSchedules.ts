@@ -9,7 +9,7 @@
  * - Verifies data integrity after migration
  */
 
-import { adminDbGet, adminDbSet } from './firebaseAdmin.js';
+import { adminDbGet, adminDbSet } from './firebaseAdmin';
 
 const DAYS_OF_WEEK = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
 

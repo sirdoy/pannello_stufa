@@ -8,9 +8,9 @@
  * - Parallel API fetching with graceful degradation
  */
 
-import { getStoveStatus } from './stoveApi.js';
-import { getHomeStatus } from './netatmoApi.js';
-import { adminDbGet } from './firebaseAdmin.js';
+import { getStoveStatus } from './stoveApi';
+import { getHomeStatus } from './netatmoApi';
+import { adminDbGet } from './firebaseAdmin';
 
 // Stove state categories for mismatch detection
 const ON_STATES = ['WORK', 'MODULATION'];

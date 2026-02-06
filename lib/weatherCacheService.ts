@@ -17,8 +17,8 @@
  *   await invalidateWeatherCache(45.4642, 9.19);
  */
 
-import { adminDbGet, adminDbSet, adminDbRemove } from './firebaseAdmin.js';
-import { getEnvironmentPath } from './environmentHelper.js';
+import { adminDbGet, adminDbSet, adminDbRemove } from './firebaseAdmin';
+import { getEnvironmentPath } from './environmentHelper';
 
 /** Cached weather entry */
 export interface CachedWeather {

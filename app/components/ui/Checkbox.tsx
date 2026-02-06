@@ -1,7 +1,6 @@
 'use client';
 
 import type React from 'react';
-'use client';
 
 import { forwardRef } from 'react';
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';

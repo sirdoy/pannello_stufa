@@ -10,8 +10,8 @@
  * - alertDeadManSwitch() sends notification when cron becomes stale
  */
 
-import { adminDbSet, adminDbGet } from './firebaseAdmin.js';
-import { triggerMaintenanceAlertServer } from './notificationTriggersServer.js';
+import { adminDbSet, adminDbGet } from './firebaseAdmin';
+import { triggerMaintenanceAlertServer } from './notificationTriggersServer';
 
 // RTDB path for dead man's switch timestamp
 const DEAD_MAN_SWITCH_PATH = 'healthMonitoring/lastCheck';

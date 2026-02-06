@@ -10,17 +10,17 @@
  * Entry point: processCoordinationCycle (called by cron every minute)
  */
 
-import { getCoordinationPreferences } from './coordinationPreferences.js';
-import { getCoordinationState, updateCoordinationState } from './coordinationState.js';
-import { handleStoveStateChange } from './coordinationDebounce.js';
-import { detectUserIntent } from './coordinationUserIntent.js';
-import { calculatePauseUntil } from './coordinationPauseCalculator.js';
-import { shouldSendCoordinationNotification, recordNotificationSent } from './coordinationNotificationThrottle.js';
-import { setRoomsToBoostMode, restoreRoomSetpoints } from './netatmoStoveSync.js';
-import { getValidAccessToken } from './netatmoTokenHelper.js';
-import { triggerNotificationServer } from './notificationTriggersServer.js';
-import NETATMO_API from './netatmoApi.js';
-import { logCoordinationEvent } from './coordinationEventLogger.js';
+import { getCoordinationPreferences } from './coordinationPreferences';
+import { getCoordinationState, updateCoordinationState } from './coordinationState';
+import { handleStoveStateChange } from './coordinationDebounce';
+import { detectUserIntent } from './coordinationUserIntent';
+import { calculatePauseUntil } from './coordinationPauseCalculator';
+import { shouldSendCoordinationNotification, recordNotificationSent } from './coordinationNotificationThrottle';
+import { setRoomsToBoostMode, restoreRoomSetpoints } from './netatmoStoveSync';
+import { getValidAccessToken } from './netatmoTokenHelper';
+import { triggerNotificationServer } from './notificationTriggersServer';
+import NETATMO_API from './netatmoApi';
+import { logCoordinationEvent } from './coordinationEventLogger';
 
 /**
  * Coordination cycle result

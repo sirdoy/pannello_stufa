@@ -14,9 +14,9 @@ import { initializeApp, getApps, cert, App } from 'firebase-admin/app';
 import { getMessaging, Messaging } from 'firebase-admin/messaging';
 import { getDatabase, Database } from 'firebase-admin/database';
 import { getFirestore, Firestore } from 'firebase-admin/firestore';
-import { logNotification } from './notificationLogger.js';
-import { filterNotificationByPreferences, getFilterMessage } from './notificationFilter.js';
-import { getDefaultPreferences } from './schemas/notificationPreferences.js';
+import { logNotification } from './notificationLogger';
+import { filterNotificationByPreferences, getFilterMessage } from './notificationFilter';
+import { getDefaultPreferences } from './schemas/notificationPreferences';
 
 // Error codes that indicate token is permanently invalid
 const INVALID_TOKEN_ERRORS = [

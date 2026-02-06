@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 38 - Library Migration
-Plan: 11 of 9+ (Gap closure in progress)
-Status: ⚠ GAPS CLOSURE — Gap closure plan 38-11 complete (43 errors fixed)
-Last activity: 2026-02-06 — Completed 38-11-PLAN.md (Firestore query types & logger interfaces)
+Plan: 13 of 9+ (Gap closure in progress)
+Status: ⚠ GAPS CLOSURE — Gap closure plan 38-13 complete (38 errors fixed)
+Last activity: 2026-02-06 — Completed 38-13-PLAN.md (Record conversion & Promise type fixes)
 
 Progress: [█████░░░░░░░░░░░░░░░░░░░] 24% (1.9/7 phases — 38 needs gap closure)
 
@@ -36,9 +36,9 @@ Progress: [█████░░░░░░░░░░░░░░░░░░
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 162 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 10)
+- Total plans completed: 163 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 11)
 - Average duration: ~5.3 min per plan
-- Total execution time: ~14.3 hours across 7 milestones
+- Total execution time: ~14.4 hours across 7 milestones
 
 **By Milestone:**
 
@@ -50,7 +50,7 @@ Progress: [█████░░░░░░░░░░░░░░░░░░
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
 | v3.2 Weather & Dashboard | 5 | 13 | 2 days (2026-02-02 - 2026-02-03) |
 | v4.0 Advanced UI | 7 | 24 | 2 days (2026-02-04 - 2026-02-05) |
-| v5.0 TypeScript Migration | 7 | 9 plans (Phase 38 complete) | In progress |
+| v5.0 TypeScript Migration | 7 | 11 gap closure plans (Phase 38 ongoing) | In progress |
 
 ## Accumulated Context
 
@@ -150,6 +150,12 @@ From 38-09 (React hooks):
 - CSSProperties typing for style constants with 'as const'
 - LongPressEventType.Pointer handles both mouse and touch events
 
+From 38-13 (Record conversion & Promise types):
+- Double assertion for Firebase writes: (data as unknown as Record<string, unknown>)
+- Index signatures on API params for generic Record<string, unknown> casting
+- Hook return type interfaces must match actual implementation return values
+- Wrap callbacks to match expected return type: async () => { await fn(); }
+
 ### Quick Tasks Completed
 
 | # | Description | Date | Commit | Directory |
@@ -167,7 +173,7 @@ From 38-09 (React hooks):
 
 ## Session Continuity
 
-Last session: 2026-02-06 10:36 UTC
-Stopped at: Completed 38-11-PLAN.md (Firestore query types & logger interfaces)
+Last session: 2026-02-06 11:15 UTC
+Stopped at: Completed 38-13-PLAN.md (Record conversion & Promise type fixes)
 Resume file: None
 Next step: Continue gap closure plans for remaining tsc errors

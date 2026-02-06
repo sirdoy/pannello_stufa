@@ -110,13 +110,14 @@ const PageContent = forwardRef(function PageContent(
   ref
 ) {
   return (
-    <main
+    <div
       ref={ref}
       className={cn('flex-1 py-6', className)}
+      role="presentation"
       {...props}
     >
       {children}
-    </main>
+    </div>
   );
 });
 

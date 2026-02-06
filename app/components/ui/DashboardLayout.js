@@ -308,13 +308,14 @@ const MainContent = forwardRef(function MainContent(
   const { collapsed } = useSidebar();
 
   return (
-    <main
+    <div
       ref={ref}
       className={cn(mainContentVariants({ collapsed }), className)}
+      role="presentation"
       {...props}
     >
       {children}
-    </main>
+    </div>
   );
 });
 

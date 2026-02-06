@@ -53,19 +53,30 @@ Plans:
 
 ### Phase 38: Library Migration
 
-**Goal:** All library files in lib/ are converted to TypeScript with proper typing.
+**Goal:** All 132 library files (116 in lib/ + 16 hooks) converted to TypeScript with proper typing.
 
-**Plans:** (created by /gsd:plan-phase)
+**Plans:** 9 plans
+
+Plans:
+- [ ] 38-01-PLAN.md — Leaf utilities (utils/, formatUtils, version, routes, fingerprint, env, geo, theme)
+- [ ] 38-02-PLAN.md — PWA utilities (lib/pwa/ — 10 browser API wrappers)
+- [ ] 38-03-PLAN.md — Core infrastructure (core/ API layer, Firebase, logger, auth, rate limiter)
+- [ ] 38-04-PLAN.md — Repositories, schemas, validators, device registry
+- [ ] 38-05-PLAN.md — External API clients (Thermorossi stove, Netatmo, OpenMeteo)
+- [ ] 38-06-PLAN.md — Philips Hue API client and notification system
+- [ ] 38-07-PLAN.md — Coordination system, health monitoring, high-level services
+- [ ] 38-08-PLAN.md — Remaining services (maintenance, scheduler, weather, dashboard, commands)
+- [ ] 38-09-PLAN.md — React hooks (lib/hooks/ + app/hooks/)
 
 **Requirements covered:**
-- LIB-01: Tutti i file lib/ convertiti a .ts (62 file)
+- LIB-01: Tutti i file lib/ convertiti a .ts (116 file)
 - LIB-02: Hooks convertiti a .ts (lib/hooks/, app/hooks/)
 - LIB-03: Utilities e helpers tipizzati
 - LIB-04: Services e repositories tipizzati
 
 **Success criteria:**
-1. All 62 files in lib/ have .ts extension (no .js remaining)
-2. All hooks return properly typed values (useNetatmo returns NetatmoData, etc.)
+1. All 116 files in lib/ have .ts extension (no .js remaining, excluding __tests__/)
+2. All hooks return properly typed values (useDebounce<T>, useOnlineStatus returns boolean, etc.)
 3. Services have typed parameters and return types (Firebase operations accept typed data)
 4. `tsc --noEmit` passes on lib/ directory with no errors
 
@@ -188,7 +199,7 @@ Plans:
 | Phase | Status | Plans | Completion |
 |-------|--------|-------|------------|
 | 37 - TypeScript Foundation | ✓ Complete | 3/3 | 100% |
-| 38 - Library Migration | Pending | 0/? | 0% |
+| 38 - Library Migration | Planned | 0/9 | 0% |
 | 39 - UI Components Migration | Pending | 0/? | 0% |
 | 40 - API Routes Migration | Pending | 0/? | 0% |
 | 41 - Pages Migration | Pending | 0/? | 0% |
@@ -197,4 +208,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-02-05*
-*Last updated: 2026-02-05*
+*Last updated: 2026-02-06*

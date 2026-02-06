@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 38 - Library Migration
-Plan: 01 of 9 (Complete)
+Plan: 04 of 9 (Complete)
 Status: In progress
-Last activity: 2026-02-06 — Completed 38-01-PLAN.md (Leaf utilities migration)
+Last activity: 2026-02-06 — Completed 38-04-PLAN.md (Repositories, schemas, validators)
 
 Progress: [████░░░░░░░░░░░░░░░░░░░░] 14% (1/7 phases complete)
 
@@ -26,7 +26,7 @@ Progress: [████░░░░░░░░░░░░░░░░░░░
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
 | 37 | TypeScript Foundation | 8 | COMPLETE (8/8) |
-| 38 | Library Migration | 4 | In progress (2/9 plans) |
+| 38 | Library Migration | 4 | In progress (4/9 plans) |
 | 39 | UI Components Migration | 3 | Pending |
 | 40 | API Routes Migration | 3 | Pending |
 | 41 | Pages Migration | 3 | Pending |
@@ -36,9 +36,9 @@ Progress: [████░░░░░░░░░░░░░░░░░░░
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 153 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 1)
-- Average duration: ~4.0 min per plan
-- Total execution time: ~10 hours across 7 milestones
+- Total plans completed: 156 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 4)
+- Average duration: ~4.5 min per plan
+- Total execution time: ~11.5 hours across 7 milestones
 
 **By Milestone:**
 
@@ -115,6 +115,13 @@ From 38-02 (PWA utilities):
 - Global Navigator augmentation for Badge API (setAppBadge?, clearAppBadge?)
 - Browser API wrappers with explicit return types and built-in DOM type usage
 
+From 38-04 (Repositories, schemas, validators, devices):
+- Generic repository pattern: BaseRepository<T> with type-safe CRUD operations
+- Zod schema type inference: export type X = z.infer<typeof xSchema>
+- Local interfaces in repositories when Firebase structure differs from global types
+- Union types for constrained strings (DeviceTypeId, DeviceColor)
+- 'as const' with Record types for literal type inference
+
 ### Quick Tasks Completed
 
 | # | Description | Date | Commit | Directory |
@@ -133,6 +140,7 @@ From 38-02 (PWA utilities):
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed 38-01-PLAN.md (Leaf utilities migration)
+Stopped at: Completed 38-04-PLAN.md (Repositories, schemas, validators, devices)
 Resume file: None
+Next step: Continue Phase 38 Library Migration (5 more plans remaining)
 Next step: Continue Phase 38 Library Migration (8 more plans remaining)

@@ -30,9 +30,9 @@ Requirements for TypeScript migration. Each maps to roadmap phases.
 
 ### UI Components Migration
 
-- [ ] **COMP-01**: Design system components convertiti a .tsx (64 file)
-- [ ] **COMP-02**: Application components convertiti a .tsx (~50 file)
-- [ ] **COMP-03**: Props definite con interface/type per ogni component
+- [x] **COMP-01**: Design system components convertiti a .tsx (64 file)
+- [x] **COMP-02**: Application components convertiti a .tsx (~50 file)
+- [x] **COMP-03**: Props definite con interface/type per ogni component
 
 ### API Routes Migration
 
@@ -100,9 +100,9 @@ Deferred to v5.1 or later — post-migration type improvements:
 | LIB-02 | Phase 38 | Complete |
 | LIB-03 | Phase 38 | Complete |
 | LIB-04 | Phase 38 | Complete |
-| COMP-01 | Phase 39 | Pending |
-| COMP-02 | Phase 39 | Pending |
-| COMP-03 | Phase 39 | Pending |
+| COMP-01 | Phase 39 | Complete |
+| COMP-02 | Phase 39 | Complete |
+| COMP-03 | Phase 39 | Complete |
 | API-01 | Phase 40 | Pending |
 | API-02 | Phase 40 | Pending |
 | API-03 | Phase 40 | Pending |
@@ -125,4 +125,4 @@ Deferred to v5.1 or later — post-migration type improvements:
 
 ---
 *Requirements defined: 2026-02-05*
-*Last updated: 2026-02-06 — Phase 38 requirements complete*
+*Last updated: 2026-02-06 — Phase 39 requirements complete*

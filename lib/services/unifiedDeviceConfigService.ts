@@ -28,20 +28,26 @@ import { ref, get } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { DEVICE_CONFIG, DISPLAY_ITEMS, DEFAULT_DEVICE_ORDER } from '@/lib/devices/deviceTypes';
+import type { DeviceType } from '@/types/firebase';
 
 const CONFIG_VERSION = 3;
 
 /**
+ * Device ID type (union of device types)
+ */
+type DeviceId = DeviceType | string;
+
+/**
  * Get device metadata (name, icon, etc.) from registry
  */
-function getDeviceMetadata(deviceId) {
+function getDeviceMetadata(deviceId: DeviceId): Record<string, unknown> | null {
   return DEVICE_CONFIG[deviceId] || DISPLAY_ITEMS[deviceId] || null;
 }
 
 /**
  * Check if device is display-only (no navbar, no hardware)
  */
-export function isDisplayOnly(deviceId) {
+export function isDisplayOnly(deviceId: DeviceId): boolean {
   return !!DISPLAY_ITEMS[deviceId];
 }
 
@@ -49,7 +55,7 @@ export function isDisplayOnly(deviceId) {
  * Check if device has a homepage card
  * All devices have homepage cards except those not in CARD_COMPONENTS (sonos for now)
  */
-export function hasHomepageCard(deviceId) {
+export function hasHomepageCard(deviceId: DeviceId): boolean {
   // Sonos doesn't have a homepage card yet
   return deviceId !== 'sonos';
 }

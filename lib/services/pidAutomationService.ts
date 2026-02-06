@@ -15,9 +15,21 @@ import { ref, onValue, set } from 'firebase/database';
 import { db } from '@/lib/firebase';
 
 /**
+ * PID configuration interface
+ */
+export interface PIDConfig {
+  enabled: boolean;
+  targetRoomId: string | null;
+  manualSetpoint: number;
+  kp: number;
+  ki: number;
+  kd: number;
+}
+
+/**
  * Default PID configuration for new users
  */
-export const DEFAULT_PID_CONFIG = {
+export const DEFAULT_PID_CONFIG: PIDConfig = {
   enabled: false,
   targetRoomId: null,
   manualSetpoint: 20, // Manual setpoint temperature (15-25°C)
@@ -28,22 +40,13 @@ export const DEFAULT_PID_CONFIG = {
 
 /**
  * Get Firebase path for user's PID automation config
- * @param {string} userId - Auth0 user ID (sub claim)
- * @returns {string} - 'users/${userId}/pidAutomation'
  */
-const getPidPath = (userId) => `users/${userId}/pidAutomation`;
+const getPidPath = (userId: string): string => `users/${userId}/pidAutomation`;
 
 /**
  * Get PID automation config for a user (read once)
- *
- * @param {string} userId - Auth0 user ID (required)
- * @returns {Promise<Object>} - PID config or defaults
- *
- * @example
- * const config = await getPidConfig(session.user.sub);
- * console.log(config.enabled); // true/false
  */
-export async function getPidConfig(userId) {
+export async function getPidConfig(userId: string | undefined): Promise<PIDConfig> {
   // Return defaults if no userId provided
   if (!userId) {
     return { ...DEFAULT_PID_CONFIG };

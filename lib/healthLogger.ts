@@ -34,15 +34,38 @@ import { Timestamp } from 'firebase-admin/firestore';
 import { subDays } from 'date-fns';
 
 /**
+ * Health check result from checkUserStoveHealth
+ */
+interface HealthCheckResult {
+  userId?: string;
+  connectionStatus?: 'online' | 'offline' | 'error' | null;
+  stoveStatus?: string | null;
+  expectedState?: 'ON' | 'OFF' | null;
+  netatmoDemand?: 'heating' | 'idle' | null;
+  stateMismatch?: {
+    detected: boolean;
+    expected: string;
+    actual: string;
+    reason: string;
+  } | null;
+  error?: string;
+}
+
+/**
+ * Log options
+ */
+interface LogOptions {
+  duration?: number;
+}
+
+/**
  * Log health check run results to Firestore
  * Creates parent document with aggregated stats and subcollection with individual checks
- *
- * @param {Array} results - Array of Promise.allSettled results from checkUserStoveHealth
- * @param {Object} [options={}] - Optional metadata
- * @param {number} [options.duration] - Execution duration in milliseconds
- * @returns {Promise<string|null>} Parent document ID or null on error
  */
-export async function logHealthCheckRun(results, options = {}) {
+export async function logHealthCheckRun(
+  results: PromiseSettledResult<HealthCheckResult>[],
+  options: LogOptions = {}
+): Promise<string | null> {
   try {
     const db = getAdminFirestore();
 

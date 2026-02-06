@@ -17,8 +17,18 @@ import {
 import { getNextScheduledChange } from '@/lib/schedulerService';
 import { syncLivingRoomWithStove } from '@/lib/netatmoStoveSync';
 import { ApiError } from '@/lib/core';
+import type { StoveCommand } from '@/types/firebase';
+
+/**
+ * Stove command source
+ */
+type StoveCommandSource = 'manual' | 'scheduler';
 
 export class StoveService {
+  private maintenanceRepo: MaintenanceRepository;
+  private stoveStateRepo: StoveStateRepository;
+  private schedulerModeRepo: SchedulerModeRepository;
+
   constructor() {
     this.maintenanceRepo = new MaintenanceRepository();
     this.stoveStateRepo = new StoveStateRepository();
@@ -27,11 +37,8 @@ export class StoveService {
 
   /**
    * Ignite stove with maintenance check
-   * @param {number} power - Power level (1-5)
-   * @param {string} source - 'manual' or 'scheduler'
-   * @returns {Promise<Object>} Result
    */
-  async ignite(power = 3, source = 'manual') {
+  async ignite(power = 3, source: StoveCommandSource = 'manual'): Promise<unknown> {
     // Check maintenance
     const canIgnite = await this.maintenanceRepo.canIgnite();
     if (!canIgnite) {
@@ -66,10 +73,8 @@ export class StoveService {
 
   /**
    * Shutdown stove
-   * @param {string} source - 'manual' or 'scheduler'
-   * @returns {Promise<Object>} Result
    */
-  async shutdown(source = 'manual') {
+  async shutdown(source: StoveCommandSource = 'manual'): Promise<unknown> {
     // No maintenance check for shutdown - always allowed
     const result = await apiShutdown();
 

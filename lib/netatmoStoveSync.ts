@@ -22,6 +22,7 @@ import { adminDbGet, adminDbSet, adminDbUpdate } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getValidAccessToken } from '@/lib/netatmoTokenHelper';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
+import type { StoveState } from '@/types/firebase';
 
 // Default temperature when stove is ON
 const DEFAULT_STOVE_TEMPERATURE = 16;
@@ -30,9 +31,30 @@ const DEFAULT_STOVE_TEMPERATURE = 16;
 const MANUAL_SETPOINT_DURATION = 8 * 60 * 60;
 
 /**
+ * Stove sync room configuration
+ */
+interface StoveSyncRoom {
+  id: string;
+  name: string;
+  originalSetpoint: number;
+}
+
+/**
+ * Stove sync configuration
+ */
+interface StoveSyncConfig {
+  enabled: boolean;
+  rooms: StoveSyncRoom[];
+  stoveTemperature: number;
+  stoveMode: boolean;
+  lastSyncAt: number | null;
+  lastSyncAction: 'stove_on' | 'stove_off' | null;
+}
+
+/**
  * Get stove sync configuration from Firebase
  */
-export async function getStoveSyncConfig() {
+export async function getStoveSyncConfig(): Promise<StoveSyncConfig> {
   const stoveSyncPath = getEnvironmentPath('netatmo/stoveSync');
   const config = await adminDbGet(stoveSyncPath);
 

@@ -15,7 +15,7 @@ import { getEnvironmentPath } from '@/lib/environmentHelper';
 /**
  * Get refresh token from Firebase
  */
-export async function getRefreshToken() {
+export async function getRefreshToken(): Promise<string | null> {
   const snapshot = await get(ref(db, getEnvironmentPath('netatmo/refresh_token')));
   return snapshot.exists() ? snapshot.val() : null;
 }
@@ -23,14 +23,14 @@ export async function getRefreshToken() {
 /**
  * Save refresh token to Firebase
  */
-export async function saveRefreshToken(token) {
+export async function saveRefreshToken(token: string): Promise<void> {
   await set(ref(db, getEnvironmentPath('netatmo/refresh_token')), token);
 }
 
 /**
  * Get home_id from Firebase
  */
-export async function getHomeId() {
+export async function getHomeId(): Promise<string | null> {
   const snapshot = await get(ref(db, getEnvironmentPath('netatmo/home_id')));
   return snapshot.exists() ? snapshot.val() : null;
 }
@@ -38,14 +38,14 @@ export async function getHomeId() {
 /**
  * Save home_id to Firebase
  */
-export async function saveHomeId(homeId) {
+export async function saveHomeId(homeId: string): Promise<void> {
   await set(ref(db, getEnvironmentPath('netatmo/home_id')), homeId);
 }
 
 /**
  * Get topology from Firebase
  */
-export async function getTopology() {
+export async function getTopology(): Promise<unknown> {
   const snapshot = await get(ref(db, getEnvironmentPath('netatmo/topology')));
   return snapshot.exists() ? snapshot.val() : null;
 }

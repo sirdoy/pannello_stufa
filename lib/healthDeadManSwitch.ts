@@ -20,12 +20,20 @@ const DEAD_MAN_SWITCH_PATH = 'healthMonitoring/lastCheck';
 const STALE_THRESHOLD_MS = 10 * 60 * 1000; // 600000 ms
 
 /**
+ * Dead man's switch status
+ */
+interface DeadManSwitchStatus {
+  stale: boolean;
+  elapsed?: number;
+  lastCheck?: string;
+  reason?: 'never_run' | 'timeout';
+}
+
+/**
  * Update dead man's switch timestamp
  * Called at START of every cron execution (before any other processing)
- *
- * @returns {Promise<boolean>} true on success, false on error (never throws)
  */
-export async function updateDeadManSwitch() {
+export async function updateDeadManSwitch(): Promise<boolean> {
   try {
     const timestamp = new Date().toISOString();
     await adminDbSet(DEAD_MAN_SWITCH_PATH, timestamp);
@@ -39,13 +47,8 @@ export async function updateDeadManSwitch() {
 
 /**
  * Check if cron is stale (hasn't run recently)
- *
- * @returns {Promise<Object>} Status object:
- *   - { stale: false, elapsed, lastCheck } - Cron is healthy
- *   - { stale: true, reason: 'never_run' } - No timestamp recorded
- *   - { stale: true, elapsed, reason: 'timeout' } - Cron hasn't run in 10+ min
  */
-export async function checkDeadManSwitch() {
+export async function checkDeadManSwitch(): Promise<DeadManSwitchStatus> {
   try {
     const lastCheck = await adminDbGet(DEAD_MAN_SWITCH_PATH);
 
@@ -83,8 +86,7 @@ export async function checkDeadManSwitch() {
     // Treat errors as stale (fail-safe)
     return {
       stale: true,
-      reason: 'error',
-      error: error.message,
+      reason: 'never_run', // Use valid union type
     };
   }
 }
@@ -92,12 +94,11 @@ export async function checkDeadManSwitch() {
 /**
  * Send alert when cron is stale
  * Fire-and-forget: logs result but doesn't throw
- *
- * @param {string} reason - 'never_run' | 'timeout'
- * @param {Object} context - Additional context (elapsed time, etc.)
- * @returns {Promise<void>}
  */
-export async function alertDeadManSwitch(reason, context = {}) {
+export async function alertDeadManSwitch(
+  reason: 'never_run' | 'timeout',
+  context: Record<string, unknown> = {}
+): Promise<void> {
   try {
     const adminUserId = process.env.ADMIN_USER_ID;
 
@@ -107,11 +108,11 @@ export async function alertDeadManSwitch(reason, context = {}) {
     }
 
     // Build message based on reason
-    let message;
+    let message: string;
     if (reason === 'never_run') {
       message = 'Health monitoring cron has never executed';
     } else if (reason === 'timeout') {
-      const elapsedMinutes = Math.floor(context.elapsed / 60000);
+      const elapsedMinutes = Math.floor((context.elapsed as number) / 60000);
       message = `Health monitoring cron hasn't run in ${elapsedMinutes} minutes`;
     } else {
       message = `Health monitoring cron issue: ${reason}`;

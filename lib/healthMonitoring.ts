@@ -19,13 +19,29 @@ const OFF_STATES = ['STANDBY', 'SHUTDOWN', 'FINALIZZAZIONE'];
 const GRACE_PERIOD_MS = 15 * 60 * 1000; // 15 minutes for STARTING states
 
 /**
+ * Health check result
+ */
+export interface HealthCheck {
+  userId: string;
+  timestamp: number;
+  stoveStatus: string | null;
+  stoveError: string | null;
+  expectedState: 'ON' | 'OFF' | null;
+  netatmoDemand: 'heating' | 'idle' | null;
+  connectionStatus: 'online' | 'offline' | 'error';
+  stateMismatch: {
+    detected: boolean;
+    expected: string;
+    actual: string;
+    reason: string;
+  } | null;
+}
+
+/**
  * Check health for a single user's stove
  * Fetches data in parallel with graceful degradation
- *
- * @param {string} userId - User ID (Auth0 sub)
- * @returns {Promise<Object>} Health check result
  */
-export async function checkUserStoveHealth(userId) {
+export async function checkUserStoveHealth(userId: string): Promise<HealthCheck> {
   const timestamp = Date.now();
 
   // Fetch data in parallel - use Promise.allSettled for graceful degradation
@@ -70,11 +86,10 @@ export async function checkUserStoveHealth(userId) {
 
 /**
  * Determine stove connection status from API result
- *
- * @param {Object} stoveResult - Promise.allSettled result for stove status
- * @returns {string} 'online' | 'offline' | 'error'
  */
-export function determineConnectionStatus(stoveResult) {
+export function determineConnectionStatus(
+  stoveResult: PromiseSettledResult<unknown>
+): 'online' | 'offline' | 'error' {
   if (stoveResult.status === 'fulfilled') {
     // Successfully fetched status
     return 'online';
@@ -92,11 +107,6 @@ export function determineConnectionStatus(stoveResult) {
 /**
  * Detect state mismatch between expected and actual stove state
  * Uses both schedule and Netatmo heating demand as signals
- *
- * @param {Object} stoveResult - Promise.allSettled result for stove status
- * @param {Object} scheduleResult - Promise.allSettled result for schedule
- * @param {Object} netatmoResult - Promise.allSettled result for Netatmo demand
- * @returns {Object|null} Mismatch object or null if no mismatch
  */
 export function detectStateMismatch(stoveResult, scheduleResult, netatmoResult) {
   // Can't detect mismatch if stove status unavailable

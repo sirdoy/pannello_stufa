@@ -4,16 +4,24 @@
  */
 
 /**
+ * HLS segment
+ */
+interface HLSSegment {
+  url: string;
+  duration?: number;
+}
+
+/**
  * Check if m3u8 is a master playlist (contains stream variants)
  */
-function isMasterPlaylist(content) {
+function isMasterPlaylist(content: string): boolean {
   return content.includes('#EXT-X-STREAM-INF');
 }
 
 /**
  * Get the best quality stream URL from master playlist
  */
-function getBestStreamUrl(m3u8Content, baseUrl) {
+function getBestStreamUrl(m3u8Content: string, baseUrl: string): string | null {
   const lines = m3u8Content.split('\n');
   let bestBandwidth = 0;
   let bestUrl = null;
@@ -42,13 +50,10 @@ function getBestStreamUrl(m3u8Content, baseUrl) {
 
 /**
  * Parse M3U8 playlist and extract segment URLs
- * @param {string} m3u8Content - Content of the m3u8 file
- * @param {string} baseUrl - Base URL for relative segment paths
- * @returns {string[]} Array of segment URLs
  */
-function parseM3u8(m3u8Content, baseUrl) {
+function parseM3u8(m3u8Content: string, baseUrl: string): string[] {
   const lines = m3u8Content.split('\n');
-  const segments = [];
+  const segments: string[] = [];
 
   for (const line of lines) {
     const trimmed = line.trim();

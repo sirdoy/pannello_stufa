@@ -16,15 +16,15 @@ import {
  * Include anche il SandboxPanel quando abilitato
  */
 export default function SandboxToggle() {
-  const [isLocal, setIsLocal] = useState(false);
-  const [enabled, setEnabled] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [isLocal, setIsLocal] = useState<boolean>(false);
+  const [enabled, setEnabled] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    checkEnvironment();
+    void checkEnvironment();
   }, []);
 
-  async function checkEnvironment() {
+  async function checkEnvironment(): Promise<void> {
     const local = isLocalEnvironment();
     setIsLocal(local);
 
@@ -40,7 +40,7 @@ export default function SandboxToggle() {
     setLoading(false);
   }
 
-  async function handleToggle() {
+  async function handleToggle(): Promise<void> {
     try {
       const newState = !enabled;
       await toggleSandbox(newState);

@@ -1,12 +1,42 @@
 import Image from 'next/image';
 import Text from '@/app/components/ui/Text';
 import StatusBadge from '@/app/components/ui/StatusBadge';
+import type { ReactNode } from 'react';
 
-export default function LogEntry({ entry, formatDate, getIcon, getDeviceBadge }) {
+interface LogUser {
+  name?: string;
+  email?: string;
+  picture?: string;
+}
+
+interface DeviceBadge {
+  label: string;
+  icon?: string;
+  color: 'primary' | 'info' | 'warning' | 'success' | 'neutral';
+}
+
+interface LogEntryData {
+  action: string;
+  device?: string;
+  value?: string | number | null;
+  user?: LogUser;
+  timestamp: number | string;
+  day?: string;
+  roomName?: string;
+}
+
+export interface LogEntryProps {
+  entry: LogEntryData;
+  formatDate: (timestamp: number | string) => string;
+  getIcon: (action: string, device?: string) => ReactNode;
+  getDeviceBadge?: (device?: string) => DeviceBadge | null;
+}
+
+export default function LogEntry({ entry, formatDate, getIcon, getDeviceBadge }: LogEntryProps) {
   const deviceBadge = getDeviceBadge ? getDeviceBadge(entry.device) : null;
 
   // Map device colors to StatusBadge colors
-  const badgeColorMap = {
+  const badgeColorMap: Record<string, 'ember' | 'ocean' | 'warning' | 'sage' | 'neutral'> = {
     primary: 'ember',
     info: 'ocean',
     warning: 'warning',
@@ -28,7 +58,7 @@ export default function LogEntry({ entry, formatDate, getIcon, getDeviceBadge })
               {entry.user.picture && (
                 <Image
                   src={entry.user.picture}
-                  alt={entry.user.name || entry.user.email}
+                  alt={entry.user.name || entry.user.email || 'User'}
                   width={24}
                   height={24}
                   className="w-6 h-6 rounded-full ring-1 ring-white/10 [html:not(.dark)_&]:ring-black/10"

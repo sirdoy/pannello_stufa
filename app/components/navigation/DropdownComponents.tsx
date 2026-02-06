@@ -2,11 +2,19 @@
 
 import TransitionLink from '@/app/components/TransitionLink';
 import Text from '@/app/components/ui/Text';
+import type { ReactNode, CSSProperties } from 'react';
+import type { LucideIcon } from 'lucide-react';
 
 /**
  * Container per dropdown menu desktop - Ember Noir Design System
  */
-export function DropdownContainer({ children, className = '', align = 'left' }) {
+export interface DropdownContainerProps {
+  children: ReactNode;
+  className?: string;
+  align?: 'left' | 'right';
+}
+
+export function DropdownContainer({ children, className = '', align = 'left' }: DropdownContainerProps) {
   const alignmentClass = align === 'right' ? 'right-0' : 'left-0';
 
   return (
@@ -21,6 +29,17 @@ export function DropdownContainer({ children, className = '', align = 'left' }) 
 /**
  * Item standard del dropdown con hover effects - Ember Noir Design System
  */
+export interface DropdownItemProps {
+  href: string;
+  icon?: string | ReactNode;
+  label: string;
+  description?: string;
+  isActive?: boolean;
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+  animationDelay?: number;
+  className?: string;
+}
+
 export function DropdownItem({
   href,
   icon,
@@ -30,7 +49,7 @@ export function DropdownItem({
   onClick,
   animationDelay = 0,
   className = ''
-}) {
+}: DropdownItemProps) {
   const activeClasses = 'bg-ember-500/30 [html:not(.dark)_&]:bg-ember-500/20 text-ember-300 [html:not(.dark)_&]:text-ember-700 shadow-liquid-sm';
   const inactiveClasses = 'text-slate-200 [html:not(.dark)_&]:text-slate-800 hover:bg-slate-800/80 [html:not(.dark)_&]:hover:bg-slate-100/80 hover:shadow-liquid-sm hover:scale-[1.02]';
 
@@ -61,7 +80,14 @@ export function DropdownItem({
 /**
  * Card info per user dropdown - Ember Noir Design System
  */
-export function DropdownInfoCard({ title, subtitle, details, className = '' }) {
+export interface DropdownInfoCardProps {
+  title: string;
+  subtitle: string;
+  details?: string;
+  className?: string;
+}
+
+export function DropdownInfoCard({ title, subtitle, details, className = '' }: DropdownInfoCardProps) {
   return (
     <div className={`px-4 py-3.5 mb-1 rounded-xl bg-slate-800/60 [html:not(.dark)_&]:bg-slate-100/60 ${className}`}>
       <Text variant="label" size="xs" weight="semibold" className="mb-1.5">
@@ -82,7 +108,15 @@ export function DropdownInfoCard({ title, subtitle, details, className = '' }) {
 /**
  * Sezione menu mobile con header - Ember Noir Design System
  */
-export function MenuSection({ icon, title, children, hasBorder = false, className = '' }) {
+export interface MenuSectionProps {
+  icon?: string | ReactNode;
+  title?: string;
+  children: ReactNode;
+  hasBorder?: boolean;
+  className?: string;
+}
+
+export function MenuSection({ icon, title, children, hasBorder = false, className = '' }: MenuSectionProps) {
   return (
     <div className={`space-y-2 ${hasBorder ? 'pt-4 mt-4 border-t border-white/15 [html:not(.dark)_&]:border-white/30' : ''} ${className}`}>
       {title && (
@@ -103,6 +137,17 @@ export function MenuSection({ icon, title, children, hasBorder = false, classNam
 /**
  * Item menu mobile con effetti - Ember Noir Design System
  */
+export interface MenuItemProps {
+  href: string;
+  icon?: string | ReactNode;
+  label: string;
+  isActive?: boolean;
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+  animationDelay?: number;
+  variant?: 'default' | 'prominent';
+  className?: string;
+}
+
 export function MenuItem({
   href,
   icon,
@@ -110,9 +155,9 @@ export function MenuItem({
   isActive = false,
   onClick,
   animationDelay = 0,
-  variant = 'default', // 'default' | 'prominent'
+  variant = 'default',
   className = ''
-}) {
+}: MenuItemProps) {
   const activeClasses = 'bg-ember-500/30 [html:not(.dark)_&]:bg-ember-500/20 text-ember-300 [html:not(.dark)_&]:text-ember-700 shadow-liquid-md ring-1 ring-ember-500/40 [html:not(.dark)_&]:ring-ember-500/30 ring-inset';
   const inactiveClasses = variant === 'prominent'
     ? 'text-white bg-gradient-to-br from-ember-600 to-flame-700 [html:not(.dark)_&]:from-ember-500 [html:not(.dark)_&]:to-flame-600 hover:from-ember-700 hover:to-flame-800 [html:not(.dark)_&]:hover:from-ember-600 [html:not(.dark)_&]:hover:to-flame-700 shadow-liquid-lg hover:shadow-liquid-xl ring-1 ring-ember-600/50 [html:not(.dark)_&]:ring-ember-500/50 ring-inset'
@@ -126,7 +171,7 @@ export function MenuItem({
     <TransitionLink
       href={href}
       onClick={onClick}
-      style={{ animationDelay: `${animationDelay}ms` }}
+      style={{ animationDelay: `${animationDelay}ms` } as CSSProperties}
       className={`group flex items-center gap-3 px-4 ${paddingClass} ${roundingClass} text-sm ${fontClass} transition-all duration-300 relative overflow-hidden hover:scale-[1.02] ${
         isActive ? activeClasses : inactiveClasses
       } ${className}`}
@@ -144,7 +189,14 @@ export function MenuItem({
 /**
  * Card utente per mobile menu - Ember Noir Design System
  */
-export function UserInfoCard({ icon: Icon, name, email, className = '' }) {
+export interface UserInfoCardProps {
+  icon?: LucideIcon;
+  name: string;
+  email?: string;
+  className?: string;
+}
+
+export function UserInfoCard({ icon: Icon, name, email, className = '' }: UserInfoCardProps) {
   return (
     <div className={`flex items-center gap-3 px-4 py-4 rounded-2xl bg-slate-800/70 [html:not(.dark)_&]:bg-slate-100/70 backdrop-blur-2xl shadow-liquid-md ring-1 ring-white/15 [html:not(.dark)_&]:ring-white/25 ring-inset ${className}`}>
       <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-ember-500/30 to-flame-500/30 [html:not(.dark)_&]:from-ember-500/20 [html:not(.dark)_&]:to-flame-500/20">

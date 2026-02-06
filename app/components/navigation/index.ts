@@ -13,3 +13,12 @@ export {
   MenuItem,
   UserInfoCard
 } from './DropdownComponents';
+
+export type {
+  DropdownContainerProps,
+  DropdownItemProps,
+  DropdownInfoCardProps,
+  MenuSectionProps,
+  MenuItemProps,
+  UserInfoCardProps
+} from './DropdownComponents';

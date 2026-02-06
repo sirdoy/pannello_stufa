@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, createContext, useContext } from 'react';
+import { useState, useEffect, useCallback, useMemo, createContext, useContext, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import CommandPalette from '@/app/components/ui/CommandPalette';
 import { getDeviceCommands } from '@/lib/commands/deviceCommands';
@@ -15,11 +15,17 @@ import {
   RefreshCw,
 } from 'lucide-react';
 
+interface CommandPaletteContextValue {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  commands: any[];
+}
+
 /**
  * CommandPaletteContext
  * Provides access to command palette state and controls
  */
-export const CommandPaletteContext = createContext(null);
+export const CommandPaletteContext = createContext<CommandPaletteContextValue | null>(null);
 
 /**
  * useCommandPalette hook
@@ -28,12 +34,19 @@ export const CommandPaletteContext = createContext(null);
  * @example
  * const { open, setOpen, commands } = useCommandPalette();
  */
-export function useCommandPalette() {
+export function useCommandPalette(): CommandPaletteContextValue {
   const context = useContext(CommandPaletteContext);
   if (!context) {
     throw new Error('useCommandPalette must be used within CommandPaletteProvider');
   }
   return context;
+}
+
+export interface CommandPaletteProviderProps {
+  /** App content */
+  children: ReactNode;
+  /** Custom commands (merged with defaults) */
+  commands?: any[];
 }
 
 /**
@@ -53,13 +66,9 @@ export function useCommandPalette() {
  * <CommandPaletteProvider>
  *   {children}
  * </CommandPaletteProvider>
- *
- * @param {Object} props
- * @param {React.ReactNode} props.children - App content
- * @param {Array} [props.commands] - Custom commands (merged with defaults)
  */
-export default function CommandPaletteProvider({ children, commands: customCommands }) {
-  const [open, setOpen] = useState(false);
+export default function CommandPaletteProvider({ children, commands: customCommands }: CommandPaletteProviderProps) {
+  const [open, setOpen] = useState<boolean>(false);
   const router = useRouter();
 
   /**

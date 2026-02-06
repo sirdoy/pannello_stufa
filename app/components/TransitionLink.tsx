@@ -9,6 +9,7 @@ interface TransitionLinkProps extends Omit<LinkProps, 'onClick'> {
   children: ReactNode;
   transitionType?: string;
   className?: string;
+  style?: React.CSSProperties;
   onClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
 }
 
@@ -49,6 +50,8 @@ export default function TransitionLink({
   children,
   transitionType,
   className = '',
+  style,
+  onClick,
   prefetch,
   replace,
   scroll,
@@ -59,6 +62,12 @@ export default function TransitionLink({
   const { startTransition, setTransitionType } = usePageTransition();
 
   const handleClick = async (e: MouseEvent<HTMLAnchorElement>) => {
+    // Call custom onClick if provided
+    onClick?.(e);
+
+    if (e.defaultPrevented) {
+      return;
+    }
     // Don't intercept:
     // - Cmd/Ctrl clicks (open in new tab)
     // - External links
@@ -93,6 +102,7 @@ export default function TransitionLink({
     <Link
       href={href}
       className={className}
+      style={style}
       onClick={handleClick}
       prefetch={prefetch}
       {...restProps}

@@ -35,28 +35,28 @@ import {
  * Visibile SOLO in localhost quando sandbox è abilitato
  */
 export default function SandboxPanel() {
-  const [isLocal, setIsLocal] = useState(false);
-  const [sandboxEnabled, setSandboxEnabled] = useState(false);
-  const [stoveState, setStoveState] = useState(null);
-  const [maintenance, setMaintenance] = useState(null);
-  const [settings, setSettings] = useState(null);
-  const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showHistory, setShowHistory] = useState(false);
+  const [isLocal, setIsLocal] = useState<boolean>(false);
+  const [sandboxEnabled, setSandboxEnabled] = useState<boolean>(false);
+  const [stoveState, setStoveState] = useState<any>(null);
+  const [maintenance, setMaintenance] = useState<any>(null);
+  const [settings, setSettings] = useState<any>(null);
+  const [history, setHistory] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showHistory, setShowHistory] = useState<boolean>(false);
 
   // Form states
-  const [newHours, setNewHours] = useState(0);
-  const [newPower, setNewPower] = useState(3);
-  const [newFan, setNewFan] = useState(0);
-  const [newTemperature, setNewTemperature] = useState(20);
+  const [newHours, setNewHours] = useState<number>(0);
+  const [newPower, setNewPower] = useState<number>(3);
+  const [newFan, setNewFan] = useState<number>(0);
+  const [newTemperature, setNewTemperature] = useState<number>(20);
 
   // Scheduler states
-  const [schedulerMode, setSchedulerModeState] = useState({ enabled: false, semiManual: false });
-  const [testIntervalStart, setTestIntervalStart] = useState('');
-  const [testIntervalEnd, setTestIntervalEnd] = useState('');
-  const [testIntervalPower, setTestIntervalPower] = useState(3);
-  const [testIntervalFan, setTestIntervalFan] = useState(3);
+  const [schedulerMode, setSchedulerModeState] = useState<any>({ enabled: false, semiManual: false });
+  const [testIntervalStart, setTestIntervalStart] = useState<string>('');
+  const [testIntervalEnd, setTestIntervalEnd] = useState<string>('');
+  const [testIntervalPower, setTestIntervalPower] = useState<number>(3);
+  const [testIntervalFan, setTestIntervalFan] = useState<number>(3);
 
   const loadData = useCallback(async () => {
     try {
@@ -289,9 +289,12 @@ export default function SandboxPanel() {
       {/* Error banner */}
       {error && (
         <Banner
-          type="error"
-          message={error}
-          onClose={() => setError(null)}
+          variant="error"
+          icon="⚠️"
+          title="Errore"
+          description={error}
+          dismissible
+          onDismiss={() => setError(null)}
         />
       )}
 
@@ -414,7 +417,7 @@ export default function SandboxPanel() {
             min="0"
             max="300"
             value={newHours}
-            onChange={(e) => setNewHours(e.target.value)}
+            onChange={(e) => setNewHours(parseInt(e.target.value, 10))}
             className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white font-bold"
             placeholder="Ore lavorate"
           />

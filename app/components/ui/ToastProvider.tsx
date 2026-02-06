@@ -1,23 +1,57 @@
 'use client';
 
+import type React from 'react';
 import { createContext, useCallback, useState, useRef } from 'react';
 import * as ToastPrimitive from '@radix-ui/react-toast';
 import Toast, { ToastViewport } from './Toast';
+
+export interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
+export interface ToastOptions {
+  variant?: 'success' | 'error' | 'warning' | 'info';
+  message: string;
+  title?: string;
+  duration?: number;
+  action?: ToastAction;
+}
+
+export interface ToastContextValue {
+  toast: (options: ToastOptions) => number;
+  dismiss: (id: number) => void;
+  dismissAll: () => void;
+  success: (message: string, opts?: Partial<ToastOptions>) => number;
+  error: (message: string, opts?: Partial<ToastOptions>) => number;
+  warning: (message: string, opts?: Partial<ToastOptions>) => number;
+  info: (message: string, opts?: Partial<ToastOptions>) => number;
+}
 
 /**
  * Toast Context
  * Provides imperative toast API across the app
  */
-export const ToastContext = createContext(null);
+export const ToastContext = createContext<ToastContextValue | null>(null);
+
+interface ToastData {
+  id: number;
+  variant: 'success' | 'error' | 'warning' | 'info';
+  message: string;
+  title?: string;
+  duration: number;
+  action?: ToastAction;
+}
+
+export interface ToastProviderProps {
+  children: React.ReactNode;
+}
 
 /**
  * ToastProvider Component
  *
  * Wraps the app to provide toast notifications with stacking behavior.
  * Max 3 toasts visible at once, oldest removed when new ones added.
- *
- * @param {Object} props
- * @param {React.ReactNode} props.children - App content
  *
  * @example
  * // In layout.js
@@ -29,23 +63,14 @@ export const ToastContext = createContext(null);
  * const { success, error } = useToast();
  * success('Saved successfully!');
  */
-export function ToastProvider({ children }) {
-  const [toasts, setToasts] = useState([]);
+export function ToastProvider({ children }: ToastProviderProps) {
+  const [toasts, setToasts] = useState<ToastData[]>([]);
   const toastIdRef = useRef(0);
 
   /**
    * Create a new toast notification
-   * @param {Object} options - Toast options
-   * @param {'success'|'error'|'warning'|'info'} options.variant - Toast variant
-   * @param {string} options.message - Toast message
-   * @param {string} [options.title] - Optional title
-   * @param {number} [options.duration] - Auto-dismiss duration (ms), default 5000 (8000 for errors)
-   * @param {Object} [options.action] - Optional action button
-   * @param {string} options.action.label - Action button label
-   * @param {Function} options.action.onClick - Action button handler
-   * @returns {number} Toast ID for manual dismissal
    */
-  const toast = useCallback(({ variant = 'info', message, title, duration, action }) => {
+  const toast = useCallback(({ variant = 'info', message, title, duration, action }: ToastOptions) => {
     const id = ++toastIdRef.current;
 
     // Default duration: 5000ms, 8000ms for errors
@@ -81,16 +106,16 @@ export function ToastProvider({ children }) {
   }, []);
 
   // Convenience methods for common toast types
-  const success = useCallback((message, opts = {}) =>
+  const success = useCallback((message: string, opts: Partial<ToastOptions> = {}) =>
     toast({ variant: 'success', message, ...opts }), [toast]);
 
-  const error = useCallback((message, opts = {}) =>
+  const error = useCallback((message: string, opts: Partial<ToastOptions> = {}) =>
     toast({ variant: 'error', message, ...opts }), [toast]);
 
-  const warning = useCallback((message, opts = {}) =>
+  const warning = useCallback((message: string, opts: Partial<ToastOptions> = {}) =>
     toast({ variant: 'warning', message, ...opts }), [toast]);
 
-  const info = useCallback((message, opts = {}) =>
+  const info = useCallback((message: string, opts: Partial<ToastOptions> = {}) =>
     toast({ variant: 'info', message, ...opts }), [toast]);
 
   // Only show max 3 toasts, slice from end (newest on top)

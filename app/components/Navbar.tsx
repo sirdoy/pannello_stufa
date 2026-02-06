@@ -20,11 +20,8 @@ import TransitionLink from './TransitionLink';
  * Get mobile bottom nav quick actions based on enabled devices
  * Max 4 items: Home + device-specific actions + Log
  * Priority: Stove > Thermostat > Lights
- *
- * @param {object} navStructure - Navigation structure with devices
- * @returns {Array} Array of { href, icon, label }
  */
-export function getMobileQuickActions(navStructure) {
+export function getMobileQuickActions(navStructure: any) {
   const actions = [];
 
   // Always: Home
@@ -66,13 +63,13 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [settingsDropdownOpen, setSettingsDropdownOpen] = useState(false);
-  const [desktopDeviceDropdown, setDesktopDeviceDropdown] = useState(null);
-  const [user, setUser] = useState(null);
-  const [devicePreferences, setDevicePreferences] = useState({});
+  const [desktopDeviceDropdown, setDesktopDeviceDropdown] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
+  const [devicePreferences, setDevicePreferences] = useState<any>({});
 
-  const userDropdownRef = useRef(null);
-  const settingsDropdownRef = useRef(null);
-  const desktopDeviceRefs = useRef({});
+  const userDropdownRef = useRef<HTMLDivElement>(null);
+  const settingsDropdownRef = useRef<HTMLDivElement>(null);
+  const desktopDeviceRefs = useRef<any>({});
   const pathname = usePathname();
   const navStructure = getNavigationStructureWithPreferences(devicePreferences);
 
@@ -265,7 +262,7 @@ export default function Navbar() {
                 <div
                   key={device.id}
                   className="relative"
-                  ref={(el) => (desktopDeviceRefs.current[device.id] = el)}
+                  ref={(el) => { if (el) desktopDeviceRefs.current[device.id] = el; }}
                 >
                   <button
                     onClick={() => setDesktopDeviceDropdown(desktopDeviceDropdown === device.id ? null : device.id)}

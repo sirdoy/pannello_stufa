@@ -10,13 +10,19 @@ import Heading from './ui/Heading';
 import Text from './ui/Text';
 import { X } from 'lucide-react';
 
-export default function WhatsNewModal({ isOpen, onClose, dontShowAgain }) {
+interface WhatsNewModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  dontShowAgain: () => void;
+}
+
+export default function WhatsNewModal({ isOpen, onClose, dontShowAgain }: WhatsNewModalProps) {
   // Prendi la versione corrente dal VERSION_HISTORY
   const currentVersionData = VERSION_HISTORY.find(v => v.version === APP_VERSION) || VERSION_HISTORY[0];
 
   if (!isOpen) return null;
 
-  const getVersionIcon = (type) => {
+  const getVersionIcon = (type: string) => {
     switch (type) {
       case 'major': return '🚀';
       case 'minor': return '✨';
@@ -25,7 +31,7 @@ export default function WhatsNewModal({ isOpen, onClose, dontShowAgain }) {
     }
   };
 
-  const getVersionColor = (type) => {
+  const getVersionColor = (type: string) => {
     switch (type) {
       case 'major': return 'from-ember-500 to-flame-500';
       case 'minor': return 'from-sage-500 to-ocean-500';
@@ -34,7 +40,7 @@ export default function WhatsNewModal({ isOpen, onClose, dontShowAgain }) {
     }
   };
 
-  const getVersionTypeLabel = (type) => {
+  const getVersionTypeLabel = (type: string) => {
     switch (type) {
       case 'major': return 'Major Release';
       case 'minor': return 'Aggiornamento';

@@ -25,23 +25,16 @@ import { Heading, Text } from './ui';
 
 /**
  * Get nested value from object using dot notation
- * @param {Object} obj - Source object
- * @param {string} path - Dot notation path (e.g., 'severityLevels.info')
- * @returns {any}
  */
-function getNestedValue(obj, path) {
+function getNestedValue(obj: any, path: string): any {
   if (!obj || !path) return undefined;
   return path.split('.').reduce((acc, key) => acc?.[key], obj);
 }
 
 /**
  * Set nested value in object using dot notation
- * @param {Object} obj - Source object
- * @param {string} path - Dot notation path
- * @param {any} value - Value to set
- * @returns {Object} New object with value set
  */
-function setNestedValue(obj, path, value) {
+function setNestedValue(obj: any, path: string, value: any): any {
   const keys = path.split('.');
   const result = { ...obj };
 
@@ -50,7 +43,7 @@ function setNestedValue(obj, path, value) {
     return result;
   }
 
-  let current = result;
+  let current: any = result;
   for (let i = 0; i < keys.length - 1; i++) {
     current[keys[i]] = { ...current[keys[i]] };
     current = current[keys[i]];
@@ -60,10 +53,19 @@ function setNestedValue(obj, path, value) {
   return result;
 }
 
+interface PreferenceToggleProps {
+  label: string;
+  description?: string;
+  checked: boolean;
+  onChange: (value: boolean) => void;
+  disabled?: boolean;
+  icon?: string;
+}
+
 /**
  * PreferenceToggle - Wrapper for Toggle with label and description
  */
-function PreferenceToggle({ label, description, checked, onChange, disabled = false, icon }) {
+function PreferenceToggle({ label, description, checked, onChange, disabled = false, icon }: PreferenceToggleProps) {
   return (
     <div className="flex items-start justify-between gap-4 py-3">
       <div className="flex-1">
@@ -88,10 +90,18 @@ function PreferenceToggle({ label, description, checked, onChange, disabled = fa
   );
 }
 
+interface CategorySectionProps {
+  categoryId: string;
+  config: any;
+  preferences: any;
+  onSave: (categoryId: string, prefs: any) => void;
+  isSaving: boolean;
+}
+
 /**
  * Category Section Component
  */
-function CategorySection({ categoryId, config, preferences, onSave, isSaving }) {
+function CategorySection({ categoryId, config, preferences, onSave, isSaving }: CategorySectionProps) {
   const categoryPrefs = preferences[categoryId] || {};
   const isEnabled = categoryPrefs.enabled ?? DEFAULT_PREFERENCES[categoryId]?.enabled ?? true;
 

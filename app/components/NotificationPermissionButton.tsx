@@ -27,11 +27,16 @@ import Button from './ui/Button';
 import Banner from './ui/Banner';
 import { Text } from './ui';
 
-export default function NotificationPermissionButton({ onSuccess, onError }) {
+interface NotificationPermissionButtonProps {
+  onSuccess?: (token: string) => void;
+  onError?: (error: Error) => void;
+}
+
+export default function NotificationPermissionButton({ onSuccess, onError }: NotificationPermissionButtonProps) {
   const { user } = useUser();
-  const [permission, setPermission] = useState('default');
+  const [permission, setPermission] = useState<NotificationPermission>('default');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [supported, setSupported] = useState(true);
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
 

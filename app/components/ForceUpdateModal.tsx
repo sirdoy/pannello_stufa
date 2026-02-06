@@ -7,11 +7,16 @@ import Button from './ui/Button';
 import Heading from './ui/Heading';
 import Text from './ui/Text';
 
+interface ForceUpdateModalProps {
+  show: boolean;
+  firebaseVersion: string;
+}
+
 /**
  * Modal bloccante per forzare aggiornamento applicazione
  * Non può essere chiusa dall'utente - solo con reload
  */
-export default function ForceUpdateModal({ show, firebaseVersion }) {
+export default function ForceUpdateModal({ show, firebaseVersion }: ForceUpdateModalProps) {
   if (!show) return null;
 
   const handleReload = () => {

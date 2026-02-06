@@ -6,9 +6,13 @@ import { db } from '@/lib/firebase';
 import Banner from './ui/Banner';
 import Button from './ui/Button';
 
-export default function CronHealthBanner({ variant = 'banner' }) {
+interface CronHealthBannerProps {
+  variant?: 'banner' | 'inline';
+}
+
+export default function CronHealthBanner({ variant = 'banner' }: CronHealthBannerProps) {
   const [showBanner, setShowBanner] = useState(false);
-  const [lastCallTime, setLastCallTime] = useState(null);
+  const [lastCallTime, setLastCallTime] = useState<string | null>(null);
   const [minutesSinceLastCall, setMinutesSinceLastCall] = useState(0);
 
   useEffect(() => {
@@ -42,7 +46,7 @@ export default function CronHealthBanner({ variant = 'banner' }) {
 
       const lastCallDate = new Date(lastCallTime);
       const now = new Date();
-      const diffMs = now - lastCallDate;
+      const diffMs = now.getTime() - lastCallDate.getTime();
       const diffMinutes = Math.floor(diffMs / 1000 / 60);
 
       console.log('🔍 Cron Health Check:', {

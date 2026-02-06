@@ -1,11 +1,23 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, MouseEvent } from 'react';
 import styles from './MaintenanceBar.module.css';
 import { formatHoursToHHMM } from '@/lib/formatUtils';
 import { Text, StatusBadge } from './ui';
 
-export default function MaintenanceBar({ maintenanceStatus }) {
+interface MaintenanceStatus {
+  currentHours: number;
+  targetHours: number;
+  percentage: number;
+  remainingHours: number;
+  isNearLimit: boolean;
+}
+
+interface MaintenanceBarProps {
+  maintenanceStatus: MaintenanceStatus | null;
+}
+
+export default function MaintenanceBar({ maintenanceStatus }: MaintenanceBarProps) {
   // Auto-expand quando ≥80% o user preference da localStorage
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -39,7 +51,7 @@ export default function MaintenanceBar({ maintenanceStatus }) {
   const { currentHours, targetHours, percentage, remainingHours, isNearLimit } = maintenanceStatus;
 
   // Salva preferenza in localStorage quando user toglie manualmente
-  const toggleExpanded = (e) => {
+  const toggleExpanded = (e: MouseEvent) => {
     e.preventDefault(); // Previeni navigazione su click toggle
     e.stopPropagation();
     const newState = !isExpanded;

@@ -8,11 +8,6 @@
  * - Geolocation button ("Usa la mia posizione")
  * - Collapsible manual coordinate entry
  * - Error display with Italian messages
- *
- * @param {Object} props
- * @param {Function} props.onLocationSelected - Callback: ({ latitude, longitude, name }) => void
- * @param {Object} props.currentLocation - Current location to display: { name, latitude, longitude }
- * @param {string} props.className - Additional container classes
  */
 
 import { useState, useEffect } from 'react';
@@ -24,14 +19,35 @@ import Banner from '@/app/components/ui/Banner';
 import { Text } from '@/app/components/ui';
 import { cn } from '@/lib/utils/cn';
 
+interface LocationData {
+  latitude: number;
+  longitude: number;
+  name: string;
+}
+
+interface Suggestion {
+  id: number;
+  name: string;
+  country: string;
+  admin1?: string;
+  latitude: number;
+  longitude: number;
+}
+
+interface LocationSearchProps {
+  onLocationSelected: (location: LocationData) => void;
+  currentLocation?: LocationData | null;
+  className?: string;
+}
+
 export default function LocationSearch({
   onLocationSelected,
   currentLocation,
   className,
-}) {
+}: LocationSearchProps) {
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
   // Geolocation state
@@ -43,7 +59,7 @@ export default function LocationSearch({
   const [manualLon, setManualLon] = useState('');
 
   // Error state
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Debounce search query
   const debouncedQuery = useDebounce(searchQuery, 300);
@@ -91,7 +107,7 @@ export default function LocationSearch({
   }, [debouncedQuery]);
 
   // Handle suggestion selection
-  const handleSelectSuggestion = (suggestion) => {
+  const handleSelectSuggestion = (suggestion: Suggestion) => {
     const locationName = suggestion.admin1
       ? `${suggestion.name}, ${suggestion.admin1}, ${suggestion.country}`
       : `${suggestion.name}, ${suggestion.country}`;

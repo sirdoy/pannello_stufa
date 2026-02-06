@@ -22,7 +22,7 @@ import { getNetatmoAuthUrl } from '@/lib/netatmoCredentials';
 import { clearSemiManualMode } from '@/lib/schedulerApiClient';
 import { STOVE_ROUTES } from '@/lib/routes';
 import { logStoveAction, logNetatmoAction, logSchedulerAction } from '@/lib/logService';
-import { logError, shouldNotify, sendErrorNotification } from '@/lib/errorMonitor';
+import { logError, shouldNotify } from '@/lib/errorMonitor';
 import { useVersion } from '@/app/context/VersionContext';
 import { getMaintenanceStatus, confirmCleaning } from '@/lib/maintenanceService';
 import Card from './ui/Card';
@@ -42,25 +42,25 @@ export default function StovePanel() {
   const { checkVersion } = useVersion();
   const { user } = useUser();
 
-  const [status, setStatus] = useState('...');
-  const [fanLevel, setFanLevel] = useState(null);
-  const [powerLevel, setPowerLevel] = useState(null);
-  const [ambientTemp, setAmbientTemp] = useState(null);
+  const [status, setStatus] = useState<string>('...');
+  const [fanLevel, setFanLevel] = useState<number | null>(null);
+  const [powerLevel, setPowerLevel] = useState<number | null>(null);
+  const [ambientTemp, setAmbientTemp] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [schedulerEnabled, setSchedulerEnabled] = useState(false);
   const [semiManualMode, setSemiManualMode] = useState(false);
-  const [returnToAutoAt, setReturnToAutoAt] = useState(null);
-  const [nextScheduledAction, setNextScheduledAction] = useState(null);
+  const [returnToAutoAt, setReturnToAutoAt] = useState<string | null>(null);
+  const [nextScheduledAction, setNextScheduledAction] = useState<any>(null);
   const [initialLoading, setInitialLoading] = useState(true);
 
   // Error monitoring states
   const [errorCode, setErrorCode] = useState(0);
   const [errorDescription, setErrorDescription] = useState('');
-  const previousErrorCode = useRef(0);
+  const previousErrorCode = useRef<number>(0);
 
   // Maintenance states
-  const [maintenanceStatus, setMaintenanceStatus] = useState(null);
+  const [maintenanceStatus, setMaintenanceStatus] = useState<any>(null);
   const [cleaningInProgress, setCleaningInProgress] = useState(false);
 
   const handleNetatmoLogout = async () => {

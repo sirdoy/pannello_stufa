@@ -5,18 +5,37 @@
  * All operations require authentication (handled by API routes).
  */
 
+/** Schedule metadata */
+export interface ScheduleMetadata {
+  id: string;
+  name: string;
+  enabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+  intervalCount?: number;
+}
+
+/** Schedule with full data */
+export interface Schedule extends ScheduleMetadata {
+  slots: Record<string, unknown[]>;
+}
+
+/** API error response */
+interface ApiError {
+  error?: string;
+}
+
 /**
  * Get all schedules (metadata only)
- * @returns {Promise<Array>} Array of schedule metadata
  */
-export async function getAllSchedules() {
+export async function getAllSchedules(): Promise<ScheduleMetadata[]> {
   const response = await fetch('/api/schedules', {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' }
   });
 
   if (!response.ok) {
-    const error = await response.json();
+    const error = await response.json() as ApiError;
     throw new Error(error.error || 'Failed to fetch schedules');
   }
 
@@ -25,10 +44,8 @@ export async function getAllSchedules() {
 
 /**
  * Get specific schedule by ID
- * @param {string} scheduleId - Schedule ID
- * @returns {Promise<Object>} Schedule object
  */
-export async function getScheduleById(scheduleId) {
+export async function getScheduleById(scheduleId: string): Promise<Schedule> {
   const response = await fetch(`/api/schedules/${scheduleId}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' }
@@ -44,11 +61,8 @@ export async function getScheduleById(scheduleId) {
 
 /**
  * Create new schedule
- * @param {string} name - Schedule name
- * @param {string} [copyFromId] - Optional: ID of schedule to copy from
- * @returns {Promise<Object>} Created schedule with ID
  */
-export async function createSchedule(name, copyFromId = null) {
+export async function createSchedule(name: string, copyFromId: string | null = null): Promise<Schedule> {
   const response = await fetch('/api/schedules', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -68,11 +82,8 @@ export async function createSchedule(name, copyFromId = null) {
 
 /**
  * Update schedule
- * @param {string} scheduleId - Schedule ID
- * @param {Object} updates - Fields to update (name, slots, enabled)
- * @returns {Promise<Object>} Updated schedule
  */
-export async function updateSchedule(scheduleId, updates) {
+export async function updateSchedule(scheduleId: string, updates: Partial<Schedule>): Promise<Schedule> {
   const response = await fetch(`/api/schedules/${scheduleId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -89,10 +100,8 @@ export async function updateSchedule(scheduleId, updates) {
 
 /**
  * Delete schedule
- * @param {string} scheduleId - Schedule ID
- * @returns {Promise<Object>} Success confirmation
  */
-export async function deleteSchedule(scheduleId) {
+export async function deleteSchedule(scheduleId: string): Promise<{ success: boolean }> {
   const response = await fetch(`/api/schedules/${scheduleId}`, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' }
@@ -108,9 +117,8 @@ export async function deleteSchedule(scheduleId) {
 
 /**
  * Get active schedule ID
- * @returns {Promise<string>} Active schedule ID
  */
-export async function getActiveScheduleId() {
+export async function getActiveScheduleId(): Promise<string> {
   const response = await fetch('/api/schedules/active', {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' }
@@ -121,16 +129,14 @@ export async function getActiveScheduleId() {
     throw new Error(error.error || 'Failed to fetch active schedule ID');
   }
 
-  const data = await response.json();
+  const data = await response.json() as { activeScheduleId: string };
   return data.activeScheduleId;
 }
 
 /**
  * Set active schedule
- * @param {string} scheduleId - Schedule ID to activate
- * @returns {Promise<Object>} Success confirmation
  */
-export async function setActiveSchedule(scheduleId) {
+export async function setActiveSchedule(scheduleId: string): Promise<{ success: boolean }> {
   const response = await fetch('/api/schedules/active', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

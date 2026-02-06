@@ -5,12 +5,24 @@
  * Sostituisce le chiamate dirette a schedulerService che richiedono WRITE.
  */
 
+/** Schedule interval */
+export interface ScheduleInterval {
+  start: string;
+  end: string;
+  power: number;
+  fan: number;
+}
+
+/** API response */
+interface ApiResponse {
+  success: boolean;
+  error?: string;
+}
+
 /**
  * Save schedule for a specific day
- * @param {string} day - Day name (e.g., "Lunedì")
- * @param {Array} schedule - Schedule intervals
  */
-export async function saveSchedule(day, schedule) {
+export async function saveSchedule(day: string, schedule: ScheduleInterval[]): Promise<ApiResponse> {
   const response = await fetch('/api/scheduler/update', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -21,7 +33,7 @@ export async function saveSchedule(day, schedule) {
   });
 
   if (!response.ok) {
-    const error = await response.json();
+    const error = await response.json() as { error?: string };
     throw new Error(error.error || 'Failed to save schedule');
   }
 
@@ -30,9 +42,8 @@ export async function saveSchedule(day, schedule) {
 
 /**
  * Set scheduler mode (enable/disable)
- * @param {boolean} enabled - Enable or disable scheduler
  */
-export async function setSchedulerMode(enabled) {
+export async function setSchedulerMode(enabled: boolean): Promise<ApiResponse> {
   const response = await fetch('/api/scheduler/update', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -52,9 +63,8 @@ export async function setSchedulerMode(enabled) {
 
 /**
  * Activate semi-manual mode
- * @param {string} returnToAutoAt - ISO timestamp when to return to auto
  */
-export async function setSemiManualMode(returnToAutoAt) {
+export async function setSemiManualMode(returnToAutoAt: string): Promise<ApiResponse> {
   const response = await fetch('/api/scheduler/update', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -75,7 +85,7 @@ export async function setSemiManualMode(returnToAutoAt) {
 /**
  * Clear semi-manual mode (return to automatic)
  */
-export async function clearSemiManualMode() {
+export async function clearSemiManualMode(): Promise<ApiResponse> {
   const response = await fetch('/api/scheduler/update', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

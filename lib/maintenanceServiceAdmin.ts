@@ -8,7 +8,27 @@ import { shouldSendMaintenanceNotification } from './maintenance/helpers';
 const MAINTENANCE_REF = 'maintenance';
 const DEFAULT_TARGET_HOURS = 50;
 
-export async function trackUsageHours(stoveStatus) {
+/** Maintenance data stored in Firebase */
+interface MaintenanceData {
+  currentHours: number;
+  targetHours: number;
+  lastCleanedAt: string | null;
+  needsCleaning: boolean;
+  lastUpdatedAt: string;
+  lastNotificationLevel: number;
+}
+
+/** Track usage hours result */
+interface TrackUsageResult {
+  tracked: boolean;
+  reason?: string;
+  elapsedMinutes?: number;
+  newCurrentHours?: number;
+  notificationData?: unknown;
+  error?: string;
+}
+
+export async function trackUsageHours(stoveStatus: string): Promise<TrackUsageResult> {
   try {
     const isWorking = (
       stoveStatus.includes('WORK') ||
@@ -21,7 +41,7 @@ export async function trackUsageHours(stoveStatus) {
 
     const now = new Date();
 
-    const transactionResult = await adminDbTransaction(MAINTENANCE_REF, (currentData) => {
+    const transactionResult = await adminDbTransaction(MAINTENANCE_REF, (currentData: MaintenanceData | null) => {
       if (!currentData) {
         return {
           currentHours: 0,
@@ -73,15 +93,15 @@ export async function trackUsageHours(stoveStatus) {
         result.lastNotificationLevel = notificationData.notificationLevel;
       }
 
-      return result;
+      return result as MaintenanceData & { _elapsedMinutes: number; _notificationData: unknown };
     });
 
-    const updatedData = transactionResult;
+    const updatedData = transactionResult as MaintenanceData & { _notificationData?: unknown; _elapsedMinutes?: number };
     const notificationData = updatedData._notificationData || null;
     const elapsedMinutes = updatedData._elapsedMinutes || 0;
 
-    delete updatedData._notificationData;
-    delete updatedData._elapsedMinutes;
+    delete (updatedData as Record<string, unknown>)._notificationData;
+    delete (updatedData as Record<string, unknown>)._elapsedMinutes;
 
     return {
       tracked: true,
@@ -95,9 +115,9 @@ export async function trackUsageHours(stoveStatus) {
   }
 }
 
-export async function canIgnite() {
+export async function canIgnite(): Promise<boolean> {
   try {
-    const data = await adminDbGet(MAINTENANCE_REF);
+    const data = await adminDbGet(MAINTENANCE_REF) as MaintenanceData | null;
     if (!data) return true;
     return !data.needsCleaning;
   } catch (error) {

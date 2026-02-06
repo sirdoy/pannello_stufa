@@ -6,11 +6,38 @@ import { shouldSendMaintenanceNotification } from './maintenance/helpers';
 const MAINTENANCE_REF = 'maintenance';
 const DEFAULT_TARGET_HOURS = 50;
 
+/** Maintenance data stored in Firebase */
+export interface MaintenanceData {
+  currentHours: number;
+  targetHours: number;
+  lastCleanedAt: string | null;
+  needsCleaning: boolean;
+  lastUpdatedAt: string | null;
+  lastNotificationLevel?: number;
+}
+
+/** Track usage hours result */
+export interface TrackUsageResult {
+  tracked: boolean;
+  reason?: string;
+  elapsedMinutes?: number;
+  newCurrentHours?: number;
+  needsCleaning?: boolean;
+  notificationData?: unknown;
+}
+
+/** Maintenance status summary */
+export interface MaintenanceStatus extends MaintenanceData {
+  percentage: number;
+  remainingHours: number;
+  isNearLimit: boolean;
+}
+
 /**
  * Get maintenance data from Firebase
  * Se sandbox è attivo in localhost, legge da sandbox/maintenance
  */
-export async function getMaintenanceData() {
+export async function getMaintenanceData(): Promise<MaintenanceData> {
   try {
     // Check sandbox mode
     if (isLocalEnvironment()) {
@@ -33,7 +60,7 @@ export async function getMaintenanceData() {
     const snapshot = await get(maintenanceRef);
 
     if (snapshot.exists()) {
-      return snapshot.val();
+      return snapshot.val() as MaintenanceData;
     }
 
     // Initialize with defaults if not exists
@@ -57,7 +84,7 @@ export async function getMaintenanceData() {
 /**
  * Update target hours (from config page) via API
  */
-export async function updateTargetHours(hours) {
+export async function updateTargetHours(hours: number | string): Promise<boolean> {
   try {
     const response = await fetch('/api/maintenance/update-target', {
       method: 'POST',
@@ -68,7 +95,7 @@ export async function updateTargetHours(hours) {
     });
 
     if (!response.ok) {
-      const error = await response.json();
+      const error = await response.json() as { message?: string };
       throw new Error(error.message || 'Failed to update target hours');
     }
 
@@ -81,15 +108,14 @@ export async function updateTargetHours(hours) {
 
 /**
  * Increment usage hours (called every minute when status = WORK or MODULATION)
- * @param {number} minutes - Minutes to add (typically 1)
  */
-export async function incrementUsageHours(minutes = 1) {
+export async function incrementUsageHours(minutes: number = 1): Promise<Partial<MaintenanceData>> {
   try {
     const data = await getMaintenanceData();
     const hoursToAdd = minutes / 60; // Convert minutes to hours
     const newCurrentHours = data.currentHours + hoursToAdd;
 
-    const updates = {
+    const updates: Partial<MaintenanceData> & { currentHours: number; lastUpdatedAt: string } = {
       currentHours: parseFloat(newCurrentHours.toFixed(4)), // 4 decimals precision
       lastUpdatedAt: new Date().toISOString()
     };
@@ -112,9 +138,8 @@ export async function incrementUsageHours(minutes = 1) {
 /**
  * Track usage hours automatically based on stove status (WORK or MODULATION)
  * Called by cron job every minute - calculates elapsed time since last update
- * @param {string} stoveStatus - Current stove status (e.g., 'WORK', 'MODULATION', 'OFF', etc.)
  */
-export async function trackUsageHours(stoveStatus) {
+export async function trackUsageHours(stoveStatus: string): Promise<TrackUsageResult> {
   try {
     // Only track when stove is actively working or modulating
     const isWorking = stoveStatus && (
@@ -130,7 +155,7 @@ export async function trackUsageHours(stoveStatus) {
     const now = new Date();
 
     // Use Firebase Transaction for atomic read-modify-write
-    const transactionResult = await runTransaction(maintenanceRef, (currentData) => {
+    const transactionResult = await runTransaction(maintenanceRef, (currentData: MaintenanceData | null) => {
       // Initialize if no data exists
       if (!currentData) {
         return {
@@ -149,10 +174,10 @@ export async function trackUsageHours(stoveStatus) {
         return currentData; // Don't add time yet
       }
 
-      const lastUpdate = new Date(currentData.lastUpdatedAt);
+      const lastUpdate = new Date(currentData.lastUpdatedAt!);
 
       // Calculate elapsed minutes since last update
-      const elapsedMinutes = (now - lastUpdate) / 1000 / 60;
+      const elapsedMinutes = (now.getTime() - lastUpdate.getTime()) / 1000 / 60;
 
       // Only update if at least 0.5 minutes passed (avoid too frequent updates)
       if (elapsedMinutes < 0.5) {
@@ -186,11 +211,11 @@ export async function trackUsageHours(stoveStatus) {
       if (notificationData) {
         currentData.lastNotificationLevel = notificationData.notificationLevel;
         // Store notification data in transaction result metadata
-        currentData._notificationData = notificationData;
+        (currentData as Record<string, unknown>)._notificationData = notificationData;
       }
 
       // Store elapsed minutes for return value (temporary field)
-      currentData._elapsedMinutes = elapsedMinutes;
+      (currentData as Record<string, unknown>)._elapsedMinutes = elapsedMinutes;
 
       return currentData;
     });
@@ -205,7 +230,7 @@ export async function trackUsageHours(stoveStatus) {
       return { tracked: false, reason: 'Transaction aborted (no snapshot)' };
     }
 
-    const updatedData = snapshot.val();
+    const updatedData = snapshot.val() as MaintenanceData & { _notificationData?: unknown; _elapsedMinutes?: number };
     if (!updatedData) {
       return { tracked: false, reason: 'Transaction aborted (no data)' };
     }
@@ -215,8 +240,8 @@ export async function trackUsageHours(stoveStatus) {
     const elapsedMinutes = updatedData._elapsedMinutes || 0;
 
     // Clean up temporary fields from result
-    delete updatedData._notificationData;
-    delete updatedData._elapsedMinutes;
+    delete (updatedData as Record<string, unknown>)._notificationData;
+    delete (updatedData as Record<string, unknown>)._elapsedMinutes;
 
     return {
       tracked: true,
@@ -234,7 +259,7 @@ export async function trackUsageHours(stoveStatus) {
 /**
  * Reset maintenance after cleaning confirmation via API
  */
-export async function confirmCleaning(user) {
+export async function confirmCleaning(user?: unknown): Promise<boolean> {
   try {
     // Chiama API route che gestisce logging e reset automaticamente
     const response = await fetch('/api/maintenance/confirm-cleaning', {
@@ -245,7 +270,7 @@ export async function confirmCleaning(user) {
     });
 
     if (!response.ok) {
-      const error = await response.json();
+      const error = await response.json() as { message?: string };
       throw new Error(error.message || 'Failed to confirm cleaning');
     }
 
@@ -259,7 +284,7 @@ export async function confirmCleaning(user) {
 /**
  * Check if stove can be ignited (maintenance check)
  */
-export async function canIgnite() {
+export async function canIgnite(): Promise<boolean> {
   try {
     const data = await getMaintenanceData();
     return !data.needsCleaning;
@@ -272,7 +297,7 @@ export async function canIgnite() {
 /**
  * Get maintenance status summary
  */
-export async function getMaintenanceStatus() {
+export async function getMaintenanceStatus(): Promise<MaintenanceStatus> {
   try {
     const data = await getMaintenanceData();
     const percentage = (data.currentHours / data.targetHours) * 100;

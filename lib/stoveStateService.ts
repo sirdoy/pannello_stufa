@@ -6,18 +6,25 @@
 import { adminDbUpdate, adminDbGet } from './firebaseAdmin';
 import { getEnvironmentPath } from './environmentHelper';
 
+/** Stove state update */
+export interface StoveStateUpdate {
+  status?: string;
+  statusDescription?: string;
+  fanLevel?: number | null;
+  powerLevel?: number | null;
+  errorCode?: number;
+  errorDescription?: string;
+  source?: 'manual' | 'scheduler' | 'api' | 'init';
+  lastUpdated?: string;
+}
+
+/** Full stove state */
+export interface StoveState extends Required<StoveStateUpdate> {}
+
 /**
  * Update stove state in Firebase for real-time sync
- * @param {Object} stateUpdate - Partial state object to update
- * @param {string} [stateUpdate.status] - Status string (e.g., 'WORK', 'OFF')
- * @param {string} [stateUpdate.statusDescription] - Human-readable status
- * @param {number} [stateUpdate.fanLevel] - Fan level (1-6)
- * @param {number} [stateUpdate.powerLevel] - Power level (1-5)
- * @param {number} [stateUpdate.errorCode] - Error code (0 = no error)
- * @param {string} [stateUpdate.errorDescription] - Error description
- * @param {string} [stateUpdate.source] - Source of update ('manual'|'scheduler'|'api')
  */
-export async function updateStoveState(stateUpdate) {
+export async function updateStoveState(stateUpdate: StoveStateUpdate): Promise<void> {
   const path = getEnvironmentPath('stove/state');
 
   try {
@@ -46,13 +53,12 @@ export async function updateStoveState(stateUpdate) {
 
 /**
  * Get current stove state from Firebase
- * @returns {Promise<Object|null>} Current stove state or null if not exists
  */
-export async function getStoveState() {
+export async function getStoveState(): Promise<StoveState | null> {
   const path = getEnvironmentPath('stove/state');
 
   try {
-    const state = await adminDbGet(path);
+    const state = await adminDbGet(path) as StoveState | null;
     return state;
   } catch (error) {
     console.error('[StoveStateService] Failed to fetch Firebase state:', error);
@@ -63,7 +69,7 @@ export async function getStoveState() {
 /**
  * Initialize stove state in Firebase (if not exists)
  */
-export async function initializeStoveState() {
+export async function initializeStoveState(): Promise<void> {
   const existing = await getStoveState();
 
   if (!existing) {

@@ -1,31 +1,57 @@
-// lib/schedulerService.js
+// lib/schedulerService.ts
 import { ref, set, get } from 'firebase/database';
 import { db } from './firebase';
 
+/** Schedule interval */
+export interface ScheduleInterval {
+  start: string; // HH:MM format
+  end: string;   // HH:MM format
+  power: number; // 1-5
+  fan: number;   // 1-6
+}
+
+/** Weekly schedule data */
+export interface WeeklySchedule {
+  [day: string]: ScheduleInterval[];
+}
+
+/** Scheduler mode */
+export interface SchedulerMode {
+  enabled: boolean;
+  semiManual?: boolean;
+  semiManualActivatedAt?: string;
+  returnToAutoAt?: string;
+  lastUpdated: string;
+}
+
+/** Next scheduled action */
+export interface NextScheduledAction {
+  timestamp: string;
+  action: 'ignite' | 'shutdown';
+  power?: number;
+  fan?: number;
+}
+
 /**
  * Get active schedule ID
- * @returns {Promise<string>} Active schedule ID
  */
-async function getActiveScheduleId() {
+async function getActiveScheduleId(): Promise<string> {
   const snapshot = await get(ref(db, 'schedules-v2/activeScheduleId'));
   return snapshot.exists() ? snapshot.val() : 'default';
 }
 
 /**
  * Get path to active schedule's day slots
- * @param {string} day - Day name (e.g., "Lunedì")
- * @returns {Promise<string>} Firebase path
  */
-async function getActiveScheduleDayPath(day) {
+async function getActiveScheduleDayPath(day: string): Promise<string> {
   const activeId = await getActiveScheduleId();
   return `schedules-v2/schedules/${activeId}/slots/${day}`;
 }
 
 /**
  * Get path to active schedule's full slots
- * @returns {Promise<string>} Firebase path
  */
-async function getActiveScheduleSlotsPath() {
+async function getActiveScheduleSlotsPath(): Promise<string> {
   const activeId = await getActiveScheduleId();
   return `schedules-v2/schedules/${activeId}/slots`;
 }
@@ -35,7 +61,7 @@ async function getActiveScheduleSlotsPath() {
  * Questo garantisce che tutti gli orari siano gestiti consistentemente
  * indipendentemente dal timezone del server
  */
-function createDateInRomeTimezone(baseDate, targetHour, targetMinute) {
+function createDateInRomeTimezone(baseDate: Date, targetHour: number, targetMinute: number): Date {
   // Ottieni i componenti della data base in timezone Europe/Rome
   const formatter = new Intl.DateTimeFormat('en-GB', {
     timeZone: 'Europe/Rome',
@@ -97,7 +123,7 @@ function createDateInRomeTimezone(baseDate, targetHour, targetMinute) {
 }
 
 // Helper per calcolare il prossimo cambio di scheduler
-export const getNextScheduledChange = async () => {
+export const getNextScheduledChange = async (): Promise<string | null> => {
   try {
     const now = new Date();
     const formatter = new Intl.DateTimeFormat('it-IT', {
@@ -119,7 +145,7 @@ export const getNextScheduledChange = async () => {
     const todayPath = await getActiveScheduleDayPath(currentDayCapitalized);
     const todaySnapshot = await get(ref(db, todayPath));
     if (todaySnapshot.exists()) {
-      const intervals = todaySnapshot.val();
+      const intervals = todaySnapshot.val() as ScheduleInterval[];
 
       // Cerca prossimo start o end oggi
       for (const interval of intervals) {
@@ -151,7 +177,7 @@ export const getNextScheduledChange = async () => {
       const nextDayPath = await getActiveScheduleDayPath(nextDay);
       const daySnapshot = await get(ref(db, nextDayPath));
       if (daySnapshot.exists()) {
-        const intervals = daySnapshot.val();
+        const intervals = daySnapshot.val() as ScheduleInterval[];
         if (intervals && intervals.length > 0) {
           // Prendi il primo intervallo del giorno
           const [startH, startM] = intervals[0].start.split(':').map(Number);
@@ -173,7 +199,7 @@ export const getNextScheduledChange = async () => {
 };
 
 // Helper per calcolare il prossimo cambio di scheduler con dettagli azione
-export const getNextScheduledAction = async () => {
+export const getNextScheduledAction = async (): Promise<NextScheduledAction | null> => {
   try {
     const now = new Date();
     const formatter = new Intl.DateTimeFormat('it-IT', {
@@ -195,7 +221,7 @@ export const getNextScheduledAction = async () => {
     const todayPath = await getActiveScheduleDayPath(currentDayCapitalized);
     const todaySnapshot = await get(ref(db, todayPath));
     if (todaySnapshot.exists()) {
-      const intervals = todaySnapshot.val();
+      const intervals = todaySnapshot.val() as ScheduleInterval[];
 
       // Cerca prossimo start o end oggi
       for (const interval of intervals) {
@@ -235,7 +261,7 @@ export const getNextScheduledAction = async () => {
       const nextDayPath = await getActiveScheduleDayPath(nextDay);
       const daySnapshot = await get(ref(db, nextDayPath));
       if (daySnapshot.exists()) {
-        const intervals = daySnapshot.val();
+        const intervals = daySnapshot.val() as ScheduleInterval[];
         if (intervals && intervals.length > 0) {
           // Prendi il primo intervallo del giorno
           const firstInterval = intervals[0];
@@ -262,7 +288,7 @@ export const getNextScheduledAction = async () => {
   }
 };
 
-export const saveSchedule = async (day, intervals) => {
+export const saveSchedule = async (day: string, intervals: ScheduleInterval[]): Promise<void> => {
   try {
     const dayPath = await getActiveScheduleDayPath(day);
     await set(ref(db, dayPath), intervals);
@@ -275,7 +301,7 @@ export const saveSchedule = async (day, intervals) => {
   }
 };
 
-export const getSchedule = async (day) => {
+export const getSchedule = async (day: string): Promise<ScheduleInterval[]> => {
   try {
     const dayPath = await getActiveScheduleDayPath(day);
     const snapshot = await get(ref(db, dayPath));
@@ -291,7 +317,7 @@ export const getSchedule = async (day) => {
 };
 
 
-export const getWeeklySchedule = async () => {
+export const getWeeklySchedule = async (): Promise<WeeklySchedule> => {
   try {
     const slotsPath = await getActiveScheduleSlotsPath();
     const snapshot = await get(ref(db, slotsPath));
@@ -306,7 +332,7 @@ export const getWeeklySchedule = async () => {
   }
 };
 
-export const setSchedulerMode = async (enabled) => {
+export const setSchedulerMode = async (enabled: boolean): Promise<void> => {
   try {
     await set(ref(db, `schedules-v2/mode`), {
       enabled: enabled,
@@ -318,7 +344,7 @@ export const setSchedulerMode = async (enabled) => {
   }
 };
 
-export const getSchedulerMode = async () => {
+export const getSchedulerMode = async (): Promise<boolean> => {
   try {
     const snapshot = await get(ref(db, `schedules-v2/mode`));
     if (snapshot.exists()) {
@@ -332,13 +358,13 @@ export const getSchedulerMode = async () => {
   }
 };
 
-export const getFullSchedulerMode = async () => {
+export const getFullSchedulerMode = async (): Promise<SchedulerMode> => {
   try {
     const snapshot = await get(ref(db, `schedules-v2/mode`));
     if (snapshot.exists()) {
-      return snapshot.val();
+      return snapshot.val() as SchedulerMode;
     } else {
-      return { enabled: false, semiManual: false }; // Default
+      return { enabled: false, semiManual: false, lastUpdated: new Date().toISOString() }; // Default
     }
   } catch (error) {
     console.error('Errore nel recupero modalità scheduler completa:', error);
@@ -346,7 +372,7 @@ export const getFullSchedulerMode = async () => {
   }
 };
 
-export const setSemiManualMode = async (nextScheduledChange) => {
+export const setSemiManualMode = async (nextScheduledChange: string): Promise<void> => {
   try {
     // Note: semiManual requires scheduler to be enabled, so we force enabled: true
     await set(ref(db, `schedules-v2/mode`), {
@@ -362,7 +388,7 @@ export const setSemiManualMode = async (nextScheduledChange) => {
   }
 };
 
-export const clearSemiManualMode = async () => {
+export const clearSemiManualMode = async (): Promise<void> => {
   try {
     const currentMode = await getFullSchedulerMode();
     await set(ref(db, `schedules-v2/mode`), {

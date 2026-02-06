@@ -3,10 +3,55 @@
  * Provides metrics and insights for weekly schedule
  */
 
+/** Schedule interval */
+export interface ScheduleInterval {
+  start: string;
+  end: string;
+  power: number;
+  fan: number;
+}
+
+/** Weekly schedule */
+export interface WeeklySchedule {
+  [day: string]: ScheduleInterval[];
+}
+
+/** Power distribution */
+export type PowerDistribution = Record<1 | 2 | 3 | 4 | 5, number>;
+
+/** Fan distribution */
+export type FanDistribution = Record<1 | 2 | 3 | 4 | 5 | 6, number>;
+
+/** Weekly statistics */
+export interface WeeklyStats {
+  totalHours: number;
+  totalIntervals: number;
+  dailyHours: Record<string, number>;
+  powerDistribution: PowerDistribution;
+  fanDistribution: FanDistribution;
+  busiestDay: string | null;
+  avgPerDay: number;
+  weekdaysTotal: number;
+  weekendTotal: number;
+}
+
+/** Power label info */
+export interface PowerLabel {
+  text: string;
+  percent: number;
+  gradient: string;
+}
+
+/** Fan label info */
+export interface FanLabel {
+  text: string;
+  percent: number;
+}
+
 /**
  * Power labels with descriptions, percentages, and Tailwind gradient classes
  */
-export const POWER_LABELS = {
+export const POWER_LABELS: Record<1 | 2 | 3 | 4 | 5, PowerLabel> = {
   1: { text: 'Minima', percent: 20, gradient: 'from-blue-400 to-blue-500' },
   2: { text: 'Bassa', percent: 40, gradient: 'from-blue-500 to-yellow-400' },
   3: { text: 'Media', percent: 60, gradient: 'from-yellow-400 to-orange-400' },
@@ -17,7 +62,7 @@ export const POWER_LABELS = {
 /**
  * Fan labels with descriptions and percentages
  */
-export const FAN_LABELS = {
+export const FAN_LABELS: Record<1 | 2 | 3 | 4 | 5 | 6, FanLabel> = {
   1: { text: 'Minima', percent: 17 },
   2: { text: 'Bassa', percent: 33 },
   3: { text: 'Media', percent: 50 },
@@ -29,7 +74,7 @@ export const FAN_LABELS = {
 /**
  * Calculate duration of a single interval in hours
  */
-function getIntervalDuration(interval) {
+function getIntervalDuration(interval: ScheduleInterval): number {
   const [startH, startM] = interval.start.split(':').map(Number);
   const [endH, endM] = interval.end.split(':').map(Number);
   const startMinutes = startH * 60 + startM;
@@ -39,10 +84,8 @@ function getIntervalDuration(interval) {
 
 /**
  * Calculate comprehensive weekly statistics
- * @param {Object} schedule - Schedule object { day: intervals[] }
- * @returns {Object} Statistics object with various metrics
  */
-export function calculateWeeklyStats(schedule) {
+export function calculateWeeklyStats(schedule: WeeklySchedule): WeeklyStats {
   const stats = {
     totalHours: 0,
     totalIntervals: 0,
@@ -99,7 +142,7 @@ export function calculateWeeklyStats(schedule) {
 /**
  * Get total hours for a specific day
  */
-export function getDayTotalHours(intervals) {
+export function getDayTotalHours(intervals: ScheduleInterval[]): number {
   return intervals.reduce((sum, interval) => {
     return sum + getIntervalDuration(interval);
   }, 0);
@@ -107,10 +150,8 @@ export function getDayTotalHours(intervals) {
 
 /**
  * Get power level gradient color for visualization
- * @param {number} power - Power level (1-5)
- * @returns {string} CSS gradient string
  */
-export function getPowerGradient(power) {
+export function getPowerGradient(power: number): string {
   const gradients = {
     1: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)', // Blue
     2: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', // Green
@@ -124,7 +165,7 @@ export function getPowerGradient(power) {
 /**
  * Get power level badge classes
  */
-export function getPowerBadgeClass(power) {
+export function getPowerBadgeClass(power: number): string {
   const classes = {
     1: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
     2: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
@@ -138,7 +179,7 @@ export function getPowerBadgeClass(power) {
 /**
  * Get fan level badge classes
  */
-export function getFanBadgeClass(fan) {
+export function getFanBadgeClass(fan: number): string {
   const intensity = Math.ceil(fan / 2); // Group: V1-2=low, V3-4=med, V5-6=high
   const classes = {
     1: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300',

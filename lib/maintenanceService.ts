@@ -1,6 +1,6 @@
 import { db } from './firebase';
 import { ref, get, set, update, runTransaction } from 'firebase/database';
-import { isLocalEnvironment, isSandboxEnabled, getSandboxMaintenance } from './sandboxService';
+import { isLocalEnvironment, isSandboxEnabled, getSandboxMaintenance, SandboxMaintenance } from './sandboxService';
 import { shouldSendMaintenanceNotification } from './maintenance/helpers';
 
 const MAINTENANCE_REF = 'maintenance';
@@ -43,7 +43,7 @@ export async function getMaintenanceData(): Promise<MaintenanceData> {
     if (isLocalEnvironment()) {
       const sandboxEnabled = await isSandboxEnabled();
       if (sandboxEnabled) {
-        const sandboxData = await getSandboxMaintenance();
+        const sandboxData = (await getSandboxMaintenance()) as unknown as SandboxMaintenance;
         // Convert sandbox format to maintenance format
         return {
           currentHours: sandboxData.hoursWorked || 0,
@@ -91,7 +91,7 @@ export async function updateTargetHours(hours: number | string): Promise<boolean
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ targetHours: parseFloat(hours) }),
+      body: JSON.stringify({ targetHours: parseFloat(String(hours)) }),
     });
 
     if (!response.ok) {
@@ -211,11 +211,11 @@ export async function trackUsageHours(stoveStatus: string): Promise<TrackUsageRe
       if (notificationData) {
         currentData.lastNotificationLevel = notificationData.notificationLevel;
         // Store notification data in transaction result metadata
-        (currentData as Record<string, unknown>)._notificationData = notificationData;
+        (currentData as unknown as Record<string, unknown>)._notificationData = notificationData;
       }
 
       // Store elapsed minutes for return value (temporary field)
-      (currentData as Record<string, unknown>)._elapsedMinutes = elapsedMinutes;
+      (currentData as unknown as Record<string, unknown>)._elapsedMinutes = elapsedMinutes;
 
       return currentData;
     });
@@ -240,8 +240,8 @@ export async function trackUsageHours(stoveStatus: string): Promise<TrackUsageRe
     const elapsedMinutes = updatedData._elapsedMinutes || 0;
 
     // Clean up temporary fields from result
-    delete (updatedData as Record<string, unknown>)._notificationData;
-    delete (updatedData as Record<string, unknown>)._elapsedMinutes;
+    delete (updatedData as unknown as Record<string, unknown>)._notificationData;
+    delete (updatedData as unknown as Record<string, unknown>)._elapsedMinutes;
 
     return {
       tracked: true,

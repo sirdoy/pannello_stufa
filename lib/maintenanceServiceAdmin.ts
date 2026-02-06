@@ -61,7 +61,7 @@ export async function trackUsageHours(stoveStatus: string): Promise<TrackUsageRe
       }
 
       const lastUpdated = new Date(currentData.lastUpdatedAt);
-      const elapsedMs = now - lastUpdated;
+      const elapsedMs = now.getTime() - lastUpdated.getTime();
       const MIN_UPDATE_INTERVAL_MS = 30 * 1000;
 
       if (elapsedMs < MIN_UPDATE_INTERVAL_MS) {
@@ -100,8 +100,8 @@ export async function trackUsageHours(stoveStatus: string): Promise<TrackUsageRe
     const notificationData = updatedData._notificationData || null;
     const elapsedMinutes = updatedData._elapsedMinutes || 0;
 
-    delete (updatedData as Record<string, unknown>)._notificationData;
-    delete (updatedData as Record<string, unknown>)._elapsedMinutes;
+    delete (updatedData as unknown as Record<string, unknown>)._notificationData;
+    delete (updatedData as unknown as Record<string, unknown>)._elapsedMinutes;
 
     return {
       tracked: true,

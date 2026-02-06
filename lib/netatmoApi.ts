@@ -182,6 +182,7 @@ export interface SetThermModeParams {
   home_id: string;
   mode: 'schedule' | 'away' | 'hg' | 'off';
   endtime?: number;
+  [key: string]: unknown;
 }
 
 /** Create Schedule Params */
@@ -190,6 +191,7 @@ export interface CreateScheduleParams {
   schedule_name: string;
   zones: unknown[];
   timetable: unknown[];
+  [key: string]: unknown;
 }
 
 /** Sync Home Schedule Params */
@@ -211,6 +213,7 @@ export interface GetRoomMeasureParams {
   date_end?: number;
   limit?: number;
   optimize?: boolean;
+  [key: string]: unknown;
 }
 
 /** Topology Data (for module name resolution) */
@@ -334,9 +337,9 @@ async function getThermState(accessToken: string, deviceId: string, moduleId: st
 async function getRoomMeasure(accessToken: string, params: GetRoomMeasureParams): Promise<unknown[]> {
   const data = await makeRequest('getroommeasure', accessToken, {
     method: 'POST',
-    body: params as Record<string, unknown>,
+    body: params,
   });
-  return (data.body as unknown[]) || [];
+  return (data.body as unknown as unknown[]) || [];
 }
 
 // ============================================================================
@@ -376,7 +379,7 @@ async function setRoomThermpoint(accessToken: string, params: SetRoomThermpointP
 async function setThermMode(accessToken: string, params: SetThermModeParams): Promise<boolean> {
   const data = await makeRequest('setthermmode', accessToken, {
     method: 'POST',
-    body: params as Record<string, unknown>,
+    body: params,
   });
   return data.status === 'ok';
 }
@@ -398,7 +401,7 @@ async function switchHomeSchedule(accessToken: string, homeId: string, scheduleI
 async function createSchedule(accessToken: string, params: CreateScheduleParams): Promise<string | undefined> {
   const data = await makeRequest('createnewhomeschedule', accessToken, {
     method: 'POST',
-    body: params as Record<string, unknown>,
+    body: params,
   });
   return data.body?.schedule_id;
 }

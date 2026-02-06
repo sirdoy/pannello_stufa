@@ -20,8 +20,48 @@
  *   });
  */
 
+import { NextRequest, NextResponse } from 'next/server';
 import { auth0 } from '@/lib/auth0';
 import { unauthorized, handleError } from './apiResponse';
+
+// =============================================================================
+// TYPE DEFINITIONS
+// =============================================================================
+
+/** Auth0 session type */
+interface Session {
+  user: {
+    sub: string;
+    email?: string;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
+
+/** Route context with params */
+interface RouteContext {
+  params: Promise<Record<string, string>>;
+}
+
+/** Route handler with authentication */
+type AuthedHandler = (
+  request: NextRequest,
+  context: RouteContext,
+  session: Session
+) => Promise<NextResponse>;
+
+/** Route handler with optional authentication */
+type OptionalAuthHandler = (
+  request: NextRequest,
+  context: RouteContext,
+  session: Session | null
+) => Promise<NextResponse>;
+
+/** Route handler without authentication */
+type UnauthHandler = (
+  request: NextRequest,
+  context: RouteContext
+) => Promise<NextResponse>;
 
 // =============================================================================
 // AUTH MIDDLEWARE
@@ -31,9 +71,9 @@ import { unauthorized, handleError } from './apiResponse';
  * Wraps a route handler with Auth0 authentication
  * Automatically returns 401 if user is not authenticated
  *
- * @param {(request: any, context: any, session: any) => Promise<any>} handler - Route handler function
+ * @param handler - Route handler function
  *   Handler signature: (request, context, session) => Promise<NextResponse>
- * @returns {(handler: any) => any} Wrapped handler
+ * @returns Wrapped handler
  *
  * @example
  * export const GET = withAuth(async (request, context, session) => {
@@ -41,8 +81,8 @@ import { unauthorized, handleError } from './apiResponse';
  *   return success({ user: session.user });
  * });
  */
-export function withAuth(handler) {
-  return async (request, context) => {
+export function withAuth(handler: AuthedHandler): UnauthHandler {
+  return async (request: NextRequest, context: RouteContext) => {
     const session = await auth0.getSession(request);
 
     if (!session?.user) {
@@ -57,9 +97,9 @@ export function withAuth(handler) {
  * Wraps a route handler with optional Auth0 authentication
  * Session is passed to handler but not required
  *
- * @param {(request: any, context: any, session: any) => Promise<any>} handler - Route handler function
+ * @param handler - Route handler function
  *   Handler signature: (request, context, session | null) => Promise<NextResponse>
- * @returns {(handler: any) => any} Wrapped handler
+ * @returns Wrapped handler
  *
  * @example
  * export const GET = withOptionalAuth(async (request, context, session) => {
@@ -69,8 +109,8 @@ export function withAuth(handler) {
  *   return success({ user: null });
  * });
  */
-export function withOptionalAuth(handler) {
-  return async (request, context) => {
+export function withOptionalAuth(handler: OptionalAuthHandler): UnauthHandler {
+  return async (request: NextRequest, context: RouteContext) => {
     const session = await auth0.getSession(request);
     return handler(request, context, session);
   };
@@ -84,9 +124,9 @@ export function withOptionalAuth(handler) {
  * Wraps a route handler with try-catch error handling
  * Automatically converts errors to appropriate API responses
  *
- * @param {(request: any, context: any, session: any) => Promise<any>} handler - Route handler function
- * @param {string} logContext - Context for error logging (optional)
- * @returns {(handler: any) => any} Wrapped handler
+ * @param handler - Route handler function
+ * @param logContext - Context for error logging (optional)
+ * @returns Wrapped handler
  *
  * @example
  * export const GET = withErrorHandler(async (request, context) => {
@@ -94,12 +134,12 @@ export function withOptionalAuth(handler) {
  *   return success({ data });
  * }, 'GetData');
  */
-export function withErrorHandler(handler, logContext = null) {
-  return async (request, context) => {
+export function withErrorHandler(handler: UnauthHandler, logContext: string | null = null): UnauthHandler {
+  return async (request: NextRequest, context: RouteContext) => {
     try {
       return await handler(request, context);
     } catch (error) {
-      return handleError(error, logContext);
+      return handleError(error as Error, logContext);
     }
   };
 }
@@ -112,10 +152,10 @@ export function withErrorHandler(handler, logContext = null) {
  * Combines auth and error handling middleware
  * Most common pattern for protected API routes
  *
- * @param {(request: any, context: any, session: any) => Promise<any>} handler - Route handler function
+ * @param handler - Route handler function
  *   Handler signature: (request, context, session) => Promise<NextResponse>
- * @param {string} logContext - Context for error logging (optional)
- * @returns {(handler: any) => any} Wrapped handler
+ * @param logContext - Context for error logging (optional)
+ * @returns Wrapped handler
  *
  * @example
  * export const GET = withAuthAndErrorHandler(async (request, context, session) => {
@@ -123,7 +163,7 @@ export function withErrorHandler(handler, logContext = null) {
  *   return success({ data });
  * }, 'UserData');
  */
-export function withAuthAndErrorHandler(handler, logContext = null) {
+export function withAuthAndErrorHandler(handler: AuthedHandler, logContext: string | null = null): UnauthHandler {
   return withErrorHandler(withAuth(handler), logContext);
 }
 
@@ -141,9 +181,9 @@ export const protect = withAuthAndErrorHandler;
  * Wraps a route handler with admin authorization
  * Checks if user is the admin user defined in ADMIN_USER_ID env var
  *
- * @param {(request: any, context: any, session: any) => Promise<any>} handler - Route handler function
- * @param {string} logContext - Context for error logging (optional)
- * @returns {(handler: any) => any} Wrapped handler
+ * @param handler - Route handler function
+ * @param logContext - Context for error logging (optional)
+ * @returns Wrapped handler
  *
  * @example
  * export const POST = withAdmin(async (request, context, session) => {
@@ -151,8 +191,8 @@ export const protect = withAuthAndErrorHandler;
  *   return success({ done: true });
  * }, 'AdminAction');
  */
-export function withAdmin(handler, logContext = null) {
-  return withErrorHandler(async (request, context) => {
+export function withAdmin(handler: AuthedHandler, logContext: string | null = null): UnauthHandler {
+  return withErrorHandler(async (request: NextRequest, context: RouteContext) => {
     const session = await auth0.getSession(request);
 
     if (!session?.user) {
@@ -180,9 +220,9 @@ export function withAdmin(handler, logContext = null) {
  * - Query param: ?secret=xxx
  * - Header: Authorization: Bearer xxx
  *
- * @param {(request: any, context: any, session: any) => Promise<any>} handler - Route handler function
- * @param {string} logContext - Context for error logging (optional)
- * @returns {(handler: any) => any} Wrapped handler
+ * @param handler - Route handler function
+ * @param logContext - Context for error logging (optional)
+ * @returns Wrapped handler
  *
  * @example
  * export const GET = withCronSecret(async (request, context) => {
@@ -190,8 +230,8 @@ export function withAdmin(handler, logContext = null) {
  *   return success({ checked: true });
  * }, 'SchedulerCheck');
  */
-export function withCronSecret(handler, logContext = null) {
-  return withErrorHandler(async (request, context) => {
+export function withCronSecret(handler: UnauthHandler, logContext: string | null = null): UnauthHandler {
+  return withErrorHandler(async (request: NextRequest, context: RouteContext) => {
     const cronSecret = process.env.CRON_SECRET;
 
     if (!cronSecret) {
@@ -221,9 +261,9 @@ export function withCronSecret(handler, logContext = null) {
  * Wraps a route handler with Hue-specific error handling
  * Automatically handles HUE_NOT_CONNECTED and NETWORK_TIMEOUT errors
  *
- * @param {(request: any, context: any, session: any) => Promise<any>} handler - Route handler function
- * @param {string} logContext - Context for error logging (optional)
- * @returns {(handler: any) => any} Wrapped handler
+ * @param handler - Route handler function
+ * @param logContext - Context for error logging (optional)
+ * @returns Wrapped handler
  *
  * @example
  * export const GET = withHueHandler(async (request, context, session) => {
@@ -232,19 +272,20 @@ export function withCronSecret(handler, logContext = null) {
  *   return success({ lights: lights.data });
  * }, 'Hue/Lights');
  */
-export function withHueHandler(handler, logContext = null) {
-  return withAuthAndErrorHandler(async (request, context, session) => {
+export function withHueHandler(handler: AuthedHandler, logContext: string | null = null): UnauthHandler {
+  return withAuthAndErrorHandler(async (request: NextRequest, context: RouteContext, session: Session) => {
     try {
       return await handler(request, context, session);
     } catch (err) {
+      const error = err as Error;
       // Handle not connected errors
-      if (err.message?.includes('HUE_NOT_CONNECTED')) {
+      if (error.message?.includes('HUE_NOT_CONNECTED')) {
         const { hueNotConnected } = await import('./apiResponse');
         return hueNotConnected();
       }
 
       // Handle network timeout (local API)
-      if (err.message === 'NETWORK_TIMEOUT') {
+      if (error.message === 'NETWORK_TIMEOUT') {
         const { hueNotOnLocalNetwork } = await import('./apiResponse');
         return hueNotOnLocalNetwork();
       }
@@ -263,8 +304,8 @@ export function withHueHandler(handler, logContext = null) {
  * Combines multiple middleware functions
  * Executes from left to right (first middleware wraps outermost)
  *
- * @param  {...((...args: any[]) => any)} middlewares - Middleware functions
- * @returns {(handler: any) => any} Combined middleware
+ * @param middlewares - Middleware functions
+ * @returns Combined middleware
  *
  * @example
  * const customMiddleware = compose(withErrorHandler, withAuth, withRateLimit);
@@ -272,8 +313,8 @@ export function withHueHandler(handler, logContext = null) {
  *   return success({ data });
  * });
  */
-export function compose(...middlewares) {
-  return (handler) => {
+export function compose(...middlewares: Array<(handler: UnauthHandler) => UnauthHandler>): (handler: UnauthHandler) => UnauthHandler {
+  return (handler: UnauthHandler) => {
     return middlewares.reduceRight(
       (acc, middleware) => middleware(acc),
       handler

@@ -13,6 +13,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import type { HttpStatus, ErrorCode } from '@/types/api';
 import { HTTP_STATUS, ERROR_CODES, ERROR_MESSAGES, ApiError } from './apiErrors';
 
 // =============================================================================
@@ -21,17 +22,21 @@ import { HTTP_STATUS, ERROR_CODES, ERROR_MESSAGES, ApiError } from './apiErrors'
 
 /**
  * Standard success response
- * @param {object} data - Response data
- * @param {string} message - Optional success message
- * @param {number} status - HTTP status code (default: 200)
- * @returns {NextResponse}
+ * @param data - Response data
+ * @param message - Optional success message
+ * @param status - HTTP status code (default: 200)
+ * @returns NextResponse
  *
  * @example
  * return success({ schedule: scheduleData });
  * return success({ created: true }, 'Programma creato', 201);
  */
-export function success(data, message = null, status = HTTP_STATUS.OK) {
-  const response = {
+export function success(
+  data: Record<string, unknown>,
+  message: string | null = null,
+  status: HttpStatus = HTTP_STATUS.OK
+): NextResponse {
+  const response: Record<string, unknown> = {
     success: true,
     ...data,
   };
@@ -45,19 +50,19 @@ export function success(data, message = null, status = HTTP_STATUS.OK) {
 
 /**
  * Created response (201)
- * @param {object} data - Response data
- * @param {string} message - Optional success message
- * @returns {NextResponse}
+ * @param data - Response data
+ * @param message - Optional success message
+ * @returns NextResponse
  */
-export function created(data, message = null) {
+export function created(data: Record<string, unknown>, message: string | null = null): NextResponse {
   return success(data, message, HTTP_STATUS.CREATED);
 }
 
 /**
  * No content response (204)
- * @returns {NextResponse}
+ * @returns NextResponse
  */
-export function noContent() {
+export function noContent(): NextResponse {
   return new NextResponse(null, { status: HTTP_STATUS.NO_CONTENT });
 }
 
@@ -67,17 +72,22 @@ export function noContent() {
 
 /**
  * Standard error response
- * @param {string} message - Error message
- * @param {string} code - Error code from ERROR_CODES
- * @param {number} status - HTTP status code
- * @param {object} details - Additional error details
- * @returns {NextResponse}
+ * @param message - Error message
+ * @param code - Error code from ERROR_CODES
+ * @param status - HTTP status code
+ * @param details - Additional error details
+ * @returns NextResponse
  *
  * @example
  * return error('Schedule not found', ERROR_CODES.NOT_FOUND, 404);
  */
-export function error(message, code = ERROR_CODES.INTERNAL_ERROR, status = HTTP_STATUS.INTERNAL_SERVER_ERROR, details = null) {
-  const response = {
+export function error(
+  message: string,
+  code: ErrorCode = ERROR_CODES.INTERNAL_ERROR,
+  status: HttpStatus = HTTP_STATUS.INTERNAL_SERVER_ERROR,
+  details: Record<string, unknown> | null = null
+): NextResponse {
+  const response: Record<string, unknown> = {
     success: false,
     error: message,
     code,
@@ -93,11 +103,11 @@ export function error(message, code = ERROR_CODES.INTERNAL_ERROR, status = HTTP_
 
 /**
  * Convert ApiError to NextResponse
- * @param {ApiError} apiError - ApiError instance
- * @returns {NextResponse}
+ * @param apiError - ApiError instance
+ * @returns NextResponse
  */
-export function fromApiError(apiError) {
-  const response = {
+export function fromApiError(apiError: ApiError): NextResponse {
+  const response: Record<string, unknown> = {
     success: false,
     error: apiError.message,
     code: apiError.code,
@@ -114,11 +124,11 @@ export function fromApiError(apiError) {
 
 /**
  * Handle any error (ApiError or standard Error)
- * @param {Error} err - Error instance
- * @param {string} context - Optional context for logging
- * @returns {NextResponse}
+ * @param err - Error instance
+ * @param context - Optional context for logging
+ * @returns NextResponse
  */
-export function handleError(err, context = null) {
+export function handleError(err: Error | ApiError, context: string | null = null): NextResponse {
   if (context) {
     console.error(`[${context}]`, err.message || err);
   }
@@ -174,77 +184,83 @@ export function handleError(err, context = null) {
 
 /**
  * Unauthorized response (401)
- * @param {string} message - Error message
- * @returns {NextResponse}
+ * @param message - Error message
+ * @returns NextResponse
  */
-export function unauthorized(message = ERROR_MESSAGES[ERROR_CODES.UNAUTHORIZED]) {
+export function unauthorized(message: string = ERROR_MESSAGES[ERROR_CODES.UNAUTHORIZED]): NextResponse {
   return error(message, ERROR_CODES.UNAUTHORIZED, HTTP_STATUS.UNAUTHORIZED);
 }
 
 /**
  * Forbidden response (403)
- * @param {string} message - Error message
- * @returns {NextResponse}
+ * @param message - Error message
+ * @returns NextResponse
  */
-export function forbidden(message = ERROR_MESSAGES[ERROR_CODES.FORBIDDEN]) {
+export function forbidden(message: string = ERROR_MESSAGES[ERROR_CODES.FORBIDDEN]): NextResponse {
   return error(message, ERROR_CODES.FORBIDDEN, HTTP_STATUS.FORBIDDEN);
 }
 
 /**
  * Not found response (404)
- * @param {string} message - Error message
- * @returns {NextResponse}
+ * @param message - Error message
+ * @returns NextResponse
  */
-export function notFound(message = ERROR_MESSAGES[ERROR_CODES.NOT_FOUND]) {
+export function notFound(message: string = ERROR_MESSAGES[ERROR_CODES.NOT_FOUND]): NextResponse {
   return error(message, ERROR_CODES.NOT_FOUND, HTTP_STATUS.NOT_FOUND);
 }
 
 /**
  * Bad request response (400)
- * @param {string} message - Error message
- * @param {object} details - Validation details
- * @returns {NextResponse}
+ * @param message - Error message
+ * @param details - Validation details
+ * @returns NextResponse
  */
-export function badRequest(message = ERROR_MESSAGES[ERROR_CODES.VALIDATION_ERROR], details = null) {
+export function badRequest(
+  message: string = ERROR_MESSAGES[ERROR_CODES.VALIDATION_ERROR],
+  details: Record<string, unknown> | null = null
+): NextResponse {
   return error(message, ERROR_CODES.VALIDATION_ERROR, HTTP_STATUS.BAD_REQUEST, details);
 }
 
 /**
  * Validation error response (400)
  * Alias for badRequest with specific code
- * @param {string} message - Error message
- * @param {object} details - Validation details
- * @returns {NextResponse}
+ * @param message - Error message
+ * @param details - Validation details
+ * @returns NextResponse
  */
-export function validationError(message, details = null) {
+export function validationError(message: string, details: Record<string, unknown> | null = null): NextResponse {
   return error(message, ERROR_CODES.INVALID_INPUT, HTTP_STATUS.BAD_REQUEST, details);
 }
 
 /**
  * Timeout response (504)
- * @param {string} message - Error message
- * @param {object} details - Additional details
- * @returns {NextResponse}
+ * @param message - Error message
+ * @param details - Additional details
+ * @returns NextResponse
  */
-export function timeout(message = ERROR_MESSAGES[ERROR_CODES.TIMEOUT], details = null) {
+export function timeout(
+  message: string = ERROR_MESSAGES[ERROR_CODES.TIMEOUT],
+  details: Record<string, unknown> | null = null
+): NextResponse {
   return error(message, ERROR_CODES.TIMEOUT, HTTP_STATUS.GATEWAY_TIMEOUT, details);
 }
 
 /**
  * Service unavailable response (503)
- * @param {string} message - Error message
- * @returns {NextResponse}
+ * @param message - Error message
+ * @returns NextResponse
  */
-export function serviceUnavailable(message = ERROR_MESSAGES[ERROR_CODES.SERVICE_UNAVAILABLE]) {
+export function serviceUnavailable(message: string = ERROR_MESSAGES[ERROR_CODES.SERVICE_UNAVAILABLE]): NextResponse {
   return error(message, ERROR_CODES.SERVICE_UNAVAILABLE, HTTP_STATUS.SERVICE_UNAVAILABLE);
 }
 
 /**
  * Internal server error response (500)
- * @param {string} message - Error message
- * @returns {NextResponse}
+ * @param message - Error message
+ * @returns NextResponse
  */
-export function serverError(message = ERROR_MESSAGES[ERROR_CODES.INTERNAL_ERROR]) {
+export function serverError(message: string = ERROR_MESSAGES[ERROR_CODES.INTERNAL_ERROR]): NextResponse {
   return error(message, ERROR_CODES.INTERNAL_ERROR, HTTP_STATUS.INTERNAL_SERVER_ERROR);
 }
 
@@ -254,9 +270,9 @@ export function serverError(message = ERROR_MESSAGES[ERROR_CODES.INTERNAL_ERROR]
 
 /**
  * Stove offline/timeout response
- * @returns {NextResponse}
+ * @returns NextResponse
  */
-export function stoveOffline() {
+export function stoveOffline(): NextResponse {
   return error(
     'Stufa non raggiungibile',
     ERROR_CODES.STOVE_OFFLINE,
@@ -267,9 +283,9 @@ export function stoveOffline() {
 
 /**
  * Maintenance required response
- * @returns {NextResponse}
+ * @returns NextResponse
  */
-export function maintenanceRequired() {
+export function maintenanceRequired(): NextResponse {
   return error(
     'Manutenzione richiesta',
     ERROR_CODES.MAINTENANCE_REQUIRED,
@@ -280,18 +296,18 @@ export function maintenanceRequired() {
 
 /**
  * Netatmo reconnect required response
- * @param {string} message - Error message
- * @returns {NextResponse}
+ * @param message - Error message
+ * @returns NextResponse
  */
-export function netatmoReconnect(message = 'Token Netatmo scaduto') {
+export function netatmoReconnect(message: string = 'Token Netatmo scaduto'): NextResponse {
   return error(message, ERROR_CODES.NETATMO_RECONNECT_REQUIRED, HTTP_STATUS.UNAUTHORIZED, { reconnect: true });
 }
 
 /**
  * Hue not connected response
- * @returns {NextResponse}
+ * @returns NextResponse
  */
-export function hueNotConnected() {
+export function hueNotConnected(): NextResponse {
   return error(
     'Hue non connesso',
     ERROR_CODES.HUE_NOT_CONNECTED,
@@ -302,9 +318,9 @@ export function hueNotConnected() {
 
 /**
  * Hue not on local network response
- * @returns {NextResponse}
+ * @returns NextResponse
  */
-export function hueNotOnLocalNetwork() {
+export function hueNotOnLocalNetwork(): NextResponse {
   return error(
     'Bridge Hue non raggiungibile',
     ERROR_CODES.HUE_NOT_ON_LOCAL_NETWORK,
@@ -319,11 +335,11 @@ export function hueNotOnLocalNetwork() {
 
 /**
  * Redirect response (302)
- * @param {string} url - Redirect URL
- * @returns {Response}
+ * @param url - Redirect URL
+ * @returns Response
  */
-export function redirect(url) {
-  return Response.redirect(url, HTTP_STATUS.MOVED_TEMPORARILY || 302);
+export function redirect(url: string): Response {
+  return Response.redirect(url, 302);
 }
 
 // =============================================================================

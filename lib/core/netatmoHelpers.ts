@@ -5,6 +5,7 @@
  */
 
 import { getValidAccessToken, handleTokenError } from '@/lib/netatmoTokenHelper';
+import type { ErrorCode } from '@/types/api';
 import { ApiError, ERROR_CODES } from './apiErrors';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { triggerNetatmoAlertServer } from '@/lib/notificationTriggersServer';
@@ -17,14 +18,14 @@ const NETATMO_NOTIFICATION_COOLDOWN_MS = 60 * 60 * 1000;
  * Send Netatmo connection lost notification with cooldown
  * Prevents spam by only sending once per hour
  */
-async function sendNetatmoConnectionLostNotification() {
+async function sendNetatmoConnectionLostNotification(): Promise<void> {
   const adminUserId = process.env.ADMIN_USER_ID;
   if (!adminUserId) return;
 
   try {
     // Check cooldown
     const lastNotifyPath = getEnvironmentPath('netatmo/lastConnectionLostNotification');
-    const lastNotify = await adminDbGet(lastNotifyPath);
+    const lastNotify = await adminDbGet(lastNotifyPath) as number | null;
     const now = Date.now();
 
     if (lastNotify && (now - lastNotify) < NETATMO_NOTIFICATION_COOLDOWN_MS) {
@@ -41,16 +42,16 @@ async function sendNetatmoConnectionLostNotification() {
     await adminDbSet(lastNotifyPath, now);
 
   } catch (error) {
-    console.error('❌ Errore invio notifica netatmo_connection_lost:', error.message);
+    console.error('❌ Errore invio notifica netatmo_connection_lost:', (error as Error).message);
   }
 }
 
 /**
  * Get a valid Netatmo access token or throw ApiError
- * @returns {Promise<string>} Valid access token
- * @throws {ApiError} If token is invalid or refresh fails
+ * @returns Valid access token
+ * @throws ApiError if token is invalid or refresh fails
  */
-export async function requireNetatmoToken() {
+export async function requireNetatmoToken(): Promise<string> {
   const { accessToken, error, message } = await getValidAccessToken();
 
   if (error) {
@@ -59,12 +60,12 @@ export async function requireNetatmoToken() {
     // Send notification if reconnect is required (async, don't block)
     if (reconnect) {
       sendNetatmoConnectionLostNotification().catch(err =>
-        console.error('❌ Errore notifica Netatmo:', err.message)
+        console.error('❌ Errore notifica Netatmo:', (err as Error).message)
       );
     }
 
     throw new ApiError(
-      reconnect ? ERROR_CODES.NETATMO_RECONNECT_REQUIRED : ERROR_CODES.NETATMO_TOKEN_INVALID,
+      (reconnect ? ERROR_CODES.NETATMO_RECONNECT_REQUIRED : ERROR_CODES.NETATMO_TOKEN_INVALID) as ErrorCode,
       message || 'Token Netatmo non valido',
       status,
       reconnect ? { reconnect: true } : null

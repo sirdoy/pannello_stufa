@@ -11,6 +11,7 @@
  *   const { id, name } = validateRequired(body, ['id', 'name']);
  */
 
+import { NextRequest } from 'next/server';
 import { ApiError, ERROR_CODES, HTTP_STATUS } from './apiErrors';
 
 // =============================================================================
@@ -21,15 +22,18 @@ import { ApiError, ERROR_CODES, HTTP_STATUS } from './apiErrors';
  * Safely parse JSON body from request
  * Returns default value on parse error instead of throwing
  *
- * @param {Request} request - HTTP request object
- * @param {object} defaultValue - Default value if parsing fails
- * @returns {Promise<object>} Parsed body or default value
+ * @param request - HTTP request object
+ * @param defaultValue - Default value if parsing fails
+ * @returns Parsed body or default value
  *
  * @example
  * const body = await parseJson(request);
  * const body = await parseJson(request, { power: 3 }); // with defaults
  */
-export async function parseJson(request, defaultValue = {}) {
+export async function parseJson<T = Record<string, unknown>>(
+  request: NextRequest,
+  defaultValue: T = {} as T
+): Promise<T> {
   try {
     const contentType = request.headers.get('content-type');
 
@@ -43,7 +47,7 @@ export async function parseJson(request, defaultValue = {}) {
       return defaultValue;
     }
 
-    return JSON.parse(text);
+    return JSON.parse(text) as T;
   } catch {
     return defaultValue;
   }
@@ -53,20 +57,20 @@ export async function parseJson(request, defaultValue = {}) {
  * Parse JSON body and throw on failure
  * Use when body is required
  *
- * @param {Request} request - HTTP request object
- * @returns {Promise<object>} Parsed body
- * @throws {ApiError} If parsing fails
+ * @param request - HTTP request object
+ * @returns Parsed body
+ * @throws ApiError if parsing fails
  *
  * @example
  * const body = await parseJsonOrThrow(request);
  */
-export async function parseJsonOrThrow(request) {
+export async function parseJsonOrThrow<T = Record<string, unknown>>(request: NextRequest): Promise<T> {
   try {
     const text = await request.text();
     if (!text || text.trim() === '') {
       throw ApiError.badRequest('Body richiesto');
     }
-    return JSON.parse(text);
+    return JSON.parse(text) as T;
   } catch (error) {
     if (error instanceof ApiError) throw error;
     throw ApiError.badRequest('JSON non valido');
@@ -80,14 +84,14 @@ export async function parseJsonOrThrow(request) {
 /**
  * Parse query parameters from URL
  *
- * @param {Request} request - HTTP request object
- * @returns {URLSearchParams} Query parameters
+ * @param request - HTTP request object
+ * @returns Query parameters
  *
  * @example
  * const query = parseQuery(request);
  * const id = query.get('id');
  */
-export function parseQuery(request) {
+export function parseQuery(request: NextRequest): URLSearchParams {
   const url = new URL(request.url);
   return url.searchParams;
 }
@@ -95,15 +99,15 @@ export function parseQuery(request) {
 /**
  * Parse query parameters as object
  *
- * @param {Request} request - HTTP request object
- * @returns {object} Query parameters as key-value pairs
+ * @param request - HTTP request object
+ * @returns Query parameters as key-value pairs
  *
  * @example
  * const { page, limit } = parseQueryObject(request);
  */
-export function parseQueryObject(request) {
+export function parseQueryObject(request: NextRequest): Record<string, string> {
   const params = parseQuery(request);
-  const obj = {};
+  const obj: Record<string, string> = {};
   for (const [key, value] of params.entries()) {
     obj[key] = value;
   }
@@ -122,11 +126,11 @@ export function parseQueryObject(request) {
  * 1. validateRequired(object, ['field1', 'field2']) - validate object has fields
  * 2. validateRequired(value, 'fieldName', allowZero?) - validate single value is present
  *
- * @param {object|any} data - Object to validate OR single value
- * @param {string[]|string} fields - Required field names OR single field name
- * @param {boolean} allowZero - For single value pattern, allow 0 as valid
- * @returns {object|any} Original data/value if valid
- * @throws {ApiError} If any field is missing
+ * @param data - Object to validate OR single value
+ * @param fields - Required field names OR single field name
+ * @param allowZero - For single value pattern, allow 0 as valid
+ * @returns Original data/value if valid
+ * @throws ApiError if any field is missing
  *
  * @example
  * // Object pattern
@@ -136,10 +140,24 @@ export function parseQueryObject(request) {
  * // Single value pattern
  * validateRequired(userId, 'userId');
  */
-export function validateRequired(data, fields, allowZero = false) {
+export function validateRequired<T extends Record<string, unknown>>(
+  data: T,
+  fields: string[],
+  allowZero?: never
+): T;
+export function validateRequired<T>(
+  data: T,
+  fields: string,
+  allowZero?: boolean
+): T;
+export function validateRequired<T>(
+  data: T | Record<string, unknown>,
+  fields: string | string[],
+  allowZero: boolean = false
+): T | Record<string, unknown> {
   // Single value pattern: validateRequired(value, 'fieldName', allowZero?)
   if (typeof fields === 'string') {
-    const value = data;
+    const value = data as T;
     const fieldName = fields;
     const isEmpty = value === undefined || value === null || value === '' ||
                     (!allowZero && value === 0);
@@ -157,8 +175,9 @@ export function validateRequired(data, fields, allowZero = false) {
   }
 
   // Object pattern: validateRequired(object, ['field1', 'field2'])
+  const obj = data as Record<string, unknown>;
   const missing = fields.filter(field => {
-    const value = data[field];
+    const value = obj[field];
     return value === undefined || value === null || value === '';
   });
 
@@ -171,22 +190,22 @@ export function validateRequired(data, fields, allowZero = false) {
     );
   }
 
-  return data;
+  return data as Record<string, unknown>;
 }
 
 /**
  * Validate that a value is one of allowed values
  *
- * @param {any} value - Value to validate
- * @param {any[]} allowed - Allowed values
- * @param {string} fieldName - Field name for error message
- * @returns {any} Original value if valid
- * @throws {ApiError} If value is not allowed
+ * @param value - Value to validate
+ * @param allowed - Allowed values
+ * @param fieldName - Field name for error message
+ * @returns Original value if valid
+ * @throws ApiError if value is not allowed
  *
  * @example
  * const status = validateEnum(body.status, ['active', 'inactive'], 'status');
  */
-export function validateEnum(value, allowed, fieldName) {
+export function validateEnum<T>(value: T, allowed: T[], fieldName: string): T {
   if (!allowed.includes(value)) {
     throw new ApiError(
       ERROR_CODES.INVALID_INPUT,
@@ -201,17 +220,17 @@ export function validateEnum(value, allowed, fieldName) {
 /**
  * Validate that a value is within a numeric range
  *
- * @param {number} value - Value to validate
- * @param {number} min - Minimum value (inclusive)
- * @param {number} max - Maximum value (inclusive)
- * @param {string} fieldName - Field name for error message
- * @returns {number} Original value if valid
- * @throws {ApiError} If value is out of range
+ * @param value - Value to validate
+ * @param min - Minimum value (inclusive)
+ * @param max - Maximum value (inclusive)
+ * @param fieldName - Field name for error message
+ * @returns Original value if valid
+ * @throws ApiError if value is out of range
  *
  * @example
  * const power = validateRange(body.power, 1, 5, 'power');
  */
-export function validateRange(value, min, max, fieldName) {
+export function validateRange(value: unknown, min: number, max: number, fieldName: string): number {
   const num = Number(value);
 
   if (isNaN(num)) {
@@ -238,11 +257,11 @@ export function validateRange(value, min, max, fieldName) {
 /**
  * Validate email format
  *
- * @param {string} email - Email to validate
- * @returns {string} Original email if valid
- * @throws {ApiError} If email format is invalid
+ * @param email - Email to validate
+ * @returns Original email if valid
+ * @throws ApiError if email format is invalid
  */
-export function validateEmail(email) {
+export function validateEmail(email: unknown): string {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (!email || typeof email !== 'string' || !emailRegex.test(email)) {
@@ -260,12 +279,12 @@ export function validateEmail(email) {
 /**
  * Validate that a value is a non-empty string
  *
- * @param {any} value - Value to validate
- * @param {string} fieldName - Field name for error message
- * @returns {string} Original value if valid
- * @throws {ApiError} If value is not a non-empty string
+ * @param value - Value to validate
+ * @param fieldName - Field name for error message
+ * @returns Original value if valid
+ * @throws ApiError if value is not a non-empty string
  */
-export function validateString(value, fieldName) {
+export function validateString(value: unknown, fieldName: string): string {
   if (!value || typeof value !== 'string' || value.trim() === '') {
     throw new ApiError(
       ERROR_CODES.INVALID_INPUT,
@@ -281,13 +300,13 @@ export function validateString(value, fieldName) {
 /**
  * Validate that a value is an array
  *
- * @param {any} value - Value to validate
- * @param {string} fieldName - Field name for error message
- * @param {number} minLength - Minimum array length (optional)
- * @returns {array} Original value if valid
- * @throws {ApiError} If value is not an array
+ * @param value - Value to validate
+ * @param fieldName - Field name for error message
+ * @param minLength - Minimum array length (optional)
+ * @returns Original value if valid
+ * @throws ApiError if value is not an array
  */
-export function validateArray(value, fieldName, minLength = 0) {
+export function validateArray<T>(value: unknown, fieldName: string, minLength: number = 0): T[] {
   if (!Array.isArray(value)) {
     throw new ApiError(
       ERROR_CODES.INVALID_INPUT,
@@ -306,18 +325,18 @@ export function validateArray(value, fieldName, minLength = 0) {
     );
   }
 
-  return value;
+  return value as T[];
 }
 
 /**
  * Validate that a value is a boolean
  *
- * @param {any} value - Value to validate
- * @param {string} fieldName - Field name for error message
- * @returns {boolean} Boolean value
- * @throws {ApiError} If value cannot be converted to boolean
+ * @param value - Value to validate
+ * @param fieldName - Field name for error message
+ * @returns Boolean value
+ * @throws ApiError if value cannot be converted to boolean
  */
-export function validateBoolean(value, fieldName) {
+export function validateBoolean(value: unknown, fieldName: string): boolean {
   if (value === true || value === 'true' || value === 1 || value === '1') {
     return true;
   }
@@ -337,19 +356,24 @@ export function validateBoolean(value, fieldName) {
 // PATH PARAMETER HELPERS
 // =============================================================================
 
+/** Route context interface */
+interface RouteContext {
+  params: Promise<Record<string, string>>;
+}
+
 /**
  * Get path parameter from dynamic route context
  * For routes like /api/items/[id]/route.js
  *
- * @param {object} context - Route context with params
- * @param {string} paramName - Parameter name
- * @returns {Promise<string>} Parameter value
- * @throws {ApiError} If parameter is missing
+ * @param context - Route context with params
+ * @param paramName - Parameter name
+ * @returns Parameter value
+ * @throws ApiError if parameter is missing
  *
  * @example
  * const id = await getPathParam(context, 'id');
  */
-export async function getPathParam(context, paramName) {
+export async function getPathParam(context: RouteContext, paramName: string): Promise<string> {
   const params = await context.params;
   const value = params?.[paramName];
 
@@ -367,12 +391,16 @@ export async function getPathParam(context, paramName) {
 /**
  * Get optional path parameter
  *
- * @param {object} context - Route context with params
- * @param {string} paramName - Parameter name
- * @param {any} defaultValue - Default value if missing
- * @returns {Promise<any>} Parameter value or default
+ * @param context - Route context with params
+ * @param paramName - Parameter name
+ * @param defaultValue - Default value if missing
+ * @returns Parameter value or default
  */
-export async function getOptionalPathParam(context, paramName, defaultValue = null) {
+export async function getOptionalPathParam<T = string>(
+  context: RouteContext,
+  paramName: string,
+  defaultValue: T | null = null
+): Promise<string | T | null> {
   const params = await context.params;
   return params?.[paramName] ?? defaultValue;
 }

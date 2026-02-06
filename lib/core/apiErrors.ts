@@ -10,6 +10,8 @@
  *   throw new ApiError(ERROR_CODES.NOT_FOUND, 'Schedule not found', HTTP_STATUS.NOT_FOUND);
  */
 
+import type { HttpStatus, ErrorCode } from '@/types/api';
+
 // =============================================================================
 // HTTP STATUS CODES
 // =============================================================================
@@ -31,7 +33,7 @@ export const HTTP_STATUS = {
   BAD_GATEWAY: 502,
   SERVICE_UNAVAILABLE: 503,
   GATEWAY_TIMEOUT: 504,
-};
+} as const;
 
 // =============================================================================
 // ERROR CODES
@@ -86,13 +88,13 @@ export const ERROR_CODES = {
   // Server
   INTERNAL_ERROR: 'INTERNAL_ERROR',
   NOT_IMPLEMENTED: 'NOT_IMPLEMENTED',
-};
+} as const;
 
 // =============================================================================
 // ERROR MESSAGES (Italian, for user-facing errors)
 // =============================================================================
 
-export const ERROR_MESSAGES = {
+export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   // Authentication
   [ERROR_CODES.UNAUTHORIZED]: 'Non autenticato',
   [ERROR_CODES.FORBIDDEN]: 'Accesso negato',
@@ -157,7 +159,16 @@ export const ERROR_MESSAGES = {
  * throw ApiError.notFound('Schedule not found');
  */
 export class ApiError extends Error {
-  constructor(code, message, status = HTTP_STATUS.INTERNAL_SERVER_ERROR, details = null) {
+  public readonly code: ErrorCode;
+  public readonly status: HttpStatus;
+  public readonly details: Record<string, unknown> | null;
+
+  constructor(
+    code: ErrorCode,
+    message?: string,
+    status: HttpStatus = HTTP_STATUS.INTERNAL_SERVER_ERROR,
+    details: Record<string, unknown> | null = null
+  ) {
     super(message || ERROR_MESSAGES[code] || 'Unknown error');
     this.name = 'ApiError';
     this.code = code;
@@ -173,8 +184,8 @@ export class ApiError extends Error {
   /**
    * Serialize error for JSON response
    */
-  toJSON() {
-    const json = {
+  toJSON(): { error: string; code: ErrorCode; details?: Record<string, unknown> } {
+    const json: { error: string; code: ErrorCode; details?: Record<string, unknown> } = {
       error: this.message,
       code: this.code,
     };
@@ -190,41 +201,41 @@ export class ApiError extends Error {
   // STATIC FACTORY METHODS
   // =============================================================================
 
-  static unauthorized(message = ERROR_MESSAGES[ERROR_CODES.UNAUTHORIZED]) {
+  static unauthorized(message: string = ERROR_MESSAGES[ERROR_CODES.UNAUTHORIZED]): ApiError {
     return new ApiError(ERROR_CODES.UNAUTHORIZED, message, HTTP_STATUS.UNAUTHORIZED);
   }
 
-  static forbidden(message = ERROR_MESSAGES[ERROR_CODES.FORBIDDEN]) {
+  static forbidden(message: string = ERROR_MESSAGES[ERROR_CODES.FORBIDDEN]): ApiError {
     return new ApiError(ERROR_CODES.FORBIDDEN, message, HTTP_STATUS.FORBIDDEN);
   }
 
-  static notFound(message = ERROR_MESSAGES[ERROR_CODES.NOT_FOUND]) {
+  static notFound(message: string = ERROR_MESSAGES[ERROR_CODES.NOT_FOUND]): ApiError {
     return new ApiError(ERROR_CODES.NOT_FOUND, message, HTTP_STATUS.NOT_FOUND);
   }
 
-  static badRequest(message = ERROR_MESSAGES[ERROR_CODES.VALIDATION_ERROR], details = null) {
+  static badRequest(message: string = ERROR_MESSAGES[ERROR_CODES.VALIDATION_ERROR], details: Record<string, unknown> | null = null): ApiError {
     return new ApiError(ERROR_CODES.VALIDATION_ERROR, message, HTTP_STATUS.BAD_REQUEST, details);
   }
 
-  static validation(message, details = null) {
+  static validation(message: string, details: Record<string, unknown> | null = null): ApiError {
     return new ApiError(ERROR_CODES.VALIDATION_ERROR, message, HTTP_STATUS.BAD_REQUEST, details);
   }
 
-  static timeout(message = ERROR_MESSAGES[ERROR_CODES.TIMEOUT]) {
+  static timeout(message: string = ERROR_MESSAGES[ERROR_CODES.TIMEOUT]): ApiError {
     return new ApiError(ERROR_CODES.TIMEOUT, message, HTTP_STATUS.GATEWAY_TIMEOUT);
   }
 
-  static serviceUnavailable(message = ERROR_MESSAGES[ERROR_CODES.SERVICE_UNAVAILABLE]) {
+  static serviceUnavailable(message: string = ERROR_MESSAGES[ERROR_CODES.SERVICE_UNAVAILABLE]): ApiError {
     return new ApiError(ERROR_CODES.SERVICE_UNAVAILABLE, message, HTTP_STATUS.SERVICE_UNAVAILABLE);
   }
 
-  static internal(message = ERROR_MESSAGES[ERROR_CODES.INTERNAL_ERROR], details = null) {
+  static internal(message: string = ERROR_MESSAGES[ERROR_CODES.INTERNAL_ERROR], details: Record<string, unknown> | null = null): ApiError {
     return new ApiError(ERROR_CODES.INTERNAL_ERROR, message, HTTP_STATUS.INTERNAL_SERVER_ERROR, details);
   }
 
   // Device-specific errors
 
-  static stoveOffline(details = null) {
+  static stoveOffline(details: Record<string, unknown> | null = null): ApiError {
     return new ApiError(
       ERROR_CODES.STOVE_OFFLINE,
       'Stufa non raggiungibile. Verifica che sia accesa e connessa alla rete.',
@@ -233,7 +244,7 @@ export class ApiError extends Error {
     );
   }
 
-  static stoveTimeout() {
+  static stoveTimeout(): ApiError {
     return new ApiError(
       ERROR_CODES.STOVE_TIMEOUT,
       'Timeout comunicazione con la stufa',
@@ -241,7 +252,7 @@ export class ApiError extends Error {
     );
   }
 
-  static maintenanceRequired() {
+  static maintenanceRequired(): ApiError {
     return new ApiError(
       ERROR_CODES.MAINTENANCE_REQUIRED,
       'Manutenzione richiesta - Conferma la pulizia prima di accendere',
@@ -249,7 +260,7 @@ export class ApiError extends Error {
     );
   }
 
-  static netatmoReconnect(message = 'Token Netatmo scaduto, riconnessione richiesta') {
+  static netatmoReconnect(message: string = 'Token Netatmo scaduto, riconnessione richiesta'): ApiError {
     return new ApiError(
       ERROR_CODES.NETATMO_RECONNECT_REQUIRED,
       message,
@@ -258,7 +269,7 @@ export class ApiError extends Error {
     );
   }
 
-  static hueNotConnected() {
+  static hueNotConnected(): ApiError {
     return new ApiError(
       ERROR_CODES.HUE_NOT_CONNECTED,
       'Hue non connesso. Connetti localmente o abilita accesso remoto.',
@@ -267,7 +278,7 @@ export class ApiError extends Error {
     );
   }
 
-  static hueNotOnLocalNetwork() {
+  static hueNotOnLocalNetwork(): ApiError {
     return new ApiError(
       ERROR_CODES.HUE_NOT_ON_LOCAL_NETWORK,
       'Bridge Hue non raggiungibile. Assicurati di essere sulla stessa rete locale.',
@@ -284,7 +295,7 @@ export class ApiError extends Error {
  * Maps legacy error messages to ApiError instances
  * Used during migration period
  */
-export function mapLegacyError(error) {
+export function mapLegacyError(error: Error): ApiError {
   const message = error.message || '';
 
   // Stove errors

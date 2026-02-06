@@ -6,6 +6,16 @@
  */
 
 import Dexie from 'dexie';
+import type { FCMToken } from '@/types/firebase';
+
+interface TokenStorageRecord {
+  id: string;
+  token: string;
+  createdAt: string;
+  lastUsed: string;
+  deviceId: string | null;
+  deviceInfo: Record<string, unknown> | null;
+}
 
 // Initialize IndexedDB via Dexie
 const db = new Dexie('fcmTokenDB');
@@ -18,9 +28,9 @@ const TOKEN_ID = 'current';
 
 /**
  * Request persistent storage to prevent eviction
- * @returns {Promise<boolean>} true if persistence granted
+ * @returns true if persistence granted
  */
-export async function requestPersistentStorage() {
+export async function requestPersistentStorage(): Promise<boolean> {
   if (typeof navigator === 'undefined') return false;
 
   if (navigator.storage && navigator.storage.persist) {
@@ -38,9 +48,8 @@ export async function requestPersistentStorage() {
 
 /**
  * Check if storage is persisted
- * @returns {Promise<boolean>}
  */
-export async function checkPersistence() {
+export async function checkPersistence(): Promise<boolean> {
   if (typeof navigator === 'undefined') return false;
 
   if (navigator.storage && navigator.storage.persisted) {
@@ -51,16 +60,16 @@ export async function checkPersistence() {
 
 /**
  * Save token to both IndexedDB and localStorage
- * @param {string} token - FCM token
- * @param {Object} metadata - Additional metadata (deviceId, deviceInfo, etc.)
+ * @param token - FCM token
+ * @param metadata - Additional metadata (deviceId, deviceInfo, etc.)
  */
-export async function saveToken(token, metadata = {}) {
+export async function saveToken(token: string, metadata: Partial<FCMToken> & { deviceInfo?: Record<string, unknown> } = {}): Promise<void> {
   if (typeof window === 'undefined') {
     throw new Error('saveToken can only be called in browser');
   }
 
   const now = new Date().toISOString();
-  const tokenData = {
+  const tokenData: TokenStorageRecord = {
     id: TOKEN_ID,
     token,
     createdAt: metadata.createdAt || now,
@@ -74,7 +83,7 @@ export async function saveToken(token, metadata = {}) {
 
   // Save to IndexedDB (primary)
   try {
-    await db.tokens.put(tokenData);
+    await (db as Dexie & { tokens: Dexie.Table<TokenStorageRecord, string> }).tokens.put(tokenData);
     console.log('[tokenStorage] Saved to IndexedDB');
   } catch (e) {
     console.error('[tokenStorage] IndexedDB save failed:', e);
@@ -91,14 +100,14 @@ export async function saveToken(token, metadata = {}) {
 
 /**
  * Load token from storage (IndexedDB first, localStorage fallback)
- * @returns {Promise<Object|null>} Token data or null if not found
+ * @returns Token data or null if not found
  */
-export async function loadToken() {
+export async function loadToken(): Promise<TokenStorageRecord | null> {
   if (typeof window === 'undefined') return null;
 
   // Try IndexedDB first
   try {
-    const record = await db.tokens.get(TOKEN_ID);
+    const record = await (db as Dexie & { tokens: Dexie.Table<TokenStorageRecord, string> }).tokens.get(TOKEN_ID);
     if (record?.token) {
       console.log('[tokenStorage] Loaded from IndexedDB');
       return record;
@@ -111,12 +120,12 @@ export async function loadToken() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      const data = JSON.parse(stored);
+      const data = JSON.parse(stored) as TokenStorageRecord;
       if (data?.token) {
         console.log('[tokenStorage] Loaded from localStorage (fallback)');
         // Sync back to IndexedDB if it was missing
         try {
-          await db.tokens.put({ ...data, id: TOKEN_ID });
+          await (db as Dexie & { tokens: Dexie.Table<TokenStorageRecord, string> }).tokens.put({ ...data, id: TOKEN_ID });
         } catch (syncError) {
           console.warn('[tokenStorage] Could not sync to IndexedDB:', syncError);
         }
@@ -133,14 +142,14 @@ export async function loadToken() {
 /**
  * Update lastUsed timestamp for existing token
  */
-export async function updateLastUsed() {
+export async function updateLastUsed(): Promise<void> {
   if (typeof window === 'undefined') return;
 
   const now = new Date().toISOString();
 
   // Update IndexedDB
   try {
-    await db.tokens.update(TOKEN_ID, { lastUsed: now });
+    await (db as Dexie & { tokens: Dexie.Table<TokenStorageRecord, string> }).tokens.update(TOKEN_ID, { lastUsed: now });
   } catch (e) {
     console.warn('[tokenStorage] IndexedDB update failed:', e);
   }
@@ -149,7 +158,7 @@ export async function updateLastUsed() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      const data = JSON.parse(stored);
+      const data = JSON.parse(stored) as TokenStorageRecord;
       data.lastUsed = now;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
@@ -161,12 +170,12 @@ export async function updateLastUsed() {
 /**
  * Clear token from all storage
  */
-export async function clearToken() {
+export async function clearToken(): Promise<void> {
   if (typeof window === 'undefined') return;
 
   // Clear IndexedDB
   try {
-    await db.tokens.delete(TOKEN_ID);
+    await (db as Dexie & { tokens: Dexie.Table<TokenStorageRecord, string> }).tokens.delete(TOKEN_ID);
     console.log('[tokenStorage] Cleared from IndexedDB');
   } catch (e) {
     console.warn('[tokenStorage] IndexedDB clear failed:', e);
@@ -183,9 +192,9 @@ export async function clearToken() {
 
 /**
  * Get token age in days
- * @returns {Promise<number|null>} Age in days or null if no token
+ * @returns Age in days or null if no token
  */
-export async function getTokenAge() {
+export async function getTokenAge(): Promise<number | null> {
   const data = await loadToken();
   if (!data?.createdAt) return null;
 
@@ -194,16 +203,28 @@ export async function getTokenAge() {
   return (now - created) / (1000 * 60 * 60 * 24);
 }
 
+interface StorageStatus {
+  available: boolean;
+  reason?: string;
+  indexedDB?: boolean;
+  localStorage?: boolean;
+  persisted?: boolean;
+  token?: TokenStorageRecord | null;
+  indexedDBError?: string;
+  localStorageError?: string;
+}
+
 /**
  * Check storage health for debugging
- * @returns {Promise<Object>} Storage status
+ * @returns Storage status
  */
-export async function getStorageStatus() {
+export async function getStorageStatus(): Promise<StorageStatus> {
   if (typeof window === 'undefined') {
     return { available: false, reason: 'SSR' };
   }
 
-  const status = {
+  const status: StorageStatus = {
+    available: true,
     indexedDB: false,
     localStorage: false,
     persisted: await checkPersistence(),
@@ -211,18 +232,18 @@ export async function getStorageStatus() {
   };
 
   try {
-    const idbRecord = await db.tokens.get(TOKEN_ID);
+    const idbRecord = await (db as Dexie & { tokens: Dexie.Table<TokenStorageRecord, string> }).tokens.get(TOKEN_ID);
     status.indexedDB = !!idbRecord?.token;
-    status.token = idbRecord;
+    status.token = idbRecord || null;
   } catch (e) {
-    status.indexedDBError = e.message;
+    status.indexedDBError = (e as Error).message;
   }
 
   try {
     const lsData = localStorage.getItem(STORAGE_KEY);
     status.localStorage = !!lsData;
   } catch (e) {
-    status.localStorageError = e.message;
+    status.localStorageError = (e as Error).message;
   }
 
   return status;

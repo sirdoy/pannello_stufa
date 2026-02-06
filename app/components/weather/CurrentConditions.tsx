@@ -252,9 +252,9 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-3 mb-1">
             <Text
-              size="4xl"
+              size="xl"
               weight="bold"
-              className="leading-none"
+              className="leading-none text-4xl"
             >
               {formatTemperature(temperature)}°
             </Text>
@@ -285,7 +285,7 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
           </div>
           <Text
             variant="secondary"
-            size="md"
+            size="base"
             className="capitalize"
           >
             {weatherDescription}

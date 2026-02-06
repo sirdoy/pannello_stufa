@@ -125,7 +125,7 @@ export function WeatherCard({
   if (error) {
     return (
       <SmartHomeCard
-        icon={<CloudOff className="w-6 h-6 sm:w-8 sm:h-8" />}
+        icon="☁️"
         title="Meteo"
         colorTheme="ocean"
       >
@@ -138,8 +138,8 @@ export function WeatherCard({
               variant="outline"
               size="sm"
               onClick={onRetry}
-              icon={<RefreshCw className="w-4 h-4" />}
             >
+              <RefreshCw className="w-4 h-4" />
               Riprova
             </Button>
           </div>
@@ -152,7 +152,7 @@ export function WeatherCard({
   if (!weatherData) {
     return (
       <SmartHomeCard
-        icon={<CloudSun className="w-6 h-6 sm:w-8 sm:h-8" />}
+        icon="🌤️"
         title="Meteo"
         colorTheme="ocean"
       >
@@ -175,18 +175,21 @@ export function WeatherCard({
 
   return (
     <SmartHomeCard
-      icon={<CloudSun className="w-6 h-6 sm:w-8 sm:h-8" />}
+      icon="🌤️"
       title={locationName ? `Meteo - ${locationName}` : 'Meteo'}
       colorTheme="ocean"
       headerActions={
-        <Button.Icon
-          icon={<RefreshCw className={cn("w-4 h-4", isRefreshing && "animate-spin")} />}
-          variant="ghost"
-          size="sm"
+        <button
           onClick={onRefresh}
           disabled={isRefreshing}
           aria-label="Aggiorna meteo"
-        />
+          className={cn(
+            "p-2 rounded-lg hover:bg-slate-800/60 transition-colors",
+            isRefreshing && "animate-spin"
+          )}
+        >
+          <RefreshCw className="w-4 h-4" />
+        </button>
       }
     >
       {stale && (

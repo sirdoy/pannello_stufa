@@ -8,12 +8,29 @@ import EventFilters from './EventFilters';
 
 const MAX_EVENTS = 200; // Memory safeguard
 
+interface HealthEvent {
+  id: string;
+  timestamp: string;
+  hasStateMismatch: boolean;
+  failureCount: number;
+  checkedCount: number;
+  successCount: number;
+  duration: number;
+  mismatchDetails?: string[];
+}
+
+interface EventsResponse {
+  events: HealthEvent[];
+  cursor: string | null;
+  hasMore: boolean;
+}
+
 export default function MonitoringTimeline() {
-  const [events, setEvents] = useState([]);
-  const [cursor, setCursor] = useState(null);
+  const [events, setEvents] = useState<HealthEvent[]>([]);
+  const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Filters
   const [typeFilter, setTypeFilter] = useState('');
@@ -44,7 +61,7 @@ export default function MonitoringTimeline() {
         throw new Error('Errore nel caricamento degli eventi');
       }
 
-      const data = await res.json();
+      const data: EventsResponse = await res.json();
 
       if (resetList) {
         setEvents(data.events);
@@ -63,7 +80,7 @@ export default function MonitoringTimeline() {
       setError(null);
     } catch (err) {
       console.error('Error fetching events:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setIsLoading(false);
     }
@@ -77,7 +94,7 @@ export default function MonitoringTimeline() {
   }, [typeFilter, severityFilter]); // Reset on filter change
 
   // Handle filter changes
-  const handleTypeChange = (value) => {
+  const handleTypeChange = (value: string) => {
     setTypeFilter(value);
     setCursor(null);
     setEvents([]);
@@ -85,7 +102,7 @@ export default function MonitoringTimeline() {
     setIsLoading(true);
   };
 
-  const handleSeverityChange = (value) => {
+  const handleSeverityChange = (value: string) => {
     setSeverityFilter(value);
     setCursor(null);
     setEvents([]);

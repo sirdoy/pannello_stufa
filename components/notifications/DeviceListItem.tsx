@@ -8,11 +8,34 @@ import Button from '@/app/components/ui/Button';
 import Input from '@/app/components/ui/Input';
 import { Text } from '@/app/components/ui';
 
+interface Device {
+  tokenKey: string;
+  displayName: string;
+  platform: string;
+  browser: string;
+  os: string;
+  lastUsed: string | null;
+  tokenPrefix: string;
+  status: 'active' | 'stale' | 'unknown';
+}
+
+interface DeviceListItemProps {
+  device: Device;
+  isCurrentDevice: boolean;
+  onUpdate: (tokenKey: string, updates: { displayName: string }) => void;
+  onRemove: (tokenKey: string) => void;
+}
+
+interface StatusStyle {
+  text: string;
+  className: string;
+}
+
 /**
  * Get status styling
  */
-const getStatusStyle = (status) => {
-  const styles = {
+const getStatusStyle = (status: string): StatusStyle => {
+  const styles: Record<string, StatusStyle> = {
     active: {
       text: 'Attivo',
       className: 'bg-sage-500/20 text-sage-400 [html:not(.dark)_&]:bg-sage-100 [html:not(.dark)_&]:text-sage-700',
@@ -32,7 +55,7 @@ const getStatusStyle = (status) => {
 /**
  * Get device icon
  */
-const getDeviceIcon = (platform, browser) => {
+const getDeviceIcon = (platform: string, browser: string): string => {
   if (platform === 'ios') return '📱';
   if (platform === 'android') return '📱';
   if (browser?.toLowerCase().includes('safari')) return '🧭';
@@ -46,12 +69,12 @@ export default function DeviceListItem({
   isCurrentDevice,
   onUpdate,
   onRemove,
-}) {
+}: DeviceListItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(device.displayName || '');
   const [isSaving, setIsSaving] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   const statusStyle = getStatusStyle(device.status);
 
@@ -90,7 +113,7 @@ export default function DeviceListItem({
       // Rollback on failure
       onUpdate(device.tokenKey, { displayName: previousName });
       setEditName(previousName);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
       setIsEditing(true);
     } finally {
       setIsSaving(false);
@@ -121,7 +144,7 @@ export default function DeviceListItem({
       // Notify parent to remove from list
       onRemove(device.tokenKey);
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
       setIsRemoving(false);
     }
   };

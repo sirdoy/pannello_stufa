@@ -6,7 +6,22 @@ import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { Text } from '@/app/components/ui';
 
-export default function HealthEventItem({ event }) {
+interface HealthEvent {
+  id: string;
+  timestamp: string;
+  hasStateMismatch: boolean;
+  failureCount: number;
+  checkedCount: number;
+  successCount: number;
+  duration: number;
+  mismatchDetails?: string[];
+}
+
+interface HealthEventItemProps {
+  event: HealthEvent;
+}
+
+export default function HealthEventItem({ event }: HealthEventItemProps) {
   const [expanded, setExpanded] = useState(false);
 
   // Determine status indicator

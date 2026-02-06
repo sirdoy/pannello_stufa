@@ -9,30 +9,29 @@ import Text from '@/app/components/ui/Text';
 import StatusBadge from '@/app/components/ui/StatusBadge';
 import Button from '@/app/components/ui/Button';
 
-/**
- * Dead Man's Switch Panel Component
- *
- * Displays cron health status with last check time and staleness detection.
- * Uses data from /api/health-monitoring/dead-man-switch endpoint.
- *
- * @param {Object} props
- * @param {Object|null} props.status - Status object from API (null while loading)
- * @param {string|null} props.error - Error message if fetch failed
- * @param {Function} props.onRetry - Callback to retry fetching status
- *
- * Healthy state:
- * @param {boolean} props.status.stale - false
- * @param {number} props.status.elapsed - Milliseconds since last check
- * @param {string} props.status.lastCheck - ISO timestamp
- *
- * Stale states:
- * @param {boolean} props.status.stale - true
- * @param {string} props.status.reason - 'never_run' | 'timeout' | 'error'
- * @param {number} [props.status.elapsed] - For 'timeout' reason
- * @param {string} [props.status.lastCheck] - For 'timeout' reason
- * @param {string} [props.status.error] - For 'error' reason
- */
-export default function DeadManSwitchPanel({ status, error, onRetry }) {
+interface HealthyStatus {
+  stale: false;
+  elapsed: number;
+  lastCheck: string;
+}
+
+interface StaleStatus {
+  stale: true;
+  reason: 'never_run' | 'timeout' | 'error';
+  elapsed?: number;
+  lastCheck?: string;
+  error?: string;
+}
+
+type DeadManSwitchStatus = HealthyStatus | StaleStatus;
+
+interface DeadManSwitchPanelProps {
+  status: DeadManSwitchStatus | null;
+  error: string | null;
+  onRetry?: () => void;
+}
+
+export default function DeadManSwitchPanel({ status, error, onRetry }: DeadManSwitchPanelProps) {
   // Error state (API fetch failed)
   if (error) {
     return (
@@ -164,7 +163,7 @@ export default function DeadManSwitchPanel({ status, error, onRetry }) {
 
   // Stale - timeout (> 10 minutes)
   if (status.reason === 'timeout') {
-    const minutesElapsed = Math.floor(status.elapsed / 60000);
+    const minutesElapsed = Math.floor((status.elapsed || 0) / 60000);
 
     return (
       <Card>
@@ -195,13 +194,15 @@ export default function DeadManSwitchPanel({ status, error, onRetry }) {
               <Text variant="secondary" size="sm">
                 Tempo trascorso: <span className="font-semibold text-danger-400">{minutesElapsed} minuti</span>
               </Text>
-              <Text variant="secondary" size="sm">
-                Ultimo controllo:{' '}
-                {formatDistanceToNow(new Date(status.lastCheck), {
-                  addSuffix: true,
-                  locale: it,
-                })}
-              </Text>
+              {status.lastCheck && (
+                <Text variant="secondary" size="sm">
+                  Ultimo controllo:{' '}
+                  {formatDistanceToNow(new Date(status.lastCheck), {
+                    addSuffix: true,
+                    locale: it,
+                  })}
+                </Text>
+              )}
             </div>
           </div>
         </div>

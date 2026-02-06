@@ -1,30 +1,35 @@
 'use client';
 
-import { CheckCircle, AlertTriangle, XCircle, RefreshCw } from 'lucide-react';
+import { CheckCircle, AlertTriangle, XCircle, RefreshCw, LucideIcon } from 'lucide-react';
 import Card, { CardHeader } from '@/app/components/ui/Card';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 import StatusBadge from '@/app/components/ui/StatusBadge';
 import Button from '@/app/components/ui/Button';
 
-/**
- * Connection Status Card Component
- *
- * Displays stove connection health with uptime percentage and check counts.
- * Uses data from /api/health-monitoring/stats endpoint.
- *
- * @param {Object} props
- * @param {Object|null} props.stats - Stats object from API (null while loading)
- * @param {number} props.stats.totalRuns - Total cron runs
- * @param {number} props.stats.totalChecks - Total health checks
- * @param {number} props.stats.successfulChecks - Successful checks count
- * @param {number} props.stats.failedChecks - Failed checks count
- * @param {number} props.stats.mismatchCount - State mismatch count
- * @param {string} props.stats.successRate - Success rate percentage (e.g., "99.5")
- * @param {string|null} props.error - Error message if fetch failed
- * @param {Function} props.onRetry - Callback to retry fetching stats
- */
-export default function ConnectionStatusCard({ stats, error, onRetry }) {
+interface ConnectionStats {
+  totalRuns: number;
+  totalChecks: number;
+  successfulChecks: number;
+  failedChecks: number;
+  mismatchCount: number;
+  successRate: string;
+}
+
+interface ConnectionStatusCardProps {
+  stats: ConnectionStats | null;
+  error: string | null;
+  onRetry?: () => void;
+}
+
+interface StatusConfig {
+  status: 'online' | 'degraded' | 'offline';
+  variant: 'badge';
+  color: 'sage' | 'warning' | 'danger';
+  icon: LucideIcon;
+}
+
+export default function ConnectionStatusCard({ stats, error, onRetry }: ConnectionStatusCardProps) {
   // Error state
   if (error) {
     return (
@@ -88,7 +93,7 @@ export default function ConnectionStatusCard({ stats, error, onRetry }) {
 
   // Determine status based on success rate
   const successRate = parseFloat(stats.successRate);
-  let statusConfig;
+  let statusConfig: StatusConfig;
 
   if (successRate >= 95) {
     statusConfig = {

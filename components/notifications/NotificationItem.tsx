@@ -4,11 +4,29 @@ import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { Text } from '@/app/components/ui';
 
+interface Notification {
+  id: string;
+  title: string;
+  body: string;
+  type: string;
+  status: string;
+  timestamp: string;
+}
+
+interface NotificationItemProps {
+  notification: Notification;
+}
+
+interface StatusStyle {
+  text: string;
+  className: string;
+}
+
 /**
  * Get icon for notification type
  */
-const getTypeIcon = (type) => {
-  const icons = {
+const getTypeIcon = (type: string): string => {
+  const icons: Record<string, string> = {
     error: '🚨',
     scheduler: '⏰',
     maintenance: '🔧',
@@ -21,8 +39,8 @@ const getTypeIcon = (type) => {
 /**
  * Get status badge styling
  */
-const getStatusStyle = (status) => {
-  const styles = {
+const getStatusStyle = (status: string): StatusStyle => {
+  const styles: Record<string, StatusStyle> = {
     sent: {
       text: 'Inviata',
       className: 'bg-ocean-500/20 text-ocean-400 [html:not(.dark)_&]:bg-ocean-100 [html:not(.dark)_&]:text-ocean-700',
@@ -42,8 +60,8 @@ const getStatusStyle = (status) => {
 /**
  * Get type label in Italian
  */
-const getTypeLabel = (type) => {
-  const labels = {
+const getTypeLabel = (type: string): string => {
+  const labels: Record<string, string> = {
     error: 'Errore',
     scheduler: 'Scheduler',
     maintenance: 'Manutenzione',
@@ -53,7 +71,7 @@ const getTypeLabel = (type) => {
   return labels[type] || type;
 };
 
-export default function NotificationItem({ notification }) {
+export default function NotificationItem({ notification }: NotificationItemProps) {
   const statusStyle = getStatusStyle(notification.status);
 
   return (

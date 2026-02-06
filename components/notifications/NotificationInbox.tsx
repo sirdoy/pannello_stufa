@@ -8,12 +8,27 @@ import NotificationFilters from './NotificationFilters';
 
 const MAX_NOTIFICATIONS = 200; // Memory safeguard per RESEARCH.md Pitfall #3
 
+interface Notification {
+  id: string;
+  title: string;
+  body: string;
+  type: string;
+  status: string;
+  timestamp: string;
+}
+
+interface NotificationsResponse {
+  notifications: Notification[];
+  cursor: string | null;
+  hasMore: boolean;
+}
+
 export default function NotificationInbox() {
-  const [notifications, setNotifications] = useState([]);
-  const [cursor, setCursor] = useState(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Filters
   const [typeFilter, setTypeFilter] = useState('');
@@ -44,7 +59,7 @@ export default function NotificationInbox() {
         throw new Error('Errore nel caricamento delle notifiche');
       }
 
-      const data = await res.json();
+      const data: NotificationsResponse = await res.json();
 
       if (resetList) {
         setNotifications(data.notifications);
@@ -63,7 +78,7 @@ export default function NotificationInbox() {
       setError(null);
     } catch (err) {
       console.error('Error fetching notifications:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setIsLoading(false);
     }
@@ -77,7 +92,7 @@ export default function NotificationInbox() {
   }, [typeFilter, statusFilter]); // Reset on filter change
 
   // Handle filter changes
-  const handleTypeChange = (value) => {
+  const handleTypeChange = (value: string) => {
     setTypeFilter(value);
     setCursor(null);
     setNotifications([]);
@@ -85,7 +100,7 @@ export default function NotificationInbox() {
     setIsLoading(true);
   };
 
-  const handleStatusChange = (value) => {
+  const handleStatusChange = (value: string) => {
     setStatusFilter(value);
     setCursor(null);
     setNotifications([]);

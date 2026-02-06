@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Select, Button } from '@/app/components/ui';
 
 const TYPE_OPTIONS = [
@@ -15,12 +16,19 @@ const SEVERITY_OPTIONS = [
   { value: 'success', label: 'Solo successi' },
 ];
 
+interface EventFiltersProps {
+  type: string;
+  severity: string;
+  onTypeChange: (value: string) => void;
+  onSeverityChange: (value: string) => void;
+}
+
 export default function EventFilters({
   type,
   severity,
   onTypeChange,
   onSeverityChange,
-}) {
+}: EventFiltersProps) {
   // Convert empty string from parent to 'all' for Select value
   const typeValue = type || 'all';
   const severityValue = severity || 'all';
@@ -32,11 +40,13 @@ export default function EventFilters({
   };
 
   // Convert 'all' back to empty string for parent
-  const handleTypeChange = (value) => {
+  const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
     onTypeChange(value === 'all' ? '' : value);
   };
 
-  const handleSeverityChange = (value) => {
+  const handleSeverityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
     onSeverityChange(value === 'all' ? '' : value);
   };
 
@@ -46,7 +56,7 @@ export default function EventFilters({
       <div className="w-full sm:w-48">
         <Select
           value={typeValue}
-          onChange={(e) => handleTypeChange(e.target.value)}
+          onChange={handleTypeChange}
           options={TYPE_OPTIONS}
           label="Tipo evento"
           variant="default"
@@ -57,7 +67,7 @@ export default function EventFilters({
       <div className="w-full sm:w-48">
         <Select
           value={severityValue}
-          onChange={(e) => handleSeverityChange(e.target.value)}
+          onChange={handleSeverityChange}
           options={SEVERITY_OPTIONS}
           label="Severita"
           variant="default"

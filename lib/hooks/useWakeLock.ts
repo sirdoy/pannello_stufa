@@ -21,9 +21,9 @@ import {
  *   {isLocked ? 'Allow screen sleep' : 'Keep screen on'}
  * </button>
  */
-export function useWakeLock() {
-  const [isLocked, setIsLocked] = useState(false);
-  const [isSupported, setIsSupported] = useState(false);
+export function useWakeLock(): { isLocked: boolean; isSupported: boolean; lock: () => Promise<void>; unlock: () => Promise<void> } {
+  const [isLocked, setIsLocked] = useState<boolean>(false);
+  const [isSupported, setIsSupported] = useState<boolean>(false);
 
   // Check support on mount
   useEffect(() => {

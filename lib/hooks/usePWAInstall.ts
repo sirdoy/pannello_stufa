@@ -25,9 +25,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
  *   return <p>Tap Share then "Add to Home Screen"</p>;
  * }
  */
-export function usePWAInstall() {
-  const [isInstalled, setIsInstalled] = useState(false);
-  const [isInstallable, setIsInstallable] = useState(false);
+export function usePWAInstall(): { isInstalled: boolean; isInstallable: boolean; isIOS: boolean; promptInstall: () => Promise<void>; dismissInstall: () => void } {
+  const [isInstalled, setIsInstalled] = useState<boolean>(false);
+  const [isInstallable, setIsInstallable] = useState<boolean>(false);
   const [isIOS, setIsIOS] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
 

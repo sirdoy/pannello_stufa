@@ -37,12 +37,27 @@ import {
  * // Show pending commands in UI
  * {pendingCommands.map(cmd => <QueuedCommand key={cmd.id} command={cmd} />)}
  */
-export function useBackgroundSync() {
-  const [pendingCommands, setPendingCommands] = useState([]);
-  const [failedCommands, setFailedCommands] = useState([]);
-  const [pendingCount, setPendingCount] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [lastSyncedCommand, setLastSyncedCommand] = useState(null);
+/** Background Sync hook return type */
+export interface UseBackgroundSyncReturn {
+  pendingCommands: unknown[];
+  failedCommands: unknown[];
+  pendingCount: number;
+  isProcessing: boolean;
+  lastSyncedCommand: unknown | null;
+  queueStoveCommand: (action: string, body?: Record<string, unknown>) => Promise<void>;
+  refreshCommands: () => Promise<void>;
+  retryFailedCommand: (id: string) => Promise<void>;
+  cancelCommand: (id: string) => Promise<void>;
+  clearAllFailed: () => Promise<void>;
+  processQueue: () => Promise<void>;
+}
+
+export function useBackgroundSync(): UseBackgroundSyncReturn {
+  const [pendingCommands, setPendingCommands] = useState<unknown[]>([]);
+  const [failedCommands, setFailedCommands] = useState<unknown[]>([]);
+  const [pendingCount, setPendingCount] = useState<number>(0);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [lastSyncedCommand, setLastSyncedCommand] = useState<unknown | null>(null);
 
   /**
    * Refresh command lists from IndexedDB

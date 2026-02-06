@@ -7,10 +7,10 @@ import { NETATMO_ROUTES } from '@/lib/routes';
  *
  * Returns rooms from homestatus API enriched with status info.
  */
-export function useRoomStatus() {
-  const [rooms, setRooms] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export function useRoomStatus(): { rooms: unknown[]; loading: boolean; error: string | null; fetchRooms: () => Promise<void> } {
+  const [rooms, setRooms] = useState<unknown[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchRooms = useCallback(async () => {
     try {

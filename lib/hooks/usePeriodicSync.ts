@@ -26,7 +26,7 @@ import {
  *   {isRegistered ? 'Disable' : 'Enable'} background checks
  * </button>
  */
-export function usePeriodicSync(options = {}) {
+export function usePeriodicSync(options: { interval?: number } = {}): unknown {
   const { interval = 15 * 60 * 1000 } = options;
 
   const [isSupported, setIsSupported] = useState(false);

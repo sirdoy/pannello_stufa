@@ -30,7 +30,7 @@ import { NETATMO_ROUTES } from '@/lib/routes';
  *   </div>
  * );
  */
-export function useScheduleData() {
+export function useScheduleData(): { schedules: unknown[]; activeSchedule: unknown | null; loading: boolean; error: string | null; source: string | null; refetch: () => Promise<void> } {
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

@@ -6,13 +6,22 @@
 /**
  * Italian day abbreviations
  */
-export const DAY_NAMES = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
+export const DAY_NAMES = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'] as const;
+
+/**
+ * Zone color configuration
+ */
+export interface ZoneColor {
+  bg: string;
+  text: string;
+  name: string;
+}
 
 /**
  * Zone type to color mapping (Ember Noir theme)
  * Each Netatmo zone type has a fixed, distinctive color
  */
-export const ZONE_COLORS = {
+export const ZONE_COLORS: Record<number, ZoneColor> = {
   // type 0: Comfort - Warm amber/orange
   0: { bg: 'hsl(25, 95%, 53%)', text: 'hsl(0, 0%, 100%)', name: 'Comfort' },
   // type 1: Night - Deep indigo/blue
@@ -21,17 +30,55 @@ export const ZONE_COLORS = {
   5: { bg: 'hsl(220, 15%, 40%)', text: 'hsl(0, 0%, 100%)', name: 'Eco' },
   // type 8: Comfort+ - Bright ember red
   8: { bg: 'hsl(15, 90%, 55%)', text: 'hsl(0, 0%, 100%)', name: 'Comfort+' },
-  // Fallback for unknown types
-  default: { bg: 'hsl(0, 0%, 50%)', text: 'hsl(0, 0%, 100%)', name: 'Altro' },
 };
+
+const ZONE_COLORS_DEFAULT: ZoneColor = { bg: 'hsl(0, 0%, 50%)', text: 'hsl(0, 0%, 100%)', name: 'Altro' };
+
+/**
+ * Netatmo schedule zone
+ */
+export interface NetatmoZone {
+  id: number;
+  type: number;
+  name: string;
+}
+
+/**
+ * Netatmo timetable slot
+ */
+export interface NetatmoTimetableSlot {
+  zone_id: number;
+  m_offset: number;
+}
+
+/**
+ * Netatmo schedule structure
+ */
+export interface NetatmoSchedule {
+  zones: NetatmoZone[];
+  timetable: NetatmoTimetableSlot[];
+}
+
+/**
+ * Parsed timeline slot for UI display
+ */
+export interface TimelineSlot {
+  day: number;
+  startMinutes: number;
+  endMinutes: number;
+  zoneType: number;
+  zoneName: string;
+  zoneId: number;
+  durationPercent: number;
+}
 
 /**
  * Get color for a zone type
  * @param {number} zoneType - Netatmo zone type (0, 1, 5, 8, etc.)
  * @returns {Object} { bg, text, name } color configuration
  */
-export function getZoneColor(zoneType) {
-  return ZONE_COLORS[zoneType] || ZONE_COLORS.default;
+export function getZoneColor(zoneType: number): ZoneColor {
+  return ZONE_COLORS[zoneType] || ZONE_COLORS_DEFAULT;
 }
 
 /**
@@ -43,12 +90,12 @@ export function getZoneColor(zoneType) {
  * const slots = parseTimelineSlots(schedule);
  * // Returns: [{ day: 0, startMinutes: 420, endMinutes: 780, zoneType: 0, zoneName: 'Comfort', durationPercent: 25 }, ...]
  */
-export function parseTimelineSlots(schedule) {
+export function parseTimelineSlots(schedule: NetatmoSchedule | null | undefined): TimelineSlot[] {
   if (!schedule || !schedule.timetable || !schedule.zones) {
     return [];
   }
 
-  const slots = [];
+  const slots: TimelineSlot[] = [];
   const timetable = schedule.timetable;
 
   for (let i = 0; i < timetable.length; i++) {
@@ -135,7 +182,7 @@ export function parseTimelineSlots(schedule) {
  * const color = tempToColor(20);
  * // Returns: "hsl(210, 70%, 80%)"
  */
-export function tempToColor(temp) {
+export function tempToColor(temp: number): string {
   // Temperature range for typical home heating
   const minTemp = 15;
   const maxTemp = 23;
@@ -172,7 +219,7 @@ export function tempToColor(temp) {
  * formatTimeFromMinutes(420); // "07:00"
  * formatTimeFromMinutes(1440); // "00:00" (next day)
  */
-export function formatTimeFromMinutes(minutes) {
+export function formatTimeFromMinutes(minutes: number): string {
   // Handle edge case: 1440 minutes = next day midnight
   const normalizedMinutes = minutes % 1440;
 
@@ -192,7 +239,7 @@ export function formatTimeFromMinutes(minutes) {
  * formatDuration(90); // "1h 30m"
  * formatDuration(120); // "2h"
  */
-export function formatDuration(minutes) {
+export function formatDuration(minutes: number): string {
   if (minutes < 60) {
     return `${minutes} min`;
   }

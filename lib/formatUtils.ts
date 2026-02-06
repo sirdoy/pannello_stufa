@@ -3,7 +3,7 @@
  * @param {number} decimalHours - Hours in decimal format (e.g., 47.5)
  * @returns {string} Formatted string in HH:MM format (e.g., "47:30")
  */
-export function formatHoursToHHMM(decimalHours) {
+export function formatHoursToHHMM(decimalHours: number | null | undefined): string {
   if (decimalHours === null || decimalHours === undefined || isNaN(decimalHours)) {
     return '0:00';
   }

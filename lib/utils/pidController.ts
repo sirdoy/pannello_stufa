@@ -18,6 +18,27 @@
  */
 
 /**
+ * PID configuration parameters
+ */
+export interface PIDConfig {
+  kp?: number;  // Proportional gain
+  ki?: number;  // Integral gain
+  kd?: number;  // Derivative gain
+  outputMin?: number;  // Minimum output value
+  outputMax?: number;  // Maximum output value
+  integralMax?: number;  // Anti-windup integral limit
+}
+
+/**
+ * PID internal state for persistence
+ */
+export interface PIDState {
+  integral: number;
+  prevError: number;
+  initialized: boolean;
+}
+
+/**
  * PID Controller class
  *
  * @param {Object} options - Configuration options
@@ -29,6 +50,16 @@
  * @param {number} options.integralMax - Anti-windup integral limit (default: 10)
  */
 export class PIDController {
+  private kp: number;
+  private ki: number;
+  private kd: number;
+  private outputMin: number;
+  private outputMax: number;
+  private integralMax: number;
+  private integral: number;
+  private prevError: number;
+  private initialized: boolean;
+
   constructor({
     kp = 0.5,
     ki = 0.1,
@@ -36,7 +67,7 @@ export class PIDController {
     outputMin = 1,
     outputMax = 5,
     integralMax = 10,
-  } = {}) {
+  }: PIDConfig = {}) {
     this.kp = kp;
     this.ki = ki;
     this.kd = kd;
@@ -58,7 +89,7 @@ export class PIDController {
    * @param {number} dt - Time delta in minutes since last computation
    * @returns {number} - Power level (integer between outputMin and outputMax)
    */
-  compute(setpoint, measured, dt) {
+  compute(setpoint: number, measured: number, dt: number): number {
     // Validate inputs
     if (typeof setpoint !== 'number' || typeof measured !== 'number') {
       throw new Error('setpoint and measured must be numbers');
@@ -104,7 +135,7 @@ export class PIDController {
    * Reset the controller state
    * Call this when starting fresh or after a long pause
    */
-  reset() {
+  reset(): void {
     this.integral = 0;
     this.prevError = 0;
     this.initialized = false;
@@ -114,7 +145,7 @@ export class PIDController {
    * Get current controller state for persistence
    * @returns {Object} - { integral, prevError }
    */
-  getState() {
+  getState(): PIDState {
     return {
       integral: this.integral,
       prevError: this.prevError,
@@ -126,7 +157,7 @@ export class PIDController {
    * Restore controller state from persistence
    * @param {Object} state - { integral, prevError, initialized }
    */
-  setState(state) {
+  setState(state: Partial<PIDState>): void {
     if (state) {
       this.integral = state.integral ?? 0;
       this.prevError = state.prevError ?? 0;
@@ -145,7 +176,7 @@ export class PIDController {
  * const pid = createPIDController({ kp: 0.8, ki: 0.2 });
  * const power = pid.compute(21.0, 19.5, 5); // 5 minutes elapsed
  */
-export function createPIDController(options = {}) {
+export function createPIDController(options: PIDConfig = {}): PIDController {
   return new PIDController(options);
 }
 
@@ -153,7 +184,7 @@ export function createPIDController(options = {}) {
  * Default PID configuration for stove-thermostat automation
  * Conservative gains to prevent oscillation in heating systems
  */
-export const DEFAULT_PID_CONFIG = {
+export const DEFAULT_PID_CONFIG: Required<PIDConfig> = {
   kp: 0.5,      // Proportional gain - moderate response to error
   ki: 0.1,      // Integral gain - slow correction for steady-state error
   kd: 0.05,     // Derivative gain - damping to prevent overshoot

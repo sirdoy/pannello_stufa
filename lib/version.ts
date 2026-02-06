@@ -14,11 +14,27 @@
  * 3. Aggiorna CHANGELOG.md manualmente con le modifiche
  */
 
-export const APP_VERSION = '1.77.0';
-export const APP_AUTHOR = 'Federico Manfredi';
-export const LAST_UPDATE = '2026-01-25';
+export interface VersionEntry {
+  version: string;
+  date: string;
+  title?: string;
+  description?: string;
+  type?: string;
+  changes: string[];
+}
 
-export const VERSION_HISTORY = [
+export interface VersionInfo {
+  version: string;
+  author: string;
+  lastUpdate: string;
+  history: VersionEntry[];
+}
+
+export const APP_VERSION: string = '1.77.0';
+export const APP_AUTHOR: string = 'Federico Manfredi';
+export const LAST_UPDATE: string = '2026-01-25';
+
+export const VERSION_HISTORY: VersionEntry[] = [
   {
     version: '1.77.0',
     date: '2026-01-25',
@@ -2449,7 +2465,7 @@ export const VERSION_HISTORY = [
   },
 ];
 
-const versionInfo = {
+const versionInfo: VersionInfo = {
   version: APP_VERSION,
   author: APP_AUTHOR,
   lastUpdate: LAST_UPDATE,

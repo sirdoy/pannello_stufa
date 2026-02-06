@@ -16,18 +16,18 @@ export const STOVE_UI_ROUTES = {
   scheduler: '/stove/scheduler',
   maintenance: '/stove/maintenance',
   errors: '/stove/errors',
-};
+} as const;
 
 // Thermostat UI pages
 export const THERMOSTAT_UI_ROUTES = {
   main: '/thermostat',
   authorized: '/thermostat/authorized',
-};
+} as const;
 
 // Camera UI pages
 export const CAMERA_UI_ROUTES = {
   main: '/camera',
-};
+} as const;
 
 // Global UI pages
 export const GLOBAL_UI_ROUTES = {
@@ -36,7 +36,7 @@ export const GLOBAL_UI_ROUTES = {
   changelog: '/changelog',
   debug: '/debug',
   offline: '/offline',
-};
+} as const;
 
 // ========================================
 // API ROUTES
@@ -54,12 +54,12 @@ export const STOVE_ROUTES = {
   setPower: `${API_BASE}/stove/setPower`,
   getSettings: `${API_BASE}/stove/settings`,
   setSettings: `${API_BASE}/stove/setSettings`,
-};
+} as const;
 
 // Scheduler endpoints
 export const SCHEDULER_ROUTES = {
-  check: (secret) => `${API_BASE}/scheduler/check?secret=${secret}`,
-};
+  check: (secret: string): string => `${API_BASE}/scheduler/check?secret=${secret}`,
+} as const;
 
 // Netatmo endpoints
 export const NETATMO_ROUTES = {
@@ -82,25 +82,25 @@ export const NETATMO_ROUTES = {
 
   // Stove-valve sync
   stoveSync: `${API_BASE}/netatmo/stove-sync`,
-};
+} as const;
 
 // Camera endpoints (Netatmo Security)
 export const CAMERA_ROUTES = {
   list: `${API_BASE}/netatmo/camera`,
   allEvents: `${API_BASE}/netatmo/camera/events`,
-  snapshot: (cameraId) => `${API_BASE}/netatmo/camera/${cameraId}/snapshot`,
-  events: (cameraId) => `${API_BASE}/netatmo/camera/${cameraId}/events`,
-};
+  snapshot: (cameraId: string): string => `${API_BASE}/netatmo/camera/${cameraId}/snapshot`,
+  events: (cameraId: string): string => `${API_BASE}/netatmo/camera/${cameraId}/events`,
+} as const;
 
 // Logging endpoints
 export const LOG_ROUTES = {
   add: `${API_BASE}/log/add`,
-};
+} as const;
 
 // User endpoints
 export const USER_ROUTES = {
   me: `${API_BASE}/user`,
-};
+} as const;
 
 // Auth endpoints (Auth0 v4 - mounted by middleware)
 export const AUTH_ROUTES = {
@@ -108,7 +108,7 @@ export const AUTH_ROUTES = {
   logout: '/auth/logout',
   callback: '/auth/callback',
   me: '/auth/me',
-};
+} as const;
 
 // All routes combined for easy export
 export const API_ROUTES = {
@@ -119,6 +119,6 @@ export const API_ROUTES = {
   log: LOG_ROUTES,
   user: USER_ROUTES,
   auth: AUTH_ROUTES,
-};
+} as const;
 
 export default API_ROUTES;

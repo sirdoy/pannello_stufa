@@ -14,10 +14,17 @@ import WeatherIcon from './WeatherIcon';
 import { formatTemperature } from './weatherHelpers';
 import { Droplets } from 'lucide-react';
 
+interface HourlyCardProps {
+  time: string;
+  weatherCode?: number | null;
+  temperature: number;
+  precipProbability?: number | null;
+}
+
 /**
  * HourlyCard - Individual card for one hour
  */
-function HourlyCard({ time, weatherCode, temperature, precipProbability }) {
+function HourlyCard({ time, weatherCode, temperature, precipProbability }: HourlyCardProps) {
   // Extract just the hour from ISO time string (e.g., "2026-02-03T14:00" -> "14:00")
   const formattedTime = time ? time.split('T')[1]?.substring(0, 5) : '--:--';
 
@@ -44,16 +51,22 @@ function HourlyCard({ time, weatherCode, temperature, precipProbability }) {
   );
 }
 
+interface HourlyData {
+  times: string[];
+  temperatures: number[];
+  weatherCodes: number[];
+  precipProbabilities: number[];
+}
+
+export interface HourlyForecastProps {
+  /** Hourly data object from API */
+  hourly: HourlyData;
+  /** Maximum hours to display */
+  maxHours?: number;
+}
+
 /**
  * HourlyForecast - Horizontal scrollable row of hourly weather cards
- *
- * @param {Object} props
- * @param {Object} props.hourly - Hourly data object from API
- * @param {string[]} props.hourly.times - ISO datetime strings
- * @param {number[]} props.hourly.temperatures - Temperatures array
- * @param {number[]} props.hourly.weatherCodes - WMO weather codes
- * @param {number[]} props.hourly.precipProbabilities - Precipitation probabilities
- * @param {number} [props.maxHours=12] - Maximum hours to display
  *
  * @example
  * <HourlyForecast
@@ -65,7 +78,7 @@ function HourlyCard({ time, weatherCode, temperature, precipProbability }) {
  *   }}
  * />
  */
-export function HourlyForecast({ hourly, maxHours = 12 }) {
+export function HourlyForecast({ hourly, maxHours = 12 }: HourlyForecastProps) {
   if (!hourly || !hourly.times || hourly.times.length === 0) {
     return null;
   }
@@ -80,7 +93,7 @@ export function HourlyForecast({ hourly, maxHours = 12 }) {
   // Find index of current hour (or next available hour)
   let startIndex = times.findIndex((time) => {
     const timeDate = time.split('T')[0];
-    const timeHour = parseInt(time.split('T')[1]?.substring(0, 2), 10);
+    const timeHour = parseInt(time.split('T')[1]?.substring(0, 2) ?? '0', 10);
     // Find first hour that's today and >= current hour
     return timeDate === today && timeHour >= currentHour;
   });

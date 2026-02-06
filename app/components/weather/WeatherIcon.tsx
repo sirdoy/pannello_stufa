@@ -20,7 +20,14 @@ import {
   CloudSnow,
   CloudFog,
   CloudLightning,
+  type LucideIcon,
 } from 'lucide-react';
+
+interface WeatherIconData {
+  day: LucideIcon;
+  night: LucideIcon;
+  label: string;
+}
 
 /**
  * WMO weather code to Lucide icon mapping
@@ -35,7 +42,7 @@ import {
  * 80-86: Showers
  * 95-99: Thunderstorm
  */
-const WMO_TO_LUCIDE = {
+const WMO_TO_LUCIDE: Record<number, WeatherIconData> = {
   // Clear sky
   0: { day: Sun, night: Moon, label: 'Sereno' },
   // Mainly clear
@@ -78,21 +85,32 @@ const WMO_TO_LUCIDE = {
 };
 
 // Default fallback for unknown codes
-const DEFAULT_ICON = { day: Sun, night: Moon, label: 'Sconosciuto' };
+const DEFAULT_ICON: WeatherIconData = { day: Sun, night: Moon, label: 'Sconosciuto' };
 
 /**
  * Get Italian weather label for a WMO code
- * @param {number} code - WMO weather code (0-99)
- * @returns {string} Italian description of the weather condition
+ * @param code - WMO weather code (0-99)
+ * @returns Italian description of the weather condition
  *
  * @example
  * getWeatherLabel(0) // 'Sereno'
  * getWeatherLabel(95) // 'Temporale'
  * getWeatherLabel(999) // 'Sconosciuto'
  */
-export function getWeatherLabel(code) {
+export function getWeatherLabel(code: number): string {
   const iconData = WMO_TO_LUCIDE[code] || DEFAULT_ICON;
   return iconData.label;
+}
+
+export interface WeatherIconProps {
+  /** WMO weather code (0-99) */
+  code: number;
+  /** Use night variant icons */
+  isNight?: boolean;
+  /** Additional CSS classes */
+  className?: string;
+  /** Icon size in pixels */
+  size?: number;
 }
 
 /**
@@ -100,12 +118,6 @@ export function getWeatherLabel(code) {
  *
  * Renders a Lucide weather icon based on WMO weather code.
  * Supports day/night variants and filled icon style.
- *
- * @param {Object} props
- * @param {number} props.code - WMO weather code (0-99)
- * @param {boolean} [props.isNight=false] - Use night variant icons
- * @param {string} [props.className] - Additional CSS classes
- * @param {number} [props.size=24] - Icon size in pixels
  *
  * @example
  * <WeatherIcon code={0} /> // Sun icon
@@ -117,7 +129,7 @@ export default function WeatherIcon({
   isNight = false,
   className = '',
   size = 24,
-}) {
+}: WeatherIconProps) {
   const iconData = WMO_TO_LUCIDE[code] || DEFAULT_ICON;
   const IconComponent = isNight ? iconData.night : iconData.day;
   const label = iconData.label;

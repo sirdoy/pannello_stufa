@@ -7,15 +7,15 @@
 
 /**
  * Format temperature with exactly one decimal precision
- * @param {number} temp - Temperature value
- * @returns {string} Formatted temperature (e.g., "18.5", "20.0")
+ * @param temp - Temperature value
+ * @returns Formatted temperature (e.g., "18.5", "20.0")
  *
  * @example
  * formatTemperature(18.456) // "18.5"
  * formatTemperature(20) // "20.0"
  * formatTemperature(-5.123) // "-5.1"
  */
-export function formatTemperature(temp) {
+export function formatTemperature(temp: number | null | undefined): string {
   if (temp === null || temp === undefined || isNaN(temp)) {
     return '--';
   }
@@ -24,16 +24,16 @@ export function formatTemperature(temp) {
 
 /**
  * Compare outdoor and indoor temperatures with Italian description
- * @param {number} outdoorTemp - Outdoor temperature
- * @param {number} indoorTemp - Indoor temperature
- * @returns {string} Italian comparison text
+ * @param outdoorTemp - Outdoor temperature
+ * @param indoorTemp - Indoor temperature
+ * @returns Italian comparison text
  *
  * @example
  * getTemperatureComparison(25, 20) // "5.0° piu caldo di casa"
  * getTemperatureComparison(15, 20) // "5.0° piu freddo di casa"
  * getTemperatureComparison(20.3, 20.5) // "Stessa temperatura di casa"
  */
-export function getTemperatureComparison(outdoorTemp, indoorTemp) {
+export function getTemperatureComparison(outdoorTemp: number | null, indoorTemp: number | null): string {
   if (outdoorTemp === null || indoorTemp === null || isNaN(outdoorTemp) || isNaN(indoorTemp)) {
     return '';
   }
@@ -57,14 +57,14 @@ export function getTemperatureComparison(outdoorTemp, indoorTemp) {
 
 /**
  * Format wind speed with unit
- * @param {number} speed - Wind speed in km/h
- * @returns {string} Formatted wind speed (e.g., "15 km/h")
+ * @param speed - Wind speed in km/h
+ * @returns Formatted wind speed (e.g., "15 km/h")
  *
  * @example
  * formatWindSpeed(15.3) // "15 km/h"
  * formatWindSpeed(8.7) // "9 km/h"
  */
-export function formatWindSpeed(speed) {
+export function formatWindSpeed(speed: number | null | undefined): string {
   if (speed === null || speed === undefined || isNaN(speed)) {
     return '-- km/h';
   }
@@ -73,8 +73,8 @@ export function formatWindSpeed(speed) {
 
 /**
  * Get Italian UV index severity label
- * @param {number} uvIndex - UV index value (0-11+)
- * @returns {string} Italian severity label
+ * @param uvIndex - UV index value (0-11+)
+ * @returns Italian severity label
  *
  * @example
  * getUVIndexLabel(1) // "Basso"
@@ -82,7 +82,7 @@ export function formatWindSpeed(speed) {
  * getUVIndexLabel(8) // "Molto alto"
  * getUVIndexLabel(12) // "Estremo"
  */
-export function getUVIndexLabel(uvIndex) {
+export function getUVIndexLabel(uvIndex: number | null | undefined): string {
   if (uvIndex === null || uvIndex === undefined || isNaN(uvIndex)) {
     return '';
   }
@@ -102,12 +102,12 @@ export function getUVIndexLabel(uvIndex) {
 
 /**
  * Check if a WMO weather code represents snow precipitation
- * @param {number} weatherCode - WMO weather code (0-99)
- * @returns {boolean} True if the code represents snow
+ * @param weatherCode - WMO weather code (0-99)
+ * @returns True if the code represents snow
  *
  * Snow codes: 71-77 (snow), 85-86 (snow showers)
  */
-export function isSnowCode(weatherCode) {
+export function isSnowCode(weatherCode: number): boolean {
   return (weatherCode >= 71 && weatherCode <= 77) || (weatherCode >= 85 && weatherCode <= 86);
 }
 
@@ -115,9 +115,9 @@ export function isSnowCode(weatherCode) {
  * Get precipitation chance description in Italian
  * Now accepts optional weatherCode to distinguish between rain and snow
  *
- * @param {number} percent - Precipitation probability (0-100)
- * @param {number} [weatherCode] - Optional WMO weather code to determine precipitation type
- * @returns {string|null} Italian description or null if too low to mention
+ * @param percent - Precipitation probability (0-100)
+ * @param weatherCode - Optional WMO weather code to determine precipitation type
+ * @returns Italian description or null if too low to mention
  *
  * @example
  * getPrecipitationLabel(5) // null
@@ -125,7 +125,7 @@ export function isSnowCode(weatherCode) {
  * getPrecipitationLabel(60, 71) // "Probabile neve" (snow code)
  * getPrecipitationLabel(85, 63) // "Pioggia prevista" (rain code)
  */
-export function getPrecipitationLabel(percent, weatherCode = null) {
+export function getPrecipitationLabel(percent: number | null | undefined, weatherCode: number | null = null): string | null {
   if (percent === null || percent === undefined || isNaN(percent)) {
     return null;
   }
@@ -151,8 +151,8 @@ export function getPrecipitationLabel(percent, weatherCode = null) {
 /**
  * Get Italian Air Quality Index (AQI) severity label
  * Uses European AQI scale (0-100+)
- * @param {number} aqi - Air Quality Index value
- * @returns {string} Italian severity label
+ * @param aqi - Air Quality Index value
+ * @returns Italian severity label
  *
  * @example
  * getAirQualityLabel(15) // "Buona"
@@ -161,7 +161,7 @@ export function getPrecipitationLabel(percent, weatherCode = null) {
  * getAirQualityLabel(75) // "Scarsa"
  * getAirQualityLabel(90) // "Molto scarsa"
  */
-export function getAirQualityLabel(aqi) {
+export function getAirQualityLabel(aqi: number | null | undefined): string {
   if (aqi === null || aqi === undefined || isNaN(aqi)) {
     return '';
   }
@@ -184,15 +184,15 @@ export function getAirQualityLabel(aqi) {
 /**
  * Get Italian atmospheric pressure label with weather indication
  * Standard sea level pressure is ~1013.25 hPa
- * @param {number} pressure - Atmospheric pressure in hPa
- * @returns {string} Italian label with weather indication
+ * @param pressure - Atmospheric pressure in hPa
+ * @returns Italian label with weather indication
  *
  * @example
  * getPressureLabel(995) // "Bassa"
  * getPressureLabel(1008) // "Normale"
  * getPressureLabel(1025) // "Alta"
  */
-export function getPressureLabel(pressure) {
+export function getPressureLabel(pressure: number | null | undefined): string {
   if (pressure === null || pressure === undefined || isNaN(pressure)) {
     return '';
   }
@@ -212,15 +212,15 @@ export function getPressureLabel(pressure) {
  * Calculate temperature trend from hourly data
  * Compares recent hours to determine if temp is rising, falling, or stable
  *
- * @param {number[]} temperatures - Array of hourly temperatures (oldest to newest)
- * @returns {'rising' | 'falling' | 'stable' | null} Trend direction or null if insufficient data
+ * @param temperatures - Array of hourly temperatures (oldest to newest)
+ * @returns Trend direction or null if insufficient data
  *
  * @example
  * getTemperatureTrend([15, 16, 17, 18, 19, 20, 21]) // 'rising'
  * getTemperatureTrend([21, 20, 19, 18, 17, 16, 15]) // 'falling'
  * getTemperatureTrend([18, 18, 18, 18, 18, 18, 18]) // 'stable'
  */
-export function getTemperatureTrend(temperatures) {
+export function getTemperatureTrend(temperatures: number[] | null | undefined): 'rising' | 'falling' | 'stable' | null {
   // Need at least 3 data points for meaningful trend
   if (!temperatures || temperatures.length < 3) {
     return null;

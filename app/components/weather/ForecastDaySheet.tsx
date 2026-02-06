@@ -15,16 +15,40 @@ import { Text } from '@/app/components/ui';
 import { WeatherIcon } from './WeatherIcon';
 import { formatTemperature, getUVIndexLabel, formatWindSpeed, getAirQualityLabel, getPressureLabel } from './weatherHelpers';
 import { HourlyForecast } from './HourlyForecast';
-import { Sunrise, Sunset, Droplets, Wind, Sun, Leaf, Gauge } from 'lucide-react';
+import { Sunrise, Sunset, Droplets, Wind, Sun, Leaf, Gauge, type LucideIcon } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { it } from 'date-fns/locale';
 
+interface ForecastDay {
+  date: string;
+  tempMax: number;
+  tempMin: number;
+  weatherCode: number;
+  condition?: {
+    description?: string;
+  };
+  uvIndex?: number | null;
+  humidity?: number;
+  windSpeed?: number;
+  precipChance?: number;
+  airQuality?: number | null;
+  sunrise?: string;
+  sunset?: string;
+}
+
+interface HourlyData {
+  times: string[];
+  temperatures: number[];
+  weatherCodes: number[];
+  precipProbabilities: number[];
+}
+
 /**
  * Format full day title (e.g., "Lunedi 3 Febbraio")
- * @param {string} dateStr - ISO date string
- * @returns {string} Formatted full date
+ * @param dateStr - ISO date string
+ * @returns Formatted full date
  */
-function formatFullDate(dateStr) {
+function formatFullDate(dateStr: string): string {
   try {
     const date = parseISO(dateStr);
     const dayName = format(date, 'EEEE', { locale: it });
@@ -39,10 +63,18 @@ function formatFullDate(dateStr) {
   }
 }
 
+interface StatCardProps {
+  icon: LucideIcon;
+  iconColor: string;
+  label: string;
+  value: string | number;
+  subLabel?: string;
+}
+
 /**
  * Stat card component for extended stats grid
  */
-function StatCard({ icon: Icon, iconColor, label, value, subLabel }) {
+function StatCard({ icon: Icon, iconColor, label, value, subLabel }: StatCardProps) {
   return (
     <div className="p-4 bg-slate-800/40 rounded-xl [html:not(.dark)_&]:bg-slate-100/80">
       <div className="flex items-center gap-2 mb-1">
@@ -57,16 +89,23 @@ function StatCard({ icon: Icon, iconColor, label, value, subLabel }) {
   );
 }
 
+export interface ForecastDaySheetProps {
+  /** Forecast day data (null when closed) */
+  day: ForecastDay | null;
+  /** Modal visibility */
+  isOpen: boolean;
+  /** Close handler */
+  onClose: () => void;
+  /** Hourly forecast data (only for today) */
+  hourly?: HourlyData | null;
+  /** Whether this is today's forecast */
+  isToday?: boolean;
+  /** Current atmospheric pressure in hPa (only for today) */
+  pressure?: number | null;
+}
+
 /**
  * ForecastDaySheet Component
- *
- * @param {Object} props
- * @param {Object|null} props.day - Forecast day data (null when closed)
- * @param {boolean} props.isOpen - Modal visibility
- * @param {Function} props.onClose - Close handler
- * @param {Object|null} props.hourly - Hourly forecast data (only for today)
- * @param {boolean} props.isToday - Whether this is today's forecast
- * @param {number|null} props.pressure - Current atmospheric pressure in hPa (only for today)
  *
  * @example
  * <ForecastDaySheet
@@ -78,7 +117,7 @@ function StatCard({ icon: Icon, iconColor, label, value, subLabel }) {
  *   pressure={1015}
  * />
  */
-export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday = false, pressure = null }) {
+export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday = false, pressure = null }: ForecastDaySheetProps) {
   // Don't render anything if no day is selected
   if (!day) {
     return null;

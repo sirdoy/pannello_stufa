@@ -20,18 +20,76 @@ import { CurrentConditions } from './CurrentConditions';
 import { ForecastRow } from './ForecastRow';
 import { ForecastDaySheet } from './ForecastDaySheet';
 
+interface WeatherCondition {
+  description?: string;
+  code?: number;
+}
+
+interface CurrentWeather {
+  temperature: number;
+  feelsLike?: number | null;
+  humidity?: number | null;
+  windSpeed?: number | null;
+  condition?: WeatherCondition;
+  uvIndex?: number | null;
+  airQuality?: number | null;
+  pressure?: number | null;
+  visibility?: number | null;
+}
+
+interface ForecastDay {
+  date: string;
+  tempMax: number;
+  tempMin: number;
+  weatherCode: number;
+  precipChance?: number;
+  condition?: {
+    description?: string;
+  };
+  uvIndex?: number | null;
+  humidity?: number;
+  windSpeed?: number;
+  airQuality?: number | null;
+  sunrise?: string;
+  sunset?: string;
+}
+
+interface HourlyData {
+  times: string[];
+  temperatures: number[];
+  weatherCodes: number[];
+  precipProbabilities: number[];
+}
+
+interface WeatherData {
+  current: CurrentWeather;
+  forecast: ForecastDay[];
+  hourly?: HourlyData;
+  cachedAt?: string;
+  stale?: boolean;
+}
+
+export interface WeatherCardProps {
+  /** Weather response from API with { current, forecast, hourly, cachedAt, stale } */
+  weatherData?: WeatherData | null;
+  /** Optional location name to display in header (e.g., "Milano") */
+  locationName?: string | null;
+  /** Optional indoor temperature for comparison */
+  indoorTemp?: number | null;
+  /** Show skeleton state */
+  isLoading?: boolean;
+  /** Error object for error state */
+  error?: Error | null;
+  /** Callback when retry button clicked */
+  onRetry?: () => void;
+  /** Callback when refresh button clicked */
+  onRefresh?: () => void;
+  /** Show refresh loading state */
+  isRefreshing?: boolean;
+}
+
 /**
  * WeatherCard - Weather display with loading/error/data states
- *
- * @param {Object} props
- * @param {Object|null} props.weatherData - Weather response from API with { current, forecast, hourly, cachedAt, stale }
- * @param {string|null} props.locationName - Optional location name to display in header (e.g., "Milano")
- * @param {number|null} props.indoorTemp - Optional indoor temperature for comparison
- * @param {boolean} props.isLoading - Show skeleton state
- * @param {Error|null} props.error - Error object for error state
- * @param {function} props.onRetry - Callback when retry button clicked
- * @param {function} props.onRefresh - Callback when refresh button clicked
- * @param {boolean} props.isRefreshing - Show refresh loading state
  *
  * @example
  * <WeatherCard
@@ -54,9 +112,9 @@ export function WeatherCard({
   onRetry = () => {},
   onRefresh = () => {},
   isRefreshing = false,
-}) {
+}: WeatherCardProps) {
   // State for selected forecast day (opens detail sheet)
-  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedDay, setSelectedDay] = useState<ForecastDay | null>(null);
 
   // Loading state - render skeleton
   if (isLoading) {

@@ -11,6 +11,7 @@
 
 import { Text } from '@/app/components/ui';
 import { Droplets, Wind, Sun, Thermometer, Gauge, Eye, ArrowUp, ArrowDown, Leaf, TrendingUp, TrendingDown, Sunrise, Sunset } from 'lucide-react';
+import type { ReactNode } from 'react';
 import WeatherIcon, { getWeatherLabel } from './WeatherIcon';
 import {
   formatTemperature,
@@ -22,17 +23,44 @@ import {
   getTemperatureTrend,
 } from './weatherHelpers';
 
+interface WeatherCondition {
+  description?: string;
+  code?: number;
+}
+
+interface CurrentWeather {
+  temperature: number;
+  feelsLike?: number | null;
+  humidity?: number | null;
+  windSpeed?: number | null;
+  condition?: WeatherCondition;
+  uvIndex?: number | null;
+  airQuality?: number | null;
+  pressure?: number | null;
+  visibility?: number | null;
+}
+
+interface TodayForecast {
+  tempMax: number;
+  tempMin: number;
+  uvIndex?: number | null;
+  airQuality?: number | null;
+  sunrise?: string;
+  sunset?: string;
+}
+
+interface WeatherDetailCellProps {
+  icon: ReactNode;
+  iconColor?: string;
+  label: string;
+  value: string;
+  sublabel?: string | null;
+}
+
 /**
  * WeatherDetailCell - Individual cell in the weather details grid
- *
- * @param {Object} props
- * @param {React.ReactNode} props.icon - Lucide icon component
- * @param {string} props.iconColor - Tailwind color class for icon
- * @param {string} props.label - Detail label
- * @param {string} props.value - Detail value
- * @param {string} [props.sublabel] - Optional secondary label below value
  */
-function WeatherDetailCell({ icon, iconColor = 'text-ocean-400', label, value, sublabel }) {
+function WeatherDetailCell({ icon, iconColor = 'text-ocean-400', label, value, sublabel }: WeatherDetailCellProps) {
   return (
     <div className="flex flex-col items-center p-3 bg-slate-800/40 rounded-xl [html:not(.dark)_&]:bg-slate-100/80">
       <span className={`w-5 h-5 ${iconColor} mb-1.5`}>
@@ -53,23 +81,19 @@ function WeatherDetailCell({ icon, iconColor = 'text-ocean-400', label, value, s
   );
 }
 
+export interface CurrentConditionsProps {
+  /** Current weather data from API */
+  current: CurrentWeather;
+  /** Today's forecast with min/max/UV */
+  todayForecast?: TodayForecast | null;
+  /** Array of hourly temperatures for trend calculation */
+  hourlyTemperatures?: number[] | null;
+  /** Optional indoor temperature for comparison */
+  indoorTemp?: number | null;
+}
+
 /**
  * CurrentConditions - Current weather display with temperature and details grid
- *
- * @param {Object} props
- * @param {Object} props.current - Current weather data from API
- * @param {number} props.current.temperature - Current temperature
- * @param {number} props.current.feelsLike - Feels like temperature
- * @param {number} props.current.humidity - Humidity percentage
- * @param {number} props.current.windSpeed - Wind speed in km/h
- * @param {Object} props.current.condition - Weather condition with description and code
- * @param {Object} [props.current.units] - Unit labels (optional)
- * @param {Object|null} props.todayForecast - Today's forecast with min/max/UV
- * @param {number} props.todayForecast.tempMax - Today's high temperature
- * @param {number} props.todayForecast.tempMin - Today's low temperature
- * @param {number} [props.todayForecast.uvIndex] - Today's UV index
- * @param {number[]|null} props.hourlyTemperatures - Array of hourly temperatures for trend calculation
- * @param {number|null} props.indoorTemp - Optional indoor temperature for comparison
  *
  * @example
  * <CurrentConditions
@@ -85,7 +109,7 @@ function WeatherDetailCell({ icon, iconColor = 'text-ocean-400', label, value, s
  *   indoorTemp={20.5}
  * />
  */
-export function CurrentConditions({ current, todayForecast = null, hourlyTemperatures = null, indoorTemp = null }) {
+export function CurrentConditions({ current, todayForecast = null, hourlyTemperatures = null, indoorTemp = null }: CurrentConditionsProps) {
   if (!current) {
     return null;
   }
@@ -116,7 +140,16 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
   const trend = getTemperatureTrend(hourlyTemperatures);
 
   // Build details array (only include items with data)
-  const details = [];
+  interface WeatherDetail {
+    key: string;
+    icon: ReactNode;
+    iconColor: string;
+    label: string;
+    value: string;
+    sublabel?: string | null;
+  }
+
+  const details: WeatherDetail[] = [];
 
   // Always include humidity, wind, feels like
   if (humidity !== null && humidity !== undefined) {

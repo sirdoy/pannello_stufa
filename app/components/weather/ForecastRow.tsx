@@ -11,12 +11,26 @@
 
 import { ForecastDayCard } from './ForecastDayCard';
 
+interface ForecastDay {
+  date: string;
+  tempMax: number;
+  tempMin: number;
+  weatherCode: number;
+  precipChance?: number;
+  condition?: {
+    description?: string;
+  };
+}
+
+export interface ForecastRowProps {
+  /** Array of forecast day objects */
+  forecast: ForecastDay[];
+  /** Callback when a day is clicked (receives day data) */
+  onDayClick?: (day: ForecastDay) => void;
+}
+
 /**
  * ForecastRow Component
- *
- * @param {Object} props
- * @param {Array} props.forecast - Array of forecast day objects
- * @param {Function} [props.onDayClick] - Callback when a day is clicked (receives day data)
  *
  * @example
  * <ForecastRow
@@ -24,7 +38,7 @@ import { ForecastDayCard } from './ForecastDayCard';
  *   onDayClick={(day) => setSelectedDay(day)}
  * />
  */
-export function ForecastRow({ forecast, onDayClick }) {
+export function ForecastRow({ forecast, onDayClick }: ForecastRowProps) {
   if (!forecast || forecast.length === 0) {
     return null;
   }

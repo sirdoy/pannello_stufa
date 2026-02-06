@@ -16,14 +16,26 @@ import { formatTemperature } from './weatherHelpers';
 import { format, parseISO } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { Droplets } from 'lucide-react';
+import type { KeyboardEvent } from 'react';
+
+interface ForecastDay {
+  date: string;
+  tempMax: number;
+  tempMin: number;
+  weatherCode: number;
+  precipChance?: number;
+  condition?: {
+    description?: string;
+  };
+}
 
 /**
  * Format day name with capitalized first letter
- * @param {string} dateStr - ISO date string
- * @param {boolean} isToday - Show "Oggi" instead of day name
- * @returns {string} Formatted day name (e.g., "Lun", "Oggi")
+ * @param dateStr - ISO date string
+ * @param isToday - Show "Oggi" instead of day name
+ * @returns Formatted day name (e.g., "Lun", "Oggi")
  */
-function formatDayName(dateStr, isToday) {
+function formatDayName(dateStr: string, isToday: boolean): string {
   if (isToday) {
     return 'Oggi';
   }
@@ -32,20 +44,19 @@ function formatDayName(dateStr, isToday) {
   return dayName.charAt(0).toUpperCase() + dayName.slice(1);
 }
 
+export interface ForecastDayCardProps {
+  /** Forecast day data */
+  day: ForecastDay;
+  /** Show "Oggi" instead of day name */
+  isToday?: boolean;
+  /** Callback when card is tapped */
+  onClick?: () => void;
+  /** Additional CSS classes */
+  className?: string;
+}
+
 /**
  * ForecastDayCard Component
- *
- * @param {Object} props
- * @param {Object} props.day - Forecast day data
- * @param {string} props.day.date - ISO date string (e.g., "2026-02-03")
- * @param {number} props.day.tempMax - Maximum temperature
- * @param {number} props.day.tempMin - Minimum temperature
- * @param {Object} props.day.condition - Weather condition { description, icon }
- * @param {number} [props.day.precipChance] - Precipitation probability (0-100)
- * @param {number} props.day.weatherCode - WMO weather code for icon
- * @param {boolean} [props.isToday=false] - Show "Oggi" instead of day name
- * @param {Function} [props.onClick] - Callback when card is tapped
- * @param {string} [props.className] - Additional CSS classes
  *
  * @example
  * <ForecastDayCard
@@ -59,10 +70,10 @@ export function ForecastDayCard({
   isToday = false,
   onClick,
   className,
-}) {
+}: ForecastDayCardProps) {
   const dayName = formatDayName(day.date, isToday);
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       onClick?.();
@@ -121,7 +132,7 @@ export function ForecastDayCard({
       </Text>
 
       {/* Precipitation chance - only show if > 10% */}
-      {day.precipChance > 10 && (
+      {(day.precipChance ?? 0) > 10 && (
         <div className="flex items-center gap-0.5 text-ocean-400 mt-1">
           <Droplets className="w-3 h-3" />
           <Text size="xs" className="text-ocean-400">

@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 39 - UI Components Migration
-Plan: 3 of 3 (01 complete, 02 partial, 03 partial)
-Status: In progress — Plans 01-03 executed (40/64 components migrated, 02 has 5 pending, 03 has 4 pending)
-Last activity: 2026-02-06 — Completed 39-03-PLAN.md (8/12 namespace components migrated)
+Plan: 4 of 4 (01-04 complete)
+Status: Complete — 54/64 components migrated (02 has 5 pending Radix, 03 has 4 pending deps, 04 complete 14/14)
+Last activity: 2026-02-06 — Completed 39-04-PLAN.md (Complex UI components migration: SmartHomeCard, DashboardLayout, DataTable, Skeleton)
 
-Progress: [██████░░░░░░░░░░░░░░░░░░] 30% (2/7 phases complete, Phase 39 in progress)
+Progress: [██████░░░░░░░░░░░░░░░░░░] 31% (2/7 phases complete, Phase 39 nearly complete)
 
 ## Milestone Overview
 
@@ -27,7 +27,7 @@ Progress: [██████░░░░░░░░░░░░░░░░░
 |-------|------|--------------|--------|
 | 37 | TypeScript Foundation | 8 | COMPLETE (8/8) |
 | 38 | Library Migration | 4 | COMPLETE (4/4) |
-| 39 | UI Components Migration | 3 | In progress (3/3 plans, 40/64 migrated, 9 pending types) |
+| 39 | UI Components Migration | 3 | Nearly complete (4/4 plans, 54/64 migrated, 10 pending) |
 | 40 | API Routes Migration | 3 | Pending |
 | 41 | Pages Migration | 3 | Pending |
 | 42 | Test Migration | 4 | Pending |
@@ -36,9 +36,9 @@ Progress: [██████░░░░░░░░░░░░░░░░░
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 167 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 15)
-- Average duration: ~5.6 min per plan
-- Total execution time: ~15.6 hours across 7 milestones
+- Total plans completed: 168 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 16)
+- Average duration: ~6.2 min per plan
+- Total execution time: ~17.3 hours across 7 milestones
 
 **By Milestone:**
 
@@ -218,3 +218,18 @@ From 39-03 (Namespace & Radix UI components):
 - Popover hover mode: NodeJS.Timeout type for setTimeout refs
 - Modal backwards compatibility: Preserve legacy maxWidth, closeOnOverlayClick props
 - Export all Props interfaces for IDE autocomplete and type safety
+
+From 39-04 (Complex UI components):
+- Namespace pattern with type assertions: SmartHomeCardComponent type for subcomponent attachment
+- TanStack Table generics: DataTableProps<TData>, Row<TData>, ColumnDef<TData>[] from @tanstack/react-table
+- Pragmatic any for complex integrations (Banner, InfoBox, Toast not yet migrated)
+- ContextMenuItem interface defined locally (should move to shared types later)
+- RightClickMenu uses uncontrolled Radix ContextMenu (no open/onOpenChange props)
+- React.KeyboardEvent<HTMLTableRowElement> for keyboard navigation handlers
+- Element → HTMLElement type assertion for .focus() calls
+- Array.isArray() guards before .map() on ReactNode types
+- useRef<HTMLButtonElement> for focus management refs
+- Record<string, T> for typed object maps (statusLabels, iconMap, iconSizes)
+- VariantProps<typeof xxxVariants> for CVA integration
+- forwardRef<HTMLElement, Props> explicit generics mandatory
+- Omit<SmartHomeCardProps, 'conflictingProp'> to extend with modifications

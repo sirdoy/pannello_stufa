@@ -1,6 +1,8 @@
 'use client';
 
+import type React from 'react';
 import { forwardRef } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 import { useLongPress } from '@/app/hooks/useLongPress';
@@ -100,26 +102,32 @@ export const controlButtonVariants = cva(
   }
 );
 
+export interface ControlButtonProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onChange' | 'type'>,
+    VariantProps<typeof controlButtonVariants> {
+  /** Button type */
+  type?: 'increment' | 'decrement';
+  /** Called with +step or -step value */
+  onChange?: (delta: number) => void;
+  /** Step size for increment/decrement (default: 1) */
+  step?: number;
+  /** Initial delay before repeat (default: 400ms) */
+  longPressDelay?: number;
+  /** Repeat interval (default: 100ms) */
+  longPressInterval?: number;
+  /** Enable haptic feedback (default: true) */
+  haptic?: boolean;
+  /** @deprecated Use onChange instead */
+  onClick?: () => void;
+}
+
 /**
  * ControlButton Component - Ember Noir Design System
  *
  * Increment/Decrement control button with CVA variants, long-press support,
  * and haptic feedback for continuous value adjustment.
- *
- * @param {Object} props - Component props
- * @param {'increment'|'decrement'} props.type - Button type
- * @param {'ember'|'ocean'|'sage'|'warning'|'danger'|'subtle'} props.variant - Color variant
- * @param {'sm'|'md'|'lg'} props.size - Button size
- * @param {boolean} props.disabled - Disabled state
- * @param {function} props.onChange - Called with +step or -step value
- * @param {number} props.step - Step size for increment/decrement (default: 1)
- * @param {number} props.longPressDelay - Initial delay before repeat (default: 400ms)
- * @param {number} props.longPressInterval - Repeat interval (default: 100ms)
- * @param {boolean} props.haptic - Enable haptic feedback (default: true)
- * @param {function} props.onClick - DEPRECATED: Use onChange instead
- * @param {string} props.className - Additional Tailwind classes
  */
-const ControlButton = forwardRef(function ControlButton(
+const ControlButton = forwardRef<HTMLButtonElement, ControlButtonProps>(function ControlButton(
   {
     type = 'increment',
     variant = 'ember',
@@ -140,11 +148,11 @@ const ControlButton = forwardRef(function ControlButton(
   const handlePress = () => {
     if (onClick) {
       // Legacy support - log deprecation warning in dev
-      if (process.env.NODE_ENV === 'development' && !handlePress._warned) {
+      if (process.env.NODE_ENV === 'development' && !(handlePress as any)._warned) {
         console.warn(
           '[ControlButton] onClick prop is deprecated. Use onChange(delta) instead.'
         );
-        handlePress._warned = true;
+        (handlePress as any)._warned = true;
       }
       onClick();
     } else if (onChange) {

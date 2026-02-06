@@ -1,27 +1,46 @@
 'use client';
 
+import type React from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { MoreVertical } from 'lucide-react';
+
+export interface ContextMenuItem {
+  /** Menu item label */
+  label: string;
+  /** Menu item icon (emoji or string) */
+  icon?: string;
+  /** Click handler */
+  onClick: () => void;
+  /** Item variant (danger for destructive actions) */
+  variant?: 'default' | 'danger';
+}
+
+export interface ContextMenuProps {
+  /** Menu items */
+  items?: ContextMenuItem[];
+  /** Accessible label for the trigger button */
+  ariaLabel?: string;
+}
 
 /**
  * ContextMenu Component
  *
  * Dropdown menu with icon button trigger.
  * Follows existing dropdown patterns for click-outside handling.
- *
- * @param {Array} items - Menu items [{label, icon, onClick, variant}]
- * @param {string} ariaLabel - Accessible label for the trigger button
  */
-export default function ContextMenu({ items = [], ariaLabel = 'Menu' }) {
+export default function ContextMenu({
+  items = [],
+  ariaLabel = 'Menu'
+}: ContextMenuProps): React.ReactElement {
   const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   // Close on click outside
   useEffect(() => {
     if (!isOpen) return;
 
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -34,7 +53,7 @@ export default function ContextMenu({ items = [], ariaLabel = 'Menu' }) {
   useEffect(() => {
     if (!isOpen) return;
 
-    const handleEscape = (e) => {
+    const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setIsOpen(false);
       }
@@ -44,7 +63,7 @@ export default function ContextMenu({ items = [], ariaLabel = 'Menu' }) {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen]);
 
-  function handleItemClick(item) {
+  function handleItemClick(item: ContextMenuItem) {
     item.onClick();
     setIsOpen(false);
   }

@@ -1,6 +1,8 @@
 'use client';
 
+import type React from 'react';
 import { forwardRef } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 import { useHaptic } from '@/app/hooks/useHaptic';
@@ -191,30 +193,32 @@ const iconSizes = {
   sm: 'text-lg',
   md: 'text-xl',
   lg: 'text-2xl',
-};
+} as const;
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  /** Button text */
+  children?: React.ReactNode;
+  /** Loading state (shows spinner) */
+  loading?: boolean;
+  /** Icon emoji/character */
+  icon?: string;
+  /** Icon position relative to text */
+  iconPosition?: 'left' | 'right';
+  /** Enable haptic feedback on click (default: true) */
+  haptic?: boolean;
+  /** Haptic pattern override (default: based on variant) */
+  hapticPattern?: 'short' | 'success' | 'warning' | 'error';
+}
 
 /**
  * Button Component - Ember Noir Design System
  *
  * Sophisticated button with warm gradients and smooth interactions.
  * Features multiple variants for different actions and contexts.
- *
- * @param {Object} props - Component props
- * @param {ReactNode} props.children - Button text
- * @param {'ember'|'subtle'|'ghost'|'success'|'danger'|'outline'} props.variant - Button style
- * @param {'sm'|'md'|'lg'} props.size - Button size
- * @param {boolean} props.disabled - Disabled state
- * @param {boolean} props.loading - Loading state (shows spinner)
- * @param {string} props.icon - Icon emoji/character
- * @param {'left'|'right'} props.iconPosition - Icon position relative to text
- * @param {boolean} props.fullWidth - Expand to full width
- * @param {boolean} props.iconOnly - Circular icon-only button
- * @param {'sage'|'ocean'|'warning'|'slate'} props.colorScheme - Color tinting for subtle/ghost variants (optional)
- * @param {boolean} props.haptic - Enable haptic feedback on click (default: true)
- * @param {'short'|'success'|'warning'|'error'} props.hapticPattern - Haptic pattern override (default: based on variant)
- * @param {string} props.className - Additional Tailwind classes
  */
-const Button = forwardRef(function Button(
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
     children,
     variant = 'ember',
@@ -245,7 +249,7 @@ const Button = forwardRef(function Button(
   const hapticFeedback = useHaptic(resolvedHapticPattern);
 
   // Wrap onClick to include haptic feedback
-  const handleClick = (e) => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (haptic && !disabled && !loading) {
       hapticFeedback.trigger();
     }
@@ -312,18 +316,19 @@ const Button = forwardRef(function Button(
   );
 });
 
+export interface ButtonIconProps extends Omit<ButtonProps, 'iconOnly' | 'children'> {
+  /** Icon emoji/character */
+  icon: string;
+  /** Required accessibility label */
+  'aria-label': string;
+}
+
 /**
  * Button.Icon - Icon-only button wrapper
  *
  * Convenience wrapper for icon-only buttons with required aria-label.
- *
- * @param {Object} props
- * @param {string} props.icon - Icon emoji/character
- * @param {string} props['aria-label'] - Required accessibility label
- * @param {'ember'|'subtle'|'ghost'|'success'|'danger'|'outline'} props.variant - Button style
- * @param {'sm'|'md'|'lg'} props.size - Button size
  */
-const ButtonIcon = forwardRef(function ButtonIcon(
+const ButtonIcon = forwardRef<HTMLButtonElement, ButtonIconProps>(function ButtonIcon(
   { icon, variant = 'ghost', size = 'md', className, ...props },
   ref
 ) {
@@ -340,16 +345,17 @@ const ButtonIcon = forwardRef(function ButtonIcon(
   );
 });
 
+export interface ButtonGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Button elements */
+  children: React.ReactNode;
+}
+
 /**
  * Button.Group - Group of related buttons
  *
  * Flex container with gap for grouping related buttons.
- *
- * @param {Object} props
- * @param {ReactNode} props.children - Button elements
- * @param {string} props.className - Additional classes
  */
-function ButtonGroup({ children, className, ...props }) {
+function ButtonGroup({ children, className, ...props }: ButtonGroupProps) {
   return (
     <div
       className={cn('flex items-center gap-2', className)}
@@ -361,12 +367,18 @@ function ButtonGroup({ children, className, ...props }) {
   );
 }
 
+// Type the Button namespace with sub-components
+type ButtonComponent = typeof Button & {
+  Icon: typeof ButtonIcon;
+  Group: typeof ButtonGroup;
+};
+
 // Attach sub-components to Button namespace
-Button.Icon = ButtonIcon;
-Button.Group = ButtonGroup;
+(Button as ButtonComponent).Icon = ButtonIcon;
+(Button as ButtonComponent).Group = ButtonGroup;
 
 // Named exports
 export { Button, ButtonIcon, ButtonGroup };
 
 // Default export
-export default Button;
+export default Button as ButtonComponent;

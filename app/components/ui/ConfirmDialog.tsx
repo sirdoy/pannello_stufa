@@ -1,5 +1,12 @@
 'use client';
 
+import type React from 'react';
+import { useEffect } from 'react';
+import Button from './Button';
+import Card from './Card';
+import Heading from './Heading';
+import Text from './Text';
+
 /**
  * @deprecated Use ConfirmationDialog instead.
  * This component will be removed in a future version.
@@ -18,14 +25,29 @@
  * @see /debug/design-system#dialog-patterns for examples
  */
 
-import { useEffect } from 'react';
-import Button from './Button';
-import Card from './Card';
-import Heading from './Heading';
-import Text from './Text';
-
 // Deprecation warning (development only)
 let hasWarnedDeprecation = false;
+
+export interface ConfirmDialogProps {
+  /** Dialog open state */
+  isOpen: boolean;
+  /** Dialog title */
+  title?: string;
+  /** Dialog message */
+  message?: string;
+  /** Confirm button text */
+  confirmText?: string;
+  /** Cancel button text */
+  cancelText?: string;
+  /** Confirm button variant */
+  confirmVariant?: 'danger' | 'ember' | 'success';
+  /** Confirm action handler */
+  onConfirm: () => void;
+  /** Cancel action handler */
+  onCancel: () => void;
+  /** Dialog icon emoji */
+  icon?: string;
+}
 
 export default function ConfirmDialog({
   isOpen,
@@ -37,7 +59,7 @@ export default function ConfirmDialog({
   onConfirm,
   onCancel,
   icon = '⚠️',
-}) {
+}: ConfirmDialogProps): React.ReactElement | null {
   // Emit deprecation warning once in development
   useEffect(() => {
     if (process.env.NODE_ENV === 'development' && !hasWarnedDeprecation) {
@@ -63,7 +85,7 @@ export default function ConfirmDialog({
 
   // Close on Escape key
   useEffect(() => {
-    const handleEscape = (e) => {
+    const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
         onCancel();
       }

@@ -1,4 +1,20 @@
+import type React from 'react';
 import Text from './Text';
+
+export interface PaginationProps {
+  /** Current page index (0-based) */
+  currentPage: number;
+  /** Total number of pages */
+  totalPages: number;
+  /** Handler for previous page button */
+  onPrevious: () => void;
+  /** Handler for next page button */
+  onNext: () => void;
+  /** Whether previous page is available */
+  hasPrev: boolean;
+  /** Whether next page is available */
+  hasNext: boolean;
+}
 
 /**
  * Pagination Component - Ember Noir Design System
@@ -13,7 +29,7 @@ export default function Pagination({
   onNext,
   hasPrev,
   hasNext,
-}) {
+}: PaginationProps): React.ReactElement {
   const buttonBaseClasses = 'px-4 py-2.5 rounded-xl font-medium transition-all duration-200';
 
   const enabledClasses = `

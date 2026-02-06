@@ -21,13 +21,26 @@
 
 import { put, getAll, getByIndex, remove, STORES } from './indexedDB';
 
+// SyncManager interface (not in all TypeScript DOM libs yet)
+interface SyncManager {
+  register(tag: string): Promise<void>;
+  getTags(): Promise<string[]>;
+}
+
+// Extend ServiceWorkerRegistration to include sync
+interface ServiceWorkerRegistrationWithSync extends ServiceWorkerRegistration {
+  sync: SyncManager;
+}
+
 // Command statuses
 export const COMMAND_STATUS = {
   PENDING: 'pending',
   PROCESSING: 'processing',
   COMPLETED: 'completed',
   FAILED: 'failed',
-};
+} as const;
+
+type CommandStatus = typeof COMMAND_STATUS[keyof typeof COMMAND_STATUS];
 
 // Sync tag for Background Sync API
 const SYNC_TAG = 'stove-command-sync';
@@ -38,11 +51,33 @@ const MAX_RETRIES = 3;
 // Retry delay in ms (exponential backoff: 1s, 2s, 4s)
 const BASE_RETRY_DELAY = 1000;
 
+interface QueuedCommand {
+  id?: number;
+  endpoint: string;
+  method: string;
+  data: Record<string, unknown>;
+  status: CommandStatus;
+  timestamp: string;
+  retries: number;
+  lastError: string | null;
+}
+
+interface ProcessQueueResult {
+  processed: number;
+  failed: number;
+}
+
+interface FormattedCommand extends QueuedCommand {
+  label: string;
+  icon: string;
+  formattedTime: string;
+}
+
 /**
  * Check if Background Sync API is supported
  * @returns {boolean}
  */
-export function isBackgroundSyncSupported() {
+export function isBackgroundSyncSupported(): boolean {
   return (
     typeof navigator !== 'undefined' &&
     'serviceWorker' in navigator &&
@@ -57,8 +92,12 @@ export function isBackgroundSyncSupported() {
  * @param {string} method - HTTP method (default: 'POST')
  * @returns {Promise<number>} Command ID
  */
-export async function queueCommand(endpoint, data = {}, method = 'POST') {
-  const command = {
+export async function queueCommand(
+  endpoint: string,
+  data: Record<string, unknown> = {},
+  method = 'POST'
+): Promise<number> {
+  const command: QueuedCommand = {
     endpoint,
     method,
     data,
@@ -82,21 +121,21 @@ export async function queueCommand(endpoint, data = {}, method = 'POST') {
     processQueue().catch(console.error);
   }
 
-  return id;
+  return id as number;
 }
 
 /**
  * Register for Background Sync
  * Called when a command is queued
  */
-export async function registerSync() {
+export async function registerSync(): Promise<void> {
   if (!isBackgroundSyncSupported()) {
     console.log('[BackgroundSync] Background Sync not supported, using fallback');
     return;
   }
 
   try {
-    const registration = await navigator.serviceWorker.ready;
+    const registration = await navigator.serviceWorker.ready as ServiceWorkerRegistrationWithSync;
     await registration.sync.register(SYNC_TAG);
     console.log('[BackgroundSync] Sync registered:', SYNC_TAG);
   } catch (error) {
@@ -109,8 +148,8 @@ export async function registerSync() {
  * Called by Service Worker on sync event or manually when coming online
  * @returns {Promise<{processed: number, failed: number}>}
  */
-export async function processQueue() {
-  const pendingCommands = await getByIndex(
+export async function processQueue(): Promise<ProcessQueueResult> {
+  const pendingCommands = await getByIndex<QueuedCommand>(
     STORES.COMMAND_QUEUE,
     'status',
     COMMAND_STATUS.PENDING
@@ -138,7 +177,7 @@ export async function processQueue() {
       await executeCommand(command);
 
       // Mark as completed and remove
-      await remove(STORES.COMMAND_QUEUE, command.id);
+      await remove(STORES.COMMAND_QUEUE, command.id!);
       processed++;
 
       console.log(`[BackgroundSync] Command completed: ${command.endpoint}`);
@@ -153,7 +192,7 @@ export async function processQueue() {
           ...command,
           status: COMMAND_STATUS.FAILED,
           retries: newRetries,
-          lastError: error.message,
+          lastError: (error as Error).message,
         });
         failed++;
       } else {
@@ -162,7 +201,7 @@ export async function processQueue() {
           ...command,
           status: COMMAND_STATUS.PENDING,
           retries: newRetries,
-          lastError: error.message,
+          lastError: (error as Error).message,
         });
 
         // Schedule retry
@@ -180,11 +219,11 @@ export async function processQueue() {
  * @param {Object} command - Command object
  * @returns {Promise<Response>}
  */
-async function executeCommand(command) {
+async function executeCommand(command: QueuedCommand): Promise<Response> {
   const { endpoint, method, data } = command;
   const url = `/api/${endpoint}`;
 
-  const options = {
+  const options: RequestInit = {
     method,
     headers: {
       'Content-Type': 'application/json',
@@ -198,7 +237,7 @@ async function executeCommand(command) {
   const response = await fetch(url, options);
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
+    const errorData = await response.json().catch(() => ({})) as { error?: string };
     throw new Error(errorData.error || `HTTP ${response.status}`);
   }
 
@@ -210,19 +249,19 @@ async function executeCommand(command) {
  * @param {string} status - Status to filter by (optional)
  * @returns {Promise<Object[]>}
  */
-export async function getQueuedCommands(status = null) {
+export async function getQueuedCommands(status: CommandStatus | null = null): Promise<QueuedCommand[]> {
   if (status) {
-    return getByIndex(STORES.COMMAND_QUEUE, 'status', status);
+    return getByIndex<QueuedCommand>(STORES.COMMAND_QUEUE, 'status', status);
   }
-  return getAll(STORES.COMMAND_QUEUE);
+  return getAll<QueuedCommand>(STORES.COMMAND_QUEUE);
 }
 
 /**
  * Get count of pending commands
  * @returns {Promise<number>}
  */
-export async function getPendingCount() {
-  const pending = await getByIndex(
+export async function getPendingCount(): Promise<number> {
+  const pending = await getByIndex<QueuedCommand>(
     STORES.COMMAND_QUEUE,
     'status',
     COMMAND_STATUS.PENDING
@@ -234,15 +273,15 @@ export async function getPendingCount() {
  * Clear failed commands from queue
  * @returns {Promise<number>} Number of commands cleared
  */
-export async function clearFailedCommands() {
-  const failed = await getByIndex(
+export async function clearFailedCommands(): Promise<number> {
+  const failed = await getByIndex<QueuedCommand>(
     STORES.COMMAND_QUEUE,
     'status',
     COMMAND_STATUS.FAILED
   );
 
   for (const command of failed) {
-    await remove(STORES.COMMAND_QUEUE, command.id);
+    await remove(STORES.COMMAND_QUEUE, command.id!);
   }
 
   console.log(`[BackgroundSync] Cleared ${failed.length} failed commands`);
@@ -254,8 +293,8 @@ export async function clearFailedCommands() {
  * @param {number} commandId - Command ID to retry
  * @returns {Promise<boolean>}
  */
-export async function retryCommand(commandId) {
-  const commands = await getAll(STORES.COMMAND_QUEUE);
+export async function retryCommand(commandId: number): Promise<boolean> {
+  const commands = await getAll<QueuedCommand>(STORES.COMMAND_QUEUE);
   const command = commands.find((c) => c.id === commandId);
 
   if (!command) {
@@ -286,7 +325,7 @@ export async function retryCommand(commandId) {
  * @param {number} commandId - Command ID to cancel
  * @returns {Promise<boolean>}
  */
-export async function cancelCommand(commandId) {
+export async function cancelCommand(commandId: number): Promise<boolean> {
   try {
     await remove(STORES.COMMAND_QUEUE, commandId);
     console.log('[BackgroundSync] Command cancelled:', commandId);
@@ -302,8 +341,8 @@ export async function cancelCommand(commandId) {
  * @param {Object} command - Command object
  * @returns {Object} Formatted command info
  */
-export function formatCommandForDisplay(command) {
-  const actionMap = {
+export function formatCommandForDisplay(command: QueuedCommand): FormattedCommand {
+  const actionMap: Record<string, { label: string; icon: string }> = {
     'stove/ignite': { label: 'Accensione stufa', icon: '🔥' },
     'stove/shutdown': { label: 'Spegnimento stufa', icon: '🌙' },
     'stove/set-power': { label: 'Imposta potenza', icon: '⚡' },

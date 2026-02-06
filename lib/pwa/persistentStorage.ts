@@ -7,11 +7,26 @@
  * @see https://developer.mozilla.org/en-US/docs/Web/API/StorageManager
  */
 
+interface StorageEstimate {
+  supported: boolean;
+  usage?: number;
+  quota?: number;
+  usagePercent?: number | string;
+  usageFormatted?: string;
+  quotaFormatted?: string;
+  error?: string;
+}
+
+interface StorageDetails extends StorageEstimate {
+  persisted: boolean;
+  isSupported: boolean;
+}
+
 /**
  * Check if Storage API is supported
  * @returns {boolean}
  */
-export function isStorageSupported() {
+export function isStorageSupported(): boolean {
   return 'storage' in navigator && 'persist' in navigator.storage;
 }
 
@@ -19,7 +34,7 @@ export function isStorageSupported() {
  * Check if storage is already persisted
  * @returns {Promise<boolean>}
  */
-export async function isPersisted() {
+export async function isPersisted(): Promise<boolean> {
   if (!isStorageSupported()) {
     return false;
   }
@@ -36,7 +51,7 @@ export async function isPersisted() {
  * Request persistent storage
  * @returns {Promise<boolean>} True if granted
  */
-export async function requestPersistentStorage() {
+export async function requestPersistentStorage(): Promise<boolean> {
   if (!isStorageSupported()) {
     console.warn('[PersistentStorage] API not supported');
     return false;
@@ -64,7 +79,7 @@ export async function requestPersistentStorage() {
  * Get storage estimate (used and quota)
  * @returns {Promise<Object>} Storage estimate
  */
-export async function getStorageEstimate() {
+export async function getStorageEstimate(): Promise<StorageEstimate> {
   if (!('storage' in navigator) || !('estimate' in navigator.storage)) {
     return { supported: false };
   }
@@ -75,13 +90,13 @@ export async function getStorageEstimate() {
       supported: true,
       usage: estimate.usage || 0,
       quota: estimate.quota || 0,
-      usagePercent: estimate.quota ? ((estimate.usage / estimate.quota) * 100).toFixed(2) : 0,
+      usagePercent: estimate.quota ? ((estimate.usage! / estimate.quota) * 100).toFixed(2) : 0,
       usageFormatted: formatBytes(estimate.usage || 0),
       quotaFormatted: formatBytes(estimate.quota || 0),
     };
   } catch (error) {
     console.error('[PersistentStorage] Error getting estimate:', error);
-    return { supported: true, error: error.message };
+    return { supported: true, error: (error as Error).message };
   }
 }
 
@@ -90,7 +105,7 @@ export async function getStorageEstimate() {
  * @param {number} bytes - Bytes to format
  * @returns {string} Formatted string
  */
-function formatBytes(bytes) {
+function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 Bytes';
 
   const k = 1024;
@@ -104,7 +119,7 @@ function formatBytes(bytes) {
  * Get detailed storage breakdown (if available)
  * @returns {Promise<Object>}
  */
-export async function getStorageDetails() {
+export async function getStorageDetails(): Promise<StorageDetails> {
   const estimate = await getStorageEstimate();
   const persisted = await isPersisted();
 

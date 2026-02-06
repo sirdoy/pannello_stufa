@@ -19,15 +19,15 @@ export const STORES = {
   COMMAND_QUEUE: 'commandQueue',
   DEVICE_STATE: 'deviceState',
   APP_STATE: 'appState',
-};
+} as const;
 
-let dbInstance = null;
+let dbInstance: IDBDatabase | null = null;
 
 /**
  * Open or get existing database connection
  * @returns {Promise<IDBDatabase>}
  */
-export async function openDB() {
+export async function openDB(): Promise<IDBDatabase> {
   if (dbInstance) {
     return dbInstance;
   }
@@ -52,7 +52,7 @@ export async function openDB() {
     };
 
     request.onupgradeneeded = (event) => {
-      const db = event.target.result;
+      const db = (event.target as IDBOpenDBRequest).result;
 
       // Command queue store - for background sync
       if (!db.objectStoreNames.contains(STORES.COMMAND_QUEUE)) {
@@ -85,7 +85,7 @@ export async function openDB() {
  * @param {string|number} key - Key to retrieve
  * @returns {Promise<any>}
  */
-export async function get(storeName, key) {
+export async function get<T = unknown>(storeName: string, key: string | number): Promise<T | undefined> {
   const db = await openDB();
 
   return new Promise((resolve, reject) => {
@@ -93,7 +93,7 @@ export async function get(storeName, key) {
     const store = transaction.objectStore(storeName);
     const request = store.get(key);
 
-    request.onsuccess = () => resolve(request.result);
+    request.onsuccess = () => resolve(request.result as T | undefined);
     request.onerror = () => reject(request.error);
   });
 }
@@ -103,7 +103,7 @@ export async function get(storeName, key) {
  * @param {string} storeName - Store name
  * @returns {Promise<any[]>}
  */
-export async function getAll(storeName) {
+export async function getAll<T = unknown>(storeName: string): Promise<T[]> {
   const db = await openDB();
 
   return new Promise((resolve, reject) => {
@@ -111,7 +111,7 @@ export async function getAll(storeName) {
     const store = transaction.objectStore(storeName);
     const request = store.getAll();
 
-    request.onsuccess = () => resolve(request.result || []);
+    request.onsuccess = () => resolve((request.result || []) as T[]);
     request.onerror = () => reject(request.error);
   });
 }
@@ -123,7 +123,7 @@ export async function getAll(storeName) {
  * @param {any} value - Value to match
  * @returns {Promise<any[]>}
  */
-export async function getByIndex(storeName, indexName, value) {
+export async function getByIndex<T = unknown>(storeName: string, indexName: string, value: IDBValidKey): Promise<T[]> {
   const db = await openDB();
 
   return new Promise((resolve, reject) => {
@@ -132,7 +132,7 @@ export async function getByIndex(storeName, indexName, value) {
     const index = store.index(indexName);
     const request = index.getAll(value);
 
-    request.onsuccess = () => resolve(request.result || []);
+    request.onsuccess = () => resolve((request.result || []) as T[]);
     request.onerror = () => reject(request.error);
   });
 }
@@ -143,7 +143,7 @@ export async function getByIndex(storeName, indexName, value) {
  * @param {any} value - Value to store
  * @returns {Promise<any>} The key of the stored value
  */
-export async function put(storeName, value) {
+export async function put<T = unknown>(storeName: string, value: T): Promise<IDBValidKey> {
   const db = await openDB();
 
   return new Promise((resolve, reject) => {
@@ -162,7 +162,7 @@ export async function put(storeName, value) {
  * @param {any} value - Value to store
  * @returns {Promise<any>} The key of the stored value
  */
-export async function add(storeName, value) {
+export async function add<T = unknown>(storeName: string, value: T): Promise<IDBValidKey> {
   const db = await openDB();
 
   return new Promise((resolve, reject) => {
@@ -181,7 +181,7 @@ export async function add(storeName, value) {
  * @param {string|number} key - Key to delete
  * @returns {Promise<void>}
  */
-export async function remove(storeName, key) {
+export async function remove(storeName: string, key: string | number): Promise<void> {
   const db = await openDB();
 
   return new Promise((resolve, reject) => {
@@ -199,7 +199,7 @@ export async function remove(storeName, key) {
  * @param {string} storeName - Store name
  * @returns {Promise<void>}
  */
-export async function clear(storeName) {
+export async function clear(storeName: string): Promise<void> {
   const db = await openDB();
 
   return new Promise((resolve, reject) => {
@@ -217,7 +217,7 @@ export async function clear(storeName) {
  * @param {string} storeName - Store name
  * @returns {Promise<number>}
  */
-export async function count(storeName) {
+export async function count(storeName: string): Promise<number> {
   const db = await openDB();
 
   return new Promise((resolve, reject) => {
@@ -234,7 +234,7 @@ export async function count(storeName) {
  * Check if IndexedDB is supported
  * @returns {boolean}
  */
-export function isSupported() {
+export function isSupported(): boolean {
   return typeof indexedDB !== 'undefined';
 }
 

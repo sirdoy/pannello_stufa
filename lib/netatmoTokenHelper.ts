@@ -18,8 +18,49 @@ const NETATMO_OAUTH_URL = 'https://api.netatmo.com/oauth2/token';
 // Token buffer: refresh 5 minutes before expiration
 const TOKEN_EXPIRY_BUFFER_MS = 5 * 60 * 1000;
 
+/** OAuth token data from Netatmo */
+interface TokenData {
+  access_token: string;
+  refresh_token?: string;
+  expires_in?: number;
+  error?: string;
+  error_description?: string;
+}
+
+/** Cached token data in Firebase */
+interface CachedTokenData {
+  access_token: string;
+  expires_at: number;
+  cached_at: number;
+}
+
+/** Token result - success */
+interface TokenSuccess {
+  accessToken: string;
+  error: null;
+}
+
+/** Token result - error */
+interface TokenError {
+  accessToken: null;
+  error: 'NOT_CONNECTED' | 'TOKEN_EXPIRED' | 'TOKEN_ERROR' | 'NO_ACCESS_TOKEN' | 'NETWORK_ERROR';
+  message: string;
+}
+
+/** Token result */
+export type TokenResult = TokenSuccess | TokenError;
+
+/** Error types */
+export type TokenErrorType = TokenError['error'];
+
+/** Error handling result */
+export interface TokenErrorHandling {
+  status: number;
+  reconnect: boolean;
+}
+
 // In-memory cache for current refresh operation to prevent race conditions
-let refreshPromise = null;
+let refreshPromise: Promise<TokenResult> | null = null;
 
 /**
  * Get valid access token (retrieves from Firebase and refreshes if needed)
@@ -29,10 +70,8 @@ let refreshPromise = null;
  * - Caches access_token with expiration time in Firebase
  * - Only refreshes when token is expired or about to expire
  * - Prevents concurrent refresh operations
- *
- * Returns: { accessToken, error }
  */
-export async function getValidAccessToken() {
+export async function getValidAccessToken(): Promise<TokenResult> {
   try {
     // If a refresh is already in progress, wait for it
     if (refreshPromise) {
@@ -40,7 +79,7 @@ export async function getValidAccessToken() {
     }
 
     // Check for cached access token first
-    const cachedData = await adminDbGet(getEnvironmentPath('netatmo/access_token_cache'));
+    const cachedData = await adminDbGet(getEnvironmentPath('netatmo/access_token_cache')) as CachedTokenData | null;
 
     // If we have a valid cached token, use it
     if (cachedData?.access_token && cachedData?.expires_at) {
@@ -70,7 +109,7 @@ export async function getValidAccessToken() {
     return {
       accessToken: null,
       error: 'NETWORK_ERROR',
-      message: err.message || 'Errore di rete durante il recupero del token.',
+      message: (err as Error).message || 'Errore di rete durante il recupero del token.',
     };
   }
 }
@@ -79,9 +118,9 @@ export async function getValidAccessToken() {
  * Internal function to perform the actual token refresh
  * Separated to allow for promise-based concurrency control
  */
-async function doTokenRefresh() {
+async function doTokenRefresh(): Promise<TokenResult> {
   // Get refresh token from Firebase (environment-aware)
-  const refreshToken = await adminDbGet(getEnvironmentPath('netatmo/refresh_token'));
+  const refreshToken = await adminDbGet(getEnvironmentPath('netatmo/refresh_token')) as string | null;
 
   if (!refreshToken) {
     return {
@@ -106,7 +145,7 @@ async function doTokenRefresh() {
     }),
   });
 
-  const data = await response.json();
+  const data = await response.json() as TokenData;
 
   // Handle errors from Netatmo API
   if (data.error) {
@@ -162,7 +201,7 @@ async function doTokenRefresh() {
 /**
  * Check if Netatmo is connected (has valid refresh token)
  */
-export async function isNetatmoConnected() {
+export async function isNetatmoConnected(): Promise<boolean> {
   try {
     const refreshToken = await adminDbGet(getEnvironmentPath('netatmo/refresh_token'));
     return refreshToken !== null;
@@ -176,7 +215,7 @@ export async function isNetatmoConnected() {
  * Save refresh token to Firebase (used by OAuth callback)
  * Also clears any cached access token to force a fresh token exchange
  */
-export async function saveRefreshToken(token) {
+export async function saveRefreshToken(token: string): Promise<void> {
   await adminDbSet(getEnvironmentPath('netatmo/refresh_token'), token);
   // Clear cached access token to force refresh on next call
   await adminDbSet(getEnvironmentPath('netatmo/access_token_cache'), null);
@@ -185,24 +224,24 @@ export async function saveRefreshToken(token) {
 /**
  * Clear all Netatmo data (logout)
  */
-export async function clearNetatmoData() {
+export async function clearNetatmoData(): Promise<void> {
   await adminDbSet(getEnvironmentPath('netatmo'), null);
 }
 
 /**
  * Handle API errors and return standardized error response
  */
-export function handleTokenError(error) {
-  const statusCode = {
+export function handleTokenError(error: TokenErrorType): TokenErrorHandling {
+  const statusCode: Record<TokenErrorType, number> = {
     'NOT_CONNECTED': 401,
     'TOKEN_EXPIRED': 401,
     'TOKEN_ERROR': 500,
     'NO_ACCESS_TOKEN': 500,
     'NETWORK_ERROR': 500,
-  }[error] || 500;
+  };
 
   return {
-    status: statusCode,
+    status: statusCode[error] || 500,
     reconnect: error === 'NOT_CONNECTED' || error === 'TOKEN_EXPIRED',
   };
 }

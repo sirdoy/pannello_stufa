@@ -10,6 +10,66 @@
  * @see https://open-meteo.com/en/docs
  */
 
+/** WMO weather condition with icon code */
+interface WeatherCondition {
+  description: string;
+  icon: string;
+}
+
+/** Current weather data */
+interface CurrentWeather {
+  temperature_2m: number;
+  apparent_temperature: number;
+  relative_humidity_2m: number;
+  wind_speed_10m: number;
+  weather_code: number;
+  surface_pressure: number;
+}
+
+/** Daily weather forecast data */
+interface DailyWeather {
+  weather_code: number[];
+  temperature_2m_max: number[];
+  temperature_2m_min: number[];
+  uv_index_max: number[];
+  precipitation_probability_max: number[];
+  relative_humidity_2m_max: number[];
+  wind_speed_10m_max: number[];
+  sunrise: string[];
+  sunset: string[];
+}
+
+/** Hourly weather forecast data */
+interface HourlyWeather {
+  temperature_2m: number[];
+  weather_code: number[];
+  precipitation_probability: number[];
+  wind_speed_10m: number[];
+}
+
+/** Complete weather forecast response */
+export interface WeatherForecast {
+  current: CurrentWeather;
+  daily: DailyWeather;
+  hourly: HourlyWeather;
+  timezone: string;
+  latitude: number;
+  longitude: number;
+}
+
+/** Air quality data */
+interface CurrentAirQuality {
+  european_aqi: number;
+}
+
+/** Air quality response */
+export interface AirQualityData {
+  current: CurrentAirQuality;
+  timezone: string;
+  latitude: number;
+  longitude: number;
+}
+
 /**
  * WMO Weather Code Mapping (Italian descriptions)
  * Maps WMO codes (0-99) to human-readable conditions and icon codes
@@ -18,7 +78,7 @@
  * 01 = clear sky, 02 = few clouds, 03 = scattered clouds, 04 = broken clouds
  * 09 = shower rain, 10 = rain, 11 = thunderstorm, 13 = snow, 50 = mist
  */
-export const WMO_CODES = {
+export const WMO_CODES: Record<number, WeatherCondition> = {
   0: { description: 'Sereno', icon: '01' },
   1: { description: 'Prevalentemente sereno', icon: '02' },
   2: { description: 'Parzialmente nuvoloso', icon: '03' },
@@ -51,31 +111,25 @@ export const WMO_CODES = {
 
 /**
  * Interpret WMO weather code to human-readable description and icon
- * @param {number} code - WMO weather code (0-99)
- * @returns {{ description: string, icon: string }} Weather condition with icon code
  *
  * @example
  * interpretWeatherCode(0) // { description: 'Sereno', icon: '01' }
  * interpretWeatherCode(95) // { description: 'Temporale', icon: '11' }
  * interpretWeatherCode(999) // { description: 'Sconosciuto', icon: '01' }
  */
-export function interpretWeatherCode(code) {
+export function interpretWeatherCode(code: number): WeatherCondition {
   return WMO_CODES[code] || { description: 'Sconosciuto', icon: '01' };
 }
 
 /**
  * Fetch weather forecast from Open-Meteo API
- * @param {number} latitude - Latitude (-90 to 90)
- * @param {number} longitude - Longitude (-180 to 180)
- * @returns {Promise<object>} Weather forecast data with current conditions and 5-day forecast
- * @throws {Error} If API request fails
  *
  * @example
  * const forecast = await fetchWeatherForecast(45.4642, 9.19);
  * console.log(forecast.current.temperature_2m); // Current temperature
  * console.log(forecast.daily.temperature_2m_max); // Array of max temps for 5 days
  */
-export async function fetchWeatherForecast(latitude, longitude) {
+export async function fetchWeatherForecast(latitude: number, longitude: number): Promise<WeatherForecast> {
   // Round coordinates to 4 decimals (~11m precision)
   const lat = latitude.toFixed(4);
   const lon = longitude.toFixed(4);
@@ -100,21 +154,17 @@ export async function fetchWeatherForecast(latitude, longitude) {
     throw new Error(`Open-Meteo API error: ${response.status} ${response.statusText}`);
   }
 
-  return response.json();
+  return response.json() as Promise<WeatherForecast>;
 }
 
 /**
  * Fetch air quality data from Open-Meteo Air Quality API
- * @param {number} latitude - Latitude (-90 to 90)
- * @param {number} longitude - Longitude (-180 to 180)
- * @returns {Promise<object>} Air quality data with European AQI
- * @throws {Error} If API request fails
  *
  * @example
  * const airQuality = await fetchAirQuality(45.4642, 9.19);
  * console.log(airQuality.current.european_aqi); // Current European AQI
  */
-export async function fetchAirQuality(latitude, longitude) {
+export async function fetchAirQuality(latitude: number, longitude: number): Promise<AirQualityData> {
   // Round coordinates to 4 decimals (~11m precision)
   const lat = latitude.toFixed(4);
   const lon = longitude.toFixed(4);
@@ -134,5 +184,5 @@ export async function fetchAirQuality(latitude, longitude) {
     throw new Error(`Open-Meteo Air Quality API error: ${response.status} ${response.statusText}`);
   }
 
-  return response.json();
+  return response.json() as Promise<AirQualityData>;
 }

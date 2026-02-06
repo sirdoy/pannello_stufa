@@ -22,23 +22,56 @@ export const NETATMO_RATE_LIMIT = 500; // Actual Netatmo limit (calls per hour)
 export const NETATMO_CONSERVATIVE_LIMIT = 400; // Enforced limit with buffer
 const WINDOW_MS = 60 * 60 * 1000; // 1 hour window
 
-// In-memory storage: Map<string, Object>
+/** Rate limit state per user */
+interface RateLimitState {
+  count: number;
+  windowStart: number;
+}
+
+/** Rate limit check result (allowed) */
+interface RateLimitAllowed {
+  allowed: true;
+  currentCount: number;
+  remaining: number;
+  limit: number;
+}
+
+/** Rate limit check result (blocked) */
+interface RateLimitBlocked {
+  allowed: false;
+  currentCount: number;
+  limit: number;
+  resetInSeconds: number;
+}
+
+/** Rate limit check result */
+export type RateLimitCheckResult = RateLimitAllowed | RateLimitBlocked;
+
+/** Rate limit tracking result */
+export interface RateLimitTrackResult {
+  count: number;
+  limit: number;
+  remaining: number;
+}
+
+/** Rate limit status result */
+export interface RateLimitStatusResult {
+  currentCount: number;
+  limit: number;
+  remaining: number;
+  windowStart: number;
+  nextResetIn: number;
+}
+
+// In-memory storage: Map<string, RateLimitState>
 // Key: userId (Auth0 sub)
 // Value: { count: number, windowStart: number (timestamp) }
-const userApiCalls = new Map();
+const userApiCalls = new Map<string, RateLimitState>();
 
 /**
  * Check if Netatmo API call is allowed for user
- *
- * @param {string} userId - User ID (Auth0 sub)
- * @returns {Object} Result object:
- *   - allowed: boolean - Whether API call is allowed
- *   - currentCount: number - Current API calls in window
- *   - remaining: number - Remaining calls in window (if allowed)
- *   - limit: number - Conservative limit (400)
- *   - resetInSeconds: number - Seconds until window resets (if blocked)
  */
-export function checkNetatmoRateLimit(userId) {
+export function checkNetatmoRateLimit(userId: string): RateLimitCheckResult {
   const now = Date.now();
 
   // Get user data (default: fresh window)
@@ -88,14 +121,8 @@ export function checkNetatmoRateLimit(userId) {
 /**
  * Track a Netatmo API call for a user
  * Call this AFTER successful API call (not before)
- *
- * @param {string} userId - User ID (Auth0 sub)
- * @returns {Object} Updated count info:
- *   - count: number - New count after tracking
- *   - limit: number - Conservative limit (400)
- *   - remaining: number - Remaining calls
  */
-export function trackNetatmoApiCall(userId) {
+export function trackNetatmoApiCall(userId: string): RateLimitTrackResult {
   const now = Date.now();
 
   // Get or create user data
@@ -130,16 +157,8 @@ export function trackNetatmoApiCall(userId) {
 /**
  * Get current Netatmo rate limit status for a user
  * Useful for debugging and UI display
- *
- * @param {string} userId - User ID
- * @returns {Object} Status object:
- *   - currentCount: number - Current API calls in window
- *   - limit: number - Conservative limit (400)
- *   - remaining: number - Remaining calls in window
- *   - windowStart: number - Window start timestamp
- *   - nextResetIn: number - Seconds until window resets
  */
-export function getNetatmoRateLimitStatus(userId) {
+export function getNetatmoRateLimitStatus(userId: string): RateLimitStatusResult {
   const now = Date.now();
   const userData = userApiCalls.get(userId);
 
@@ -172,7 +191,7 @@ export function getNetatmoRateLimitStatus(userId) {
  * Removes user entries older than 2 hours
  * Runs every 10 minutes
  */
-function cleanupOldEntries() {
+function cleanupOldEntries(): void {
   const now = Date.now();
   const maxAge = 2 * 60 * 60 * 1000; // 2 hours max retention
   let totalCleaned = 0;

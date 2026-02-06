@@ -22,11 +22,30 @@
  */
 export const NETATMO_OAUTH_SCOPES = 'read_thermostat write_thermostat read_camera access_camera';
 
+/** Netatmo OAuth credentials (server-side) */
+export interface NetatmoCredentials {
+  clientId: string;
+  clientSecret: string;
+  redirectUri: string;
+}
+
+/** Netatmo OAuth credentials (client-side - no secret) */
+export interface NetatmoCredentialsClient {
+  clientId: string;
+  redirectUri: string;
+}
+
+/** Internal credentials structure */
+interface CredentialsRaw {
+  clientId: string | undefined;
+  clientSecret: string | undefined;
+  redirectUri: string | undefined;
+}
+
 /**
  * Get Netatmo credentials from environment
- * @returns {{ clientId: string|undefined, clientSecret: string|undefined, redirectUri: string|undefined }}
  */
-function getCredentials() {
+function getCredentials(): CredentialsRaw {
   return {
     clientId: process.env.NEXT_PUBLIC_NETATMO_CLIENT_ID,
     clientSecret: process.env.NETATMO_CLIENT_SECRET,
@@ -36,10 +55,8 @@ function getCredentials() {
 
 /**
  * Validate credentials and throw descriptive error if incomplete
- * @param {{ clientId: any, clientSecret: any, redirectUri: any }} credentials
- * @throws {Error} If any credential field is missing
  */
-function validateCredentials(credentials) {
+function validateCredentials(credentials: CredentialsRaw): asserts credentials is NetatmoCredentials {
   if (!credentials.clientId) {
     throw new Error(
       `Missing NEXT_PUBLIC_NETATMO_CLIENT_ID. ` +
@@ -76,15 +93,12 @@ function validateCredentials(credentials) {
  * - localhost: .env.local values
  * - production: Vercel Environment Variables values
  *
- * @returns {{ clientId: string, clientSecret: string, redirectUri: string }}
- * @throws {Error} If credentials are missing or incomplete
- *
  * @example
  * // In API route or server-side code
  * const credentials = getNetatmoCredentials();
  * // → { clientId: '...', clientSecret: '...', redirectUri: '...' }
  */
-export function getNetatmoCredentials() {
+export function getNetatmoCredentials(): NetatmoCredentials {
   const credentials = getCredentials();
   validateCredentials(credentials);
   return credentials;
@@ -100,15 +114,12 @@ export function getNetatmoCredentials() {
  * - localhost: .env.local values
  * - production: Vercel Environment Variables values
  *
- * @returns {{ clientId: string, redirectUri: string }}
- * @throws {Error} If client-side credentials are missing
- *
  * @example
  * // In React component
  * const credentials = getNetatmoCredentialsClient();
  * const authUrl = `https://api.netatmo.com/oauth2/authorize?client_id=${credentials.clientId}...`;
  */
-export function getNetatmoCredentialsClient() {
+export function getNetatmoCredentialsClient(): NetatmoCredentialsClient {
   const clientId = process.env.NEXT_PUBLIC_NETATMO_CLIENT_ID;
   const redirectUri = process.env.NEXT_PUBLIC_NETATMO_REDIRECT_URI;
 
@@ -137,15 +148,12 @@ export function getNetatmoCredentialsClient() {
  * Build Netatmo OAuth authorization URL
  * Uses centralized scopes and credentials
  *
- * @param {string} [state='auth'] - OAuth state parameter for tracking
- * @returns {string} Complete OAuth authorization URL
- *
  * @example
  * // In React component
  * const authUrl = getNetatmoAuthUrl('thermostat');
  * window.location.href = authUrl;
  */
-export function getNetatmoAuthUrl(state = 'auth') {
+export function getNetatmoAuthUrl(state: string = 'auth'): string {
   const { clientId, redirectUri } = getNetatmoCredentialsClient();
   return `https://api.netatmo.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(NETATMO_OAUTH_SCOPES)}&state=${state}`;
 }

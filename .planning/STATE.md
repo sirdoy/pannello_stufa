@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 39 - UI Components Migration
-Plan: 2 of 3 (01 complete, 02 partial)
-Status: In progress — Plans 01-02 executed (32/64 components migrated, 02 has 5 pending)
-Last activity: 2026-02-06 — Completed 39-02-PLAN.md (9/14 fully typed, 5 pending)
+Plan: 3 of 3 (01 complete, 02 partial, 03 partial)
+Status: In progress — Plans 01-03 executed (40/64 components migrated, 02 has 5 pending, 03 has 4 pending)
+Last activity: 2026-02-06 — Completed 39-03-PLAN.md (8/12 namespace components migrated)
 
 Progress: [██████░░░░░░░░░░░░░░░░░░] 30% (2/7 phases complete, Phase 39 in progress)
 
@@ -27,7 +27,7 @@ Progress: [██████░░░░░░░░░░░░░░░░░
 |-------|------|--------------|--------|
 | 37 | TypeScript Foundation | 8 | COMPLETE (8/8) |
 | 38 | Library Migration | 4 | COMPLETE (4/4) |
-| 39 | UI Components Migration | 3 | In progress (2/3 plans, 32/64 migrated, 5 pending types) |
+| 39 | UI Components Migration | 3 | In progress (3/3 plans, 40/64 migrated, 9 pending types) |
 | 40 | API Routes Migration | 3 | Pending |
 | 41 | Pages Migration | 3 | Pending |
 | 42 | Test Migration | 4 | Pending |
@@ -186,9 +186,9 @@ From 39-01 (Foundation UI components):
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed 39-02-PLAN.md (9/14 form/interaction components fully typed, 5 Radix pending)
+Stopped at: Completed 39-03-PLAN.md (8/12 namespace components fully typed, 4 pending: Toast, ToastProvider, Banner, PageLayout)
 Resume file: None
-Next step: Complete 39-02 remaining types (Checkbox, Switch, Slider, Select, RadioGroup) or proceed to 39-03
+Next step: Complete 39-03 remaining 4 files OR close Phase 39 with documentation of pending work
 
 From 38-10 (Type definitions gap closure):
 - Type narrowing with 'in' operator for discriminated unions: if ('property' in object)
@@ -208,3 +208,13 @@ From 39-02 (Form/interaction components):
 - Type assertions for sub-component attachment: (Button as ButtonComponent).Icon = ButtonIcon
 - Synthetic event typing: React.ChangeEvent<HTMLInputElement> for controlled/uncontrolled patterns
 - Partial migration documentation: Track pending work as deviation when time-constrained
+
+From 39-03 (Namespace & Radix UI components):
+- ComponentPropsWithoutRef<typeof RadixPrimitive.SubComponent> for each Radix namespace subcomponent
+- Namespace type casting pattern: type XxxComponent = typeof Xxx & { Child: typeof XxxChild }
+- Type-safe namespace attachment: (Parent as ParentComponent).Child = ChildComponent
+- Accordion: Use ComponentPropsWithoutRef<Root> directly for single/multiple union compatibility
+- RightClickMenu: ContextMenu API doesn't support sideOffset/alignOffset (unlike Popover/Tooltip)
+- Popover hover mode: NodeJS.Timeout type for setTimeout refs
+- Modal backwards compatibility: Preserve legacy maxWidth, closeOnOverlayClick props
+- Export all Props interfaces for IDE autocomplete and type safety

@@ -7,25 +7,34 @@
 
 import { BaseRepository } from './base/BaseRepository';
 
-export class SchedulerModeRepository extends BaseRepository {
+/** Scheduler mode configuration */
+interface SchedulerMode {
+  enabled: boolean;
+  semiManual: boolean;
+  semiManualActivatedAt?: string;
+  returnToAutoAt?: string;
+  lastUpdated?: string;
+}
+
+export class SchedulerModeRepository extends BaseRepository<SchedulerMode> {
   constructor() {
     super('schedules-v2');
   }
 
   /**
    * Get full scheduler mode
-   * @returns {Promise<Object>} Mode object
+   * @returns Mode object
    */
-  async getMode() {
+  async getMode(): Promise<SchedulerMode> {
     const mode = await this.get('mode');
     return mode || { enabled: false, semiManual: false };
   }
 
   /**
    * Set scheduler enabled/disabled
-   * @param {boolean} enabled - Enable or disable
+   * @param enabled - Enable or disable
    */
-  async setEnabled(enabled) {
+  async setEnabled(enabled: boolean): Promise<void> {
     const data = this.withTimestamp({
       enabled,
       semiManual: false, // Reset semi-manual when toggling
@@ -36,10 +45,10 @@ export class SchedulerModeRepository extends BaseRepository {
 
   /**
    * Activate semi-manual mode
-   * @param {string} returnToAutoAt - ISO timestamp for auto return
+   * @param returnToAutoAt - ISO timestamp for auto return
    */
-  async setSemiManual(returnToAutoAt) {
-    const data = {
+  async setSemiManual(returnToAutoAt: string): Promise<void> {
+    const data: SchedulerMode = {
       enabled: true,
       semiManual: true,
       semiManualActivatedAt: new Date().toISOString(),
@@ -53,7 +62,7 @@ export class SchedulerModeRepository extends BaseRepository {
   /**
    * Clear semi-manual mode
    */
-  async clearSemiManual() {
+  async clearSemiManual(): Promise<void> {
     const current = await this.getMode();
     const data = this.withTimestamp({
       enabled: current.enabled,
@@ -65,18 +74,18 @@ export class SchedulerModeRepository extends BaseRepository {
 
   /**
    * Get active schedule ID
-   * @returns {Promise<string>} Active schedule ID or 'default'
+   * @returns Active schedule ID or 'default'
    */
-  async getActiveScheduleId() {
+  async getActiveScheduleId(): Promise<string> {
     const id = await this.get('activeScheduleId');
-    return id || 'default';
+    return (id as unknown as string) || 'default';
   }
 
   /**
    * Set active schedule ID
-   * @param {string} scheduleId - Schedule ID to activate
+   * @param scheduleId - Schedule ID to activate
    */
-  async setActiveScheduleId(scheduleId) {
-    return this.set('activeScheduleId', scheduleId);
+  async setActiveScheduleId(scheduleId: string): Promise<void> {
+    return this.set('activeScheduleId', scheduleId as unknown as Partial<SchedulerMode>);
   }
 }

@@ -9,16 +9,33 @@ import { BaseRepository } from './base/BaseRepository';
 
 const DEFAULT_TARGET_HOURS = 50;
 
-export class MaintenanceRepository extends BaseRepository {
+/** Maintenance data structure stored in Firebase */
+interface MaintenanceData {
+  currentHours: number;
+  targetHours: number;
+  lastCleanedAt: string | null;
+  needsCleaning: boolean;
+  lastUpdatedAt: string | null;
+  lastNotificationLevel: number;
+}
+
+/** Extended maintenance status with computed fields */
+interface MaintenanceStatus extends MaintenanceData {
+  percentage: number;
+  remainingHours: number;
+  isNearLimit: boolean;
+}
+
+export class MaintenanceRepository extends BaseRepository<MaintenanceData> {
   constructor() {
     super('maintenance');
   }
 
   /**
    * Get maintenance data with defaults
-   * @returns {Promise<Object>} Maintenance data
+   * @returns Maintenance data
    */
-  async getData() {
+  async getData(): Promise<MaintenanceData> {
     const data = await this.get();
 
     if (data) {
@@ -26,7 +43,7 @@ export class MaintenanceRepository extends BaseRepository {
     }
 
     // Initialize with defaults
-    const defaultData = {
+    const defaultData: MaintenanceData = {
       currentHours: 0,
       targetHours: DEFAULT_TARGET_HOURS,
       lastCleanedAt: null,
@@ -41,29 +58,29 @@ export class MaintenanceRepository extends BaseRepository {
 
   /**
    * Update maintenance data
-   * @param {Object} updates - Fields to update
+   * @param updates - Fields to update
    */
-  async updateData(updates) {
+  async updateData(updates: Partial<MaintenanceData>): Promise<void> {
     const data = this.withTimestamp(updates);
     return this.update('', data);
   }
 
   /**
    * Check if ignition is allowed
-   * @returns {Promise<boolean>} True if allowed
+   * @returns True if allowed
    */
-  async canIgnite() {
+  async canIgnite(): Promise<boolean> {
     const data = await this.getData();
     return !data.needsCleaning;
   }
 
   /**
    * Reset maintenance after cleaning
-   * @returns {Promise<Object>} Updated data
+   * @returns Updated data
    */
-  async confirmCleaning() {
+  async confirmCleaning(): Promise<Partial<MaintenanceData> & { lastUpdatedAt: string }> {
     const now = new Date().toISOString();
-    const updates = {
+    const updates: Partial<MaintenanceData> = {
       currentHours: 0,
       needsCleaning: false,
       lastCleanedAt: now,
@@ -76,17 +93,17 @@ export class MaintenanceRepository extends BaseRepository {
 
   /**
    * Update target hours
-   * @param {number} hours - New target hours
+   * @param hours - New target hours
    */
-  async setTargetHours(hours) {
+  async setTargetHours(hours: number): Promise<void> {
     return this.updateData({ targetHours: hours });
   }
 
   /**
    * Get status summary
-   * @returns {Promise<Object>} Status with percentage and remaining hours
+   * @returns Status with percentage and remaining hours
    */
-  async getStatus() {
+  async getStatus(): Promise<MaintenanceStatus> {
     const data = await this.getData();
     const percentage = (data.currentHours / data.targetHours) * 100;
     const remainingHours = Math.max(0, data.targetHours - data.currentHours);

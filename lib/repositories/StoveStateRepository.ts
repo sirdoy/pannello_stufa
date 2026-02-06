@@ -7,8 +7,9 @@
 
 import { BaseRepository } from './base/BaseRepository';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
+import type { StoveState } from '@/types/firebase';
 
-export class StoveStateRepository extends BaseRepository {
+export class StoveStateRepository extends BaseRepository<StoveState> {
   constructor() {
     // Use environment-aware path (handles sandbox/production automatically)
     super(getEnvironmentPath('stove/state'));
@@ -16,17 +17,17 @@ export class StoveStateRepository extends BaseRepository {
 
   /**
    * Get current stove state
-   * @returns {Promise<Object|null>} Stove state
+   * @returns Stove state
    */
-  async getState() {
+  async getState(): Promise<StoveState | null> {
     return this.get();
   }
 
   /**
    * Update stove state (merges with existing)
-   * @param {Object} state - State updates
+   * @param state - State updates
    */
-  async updateState(state) {
+  async updateState(state: Partial<StoveState>): Promise<void> {
     const data = this.withTimestamp({
       ...state,
       lastUpdated: new Date().toISOString(),
@@ -36,10 +37,10 @@ export class StoveStateRepository extends BaseRepository {
 
   /**
    * Set full stove state (overwrite)
-   * @param {Object} state - Complete state
+   * @param state - Complete state
    */
-  async setState(state) {
-    const data = this.withTimestamp(state);
-    return this.set('', data);
+  async setState(state: StoveState): Promise<void> {
+    const data = this.withTimestamp(state as unknown as Record<string, unknown>);
+    return this.set('', data as unknown as Partial<StoveState>);
   }
 }

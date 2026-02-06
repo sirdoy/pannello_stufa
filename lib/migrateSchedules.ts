@@ -14,12 +14,36 @@ import { adminDbGet, adminDbSet } from './firebaseAdmin.js';
 const DAYS_OF_WEEK = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
 
 /**
+ * Migration options
+ */
+export interface MigrationOptions {
+  dryRun?: boolean;
+}
+
+/**
+ * Migration result
+ */
+export interface MigrationResult {
+  success: boolean;
+  alreadyMigrated?: boolean;
+  dryRun?: boolean;
+  message: string;
+  error?: string;
+  errors?: string[];
+  stats?: {
+    totalIntervals: number;
+    daysWithIntervals: number;
+    modeMigrated: boolean;
+  };
+}
+
+/**
  * Main migration function
  * @param {Object} options - Migration options
  * @param {boolean} options.dryRun - If true, simulates migration without writing to Firebase
  * @returns {Promise<Object>} Migration result with status and details
  */
-export async function migrateSchedulesToV2({ dryRun = false } = {}) {
+export async function migrateSchedulesToV2({ dryRun = false }: MigrationOptions = {}): Promise<MigrationResult> {
   console.log('🔄 Starting migration: /stoveScheduler → /schedules-v2');
   if (dryRun) {
     console.log('🔍 DRY RUN MODE - No changes will be written to Firebase');
@@ -56,7 +80,7 @@ export async function migrateSchedulesToV2({ dryRun = false } = {}) {
 
     // Step 3: Extract slots for "default" schedule
     console.log('📦 Extracting schedule slots...');
-    const defaultSlots = {};
+    const defaultSlots: Record<string, unknown[]> = {};
     let totalIntervals = 0;
 
     for (const day of DAYS_OF_WEEK) {
@@ -165,12 +189,12 @@ export async function migrateSchedulesToV2({ dryRun = false } = {}) {
  * Create fresh v2 structure when no v1 data exists
  * @param {boolean} dryRun - If true, only logs what would be created
  */
-async function createFreshV2Structure(dryRun = false) {
+async function createFreshV2Structure(dryRun: boolean = false): Promise<void> {
   const now = new Date().toISOString();
   const emptySlots = DAYS_OF_WEEK.reduce((acc, day) => {
     acc[day] = [];
     return acc;
-  }, {});
+  }, {} as Record<string, unknown[]>);
 
   const defaultSchedule = {
     name: 'Default',
@@ -199,13 +223,21 @@ async function createFreshV2Structure(dryRun = false) {
 }
 
 /**
+ * Verification result
+ */
+interface VerificationResult {
+  success: boolean;
+  errors: string[];
+}
+
+/**
  * Verify migration data integrity
  * @param {Object} originalSlots - Original slots from v1
  * @param {Object} originalMode - Original mode from v1
  * @returns {Promise<Object>} Verification result
  */
-async function verifyMigration(originalSlots, originalMode) {
-  const errors = [];
+async function verifyMigration(originalSlots: Record<string, unknown[]>, originalMode: unknown): Promise<VerificationResult> {
+  const errors: string[] = [];
 
   try {
     // Check default schedule exists
@@ -236,8 +268,14 @@ async function verifyMigration(originalSlots, originalMode) {
       const v2Mode = await adminDbGet('schedules-v2/mode');
       if (!v2Mode) {
         errors.push('Mode not migrated to v2');
-      } else if (v2Mode.enabled !== originalMode.enabled) {
-        errors.push('Mode.enabled mismatch');
+      } else if (typeof originalMode === 'object' && originalMode !== null && 'enabled' in originalMode) {
+        const origMode = originalMode as { enabled?: boolean };
+        if (typeof v2Mode === 'object' && v2Mode !== null && 'enabled' in v2Mode) {
+          const v2ModeObj = v2Mode as { enabled?: boolean };
+          if (v2ModeObj.enabled !== origMode.enabled) {
+            errors.push('Mode.enabled mismatch');
+          }
+        }
       }
     }
 
@@ -256,7 +294,7 @@ async function verifyMigration(originalSlots, originalMode) {
  * CLI execution support
  * Usage: node -e "require('./lib/migrateSchedules').runMigration()"
  */
-export async function runMigration() {
+export async function runMigration(): Promise<void> {
   const result = await migrateSchedulesToV2();
   console.log('\n📋 Migration Result:', JSON.stringify(result, null, 2));
   process.exit(result.success ? 0 : 1);

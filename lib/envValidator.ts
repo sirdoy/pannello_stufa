@@ -13,6 +13,18 @@
  *   }
  */
 
+export interface ValidationResult {
+  valid: boolean;
+  missing: string[];
+  warnings: string[];
+}
+
+export interface NetatmoValidationResult {
+  valid: boolean;
+  environment: 'dev' | 'prod' | 'unknown';
+  warnings: string[];
+}
+
 /**
  * Validate health monitoring environment variables
  *
@@ -21,7 +33,7 @@
  *   - missing: string[] - Names of missing required vars
  *   - warnings: string[] - Names of missing optional vars
  */
-export function validateHealthMonitoringEnv() {
+export function validateHealthMonitoringEnv(): ValidationResult {
   const required = [
     'ADMIN_USER_ID',
     'CRON_SECRET',
@@ -69,11 +81,11 @@ export function validateHealthMonitoringEnv() {
  *   - environment: 'dev' | 'prod' | 'unknown' - Credential type
  *   - warnings: string[] - Configuration warnings
  */
-export function validateNetatmoEnv() {
+export function validateNetatmoEnv(): NetatmoValidationResult {
   const clientId = process.env.NETATMO_CLIENT_ID;
   const clientSecret = process.env.NETATMO_CLIENT_SECRET;
 
-  const warnings = [];
+  const warnings: string[] = [];
 
   // Check if credentials are present
   if (!clientId || !clientSecret) {
@@ -86,7 +98,7 @@ export function validateNetatmoEnv() {
 
   // Detect dev vs prod credentials
   // Dev credentials typically contain 'test', 'dev', or are shorter
-  let environment = 'prod';
+  let environment: 'dev' | 'prod' | 'unknown' = 'prod';
 
   if (
     clientId.toLowerCase().includes('test') ||

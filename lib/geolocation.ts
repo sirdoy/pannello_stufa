@@ -15,6 +15,22 @@
  */
 
 /**
+ * Geolocation position result
+ */
+export interface GeolocationResult {
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+}
+
+/**
+ * Custom error with code property
+ */
+export interface GeolocationError extends Error {
+  code: string;
+}
+
+/**
  * Error codes for geolocation failures
  * Standardized codes that map to browser GeolocationPositionError codes
  */
@@ -54,11 +70,11 @@ export const GEOLOCATION_ERROR_MESSAGES = {
  *   }
  * }
  */
-export function getCurrentLocation() {
+export function getCurrentLocation(): Promise<GeolocationResult> {
   return new Promise((resolve, reject) => {
     // Check if geolocation is supported
     if (!navigator.geolocation) {
-      const error = new Error(GEOLOCATION_ERROR_MESSAGES[GEOLOCATION_ERRORS.NOT_SUPPORTED]);
+      const error = new Error(GEOLOCATION_ERROR_MESSAGES[GEOLOCATION_ERRORS.NOT_SUPPORTED]) as GeolocationError;
       error.code = GEOLOCATION_ERRORS.NOT_SUPPORTED;
       reject(error);
       return;
@@ -99,7 +115,7 @@ export function getCurrentLocation() {
             errorCode = GEOLOCATION_ERRORS.UNKNOWN;
         }
 
-        const err = new Error(GEOLOCATION_ERROR_MESSAGES[errorCode]);
+        const err = new Error(GEOLOCATION_ERROR_MESSAGES[errorCode]) as GeolocationError;
         err.code = errorCode;
         reject(err);
       },

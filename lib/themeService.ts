@@ -11,9 +11,11 @@
 
 const THEME_KEY = 'pannello-stufa-theme';
 const THEMES = {
-  LIGHT: 'light',
-  DARK: 'dark',
+  LIGHT: 'light' as const,
+  DARK: 'dark' as const,
 };
+
+export type Theme = typeof THEMES[keyof typeof THEMES];
 
 /**
  * Get theme preference for a user via API
@@ -21,7 +23,7 @@ const THEMES = {
  * @param {string} userId - Auth0 user ID
  * @returns {Promise<string>} Theme value ('light' | 'dark')
  */
-export async function getThemePreference(userId) {
+export async function getThemePreference(userId: string | null | undefined): Promise<Theme> {
   // Try Firebase first via API
   if (userId) {
     try {
@@ -50,8 +52,8 @@ export async function getThemePreference(userId) {
   // Fallback to localStorage
   if (typeof window !== 'undefined') {
     const localTheme = localStorage.getItem(THEME_KEY);
-    if (localTheme && Object.values(THEMES).includes(localTheme)) {
-      return localTheme;
+    if (localTheme && (localTheme === 'light' || localTheme === 'dark')) {
+      return localTheme as Theme;
     }
   }
 
@@ -66,7 +68,7 @@ export async function getThemePreference(userId) {
  * @param {string} theme - Theme value ('light' | 'dark')
  * @returns {Promise<boolean>} Success status
  */
-export async function updateThemePreference(userId, theme) {
+export async function updateThemePreference(userId: string | null | undefined, theme: Theme): Promise<boolean> {
   if (!Object.values(THEMES).includes(theme)) {
     throw new Error(`Invalid theme: ${theme}. Must be 'light' or 'dark'`);
   }
@@ -108,7 +110,7 @@ export async function updateThemePreference(userId, theme) {
  * @param {string} userId - Auth0 user ID
  * @returns {Promise<string>} New theme value
  */
-export async function toggleTheme(userId) {
+export async function toggleTheme(userId: string | null | undefined): Promise<Theme> {
   const currentTheme = await getThemePreference(userId);
   const newTheme = currentTheme === THEMES.LIGHT ? THEMES.DARK : THEMES.LIGHT;
   await updateThemePreference(userId, newTheme);
@@ -120,7 +122,7 @@ export async function toggleTheme(userId) {
  * Includes smooth transition animation and updates theme-color meta tag
  * @param {string} theme - Theme value ('light' | 'dark')
  */
-export function applyThemeToDOM(theme) {
+export function applyThemeToDOM(theme: Theme): void {
   if (typeof window === 'undefined') return;
 
   const html = document.documentElement;
@@ -137,7 +139,7 @@ export function applyThemeToDOM(theme) {
 
   // Update theme-color meta tag for iOS PWA status bar
   const themeColor = theme === THEMES.DARK ? '#0f172a' : '#f8fafc';
-  let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+  let metaThemeColor = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null;
   if (metaThemeColor) {
     metaThemeColor.setAttribute('content', themeColor);
   } else {
@@ -158,7 +160,7 @@ export function applyThemeToDOM(theme) {
  * @param {string} userId - Auth0 user ID
  * @returns {Promise<string>} Current theme
  */
-export async function initializeTheme(userId) {
+export async function initializeTheme(userId: string | null | undefined): Promise<Theme> {
   const theme = await getThemePreference(userId);
   applyThemeToDOM(theme);
   return theme;

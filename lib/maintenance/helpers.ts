@@ -5,6 +5,17 @@
  */
 
 /**
+ * Maintenance notification data
+ */
+export interface MaintenanceNotificationData {
+  notificationLevel: number;
+  percentage: number;
+  currentHours: number;
+  targetHours: number;
+  remainingHours: number;
+}
+
+/**
  * Check if maintenance notification should be sent
  * Returns notification data if threshold reached, null otherwise
  *
@@ -14,7 +25,12 @@
  * @param {number} lastNotificationLevel - Last notification level sent (0, 80, 90, or 100)
  * @returns {Object|null} Notification data if threshold reached, null otherwise
  */
-export function shouldSendMaintenanceNotification(percentage, currentHours, targetHours, lastNotificationLevel = 0) {
+export function shouldSendMaintenanceNotification(
+  percentage: number,
+  currentHours: number,
+  targetHours: number,
+  lastNotificationLevel: number = 0
+): MaintenanceNotificationData | null {
   // Determine notification level
   let notificationLevel = 0;
   if (percentage >= 100) notificationLevel = 100;

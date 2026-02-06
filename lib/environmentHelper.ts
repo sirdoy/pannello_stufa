@@ -8,7 +8,7 @@
  * Check if running in development environment
  * @returns {boolean}
  */
-export function isDevelopment() {
+export function isDevelopment(): boolean {
   // Check for localhost or 127.0.0.1 in various contexts
   if (typeof window !== 'undefined' && window.location && window.location.hostname) {
     // Client-side check
@@ -32,7 +32,7 @@ export function isDevelopment() {
  * Get Firebase path prefix for current environment
  * @returns {string} - Empty string for production, 'dev/' for development
  */
-export function getEnvironmentPrefix() {
+export function getEnvironmentPrefix(): string {
   return isDevelopment() ? 'dev/' : '';
 }
 
@@ -50,7 +50,7 @@ export function getEnvironmentPrefix() {
  * getEnvironmentPath('netatmo') // 'dev/netatmo'
  * getEnvironmentPath('hue/refresh_token') // 'dev/hue/refresh_token'
  */
-export function getEnvironmentPath(basePath) {
+export function getEnvironmentPath(basePath: string): string {
   const prefix = getEnvironmentPrefix();
   return `${prefix}${basePath}`;
 }
@@ -59,14 +59,14 @@ export function getEnvironmentPath(basePath) {
  * Get current environment name
  * @returns {'development' | 'production'}
  */
-export function getEnvironmentName() {
+export function getEnvironmentName(): 'development' | 'production' {
   return isDevelopment() ? 'development' : 'production';
 }
 
 /**
  * Log environment info (useful for debugging)
  */
-export function logEnvironmentInfo() {
+export function logEnvironmentInfo(): void {
   const env = getEnvironmentName();
   const prefix = getEnvironmentPrefix();
 

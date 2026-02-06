@@ -8,16 +8,69 @@
 import { UAParser } from 'ua-parser-js';
 
 /**
+ * Parsed device information from UAParser
+ */
+export interface ParsedDeviceInfo {
+  browser: {
+    name: string;
+    version: string;
+    major?: string;
+  };
+  os: {
+    name: string;
+    version: string;
+  };
+  device: {
+    type: string;
+    vendor: string;
+    model: string;
+  };
+  engine: {
+    name: string;
+    version: string;
+  };
+  cpu: {
+    architecture: string;
+  };
+}
+
+/**
+ * Device information for display
+ */
+export interface DeviceInfo {
+  browser: string;
+  browserVersion: string;
+  os: string;
+  osVersion: string;
+  deviceType: string;
+  screenWidth: number | null;
+  screenHeight: number | null;
+  timezone: string | null;
+}
+
+/**
+ * Complete device fingerprint
+ */
+export interface DeviceFingerprint {
+  deviceId: string;
+  displayName: string;
+  deviceInfo: DeviceInfo;
+  userAgent: string;
+}
+
+/**
  * Parse user agent string into structured device info
  * @param {string} userAgent - Navigator.userAgent string
  * @returns {Object} Parsed device information
  */
-export function parseUserAgent(userAgent) {
+export function parseUserAgent(userAgent: string | null | undefined): ParsedDeviceInfo {
   if (!userAgent) {
     return {
       browser: { name: 'Unknown', version: '' },
       os: { name: 'Unknown', version: '' },
       device: { type: 'desktop', vendor: '', model: '' },
+      engine: { name: '', version: '' },
+      cpu: { architecture: '' },
     };
   }
 
@@ -55,7 +108,7 @@ export function parseUserAgent(userAgent) {
  * @param {string} str - String to hash
  * @returns {string} 16-character hex hash
  */
-function simpleHash(str) {
+function simpleHash(str: string): string {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
@@ -84,7 +137,7 @@ function simpleHash(str) {
  * @param {string} userAgent - Navigator.userAgent string
  * @returns {Object} Device fingerprint with deviceId and metadata
  */
-export function generateDeviceFingerprint(userAgent) {
+export function generateDeviceFingerprint(userAgent: string): DeviceFingerprint {
   const parsed = parseUserAgent(userAgent);
 
   // Use only browser name + OS name for stable ID
@@ -96,7 +149,7 @@ export function generateDeviceFingerprint(userAgent) {
   const displayName = `${parsed.browser.name} on ${parsed.os.name}`;
 
   // Full device info for debugging and display
-  const deviceInfo = {
+  const deviceInfo: DeviceInfo = {
     browser: parsed.browser.name,
     browserVersion: parsed.browser.version,
     os: parsed.os.name,
@@ -119,7 +172,7 @@ export function generateDeviceFingerprint(userAgent) {
  * Get current device fingerprint (browser context)
  * @returns {Object|null} Device fingerprint or null if SSR
  */
-export function getCurrentDeviceFingerprint() {
+export function getCurrentDeviceFingerprint(): DeviceFingerprint | null {
   if (typeof navigator === 'undefined') {
     return null;
   }
@@ -133,7 +186,7 @@ export function getCurrentDeviceFingerprint() {
  * @param {Object} fp2 - Second fingerprint
  * @returns {boolean} True if same device
  */
-export function isSameDevice(fp1, fp2) {
+export function isSameDevice(fp1: DeviceFingerprint | null | undefined, fp2: DeviceFingerprint | null | undefined): boolean {
   if (!fp1?.deviceId || !fp2?.deviceId) return false;
   return fp1.deviceId === fp2.deviceId;
 }
@@ -143,10 +196,10 @@ export function isSameDevice(fp1, fp2) {
  * @param {Object} deviceInfo - Device info from fingerprint
  * @returns {string} Formatted string
  */
-export function formatDeviceInfo(deviceInfo) {
+export function formatDeviceInfo(deviceInfo: DeviceInfo | null | undefined): string {
   if (!deviceInfo) return 'Unknown device';
 
-  const parts = [];
+  const parts: string[] = [];
 
   if (deviceInfo.browser) {
     parts.push(deviceInfo.browser);

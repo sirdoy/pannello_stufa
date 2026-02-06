@@ -16,7 +16,7 @@ export interface UseContextMenuLongPressOptions {
 
 /** useContextMenuLongPress return type */
 export interface UseContextMenuLongPressReturn {
-  bind: () => ReturnType<typeof useLibLongPress>;
+  bind: ReturnType<typeof useLibLongPress>;
   isPressed: boolean;
 }
 
@@ -79,8 +79,8 @@ export function useContextMenuLongPress(
     onStart: () => setIsPressed(true),
     onFinish: () => setIsPressed(false),
     onCancel: () => setIsPressed(false),
-    // Detect which event type triggered
-    detect: LongPressEventType.Both,
+    // Use Pointer which handles both mouse and touch
+    detect: LongPressEventType.Pointer,
   });
 
   return {

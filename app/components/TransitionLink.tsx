@@ -1,8 +1,16 @@
 'use client';
 
-import Link from 'next/link';
+import Link, { LinkProps } from 'next/link';
 import { useRouter } from 'next/navigation';
 import { usePageTransition } from '@/app/context/PageTransitionContext';
+import { ReactNode, MouseEvent } from 'react';
+
+interface TransitionLinkProps extends Omit<LinkProps, 'onClick'> {
+  children: ReactNode;
+  transitionType?: string;
+  className?: string;
+  onClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
+}
 
 /**
  * TransitionLink - Enhanced Next.js Link with page transitions
@@ -46,11 +54,11 @@ export default function TransitionLink({
   scroll,
   shallow,
   ...restProps
-}) {
+}: TransitionLinkProps) {
   const router = useRouter();
   const { startTransition, setTransitionType } = usePageTransition();
 
-  const handleClick = async (e) => {
+  const handleClick = async (e: MouseEvent<HTMLAnchorElement>) => {
     // Don't intercept:
     // - Cmd/Ctrl clicks (open in new tab)
     // - External links
@@ -74,9 +82,9 @@ export default function TransitionLink({
     // Start transition and navigate
     await startTransition(async () => {
       if (replace) {
-        router.replace(href, { scroll });
+        router.replace(href.toString());
       } else {
-        router.push(href, { scroll });
+        router.push(href.toString());
       }
     });
   };

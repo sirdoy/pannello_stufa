@@ -3,6 +3,15 @@
 import { useRouter } from 'next/navigation';
 import Button from './ui/Button';
 import Heading from './ui/Heading';
+import { ReactNode } from 'react';
+
+interface SettingsLayoutProps {
+  children: ReactNode;
+  title: string;
+  icon?: string;
+  showBackButton?: boolean;
+  backHref?: string;
+}
 
 /**
  * SettingsLayout - Unified layout wrapper for all settings pages
@@ -12,13 +21,6 @@ import Heading from './ui/Heading';
  * - Consistent padding and max-width container
  * - Optional back button
  * - Consistent header styling
- *
- * @param {Object} props
- * @param {React.ReactNode} props.children - Page content
- * @param {string} props.title - Page title
- * @param {string} [props.icon] - Optional emoji icon for title
- * @param {boolean} [props.showBackButton=true] - Show back button
- * @param {string} [props.backHref] - Custom back navigation path (defaults to browser back)
  */
 export default function SettingsLayout({
   children,
@@ -26,7 +28,7 @@ export default function SettingsLayout({
   icon,
   showBackButton = true,
   backHref
-}) {
+}: SettingsLayoutProps) {
   const router = useRouter();
 
   const handleBack = () => {

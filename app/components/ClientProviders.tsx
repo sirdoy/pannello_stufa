@@ -10,12 +10,17 @@ import { OfflineBanner } from '@/app/components/ui';
 import PWAInitializer from './PWAInitializer';
 import AxeDevtools from './AxeDevtools';
 import CommandPaletteProvider from './layout/CommandPaletteProvider';
+import { ReactNode } from 'react';
+
+interface ClientProvidersProps {
+  children: ReactNode;
+}
 
 /**
  * Wrapper per tutti i provider client-side
  * Permette di usare Context in layout.js (Server Component)
  */
-export default function ClientProviders({ children }) {
+export default function ClientProviders({ children }: ClientProvidersProps) {
   return (
     <Auth0Provider>
       <ThemeScript />

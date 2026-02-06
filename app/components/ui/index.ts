@@ -91,3 +91,59 @@ export { default as StatusCard } from './StatusCard';
 // DataTable (v4.0+)
 export { default as DataTable, dataTableVariants } from './DataTable';
 export { default as DataTableToolbar } from './DataTableToolbar';
+
+// ============================================================================
+// Type Re-exports (commonly used Props interfaces)
+// ============================================================================
+
+// Core components
+export type { ButtonProps, ButtonIconProps, ButtonGroupProps } from './Button';
+export type { CardProps, CardHeaderProps, CardTitleProps, CardContentProps, CardFooterProps, CardDividerProps } from './Card';
+export type { InputProps } from './Input';
+export type { BadgeProps } from './Badge';
+
+// Layout components
+export type { ContainerProps } from './Container';
+export type { GridProps } from './Grid';
+export type { SectionProps } from './Section';
+
+// Typography components
+export type { HeadingProps } from './Heading';
+export type { TextProps } from './Text';
+
+// Primitive components
+export type { IconProps } from './Icon';
+export type { DividerProps } from './Divider';
+
+// Namespace components
+export type { TabsProps, TabsListProps, TabsTriggerProps, TabsContentProps } from './Tabs';
+export type { SheetProps, SheetOverlayProps, SheetContentProps, SheetHeaderProps, SheetFooterProps, SheetTitleProps, SheetDescriptionProps } from './Sheet';
+export type { AccordionProps, AccordionItemProps, AccordionTriggerProps, AccordionContentProps } from './Accordion';
+export type { TooltipProps, TooltipProviderProps, TooltipRootProps, TooltipContentProps } from './Tooltip';
+export type { PopoverProps, PopoverContentProps, PopoverCloseProps, PopoverArrowProps } from './Popover';
+
+// Smart home components
+export type { SmartHomeCardProps, SmartHomeCardHeaderProps, SmartHomeCardStatusProps, SmartHomeCardControlsProps } from './SmartHomeCard';
+export type { DeviceCardProps } from './DeviceCard';
+export type { StatusCardProps } from './StatusCard';
+
+// Feedback components
+export type { SpinnerProps } from './Spinner';
+export type { ProgressProps } from './Progress';
+
+// Page layout components
+export type { PageLayoutProps, PageHeaderProps, PageContentProps, PageFooterProps } from './PageLayout';
+export type { DashboardLayoutProps } from './DashboardLayout';
+
+// DataTable
+export type { DataTableProps } from './DataTable';
+export type { DataTableToolbarProps } from './DataTableToolbar';
+
+// Modal components
+export type { ModalProps } from './Modal';
+export type { ConfirmDialogProps } from './ConfirmDialog';
+export type { ConfirmationDialogProps } from './ConfirmationDialog';
+
+// Other components
+export type { SkeletonProps } from './Skeleton';
+export type { EmptyStateProps } from './EmptyState';

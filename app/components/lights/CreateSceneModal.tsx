@@ -10,6 +10,43 @@ import Heading from '../ui/Heading';
 import Text from '../ui/Text';
 import { X } from 'lucide-react';
 
+interface HueRoom {
+  id: string;
+  metadata?: { name?: string };
+  services?: Array<{ rid: string }>;
+  [key: string]: any;
+}
+
+interface HueLight {
+  id: string;
+  on?: { on: boolean };
+  dimming?: { brightness: number };
+  color?: { xy?: { x: number; y: number } };
+  [key: string]: any;
+}
+
+interface LightConfig {
+  on: boolean;
+  brightness: number;
+  color: { x: number; y: number } | null;
+}
+
+interface SceneAction {
+  target: { rid: string; rtype: string };
+  action: {
+    on: { on: boolean };
+    dimming?: { brightness: number };
+    color?: { xy: { x: number; y: number } };
+  };
+}
+
+interface CreateSceneModalProps {
+  isOpen: boolean;
+  rooms?: HueRoom[];
+  onConfirm: (data: { name: string; groupRid: string; actions: SceneAction[] }) => void;
+  onCancel: () => void;
+}
+
 /**
  * CreateSceneModal Component
  *
@@ -19,22 +56,17 @@ import { X } from 'lucide-react';
  * 3. Pre-populates form with current states
  * 4. User can adjust on/off, brightness, color for each light
  * 5. Saves scene with configured states
- *
- * @param {boolean} isOpen - Modal open state
- * @param {Array} rooms - Array of room objects {id, metadata: {name}, services: [{rid}]}
- * @param {Function} onConfirm - Callback with {name, groupRid, actions}
- * @param {Function} onCancel - Callback to close modal
  */
 export default function CreateSceneModal({
   isOpen,
   rooms = [],
   onConfirm,
   onCancel,
-}) {
+}: CreateSceneModalProps) {
   const [name, setName] = useState('');
   const [selectedRoom, setSelectedRoom] = useState('');
-  const [lights, setLights] = useState([]);
-  const [lightConfigs, setLightConfigs] = useState({});
+  const [lights, setLights] = useState<HueLight[]>([]);
+  const [lightConfigs, setLightConfigs] = useState<Record<string, LightConfig>>({});
   const [loadingLights, setLoadingLights] = useState(false);
   const [error, setError] = useState('');
 
@@ -103,7 +135,7 @@ export default function CreateSceneModal({
     }
   }, [selectedRoom, fetchRoomLights]);
 
-  function handleLightToggle(lightId) {
+  function handleLightToggle(lightId: string) {
     setLightConfigs(prev => ({
       ...prev,
       [lightId]: {
@@ -113,7 +145,7 @@ export default function CreateSceneModal({
     }));
   }
 
-  function handleBrightnessChange(lightId, brightness) {
+  function handleBrightnessChange(lightId: string, brightness: number) {
     setLightConfigs(prev => ({
       ...prev,
       [lightId]: {
@@ -123,7 +155,7 @@ export default function CreateSceneModal({
     }));
   }
 
-  function handleColorChange(lightId, x, y) {
+  function handleColorChange(lightId: string, x: number, y: number) {
     setLightConfigs(prev => ({
       ...prev,
       [lightId]: {
@@ -158,10 +190,10 @@ export default function CreateSceneModal({
     }
 
     // Build actions array for Hue API
-    const actions = lights.map(light => {
-      const config = lightConfigs[light.id] || {};
+    const actions: SceneAction[] = lights.map(light => {
+      const config = lightConfigs[light.id] || { on: true, brightness: 100, color: null };
 
-      const action = {
+      const action: SceneAction = {
         target: { rid: light.id, rtype: 'light' },
         action: {
           on: { on: config.on ?? true }
@@ -193,7 +225,7 @@ export default function CreateSceneModal({
     });
   }
 
-  function handleKeyPress(e) {
+  function handleKeyPress(e: React.KeyboardEvent) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleConfirm();
@@ -297,7 +329,7 @@ export default function CreateSceneModal({
               </label>
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {lights.map(light => {
-                  const config = lightConfigs[light.id] || {};
+                  const config = lightConfigs[light.id] || { on: true, brightness: 100, color: null };
                   return (
                     <div key={light.id} className="p-4 bg-white/40 [html:not(.dark)_&]:bg-slate-800/40 rounded-xl border border-slate-200/50 [html:not(.dark)_&]:border-slate-700/50">
                       {/* Light Name + Toggle */}
@@ -330,7 +362,7 @@ export default function CreateSceneModal({
                             min="0"
                             max="100"
                             value={config.brightness || 100}
-                            onChange={(e) => handleBrightnessChange(light.id, e.target.value)}
+                            onChange={(e) => handleBrightnessChange(light.id, Number(e.target.value))}
                             className="w-full h-2 bg-slate-200 [html:not(.dark)_&]:bg-slate-700 rounded appearance-none cursor-pointer accent-flame-500"
                           />
                         </div>

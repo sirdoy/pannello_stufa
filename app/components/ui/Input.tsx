@@ -1,7 +1,9 @@
 'use client';
 
+import type React from 'react';
 import { forwardRef, useId, useState, useCallback } from 'react';
 import * as Label from '@radix-ui/react-label';
+import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { AlertCircle, X } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
@@ -11,18 +13,6 @@ import { cn } from '@/lib/utils/cn';
  *
  * Enhanced form input with dark-first design, validation states,
  * and optional features (clearable, character count).
- *
- * @param {Object} props
- * @param {string} props.type - Input type (default: 'text')
- * @param {string} props.label - Label text
- * @param {string} props.icon - Optional emoji icon
- * @param {'default'|'error'|'success'} props.variant - Visual variant
- * @param {string} props.error - Error message (triggers error variant)
- * @param {boolean} props.clearable - Show clear button when has value
- * @param {boolean} props.showCount - Show character count (requires maxLength)
- * @param {function} props.validate - Real-time validation function (value) => errorString | null
- * @param {string} props.className - Additional input classes
- * @param {string} props.containerClassName - Container classes
  */
 
 const inputVariants = cva(
@@ -64,7 +54,28 @@ const inputVariants = cva(
   }
 );
 
-const Input = forwardRef(function Input(
+export interface InputProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>,
+    VariantProps<typeof inputVariants> {
+  /** Label text */
+  label?: string;
+  /** Optional emoji icon */
+  icon?: string;
+  /** Error message (triggers error variant) */
+  error?: string;
+  /** Helper text (reserved for future use) */
+  helperText?: string;
+  /** Show clear button when has value */
+  clearable?: boolean;
+  /** Show character count (requires maxLength) */
+  showCount?: boolean;
+  /** Real-time validation function */
+  validate?: (value: string) => string | null;
+  /** Container classes */
+  containerClassName?: string;
+}
+
+const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   {
     type = 'text',
     label,
@@ -93,14 +104,16 @@ const Input = forwardRef(function Input(
   const errorId = `${inputId}-error`;
 
   // Internal state for validation errors
-  const [validationError, setValidationError] = useState(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   // Determine if we need to manage value internally (for clearable, showCount, or validate)
   const needsInternalControl = clearable || showCount || validate;
   const isControlled = controlledValue !== undefined;
 
   // Track value for clearable and showCount (works for both controlled and uncontrolled)
-  const [internalValue, setInternalValue] = useState(defaultValue || '');
+  const [internalValue, setInternalValue] = useState<string>(
+    (defaultValue as string) || ''
+  );
   const currentValue = isControlled ? controlledValue : internalValue;
 
   // Determine final error and variant
@@ -109,7 +122,7 @@ const Input = forwardRef(function Input(
 
   // Handle input changes
   const handleChange = useCallback(
-    (e) => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
 
       // Update internal state for uncontrolled mode
@@ -137,7 +150,7 @@ const Input = forwardRef(function Input(
     const syntheticEvent = {
       target: { value: '' },
       currentTarget: { value: '' },
-    };
+    } as React.ChangeEvent<HTMLInputElement>;
 
     // Update internal state
     if (!isControlled) {
@@ -245,7 +258,7 @@ const Input = forwardRef(function Input(
               '[html:not(.dark)_&]:text-slate-400'
             )}
           >
-            {currentValue?.length || 0}/{maxLength}
+            {(currentValue as string)?.length || 0}/{maxLength}
           </div>
         )}
       </div>

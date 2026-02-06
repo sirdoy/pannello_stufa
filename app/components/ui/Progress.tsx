@@ -1,7 +1,9 @@
 'use client';
 
+import type React from 'react';
 import * as ProgressPrimitive from '@radix-ui/react-progress';
 import { forwardRef } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 
@@ -54,20 +56,21 @@ const indicatorVariants = cva(
   }
 );
 
+export interface ProgressProps
+  extends React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>,
+    VariantProps<typeof progressVariants>,
+    VariantProps<typeof indicatorVariants> {
+  /** Additional CSS classes for indicator */
+  indicatorClassName?: string;
+  /** Accessible label */
+  label?: string;
+}
+
 /**
  * Progress - Accessible progress bar with Radix primitive
  *
  * Uses @radix-ui/react-progress for proper ARIA attributes.
  * Supports determinate (with value) and indeterminate (loading) states.
- *
- * @param {Object} props - Component props
- * @param {number} props.value - Progress value (0-max), undefined for indeterminate
- * @param {number} props.max - Maximum value (default: 100)
- * @param {'sm'|'md'|'lg'} props.size - Bar height size
- * @param {'ember'|'ocean'|'sage'|'warning'|'danger'} props.variant - Color variant
- * @param {boolean} props.indeterminate - Force indeterminate state
- * @param {string} props.className - Additional CSS classes for root
- * @param {string} props.indicatorClassName - Additional CSS classes for indicator
  *
  * @example
  * // Determinate progress
@@ -81,7 +84,7 @@ const indicatorVariants = cva(
  * // Auto-indeterminate when value undefined
  * <Progress />
  */
-const Progress = forwardRef(({
+const Progress = forwardRef<HTMLDivElement, ProgressProps>(({
   value,
   max = 100,
   size,
@@ -94,7 +97,7 @@ const Progress = forwardRef(({
 }, ref) => {
   // If value is undefined or null, treat as indeterminate
   const isIndeterminate = indeterminate || value === undefined || value === null;
-  const percentage = isIndeterminate ? null : Math.min(Math.max(value, 0), max);
+  const percentage = isIndeterminate ? null : Math.min(Math.max(value as number, 0), max!);
 
   return (
     <ProgressPrimitive.Root
@@ -110,7 +113,7 @@ const Progress = forwardRef(({
           indicatorVariants({ variant, indeterminate: isIndeterminate }),
           indicatorClassName
         )}
-        style={isIndeterminate ? undefined : { width: `${(percentage / max) * 100}%` }}
+        style={isIndeterminate ? undefined : { width: `${(percentage! / max!) * 100}%` }}
       />
     </ProgressPrimitive.Root>
   );

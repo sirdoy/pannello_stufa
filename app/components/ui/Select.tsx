@@ -1,7 +1,9 @@
 'use client';
 
+import type React from 'react';
 import { forwardRef, useId } from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
+import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { Check, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';

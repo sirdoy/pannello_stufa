@@ -1,7 +1,9 @@
 'use client';
 
+import type React from 'react';
 import * as ToastPrimitive from '@radix-ui/react-toast';
 import { forwardRef } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
@@ -62,25 +64,27 @@ const variantIcons = {
   error: AlertCircle,
   warning: AlertTriangle,
   info: Info,
-};
+} as const;
+
+export interface ToastProps
+  extends React.ComponentPropsWithoutRef<typeof ToastPrimitive.Root>,
+    VariantProps<typeof toastVariants> {
+  /** Optional title */
+  title?: string;
+  /** Toast message */
+  children?: React.ReactNode;
+  /** Optional action button */
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+}
 
 /**
  * Toast Component
  *
  * Notification toast built on Radix Toast primitive.
  * Supports auto-dismiss, manual dismiss, swipe to dismiss, and action buttons.
- *
- * @param {Object} props
- * @param {'success'|'error'|'warning'|'info'} props.variant - Toast variant
- * @param {string} [props.title] - Optional title
- * @param {React.ReactNode} props.children - Toast message
- * @param {Object} [props.action] - Optional action button
- * @param {string} props.action.label - Action button label
- * @param {Function} props.action.onClick - Action button handler
- * @param {string} [props.className] - Additional classes
- * @param {boolean} [props.open] - Controlled open state
- * @param {Function} [props.onOpenChange] - Open state change handler
- * @param {number} [props.duration] - Auto-dismiss duration in ms
  *
  * @example
  * // Used via ToastProvider/useToast hook
@@ -94,14 +98,16 @@ const variantIcons = {
  *   action: { label: 'Refresh', onClick: () => location.reload() }
  * });
  */
-const Toast = forwardRef(
-  ({ className, variant = 'info', title, children, action, ...props }, ref) => {
-    const Icon = variantIcons[variant];
+const Toast = forwardRef<
+  React.ElementRef<typeof ToastPrimitive.Root>,
+  ToastProps
+>(({ className, variant = 'info', title, children, action, ...props }, ref) => {
+  const Icon = variantIcons[variant || 'info'];
 
     return (
       <ToastPrimitive.Root
         ref={ref}
-        className={cn(toastVariants({ variant }), className)}
+        className={cn(toastVariants({ variant: variant || 'info' }), className)}
         {...props}
       >
         {/* Icon */}
@@ -150,16 +156,16 @@ const Toast = forwardRef(
 );
 Toast.displayName = 'Toast';
 
+export interface ToastViewportProps
+  extends React.ComponentPropsWithoutRef<typeof ToastPrimitive.Viewport> {}
+
 /**
  * ToastViewport Component
  *
  * Container for toast notifications, positioned in bottom-right corner.
  * Stacks toasts with newest on top (flex-col-reverse).
- *
- * @param {Object} props
- * @param {string} [props.className] - Additional classes
  */
-function ToastViewport({ className }) {
+function ToastViewport({ className, ...props }: ToastViewportProps) {
   return (
     <ToastPrimitive.Viewport
       className={cn(
@@ -171,6 +177,7 @@ function ToastViewport({ className }) {
         'max-sm:bottom-0 max-sm:right-0 max-sm:left-0 max-sm:p-4',
         className
       )}
+      {...props}
     />
   );
 }

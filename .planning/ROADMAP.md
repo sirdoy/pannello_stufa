@@ -55,7 +55,7 @@ Plans:
 
 **Goal:** All 132 library files (116 in lib/ + 16 hooks) converted to TypeScript with proper typing.
 
-**Plans:** 9 plans
+**Plans:** 13 plans (9 migration + 4 gap closure)
 
 Plans:
 - [x] 38-01-PLAN.md — Leaf utilities (utils/, formatUtils, version, routes, fingerprint, env, geo, theme)
@@ -67,6 +67,10 @@ Plans:
 - [x] 38-07-PLAN.md — Coordination system, health monitoring, high-level services
 - [x] 38-08-PLAN.md — Remaining services (maintenance, scheduler, weather, dashboard, commands)
 - [x] 38-09-PLAN.md — React hooks (lib/hooks/ + app/hooks/)
+- [ ] 38-10-PLAN.md — Gap closure: type definitions and interface completeness (45 errors)
+- [ ] 38-11-PLAN.md — Gap closure: Firestore query types and parameter interfaces (38 errors)
+- [ ] 38-12-PLAN.md — Gap closure: Firebase data unknown narrowing (62 errors)
+- [ ] 38-13-PLAN.md — Gap closure: Record conversion, Promise types, misc fixes (43 errors)
 
 **Requirements covered:**
 - LIB-01: Tutti i file lib/ convertiti a .ts (116 file)
@@ -199,7 +203,7 @@ Plans:
 | Phase | Status | Plans | Completion |
 |-------|--------|-------|------------|
 | 37 - TypeScript Foundation | ✓ Complete | 3/3 | 100% |
-| 38 - Library Migration | ⚠ Gaps Found | 9/9 | 90% |
+| 38 - Library Migration | ⚠ Gap Closure | 9/13 (4 gap closure pending) | 90% |
 | 39 - UI Components Migration | Pending | 0/? | 0% |
 | 40 - API Routes Migration | Pending | 0/? | 0% |
 | 41 - Pages Migration | Pending | 0/? | 0% |

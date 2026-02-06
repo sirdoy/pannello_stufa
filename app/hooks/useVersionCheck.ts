@@ -7,15 +7,31 @@ import { APP_VERSION } from '@/lib/version';
 const STORAGE_KEY = 'lastSeenVersion';
 const DISMISSED_KEY = 'dismissedVersions';
 
+/** Changelog version type */
+export interface ChangelogVersion {
+  version: string;
+  date: string;
+  changes: unknown[];
+}
+
+/** useVersionCheck return type */
+export interface UseVersionCheckReturn {
+  hasNewVersion: boolean;
+  latestVersion: ChangelogVersion | null;
+  showWhatsNew: boolean;
+  dismissWhatsNew: (dontShowAgain?: boolean) => void;
+  dismissBadge: () => void;
+}
+
 /**
  * Hook per controllo nuove versioni
- * @returns {Object} { hasNewVersion, latestVersion, showWhatsNew, dismissWhatsNew, dismissBadge }
+ * @returns Version check state and controls
  */
-export function useVersionCheck() {
-  const [hasNewVersion, setHasNewVersion] = useState(false);
-  const [latestVersion, setLatestVersion] = useState(null);
-  const [showWhatsNew, setShowWhatsNew] = useState(false);
-  const fetchedRef = useRef(false);
+export function useVersionCheck(): UseVersionCheckReturn {
+  const [hasNewVersion, setHasNewVersion] = useState<boolean>(false);
+  const [latestVersion, setLatestVersion] = useState<ChangelogVersion | null>(null);
+  const [showWhatsNew, setShowWhatsNew] = useState<boolean>(false);
+  const fetchedRef = useRef<boolean>(false);
 
   useEffect(() => {
     // Previeni double fetch in React Strict Mode
@@ -64,7 +80,7 @@ export function useVersionCheck() {
     checkVersion();
   }, []);
 
-  const dismissWhatsNew = (dontShowAgain = false) => {
+  const dismissWhatsNew = (dontShowAgain: boolean = false) => {
     setShowWhatsNew(false);
     localStorage.setItem(STORAGE_KEY, APP_VERSION);
 
@@ -91,11 +107,11 @@ export function useVersionCheck() {
 
 /**
  * Confronta due versioni semantiche
- * @param {string} v1 - Prima versione (es. "1.2.0")
- * @param {string} v2 - Seconda versione (es. "1.1.0")
- * @returns {number} 1 se v1 > v2, -1 se v1 < v2, 0 se uguali
+ * @param v1 - Prima versione (es. "1.2.0")
+ * @param v2 - Seconda versione (es. "1.1.0")
+ * @returns 1 se v1 > v2, -1 se v1 < v2, 0 se uguali
  */
-function compareVersions(v1, v2) {
+function compareVersions(v1: string, v2: string): number {
   const parts1 = v1.split('.').map(Number);
   const parts2 = v2.split('.').map(Number);
 
@@ -109,9 +125,9 @@ function compareVersions(v1, v2) {
 
 /**
  * Recupera lista versioni dismesse da localStorage
- * @returns {Array<string>}
+ * @returns Array of dismissed version strings
  */
-function getDismissedVersions() {
+function getDismissedVersions(): string[] {
   try {
     const dismissed = localStorage.getItem(DISMISSED_KEY);
     return dismissed ? JSON.parse(dismissed) : [];

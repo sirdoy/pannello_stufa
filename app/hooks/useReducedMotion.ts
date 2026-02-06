@@ -18,7 +18,7 @@ const QUERY = '(prefers-reduced-motion: no-preference)';
  * - 'reduce': User prefers reduced motion (returns true)
  * - 'no-preference': User allows motion (returns false)
  *
- * @returns {boolean} True if reduced motion preferred, false if motion allowed
+ * @returns True if reduced motion preferred, false if motion allowed
  *
  * @example
  * // Conditionally disable animation
@@ -32,8 +32,8 @@ const QUERY = '(prefers-reduced-motion: no-preference)';
  *   triggerAnimation();
  * }
  */
-export function useReducedMotion() {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
+export function useReducedMotion(): boolean {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState<boolean>(() => {
     // SSR-safe: default to reduced motion on server for accessibility
     if (typeof window === 'undefined') return true;
     return !window.matchMedia(QUERY).matches;
@@ -41,7 +41,7 @@ export function useReducedMotion() {
 
   useEffect(() => {
     const mediaQueryList = window.matchMedia(QUERY);
-    const listener = (event) => {
+    const listener = (event: MediaQueryListEvent) => {
       setPrefersReducedMotion(!event.matches);
     };
 

@@ -1,8 +1,24 @@
 'use client';
 
-import { useLongPress as useLibLongPress, LongPressEventType } from 'use-long-press';
+import { useLongPress as useLibLongPress, LongPressEventType, LongPressCallback } from 'use-long-press';
 import { useCallback, useState } from 'react';
 import { vibrateShort } from '@/lib/pwa/vibration';
+
+/** useContextMenuLongPress options */
+export interface UseContextMenuLongPressOptions {
+  /** Time in ms before triggering (default: 500) */
+  threshold?: number;
+  /** Enable haptic feedback (default: true) */
+  haptic?: boolean;
+  /** Cancel if finger moves (default: true) */
+  cancelOnMovement?: boolean;
+}
+
+/** useContextMenuLongPress return type */
+export interface UseContextMenuLongPressReturn {
+  bind: () => ReturnType<typeof useLibLongPress>;
+  isPressed: boolean;
+}
 
 /**
  * useContextMenuLongPress Hook - Ember Noir Design System
@@ -13,12 +29,9 @@ import { vibrateShort } from '@/lib/pwa/vibration';
  * Different from useLongPress hook which is for continuous value adjustment.
  * This hook triggers ONCE after the threshold, ideal for context menus.
  *
- * @param {Function} onLongPress - Callback when long-press threshold is reached
- * @param {Object} options - Configuration options
- * @param {number} options.threshold - Time in ms before triggering (default: 500)
- * @param {boolean} options.haptic - Enable haptic feedback (default: true)
- * @param {boolean} options.cancelOnMovement - Cancel if finger moves (default: true)
- * @returns {Object} { bind, isPressed } - Event handlers and pressed state for animations
+ * @param onLongPress - Callback when long-press threshold is reached
+ * @param options - Configuration options
+ * @returns Event handlers and pressed state for animations
  *
  * @example
  * const { bind, isPressed } = useContextMenuLongPress(() => {
@@ -40,9 +53,12 @@ import { vibrateShort } from '@/lib/pwa/vibration';
  *   </div>
  * );
  */
-export function useContextMenuLongPress(onLongPress, options = {}) {
+export function useContextMenuLongPress(
+  onLongPress: LongPressCallback,
+  options: UseContextMenuLongPressOptions = {}
+): UseContextMenuLongPressReturn {
   const { threshold = 500, haptic = true, cancelOnMovement = true } = options;
-  const [isPressed, setIsPressed] = useState(false);
+  const [isPressed, setIsPressed] = useState<boolean>(false);
 
   // Wrap callback to include haptic feedback
   const handleLongPress = useCallback(
@@ -79,10 +95,10 @@ export function useContextMenuLongPress(onLongPress, options = {}) {
  * @example
  * <div style={longPressPreventSelection}>Content</div>
  */
-export const longPressPreventSelection = {
-  WebkitUserSelect: 'none',
-  userSelect: 'none',
-  WebkitTouchCallout: 'none',
+export const longPressPreventSelection: React.CSSProperties = {
+  WebkitUserSelect: 'none' as const,
+  userSelect: 'none' as const,
+  WebkitTouchCallout: 'none' as const,
 };
 
 export default useContextMenuLongPress;

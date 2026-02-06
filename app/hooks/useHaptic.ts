@@ -9,14 +9,23 @@ import {
   isVibrationSupported,
 } from '@/lib/pwa/vibration';
 
+/** Haptic pattern type */
+export type HapticPattern = 'short' | 'success' | 'warning' | 'error';
+
+/** useHaptic return type */
+export interface UseHapticReturn {
+  trigger: () => void;
+  isSupported: boolean;
+}
+
 /**
  * useHaptic Hook - Ember Noir Design System
  *
  * Provides haptic feedback for interactive elements (buttons, toggles, etc.).
  * Wraps vibration.js patterns with React hooks for memoization and lifecycle management.
  *
- * @param {string} pattern - Haptic pattern to use ('short' | 'success' | 'warning' | 'error')
- * @returns {Object} { trigger, isSupported } - Trigger function and support detection
+ * @param pattern - Haptic pattern to use ('short' | 'success' | 'warning' | 'error')
+ * @returns Trigger function and support detection
  *
  * @example
  * const haptic = useHaptic('short');
@@ -26,7 +35,7 @@ import {
  * const haptic = useHaptic('success');
  * if (haptic.isSupported) { haptic.trigger(); }
  */
-export function useHaptic(pattern = 'short') {
+export function useHaptic(pattern: HapticPattern = 'short'): UseHapticReturn {
   // Map pattern names to vibration functions
   const vibrationFunction = useMemo(() => {
     switch (pattern) {

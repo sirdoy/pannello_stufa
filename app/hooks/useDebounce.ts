@@ -9,9 +9,9 @@ import { useState, useEffect } from 'react';
  * only after delay ms of no changes. Useful for search input to prevent
  * excessive API calls.
  *
- * @param {any} value - Value to debounce
- * @param {number} delay - Delay in milliseconds (default 300ms)
- * @returns {any} Debounced value
+ * @param value - Value to debounce
+ * @param delay - Delay in milliseconds (default 300ms)
+ * @returns Debounced value
  *
  * @example
  * const [searchQuery, setSearchQuery] = useState('');
@@ -23,8 +23,8 @@ import { useState, useEffect } from 'react';
  *   }
  * }, [debouncedQuery]);
  */
-export function useDebounce(value, delay = 300) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
+export function useDebounce<T>(value: T, delay: number = 300): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
   useEffect(() => {
     // Set up timeout to update debounced value after delay

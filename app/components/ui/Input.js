@@ -177,7 +177,7 @@ const Input = forwardRef(function Input(
       )}
 
       {/* Input wrapper for positioning clear button */}
-      <div className="relative">
+      <div className="relative" suppressHydrationWarning>
         <input
           ref={ref}
           type={type}

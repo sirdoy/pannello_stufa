@@ -345,7 +345,7 @@ export default function DesignSystemPage() {
                   <div className="flex flex-wrap gap-3">
                     <Button icon="🔥" variant="ember">Start Stove</Button>
                     <Button icon="❄️" variant="subtle" iconPosition="right">Turn Off</Button>
-                    <Button icon="🔥" variant="ember" iconOnly size="md" />
+                    <Button icon="🔥" variant="ember" iconOnly size="md" aria-label="Ignite stove" />
                     <ButtonIcon icon="⚙️" label="Settings" variant="ghost" />
                     <ButtonIcon icon="❌" label="Close" variant="danger" size="sm" />
                   </div>

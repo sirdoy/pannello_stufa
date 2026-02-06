@@ -159,7 +159,7 @@ const RightClickMenuItem = forwardRef(function RightClickMenuItem(
       {...props}
     >
       {icon && (
-        <span className="flex-shrink-0 w-4 h-4 text-slate-400 [html:not(.dark)_&]:text-slate-500">
+        <span className="flex-shrink-0 w-4 h-4 text-slate-400 [html:not(.dark)_&]:text-slate-500" aria-hidden="true">
           {icon}
         </span>
       )}
@@ -191,7 +191,7 @@ const RightClickMenuCheckboxItem = forwardRef(function RightClickMenuCheckboxIte
         <Check className="w-4 h-4 text-ember-500" />
       </ContextMenuPrimitive.ItemIndicator>
       {icon && (
-        <span className="flex-shrink-0 w-4 h-4 text-slate-400 [html:not(.dark)_&]:text-slate-500">
+        <span className="flex-shrink-0 w-4 h-4 text-slate-400 [html:not(.dark)_&]:text-slate-500" aria-hidden="true">
           {icon}
         </span>
       )}

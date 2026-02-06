@@ -197,7 +197,7 @@ const CommandPalette = forwardRef(function CommandPalette(
                     <div className="flex items-center gap-3">
                       {/* Icon (user decision: all items have icons) */}
                       {item.icon && (
-                        <span className="flex-shrink-0 text-slate-400 [html:not(.dark)_&]:text-slate-500">
+                        <span className="flex-shrink-0 text-slate-400 [html:not(.dark)_&]:text-slate-500" aria-hidden="true">
                           {item.icon}
                         </span>
                       )}

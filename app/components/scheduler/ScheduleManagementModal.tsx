@@ -11,20 +11,28 @@ import Heading from '../ui/Heading';
 import Text from '../ui/Text';
 import { X, Pencil, Trash2, CheckCircle } from 'lucide-react';
 
-/**
- * ScheduleManagementModal Component
- *
- * Modal for managing existing schedules: rename, delete, set as active.
- *
- * @param {Object} props
- * @param {boolean} props.isOpen - Modal open state
- * @param {Array} props.schedules - Array of schedule objects {id, name, enabled, isActive}
- * @param {string} props.activeScheduleId - ID of currently active schedule
- * @param {Function} props.onSetActive - Callback to set schedule as active (scheduleId)
- * @param {Function} props.onRename - Callback to rename schedule (scheduleId, newName)
- * @param {Function} props.onDelete - Callback to delete schedule (scheduleId)
- * @param {Function} props.onClose - Callback to close modal
- */
+interface Schedule {
+  id: string;
+  name: string;
+  enabled?: boolean;
+  isActive?: boolean;
+}
+
+interface ConfirmDeleteState {
+  isOpen: boolean;
+  schedule: Schedule | null;
+}
+
+export interface ScheduleManagementModalProps {
+  isOpen: boolean;
+  schedules?: Schedule[];
+  activeScheduleId: string;
+  onSetActive: (scheduleId: string) => void;
+  onRename: (scheduleId: string, newName: string) => void;
+  onDelete: (scheduleId: string) => void;
+  onClose: () => void;
+}
+
 export default function ScheduleManagementModal({
   isOpen,
   schedules = [],
@@ -33,17 +41,17 @@ export default function ScheduleManagementModal({
   onRename,
   onDelete,
   onClose,
-}) {
-  const [editingId, setEditingId] = useState(null);
+}: ScheduleManagementModalProps) {
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [error, setError] = useState('');
-  const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, schedule: null });
+  const [confirmDelete, setConfirmDelete] = useState<ConfirmDeleteState>({ isOpen: false, schedule: null });
 
   // Custom Escape key handler (handles nested modals)
   useEffect(() => {
     if (!isOpen) return;
 
-    const handleEscape = (e) => {
+    const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         if (confirmDelete.isOpen) {
           setConfirmDelete({ isOpen: false, schedule: null });
@@ -61,7 +69,7 @@ export default function ScheduleManagementModal({
 
   if (!isOpen) return null;
 
-  const handleStartEdit = (schedule) => {
+  const handleStartEdit = (schedule: Schedule) => {
     setEditingId(schedule.id);
     setEditName(schedule.name);
     setError('');
@@ -73,7 +81,7 @@ export default function ScheduleManagementModal({
     setError('');
   };
 
-  const handleSaveEdit = (scheduleId) => {
+  const handleSaveEdit = (scheduleId: string) => {
     const trimmedName = editName.trim();
 
     // Validation
@@ -109,7 +117,7 @@ export default function ScheduleManagementModal({
     setError('');
   };
 
-  const handleDeleteRequest = (schedule) => {
+  const handleDeleteRequest = (schedule: Schedule) => {
     setConfirmDelete({ isOpen: true, schedule });
   };
 
@@ -151,7 +159,7 @@ export default function ScheduleManagementModal({
             </div>
             <ActionButton
               icon={<X />}
-              variant="close"
+              variant="ghost"
               size="md"
               onClick={onClose}
               ariaLabel="Chiudi"
@@ -184,7 +192,7 @@ export default function ScheduleManagementModal({
                           }}
                           maxLength={30}
                           autoFocus
-                          size="sm"
+                          
                           error={error}
                         />
                         <div className="flex gap-2">
@@ -203,7 +211,7 @@ export default function ScheduleManagementModal({
                         </Text>
                         <ActionButton
                           icon={<Pencil />}
-                          variant="primary"
+                          variant="ember"
                           size="sm"
                           onClick={() => handleStartEdit(activeSchedule)}
                           ariaLabel="Modifica nome"
@@ -244,7 +252,7 @@ export default function ScheduleManagementModal({
                           }}
                           maxLength={30}
                           autoFocus
-                          size="sm"
+                          
                           error={error}
                         />
                         <div className="flex gap-2">
@@ -267,7 +275,7 @@ export default function ScheduleManagementModal({
                         <div className="flex items-center gap-1">
                           <ActionButton
                             icon={<CheckCircle />}
-                            variant="success"
+                            variant="sage"
                             size="sm"
                             onClick={() => onSetActive(schedule.id)}
                             ariaLabel="Imposta come attiva"
@@ -275,7 +283,7 @@ export default function ScheduleManagementModal({
                           />
                           <ActionButton
                             icon={<Pencil />}
-                            variant="primary"
+                            variant="ember"
                             size="sm"
                             onClick={() => handleStartEdit(schedule)}
                             ariaLabel="Modifica nome"

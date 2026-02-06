@@ -12,26 +12,26 @@ import Heading from '../ui/Heading';
 import Text from '../ui/Text';
 import { X } from 'lucide-react';
 
-/**
- * CreateScheduleModal Component
- *
- * Modal for creating new schedule configurations.
- * Allows creating from scratch or copying from existing schedule.
- *
- * @param {Object} props
- * @param {boolean} props.isOpen - Modal open state
- * @param {Array} props.existingSchedules - Array of existing schedules for copy option
- * @param {Function} props.onConfirm - Callback with {name, copyFromId} or {name, copyFromId: null}
- * @param {Function} props.onCancel - Callback to close modal
- */
+interface ExistingSchedule {
+  id: string;
+  name: string;
+}
+
+export interface CreateScheduleModalProps {
+  isOpen: boolean;
+  existingSchedules?: ExistingSchedule[];
+  onConfirm: (data: { name: string; copyFromId: string | null }) => void;
+  onCancel: () => void;
+}
+
 export default function CreateScheduleModal({
   isOpen,
   existingSchedules = [],
   onConfirm,
   onCancel,
-}) {
+}: CreateScheduleModalProps) {
   const [name, setName] = useState('');
-  const [mode, setMode] = useState('scratch'); // 'scratch' or 'copy'
+  const [mode, setMode] = useState<'scratch' | 'copy'>('scratch');
   const [copyFromId, setCopyFromId] = useState('');
   const [error, setError] = useState('');
 
@@ -86,7 +86,7 @@ export default function CreateScheduleModal({
     });
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleConfirm();
@@ -115,7 +115,7 @@ export default function CreateScheduleModal({
             </div>
             <ActionButton
               icon={<X />}
-              variant="close"
+              variant="ghost"
               size="md"
               onClick={onCancel}
               ariaLabel="Chiudi"
@@ -140,7 +140,6 @@ export default function CreateScheduleModal({
                 placeholder="Es: Weekend, Inverno, Estate..."
                 maxLength={30}
                 autoFocus
-                liquid
               />
               {error && (
                 <Text variant="ember" size="sm" className="mt-2 flex items-center gap-1">
@@ -160,20 +159,25 @@ export default function CreateScheduleModal({
               </Text>
               <RadioGroup
                 value={mode}
-                onValueChange={setMode}
-                variant="ember"
+                onValueChange={(value) => setMode(value as 'scratch' | 'copy')}
                 className="grid grid-cols-1 sm:grid-cols-2 gap-3"
               >
                 <RadioGroupItem
                   value="scratch"
-                  label="Da Zero"
-                  description="Inizia con una pianificazione vuota"
-                />
+                >
+                  <div>
+                    <div className="font-medium">Da Zero</div>
+                    <div className="text-sm text-neutral-400">Inizia con una pianificazione vuota</div>
+                  </div>
+                </RadioGroupItem>
                 <RadioGroupItem
                   value="copy"
-                  label="Copia Esistente"
-                  description="Duplica una pianificazione"
-                />
+                >
+                  <div>
+                    <div className="font-medium">Copia Esistente</div>
+                    <div className="text-sm text-neutral-400">Duplica una pianificazione</div>
+                  </div>
+                </RadioGroupItem>
               </RadioGroup>
             </div>
 

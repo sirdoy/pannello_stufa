@@ -5,6 +5,15 @@ import BottomSheet from '../ui/BottomSheet';
 import ProgressBar from '../ui/ProgressBar';
 import Button from '../ui/Button';
 import Text from '../ui/Text';
+import type { ScheduleInterval } from '@/lib/schedulerService';
+
+export interface IntervalBottomSheetProps {
+  range: ScheduleInterval | undefined;
+  isOpen: boolean;
+  onClose: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}
 
 export default function IntervalBottomSheet({
   range,
@@ -12,7 +21,7 @@ export default function IntervalBottomSheet({
   onClose,
   onEdit,
   onDelete,
-}) {
+}: IntervalBottomSheetProps) {
   if (!isOpen || !range) return null;
 
   // Calcola durata intervallo
@@ -108,10 +117,9 @@ export default function IntervalBottomSheet({
           size="md"
           fullWidth
           onClick={onEdit}
-          icon={<Edit2 />}
-          iconPosition="left"
           className="bg-ocean-500/10 [html:not(.dark)_&]:bg-ocean-500/20 text-ocean-600 [html:not(.dark)_&]:text-ocean-400 hover:bg-ocean-500/20 [html:not(.dark)_&]:hover:bg-ocean-500/30 ring-1 ring-ocean-500/30 [html:not(.dark)_&]:ring-ocean-500/40"
         >
+          <Edit2 className="w-4 h-4 mr-2" />
           Modifica
         </Button>
 
@@ -120,10 +128,9 @@ export default function IntervalBottomSheet({
           size="md"
           fullWidth
           onClick={onDelete}
-          icon={<Trash2 />}
-          iconPosition="left"
           className="bg-ember-500/10 [html:not(.dark)_&]:bg-ember-500/20 text-ember-600 [html:not(.dark)_&]:text-ember-400 hover:bg-ember-500/20 [html:not(.dark)_&]:hover:bg-ember-500/30 ring-1 ring-ember-500/30 [html:not(.dark)_&]:ring-ember-500/40"
         >
+          <Trash2 className="w-4 h-4 mr-2" />
           Elimina
         </Button>
       </div>

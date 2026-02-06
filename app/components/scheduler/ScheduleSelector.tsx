@@ -7,33 +7,35 @@ import Button from '../ui/Button';
 import Text from '../ui/Text';
 import { cn } from '@/lib/utils/cn';
 
-/**
- * ScheduleSelector Component
- *
- * Dropdown selector for managing multiple schedules.
- * Uses design system Popover for consistent behavior and accessibility.
- *
- * @param {Object} props
- * @param {Array} props.schedules - Array of schedule objects {id, name, enabled, isActive}
- * @param {string} props.activeScheduleId - ID of currently active schedule
- * @param {Function} props.onSelectSchedule - Callback when schedule is selected
- * @param {Function} props.onCreateNew - Callback to create new schedule
- * @param {boolean} props.loading - Loading state
- */
+interface Schedule {
+  id: string;
+  name: string;
+  enabled?: boolean;
+  isActive?: boolean;
+}
+
+export interface ScheduleSelectorProps {
+  schedules?: Schedule[];
+  activeScheduleId: string;
+  onSelectSchedule: (scheduleId: string) => void;
+  onCreateNew: () => void;
+  loading?: boolean;
+}
+
 export default function ScheduleSelector({
   schedules = [],
   activeScheduleId,
   onSelectSchedule,
   onCreateNew,
   loading = false,
-}) {
+}: ScheduleSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const activeSchedule = schedules.find(s => s.id === activeScheduleId);
   const otherSchedules = schedules.filter(s => s.id !== activeScheduleId);
   const hasSchedules = schedules.length > 0;
 
-  const handleSelect = (scheduleId) => {
+  const handleSelect = (scheduleId: string) => {
     onSelectSchedule(scheduleId);
     setIsOpen(false);
   };
@@ -120,9 +122,9 @@ export default function ScheduleSelector({
                 variant="ember"
                 size="sm"
                 className="w-full"
-                icon={<Plus className="w-4 h-4" />}
                 onClick={handleCreateNew}
               >
+                <Plus className="w-4 h-4 mr-2" />
                 Crea Prima Pianificazione
               </Button>
             </div>
@@ -186,9 +188,9 @@ export default function ScheduleSelector({
                 variant="ember"
                 size="sm"
                 className="w-full"
-                icon={<Plus className="w-4 h-4" />}
                 onClick={handleCreateNew}
               >
+                <Plus className="w-4 h-4 mr-2" />
                 Crea Nuova Pianificazione
               </Button>
             </div>

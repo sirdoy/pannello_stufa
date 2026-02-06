@@ -12,6 +12,7 @@ import Text from '../ui/Text';
 import { Tabs, TabsList, TabsTrigger } from '../ui/Tabs';
 import { X } from 'lucide-react';
 import { getPowerBadgeClass, getFanBadgeClass } from '@/lib/schedulerStats';
+import type { ScheduleInterval } from '@/lib/schedulerService';
 
 const DURATION_PRESETS = [
   { value: 15, label: '15 minuti' },
@@ -19,21 +20,31 @@ const DURATION_PRESETS = [
   { value: 60, label: '1 ora' },
   { value: 120, label: '2 ore' },
   { value: 'custom', label: 'Personalizzata' },
-];
+] as const;
+
+export interface AddIntervalModalProps {
+  isOpen: boolean;
+  day: string;
+  mode?: 'add' | 'edit';
+  initialInterval?: ScheduleInterval | null;
+  suggestedStart?: string;
+  onConfirm: (interval: ScheduleInterval & { duration: number }) => void;
+  onCancel: () => void;
+}
 
 export default function AddIntervalModal({
   isOpen,
   day,
-  mode = 'add', // 'add' or 'edit'
-  initialInterval = null, // For edit mode
+  mode = 'add',
+  initialInterval = null,
   suggestedStart = '00:00',
   onConfirm,
   onCancel,
-}) {
-  const [inputMode, setInputMode] = useState('duration'); // 'duration' or 'endTime'
+}: AddIntervalModalProps) {
+  const [inputMode, setInputMode] = useState<'duration' | 'endTime'>('duration');
   const [start, setStart] = useState(suggestedStart);
   const [end, setEnd] = useState('00:00');
-  const [durationPreset, setDurationPreset] = useState(30);
+  const [durationPreset, setDurationPreset] = useState<number | 'custom'>(30);
   const [customMinutes, setCustomMinutes] = useState(60);
   const [power, setPower] = useState(2);
   const [fan, setFan] = useState(3);
@@ -151,7 +162,7 @@ export default function AddIntervalModal({
           </Heading>
           <ActionButton
             icon={<X />}
-            variant="close"
+            variant="ghost"
             size="md"
             onClick={onCancel}
             ariaLabel="Chiudi"
@@ -173,7 +184,7 @@ export default function AddIntervalModal({
             <Text as="label" variant="secondary" size="sm" weight="semibold" className="block mb-2">
               Modalità Inserimento
             </Text>
-            <Tabs value={inputMode} onValueChange={setInputMode} className="w-full">
+            <Tabs value={inputMode} onValueChange={(value) => setInputMode(value as 'duration' | 'endTime')} className="w-full">
               <TabsList className="w-full">
                 <TabsTrigger value="duration" className="flex-1">
                   ⏱️ Durata
@@ -189,7 +200,8 @@ export default function AddIntervalModal({
           {inputMode === 'duration' && (
             <>
               <Select
-                label="⏱️ Durata"
+                label="Durata"
+                icon="⏱️"
                 value={durationPreset}
                 onChange={(e) => setDurationPreset(e.target.value === 'custom' ? 'custom' : Number(e.target.value))}
                 options={DURATION_PRESETS.map(preset => ({
@@ -251,7 +263,8 @@ export default function AddIntervalModal({
                 </Text>
               </div>
               <Select
-                label="⚡ Potenza"
+                label="Potenza"
+                icon="⚡"
                 value={power}
                 onChange={(e) => setPower(Number(e.target.value))}
                 options={powerOptions.map(p => ({
@@ -272,7 +285,8 @@ export default function AddIntervalModal({
                 </Text>
               </div>
               <Select
-                label="💨 Ventola"
+                label="Ventola"
+                icon="💨"
                 value={fan}
                 onChange={(e) => setFan(Number(e.target.value))}
                 options={fanOptions.map(f => ({

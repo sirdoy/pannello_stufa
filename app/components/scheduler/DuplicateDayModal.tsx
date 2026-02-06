@@ -12,8 +12,16 @@ import { X } from 'lucide-react';
 
 const daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
 
-export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [], onConfirm, onCancel }) {
-  const [selectedDays, setSelectedDays] = useState([]);
+export interface DuplicateDayModalProps {
+  isOpen: boolean;
+  sourceDay: string;
+  excludeDays?: string[];
+  onConfirm: (selectedDays: string[]) => void;
+  onCancel: () => void;
+}
+
+export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [], onConfirm, onCancel }: DuplicateDayModalProps) {
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
 
   // Reset selected days when modal opens
   useEffect(() => {
@@ -24,7 +32,7 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
 
   const availableDays = daysOfWeek.filter(day => !excludeDays.includes(day));
 
-  const toggleDay = (day) => {
+  const toggleDay = (day: string) => {
     setSelectedDays(prev =>
       prev.includes(day)
         ? prev.filter(d => d !== day)
@@ -64,12 +72,12 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <Heading level={2} size="xl" weight="semibold">
+          <Heading level={2} size="xl">
             Duplica {sourceDay}
           </Heading>
           <ActionButton
             icon={<X />}
-            variant="close"
+            variant="ghost"
             size="md"
             onClick={onCancel}
             ariaLabel="Chiudi"

@@ -6,11 +6,35 @@
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Web_Share_API
  */
 
+interface StoveData {
+  status?: string;
+  temperature?: number;
+  power?: number;
+  mode?: string;
+}
+
+interface ThermostatData {
+  temperature?: number;
+  setpoint?: number;
+  humidity?: number;
+}
+
+interface DeviceSummaryData {
+  stove?: StoveData;
+  thermostat?: ThermostatData;
+}
+
+interface ErrorData {
+  code?: string;
+  message?: string;
+  timestamp?: string;
+}
+
 /**
  * Check if Web Share API is supported
  * @returns {boolean}
  */
-export function isShareSupported() {
+export function isShareSupported(): boolean {
   return 'share' in navigator;
 }
 
@@ -18,7 +42,7 @@ export function isShareSupported() {
  * Check if sharing files is supported
  * @returns {boolean}
  */
-export function isFileShareSupported() {
+export function isFileShareSupported(): boolean {
   return 'canShare' in navigator;
 }
 
@@ -30,7 +54,7 @@ export function isFileShareSupported() {
  * @param {string} [data.url] - Share URL
  * @returns {Promise<boolean>} True if shared successfully
  */
-export async function share(data) {
+export async function share(data: ShareData): Promise<boolean> {
   if (!isShareSupported()) {
     console.warn('[WebShare] API not supported');
     return false;
@@ -41,7 +65,7 @@ export async function share(data) {
     console.log('[WebShare] Shared successfully');
     return true;
   } catch (error) {
-    if (error.name === 'AbortError') {
+    if ((error as Error).name === 'AbortError') {
       // User cancelled - not an error
       console.log('[WebShare] Share cancelled by user');
       return false;
@@ -60,7 +84,7 @@ export async function share(data) {
  * @param {string} [stoveData.mode] - Operating mode
  * @returns {Promise<boolean>}
  */
-export async function shareStoveStatus(stoveData) {
+export async function shareStoveStatus(stoveData: StoveData): Promise<boolean> {
   const statusText = stoveData.status === 'on' ? 'Accesa' : 'Spenta';
   const tempText = stoveData.temperature ? `${stoveData.temperature}°C` : 'N/D';
   const powerText = stoveData.power ? `Potenza ${stoveData.power}` : '';
@@ -83,7 +107,7 @@ export async function shareStoveStatus(stoveData) {
  * @param {Object} thermostatData - Thermostat data
  * @returns {Promise<boolean>}
  */
-export async function shareThermostatStatus(thermostatData) {
+export async function shareThermostatStatus(thermostatData: ThermostatData): Promise<boolean> {
   const tempText = thermostatData.temperature ? `${thermostatData.temperature}°C` : 'N/D';
   const setpointText = thermostatData.setpoint ? `${thermostatData.setpoint}°C` : 'N/D';
   const humidityText = thermostatData.humidity ? `${thermostatData.humidity}%` : '';
@@ -109,7 +133,7 @@ export async function shareThermostatStatus(thermostatData) {
  * @param {Object} data.thermostat - Thermostat data
  * @returns {Promise<boolean>}
  */
-export async function shareDeviceSummary(data) {
+export async function shareDeviceSummary(data: DeviceSummaryData): Promise<boolean> {
   const { stove, thermostat } = data;
 
   const lines = ['📊 Riepilogo Dispositivi', ''];
@@ -140,7 +164,7 @@ export async function shareDeviceSummary(data) {
  * Share the app itself
  * @returns {Promise<boolean>}
  */
-export async function shareApp() {
+export async function shareApp(): Promise<boolean> {
   return share({
     title: 'Pannello Stufa',
     text: 'Controllo remoto della stufa Thermorossi con pianificazione automatica e monitoraggio temperatura',
@@ -156,7 +180,7 @@ export async function shareApp() {
  * @param {string} [error.timestamp] - When error occurred
  * @returns {Promise<boolean>}
  */
-export async function shareErrorLog(error) {
+export async function shareErrorLog(error: ErrorData): Promise<boolean> {
   const timestamp = error.timestamp
     ? new Date(error.timestamp).toLocaleString('it-IT')
     : new Date().toLocaleString('it-IT');

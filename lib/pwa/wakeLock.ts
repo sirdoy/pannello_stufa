@@ -7,13 +7,13 @@
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Screen_Wake_Lock_API
  */
 
-let wakeLock = null;
+let wakeLock: WakeLockSentinel | null = null;
 
 /**
  * Check if Wake Lock API is supported
  * @returns {boolean}
  */
-export function isWakeLockSupported() {
+export function isWakeLockSupported(): boolean {
   return 'wakeLock' in navigator;
 }
 
@@ -21,7 +21,7 @@ export function isWakeLockSupported() {
  * Request a screen wake lock
  * @returns {Promise<boolean>} True if lock acquired successfully
  */
-export async function requestWakeLock() {
+export async function requestWakeLock(): Promise<boolean> {
   if (!isWakeLockSupported()) {
     console.warn('[WakeLock] API not supported');
     return false;
@@ -42,7 +42,7 @@ export async function requestWakeLock() {
     // - Document is not visible
     // - Battery saver mode is on
     // - User denied permission
-    console.warn('[WakeLock] Request failed:', error.message);
+    console.warn('[WakeLock] Request failed:', (error as Error).message);
     return false;
   }
 }
@@ -51,7 +51,7 @@ export async function requestWakeLock() {
  * Release the current wake lock
  * @returns {Promise<boolean>} True if released successfully
  */
-export async function releaseWakeLock() {
+export async function releaseWakeLock(): Promise<boolean> {
   if (!wakeLock) {
     return true;
   }
@@ -71,7 +71,7 @@ export async function releaseWakeLock() {
  * Check if wake lock is currently active
  * @returns {boolean}
  */
-export function isWakeLockActive() {
+export function isWakeLockActive(): boolean {
   return wakeLock !== null;
 }
 
@@ -80,7 +80,7 @@ export function isWakeLockActive() {
  * Should be called when document becomes visible again
  * @returns {Promise<boolean>}
  */
-export async function reacquireWakeLock() {
+export async function reacquireWakeLock(): Promise<boolean> {
   if (!isWakeLockSupported()) {
     return false;
   }

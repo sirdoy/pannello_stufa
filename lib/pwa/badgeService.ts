@@ -21,14 +21,32 @@
 
 import { put, get, STORES } from './indexedDB';
 
+// Badge API declarations (not in all TypeScript DOM libs yet)
+declare global {
+  interface Navigator {
+    setAppBadge?(count?: number): Promise<void>;
+    clearAppBadge?(): Promise<void>;
+  }
+}
+
 // Badge count key in IndexedDB
 const BADGE_KEY = 'badgeCount';
+
+interface BadgeState {
+  key: string;
+  value: number;
+}
+
+interface AlertData {
+  errors?: number;
+  needsMaintenance?: boolean;
+}
 
 /**
  * Check if Badge API is supported
  * @returns {boolean}
  */
-export function isBadgeSupported() {
+export function isBadgeSupported(): boolean {
   return typeof navigator !== 'undefined' && 'setAppBadge' in navigator;
 }
 
@@ -36,9 +54,9 @@ export function isBadgeSupported() {
  * Get current badge count from IndexedDB
  * @returns {Promise<number>}
  */
-export async function getBadgeCount() {
+export async function getBadgeCount(): Promise<number> {
   try {
-    const result = await get(STORES.APP_STATE, BADGE_KEY);
+    const result = await get<BadgeState>(STORES.APP_STATE, BADGE_KEY);
     return result?.value || 0;
   } catch (error) {
     console.error('[BadgeService] Failed to get badge count:', error);
@@ -51,7 +69,7 @@ export async function getBadgeCount() {
  * @param {number} count - Badge count
  * @returns {Promise<void>}
  */
-async function saveBadgeCount(count) {
+async function saveBadgeCount(count: number): Promise<void> {
   try {
     await put(STORES.APP_STATE, { key: BADGE_KEY, value: count });
   } catch (error) {
@@ -64,7 +82,7 @@ async function saveBadgeCount(count) {
  * @param {number} count - Number to show on badge
  * @returns {Promise<boolean>} Success status
  */
-export async function setBadgeCount(count) {
+export async function setBadgeCount(count: number): Promise<boolean> {
   if (!isBadgeSupported()) {
     console.log('[BadgeService] Badge API not supported');
     return false;
@@ -74,9 +92,9 @@ export async function setBadgeCount(count) {
     const safeCount = Math.max(0, Math.floor(count));
 
     if (safeCount > 0) {
-      await navigator.setAppBadge(safeCount);
+      await navigator.setAppBadge!(safeCount);
     } else {
-      await navigator.clearAppBadge();
+      await navigator.clearAppBadge!();
     }
 
     await saveBadgeCount(safeCount);
@@ -92,13 +110,13 @@ export async function setBadgeCount(count) {
  * Clear the app badge
  * @returns {Promise<boolean>} Success status
  */
-export async function clearBadge() {
+export async function clearBadge(): Promise<boolean> {
   if (!isBadgeSupported()) {
     return false;
   }
 
   try {
-    await navigator.clearAppBadge();
+    await navigator.clearAppBadge!();
     await saveBadgeCount(0);
 
     // Also notify Service Worker
@@ -116,7 +134,7 @@ export async function clearBadge() {
  * Increment badge count by 1
  * @returns {Promise<number>} New badge count
  */
-export async function incrementBadge() {
+export async function incrementBadge(): Promise<number> {
   const current = await getBadgeCount();
   const newCount = current + 1;
   await setBadgeCount(newCount);
@@ -127,7 +145,7 @@ export async function incrementBadge() {
  * Decrement badge count by 1 (min 0)
  * @returns {Promise<number>} New badge count
  */
-export async function decrementBadge() {
+export async function decrementBadge(): Promise<number> {
   const current = await getBadgeCount();
   const newCount = Math.max(0, current - 1);
   await setBadgeCount(newCount);
@@ -141,7 +159,7 @@ export async function decrementBadge() {
  * @param {boolean} alerts.needsMaintenance - Whether maintenance is needed
  * @returns {Promise<number>} Total badge count
  */
-export async function updateBadgeFromAlerts({ errors = 0, needsMaintenance = false }) {
+export async function updateBadgeFromAlerts({ errors = 0, needsMaintenance = false }: AlertData): Promise<number> {
   const totalCount = errors + (needsMaintenance ? 1 : 0);
   await setBadgeCount(totalCount);
   return totalCount;
@@ -152,7 +170,7 @@ export async function updateBadgeFromAlerts({ errors = 0, needsMaintenance = fal
  * @param {string} type - Message type
  * @param {Object} data - Message data
  */
-async function notifyServiceWorker(type, data = {}) {
+async function notifyServiceWorker(type: string, data: Record<string, unknown> = {}): Promise<void> {
   if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) {
     return;
   }
@@ -172,7 +190,7 @@ async function notifyServiceWorker(type, data = {}) {
  * Syncs badge count from IndexedDB to actual badge
  * @returns {Promise<number>} Current badge count
  */
-export async function initializeBadge() {
+export async function initializeBadge(): Promise<number> {
   if (!isBadgeSupported()) {
     return 0;
   }
@@ -180,9 +198,9 @@ export async function initializeBadge() {
   const count = await getBadgeCount();
 
   if (count > 0) {
-    await navigator.setAppBadge(count);
+    await navigator.setAppBadge!(count);
   } else {
-    await navigator.clearAppBadge();
+    await navigator.clearAppBadge!();
   }
 
   console.log('[BadgeService] Badge initialized:', count);

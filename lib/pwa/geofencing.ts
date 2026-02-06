@@ -15,11 +15,49 @@ import { get, put, STORES } from './indexedDB';
 const GEOFENCE_KEY = 'geofence-config';
 const DEFAULT_RADIUS = 200; // meters
 
+interface GeofenceAction {
+  action: string;
+  enabled: boolean;
+}
+
+interface GeofenceActions {
+  onLeave?: GeofenceAction;
+  onArrive?: GeofenceAction;
+}
+
+interface GeofenceConfig {
+  key?: string;
+  latitude: number;
+  longitude: number;
+  accuracy?: number;
+  radius: number;
+  enabled: boolean;
+  actions?: GeofenceActions;
+  setAt?: number;
+  updatedAt?: number;
+}
+
+interface GeofenceOptions {
+  radius?: number;
+  actions?: GeofenceActions;
+}
+
+interface GeofenceStatus {
+  configured: boolean;
+  enabled: boolean;
+  isHome: boolean | null;
+  distance: number | null;
+  radius?: number;
+  accuracy?: number;
+  actions?: GeofenceActions;
+  error?: string;
+}
+
 /**
  * Check if Geolocation API is supported
  * @returns {boolean}
  */
-export function isGeolocationSupported() {
+export function isGeolocationSupported(): boolean {
   return 'geolocation' in navigator;
 }
 
@@ -31,7 +69,7 @@ export function isGeolocationSupported() {
  * @param {number} lon2 - Second longitude
  * @returns {number} Distance in meters
  */
-export function calculateDistance(lat1, lon1, lat2, lon2) {
+export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371e3; // Earth's radius in meters
   const φ1 = (lat1 * Math.PI) / 180;
   const φ2 = (lat2 * Math.PI) / 180;
@@ -51,7 +89,7 @@ export function calculateDistance(lat1, lon1, lat2, lon2) {
  * @param {PositionOptions} options - Geolocation options
  * @returns {Promise<GeolocationPosition>}
  */
-export function getCurrentPosition(options = {}) {
+export function getCurrentPosition(options: PositionOptions = {}): Promise<GeolocationPosition> {
   return new Promise((resolve, reject) => {
     if (!isGeolocationSupported()) {
       reject(new Error('Geolocation not supported'));
@@ -75,9 +113,9 @@ export function getCurrentPosition(options = {}) {
  * Get saved geofence configuration
  * @returns {Promise<Object|null>}
  */
-export async function getGeofenceConfig() {
+export async function getGeofenceConfig(): Promise<GeofenceConfig | null> {
   try {
-    return await get(STORES.APP_STATE, GEOFENCE_KEY);
+    return await get<GeofenceConfig>(STORES.APP_STATE, GEOFENCE_KEY);
   } catch (error) {
     console.error('[Geofencing] Error getting config:', error);
     return null;
@@ -94,7 +132,7 @@ export async function getGeofenceConfig() {
  * @param {Object} [config.actions] - Actions to perform on enter/exit
  * @returns {Promise<void>}
  */
-export async function saveGeofenceConfig(config) {
+export async function saveGeofenceConfig(config: GeofenceConfig): Promise<void> {
   try {
     await put(STORES.APP_STATE, {
       key: GEOFENCE_KEY,
@@ -117,10 +155,10 @@ export async function saveGeofenceConfig(config) {
  * @param {Object} [options.actions] - Actions configuration
  * @returns {Promise<Object>} The saved configuration
  */
-export async function setCurrentLocationAsHome(options = {}) {
+export async function setCurrentLocationAsHome(options: GeofenceOptions = {}): Promise<GeofenceConfig> {
   const position = await getCurrentPosition();
 
-  const config = {
+  const config: GeofenceConfig = {
     latitude: position.coords.latitude,
     longitude: position.coords.longitude,
     accuracy: position.coords.accuracy,
@@ -141,7 +179,7 @@ export async function setCurrentLocationAsHome(options = {}) {
  * Check if current position is inside the geofence
  * @returns {Promise<Object>} Status object with isHome, distance, etc.
  */
-export async function checkGeofenceStatus() {
+export async function checkGeofenceStatus(): Promise<GeofenceStatus> {
   const config = await getGeofenceConfig();
 
   if (!config || !config.enabled) {
@@ -180,7 +218,7 @@ export async function checkGeofenceStatus() {
       enabled: true,
       isHome: null,
       distance: null,
-      error: error.message,
+      error: (error as Error).message,
     };
   }
 }
@@ -189,7 +227,7 @@ export async function checkGeofenceStatus() {
  * Enable geofencing
  * @returns {Promise<void>}
  */
-export async function enableGeofencing() {
+export async function enableGeofencing(): Promise<void> {
   const config = await getGeofenceConfig();
   if (config) {
     await saveGeofenceConfig({ ...config, enabled: true });
@@ -200,7 +238,7 @@ export async function enableGeofencing() {
  * Disable geofencing
  * @returns {Promise<void>}
  */
-export async function disableGeofencing() {
+export async function disableGeofencing(): Promise<void> {
   const config = await getGeofenceConfig();
   if (config) {
     await saveGeofenceConfig({ ...config, enabled: false });
@@ -214,7 +252,7 @@ export async function disableGeofencing() {
  * @param {Object} [actions.onArrive] - Action when arriving home
  * @returns {Promise<void>}
  */
-export async function updateGeofenceActions(actions) {
+export async function updateGeofenceActions(actions: GeofenceActions): Promise<void> {
   const config = await getGeofenceConfig();
   if (config) {
     await saveGeofenceConfig({
@@ -228,10 +266,10 @@ export async function updateGeofenceActions(actions) {
  * Clear geofence configuration
  * @returns {Promise<void>}
  */
-export async function clearGeofenceConfig() {
+export async function clearGeofenceConfig(): Promise<void> {
   try {
-    const { del } = await import('./indexedDB');
-    await del(STORES.APP_STATE, GEOFENCE_KEY);
+    const { remove } = await import('./indexedDB');
+    await remove(STORES.APP_STATE, GEOFENCE_KEY);
     console.log('[Geofencing] Config cleared');
   } catch (error) {
     console.error('[Geofencing] Error clearing config:', error);

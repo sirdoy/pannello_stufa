@@ -7,11 +7,13 @@
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Vibration_API
  */
 
+type VibrationPattern = number | number[];
+
 /**
  * Predefined vibration patterns
  * Each pattern is an array of [vibrate, pause, vibrate, pause, ...]
  */
-export const VIBRATION_PATTERNS = {
+export const VIBRATION_PATTERNS: Record<string, VibrationPattern> = {
   // Short single vibration - for confirmations
   SHORT: [100],
 
@@ -44,7 +46,7 @@ export const VIBRATION_PATTERNS = {
  * Check if Vibration API is supported
  * @returns {boolean}
  */
-export function isVibrationSupported() {
+export function isVibrationSupported(): boolean {
   return 'vibrate' in navigator;
 }
 
@@ -53,7 +55,7 @@ export function isVibrationSupported() {
  * @param {number|number[]} pattern - Duration in ms or pattern array
  * @returns {boolean} True if vibration started
  */
-export function vibrate(pattern = VIBRATION_PATTERNS.SHORT) {
+export function vibrate(pattern: VibrationPattern = VIBRATION_PATTERNS.SHORT): boolean {
   if (!isVibrationSupported()) {
     console.warn('[Vibration] API not supported');
     return false;
@@ -71,7 +73,7 @@ export function vibrate(pattern = VIBRATION_PATTERNS.SHORT) {
  * Stop any ongoing vibration
  * @returns {boolean}
  */
-export function stopVibration() {
+export function stopVibration(): boolean {
   if (!isVibrationSupported()) {
     return false;
   }
@@ -82,49 +84,49 @@ export function stopVibration() {
 /**
  * Vibrate for a short confirmation
  */
-export function vibrateShort() {
+export function vibrateShort(): boolean {
   return vibrate(VIBRATION_PATTERNS.SHORT);
 }
 
 /**
  * Vibrate for success feedback
  */
-export function vibrateSuccess() {
+export function vibrateSuccess(): boolean {
   return vibrate(VIBRATION_PATTERNS.SUCCESS);
 }
 
 /**
  * Vibrate for warning
  */
-export function vibrateWarning() {
+export function vibrateWarning(): boolean {
   return vibrate(VIBRATION_PATTERNS.WARNING);
 }
 
 /**
  * Vibrate for error alert
  */
-export function vibrateError() {
+export function vibrateError(): boolean {
   return vibrate(VIBRATION_PATTERNS.ERROR);
 }
 
 /**
  * Vibrate for critical alert (stove error, etc.)
  */
-export function vibrateCritical() {
+export function vibrateCritical(): boolean {
   return vibrate(VIBRATION_PATTERNS.CRITICAL);
 }
 
 /**
  * Vibrate for notification
  */
-export function vibrateNotification() {
+export function vibrateNotification(): boolean {
   return vibrate(VIBRATION_PATTERNS.NOTIFICATION);
 }
 
 /**
  * Vibrate for heartbeat (connection restored)
  */
-export function vibrateHeartbeat() {
+export function vibrateHeartbeat(): boolean {
   return vibrate(VIBRATION_PATTERNS.HEARTBEAT);
 }
 

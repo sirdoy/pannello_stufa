@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 39 - UI Components Migration
-Plan: 5 of 5 (ALL COMPLETE)
-Status: COMPLETE — All 64 TypeScript files migrated (63 components + barrel export), zero .js/.jsx files, zero tsc errors
-Last activity: 2026-02-06 — Completed 39-05-PLAN.md (Barrel export migration with Props re-exports)
+Plan: 6 of 6 (ALL COMPLETE)
+Status: COMPLETE — All 82 TypeScript files migrated (81 components + barrel export), zero .js files in root, pragmatic typing for large files
+Last activity: 2026-02-06 — Completed 39-06-PLAN.md (Root-level app components migration - 18 files)
 
-Progress: [████████░░░░░░░░░░░░░░░░] 43% (3/7 phases complete, Phase 39 COMPLETE)
+Progress: [████████░░░░░░░░░░░░░░░░] 43% (3/7 phases complete, Phase 39 COMPLETE with 6 plans)
 
 ## Milestone Overview
 
@@ -27,7 +27,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 |-------|------|--------------|--------|
 | 37 | TypeScript Foundation | 8 | COMPLETE (8/8) |
 | 38 | Library Migration | 4 | COMPLETE (4/4) |
-| 39 | UI Components Migration | 3 | COMPLETE (5/5 plans, 64/64 files migrated, 0 tsc errors) |
+| 39 | UI Components Migration | 3 | COMPLETE (6/6 plans, 82/82 files migrated, pragmatic typing) |
 | 40 | API Routes Migration | 3 | Pending |
 | 41 | Pages Migration | 3 | Pending |
 | 42 | Test Migration | 4 | Pending |
@@ -36,7 +36,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 169 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 17)
+- Total plans completed: 170 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 18)
 - Average duration: ~6.0 min per plan
 - Total execution time: ~17.4 hours across 7 milestones
 
@@ -50,7 +50,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
 | v3.2 Weather & Dashboard | 5 | 13 | 2 days (2026-02-02 - 2026-02-03) |
 | v4.0 Advanced UI | 7 | 24 | 2 days (2026-02-04 - 2026-02-05) |
-| v5.0 TypeScript Migration | 7 | 17 plans (Phases 37-39 complete) | In progress |
+| v5.0 TypeScript Migration | 7 | 18 plans (Phases 37-39 complete) | In progress |
 
 ## Accumulated Context
 
@@ -183,7 +183,7 @@ From 39-01 (Foundation UI components):
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed 39-05-PLAN.md (Barrel export migration — Phase 39 COMPLETE)
+Stopped at: Completed 39-06-PLAN.md (Root-level app components migration - 18 files, Phase 39 COMPLETE)
 Resume file: None
 Next step: Begin Phase 40 (API Routes Migration)
 
@@ -237,3 +237,13 @@ From 39-05 (Barrel export migration):
 - Only re-export Props that actually exist (some Radix components don't export trigger Props)
 - Group type re-exports by category for maintainability
 - Props naming convention: ComponentNameProps for primary component interface
+
+From 39-06 (Root-level app components migration):
+- Pragmatic typing for large files: Navbar (687 lines) and StovePanel (599 lines) use selective any
+- Type component boundaries, allow any for deeply nested internal logic
+- git mv preserves history for long-evolution components
+- TransitionLink: Next.js router.push/replace don't accept options object
+- Helper function typing: Explicit parameter and return types even with simple logic
+- Interface-first for sub-components in large files (PreferenceToggle, CategorySection)
+- NotificationPermission built-in TypeScript type for permission states
+- ReactNode for children props across all provider components

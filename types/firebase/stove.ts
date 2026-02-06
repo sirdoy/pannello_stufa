@@ -10,7 +10,9 @@ export type StoveStatus =
   | 'modulating'
   | 'shutdown'
   | 'error'
-  | 'standby';
+  | 'standby'
+  | 'START'
+  | 'STANDBY';
 
 /** Stove power level (1-5) */
 export type StovePowerLevel = 1 | 2 | 3 | 4 | 5;
@@ -25,6 +27,10 @@ export interface StoveState {
   lastUpdatedAt: string; // ISO 8601
   errorCode?: string;
   errorMessage?: string;
+  fanLevel?: number;
+  powerLevel?: number;
+  statusDescription?: string;
+  source?: string;
 }
 
 /** Stove command for API requests */

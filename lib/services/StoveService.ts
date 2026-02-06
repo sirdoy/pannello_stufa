@@ -17,7 +17,7 @@ import {
 import { getNextScheduledChange } from '@/lib/schedulerService';
 import { syncLivingRoomWithStove } from '@/lib/netatmoStoveSync';
 import { ApiError } from '@/lib/core';
-import type { StoveCommand } from '@/types/firebase';
+import type { StoveCommand, StovePowerLevel } from '@/types/firebase';
 
 /**
  * Stove command source
@@ -46,7 +46,7 @@ export class StoveService {
     }
 
     // Call external API
-    const result = await apiIgnite(power);
+    const result = await apiIgnite(power as StovePowerLevel);
 
     // Update state
     await this.stoveStateRepo.updateState({
@@ -63,7 +63,7 @@ export class StoveService {
 
     // Sync Netatmo thermostats with stove state (async, don't block response)
     syncLivingRoomWithStove(true).then((syncResult) => {
-      if (syncResult.synced) {
+      if (syncResult.synced && 'roomNames' in syncResult && 'temperature' in syncResult) {
         console.log(`Netatmo stove sync (ignite): ${syncResult.roomNames || 'Rooms'} set to ${syncResult.temperature}C`);
       }
     }).catch(err => console.error('Netatmo stove sync error (ignite):', err.message));
@@ -91,7 +91,7 @@ export class StoveService {
 
     // Sync Netatmo thermostats with stove state (async, don't block response)
     syncLivingRoomWithStove(false).then((syncResult) => {
-      if (syncResult.synced) {
+      if (syncResult.synced && 'roomNames' in syncResult) {
         console.log(`Netatmo stove sync (shutdown): ${syncResult.roomNames || 'Rooms'} returned to schedule`);
       }
     }).catch(err => console.error('Netatmo stove sync error (shutdown):', err.message));

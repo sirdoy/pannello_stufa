@@ -129,7 +129,7 @@ function getDefaultPreferences(): DevicePreferences {
 
   Object.values(DEVICE_CONFIG).forEach(device => {
     // Enable stove and thermostat by default, disable others
-    defaults[device.id] = [DEVICE_TYPES.STOVE, DEVICE_TYPES.THERMOSTAT].includes(device.id);
+    defaults[device.id] = ([DEVICE_TYPES.STOVE, DEVICE_TYPES.THERMOSTAT] as string[]).includes(device.id);
   });
 
   return defaults;

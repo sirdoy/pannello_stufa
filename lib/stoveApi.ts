@@ -64,7 +64,7 @@ interface StoveNumericResponse {
 
 /** Thermorossi API generic response */
 interface StoveApiResponse {
-  isSandbox: boolean;
+  isSandbox?: boolean;
   [key: string]: unknown;
 }
 

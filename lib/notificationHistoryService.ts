@@ -15,7 +15,17 @@
  */
 
 import { getAdminFirestore } from './firebaseAdmin.js';
-import { Timestamp } from 'firebase-admin/firestore';
+import { Timestamp, QueryDocumentSnapshot, DocumentData } from 'firebase-admin/firestore';
+
+/**
+ * Notification history filter options
+ */
+interface NotificationHistoryFilter {
+  limit?: number;
+  cursor?: string | null;
+  type?: string | null;
+  status?: string | null;
+}
 
 /**
  * Get notification history for a user with pagination
@@ -28,7 +38,7 @@ import { Timestamp } from 'firebase-admin/firestore';
  * @param {string} [options.status=null] - Filter by status (sent, delivered, failed)
  * @returns {Promise<Object>} { notifications: Array, cursor: string|null, hasMore: boolean }
  */
-export async function getNotificationHistory(userId, options = {}) {
+export async function getNotificationHistory(userId: string, options: NotificationHistoryFilter = {}) {
   try {
     const db = getAdminFirestore();
 
@@ -97,9 +107,10 @@ export async function getNotificationHistory(userId, options = {}) {
 
     // Extract notifications
     const notifications = [];
-    let lastDoc = null;
+    let lastDoc: QueryDocumentSnapshot<DocumentData, DocumentData> | null = null;
 
-    snapshot.forEach((doc, index) => {
+    snapshot.forEach((doc: QueryDocumentSnapshot<DocumentData, DocumentData>) => {
+      const index = notifications.length;
       // Only include up to effectiveLimit (extra doc is just for hasMore check)
       if (index < effectiveLimit) {
         const data = doc.data();

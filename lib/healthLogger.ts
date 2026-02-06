@@ -30,7 +30,7 @@
  */
 
 import { getAdminFirestore } from './firebaseAdmin.js';
-import { Timestamp } from 'firebase-admin/firestore';
+import { Timestamp, Query, DocumentData } from 'firebase-admin/firestore';
 import { subDays } from 'date-fns';
 
 /**
@@ -39,7 +39,9 @@ import { subDays } from 'date-fns';
 interface HealthCheckResult {
   userId?: string;
   connectionStatus?: 'online' | 'offline' | 'error' | null;
-  stoveStatus?: string | null;
+  stoveStatus?: {
+    StatusDescription?: string;
+  } | string | null;
   expectedState?: 'ON' | 'OFF' | null;
   netatmoDemand?: 'heating' | 'idle' | null;
   stateMismatch?: {
@@ -49,6 +51,16 @@ interface HealthCheckResult {
     reason: string;
   } | null;
   error?: string;
+}
+
+/**
+ * Health log filter options
+ */
+interface HealthLogFilter {
+  startDate?: Date;
+  endDate?: Date;
+  hasStateMismatch?: boolean;
+  limit?: number;
 }
 
 /**
@@ -103,7 +115,9 @@ export async function logHealthCheckRun(
             userId: health.userId || 'unknown',
             status: 'fulfilled',
             connectionStatus: health.connectionStatus || null,
-            stoveStatus: health.stoveStatus?.StatusDescription || null,
+            stoveStatus: typeof health.stoveStatus === 'object' && health.stoveStatus !== null
+              ? health.stoveStatus.StatusDescription || null
+              : health.stoveStatus || null,
             expectedState: health.expectedState || null,
             netatmoDemand: health.netatmoDemand || null,
             stateMismatch: health.stateMismatch || null,
@@ -147,11 +161,11 @@ export async function logHealthCheckRun(
  * @param {number} [options.limit=100] - Maximum number of logs to return
  * @returns {Promise<Array>} Array of log documents with converted timestamps
  */
-export async function getRecentHealthLogs(options = {}) {
+export async function getRecentHealthLogs(options: HealthLogFilter = {}) {
   try {
     const db = getAdminFirestore();
 
-    let query = db.collection('healthMonitoring');
+    let query: Query<DocumentData, DocumentData> = db.collection('healthMonitoring');
 
     // Apply date filters (default to last 24 hours)
     const startDate = options.startDate || subDays(new Date(), 1);
@@ -249,7 +263,7 @@ export async function getHealthStats(days = 7) {
       successfulChecks: 0,
       failedChecks: 0,
       mismatchCount: 0,
-      successRate: 0,
+      successRate: 0 as number | string,
     };
 
     snapshot.forEach(doc => {
@@ -266,7 +280,7 @@ export async function getHealthStats(days = 7) {
 
     // Calculate success rate
     if (stats.totalChecks > 0) {
-      stats.successRate = ((stats.successfulChecks / stats.totalChecks) * 100).toFixed(1);
+      stats.successRate = Number(((stats.successfulChecks / stats.totalChecks) * 100).toFixed(1));
     }
 
     return stats;

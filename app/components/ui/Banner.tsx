@@ -1,6 +1,8 @@
 'use client';
 
+import type React from 'react';
 import { useState, useEffect } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 import { X, Info, AlertTriangle, AlertCircle, CheckCircle, Flame } from 'lucide-react';
@@ -100,25 +102,33 @@ const iconMap = {
   ember: Flame,
 };
 
+export interface BannerProps extends VariantProps<typeof bannerVariants> {
+  /** Custom icon (overrides default) - emoji string or React element */
+  icon?: string | React.ReactNode;
+  /** Banner title */
+  title?: string;
+  /** Banner content */
+  description?: string | React.ReactNode;
+  /** Action buttons */
+  actions?: React.ReactNode;
+  /** Show dismiss button */
+  dismissible?: boolean;
+  /** Dismiss handler */
+  onDismiss?: () => void;
+  /** Unique key for persistent dismissal */
+  dismissKey?: string;
+  /** Additional CSS classes */
+  className?: string;
+  /** Additional content */
+  children?: React.ReactNode;
+}
+
 /**
  * Banner Component - Ember Noir Design System
  *
  * Sophisticated alert/notification banner with warm aesthetic.
  * Supports persistent dismissal via localStorage.
  * Uses CVA for variant and compact styling.
- *
- * @param {Object} props - Component props
- * @param {'info'|'warning'|'error'|'success'|'ember'} props.variant - Banner style
- * @param {string|ReactNode} props.icon - Custom icon (overrides default)
- * @param {string} props.title - Banner title
- * @param {string|ReactNode} props.description - Banner content
- * @param {ReactNode} props.actions - Action buttons
- * @param {boolean} props.dismissible - Show dismiss button
- * @param {function} props.onDismiss - Dismiss handler
- * @param {string} props.dismissKey - Unique key for persistent dismissal
- * @param {boolean} props.compact - Use compact layout
- * @param {string} props.className - Additional CSS classes
- * @param {ReactNode} props.children - Additional content
  *
  * @example
  * <Banner
@@ -141,7 +151,7 @@ export default function Banner({
   compact = false,
   className = '',
   children,
-}) {
+}: BannerProps) {
   const [isDismissed, setIsDismissed] = useState(false);
 
   // Check persistent dismissal
@@ -169,8 +179,9 @@ export default function Banner({
     return null;
   }
 
-  // Get variant-specific styles
-  const validVariant = textVariants[variant] ? variant : 'info';
+  // Get variant-specific styles (with proper type guard)
+  const validVariant: keyof typeof textVariants =
+    variant && variant in textVariants ? variant : 'info';
   const styles = textVariants[validVariant];
 
   // Get icon component or custom icon
@@ -207,7 +218,7 @@ export default function Banner({
           {title && (
             <Heading
               level={3}
-              size={compact ? 'sm' : 'base'}
+              size={compact ? 'sm' : 'md'}
               className={cn(
                 styles.title,
                 (description || children || actions) && 'mb-1'

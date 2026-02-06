@@ -21,16 +21,30 @@
  *   });
  */
 
-import { ref, onValue, set } from 'firebase/database';
+import { ref, onValue, set, Unsubscribe } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
+
+/** Location data */
+export interface Location {
+  latitude: number;
+  longitude: number;
+  name: string | null;
+  updatedAt: number;
+}
+
+/** Location input */
+export interface LocationInput {
+  latitude: number;
+  longitude: number;
+  name?: string;
+}
 
 /**
  * Get Firebase RTDB path for location data
  * Respects environment (dev vs production)
- * @returns {string} Firebase path
  */
-const getLocationPath = () => getEnvironmentPath('config/location');
+const getLocationPath = (): string => getEnvironmentPath('config/location');
 
 /**
  * Read current location from Firebase (once)
@@ -44,7 +58,7 @@ const getLocationPath = () => getEnvironmentPath('config/location');
  *   console.log(`${location.latitude}, ${location.longitude}`);
  * }
  */
-export async function getLocation() {
+export async function getLocation(): Promise<Location | null> {
   const locationRef = ref(db, getLocationPath());
   return new Promise((resolve) => {
     onValue(locationRef, (snapshot) => {
@@ -70,7 +84,7 @@ export async function getLocation() {
  *   name: 'Milano, IT'
  * });
  */
-export async function setLocation({ latitude, longitude, name }) {
+export async function setLocation({ latitude, longitude, name }: LocationInput): Promise<void> {
   const locationRef = ref(db, getLocationPath());
   await set(locationRef, {
     latitude,
@@ -97,7 +111,7 @@ export async function setLocation({ latitude, longitude, name }) {
  * // Later: stop listening
  * unsubscribe();
  */
-export function subscribeToLocation(callback) {
+export function subscribeToLocation(callback: (location: Location | null) => void): Unsubscribe {
   const locationRef = ref(db, getLocationPath());
   const unsubscribe = onValue(locationRef, (snapshot) => {
     callback(snapshot.val());

@@ -12,15 +12,29 @@
  *   await setDashboardPreferences(userId, { cardOrder: [...] });
  */
 
-import { ref, onValue, set } from 'firebase/database';
+import { ref, onValue, set, Unsubscribe } from 'firebase/database';
 import { db } from '@/lib/firebase';
+
+/** Dashboard card */
+export interface DashboardCard {
+  id: string;
+  label: string;
+  icon: string;
+  visible: boolean;
+}
+
+/** Dashboard preferences */
+export interface DashboardPreferences {
+  cardOrder: DashboardCard[];
+  updatedAt?: number;
+}
 
 /**
  * Default card order for new users
  * Matches existing home page cards plus weather
  * Each card has id, label, icon, and visible properties
  */
-export const DEFAULT_CARD_ORDER = [
+export const DEFAULT_CARD_ORDER: DashboardCard[] = [
   { id: 'stove', label: 'Stufa', icon: '🔥', visible: true },
   { id: 'thermostat', label: 'Termostato', icon: '🌡️', visible: true },
   { id: 'weather', label: 'Meteo', icon: '☀️', visible: true },
@@ -30,10 +44,8 @@ export const DEFAULT_CARD_ORDER = [
 
 /**
  * Get Firebase path for user's dashboard preferences
- * @param {string} userId - Auth0 user ID (sub claim)
- * @returns {string} - 'users/${userId}/dashboardPreferences'
  */
-const getDashboardPath = (userId) => `users/${userId}/dashboardPreferences`;
+const getDashboardPath = (userId: string): string => `users/${userId}/dashboardPreferences`;
 
 /**
  * Get dashboard preferences for a user (read once)
@@ -45,7 +57,7 @@ const getDashboardPath = (userId) => `users/${userId}/dashboardPreferences`;
  * const prefs = await getDashboardPreferences(session.user.sub);
  * console.log(prefs.cardOrder); // Array of card configs
  */
-export async function getDashboardPreferences(userId) {
+export async function getDashboardPreferences(userId: string): Promise<DashboardPreferences> {
   // Return defaults if no userId provided
   if (!userId) {
     return { cardOrder: DEFAULT_CARD_ORDER };
@@ -83,7 +95,7 @@ export async function getDashboardPreferences(userId) {
  *   ]
  * });
  */
-export async function setDashboardPreferences(userId, { cardOrder }) {
+export async function setDashboardPreferences(userId: string, { cardOrder }: { cardOrder: DashboardCard[] }): Promise<void> {
   if (!userId) {
     throw new Error('userId is required to save dashboard preferences');
   }
@@ -110,7 +122,7 @@ export async function setDashboardPreferences(userId, { cardOrder }) {
  *
  * // Later: unsubscribe()
  */
-export function subscribeToDashboardPreferences(userId, callback) {
+export function subscribeToDashboardPreferences(userId: string, callback: (prefs: DashboardPreferences) => void): Unsubscribe {
   // Return noop unsubscribe if no userId
   if (!userId) {
     callback({ cardOrder: DEFAULT_CARD_ORDER });

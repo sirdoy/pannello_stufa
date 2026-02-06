@@ -10,6 +10,43 @@
 import { ref, get, set, update } from 'firebase/database';
 import { db } from './firebase';
 
+/** Sandbox error */
+export interface SandboxError {
+  code: string;
+  description: string;
+}
+
+/** Sandbox stove state */
+export interface SandboxStoveState {
+  status: string;
+  fan: number;
+  power: number;
+  temperature: number;
+  lastUpdate: string;
+}
+
+/** Sandbox maintenance */
+export interface SandboxMaintenance {
+  hoursWorked: number;
+  maxHours: number;
+  needsCleaning: boolean;
+  lastUpdatedAt: string | null;
+}
+
+/** Sandbox config */
+export interface SandboxConfig {
+  enabled: boolean;
+  stoveState: SandboxStoveState;
+  maintenance: SandboxMaintenance;
+  error: SandboxError | null;
+  settings: {
+    autoProgressStates: boolean;
+    simulateDelay: boolean;
+    randomErrors: boolean;
+  };
+  history: unknown[];
+}
+
 // Stati possibili della stufa
 export const STOVE_STATES = {
   OFF: 'OFF',
@@ -21,7 +58,7 @@ export const STOVE_STATES = {
 };
 
 // Errori simulabili
-export const SANDBOX_ERRORS = {
+export const SANDBOX_ERRORS: Record<string, SandboxError | null> = {
   NONE: null,
   HIGH_TEMP: { code: 'AL01', description: 'Temperatura troppo alta' },
   LOW_PRESSURE: { code: 'AL02', description: 'Pressione insufficiente' },
@@ -33,7 +70,7 @@ export const SANDBOX_ERRORS = {
 /**
  * Verifica se siamo in ambiente locale
  */
-export function isLocalEnvironment() {
+export function isLocalEnvironment(): boolean {
   if (typeof window === 'undefined') {
     // Server-side: check NODE_ENV
     return process.env.NODE_ENV === 'development';
@@ -47,7 +84,7 @@ export function isLocalEnvironment() {
 /**
  * Inizializza i dati sandbox in Firebase
  */
-export async function initializeSandbox() {
+export async function initializeSandbox(): Promise<SandboxConfig> {
   if (!isLocalEnvironment()) {
     throw new Error('Sandbox disponibile solo in localhost');
   }
@@ -84,13 +121,13 @@ export async function initializeSandbox() {
     return initialData;
   }
 
-  return snapshot.val();
+  return snapshot.val() as SandboxConfig;
 }
 
 /**
  * Abilita/disabilita modalità sandbox
  */
-export async function toggleSandbox(enabled) {
+export async function toggleSandbox(enabled: boolean): Promise<boolean> {
   if (!isLocalEnvironment()) {
     throw new Error('Sandbox disponibile solo in localhost');
   }
@@ -108,7 +145,7 @@ export async function toggleSandbox(enabled) {
  * Verifica se sandbox è abilitato
  * Controlla sia la variabile d'ambiente SANDBOX_MODE che Firebase
  */
-export async function isSandboxEnabled() {
+export async function isSandboxEnabled(): Promise<boolean> {
   if (!isLocalEnvironment()) {
     return false;
   }
@@ -133,7 +170,7 @@ export async function isSandboxEnabled() {
  * Ottiene lo stato simulato della stufa
  * Include anche l'errore se presente
  */
-export async function getSandboxStoveState() {
+export async function getSandboxStoveState(): Promise<SandboxStoveState & { error: SandboxError | null }> {
   if (!isLocalEnvironment()) {
     throw new Error('Sandbox disponibile solo in localhost');
   }
@@ -326,7 +363,7 @@ export async function getSandboxMaintenance() {
     return getSandboxMaintenance();
   }
 
-  return snapshot.val();
+  return snapshot.val() as SandboxConfig;
 }
 
 /**
@@ -407,7 +444,7 @@ export async function getSandboxSettings() {
     return getSandboxSettings();
   }
 
-  return snapshot.val();
+  return snapshot.val() as SandboxConfig;
 }
 
 /**

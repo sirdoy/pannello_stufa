@@ -17,16 +17,31 @@ import {
 /**
  * Device Commands for Command Palette
  *
- * Per CONTEXT.md:
+ * Per CONTEXT.MD:
  * - Full command set: Navigation + Global actions + Device commands
  * - Device command format: Claude's discretion on organization
  * - No recent commands section (per CMDK-05 deferral)
  */
 
+/** Command group */
+export interface CommandGroup {
+  heading: string;
+  items: CommandItem[];
+}
+
+/** Command item */
+export interface CommandItem {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  shortcut?: string;
+  onSelect: () => void | Promise<void>;
+}
+
 /**
  * Execute stove action with error handling
  */
-async function executeStoveAction(endpoint, body = {}) {
+async function executeStoveAction(endpoint: string, body: Record<string, unknown> = {}): Promise<unknown> {
   try {
     const response = await fetch(`/api/stove/${endpoint}`, {
       method: 'POST',
@@ -46,7 +61,7 @@ async function executeStoveAction(endpoint, body = {}) {
 /**
  * Execute thermostat action with error handling
  */
-async function executeThermostatAction(endpoint, body = {}) {
+async function executeThermostatAction(endpoint: string, body: Record<string, unknown> = {}): Promise<unknown> {
   try {
     const response = await fetch(`/api/netatmo/${endpoint}`, {
       method: 'POST',
@@ -66,7 +81,7 @@ async function executeThermostatAction(endpoint, body = {}) {
 /**
  * Execute lights action with error handling
  */
-async function executeLightsAction(endpoint, method = 'PUT', body = {}) {
+async function executeLightsAction(endpoint: string, method: string = 'PUT', body: Record<string, unknown> = {}): Promise<unknown> {
   try {
     const response = await fetch(`/api/hue/${endpoint}`, {
       method,
@@ -86,7 +101,7 @@ async function executeLightsAction(endpoint, method = 'PUT', body = {}) {
 /**
  * Get stove commands
  */
-export function getStoveCommands() {
+export function getStoveCommands(): CommandGroup {
   return {
     heading: 'Stufa',
     items: [
@@ -163,7 +178,7 @@ export function getStoveCommands() {
 /**
  * Get thermostat commands
  */
-export function getThermostatCommands() {
+export function getThermostatCommands(): CommandGroup {
   return {
     heading: 'Termostato',
     items: [
@@ -213,7 +228,7 @@ export function getThermostatCommands() {
 /**
  * Get lights commands
  */
-export function getLightsCommands() {
+export function getLightsCommands(): CommandGroup {
   return {
     heading: 'Luci',
     items: [
@@ -269,7 +284,7 @@ export function getLightsCommands() {
 /**
  * Get all device commands combined
  */
-export function getDeviceCommands() {
+export function getDeviceCommands(): CommandGroup[] {
   return [
     getStoveCommands(),
     getThermostatCommands(),

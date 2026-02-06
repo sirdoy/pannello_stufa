@@ -12,8 +12,27 @@
  *   const { data, cachedAt, stale } = await getCachedWeather(lat, lon, fetchWeatherForecast);
  */
 
+/** Weather data generic type */
+export type WeatherData = unknown;
+
+/** Cache entry */
+interface WeatherCacheEntry {
+  data: WeatherData;
+  timestamp: number;
+}
+
+/** Cached weather result */
+export interface CachedWeatherResult {
+  data: WeatherData;
+  cachedAt: number;
+  stale: boolean;
+}
+
+/** Fetch function type */
+export type WeatherFetchFn = (lat: number, lon: number) => Promise<WeatherData>;
+
 // In-memory cache (Map for fast lookups)
-const cache = new Map();
+const cache = new Map<string, WeatherCacheEntry>();
 
 // Cache TTL: 15 minutes in milliseconds
 const CACHE_TTL = 15 * 60 * 1000; // 15 minutes
@@ -25,17 +44,8 @@ const CACHE_TTL = 15 * 60 * 1000; // 15 minutes
  * - Fresh data (age < 15min): Return cached data immediately
  * - Stale data (age > 15min): Return cached data + trigger background refresh
  * - No cache: Fetch fresh data and cache it
- *
- * @param {number} lat - Latitude (4 decimal precision for cache key)
- * @param {number} lon - Longitude (4 decimal precision for cache key)
- * @param {Function} fetchFn - Function to fetch fresh data (lat, lon) => Promise<data>
- * @returns {Promise<{ data: object, cachedAt: number, stale: boolean }>}
- *
- * @example
- * const { data, cachedAt, stale } = await getCachedWeather(45.4642, 9.19, fetchWeatherForecast);
- * console.log(`Cached at: ${new Date(cachedAt)}, Stale: ${stale}`);
  */
-export async function getCachedWeather(lat, lon, fetchFn) {
+export async function getCachedWeather(lat: number, lon: number, fetchFn: WeatherFetchFn): Promise<CachedWeatherResult> {
   // Build cache key with 4-decimal precision (~11m accuracy)
   const cacheKey = `location:${lat.toFixed(4)},${lon.toFixed(4)}`;
 
@@ -91,6 +101,6 @@ export async function getCachedWeather(lat, lon, fetchFn) {
  * Clear all cached weather data
  * Useful for testing or manual cache invalidation
  */
-export function clearWeatherCache() {
+export function clearWeatherCache(): void {
   cache.clear();
 }

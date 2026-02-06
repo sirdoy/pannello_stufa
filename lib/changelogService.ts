@@ -1,15 +1,28 @@
-// lib/changelogService.js
+// lib/changelogService.ts
 import { ref, set, get, push } from 'firebase/database';
 import { db } from './firebase';
 
+/** Version type */
+export type VersionType = 'major' | 'minor' | 'patch';
+
+/** Changelog entry */
+export interface ChangelogEntry {
+  version: string;
+  date: string;
+  changes: string[];
+  type: VersionType;
+  timestamp: string;
+}
+
 /**
  * Salva una nuova versione nel changelog Firebase
- * @param {string} version - Numero versione (es. "1.1.0")
- * @param {string} date - Data rilascio (YYYY-MM-DD)
- * @param {Array<string>} changes - Array di modifiche
- * @param {string} type - Tipo versione: 'major' | 'minor' | 'patch'
  */
-export const saveVersionToFirebase = async (version, date, changes, type = 'minor') => {
+export const saveVersionToFirebase = async (
+  version: string,
+  date: string,
+  changes: string[],
+  type: VersionType = 'minor'
+): Promise<void> => {
   try {
     const versionRef = ref(db, `changelog/${version.replace(/\./g, '_')}`);
     await set(versionRef, {
@@ -27,18 +40,17 @@ export const saveVersionToFirebase = async (version, date, changes, type = 'mino
 
 /**
  * Recupera tutte le versioni dal changelog Firebase
- * @returns {Promise<Array>} Array di versioni ordinate per data (più recenti prima)
  */
-export const getChangelogFromFirebase = async () => {
+export const getChangelogFromFirebase = async (): Promise<ChangelogEntry[]> => {
   try {
     const changelogRef = ref(db, 'changelog');
     const snapshot = await get(changelogRef);
 
     if (snapshot.exists()) {
-      const data = snapshot.val();
+      const data = snapshot.val() as Record<string, ChangelogEntry>;
       // Converti oggetto in array e ordina per data decrescente
       const versions = Object.values(data).sort((a, b) => {
-        return new Date(b.date) - new Date(a.date);
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
       });
       return versions;
     } else {
@@ -52,9 +64,8 @@ export const getChangelogFromFirebase = async () => {
 
 /**
  * Recupera l'ultima versione rilasciata
- * @returns {Promise<Object|null>} Oggetto versione o null
  */
-export const getLatestVersion = async () => {
+export const getLatestVersion = async (): Promise<ChangelogEntry | null> => {
   try {
     const versions = await getChangelogFromFirebase();
     return versions.length > 0 ? versions[0] : null;
@@ -66,11 +77,8 @@ export const getLatestVersion = async () => {
 
 /**
  * Determina il tipo di versione dal numero semantico
- * @param {string} currentVersion - Versione corrente (es. "1.0.0")
- * @param {string} newVersion - Nuova versione (es. "1.1.0")
- * @returns {string} 'major' | 'minor' | 'patch'
  */
-export const getVersionType = (currentVersion, newVersion) => {
+export const getVersionType = (currentVersion: string, newVersion: string): VersionType => {
   const [currentMajor, currentMinor, currentPatch] = currentVersion.split('.').map(Number);
   const [newMajor, newMinor, newPatch] = newVersion.split('.').map(Number);
 
@@ -82,9 +90,8 @@ export const getVersionType = (currentVersion, newVersion) => {
 
 /**
  * Sincronizza VERSION_HISTORY con Firebase
- * @param {Array} versionHistory - Array da lib/version.js
  */
-export const syncVersionHistoryToFirebase = async (versionHistory) => {
+export const syncVersionHistoryToFirebase = async (versionHistory: Partial<ChangelogEntry>[]): Promise<void> => {
   try {
     for (let i = 0; i < versionHistory.length; i++) {
       const version = versionHistory[i];

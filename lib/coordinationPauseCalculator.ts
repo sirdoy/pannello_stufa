@@ -121,15 +121,15 @@ export function calculatePauseUntil(
   const pauseUntil = now.getTime() + (waitMinutes * 60 * 1000);
 
   // Enrich with zone information
-  const zone = schedule.zones?.find(z => z.id === nextSlot.zone_id) || {};
+  const zone = schedule.zones?.find(z => z.id === nextSlot.zone_id);
 
   return {
     pauseUntil,
     nextSlot: {
       offset: nextSlot.m_offset,
       zoneId: nextSlot.zone_id,
-      zoneName: zone.name || `Zone ${nextSlot.zone_id}`,
-      temp: zone.temp,
+      zoneName: zone?.name || `Zone ${nextSlot.zone_id}`,
+      temp: zone?.temp,
     },
     waitMinutes,
   };

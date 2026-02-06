@@ -23,6 +23,23 @@ import {
 import { getDefaultPreferences } from '@/lib/schemas/notificationPreferences';
 
 /**
+ * Notification preferences data from Firebase
+ */
+interface NotificationPreferencesData {
+  enabledTypes?: Record<string, boolean>;
+  dndWindows?: unknown[];
+  rateLimits?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+/**
+ * Trigger notification options
+ */
+interface TriggerNotificationOptions {
+  skipPreferenceCheck?: boolean;
+}
+
+/**
  * Type ID Mapping (Legacy → Phase 3 Schema)
  *
  * Maps old notification type IDs to new type names in Phase 3 schema.
@@ -82,12 +99,12 @@ function getNewTypeName(legacyTypeId) {
  * @param {string} userId - User ID
  * @returns {Promise<Object>} User preferences merged with defaults
  */
-async function getUserPreferencesServer(userId) {
+async function getUserPreferencesServer(userId: string) {
   try {
     // NEW PATH: Phase 3 uses users/{userId}/settings/notifications
-    const prefs = await adminDbGet(`users/${userId}/settings/notifications`);
+    const prefsData = await adminDbGet(`users/${userId}/settings/notifications`) as NotificationPreferencesData | null;
 
-    if (!prefs) {
+    if (!prefsData) {
       // Return defaults from Phase 3 schema
       return getDefaultPreferences();
     }
@@ -96,10 +113,10 @@ async function getUserPreferencesServer(userId) {
     const defaults = getDefaultPreferences();
     return {
       ...defaults,
-      ...prefs,
-      enabledTypes: { ...defaults.enabledTypes, ...prefs.enabledTypes },
-      dndWindows: prefs.dndWindows || defaults.dndWindows,
-      rateLimits: { ...defaults.rateLimits, ...prefs.rateLimits },
+      ...prefsData,
+      enabledTypes: { ...defaults.enabledTypes, ...prefsData.enabledTypes },
+      dndWindows: prefsData.dndWindows || defaults.dndWindows,
+      rateLimits: { ...defaults.rateLimits, ...prefsData.rateLimits },
     };
 
   } catch (error) {
@@ -114,9 +131,12 @@ async function getUserPreferencesServer(userId) {
  * @param {string} newTypeName - New type name (e.g., 'CRITICAL', 'scheduler_success')
  * @returns {Object} { shouldSend: boolean, reason?: string }
  */
-function checkTypeEnabled(preferences, newTypeName) {
+function checkTypeEnabled(preferences: unknown, newTypeName: string) {
+  // Type guard for preferences object
+  const prefs = preferences as NotificationPreferencesData | null;
+
   // Check enabledTypes map from Phase 3 schema
-  const enabled = preferences?.enabledTypes?.[newTypeName];
+  const enabled = prefs?.enabledTypes?.[newTypeName];
 
   // If type not found in preferences, default to enabled (safe default)
   if (enabled === undefined) {
@@ -142,7 +162,12 @@ function checkTypeEnabled(preferences, newTypeName) {
  * @param {boolean} options.skipPreferenceCheck - Skip preference checking (emergency notifications)
  * @returns {Promise<Object>} Result with success/skipped/error
  */
-export async function triggerNotificationServer(userId, typeId, data = {}, options = {}) {
+export async function triggerNotificationServer(
+  userId: string,
+  typeId: string,
+  data: Record<string, unknown> = {},
+  options: TriggerNotificationOptions = {}
+) {
   try {
     // Get notification type
     const notificationType = NOTIFICATION_TYPES[typeId];
@@ -204,12 +229,16 @@ export async function triggerNotificationServer(userId, typeId, data = {}, optio
     // Send notification (will pass through Phase 3 filter chain)
     const result = await sendNotificationToUser(userId, notification);
 
-    console.log(`[Notification] Sent ${typeId} to ${userId}: ${result.successCount} success, ${result.failureCount} failed`);
+    // Extract success/failure counts from multi-device result
+    const successCount = 'successCount' in result ? result.successCount : 0;
+    const failureCount = 'failureCount' in result ? result.failureCount : 0;
+
+    console.log(`[Notification] Sent ${typeId} to ${userId}: ${successCount} success, ${failureCount} failed`);
 
     return {
       success: result.success,
-      successCount: result.successCount,
-      failureCount: result.failureCount,
+      successCount,
+      failureCount,
     };
 
   } catch (error) {

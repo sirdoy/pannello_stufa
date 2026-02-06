@@ -390,12 +390,20 @@ export function getNotificationTypesByCategory(categoryId) {
 }
 
 /**
+ * Notification payload data
+ */
+interface NotificationPayloadData {
+  url?: string;
+  [key: string]: unknown;
+}
+
+/**
  * Build notification payload from type and data
  * @param {string} typeId - Notification type ID
  * @param {Object} data - Dynamic data for the notification
  * @returns {Object} Notification payload
  */
-export function buildNotificationPayload(typeId, data = {}) {
+export function buildNotificationPayload(typeId: string, data: NotificationPayloadData = {}) {
   const type = NOTIFICATION_TYPES[typeId];
 
   if (!type) {

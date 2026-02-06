@@ -2,21 +2,22 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+interface GlassEffectProps {
+  bgColor?: string;
+  opacity?: number;
+}
+
 /**
  * GlassEffect - Optimized WebGL liquid glass effect
  *
  * Effetto vetro liquido ultra-leggero che funziona con qualsiasi contenuto sottostante.
  * Utilizza CSS backdrop-filter per il blur e WebGL solo per pattern frost animato.
- *
- * @param {Object} props
- * @param {string} props.bgColor - Background color as hex string (default: '#ffffff')
- * @param {number} props.opacity - Base opacity 0-1 (default: 0.15)
  */
 export default function GlassEffect({
   bgColor = '#ffffff',
   opacity = 0.15
-}) {
-  const canvasRef = useRef(null);
+}: GlassEffectProps) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [webglError, setWebglError] = useState(false);
 
   useEffect(() => {
@@ -40,9 +41,9 @@ export default function GlassEffect({
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    let animationId;
+    let animationId: number;
     let startTime = performance.now();
-    let resizeObserver;
+    let resizeObserver: ResizeObserver;
 
     // Vertex shader - fullscreen quad
     const vertexShaderSource = `
@@ -107,8 +108,10 @@ export default function GlassEffect({
       }
     `;
 
-    function compileShader(source, type) {
+    function compileShader(source: string, type: number): WebGLShader | null {
       const shader = gl.createShader(type);
+      if (!shader) return null;
+
       gl.shaderSource(shader, source);
       gl.compileShader(shader);
 
@@ -129,6 +132,11 @@ export default function GlassEffect({
     }
 
     const program = gl.createProgram();
+    if (!program) {
+      setWebglError(true);
+      return;
+    }
+
     gl.attachShader(program, vs);
     gl.attachShader(program, fs);
     gl.linkProgram(program);
@@ -161,6 +169,7 @@ export default function GlassEffect({
     };
 
     function resize() {
+      if (!canvas) return;
       const rect = canvas.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2.0);
       const w = Math.floor(rect.width * dpr);
@@ -176,6 +185,7 @@ export default function GlassEffect({
     }
 
     function animate() {
+      if (!canvas) return;
       resize();
       const currentTime = (performance.now() - startTime) * 0.001;
 

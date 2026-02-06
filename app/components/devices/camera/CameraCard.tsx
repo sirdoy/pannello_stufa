@@ -10,6 +10,14 @@ import { Text, Button } from '../../ui';
 import NETATMO_CAMERA_API from '@/lib/netatmoCameraApi';
 import HlsPlayer from './HlsPlayer';
 
+interface NetatmoCamera {
+  id: string;
+  name: string;
+  status: 'on' | 'off';
+  type: string;
+  [key: string]: any;
+}
+
 /**
  * CameraCard - Camera summary view for homepage
  * Shows camera status with snapshot and live video preview
@@ -17,13 +25,13 @@ import HlsPlayer from './HlsPlayer';
 export default function CameraCard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [connected, setConnected] = useState(false);
   const [needsReauth, setNeedsReauth] = useState(false); // Token exists but missing camera scopes
-  const [cameras, setCameras] = useState([]);
+  const [cameras, setCameras] = useState<NetatmoCamera[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedCameraId, setSelectedCameraId] = useState(null);
-  const [snapshotUrl, setSnapshotUrl] = useState(null);
+  const [selectedCameraId, setSelectedCameraId] = useState<string | null>(null);
+  const [snapshotUrl, setSnapshotUrl] = useState<string | null>(null);
   const [snapshotLoading, setSnapshotLoading] = useState(false);
   const [snapshotError, setSnapshotError] = useState(false);
   const [isLiveMode, setIsLiveMode] = useState(false);
@@ -51,7 +59,7 @@ export default function CameraCard() {
     }
   }, [selectedCameraId]);
 
-  async function fetchCameras(retryCount = 0) {
+  async function fetchCameras(retryCount: number = 0) {
     const MAX_RETRIES = 1;
     const RETRY_DELAY_MS = 1500;
 
@@ -119,7 +127,7 @@ export default function CameraCard() {
     }
   }
 
-  async function fetchSnapshot(cameraId) {
+  async function fetchSnapshot(cameraId: string) {
     try {
       setSnapshotLoading(true);
       setSnapshotError(false);

@@ -4,26 +4,36 @@ import { useEffect, useRef, useState } from 'react';
 import { Maximize, Minimize } from 'lucide-react';
 import { Text, Button } from '../../ui';
 
+interface HlsPlayerProps {
+  src: string;
+  poster?: string;
+  className?: string;
+  onError?: (error: string) => void;
+  showControls?: boolean;
+  autoPlay?: boolean;
+  muted?: boolean;
+}
+
 /**
  * HlsPlayer - Video player for HLS streams (Netatmo cameras)
  * Uses hls.js for HLS playback support in browsers that don't support it natively
- *
- * @param {string} src - HLS stream URL (m3u8)
- * @param {string} poster - Poster image URL (shown before video loads)
- * @param {string} className - Additional CSS classes
- * @param {function} onError - Error callback
- * @param {boolean} showControls - Show native video controls (default: false for live, true for VOD)
- * @param {boolean} autoPlay - Auto-play video (default: true)
- * @param {boolean} muted - Mute video (default: true for live, false for VOD with controls)
  */
-export default function HlsPlayer({ src, poster, className = '', onError, showControls = false, autoPlay = true, muted }) {
+export default function HlsPlayer({
+  src,
+  poster,
+  className = '',
+  onError,
+  showControls = false,
+  autoPlay = true,
+  muted
+}: HlsPlayerProps) {
   // Default muted based on showControls if not explicitly set
   const isMuted = muted !== undefined ? muted : !showControls;
-  const containerRef = useRef(null);
-  const videoRef = useRef(null);
-  const hlsRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const hlsRef = useRef<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Detect mobile devices (iOS and Android)

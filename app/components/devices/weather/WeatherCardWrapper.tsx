@@ -4,6 +4,39 @@ import { useState, useEffect, useCallback } from 'react';
 import { WeatherCard } from '@/app/components/weather';
 import { subscribeToLocation } from '@/lib/services/locationService';
 
+interface Location {
+  name: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+interface WeatherData {
+  current: {
+    temp: number;
+    feels_like: number;
+    humidity: number;
+    weather: Array<{
+      id: number;
+      main: string;
+      description: string;
+      icon: string;
+    }>;
+  };
+  daily: Array<{
+    dt: number;
+    temp: {
+      min: number;
+      max: number;
+    };
+    weather: Array<{
+      id: number;
+      main: string;
+      description: string;
+      icon: string;
+    }>;
+  }>;
+}
+
 /**
  * WeatherCardWrapper - Client component that wraps WeatherCard with data fetching
  *
@@ -20,14 +53,14 @@ import { subscribeToLocation } from '@/lib/services/locationService';
  * 4. WeatherCard handles all UI rendering
  */
 export default function WeatherCardWrapper() {
-  const [location, setLocation] = useState(null);
-  const [weatherData, setWeatherData] = useState(null);
+  const [location, setLocation] = useState<Location | null>(null);
+  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<Error | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Memoized weather fetch function
-  const fetchWeather = useCallback(async (lat, lon) => {
+  const fetchWeather = useCallback(async (lat: number, lon: number) => {
     setIsLoading(true);
     setError(null);
 
@@ -40,7 +73,7 @@ export default function WeatherCardWrapper() {
       setWeatherData(data);
     } catch (err) {
       console.error('Weather fetch error:', err);
-      setError(err);
+      setError(err as Error);
     } finally {
       setIsLoading(false);
     }

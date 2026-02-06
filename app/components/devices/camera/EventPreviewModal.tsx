@@ -7,20 +7,38 @@ import HlsPlayer from './HlsPlayer';
 import NETATMO_CAMERA_API from '@/lib/netatmoCameraApi';
 import { downloadHlsVideo } from '@/lib/hlsDownloader';
 
+interface CameraEvent {
+  id?: string;
+  video_id?: string;
+  snapshot?: { url?: string };
+  type: string;
+  sub_type?: string;
+  time: number;
+  message?: string;
+  video_status?: string;
+}
+
+interface Camera {
+  vpn_url?: string;
+  [key: string]: any;
+}
+
+interface EventPreviewModalProps {
+  event: CameraEvent | null;
+  camera: Camera | null;
+  onClose: () => void;
+}
+
 /**
  * EventPreviewModal - Modal for viewing camera event video
  * Uses the UI Modal component for proper centering and scroll lock
- *
- * @param {Object} event - Event object with video_id, snapshot, type, time
- * @param {Object} camera - Camera object with vpn_url
- * @param {function} onClose - Callback to close modal
  */
-export default function EventPreviewModal({ event, camera, onClose }) {
+export default function EventPreviewModal({ event, camera, onClose }: EventPreviewModalProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [useFallback, setUseFallback] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState('');
-  const [downloadError, setDownloadError] = useState(null);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
   // Reset state when event changes
   useEffect(() => {
@@ -34,7 +52,7 @@ export default function EventPreviewModal({ event, camera, onClose }) {
   if (!event || !camera) return null;
 
   // Strip HTML tags from message
-  const stripHtml = (html) => html?.replace(/<[^>]*>/g, '') || null;
+  const stripHtml = (html: string | undefined): string | null => html?.replace(/<[^>]*>/g, '') || null;
 
   // Get URLs
   const snapshotUrl = NETATMO_CAMERA_API.getEventSnapshotUrl(event);

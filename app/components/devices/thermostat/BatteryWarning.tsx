@@ -2,6 +2,32 @@
 
 import { Banner, Text } from '../../ui';
 
+type BatteryState = 'full' | 'high' | 'medium' | 'low' | 'very_low';
+type ModuleType = 'NRV' | 'NATherm1' | 'NAPlug' | 'OTH' | 'OTM' | string;
+
+interface Module {
+  id: string;
+  name?: string;
+  type: ModuleType;
+  battery_state?: BatteryState;
+  reachable?: boolean;
+}
+
+interface BatteryWarningProps {
+  lowBatteryModules?: Module[];
+  hasCriticalBattery?: boolean;
+  onDismiss?: (() => void) | null;
+}
+
+interface BatteryBadgeProps {
+  batteryState: BatteryState;
+  showLabel?: boolean;
+}
+
+interface ModuleBatteryListProps {
+  modules?: Module[];
+}
+
 /**
  * BatteryWarning - Displays battery status warnings for Netatmo modules
  *
@@ -16,7 +42,7 @@ import { Banner, Text } from '../../ui';
 /**
  * Get battery icon based on state
  */
-function getBatteryIcon(state) {
+function getBatteryIcon(state: BatteryState): string {
   switch (state) {
     case 'very_low':
       return '🪫'; // Empty battery
@@ -34,7 +60,7 @@ function getBatteryIcon(state) {
 /**
  * Get display label for battery state in Italian
  */
-function getBatteryLabel(state) {
+function getBatteryLabel(state: BatteryState): string {
   switch (state) {
     case 'very_low':
       return 'Critica';
@@ -54,7 +80,7 @@ function getBatteryLabel(state) {
 /**
  * Get module type display name in Italian
  */
-function getModuleTypeName(type) {
+function getModuleTypeName(type: ModuleType): string {
   switch (type) {
     case 'NRV':
       return 'Valvola';
@@ -74,16 +100,12 @@ function getModuleTypeName(type) {
 /**
  * BatteryWarning component
  * Displays a banner warning for modules with low/critical battery
- *
- * @param {Object[]} lowBatteryModules - Array of modules with low battery
- * @param {boolean} hasCriticalBattery - True if any module has very_low battery
- * @param {Function} onDismiss - Optional dismiss handler
  */
 export default function BatteryWarning({
   lowBatteryModules = [],
   hasCriticalBattery = false,
   onDismiss = null,
-}) {
+}: BatteryWarningProps) {
   if (!lowBatteryModules || lowBatteryModules.length === 0) {
     return null;
   }
@@ -126,11 +148,8 @@ export default function BatteryWarning({
 /**
  * BatteryBadge - Small badge to show battery status on a card
  * Used for compact battery indication in device cards
- *
- * @param {string} batteryState - Battery state: "full", "high", "medium", "low", "very_low"
- * @param {boolean} showLabel - Whether to show text label
  */
-export function BatteryBadge({ batteryState, showLabel = false }) {
+export function BatteryBadge({ batteryState, showLabel = false }: BatteryBadgeProps) {
   if (!batteryState) return null;
 
   // Only show badge for concerning states
@@ -159,10 +178,8 @@ export function BatteryBadge({ batteryState, showLabel = false }) {
 /**
  * ModuleBatteryList - Displays all modules with their battery status
  * Used in expanded device details view
- *
- * @param {Object[]} modules - Array of modules with battery info
  */
-export function ModuleBatteryList({ modules = [] }) {
+export function ModuleBatteryList({ modules = [] }: ModuleBatteryListProps) {
   if (!modules || modules.length === 0) {
     return null;
   }

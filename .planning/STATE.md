@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 39 - UI Components Migration
-Plan: 8 of 8 (ALL COMPLETE)
-Status: COMPLETE — All 89 TypeScript files migrated (88 components + barrel export), zero .js files, pragmatic typing for large files (PidAutomationPanel 710 lines, StoveSyncPanel 564 lines)
-Last activity: 2026-02-06 — Completed 39-08-PLAN.md (Netatmo & Lights components migration - 7 files)
+Plan: 9 of 9 (ALL COMPLETE)
+Status: COMPLETE — All 105 TypeScript files migrated (104 components + barrel export), zero .js/.jsx files in app/components, pragmatic typing for large/testing files
+Last activity: 2026-02-06 — Completed 39-09-PLAN.md (Weather, Log, Navigation, Sandbox, Layout - 16 files)
 
-Progress: [████████░░░░░░░░░░░░░░░░] 43% (3/7 phases complete, Phase 39 COMPLETE with 8 plans)
+Progress: [████████░░░░░░░░░░░░░░░░] 43% (3/7 phases complete, Phase 39 COMPLETE with 9 plans)
 
 ## Milestone Overview
 
@@ -27,7 +27,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 |-------|------|--------------|--------|
 | 37 | TypeScript Foundation | 8 | COMPLETE (8/8) |
 | 38 | Library Migration | 4 | COMPLETE (4/4) |
-| 39 | UI Components Migration | 3 | COMPLETE (8/8 plans, 89/89 files migrated, pragmatic typing) |
+| 39 | UI Components Migration | 3 | COMPLETE (9/9 plans, 105/105 files migrated, 0 tsc errors) |
 | 40 | API Routes Migration | 3 | Pending |
 | 41 | Pages Migration | 3 | Pending |
 | 42 | Test Migration | 4 | Pending |

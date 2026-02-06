@@ -7,31 +7,173 @@
 
 const NETATMO_API_BASE = 'https://api.netatmo.com';
 
+// ============================================================================
+// TYPES
+// ============================================================================
+
+/** Camera from Netatmo Security API */
+export interface NetatmoCamera {
+  id: string;
+  name?: string;
+  type: string;
+  status?: string;
+  is_local?: boolean;
+  vpn_url?: string;
+  local_url?: string;
+  sd_status?: string;
+  alim_status?: string;
+  light_mode_status?: string;
+}
+
+/** Person from Netatmo Security API */
+export interface NetatmoPerson {
+  id: string;
+  pseudo?: string;
+  out_of_sight?: boolean;
+  last_seen?: number;
+  face?: {
+    id: string;
+    key: string;
+  };
+}
+
+/** Camera Event from Netatmo Security API */
+export interface NetatmoEvent {
+  id: string;
+  type: string;
+  time: number;
+  camera_id: string;
+  message?: string;
+  sub_type?: number;
+  person_id?: string;
+  is_arrival?: boolean;
+  snapshot?: {
+    id: string;
+    key: string;
+    url?: string;
+  };
+  vignette?: {
+    id: string;
+    key: string;
+    url?: string;
+  };
+  video_id?: string;
+  video_status?: string;
+  event_list?: unknown[];
+}
+
+/** Home with cameras from Security API */
+export interface NetatmoCameraHome {
+  id: string;
+  name?: string;
+  cameras?: NetatmoCamera[];
+  persons?: NetatmoPerson[];
+  events?: NetatmoEvent[];
+}
+
+/** Parsed Camera (cleaned for Firebase) */
+export interface ParsedCamera {
+  id: string;
+  name: string;
+  type: string;
+  status: string;
+  is_local: boolean;
+  home_id: string;
+  home_name: string;
+  vpn_url?: string;
+  local_url?: string;
+  sd_status?: string;
+  alim_status?: string;
+  light_mode_status?: string;
+}
+
+/** Parsed Person (cleaned for Firebase) */
+export interface ParsedPerson {
+  id: string;
+  name: string;
+  out_of_sight: boolean;
+  last_seen?: number;
+  face?: {
+    id: string;
+    key: string;
+  };
+}
+
+/** Parsed Event (cleaned for Firebase) */
+export interface ParsedEvent {
+  id: string;
+  type: string;
+  time: number;
+  camera_id: string;
+  message?: string;
+  sub_type?: number;
+  person_id?: string;
+  is_arrival?: boolean;
+  snapshot?: {
+    id: string;
+    key: string;
+    url?: string;
+  };
+  vignette?: {
+    id: string;
+    key: string;
+    url?: string;
+  };
+  video_id?: string;
+  video_status?: string;
+  event_list?: unknown[];
+}
+
+/** Request options */
+interface RequestOptions {
+  method?: string;
+  headers?: Record<string, string>;
+  body?: Record<string, string>;
+}
+
+/** API Response */
+interface NetatmoApiResponse {
+  body?: {
+    homes?: NetatmoCameraHome[];
+    events_list?: NetatmoEvent[];
+    [key: string]: unknown;
+  };
+  error?: {
+    message?: string;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
+
+// ============================================================================
+// API REQUEST
+// ============================================================================
+
 /**
  * Make authenticated API request
  */
-async function makeRequest(endpoint, accessToken, options = {}) {
+async function makeRequest(endpoint: string, accessToken: string, options: RequestOptions = {}): Promise<NetatmoApiResponse> {
   const url = `${NETATMO_API_BASE}/api/${endpoint}`;
   const method = options.method || 'GET';
-  const headers = {
+  const headers: Record<string, string> = {
     Authorization: `Bearer ${accessToken}`,
     ...options.headers,
   };
 
-  const config = {
+  const config: RequestInit = {
     method,
     headers,
   };
 
   if (options.body) {
     if (method === 'POST') {
-      config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+      config.headers = { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' };
       config.body = new URLSearchParams(options.body);
     }
   }
 
   const response = await fetch(url, config);
-  const data = await response.json();
+  const data = await response.json() as NetatmoApiResponse;
 
   if (data.error) {
     throw new Error(`Netatmo API Error: ${data.error.message || JSON.stringify(data.error)}`);
@@ -51,11 +193,8 @@ async function makeRequest(endpoint, accessToken, options = {}) {
  * IMPORTANT: Uses 'gethomedata' (Security API) instead of 'homesdata' (Energy API)
  * because 'homesdata' returns cameras as modules without vpn_url/status,
  * while 'gethomedata' returns full camera data with streaming URLs.
- *
- * @param {string} accessToken - OAuth access token
- * @param {number} size - Number of events to retrieve (default 50, max ~200)
  */
-async function getCamerasData(accessToken, size = 50) {
+async function getCamerasData(accessToken: string, size: number = 50): Promise<NetatmoCameraHome[]> {
   // Use Security API endpoint which returns cameras with full data
   // Pass size parameter to get more events
   const data = await makeRequest('gethomedata', accessToken, {
@@ -71,11 +210,8 @@ async function getCamerasData(accessToken, size = 50) {
 
 /**
  * Get camera events for a specific home
- * @param {string} accessToken - OAuth access token
- * @param {string} homeId - Home ID
- * @param {number} size - Number of events to retrieve (default 10)
  */
-async function getCameraEvents(accessToken, homeId, size = 10) {
+async function getCameraEvents(accessToken: string, homeId: string, size: number = 10): Promise<NetatmoEvent[]> {
   const data = await makeRequest('gethomedata', accessToken, {
     method: 'POST',
     body: {
@@ -90,12 +226,8 @@ async function getCameraEvents(accessToken, homeId, size = 10) {
 /**
  * Get events older than a specific event (for pagination)
  * Uses Netatmo's geteventsuntil endpoint
- * @param {string} accessToken - OAuth access token
- * @param {string} homeId - Home ID
- * @param {string} eventId - Get events older than this event
- * @param {number} size - Number of events to retrieve (default 30)
  */
-async function getEventsUntil(accessToken, homeId, eventId, size = 30) {
+async function getEventsUntil(accessToken: string, homeId: string, eventId: string, size: number = 30): Promise<NetatmoEvent[]> {
   const data = await makeRequest('geteventsuntil', accessToken, {
     method: 'POST',
     body: {
@@ -117,16 +249,16 @@ async function getEventsUntil(accessToken, homeId, eventId, size = 30) {
  * Searches ALL homes for cameras (not just the first one)
  * Filters out undefined values for Firebase compatibility
  */
-function parseCameras(homesData) {
+function parseCameras(homesData: NetatmoCameraHome[]): ParsedCamera[] {
   if (!homesData || homesData.length === 0) return [];
 
   // Search ALL homes for cameras (cameras may be in a different home than thermostats)
-  const allCameras = [];
+  const allCameras: ParsedCamera[] = [];
 
   for (const home of homesData) {
     const homeCameras = home.cameras || [];
     for (const camera of homeCameras) {
-      const parsed = {
+      const parsed: ParsedCamera = {
         id: camera.id,
         name: camera.name || 'Camera',
         type: camera.type, // NACamera (Welcome) or NOC (Presence)
@@ -165,11 +297,11 @@ function parseCameras(homesData) {
  * Searches ALL homes for persons
  * Filters out undefined values for Firebase compatibility
  */
-function parsePersons(homesData) {
+function parsePersons(homesData: NetatmoCameraHome[]): ParsedPerson[] {
   if (!homesData || homesData.length === 0) return [];
 
   // Search ALL homes for persons (deduplicate by ID)
-  const personsMap = new Map();
+  const personsMap = new Map<string, ParsedPerson>();
 
   for (const home of homesData) {
     const homePersons = home.persons || [];
@@ -177,7 +309,7 @@ function parsePersons(homesData) {
       // Skip if we already have this person
       if (personsMap.has(person.id)) continue;
 
-      const parsed = {
+      const parsed: ParsedPerson = {
         id: person.id,
         name: person.pseudo || 'Sconosciuto',
         out_of_sight: person.out_of_sight ?? true,
@@ -209,11 +341,11 @@ function parsePersons(homesData) {
  * - Media: snapshot, video_id, video_status, vignette
  * - Details: message, sub_type, person_id, is_arrival
  */
-function parseEvents(events) {
+function parseEvents(events: NetatmoEvent[]): ParsedEvent[] {
   if (!events || events.length === 0) return [];
 
   return events.map(event => {
-    const parsed = {
+    const parsed: ParsedEvent = {
       id: event.id,
       type: event.type,
       time: event.time,
@@ -281,7 +413,7 @@ function parseEvents(events) {
  * Get snapshot URL for a camera
  * Returns VPN URL (always works) or local URL (faster, same network only)
  */
-function getSnapshotUrl(camera, preferLocal = false) {
+function getSnapshotUrl(camera: ParsedCamera, preferLocal: boolean = false): string | null {
   if (preferLocal && camera.is_local && camera.local_url) {
     return `${camera.local_url}/live/snapshot_720.jpg`;
   }
@@ -294,11 +426,8 @@ function getSnapshotUrl(camera, preferLocal = false) {
 /**
  * Get HLS live stream URL for a camera
  * Returns the m3u8 playlist URL for live video streaming
- * @param {Object} camera - Camera object with vpn_url or local_url
- * @param {boolean} preferLocal - Whether to prefer local URL (faster but only works on same network)
- * @returns {string|null} HLS stream URL or null if not available
  */
-function getLiveStreamUrl(camera, preferLocal = false) {
+function getLiveStreamUrl(camera: ParsedCamera, preferLocal: boolean = false): string | null {
   if (preferLocal && camera.is_local && camera.local_url) {
     return `${camera.local_url}/live/index.m3u8`;
   }
@@ -312,7 +441,7 @@ function getLiveStreamUrl(camera, preferLocal = false) {
  * Get event snapshot URL
  * Tries snapshot first, falls back to vignette
  */
-function getEventSnapshotUrl(event) {
+function getEventSnapshotUrl(event: ParsedEvent): string | null {
   // Try direct URL first (some events have it)
   if (event.snapshot?.url) {
     return event.snapshot.url;
@@ -338,7 +467,7 @@ function getEventSnapshotUrl(event) {
  * Get sub-type name for outdoor camera events
  * Sub-types: 1=human, 2=animal, 3=vehicle
  */
-function getSubTypeName(subType) {
+function getSubTypeName(subType: number): string | null {
   switch (subType) {
     case 1:
       return 'Persona';
@@ -354,7 +483,7 @@ function getSubTypeName(subType) {
 /**
  * Get sub-type icon
  */
-function getSubTypeIcon(subType) {
+function getSubTypeIcon(subType: number): string | null {
   switch (subType) {
     case 1:
       return '🚶';
@@ -370,11 +499,8 @@ function getSubTypeIcon(subType) {
 /**
  * Get event video URL (HLS stream)
  * Requires the camera object to get the vpn_url
- * @param {Object} event - Event object with video_id
- * @param {Object} camera - Camera object with vpn_url
- * @returns {string|null} HLS video URL or null if not available
  */
-function getEventVideoUrl(event, camera) {
+function getEventVideoUrl(event: ParsedEvent, camera: ParsedCamera): string | null {
   if (!event.video_id || !camera?.vpn_url) return null;
   // Video status can be: 'recording', 'available', 'deleted'
   if (event.video_status === 'deleted') return null;
@@ -383,11 +509,8 @@ function getEventVideoUrl(event, camera) {
 
 /**
  * Get event video thumbnail URL
- * @param {Object} event - Event object with video_id
- * @param {Object} camera - Camera object with vpn_url
- * @returns {string|null} Thumbnail URL or null if not available
  */
-function getEventVideoThumbnail(event, camera) {
+function getEventVideoThumbnail(event: ParsedEvent, camera: ParsedCamera): string | null {
   if (!event.video_id || !camera?.vpn_url) return null;
   if (event.video_status === 'deleted') return null;
   return `${camera.vpn_url}/vod/${event.video_id}/thumbnail.jpg`;
@@ -397,11 +520,8 @@ function getEventVideoThumbnail(event, camera) {
  * Get event video download URL (HLS stream)
  * Note: Netatmo doesn't provide direct MP4 downloads, only HLS streams.
  * The HLS URL can be opened in Safari, VLC, or other HLS-compatible players.
- * @param {Object} event - Event object with video_id
- * @param {Object} camera - Camera object with vpn_url
- * @returns {string|null} HLS stream URL or null if not available
  */
-function getEventVideoDownloadUrl(event, camera) {
+function getEventVideoDownloadUrl(event: ParsedEvent, camera: ParsedCamera): string | null {
   // Netatmo only provides HLS streams, same as getEventVideoUrl
   return getEventVideoUrl(event, camera);
 }
@@ -409,7 +529,7 @@ function getEventVideoDownloadUrl(event, camera) {
 /**
  * Get camera type display name
  */
-function getCameraTypeName(type) {
+function getCameraTypeName(type: string): string {
   switch (type) {
     case 'NACamera':
       return 'Welcome (Indoor)';
@@ -425,7 +545,7 @@ function getCameraTypeName(type) {
 /**
  * Get event type display name (Italian)
  */
-function getEventTypeName(type) {
+function getEventTypeName(type: string): string {
   switch (type) {
     case 'person':
       return 'Persona riconosciuta';
@@ -447,7 +567,7 @@ function getEventTypeName(type) {
 /**
  * Get event icon emoji
  */
-function getEventIcon(type) {
+function getEventIcon(type: string): string {
   switch (type) {
     case 'person':
       return '👤';

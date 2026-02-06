@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 38 - Library Migration
-Plan: 07 of 9 (Complete)
+Plan: 08 of 9 (Complete)
 Status: In progress
-Last activity: 2026-02-06 — Completed 38-07-PLAN.md (Coordination and health monitoring)
+Last activity: 2026-02-06 — Completed 38-08-PLAN.md (Remaining services migration)
 
 Progress: [████░░░░░░░░░░░░░░░░░░░░] 14% (1/7 phases complete)
 
@@ -26,7 +26,7 @@ Progress: [████░░░░░░░░░░░░░░░░░░░
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
 | 37 | TypeScript Foundation | 8 | COMPLETE (8/8) |
-| 38 | Library Migration | 4 | In progress (7/9 plans) |
+| 38 | Library Migration | 4 | In progress (8/9 plans) |
 | 39 | UI Components Migration | 3 | Pending |
 | 40 | API Routes Migration | 3 | Pending |
 | 41 | Pages Migration | 3 | Pending |
@@ -36,9 +36,9 @@ Progress: [████░░░░░░░░░░░░░░░░░░░
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 159 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 7)
-- Average duration: ~5.2 min per plan
-- Total execution time: ~13.8 hours across 7 milestones
+- Total plans completed: 160 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 8)
+- Average duration: ~5.3 min per plan
+- Total execution time: ~14.1 hours across 7 milestones
 
 **By Milestone:**
 
@@ -50,7 +50,7 @@ Progress: [████░░░░░░░░░░░░░░░░░░░
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
 | v3.2 Weather & Dashboard | 5 | 13 | 2 days (2026-02-02 - 2026-02-03) |
 | v4.0 Advanced UI | 7 | 24 | 2 days (2026-02-04 - 2026-02-05) |
-| v5.0 TypeScript Migration | 7 | 1/9 plans | In progress |
+| v5.0 TypeScript Migration | 7 | 8/9 plans | In progress |
 
 ## Accumulated Context
 
@@ -128,6 +128,15 @@ From 38-04 (Repositories, schemas, validators, devices):
 - Union types for constrained strings (DeviceTypeId, DeviceColor)
 - 'as const' with Record types for literal type inference
 
+From 38-08 (Remaining services):
+- Transaction temporary fields: Cast to Record<string, unknown> for _metadata fields
+- Admin vs Client SDK: Read operations use client SDK, writes require Admin SDK + API routes
+- Stale-while-revalidate: In-memory Map cache + background refresh pattern
+- Hook return interface: Explicit interface export + function return type for docs/IDE
+- Scheduler mode state machine: Explicit type for manual/automatic/semi-manual transitions
+- Sandbox testing types: Nested interfaces for config/state/maintenance/error domains
+- Unknown for deeply nested API responses rather than full typing
+
 ### Quick Tasks Completed
 
 | # | Description | Date | Commit | Directory |
@@ -146,6 +155,6 @@ From 38-04 (Repositories, schemas, validators, devices):
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed 38-07-PLAN.md (Coordination and health monitoring)
+Stopped at: Completed 38-08-PLAN.md (Remaining services migration)
 Resume file: None
-Next step: Continue Phase 38 Library Migration (2 more plans remaining in wave 4)
+Next step: Continue Phase 38 Library Migration (1 more plan remaining)

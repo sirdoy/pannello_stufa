@@ -42,7 +42,7 @@ export default async function Home() {
   const visibleCards = getVisibleDashboardCards(deviceConfig);
 
   return (
-    <main>
+    <>
       {/* Page header using new Section component */}
       <Section
         title="I tuoi dispositivi"
@@ -80,6 +80,6 @@ export default async function Home() {
           />
         )}
       </Section>
-    </main>
+    </>
   );
 }

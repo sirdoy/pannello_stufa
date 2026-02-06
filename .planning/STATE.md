@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 39 - UI Components Migration
-Plan: 4 of 4 (01-04 complete)
-Status: Complete — 54/64 components migrated (02 has 5 pending Radix, 03 has 4 pending deps, 04 complete 14/14)
-Last activity: 2026-02-06 — Completed 39-04-PLAN.md (Complex UI components migration: SmartHomeCard, DashboardLayout, DataTable, Skeleton)
+Plan: 5 of 5 (ALL COMPLETE)
+Status: COMPLETE — All 64 TypeScript files migrated (63 components + barrel export), zero .js/.jsx files, zero tsc errors
+Last activity: 2026-02-06 — Completed 39-05-PLAN.md (Barrel export migration with Props re-exports)
 
-Progress: [██████░░░░░░░░░░░░░░░░░░] 31% (2/7 phases complete, Phase 39 nearly complete)
+Progress: [████████░░░░░░░░░░░░░░░░] 43% (3/7 phases complete, Phase 39 COMPLETE)
 
 ## Milestone Overview
 
@@ -27,7 +27,7 @@ Progress: [██████░░░░░░░░░░░░░░░░░
 |-------|------|--------------|--------|
 | 37 | TypeScript Foundation | 8 | COMPLETE (8/8) |
 | 38 | Library Migration | 4 | COMPLETE (4/4) |
-| 39 | UI Components Migration | 3 | Nearly complete (4/4 plans, 54/64 migrated, 10 pending) |
+| 39 | UI Components Migration | 3 | COMPLETE (5/5 plans, 64/64 files migrated, 0 tsc errors) |
 | 40 | API Routes Migration | 3 | Pending |
 | 41 | Pages Migration | 3 | Pending |
 | 42 | Test Migration | 4 | Pending |
@@ -36,9 +36,9 @@ Progress: [██████░░░░░░░░░░░░░░░░░
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 168 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 16)
-- Average duration: ~6.2 min per plan
-- Total execution time: ~17.3 hours across 7 milestones
+- Total plans completed: 169 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 17)
+- Average duration: ~6.0 min per plan
+- Total execution time: ~17.4 hours across 7 milestones
 
 **By Milestone:**
 
@@ -50,7 +50,7 @@ Progress: [██████░░░░░░░░░░░░░░░░░
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
 | v3.2 Weather & Dashboard | 5 | 13 | 2 days (2026-02-02 - 2026-02-03) |
 | v4.0 Advanced UI | 7 | 24 | 2 days (2026-02-04 - 2026-02-05) |
-| v5.0 TypeScript Migration | 7 | 15 plans (Phase 38 complete, Phase 39 in progress) | In progress |
+| v5.0 TypeScript Migration | 7 | 17 plans (Phases 37-39 complete) | In progress |
 
 ## Accumulated Context
 
@@ -89,10 +89,7 @@ Key patterns from previous milestones preserved for v5.0 migration:
 
 ### Blockers/Concerns
 
-**Known Tech Debt:**
-- Label component not exported from barrel (low impact)
-- 5 Radix form components need TypeScript typing (Checkbox, Switch, Slider, Select, RadioGroup) - 71 tsc errors
-- Phase 39-02 partially complete - follow-up work needed
+**None** - Phase 39 complete with zero tsc errors
 
 ### TypeScript Migration Patterns (v5.0)
 
@@ -186,9 +183,9 @@ From 39-01 (Foundation UI components):
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed 39-03-PLAN.md (8/12 namespace components fully typed, 4 pending: Toast, ToastProvider, Banner, PageLayout)
+Stopped at: Completed 39-05-PLAN.md (Barrel export migration — Phase 39 COMPLETE)
 Resume file: None
-Next step: Complete 39-03 remaining 4 files OR close Phase 39 with documentation of pending work
+Next step: Begin Phase 40 (API Routes Migration)
 
 From 38-10 (Type definitions gap closure):
 - Type narrowing with 'in' operator for discriminated unions: if ('property' in object)
@@ -233,3 +230,10 @@ From 39-04 (Complex UI components):
 - VariantProps<typeof xxxVariants> for CVA integration
 - forwardRef<HTMLElement, Props> explicit generics mandatory
 - Omit<SmartHomeCardProps, 'conflictingProp'> to extend with modifications
+
+From 39-05 (Barrel export migration):
+- Type re-exports in barrel files: export type { ComponentProps } from './Component'
+- TypeScript automatically resolves './Button' to Button.tsx - no path changes needed
+- Only re-export Props that actually exist (some Radix components don't export trigger Props)
+- Group type re-exports by category for maintainability
+- Props naming convention: ComponentNameProps for primary component interface

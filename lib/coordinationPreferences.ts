@@ -20,14 +20,15 @@ import { getEnvironmentPath } from '@/lib/environmentHelper';
 import {
   coordinationPreferencesSchema,
   getDefaultCoordinationPreferences,
+  type CoordinationPreferences,
 } from '@/lib/schemas/coordinationPreferences';
 
 /**
  * Get coordination preferences for a user
- * @param {string} userId - User ID (Auth0 sub)
- * @returns {Promise<Object>} User preferences or defaults if not found
  */
-export async function getCoordinationPreferences(userId) {
+export async function getCoordinationPreferences(
+  userId: string
+): Promise<CoordinationPreferences> {
   const prefsPath = getEnvironmentPath(`coordination/preferences/${userId}`);
   const prefs = await adminDbGet(prefsPath);
 
@@ -41,13 +42,11 @@ export async function getCoordinationPreferences(userId) {
 /**
  * Update coordination preferences for a user
  * Validates with Zod, merges updates, increments version, sets updatedAt
- *
- * @param {string} userId - User ID (Auth0 sub)
- * @param {Object} updates - Partial preference updates
- * @returns {Promise<Object>} Updated preferences
- * @throws {Error} If validation fails
  */
-export async function updateCoordinationPreferences(userId, updates) {
+export async function updateCoordinationPreferences(
+  userId: string,
+  updates: Partial<CoordinationPreferences>
+): Promise<CoordinationPreferences> {
   // Get current preferences
   const currentPrefs = await getCoordinationPreferences(userId);
 

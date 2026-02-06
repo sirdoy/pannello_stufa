@@ -20,29 +20,67 @@
 
 import { updateCoordinationState } from '@/lib/coordinationState';
 
-// In-memory storage: Map<userId, timerEntry>
-// Timer does NOT persist across server restarts (intentional per RESEARCH.md)
-const activeTimers = new Map();
+/**
+ * Stove target state for debouncing
+ */
+type StoveTargetState = 'ON' | 'OFF';
 
 /**
  * Timer entry structure
- * @typedef {Object} TimerEntry
- * @property {NodeJS.Timeout} timer - setTimeout handle
- * @property {number} startedAt - Timestamp when timer started (Date.now())
- * @property {'ON'|'OFF'} targetState - What state triggered the debounce
- * @property {number} duration - Duration in milliseconds
  */
+interface TimerEntry {
+  timer: NodeJS.Timeout;
+  startedAt: number;
+  targetState: StoveTargetState;
+  duration: number;
+}
+
+/**
+ * Debounce result
+ */
+interface DebounceResult {
+  started: boolean;
+  duration: number;
+}
+
+/**
+ * Cancel result
+ */
+interface CancelResult {
+  cancelled: boolean;
+}
+
+/**
+ * Debounce status
+ */
+interface DebounceStatus {
+  pending: boolean;
+  startedAt: number | null;
+  remainingMs: number | null;
+  targetState: StoveTargetState | null;
+}
+
+/**
+ * State change result
+ */
+interface StateChangeResult {
+  action: 'timer_started' | 'retry_started' | 'executed_immediately' | 'no_change';
+  delayMs: number | null;
+}
+
+// In-memory storage: Map<userId, timerEntry>
+// Timer does NOT persist across server restarts (intentional per RESEARCH.md)
+const activeTimers = new Map<string, TimerEntry>();
 
 /**
  * Start a debounce timer for a user
- *
- * @param {string} userId - User ID (Auth0 sub)
- * @param {'ON'|'OFF'} targetState - What state triggered the timer
- * @param {Function} callback - Function to call when timer expires
- * @param {number} delayMs - Delay in milliseconds (default: 120000 = 2 min)
- * @returns {Promise<Object>} Result: { started: true, duration: delayMs }
  */
-export async function startDebounceTimer(userId, targetState, callback, delayMs = 120000) {
+export async function startDebounceTimer(
+  userId: string,
+  targetState: StoveTargetState,
+  callback: () => Promise<void>,
+  delayMs = 120000
+): Promise<DebounceResult> {
   // Cancel existing timer if any
   await cancelDebounceTimer(userId);
 
@@ -90,11 +128,8 @@ export async function startDebounceTimer(userId, targetState, callback, delayMs 
 
 /**
  * Cancel debounce timer for a user
- *
- * @param {string} userId - User ID
- * @returns {Promise<Object>} Result: { cancelled: boolean }
  */
-export async function cancelDebounceTimer(userId) {
+export async function cancelDebounceTimer(userId: string): Promise<CancelResult> {
   const entry = activeTimers.get(userId);
 
   if (!entry) {
@@ -120,25 +155,15 @@ export async function cancelDebounceTimer(userId) {
 
 /**
  * Check if user has pending debounce timer
- *
- * @param {string} userId - User ID
- * @returns {boolean} True if timer exists
  */
-export function hasPendingDebounce(userId) {
+export function hasPendingDebounce(userId: string): boolean {
   return activeTimers.has(userId);
 }
 
 /**
  * Get debounce status for a user
- *
- * @param {string} userId - User ID
- * @returns {Object} Status:
- *   - pending: boolean
- *   - startedAt: number|null
- *   - remainingMs: number|null
- *   - targetState: string|null
  */
-export function getDebounceStatus(userId) {
+export function getDebounceStatus(userId: string): DebounceStatus {
   const entry = activeTimers.get(userId);
 
   if (!entry) {
@@ -170,15 +195,12 @@ export function getDebounceStatus(userId) {
  * - OFF during debounce with targetState ON: Cancel, start 30s retry
  * - OFF + no pending: Execute immediately (restore setpoints)
  * - State matches targetState: No action needed
- *
- * @param {string} userId - User ID
- * @param {'ON'|'OFF'} newState - New stove state
- * @param {Function} callback - Function to execute when debounce completes
- * @returns {Promise<Object>} Result:
- *   - action: 'timer_started' | 'retry_started' | 'executed_immediately' | 'no_change'
- *   - delayMs: number|null
  */
-export async function handleStoveStateChange(userId, newState, callback) {
+export async function handleStoveStateChange(
+  userId: string,
+  newState: StoveTargetState,
+  callback: () => Promise<void>
+): Promise<StateChangeResult> {
   const entry = activeTimers.get(userId);
   const hasPending = !!entry;
 
@@ -219,7 +241,7 @@ export async function handleStoveStateChange(userId, newState, callback) {
  * Removes stale entries (timers that should have fired but are still in Map)
  * This shouldn't happen in normal operation, but provides safety
  */
-function cleanupOldEntries() {
+function cleanupOldEntries(): void {
   const now = Date.now();
   const maxAge = 5 * 60 * 1000; // 5 minutes (safety buffer)
   let totalCleaned = 0;

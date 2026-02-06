@@ -23,42 +23,43 @@ const SETPOINT_TOLERANCE = 0.5;
 /**
  * Non-standard modes that indicate user intent
  */
-const NON_STANDARD_MODES = ['away', 'hg', 'off'];
+const NON_STANDARD_MODES = ['away', 'hg', 'off'] as const;
+
+/**
+ * Change type
+ */
+type ChangeType = 'setpoint_changed' | 'mode_changed';
+
+/**
+ * Manual change entry
+ */
+interface ManualChange {
+  roomId: string;
+  roomName: string;
+  type: ChangeType;
+  expected: number | string;
+  actual: number | string;
+}
+
+/**
+ * User intent detection result
+ */
+interface IntentResult {
+  manualChange: boolean;
+  changes: ManualChange[];
+  reason: string | null;
+  error?: string;
+}
 
 /**
  * Detect user intent across multiple rooms
- *
- * @param {string} homeId - Netatmo home ID
- * @param {string[]} roomIds - Array of room IDs to check
- * @param {Object} expectedSetpoints - Object { roomId: expectedTemp }
- * @param {string} accessToken - Netatmo access token
- * @returns {Promise<{
- *   manualChange: boolean,
- *   changes: Array<{
- *     roomId: string,
- *     roomName: string,
- *     type: 'setpoint_changed' | 'mode_changed',
- *     expected: number | string,
- *     actual: number | string,
- *   }>,
- *   reason: string | null,
- *   error?: string
- * }>}
- *
- * @example
- * const result = await detectUserIntent(
- *   'home123',
- *   ['room1', 'room2'],
- *   { room1: 21.0, room2: 19.0 },
- *   accessToken
- * );
- *
- * if (result.manualChange) {
- *   console.log('Manual change detected:', result.reason);
- *   // Pause automation
- * }
  */
-export async function detectUserIntent(homeId, roomIds, expectedSetpoints, accessToken) {
+export async function detectUserIntent(
+  homeId: string,
+  roomIds: string[],
+  expectedSetpoints: Record<string, number>,
+  accessToken: string
+): Promise<IntentResult> {
   try {
     // Get current home status from Netatmo
     const homeStatus = await NETATMO_API.getHomeStatus(accessToken, homeId);
@@ -72,7 +73,7 @@ export async function detectUserIntent(homeId, roomIds, expectedSetpoints, acces
       };
     }
 
-    const changes = [];
+    const changes: ManualChange[] = [];
 
     // Check each room for manual changes
     for (const roomId of roomIds) {
@@ -149,20 +150,13 @@ export async function detectUserIntent(homeId, roomIds, expectedSetpoints, acces
 /**
  * Check if a single room was manually changed
  * Convenience wrapper for single-room check
- *
- * @param {string} homeId - Netatmo home ID
- * @param {string} roomId - Room ID to check
- * @param {number} expectedSetpoint - Expected setpoint temperature
- * @param {string} accessToken - Netatmo access token
- * @returns {Promise<boolean>} True if manual change detected
- *
- * @example
- * const changed = await wasManuallyChanged('home123', 'room1', 21.0, accessToken);
- * if (changed) {
- *   // Pause automation for this room
- * }
  */
-export async function wasManuallyChanged(homeId, roomId, expectedSetpoint, accessToken) {
+export async function wasManuallyChanged(
+  homeId: string,
+  roomId: string,
+  expectedSetpoint: number,
+  accessToken: string
+): Promise<boolean> {
   const result = await detectUserIntent(
     homeId,
     [roomId],

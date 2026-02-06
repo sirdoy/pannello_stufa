@@ -23,19 +23,29 @@ import NETATMO_API from './netatmoApi.js';
 import { logCoordinationEvent } from './coordinationEventLogger.js';
 
 /**
+ * Coordination cycle result
+ */
+interface CoordinationResult {
+  action: 'skipped' | 'paused' | 'debouncing' | 'applied' | 'restored' | 'no_change';
+  reason: string;
+  pausedUntil?: number;
+  remainingMs?: number;
+  delayMs?: number;
+  rooms?: Array<Record<string, unknown>>;
+  notificationSent?: boolean;
+  [key: string]: unknown;
+}
+
+/**
  * Main coordination cycle - called by cron every minute
  *
  * Orchestrates: state check → user intent → debounce → action → notification
- *
- * @param {string} userId - User ID (Auth0 sub)
- * @param {string} stoveStatus - Current stove status (WORK, MODULATION, STARTING, STANDBY, etc.)
- * @param {string} homeId - Netatmo home ID
- * @returns {Promise<Object>} Result:
- *   - action: 'skipped' | 'paused' | 'debouncing' | 'applied' | 'restored' | 'no_change'
- *   - reason: string explaining the action
- *   - ... additional details based on action
  */
-export async function processCoordinationCycle(userId, stoveStatus, homeId) {
+export async function processCoordinationCycle(
+  userId: string,
+  stoveStatus: string,
+  homeId: string
+): Promise<CoordinationResult> {
   console.log(`🔄 [Coordination] Starting cycle for ${userId}, stove: ${stoveStatus}`);
 
   // Step 1: Get coordination preferences

@@ -32,29 +32,52 @@ const DEFAULT_PAUSE_MINUTES = 60;
 const MINUTES_IN_WEEK = 7 * 24 * 60;
 
 /**
+ * Netatmo schedule timetable entry
+ */
+interface TimetableEntry {
+  m_offset: number;
+  zone_id: number;
+}
+
+/**
+ * Netatmo schedule zone
+ */
+interface ScheduleZone {
+  id: number;
+  name: string;
+  temp: number;
+}
+
+/**
+ * Netatmo schedule
+ */
+interface NetatmoSchedule {
+  timetable: TimetableEntry[];
+  zones?: ScheduleZone[];
+}
+
+/**
+ * Pause calculation result
+ */
+interface PauseResult {
+  pauseUntil: number;
+  nextSlot: {
+    offset: number;
+    zoneId: number;
+    zoneName: string;
+    temp?: number;
+  } | null;
+  waitMinutes: number;
+}
+
+/**
  * Calculate when automation pause should end
  * Returns timestamp of next schedule slot
- *
- * @param {Date|number} currentTime - Current time (Date object or timestamp)
- * @param {Object} schedule - Netatmo schedule with timetable and zones
- * @returns {{
- *   pauseUntil: number,
- *   nextSlot: {
- *     offset: number,
- *     zoneId: number,
- *     zoneName: string,
- *     temp: number,
- *   },
- *   waitMinutes: number,
- * }}
- *
- * @example
- * const result = calculatePauseUntil(new Date(), netatmoSchedule);
- * console.log(`Pause until: ${new Date(result.pauseUntil)}`);
- * console.log(`Next zone: ${result.nextSlot.zoneName} at ${result.nextSlot.temp}°C`);
- * console.log(`Wait: ${result.waitMinutes} minutes`);
  */
-export function calculatePauseUntil(currentTime, schedule) {
+export function calculatePauseUntil(
+  currentTime: Date | number,
+  schedule: NetatmoSchedule
+): PauseResult {
   // Convert to Date if timestamp
   const now = currentTime instanceof Date ? currentTime : new Date(currentTime);
 
@@ -115,15 +138,8 @@ export function calculatePauseUntil(currentTime, schedule) {
 /**
  * Calculate current m_offset (minutes since Monday 00:00)
  * Uses UTC to match Netatmo API behavior
- *
- * @param {Date} date - Current date
- * @returns {number} Minutes since Monday 00:00
- *
- * @example
- * // Tuesday 14:30 → (1 day × 1440 min) + (14.5 hours × 60 min) = 2310 minutes
- * const offset = calculateCurrentOffset(new Date('2024-01-09T14:30:00Z')); // Tuesday
  */
-function calculateCurrentOffset(date) {
+function calculateCurrentOffset(date: Date): number {
   // Get day of week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
   const dayOfWeek = date.getUTCDay();
 
@@ -145,20 +161,11 @@ function calculateCurrentOffset(date) {
 /**
  * Get next schedule slot from timetable
  * Returns first slot with m_offset > currentOffset, or wraps to Monday if needed
- *
- * @param {number} currentOffset - Current m_offset
- * @param {Array} timetable - Array of { m_offset, zone_id }
- * @returns {Object|null} Next timetable entry or null if not found
- *
- * @example
- * const nextSlot = getNextScheduleSlot(500, [
- *   { m_offset: 0, zone_id: 1 },
- *   { m_offset: 360, zone_id: 2 },
- *   { m_offset: 720, zone_id: 1 },
- * ]);
- * // Returns: { m_offset: 720, zone_id: 1 }
  */
-export function getNextScheduleSlot(currentOffset, timetable) {
+export function getNextScheduleSlot(
+  currentOffset: number,
+  timetable: TimetableEntry[]
+): TimetableEntry | null {
   // Sort timetable by offset (in case it's not sorted)
   const sortedTimetable = [...timetable].sort((a, b) => a.m_offset - b.m_offset);
 
@@ -175,16 +182,11 @@ export function getNextScheduleSlot(currentOffset, timetable) {
 
 /**
  * Format human-readable pause reason in Italian
- *
- * @param {string} changeType - Type of change ('setpoint', 'mode', or 'both')
- * @param {number} pauseUntil - Timestamp when pause ends
- * @returns {string} Italian-localized pause reason
- *
- * @example
- * const reason = formatPauseReason('setpoint', Date.now() + 3600000);
- * // Returns: "Automazione in pausa fino alle 15:30 (modifica manuale rilevata)"
  */
-export function formatPauseReason(changeType, pauseUntil) {
+export function formatPauseReason(
+  changeType: 'setpoint' | 'mode' | 'both',
+  pauseUntil: number
+): string {
   const pauseDate = new Date(pauseUntil);
   const hours = pauseDate.getHours().toString().padStart(2, '0');
   const minutes = pauseDate.getMinutes().toString().padStart(2, '0');

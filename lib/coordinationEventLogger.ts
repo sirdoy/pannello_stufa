@@ -31,20 +31,64 @@ import { Timestamp } from 'firebase-admin/firestore';
 import { subDays } from 'date-fns';
 
 /**
+ * Coordination event type
+ */
+type CoordinationEventType =
+  | 'boost_applied'
+  | 'setpoints_restored'
+  | 'automation_paused'
+  | 'user_intent_detected'
+  | 'max_setpoint_capped'
+  | 'notification_sent'
+  | 'notification_throttled';
+
+/**
+ * Coordination action
+ */
+type CoordinationAction = 'applied' | 'restored' | 'paused' | 'skipped' | 'debouncing';
+
+/**
+ * Coordination event data
+ */
+interface CoordinationEvent {
+  userId: string;
+  eventType: CoordinationEventType;
+  stoveStatus: string;
+  action: CoordinationAction;
+  details?: Record<string, unknown>;
+  notificationSent?: boolean;
+  cronRunId?: string | null;
+}
+
+/**
+ * Query options for coordination events
+ */
+interface QueryOptions {
+  userId?: string;
+  eventType?: CoordinationEventType;
+  startDate?: Date;
+  endDate?: Date;
+  limit?: number;
+}
+
+/**
+ * Coordination statistics
+ */
+interface CoordinationStats {
+  totalEvents: number;
+  byEventType: Record<string, number>;
+  notificationsSent: number;
+  notificationsThrottled: number;
+  pauseCount: number;
+  totalPauseDurationMinutes: number;
+  averagePauseDurationMinutes: number;
+}
+
+/**
  * Log coordination event to Firestore
  * Fire-and-forget: catches errors, returns null on failure
- *
- * @param {Object} event - Event data
- * @param {string} event.userId - User ID (Auth0 sub)
- * @param {string} event.eventType - Event type: 'boost_applied', 'setpoints_restored', 'automation_paused', 'user_intent_detected', 'max_setpoint_capped', 'notification_sent', 'notification_throttled'
- * @param {string} event.stoveStatus - Current stove status
- * @param {string} event.action - Action taken: 'applied', 'restored', 'paused', 'skipped', 'debouncing'
- * @param {Object} [event.details={}] - Event-specific details
- * @param {boolean} [event.notificationSent=false] - Whether notification was sent
- * @param {string} [event.cronRunId=null] - Optional cron run ID for correlation
- * @returns {Promise<string|null>} Document ID or null on error
  */
-export async function logCoordinationEvent(event) {
+export async function logCoordinationEvent(event: CoordinationEvent): Promise<string | null> {
   try {
     const db = getAdminFirestore();
 
@@ -81,16 +125,10 @@ export async function logCoordinationEvent(event) {
 
 /**
  * Get recent coordination events with filters
- *
- * @param {Object} [options={}] - Query options
- * @param {string} [options.userId] - Filter by user ID
- * @param {string} [options.eventType] - Filter by event type
- * @param {Date} [options.startDate] - Start date filter (default: 7 days ago)
- * @param {Date} [options.endDate] - End date filter (default: now)
- * @param {number} [options.limit=100] - Maximum number of events to return
- * @returns {Promise<Array>} Array of event documents with converted timestamps
  */
-export async function getRecentCoordinationEvents(options = {}) {
+export async function getRecentCoordinationEvents(
+  options: QueryOptions = {}
+): Promise<Array<Record<string, unknown>>> {
   try {
     const db = getAdminFirestore();
 
@@ -122,13 +160,14 @@ export async function getRecentCoordinationEvents(options = {}) {
 
     const snapshot = await query.get();
 
-    const events = [];
+    const events: Array<Record<string, unknown>> = [];
     snapshot.forEach(doc => {
+      const data = doc.data();
       events.push({
         id: doc.id,
-        ...doc.data(),
+        ...data,
         // Convert Firestore Timestamp to ISO string for client
-        timestamp: doc.data().timestamp.toDate().toISOString(),
+        timestamp: (data.timestamp as Timestamp).toDate().toISOString(),
       });
     });
 
@@ -143,12 +182,11 @@ export async function getRecentCoordinationEvents(options = {}) {
 /**
  * Get coordination statistics for last N days
  * Useful for dashboard summary cards
- *
- * @param {string} userId - User ID to get stats for
- * @param {number} [days=7] - Number of days to analyze
- * @returns {Promise<Object>} Statistics
  */
-export async function getCoordinationStats(userId, days = 7) {
+export async function getCoordinationStats(
+  userId: string,
+  days = 7
+): Promise<CoordinationStats> {
   try {
     const db = getAdminFirestore();
 
@@ -161,16 +199,17 @@ export async function getCoordinationStats(userId, days = 7) {
 
     const snapshot = await query.get();
 
-    const stats = {
+    const stats: CoordinationStats = {
       totalEvents: 0,
       byEventType: {},
       notificationsSent: 0,
       notificationsThrottled: 0,
       pauseCount: 0,
       totalPauseDurationMinutes: 0,
+      averagePauseDurationMinutes: 0,
     };
 
-    const pauseDurations = [];
+    const pauseDurations: number[] = [];
 
     snapshot.forEach(doc => {
       const data = doc.data();
@@ -192,8 +231,8 @@ export async function getCoordinationStats(userId, days = 7) {
       // Track pause durations
       if (data.eventType === 'automation_paused' && data.details?.pausedUntil) {
         stats.pauseCount++;
-        const pauseStart = data.timestamp.toDate().getTime();
-        const pauseEnd = data.details.pausedUntil;
+        const pauseStart = (data.timestamp as Timestamp).toDate().getTime();
+        const pauseEnd = data.details.pausedUntil as number;
         const durationMinutes = (pauseEnd - pauseStart) / (60 * 1000);
         pauseDurations.push(durationMinutes);
       }

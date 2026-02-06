@@ -20,24 +20,27 @@
  * "Global throttle - max 1 notification total every 30 minutes across all coordination events"
  */
 
+/**
+ * Throttle check result
+ */
+interface ThrottleResult {
+  allowed: boolean;
+  waitSeconds: number;
+  reason: 'global_throttle' | null;
+}
+
 // In-memory storage: Map<userId, timestamp>
 // Key: userId (Auth0 sub)
 // Value: Timestamp (ms) when last coordination notification was sent
-const lastNotificationSent = new Map();
+const lastNotificationSent = new Map<string, number>();
 
 // Global throttle window: 30 minutes
 const GLOBAL_THROTTLE_MS = 30 * 60 * 1000;
 
 /**
  * Check if coordination notification is allowed for user
- *
- * @param {string} userId - User ID (Auth0 sub)
- * @returns {Object} Result:
- *   - allowed: boolean - Whether notification is allowed
- *   - waitSeconds: number - How long until next notification allowed
- *   - reason: string|null - 'global_throttle' if blocked, null if allowed
  */
-export function shouldSendCoordinationNotification(userId) {
+export function shouldSendCoordinationNotification(userId: string): ThrottleResult {
   const lastSent = lastNotificationSent.get(userId);
   const now = Date.now();
 
@@ -78,14 +81,21 @@ export function shouldSendCoordinationNotification(userId) {
 }
 
 /**
+ * Throttle status
+ */
+interface ThrottleStatus {
+  lastSentAt: number | null;
+  nextAllowedAt: number | null;
+  waitSeconds: number;
+}
+
+/**
  * Record that a coordination notification was sent
  *
  * MUST be called after successfully sending notification
  * Updates the timestamp to start new 30-minute window
- *
- * @param {string} userId - User ID
  */
-export function recordNotificationSent(userId) {
+export function recordNotificationSent(userId: string): void {
   const now = Date.now();
   lastNotificationSent.set(userId, now);
   console.log(`📝 Coordination notification recorded for ${userId} (next allowed in 30 min)`);
@@ -95,14 +105,8 @@ export function recordNotificationSent(userId) {
  * Get throttle status for a user
  *
  * Useful for debugging and UI display
- *
- * @param {string} userId - User ID
- * @returns {Object} Status:
- *   - lastSentAt: number|null - Timestamp of last notification
- *   - nextAllowedAt: number|null - Timestamp when next notification allowed
- *   - waitSeconds: number - Seconds until next notification allowed (0 if allowed now)
  */
-export function getThrottleStatus(userId) {
+export function getThrottleStatus(userId: string): ThrottleStatus {
   const lastSent = lastNotificationSent.get(userId);
   const now = Date.now();
 
@@ -129,11 +133,8 @@ export function getThrottleStatus(userId) {
  * Clear throttle for a user
  *
  * Useful for testing and admin overrides
- *
- * @param {string} userId - User ID
- * @returns {boolean} True if entry was cleared
  */
-export function clearThrottle(userId) {
+export function clearThrottle(userId: string): boolean {
   const existed = lastNotificationSent.has(userId);
   lastNotificationSent.delete(userId);
 
@@ -149,7 +150,7 @@ export function clearThrottle(userId) {
  * Removes entries older than 30 minutes (expired throttle windows)
  * Runs every 5 minutes
  */
-function cleanupOldEntries() {
+function cleanupOldEntries(): void {
   const now = Date.now();
   let totalCleaned = 0;
 

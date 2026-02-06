@@ -21,10 +21,23 @@ import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 
 /**
- * Get default coordination state
- * @returns {Object} Default state
+ * Coordination state interface
  */
-function getDefaultState() {
+export interface CoordinationState {
+  stoveOn: boolean;
+  automationPaused: boolean;
+  pausedUntil: number | null;
+  pauseReason: 'manual_setpoint_change' | 'manual_mode_change' | null;
+  lastStateChange: number;
+  pendingDebounce: boolean;
+  debounceStartedAt: number | null;
+  previousSetpoints: Record<string, number> | null;
+}
+
+/**
+ * Get default coordination state
+ */
+function getDefaultState(): CoordinationState {
   return {
     stoveOn: false,
     automationPaused: false,
@@ -39,11 +52,10 @@ function getDefaultState() {
 
 /**
  * Get current coordination state from Firebase
- * @returns {Promise<Object>} Current state or default if not found
  */
-export async function getCoordinationState() {
+export async function getCoordinationState(): Promise<CoordinationState> {
   const statePath = getEnvironmentPath('coordination/state');
-  const state = await adminDbGet(statePath);
+  const state = await adminDbGet(statePath) as CoordinationState | null;
 
   if (!state) {
     return getDefaultState();
@@ -54,10 +66,10 @@ export async function getCoordinationState() {
 
 /**
  * Update coordination state (merges updates)
- * @param {Object} updates - Fields to update
- * @returns {Promise<Object>} Updated state
  */
-export async function updateCoordinationState(updates) {
+export async function updateCoordinationState(
+  updates: Partial<CoordinationState>
+): Promise<CoordinationState> {
   const currentState = await getCoordinationState();
 
   const newState = {
@@ -74,9 +86,8 @@ export async function updateCoordinationState(updates) {
 
 /**
  * Reset coordination state to defaults
- * @returns {Promise<Object>} Reset state
  */
-export async function resetCoordinationState() {
+export async function resetCoordinationState(): Promise<CoordinationState> {
   const defaultState = getDefaultState();
   const statePath = getEnvironmentPath('coordination/state');
   await adminDbSet(statePath, defaultState);

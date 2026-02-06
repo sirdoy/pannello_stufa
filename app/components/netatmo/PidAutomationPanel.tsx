@@ -18,10 +18,25 @@ import { NETATMO_ROUTES } from '@/lib/routes';
 import { getPidConfig, setPidConfig, subscribeToPidConfig } from '@/lib/services/pidAutomationService';
 import { PIDController } from '@/lib/utils/pidController';
 
+interface RoomData {
+  room_id: string;
+  room_name: string;
+  temperature?: number;
+  setpoint?: number;
+  [key: string]: any;
+}
+
+interface RoomSelectorProps {
+  rooms: RoomData[];
+  selectedRoomId: string | null;
+  onChange: (roomId: string | null) => void;
+  disabled: boolean;
+}
+
 /**
  * Room Selector Component
  */
-function RoomSelector({ rooms, selectedRoomId, onChange, disabled }) {
+function RoomSelector({ rooms, selectedRoomId, onChange, disabled }: RoomSelectorProps) {
   return (
     <div className="space-y-2">
       <Text weight="semibold" size="sm">
@@ -49,10 +64,16 @@ function RoomSelector({ rooms, selectedRoomId, onChange, disabled }) {
   );
 }
 
+interface ManualSetpointInputProps {
+  value: number;
+  onChange: (value: number) => void;
+  disabled: boolean;
+}
+
 /**
  * Manual Setpoint Input Component
  */
-function ManualSetpointInput({ value, onChange, disabled }) {
+function ManualSetpointInput({ value, onChange, disabled }: ManualSetpointInputProps) {
   const MIN_TEMP = 15;
   const MAX_TEMP = 25;
   const STEP = 0.5;
@@ -162,7 +183,7 @@ function ManualSetpointInput({ value, onChange, disabled }) {
  * Simulates a "cold start" (no accumulated integral/derivative)
  * with dt=5 minutes (the scheduler cron interval).
  */
-function computePidPreview(measured, setpoint, kp, ki, kd) {
+function computePidPreview(measured: number | null | undefined, setpoint: number | null | undefined, kp: number, ki: number, kd: number): number | null {
   if (measured == null || setpoint == null) return null;
   const pid = new PIDController({ kp, ki, kd });
   return pid.compute(setpoint, measured, 5);
@@ -171,7 +192,7 @@ function computePidPreview(measured, setpoint, kp, ki, kd) {
 /**
  * Power level labels in Italian
  */
-const POWER_LABELS = {
+const POWER_LABELS: Record<number, string> = {
   1: 'Minima',
   2: 'Bassa',
   3: 'Media',
@@ -182,7 +203,7 @@ const POWER_LABELS = {
 /**
  * Color class for each power level
  */
-const POWER_COLORS = {
+const POWER_COLORS: Record<number, string> = {
   1: 'text-blue-400 [html:not(.dark)_&]:text-blue-600',
   2: 'text-cyan-400 [html:not(.dark)_&]:text-cyan-600',
   3: 'text-yellow-400 [html:not(.dark)_&]:text-yellow-600',
@@ -193,7 +214,7 @@ const POWER_COLORS = {
 /**
  * Background color class for power level indicator
  */
-const POWER_BG_COLORS = {
+const POWER_BG_COLORS: Record<number, string> = {
   1: 'bg-blue-500/20 border-blue-500/30',
   2: 'bg-cyan-500/20 border-cyan-500/30',
   3: 'bg-yellow-500/20 border-yellow-500/30',
@@ -201,10 +222,14 @@ const POWER_BG_COLORS = {
   5: 'bg-red-500/20 border-red-500/30',
 };
 
+interface PidPowerPreviewProps {
+  powerLevel: number | null;
+}
+
 /**
  * PID Power Preview Component
  */
-function PidPowerPreview({ powerLevel }) {
+function PidPowerPreview({ powerLevel }: PidPowerPreviewProps) {
   if (powerLevel == null) return null;
 
   return (
@@ -242,10 +267,18 @@ function PidPowerPreview({ powerLevel }) {
   );
 }
 
+interface TemperatureDisplayProps {
+  room: RoomData | null;
+  manualSetpoint: number;
+  kp: number;
+  ki: number;
+  kd: number;
+}
+
 /**
  * Temperature Display Component
  */
-function TemperatureDisplay({ room, manualSetpoint, kp, ki, kd }) {
+function TemperatureDisplay({ room, manualSetpoint, kp, ki, kd }: TemperatureDisplayProps) {
   if (!room) {
     return (
       <div className="p-4 rounded-xl bg-white/[0.04] [html:not(.dark)_&]:bg-white/[0.06] backdrop-blur-sm border border-white/10">

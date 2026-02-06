@@ -17,10 +17,28 @@ import { Card, Button, Banner, Skeleton, Heading, Text } from '@/app/components/
 import Toggle from '@/app/components/ui/Toggle';
 import { NETATMO_ROUTES, STOVE_ROUTES } from '@/lib/routes';
 
+interface RoomData {
+  id: string;
+  name: string;
+  type: string;
+  [key: string]: any;
+}
+
+interface RoomCheckboxProps {
+  room: RoomData;
+  selected: boolean;
+  onChange: (checked: boolean) => void;
+  disabled: boolean;
+}
+
+interface StoveSyncPanelProps {
+  onSyncComplete?: () => Promise<void>;
+}
+
 /**
  * Room Selection Checkbox Component
  */
-function RoomCheckbox({ room, selected, onChange, disabled }) {
+function RoomCheckbox({ room, selected, onChange, disabled }: RoomCheckboxProps) {
   return (
     <label
       className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all duration-200 cursor-pointer ${
@@ -49,7 +67,7 @@ function RoomCheckbox({ room, selected, onChange, disabled }) {
   );
 }
 
-function getRoomTypeIcon(type) {
+function getRoomTypeIcon(type: string): string {
   const types = {
     livingroom: '🛋️',
     bedroom: '🛏️',
@@ -61,7 +79,7 @@ function getRoomTypeIcon(type) {
   return types[type] || '🏠';
 }
 
-function getRoomTypeLabel(type) {
+function getRoomTypeLabel(type: string): string {
   const types = {
     livingroom: 'Soggiorno',
     bedroom: 'Camera',
@@ -73,20 +91,20 @@ function getRoomTypeLabel(type) {
   return types[type] || 'Personalizzata';
 }
 
-export default function StoveSyncPanel({ onSyncComplete }) {
+export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [syncing, setSyncing] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [syncSuccess, setSyncSuccess] = useState(null);
+  const [syncSuccess, setSyncSuccess] = useState<string | null>(null);
 
-  const [config, setConfig] = useState(null);
-  const [availableRooms, setAvailableRooms] = useState([]);
+  const [config, setConfig] = useState<any>(null);
+  const [availableRooms, setAvailableRooms] = useState<RoomData[]>([]);
 
   // Form state
   const [enabled, setEnabled] = useState(false);
-  const [selectedRoomIds, setSelectedRoomIds] = useState([]);
+  const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([]);
   const [stoveTemperature, setStoveTemperature] = useState(16);
 
   const [hasChanges, setHasChanges] = useState(false);
@@ -117,13 +135,13 @@ export default function StoveSyncPanel({ onSyncComplete }) {
 
     } catch (err) {
       console.error('Error fetching stove sync config:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Errore sconosciuto');
     } finally {
       setLoading(false);
     }
   }
 
-  function handleRoomToggle(roomId, selected) {
+  function handleRoomToggle(roomId: string, selected: boolean) {
     const newSelection = selected
       ? [...selectedRoomIds, roomId]
       : selectedRoomIds.filter(id => id !== roomId);
@@ -133,14 +151,14 @@ export default function StoveSyncPanel({ onSyncComplete }) {
     setSuccess(false);
   }
 
-  function handleTemperatureChange(delta) {
+  function handleTemperatureChange(delta: number) {
     const newTemp = Math.max(5, Math.min(30, stoveTemperature + delta));
     setStoveTemperature(newTemp);
     setHasChanges(true);
     setSuccess(false);
   }
 
-  function handleEnabledToggle(value) {
+  function handleEnabledToggle(value: boolean) {
     setEnabled(value);
     setHasChanges(true);
     setSuccess(false);
@@ -197,7 +215,7 @@ export default function StoveSyncPanel({ onSyncComplete }) {
 
     } catch (err) {
       console.error('Error saving stove sync:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Errore sconosciuto');
     } finally {
       setSaving(false);
     }
@@ -234,7 +252,7 @@ export default function StoveSyncPanel({ onSyncComplete }) {
 
     } catch (err) {
       console.error('Error disabling stove sync:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Errore sconosciuto');
     } finally {
       setSaving(false);
     }
@@ -313,7 +331,7 @@ export default function StoveSyncPanel({ onSyncComplete }) {
 
     } catch (err) {
       console.error('Error syncing now:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Errore sconosciuto');
     } finally {
       setSyncing(false);
     }

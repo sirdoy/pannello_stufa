@@ -5,9 +5,39 @@ import { Card, Button, StatusBadge, Heading, Text, Badge } from '@/app/component
 import { BatteryBadge } from '@/app/components/devices/thermostat/BatteryWarning';
 import { NETATMO_ROUTES } from '@/lib/routes';
 
-export default function RoomCard({ room, onRefresh }) {
+interface ModuleData {
+  id: string;
+  name: string;
+  type: string;
+  battery_state?: string;
+  reachable?: boolean;
+  bridge?: string;
+  [key: string]: unknown;
+}
+
+interface RoomCardProps {
+  room: {
+    id: string;
+    name: string;
+    type: string;
+    mode?: string;
+    setpoint?: number;
+    temperature?: number;
+    heating?: boolean;
+    deviceType?: 'thermostat' | 'valve' | 'unknown';
+    hasLowBattery?: boolean;
+    hasCriticalBattery?: boolean;
+    isOffline?: boolean;
+    stoveSync?: boolean;
+    roomModules?: ModuleData[];
+    [key: string]: unknown;
+  };
+  onRefresh?: () => Promise<void>;
+}
+
+export default function RoomCard({ room, onRefresh }: RoomCardProps) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [editingTemp, setEditingTemp] = useState(false);
   const [targetTemp, setTargetTemp] = useState(room.setpoint || 20);
 
@@ -16,10 +46,10 @@ export default function RoomCard({ room, onRefresh }) {
   const isHeating = room.heating || false;
 
   // Get device type icon and label
-  function getDeviceIcon(module) {
+  function getDeviceIcon(module: ModuleData | null): { icon: string; label: string } {
     if (!module) return { icon: '📡', label: 'Dispositivo' };
 
-    const types = {
+    const types: Record<string, { icon: string; label: string }> = {
       NATherm1: { icon: '🌡️', label: 'Termostato' },
       NRV: { icon: '🔧', label: 'Valvola' },
       NAPlug: { icon: '🔌', label: 'Relè' },
@@ -31,7 +61,7 @@ export default function RoomCard({ room, onRefresh }) {
   }
 
   // Temperature color coding with dark mode
-  function getTempColor(temp, setpoint) {
+  function getTempColor(temp?: number, setpoint?: number): string {
     if (!temp || !setpoint) return 'text-slate-400 [html:not(.dark)_&]:text-slate-600';
     const diff = temp - setpoint;
     if (diff >= 0.5) return 'text-sage-400 [html:not(.dark)_&]:text-sage-600';
@@ -40,20 +70,20 @@ export default function RoomCard({ room, onRefresh }) {
   }
 
   // Mode badge config with dark mode colors
-  function getModeBadge(mode) {
-    const badges = {
+  function getModeBadge(mode?: string): { text: string; color: string; icon: string } {
+    const badges: Record<string, { text: string; color: string; icon: string }> = {
       manual: { text: 'Manuale', color: 'flame', icon: '✋' },
       home: { text: 'Casa', color: 'sage', icon: '🏠' },
       max: { text: 'Max', color: 'warning', icon: '🔥' },
       off: { text: 'Off', color: 'slate', icon: '⏸️' },
       schedule: { text: 'Programmato', color: 'ocean', icon: '⏰' },
     };
-    return badges[mode] || badges.schedule;
+    return badges[mode || 'schedule'] || badges.schedule;
   }
 
   // Room type display info
-  function getRoomTypeInfo(type) {
-    const types = {
+  function getRoomTypeInfo(type?: string): { icon: string; label: string } {
+    const types: Record<string, { icon: string; label: string }> = {
       livingroom: { icon: '🛋️', label: 'Soggiorno' },
       bedroom: { icon: '🛏️', label: 'Camera' },
       kitchen: { icon: '🍳', label: 'Cucina' },
@@ -62,10 +92,10 @@ export default function RoomCard({ room, onRefresh }) {
       corridor: { icon: '🚪', label: 'Corridoio' },
       custom: { icon: '🏠', label: 'Personalizzata' },
     };
-    return types[type] || { icon: '🏠', label: 'Stanza' };
+    return types[type || 'custom'] || { icon: '🏠', label: 'Stanza' };
   }
 
-  async function setTemperature(temp) {
+  async function setTemperature(temp: number) {
     try {
       setLoading(true);
       setError(null);
@@ -89,7 +119,7 @@ export default function RoomCard({ room, onRefresh }) {
       setEditingTemp(false);
       if (onRefresh) await onRefresh();
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Errore sconosciuto');
     } finally {
       setLoading(false);
     }
@@ -117,7 +147,7 @@ export default function RoomCard({ room, onRefresh }) {
 
       if (onRefresh) await onRefresh();
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Errore sconosciuto');
     } finally {
       setLoading(false);
     }
@@ -145,7 +175,7 @@ export default function RoomCard({ room, onRefresh }) {
 
       if (onRefresh) await onRefresh();
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Errore sconosciuto');
     } finally {
       setLoading(false);
     }
@@ -155,7 +185,7 @@ export default function RoomCard({ room, onRefresh }) {
   const roomInfo = getRoomTypeInfo(room.type);
 
   // Badge color classes with dark mode
-  const badgeColors = {
+  const badgeColors: Record<string, string> = {
     ocean: 'bg-ocean-900/40 [html:not(.dark)_&]:bg-ocean-100 text-ocean-300 [html:not(.dark)_&]:text-ocean-700 border-ocean-700 [html:not(.dark)_&]:border-ocean-200',
     flame: 'bg-flame-900/40 [html:not(.dark)_&]:bg-flame-100 text-flame-300 [html:not(.dark)_&]:text-flame-700 border-flame-700 [html:not(.dark)_&]:border-flame-200',
     sage: 'bg-sage-900/40 [html:not(.dark)_&]:bg-sage-100 text-sage-300 [html:not(.dark)_&]:text-sage-700 border-sage-700 [html:not(.dark)_&]:border-sage-200',

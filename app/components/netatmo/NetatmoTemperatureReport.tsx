@@ -5,13 +5,29 @@ import { useRouter } from 'next/navigation';
 import { Card, Button, Heading, Text } from '@/app/components/ui';
 import { NETATMO_ROUTES } from '@/lib/routes';
 
+interface RoomData {
+  room_id: string;
+  room_name: string;
+  room_type: string;
+  temperature?: number;
+  setpoint?: number;
+  heating?: boolean;
+  deviceType: 'thermostat' | 'valve' | 'unknown';
+  modules?: Array<{
+    id: string;
+    type: string;
+    [key: string]: unknown;
+  }>;
+  [key: string]: unknown;
+}
+
 export default function NetatmoTemperatureReport() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [connected, setConnected] = useState(false);
-  const [rooms, setRooms] = useState([]);
-  const [error, setError] = useState(null);
-  const [lastUpdate, setLastUpdate] = useState(null);
+  const [rooms, setRooms] = useState<RoomData[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdate, setLastUpdate] = useState<number | null>(null);
 
   // Flag per prevenire double fetch in React Strict Mode
   const pollingStartedRef = useRef(false);
@@ -34,27 +50,27 @@ export default function NetatmoTemperatureReport() {
       const topologyData = await topologyResponse.json();
 
       // Enrich rooms with module information
-      const enrichedRooms = (data.rooms || []).map(room => {
-        const topologyRoom = topologyData.rooms?.find(r => r.id === room.room_id);
-        const modules = topologyData.modules?.filter(m =>
+      const enrichedRooms = (data.rooms || []).map((room: any) => {
+        const topologyRoom = topologyData.rooms?.find((r: any) => r.id === room.room_id);
+        const modules = topologyData.modules?.filter((m: any) =>
           topologyRoom?.modules?.includes(m.id)
         ) || [];
 
         // Filter out relay modules (NAPlug) and cameras (NACamera, NOC)
-        const filteredModules = modules.filter(m =>
+        const filteredModules = modules.filter((m: any) =>
           m.type !== 'NAPlug' && m.type !== 'NACamera' && m.type !== 'NOC'
         );
 
         // Determine device type priority
-        const hasThermostat = filteredModules.some(m => m.type === 'NATherm1' || m.type === 'OTH');
-        const hasValve = filteredModules.some(m => m.type === 'NRV');
+        const hasThermostat = filteredModules.some((m: any) => m.type === 'NATherm1' || m.type === 'OTH');
+        const hasValve = filteredModules.some((m: any) => m.type === 'NRV');
 
         return {
           ...room,
           modules: filteredModules,
           deviceType: hasThermostat ? 'thermostat' : hasValve ? 'valve' : 'unknown',
         };
-      }).filter(room => {
+      }).filter((room: RoomData) => {
         // Only include rooms with thermostat or valve devices
         return room.deviceType === 'thermostat' || room.deviceType === 'valve';
       });
@@ -87,8 +103,8 @@ export default function NetatmoTemperatureReport() {
   }, []);
 
   // Get room type icon
-  const getRoomIcon = (roomType) => {
-    const icons = {
+  const getRoomIcon = (roomType: string): string => {
+    const icons: Record<string, string> = {
       livingroom: '🛋️',
       bedroom: '🛏️',
       kitchen: '🍳',
@@ -100,7 +116,7 @@ export default function NetatmoTemperatureReport() {
   };
 
   // Get temperature color
-  const getTempColor = (temp, setpoint) => {
+  const getTempColor = (temp?: number, setpoint?: number): string => {
     if (!temp || !setpoint) return 'text-slate-400 [html:not(.dark)_&]:text-slate-600';
     const diff = temp - setpoint;
     if (diff >= 0.5) return 'text-sage-400 [html:not(.dark)_&]:text-sage-600';

@@ -16,6 +16,7 @@ import { Card, Button, Banner, Skeleton, Heading, Text } from '@/app/components/
 import Toggle from '@/app/components/ui/Toggle';
 import { NETATMO_ROUTES } from '@/lib/routes';
 import { getPidConfig, setPidConfig, subscribeToPidConfig } from '@/lib/services/pidAutomationService';
+import { PIDController } from '@/lib/utils/pidController';
 
 /**
  * Room Selector Component
@@ -157,9 +158,94 @@ function ManualSetpointInput({ value, onChange, disabled }) {
 }
 
 /**
+ * Compute PID power preview for display purposes.
+ * Simulates a "cold start" (no accumulated integral/derivative)
+ * with dt=5 minutes (the scheduler cron interval).
+ */
+function computePidPreview(measured, setpoint, kp, ki, kd) {
+  if (measured == null || setpoint == null) return null;
+  const pid = new PIDController({ kp, ki, kd });
+  return pid.compute(setpoint, measured, 5);
+}
+
+/**
+ * Power level labels in Italian
+ */
+const POWER_LABELS = {
+  1: 'Minima',
+  2: 'Bassa',
+  3: 'Media',
+  4: 'Alta',
+  5: 'Massima',
+};
+
+/**
+ * Color class for each power level
+ */
+const POWER_COLORS = {
+  1: 'text-blue-400 [html:not(.dark)_&]:text-blue-600',
+  2: 'text-cyan-400 [html:not(.dark)_&]:text-cyan-600',
+  3: 'text-yellow-400 [html:not(.dark)_&]:text-yellow-600',
+  4: 'text-orange-400 [html:not(.dark)_&]:text-orange-600',
+  5: 'text-red-400 [html:not(.dark)_&]:text-red-600',
+};
+
+/**
+ * Background color class for power level indicator
+ */
+const POWER_BG_COLORS = {
+  1: 'bg-blue-500/20 border-blue-500/30',
+  2: 'bg-cyan-500/20 border-cyan-500/30',
+  3: 'bg-yellow-500/20 border-yellow-500/30',
+  4: 'bg-orange-500/20 border-orange-500/30',
+  5: 'bg-red-500/20 border-red-500/30',
+};
+
+/**
+ * PID Power Preview Component
+ */
+function PidPowerPreview({ powerLevel }) {
+  if (powerLevel == null) return null;
+
+  return (
+    <div className={`mt-4 p-4 rounded-xl border ${POWER_BG_COLORS[powerLevel]}`}>
+      <Text variant="secondary" size="sm" className="mb-2">
+        Potenza boost calcolata dal PID
+      </Text>
+      <div className="flex items-center gap-3">
+        {/* Power level bars */}
+        <div className="flex gap-1">
+          {[1, 2, 3, 4, 5].map((level) => (
+            <div
+              key={level}
+              className={`w-4 rounded-sm transition-all ${
+                level <= powerLevel
+                  ? 'bg-ember-500 [html:not(.dark)_&]:bg-ember-600'
+                  : 'bg-slate-700/50 [html:not(.dark)_&]:bg-slate-300/50'
+              }`}
+              style={{ height: `${8 + level * 4}px` }}
+            />
+          ))}
+        </div>
+        {/* Power value */}
+        <Text weight="bold" className={`text-3xl ${POWER_COLORS[powerLevel]}`}>
+          {powerLevel}
+        </Text>
+        <Text variant="secondary" size="sm">
+          / 5 &mdash; {POWER_LABELS[powerLevel]}
+        </Text>
+      </div>
+      <Text variant="tertiary" size="xs" className="mt-2">
+        Anteprima: potenza che il PID imposterebbe alla prima iterazione (dt=5min, senza storico)
+      </Text>
+    </div>
+  );
+}
+
+/**
  * Temperature Display Component
  */
-function TemperatureDisplay({ room, manualSetpoint }) {
+function TemperatureDisplay({ room, manualSetpoint, kp, ki, kd }) {
   if (!room) {
     return (
       <div className="p-4 rounded-xl bg-white/[0.04] [html:not(.dark)_&]:bg-white/[0.06] backdrop-blur-sm border border-white/10">
@@ -172,6 +258,9 @@ function TemperatureDisplay({ room, manualSetpoint }) {
 
   // Use manual setpoint for calculations
   const targetSetpoint = manualSetpoint;
+
+  // Compute PID power preview
+  const previewPower = computePidPreview(room.temperature, targetSetpoint, kp, ki, kd);
 
   return (
     <div className="p-4 rounded-xl bg-white/[0.04] [html:not(.dark)_&]:bg-white/[0.06] backdrop-blur-sm border border-white/10">
@@ -208,6 +297,8 @@ function TemperatureDisplay({ room, manualSetpoint }) {
           </Text>
         </div>
       )}
+      {/* PID Power Preview */}
+      <PidPowerPreview powerLevel={previewPower} />
     </div>
   );
 }
@@ -543,7 +634,7 @@ export default function PidAutomationPanel() {
 
           {/* Temperature Display */}
           <div className="mb-6">
-            <TemperatureDisplay room={selectedRoom} manualSetpoint={manualSetpoint} />
+            <TemperatureDisplay room={selectedRoom} manualSetpoint={manualSetpoint} kp={kp} ki={ki} kd={kd} />
           </div>
 
           {/* Advanced Settings */}

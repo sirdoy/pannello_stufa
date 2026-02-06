@@ -3,31 +3,72 @@
  * Helper functions for device management and navigation
  */
 
+import type { DeviceConfig, DeviceTypeId, DeviceColor } from './deviceTypes';
 import { DEVICE_TYPES, DEVICE_CONFIG, DEVICE_COLORS, GLOBAL_SECTIONS, SETTINGS_MENU } from './deviceTypes';
+
+/** Navigation item */
+interface NavItem {
+  label: string;
+  route: string;
+  icon?: string;
+}
+
+/** Device navigation structure */
+interface DeviceNav {
+  id: DeviceTypeId;
+  name: string;
+  icon: string;
+  color: DeviceColor;
+  items: NavItem[];
+}
+
+/** Settings menu item with optional submenu */
+interface SettingsMenuItemOutput {
+  id: string;
+  label: string;
+  route: string;
+  icon: string;
+  description: string;
+  submenu?: SettingsMenuItemOutput[];
+}
+
+/** Complete navigation structure */
+interface NavigationStructure {
+  devices: DeviceNav[];
+  global: NavItem[];
+  settings: SettingsMenuItemOutput[];
+}
+
+/** Device badge configuration */
+interface DeviceBadge {
+  text: string;
+  variant: 'success' | 'danger' | 'warning' | 'neutral';
+  pulse: boolean;
+}
 
 /**
  * Get all enabled devices
- * @returns {Array} Array of enabled device configs
+ * @returns Array of enabled device configs
  */
-export function getEnabledDevices() {
+export function getEnabledDevices(): DeviceConfig[] {
   return Object.values(DEVICE_CONFIG).filter(device => device.enabled);
 }
 
 /**
  * Get device configuration by ID
- * @param {string} deviceId - Device ID (from DEVICE_TYPES)
- * @returns {object|null} Device config or null if not found
+ * @param deviceId - Device ID (from DEVICE_TYPES)
+ * @returns Device config or null if not found
  */
-export function getDeviceConfig(deviceId) {
-  return DEVICE_CONFIG[deviceId] || null;
+export function getDeviceConfig(deviceId: string): DeviceConfig | null {
+  return DEVICE_CONFIG[deviceId as DeviceTypeId] || null;
 }
 
 /**
  * Get device color classes
- * @param {string} deviceId - Device ID
- * @returns {object} Tailwind color classes object
+ * @param deviceId - Device ID
+ * @returns Tailwind color classes object
  */
-export function getDeviceColors(deviceId) {
+export function getDeviceColors(deviceId: string): { bg: string; text: string; border: string; hover: string; badge: string } {
   const device = getDeviceConfig(deviceId);
   if (!device) return DEVICE_COLORS.primary; // Default fallback
   return DEVICE_COLORS[device.color] || DEVICE_COLORS.primary;
@@ -35,21 +76,21 @@ export function getDeviceColors(deviceId) {
 
 /**
  * Check if device has specific feature
- * @param {string} deviceId - Device ID
- * @param {string} feature - Feature name (hasScheduler, hasMaintenance, hasErrors)
- * @returns {boolean}
+ * @param deviceId - Device ID
+ * @param feature - Feature name (hasScheduler, hasMaintenance, hasErrors)
+ * @returns Boolean indicating feature presence
  */
-export function deviceHasFeature(deviceId, feature) {
+export function deviceHasFeature(deviceId: string, feature: string): boolean {
   const device = getDeviceConfig(deviceId);
-  return device?.features?.[feature] || false;
+  return device?.features?.[feature as keyof DeviceConfig['features']] || false;
 }
 
 /**
  * Get device navigation items (routes)
- * @param {string} deviceId - Device ID
- * @returns {Array} Array of navigation items with { label, route }
+ * @param deviceId - Device ID
+ * @returns Array of navigation items with { label, route }
  */
-export function getDeviceNavItems(deviceId) {
+export function getDeviceNavItems(deviceId: string): NavItem[] {
   const device = getDeviceConfig(deviceId);
   if (!device) return [];
 
@@ -92,9 +133,9 @@ export function getDeviceNavItems(deviceId) {
 
 /**
  * Get global navigation sections (Log, Changelog, etc.)
- * @returns {Array} Array of global nav items
+ * @returns Array of global nav items
  */
-export function getGlobalNavItems() {
+export function getGlobalNavItems(): NavItem[] {
   return Object.values(GLOBAL_SECTIONS).map(section => ({
     label: section.name,
     route: section.route,
@@ -104,11 +145,11 @@ export function getGlobalNavItems() {
 
 /**
  * Get settings menu items
- * @returns {Array} Array of settings menu items (with optional submenu)
+ * @returns Array of settings menu items (with optional submenu)
  */
-export function getSettingsMenuItems() {
+export function getSettingsMenuItems(): SettingsMenuItemOutput[] {
   return Object.values(SETTINGS_MENU).map(item => {
-    const menuItem = {
+    const menuItem: SettingsMenuItemOutput = {
       id: item.id,
       label: item.name,
       route: item.route,
@@ -133,9 +174,9 @@ export function getSettingsMenuItems() {
 
 /**
  * Build complete navigation structure for navbar
- * @returns {object} Navigation structure { devices: [...], global: [...], settings: [...] }
+ * @returns Navigation structure { devices: [...], global: [...], settings: [...] }
  */
-export function getNavigationStructure() {
+export function getNavigationStructure(): NavigationStructure {
   const devices = getEnabledDevices().map(device => ({
     id: device.id,
     name: device.name,
@@ -152,10 +193,10 @@ export function getNavigationStructure() {
 
 /**
  * Build complete navigation structure for navbar with user preferences
- * @param {object} preferences - User device preferences { deviceId: boolean }
- * @returns {object} Navigation structure { devices: [...], global: [...], settings: [...] }
+ * @param preferences - User device preferences { deviceId: boolean }
+ * @returns Navigation structure { devices: [...], global: [...], settings: [...] }
  */
-export function getNavigationStructureWithPreferences(preferences) {
+export function getNavigationStructureWithPreferences(preferences: Record<string, boolean>): NavigationStructure {
   // Filter devices based on user preferences
   const enabledDevices = Object.values(DEVICE_CONFIG).filter(device => {
     return preferences[device.id] === true;
@@ -177,11 +218,11 @@ export function getNavigationStructureWithPreferences(preferences) {
 
 /**
  * Check if a route belongs to a specific device
- * @param {string} pathname - Current route pathname
- * @param {string} deviceId - Device ID to check
- * @returns {boolean}
+ * @param pathname - Current route pathname
+ * @param deviceId - Device ID to check
+ * @returns Boolean indicating if route belongs to device
  */
-export function isDeviceRoute(pathname, deviceId) {
+export function isDeviceRoute(pathname: string, deviceId: string): boolean {
   const device = getDeviceConfig(deviceId);
   if (!device) return false;
 
@@ -192,10 +233,10 @@ export function isDeviceRoute(pathname, deviceId) {
 
 /**
  * Get active device from current pathname
- * @param {string} pathname - Current route pathname
- * @returns {string|null} Active device ID or null
+ * @param pathname - Current route pathname
+ * @returns Active device ID or null
  */
-export function getActiveDevice(pathname) {
+export function getActiveDevice(pathname: string): string | null {
   const devices = getEnabledDevices();
   for (const device of devices) {
     if (isDeviceRoute(pathname, device.id)) {
@@ -207,11 +248,11 @@ export function getActiveDevice(pathname) {
 
 /**
  * Get device badge display (for homepage cards)
- * @param {string} deviceId - Device ID
- * @param {object} status - Device status object
- * @returns {object|null} Badge config { text, variant, pulse } or null
+ * @param deviceId - Device ID
+ * @param status - Device status object
+ * @returns Badge config { text, variant, pulse } or null
  */
-export function getDeviceBadge(deviceId, status) {
+export function getDeviceBadge(deviceId: string, status?: Record<string, unknown>): DeviceBadge | null {
   // Device-specific badge logic
   switch (deviceId) {
     case DEVICE_TYPES.STOVE:

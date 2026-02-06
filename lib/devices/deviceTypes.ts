@@ -3,6 +3,12 @@
  * Centralized device registry for the Smart Home Hub
  */
 
+/** Device type union */
+export type DeviceTypeId = 'stove' | 'thermostat' | 'camera' | 'lights' | 'sonos';
+
+/** Color palette type */
+export type DeviceColor = 'primary' | 'info' | 'ocean' | 'warning' | 'success';
+
 /**
  * Device type constants
  */
@@ -12,13 +18,22 @@ export const DEVICE_TYPES = {
   CAMERA: 'camera',
   LIGHTS: 'lights',
   SONOS: 'sonos',
-};
+} as const;
+
+/** Display item configuration */
+interface DisplayItem {
+  id: string;
+  name: string;
+  icon: string;
+  color: DeviceColor;
+  type: 'display';
+}
 
 /**
  * Display-only items (no routes, no navbar entry)
  * These appear only in dashboard cards, not in navigation
  */
-export const DISPLAY_ITEMS = {
+export const DISPLAY_ITEMS: Record<string, DisplayItem> = {
   weather: {
     id: 'weather',
     name: 'Meteo',
@@ -28,11 +43,39 @@ export const DISPLAY_ITEMS = {
   },
 };
 
+/** Device feature configuration */
+interface DeviceFeatures {
+  hasScheduler?: boolean;
+  hasMaintenance?: boolean;
+  hasErrors?: boolean;
+  hasSnapshot?: boolean;
+  hasEvents?: boolean;
+  hasColors?: boolean;
+  hasBrightness?: boolean;
+  hasScenes?: boolean;
+  hasRooms?: boolean;
+  hasSpotify?: boolean;
+  hasPlayback?: boolean;
+  hasZones?: boolean;
+  hasSearch?: boolean;
+}
+
+/** Device configuration */
+export interface DeviceConfig {
+  id: DeviceTypeId;
+  name: string;
+  icon: string;
+  color: DeviceColor;
+  enabled: boolean;
+  routes: Record<string, string>;
+  features: DeviceFeatures;
+}
+
 /**
  * Device configuration registry
  * Each device has: id, name, icon, color (Tailwind palette), routes, enabled flag
  */
-export const DEVICE_CONFIG = {
+export const DEVICE_CONFIG: Record<DeviceTypeId, DeviceConfig> = {
   [DEVICE_TYPES.STOVE]: {
     id: 'stove',
     name: 'Stufa',
@@ -133,7 +176,7 @@ export const DEVICE_CONFIG = {
  * Unified registry combining hardware devices and display items
  * Used for dashboard cards configuration
  */
-export const ALL_DASHBOARD_ITEMS = {
+export const ALL_DASHBOARD_ITEMS: Record<string, DeviceConfig | DisplayItem> = {
   ...DEVICE_CONFIG,
   ...DISPLAY_ITEMS,
 };
@@ -142,12 +185,21 @@ export const ALL_DASHBOARD_ITEMS = {
  * Default order for dashboard items (new users)
  * Defines initial order and visibility
  */
-export const DEFAULT_DEVICE_ORDER = ['stove', 'thermostat', 'weather', 'lights', 'camera', 'sonos'];
+export const DEFAULT_DEVICE_ORDER: string[] = ['stove', 'thermostat', 'weather', 'lights', 'camera', 'sonos'];
+
+/** Color class configuration */
+interface ColorClasses {
+  bg: string;
+  text: string;
+  border: string;
+  hover: string;
+  badge: string;
+}
 
 /**
  * Tailwind color mappings for device types
  */
-export const DEVICE_COLORS = {
+export const DEVICE_COLORS: Record<DeviceColor, ColorClasses> = {
   primary: {
     bg: 'bg-primary-50',
     text: 'text-primary-600',
@@ -185,11 +237,19 @@ export const DEVICE_COLORS = {
   },
 };
 
+/** Global section configuration */
+interface GlobalSection {
+  id: string;
+  name: string;
+  icon: string;
+  route: string;
+}
+
 /**
  * Global navigation sections
  * Rimosso LOG e CHANGELOG - ora sono nel dropdown Impostazioni
  */
-export const GLOBAL_SECTIONS = {
+export const GLOBAL_SECTIONS: Record<string, GlobalSection> = {
   MONITORING: {
     id: 'monitoring',
     name: 'Monitoring',
@@ -198,10 +258,20 @@ export const GLOBAL_SECTIONS = {
   },
 };
 
+/** Settings menu item configuration */
+interface SettingsMenuItem {
+  id: string;
+  name: string;
+  icon: string;
+  route: string;
+  description: string;
+  submenu?: SettingsMenuItem[];
+}
+
 /**
  * Settings menu items (for settings dropdown in navbar)
  */
-export const SETTINGS_MENU = {
+export const SETTINGS_MENU: Record<string, SettingsMenuItem> = {
   SETTINGS: {
     id: 'settings',
     name: 'Impostazioni',

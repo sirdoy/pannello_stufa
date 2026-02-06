@@ -98,6 +98,10 @@ export const coordinationPreferencesSchema = z.object({
   updatedAt: z.string().datetime().optional(),
 });
 
+/** Inferred TypeScript types from Zod schemas */
+export type ZoneConfig = z.infer<typeof zoneConfigSchema>;
+export type CoordinationPreferences = z.infer<typeof coordinationPreferencesSchema>;
+
 /**
  * Get default coordination preferences
  *
@@ -107,9 +111,9 @@ export const coordinationPreferencesSchema = z.object({
  * - No zones configured (user must configure)
  * - Notification defaults: coordinationApplied + automationPaused + maxSetpointReached
  *
- * @returns {Object} Default preferences object
+ * @returns Default preferences object
  */
-export function getDefaultCoordinationPreferences() {
+export function getDefaultCoordinationPreferences(): CoordinationPreferences {
   return coordinationPreferencesSchema.parse({
     enabled: true,
     defaultBoost: 2,

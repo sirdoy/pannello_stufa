@@ -153,12 +153,10 @@ export const notificationPreferencesSchema = z.object({
   updatedAt: z.string().datetime().optional(),
 });
 
-/**
- * TypeScript Type Inference
- * Automatically inferred from Zod schema.
- * Use: `import type { NotificationPreferences } from '@/lib/schemas/notificationPreferences';`
- */
-// Note: For TypeScript projects, add: export type NotificationPreferences = z.infer<typeof notificationPreferencesSchema>;
+/** Inferred TypeScript types from Zod schemas */
+export type DNDWindow = z.infer<typeof dndWindowSchema>;
+export type RateLimit = z.infer<typeof rateLimitSchema>;
+export type NotificationPreferences = z.infer<typeof notificationPreferencesSchema>;
 
 /**
  * Get Default Notification Preferences
@@ -169,9 +167,9 @@ export const notificationPreferencesSchema = z.object({
  * - No DND windows by default
  * - Timezone auto-detected from browser
  *
- * @returns {Object} Default preferences object
+ * @returns Default preferences object
  */
-export function getDefaultPreferences() {
+export function getDefaultPreferences(): NotificationPreferences {
   // Auto-detect timezone using browser Intl API
   const timezone = typeof Intl !== 'undefined'
     ? Intl.DateTimeFormat().resolvedOptions().timeZone

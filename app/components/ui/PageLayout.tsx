@@ -1,6 +1,8 @@
 'use client';
 
+import type React from 'react';
 import { forwardRef } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 import Heading from './Heading';
@@ -42,12 +44,23 @@ const pageLayoutVariants = cva(
   }
 );
 
+export interface PageHeaderProps extends React.HTMLAttributes<HTMLElement> {
+  /** Page title */
+  title?: string;
+  /** Page description */
+  description?: string;
+  /** Action buttons */
+  actions?: React.ReactNode;
+  /** Custom children (overrides structured content) */
+  children?: React.ReactNode;
+}
+
 /**
  * PageHeader Component - Header slot for PageLayout
  *
  * Renders title, description, and optional actions.
  */
-const PageHeader = forwardRef(function PageHeader(
+const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(function PageHeader(
   {
     title,
     description,
@@ -100,12 +113,17 @@ const PageHeader = forwardRef(function PageHeader(
   );
 });
 
+export interface PageContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Content */
+  children?: React.ReactNode;
+}
+
 /**
  * PageContent Component - Content slot for PageLayout
  *
  * Main content area with flexible growth.
  */
-const PageContent = forwardRef(function PageContent(
+const PageContent = forwardRef<HTMLDivElement, PageContentProps>(function PageContent(
   { className, children, ...props },
   ref
 ) {
@@ -121,12 +139,17 @@ const PageContent = forwardRef(function PageContent(
   );
 });
 
+export interface PageFooterProps extends React.HTMLAttributes<HTMLElement> {
+  /** Footer content */
+  children?: React.ReactNode;
+}
+
 /**
  * PageFooter Component - Footer slot for PageLayout
  *
  * Optional footer with consistent styling.
  */
-const PageFooter = forwardRef(function PageFooter(
+const PageFooter = forwardRef<HTMLElement, PageFooterProps>(function PageFooter(
   { className, children, ...props },
   ref
 ) {
@@ -144,20 +167,24 @@ const PageFooter = forwardRef(function PageFooter(
   );
 });
 
+export interface PageLayoutProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof pageLayoutVariants> {
+  /** Header slot (typically PageHeader) */
+  header?: React.ReactNode;
+  /** Footer slot (optional, typically PageFooter) */
+  footer?: React.ReactNode;
+  /** Center content horizontally */
+  centered?: boolean;
+  /** Page content */
+  children?: React.ReactNode;
+}
+
 /**
  * PageLayout Component - Ember Noir Design System
  *
  * Consistent page structure with header, content, and footer slots.
  * Provides responsive max-width and padding configurations.
- *
- * @param {Object} props - Component props
- * @param {ReactNode} props.header - Header slot (typically PageHeader)
- * @param {ReactNode} props.footer - Footer slot (optional, typically PageFooter)
- * @param {'sm'|'md'|'lg'|'xl'|'2xl'|'full'} props.maxWidth - Maximum content width
- * @param {'none'|'sm'|'md'|'lg'} props.padding - Horizontal padding
- * @param {boolean} props.centered - Center content horizontally
- * @param {ReactNode} props.children - Page content
- * @param {string} props.className - Additional classes
  *
  * @example
  * <PageLayout
@@ -173,7 +200,7 @@ const PageFooter = forwardRef(function PageFooter(
  *   <main content />
  * </PageLayout>
  */
-const PageLayout = forwardRef(function PageLayout(
+const PageLayout = forwardRef<HTMLDivElement, PageLayoutProps>(function PageLayout(
   {
     header,
     footer,
@@ -203,10 +230,17 @@ const PageLayout = forwardRef(function PageLayout(
   );
 });
 
+// Type the PageLayout namespace with sub-components
+type PageLayoutComponent = typeof PageLayout & {
+  Header: typeof PageHeader;
+  Content: typeof PageContent;
+  Footer: typeof PageFooter;
+};
+
 // Attach sub-components for namespace pattern
-PageLayout.Header = PageHeader;
-PageLayout.Content = PageContent;
-PageLayout.Footer = PageFooter;
+(PageLayout as PageLayoutComponent).Header = PageHeader;
+(PageLayout as PageLayoutComponent).Content = PageContent;
+(PageLayout as PageLayoutComponent).Footer = PageFooter;
 
 export { PageLayout, pageLayoutVariants, PageHeader, PageContent, PageFooter };
-export default PageLayout;
+export default PageLayout as PageLayoutComponent;

@@ -88,18 +88,18 @@ Deferred to v5.1 or later — post-migration type improvements:
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SETUP-01 | Phase 37 | Pending |
-| SETUP-02 | Phase 37 | Pending |
-| SETUP-03 | Phase 37 | Pending |
-| SETUP-04 | Phase 37 | Pending |
-| TYPE-01 | Phase 37 | Pending |
-| TYPE-02 | Phase 37 | Pending |
-| TYPE-03 | Phase 37 | Pending |
-| TYPE-04 | Phase 37 | Pending |
-| LIB-01 | Phase 38 | Pending |
-| LIB-02 | Phase 38 | Pending |
-| LIB-03 | Phase 38 | Pending |
-| LIB-04 | Phase 38 | Pending |
+| SETUP-01 | Phase 37 | Complete |
+| SETUP-02 | Phase 37 | Complete |
+| SETUP-03 | Phase 37 | Complete |
+| SETUP-04 | Phase 37 | Complete |
+| TYPE-01 | Phase 37 | Complete |
+| TYPE-02 | Phase 37 | Complete |
+| TYPE-03 | Phase 37 | Complete |
+| TYPE-04 | Phase 37 | Complete |
+| LIB-01 | Phase 38 | Complete |
+| LIB-02 | Phase 38 | Complete |
+| LIB-03 | Phase 38 | Complete |
+| LIB-04 | Phase 38 | Gaps (252 tsc errors) |
 | COMP-01 | Phase 39 | Pending |
 | COMP-02 | Phase 39 | Pending |
 | COMP-03 | Phase 39 | Pending |

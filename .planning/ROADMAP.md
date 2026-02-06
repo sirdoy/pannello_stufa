@@ -58,15 +58,15 @@ Plans:
 **Plans:** 9 plans
 
 Plans:
-- [ ] 38-01-PLAN.md — Leaf utilities (utils/, formatUtils, version, routes, fingerprint, env, geo, theme)
-- [ ] 38-02-PLAN.md — PWA utilities (lib/pwa/ — 10 browser API wrappers)
-- [ ] 38-03-PLAN.md — Core infrastructure (core/ API layer, Firebase, logger, auth, rate limiter)
-- [ ] 38-04-PLAN.md — Repositories, schemas, validators, device registry
-- [ ] 38-05-PLAN.md — External API clients (Thermorossi stove, Netatmo, OpenMeteo)
-- [ ] 38-06-PLAN.md — Philips Hue API client and notification system
-- [ ] 38-07-PLAN.md — Coordination system, health monitoring, high-level services
-- [ ] 38-08-PLAN.md — Remaining services (maintenance, scheduler, weather, dashboard, commands)
-- [ ] 38-09-PLAN.md — React hooks (lib/hooks/ + app/hooks/)
+- [x] 38-01-PLAN.md — Leaf utilities (utils/, formatUtils, version, routes, fingerprint, env, geo, theme)
+- [x] 38-02-PLAN.md — PWA utilities (lib/pwa/ — 10 browser API wrappers)
+- [x] 38-03-PLAN.md — Core infrastructure (core/ API layer, Firebase, logger, auth, rate limiter)
+- [x] 38-04-PLAN.md — Repositories, schemas, validators, device registry
+- [x] 38-05-PLAN.md — External API clients (Thermorossi stove, Netatmo, OpenMeteo)
+- [x] 38-06-PLAN.md — Philips Hue API client and notification system
+- [x] 38-07-PLAN.md — Coordination system, health monitoring, high-level services
+- [x] 38-08-PLAN.md — Remaining services (maintenance, scheduler, weather, dashboard, commands)
+- [x] 38-09-PLAN.md — React hooks (lib/hooks/ + app/hooks/)
 
 **Requirements covered:**
 - LIB-01: Tutti i file lib/ convertiti a .ts (116 file)
@@ -199,7 +199,7 @@ Plans:
 | Phase | Status | Plans | Completion |
 |-------|--------|-------|------------|
 | 37 - TypeScript Foundation | ✓ Complete | 3/3 | 100% |
-| 38 - Library Migration | Planned | 0/9 | 0% |
+| 38 - Library Migration | ⚠ Gaps Found | 9/9 | 90% |
 | 39 - UI Components Migration | Pending | 0/? | 0% |
 | 40 - API Routes Migration | Pending | 0/? | 0% |
 | 41 - Pages Migration | Pending | 0/? | 0% |

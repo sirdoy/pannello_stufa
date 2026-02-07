@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 40 - API Routes Migration
-Plan: 2 of 8 (COMPLETE)
-Status: In progress — Completed 40-02-PLAN.md (Netatmo API Routes - 16 files migrated)
-Last activity: 2026-02-07 — Completed 40-02-PLAN.md (Netatmo API Routes Migration)
+Plan: 7 of 8 (COMPLETE)
+Status: In progress — Completed 40-07-PLAN.md (Gap Closure - TypeScript errors resolved)
+Last activity: 2026-02-07 — Completed 40-07-PLAN.md (API Routes Gap Closure)
 
-Progress: [████████░░░░░░░░░░░░░░░░] 44% (3/7 phases complete, Phase 40: 2/8 plans complete)
+Progress: [████████░░░░░░░░░░░░░░░░] 46% (3/7 phases complete, Phase 40: 7/8 plans complete)
 
 ## Milestone Overview
 
@@ -28,7 +28,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 | 37 | TypeScript Foundation | 8 | COMPLETE (8/8) |
 | 38 | Library Migration | 4 | COMPLETE (4/4) |
 | 39 | UI Components Migration | 3 | COMPLETE (11/11 plans, 137/137 files migrated, 0 tsc errors) |
-| 40 | API Routes Migration | 3 | In progress (6/8 plans complete) |
+| 40 | API Routes Migration | 3 | In progress (7/8 plans complete) |
 | 41 | Pages Migration | 3 | Pending |
 | 42 | Test Migration | 4 | Pending |
 | 43 | Verification | 4 | Pending |
@@ -36,7 +36,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 177 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 25)
+- Total plans completed: 178 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 26)
 - Average duration: ~6.0 min per plan
 - Total execution time: ~17.9 hours across 7 milestones
 
@@ -50,7 +50,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
 | v3.2 Weather & Dashboard | 5 | 13 | 2 days (2026-02-02 - 2026-02-03) |
 | v4.0 Advanced UI | 7 | 24 | 2 days (2026-02-04 - 2026-02-05) |
-| v5.0 TypeScript Migration | 7 | 25 plans (Phases 37-39 complete, Phase 40: 2/8) | In progress |
+| v5.0 TypeScript Migration | 7 | 26 plans (Phases 37-39 complete, Phase 40: 7/8) | In progress |
 
 ## Accumulated Context
 
@@ -91,6 +91,14 @@ Key patterns from previous milestones preserved for v5.0 migration:
 - Date arithmetic: Always use .getTime() for Date subtraction in TypeScript strict mode
 - Dynamic route params: Next.js 15 requires Promise<{ paramName: string }> for context.params
 
+**Phase 40-07 decisions (gap closure):**
+- ErrorCode synchronization: Add new codes to ERROR_CODES constant, ERROR_MESSAGES map, AND ErrorCode type
+- Pragmatic any for Hue API responses: External library complexity warrants type assertion over full generation
+- Pragmatic any for Open-Meteo responses: No official TypeScript types available for external API
+- Double assertion pattern: (value as unknown as TargetType) for incompatible type conversions
+- CoordinationEventType extensibility: Add coordination_error, coordination_debouncing for error logging
+- Test import failures documented for Phase 42: route.js → route.ts path changes expected
+
 ### Pending Todos
 
 **Operational Setup (from previous milestones, pending deployment):**
@@ -101,7 +109,10 @@ Key patterns from previous milestones preserved for v5.0 migration:
 
 ### Blockers/Concerns
 
-**None** - Phase 39 complete with zero tsc errors, all UI components migrated
+**Phase 42 Test Migration Prerequisites:**
+- 3 API route test files need import path updates (route.js → route.ts)
+- Files: app/api/netatmo/setthermmode/__tests__/route.test.js, app/api/netatmo/setroomthermpoint/__tests__/route.test.js, app/api/hue/discover/__tests__/route.test.js
+- Expected behavior, documented in 40-07-SUMMARY.md
 
 ### TypeScript Migration Patterns (v5.0)
 
@@ -195,9 +206,9 @@ From 39-01 (Foundation UI components):
 ## Session Continuity
 
 Last session: 2026-02-07
-Stopped at: Completed 40-02-PLAN.md (Netatmo API Routes - 16 files migrated)
+Stopped at: Completed 40-07-PLAN.md (Gap Closure - TypeScript errors resolved, 90/90 routes migrated)
 Resume file: None
-Next step: Continue Phase 40 with remaining plans (03-08)
+Next step: Continue Phase 40 with plan 08 (final verification)
 
 From 38-10 (Type definitions gap closure):
 - Type narrowing with 'in' operator for discriminated unions: if ('property' in object)
@@ -326,3 +337,11 @@ From 40-03 (Hue API Routes Migration):
 - Discriminated union parsing: (array as Type[]).find(item => item.success) for OAuth responses
 - Type-safe error handling: unknown type with instanceof Error type guards
 - git mv preserves history for all route migrations
+
+From 40-07 (API Routes Gap Closure):
+- ErrorCode synchronization: Add to ERROR_CODES constant, ERROR_MESSAGES map, AND ErrorCode type in types/api/errors.ts
+- Pragmatic any for external API responses: Hue v2 API, Open-Meteo (no official TS types)
+- Double assertion pattern: (value as unknown as TargetType) for incompatible conversions
+- Error function calls: error(message, ErrorCode, HttpStatus) not error(message, number)
+- Date arithmetic: Always use .getTime() for TypeScript strict mode compatibility
+- Gap closure pattern: Run tsc, categorize errors, fix systematically by type (80 errors → 0 in 12min)

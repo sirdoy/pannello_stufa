@@ -61,7 +61,7 @@ export default function ActionButton({
     warning: `
       bg-warning-500/15 text-warning-400 ring-warning-500/30
       hover:bg-warning-500/25 hover:ring-warning-500/50
-      [html:not(.dark)_&]:bg-warning-500/10 [html:not(.dark)_&]:text-warning-600 [html:not(.dark)_&]:ring-warning-500/25
+      [html:not(.dark)_&]:bg-warning-500/10 [html:not(.dark)_&]:text-warning-700 [html:not(.dark)_&]:ring-warning-500/25
       [html:not(.dark)_&]:hover:bg-warning-500/20
     `,
     danger: `

@@ -690,11 +690,11 @@ export default function StoveCard() {
       return {
         label: 'IN ATTESA',
         icon: '💤',
-        textColor: 'text-warning-400 [html:not(.dark)_&]:text-warning-600',
+        textColor: 'text-warning-400 [html:not(.dark)_&]:text-warning-700',
         bgColor: 'bg-gradient-to-br from-warning-900/30 via-slate-900/60 to-warning-800/20 [html:not(.dark)_&]:from-warning-100/80 [html:not(.dark)_&]:via-warning-50/90 [html:not(.dark)_&]:to-warning-100/70',
         borderColor: 'border-warning-500/40 [html:not(.dark)_&]:border-warning-300',
         boxBgColor: 'bg-warning-900/40 backdrop-blur-xl [html:not(.dark)_&]:bg-warning-100/80',
-        boxLabelColor: 'text-warning-300 [html:not(.dark)_&]:text-warning-600',
+        boxLabelColor: 'text-warning-300 [html:not(.dark)_&]:text-warning-700',
         boxValueColor: 'text-warning-100 [html:not(.dark)_&]:text-warning-700',
         boxSuffixColor: 'text-warning-400/70 [html:not(.dark)_&]:text-warning-500',
         glowColor: 'shadow-[0_0_20px_rgba(234,179,8,0.2)] [html:not(.dark)_&]:shadow-[0_0_15px_rgba(234,179,8,0.1)]',

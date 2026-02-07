@@ -217,7 +217,7 @@ export default function LogPage() {
               onClick={() => setDeviceFilter('lights')}
               className={deviceFilter === 'lights'
                 ? 'bg-warning-500/20 text-warning-300 [html:not(.dark)_&]:bg-warning-500/15 [html:not(.dark)_&]:text-warning-700'
-                : 'text-warning-400 [html:not(.dark)_&]:text-warning-600 hover:bg-warning-500/10'}
+                : 'text-warning-400 [html:not(.dark)_&]:text-warning-700 hover:bg-warning-500/10'}
             >
               Luci ({deviceCounts.lights})
             </Button>

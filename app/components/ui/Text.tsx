@@ -27,7 +27,7 @@ const textVariants = cva(
         ember: 'text-ember-400 [html:not(.dark)_&]:text-ember-600',
         ocean: 'text-ocean-400 [html:not(.dark)_&]:text-ocean-600',
         sage: 'text-sage-400 [html:not(.dark)_&]:text-sage-600',
-        warning: 'text-warning-400 [html:not(.dark)_&]:text-warning-600',
+        warning: 'text-warning-400 [html:not(.dark)_&]:text-warning-700',
         danger: 'text-danger-400 [html:not(.dark)_&]:text-danger-600',
         info: 'text-ocean-400 [html:not(.dark)_&]:text-ocean-600', // alias for ocean
         // Special variants

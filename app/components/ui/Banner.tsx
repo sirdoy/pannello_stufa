@@ -72,7 +72,7 @@ const textVariants = {
   warning: {
     title: 'text-warning-200 [html:not(.dark)_&]:text-warning-800',
     description: 'text-warning-300 [html:not(.dark)_&]:text-warning-700',
-    icon: 'text-warning-400 [html:not(.dark)_&]:text-warning-600',
+    icon: 'text-warning-400 [html:not(.dark)_&]:text-warning-700',
   },
   error: {
     title: 'text-danger-200 [html:not(.dark)_&]:text-danger-800',

@@ -941,7 +941,7 @@ export default function LightsCard() {
           />
           {isRoomOn && (
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800/50 border border-slate-700/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
-              <Sun className="w-4 h-4 text-warning-400 [html:not(.dark)_&]:text-warning-600" />
+              <Sun className="w-4 h-4 text-warning-400 [html:not(.dark)_&]:text-warning-700" />
               <Slider
                 value={localBrightness !== null ? localBrightness : avgBrightness}
                 onChange={(value) => setLocalBrightness(value)}
@@ -1104,7 +1104,7 @@ export default function LightsCard() {
                           <span className={`text-2xl sm:text-3xl font-black font-display ${
                             adaptive.brightnessValue
                               ? adaptive.brightnessValue
-                              : 'text-warning-400 [html:not(.dark)_&]:text-warning-600'
+                              : 'text-warning-400 [html:not(.dark)_&]:text-warning-700'
                           }`}>
                             {localBrightness !== null ? localBrightness : avgBrightness}%
                           </span>

@@ -223,7 +223,7 @@ export const DEVICE_COLORS: Record<DeviceColor, ColorClasses> = {
   },
   warning: {
     bg: 'bg-warning-50',
-    text: 'text-warning-600',
+    text: 'text-warning-700',
     border: 'border-warning-200',
     hover: 'hover:bg-warning-100',
     badge: 'bg-warning-500 text-white',

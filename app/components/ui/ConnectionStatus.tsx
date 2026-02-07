@@ -16,7 +16,7 @@ export const connectionStatusVariants = cva(
       status: {
         online: 'text-sage-400 [html:not(.dark)_&]:text-sage-600',
         offline: 'text-slate-400 [html:not(.dark)_&]:text-slate-600',
-        connecting: 'text-warning-400 [html:not(.dark)_&]:text-warning-600',
+        connecting: 'text-warning-400 [html:not(.dark)_&]:text-warning-700',
         unknown: 'text-slate-400/70 [html:not(.dark)_&]:text-slate-500',
       },
       size: {

@@ -66,7 +66,7 @@ export default function RoomCard({ room, onRefresh }: RoomCardProps) {
     const diff = temp - setpoint;
     if (diff >= 0.5) return 'text-sage-400 [html:not(.dark)_&]:text-sage-600';
     if (diff <= -1) return 'text-ember-400 [html:not(.dark)_&]:text-ember-600';
-    return 'text-warning-400 [html:not(.dark)_&]:text-warning-600';
+    return 'text-warning-400 [html:not(.dark)_&]:text-warning-700';
   }
 
   // Mode badge config with dark mode colors

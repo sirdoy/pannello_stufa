@@ -6,14 +6,19 @@ import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 import Badge from '@/app/components/ui/Badge';
 
-export default function WeatherTab({ autoRefresh, refreshTrigger }) {
-  const [getResponses, setGetResponses] = useState({});
-  const [loadingGet, setLoadingGet] = useState({});
-  const [timings, setTimings] = useState({});
-  const [copiedUrl, setCopiedUrl] = useState(null);
-  const [cacheStatus, setCacheStatus] = useState(null);
+interface WeatherTabProps {
+  autoRefresh: boolean;
+  refreshTrigger: number;
+}
 
-  const copyUrlToClipboard = async (url) => {
+export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabProps) {
+  const [getResponses, setGetResponses] = useState<Record<string, any>>({});
+  const [loadingGet, setLoadingGet] = useState<Record<string, boolean>>({});
+  const [timings, setTimings] = useState<Record<string, number>>({});
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+  const [cacheStatus, setCacheStatus] = useState<any>(null);
+
+  const copyUrlToClipboard = async (url: string) => {
     try {
       await navigator.clipboard.writeText(url);
       setCopiedUrl(url);
@@ -23,7 +28,7 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }) {
     }
   };
 
-  const fetchGetEndpoint = useCallback(async (name, url) => {
+  const fetchGetEndpoint = useCallback(async (name: string, url: string) => {
     setLoadingGet((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {

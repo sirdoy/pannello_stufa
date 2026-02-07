@@ -7,16 +7,21 @@ import { API_KEY } from '@/lib/stoveApi';
 
 const BASE_URL = 'https://wsthermorossi.cloudwinet.it/WiNetStove.svc/json';
 
-export default function StoveTab({ autoRefresh, refreshTrigger }) {
-  const [getResponses, setGetResponses] = useState({});
-  const [postResponses, setPostResponses] = useState({});
-  const [loadingGet, setLoadingGet] = useState({});
-  const [loadingPost, setLoadingPost] = useState({});
-  const [timings, setTimings] = useState({});
-  const [copiedUrl, setCopiedUrl] = useState(null);
+interface StoveTabProps {
+  autoRefresh: boolean;
+  refreshTrigger: number;
+}
+
+export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps) {
+  const [getResponses, setGetResponses] = useState<Record<string, any>>({});
+  const [postResponses, setPostResponses] = useState<Record<string, any>>({});
+  const [loadingGet, setLoadingGet] = useState<Record<string, boolean>>({});
+  const [loadingPost, setLoadingPost] = useState<Record<string, boolean>>({});
+  const [timings, setTimings] = useState<Record<string, number>>({});
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
   // External URL mapping
-  const getExternalUrl = (endpoint) => {
+  const getExternalUrl = (endpoint: string): string | undefined => {
     const mapping = {
       '/api/stove/status': `${BASE_URL}/GetStatus/${API_KEY}`,
       '/api/stove/getPower': `${BASE_URL}/GetPower/${API_KEY}`,
@@ -34,7 +39,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }) {
     return mapping[endpoint] || endpoint;
   };
 
-  const copyUrlToClipboard = async (endpoint) => {
+  const copyUrlToClipboard = async (endpoint: string) => {
     try {
       await navigator.clipboard.writeText(getExternalUrl(endpoint));
       setCopiedUrl(endpoint);
@@ -50,7 +55,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }) {
     return cleanData;
   };
 
-  const fetchGetEndpoint = useCallback(async (name, url) => {
+  const fetchGetEndpoint = useCallback(async (name: string, url: string) => {
     setLoadingGet((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {
@@ -76,7 +81,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }) {
     fetchGetEndpoint('waterSetTemp', '/api/stove/getWaterSetTemperature');
   }, [fetchGetEndpoint]);
 
-  const callPostEndpoint = async (name, url, body) => {
+  const callPostEndpoint = async (name: string, url: string, body: any) => {
     setLoadingPost((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {

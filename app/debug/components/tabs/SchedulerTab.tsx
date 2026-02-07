@@ -5,15 +5,20 @@ import { EndpointCard, PostEndpointCard } from '@/app/debug/components/ApiTab';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 
-export default function SchedulerTab({ autoRefresh, refreshTrigger }) {
-  const [getResponses, setGetResponses] = useState({});
-  const [postResponses, setPostResponses] = useState({});
-  const [loadingGet, setLoadingGet] = useState({});
-  const [loadingPost, setLoadingPost] = useState({});
-  const [timings, setTimings] = useState({});
-  const [copiedUrl, setCopiedUrl] = useState(null);
+interface SchedulerTabProps {
+  autoRefresh: boolean;
+  refreshTrigger: number;
+}
 
-  const copyUrlToClipboard = async (url) => {
+export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerTabProps) {
+  const [getResponses, setGetResponses] = useState<Record<string, any>>({});
+  const [postResponses, setPostResponses] = useState<Record<string, any>>({});
+  const [loadingGet, setLoadingGet] = useState<Record<string, boolean>>({});
+  const [loadingPost, setLoadingPost] = useState<Record<string, boolean>>({});
+  const [timings, setTimings] = useState<Record<string, number>>({});
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+
+  const copyUrlToClipboard = async (url: string) => {
     try {
       await navigator.clipboard.writeText(url);
       setCopiedUrl(url);
@@ -23,7 +28,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }) {
     }
   };
 
-  const fetchGetEndpoint = useCallback(async (name, url) => {
+  const fetchGetEndpoint = useCallback(async (name: string, url: string) => {
     setLoadingGet((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {
@@ -44,7 +49,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }) {
     fetchGetEndpoint('healthMonitoringStats', '/api/health-monitoring/stats');
   }, [fetchGetEndpoint]);
 
-  const callPostEndpoint = async (name, url, body) => {
+  const callPostEndpoint = async (name: string, url: string, body: any) => {
     setLoadingPost((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {

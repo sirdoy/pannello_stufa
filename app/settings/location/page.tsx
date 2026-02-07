@@ -21,12 +21,23 @@ import { Text, Heading, Banner } from '@/app/components/ui';
 import Skeleton from '@/app/components/ui/Skeleton';
 import LocationSearch from '@/app/components/LocationSearch';
 
+interface LocationData {
+  city: string;
+  lat: number;
+  lon: number;
+}
+
+interface SaveMessage {
+  type: 'success' | 'error';
+  text: string;
+}
+
 export default function LocationSettingsPage() {
   const { user, isLoading: userLoading } = useUser();
-  const [currentLocation, setCurrentLocation] = useState(null);
+  const [currentLocation, setCurrentLocation] = useState<LocationData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState(null);
+  const [saveMessage, setSaveMessage] = useState<SaveMessage | null>(null);
 
   // Fetch current location on mount
   useEffect(() => {
@@ -53,7 +64,7 @@ export default function LocationSettingsPage() {
   }, [user, userLoading]);
 
   // Handle location selection from LocationSearch
-  const handleLocationSelected = async (location) => {
+  const handleLocationSelected = async (location: LocationData) => {
     setIsSaving(true);
     setSaveMessage(null);
 

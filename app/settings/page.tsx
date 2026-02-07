@@ -35,7 +35,7 @@ function ThemeContent() {
   const { theme, setTheme, isLoading: themeLoading } = useTheme();
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleThemeChange = async (newTheme) => {
+  const handleThemeChange = async (newTheme: 'light' | 'dark') => {
     setIsSaving(true);
     try {
       await setTheme(newTheme);
@@ -217,12 +217,23 @@ function ThemeContent() {
 /**
  * LocationContent - Extracted from location/page.js
  */
+interface LocationData {
+  city: string;
+  lat: number;
+  lon: number;
+}
+
+interface SaveMessage {
+  type: 'success' | 'error';
+  text: string;
+}
+
 function LocationContent() {
   const { user } = useUser();
-  const [currentLocation, setCurrentLocation] = useState(null);
+  const [currentLocation, setCurrentLocation] = useState<LocationData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState(null);
+  const [saveMessage, setSaveMessage] = useState<SaveMessage | null>(null);
 
   // Fetch current location on mount
   useEffect(() => {
@@ -249,7 +260,7 @@ function LocationContent() {
   }, [user]);
 
   // Handle location selection from LocationSearch
-  const handleLocationSelected = async (location) => {
+  const handleLocationSelected = async (location: LocationData) => {
     setIsSaving(true);
     setSaveMessage(null);
 
@@ -342,6 +353,15 @@ function LocationContent() {
 }
 
 
+interface UnifiedDevice {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  visible: boolean;
+  order: number;
+}
+
 /**
  * UnifiedDevicesContent - Unified device settings
  * Single toggle controls visibility (navbar for hardware, homepage for all)
@@ -350,8 +370,8 @@ function LocationContent() {
 function UnifiedDevicesContent() {
   const { user } = useUser();
   const router = useRouter();
-  const [devices, setDevices] = useState([]);
-  const [originalDevices, setOriginalDevices] = useState([]);
+  const [devices, setDevices] = useState<UnifiedDevice[]>([]);
+  const [originalDevices, setOriginalDevices] = useState<UnifiedDevice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
@@ -393,7 +413,7 @@ function UnifiedDevicesContent() {
   }, [devices, originalDevices]);
 
   // Toggle device visibility
-  const handleToggleVisible = (deviceId) => {
+  const handleToggleVisible = (deviceId: string) => {
     setDevices(prev =>
       prev.map(d =>
         d.id === deviceId ? { ...d, visible: !d.visible } : d
@@ -402,7 +422,7 @@ function UnifiedDevicesContent() {
   };
 
   // Move device up in order
-  const moveUp = (index) => {
+  const moveUp = (index: number) => {
     if (index === 0) return;
     setDevices(prev => {
       const newDevices = [...prev];
@@ -415,7 +435,7 @@ function UnifiedDevicesContent() {
   };
 
   // Move device down in order
-  const moveDown = (index) => {
+  const moveDown = (index: number) => {
     if (index === devices.length - 1) return;
     setDevices(prev => {
       const newDevices = [...prev];
@@ -462,7 +482,7 @@ function UnifiedDevicesContent() {
 
     } catch (error) {
       console.error('Error saving config:', error);
-      alert('Errore nel salvataggio: ' + error.message);
+      alert('Errore nel salvataggio: ' + (error instanceof Error ? error.message : 'Errore sconosciuto'));
     } finally {
       setIsSaving(false);
     }

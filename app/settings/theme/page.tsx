@@ -25,7 +25,7 @@ export default function ThemeSettingsPage() {
   const { theme, setTheme, isLoading: themeLoading } = useTheme();
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleThemeChange = async (newTheme) => {
+  const handleThemeChange = async (newTheme: 'light' | 'dark') => {
     setIsSaving(true);
     try {
       await setTheme(newTheme);

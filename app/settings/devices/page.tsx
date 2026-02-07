@@ -20,11 +20,22 @@ import Skeleton from '@/app/components/ui/Skeleton';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 
+interface Device {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+}
+
+interface DevicePreferences {
+  [deviceId: string]: boolean;
+}
+
 export default function DevicesSettingsPage() {
   const { user, isLoading: userLoading } = useUser();
   const router = useRouter();
-  const [devices, setDevices] = useState([]);
-  const [preferences, setPreferences] = useState({});
+  const [devices, setDevices] = useState<Device[]>([]);
+  const [preferences, setPreferences] = useState<DevicePreferences>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
@@ -59,7 +70,7 @@ export default function DevicesSettingsPage() {
   };
 
   // Toggle device
-  const handleToggleDevice = (deviceId) => {
+  const handleToggleDevice = (deviceId: string) => {
     const newPreferences = {
       ...preferences,
       [deviceId]: !preferences[deviceId],
@@ -97,7 +108,7 @@ export default function DevicesSettingsPage() {
 
     } catch (error) {
       console.error('Error saving preferences:', error);
-      alert('Errore nel salvataggio: ' + error.message);
+      alert('Errore nel salvataggio: ' + (error instanceof Error ? error.message : 'Errore sconosciuto'));
     } finally {
       setIsSaving(false);
     }

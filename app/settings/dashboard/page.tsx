@@ -22,12 +22,25 @@ import { Text, Badge, Banner } from '@/app/components/ui';
 import Skeleton from '@/app/components/ui/Skeleton';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 
+interface DashboardCard {
+  id: string;
+  label: string;
+  icon: string;
+  visible: boolean;
+  order: number;
+}
+
+interface SaveMessage {
+  type: 'success' | 'error';
+  text: string;
+}
+
 export default function DashboardSettingsPage() {
   const { user, isLoading: userLoading } = useUser();
-  const [cards, setCards] = useState([]);
+  const [cards, setCards] = useState<DashboardCard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState(null);
+  const [saveMessage, setSaveMessage] = useState<SaveMessage | null>(null);
 
   // Fetch current preferences on mount
   useEffect(() => {
@@ -53,7 +66,7 @@ export default function DashboardSettingsPage() {
   }, [user, userLoading]);
 
   // Move card up in the list
-  const moveUp = (index) => {
+  const moveUp = (index: number) => {
     if (index === 0) return;
     setCards((prev) => {
       const newCards = [...prev];
@@ -66,7 +79,7 @@ export default function DashboardSettingsPage() {
   };
 
   // Move card down in the list
-  const moveDown = (index) => {
+  const moveDown = (index: number) => {
     if (index === cards.length - 1) return;
     setCards((prev) => {
       const newCards = [...prev];
@@ -79,7 +92,7 @@ export default function DashboardSettingsPage() {
   };
 
   // Toggle card visibility
-  const toggleVisibility = (index, newVisible) => {
+  const toggleVisibility = (index: number, newVisible: boolean) => {
     setCards((prev) =>
       prev.map((card, i) =>
         i === index ? { ...card, visible: newVisible } : card

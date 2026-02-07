@@ -127,7 +127,7 @@ export default function NotificationsDashboard() {
    * 70-84%: Yellow (warning)
    * < 70%: Red (ember)
    */
-  const getDeliveryRateColor = (rate: number): string => {
+  const getDeliveryRateColor = (rate: number): 'sage' | 'warning' | 'ember' => {
     if (rate >= 85) return 'sage';
     if (rate >= 70) return 'warning';
     return 'ember';
@@ -165,7 +165,7 @@ export default function NotificationsDashboard() {
     if (!dateString) return 'Never';
     const date = new Date(dateString);
     const now = new Date();
-    const diff = now - date;
+    const diff = now.getTime() - date.getTime();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
     if (days === 0) return 'Today';
@@ -177,7 +177,7 @@ export default function NotificationsDashboard() {
   /**
    * Get trend icon and color
    */
-  const getTrendIcon = (trend: string): { icon: string; color: string } => {
+  const getTrendIcon = (trend: string): { icon: string; color: 'sage' | 'ember' | 'secondary' } => {
     if (trend === 'improving') return { icon: '↗', color: 'sage' };
     if (trend === 'declining') return { icon: '↘', color: 'ember' };
     return { icon: '→', color: 'secondary' };

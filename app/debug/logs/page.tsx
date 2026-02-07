@@ -70,7 +70,7 @@ export default function DebugLogsPage() {
   };
 
   return (
-    <PageLayout maxWidth="4xl">
+    <PageLayout maxWidth="7xl">
       <div className="space-y-6">
       <Card className="p-6">
         <div className="flex items-center justify-between mb-6">

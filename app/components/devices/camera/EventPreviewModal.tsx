@@ -4,29 +4,12 @@ import { useState, useEffect } from 'react';
 import { X, Play } from 'lucide-react';
 import { Modal, Text, Button, Card } from '../../ui';
 import HlsPlayer from './HlsPlayer';
-import NETATMO_CAMERA_API from '@/lib/netatmoCameraApi';
+import NETATMO_CAMERA_API, { ParsedEvent, ParsedCamera } from '@/lib/netatmoCameraApi';
 import { downloadHlsVideo } from '@/lib/hlsDownloader';
 
-interface CameraEvent {
-  id?: string;
-  camera_id?: string;
-  video_id?: string;
-  snapshot?: { url?: string };
-  type: string;
-  sub_type?: string;
-  time: number;
-  message?: string;
-  video_status?: string;
-}
-
-interface Camera {
-  vpn_url?: string;
-  [key: string]: any;
-}
-
 interface EventPreviewModalProps {
-  event: CameraEvent | null;
-  camera: Camera | null;
+  event: ParsedEvent | null;
+  camera: ParsedCamera | null;
   onClose: () => void;
 }
 
@@ -107,13 +90,13 @@ export default function EventPreviewModal({ event, camera, onClose }: EventPrevi
           <div className="flex items-center gap-3">
             <span className="text-2xl">
               {event.sub_type
-                ? NETATMO_CAMERA_API.getSubTypeIcon(parseInt(event.sub_type, 10))
+                ? NETATMO_CAMERA_API.getSubTypeIcon(event.sub_type)
                 : NETATMO_CAMERA_API.getEventIcon(event.type)}
             </span>
             <div>
               <Text variant="body">
                 {event.sub_type
-                  ? NETATMO_CAMERA_API.getSubTypeName(parseInt(event.sub_type, 10))
+                  ? NETATMO_CAMERA_API.getSubTypeName(event.sub_type)
                   : NETATMO_CAMERA_API.getEventTypeName(event.type)}
               </Text>
               <Text variant="tertiary" size="sm">

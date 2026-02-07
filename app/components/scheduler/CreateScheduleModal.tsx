@@ -206,7 +206,7 @@ export default function CreateScheduleModal({
           {/* Footer */}
           <div className="flex gap-3 mt-8">
             <Button
-              variant="neutral"
+              variant="subtle"
               onClick={onCancel}
               className="flex-1"
             >

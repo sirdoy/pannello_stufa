@@ -10,33 +10,41 @@ import { cn } from '@/lib/utils/cn';
  * Lights Page - Complete Philips Hue control
  * Full view with rooms, individual lights, and scenes
  */
-type PairingStep = 'discovering' | 'waitingForButtonPress' | 'pairing' | 'success' | 'remotePairing';
+type PairingStep = 'discovering' | 'waitingForButtonPress' | 'pairing' | 'success' | 'remotePairing' | 'noLocalBridge' | 'selectBridge' | 'remotePairingWait';
 
 interface HueRoom {
   id: string;
   name: string;
   lights: string[];
   on?: boolean;
+  services?: Array<{ rid: string; rtype: string }>;
+  children?: Array<{ rid: string; rtype: string }>;
+  metadata?: { name: string; archetype?: string };
 }
 
 interface HueLight {
   id: string;
   name: string;
-  on: boolean;
-  brightness?: number;
-  color?: { x: number; y: number } | null;
+  on?: { on: boolean };
+  dimming?: { brightness: number };
+  color?: { xy?: { x: number; y: number } } | null;
   room?: string;
+  owner?: { rid: string; rtype: string };
+  metadata?: { name: string; archetype?: string };
 }
 
 interface HueScene {
   id: string;
   name: string;
   room?: string;
+  group?: { rid: string; rtype: string };
+  metadata?: { name: string };
 }
 
 interface HueBridge {
   id: string;
   ipaddress: string;
+  internalipaddress?: string;
 }
 
 export default function LightsPage() {
@@ -211,7 +219,7 @@ export default function LightsPage() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          dimming: { brightness: parseFloat(brightness) }
+          dimming: { brightness: brightness }
         }),
       });
 
@@ -233,7 +241,7 @@ export default function LightsPage() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          dimming: { brightness: parseFloat(brightness) }
+          dimming: { brightness: brightness }
         }),
       });
 
@@ -1088,7 +1096,7 @@ export default function LightsPage() {
                                       variant="subtle"
                                       onClick={() => handleLightToggle(light.id, false)}
                                       disabled={refreshing}
-                                      size="xs"
+                                      size="sm"
                                       fullWidth
                                       icon="🌙"
                                     >
@@ -1099,7 +1107,7 @@ export default function LightsPage() {
                                       variant="ember"
                                       onClick={() => handleLightToggle(light.id, true)}
                                       disabled={refreshing}
-                                      size="xs"
+                                      size="sm"
                                       fullWidth
                                       icon="💡"
                                     >

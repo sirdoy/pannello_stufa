@@ -179,14 +179,14 @@ export default function DevicesSettingsPage() {
                     ? 'border-ember-600 [html:not(.dark)_&]:border-ember-400 bg-ember-950/30 [html:not(.dark)_&]:bg-ember-50/50'
                     : 'border-slate-600 [html:not(.dark)_&]:border-slate-300 bg-white/[0.02] [html:not(.dark)_&]:bg-slate-50/50'
                 }`}
-                style={{ '--stagger-index': index }}
+                style={{ '--stagger-index': index } as React.CSSProperties}
               >
                 <div className="flex items-start justify-between gap-4">
                   {/* Device info */}
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <Text className="text-2xl">{device.icon}</Text>
-                      <Heading level={3} size="base">
+                      <Heading level={3} size="md">
                         {device.name}
                       </Heading>
                       {isEnabled && (
@@ -227,7 +227,7 @@ export default function DevicesSettingsPage() {
 
             <div className="flex gap-3 flex-shrink-0">
               <Button
-                variant="neutral"
+                variant="subtle"
                 onClick={handleReset}
                 disabled={isSaving}
                 className="flex-1 sm:flex-initial"

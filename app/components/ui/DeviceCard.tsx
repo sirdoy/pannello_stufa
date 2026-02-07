@@ -197,7 +197,7 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
                 {connectButtonLabel}
               </Button>
               {connectInfoRoute && (
-                <Button variant="neutral" onClick={() => window.location.href = connectInfoRoute}>
+                <Button variant="subtle" onClick={() => window.location.href = connectInfoRoute}>
                   Maggiori Info
                 </Button>
               )}

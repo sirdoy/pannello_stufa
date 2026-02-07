@@ -94,7 +94,7 @@ export default function TransitionsDebugPage() {
   ];
 
   return (
-    <PageLayout maxWidth="4xl">
+    <PageLayout maxWidth="7xl">
       <div className="space-y-8">
       {/* Header */}
       <div className="space-y-4">

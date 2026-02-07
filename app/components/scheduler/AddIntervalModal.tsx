@@ -293,7 +293,7 @@ export default function AddIntervalModal({
                   value: f,
                   label: `Livello ${f}`,
                 }))}
-                variant="neutral"
+                variant="subtle"
               />
             </div>
           </div>
@@ -302,7 +302,7 @@ export default function AddIntervalModal({
         {/* Actions */}
         <div className="flex gap-3">
           <Button
-            variant="neutral"
+            variant="subtle"
             onClick={onCancel}
             className="flex-1"
           >

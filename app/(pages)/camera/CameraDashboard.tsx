@@ -17,45 +17,22 @@ import {
   EmptyState,
   Skeleton,
 } from '@/app/components/ui';
-import NETATMO_CAMERA_API from '@/lib/netatmoCameraApi';
+import NETATMO_CAMERA_API, { ParsedCamera, ParsedEvent } from '@/lib/netatmoCameraApi';
 import HlsPlayer from '@/app/components/devices/camera/HlsPlayer';
 import EventPreviewModal from '@/app/components/devices/camera/EventPreviewModal';
-
-interface Camera {
-  id: string;
-  name: string;
-  status: string;
-  sd_status?: string;
-  alim_status?: string;
-  type?: string;
-  is_local?: boolean;
-  home_id?: string;
-  home_name?: string;
-  light_mode_status?: string;
-}
-
-interface CameraEvent {
-  id: string;
-  type: string;
-  time: number;
-  camera_id: string;
-  snapshot?: { id?: string; key?: string; url?: string };
-  video_id?: string;
-  video_status?: string;
-}
 
 export default function CameraDashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [needsReauth, setNeedsReauth] = useState<boolean>(false);
-  const [cameras, setCameras] = useState<Camera[]>([]);
-  const [events, setEvents] = useState<CameraEvent[]>([]);
+  const [cameras, setCameras] = useState<ParsedCamera[]>([]);
+  const [events, setEvents] = useState<ParsedEvent[]>([]);
   const [selectedCameraId, setSelectedCameraId] = useState<string | null>(null);
   const [snapshotUrls, setSnapshotUrls] = useState<Record<string, string>>({});
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [isLiveMode, setIsLiveMode] = useState<boolean>(false);
-  const [selectedEvent, setSelectedEvent] = useState<CameraEvent | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<ParsedEvent | null>(null);
 
   const fetchedRef = useRef<boolean>(false);
 
@@ -418,8 +395,9 @@ export default function CameraDashboard() {
                               alt={NETATMO_CAMERA_API.getEventTypeName(event.type)}
                               className="w-full h-full object-cover"
                               onError={(e) => {
-                                e.target.style.display = 'none';
-                                e.target.nextSibling.style.display = 'flex';
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                (target.nextSibling as HTMLElement).style.display = 'flex';
                               }}
                             />
                           ) : null}

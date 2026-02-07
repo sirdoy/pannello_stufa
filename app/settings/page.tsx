@@ -605,7 +605,7 @@ function UnifiedDevicesContent() {
 
             <div className="flex gap-3 flex-shrink-0">
               <Button
-                variant="neutral"
+                variant="subtle"
                 onClick={handleReset}
                 disabled={isSaving}
                 className="flex-1 sm:flex-initial"

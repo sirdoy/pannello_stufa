@@ -140,7 +140,7 @@ export default function OfflinePage() {
 
           {/* Command List */}
           <div className="mt-3 space-y-2">
-            {pendingCommands.slice(0, 3).map((cmd) => (
+            {pendingCommands.slice(0, 3).map((cmd: any) => (
               <div
                 key={cmd.id}
                 className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-white/[0.02]"
@@ -204,8 +204,8 @@ export default function OfflinePage() {
               </div>
             </div>
             <StatusBadge
-              status={stoveState.isOn ? 'success' : 'neutral'}
-              label={stoveState.isOn ? 'Accesa' : 'Spenta'}
+              status={stoveState.isOn ? 'Accesa' : 'Spenta'}
+              color={stoveState.isOn ? 'ember' : 'neutral'}
             />
           </div>
 
@@ -257,7 +257,7 @@ export default function OfflinePage() {
               </div>
             )}
             {stoveState.needsCleaning && (
-              <StatusBadge status="warning">Pulizia richiesta</StatusBadge>
+              <StatusBadge status="Pulizia richiesta" color="warning" />
             )}
           </div>
 
@@ -287,7 +287,7 @@ export default function OfflinePage() {
               </div>
             </div>
             {thermostatState.isHeating && (
-              <StatusBadge status="warning">Riscaldamento</StatusBadge>
+              <StatusBadge status="Riscaldamento" color="warning" />
             )}
           </div>
 

@@ -23,7 +23,7 @@ const mockWeatherData = {
     { date: '2026-02-05', tempMax: 15.0, tempMin: 9.5, condition: { description: 'Pioggia moderata', icon: '10' }, weatherCode: 63, precipChance: 85, uvIndex: 1, airQuality: 18 },
     { date: '2026-02-06', tempMax: 17.5, tempMin: 10.2, condition: { description: 'Nuvoloso', icon: '04' }, weatherCode: 3, precipChance: 20, uvIndex: 3, airQuality: 42 },
   ],
-  cachedAt: Date.now() - 5 * 60 * 1000, // 5 minutes ago
+  cachedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(), // 5 minutes ago
   stale: false,
 };
 

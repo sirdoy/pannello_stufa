@@ -2,22 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { getChangelogFromFirebase } from '@/lib/changelogService';
-import { VERSION_HISTORY, APP_VERSION } from '@/lib/version';
+import { VERSION_HISTORY, APP_VERSION, VersionEntry } from '@/lib/version';
 import { Card, Skeleton, Heading, Text, StatusBadge, Divider } from '@/app/components/ui';
 
 const ITEMS_PER_PAGE = 10;
 
-interface ChangelogVersion {
-  version: string;
-  date: string;
-  type: 'major' | 'minor' | 'patch';
-  changes: string[];
-}
-
 type Source = 'local' | 'firebase';
 
 export default function ChangelogPage() {
-  const [changelog, setChangelog] = useState<ChangelogVersion[]>([]);
+  const [changelog, setChangelog] = useState<VersionEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [source, setSource] = useState<Source>('local');
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -63,7 +56,7 @@ export default function ChangelogPage() {
   }, []);
 
   // Ordina versioni in modo semantico decrescente
-  const sortVersions = (versions: ChangelogVersion[]): ChangelogVersion[] => {
+  const sortVersions = (versions: VersionEntry[]): VersionEntry[] => {
     return [...versions].sort((a, b) => {
       const [aMajor, aMinor, aPatch] = a.version.split('.').map(Number);
       const [bMajor, bMinor, bPatch] = b.version.split('.').map(Number);
@@ -97,9 +90,9 @@ export default function ChangelogPage() {
       accentClass: 'from-ocean-500/20 to-ocean-500/10 border-ocean-500/30 [html:not(.dark)_&]:from-ocean-100 [html:not(.dark)_&]:to-ocean-100/50 [html:not(.dark)_&]:border-ocean-300',
       dotClass: 'bg-gradient-to-br from-ocean-400 to-ocean-500 shadow-[0_0_12px_rgba(67,125,174,0.4)]',
     },
-  };
+  } as const;
 
-  const getConfig = (type: 'major' | 'minor' | 'patch') => versionConfig[type] || versionConfig.patch;
+  const getConfig = (type?: string) => versionConfig[type as keyof typeof versionConfig] || versionConfig.patch;
 
   if (loading) {
     return (

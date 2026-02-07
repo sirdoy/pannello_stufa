@@ -97,7 +97,7 @@ function LogContent() {
     <div className="space-y-6 mt-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex gap-2">
-          {['notifications', 'fcm', 'general'].map((cat) => (
+          {(['notifications', 'fcm', 'general'] as const).map((cat) => (
             <Button
               key={cat}
               variant={category === cat ? 'ember' : 'outline'}
@@ -208,7 +208,7 @@ function NotificheContent() {
     fetchStats();
   }, []);
 
-  const getDeliveryRateColor = (rate: number): string => {
+  const getDeliveryRateColor = (rate: number): 'sage' | 'warning' | 'ember' => {
     if (rate >= 85) return 'sage';
     if (rate >= 70) return 'warning';
     return 'ember';
@@ -328,7 +328,7 @@ function DebugPageContent() {
   }, []);
 
   return (
-    <PageLayout maxWidth="6xl">
+    <PageLayout maxWidth="7xl">
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-4">
@@ -429,7 +429,7 @@ function DebugPageContent() {
 export default function DebugPage() {
   return (
     <Suspense fallback={
-      <PageLayout maxWidth="6xl">
+      <PageLayout maxWidth="7xl">
         <Skeleton className="h-64 w-full" />
       </PageLayout>
     }>

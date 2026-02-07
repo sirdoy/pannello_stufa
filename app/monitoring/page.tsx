@@ -100,7 +100,7 @@ export default function MonitoringPage() {
           variant="ghost"
           size="sm"
           onClick={() => router.push('/')}
-          icon={<ArrowLeft size={16} />}
+          icon="←"
         >
           Home
         </Button>
@@ -115,8 +115,8 @@ export default function MonitoringPage() {
       {/* Status cards section */}
       <Section spacing="none" as="div">
         <Grid cols={2} gap="md" className="md:grid-cols-2">
-          <ConnectionStatusCard stats={stats} error={statsError} onRetry={handleStatsRetry} />
-          <DeadManSwitchPanel status={dmsStatus} error={dmsError} onRetry={handleDMSRetry} />
+          <ConnectionStatusCard stats={stats as any} error={statsError} onRetry={handleStatsRetry} />
+          <DeadManSwitchPanel status={dmsStatus as any} error={dmsError} onRetry={handleDMSRetry} />
         </Grid>
       </Section>
 

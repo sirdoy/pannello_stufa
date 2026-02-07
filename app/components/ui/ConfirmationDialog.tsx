@@ -248,7 +248,7 @@ const ConfirmationDialog = forwardRef<HTMLDivElement, ConfirmationDialogProps>(f
           <div className="flex items-center justify-end gap-3 mt-6">
             <Button
               ref={cancelButtonRef}
-              variant="neutral"
+              variant="subtle"
               onClick={handleCancel}
               disabled={loading}
               data-testid="confirmation-cancel"

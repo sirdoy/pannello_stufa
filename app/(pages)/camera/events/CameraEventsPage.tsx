@@ -15,31 +15,17 @@ import {
   EmptyState,
   Skeleton,
 } from '@/app/components/ui';
-import NETATMO_CAMERA_API from '@/lib/netatmoCameraApi';
+import NETATMO_CAMERA_API, { ParsedCamera, ParsedEvent } from '@/lib/netatmoCameraApi';
 import EventPreviewModal from '@/app/components/devices/camera/EventPreviewModal';
 
-interface Camera {
-  id: string;
-  name: string;
-}
-
-interface CameraEvent {
-  id: string;
-  type: string;
-  time: number;
-  camera_id: string;
-  snapshot?: { url?: string };
-  video_id?: string;
-}
-
-export default function CameraEventsPage() {
+export default function ParsedEventsPage() {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [cameras, setCameras] = useState<Camera[]>([]);
-  const [events, setEvents] = useState<CameraEvent[]>([]);
+  const [cameras, setCameras] = useState<ParsedCamera[]>([]);
+  const [events, setEvents] = useState<ParsedEvent[]>([]);
   const [selectedCameraId, setSelectedCameraId] = useState<string>('all');
-  const [selectedEvent, setSelectedEvent] = useState<CameraEvent | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<ParsedEvent | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [totalEvents, setTotalEvents] = useState<number>(0);
   const [displayCount, setDisplayCount] = useState<number>(20);
@@ -87,7 +73,7 @@ export default function CameraEventsPage() {
   // Filter events by selected camera
   const filteredEvents = selectedCameraId === 'all'
     ? events
-    : events.filter((e: CameraEvent) => e.camera_id === selectedCameraId);
+    : events.filter((e: ParsedEvent) => e.camera_id === selectedCameraId);
 
   // Check if there are more events to show
   const hasMore = displayCount < filteredEvents.length;
@@ -139,8 +125,8 @@ export default function CameraEventsPage() {
   };
 
   // Group events by date
-  const groupEventsByDate = (events) => {
-    const groups = {};
+  const groupEventsByDate = (events: ParsedEvent[]): Record<string, ParsedEvent[]> => {
+    const groups: Record<string, ParsedEvent[]> = {};
     events.forEach(event => {
       const date = new Date(event.time * 1000).toLocaleDateString('it-IT', {
         weekday: 'long',
@@ -160,7 +146,7 @@ export default function CameraEventsPage() {
 
   if (loading) {
     return (
-      <Section title="Eventi Camera" description="Caricamento..." spacing="section">
+      <Section title="Eventi Camera" description="Caricamento..." spacing="lg">
         <div className="space-y-4">
           {[...Array(5)].map((_, i) => (
             <Skeleton.Card key={i} className="h-24" />
@@ -172,7 +158,7 @@ export default function CameraEventsPage() {
 
   if (error) {
     return (
-      <Section title="Eventi Camera" spacing="section">
+      <Section title="Eventi Camera" spacing="lg">
         <Banner
           variant="error"
           title="Errore"
@@ -192,7 +178,7 @@ export default function CameraEventsPage() {
 
   if (events.length === 0) {
     return (
-      <Section title="Eventi Camera" spacing="section">
+      <Section title="Eventi Camera" spacing="lg">
         <EmptyState
           icon="📹"
           title="Nessun evento registrato"
@@ -216,7 +202,7 @@ export default function CameraEventsPage() {
     <Section
       title="Eventi Camera"
       description={eventsDescription}
-      spacing="section"
+      spacing="lg"
       action={
         <div className="flex gap-2">
           <Button
@@ -241,7 +227,7 @@ export default function CameraEventsPage() {
       {cameras.length > 1 && (
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
           <Button
-            variant={selectedCameraId === 'all' ? 'ocean' : 'subtle'}
+            variant={selectedCameraId === 'all' ? 'ember' : 'subtle'}
             size="sm"
             onClick={() => {
               setSelectedCameraId('all');
@@ -253,7 +239,7 @@ export default function CameraEventsPage() {
           {cameras.map(camera => (
             <Button
               key={camera.id}
-              variant={selectedCameraId === camera.id ? 'ocean' : 'subtle'}
+              variant={selectedCameraId === camera.id ? 'ember' : 'subtle'}
               size="sm"
               onClick={() => {
                 setSelectedCameraId(camera.id);
@@ -301,7 +287,7 @@ export default function CameraEventsPage() {
                             alt={NETATMO_CAMERA_API.getEventTypeName(event.type)}
                             className="w-full h-full object-cover"
                             onError={(e) => {
-                              e.target.style.display = 'none';
+                              (e.target as HTMLImageElement).style.display = 'none';
                             }}
                           />
                         ) : null}

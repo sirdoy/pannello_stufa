@@ -43,8 +43,8 @@ export default function LogPage() {
       }
 
       const entries = Object.entries(data)
-        .map(([id, entry]) => ({ id, ...entry }))
-        .sort((a, b) => b.timestamp - a.timestamp);
+        .map(([id, entry]) => ({ id, ...(entry as Record<string, any>) } as any))
+        .sort((a: any, b: any) => b.timestamp - a.timestamp);
 
       setLog(entries);
       setLoading(false);
@@ -112,7 +112,7 @@ export default function LogPage() {
     return '📄';
   };
 
-  const getDeviceBadge = (device?: string): { label: string; icon?: string; color: string } => {
+  const getDeviceBadge = (device?: string): { label: string; icon?: string; color: 'primary' | 'info' | 'warning' | 'success' | 'neutral' } => {
     const config = DEVICE_CONFIG[device];
     if (!config) return { label: 'Sistema', color: 'neutral' };
 
@@ -198,7 +198,7 @@ export default function LogPage() {
           {/* Thermostat */}
           {deviceCounts.thermostat > 0 && (
             <Button
-              variant={deviceFilter === 'thermostat' ? 'ocean' : 'ghost'}
+              variant={deviceFilter === 'thermostat' ? 'ember' : 'ghost'}
               size="sm"
               icon="🌡️"
               onClick={() => setDeviceFilter('thermostat')}

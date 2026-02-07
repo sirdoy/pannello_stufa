@@ -1004,7 +1004,7 @@ export default function DesignSystemPage() {
                 <div className="flex flex-wrap items-center gap-4 mt-4">
                   <Spinner variant="ember" aria-label="Loading" />
                   <Spinner variant="white" aria-label="Loading" />
-                  <Spinner variant="tertiary" aria-label="Loading" />
+                  <Spinner variant="muted" aria-label="Loading" />
                   <Text variant="tertiary" size="xs">Variants: ember, white, muted</Text>
                 </div>
               </CardContent>
@@ -1039,9 +1039,9 @@ export default function DesignSystemPage() {
                     />
                     <Input
                       aria-label="Input with Variant"
-                      placeholder="Ocean variant..."
+                      placeholder="Default variant..."
                       icon="🌊"
-                      variant="subtle"
+                      variant="default"
                       autoComplete="off" data-lpignore="true" data-1p-ignore
                     />
                     <Input
@@ -1102,6 +1102,7 @@ export default function DesignSystemPage() {
                     />
                     <Select
                       label="Select with Variant"
+                      icon="🌊"
                       variant="subtle"
                       options={[
                         { value: 'a', label: 'Ocean Option A' },
@@ -1113,6 +1114,7 @@ export default function DesignSystemPage() {
                     />
                     <Select
                       label="Disabled Select"
+                      icon="🚫"
                       disabled
                       options={[
                         { value: '1', label: 'Cannot select' },
@@ -1148,7 +1150,7 @@ export default function DesignSystemPage() {
                     <div className="flex items-center gap-3">
                       <Toggle
                         checked={toggleState}
-                        onChange={setToggleState}
+                        onCheckedChange={setToggleState}
                         aria-label="Default Toggle"
                       />
                       <Text variant="secondary" size="sm">Default (Ember) - Interactive</Text>
@@ -1158,7 +1160,7 @@ export default function DesignSystemPage() {
                         checked={true}
                         onChange={() => {}}
                         aria-label="Ocean Variant"
-                        variant="subtle"
+                        variant="ocean"
                       />
                       <Text variant="secondary" size="sm">Ocean Variant</Text>
                     </div>
@@ -1251,7 +1253,7 @@ export default function DesignSystemPage() {
                           checked={true}
                           onChange={() => {}}
                           aria-label="Ocean"
-                          variant="subtle"
+                          variant="ocean"
                         />
                         <Checkbox
                           id="checkbox-sage"
@@ -1391,7 +1393,7 @@ export default function DesignSystemPage() {
                   </Text>
                   <div className="space-y-4">
                     <ProgressBar value={75} variant="ember" aria-label="Ember Progress" />
-                    <ProgressBar value={60} variant="subtle" aria-label="Ocean Progress" />
+                    <ProgressBar value={60} variant="ocean" aria-label="Ocean Progress" />
                     <ProgressBar value={85} variant="sage" aria-label="Sage Progress" />
                     <ProgressBar value={40} variant="warning" aria-label="Warning Progress" />
                     <ProgressBar value={25} variant="danger" aria-label="Danger Progress" />
@@ -1424,7 +1426,7 @@ export default function DesignSystemPage() {
                     />
                     <ProgressBar
                       value={45}
-                      variant="subtle"
+                      variant="ocean"
                       leftContent={<Text variant="tertiary" size="sm">💨 Fan</Text>}
                       rightContent={<Text variant="secondary" size="sm">45%</Text>}
                     />
@@ -1947,11 +1949,11 @@ export default function DesignSystemPage() {
                   {showToast && (
                     <div className="fixed bottom-4 right-4 z-50 max-w-md">
                       <Toast
-                        message="Operation completed successfully!"
                         variant="success"
-                        duration={5000}
-                        onDismiss={() => setShowToast(false)}
-                      />
+                        onOpenChange={(open) => { if (!open) setShowToast(false); }}
+                      >
+                        Operation completed successfully!
+                      </Toast>
                     </div>
                   )}
                   <div className="mt-4 space-y-3">
@@ -2048,10 +2050,10 @@ export default function DesignSystemPage() {
                 <div>
                   <Text variant="label" size="xs" className="mb-3">Clear Sky and Clouds</Text>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <WeatherIconDemo code={0} aria-label="Sereno" />
-                    <WeatherIconDemo code={1} aria-label="Prevalentemente sereno" />
-                    <WeatherIconDemo code={2} aria-label="Parzialmente nuvoloso" />
-                    <WeatherIconDemo code={3} aria-label="Coperto" />
+                    <WeatherIconDemo code={0} label="Sereno" />
+                    <WeatherIconDemo code={1} label="Prevalentemente sereno" />
+                    <WeatherIconDemo code={2} label="Parzialmente nuvoloso" />
+                    <WeatherIconDemo code={3} label="Coperto" />
                   </div>
                 </div>
 
@@ -2064,10 +2066,10 @@ export default function DesignSystemPage() {
                     Use isNight=true to show moon-based icons for clear/partly cloudy conditions
                   </Text>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <WeatherIconDemo code={0} aria-label="Day - Clear" isNight={false} />
-                    <WeatherIconDemo code={0} aria-label="Night - Clear" isNight={true} />
-                    <WeatherIconDemo code={2} aria-label="Day - Partly cloudy" isNight={false} />
-                    <WeatherIconDemo code={2} aria-label="Night - Partly cloudy" isNight={true} />
+                    <WeatherIconDemo code={0} label="Day - Clear" isNight={false} />
+                    <WeatherIconDemo code={0} label="Night - Clear" isNight={true} />
+                    <WeatherIconDemo code={2} label="Day - Partly cloudy" isNight={false} />
+                    <WeatherIconDemo code={2} label="Night - Partly cloudy" isNight={true} />
                   </div>
                 </div>
 
@@ -2077,8 +2079,8 @@ export default function DesignSystemPage() {
                 <div>
                   <Text variant="label" size="xs" className="mb-3">Fog</Text>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <WeatherIconDemo code={45} aria-label="Nebbia" />
-                    <WeatherIconDemo code={48} aria-label="Nebbia con brina" />
+                    <WeatherIconDemo code={45} label="Nebbia" />
+                    <WeatherIconDemo code={48} label="Nebbia con brina" />
                   </div>
                 </div>
 
@@ -2088,10 +2090,10 @@ export default function DesignSystemPage() {
                 <div>
                   <Text variant="label" size="xs" className="mb-3">Drizzle (Pioviggine)</Text>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <WeatherIconDemo code={51} aria-label="Pioviggine leggera" />
-                    <WeatherIconDemo code={53} aria-label="Pioviggine moderata" />
-                    <WeatherIconDemo code={55} aria-label="Pioviggine intensa" />
-                    <WeatherIconDemo code={56} aria-label="Pioviggine gelata" />
+                    <WeatherIconDemo code={51} label="Pioviggine leggera" />
+                    <WeatherIconDemo code={53} label="Pioviggine moderata" />
+                    <WeatherIconDemo code={55} label="Pioviggine intensa" />
+                    <WeatherIconDemo code={56} label="Pioviggine gelata" />
                   </div>
                 </div>
 
@@ -2101,10 +2103,10 @@ export default function DesignSystemPage() {
                 <div>
                   <Text variant="label" size="xs" className="mb-3">Rain (Pioggia)</Text>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <WeatherIconDemo code={61} aria-label="Pioggia leggera" />
-                    <WeatherIconDemo code={63} aria-label="Pioggia moderata" />
-                    <WeatherIconDemo code={65} aria-label="Pioggia intensa" />
-                    <WeatherIconDemo code={66} aria-label="Pioggia gelata" />
+                    <WeatherIconDemo code={61} label="Pioggia leggera" />
+                    <WeatherIconDemo code={63} label="Pioggia moderata" />
+                    <WeatherIconDemo code={65} label="Pioggia intensa" />
+                    <WeatherIconDemo code={66} label="Pioggia gelata" />
                   </div>
                 </div>
 
@@ -2117,14 +2119,14 @@ export default function DesignSystemPage() {
                     WMO codes 71-77, 85-86 map to CloudSnow icon
                   </Text>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <WeatherIconDemo code={71} aria-label="Neve leggera" />
-                    <WeatherIconDemo code={73} aria-label="Neve moderata" />
-                    <WeatherIconDemo code={75} aria-label="Neve intensa" />
-                    <WeatherIconDemo code={77} aria-label="Granuli di neve" />
+                    <WeatherIconDemo code={71} label="Neve leggera" />
+                    <WeatherIconDemo code={73} label="Neve moderata" />
+                    <WeatherIconDemo code={75} label="Neve intensa" />
+                    <WeatherIconDemo code={77} label="Granuli di neve" />
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
-                    <WeatherIconDemo code={85} aria-label="Rovesci neve leggeri" />
-                    <WeatherIconDemo code={86} aria-label="Rovesci neve intensi" />
+                    <WeatherIconDemo code={85} label="Rovesci neve leggeri" />
+                    <WeatherIconDemo code={86} label="Rovesci neve intensi" />
                   </div>
                 </div>
 
@@ -2134,9 +2136,9 @@ export default function DesignSystemPage() {
                 <div>
                   <Text variant="label" size="xs" className="mb-3">Showers (Rovesci)</Text>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <WeatherIconDemo code={80} aria-label="Rovesci leggeri" />
-                    <WeatherIconDemo code={81} aria-label="Rovesci moderati" />
-                    <WeatherIconDemo code={82} aria-label="Rovesci violenti" />
+                    <WeatherIconDemo code={80} label="Rovesci leggeri" />
+                    <WeatherIconDemo code={81} label="Rovesci moderati" />
+                    <WeatherIconDemo code={82} label="Rovesci violenti" />
                   </div>
                 </div>
 
@@ -2146,9 +2148,9 @@ export default function DesignSystemPage() {
                 <div>
                   <Text variant="label" size="xs" className="mb-3">Thunderstorm (Temporale)</Text>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <WeatherIconDemo code={95} aria-label="Temporale" />
-                    <WeatherIconDemo code={96} aria-label="Temporale grandine" />
-                    <WeatherIconDemo code={99} aria-label="Temporale grandine forte" />
+                    <WeatherIconDemo code={95} label="Temporale" />
+                    <WeatherIconDemo code={96} label="Temporale grandine" />
+                    <WeatherIconDemo code={99} label="Temporale grandine forte" />
                   </div>
                 </div>
 
@@ -2591,14 +2593,14 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
 
                 <div>
                   <Text variant="tertiary" size="xs" className="mb-3">Accessibility</Text>
-                  <AccessibilitySection componentName="DataTable" />
+                  <AccessibilitySection />
                 </div>
 
                 <CardDivider />
 
                 <div>
                   <Text variant="tertiary" size="xs" className="mb-3">Props</Text>
-                  <PropTable componentName="DataTable" />
+                  <PropTable />
                 </div>
               </div>
             </CardContent>

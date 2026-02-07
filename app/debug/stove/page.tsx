@@ -133,7 +133,7 @@ export default function StoveDebugPage() {
   const callPostEndpoint = async (name: string, url: string, body: any = null): Promise<void> => {
     setLoadingPost((prev) => ({ ...prev, [name]: true }));
     try {
-      const options = {
+      const options: RequestInit = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       };
@@ -533,14 +533,16 @@ interface CopyUrlButtonProps {
 
 function CopyUrlButton({ onClick, isCopied, label = "Copia URL" }: CopyUrlButtonProps) {
   return (
-    <Button.Icon
-      icon={isCopied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+    <Button
       onClick={onClick}
       variant="ghost"
       size="sm"
+      iconOnly
       aria-label={isCopied ? "URL copiato" : label}
       className={isCopied ? "text-green-500" : "text-slate-400 [html:not(.dark)_&]:text-slate-500"}
-    />
+    >
+      {isCopied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+    </Button>
   );
 }
 

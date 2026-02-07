@@ -213,7 +213,7 @@ export default function TestNotificationPage() {
                 name="targetMode"
                 value="all"
                 checked={targetMode === 'all'}
-                onChange={(e) => setTargetMode(e.target.value)}
+                onChange={(e) => setTargetMode(e.target.value as TargetMode)}
                 className="w-4 h-4 text-ember-500 focus:ring-ember-500"
                 data-testid="target-all"
               />
@@ -226,7 +226,7 @@ export default function TestNotificationPage() {
                 name="targetMode"
                 value="specific"
                 checked={targetMode === 'specific'}
-                onChange={(e) => setTargetMode(e.target.value)}
+                onChange={(e) => setTargetMode(e.target.value as TargetMode)}
                 className="w-4 h-4 text-ember-500 focus:ring-ember-500"
                 data-testid="target-specific"
               />
@@ -268,7 +268,7 @@ export default function TestNotificationPage() {
             <Text variant="tertiary" size="sm" className="mb-2">Template</Text>
             <select
               value={template}
-              onChange={(e) => handleTemplateChange(e.target.value)}
+              onChange={(e) => handleTemplateChange(e.target.value as TemplateKey)}
               className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-lg text-slate-200 focus:border-ember-500 focus:ring-1 focus:ring-ember-500"
               data-testid="test-template"
             >
@@ -331,7 +331,7 @@ export default function TestNotificationPage() {
                 name="priority"
                 value={p.value}
                 checked={priority === p.value}
-                onChange={(e) => setPriority(e.target.value)}
+                onChange={(e) => setPriority(e.target.value as Priority)}
                 className="w-4 h-4 mt-1 text-ember-500 focus:ring-ember-500 bg-slate-800 border-white/20"
                 data-testid={`priority-${p.value}`}
               />

@@ -199,7 +199,7 @@ export default function ScheduleManagementModal({
                           <Button variant="success" size="sm" onClick={() => handleSaveEdit(activeSchedule.id)}>
                             Salva
                           </Button>
-                          <Button variant="neutral" size="sm" onClick={handleCancelEdit}>
+                          <Button variant="subtle" size="sm" onClick={handleCancelEdit}>
                             Annulla
                           </Button>
                         </div>
@@ -259,7 +259,7 @@ export default function ScheduleManagementModal({
                           <Button variant="success" size="sm" onClick={() => handleSaveEdit(schedule.id)}>
                             Salva
                           </Button>
-                          <Button variant="neutral" size="sm" onClick={handleCancelEdit}>
+                          <Button variant="subtle" size="sm" onClick={handleCancelEdit}>
                             Annulla
                           </Button>
                         </div>
@@ -317,7 +317,7 @@ export default function ScheduleManagementModal({
           {/* Footer */}
           <div className="mt-6">
             <Button
-              variant="neutral"
+              variant="subtle"
               onClick={onClose}
               className="w-full"
             >

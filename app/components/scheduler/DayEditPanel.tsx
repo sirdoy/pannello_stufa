@@ -119,7 +119,7 @@ export default function DayEditPanel({
               />
               {/* Desktop: Button with text */}
               <Button
-                variant="neutral"
+                variant="subtle"
                 onClick={() => onDuplicate(day)}
                 className="hidden sm:flex"
               >

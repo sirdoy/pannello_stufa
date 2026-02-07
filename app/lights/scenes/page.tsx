@@ -38,7 +38,7 @@ export default function ScenesPage() {
   const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
   const [editingScene, setEditingScene] = useState<HueScene | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<HueScene | null>(null);
-  const [toast, setToast] = useState<{ message: string; icon?: string; variant?: string } | null>(null);
+  const [toast, setToast] = useState<{ message: string; icon?: string; variant?: 'success' | 'error' | 'warning' | 'info' } | null>(null);
 
   const connectionCheckedRef = useRef<boolean>(false);
 
@@ -334,7 +334,7 @@ export default function ScenesPage() {
             <Text variant="secondary" size="xs" className="mb-2">Filtra per stanza:</Text>
             <div className="flex flex-wrap gap-2">
               <Button
-                variant={selectedRoom === 'all' ? 'primary' : 'outline'}
+                variant={selectedRoom === 'all' ? 'ember' : 'outline'}
                 onClick={() => setSelectedRoom('all')}
                 size="sm"
               >
@@ -347,7 +347,7 @@ export default function ScenesPage() {
                 return (
                   <Button
                     key={room.id}
-                    variant={selectedRoom === room.id ? 'primary' : 'outline'}
+                    variant={selectedRoom === room.id ? 'ember' : 'outline'}
                     onClick={() => setSelectedRoom(room.id)}
                     size="sm"
                   >
@@ -507,12 +507,11 @@ export default function ScenesPage() {
       {/* Toast Notification */}
       {toast && (
         <Toast
-          message={toast.message}
           variant={toast.variant}
-          icon={toast.icon}
-          duration={3000}
-          onDismiss={() => setToast(null)}
-        />
+          onOpenChange={(open) => { if (!open) setToast(null); }}
+        >
+          {toast.message}
+        </Toast>
       )}
     </div>
   );

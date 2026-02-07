@@ -8,6 +8,18 @@ import Text from '@/app/components/ui/Text';
 import Badge from '@/app/components/ui/Badge';
 import { Copy, Check, ChevronDown, ChevronUp, Clock } from 'lucide-react';
 
+interface EndpointCardProps {
+  name: string;
+  url: string;
+  externalUrl?: string;
+  response: any;
+  loading: boolean;
+  timing?: number;
+  onRefresh: () => void;
+  onCopyUrl: () => void;
+  isCopied: boolean;
+}
+
 /**
  * EndpointCard - Display GET endpoint with response
  */
@@ -21,7 +33,7 @@ export function EndpointCard({
   onRefresh,
   onCopyUrl,
   isCopied,
-}) {
+}: EndpointCardProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const hasError = response?.error || (response && !response.success && response.success !== undefined);
 
@@ -96,6 +108,28 @@ export function EndpointCard({
 /**
  * PostEndpointCard - Display POST endpoint with input fields
  */
+
+interface ApiParam {
+  name: string;
+  label: string;
+  type: string;
+  defaultValue: string;
+  required?: boolean;
+}
+
+interface PostEndpointCardProps {
+  name: string;
+  url: string;
+  externalUrl?: string;
+  params?: ApiParam[];
+  response: any;
+  loading: boolean;
+  timing?: number;
+  onExecute: (formValues: Record<string, string>) => void;
+  onCopyUrl: () => void;
+  isCopied: boolean;
+}
+
 export function PostEndpointCard({
   name,
   url,
@@ -107,9 +141,9 @@ export function PostEndpointCard({
   onExecute,
   onCopyUrl,
   isCopied,
-}) {
-  const [formValues, setFormValues] = useState(
-    params.reduce((acc, param) => ({ ...acc, [param.name]: param.defaultValue }), {})
+}: PostEndpointCardProps) {
+  const [formValues, setFormValues] = useState<Record<string, string>>(
+    params.reduce((acc, param) => ({ ...acc, [param.name]: param.defaultValue }), {} as Record<string, string>)
   );
   const [isExpanded, setIsExpanded] = useState(false);
   const hasError = response?.error || (response && !response.success && response.success !== undefined);
@@ -119,7 +153,7 @@ export function PostEndpointCard({
     setIsExpanded(true);
   };
 
-  const handleInputChange = (paramName, value) => {
+  const handleInputChange = (paramName: string, value: string) => {
     setFormValues((prev) => ({ ...prev, [paramName]: value }));
   };
 
@@ -236,7 +270,11 @@ export function PostEndpointCard({
 /**
  * JsonDisplay - Formatted JSON with copy button
  */
-export function JsonDisplay({ data }) {
+interface JsonDisplayProps {
+  data: any;
+}
+
+export function JsonDisplay({ data }: JsonDisplayProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {

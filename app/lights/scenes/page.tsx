@@ -13,25 +13,36 @@ import Toast from '@/app/components/ui/Toast';
  * Scenes Page - Philips Hue scene management
  * View and activate all available scenes
  */
+interface HueScene {
+  id: string;
+  metadata?: { name?: string };
+  group?: { rid?: string };
+}
+
+interface HueRoom {
+  id: string;
+  metadata?: { name?: string };
+}
+
 export default function ScenesPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-  const [connected, setConnected] = useState(false);
-  const [scenes, setScenes] = useState([]);
-  const [rooms, setRooms] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [activatingScene, setActivatingScene] = useState(null);
-  const [selectedRoom, setSelectedRoom] = useState('all');
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [editingScene, setEditingScene] = useState(null);
-  const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [toast, setToast] = useState(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [connected, setConnected] = useState<boolean>(false);
+  const [scenes, setScenes] = useState<HueScene[]>([]);
+  const [rooms, setRooms] = useState<HueRoom[]>([]);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [activatingScene, setActivatingScene] = useState<string | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<string>('all');
+  const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
+  const [editingScene, setEditingScene] = useState<HueScene | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<HueScene | null>(null);
+  const [toast, setToast] = useState<{ message: string; icon?: string; variant?: string } | null>(null);
 
-  const connectionCheckedRef = useRef(false);
+  const connectionCheckedRef = useRef<boolean>(false);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (): Promise<void> => {
     try {
       setError(null);
 
@@ -40,7 +51,7 @@ export default function ScenesPage() {
         fetch('/api/hue/rooms'),
       ]);
 
-      const [scenesData, roomsData] = await Promise.all([
+      const [scenesData, roomsData]: any[] = await Promise.all([
         scenesRes.json(),
         roomsRes.json(),
       ]);
@@ -55,7 +66,7 @@ export default function ScenesPage() {
 
       setScenes(scenesData.scenes || []);
       // Sort rooms with 'Casa' first, then alphabetical
-      const sortedRooms = (roomsData.rooms || []).sort((a, b) => {
+      const sortedRooms = (roomsData.rooms || []).sort((a: HueRoom, b: HueRoom) => {
         if (a.metadata?.name === 'Casa') return -1;
         if (b.metadata?.name === 'Casa') return 1;
         return (a.metadata?.name || '').localeCompare(b.metadata?.name || '');
@@ -63,11 +74,11 @@ export default function ScenesPage() {
       setRooms(sortedRooms);
     } catch (err) {
       console.error('Errore fetch scene Hue:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Errore sconosciuto');
     }
   }, []);
 
-  const checkConnection = useCallback(async () => {
+  const checkConnection = useCallback(async (): Promise<void> => {
     try {
       setLoading(true);
       setError(null);

@@ -9,10 +9,10 @@ import { NETATMO_ROUTES } from '@/lib/routes';
 function NetatmoHubContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [connected, setConnected] = useState(false);
-  const [oauthError, setOauthError] = useState(null);
-  const connectionCheckedRef = useRef(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [connected, setConnected] = useState<boolean>(false);
+  const [oauthError, setOauthError] = useState<string | null>(null);
+  const connectionCheckedRef = useRef<boolean>(false);
 
   // Check for OAuth callback errors in URL
   useEffect(() => {
@@ -31,11 +31,11 @@ function NetatmoHubContent() {
     checkConnection();
   }, []);
 
-  async function checkConnection() {
+  async function checkConnection(): Promise<void> {
     try {
       setLoading(true);
       const response = await fetch(NETATMO_ROUTES.homesData);
-      const data = await response.json();
+      const data: any = await response.json();
 
       // Check if connected (has valid token)
       if (!data.reconnect && !data.error && data.home_id) {

@@ -10,34 +10,63 @@ import { cn } from '@/lib/utils/cn';
  * Lights Page - Complete Philips Hue control
  * Full view with rooms, individual lights, and scenes
  */
+type PairingStep = 'discovering' | 'waitingForButtonPress' | 'pairing' | 'success' | 'remotePairing';
+
+interface HueRoom {
+  id: string;
+  name: string;
+  lights: string[];
+  on?: boolean;
+}
+
+interface HueLight {
+  id: string;
+  name: string;
+  on: boolean;
+  brightness?: number;
+  color?: { x: number; y: number } | null;
+  room?: string;
+}
+
+interface HueScene {
+  id: string;
+  name: string;
+  room?: string;
+}
+
+interface HueBridge {
+  id: string;
+  ipaddress: string;
+}
+
 export default function LightsPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-  const [connected, setConnected] = useState(false);
-  const [rooms, setRooms] = useState([]);
-  const [lights, setLights] = useState([]);
-  const [scenes, setScenes] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [expandedRoom, setExpandedRoom] = useState(null);
-  const [activatingScene, setActivatingScene] = useState(null);
-  const [changingColor, setChangingColor] = useState(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [connected, setConnected] = useState<boolean>(false);
+  const [rooms, setRooms] = useState<HueRoom[]>([]);
+  const [lights, setLights] = useState<HueLight[]>([]);
+  const [scenes, setScenes] = useState<HueScene[]>([]);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [expandedRoom, setExpandedRoom] = useState<string | null>(null);
+  const [activatingScene, setActivatingScene] = useState<string | null>(null);
+  const [changingColor, setChangingColor] = useState<string | null>(null);
 
   // Connection status details
-  const [needsRemotePairing, setNeedsRemotePairing] = useState(false);
+  const [needsRemotePairing, setNeedsRemotePairing] = useState<boolean>(false);
 
   // Pairing states
-  const [pairing, setPairing] = useState(false);
-  const [pairingStep, setPairingStep] = useState(null); // 'discovering' | 'waitingForButtonPress' | 'pairing' | 'success' | 'remotePairing'
-  const [pairingError, setPairingError] = useState(null);
-  const [discoveredBridges, setDiscoveredBridges] = useState([]);
-  const [selectedBridge, setSelectedBridge] = useState(null);
-  const [pairingCountdown, setPairingCountdown] = useState(30);
-  const pairingTimerRef = useRef(null);
+  const [pairing, setPairing] = useState<boolean>(false);
+  const [pairingStep, setPairingStep] = useState<PairingStep | null>(null);
+  const [pairingError, setPairingError] = useState<string | null>(null);
+  const [discoveredBridges, setDiscoveredBridges] = useState<HueBridge[]>([]);
+  const [selectedBridge, setSelectedBridge] = useState<HueBridge | null>(null);
+  const [pairingCountdown, setPairingCountdown] = useState<number>(30);
+  const pairingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const connectionCheckedRef = useRef(false);
-  const pollingStartedRef = useRef(false);
+  const connectionCheckedRef = useRef<boolean>(false);
+  const pollingStartedRef = useRef<boolean>(false);
 
   // Check connection on mount
   useEffect(() => {
@@ -61,13 +90,13 @@ export default function LightsPage() {
     };
   }, [connected]);
 
-  async function checkConnection() {
+  async function checkConnection(): Promise<void> {
     try {
       setLoading(true);
       setError(null);
 
       const response = await fetch('/api/hue/status');
-      const data = await response.json();
+      const data: any = await response.json();
 
       setConnected(data.connected || false);
 
@@ -81,13 +110,13 @@ export default function LightsPage() {
     } catch (err) {
       console.error('Errore connessione Hue:', err);
       setConnected(false);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Errore sconosciuto');
     } finally {
       setLoading(false);
     }
   }
 
-  async function fetchData() {
+  async function fetchData(): Promise<void> {
     try {
       setError(null);
 
@@ -127,14 +156,14 @@ export default function LightsPage() {
     }
   }
 
-  async function handleRefresh() {
+  async function handleRefresh(): Promise<void> {
     setRefreshing(true);
     await checkConnection();
     if (connected) await fetchData();
     setRefreshing(false);
   }
 
-  async function handleRoomToggle(groupedLightId, on) {
+  async function handleRoomToggle(groupedLightId: string, on: boolean): Promise<void> {
     try {
       setRefreshing(true);
       setError(null);
@@ -154,7 +183,7 @@ export default function LightsPage() {
     }
   }
 
-  async function handleLightToggle(lightId, on) {
+  async function handleLightToggle(lightId: string, on: boolean): Promise<void> {
     try {
       setRefreshing(true);
       setError(null);
@@ -174,7 +203,7 @@ export default function LightsPage() {
     }
   }
 
-  async function handleBrightnessChange(groupedLightId, brightness) {
+  async function handleBrightnessChange(groupedLightId: string, brightness: number): Promise<void> {
     try {
       setRefreshing(true);
       setError(null);
@@ -196,7 +225,7 @@ export default function LightsPage() {
     }
   }
 
-  async function handleLightBrightnessChange(lightId, brightness) {
+  async function handleLightBrightnessChange(lightId: string, brightness: number): Promise<void> {
     try {
       setRefreshing(true);
       setError(null);
@@ -218,7 +247,7 @@ export default function LightsPage() {
     }
   }
 
-  async function handleLightColorChange(lightId, colorPreset) {
+  async function handleLightColorChange(lightId: string, colorPreset: any): Promise<void> {
     try {
       setChangingColor(lightId);
       setError(null);
@@ -245,7 +274,7 @@ export default function LightsPage() {
     }
   }
 
-  async function handleActivateScene(sceneId, sceneName) {
+  async function handleActivateScene(sceneId: string, sceneName: string): Promise<void> {
     try {
       setActivatingScene(sceneId);
       setError(null);
@@ -267,7 +296,7 @@ export default function LightsPage() {
     }
   }
 
-  async function handleAllLightsToggle(on) {
+  async function handleAllLightsToggle(on: boolean): Promise<void> {
     try {
       setRefreshing(true);
       setError(null);
@@ -326,7 +355,7 @@ export default function LightsPage() {
   };
 
   // Disconnect from Hue
-  async function handleDisconnect() {
+  async function handleDisconnect(): Promise<void> {
     if (!confirm('Disconnettere il bridge Hue? Dovrai riconnetterti per controllare le luci.')) {
       return;
     }
@@ -353,7 +382,7 @@ export default function LightsPage() {
   }
 
   // Start local pairing flow
-  async function handleStartPairing() {
+  async function handleStartPairing(): Promise<void> {
     try {
       setPairing(true);
       setPairingStep('discovering');
@@ -403,7 +432,7 @@ export default function LightsPage() {
   }
 
   // Pair with selected bridge
-  async function handlePairWithBridge(bridge) {
+  async function handlePairWithBridge(bridge: HueBridge): Promise<void> {
     try {
       setPairingStep('pairing');
       setPairingError(null);
@@ -484,7 +513,7 @@ export default function LightsPage() {
   }
 
   // Execute remote pairing (after user pressed bridge button)
-  async function handleExecuteRemotePairing() {
+  async function handleExecuteRemotePairing(): Promise<void> {
     try {
       setPairingStep('remotePairing');
       setPairingError(null);

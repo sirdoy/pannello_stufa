@@ -6,10 +6,10 @@ import { Card } from '@/app/components/ui';
 
 export default function NetatmoAuthorizedPage() {
   const router = useRouter();
-  const [status, setStatus] = useState('Verifica autenticazione...');
+  const [status, setStatus] = useState<string>('Verifica autenticazione...');
 
   useEffect(() => {
-    async function checkAndRedirect() {
+    async function checkAndRedirect(): Promise<void> {
       try {
         // Wait a moment for callback to finish processing
         await new Promise(resolve => setTimeout(resolve, 1500));

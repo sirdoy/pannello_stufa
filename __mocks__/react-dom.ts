@@ -4,11 +4,13 @@
  * Source: https://github.com/testing-library/react-testing-library/issues/62
  */
 
+import React from 'react';
+
 const ReactDOM = jest.requireActual('react-dom');
 
 module.exports = {
   ...ReactDOM,
   // Render portal content inline instead of to document.body
   // This ensures testing-library can find the content in its container
-  createPortal: (node) => node,
+  createPortal: (node: React.ReactNode) => node,
 };

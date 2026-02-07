@@ -3,4 +3,4 @@
  * Maps internal imports to the public 'next/server' API
  */
 
-module.exports = require('next/server');
+export { NextResponse } from 'next/server';

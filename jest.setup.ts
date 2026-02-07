@@ -1,3 +1,17 @@
+import '@testing-library/jest-dom';
+import { configure } from '@testing-library/react';
+import React from 'react';
+import { toHaveNoViolations, configureAxe } from 'jest-axe';
+
+// Declare global test environment variables and utilities
+declare global {
+  var __TEST_ENVIRONMENT__: boolean;
+  var __CLIENT_SIDE_MOUNTED__: boolean;
+  var IS_REACT_ACT_ENVIRONMENT: boolean;
+  var axe: ReturnType<typeof configureAxe>;
+  var runAxeWithRealTimers: (container: Element) => Promise<any>;
+}
+
 // Mock react-dom FIRST (before testing-library loads it)
 // This ensures createPortal renders inline in tests
 jest.mock('react-dom', () => {
@@ -6,15 +20,11 @@ jest.mock('react-dom', () => {
     ...actualReactDOM,
     // Render portal content inline instead of to document.body
     // This fixes React 19 + Next.js 16 portal components not rendering in testing-library container
-    createPortal: (node) => node,
+    createPortal: (node: React.ReactNode) => node,
   };
 });
 
-// Learn more: https://github.com/testing-library/jest-dom
-require('@testing-library/jest-dom');
-
 // Configure testing-library for React 19 compatibility
-const { configure, waitFor } = require('@testing-library/react');
 configure({
   // React 19: Increase timeout for async rendering (portals, Suspense, etc.)
   asyncUtilTimeout: 3000,
@@ -38,16 +48,15 @@ global.__CLIENT_SIDE_MOUNTED__ = true;
 
 // Add React.act polyfill for React 19
 // Standalone implementation that doesn't create circular dependencies
-const React = require('react');
 if (!React.act) {
-  React.act = function (callback) {
+  React.act = function (callback: () => any) {
     try {
       const result = callback();
       // If it's a promise, wait for it
       if (result !== null && typeof result === 'object' && typeof result.then === 'function') {
         return result.then(
-          (value) => value,
-          (error) => {
+          (value: any) => value,
+          (error: any) => {
             throw error;
           }
         );
@@ -57,7 +66,7 @@ if (!React.act) {
     } catch (error) {
       return Promise.reject(error);
     }
-  };
+  } as any;
 }
 
 // Mock environment variables for testing
@@ -74,7 +83,7 @@ process.env.CRON_SECRET = 'test-secret';
 if (typeof window !== 'undefined') {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
-    value: jest.fn().mockImplementation((query) => ({
+    value: jest.fn().mockImplementation((query: string) => ({
       matches: false,
       media: query,
       onchange: null,
@@ -89,14 +98,17 @@ if (typeof window !== 'undefined') {
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
+  constructor(callback?: IntersectionObserverCallback, options?: IntersectionObserverInit) {}
   disconnect() {}
-  observe() {}
-  takeRecords() {
+  observe(target: Element) {}
+  takeRecords(): IntersectionObserverEntry[] {
     return [];
   }
-  unobserve() {}
-};
+  unobserve(target: Element) {}
+  readonly root: Element | Document | null = null;
+  readonly rootMargin: string = '';
+  readonly thresholds: ReadonlyArray<number> = [];
+} as any;
 
 // Mock Pointer Capture API (required for Radix UI Select)
 // JSDOM doesn't support Pointer Capture API, so we need to polyfill it
@@ -111,16 +123,26 @@ if (typeof window !== 'undefined' && typeof Element !== 'undefined') {
 
 // Mock ResizeObserver (required for Radix UI positioning)
 global.ResizeObserver = class ResizeObserver {
-  constructor(callback) {
+  constructor(callback: ResizeObserverCallback) {
     this.callback = callback;
   }
+  callback: ResizeObserverCallback;
   disconnect() {}
-  observe() {}
-  unobserve() {}
-};
+  observe(target: Element, options?: ResizeObserverOptions) {}
+  unobserve(target: Element) {}
+} as any;
 
 // Mock DOMRect (required for Radix floating UI)
 global.DOMRect = global.DOMRect || class DOMRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+
   constructor(x = 0, y = 0, width = 0, height = 0) {
     this.x = x;
     this.y = y;
@@ -131,13 +153,13 @@ global.DOMRect = global.DOMRect || class DOMRect {
     this.bottom = y + height;
     this.left = x;
   }
-  static fromRect(other) {
-    return new DOMRect(other.x, other.y, other.width, other.height);
+  static fromRect(other?: DOMRectInit): DOMRect {
+    return new DOMRect(other?.x, other?.y, other?.width, other?.height);
   }
   toJSON() {
     return { x: this.x, y: this.y, width: this.width, height: this.height };
   }
-};
+} as any;
 
 // Mock getBoundingClientRect to return a valid DOMRect
 if (typeof Element !== 'undefined') {
@@ -154,23 +176,28 @@ if (typeof Element !== 'undefined') {
 // Polyfill Request for API route tests
 if (typeof Request === 'undefined') {
   global.Request = class Request {
-    constructor(url, init) {
+    url: string;
+    method: string;
+    headers: any;
+    body: any;
+
+    constructor(url: string, init?: RequestInit) {
       this.url = url;
       this.method = init?.method || 'GET';
       this.headers = init?.headers || {};
       this.body = init?.body;
     }
-  };
+  } as any;
 }
 
 // Mock localStorage
-const localStorageMock = {
+const localStorageMock: Record<string, jest.Mock> = {
   getItem: jest.fn(),
   setItem: jest.fn(),
   removeItem: jest.fn(),
   clear: jest.fn(),
 };
-global.localStorage = localStorageMock;
+global.localStorage = localStorageMock as any;
 
 // Mock Firebase to prevent initialization issues
 jest.mock('firebase/app', () => ({
@@ -227,7 +254,7 @@ jest.mock('next/navigation', () => ({
 
 // Mock Next.js server (updated for Next.js 16)
 // Use mockImplementation to survive jest.clearAllMocks()
-const nextResponseJsonImpl = (body, init) => {
+const nextResponseJsonImpl = (body: unknown, init?: { status?: number; headers?: HeadersInit }) => {
   const response = {
     status: init?.status || 200,
     headers: new Headers(init?.headers || {}),
@@ -237,7 +264,7 @@ const nextResponseJsonImpl = (body, init) => {
 };
 
 // Create NextResponse as a constructor function with static methods
-function NextResponseMock(body, init) {
+function NextResponseMock(body: any, init?: { status?: number; headers?: HeadersInit }) {
   return {
     body,
     status: init?.status || 200,
@@ -247,7 +274,7 @@ function NextResponseMock(body, init) {
 }
 
 // Add static json method
-NextResponseMock.json = jest.fn().mockImplementation(nextResponseJsonImpl);
+(NextResponseMock as any).json = jest.fn().mockImplementation(nextResponseJsonImpl);
 
 jest.mock('next/server', () => ({
   __esModule: true,
@@ -260,8 +287,8 @@ afterEach(() => {
   jest.clearAllMocks();
 
   // Restore NextResponse.json implementation after clearAllMocks
-  if (NextResponseMock.json.mockImplementation) {
-    NextResponseMock.json.mockImplementation(nextResponseJsonImpl);
+  if ((NextResponseMock as any).json.mockImplementation) {
+    (NextResponseMock as any).json.mockImplementation(nextResponseJsonImpl);
   }
 
   localStorageMock.getItem.mockClear();
@@ -272,7 +299,6 @@ afterEach(() => {
 
 // ===== ACCESSIBILITY TESTING (jest-axe) =====
 // Import and extend jest-axe matchers for a11y assertions
-const { toHaveNoViolations, configureAxe } = require('jest-axe');
 expect.extend(toHaveNoViolations);
 
 // Configure axe for better test stability in JSDOM
@@ -289,7 +315,7 @@ global.axe = configuredAxe;
 
 // Helper for jest-axe with fake timers (axe-core uses setTimeout internally)
 // Usage: await runAxeWithRealTimers(container)
-global.runAxeWithRealTimers = async (container) => {
+global.runAxeWithRealTimers = async (container: Element) => {
   // If fake timers are active, temporarily switch to real timers
   const isUsingFakeTimers = typeof jest !== 'undefined' && jest.isFakeTimers && jest.isFakeTimers();
 

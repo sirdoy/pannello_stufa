@@ -63,7 +63,7 @@ export const GET = withAuthAndErrorHandler(async () => {
  *   400: { error: '...validation error...', code: 'VALIDATION_ERROR' }
  */
 export const POST = withAuthAndErrorHandler(async (request) => {
-  const body = await request.json();
+  const body = (await request.json()) as UpdateLocationBody;
   const { latitude, longitude, name } = body;
 
   // Validate required fields
@@ -72,8 +72,8 @@ export const POST = withAuthAndErrorHandler(async (request) => {
   }
 
   // Parse and validate coordinates
-  const lat = parseFloat(latitude);
-  const lon = parseFloat(longitude);
+  const lat = typeof latitude === 'string' ? parseFloat(latitude) : latitude;
+  const lon = typeof longitude === 'string' ? parseFloat(longitude) : longitude;
 
   if (isNaN(lat) || isNaN(lon)) {
     return badRequest('latitude and longitude must be valid numbers');

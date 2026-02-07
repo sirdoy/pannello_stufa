@@ -17,6 +17,14 @@ import {
 } from '@/lib/devicePreferencesService';
 import { DEVICE_CONFIG } from '@/lib/devices/deviceTypes';
 
+interface DevicePreferences {
+  [deviceId: string]: boolean;
+}
+
+interface UpdatePreferencesBody {
+  preferences: DevicePreferences;
+}
+
 export const dynamic = 'force-dynamic';
 
 /**
@@ -52,7 +60,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
  */
 export const POST = withAuthAndErrorHandler(async (request, context, session) => {
   const userId = session.user.sub;
-  const body = await parseJsonOrThrow(request);
+  const body = (await parseJsonOrThrow(request)) as UpdatePreferencesBody;
   const { preferences } = body;
 
   // Validate preferences object
@@ -90,8 +98,8 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
 /**
  * Get device description for UI
  */
-function getDeviceDescription(deviceId) {
-  const descriptions = {
+function getDeviceDescription(deviceId: string): string {
+  const descriptions: Record<string, string> = {
     stove: 'Stufa a pellet Thermorossi - controllo accensione, spegnimento, potenza e ventilazione',
     thermostat: 'Termostato Netatmo Energy - gestione multi-room temperatura e programmazione',
     lights: 'Luci Philips Hue - controllo luci smart, scene e automazioni',

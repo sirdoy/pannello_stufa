@@ -23,20 +23,31 @@ import { adminDbGet, adminDbUpdate } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
+interface ResolveErrorBody {
+  errorId: string;
+}
+
+interface ErrorData {
+  errorCode: number;
+  resolved?: boolean;
+  resolvedAt?: number;
+  [key: string]: unknown;
+}
+
 /**
  * POST /api/errors/resolve
  * Mark a stove error as resolved
  * Protected: Requires Auth0 authentication
  */
 export const POST = withAuthAndErrorHandler(async (request) => {
-  const body = await parseJsonOrThrow(request);
+  const body = (await parseJsonOrThrow(request)) as ResolveErrorBody;
   const { errorId } = body;
 
   // Validate required field
   validateRequired(errorId, 'errorId');
 
   // Verify error exists
-  const errorData = await adminDbGet(`errors/${errorId}`);
+  const errorData = (await adminDbGet(`errors/${errorId}`)) as ErrorData | null;
 
   if (!errorData) {
     return notFound('Errore non trovato');

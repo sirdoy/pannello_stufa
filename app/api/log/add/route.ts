@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
  */
 export const POST = withAuthAndErrorHandler(async (request, context, session) => {
   const user = session.user;
-  const body = await parseJson(request);
+  const body = (await parseJson(request)) as Record<string, unknown>;
 
   const logEntry = {
     ...body,

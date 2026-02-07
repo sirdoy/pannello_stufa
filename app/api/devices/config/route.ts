@@ -22,6 +22,16 @@ import {
 } from '@/lib/services/unifiedDeviceConfigService';
 import { DEFAULT_DEVICE_ORDER } from '@/lib/devices/deviceTypes';
 
+interface DeviceConfigEntry {
+  id: string;
+  visible: boolean;
+  order: number;
+}
+
+interface UpdateDeviceConfigBody {
+  devices: DeviceConfigEntry[];
+}
+
 export const dynamic = 'force-dynamic';
 
 /**
@@ -56,7 +66,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
  */
 export const POST = withAuthAndErrorHandler(async (request, context, session) => {
   const userId = session.user.sub;
-  const body = await parseJsonOrThrow(request);
+  const body = (await parseJsonOrThrow(request)) as UpdateDeviceConfigBody;
   const { devices } = body;
 
   // Validate devices array
@@ -66,7 +76,7 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
 
   // Validate each device entry
   const validIds = new Set(DEFAULT_DEVICE_ORDER);
-  const seenIds = new Set();
+  const seenIds = new Set<string>();
 
   for (const device of devices) {
     // Check required fields

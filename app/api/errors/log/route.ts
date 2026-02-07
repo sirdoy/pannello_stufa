@@ -27,7 +27,16 @@ import { adminDbPush } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
-const VALID_SEVERITIES = ['info', 'warning', 'error', 'critical'];
+type Severity = 'info' | 'warning' | 'error' | 'critical';
+
+const VALID_SEVERITIES: Severity[] = ['info', 'warning', 'error', 'critical'];
+
+interface LogErrorBody {
+  errorCode: number;
+  errorDescription: string;
+  severity: Severity;
+  additionalData?: Record<string, unknown>;
+}
 
 /**
  * POST /api/errors/log
@@ -35,7 +44,7 @@ const VALID_SEVERITIES = ['info', 'warning', 'error', 'critical'];
  * Protected: Requires Auth0 authentication
  */
 export const POST = withAuthAndErrorHandler(async (request) => {
-  const body = await parseJsonOrThrow(request);
+  const body = (await parseJsonOrThrow(request)) as LogErrorBody;
   const { errorCode, errorDescription, severity, additionalData } = body;
 
   // Validate required fields

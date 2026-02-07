@@ -14,7 +14,7 @@ Plan: 4 of 7 (IN PROGRESS)
 Status: In progress — Settings pages migrated to TypeScript
 Last activity: 2026-02-07 — Completed 41-04-PLAN.md (10 settings pages migrated)
 
-Progress: [██████████░░░░░░░░░░░░░░] 57% (4/7 phases complete, Phase 41: 4/7 plans)
+Progress: [██████████░░░░░░░░░░░░░░] 57% (4/7 phases complete, Phase 41: 4/7 plans complete)
 
 ## Milestone Overview
 
@@ -29,15 +29,15 @@ Progress: [██████████░░░░░░░░░░░░░
 | 38 | Library Migration | 4 | COMPLETE (4/4) |
 | 39 | UI Components Migration | 3 | COMPLETE (11/11 plans, 137/137 files migrated, 0 tsc errors) |
 | 40 | API Routes Migration | 3 | COMPLETE (7/7 plans, 90/90 files migrated, 0 tsc errors) |
-| 41 | Pages Migration | 3 | IN PROGRESS (4/7 plans complete, 41 files migrated) |
+| 41 | Pages Migration | 3 | IN PROGRESS (2/7 plans complete, 7 schedule components migrated) |
 | 42 | Test Migration | 4 | Pending |
 | 43 | Verification | 4 | Pending |
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 185 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 33)
-- Average duration: ~6.0 min per plan
+- Total plans completed: 182 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 30)
+- Average duration: ~6.1 min per plan
 - Total execution time: ~18.5 hours across 7 milestones
 
 **By Milestone:**

@@ -26,7 +26,8 @@ import Badge from '@/app/components/ui/Badge';
 import Skeleton from '@/app/components/ui/Skeleton';
 import { Heading, Text } from '@/app/components/ui';
 import LocationSearch from '@/app/components/LocationSearch';
-import { Palette, MapPin, Smartphone, ChevronUp, ChevronDown } from 'lucide-react';
+import { Palette, MapPin, Smartphone, ChevronUp, ChevronDown, FlaskConical } from 'lucide-react';
+import SandboxToggle from '@/app/components/sandbox/SandboxToggle';
 
 /**
  * ThemeContent - Extracted from theme/page.js
@@ -661,6 +662,20 @@ function UnifiedDevicesContent() {
 }
 
 /**
+ * SandboxContent - Sandbox testing toggle
+ */
+function SandboxContent() {
+  return (
+    <div className="space-y-6 mt-6">
+      <Text variant="secondary">
+        Attiva la modalita sandbox per testare senza chiamate reali ai dispositivi
+      </Text>
+      <SandboxToggle />
+    </div>
+  );
+}
+
+/**
  * Main Settings Page Component
  */
 function SettingsPageContent() {
@@ -701,11 +716,13 @@ function SettingsPageContent() {
           <Tabs.Trigger value="aspetto" icon={<Palette size={18} />}>Aspetto</Tabs.Trigger>
           <Tabs.Trigger value="posizione" icon={<MapPin size={18} />}>Posizione</Tabs.Trigger>
           <Tabs.Trigger value="dispositivi" icon={<Smartphone size={18} />}>Dispositivi</Tabs.Trigger>
+          <Tabs.Trigger value="sandbox" icon={<FlaskConical size={18} />}>Sandbox</Tabs.Trigger>
         </Tabs.List>
 
         <Tabs.Content value="aspetto"><ThemeContent /></Tabs.Content>
         <Tabs.Content value="posizione"><LocationContent /></Tabs.Content>
         <Tabs.Content value="dispositivi"><UnifiedDevicesContent /></Tabs.Content>
+        <Tabs.Content value="sandbox"><SandboxContent /></Tabs.Content>
       </Tabs>
     </SettingsLayout>
   );

@@ -6,10 +6,8 @@ export const dynamic = 'force-dynamic';
 
 /**
  * Helper function to format time from ISO string to HH:MM
- * @param {string} isoString - ISO date-time string (e.g., "2026-02-03T07:15")
- * @returns {string} Formatted time (e.g., "07:15")
  */
-function formatTime(isoString) {
+function formatTime(isoString: string | undefined): string | null {
   if (!isoString) return null;
   try {
     const date = new Date(isoString);
@@ -82,10 +80,10 @@ export const GET = withAuthAndErrorHandler(async (request) => {
     const currentCondition = interpretWeatherCode(data.current.weather_code);
 
     // Extract air quality value
-    const airQuality = airQualityResult?.current?.european_aqi ?? null;
+    const airQuality = (airQualityResult as any)?.current?.european_aqi ?? null;
 
     // Enrich daily forecast with interpreted codes and extended data
-    const dailyForecast = data.daily.time.map((date, i) => {
+    const dailyForecast = data.daily.time.map((date: string, i: number) => {
       const code = data.daily.weather_code[i];
       return {
         date,
@@ -141,10 +139,11 @@ export const GET = withAuthAndErrorHandler(async (request) => {
     });
   } catch (err) {
     // Log error for monitoring
-    console.error('[Weather/Forecast]', err.message || err);
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    console.error('[Weather/Forecast]', errorMessage);
 
     // Handle Open-Meteo API errors
-    if (err.message && err.message.includes('Open-Meteo API error')) {
+    if (errorMessage.includes('Open-Meteo API error')) {
       return error('Weather service unavailable', 'WEATHER_API_ERROR', 503);
     }
 

@@ -24,13 +24,24 @@ import { adminDbGet, adminDbUpdate } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
+interface UpdateTargetBody {
+  targetHours: number;
+}
+
+interface MaintenanceData {
+  currentHours: number;
+  targetHours: number;
+  needsCleaning?: boolean;
+  [key: string]: unknown;
+}
+
 /**
  * POST /api/maintenance/update-target
  * Update maintenance target hours
  * Protected: Requires Auth0 authentication
  */
 export const POST = withAuthAndErrorHandler(async (request) => {
-  const body = await parseJsonOrThrow(request);
+  const body = (await parseJsonOrThrow(request)) as UpdateTargetBody;
   const { targetHours } = body;
 
   // Validate required field
@@ -40,15 +51,15 @@ export const POST = withAuthAndErrorHandler(async (request) => {
   }
 
   // Get current maintenance data
-  const maintenanceData = await adminDbGet('maintenance');
+  const maintenanceData = (await adminDbGet('maintenance')) as MaintenanceData | null;
 
   if (!maintenanceData) {
     return notFound('Dati manutenzione non trovati');
   }
 
   // Update target hours
-  const updates = {
-    targetHours: parseFloat(targetHours),
+  const updates: Partial<MaintenanceData> = {
+    targetHours: parseFloat(targetHours as any),
   };
 
   // Check if current hours >= new threshold

@@ -20,6 +20,14 @@ import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
 
 export const dynamic = 'force-dynamic';
 
+interface MaintenanceData {
+  currentHours: number;
+  targetHours: number;
+  needsCleaning?: boolean;
+  lastCleanedAt?: string;
+  [key: string]: unknown;
+}
+
 /**
  * POST /api/maintenance/confirm-cleaning
  * Confirm stove cleaning
@@ -29,7 +37,7 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
   const user = session.user;
 
   // Get current maintenance data
-  const maintenanceData = await adminDbGet('maintenance');
+  const maintenanceData = (await adminDbGet('maintenance')) as MaintenanceData | null;
 
   if (!maintenanceData) {
     return notFound('Dati manutenzione non trovati');

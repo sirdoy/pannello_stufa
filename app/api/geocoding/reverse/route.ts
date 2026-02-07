@@ -12,13 +12,19 @@ import { withAuthAndErrorHandler, success, badRequest } from '@/lib/core';
 // Force dynamic rendering (server-side fetch to external API)
 export const dynamic = 'force-dynamic';
 
+interface GeocodingResult {
+  name: string;
+  admin1?: string;
+  country?: string;
+  latitude: number;
+  longitude: number;
+  [key: string]: unknown;
+}
+
 /**
  * Fetch with retry logic for Open-Meteo API
- * @param {string} url - URL to fetch
- * @param {number} retries - Number of retries remaining (default 3)
- * @returns {Promise<Response>} Fetch response
  */
-async function fetchWithRetry(url, retries = 3) {
+async function fetchWithRetry(url: string, retries = 3): Promise<Response> {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const response = await fetch(url, {
@@ -50,11 +56,8 @@ async function fetchWithRetry(url, retries = 3) {
 
 /**
  * Format coordinates as fallback name
- * @param {number} latitude - Latitude
- * @param {number} longitude - Longitude
- * @returns {string} Formatted coordinates string
  */
-function formatCoordinates(latitude, longitude) {
+function formatCoordinates(latitude: number, longitude: number): string {
   const latDir = latitude >= 0 ? 'N' : 'S';
   const lonDir = longitude >= 0 ? 'E' : 'W';
   return `${Math.abs(latitude).toFixed(2)}° ${latDir}, ${Math.abs(longitude).toFixed(2)}° ${lonDir}`;
@@ -62,10 +65,8 @@ function formatCoordinates(latitude, longitude) {
 
 /**
  * Format location name from Open-Meteo result
- * @param {Object} result - Open-Meteo geocoding result
- * @returns {string} Formatted location name
  */
-function formatLocationName(result) {
+function formatLocationName(result: GeocodingResult): string {
   const parts = [result.name];
 
   // Add admin region if different from city name
@@ -164,7 +165,7 @@ export const GET = withAuthAndErrorHandler(async (request) => {
       });
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as { timezone?: string };
 
     // The forecast API doesn't return city name, so we need another approach
     // Let's try the geocoding search API with specific coordinates
@@ -208,7 +209,7 @@ export const GET = withAuthAndErrorHandler(async (request) => {
       const cityResponse = await fetchWithRetry(citySearchUrl.toString());
 
       if (cityResponse.ok) {
-        const cityData = await cityResponse.json();
+        const cityData = (await cityResponse.json()) as { results?: GeocodingResult[] };
         if (cityData.results && cityData.results.length > 0) {
           const result = cityData.results[0];
           return success({
@@ -228,7 +229,8 @@ export const GET = withAuthAndErrorHandler(async (request) => {
     });
   } catch (error) {
     // Log error for monitoring
-    console.error('[Geocoding/Reverse] Error:', error.message || error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('[Geocoding/Reverse] Error:', errorMessage);
 
     // Fallback to coordinates on error
     return success({

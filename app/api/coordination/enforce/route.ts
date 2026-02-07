@@ -23,6 +23,14 @@ import { logCoordinationEvent } from '@/lib/coordinationEventLogger';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
+interface CoordinationResponse {
+  success: boolean;
+  action: string;
+  details: Record<string, any>;
+  timestamp: number;
+  duration: number;
+}
+
 /**
  * GET /api/coordination/enforce
  * Main cron handler for coordination enforcement
@@ -48,8 +56,8 @@ export const GET = withCronSecret(async (request) => {
   }
 
   // 2. Get current stove status
-  let stoveStatus;
-  let stoveStatusDescription;
+  let stoveStatus: string;
+  let stoveStatusDescription: string;
 
   try {
     const stoveData = await getStoveStatus();
@@ -58,6 +66,8 @@ export const GET = withCronSecret(async (request) => {
   } catch (error) {
     console.error('❌ [Coordination] Failed to get stove status:', error);
 
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
     // Log error to Firestore (fire-and-forget)
     logCoordinationEvent({
       userId,
@@ -65,7 +75,7 @@ export const GET = withCronSecret(async (request) => {
       stoveStatus: 'ERROR',
       action: 'error',
       details: {
-        error: error.message,
+        error: errorMessage,
         source: 'stove_api',
       },
       notificationSent: false,
@@ -76,7 +86,7 @@ export const GET = withCronSecret(async (request) => {
       action: 'error',
       details: {
         error: 'Failed to get stove status',
-        message: error.message,
+        message: errorMessage,
       },
       timestamp: Date.now(),
       duration: Date.now() - startTime,
@@ -84,12 +94,12 @@ export const GET = withCronSecret(async (request) => {
   }
 
   // 3. Get home_id from Firebase
-  let homeId;
+  let homeId: string;
 
   try {
-    homeId = await adminDbGet(`users/${userId}/home_id`);
+    const fetchedHomeId = (await adminDbGet(`users/${userId}/home_id`)) as string | null;
 
-    if (!homeId) {
+    if (!fetchedHomeId) {
       console.warn('⚠️ [Coordination] No home_id found for user');
 
       // Log error to Firestore (fire-and-forget)
@@ -114,8 +124,12 @@ export const GET = withCronSecret(async (request) => {
         duration: Date.now() - startTime,
       });
     }
+
+    homeId = fetchedHomeId;
   } catch (error) {
     console.error('❌ [Coordination] Failed to get home_id:', error);
+
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
     // Log error to Firestore (fire-and-forget)
     logCoordinationEvent({
@@ -124,7 +138,7 @@ export const GET = withCronSecret(async (request) => {
       stoveStatus,
       action: 'error',
       details: {
-        error: error.message,
+        error: errorMessage,
         source: 'firebase',
       },
       notificationSent: false,
@@ -135,7 +149,7 @@ export const GET = withCronSecret(async (request) => {
       action: 'error',
       details: {
         error: 'Failed to get home_id',
-        message: error.message,
+        message: errorMessage,
       },
       timestamp: Date.now(),
       duration: Date.now() - startTime,
@@ -143,12 +157,14 @@ export const GET = withCronSecret(async (request) => {
   }
 
   // 4. Execute coordination cycle
-  let result;
+  let result: any;
 
   try {
     result = await processCoordinationCycle(userId, stoveStatus, homeId);
   } catch (error) {
     console.error('❌ [Coordination] Cycle execution error:', error);
+
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
     // Log error to Firestore (fire-and-forget)
     logCoordinationEvent({
@@ -157,7 +173,7 @@ export const GET = withCronSecret(async (request) => {
       stoveStatus,
       action: 'error',
       details: {
-        error: error.message,
+        error: errorMessage,
         source: 'orchestrator',
       },
       notificationSent: false,
@@ -168,7 +184,7 @@ export const GET = withCronSecret(async (request) => {
       action: 'error',
       details: {
         error: 'Coordination cycle failed',
-        message: error.message,
+        message: errorMessage,
         stoveStatus,
       },
       timestamp: Date.now(),

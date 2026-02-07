@@ -12,13 +12,20 @@ import { withAuthAndErrorHandler, success, badRequest } from '@/lib/core';
 // Force dynamic rendering (server-side fetch to external API)
 export const dynamic = 'force-dynamic';
 
+interface GeocodingSearchResult {
+  id: number;
+  name: string;
+  country: string | null;
+  admin1: string | null;
+  latitude: number;
+  longitude: number;
+  timezone: string | null;
+}
+
 /**
  * Fetch with retry logic for Open-Meteo API
- * @param {string} url - URL to fetch
- * @param {number} retries - Number of retries remaining (default 3)
- * @returns {Promise<Response>} Fetch response
  */
-async function fetchWithRetry(url, retries = 3) {
+async function fetchWithRetry(url: string, retries = 3): Promise<Response> {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const response = await fetch(url, {
@@ -91,10 +98,10 @@ export const GET = withAuthAndErrorHandler(async (request) => {
       return success({ results: [] });
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as { results?: any[] };
 
     // Open-Meteo returns { results: [...] } or {} if no results
-    const results = (data.results || []).map(result => ({
+    const results: GeocodingSearchResult[] = (data.results || []).map((result: any) => ({
       id: result.id,
       name: result.name,
       country: result.country || null,
@@ -107,7 +114,8 @@ export const GET = withAuthAndErrorHandler(async (request) => {
     return success({ results });
   } catch (error) {
     // Log error for monitoring
-    console.error('[Geocoding/Search] Error:', error.message || error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('[Geocoding/Search] Error:', errorMessage);
 
     // Return empty results on fetch failure (graceful degradation)
     return success({ results: [] });

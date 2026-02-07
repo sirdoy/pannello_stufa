@@ -24,7 +24,13 @@ import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
-const VALID_THEMES = ['light', 'dark'];
+type Theme = 'light' | 'dark';
+
+const VALID_THEMES: Theme[] = ['light', 'dark'];
+
+interface UpdateThemeBody {
+  theme: Theme;
+}
 
 /**
  * GET /api/user/theme
@@ -35,7 +41,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
   const userId = session.user.sub;
 
   // Get theme from Firebase
-  const theme = await adminDbGet(`users/${userId}/preferences/theme`);
+  const theme = (await adminDbGet(`users/${userId}/preferences/theme`)) as Theme | null;
 
   if (theme) {
     return success({ theme });
@@ -43,7 +49,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
 
   // Default: light
   return success({
-    theme: 'light',
+    theme: 'light' as Theme,
     default: true,
   });
 }, 'User/GetTheme');
@@ -55,7 +61,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
  */
 export const POST = withAuthAndErrorHandler(async (request, context, session) => {
   const userId = session.user.sub;
-  const body = await parseJsonOrThrow(request);
+  const body = (await parseJsonOrThrow(request)) as UpdateThemeBody;
   const { theme } = body;
 
   // Validate

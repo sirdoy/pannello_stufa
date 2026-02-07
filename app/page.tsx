@@ -4,12 +4,12 @@ import ThermostatCard from './components/devices/thermostat/ThermostatCard';
 import CameraCard from './components/devices/camera/CameraCard';
 import LightsCard from './components/devices/lights/LightsCard';
 import WeatherCardWrapper from './components/devices/weather/WeatherCardWrapper';
-import SandboxToggle from './components/sandbox/SandboxToggle';
+import SandboxPanel from './components/sandbox/SandboxPanel';
 import {
   getUnifiedDeviceConfigAdmin,
   getVisibleDashboardCards,
 } from '@/lib/services/unifiedDeviceConfigService';
-import { Section, Grid, EmptyState } from './components/ui';
+import { Grid, EmptyState } from './components/ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,44 +42,36 @@ export default async function Home() {
   const visibleCards = getVisibleDashboardCards(deviceConfig);
 
   return (
-    <>
-      {/* Page header using new Section component */}
-      <Section
-        title="I tuoi dispositivi"
-        description="Controlla e monitora tutti i dispositivi della tua casa in tempo reale"
-        spacing="lg"
-        level={1}
-      >
-        {/* Sandbox Toggle - Solo in localhost */}
-        <SandboxToggle />
+    <section className="py-8 sm:py-12 lg:py-16">
+      {/* Sandbox Panel - Solo in localhost quando abilitato */}
+      <SandboxPanel />
 
-        {/* Devices grid using new Grid component */}
-        <Grid cols={2} gap="lg">
-          {visibleCards.map((card, index) => {
-            const CardComponent = CARD_COMPONENTS[card.id];
-            if (!CardComponent) return null;
+      {/* Devices grid using new Grid component */}
+      <Grid cols={2} gap="lg">
+        {visibleCards.map((card, index) => {
+          const CardComponent = CARD_COMPONENTS[card.id];
+          if (!CardComponent) return null;
 
-            return (
-              <div
-                key={card.id}
-                className="animate-spring-in"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <CardComponent />
-              </div>
-            );
-          })}
-        </Grid>
+          return (
+            <div
+              key={card.id}
+              className="animate-spring-in"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <CardComponent />
+            </div>
+          );
+        })}
+      </Grid>
 
-        {/* Empty State using new EmptyState component */}
-        {visibleCards.length === 0 && (
-          <EmptyState
-            icon="🏠"
-            title="Nessun dispositivo configurato"
-            description="Aggiungi i tuoi dispositivi per iniziare"
-          />
-        )}
-      </Section>
-    </>
+      {/* Empty State using new EmptyState component */}
+      {visibleCards.length === 0 && (
+        <EmptyState
+          icon="🏠"
+          title="Nessun dispositivo configurato"
+          description="Aggiungi i tuoi dispositivi per iniziare"
+        />
+      )}
+    </section>
   );
 }

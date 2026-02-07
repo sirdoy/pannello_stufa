@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 40 - API Routes Migration
-Plan: 1 of 3 (COMPLETE)
-Status: In progress — Completed 40-01-PLAN.md (Stove API Routes - 14 files migrated)
-Last activity: 2026-02-07 — Completed 40-01-PLAN.md (Stove API Routes Migration)
+Plan: 6 of 8 (COMPLETE)
+Status: In progress — Completed 40-06-PLAN.md (Miscellaneous Routes - 16 files migrated, 90 total .ts routes)
+Last activity: 2026-02-07 — Completed 40-06-PLAN.md (Miscellaneous Routes Migration)
 
-Progress: [████████░░░░░░░░░░░░░░░░] 44% (3/7 phases complete, Phase 40: 1/3 plans complete)
+Progress: [████████░░░░░░░░░░░░░░░░] 46% (3/7 phases complete, Phase 40: 6/8 plans complete)
 
 ## Milestone Overview
 
@@ -28,7 +28,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 | 37 | TypeScript Foundation | 8 | COMPLETE (8/8) |
 | 38 | Library Migration | 4 | COMPLETE (4/4) |
 | 39 | UI Components Migration | 3 | COMPLETE (11/11 plans, 137/137 files migrated, 0 tsc errors) |
-| 40 | API Routes Migration | 3 | In progress (1/3 plans complete - Hue routes) |
+| 40 | API Routes Migration | 3 | In progress (6/8 plans complete - 90/90 route.ts files, 0 route.js remaining) |
 | 41 | Pages Migration | 3 | Pending |
 | 42 | Test Migration | 4 | Pending |
 | 43 | Verification | 4 | Pending |
@@ -36,9 +36,9 @@ Progress: [████████░░░░░░░░░░░░░░░
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 176 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 24)
+- Total plans completed: 181 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 29)
 - Average duration: ~6.0 min per plan
-- Total execution time: ~17.7 hours across 7 milestones
+- Total execution time: ~18.1 hours across 7 milestones
 
 **By Milestone:**
 
@@ -183,9 +183,9 @@ From 39-01 (Foundation UI components):
 ## Session Continuity
 
 Last session: 2026-02-07
-Stopped at: Completed 40-01-PLAN.md (Stove API Routes - 14 files migrated)
+Stopped at: Completed 40-06-PLAN.md (Miscellaneous Routes - 16 files migrated, 90 total .ts routes)
 Resume file: None
-Next step: Continue Phase 40 with remaining API route migrations (Netatmo, Hue, etc.)
+Next step: Continue Phase 40 with remaining plans (07-08)
 
 From 38-10 (Type definitions gap closure):
 - Type narrowing with 'in' operator for discriminated unions: if ('property' in object)
@@ -281,6 +281,16 @@ From 39-11 (Final components + error resolution):
 - Type guards in render: 'separator' in item && item.separator for discriminated unions
 - parseInt(stringValue, 10) for parsing numeric strings from props
 - Cast to any for interface mismatches when data transformation not available
+
+From 40-06 (Miscellaneous API routes):
+- Pragmatic typing for complex routes (200+ lines): coordination/enforce, geocoding/reverse use minimal typing with any for deep internal logic
+- External API pragmatic typing: Open-Meteo responses typed with minimal interfaces (GeocodingResult), cast pragmatically without full codegen
+- Firebase Admin SDK casting: (await adminDbGet(path)) as TypeInterface | null for all operations
+- Error instanceof check: error instanceof Error ? error.message : 'Unknown error' for all error handlers
+- Theme type union: 'light' | 'dark' with VALID_THEMES array for runtime validation via validateEnum
+- Request body interfaces defined inline per route (UpdateTargetBody, UpdateThemeBody, etc.)
+- Maintenance data interfaces for type-safe Firebase operations (MaintenanceData with currentHours, targetHours)
+- All 90 API route files migrated to TypeScript (0 .js files remaining in app/api)
 
 
 From 40-03 (Hue API Routes Migration):

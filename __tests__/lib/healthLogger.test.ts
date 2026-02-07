@@ -13,12 +13,12 @@ import {
   getRecentHealthLogs,
   getHealthCheckDetails,
   getHealthStats,
-} from '../../lib/healthLogger.js';
+} from '../../lib/healthLogger.ts';
 
 // Mock dependencies
-jest.mock('../../lib/firebaseAdmin.js');
+jest.mock('../../lib/firebaseAdmin.ts');
 
-import { getAdminFirestore } from '../../lib/firebaseAdmin.js';
+import { getAdminFirestore } from '../../lib/firebaseAdmin.ts';
 import { Timestamp } from 'firebase-admin/firestore';
 
 describe('healthLogger', () => {

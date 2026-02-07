@@ -6,14 +6,14 @@ import {
   updateDeadManSwitch,
   checkDeadManSwitch,
   alertDeadManSwitch,
-} from '../../lib/healthDeadManSwitch.js';
+} from '../../lib/healthDeadManSwitch.ts';
 
 // Mock dependencies
-jest.mock('../../lib/firebaseAdmin.js');
-jest.mock('../../lib/notificationTriggersServer.js');
+jest.mock('../../lib/firebaseAdmin.ts');
+jest.mock('../../lib/notificationTriggersServer.ts');
 
-import { adminDbSet, adminDbGet } from '../../lib/firebaseAdmin.js';
-import { triggerMaintenanceAlertServer } from '../../lib/notificationTriggersServer.js';
+import { adminDbSet, adminDbGet } from '../../lib/firebaseAdmin.ts';
+import { triggerMaintenanceAlertServer } from '../../lib/notificationTriggersServer.ts';
 
 describe('healthDeadManSwitch', () => {
   beforeEach(() => {

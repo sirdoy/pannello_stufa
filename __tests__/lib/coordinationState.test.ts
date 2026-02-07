@@ -6,14 +6,14 @@ import {
   getCoordinationState,
   updateCoordinationState,
   resetCoordinationState
-} from '../../lib/coordinationState.js';
+} from '../../lib/coordinationState.ts';
 
 // Mock dependencies
-jest.mock('../../lib/firebaseAdmin.js');
-jest.mock('../../lib/environmentHelper.js');
+jest.mock('../../lib/firebaseAdmin.ts');
+jest.mock('../../lib/environmentHelper.ts');
 
-import { adminDbGet, adminDbSet } from '../../lib/firebaseAdmin.js';
-import { getEnvironmentPath } from '../../lib/environmentHelper.js';
+import { adminDbGet, adminDbSet } from '../../lib/firebaseAdmin.ts';
+import { getEnvironmentPath } from '../../lib/environmentHelper.ts';
 
 describe('coordinationState', () => {
   beforeEach(() => {

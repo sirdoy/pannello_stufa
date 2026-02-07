@@ -13,16 +13,16 @@ import {
   checkUserStoveHealth,
   determineConnectionStatus,
   detectStateMismatch,
-} from '../../lib/healthMonitoring.js';
+} from '../../lib/healthMonitoring.ts';
 
 // Mock dependencies
-jest.mock('../../lib/stoveApi.js');
-jest.mock('../../lib/netatmoApi.js');
-jest.mock('../../lib/firebaseAdmin.js');
+jest.mock('../../lib/stoveApi.ts');
+jest.mock('../../lib/netatmoApi.ts');
+jest.mock('../../lib/firebaseAdmin.ts');
 
-import { getStoveStatus } from '../../lib/stoveApi.js';
-import { getHomeStatus } from '../../lib/netatmoApi.js';
-import { adminDbGet } from '../../lib/firebaseAdmin.js';
+import { getStoveStatus } from '../../lib/stoveApi.ts';
+import { getHomeStatus } from '../../lib/netatmoApi.ts';
+import { adminDbGet } from '../../lib/firebaseAdmin.ts';
 
 describe('healthMonitoring', () => {
   beforeEach(() => {

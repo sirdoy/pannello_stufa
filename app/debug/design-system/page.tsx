@@ -62,26 +62,26 @@ import { componentDocs } from './data/component-docs';
  * @see docs/design-system.md for complete technical documentation
  */
 export default function DesignSystemPage() {
-  const [toggleState, setToggleState] = useState(false);
-  const [selectValue, setSelectValue] = useState('1');
-  const [showToast, setShowToast] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [showBottomSheet, setShowBottomSheet] = useState(false);
-  const [checkboxState, setCheckboxState] = useState(false);
-  const [checkboxIndeterminate, setCheckboxIndeterminate] = useState(true);
-  const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
-  const [rightSheetOpen, setRightSheetOpen] = useState(false);
-  const [leftSheetOpen, setLeftSheetOpen] = useState(false);
-  const [topSheetOpen, setTopSheetOpen] = useState(false);
-  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
-  const [menuCheckboxState, setMenuCheckboxState] = useState(false);
+  const [toggleState, setToggleState] = useState<boolean>(false);
+  const [selectValue, setSelectValue] = useState<string>('1');
+  const [showToast, setShowToast] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
+  const [showBottomSheet, setShowBottomSheet] = useState<boolean>(false);
+  const [checkboxState, setCheckboxState] = useState<boolean>(false);
+  const [checkboxIndeterminate, setCheckboxIndeterminate] = useState<boolean>(true);
+  const [bottomSheetOpen, setBottomSheetOpen] = useState<boolean>(false);
+  const [rightSheetOpen, setRightSheetOpen] = useState<boolean>(false);
+  const [leftSheetOpen, setLeftSheetOpen] = useState<boolean>(false);
+  const [topSheetOpen, setTopSheetOpen] = useState<boolean>(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState<boolean>(false);
+  const [menuCheckboxState, setMenuCheckboxState] = useState<boolean>(false);
   // Dialog Patterns states
-  const [showConfirmDefault, setShowConfirmDefault] = useState(false);
-  const [showConfirmDanger, setShowConfirmDanger] = useState(false);
-  const [showFormModal, setShowFormModal] = useState(false);
-  const [isConfirmingDefault, setIsConfirmingDefault] = useState(false);
-  const [isConfirmingDanger, setIsConfirmingDanger] = useState(false);
+  const [showConfirmDefault, setShowConfirmDefault] = useState<boolean>(false);
+  const [showConfirmDanger, setShowConfirmDanger] = useState<boolean>(false);
+  const [showFormModal, setShowFormModal] = useState<boolean>(false);
+  const [isConfirmingDefault, setIsConfirmingDefault] = useState<boolean>(false);
+  const [isConfirmingDanger, setIsConfirmingDanger] = useState<boolean>(false);
 
   // Demo schema for FormModal
   const demoFormSchema = z.object({
@@ -90,14 +90,14 @@ export default function DesignSystemPage() {
   });
 
   // ConfirmationDialog demo handlers
-  const handleConfirmDefault = async () => {
+  const handleConfirmDefault = async (): Promise<void> => {
     setIsConfirmingDefault(true);
     await new Promise(r => setTimeout(r, 1500)); // Simulate async
     setIsConfirmingDefault(false);
     setShowConfirmDefault(false);
   };
 
-  const handleConfirmDanger = async () => {
+  const handleConfirmDanger = async (): Promise<void> => {
     setIsConfirmingDanger(true);
     await new Promise(r => setTimeout(r, 1500));
     setIsConfirmingDanger(false);
@@ -105,7 +105,7 @@ export default function DesignSystemPage() {
   };
 
   // FormModal demo handler
-  const handleFormSubmit = async (data) => {
+  const handleFormSubmit = async (data: any): Promise<void> => {
     await new Promise(r => setTimeout(r, 1500)); // Simulate API call
     console.log('Form submitted:', data);
   };

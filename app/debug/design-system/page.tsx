@@ -345,7 +345,7 @@ export default function DesignSystemPage() {
                   <div className="flex flex-wrap gap-3">
                     <Button icon="🔥" variant="ember">Start Stove</Button>
                     <Button icon="❄️" variant="subtle" iconPosition="right">Turn Off</Button>
-                    <Button icon="🔥" variant="ember" iconOnly size="md" aria-aria-label="Ignite stove" />
+                    <Button icon="🔥" variant="ember" iconOnly size="md" aria-label="Ignite stove" />
                     <ButtonIcon icon="⚙️" aria-label="Settings" variant="ghost" />
                     <ButtonIcon icon="❌" aria-label="Close" variant="danger" size="sm" />
                   </div>
@@ -1028,34 +1028,40 @@ export default function DesignSystemPage() {
                       aria-label="Text Input"
                       placeholder="Enter text..."
                       icon="📧"
+                      autoComplete="off" data-lpignore="true" data-1p-ignore
                     />
                     <Input
                       aria-label="Password Input"
                       type="password"
                       placeholder="Enter password..."
                       icon="🔒"
+                      autoComplete="off" data-lpignore="true" data-1p-ignore
                     />
                     <Input
                       aria-label="Input with Variant"
                       placeholder="Ocean variant..."
                       icon="🌊"
                       variant="subtle"
+                      autoComplete="off" data-lpignore="true" data-1p-ignore
                     />
                     <Input
                       aria-label="Input with Helper Text"
                       placeholder="Enter text..."
                       helperText="This is helper text that provides additional context"
+                      autoComplete="off" data-lpignore="true" data-1p-ignore
                     />
                     <Input
                       aria-label="Input with Error"
                       placeholder="Enter text..."
                       error="This field is required"
+                      autoComplete="off" data-lpignore="true" data-1p-ignore
                     />
                     <Input
                       aria-label="Disabled Input"
                       placeholder="Disabled..."
                       disabled
                       value="Cannot edit"
+                      autoComplete="off" data-lpignore="true" data-1p-ignore
                     />
                   </div>
                   <div className="mt-4">
@@ -1083,7 +1089,7 @@ export default function DesignSystemPage() {
                   </Text>
                   <div className="space-y-4 max-w-md">
                     <Select
-                      aria-label="Select Dropdown"
+                      label="Select Dropdown"
                       icon="🎯"
                       options={[
                         { value: '1', label: 'Option 1' },
@@ -1095,7 +1101,7 @@ export default function DesignSystemPage() {
                       onChange={(e) => setSelectValue(e.target.value)}
                     />
                     <Select
-                      aria-label="Select with Variant"
+                      label="Select with Variant"
                       variant="subtle"
                       options={[
                         { value: 'a', label: 'Ocean Option A' },
@@ -1106,7 +1112,7 @@ export default function DesignSystemPage() {
                       onChange={() => {}}
                     />
                     <Select
-                      aria-label="Disabled Select"
+                      label="Disabled Select"
                       disabled
                       options={[
                         { value: '1', label: 'Cannot select' },
@@ -1833,25 +1839,25 @@ export default function DesignSystemPage() {
                   </RightClickMenu.Trigger>
                   <RightClickMenu.Content>
                     <RightClickMenu.Label>Actions</RightClickMenu.Label>
-                    <RightClickMenu.Item icon={<Edit className="w-4 h-4" />}>
+                    <RightClickMenu.Item icon={<Edit className="w-4 h-4" aria-hidden="true" />}>
                       Edit
                     </RightClickMenu.Item>
-                    <RightClickMenu.Item icon={<Copy className="w-4 h-4" />}>
+                    <RightClickMenu.Item icon={<Copy className="w-4 h-4" aria-hidden="true" />}>
                       Duplicate
                     </RightClickMenu.Item>
-                    <RightClickMenu.Item icon={<Share className="w-4 h-4" />}>
+                    <RightClickMenu.Item icon={<Share className="w-4 h-4" aria-hidden="true" />}>
                       Share
                     </RightClickMenu.Item>
                     <RightClickMenu.Separator />
                     <RightClickMenu.CheckboxItem
                       checked={menuCheckboxState}
                       onCheckedChange={setMenuCheckboxState}
-                      icon={<Power className="w-4 h-4" />}
+                      icon={<Power className="w-4 h-4" aria-hidden="true" />}
                     >
                       Auto Mode
                     </RightClickMenu.CheckboxItem>
                     <RightClickMenu.Separator />
-                    <RightClickMenu.Item icon={<Trash2 className="w-4 h-4" />}>
+                    <RightClickMenu.Item icon={<Trash2 className="w-4 h-4" aria-hidden="true" />}>
                       Delete
                     </RightClickMenu.Item>
                   </RightClickMenu.Content>
@@ -1893,15 +1899,15 @@ export default function DesignSystemPage() {
                     {
                       heading: 'Navigation',
                       items: [
-                        { id: 'demo-home', label: 'Dashboard', icon: <Home className="w-4 h-4" />, shortcut: 'Cmd+D', onSelect: () => console.log('Navigate home') },
-                        { id: 'demo-settings', label: 'Settings', icon: <Settings className="w-4 h-4" />, shortcut: 'Cmd+,', onSelect: () => console.log('Navigate settings') },
+                        { id: 'demo-home', label: 'Dashboard', icon: <Home className="w-4 h-4" aria-hidden="true" />, shortcut: 'Cmd+D', onSelect: () => console.log('Navigate home') },
+                        { id: 'demo-settings', label: 'Settings', icon: <Settings className="w-4 h-4" aria-hidden="true" />, shortcut: 'Cmd+,', onSelect: () => console.log('Navigate settings') },
                       ]
                     },
                     {
                       heading: 'Actions',
                       items: [
-                        { id: 'demo-power', label: 'Toggle Power', icon: <Power className="w-4 h-4" />, onSelect: () => console.log('Toggle power') },
-                        { id: 'demo-theme', label: 'Toggle Theme', icon: <Moon className="w-4 h-4" />, onSelect: () => console.log('Toggle theme') },
+                        { id: 'demo-power', label: 'Toggle Power', icon: <Power className="w-4 h-4" aria-hidden="true" />, onSelect: () => console.log('Toggle power') },
+                        { id: 'demo-theme', label: 'Toggle Theme', icon: <Moon className="w-4 h-4" aria-hidden="true" />, onSelect: () => console.log('Toggle theme') },
                       ]
                     },
                   ]}
@@ -2292,7 +2298,7 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
 
                 <div>
                   <Text variant="label" size="xs" className="mb-3">Divider with Label</Text>
-                  <Divider aria-label="Settings" variant="gradient" spacing="medium" />
+                  <Divider label="Settings" variant="gradient" spacing="medium" />
                   <Text variant="secondary">Content after divider with label</Text>
                 </div>
 
@@ -2524,6 +2530,7 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
                       {...field}
                       error={fieldState.error?.message}
                       data-field="name"
+                      autoComplete="off" data-lpignore="true" data-1p-ignore
                     />
                   )}
                 />
@@ -2538,6 +2545,7 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
                       {...field}
                       error={fieldState.error?.message}
                       data-field="email"
+                      autoComplete="off" data-lpignore="true" data-1p-ignore
                     />
                   )}
                 />
@@ -2649,7 +2657,7 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
             <div className="text-center space-y-2">
               <Text variant="tertiary" size="sm">
                 Complete technical documentation:{' '}
-                <Text variant="tertiary">docs/design-system.md</Text>
+                <Text as="span" variant="tertiary">docs/design-system.md</Text>
               </Text>
               <Text variant="tertiary" size="xs">
                 Ember Noir Design System v3.0 - Complete Phase 14-16 Components

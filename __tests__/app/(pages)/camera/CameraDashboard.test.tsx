@@ -14,7 +14,7 @@ import path from 'path';
 describe('CameraDashboard Grid Props', () => {
   const componentPath = path.join(
     process.cwd(),
-    'app/(pages)/camera/CameraDashboard.js'
+    'app/(pages)/camera/CameraDashboard.tsx'
   );
 
   let componentSource;

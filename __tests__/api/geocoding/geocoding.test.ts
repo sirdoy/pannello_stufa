@@ -52,7 +52,7 @@ describe('Geocoding Search API', () => {
         ],
       };
 
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => mockOpenMeteoResponse,
       });
@@ -109,7 +109,7 @@ describe('Geocoding Search API', () => {
 
     it('should return empty results for no matches', async () => {
       // Mock Open-Meteo empty response
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({}),
       });
@@ -130,15 +130,15 @@ describe('Geocoding Search API', () => {
 
     it('should return empty results on API failure', async () => {
       // Mock API failure
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as any).mockResolvedValueOnce({
         ok: false,
         status: 500,
       });
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as any).mockResolvedValueOnce({
         ok: false,
         status: 500,
       });
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as any).mockResolvedValueOnce({
         ok: false,
         status: 500,
       });
@@ -158,7 +158,7 @@ describe('Geocoding Search API', () => {
     });
 
     it('should call Open-Meteo API with correct parameters', async () => {
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ results: [] }),
       });
@@ -191,7 +191,7 @@ describe('Geocoding Reverse API', () => {
   describe('GET /api/geocoding/reverse', () => {
     it('should return city name for valid coordinates', async () => {
       // Mock forecast API response (first call)
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           timezone: 'Europe/Rome',
@@ -200,7 +200,7 @@ describe('Geocoding Reverse API', () => {
       });
 
       // Mock city search response (second call)
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           results: [
@@ -278,7 +278,7 @@ describe('Geocoding Reverse API', () => {
 
     it('should return formatted coordinates as fallback on API failure', async () => {
       // Mock API failure
-      global.fetch.mockRejectedValueOnce(new Error('Network error'));
+      (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
 
       const { GET } = await import('@/app/api/geocoding/reverse/route');
 

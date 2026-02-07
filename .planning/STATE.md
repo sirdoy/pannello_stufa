@@ -99,6 +99,11 @@ Key patterns from previous milestones preserved for v5.0 migration:
 - CoordinationEventType extensibility: Add coordination_error, coordination_debouncing for error logging
 - Test import failures documented for Phase 42: route.js → route.ts path changes expected
 
+**Phase 41-02 decisions (thermostat schedule components):**
+- Domain-specific callback typing: onChange callbacks typed as (newValue: number) => void not ChangeEvent handlers
+- Pragmatic typing at boundaries: Cast useScheduleData/useRoomStatus unknown[] to local Room[]/Schedule[] interfaces
+- Date arithmetic with .getTime(): Required for TypeScript strict mode (endDate.getTime() - now.getTime())
+
 ### Pending Todos
 
 **Operational Setup (from previous milestones, pending deployment):**
@@ -205,10 +210,10 @@ From 39-01 (Foundation UI components):
 
 ## Session Continuity
 
-Last session: 2026-02-07
-Stopped at: Completed 41-04-PLAN.md — all settings pages migrated to TypeScript
+Last session: 2026-02-07 11:39 UTC
+Stopped at: Completed 41-02-PLAN.md — 7 thermostat schedule components migrated
 Resume file: None
-Next step: Continue Phase 41 Pages Migration with remaining plans (41-05 through 41-07)
+Next step: Continue Phase 41 Pages Migration with remaining plans (41-03 through 41-07)
 
 From 38-10 (Type definitions gap closure):
 - Type narrowing with 'in' operator for discriminated unions: if ('property' in object)

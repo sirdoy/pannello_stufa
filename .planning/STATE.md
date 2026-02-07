@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 
 ## Current Position
 
-Phase: 40 - API Routes Migration
-Plan: 7 of 7 (ALL COMPLETE)
-Status: COMPLETE — All 90 API route files migrated to TypeScript, ZERO .js route files remaining, ZERO tsc errors
-Last activity: 2026-02-07 — Phase 40 verified complete
+Phase: 41 - Pages Migration
+Plan: 1 of 7 (IN PROGRESS)
+Status: In progress — Root files, context providers, and standalone pages migrated to TypeScript
+Last activity: 2026-02-07 — Completed 41-01-PLAN.md (11 files migrated)
 
-Progress: [██████████░░░░░░░░░░░░░░] 57% (4/7 phases complete, Phase 40 COMPLETE with 7 plans)
+Progress: [██████████░░░░░░░░░░░░░░] 57% (4/7 phases complete, Phase 41: 1/7 plans)
 
 ## Milestone Overview
 
@@ -29,16 +29,16 @@ Progress: [██████████░░░░░░░░░░░░░
 | 38 | Library Migration | 4 | COMPLETE (4/4) |
 | 39 | UI Components Migration | 3 | COMPLETE (11/11 plans, 137/137 files migrated, 0 tsc errors) |
 | 40 | API Routes Migration | 3 | COMPLETE (7/7 plans, 90/90 files migrated, 0 tsc errors) |
-| 41 | Pages Migration | 3 | Pending |
+| 41 | Pages Migration | 3 | IN PROGRESS (1/7 plans complete, 11/11 files migrated in 41-01) |
 | 42 | Test Migration | 4 | Pending |
 | 43 | Verification | 4 | Pending |
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 181 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 29)
+- Total plans completed: 182 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 30)
 - Average duration: ~6.0 min per plan
-- Total execution time: ~17.9 hours across 7 milestones
+- Total execution time: ~18.0 hours across 7 milestones
 
 **By Milestone:**
 
@@ -206,9 +206,9 @@ From 39-01 (Foundation UI components):
 ## Session Continuity
 
 Last session: 2026-02-07
-Stopped at: Phase 40 complete — all 90 API route files migrated, 0 tsc errors
+Stopped at: Completed 41-01-PLAN.md — root files, context providers, and standalone pages migrated
 Resume file: None
-Next step: `/gsd:discuss-phase 41` to plan Pages Migration
+Next step: Continue Phase 41 Pages Migration with remaining plans (41-02 through 41-07)
 
 From 38-10 (Type definitions gap closure):
 - Type narrowing with 'in' operator for discriminated unions: if ('property' in object)
@@ -345,3 +345,13 @@ From 40-07 (API Routes Gap Closure):
 - Error function calls: error(message, ErrorCode, HttpStatus) not error(message, number)
 - Date arithmetic: Always use .getTime() for TypeScript strict mode compatibility
 - Gap closure pattern: Run tsc, categorize errors, fix systematically by type (80 errors → 0 in 12min)
+
+From 41-01 (Root files, context providers, standalone pages):
+- Null + type guard pattern for React Context: createContext<T | null>(null) with runtime null check in hook
+- Metadata/Viewport type imports from 'next' for root layout (export const metadata: Metadata)
+- ReactNode type for children props across all providers and pages
+- Context provider pattern: interface XxxContextValue + createContext<XxxContextValue | null>(null) + useXxx(): XxxContextValue hook with null check
+- Inline interfaces for page-specific data types (FormattedStoveState, ChangelogVersion, LogEntryData)
+- Explicit function return types for all async functions and callbacks (async (): Promise<void> =>)
+- Type unions for constrained string values (Source = 'local' | 'firebase', DeviceFilter = 'all' | 'stove' | ...)
+- Helper function typing: explicit parameter and return types for all helper functions

@@ -15,8 +15,41 @@ import {
   getAvailableRoomsForSync,
 } from '@/lib/netatmoStoveSync';
 import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
+import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';
+
+interface Room {
+  id: string;
+  name: string;
+}
+
+interface StoveSyncEnableBody {
+  action: 'enable';
+  rooms?: Room[];
+  roomId?: string;
+  roomName?: string;
+  stoveTemperature?: number;
+}
+
+interface StoveSyncDisableBody {
+  action: 'disable';
+}
+
+interface StoveSyncSyncBody {
+  action: 'sync';
+  stoveIsOn?: boolean;
+}
+
+type StoveSyncBody = StoveSyncEnableBody | StoveSyncDisableBody | StoveSyncSyncBody;
+
+interface SyncResult {
+  synced: boolean;
+  temperature?: number;
+  roomNames?: string;
+  rooms?: Room[];
+  [key: string]: unknown;
+}
 
 /**
  * GET /api/netatmo/stove-sync
@@ -44,27 +77,27 @@ export const GET = withAuthAndErrorHandler(async () => {
  *
  * Protected: Requires Auth0 authentication
  */
-export const POST = withAuthAndErrorHandler(async (request, context, session) => {
-  const user = session.user;
-  const body = await parseJsonOrThrow(request);
+export const POST = withAuthAndErrorHandler(async (request: NextRequest, _context: unknown, session?: any) => {
+  const user = session?.user;
+  const body = await parseJsonOrThrow(request) as StoveSyncBody;
   const { action } = body;
 
   validateRequired(action, 'action');
 
-  let result;
+  let result: Record<string, unknown>;
 
   switch (action) {
     case 'enable': {
       // Support both single room (legacy) and multiple rooms (new)
-      let rooms = body.rooms;
-      const stoveTemperature = body.stoveTemperature || 16;
+      let rooms = (body as StoveSyncEnableBody).rooms;
+      const stoveTemperature = (body as StoveSyncEnableBody).stoveTemperature || 16;
 
       if (!rooms) {
         // Legacy single-room API
-        const { roomId, roomName } = body;
+        const { roomId, roomName } = body as StoveSyncEnableBody;
         validateRequired(roomId, 'roomId');
         validateRequired(roomName, 'roomName');
-        rooms = [{ id: roomId, name: roomName }];
+        rooms = [{ id: roomId!, name: roomName! }];
       }
 
       if (!Array.isArray(rooms) || rooms.length === 0) {
@@ -87,11 +120,11 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
         rooms: rooms.map(r => ({ id: r.id, name: r.name })),
         stoveTemperature,
         timestamp: Date.now(),
-        user: {
+        user: user ? {
           email: user.email,
           name: user.name,
           sub: user.sub,
-        },
+        } : null,
         source: 'manual',
       });
       break;
@@ -109,21 +142,21 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
         action: 'Sincronizzazione stufa disattivata',
         device: DEVICE_TYPES.THERMOSTAT,
         timestamp: Date.now(),
-        user: {
+        user: user ? {
           email: user.email,
           name: user.name,
           sub: user.sub,
-        },
+        } : null,
         source: 'manual',
       });
       break;
     }
 
     case 'sync': {
-      const { stoveIsOn } = body;
+      const { stoveIsOn } = body as StoveSyncSyncBody;
       validateBoolean(stoveIsOn, 'stoveIsOn');
 
-      const syncResult = await syncLivingRoomWithStove(stoveIsOn);
+      const syncResult = await syncLivingRoomWithStove(stoveIsOn!) as SyncResult;
       result = {
         synced: syncResult.synced,
         ...syncResult,
@@ -140,11 +173,11 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
           roomNames: syncResult.roomNames,
           temperature: syncResult.temperature,
           timestamp: Date.now(),
-          user: {
+          user: user ? {
             email: user.email,
             name: user.name,
             sub: user.sub,
-          },
+          } : null,
           source: 'manual',
         });
       }

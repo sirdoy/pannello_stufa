@@ -5,6 +5,11 @@ import NETATMO_CAMERA_API from '@/lib/netatmoCameraApi';
 
 export const dynamic = 'force-dynamic';
 
+interface Home {
+  events?: Array<{ time?: number; [key: string]: unknown }>;
+  [key: string]: unknown;
+}
+
 /**
  * GET /api/netatmo/camera
  * Retrieves list of cameras with status
@@ -14,7 +19,7 @@ export const GET = withAuthAndErrorHandler(async () => {
   const accessToken = await requireNetatmoToken();
 
   // Get cameras data from ALL homes (cameras may be in different home than thermostats)
-  const homesData = await NETATMO_CAMERA_API.getCamerasData(accessToken);
+  const homesData = await NETATMO_CAMERA_API.getCamerasData(accessToken) as unknown as Home[];
 
   if (!homesData || homesData.length === 0) {
     return success({
@@ -24,11 +29,11 @@ export const GET = withAuthAndErrorHandler(async () => {
     });
   }
 
-  const cameras = NETATMO_CAMERA_API.parseCameras(homesData);
-  const persons = NETATMO_CAMERA_API.parsePersons(homesData);
+  const cameras = NETATMO_CAMERA_API.parseCameras(homesData as any) as unknown as Array<{ home_id?: string; [key: string]: unknown }>;
+  const persons = NETATMO_CAMERA_API.parsePersons(homesData as any);
 
   // Get recent events from ALL homes that have cameras
-  const allEvents = [];
+  const allEvents: Array<{ time?: number; [key: string]: unknown }> = [];
   for (const home of homesData) {
     if (home.events && home.events.length > 0) {
       allEvents.push(...home.events);
@@ -36,7 +41,7 @@ export const GET = withAuthAndErrorHandler(async () => {
   }
   // Sort by time descending and take first 10
   allEvents.sort((a, b) => (b.time || 0) - (a.time || 0));
-  const events = NETATMO_CAMERA_API.parseEvents(allEvents.slice(0, 10));
+  const events = NETATMO_CAMERA_API.parseEvents(allEvents as any);
 
   // Find the home_id that contains cameras (for future reference)
   const cameraHomeId = cameras.length > 0 ? cameras[0].home_id : null;

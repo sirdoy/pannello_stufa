@@ -10,8 +10,23 @@ import { adminDbGet, adminDbPush } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
+import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';
+
+interface Schedule {
+  id: string;
+  name?: string;
+  selected?: boolean;
+  zones?: unknown[];
+  timetable?: unknown[];
+  [key: string]: unknown;
+}
+
+interface Home {
+  schedules?: Schedule[];
+  [key: string]: unknown;
+}
 
 /**
  * POST /api/netatmo/calibrate
@@ -26,19 +41,19 @@ export const dynamic = 'force-dynamic';
  * This endpoint uses method #2 to force calibration on demand.
  * Protected: Requires Auth0 authentication
  */
-export const POST = withAuthAndErrorHandler(async (request, _context, session) => {
-  const user = session.user;
+export const POST = withAuthAndErrorHandler(async (request: NextRequest, _context: unknown, session?: any) => {
+  const user = session?.user;
   const accessToken = await requireNetatmoToken();
 
   // Get home_id from Firebase (use environment-aware path)
   const homeIdPath = getEnvironmentPath('netatmo/home_id');
-  const homeId = await adminDbGet(homeIdPath);
+  const homeId = await adminDbGet(homeIdPath) as string | null;
   if (!homeId) {
     return badRequest('home_id non trovato. Chiama prima /api/netatmo/homesdata');
   }
 
   // Get homes data directly from Netatmo API to get complete schedule structure
-  const homesData = await NETATMO_API.getHomesData(accessToken);
+  const homesData = await NETATMO_API.getHomesData(accessToken) as unknown as Home[];
 
   if (!homesData || homesData.length === 0) {
     return notFound('Nessuna casa trovata nell\'account Netatmo');
@@ -87,6 +102,10 @@ export const POST = withAuthAndErrorHandler(async (request, _context, session) =
   // Find another schedule (not the current one)
   const alternativeSchedule = schedules.find(s => s.id !== currentSchedule.id);
 
+  if (!alternativeSchedule) {
+    return badRequest('Nessuno schedule alternativo trovato');
+  }
+
   console.log('Switching to alternative schedule:', alternativeSchedule.name);
 
   // Switch to alternative schedule
@@ -118,12 +137,12 @@ export const POST = withAuthAndErrorHandler(async (request, _context, session) =
     schedule_id: currentSchedule.id,
     schedule_name: currentSchedule.name || 'Unknown',
     timestamp: Date.now(),
-    user: {
+    user: user ? {
       email: user.email,
       name: user.name,
       picture: user.picture,
       sub: user.sub,
-    },
+    } : null,
     source: 'manual',
   };
 
@@ -134,7 +153,7 @@ export const POST = withAuthAndErrorHandler(async (request, _context, session) =
     timestamp: Date.now(),
     schedule_id: currentSchedule.id,
     schedule_name: currentSchedule.name || 'Unknown',
-    triggered_by: user.email,
+    triggered_by: user?.email || 'unknown',
     status: 'success',
   };
   await adminDbPush('netatmo/calibrations', calibrationEntry);

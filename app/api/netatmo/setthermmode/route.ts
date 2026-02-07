@@ -12,10 +12,22 @@ import { adminDbGet, adminDbPush } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
+import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
 const VALID_MODES = ['schedule', 'away', 'hg', 'off'];
+
+interface SetThermModeBody {
+  mode?: string;
+  endtime?: number;
+}
+
+interface ThermModeParams {
+  home_id: string;
+  mode: string;
+  endtime?: number;
+}
 
 /**
  * POST /api/netatmo/setthermmode
@@ -24,9 +36,9 @@ const VALID_MODES = ['schedule', 'away', 'hg', 'off'];
  * Mode: schedule, away, hg (frost guard), off
  * Protected: Requires Auth0 authentication
  */
-export const POST = withAuthAndErrorHandler(async (request, context, session) => {
-  const user = session.user;
-  const body = await parseJsonOrThrow(request);
+export const POST = withAuthAndErrorHandler(async (request: NextRequest, _context: unknown, session?: any) => {
+  const user = session?.user;
+  const body = await parseJsonOrThrow(request) as SetThermModeBody;
   const { mode, endtime } = body;
 
   // Validate inputs
@@ -37,13 +49,13 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
 
   // Get home_id from Firebase (use environment-aware path)
   const homeIdPath = getEnvironmentPath('netatmo/home_id');
-  const homeId = await adminDbGet(homeIdPath);
+  const homeId = await adminDbGet(homeIdPath) as string | null;
   if (!homeId) {
     return badRequest('home_id non trovato. Chiama prima /api/netatmo/homesdata');
   }
 
   // Build request params
-  const params = {
+  const params: ThermModeParams = {
     home_id: homeId,
     mode,
   };
@@ -53,7 +65,7 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
   }
 
   // Set thermostat mode
-  const result = await NETATMO_API.setThermMode(accessToken, params);
+  const result = await NETATMO_API.setThermMode(accessToken, params as any);
 
   if (!result) {
     return serverError('Comando non riuscito');
@@ -67,12 +79,12 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
     mode,
     endtime: endtime || null,
     timestamp: Date.now(),
-    user: {
+    user: user ? {
       email: user.email,
       name: user.name,
       picture: user.picture,
       sub: user.sub,
-    },
+    } : null,
     source: 'manual',
   };
 

@@ -1,7 +1,13 @@
 import { withAuthAndErrorHandler, success, requireNetatmoToken, parseQuery } from '@/lib/core';
 import NETATMO_CAMERA_API from '@/lib/netatmoCameraApi';
+import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';
+
+interface Home {
+  events?: Array<{ time?: number; camera_id?: string; [key: string]: unknown }>;
+  [key: string]: unknown;
+}
 
 /**
  * GET /api/netatmo/camera/events
@@ -15,7 +21,7 @@ export const dynamic = 'force-dynamic';
  *
  * Protected: Requires Auth0 authentication
  */
-export const GET = withAuthAndErrorHandler(async (request) => {
+export const GET = withAuthAndErrorHandler(async (request: NextRequest) => {
   const params = parseQuery(request);
   const cameraId = params.get('camera_id');
   const sizeParam = params.get('size');
@@ -25,7 +31,7 @@ export const GET = withAuthAndErrorHandler(async (request) => {
   const accessToken = await requireNetatmoToken();
 
   // Get cameras data with events
-  const homesData = await NETATMO_CAMERA_API.getCamerasData(accessToken, size);
+  const homesData = await NETATMO_CAMERA_API.getCamerasData(accessToken, size) as unknown as Home[];
 
   if (!homesData || homesData.length === 0) {
     return success({
@@ -35,8 +41,8 @@ export const GET = withAuthAndErrorHandler(async (request) => {
     });
   }
 
-  const cameras = NETATMO_CAMERA_API.parseCameras(homesData);
-  let allEvents = [];
+  const cameras = NETATMO_CAMERA_API.parseCameras(homesData as any);
+  let allEvents: Array<{ time?: number; camera_id?: string; [key: string]: unknown }> = [];
 
   // Get events from all homes
   for (const home of homesData) {
@@ -54,7 +60,7 @@ export const GET = withAuthAndErrorHandler(async (request) => {
   }
 
   // Parse all events
-  const parsedEvents = NETATMO_CAMERA_API.parseEvents(allEvents);
+  const parsedEvents = NETATMO_CAMERA_API.parseEvents(allEvents as any);
 
   // Debug logging
   console.log('[Camera Events]', {

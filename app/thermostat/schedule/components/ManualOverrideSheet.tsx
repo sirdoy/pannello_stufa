@@ -7,34 +7,46 @@ import DurationPicker from './DurationPicker';
 import TemperaturePicker from './TemperaturePicker';
 import { Flame, CheckCircle } from 'lucide-react';
 
+interface Room {
+  id: string;
+  name?: string;
+  temperature?: number;
+  setpoint?: number;
+  mode?: string;
+  [key: string]: unknown;
+}
+
+interface ManualOverrideSheetProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onOverrideCreated?: () => void;
+}
+
 /**
  * ManualOverrideSheet - Bottom sheet for creating temperature overrides
- *
- * @param {boolean} isOpen - Sheet visibility
- * @param {Function} onClose - Close handler
- * @param {Function} onOverrideCreated - Success callback
  */
 export default function ManualOverrideSheet({
   isOpen,
   onClose,
   onOverrideCreated,
-}) {
+}: ManualOverrideSheetProps) {
   const { rooms, loading: roomsLoading } = useRoomStatus();
 
   // Form state
-  const [selectedRoomId, setSelectedRoomId] = useState('');
-  const [temperature, setTemperature] = useState(20);
-  const [duration, setDuration] = useState(60); // 1 hour default
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
+  const [selectedRoomId, setSelectedRoomId] = useState<string>('');
+  const [temperature, setTemperature] = useState<number>(20);
+  const [duration, setDuration] = useState<number>(60); // 1 hour default
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean>(false);
 
   // Auto-select first room when loaded
   useEffect(() => {
-    if (rooms.length > 0 && !selectedRoomId) {
-      setSelectedRoomId(rooms[0].id);
+    const roomsTyped = rooms as Room[];
+    if (roomsTyped.length > 0 && !selectedRoomId) {
+      setSelectedRoomId(roomsTyped[0].id);
       // Pre-fill temperature from current setpoint
-      const room = rooms[0];
+      const room = roomsTyped[0];
       if (room.setpoint) {
         setTemperature(room.setpoint);
       }
@@ -42,15 +54,15 @@ export default function ManualOverrideSheet({
   }, [rooms, selectedRoomId]);
 
   // Update temperature when room changes
-  const handleRoomChange = (roomId) => {
+  const handleRoomChange = (roomId: string): void => {
     setSelectedRoomId(roomId);
-    const room = rooms.find(r => r.id === roomId);
+    const room = (rooms as Room[]).find(r => r.id === roomId);
     if (room?.setpoint) {
       setTemperature(room.setpoint);
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
     if (!selectedRoomId) return;
 
     try {
@@ -87,19 +99,20 @@ export default function ManualOverrideSheet({
         setError(null);
       }, 1500);
     } catch (err) {
-      setError(err.message);
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setError(message);
     } finally {
       setSubmitting(false);
     }
   };
 
   // Room options for select
-  const roomOptions = rooms.map(r => ({
+  const roomOptions = (rooms as Room[]).map(r => ({
     value: r.id,
     label: `${r.name} (${r.temperature?.toFixed(1) || '--'}°C)`,
   }));
 
-  const selectedRoom = rooms.find(r => r.id === selectedRoomId);
+  const selectedRoom = (rooms as Room[]).find(r => r.id === selectedRoomId);
 
   return (
     <BottomSheet

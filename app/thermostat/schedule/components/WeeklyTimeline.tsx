@@ -4,16 +4,34 @@ import { parseTimelineSlots, DAY_NAMES, formatTimeFromMinutes, ZONE_COLORS } fro
 import TimelineSlot from './TimelineSlot';
 import { Text } from '@/app/components/ui';
 
+interface Schedule {
+  timetable?: unknown;
+  zones?: Array<{ type: number; [key: string]: unknown }>;
+  [key: string]: unknown;
+}
+
+interface TimelineSlot {
+  day: number;
+  zoneType: number;
+  zoneName: string;
+  startMinutes: number;
+  endMinutes: number;
+  durationPercent: number;
+  [key: string]: unknown;
+}
+
+interface WeeklyTimelineProps {
+  schedule?: Schedule | null;
+  className?: string;
+}
+
 /**
  * WeeklyTimeline - 7-day schedule visualization
- *
- * @param {Object} schedule - Schedule object with zones and timetable
- * @param {string} className - Additional CSS classes
  */
-export default function WeeklyTimeline({ schedule, className = '' }) {
+export default function WeeklyTimeline({ schedule, className = '' }: WeeklyTimelineProps) {
   // Current time indicator position
-  const [currentTimePercent, setCurrentTimePercent] = useState(null);
-  const [currentDay, setCurrentDay] = useState(null);
+  const [currentTimePercent, setCurrentTimePercent] = useState<number | null>(null);
+  const [currentDay, setCurrentDay] = useState<number | null>(null);
 
   // Update current time every minute
   useEffect(() => {
@@ -34,15 +52,15 @@ export default function WeeklyTimeline({ schedule, className = '' }) {
   }, []);
 
   // Parse schedule into day-grouped slots
-  const slotsByDay = useMemo(() => {
+  const slotsByDay = useMemo((): TimelineSlot[][] => {
     if (!schedule?.timetable || !schedule?.zones) {
       return Array(7).fill([]);
     }
 
-    const allSlots = parseTimelineSlots(schedule);
+    const allSlots = parseTimelineSlots(schedule) as TimelineSlot[];
 
     // Group by day (0-6)
-    const grouped = Array(7).fill(null).map(() => []);
+    const grouped: TimelineSlot[][] = Array(7).fill(null).map(() => []);
     allSlots.forEach(slot => {
       grouped[slot.day].push(slot);
     });
@@ -53,11 +71,11 @@ export default function WeeklyTimeline({ schedule, className = '' }) {
   // Get unique zones used in the schedule for legend
   const usedZones = useMemo(() => {
     if (!schedule?.zones) return [];
-    const zoneTypes = new Set();
+    const zoneTypes = new Set<number>();
     schedule.zones.forEach(z => zoneTypes.add(z.type));
     return Array.from(zoneTypes).map(type => ({
       type,
-      ...ZONE_COLORS[type] || ZONE_COLORS.default
+      ...(ZONE_COLORS[type] || ZONE_COLORS.default)
     }));
   }, [schedule]);
 

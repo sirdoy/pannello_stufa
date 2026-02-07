@@ -4,23 +4,31 @@ import { Select, Button, Text } from '@/app/components/ui';
 import { NETATMO_ROUTES } from '@/lib/routes';
 import { Check, RefreshCw } from 'lucide-react';
 
+interface Schedule {
+  id: string;
+  name: string;
+  [key: string]: unknown;
+}
+
+interface ScheduleSelectorProps {
+  schedules?: Schedule[];
+  activeSchedule?: Schedule | null;
+  onScheduleChanged?: () => void;
+}
+
 /**
  * ScheduleSelector - Dropdown for switching between schedules
- *
- * @param {Array} schedules - List of available schedules
- * @param {Object} activeSchedule - Currently active schedule
- * @param {Function} onScheduleChanged - Callback after successful switch
  */
 export default function ScheduleSelector({
   schedules = [],
   activeSchedule,
   onScheduleChanged,
-}) {
-  const [switching, setSwitching] = useState(false);
-  const [error, setError] = useState(null);
-  const [selectedId, setSelectedId] = useState(activeSchedule?.id || '');
+}: ScheduleSelectorProps) {
+  const [switching, setSwitching] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string>(activeSchedule?.id || '');
 
-  const handleSwitch = async () => {
+  const handleSwitch = async (): Promise<void> => {
     if (!selectedId || selectedId === activeSchedule?.id) return;
 
     try {
@@ -42,7 +50,8 @@ export default function ScheduleSelector({
       // Success - notify parent to refetch
       onScheduleChanged?.();
     } catch (err) {
-      setError(err.message);
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setError(message);
     } finally {
       setSwitching(false);
     }

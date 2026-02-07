@@ -2,24 +2,26 @@
 import { formatDuration } from '@/lib/utils/scheduleHelpers';
 import { Text } from '@/app/components/ui';
 
+interface DurationPickerProps {
+  value: number;
+  onChange: (newValue: number) => void;
+}
+
 /**
  * DurationPicker - Logarithmic slider for 5min to 12 hours
  *
  * Uses logarithmic scale for better UX (more granularity at short durations).
- *
- * @param {number} value - Duration in minutes (5-720)
- * @param {Function} onChange - Called with new duration in minutes
  */
-export default function DurationPicker({ value, onChange }) {
+export default function DurationPicker({ value, onChange }: DurationPickerProps) {
   // Logarithmic scale: 5 min to 720 min (12 hours)
   const minLog = Math.log(5);
   const maxLog = Math.log(720);
 
-  const toSlider = (minutes) => {
+  const toSlider = (minutes: number): number => {
     return ((Math.log(minutes) - minLog) / (maxLog - minLog)) * 100;
   };
 
-  const fromSlider = (percent) => {
+  const fromSlider = (percent: number): number => {
     const raw = Math.exp(minLog + (percent / 100) * (maxLog - minLog));
     // Round to nice values
     if (raw < 15) return Math.round(raw / 5) * 5; // 5-min steps

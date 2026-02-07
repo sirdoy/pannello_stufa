@@ -6,22 +6,29 @@ import { X, Flame, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 
+interface Room {
+  id: string;
+  name: string;
+  mode?: string;
+  setpoint?: number;
+  endtime?: number;
+  [key: string]: unknown;
+}
+
+interface ActiveOverrideBadgeProps {
+  room: Room;
+  onCancelled?: () => void;
+}
+
 /**
  * ActiveOverrideBadge - Shows active override with cancel option
- *
- * @param {Object} room - Room object with override info
- * @param {number} room.id - Room ID
- * @param {string} room.name - Room name
- * @param {number} room.setpoint - Current override temperature
- * @param {number} room.endtime - UNIX timestamp (seconds) when override ends
- * @param {Function} onCancelled - Callback after cancellation
  */
 export default function ActiveOverrideBadge({
   room,
   onCancelled,
-}) {
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [cancelling, setCancelling] = useState(false);
+}: ActiveOverrideBadgeProps) {
+  const [showConfirm, setShowConfirm] = useState<boolean>(false);
+  const [cancelling, setCancelling] = useState<boolean>(false);
 
   if (!room || room.mode !== 'manual') {
     return null;
@@ -30,9 +37,9 @@ export default function ActiveOverrideBadge({
   // Calculate remaining time
   const endDate = room.endtime ? new Date(room.endtime * 1000) : null;
   const now = new Date();
-  const remainingMinutes = endDate ? Math.max(0, Math.round((endDate - now) / 60000)) : null;
+  const remainingMinutes = endDate ? Math.max(0, Math.round((endDate.getTime() - now.getTime()) / 60000)) : null;
 
-  const formatRemaining = (minutes) => {
+  const formatRemaining = (minutes: number | null): string => {
     if (!minutes) return '';
     if (minutes < 60) return `${minutes} min`;
     const hours = Math.floor(minutes / 60);
@@ -40,7 +47,7 @@ export default function ActiveOverrideBadge({
     return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
   };
 
-  const handleCancel = async () => {
+  const handleCancel = async (): Promise<void> => {
     try {
       setCancelling(true);
 
@@ -61,7 +68,8 @@ export default function ActiveOverrideBadge({
       setShowConfirm(false);
       onCancelled?.();
     } catch (err) {
-      console.error('Cancel override failed:', err);
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      console.error('Cancel override failed:', message);
       // Keep dialog open on error
     } finally {
       setCancelling(false);

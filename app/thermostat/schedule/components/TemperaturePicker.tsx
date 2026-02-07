@@ -3,14 +3,16 @@ import { Button, Text } from '@/app/components/ui';
 import { Minus, Plus } from 'lucide-react';
 import { tempToColor } from '@/lib/utils/scheduleHelpers';
 
+interface TemperaturePickerProps {
+  value: number;
+  onChange: (newValue: number) => void;
+  min?: number;
+  max?: number;
+  step?: number;
+}
+
 /**
  * TemperaturePicker - Temperature selector with +/- buttons
- *
- * @param {number} value - Temperature in °C
- * @param {Function} onChange - Called with new temperature
- * @param {number} min - Minimum temperature (default: 5)
- * @param {number} max - Maximum temperature (default: 30)
- * @param {number} step - Step size (default: 0.5)
  */
 export default function TemperaturePicker({
   value,
@@ -18,13 +20,13 @@ export default function TemperaturePicker({
   min = 5,
   max = 30,
   step = 0.5,
-}) {
-  const decrease = () => {
+}: TemperaturePickerProps) {
+  const decrease = (): void => {
     const newValue = Math.max(min, value - step);
     onChange(newValue);
   };
 
-  const increase = () => {
+  const increase = (): void => {
     const newValue = Math.min(max, value + step);
     onChange(newValue);
   };

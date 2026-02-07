@@ -1,14 +1,16 @@
 'use client';
 import { getZoneColor } from '@/lib/utils/scheduleHelpers';
 
+interface TimelineSlotProps {
+  zoneType: number;
+  zoneName: string;
+  startTime: string;
+  endTime: string;
+  widthPercent: number;
+}
+
 /**
  * TimelineSlot - Single zone slot in timeline
- *
- * @param {number} zoneType - Netatmo zone type (0=Comfort, 1=Night, 5=Away, 8=Comfort+)
- * @param {string} zoneName - Name of the zone
- * @param {string} startTime - Formatted start time (e.g., "08:00")
- * @param {string} endTime - Formatted end time
- * @param {number} widthPercent - Slot width as percentage of day (0-100)
  */
 export default function TimelineSlot({
   zoneType,
@@ -16,7 +18,7 @@ export default function TimelineSlot({
   startTime,
   endTime,
   widthPercent,
-}) {
+}: TimelineSlotProps) {
   const zoneColor = getZoneColor(zoneType);
 
   return (

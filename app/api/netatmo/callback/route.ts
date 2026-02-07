@@ -1,7 +1,6 @@
 import { withErrorHandler, redirect } from '@/lib/core';
 import { saveRefreshToken } from '@/lib/netatmoTokenHelper';
 import { getNetatmoCredentials } from '@/lib/netatmoCredentials';
-import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +17,7 @@ interface NetatmoTokenResponse {
  * OAuth callback handler for Netatmo authorization
  * Note: No auth middleware - this validates OAuth tokens directly
  */
-export const GET = withErrorHandler(async (request: NextRequest) => {
+export const GET = withErrorHandler(async (request: any, _context: any): Promise<any> => {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
 

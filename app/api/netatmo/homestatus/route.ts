@@ -65,17 +65,17 @@ export const GET = withAuthAndErrorHandler(async () => {
   }
 
   // Get home status
-  const homeStatus = await NETATMO_API.getHomeStatus(accessToken, homeId) as HomeStatus;
+  const homeStatus = await NETATMO_API.getHomeStatus(accessToken, homeId) as any;
 
   // Extract temperature data
-  const temperatures = NETATMO_API.extractTemperatures(homeStatus) as RoomTemperature[];
+  const temperatures = NETATMO_API.extractTemperatures(homeStatus as any) as RoomTemperature[];
 
   // Get topology to enrich data with room/module names
   const topologyPath = getEnvironmentPath('netatmo/topology');
   const topology = await adminDbGet(topologyPath) as Topology | null;
 
   // Extract modules with battery/status info
-  const modulesWithStatus = NETATMO_API.extractModulesWithStatus(homeStatus, topology) as ModuleWithStatus[];
+  const modulesWithStatus = NETATMO_API.extractModulesWithStatus(homeStatus as any, topology as any) as unknown as ModuleWithStatus[];
 
   // Get stove sync status for living room indicator
   const stoveSyncPath = getEnvironmentPath('netatmo/stoveSync');
@@ -123,9 +123,9 @@ export const GET = withAuthAndErrorHandler(async () => {
   });
 
   // Get modules with low battery
-  const lowBatteryModules = NETATMO_API.getModulesWithLowBattery(modulesWithStatus);
-  const hasCriticalBattery = NETATMO_API.hasAnyCriticalBattery(modulesWithStatus);
-  const hasLowBattery = NETATMO_API.hasAnyLowBattery(modulesWithStatus);
+  const lowBatteryModules = NETATMO_API.getModulesWithLowBattery(modulesWithStatus as any);
+  const hasCriticalBattery = NETATMO_API.hasAnyCriticalBattery(modulesWithStatus as any);
+  const hasLowBattery = NETATMO_API.hasAnyLowBattery(modulesWithStatus as any);
 
   // Save current status to Firebase
   const statusToSave: Record<string, unknown> = {

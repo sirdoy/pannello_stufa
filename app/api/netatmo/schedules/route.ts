@@ -8,7 +8,6 @@ import NETATMO_API from '@/lib/netatmoApi';
 import { clearCachedAccessToken, getValidAccessToken } from '@/lib/netatmoTokenHelper';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import type { Session } from '@auth0/nextjs-auth0';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +20,7 @@ interface ScheduleSwitchBody {
  * Returns list of all schedules with active indicator
  * Cached for 5 minutes to reduce API calls
  */
-export const GET = withAuthAndErrorHandler(async (req: NextRequest, session?: Session) => {
+export const GET = withAuthAndErrorHandler(async (req: NextRequest, session?: any) => {
   const userId = session?.user?.sub || 'anonymous';
 
   // Rate limit check
@@ -30,12 +29,12 @@ export const GET = withAuthAndErrorHandler(async (req: NextRequest, session?: Se
     return NextResponse.json(
       {
         error: 'RATE_LIMIT_EXCEEDED',
-        message: `Limite API Netatmo raggiunto. Riprova tra ${rateCheck.resetInSeconds}s`,
-        retryAfter: rateCheck.resetInSeconds,
+        message: `Limite API Netatmo raggiunto. Riprova tra ${(rateCheck as any).resetInSeconds}s`,
+        retryAfter: (rateCheck as any).resetInSeconds,
       },
       {
         status: 429,
-        headers: { 'Retry-After': String(rateCheck.resetInSeconds) },
+        headers: { 'Retry-After': String((rateCheck as any).resetInSeconds) },
       }
     );
   }
@@ -64,7 +63,7 @@ export const GET = withAuthAndErrorHandler(async (req: NextRequest, session?: Se
       return success({
         schedules: result.data,
         _source: result.source,
-        _age_seconds: result.age_seconds || 0,
+        _age_seconds: (result as any).age_seconds || 0,
       });
 
     } catch (error) {
@@ -108,7 +107,7 @@ export const GET = withAuthAndErrorHandler(async (req: NextRequest, session?: Se
  * Body: { scheduleId: string }
  * Control operations are NEVER cached
  */
-export const POST = withAuthAndErrorHandler(async (req: NextRequest, session?: Session) => {
+export const POST = withAuthAndErrorHandler(async (req: NextRequest, session?: any) => {
   const userId = session?.user?.sub || 'anonymous';
 
   // Rate limit check
@@ -117,12 +116,12 @@ export const POST = withAuthAndErrorHandler(async (req: NextRequest, session?: S
     return NextResponse.json(
       {
         error: 'RATE_LIMIT_EXCEEDED',
-        message: `Limite API Netatmo raggiunto. Riprova tra ${rateCheck.resetInSeconds}s`,
-        retryAfter: rateCheck.resetInSeconds,
+        message: `Limite API Netatmo raggiunto. Riprova tra ${(rateCheck as any).resetInSeconds}s`,
+        retryAfter: (rateCheck as any).resetInSeconds,
       },
       {
         status: 429,
-        headers: { 'Retry-After': String(rateCheck.resetInSeconds) },
+        headers: { 'Retry-After': String((rateCheck as any).resetInSeconds) },
       }
     );
   }

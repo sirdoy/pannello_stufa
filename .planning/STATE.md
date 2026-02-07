@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 41 - Pages Migration
-Plan: 6 of 7 (COMPLETE)
-Status: In progress — Debug co-located components migrated to TypeScript
-Last activity: 2026-02-07 — Completed 41-06-PLAN.md (19 debug components migrated)
+Plan: 7 of 7 (COMPLETE)
+Status: Phase complete — All 70 page/component files migrated, component props fixed, 198 external API type errors identified
+Last activity: 2026-02-07 — Completed 41-07-PLAN.md (gap closure: verified migration, fixed component types)
 
-Progress: [██████████░░░░░░░░░░░░░░] 58% (4/7 phases complete, Phase 41: 6/7 plans complete)
+Progress: [█████████████░░░░░░░░░░░] 65% (5/7 phases complete, Phase 41: 7/7 plans complete)
 
 ## Milestone Overview
 
@@ -29,7 +29,7 @@ Progress: [██████████░░░░░░░░░░░░░
 | 38 | Library Migration | 4 | COMPLETE (4/4) |
 | 39 | UI Components Migration | 3 | COMPLETE (11/11 plans, 137/137 files migrated, 0 tsc errors) |
 | 40 | API Routes Migration | 3 | COMPLETE (7/7 plans, 90/90 files migrated, 0 tsc errors) |
-| 41 | Pages Migration | 3 | IN PROGRESS (6/7 plans complete, 43 files migrated: 24 pages + 19 components) |
+| 41 | Pages Migration | 3 | COMPLETE (7/7 plans, 70 files migrated, 30+ component prop fixes, 198 external API type errors documented) |
 | 42 | Test Migration | 4 | Pending |
 | 43 | Verification | 4 | Pending |
 
@@ -210,10 +210,10 @@ From 39-01 (Foundation UI components):
 
 ## Session Continuity
 
-Last session: 2026-02-07 11:42 UTC
-Stopped at: Completed 41-06-PLAN.md — 19 debug co-located components migrated to TypeScript
+Last session: 2026-02-07 14:50 UTC
+Stopped at: Completed 41-07-PLAN.md — Gap closure: verified all 70 files migrated, fixed component type errors
 Resume file: None
-Next step: Continue Phase 41 Pages Migration with plan 41-07 (Gap Closure)
+Next step: Begin Phase 42 Test Migration
 
 From 38-10 (Type definitions gap closure):
 - Type narrowing with 'in' operator for discriminated unions: if ('property' in object)
@@ -387,3 +387,15 @@ From 41-05 (Debug pages migration):
 - Explicit async function typing: Promise<void> for all async handlers, even if no return value needed
 - Device/preference state typing: Record<string, T> for flexible structures (DevicePreferences, NotificationDevice)
 - TestResult union types: 'success' | 'error' | 'no_tokens' for state machines
+
+From 41-07 (Pages gap closure - component type validation):
+- Component variant validation: Check CVA definitions for valid variants before using
+- Button valid variants: ember, subtle, ghost, success, danger, outline (NOT ocean, primary, default)
+- Text valid variants: body, secondary, tertiary, ember, ocean, sage, warning, danger, info, label (NOT muted, body-sm)
+- Badge valid variants: ember, ocean, sage, warning, danger, neutral (subtle IS valid)
+- Heading has NO weight prop (always font-bold via base classes)
+- Size limits: Text max is xl (not 2xl/3xl), Card radius max practical is 2xl (not 4xl/6xl)
+- ApiParam interface extension: Add options, min, max for select/number inputs
+- Form defaultValue must be string type (form inputs always return strings)
+- External API type gaps: 198 errors from Hue/Camera/Netatmo property access (properties exist in API but not in type definitions)
+- Created types/external-apis.d.ts for type augmentation foundation (global declarations for Hue/Camera/Netatmo)

@@ -1,4 +1,4 @@
-// app/components/ui/__tests__/Switch.test.js
+// app/components/ui/__tests__/Switch.test.tsx
 /**
  * Switch Component Tests
  *

@@ -1,4 +1,4 @@
-// app/components/ui/__tests__/StatusCard.test.js
+// app/components/ui/__tests__/StatusCard.test.tsx
 /**
  * StatusCard Component Tests
  *

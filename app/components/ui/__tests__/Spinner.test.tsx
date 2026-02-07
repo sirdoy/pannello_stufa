@@ -1,4 +1,4 @@
-// app/components/ui/__tests__/Spinner.test.js
+// app/components/ui/__tests__/Spinner.test.tsx
 /**
  * Spinner Component Tests
  *

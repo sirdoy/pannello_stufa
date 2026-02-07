@@ -1,4 +1,4 @@
-// app/components/ui/__tests__/Text.test.js
+// app/components/ui/__tests__/Text.test.tsx
 /**
  * Text Component Tests
  *

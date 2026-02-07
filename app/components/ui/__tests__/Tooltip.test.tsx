@@ -1,4 +1,4 @@
-// app/components/ui/__tests__/Tooltip.test.js
+// app/components/ui/__tests__/Tooltip.test.tsx
 /**
  * Tooltip Component Tests
  *

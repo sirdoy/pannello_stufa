@@ -1,4 +1,4 @@
-// app/components/ui/__tests__/Toast.test.js
+// app/components/ui/__tests__/Toast.test.tsx
 /**
  * Toast Component Tests
  *

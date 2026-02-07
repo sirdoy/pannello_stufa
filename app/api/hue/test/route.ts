@@ -19,27 +19,27 @@ export const GET = withAuthAndErrorHandler(async () => {
   const hueApi = new HueApi(tokenResult.accessToken);
 
   // Test 1: Bridge Home
-  let bridgeHomeResult;
+  let bridgeHomeResult: unknown;
   try {
     bridgeHomeResult = await hueApi.getBridgeHome();
-  } catch (err) {
-    bridgeHomeResult = { error: err.message };
+  } catch (err: unknown) {
+    bridgeHomeResult = { error: err instanceof Error ? err.message : 'Unknown error' };
   }
 
   // Test 2: Bridge
-  let bridgeResult;
+  let bridgeResult: unknown;
   try {
     bridgeResult = await hueApi.getBridge();
-  } catch (err) {
-    bridgeResult = { error: err.message };
+  } catch (err: unknown) {
+    bridgeResult = { error: err instanceof Error ? err.message : 'Unknown error' };
   }
 
   // Test 3: Devices
-  let devicesResult;
+  let devicesResult: unknown;
   try {
     devicesResult = await hueApi.getDevices();
-  } catch (err) {
-    devicesResult = { error: err.message };
+  } catch (err: unknown) {
+    devicesResult = { error: err instanceof Error ? err.message : 'Unknown error' };
   }
 
   return success({

@@ -18,8 +18,21 @@ import { getHueConnection } from '@/lib/hue/hueLocalHelper';
 
 export const dynamic = 'force-dynamic';
 
+interface SceneAction {
+  target: {
+    rid: string;
+  };
+  action: Record<string, unknown>;
+}
+
+interface CreateSceneRequestBody {
+  name: string;
+  groupRid: string;
+  actions: SceneAction[];
+}
+
 export const POST = withAuthAndErrorHandler(async (request) => {
-  const body = await parseJsonOrThrow(request);
+  const body = await parseJsonOrThrow(request) as CreateSceneRequestBody;
   const { name, groupRid, actions } = body;
 
   // Validation 1: Name required
@@ -67,9 +80,9 @@ export const POST = withAuthAndErrorHandler(async (request) => {
     return success({
       scene: createdScene || null,
     });
-  } catch (err) {
+  } catch (err: unknown) {
     // Handle network timeout (not on local network)
-    if (err.message === 'NETWORK_TIMEOUT') {
+    if (err instanceof Error && err.message === 'NETWORK_TIMEOUT') {
       return hueNotOnLocalNetwork();
     }
     throw err;

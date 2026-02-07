@@ -17,8 +17,13 @@ import { saveHueConnection } from '@/lib/hue/hueLocalHelper';
 
 export const dynamic = 'force-dynamic';
 
+interface PairRequestBody {
+  bridgeIp: string;
+  bridgeId?: string;
+}
+
 export const POST = withAuthAndErrorHandler(async (request) => {
-  const { bridgeIp, bridgeId } = await parseJsonOrThrow(request);
+  const { bridgeIp, bridgeId } = await parseJsonOrThrow(request) as PairRequestBody;
 
   if (!bridgeIp) {
     return badRequest('Bridge IP obbligatorio');
@@ -39,15 +44,18 @@ export const POST = withAuthAndErrorHandler(async (request) => {
     return success({
       username: result.username,
     });
-  } catch (err) {
-    if (err.message === 'LINK_BUTTON_NOT_PRESSED') {
+  } catch (err: unknown) {
+    const error_message = err instanceof Error ? err.message : 'Unknown error';
+    const error_code = (err as { code?: string }).code;
+
+    if (error_message === 'LINK_BUTTON_NOT_PRESSED') {
       return error(
         'Premi il pulsante sul bridge entro 30 secondi',
         ERROR_CODES.HUE_LINK_BUTTON_NOT_PRESSED,
         HTTP_STATUS.BAD_REQUEST
       );
     }
-    if (err.message === 'NETWORK_TIMEOUT' || err.code === 'ETIMEDOUT' || err.code === 'ECONNREFUSED') {
+    if (error_message === 'NETWORK_TIMEOUT' || error_code === 'ETIMEDOUT' || error_code === 'ECONNREFUSED') {
       return error(
         'Bridge non raggiungibile - timeout connessione. Sei sulla stessa rete del bridge?',
         ERROR_CODES.TIMEOUT,

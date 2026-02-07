@@ -24,7 +24,21 @@ import { withAuthAndErrorHandler } from '@/lib/core';
 
 export const dynamic = 'force-dynamic';
 
-async function getTrendsHandler(req) {
+interface DailyTrend {
+  date: string;
+  total: number;
+  sent: number;
+  failed: number;
+  deliveryRate: number;
+}
+
+interface NotificationLogData {
+  timestamp: Timestamp;
+  status: string;
+  [key: string]: unknown;
+}
+
+async function getTrendsHandler(req: Request): Promise<NextResponse> {
   const { searchParams } = new URL(req.url);
 
   // Get days parameter (default 7, max 30)
@@ -50,7 +64,7 @@ async function getTrendsHandler(req) {
   });
 
   // Initialize daily data structure
-  const dailyMap = {};
+  const dailyMap: Record<string, DailyTrend> = {};
   allDays.forEach((day) => {
     const dateKey = format(day, 'yyyy-MM-dd');
     dailyMap[dateKey] = {
@@ -64,7 +78,7 @@ async function getTrendsHandler(req) {
 
   // Aggregate data by day
   snapshot.forEach((doc) => {
-    const data = doc.data();
+    const data = doc.data() as NotificationLogData;
     const docDate = data.timestamp.toDate();
     const dateKey = format(startOfDay(docDate), 'yyyy-MM-dd');
 

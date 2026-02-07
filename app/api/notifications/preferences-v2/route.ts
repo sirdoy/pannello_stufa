@@ -25,7 +25,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
   const userId = session.user.sub;
 
   // Get preferences from RTDB using Admin SDK
-  const prefs = await adminDbGet(`users/${userId}/settings/notifications`);
+  const prefs = await adminDbGet(`users/${userId}/settings/notifications`) as Record<string, unknown> | null;
 
   if (prefs) {
     return success({ preferences: prefs });
@@ -47,7 +47,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
  */
 export const PUT = withAuthAndErrorHandler(async (request, context, session) => {
   const userId = session.user.sub;
-  const body = await parseJsonOrThrow(request);
+  const body = await parseJsonOrThrow(request) as Record<string, unknown>;
 
   // Prepare update with metadata
   const update = {

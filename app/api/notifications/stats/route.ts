@@ -69,14 +69,14 @@ export async function GET(request: Request): Promise<NextResponse> {
     const deliveryStats = await getDeliveryStats(hours);
 
     // Get error stats from Firebase RTDB
-    const allErrors = await adminDbGet('notificationErrors') || {};
+    const allErrors = await adminDbGet('notificationErrors') as Record<string, ErrorData> | null || {};
     const recentErrors = Object.entries(allErrors)
       .filter(([, error]) => {
         const errorTime = new Date(error.timestamp);
         return errorTime >= start;
       });
 
-    const errorsByCode = {};
+    const errorsByCode: Record<string, number> = {};
     recentErrors.forEach(([, error]) => {
       const code = error.errorCode || 'unknown';
       errorsByCode[code] = (errorsByCode[code] || 0) + 1;
@@ -88,7 +88,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     };
 
     // Get device stats from Firebase RTDB
-    const usersData = await adminDbGet('users') || {};
+    const usersData = await adminDbGet('users') as Record<string, UserData> | null || {};
     let totalDevices = 0;
     let activeDevices = 0;
     let staleDevices = 0;
@@ -167,7 +167,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       {
         success: false,
         error: 'Failed to fetch notification stats',
-        message: error.message,
+        message: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );

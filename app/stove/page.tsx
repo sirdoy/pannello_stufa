@@ -36,54 +36,54 @@ export default function StovePage() {
   const { queueStoveCommand, hasPendingCommands, pendingCommands, lastSyncedCommand } = useBackgroundSync();
 
   // Core stove state
-  const [status, setStatus] = useState('...');
-  const [fanLevel, setFanLevel] = useState(null);
-  const [powerLevel, setPowerLevel] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
+  const [status, setStatus] = useState<string>('...');
+  const [fanLevel, setFanLevel] = useState<number | null>(null);
+  const [powerLevel, setPowerLevel] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [initialLoading, setInitialLoading] = useState<boolean>(true);
 
   // Scheduler state
-  const [schedulerEnabled, setSchedulerEnabled] = useState(false);
-  const [semiManualMode, setSemiManualMode] = useState(false);
-  const [returnToAutoAt, setReturnToAutoAt] = useState(null);
-  const [nextScheduledAction, setNextScheduledAction] = useState(null);
+  const [schedulerEnabled, setSchedulerEnabled] = useState<boolean>(false);
+  const [semiManualMode, setSemiManualMode] = useState<boolean>(false);
+  const [returnToAutoAt, setReturnToAutoAt] = useState<string | null>(null);
+  const [nextScheduledAction, setNextScheduledAction] = useState<{ action: string; timestamp: string } | null>(null);
 
   // Error monitoring
-  const [errorCode, setErrorCode] = useState(0);
-  const [errorDescription, setErrorDescription] = useState('');
-  const previousErrorCode = useRef(0);
+  const [errorCode, setErrorCode] = useState<number>(0);
+  const [errorDescription, setErrorDescription] = useState<string>('');
+  const previousErrorCode = useRef<number>(0);
 
   // Maintenance
-  const [maintenanceStatus, setMaintenanceStatus] = useState(null);
-  const [cleaningInProgress, setCleaningInProgress] = useState(false);
+  const [maintenanceStatus, setMaintenanceStatus] = useState<{ needsCleaning: boolean; currentHours: number; targetHours: number } | null>(null);
+  const [cleaningInProgress, setCleaningInProgress] = useState<boolean>(false);
 
   // Sandbox mode
-  const [sandboxMode, setSandboxMode] = useState(false);
+  const [sandboxMode, setSandboxMode] = useState<boolean>(false);
 
   // Toast notification
-  const [toast, setToast] = useState(null);
-  const [loadingMessage, setLoadingMessage] = useState('Caricamento...');
+  const [toast, setToast] = useState<{ message: string; icon?: string; variant?: string } | null>(null);
+  const [loadingMessage, setLoadingMessage] = useState<string>('Caricamento...');
 
   // Firebase connection
-  const [isFirebaseConnected, setIsFirebaseConnected] = useState(true);
-  const [usePollingFallback, setUsePollingFallback] = useState(false);
-  const lastFirebaseUpdateRef = useRef(null);
+  const [isFirebaseConnected, setIsFirebaseConnected] = useState<boolean>(true);
+  const [usePollingFallback, setUsePollingFallback] = useState<boolean>(false);
+  const lastFirebaseUpdateRef = useRef<Date | null>(null);
 
   // Refs for tracking previous values
-  const previousStatusRef = useRef(null);
-  const previousFanLevelRef = useRef(null);
-  const previousPowerLevelRef = useRef(null);
-  const pollingStartedRef = useRef(false);
+  const previousStatusRef = useRef<string | null>(null);
+  const previousFanLevelRef = useRef<number | null>(null);
+  const previousPowerLevelRef = useRef<number | null>(null);
+  const pollingStartedRef = useRef<boolean>(false);
 
   // ─────────────────────────────────────────────────────────────
   // Data Fetching Functions
   // ─────────────────────────────────────────────────────────────
 
-  const fetchFanLevel = async () => {
+  const fetchFanLevel = async (): Promise<number | null> => {
     try {
       const res = await fetch(STOVE_ROUTES.getFan);
-      const json = await res.json();
+      const json: any = await res.json();
       const level = json?.Result ?? 3;
       setFanLevel(level);
       return level;
@@ -93,10 +93,10 @@ export default function StovePage() {
     }
   };
 
-  const fetchPowerLevel = async () => {
+  const fetchPowerLevel = async (): Promise<number | null> => {
     try {
       const res = await fetch(STOVE_ROUTES.getPower);
-      const json = await res.json();
+      const json: any = await res.json();
       const level = json?.Result ?? 2;
       setPowerLevel(level);
       return level;
@@ -106,15 +106,15 @@ export default function StovePage() {
     }
   };
 
-  const fetchSchedulerMode = async () => {
+  const fetchSchedulerMode = async (): Promise<void> => {
     try {
-      const mode = await getFullSchedulerMode();
+      const mode: any = await getFullSchedulerMode();
       setSchedulerEnabled(mode.enabled);
       setSemiManualMode(mode.semiManual || false);
       setReturnToAutoAt(mode.returnToAutoAt || null);
 
       if (mode.enabled && !mode.semiManual) {
-        const nextAction = await getNextScheduledAction();
+        const nextAction: any = await getNextScheduledAction();
         setNextScheduledAction(nextAction);
       } else {
         setNextScheduledAction(null);
@@ -124,9 +124,9 @@ export default function StovePage() {
     }
   };
 
-  const fetchMaintenanceStatus = async () => {
+  const fetchMaintenanceStatus = async (): Promise<void> => {
     try {
-      const status = await getMaintenanceStatus();
+      const status: any = await getMaintenanceStatus();
       setMaintenanceStatus(status);
     } catch (err) {
       console.error('Errore stato manutenzione:', err);
@@ -228,7 +228,7 @@ export default function StovePage() {
     if (pollingStartedRef.current) return;
     fetchStatusAndUpdate();
     pollingStartedRef.current = true;
-    let timeoutId = null;
+    let timeoutId: NodeJS.Timeout | null = null;
 
     const scheduleNextPoll = () => {
       let interval;
@@ -246,7 +246,7 @@ export default function StovePage() {
       timeoutId = setTimeout(() => {
         const now = new Date();
         const lastUpdate = lastFirebaseUpdateRef.current;
-        const timeSinceUpdate = lastUpdate ? (now - lastUpdate) / 1000 : Infinity;
+        const timeSinceUpdate = lastUpdate ? (now.getTime() - lastUpdate.getTime()) / 1000 : Infinity;
         const staleThreshold = usePollingFallback ? 30 : (status !== 'spento' ? 30 : 90);
 
         if (!isFirebaseConnected || timeSinceUpdate > staleThreshold || usePollingFallback) {
@@ -356,7 +356,7 @@ export default function StovePage() {
   // Handlers
   // ─────────────────────────────────────────────────────────────
 
-  const handleFanChange = async (newLevel) => {
+  const handleFanChange = async (newLevel: number): Promise<void> => {
     setLoadingMessage('Modifica ventola...');
     setLoading(true);
     setFanLevel(newLevel);
@@ -366,7 +366,7 @@ export default function StovePage() {
       body: JSON.stringify({ level: newLevel, source: 'manual' }),
     });
 
-    const data = await response.json();
+    const data: any = await response.json();
     if (data.modeChanged) {
       setToast({ message: 'Modalità Semi-Manuale attivata', icon: '⚙️', variant: 'warning' });
       setSemiManualMode(true);
@@ -379,7 +379,7 @@ export default function StovePage() {
     setLoading(false);
   };
 
-  const handlePowerChange = async (newLevel) => {
+  const handlePowerChange = async (newLevel: number): Promise<void> => {
     setLoadingMessage('Modifica potenza...');
     setLoading(true);
     setPowerLevel(newLevel);
@@ -389,7 +389,7 @@ export default function StovePage() {
       body: JSON.stringify({ level: newLevel, source: 'manual' }),
     });
 
-    const data = await response.json();
+    const data: any = await response.json();
     if (data.modeChanged) {
       setToast({ message: 'Modalità Semi-Manuale attivata', icon: '⚙️', variant: 'warning' });
       setSemiManualMode(true);
@@ -402,7 +402,7 @@ export default function StovePage() {
     setLoading(false);
   };
 
-  const handleIgnite = async () => {
+  const handleIgnite = async (): Promise<void> => {
     if (!isOnline) {
       await queueStoveCommand('ignite', { source: 'manual' });
       setToast({ message: 'Comando in coda - eseguito al ripristino connessione', variant: 'warning' });
@@ -420,7 +420,7 @@ export default function StovePage() {
     setLoading(false);
   };
 
-  const handleShutdown = async () => {
+  const handleShutdown = async (): Promise<void> => {
     if (!isOnline) {
       await queueStoveCommand('shutdown', { source: 'manual' });
       setToast({ message: 'Comando in coda - eseguito al ripristino connessione', variant: 'warning' });
@@ -438,16 +438,16 @@ export default function StovePage() {
     setLoading(false);
   };
 
-  const handleClearSemiManual = async () => {
+  const handleClearSemiManual = async (): Promise<void> => {
     await clearSemiManualMode();
     await logSchedulerAction.clearSemiManual();
     setSemiManualMode(false);
     setReturnToAutoAt(null);
-    const nextAction = await getNextScheduledAction();
+    const nextAction: any = await getNextScheduledAction();
     setNextScheduledAction(nextAction);
   };
 
-  const handleConfirmCleaning = async () => {
+  const handleConfirmCleaning = async (): Promise<void> => {
     setCleaningInProgress(true);
     try {
       await confirmCleaning(user);
@@ -464,7 +464,7 @@ export default function StovePage() {
   // Status Mapping
   // ─────────────────────────────────────────────────────────────
 
-  const getStatusConfig = (status) => {
+  const getStatusConfig = (status: string): { label: string; icon: string; theme: string; pulse: boolean } => {
     if (!status) return { label: 'CARICAMENTO', icon: '⏳', theme: 'slate', pulse: true };
 
     const s = status.toUpperCase();

@@ -13,15 +13,26 @@ import Text from '@/app/components/ui/Text';
 
 export const dynamic = 'force-dynamic';
 
+interface MaintenanceData {
+  currentHours: number;
+  targetHours: number;
+  lastCleanedAt?: number;
+}
+
+interface SaveMessage {
+  type: 'success' | 'error';
+  text: string;
+}
+
 export default function MaintenancePage() {
   const { user, isLoading } = useUser();
-  const [maintenanceData, setMaintenanceData] = useState(null);
-  const [targetHours, setTargetHours] = useState(50);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [isResetting, setIsResetting] = useState(false);
+  const [maintenanceData, setMaintenanceData] = useState<MaintenanceData | null>(null);
+  const [targetHours, setTargetHours] = useState<number>(50);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [saveMessage, setSaveMessage] = useState<SaveMessage | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [showResetConfirm, setShowResetConfirm] = useState<boolean>(false);
+  const [isResetting, setIsResetting] = useState<boolean>(false);
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -29,9 +40,9 @@ export default function MaintenancePage() {
     }
   }, [user, isLoading]);
 
-  const loadMaintenanceData = async () => {
+  const loadMaintenanceData = async (): Promise<void> => {
     try {
-      const data = await getMaintenanceData();
+      const data: any = await getMaintenanceData();
       setMaintenanceData(data);
       setTargetHours(data.targetHours);
       setLoading(false);
@@ -41,7 +52,7 @@ export default function MaintenancePage() {
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = async (): Promise<void> => {
     if (targetHours < 1 || targetHours > 1000) {
       setSaveMessage({ type: 'error', text: 'Inserisci un valore tra 1 e 1000 ore' });
       return;
@@ -63,11 +74,11 @@ export default function MaintenancePage() {
     }
   };
 
-  const handleResetRequest = () => {
+  const handleResetRequest = (): void => {
     setShowResetConfirm(true);
   };
 
-  const handleConfirmReset = async () => {
+  const handleConfirmReset = async (): Promise<void> => {
     setIsResetting(true);
     try {
       await confirmCleaning(user);
@@ -83,7 +94,7 @@ export default function MaintenancePage() {
     }
   };
 
-  const handleCancelReset = () => {
+  const handleCancelReset = (): void => {
     setShowResetConfirm(false);
   };
 

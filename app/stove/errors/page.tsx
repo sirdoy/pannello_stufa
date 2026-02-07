@@ -8,12 +8,22 @@ import ErrorAlert from '@/app/components/ui/ErrorAlert';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 
+interface ErrorItem {
+  id: string;
+  errorCode: number;
+  errorDescription: string;
+  timestamp: number;
+  status?: string;
+  resolved: boolean;
+  resolvedAt?: number;
+}
+
 export default function ErrorsPage() {
   const router = useRouter();
-  const [errors, setErrors] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [filter, setFilter] = useState('all'); // 'all', 'active', 'resolved'
+  const [errors, setErrors] = useState<ErrorItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [filter, setFilter] = useState<'all' | 'active' | 'resolved'>('all');
 
   const ERRORS_PER_PAGE = 20;
 
@@ -21,10 +31,10 @@ export default function ErrorsPage() {
     fetchErrors();
   }, []);
 
-  const fetchErrors = async () => {
+  const fetchErrors = async (): Promise<void> => {
     setLoading(true);
     try {
-      const allErrors = await getRecentErrors(100);
+      const allErrors: any = await getRecentErrors(100);
       setErrors(allErrors);
     } catch (error) {
       console.error('Failed to fetch errors:', error);
@@ -33,7 +43,7 @@ export default function ErrorsPage() {
     }
   };
 
-  const handleResolve = async (errorId) => {
+  const handleResolve = async (errorId: string): Promise<void> => {
     const success = await resolveError(errorId);
     if (success) {
       await fetchErrors();
@@ -52,7 +62,7 @@ export default function ErrorsPage() {
     (currentPage + 1) * ERRORS_PER_PAGE
   );
 
-  const formatDate = (timestamp) => {
+  const formatDate = (timestamp: number): string => {
     return new Date(timestamp).toLocaleString('it-IT', {
       day: '2-digit',
       month: '2-digit',
@@ -62,7 +72,7 @@ export default function ErrorsPage() {
     });
   };
 
-  const formatDuration = (startTime, endTime) => {
+  const formatDuration = (startTime: number, endTime: number): string => {
     const duration = (endTime - startTime) / 1000 / 60; // minutes
     if (duration < 60) return `${Math.round(duration)}m`;
     const hours = Math.floor(duration / 60);

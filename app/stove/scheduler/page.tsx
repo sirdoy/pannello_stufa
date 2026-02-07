@@ -25,50 +25,91 @@ import ScheduleManagementModal from '@/app/components/scheduler/ScheduleManageme
 
 const daysOfWeek = [
   'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'
-];
+] as const;
+
+type DayOfWeek = typeof daysOfWeek[number];
+
+interface ScheduleInterval {
+  start: string;
+  end: string;
+  power?: number;
+}
+
+type WeekSchedule = Record<DayOfWeek, ScheduleInterval[]>;
+
+interface ConfirmDialogState {
+  isOpen: boolean;
+  day: DayOfWeek | null;
+  intervalIndex: number | null;
+}
+
+interface DuplicateModalState {
+  isOpen: boolean;
+  sourceDay: DayOfWeek | null;
+}
+
+interface AddIntervalModalState {
+  isOpen: boolean;
+  mode: 'add' | 'edit';
+  day: DayOfWeek | null;
+  index: number | null;
+  initialInterval: ScheduleInterval | null;
+  suggestedStart: string;
+}
+
+interface ToastMessage {
+  message: string;
+  icon?: string;
+  variant?: string;
+}
+
+interface SaveStatus {
+  isSaving: boolean;
+  day: DayOfWeek | null;
+}
 
 export default function WeeklyScheduler() {
-  const [schedule, setSchedule] = useState(() =>
+  const [schedule, setSchedule] = useState<WeekSchedule>(() =>
     daysOfWeek.reduce((acc, day) => {
       acc[day] = [];
       return acc;
-    }, {})
+    }, {} as WeekSchedule)
   );
-  const [schedulerEnabled, setSchedulerEnabled] = useState(false);
-  const [semiManualMode, setSemiManualModeState] = useState(false);
-  const [returnToAutoAt, setReturnToAutoAt] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [confirmDialog, setConfirmDialog] = useState({
+  const [schedulerEnabled, setSchedulerEnabled] = useState<boolean>(false);
+  const [semiManualMode, setSemiManualModeState] = useState<boolean>(false);
+  const [returnToAutoAt, setReturnToAutoAt] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>({
     isOpen: false,
     day: null,
     intervalIndex: null,
   });
-  const [duplicateModal, setDuplicateModal] = useState({
+  const [duplicateModal, setDuplicateModal] = useState<DuplicateModalState>({
     isOpen: false,
     sourceDay: null,
   });
-  const [addIntervalModal, setAddIntervalModal] = useState({
+  const [addIntervalModal, setAddIntervalModal] = useState<AddIntervalModalState>({
     isOpen: false,
-    mode: 'add', // 'add' or 'edit'
+    mode: 'add',
     day: null,
-    index: null, // For edit mode
-    initialInterval: null, // For edit mode
+    index: null,
+    initialInterval: null,
     suggestedStart: '00:00',
   });
-  const [toast, setToast] = useState(null);
-  const [lastLocalSave, setLastLocalSave] = useState(null);
-  const [saveStatus, setSaveStatus] = useState({
+  const [toast, setToast] = useState<ToastMessage | null>(null);
+  const [lastLocalSave, setLastLocalSave] = useState<number | null>(null);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>({
     isSaving: false,
     day: null,
   });
-  const [selectedDay, setSelectedDay] = useState('Lunedì'); // Selected day for edit panel
+  const [selectedDay, setSelectedDay] = useState<DayOfWeek>('Lunedì');
 
   // Multi-schedule management states
-  const [schedules, setSchedules] = useState([]);
-  const [activeScheduleId, setActiveScheduleId] = useState('default');
-  const [loadingSchedules, setLoadingSchedules] = useState(true);
-  const [createScheduleModal, setCreateScheduleModal] = useState(false);
-  const [manageSchedulesModal, setManageSchedulesModal] = useState(false);
+  const [schedules, setSchedules] = useState<any[]>([]);
+  const [activeScheduleId, setActiveScheduleId] = useState<string>('default');
+  const [loadingSchedules, setLoadingSchedules] = useState<boolean>(true);
+  const [createScheduleModal, setCreateScheduleModal] = useState<boolean>(false);
+  const [manageSchedulesModal, setManageSchedulesModal] = useState<boolean>(false);
 
   // Load all schedules on mount
   useEffect(() => {
@@ -173,12 +214,12 @@ export default function WeeklyScheduler() {
   }, [lastLocalSave]);
 
   // Wrapper for saveSchedule that tracks local saves
-  const saveSchedule = async (day, intervals) => {
+  const saveSchedule = async (day: DayOfWeek, intervals: ScheduleInterval[]): Promise<void> => {
     setLastLocalSave(Date.now());
     await apiSaveSchedule(day, intervals);
   };
 
-  const addTimeRange = (day) => {
+  const addTimeRange = (day: DayOfWeek): void => {
     const daySchedule = schedule[day];
 
     // Trova l'ultimo intervallo in ordine temporale
@@ -206,7 +247,7 @@ export default function WeeklyScheduler() {
     });
   };
 
-  const handleEditIntervalRequest = (day, index) => {
+  const handleEditIntervalRequest = (day: DayOfWeek, index: number): void => {
     const interval = schedule[day][index];
     setAddIntervalModal({
       isOpen: true,
@@ -218,7 +259,7 @@ export default function WeeklyScheduler() {
     });
   };
 
-  const incrementTime = (time, minutesToAdd) => {
+  const incrementTime = (time: string, minutesToAdd: number): string => {
     const [h, m] = time.split(':').map(Number);
     const total = h * 60 + m + minutesToAdd;
     const newH = String(Math.floor(total / 60) % 24).padStart(2, '0');
@@ -226,12 +267,12 @@ export default function WeeklyScheduler() {
     return `${newH}:${newM}`;
   };
 
-  const isValidRange = (start, end) => {
+  const isValidRange = (start: string, end: string): boolean => {
     return start < end;
   };
 
   // Ordina gli intervalli per orario di inizio
-  const sortIntervals = (intervals) => {
+  const sortIntervals = (intervals: ScheduleInterval[]): ScheduleInterval[] => {
     return [...intervals].sort((a, b) => {
       if (a.start < b.start) return -1;
       if (a.start > b.start) return 1;
@@ -240,7 +281,7 @@ export default function WeeklyScheduler() {
   };
 
   // Applica collegamento tra intervalli adiacenti e rimuove sovrapposizioni
-  const applyAdjacentLinksAndRemoveOverlaps = (intervals, changedIndex, originalStart, originalEnd, field) => {
+  const applyAdjacentLinksAndRemoveOverlaps = (intervals: ScheduleInterval[], changedIndex: number, originalStart: string, originalEnd: string, field: 'start' | 'end'): ScheduleInterval[] => {
     let result = [...intervals];
     const changedInterval = result[changedIndex];
 

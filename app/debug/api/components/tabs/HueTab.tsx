@@ -185,7 +185,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             params={[
               { name: 'lightId', label: 'Light ID', type: 'text', defaultValue: '' },
               { name: 'on', label: 'On/Off', type: 'select', options: ['true', 'false'], defaultValue: 'true' },
-              { name: 'brightness', label: 'Brightness (0-100)', type: 'number', min: 0, max: 100, defaultValue: 50 },
+              { name: 'brightness', label: 'Brightness (0-100)', type: 'number', min: 0, max: 100, defaultValue: '50' },
             ]}
             response={postResponses.controlLight}
             loading={loadingPost.controlLight}
@@ -207,7 +207,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             params={[
               { name: 'roomId', label: 'Room ID', type: 'text', defaultValue: '' },
               { name: 'on', label: 'On/Off', type: 'select', options: ['true', 'false'], defaultValue: 'true' },
-              { name: 'brightness', label: 'Brightness (0-100)', type: 'number', min: 0, max: 100, defaultValue: 50 },
+              { name: 'brightness', label: 'Brightness (0-100)', type: 'number', min: 0, max: 100, defaultValue: '50' },
             ]}
             response={postResponses.controlRoom}
             loading={loadingPost.controlRoom}

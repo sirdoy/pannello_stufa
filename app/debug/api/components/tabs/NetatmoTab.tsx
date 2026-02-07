@@ -214,7 +214,7 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
             url="/api/netatmo/setroomthermpoint"
             externalUrl="https://api.netatmo.com/api/setroomthermpoint"
             params={[
-              { name: 'temp', label: 'Temperature (°C)', type: 'number', min: 7, max: 30, defaultValue: 20 },
+              { name: 'temp', label: 'Temperature (°C)', type: 'number', min: 7, max: 30, defaultValue: '20' },
             ]}
             response={postResponses.setroomthermpoint}
             loading={loadingPost.setroomthermpoint}

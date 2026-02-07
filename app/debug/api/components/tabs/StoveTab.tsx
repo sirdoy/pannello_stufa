@@ -231,7 +231,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
             url="/api/stove/ignite"
             externalUrl={getExternalUrl('/api/stove/ignite')}
             params={[
-              { name: 'power', label: 'Power Level (1-5)', type: 'number', min: 1, max: 5, defaultValue: 3 },
+              { name: 'power', label: 'Power Level (1-5)', type: 'number', min: 1, max: 5, defaultValue: '3' },
             ]}
             response={postResponses.ignite}
             loading={loadingPost.ignite}
@@ -258,7 +258,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
             url="/api/stove/setPower"
             externalUrl={getExternalUrl('/api/stove/setPower')}
             params={[
-              { name: 'level', label: 'Level (1-5)', type: 'number', min: 1, max: 5, defaultValue: 3 },
+              { name: 'level', label: 'Level (1-5)', type: 'number', min: 1, max: 5, defaultValue: '3' },
             ]}
             response={postResponses.setPower}
             loading={loadingPost.setPower}
@@ -273,7 +273,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
             url="/api/stove/setFan"
             externalUrl={getExternalUrl('/api/stove/setFan')}
             params={[
-              { name: 'level', label: 'Level (1-6)', type: 'number', min: 1, max: 6, defaultValue: 3 },
+              { name: 'level', label: 'Level (1-6)', type: 'number', min: 1, max: 6, defaultValue: '3' },
             ]}
             response={postResponses.setFan}
             loading={loadingPost.setFan}
@@ -288,7 +288,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
             url="/api/stove/setWaterTemperature"
             externalUrl={getExternalUrl('/api/stove/setWaterTemperature')}
             params={[
-              { name: 'temperature', label: 'Temperature (30-80°C)', type: 'number', min: 30, max: 80, defaultValue: 50 },
+              { name: 'temperature', label: 'Temperature (30-80°C)', type: 'number', min: 30, max: 80, defaultValue: '50' },
             ]}
             response={postResponses.setWaterTemp}
             loading={loadingPost.setWaterTemp}

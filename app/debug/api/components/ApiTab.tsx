@@ -48,7 +48,7 @@ export function EndpointCard({
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
-            <Heading level={3} size="sm" weight="semibold">
+            <Heading level={3} size="sm">
               {name}
             </Heading>
             <Badge variant="ocean" size="sm">
@@ -115,6 +115,9 @@ interface ApiParam {
   type: string;
   defaultValue: string;
   required?: boolean;
+  options?: string[];
+  min?: number;
+  max?: number;
 }
 
 interface PostEndpointCardProps {
@@ -168,7 +171,7 @@ export function PostEndpointCard({
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
-            <Heading level={3} size="sm" weight="semibold">
+            <Heading level={3} size="sm">
               {name}
             </Heading>
             <Badge variant="warning" size="sm">
@@ -239,7 +242,7 @@ export function PostEndpointCard({
                       onChange={(e) =>
                         handleInputChange(
                           param.name,
-                          param.type === 'number' ? parseInt(e.target.value) : e.target.value
+                          param.type === 'number' ? e.target.value : e.target.value
                         )
                       }
                       className="flex-1 px-3 py-1.5 border border-slate-600 [html:not(.dark)_&]:border-slate-300 rounded-lg bg-slate-800 [html:not(.dark)_&]:bg-white text-slate-100 [html:not(.dark)_&]:text-slate-900"
@@ -256,7 +259,7 @@ export function PostEndpointCard({
               {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </Button>
           )}
-          <Button onClick={handleExecute} loading={loading} size="sm" variant="default">
+          <Button onClick={handleExecute} loading={loading} size="sm" variant="ember">
             Execute
           </Button>
         </div>

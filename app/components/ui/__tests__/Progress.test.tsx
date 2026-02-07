@@ -1,4 +1,4 @@
-// app/components/ui/__tests__/Progress.test.js
+// app/components/ui/__tests__/Progress.test.tsx
 /**
  * Progress Component Tests
  *

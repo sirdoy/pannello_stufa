@@ -1,4 +1,4 @@
-// app/components/ui/__tests__/PageLayout.test.js
+// app/components/ui/__tests__/PageLayout.test.tsx
 /**
  * PageLayout Component Tests
  *

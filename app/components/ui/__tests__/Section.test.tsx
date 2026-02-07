@@ -1,4 +1,4 @@
-// app/components/ui/__tests__/Section.test.js
+// app/components/ui/__tests__/Section.test.tsx
 /**
  * Section Component Tests
  *

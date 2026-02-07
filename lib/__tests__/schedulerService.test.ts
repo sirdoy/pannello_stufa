@@ -566,7 +566,8 @@ describe('schedulerService', () => {
       const result = await getFullSchedulerMode();
 
       // ASSERT
-      expect(result).toEqual({ enabled: false, semiManual: false });
+      expect(result).toMatchObject({ enabled: false, semiManual: false });
+      expect(result.lastUpdated).toBeDefined();
     });
 
     test('returns default mode on Firebase error', async () => {
@@ -577,7 +578,8 @@ describe('schedulerService', () => {
       const result = await getFullSchedulerMode();
 
       // ASSERT
-      expect(result).toEqual({ enabled: false, semiManual: false });
+      expect(result).toMatchObject({ enabled: false, semiManual: false });
+      expect(result.lastUpdated).toBeDefined();
       expect(console.error).toHaveBeenCalled();
     });
   });

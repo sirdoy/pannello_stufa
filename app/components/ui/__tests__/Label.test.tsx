@@ -1,4 +1,4 @@
-// app/components/ui/__tests__/Label.test.js
+// app/components/ui/__tests__/Label.test.tsx
 /**
  * Label Component Tests
  *

@@ -1,4 +1,4 @@
-// app/components/ui/__tests__/Popover.test.js
+// app/components/ui/__tests__/Popover.test.tsx
 /**
  * Popover Component Tests
  *

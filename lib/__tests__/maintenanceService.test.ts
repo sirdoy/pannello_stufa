@@ -8,6 +8,7 @@ import {
   getMaintenanceStatus,
 } from '../maintenanceService';
 import { logUserAction } from '../logService';
+import { ref, get, set, update, runTransaction } from 'firebase/database';
 
 // Mock Firebase module
 jest.mock('firebase/database', () => ({
@@ -23,9 +24,6 @@ jest.mock('../firebase', () => ({
 jest.mock('../logService', () => ({
   logUserAction: jest.fn(),
 }));
-
-// Get mocked functions
-const { ref, get, set, update, runTransaction } = require('firebase/database');
 
 describe('maintenanceService', () => {
   beforeEach(() => {

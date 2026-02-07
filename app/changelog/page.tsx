@@ -239,7 +239,7 @@ export default function ChangelogPage() {
             disabled={currentPage === 1}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ${
               currentPage === 1
-                ? 'bg-slate-800/30 text-slate-500 cursor-not-allowed [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-400'
+                ? 'bg-slate-800/30 text-slate-500 cursor-not-allowed [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-500'
                 : 'bg-slate-800/50 text-slate-200 hover:bg-slate-700/50 active:scale-95 [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:text-slate-700 [html:not(.dark)_&]:hover:bg-slate-300'
             }`}
           >
@@ -296,7 +296,7 @@ export default function ChangelogPage() {
             disabled={currentPage === totalPages}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ${
               currentPage === totalPages
-                ? 'bg-slate-800/30 text-slate-500 cursor-not-allowed [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-400'
+                ? 'bg-slate-800/30 text-slate-500 cursor-not-allowed [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-500'
                 : 'bg-slate-800/50 text-slate-200 hover:bg-slate-700/50 active:scale-95 [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:text-slate-700 [html:not(.dark)_&]:hover:bg-slate-300'
             }`}
           >

@@ -7,6 +7,52 @@ import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 import DeliveryChart from './components/DeliveryChart';
 
+interface NotificationStats {
+  notifications: {
+    total: number;
+    sent: number;
+    failed: number;
+    deliveryRate: number;
+  };
+  devices: {
+    active: number;
+    total: number;
+    stale: number;
+  };
+  errors: {
+    total: number;
+    byCode: Record<string, number>;
+  };
+  alerting?: {
+    lastAlertSent?: string;
+    lastAlertRate?: number;
+  };
+}
+
+interface Device {
+  id: string;
+  displayName: string;
+  tokenPrefix: string;
+  platform: string;
+  lastUsed: string;
+  status: 'active' | 'stale' | 'unknown';
+  browser?: string;
+  os?: string;
+  tokenKey?: string;
+  token?: string;
+}
+
+interface TrendsSummary {
+  totalNotifications: number;
+  averageDeliveryRate: number;
+  trend: 'improving' | 'declining' | 'stable';
+}
+
+interface Trends {
+  daily: any[];
+  summary: TrendsSummary;
+}
+
 /**
  * Notifications Dashboard
  *
@@ -19,17 +65,17 @@ import DeliveryChart from './components/DeliveryChart';
  * - Manual refresh (no auto-polling per 02-CONTEXT.md)
  */
 export default function NotificationsDashboard() {
-  const [stats, setStats] = useState(null);
-  const [devices, setDevices] = useState([]);
-  const [trends, setTrends] = useState(null);
-  const [alertInfo, setAlertInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [stats, setStats] = useState<NotificationStats | null>(null);
+  const [devices, setDevices] = useState<Device[]>([]);
+  const [trends, setTrends] = useState<Trends | null>(null);
+  const [alertInfo, setAlertInfo] = useState<NotificationStats['alerting'] | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   /**
    * Fetch all dashboard data
    */
-  const fetchStats = async () => {
+  const fetchStats = async (): Promise<void> => {
     setLoading(true);
     setError(null);
 
@@ -64,7 +110,7 @@ export default function NotificationsDashboard() {
       }
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
@@ -81,7 +127,7 @@ export default function NotificationsDashboard() {
    * 70-84%: Yellow (warning)
    * < 70%: Red (ember)
    */
-  const getDeliveryRateColor = (rate) => {
+  const getDeliveryRateColor = (rate: number): string => {
     if (rate >= 85) return 'sage';
     if (rate >= 70) return 'warning';
     return 'ember';
@@ -90,7 +136,7 @@ export default function NotificationsDashboard() {
   /**
    * Get device status badge classes
    */
-  const getStatusBadge = (status) => {
+  const getStatusBadge = (status: string): { bg: string; text: string; label: string } => {
     const badges = {
       active: {
         bg: 'bg-sage-50 [html:not(.dark)_&]:bg-sage-50',
@@ -115,7 +161,7 @@ export default function NotificationsDashboard() {
   /**
    * Format date for display
    */
-  const formatDate = (dateString) => {
+  const formatDate = (dateString?: string): string => {
     if (!dateString) return 'Never';
     const date = new Date(dateString);
     const now = new Date();
@@ -131,7 +177,7 @@ export default function NotificationsDashboard() {
   /**
    * Get trend icon and color
    */
-  const getTrendIcon = (trend) => {
+  const getTrendIcon = (trend: string): { icon: string; color: string } => {
     if (trend === 'improving') return { icon: '↗', color: 'sage' };
     if (trend === 'declining') return { icon: '↘', color: 'ember' };
     return { icon: '→', color: 'secondary' };

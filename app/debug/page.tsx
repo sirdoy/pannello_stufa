@@ -39,14 +39,23 @@ import SchedulerTab from '@/app/debug/components/tabs/SchedulerTab';
 // ============================================================================
 // LOG CONTENT - Debug Logs
 // ============================================================================
-function LogContent() {
-  const [logs, setLogs] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [autoRefresh, setAutoRefresh] = useState(false);
-  const [category, setCategory] = useState('notifications');
-  const [total, setTotal] = useState(0);
+interface LogEntry {
+  id?: string;
+  message: string;
+  timestamp: number;
+  data?: Record<string, any>;
+}
 
-  const fetchLogs = async () => {
+type LogCategory = 'notifications' | 'fcm' | 'general';
+
+function LogContent() {
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [autoRefresh, setAutoRefresh] = useState<boolean>(false);
+  const [category, setCategory] = useState<LogCategory>('notifications');
+  const [total, setTotal] = useState<number>(0);
+
+  const fetchLogs = async (): Promise<void> => {
     setLoading(true);
     try {
       const res = await fetch(`/api/debug/log?category=${category}&limit=100`);
@@ -73,7 +82,7 @@ function LogContent() {
     }
   }, [autoRefresh, category]);
 
-  const formatTime = (timestamp) => {
+  const formatTime = (timestamp: number): string => {
     const date = new Date(timestamp);
     return date.toLocaleString('it-IT', {
       day: '2-digit',
@@ -160,12 +169,26 @@ function LogContent() {
 // ============================================================================
 // NOTIFICHE CONTENT - Notifications Dashboard
 // ============================================================================
-function NotificheContent() {
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+interface NotificationStats {
+  notifications: {
+    total: number;
+    deliveryRate: number;
+    sent: number;
+    failed: number;
+  };
+  devices: {
+    active: number;
+    total: number;
+    stale: number;
+  };
+}
 
-  const fetchStats = async () => {
+function NotificheContent() {
+  const [stats, setStats] = useState<NotificationStats | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchStats = async (): Promise<void> => {
     setLoading(true);
     setError(null);
     try {
@@ -175,7 +198,7 @@ function NotificheContent() {
       if (data.success) setStats(data.stats);
     } catch (err) {
       console.error('Error fetching stats:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
@@ -185,7 +208,7 @@ function NotificheContent() {
     fetchStats();
   }, []);
 
-  const getDeliveryRateColor = (rate) => {
+  const getDeliveryRateColor = (rate: number): string => {
     if (rate >= 85) return 'sage';
     if (rate >= 70) return 'warning';
     return 'ember';
@@ -265,20 +288,20 @@ function DebugPageContent() {
   const router = useRouter();
 
   const currentTab = searchParams.get('tab') || 'stufa';
-  const [autoRefresh, setAutoRefresh] = useState(false);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [autoRefresh, setAutoRefresh] = useState<boolean>(false);
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
-  const handleTabChange = (value) => {
+  const handleTabChange = (value: string): void => {
     router.push(`/debug?tab=${value}`, { scroll: false });
   };
 
-  const handleManualRefresh = () => {
+  const handleManualRefresh = (): void => {
     setRefreshTrigger(prev => prev + 1);
   };
 
   // Keyboard shortcuts
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent): void => {
       // Tab shortcuts (1-8)
       if (e.key >= '1' && e.key <= '8' && !e.metaKey && !e.ctrlKey) {
         const tabs = ['stufa', 'netatmo', 'hue', 'weather', 'firebase', 'scheduler', 'log', 'notifiche'];

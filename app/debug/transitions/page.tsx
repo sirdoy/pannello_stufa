@@ -6,6 +6,23 @@ import { usePageTransition, TRANSITION_TYPES } from '@/app/context/PageTransitio
 import { ArrowLeft, Sparkles, Zap, Waves, Layers, Slash } from 'lucide-react';
 import { Heading, Text, Card, Banner } from '@/app/components/ui';
 import PageLayout from '@/app/components/ui/PageLayout';
+import type { ReactNode } from 'react';
+
+type TransitionType = typeof TRANSITION_TYPES[keyof typeof TRANSITION_TYPES];
+
+interface TransitionConfig {
+  type: TransitionType;
+  name: string;
+  description: string;
+  icon: ReactNode;
+  color: string;
+}
+
+interface DemoPage {
+  href: string;
+  label: string;
+  emoji: string;
+}
 
 /**
  * Transitions Demo Page - Test cinematographic page transitions
@@ -15,9 +32,9 @@ import PageLayout from '@/app/components/ui/PageLayout';
  */
 export default function TransitionsDebugPage() {
   const { transitionType, setTransitionType, direction, isTransitioning } = usePageTransition();
-  const [selectedType, setSelectedType] = useState(transitionType);
+  const [selectedType, setSelectedType] = useState<TransitionType>(transitionType);
 
-  const transitionsList = [
+  const transitionsList: TransitionConfig[] = [
     {
       type: TRANSITION_TYPES.SLIDE_MORPH,
       name: 'Slide Morph',
@@ -62,12 +79,12 @@ export default function TransitionsDebugPage() {
     },
   ];
 
-  const handleChangeType = (type) => {
+  const handleChangeType = (type: TransitionType): void => {
     setSelectedType(type);
     setTransitionType(type);
   };
 
-  const demoPages = [
+  const demoPages: DemoPage[] = [
     { href: '/', label: 'Home', emoji: '🏠' },
     { href: '/stove', label: 'Stufa', emoji: '🔥' },
     { href: '/stove/scheduler', label: 'Scheduler', emoji: '⏰' },

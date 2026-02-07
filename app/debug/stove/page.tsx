@@ -8,9 +8,15 @@ import Text from '@/app/components/ui/Text';
 import { Copy, Check } from 'lucide-react';
 import { API_KEY } from '@/lib/stoveApi';
 
+interface StoveApiResponse {
+  [key: string]: any;
+}
+
+type LoadingState = Record<string, boolean>;
+
 export default function StoveDebugPage() {
   // GET responses state
-  const [getResponses, setGetResponses] = useState({
+  const [getResponses, setGetResponses] = useState<Record<string, StoveApiResponse | null>>({
     status: null,
     power: null,
     fan: null,
@@ -21,22 +27,22 @@ export default function StoveDebugPage() {
   });
 
   // POST responses state
-  const [postResponses, setPostResponses] = useState({});
+  const [postResponses, setPostResponses] = useState<Record<string, StoveApiResponse>>({});
 
   // Input state for POST operations
-  const [powerInput, setPowerInput] = useState(3);
-  const [fanInput, setFanInput] = useState(3);
-  const [waterTempInput, setWaterTempInput] = useState(50);
+  const [powerInput, setPowerInput] = useState<number>(3);
+  const [fanInput, setFanInput] = useState<number>(3);
+  const [waterTempInput, setWaterTempInput] = useState<number>(50);
 
   // Loading states
-  const [loadingGet, setLoadingGet] = useState({});
-  const [loadingPost, setLoadingPost] = useState({});
+  const [loadingGet, setLoadingGet] = useState<LoadingState>({});
+  const [loadingPost, setLoadingPost] = useState<LoadingState>({});
 
   // Auto-refresh state
-  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [autoRefresh, setAutoRefresh] = useState<boolean>(false);
 
   // Copied URL tracking
-  const [copiedUrl, setCopiedUrl] = useState(null);
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
   // Thermorossi API URLs mapping
   const BASE_URL = 'https://wsthermorossi.cloudwinet.it/WiNetStove.svc/json';
@@ -59,14 +65,14 @@ export default function StoveDebugPage() {
   /**
    * Get external Thermorossi URL for an endpoint
    */
-  const getExternalUrl = (endpoint) => {
-    return thermorossiUrls[endpoint] || endpoint;
+  const getExternalUrl = (endpoint: string): string => {
+    return (thermorossiUrls as Record<string, string>)[endpoint] || endpoint;
   };
 
   /**
    * Copy external URL to clipboard
    */
-  const copyUrlToClipboard = async (endpoint) => {
+  const copyUrlToClipboard = async (endpoint: string): Promise<void> => {
     const externalUrl = getExternalUrl(endpoint);
     try {
       await navigator.clipboard.writeText(externalUrl);
@@ -80,7 +86,7 @@ export default function StoveDebugPage() {
   /**
    * Remove internal fields from API response (show only real API data)
    */
-  const cleanApiResponse = (data) => {
+  const cleanApiResponse = (data: any): any => {
     if (!data || typeof data !== 'object') return data;
     const { isSandbox, ...cleanData } = data;
     return cleanData;
@@ -89,7 +95,7 @@ export default function StoveDebugPage() {
   /**
    * Fetch a single GET endpoint
    */
-  const fetchGetEndpoint = async (name, url) => {
+  const fetchGetEndpoint = async (name: string, url: string): Promise<void> => {
     setLoadingGet((prev) => ({ ...prev, [name]: true }));
     try {
       const res = await fetch(url);
@@ -109,7 +115,7 @@ export default function StoveDebugPage() {
   /**
    * Fetch all GET endpoints
    */
-  const fetchAllGetEndpoints = async () => {
+  const fetchAllGetEndpoints = async (): Promise<void> => {
     await Promise.all([
       fetchGetEndpoint('status', '/api/stove/status'),
       fetchGetEndpoint('power', '/api/stove/getPower'),
@@ -124,7 +130,7 @@ export default function StoveDebugPage() {
   /**
    * Call a POST endpoint
    */
-  const callPostEndpoint = async (name, url, body = null) => {
+  const callPostEndpoint = async (name: string, url: string, body: any = null): Promise<void> => {
     setLoadingPost((prev) => ({ ...prev, [name]: true }));
     try {
       const options = {
@@ -519,7 +525,13 @@ export default function StoveDebugPage() {
 /**
  * Copy URL button component with proper accessibility
  */
-function CopyUrlButton({ onClick, isCopied, label = "Copia URL" }) {
+interface CopyUrlButtonProps {
+  onClick: () => void;
+  isCopied: boolean;
+  label?: string;
+}
+
+function CopyUrlButton({ onClick, isCopied, label = "Copia URL" }: CopyUrlButtonProps) {
   return (
     <Button.Icon
       icon={isCopied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
@@ -535,7 +547,18 @@ function CopyUrlButton({ onClick, isCopied, label = "Copia URL" }) {
 /**
  * Component to display a GET endpoint with its response
  */
-function EndpointDisplay({ title, endpoint, externalUrl, response, loading, onRefresh, onCopyUrl, isCopied }) {
+interface EndpointDisplayProps {
+  title: string;
+  endpoint: string;
+  externalUrl: string;
+  response: any;
+  loading: boolean;
+  onRefresh: () => void;
+  onCopyUrl: () => void;
+  isCopied: boolean;
+}
+
+function EndpointDisplay({ title, endpoint, externalUrl, response, loading, onRefresh, onCopyUrl, isCopied }: EndpointDisplayProps) {
   return (
     <div className="border-b border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 pb-4 last:border-0">
       <div className="flex items-center justify-between mb-2">
@@ -560,7 +583,11 @@ function EndpointDisplay({ title, endpoint, externalUrl, response, loading, onRe
 /**
  * Component to display JSON data with syntax highlighting
  */
-function JsonDisplay({ data }) {
+interface JsonDisplayProps {
+  data: any;
+}
+
+function JsonDisplay({ data }: JsonDisplayProps) {
   return (
     <pre className="mt-2 p-3 bg-slate-900 [html:not(.dark)_&]:bg-slate-900 bg-black text-green-400 rounded-lg text-xs overflow-x-auto font-mono">
       {JSON.stringify(data, null, 2)}

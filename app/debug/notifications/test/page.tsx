@@ -7,23 +7,59 @@ import Button from '@/app/components/ui/Button';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 
+interface Device {
+  tokenKey: string;
+  token: string;
+  displayName: string;
+  browser: string;
+  os: string;
+}
+
+interface Template {
+  title: string;
+  body: string;
+  description: string;
+  defaultPriority: string;
+}
+
+interface DeliveryResult {
+  successCount: number;
+  failureCount: number;
+  errors?: Array<{ errorCode: string; tokenPrefix: string }>;
+}
+
+interface TestResult {
+  success: boolean;
+  trace?: {
+    sentAt: string;
+    targetDevices: number;
+    deliveryResults: DeliveryResult;
+    template?: string;
+  };
+  error?: string;
+}
+
+type TargetMode = 'all' | 'specific';
+type TemplateKey = 'custom' | 'error_alert' | 'scheduler_success' | 'maintenance_reminder' | 'critical_test' | 'low_priority_test';
+type Priority = 'high' | 'normal' | 'low';
+
 export default function TestNotificationPage() {
   const router = useRouter();
-  const [devices, setDevices] = useState([]);
-  const [loadingDevices, setLoadingDevices] = useState(true);
+  const [devices, setDevices] = useState<Device[]>([]);
+  const [loadingDevices, setLoadingDevices] = useState<boolean>(true);
 
   // Form state
-  const [targetMode, setTargetMode] = useState('all');
-  const [selectedDevice, setSelectedDevice] = useState(null);
-  const [template, setTemplate] = useState('custom');
-  const [customTitle, setCustomTitle] = useState('');
-  const [customBody, setCustomBody] = useState('');
-  const [priority, setPriority] = useState('normal');
-  const [sending, setSending] = useState(false);
-  const [result, setResult] = useState(null);
+  const [targetMode, setTargetMode] = useState<TargetMode>('all');
+  const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
+  const [template, setTemplate] = useState<TemplateKey>('custom');
+  const [customTitle, setCustomTitle] = useState<string>('');
+  const [customBody, setCustomBody] = useState<string>('');
+  const [priority, setPriority] = useState<Priority>('normal');
+  const [sending, setSending] = useState<boolean>(false);
+  const [result, setResult] = useState<TestResult | null>(null);
 
   // Template definitions (match API)
-  const templates = {
+  const templates: Record<TemplateKey, Template> = {
     custom: { title: '', body: '', description: 'Write your own message', defaultPriority: 'normal' },
     error_alert: {
       title: 'Errore Stufa',
@@ -69,7 +105,7 @@ export default function TestNotificationPage() {
     fetchDevices();
   }, []);
 
-  const fetchDevices = async () => {
+  const fetchDevices = async (): Promise<void> => {
     try {
       const response = await fetch('/api/notifications/devices');
       const data = await response.json();
@@ -83,19 +119,19 @@ export default function TestNotificationPage() {
     }
   };
 
-  const handleTemplateChange = (newTemplate) => {
+  const handleTemplateChange = (newTemplate: TemplateKey): void => {
     setTemplate(newTemplate);
     if (templates[newTemplate]?.defaultPriority) {
-      setPriority(templates[newTemplate].defaultPriority);
+      setPriority(templates[newTemplate].defaultPriority as Priority);
     }
   };
 
-  const handleSend = async () => {
+  const handleSend = async (): Promise<void> => {
     setSending(true);
     setResult(null);
 
     try {
-      const body = {};
+      const body: any = {};
 
       // Target selection
       if (targetMode === 'specific' && selectedDevice) {
@@ -130,14 +166,14 @@ export default function TestNotificationPage() {
     } catch (err) {
       setResult({
         success: false,
-        error: 'Failed to send notification: ' + err.message
+        error: 'Failed to send notification: ' + (err instanceof Error ? err.message : 'Unknown error')
       });
     } finally {
       setSending(false);
     }
   };
 
-  const isFormValid = () => {
+  const isFormValid = (): boolean => {
     if (targetMode === 'specific' && !selectedDevice) return false;
     if (template === 'custom' && (!customTitle || !customBody)) return false;
     return true;

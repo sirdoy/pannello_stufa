@@ -5,6 +5,8 @@ import { WeatherCard } from '@/app/components/weather';
 import { PageLayout } from '@/app/components/ui';
 import { Button } from '@/app/components/ui';
 
+type TestState = 'loading' | 'error' | 'data';
+
 // Mock weather data matching API response shape
 const mockWeatherData = {
   current: {
@@ -26,7 +28,7 @@ const mockWeatherData = {
 };
 
 export default function WeatherTestPage() {
-  const [state, setState] = useState('data'); // 'loading', 'error', 'data'
+  const [state, setState] = useState<TestState>('data');
 
   return (
     <PageLayout title="Weather Card Test">

@@ -8,14 +8,24 @@ import Text from '../../components/ui/Text';
 import PageLayout from '../../components/ui/PageLayout';
 import Banner from '../../components/ui/Banner';
 
-export default function DebugLogsPage() {
-  const [logs, setLogs] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [autoRefresh, setAutoRefresh] = useState(false);
-  const [category, setCategory] = useState('notifications');
-  const [total, setTotal] = useState(0);
+interface LogEntry {
+  id?: string;
+  message: string;
+  timestamp: number;
+  data?: Record<string, any>;
+  userAgent?: string;
+}
 
-  const fetchLogs = async () => {
+type LogCategory = 'notifications' | 'fcm' | 'general';
+
+export default function DebugLogsPage() {
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [autoRefresh, setAutoRefresh] = useState<boolean>(false);
+  const [category, setCategory] = useState<LogCategory>('notifications');
+  const [total, setTotal] = useState<number>(0);
+
+  const fetchLogs = async (): Promise<void> => {
     setLoading(true);
     try {
       const res = await fetch(`/api/debug/log?category=${category}&limit=100`);
@@ -31,7 +41,7 @@ export default function DebugLogsPage() {
     }
   };
 
-  const clearLogs = async () => {
+  const clearLogs = async (): Promise<void> => {
     if (!confirm('Vuoi davvero cancellare tutti i log di questa categoria?')) return;
     // Per ora non implementiamo il clear, solo refresh
     alert('Clear logs non ancora implementato. Cancella manualmente da Firebase Console.');
@@ -48,7 +58,7 @@ export default function DebugLogsPage() {
     }
   }, [autoRefresh, category]);
 
-  const formatTime = (timestamp) => {
+  const formatTime = (timestamp: number): string => {
     const date = new Date(timestamp);
     return date.toLocaleString('it-IT', {
       day: '2-digit',
@@ -92,7 +102,7 @@ export default function DebugLogsPage() {
 
         {/* Category Selector */}
         <div className="flex gap-2 mb-6">
-          {['notifications', 'fcm', 'general'].map((cat) => (
+          {(['notifications', 'fcm', 'general'] as LogCategory[]).map((cat) => (
             <Button
               key={cat}
               variant={category === cat ? 'ember' : 'outline'}

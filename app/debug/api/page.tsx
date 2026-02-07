@@ -13,17 +13,19 @@ import WeatherTab from './components/tabs/WeatherTab';
 import FirebaseTab from './components/tabs/FirebaseTab';
 import SchedulerTab from './components/tabs/SchedulerTab';
 
+type TabValue = 'stove' | 'netatmo' | 'hue' | 'weather' | 'firebase' | 'scheduler';
+
 export default function ApiDebugPage() {
-  const [activeTab, setActiveTab] = useState('stove');
-  const [autoRefresh, setAutoRefresh] = useState(false);
-  const [lastRefresh, setLastRefresh] = useState(null);
+  const [activeTab, setActiveTab] = useState<TabValue>('stove');
+  const [autoRefresh, setAutoRefresh] = useState<boolean>(false);
+  const [lastRefresh, setLastRefresh] = useState<number | null>(null);
 
   // Detect environment
   const isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
 
   // Read tab from URL hash on mount
   useEffect(() => {
-    const hash = window.location.hash.replace('#', '');
+    const hash = window.location.hash.replace('#', '') as TabValue;
     if (hash && ['stove', 'netatmo', 'hue', 'weather', 'firebase', 'scheduler'].includes(hash)) {
       setActiveTab(hash);
     }
@@ -36,7 +38,7 @@ export default function ApiDebugPage() {
 
   // Keyboard shortcuts
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       // Cmd/Ctrl + R: Refresh current tab (prevent default browser refresh)
       if ((e.metaKey || e.ctrlKey) && e.key === 'r') {
         e.preventDefault();
@@ -44,7 +46,7 @@ export default function ApiDebugPage() {
       }
       // Number keys 1-6: Switch tabs
       if (!e.metaKey && !e.ctrlKey && !e.altKey) {
-        const tabs = ['stove', 'netatmo', 'hue', 'weather', 'firebase', 'scheduler'];
+        const tabs: TabValue[] = ['stove', 'netatmo', 'hue', 'weather', 'firebase', 'scheduler'];
         const index = parseInt(e.key) - 1;
         if (index >= 0 && index < tabs.length) {
           setActiveTab(tabs[index]);
@@ -60,7 +62,7 @@ export default function ApiDebugPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleRefreshAll = () => {
+  const handleRefreshAll = (): void => {
     setLastRefresh(Date.now());
   };
 
@@ -110,7 +112,7 @@ export default function ApiDebugPage() {
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabValue)}>
           <Tabs.List>
             <Tabs.Trigger value="stove">🔥 Stove</Tabs.Trigger>
             <Tabs.Trigger value="netatmo">🌡️ Netatmo</Tabs.Trigger>

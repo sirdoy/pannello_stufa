@@ -14,6 +14,31 @@ import {
 import { format, parseISO } from 'date-fns';
 import Text from '@/app/components/ui/Text';
 
+interface DailyDataItem {
+  date: string;
+  total: number;
+  sent: number;
+  failed: number;
+  deliveryRate: number;
+}
+
+interface DeliveryChartProps {
+  data?: DailyDataItem[];
+  loading?: boolean;
+}
+
+interface ChartDataItem extends Omit<DailyDataItem, 'deliveryRate'> {
+  displayDate: string;
+  deliveryRate: number;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    payload: DailyDataItem;
+  }>;
+}
+
 /**
  * DeliveryChart Component
  *
@@ -30,7 +55,7 @@ import Text from '@/app/components/ui/Text';
  * - Left Y-axis: notification count
  * - Right Y-axis: delivery rate (0-100%)
  */
-export default function DeliveryChart({ data = [], loading = false }) {
+export default function DeliveryChart({ data = [], loading = false }: DeliveryChartProps) {
   if (loading) {
     return (
       <div className="h-[300px] flex items-center justify-center bg-slate-800/30 [html:not(.dark)_&]:bg-slate-100 rounded-lg">
@@ -48,7 +73,7 @@ export default function DeliveryChart({ data = [], loading = false }) {
   }
 
   // Format data for Recharts
-  const chartData = data.map((item) => ({
+  const chartData: ChartDataItem[] = data.map((item) => ({
     ...item,
     // Format date for X-axis display
     displayDate: format(parseISO(item.date), 'MMM dd'),
@@ -57,7 +82,7 @@ export default function DeliveryChart({ data = [], loading = false }) {
   }));
 
   // Custom tooltip
-  const CustomTooltip = ({ active, payload }) => {
+  const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     if (!active || !payload || payload.length === 0) return null;
 
     const data = payload[0].payload;

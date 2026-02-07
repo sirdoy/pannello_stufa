@@ -5,18 +5,19 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import Button from '@/app/components/ui/Button';
 
+interface CodeBlockProps {
+  code: string;
+  language?: string;
+  showLineNumbers?: boolean;
+  className?: string;
+}
+
 /**
  * CodeBlock Component - Design System Documentation
  *
  * Syntax-highlighted code block with copy-to-clipboard functionality.
  * Uses react-syntax-highlighter with VS Code Dark+ theme.
  * Styled to match Ember Noir design system.
- *
- * @param {Object} props - Component props
- * @param {string} props.code - Code string to display
- * @param {string} [props.language='jsx'] - Programming language for syntax highlighting
- * @param {boolean} [props.showLineNumbers=true] - Show line numbers
- * @param {string} [props.className] - Additional CSS classes
  *
  * @example
  * <CodeBlock
@@ -29,7 +30,7 @@ export default function CodeBlock({
   language = 'jsx',
   showLineNumbers = true,
   className = '',
-}) {
+}: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {

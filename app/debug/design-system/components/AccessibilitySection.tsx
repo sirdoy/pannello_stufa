@@ -5,18 +5,29 @@ import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 import Badge from '@/app/components/ui/Badge';
 
+interface KeyboardItem {
+  key: string;
+  action: string;
+}
+
+interface AriaItem {
+  attr: string;
+  description: string;
+}
+
+interface AccessibilitySectionProps {
+  keyboard?: KeyboardItem[];
+  aria?: AriaItem[];
+  screenReader?: string;
+  className?: string;
+}
+
 /**
  * AccessibilitySection Component - Design System Documentation
  *
  * Displays accessibility documentation for interactive components.
  * Includes keyboard navigation, ARIA attributes, and screen reader info.
  * Styled to match Ember Noir design system.
- *
- * @param {Object} props - Component props
- * @param {Array<{key: string, action: string}>} [props.keyboard] - Keyboard navigation shortcuts
- * @param {Array<{attr: string, description: string}>} [props.aria] - ARIA attributes used
- * @param {string} [props.screenReader] - Screen reader behavior description
- * @param {string} [props.className] - Additional CSS classes
  *
  * @example
  * <AccessibilitySection
@@ -35,7 +46,7 @@ export default function AccessibilitySection({
   aria = [],
   screenReader,
   className = '',
-}) {
+}: AccessibilitySectionProps) {
   const hasContent = keyboard.length > 0 || aria.length > 0 || screenReader;
 
   if (!hasContent) {

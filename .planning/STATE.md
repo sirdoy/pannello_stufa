@@ -189,9 +189,9 @@ From 39-01 (Foundation UI components):
 ## Session Continuity
 
 Last session: 2026-02-07
-Stopped at: Completed 40-04-PLAN.md (Notifications API Routes - 15 files migrated)
+Stopped at: Completed 40-05-PLAN.md (Health/Monitoring, Scheduler, Schedules Routes - 10 files migrated)
 Resume file: None
-Next step: Continue Phase 40 with remaining plans (05, 07-08)
+Next step: Continue Phase 40 with remaining plans (06-08)
 
 From 38-10 (Type definitions gap closure):
 - Type narrowing with 'in' operator for discriminated unions: if ('property' in object)
@@ -287,6 +287,18 @@ From 39-11 (Final components + error resolution):
 - Type guards in render: 'separator' in item && item.separator for discriminated unions
 - parseInt(stringValue, 10) for parsing numeric strings from props
 - Cast to any for interface mismatches when data transformation not available
+
+From 40-05 (Health/Monitoring, Scheduler, Schedules Routes):
+- Pragmatic typing for large files: scheduler/check (995 lines) typed function signatures, not internals
+- Helper function explicit return types: Promise<any>, Promise<void> for all async helper functions
+- Firebase adminDbGet() cast to 'as any' for deeply nested objects in complex routes
+- Error handling with instanceof Error checks before accessing error.message
+- Type guards for PromiseSettledResult: (r): r is PromiseFulfilledResult<any> => r.status === 'fulfilled'
+- Firestore Query<DocumentData, DocumentData> typing for query chains with where/orderBy
+- Local HealthEvent interface for typed document.data() mapping in logs route
+- Schedule and UpdateScheduleBody interfaces for CRUD operations
+- Dynamic route params use getPathParam helper (already typed in core lib)
+- Line count preserved with minimal refactoring: 994 -> 995 lines for scheduler/check
 
 From 40-06 (Miscellaneous API routes):
 - Pragmatic typing for complex routes (200+ lines): coordination/enforce, geocoding/reverse use minimal typing with any for deep internal logic

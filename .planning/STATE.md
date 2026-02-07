@@ -125,6 +125,11 @@ Key patterns from previous milestones preserved for v5.0 migration:
 - Plan 42-04 completed remaining E-K files (4 files): HealthIndicator, InfoBox, Input, Kbd
 - Document collision in summary, continue with remaining work
 
+**Phase 42-06 decisions (final app/ and __tests__ migration):**
+- API route imports already extensionless: Plan expected broken imports (route.js → route.ts) but all were already correct
+- Parallel execution resulted in combined commit: Wave 2 agents migrated overlapping files, all committed together
+- Pre-existing test failures documented but not fixed: Context provider issues and missing mock data unrelated to migration
+
 ### Pending Todos
 
 **Operational Setup (from previous milestones, pending deployment):**
@@ -135,10 +140,7 @@ Key patterns from previous milestones preserved for v5.0 migration:
 
 ### Blockers/Concerns
 
-**Phase 42 Test Migration Prerequisites:**
-- 3 API route test files need import path updates (route.js → route.ts)
-- Files: app/api/netatmo/setthermmode/__tests__/route.test.js, app/api/netatmo/setroomthermpoint/__tests__/route.test.js, app/api/hue/discover/__tests__/route.test.js
-- Expected behavior, documented in 40-07-SUMMARY.md
+None - Phase 42 Wave 2 complete, all test files migrated to TypeScript.
 
 ### TypeScript Migration Patterns (v5.0)
 
@@ -231,10 +233,10 @@ From 39-01 (Foundation UI components):
 
 ## Session Continuity
 
-Last session: 2026-02-07 15:33 UTC
-Stopped at: Completed 42-03-PLAN.md and 42-04-PLAN.md — Root and UI component test migrations
+Last session: 2026-02-07 15:34 UTC
+Stopped at: Completed 42-06-PLAN.md — Wave 2 complete, all app/ and __tests__ test files migrated
 Resume file: None
-Next step: Complete Phase 42 Wave 2 (plans 05, 06 completion), then Plan 42-gap
+Next step: Plan 42-gap (gap closure to catch any missed test files and resolve test errors)
 
 From 38-10 (Type definitions gap closure):
 - Type narrowing with 'in' operator for discriminated unions: if ('property' in object)

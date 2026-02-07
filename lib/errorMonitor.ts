@@ -158,6 +158,31 @@ export async function getRecentErrors(limit: number = 50): Promise<ErrorEntry[]>
 }
 
 /**
+ * Resolve an error by marking it as resolved via API
+ */
+export async function resolveError(errorId: string): Promise<boolean> {
+  try {
+    const response = await fetch('/api/errors/resolve', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ errorId }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error((error as { message?: string }).message || 'Failed to resolve');
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Failed to resolve error:', error);
+    return false;
+  }
+}
+
+/**
  * Get active (unresolved) errors
  */
 export async function getActiveErrors(): Promise<ErrorEntry[]> {
@@ -186,4 +211,106 @@ export function shouldNotify(errorCode: number, previousErrorCode: number): bool
 
   // Notify for any new error
   return true;
+}
+
+/**
+ * Send browser notification for critical errors
+ */
+export async function sendErrorNotification(errorCode: number, errorDescription: string): Promise<boolean> {
+  // Check if browser supports notifications
+  if (!('Notification' in window)) {
+    return false;
+  }
+
+  // Request permission if not granted
+  if (Notification.permission === 'default') {
+    await Notification.requestPermission();
+  }
+
+  // Send notification if permitted
+  if (Notification.permission === 'granted') {
+    const errorInfo = getErrorInfo(errorCode);
+    const icon = errorInfo.severity === ERROR_SEVERITY.CRITICAL ? '🚨' : '⚠️';
+
+    new Notification(`${icon} Allarme Stufa`, {
+      body: errorDescription || `Errore ${errorCode} rilevato`,
+      icon: '/icon-192x192.png',
+      badge: '/icon-192x192.png',
+      tag: `stove-error-${errorCode}`,
+      requireInteraction: errorInfo.severity === ERROR_SEVERITY.CRITICAL,
+    });
+
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Send push notification for errors (server-side + client-side)
+ * Invia notifica push a tutti i dispositivi dell'utente registrati
+ * Controlla preferenze utente prima di inviare
+ */
+export async function sendErrorPushNotification(
+  errorCode: number,
+  errorDescription: string,
+  userId: string
+): Promise<boolean> {
+  try {
+    const errorInfo = getErrorInfo(errorCode);
+
+    // Check user preferences (dynamic import to avoid issues)
+    try {
+      const { shouldSendErrorNotification } = await import('./notificationPreferencesService');
+      const shouldSend = await shouldSendErrorNotification(userId, errorInfo.severity);
+
+      if (!shouldSend) {
+        console.log(`⏭️ Error notification skipped (user preferences): ${errorCode} - ${errorInfo.severity}`);
+        return false;
+      }
+    } catch (prefError) {
+      console.warn('Could not check preferences, sending anyway:', prefError);
+      // Fail-safe: invia comunque se non riesce a controllare preferenze
+    }
+
+    const emoji = errorInfo.severity === ERROR_SEVERITY.CRITICAL ? '🚨' :
+                  errorInfo.severity === ERROR_SEVERITY.ERROR ? '⚠️' : 'ℹ️';
+
+    const notification = {
+      title: `${emoji} Errore Stufa`,
+      body: errorDescription || `Errore ${errorCode}: ${errorInfo.description}`,
+      icon: '/icons/icon-192.png',
+      priority: errorInfo.severity === ERROR_SEVERITY.CRITICAL ? 'high' : 'normal',
+      data: {
+        type: 'stove_error',
+        errorCode: String(errorCode),
+        severity: errorInfo.severity,
+        url: '/stove/errors',
+      },
+    };
+
+    // Call API to send push notification
+    const response = await fetch('/api/notifications/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId,
+        notification,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('Failed to send push notification:', await response.text());
+      return false;
+    }
+
+    console.log('✅ Push notification sent for error', errorCode);
+    return true;
+
+  } catch (error) {
+    console.error('Error sending push notification:', error);
+    return false;
+  }
 }

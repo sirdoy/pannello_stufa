@@ -70,26 +70,30 @@ let refreshPromise: Promise<TokenResult> | null = null;
  * - Caches access_token with expiration time in Firebase
  * - Only refreshes when token is expired or about to expire
  * - Prevents concurrent refresh operations
+ *
+ * @param forceRefresh - If true, bypass cache and force a token refresh
  */
-export async function getValidAccessToken(): Promise<TokenResult> {
+export async function getValidAccessToken(forceRefresh = false): Promise<TokenResult> {
   try {
     // If a refresh is already in progress, wait for it
     if (refreshPromise) {
       return await refreshPromise;
     }
 
-    // Check for cached access token first
-    const cachedData = await adminDbGet(getEnvironmentPath('netatmo/access_token_cache')) as CachedTokenData | null;
+    // Check for cached access token first (unless force refresh)
+    if (!forceRefresh) {
+      const cachedData = await adminDbGet(getEnvironmentPath('netatmo/access_token_cache')) as CachedTokenData | null;
 
-    // If we have a valid cached token, use it
-    if (cachedData?.access_token && cachedData?.expires_at) {
-      const now = Date.now();
-      // Check if token is still valid (with buffer)
-      if (cachedData.expires_at > now + TOKEN_EXPIRY_BUFFER_MS) {
-        return {
-          accessToken: cachedData.access_token,
-          error: null,
-        };
+      // If we have a valid cached token, use it
+      if (cachedData?.access_token && cachedData?.expires_at) {
+        const now = Date.now();
+        // Check if token is still valid (with buffer)
+        if (cachedData.expires_at > now + TOKEN_EXPIRY_BUFFER_MS) {
+          return {
+            accessToken: cachedData.access_token,
+            error: null,
+          };
+        }
       }
     }
 
@@ -222,6 +226,15 @@ export async function saveRefreshToken(token: string): Promise<void> {
 }
 
 /**
+ * Clear cached access token (force refresh on next request)
+ * Used when an API call fails with "Invalid access token" despite having a cached token
+ */
+export async function clearCachedAccessToken(): Promise<void> {
+  await adminDbSet(getEnvironmentPath('netatmo/access_token_cache'), null);
+  console.log('🗑️ Cleared cached access token');
+}
+
+/**
  * Clear all Netatmo data (logout)
  */
 export async function clearNetatmoData(): Promise<void> {
@@ -250,6 +263,7 @@ const netatmoTokenHelper = {
   getValidAccessToken,
   isNetatmoConnected,
   saveRefreshToken,
+  clearCachedAccessToken,
   clearNetatmoData,
   handleTokenError,
 };

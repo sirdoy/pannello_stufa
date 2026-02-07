@@ -3,7 +3,7 @@
  * Tests OAuth token management, refresh logic, and error handling
  */
 
-import { getValidAccessToken, isNetatmoConnected, handleTokenError } from '@/lib/netatmoTokenHelper';
+import { getValidAccessToken, isNetatmoConnected, handleTokenError, clearCachedAccessToken } from '@/lib/netatmoTokenHelper';
 
 // Mock Firebase Admin SDK
 const mockAdminDbGet = jest.fn();
@@ -117,6 +117,48 @@ describe('netatmoTokenHelper', () => {
       expect(mockAdminDbSet).toHaveBeenCalledWith('dev/netatmo/access_token_cache', expect.any(Object));
     });
 
+    it('should use cached token when still valid', async () => {
+      const now = Date.now();
+      const expiresAt = now + (60 * 60 * 1000); // 1 hour from now
+
+      mockAdminDbGet
+        .mockResolvedValueOnce({
+          access_token: 'cached-access-token',
+          expires_at: expiresAt,
+          cached_at: now - (10 * 60 * 1000), // Cached 10 minutes ago
+        });
+
+      const result = await getValidAccessToken();
+
+      expect(result.accessToken).toBe('cached-access-token');
+      expect(result.error).toBeNull();
+      // Should NOT call fetch when using cached token
+      expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    it('should bypass cache and force refresh when forceRefresh=true', async () => {
+      const now = Date.now();
+      const expiresAt = now + (60 * 60 * 1000); // Valid cached token
+
+      // First call would return cached data, but we're forcing refresh
+      mockAdminDbGet
+        .mockResolvedValueOnce('test-refresh-token'); // For doTokenRefresh
+
+      global.fetch.mockResolvedValue({
+        json: async () => ({
+          access_token: 'fresh-access-token',
+          expires_in: 10800,
+        }),
+      });
+
+      const result = await getValidAccessToken(true); // forceRefresh = true
+
+      expect(result.accessToken).toBe('fresh-access-token');
+      expect(result.error).toBeNull();
+      // Should call fetch even though cache might be valid
+      expect(global.fetch).toHaveBeenCalled();
+    });
+
     it('should handle missing access_token in response', async () => {
       mockAdminDbGet.mockResolvedValue('test-refresh-token');
 
@@ -209,6 +251,14 @@ describe('netatmoTokenHelper', () => {
 
       expect(result.status).toBe(500);
       expect(result.reconnect).toBe(false);
+    });
+  });
+
+  describe('clearCachedAccessToken', () => {
+    it('should clear cached access token from Firebase', async () => {
+      await clearCachedAccessToken();
+
+      expect(mockAdminDbSet).toHaveBeenCalledWith('dev/netatmo/access_token_cache', null);
     });
   });
 });

@@ -555,6 +555,11 @@ export default function StovePage() {
 
   return (
     <div className="relative">
+      {/* Page Title - Visually hidden for accessibility and proper heading hierarchy */}
+      <Heading level={1} className="sr-only">
+        Controllo Stufa
+      </Heading>
+
       {/* Full-screen ambient gradient overlay */}
       <div className={`fixed inset-0 -z-10 bg-gradient-to-br ${theme.bg} transition-all duration-1000`} />
 
@@ -676,10 +681,14 @@ export default function StovePage() {
                   </span>
                 </div>
 
-                {/* Status Label */}
-                <Heading level={1} size="3xl" weight="black" className={`${theme.accent} tracking-tight uppercase mb-2`}>
+                {/* Status Label - Using div instead of h1 for visual display (page-level h1 is visually hidden above) */}
+                <div
+                  className={`text-3xl sm:text-4xl font-black font-display ${theme.accent} tracking-tight uppercase mb-2`}
+                  role="status"
+                  aria-live="polite"
+                >
                   {statusConfig.label}
-                </Heading>
+                </div>
                 {statusConfig.label !== status?.toUpperCase() && (
                   <Text size="sm" className="text-slate-500 font-mono">
                     {status}

@@ -5,6 +5,7 @@ import { getEnvironmentPath } from '@/lib/environmentHelper';
 import { getCached, invalidateCache } from '@/lib/netatmoCacheService';
 import { checkNetatmoRateLimit, trackNetatmoApiCall } from '@/lib/netatmoRateLimiter';
 import NETATMO_API from '@/lib/netatmoApi';
+import { clearCachedAccessToken, getValidAccessToken } from '@/lib/netatmoTokenHelper';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -33,27 +34,65 @@ export const GET = withAuthAndErrorHandler(async (req, session) => {
     );
   }
 
-  const accessToken = await requireNetatmoToken();
+  let accessToken = await requireNetatmoToken();
 
-  // Get schedules with cache
-  const result = await getCached('schedules', async () => {
-    // Track API call (only for actual API calls, not cache hits)
-    trackNetatmoApiCall(userId);
+  // Get schedules with cache - with retry logic for invalid tokens
+  let retryCount = 0;
+  const MAX_RETRIES = 1;
 
-    const homeId = await adminDbGet(getEnvironmentPath('netatmo/home_id'));
-    if (!homeId) {
-      throw new Error('home_id non trovato. Chiama prima /api/netatmo/homesdata');
+  while (retryCount <= MAX_RETRIES) {
+    try {
+      const result = await getCached('schedules', async () => {
+        // Track API call (only for actual API calls, not cache hits)
+        trackNetatmoApiCall(userId);
+
+        const homeId = await adminDbGet(getEnvironmentPath('netatmo/home_id'));
+        if (!homeId) {
+          throw new Error('home_id non trovato. Chiama prima /api/netatmo/homesdata');
+        }
+
+        const homesData = await NETATMO_API.getHomesData(accessToken);
+        return NETATMO_API.parseSchedules(homesData);
+      });
+
+      return success({
+        schedules: result.data,
+        _source: result.source,
+        _age_seconds: result.age_seconds || 0,
+      });
+
+    } catch (error) {
+      // Check if this is an "Invalid access token" error from Netatmo API
+      const isInvalidTokenError =
+        error.message &&
+        (error.message.includes('Invalid access token') || error.message.includes('Access token expired'));
+
+      if (isInvalidTokenError && retryCount < MAX_RETRIES) {
+        console.warn(`⚠️ Invalid access token detected, clearing cache and retrying (attempt ${retryCount + 1}/${MAX_RETRIES})`);
+
+        // Clear the cached token and schedule cache
+        await clearCachedAccessToken();
+        await invalidateCache('schedules');
+
+        // Get a fresh token with force refresh
+        const tokenResult = await getValidAccessToken(true);
+        if (tokenResult.error) {
+          // Token refresh failed - throw the original error
+          throw error;
+        }
+
+        accessToken = tokenResult.accessToken;
+        retryCount++;
+        continue; // Retry with new token
+      }
+
+      // Not an invalid token error, or we've exhausted retries
+      throw error;
     }
+  }
 
-    const homesData = await NETATMO_API.getHomesData(accessToken);
-    return NETATMO_API.parseSchedules(homesData);
-  });
-
-  return success({
-    schedules: result.data,
-    _source: result.source,
-    _age_seconds: result.age_seconds || 0,
-  });
+  // Should never reach here, but TypeScript needs this
+  throw new Error('Unexpected: exceeded retry loop');
 }, 'Netatmo/Schedules');
 
 /**

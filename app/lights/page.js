@@ -538,7 +538,7 @@ export default function LightsPage() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card className="p-8">
-          <Heading level={2} size="lg" className="mb-4">
+          <Heading level={1} size="lg" className="mb-4">
             {needsRemotePairing ? 'Completa Configurazione Cloud' : 'Bridge Hue Non Connesso'}
           </Heading>
 

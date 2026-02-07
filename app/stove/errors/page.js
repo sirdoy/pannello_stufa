@@ -140,7 +140,7 @@ export default function ErrorsPage() {
         {paginatedErrors.length === 0 ? (
           <Card variant="glass" className="p-12 text-center">
             <span className="text-6xl mb-4 block">✅</span>
-            <Heading level={3} size="xl" weight="bold" className="mb-2">
+            <Heading level={2} size="xl" weight="bold" className="mb-2">
               Nessun errore trovato
             </Heading>
             <Text variant="tertiary">

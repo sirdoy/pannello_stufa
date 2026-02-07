@@ -377,5 +377,13 @@ From 41-03 (Device pages migration):
 - Record<string, T> for typed object maps: Record<string, string> for snapshotUrls, theme configuration
 - Promise<void> return types mandatory on all async functions and handlers
 - IntersectionObserver typing for virtual scrolling: useRef<IntersectionObserver | null>(null)
+
+From 41-05 (Debug pages migration):
+- Edge-typing for very large files: design-system page (2834 lines) typed only state/handlers, not internal rendering
+- Pragmatic any for debug tooling: StoveApiResponse with index signature [key: string]: any for raw API responses
+- Recharts component typing: Define props interface + chart data item interface for type-safe transformations
+- Error instanceof checks: err instanceof Error ? err.message : 'Unknown error' for proper error handling
+- Type unions for debug state: TestState = 'loading' | 'error' | 'data', TabValue = 'stove' | 'netatmo' | ...
+- Explicit async function typing: Promise<void> for all async handlers, even if no return value needed
 - Device/preference state typing: Record<string, T> for flexible structures (DevicePreferences, NotificationDevice)
 - TestResult union types: 'success' | 'error' | 'no_tokens' for state machines

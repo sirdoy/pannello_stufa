@@ -14,6 +14,20 @@ import { adminDbGet } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
+interface TokenData {
+  token: string;
+  tokenKey?: string;
+  deviceId?: string;
+  displayName?: string;
+  platform?: string;
+  browser?: string;
+  os?: string;
+  createdAt: string;
+  lastUsed?: string;
+}
+
+type DeviceStatus = 'active' | 'stale' | 'unknown';
+
 /**
  * GET /api/notifications/devices
  * Fetch all registered devices for the authenticated user
@@ -23,7 +37,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
   const user = session.user;
 
   // Fetch user's FCM tokens from Firebase
-  const tokensData = await adminDbGet(`users/${user.sub}/fcmTokens`);
+  const tokensData = await adminDbGet(`users/${user.sub}/fcmTokens`) as Record<string, TokenData> | null;
 
   if (!tokensData) {
     return success({
@@ -37,7 +51,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
    * - stale: not used in 30+ days
    * - unknown: no lastUsed data
    */
-  const calculateStatus = (lastUsed) => {
+  const calculateStatus = (lastUsed: string | undefined): DeviceStatus => {
     if (!lastUsed) return 'unknown';
     const lastUsedDate = new Date(lastUsed);
     const now = new Date();
@@ -68,7 +82,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
   });
 
   // Sort by lastUsed descending (most recent first)
-  devices.sort((a, b) => new Date(b.lastUsed) - new Date(a.lastUsed));
+  devices.sort((a, b) => new Date(b.lastUsed).getTime() - new Date(a.lastUsed).getTime());
 
   return success({
     devices,

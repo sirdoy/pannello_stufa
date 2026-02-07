@@ -12,11 +12,26 @@
 import { withAuthAndErrorHandler, success, badRequest } from '@/lib/core';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 
+interface DashboardCard {
+  id: string;
+  label: string;
+  icon: string;
+  visible: boolean;
+}
+
+interface DashboardPreferences {
+  cardOrder: DashboardCard[];
+}
+
+interface UpdateDashboardBody {
+  cardOrder: DashboardCard[];
+}
+
 /**
  * Default card order for new users
  * Must match client-side constant
  */
-const DEFAULT_CARD_ORDER = [
+const DEFAULT_CARD_ORDER: DashboardCard[] = [
   { id: 'stove', label: 'Stufa', icon: '🔥', visible: true },
   { id: 'thermostat', label: 'Termostato', icon: '🌡️', visible: true },
   { id: 'weather', label: 'Meteo', icon: '☀️', visible: true },
@@ -46,7 +61,7 @@ export const dynamic = 'force-dynamic';
 export const GET = withAuthAndErrorHandler(async (request, context, session) => {
   const userId = session.user.sub;
   const dashboardPath = `users/${userId}/dashboardPreferences`;
-  const preferences = await adminDbGet(dashboardPath);
+  const preferences = (await adminDbGet(dashboardPath)) as DashboardPreferences | null;
 
   // Return stored or defaults
   return success({
@@ -77,7 +92,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
  */
 export const POST = withAuthAndErrorHandler(async (request, context, session) => {
   const userId = session.user.sub;
-  const body = await request.json();
+  const body = (await request.json()) as UpdateDashboardBody;
   const { cardOrder } = body;
 
   // Validate cardOrder structure

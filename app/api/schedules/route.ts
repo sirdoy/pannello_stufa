@@ -9,13 +9,21 @@ import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
+interface Schedule {
+  name: string;
+  enabled: boolean;
+  slots: Record<string, any[]>;
+  createdAt: string;
+  updatedAt: string;
+}
+
 /**
  * GET /api/schedules
  * List all schedules (metadata only, no slots)
  */
 export const GET = withAuthAndErrorHandler(async () => {
-  const schedulesData = await adminDbGet('schedules-v2/schedules');
-  const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId');
+  const schedulesData = await adminDbGet('schedules-v2/schedules') as Record<string, Schedule> | null;
+  const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId') as string | null;
 
   if (!schedulesData) {
     return success({
@@ -43,13 +51,18 @@ export const GET = withAuthAndErrorHandler(async () => {
   });
 }, 'Schedules/List');
 
+interface CreateScheduleBody {
+  name: string;
+  copyFromId?: string;
+}
+
 /**
  * POST /api/schedules
  * Create new schedule (from scratch or copy from existing)
  * Body: { name: string, copyFromId?: string }
  */
 export const POST = withAuthAndErrorHandler(async (request) => {
-  const body = await parseJsonOrThrow(request);
+  const body = await parseJsonOrThrow(request) as CreateScheduleBody;
   const { name, copyFromId } = body;
 
   // Validation: name required
@@ -58,9 +71,9 @@ export const POST = withAuthAndErrorHandler(async (request) => {
   }
 
   // Validation: name must be unique
-  const existingSchedules = await adminDbGet('schedules-v2/schedules');
+  const existingSchedules = await adminDbGet('schedules-v2/schedules') as Record<string, Schedule> | null;
   if (existingSchedules) {
-    const names = Object.values(existingSchedules).map(s => s.name.toLowerCase());
+    const names = Object.values(existingSchedules).map((s: Schedule) => s.name.toLowerCase());
     if (names.includes(name.trim().toLowerCase())) {
       return badRequest('Schedule name already exists');
     }
@@ -70,11 +83,11 @@ export const POST = withAuthAndErrorHandler(async (request) => {
   const scheduleId = generateScheduleId(name);
 
   const now = new Date().toISOString();
-  let slots = createEmptySlots();
+  let slots: Record<string, any[]> = createEmptySlots();
 
   // If copying from existing schedule
   if (copyFromId) {
-    const sourceSchedule = await adminDbGet(`schedules-v2/schedules/${copyFromId}`);
+    const sourceSchedule = await adminDbGet(`schedules-v2/schedules/${copyFromId}`) as Schedule | null;
     if (!sourceSchedule) {
       return notFound(`Source schedule '${copyFromId}' not found`);
     }
@@ -106,7 +119,7 @@ export const POST = withAuthAndErrorHandler(async (request) => {
 /**
  * Helper: Calculate total intervals
  */
-function calculateTotalIntervals(slots) {
+function calculateTotalIntervals(slots: Record<string, any[]> | undefined): number {
   if (!slots) return 0;
   return Object.values(slots).reduce((total, dayIntervals) => {
     return total + (Array.isArray(dayIntervals) ? dayIntervals.length : 0);
@@ -116,9 +129,9 @@ function calculateTotalIntervals(slots) {
 /**
  * Helper: Create empty slots for all days
  */
-function createEmptySlots() {
+function createEmptySlots(): Record<string, any[]> {
   const days = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
-  return days.reduce((acc, day) => {
+  return days.reduce((acc: Record<string, any[]>, day) => {
     acc[day] = [];
     return acc;
   }, {});
@@ -127,7 +140,7 @@ function createEmptySlots() {
 /**
  * Helper: Generate unique schedule ID from name
  */
-function generateScheduleId(name) {
+function generateScheduleId(name: string): string {
   const normalized = name
     .toLowerCase()
     .trim()

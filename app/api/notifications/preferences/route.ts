@@ -39,8 +39,35 @@ import { adminDbGet, adminDbSet, adminDbUpdate } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
+interface NotificationPreferences {
+  errors: {
+    enabled: boolean;
+    severityLevels: {
+      info: boolean;
+      warning: boolean;
+      error: boolean;
+      critical: boolean;
+    };
+  };
+  scheduler: {
+    enabled: boolean;
+    ignition: boolean;
+    shutdown: boolean;
+  };
+  maintenance: {
+    enabled: boolean;
+    threshold80: boolean;
+    threshold90: boolean;
+    threshold100: boolean;
+  };
+}
+
+interface UpdatePreferencesBody {
+  preferences: NotificationPreferences;
+}
+
 // Default preferences
-const DEFAULT_PREFERENCES = {
+const DEFAULT_PREFERENCES: NotificationPreferences = {
   errors: {
     enabled: true,
     severityLevels: {
@@ -72,7 +99,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
   const userId = session.user.sub;
 
   // Get preferences from Firebase
-  const preferences = await adminDbGet(`users/${userId}/notificationPreferences`);
+  const preferences = await adminDbGet(`users/${userId}/notificationPreferences`) as NotificationPreferences | null;
 
   if (preferences) {
     return success({ preferences });
@@ -94,7 +121,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
  */
 export const PUT = withAuthAndErrorHandler(async (request, context, session) => {
   const userId = session.user.sub;
-  const body = await parseJsonOrThrow(request);
+  const body = await parseJsonOrThrow(request) as UpdatePreferencesBody;
   const { preferences } = body;
 
   // Validate required field

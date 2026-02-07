@@ -5,6 +5,49 @@ import { getEnvironmentPath } from '@/lib/environmentHelper';
 
 export const dynamic = 'force-dynamic';
 
+interface StoveSyncData {
+  enabled?: boolean;
+  stoveMode?: string;
+  stoveTemperature?: number;
+  rooms?: Array<{ id: string }>;
+  livingRoomId?: string;
+}
+
+interface Topology {
+  rooms?: Array<{ id: string; name: string; type: string }>;
+}
+
+interface RoomTemperature {
+  room_id: string;
+  temperature?: number;
+  setpoint?: number;
+  mode?: string;
+  heating?: boolean;
+  endtime?: number;
+}
+
+interface EnrichedRoom {
+  room_id: string;
+  room_name: string;
+  room_type: string;
+  temperature?: number;
+  setpoint?: number;
+  mode?: string;
+  heating?: boolean;
+  endtime?: number;
+  stoveSync?: boolean;
+  stoveSyncSetpoint?: number;
+}
+
+interface ModuleWithStatus {
+  [key: string]: unknown;
+}
+
+interface HomeStatus {
+  therm_mode?: string;
+  [key: string]: unknown;
+}
+
 /**
  * GET /api/netatmo/homestatus
  * Retrieves real-time status of all rooms and modules
@@ -16,33 +59,33 @@ export const GET = withAuthAndErrorHandler(async () => {
 
   // Get home_id from Firebase
   const homeIdPath = getEnvironmentPath('netatmo/home_id');
-  const homeId = await adminDbGet(homeIdPath);
+  const homeId = await adminDbGet(homeIdPath) as string | null;
   if (!homeId) {
     return badRequest('home_id non trovato. Chiama prima /api/netatmo/homesdata');
   }
 
   // Get home status
-  const homeStatus = await NETATMO_API.getHomeStatus(accessToken, homeId);
+  const homeStatus = await NETATMO_API.getHomeStatus(accessToken, homeId) as HomeStatus;
 
   // Extract temperature data
-  const temperatures = NETATMO_API.extractTemperatures(homeStatus);
+  const temperatures = NETATMO_API.extractTemperatures(homeStatus) as RoomTemperature[];
 
   // Get topology to enrich data with room/module names
   const topologyPath = getEnvironmentPath('netatmo/topology');
-  const topology = await adminDbGet(topologyPath);
+  const topology = await adminDbGet(topologyPath) as Topology | null;
 
   // Extract modules with battery/status info
-  const modulesWithStatus = NETATMO_API.extractModulesWithStatus(homeStatus, topology);
+  const modulesWithStatus = NETATMO_API.extractModulesWithStatus(homeStatus, topology) as ModuleWithStatus[];
 
   // Get stove sync status for living room indicator
   const stoveSyncPath = getEnvironmentPath('netatmo/stoveSync');
-  const stoveSyncData = await adminDbGet(stoveSyncPath);
+  const stoveSyncData = await adminDbGet(stoveSyncPath) as StoveSyncData | null;
 
   // Enrich with room names (filter out undefined values for Firebase)
-  const enrichedRooms = temperatures.map(temp => {
+  const enrichedRooms: EnrichedRoom[] = temperatures.map(temp => {
     const room = topology?.rooms?.find(r => r.id === temp.room_id);
 
-    const enriched = {
+    const enriched: EnrichedRoom = {
       room_id: temp.room_id,
       room_name: room?.name || 'Sconosciuta',
       room_type: room?.type || 'unknown',
@@ -85,7 +128,7 @@ export const GET = withAuthAndErrorHandler(async () => {
   const hasLowBattery = NETATMO_API.hasAnyLowBattery(modulesWithStatus);
 
   // Save current status to Firebase
-  const statusToSave = {
+  const statusToSave: Record<string, unknown> = {
     rooms: enrichedRooms,
     modules: modulesWithStatus,
     updated_at: Date.now(),
@@ -100,7 +143,7 @@ export const GET = withAuthAndErrorHandler(async () => {
   const currentStatusPath = getEnvironmentPath('netatmo/currentStatus');
   await adminDbSet(currentStatusPath, statusToSave);
 
-  const response = {
+  const response: Record<string, unknown> = {
     rooms: enrichedRooms,
     modules: modulesWithStatus,
     lowBatteryModules,

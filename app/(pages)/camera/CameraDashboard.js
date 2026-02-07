@@ -138,7 +138,7 @@ export default function CameraDashboard() {
   if (loading) {
     return (
       <Section title="Videocamere" description="Caricamento..." spacing="section">
-        <Grid cols={{ mobile: 1, desktop: 2 }} gap="large">
+        <Grid cols={2} gap="lg">
           <Skeleton.Card className="min-h-[400px]" />
           <Skeleton.Card className="min-h-[400px]" />
         </Grid>
@@ -226,7 +226,7 @@ export default function CameraDashboard() {
         </div>
       }
     >
-      <Grid cols={{ mobile: 1, desktop: 2 }} gap="large">
+      <Grid cols={2} gap="lg">
         {/* Camera list */}
         <Card>
           <CardHeader>

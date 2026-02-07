@@ -7,15 +7,21 @@ import { checkNetatmoRateLimit, trackNetatmoApiCall } from '@/lib/netatmoRateLim
 import NETATMO_API from '@/lib/netatmoApi';
 import { clearCachedAccessToken, getValidAccessToken } from '@/lib/netatmoTokenHelper';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import type { Session } from '@auth0/nextjs-auth0';
 
 export const dynamic = 'force-dynamic';
+
+interface ScheduleSwitchBody {
+  scheduleId?: string;
+}
 
 /**
  * GET /api/netatmo/schedules
  * Returns list of all schedules with active indicator
  * Cached for 5 minutes to reduce API calls
  */
-export const GET = withAuthAndErrorHandler(async (req, session) => {
+export const GET = withAuthAndErrorHandler(async (req: NextRequest, session?: Session) => {
   const userId = session?.user?.sub || 'anonymous';
 
   // Rate limit check
@@ -46,7 +52,7 @@ export const GET = withAuthAndErrorHandler(async (req, session) => {
         // Track API call (only for actual API calls, not cache hits)
         trackNetatmoApiCall(userId);
 
-        const homeId = await adminDbGet(getEnvironmentPath('netatmo/home_id'));
+        const homeId = await adminDbGet(getEnvironmentPath('netatmo/home_id')) as string | null;
         if (!homeId) {
           throw new Error('home_id non trovato. Chiama prima /api/netatmo/homesdata');
         }
@@ -64,6 +70,7 @@ export const GET = withAuthAndErrorHandler(async (req, session) => {
     } catch (error) {
       // Check if this is an "Invalid access token" error from Netatmo API
       const isInvalidTokenError =
+        error instanceof Error &&
         error.message &&
         (error.message.includes('Invalid access token') || error.message.includes('Access token expired'));
 
@@ -101,7 +108,7 @@ export const GET = withAuthAndErrorHandler(async (req, session) => {
  * Body: { scheduleId: string }
  * Control operations are NEVER cached
  */
-export const POST = withAuthAndErrorHandler(async (req, session) => {
+export const POST = withAuthAndErrorHandler(async (req: NextRequest, session?: Session) => {
   const userId = session?.user?.sub || 'anonymous';
 
   // Rate limit check
@@ -121,7 +128,7 @@ export const POST = withAuthAndErrorHandler(async (req, session) => {
   }
 
   // Parse request body
-  const body = await req.json();
+  const body = await req.json() as ScheduleSwitchBody;
   const { scheduleId } = body;
 
   if (!scheduleId) {
@@ -131,7 +138,7 @@ export const POST = withAuthAndErrorHandler(async (req, session) => {
   const accessToken = await requireNetatmoToken();
 
   // Get home_id
-  const homeId = await adminDbGet(getEnvironmentPath('netatmo/home_id'));
+  const homeId = await adminDbGet(getEnvironmentPath('netatmo/home_id')) as string | null;
   if (!homeId) {
     return badRequest('home_id non trovato. Chiama prima /api/netatmo/homesdata');
   }

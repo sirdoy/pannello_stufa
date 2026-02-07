@@ -12,6 +12,19 @@ import { withAuthAndErrorHandler, success, badRequest, error } from '@/lib/core'
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 
+interface Location {
+  latitude: number;
+  longitude: number;
+  name: string | null;
+  updatedAt: number;
+}
+
+interface UpdateLocationBody {
+  latitude: number | string;
+  longitude: number | string;
+  name?: string;
+}
+
 // Force dynamic rendering (Firebase Admin SDK requires Node.js runtime)
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +38,7 @@ export const dynamic = 'force-dynamic';
  */
 export const GET = withAuthAndErrorHandler(async () => {
   const locationPath = getEnvironmentPath('config/location');
-  const location = await adminDbGet(locationPath);
+  const location = (await adminDbGet(locationPath)) as Location | null;
 
   if (!location) {
     return error('Location not configured', 'LOCATION_NOT_SET', 404);

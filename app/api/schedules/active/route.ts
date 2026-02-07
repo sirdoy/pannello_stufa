@@ -21,7 +21,7 @@ export const dynamic = 'force-dynamic';
  * Get current active schedule ID
  */
 export const GET = withAuthAndErrorHandler(async () => {
-  const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId');
+  const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId') as string | null;
 
   if (!activeScheduleId) {
     return notFound('No active schedule set');
@@ -30,13 +30,17 @@ export const GET = withAuthAndErrorHandler(async () => {
   return success({ activeScheduleId });
 }, 'Schedules/GetActive');
 
+interface SetActiveScheduleBody {
+  scheduleId: string;
+}
+
 /**
  * POST /api/schedules/active
  * Set active schedule (atomic operation with validation)
  * Body: { scheduleId: string }
  */
 export const POST = withAuthAndErrorHandler(async (request) => {
-  const body = await parseJsonOrThrow(request);
+  const body = await parseJsonOrThrow(request) as SetActiveScheduleBody;
   const { scheduleId } = body;
 
   // Validation: scheduleId required
@@ -46,7 +50,7 @@ export const POST = withAuthAndErrorHandler(async (request) => {
   }
 
   // Validation: schedule must exist
-  const schedule = await adminDbGet(`schedules-v2/schedules/${scheduleId}`);
+  const schedule = await adminDbGet(`schedules-v2/schedules/${scheduleId}`) as { name: string } | null;
   if (!schedule) {
     return notFound(`Schedule '${scheduleId}' does not exist`);
   }

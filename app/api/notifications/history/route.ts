@@ -106,7 +106,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
     console.error('❌ Error fetching notification history:', error);
 
     // Handle specific errors
-    if (error.message === 'Invalid cursor format') {
+    if (error instanceof Error && error.message === 'Invalid cursor format') {
       return errorResponse('Invalid cursor', 400);
     }
 

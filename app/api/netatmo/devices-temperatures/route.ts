@@ -2,6 +2,34 @@ import { withAuthAndErrorHandler, success, notFound, requireNetatmoToken } from 
 
 export const dynamic = 'force-dynamic';
 
+interface DeviceModule {
+  _id: string;
+  module_name?: string;
+  measured?: {
+    temperature?: number;
+  };
+  [key: string]: unknown;
+}
+
+interface Device {
+  _id: string;
+  modules?: DeviceModule[];
+  [key: string]: unknown;
+}
+
+interface DeviceListResponse {
+  body?: {
+    devices?: Device[];
+  };
+}
+
+interface TemperatureResult {
+  device_id: string;
+  module_id: string;
+  name: string;
+  temperature: number;
+}
+
 /**
  * GET /api/netatmo/devices-temperatures
  * Retrieves temperatures from all Netatmo devices/modules
@@ -17,12 +45,12 @@ export const GET = withAuthAndErrorHandler(async () => {
     },
   });
 
-  const deviceData = await deviceRes.json();
+  const deviceData = await deviceRes.json() as DeviceListResponse;
   if (!deviceData.body?.devices?.length) {
     return notFound('Nessun dispositivo trovato');
   }
 
-  const results = [];
+  const results: TemperatureResult[] = [];
   for (const device of deviceData.body.devices) {
     const device_id = device._id;
     for (const dev of device.modules || []) {

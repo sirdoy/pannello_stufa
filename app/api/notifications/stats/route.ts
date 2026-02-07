@@ -28,10 +28,29 @@ import { subHours, subDays } from 'date-fns';
 
 export const dynamic = 'force-dynamic';
 
+interface ErrorData {
+  timestamp: string;
+  errorCode?: string;
+  [key: string]: unknown;
+}
+
+interface TokenData {
+  lastUsed?: string;
+  deviceInfo?: {
+    platform?: string;
+  };
+  [key: string]: unknown;
+}
+
+interface UserData {
+  fcmTokens?: Record<string, TokenData>;
+  [key: string]: unknown;
+}
+
 /**
  * Get notification statistics
  */
-export async function GET(request) {
+export async function GET(request: Request): Promise<NextResponse> {
   try {
     // Parse query parameters
     const { searchParams } = new URL(request.url);

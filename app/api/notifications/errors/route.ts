@@ -16,6 +16,23 @@ import { success, badRequest } from '@/lib/core/apiResponse';
 
 export const dynamic = 'force-dynamic';
 
+interface NotificationError {
+  id?: string;
+  timestamp: string;
+  userId: string;
+  tokenPrefix: string;
+  deviceId: string | null;
+  errorCode: string;
+  errorMessage: string;
+  notificationType: string;
+  notificationTitle: string;
+  resolved: boolean;
+}
+
+interface MarkResolvedBody {
+  errorId: string;
+}
+
 /**
  * GET /api/notifications/errors
  * Query notification errors with filtering
@@ -70,11 +87,11 @@ export const GET = withAuthAndErrorHandler(async (request) => {
   }
 
   // Convert to array and apply filters
-  let errors = [];
+  let errors: NotificationError[] = [];
   snapshot.forEach(errorSnap => {
-    const error = errorSnap.val();
+    const error = errorSnap.val() as NotificationError;
     errors.push({
-      id: errorSnap.key,
+      id: errorSnap.key as string,
       ...error,
     });
   });
@@ -127,7 +144,7 @@ export const GET = withAuthAndErrorHandler(async (request) => {
  * }
  */
 export const POST = withAuthAndErrorHandler(async (request) => {
-  const body = await request.json();
+  const body = await request.json() as MarkResolvedBody;
   const { errorId } = body;
 
   if (!errorId) {

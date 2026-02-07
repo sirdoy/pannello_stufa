@@ -63,7 +63,7 @@ export const GET = withCronSecret(async (request) => {
 
   // 4. Check each user's stove health in parallel
   const results = await Promise.allSettled(
-    users.map(userId => checkUserStoveHealth(userId))
+    users.map((userId: string) => checkUserStoveHealth(userId))
   );
 
   // 5. Log results to Firestore (fire-and-forget)
@@ -78,7 +78,17 @@ export const GET = withCronSecret(async (request) => {
   for (const result of results) {
     if (result.status !== 'fulfilled') continue;
 
-    const { userId, connectionStatus, stateMismatch } = result.value;
+    const { userId, connectionStatus, stateMismatch } = result.value as {
+      userId: string;
+      connectionStatus: string;
+      stateMismatch?: {
+        detected: boolean;
+        reason: string;
+        expected: string;
+        actual: string;
+        errorDescription?: string;
+      };
+    };
 
     // Check throttle BEFORE attempting to send
     const throttleCheck = shouldSendCoordinationNotification(userId);
@@ -137,7 +147,7 @@ export const GET = withCronSecret(async (request) => {
   const successCount = results.filter(r => r.status === 'fulfilled').length;
   const failureCount = results.filter(r => r.status === 'rejected').length;
   const mismatches = results
-    .filter(r => r.status === 'fulfilled' && r.value?.stateMismatch?.detected)
+    .filter((r): r is PromiseFulfilledResult<any> => r.status === 'fulfilled' && r.value?.stateMismatch?.detected)
     .map(r => ({
       userId: r.value.userId,
       expected: r.value.stateMismatch.expected,

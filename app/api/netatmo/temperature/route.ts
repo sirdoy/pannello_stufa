@@ -4,6 +4,21 @@ import { getEnvironmentPath } from '@/lib/environmentHelper';
 
 export const dynamic = 'force-dynamic';
 
+interface DeviceConfig {
+  device_id?: string;
+  module_id?: string;
+}
+
+interface ThermStateRoom {
+  measured?: {
+    temperature?: number;
+  };
+}
+
+interface ThermStateResponse {
+  body?: Record<string, ThermStateRoom>;
+}
+
 /**
  * POST /api/netatmo/temperature
  * Gets temperature from configured device/module
@@ -15,7 +30,7 @@ export const POST = withAuthAndErrorHandler(async () => {
 
   // Get device config from Firebase
   const deviceConfigPath = getEnvironmentPath('netatmo/deviceConfig');
-  const configData = await adminDbGet(deviceConfigPath);
+  const configData = await adminDbGet(deviceConfigPath) as DeviceConfig | null;
   if (!configData) {
     return badRequest('Configurazione dispositivo mancante');
   }
@@ -35,7 +50,7 @@ export const POST = withAuthAndErrorHandler(async () => {
     body: new URLSearchParams({ device_id, module_id }),
   });
 
-  const stateJson = await stateRes.json();
+  const stateJson = await stateRes.json() as ThermStateResponse;
 
   if (!stateJson.body || Object.keys(stateJson.body).length === 0) {
     console.error('Netatmo state error:', stateJson);

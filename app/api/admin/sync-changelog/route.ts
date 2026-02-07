@@ -9,24 +9,30 @@
  * - Bearer token matching CRON_SECRET (GitHub Actions automation)
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth0 } from '@/lib/auth0';
 import { syncVersionHistoryToFirebase } from '@/lib/changelogService';
 import { VERSION_HISTORY } from '@/lib/version';
+import type { Session } from '@auth0/nextjs-auth0';
 
 export const dynamic = 'force-dynamic';
+
+interface AuthorizationResult {
+  authorized: boolean;
+  method?: 'token' | 'auth0';
+}
 
 /**
  * Helper to check admin access via Auth0
  */
-function isAdmin(session) {
+function isAdmin(session: Session | null | undefined): boolean {
   return session?.user?.sub === process.env.ADMIN_USER_ID;
 }
 
 /**
  * Helper to check secret token (for GitHub Actions)
  */
-function isValidSecretToken(request) {
+function isValidSecretToken(request: NextRequest): boolean {
   const authHeader = request.headers.get('Authorization');
   if (!authHeader?.startsWith('Bearer ')) return false;
 
@@ -37,7 +43,7 @@ function isValidSecretToken(request) {
 /**
  * Helper to verify authorization (Auth0 session OR secret token)
  */
-async function verifyAuthorization(request) {
+async function verifyAuthorization(request: NextRequest): Promise<AuthorizationResult> {
   // First check secret token (for automated sync)
   if (isValidSecretToken(request)) {
     return { authorized: true, method: 'token' };
@@ -60,7 +66,7 @@ async function verifyAuthorization(request) {
  * GET /api/admin/sync-changelog
  * Get changelog info without syncing
  */
-export async function GET(request) {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   const { authorized } = await verifyAuthorization(request);
 
   if (!authorized) {
@@ -82,7 +88,7 @@ export async function GET(request) {
  * POST /api/admin/sync-changelog
  * Sync changelog to Firebase
  */
-export async function POST(request) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   const { authorized, method } = await verifyAuthorization(request);
 
   if (!authorized) {
@@ -105,8 +111,9 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error('Sync changelog error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Sync failed', message: error.message },
+      { error: 'Sync failed', message: errorMessage },
       { status: 500 }
     );
   }

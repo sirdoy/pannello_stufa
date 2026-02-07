@@ -1,15 +1,24 @@
 import { withErrorHandler, redirect } from '@/lib/core';
 import { saveRefreshToken } from '@/lib/netatmoTokenHelper';
 import { getNetatmoCredentials } from '@/lib/netatmoCredentials';
+import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';
+
+interface NetatmoTokenResponse {
+  access_token?: string;
+  refresh_token?: string;
+  expires_in?: number;
+  error?: string;
+  error_description?: string;
+}
 
 /**
  * GET /api/netatmo/callback
  * OAuth callback handler for Netatmo authorization
  * Note: No auth middleware - this validates OAuth tokens directly
  */
-export const GET = withErrorHandler(async (request) => {
+export const GET = withErrorHandler(async (request: NextRequest) => {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
 
@@ -34,7 +43,7 @@ export const GET = withErrorHandler(async (request) => {
     }),
   });
 
-  const json = await res.json();
+  const json = await res.json() as NetatmoTokenResponse;
 
   // Handle Netatmo API errors
   if (json.error) {

@@ -13,7 +13,7 @@ import {
   error as errorResponse,
 } from '@/lib/core';
 import { getAdminFirestore } from '@/lib/firebaseAdmin';
-import { Timestamp } from 'firebase-admin/firestore';
+import { Timestamp, Query, DocumentData } from 'firebase-admin/firestore';
 import { subDays } from 'date-fns';
 
 export const dynamic = 'force-dynamic';
@@ -74,7 +74,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
   // Fetch health monitoring logs
   try {
     const db = getAdminFirestore();
-    let query = db.collection('healthMonitoring');
+    let query: Query<DocumentData, DocumentData> = db.collection('healthMonitoring');
 
     // Apply 7-day date filter
     const startDate = subDays(new Date(), 7);
@@ -110,9 +110,26 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
     const snapshot = await query.get();
 
     // Convert documents to event objects
-    const events = [];
+    interface HealthEvent {
+      id: string;
+      timestamp: string;
+      checkedCount: number;
+      successCount: number;
+      failureCount: number;
+      hasStateMismatch: boolean;
+      duration: number;
+    }
+
+    const events: HealthEvent[] = [];
     snapshot.forEach(doc => {
-      const data = doc.data();
+      const data = doc.data() as {
+        timestamp: Timestamp;
+        checkedCount: number;
+        successCount: number;
+        failureCount: number;
+        hasStateMismatch: boolean;
+        duration: number;
+      };
       events.push({
         id: doc.id,
         timestamp: data.timestamp.toDate().toISOString(),
@@ -138,7 +155,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
     console.error('❌ Error fetching health monitoring logs:', error);
 
     // Handle specific errors
-    if (error.message?.includes('cursor')) {
+    if (error instanceof Error && error.message?.includes('cursor')) {
       return errorResponse('Invalid cursor', 400);
     }
 

@@ -2,6 +2,23 @@ import { withAuthAndErrorHandler, success, requireNetatmoToken } from '@/lib/cor
 
 export const dynamic = 'force-dynamic';
 
+interface HomesDataHome {
+  id: string;
+  name: string;
+  cameras?: unknown[];
+  modules?: Array<{ type: string; [key: string]: unknown }>;
+  [key: string]: unknown;
+}
+
+interface GetHomeDataHome {
+  id: string;
+  name: string;
+  cameras?: unknown[];
+  persons?: unknown[];
+  events?: unknown[];
+  [key: string]: unknown;
+}
+
 /**
  * GET /api/netatmo/debug
  * Debug endpoint to see raw Netatmo API response
@@ -22,7 +39,7 @@ export const GET = withAuthAndErrorHandler(async () => {
     },
     body: new URLSearchParams({}),
   });
-  const homesdataRaw = await homesdataResponse.json();
+  const homesdataRaw = await homesdataResponse.json() as { body?: { homes?: HomesDataHome[] } };
 
   // 2. gethomedata (Security API) - returns cameras with full data
   const gethomeResponse = await fetch('https://api.netatmo.com/api/gethomedata', {
@@ -33,7 +50,7 @@ export const GET = withAuthAndErrorHandler(async () => {
     },
     body: new URLSearchParams({}),
   });
-  const gethomeRaw = await gethomeResponse.json();
+  const gethomeRaw = await gethomeResponse.json() as { body?: { homes?: GetHomeDataHome[] } };
 
   // Analyze both responses
   const analysis = {

@@ -125,17 +125,26 @@ Plans:
 
 ### Phase 40: API Routes Migration
 
-**Goal:** All API routes are converted to TypeScript with typed request/response.
+**Goal:** All 90 API route files are converted to TypeScript with typed request/response.
 
-**Plans:** (created by /gsd:plan-phase)
+**Plans:** 7 plans (6 migration + 1 gap closure)
+
+Plans:
+- [ ] 40-01-PLAN.md — Stove routes (14 Thermorossi stove API endpoints)
+- [ ] 40-02-PLAN.md — Netatmo routes (16 thermostat, camera, OAuth endpoints)
+- [ ] 40-03-PLAN.md — Hue routes (18 Philips Hue lights, scenes, remote OAuth endpoints)
+- [ ] 40-04-PLAN.md — Notification routes (15 push notification management endpoints)
+- [ ] 40-05-PLAN.md — Health/Monitoring + Scheduler/Schedules routes (10 cron and CRUD endpoints)
+- [ ] 40-06-PLAN.md — Config/User/Misc routes (16 admin, devices, errors, geocoding, etc.)
+- [ ] 40-07-PLAN.md — Gap closure: tsc error resolution and migration verification
 
 **Requirements covered:**
-- API-01: Tutti gli API routes convertiti a .ts (~80 file)
+- API-01: Tutti gli API routes convertiti a .ts (90 file)
 - API-02: Request/Response types per ogni endpoint
 - API-03: Middleware e utility API tipizzati
 
 **Success criteria:**
-1. All ~80 API route files in app/api/ have .ts extension (no .js remaining)
+1. All 90 API route files in app/api/ have .ts extension (no .js remaining)
 2. Each endpoint has typed request body and response body
 3. API middleware functions have typed parameters
 4. `tsc --noEmit` passes on app/api/ directory with no errors
@@ -218,11 +227,11 @@ Plans:
 | 37 - TypeScript Foundation | ✓ Complete | 3/3 | 100% |
 | 38 - Library Migration | ✓ Complete | 13/13 | 100% |
 | 39 - UI Components Migration | ✓ Complete | 11/11 | 100% |
-| 40 - API Routes Migration | Pending | 0/? | 0% |
+| 40 - API Routes Migration | Planned | 0/7 | 0% |
 | 41 - Pages Migration | Pending | 0/? | 0% |
 | 42 - Test Migration | Pending | 0/? | 0% |
 | 43 - Verification | Pending | 0/? | 0% |
 
 ---
 *Roadmap created: 2026-02-05*
-*Last updated: 2026-02-06 — Phase 39 complete (11 plans: 9 migration + 2 gap closure, 137 component files, 0 tsc errors)*
+*Last updated: 2026-02-07 — Phase 40 planned (7 plans: 6 migration + 1 gap closure, 90 API route files)*

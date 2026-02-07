@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 40 - API Routes Migration
-Plan: 6 of 8 (COMPLETE)
-Status: In progress — Completed 40-06-PLAN.md (Miscellaneous Routes - 16 files migrated, 90 total .ts routes)
-Last activity: 2026-02-07 — Completed 40-06-PLAN.md (Miscellaneous Routes Migration)
+Plan: 4 of 8 (COMPLETE)
+Status: In progress — Completed 40-04-PLAN.md (Notifications API Routes - 15 files migrated)
+Last activity: 2026-02-07 — Completed 40-04-PLAN.md (Notifications API Routes Migration)
 
-Progress: [████████░░░░░░░░░░░░░░░░] 46% (3/7 phases complete, Phase 40: 6/8 plans complete)
+Progress: [████████░░░░░░░░░░░░░░░░] 45% (3/7 phases complete, Phase 40: 6/8 plans complete)
 
 ## Milestone Overview
 
@@ -28,7 +28,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 | 37 | TypeScript Foundation | 8 | COMPLETE (8/8) |
 | 38 | Library Migration | 4 | COMPLETE (4/4) |
 | 39 | UI Components Migration | 3 | COMPLETE (11/11 plans, 137/137 files migrated, 0 tsc errors) |
-| 40 | API Routes Migration | 3 | In progress (6/8 plans complete - 90/90 route.ts files, 0 route.js remaining) |
+| 40 | API Routes Migration | 3 | In progress (6/8 plans complete) |
 | 41 | Pages Migration | 3 | Pending |
 | 42 | Test Migration | 4 | Pending |
 | 43 | Verification | 4 | Pending |
@@ -36,9 +36,9 @@ Progress: [████████░░░░░░░░░░░░░░░
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 181 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 29)
+- Total plans completed: 176 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 24)
 - Average duration: ~6.0 min per plan
-- Total execution time: ~18.1 hours across 7 milestones
+- Total execution time: ~17.8 hours across 7 milestones
 
 **By Milestone:**
 
@@ -78,6 +78,12 @@ Key patterns from previous milestones preserved for v5.0 migration:
 - Reduced motion: selective :not() exclusions preserve functional animations
 - DeviceCard contextMenuItems prop for declarative context menu
 - Button.Icon quick actions pattern with conditional visibility
+
+**Phase 40-04 decisions:**
+- Error function signature: error(message, ErrorCode, HttpStatus) not error(message, status)
+- Union type handling: Use 'in' operator for discriminated union property checks
+- Date arithmetic: Always use .getTime() for Date subtraction in TypeScript strict mode
+- Dynamic route params: Next.js 15 requires Promise<{ paramName: string }> for context.params
 
 ### Pending Todos
 
@@ -183,9 +189,9 @@ From 39-01 (Foundation UI components):
 ## Session Continuity
 
 Last session: 2026-02-07
-Stopped at: Completed 40-06-PLAN.md (Miscellaneous Routes - 16 files migrated, 90 total .ts routes)
+Stopped at: Completed 40-04-PLAN.md (Notifications API Routes - 15 files migrated)
 Resume file: None
-Next step: Continue Phase 40 with remaining plans (07-08)
+Next step: Continue Phase 40 with remaining plans (05, 07-08)
 
 From 38-10 (Type definitions gap closure):
 - Type narrowing with 'in' operator for discriminated unions: if ('property' in object)

@@ -230,11 +230,12 @@ From 39-01 (Foundation UI components):
 | 010 | Stove-thermostat PID automation | 2026-02-04 | 707fcb1 | [010-stove-thermostat-pid-automation](./quick/010-stove-thermostat-pid-automation/) |
 | 011 | Settings tabs unification | 2026-02-05 | 601c3da | [011-refactor-settings-tabs-unification](./quick/011-refactor-settings-tabs-unification/) |
 | 012 | API debug console with tabs | 2026-02-05 | 34aaa52 | [012-debug-page-component-tabs-with-api-testi](./quick/012-debug-page-component-tabs-with-api-testi/) |
+| 013 | Home cleanup - sandbox to settings | 2026-02-07 | 3f89d03 | [013-home-cleanup-sandbox-to-settings](./quick/013-home-cleanup-sandbox-to-settings/) |
 
 ## Session Continuity
 
-Last session: 2026-02-07 15:34 UTC
-Stopped at: Completed 42-06-PLAN.md — Wave 2 complete, all app/ and __tests__ test files migrated
+Last session: 2026-02-07 15:42 UTC
+Stopped at: Completed quick task 013 (home cleanup - sandbox to settings)
 Resume file: None
 Next step: Plan 42-gap (gap closure to catch any missed test files and resolve test errors)
 

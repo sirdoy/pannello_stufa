@@ -36,9 +36,9 @@ Requirements for TypeScript migration. Each maps to roadmap phases.
 
 ### API Routes Migration
 
-- [ ] **API-01**: Tutti gli API routes convertiti a .ts (~80 file)
-- [ ] **API-02**: Request/Response types per ogni endpoint
-- [ ] **API-03**: Middleware e utility API tipizzati
+- [x] **API-01**: Tutti gli API routes convertiti a .ts (90 file)
+- [x] **API-02**: Request/Response types per ogni endpoint
+- [x] **API-03**: Middleware e utility API tipizzati
 
 ### Pages Migration
 
@@ -103,9 +103,9 @@ Deferred to v5.1 or later — post-migration type improvements:
 | COMP-01 | Phase 39 | Complete |
 | COMP-02 | Phase 39 | Complete |
 | COMP-03 | Phase 39 | Complete |
-| API-01 | Phase 40 | Pending |
-| API-02 | Phase 40 | Pending |
-| API-03 | Phase 40 | Pending |
+| API-01 | Phase 40 | Complete |
+| API-02 | Phase 40 | Complete |
+| API-03 | Phase 40 | Complete |
 | PAGE-01 | Phase 41 | Pending |
 | PAGE-02 | Phase 41 | Pending |
 | PAGE-03 | Phase 41 | Pending |
@@ -125,4 +125,4 @@ Deferred to v5.1 or later — post-migration type improvements:
 
 ---
 *Requirements defined: 2026-02-05*
-*Last updated: 2026-02-06 — Phase 39 requirements complete*
+*Last updated: 2026-02-07 — Phase 40 requirements complete*

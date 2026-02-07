@@ -9,5 +9,5 @@ import { getFanLevel } from '@/lib/stoveApi';
  */
 export const GET = withAuthAndErrorHandler(async () => {
   const data = await getFanLevel();
-  return success(data);
+  return success(data as unknown as Record<string, unknown>);
 }, 'Stove/GetFan');

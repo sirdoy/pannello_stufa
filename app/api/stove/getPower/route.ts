@@ -9,5 +9,5 @@ import { getPowerLevel } from '@/lib/stoveApi';
  */
 export const GET = withAuthAndErrorHandler(async () => {
   const data = await getPowerLevel();
-  return success(data);
+  return success(data as unknown as Record<string, unknown>);
 }, 'Stove/GetPower');

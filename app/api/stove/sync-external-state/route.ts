@@ -16,7 +16,13 @@ export const POST = withAuthAndErrorHandler(async (request) => {
   // Validate required fields
   validateRequired(body, ['status']);
 
-  const { status, fanLevel, powerLevel, errorCode, errorDescription } = body;
+  const { status, fanLevel, powerLevel, errorCode, errorDescription } = body as {
+    status: string;
+    fanLevel?: number | null;
+    powerLevel?: number | null;
+    errorCode?: number;
+    errorDescription?: string;
+  };
 
   // Sync to Firebase for multi-device real-time updates
   await updateStoveState({
@@ -25,7 +31,7 @@ export const POST = withAuthAndErrorHandler(async (request) => {
     powerLevel,
     errorCode: errorCode ?? 0,
     errorDescription: errorDescription ?? '',
-    source: 'external_change'
+    source: 'manual' // External changes are treated as manual actions
   });
 
   return success({ message: 'External state synced to Firebase' });

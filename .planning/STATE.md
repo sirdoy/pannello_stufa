@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 
 ## Current Position
 
-Phase: 39 - UI Components Migration
-Plan: 11 of 11 (ALL COMPLETE)
-Status: COMPLETE — All 137 TypeScript files migrated (136 components + barrel export), ZERO .js/.jsx files in components/, ZERO tsc errors
-Last activity: 2026-02-06 — Completed 39-11-PLAN.md (Final Components + Error Resolution)
+Phase: 40 - API Routes Migration
+Plan: 1 of 3 (COMPLETE)
+Status: In progress — Completed 40-01-PLAN.md (Stove API Routes - 14 files migrated)
+Last activity: 2026-02-07 — Completed 40-01-PLAN.md (Stove API Routes Migration)
 
-Progress: [████████░░░░░░░░░░░░░░░░] 43% (3/7 phases complete, Phase 39 COMPLETE with 11 plans)
+Progress: [████████░░░░░░░░░░░░░░░░] 44% (3/7 phases complete, Phase 40: 1/3 plans complete)
 
 ## Milestone Overview
 
@@ -28,7 +28,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 | 37 | TypeScript Foundation | 8 | COMPLETE (8/8) |
 | 38 | Library Migration | 4 | COMPLETE (4/4) |
 | 39 | UI Components Migration | 3 | COMPLETE (11/11 plans, 137/137 files migrated, 0 tsc errors) |
-| 40 | API Routes Migration | 3 | Pending |
+| 40 | API Routes Migration | 3 | In progress (1/3 plans complete - Hue routes) |
 | 41 | Pages Migration | 3 | Pending |
 | 42 | Test Migration | 4 | Pending |
 | 43 | Verification | 4 | Pending |
@@ -36,9 +36,9 @@ Progress: [████████░░░░░░░░░░░░░░░
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 174 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 22)
+- Total plans completed: 176 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 24)
 - Average duration: ~6.0 min per plan
-- Total execution time: ~17.6 hours across 7 milestones
+- Total execution time: ~17.7 hours across 7 milestones
 
 **By Milestone:**
 
@@ -50,7 +50,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
 | v3.2 Weather & Dashboard | 5 | 13 | 2 days (2026-02-02 - 2026-02-03) |
 | v4.0 Advanced UI | 7 | 24 | 2 days (2026-02-04 - 2026-02-05) |
-| v5.0 TypeScript Migration | 7 | 22 plans (Phases 37-39 complete) | In progress |
+| v5.0 TypeScript Migration | 7 | 24 plans (Phases 37-39 complete, Phase 40: 1/3) | In progress |
 
 ## Accumulated Context
 
@@ -182,10 +182,10 @@ From 39-01 (Foundation UI components):
 
 ## Session Continuity
 
-Last session: 2026-02-06
-Stopped at: Phase 39 complete — all 137 component files migrated, 0 tsc errors
+Last session: 2026-02-07
+Stopped at: Completed 40-01-PLAN.md (Stove API Routes - 14 files migrated)
 Resume file: None
-Next step: `/gsd:plan-phase 40` to plan API Routes Migration
+Next step: Continue Phase 40 with remaining API route migrations (Netatmo, Hue, etc.)
 
 From 38-10 (Type definitions gap closure):
 - Type narrowing with 'in' operator for discriminated unions: if ('property' in object)
@@ -281,3 +281,14 @@ From 39-11 (Final components + error resolution):
 - Type guards in render: 'separator' in item && item.separator for discriminated unions
 - parseInt(stringValue, 10) for parsing numeric strings from props
 - Cast to any for interface mismatches when data transformation not available
+
+
+From 40-03 (Hue API Routes Migration):
+- RouteContext interface for dynamic params: interface RouteContext { params: Promise<{ id: string }> }
+- Inline body interfaces for POST/PUT routes (PairRequestBody, LightStateBody, CreateSceneRequestBody)
+- Body interfaces with index signature for flexibility: [key: string]: unknown
+- OAuth callback uses withErrorHandler (not withAuthAndErrorHandler) since redirects handle auth
+- Complex OAuth responses typed with local interfaces (LinkButtonError, CreateUserResponse)
+- Discriminated union parsing: (array as Type[]).find(item => item.success) for OAuth responses
+- Type-safe error handling: unknown type with instanceof Error type guards
+- git mv preserves history for all route migrations

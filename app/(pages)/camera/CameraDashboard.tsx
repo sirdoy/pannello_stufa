@@ -27,6 +27,11 @@ interface Camera {
   status: string;
   sd_status?: string;
   alim_status?: string;
+  type?: string;
+  is_local?: boolean;
+  home_id?: string;
+  home_name?: string;
+  light_mode_status?: string;
 }
 
 interface CameraEvent {
@@ -34,8 +39,9 @@ interface CameraEvent {
   type: string;
   time: number;
   camera_id: string;
-  snapshot?: { url?: string };
+  snapshot?: { id?: string; key?: string; url?: string };
   video_id?: string;
+  video_status?: string;
 }
 
 export default function CameraDashboard() {
@@ -154,7 +160,7 @@ export default function CameraDashboard() {
 
   if (loading) {
     return (
-      <Section title="Videocamere" description="Caricamento..." spacing="section">
+      <Section title="Videocamere" description="Caricamento..." spacing="lg">
         <Grid cols={2} gap="lg">
           <Skeleton.Card className="min-h-[400px]" />
           <Skeleton.Card className="min-h-[400px]" />
@@ -166,7 +172,7 @@ export default function CameraDashboard() {
   // Needs re-authorization - token exists but missing camera scopes
   if (needsReauth) {
     return (
-      <Section title="Videocamere" spacing="section">
+      <Section title="Videocamere" spacing="lg">
         <Card>
           <CardContent className="py-8">
             <div className="text-center">
@@ -176,7 +182,7 @@ export default function CameraDashboard() {
                 L'accesso alle videocamere richiede una nuova autorizzazione con i permessi aggiornati.
                 Clicca il pulsante per riautorizzare Netatmo.
               </Text>
-              <Button variant="ocean" onClick={handleReauthorize}>
+              <Button variant="ember" onClick={handleReauthorize}>
                 Riautorizza Netatmo
               </Button>
             </div>
@@ -188,7 +194,7 @@ export default function CameraDashboard() {
 
   if (error) {
     return (
-      <Section title="Videocamere" spacing="section">
+      <Section title="Videocamere" spacing="lg">
         <Banner
           variant="error"
           title="Errore"
@@ -203,14 +209,14 @@ export default function CameraDashboard() {
 
   if (cameras.length === 0) {
     return (
-      <Section title="Videocamere" spacing="section">
+      <Section title="Videocamere" spacing="lg">
         <EmptyState
           icon="📹"
           title="Nessuna videocamera trovata"
           description="Non sono state trovate videocamere Netatmo nel tuo account. Assicurati di aver autorizzato l'accesso alle videocamere."
         />
         <div className="text-center mt-4">
-          <Button variant="ocean" onClick={handleReauthorize}>
+          <Button variant="ember" onClick={handleReauthorize}>
             Riautorizza Netatmo
           </Button>
         </div>
@@ -222,7 +228,7 @@ export default function CameraDashboard() {
     <Section
       title="Videocamere"
       description="Visualizza le tue videocamere Netatmo"
-      spacing="section"
+      spacing="lg"
       action={
         <div className="flex gap-2">
           <Button
@@ -306,14 +312,14 @@ export default function CameraDashboard() {
               {selectedCamera.status === 'on' && (
                 <div className="flex gap-2 mb-4">
                   <Button
-                    variant={!isLiveMode ? 'ocean' : 'subtle'}
+                    variant={!isLiveMode ? 'ember' : 'subtle'}
                     size="sm"
                     onClick={() => setIsLiveMode(false)}
                   >
                     Snapshot
                   </Button>
                   <Button
-                    variant={isLiveMode ? 'ocean' : 'subtle'}
+                    variant={isLiveMode ? 'ember' : 'subtle'}
                     size="sm"
                     onClick={() => setIsLiveMode(true)}
                   >

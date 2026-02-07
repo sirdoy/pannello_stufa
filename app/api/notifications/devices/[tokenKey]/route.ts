@@ -49,17 +49,17 @@ export const PATCH = withAuthAndErrorHandler(async (request, context: RouteConte
   // Validate displayName
   const { displayName } = body;
   if (!displayName || typeof displayName !== 'string') {
-    return error('displayName is required', 400);
+    return error('displayName is required', 'VALIDATION_ERROR', 400);
   }
   if (displayName.length > 50) {
-    return error('displayName must be 50 characters or less', 400);
+    return error('displayName must be 50 characters or less', 'VALIDATION_ERROR', 400);
   }
 
   // Verify device belongs to user
   const devicePath = `users/${userId}/fcmTokens/${tokenKey}`;
   const device = await adminDbGet(devicePath);
   if (!device) {
-    return error('Device not found', 404);
+    return error('Device not found', 'NOT_FOUND', 404);
   }
 
   // Update device name
@@ -98,7 +98,7 @@ export const DELETE = withAuthAndErrorHandler(async (request, context: RouteCont
   const devicePath = `users/${userId}/fcmTokens/${tokenKey}`;
   const device = await adminDbGet(devicePath);
   if (!device) {
-    return error('Device not found', 404);
+    return error('Device not found', 'NOT_FOUND', 404);
   }
 
   // Remove device

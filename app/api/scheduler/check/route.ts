@@ -50,16 +50,14 @@ export const dynamic = 'force-dynamic';
 // HELPER FUNCTIONS
 // =============================================================================
 
-function capitalize(str) {
+function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 /**
  * Send scheduler notification using Phase 3 notification system
- * @param {string} action - 'IGNITE' | 'SHUTDOWN' | 'POWER_CHANGE' | 'FAN_CHANGE'
- * @param {string} details - Optional details message
  */
-async function sendSchedulerNotification(action, details = '') {
+async function sendSchedulerNotification(action: string, details: string = ''): Promise<void> {
   try {
     const adminUserId = process.env.ADMIN_USER_ID;
 
@@ -91,10 +89,10 @@ async function sendSchedulerNotification(action, details = '') {
   }
 }
 
-async function calibrateValvesIfNeeded() {
+async function calibrateValvesIfNeeded(): Promise<any> {
   try {
     const calibrationPath = getEnvironmentPath('netatmo/lastAutoCalibration');
-    const lastCalibration = await adminDbGet(calibrationPath);
+    const lastCalibration = await adminDbGet(calibrationPath) as number | null;
 
     const now = Date.now();
     const TWELVE_HOURS = 12 * 60 * 60 * 1000;
@@ -110,7 +108,7 @@ async function calibrateValvesIfNeeded() {
     console.log('🔧 Avvio calibrazione automatica valvole Netatmo (ogni 12h)...');
 
     // Call service directly instead of HTTP request
-    const result = await calibrateValvesServer();
+    const result = await calibrateValvesServer() as any;
 
     if (!result.calibrated) {
       console.error('❌ Calibrazione automatica fallita:', result.error || result.reason);
@@ -131,7 +129,7 @@ async function calibrateValvesIfNeeded() {
     return {
       calibrated: false,
       reason: 'exception',
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
@@ -140,10 +138,10 @@ async function calibrateValvesIfNeeded() {
  * Refresh weather data if interval has passed (every 30 minutes)
  * Following same pattern as calibrateValvesIfNeeded()
  */
-async function refreshWeatherIfNeeded() {
+async function refreshWeatherIfNeeded(): Promise<any> {
   try {
     const lastRefreshPath = getEnvironmentPath('cron/lastWeatherRefresh');
-    const lastRefresh = await adminDbGet(lastRefreshPath);
+    const lastRefresh = await adminDbGet(lastRefreshPath) as number | null;
 
     const now = Date.now();
     const THIRTY_MINUTES = 30 * 60 * 1000;
@@ -160,7 +158,7 @@ async function refreshWeatherIfNeeded() {
 
     // Read location from Firebase
     const locationPath = getEnvironmentPath('config/location');
-    const location = await adminDbGet(locationPath);
+    const location = await adminDbGet(locationPath) as { latitude: number; longitude: number; name?: string } | null;
 
     if (!location || !location.latitude || !location.longitude) {
       console.warn('⚠️ Weather refresh skipped: location not configured');
@@ -195,7 +193,7 @@ async function refreshWeatherIfNeeded() {
     return {
       refreshed: false,
       reason: 'exception',
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
@@ -204,10 +202,10 @@ async function refreshWeatherIfNeeded() {
  * Cleanup stale FCM tokens if interval has passed (every 7 days)
  * Following same pattern as calibrateValvesIfNeeded()
  */
-async function cleanupTokensIfNeeded() {
+async function cleanupTokensIfNeeded(): Promise<any> {
   try {
     const lastCleanupPath = getEnvironmentPath('cron/lastTokenCleanup');
-    const lastCleanup = await adminDbGet(lastCleanupPath);
+    const lastCleanup = await adminDbGet(lastCleanupPath) as number | null;
 
     const now = Date.now();
     const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
@@ -243,7 +241,7 @@ async function cleanupTokensIfNeeded() {
 
         Object.entries(tokens).forEach(([tokenKey, tokenData]) => {
           tokensScanned++;
-          const data = tokenData;
+          const data = tokenData as { lastUsed?: string; createdAt?: string };
 
           // Use lastUsed if available, otherwise fall back to createdAt
           const lastActivity = data.lastUsed || data.createdAt;
@@ -316,16 +314,19 @@ async function cleanupTokensIfNeeded() {
     return {
       cleaned: false,
       reason: 'exception',
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
 
 /**
  * Send maintenance notification using Phase 3 notification system
- * @param {Object} notificationData - { notificationLevel, percentage, remainingHours }
  */
-async function sendMaintenanceNotificationIfNeeded(notificationData) {
+async function sendMaintenanceNotificationIfNeeded(notificationData: {
+  notificationLevel: number;
+  percentage: number;
+  remainingHours: number;
+}): Promise<void> {
   const { notificationLevel, percentage, remainingHours } = notificationData;
 
   const adminUserId = process.env.ADMIN_USER_ID;
@@ -368,7 +369,7 @@ async function sendMaintenanceNotificationIfNeeded(notificationData) {
  * - Sends when stove enters WORK state
  * - Prevents spam by checking if already notified in last 30 minutes
  */
-async function sendStoveStatusWorkNotification(currentStatus) {
+async function sendStoveStatusWorkNotification(currentStatus: string): Promise<void> {
   const adminUserId = process.env.ADMIN_USER_ID;
   if (!adminUserId) return;
 
@@ -378,7 +379,7 @@ async function sendStoveStatusWorkNotification(currentStatus) {
   try {
     // Check if we already notified recently (30 min cooldown)
     const lastNotifyPath = getEnvironmentPath('scheduler/lastWorkNotification');
-    const lastNotify = await adminDbGet(lastNotifyPath);
+    const lastNotify = await adminDbGet(lastNotifyPath) as number | null;
     const now = Date.now();
     const THIRTY_MINUTES = 30 * 60 * 1000;
 
@@ -396,7 +397,7 @@ async function sendStoveStatusWorkNotification(currentStatus) {
     await adminDbSet(lastNotifyPath, now);
 
   } catch (error) {
-    console.error('❌ Errore invio notifica stove_status_work:', error.message);
+    console.error('❌ Errore invio notifica stove_status_work:', error instanceof Error ? error.message : 'Unknown error');
   }
 }
 
@@ -405,7 +406,7 @@ async function sendStoveStatusWorkNotification(currentStatus) {
  * - Detects when stove goes OFF during an active schedule interval
  * - Only triggers if scheduler previously ignited during this interval
  */
-async function checkAndNotifyUnexpectedOff(active, isOn, statusFetchFailed) {
+async function checkAndNotifyUnexpectedOff(active: any, isOn: boolean, statusFetchFailed: boolean): Promise<void> {
   const adminUserId = process.env.ADMIN_USER_ID;
   if (!adminUserId) return;
 
@@ -415,7 +416,7 @@ async function checkAndNotifyUnexpectedOff(active, isOn, statusFetchFailed) {
   try {
     // Check if we ignited during this schedule interval
     const ignitionTrackPath = getEnvironmentPath('scheduler/lastIgnitionInterval');
-    const lastIgnition = await adminDbGet(ignitionTrackPath);
+    const lastIgnition = await adminDbGet(ignitionTrackPath) as { interval: string } | null;
 
     if (!lastIgnition) return; // No previous ignition tracked
 
@@ -425,7 +426,7 @@ async function checkAndNotifyUnexpectedOff(active, isOn, statusFetchFailed) {
 
     // Check if we already notified for this unexpected off (1 hour cooldown)
     const unexpectedOffPath = getEnvironmentPath('scheduler/lastUnexpectedOffNotification');
-    const lastUnexpectedNotify = await adminDbGet(unexpectedOffPath);
+    const lastUnexpectedNotify = await adminDbGet(unexpectedOffPath) as number | null;
     const now = Date.now();
     const ONE_HOUR = 60 * 60 * 1000;
 
@@ -443,14 +444,14 @@ async function checkAndNotifyUnexpectedOff(active, isOn, statusFetchFailed) {
     await adminDbSet(unexpectedOffPath, now);
 
   } catch (error) {
-    console.error('❌ Errore invio notifica stove_unexpected_off:', error.message);
+    console.error('❌ Errore invio notifica stove_unexpected_off:', error instanceof Error ? error.message : 'Unknown error');
   }
 }
 
 /**
  * Track ignition for unexpected off detection
  */
-async function trackIgnitionForInterval(active) {
+async function trackIgnitionForInterval(active: any): Promise<void> {
   if (!active) return;
 
   try {
@@ -460,11 +461,11 @@ async function trackIgnitionForInterval(active) {
       timestamp: Date.now(),
     });
   } catch (error) {
-    console.error('❌ Errore tracking ignition interval:', error.message);
+    console.error('❌ Errore tracking ignition interval:', error instanceof Error ? error.message : 'Unknown error');
   }
 }
 
-async function fetchStoveData() {
+async function fetchStoveData(): Promise<any> {
   let currentStatus = 'unknown';
   let isOn = false;
   let currentFanLevel = 3;
@@ -473,15 +474,15 @@ async function fetchStoveData() {
 
   try {
     const [statusData, fanData, powerData] = await Promise.all([
-      getStoveStatus().catch(err => {
+      getStoveStatus().catch((err: any) => {
         console.error('❌ Status fetch failed:', err.message);
         return null;
       }),
-      getFanLevel().catch(err => {
+      getFanLevel().catch((err: any) => {
         console.error('❌ Fan fetch failed:', err.message);
         return null;
       }),
-      getPowerLevel().catch(err => {
+      getPowerLevel().catch((err: any) => {
         console.error('❌ Power fetch failed:', err.message);
         return null;
       })
@@ -515,7 +516,7 @@ async function fetchStoveData() {
   return { currentStatus, isOn, currentFanLevel, currentPowerLevel, statusFetchFailed };
 }
 
-async function handleIgnition(active, ora) {
+async function handleIgnition(active: any, ora: string): Promise<any> {
   try {
     const confirmStatusData = await getStoveStatus();
     if (confirmStatusData) {
@@ -526,7 +527,7 @@ async function handleIgnition(active, ora) {
       }
     }
   } catch (confirmError) {
-    console.error('❌ Confirmation status fetch failed:', confirmError.message);
+    console.error('❌ Confirmation status fetch failed:', confirmError instanceof Error ? confirmError.message : 'Unknown error');
     return { skipped: true, reason: 'CONFIRMATION_FAILED' };
   }
 
@@ -543,20 +544,20 @@ async function handleIgnition(active, ora) {
 
     await sendSchedulerNotification('IGNITE', `Stufa accesa automaticamente alle ${ora} (P${active.power}, V${active.fan})`);
 
-    syncLivingRoomWithStove(true).then((result) => {
+    syncLivingRoomWithStove(true).then((result: any) => {
       if (result.synced) {
         console.log(`✅ Netatmo stove sync: ${result.roomNames || 'Rooms'} set to ${result.temperature}°C`);
       }
-    }).catch(err => console.error('❌ Netatmo stove sync error:', err));
+    }).catch((err: any) => console.error('❌ Netatmo stove sync error:', err));
 
     return { success: true };
   } catch (error) {
-    console.error('❌ Failed to ignite stove:', error.message);
-    return { success: false, error: error.message };
+    console.error('❌ Failed to ignite stove:', error instanceof Error ? error.message : 'Unknown error');
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
 
-async function handleShutdown(ora) {
+async function handleShutdown(ora: string): Promise<any> {
   try {
     await shutdownStove();
 
@@ -568,11 +569,11 @@ async function handleShutdown(ora) {
 
     await sendSchedulerNotification('SHUTDOWN', `Stufa spenta automaticamente alle ${ora}`);
 
-    syncLivingRoomWithStove(false).then((result) => {
+    syncLivingRoomWithStove(false).then((result: any) => {
       if (result.synced) {
         console.log(`✅ Netatmo stove sync: ${result.roomNames || 'Rooms'} returned to schedule`);
       }
-    }).catch(err => console.error('❌ Netatmo stove sync error:', err));
+    }).catch((err: any) => console.error('❌ Netatmo stove sync error:', err));
 
     return { success: true };
   } catch (error) {
@@ -581,7 +582,7 @@ async function handleShutdown(ora) {
   }
 }
 
-async function handleLevelChanges(active, currentPowerLevel, currentFanLevel) {
+async function handleLevelChanges(active: any, currentPowerLevel: number, currentFanLevel: number): Promise<any> {
   let changeApplied = false;
 
   if (currentPowerLevel !== active.power) {
@@ -619,7 +620,7 @@ async function handleLevelChanges(active, currentPowerLevel, currentFanLevel) {
  * @param {boolean} schedulerEnabled - Whether scheduler is enabled
  * @returns {Object} - { skipped, reason } or { adjusted, from, to, temperature, setpoint }
  */
-async function runPidAutomationIfEnabled(isOn, currentPowerLevel, semiManual, schedulerEnabled) {
+async function runPidAutomationIfEnabled(isOn: boolean, currentPowerLevel: number, semiManual: boolean, schedulerEnabled: boolean): Promise<any> {
   try {
     // Skip if stove is not ON
     if (!isOn) {
@@ -638,13 +639,13 @@ async function runPidAutomationIfEnabled(isOn, currentPowerLevel, semiManual, sc
     }
 
     // Read PID config from Firebase
-    const pidConfig = await adminDbGet(`users/${adminUserId}/pidAutomation`);
+    const pidConfig = await adminDbGet(`users/${adminUserId}/pidAutomation`) as any;
     if (!pidConfig || !pidConfig.enabled) {
       return { skipped: true, reason: 'pid_disabled' };
     }
 
     // Read Netatmo current status from Firebase cache
-    const netatmoStatus = await adminDbGet('netatmo/currentStatus');
+    const netatmoStatus = await adminDbGet('netatmo/currentStatus') as any;
     if (!netatmoStatus || !netatmoStatus.rooms) {
       return { skipped: true, reason: 'no_netatmo_data' };
     }
@@ -655,9 +656,9 @@ async function runPidAutomationIfEnabled(isOn, currentPowerLevel, semiManual, sc
       return { skipped: true, reason: 'no_target_room' };
     }
 
-    const rooms = Object.values(netatmoStatus.rooms);
+    const rooms = Object.values(netatmoStatus.rooms) as any[];
     // Note: netatmo/currentStatus saves rooms with room_id field, not id
-    const targetRoom = rooms.find(r => String(r.room_id) === String(targetRoomId));
+    const targetRoom = rooms.find((r: any) => String(r.room_id) === String(targetRoomId));
     if (!targetRoom) {
       return { skipped: true, reason: 'room_not_found' };
     }
@@ -676,7 +677,7 @@ async function runPidAutomationIfEnabled(isOn, currentPowerLevel, semiManual, sc
 
     // Read PID state from Firebase (integral, prevError, lastRun)
     const pidStatePath = getEnvironmentPath('pidAutomation/state');
-    const pidState = await adminDbGet(pidStatePath);
+    const pidState = await adminDbGet(pidStatePath) as any;
 
     // Calculate time delta in minutes
     const now = Date.now();
@@ -723,8 +724,8 @@ async function runPidAutomationIfEnabled(isOn, currentPowerLevel, semiManual, sc
       console.log(`🎯 PID: ${measured.toFixed(1)}°C -> ${setpoint.toFixed(1)}°C target, power ${currentPowerLevel} -> ${targetPower}`);
 
       // Apply new power level
-      await setPowerLevel(targetPower);
-      await updateStoveState({ powerLevel: targetPower, source: 'pid_automation' });
+      await setPowerLevel(targetPower as any);
+      await updateStoveState({ powerLevel: targetPower, source: 'pid_automation' as any });
 
       return {
         adjusted: true,
@@ -769,7 +770,7 @@ export const GET = withCronSecret(async (_request) => {
   console.log(`✅ Cron health updated: ${cronHealthTimestamp}`);
 
   // Check if scheduler mode is enabled
-  const modeData = (await adminDbGet('schedules-v2/mode')) || { enabled: false, semiManual: false };
+  const modeData = ((await adminDbGet('schedules-v2/mode')) as any) || { enabled: false, semiManual: false };
   const schedulerEnabled = modeData.enabled;
 
   if (!schedulerEnabled) {
@@ -813,14 +814,14 @@ export const GET = withCronSecret(async (_request) => {
   const currentMinutes = parseInt(hourPart) * 60 + parseInt(minutePart);
 
   // Get active schedule
-  const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId') || 'default';
-  const intervals = await adminDbGet(`schedules-v2/schedules/${activeScheduleId}/slots/${giorno}`);
+  const activeScheduleId = (await adminDbGet('schedules-v2/activeScheduleId') as string | null) || 'default';
+  const intervals = (await adminDbGet(`schedules-v2/schedules/${activeScheduleId}/slots/${giorno}`) as any[] | null);
 
   if (!intervals) {
     return success({ message: 'Nessuno scheduler', giorno, ora });
   }
 
-  const active = intervals.find(({ start, end }) => {
+  const active = intervals.find(({ start, end }: any) => {
     const [sh, sm] = start.split(':').map(Number);
     const [eh, em] = end.split(':').map(Number);
     const startMin = sh * 60 + sm;
@@ -832,7 +833,7 @@ export const GET = withCronSecret(async (_request) => {
   const { currentStatus, isOn, currentFanLevel, currentPowerLevel, statusFetchFailed } = await fetchStoveData();
 
   // Send stove status WORK notification if conditions are met (async, don't block)
-  sendStoveStatusWorkNotification(currentStatus).catch(err =>
+  sendStoveStatusWorkNotification(currentStatus).catch((err: any) =>
     console.error('❌ Errore notifica stove_status_work:', err.message)
   );
 
@@ -876,7 +877,7 @@ export const GET = withCronSecret(async (_request) => {
     console.log(`✅ Maintenance tracked: +${maintenanceTrack.elapsedMinutes}min → ${maintenanceTrack.newCurrentHours.toFixed(2)}h total`);
 
     if (maintenanceTrack.notificationData) {
-      await sendMaintenanceNotificationIfNeeded(maintenanceTrack.notificationData);
+      await sendMaintenanceNotificationIfNeeded(maintenanceTrack.notificationData as any);
     }
   }
 
@@ -884,7 +885,7 @@ export const GET = withCronSecret(async (_request) => {
   // This handles both state mismatches AND setpoint expiration (8-hour manual setpoints)
   try {
     console.log(`🔥 Stove sync check: isOn=${isOn}, status=${currentStatus}`);
-    const enforcementResult = await enforceStoveSyncSetpoints(isOn);
+    const enforcementResult = await enforceStoveSyncSetpoints(isOn) as any;
     if (enforcementResult.enforced || enforcementResult.synced) {
       if (enforcementResult.action === 'setpoint_enforcement') {
         console.log(`✅ Stove sync enforcement: ${enforcementResult.fixedCount} room(s) re-synced (setpoints had drifted)`);
@@ -962,7 +963,7 @@ export const GET = withCronSecret(async (_request) => {
           console.log(`🎯 PID automation: no change needed (power=${result.currentPower}, temp=${result.temperature}°C, setpoint=${result.setpoint}°C)`);
         }
       })
-      .catch(err => console.error('❌ PID automation error:', err.message));
+      .catch((err: any) => console.error('❌ PID automation error:', err.message));
 
   } else {
     // No active schedule - turn off if on

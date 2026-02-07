@@ -128,7 +128,7 @@ export const PUT = withAuthAndErrorHandler(async (request, context, session) => 
   validateRequired(preferences, 'preferences');
 
   // Update preferences on Firebase using Admin SDK
-  await adminDbUpdate(`users/${userId}/notificationPreferences`, preferences);
+  await adminDbUpdate(`users/${userId}/notificationPreferences`, preferences as unknown as Record<string, unknown>);
 
   console.log(`Preferenze notifiche aggiornate per user ${userId}`);
 

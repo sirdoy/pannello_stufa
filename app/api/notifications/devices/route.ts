@@ -55,7 +55,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
     if (!lastUsed) return 'unknown';
     const lastUsedDate = new Date(lastUsed);
     const now = new Date();
-    const daysDiff = Math.floor((now - lastUsedDate) / (1000 * 60 * 60 * 24));
+    const daysDiff = Math.floor((now.getTime() - lastUsedDate.getTime()) / (1000 * 60 * 60 * 24));
 
     if (daysDiff <= 7) return 'active';      // Used within 7 days
     if (daysDiff > 30) return 'stale';       // Not used in 30+ days

@@ -28,11 +28,27 @@ import { getAdminDatabase } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
+interface RegisterTokenBody {
+  token: string;
+  deviceId?: string;
+  displayName?: string;
+  deviceInfo?: Record<string, unknown>;
+  userAgent?: string;
+  platform?: string;
+  isPWA?: boolean;
+}
+
+interface ExistingTokenData {
+  deviceInfo?: Record<string, unknown>;
+  displayName?: string;
+  [key: string]: unknown;
+}
+
 /**
  * Sanitize FCM token for use as Firebase key
  * Firebase paths cannot contain: . $ # [ ] /
  */
-function sanitizeFirebaseKey(token) {
+function sanitizeFirebaseKey(token: string): string {
   return token
     .replace(/\./g, '_DOT_')
     .replace(/\$/g, '_DOL_')
@@ -49,7 +65,7 @@ function sanitizeFirebaseKey(token) {
  */
 export const POST = withAuthAndErrorHandler(async (request, context, session) => {
   const userId = session.user.sub;
-  const body = await parseJsonOrThrow(request);
+  const body = await parseJsonOrThrow(request) as RegisterTokenBody;
   const { token, deviceId, displayName, deviceInfo, userAgent, platform, isPWA } = body;
 
   // Validate required field
@@ -69,7 +85,7 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
 
     if (snapshot.exists()) {
       // Device exists - update the existing entry
-      const existingData = snapshot.val();
+      const existingData = snapshot.val() as Record<string, ExistingTokenData>;
       const existingKey = Object.keys(existingData)[0];
 
       await tokensRef.child(existingKey).update({

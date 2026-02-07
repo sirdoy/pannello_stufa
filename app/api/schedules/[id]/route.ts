@@ -17,6 +17,20 @@ import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
+interface Schedule {
+  name: string;
+  enabled: boolean;
+  slots: Record<string, any[]>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface UpdateScheduleBody {
+  name?: string;
+  slots?: Record<string, any[]>;
+  enabled?: boolean;
+}
+
 /**
  * GET /api/schedules/[id]
  * Get specific schedule with full data
@@ -24,7 +38,7 @@ export const dynamic = 'force-dynamic';
 export const GET = withAuthAndErrorHandler(async (request, context) => {
   const id = await getPathParam(context, 'id');
 
-  const schedule = await adminDbGet(`schedules-v2/schedules/${id}`);
+  const schedule = await adminDbGet(`schedules-v2/schedules/${id}`) as Schedule | null;
 
   if (!schedule) {
     return notFound(`Schedule '${id}' not found`);
@@ -40,21 +54,21 @@ export const GET = withAuthAndErrorHandler(async (request, context) => {
  */
 export const PUT = withAuthAndErrorHandler(async (request, context) => {
   const id = await getPathParam(context, 'id');
-  const updates = await parseJson(request);
+  const updates = await parseJson(request) as UpdateScheduleBody;
 
   // Check schedule exists
-  const existingSchedule = await adminDbGet(`schedules-v2/schedules/${id}`);
+  const existingSchedule = await adminDbGet(`schedules-v2/schedules/${id}`) as Schedule | null;
   if (!existingSchedule) {
     return notFound(`Schedule '${id}' not found`);
   }
 
   // Validation: if updating name, check uniqueness
   if (updates.name && updates.name !== existingSchedule.name) {
-    const allSchedules = await adminDbGet('schedules-v2/schedules');
+    const allSchedules = await adminDbGet('schedules-v2/schedules') as Record<string, Schedule> | null;
     if (allSchedules) {
       const otherNames = Object.entries(allSchedules)
         .filter(([otherId]) => otherId !== id)
-        .map(([, data]) => data.name.toLowerCase());
+        .map(([, data]: [string, Schedule]) => data.name.toLowerCase());
 
       if (otherNames.includes(updates.name.toLowerCase())) {
         return badRequest('Schedule name already exists');
@@ -63,7 +77,7 @@ export const PUT = withAuthAndErrorHandler(async (request, context) => {
   }
 
   // Build updated schedule
-  const updatedSchedule = {
+  const updatedSchedule: any = {
     ...existingSchedule,
     ...updates,
     updatedAt: new Date().toISOString()
@@ -90,13 +104,13 @@ export const DELETE = withAuthAndErrorHandler(async (request, context) => {
   const id = await getPathParam(context, 'id');
 
   // Validation 1: Cannot delete active schedule
-  const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId');
+  const activeScheduleId = await adminDbGet('schedules-v2/activeScheduleId') as string | null;
   if (activeScheduleId === id) {
     return badRequest('Cannot delete active schedule. Please activate another schedule first.');
   }
 
   // Validation 2: Cannot delete last schedule
-  const allSchedules = await adminDbGet('schedules-v2/schedules');
+  const allSchedules = await adminDbGet('schedules-v2/schedules') as Record<string, Schedule> | null;
   const scheduleCount = allSchedules ? Object.keys(allSchedules).length : 0;
 
   if (scheduleCount <= 1) {
@@ -104,7 +118,7 @@ export const DELETE = withAuthAndErrorHandler(async (request, context) => {
   }
 
   // Check schedule exists
-  const schedule = await adminDbGet(`schedules-v2/schedules/${id}`);
+  const schedule = await adminDbGet(`schedules-v2/schedules/${id}`) as Schedule | null;
   if (!schedule) {
     return notFound(`Schedule '${id}' not found`);
   }

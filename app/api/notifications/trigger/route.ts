@@ -25,13 +25,20 @@ import { triggerNotificationServer } from '@/lib/notificationTriggersServer';
 
 export const dynamic = 'force-dynamic';
 
+interface TriggerNotificationBody {
+  typeId: string;
+  data?: Record<string, unknown>;
+  userId?: string;
+  adminSecret?: string;
+}
+
 /**
  * POST /api/notifications/trigger
  * Trigger a typed notification with preference checking
  */
 export const POST = withAuthAndErrorHandler(async (request, context, session) => {
   const user = session.user;
-  const body = await parseJsonOrThrow(request);
+  const body = await parseJsonOrThrow(request) as TriggerNotificationBody;
 
   const { typeId, data = {}, userId: targetUserId } = body;
 

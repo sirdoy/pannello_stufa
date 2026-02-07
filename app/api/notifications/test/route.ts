@@ -26,8 +26,24 @@ import { sendNotificationToUser, sendPushNotification, adminDbGet } from '@/lib/
 
 export const dynamic = 'force-dynamic';
 
+interface TestNotificationBody {
+  deviceToken?: string;
+  template?: string;
+  customTitle?: string;
+  customBody?: string;
+  broadcast?: boolean;
+  priority?: 'high' | 'normal' | 'low';
+}
+
+interface NotificationTemplate {
+  title: string;
+  body: string;
+  priority: 'high' | 'normal' | 'low';
+  type: string;
+}
+
 // Predefined notification templates (using Phase 3 type names)
-const TEMPLATES = {
+const TEMPLATES: Record<string, NotificationTemplate> = {
   error_alert: {
     title: '❌ Errore Stufa',
     body: 'Attenzione: rilevato errore nel sistema. Verifica lo stato della stufa.',
@@ -70,7 +86,7 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
   const sentAt = new Date().toISOString();
 
   // Parse optional body (empty object if no body)
-  const body = await parseJson(request, {});
+  const body = await parseJson(request, {}) as TestNotificationBody;
   const { deviceToken, template, customTitle, customBody, broadcast, priority } = body;
 
   // Build notification from template or custom values
@@ -117,7 +133,7 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
     result = await sendPushNotification(deviceToken, notification, user.sub);
   } else {
     // Broadcast to all user devices (default if neither deviceToken nor broadcast specified)
-    const tokensData = await adminDbGet(`users/${user.sub}/fcmTokens`);
+    const tokensData = await adminDbGet(`users/${user.sub}/fcmTokens`) as Record<string, unknown> | null;
     targetDevices = tokensData ? Object.keys(tokensData).length : 0;
     result = await sendNotificationToUser(user.sub, notification);
   }

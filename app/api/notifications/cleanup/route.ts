@@ -21,6 +21,22 @@ import { getAdminDatabase } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
+interface TokenData {
+  lastUsed?: string;
+  createdAt?: string;
+  [key: string]: unknown;
+}
+
+interface UserSnapshot {
+  fcmTokens?: Record<string, TokenData>;
+  [key: string]: unknown;
+}
+
+interface ErrorData {
+  timestamp: string;
+  [key: string]: unknown;
+}
+
 // Tokens inactive for >90 days are considered stale
 const STALE_THRESHOLD_MS = 90 * 24 * 60 * 60 * 1000;
 
@@ -29,7 +45,7 @@ const STALE_THRESHOLD_MS = 90 * 24 * 60 * 60 * 1000;
  * Remove stale FCM tokens
  * Protected: Requires CRON_SECRET bearer token
  */
-export async function POST(request) {
+export async function POST(request: Request): Promise<Response> {
   try {
     // Verify authorization
     const authHeader = request.headers.get('authorization');
@@ -68,13 +84,13 @@ export async function POST(request) {
     }
 
     const now = Date.now();
-    const updates = {};
+    const updates: Record<string, null> = {};
     let scanned = 0;
     let removed = 0;
 
     snapshot.forEach(userSnap => {
-      const userId = userSnap.key;
-      const tokens = userSnap.child('fcmTokens').val() || {};
+      const userId = userSnap.key as string;
+      const tokens = userSnap.child('fcmTokens').val() as Record<string, TokenData> | null || {};
 
       Object.entries(tokens).forEach(([tokenKey, tokenData]) => {
         scanned++;
@@ -118,9 +134,9 @@ export async function POST(request) {
 
     let errorsRemoved = 0;
     if (errorsSnapshot.exists()) {
-      const errorUpdates = {};
+      const errorUpdates: Record<string, null> = {};
       errorsSnapshot.forEach(errorSnap => {
-        const error = errorSnap.val();
+        const error = errorSnap.val() as ErrorData;
         if (error.timestamp && error.timestamp < errorCutoff) {
           errorUpdates[`notificationErrors/${errorSnap.key}`] = null;
           errorsRemoved++;
@@ -146,7 +162,7 @@ export async function POST(request) {
   } catch (error) {
     console.error('❌ Cleanup error:', error);
     return Response.json(
-      { error: 'Cleanup failed', message: error.message },
+      { error: 'Cleanup failed', message: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -156,7 +172,7 @@ export async function POST(request) {
  * GET /api/notifications/cleanup
  * Health check endpoint (no auth required)
  */
-export async function GET() {
+export async function GET(): Promise<Response> {
   return Response.json({
     endpoint: '/api/notifications/cleanup',
     method: 'POST',

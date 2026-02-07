@@ -31,6 +31,20 @@ import { sendNotificationToUser } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
+interface SendNotificationPayload {
+  title: string;
+  body: string;
+  icon?: string;
+  priority?: 'high' | 'normal';
+  data?: Record<string, unknown>;
+}
+
+interface SendNotificationBody {
+  userId: string;
+  notification: SendNotificationPayload;
+  adminSecret?: string;
+}
+
 /**
  * POST /api/notifications/send
  * Send push notification to a user
@@ -41,7 +55,7 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
 
   // Check admin secret from header or body
   const adminSecret = request.headers.get('x-admin-secret');
-  const body = await parseJsonOrThrow(request);
+  const body = await parseJsonOrThrow(request) as SendNotificationBody;
   const bodySecret = body.adminSecret;
 
   const isAdmin = adminSecret === process.env.ADMIN_SECRET ||
@@ -66,10 +80,10 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
   if (result.success) {
     return success({
       message: 'Notifica inviata',
-      sentTo: result.successCount,
-      failed: result.failureCount,
+      sentTo: 'successCount' in result ? result.successCount : 0,
+      failed: 'failureCount' in result ? result.failureCount : 0,
     });
   } else {
-    return badRequest(result.message || 'Impossibile inviare notifica');
+    return badRequest('message' in result ? result.message : 'Impossibile inviare notifica');
   }
 }, 'Notifications/Send');

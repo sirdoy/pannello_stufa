@@ -28,6 +28,10 @@ import { sendNotificationToUser, getAdminDatabase } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
+interface UsersSnapshot {
+  [key: string]: unknown;
+}
+
 const RATE_THRESHOLD = 85; // Alert if below 85%
 const CHECK_PERIOD_HOURS = 1; // Check last hour (per 02-CONTEXT.md)
 
@@ -36,7 +40,7 @@ const CHECK_PERIOD_HOURS = 1; // Check last hour (per 02-CONTEXT.md)
  * Check delivery rate and send alert if needed
  * Protected: Requires CRON_SECRET bearer token
  */
-export async function POST(request) {
+export async function POST(request: Request): Promise<Response> {
   try {
     // Verify authorization
     const authHeader = request.headers.get('authorization');
@@ -84,7 +88,7 @@ export async function POST(request) {
         const usersSnapshot = await db.ref('users').limitToFirst(1).once('value');
 
         if (usersSnapshot.exists()) {
-          const firstUserId = Object.keys(usersSnapshot.val())[0];
+          const firstUserId = Object.keys(usersSnapshot.val() as UsersSnapshot)[0];
           targetUserId = firstUserId;
         }
       }
@@ -111,7 +115,7 @@ export async function POST(request) {
           await recordRateAlert(deliveryRate);
           alertSent = true;
         } else {
-          console.error('❌ Failed to send alert notification:', result.message);
+          console.error('❌ Failed to send alert notification:', 'message' in result ? result.message : 'Unknown error');
         }
       } else {
         console.warn('⚠️ No admin user found to send alert');
@@ -146,7 +150,7 @@ export async function POST(request) {
   } catch (error) {
     console.error('❌ Rate check error:', error);
     return Response.json(
-      { error: 'Rate check failed', message: error.message },
+      { error: 'Rate check failed', message: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -156,7 +160,7 @@ export async function POST(request) {
  * GET /api/notifications/check-rate
  * Health check endpoint (no auth required)
  */
-export async function GET() {
+export async function GET(): Promise<Response> {
   return Response.json({
     endpoint: '/api/notifications/check-rate',
     method: 'POST',

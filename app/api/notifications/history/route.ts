@@ -55,7 +55,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
   if (limitParam) {
     const parsedLimit = parseInt(limitParam, 10);
     if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 100) {
-      return errorResponse('Invalid limit parameter (must be 1-100)', 400);
+      return errorResponse('Invalid limit parameter (must be 1-100)', 'VALIDATION_ERROR', 400);
     }
     limit = parsedLimit;
   }
@@ -64,6 +64,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
   if (type && !isValidNotificationType(type)) {
     return errorResponse(
       `Invalid type parameter (valid: scheduler, error, maintenance, test, generic)`,
+      'VALIDATION_ERROR',
       400
     );
   }
@@ -72,6 +73,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
   if (status && !isValidNotificationStatus(status)) {
     return errorResponse(
       `Invalid status parameter (valid: sent, delivered, failed)`,
+      'VALIDATION_ERROR',
       400
     );
   }
@@ -82,7 +84,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
       // Test base64 decode
       Buffer.from(cursor, 'base64').toString('utf-8');
     } catch (err) {
-      return errorResponse('Invalid cursor format', 400);
+      return errorResponse('Invalid cursor format', 'VALIDATION_ERROR', 400);
     }
   }
 
@@ -107,7 +109,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
 
     // Handle specific errors
     if (error instanceof Error && error.message === 'Invalid cursor format') {
-      return errorResponse('Invalid cursor', 400);
+      return errorResponse('Invalid cursor', 'VALIDATION_ERROR', 400);
     }
 
     // Generic error

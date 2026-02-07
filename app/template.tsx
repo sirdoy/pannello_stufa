@@ -16,9 +16,9 @@ import { useEffect, useState } from 'react';
  * - Effetto "lift" professionale
  * - View Transitions API (Chrome/Edge) con fallback automatico
  */
-export default function Template({ children }) {
-  const [mounted, setMounted] = useState(false);
-  const [showOverlay, setShowOverlay] = useState(true);
+export default function Template({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = useState<boolean>(false);
+  const [showOverlay, setShowOverlay] = useState<boolean>(true);
 
   useEffect(() => {
     // Reset scroll position on page navigation

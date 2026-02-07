@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, useRef, useEffect, ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 
 /**
@@ -14,32 +14,44 @@ import { usePathname } from 'next/navigation';
  * - Ember Noir integration
  */
 
-const PageTransitionContext = createContext({
-  startTransition: () => {},
-  isTransitioning: false,
-  transitionType: 'slide-morph',
-  setTransitionType: () => {},
-});
+type TransitionType = 'slide-morph' | 'fade-scale' | 'ember-burst' | 'liquid-flow' | 'stack-lift' | 'diagonal-sweep';
+type Direction = 'forward' | 'backward';
 
-export const usePageTransition = () => useContext(PageTransitionContext);
+interface PageTransitionContextValue {
+  startTransition: (callback?: () => void | Promise<void>) => Promise<void>;
+  isTransitioning: boolean;
+  transitionType: TransitionType;
+  setTransitionType: (type: TransitionType) => void;
+  direction: Direction;
+}
+
+const PageTransitionContext = createContext<PageTransitionContextValue | null>(null);
+
+export const usePageTransition = (): PageTransitionContextValue => {
+  const context = useContext(PageTransitionContext);
+  if (!context) {
+    throw new Error('usePageTransition must be used within PageTransitionProvider');
+  }
+  return context;
+};
 
 // Transition types disponibili
 export const TRANSITION_TYPES = {
-  SLIDE_MORPH: 'slide-morph',      // Default: slide + scale + blur
-  FADE_SCALE: 'fade-scale',         // Fade + gentle scale
-  EMBER_BURST: 'ember-burst',       // Esplosione ember glow
-  LIQUID_FLOW: 'liquid-flow',       // Liquid glass flow
-  STACK_LIFT: 'stack-lift',         // Card lift & stack
-  DIAGONAL_SWEEP: 'diagonal-sweep', // Diagonal wipe
+  SLIDE_MORPH: 'slide-morph' as const,      // Default: slide + scale + blur
+  FADE_SCALE: 'fade-scale' as const,         // Fade + gentle scale
+  EMBER_BURST: 'ember-burst' as const,       // Esplosione ember glow
+  LIQUID_FLOW: 'liquid-flow' as const,       // Liquid glass flow
+  STACK_LIFT: 'stack-lift' as const,         // Card lift & stack
+  DIAGONAL_SWEEP: 'diagonal-sweep' as const, // Diagonal wipe
 };
 
-export function PageTransitionProvider({ children }) {
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [transitionType, setTransitionType] = useState(TRANSITION_TYPES.SLIDE_MORPH);
-  const [direction, setDirection] = useState('forward'); // 'forward' | 'backward'
+export function PageTransitionProvider({ children }: { children: ReactNode }) {
+  const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
+  const [transitionType, setTransitionType] = useState<TransitionType>(TRANSITION_TYPES.SLIDE_MORPH);
+  const [direction, setDirection] = useState<Direction>('forward');
   const pathname = usePathname();
-  const previousPathRef = useRef(pathname);
-  const historyStackRef = useRef([pathname]);
+  const previousPathRef = useRef<string>(pathname);
+  const historyStackRef = useRef<string[]>([pathname]);
 
   // Detect navigation direction
   useEffect(() => {
@@ -69,7 +81,7 @@ export function PageTransitionProvider({ children }) {
    * Start page transition
    * Usa View Transitions API se disponibile, altrimenti fallback CSS
    */
-  const startTransition = useCallback(async (callback) => {
+  const startTransition = useCallback(async (callback?: () => void | Promise<void>): Promise<void> => {
     // Set transitioning state
     setIsTransitioning(true);
 
@@ -93,7 +105,7 @@ export function PageTransitionProvider({ children }) {
         document.documentElement.setAttribute('data-transition-phase', 'exit');
 
         // Wait for exit animation
-        await new Promise(resolve => setTimeout(resolve, 400));
+        await new Promise<void>(resolve => setTimeout(resolve, 400));
 
         // Execute callback
         if (callback) await callback();
@@ -102,7 +114,7 @@ export function PageTransitionProvider({ children }) {
         document.documentElement.setAttribute('data-transition-phase', 'enter');
 
         // Wait for enter animation
-        await new Promise(resolve => setTimeout(resolve, 400));
+        await new Promise<void>(resolve => setTimeout(resolve, 400));
       }
     } catch (error) {
       console.error('Page transition error:', error);

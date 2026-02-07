@@ -1,17 +1,17 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { getLatestVersion } from '@/lib/changelogService';
 import { APP_VERSION } from '@/lib/version';
 import { isDevelopment } from '@/lib/environmentHelper';
 
 /**
  * Confronta due versioni semantiche (MAJOR.MINOR.PATCH)
- * @param {string} v1 - Versione 1 (es. "1.4.2")
- * @param {string} v2 - Versione 2 (es. "1.5.0")
- * @returns {number} -1 se v1 < v2, 0 se v1 === v2, 1 se v1 > v2
+ * @param v1 - Versione 1 (es. "1.4.2")
+ * @param v2 - Versione 2 (es. "1.5.0")
+ * @returns -1 se v1 < v2, 0 se v1 === v2, 1 se v1 > v2
  */
-function compareVersions(v1, v2) {
+function compareVersions(v1: string, v2: string): number {
   const parts1 = v1.split('.').map(Number);
   const parts2 = v2.split('.').map(Number);
 
@@ -26,22 +26,29 @@ function compareVersions(v1, v2) {
   return 0;
 }
 
+interface VersionContextValue {
+  needsUpdate: boolean;
+  firebaseVersion: string | null;
+  checkVersion: () => Promise<void>;
+  isChecking: boolean;
+}
+
 /**
  * Context per gestione globale stato version enforcement
  * Permette check on-demand da qualsiasi componente (es. polling status)
  */
-const VersionContext = createContext(null);
+const VersionContext = createContext<VersionContextValue | null>(null);
 
-export function VersionProvider({ children }) {
-  const [needsUpdate, setNeedsUpdate] = useState(false);
-  const [firebaseVersion, setFirebaseVersion] = useState(null);
-  const [isChecking, setIsChecking] = useState(false);
+export function VersionProvider({ children }: { children: ReactNode }) {
+  const [needsUpdate, setNeedsUpdate] = useState<boolean>(false);
+  const [firebaseVersion, setFirebaseVersion] = useState<string | null>(null);
+  const [isChecking, setIsChecking] = useState<boolean>(false);
 
   /**
    * Controlla versione Firebase vs locale
    * Può essere chiamata on-demand da qualsiasi componente
    */
-  const checkVersion = useCallback(async () => {
+  const checkVersion = useCallback(async (): Promise<void> => {
     // Evita check simultanei usando ref interno invece di state dependency
     if (isChecking) return;
 
@@ -100,9 +107,9 @@ export function VersionProvider({ children }) {
 
 /**
  * Hook per accedere al VersionContext
- * @returns {Object} { needsUpdate, firebaseVersion, checkVersion, isChecking }
+ * @returns { needsUpdate, firebaseVersion, checkVersion, isChecking }
  */
-export function useVersion() {
+export function useVersion(): VersionContextValue {
   const context = useContext(VersionContext);
   if (!context) {
     throw new Error('useVersion must be used within VersionProvider');

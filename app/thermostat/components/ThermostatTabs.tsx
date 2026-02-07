@@ -1,8 +1,18 @@
 'use client';
 
+import { ReactNode } from 'react';
 import { Tabs } from '@/app/components/ui';
 import { Calendar, SlidersHorizontal, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
+
+interface ThermostatTabsProps {
+  defaultValue?: string;
+  onTabChange?: (value: string) => void;
+  scheduleContent?: ReactNode;
+  manualContent?: ReactNode;
+  historyContent?: ReactNode;
+  className?: string;
+}
 
 /**
  * ThermostatTabs - Tabbed interface for thermostat page
@@ -12,14 +22,6 @@ import { cn } from '@/lib/utils/cn';
  * - Icons for each tab (Calendar, Sliders, Clock)
  * - Tabs positioned at top on both mobile and desktop
  * - Default tab: Schedule
- *
- * @param {Object} props
- * @param {string} props.defaultValue - Initial selected tab (default: 'schedule')
- * @param {Function} props.onTabChange - Callback when tab changes
- * @param {ReactNode} props.scheduleContent - Content for Schedule tab
- * @param {ReactNode} props.manualContent - Content for Manual tab
- * @param {ReactNode} props.historyContent - Content for History tab
- * @param {string} props.className - Additional classes for root
  */
 export function ThermostatTabs({
   defaultValue = 'schedule',
@@ -28,7 +30,7 @@ export function ThermostatTabs({
   manualContent,
   historyContent,
   className,
-}) {
+}: ThermostatTabsProps) {
   return (
     <Tabs
       defaultValue={defaultValue}

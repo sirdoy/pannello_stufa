@@ -1,3 +1,4 @@
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import Navbar from './components/Navbar';
 import { Footer } from './components/ui';
@@ -5,7 +6,7 @@ import ClientProviders from './components/ClientProviders';
 import VersionEnforcer from './components/VersionEnforcer';
 import AppleSplashScreens from './components/AppleSplashScreens';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Pannello Stufa',
   description: 'Controllo remoto della stufa Thermorossi con pianificazione automatica e monitoraggio temperatura',
   applicationName: 'Pannello Stufa',
@@ -20,7 +21,7 @@ export const metadata = {
   manifest: '/manifest.json',
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -28,7 +29,7 @@ export const viewport = {
   viewportFit: 'cover',
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="it" suppressHydrationWarning>
     <head>

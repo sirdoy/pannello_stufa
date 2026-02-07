@@ -10,14 +10,20 @@ import ManualOverrideSheet from './components/ManualOverrideSheet';
 import ActiveOverrideBadge from './components/ActiveOverrideBadge';
 import { ArrowLeft, RefreshCw, Calendar, Flame } from 'lucide-react';
 
+interface Room {
+  id: string;
+  mode?: string;
+  [key: string]: unknown;
+}
+
 function ScheduleContent() {
   const router = useRouter();
   const { schedules, activeSchedule, loading, error, refetch } = useScheduleData();
   const { rooms, refetch: refetchRooms } = useRoomStatus();
-  const [showOverrideSheet, setShowOverrideSheet] = useState(false);
+  const [showOverrideSheet, setShowOverrideSheet] = useState<boolean>(false);
 
   // Find rooms with active override
-  const roomsWithOverride = rooms.filter(r => r.mode === 'manual');
+  const roomsWithOverride = (rooms as Room[]).filter(r => r.mode === 'manual');
 
   if (loading) {
     return <Skeleton.SchedulePage />;

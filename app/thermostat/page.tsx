@@ -11,17 +11,86 @@ import ThermostatTabs from './components/ThermostatTabs';
 import { NETATMO_ROUTES } from '@/lib/routes';
 import { Calendar, Clock } from 'lucide-react';
 
+interface NetatmoTopology {
+  home_id: string;
+  home_name: string;
+  rooms?: NetatmoRoom[];
+  modules?: NetatmoModule[];
+  [key: string]: unknown;
+}
+
+interface NetatmoRoom {
+  id: string;
+  name?: string;
+  modules?: string[];
+  [key: string]: unknown;
+}
+
+interface NetatmoModule {
+  id: string;
+  type: string;
+  battery_state?: string;
+  battery_level?: number;
+  reachable?: boolean;
+  rf_strength?: number;
+  [key: string]: unknown;
+}
+
+interface NetatmoStatus {
+  mode?: string;
+  rooms?: RoomStatus[];
+  modules?: ModuleStatus[];
+  hasLowBattery?: boolean;
+  hasCriticalBattery?: boolean;
+  lowBatteryModules?: NetatmoModule[];
+  [key: string]: unknown;
+}
+
+interface RoomStatus {
+  room_id: string;
+  temperature?: number;
+  setpoint?: number;
+  mode?: string;
+  heating?: boolean;
+  stoveSync?: boolean;
+  stoveSyncSetpoint?: number;
+  [key: string]: unknown;
+}
+
+interface ModuleStatus {
+  id: string;
+  battery_state?: string;
+  battery_level?: number;
+  reachable?: boolean;
+  rf_strength?: number;
+  [key: string]: unknown;
+}
+
+interface RoomWithStatus extends NetatmoRoom {
+  temperature?: number;
+  setpoint?: number;
+  mode?: string;
+  heating?: boolean;
+  stoveSync?: boolean;
+  stoveSyncSetpoint?: number;
+  roomModules?: NetatmoModule[];
+  deviceType: 'thermostat' | 'valve' | 'unknown';
+  hasLowBattery?: boolean;
+  hasCriticalBattery?: boolean;
+  isOffline?: boolean;
+}
+
 function NetatmoContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [connected, setConnected] = useState(false);
-  const [topology, setTopology] = useState(null);
-  const [status, setStatus] = useState(null);
-  const [mode, setMode] = useState('schedule');
-  const [refreshing, setRefreshing] = useState(false);
-  const [oauthError, setOauthError] = useState(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [connected, setConnected] = useState<boolean>(false);
+  const [topology, setTopology] = useState<NetatmoTopology | null>(null);
+  const [status, setStatus] = useState<NetatmoStatus | null>(null);
+  const [mode, setMode] = useState<string>('schedule');
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [oauthError, setOauthError] = useState<string | null>(null);
 
   // Flags per prevenire double fetch in React Strict Mode
   const connectionCheckedRef = useRef(false);
@@ -96,7 +165,7 @@ function NetatmoContent() {
       // If we get data without error, we're connected
       if (!data.error && data.home_id) {
         setConnected(true);
-        setTopology(data);
+        setTopology(data as NetatmoTopology);
       } else if (data.error && (data.error.includes('refresh token') || data.error.includes('Nessun refresh token'))) {
         // Not connected - show auth card
         setConnected(false);
@@ -109,17 +178,18 @@ function NetatmoContent() {
     } catch (err) {
       console.error('❌ Netatmo: Exception in checkConnection -', err);
       // If fetch fails, check if it's auth error
-      if (err.message && (err.message.includes('refresh token') || err.message.includes('Nessun refresh token'))) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      if (message.includes('refresh token') || message.includes('Nessun refresh token')) {
         setConnected(false);
       } else {
-        setError(err.message);
+        setError(message);
       }
     } finally {
       setLoading(false);
     }
   }
 
-  async function fetchTopology() {
+  async function fetchTopology(): Promise<void> {
     try {
       setLoading(true);
       setError(null);
@@ -131,15 +201,16 @@ function NetatmoContent() {
         throw new Error(data.error);
       }
 
-      setTopology(data);
+      setTopology(data as NetatmoTopology);
     } catch (err) {
-      setError(err.message);
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setError(message);
     } finally {
       setLoading(false);
     }
   }
 
-  async function fetchStatus() {
+  async function fetchStatus(): Promise<void> {
     try {
       setError(null);
 
@@ -150,14 +221,15 @@ function NetatmoContent() {
         throw new Error(data.error);
       }
 
-      setStatus(data);
+      setStatus(data as NetatmoStatus);
       setMode(data.mode || 'schedule');
     } catch (err) {
-      setError(err.message);
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setError(message);
     }
   }
 
-  async function handleModeChange(newMode) {
+  async function handleModeChange(newMode: string): Promise<void> {
     try {
       setError(null);
 
@@ -176,11 +248,12 @@ function NetatmoContent() {
       setMode(newMode);
       await fetchStatus();
     } catch (err) {
-      setError(err.message);
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setError(message);
     }
   }
 
-  async function handleRefresh() {
+  async function handleRefresh(): Promise<void> {
     setRefreshing(true);
     await fetchTopology();
     await fetchStatus();
@@ -264,7 +337,7 @@ function NetatmoContent() {
 
   // Map rooms with status and enrich with module info
   // Shows ALL rooms from topology, even if offline
-  const roomsWithStatus = rooms.map(room => {
+  const roomsWithStatus: RoomWithStatus[] = rooms.map(room => {
     const roomStatus = status?.rooms?.find(r => r.room_id === room.id);
 
     // Find modules for this room (exclude relays - NAPlug and cameras - NACamera, NOC), with battery info

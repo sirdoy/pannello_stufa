@@ -7,10 +7,19 @@ import { it } from 'date-fns/locale';
 import SettingsLayout from '@/app/components/SettingsLayout';
 import { Card, Button, Heading, Text, Skeleton, EmptyState, Badge, DataTable } from '@/app/components/ui';
 
+interface NotificationHistoryItem {
+  timestamp: number;
+  type: 'error' | 'scheduler' | 'maintenance' | 'test' | 'generic';
+  status: 'sent' | 'delivered' | 'failed';
+  title: string;
+  body: string;
+  [key: string]: any;
+}
+
 /**
  * Get Italian label for notification type
  */
-const getTypeLabel = (type) => {
+const getTypeLabel = (type: string) => {
   const labels = {
     error: 'Errore',
     scheduler: 'Scheduler',
@@ -23,9 +32,9 @@ const getTypeLabel = (type) => {
 
 export default function NotificationHistoryPage() {
   const { user, isLoading: userLoading } = useUser();
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState<NotificationHistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch all notifications (client-side pagination)
   useEffect(() => {
@@ -45,7 +54,7 @@ export default function NotificationHistoryPage() {
         setError(null);
       } catch (err) {
         console.error('Error fetching notifications:', err);
-        setError(err.message);
+        setError(err instanceof Error ? err.message : 'Errore sconosciuto');
       } finally {
         setIsLoading(false);
       }

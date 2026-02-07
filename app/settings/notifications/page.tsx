@@ -31,16 +31,36 @@ import NotificationSettingsForm from './NotificationSettingsForm';
 import Skeleton from '@/app/components/ui/Skeleton';
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 
+type TestResult = 'success' | 'error' | 'no_tokens';
+
+interface NotificationDevice {
+  tokenKey: string;
+  customName?: string;
+  lastUsed?: number;
+  [key: string]: any;
+}
+
+interface NotificationPreferences {
+  enabledTypes: Record<string, boolean>;
+  dndWindows: Array<{
+    enabled: boolean;
+    start: string;
+    end: string;
+  }>;
+  timezone: string;
+  rateLimits?: Record<string, number>;
+}
+
 export default function NotificationsSettingsPage() {
   const { user, isLoading: userLoading } = useUser();
-  const [devices, setDevices] = useState([]);
+  const [devices, setDevices] = useState<NotificationDevice[]>([]);
   const [isLoadingDevices, setIsLoadingDevices] = useState(true);
   const [isSendingTest, setIsSendingTest] = useState(false);
-  const [testResult, setTestResult] = useState(null); // 'success' | 'error' | 'no_tokens' | null
+  const [testResult, setTestResult] = useState<TestResult | null>(null);
   const [isReactivating, setIsReactivating] = useState(false);
   const [isDeactivating, setIsDeactivating] = useState(false);
-  const [registrationError, setRegistrationError] = useState(null);
-  const [currentDeviceToken, setCurrentDeviceToken] = useState(null);
+  const [registrationError, setRegistrationError] = useState<string | null>(null);
+  const [currentDeviceToken, setCurrentDeviceToken] = useState<string | null>(null);
   const [isCurrentDeviceRegistered, setIsCurrentDeviceRegistered] = useState(false);
 
   // Notification preferences - managed by hook with Firestore sync
@@ -98,7 +118,7 @@ export default function NotificationsSettingsPage() {
       setTimeout(() => setTestResult(null), 5000);
     } catch (error) {
       console.error('Errore riattivazione:', error);
-      setRegistrationError(error.message || 'Errore sconosciuto');
+      setRegistrationError(error instanceof Error ? error.message : 'Errore sconosciuto');
       setTestResult('error');
     } finally {
       setIsReactivating(false);
@@ -124,14 +144,14 @@ export default function NotificationsSettingsPage() {
       }
     } catch (error) {
       console.error('Errore disattivazione:', error);
-      alert('Errore: ' + error.message);
+      alert('Errore: ' + (error instanceof Error ? error.message : 'Errore sconosciuto'));
     } finally {
       setIsDeactivating(false);
     }
   };
 
   // Handler for saving notification preferences
-  const handleSavePreferences = async (data) => {
+  const handleSavePreferences = async (data: NotificationPreferences) => {
     try {
       await savePreferences(data);
 
@@ -140,7 +160,7 @@ export default function NotificationsSettingsPage() {
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
       console.error('[NotificationsPage] Error saving preferences:', error);
-      alert('Errore salvataggio preferenze: ' + error.message);
+      alert('Errore salvataggio preferenze: ' + (error instanceof Error ? error.message : 'Errore sconosciuto'));
     }
   };
 

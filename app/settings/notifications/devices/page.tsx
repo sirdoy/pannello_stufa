@@ -7,12 +7,20 @@ import { Card, Button, Heading, Text, Skeleton, EmptyState, Banner } from '@/app
 import DeviceListItem from '@/components/notifications/DeviceListItem';
 import { checkStoredToken } from '@/lib/notificationService';
 
+interface NotificationDevice {
+  tokenKey: string;
+  token: string;
+  customName?: string;
+  lastUsed?: number;
+  [key: string]: any;
+}
+
 export default function DeviceManagementPage() {
   const { user, isLoading: userLoading } = useUser();
-  const [devices, setDevices] = useState([]);
+  const [devices, setDevices] = useState<NotificationDevice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [currentToken, setCurrentToken] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+  const [currentToken, setCurrentToken] = useState<string | null>(null);
 
   // Fetch devices
   const fetchDevices = useCallback(async () => {
@@ -28,7 +36,7 @@ export default function DeviceManagementPage() {
       setDevices(data.devices || []);
     } catch (err) {
       console.error('Error fetching devices:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Errore sconosciuto');
     } finally {
       setIsLoading(false);
     }
@@ -54,7 +62,7 @@ export default function DeviceManagementPage() {
   }, [user?.sub, fetchDevices]);
 
   // Handle device update (optimistic)
-  const handleDeviceUpdate = (tokenKey, updates) => {
+  const handleDeviceUpdate = (tokenKey: string, updates: Partial<NotificationDevice>) => {
     setDevices(prev =>
       prev.map(d =>
         d.tokenKey === tokenKey ? { ...d, ...updates } : d
@@ -63,7 +71,7 @@ export default function DeviceManagementPage() {
   };
 
   // Handle device removal
-  const handleDeviceRemove = (tokenKey) => {
+  const handleDeviceRemove = (tokenKey: string) => {
     setDevices(prev => prev.filter(d => d.tokenKey !== tokenKey));
   };
 

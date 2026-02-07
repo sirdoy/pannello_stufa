@@ -30,6 +30,24 @@ import Input from '@/app/components/ui/Input';
 import { Heading, Text } from '@/app/components/ui';
 import Skeleton from '@/app/components/ui/Skeleton';
 
+interface NotificationPreferences {
+  enabledTypes: Record<string, boolean>;
+  dndWindows: Array<{
+    enabled: boolean;
+    start: string;
+    end: string;
+  }>;
+  timezone: string;
+  rateLimits?: Record<string, number>;
+}
+
+interface NotificationSettingsFormProps {
+  initialValues?: NotificationPreferences;
+  onSubmit: (data: NotificationPreferences) => Promise<void>;
+  isLoading?: boolean;
+  isSaving?: boolean;
+}
+
 /**
  * Category metadata for UI rendering
  */
@@ -68,19 +86,13 @@ const CATEGORY_CONFIG = {
 
 /**
  * NotificationSettingsForm Component
- *
- * @param {Object} props
- * @param {Object} props.initialValues - Existing preferences (optional)
- * @param {Function} props.onSubmit - async (data) => void
- * @param {boolean} props.isLoading - Loading state for initial data
- * @param {boolean} props.isSaving - Saving state for submit button
  */
 export default function NotificationSettingsForm({
   initialValues,
   onSubmit,
   isLoading = false,
   isSaving = false,
-}) {
+}: NotificationSettingsFormProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [detectedTimezone, setDetectedTimezone] = useState('UTC');
 
@@ -122,7 +134,7 @@ export default function NotificationSettingsForm({
   const hasDndWindow = dndWindows.length > 0 && dndWindows[0]?.enabled;
 
   // Handle form submission
-  const handleFormSubmit = async (data) => {
+  const handleFormSubmit = async (data: NotificationPreferences) => {
     await onSubmit(data);
   };
 

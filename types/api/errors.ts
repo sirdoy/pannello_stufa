@@ -53,6 +53,11 @@ export type ErrorCode =
   | 'HUE_BRIDGE_NOT_FOUND'
   | 'HUE_LINK_BUTTON_NOT_PRESSED'
   | 'HUE_NOT_ON_LOCAL_NETWORK'
+  | 'HUE_ERROR'
+  // Weather-specific
+  | 'WEATHER_API_ERROR'
+  // Config
+  | 'LOCATION_NOT_SET'
   // Firebase
   | 'FIREBASE_ERROR'
   // Rate limiting

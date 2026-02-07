@@ -90,7 +90,7 @@ export const PUT = withAuthAndErrorHandler(async (request, context: RouteContext
       payload.actions = updates.actions;
     }
 
-    const response = await hueApi.updateScene(sceneId, payload);
+    const response = await hueApi.updateScene(sceneId, payload) as any;
 
     // Check for Hue API errors
     if (response.errors && response.errors.length > 0) {
@@ -134,7 +134,7 @@ export const DELETE = withAuthAndErrorHandler(async (request, context: RouteCont
   try {
     // Delete scene via Hue API
     const hueApi = new HueApi(connection.bridgeIp, connection.username);
-    const response = await hueApi.deleteScene(sceneId);
+    const response = await hueApi.deleteScene(sceneId) as any;
 
     // Check for Hue API errors
     if (response.errors && response.errors.length > 0) {

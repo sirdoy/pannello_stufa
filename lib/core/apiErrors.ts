@@ -78,6 +78,13 @@ export const ERROR_CODES = {
   HUE_BRIDGE_NOT_FOUND: 'HUE_BRIDGE_NOT_FOUND',
   HUE_LINK_BUTTON_NOT_PRESSED: 'HUE_LINK_BUTTON_NOT_PRESSED',
   HUE_NOT_ON_LOCAL_NETWORK: 'HUE_NOT_ON_LOCAL_NETWORK',
+  HUE_ERROR: 'HUE_ERROR',
+
+  // Weather-specific
+  WEATHER_API_ERROR: 'WEATHER_API_ERROR',
+
+  // Config
+  LOCATION_NOT_SET: 'LOCATION_NOT_SET',
 
   // Firebase
   FIREBASE_ERROR: 'FIREBASE_ERROR',
@@ -133,6 +140,13 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ERROR_CODES.HUE_BRIDGE_NOT_FOUND]: 'Bridge Hue non trovato',
   [ERROR_CODES.HUE_LINK_BUTTON_NOT_PRESSED]: 'Premi il pulsante sul bridge Hue',
   [ERROR_CODES.HUE_NOT_ON_LOCAL_NETWORK]: 'Non sei sulla rete locale del bridge Hue',
+  [ERROR_CODES.HUE_ERROR]: 'Errore Philips Hue',
+
+  // Weather
+  [ERROR_CODES.WEATHER_API_ERROR]: 'Errore API meteo',
+
+  // Config
+  [ERROR_CODES.LOCATION_NOT_SET]: 'Posizione non configurata',
 
   // Firebase
   [ERROR_CODES.FIREBASE_ERROR]: 'Errore database',

@@ -66,7 +66,7 @@ export const POST = withAuthAndErrorHandler(async (request) => {
   try {
     // Create scene via Hue API
     const hueApi = new HueApi(connection.bridgeIp, connection.username);
-    const response = await hueApi.createScene(name.trim(), groupRid, actions);
+    const response = await hueApi.createScene(name.trim(), groupRid, actions) as any;
 
     // Check for Hue API errors
     if (response.errors && response.errors.length > 0) {

@@ -11,6 +11,8 @@ import {
   withAuthAndErrorHandler,
   success,
   error as errorResponse,
+  ERROR_CODES,
+  HTTP_STATUS,
 } from '@/lib/core';
 import { getHealthStats } from '@/lib/healthLogger';
 
@@ -45,7 +47,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
   if (daysParam) {
     const parsedDays = parseInt(daysParam, 10);
     if (isNaN(parsedDays) || parsedDays < 1 || parsedDays > 30) {
-      return errorResponse('Invalid days parameter (must be 1-30)', 400);
+      return errorResponse('Invalid days parameter (must be 1-30)', ERROR_CODES.INVALID_INPUT, HTTP_STATUS.BAD_REQUEST);
     }
     days = parsedDays;
   }

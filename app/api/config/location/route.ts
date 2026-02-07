@@ -8,7 +8,7 @@
  * This is a shared configuration for the entire app.
  */
 
-import { withAuthAndErrorHandler, success, badRequest, error } from '@/lib/core';
+import { withAuthAndErrorHandler, success, badRequest, error, ERROR_CODES, HTTP_STATUS } from '@/lib/core';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 
@@ -41,7 +41,7 @@ export const GET = withAuthAndErrorHandler(async () => {
   const location = (await adminDbGet(locationPath)) as Location | null;
 
   if (!location) {
-    return error('Location not configured', 'LOCATION_NOT_SET', 404);
+    return error('Location not configured', ERROR_CODES.LOCATION_NOT_SET, HTTP_STATUS.NOT_FOUND);
   }
 
   return success({ location });

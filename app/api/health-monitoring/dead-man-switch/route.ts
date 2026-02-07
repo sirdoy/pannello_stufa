@@ -55,7 +55,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
   try {
     const status = await checkDeadManSwitch();
 
-    return success(status);
+    return success(status as unknown as Record<string, unknown>);
 
   } catch (error) {
     console.error('❌ Error checking dead man\'s switch:', error);

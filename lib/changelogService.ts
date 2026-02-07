@@ -91,7 +91,7 @@ export const getVersionType = (currentVersion: string, newVersion: string): Vers
 /**
  * Sincronizza VERSION_HISTORY con Firebase
  */
-export const syncVersionHistoryToFirebase = async (versionHistory: Partial<ChangelogEntry>[]): Promise<void> => {
+export const syncVersionHistoryToFirebase = async (versionHistory: any[]): Promise<void> => {
   try {
     for (let i = 0; i < versionHistory.length; i++) {
       const version = versionHistory[i];

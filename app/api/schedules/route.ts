@@ -43,7 +43,7 @@ export const GET = withAuthAndErrorHandler(async () => {
   }));
 
   // Sort by createdAt (oldest first)
-  const sorted = schedules.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+  const sorted = schedules.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
   return success({
     schedules: sorted,

@@ -1,4 +1,4 @@
-import { withAuthAndErrorHandler, success, badRequest, error } from '@/lib/core';
+import { withAuthAndErrorHandler, success, badRequest, error, ERROR_CODES, HTTP_STATUS } from '@/lib/core';
 import { getCachedWeather } from '@/lib/weatherCache';
 import { fetchWeatherForecast, fetchAirQuality, interpretWeatherCode } from '@/lib/openMeteo';
 
@@ -74,7 +74,7 @@ export const GET = withAuthAndErrorHandler(async (request) => {
       }),
     ]);
 
-    const { data, cachedAt, stale } = weatherResult;
+    const { data, cachedAt, stale } = weatherResult as any;
 
     // Enrich current weather with interpreted code
     const currentCondition = interpretWeatherCode(data.current.weather_code);
@@ -144,7 +144,7 @@ export const GET = withAuthAndErrorHandler(async (request) => {
 
     // Handle Open-Meteo API errors
     if (errorMessage.includes('Open-Meteo API error')) {
-      return error('Weather service unavailable', 'WEATHER_API_ERROR', 503);
+      return error('Weather service unavailable', ERROR_CODES.WEATHER_API_ERROR, HTTP_STATUS.SERVICE_UNAVAILABLE);
     }
 
     // Generic network/fetch errors

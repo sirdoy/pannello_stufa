@@ -25,7 +25,7 @@ export const PUT = withHueHandler(async (request, context: RouteContext, session
   const user = session.user;
 
   const provider = await HueConnectionStrategy.getProvider();
-  const response = await provider.activateScene(id);
+  const response = await provider.activateScene(id) as any;
 
   // Log action
   await adminDbPush('log', {

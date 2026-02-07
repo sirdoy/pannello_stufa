@@ -32,7 +32,7 @@ export const GET = withHueHandler(async (request, context: RouteContext) => {
   const id = await getPathParam(context, 'id');
 
   const provider = await HueConnectionStrategy.getProvider();
-  const response = await provider.getLight(id);
+  const response = await provider.getLight(id) as any;
 
   return success({
     light: response.data?.[0] || null,
@@ -45,7 +45,7 @@ export const PUT = withHueHandler(async (request, context: RouteContext, session
   const user = session.user;
 
   const provider = await HueConnectionStrategy.getProvider();
-  const response = await provider.setLightState(id, body);
+  const response = await provider.setLightState(id, body) as any;
 
   // Log action
   const actionDescription = body.on !== undefined

@@ -40,12 +40,14 @@ type CoordinationEventType =
   | 'user_intent_detected'
   | 'max_setpoint_capped'
   | 'notification_sent'
-  | 'notification_throttled';
+  | 'notification_throttled'
+  | 'coordination_error'
+  | 'coordination_debouncing';
 
 /**
  * Coordination action
  */
-type CoordinationAction = 'applied' | 'restored' | 'paused' | 'skipped' | 'debouncing' | 'no_change' | 'capped' | 'retry_timer' | 'throttled';
+type CoordinationAction = 'applied' | 'restored' | 'paused' | 'skipped' | 'debouncing' | 'no_change' | 'capped' | 'retry_timer' | 'throttled' | 'error';
 
 /**
  * Coordination event data

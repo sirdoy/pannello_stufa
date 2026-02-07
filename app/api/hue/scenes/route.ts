@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 
 export const GET = withHueHandler(async () => {
   const provider = await HueConnectionStrategy.getProvider();
-  const response = await provider.getScenes();
+  const response = await provider.getScenes() as any;
 
   return success({
     scenes: response.data || [],

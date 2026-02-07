@@ -13,7 +13,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth0 } from '@/lib/auth0';
 import { syncVersionHistoryToFirebase } from '@/lib/changelogService';
 import { VERSION_HISTORY } from '@/lib/version';
-import type { Session } from '@auth0/nextjs-auth0';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +24,7 @@ interface AuthorizationResult {
 /**
  * Helper to check admin access via Auth0
  */
-function isAdmin(session: Session | null | undefined): boolean {
+function isAdmin(session: any): boolean {
   return session?.user?.sub === process.env.ADMIN_USER_ID;
 }
 

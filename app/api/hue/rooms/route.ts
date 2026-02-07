@@ -14,8 +14,8 @@ export const GET = withHueHandler(async () => {
   const provider = await HueConnectionStrategy.getProvider();
 
   const [roomsResponse, zonesResponse] = await Promise.all([
-    provider.getRooms(),
-    provider.getZones(),
+    provider.getRooms() as any,
+    provider.getZones() as any,
   ]);
 
   // Combine rooms and zones

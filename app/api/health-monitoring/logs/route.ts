@@ -11,6 +11,8 @@ import {
   withAuthAndErrorHandler,
   success,
   error as errorResponse,
+  ERROR_CODES,
+  HTTP_STATUS,
 } from '@/lib/core';
 import { getAdminFirestore } from '@/lib/firebaseAdmin';
 import { Timestamp, Query, DocumentData } from 'firebase-admin/firestore';
@@ -50,7 +52,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
   if (limitParam) {
     const parsedLimit = parseInt(limitParam, 10);
     if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 100) {
-      return errorResponse('Invalid limit parameter (must be 1-100)', 400);
+      return errorResponse('Invalid limit parameter (must be 1-100)', ERROR_CODES.INVALID_INPUT, HTTP_STATUS.BAD_REQUEST);
     }
     limit = parsedLimit;
   }
@@ -59,7 +61,8 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
   if (type && type !== 'mismatch') {
     return errorResponse(
       `Invalid type parameter (valid: mismatch)`,
-      400
+      ERROR_CODES.INVALID_INPUT,
+      HTTP_STATUS.BAD_REQUEST
     );
   }
 
@@ -67,7 +70,8 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
   if (severity && !['error', 'warning'].includes(severity)) {
     return errorResponse(
       `Invalid severity parameter (valid: error, warning)`,
-      400
+      ERROR_CODES.INVALID_INPUT,
+      HTTP_STATUS.BAD_REQUEST
     );
   }
 
@@ -99,7 +103,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
     if (cursor) {
       const cursorDoc = await db.collection('healthMonitoring').doc(cursor).get();
       if (!cursorDoc.exists) {
-        return errorResponse('Invalid cursor', 400);
+        return errorResponse('Invalid cursor', ERROR_CODES.INVALID_INPUT, HTTP_STATUS.BAD_REQUEST);
       }
       query = query.startAfter(cursorDoc);
     }
@@ -156,7 +160,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
 
     // Handle specific errors
     if (error instanceof Error && error.message?.includes('cursor')) {
-      return errorResponse('Invalid cursor', 400);
+      return errorResponse('Invalid cursor', ERROR_CODES.INVALID_INPUT, HTTP_STATUS.BAD_REQUEST);
     }
 
     // Generic error

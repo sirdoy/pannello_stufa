@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 
 ## Current Position
 
-Phase: 41 - Pages Migration
-Plan: 7 of 7 (COMPLETE)
-Status: Phase complete — All 70 page/component files migrated, component props fixed, 198 external API type errors identified
-Last activity: 2026-02-07 — Completed 41-07-PLAN.md (gap closure: verified migration, fixed component types)
+Phase: 42 - Test Migration
+Plan: 1 of 4 (In progress)
+Status: In progress — Jest config/setup/mocks migrated, 131 tests discovered
+Last activity: 2026-02-07 — Completed 42-01-PLAN.md (Jest configuration migration)
 
-Progress: [█████████████░░░░░░░░░░░] 65% (5/7 phases complete, Phase 41: 7/7 plans complete)
+Progress: [█████████████░░░░░░░░░░░] 66% (5/7 phases complete, Phase 42: 1/4 plans complete)
 
 ## Milestone Overview
 
@@ -30,15 +30,15 @@ Progress: [█████████████░░░░░░░░░░
 | 39 | UI Components Migration | 3 | COMPLETE (11/11 plans, 137/137 files migrated, 0 tsc errors) |
 | 40 | API Routes Migration | 3 | COMPLETE (7/7 plans, 90/90 files migrated, 0 tsc errors) |
 | 41 | Pages Migration | 3 | COMPLETE (7/7 plans, 70 files migrated, 30+ component prop fixes, 198 external API type errors documented) |
-| 42 | Test Migration | 4 | Pending |
+| 42 | Test Migration | 4 | In progress (1/4 plans complete, Jest infrastructure migrated) |
 | 43 | Verification | 4 | Pending |
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 184 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 32)
+- Total plans completed: 185 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 33)
 - Average duration: ~6.1 min per plan
-- Total execution time: ~18.8 hours across 7 milestones
+- Total execution time: ~18.9 hours across 7 milestones
 
 **By Milestone:**
 
@@ -50,7 +50,7 @@ Progress: [█████████████░░░░░░░░░░
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
 | v3.2 Weather & Dashboard | 5 | 13 | 2 days (2026-02-02 - 2026-02-03) |
 | v4.0 Advanced UI | 7 | 24 | 2 days (2026-02-04 - 2026-02-05) |
-| v5.0 TypeScript Migration | 7 | 31 plans (Phases 37-40 complete, Phase 41: 5/7) | In progress |
+| v5.0 TypeScript Migration | 7 | 33 plans (Phases 37-41 complete, Phase 42: 1/4) | In progress |
 
 ## Accumulated Context
 
@@ -103,6 +103,13 @@ Key patterns from previous milestones preserved for v5.0 migration:
 - Domain-specific callback typing: onChange callbacks typed as (newValue: number) => void not ChangeEvent handlers
 - Pragmatic typing at boundaries: Cast useScheduleData/useRoomStatus unknown[] to local Room[]/Schedule[] interfaces
 - Date arithmetic with .getTime(): Required for TypeScript strict mode (endDate.getTime() - now.getTime())
+
+**Phase 42-01 decisions (Jest configuration migration):**
+- Jest ESM exports: Use 'export default' instead of module.exports for TypeScript compatibility
+- Import .js extension: Import from 'next/jest.js' not 'next/jest' for ESM resolution
+- Mixed mock patterns: next-server uses ESM export, react-dom uses module.exports (Jest automatic mock requirement)
+- Global test types: Declare global block in jest.setup.ts for __TEST_ENVIRONMENT__, axe, runAxeWithRealTimers
+- Pragmatic mock typing: Use 'as any' for complex mock objects (NextResponseMock, Observer classes)
 
 ### Pending Todos
 
@@ -210,10 +217,10 @@ From 39-01 (Foundation UI components):
 
 ## Session Continuity
 
-Last session: 2026-02-07 14:50 UTC
-Stopped at: Completed 41-07-PLAN.md — Gap closure: verified all 70 files migrated, fixed component type errors
+Last session: 2026-02-07 15:22 UTC
+Stopped at: Completed 42-01-PLAN.md — Jest config/setup/mocks migrated to TypeScript
 Resume file: None
-Next step: Begin Phase 42 Test Migration
+Next step: Continue Phase 42 Test Migration (Plan 02: UI Component Tests)
 
 From 38-10 (Type definitions gap closure):
 - Type narrowing with 'in' operator for discriminated unions: if ('property' in object)

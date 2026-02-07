@@ -190,6 +190,7 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
           icon={icon}
           title={`${title} Non Connesso`}
           description={connectionError || `Connetti il tuo account per controllare ${title.toLowerCase()}`}
+          level={3}
           action={
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button variant="ember" onClick={onConnect}>

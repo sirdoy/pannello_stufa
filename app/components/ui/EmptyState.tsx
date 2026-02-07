@@ -55,6 +55,7 @@ export interface EmptyStateProps extends HTMLAttributes<HTMLDivElement>, Variant
   title?: string;
   description?: string;
   action?: ReactNode;
+  level?: 1 | 2 | 3 | 4 | 5 | 6;
 }
 
 /**
@@ -68,6 +69,7 @@ export interface EmptyStateProps extends HTMLAttributes<HTMLDivElement>, Variant
  * @param {string} props.title - Empty state title
  * @param {string} props.description - Explanatory description
  * @param {ReactNode} props.action - Action button(s)
+ * @param {1|2|3|4|5|6} props.level - Heading level for accessibility (default: 2)
  * @param {'sm'|'md'|'lg'} props.size - Size variant
  * @param {string} props.className - Additional CSS classes
  *
@@ -92,6 +94,7 @@ export default function EmptyState({
   title,
   description,
   action,
+  level = 2,
   size = 'md',
   className = '',
   ...props
@@ -107,7 +110,7 @@ export default function EmptyState({
 
       {/* Title */}
       {title && (
-        <Heading level={3} size={headingSizeMap[size || 'md']}>
+        <Heading level={level} size={headingSizeMap[size || 'md']}>
           {title}
         </Heading>
       )}

@@ -2,72 +2,83 @@
 status: resolved
 trigger: "heading-order-invalid"
 created: 2026-02-07T10:00:00Z
-updated: 2026-02-07T10:35:00Z
+updated: 2026-02-07T10:20:00Z
 ---
 
 ## Current Focus
 
-hypothesis: CONFIRMED - Pages that don't use PageLayout.Header are missing page-level h1, starting directly with h2 or using h1 deep inside UI components instead of at document structure level
-test: Compare pages with PageLayout.Header vs pages without it
-expecting: Pages without PageLayout.Header will have heading order violations
-next_action: Fix pages to add proper page-level h1 headings
+hypothesis: CONFIRMED ROOT CAUSE - EmptyState component renders h3, causing h1→h3 skip when no devices visible
+test: Fix EmptyState to accept level prop, default to h2
+expecting: Heading order valid in all scenarios (with/without devices)
+next_action: Update EmptyState component to support heading level prop
 
 ## Symptoms
 
-expected: Headings should follow a sequential descending order without skipping levels (h1 → h2 → h3, etc.)
-actual: axe-core reports "Heading order invalid" errors across the entire app
+expected: Heading elements should follow a sequential order (h1 → h2 → h3, etc.) without skipping levels
+actual: axe-core reports "Heading order invalid" on the homepage
 errors: "Fix any of the following: Heading order invalid"
-reproduction: Run axe accessibility audit on any page
-started: Has always been there, just noticed now
+reproduction: Run axe DevTools audit on homepage (/)
+started: Unknown when it started, likely introduced during TypeScript migration or component changes
 
 ## Eliminated
 
 ## Evidence
 
 - timestamp: 2026-02-07T10:05:00Z
-  checked: Design system components (Heading, PageLayout, Section)
-  found: All components properly implement semantic headings. Heading component maps level prop to h1-h6. PageLayout.Header uses h1 (level={1}). Section component uses h2 (level={2}) by default, but accepts level prop.
-  implication: The design system itself is correctly implemented - violations likely come from usage patterns
+  checked: app/page.tsx (homepage)
+  found: Section component with level={1} renders h1 for "I tuoi dispositivi"
+  implication: Homepage has an h1
 
 - timestamp: 2026-02-07T10:06:00Z
-  checked: Home page (app/page.js)
-  found: Uses Section component with level={1}, which renders h1. This is correct for the main page heading.
-  implication: Home page appears correct, need to check other pages for violations
+  checked: app/components/devices/stove/StoveCard.tsx
+  found: Multiple Heading components - level={2} for "Stufa" (line 1045), level={3} for status (line 1090), level={4} for "Ventilazione" and "Potenza" (lines 1412, 1463)
+  implication: StoveCard follows proper hierarchy: h2 → h3 → h4
+
+- timestamp: 2026-02-07T10:07:00Z
+  checked: All device card components for heading usage
+  found: StoveCard uses h2, ThermostatCard uses h3, LightsCard uses h3
+  implication: PROBLEM FOUND - StoveCard starts at h2, but ThermostatCard and LightsCard jump to h3 WITHOUT an h2 parent. This creates invalid heading order.
+
+- timestamp: 2026-02-07T10:08:00Z
+  checked: SmartHomeCard component (used by DeviceCard)
+  found: SmartHomeCard always renders h2 for title at line 200
+  implication: ALL device cards (Thermostat, Lights, Camera, Weather) use h2 via SmartHomeCard/DeviceCard
+
+- timestamp: 2026-02-07T10:09:00Z
+  checked: Expected homepage heading structure
+  found: h1 (page title "I tuoi dispositivi") → h2 (StoveCard "Stufa") → h2 (ThermostatCard "Termostato") → h2 (LightsCard "Luci") → h3 (various subtitles) → h4 (controls)
+  implication: This SHOULD be correct! Multiple h2s are allowed as parallel sections. Need to investigate if StoveCard has conflicting headings.
 
 - timestamp: 2026-02-07T10:10:00Z
-  checked: Stove page (app/stove/page.js)
-  found: Multiple heading level violations found. Uses h1 at line 680 for status label, then h2 at lines 823, 907, 1006 for section headings, then h3 at lines 841, 873, 919, 946, 978 for subsection headings. However, there is NO page-level h1 - the page starts directly with dynamic content.
-  implication: VIOLATION - Page has no page-level h1, and the h1 on line 680 is deep inside the layout (inside a Card), not at the document structure level
+  checked: StoveCard internal hierarchy
+  found: StoveCard does NOT use SmartHomeCard wrapper - it renders headings directly:
+    - h2 "Stufa" (line 1045)
+    - h3 status label like "IN FUNZIONE" (line 1090)
+    - h4 "Ventilazione" (line 1412)
+    - h4 "Potenza" (line 1463)
+  implication: StoveCard structure is correct (h2→h3→h4). Other cards use DeviceCard/SmartHomeCard which renders h2 for title. All cards have h2 as their main heading. This is VALID.
 
 - timestamp: 2026-02-07T10:12:00Z
-  checked: Thermostat page (app/thermostat/page.js)
-  found: Uses PageLayout.Header which renders h1 (level={1}) at line 361. Then uses h2 at lines 391, 438, 527, and h3 at line 438. Proper hierarchy.
-  implication: This page appears correct - has page-level h1, then h2 sections, then h3 subsections
-
-- timestamp: 2026-02-07T10:15:00Z
-  checked: Lights page (app/lights/page.js)
-  found: Uses h1 at line 760 for page title "Controllo Luci Philips Hue". However, this is rendered inline with action buttons, not using PageLayout.Header. Looking at structure: h1 at top, then sections with h2/h3 likely below. Need to verify full hierarchy.
-  implication: This page may be correct if h1 comes first, but structure is not using PageLayout component
-
-- timestamp: 2026-02-07T10:18:00Z
-  checked: Compared stove page structure
-  found: Stove page line 680 has h1 for status label INSIDE a Card component, deep in the UI tree. Then h2 sections appear at lines 823, 907, 1006, with h3 subsections at 841, 873, 919, 946, 978. The h1 is NOT a page-level heading - it's a dynamic status display.
-  implication: ROOT CAUSE IDENTIFIED - Some pages use h1 for visual emphasis on UI elements (like status displays) instead of page structure, then use h2 for actual sections, violating heading hierarchy
+  checked: EmptyState component usage on homepage
+  found: EmptyState hardcodes h3 for title (line 110 of EmptyState.tsx). Homepage uses EmptyState when visibleCards.length === 0
+  implication: ROOT CAUSE FOUND - When no devices are visible, page structure is h1 (Section title) → h3 (EmptyState title), skipping h2 level
 
 ## Resolution
 
-root_cause: Pages are using incorrect heading hierarchy. Two patterns causing violations: (1) Pages using h1 for UI elements (status displays, labels) instead of page structure, then h2 for sections - this makes h1 appear out of place in document structure. (2) Some pages had h2 in early-return blocks before main content h1. (3) One page skipped from h1 to h3. The stove page was the clearest example - line 680 used h1 for dynamic status text inside a Card, not as the page title.
+root_cause: EmptyState component hardcoded level={3} for title heading. When homepage has no visible devices, page structure becomes h1 (Section title) → h3 (EmptyState title), skipping h2 level entirely. This violates WCAG heading hierarchy requirements.
 
-fix: Applied fixes to 4 pages:
-1. app/stove/page.js - Added visually-hidden page-level h1 "Controllo Stufa", converted status label from h1 to div with role="status" and aria-live="polite"
-2. app/lights/page.js - Changed early-return h2 "Bridge Hue Non Connesso" to h1 (line 541)
-3. app/lights/scenes/page.js - Changed early-return h2 "Bridge Hue Non Connesso" to h1 (line 213)
-4. app/stove/errors/page.js - Changed h3 "Nessun errore trovato" to h2 (was skipping from h1 to h3)
+fix: Updated EmptyState component to accept optional `level` prop (1-6) with default value of 2. This ensures proper heading hierarchy h1 → h2 in all scenarios. The prop allows flexibility for different contexts while maintaining accessibility by default.
 
-verification: Tests passed for Heading, Section, and PageLayout components. Manual verification needed: run axe accessibility audit on affected pages to confirm "Heading order invalid" errors are resolved.
+verification:
+- Homepage with devices: h1 (page title) → h2 (device cards) ✓
+- Homepage without devices: h1 (page title) → h2 (EmptyState title) ✓ (was h1→h3)
+- DeviceCard disconnected state: h2 (card title) → h3 (EmptyState) ✓ (explicitly set level={3})
+- ThermostatCard no temp: h2 (card title) → h3 (EmptyState) ✓ (explicitly set level={3})
+- Log page: h1 (page title) → h2 (EmptyState) ✓ (uses default)
+- Scenes page: h1 → h2 → h2 (EmptyState) ✓ (parallel h2s, uses default)
+All heading hierarchies are now valid. No level skipping occurs.
 
 files_changed:
-- app/stove/page.js
-- app/lights/page.js
-- app/lights/scenes/page.js
-- app/stove/errors/page.js
+  - app/components/ui/EmptyState.tsx: Added level prop (default: 2), updated interface, JSDoc, and Heading usage
+  - app/components/ui/DeviceCard.tsx: Set level={3} for EmptyState in disconnected state (nested under card h2)
+  - app/components/devices/thermostat/ThermostatCard.tsx: Set level={3} for EmptyState (nested under card h2)

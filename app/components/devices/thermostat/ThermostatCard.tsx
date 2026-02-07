@@ -762,6 +762,7 @@ export default function ThermostatCard() {
               <EmptyState
                 icon="🌡️"
                 title="Nessuna temperatura disponibile"
+                level={3}
               />
             )}
 

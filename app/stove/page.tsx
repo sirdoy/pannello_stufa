@@ -484,49 +484,49 @@ export default function StovePage() {
   const needsMaintenance = maintenanceStatus?.needsCleaning || false;
   const isWorking = status?.toUpperCase().includes('WORK');
 
-  // Theme colors
+  // Theme colors (dark + light mode via [html:not(.dark)_&] overrides)
   const themeColors = {
     ember: {
-      bg: 'from-ember-950/80 via-slate-950 to-flame-950/60',
-      glow: 'shadow-[0_0_120px_40px_rgba(237,111,16,0.15)]',
-      accent: 'text-ember-400',
-      accentBg: 'bg-ember-500/20',
-      border: 'border-ember-500/30',
+      bg: 'from-ember-950/80 via-slate-950 to-flame-950/60 [html:not(.dark)_&]:from-ember-50/80 [html:not(.dark)_&]:via-slate-50 [html:not(.dark)_&]:to-flame-50/60',
+      glow: 'shadow-[0_0_120px_40px_rgba(237,111,16,0.15)] [html:not(.dark)_&]:shadow-[0_0_80px_30px_rgba(237,111,16,0.06)]',
+      accent: 'text-ember-400 [html:not(.dark)_&]:text-ember-700',
+      accentBg: 'bg-ember-500/20 [html:not(.dark)_&]:bg-ember-500/10',
+      border: 'border-ember-500/30 [html:not(.dark)_&]:border-ember-500/20',
     },
     slate: {
-      bg: 'from-slate-950 via-slate-900 to-slate-950',
+      bg: 'from-slate-950 via-slate-900 to-slate-950 [html:not(.dark)_&]:from-slate-100 [html:not(.dark)_&]:via-slate-50 [html:not(.dark)_&]:to-slate-100',
       glow: '',
-      accent: 'text-slate-400',
-      accentBg: 'bg-slate-500/20',
-      border: 'border-slate-600/30',
+      accent: 'text-slate-400 [html:not(.dark)_&]:text-slate-600',
+      accentBg: 'bg-slate-500/20 [html:not(.dark)_&]:bg-slate-500/10',
+      border: 'border-slate-600/30 [html:not(.dark)_&]:border-slate-300/50',
     },
     ocean: {
-      bg: 'from-ocean-950/80 via-slate-950 to-ocean-950/60',
-      glow: 'shadow-[0_0_100px_30px_rgba(67,125,174,0.12)]',
-      accent: 'text-ocean-400',
-      accentBg: 'bg-ocean-500/20',
-      border: 'border-ocean-500/30',
+      bg: 'from-ocean-950/80 via-slate-950 to-ocean-950/60 [html:not(.dark)_&]:from-ocean-50/80 [html:not(.dark)_&]:via-slate-50 [html:not(.dark)_&]:to-ocean-50/60',
+      glow: 'shadow-[0_0_100px_30px_rgba(67,125,174,0.12)] [html:not(.dark)_&]:shadow-[0_0_60px_20px_rgba(67,125,174,0.06)]',
+      accent: 'text-ocean-400 [html:not(.dark)_&]:text-ocean-700',
+      accentBg: 'bg-ocean-500/20 [html:not(.dark)_&]:bg-ocean-500/10',
+      border: 'border-ocean-500/30 [html:not(.dark)_&]:border-ocean-500/20',
     },
     warning: {
-      bg: 'from-warning-950/60 via-slate-950 to-warning-950/40',
-      glow: 'shadow-[0_0_80px_25px_rgba(234,179,8,0.1)]',
-      accent: 'text-warning-400',
-      accentBg: 'bg-warning-500/20',
-      border: 'border-warning-500/30',
+      bg: 'from-warning-950/60 via-slate-950 to-warning-950/40 [html:not(.dark)_&]:from-warning-50/60 [html:not(.dark)_&]:via-slate-50 [html:not(.dark)_&]:to-warning-50/40',
+      glow: 'shadow-[0_0_80px_25px_rgba(234,179,8,0.1)] [html:not(.dark)_&]:shadow-[0_0_50px_15px_rgba(234,179,8,0.05)]',
+      accent: 'text-warning-400 [html:not(.dark)_&]:text-warning-700',
+      accentBg: 'bg-warning-500/20 [html:not(.dark)_&]:bg-warning-500/10',
+      border: 'border-warning-500/30 [html:not(.dark)_&]:border-warning-500/20',
     },
     danger: {
-      bg: 'from-danger-950/70 via-slate-950 to-danger-950/50',
-      glow: 'shadow-[0_0_100px_35px_rgba(239,68,68,0.15)]',
-      accent: 'text-danger-400',
-      accentBg: 'bg-danger-500/20',
-      border: 'border-danger-500/30',
+      bg: 'from-danger-950/70 via-slate-950 to-danger-950/50 [html:not(.dark)_&]:from-danger-50/70 [html:not(.dark)_&]:via-slate-50 [html:not(.dark)_&]:to-danger-50/50',
+      glow: 'shadow-[0_0_100px_35px_rgba(239,68,68,0.15)] [html:not(.dark)_&]:shadow-[0_0_60px_20px_rgba(239,68,68,0.08)]',
+      accent: 'text-danger-400 [html:not(.dark)_&]:text-danger-700',
+      accentBg: 'bg-danger-500/20 [html:not(.dark)_&]:bg-danger-500/10',
+      border: 'border-danger-500/30 [html:not(.dark)_&]:border-danger-500/20',
     },
     sage: {
-      bg: 'from-sage-950/70 via-slate-950 to-sage-950/50',
-      glow: 'shadow-[0_0_80px_25px_rgba(96,115,96,0.12)]',
-      accent: 'text-sage-400',
-      accentBg: 'bg-sage-500/20',
-      border: 'border-sage-500/30',
+      bg: 'from-sage-950/70 via-slate-950 to-sage-950/50 [html:not(.dark)_&]:from-sage-50/70 [html:not(.dark)_&]:via-slate-50 [html:not(.dark)_&]:to-sage-50/50',
+      glow: 'shadow-[0_0_80px_25px_rgba(96,115,96,0.12)] [html:not(.dark)_&]:shadow-[0_0_50px_15px_rgba(96,115,96,0.06)]',
+      accent: 'text-sage-400 [html:not(.dark)_&]:text-sage-700',
+      accentBg: 'bg-sage-500/20 [html:not(.dark)_&]:bg-sage-500/10',
+      border: 'border-sage-500/30 [html:not(.dark)_&]:border-sage-500/20',
     },
   };
 
@@ -699,20 +699,20 @@ export default function StovePage() {
               {/* Metrics Grid */}
               <div className="grid grid-cols-2 gap-4 sm:gap-6 mb-8">
                 {/* Fan Level Gauge */}
-                <div className={`relative overflow-hidden rounded-2xl bg-slate-900/60 backdrop-blur-xl border ${theme.border} p-5 sm:p-6`}>
+                <div className={`relative overflow-hidden rounded-2xl bg-slate-900/60 [html:not(.dark)_&]:bg-white/70 backdrop-blur-xl border ${theme.border} p-5 sm:p-6`}>
                   <div className="flex flex-col items-center">
                     <span className="text-3xl sm:text-4xl mb-2">💨</span>
-                    <Text size="xs" className="text-slate-400 uppercase tracking-wider mb-1">
+                    <Text size="xs" className="text-slate-400 [html:not(.dark)_&]:text-slate-500 uppercase tracking-wider mb-1">
                       Ventola
                     </Text>
                     <div className="flex items-baseline">
-                      <span className="text-4xl sm:text-5xl font-black text-ocean-400">
+                      <span className="text-4xl sm:text-5xl font-black text-ocean-400 [html:not(.dark)_&]:text-ocean-600">
                         {fanLevel ?? '-'}
                       </span>
-                      <span className="text-lg sm:text-xl font-bold text-slate-600">/6</span>
+                      <span className="text-lg sm:text-xl font-bold text-slate-600 [html:not(.dark)_&]:text-slate-400">/6</span>
                     </div>
                     {/* Mini bar indicator */}
-                    <div className="w-full mt-3 h-2 bg-slate-800 rounded-full overflow-hidden">
+                    <div className="w-full mt-3 h-2 bg-slate-800 [html:not(.dark)_&]:bg-slate-200 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-gradient-to-r from-ocean-500 to-ocean-400 transition-all duration-300"
                         style={{ width: fanLevel ? `${(fanLevel / 6) * 100}%` : '0%' }}
@@ -722,20 +722,20 @@ export default function StovePage() {
                 </div>
 
                 {/* Power Level Gauge */}
-                <div className={`relative overflow-hidden rounded-2xl bg-slate-900/60 backdrop-blur-xl border ${theme.border} p-5 sm:p-6`}>
+                <div className={`relative overflow-hidden rounded-2xl bg-slate-900/60 [html:not(.dark)_&]:bg-white/70 backdrop-blur-xl border ${theme.border} p-5 sm:p-6`}>
                   <div className="flex flex-col items-center">
                     <span className="text-3xl sm:text-4xl mb-2">⚡</span>
-                    <Text size="xs" className="text-slate-400 uppercase tracking-wider mb-1">
+                    <Text size="xs" className="text-slate-400 [html:not(.dark)_&]:text-slate-500 uppercase tracking-wider mb-1">
                       Potenza
                     </Text>
                     <div className="flex items-baseline">
-                      <span className="text-4xl sm:text-5xl font-black text-ember-400">
+                      <span className="text-4xl sm:text-5xl font-black text-ember-400 [html:not(.dark)_&]:text-ember-600">
                         {powerLevel ?? '-'}
                       </span>
-                      <span className="text-lg sm:text-xl font-bold text-slate-600">/5</span>
+                      <span className="text-lg sm:text-xl font-bold text-slate-600 [html:not(.dark)_&]:text-slate-400">/5</span>
                     </div>
                     {/* Mini bar indicator */}
-                    <div className="w-full mt-3 h-2 bg-slate-800 rounded-full overflow-hidden">
+                    <div className="w-full mt-3 h-2 bg-slate-800 [html:not(.dark)_&]:bg-slate-200 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-gradient-to-r from-ember-500 to-flame-400 transition-all duration-300"
                         style={{ width: powerLevel ? `${(powerLevel / 5) * 100}%` : '0%' }}
@@ -770,12 +770,12 @@ export default function StovePage() {
               </div>
 
               {/* Mode Indicator */}
-              <div className={`rounded-2xl bg-slate-900/50 backdrop-blur-xl border ${theme.border} p-4 sm:p-5`}>
+              <div className={`rounded-2xl bg-slate-900/50 [html:not(.dark)_&]:bg-white/60 backdrop-blur-xl border ${theme.border} p-4 sm:p-5`}>
                 <div className="flex items-center gap-4">
                   <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    schedulerEnabled && semiManualMode ? 'bg-warning-900/50 border-2 border-warning-500/50' :
-                    schedulerEnabled ? 'bg-sage-900/50 border-2 border-sage-500/50' :
-                    'bg-ember-900/50 border-2 border-ember-500/50'
+                    schedulerEnabled && semiManualMode ? 'bg-warning-900/50 [html:not(.dark)_&]:bg-warning-100 border-2 border-warning-500/50 [html:not(.dark)_&]:border-warning-300' :
+                    schedulerEnabled ? 'bg-sage-900/50 [html:not(.dark)_&]:bg-sage-100 border-2 border-sage-500/50 [html:not(.dark)_&]:border-sage-300' :
+                    'bg-ember-900/50 [html:not(.dark)_&]:bg-ember-100 border-2 border-ember-500/50 [html:not(.dark)_&]:border-ember-300'
                   }`}>
                     <span className="text-2xl sm:text-3xl">
                       {schedulerEnabled && semiManualMode ? '⚙️' : schedulerEnabled ? '⏰' : '🔧'}
@@ -783,8 +783,8 @@ export default function StovePage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <Text className={`text-base sm:text-lg ${
-                      schedulerEnabled && semiManualMode ? 'text-warning-400' :
-                      schedulerEnabled ? 'text-sage-400' : 'text-ember-400'
+                      schedulerEnabled && semiManualMode ? 'text-warning-400 [html:not(.dark)_&]:text-warning-700' :
+                      schedulerEnabled ? 'text-sage-400 [html:not(.dark)_&]:text-sage-700' : 'text-ember-400 [html:not(.dark)_&]:text-ember-700'
                     }`}>
                       {schedulerEnabled && semiManualMode ? 'Semi-manuale' : schedulerEnabled ? 'Automatica' : 'Manuale'}
                     </Text>
@@ -844,7 +844,7 @@ export default function StovePage() {
             {/* Fan Control */}
             <Card variant="glass" className="overflow-hidden">
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-ocean-900/50 flex items-center justify-center border-2 border-ocean-500/50">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-ocean-900/50 [html:not(.dark)_&]:bg-ocean-100 flex items-center justify-center border-2 border-ocean-500/50 [html:not(.dark)_&]:border-ocean-300">
                   <span className="text-xl sm:text-2xl">💨</span>
                 </div>
                 <Heading level={3} size="lg">Ventilazione</Heading>
@@ -860,8 +860,8 @@ export default function StovePage() {
                 <div className="flex flex-col items-center px-6">
                   <Text variant="label" size="sm" className="mb-1">Livello</Text>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-5xl sm:text-6xl font-black text-ocean-400">{fanLevel ?? '-'}</span>
-                    <span className="text-xl font-bold text-slate-500">/6</span>
+                    <span className="text-5xl sm:text-6xl font-black text-ocean-400 [html:not(.dark)_&]:text-ocean-600">{fanLevel ?? '-'}</span>
+                    <span className="text-xl font-bold text-slate-500 [html:not(.dark)_&]:text-slate-400">/6</span>
                   </div>
                 </div>
                 <ControlButton
@@ -876,7 +876,7 @@ export default function StovePage() {
             {/* Power Control */}
             <Card variant="glass" className="overflow-hidden">
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-ember-900/50 flex items-center justify-center border-2 border-ember-500/50">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-ember-900/50 [html:not(.dark)_&]:bg-ember-100 flex items-center justify-center border-2 border-ember-500/50 [html:not(.dark)_&]:border-ember-300">
                   <span className="text-xl sm:text-2xl">⚡</span>
                 </div>
                 <Heading level={3} size="lg">Potenza</Heading>
@@ -892,8 +892,8 @@ export default function StovePage() {
                 <div className="flex flex-col items-center px-6">
                   <Text variant="label" size="sm" className="mb-1">Livello</Text>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-5xl sm:text-6xl font-black text-ember-400">{powerLevel ?? '-'}</span>
-                    <span className="text-xl font-bold text-slate-500">/5</span>
+                    <span className="text-5xl sm:text-6xl font-black text-ember-400 [html:not(.dark)_&]:text-ember-600">{powerLevel ?? '-'}</span>
+                    <span className="text-xl font-bold text-slate-500 [html:not(.dark)_&]:text-slate-400">/5</span>
                   </div>
                 </div>
                 <ControlButton
@@ -921,11 +921,11 @@ export default function StovePage() {
             <Link href="/stove/scheduler" className="block group">
               <Card variant="glass" className="h-full transition-all duration-300 hover:shadow-sage-glow hover:scale-[1.02] hover:border-sage-500/40">
                 <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-sage-900/50 flex items-center justify-center border border-sage-500/30 group-hover:border-sage-500/60 transition-colors flex-shrink-0">
+                  <div className="w-14 h-14 rounded-2xl bg-sage-900/50 [html:not(.dark)_&]:bg-sage-100 flex items-center justify-center border border-sage-500/30 [html:not(.dark)_&]:border-sage-300 group-hover:border-sage-500/60 transition-colors flex-shrink-0">
                     <span className="text-3xl">📅</span>
                   </div>
                   <div className="min-w-0 flex-1">
-                    <Heading level={3} size="md" className="group-hover:text-sage-400 transition-colors mb-1">
+                    <Heading level={3} size="md" className="group-hover:text-sage-400 [html:not(.dark)_&]:group-hover:text-sage-600 transition-colors mb-1">
                       Pianificazione
                     </Heading>
                     <Text variant="tertiary" size="sm">
@@ -948,11 +948,11 @@ export default function StovePage() {
             <Link href="/stove/maintenance" className="block group">
               <Card variant="glass" className="h-full transition-all duration-300 hover:shadow-ocean-glow hover:scale-[1.02] hover:border-ocean-500/40">
                 <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-ocean-900/50 flex items-center justify-center border border-ocean-500/30 group-hover:border-ocean-500/60 transition-colors flex-shrink-0">
+                  <div className="w-14 h-14 rounded-2xl bg-ocean-900/50 [html:not(.dark)_&]:bg-ocean-100 flex items-center justify-center border border-ocean-500/30 [html:not(.dark)_&]:border-ocean-300 group-hover:border-ocean-500/60 transition-colors flex-shrink-0">
                     <span className="text-3xl">🔧</span>
                   </div>
                   <div className="min-w-0 flex-1">
-                    <Heading level={3} size="md" className="group-hover:text-ocean-400 transition-colors mb-1">
+                    <Heading level={3} size="md" className="group-hover:text-ocean-400 [html:not(.dark)_&]:group-hover:text-ocean-600 transition-colors mb-1">
                       Manutenzione
                     </Heading>
                     <Text variant="tertiary" size="sm">
@@ -980,11 +980,11 @@ export default function StovePage() {
             <Link href="/stove/errors" className="block group">
               <Card variant="glass" className="h-full transition-all duration-300 hover:shadow-ember-glow hover:scale-[1.02] hover:border-ember-500/40">
                 <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-ember-900/50 flex items-center justify-center border border-ember-500/30 group-hover:border-ember-500/60 transition-colors flex-shrink-0">
+                  <div className="w-14 h-14 rounded-2xl bg-ember-900/50 [html:not(.dark)_&]:bg-ember-100 flex items-center justify-center border border-ember-500/30 [html:not(.dark)_&]:border-ember-300 group-hover:border-ember-500/60 transition-colors flex-shrink-0">
                     <span className="text-3xl">🚨</span>
                   </div>
                   <div className="min-w-0 flex-1">
-                    <Heading level={3} size="md" className="group-hover:text-ember-400 transition-colors mb-1">
+                    <Heading level={3} size="md" className="group-hover:text-ember-400 [html:not(.dark)_&]:group-hover:text-ember-600 transition-colors mb-1">
                       Storico Allarmi
                     </Heading>
                     <Text variant="tertiary" size="sm">

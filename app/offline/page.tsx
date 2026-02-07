@@ -257,7 +257,7 @@ export default function OfflinePage() {
               </div>
             )}
             {stoveState.needsCleaning && (
-              <StatusBadge status="warning" label="Pulizia richiesta" />
+              <StatusBadge status="warning">Pulizia richiesta</StatusBadge>
             )}
           </div>
 
@@ -287,7 +287,7 @@ export default function OfflinePage() {
               </div>
             </div>
             {thermostatState.isHeating && (
-              <StatusBadge status="warning" label="Riscaldamento" />
+              <StatusBadge status="warning">Riscaldamento</StatusBadge>
             )}
           </div>
 

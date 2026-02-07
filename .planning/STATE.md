@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 41 - Pages Migration
-Plan: 1 of 7 (IN PROGRESS)
-Status: In progress — Root files, context providers, and standalone pages migrated to TypeScript
-Last activity: 2026-02-07 — Completed 41-01-PLAN.md (11 files migrated)
+Plan: 4 of 7 (IN PROGRESS)
+Status: In progress — Settings pages migrated to TypeScript
+Last activity: 2026-02-07 — Completed 41-04-PLAN.md (10 settings pages migrated)
 
-Progress: [██████████░░░░░░░░░░░░░░] 57% (4/7 phases complete, Phase 41: 1/7 plans)
+Progress: [██████████░░░░░░░░░░░░░░] 57% (4/7 phases complete, Phase 41: 4/7 plans)
 
 ## Milestone Overview
 
@@ -29,16 +29,16 @@ Progress: [██████████░░░░░░░░░░░░░
 | 38 | Library Migration | 4 | COMPLETE (4/4) |
 | 39 | UI Components Migration | 3 | COMPLETE (11/11 plans, 137/137 files migrated, 0 tsc errors) |
 | 40 | API Routes Migration | 3 | COMPLETE (7/7 plans, 90/90 files migrated, 0 tsc errors) |
-| 41 | Pages Migration | 3 | IN PROGRESS (1/7 plans complete, 11/11 files migrated in 41-01) |
+| 41 | Pages Migration | 3 | IN PROGRESS (4/7 plans complete, 41 files migrated) |
 | 42 | Test Migration | 4 | Pending |
 | 43 | Verification | 4 | Pending |
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 182 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 30)
+- Total plans completed: 185 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 33)
 - Average duration: ~6.0 min per plan
-- Total execution time: ~18.0 hours across 7 milestones
+- Total execution time: ~18.5 hours across 7 milestones
 
 **By Milestone:**
 
@@ -206,9 +206,9 @@ From 39-01 (Foundation UI components):
 ## Session Continuity
 
 Last session: 2026-02-07
-Stopped at: Completed 41-01-PLAN.md — root files, context providers, and standalone pages migrated
+Stopped at: Completed 41-04-PLAN.md — all settings pages migrated to TypeScript
 Resume file: None
-Next step: Continue Phase 41 Pages Migration with remaining plans (41-02 through 41-07)
+Next step: Continue Phase 41 Pages Migration with remaining plans (41-05 through 41-07)
 
 From 38-10 (Type definitions gap closure):
 - Type narrowing with 'in' operator for discriminated unions: if ('property' in object)
@@ -355,3 +355,12 @@ From 41-01 (Root files, context providers, standalone pages):
 - Explicit function return types for all async functions and callbacks (async (): Promise<void> =>)
 - Type unions for constrained string values (Source = 'local' | 'firebase', DeviceFilter = 'all' | 'stove' | ...)
 - Helper function typing: explicit parameter and return types for all helper functions
+
+From 41-04 (Settings pages migration):
+- Edge-typing pattern for large files (700+ lines): type boundaries (props, callbacks) not internals
+- Form preferences interface pattern: NotificationPreferences with enabledTypes, dndWindows, timezone, rateLimits
+- SaveMessage type pattern: { type: 'success' | 'error'; text: string } for reusable feedback state
+- Settings page typing: interface for data, typed callbacks with proper parameters
+- Form component props interface: initialValues, onSubmit, isLoading, isSaving
+- Device/preference state typing: Record<string, T> for flexible structures (DevicePreferences, NotificationDevice)
+- TestResult union types: 'success' | 'error' | 'no_tokens' for state machines

@@ -21,20 +21,37 @@ import NETATMO_CAMERA_API from '@/lib/netatmoCameraApi';
 import HlsPlayer from '@/app/components/devices/camera/HlsPlayer';
 import EventPreviewModal from '@/app/components/devices/camera/EventPreviewModal';
 
+interface Camera {
+  id: string;
+  name: string;
+  status: string;
+  sd_status?: string;
+  alim_status?: string;
+}
+
+interface CameraEvent {
+  id: string;
+  type: string;
+  time: number;
+  camera_id: string;
+  snapshot?: { url?: string };
+  video_id?: string;
+}
+
 export default function CameraDashboard() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [needsReauth, setNeedsReauth] = useState(false);
-  const [cameras, setCameras] = useState([]);
-  const [events, setEvents] = useState([]);
-  const [selectedCameraId, setSelectedCameraId] = useState(null);
-  const [snapshotUrls, setSnapshotUrls] = useState({});
-  const [refreshing, setRefreshing] = useState(false);
-  const [isLiveMode, setIsLiveMode] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [needsReauth, setNeedsReauth] = useState<boolean>(false);
+  const [cameras, setCameras] = useState<Camera[]>([]);
+  const [events, setEvents] = useState<CameraEvent[]>([]);
+  const [selectedCameraId, setSelectedCameraId] = useState<string | null>(null);
+  const [snapshotUrls, setSnapshotUrls] = useState<Record<string, string>>({});
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [isLiveMode, setIsLiveMode] = useState<boolean>(false);
+  const [selectedEvent, setSelectedEvent] = useState<CameraEvent | null>(null);
 
-  const fetchedRef = useRef(false);
+  const fetchedRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (fetchedRef.current) return;
@@ -42,14 +59,14 @@ export default function CameraDashboard() {
     fetchData();
   }, []);
 
-  async function fetchData() {
+  async function fetchData(): Promise<void> {
     try {
       setLoading(true);
       setError(null);
       setNeedsReauth(false);
 
       const response = await fetch(CAMERA_ROUTES.list);
-      const data = await response.json();
+      const data: any = await response.json();
 
       // Check if needs reconnection
       if (data.reconnect) {
@@ -75,7 +92,7 @@ export default function CameraDashboard() {
       setEvents(data.events || []);
 
       // Fetch snapshots for all cameras
-      const urls = {};
+      const urls: Record<string, string> = {};
       for (const camera of data.cameras || []) {
         try {
           const snapRes = await fetch(CAMERA_ROUTES.snapshot(camera.id));

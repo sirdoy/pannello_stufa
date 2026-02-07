@@ -18,21 +18,35 @@ import {
 import NETATMO_CAMERA_API from '@/lib/netatmoCameraApi';
 import EventPreviewModal from '@/app/components/devices/camera/EventPreviewModal';
 
+interface Camera {
+  id: string;
+  name: string;
+}
+
+interface CameraEvent {
+  id: string;
+  type: string;
+  time: number;
+  camera_id: string;
+  snapshot?: { url?: string };
+  video_id?: string;
+}
+
 export default function CameraEventsPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [cameras, setCameras] = useState([]);
-  const [events, setEvents] = useState([]);
-  const [selectedCameraId, setSelectedCameraId] = useState('all');
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [refreshing, setRefreshing] = useState(false);
-  const [totalEvents, setTotalEvents] = useState(0);
-  const [displayCount, setDisplayCount] = useState(20); // Virtual scrolling - show 20 at a time
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [cameras, setCameras] = useState<Camera[]>([]);
+  const [events, setEvents] = useState<CameraEvent[]>([]);
+  const [selectedCameraId, setSelectedCameraId] = useState<string>('all');
+  const [selectedEvent, setSelectedEvent] = useState<CameraEvent | null>(null);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [totalEvents, setTotalEvents] = useState<number>(0);
+  const [displayCount, setDisplayCount] = useState<number>(20);
 
-  const fetchedRef = useRef(false);
-  const loadMoreRef = useRef(null);
-  const observerRef = useRef(null);
+  const fetchedRef = useRef<boolean>(false);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     if (fetchedRef.current) return;
@@ -40,14 +54,14 @@ export default function CameraEventsPage() {
     fetchData();
   }, []);
 
-  async function fetchData() {
+  async function fetchData(): Promise<void> {
     try {
       setLoading(true);
       setError(null);
 
       // Fetch all events at once (API returns up to ~200)
       const response = await fetch(CAMERA_ROUTES.allEvents);
-      const data = await response.json();
+      const data: any = await response.json();
 
       if (data.reconnect || data.error) {
         throw new Error(data.error || 'Autorizzazione richiesta');
@@ -59,21 +73,21 @@ export default function CameraEventsPage() {
       setDisplayCount(20); // Reset to initial display count
     } catch (err) {
       console.error('Error fetching camera events:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Errore sconosciuto');
     } finally {
       setLoading(false);
     }
   }
 
   // Virtual scrolling - show more events when scrolling
-  const handleLoadMore = useCallback(() => {
+  const handleLoadMore = useCallback((): void => {
     setDisplayCount(prev => prev + 20);
   }, []);
 
   // Filter events by selected camera
   const filteredEvents = selectedCameraId === 'all'
     ? events
-    : events.filter(e => e.camera_id === selectedCameraId);
+    : events.filter((e: CameraEvent) => e.camera_id === selectedCameraId);
 
   // Check if there are more events to show
   const hasMore = displayCount < filteredEvents.length;

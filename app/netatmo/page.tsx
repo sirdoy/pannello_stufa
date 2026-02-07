@@ -122,7 +122,7 @@ function NetatmoHubContent() {
         {/* Navigation Options */}
         <div className="space-y-4">
           <Button
-            variant="primary"
+            variant="ember"
             onClick={() => router.push('/thermostat')}
             className="w-full"
           >
@@ -133,7 +133,7 @@ function NetatmoHubContent() {
           </Button>
 
           <Button
-            variant="ocean"
+            variant="subtle"
             onClick={() => router.push('/camera')}
             className="w-full"
           >

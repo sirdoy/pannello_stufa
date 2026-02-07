@@ -216,7 +216,7 @@ export default function OfflinePage() {
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 Ambiente
               </Text>
-              <Text size="2xl" weight="semibold" className="text-ember-500 dark:text-ember-400">
+              <Text size="xl" className="text-ember-500 dark:text-ember-400">
                 {stoveState.temperature != null
                   ? `${stoveState.temperature}°`
                   : '--'}
@@ -228,7 +228,7 @@ export default function OfflinePage() {
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 Target
               </Text>
-              <Text size="2xl" weight="semibold">
+              <Text size="xl">
                 {stoveState.setpoint != null
                   ? `${stoveState.setpoint}°`
                   : '--'}
@@ -240,7 +240,7 @@ export default function OfflinePage() {
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 Fumi
               </Text>
-              <Text size="2xl" weight="semibold">
+              <Text size="xl">
                 {stoveState.exhaustTemp != null
                   ? `${stoveState.exhaustTemp}°`
                   : '--'}
@@ -253,7 +253,7 @@ export default function OfflinePage() {
             {stoveState.powerLevel != null && (
               <div className="flex items-center gap-2">
                 <Text variant="tertiary" size="sm">Potenza:</Text>
-                <Text size="sm" weight="medium">{stoveState.powerLevel}</Text>
+                <Text size="sm">{stoveState.powerLevel}</Text>
               </div>
             )}
             {stoveState.needsCleaning && (
@@ -298,7 +298,7 @@ export default function OfflinePage() {
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 {thermostatState.roomName || 'Temperatura'}
               </Text>
-              <Text size="3xl" weight="semibold" className="text-ocean-500 dark:text-ocean-400">
+              <Text size="xl" className="text-ocean-500 dark:text-ocean-400">
                 {thermostatState.temperature != null
                   ? `${thermostatState.temperature.toFixed(1)}°`
                   : '--'}
@@ -315,7 +315,7 @@ export default function OfflinePage() {
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 Target
               </Text>
-              <Text size="3xl" weight="semibold">
+              <Text size="xl">
                 {thermostatState.setpoint != null
                   ? `${thermostatState.setpoint}°`
                   : '--'}

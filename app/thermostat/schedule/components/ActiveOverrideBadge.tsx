@@ -93,7 +93,7 @@ export default function ActiveOverrideBadge({
         <div className="flex items-center gap-2">
           <Flame className="text-ember-400" size={20} />
           <div className="text-left">
-            <Text variant="body" weight="bold" className="text-ember-300">
+            <Text variant="body" className="text-ember-300">
               {room.setpoint}°C
             </Text>
             <Text variant="tertiary" size="xs">

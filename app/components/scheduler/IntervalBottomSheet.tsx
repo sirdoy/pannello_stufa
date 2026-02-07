@@ -64,17 +64,17 @@ export default function IntervalBottomSheet({
           leftContent={
             <>
               <Text as="span" className="text-xl">⚡</Text>
-              <Text as="span" variant="secondary" size="sm" weight="semibold">
+              <Text as="span" variant="secondary" size="sm">
                 Potenza
               </Text>
             </>
           }
           rightContent={
             <>
-              <Text as="span" variant="tertiary" size="xs" weight="bold">
+              <Text as="span" variant="tertiary" size="xs">
                 P{range.power}
               </Text>
-              <Text as="span" size="sm" weight="medium">
+              <Text as="span" size="sm">
                 {powerLabel.text}
               </Text>
             </>
@@ -92,17 +92,17 @@ export default function IntervalBottomSheet({
           leftContent={
             <>
               <Text as="span" className="text-xl">💨</Text>
-              <Text as="span" variant="secondary" size="sm" weight="semibold">
+              <Text as="span" variant="secondary" size="sm">
                 Ventola
               </Text>
             </>
           }
           rightContent={
             <>
-              <Text as="span" variant="tertiary" size="xs" weight="bold">
+              <Text as="span" variant="tertiary" size="xs">
                 V{range.fan}
               </Text>
-              <Text as="span" size="sm" weight="medium">
+              <Text as="span" size="sm">
                 {fanLabel.text}
               </Text>
             </>

@@ -83,7 +83,7 @@ export default function ProgressBar({
           {/* Left side */}
           {leftContent && <div className="flex items-center gap-2">{leftContent}</div>}
           {label && !leftContent && (
-            <Text variant="secondary" size="sm" weight="semibold" as="span">{label}</Text>
+            <Text variant="secondary" size="sm" as="span">{label}</Text>
           )}
 
           {/* Right side */}

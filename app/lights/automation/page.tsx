@@ -76,7 +76,7 @@ export default function AutomationPage() {
           </Text>
           <div className="flex gap-3">
             <Button
-              variant="primary"
+              variant="ember"
               onClick={() => router.push('/lights')}
             >
               💡 Controlla Luci

@@ -87,7 +87,7 @@ export default function WhatsNewModal({ isOpen, onClose, dontShowAgain }: WhatsN
 
           {/* Version badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full relative z-10">
-            <Text as="span" size="sm" weight="semibold" className="text-white">Versione {APP_VERSION}</Text>
+            <Text as="span" size="sm" className="text-white">Versione {APP_VERSION}</Text>
             <Text as="span" size="xs" className="text-white/75">
               {new Date(currentVersionData.date).toLocaleDateString('it-IT', {
                 day: '2-digit',
@@ -120,7 +120,7 @@ export default function WhatsNewModal({ isOpen, onClose, dontShowAgain }: WhatsN
             >
               <div className="flex items-center gap-2">
                 <Text as="span" className="text-2xl">📋</Text>
-                <Text as="span" variant="secondary" size="sm" weight="medium" className="group-hover:text-ember-400 [html:not(.dark)_&]:group-hover:text-ember-600">
+                <Text as="span" variant="secondary" size="sm" className="group-hover:text-ember-400 [html:not(.dark)_&]:group-hover:text-ember-600">
                   Vedi changelog completo
                 </Text>
               </div>

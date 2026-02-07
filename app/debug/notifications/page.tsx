@@ -210,7 +210,7 @@ export default function NotificationsDashboard() {
 
         {error && (
           <div className="mt-4 p-4 rounded-lg bg-ember-50 [html:not(.dark)_&]:bg-ember-50 border border-ember-200 [html:not(.dark)_&]:border-ember-300">
-            <Text variant="ember" size="sm" weight="semibold">
+            <Text variant="ember" size="sm">
               ⚠️ Error loading dashboard: {error}
             </Text>
           </div>
@@ -225,7 +225,7 @@ export default function NotificationsDashboard() {
             <Text variant="tertiary" size="xs" className="mb-2">
               Today's Notifications
             </Text>
-            <Text as="p" variant="ocean" weight="bold" className="text-4xl">
+            <Text variant="tertiary" className="text-4xl">
               {stats.notifications.total}
             </Text>
             <Text variant="secondary" size="xs" className="mt-2">
@@ -247,7 +247,7 @@ export default function NotificationsDashboard() {
             <Text
               as="p"
               variant={getDeliveryRateColor(stats.notifications.deliveryRate)}
-              weight="bold"
+             
               className="text-4xl"
             >
               {stats.notifications.deliveryRate.toFixed(1)}%
@@ -262,7 +262,7 @@ export default function NotificationsDashboard() {
             <Text variant="tertiary" size="xs" className="mb-2">
               Active Devices
             </Text>
-            <Text as="p" weight="bold" className="text-4xl">
+            <Text as="p" className="text-4xl">
               {stats.devices.active}
             </Text>
             <Text variant="secondary" size="xs" className="mt-2">
@@ -282,20 +282,20 @@ export default function NotificationsDashboard() {
             <div className="flex gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <Text variant="tertiary" size="xs">Total:</Text>
-                <Text weight="semibold" size="sm">
+                <Text size="sm">
                   {trends.summary.totalNotifications}
                 </Text>
               </div>
               <div className="flex items-center gap-2">
                 <Text variant="tertiary" size="xs">Avg Rate:</Text>
-                <Text weight="semibold" size="sm">
+                <Text size="sm">
                   {trends.summary.averageDeliveryRate}%
                 </Text>
               </div>
               <div className="flex items-center gap-2">
                 <Text
                   variant={getTrendIcon(trends.summary.trend).color}
-                  weight="semibold"
+                 
                   size="sm"
                 >
                   {getTrendIcon(trends.summary.trend).icon} {trends.summary.trend}
@@ -327,8 +327,8 @@ export default function NotificationsDashboard() {
                 Current Delivery Rate
               </Text>
               <Text
-                size="2xl"
-                weight="bold"
+                size="xl"
+               
                 variant={getDeliveryRateColor(stats.notifications.deliveryRate)}
               >
                 {stats.notifications.deliveryRate.toFixed(1)}%
@@ -342,7 +342,7 @@ export default function NotificationsDashboard() {
               <Text variant="tertiary" size="xs" className="mb-2">
                 Last Alert Sent
               </Text>
-              <Text size="lg" weight="medium">
+              <Text size="lg">
                 {alertInfo?.lastAlertSent
                   ? formatDate(alertInfo.lastAlertSent)
                   : 'Never'}
@@ -386,7 +386,7 @@ export default function NotificationsDashboard() {
               <Text variant="secondary" size="sm">
                 Total Errors
               </Text>
-              <Text weight="bold" size="lg" variant="ember">
+              <Text size="lg" variant="ember">
                 {stats.errors.total}
               </Text>
             </div>
@@ -409,7 +409,7 @@ export default function NotificationsDashboard() {
                         <Text size="sm" className="font-mono">
                           {code}
                         </Text>
-                        <Text size="sm" weight="semibold" variant="ember">
+                        <Text size="sm" variant="ember">
                           {count}
                         </Text>
                       </div>
@@ -439,22 +439,22 @@ export default function NotificationsDashboard() {
               <thead>
                 <tr className="border-b border-white/[0.06] [html:not(.dark)_&]:border-black/[0.06]">
                   <th className="text-left py-3 px-4">
-                    <Text variant="tertiary" size="xs" weight="semibold" uppercase>
+                    <Text variant="tertiary" size="xs" uppercase>
                       Device
                     </Text>
                   </th>
                   <th className="text-left py-3 px-4">
-                    <Text variant="tertiary" size="xs" weight="semibold" uppercase>
+                    <Text variant="tertiary" size="xs" uppercase>
                       Platform
                     </Text>
                   </th>
                   <th className="text-left py-3 px-4">
-                    <Text variant="tertiary" size="xs" weight="semibold" uppercase>
+                    <Text variant="tertiary" size="xs" uppercase>
                       Last Used
                     </Text>
                   </th>
                   <th className="text-left py-3 px-4">
-                    <Text variant="tertiary" size="xs" weight="semibold" uppercase>
+                    <Text variant="tertiary" size="xs" uppercase>
                       Status
                     </Text>
                   </th>
@@ -469,7 +469,7 @@ export default function NotificationsDashboard() {
                       className="border-b border-white/[0.04] [html:not(.dark)_&]:border-black/[0.04] hover:bg-white/[0.02] [html:not(.dark)_&]:hover:bg-black/[0.02]"
                     >
                       <td className="py-3 px-4">
-                        <Text size="sm" weight="medium">
+                        <Text size="sm">
                           {device.displayName}
                         </Text>
                         <Text variant="tertiary" size="xs" className="font-mono mt-1">
@@ -488,7 +488,7 @@ export default function NotificationsDashboard() {
                         >
                           <Text
                             size="xs"
-                            weight="semibold"
+                           
                             className={statusBadge.text}
                           >
                             {statusBadge.label}

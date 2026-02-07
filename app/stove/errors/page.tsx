@@ -101,7 +101,7 @@ export default function ErrorsPage() {
       <Card variant="glass" className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <Heading level={1} size="3xl" weight="bold" className="flex items-center gap-3">
+            <Heading level={1} size="3xl" className="flex items-center gap-3">
               <span>🚨</span>
               Storico Allarmi
             </Heading>
@@ -150,7 +150,7 @@ export default function ErrorsPage() {
         {paginatedErrors.length === 0 ? (
           <Card variant="glass" className="p-12 text-center">
             <span className="text-6xl mb-4 block">✅</span>
-            <Heading level={2} size="xl" weight="bold" className="mb-2">
+            <Heading level={2} size="xl" className="mb-2">
               Nessun errore trovato
             </Heading>
             <Text variant="tertiary">
@@ -173,7 +173,7 @@ export default function ErrorsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-700 [html:not(.dark)_&]:border-slate-200">
                   <div>
                     <Text variant="tertiary" size="xs" className="mb-1">Data e Ora</Text>
-                    <Text size="sm" weight="medium">
+                    <Text size="sm">
                       {formatDate(error.timestamp)}
                     </Text>
                   </div>
@@ -181,7 +181,7 @@ export default function ErrorsPage() {
                   {error.status && (
                     <div>
                       <Text variant="tertiary" size="xs" className="mb-1">Stato Stufa</Text>
-                      <Text size="sm" weight="medium">
+                      <Text size="sm">
                         {error.status}
                       </Text>
                     </div>
@@ -201,7 +201,7 @@ export default function ErrorsPage() {
                   {error.resolved && error.resolvedAt && (
                     <div>
                       <Text variant="tertiary" size="xs" className="mb-1">Risolto Dopo</Text>
-                      <Text size="sm" weight="medium">
+                      <Text size="sm">
                         {formatDuration(error.timestamp, error.resolvedAt)}
                       </Text>
                     </div>

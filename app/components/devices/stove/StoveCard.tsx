@@ -1119,14 +1119,14 @@ export default function StoveCard() {
                               <div className="flex items-center gap-1.5 mb-1.5">
                                 <span className="text-xl sm:text-2xl">💨</span>
                               </div>
-                              <Text weight="bold" className={`text-[10px] sm:text-xs font-display ${statusInfo.boxLabelColor} uppercase tracking-wider mb-1`}>
+                              <Text className={`text-[10px] sm:text-xs font-display ${statusInfo.boxLabelColor} uppercase tracking-wider mb-1`}>
                                 Ventola
                               </Text>
                               <div className="flex items-baseline gap-0.5">
-                                <Text weight="black" className={`text-2xl sm:text-3xl font-display ${statusInfo.boxValueColor} leading-none`}>
+                                <Text className={`text-2xl sm:text-3xl font-display ${statusInfo.boxValueColor} leading-none`}>
                                   {fanLevel ?? '-'}
                                 </Text>
-                                <Text as="span" weight="semibold" className={`text-sm sm:text-base ${statusInfo.boxSuffixColor}`}>/6</Text>
+                                <Text as="span" className={`text-sm sm:text-base ${statusInfo.boxSuffixColor}`}>/6</Text>
                               </div>
                             </div>
                           </div>
@@ -1137,14 +1137,14 @@ export default function StoveCard() {
                               <div className="flex items-center gap-1.5 mb-1.5">
                                 <span className="text-xl sm:text-2xl">⚡</span>
                               </div>
-                              <Text weight="bold" className={`text-[10px] sm:text-xs font-display ${statusInfo.boxLabelColor} uppercase tracking-wider mb-1`}>
+                              <Text className={`text-[10px] sm:text-xs font-display ${statusInfo.boxLabelColor} uppercase tracking-wider mb-1`}>
                                 Potenza
                               </Text>
                               <div className="flex items-baseline gap-0.5">
-                                <Text weight="black" className={`text-2xl sm:text-3xl font-display ${statusInfo.boxValueColor} leading-none`}>
+                                <Text className={`text-2xl sm:text-3xl font-display ${statusInfo.boxValueColor} leading-none`}>
                                   {powerLevel ?? '-'}
                                 </Text>
-                                <Text as="span" weight="semibold" className={`text-sm sm:text-base ${statusInfo.boxSuffixColor}`}>/5</Text>
+                                <Text as="span" className={`text-sm sm:text-base ${statusInfo.boxSuffixColor}`}>/5</Text>
                               </div>
                             </div>
                           </div>
@@ -1327,11 +1327,11 @@ export default function StoveCard() {
                       })()
                     ) : schedulerEnabled && nextScheduledAction ? (
                       <>
-                        <Text as="span" weight="semibold" className={nextScheduledAction.action === 'ignite' ? 'text-ember-400 [html:not(.dark)_&]:text-ember-600' : 'text-slate-300 [html:not(.dark)_&]:text-slate-600'}>
+                        <Text as="span" className={nextScheduledAction.action === 'ignite' ? 'text-ember-400 [html:not(.dark)_&]:text-ember-600' : 'text-slate-300 [html:not(.dark)_&]:text-slate-600'}>
                           {nextScheduledAction.action === 'ignite' ? '🔥 Accensione' : '❄️ Spegnimento'}
                         </Text>
                         {' alle '}
-                        <Text as="span" weight="medium" className="text-slate-300 [html:not(.dark)_&]:text-slate-600">
+                        <Text as="span" className="text-slate-300 [html:not(.dark)_&]:text-slate-600">
                           {(() => {
                             const date = new Date(nextScheduledAction.timestamp);
                             const time = date.toLocaleString('it-IT', { hour: '2-digit', minute: '2-digit' });
@@ -1417,7 +1417,7 @@ export default function StoveCard() {
                       {/* Bottone Meno */}
                       <ControlButton
                         type="decrement"
-                        variant="ocean"
+                        variant="subtle"
                         onClick={() => {
                           if (fanLevel > 1) {
                             const newLevel = fanLevel - 1;
@@ -1441,7 +1441,7 @@ export default function StoveCard() {
                       {/* Bottone Più */}
                       <ControlButton
                         type="increment"
-                        variant="ocean"
+                        variant="subtle"
                         onClick={() => {
                           if (fanLevel < 6) {
                             const newLevel = fanLevel + 1;

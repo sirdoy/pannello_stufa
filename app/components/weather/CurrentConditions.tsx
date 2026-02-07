@@ -69,7 +69,7 @@ function WeatherDetailCell({ icon, iconColor = 'text-ocean-400', label, value, s
       <Text variant="tertiary" size="xs" className="mb-0.5">
         {label}
       </Text>
-      <Text size="sm" weight="medium">
+      <Text size="sm">
         {value}
       </Text>
       {sublabel && (
@@ -253,7 +253,7 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
           <div className="flex items-baseline gap-3 mb-1">
             <Text
               size="xl"
-              weight="bold"
+             
               className="leading-none text-4xl"
             >
               {formatTemperature(temperature)}°

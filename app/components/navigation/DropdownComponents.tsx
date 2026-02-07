@@ -90,10 +90,10 @@ export interface DropdownInfoCardProps {
 export function DropdownInfoCard({ title, subtitle, details, className = '' }: DropdownInfoCardProps) {
   return (
     <div className={`px-4 py-3.5 mb-1 rounded-xl bg-slate-800/60 [html:not(.dark)_&]:bg-slate-100/60 ${className}`}>
-      <Text variant="label" size="xs" weight="semibold" className="mb-1.5">
+      <Text variant="label" size="xs" className="mb-1.5">
         {title}
       </Text>
-      <Text variant="body" size="sm" weight="semibold" className="truncate">
+      <Text variant="body" size="sm" className="truncate">
         {subtitle}
       </Text>
       {details && (
@@ -122,7 +122,7 @@ export function MenuSection({ icon, title, children, hasBorder = false, classNam
       {title && (
         <div className="flex items-center gap-2 px-3 py-2">
           {icon && <span className="text-xl">{icon}</span>}
-          <Text variant="label" size="xs" weight="bold" className="uppercase tracking-widest">
+          <Text variant="label" size="xs" className="uppercase tracking-widest">
             {title}
           </Text>
         </div>
@@ -203,7 +203,7 @@ export function UserInfoCard({ icon: Icon, name, email, className = '' }: UserIn
         {Icon && <Icon className="w-6 h-6 text-ember-300 [html:not(.dark)_&]:text-ember-700" />}
       </div>
       <div className="flex-1 min-w-0">
-        <Text variant="body" size="sm" weight="semibold" className="truncate">
+        <Text variant="body" size="sm" className="truncate">
           {name}
         </Text>
         {email && (

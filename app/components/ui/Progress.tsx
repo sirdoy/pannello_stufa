@@ -78,7 +78,7 @@ export interface ProgressProps
  *
  * @example
  * // Indeterminate loading
- * <Progress indeterminate variant="ocean" />
+ * <Progress indeterminate variant="neutral" />
  *
  * @example
  * // Auto-indeterminate when value undefined

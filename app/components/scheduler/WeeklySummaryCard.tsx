@@ -36,14 +36,14 @@ export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) 
       <div className="space-y-3 mb-6">
         <div className="flex items-center justify-between text-sm">
           <Text as="span" variant="secondary">Ore totali</Text>
-          <Text as="span" weight="bold" size="lg">
+          <Text as="span" size="lg">
             {formatHours(stats.totalHours)}
           </Text>
         </div>
 
         <div className="flex items-center justify-between text-sm">
           <Text as="span" variant="secondary">Intervalli</Text>
-          <Text as="span" weight="medium">
+          <Text as="span">
             {stats.totalIntervals}
           </Text>
         </div>
@@ -52,7 +52,7 @@ export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) 
           <>
             <div className="flex items-center justify-between text-sm">
               <Text as="span" variant="secondary">Media giornaliera</Text>
-              <Text as="span" weight="medium">
+              <Text as="span">
                 {formatHours(stats.avgPerDay)}
               </Text>
             </div>
@@ -60,7 +60,7 @@ export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) 
             {stats.busiestDay && (
               <div className="flex items-center justify-between text-sm">
                 <Text as="span" variant="secondary">Giorno più utilizzato</Text>
-                <Text as="span" weight="medium" className="text-primary-600 dark:text-primary-400">
+                <Text as="span" className="text-primary-600 dark:text-primary-400">
                   {stats.busiestDay} ({formatHours(stats.dailyHours[stats.busiestDay])})
                 </Text>
               </div>

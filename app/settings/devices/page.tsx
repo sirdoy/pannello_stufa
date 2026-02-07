@@ -163,7 +163,7 @@ export default function DevicesSettingsPage() {
 
       {/* Devices list */}
       <Card variant="glass" className="p-6">
-        <Heading level={2} size="lg" weight="semibold" className="mb-4">
+        <Heading level={2} size="lg" className="mb-4">
           Dispositivi Disponibili
         </Heading>
 
@@ -186,7 +186,7 @@ export default function DevicesSettingsPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <Text className="text-2xl">{device.icon}</Text>
-                      <Heading level={3} size="base" weight="semibold">
+                      <Heading level={3} size="base">
                         {device.name}
                       </Heading>
                       {isEnabled && (
@@ -217,7 +217,7 @@ export default function DevicesSettingsPage() {
         <Card variant="glass" className="p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
             <div className="flex-1">
-              <Text size="sm" weight="medium">
+              <Text size="sm">
                 Hai modifiche non salvate
               </Text>
               <Text variant="tertiary" size="xs" className="mt-1">
@@ -249,21 +249,21 @@ export default function DevicesSettingsPage() {
 
       {/* Info card */}
       <Card variant="glass" className="p-6 bg-ocean-900/10 [html:not(.dark)_&]:bg-ocean-50/50">
-        <Heading level={3} size="base" weight="semibold" variant="ocean" className="mb-3">
+        <Heading level={3} size="base" variant="subtle" className="mb-3">
           ℹ️ Note
         </Heading>
         <ul className="space-y-2">
           <li className="flex gap-2">
             <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
-            <Text as="span" variant="ocean" size="sm">I dispositivi disabilitati non verranno eliminati, potrai riattivarli quando vuoi</Text>
+            <Text variant="tertiary" size="sm">I dispositivi disabilitati non verranno eliminati, potrai riattivarli quando vuoi</Text>
           </li>
           <li className="flex gap-2">
             <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
-            <Text as="span" variant="ocean" size="sm">Le modifiche saranno visibili immediatamente dopo il salvataggio</Text>
+            <Text variant="tertiary" size="sm">Le modifiche saranno visibili immediatamente dopo il salvataggio</Text>
           </li>
           <li className="flex gap-2">
             <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
-            <Text as="span" variant="ocean" size="sm">La configurazione è personale e non influisce sugli altri utenti</Text>
+            <Text variant="tertiary" size="sm">La configurazione è personale e non influisce sugli altri utenti</Text>
           </li>
         </ul>
       </Card>

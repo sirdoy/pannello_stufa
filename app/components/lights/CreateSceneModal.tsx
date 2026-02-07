@@ -333,7 +333,7 @@ export default function CreateSceneModal({
                     <div key={light.id} className="p-4 bg-white/40 [html:not(.dark)_&]:bg-slate-800/40 rounded-xl border border-slate-200/50 [html:not(.dark)_&]:border-slate-700/50">
                       {/* Light Name + Toggle */}
                       <div className="flex items-center justify-between mb-3">
-                        <Text as="span" weight="medium">
+                        <Text as="span">
                           {light.metadata?.name || 'Luce'}
                         </Text>
                         <button

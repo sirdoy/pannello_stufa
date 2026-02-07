@@ -199,7 +199,7 @@ export default function NotificationPermissionButton({ onSuccess, onError }: Not
         </Button>
 
         <div>
-          <Text variant="secondary" size="sm" weight="medium" className="mb-1">
+          <Text variant="secondary" size="sm" className="mb-1">
             Riceverai notifiche per:
           </Text>
           <ul className="list-disc list-inside space-y-0.5">

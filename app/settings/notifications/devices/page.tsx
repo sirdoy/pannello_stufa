@@ -167,7 +167,7 @@ export default function DeviceManagementPage() {
           />
           <div className="mt-6 text-center">
             <Button
-              variant="primary"
+              variant="ember"
               onClick={() => (window.location.href = '/settings/notifications')}
             >
               Vai alle impostazioni notifiche

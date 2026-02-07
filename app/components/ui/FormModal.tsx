@@ -327,7 +327,7 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
         <Modal.Footer>
           <Button
             type="button"
-            variant="subtle"
+            variant="neutral"
             onClick={handleClose}
             disabled={isLoading}
           >

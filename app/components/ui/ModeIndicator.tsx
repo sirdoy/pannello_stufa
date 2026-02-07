@@ -61,7 +61,7 @@ export default function ModeIndicator({
       <div className="flex items-center gap-2">
         <span className={compact ? 'text-xl' : 'text-2xl'}>{getIcon()}</span>
         <div>
-          <Text variant={getVariant()} size="sm" weight="semibold" as="p">
+          <Text variant={getVariant()} size="sm" as="p">
             {getLabel()}
           </Text>
           <Text variant="tertiary" size="xs" as="p">

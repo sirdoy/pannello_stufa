@@ -308,7 +308,7 @@ export default function StoveDebugPage() {
               <div className="border-b border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex-1 min-w-0">
-                    <Heading level={3} size="md" weight="semibold">
+                    <Heading level={3} size="md">
                       Ignite Stove
                     </Heading>
                     <div className="flex items-center gap-2 mt-1">
@@ -343,7 +343,7 @@ export default function StoveDebugPage() {
               <div className="border-b border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex-1 min-w-0">
-                    <Heading level={3} size="md" weight="semibold">
+                    <Heading level={3} size="md">
                       Shutdown Stove
                     </Heading>
                     <div className="flex items-center gap-2 mt-1">
@@ -377,7 +377,7 @@ export default function StoveDebugPage() {
               <div className="border-b border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex-1 min-w-0">
-                    <Heading level={3} size="md" weight="semibold">
+                    <Heading level={3} size="md">
                       Set Power Level
                     </Heading>
                     <div className="flex items-center gap-2 mt-1">
@@ -425,7 +425,7 @@ export default function StoveDebugPage() {
               <div className="border-b border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex-1 min-w-0">
-                    <Heading level={3} size="md" weight="semibold">
+                    <Heading level={3} size="md">
                       Set Fan Level
                     </Heading>
                     <div className="flex items-center gap-2 mt-1">
@@ -473,7 +473,7 @@ export default function StoveDebugPage() {
               <div className="pb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex-1 min-w-0">
-                    <Heading level={3} size="md" weight="semibold">
+                    <Heading level={3} size="md">
                       Set Water Temperature (Boiler)
                     </Heading>
                     <div className="flex items-center gap-2 mt-1">
@@ -563,7 +563,7 @@ function EndpointDisplay({ title, endpoint, externalUrl, response, loading, onRe
     <div className="border-b border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 pb-4 last:border-0">
       <div className="flex items-center justify-between mb-2">
         <div className="flex-1 min-w-0">
-          <Heading level={3} size="md" weight="semibold">{title}</Heading>
+          <Heading level={3} size="md">{title}</Heading>
           <div className="flex items-center gap-2 mt-1">
             <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
               {externalUrl}

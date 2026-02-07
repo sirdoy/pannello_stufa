@@ -78,7 +78,7 @@ export interface HeadingProps extends HTMLAttributes<HTMLHeadingElement>, Varian
  *
  * @example
  * <Heading level={1} size="3xl" variant="gradient">Main Title</Heading>
- * <Heading level={3} variant="ocean">Info Title</Heading>
+ * <Heading level={3} variant="neutral">Info Title</Heading>
  */
 const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Heading(
   {

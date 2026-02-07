@@ -82,7 +82,7 @@ function ThemeContent() {
             <div className="flex items-center gap-3">
               <div className="text-3xl">☀️</div>
               <div className="text-left">
-                <Text variant="body" weight="semibold" as="div">
+                <Text variant="body" as="div">
                   Modalità Chiara
                 </Text>
                 <Text variant="secondary" size="sm" as="div">
@@ -116,7 +116,7 @@ function ThemeContent() {
             <div className="flex items-center gap-3">
               <div className="text-3xl">🌙</div>
               <div className="text-left">
-                <Text variant="body" weight="semibold" as="div">
+                <Text variant="body" as="div">
                   Modalità Scura
                 </Text>
                 <Text variant="secondary" size="sm" as="div">
@@ -151,7 +151,7 @@ function ThemeContent() {
         <div className="space-y-4">
           {/* Sample elements */}
           <div className="p-4 backdrop-blur-md bg-white/10 [html:not(.dark)_&]:bg-white/10 bg-white/5 rounded-lg border border-white/20 [html:not(.dark)_&]:border-white/20 border-white/10">
-            <Text variant="body" weight="medium" className="mb-2">
+            <Text variant="body" className="mb-2">
               Esempio Glass Effect
             </Text>
             <Text variant="secondary" size="sm">
@@ -178,19 +178,19 @@ function ThemeContent() {
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3 bg-ember-50 [html:not(.dark)_&]:bg-ember-50 bg-ember-900/20 rounded-lg">
               <Text variant="tertiary" size="xs" className="mb-1">Primary</Text>
-              <Text variant="ember" weight="semibold">Rosso</Text>
+              <Text variant="ember">Rosso</Text>
             </div>
             <div className="p-3 bg-ocean-50 [html:not(.dark)_&]:bg-ocean-50 bg-ocean-900/20 rounded-lg">
               <Text variant="tertiary" size="xs" className="mb-1">Info</Text>
-              <Text variant="ocean" weight="semibold">Blu</Text>
+              <Text variant="tertiary">Blu</Text>
             </div>
             <div className="p-3 bg-sage-50 [html:not(.dark)_&]:bg-sage-50 bg-sage-900/20 rounded-lg">
               <Text variant="tertiary" size="xs" className="mb-1">Success</Text>
-              <Text variant="sage" weight="semibold">Verde</Text>
+              <Text variant="sage">Verde</Text>
             </div>
             <div className="p-3 bg-warning-50 [html:not(.dark)_&]:bg-warning-50 bg-warning-900/20 rounded-lg">
               <Text variant="tertiary" size="xs" className="mb-1">Warning</Text>
-              <Text variant="warning" weight="semibold">Arancione</Text>
+              <Text variant="warning">Arancione</Text>
             </div>
           </div>
         </div>
@@ -534,7 +534,7 @@ function UnifiedDevicesContent() {
                     <span className="text-2xl flex-shrink-0">{device.icon}</span>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <Text weight="semibold" className="truncate">{device.name}</Text>
+                        <Text className="truncate">{device.name}</Text>
                         {device.isDisplayOnly && (
                           <Badge variant="ocean" size="sm">solo home</Badge>
                         )}
@@ -594,7 +594,7 @@ function UnifiedDevicesContent() {
         <Card variant="glass" className="p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
             <div className="flex-1">
-              <Text size="sm" weight="medium">
+              <Text size="sm">
                 Hai modifiche non salvate
               </Text>
               <Text variant="tertiary" size="xs" className="mt-1">
@@ -626,31 +626,31 @@ function UnifiedDevicesContent() {
 
       {/* Info card */}
       <Card variant="glass" className="p-4 sm:p-6 bg-ocean-900/10 [html:not(.dark)_&]:bg-ocean-50/50">
-        <Heading level={3} size="base" weight="semibold" variant="ocean" className="mb-3">
+        <Heading level={3} size="base" variant="subtle" className="mb-3">
           ℹ️ Come funziona
         </Heading>
         <ul className="space-y-2">
           <li className="flex gap-2">
             <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
-            <Text as="span" variant="ocean" size="sm">
+            <Text variant="tertiary" size="sm">
               Il toggle controlla la visibilità del dispositivo (menu e homepage)
             </Text>
           </li>
           <li className="flex gap-2">
             <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
-            <Text as="span" variant="ocean" size="sm">
+            <Text variant="tertiary" size="sm">
               Usa le frecce per riordinare i dispositivi nella homepage
             </Text>
           </li>
           <li className="flex gap-2">
             <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
-            <Text as="span" variant="ocean" size="sm">
+            <Text variant="tertiary" size="sm">
               <strong>solo home</strong>: il dispositivo appare solo nella homepage (es. Meteo)
             </Text>
           </li>
           <li className="flex gap-2">
             <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
-            <Text as="span" variant="ocean" size="sm">
+            <Text variant="tertiary" size="sm">
               <strong>solo menu</strong>: il dispositivo appare solo nel menu (es. Sonos)
             </Text>
           </li>

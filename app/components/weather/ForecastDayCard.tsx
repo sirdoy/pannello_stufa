@@ -99,7 +99,7 @@ export function ForecastDayCard({
       <Text
         variant="secondary"
         size="sm"
-        weight="medium"
+       
         className="mb-2"
       >
         {dayName}
@@ -116,7 +116,7 @@ export function ForecastDayCard({
       <Text
         variant="body"
         size="lg"
-        weight="bold"
+       
         className="text-ember-400 leading-tight"
       >
         {formatTemperature(day.tempMax)}°

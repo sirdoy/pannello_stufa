@@ -38,7 +38,7 @@ function HourlyCard({ time, weatherCode, temperature, precipProbability }: Hourl
         size={24}
         className="text-ocean-400 mb-2"
       />
-      <Text size="sm" weight="medium">
+      <Text size="sm">
         {formatTemperature(temperature)}°
       </Text>
       {precipProbability !== null && precipProbability !== undefined && precipProbability > 0 && (

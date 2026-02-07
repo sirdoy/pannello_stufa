@@ -64,7 +64,7 @@ export default function LogEntry({ entry, formatDate, getIcon, getDeviceBadge }:
                   className="w-6 h-6 rounded-full ring-1 ring-white/10 [html:not(.dark)_&]:ring-black/10"
                 />
               )}
-              <Text variant="body" weight="semibold" size="sm">
+              <Text variant="body" size="sm">
                 {entry.user.name || entry.user.email}
               </Text>
             </div>
@@ -88,11 +88,11 @@ export default function LogEntry({ entry, formatDate, getIcon, getDeviceBadge }:
 
         {/* Action */}
         <div className="flex items-baseline gap-2 flex-wrap">
-          <Text variant="body" weight="medium">
+          <Text variant="body">
             {entry.action}
           </Text>
           {entry.value !== undefined && entry.value !== null && (
-            <Text variant="ember" weight="semibold">
+            <Text variant="ember">
               → {entry.value}
             </Text>
           )}
@@ -103,12 +103,12 @@ export default function LogEntry({ entry, formatDate, getIcon, getDeviceBadge }:
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
             {entry.day && (
               <Text variant="tertiary" size="xs">
-                📅 Giorno: <Text as="span" variant="secondary" size="xs" weight="medium">{entry.day}</Text>
+                📅 Giorno: <Text as="span" variant="secondary" size="xs">{entry.day}</Text>
               </Text>
             )}
             {entry.roomName && (
               <Text variant="tertiary" size="xs">
-                🏠 Stanza: <Text as="span" variant="secondary" size="xs" weight="medium">{entry.roomName}</Text>
+                🏠 Stanza: <Text as="span" variant="secondary" size="xs">{entry.roomName}</Text>
               </Text>
             )}
           </div>

@@ -228,7 +228,7 @@ export default function NetatmoTemperatureReport() {
               {/* Room info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <Text variant="body" size="sm" weight="semibold" className="truncate">
+                  <Text variant="body" size="sm" className="truncate">
                     {room.room_name}
                   </Text>
                   {/* Device type badge */}
@@ -250,7 +250,7 @@ export default function NetatmoTemperatureReport() {
                         {room.temperature.toFixed(1)}°
                       </span>
                       <Text variant="tertiary" size="xs" as="span">/</Text>
-                      <Text variant="tertiary" size="sm" weight="medium" as="span">
+                      <Text variant="tertiary" size="sm" as="span">
                         {room.setpoint?.toFixed(1)}°
                       </Text>
                     </>
@@ -258,7 +258,7 @@ export default function NetatmoTemperatureReport() {
                     <>
                       <Text variant="tertiary" size="sm" as="span">--°</Text>
                       <Text variant="tertiary" size="xs" as="span">/</Text>
-                      <Text variant="tertiary" size="sm" weight="medium" as="span">
+                      <Text variant="tertiary" size="sm" as="span">
                         {room.setpoint.toFixed(1)}°
                       </Text>
                     </>

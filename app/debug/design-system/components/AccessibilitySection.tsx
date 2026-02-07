@@ -56,7 +56,7 @@ export default function AccessibilitySection({
   return (
     <Card variant="subtle" className={className}>
       <CardContent>
-        <Heading level={4} variant="ocean" className="mb-4">
+        <Heading level={4} variant="subtle" className="mb-4">
           Accessibility
         </Heading>
 

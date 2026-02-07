@@ -311,7 +311,7 @@ export default function ScenesPage() {
 
           <div className="flex gap-2">
             <Button
-              variant="primary"
+              variant="ember"
               onClick={() => setCreateModalOpen(true)}
               size="sm"
             >
@@ -381,7 +381,7 @@ export default function ScenesPage() {
                     }`}
                   >
                     <div className="text-4xl mb-3">🎨</div>
-                    <Text size="sm" weight="semibold" className="text-center">
+                    <Text size="sm" className="text-center">
                       {scene.metadata?.name || 'Scena'}
                     </Text>
                     {activatingScene === scene.id && (
@@ -429,7 +429,7 @@ export default function ScenesPage() {
                 }`}
               >
                 <div className="text-4xl mb-3">🎨</div>
-                <Text size="sm" weight="semibold" className="text-center">
+                <Text size="sm" className="text-center">
                   {scene.metadata?.name || 'Scena'}
                 </Text>
                 {activatingScene === scene.id && (

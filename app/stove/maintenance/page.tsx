@@ -122,32 +122,32 @@ export default function MaintenancePage() {
       <div className="max-w-2xl mx-auto py-8 px-4 space-y-6">
         {/* Header */}
         <div className="text-center mb-8">
-          <Heading level={1} size="3xl" weight="bold" className="mb-2">🔧 Manutenzione</Heading>
+          <Heading level={1} size="3xl" className="mb-2">🔧 Manutenzione</Heading>
           <Text variant="tertiary">Configura gli intervalli di pulizia della stufa</Text>
         </div>
 
         {/* Current Status Card */}
         <Card variant="glass" className="p-6 sm:p-8">
-          <Heading level={2} size="xl" weight="semibold" className="mb-4">📊 Stato Attuale</Heading>
+          <Heading level={2} size="xl" className="mb-4">📊 Stato Attuale</Heading>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-white/[0.05] [html:not(.dark)_&]:bg-white/[0.08] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-white/[0.08] [html:not(.dark)_&]:ring-white/[0.15] ring-inset rounded-lg p-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.08] [html:not(.dark)_&]:before:from-white/[0.12] before:to-transparent before:pointer-events-none">
               <Text variant="tertiary" size="sm" className="mb-1 relative z-10">Ore di Utilizzo</Text>
-              <Heading level={3} size="2xl" weight="bold" className="relative z-10">
+              <Heading level={3} size="2xl" className="relative z-10">
                 {formatHoursToHHMM(maintenanceData?.currentHours || 0)}
               </Heading>
             </div>
 
             <div className="bg-ember-500/[0.15] [html:not(.dark)_&]:bg-ember-500/[0.08] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-ember-500/30 [html:not(.dark)_&]:ring-ember-500/20 ring-inset rounded-lg p-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-ember-500/[0.20] [html:not(.dark)_&]:before:from-ember-500/[0.12] before:to-transparent before:pointer-events-none">
               <Text variant="tertiary" size="sm" className="mb-1 relative z-10">Ore Target</Text>
-              <Heading level={3} size="2xl" weight="bold" variant="ember" className="relative z-10">
+              <Heading level={3} size="2xl" variant="ember" className="relative z-10">
                 {formatHoursToHHMM(maintenanceData?.targetHours || 50)}
               </Heading>
             </div>
 
             <div className="bg-sage-500/[0.15] [html:not(.dark)_&]:bg-sage-500/[0.08] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-sage-500/30 [html:not(.dark)_&]:ring-sage-500/20 ring-inset rounded-lg p-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-sage-500/[0.20] [html:not(.dark)_&]:before:from-sage-500/[0.12] before:to-transparent before:pointer-events-none">
               <Text variant="tertiary" size="sm" className="mb-1 relative z-10">Ore Rimanenti</Text>
-              <Heading level={3} size="2xl" weight="bold" variant="sage" className="relative z-10">
+              <Heading level={3} size="2xl" variant="sage" className="relative z-10">
                 {formatHoursToHHMM(Math.max(0, (maintenanceData?.targetHours || 50) - (maintenanceData?.currentHours || 0)))}
               </Heading>
             </div>
@@ -182,7 +182,7 @@ export default function MaintenancePage() {
 
         {/* Configuration Card */}
         <Card variant="glass" className="p-6 sm:p-8">
-          <Heading level={2} size="xl" weight="semibold" className="mb-4">⚙️ Configurazione</Heading>
+          <Heading level={2} size="xl" className="mb-4">⚙️ Configurazione</Heading>
 
           <div className="space-y-4">
             <div>
@@ -206,7 +206,7 @@ export default function MaintenancePage() {
 
             {/* Quick presets */}
             <div>
-              <Text variant="secondary" size="sm" weight="medium" className="mb-2">Preselezioni rapide:</Text>
+              <Text variant="secondary" size="sm" className="mb-2">Preselezioni rapide:</Text>
               <div className="flex gap-2 flex-wrap">
                 {[25, 50, 75, 100, 150, 200].map((hours) => (
                   <button
@@ -248,12 +248,12 @@ export default function MaintenancePage() {
 
         {/* Info Card */}
         <Card variant="glass" className="p-6 sm:p-8 bg-ocean-50/50 [html:not(.dark)_&]:bg-ocean-50/50 bg-ocean-900/10 border border-ocean-200 [html:not(.dark)_&]:border-ocean-200 border-ocean-800">
-          <Heading level={3} weight="semibold" variant="ocean" className="mb-2">ℹ️ Come Funziona</Heading>
+          <Heading level={3} variant="subtle" className="mb-2">ℹ️ Come Funziona</Heading>
           <ul className="space-y-1">
-            <Text as="li" variant="ocean" size="sm">• Il contatore aumenta automaticamente ogni minuto quando la stufa è in funzione (status WORK)</Text>
-            <Text as="li" variant="ocean" size="sm">• Al raggiungimento delle ore impostate, apparirà un banner di richiesta pulizia</Text>
-            <Text as="li" variant="ocean" size="sm">• La stufa non potrà essere accesa (né manualmente né automaticamente) finché non confermi la pulizia</Text>
-            <Text as="li" variant="ocean" size="sm">• Dopo la conferma, il contatore si azzererà automaticamente</Text>
+            <Text variant="tertiary" size="sm">• Il contatore aumenta automaticamente ogni minuto quando la stufa è in funzione (status WORK)</Text>
+            <Text variant="tertiary" size="sm">• Al raggiungimento delle ore impostate, apparirà un banner di richiesta pulizia</Text>
+            <Text variant="tertiary" size="sm">• La stufa non potrà essere accesa (né manualmente né automaticamente) finché non confermi la pulizia</Text>
+            <Text variant="tertiary" size="sm">• Dopo la conferma, il contatore si azzererà automaticamente</Text>
           </ul>
         </Card>
       </div>

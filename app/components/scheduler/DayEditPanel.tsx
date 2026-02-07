@@ -80,7 +80,7 @@ export default function DayEditPanel({
             <Heading level={3} className="text-2xl">
               {day}
             </Heading>
-            <Text as="span" variant="secondary" size="sm" weight="medium" className="bg-slate-800/60 [html:not(.dark)_&]:bg-slate-100 px-3 py-1 rounded-full">
+            <Text as="span" variant="secondary" size="sm" className="bg-slate-800/60 [html:not(.dark)_&]:bg-slate-100 px-3 py-1 rounded-full">
               {intervals.length} {intervals.length === 1 ? 'intervallo' : 'intervalli'}
               {intervals.length > 0 && ` • ${totalHours.toFixed(1)}h`}
             </Text>
@@ -119,7 +119,7 @@ export default function DayEditPanel({
               />
               {/* Desktop: Button with text */}
               <Button
-                variant="subtle"
+                variant="neutral"
                 onClick={() => onDuplicate(day)}
                 className="hidden sm:flex"
               >

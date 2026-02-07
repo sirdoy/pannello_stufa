@@ -89,7 +89,7 @@ export default function DeliveryChart({ data = [], loading = false }: DeliveryCh
 
     return (
       <div className="bg-slate-900 [html:not(.dark)_&]:bg-white border border-white/10 [html:not(.dark)_&]:border-black/10 rounded-lg p-3 shadow-xl">
-        <Text size="xs" weight="semibold" className="mb-2">
+        <Text size="xs" className="mb-2">
           {format(parseISO(data.date), 'MMMM dd, yyyy')}
         </Text>
         <div className="space-y-1.5">
@@ -97,7 +97,7 @@ export default function DeliveryChart({ data = [], loading = false }: DeliveryCh
             <Text size="xs" variant="secondary">
               Total:
             </Text>
-            <Text size="xs" weight="medium">
+            <Text size="xs">
               {data.total}
             </Text>
           </div>
@@ -108,7 +108,7 @@ export default function DeliveryChart({ data = [], loading = false }: DeliveryCh
                 Sent:
               </Text>
             </div>
-            <Text size="xs" weight="medium" className="text-sage-500">
+            <Text size="xs" className="text-sage-500">
               {data.sent}
             </Text>
           </div>
@@ -119,7 +119,7 @@ export default function DeliveryChart({ data = [], loading = false }: DeliveryCh
                 Failed:
               </Text>
             </div>
-            <Text size="xs" weight="medium" className="text-ember-500">
+            <Text size="xs" className="text-ember-500">
               {data.failed}
             </Text>
           </div>
@@ -131,7 +131,7 @@ export default function DeliveryChart({ data = [], loading = false }: DeliveryCh
                 Rate:
               </Text>
             </div>
-            <Text size="xs" weight="semibold" className="text-ocean-500">
+            <Text size="xs" className="text-ocean-500">
               {data.deliveryRate}%
             </Text>
           </div>

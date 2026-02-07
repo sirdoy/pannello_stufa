@@ -136,14 +136,14 @@ export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday 
         <div className="flex items-center justify-center gap-4">
           <div>
             <Text variant="tertiary" size="xs" className="mb-1">Max</Text>
-            <Text size="xl" weight="bold" className="text-ember-400 text-3xl">
+            <Text size="xl" className="text-ember-400 text-3xl">
               {formatTemperature(day.tempMax)}°
             </Text>
           </div>
           <div className="w-px h-12 bg-slate-700/50 [html:not(.dark)_&]:bg-slate-300/50" />
           <div>
             <Text variant="tertiary" size="xs" className="mb-1">Min</Text>
-            <Text size="xl" weight="bold" className="text-ocean-400 text-3xl">
+            <Text size="xl" className="text-ocean-400 text-3xl">
               {formatTemperature(day.tempMin)}°
             </Text>
           </div>
@@ -250,7 +250,7 @@ export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday 
       {/* Hourly forecast - only for today */}
       {isToday && hourly && (
         <div className="mt-6 pt-4 border-t border-slate-700/30 [html:not(.dark)_&]:border-slate-200/50">
-          <Text variant="secondary" size="sm" weight="medium" className="mb-3">
+          <Text variant="secondary" size="sm" className="mb-3">
             Previsioni orarie
           </Text>
           <HourlyForecast hourly={hourly} />

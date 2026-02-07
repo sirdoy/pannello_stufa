@@ -39,7 +39,7 @@ interface RoomSelectorProps {
 function RoomSelector({ rooms, selectedRoomId, onChange, disabled }: RoomSelectorProps) {
   return (
     <div className="space-y-2">
-      <Text weight="semibold" size="sm">
+      <Text size="sm">
         Stanza da monitorare
       </Text>
       <select
@@ -101,7 +101,7 @@ function ManualSetpointInput({ value, onChange, disabled }: ManualSetpointInputP
 
   return (
     <div className="space-y-4">
-      <Text weight="semibold" size="sm">
+      <Text size="sm">
         Setpoint target
       </Text>
 
@@ -253,7 +253,7 @@ function PidPowerPreview({ powerLevel }: PidPowerPreviewProps) {
           ))}
         </div>
         {/* Power value */}
-        <Text weight="bold" className={`text-3xl ${POWER_COLORS[powerLevel]}`}>
+        <Text className={`text-3xl ${POWER_COLORS[powerLevel]}`}>
           {powerLevel}
         </Text>
         <Text variant="secondary" size="sm">
@@ -300,13 +300,13 @@ function TemperatureDisplay({ room, manualSetpoint, kp, ki, kd }: TemperatureDis
       <div className="flex items-center justify-between">
         <div>
           <Text variant="secondary" size="sm">Temperatura attuale</Text>
-          <Text weight="bold" className="text-2xl text-white [html:not(.dark)_&]:text-slate-900">
+          <Text className="text-2xl text-white [html:not(.dark)_&]:text-slate-900">
             {room.temperature?.toFixed(1) || '--'}°C
           </Text>
         </div>
         <div className="text-right">
           <Text variant="secondary" size="sm">Target PID</Text>
-          <Text weight="bold" className="text-2xl text-ember-400 [html:not(.dark)_&]:text-ember-600">
+          <Text className="text-2xl text-ember-400 [html:not(.dark)_&]:text-ember-600">
             {targetSetpoint?.toFixed(1) || '--'}°C
           </Text>
         </div>
@@ -349,7 +349,7 @@ function AdvancedSettings({ kp, ki, kd, onChange, disabled }) {
         onClick={() => setExpanded(!expanded)}
         className="w-full px-4 py-3 flex items-center justify-between bg-white/[0.02] [html:not(.dark)_&]:bg-slate-50/50 hover:bg-white/[0.04] transition-colors"
       >
-        <Text weight="semibold" size="sm">
+        <Text size="sm">
           Impostazioni avanzate (PID)
         </Text>
         <span className="text-slate-400">{expanded ? '▲' : '▼'}</span>
@@ -626,7 +626,7 @@ export default function PidAutomationPanel() {
       <div className="mb-6 p-4 rounded-xl bg-white/[0.05] [html:not(.dark)_&]:bg-white/[0.08] backdrop-blur-xl border border-white/5 [html:not(.dark)_&]:border-white/10">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <Text weight="semibold" className="mb-1">
+            <Text className="mb-1">
               Abilita automazione PID
             </Text>
             <Text variant="secondary" size="sm">
@@ -707,7 +707,7 @@ export default function PidAutomationPanel() {
 
       {/* Help Info */}
       <div className="mt-6 p-4 bg-slate-800/40 rounded-xl [html:not(.dark)_&]:bg-slate-100/60">
-        <Text variant="secondary" size="sm" weight="semibold" className="mb-2">
+        <Text variant="secondary" size="sm" className="mb-2">
           Come funziona
         </Text>
         <ul className="space-y-1 ml-4">

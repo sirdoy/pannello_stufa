@@ -100,7 +100,7 @@ export interface TextProps extends HTMLAttributes<HTMLElement>, VariantProps<typ
  * // Correct - use variant and size props
  * <Text variant="secondary" size="sm">Description</Text>
  * <Text variant="tertiary" size="xs" uppercase>Label</Text>
- * <Text variant="ocean" weight="bold">Highlighted</Text>
+ * <Text variant="tertiary">Highlighted</Text>
  *
  * // Wrong - external color classes
  * <Text className="text-slate-400">Text</Text>

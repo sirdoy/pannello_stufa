@@ -55,7 +55,7 @@ function RoomCheckbox({ room, selected, onChange, disabled }: RoomCheckboxProps)
         className="w-5 h-5 rounded-md border-2 border-slate-500 bg-slate-800 checked:bg-ember-500 checked:border-ember-500 focus:ring-2 focus:ring-ember-500/30 transition-all"
       />
       <div className="flex-1">
-        <Text weight="semibold" size="sm">
+        <Text size="sm">
           {room.name}
         </Text>
         <Text variant="tertiary" size="xs">
@@ -392,7 +392,7 @@ export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) 
       <div className="mb-6 p-4 rounded-xl bg-white/[0.05] [html:not(.dark)_&]:bg-white/[0.08] backdrop-blur-xl border border-white/5 [html:not(.dark)_&]:border-white/10">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <Text weight="semibold" className="mb-1">
+            <Text className="mb-1">
               Abilita sincronizzazione
             </Text>
             <Text variant="secondary" size="sm">
@@ -414,7 +414,7 @@ export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) 
         <>
           {/* Temperature Setting */}
           <div className="mb-6">
-            <Text weight="semibold" className="mb-3">
+            <Text className="mb-3">
               Temperatura valvole quando stufa è accesa
             </Text>
             <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.04] [html:not(.dark)_&]:bg-white/[0.06] backdrop-blur-sm border border-white/10">
@@ -449,7 +449,7 @@ export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) 
 
           {/* Room Selection */}
           <div className="mb-6">
-            <Text weight="semibold" className="mb-3">
+            <Text className="mb-3">
               Seleziona stanze da sincronizzare ({selectedRoomIds.length} selezionate)
             </Text>
             {availableRooms.length === 0 ? (
@@ -476,24 +476,24 @@ export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) 
       {/* Current Configuration Summary */}
       {config?.enabled && (
         <div className="mb-6 p-4 rounded-xl bg-ocean-900/10 [html:not(.dark)_&]:bg-ocean-50/50 border border-ocean-700/30 [html:not(.dark)_&]:border-ocean-200">
-          <Text variant="ocean" size="sm" weight="semibold" className="mb-2">
+          <Text variant="tertiary" size="sm" className="mb-2">
             ℹ️ Configurazione attuale
           </Text>
           <ul className="space-y-1">
             <li>
-              <Text variant="ocean" size="sm">
+              <Text variant="tertiary" size="sm">
                 • Sincronizzazione: <strong>{config.enabled ? 'Attiva' : 'Disattiva'}</strong>
               </Text>
             </li>
             {config.enabled && config.rooms && (
               <>
                 <li>
-                  <Text variant="ocean" size="sm">
+                  <Text variant="tertiary" size="sm">
                     • Stanze: <strong>{config.rooms.map(r => r.name).join(', ')}</strong>
                   </Text>
                 </li>
                 <li>
-                  <Text variant="ocean" size="sm">
+                  <Text variant="tertiary" size="sm">
                     • Temperatura stufa ON: <strong>{config.stoveTemperature}°C</strong>
                   </Text>
                 </li>
@@ -551,7 +551,7 @@ export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) 
 
       {/* Help Info */}
       <div className="mt-6 p-4 bg-slate-800/40 rounded-xl [html:not(.dark)_&]:bg-slate-100/60">
-        <Text variant="secondary" size="sm" weight="semibold" className="mb-2">
+        <Text variant="secondary" size="sm" className="mb-2">
           💡 Come funziona
         </Text>
         <ul className="space-y-1 ml-4">

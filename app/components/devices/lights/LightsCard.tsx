@@ -857,7 +857,7 @@ export default function LightsCard() {
             <div className="flex items-center gap-2 min-w-0">
               <span className="text-xl">🏠</span>
               <div className="min-w-0">
-                <Text size="sm" weight="semibold" className="font-display truncate">Tutta la Casa</Text>
+                <Text size="sm" className="font-display truncate">Tutta la Casa</Text>
                 <Text variant="tertiary" size="xs">{totalLightsOn}/{lights.length} accese</Text>
               </div>
             </div>

@@ -138,7 +138,7 @@ export default function ChangelogPage() {
               <Text variant="label" size="xs">Versione Corrente</Text>
               <div className="flex items-center gap-2">
                 <div className="px-4 py-2 rounded-xl bg-gradient-to-r from-ember-500 to-flame-600 text-white shadow-lg shadow-ember-500/25">
-                  <Text as="span" variant="body" size="xl" weight="bold" className="!text-white">
+                  <Text as="span" variant="body" size="xl" className="!text-white">
                     v{APP_VERSION}
                   </Text>
                 </div>
@@ -332,9 +332,9 @@ export default function ChangelogPage() {
         <Divider variant="gradient" spacing="small" className="my-4" />
         <div className="text-center">
           <Text variant="tertiary" size="xs">
-            Versionamento Semantico: <Text as="span" variant="tertiary" size="xs" weight="semibold">MAJOR</Text>.
-            <Text as="span" variant="tertiary" size="xs" weight="semibold">MINOR</Text>.
-            <Text as="span" variant="tertiary" size="xs" weight="semibold">PATCH</Text>
+            Versionamento Semantico: <Text as="span" variant="tertiary" size="xs">MAJOR</Text>.
+            <Text as="span" variant="tertiary" size="xs">MINOR</Text>.
+            <Text as="span" variant="tertiary" size="xs">PATCH</Text>
           </Text>
         </div>
       </Card>

@@ -90,7 +90,7 @@ export default function ThemeSettingsPage() {
             <div className="flex items-center gap-3">
               <div className="text-3xl">☀️</div>
               <div className="text-left">
-                <Text variant="body" weight="semibold" as="div">
+                <Text variant="body" as="div">
                   Modalità Chiara
                 </Text>
                 <Text variant="secondary" size="sm" as="div">
@@ -124,7 +124,7 @@ export default function ThemeSettingsPage() {
             <div className="flex items-center gap-3">
               <div className="text-3xl">🌙</div>
               <div className="text-left">
-                <Text variant="body" weight="semibold" as="div">
+                <Text variant="body" as="div">
                   Modalità Scura
                 </Text>
                 <Text variant="secondary" size="sm" as="div">
@@ -159,7 +159,7 @@ export default function ThemeSettingsPage() {
         <div className="space-y-4">
           {/* Sample elements */}
           <div className="p-4 backdrop-blur-md bg-white/10 [html:not(.dark)_&]:bg-white/10 bg-white/5 rounded-lg border border-white/20 [html:not(.dark)_&]:border-white/20 border-white/10">
-            <Text variant="body" weight="medium" className="mb-2">
+            <Text variant="body" className="mb-2">
               Esempio Glass Effect
             </Text>
             <Text variant="secondary" size="sm">
@@ -186,19 +186,19 @@ export default function ThemeSettingsPage() {
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3 bg-ember-50 [html:not(.dark)_&]:bg-ember-50 bg-ember-900/20 rounded-lg">
               <Text variant="tertiary" size="xs" className="mb-1">Primary</Text>
-              <Text variant="ember" weight="semibold">Rosso</Text>
+              <Text variant="ember">Rosso</Text>
             </div>
             <div className="p-3 bg-ocean-50 [html:not(.dark)_&]:bg-ocean-50 bg-ocean-900/20 rounded-lg">
               <Text variant="tertiary" size="xs" className="mb-1">Info</Text>
-              <Text variant="ocean" weight="semibold">Blu</Text>
+              <Text variant="tertiary">Blu</Text>
             </div>
             <div className="p-3 bg-sage-50 [html:not(.dark)_&]:bg-sage-50 bg-sage-900/20 rounded-lg">
               <Text variant="tertiary" size="xs" className="mb-1">Success</Text>
-              <Text variant="sage" weight="semibold">Verde</Text>
+              <Text variant="sage">Verde</Text>
             </div>
             <div className="p-3 bg-warning-50 [html:not(.dark)_&]:bg-warning-50 bg-warning-900/20 rounded-lg">
               <Text variant="tertiary" size="xs" className="mb-1">Warning</Text>
-              <Text variant="warning" weight="semibold">Arancione</Text>
+              <Text variant="warning">Arancione</Text>
             </div>
           </div>
         </div>

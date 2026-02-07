@@ -111,7 +111,7 @@ export default function EventPreviewModal({ event, camera, onClose }: EventPrevi
                 : NETATMO_CAMERA_API.getEventIcon(event.type)}
             </span>
             <div>
-              <Text variant="body" weight="semibold">
+              <Text variant="body">
                 {event.sub_type
                   ? NETATMO_CAMERA_API.getSubTypeName(parseInt(event.sub_type, 10))
                   : NETATMO_CAMERA_API.getEventTypeName(event.type)}

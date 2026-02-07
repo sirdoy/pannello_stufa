@@ -559,7 +559,7 @@ export default function ThermostatCard() {
                     {/* Offline Message */}
                     <div className="flex flex-col items-center justify-center py-6">
                       <span className="text-5xl mb-4">📵</span>
-                      <Text variant="secondary" size="lg" weight="bold" className="mb-2">
+                      <Text variant="secondary" size="lg" className="mb-2">
                         Dispositivo Offline
                       </Text>
                       <Text variant="tertiary" size="sm" className="text-center max-w-xs">
@@ -612,14 +612,14 @@ export default function ThermostatCard() {
                     {/* Current Temperature Box */}
                     <div className="relative overflow-hidden rounded-2xl bg-slate-800/60 backdrop-blur-xl border border-white/10 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
                       <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
-                        <Text variant="label" size="xs" weight="bold" className="mb-2 font-display">
+                        <Text variant="label" size="xs" className="mb-2 font-display">
                           Attuale
                         </Text>
                         <div className="flex items-baseline gap-1">
-                          <Text weight="black" className="text-4xl sm:text-5xl font-display text-slate-100 leading-none [html:not(.dark)_&]:text-slate-900">
+                          <Text className="text-4xl sm:text-5xl font-display text-slate-100 leading-none [html:not(.dark)_&]:text-slate-900">
                             {selectedRoom.temperature}
                           </Text>
-                          <Text as="span" weight="bold" className="text-2xl sm:text-3xl text-slate-400 [html:not(.dark)_&]:text-slate-500">°</Text>
+                          <Text as="span" className="text-2xl sm:text-3xl text-slate-400 [html:not(.dark)_&]:text-slate-500">°</Text>
                         </div>
                       </div>
                     </div>
@@ -628,14 +628,14 @@ export default function ThermostatCard() {
                     {selectedRoom.setpoint && (
                       <div className="relative overflow-hidden rounded-2xl bg-ocean-900/40 backdrop-blur-xl border border-ocean-500/30 [html:not(.dark)_&]:bg-ocean-50/80 [html:not(.dark)_&]:border-ocean-200">
                         <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
-                          <Text variant="ocean" size="xs" weight="bold" uppercase tracking className="mb-2 font-display">
+                          <Text variant="tertiary" size="xs" uppercase tracking className="mb-2 font-display">
                             Target
                           </Text>
                           <div className="flex items-baseline gap-1">
-                            <Text variant="ocean" weight="black" className="text-4xl sm:text-5xl font-display leading-none [html:not(.dark)_&]:text-ocean-600">
+                            <Text variant="tertiary" className="text-4xl sm:text-5xl font-display leading-none [html:not(.dark)_&]:text-ocean-600">
                               {selectedRoom.setpoint}
                             </Text>
-                            <Text as="span" weight="bold" className="text-2xl sm:text-3xl text-ocean-400/70 [html:not(.dark)_&]:text-ocean-500">°</Text>
+                            <Text as="span" className="text-2xl sm:text-3xl text-ocean-400/70 [html:not(.dark)_&]:text-ocean-500">°</Text>
                           </div>
                         </div>
                       </div>
@@ -743,7 +743,7 @@ export default function ThermostatCard() {
                       </Button>
                       <div className="flex flex-col items-center justify-center px-4">
                         <Text variant="label" size="xs" className="font-display">Target</Text>
-                        <Text variant="ocean" weight="black" className="text-2xl sm:text-3xl font-display">{selectedRoom.setpoint}°</Text>
+                        <Text variant="tertiary" className="text-2xl sm:text-3xl font-display">{selectedRoom.setpoint}°</Text>
                       </div>
                       <Button
                         variant="subtle"
@@ -875,7 +875,7 @@ export default function ThermostatCard() {
                     ? 'bg-sage-900/30 border-sage-500/40 text-sage-300 [html:not(.dark)_&]:bg-sage-50/80 [html:not(.dark)_&]:border-sage-300 [html:not(.dark)_&]:text-sage-700'
                     : 'bg-danger-900/30 border-danger-500/40 text-danger-300 [html:not(.dark)_&]:bg-danger-50/80 [html:not(.dark)_&]:border-danger-300 [html:not(.dark)_&]:text-danger-700'
                 }`}>
-                  <Text size="sm" weight="medium" className="font-display">
+                  <Text size="sm" className="font-display">
                     {calibrationSuccess
                       ? '✓ Calibrazione valvole avviata con successo'
                       : '✗ Calibrazione fallita'

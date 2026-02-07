@@ -99,7 +99,7 @@ export default function MaintenanceBar({ maintenanceStatus }: MaintenanceBarProp
       <div className="flex items-center justify-between p-4 cursor-pointer relative z-10" onClick={toggleExpanded}>
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <span className="text-lg flex-shrink-0">🔧</span>
-          <Text variant="body" weight="medium" className="flex-shrink-0">Manutenzione</Text>
+          <Text variant="body" className="flex-shrink-0">Manutenzione</Text>
 
           {/* Badge percentuale - nascosto quando espanso */}
           {!isExpanded && (

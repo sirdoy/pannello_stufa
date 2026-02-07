@@ -57,18 +57,18 @@ export default function ForceUpdateModal({ show, firebaseVersion }: ForceUpdateM
           {/* Version info */}
           <div className="bg-slate-100 [html:not(.dark)_&]:bg-slate-800 rounded-xl p-4 space-y-2">
             <div className="flex justify-between items-center">
-              <Text as="span" size="sm" weight="medium" className="text-slate-600 [html:not(.dark)_&]:text-slate-400">
+              <Text as="span" size="sm" className="text-slate-600 [html:not(.dark)_&]:text-slate-400">
                 Versione attuale:
               </Text>
-              <Text as="span" size="sm" weight="bold" className="text-slate-900 [html:not(.dark)_&]:text-white">
+              <Text as="span" size="sm" className="text-slate-900 [html:not(.dark)_&]:text-white">
                 {APP_VERSION}
               </Text>
             </div>
             <div className="flex justify-between items-center">
-              <Text as="span" size="sm" weight="medium" className="text-slate-600 [html:not(.dark)_&]:text-slate-400">
+              <Text as="span" size="sm" className="text-slate-600 [html:not(.dark)_&]:text-slate-400">
                 Nuova versione:
               </Text>
-              <Text as="span" size="sm" weight="bold" variant="ember">
+              <Text as="span" size="sm" variant="ember">
                 {firebaseVersion}
               </Text>
             </div>

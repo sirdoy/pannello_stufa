@@ -138,7 +138,7 @@ export default function DebugLogsPage() {
                 }`}
               >
                 <div className="flex justify-between items-start mb-2">
-                  <Text weight="semibold" size="sm">
+                  <Text size="sm">
                     {log.message}
                   </Text>
                   <Text variant="tertiary" size="xs" className="whitespace-nowrap ml-4">

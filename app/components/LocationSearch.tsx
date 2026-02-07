@@ -194,7 +194,7 @@ export default function LocationSearch({
           <Text variant="tertiary" size="xs" className="mb-1">
             Posizione attuale
           </Text>
-          <Text weight="medium">{currentLocation.name}</Text>
+          <Text>{currentLocation.name}</Text>
         </div>
       )}
 
@@ -228,7 +228,7 @@ export default function LocationSearch({
                 >
                   <span className="text-ocean-400 flex-shrink-0">📍</span>
                   <div className="min-w-0">
-                    <Text weight="medium" className="truncate">{s.name}</Text>
+                    <Text className="truncate">{s.name}</Text>
                     <Text variant="tertiary" size="sm" className="truncate">
                       {s.country}{s.admin1 ? `, ${s.admin1}` : ''}
                     </Text>

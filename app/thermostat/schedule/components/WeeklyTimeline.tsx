@@ -128,7 +128,7 @@ export default function WeeklyTimeline({ schedule, className = '' }: WeeklyTimel
               <Text
                 variant="secondary"
                 size="sm"
-                weight="medium"
+               
                 className="w-12 shrink-0 text-right"
               >
                 {dayName}

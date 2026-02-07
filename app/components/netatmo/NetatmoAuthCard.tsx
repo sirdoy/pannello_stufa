@@ -31,7 +31,7 @@ export default function NetatmoAuthCard() {
 
         {/* Features */}
         <div className="bg-slate-800/60 [html:not(.dark)_&]:bg-slate-50 rounded-2xl p-6 mb-8 text-left">
-          <Text variant="body" size="sm" weight="semibold" className="mb-3">
+          <Text variant="body" size="sm" className="mb-3">
             Cosa puoi fare:
           </Text>
           <ul className="space-y-2 text-sm">

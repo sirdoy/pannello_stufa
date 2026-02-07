@@ -242,7 +242,7 @@ export default function Navbar() {
               </div>
               <Text
                 as="span"
-                weight="bold"
+               
                 className="
                   hidden sm:inline
                   text-lg lg:text-xl
@@ -668,7 +668,7 @@ export default function Navbar() {
                     `}
                   >
                     <IconComponent className="w-6 h-6 mb-1" />
-                    <Text as="span" weight="medium" className="text-[10px] font-display">{action.label}</Text>
+                    <Text as="span" className="text-[10px] font-display">{action.label}</Text>
                   </TransitionLink>
                 );
               })}

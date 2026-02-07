@@ -68,7 +68,7 @@ export default function InfoBox({
         <Text
           variant="label"
           size="xs"
-          weight="medium"
+         
           as="span"
           className="mb-0.5 text-center"
         >

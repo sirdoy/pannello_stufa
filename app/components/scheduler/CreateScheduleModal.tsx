@@ -126,7 +126,7 @@ export default function CreateScheduleModal({
           <div className="space-y-6">
             {/* Name Input */}
             <div>
-              <Text as="label" variant="secondary" size="sm" weight="semibold" className="block mb-2">
+              <Text as="label" variant="secondary" size="sm" className="block mb-2">
                 Nome Pianificazione <Text as="span" variant="ember">*</Text>
               </Text>
               <Input
@@ -154,7 +154,7 @@ export default function CreateScheduleModal({
 
             {/* Mode Selection */}
             <div>
-              <Text as="label" variant="secondary" size="sm" weight="semibold" className="block mb-3">
+              <Text as="label" variant="secondary" size="sm" className="block mb-3">
                 Modalità Creazione
               </Text>
               <RadioGroup
@@ -206,7 +206,7 @@ export default function CreateScheduleModal({
           {/* Footer */}
           <div className="flex gap-3 mt-8">
             <Button
-              variant="subtle"
+              variant="neutral"
               onClick={onCancel}
               className="flex-1"
             >

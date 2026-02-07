@@ -143,7 +143,7 @@ function LogContent() {
               }`}
             >
               <div className="flex justify-between items-start mb-2">
-                <Text weight="semibold" size="sm">{log.message}</Text>
+                <Text size="sm">{log.message}</Text>
                 <Text variant="tertiary" size="xs" className="whitespace-nowrap ml-4">
                   {formatTime(log.timestamp)}
                 </Text>
@@ -233,7 +233,7 @@ function NotificheContent() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="p-6 bg-ocean-50 [html:not(.dark)_&]:bg-ocean-50 border-2 border-ocean-200">
             <Text variant="tertiary" size="xs" className="mb-2">Notifiche Oggi</Text>
-            <Text as="p" variant="ocean" weight="bold" className="text-4xl">
+            <Text variant="tertiary" className="text-4xl">
               {stats.notifications.total}
             </Text>
           </Card>
@@ -249,7 +249,7 @@ function NotificheContent() {
             <Text
               as="p"
               variant={getDeliveryRateColor(stats.notifications.deliveryRate)}
-              weight="bold"
+             
               className="text-4xl"
             >
               {stats.notifications.deliveryRate.toFixed(1)}%
@@ -258,7 +258,7 @@ function NotificheContent() {
 
           <Card className="p-6 bg-slate-50 [html:not(.dark)_&]:bg-slate-50 border-2 border-slate-200">
             <Text variant="tertiary" size="xs" className="mb-2">Device Attivi</Text>
-            <Text as="p" weight="bold" className="text-4xl">
+            <Text as="p" className="text-4xl">
               {stats.devices.active}
             </Text>
             <Text variant="secondary" size="xs" className="mt-2">

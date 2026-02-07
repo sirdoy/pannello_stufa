@@ -92,7 +92,7 @@ export default function LoadingOverlay({
 
           {/* Message */}
           <div className="text-center space-y-2 relative z-10">
-            <Text variant="body" size="lg" weight="bold" className="sm:text-xl">
+            <Text variant="body" size="lg" className="sm:text-xl">
               {message}
             </Text>
             <Text variant="tertiary" size="sm">

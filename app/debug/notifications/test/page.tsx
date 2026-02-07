@@ -288,7 +288,7 @@ export default function TestNotificationPage() {
           {!isCustom && selectedTemplate ? (
             <div className="p-4 bg-slate-800/50 border border-white/10 rounded-lg">
               <Text variant="tertiary" size="xs" className="mb-2">Preview:</Text>
-              <Text weight="semibold">{selectedTemplate.title}</Text>
+              <Text>{selectedTemplate.title}</Text>
               <Text size="sm" className="mt-1">{selectedTemplate.body}</Text>
             </div>
           ) : (
@@ -336,7 +336,7 @@ export default function TestNotificationPage() {
                 data-testid={`priority-${p.value}`}
               />
               <div>
-                <Text weight="medium">{p.label}</Text>
+                <Text>{p.label}</Text>
                 <Text variant="tertiary" size="xs">{p.description}</Text>
               </div>
             </label>

@@ -181,7 +181,7 @@ export default function AddIntervalModal({
 
           {/* Toggle: Duration vs End Time */}
           <div>
-            <Text as="label" variant="secondary" size="sm" weight="semibold" className="block mb-2">
+            <Text as="label" variant="secondary" size="sm" className="block mb-2">
               Modalità Inserimento
             </Text>
             <Tabs value={inputMode} onValueChange={(value) => setInputMode(value as 'duration' | 'endTime')} className="w-full">
@@ -241,7 +241,7 @@ export default function AddIntervalModal({
             <Text variant="secondary" size="sm" className="mb-1">
               {inputMode === 'duration' ? 'Orario fine calcolato:' : 'Orario fine selezionato:'}
             </Text>
-            <Text size="xl" weight="bold" className="text-2xl">{calculatedEnd}</Text>
+            <Text size="xl" className="text-2xl">{calculatedEnd}</Text>
             {!isValidInterval() && (
               <Text variant="danger" size="sm" className="mt-2">
                 ⚠️ {durationPreset === 'custom' && customMinutes < 15
@@ -293,7 +293,7 @@ export default function AddIntervalModal({
                   value: f,
                   label: `Livello ${f}`,
                 }))}
-                variant="ocean"
+                variant="neutral"
               />
             </div>
           </div>
@@ -302,7 +302,7 @@ export default function AddIntervalModal({
         {/* Actions */}
         <div className="flex gap-3">
           <Button
-            variant="subtle"
+            variant="neutral"
             onClick={onCancel}
             className="flex-1"
           >

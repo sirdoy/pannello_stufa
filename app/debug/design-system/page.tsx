@@ -207,7 +207,7 @@ export default function DesignSystemPage() {
                     <Heading level={1} variant="default">Heading 1 - Default (slate-100/slate-900)</Heading>
                     <Heading level={2} variant="gradient">Heading 2 - Gradient (ember→flame)</Heading>
                     <Heading level={3} variant="ember">Heading 3 - Ember (ember-400/ember-700)</Heading>
-                    <Heading level={4} variant="ocean">Heading 4 - Ocean (ocean-300/ocean-700)</Heading>
+                    <Heading level={4} variant="subtle">Heading 4 - Ocean (ocean-300/ocean-700)</Heading>
                     <Heading level={5} variant="sage">Heading 5 - Sage (sage-400/sage-700)</Heading>
                     <Heading level={6} variant="subtle">Heading 6 - Subtle (slate-400/slate-600)</Heading>
                     <Heading level={3} variant="warning">Heading - Warning (warning-400/warning-700)</Heading>
@@ -227,11 +227,11 @@ export default function DesignSystemPage() {
                     <Text variant="body">Body Text - Primary (slate-100/slate-900)</Text>
                     <Text variant="secondary">Secondary Text - Descriptions (slate-300/slate-600)</Text>
                     <Text variant="tertiary">Tertiary Text - Captions (slate-400/slate-500)</Text>
-                    <Text variant="ember" weight="semibold">Ember Accent - Highlighted (ember-400/ember-600)</Text>
-                    <Text variant="ocean" weight="semibold">Ocean Accent - Info (ocean-400/ocean-600)</Text>
-                    <Text variant="sage" weight="semibold">Sage Accent - Success (sage-400/sage-600)</Text>
-                    <Text variant="warning" weight="semibold">Warning Accent - Attention (warning-400/warning-600)</Text>
-                    <Text variant="danger" weight="semibold">Danger Accent - Error (danger-400/danger-600)</Text>
+                    <Text variant="ember">Ember Accent - Highlighted (ember-400/ember-600)</Text>
+                    <Text variant="tertiary">Ocean Accent - Info (ocean-400/ocean-600)</Text>
+                    <Text variant="sage">Sage Accent - Success (sage-400/sage-600)</Text>
+                    <Text variant="warning">Warning Accent - Attention (warning-400/warning-600)</Text>
+                    <Text variant="danger">Danger Accent - Error (danger-400/danger-600)</Text>
                     <Text variant="label">Label Text - auto uppercase tracking-wider</Text>
                     <Text mono variant="tertiary" size="sm">Monospace - code_example</Text>
                   </div>
@@ -320,7 +320,7 @@ export default function DesignSystemPage() {
                     <Button variant="ghost">Ghost</Button>
                     <Button variant="success">Success</Button>
                     <Button variant="danger">Danger</Button>
-                    <Button variant="ocean">Ocean</Button>
+                    <Button variant="subtle">Ocean</Button>
                     <Button variant="outline">Outline</Button>
                   </div>
                 </div>
@@ -345,9 +345,9 @@ export default function DesignSystemPage() {
                   <div className="flex flex-wrap gap-3">
                     <Button icon="🔥" variant="ember">Start Stove</Button>
                     <Button icon="❄️" variant="subtle" iconPosition="right">Turn Off</Button>
-                    <Button icon="🔥" variant="ember" iconOnly size="md" aria-label="Ignite stove" />
-                    <ButtonIcon icon="⚙️" label="Settings" variant="ghost" />
-                    <ButtonIcon icon="❌" label="Close" variant="danger" size="sm" />
+                    <Button icon="🔥" variant="ember" iconOnly size="md" aria-aria-label="Ignite stove" />
+                    <ButtonIcon icon="⚙️" aria-label="Settings" variant="ghost" />
+                    <ButtonIcon icon="❌" aria-label="Close" variant="danger" size="sm" />
                   </div>
                 </div>
 
@@ -523,7 +523,7 @@ export default function DesignSystemPage() {
               dismissible
               dismissKey="demo-compact-info"
             />
-            <Text variant="warning" weight="semibold" size="sm" className="mt-4">
+            <Text variant="warning" size="sm" className="mt-4">
               ⚠️ CRITICAL: Always use description prop! Using children directly will NOT apply variant colors.
             </Text>
           </div>
@@ -732,8 +732,8 @@ export default function DesignSystemPage() {
                   <HealthIndicator status="critical" />
                 </div>
                 <div className="mt-4 flex flex-wrap gap-6">
-                  <HealthIndicator status="critical" pulse label="Sistema critico" />
-                  <HealthIndicator status="warning" label="Manutenzione richiesta" />
+                  <HealthIndicator status="critical" pulse aria-label="Sistema critico" />
+                  <HealthIndicator status="warning" aria-label="Manutenzione richiesta" />
                 </div>
                 <div className="mt-4">
                   <PropTable props={componentDocs.HealthIndicator.props} />
@@ -846,7 +846,7 @@ export default function DesignSystemPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <ControlButton type="decrement" size="md" variant="ember" onChange={() => {}} />
-                    <Text variant="ember" weight="bold">22°C</Text>
+                    <Text variant="ember">22°C</Text>
                     <ControlButton type="increment" size="md" variant="ember" onChange={() => {}} />
                   </div>
                 </div>
@@ -1002,9 +1002,9 @@ export default function DesignSystemPage() {
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-4 mt-4">
-                  <Spinner variant="ember" label="Loading" />
-                  <Spinner variant="white" label="Loading" />
-                  <Spinner variant="muted" label="Loading" />
+                  <Spinner variant="ember" aria-label="Loading" />
+                  <Spinner variant="white" aria-label="Loading" />
+                  <Spinner variant="tertiary" aria-label="Loading" />
                   <Text variant="tertiary" size="xs">Variants: ember, white, muted</Text>
                 </div>
               </CardContent>
@@ -1025,34 +1025,34 @@ export default function DesignSystemPage() {
                   </Text>
                   <div className="space-y-4 max-w-md">
                     <Input
-                      label="Text Input"
+                      aria-label="Text Input"
                       placeholder="Enter text..."
                       icon="📧"
                     />
                     <Input
-                      label="Password Input"
+                      aria-label="Password Input"
                       type="password"
                       placeholder="Enter password..."
                       icon="🔒"
                     />
                     <Input
-                      label="Input with Variant"
+                      aria-label="Input with Variant"
                       placeholder="Ocean variant..."
                       icon="🌊"
-                      variant="ocean"
+                      variant="subtle"
                     />
                     <Input
-                      label="Input with Helper Text"
+                      aria-label="Input with Helper Text"
                       placeholder="Enter text..."
                       helperText="This is helper text that provides additional context"
                     />
                     <Input
-                      label="Input with Error"
+                      aria-label="Input with Error"
                       placeholder="Enter text..."
                       error="This field is required"
                     />
                     <Input
-                      label="Disabled Input"
+                      aria-label="Disabled Input"
                       placeholder="Disabled..."
                       disabled
                       value="Cannot edit"
@@ -1083,7 +1083,7 @@ export default function DesignSystemPage() {
                   </Text>
                   <div className="space-y-4 max-w-md">
                     <Select
-                      label="Select Dropdown"
+                      aria-label="Select Dropdown"
                       icon="🎯"
                       options={[
                         { value: '1', label: 'Option 1' },
@@ -1095,8 +1095,8 @@ export default function DesignSystemPage() {
                       onChange={(e) => setSelectValue(e.target.value)}
                     />
                     <Select
-                      label="Select with Variant"
-                      variant="ocean"
+                      aria-label="Select with Variant"
+                      variant="subtle"
                       options={[
                         { value: 'a', label: 'Ocean Option A' },
                         { value: 'b', label: 'Ocean Option B' },
@@ -1106,7 +1106,7 @@ export default function DesignSystemPage() {
                       onChange={() => {}}
                     />
                     <Select
-                      label="Disabled Select"
+                      aria-label="Disabled Select"
                       disabled
                       options={[
                         { value: '1', label: 'Cannot select' },
@@ -1143,7 +1143,7 @@ export default function DesignSystemPage() {
                       <Toggle
                         checked={toggleState}
                         onChange={setToggleState}
-                        label="Default Toggle"
+                        aria-label="Default Toggle"
                       />
                       <Text variant="secondary" size="sm">Default (Ember) - Interactive</Text>
                     </div>
@@ -1151,8 +1151,8 @@ export default function DesignSystemPage() {
                       <Toggle
                         checked={true}
                         onChange={() => {}}
-                        label="Ocean Variant"
-                        variant="ocean"
+                        aria-label="Ocean Variant"
+                        variant="subtle"
                       />
                       <Text variant="secondary" size="sm">Ocean Variant</Text>
                     </div>
@@ -1160,7 +1160,7 @@ export default function DesignSystemPage() {
                       <Toggle
                         checked={true}
                         onChange={() => {}}
-                        label="Sage Variant"
+                        aria-label="Sage Variant"
                         variant="sage"
                       />
                       <Text variant="secondary" size="sm">Sage Variant</Text>
@@ -1169,19 +1169,19 @@ export default function DesignSystemPage() {
                       <Toggle
                         checked={false}
                         onChange={() => {}}
-                        label="Small Size"
+                        aria-label="Small Size"
                         size="sm"
                       />
                       <Toggle
                         checked={false}
                         onChange={() => {}}
-                        label="Medium Size"
+                        aria-label="Medium Size"
                         size="md"
                       />
                       <Toggle
                         checked={false}
                         onChange={() => {}}
-                        label="Large Size"
+                        aria-label="Large Size"
                         size="lg"
                       />
                       <Text variant="tertiary" size="xs" className="ml-2">Sizes: sm (h-6), md (h-8), lg (h-10)</Text>
@@ -1190,7 +1190,7 @@ export default function DesignSystemPage() {
                       <Toggle
                         checked={false}
                         onChange={() => {}}
-                        label="Disabled Toggle"
+                        aria-label="Disabled Toggle"
                         disabled
                       />
                       <Text variant="secondary" size="sm">Disabled State</Text>
@@ -1225,7 +1225,7 @@ export default function DesignSystemPage() {
                         id="checkbox-1"
                         checked={checkboxState}
                         onChange={(e) => setCheckboxState(e.target.checked)}
-                        label="Interactive Checkbox"
+                        aria-label="Interactive Checkbox"
                       />
                       <Text variant="secondary" size="sm">Default (Ocean) - Click to toggle</Text>
                     </div>
@@ -1237,35 +1237,35 @@ export default function DesignSystemPage() {
                           id="checkbox-primary"
                           checked={true}
                           onChange={() => {}}
-                          label="Primary"
-                          variant="primary"
+                          aria-label="Primary"
+                          variant="ember"
                         />
                         <Checkbox
                           id="checkbox-ocean"
                           checked={true}
                           onChange={() => {}}
-                          label="Ocean"
-                          variant="ocean"
+                          aria-label="Ocean"
+                          variant="subtle"
                         />
                         <Checkbox
                           id="checkbox-sage"
                           checked={true}
                           onChange={() => {}}
-                          label="Sage"
+                          aria-label="Sage"
                           variant="sage"
                         />
                         <Checkbox
                           id="checkbox-ember"
                           checked={true}
                           onChange={() => {}}
-                          label="Ember"
+                          aria-label="Ember"
                           variant="ember"
                         />
                         <Checkbox
                           id="checkbox-flame"
                           checked={true}
                           onChange={() => {}}
-                          label="Flame"
+                          aria-label="Flame"
                           variant="flame"
                         />
                       </div>
@@ -1278,21 +1278,21 @@ export default function DesignSystemPage() {
                           id="checkbox-sm"
                           checked={true}
                           onChange={() => {}}
-                          label="Small"
+                          aria-label="Small"
                           size="sm"
                         />
                         <Checkbox
                           id="checkbox-md"
                           checked={true}
                           onChange={() => {}}
-                          label="Medium"
+                          aria-label="Medium"
                           size="md"
                         />
                         <Checkbox
                           id="checkbox-lg"
                           checked={true}
                           onChange={() => {}}
-                          label="Large"
+                          aria-label="Large"
                           size="lg"
                         />
                       </div>
@@ -1305,32 +1305,32 @@ export default function DesignSystemPage() {
                           id="checkbox-checked"
                           checked={true}
                           onChange={() => {}}
-                          label="Checked"
+                          aria-label="Checked"
                         />
                         <Checkbox
                           id="checkbox-unchecked"
                           checked={false}
                           onChange={() => {}}
-                          label="Unchecked"
+                          aria-label="Unchecked"
                         />
                         <Checkbox
                           id="checkbox-indeterminate"
                           indeterminate={checkboxIndeterminate}
                           onChange={() => setCheckboxIndeterminate(!checkboxIndeterminate)}
-                          label="Indeterminate"
+                          aria-label="Indeterminate"
                         />
                         <Checkbox
                           id="checkbox-disabled"
                           checked={false}
                           onChange={() => {}}
-                          label="Disabled"
+                          aria-label="Disabled"
                           disabled
                         />
                         <Checkbox
                           id="checkbox-disabled-checked"
                           checked={true}
                           onChange={() => {}}
-                          label="Disabled Checked"
+                          aria-label="Disabled Checked"
                           disabled
                         />
                       </div>
@@ -1384,11 +1384,11 @@ export default function DesignSystemPage() {
                     Props: value (0-100), variant (ember|ocean|sage|warning|danger), size (sm|md|lg), animated, label, leftContent, rightContent
                   </Text>
                   <div className="space-y-4">
-                    <ProgressBar value={75} variant="ember" label="Ember Progress" />
-                    <ProgressBar value={60} variant="ocean" label="Ocean Progress" />
-                    <ProgressBar value={85} variant="sage" label="Sage Progress" />
-                    <ProgressBar value={40} variant="warning" label="Warning Progress" />
-                    <ProgressBar value={25} variant="danger" label="Danger Progress" />
+                    <ProgressBar value={75} variant="ember" aria-label="Ember Progress" />
+                    <ProgressBar value={60} variant="subtle" aria-label="Ocean Progress" />
+                    <ProgressBar value={85} variant="sage" aria-label="Sage Progress" />
+                    <ProgressBar value={40} variant="warning" aria-label="Warning Progress" />
+                    <ProgressBar value={25} variant="danger" aria-label="Danger Progress" />
                   </div>
                 </div>
 
@@ -1398,9 +1398,9 @@ export default function DesignSystemPage() {
                 <div>
                   <Text variant="label" size="xs" className="mb-3">Sizes</Text>
                   <div className="space-y-4">
-                    <ProgressBar value={65} size="sm" variant="ember" label="Small (h-2)" />
-                    <ProgressBar value={65} size="md" variant="ember" label="Medium (h-3)" />
-                    <ProgressBar value={65} size="lg" variant="ember" label="Large (h-4)" />
+                    <ProgressBar value={65} size="sm" variant="ember" aria-label="Small (h-2)" />
+                    <ProgressBar value={65} size="md" variant="ember" aria-label="Medium (h-3)" />
+                    <ProgressBar value={65} size="lg" variant="ember" aria-label="Large (h-4)" />
                   </div>
                 </div>
 
@@ -1413,20 +1413,20 @@ export default function DesignSystemPage() {
                     <ProgressBar
                       value={80}
                       variant="ember"
-                      leftContent={<Text variant="ember" weight="semibold" size="sm">🔥 Power</Text>}
-                      rightContent={<Text variant="secondary" size="sm" weight="bold">80%</Text>}
+                      leftContent={<Text variant="ember" size="sm">🔥 Power</Text>}
+                      rightContent={<Text variant="secondary" size="sm">80%</Text>}
                     />
                     <ProgressBar
                       value={45}
-                      variant="ocean"
-                      leftContent={<Text variant="ocean" weight="semibold" size="sm">💨 Fan</Text>}
-                      rightContent={<Text variant="secondary" size="sm" weight="bold">45%</Text>}
+                      variant="subtle"
+                      leftContent={<Text variant="tertiary" size="sm">💨 Fan</Text>}
+                      rightContent={<Text variant="secondary" size="sm">45%</Text>}
                     />
                     <ProgressBar
                       value={92}
                       variant="warning"
-                      leftContent={<Text variant="warning" weight="semibold" size="sm">⏱️ Maintenance</Text>}
-                      rightContent={<Text variant="warning" size="sm" weight="bold">92h / 100h</Text>}
+                      leftContent={<Text variant="warning" size="sm">⏱️ Maintenance</Text>}
+                      rightContent={<Text variant="warning" size="sm">92h / 100h</Text>}
                     />
                   </div>
                 </div>
@@ -1439,7 +1439,7 @@ export default function DesignSystemPage() {
                   <Text variant="tertiary" size="sm" className="mb-3">
                     animated=true adds smooth transitions (500ms duration)
                   </Text>
-                  <ProgressBar value={70} variant="sage" animated label="Animated Progress" />
+                  <ProgressBar value={70} variant="sage" animated aria-label="Animated Progress" />
                 </div>
               </div>
             </CardContent>
@@ -1532,7 +1532,7 @@ export default function DesignSystemPage() {
                   <Text variant="tertiary" size="sm" className="mb-4">
                     Props: isOpen, onClose, title, icon, showCloseButton, showHandle, closeOnBackdrop, className
                   </Text>
-                  <Button variant="ocean" onClick={() => setShowBottomSheet(true)}>
+                  <Button variant="subtle" onClick={() => setShowBottomSheet(true)}>
                     Open Bottom Sheet
                   </Button>
                   <BottomSheet
@@ -1724,15 +1724,15 @@ export default function DesignSystemPage() {
                     </Sheet.Header>
                     <div className="space-y-4 py-4">
                       <div>
-                        <Text variant="body-sm" className="text-slate-400">Stato</Text>
+                        <Text variant="body" size="sm" className="text-slate-400">Stato</Text>
                         <Text className="text-sage-400">Online</Text>
                       </div>
                       <div>
-                        <Text variant="body-sm" className="text-slate-400">Temperatura</Text>
+                        <Text variant="body" size="sm" className="text-slate-400">Temperatura</Text>
                         <Text className="text-3xl font-display">21°C</Text>
                       </div>
                       <div>
-                        <Text variant="body-sm" className="text-slate-400">Ore di funzionamento</Text>
+                        <Text variant="body" size="sm" className="text-slate-400">Ore di funzionamento</Text>
                         <Text>1,234h</Text>
                       </div>
                     </div>
@@ -1958,7 +1958,7 @@ export default function DesignSystemPage() {
                         <Text variant="warning" size="xs">⚠️ Warning</Text>
                       </div>
                       <div className="bg-ocean-900/80 rounded-xl p-3 border border-ocean-500/50 flex items-center gap-2">
-                        <Text variant="ocean" size="xs">ℹ️ Info</Text>
+                        <Text variant="tertiary" size="xs">ℹ️ Info</Text>
                       </div>
                       <div className="bg-danger-900/80 rounded-xl p-3 border border-danger-500/50 flex items-center gap-2">
                         <Text variant="danger" size="xs">❌ Error</Text>
@@ -2042,10 +2042,10 @@ export default function DesignSystemPage() {
                 <div>
                   <Text variant="label" size="xs" className="mb-3">Clear Sky and Clouds</Text>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <WeatherIconDemo code={0} label="Sereno" />
-                    <WeatherIconDemo code={1} label="Prevalentemente sereno" />
-                    <WeatherIconDemo code={2} label="Parzialmente nuvoloso" />
-                    <WeatherIconDemo code={3} label="Coperto" />
+                    <WeatherIconDemo code={0} aria-label="Sereno" />
+                    <WeatherIconDemo code={1} aria-label="Prevalentemente sereno" />
+                    <WeatherIconDemo code={2} aria-label="Parzialmente nuvoloso" />
+                    <WeatherIconDemo code={3} aria-label="Coperto" />
                   </div>
                 </div>
 
@@ -2058,10 +2058,10 @@ export default function DesignSystemPage() {
                     Use isNight=true to show moon-based icons for clear/partly cloudy conditions
                   </Text>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <WeatherIconDemo code={0} label="Day - Clear" isNight={false} />
-                    <WeatherIconDemo code={0} label="Night - Clear" isNight={true} />
-                    <WeatherIconDemo code={2} label="Day - Partly cloudy" isNight={false} />
-                    <WeatherIconDemo code={2} label="Night - Partly cloudy" isNight={true} />
+                    <WeatherIconDemo code={0} aria-label="Day - Clear" isNight={false} />
+                    <WeatherIconDemo code={0} aria-label="Night - Clear" isNight={true} />
+                    <WeatherIconDemo code={2} aria-label="Day - Partly cloudy" isNight={false} />
+                    <WeatherIconDemo code={2} aria-label="Night - Partly cloudy" isNight={true} />
                   </div>
                 </div>
 
@@ -2071,8 +2071,8 @@ export default function DesignSystemPage() {
                 <div>
                   <Text variant="label" size="xs" className="mb-3">Fog</Text>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <WeatherIconDemo code={45} label="Nebbia" />
-                    <WeatherIconDemo code={48} label="Nebbia con brina" />
+                    <WeatherIconDemo code={45} aria-label="Nebbia" />
+                    <WeatherIconDemo code={48} aria-label="Nebbia con brina" />
                   </div>
                 </div>
 
@@ -2082,10 +2082,10 @@ export default function DesignSystemPage() {
                 <div>
                   <Text variant="label" size="xs" className="mb-3">Drizzle (Pioviggine)</Text>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <WeatherIconDemo code={51} label="Pioviggine leggera" />
-                    <WeatherIconDemo code={53} label="Pioviggine moderata" />
-                    <WeatherIconDemo code={55} label="Pioviggine intensa" />
-                    <WeatherIconDemo code={56} label="Pioviggine gelata" />
+                    <WeatherIconDemo code={51} aria-label="Pioviggine leggera" />
+                    <WeatherIconDemo code={53} aria-label="Pioviggine moderata" />
+                    <WeatherIconDemo code={55} aria-label="Pioviggine intensa" />
+                    <WeatherIconDemo code={56} aria-label="Pioviggine gelata" />
                   </div>
                 </div>
 
@@ -2095,10 +2095,10 @@ export default function DesignSystemPage() {
                 <div>
                   <Text variant="label" size="xs" className="mb-3">Rain (Pioggia)</Text>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <WeatherIconDemo code={61} label="Pioggia leggera" />
-                    <WeatherIconDemo code={63} label="Pioggia moderata" />
-                    <WeatherIconDemo code={65} label="Pioggia intensa" />
-                    <WeatherIconDemo code={66} label="Pioggia gelata" />
+                    <WeatherIconDemo code={61} aria-label="Pioggia leggera" />
+                    <WeatherIconDemo code={63} aria-label="Pioggia moderata" />
+                    <WeatherIconDemo code={65} aria-label="Pioggia intensa" />
+                    <WeatherIconDemo code={66} aria-label="Pioggia gelata" />
                   </div>
                 </div>
 
@@ -2111,14 +2111,14 @@ export default function DesignSystemPage() {
                     WMO codes 71-77, 85-86 map to CloudSnow icon
                   </Text>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <WeatherIconDemo code={71} label="Neve leggera" />
-                    <WeatherIconDemo code={73} label="Neve moderata" />
-                    <WeatherIconDemo code={75} label="Neve intensa" />
-                    <WeatherIconDemo code={77} label="Granuli di neve" />
+                    <WeatherIconDemo code={71} aria-label="Neve leggera" />
+                    <WeatherIconDemo code={73} aria-label="Neve moderata" />
+                    <WeatherIconDemo code={75} aria-label="Neve intensa" />
+                    <WeatherIconDemo code={77} aria-label="Granuli di neve" />
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
-                    <WeatherIconDemo code={85} label="Rovesci neve leggeri" />
-                    <WeatherIconDemo code={86} label="Rovesci neve intensi" />
+                    <WeatherIconDemo code={85} aria-label="Rovesci neve leggeri" />
+                    <WeatherIconDemo code={86} aria-label="Rovesci neve intensi" />
                   </div>
                 </div>
 
@@ -2128,9 +2128,9 @@ export default function DesignSystemPage() {
                 <div>
                   <Text variant="label" size="xs" className="mb-3">Showers (Rovesci)</Text>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <WeatherIconDemo code={80} label="Rovesci leggeri" />
-                    <WeatherIconDemo code={81} label="Rovesci moderati" />
-                    <WeatherIconDemo code={82} label="Rovesci violenti" />
+                    <WeatherIconDemo code={80} aria-label="Rovesci leggeri" />
+                    <WeatherIconDemo code={81} aria-label="Rovesci moderati" />
+                    <WeatherIconDemo code={82} aria-label="Rovesci violenti" />
                   </div>
                 </div>
 
@@ -2140,9 +2140,9 @@ export default function DesignSystemPage() {
                 <div>
                   <Text variant="label" size="xs" className="mb-3">Thunderstorm (Temporale)</Text>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <WeatherIconDemo code={95} label="Temporale" />
-                    <WeatherIconDemo code={96} label="Temporale grandine" />
-                    <WeatherIconDemo code={99} label="Temporale grandine forte" />
+                    <WeatherIconDemo code={95} aria-label="Temporale" />
+                    <WeatherIconDemo code={96} aria-label="Temporale grandine" />
+                    <WeatherIconDemo code={99} aria-label="Temporale grandine forte" />
                   </div>
                 </div>
 
@@ -2292,7 +2292,7 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
 
                 <div>
                   <Text variant="label" size="xs" className="mb-3">Divider with Label</Text>
-                  <Divider label="Settings" variant="gradient" spacing="medium" />
+                  <Divider aria-label="Settings" variant="gradient" spacing="medium" />
                   <Text variant="secondary">Content after divider with label</Text>
                 </div>
 
@@ -2458,7 +2458,7 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
                       <Text variant="secondary" size="sm" className="mb-3">
                         Hybrid validation: onBlur for touched fields, summary on submit. Error display at top and inline.
                       </Text>
-                      <Button variant="ocean" onClick={() => setShowFormModal(true)}>
+                      <Button variant="subtle" onClick={() => setShowFormModal(true)}>
                         Open Form Modal
                       </Button>
                     </div>
@@ -2519,7 +2519,7 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
                   control={control}
                   render={({ field, fieldState }) => (
                     <Input
-                      label="Name"
+                      aria-label="Name"
                       placeholder="Enter name"
                       {...field}
                       error={fieldState.error?.message}
@@ -2532,7 +2532,7 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
                   control={control}
                   render={({ field, fieldState }) => (
                     <Input
-                      label="Email"
+                      aria-label="Email"
                       type="email"
                       placeholder="user@example.com"
                       {...field}
@@ -2649,7 +2649,7 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
             <div className="text-center space-y-2">
               <Text variant="tertiary" size="sm">
                 Complete technical documentation:{' '}
-                <Text as="span" variant="ocean" weight="semibold">docs/design-system.md</Text>
+                <Text variant="tertiary">docs/design-system.md</Text>
               </Text>
               <Text variant="tertiary" size="xs">
                 Ember Noir Design System v3.0 - Complete Phase 14-16 Components
@@ -2684,7 +2684,7 @@ function DataTableDemo() {
       accessorKey: 'name',
       header: 'Device Name',
       cell: ({ getValue }) => (
-        <Text weight="medium">{getValue()}</Text>
+        <Text>{getValue()}</Text>
       ),
     },
     {
@@ -2784,7 +2784,7 @@ function SectionShowcase({ title, icon, docs, children }) {
           <Heading level={2} variant="gradient">{title}</Heading>
         </div>
         {docs && (
-          <Text variant="ocean" size="xs" mono className="hidden sm:block">
+          <Text variant="tertiary" size="xs" mono className="hidden sm:block">
             {docs}
           </Text>
         )}
@@ -2812,7 +2812,7 @@ function ColorSwatch({ name, description, colors, usage }) {
             />
           ))}
         </div>
-        <Text variant="tertiary" size="xs" weight="medium">
+        <Text variant="tertiary" size="xs">
           Usage: {usage}
         </Text>
       </CardContent>

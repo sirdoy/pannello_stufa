@@ -69,7 +69,7 @@ function PreferenceToggle({ label, description, checked, onChange, disabled = fa
   return (
     <div className="flex items-start justify-between gap-4 py-3">
       <div className="flex-1">
-        <Text weight="medium" className="flex items-center gap-2">
+        <Text className="flex items-center gap-2">
           {icon && <span>{icon}</span>}
           <span>{label}</span>
         </Text>

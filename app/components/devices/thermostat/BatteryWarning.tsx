@@ -194,7 +194,7 @@ export function ModuleBatteryList({ modules = [] }: ModuleBatteryListProps) {
 
   return (
     <div className="space-y-2">
-      <Text variant="label" size="xs" weight="bold" className="font-display">
+      <Text variant="label" size="xs" className="font-display">
         Stato Batterie
       </Text>
       <div className="space-y-1">
@@ -207,7 +207,7 @@ export function ModuleBatteryList({ modules = [] }: ModuleBatteryListProps) {
               <span className="text-sm">
                 {module.type === 'NRV' ? '🔧' : '🌡️'}
               </span>
-              <Text size="sm" weight="medium">
+              <Text size="sm">
                 {module.name || getModuleTypeName(module.type)}
               </Text>
             </div>

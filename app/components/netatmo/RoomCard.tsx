@@ -289,7 +289,7 @@ export default function RoomCard({ room, onRefresh }: RoomCardProps) {
               </>
             ) : (
               <>
-                <Text variant="tertiary" size="xl" weight="bold" as="span" title="Sensore temperatura non disponibile">
+                <Text variant="tertiary" size="xl" as="span" title="Sensore temperatura non disponibile">
                   --°
                 </Text>
                 <Text variant="tertiary" size="xl" as="span" className="mx-1">/</Text>
@@ -401,7 +401,7 @@ export default function RoomCard({ room, onRefresh }: RoomCardProps) {
       {/* Module Details with Battery Status */}
       {room.roomModules && room.roomModules.length > 0 && (
         <div className="mt-4 pt-4 border-t border-white/5 [html:not(.dark)_&]:border-white/10">
-          <Text variant="secondary" size="xs" weight="semibold" className="mb-2">
+          <Text variant="secondary" size="xs" className="mb-2">
             Dispositivi ({room.roomModules.length})
           </Text>
           <div className="space-y-2">
@@ -419,7 +419,7 @@ export default function RoomCard({ room, onRefresh }: RoomCardProps) {
                 >
                   <span className={`text-lg flex-shrink-0 ${isModuleOffline ? 'opacity-50' : ''}`}>{deviceInfo.icon}</span>
                   <div className="flex-1 min-w-0">
-                    <Text variant="body" size="xs" weight="semibold" className={`truncate ${isModuleOffline ? 'opacity-60' : ''}`}>
+                    <Text variant="body" size="xs" className={`truncate ${isModuleOffline ? 'opacity-60' : ''}`}>
                       {module.name}
                     </Text>
                     <Text variant="tertiary" size="xs">

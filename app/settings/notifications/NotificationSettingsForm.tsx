@@ -170,7 +170,7 @@ export default function NotificationSettingsForm({
             {category.types.map((type) => (
               <div key={type.key} className="flex items-start justify-between gap-4 py-2">
                 <div className="flex-1">
-                  <Text weight="medium">{type.label}</Text>
+                  <Text>{type.label}</Text>
                   <Text variant="secondary" size="sm">
                     {type.description}
                   </Text>
@@ -212,7 +212,7 @@ export default function NotificationSettingsForm({
           {/* Enable DND Toggle */}
           <div className="flex items-start justify-between gap-4 py-2">
             <div className="flex-1">
-              <Text weight="medium">Enable DND</Text>
+              <Text>Enable DND</Text>
               <Text variant="secondary" size="sm">
                 Activate Do Not Disturb mode
               </Text>
@@ -349,7 +349,7 @@ export default function NotificationSettingsForm({
             {/* Rate Limits for each category */}
             {Object.entries(CATEGORY_CONFIG).map(([categoryId, category]) => (
               <div key={categoryId} className="space-y-4">
-                <Text weight="medium" className="flex items-center gap-2">
+                <Text className="flex items-center gap-2">
                   <span>{category.icon}</span>
                   <span>{category.label} Rate Limits</span>
                 </Text>

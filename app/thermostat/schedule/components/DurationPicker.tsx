@@ -33,7 +33,7 @@ export default function DurationPicker({ value, onChange }: DurationPickerProps)
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <Text variant="label" size="sm">Durata</Text>
-        <Text variant="body" weight="bold" className="text-ember-400">
+        <Text variant="body" className="text-ember-400">
           {formatDuration(value)}
         </Text>
       </div>

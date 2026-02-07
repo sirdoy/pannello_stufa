@@ -169,7 +169,7 @@ export default function ScheduleManagementModal({
           {/* Active Schedule Section */}
           {activeSchedule && (
             <div className="mb-6">
-              <Text as="h4" variant="tertiary" size="sm" weight="semibold" className="uppercase tracking-wider mb-3">
+              <Text as="h4" variant="tertiary" size="sm" className="uppercase tracking-wider mb-3">
                 Pianificazione Attiva
               </Text>
               <div className="p-4 bg-sage-950/30 rounded-2xl border-2 border-sage-700/50 [html:not(.dark)_&]:bg-sage-50/50 [html:not(.dark)_&]:border-sage-300/50">
@@ -199,14 +199,14 @@ export default function ScheduleManagementModal({
                           <Button variant="success" size="sm" onClick={() => handleSaveEdit(activeSchedule.id)}>
                             Salva
                           </Button>
-                          <Button variant="subtle" size="sm" onClick={handleCancelEdit}>
+                          <Button variant="neutral" size="sm" onClick={handleCancelEdit}>
                             Annulla
                           </Button>
                         </div>
                       </div>
                     ) : (
                       <div className="flex items-center justify-between">
-                        <Text as="span" weight="semibold" variant="sage">
+                        <Text as="span" variant="sage">
                           {activeSchedule.name}
                         </Text>
                         <ActionButton
@@ -227,7 +227,7 @@ export default function ScheduleManagementModal({
           {/* Inactive Schedules Section */}
           {inactiveSchedules.length > 0 && (
             <div>
-              <Text as="h4" variant="tertiary" size="sm" weight="semibold" className="uppercase tracking-wider mb-3">
+              <Text as="h4" variant="tertiary" size="sm" className="uppercase tracking-wider mb-3">
                 Altre Pianificazioni
               </Text>
               <div className="space-y-3">
@@ -259,7 +259,7 @@ export default function ScheduleManagementModal({
                           <Button variant="success" size="sm" onClick={() => handleSaveEdit(schedule.id)}>
                             Salva
                           </Button>
-                          <Button variant="subtle" size="sm" onClick={handleCancelEdit}>
+                          <Button variant="neutral" size="sm" onClick={handleCancelEdit}>
                             Annulla
                           </Button>
                         </div>
@@ -268,7 +268,7 @@ export default function ScheduleManagementModal({
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <div className="w-3 h-3 rounded-full bg-slate-500 [html:not(.dark)_&]:bg-slate-400" />
-                          <Text as="span" weight="semibold" className="truncate">
+                          <Text as="span" className="truncate">
                             {schedule.name}
                           </Text>
                         </div>
@@ -317,7 +317,7 @@ export default function ScheduleManagementModal({
           {/* Footer */}
           <div className="mt-6">
             <Button
-              variant="subtle"
+              variant="neutral"
               onClick={onClose}
               className="w-full"
             >

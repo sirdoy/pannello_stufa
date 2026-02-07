@@ -504,7 +504,7 @@ export default function NotificationsSettingsPage() {
                           <span className="text-lg">
                             {device.platform === 'ios' ? '📱' : '💻'}
                           </span>
-                          <Text weight="medium">
+                          <Text>
                             {device.platform === 'ios'
                               ? 'iPhone/iPad'
                               : 'Dispositivo'}
@@ -580,7 +580,7 @@ export default function NotificationsSettingsPage() {
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <div className="text-xl flex-shrink-0">📬</div>
             <div className="min-w-0">
-              <Text weight="medium">Cronologia Notifiche</Text>
+              <Text>Cronologia Notifiche</Text>
               <Text variant="tertiary" size="sm">
                 Visualizza tutte le notifiche inviate
               </Text>
@@ -602,7 +602,7 @@ export default function NotificationsSettingsPage() {
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <div className="text-xl flex-shrink-0">📱</div>
             <div className="min-w-0">
-              <Text weight="medium">Gestione Dispositivi</Text>
+              <Text>Gestione Dispositivi</Text>
               <Text variant="tertiary" size="sm">
                 Rinomina o rimuovi dispositivi registrati
               </Text>
@@ -626,42 +626,42 @@ export default function NotificationsSettingsPage() {
         <div className="flex gap-4">
           <div className="text-2xl flex-shrink-0">ℹ️</div>
           <div className="flex-1">
-            <Heading level={3} size="md" variant="ocean" className="mb-3">
+            <Heading level={3} size="md" variant="subtle" className="mb-3">
               Note per iOS (iPhone/iPad)
             </Heading>
 
             <ul className="space-y-2">
               <li className="flex gap-2">
-                <Text variant="ocean" size="sm" className="flex-shrink-0">
+                <Text variant="tertiary" size="sm" className="flex-shrink-0">
                   •
                 </Text>
-                <Text variant="ocean" size="sm">
+                <Text variant="tertiary" size="sm">
                   Le notifiche funzionano solo se l&apos;app è installata come
                   PWA (Aggiungi a Home da Safari)
                 </Text>
               </li>
               <li className="flex gap-2">
-                <Text variant="ocean" size="sm" className="flex-shrink-0">
+                <Text variant="tertiary" size="sm" className="flex-shrink-0">
                   •
                 </Text>
-                <Text variant="ocean" size="sm">
+                <Text variant="tertiary" size="sm">
                   Richiede iOS 16.4 o superiore
                 </Text>
               </li>
               <li className="flex gap-2">
-                <Text variant="ocean" size="sm" className="flex-shrink-0">
+                <Text variant="tertiary" size="sm" className="flex-shrink-0">
                   •
                 </Text>
-                <Text variant="ocean" size="sm">
+                <Text variant="tertiary" size="sm">
                   Una volta negato il permesso, devi abilitarlo manualmente
                   dalle impostazioni iOS
                 </Text>
               </li>
               <li className="flex gap-2">
-                <Text variant="ocean" size="sm" className="flex-shrink-0">
+                <Text variant="tertiary" size="sm" className="flex-shrink-0">
                   •
                 </Text>
-                <Text variant="ocean" size="sm">
+                <Text variant="tertiary" size="sm">
                   Le notifiche arrivano anche quando l&apos;app è chiusa
                 </Text>
               </li>
@@ -676,7 +676,7 @@ export default function NotificationsSettingsPage() {
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <div className="text-xl flex-shrink-0">🔍</div>
             <div className="min-w-0">
-              <Text weight="medium">Debug Logs</Text>
+              <Text>Debug Logs</Text>
               <Text variant="tertiary" size="sm">
                 Visualizza log diagnostici per troubleshooting
               </Text>

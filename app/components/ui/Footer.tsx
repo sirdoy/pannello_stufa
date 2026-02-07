@@ -41,7 +41,7 @@ export default function Footer({ className = '', ...props }: FooterProps) {
               <Text variant="tertiary" size="sm" as="span" className="sm:hidden">❤️ by</Text>
               <span className="hidden sm:inline text-danger-400 text-base animate-pulse">❤️</span>
               <Text variant="tertiary" size="sm" as="span" className="hidden sm:inline">by</Text>
-              <Text variant="body" size="sm" weight="bold" as="strong">{APP_AUTHOR}</Text>
+              <Text variant="body" size="sm" as="strong">{APP_AUTHOR}</Text>
             </div>
 
             {/* Version info */}
@@ -63,7 +63,7 @@ export default function Footer({ className = '', ...props }: FooterProps) {
                 "
               >
                 <Text variant="tertiary" size="sm" as="span" className="group-hover:text-ember-400 [html:not(.dark)_&]:group-hover:text-ember-600 transition-colors">Versione</Text>
-                <Text variant="body" size="base" weight="bold" as="strong" className="group-hover:text-ember-400 [html:not(.dark)_&]:group-hover:text-ember-600 transition-colors">
+                <Text variant="body" size="base" as="strong" className="group-hover:text-ember-400 [html:not(.dark)_&]:group-hover:text-ember-600 transition-colors">
                   {APP_VERSION}
                 </Text>
                 <span className="text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200">

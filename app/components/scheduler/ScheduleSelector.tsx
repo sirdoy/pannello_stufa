@@ -75,10 +75,10 @@ export default function ScheduleSelector({
           <div className="flex items-center gap-3 flex-1 text-left">
             <div className="w-2 h-2 rounded-full bg-sage-500 shadow-sage-glow-sm animate-pulse shrink-0" />
             <div className="flex-1 min-w-0">
-              <Text variant="tertiary" size="xs" weight="medium">
+              <Text variant="tertiary" size="xs">
                 Pianificazione Attiva
               </Text>
-              <Text weight="semibold" className="truncate">
+              <Text className="truncate">
                 {loading ? 'Caricamento...' : activeSchedule?.name || 'Nessuna'}
               </Text>
             </div>
@@ -105,7 +105,7 @@ export default function ScheduleSelector({
           <div className="p-4">
             <div className="text-center py-4">
               <div className="text-3xl mb-3">📅</div>
-              <Text weight="semibold" size="sm" variant="secondary" className="mb-2">
+              <Text size="sm" variant="secondary" className="mb-2">
                 Nessuna pianificazione trovata
               </Text>
               <Text variant="tertiary" size="xs" className="mb-4">
@@ -133,12 +133,12 @@ export default function ScheduleSelector({
           <>
             {/* Active Schedule Section */}
             <div className="p-3 border-b border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
-              <Text as="div" variant="tertiary" size="xs" weight="semibold" className="uppercase tracking-wider mb-2 px-2">
+              <Text as="div" variant="tertiary" size="xs" className="uppercase tracking-wider mb-2 px-2">
                 Attiva
               </Text>
               <div className="px-3 py-2 bg-sage-950/30 rounded-xl flex items-center gap-3 [html:not(.dark)_&]:bg-sage-50/50">
                 <div className="w-2 h-2 rounded-full bg-sage-500 shadow-sage-glow-sm shrink-0" />
-                <Text as="div" size="sm" weight="semibold" variant="sage" className="flex-1">
+                <Text as="div" size="sm" variant="sage" className="flex-1">
                   {activeSchedule?.name}
                 </Text>
                 <Check className="w-4 h-4 text-sage-400 [html:not(.dark)_&]:text-sage-600" />
@@ -148,7 +148,7 @@ export default function ScheduleSelector({
             {/* Other Schedules Section */}
             {otherSchedules.length > 0 && (
               <div className="p-3 border-b border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
-                <Text as="div" variant="tertiary" size="xs" weight="semibold" className="uppercase tracking-wider mb-2 px-2">
+                <Text as="div" variant="tertiary" size="xs" className="uppercase tracking-wider mb-2 px-2">
                   Disponibili
                 </Text>
                 <div className="space-y-1">
@@ -170,7 +170,7 @@ export default function ScheduleSelector({
                       <Text
                         as="div"
                         size="sm"
-                        weight="medium"
+                       
                         variant="secondary"
                         className="flex-1 group-hover:text-slate-100 [html:not(.dark)_&]:group-hover:text-slate-900"
                       >

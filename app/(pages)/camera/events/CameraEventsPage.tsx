@@ -331,7 +331,7 @@ export default function CameraEventsPage() {
                               ? NETATMO_CAMERA_API.getSubTypeIcon(event.sub_type)
                               : NETATMO_CAMERA_API.getEventIcon(event.type)}
                           </span>
-                          <Text variant="body" weight="semibold">
+                          <Text variant="body">
                             {event.sub_type
                               ? NETATMO_CAMERA_API.getSubTypeName(event.sub_type)
                               : NETATMO_CAMERA_API.getEventTypeName(event.type)}

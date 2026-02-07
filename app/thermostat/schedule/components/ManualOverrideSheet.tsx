@@ -125,7 +125,7 @@ export default function ManualOverrideSheet({
       {success ? (
         <div className="text-center py-8">
           <CheckCircle className="w-16 h-16 text-sage-400 mx-auto mb-4" />
-          <Text variant="sage" size="lg" weight="bold">Override applicato!</Text>
+          <Text variant="sage" size="lg">Override applicato!</Text>
         </div>
       ) : (
         <div className="space-y-6">

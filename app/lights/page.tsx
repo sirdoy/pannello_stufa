@@ -664,7 +664,7 @@ export default function LightsPage() {
               <div className="flex gap-3">
                 {remoteApiAvailable && (
                   <Button
-                    variant="primary"
+                    variant="ember"
                     onClick={() => window.location.href = '/api/hue/remote/authorize'}
                   >
                     ☁️ Connetti via Cloud
@@ -1023,7 +1023,7 @@ export default function LightsPage() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <Text variant="secondary" size="xs">Luminosità Stanza</Text>
-                        <Text variant="body" size="sm" weight="bold">{avgBrightness}%</Text>
+                        <Text variant="body" size="sm">{avgBrightness}%</Text>
                       </div>
                       <Slider
                         value={avgBrightness}
@@ -1075,7 +1075,7 @@ export default function LightsPage() {
                               >
                                 <div className="flex items-center justify-between mb-2">
                                   <div>
-                                    <Text size="sm" weight="semibold">{light.metadata?.name || 'Luce'}</Text>
+                                    <Text size="sm">{light.metadata?.name || 'Luce'}</Text>
                                     {hasColor && <Text variant="tertiary" size="xs">🎨 Colore disponibile</Text>}
                                   </div>
                                   {lightOn && <Badge variant="ember" size="sm">ON</Badge>}
@@ -1114,7 +1114,7 @@ export default function LightsPage() {
                                     <div className="space-y-1">
                                       <div className="flex items-center justify-between">
                                         <Text variant="tertiary" size="xs">Luminosità</Text>
-                                        <Text size="xs" weight="bold">{Math.round(lightBrightness)}%</Text>
+                                        <Text size="xs">{Math.round(lightBrightness)}%</Text>
                                       </div>
                                       <Slider
                                         value={lightBrightness}
@@ -1178,7 +1178,7 @@ export default function LightsPage() {
                               )}
                             >
                               <div className="text-2xl mb-1">🎨</div>
-                              <Text size="xs" weight="semibold" className="text-center">
+                              <Text size="xs" className="text-center">
                                 {scene.metadata?.name || 'Scena'}
                               </Text>
                               {activatingScene === scene.id && (

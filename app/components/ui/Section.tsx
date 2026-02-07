@@ -105,7 +105,7 @@ export default function Section({
             <div className="flex items-center gap-3 mb-2">
               <div className="h-1 w-12 bg-gradient-to-r from-ember-500 to-flame-600 rounded-full" />
               {subtitle && (
-                <Text variant="tertiary" size="sm" weight="medium" uppercase tracking as="span">
+                <Text variant="tertiary" size="sm" uppercase tracking as="span">
                   {subtitle}
                 </Text>
               )}

@@ -110,7 +110,7 @@ export default function TransitionsDebugPage() {
           <Heading level={1} className="mb-2">
             🎬 Page Transitions Demo
           </Heading>
-          <Text variant="muted">
+          <Text variant="tertiary">
             Sistema di transizioni cinematografiche con View Transitions API + CSS fallback
           </Text>
         </div>
@@ -124,21 +124,21 @@ export default function TransitionsDebugPage() {
               w-3 h-3 rounded-full
               ${isTransitioning ? 'bg-ember-400 animate-pulse-ember' : 'bg-sage-400'}
             `} />
-            <Text weight="semibold">
+            <Text>
               Status: {isTransitioning ? 'Transitioning...' : 'Ready'}
             </Text>
           </div>
 
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <Text variant="muted" className="mb-1">Transition Type:</Text>
-              <Text weight="semibold" className="text-ember-400">
+              <Text variant="tertiary" className="mb-1">Transition Type:</Text>
+              <Text className="text-ember-400">
                 {selectedType}
               </Text>
             </div>
             <div>
-              <Text variant="muted" className="mb-1">Direction:</Text>
-              <Text weight="semibold" className="text-ember-400">
+              <Text variant="tertiary" className="mb-1">Direction:</Text>
+              <Text className="text-ember-400">
                 {direction}
               </Text>
             </div>
@@ -149,7 +149,7 @@ export default function TransitionsDebugPage() {
       {/* Transition Types */}
       <div className="space-y-4">
         <Heading level={2}>Tipi di Transizione</Heading>
-        <Text variant="muted">
+        <Text variant="tertiary">
           Seleziona un tipo di transizione, poi clicca su una delle pagine demo sotto
         </Text>
 
@@ -196,10 +196,10 @@ export default function TransitionsDebugPage() {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <Text weight="semibold" className="mb-1">
+                  <Text className="mb-1">
                     {transition.name}
                   </Text>
-                  <Text variant="muted" className="text-sm">
+                  <Text variant="tertiary" className="text-sm">
                     {transition.description}
                   </Text>
                 </div>
@@ -226,7 +226,7 @@ export default function TransitionsDebugPage() {
       {/* Demo Pages */}
       <div className="space-y-4">
         <Heading level={2}>Test su Pagine Reali</Heading>
-        <Text variant="muted">
+        <Text variant="tertiary">
           Clicca su una pagina per vedere la transizione &quot;{selectedType}&quot; in azione
         </Text>
 
@@ -260,10 +260,10 @@ export default function TransitionsDebugPage() {
                   {page.emoji}
                 </div>
                 <div>
-                  <Text weight="semibold" className="mb-1">
+                  <Text className="mb-1">
                     {page.label}
                   </Text>
-                  <Text variant="muted" className="text-sm">
+                  <Text variant="tertiary" className="text-sm">
                     {page.href}
                   </Text>
                 </div>
@@ -308,7 +308,7 @@ export default function TransitionsDebugPage() {
 
         <Card variant="subtle" className="p-6 space-y-4">
           <div>
-            <Text weight="semibold" className="mb-2 text-ember-400">
+            <Text className="mb-2 text-ember-400">
               1. Import TransitionLink
             </Text>
             <pre className="bg-slate-950/50 p-4 rounded-xl overflow-x-auto text-sm">
@@ -319,7 +319,7 @@ export default function TransitionsDebugPage() {
           </div>
 
           <div>
-            <Text weight="semibold" className="mb-2 text-ember-400">
+            <Text className="mb-2 text-ember-400">
               2. Usa al posto di Link
             </Text>
             <pre className="bg-slate-950/50 p-4 rounded-xl overflow-x-auto text-sm">
@@ -341,7 +341,7 @@ export default function TransitionsDebugPage() {
           </div>
 
           <div>
-            <Text weight="semibold" className="mb-2 text-ember-400">
+            <Text className="mb-2 text-ember-400">
               3. Cambia transizione globalmente
             </Text>
             <pre className="bg-slate-950/50 p-4 rounded-xl overflow-x-auto text-sm">

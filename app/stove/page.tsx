@@ -702,7 +702,7 @@ export default function StovePage() {
                 <div className={`relative overflow-hidden rounded-2xl bg-slate-900/60 backdrop-blur-xl border ${theme.border} p-5 sm:p-6`}>
                   <div className="flex flex-col items-center">
                     <span className="text-3xl sm:text-4xl mb-2">💨</span>
-                    <Text weight="bold" size="xs" className="text-slate-400 uppercase tracking-wider mb-1">
+                    <Text size="xs" className="text-slate-400 uppercase tracking-wider mb-1">
                       Ventola
                     </Text>
                     <div className="flex items-baseline">
@@ -725,7 +725,7 @@ export default function StovePage() {
                 <div className={`relative overflow-hidden rounded-2xl bg-slate-900/60 backdrop-blur-xl border ${theme.border} p-5 sm:p-6`}>
                   <div className="flex flex-col items-center">
                     <span className="text-3xl sm:text-4xl mb-2">⚡</span>
-                    <Text weight="bold" size="xs" className="text-slate-400 uppercase tracking-wider mb-1">
+                    <Text size="xs" className="text-slate-400 uppercase tracking-wider mb-1">
                       Potenza
                     </Text>
                     <div className="flex items-baseline">
@@ -782,7 +782,7 @@ export default function StovePage() {
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <Text weight="bold" className={`text-base sm:text-lg ${
+                    <Text className={`text-base sm:text-lg ${
                       schedulerEnabled && semiManualMode ? 'text-warning-400' :
                       schedulerEnabled ? 'text-sage-400' : 'text-ember-400'
                     }`}>
@@ -853,7 +853,7 @@ export default function StovePage() {
               <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
                 <ControlButton
                   type="decrement"
-                  variant="ocean"
+                  variant="subtle"
                   onClick={() => fanLevel > 1 && handleFanChange(fanLevel - 1)}
                   disabled={!fanLevel || fanLevel <= 1}
                 />
@@ -866,7 +866,7 @@ export default function StovePage() {
                 </div>
                 <ControlButton
                   type="increment"
-                  variant="ocean"
+                  variant="subtle"
                   onClick={() => fanLevel < 6 && handleFanChange(fanLevel + 1)}
                   disabled={!fanLevel || fanLevel >= 6}
                 />

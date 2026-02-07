@@ -187,7 +187,16 @@ Plans:
 
 **Goal:** All test files are converted to TypeScript and passing.
 
-**Plans:** (created by /gsd:plan-phase)
+**Plans:** 7 plans (6 migration + 1 verification/gap closure)
+
+Plans:
+- [ ] 42-01-PLAN.md — Jest config, setup, and __mocks__/ migration to TypeScript (4 files)
+- [ ] 42-02-PLAN.md — lib/ test files migration: lib/__tests__/, core, hooks, hue, pwa, services, utils (31 files)
+- [ ] 42-03-PLAN.md — Root __tests__/ lib, api, utils, hooks, and root-level service tests (31 files)
+- [ ] 42-04-PLAN.md — UI component tests batch 1: accessibility through Kbd (26 files)
+- [ ] 42-05-PLAN.md — UI component tests batch 2: Label through Tooltip (25 files)
+- [ ] 42-06-PLAN.md — Remaining app/ tests: hooks, context, API routes, components, thermostat (18 files)
+- [ ] 42-07-PLAN.md — Full test suite verification, tsc check, and gap closure
 
 **Requirements covered:**
 - TEST-01: Test files lib/ convertiti a .ts
@@ -238,9 +247,9 @@ Plans:
 | 39 - UI Components Migration | ✓ Complete | 11/11 | 100% |
 | 40 - API Routes Migration | ✓ Complete | 7/7 | 100% |
 | 41 - Pages Migration | ✓ Complete | 7/7 | 100% |
-| 42 - Test Migration | Pending | 0/? | 0% |
+| 42 - Test Migration | In Progress | 0/7 | 0% |
 | 43 - Verification | Pending | 0/? | 0% |
 
 ---
 *Roadmap created: 2026-02-05*
-*Last updated: 2026-02-07 — Phase 41 complete (7/7 plans, 70 files migrated, 30+ component prop fixes)*
+*Last updated: 2026-02-07 — Phase 42 planned (7 plans, 131 test files + 4 config/mock files)*

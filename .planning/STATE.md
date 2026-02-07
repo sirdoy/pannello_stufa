@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 40 - API Routes Migration
-Plan: 4 of 8 (COMPLETE)
-Status: In progress — Completed 40-04-PLAN.md (Notifications API Routes - 15 files migrated)
-Last activity: 2026-02-07 — Completed 40-04-PLAN.md (Notifications API Routes Migration)
+Plan: 2 of 8 (COMPLETE)
+Status: In progress — Completed 40-02-PLAN.md (Netatmo API Routes - 16 files migrated)
+Last activity: 2026-02-07 — Completed 40-02-PLAN.md (Netatmo API Routes Migration)
 
-Progress: [████████░░░░░░░░░░░░░░░░] 45% (3/7 phases complete, Phase 40: 6/8 plans complete)
+Progress: [████████░░░░░░░░░░░░░░░░] 44% (3/7 phases complete, Phase 40: 2/8 plans complete)
 
 ## Milestone Overview
 
@@ -36,9 +36,9 @@ Progress: [████████░░░░░░░░░░░░░░░
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 176 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 24)
+- Total plans completed: 177 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 25)
 - Average duration: ~6.0 min per plan
-- Total execution time: ~17.8 hours across 7 milestones
+- Total execution time: ~17.9 hours across 7 milestones
 
 **By Milestone:**
 
@@ -50,7 +50,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 | v3.1 Compliance | 6 | 13 | 4 days (2026-01-30 - 2026-02-02) |
 | v3.2 Weather & Dashboard | 5 | 13 | 2 days (2026-02-02 - 2026-02-03) |
 | v4.0 Advanced UI | 7 | 24 | 2 days (2026-02-04 - 2026-02-05) |
-| v5.0 TypeScript Migration | 7 | 24 plans (Phases 37-39 complete, Phase 40: 1/3) | In progress |
+| v5.0 TypeScript Migration | 7 | 25 plans (Phases 37-39 complete, Phase 40: 2/8) | In progress |
 
 ## Accumulated Context
 
@@ -78,6 +78,12 @@ Key patterns from previous milestones preserved for v5.0 migration:
 - Reduced motion: selective :not() exclusions preserve functional animations
 - DeviceCard contextMenuItems prop for declarative context menu
 - Button.Icon quick actions pattern with conditional visibility
+
+**Phase 40-02 decisions:**
+- Pragmatic external API typing: Use 'as any' for NETATMO_CAMERA_API responses (external types complex)
+- Session type workaround: Use 'any' instead of importing Session from @auth0 (compatibility)
+- Dynamic route params: RouteContext { params: Promise<{ cameraId: string }> } for Next.js 15
+- Remove 'as const' from VALID_MODES arrays: validateEnum expects string[], not readonly tuple
 
 **Phase 40-04 decisions:**
 - Error function signature: error(message, ErrorCode, HttpStatus) not error(message, status)
@@ -189,9 +195,9 @@ From 39-01 (Foundation UI components):
 ## Session Continuity
 
 Last session: 2026-02-07
-Stopped at: Completed 40-05-PLAN.md (Health/Monitoring, Scheduler, Schedules Routes - 10 files migrated)
+Stopped at: Completed 40-02-PLAN.md (Netatmo API Routes - 16 files migrated)
 Resume file: None
-Next step: Continue Phase 40 with remaining plans (06-08)
+Next step: Continue Phase 40 with remaining plans (03-08)
 
 From 38-10 (Type definitions gap closure):
 - Type narrowing with 'in' operator for discriminated unions: if ('property' in object)

@@ -160,13 +160,13 @@ Plans:
 **Plans:** 7 plans (6 migration + 1 gap closure)
 
 Plans:
-- [ ] 41-01-PLAN.md — Root files (layout, template, not-found), context providers, and 5 simple standalone pages
-- [ ] 41-02-PLAN.md — Thermostat pages and co-located schedule components (11 files)
-- [ ] 41-03-PLAN.md — Stove, lights, netatmo, and camera pages with co-located components (14 files)
-- [ ] 41-04-PLAN.md — Settings pages and NotificationSettingsForm (10 files)
-- [ ] 41-05-PLAN.md — Debug pages, DeliveryChart, and design-system page (10 files)
-- [ ] 41-06-PLAN.md — Debug tab components and design-system doc components (19 files)
-- [ ] 41-07-PLAN.md — Gap closure: tsc error resolution and migration verification
+- [x] 41-01-PLAN.md — Root files (layout, template, not-found), context providers, and 5 simple standalone pages
+- [x] 41-02-PLAN.md — Thermostat pages and co-located schedule components (11 files)
+- [x] 41-03-PLAN.md — Stove, lights, netatmo, and camera pages with co-located components (14 files)
+- [x] 41-04-PLAN.md — Settings pages and NotificationSettingsForm (10 files)
+- [x] 41-05-PLAN.md — Debug pages, DeliveryChart, and design-system page (10 files)
+- [x] 41-06-PLAN.md — Debug tab components and design-system doc components (19 files)
+- [x] 41-07-PLAN.md — Gap closure: tsc error resolution and migration verification
 
 **Requirements covered:**
 - PAGE-01: Layout e page files convertiti a .tsx
@@ -237,10 +237,10 @@ Plans:
 | 38 - Library Migration | ✓ Complete | 13/13 | 100% |
 | 39 - UI Components Migration | ✓ Complete | 11/11 | 100% |
 | 40 - API Routes Migration | ✓ Complete | 7/7 | 100% |
-| 41 - Pages Migration | Planned | 0/7 | 0% |
+| 41 - Pages Migration | ✓ Complete | 7/7 | 100% |
 | 42 - Test Migration | Pending | 0/? | 0% |
 | 43 - Verification | Pending | 0/? | 0% |
 
 ---
 *Roadmap created: 2026-02-05*
-*Last updated: 2026-02-07 — Phase 41 planned (7 plans: 6 migration + 1 gap closure, ~70 files)*
+*Last updated: 2026-02-07 — Phase 41 complete (7/7 plans, 70 files migrated, 30+ component prop fixes)*

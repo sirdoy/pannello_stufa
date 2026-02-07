@@ -42,9 +42,9 @@ Requirements for TypeScript migration. Each maps to roadmap phases.
 
 ### Pages Migration
 
-- [ ] **PAGE-01**: Layout e page files convertiti a .tsx
-- [ ] **PAGE-02**: Context providers convertiti a .tsx
-- [ ] **PAGE-03**: Loading/Error/Not-found states tipizzati
+- [x] **PAGE-01**: Layout e page files convertiti a .tsx
+- [x] **PAGE-02**: Context providers convertiti a .tsx
+- [x] **PAGE-03**: Loading/Error/Not-found states tipizzati
 
 ### Test Migration
 
@@ -106,9 +106,9 @@ Deferred to v5.1 or later — post-migration type improvements:
 | API-01 | Phase 40 | Complete |
 | API-02 | Phase 40 | Complete |
 | API-03 | Phase 40 | Complete |
-| PAGE-01 | Phase 41 | Pending |
-| PAGE-02 | Phase 41 | Pending |
-| PAGE-03 | Phase 41 | Pending |
+| PAGE-01 | Phase 41 | Complete |
+| PAGE-02 | Phase 41 | Complete |
+| PAGE-03 | Phase 41 | Complete |
 | TEST-01 | Phase 42 | Pending |
 | TEST-02 | Phase 42 | Pending |
 | TEST-03 | Phase 42 | Pending |
@@ -125,4 +125,4 @@ Deferred to v5.1 or later — post-migration type improvements:
 
 ---
 *Requirements defined: 2026-02-05*
-*Last updated: 2026-02-07 — Phase 40 requirements complete*
+*Last updated: 2026-02-07 — Phase 41 requirements complete*

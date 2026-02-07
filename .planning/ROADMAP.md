@@ -219,7 +219,17 @@ Plans:
 
 **Goal:** TypeScript migration is complete with passing build and zero JS files.
 
-**Plans:** (created by /gsd:plan-phase)
+**Plans:** 8 plans
+
+Plans:
+- [ ] 43-01-PLAN.md — Shared mock type utilities and full external API type definitions
+- [ ] 43-02-PLAN.md — Fix all 170 non-test source file tsc errors (29 pages/components)
+- [ ] 43-03-PLAN.md — Fix mock type errors in 8 high-error UI component tests (688 errors)
+- [ ] 43-04-PLAN.md — Fix mock type errors in 19 lib/ test files (350 errors)
+- [ ] 43-05-PLAN.md — Fix mock type errors in 21 __tests__/ and API route tests (520 errors)
+- [ ] 43-06-PLAN.md — Fix mock type errors in remaining 32 test files (445 errors)
+- [ ] 43-07-PLAN.md — Fix all 25 failing test runtime errors (11 test suites)
+- [ ] 43-08-PLAN.md — Config file conversion, final lockdown, and full validation
 
 **Requirements covered:**
 - VERIFY-01: `npm run build` completa senza errori
@@ -248,8 +258,8 @@ Plans:
 | 40 - API Routes Migration | ✓ Complete | 7/7 | 100% |
 | 41 - Pages Migration | ✓ Complete | 7/7 | 100% |
 | 42 - Test Migration | ✓ Complete | 7/7 | 100% |
-| 43 - Verification | Pending | 0/? | 0% |
+| 43 - Verification | In Progress | 0/8 | 0% |
 
 ---
 *Roadmap created: 2026-02-05*
-*Last updated: 2026-02-07 — Phase 42 complete (7 plans, 131 test files + 5 config/mock files migrated, 3012/3037 tests passing)*
+*Last updated: 2026-02-07 — Phase 43 planned (8 plans in 4 waves: fix 1654 tsc errors, 25 test failures, config conversion, final lockdown)*

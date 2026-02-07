@@ -415,7 +415,7 @@
     --color-text-secondary: var(--color-slate-800);
     --color-text-tertiary: var(--color-slate-700);
     --color-text-muted: var(--color-slate-600);
-    --color-text-disabled: var(--color-slate-400);
+    --color-text-disabled: var(--color-slate-500);
 
     /* Border overrides */
     --color-border-default: rgba(0, 0, 0, 0.06);

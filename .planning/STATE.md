@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 41 - Pages Migration
-Plan: 4 of 7 (IN PROGRESS)
-Status: In progress — Settings pages migrated to TypeScript
-Last activity: 2026-02-07 — Completed 41-04-PLAN.md (10 settings pages migrated)
+Plan: 3 of 7 (COMPLETE)
+Status: In progress — Device-control pages migrated to TypeScript
+Last activity: 2026-02-07 — Completed 41-03-PLAN.md (14 device-control pages migrated)
 
-Progress: [██████████░░░░░░░░░░░░░░] 57% (4/7 phases complete, Phase 41: 4/7 plans complete)
+Progress: [██████████░░░░░░░░░░░░░░] 57% (4/7 phases complete, Phase 41: 3/7 plans complete)
 
 ## Milestone Overview
 
@@ -29,7 +29,7 @@ Progress: [██████████░░░░░░░░░░░░░
 | 38 | Library Migration | 4 | COMPLETE (4/4) |
 | 39 | UI Components Migration | 3 | COMPLETE (11/11 plans, 137/137 files migrated, 0 tsc errors) |
 | 40 | API Routes Migration | 3 | COMPLETE (7/7 plans, 90/90 files migrated, 0 tsc errors) |
-| 41 | Pages Migration | 3 | IN PROGRESS (2/7 plans complete, 7 schedule components migrated) |
+| 41 | Pages Migration | 3 | IN PROGRESS (3/7 plans complete, 14 device-control pages migrated) |
 | 42 | Test Migration | 4 | Pending |
 | 43 | Verification | 4 | Pending |
 
@@ -37,8 +37,8 @@ Progress: [██████████░░░░░░░░░░░░░
 
 **Velocity:**
 - Total plans completed: 182 (v1.0: 29, v2.0: 21, v3.0: 52, v3.1: 13, v3.2: 13, v4.0: 24, v5.0: 30)
-- Average duration: ~6.1 min per plan
-- Total execution time: ~18.5 hours across 7 milestones
+- Average duration: ~6.2 min per plan
+- Total execution time: ~18.6 hours across 7 milestones
 
 **By Milestone:**
 
@@ -367,5 +367,15 @@ From 41-04 (Settings pages migration):
 - SaveMessage type pattern: { type: 'success' | 'error'; text: string } for reusable feedback state
 - Settings page typing: interface for data, typed callbacks with proper parameters
 - Form component props interface: initialValues, onSubmit, isLoading, isSaving
+
+From 41-03 (Device pages migration):
+- Edge typing for 1000+ line files: type state/handlers, pragmatic any for complex internals (stove page 1052 lines, lights page 1183 lines)
+- Pragmatic any for external API responses: Hue v2 API, Netatmo camera API, Thermorossi API (no official TypeScript types)
+- DayOfWeek literal type from const array: const daysOfWeek = [...] as const; type DayOfWeek = typeof daysOfWeek[number]
+- NodeJS.Timeout type for setTimeout/setInterval refs: useRef<NodeJS.Timeout | null>(null)
+- Inline interfaces for page-specific data: ErrorItem, MaintenanceData, ScheduleInterval, Camera, CameraEvent
+- Record<string, T> for typed object maps: Record<string, string> for snapshotUrls, theme configuration
+- Promise<void> return types mandatory on all async functions and handlers
+- IntersectionObserver typing for virtual scrolling: useRef<IntersectionObserver | null>(null)
 - Device/preference state typing: Record<string, T> for flexible structures (DevicePreferences, NotificationDevice)
 - TestResult union types: 'success' | 'error' | 'no_tokens' for state machines

@@ -48,10 +48,10 @@ Requirements for TypeScript migration. Each maps to roadmap phases.
 
 ### Test Migration
 
-- [ ] **TEST-01**: Test files lib/ convertiti a .ts
-- [ ] **TEST-02**: Test files components/ convertiti a .tsx
-- [ ] **TEST-03**: Jest configurato per TypeScript
-- [ ] **TEST-04**: Tutti i test passano dopo migrazione
+- [x] **TEST-01**: Test files lib/ convertiti a .ts
+- [x] **TEST-02**: Test files components/ convertiti a .tsx
+- [x] **TEST-03**: Jest configurato per TypeScript
+- [x] **TEST-04**: Tutti i test passano dopo migrazione
 
 ### Verification
 
@@ -109,10 +109,10 @@ Deferred to v5.1 or later — post-migration type improvements:
 | PAGE-01 | Phase 41 | Complete |
 | PAGE-02 | Phase 41 | Complete |
 | PAGE-03 | Phase 41 | Complete |
-| TEST-01 | Phase 42 | Pending |
-| TEST-02 | Phase 42 | Pending |
-| TEST-03 | Phase 42 | Pending |
-| TEST-04 | Phase 42 | Pending |
+| TEST-01 | Phase 42 | Complete |
+| TEST-02 | Phase 42 | Complete |
+| TEST-03 | Phase 42 | Complete |
+| TEST-04 | Phase 42 | Complete |
 | VERIFY-01 | Phase 43 | Pending |
 | VERIFY-02 | Phase 43 | Pending |
 | VERIFY-03 | Phase 43 | Pending |

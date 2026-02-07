@@ -243,7 +243,7 @@ From 39-01 (Foundation UI components):
 | 011 | Settings tabs unification | 2026-02-05 | 601c3da | [011-refactor-settings-tabs-unification](./quick/011-refactor-settings-tabs-unification/) |
 | 012 | API debug console with tabs | 2026-02-05 | 34aaa52 | [012-debug-page-component-tabs-with-api-testi](./quick/012-debug-page-component-tabs-with-api-testi/) |
 | 013 | Home cleanup - sandbox to settings | 2026-02-07 | 3f89d03 | [013-home-cleanup-sandbox-to-settings](./quick/013-home-cleanup-sandbox-to-settings/) |
-| 014 | Auth0 route protection audit | 2026-02-07 | pending | [014-auth0-route-protection-audit](./quick/014-auth0-route-protection-audit/) |
+| 014 | Auth0 route protection audit | 2026-02-07 | e05d338 | [014-auth0-route-protection-audit](./quick/014-auth0-route-protection-audit/) |
 
 ## Session Continuity
 

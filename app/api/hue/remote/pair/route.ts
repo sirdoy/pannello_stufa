@@ -45,6 +45,13 @@ export const POST = withAuthAndErrorHandler(async () => {
   console.log('🔗 [Hue Remote Pair] Enabling link button mode...');
 
   try {
+    interface LinkButtonError {
+      error?: {
+        type: number;
+        description?: string;
+      };
+    }
+
     const linkButtonResponse = await fetch(`${HUE_REMOTE_BASE}/bridge/0/config`, {
       method: 'PUT',
       headers: {
@@ -54,12 +61,12 @@ export const POST = withAuthAndErrorHandler(async () => {
       body: JSON.stringify({ linkbutton: true }),
     });
 
-    const linkButtonData = await linkButtonResponse.json();
+    const linkButtonData = await linkButtonResponse.json() as unknown;
     console.log('📥 [Hue Remote Pair] Link button response:', JSON.stringify(linkButtonData));
 
     // The response might be an array with success/error objects
     if (Array.isArray(linkButtonData)) {
-      const hasError = linkButtonData.find(item => item.error);
+      const hasError = (linkButtonData as LinkButtonError[]).find(item => item.error);
       if (hasError) {
         console.error('❌ [Hue Remote Pair] Link button error:', hasError.error);
         // Error 101 = link button not pressed
@@ -77,8 +84,8 @@ export const POST = withAuthAndErrorHandler(async () => {
         );
       }
     }
-  } catch (err) {
-    console.error('❌ [Hue Remote Pair] Link button request failed:', err);
+  } catch (err: unknown) {
+    console.error('❌ [Hue Remote Pair] Link button request failed:', err instanceof Error ? err.message : 'Unknown error');
     return error(
       'Errore di comunicazione con il cloud Hue',
       ERROR_CODES.NETWORK_ERROR,
@@ -101,13 +108,24 @@ export const POST = withAuthAndErrorHandler(async () => {
       }),
     });
 
-    const createUserData = await createUserResponse.json();
+    interface CreateUserResponse {
+      success?: {
+        username: string;
+        clientkey?: string;
+      };
+      error?: {
+        type: number;
+        description?: string;
+      };
+    }
+
+    const createUserData = await createUserResponse.json() as unknown;
     console.log('📥 [Hue Remote Pair] Create user response:', JSON.stringify(createUserData));
 
     // Parse response - should be array with success containing username
     if (Array.isArray(createUserData) && createUserData.length > 0) {
-      const successItem = createUserData.find(item => item.success);
-      const errorItem = createUserData.find(item => item.error);
+      const successItem = (createUserData as CreateUserResponse[]).find(item => item.success);
+      const errorItem = (createUserData as CreateUserResponse[]).find(item => item.error);
 
       if (errorItem) {
         console.error('❌ [Hue Remote Pair] Create user error:', errorItem.error);
@@ -166,8 +184,8 @@ export const POST = withAuthAndErrorHandler(async () => {
       HTTP_STATUS.INTERNAL_SERVER_ERROR
     );
 
-  } catch (err) {
-    console.error('❌ [Hue Remote Pair] Create user request failed:', err);
+  } catch (err: unknown) {
+    console.error('❌ [Hue Remote Pair] Create user request failed:', err instanceof Error ? err.message : 'Unknown error');
     return error(
       'Errore di comunicazione con il cloud Hue',
       ERROR_CODES.NETWORK_ERROR,

@@ -20,13 +20,29 @@ import { getHueConnection } from '@/lib/hue/hueLocalHelper';
 
 export const dynamic = 'force-dynamic';
 
+interface RouteContext {
+  params: Promise<{ id: string }>;
+}
+
+interface SceneAction {
+  target: {
+    rid: string;
+  };
+  action: Record<string, unknown>;
+}
+
+interface UpdateSceneRequestBody {
+  name?: string;
+  actions?: SceneAction[];
+}
+
 /**
  * PUT /api/hue/scenes/[id]
  * Update scene name and/or actions
  */
-export const PUT = withAuthAndErrorHandler(async (request, context) => {
+export const PUT = withAuthAndErrorHandler(async (request, context: RouteContext) => {
   const sceneId = await getPathParam(context, 'id');
-  const updates = await parseJsonOrThrow(request);
+  const updates = await parseJsonOrThrow(request) as UpdateSceneRequestBody;
 
   // Validation: At least one field to update
   if (!updates.name && !updates.actions) {
@@ -66,7 +82,7 @@ export const PUT = withAuthAndErrorHandler(async (request, context) => {
     const hueApi = new HueApi(connection.bridgeIp, connection.username);
 
     // Prepare update payload (trim name if provided)
-    const payload = {};
+    const payload: Record<string, unknown> = {};
     if (updates.name !== undefined) {
       payload.name = updates.name.trim();
     }
@@ -92,9 +108,9 @@ export const PUT = withAuthAndErrorHandler(async (request, context) => {
     return success({
       scene: response.data?.[0] || null,
     });
-  } catch (err) {
+  } catch (err: unknown) {
     // Handle network timeout (not on local network)
-    if (err.message === 'NETWORK_TIMEOUT') {
+    if (err instanceof Error && err.message === 'NETWORK_TIMEOUT') {
       return hueNotOnLocalNetwork();
     }
     throw err;
@@ -105,7 +121,7 @@ export const PUT = withAuthAndErrorHandler(async (request, context) => {
  * DELETE /api/hue/scenes/[id]
  * Delete scene from Hue bridge
  */
-export const DELETE = withAuthAndErrorHandler(async (request, context) => {
+export const DELETE = withAuthAndErrorHandler(async (request, context: RouteContext) => {
   const sceneId = await getPathParam(context, 'id');
 
   // Get Hue connection from Firebase
@@ -138,9 +154,9 @@ export const DELETE = withAuthAndErrorHandler(async (request, context) => {
     return success({
       message: 'Scena eliminata con successo',
     });
-  } catch (err) {
+  } catch (err: unknown) {
     // Handle network timeout (not on local network)
-    if (err.message === 'NETWORK_TIMEOUT') {
+    if (err instanceof Error && err.message === 'NETWORK_TIMEOUT') {
       return hueNotOnLocalNetwork();
     }
     throw err;

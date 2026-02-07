@@ -16,7 +16,11 @@ import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
 
 export const dynamic = 'force-dynamic';
 
-export const PUT = withHueHandler(async (request, context, session) => {
+interface RouteContext {
+  params: Promise<{ id: string }>;
+}
+
+export const PUT = withHueHandler(async (request, context: RouteContext, session) => {
   const id = await getPathParam(context, 'id');
   const user = session.user;
 

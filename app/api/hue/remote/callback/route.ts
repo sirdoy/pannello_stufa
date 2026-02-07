@@ -111,9 +111,10 @@ export const GET = withErrorHandler(async (request) => {
 
     // Redirect to home with success message
     return NextResponse.redirect(new URL('/?hue_remote=connected', request.url));
-  } catch (tokenError) {
-    console.error('❌ [Hue OAuth Callback] Token exchange failed:', tokenError.message);
+  } catch (tokenError: unknown) {
+    const errorMessage = tokenError instanceof Error ? tokenError.message : 'Unknown error';
+    console.error('❌ [Hue OAuth Callback] Token exchange failed:', errorMessage);
     await remove(stateRef);
-    return NextResponse.redirect(new URL(`/?error=token_exchange_failed&desc=${encodeURIComponent(tokenError.message)}`, request.url));
+    return NextResponse.redirect(new URL(`/?error=token_exchange_failed&desc=${encodeURIComponent(errorMessage)}`, request.url));
   }
 }, 'Hue/Remote/Callback');

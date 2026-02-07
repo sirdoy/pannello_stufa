@@ -18,7 +18,17 @@ import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
 
 export const dynamic = 'force-dynamic';
 
-export const GET = withHueHandler(async (request, context) => {
+interface RouteContext {
+  params: Promise<{ id: string }>;
+}
+
+interface GroupedLightStateBody {
+  on?: { on: boolean };
+  dimming?: { brightness: number };
+  [key: string]: unknown;
+}
+
+export const GET = withHueHandler(async (request, context: RouteContext) => {
   const id = await getPathParam(context, 'id');
 
   const provider = await HueConnectionStrategy.getProvider();
@@ -29,9 +39,9 @@ export const GET = withHueHandler(async (request, context) => {
   });
 }, 'Hue/Room/Get');
 
-export const PUT = withHueHandler(async (request, context, session) => {
+export const PUT = withHueHandler(async (request, context: RouteContext, session) => {
   const id = await getPathParam(context, 'id');
-  const body = await parseJson(request);
+  const body = await parseJson(request) as GroupedLightStateBody;
   const user = session.user;
 
   const provider = await HueConnectionStrategy.getProvider();

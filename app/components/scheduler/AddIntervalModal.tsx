@@ -293,7 +293,7 @@ export default function AddIntervalModal({
                   value: f,
                   label: `Livello ${f}`,
                 }))}
-                variant="subtle"
+                variant="default"
               />
             </div>
           </div>

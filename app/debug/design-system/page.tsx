@@ -1098,12 +1098,12 @@ export default function DesignSystemPage() {
                         { value: '4', label: 'Disabled Option', disabled: true },
                       ]}
                       value={selectValue}
-                      onChange={(e) => setSelectValue(e.target.value)}
+                      onChange={(e) => setSelectValue(String(e.target.value))}
                     />
                     <Select
                       label="Select with Variant"
                       icon="🌊"
-                      variant="subtle"
+                      variant="ocean"
                       options={[
                         { value: 'a', label: 'Ocean Option A' },
                         { value: 'b', label: 'Ocean Option B' },

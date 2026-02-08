@@ -839,8 +839,8 @@ export default function ThermostatCard() {
                           icon="📅"
                           value={selectedScheduleId || typedActiveSchedule?.id || ''}
                           onChange={(e) => {
-                            setSelectedScheduleId(e.target.value);
-                            handleScheduleChange(e.target.value);
+                            setSelectedScheduleId(String(e.target.value));
+                            handleScheduleChange(String(e.target.value));
                           }}
                           options={typedSchedules.map(s => ({
                             value: s.id,

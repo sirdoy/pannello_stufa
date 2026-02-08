@@ -29,7 +29,7 @@ describe('netatmoApi', () => {
 
   describe('getAccessToken', () => {
     it('should exchange refresh token for access token', async () => {
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         json: async () => ({
           access_token: 'test-access-token',
           refresh_token: 'new-refresh-token',
@@ -48,7 +48,7 @@ describe('netatmoApi', () => {
     });
 
     it('should throw error when access_token is missing', async () => {
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         json: async () => ({
           error: 'invalid_grant',
         }),
@@ -71,7 +71,7 @@ describe('netatmoApi', () => {
         },
       ];
 
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         json: async () => ({
           body: { homes: mockHomes },
         }),
@@ -83,7 +83,7 @@ describe('netatmoApi', () => {
     });
 
     it('should throw error when Netatmo API returns error', async () => {
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         json: async () => ({
           error: { message: 'Invalid token' },
         }),
@@ -118,7 +118,7 @@ describe('netatmoApi', () => {
         },
       ];
 
-      const result = parseRooms(homesData);
+      const result = parseRooms(homesData as any);
 
       expect(result).toHaveLength(2);
       expect(result[0]).toEqual({
@@ -158,7 +158,7 @@ describe('netatmoApi', () => {
         },
       ];
 
-      const result = parseRooms(homesData);
+      const result = parseRooms(homesData as any);
 
       expect(result[0]).not.toHaveProperty('setpoint');
     });
@@ -186,7 +186,7 @@ describe('netatmoApi', () => {
         },
       ];
 
-      const result = parseModules(homesData);
+      const result = parseModules(homesData as any);
 
       expect(result).toHaveLength(2);
       expect(result[0]).toEqual({
@@ -232,7 +232,7 @@ describe('netatmoApi', () => {
         ],
       };
 
-      const result = extractTemperatures(homeStatus);
+      const result = extractTemperatures(homeStatus as any);
 
       expect(result).toHaveLength(2);
       expect(result[0]).toEqual({
@@ -259,13 +259,13 @@ describe('netatmoApi', () => {
 
   describe('API error handling', () => {
     it('should handle network errors', async () => {
-      global.fetch.mockRejectedValue(new Error('Network error'));
+      (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
 
       await expect(getHomesData('token')).rejects.toThrow();
     });
 
     it('should handle Netatmo API errors with object format', async () => {
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         json: async () => ({
           error: {
             code: 2,
@@ -280,7 +280,7 @@ describe('netatmoApi', () => {
     });
 
     it('should handle Netatmo API errors with string format', async () => {
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         json: async () => ({
           error: 'invalid_token',
         }),
@@ -294,7 +294,7 @@ describe('netatmoApi', () => {
 
   describe('POST request formatting', () => {
     it('should send POST requests with application/x-www-form-urlencoded', async () => {
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         json: async () => ({
           status: 'ok',
         }),
@@ -559,7 +559,7 @@ describe('netatmoApi', () => {
         },
       ];
 
-      const result = parseSchedules(homesData);
+      const result = parseSchedules(homesData as any);
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -620,7 +620,7 @@ describe('netatmoApi', () => {
         },
       ];
 
-      const result = parseSchedules(homesData);
+      const result = parseSchedules(homesData as any);
 
       expect(result).toHaveLength(1);
       expect(result[0].zones).toHaveLength(2);
@@ -652,7 +652,7 @@ describe('netatmoApi', () => {
         },
       ];
 
-      const result = parseSchedules(homesData);
+      const result = parseSchedules(homesData as any);
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -672,7 +672,7 @@ describe('netatmoApi', () => {
 
     it('should handle null or missing schedules', () => {
       const homesData = [{ schedules: null }];
-      const result = parseSchedules(homesData);
+      const result = parseSchedules(homesData as any);
       expect(result).toEqual([]);
     });
 
@@ -723,7 +723,7 @@ describe('netatmoApi', () => {
         },
       ];
 
-      const result = parseSchedules(homesData);
+      const result = parseSchedules(homesData as any);
 
       expect(result).toHaveLength(1);
       expect(result[0].zones).toHaveLength(3);

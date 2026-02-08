@@ -9,7 +9,7 @@ import {
 } from '../maintenanceService';
 import { logUserAction } from '../logService';
 import { ref, get, set, update, runTransaction } from 'firebase/database';
-import { createMockFetchResponse } from '@/__tests__/__utils__/mockFactories';
+import { createMockFetchResponse, createMockDbRef, createMockDataSnapshot } from '@/__tests__/__utils__/mockFactories';
 
 // Mock Firebase module
 jest.mock('firebase/database');
@@ -37,10 +37,13 @@ describe('maintenanceService', () => {
     ) as jest.MockedFunction<typeof fetch>;
 
     // Setup mock functions
-    mockRef.mockReturnValue('mock-ref' as any);
-    mockGet.mockResolvedValue({ exists: () => false } as any);
+    const defaultMockDbRef = createMockDbRef();
+    mockRef.mockReturnValue(defaultMockDbRef);
+    mockGet.mockResolvedValue(createMockDataSnapshot(null));
     mockSet.mockResolvedValue(undefined);
-    mockUpdate.mockResolvedValue(undefined);
+    if (mockUpdate?.mockResolvedValue) {
+      mockUpdate.mockResolvedValue(undefined);
+    }
 
     // Mock runTransaction with default behavior
     // This mock uses the most recent data from get() to simulate realistic transaction behavior
@@ -97,8 +100,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      mockRef.mockReturnValue('mock-ref');
-      mockGet.mockResolvedValue(mockSnapshot);
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
+      mockGet.mockResolvedValue(createMockDataSnapshot(mockSnapshot.val()));
 
       // ACT
       const result = await getMaintenanceData();
@@ -110,11 +114,9 @@ describe('maintenanceService', () => {
 
     test('initializes with default data when not exists', async () => {
       // ARRANGE
-      const mockSnapshot = {
-        exists: () => false,
-      };
-      mockRef.mockReturnValue('mock-ref');
-      mockGet.mockResolvedValue(mockSnapshot);
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
+      mockGet.mockResolvedValue(createMockDataSnapshot(null));
       mockSet.mockResolvedValue(undefined);
 
       // ACT
@@ -137,7 +139,8 @@ describe('maintenanceService', () => {
 
     test('throws error on Firebase failure', async () => {
       // ARRANGE
-      mockRef.mockReturnValue('mock-ref');
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
       mockGet.mockRejectedValue(new Error('Firebase error'));
 
       // ACT & ASSERT
@@ -203,8 +206,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      mockRef.mockReturnValue('mock-ref');
-      mockGet.mockResolvedValue(mockSnapshot);
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
+      mockGet.mockResolvedValue(createMockDataSnapshot(mockSnapshot.val()));
       mockUpdate.mockResolvedValue(undefined);
       const mockDate = new Date('2025-10-15T12:00:00.000Z');
       jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
@@ -232,8 +236,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      mockRef.mockReturnValue('mock-ref');
-      mockGet.mockResolvedValue(mockSnapshot);
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
+      mockGet.mockResolvedValue(createMockDataSnapshot(mockSnapshot.val()));
       mockUpdate.mockResolvedValue(undefined);
 
       // ACT
@@ -255,8 +260,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      mockRef.mockReturnValue('mock-ref');
-      mockGet.mockResolvedValue(mockSnapshot);
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
+      mockGet.mockResolvedValue(createMockDataSnapshot(mockSnapshot.val()));
       mockUpdate.mockResolvedValue(undefined);
 
       // ACT
@@ -269,7 +275,8 @@ describe('maintenanceService', () => {
 
     test('throws error on Firebase failure', async () => {
       // ARRANGE
-      mockRef.mockReturnValue('mock-ref');
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
       mockGet.mockRejectedValue(new Error('Firebase error'));
 
       // ACT & ASSERT
@@ -290,8 +297,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      mockRef.mockReturnValue('mock-ref');
-      mockGet.mockResolvedValue(mockSnapshot);
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
+      mockGet.mockResolvedValue(createMockDataSnapshot(mockSnapshot.val()));
       mockUpdate.mockResolvedValue(undefined);
       const mockNow = new Date('2025-10-15T12:00:00.000Z');
       jest.spyOn(global, 'Date').mockImplementation(() => mockNow);
@@ -322,8 +330,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      mockRef.mockReturnValue('mock-ref');
-      mockGet.mockResolvedValue(mockSnapshot);
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
+      mockGet.mockResolvedValue(createMockDataSnapshot(mockSnapshot.val()));
       mockUpdate.mockResolvedValue(undefined);
 
       // ACT
@@ -364,8 +373,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      mockRef.mockReturnValue('mock-ref');
-      mockGet.mockResolvedValue(mockSnapshot);
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
+      mockGet.mockResolvedValue(createMockDataSnapshot(mockSnapshot.val()));
       const mockNow = new Date('2025-10-15T12:00:00.000Z');
       jest.spyOn(global, 'Date').mockImplementation(() => mockNow);
 
@@ -392,8 +402,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      mockRef.mockReturnValue('mock-ref');
-      mockGet.mockResolvedValue(mockSnapshot);
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
+      mockGet.mockResolvedValue(createMockDataSnapshot(mockSnapshot.val()));
       mockUpdate.mockResolvedValue(undefined);
 
       // ACT
@@ -422,8 +433,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      mockRef.mockReturnValue('mock-ref');
-      mockGet.mockResolvedValue(mockSnapshot);
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
+      mockGet.mockResolvedValue(createMockDataSnapshot(mockSnapshot.val()));
       mockUpdate.mockResolvedValue(undefined);
 
       // ACT
@@ -454,8 +466,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      mockRef.mockReturnValue('mock-ref');
-      mockGet.mockResolvedValue(mockSnapshot);
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
+      mockGet.mockResolvedValue(createMockDataSnapshot(mockSnapshot.val()));
       mockUpdate.mockResolvedValue(undefined);
 
       // ACT
@@ -469,7 +482,8 @@ describe('maintenanceService', () => {
 
     test('throws error on Firebase failure', async () => {
       // ARRANGE
-      mockRef.mockReturnValue('mock-ref');
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
       mockGet.mockRejectedValue(new Error('Firebase error'));
 
       // ACT & ASSERT
@@ -531,8 +545,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      mockRef.mockReturnValue('mock-ref');
-      mockGet.mockResolvedValue(mockSnapshot);
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
+      mockGet.mockResolvedValue(createMockDataSnapshot(mockSnapshot.val()));
 
       // ACT
       const result = await canIgnite();
@@ -552,8 +567,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      mockRef.mockReturnValue('mock-ref');
-      mockGet.mockResolvedValue(mockSnapshot);
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
+      mockGet.mockResolvedValue(createMockDataSnapshot(mockSnapshot.val()));
 
       // ACT
       const result = await canIgnite();
@@ -564,7 +580,8 @@ describe('maintenanceService', () => {
 
     test('returns true on Firebase error (fail-safe default)', async () => {
       // ARRANGE
-      mockRef.mockReturnValue('mock-ref');
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
       mockGet.mockRejectedValue(new Error('Firebase error'));
 
       // ACT
@@ -592,8 +609,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      mockRef.mockReturnValue('mock-ref');
-      mockGet.mockResolvedValue(mockSnapshot);
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
+      mockGet.mockResolvedValue(createMockDataSnapshot(mockSnapshot.val()));
 
       // ACT
       const result = await getMaintenanceStatus();
@@ -618,8 +636,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      mockRef.mockReturnValue('mock-ref');
-      mockGet.mockResolvedValue(mockSnapshot);
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
+      mockGet.mockResolvedValue(createMockDataSnapshot(mockSnapshot.val()));
 
       // ACT
       const result = await getMaintenanceStatus();
@@ -640,8 +659,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      mockRef.mockReturnValue('mock-ref');
-      mockGet.mockResolvedValue(mockSnapshot);
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
+      mockGet.mockResolvedValue(createMockDataSnapshot(mockSnapshot.val()));
 
       // ACT
       const result = await getMaintenanceStatus();
@@ -662,8 +682,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      mockRef.mockReturnValue('mock-ref');
-      mockGet.mockResolvedValue(mockSnapshot);
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
+      mockGet.mockResolvedValue(createMockDataSnapshot(mockSnapshot.val()));
 
       // ACT
       const result = await getMaintenanceStatus();
@@ -675,7 +696,8 @@ describe('maintenanceService', () => {
 
     test('throws error on Firebase failure', async () => {
       // ARRANGE
-      mockRef.mockReturnValue('mock-ref');
+      const mockDbRef = createMockDbRef();
+      mockRef.mockReturnValue(mockDbRef);
       mockGet.mockRejectedValue(new Error('Firebase error'));
 
       // ACT & ASSERT

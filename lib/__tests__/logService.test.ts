@@ -30,13 +30,12 @@ describe('logService', () => {
   describe('logUserAction', () => {
     test('logs action with correct API call', async () => {
       // ARRANGE
-      (global.fetch as jest.Mock).mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({ success: true }),
-      });
+      global.fetch = jest.fn().mockResolvedValue(
+        createMockFetchResponse({ success: true })
+      ) as jest.MockedFunction<typeof fetch>;
 
       // ACT
-      await logUserAction('Test action', 'Test value', { key: 'metadata' }, {});
+      await logUserAction('Test action', 'Test value', { key: 'metadata' } as any, {});
 
       // ASSERT
       expect(global.fetch).toHaveBeenCalledWith('/api/log/add', {
@@ -60,7 +59,7 @@ describe('logService', () => {
       await logUserAction('Test action', 'test-device');
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('action', 'Test action');
       expect(callBody).toHaveProperty('device', 'test-device');
       expect(callBody).not.toHaveProperty('value');
@@ -74,7 +73,7 @@ describe('logService', () => {
       await logUserAction('Test action', 'test-device', 'value');
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('action', 'Test action');
       expect(callBody).toHaveProperty('device', 'test-device');
       expect(callBody).toHaveProperty('value', 'value');
@@ -88,7 +87,7 @@ describe('logService', () => {
       await logUserAction('Test action', 'test-device', null, { source: 'manual', deviceId: '123' });
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('action', 'Test action');
       expect(callBody).toHaveProperty('device', 'test-device');
       expect(callBody).toHaveProperty('source', 'manual');
@@ -135,7 +134,7 @@ describe('logService', () => {
       await logUserAction('Test action', 'test-device', 0);
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('device', 'test-device');
       expect(callBody).toHaveProperty('value', 0);
     });
@@ -148,7 +147,7 @@ describe('logService', () => {
       await logUserAction('Test action', 'test-device', '');
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('device', 'test-device');
       expect(callBody).toHaveProperty('value', '');
     });
@@ -164,7 +163,7 @@ describe('logService', () => {
       await logStoveAction.ignite();
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('action', 'Accensione stufa');
     });
 
@@ -173,7 +172,7 @@ describe('logService', () => {
       await logStoveAction.shutdown();
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('action', 'Spegnimento stufa');
     });
 
@@ -182,7 +181,7 @@ describe('logService', () => {
       await logStoveAction.setFan(3);
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('action', 'Modifica ventilazione');
       expect(callBody).toHaveProperty('value', 3);
     });
@@ -192,7 +191,7 @@ describe('logService', () => {
       await logStoveAction.setPower(4);
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('action', 'Modifica potenza');
       expect(callBody).toHaveProperty('value', 4);
     });
@@ -208,7 +207,7 @@ describe('logService', () => {
       await logSchedulerAction.toggleMode(true);
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('action', 'Attivazione modalità automatica');
     });
 
@@ -217,7 +216,7 @@ describe('logService', () => {
       await logSchedulerAction.toggleMode(false);
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('action', 'Attivazione modalità manuale');
     });
 
@@ -226,7 +225,7 @@ describe('logService', () => {
       await logSchedulerAction.updateSchedule('Lunedì');
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('action', 'Modifica scheduler');
       expect(callBody).toHaveProperty('day', 'Lunedì');
       expect(callBody).not.toHaveProperty('value');
@@ -237,7 +236,7 @@ describe('logService', () => {
       await logSchedulerAction.addInterval('Martedì');
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('action', 'Aggiunto intervallo scheduler');
       expect(callBody).toHaveProperty('day', 'Martedì');
     });
@@ -247,7 +246,7 @@ describe('logService', () => {
       await logSchedulerAction.removeInterval('Mercoledì', 2);
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('action', 'Rimosso intervallo scheduler');
       expect(callBody).toHaveProperty('day', 'Mercoledì');
       expect(callBody).toHaveProperty('intervalIndex', 2);
@@ -258,7 +257,7 @@ describe('logService', () => {
       await logSchedulerAction.clearSemiManual();
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('action', 'Disattivazione modalità semi-manuale');
     });
   });
@@ -273,7 +272,7 @@ describe('logService', () => {
       await logNetatmoAction.connect();
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('action', 'Connessione Netatmo');
     });
 
@@ -282,7 +281,7 @@ describe('logService', () => {
       await logNetatmoAction.disconnect();
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('action', 'Disconnessione Netatmo');
     });
 
@@ -291,7 +290,7 @@ describe('logService', () => {
       await logNetatmoAction.setRoomTemperature('Living Room', 21.5);
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('action', 'Modifica temperatura stanza');
       expect(callBody).toHaveProperty('value', 21.5);
       expect(callBody).toHaveProperty('roomName', 'Living Room');
@@ -302,7 +301,7 @@ describe('logService', () => {
       await logNetatmoAction.setMode('schedule');
 
       // ASSERT
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('action', 'Cambio modalità termostato');
       expect(callBody).toHaveProperty('value', 'schedule');
     });
@@ -330,7 +329,7 @@ describe('logService', () => {
 
       // ASSERT
       expect(global.fetch).toHaveBeenCalled();
-      const callBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const callBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(callBody).toHaveProperty('action', 'Accensione stufa');
     });
   });

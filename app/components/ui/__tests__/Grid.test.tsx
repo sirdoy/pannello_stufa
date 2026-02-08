@@ -142,7 +142,7 @@ describe('Grid', () => {
   describe('Polymorphic Rendering', () => {
     it('renders as div by default', () => {
       const { container } = render(<Grid>Content</Grid>);
-      expect(container.firstChild.tagName).toBe('DIV');
+      expect((container.firstChild as any).tagName).toBe('DIV');
     });
 
     it('allows custom className to override', () => {

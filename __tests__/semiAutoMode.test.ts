@@ -39,7 +39,7 @@ describe('Semi-Auto Mode Activation', () => {
   describe('Status field detection', () => {
     it('should correctly detect WORK status using StatusDescription field', async () => {
       // Simula risposta API reale (usa StatusDescription, non status)
-      getStoveStatus.mockResolvedValue({
+      (getStoveStatus as jest.Mock).mockResolvedValue({
         StatusDescription: 'WORK',
         Error: 0,
         ErrorDescription: '',
@@ -51,7 +51,7 @@ describe('Semi-Auto Mode Activation', () => {
       expect(statusData.StatusDescription).toBe('WORK');
 
       // Verifica che 'status' minuscolo NON esista
-      expect(statusData.status).toBeUndefined();
+      expect((statusData as any).status).toBeUndefined();
 
       // Test la logica corretta per rilevare stufa accesa
       const isOn = statusData?.StatusDescription?.includes('WORK') ||
@@ -61,7 +61,7 @@ describe('Semi-Auto Mode Activation', () => {
     });
 
     it('should correctly detect START status using StatusDescription field', async () => {
-      getStoveStatus.mockResolvedValue({
+      (getStoveStatus as jest.Mock).mockResolvedValue({
         StatusDescription: 'START',
         Error: 0,
         ErrorDescription: '',
@@ -75,7 +75,7 @@ describe('Semi-Auto Mode Activation', () => {
     });
 
     it('should correctly detect OFF status', async () => {
-      getStoveStatus.mockResolvedValue({
+      (getStoveStatus as jest.Mock).mockResolvedValue({
         StatusDescription: 'OFF',
         Error: 0,
         ErrorDescription: '',
@@ -90,7 +90,7 @@ describe('Semi-Auto Mode Activation', () => {
 
     it('should NOT detect status with wrong field name (lowercase)', async () => {
       // Questo test verifica il bug: usare .status invece di .StatusDescription
-      getStoveStatus.mockResolvedValue({
+      (getStoveStatus as jest.Mock).mockResolvedValue({
         StatusDescription: 'WORK',
         Error: 0,
         ErrorDescription: '',
@@ -99,8 +99,8 @@ describe('Semi-Auto Mode Activation', () => {
       const statusData = await getStoveStatus();
 
       // BUG: usare .status (minuscolo) ritorna undefined (che è falsy)
-      const isOnWrong = statusData?.status?.includes('WORK') ||
-                        statusData?.status?.includes('START');
+      const isOnWrong = (statusData as any)?.status?.includes('WORK') ||
+                        (statusData as any)?.status?.includes('START');
 
       expect(isOnWrong).toBeUndefined(); // undefined perché .status non esiste!
 
@@ -115,12 +115,12 @@ describe('Semi-Auto Mode Activation', () => {
   describe('Semi-Auto mode activation logic', () => {
     it('should activate semi-auto when all conditions are met', async () => {
       // Setup: scheduler attivo, non in semi-manual
-      getFullSchedulerMode.mockResolvedValue({
+      (getFullSchedulerMode as jest.Mock).mockResolvedValue({
         enabled: true,
         semiManual: false,
       });
 
-      getNextScheduledChange.mockResolvedValue('2025-11-27T18:30:00.000Z');
+      (getNextScheduledChange as jest.Mock).mockResolvedValue('2025-11-27T18:30:00.000Z');
 
       // Simula la logica delle route stove (ignite, shutdown, setPower, setFan)
       const source = 'manual';
@@ -142,12 +142,12 @@ describe('Semi-Auto Mode Activation', () => {
     it('should activate semi-auto even when stove is OFF (manual command)', async () => {
       // Il semi-manuale si attiva per qualsiasi comando manuale,
       // indipendentemente dallo stato attuale della stufa
-      getFullSchedulerMode.mockResolvedValue({
+      (getFullSchedulerMode as jest.Mock).mockResolvedValue({
         enabled: true,
         semiManual: false,
       });
 
-      getNextScheduledChange.mockResolvedValue('2025-11-27T18:30:00.000Z');
+      (getNextScheduledChange as jest.Mock).mockResolvedValue('2025-11-27T18:30:00.000Z');
 
       const source = 'manual';
 
@@ -166,7 +166,7 @@ describe('Semi-Auto Mode Activation', () => {
     });
 
     it('should NOT activate semi-auto when scheduler is disabled', async () => {
-      getFullSchedulerMode.mockResolvedValue({
+      (getFullSchedulerMode as jest.Mock).mockResolvedValue({
         enabled: false, // Scheduler disabilitato
         semiManual: false,
       });
@@ -177,7 +177,7 @@ describe('Semi-Auto Mode Activation', () => {
       if (source === 'manual') {
         const mode = await getFullSchedulerMode();
         if (mode.enabled && !mode.semiManual) {
-          await setSemiManualMode();
+          await setSemiManualMode(null as any);
           modeChanged = true;
         }
       }
@@ -187,7 +187,7 @@ describe('Semi-Auto Mode Activation', () => {
     });
 
     it('should NOT activate semi-auto when already in semi-manual', async () => {
-      getFullSchedulerMode.mockResolvedValue({
+      (getFullSchedulerMode as jest.Mock).mockResolvedValue({
         enabled: true,
         semiManual: true, // Già in semi-manual
       });
@@ -198,7 +198,7 @@ describe('Semi-Auto Mode Activation', () => {
       if (source === 'manual') {
         const mode = await getFullSchedulerMode();
         if (mode.enabled && !mode.semiManual) {
-          await setSemiManualMode();
+          await setSemiManualMode(null as any);
           modeChanged = true;
         }
       }
@@ -208,16 +208,16 @@ describe('Semi-Auto Mode Activation', () => {
     });
 
     it('should NOT activate semi-auto when source is not manual (scheduler action)', async () => {
-      getFullSchedulerMode.mockResolvedValue({
+      (getFullSchedulerMode as jest.Mock).mockResolvedValue({
         enabled: true,
         semiManual: false,
       });
 
-      const source = 'scheduler'; // Azione automatica
+      const source: string = 'scheduler'; // Azione automatica
 
       let modeChanged = false;
       if (source === 'manual') {
-        await setSemiManualMode();
+        await setSemiManualMode(null as any);
         modeChanged = true;
       }
 

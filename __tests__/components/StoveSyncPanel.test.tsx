@@ -7,7 +7,7 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import StoveSyncPanel from '@/app/components/netatmo/StoveSyncPanel';
 
 // Mock fetch
-global.fetch = jest.fn();
+global.fetch = jest.fn() as jest.Mock;
 
 describe('StoveSyncPanel', () => {
   beforeEach(() => {
@@ -16,7 +16,7 @@ describe('StoveSyncPanel', () => {
 
   it('should render loading skeleton initially', () => {
     // Mock fetch to never resolve (stays in loading state)
-    global.fetch.mockImplementation(() => new Promise(() => {}));
+    (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
 
     const { container } = render(<StoveSyncPanel />);
 
@@ -46,10 +46,10 @@ describe('StoveSyncPanel', () => {
       ],
     };
 
-    global.fetch.mockResolvedValue({
+    (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
       json: async () => mockConfig,
-    });
+    } as any);
 
     render(<StoveSyncPanel />);
 
@@ -75,10 +75,10 @@ describe('StoveSyncPanel', () => {
       ],
     };
 
-    global.fetch.mockResolvedValue({
+    (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
       json: async () => mockConfig,
-    });
+    } as any);
 
     render(<StoveSyncPanel />);
 
@@ -104,10 +104,10 @@ describe('StoveSyncPanel', () => {
       ],
     };
 
-    global.fetch.mockResolvedValue({
+    (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
       json: async () => mockConfig,
-    });
+    } as any);
 
     const { container } = render(<StoveSyncPanel />);
 
@@ -132,10 +132,10 @@ describe('StoveSyncPanel', () => {
       availableRooms: [],
     };
 
-    global.fetch.mockResolvedValue({
+    (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
       json: async () => mockConfig,
-    });
+    } as any);
 
     render(<StoveSyncPanel />);
 
@@ -165,10 +165,10 @@ describe('StoveSyncPanel', () => {
     };
 
     // Mock all fetch calls
-    global.fetch.mockResolvedValue({
+    (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
       json: async () => mockConfig,
-    });
+    } as any);
 
     render(<StoveSyncPanel />);
 
@@ -189,7 +189,8 @@ describe('StoveSyncPanel', () => {
     });
 
     // Reset mock to track only POST calls
-    const callCount = global.fetch.mock.calls.length;
+    const fetchMock = global.fetch as jest.Mock;
+    const callCount = fetchMock.mock.calls.length;
 
     // Click save
     const saveButton = screen.getByText('Salva modifiche').closest('button');
@@ -198,17 +199,17 @@ describe('StoveSyncPanel', () => {
     // Wait for fetch to be called with POST
     await waitFor(() => {
       // Check that a new fetch call was made after the initial GET
-      expect(global.fetch.mock.calls.length).toBeGreaterThan(callCount);
+      expect(fetchMock.mock.calls.length).toBeGreaterThan(callCount);
     });
 
     // Verify the save call was made
-    const lastCall = global.fetch.mock.calls[global.fetch.mock.calls.length - 1];
+    const lastCall = fetchMock.mock.calls[fetchMock.mock.calls.length - 1];
     expect(lastCall[0]).toContain('/api/netatmo/stove-sync');
-    expect(lastCall[1].method).toBe('POST');
+    expect((lastCall[1] as any).method).toBe('POST');
   });
 
   it('should handle errors gracefully', async () => {
-    global.fetch.mockRejectedValue(new Error('Network error'));
+    (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
 
     render(<StoveSyncPanel />);
 

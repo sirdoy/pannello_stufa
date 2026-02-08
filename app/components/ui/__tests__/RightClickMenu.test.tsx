@@ -89,7 +89,7 @@ const TestRightClickMenuWithGroups = (props) => (
 /**
  * Helper: Fire contextmenu event on an element
  */
-const fireContextMenu = (element, options = {}) => {
+const fireContextMenu = (element: any, options: any = {}) => {
   fireEvent.contextMenu(element, {
     clientX: options.clientX || 100,
     clientY: options.clientY || 100,
@@ -697,7 +697,7 @@ describe('RightClickMenu Component', () => {
     test('RightClickMenuContent forwards ref', () => {
       const ref = { current: null };
       render(
-        <RightClickMenu defaultOpen>
+        <RightClickMenu {...({ defaultOpen: true } as any)}>
           <RightClickMenu.Trigger asChild>
             <div data-testid="context-trigger">Trigger</div>
           </RightClickMenu.Trigger>
@@ -794,7 +794,7 @@ describe('RightClickMenu Component', () => {
       const user = userEvent.setup();
 
       const { rerender } = render(
-        <RightClickMenu open={false} onOpenChange={handleOpenChange}>
+        <RightClickMenu {...({ open: false, onOpenChange: handleOpenChange } as any)}>
           <RightClickMenu.Trigger asChild>
             <div data-testid="context-trigger">Trigger</div>
           </RightClickMenu.Trigger>
@@ -812,7 +812,7 @@ describe('RightClickMenu Component', () => {
 
       // Rerender with open=true
       rerender(
-        <RightClickMenu open={true} onOpenChange={handleOpenChange}>
+        <RightClickMenu {...({ open: true, onOpenChange: handleOpenChange } as any)}>
           <RightClickMenu.Trigger asChild>
             <div data-testid="context-trigger">Trigger</div>
           </RightClickMenu.Trigger>

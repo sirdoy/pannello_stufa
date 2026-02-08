@@ -4,7 +4,7 @@ import ProgressBar from '../ProgressBar';
 // Mock Text component to avoid dependency issues
 jest.mock('../Text', () => ({
   __esModule: true,
-  default: ({ children, as: Component = 'span', ...props }) => <Component {...props}>{children}</Component>
+  default: ({ children, as: Component = 'span', ...props }: any) => <Component {...props}>{children}</Component>
 }));
 
 describe('ProgressBar Component', () => {

@@ -139,7 +139,7 @@ describe('netatmoCredentials', () => {
         redirectUri: 'https://app.vercel.app/callback',
       });
       // Verify clientSecret is NOT exposed to client
-      expect(credentials.clientSecret).toBeUndefined();
+      expect((credentials as any).clientSecret).toBeUndefined();
     });
 
     it('throws error if credentials are missing', () => {
@@ -166,7 +166,7 @@ describe('netatmoCredentials', () => {
       expect(clientCredentials.redirectUri).toEqual(serverCredentials.redirectUri);
       // clientSecret should only be in server credentials
       expect(serverCredentials.clientSecret).toBeDefined();
-      expect(clientCredentials.clientSecret).toBeUndefined();
+      expect((clientCredentials as any).clientSecret).toBeUndefined();
     });
   });
 

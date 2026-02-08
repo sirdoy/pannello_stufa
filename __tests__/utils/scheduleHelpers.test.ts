@@ -108,10 +108,10 @@ describe('scheduleHelpers', () => {
     });
 
     it('should return empty array for invalid input', () => {
-      expect(parseTimelineSlots(null)).toEqual([]);
-      expect(parseTimelineSlots({})).toEqual([]);
-      expect(parseTimelineSlots({ zones: [] })).toEqual([]);
-      expect(parseTimelineSlots({ timetable: [] })).toEqual([]);
+      expect(parseTimelineSlots(null as any)).toEqual([]);
+      expect(parseTimelineSlots({} as any)).toEqual([]);
+      expect(parseTimelineSlots({ zones: [] } as any)).toEqual([]);
+      expect(parseTimelineSlots({ timetable: [] } as any)).toEqual([]);
     });
 
     it('should skip slots with missing zones', () => {

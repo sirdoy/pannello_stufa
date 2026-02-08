@@ -34,11 +34,11 @@ describe('sandboxService', () => {
   describe('isLocalEnvironment', () => {
     it('should return true in development environment', () => {
       const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'development';
+      (process.env as any).NODE_ENV = 'development';
 
       expect(isLocalEnvironment()).toBe(true);
 
-      process.env.NODE_ENV = originalEnv;
+      (process.env as any).NODE_ENV = originalEnv;
     });
 
     // Note: In Jest test environment, NODE_ENV is 'test' which is treated as development

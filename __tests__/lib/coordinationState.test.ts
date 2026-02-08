@@ -6,26 +6,30 @@ import {
   getCoordinationState,
   updateCoordinationState,
   resetCoordinationState
-} from '../../lib/coordinationState.ts';
+} from '../../lib/coordinationState';
 
 // Mock dependencies
-jest.mock('../../lib/firebaseAdmin.ts');
-jest.mock('../../lib/environmentHelper.ts');
+jest.mock('../../lib/firebaseAdmin');
+jest.mock('../../lib/environmentHelper');
 
-import { adminDbGet, adminDbSet } from '../../lib/firebaseAdmin.ts';
-import { getEnvironmentPath } from '../../lib/environmentHelper.ts';
+import { adminDbGet, adminDbSet } from '../../lib/firebaseAdmin';
+import { getEnvironmentPath } from '../../lib/environmentHelper';
+
+const mockGetEnvironmentPath = getEnvironmentPath as jest.MockedFunction<typeof getEnvironmentPath>;
+const mockAdminDbGet = adminDbGet as jest.MockedFunction<typeof adminDbGet>;
+const mockAdminDbSet = adminDbSet as jest.MockedFunction<typeof adminDbSet>;
 
 describe('coordinationState', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
     // Setup default mock implementations
-    getEnvironmentPath.mockImplementation(path => `test/${path}`);
+    mockGetEnvironmentPath.mockImplementation(path => `test/${path}`);
   });
 
   describe('getCoordinationState', () => {
     it('returns default state when nothing stored', async () => {
-      adminDbGet.mockResolvedValue(null);
+      mockAdminDbGet.mockResolvedValue(null);
 
       const state = await getCoordinationState();
 
@@ -39,7 +43,7 @@ describe('coordinationState', () => {
         previousSetpoints: null,
       });
       expect(state.lastStateChange).toBeGreaterThan(0);
-      expect(adminDbGet).toHaveBeenCalledWith('test/coordination/state');
+      expect(mockAdminDbGet).toHaveBeenCalledWith('test/coordination/state');
     });
 
     it('returns stored state', async () => {
@@ -53,16 +57,16 @@ describe('coordinationState', () => {
         debounceStartedAt: null,
         previousSetpoints: { '12345': 21 },
       };
-      adminDbGet.mockResolvedValue(storedState);
+      mockAdminDbGet.mockResolvedValue(storedState);
 
       const state = await getCoordinationState();
 
       expect(state).toEqual(storedState);
-      expect(adminDbGet).toHaveBeenCalledWith('test/coordination/state');
+      expect(mockAdminDbGet).toHaveBeenCalledWith('test/coordination/state');
     });
 
     it('uses environment-aware path', async () => {
-      adminDbGet.mockResolvedValue(null);
+      mockAdminDbGet.mockResolvedValue(null);
 
       await getCoordinationState();
 
@@ -82,7 +86,7 @@ describe('coordinationState', () => {
         debounceStartedAt: null,
         previousSetpoints: null,
       };
-      adminDbGet.mockResolvedValue(existingState);
+      mockAdminDbGet.mockResolvedValue(existingState);
 
       const updates = {
         stoveOn: true,
@@ -97,11 +101,11 @@ describe('coordinationState', () => {
       expect(updatedState.automationPaused).toBe(false); // Unchanged
       expect(updatedState.pausedUntil).toBeNull(); // Unchanged
       expect(updatedState.lastStateChange).toBeGreaterThan(existingState.lastStateChange);
-      expect(adminDbSet).toHaveBeenCalledWith('test/coordination/state', updatedState);
+      expect(mockAdminDbSet).toHaveBeenCalledWith('test/coordination/state', updatedState);
     });
 
     it('sets lastStateChange automatically', async () => {
-      adminDbGet.mockResolvedValue({
+      mockAdminDbGet.mockResolvedValue({
         stoveOn: false,
         automationPaused: false,
         pausedUntil: null,
@@ -131,7 +135,7 @@ describe('coordinationState', () => {
         debounceStartedAt: 1737990000000,
         previousSetpoints: { '12345': 21 },
       };
-      adminDbGet.mockResolvedValue(existingState);
+      mockAdminDbGet.mockResolvedValue(existingState);
 
       const updates = { pendingDebounce: false };
       const updatedState = await updateCoordinationState(updates);
@@ -142,7 +146,7 @@ describe('coordinationState', () => {
     });
 
     it('overwrites existing lastStateChange', async () => {
-      adminDbGet.mockResolvedValue({
+      mockAdminDbGet.mockResolvedValue({
         stoveOn: false,
         automationPaused: false,
         pausedUntil: null,
@@ -177,7 +181,7 @@ describe('coordinationState', () => {
         previousSetpoints: null,
       });
       expect(resetState.lastStateChange).toBeGreaterThan(0);
-      expect(adminDbSet).toHaveBeenCalledWith('test/coordination/state', resetState);
+      expect(mockAdminDbSet).toHaveBeenCalledWith('test/coordination/state', resetState);
     });
 
     it('uses environment-aware path', async () => {
@@ -189,7 +193,7 @@ describe('coordinationState', () => {
 
   describe('state shape', () => {
     it('matches documented schema', async () => {
-      adminDbGet.mockResolvedValue(null);
+      mockAdminDbGet.mockResolvedValue(null);
       const state = await getCoordinationState();
 
       // Verify all required fields exist

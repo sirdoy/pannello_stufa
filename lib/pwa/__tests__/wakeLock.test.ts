@@ -20,15 +20,15 @@ describe('wakeLock', () => {
   describe('requestWakeLock', () => {
     it('returns false if not supported', async () => {
       // In jsdom, wakeLock is not supported
-      const originalWakeLock = navigator.wakeLock;
-      delete navigator.wakeLock;
+      const originalWakeLock = (navigator as any).wakeLock;
+      Object.defineProperty(navigator, 'wakeLock', { value: undefined, writable: true, configurable: true });
 
       const result = await requestWakeLock();
       expect(result).toBe(false);
 
       // Restore
       if (originalWakeLock) {
-        navigator.wakeLock = originalWakeLock;
+        Object.defineProperty(navigator, 'wakeLock', { value: originalWakeLock, writable: true, configurable: true });
       }
     });
   });

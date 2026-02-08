@@ -13,12 +13,13 @@ jest.mock('../indexedDB', () => ({
   put: jest.fn().mockResolvedValue(1),
   getAll: jest.fn().mockResolvedValue([]),
   getByIndex: jest.fn().mockResolvedValue([]),
-  remove: jest.fn().mockResolvedValue(),
+  remove: jest.fn((storeName: string, key: string | number) => Promise.resolve()),
   STORES: {
     COMMAND_QUEUE: 'commandQueue',
     DEVICE_STATE: 'deviceState',
     APP_STATE: 'appState',
   },
+  initDB: jest.fn().mockResolvedValue(undefined),
 }));
 
 describe('backgroundSync', () => {
@@ -42,8 +43,12 @@ describe('backgroundSync', () => {
       const command = {
         id: 1,
         endpoint: 'stove/ignite',
+        method: 'POST',
+        data: {},
         timestamp: '2026-01-19T10:30:00.000Z',
-        status: 'pending',
+        status: 'pending' as const,
+        retries: 0,
+        lastError: null,
       };
 
       const result = formatCommandForDisplay(command);
@@ -58,8 +63,12 @@ describe('backgroundSync', () => {
       const command = {
         id: 2,
         endpoint: 'stove/shutdown',
+        method: 'POST',
+        data: {},
         timestamp: '2026-01-19T10:30:00.000Z',
-        status: 'pending',
+        status: 'pending' as const,
+        retries: 0,
+        lastError: null,
       };
 
       const result = formatCommandForDisplay(command);
@@ -72,8 +81,12 @@ describe('backgroundSync', () => {
       const command = {
         id: 3,
         endpoint: 'stove/set-power',
+        method: 'POST',
+        data: {},
         timestamp: '2026-01-19T10:30:00.000Z',
-        status: 'pending',
+        status: 'pending' as const,
+        retries: 0,
+        lastError: null,
       };
 
       const result = formatCommandForDisplay(command);
@@ -86,8 +99,12 @@ describe('backgroundSync', () => {
       const command = {
         id: 4,
         endpoint: 'unknown/action',
+        method: 'POST',
+        data: {},
         timestamp: '2026-01-19T10:30:00.000Z',
-        status: 'pending',
+        status: 'pending' as const,
+        retries: 0,
+        lastError: null,
       };
 
       const result = formatCommandForDisplay(command);
@@ -100,8 +117,12 @@ describe('backgroundSync', () => {
       const command = {
         id: 1,
         endpoint: 'stove/ignite',
+        method: 'POST',
+        data: {},
         timestamp: '2026-01-19T10:30:00.000Z',
-        status: 'pending',
+        status: 'pending' as const,
+        retries: 0,
+        lastError: null,
       };
 
       const result = formatCommandForDisplay(command);
@@ -114,8 +135,9 @@ describe('backgroundSync', () => {
       const command = {
         id: 1,
         endpoint: 'stove/ignite',
+        method: 'POST',
         timestamp: '2026-01-19T10:30:00.000Z',
-        status: 'pending',
+        status: 'pending' as const,
         retries: 2,
         lastError: 'Network error',
         data: { source: 'manual' },

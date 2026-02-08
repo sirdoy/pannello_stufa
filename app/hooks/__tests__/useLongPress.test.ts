@@ -34,7 +34,7 @@ describe('useLongPress Hook', () => {
       const callback = jest.fn();
       const { result } = renderHook(() => useLongPress(callback));
 
-      const mockEvent = { preventDefault: jest.fn() };
+      const mockEvent = { preventDefault: jest.fn() } as any;
 
       act(() => {
         result.current.onTouchStart(mockEvent);
@@ -210,7 +210,7 @@ describe('useLongPress Hook', () => {
       const callback = jest.fn();
       const { result } = renderHook(() => useLongPress(callback));
 
-      const mockEvent = { preventDefault: jest.fn() };
+      const mockEvent = { preventDefault: jest.fn() } as any;
 
       act(() => {
         result.current.onTouchStart(mockEvent);
@@ -234,7 +234,7 @@ describe('useLongPress Hook', () => {
       const callback = jest.fn();
       const { result } = renderHook(() => useLongPress(callback));
 
-      const mockEvent = { preventDefault: jest.fn() };
+      const mockEvent = { preventDefault: jest.fn() } as any;
 
       act(() => {
         result.current.onTouchStart(mockEvent);

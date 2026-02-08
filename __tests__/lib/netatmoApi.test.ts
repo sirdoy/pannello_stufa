@@ -206,7 +206,7 @@ describe('netatmoApi', () => {
     });
 
     it('should handle empty modules', () => {
-      const result = parseModules([{ modules: [] }]);
+      const result = parseModules([{ id: 'home1', modules: [] }] as any);
       expect(result).toEqual([]);
     });
   });
@@ -353,7 +353,7 @@ describe('netatmoApi', () => {
         ],
       };
 
-      const result = extractModulesWithStatus(homeStatus);
+      const result = extractModulesWithStatus(homeStatus as any);
 
       expect(result).toHaveLength(3);
 
@@ -409,7 +409,7 @@ describe('netatmoApi', () => {
         ],
       };
 
-      const result = extractModulesWithStatus(homeStatus, topology);
+      const result = extractModulesWithStatus(homeStatus as any, topology as any);
 
       expect(result[0].name).toBe('Valvola Soggiorno');
     });
@@ -438,7 +438,7 @@ describe('netatmoApi', () => {
         ],
       };
 
-      const result = extractModulesWithStatus(homeStatus);
+      const result = extractModulesWithStatus(homeStatus as any);
 
       expect(result[0]).not.toHaveProperty('battery_state');
       expect(result[0]).not.toHaveProperty('battery_level');
@@ -456,7 +456,7 @@ describe('netatmoApi', () => {
         { id: 'v5', battery_state: 'very_low' },
       ];
 
-      const result = getModulesWithLowBattery(modules);
+      const result = getModulesWithLowBattery(modules as any);
 
       expect(result).toHaveLength(2);
       expect(result.map(m => m.id)).toEqual(['v4', 'v5']);
@@ -468,7 +468,7 @@ describe('netatmoApi', () => {
         { id: 'v2', battery_state: 'high' },
       ];
 
-      const result = getModulesWithLowBattery(modules);
+      const result = getModulesWithLowBattery(modules as any);
 
       expect(result).toEqual([]);
     });
@@ -481,7 +481,7 @@ describe('netatmoApi', () => {
         { id: 'v2', battery_state: 'very_low' },
       ];
 
-      expect(hasAnyCriticalBattery(modules)).toBe(true);
+      expect(hasAnyCriticalBattery(modules as any)).toBe(true);
     });
 
     it('should return false when no module has very_low battery', () => {
@@ -490,35 +490,35 @@ describe('netatmoApi', () => {
         { id: 'v2', battery_state: 'low' },
       ];
 
-      expect(hasAnyCriticalBattery(modules)).toBe(false);
+      expect(hasAnyCriticalBattery(modules as any)).toBe(false);
     });
   });
 
   describe('hasAnyLowBattery', () => {
     it('should return true when any module has low battery', () => {
       const modules = [
-        { id: 'v1', battery_state: 'full' },
-        { id: 'v2', battery_state: 'low' },
-      ];
+        { id: 'v1', type: 'NATherm1', reachable: true, battery_state: 'full' },
+        { id: 'v2', type: 'NATherm1', reachable: true, battery_state: 'low' },
+      ] as any[];
 
       expect(hasAnyLowBattery(modules)).toBe(true);
     });
 
     it('should return true when any module has very_low battery', () => {
       const modules = [
-        { id: 'v1', battery_state: 'full' },
-        { id: 'v2', battery_state: 'very_low' },
-      ];
+        { id: 'v1', type: 'NATherm1', reachable: true, battery_state: 'full' },
+        { id: 'v2', type: 'NATherm1', reachable: true, battery_state: 'very_low' },
+      ] as any[];
 
       expect(hasAnyLowBattery(modules)).toBe(true);
     });
 
     it('should return false when all modules have adequate battery', () => {
       const modules = [
-        { id: 'v1', battery_state: 'full' },
-        { id: 'v2', battery_state: 'high' },
-        { id: 'v3', battery_state: 'medium' },
-      ];
+        { id: 'v1', type: 'NATherm1', reachable: true, battery_state: 'full' },
+        { id: 'v2', type: 'NATherm1', reachable: true, battery_state: 'high' },
+        { id: 'v3', type: 'NATherm1', reachable: true, battery_state: 'medium' },
+      ] as any[];
 
       expect(hasAnyLowBattery(modules)).toBe(false);
     });

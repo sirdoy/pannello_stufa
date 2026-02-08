@@ -18,8 +18,8 @@ describe('StoveCard - External Change Detection & Firebase Sync', () => {
   describe('Firebase Sync Logic', () => {
     it('should detect status change and call updateStoveState', async () => {
       // Simulate polling detecting a status change
-      const previousStatus = 'spento';
-      const newStatus = 'acceso';
+      const previousStatus: string = 'spento';
+      const newStatus: string = 'acceso';
       const newFanLevel = 3;
       const newPowerLevel = 2;
       const newErrorCode = 0;
@@ -50,8 +50,8 @@ describe('StoveCard - External Change Detection & Firebase Sync', () => {
     });
 
     it('should detect fan level change and sync to Firebase', async () => {
-      const previousFanLevel = 3;
-      const newFanLevel = 5;
+      const previousFanLevel: number = 3;
+      const newFanLevel: number = 5;
       const previousStatus = 'acceso';
       const newStatus = 'acceso';
 
@@ -125,7 +125,7 @@ describe('StoveCard - External Change Detection & Firebase Sync', () => {
 
   describe('Adaptive Polling Intervals', () => {
     it('should use 15s interval when stove is ON', () => {
-      const status = 'acceso';
+      const status: string = 'acceso';
       const usePollingFallback = false;
 
       const stoveIsOn = status !== 'spento' &&
@@ -140,7 +140,7 @@ describe('StoveCard - External Change Detection & Firebase Sync', () => {
     });
 
     it('should use 60s interval when stove is OFF', () => {
-      const status = 'spento';
+      const status: string = 'spento';
       const usePollingFallback = false;
 
       const stoveIsOn = status !== 'spento' &&
@@ -155,7 +155,7 @@ describe('StoveCard - External Change Detection & Firebase Sync', () => {
     });
 
     it('should use 10s interval when Firebase disconnected', () => {
-      const status = 'acceso';
+      const status: string = 'acceso';
       const usePollingFallback = true;
 
       const stoveIsOn = status !== 'spento' &&

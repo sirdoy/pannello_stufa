@@ -13,16 +13,16 @@ import {
   checkUserStoveHealth,
   determineConnectionStatus,
   detectStateMismatch,
-} from '../../lib/healthMonitoring.ts';
+} from '../../lib/healthMonitoring';
 
 // Mock dependencies
-jest.mock('../../lib/stoveApi.ts');
-jest.mock('../../lib/netatmoApi.ts');
-jest.mock('../../lib/firebaseAdmin.ts');
+jest.mock('../../lib/stoveApi');
+jest.mock('../../lib/netatmoApi');
+jest.mock('../../lib/firebaseAdmin');
 
-import { getStoveStatus } from '../../lib/stoveApi.ts';
-import { getHomeStatus } from '../../lib/netatmoApi.ts';
-import { adminDbGet } from '../../lib/firebaseAdmin.ts';
+import { getStoveStatus } from '../../lib/stoveApi';
+import { getHomeStatus } from '../../lib/netatmoApi';
+import { adminDbGet } from '../../lib/firebaseAdmin';
 
 describe('healthMonitoring', () => {
   beforeEach(() => {
@@ -32,36 +32,36 @@ describe('healthMonitoring', () => {
   describe('determineConnectionStatus', () => {
     it('returns online when stove status fetched successfully', () => {
       const stoveResult = {
-        status: 'fulfilled',
+        status: 'fulfilled' as const,
         value: { StatusDescription: 'WORK' },
-      };
+      } as PromiseSettledResult<unknown>;
 
       expect(determineConnectionStatus(stoveResult)).toBe('online');
     });
 
     it('returns offline on timeout error', () => {
       const stoveResult = {
-        status: 'rejected',
+        status: 'rejected' as const,
         reason: new Error('STOVE_TIMEOUT'),
-      };
+      } as PromiseSettledResult<unknown>;
 
       expect(determineConnectionStatus(stoveResult)).toBe('offline');
     });
 
     it('returns error on other errors', () => {
       const stoveResult = {
-        status: 'rejected',
+        status: 'rejected' as const,
         reason: new Error('Network error'),
-      };
+      } as PromiseSettledResult<unknown>;
 
       expect(determineConnectionStatus(stoveResult)).toBe('error');
     });
 
     it('returns error on parsing errors', () => {
       const stoveResult = {
-        status: 'rejected',
+        status: 'rejected' as const,
         reason: new Error('Invalid JSON'),
-      };
+      } as PromiseSettledResult<unknown>;
 
       expect(determineConnectionStatus(stoveResult)).toBe('error');
     });
@@ -180,12 +180,12 @@ describe('healthMonitoring', () => {
       const userId = 'auth0|test123';
 
       // Mock successful responses
-      getStoveStatus.mockResolvedValue({ StatusDescription: 'WORK', Error: 0 });
-      adminDbGet
+      (getStoveStatus as jest.Mock).mockResolvedValue({ StatusDescription: 'WORK', Error: 0 });
+      (adminDbGet as jest.Mock)
         .mockResolvedValueOnce('auto') // mode
         .mockResolvedValueOnce([{ day: 1, start: 0, end: 1440, enabled: true }]) // schedule
         .mockResolvedValueOnce({ token: 'fake-token' }); // Netatmo token
-      getHomeStatus.mockResolvedValue({ rooms: [{ heating_power_request: 50 }] });
+      (getHomeStatus as jest.Mock).mockResolvedValue({ rooms: [{ heating_power_request: 50 }] });
 
       const health = await checkUserStoveHealth(userId);
 
@@ -203,8 +203,8 @@ describe('healthMonitoring', () => {
       const userId = 'auth0|test123';
 
       // Stove OK, Schedule OK, Netatmo fails
-      getStoveStatus.mockResolvedValue({ StatusDescription: 'WORK', Error: 0 });
-      adminDbGet
+      (getStoveStatus as jest.Mock).mockResolvedValue({ StatusDescription: 'WORK', Error: 0 });
+      (adminDbGet as jest.Mock)
         .mockResolvedValueOnce('auto')
         .mockResolvedValueOnce([{ day: 1, start: 0, end: 1440, enabled: true }])
         .mockRejectedValueOnce(new Error('Netatmo API error'));
@@ -222,8 +222,8 @@ describe('healthMonitoring', () => {
       const userId = 'auth0|test123';
 
       // Stove timeout
-      getStoveStatus.mockRejectedValue(new Error('STOVE_TIMEOUT'));
-      adminDbGet
+      (getStoveStatus as jest.Mock).mockRejectedValue(new Error('STOVE_TIMEOUT'));
+      (adminDbGet as jest.Mock)
         .mockResolvedValueOnce('auto')
         .mockResolvedValueOnce([{ day: 1, start: 0, end: 1440, enabled: true }]);
 
@@ -238,9 +238,9 @@ describe('healthMonitoring', () => {
       const userId = 'auth0|test123';
 
       // All APIs fail
-      getStoveStatus.mockRejectedValue(new Error('Network error'));
-      adminDbGet.mockRejectedValue(new Error('Firebase error'));
-      getHomeStatus.mockRejectedValue(new Error('Netatmo error'));
+      (getStoveStatus as jest.Mock).mockRejectedValue(new Error('Network error'));
+      (adminDbGet as jest.Mock).mockRejectedValue(new Error('Firebase error'));
+      (getHomeStatus as jest.Mock).mockRejectedValue(new Error('Netatmo error'));
 
       const health = await checkUserStoveHealth(userId);
 
@@ -255,8 +255,8 @@ describe('healthMonitoring', () => {
     it('includes timestamp in result', async () => {
       const userId = 'auth0|test123';
 
-      getStoveStatus.mockResolvedValue({ StatusDescription: 'STANDBY', Error: 0 });
-      adminDbGet.mockResolvedValue('manual');
+      (getStoveStatus as jest.Mock).mockResolvedValue({ StatusDescription: 'STANDBY', Error: 0 });
+      (adminDbGet as jest.Mock).mockResolvedValue('manual');
 
       const before = Date.now();
       const health = await checkUserStoveHealth(userId);

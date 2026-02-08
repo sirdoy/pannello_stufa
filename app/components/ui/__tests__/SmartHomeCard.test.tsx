@@ -442,7 +442,7 @@ describe('SmartHomeCard', () => {
 
   describe('Ref Forwarding', () => {
     it('forwards ref to Card root element', () => {
-      const ref = createRef();
+      const ref = createRef() as any;
       render(
         <SmartHomeCard ref={ref}>
           <p>Content</p>
@@ -452,19 +452,19 @@ describe('SmartHomeCard', () => {
     });
 
     it('forwards ref to SmartHomeCardHeader', () => {
-      const ref = createRef();
+      const ref = createRef() as any;
       render(<SmartHomeCardHeader ref={ref}>Header</SmartHomeCardHeader>);
       expect(ref.current).toBeInstanceOf(HTMLDivElement);
     });
 
     it('forwards ref to SmartHomeCardStatus', () => {
-      const ref = createRef();
+      const ref = createRef() as any;
       render(<SmartHomeCardStatus ref={ref}>Status</SmartHomeCardStatus>);
       expect(ref.current).toBeInstanceOf(HTMLDivElement);
     });
 
     it('forwards ref to SmartHomeCardControls', () => {
-      const ref = createRef();
+      const ref = createRef() as any;
       render(<SmartHomeCardControls ref={ref}>Controls</SmartHomeCardControls>);
       expect(ref.current).toBeInstanceOf(HTMLDivElement);
     });

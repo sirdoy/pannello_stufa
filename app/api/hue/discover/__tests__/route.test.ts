@@ -15,6 +15,9 @@ import { GET } from '../route';
 import { discoverBridges } from '@/lib/hue/hueApi';
 import { auth0 } from '@/lib/auth0';
 
+const mockGetSession = auth0.getSession as jest.MockedFunction<typeof auth0.getSession>;
+const mockDiscoverBridges = discoverBridges as jest.MockedFunction<typeof discoverBridges>;
+
 describe('GET /api/hue/discover', () => {
   let mockRequest;
   const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
@@ -23,13 +26,13 @@ describe('GET /api/hue/discover', () => {
     jest.clearAllMocks();
     mockRequest = new Request('http://localhost:3000/api/hue/discover');
     // Default: authenticated user
-    auth0.getSession.mockResolvedValue(mockSession);
+    mockGetSession.mockResolvedValue(mockSession as any);
   });
 
   it('should return 401 when not authenticated', async () => {
-    auth0.getSession.mockResolvedValue(null);
+    mockGetSession.mockResolvedValue(null);
 
-    const response = await GET(mockRequest);
+    const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -49,9 +52,9 @@ describe('GET /api/hue/discover', () => {
       },
     ];
 
-    discoverBridges.mockResolvedValue(mockBridges);
+    mockDiscoverBridges.mockResolvedValue(mockBridges);
 
-    const response = await GET(mockRequest);
+    const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -59,13 +62,13 @@ describe('GET /api/hue/discover', () => {
       success: true,
       bridges: mockBridges,
     });
-    expect(discoverBridges).toHaveBeenCalled();
+    expect(mockDiscoverBridges).toHaveBeenCalled();
   });
 
   it('should return empty array when no bridges found', async () => {
-    discoverBridges.mockResolvedValue([]);
+    mockDiscoverBridges.mockResolvedValue([]);
 
-    const response = await GET(mockRequest);
+    const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -76,9 +79,9 @@ describe('GET /api/hue/discover', () => {
   });
 
   it('should handle discovery errors gracefully', async () => {
-    discoverBridges.mockRejectedValue(new Error('Network error'));
+    mockDiscoverBridges.mockRejectedValue(new Error('Network error'));
 
-    const response = await GET(mockRequest);
+    const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(500);
@@ -87,9 +90,9 @@ describe('GET /api/hue/discover', () => {
   });
 
   it('should handle bridge discovery service timeout', async () => {
-    discoverBridges.mockRejectedValue(new Error('Failed to discover bridges'));
+    mockDiscoverBridges.mockRejectedValue(new Error('Failed to discover bridges'));
 
-    const response = await GET(mockRequest);
+    const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(500);

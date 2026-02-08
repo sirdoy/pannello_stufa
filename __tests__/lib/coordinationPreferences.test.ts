@@ -6,14 +6,14 @@ import {
   getCoordinationPreferences,
   updateCoordinationPreferences,
   getDefaultCoordinationPreferences,
-} from '../../lib/coordinationPreferences.ts';
+} from '../../lib/coordinationPreferences';
 
 // Mock dependencies
-jest.mock('../../lib/firebaseAdmin.ts');
-jest.mock('../../lib/environmentHelper.ts');
+jest.mock('../../lib/firebaseAdmin');
+jest.mock('../../lib/environmentHelper');
 
-import { adminDbGet, adminDbSet } from '../../lib/firebaseAdmin.ts';
-import { getEnvironmentPath } from '../../lib/environmentHelper.ts';
+import { adminDbGet, adminDbSet } from '../../lib/firebaseAdmin';
+import { getEnvironmentPath } from '../../lib/environmentHelper';
 
 describe('coordinationPreferences', () => {
   const testUserId = 'auth0|12345';
@@ -22,12 +22,12 @@ describe('coordinationPreferences', () => {
     jest.clearAllMocks();
 
     // Setup default mock implementations
-    getEnvironmentPath.mockImplementation(path => `test/${path}`);
+    (getEnvironmentPath as jest.Mock).mockImplementation(path => `test/${path}`);
   });
 
   describe('getCoordinationPreferences', () => {
     it('returns defaults for new user', async () => {
-      adminDbGet.mockResolvedValue(null);
+      (adminDbGet as jest.Mock).mockResolvedValue(null);
 
       const prefs = await getCoordinationPreferences(testUserId);
 
@@ -63,7 +63,7 @@ describe('coordinationPreferences', () => {
         version: 5,
         updatedAt: '2026-01-27T10:00:00Z',
       };
-      adminDbGet.mockResolvedValue(storedPrefs);
+      (adminDbGet as jest.Mock).mockResolvedValue(storedPrefs);
 
       const prefs = await getCoordinationPreferences(testUserId);
 
@@ -72,7 +72,7 @@ describe('coordinationPreferences', () => {
     });
 
     it('uses environment-aware path', async () => {
-      adminDbGet.mockResolvedValue(null);
+      (adminDbGet as jest.Mock).mockResolvedValue(null);
 
       await getCoordinationPreferences(testUserId);
 
@@ -94,7 +94,7 @@ describe('coordinationPreferences', () => {
         },
         version: 1,
       };
-      adminDbGet.mockResolvedValue(existingPrefs);
+      (adminDbGet as jest.Mock).mockResolvedValue(existingPrefs);
 
       const updates = {
         defaultBoost: 3,
@@ -120,7 +120,7 @@ describe('coordinationPreferences', () => {
     });
 
     it('rejects invalid data', async () => {
-      adminDbGet.mockResolvedValue({
+      (adminDbGet as jest.Mock).mockResolvedValue({
         enabled: true,
         defaultBoost: 2,
         zones: [],
@@ -157,7 +157,7 @@ describe('coordinationPreferences', () => {
         },
         version: 3,
       };
-      adminDbGet.mockResolvedValue(existingPrefs);
+      (adminDbGet as jest.Mock).mockResolvedValue(existingPrefs);
 
       const updatedPrefs = await updateCoordinationPreferences(testUserId, {
         defaultBoost: 3,
@@ -167,7 +167,7 @@ describe('coordinationPreferences', () => {
     });
 
     it('sets updatedAt', async () => {
-      adminDbGet.mockResolvedValue({
+      (adminDbGet as jest.Mock).mockResolvedValue({
         enabled: true,
         defaultBoost: 2,
         zones: [],
@@ -208,7 +208,7 @@ describe('coordinationPreferences', () => {
         version: 2,
         updatedAt: '2026-01-27T10:00:00Z',
       };
-      adminDbGet.mockResolvedValue(existingPrefs);
+      (adminDbGet as jest.Mock).mockResolvedValue(existingPrefs);
 
       const updates = {
         enabled: false, // Just disable coordination
@@ -226,7 +226,7 @@ describe('coordinationPreferences', () => {
 
   describe('zone configuration', () => {
     it('validates zone correctly', async () => {
-      adminDbGet.mockResolvedValue({
+      (adminDbGet as jest.Mock).mockResolvedValue({
         enabled: true,
         defaultBoost: 2,
         zones: [],
@@ -264,7 +264,7 @@ describe('coordinationPreferences', () => {
     });
 
     it('rejects invalid zone (missing roomId)', async () => {
-      adminDbGet.mockResolvedValue({
+      (adminDbGet as jest.Mock).mockResolvedValue({
         enabled: true,
         defaultBoost: 2,
         zones: [],
@@ -291,7 +291,7 @@ describe('coordinationPreferences', () => {
 
   describe('boost amount constraints', () => {
     it('accepts valid boost amounts', async () => {
-      adminDbGet.mockResolvedValue({
+      (adminDbGet as jest.Mock).mockResolvedValue({
         enabled: true,
         defaultBoost: 2,
         zones: [],
@@ -314,7 +314,7 @@ describe('coordinationPreferences', () => {
     });
 
     it('rejects boost below minimum (0.5°C)', async () => {
-      adminDbGet.mockResolvedValue({
+      (adminDbGet as jest.Mock).mockResolvedValue({
         enabled: true,
         defaultBoost: 2,
         zones: [],
@@ -333,7 +333,7 @@ describe('coordinationPreferences', () => {
     });
 
     it('rejects boost above maximum (5°C)', async () => {
-      adminDbGet.mockResolvedValue({
+      (adminDbGet as jest.Mock).mockResolvedValue({
         enabled: true,
         defaultBoost: 2,
         zones: [],

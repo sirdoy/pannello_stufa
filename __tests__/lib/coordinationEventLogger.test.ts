@@ -48,15 +48,15 @@ describe('coordinationEventLogger', () => {
       collection: mockCollection,
     };
 
-    getAdminFirestore.mockReturnValue(mockDb);
+    (getAdminFirestore as jest.Mock).mockReturnValue(mockDb);
 
     // Mock Timestamp.now()
-    Timestamp.now = jest.fn(() => ({
+    (Timestamp.now as any) = jest.fn(() => ({
       toDate: () => new Date('2026-01-27T14:00:00Z'),
     }));
 
     // Mock Timestamp.fromDate()
-    Timestamp.fromDate = jest.fn((date) => ({
+    (Timestamp.fromDate as any) = jest.fn((date: Date) => ({
       toDate: () => date,
     }));
   });
@@ -75,7 +75,7 @@ describe('coordinationEventLogger', () => {
           rooms: [{ roomId: 'room1', roomName: 'Living', setpoint: 22 }],
         },
         notificationSent: true,
-      };
+      } as any;
 
       const result = await logCoordinationEvent(event);
 
@@ -104,7 +104,7 @@ describe('coordinationEventLogger', () => {
         eventType: 'setpoints_restored',
         stoveStatus: 'STANDBY',
         action: 'restored',
-      };
+      } as any;
 
       await logCoordinationEvent(event);
 
@@ -124,7 +124,7 @@ describe('coordinationEventLogger', () => {
         eventType: 'boost_applied',
         stoveStatus: 'WORK',
         action: 'applied',
-      };
+      } as any;
 
       const result = await logCoordinationEvent(event);
 
@@ -135,7 +135,7 @@ describe('coordinationEventLogger', () => {
       const event = {
         userId: 'user123',
         // Missing eventType, stoveStatus, action
-      };
+      } as any;
 
       const result = await logCoordinationEvent(event);
 
@@ -153,7 +153,7 @@ describe('coordinationEventLogger', () => {
         stoveStatus: 'WORK',
         action: 'paused',
         // No details, notificationSent, or cronRunId
-      };
+      } as any;
 
       await logCoordinationEvent(event);
 
@@ -176,7 +176,7 @@ describe('coordinationEventLogger', () => {
         stoveStatus: 'WORK',
         action: 'applied',
         cronRunId: 'cron-run-123',
-      };
+      } as any;
 
       await logCoordinationEvent(event);
 

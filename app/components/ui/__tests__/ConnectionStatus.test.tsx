@@ -190,7 +190,7 @@ describe('ConnectionStatus', () => {
       const statuses = ['online', 'offline', 'connecting', 'unknown'];
 
       for (const status of statuses) {
-        const { container } = render(<ConnectionStatus status={status} />);
+        const { container } = render(<ConnectionStatus status={status as any} />);
         const results = await axe(container);
         expect(results).toHaveNoViolations();
       }

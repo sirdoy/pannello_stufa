@@ -10,13 +10,17 @@ import { getEnvironmentPath } from '@/lib/environmentHelper';
 jest.mock('@/lib/firebaseAdmin');
 jest.mock('@/lib/environmentHelper');
 
+const mockAdminDbGet = adminDbGet as jest.MockedFunction<typeof adminDbGet>;
+const mockAdminDbSet = adminDbSet as jest.MockedFunction<typeof adminDbSet>;
+const mockGetEnvironmentPath = getEnvironmentPath as jest.MockedFunction<typeof getEnvironmentPath>;
+
 describe('netatmoCacheService', () => {
   beforeEach(() => {
     // Clear all mocks before each test
     jest.clearAllMocks();
 
     // Default mock implementation
-    getEnvironmentPath.mockImplementation((path) => `dev/${path}`);
+    mockGetEnvironmentPath.mockImplementation((path) => `dev/${path}`);
   });
 
   describe('CACHE_TTL_MS', () => {
@@ -33,7 +37,7 @@ describe('netatmoCacheService', () => {
       const now = Date.now();
 
       // Mock valid cache (2 minutes old)
-      adminDbGet.mockResolvedValue({
+      mockAdminDbGet.mockResolvedValue({
         data: cachedData,
         cached_at: now - (2 * 60 * 1000), // 2 minutes ago
       });
@@ -45,8 +49,8 @@ describe('netatmoCacheService', () => {
       // Should return cached data
       expect(result.data).toEqual(cachedData);
       expect(result.source).toBe('cache');
-      expect(result.age_seconds).toBeGreaterThanOrEqual(119);
-      expect(result.age_seconds).toBeLessThanOrEqual(121);
+      expect((result as any).age_seconds).toBeGreaterThanOrEqual(119);
+      expect((result as any).age_seconds).toBeLessThanOrEqual(121);
 
       // Should NOT call fetch function
       expect(fetchFn).not.toHaveBeenCalled();
@@ -61,7 +65,7 @@ describe('netatmoCacheService', () => {
       const now = Date.now();
 
       // Mock expired cache (10 minutes old)
-      adminDbGet.mockResolvedValue({
+      mockAdminDbGet.mockResolvedValue({
         data: { schedule: 'old data' },
         cached_at: now - (10 * 60 * 1000), // 10 minutes ago
       });
@@ -73,7 +77,7 @@ describe('netatmoCacheService', () => {
       // Should return fresh data
       expect(result.data).toEqual(freshData);
       expect(result.source).toBe('api');
-      expect(result.age_seconds).toBeUndefined();
+      expect((result as any).age_seconds).toBeUndefined();
 
       // Should call fetch function
       expect(fetchFn).toHaveBeenCalledTimes(1);
@@ -93,7 +97,7 @@ describe('netatmoCacheService', () => {
       const freshData = { schedule: 'brand new data' };
 
       // Mock empty cache
-      adminDbGet.mockResolvedValue(null);
+      mockAdminDbGet.mockResolvedValue(null);
 
       const fetchFn = jest.fn().mockResolvedValue(freshData);
 
@@ -126,7 +130,7 @@ describe('netatmoCacheService', () => {
       Date.now = jest.fn(() => mockTimestamp);
 
       // Mock empty cache
-      adminDbGet.mockResolvedValue(null);
+      mockAdminDbGet.mockResolvedValue(null);
 
       const fetchFn = jest.fn().mockResolvedValue(freshData);
 
@@ -150,7 +154,7 @@ describe('netatmoCacheService', () => {
       const fetchError = new Error('Netatmo API error');
 
       // Mock empty cache
-      adminDbGet.mockResolvedValue(null);
+      mockAdminDbGet.mockResolvedValue(null);
 
       const fetchFn = jest.fn().mockRejectedValue(fetchError);
 
@@ -166,7 +170,7 @@ describe('netatmoCacheService', () => {
       const freshData = { schedule: 'recovered data' };
 
       // Mock invalid cache (missing data field)
-      adminDbGet.mockResolvedValue({
+      mockAdminDbGet.mockResolvedValue({
         cached_at: Date.now() - 60000,
         // data field missing
       });
@@ -186,7 +190,7 @@ describe('netatmoCacheService', () => {
       const freshData = { schedule: 'recovered data' };
 
       // Mock invalid cache (missing cached_at field)
-      adminDbGet.mockResolvedValue({
+      mockAdminDbGet.mockResolvedValue({
         data: { schedule: 'old data' },
         // cached_at field missing
       });
@@ -206,7 +210,7 @@ describe('netatmoCacheService', () => {
     it('should remove cache entry from Firebase', async () => {
       const cacheKey = 'schedule/12345';
 
-      adminDbSet.mockResolvedValue(undefined);
+      mockAdminDbSet.mockResolvedValue(undefined);
 
       const result = await invalidateCache(cacheKey);
 
@@ -221,7 +225,7 @@ describe('netatmoCacheService', () => {
       const cacheKey = 'schedule/error';
       const deleteError = new Error('Firebase error');
 
-      adminDbSet.mockRejectedValue(deleteError);
+      mockAdminDbSet.mockRejectedValue(deleteError);
 
       // Should propagate the error
       await expect(invalidateCache(cacheKey)).rejects.toThrow('Firebase error');
@@ -230,7 +234,7 @@ describe('netatmoCacheService', () => {
     it('should work with nested cache keys', async () => {
       const cacheKey = 'schedule/home/12345/room/67890';
 
-      adminDbSet.mockResolvedValue(undefined);
+      mockAdminDbSet.mockResolvedValue(undefined);
 
       await invalidateCache(cacheKey);
 

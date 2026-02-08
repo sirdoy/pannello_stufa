@@ -64,7 +64,7 @@ describe('StatusCard', () => {
             icon="🌡️"
             title="Thermostat"
             status="Status"
-            statusVariant={variant}
+            statusVariant={variant as any}
           >
             <p>Content</p>
           </StatusCard>
@@ -404,7 +404,7 @@ describe('StatusCard', () => {
 
   describe('Ref Forwarding', () => {
     it('forwards ref to SmartHomeCard', () => {
-      const ref = createRef();
+      const ref = createRef() as any;
       render(
         <StatusCard ref={ref} status="Active">
           <p>Content</p>

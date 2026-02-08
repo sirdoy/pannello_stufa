@@ -11,10 +11,13 @@ import {
 describe('coordinationPauseCalculator', () => {
   // Sample schedule matching Netatmo structure
   const sampleSchedule = {
+    id: 'test-schedule',
+    name: 'Test Schedule',
+    type: 'therm',
     zones: [
-      { id: 1, name: 'Comfort', temp: 21 },
-      { id: 2, name: 'Night', temp: 18 },
-      { id: 3, name: 'Eco', temp: 19 },
+      { id: 1, name: 'Comfort', type: 0, temp: 21 },
+      { id: 2, name: 'Night', type: 1, temp: 18 },
+      { id: 3, name: 'Eco', type: 5, temp: 19 },
     ],
     timetable: [
       { m_offset: 0, zone_id: 2 },      // Monday 00:00 - Night
@@ -87,6 +90,9 @@ describe('coordinationPauseCalculator', () => {
     it('empty timetable returns 1-hour default pause', () => {
       const now = new Date('2024-01-08T10:00:00Z');
       const emptySchedule = {
+        id: 'empty-schedule',
+        name: 'Empty',
+        type: 'therm',
         zones: [],
         timetable: [],
       };
@@ -113,13 +119,16 @@ describe('coordinationPauseCalculator', () => {
     it('handles schedule without zones', () => {
       const now = new Date('2024-01-08T10:00:00Z'); // Monday 10:00
       const scheduleWithoutZones = {
+        id: 'no-zones',
+        name: 'No Zones',
+        type: 'therm',
         timetable: [
           { m_offset: 0, zone_id: 1 },
           { m_offset: 1320, zone_id: 2 },
         ],
       };
 
-      const result = calculatePauseUntil(now, scheduleWithoutZones);
+      const result = calculatePauseUntil(now, scheduleWithoutZones as any);
 
       // Should still find next slot
       expect(result.nextSlot.offset).toBe(1320);
@@ -142,7 +151,10 @@ describe('coordinationPauseCalculator', () => {
     it('handles unsorted timetable', () => {
       const now = new Date('2024-01-08T10:00:00Z'); // Monday 10:00
       const unsortedSchedule = {
-        zones: [{ id: 1, name: 'Comfort', temp: 21 }],
+        id: 'unsorted',
+        name: 'Unsorted',
+        type: 'therm',
+        zones: [{ id: 1, name: 'Comfort', type: 0, temp: 21 }],
         timetable: [
           { m_offset: 1320, zone_id: 1 }, // Out of order
           { m_offset: 420, zone_id: 1 },
@@ -249,7 +261,7 @@ describe('coordinationPauseCalculator', () => {
     it('handles unknown change type with fallback', () => {
       const pauseTime = new Date('2024-01-08T12:00:00').getTime();
 
-      const reason = formatPauseReason('unknown', pauseTime);
+      const reason = formatPauseReason('unknown' as any, pauseTime);
 
       expect(reason).toContain('12:00');
       expect(reason).toContain('modifica manuale rilevata');

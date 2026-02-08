@@ -43,7 +43,7 @@ describe('notificationHistoryService', () => {
       collection: mockCollection,
     };
 
-    getAdminFirestore.mockReturnValue(mockDb);
+    (getAdminFirestore as jest.Mock).mockReturnValue(mockDb);
   });
 
   describe('getNotificationHistory', () => {

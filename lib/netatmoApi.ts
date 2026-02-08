@@ -493,7 +493,7 @@ function parseModules(homesData: NetatmoHome[]): ParsedModule[] {
 
   const home = homesData[0];
   return (home.modules || []).map(module => {
-    const parsed: ParsedModule = {
+    const parsed: Partial<ParsedModule> = {
       id: module.id,
       name: module.name,
       type: module.type,
@@ -510,7 +510,7 @@ function parseModules(homesData: NetatmoHome[]): ParsedModule[] {
       parsed.room_id = module.room_id;
     }
 
-    return parsed;
+    return parsed as ParsedModule;
   });
 }
 

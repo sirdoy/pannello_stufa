@@ -24,6 +24,8 @@ describe('netatmoCameraApi', () => {
 
     it('should parse cameras correctly', () => {
       const input = [{
+        id: 'home1',
+        name: 'Home',
         cameras: [{
           id: 'cam1',
           name: 'Test Camera',
@@ -34,7 +36,7 @@ describe('netatmoCameraApi', () => {
           local_url: 'http://192.168.1.10',
           sd_status: 'on',
         }],
-      }];
+      }] as any[];
 
       const result = parseCameras(input);
 
@@ -51,6 +53,7 @@ describe('netatmoCameraApi', () => {
 
     it('should filter out undefined optional properties', () => {
       const input = [{
+        id: 'home1',
         cameras: [{
           id: 'cam1',
           name: 'Camera',
@@ -58,7 +61,7 @@ describe('netatmoCameraApi', () => {
           status: 'off',
           // No vpn_url, local_url, etc.
         }],
-      }];
+      }] as any[];
 
       const result = parseCameras(input);
 
@@ -69,6 +72,7 @@ describe('netatmoCameraApi', () => {
 
     it('should handle Presence camera with light_mode_status', () => {
       const input = [{
+        id: 'home1',
         cameras: [{
           id: 'cam2',
           name: 'Outdoor',
@@ -76,7 +80,7 @@ describe('netatmoCameraApi', () => {
           status: 'on',
           light_mode_status: 'auto',
         }],
-      }];
+      }] as any[];
 
       const result = parseCameras(input);
 
@@ -92,6 +96,7 @@ describe('netatmoCameraApi', () => {
 
     it('should parse persons correctly', () => {
       const input = [{
+        id: 'home1',
         persons: [{
           id: 'person1',
           pseudo: 'John',
@@ -102,7 +107,7 @@ describe('netatmoCameraApi', () => {
             key: 'abc123',
           },
         }],
-      }];
+      }] as any[];
 
       const result = parsePersons(input);
 
@@ -116,11 +121,12 @@ describe('netatmoCameraApi', () => {
 
     it('should handle person without pseudo', () => {
       const input = [{
+        id: 'home1',
         persons: [{
           id: 'person2',
           last_seen: 1704067200,
         }],
-      }];
+      }] as any[];
 
       const result = parsePersons(input);
 
@@ -184,7 +190,7 @@ describe('netatmoCameraApi', () => {
         vpn_url: 'https://vpn.test.com',
         local_url: 'http://192.168.1.10',
         is_local: true,
-      };
+      } as any;
 
       const url = getSnapshotUrl(camera, false);
       expect(url).toBe('https://vpn.test.com/live/snapshot_720.jpg');
@@ -195,7 +201,7 @@ describe('netatmoCameraApi', () => {
         vpn_url: 'https://vpn.test.com',
         local_url: 'http://192.168.1.10',
         is_local: true,
-      };
+      } as any;
 
       const url = getSnapshotUrl(camera, true);
       expect(url).toBe('http://192.168.1.10/live/snapshot_720.jpg');
@@ -205,14 +211,14 @@ describe('netatmoCameraApi', () => {
       const camera = {
         vpn_url: 'https://vpn.test.com',
         is_local: false,
-      };
+      } as any;
 
       const url = getSnapshotUrl(camera, true);
       expect(url).toBe('https://vpn.test.com/live/snapshot_720.jpg');
     });
 
     it('should return null when no URL available', () => {
-      const camera = {};
+      const camera = {} as any;
 
       const url = getSnapshotUrl(camera, false);
       expect(url).toBeNull();
@@ -226,14 +232,14 @@ describe('netatmoCameraApi', () => {
           id: 'snap123',
           key: 'key456',
         },
-      };
+      } as any;
 
       const url = getEventSnapshotUrl(event);
       expect(url).toBe('https://api.netatmo.com/api/getcamerapicture?image_id=snap123&key=key456');
     });
 
     it('should return null when no snapshot', () => {
-      const event = {};
+      const event = {} as any;
       const url = getEventSnapshotUrl(event);
       expect(url).toBeNull();
     });

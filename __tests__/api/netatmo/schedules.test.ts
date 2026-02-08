@@ -27,7 +27,7 @@ describe('GET /api/netatmo/schedules - Integration Logic', () => {
       { id: 'schedule-2', name: 'Evening', type: 'therm', selected: false },
     ];
 
-    getCached.mockResolvedValue({
+    (getCached as jest.Mock).mockResolvedValue({
       data: mockSchedules,
       source: 'cache',
       age_seconds: 120,
@@ -38,14 +38,14 @@ describe('GET /api/netatmo/schedules - Integration Logic', () => {
 
     expect(result.data).toEqual(mockSchedules);
     expect(result.source).toBe('cache');
-    expect(result.age_seconds).toBe(120);
+    expect((result as any).age_seconds).toBe(120);
     expect(getCached).toHaveBeenCalledWith('schedules', expect.any(Function));
   });
 
   it('should check rate limit before API call', () => {
     const userId = 'user-123';
 
-    checkNetatmoRateLimit.mockReturnValue({
+    (checkNetatmoRateLimit as jest.Mock).mockReturnValue({
       allowed: true,
       currentCount: 10,
       remaining: 390,
@@ -55,7 +55,7 @@ describe('GET /api/netatmo/schedules - Integration Logic', () => {
     const rateCheck = checkNetatmoRateLimit(userId);
 
     expect(rateCheck.allowed).toBe(true);
-    expect(rateCheck.remaining).toBe(390);
+    expect((rateCheck as any).remaining).toBe(390);
     expect(checkNetatmoRateLimit).toHaveBeenCalledWith(userId);
   });
 
@@ -82,9 +82,9 @@ describe('GET /api/netatmo/schedules - Integration Logic', () => {
       { id: 'schedule-2', name: 'Evening', type: 'therm', selected: false },
     ];
 
-    NETATMO_API.parseSchedules.mockReturnValue(mockParsedSchedules);
+    (NETATMO_API.parseSchedules as jest.Mock).mockReturnValue(mockParsedSchedules);
 
-    const result = NETATMO_API.parseSchedules(mockHomesData);
+    const result = NETATMO_API.parseSchedules(mockHomesData as any);
 
     expect(result).toEqual(mockParsedSchedules);
     expect(NETATMO_API.parseSchedules).toHaveBeenCalledWith(mockHomesData);
@@ -93,7 +93,7 @@ describe('GET /api/netatmo/schedules - Integration Logic', () => {
   it('should return 429 details when rate limit exceeded', () => {
     const userId = 'user-789';
 
-    checkNetatmoRateLimit.mockReturnValue({
+    (checkNetatmoRateLimit as jest.Mock).mockReturnValue({
       allowed: false,
       currentCount: 400,
       limit: 400,
@@ -103,7 +103,7 @@ describe('GET /api/netatmo/schedules - Integration Logic', () => {
     const rateCheck = checkNetatmoRateLimit(userId);
 
     expect(rateCheck.allowed).toBe(false);
-    expect(rateCheck.resetInSeconds).toBe(1800);
+    expect((rateCheck as any).resetInSeconds).toBe(1800);
   });
 });
 
@@ -117,7 +117,7 @@ describe('POST /api/netatmo/schedules - Integration Logic', () => {
     const mockHomeId = 'home-123';
     const mockScheduleId = 'schedule-2';
 
-    NETATMO_API.switchHomeSchedule.mockResolvedValue(true);
+    (NETATMO_API.switchHomeSchedule as jest.Mock).mockResolvedValue(true);
 
     const result = await NETATMO_API.switchHomeSchedule(
       mockAccessToken,
@@ -134,7 +134,7 @@ describe('POST /api/netatmo/schedules - Integration Logic', () => {
   });
 
   it('should invalidate cache after successful switch', async () => {
-    invalidateCache.mockResolvedValue(true);
+    (invalidateCache as jest.Mock).mockResolvedValue(true);
 
     const result = await invalidateCache('schedules');
 
@@ -145,7 +145,7 @@ describe('POST /api/netatmo/schedules - Integration Logic', () => {
   it('should check rate limit before switch', () => {
     const userId = 'user-switch';
 
-    checkNetatmoRateLimit.mockReturnValue({
+    (checkNetatmoRateLimit as jest.Mock).mockReturnValue({
       allowed: true,
       currentCount: 5,
       remaining: 395,
@@ -155,7 +155,7 @@ describe('POST /api/netatmo/schedules - Integration Logic', () => {
     const rateCheck = checkNetatmoRateLimit(userId);
 
     expect(rateCheck.allowed).toBe(true);
-    expect(rateCheck.remaining).toBe(395);
+    expect((rateCheck as any).remaining).toBe(395);
   });
 
   it('should track API call after switch', () => {
@@ -167,7 +167,7 @@ describe('POST /api/netatmo/schedules - Integration Logic', () => {
   });
 
   it('should handle rate limit exceeded', () => {
-    checkNetatmoRateLimit.mockReturnValue({
+    (checkNetatmoRateLimit as jest.Mock).mockReturnValue({
       allowed: false,
       currentCount: 400,
       limit: 400,
@@ -177,13 +177,13 @@ describe('POST /api/netatmo/schedules - Integration Logic', () => {
     const rateCheck = checkNetatmoRateLimit('user-blocked');
 
     expect(rateCheck.allowed).toBe(false);
-    expect(rateCheck.resetInSeconds).toBe(600);
+    expect((rateCheck as any).resetInSeconds).toBe(600);
   });
 
   it('should retrieve home_id from Firebase', async () => {
     const mockHomeId = 'home-456';
 
-    adminDbGet.mockResolvedValue(mockHomeId);
+    (adminDbGet as jest.Mock).mockResolvedValue(mockHomeId);
 
     const homeId = await adminDbGet('dev/netatmo/home_id');
 

@@ -208,7 +208,7 @@ describe('hueRemoteTokenHelper', () => {
       );
 
       // Verify body is URLSearchParams with correct parameters
-      const fetchCall = fetch.mock.calls[0];
+      const fetchCall = (fetch as jest.Mock).mock.calls[0];
       const body = fetchCall[1].body;
       expect(body).toBeInstanceOf(URLSearchParams);
       expect(body.get('code')).toBe('auth-code-123');

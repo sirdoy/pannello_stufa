@@ -45,7 +45,7 @@ describe('maintenanceService - Concurrency Tests', () => {
             lastNotificationLevel: 0,
           }),
         },
-      };
+      } as any;
 
       mockedFirebase.runTransaction.mockResolvedValue(mockTransactionResult);
 
@@ -67,7 +67,7 @@ describe('maintenanceService - Concurrency Tests', () => {
             lastNotificationLevel: 0,
           }),
         },
-      };
+      } as any;
 
       mockedFirebase.runTransaction.mockResolvedValue(mockTransactionResult);
 
@@ -88,7 +88,7 @@ describe('maintenanceService - Concurrency Tests', () => {
             lastNotificationLevel: 0,
           }),
         },
-      };
+      } as any;
 
       mockedFirebase.runTransaction.mockResolvedValue(mockTransactionResult);
 
@@ -135,7 +135,7 @@ describe('maintenanceService - Concurrency Tests', () => {
         return Promise.resolve({
           committed: result !== undefined,
           snapshot: result !== undefined ? { val: () => result } : null,
-        });
+        } as any);
       });
 
       const result = await trackUsageHours('WORK');
@@ -163,7 +163,7 @@ describe('maintenanceService - Concurrency Tests', () => {
         return Promise.resolve({
           committed: true,
           snapshot: { val: () => result },
-        });
+        } as any);
       });
 
       const result = await trackUsageHours('WORK');
@@ -183,9 +183,9 @@ describe('maintenanceService - Concurrency Tests', () => {
       const updatedData = transactionFn(mockData);
 
       // Should have set lastUpdatedAt
-      expect(updatedData.lastUpdatedAt).toBeTruthy();
+      expect((updatedData as any).lastUpdatedAt).toBeTruthy();
       // Should NOT have added time yet
-      expect(updatedData.currentHours).toBe(0);
+      expect((updatedData as any).currentHours).toBe(0);
     });
 
     it('should calculate elapsed time correctly and add to currentHours', async () => {
@@ -205,7 +205,7 @@ describe('maintenanceService - Concurrency Tests', () => {
         return Promise.resolve({
           committed: true,
           snapshot: { val: () => result },
-        });
+        } as any);
       });
 
       const result = await trackUsageHours('WORK');
@@ -225,8 +225,8 @@ describe('maintenanceService - Concurrency Tests', () => {
       const updatedData = transactionFn(mockData);
 
       // Should have added approximately 2 minutes (0.0333 hours)
-      expect(updatedData.currentHours).toBeGreaterThan(10.0);
-      expect(updatedData.currentHours).toBeLessThan(10.05); // Allow some tolerance
+      expect((updatedData as any).currentHours).toBeGreaterThan(10.0);
+      expect((updatedData as any).currentHours).toBeLessThan(10.05); // Allow some tolerance
     });
 
     it('should set needsCleaning when threshold reached', async () => {
@@ -246,7 +246,7 @@ describe('maintenanceService - Concurrency Tests', () => {
         return Promise.resolve({
           committed: true,
           snapshot: { val: () => result },
-        });
+        } as any);
       });
 
       const result = await trackUsageHours('WORK');
@@ -264,8 +264,8 @@ describe('maintenanceService - Concurrency Tests', () => {
       const updatedData = transactionFn(mockData);
 
       // Should have set needsCleaning to true
-      expect(updatedData.needsCleaning).toBe(true);
-      expect(updatedData.currentHours).toBeGreaterThanOrEqual(50);
+      expect((updatedData as any).needsCleaning).toBe(true);
+      expect((updatedData as any).currentHours).toBeGreaterThanOrEqual(50);
     });
 
     it('should handle notification data atomically', async () => {
@@ -285,7 +285,7 @@ describe('maintenanceService - Concurrency Tests', () => {
         return Promise.resolve({
           committed: true,
           snapshot: { val: () => result },
-        });
+        } as any);
       });
 
       const result = await trackUsageHours('WORK');
@@ -305,8 +305,8 @@ describe('maintenanceService - Concurrency Tests', () => {
       const updatedData = transactionFn(mockData);
 
       // Should have updated lastNotificationLevel if threshold reached
-      if (updatedData.currentHours / updatedData.targetHours >= 0.8) {
-        expect(updatedData.lastNotificationLevel).toBeGreaterThan(0);
+      if ((updatedData as any).currentHours / (updatedData as any).targetHours >= 0.8) {
+        expect((updatedData as any).lastNotificationLevel).toBeGreaterThan(0);
       }
     });
 
@@ -346,14 +346,14 @@ describe('maintenanceService - Concurrency Tests', () => {
               return {
                 committed: true,
                 snapshot: { val: () => finalResult },
-              };
+              } as any;
             });
         }
 
         return Promise.resolve({
           committed: false,
           snapshot: null,
-        });
+        } as any);
       });
 
       const result = await trackUsageHours('WORK');

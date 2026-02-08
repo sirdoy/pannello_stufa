@@ -748,7 +748,7 @@ describe('CommandPaletteProvider', () => {
 
     it('openPalette function works', async () => {
       function TestComponent() {
-        const { openPalette } = useCommandPalette();
+        const { openPalette } = useCommandPalette() as any;
         return <button onClick={openPalette}>Open</button>;
       }
 
@@ -767,7 +767,7 @@ describe('CommandPaletteProvider', () => {
 
     it('closePalette function works', async () => {
       function TestComponent() {
-        const { openPalette, closePalette } = useCommandPalette();
+        const { openPalette, closePalette } = useCommandPalette() as any;
         return (
           <>
             <button onClick={openPalette}>Open</button>

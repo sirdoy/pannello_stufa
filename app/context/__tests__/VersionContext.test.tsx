@@ -127,7 +127,7 @@ describe('VersionContext', () => {
         type: 'minor',
         changes: ['Same version']
       };
-      getLatestVersion.mockResolvedValueOnce(mockLatestVersion);
+      (getLatestVersion as jest.Mock).mockResolvedValueOnce(mockLatestVersion);
 
       const { result } = renderHook(() => useVersion(), { wrapper });
 
@@ -150,7 +150,7 @@ describe('VersionContext', () => {
         changes: ['New feature']
       };
 
-      getLatestVersion.mockResolvedValueOnce(mockLatestVersion);
+      (getLatestVersion as jest.Mock).mockResolvedValueOnce(mockLatestVersion);
 
       const { result } = renderHook(() => useVersion(), { wrapper });
 
@@ -178,7 +178,7 @@ describe('VersionContext', () => {
         changes: ['Current version']
       };
 
-      getLatestVersion.mockResolvedValueOnce(mockLatestVersion);
+      (getLatestVersion as jest.Mock).mockResolvedValueOnce(mockLatestVersion);
 
       const { result } = renderHook(() => useVersion(), { wrapper });
 
@@ -200,7 +200,7 @@ describe('VersionContext', () => {
         changes: ['Old version']
       };
 
-      getLatestVersion.mockResolvedValueOnce(mockLatestVersion);
+      (getLatestVersion as jest.Mock).mockResolvedValueOnce(mockLatestVersion);
 
       const { result } = renderHook(() => useVersion(), { wrapper });
 
@@ -215,7 +215,7 @@ describe('VersionContext', () => {
     });
 
     test('handles missing latest version gracefully', async () => {
-      getLatestVersion.mockResolvedValueOnce(null);
+      (getLatestVersion as jest.Mock<Promise<any>>).mockResolvedValueOnce(null);
 
       const { result } = renderHook(() => useVersion(), { wrapper });
 
@@ -231,7 +231,7 @@ describe('VersionContext', () => {
 
     test('handles API errors gracefully', async () => {
       const consoleError = jest.spyOn(console, 'error').mockImplementation();
-      getLatestVersion.mockRejectedValueOnce(new Error('API Error'));
+      (getLatestVersion as jest.Mock).mockRejectedValueOnce(new Error('API Error'));
 
       const { result } = renderHook(() => useVersion(), { wrapper });
 
@@ -260,7 +260,7 @@ describe('VersionContext', () => {
         changes: ['New feature']
       };
 
-      getLatestVersion.mockImplementation(
+      (getLatestVersion as jest.Mock).mockImplementation(
         () => new Promise(resolve => setTimeout(() => resolve(mockLatestVersion), 100))
       );
 
@@ -296,7 +296,7 @@ describe('VersionContext', () => {
       const mockPromise = new Promise(resolve => {
         resolvePromise = () => resolve(mockLatestVersion);
       });
-      getLatestVersion.mockReturnValueOnce(mockPromise);
+      (getLatestVersion as jest.Mock).mockReturnValueOnce(mockPromise);
 
       const { result } = renderHook(() => useVersion(), { wrapper });
 
@@ -323,7 +323,7 @@ describe('VersionContext', () => {
 
     test('resets isChecking on error', async () => {
       const consoleError = jest.spyOn(console, 'error').mockImplementation();
-      getLatestVersion.mockRejectedValueOnce(new Error('API Error'));
+      (getLatestVersion as jest.Mock).mockRejectedValueOnce(new Error('API Error'));
 
       const { result } = renderHook(() => useVersion(), { wrapper });
 
@@ -382,7 +382,7 @@ describe('VersionContext', () => {
           changes: ['Test']
         };
 
-        getLatestVersion.mockResolvedValueOnce(mockLatestVersion);
+        (getLatestVersion as jest.Mock).mockResolvedValueOnce(mockLatestVersion);
 
         const { result } = renderHook(() => useVersion(), { wrapper });
 

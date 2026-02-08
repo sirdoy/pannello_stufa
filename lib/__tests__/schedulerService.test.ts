@@ -42,7 +42,7 @@ describe('schedulerService', () => {
 
       // Mock Firebase responses - use call order since path inspection is unreliable
       let callCount = 0;
-      mockGet.mockImplementation(() => {
+      (mockGet as jest.Mock).mockImplementation(() => {
         callCount++;
         // First call: activeScheduleId
         if (callCount === 1) {
@@ -79,14 +79,14 @@ describe('schedulerService', () => {
       jest.spyOn(global, 'Date').mockImplementation(() => mockNow);
 
       let callCount = 0;
-      mockGet.mockImplementation(() => {
+      (mockGet as jest.Mock).mockImplementation(() => {
         callCount++;
         // First call: activeScheduleId
         if (callCount === 1) {
           return Promise.resolve({
             exists: () => true,
             val: () => 'default',
-          });
+          } as any);
         }
         // Second call: schedule slots for Mercoledì
         if (callCount === 2) {
@@ -95,9 +95,9 @@ describe('schedulerService', () => {
             val: () => [
               { start: '18:00', end: '22:00', power: 4, fan: 3 },
             ],
-          });
+          } as any);
         }
-        return Promise.resolve({ exists: () => false });
+        return Promise.resolve({ exists: () => false } as any);
       });
 
       // ACT
@@ -115,14 +115,14 @@ describe('schedulerService', () => {
       jest.spyOn(global, 'Date').mockImplementation(() => mockNow);
 
       let callCount = 0;
-      mockGet.mockImplementation(() => {
+      (mockGet as jest.Mock).mockImplementation(() => {
         callCount++;
         // First call: activeScheduleId
         if (callCount === 1) {
           return Promise.resolve({
             exists: () => true,
             val: () => 'default',
-          });
+          } as any);
         }
         // Second call: Wednesday (today) - past intervals
         if (callCount === 2) {
@@ -131,14 +131,14 @@ describe('schedulerService', () => {
             val: () => [
               { start: '06:00', end: '08:00', power: 3, fan: 2 },
             ],
-          });
+          } as any);
         }
         // Third call: activeScheduleId again (for next day)
         if (callCount === 3) {
           return Promise.resolve({
             exists: () => true,
             val: () => 'default',
-          });
+          } as any);
         }
         // Fourth call: Thursday (tomorrow) - future interval
         if (callCount === 4) {
@@ -147,9 +147,9 @@ describe('schedulerService', () => {
             val: () => [
               { start: '18:00', end: '22:00', power: 4, fan: 3 },
             ],
-          });
+          } as any);
         }
-        return Promise.resolve({ exists: () => false });
+        return Promise.resolve({ exists: () => false } as any);
       });
 
       // ACT
@@ -286,15 +286,15 @@ describe('schedulerService', () => {
       ];
 
       // Mock get for activeScheduleId calls
-      mockGet.mockImplementation((dbRef) => {
-        const path = typeof dbRef === 'string' ? dbRef : dbRef._path?.toString() || '';
+      (mockGet as jest.Mock).mockImplementation((dbRef: any) => {
+        const path = typeof dbRef === 'string' ? dbRef : (dbRef as any)._path?.toString() || '';
         if (path.includes('activeScheduleId')) {
           return Promise.resolve({
             exists: () => true,
             val: () => 'default',
-          });
+          } as any);
         }
-        return Promise.resolve({ exists: () => false });
+        return Promise.resolve({ exists: () => false } as any);
       });
 
       (ref as jest.Mock).mockReturnValue('mock-ref');

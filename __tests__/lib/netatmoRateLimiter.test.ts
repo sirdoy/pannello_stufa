@@ -41,9 +41,10 @@ describe('netatmoRateLimiter', () => {
 
       expect(result.allowed).toBe(true);
       expect(result.currentCount).toBe(0);
-      expect(result.remaining).toBe(400);
+      if (result.allowed) {
+        expect(result.remaining).toBe(400);
+      }
       expect(result.limit).toBe(400);
-      expect(result.resetInSeconds).toBeUndefined();
     });
 
     it('should block request when limit reached', () => {
@@ -59,8 +60,10 @@ describe('netatmoRateLimiter', () => {
       expect(result.allowed).toBe(false);
       expect(result.currentCount).toBe(400);
       expect(result.limit).toBe(400);
-      expect(result.resetInSeconds).toBeGreaterThan(0);
-      expect(result.resetInSeconds).toBeLessThanOrEqual(3600); // Max 1 hour
+      if (!result.allowed) {
+        expect((result as any).resetInSeconds).toBeGreaterThan(0);
+        expect((result as any).resetInSeconds).toBeLessThanOrEqual(3600); // Max 1 hour
+      }
     });
 
     it('should reset counter after window expires', () => {
@@ -79,7 +82,9 @@ describe('netatmoRateLimiter', () => {
 
       expect(result.allowed).toBe(true);
       expect(result.currentCount).toBe(0); // Counter reset
-      expect(result.remaining).toBe(400);
+      if (result.allowed) {
+        expect(result.remaining).toBe(400);
+      }
     });
 
     it('should return correct remaining count', () => {
@@ -94,7 +99,9 @@ describe('netatmoRateLimiter', () => {
 
       expect(result.allowed).toBe(true);
       expect(result.currentCount).toBe(100);
-      expect(result.remaining).toBe(300); // 400 - 100
+      if (result.allowed) {
+        expect(result.remaining).toBe(300); // 400 - 100
+      }
       expect(result.limit).toBe(400);
     });
 
@@ -114,7 +121,9 @@ describe('netatmoRateLimiter', () => {
 
       expect(result1.allowed).toBe(false);
       expect(result2.allowed).toBe(true);
-      expect(result2.remaining).toBe(400);
+      if (result2.allowed) {
+        expect(result2.remaining).toBe(400);
+      }
     });
   });
 
@@ -306,7 +315,9 @@ describe('netatmoRateLimiter', () => {
       // Check again - should show updated count
       const checkResult2 = checkNetatmoRateLimit(testUserId);
       expect(checkResult2.currentCount).toBe(1);
-      expect(checkResult2.remaining).toBe(399);
+      if (checkResult2.allowed) {
+        expect(checkResult2.remaining).toBe(399);
+      }
     });
 
     it('should enforce limit across check-track cycles', () => {

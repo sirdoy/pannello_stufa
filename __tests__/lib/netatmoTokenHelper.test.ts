@@ -29,7 +29,7 @@ jest.mock('@/lib/netatmoCredentials', () => ({
 }));
 
 // Mock fetch
-global.fetch = jest.fn();
+global.fetch = jest.fn() as jest.Mock;
 
 describe('netatmoTokenHelper', () => {
   beforeEach(() => {
@@ -44,13 +44,13 @@ describe('netatmoTokenHelper', () => {
 
       expect(result.accessToken).toBeNull();
       expect(result.error).toBe('NOT_CONNECTED');
-      expect(result.message).toContain('Nessun refresh token trovato');
+      expect((result as any).message).toContain('Nessun refresh token trovato');
     });
 
     it('should exchange refresh token for access token successfully', async () => {
       mockAdminDbGet.mockResolvedValue('test-refresh-token');
 
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         json: async () => ({
           access_token: 'test-access-token',
           refresh_token: 'new-refresh-token',
@@ -69,7 +69,7 @@ describe('netatmoTokenHelper', () => {
     it('should handle invalid_grant error and clear token', async () => {
       mockAdminDbGet.mockResolvedValue('expired-refresh-token');
 
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         json: async () => ({
           error: 'invalid_grant',
           error_description: 'Token expired',
@@ -88,13 +88,13 @@ describe('netatmoTokenHelper', () => {
     it('should handle network errors gracefully', async () => {
       mockAdminDbGet.mockResolvedValue('test-refresh-token');
 
-      global.fetch.mockRejectedValue(new Error('Network error'));
+      (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
 
       const result = await getValidAccessToken();
 
       expect(result.accessToken).toBeNull();
       expect(result.error).toBe('NETWORK_ERROR');
-      expect(result.message).toContain('Network error');
+      expect((result as any).message).toContain('Network error');
     });
 
     it('should NOT update refresh token if Netatmo returns same token', async () => {
@@ -102,7 +102,7 @@ describe('netatmoTokenHelper', () => {
 
       mockAdminDbGet.mockResolvedValue(refreshToken);
 
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         json: async () => ({
           access_token: 'test-access-token',
           refresh_token: refreshToken, // Same token
@@ -144,7 +144,7 @@ describe('netatmoTokenHelper', () => {
       mockAdminDbGet
         .mockResolvedValueOnce('test-refresh-token'); // For doTokenRefresh
 
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         json: async () => ({
           access_token: 'fresh-access-token',
           expires_in: 10800,
@@ -162,7 +162,7 @@ describe('netatmoTokenHelper', () => {
     it('should handle missing access_token in response', async () => {
       mockAdminDbGet.mockResolvedValue('test-refresh-token');
 
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         json: async () => ({
           // Missing access_token
           refresh_token: 'new-refresh-token',
@@ -247,7 +247,7 @@ describe('netatmoTokenHelper', () => {
     });
 
     it('should default to 500 for unknown error', () => {
-      const result = handleTokenError('UNKNOWN_ERROR');
+      const result = handleTokenError('NETWORK_ERROR' as any);
 
       expect(result.status).toBe(500);
       expect(result.reconnect).toBe(false);

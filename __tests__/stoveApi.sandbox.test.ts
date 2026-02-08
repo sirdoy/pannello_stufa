@@ -58,9 +58,9 @@ describe('stoveApi with sandbox', () => {
 
   describe('getStoveStatus', () => {
     it('should use sandbox when enabled in localhost', async () => {
-      isLocalEnvironment.mockReturnValue(true);
-      isSandboxEnabled.mockResolvedValue(true);
-      getSandboxStoveState.mockResolvedValue({
+      (isLocalEnvironment as jest.Mock).mockReturnValue(true);
+      (isSandboxEnabled as jest.Mock).mockResolvedValue(true);
+      (getSandboxStoveState as jest.Mock).mockResolvedValue({
         status: 'WORK',
         fan: 3,
         power: 4,
@@ -79,11 +79,11 @@ describe('stoveApi with sandbox', () => {
     });
 
     it('should use real API when sandbox disabled', async () => {
-      isLocalEnvironment.mockReturnValue(true);
-      isSandboxEnabled.mockResolvedValue(false);
+      (isLocalEnvironment as jest.Mock).mockReturnValue(true);
+      (isSandboxEnabled as jest.Mock).mockResolvedValue(false);
 
       // Mock fetch for real API call
-      global.fetch = jest.fn(() =>
+      (global as any).fetch = jest.fn(() =>
         Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ StatusDescription: 'OFF' }),
@@ -97,9 +97,9 @@ describe('stoveApi with sandbox', () => {
     });
 
     it('should use real API in production', async () => {
-      isLocalEnvironment.mockReturnValue(false);
+      (isLocalEnvironment as jest.Mock).mockReturnValue(false);
 
-      global.fetch = jest.fn(() =>
+      (global as any).fetch = jest.fn(() =>
         Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ StatusDescription: 'OFF' }),
@@ -115,9 +115,9 @@ describe('stoveApi with sandbox', () => {
 
   describe('igniteStove', () => {
     it('should use sandbox ignite when enabled', async () => {
-      isLocalEnvironment.mockReturnValue(true);
-      isSandboxEnabled.mockResolvedValue(true);
-      sandboxIgnite.mockResolvedValue({ success: true });
+      (isLocalEnvironment as jest.Mock).mockReturnValue(true);
+      (isSandboxEnabled as jest.Mock).mockResolvedValue(true);
+      (sandboxIgnite as jest.Mock).mockResolvedValue({ success: true });
 
       const result = await igniteStove(4);
 
@@ -128,9 +128,9 @@ describe('stoveApi with sandbox', () => {
 
   describe('shutdownStove', () => {
     it('should use sandbox shutdown when enabled', async () => {
-      isLocalEnvironment.mockReturnValue(true);
-      isSandboxEnabled.mockResolvedValue(true);
-      sandboxShutdown.mockResolvedValue({ success: true });
+      (isLocalEnvironment as jest.Mock).mockReturnValue(true);
+      (isSandboxEnabled as jest.Mock).mockResolvedValue(true);
+      (sandboxShutdown as jest.Mock).mockResolvedValue({ success: true });
 
       const result = await shutdownStove();
 
@@ -141,9 +141,9 @@ describe('stoveApi with sandbox', () => {
 
   describe('setPowerLevel', () => {
     it('should use sandbox setPower when enabled', async () => {
-      isLocalEnvironment.mockReturnValue(true);
-      isSandboxEnabled.mockResolvedValue(true);
-      sandboxSetPower.mockResolvedValue({ success: true });
+      (isLocalEnvironment as jest.Mock).mockReturnValue(true);
+      (isSandboxEnabled as jest.Mock).mockResolvedValue(true);
+      (sandboxSetPower as jest.Mock).mockResolvedValue({ success: true });
 
       const result = await setPowerLevel(3);
 
@@ -152,16 +152,16 @@ describe('stoveApi with sandbox', () => {
     });
 
     it('should throw error for invalid power level', async () => {
-      await expect(setPowerLevel(0)).rejects.toThrow('Potenza deve essere tra 1 e 5');
-      await expect(setPowerLevel(6)).rejects.toThrow('Potenza deve essere tra 1 e 5');
+      await expect(setPowerLevel(0 as any)).rejects.toThrow('Potenza deve essere tra 1 e 5');
+      await expect(setPowerLevel(6 as any)).rejects.toThrow('Potenza deve essere tra 1 e 5');
     });
   });
 
   describe('setFanLevel', () => {
     it('should use sandbox setFan when enabled', async () => {
-      isLocalEnvironment.mockReturnValue(true);
-      isSandboxEnabled.mockResolvedValue(true);
-      sandboxSetFan.mockResolvedValue({ success: true });
+      (isLocalEnvironment as jest.Mock).mockReturnValue(true);
+      (isSandboxEnabled as jest.Mock).mockResolvedValue(true);
+      (sandboxSetFan as jest.Mock).mockResolvedValue({ success: true });
 
       const result = await setFanLevel(2);
 

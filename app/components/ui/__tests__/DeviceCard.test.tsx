@@ -621,7 +621,7 @@ describe('DeviceCard', () => {
 
   describe('Ref Forwarding', () => {
     it('forwards ref correctly', () => {
-      const ref = createRef();
+      const ref = createRef() as any;
       render(
         <DeviceCard ref={ref} icon="🔥" title="Stufa">
           <p>Content</p>
@@ -738,7 +738,7 @@ describe('DeviceCard', () => {
       ];
 
       const { container } = render(
-        <DeviceCard icon="🔥" title="Stufa" contextMenuItems={contextMenuItems}>
+        <DeviceCard icon="🔥" title="Stufa" contextMenuItems={contextMenuItems as any}>
           <p>Content</p>
         </DeviceCard>
       );
@@ -764,7 +764,7 @@ describe('DeviceCard', () => {
       ];
 
       const { container } = render(
-        <DeviceCard icon="🔥" title="Stufa" contextMenuItems={contextMenuItems}>
+        <DeviceCard icon="🔥" title="Stufa" contextMenuItems={contextMenuItems as any}>
           <p>Content</p>
         </DeviceCard>
       );

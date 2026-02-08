@@ -60,7 +60,7 @@ describe('StoveService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    syncLivingRoomWithStove.mockResolvedValue({
+    (syncLivingRoomWithStove as jest.Mock).mockResolvedValue({
       synced: true,
       roomNames: 'Living Room',
       temperature: 16,
@@ -90,7 +90,7 @@ describe('StoveService', () => {
     });
 
     it('should not block on sync errors', async () => {
-      syncLivingRoomWithStove.mockRejectedValue(new Error('Netatmo unavailable'));
+      (syncLivingRoomWithStove as jest.Mock).mockRejectedValue(new Error('Netatmo unavailable'));
 
       // Should not throw, even if sync fails
       const result = await service.ignite(3, 'manual');
@@ -101,7 +101,7 @@ describe('StoveService', () => {
 
     it('should not sync when maintenance check fails', async () => {
       // Override the maintenance repo for this test
-      MaintenanceRepository.mockImplementation(() => ({
+      (MaintenanceRepository as jest.Mock).mockImplementation(() => ({
         canIgnite: jest.fn().mockResolvedValue(false),
       }));
       const serviceWithBlockedMaintenance = new StoveService();
@@ -134,7 +134,7 @@ describe('StoveService', () => {
     });
 
     it('should not block on sync errors', async () => {
-      syncLivingRoomWithStove.mockRejectedValue(new Error('Netatmo unavailable'));
+      (syncLivingRoomWithStove as jest.Mock).mockRejectedValue(new Error('Netatmo unavailable'));
 
       // Should not throw, even if sync fails
       const result = await service.shutdown('manual');

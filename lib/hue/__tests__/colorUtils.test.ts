@@ -120,7 +120,7 @@ describe('colorUtils', () => {
       const light = {
         on: { on: true },
         dimming: { brightness: 50 },
-      };
+      } as any;
       expect(supportsColor(light)).toBe(false);
     });
 

@@ -66,7 +66,7 @@ describe('useHaptic', () => {
   });
 
   it('should default to vibrateShort for unknown pattern', () => {
-    const { result } = renderHook(() => useHaptic('unknown'));
+    const { result } = renderHook(() => useHaptic('unknown' as any));
 
     act(() => {
       result.current.trigger();

@@ -78,14 +78,14 @@ describe('JSON Body Parsing', () => {
     });
 
     it('should throw on empty body', async () => {
-      const request = { text: () => Promise.resolve('') };
+      const request = { text: () => Promise.resolve('') } as any;
 
       await expect(parseJsonOrThrow(request)).rejects.toThrow(ApiError);
       await expect(parseJsonOrThrow(request)).rejects.toThrow('Body richiesto');
     });
 
     it('should throw on invalid JSON', async () => {
-      const request = { text: () => Promise.resolve('invalid json') };
+      const request = { text: () => Promise.resolve('invalid json') } as any;
 
       await expect(parseJsonOrThrow(request)).rejects.toThrow(ApiError);
       await expect(parseJsonOrThrow(request)).rejects.toThrow('JSON non valido');

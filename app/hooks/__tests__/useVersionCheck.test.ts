@@ -14,6 +14,8 @@ jest.mock('@/lib/version', () => ({
 
 import { getLatestVersion } from '@/lib/changelogService';
 
+const mockGetLatestVersion = getLatestVersion as jest.MockedFunction<typeof getLatestVersion>;
+
 describe('useVersionCheck Hook', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -22,7 +24,7 @@ describe('useVersionCheck Hook', () => {
 
   describe('Initial State', () => {
     test('returns correct initial state', async () => {
-      getLatestVersion.mockResolvedValueOnce(null);
+      mockGetLatestVersion.mockResolvedValueOnce(null);
 
       const { result } = renderHook(() => useVersionCheck());
 
@@ -44,11 +46,12 @@ describe('useVersionCheck Hook', () => {
       const mockLatestVersion = {
         version: '1.6.0',
         date: '2025-10-11',
-        type: 'minor',
-        changes: ['New feature']
+        type: 'minor' as const,
+        changes: ['New feature'],
+        timestamp: '2025-10-11T00:00:00.000Z'
       };
 
-      getLatestVersion.mockResolvedValueOnce(mockLatestVersion);
+      mockGetLatestVersion.mockResolvedValueOnce(mockLatestVersion);
 
       const { result } = renderHook(() => useVersionCheck());
 
@@ -62,11 +65,12 @@ describe('useVersionCheck Hook', () => {
       const mockLatestVersion = {
         version: '1.5.0', // Same as APP_VERSION
         date: '2025-10-10',
-        type: 'minor',
-        changes: ['Current version']
+        type: 'minor' as const,
+        changes: ['Current version'],
+        timestamp: '2025-10-10T00:00:00.000Z'
       };
 
-      getLatestVersion.mockResolvedValueOnce(mockLatestVersion);
+      mockGetLatestVersion.mockResolvedValueOnce(mockLatestVersion);
 
       const { result } = renderHook(() => useVersionCheck());
 
@@ -79,11 +83,12 @@ describe('useVersionCheck Hook', () => {
       const mockLatestVersion = {
         version: '1.4.0', // Older than APP_VERSION
         date: '2025-10-09',
-        type: 'minor',
-        changes: ['Old version']
+        type: 'minor' as const,
+        changes: ['Old version'],
+        timestamp: '2025-10-09T00:00:00.000Z'
       };
 
-      getLatestVersion.mockResolvedValueOnce(mockLatestVersion);
+      mockGetLatestVersion.mockResolvedValueOnce(mockLatestVersion);
 
       const { result } = renderHook(() => useVersionCheck());
 
@@ -93,7 +98,7 @@ describe('useVersionCheck Hook', () => {
     });
 
     test('handles missing latest version gracefully', async () => {
-      getLatestVersion.mockResolvedValueOnce(null);
+      mockGetLatestVersion.mockResolvedValueOnce(null);
 
       const { result } = renderHook(() => useVersionCheck());
 
@@ -105,7 +110,7 @@ describe('useVersionCheck Hook', () => {
 
     test('handles API errors gracefully', async () => {
       const consoleError = jest.spyOn(console, 'error').mockImplementation();
-      getLatestVersion.mockRejectedValueOnce(new Error('API Error'));
+      mockGetLatestVersion.mockRejectedValueOnce(new Error('API Error'));
 
       const { result } = renderHook(() => useVersionCheck());
 
@@ -123,11 +128,12 @@ describe('useVersionCheck Hook', () => {
       const mockLatestVersion = {
         version: '1.6.0',
         date: '2025-10-11',
-        type: 'minor',
-        changes: ['New feature']
+        type: 'minor' as const,
+        changes: ['New feature'],
+        timestamp: '2025-10-11T00:00:00.000Z'
       };
 
-      getLatestVersion.mockResolvedValueOnce(mockLatestVersion);
+      mockGetLatestVersion.mockResolvedValueOnce(mockLatestVersion);
 
       const { result } = renderHook(() => useVersionCheck());
 
@@ -142,11 +148,12 @@ describe('useVersionCheck Hook', () => {
       const mockLatestVersion = {
         version: '1.5.0',
         date: '2025-10-10',
-        type: 'minor',
-        changes: ['Current version']
+        type: 'minor' as const,
+        changes: ['Current version'],
+        timestamp: '2025-10-10T00:00:00.000Z'
       };
 
-      getLatestVersion.mockResolvedValueOnce(mockLatestVersion);
+      mockGetLatestVersion.mockResolvedValueOnce(mockLatestVersion);
 
       const { result } = renderHook(() => useVersionCheck());
 
@@ -161,11 +168,12 @@ describe('useVersionCheck Hook', () => {
       const mockLatestVersion = {
         version: '1.6.0',
         date: '2025-10-11',
-        type: 'minor',
-        changes: ['New feature']
+        type: 'minor' as const,
+        changes: ['New feature'],
+        timestamp: '2025-10-11T00:00:00.000Z'
       };
 
-      getLatestVersion.mockResolvedValueOnce(mockLatestVersion);
+      mockGetLatestVersion.mockResolvedValueOnce(mockLatestVersion);
 
       const { result } = renderHook(() => useVersionCheck());
 
@@ -180,11 +188,12 @@ describe('useVersionCheck Hook', () => {
       const mockLatestVersion = {
         version: '1.6.0',
         date: '2025-10-11',
-        type: 'minor',
-        changes: ['New feature']
+        type: 'minor' as const,
+        changes: ['New feature'],
+        timestamp: '2025-10-11T00:00:00.000Z'
       };
 
-      getLatestVersion.mockResolvedValueOnce(mockLatestVersion);
+      mockGetLatestVersion.mockResolvedValueOnce(mockLatestVersion);
 
       const { result } = renderHook(() => useVersionCheck());
 
@@ -207,11 +216,12 @@ describe('useVersionCheck Hook', () => {
       const mockLatestVersion = {
         version: '1.6.0',
         date: '2025-10-11',
-        type: 'minor',
-        changes: ['New feature']
+        type: 'minor' as const,
+        changes: ['New feature'],
+        timestamp: '2025-10-11T00:00:00.000Z'
       };
 
-      getLatestVersion.mockResolvedValueOnce(mockLatestVersion);
+      mockGetLatestVersion.mockResolvedValueOnce(mockLatestVersion);
 
       const { result } = renderHook(() => useVersionCheck());
 
@@ -237,11 +247,12 @@ describe('useVersionCheck Hook', () => {
       const mockLatestVersion = {
         version: '1.6.0',
         date: '2025-10-11',
-        type: 'minor',
-        changes: ['New feature']
+        type: 'minor' as const,
+        changes: ['New feature'],
+        timestamp: '2025-10-11T00:00:00.000Z'
       };
 
-      getLatestVersion.mockResolvedValueOnce(mockLatestVersion);
+      mockGetLatestVersion.mockResolvedValueOnce(mockLatestVersion);
 
       const { result } = renderHook(() => useVersionCheck());
 
@@ -265,11 +276,12 @@ describe('useVersionCheck Hook', () => {
       const mockLatestVersion = {
         version: '1.6.0',
         date: '2025-10-11',
-        type: 'minor',
-        changes: ['New feature']
+        type: 'minor' as const,
+        changes: ['New feature'],
+        timestamp: '2025-10-11T00:00:00.000Z'
       };
 
-      getLatestVersion.mockResolvedValueOnce(mockLatestVersion);
+      mockGetLatestVersion.mockResolvedValueOnce(mockLatestVersion);
 
       const { result } = renderHook(() => useVersionCheck());
 
@@ -296,11 +308,12 @@ describe('useVersionCheck Hook', () => {
       const mockLatestVersion = {
         version: '1.6.0',
         date: '2025-10-11',
-        type: 'minor',
-        changes: ['New feature']
+        type: 'minor' as const,
+        changes: ['New feature'],
+        timestamp: '2025-10-11T00:00:00.000Z'
       };
 
-      getLatestVersion.mockResolvedValueOnce(mockLatestVersion);
+      mockGetLatestVersion.mockResolvedValueOnce(mockLatestVersion);
 
       const { result } = renderHook(() => useVersionCheck());
 
@@ -316,11 +329,12 @@ describe('useVersionCheck Hook', () => {
       const mockLatestVersion = {
         version: '1.6.0',
         date: '2025-10-11',
-        type: 'minor',
-        changes: ['New feature']
+        type: 'minor' as const,
+        changes: ['New feature'],
+        timestamp: '2025-10-11T00:00:00.000Z'
       };
 
-      getLatestVersion.mockResolvedValue(mockLatestVersion);
+      mockGetLatestVersion.mockResolvedValue(mockLatestVersion);
 
       // Render hook twice to simulate strict mode
       const { rerender } = renderHook(() => useVersionCheck());
@@ -328,7 +342,7 @@ describe('useVersionCheck Hook', () => {
 
       await waitFor(() => {
         // Should only call once despite double render
-        expect(getLatestVersion).toHaveBeenCalledTimes(1);
+        expect(mockGetLatestVersion).toHaveBeenCalledTimes(1);
       });
     });
   });

@@ -76,7 +76,7 @@ describe('stoveApi', () => {
         });
 
         test('accepts string parameter and generates correct URL', () => {
-          const result = STUFA_API.setFan('3');
+          const result = STUFA_API.setFan(3);
           expect(result).toBe(`${BASE_URL}/SetFanLevel/${API_KEY};3`);
         });
       });
@@ -106,7 +106,7 @@ describe('stoveApi', () => {
         });
 
         test('accepts string parameter and generates correct URL', () => {
-          const result = STUFA_API.setPower('4');
+          const result = STUFA_API.setPower(4);
           expect(result).toBe(`${BASE_URL}/SetPower/${API_KEY};4`);
         });
       });
@@ -216,7 +216,7 @@ describe('stoveApi', () => {
 
     test('resolves when fetch succeeds within timeout', async () => {
       const mockResponse = { ok: true, json: async () => ({ data: 'test' }) };
-      global.fetch = jest.fn(() => Promise.resolve(mockResponse));
+      global.fetch = jest.fn(() => Promise.resolve(mockResponse)) as jest.Mock;
 
       const response = await fetchWithTimeout('https://example.com', 5000);
 
@@ -229,7 +229,7 @@ describe('stoveApi', () => {
 
     test('uses DEFAULT_TIMEOUT when no timeout specified', async () => {
       const mockResponse = { ok: true };
-      global.fetch = jest.fn(() => Promise.resolve(mockResponse));
+      global.fetch = jest.fn(() => Promise.resolve(mockResponse)) as jest.Mock;
 
       await fetchWithTimeout('https://example.com');
 
@@ -245,13 +245,13 @@ describe('stoveApi', () => {
     });
 
     afterEach(() => {
-      console.log.mockRestore();
-      console.error.mockRestore();
+      (console.log as jest.Mock).mockRestore();
+      (console.error as jest.Mock).mockRestore();
     });
 
     test('succeeds when fetch succeeds on first attempt', async () => {
       const mockResponse = { ok: true, json: async () => ({ data: 'test' }) };
-      global.fetch = jest.fn(() => Promise.resolve(mockResponse));
+      global.fetch = jest.fn(() => Promise.resolve(mockResponse)) as jest.Mock;
 
       const response = await fetchWithRetry('https://example.com', 1000, 2);
 
@@ -265,7 +265,7 @@ describe('stoveApi', () => {
         const error = new Error('The operation was aborted');
         error.name = 'AbortError';
         return Promise.reject(error);
-      });
+      }) as jest.Mock;
 
       await expect(fetchWithRetry('https://example.com', 10, 2)).rejects.toThrow('STOVE_TIMEOUT');
 
@@ -276,7 +276,7 @@ describe('stoveApi', () => {
 
     test('does not retry on non-abort errors', async () => {
       const networkError = new Error('Network error');
-      global.fetch = jest.fn(() => Promise.reject(networkError));
+      global.fetch = jest.fn(() => Promise.reject(networkError)) as jest.Mock;
 
       await expect(fetchWithRetry('https://example.com', 1000, 2)).rejects.toThrow('Network error');
 

@@ -82,7 +82,7 @@ describe('persistentStorage', () => {
 
     it('calculates usage percentage', async () => {
       const estimate = await getStorageEstimate();
-      expect(parseFloat(estimate.usagePercent)).toBeCloseTo(1, 1);
+      expect(parseFloat(estimate.usagePercent as string)).toBeCloseTo(1, 1);
     });
   });
 });

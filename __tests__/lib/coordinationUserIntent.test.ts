@@ -13,6 +13,8 @@ jest.mock('@/lib/netatmoApi', () => ({
   },
 }));
 
+const mockGetHomeStatus = NETATMO_API.getHomeStatus as jest.MockedFunction<typeof NETATMO_API.getHomeStatus>;
+
 describe('coordinationUserIntent', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -21,16 +23,17 @@ describe('coordinationUserIntent', () => {
   describe('detectUserIntent', () => {
     it('detects setpoint change > 0.5°C', async () => {
       // Mock home status with changed setpoint
-      NETATMO_API.getHomeStatus.mockResolvedValue({
+      mockGetHomeStatus.mockResolvedValue({
         rooms: [
           {
             id: 'room1',
+            type: 'room',
             name: 'Living Room',
             therm_setpoint_temperature: 23.0, // Expected 21.0
             therm_setpoint_mode: 'manual',
           },
         ],
-      });
+      } as any);
 
       const result = await detectUserIntent(
         'home123',
@@ -54,16 +57,17 @@ describe('coordinationUserIntent', () => {
 
     it('ignores setpoint change <= 0.5°C (tolerance)', async () => {
       // Mock home status with small setpoint change
-      NETATMO_API.getHomeStatus.mockResolvedValue({
+      mockGetHomeStatus.mockResolvedValue({
         rooms: [
           {
             id: 'room1',
+            type: 'room',
             name: 'Living Room',
             therm_setpoint_temperature: 21.3, // Expected 21.0 (diff = 0.3)
             therm_setpoint_mode: 'manual',
           },
         ],
-      });
+      } as any);
 
       const result = await detectUserIntent(
         'home123',
@@ -79,16 +83,17 @@ describe('coordinationUserIntent', () => {
 
     it('detects mode change to away', async () => {
       // Mock home status with away mode
-      NETATMO_API.getHomeStatus.mockResolvedValue({
+      mockGetHomeStatus.mockResolvedValue({
         rooms: [
           {
             id: 'room1',
+            type: 'room',
             name: 'Living Room',
             therm_setpoint_temperature: 21.0,
             therm_setpoint_mode: 'away',
           },
         ],
-      });
+      } as any);
 
       const result = await detectUserIntent(
         'home123',
@@ -110,16 +115,17 @@ describe('coordinationUserIntent', () => {
 
     it('detects mode change to hg (frost guard)', async () => {
       // Mock home status with frost guard mode
-      NETATMO_API.getHomeStatus.mockResolvedValue({
+      mockGetHomeStatus.mockResolvedValue({
         rooms: [
           {
             id: 'room1',
+            type: 'room',
             name: 'Living Room',
             therm_setpoint_temperature: 7.0,
             therm_setpoint_mode: 'hg',
           },
         ],
-      });
+      } as any);
 
       const result = await detectUserIntent(
         'home123',
@@ -137,16 +143,17 @@ describe('coordinationUserIntent', () => {
 
     it('detects mode change to off', async () => {
       // Mock home status with off mode
-      NETATMO_API.getHomeStatus.mockResolvedValue({
+      mockGetHomeStatus.mockResolvedValue({
         rooms: [
           {
             id: 'room1',
+            type: 'room',
             name: 'Living Room',
             therm_setpoint_temperature: 7.0,
             therm_setpoint_mode: 'off',
           },
         ],
-      });
+      } as any);
 
       const result = await detectUserIntent(
         'home123',
@@ -164,16 +171,17 @@ describe('coordinationUserIntent', () => {
 
     it('no change detected when setpoint matches', async () => {
       // Mock home status with matching setpoint
-      NETATMO_API.getHomeStatus.mockResolvedValue({
+      mockGetHomeStatus.mockResolvedValue({
         rooms: [
           {
             id: 'room1',
+            type: 'room',
             name: 'Living Room',
             therm_setpoint_temperature: 21.0,
             therm_setpoint_mode: 'manual',
           },
         ],
-      });
+      } as any);
 
       const result = await detectUserIntent(
         'home123',
@@ -188,16 +196,17 @@ describe('coordinationUserIntent', () => {
 
     it('no change detected in normal home mode', async () => {
       // Mock home status in home mode
-      NETATMO_API.getHomeStatus.mockResolvedValue({
+      mockGetHomeStatus.mockResolvedValue({
         rooms: [
           {
             id: 'room1',
+            type: 'room',
             name: 'Living Room',
             therm_setpoint_temperature: 21.0,
             therm_setpoint_mode: 'home',
           },
         ],
-      });
+      } as any);
 
       const result = await detectUserIntent(
         'home123',
@@ -212,7 +221,7 @@ describe('coordinationUserIntent', () => {
 
     it('handles missing room data gracefully', async () => {
       // Mock home status without the requested room
-      NETATMO_API.getHomeStatus.mockResolvedValue({
+      mockGetHomeStatus.mockResolvedValue({
         rooms: [
           {
             id: 'room2',
@@ -221,7 +230,7 @@ describe('coordinationUserIntent', () => {
             therm_setpoint_mode: 'manual',
           },
         ],
-      });
+      } as any);
 
       const result = await detectUserIntent(
         'home123',
@@ -236,7 +245,7 @@ describe('coordinationUserIntent', () => {
 
     it('handles API errors gracefully', async () => {
       // Mock API error
-      NETATMO_API.getHomeStatus.mockRejectedValue(new Error('API timeout'));
+      mockGetHomeStatus.mockRejectedValue(new Error('API timeout'));
 
       const result = await detectUserIntent(
         'home123',
@@ -253,10 +262,11 @@ describe('coordinationUserIntent', () => {
 
     it('multi-room detection works correctly', async () => {
       // Mock home status with changes in multiple rooms
-      NETATMO_API.getHomeStatus.mockResolvedValue({
+      mockGetHomeStatus.mockResolvedValue({
         rooms: [
           {
             id: 'room1',
+            type: 'room',
             name: 'Living Room',
             therm_setpoint_temperature: 23.0, // Expected 21.0
             therm_setpoint_mode: 'manual',
@@ -274,7 +284,7 @@ describe('coordinationUserIntent', () => {
             therm_setpoint_mode: 'away', // Mode changed
           },
         ],
-      });
+      } as any);
 
       const result = await detectUserIntent(
         'home123',
@@ -306,16 +316,17 @@ describe('coordinationUserIntent', () => {
 
     it('detects both setpoint and mode change in same room', async () => {
       // Mock home status with both types of changes
-      NETATMO_API.getHomeStatus.mockResolvedValue({
+      mockGetHomeStatus.mockResolvedValue({
         rooms: [
           {
             id: 'room1',
+            type: 'room',
             name: 'Living Room',
             therm_setpoint_temperature: 23.0, // Expected 21.0
             therm_setpoint_mode: 'away', // Mode changed too
           },
         ],
-      });
+      } as any);
 
       const result = await detectUserIntent(
         'home123',
@@ -331,7 +342,7 @@ describe('coordinationUserIntent', () => {
 
     it('handles empty home status gracefully', async () => {
       // Mock empty home status
-      NETATMO_API.getHomeStatus.mockResolvedValue(null);
+      mockGetHomeStatus.mockResolvedValue(null);
 
       const result = await detectUserIntent(
         'home123',
@@ -348,16 +359,17 @@ describe('coordinationUserIntent', () => {
   describe('wasManuallyChanged', () => {
     it('returns true when manual change detected', async () => {
       // Mock home status with changed setpoint
-      NETATMO_API.getHomeStatus.mockResolvedValue({
+      mockGetHomeStatus.mockResolvedValue({
         rooms: [
           {
             id: 'room1',
+            type: 'room',
             name: 'Living Room',
             therm_setpoint_temperature: 23.0,
             therm_setpoint_mode: 'manual',
           },
         ],
-      });
+      } as any);
 
       const changed = await wasManuallyChanged(
         'home123',
@@ -371,16 +383,17 @@ describe('coordinationUserIntent', () => {
 
     it('returns false when no change detected', async () => {
       // Mock home status with matching setpoint
-      NETATMO_API.getHomeStatus.mockResolvedValue({
+      mockGetHomeStatus.mockResolvedValue({
         rooms: [
           {
             id: 'room1',
+            type: 'room',
             name: 'Living Room',
             therm_setpoint_temperature: 21.0,
             therm_setpoint_mode: 'manual',
           },
         ],
-      });
+      } as any);
 
       const changed = await wasManuallyChanged(
         'home123',
@@ -394,7 +407,7 @@ describe('coordinationUserIntent', () => {
 
     it('returns false on API error', async () => {
       // Mock API error
-      NETATMO_API.getHomeStatus.mockRejectedValue(new Error('API error'));
+      mockGetHomeStatus.mockRejectedValue(new Error('API error'));
 
       const changed = await wasManuallyChanged(
         'home123',

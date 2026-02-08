@@ -91,8 +91,8 @@ describe('NetatmoPage - setState-in-render fix', () => {
       get: jest.fn(() => null),
     };
 
-    useRouter.mockReturnValue(mockRouter);
-    useSearchParams.mockReturnValue(mockSearchParams);
+    (useRouter as jest.Mock).mockReturnValue(mockRouter);
+    (useSearchParams as jest.Mock).mockReturnValue(mockSearchParams);
 
     // Mock fetch globally
     global.fetch = jest.fn();
@@ -104,7 +104,7 @@ describe('NetatmoPage - setState-in-render fix', () => {
 
   test('should NOT call router.replace during render (setState-in-render bug)', async () => {
     // Mock API to return "not connected" response
-    global.fetch.mockResolvedValueOnce({
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
       json: async () => ({
         error: 'Nessun refresh token disponibile',
       }),
@@ -136,7 +136,7 @@ describe('NetatmoPage - setState-in-render fix', () => {
 
   test('should show skeleton immediately when not connected', async () => {
     // Mock API to return "not connected" response
-    global.fetch.mockResolvedValueOnce({
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
       json: async () => ({
         error: 'Nessun refresh token disponibile',
       }),
@@ -158,7 +158,7 @@ describe('NetatmoPage - setState-in-render fix', () => {
 
   test('should redirect in useEffect, not in render', async () => {
     // Mock API to return "not connected" response
-    global.fetch.mockResolvedValueOnce({
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
       json: async () => ({
         error: 'Nessun refresh token disponibile',
       }),
@@ -180,7 +180,7 @@ describe('NetatmoPage - setState-in-render fix', () => {
 
   test('should not redirect when connected', async () => {
     // Mock API to return successful connection
-    global.fetch
+    (global.fetch as jest.Mock)
       .mockResolvedValueOnce({
         json: async () => ({
           home_id: '123',

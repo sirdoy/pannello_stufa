@@ -64,8 +64,8 @@ describe('weatherCache', () => {
 
     // Called twice - different locations
     expect(mockFetch).toHaveBeenCalledTimes(2);
-    expect(result1.data.temperature).toBe(20);
-    expect(result2.data.temperature).toBe(25);
+    expect((result1.data as any).temperature).toBe(20);
+    expect((result2.data as any).temperature).toBe(25);
   });
 
   it('clearWeatherCache removes all cached data', async () => {

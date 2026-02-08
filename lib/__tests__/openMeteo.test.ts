@@ -7,7 +7,7 @@
 import { interpretWeatherCode, WMO_CODES, fetchWeatherForecast, fetchAirQuality } from '../openMeteo';
 
 // Mock global fetch
-global.fetch = jest.fn();
+global.fetch = jest.fn() as jest.Mock;
 
 describe('openMeteo', () => {
   beforeEach(() => {
@@ -51,7 +51,7 @@ describe('openMeteo', () => {
 
   describe('fetchWeatherForecast', () => {
     it('constructs correct API URL with all required parameters', async () => {
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve({ test: 'data' }),
       });
@@ -59,7 +59,7 @@ describe('openMeteo', () => {
       await fetchWeatherForecast(45.4642, 9.19);
 
       expect(global.fetch).toHaveBeenCalledTimes(1);
-      const calledUrl = global.fetch.mock.calls[0][0];
+      const calledUrl = (global.fetch as jest.Mock).mock.calls[0][0];
 
       // Verify base URL
       expect(calledUrl).toContain('https://api.open-meteo.com/v1/forecast');
@@ -99,20 +99,20 @@ describe('openMeteo', () => {
     });
 
     it('rounds coordinates to 4 decimal places', async () => {
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve({}),
       });
 
       await fetchWeatherForecast(45.46429999, 9.19000001);
 
-      const calledUrl = global.fetch.mock.calls[0][0];
+      const calledUrl = (global.fetch as jest.Mock).mock.calls[0][0];
       expect(calledUrl).toContain('latitude=45.4643');
       expect(calledUrl).toContain('longitude=9.1900');
     });
 
     it('throws error for non-OK response', async () => {
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 500,
         statusText: 'Internal Server Error',
@@ -128,7 +128,7 @@ describe('openMeteo', () => {
         current: { temperature_2m: 15.5 },
         daily: { temperature_2m_max: [20, 21, 22] },
       };
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve(mockData),
       });
@@ -140,7 +140,7 @@ describe('openMeteo', () => {
 
   describe('fetchAirQuality', () => {
     it('constructs correct API URL for air quality', async () => {
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve({ current: { european_aqi: 25 } }),
       });
@@ -148,7 +148,7 @@ describe('openMeteo', () => {
       await fetchAirQuality(45.4642, 9.19);
 
       expect(global.fetch).toHaveBeenCalledTimes(1);
-      const calledUrl = global.fetch.mock.calls[0][0];
+      const calledUrl = (global.fetch as jest.Mock).mock.calls[0][0];
 
       // Verify base URL (air quality uses a different subdomain)
       expect(calledUrl).toContain('https://air-quality-api.open-meteo.com/v1/air-quality');
@@ -165,7 +165,7 @@ describe('openMeteo', () => {
     });
 
     it('throws error for non-OK response', async () => {
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 503,
         statusText: 'Service Unavailable',
@@ -178,7 +178,7 @@ describe('openMeteo', () => {
 
     it('returns JSON data with european_aqi on success', async () => {
       const mockData = { current: { european_aqi: 35 } };
-      global.fetch.mockResolvedValueOnce({
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve(mockData),
       });

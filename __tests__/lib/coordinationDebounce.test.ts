@@ -98,7 +98,7 @@ describe('coordinationDebounce', () => {
       const userId = 'user123';
       const callback = jest.fn();
 
-      updateCoordinationState.mockClear();
+      (updateCoordinationState as jest.Mock).mockClear();
       await startDebounceTimer(userId, 'ON', callback, 120000);
 
       // Advance timers
@@ -140,7 +140,7 @@ describe('coordinationDebounce', () => {
       const callback = jest.fn();
 
       await startDebounceTimer(userId, 'ON', callback, 120000);
-      updateCoordinationState.mockClear();
+      (updateCoordinationState as jest.Mock).mockClear();
 
       await cancelDebounceTimer(userId);
 

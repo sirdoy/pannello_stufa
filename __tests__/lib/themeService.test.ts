@@ -41,7 +41,7 @@ describe('themeService', () => {
         ok: true,
         json: () => Promise.resolve({ theme: 'light' }),
       })
-    );
+    ) as jest.Mock;
   });
 
   describe('THEMES constants', () => {
@@ -58,7 +58,7 @@ describe('themeService', () => {
           ok: true,
           json: () => Promise.resolve({ theme: THEMES.DARK }),
         })
-      );
+      ) as jest.Mock;
 
       const result = await getThemePreference('user123');
 
@@ -104,7 +104,7 @@ describe('themeService', () => {
           ok: true,
           json: () => Promise.resolve({ success: true }),
         })
-      );
+      ) as jest.Mock;
 
       const result = await updateThemePreference('user123', THEMES.DARK);
 
@@ -125,7 +125,7 @@ describe('themeService', () => {
           ok: true,
           json: () => Promise.resolve({ success: true }),
         })
-      );
+      ) as jest.Mock;
 
       await updateThemePreference('user123', THEMES.DARK);
 
@@ -134,7 +134,7 @@ describe('themeService', () => {
 
     it('should throw error for invalid theme', async () => {
       await expect(
-        updateThemePreference('user123', 'invalid-theme')
+        updateThemePreference('user123', 'invalid-theme' as any)
       ).rejects.toThrow('Invalid theme');
     });
 
@@ -152,7 +152,7 @@ describe('themeService', () => {
           ok: false,
           json: () => Promise.resolve({ message: 'API error' }),
         })
-      );
+      ) as jest.Mock;
 
       await expect(
         updateThemePreference('user123', THEMES.DARK)
@@ -238,7 +238,7 @@ describe('themeService', () => {
           ok: true,
           json: () => Promise.resolve({ theme: THEMES.DARK }),
         })
-      );
+      ) as jest.Mock;
 
       const result = await initializeTheme('user123');
 

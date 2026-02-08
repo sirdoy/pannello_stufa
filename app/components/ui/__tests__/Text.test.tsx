@@ -63,7 +63,7 @@ describe('Text', () => {
     it('should have no a11y violations with as="label"', async () => {
       const { container } = render(
         <div>
-          <Text as="label" htmlFor="test-input" aria-label="Form Label">Form Label</Text>
+          <Text as="label" htmlFor="test-input" aria-label="Form Label" {...({} as any)}>Form Label</Text>
           <input id="test-input" type="text" />
         </div>
       );
@@ -344,7 +344,7 @@ describe('Text', () => {
     });
 
     it('passes htmlFor to label element', () => {
-      render(<Text as="label" htmlFor="my-input" aria-label="Label">Label</Text>);
+      render(<Text as="label" htmlFor="my-input" aria-label="Label" {...({} as any)}>Label</Text>);
       const text = screen.getByText('Label');
       expect(text).toHaveAttribute('for', 'my-input');
     });

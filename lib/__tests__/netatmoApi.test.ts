@@ -32,7 +32,7 @@ describe('netatmoApi control functions', () => {
     const baseParams = {
       home_id: 'home123',
       room_id: 'room456',
-      mode: 'manual',
+      mode: 'manual' as const,
     };
 
     it('should convert integer temperature to float', async () => {
@@ -40,7 +40,7 @@ describe('netatmoApi control functions', () => {
         json: async () => ({ status: 'ok' }),
       });
 
-      await setRoomThermpoint(accessToken, { ...baseParams, temp: 21 });
+      await setRoomThermpoint(accessToken, { ...baseParams, temp: 21 } as any);
 
       expect(mockFetch).toHaveBeenCalledWith(
         'https://api.netatmo.com/api/setroomthermpoint',
@@ -65,7 +65,7 @@ describe('netatmoApi control functions', () => {
         json: async () => ({ status: 'ok' }),
       });
 
-      await setRoomThermpoint(accessToken, { ...baseParams, temp: 21.5 });
+      await setRoomThermpoint(accessToken, { ...baseParams, temp: 21.5 } as any);
 
       const callArgs = mockFetch.mock.calls[0][1];
       const bodyParams = new URLSearchParams(callArgs.body);
@@ -78,7 +78,7 @@ describe('netatmoApi control functions', () => {
         json: async () => ({ status: 'ok' }),
       });
 
-      await setRoomThermpoint(accessToken, { ...baseParams, temp: '21' });
+      await setRoomThermpoint(accessToken, { ...baseParams, temp: '21' } as any);
 
       const callArgs = mockFetch.mock.calls[0][1];
       const bodyParams = new URLSearchParams(callArgs.body);
@@ -91,7 +91,7 @@ describe('netatmoApi control functions', () => {
         json: async () => ({ status: 'ok' }),
       });
 
-      await setRoomThermpoint(accessToken, { ...baseParams, temp: 21 });
+      await setRoomThermpoint(accessToken, { ...baseParams, temp: 21 } as any);
 
       expect(mockFetch).toHaveBeenCalledWith(
         'https://api.netatmo.com/api/setroomthermpoint',
@@ -104,7 +104,7 @@ describe('netatmoApi control functions', () => {
         json: async () => ({ status: 'ok' }),
       });
 
-      await setRoomThermpoint(accessToken, { ...baseParams, temp: 21 });
+      await setRoomThermpoint(accessToken, { ...baseParams, temp: 21 } as any);
 
       const callArgs = mockFetch.mock.calls[0][1];
       expect(callArgs.headers['Content-Type']).toBe('application/x-www-form-urlencoded');
@@ -116,7 +116,7 @@ describe('netatmoApi control functions', () => {
         json: async () => ({ status: 'ok' }),
       });
 
-      const result = await setRoomThermpoint(accessToken, { ...baseParams, temp: 21 });
+      const result = await setRoomThermpoint(accessToken, { ...baseParams, temp: 21 } as any);
 
       expect(result).toBe(true);
     });
@@ -139,7 +139,7 @@ describe('netatmoApi control functions', () => {
         home_id: 'home123',
         room_id: 'room456',
         mode: 'home',
-      });
+      } as any);
 
       const callArgs = mockFetch.mock.calls[0][1];
       const bodyParams = new URLSearchParams(callArgs.body);
@@ -167,7 +167,7 @@ describe('netatmoApi control functions', () => {
     const accessToken = 'test-access-token';
     const baseParams = {
       home_id: 'home123',
-      mode: 'schedule',
+      mode: 'schedule' as const,
     };
 
     it('should handle schedule mode', async () => {
@@ -194,7 +194,7 @@ describe('netatmoApi control functions', () => {
         json: async () => ({ status: 'ok' }),
       });
 
-      await setThermMode(accessToken, { ...baseParams, mode: 'away' });
+      await setThermMode(accessToken, { ...baseParams, mode: 'away' as const });
 
       const callArgs = mockFetch.mock.calls[0][1];
       const bodyParams = new URLSearchParams(callArgs.body);
@@ -206,7 +206,7 @@ describe('netatmoApi control functions', () => {
         json: async () => ({ status: 'ok' }),
       });
 
-      await setThermMode(accessToken, { ...baseParams, mode: 'hg' });
+      await setThermMode(accessToken, { ...baseParams, mode: 'hg' as const });
 
       const callArgs = mockFetch.mock.calls[0][1];
       const bodyParams = new URLSearchParams(callArgs.body);
@@ -218,7 +218,7 @@ describe('netatmoApi control functions', () => {
         json: async () => ({ status: 'ok' }),
       });
 
-      await setThermMode(accessToken, { ...baseParams, mode: 'off' });
+      await setThermMode(accessToken, { ...baseParams, mode: 'off' as const });
 
       const callArgs = mockFetch.mock.calls[0][1];
       const bodyParams = new URLSearchParams(callArgs.body);
@@ -231,7 +231,7 @@ describe('netatmoApi control functions', () => {
       });
 
       const endtime = Math.floor(Date.now() / 1000) + 7200;
-      await setThermMode(accessToken, { ...baseParams, mode: 'away', endtime });
+      await setThermMode(accessToken, { ...baseParams, mode: 'away' as const, endtime });
 
       const callArgs = mockFetch.mock.calls[0][1];
       const bodyParams = new URLSearchParams(callArgs.body);
@@ -244,7 +244,7 @@ describe('netatmoApi control functions', () => {
       });
 
       const endtime = Math.floor(Date.now() / 1000) + 7200;
-      await setThermMode(accessToken, { ...baseParams, mode: 'hg', endtime });
+      await setThermMode(accessToken, { ...baseParams, mode: 'hg' as const, endtime });
 
       const callArgs = mockFetch.mock.calls[0][1];
       const bodyParams = new URLSearchParams(callArgs.body);

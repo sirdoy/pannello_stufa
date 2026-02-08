@@ -132,8 +132,8 @@ describe('PIDController', () => {
     it('should throw error for invalid inputs', () => {
       const pid = new PIDController();
 
-      expect(() => pid.compute('21', 20, 1)).toThrow('setpoint and measured must be numbers');
-      expect(() => pid.compute(21, '20', 1)).toThrow('setpoint and measured must be numbers');
+      expect(() => pid.compute('21' as any, 20, 1)).toThrow('setpoint and measured must be numbers');
+      expect(() => pid.compute(21, '20' as any, 1)).toThrow('setpoint and measured must be numbers');
       expect(() => pid.compute(21, 20, 0)).toThrow('dt must be a positive number');
       expect(() => pid.compute(21, 20, -1)).toThrow('dt must be a positive number');
     });
@@ -222,8 +222,8 @@ describe('createPIDController', () => {
 
   it('should pass options to constructor', () => {
     const pid = createPIDController({ kp: 0.8, outputMax: 3 });
-    expect(pid.kp).toBe(0.8);
-    expect(pid.outputMax).toBe(3);
+    expect((pid as any).kp).toBe(0.8);
+    expect((pid as any).outputMax).toBe(3);
   });
 });
 

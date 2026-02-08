@@ -280,7 +280,7 @@ export async function getHealthStats(days = 7) {
 
     // Calculate success rate
     if (stats.totalChecks > 0) {
-      stats.successRate = Number(((stats.successfulChecks / stats.totalChecks) * 100).toFixed(1));
+      stats.successRate = ((stats.successfulChecks / stats.totalChecks) * 100).toFixed(1);
     }
 
     return stats;

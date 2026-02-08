@@ -171,8 +171,9 @@ describe('scheduleHelpers', () => {
     });
 
     it('should return default color for unknown zone types', () => {
-      expect(getZoneColor(99)).toBe(ZONE_COLORS.default);
-      expect(getZoneColor(undefined)).toBe(ZONE_COLORS.default);
+      const unknownColor = getZoneColor(99);
+      expect(unknownColor).toEqual({ bg: 'hsl(0, 0%, 50%)', text: 'hsl(0, 0%, 100%)', name: 'Altro' });
+      expect(getZoneColor(undefined as any)).toEqual({ bg: 'hsl(0, 0%, 50%)', text: 'hsl(0, 0%, 100%)', name: 'Altro' });
     });
 
     it('should have bg and text properties', () => {

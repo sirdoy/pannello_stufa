@@ -26,7 +26,8 @@ interface DeadManSwitchStatus {
   stale: boolean;
   elapsed?: number;
   lastCheck?: string;
-  reason?: 'never_run' | 'timeout';
+  reason?: 'never_run' | 'timeout' | 'error';
+  error?: string;
 }
 
 /**
@@ -86,7 +87,8 @@ export async function checkDeadManSwitch(): Promise<DeadManSwitchStatus> {
     // Treat errors as stale (fail-safe)
     return {
       stale: true,
-      reason: 'never_run', // Use valid union type
+      reason: 'error',
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
@@ -96,7 +98,7 @@ export async function checkDeadManSwitch(): Promise<DeadManSwitchStatus> {
  * Fire-and-forget: logs result but doesn't throw
  */
 export async function alertDeadManSwitch(
-  reason: 'never_run' | 'timeout',
+  reason: 'never_run' | 'timeout' | 'error',
   context: Record<string, unknown> = {}
 ): Promise<void> {
   try {

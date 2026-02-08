@@ -497,10 +497,12 @@ function parseModules(homesData: NetatmoHome[]): ParsedModule[] {
       id: module.id,
       name: module.name,
       type: module.type,
-      reachable: module.reachable ?? false,
     };
 
     // Only add optional properties if they're defined
+    if (module.reachable !== undefined && module.reachable !== null) {
+      parsed.reachable = module.reachable;
+    }
     if (module.bridge !== undefined && module.bridge !== null) {
       parsed.bridge = module.bridge;
     }

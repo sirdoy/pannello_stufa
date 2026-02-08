@@ -75,7 +75,7 @@ export async function checkUserStoveHealth(userId: string): Promise<HealthCheck>
   return {
     userId,
     timestamp,
-    stoveStatus: (stoveResult.status === 'fulfilled' && stoveStatus?.StatusDescription) || 'unknown',
+    stoveStatus: stoveResult.status === 'fulfilled' ? (stoveStatus?.StatusDescription || 'unknown') : null,
     stoveError,
     expectedState,
     netatmoDemand,

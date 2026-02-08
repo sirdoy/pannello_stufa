@@ -67,6 +67,8 @@ interface ModuleStatus {
 }
 
 interface RoomWithStatus extends NetatmoRoom {
+  name: string;
+  type: string;
   temperature?: number;
   setpoint?: number;
   mode?: string;
@@ -278,7 +280,7 @@ function NetatmoContent() {
             Errore Connessione Netatmo
           </Heading>
 
-          <ErrorAlert message={error} />
+          <Banner variant="error">{error}</Banner>
 
           {/* Helpful troubleshooting info */}
           <Banner variant="info" icon="💡" title="Suggerimenti:" className="mt-6">
@@ -343,7 +345,7 @@ function NetatmoContent() {
     // Find modules for this room (exclude relays - NAPlug and cameras - NACamera, NOC), with battery info
     const roomModules = room.modules?.map(moduleId => {
       return modulesWithBattery.find(m => m.id === moduleId);
-    }).filter(Boolean).filter(m => m.type !== 'NAPlug' && m.type !== 'NACamera' && m.type !== 'NOC') || [];
+    }).filter(Boolean).filter(m => m!.type !== 'NAPlug' && m!.type !== 'NACamera' && m!.type !== 'NOC') as NetatmoModule[] || [];
 
     // Determine device type
     const hasThermostat = roomModules.some(m => m.type === 'NATherm1' || m.type === 'OTH');
@@ -358,8 +360,12 @@ function NetatmoContent() {
     // Check if room is offline (no reachable modules)
     const isOffline = roomModules.length > 0 && roomModules.every(m => m.reachable === false);
 
+    const deviceType: 'thermostat' | 'valve' | 'unknown' = hasThermostat ? 'thermostat' : hasValve ? 'valve' : 'unknown';
+
     return {
       ...room,
+      name: room.name || 'Stanza',
+      type: 'custom',
       temperature: roomStatus?.temperature,
       setpoint: roomStatus?.setpoint,
       mode: roomStatus?.mode,
@@ -367,7 +373,7 @@ function NetatmoContent() {
       stoveSync: roomStatus?.stoveSync || false,
       stoveSyncSetpoint: roomStatus?.stoveSyncSetpoint,
       roomModules, // Add module details with battery info
-      deviceType: hasThermostat ? 'thermostat' : hasValve ? 'valve' : 'unknown',
+      deviceType,
       hasLowBattery,
       hasCriticalBattery,
       isOffline,
@@ -439,7 +445,7 @@ function NetatmoContent() {
       {/* Error Alert - above tabs */}
       {error && (
         <div className="mb-6">
-          <ErrorAlert message={error} />
+          <Banner variant="error">{error}</Banner>
         </div>
       )}
 
@@ -447,7 +453,7 @@ function NetatmoContent() {
       {(status?.hasLowBattery || status?.hasCriticalBattery) && (
         <div className="mb-6">
           <BatteryWarning
-            lowBatteryModules={status?.lowBatteryModules || []}
+            lowBatteryModules={(status?.lowBatteryModules || []) as any}
             hasCriticalBattery={status?.hasCriticalBattery || false}
           />
         </div>
@@ -548,7 +554,7 @@ function NetatmoContent() {
               {/* Module Battery Status List */}
               {modulesWithBattery && modulesWithBattery.length > 0 && (
                 <div className="mt-4 pt-4 border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
-                  <ModuleBatteryList modules={modulesWithBattery} />
+                  <ModuleBatteryList modules={modulesWithBattery as any} />
                 </div>
               )}
 
@@ -577,7 +583,7 @@ function NetatmoContent() {
               {sortedRooms.map(room => (
                 <RoomCard
                   key={room.id}
-                  room={room}
+                  room={room as any}
                   onRefresh={fetchStatus}
                 />
               ))}

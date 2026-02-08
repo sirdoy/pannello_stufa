@@ -1,22 +1,12 @@
 'use client';
 import { useMemo, useState, useEffect } from 'react';
-import { parseTimelineSlots, DAY_NAMES, formatTimeFromMinutes, ZONE_COLORS } from '@/lib/utils/scheduleHelpers';
+import { parseTimelineSlots, DAY_NAMES, formatTimeFromMinutes, ZONE_COLORS, TimelineSlot as ImportedTimelineSlot } from '@/lib/utils/scheduleHelpers';
 import TimelineSlot from './TimelineSlot';
 import { Text } from '@/app/components/ui';
 
 interface Schedule {
   timetable?: unknown;
   zones?: Array<{ type: number; [key: string]: unknown }>;
-  [key: string]: unknown;
-}
-
-interface TimelineSlot {
-  day: number;
-  zoneType: number;
-  zoneName: string;
-  startMinutes: number;
-  endMinutes: number;
-  durationPercent: number;
   [key: string]: unknown;
 }
 
@@ -52,15 +42,15 @@ export default function WeeklyTimeline({ schedule, className = '' }: WeeklyTimel
   }, []);
 
   // Parse schedule into day-grouped slots
-  const slotsByDay = useMemo((): TimelineSlot[][] => {
+  const slotsByDay = useMemo((): ImportedTimelineSlot[][] => {
     if (!schedule?.timetable || !schedule?.zones) {
       return Array(7).fill([]);
     }
 
-    const allSlots = parseTimelineSlots(schedule) as TimelineSlot[];
+    const allSlots = parseTimelineSlots(schedule as any);
 
     // Group by day (0-6)
-    const grouped: TimelineSlot[][] = Array(7).fill(null).map(() => []);
+    const grouped: ImportedTimelineSlot[][] = Array(7).fill(null).map(() => []);
     allSlots.forEach(slot => {
       grouped[slot.day].push(slot);
     });
@@ -73,9 +63,10 @@ export default function WeeklyTimeline({ schedule, className = '' }: WeeklyTimel
     if (!schedule?.zones) return [];
     const zoneTypes = new Set<number>();
     schedule.zones.forEach(z => zoneTypes.add(z.type));
+    const defaultColor = { bg: 'hsl(0, 0%, 50%)', text: 'hsl(0, 0%, 100%)', name: 'Altro' };
     return Array.from(zoneTypes).map(type => ({
       type,
-      ...(ZONE_COLORS[type] || ZONE_COLORS.default)
+      ...(ZONE_COLORS[type] || defaultColor)
     }));
   }, [schedule]);
 

@@ -1,7 +1,7 @@
 'use client';
 import { Suspense, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, Heading, Text, Button, Skeleton, ErrorAlert } from '@/app/components/ui';
+import { Card, Heading, Text, Button, Skeleton } from '@/app/components/ui';
 import { useScheduleData } from '@/lib/hooks/useScheduleData';
 import { useRoomStatus } from '@/lib/hooks/useRoomStatus';
 import ScheduleSelector from './components/ScheduleSelector';
@@ -12,7 +12,14 @@ import { ArrowLeft, RefreshCw, Calendar, Flame } from 'lucide-react';
 
 interface Room {
   id: string;
+  name: string;
   mode?: string;
+  [key: string]: unknown;
+}
+
+interface Schedule {
+  id: string;
+  name: string;
   [key: string]: unknown;
 }
 
@@ -32,7 +39,9 @@ function ScheduleContent() {
   if (error) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <ErrorAlert message={error} />
+        <Card variant="elevated" className="p-6">
+          <Text variant="danger">{error}</Text>
+        </Card>
         <div className="mt-4">
           <Button variant="subtle" onClick={refetch}>
             <RefreshCw size={16} className="mr-2" />
@@ -72,7 +81,7 @@ function ScheduleContent() {
             variant="subtle"
             size="sm"
             onClick={refetch}
-            icon={<RefreshCw size={16} />}
+            icon={<RefreshCw size={16} /> as any}
           >
             Aggiorna
           </Button>
@@ -82,8 +91,8 @@ function ScheduleContent() {
       {/* Schedule selector card */}
       <Card variant="glass" className="p-5 sm:p-6 mb-6">
         <ScheduleSelector
-          schedules={schedules}
-          activeSchedule={activeSchedule}
+          schedules={schedules as Schedule[]}
+          activeSchedule={activeSchedule as Schedule}
           onScheduleChanged={refetch}
         />
       </Card>
@@ -96,12 +105,12 @@ function ScheduleContent() {
           </Heading>
           {activeSchedule && (
             <Text variant="tertiary" size="sm">
-              {activeSchedule.name}
+              {(activeSchedule as Schedule).name}
             </Text>
           )}
         </div>
 
-        <WeeklyTimeline schedule={activeSchedule} />
+        <WeeklyTimeline schedule={activeSchedule as any} />
       </Card>
 
       {/* Active overrides section */}
@@ -115,7 +124,7 @@ function ScheduleContent() {
             {roomsWithOverride.map(room => (
               <ActiveOverrideBadge
                 key={room.id}
-                room={room}
+                room={room as Room}
                 onCancelled={() => {
                   refetchRooms();
                   refetch(); // Also refresh schedules

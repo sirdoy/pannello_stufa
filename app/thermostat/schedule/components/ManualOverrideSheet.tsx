@@ -134,7 +134,7 @@ export default function ManualOverrideSheet({
             <Text variant="label" size="sm" className="mb-1.5">Stanza</Text>
             <Select
               value={selectedRoomId}
-              onChange={(e) => handleRoomChange(e.target.value)}
+              onChange={(e) => handleRoomChange(String(e.target.value))}
               options={roomOptions}
               disabled={roomsLoading || submitting}
             />
@@ -175,7 +175,7 @@ export default function ManualOverrideSheet({
             loading={submitting}
             disabled={!selectedRoomId || submitting}
             className="w-full"
-            icon={<Flame />}
+            icon={<Flame /> as any}
           >
             Applica Override
           </Button>

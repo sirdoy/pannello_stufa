@@ -75,7 +75,7 @@ export default function ScheduleSelector({
           </label>
           <Select
             value={selectedId}
-            onChange={(e) => setSelectedId(e.target.value)}
+            onChange={(e) => setSelectedId(String(e.target.value))}
             options={options}
             disabled={switching || schedules.length === 0}
           />
@@ -87,7 +87,7 @@ export default function ScheduleSelector({
             variant="ember"
             onClick={handleSwitch}
             loading={switching}
-            icon={switching ? <RefreshCw className="animate-spin" /> : <Check />}
+            icon={(switching ? <RefreshCw className="animate-spin" /> : <Check />) as any}
           >
             Applica
           </Button>
@@ -113,7 +113,7 @@ export default function ScheduleSelector({
 
       {/* Error message */}
       {error && (
-        <Text variant="error" size="sm">{error}</Text>
+        <Text variant="danger" size="sm">{error}</Text>
       )}
     </div>
   );

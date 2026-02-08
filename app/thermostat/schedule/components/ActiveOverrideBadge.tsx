@@ -122,14 +122,13 @@ export default function ActiveOverrideBadge({
       {/* Confirm dialog */}
       <ConfirmDialog
         isOpen={showConfirm}
-        onClose={() => setShowConfirm(false)}
+        onCancel={() => setShowConfirm(false)}
         onConfirm={handleCancel}
         title="Annulla Override"
         message={`Vuoi tornare alla programmazione normale per ${room.name}?`}
         confirmText="Annulla Override"
         cancelText="Mantieni"
-        variant="warning"
-        loading={cancelling}
+        confirmVariant="ember"
       />
     </>
   );

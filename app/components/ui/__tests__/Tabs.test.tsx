@@ -1,13 +1,21 @@
+import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe } from 'jest-axe';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../Tabs';
+import Tabs, { TabsList, TabsTrigger, TabsContent } from '../Tabs';
+import type { TabsProps } from '../Tabs';
 import { Calendar, Sliders, History } from 'lucide-react';
+
+interface TestTabsProps {
+  defaultValue?: string;
+  orientation?: 'horizontal' | 'vertical';
+  className?: string;
+}
 
 /**
  * Test helper: Standard tabs setup
  */
-const TestTabs = ({ defaultValue = 'tab1', ...props }) => (
+const TestTabs = ({ defaultValue = 'tab1', ...props }: TestTabsProps) => (
   <Tabs defaultValue={defaultValue} {...props}>
     <Tabs.List>
       <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
@@ -20,10 +28,16 @@ const TestTabs = ({ defaultValue = 'tab1', ...props }) => (
   </Tabs>
 );
 
+interface TabsWithIconsProps {
+  defaultValue?: string;
+  orientation?: 'horizontal' | 'vertical';
+  className?: string;
+}
+
 /**
  * Test helper: Tabs with icons
  */
-const TabsWithIcons = ({ defaultValue = 'schedule', ...props }) => (
+const TabsWithIcons = ({ defaultValue = 'schedule', ...props }: TabsWithIconsProps) => (
   <Tabs defaultValue={defaultValue} {...props}>
     <Tabs.List>
       <Tabs.Trigger value="schedule" icon={<Calendar data-testid="calendar-icon" />}>

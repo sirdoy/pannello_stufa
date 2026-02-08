@@ -1,12 +1,21 @@
+import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe } from 'jest-axe';
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '../Accordion';
+import Accordion, { AccordionItem, AccordionTrigger, AccordionContent } from '../Accordion';
+import type { AccordionProps } from '../Accordion';
+
+interface TestAccordionProps {
+  type?: 'single';
+  collapsible?: boolean;
+  defaultValue?: string;
+  className?: string;
+}
 
 /**
  * Test helper: Standard accordion setup with single mode
  */
-const TestAccordion = ({ type = 'single', collapsible = false, defaultValue, ...props }) => (
+const TestAccordion = ({ type = 'single', collapsible = false, defaultValue, ...props }: TestAccordionProps) => (
   <Accordion type={type} collapsible={collapsible} defaultValue={defaultValue} {...props}>
     <Accordion.Item value="item-1">
       <Accordion.Trigger>Section 1</Accordion.Trigger>
@@ -23,10 +32,15 @@ const TestAccordion = ({ type = 'single', collapsible = false, defaultValue, ...
   </Accordion>
 );
 
+interface TestAccordionMultipleProps {
+  defaultValue?: string[];
+  className?: string;
+}
+
 /**
  * Test helper: Accordion with multiple mode
  */
-const TestAccordionMultiple = ({ defaultValue = [], ...props }) => (
+const TestAccordionMultiple = ({ defaultValue = [], ...props }: TestAccordionMultipleProps) => (
   <Accordion type="multiple" defaultValue={defaultValue} {...props}>
     <Accordion.Item value="item-1">
       <Accordion.Trigger>Section 1</Accordion.Trigger>

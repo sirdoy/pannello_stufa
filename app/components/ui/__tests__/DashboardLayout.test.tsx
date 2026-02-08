@@ -1,13 +1,15 @@
-// app/components/ui/__tests__/DashboardLayout.test.js
+// app/components/ui/__tests__/DashboardLayout.test.tsx
 /**
  * DashboardLayout Component Tests
  *
  * Tests accessibility, sidebar collapse, mobile behavior, and context hook.
  * Uses jest-axe for automated a11y violation detection.
  */
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
-import DashboardLayout, {
+import {
+  DashboardLayout,
   useSidebar,
   Sidebar,
   SidebarHeader,
@@ -21,7 +23,7 @@ import DashboardLayout, {
 expect.extend(toHaveNoViolations);
 
 // Test component to access sidebar context
-function SidebarConsumer() {
+function SidebarConsumer(): React.JSX.Element {
   const { collapsed, toggle, mobileOpen, toggleMobile } = useSidebar();
   return (
     <div>
@@ -48,9 +50,9 @@ describe('DashboardLayout', () => {
       render(
         <DashboardLayout
           sidebar={
-            <DashboardLayout.Sidebar>
+            <Sidebar>
               <nav>Sidebar nav</nav>
-            </DashboardLayout.Sidebar>
+            </Sidebar>
           }
         >
           <div>Content</div>
@@ -63,12 +65,12 @@ describe('DashboardLayout', () => {
       render(
         <DashboardLayout
           sidebar={
-            <DashboardLayout.Sidebar>
+            <Sidebar>
               <nav>Navigation</nav>
-            </DashboardLayout.Sidebar>
+            </Sidebar>
           }
         >
-          <DashboardLayout.Main>Dashboard content</DashboardLayout.Main>
+          <MainContent>Dashboard content</MainContent>
         </DashboardLayout>
       );
       expect(screen.getByText('Navigation')).toBeInTheDocument();
@@ -81,9 +83,9 @@ describe('DashboardLayout', () => {
       render(
         <DashboardLayout
           sidebar={
-            <DashboardLayout.Sidebar>
+            <Sidebar>
               <SidebarConsumer />
-            </DashboardLayout.Sidebar>
+            </Sidebar>
           }
         >
           <div>Content</div>
@@ -97,9 +99,9 @@ describe('DashboardLayout', () => {
         <DashboardLayout
           defaultCollapsed
           sidebar={
-            <DashboardLayout.Sidebar>
+            <Sidebar>
               <SidebarConsumer />
-            </DashboardLayout.Sidebar>
+            </Sidebar>
           }
         >
           <div>Content</div>
@@ -112,9 +114,9 @@ describe('DashboardLayout', () => {
       render(
         <DashboardLayout
           sidebar={
-            <DashboardLayout.Sidebar>
+            <Sidebar>
               <SidebarConsumer />
-            </DashboardLayout.Sidebar>
+            </Sidebar>
           }
         >
           <div>Content</div>
@@ -134,9 +136,9 @@ describe('DashboardLayout', () => {
       render(
         <DashboardLayout
           sidebar={
-            <DashboardLayout.Sidebar>
+            <Sidebar>
               <SidebarConsumer />
-            </DashboardLayout.Sidebar>
+            </Sidebar>
           }
         >
           <div>Content</div>
@@ -168,9 +170,9 @@ describe('DashboardLayout', () => {
       render(
         <DashboardLayout
           sidebar={
-            <DashboardLayout.Sidebar>
-              <DashboardLayout.SidebarToggle />
-            </DashboardLayout.Sidebar>
+            <Sidebar>
+              <SidebarToggle />
+            </Sidebar>
           }
         >
           <div>Content</div>
@@ -184,9 +186,9 @@ describe('DashboardLayout', () => {
         <DashboardLayout
           defaultCollapsed
           sidebar={
-            <DashboardLayout.Sidebar>
-              <DashboardLayout.SidebarToggle />
-            </DashboardLayout.Sidebar>
+            <Sidebar>
+              <SidebarToggle />
+            </Sidebar>
           }
         >
           <div>Content</div>
@@ -199,10 +201,10 @@ describe('DashboardLayout', () => {
       render(
         <DashboardLayout
           sidebar={
-            <DashboardLayout.Sidebar>
+            <Sidebar>
               <SidebarConsumer />
-              <DashboardLayout.SidebarToggle />
-            </DashboardLayout.Sidebar>
+              <SidebarToggle />
+            </Sidebar>
           }
         >
           <div>Content</div>
@@ -219,9 +221,9 @@ describe('DashboardLayout', () => {
       render(
         <DashboardLayout
           sidebar={
-            <DashboardLayout.Sidebar>
-              <DashboardLayout.SidebarToggle />
-            </DashboardLayout.Sidebar>
+            <Sidebar>
+              <SidebarToggle />
+            </Sidebar>
           }
         >
           <div>Content</div>
@@ -237,7 +239,7 @@ describe('DashboardLayout', () => {
     it('renders menu button', () => {
       render(
         <DashboardLayout>
-          <DashboardLayout.MobileMenuButton />
+          <MobileMenuButton />
           <div>Content</div>
         </DashboardLayout>
       );
@@ -248,12 +250,12 @@ describe('DashboardLayout', () => {
       render(
         <DashboardLayout
           sidebar={
-            <DashboardLayout.Sidebar>
+            <Sidebar>
               <SidebarConsumer />
-            </DashboardLayout.Sidebar>
+            </Sidebar>
           }
         >
-          <DashboardLayout.MobileMenuButton />
+          <MobileMenuButton />
           <div>Content</div>
         </DashboardLayout>
       );
@@ -268,12 +270,12 @@ describe('DashboardLayout', () => {
       render(
         <DashboardLayout
           sidebar={
-            <DashboardLayout.Sidebar>
+            <Sidebar>
               <SidebarConsumer />
-            </DashboardLayout.Sidebar>
+            </Sidebar>
           }
         >
-          <DashboardLayout.MobileMenuButton />
+          <MobileMenuButton />
           <div>Content</div>
         </DashboardLayout>
       );
@@ -285,7 +287,7 @@ describe('DashboardLayout', () => {
     it('has aria-expanded attribute', () => {
       render(
         <DashboardLayout>
-          <DashboardLayout.MobileMenuButton />
+          <MobileMenuButton />
           <div>Content</div>
         </DashboardLayout>
       );
@@ -300,9 +302,9 @@ describe('DashboardLayout', () => {
       render(
         <DashboardLayout
           sidebar={
-            <DashboardLayout.Sidebar>
-              <DashboardLayout.SidebarHeader>Logo</DashboardLayout.SidebarHeader>
-            </DashboardLayout.Sidebar>
+            <Sidebar>
+              <SidebarHeader>Logo</SidebarHeader>
+            </Sidebar>
           }
         >
           <div>Content</div>
@@ -315,9 +317,9 @@ describe('DashboardLayout', () => {
       render(
         <DashboardLayout
           sidebar={
-            <DashboardLayout.Sidebar>
-              <DashboardLayout.SidebarContent>Nav items</DashboardLayout.SidebarContent>
-            </DashboardLayout.Sidebar>
+            <Sidebar>
+              <SidebarContent>Nav items</SidebarContent>
+            </Sidebar>
           }
         >
           <div>Content</div>
@@ -330,9 +332,9 @@ describe('DashboardLayout', () => {
       render(
         <DashboardLayout
           sidebar={
-            <DashboardLayout.Sidebar>
-              <DashboardLayout.SidebarFooter>User info</DashboardLayout.SidebarFooter>
-            </DashboardLayout.Sidebar>
+            <Sidebar>
+              <SidebarFooter>User info</SidebarFooter>
+            </Sidebar>
           }
         >
           <div>Content</div>
@@ -345,16 +347,16 @@ describe('DashboardLayout', () => {
       render(
         <DashboardLayout
           sidebar={
-            <DashboardLayout.Sidebar>
-              <DashboardLayout.SidebarHeader>App Logo</DashboardLayout.SidebarHeader>
-              <DashboardLayout.SidebarContent>Menu items</DashboardLayout.SidebarContent>
-              <DashboardLayout.SidebarFooter>
-                <DashboardLayout.SidebarToggle />
-              </DashboardLayout.SidebarFooter>
-            </DashboardLayout.Sidebar>
+            <Sidebar>
+              <SidebarHeader>App Logo</SidebarHeader>
+              <SidebarContent>Menu items</SidebarContent>
+              <SidebarFooter>
+                <SidebarToggle />
+              </SidebarFooter>
+            </Sidebar>
           }
         >
-          <DashboardLayout.Main>Main content area</DashboardLayout.Main>
+          <MainContent>Main content area</MainContent>
         </DashboardLayout>
       );
 
@@ -369,7 +371,7 @@ describe('DashboardLayout', () => {
     it('renders main content', () => {
       render(
         <DashboardLayout>
-          <DashboardLayout.Main>Dashboard</DashboardLayout.Main>
+          <MainContent>Dashboard</MainContent>
         </DashboardLayout>
       );
       expect(screen.getByRole('main')).toHaveTextContent('Dashboard');
@@ -379,12 +381,12 @@ describe('DashboardLayout', () => {
       render(
         <DashboardLayout
           sidebar={
-            <DashboardLayout.Sidebar>
+            <Sidebar>
               <SidebarConsumer />
-            </DashboardLayout.Sidebar>
+            </Sidebar>
           }
         >
-          <DashboardLayout.Main data-testid="main">Content</DashboardLayout.Main>
+          <MainContent data-testid="main">Content</MainContent>
         </DashboardLayout>
       );
 
@@ -401,7 +403,7 @@ describe('DashboardLayout', () => {
     it('accepts custom className', () => {
       render(
         <DashboardLayout>
-          <DashboardLayout.Main className="custom-main">Content</DashboardLayout.Main>
+          <MainContent className="custom-main">Content</MainContent>
         </DashboardLayout>
       );
       expect(screen.getByRole('main')).toHaveClass('custom-main');
@@ -414,9 +416,9 @@ describe('DashboardLayout', () => {
         <DashboardLayout
           defaultCollapsed
           sidebar={
-            <DashboardLayout.Sidebar data-testid="sidebar">
+            <Sidebar data-testid="sidebar">
               <nav>Nav</nav>
-            </DashboardLayout.Sidebar>
+            </Sidebar>
           }
         >
           <div>Content</div>
@@ -429,9 +431,9 @@ describe('DashboardLayout', () => {
       render(
         <DashboardLayout
           sidebar={
-            <DashboardLayout.Sidebar data-testid="sidebar">
+            <Sidebar data-testid="sidebar">
               <nav>Nav</nav>
-            </DashboardLayout.Sidebar>
+            </Sidebar>
           }
         >
           <div>Content</div>
@@ -445,7 +447,7 @@ describe('DashboardLayout', () => {
     it('has no accessibility violations with basic layout', async () => {
       const { container } = render(
         <DashboardLayout>
-          <DashboardLayout.Main>Content</DashboardLayout.Main>
+          <MainContent>Content</MainContent>
         </DashboardLayout>
       );
       const results = await axe(container);
@@ -456,16 +458,16 @@ describe('DashboardLayout', () => {
       const { container } = render(
         <DashboardLayout
           sidebar={
-            <DashboardLayout.Sidebar>
-              <DashboardLayout.SidebarHeader>Logo</DashboardLayout.SidebarHeader>
-              <DashboardLayout.SidebarContent>Navigation</DashboardLayout.SidebarContent>
-              <DashboardLayout.SidebarFooter>
-                <DashboardLayout.SidebarToggle />
-              </DashboardLayout.SidebarFooter>
-            </DashboardLayout.Sidebar>
+            <Sidebar>
+              <SidebarHeader>Logo</SidebarHeader>
+              <SidebarContent>Navigation</SidebarContent>
+              <SidebarFooter>
+                <SidebarToggle />
+              </SidebarFooter>
+            </Sidebar>
           }
         >
-          <DashboardLayout.Main>Dashboard content</DashboardLayout.Main>
+          <MainContent>Dashboard content</MainContent>
         </DashboardLayout>
       );
       const results = await axe(container);
@@ -476,9 +478,9 @@ describe('DashboardLayout', () => {
       render(
         <DashboardLayout
           sidebar={
-            <DashboardLayout.Sidebar>
+            <Sidebar>
               <nav>Nav</nav>
-            </DashboardLayout.Sidebar>
+            </Sidebar>
           }
         >
           <div>Content</div>
@@ -509,39 +511,39 @@ describe('DashboardLayout', () => {
   });
 
   describe('Namespace Pattern', () => {
-    it('exposes Sidebar as DashboardLayout.Sidebar', () => {
-      expect(DashboardLayout.Sidebar).toBeDefined();
-      expect(DashboardLayout.Sidebar).toBe(Sidebar);
+    it('exposes Sidebar as Sidebar', () => {
+      expect(Sidebar).toBeDefined();
+      expect(Sidebar).toBe(Sidebar);
     });
 
-    it('exposes SidebarHeader as DashboardLayout.SidebarHeader', () => {
-      expect(DashboardLayout.SidebarHeader).toBeDefined();
-      expect(DashboardLayout.SidebarHeader).toBe(SidebarHeader);
+    it('exposes SidebarHeader as SidebarHeader', () => {
+      expect(SidebarHeader).toBeDefined();
+      expect(SidebarHeader).toBe(SidebarHeader);
     });
 
-    it('exposes SidebarContent as DashboardLayout.SidebarContent', () => {
-      expect(DashboardLayout.SidebarContent).toBeDefined();
-      expect(DashboardLayout.SidebarContent).toBe(SidebarContent);
+    it('exposes SidebarContent as SidebarContent', () => {
+      expect(SidebarContent).toBeDefined();
+      expect(SidebarContent).toBe(SidebarContent);
     });
 
-    it('exposes SidebarFooter as DashboardLayout.SidebarFooter', () => {
-      expect(DashboardLayout.SidebarFooter).toBeDefined();
-      expect(DashboardLayout.SidebarFooter).toBe(SidebarFooter);
+    it('exposes SidebarFooter as SidebarFooter', () => {
+      expect(SidebarFooter).toBeDefined();
+      expect(SidebarFooter).toBe(SidebarFooter);
     });
 
-    it('exposes SidebarToggle as DashboardLayout.SidebarToggle', () => {
-      expect(DashboardLayout.SidebarToggle).toBeDefined();
-      expect(DashboardLayout.SidebarToggle).toBe(SidebarToggle);
+    it('exposes SidebarToggle as SidebarToggle', () => {
+      expect(SidebarToggle).toBeDefined();
+      expect(SidebarToggle).toBe(SidebarToggle);
     });
 
-    it('exposes MobileMenuButton as DashboardLayout.MobileMenuButton', () => {
-      expect(DashboardLayout.MobileMenuButton).toBeDefined();
-      expect(DashboardLayout.MobileMenuButton).toBe(MobileMenuButton);
+    it('exposes MobileMenuButton as MobileMenuButton', () => {
+      expect(MobileMenuButton).toBeDefined();
+      expect(MobileMenuButton).toBe(MobileMenuButton);
     });
 
-    it('exposes Main as DashboardLayout.Main', () => {
-      expect(DashboardLayout.Main).toBeDefined();
-      expect(DashboardLayout.Main).toBe(MainContent);
+    it('exposes Main as MainContent', () => {
+      expect(MainContent).toBeDefined();
+      expect(MainContent).toBe(MainContent);
     });
   });
 });

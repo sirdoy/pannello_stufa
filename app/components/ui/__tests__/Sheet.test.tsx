@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe } from 'jest-axe';
@@ -10,6 +11,19 @@ import Sheet, {
   SheetDescription,
   SheetClose,
 } from '../Sheet';
+import type { SheetContentProps } from '../Sheet';
+
+type SheetSide = 'top' | 'bottom' | 'left' | 'right';
+type SheetSize = 'auto' | 'sm' | 'md' | 'lg';
+
+interface TestSheetProps extends React.ComponentProps<'div'> {
+  open?: boolean;
+  onOpenChange?: jest.Mock<void, [boolean]>;
+  side?: SheetSide;
+  size?: SheetSize;
+  showCloseButton?: boolean;
+  children?: React.ReactNode;
+}
 
 /**
  * Test helper: Sheet with common structure
@@ -22,7 +36,7 @@ const TestSheet = ({
   showCloseButton = true,
   children,
   ...props
-}) => (
+}: TestSheetProps) => (
   <Sheet open={open} onOpenChange={onOpenChange}>
     <Sheet.Trigger asChild>
       <button data-testid="sheet-trigger">Open Sheet</button>

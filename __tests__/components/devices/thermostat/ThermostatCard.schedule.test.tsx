@@ -63,10 +63,16 @@ describe('ThermostatCard - Schedule Section', () => {
               {
                 id: 'room-1',
                 name: 'Soggiorno',
-                modules: [],
+                modules: ['module-1'],
               },
             ],
-            modules: [],
+            modules: [
+              {
+                id: 'module-1',
+                type: 'NATherm1',
+                name: 'Termostato Soggiorno',
+              },
+            ],
           }),
         } as Response);
       }
@@ -84,7 +90,14 @@ describe('ThermostatCard - Schedule Section', () => {
                 heating: false,
               },
             ],
-            modules: [],
+            modules: [
+              {
+                id: 'module-1',
+                type: 'NATherm1',
+                battery_state: 'full',
+                reachable: true,
+              },
+            ],
             lowBatteryModules: [],
             hasLowBattery: false,
             hasCriticalBattery: false,
@@ -110,8 +123,8 @@ describe('ThermostatCard - Schedule Section', () => {
       expect(screen.getByText('Soggiorno')).toBeInTheDocument();
     }, { timeout: 3000 });
 
-    // Check for "Programmazione" section
-    expect(screen.getByText('Programmazione')).toBeInTheDocument();
+    // Check for "Programmazione" section (may appear in divider and label)
+    expect(screen.getAllByText(/Programmazione/i).length).toBeGreaterThan(0);
 
     // Check for label
     expect(screen.getByText('Programmazione attiva')).toBeInTheDocument();

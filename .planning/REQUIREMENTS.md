@@ -58,26 +58,26 @@ Requirements for Tech Debt & Code Quality milestone. Each maps to roadmap phases
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| STRICT-01 | — | Pending |
-| STRICT-02 | — | Pending |
-| STRICT-03 | — | Pending |
-| STRICT-04 | — | Pending |
-| STRICT-05 | — | Pending |
-| STRICT-06 | — | Pending |
-| STRICT-07 | — | Pending |
-| STRICT-08 | — | Pending |
-| TEST-01 | — | Pending |
-| TEST-02 | — | Pending |
-| TEST-03 | — | Pending |
-| DEAD-01 | — | Pending |
-| DEAD-02 | — | Pending |
-| DEAD-03 | — | Pending |
+| STRICT-01 | Phase 44 | Pending |
+| STRICT-02 | Phase 44, 45, 46, 47 | Pending |
+| STRICT-03 | Phase 44, 45, 46 | Pending |
+| STRICT-04 | Phase 44, 45, 46 | Pending |
+| STRICT-05 | Phase 46 | Pending |
+| STRICT-06 | Phase 46 | Pending |
+| STRICT-07 | Phase 47 | Pending |
+| STRICT-08 | Phase 47 | Pending |
+| TEST-01 | Phase 47 | Pending |
+| TEST-02 | Phase 47 | Pending |
+| TEST-03 | Phase 47 | Pending |
+| DEAD-01 | Phase 48 | Pending |
+| DEAD-02 | Phase 48 | Pending |
+| DEAD-03 | Phase 48 | Pending |
 
 **Coverage:**
 - v5.1 requirements: 14 total
-- Mapped to phases: 0
-- Unmapped: 14 ⚠️
+- Mapped to phases: 14/14 (100%)
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-02-08*
-*Last updated: 2026-02-08 after initial definition*
+*Last updated: 2026-02-08 after roadmap creation*

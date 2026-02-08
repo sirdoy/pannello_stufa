@@ -5,33 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-05)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v5.0 TypeScript Migration — convert 572 JS/JSX files to TS/TSX
+**Current focus:** v5.1 Tech Debt & Code Quality — zero tsc errors everywhere, all tests green, stricter TS, dead code removal, coverage gaps
 
 ## Current Position
 
-Phase: 43 - Verification
-Plan: 08 of 8 (COMPLETE)
-Status: Complete — Phase 43 verification finished. TypeScript migration v5.0 fully verified and locked down.
-Last activity: 2026-02-08 — Completed 43-08-PLAN.md (config files converted, allowJs disabled, production build verified, 0 JS files remaining)
-
-Progress: [████████████████████████] 100% (7/7 phases complete, Phase 43: 8/8 plans complete)
-
-## Milestone Overview
-
-**v5.0 TypeScript Migration**
-- Phases: 7 (37-43)
-- Requirements: 24
-- Target: Convert all 572 JS/JSX files to TS/TSX
-
-| Phase | Name | Requirements | Status |
-|-------|------|--------------|--------|
-| 37 | TypeScript Foundation | 8 | COMPLETE (8/8) |
-| 38 | Library Migration | 4 | COMPLETE (4/4) |
-| 39 | UI Components Migration | 3 | COMPLETE (11/11 plans, 137/137 files migrated, 0 tsc errors) |
-| 40 | API Routes Migration | 3 | COMPLETE (7/7 plans, 90/90 files migrated, 0 tsc errors) |
-| 41 | Pages Migration | 3 | COMPLETE (7/7 plans, 70 files migrated, 30+ component prop fixes, 198 external API type errors documented) |
-| 42 | Test Migration | 4 | COMPLETE (7/7 plans, 131/131 test files migrated, 3008 tests passing, 1492 mock type errors documented) |
-| 43 | Verification | 4 | COMPLETE (8/8 plans, config files migrated, allowJs disabled, production build verified, 0 tsc errors) |
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-08 — Milestone v5.1 started
 
 ## Performance Metrics
 

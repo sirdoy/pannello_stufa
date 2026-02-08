@@ -334,7 +334,16 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-(None — start next milestone with `/gsd:new-milestone`)
+## Current Milestone: v5.1 Tech Debt & Code Quality
+
+**Goal:** Achieve a pristine codebase — zero tsc errors everywhere (including tests), all tests green, stricter TypeScript compiler options, dead code removed, and test coverage gaps filled.
+
+**Target features:**
+- Fix ~400 mock type tsc errors in test files (make tsc fully clean)
+- Fix all failing tests (ThermostatCard.schedule + any others)
+- Enable stricter TypeScript options (noUncheckedIndexedAccess, exactOptionalPropertyTypes, etc.)
+- Remove dead code (unused files, exports, dependencies)
+- Fill test coverage gaps in untested areas
 
 ### Out of Scope
 
@@ -465,4 +474,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Deployment**: Vercel (current hosting platform)
 
 ---
-*Last updated: 2026-02-08 after v5.0 milestone (TypeScript Migration complete)*
+*Last updated: 2026-02-08 after v5.1 milestone start (Tech Debt & Code Quality)*

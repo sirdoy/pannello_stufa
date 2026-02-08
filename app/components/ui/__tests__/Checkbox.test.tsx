@@ -213,7 +213,7 @@ describe('Checkbox', () => {
     });
 
     it('renders all color variants without errors', () => {
-      const variants = ['primary', 'ember', 'ocean', 'sage', 'flame'];
+      const variants = ['primary', 'ember', 'ocean', 'sage', 'flame'] as const;
       variants.forEach((variant) => {
         const { unmount } = render(
           <Checkbox variant={variant} checked aria-label={variant} />

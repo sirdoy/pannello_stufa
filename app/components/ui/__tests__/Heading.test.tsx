@@ -58,7 +58,7 @@ describe('Heading', () => {
     });
 
     it('should have no a11y violations with all variants', async () => {
-      const variants = ['default', 'gradient', 'subtle', 'ember', 'ocean', 'sage', 'warning', 'danger', 'info'];
+      const variants = ['default', 'gradient', 'subtle', 'ember', 'ocean', 'sage', 'warning', 'danger', 'info'] as const;
       const { container } = render(
         <div>
           {variants.map((variant, index) => (
@@ -104,7 +104,7 @@ describe('Heading', () => {
     });
 
     it('should have no a11y violations with all sizes', async () => {
-      const sizes = ['sm', 'md', 'lg', 'xl', '2xl', '3xl'];
+      const sizes = ['sm', 'md', 'lg', 'xl', '2xl', '3xl'] as const;
       for (const size of sizes) {
         const { container } = render(
           <Heading size={size}>{size} Heading</Heading>

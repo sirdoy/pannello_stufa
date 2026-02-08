@@ -211,7 +211,7 @@ describe('HealthIndicator', () => {
     });
 
     it('has no accessibility violations with all statuses', async () => {
-      const statuses = ['ok', 'warning', 'error', 'critical'];
+      const statuses = ['ok', 'warning', 'error', 'critical'] as const;
 
       for (const status of statuses) {
         const { container } = render(<HealthIndicator status={status} />);

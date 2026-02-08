@@ -38,7 +38,7 @@ describe('Text', () => {
     });
 
     it('should have no a11y violations with all variants', async () => {
-      const variants = ['body', 'secondary', 'tertiary', 'ember', 'ocean', 'sage', 'warning', 'danger', 'info', 'label'];
+      const variants = ['body', 'secondary', 'tertiary', 'ember', 'ocean', 'sage', 'warning', 'danger', 'info', 'label'] as const;
       const { container } = render(
         <div>
           {variants.map((variant) => (
@@ -63,7 +63,7 @@ describe('Text', () => {
     it('should have no a11y violations with as="label"', async () => {
       const { container } = render(
         <div>
-          <Text as="label" htmlFor="test-input">Form Label</Text>
+          <Text as="label" htmlFor="test-input" aria-label="Form Label">Form Label</Text>
           <input id="test-input" type="text" />
         </div>
       );
@@ -97,7 +97,7 @@ describe('Text', () => {
 
     // All sizes pass axe checks
     it('should have no a11y violations with all sizes', async () => {
-      const sizes = ['xs', 'sm', 'base', 'lg', 'xl'];
+      const sizes = ['xs', 'sm', 'base', 'lg', 'xl'] as const;
       for (const size of sizes) {
         const { container } = render(
           <Text size={size}>{size} Text</Text>
@@ -109,7 +109,7 @@ describe('Text', () => {
 
     // Text as different semantic elements
     it('should have no a11y violations with various semantic elements', async () => {
-      const elements = ['p', 'span', 'div'];
+      const elements = ['p', 'span', 'div'] as const;
       for (const as of elements) {
         const { container } = render(
           <Text as={as}>{as} element</Text>
@@ -344,7 +344,7 @@ describe('Text', () => {
     });
 
     it('passes htmlFor to label element', () => {
-      render(<Text as="label" htmlFor="my-input">Label</Text>);
+      render(<Text as="label" htmlFor="my-input" aria-label="Label">Label</Text>);
       const text = screen.getByText('Label');
       expect(text).toHaveAttribute('for', 'my-input');
     });

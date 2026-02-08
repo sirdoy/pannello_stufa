@@ -5,7 +5,7 @@ import InfoBox from '../InfoBox';
 describe('InfoBox Component', () => {
   describe('Rendering', () => {
     test('renders with label and value', () => {
-      render(<InfoBox label="Test Label" value="Test Value" />);
+      render(<InfoBox icon="📦" label="Test Label" value="Test Value" />);
       expect(screen.getByText('Test Label')).toBeInTheDocument();
       expect(screen.getByText('Test Value')).toBeInTheDocument();
     });
@@ -19,7 +19,7 @@ describe('InfoBox Component', () => {
   describe('Variants', () => {
     test('neutral variant applies slate text color', () => {
       const { container } = render(
-        <InfoBox label="Test" value="Value" variant="neutral" />
+        <InfoBox icon="📦" label="Test" value="Value" variant="neutral" />
       );
       const valueEl = container.querySelector('.text-slate-100');
       expect(valueEl).toBeInTheDocument();
@@ -27,7 +27,7 @@ describe('InfoBox Component', () => {
 
     test('ember variant applies ember text color', () => {
       const { container } = render(
-        <InfoBox label="Test" value="Value" variant="ember" />
+        <InfoBox icon="📦" label="Test" value="Value" variant="ember" />
       );
       const valueEl = container.querySelector('.text-ember-400');
       expect(valueEl).toBeInTheDocument();
@@ -35,7 +35,7 @@ describe('InfoBox Component', () => {
 
     test('sage variant applies sage text color', () => {
       const { container } = render(
-        <InfoBox label="Test" value="Value" variant="sage" />
+        <InfoBox icon="📦" label="Test" value="Value" variant="sage" />
       );
       const valueEl = container.querySelector('.text-sage-400');
       expect(valueEl).toBeInTheDocument();
@@ -43,7 +43,7 @@ describe('InfoBox Component', () => {
 
     test('ocean variant applies ocean text color', () => {
       const { container } = render(
-        <InfoBox label="Test" value="Value" variant="ocean" />
+        <InfoBox icon="📦" label="Test" value="Value" variant="ocean" />
       );
       const valueEl = container.querySelector('.text-ocean-400');
       expect(valueEl).toBeInTheDocument();
@@ -51,7 +51,7 @@ describe('InfoBox Component', () => {
 
     test('warning variant applies warning text color', () => {
       const { container } = render(
-        <InfoBox label="Test" value="Value" variant="warning" />
+        <InfoBox icon="📦" label="Test" value="Value" variant="warning" />
       );
       const valueEl = container.querySelector('.text-warning-400');
       expect(valueEl).toBeInTheDocument();
@@ -59,7 +59,7 @@ describe('InfoBox Component', () => {
 
     test('danger variant applies danger text color', () => {
       const { container } = render(
-        <InfoBox label="Test" value="Value" variant="danger" />
+        <InfoBox icon="📦" label="Test" value="Value" variant="danger" />
       );
       const valueEl = container.querySelector('.text-danger-400');
       expect(valueEl).toBeInTheDocument();
@@ -67,7 +67,7 @@ describe('InfoBox Component', () => {
 
     test('default variant is neutral', () => {
       const { container } = render(
-        <InfoBox label="Test" value="Value" />
+        <InfoBox icon="📦" label="Test" value="Value" />
       );
       const valueEl = container.querySelector('.text-slate-100');
       expect(valueEl).toBeInTheDocument();
@@ -85,7 +85,7 @@ describe('InfoBox Component', () => {
 
     test('ember variant has no accessibility violations', async () => {
       const { container } = render(
-        <InfoBox label="Status" value="Active" variant="ember" />
+        <InfoBox icon="📦" label="Status" value="Active" variant="ember" />
       );
       const results = await axe(container);
       expect(results).toHaveNoViolations();
@@ -95,7 +95,7 @@ describe('InfoBox Component', () => {
   describe('Custom className', () => {
     test('applies custom className', () => {
       const { container } = render(
-        <InfoBox label="Test" value="Value" className="custom-class" />
+        <InfoBox icon="📦" label="Test" value="Value" className="custom-class" />
       );
       expect(container.firstChild).toHaveClass('custom-class');
     });

@@ -318,37 +318,37 @@ describe('Card', () => {
 
   describe('forwardRef', () => {
     it('forwards ref to Card root element', () => {
-      const ref = createRef();
+      const ref = createRef<HTMLDivElement>();
       render(<Card ref={ref}>Content</Card>);
       expect(ref.current).toBeInstanceOf(HTMLDivElement);
     });
 
     it('forwards ref to CardHeader', () => {
-      const ref = createRef();
+      const ref = createRef<HTMLDivElement>();
       render(<CardHeader ref={ref}>Header</CardHeader>);
       expect(ref.current).toBeInstanceOf(HTMLDivElement);
     });
 
     it('forwards ref to CardTitle', () => {
-      const ref = createRef();
+      const ref = createRef<HTMLDivElement>();
       render(<CardTitle ref={ref}>Title</CardTitle>);
       expect(ref.current).toBeInstanceOf(HTMLDivElement);
     });
 
     it('forwards ref to CardContent', () => {
-      const ref = createRef();
+      const ref = createRef<HTMLDivElement>();
       render(<CardContent ref={ref}>Content</CardContent>);
       expect(ref.current).toBeInstanceOf(HTMLDivElement);
     });
 
     it('forwards ref to CardFooter', () => {
-      const ref = createRef();
+      const ref = createRef<HTMLDivElement>();
       render(<CardFooter ref={ref}>Footer</CardFooter>);
       expect(ref.current).toBeInstanceOf(HTMLDivElement);
     });
 
     it('forwards ref to CardDivider', () => {
-      const ref = createRef();
+      const ref = createRef<HTMLDivElement>();
       render(<CardDivider ref={ref} />);
       expect(ref.current).toBeInstanceOf(HTMLDivElement);
     });
@@ -422,7 +422,7 @@ describe('Card', () => {
       const { container } = render(
         <Card onClick={handleClick}>Content</Card>
       );
-      container.firstChild.click();
+      (container.firstChild as HTMLElement).click();
       expect(handleClick).toHaveBeenCalledTimes(1);
     });
 

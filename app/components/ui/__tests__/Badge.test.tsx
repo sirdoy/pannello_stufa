@@ -166,15 +166,15 @@ describe('Badge', () => {
 
   describe('Ref Forwarding', () => {
     it('forwards ref correctly', () => {
-      const ref = createRef();
+      const ref = createRef<HTMLSpanElement>();
       render(<Badge ref={ref}>Ref Test</Badge>);
       expect(ref.current).toBeInstanceOf(HTMLSpanElement);
     });
 
     it('ref points to the span element', () => {
-      const ref = createRef();
+      const ref = createRef<HTMLSpanElement>();
       render(<Badge ref={ref}>Ref Test</Badge>);
-      expect(ref.current.tagName).toBe('SPAN');
+      expect(ref.current?.tagName).toBe('SPAN');
       expect(ref.current).toHaveTextContent('Ref Test');
     });
   });
@@ -224,7 +224,7 @@ describe('Badge', () => {
     });
 
     it('has no accessibility violations with all variants', async () => {
-      const variants = ['ember', 'sage', 'ocean', 'warning', 'danger', 'neutral'];
+      const variants = ['ember', 'sage', 'ocean', 'warning', 'danger', 'neutral'] as const;
 
       for (const variant of variants) {
         const { container } = render(
@@ -281,7 +281,7 @@ describe('Badge', () => {
     });
 
     it('has no accessibility violations with all sizes', async () => {
-      const sizes = ['sm', 'md', 'lg'];
+      const sizes = ['sm', 'md', 'lg'] as const;
       for (const size of sizes) {
         const { container } = render(
           <Badge size={size}>{size} Badge</Badge>

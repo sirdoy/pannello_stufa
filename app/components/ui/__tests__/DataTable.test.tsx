@@ -312,15 +312,15 @@ describe('DataTable', () => {
 
   describe('Ref Forwarding', () => {
     it('forwards ref correctly', () => {
-      const ref = createRef();
+      const ref = createRef<HTMLDivElement>();
       render(<DataTable ref={ref} data={mockData} columns={mockColumns} />);
       expect(ref.current).toBeInstanceOf(HTMLDivElement);
     });
 
     it('ref points to the wrapper div element', () => {
-      const ref = createRef();
+      const ref = createRef<HTMLDivElement>();
       render(<DataTable ref={ref} data={mockData} columns={mockColumns} />);
-      expect(ref.current.tagName).toBe('DIV');
+      expect(ref.current?.tagName).toBe('DIV');
       expect(ref.current).toHaveClass('space-y-4');
     });
   });

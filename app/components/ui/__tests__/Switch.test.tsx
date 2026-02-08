@@ -189,7 +189,7 @@ describe('Switch', () => {
 
   describe('Color Variants', () => {
     it('renders all color variants without errors', () => {
-      const variants = ['ember', 'ocean', 'sage'];
+      const variants = ['ember', 'ocean', 'sage'] as const;
       variants.forEach((variant) => {
         const { unmount } = render(
           <Switch variant={variant} checked label={variant} />

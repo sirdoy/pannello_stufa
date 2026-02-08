@@ -25,50 +25,43 @@ describe('ActionButton Component', () => {
   });
 
   describe('Variants', () => {
-    test('renders primary variant by default', () => {
+    test('renders ember variant by default', () => {
       render(<ActionButton icon="✓" ariaLabel="Test" />);
       const button = screen.getByRole('button');
       expect(button).toHaveClass('bg-ember-500/15'); // Dark mode default
       expect(button).toHaveClass('text-ember-400');
     });
 
-    test('renders edit variant', () => {
-      render(<ActionButton icon="✏️" variant="edit" ariaLabel="Edit" />);
+    test('renders ocean variant', () => {
+      render(<ActionButton icon="✏️" variant="ocean" ariaLabel="Edit" />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-ocean-500/15'); // Updated to ocean-500
+      expect(button).toHaveClass('bg-ocean-500/15');
       expect(button).toHaveClass('text-ocean-400');
     });
 
-    test('renders delete variant', () => {
-      render(<ActionButton icon="🗑️" variant="delete" ariaLabel="Delete" />);
+    test('renders danger variant', () => {
+      render(<ActionButton icon="🗑️" variant="danger" ariaLabel="Delete" />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-danger-500/15'); // Updated to danger-500
+      expect(button).toHaveClass('bg-danger-500/15');
       expect(button).toHaveClass('text-danger-400');
     });
 
-    test('renders close variant', () => {
-      render(<ActionButton icon="✕" variant="close" ariaLabel="Close" />);
+    test('renders ghost variant', () => {
+      render(<ActionButton icon="✕" variant="ghost" ariaLabel="Close" />);
       const button = screen.getByRole('button');
       expect(button).toHaveClass('bg-slate-500/10');
       expect(button).toHaveClass('text-slate-400');
     });
 
-    test('renders info variant', () => {
-      render(<ActionButton icon="ℹ️" variant="info" ariaLabel="Info" />);
-      const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-ocean-500/15'); // Updated to ocean-500
-      expect(button).toHaveClass('text-ocean-400');
-    });
-
     test('renders warning variant', () => {
       render(<ActionButton icon="⚠️" variant="warning" ariaLabel="Warning" />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-warning-500/15'); // Updated to warning-500
+      expect(button).toHaveClass('bg-warning-500/15');
       expect(button).toHaveClass('text-warning-400');
     });
 
-    test('renders success variant', () => {
-      render(<ActionButton icon="✓" variant="success" ariaLabel="Success" />);
+    test('renders sage variant', () => {
+      render(<ActionButton icon="✓" variant="sage" ariaLabel="Success" />);
       const button = screen.getByRole('button');
       expect(button).toHaveClass('bg-sage-500/15');
       expect(button).toHaveClass('text-sage-400');

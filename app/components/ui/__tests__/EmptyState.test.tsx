@@ -160,7 +160,7 @@ describe('EmptyState', () => {
     });
 
     it('has no accessibility violations with all size variants', async () => {
-      const sizes = ['sm', 'md', 'lg'];
+      const sizes = ['sm', 'md', 'lg'] as const;
 
       for (const size of sizes) {
         const { container } = render(

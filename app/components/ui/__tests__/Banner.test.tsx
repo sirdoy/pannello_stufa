@@ -115,7 +115,7 @@ describe('Banner', () => {
 
     it('falls back to info variant for invalid variant', () => {
       const { container } = render(
-        <Banner title="Invalid" variant="invalid" />
+        <Banner title="Invalid" variant={'invalid' as any} />
       );
       const banner = container.firstChild;
       expect(banner).toHaveClass('bg-ocean-500/[0.15]');
@@ -373,7 +373,7 @@ describe('Banner', () => {
     });
 
     it('has no accessibility violations with all variants', async () => {
-      const variants = ['info', 'warning', 'error', 'success', 'ember'];
+      const variants = ['info', 'warning', 'error', 'success', 'ember'] as const;
 
       for (const variant of variants) {
         const { container } = render(

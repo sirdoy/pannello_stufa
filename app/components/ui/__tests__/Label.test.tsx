@@ -71,7 +71,7 @@ describe('Label', () => {
     });
 
     it('should have no a11y violations with all sizes', async () => {
-      const sizes = ['sm', 'md', 'lg'];
+      const sizes = ['sm', 'md', 'lg'] as const;
       for (const size of sizes) {
         const { container } = render(
           <Label size={size}>{size} Label</Label>

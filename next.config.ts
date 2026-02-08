@@ -1,10 +1,5 @@
+import type { NextConfig } from 'next';
 import withSerwistInit from '@serwist/next';
-
-import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 const withSerwist = withSerwistInit({
   swSrc: 'app/sw.ts',
@@ -14,10 +9,8 @@ const withSerwist = withSerwistInit({
   disable: process.env.NODE_ENV === 'development',
 });
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
   reactStrictMode: true,
-  outputFileTracingRoot: resolve(__dirname),
   env: {
     NEXT_PUBLIC_TEST_MODE: process.env.TEST_MODE || 'false',
   },

@@ -13,7 +13,7 @@ import {
 jest.mock('../indexedDB', () => ({
   get: jest.fn().mockResolvedValue(null),
   getAll: jest.fn().mockResolvedValue([]),
-  put: jest.fn().mockResolvedValue(),
+  put: jest.fn().mockResolvedValue(undefined),
   STORES: {
     COMMAND_QUEUE: 'commandQueue',
     DEVICE_STATE: 'deviceState',
@@ -36,7 +36,7 @@ describe('offlineStateCache', () => {
     });
 
     it('returns null for undefined state', () => {
-      expect(formatStoveStateForDisplay({ timestamp: '2026-01-19T10:00:00Z' })).toBeNull();
+      expect(formatStoveStateForDisplay({ timestamp: '2026-01-19T10:00:00Z' } as any)).toBeNull();
     });
 
     it('formats stove state correctly when on', () => {
@@ -54,7 +54,7 @@ describe('offlineStateCache', () => {
         timestamp: new Date().toISOString(),
       };
 
-      const result = formatStoveStateForDisplay(cachedData);
+      const result = formatStoveStateForDisplay(cachedData as any);
 
       expect(result.isOn).toBe(true);
       expect(result.status).toBe('on');
@@ -75,7 +75,7 @@ describe('offlineStateCache', () => {
         timestamp: new Date().toISOString(),
       };
 
-      const result = formatStoveStateForDisplay(cachedData);
+      const result = formatStoveStateForDisplay(cachedData as any);
 
       expect(result.isOn).toBe(false);
       expect(result.status).toBe('off');
@@ -88,7 +88,7 @@ describe('offlineStateCache', () => {
         timestamp: thirtyFiveMinutesAgo.toISOString(),
       };
 
-      const result = formatStoveStateForDisplay(cachedData);
+      const result = formatStoveStateForDisplay(cachedData as any);
 
       expect(result.isStale).toBe(true);
       expect(result.ageMinutes).toBeGreaterThan(30);
@@ -106,7 +106,7 @@ describe('offlineStateCache', () => {
         timestamp: new Date().toISOString(),
       };
 
-      const result = formatStoveStateForDisplay(cachedData);
+      const result = formatStoveStateForDisplay(cachedData as any);
 
       expect(result.isOn).toBe(true);
       expect(result.temperature).toBe(21);
@@ -121,7 +121,7 @@ describe('offlineStateCache', () => {
         timestamp: '2026-01-19T14:30:00.000Z',
       };
 
-      const result = formatStoveStateForDisplay(cachedData);
+      const result = formatStoveStateForDisplay(cachedData as any);
 
       expect(result.cachedAtFormatted).toBeDefined();
       expect(typeof result.cachedAtFormatted).toBe('string');
@@ -150,7 +150,7 @@ describe('offlineStateCache', () => {
         timestamp: new Date().toISOString(),
       };
 
-      const result = formatThermostatStateForDisplay(cachedData);
+      const result = formatThermostatStateForDisplay(cachedData as any);
 
       expect(result.temperature).toBe(21.5);
       expect(result.setpoint).toBe(22);
@@ -172,7 +172,7 @@ describe('offlineStateCache', () => {
         timestamp: new Date().toISOString(),
       };
 
-      const result = formatThermostatStateForDisplay(cachedData);
+      const result = formatThermostatStateForDisplay(cachedData as any);
 
       expect(result.temperature).toBe(20);
       expect(result.setpoint).toBe(21);
@@ -187,7 +187,7 @@ describe('offlineStateCache', () => {
         timestamp: fortyMinutesAgo.toISOString(),
       };
 
-      const result = formatThermostatStateForDisplay(cachedData);
+      const result = formatThermostatStateForDisplay(cachedData as any);
 
       expect(result.isStale).toBe(true);
     });

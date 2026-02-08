@@ -10,12 +10,12 @@ describe('PIDController', () => {
   describe('constructor', () => {
     it('should use default values when no options provided', () => {
       const pid = new PIDController();
-      expect(pid.kp).toBe(0.5);
-      expect(pid.ki).toBe(0.1);
-      expect(pid.kd).toBe(0.05);
-      expect(pid.outputMin).toBe(1);
-      expect(pid.outputMax).toBe(5);
-      expect(pid.integralMax).toBe(10);
+      expect(pid['kp']).toBe(0.5);
+      expect(pid['ki']).toBe(0.1);
+      expect(pid['kd']).toBe(0.05);
+      expect(pid['outputMin']).toBe(1);
+      expect(pid['outputMax']).toBe(5);
+      expect(pid['integralMax']).toBe(10);
     });
 
     it('should accept custom configuration', () => {
@@ -27,12 +27,12 @@ describe('PIDController', () => {
         outputMax: 4,
         integralMax: 5,
       });
-      expect(pid.kp).toBe(1.0);
-      expect(pid.ki).toBe(0.2);
-      expect(pid.kd).toBe(0.1);
-      expect(pid.outputMin).toBe(2);
-      expect(pid.outputMax).toBe(4);
-      expect(pid.integralMax).toBe(5);
+      expect(pid['kp']).toBe(1.0);
+      expect(pid['ki']).toBe(0.2);
+      expect(pid['kd']).toBe(0.1);
+      expect(pid['outputMin']).toBe(2);
+      expect(pid['outputMax']).toBe(4);
+      expect(pid['integralMax']).toBe(5);
     });
   });
 

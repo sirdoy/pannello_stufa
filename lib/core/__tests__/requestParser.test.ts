@@ -20,17 +20,17 @@ import {
 import { ApiError, ERROR_CODES } from '../apiErrors';
 
 // Helper to create mock request
-function createMockRequest(body = null, contentType = 'application/json', url = 'https://example.com/api/test') {
+function createMockRequest(body: any = null, contentType = 'application/json', url = 'https://example.com/api/test') {
   return {
     headers: {
-      get: jest.fn((name) => {
+      get: jest.fn((name: any) => {
         if (name === 'content-type') return contentType;
         return null;
       }),
     },
     text: jest.fn(() => Promise.resolve(body ? JSON.stringify(body) : '')),
     url,
-  };
+  } as any;
 }
 
 describe('JSON Body Parsing', () => {
@@ -53,7 +53,7 @@ describe('JSON Body Parsing', () => {
       const request = {
         headers: { get: () => 'application/json' },
         text: () => Promise.resolve('not valid json'),
-      };
+      } as any;
       const result = await parseJson(request, { fallback: true });
 
       expect(result).toEqual({ fallback: true });
@@ -71,7 +71,7 @@ describe('JSON Body Parsing', () => {
     it('should parse valid JSON body', async () => {
       const request = {
         text: () => Promise.resolve(JSON.stringify({ name: 'test' })),
-      };
+      } as any;
       const result = await parseJsonOrThrow(request);
 
       expect(result).toEqual({ name: 'test' });

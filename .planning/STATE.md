@@ -11,8 +11,8 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 
 Phase: 43 - Verification
 Plan: 07 of 8
-Status: In progress — Plan 43-06 complete (remaining UI & scattered test mock types)
-Last activity: 2026-02-08 — Completed 43-06-PLAN.md (169 errors fixed in 16 remaining test files)
+Status: In progress — Plans 43-01 through 43-06 complete, Plan 43-03 just completed
+Last activity: 2026-02-08 — Completed 43-03-PLAN.md (UI component test mock types: 413 errors fixed in 8 high-error files)
 
 Progress: [███████████████░░░░░░░░░] 82% (6/7 phases complete, Phase 43: 6/8 plans complete)
 
@@ -142,6 +142,13 @@ Key patterns from previous milestones preserved for v5.0 migration:
 - Shared mock utilities pattern: Centralized helpers reduce boilerplate across 92 test files
 - External API types as reference: Comprehensive types serve as documentation even if source files use local interfaces
 - Type helper generics: mockFunction<T>, typedMockResolvedValue<T> for type-safe mock operations
+
+**Phase 43-03 decisions (UI component test mock types):**
+- Namespace import pattern: Use default import for components with namespace subcomponents (Accordion.Item, Tabs.List, Sheet.Content)
+- Named exports for direct usage: Import subcomponents separately when not using namespace pattern
+- As const for test.each: Preserve literal types in test arrays with `as const` assertion
+- React JSX namespace: Import React for React.JSX.Element return types in test components
+- DashboardLayout special case: Use named imports instead of namespace pattern (ForwardRefExoticComponent limitation)
 
 **Phase 43-02 decisions (source file type errors):**
 - Component variant validation: Always check CVA definitions before using variant props (Select: default/ember/ocean, Input: default/error/success)

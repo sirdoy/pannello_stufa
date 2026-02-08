@@ -33,6 +33,18 @@ jest.mock('@/lib/netatmoTokenHelper');
 jest.mock('@/lib/notificationTriggersServer');
 jest.mock('@/lib/netatmoApi');
 
+// Use jest.mocked() for type-safe mocking
+const mockedCoordinationPreferences = jest.mocked(coordinationPreferences);
+const mockedCoordinationState = jest.mocked(coordinationState);
+const mockedCoordinationDebounce = jest.mocked(coordinationDebounce);
+const mockedCoordinationUserIntent = jest.mocked(coordinationUserIntent);
+const mockedCoordinationPauseCalculator = jest.mocked(coordinationPauseCalculator);
+const mockedCoordinationNotificationThrottle = jest.mocked(coordinationNotificationThrottle);
+const mockedNetatmoStoveSync = jest.mocked(netatmoStoveSync);
+const mockedNetatmoTokenHelper = jest.mocked(netatmoTokenHelper);
+const mockedNotificationTriggersServer = jest.mocked(notificationTriggersServer);
+const mockedNetatmoApi = jest.mocked(NETATMO_API);
+
 describe('coordinationOrchestrator', () => {
   const mockUserId = 'user123';
   const mockHomeId = 'home456';
@@ -40,8 +52,8 @@ describe('coordinationOrchestrator', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Default NETATMO_API mock
-    NETATMO_API.getThermSchedules = jest.fn().mockResolvedValue([]);
+    // Default NETATMO_API mock - add getThermSchedules if needed
+    (NETATMO_API as any).getThermSchedules = jest.fn().mockResolvedValue([]);
   });
 
   // =============================================================================
@@ -68,14 +80,14 @@ describe('coordinationOrchestrator', () => {
     };
 
     beforeEach(() => {
-      coordinationPreferences.getCoordinationPreferences.mockResolvedValue(mockPreferences);
-      coordinationState.getCoordinationState.mockResolvedValue(mockState);
-      coordinationState.updateCoordinationState.mockResolvedValue({});
-      netatmoTokenHelper.getValidAccessToken.mockResolvedValue({ accessToken: 'token123' });
+      mockedCoordinationPreferences.getCoordinationPreferences.mockResolvedValue(mockPreferences as any);
+      mockedCoordinationState.getCoordinationState.mockResolvedValue(mockState as any);
+      mockedCoordinationState.updateCoordinationState.mockResolvedValue(mockState as any);
+      mockedNetatmoTokenHelper.getValidAccessToken.mockResolvedValue({ accessToken: 'token123', error: null });
     });
 
     test('skips when coordination disabled', async () => {
-      coordinationPreferences.getCoordinationPreferences.mockResolvedValue({
+      mockedCoordinationPreferences.getCoordinationPreferences.mockResolvedValue({
         ...mockPreferences,
         enabled: false,
       });
@@ -88,7 +100,7 @@ describe('coordinationOrchestrator', () => {
 
     test('respects pause until pausedUntil', async () => {
       const pausedUntil = Date.now() + 30 * 60 * 1000; // 30 minutes from now
-      coordinationState.getCoordinationState.mockResolvedValue({
+      (mockedCoordinationState.getCoordinationState as any).mockResolvedValue({
         ...mockState,
         automationPaused: true,
         pausedUntil,
@@ -104,12 +116,12 @@ describe('coordinationOrchestrator', () => {
 
     test('clears expired pause', async () => {
       const expiredPause = Date.now() - 1000; // 1 second ago
-      coordinationState.getCoordinationState.mockResolvedValue({
+      (mockedCoordinationState.getCoordinationState as any).mockResolvedValue({
         ...mockState,
         automationPaused: true,
         pausedUntil: expiredPause,
       });
-      coordinationDebounce.handleStoveStateChange.mockResolvedValue({
+      (coordinationDebounce.handleStoveStateChange as any).mockResolvedValue({
         action: 'no_change',
       });
 
@@ -123,7 +135,7 @@ describe('coordinationOrchestrator', () => {
     });
 
     test('detects user intent and pauses', async () => {
-      coordinationUserIntent.detectUserIntent.mockResolvedValue({
+      (coordinationUserIntent.detectUserIntent as any).mockResolvedValue({
         manualChange: true,
         reason: 'Setpoint modificato manualmente (Living Room)',
         changes: [
@@ -132,7 +144,7 @@ describe('coordinationOrchestrator', () => {
       });
 
       // Mock NETATMO_API as an object with methods
-      NETATMO_API.getThermSchedules = jest.fn().mockResolvedValue([
+      (NETATMO_API as any).getThermSchedules = jest.fn().mockResolvedValue([
         {
           selected: true,
           timetable: [
@@ -146,16 +158,16 @@ describe('coordinationOrchestrator', () => {
         },
       ]);
 
-      coordinationPauseCalculator.calculatePauseUntil.mockReturnValue({
+      (coordinationPauseCalculator.calculatePauseUntil as any).mockReturnValue({
         pauseUntil: Date.now() + 3600000,
         waitMinutes: 60,
       });
 
-      coordinationNotificationThrottle.shouldSendCoordinationNotification.mockReturnValue({
+      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockReturnValue({
         allowed: true,
       });
 
-      notificationTriggersServer.triggerNotificationServer.mockResolvedValue({
+      (notificationTriggersServer.triggerNotificationServer as any).mockResolvedValue({
         success: true,
       });
 
@@ -173,12 +185,12 @@ describe('coordinationOrchestrator', () => {
     });
 
     test('starts debounce on stove ON', async () => {
-      coordinationUserIntent.detectUserIntent.mockResolvedValue({
+      (coordinationUserIntent.detectUserIntent as any).mockResolvedValue({
         manualChange: false,
         changes: [],
       });
 
-      coordinationDebounce.handleStoveStateChange.mockResolvedValue({
+      (coordinationDebounce.handleStoveStateChange as any).mockResolvedValue({
         action: 'timer_started',
         delayMs: 120000,
       });
@@ -195,13 +207,13 @@ describe('coordinationOrchestrator', () => {
     });
 
     test('handles OFF during debounce (30s retry)', async () => {
-      coordinationState.getCoordinationState.mockResolvedValue({
+      (mockedCoordinationState.getCoordinationState as any).mockResolvedValue({
         ...mockState,
         stoveOn: true,
         pendingDebounce: true,
       });
 
-      coordinationDebounce.handleStoveStateChange.mockResolvedValue({
+      (coordinationDebounce.handleStoveStateChange as any).mockResolvedValue({
         action: 'retry_started',
         delayMs: 30000,
       });
@@ -213,7 +225,7 @@ describe('coordinationOrchestrator', () => {
     });
 
     test('restores setpoints on stove OFF', async () => {
-      coordinationState.getCoordinationState.mockResolvedValue({
+      (mockedCoordinationState.getCoordinationState as any).mockResolvedValue({
         ...mockState,
         stoveOn: true,
         previousSetpoints: {
@@ -222,12 +234,12 @@ describe('coordinationOrchestrator', () => {
         },
       });
 
-      coordinationDebounce.handleStoveStateChange.mockResolvedValue({
+      (coordinationDebounce.handleStoveStateChange as any).mockResolvedValue({
         action: 'executed_immediately',
         delayMs: 0,
       });
 
-      netatmoStoveSync.restoreRoomSetpoints.mockResolvedValue({
+      (netatmoStoveSync.restoreRoomSetpoints as any).mockResolvedValue({
         success: true,
         restoredRooms: [
           { roomId: 'room1', roomName: 'Living Room' },
@@ -235,11 +247,11 @@ describe('coordinationOrchestrator', () => {
         ],
       });
 
-      coordinationNotificationThrottle.shouldSendCoordinationNotification.mockReturnValue({
+      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockReturnValue({
         allowed: true,
       });
 
-      notificationTriggersServer.triggerNotificationServer.mockResolvedValue({
+      (notificationTriggersServer.triggerNotificationServer as any).mockResolvedValue({
         success: true,
       });
 
@@ -264,15 +276,15 @@ describe('coordinationOrchestrator', () => {
     };
 
     beforeEach(() => {
-      netatmoTokenHelper.getValidAccessToken.mockResolvedValue({ accessToken: 'token123' });
-      coordinationState.getCoordinationState.mockResolvedValue({
+      (netatmoTokenHelper.getValidAccessToken as any).mockResolvedValue({ accessToken: 'token123', error: null });
+      (mockedCoordinationState.getCoordinationState as any).mockResolvedValue({
         previousSetpoints: {},
       });
-      coordinationState.updateCoordinationState.mockResolvedValue({});
+      (mockedCoordinationState.updateCoordinationState as any).mockResolvedValue({ previousSetpoints: {} } as any);
     });
 
     test('uses zone-specific boost amounts', async () => {
-      netatmoStoveSync.setRoomsToBoostMode.mockResolvedValue({
+      (netatmoStoveSync.setRoomsToBoostMode as any).mockResolvedValue({
         success: true,
         appliedSetpoints: {
           room1: { previous: 20, applied: 22.5, capped: false },
@@ -293,7 +305,7 @@ describe('coordinationOrchestrator', () => {
     });
 
     test('caps at 30°C', async () => {
-      netatmoStoveSync.setRoomsToBoostMode.mockResolvedValue({
+      (netatmoStoveSync.setRoomsToBoostMode as any).mockResolvedValue({
         success: true,
         appliedSetpoints: {
           room1: { previous: 28, applied: 30, capped: true },
@@ -308,7 +320,7 @@ describe('coordinationOrchestrator', () => {
     });
 
     test('stores previous setpoints in state', async () => {
-      netatmoStoveSync.setRoomsToBoostMode.mockResolvedValue({
+      (netatmoStoveSync.setRoomsToBoostMode as any).mockResolvedValue({
         success: true,
         appliedSetpoints: {
           room1: { previous: 21, applied: 23.5, capped: false },
@@ -328,24 +340,24 @@ describe('coordinationOrchestrator', () => {
 
   describe('restorePreviousSetpoints', () => {
     beforeEach(() => {
-      netatmoTokenHelper.getValidAccessToken.mockResolvedValue({ accessToken: 'token123' });
-      coordinationState.getCoordinationState.mockResolvedValue({
+      (netatmoTokenHelper.getValidAccessToken as any).mockResolvedValue({ accessToken: 'token123', error: null });
+      (mockedCoordinationState.getCoordinationState as any).mockResolvedValue({
         previousSetpoints: {
           room1: 21,
           room2: 19,
         },
       });
-      coordinationPreferences.getCoordinationPreferences.mockResolvedValue({
+      mockedCoordinationPreferences.getCoordinationPreferences.mockResolvedValue({
         zones: [
           { roomId: 'room1', roomName: 'Living Room', enabled: true },
           { roomId: 'room2', roomName: 'Bedroom', enabled: true },
         ],
-      });
-      coordinationState.updateCoordinationState.mockResolvedValue({});
+      } as any);
+      (mockedCoordinationState.updateCoordinationState as any).mockResolvedValue({ previousSetpoints: null } as any);
     });
 
     test('uses stored previous setpoints', async () => {
-      netatmoStoveSync.restoreRoomSetpoints.mockResolvedValue({
+      (netatmoStoveSync.restoreRoomSetpoints as any).mockResolvedValue({
         success: true,
         restoredRooms: [
           { roomId: 'room1', roomName: 'Living Room', restoredTo: 21 },
@@ -363,7 +375,7 @@ describe('coordinationOrchestrator', () => {
     });
 
     test('clears state after restore', async () => {
-      netatmoStoveSync.restoreRoomSetpoints.mockResolvedValue({
+      (netatmoStoveSync.restoreRoomSetpoints as any).mockResolvedValue({
         success: true,
         restoredRooms: [
           { roomId: 'room1', roomName: 'Living Room' },
@@ -384,11 +396,11 @@ describe('coordinationOrchestrator', () => {
 
   describe('sendCoordinationNotification', () => {
     beforeEach(() => {
-      coordinationNotificationThrottle.recordNotificationSent.mockImplementation(() => {});
+      (coordinationNotificationThrottle.recordNotificationSent as any).mockImplementation(() => {});
     });
 
     test('respects throttle', async () => {
-      coordinationNotificationThrottle.shouldSendCoordinationNotification.mockReturnValue({
+      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockReturnValue({
         allowed: false,
         waitSeconds: 1200,
         reason: 'global_throttle',
@@ -403,11 +415,11 @@ describe('coordinationOrchestrator', () => {
     });
 
     test('calls triggerNotificationServer when allowed', async () => {
-      coordinationNotificationThrottle.shouldSendCoordinationNotification.mockReturnValue({
+      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockReturnValue({
         allowed: true,
       });
 
-      notificationTriggersServer.triggerNotificationServer.mockResolvedValue({
+      (notificationTriggersServer.triggerNotificationServer as any).mockResolvedValue({
         success: true,
         skipped: false,
       });
@@ -431,11 +443,11 @@ describe('coordinationOrchestrator', () => {
     });
 
     test('records notification sent', async () => {
-      coordinationNotificationThrottle.shouldSendCoordinationNotification.mockReturnValue({
+      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockReturnValue({
         allowed: true,
       });
 
-      notificationTriggersServer.triggerNotificationServer.mockResolvedValue({
+      (notificationTriggersServer.triggerNotificationServer as any).mockResolvedValue({
         success: true,
         skipped: false,
       });
@@ -446,11 +458,11 @@ describe('coordinationOrchestrator', () => {
     });
 
     test('formats messages correctly', async () => {
-      coordinationNotificationThrottle.shouldSendCoordinationNotification.mockReturnValue({
+      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockReturnValue({
         allowed: true,
       });
 
-      notificationTriggersServer.triggerNotificationServer.mockResolvedValue({
+      (notificationTriggersServer.triggerNotificationServer as any).mockResolvedValue({
         success: true,
         skipped: false,
       });
@@ -466,8 +478,7 @@ describe('coordinationOrchestrator', () => {
         mockUserId,
         'generic',
         expect.objectContaining({
-          body: expect.stringContaining('Boost'),
-          body: expect.stringContaining('Living Room'),
+          body: expect.stringMatching(/Boost.*Living Room/),
         }),
         expect.any(Object)
       );
@@ -489,7 +500,7 @@ describe('coordinationOrchestrator', () => {
     });
 
     test('returns throttle info when blocked', async () => {
-      coordinationNotificationThrottle.shouldSendCoordinationNotification.mockReturnValue({
+      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockReturnValue({
         allowed: false,
         waitSeconds: 600,
         reason: 'global_throttle',

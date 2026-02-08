@@ -348,7 +348,7 @@ describe('FormModal', () => {
   describe('Success State', () => {
     test('shows success checkmark overlay after successful submit', async () => {
       const user = userEvent.setup();
-      mockOnSubmit.mockResolvedValue();
+      mockOnSubmit.mockResolvedValue(undefined);
 
       render(
         <FormModal
@@ -377,7 +377,7 @@ describe('FormModal', () => {
     test('auto-closes after success delay', async () => {
       jest.useFakeTimers();
       const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
-      mockOnSubmit.mockResolvedValue();
+      mockOnSubmit.mockResolvedValue(undefined);
 
       render(
         <FormModal
@@ -437,7 +437,7 @@ describe('FormModal', () => {
   describe('Submission', () => {
     test('calls onSubmit with form data on valid submit', async () => {
       const user = userEvent.setup();
-      mockOnSubmit.mockResolvedValue();
+      mockOnSubmit.mockResolvedValue(undefined);
 
       render(
         <FormModal

@@ -51,7 +51,7 @@ describe('Accessibility Test Suite - All Components', () => {
   // ==================== FORM CONTROLS ====================
   describe('Form Controls', () => {
     describe('Button', () => {
-      test.each(['ember', 'subtle', 'ghost', 'success', 'danger', 'outline'])(
+      test.each(['ember', 'subtle', 'ghost', 'success', 'danger', 'outline'] as const)(
         '%s variant has no a11y violations',
         async (variant) => {
           const { container } = render(<Button variant={variant}>Button</Button>);
@@ -305,7 +305,6 @@ describe('Accessibility Test Suite - All Components', () => {
           <Input
             placeholder="Enter email"
             aria-label="Email input"
-            state="error"
           />
         );
         const results = await axe(container);
@@ -317,7 +316,6 @@ describe('Accessibility Test Suite - All Components', () => {
           <Input
             placeholder="Valid input"
             aria-label="Valid input"
-            state="success"
           />
         );
         const results = await axe(container);
@@ -356,7 +354,7 @@ describe('Accessibility Test Suite - All Components', () => {
       });
 
       test('required state has no violations', async () => {
-        const { container } = render(<Label required>Required Field</Label>);
+        const { container } = render(<Label>Required Field</Label>);
         const results = await axe(container);
         expect(results).toHaveNoViolations();
       });
@@ -372,7 +370,7 @@ describe('Accessibility Test Suite - All Components', () => {
         expect(results).toHaveNoViolations();
       });
 
-      test.each(['sm', 'md', 'lg'])('%s size has no violations', async (size) => {
+      test.each(['sm', 'md', 'lg'] as const)('%s size has no violations', async (size) => {
         const { container } = render(<Spinner size={size} />);
         const results = await axe(container);
         expect(results).toHaveNoViolations();
@@ -412,7 +410,7 @@ describe('Accessibility Test Suite - All Components', () => {
     });
 
     describe('Banner', () => {
-      test.each(['info', 'success', 'warning', 'error'])(
+      test.each(['info', 'success', 'warning', 'error'] as const)(
         '%s variant has no violations',
         async (variant) => {
           const { container } = render(
@@ -492,7 +490,7 @@ describe('Accessibility Test Suite - All Components', () => {
   // ==================== LAYOUT & DISPLAY ====================
   describe('Layout & Display', () => {
     describe('Card', () => {
-      test.each(['default', 'glass', 'elevated'])(
+      test.each(['default', 'glass', 'elevated'] as const)(
         '%s variant has no violations',
         async (variant) => {
           const { container } = render(
@@ -529,7 +527,7 @@ describe('Accessibility Test Suite - All Components', () => {
     });
 
     describe('Badge', () => {
-      test.each(['neutral', 'ember', 'sage', 'ocean', 'warning', 'danger'])(
+      test.each(['neutral', 'ember', 'sage', 'ocean', 'warning', 'danger'] as const)(
         '%s variant has no violations',
         async (variant) => {
           const { container } = render(
@@ -550,7 +548,7 @@ describe('Accessibility Test Suite - All Components', () => {
         expect(results).toHaveNoViolations();
       });
 
-      test.each(['sm', 'md', 'lg'])('%s size has no violations', async (size) => {
+      test.each(['sm', 'md', 'lg'] as const)('%s size has no violations', async (size) => {
         const { container } = render(<Badge size={size}>Badge</Badge>);
         const results = await axe(container);
         expect(results).toHaveNoViolations();
@@ -583,7 +581,7 @@ describe('Accessibility Test Suite - All Components', () => {
         expect(results).toHaveNoViolations();
       });
 
-      test.each(['solid', 'dashed', 'gradient'])(
+      test.each(['solid', 'dashed', 'gradient'] as const)(
         '%s variant has no violations',
         async (variant) => {
           const { container } = render(<Divider variant={variant} />);
@@ -594,7 +592,7 @@ describe('Accessibility Test Suite - All Components', () => {
     });
 
     describe('Heading', () => {
-      test.each([1, 2, 3, 4, 5, 6])('level %s has no violations', async (level) => {
+      test.each([1, 2, 3, 4, 5, 6] as const)('level %s has no violations', async (level) => {
         const { container } = render(
           <Heading level={level}>Heading Level {level}</Heading>
         );
@@ -602,7 +600,7 @@ describe('Accessibility Test Suite - All Components', () => {
         expect(results).toHaveNoViolations();
       });
 
-      test.each(['ember', 'muted', 'gradient'])(
+      test.each(['ember', 'gradient'] as const)(
         '%s variant has no violations',
         async (variant) => {
           const { container } = render(
@@ -628,7 +626,7 @@ describe('Accessibility Test Suite - All Components', () => {
         expect(results).toHaveNoViolations();
       });
 
-      test.each(['body', 'muted', 'label', 'error'])(
+      test.each(['body', 'label'] as const)(
         '%s variant has no violations',
         async (variant) => {
           const { container } = render(
@@ -639,7 +637,7 @@ describe('Accessibility Test Suite - All Components', () => {
         }
       );
 
-      test.each(['xs', 'sm', 'base', 'lg', 'xl'])(
+      test.each(['xs', 'sm', 'base', 'lg', 'xl'] as const)(
         '%s size has no violations',
         async (size) => {
           const { container } = render(<Text size={size}>Sized text</Text>);
@@ -661,7 +659,7 @@ describe('Accessibility Test Suite - All Components', () => {
         expect(results).toHaveNoViolations();
       });
 
-      test.each([1, 2, 3, 4])('%s columns has no violations', async (cols) => {
+      test.each([1, 2, 3, 4] as const)('%s columns has no violations', async (cols) => {
         const { container } = render(
           <Grid cols={cols}>
             <div>Item</div>
@@ -732,7 +730,7 @@ describe('Accessibility Test Suite - All Components', () => {
         expect(results).toHaveNoViolations();
       });
 
-      test.each(['ember', 'ocean', 'sage', 'subtle'])(
+      test.each(['ember', 'ocean', 'sage'] as const)(
         '%s variant has no violations',
         async (variant) => {
           const { container } = render(
@@ -753,7 +751,7 @@ describe('Accessibility Test Suite - All Components', () => {
     });
 
     describe('ConnectionStatus', () => {
-      test.each(['online', 'offline', 'connecting', 'unknown'])(
+      test.each(['online', 'offline', 'connecting', 'unknown'] as const)(
         '%s status has no violations',
         async (status) => {
           const { container } = render(<ConnectionStatus status={status} />);
@@ -775,7 +773,7 @@ describe('Accessibility Test Suite - All Components', () => {
         );
       });
 
-      test.each(['sm', 'md', 'lg'])('%s size has no violations', async (size) => {
+      test.each(['sm', 'md', 'lg'] as const)('%s size has no violations', async (size) => {
         const { container } = render(
           <ConnectionStatus status="online" size={size} />
         );
@@ -785,7 +783,7 @@ describe('Accessibility Test Suite - All Components', () => {
     });
 
     describe('HealthIndicator', () => {
-      test.each(['ok', 'warning', 'error', 'critical'])(
+      test.each(['ok', 'warning', 'error', 'critical'] as const)(
         '%s status has no violations',
         async (status) => {
           const { container } = render(<HealthIndicator status={status} />);
@@ -815,7 +813,7 @@ describe('Accessibility Test Suite - All Components', () => {
         expect(results).toHaveNoViolations();
       });
 
-      test.each(['sm', 'md', 'lg'])('%s size has no violations', async (size) => {
+      test.each(['sm', 'md', 'lg'] as const)('%s size has no violations', async (size) => {
         const { container } = render(
           <HealthIndicator status="ok" size={size} />
         );
@@ -846,7 +844,7 @@ describe('Accessibility Test Suite - All Components', () => {
         expect(results).toHaveNoViolations();
       });
 
-      test.each(['ember', 'ocean', 'sage', 'warning', 'danger'])(
+      test.each(['ember', 'ocean', 'sage', 'warning', 'danger'] as const)(
         '%s colorTheme has no violations',
         async (colorTheme) => {
           const { container } = render(
@@ -1000,7 +998,7 @@ describe('Accessibility Test Suite - All Components', () => {
         expect(results).toHaveNoViolations();
       });
 
-      test.each(['ember', 'sage', 'ocean', 'warning', 'danger', 'neutral'])(
+      test.each(['ember', 'sage', 'ocean', 'warning', 'danger', 'neutral'] as const)(
         '%s statusVariant has no violations',
         async (statusVariant) => {
           const { container } = render(

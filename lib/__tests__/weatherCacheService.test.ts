@@ -6,23 +6,22 @@
 import { getWeatherFromCache, saveWeatherToCache, invalidateWeatherCache } from '../weatherCacheService';
 
 // Mock Firebase Admin
-jest.mock('../firebaseAdmin', () => ({
-  adminDbGet: jest.fn(),
-  adminDbSet: jest.fn(),
-  adminDbRemove: jest.fn(),
-}));
-
-// Mock environment helper (default to production for tests)
-jest.mock('../environmentHelper', () => ({
-  getEnvironmentPath: jest.fn((path) => path), // Production: no prefix
-}));
+jest.mock('../firebaseAdmin');
+jest.mock('../environmentHelper');
 
 import { adminDbGet, adminDbSet, adminDbRemove } from '../firebaseAdmin';
 import { getEnvironmentPath } from '../environmentHelper';
 
+const mockAdminDbGet = jest.mocked(adminDbGet);
+const mockAdminDbSet = jest.mocked(adminDbSet);
+const mockAdminDbRemove = jest.mocked(adminDbRemove);
+const mockGetEnvironmentPath = jest.mocked(getEnvironmentPath);
+
 describe('weatherCacheService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Default: identity function (production-like, no prefix)
+    mockGetEnvironmentPath.mockImplementation((path: string) => path);
   });
 
   describe('Cache key generation', () => {
@@ -30,7 +29,7 @@ describe('weatherCacheService', () => {
       const lat = 45.464203;
       const lon = 9.189982;
 
-      adminDbGet.mockResolvedValue(null);
+      mockAdminDbGet.mockResolvedValue(null);
 
       await getWeatherFromCache(lat, lon);
 
@@ -39,7 +38,7 @@ describe('weatherCacheService', () => {
     });
 
     it('should round coordinates correctly', async () => {
-      adminDbGet.mockResolvedValue(null);
+      mockAdminDbGet.mockResolvedValue(null);
 
       // Test rounding (toFixed uses standard rounding)
       await getWeatherFromCache(45.46425, 9.18995);
@@ -51,7 +50,7 @@ describe('weatherCacheService', () => {
     });
 
     it('should handle negative coordinates', async () => {
-      adminDbGet.mockResolvedValue(null);
+      mockAdminDbGet.mockResolvedValue(null);
 
       await getWeatherFromCache(-45.4642, -9.19);
       expect(adminDbGet).toHaveBeenCalledWith('weather/cache/-45.4642,-9.1900');
@@ -61,9 +60,9 @@ describe('weatherCacheService', () => {
   describe('Environment path prefixing', () => {
     it('should use environment path prefix for cache key', async () => {
       // Mock development environment (returns 'dev/' prefix)
-      getEnvironmentPath.mockImplementation((path) => `dev/${path}`);
+      (getEnvironmentPath as jest.Mock).mockImplementation((path) => `dev/${path}`);
 
-      adminDbGet.mockResolvedValue(null);
+      mockAdminDbGet.mockResolvedValue(null);
 
       await getWeatherFromCache(45.4642, 9.19);
 
@@ -73,9 +72,9 @@ describe('weatherCacheService', () => {
 
     it('should work without prefix in production', async () => {
       // Mock production environment (returns no prefix)
-      getEnvironmentPath.mockImplementation((path) => path);
+      (getEnvironmentPath as jest.Mock).mockImplementation((path) => path);
 
-      adminDbGet.mockResolvedValue(null);
+      mockAdminDbGet.mockResolvedValue(null);
 
       await getWeatherFromCache(45.4642, 9.19);
 
@@ -93,7 +92,7 @@ describe('weatherCacheService', () => {
         timestamp: Date.now(),
       };
 
-      adminDbGet.mockResolvedValue(mockCachedData);
+      mockAdminDbGet.mockResolvedValue(mockCachedData);
 
       const result = await getWeatherFromCache(45.4642, 9.19);
 
@@ -102,7 +101,7 @@ describe('weatherCacheService', () => {
     });
 
     it('should return null if cache does not exist', async () => {
-      adminDbGet.mockResolvedValue(null);
+      mockAdminDbGet.mockResolvedValue(null);
 
       const result = await getWeatherFromCache(45.4642, 9.19);
 
@@ -110,7 +109,7 @@ describe('weatherCacheService', () => {
     });
 
     it('should return null if cache is invalid (missing data)', async () => {
-      adminDbGet.mockResolvedValue({ timestamp: Date.now() }); // Missing 'data'
+      mockAdminDbGet.mockResolvedValue({ timestamp: Date.now() }); // Missing 'data'
 
       const result = await getWeatherFromCache(45.4642, 9.19);
 
@@ -118,7 +117,7 @@ describe('weatherCacheService', () => {
     });
 
     it('should return null if cache is invalid (missing timestamp)', async () => {
-      adminDbGet.mockResolvedValue({ data: {} }); // Missing 'timestamp'
+      mockAdminDbGet.mockResolvedValue({ data: {} }); // Missing 'timestamp'
 
       const result = await getWeatherFromCache(45.4642, 9.19);
 
@@ -126,7 +125,7 @@ describe('weatherCacheService', () => {
     });
 
     it('should handle Firebase errors gracefully', async () => {
-      adminDbGet.mockRejectedValue(new Error('Firebase error'));
+      mockAdminDbGet.mockRejectedValue(new Error('Firebase error'));
 
       const result = await getWeatherFromCache(45.4642, 9.19);
 
@@ -143,7 +142,7 @@ describe('weatherCacheService', () => {
 
       await saveWeatherToCache(45.4642, 9.19, mockWeatherData);
 
-      expect(adminDbSet).toHaveBeenCalledWith(
+      expect(mockAdminDbSet).toHaveBeenCalledWith(
         'weather/cache/45.4642,9.1900',
         expect.objectContaining({
           data: mockWeatherData,
@@ -153,7 +152,7 @@ describe('weatherCacheService', () => {
     });
 
     it('should throw error if Firebase save fails', async () => {
-      adminDbSet.mockRejectedValue(new Error('Firebase error'));
+      mockAdminDbSet.mockRejectedValue(new Error('Firebase error'));
 
       await expect(
         saveWeatherToCache(45.4642, 9.19, {})
@@ -169,7 +168,7 @@ describe('weatherCacheService', () => {
     });
 
     it('should throw error if Firebase remove fails', async () => {
-      adminDbRemove.mockRejectedValue(new Error('Firebase error'));
+      (adminDbRemove as jest.Mock).mockRejectedValue(new Error('Firebase error'));
 
       await expect(
         invalidateWeatherCache(45.4642, 9.19)

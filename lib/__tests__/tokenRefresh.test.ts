@@ -102,7 +102,7 @@ describe('tokenRefresh', () => {
     });
 
     it('updates lastUsed when token is fresh', async () => {
-      mockLoadToken.mockResolvedValue({ token: 'fresh-token' });
+      mockLoadToken.mockResolvedValue({ token: 'fresh-token' } as any);
       mockGetTokenAge.mockResolvedValue(10);
 
       const result = await checkAndRefreshToken('user123');
@@ -117,7 +117,7 @@ describe('tokenRefresh', () => {
       mockLoadToken.mockResolvedValue({
         token: 'old-token',
         deviceId: 'device-123',
-      });
+      } as any);
       mockGetTokenAge.mockResolvedValue(45);
       mockGetToken.mockResolvedValue('new-token-abc');
 
@@ -129,7 +129,7 @@ describe('tokenRefresh', () => {
       expect(mockGetToken).toHaveBeenCalled();
       expect(saveToken).toHaveBeenCalledWith(
         'new-token-abc',
-        expect.objectContaining({ deviceId: 'test-device-id' })
+        expect.objectContaining({ deviceId: 'device-123' })
       );
     });
 
@@ -149,7 +149,7 @@ describe('tokenRefresh', () => {
       mockLoadToken.mockResolvedValue({
         token: 'old-token',
         deviceId: 'device-123',
-      });
+      } as any);
       mockGetTokenAge.mockResolvedValue(45);
       mockDeleteToken.mockRejectedValue(new Error('Delete failed'));
       mockGetToken.mockResolvedValue('new-token-xyz');
@@ -166,7 +166,7 @@ describe('tokenRefresh', () => {
       mockLoadToken.mockResolvedValue({
         token: 'old-token',
         deviceId: 'device-123',
-      });
+      } as any);
       mockGetTokenAge.mockResolvedValue(45);
       mockGetToken.mockResolvedValue('new-token-fail');
       (global.fetch as jest.Mock).mockResolvedValueOnce({
@@ -180,7 +180,7 @@ describe('tokenRefresh', () => {
       expect(result.token).toBe('new-token-fail');
       expect(saveToken).toHaveBeenCalledWith(
         'new-token-fail',
-        expect.objectContaining({ deviceId: 'test-device-id' })
+        expect.objectContaining({ deviceId: 'device-123' })
       );
     });
 
@@ -188,7 +188,7 @@ describe('tokenRefresh', () => {
       mockLoadToken.mockResolvedValue({
         token: 'stored-token',
         deviceId: 'device-123',
-      });
+      } as any);
       mockGetTokenAge.mockResolvedValue(45);
       mockGetToken.mockRejectedValue(new Error('Network error'));
 

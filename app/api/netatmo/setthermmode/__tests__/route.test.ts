@@ -11,10 +11,11 @@ jest.mock('@/lib/core', () => {
   }));
 
   return {
-    withAuthAndErrorHandler: jest.fn((handler) => async (request, context, session) => {
+    withAuthAndErrorHandler: jest.fn((handler) => async (request: any, context: any) => {
+      const mockSession = { user: { email: 'test@test.com', name: 'Test User', sub: 'auth0|123' } };
       try {
-        return await handler(request, context, session);
-      } catch (error) {
+        return await handler(request, context, mockSession);
+      } catch (error: any) {
         return badRequestMock(error.message);
       }
     }),
@@ -85,12 +86,12 @@ describe('POST /api/netatmo/setthermmode', () => {
     jest.clearAllMocks();
 
     // Reset default mock implementations
-    adminDbGet.mockResolvedValue('home123');
-    adminDbPush.mockResolvedValue({ key: 'log-key-123' });
-    NETATMO_API.setThermMode.mockResolvedValue(true);
+    (adminDbGet as jest.Mock).mockResolvedValue('home123');
+    (adminDbPush as jest.Mock).mockResolvedValue({ key: 'log-key-123' });
+    (NETATMO_API.setThermMode as jest.Mock).mockResolvedValue(true);
   });
 
-  const createRequest = (body) => {
+  const createRequest = (body): any => {
     return {
       json: async () => body,
     };
@@ -99,7 +100,7 @@ describe('POST /api/netatmo/setthermmode', () => {
   it('should return 400 when mode is missing', async () => {
     const request = createRequest({});
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -109,7 +110,7 @@ describe('POST /api/netatmo/setthermmode', () => {
   it('should return 400 when mode is invalid', async () => {
     const request = createRequest({ mode: 'invalid' });
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -117,11 +118,11 @@ describe('POST /api/netatmo/setthermmode', () => {
   });
 
   it('should return 400 when home_id not found in Firebase', async () => {
-    adminDbGet.mockResolvedValueOnce(null);
+    (adminDbGet as jest.Mock).mockResolvedValueOnce(null);
 
     const request = createRequest({ mode: 'schedule' });
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -131,7 +132,7 @@ describe('POST /api/netatmo/setthermmode', () => {
   it('should return 200 success with schedule mode', async () => {
     const request = createRequest({ mode: 'schedule' });
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -148,7 +149,7 @@ describe('POST /api/netatmo/setthermmode', () => {
   it('should return 200 success with away mode', async () => {
     const request = createRequest({ mode: 'away' });
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -165,7 +166,7 @@ describe('POST /api/netatmo/setthermmode', () => {
     const endtime = Math.floor(Date.now() / 1000) + 7200;
     const request = createRequest({ mode: 'away', endtime });
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -182,7 +183,7 @@ describe('POST /api/netatmo/setthermmode', () => {
   it('should return 200 success with hg (frost guard) mode', async () => {
     const request = createRequest({ mode: 'hg' });
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -198,7 +199,7 @@ describe('POST /api/netatmo/setthermmode', () => {
   it('should return 200 success with off mode', async () => {
     const request = createRequest({ mode: 'off' });
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -214,7 +215,7 @@ describe('POST /api/netatmo/setthermmode', () => {
   it('should push log entry to Firebase on success', async () => {
     const request = createRequest({ mode: 'away' });
 
-    await POST(request, {}, mockSession);
+    await POST(request, {} as any);
 
     expect(adminDbPush).toHaveBeenCalledWith(
       'log',
@@ -236,7 +237,7 @@ describe('POST /api/netatmo/setthermmode', () => {
     const endtime = Math.floor(Date.now() / 1000) + 7200;
     const request = createRequest({ mode: 'hg', endtime });
 
-    await POST(request, {}, mockSession);
+    await POST(request, {} as any);
 
     expect(adminDbPush).toHaveBeenCalledWith(
       'log',
@@ -250,7 +251,7 @@ describe('POST /api/netatmo/setthermmode', () => {
   it('should set endtime to null in log when not provided', async () => {
     const request = createRequest({ mode: 'schedule' });
 
-    await POST(request, {}, mockSession);
+    await POST(request, {} as any);
 
     expect(adminDbPush).toHaveBeenCalledWith(
       'log',
@@ -261,11 +262,11 @@ describe('POST /api/netatmo/setthermmode', () => {
   });
 
   it('should return 500 when Netatmo API command fails', async () => {
-    NETATMO_API.setThermMode.mockResolvedValueOnce(false);
+    (NETATMO_API.setThermMode as jest.Mock).mockResolvedValueOnce(false);
 
     const request = createRequest({ mode: 'schedule' });
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(500);
@@ -275,7 +276,7 @@ describe('POST /api/netatmo/setthermmode', () => {
   it('should use environment-aware path for home_id', async () => {
     const request = createRequest({ mode: 'schedule' });
 
-    await POST(request, {}, mockSession);
+    await POST(request, {} as any);
 
     expect(getEnvironmentPath).toHaveBeenCalledWith('netatmo/home_id');
     expect(adminDbGet).toHaveBeenCalledWith('netatmo/home_id');
@@ -288,7 +289,7 @@ describe('POST /api/netatmo/setthermmode', () => {
     for (const mode of validModes) {
       jest.clearAllMocks();
       const request = createRequest({ mode });
-      const response = await POST(request, {}, mockSession);
+      const response = await POST(request, {} as any);
 
       expect(response.status).toBe(200);
     }
@@ -300,25 +301,25 @@ describe('POST /api/netatmo/setthermmode', () => {
     // Test schedule mode - endtime should not be included
     jest.clearAllMocks();
     let request = createRequest({ mode: 'schedule', endtime });
-    await POST(request, {}, mockSession);
+    await POST(request, {} as any);
 
-    let callParams = NETATMO_API.setThermMode.mock.calls[0][1];
+    let callParams = ((NETATMO_API as any).setThermMode as jest.Mock).mock.calls[0][1];
     expect(callParams.endtime).toBeUndefined();
 
     // Test away mode - endtime should be included
     jest.clearAllMocks();
     request = createRequest({ mode: 'away', endtime });
-    await POST(request, {}, mockSession);
+    await POST(request, {} as any);
 
-    callParams = NETATMO_API.setThermMode.mock.calls[0][1];
+    callParams = ((NETATMO_API as any).setThermMode as jest.Mock).mock.calls[0][1];
     expect(callParams.endtime).toBe(endtime);
 
     // Test hg mode - endtime should be included
     jest.clearAllMocks();
     request = createRequest({ mode: 'hg', endtime });
-    await POST(request, {}, mockSession);
+    await POST(request, {} as any);
 
-    callParams = NETATMO_API.setThermMode.mock.calls[0][1];
+    callParams = ((NETATMO_API as any).setThermMode as jest.Mock).mock.calls[0][1];
     expect(callParams.endtime).toBe(endtime);
   });
 });

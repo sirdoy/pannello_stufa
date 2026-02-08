@@ -5,7 +5,7 @@
 import {
   validateHealthMonitoringEnv,
   validateNetatmoEnv,
-} from '../../lib/envValidator.ts';
+} from '../../lib/envValidator';
 
 describe('envValidator', () => {
   // Save original env vars
@@ -23,9 +23,9 @@ describe('envValidator', () => {
   afterEach(() => {
     // Restore env vars
     process.env = originalEnv;
-    console.log.mockRestore();
-    console.warn.mockRestore();
-    console.error.mockRestore();
+    (console.log as jest.Mock).mockRestore();
+    (console.warn as jest.Mock).mockRestore();
+    (console.error as jest.Mock).mockRestore();
   });
 
   describe('validateHealthMonitoringEnv', () => {
@@ -163,7 +163,12 @@ describe('envValidator', () => {
     });
 
     it('should warn when using dev credentials in production', () => {
-      process.env.NODE_ENV = 'production';
+      const originalNodeEnv = process.env.NODE_ENV;
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'production',
+        writable: true,
+        configurable: true,
+      });
       process.env.NETATMO_CLIENT_ID = 'test-client-id';
       process.env.NETATMO_CLIENT_SECRET = 'secret-12345';
 
@@ -172,10 +177,21 @@ describe('envValidator', () => {
       expect(result.valid).toBe(true);
       expect(result.environment).toBe('dev');
       expect(result.warnings).toContain('Using dev Netatmo credentials in production environment');
+
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: originalNodeEnv,
+        writable: true,
+        configurable: true,
+      });
     });
 
     it('should not warn when using prod credentials in production', () => {
-      process.env.NODE_ENV = 'production';
+      const originalNodeEnv = process.env.NODE_ENV;
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'production',
+        writable: true,
+        configurable: true,
+      });
       process.env.NETATMO_CLIENT_ID = 'client-id-12345';
       process.env.NETATMO_CLIENT_SECRET = 'secret-67890';
 
@@ -184,6 +200,12 @@ describe('envValidator', () => {
       expect(result.valid).toBe(true);
       expect(result.environment).toBe('prod');
       expect(result.warnings).toEqual([]);
+
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: originalNodeEnv,
+        writable: true,
+        configurable: true,
+      });
     });
   });
 });

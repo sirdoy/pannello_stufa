@@ -56,6 +56,7 @@ const customJestConfig: Config = {
     '<rootDir>/.next/',
     '<rootDir>/node_modules/',
     '<rootDir>/out/',
+    '<rootDir>/__tests__/__utils__/',
   ],
 
   // Module file extensions

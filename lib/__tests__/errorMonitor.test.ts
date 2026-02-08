@@ -32,9 +32,9 @@ describe('errorMonitor', () => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
 
     // Mock window.Notification for browser notification tests
-    global.Notification = jest.fn();
-    global.Notification.permission = 'default';
-    global.Notification.requestPermission = jest.fn();
+    global.Notification = jest.fn() as any;
+    (global.Notification as any).permission = 'default';
+    (global.Notification as any).requestPermission = jest.fn();
   });
 
   afterEach(() => {
@@ -491,21 +491,21 @@ describe('errorMonitor', () => {
 
     test('requests permission when permission is default', async () => {
       // ARRANGE
-      global.Notification.permission = 'default';
-      global.Notification.requestPermission.mockResolvedValue('granted');
-      global.Notification.mockImplementation(() => {});
+      (global.Notification as any).permission = 'default';
+      ((global.Notification as any).requestPermission as jest.Mock).mockResolvedValue('granted');
+      (global.Notification as unknown as jest.Mock).mockImplementation(() => {});
 
       // ACT
       const result = await sendErrorNotification(5, 'Test error');
 
       // ASSERT
-      expect(global.Notification.requestPermission).toHaveBeenCalled();
+      expect((global.Notification as any).requestPermission).toHaveBeenCalled();
     });
 
     test('sends notification when permission is granted', async () => {
       // ARRANGE
-      global.Notification.permission = 'granted';
-      global.Notification.mockImplementation(() => {});
+      (global.Notification as any).permission = 'granted';
+      (global.Notification as unknown as jest.Mock).mockImplementation(() => {});
 
       // ACT
       const result = await sendErrorNotification(5, 'Test error');
@@ -524,7 +524,7 @@ describe('errorMonitor', () => {
 
     test('returns false when permission is denied', async () => {
       // ARRANGE
-      global.Notification.permission = 'denied';
+      (global.Notification as any).permission = 'denied';
 
       // ACT
       const result = await sendErrorNotification(5, 'Test error');
@@ -540,8 +540,8 @@ describe('errorMonitor', () => {
         description: 'Critical error',
         severity: ERROR_SEVERITY.CRITICAL,
       };
-      global.Notification.permission = 'granted';
-      global.Notification.mockImplementation(() => {});
+      (global.Notification as any).permission = 'granted';
+      (global.Notification as unknown as jest.Mock).mockImplementation(() => {});
 
       // ACT
       await sendErrorNotification(99, 'Critical error');
@@ -560,11 +560,11 @@ describe('errorMonitor', () => {
 
     test('uses default error message when description not provided', async () => {
       // ARRANGE
-      global.Notification.permission = 'granted';
-      global.Notification.mockImplementation(() => {});
+      (global.Notification as any).permission = 'granted';
+      (global.Notification as unknown as jest.Mock).mockImplementation(() => {});
 
       // ACT
-      await sendErrorNotification(5);
+      await sendErrorNotification(5, '' as any);
 
       // ASSERT
       expect(global.Notification).toHaveBeenCalledWith(

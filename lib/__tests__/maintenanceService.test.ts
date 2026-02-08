@@ -12,18 +12,24 @@ import { ref, get, set, update, runTransaction } from 'firebase/database';
 import { createMockFetchResponse, createMockDbRef, createMockDataSnapshot } from '@/__tests__/__utils__/mockFactories';
 
 // Mock Firebase module
-jest.mock('firebase/database');
+jest.mock('firebase/database', () => ({
+  ref: jest.fn(),
+  get: jest.fn(),
+  set: jest.fn(),
+  update: jest.fn(),
+  runTransaction: jest.fn(),
+}));
 jest.mock('../firebase', () => ({
   db: {},
 }));
 jest.mock('../logService');
 
-const mockRef = jest.mocked(ref);
-const mockGet = jest.mocked(get);
-const mockSet = jest.mocked(set);
-const mockUpdate = jest.mocked(update);
-const mockRunTransaction = jest.mocked(runTransaction);
-const mockLogUserAction = jest.mocked(logUserAction);
+const mockRef = ref as jest.Mock;
+const mockGet = get as jest.Mock;
+const mockSet = set as jest.Mock;
+const mockUpdate = update as jest.Mock;
+const mockRunTransaction = runTransaction as jest.Mock;
+const mockLogUserAction = logUserAction as jest.Mock;
 
 describe('maintenanceService', () => {
   beforeEach(() => {
@@ -41,9 +47,7 @@ describe('maintenanceService', () => {
     mockRef.mockReturnValue(defaultMockDbRef);
     mockGet.mockResolvedValue(createMockDataSnapshot(null));
     mockSet.mockResolvedValue(undefined);
-    if (mockUpdate?.mockResolvedValue) {
-      mockUpdate.mockResolvedValue(undefined);
-    }
+    mockUpdate.mockResolvedValue(undefined);
 
     // Mock runTransaction with default behavior
     // This mock uses the most recent data from get() to simulate realistic transaction behavior
@@ -130,7 +134,7 @@ describe('maintenanceService', () => {
         needsCleaning: false,
         lastUpdatedAt: null, // Will be set on first WORK tracking
       });
-      expect(set).toHaveBeenCalledWith('mock-ref', expect.objectContaining({
+      expect(set).toHaveBeenCalledWith(mockDbRef, expect.objectContaining({
         currentHours: 0,
         targetHours: 50,
         lastUpdatedAt: null,
@@ -219,7 +223,7 @@ describe('maintenanceService', () => {
       // ASSERT
       expect(result).toHaveProperty('currentHours', 26.0);
       expect(result).toHaveProperty('lastUpdatedAt', '2025-10-15T12:00:00.000Z');
-      expect(update).toHaveBeenCalledWith('mock-ref', {
+      expect(update).toHaveBeenCalledWith(mockDbRef, {
         currentHours: 26.0,
         lastUpdatedAt: '2025-10-15T12:00:00.000Z',
       });

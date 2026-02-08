@@ -13,12 +13,12 @@ import {
   getRecentHealthLogs,
   getHealthCheckDetails,
   getHealthStats,
-} from '../../lib/healthLogger.ts';
+} from '../../lib/healthLogger';
 
 // Mock dependencies
-jest.mock('../../lib/firebaseAdmin.ts');
+jest.mock('../../lib/firebaseAdmin');
 
-import { getAdminFirestore } from '../../lib/firebaseAdmin.ts';
+import { getAdminFirestore } from '../../lib/firebaseAdmin';
 import { Timestamp } from 'firebase-admin/firestore';
 
 describe('healthLogger', () => {
@@ -72,14 +72,14 @@ describe('healthLogger', () => {
       batch: jest.fn().mockReturnValue(mockBatch),
     };
 
-    getAdminFirestore.mockReturnValue(mockDb);
+    (getAdminFirestore as jest.Mock).mockReturnValue(mockDb);
   });
 
   describe('logHealthCheckRun', () => {
     it('creates parent document with correct aggregated stats', async () => {
       const results = [
         {
-          status: 'fulfilled',
+          status: 'fulfilled' as const,
           value: {
             userId: 'user1',
             connectionStatus: 'online',
@@ -87,7 +87,7 @@ describe('healthLogger', () => {
           },
         },
         {
-          status: 'fulfilled',
+          status: 'fulfilled' as const,
           value: {
             userId: 'user2',
             connectionStatus: 'online',
@@ -95,10 +95,10 @@ describe('healthLogger', () => {
           },
         },
         {
-          status: 'rejected',
+          status: 'rejected' as const,
           reason: new Error('Failed'),
         },
-      ];
+      ] as any;
 
       await logHealthCheckRun(results, { duration: 1500 });
 
@@ -115,7 +115,7 @@ describe('healthLogger', () => {
     it('creates subcollection documents for each result', async () => {
       const results = [
         {
-          status: 'fulfilled',
+          status: 'fulfilled' as const,
           value: {
             userId: 'user1',
             connectionStatus: 'online',
@@ -125,7 +125,7 @@ describe('healthLogger', () => {
             stateMismatch: null,
           },
         },
-      ];
+      ] as any;
 
       await logHealthCheckRun(results);
 
@@ -147,10 +147,10 @@ describe('healthLogger', () => {
     it('handles rejected results in subcollection', async () => {
       const results = [
         {
-          status: 'rejected',
+          status: 'rejected' as const,
           reason: new Error('Network timeout'),
         },
-      ];
+      ] as any;
 
       await logHealthCheckRun(results);
 
@@ -169,10 +169,10 @@ describe('healthLogger', () => {
     it('returns parent document ID on success', async () => {
       const results = [
         {
-          status: 'fulfilled',
+          status: 'fulfilled' as const,
           value: { userId: 'user1', connectionStatus: 'online' },
         },
-      ];
+      ] as any;
 
       const docId = await logHealthCheckRun(results);
 
@@ -184,10 +184,10 @@ describe('healthLogger', () => {
 
       const results = [
         {
-          status: 'fulfilled',
+          status: 'fulfilled' as const,
           value: { userId: 'user1' },
         },
-      ];
+      ] as any;
 
       const docId = await logHealthCheckRun(results);
 
@@ -198,10 +198,10 @@ describe('healthLogger', () => {
     it('sets duration to 0 if not provided', async () => {
       const results = [
         {
-          status: 'fulfilled',
+          status: 'fulfilled' as const,
           value: { userId: 'user1' },
         },
-      ];
+      ] as any;
 
       await logHealthCheckRun(results);
 
@@ -213,13 +213,13 @@ describe('healthLogger', () => {
     it('detects state mismatch flag correctly', async () => {
       const results = [
         {
-          status: 'fulfilled',
+          status: 'fulfilled' as const,
           value: {
             userId: 'user1',
             stateMismatch: { detected: true, reason: 'should_be_on' },
           },
         },
-      ];
+      ] as any;
 
       await logHealthCheckRun(results);
 

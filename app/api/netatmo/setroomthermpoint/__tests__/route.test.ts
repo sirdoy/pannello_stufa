@@ -11,10 +11,11 @@ jest.mock('@/lib/core', () => {
   }));
 
   return {
-    withAuthAndErrorHandler: jest.fn((handler) => async (request, context, session) => {
+    withAuthAndErrorHandler: jest.fn((handler) => async (request: any, context: any) => {
+      const mockSession = { user: { email: 'test@test.com', name: 'Test User', sub: 'auth0|123' } };
       try {
-        return await handler(request, context, session);
-      } catch (error) {
+        return await handler(request, context, mockSession);
+      } catch (error: any) {
         return badRequestMock(error.message);
       }
     }),
@@ -85,12 +86,12 @@ describe('POST /api/netatmo/setroomthermpoint', () => {
     jest.clearAllMocks();
 
     // Reset default mock implementations
-    adminDbGet.mockResolvedValue('home123');
-    adminDbPush.mockResolvedValue({ key: 'log-key-123' });
-    NETATMO_API.setRoomThermpoint.mockResolvedValue(true);
+    (adminDbGet as jest.Mock).mockResolvedValue('home123');
+    (adminDbPush as jest.Mock).mockResolvedValue({ key: 'log-key-123' });
+    (NETATMO_API.setRoomThermpoint as jest.Mock).mockResolvedValue(true);
   });
 
-  const createRequest = (body) => {
+  const createRequest = (body): any => {
     return {
       json: async () => body,
     };
@@ -99,7 +100,7 @@ describe('POST /api/netatmo/setroomthermpoint', () => {
   it('should return 400 when room_id is missing', async () => {
     const request = createRequest({ mode: 'manual', temp: 21 });
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -109,7 +110,7 @@ describe('POST /api/netatmo/setroomthermpoint', () => {
   it('should return 400 when mode is missing', async () => {
     const request = createRequest({ room_id: 'room456', temp: 21 });
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -119,7 +120,7 @@ describe('POST /api/netatmo/setroomthermpoint', () => {
   it('should return 400 when mode is invalid', async () => {
     const request = createRequest({ room_id: 'room456', mode: 'invalid', temp: 21 });
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -129,7 +130,7 @@ describe('POST /api/netatmo/setroomthermpoint', () => {
   it('should return 400 when mode is manual but temp is missing', async () => {
     const request = createRequest({ room_id: 'room456', mode: 'manual' });
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -137,11 +138,11 @@ describe('POST /api/netatmo/setroomthermpoint', () => {
   });
 
   it('should return 400 when home_id not found in Firebase', async () => {
-    adminDbGet.mockResolvedValueOnce(null);
+    (adminDbGet as jest.Mock).mockResolvedValueOnce(null);
 
     const request = createRequest({ room_id: 'room456', mode: 'manual', temp: 21 });
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -151,7 +152,7 @@ describe('POST /api/netatmo/setroomthermpoint', () => {
   it('should return 200 success with valid manual mode and temp', async () => {
     const request = createRequest({ room_id: 'room456', mode: 'manual', temp: 21 });
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -170,7 +171,7 @@ describe('POST /api/netatmo/setroomthermpoint', () => {
   it('should return 200 success with home mode (no temp required)', async () => {
     const request = createRequest({ room_id: 'room456', mode: 'home' });
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -188,7 +189,7 @@ describe('POST /api/netatmo/setroomthermpoint', () => {
   it('should push log entry to Firebase on success', async () => {
     const request = createRequest({ room_id: 'room456', mode: 'manual', temp: 21.5 });
 
-    await POST(request, {}, mockSession);
+    await POST(request, {} as any);
 
     expect(adminDbPush).toHaveBeenCalledWith(
       'log',
@@ -212,7 +213,7 @@ describe('POST /api/netatmo/setroomthermpoint', () => {
     const endtime = Math.floor(Date.now() / 1000) + 3600;
     const request = createRequest({ room_id: 'room456', mode: 'manual', temp: 21, endtime });
 
-    await POST(request, {}, mockSession);
+    await POST(request, {} as any);
 
     expect(NETATMO_API.setRoomThermpoint).toHaveBeenCalledWith(
       'test-access-token',
@@ -227,11 +228,11 @@ describe('POST /api/netatmo/setroomthermpoint', () => {
   });
 
   it('should return 500 when Netatmo API command fails', async () => {
-    NETATMO_API.setRoomThermpoint.mockResolvedValueOnce(false);
+    (NETATMO_API.setRoomThermpoint as jest.Mock).mockResolvedValueOnce(false);
 
     const request = createRequest({ room_id: 'room456', mode: 'manual', temp: 21 });
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(500);
@@ -241,7 +242,7 @@ describe('POST /api/netatmo/setroomthermpoint', () => {
   it('should handle max mode correctly', async () => {
     const request = createRequest({ room_id: 'room456', mode: 'max' });
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -256,7 +257,7 @@ describe('POST /api/netatmo/setroomthermpoint', () => {
   it('should handle off mode correctly', async () => {
     const request = createRequest({ room_id: 'room456', mode: 'off' });
 
-    const response = await POST(request, {}, mockSession);
+    const response = await POST(request, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -271,7 +272,7 @@ describe('POST /api/netatmo/setroomthermpoint', () => {
   it('should use environment-aware path for home_id', async () => {
     const request = createRequest({ room_id: 'room456', mode: 'home' });
 
-    await POST(request, {}, mockSession);
+    await POST(request, {} as any);
 
     expect(getEnvironmentPath).toHaveBeenCalledWith('netatmo/home_id');
     expect(adminDbGet).toHaveBeenCalledWith('netatmo/home_id');

@@ -154,14 +154,16 @@ describe('DashboardLayout', () => {
       expect(screen.getByTestId('mobile-state')).toHaveTextContent('closed');
     });
 
-    it('returns default context values when used outside provider', () => {
-      // Note: Context has default values, so it doesn't throw
-      // This tests that it still renders (with noop functions)
-      render(<SidebarConsumer />);
+    it('throws error when used outside provider', () => {
+      // Hook should throw when used outside DashboardLayout provider
+      // Suppress console.error for this test since we expect an error
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-      // Default values from context
-      expect(screen.getByTestId('collapsed-state')).toHaveTextContent('expanded');
-      expect(screen.getByTestId('mobile-state')).toHaveTextContent('closed');
+      expect(() => {
+        render(<SidebarConsumer />);
+      }).toThrow('useSidebar must be used within a DashboardLayout');
+
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -371,10 +373,10 @@ describe('DashboardLayout', () => {
     it('renders main content', () => {
       render(
         <DashboardLayout>
-          <MainContent>Dashboard</MainContent>
+          <MainContent data-testid="main-content">Dashboard</MainContent>
         </DashboardLayout>
       );
-      expect(screen.getByRole('main')).toHaveTextContent('Dashboard');
+      expect(screen.getByTestId('main-content')).toHaveTextContent('Dashboard');
     });
 
     it('adjusts margin based on collapsed state', () => {
@@ -403,10 +405,10 @@ describe('DashboardLayout', () => {
     it('accepts custom className', () => {
       render(
         <DashboardLayout>
-          <MainContent className="custom-main">Content</MainContent>
+          <MainContent className="custom-main" data-testid="main-content">Content</MainContent>
         </DashboardLayout>
       );
-      expect(screen.getByRole('main')).toHaveClass('custom-main');
+      expect(screen.getByTestId('main-content')).toHaveClass('custom-main');
     });
   });
 

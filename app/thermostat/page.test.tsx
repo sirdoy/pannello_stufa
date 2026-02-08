@@ -38,6 +38,11 @@ jest.mock('@/app/components/ui', () => {
       <p>{description}</p>
     </header>
   );
+  const MockTabs = ({ children }) => <div data-testid="tabs">{children}</div>;
+  MockTabs.List = ({ children }) => <div data-testid="tabs-list">{children}</div>;
+  MockTabs.Trigger = ({ children, value }) => <button data-value={value}>{children}</button>;
+  MockTabs.Content = ({ children }) => <div>{children}</div>;
+
   return {
     Card: ({ children }) => <div data-testid="card">{children}</div>,
     Button: ({ children, onClick }) => <button onClick={onClick}>{children}</button>,
@@ -51,6 +56,7 @@ jest.mock('@/app/components/ui', () => {
     Grid: ({ children }) => <div>{children}</div>,
     InfoBox: ({ title, children }) => <div data-testid="info-box"><strong>{title}</strong>{children}</div>,
     PageLayout: MockPageLayout,
+    Tabs: MockTabs,
   };
 });
 

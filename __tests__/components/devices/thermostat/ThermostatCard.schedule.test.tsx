@@ -27,7 +27,8 @@ jest.mock('@/lib/hooks/useScheduleData');
 const mockedUseScheduleData = jest.mocked(useScheduleData);
 
 // Mock fetch
-const mockedFetch = jest.mocked(global.fetch);
+global.fetch = jest.fn() as jest.MockedFunction<typeof fetch>;
+const mockedFetch = global.fetch as jest.MockedFunction<typeof fetch>;
 
 describe('ThermostatCard - Schedule Section', () => {
   const mockSchedules = [
@@ -47,11 +48,12 @@ describe('ThermostatCard - Schedule Section', () => {
       activeSchedule: mockSchedules[0],
       loading: false,
       refetch: mockRefetch,
-    });
+    } as any);
 
     // Mock initial connection check (connected)
     mockedFetch.mockImplementation((url) => {
-      if (url.includes('/api/netatmo/homesdata')) {
+      const urlString = typeof url === 'string' ? url : url.toString();
+      if (urlString.includes('/api/netatmo/homesdata')) {
         return Promise.resolve({
           ok: true,
           json: async () => ({
@@ -66,9 +68,9 @@ describe('ThermostatCard - Schedule Section', () => {
             ],
             modules: [],
           }),
-        });
+        } as Response);
       }
-      if (url.includes('/api/netatmo/homestatus')) {
+      if (urlString.includes('/api/netatmo/homestatus')) {
         return Promise.resolve({
           ok: true,
           json: async () => ({
@@ -87,12 +89,12 @@ describe('ThermostatCard - Schedule Section', () => {
             hasLowBattery: false,
             hasCriticalBattery: false,
           }),
-        });
+        } as Response);
       }
       return Promise.resolve({
         ok: true,
         json: async () => ({}),
-      });
+      } as Response);
     });
   });
 
@@ -124,7 +126,7 @@ describe('ThermostatCard - Schedule Section', () => {
       activeSchedule: null,
       loading: true,
       refetch: mockRefetch,
-    });
+    } as any);
 
     render(<ThermostatCard />);
 
@@ -146,7 +148,7 @@ describe('ThermostatCard - Schedule Section', () => {
       activeSchedule: null,
       loading: false,
       refetch: mockRefetch,
-    });
+    } as any);
 
     render(<ThermostatCard />);
 

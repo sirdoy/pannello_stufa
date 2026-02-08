@@ -8,6 +8,7 @@ import {
   UserInfoCard
 } from '../DropdownComponents';
 import { User, LogOut } from 'lucide-react';
+import { PageTransitionProvider } from '@/app/context/PageTransitionContext';
 
 // Mock next/link
 jest.mock('next/link', () => {
@@ -19,6 +20,15 @@ jest.mock('next/link', () => {
   MockLink.displayName = 'MockLink';
   return MockLink;
 });
+
+// Helper to render with providers
+const renderWithProviders = (ui: React.ReactElement) => {
+  return render(
+    <PageTransitionProvider>
+      {ui}
+    </PageTransitionProvider>
+  );
+};
 
 describe('DropdownComponents', () => {
   describe('DropdownContainer', () => {
@@ -43,7 +53,7 @@ describe('DropdownComponents', () => {
 
   describe('DropdownItem', () => {
     it('renders with label and icon', () => {
-      render(
+      renderWithProviders(
         <DropdownItem
           href="/test"
           label="Test Item"
@@ -55,7 +65,7 @@ describe('DropdownComponents', () => {
     });
 
     it('renders with description', () => {
-      render(
+      renderWithProviders(
         <DropdownItem
           href="/test"
           label="Test Item"
@@ -66,7 +76,7 @@ describe('DropdownComponents', () => {
     });
 
     it('applies active state correctly', () => {
-      const { container } = render(
+      const { container } = renderWithProviders(
         <DropdownItem
           href="/test"
           label="Active Item"
@@ -118,7 +128,7 @@ describe('DropdownComponents', () => {
 
   describe('MenuItem', () => {
     it('renders standard menu item', () => {
-      render(
+      renderWithProviders(
         <MenuItem
           href="/test"
           label="Test Menu"
@@ -130,7 +140,7 @@ describe('DropdownComponents', () => {
     });
 
     it('applies prominent variant correctly', () => {
-      const { container } = render(
+      const { container } = renderWithProviders(
         <MenuItem
           href="/logout"
           label="Logout"

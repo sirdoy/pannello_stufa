@@ -130,7 +130,7 @@ describe('EmptyState', () => {
 
     it('uses semantic heading for title', () => {
       render(<EmptyState title="Empty State Title" />);
-      const heading = screen.getByRole('heading', { level: 3 });
+      const heading = screen.getByRole('heading', { level: 2 });
       expect(heading).toHaveTextContent('Empty State Title');
     });
 

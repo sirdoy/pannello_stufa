@@ -25,10 +25,16 @@ interface ApiError {
   error?: string;
 }
 
+/** Response from GET /api/schedules */
+interface GetSchedulesResponse {
+  schedules: ScheduleMetadata[];
+  activeScheduleId: string;
+}
+
 /**
  * Get all schedules (metadata only)
  */
-export async function getAllSchedules(): Promise<ScheduleMetadata[]> {
+export async function getAllSchedules(): Promise<GetSchedulesResponse> {
   const response = await fetch('/api/schedules', {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' }

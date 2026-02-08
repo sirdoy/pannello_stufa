@@ -1040,12 +1040,14 @@ export default function StovePage() {
       {/* Toast Notification */}
       {toast && (
         <Toast
-          message={toast.message}
-          icon={toast.icon}
           variant={toast.variant}
+          open={!!toast}
+          onOpenChange={(open) => !open && setToast(null)}
           duration={3000}
-          onDismiss={() => setToast(null)}
-        />
+        >
+          {toast.icon && <span>{toast.icon}</span>}
+          {toast.message}
+        </Toast>
       )}
     </div>
   );

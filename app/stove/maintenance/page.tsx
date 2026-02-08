@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
@@ -111,7 +112,9 @@ export default function MaintenancePage() {
       <div className="flex items-center justify-center py-20">
         <Card variant="glass" className="p-8 text-center">
           <Text variant="tertiary" className="mb-4">Accesso non autorizzato</Text>
-          <Button href="/auth/login" variant="ember">Accedi</Button>
+          <Link href="/auth/login">
+            <Button variant="ember">Accedi</Button>
+          </Link>
         </Card>
       </div>
     );
@@ -191,7 +194,7 @@ export default function MaintenancePage() {
                 type="number"
                 label="Ore di utilizzo prima della pulizia"
                 icon="⏱️"
-                variant="ember"
+                variant="default"
                 min="1"
                 max="1000"
                 step="1"

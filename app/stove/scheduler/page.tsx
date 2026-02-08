@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getWeeklySchedule, getFullSchedulerMode, getNextScheduledChange } from '@/lib/schedulerService';
+import { getWeeklySchedule, getFullSchedulerMode, getNextScheduledChange, type ScheduleInterval as ServiceScheduleInterval } from '@/lib/schedulerService';
 import { saveSchedule as apiSaveSchedule, setSchedulerMode, setSemiManualMode, clearSemiManualMode } from '@/lib/schedulerApiClient';
 import {
   getAllSchedules,
@@ -33,6 +33,7 @@ interface ScheduleInterval {
   start: string;
   end: string;
   power?: number;
+  fan?: number;
 }
 
 type WeekSchedule = Record<DayOfWeek, ScheduleInterval[]>;
@@ -140,7 +141,7 @@ export default function WeeklyScheduler() {
           // Ordina gli intervalli caricati da Firebase
           acc[day] = sortIntervals(data[day] || []);
           return acc;
-        }, {});
+        }, {} as WeekSchedule);
         setSchedule(filledData);
 
         // Auto-select first day with intervals ONLY on initial load
@@ -191,7 +192,7 @@ export default function WeeklyScheduler() {
           const remoteSchedule = daysOfWeek.reduce((acc, day) => {
             acc[day] = sortIntervals(data[day] || []);
             return acc;
-          }, {});
+          }, {} as WeekSchedule);
 
           setSchedule(remoteSchedule);
 
@@ -216,7 +217,7 @@ export default function WeeklyScheduler() {
   // Wrapper for saveSchedule that tracks local saves
   const saveSchedule = async (day: DayOfWeek, intervals: ScheduleInterval[]): Promise<void> => {
     setLastLocalSave(Date.now());
-    await apiSaveSchedule(day, intervals);
+    await apiSaveSchedule(day, intervals as ServiceScheduleInterval[]);
   };
 
   const addTimeRange = (day: DayOfWeek): void => {
@@ -648,7 +649,7 @@ export default function WeeklyScheduler() {
       const filledData = daysOfWeek.reduce((acc, day) => {
         acc[day] = sortIntervals(data[day] || []);
         return acc;
-      }, {});
+      }, {} as WeekSchedule);
       setSchedule(filledData);
 
       setToast({
@@ -787,7 +788,7 @@ export default function WeeklyScheduler() {
             <div className="flex gap-3">
               {schedulerEnabled && semiManualMode && (
                 <Button
-                  variant="warning"
+                  variant="subtle"
                   onClick={handleClearSemiManual}
                   className="flex-1"
                   icon="↩️"
@@ -820,7 +821,7 @@ export default function WeeklyScheduler() {
         </Card>
 
         {/* Right: Weekly Stats */}
-        <WeeklySummaryCard schedule={schedule} />
+        <WeeklySummaryCard schedule={schedule as any} />
       </div>
 
       {/* Weekly Timeline - Always Visible */}
@@ -831,16 +832,16 @@ export default function WeeklyScheduler() {
           </Heading>
         </div>
         <WeeklyTimeline
-          schedule={schedule}
+          schedule={schedule as any}
           selectedDay={selectedDay}
-          onSelectDay={setSelectedDay}
+          onSelectDay={setSelectedDay as (day: string) => void}
         />
       </Card>
 
       {/* Day Edit Panel - Shows selected day */}
       <DayEditPanel
         day={selectedDay}
-        intervals={schedule[selectedDay] || []}
+        intervals={schedule[selectedDay] as any || []}
         onAddInterval={() => addTimeRange(selectedDay)}
         onEditIntervalModal={(index) => handleEditIntervalRequest(selectedDay, index)}
         onDeleteInterval={(index) => handleRemoveIntervalRequest(selectedDay, index)}
@@ -874,8 +875,8 @@ export default function WeeklyScheduler() {
       <AddIntervalModal
         isOpen={addIntervalModal.isOpen}
         mode={addIntervalModal.mode}
-        day={addIntervalModal.day}
-        initialInterval={addIntervalModal.initialInterval}
+        day={addIntervalModal.day as string}
+        initialInterval={addIntervalModal.initialInterval as any}
         suggestedStart={addIntervalModal.suggestedStart}
         onConfirm={handleConfirmAddInterval}
         onCancel={handleCancelAddInterval}
@@ -903,7 +904,7 @@ export default function WeeklyScheduler() {
       {/* Toast Notifications */}
       {toast && (
         <Toast
-          variant={toast.variant}
+          variant={toast.variant as 'success' | 'error' | 'warning' | 'info'}
           open={!!toast}
           onOpenChange={(open) => !open && setToast(null)}
           duration={3000}

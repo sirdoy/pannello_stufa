@@ -189,7 +189,7 @@ export default function CreateScheduleModal({
                   icon="📋"
                   value={copyFromId}
                   onChange={(e) => {
-                    setCopyFromId(String(e.target.value));
+                    setCopyFromId(e.target.value as string);
                     setError('');
                   }}
                   placeholder="Seleziona una pianificazione..."

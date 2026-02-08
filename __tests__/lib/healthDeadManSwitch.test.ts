@@ -6,14 +6,19 @@ import {
   updateDeadManSwitch,
   checkDeadManSwitch,
   alertDeadManSwitch,
-} from '../../lib/healthDeadManSwitch.ts';
+} from '../../lib/healthDeadManSwitch';
 
 // Mock dependencies
-jest.mock('../../lib/firebaseAdmin.ts');
-jest.mock('../../lib/notificationTriggersServer.ts');
+jest.mock('../../lib/firebaseAdmin');
+jest.mock('../../lib/notificationTriggersServer');
 
-import { adminDbSet, adminDbGet } from '../../lib/firebaseAdmin.ts';
-import { triggerMaintenanceAlertServer } from '../../lib/notificationTriggersServer.ts';
+import { adminDbSet, adminDbGet } from '../../lib/firebaseAdmin';
+import { triggerMaintenanceAlertServer } from '../../lib/notificationTriggersServer';
+
+// Use jest.mocked() for type-safe mocking
+const mockedAdminDbSet = jest.mocked(adminDbSet);
+const mockedAdminDbGet = jest.mocked(adminDbGet);
+const mockedTriggerMaintenanceAlertServer = jest.mocked(triggerMaintenanceAlertServer);
 
 describe('healthDeadManSwitch', () => {
   beforeEach(() => {
@@ -24,29 +29,29 @@ describe('healthDeadManSwitch', () => {
   });
 
   afterEach(() => {
-    console.log.mockRestore();
-    console.error.mockRestore();
+    (console.log as any).mockRestore();
+    (console.error as any).mockRestore();
   });
 
   describe('updateDeadManSwitch', () => {
     it('should write timestamp to RTDB and return true', async () => {
-      adminDbSet.mockResolvedValue();
+      mockedAdminDbSet.mockResolvedValue();
 
       const result = await updateDeadManSwitch();
 
       expect(result).toBe(true);
-      expect(adminDbSet).toHaveBeenCalledWith(
+      expect(mockedAdminDbSet).toHaveBeenCalledWith(
         'healthMonitoring/lastCheck',
         expect.any(String) // ISO timestamp
       );
 
       // Verify timestamp format (ISO 8601)
-      const timestamp = adminDbSet.mock.calls[0][1];
+      const timestamp = mockedAdminDbSet.mock.calls[0][1];
       expect(timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
 
     it('should return false on RTDB error', async () => {
-      adminDbSet.mockRejectedValue(new Error('RTDB connection failed'));
+      mockedAdminDbSet.mockRejectedValue(new Error('RTDB connection failed'));
 
       const result = await updateDeadManSwitch();
 
@@ -60,7 +65,7 @@ describe('healthDeadManSwitch', () => {
 
   describe('checkDeadManSwitch', () => {
     it('should return stale: true with reason: never_run when no timestamp exists', async () => {
-      adminDbGet.mockResolvedValue(null);
+      mockedAdminDbGet.mockResolvedValue(null);
 
       const result = await checkDeadManSwitch();
 
@@ -74,7 +79,7 @@ describe('healthDeadManSwitch', () => {
     it('should return stale: true when elapsed > 10 minutes', async () => {
       // Timestamp from 15 minutes ago
       const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
-      adminDbGet.mockResolvedValue(fifteenMinutesAgo);
+      mockedAdminDbGet.mockResolvedValue(fifteenMinutesAgo);
 
       const result = await checkDeadManSwitch();
 
@@ -87,7 +92,7 @@ describe('healthDeadManSwitch', () => {
     it('should return stale: false when elapsed < 10 minutes', async () => {
       // Timestamp from 5 minutes ago
       const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-      adminDbGet.mockResolvedValue(fiveMinutesAgo);
+      mockedAdminDbGet.mockResolvedValue(fiveMinutesAgo);
 
       const result = await checkDeadManSwitch();
 
@@ -99,7 +104,7 @@ describe('healthDeadManSwitch', () => {
     it('should return stale: true with reason: timeout exactly at 10 minutes', async () => {
       // Timestamp from exactly 10 minutes + 1ms ago (boundary test)
       const threshold = new Date(Date.now() - (10 * 60 * 1000 + 1)).toISOString();
-      adminDbGet.mockResolvedValue(threshold);
+      mockedAdminDbGet.mockResolvedValue(threshold);
 
       const result = await checkDeadManSwitch();
 
@@ -108,13 +113,18 @@ describe('healthDeadManSwitch', () => {
     });
 
     it('should return stale: true with reason: error on RTDB error', async () => {
-      adminDbGet.mockRejectedValue(new Error('RTDB read failed'));
+      mockedAdminDbGet.mockRejectedValue(new Error('RTDB read failed'));
 
       const result = await checkDeadManSwitch();
 
       expect(result.stale).toBe(true);
-      expect(result.reason).toBe('error');
-      expect(result.error).toBe('RTDB read failed');
+      // Type narrowing for discriminated union
+      if (result.stale && 'reason' in result) {
+        expect(result.reason).toBe('error');
+      }
+      if ('error' in result) {
+        expect(result.error).toBe('RTDB read failed');
+      }
     });
   });
 
@@ -130,11 +140,11 @@ describe('healthDeadManSwitch', () => {
     });
 
     it('should send maintenance alert with never_run message', async () => {
-      triggerMaintenanceAlertServer.mockResolvedValue({ success: true });
+      mockedTriggerMaintenanceAlertServer.mockResolvedValue({ success: true } as any);
 
       await alertDeadManSwitch('never_run');
 
-      expect(triggerMaintenanceAlertServer).toHaveBeenCalledWith(
+      expect(mockedTriggerMaintenanceAlertServer).toHaveBeenCalledWith(
         ADMIN_USER_ID,
         100, // Critical threshold
         {
@@ -145,12 +155,12 @@ describe('healthDeadManSwitch', () => {
     });
 
     it('should send maintenance alert with timeout message and elapsed minutes', async () => {
-      triggerMaintenanceAlertServer.mockResolvedValue({ success: true });
+      mockedTriggerMaintenanceAlertServer.mockResolvedValue({ success: true } as any);
 
       const elapsed = 15 * 60 * 1000; // 15 minutes
       await alertDeadManSwitch('timeout', { elapsed });
 
-      expect(triggerMaintenanceAlertServer).toHaveBeenCalledWith(
+      expect(mockedTriggerMaintenanceAlertServer).toHaveBeenCalledWith(
         ADMIN_USER_ID,
         100,
         {
@@ -161,7 +171,7 @@ describe('healthDeadManSwitch', () => {
     });
 
     it('should not throw if notification fails', async () => {
-      triggerMaintenanceAlertServer.mockResolvedValue({
+      mockedTriggerMaintenanceAlertServer.mockResolvedValue({
         success: false,
         error: 'No FCM tokens',
       });
@@ -176,7 +186,7 @@ describe('healthDeadManSwitch', () => {
     });
 
     it('should not throw if notification throws exception', async () => {
-      triggerMaintenanceAlertServer.mockRejectedValue(new Error('Network error'));
+      mockedTriggerMaintenanceAlertServer.mockRejectedValue(new Error('Network error'));
 
       await expect(alertDeadManSwitch('never_run'))
         .resolves

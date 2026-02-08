@@ -15,7 +15,7 @@ jest.mock('date-fns', () => ({
 
 describe('ConnectionStatusCard', () => {
   it('renders loading state when stats is null', () => {
-    render(<ConnectionStatusCard stats={null} />);
+    render(<ConnectionStatusCard stats={null} error={null} />);
 
     // Should show heading
     expect(screen.getByText('Stove Connection')).toBeInTheDocument();
@@ -35,7 +35,7 @@ describe('ConnectionStatusCard', () => {
       successRate: '95.0',
     };
 
-    render(<ConnectionStatusCard stats={stats} />);
+    render(<ConnectionStatusCard stats={stats} error={null} />);
 
     // Should display uptime percentage prominently
     expect(screen.getByText('95.0%')).toBeInTheDocument();
@@ -52,7 +52,7 @@ describe('ConnectionStatusCard', () => {
       successRate: '97.5',
     };
 
-    render(<ConnectionStatusCard stats={stats} />);
+    render(<ConnectionStatusCard stats={stats} error={null} />);
 
     expect(screen.getByText('online')).toBeInTheDocument();
   });
@@ -67,7 +67,7 @@ describe('ConnectionStatusCard', () => {
       successRate: '85.0',
     };
 
-    render(<ConnectionStatusCard stats={stats} />);
+    render(<ConnectionStatusCard stats={stats} error={null} />);
 
     expect(screen.getByText('degraded')).toBeInTheDocument();
   });
@@ -82,7 +82,7 @@ describe('ConnectionStatusCard', () => {
       successRate: '50.0',
     };
 
-    render(<ConnectionStatusCard stats={stats} />);
+    render(<ConnectionStatusCard stats={stats} error={null} />);
 
     expect(screen.getByText('offline')).toBeInTheDocument();
   });
@@ -97,7 +97,7 @@ describe('ConnectionStatusCard', () => {
       successRate: '90.0',
     };
 
-    render(<ConnectionStatusCard stats={stats} />);
+    render(<ConnectionStatusCard stats={stats} error={null} />);
 
     // Should display counts (with locale formatting)
     expect(screen.getByText('180')).toBeInTheDocument();
@@ -118,7 +118,7 @@ describe('ConnectionStatusCard', () => {
       successRate: '95.0',
     };
 
-    render(<ConnectionStatusCard stats={stats} />);
+    render(<ConnectionStatusCard stats={stats} error={null} />);
 
     expect(screen.getByText(/5 state mismatches detected/i)).toBeInTheDocument();
     expect(screen.getByText(/Stove state did not match expected scheduler state/i)).toBeInTheDocument();
@@ -134,7 +134,7 @@ describe('ConnectionStatusCard', () => {
       successRate: '95.0',
     };
 
-    render(<ConnectionStatusCard stats={stats} />);
+    render(<ConnectionStatusCard stats={stats} error={null} />);
 
     expect(screen.queryByText(/mismatch/i)).not.toBeInTheDocument();
   });
@@ -142,7 +142,7 @@ describe('ConnectionStatusCard', () => {
 
 describe('DeadManSwitchPanel', () => {
   it('renders loading state when status is null', () => {
-    render(<DeadManSwitchPanel status={null} />);
+    render(<DeadManSwitchPanel status={null} error={null} />);
 
     // Should show heading
     expect(screen.getByText('Cron Health')).toBeInTheDocument();
@@ -154,12 +154,12 @@ describe('DeadManSwitchPanel', () => {
 
   it('shows "healthy" badge when stale is false', () => {
     const status = {
-      stale: false,
+      stale: false as const,
       elapsed: 30000, // 30 seconds
       lastCheck: new Date().toISOString(),
     };
 
-    render(<DeadManSwitchPanel status={status} />);
+    render(<DeadManSwitchPanel status={status} error={null} />);
 
     expect(screen.getByText('healthy')).toBeInTheDocument();
     expect(screen.getByText('Sistema attivo')).toBeInTheDocument();
@@ -167,13 +167,13 @@ describe('DeadManSwitchPanel', () => {
 
   it('shows "stale" badge when stale is true', () => {
     const status = {
-      stale: true,
-      reason: 'timeout',
+      stale: true as const,
+      reason: 'timeout' as const,
       elapsed: 700000, // > 10 minutes
       lastCheck: new Date(Date.now() - 700000).toISOString(),
     };
 
-    render(<DeadManSwitchPanel status={status} />);
+    render(<DeadManSwitchPanel status={status} error={null} />);
 
     // Should show "stale" badge
     const badges = screen.getAllByText('stale');
@@ -182,11 +182,11 @@ describe('DeadManSwitchPanel', () => {
 
   it('displays correct message for "never_run" reason', () => {
     const status = {
-      stale: true,
-      reason: 'never_run',
+      stale: true as const,
+      reason: 'never_run' as const,
     };
 
-    render(<DeadManSwitchPanel status={status} />);
+    render(<DeadManSwitchPanel status={status} error={null} />);
 
     expect(screen.getByText('Cron mai eseguito')).toBeInTheDocument();
     expect(screen.getByText(/Il sistema di monitoraggio non ha ancora registrato/i)).toBeInTheDocument();
@@ -194,13 +194,13 @@ describe('DeadManSwitchPanel', () => {
 
   it('displays elapsed time for "timeout" reason', () => {
     const status = {
-      stale: true,
-      reason: 'timeout',
+      stale: true as const,
+      reason: 'timeout' as const,
       elapsed: 720000, // 12 minutes
       lastCheck: new Date(Date.now() - 720000).toISOString(),
     };
 
-    render(<DeadManSwitchPanel status={status} />);
+    render(<DeadManSwitchPanel status={status} error={null} />);
 
     expect(screen.getByText('Cron non risponde')).toBeInTheDocument();
 
@@ -213,12 +213,12 @@ describe('DeadManSwitchPanel', () => {
 
   it('displays error message for "error" reason', () => {
     const status = {
-      stale: true,
-      reason: 'error',
+      stale: true as const,
+      reason: 'error' as const,
       error: 'Database connection failed',
     };
 
-    render(<DeadManSwitchPanel status={status} />);
+    render(<DeadManSwitchPanel status={status} error={null} />);
 
     expect(screen.getByText('Errore di sistema')).toBeInTheDocument();
     expect(screen.getByText('Database connection failed')).toBeInTheDocument();
@@ -226,12 +226,12 @@ describe('DeadManSwitchPanel', () => {
 
   it('displays last check time for healthy status', () => {
     const status = {
-      stale: false,
+      stale: false as const,
       elapsed: 30000,
       lastCheck: new Date().toISOString(),
     };
 
-    render(<DeadManSwitchPanel status={status} />);
+    render(<DeadManSwitchPanel status={status} error={null} />);
 
     // Mock returns "5 minuti fa"
     expect(screen.getByText(/Ultimo controllo:/i)).toBeInTheDocument();

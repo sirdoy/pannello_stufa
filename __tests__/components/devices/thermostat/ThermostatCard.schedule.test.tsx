@@ -23,8 +23,11 @@ jest.mock('next/navigation', () => ({
 // Mock useScheduleData hook
 jest.mock('@/lib/hooks/useScheduleData');
 
+// Get typed mocks
+const mockedUseScheduleData = jest.mocked(useScheduleData);
+
 // Mock fetch
-global.fetch = jest.fn();
+const mockedFetch = jest.mocked(global.fetch);
 
 describe('ThermostatCard - Schedule Section', () => {
   const mockSchedules = [
@@ -39,7 +42,7 @@ describe('ThermostatCard - Schedule Section', () => {
     jest.clearAllMocks();
 
     // Default: connected state with schedules loaded
-    useScheduleData.mockReturnValue({
+    mockedUseScheduleData.mockReturnValue({
       schedules: mockSchedules,
       activeSchedule: mockSchedules[0],
       loading: false,
@@ -47,7 +50,7 @@ describe('ThermostatCard - Schedule Section', () => {
     });
 
     // Mock initial connection check (connected)
-    global.fetch.mockImplementation((url) => {
+    mockedFetch.mockImplementation((url) => {
       if (url.includes('/api/netatmo/homesdata')) {
         return Promise.resolve({
           ok: true,
@@ -116,7 +119,7 @@ describe('ThermostatCard - Schedule Section', () => {
   });
 
   test('shows loading spinner while schedule data loads', async () => {
-    useScheduleData.mockReturnValue({
+    mockedUseScheduleData.mockReturnValue({
       schedules: [],
       activeSchedule: null,
       loading: true,
@@ -138,7 +141,7 @@ describe('ThermostatCard - Schedule Section', () => {
   });
 
   test('shows empty state when no schedules available', async () => {
-    useScheduleData.mockReturnValue({
+    mockedUseScheduleData.mockReturnValue({
       schedules: [],
       activeSchedule: null,
       loading: false,

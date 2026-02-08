@@ -68,10 +68,16 @@ See `.planning/milestones/` for full archives.
 3. All lib/ functions handle null/undefined edge cases properly
 4. tsc --noEmit shows zero errors in lib/ directory
 
-**Plans**: TBD
+**Plans**: 7 plans
 
 Plans:
-- [ ] 44-01: TBD after phase planning
+- [ ] 44-01-PLAN.md — Enable strict mode + fix miscellaneous lib/ files (health, sandbox, repositories, commands, migration)
+- [ ] 44-02-PLAN.md — Fix notification triggers + filter (notificationTriggers, notificationTriggersServer, notificationFilter)
+- [ ] 44-03-PLAN.md — Fix notification services (notificationService, notificationPreferencesService, notificationLogger, notificationHistoryService, notificationValidation)
+- [ ] 44-04-PLAN.md — Fix Firebase + services (firebaseAdmin, tokenRefresh, unifiedDeviceConfigService, StoveService, pidAutomationService)
+- [ ] 44-05-PLAN.md — Fix Netatmo + coordination + scheduler (netatmoStoveSync, netatmoService, coordinationOrchestrator, schedulerStats, schedulerService, + 3 small files)
+- [ ] 44-06-PLAN.md — Fix hooks + PWA (useGeofencing, useOnlineStatus, usePWAInstall, useBackgroundSync, usePeriodicSync, useScheduleData, useRoomStatus, pwa/geofencing)
+- [ ] 44-07-PLAN.md — Fix test files + final verification (5 test files, gap sweep, zero lib/ errors confirmed)
 
 ---
 
@@ -172,11 +178,11 @@ Plans:
 | 11-18 | v3.0 | 52/52 | ✓ Complete | 2026-01-30 |
 | 6-10 | v2.0 | 21/21 | ✓ Complete | 2026-01-28 |
 | 1-5 | v1.0 | 29/29 | ✓ Complete | 2026-01-26 |
-| **44** | **v5.1** | **0/TBD** | **Not started** | **-** |
+| **44** | **v5.1** | **0/7** | **Planned** | **-** |
 | **45** | **v5.1** | **0/TBD** | **Not started** | **-** |
 | **46** | **v5.1** | **0/TBD** | **Not started** | **-** |
 | **47** | **v5.1** | **0/TBD** | **Not started** | **-** |
 | **48** | **v5.1** | **0/TBD** | **Not started** | **-** |
 
 ---
-*Last updated: 2026-02-08 — v5.1 Tech Debt & Code Quality roadmap created*
+*Last updated: 2026-02-08 — Phase 44 planned (7 plans, 3 waves)*

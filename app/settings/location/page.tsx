@@ -22,9 +22,9 @@ import Skeleton from '@/app/components/ui/Skeleton';
 import LocationSearch from '@/app/components/LocationSearch';
 
 interface LocationData {
-  city: string;
-  lat: number;
-  lon: number;
+  latitude: number;
+  longitude: number;
+  name: string;
 }
 
 interface SaveMessage {
@@ -136,7 +136,7 @@ export default function LocationSettingsPage() {
         {/* Save feedback */}
         {saveMessage && (
           <Banner
-            variant={saveMessage.type === 'success' ? 'success' : 'danger'}
+            variant={saveMessage.type === 'success' ? 'success' : 'error'}
             compact
             className="mt-4"
           >

@@ -16,10 +16,10 @@ import Modal, {
 const TestModal = ({
   isOpen = true,
   onClose = jest.fn(),
-  size = 'md',
+  size = 'md' as const,
   children,
   ...props
-}) => (
+}: any) => (
   <Modal isOpen={isOpen} onClose={onClose} size={size} {...props}>
     <Modal.Header>
       <Modal.Title>Test Modal</Modal.Title>

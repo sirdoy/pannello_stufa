@@ -39,8 +39,8 @@ describe('hueRemoteTokenHelper', () => {
 
     // Mock ref to return a mock reference object
     const { ref, update } = require('firebase/database');
-    ref.mockReturnValue('mock-ref');
-    update.mockResolvedValue();
+    (ref as jest.Mock).mockReturnValue('mock-ref');
+    (update as jest.Mock).mockResolvedValue(undefined);
   });
 
   describe('getValidRemoteAccessToken', () => {
@@ -48,7 +48,7 @@ describe('hueRemoteTokenHelper', () => {
       const { ref, get, update } = require('firebase/database');
 
       // Mock Firebase get (has refresh token, but no valid cached access_token)
-      get.mockResolvedValue({
+      (get as jest.Mock).mockResolvedValue({
         exists: () => true,
         val: () => ({
           refresh_token: 'old-refresh-token',
@@ -57,7 +57,7 @@ describe('hueRemoteTokenHelper', () => {
       });
 
       // Mock Hue OAuth refresh endpoint (standard OAuth2 token endpoint)
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         ok: true,
         status: 200,
         headers: { get: () => 'application/json' },
@@ -92,7 +92,7 @@ describe('hueRemoteTokenHelper', () => {
       const { get } = require('firebase/database');
 
       // Mock Firebase get (has valid cached access_token)
-      get.mockResolvedValue({
+      (get as jest.Mock).mockResolvedValue({
         exists: () => true,
         val: () => ({
           refresh_token: 'refresh-token',
@@ -116,7 +116,7 @@ describe('hueRemoteTokenHelper', () => {
       const { get } = require('firebase/database');
 
       // Mock Firebase get (no refresh token, no access_token)
-      get.mockResolvedValue({
+      (get as jest.Mock).mockResolvedValue({
         exists: () => false,
       });
 
@@ -134,7 +134,7 @@ describe('hueRemoteTokenHelper', () => {
       const { get } = require('firebase/database');
 
       // Mock Firebase get (has refresh token, no cached access_token)
-      get.mockResolvedValue({
+      (get as jest.Mock).mockResolvedValue({
         exists: () => true,
         val: () => ({
           refresh_token: 'invalid-token',
@@ -143,7 +143,7 @@ describe('hueRemoteTokenHelper', () => {
       });
 
       // Mock Hue OAuth error
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         ok: false,
         status: 400,
         headers: { get: () => 'application/json' },
@@ -180,7 +180,7 @@ describe('hueRemoteTokenHelper', () => {
     });
 
     it('should exchange authorization code for tokens', async () => {
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         ok: true,
         json: async () => ({
           access_token: 'access-token',
@@ -216,7 +216,7 @@ describe('hueRemoteTokenHelper', () => {
     });
 
     it('should throw error when code exchange fails', async () => {
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         ok: false,
         json: async () => ({
           error: 'invalid_request',
@@ -268,7 +268,7 @@ describe('hueRemoteTokenHelper', () => {
     it('should return true when refresh token exists', async () => {
       const { get } = require('firebase/database');
 
-      get.mockResolvedValue({
+      (get as jest.Mock).mockResolvedValue({
         exists: () => true,
         val: () => ({ refresh_token: 'token' }),
       });
@@ -281,7 +281,7 @@ describe('hueRemoteTokenHelper', () => {
     it('should return false when no refresh token', async () => {
       const { get } = require('firebase/database');
 
-      get.mockResolvedValue({
+      (get as jest.Mock).mockResolvedValue({
         exists: () => false,
       });
 

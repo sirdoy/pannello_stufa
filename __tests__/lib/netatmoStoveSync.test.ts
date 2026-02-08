@@ -46,6 +46,14 @@ import { adminDbGet, adminDbSet, adminDbUpdate } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getValidAccessToken } from '@/lib/netatmoTokenHelper';
 
+// Type assertions for mocked functions
+const mockedAdminDbGet = adminDbGet as jest.MockedFunction<typeof adminDbGet>;
+const mockedAdminDbSet = adminDbSet as jest.MockedFunction<typeof adminDbSet>;
+const mockedAdminDbUpdate = adminDbUpdate as jest.MockedFunction<typeof adminDbUpdate>;
+const mockedGetValidAccessToken = getValidAccessToken as jest.MockedFunction<typeof getValidAccessToken>;
+const mockedNetatmoApiGetHomeStatus = NETATMO_API.getHomeStatus as jest.MockedFunction<typeof NETATMO_API.getHomeStatus>;
+const mockedNetatmoApiSetRoomThermpoint = NETATMO_API.setRoomThermpoint as jest.MockedFunction<typeof NETATMO_API.setRoomThermpoint>;
+
 describe('netatmoStoveSync', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -60,7 +68,7 @@ describe('netatmoStoveSync', () => {
         stoveMode: false,
       };
 
-      adminDbGet.mockResolvedValue(mockConfig);
+      mockedAdminDbGet.mockResolvedValue(mockConfig);
 
       const result = await getStoveSyncConfig();
 
@@ -69,7 +77,7 @@ describe('netatmoStoveSync', () => {
     });
 
     it('should return default config when Firebase returns null', async () => {
-      adminDbGet.mockResolvedValue(null);
+      mockedAdminDbGet.mockResolvedValue(null);
 
       const result = await getStoveSyncConfig();
 
@@ -112,7 +120,7 @@ describe('netatmoStoveSync', () => {
 
   describe('disableStoveSync', () => {
     it('should update config to disabled', async () => {
-      adminDbGet.mockResolvedValue({
+      mockedAdminDbGet.mockResolvedValue({
         enabled: true,
         livingRoomId: 'room-123',
         stoveMode: false,
@@ -131,7 +139,7 @@ describe('netatmoStoveSync', () => {
 
   describe('syncLivingRoomWithStove', () => {
     it('should return disabled when sync is not enabled', async () => {
-      adminDbGet.mockResolvedValue({
+      mockedAdminDbGet.mockResolvedValue({
         enabled: false,
         livingRoomId: 'room-123',
       });
@@ -146,7 +154,7 @@ describe('netatmoStoveSync', () => {
     });
 
     it('should return not_configured when rooms are not configured', async () => {
-      adminDbGet.mockResolvedValue({
+      mockedAdminDbGet.mockResolvedValue({
         enabled: true,
         rooms: [], // Empty rooms array - new format
       });
@@ -161,7 +169,7 @@ describe('netatmoStoveSync', () => {
     });
 
     it('should return no_change when stove state matches current mode', async () => {
-      adminDbGet.mockResolvedValue({
+      mockedAdminDbGet.mockResolvedValue({
         enabled: true,
         livingRoomId: 'room-123',
         stoveMode: true, // Already in stove mode
@@ -178,7 +186,7 @@ describe('netatmoStoveSync', () => {
 
     it('should set room to stove temperature when stove turns ON', async () => {
       // First call: getStoveSyncConfig
-      adminDbGet.mockResolvedValueOnce({
+      mockedAdminDbGet.mockResolvedValueOnce({
         enabled: true,
         livingRoomId: 'room-123',
         livingRoomName: 'Salotto',
@@ -186,7 +194,7 @@ describe('netatmoStoveSync', () => {
         stoveMode: false,
       });
       // Second call: home_id
-      adminDbGet.mockResolvedValueOnce('home-456');
+      mockedAdminDbGet.mockResolvedValueOnce('home-456');
 
       getValidAccessToken.mockResolvedValue({ accessToken: 'valid-token' });
 
@@ -215,7 +223,7 @@ describe('netatmoStoveSync', () => {
 
     it('should return room to schedule when stove turns OFF', async () => {
       // First call: getStoveSyncConfig (for sync check)
-      adminDbGet.mockResolvedValueOnce({
+      mockedAdminDbGet.mockResolvedValueOnce({
         enabled: true,
         livingRoomId: 'room-123',
         livingRoomName: 'Salotto',
@@ -223,9 +231,9 @@ describe('netatmoStoveSync', () => {
         stoveMode: true, // Currently in stove mode
       });
       // Second call: home_id
-      adminDbGet.mockResolvedValueOnce('home-456');
+      mockedAdminDbGet.mockResolvedValueOnce('home-456');
       // Third call: getStoveSyncConfig (in setLivingRoomToSchedule)
-      adminDbGet.mockResolvedValueOnce({
+      mockedAdminDbGet.mockResolvedValueOnce({
         enabled: true,
         livingRoomId: 'room-123',
         livingRoomName: 'Salotto',
@@ -281,7 +289,7 @@ describe('netatmoStoveSync', () => {
   describe('checkStoveSyncOnStatusChange', () => {
     beforeEach(() => {
       // Default: sync enabled and not in stove mode
-      adminDbGet.mockResolvedValue({
+      mockedAdminDbGet.mockResolvedValue({
         enabled: true,
         rooms: [{ id: 'room-123', name: 'Salotto' }],
         stoveTemperature: 16,
@@ -386,7 +394,7 @@ describe('netatmoStoveSync', () => {
 
   describe('enforceStoveSyncSetpoints', () => {
     it('should return disabled when sync is not enabled', async () => {
-      adminDbGet.mockResolvedValue({ enabled: false, rooms: [] });
+      mockedAdminDbGet.mockResolvedValue({ enabled: false, rooms: [] });
 
       const result = await enforceStoveSyncSetpoints(true);
 
@@ -470,13 +478,13 @@ describe('netatmoStoveSync', () => {
     });
 
     it('should re-apply setpoints when room setpoint is undefined (not found in Netatmo response)', async () => {
-      adminDbGet.mockResolvedValueOnce({
+      mockedAdminDbGet.mockResolvedValueOnce({
         enabled: true,
         rooms: [{ id: 'room-123', name: 'Salotto' }],
         stoveTemperature: 16,
         stoveMode: true,
       });
-      adminDbGet.mockResolvedValueOnce('home-456');
+      mockedAdminDbGet.mockResolvedValueOnce('home-456');
 
       getValidAccessToken.mockResolvedValue({ accessToken: 'valid-token' });
       // Room not found in Netatmo response
@@ -495,13 +503,13 @@ describe('netatmoStoveSync', () => {
     });
 
     it('should not re-apply when setpoint is correct (within tolerance)', async () => {
-      adminDbGet.mockResolvedValueOnce({
+      mockedAdminDbGet.mockResolvedValueOnce({
         enabled: true,
         rooms: [{ id: 'room-123', name: 'Salotto' }],
         stoveTemperature: 16,
         stoveMode: true,
       });
-      adminDbGet.mockResolvedValueOnce('home-456');
+      mockedAdminDbGet.mockResolvedValueOnce('home-456');
 
       getValidAccessToken.mockResolvedValue({ accessToken: 'valid-token' });
       NETATMO_API.getHomeStatus.mockResolvedValue({

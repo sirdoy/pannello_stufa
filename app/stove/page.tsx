@@ -55,14 +55,14 @@ export default function StovePage() {
   const previousErrorCode = useRef<number>(0);
 
   // Maintenance
-  const [maintenanceStatus, setMaintenanceStatus] = useState<{ needsCleaning: boolean; currentHours: number; targetHours: number } | null>(null);
+  const [maintenanceStatus, setMaintenanceStatus] = useState<{ needsCleaning: boolean; currentHours: number; targetHours: number; percentage: number; remainingHours: number; isNearLimit: boolean } | null>(null);
   const [cleaningInProgress, setCleaningInProgress] = useState<boolean>(false);
 
   // Sandbox mode
   const [sandboxMode, setSandboxMode] = useState<boolean>(false);
 
   // Toast notification
-  const [toast, setToast] = useState<{ message: string; icon?: string; variant?: string } | null>(null);
+  const [toast, setToast] = useState<{ message: string; icon?: string; variant?: 'success' | 'error' | 'warning' | 'info' } | null>(null);
   const [loadingMessage, setLoadingMessage] = useState<string>('Caricamento...');
 
   // Firebase connection
@@ -218,7 +218,7 @@ export default function StovePage() {
         'stove/shutdown': '🌙 Stufa spenta (sincronizzato)',
         'stove/set-power': '⚡ Potenza impostata (sincronizzato)',
       };
-      const message = actionLabels[lastSyncedCommand.endpoint] || 'Comando sincronizzato';
+      const message = actionLabels[(lastSyncedCommand as any).endpoint] || 'Comando sincronizzato';
       setToast({ message, variant: 'success' });
       fetchStatusAndUpdate();
     }
@@ -802,7 +802,7 @@ export default function StovePage() {
                 <div className="flex flex-wrap gap-2 mt-4">
                   {schedulerEnabled && semiManualMode && (
                     <Button
-                      variant="warning"
+                      variant="outline"
                       size="sm"
                       onClick={handleClearSemiManual}
                     >

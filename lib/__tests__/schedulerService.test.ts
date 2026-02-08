@@ -18,6 +18,10 @@ jest.mock('../firebase', () => ({
   db: {},
 }));
 
+const mockRef = jest.mocked(ref);
+const mockSet = jest.mocked(set);
+const mockGet = jest.mocked(get);
+
 describe('schedulerService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -38,7 +42,7 @@ describe('schedulerService', () => {
 
       // Mock Firebase responses - use call order since path inspection is unreliable
       let callCount = 0;
-      get.mockImplementation(() => {
+      mockGet.mockImplementation(() => {
         callCount++;
         // First call: activeScheduleId
         if (callCount === 1) {
@@ -75,7 +79,7 @@ describe('schedulerService', () => {
       jest.spyOn(global, 'Date').mockImplementation(() => mockNow);
 
       let callCount = 0;
-      get.mockImplementation(() => {
+      mockGet.mockImplementation(() => {
         callCount++;
         // First call: activeScheduleId
         if (callCount === 1) {
@@ -111,7 +115,7 @@ describe('schedulerService', () => {
       jest.spyOn(global, 'Date').mockImplementation(() => mockNow);
 
       let callCount = 0;
-      get.mockImplementation(() => {
+      mockGet.mockImplementation(() => {
         callCount++;
         // First call: activeScheduleId
         if (callCount === 1) {
@@ -166,7 +170,7 @@ describe('schedulerService', () => {
       const emptySnapshot = {
         exists: () => false,
       };
-      get.mockResolvedValue(emptySnapshot);
+      (get as jest.Mock).mockResolvedValue(emptySnapshot);
 
       // ACT
       const result = await getNextScheduledChange();
@@ -179,7 +183,7 @@ describe('schedulerService', () => {
       // ARRANGE
       const mockNow = new Date('2025-10-15T12:00:00.000Z');
       jest.spyOn(global, 'Date').mockImplementation(() => mockNow);
-      get.mockRejectedValue(new Error('Firebase error'));
+      (get as jest.Mock).mockRejectedValue(new Error('Firebase error'));
 
       // ACT
       const result = await getNextScheduledChange();
@@ -205,7 +209,7 @@ describe('schedulerService', () => {
           { start: '18:00', end: '22:00', power: 4, fan: 3 },
         ],
       };
-      get.mockResolvedValue(mockSnapshot);
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getNextScheduledAction();
@@ -228,7 +232,7 @@ describe('schedulerService', () => {
           { start: '18:00', end: '22:00', power: 4, fan: 3 },
         ],
       };
-      get.mockResolvedValue(mockSnapshot);
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getNextScheduledAction();
@@ -248,7 +252,7 @@ describe('schedulerService', () => {
       const emptySnapshot = {
         exists: () => false,
       };
-      get.mockResolvedValue(emptySnapshot);
+      (get as jest.Mock).mockResolvedValue(emptySnapshot);
 
       // ACT
       const result = await getNextScheduledAction();
@@ -261,7 +265,7 @@ describe('schedulerService', () => {
       // ARRANGE
       const mockNow = new Date('2025-10-15T12:00:00.000Z');
       jest.spyOn(global, 'Date').mockImplementation(() => mockNow);
-      get.mockRejectedValue(new Error('Firebase error'));
+      (get as jest.Mock).mockRejectedValue(new Error('Firebase error'));
 
       // ACT
       const result = await getNextScheduledAction();
@@ -282,7 +286,7 @@ describe('schedulerService', () => {
       ];
 
       // Mock get for activeScheduleId calls
-      get.mockImplementation((dbRef) => {
+      mockGet.mockImplementation((dbRef) => {
         const path = typeof dbRef === 'string' ? dbRef : dbRef._path?.toString() || '';
         if (path.includes('activeScheduleId')) {
           return Promise.resolve({
@@ -293,8 +297,8 @@ describe('schedulerService', () => {
         return Promise.resolve({ exists: () => false });
       });
 
-      ref.mockReturnValue('mock-ref');
-      set.mockResolvedValue();
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      mockSet.mockResolvedValue(undefined);
 
       // ACT
       await saveSchedule(day, intervals);
@@ -310,8 +314,8 @@ describe('schedulerService', () => {
       // ARRANGE
       const day = 'Lunedì';
       const intervals = [];
-      ref.mockReturnValue('mock-ref');
-      set.mockRejectedValue(new Error('Firebase error'));
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      mockSet.mockRejectedValue(new Error('Firebase error'));
 
       // ACT
       await saveSchedule(day, intervals);
@@ -335,7 +339,7 @@ describe('schedulerService', () => {
         exists: () => true,
         val: () => expectedSchedule,
       };
-      get.mockResolvedValue(mockSnapshot);
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getSchedule(day);
@@ -350,7 +354,7 @@ describe('schedulerService', () => {
       const mockSnapshot = {
         exists: () => false,
       };
-      get.mockResolvedValue(mockSnapshot);
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getSchedule(day);
@@ -362,7 +366,7 @@ describe('schedulerService', () => {
     test('returns empty array on Firebase error', async () => {
       // ARRANGE
       const day = 'Lunedì';
-      get.mockRejectedValue(new Error('Firebase error'));
+      (get as jest.Mock).mockRejectedValue(new Error('Firebase error'));
 
       // ACT
       const result = await getSchedule(day);
@@ -387,7 +391,7 @@ describe('schedulerService', () => {
         exists: () => true,
         val: () => expectedSchedule,
       };
-      get.mockResolvedValue(mockSnapshot);
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getWeeklySchedule();
@@ -401,7 +405,7 @@ describe('schedulerService', () => {
       const mockSnapshot = {
         exists: () => false,
       };
-      get.mockResolvedValue(mockSnapshot);
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getWeeklySchedule();
@@ -412,7 +416,7 @@ describe('schedulerService', () => {
 
     test('returns empty object on Firebase error', async () => {
       // ARRANGE
-      get.mockRejectedValue(new Error('Firebase error'));
+      (get as jest.Mock).mockRejectedValue(new Error('Firebase error'));
 
       // ACT
       const result = await getWeeklySchedule();
@@ -429,8 +433,8 @@ describe('schedulerService', () => {
   describe('setSchedulerMode', () => {
     test('sets scheduler mode to enabled with timestamp', async () => {
       // ARRANGE
-      ref.mockReturnValue('mock-ref');
-      set.mockResolvedValue();
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      mockSet.mockResolvedValue(undefined);
       const mockDate = new Date('2025-10-15T12:00:00.000Z');
       jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
 
@@ -447,8 +451,8 @@ describe('schedulerService', () => {
 
     test('sets scheduler mode to disabled', async () => {
       // ARRANGE
-      ref.mockReturnValue('mock-ref');
-      set.mockResolvedValue();
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      mockSet.mockResolvedValue(undefined);
 
       // ACT
       await setSchedulerMode(false);
@@ -462,8 +466,8 @@ describe('schedulerService', () => {
 
     test('handles Firebase error on mode set', async () => {
       // ARRANGE
-      ref.mockReturnValue('mock-ref');
-      set.mockRejectedValue(new Error('Firebase error'));
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      mockSet.mockRejectedValue(new Error('Firebase error'));
 
       // ACT
       await setSchedulerMode(true);
@@ -483,7 +487,7 @@ describe('schedulerService', () => {
         exists: () => true,
         val: () => ({ enabled: true }),
       };
-      get.mockResolvedValue(mockSnapshot);
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getSchedulerMode();
@@ -498,7 +502,7 @@ describe('schedulerService', () => {
         exists: () => true,
         val: () => ({ enabled: false }),
       };
-      get.mockResolvedValue(mockSnapshot);
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getSchedulerMode();
@@ -512,7 +516,7 @@ describe('schedulerService', () => {
       const mockSnapshot = {
         exists: () => false,
       };
-      get.mockResolvedValue(mockSnapshot);
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getSchedulerMode();
@@ -523,7 +527,7 @@ describe('schedulerService', () => {
 
     test('returns false on Firebase error', async () => {
       // ARRANGE
-      get.mockRejectedValue(new Error('Firebase error'));
+      (get as jest.Mock).mockRejectedValue(new Error('Firebase error'));
 
       // ACT
       const result = await getSchedulerMode();
@@ -546,7 +550,7 @@ describe('schedulerService', () => {
         exists: () => true,
         val: () => expectedMode,
       };
-      get.mockResolvedValue(mockSnapshot);
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getFullSchedulerMode();
@@ -560,7 +564,7 @@ describe('schedulerService', () => {
       const mockSnapshot = {
         exists: () => false,
       };
-      get.mockResolvedValue(mockSnapshot);
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getFullSchedulerMode();
@@ -572,7 +576,7 @@ describe('schedulerService', () => {
 
     test('returns default mode on Firebase error', async () => {
       // ARRANGE
-      get.mockRejectedValue(new Error('Firebase error'));
+      (get as jest.Mock).mockRejectedValue(new Error('Firebase error'));
 
       // ACT
       const result = await getFullSchedulerMode();
@@ -593,9 +597,9 @@ describe('schedulerService', () => {
         exists: () => true,
         val: () => currentMode,
       };
-      get.mockResolvedValue(mockSnapshot);
-      ref.mockReturnValue('mock-ref');
-      set.mockResolvedValue();
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      mockSet.mockResolvedValue(undefined);
       const mockDate = new Date('2025-10-15T12:00:00.000Z');
       jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
 
@@ -618,9 +622,9 @@ describe('schedulerService', () => {
     test('handles Firebase error on semi-manual activation', async () => {
       // ARRANGE
       const nextChange = '2025-10-15T18:00:00.000Z';
-      ref.mockReturnValue('mock-ref');
+      (ref as jest.Mock).mockReturnValue('mock-ref');
       // setSemiManualMode uses set() not get(), so mock set() to fail
-      set.mockRejectedValue(new Error('Firebase error'));
+      mockSet.mockRejectedValue(new Error('Firebase error'));
 
       // ACT
       await setSemiManualMode(nextChange);
@@ -642,9 +646,9 @@ describe('schedulerService', () => {
         exists: () => true,
         val: () => currentMode,
       };
-      get.mockResolvedValue(mockSnapshot);
-      ref.mockReturnValue('mock-ref');
-      set.mockResolvedValue();
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      mockSet.mockResolvedValue(undefined);
       const mockDate = new Date('2025-10-15T12:00:00.000Z');
       jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
 
@@ -664,7 +668,7 @@ describe('schedulerService', () => {
 
     test('handles Firebase error on semi-manual clear', async () => {
       // ARRANGE
-      get.mockRejectedValue(new Error('Firebase error'));
+      (get as jest.Mock).mockRejectedValue(new Error('Firebase error'));
 
       // ACT
       await clearSemiManualMode();

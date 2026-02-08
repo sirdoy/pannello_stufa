@@ -319,7 +319,7 @@ function Select({
   // eslint-disable-next-line no-unused-vars
   liquid = false, // Legacy prop - ignored
   ...props
-}) {
+}: SelectProps) {
   const labelId = useId();
 
   // Warn about searchable prop

@@ -21,12 +21,12 @@ expect.extend(toHaveNoViolations);
  * Test helper: Basic Popover structure using asChild pattern
  */
 const TestPopover = ({
-  triggerMode = 'click',
-  size = 'md',
+  triggerMode = 'click' as const,
+  size = 'md' as const,
   arrow = false,
   children,
   ...props
-}) => (
+}: any) => (
   <Popover triggerMode={triggerMode} {...props}>
     <Popover.Trigger asChild>
       <button type="button" data-testid="popover-trigger">Open Popover</button>

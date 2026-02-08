@@ -219,9 +219,9 @@ function ThemeContent() {
  * LocationContent - Extracted from location/page.js
  */
 interface LocationData {
-  city: string;
-  lat: number;
-  lon: number;
+  latitude: number;
+  longitude: number;
+  name: string;
 }
 
 interface SaveMessage {
@@ -315,7 +315,7 @@ function LocationContent() {
         {/* Save feedback */}
         {saveMessage && (
           <Banner
-            variant={saveMessage.type === 'success' ? 'success' : 'danger'}
+            variant={saveMessage.type === 'success' ? 'success' : 'error'}
             compact
             className="mt-4"
           >
@@ -627,7 +627,7 @@ function UnifiedDevicesContent() {
 
       {/* Info card */}
       <Card variant="glass" className="p-4 sm:p-6 bg-ocean-900/10 [html:not(.dark)_&]:bg-ocean-50/50">
-        <Heading level={3} size="base" variant="subtle" className="mb-3">
+        <Heading level={3} size="md" variant="subtle" className="mb-3">
           ℹ️ Come funziona
         </Heading>
         <ul className="space-y-2">

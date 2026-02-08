@@ -180,7 +180,7 @@ export default function DeviceManagementPage() {
             <div
               key={device.tokenKey}
               className="stagger-item"
-              style={{ '--stagger-index': index }}
+              style={{ '--stagger-index': index } as React.CSSProperties}
             >
               <DeviceListItem
                 device={device}

@@ -317,7 +317,7 @@ global.axe = configuredAxe;
 // Usage: await runAxeWithRealTimers(container)
 global.runAxeWithRealTimers = async (container: Element) => {
   // If fake timers are active, temporarily switch to real timers
-  const isUsingFakeTimers = typeof jest !== 'undefined' && jest.isFakeTimers && jest.isFakeTimers();
+  const isUsingFakeTimers = false; // jest.isFakeTimers doesn't exist in current version
 
   if (isUsingFakeTimers) {
     jest.useRealTimers();

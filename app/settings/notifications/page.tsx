@@ -380,7 +380,7 @@ export default function NotificationsSettingsPage() {
               )}
 
               {testResult === 'rate_limited' && (
-                <Text variant="copper" size="sm">
+                <Text variant="warning" size="sm">
                   ⏱️ Rate limit: troppi test ravvicinati. Attendi qualche secondo.
                 </Text>
               )}

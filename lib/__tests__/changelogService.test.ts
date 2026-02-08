@@ -31,8 +31,8 @@ describe('changelogService', () => {
       const date = '2025-10-15';
       const changes = ['Fix bug', 'Add feature'];
       const type = 'minor';
-      ref.mockReturnValue('mock-ref');
-      set.mockResolvedValue();
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (set as jest.Mock).mockResolvedValue(undefined);
       const mockDate = new Date('2025-10-15T12:00:00.000Z');
       jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
 
@@ -56,8 +56,8 @@ describe('changelogService', () => {
       const version = '1.2.0';
       const date = '2025-10-15';
       const changes = ['Update'];
-      ref.mockReturnValue('mock-ref');
-      set.mockResolvedValue();
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (set as jest.Mock).mockResolvedValue(undefined);
 
       // ACT
       await saveVersionToFirebase(version, date, changes); // No type parameter
@@ -73,8 +73,8 @@ describe('changelogService', () => {
       const version = '1.2.3';
       const date = '2025-10-15';
       const changes = ['Fix'];
-      ref.mockReturnValue('mock-ref');
-      set.mockRejectedValue(new Error('Firebase error'));
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (set as jest.Mock).mockRejectedValue(new Error('Firebase error'));
 
       // ACT
       await saveVersionToFirebase(version, date, changes);
@@ -114,8 +114,8 @@ describe('changelogService', () => {
         exists: () => true,
         val: () => mockData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getChangelogFromFirebase();
@@ -132,8 +132,8 @@ describe('changelogService', () => {
       const mockSnapshot = {
         exists: () => false,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getChangelogFromFirebase();
@@ -144,8 +144,8 @@ describe('changelogService', () => {
 
     test('returns empty array on Firebase error', async () => {
       // ARRANGE
-      ref.mockReturnValue('mock-ref');
-      get.mockRejectedValue(new Error('Firebase error'));
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (get as jest.Mock).mockRejectedValue(new Error('Firebase error'));
 
       // ACT
       const result = await getChangelogFromFirebase();
@@ -172,8 +172,8 @@ describe('changelogService', () => {
         exists: () => true,
         val: () => mockData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getChangelogFromFirebase();
@@ -195,8 +195,8 @@ describe('changelogService', () => {
         exists: () => true,
         val: () => mockData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getLatestVersion();
@@ -211,8 +211,8 @@ describe('changelogService', () => {
       const mockSnapshot = {
         exists: () => false,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getLatestVersion();
@@ -223,8 +223,8 @@ describe('changelogService', () => {
 
     test('returns null on error', async () => {
       // ARRANGE
-      ref.mockReturnValue('mock-ref');
-      get.mockRejectedValue(new Error('Firebase error'));
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (get as jest.Mock).mockRejectedValue(new Error('Firebase error'));
 
       // ACT
       const result = await getLatestVersion();
@@ -329,8 +329,8 @@ describe('changelogService', () => {
         { version: '1.1.0', date: '2025-10-01', changes: ['Update'] },
         { version: '1.0.0', date: '2025-09-01', changes: ['Initial'] },
       ];
-      ref.mockReturnValue('mock-ref');
-      set.mockResolvedValue();
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (set as jest.Mock).mockResolvedValue(undefined);
 
       // ACT
       await syncVersionHistoryToFirebase(versionHistory);
@@ -348,15 +348,15 @@ describe('changelogService', () => {
         { version: '1.0.1', date: '2025-09-15', changes: ['Fix'] },
         { version: '1.0.0', date: '2025-09-01', changes: ['Initial'] },
       ];
-      ref.mockReturnValue('mock-ref');
-      set.mockResolvedValue();
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (set as jest.Mock).mockResolvedValue(undefined);
 
       // ACT
       await syncVersionHistoryToFirebase(versionHistory);
 
       // ASSERT
       // Check that set was called with correct types
-      const calls = set.mock.calls;
+      const calls = (set as jest.Mock).mock.calls;
       // First version (2.0.0) should be major compared to 1.1.0
       expect(calls[0][1].type).toBe('major');
       // Second version (1.1.0) should be minor compared to 1.0.1
@@ -370,8 +370,8 @@ describe('changelogService', () => {
       const versionHistory = [
         { version: '1.0.0', date: '2025-10-01', changes: ['Initial'] },
       ];
-      ref.mockReturnValue('mock-ref');
-      set.mockResolvedValue();
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (set as jest.Mock).mockResolvedValue(undefined);
 
       // ACT
       await syncVersionHistoryToFirebase(versionHistory);
@@ -386,8 +386,8 @@ describe('changelogService', () => {
     test('handles empty version history', async () => {
       // ARRANGE
       const versionHistory = [];
-      ref.mockReturnValue('mock-ref');
-      set.mockResolvedValue();
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (set as jest.Mock).mockResolvedValue(undefined);
 
       // ACT
       await syncVersionHistoryToFirebase(versionHistory);
@@ -404,11 +404,11 @@ describe('changelogService', () => {
         { version: '1.1.0', date: '2025-10-01', changes: ['Update'] },
         { version: '1.0.0', date: '2025-09-01', changes: ['Initial'] },
       ];
-      ref.mockReturnValue('mock-ref');
+      (ref as jest.Mock).mockReturnValue('mock-ref');
       set
         .mockResolvedValueOnce() // First succeeds
         .mockRejectedValueOnce(new Error('Firebase error')) // Second fails
-        .mockResolvedValueOnce(); // Third succeeds
+        .mockResolvedValueOnce(undefined); // Third succeeds
 
       // ACT
       await syncVersionHistoryToFirebase(versionHistory);
@@ -424,7 +424,7 @@ describe('changelogService', () => {
       const versionHistory = [
         { version: '1.0.0', date: '2025-10-01', changes: ['Initial'] },
       ];
-      ref.mockImplementation(() => {
+      (ref as jest.Mock).mockImplementation(() => {
         throw new Error('Critical error');
       });
 

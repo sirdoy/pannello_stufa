@@ -9,21 +9,21 @@ import {
 } from '../maintenanceService';
 import { logUserAction } from '../logService';
 import { ref, get, set, update, runTransaction } from 'firebase/database';
+import { createMockFetchResponse } from '@/__tests__/__utils__/mockFactories';
 
 // Mock Firebase module
-jest.mock('firebase/database', () => ({
-  ref: jest.fn(),
-  get: jest.fn(),
-  set: jest.fn(),
-  update: jest.fn(),
-  runTransaction: jest.fn(),
-}));
+jest.mock('firebase/database');
 jest.mock('../firebase', () => ({
   db: {},
 }));
-jest.mock('../logService', () => ({
-  logUserAction: jest.fn(),
-}));
+jest.mock('../logService');
+
+const mockRef = jest.mocked(ref);
+const mockGet = jest.mocked(get);
+const mockSet = jest.mocked(set);
+const mockUpdate = jest.mocked(update);
+const mockRunTransaction = jest.mocked(runTransaction);
+const mockLogUserAction = jest.mocked(logUserAction);
 
 describe('maintenanceService', () => {
   beforeEach(() => {
@@ -32,22 +32,19 @@ describe('maintenanceService', () => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
 
     // Mock global fetch
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ success: true }),
-      })
-    );
+    global.fetch = jest.fn().mockResolvedValue(
+      createMockFetchResponse({ success: true })
+    ) as jest.MockedFunction<typeof fetch>;
 
     // Setup mock functions
-    ref.mockReturnValue('mock-ref');
-    get.mockResolvedValue({ exists: () => false });
-    set.mockResolvedValue();
-    update.mockResolvedValue();
+    mockRef.mockReturnValue('mock-ref' as any);
+    mockGet.mockResolvedValue({ exists: () => false } as any);
+    mockSet.mockResolvedValue(undefined);
+    mockUpdate.mockResolvedValue(undefined);
 
     // Mock runTransaction with default behavior
     // This mock uses the most recent data from get() to simulate realistic transaction behavior
-    runTransaction.mockImplementation(async (refParam, updateFn) => {
+    mockRunTransaction.mockImplementation(async (refParam, updateFn) => {
       // Get the latest data from the mocked get() call
       const snapshot = await get(refParam);
       let currentData = snapshot.exists() ? snapshot.val() : null;
@@ -71,14 +68,14 @@ describe('maintenanceService', () => {
         return {
           committed: false,
           snapshot: null,
-        };
+        } as any;
       }
 
       // Otherwise, transaction succeeds
       return {
         committed: true,
         snapshot: { val: () => result },
-      };
+      } as any;
     });
   });
 
@@ -100,8 +97,8 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getMaintenanceData();
@@ -116,9 +113,9 @@ describe('maintenanceService', () => {
       const mockSnapshot = {
         exists: () => false,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
-      set.mockResolvedValue();
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockResolvedValue(mockSnapshot);
+      mockSet.mockResolvedValue(undefined);
 
       // ACT
       const result = await getMaintenanceData();
@@ -140,8 +137,8 @@ describe('maintenanceService', () => {
 
     test('throws error on Firebase failure', async () => {
       // ARRANGE
-      ref.mockReturnValue('mock-ref');
-      get.mockRejectedValue(new Error('Firebase error'));
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockRejectedValue(new Error('Firebase error'));
 
       // ACT & ASSERT
       await expect(getMaintenanceData()).rejects.toThrow('Firebase error');
@@ -155,12 +152,9 @@ describe('maintenanceService', () => {
   describe('updateTargetHours', () => {
     test('updates target hours successfully via API', async () => {
       // ARRANGE
-      global.fetch = jest.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ success: true }),
-        })
-      );
+      global.fetch = jest.fn().mockResolvedValue(
+        createMockFetchResponse({ success: true })
+      ) as jest.MockedFunction<typeof fetch>;
 
       // ACT
       const result = await updateTargetHours(100);
@@ -178,12 +172,9 @@ describe('maintenanceService', () => {
 
     test('throws error on API failure', async () => {
       // ARRANGE
-      global.fetch = jest.fn(() =>
-        Promise.resolve({
-          ok: false,
-          json: () => Promise.resolve({ message: 'API error' }),
-        })
-      );
+      global.fetch = jest.fn().mockResolvedValue(
+        createMockFetchResponse({ message: 'API error' }, { ok: false })
+      ) as jest.MockedFunction<typeof fetch>;
 
       // ACT & ASSERT
       await expect(updateTargetHours(100)).rejects.toThrow('API error');
@@ -192,7 +183,7 @@ describe('maintenanceService', () => {
 
     test('throws error on fetch failure', async () => {
       // ARRANGE
-      global.fetch = jest.fn(() => Promise.reject(new Error('Network error')));
+      global.fetch = jest.fn().mockRejectedValue(new Error('Network error')) as jest.MockedFunction<typeof fetch>;
 
       // ACT & ASSERT
       await expect(updateTargetHours(100)).rejects.toThrow('Network error');
@@ -212,9 +203,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
-      update.mockResolvedValue();
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockResolvedValue(mockSnapshot);
+      mockUpdate.mockResolvedValue(undefined);
       const mockDate = new Date('2025-10-15T12:00:00.000Z');
       jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
 
@@ -241,9 +232,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
-      update.mockResolvedValue();
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockResolvedValue(mockSnapshot);
+      mockUpdate.mockResolvedValue(undefined);
 
       // ACT
       const result = await incrementUsageHours(10); // +0.1667 hours -> 50.0667
@@ -264,9 +255,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
-      update.mockResolvedValue();
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockResolvedValue(mockSnapshot);
+      mockUpdate.mockResolvedValue(undefined);
 
       // ACT
       const result = await incrementUsageHours(1); // +0.0167 hours
@@ -278,8 +269,8 @@ describe('maintenanceService', () => {
 
     test('throws error on Firebase failure', async () => {
       // ARRANGE
-      ref.mockReturnValue('mock-ref');
-      get.mockRejectedValue(new Error('Firebase error'));
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockRejectedValue(new Error('Firebase error'));
 
       // ACT & ASSERT
       await expect(incrementUsageHours(1)).rejects.toThrow('Firebase error');
@@ -299,9 +290,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
-      update.mockResolvedValue();
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockResolvedValue(mockSnapshot);
+      mockUpdate.mockResolvedValue(undefined);
       const mockNow = new Date('2025-10-15T12:00:00.000Z');
       jest.spyOn(global, 'Date').mockImplementation(() => mockNow);
 
@@ -331,9 +322,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
-      update.mockResolvedValue();
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockResolvedValue(mockSnapshot);
+      mockUpdate.mockResolvedValue(undefined);
 
       // ACT
       const result = await trackUsageHours('WORK');
@@ -373,8 +364,8 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockResolvedValue(mockSnapshot);
       const mockNow = new Date('2025-10-15T12:00:00.000Z');
       jest.spyOn(global, 'Date').mockImplementation(() => mockNow);
 
@@ -401,9 +392,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
-      update.mockResolvedValue();
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockResolvedValue(mockSnapshot);
+      mockUpdate.mockResolvedValue(undefined);
 
       // ACT
       const result = await trackUsageHours('WORK');
@@ -431,9 +422,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
-      update.mockResolvedValue();
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockResolvedValue(mockSnapshot);
+      mockUpdate.mockResolvedValue(undefined);
 
       // ACT
       const result = await trackUsageHours('WORK');
@@ -463,9 +454,9 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
-      update.mockResolvedValue();
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockResolvedValue(mockSnapshot);
+      mockUpdate.mockResolvedValue(undefined);
 
       // ACT
       const result = await trackUsageHours('WORK_ACTIVE'); // Status with WORK substring
@@ -478,8 +469,8 @@ describe('maintenanceService', () => {
 
     test('throws error on Firebase failure', async () => {
       // ARRANGE
-      ref.mockReturnValue('mock-ref');
-      get.mockRejectedValue(new Error('Firebase error'));
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockRejectedValue(new Error('Firebase error'));
 
       // ACT & ASSERT
       await expect(trackUsageHours('WORK')).rejects.toThrow('Firebase error');
@@ -490,12 +481,9 @@ describe('maintenanceService', () => {
     test('confirms cleaning successfully via API', async () => {
       // ARRANGE
       const user = { name: 'Test User' };
-      global.fetch = jest.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ success: true }),
-        })
-      );
+      global.fetch = jest.fn().mockResolvedValue(
+        createMockFetchResponse({ success: true })
+      ) as jest.MockedFunction<typeof fetch>;
 
       // ACT
       const result = await confirmCleaning(user);
@@ -512,12 +500,9 @@ describe('maintenanceService', () => {
 
     test('throws error on API failure', async () => {
       // ARRANGE
-      global.fetch = jest.fn(() =>
-        Promise.resolve({
-          ok: false,
-          json: () => Promise.resolve({ message: 'API error' }),
-        })
-      );
+      global.fetch = jest.fn().mockResolvedValue(
+        createMockFetchResponse({ message: 'API error' }, { ok: false })
+      ) as jest.MockedFunction<typeof fetch>;
 
       // ACT & ASSERT
       await expect(confirmCleaning({})).rejects.toThrow('API error');
@@ -526,7 +511,7 @@ describe('maintenanceService', () => {
 
     test('throws error on fetch failure', async () => {
       // ARRANGE
-      global.fetch = jest.fn(() => Promise.reject(new Error('Network error')));
+      global.fetch = jest.fn().mockRejectedValue(new Error('Network error')) as jest.MockedFunction<typeof fetch>;
 
       // ACT & ASSERT
       await expect(confirmCleaning({})).rejects.toThrow('Network error');
@@ -546,8 +531,8 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await canIgnite();
@@ -567,8 +552,8 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await canIgnite();
@@ -579,8 +564,8 @@ describe('maintenanceService', () => {
 
     test('returns true on Firebase error (fail-safe default)', async () => {
       // ARRANGE
-      ref.mockReturnValue('mock-ref');
-      get.mockRejectedValue(new Error('Firebase error'));
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockRejectedValue(new Error('Firebase error'));
 
       // ACT
       const result = await canIgnite();
@@ -607,8 +592,8 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getMaintenanceStatus();
@@ -633,8 +618,8 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getMaintenanceStatus();
@@ -655,8 +640,8 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getMaintenanceStatus();
@@ -677,8 +662,8 @@ describe('maintenanceService', () => {
         exists: () => true,
         val: () => existingData,
       };
-      ref.mockReturnValue('mock-ref');
-      get.mockResolvedValue(mockSnapshot);
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getMaintenanceStatus();
@@ -690,8 +675,8 @@ describe('maintenanceService', () => {
 
     test('throws error on Firebase failure', async () => {
       // ARRANGE
-      ref.mockReturnValue('mock-ref');
-      get.mockRejectedValue(new Error('Firebase error'));
+      mockRef.mockReturnValue('mock-ref');
+      mockGet.mockRejectedValue(new Error('Firebase error'));
 
       // ACT & ASSERT
       await expect(getMaintenanceStatus()).rejects.toThrow('Firebase error');

@@ -18,6 +18,14 @@ jest.mock('../firebase', () => ({
   database: {},
 }));
 
+const mockRef = jest.mocked(ref);
+const mockPush = jest.mocked(push);
+const mockSet = jest.mocked(set);
+const mockGet = jest.mocked(get);
+const mockQuery = jest.mocked(query);
+const mockOrderByChild = jest.mocked(orderByChild);
+const mockLimitToLast = jest.mocked(limitToLast);
+
 describe('errorMonitor', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -138,7 +146,7 @@ describe('errorMonitor', () => {
       const additionalData = { stoveId: '123' };
       const mockTimestamp = 1697400000000;
 
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({
           errorLog: {
@@ -178,7 +186,7 @@ describe('errorMonitor', () => {
 
     test('logs error code 0 with INFO severity', async () => {
       // ARRANGE
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({
           errorLog: {
@@ -200,7 +208,7 @@ describe('errorMonitor', () => {
 
     test('returns null on API error', async () => {
       // ARRANGE
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         ok: false,
         json: () => Promise.resolve({ message: 'API error' }),
       });
@@ -218,7 +226,7 @@ describe('errorMonitor', () => {
 
     test('logs error without additional data', async () => {
       // ARRANGE
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({
           errorLog: {
@@ -252,9 +260,9 @@ describe('errorMonitor', () => {
           callback({ key: 'error3', val: () => ({ errorCode: 3, timestamp: 3000 }) });
         },
       };
-      ref.mockReturnValue('mock-ref');
-      query.mockReturnValue('mock-query');
-      get.mockResolvedValue(mockSnapshot);
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (query as jest.Mock).mockReturnValue('mock-query');
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getRecentErrors(50);
@@ -272,9 +280,9 @@ describe('errorMonitor', () => {
       const mockSnapshot = {
         exists: () => false,
       };
-      ref.mockReturnValue('mock-ref');
-      query.mockReturnValue('mock-query');
-      get.mockResolvedValue(mockSnapshot);
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (query as jest.Mock).mockReturnValue('mock-query');
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getRecentErrors();
@@ -288,9 +296,9 @@ describe('errorMonitor', () => {
       const mockSnapshot = {
         exists: () => false,
       };
-      ref.mockReturnValue('mock-ref');
-      query.mockReturnValue('mock-query');
-      get.mockResolvedValue(mockSnapshot);
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (query as jest.Mock).mockReturnValue('mock-query');
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       await getRecentErrors();
@@ -301,9 +309,9 @@ describe('errorMonitor', () => {
 
     test('returns empty array on Firebase error', async () => {
       // ARRANGE
-      ref.mockReturnValue('mock-ref');
-      query.mockReturnValue('mock-query');
-      get.mockRejectedValue(new Error('Firebase error'));
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (query as jest.Mock).mockReturnValue('mock-query');
+      (get as jest.Mock).mockRejectedValue(new Error('Firebase error'));
 
       // ACT
       const result = await getRecentErrors();
@@ -328,9 +336,9 @@ describe('errorMonitor', () => {
           callback({ key: 'error3', val: () => ({ errorCode: 3, resolved: false }) });
         },
       };
-      ref.mockReturnValue('mock-ref');
-      query.mockReturnValue('mock-query');
-      get.mockResolvedValue(mockSnapshot);
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (query as jest.Mock).mockReturnValue('mock-query');
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getActiveErrors();
@@ -350,9 +358,9 @@ describe('errorMonitor', () => {
           callback({ key: 'error2', val: () => ({ errorCode: 2, resolved: true }) });
         },
       };
-      ref.mockReturnValue('mock-ref');
-      query.mockReturnValue('mock-query');
-      get.mockResolvedValue(mockSnapshot);
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (query as jest.Mock).mockReturnValue('mock-query');
+      (get as jest.Mock).mockResolvedValue(mockSnapshot);
 
       // ACT
       const result = await getActiveErrors();
@@ -363,9 +371,9 @@ describe('errorMonitor', () => {
 
     test('returns empty array on Firebase error', async () => {
       // ARRANGE
-      ref.mockReturnValue('mock-ref');
-      query.mockReturnValue('mock-query');
-      get.mockRejectedValue(new Error('Firebase error'));
+      (ref as jest.Mock).mockReturnValue('mock-ref');
+      (query as jest.Mock).mockReturnValue('mock-query');
+      (get as jest.Mock).mockRejectedValue(new Error('Firebase error'));
 
       // ACT
       const result = await getActiveErrors();
@@ -388,7 +396,7 @@ describe('errorMonitor', () => {
     test('marks error as resolved via API', async () => {
       // ARRANGE
       const errorId = 'error-123';
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ success: true }),
       });
@@ -410,7 +418,7 @@ describe('errorMonitor', () => {
     test('returns false on API error', async () => {
       // ARRANGE
       const errorId = 'error-123';
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         ok: false,
         json: () => Promise.resolve({ message: 'Failed to resolve' }),
       });

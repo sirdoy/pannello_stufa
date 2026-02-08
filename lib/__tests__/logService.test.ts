@@ -4,6 +4,7 @@ import {
   logSchedulerAction,
   logNetatmoAction,
 } from '../logService';
+import { createMockFetchResponse } from '@/__tests__/__utils__/mockFactories';
 
 // Mock routes
 jest.mock('../routes', () => ({
@@ -29,7 +30,7 @@ describe('logService', () => {
   describe('logUserAction', () => {
     test('logs action with correct API call', async () => {
       // ARRANGE
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ success: true }),
       });
@@ -53,7 +54,7 @@ describe('logService', () => {
 
     test('logs action without value when value is null', async () => {
       // ARRANGE
-      global.fetch.mockResolvedValue({ ok: true });
+      (global.fetch as jest.Mock).mockResolvedValue({ ok: true });
 
       // ACT
       await logUserAction('Test action', 'test-device');
@@ -67,7 +68,7 @@ describe('logService', () => {
 
     test('logs action without metadata when metadata is empty', async () => {
       // ARRANGE
-      global.fetch.mockResolvedValue({ ok: true });
+      (global.fetch as jest.Mock).mockResolvedValue({ ok: true });
 
       // ACT
       await logUserAction('Test action', 'test-device', 'value');
@@ -81,7 +82,7 @@ describe('logService', () => {
 
     test('includes metadata in log when provided', async () => {
       // ARRANGE
-      global.fetch.mockResolvedValue({ ok: true });
+      (global.fetch as jest.Mock).mockResolvedValue({ ok: true });
 
       // ACT
       await logUserAction('Test action', 'test-device', null, { source: 'manual', deviceId: '123' });
@@ -97,7 +98,7 @@ describe('logService', () => {
 
     test('logs error when API call fails', async () => {
       // ARRANGE
-      global.fetch.mockResolvedValue({
+      (global.fetch as jest.Mock).mockResolvedValue({
         ok: false,
         status: 500,
       });
@@ -114,7 +115,7 @@ describe('logService', () => {
 
     test('logs error when fetch throws exception', async () => {
       // ARRANGE
-      global.fetch.mockRejectedValue(new Error('Network error'));
+      (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
 
       // ACT
       await logUserAction('Test action', 'test-device');
@@ -128,7 +129,7 @@ describe('logService', () => {
 
     test('handles value 0 correctly (falsy but valid)', async () => {
       // ARRANGE
-      global.fetch.mockResolvedValue({ ok: true });
+      (global.fetch as jest.Mock).mockResolvedValue({ ok: true });
 
       // ACT
       await logUserAction('Test action', 'test-device', 0);
@@ -141,7 +142,7 @@ describe('logService', () => {
 
     test('handles empty string value correctly', async () => {
       // ARRANGE
-      global.fetch.mockResolvedValue({ ok: true });
+      (global.fetch as jest.Mock).mockResolvedValue({ ok: true });
 
       // ACT
       await logUserAction('Test action', 'test-device', '');
@@ -155,7 +156,7 @@ describe('logService', () => {
 
   describe('logStoveAction', () => {
     beforeEach(() => {
-      global.fetch.mockResolvedValue({ ok: true });
+      (global.fetch as jest.Mock).mockResolvedValue({ ok: true });
     });
 
     test('ignite logs correct action', async () => {
@@ -199,7 +200,7 @@ describe('logService', () => {
 
   describe('logSchedulerAction', () => {
     beforeEach(() => {
-      global.fetch.mockResolvedValue({ ok: true });
+      (global.fetch as jest.Mock).mockResolvedValue({ ok: true });
     });
 
     test('toggleMode logs correct action when enabled', async () => {
@@ -264,7 +265,7 @@ describe('logService', () => {
 
   describe('logNetatmoAction', () => {
     beforeEach(() => {
-      global.fetch.mockResolvedValue({ ok: true });
+      (global.fetch as jest.Mock).mockResolvedValue({ ok: true });
     });
 
     test('connect logs correct action', async () => {
@@ -322,7 +323,7 @@ describe('logService', () => {
     test('default export stove actions work correctly', async () => {
       // ARRANGE
       const logService = (await import('../logService')).default;
-      global.fetch.mockResolvedValue({ ok: true });
+      (global.fetch as jest.Mock).mockResolvedValue({ ok: true });
 
       // ACT
       await logService.stove.ignite();

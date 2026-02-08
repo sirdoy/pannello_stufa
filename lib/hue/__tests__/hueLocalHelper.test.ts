@@ -24,9 +24,9 @@ describe('hueLocalHelper', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Mock ref to return a mock reference object
-    ref.mockReturnValue('mock-ref');
+    (ref as jest.Mock).mockReturnValue('mock-ref');
     // Reset set to resolve successfully by default
-    set.mockResolvedValue();
+    (set as jest.Mock).mockResolvedValue(undefined);
   });
 
   describe('getHueConnection', () => {
@@ -37,7 +37,7 @@ describe('hueLocalHelper', () => {
         clientkey: 'test-clientkey-456',
       };
 
-      get.mockResolvedValue({
+      (get as jest.Mock).mockResolvedValue({
         exists: () => true,
         val: () => mockData,
       });
@@ -53,7 +53,7 @@ describe('hueLocalHelper', () => {
     });
 
     it('should return null when no connection exists', async () => {
-      get.mockResolvedValue({
+      (get as jest.Mock).mockResolvedValue({
         exists: () => false,
       });
 
@@ -63,7 +63,7 @@ describe('hueLocalHelper', () => {
     });
 
     it('should return null when missing bridge_ip', async () => {
-      get.mockResolvedValue({
+      (get as jest.Mock).mockResolvedValue({
         exists: () => true,
         val: () => ({ username: 'test-username' }), // Missing bridge_ip
       });
@@ -74,7 +74,7 @@ describe('hueLocalHelper', () => {
     });
 
     it('should handle errors gracefully', async () => {
-      get.mockRejectedValue(new Error('Firebase error'));
+      (get as jest.Mock).mockRejectedValue(new Error('Firebase error'));
 
       const result = await getHueConnection();
 
@@ -119,7 +119,7 @@ describe('hueLocalHelper', () => {
     });
 
     it('should throw error on Firebase failure', async () => {
-      set.mockRejectedValue(new Error('Firebase write error'));
+      (set as jest.Mock).mockRejectedValue(new Error('Firebase write error'));
 
       await expect(
         saveHueConnection('192.168.1.100', 'test-username')
@@ -151,7 +151,7 @@ describe('hueLocalHelper', () => {
         updated_at: '2026-01-04T12:00:00.000Z',
       };
 
-      get.mockResolvedValue({
+      (get as jest.Mock).mockResolvedValue({
         exists: () => true,
         val: () => mockData,
       });
@@ -168,7 +168,7 @@ describe('hueLocalHelper', () => {
     });
 
     it('should return not connected when missing credentials', async () => {
-      get.mockResolvedValue({
+      (get as jest.Mock).mockResolvedValue({
         exists: () => true,
         val: () => ({ connected: false }), // No bridge_ip or username
       });
@@ -185,7 +185,7 @@ describe('hueLocalHelper', () => {
     });
 
     it('should handle errors gracefully', async () => {
-      get.mockRejectedValue(new Error('Firebase error'));
+      (get as jest.Mock).mockRejectedValue(new Error('Firebase error'));
 
       const result = await getHueStatus();
 
@@ -198,7 +198,7 @@ describe('hueLocalHelper', () => {
 
   describe('isHueConnected', () => {
     it('should return true when connected', async () => {
-      get.mockResolvedValue({
+      (get as jest.Mock).mockResolvedValue({
         exists: () => true,
         val: () => ({
           bridge_ip: '192.168.1.100',
@@ -212,7 +212,7 @@ describe('hueLocalHelper', () => {
     });
 
     it('should return false when not connected', async () => {
-      get.mockResolvedValue({
+      (get as jest.Mock).mockResolvedValue({
         exists: () => false,
       });
 

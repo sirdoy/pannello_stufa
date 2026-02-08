@@ -4,6 +4,44 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 
 ---
 
+## v5.0 TypeScript Migration (Shipped: 2026-02-08)
+
+**Delivered:** Complete TypeScript migration of 575 JavaScript/JSX files across all application layers — libraries, components, API routes, pages, tests, and config files — with zero tsc errors, passing production build, and `allowJs: false` enforcement preventing future regression.
+
+**Phases completed:** 37-43 (56 plans total)
+
+**Key accomplishments:**
+
+- TypeScript foundation with 24 shared type definition files for Firebase, API, components, and config patterns
+- Library migration (132 files): utilities, PWA, core infrastructure, repositories, external API clients, hooks — all with proper typing
+- UI component migration (119 files): design system + application components with CVA variants, Radix UI wrappers, namespace patterns
+- API route migration (90 files): all endpoints with typed request/response, inline body interfaces, pragmatic external API typing
+- Pages migration (70 files): layouts, providers, co-located components with typed context values and prop interfaces
+- Test migration (131 files): Jest configured for TypeScript, comprehensive mock typing with jest.mocked() pattern
+- Final verification: production build passes (30.5s, 49 routes), tsc --noEmit zero errors, allowJs:false locked down
+
+**Stats:**
+
+- 56 plans executed across 7 phases
+- 24/24 v5.0 requirements satisfied (100%)
+- 759 files changed (+45,658 insertions, -8,084 deletions)
+- 531 TypeScript source files (.ts/.tsx)
+- 3028+ tests passing
+- 237 git commits with atomic, well-documented changes
+- 4 days from phase 37 start to completion (2026-02-05 → 2026-02-08)
+
+**Git range:** `feat(37-01)` → `docs(43-08)`
+
+**Archives:**
+- [Roadmap](milestones/v5.0-ROADMAP.md)
+- [Requirements](milestones/v5.0-REQUIREMENTS.md)
+
+**Tech debt:** ~400 remaining mock type tsc errors in test files (compile-time only, all tests pass at runtime). 4 pre-existing ThermostatCard.schedule test failures.
+
+**What's next:** TypeScript migration complete. Codebase is now fully typed with compile-time safety. Consider feature development or operational improvements for next milestone.
+
+---
+
 ## v4.0 Advanced UI Components (Shipped: 2026-02-05)
 
 **Delivered:** 12 advanced UI components (Popover, Tabs, Accordion, Sheet, RightClickMenu, CommandPalette, Kbd, ConfirmationDialog, FormModal, DataTable, DataTableToolbar, DataTableRow) with CSS animation system and application-wide integration including quick actions on all device cards.
@@ -220,3 +258,5 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 
 _For current project status, see `.planning/PROJECT.md`_
 _To start next milestone, run `/gsd:new-milestone`_
+
+

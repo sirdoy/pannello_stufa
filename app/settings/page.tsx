@@ -361,6 +361,8 @@ interface UnifiedDevice {
   description: string;
   visible: boolean;
   order: number;
+  isDisplayOnly?: boolean;
+  hasHomepageCard?: boolean;
 }
 
 /**

@@ -30,25 +30,15 @@ import NotificationPreferencesPanel from '@/app/components/NotificationPreferenc
 import NotificationSettingsForm from './NotificationSettingsForm';
 import Skeleton from '@/app/components/ui/Skeleton';
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
+import type { NotificationPreferences } from '@/lib/schemas/notificationPreferences';
 
-type TestResult = 'success' | 'error' | 'no_tokens';
+type TestResult = 'success' | 'error' | 'no_tokens' | 'rate_limited';
 
 interface NotificationDevice {
   tokenKey: string;
   customName?: string;
   lastUsed?: number;
   [key: string]: any;
-}
-
-interface NotificationPreferences {
-  enabledTypes: Record<string, boolean>;
-  dndWindows: Array<{
-    enabled: boolean;
-    start: string;
-    end: string;
-  }>;
-  timezone: string;
-  rateLimits?: Record<string, number>;
 }
 
 export default function NotificationsSettingsPage() {
@@ -178,14 +168,14 @@ export default function NotificationsSettingsPage() {
         const tokensData = snapshot.val();
         const devicesList = Object.entries(tokensData).map(([key, data]) => ({
           id: key,
-          ...data,
-        }));
+          ...(typeof data === 'object' && data !== null ? data : {}),
+        })) as unknown as NotificationDevice[];
         setDevices(devicesList);
 
         // Check if current device token is in the list
         if (currentDeviceToken) {
           const isRegistered = devicesList.some(
-            (d) => d.token === currentDeviceToken
+            (d) => (d as any).token === currentDeviceToken
           );
           setIsCurrentDeviceRegistered(isRegistered);
         }

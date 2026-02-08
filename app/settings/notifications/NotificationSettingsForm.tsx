@@ -22,6 +22,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   notificationPreferencesSchema,
   getDefaultPreferences,
+  type NotificationPreferences,
 } from '@/lib/schemas/notificationPreferences';
 import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
@@ -29,17 +30,6 @@ import Toggle from '@/app/components/ui/Toggle';
 import Input from '@/app/components/ui/Input';
 import { Heading, Text } from '@/app/components/ui';
 import Skeleton from '@/app/components/ui/Skeleton';
-
-interface NotificationPreferences {
-  enabledTypes: Record<string, boolean>;
-  dndWindows: Array<{
-    enabled: boolean;
-    start: string;
-    end: string;
-  }>;
-  timezone: string;
-  rateLimits?: Record<string, number>;
-}
 
 interface NotificationSettingsFormProps {
   initialValues?: NotificationPreferences;
@@ -116,7 +106,7 @@ export default function NotificationSettingsForm({
     setValue,
     formState: { errors, isDirty },
     reset,
-  } = useForm({
+  } = useForm<NotificationPreferences>({
     resolver: zodResolver(notificationPreferencesSchema),
     defaultValues: initialValues || defaultPreferences,
     mode: 'onBlur',

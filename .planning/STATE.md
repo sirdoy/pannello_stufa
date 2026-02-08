@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 43 - Verification
-Plan: 06 of 8
-Status: In progress — Plan 43-05 complete (fixed 171 errors in 3 critical test files: netatmoStoveSync, coordinationOrchestrator, healthDeadManSwitch)
-Last activity: 2026-02-08 — Completed 43-05-PLAN.md (__tests__/ cluster: 33% error reduction, patterns established for remaining 18 files)
+Plan: 07 of 8
+Status: In progress — Plan 43-07 complete (fixed 22 of 25 failing runtime tests: health/netatmo/schedule source bugs + UI component test updates)
+Last activity: 2026-02-08 — Completed 43-07-PLAN.md (88% success rate, 4 source bugs fixed, 3 ThermostatCard.schedule tests remaining)
 
-Progress: [███████████████░░░░░░░░░] 80% (6/7 phases complete, Phase 43: 5/8 plans complete)
+Progress: [███████████████░░░░░░░░░] 82% (6/7 phases complete, Phase 43: 7/8 plans complete)
 
 ## Milestone Overview
 
@@ -156,6 +156,17 @@ Key patterns from previous milestones preserved for v5.0 migration:
 - Button href removal: Use Next Link wrapper pattern instead of href prop (Button doesn't support href)
 - Auto-fix collaboration: Linter/formatter can commit fixes in parallel with manual fixes for non-conflicting type corrections
 
+**Phase 43-07 decisions (runtime test fixes):**
+- Source bugs vs test bugs: 4 of 6 health/netatmo/schedule failures were actual source bugs requiring fixes
+- Error handling patterns: Dead man switch must return 'error' reason with message (not 'never_run') on exceptions
+- Type consistency: successRate must be string from toFixed (not Number(toFixed)) for API consistency
+- Null semantics: API failures return null for missing data (not 'unknown' string) for proper type narrowing
+- Optional properties: Only add properties to parsed objects when source value exists (reachable, bridge, room_id)
+- Test provider wrapping: Components using TransitionLink require PageTransitionProvider in tests
+- Semantic roles: Layout components use role="presentation" for content areas (not semantic <main> elements)
+- Context error handling: Context hooks throw errors outside providers (don't return defaults)
+- Mock type safety: Use type guards (typeof url === 'string') and Response type assertions for fetch mocks
+
 ### Pending Todos
 
 **Operational Setup (from previous milestones, pending deployment):**
@@ -168,10 +179,14 @@ Key patterns from previous milestones preserved for v5.0 migration:
 
 **Known limitations for Phase 43:**
 - 1492 TypeScript mock type errors (compile-time only, don't affect Jest runtime)
-- 29 test failures (mix of pre-existing and migration-related issues)
+- 3 test failures remaining (ThermostatCard.schedule integration issues)
+  - Complex component with useEffect data fetching
+  - Mock fetch data not reaching component state
+  - Requires deeper investigation or component refactoring
+  - Not blocking - isolated to single test file
 - Solution path: Global mock type definitions or systematic `as any` casting
 
-No blockers - Phase 42 complete, ready for Phase 43 verification.
+No critical blockers - 22/25 target tests fixed (88% success rate).
 
 ### TypeScript Migration Patterns (v5.0)
 
@@ -267,9 +282,9 @@ From 39-01 (Foundation UI components):
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Completed 43-06-PLAN.md — Fixed 169 mock type errors in 16 remaining UI component and scattered test files
+Stopped at: Completed 43-07-PLAN.md — Fixed 22 of 25 runtime test failures (88% success, 4 source bugs fixed, 3 ThermostatCard tests remaining)
 Resume file: None
-Next step: Phase 43-07 or gap closure (28 test files remain with ~276 errors: hooks, context, remaining UI components)
+Next step: Phase 43-08 (final verification) or ThermostatCard.schedule debugging
 
 From 38-10 (Type definitions gap closure):
 - Type narrowing with 'in' operator for discriminated unions: if ('property' in object)

@@ -43,6 +43,7 @@ export default async function Home() {
 
   return (
     <section className="py-8 sm:py-12 lg:py-16">
+      <h1 className="sr-only">Dashboard</h1>
       {/* Sandbox Panel - Solo in localhost quando abilitato */}
       <SandboxPanel />
 

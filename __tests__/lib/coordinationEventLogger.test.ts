@@ -18,13 +18,13 @@ jest.mock('@/lib/firebaseAdmin');
 jest.mock('firebase-admin/firestore');
 
 describe('coordinationEventLogger', () => {
-  let mockCollection;
-  let mockAdd;
-  let mockWhere;
-  let mockOrderBy;
-  let mockLimit;
-  let mockGet;
-  let mockDb;
+  let mockCollection: jest.Mock;
+  let mockAdd: jest.Mock;
+  let mockWhere: jest.Mock;
+  let mockOrderBy: jest.Mock;
+  let mockLimit: jest.Mock;
+  let mockGet: jest.Mock;
+  let mockDb: any;
 
   beforeEach(() => {
     jest.clearAllMocks();

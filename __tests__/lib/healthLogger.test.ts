@@ -22,12 +22,12 @@ import { getAdminFirestore } from '../../lib/firebaseAdmin';
 import { Timestamp } from 'firebase-admin/firestore';
 
 describe('healthLogger', () => {
-  let mockDb;
-  let mockCollection;
-  let mockDoc;
-  let mockBatch;
-  let mockQuery;
-  let mockSnapshot;
+  let mockDb: any;
+  let mockCollection: any;
+  let mockDoc: any;
+  let mockBatch: any;
+  let mockQuery: any;
+  let mockSnapshot: any;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -229,7 +229,7 @@ describe('healthLogger', () => {
     });
 
     it('handles empty results array', async () => {
-      const results = [];
+      const results: any[] = [];
 
       const docId = await logHealthCheckRun(results);
 
@@ -300,7 +300,7 @@ describe('healthLogger', () => {
         toDate: jest.fn().mockReturnValue(mockDate),
       };
 
-      mockSnapshot.forEach.mockImplementation(callback => {
+      mockSnapshot.forEach.mockImplementation((callback: any) => {
         callback({
           id: 'doc1',
           data: jest.fn().mockReturnValue({
@@ -333,7 +333,7 @@ describe('healthLogger', () => {
     });
 
     it('returns array of check documents', async () => {
-      mockSnapshot.forEach.mockImplementation(callback => {
+      mockSnapshot.forEach.mockImplementation((callback: any) => {
         callback({
           id: 'check1',
           data: jest.fn().mockReturnValue({ userId: 'user1' }),
@@ -354,7 +354,7 @@ describe('healthLogger', () => {
 
   describe('getHealthStats', () => {
     it('calculates stats correctly', async () => {
-      mockSnapshot.forEach.mockImplementation(callback => {
+      mockSnapshot.forEach.mockImplementation((callback: any) => {
         callback({
           data: jest.fn().mockReturnValue({
             checkedCount: 3,

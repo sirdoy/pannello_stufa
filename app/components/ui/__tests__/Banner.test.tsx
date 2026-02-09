@@ -329,7 +329,7 @@ describe('Banner', () => {
 
     it('maintains proper heading hierarchy', () => {
       render(<Banner title="Heading Test" />);
-      const heading = screen.getByRole('heading', { level: 3 });
+      const heading = screen.getByRole('heading', { level: 2 });
       expect(heading).toHaveTextContent('Heading Test');
     });
 

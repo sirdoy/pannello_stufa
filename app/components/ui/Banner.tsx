@@ -217,7 +217,7 @@ export default function Banner({
           {/* Title */}
           {title && (
             <Heading
-              level={3}
+              level={2}
               size={compact ? 'sm' : 'md'}
               className={cn(
                 styles.title,

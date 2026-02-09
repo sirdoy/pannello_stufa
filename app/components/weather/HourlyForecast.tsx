@@ -121,9 +121,9 @@ export function HourlyForecast({ hourly, maxHours = 12 }: HourlyForecastProps) {
           <HourlyCard
             key={time}
             time={time}
-            weatherCode={displayCodes[index]}
-            temperature={displayTemps[index]}
-            precipProbability={displayPrecip[index]}
+            weatherCode={displayCodes[index] ?? 0}
+            temperature={displayTemps[index] ?? 0}
+            precipProbability={displayPrecip[index] ?? 0}
           />
         ))}
       </div>

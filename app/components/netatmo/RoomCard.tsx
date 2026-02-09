@@ -78,7 +78,7 @@ export default function RoomCard({ room, onRefresh }: RoomCardProps) {
       off: { text: 'Off', color: 'slate', icon: '⏸️' },
       schedule: { text: 'Programmato', color: 'ocean', icon: '⏰' },
     };
-    return badges[mode || 'schedule'] || badges.schedule;
+    return (badges[mode || 'schedule'] ?? badges.schedule)!;
   }
 
   // Room type display info

@@ -51,8 +51,9 @@ export default function CameraCard() {
 
   // Auto-select first camera
   useEffect(() => {
-    if (cameras.length > 0 && !selectedCameraId) {
-      setSelectedCameraId(cameras[0].id);
+    const firstCamera = cameras[0];
+    if (cameras.length > 0 && !selectedCameraId && firstCamera) {
+      setSelectedCameraId(firstCamera.id);
     }
   }, [cameras, selectedCameraId]);
 

@@ -204,7 +204,9 @@ export default function SandboxPanel() {
       };
 
       // Salva su Firebase
-      await saveSchedule(today, [testInterval]);
+      if (today) {
+        await saveSchedule(today, [testInterval]);
+      }
 
       // Attiva automaticamente lo scheduler se non è già attivo
       if (!schedulerMode.enabled) {
@@ -224,7 +226,9 @@ export default function SandboxPanel() {
       try {
         const dayNames = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
         const today = dayNames[new Date().getDay()];
-        await saveSchedule(today, []);
+        if (today) {
+          await saveSchedule(today, []);
+        }
         await loadData();
       } catch (err) {
         setError(err instanceof Error ? err.message : String(err));

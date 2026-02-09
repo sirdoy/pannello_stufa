@@ -49,7 +49,7 @@ const getStatusStyle = (status: string): StatusStyle => {
       className: 'bg-slate-500/20 text-slate-400 [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:text-slate-600',
     },
   };
-  return styles[status] || styles.unknown;
+  return (styles[status] ?? styles.unknown)!;
 };
 
 /**

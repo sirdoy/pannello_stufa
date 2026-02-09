@@ -84,7 +84,8 @@ export default function ParsedEventsPage() {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
+        const firstEntry = entries[0];
+        if (firstEntry?.isIntersecting) {
           handleLoadMore();
         }
       },

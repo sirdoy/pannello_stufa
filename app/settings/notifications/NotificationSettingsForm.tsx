@@ -227,13 +227,19 @@ export default function NotificationSettingsForm({
                       } else if (value) {
                         // Enable existing window
                         const updated = [...field.value];
-                        updated[0] = { ...updated[0], enabled: true };
-                        field.onChange(updated);
+                        const firstWindow = updated[0];
+                        if (firstWindow) {
+                          updated[0] = { ...firstWindow, enabled: true };
+                          field.onChange(updated);
+                        }
                       } else {
                         // Disable existing window
                         const updated = [...field.value];
-                        updated[0] = { ...updated[0], enabled: false };
-                        field.onChange(updated);
+                        const firstWindow = updated[0];
+                        if (firstWindow) {
+                          updated[0] = { ...firstWindow, enabled: false };
+                          field.onChange(updated);
+                        }
                       }
                     }}
                     label="Enable DND"

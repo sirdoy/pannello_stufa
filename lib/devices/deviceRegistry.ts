@@ -94,8 +94,8 @@ export function getDeviceNavItems(deviceId: string): NavItem[] {
   const device = getDeviceConfig(deviceId);
   if (!device) return [];
 
-  const navItems = [
-    { label: 'Controllo', route: device.routes.main },
+  const navItems: NavItem[] = [
+    { label: 'Controllo', route: device.routes.main! },
   ];
 
   // Add conditional nav items based on features
@@ -124,8 +124,11 @@ export function getDeviceNavItems(deviceId: string): NavItem[] {
       return;
     }
     // Add custom routes (e.g., scenes, zones, spotify, etc.)
-    const label = key.charAt(0).toUpperCase() + key.slice(1);
-    navItems.push({ label, route });
+    if (route) {
+      const label = key.charAt(0).toUpperCase() + key.slice(1);
+      const validRoute: string = route;
+      navItems.push({ label, route: validRoute });
+    }
   });
 
   return navItems;

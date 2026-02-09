@@ -291,10 +291,10 @@ afterEach(() => {
     (NextResponseMock as any).json.mockImplementation(nextResponseJsonImpl);
   }
 
-  localStorageMock.getItem.mockClear();
-  localStorageMock.setItem.mockClear();
-  localStorageMock.removeItem.mockClear();
-  localStorageMock.clear.mockClear();
+  localStorageMock.getItem?.mockClear();
+  localStorageMock.setItem?.mockClear();
+  localStorageMock.removeItem?.mockClear();
+  localStorageMock.clear?.mockClear();
 });
 
 // ===== ACCESSIBILITY TESTING (jest-axe) =====

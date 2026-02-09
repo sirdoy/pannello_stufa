@@ -33,7 +33,7 @@ const getTypeIcon = (type: string): string => {
     test: '🧪',
     generic: 'ℹ️',
   };
-  return icons[type] || icons.generic;
+  return (icons[type] ?? icons.generic)!;
 };
 
 /**
@@ -54,7 +54,7 @@ const getStatusStyle = (status: string): StatusStyle => {
       className: 'bg-ember-500/20 text-ember-400 [html:not(.dark)_&]:bg-ember-100 [html:not(.dark)_&]:text-ember-700',
     },
   };
-  return styles[status] || styles.sent;
+  return (styles[status] ?? styles.sent)!;
 };
 
 /**

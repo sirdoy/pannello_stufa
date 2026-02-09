@@ -722,7 +722,10 @@ export default function ThermostatCard() {
                         // Cycle: schedule -> away -> hg -> off -> schedule
                         const modes = ['schedule', 'away', 'hg', 'off'];
                         const nextIndex = (modes.indexOf(mode) + 1) % modes.length;
-                        handleModeChange(modes[nextIndex]);
+                        const nextMode = modes[nextIndex];
+                        if (nextMode) {
+                          handleModeChange(nextMode);
+                        }
                       }}
                       disabled={refreshing}
                     >

@@ -145,7 +145,10 @@ const Slider = forwardRef<HTMLSpanElement, SliderProps>(function Slider(
       if (range) {
         callback(values);
       } else {
-        callback(values[0]);
+        const firstValue = values[0];
+        if (firstValue !== undefined) {
+          callback(firstValue);
+        }
       }
     }
   }, [range, onValueChange, onChange]);

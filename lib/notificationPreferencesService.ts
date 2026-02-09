@@ -166,7 +166,7 @@ export const DEFAULT_PREFERENCES = {
  * @param {string} userId - User ID (Auth0 sub)
  * @returns {Promise<Object>} User preferences
  */
-export async function getUserPreferences(userId) {
+export async function getUserPreferences(userId: string) {
   if (!userId) {
     throw new Error('User ID required');
   }
@@ -199,7 +199,7 @@ export async function getUserPreferences(userId) {
  * @param {Object} preferences - Preferences object (partial update supported)
  * @returns {Promise<boolean>}
  */
-export async function updateUserPreferences(userId, preferences) {
+export async function updateUserPreferences(userId: string, preferences: Record<string, unknown>) {
   if (!userId) {
     throw new Error('User ID required');
   }
@@ -233,7 +233,7 @@ export async function updateUserPreferences(userId, preferences) {
  * @param {Object} sectionPreferences - Section preferences
  * @returns {Promise<boolean>}
  */
-export async function updatePreferenceSection(userId, section, sectionPreferences) {
+export async function updatePreferenceSection(userId: string, section: string, sectionPreferences: Record<string, unknown>) {
   if (!userId) {
     throw new Error('User ID required');
   }
@@ -263,7 +263,7 @@ export async function updatePreferenceSection(userId, section, sectionPreference
  * @param {string} severity - 'info'|'warning'|'error'|'critical'
  * @returns {Promise<boolean>}
  */
-export async function shouldSendErrorNotification(userId, severity) {
+export async function shouldSendErrorNotification(userId: string, severity: string) {
   if (!userId) return false;
 
   try {
@@ -290,7 +290,7 @@ export async function shouldSendErrorNotification(userId, severity) {
  * @param {string} action - 'ignition'|'shutdown'
  * @returns {Promise<boolean>}
  */
-export async function shouldSendSchedulerNotification(userId, action) {
+export async function shouldSendSchedulerNotification(userId: string, action: string) {
   if (!userId) return false;
 
   try {
@@ -317,7 +317,7 @@ export async function shouldSendSchedulerNotification(userId, action) {
  * @param {number} thresholdLevel - 80|90|100
  * @returns {Promise<boolean>}
  */
-export async function shouldSendMaintenanceNotification(userId, thresholdLevel) {
+export async function shouldSendMaintenanceNotification(userId: string, thresholdLevel: number) {
   if (!userId) return false;
 
   try {
@@ -343,7 +343,7 @@ export async function shouldSendMaintenanceNotification(userId, thresholdLevel) 
  * @param {string} userId - User ID
  * @returns {Promise<boolean>}
  */
-export async function resetPreferences(userId) {
+export async function resetPreferences(userId: string) {
   if (!userId) {
     throw new Error('User ID required');
   }
@@ -363,7 +363,7 @@ export async function resetPreferences(userId) {
  * @param {string} userId - User ID
  * @returns {Promise<Object>}
  */
-export async function getPreferenceStats(userId) {
+export async function getPreferenceStats(userId: string) {
   if (!userId) {
     throw new Error('User ID required');
   }

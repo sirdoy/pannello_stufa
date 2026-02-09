@@ -31,7 +31,7 @@ function getVapidKey() {
 /**
  * Debug logger - salva log su Firebase per troubleshooting remoto
  */
-async function debugLog(message, data = {}) {
+async function debugLog(message: string, data: Record<string, unknown> = {}) {
   try {
     await fetch('/api/debug/log', {
       method: 'POST',
@@ -141,7 +141,7 @@ export async function requestNotificationPermission() {
  * - Device fingerprinting for multi-device support
  * - Token refresh awareness (see tokenRefresh.js)
  */
-export async function getFCMToken(userId) {
+export async function getFCMToken(userId: string) {
   // Ottieni VAPID key al momento dell'uso
   const vapidKey = getVapidKey();
 
@@ -239,18 +239,21 @@ export async function getFCMToken(userId) {
             const sw = newReg.installing || newReg.waiting;
             const timeout = setTimeout(() => reject(new Error('SW activation timeout')), timeoutMs);
 
-            sw.addEventListener('statechange', () => {
-              if (sw.state === 'activated') {
-                clearTimeout(timeout);
-                resolve(undefined);
-              }
-            });
+            if (sw) {
+              sw.addEventListener('statechange', () => {
+                if (sw && sw.state === 'activated') {
+                  clearTimeout(timeout);
+                  resolve(undefined);
+                }
+              });
+            }
           });
         }
 
         return newReg;
-      } catch (regError) {
-        await debugLog('Errore registrazione SW', { error: regError.message });
+      } catch (regError: unknown) {
+        const errorMessage = regError instanceof Error ? regError.message : String(regError);
+        await debugLog('Errore registrazione SW', { error: errorMessage });
         throw regError;
       }
     };
@@ -330,10 +333,12 @@ export async function getFCMToken(userId) {
     console.log('✅ FCM token salvato:', token);
     return token;
 
-  } catch (error) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack?.substring(0, 500) : undefined;
     await debugLog('Errore getFCMToken', {
-      error: error.message,
-      stack: error.stack?.substring(0, 500),
+      error: errorMessage,
+      stack: errorStack,
     });
     console.error('❌ Errore ottenimento FCM token:', error);
     throw error;
@@ -344,7 +349,7 @@ export async function getFCMToken(userId) {
  * Setup listener per notifiche in foreground
  * (quando l'app è aperta)
  */
-export function onForegroundMessage(callback) {
+export function onForegroundMessage(callback?: (payload: unknown) => void) {
   if (!isNotificationSupported()) return () => {};
 
   const messaging = getMessaging();
@@ -358,7 +363,7 @@ export function onForegroundMessage(callback) {
 
       // Crea notifica nativa
       if (Notification.permission === 'granted') {
-        const notification = new Notification(title, {
+        const notification = new Notification(title || '', {
           body,
           icon: icon || '/icons/icon-192.png',
           badge: '/icons/icon-72.png',
@@ -390,7 +395,7 @@ export function onForegroundMessage(callback) {
 /**
  * Helper: Crea payload notifica per errori stufa
  */
-export function createErrorNotification(errorCode, errorDescription, severity) {
+export function createErrorNotification(errorCode: string | number, errorDescription: string, severity: string) {
   const emoji = severity === 'CRITICAL' ? '🚨' : severity === 'ERROR' ? '⚠️' : 'ℹ️';
 
   return {
@@ -412,7 +417,7 @@ export function createErrorNotification(errorCode, errorDescription, severity) {
 /**
  * Helper: Crea payload notifica per scheduler
  */
-export function createSchedulerNotification(action, details) {
+export function createSchedulerNotification(action: string, details?: string) {
   const emoji = action === 'IGNITE' ? '🔥' : '🌙';
   const actionText = action === 'IGNITE' ? 'Accensione' : 'Spegnimento';
 
@@ -434,7 +439,7 @@ export function createSchedulerNotification(action, details) {
 /**
  * Helper: Crea payload notifica per manutenzione
  */
-export function createMaintenanceNotification(percentage, remainingHours) {
+export function createMaintenanceNotification(percentage: number, remainingHours: number) {
   const emoji = percentage >= 100 ? '🚨' : percentage >= 80 ? '⚠️' : 'ℹ️';
   const urgency = percentage >= 100 ? 'URGENTE' : percentage >= 80 ? 'Attenzione' : 'Promemoria';
 
@@ -466,7 +471,7 @@ export function createMaintenanceNotification(percentage, remainingHours) {
 /**
  * Helper: Crea payload notifica generica
  */
-export function createGenericNotification(title, body, data = {}) {
+export function createGenericNotification(title: string, body: string, data: Record<string, unknown> = {}) {
   return {
     notification: {
       title,
@@ -483,7 +488,7 @@ export function createGenericNotification(title, body, data = {}) {
 /**
  * Ottiene tutti i token FCM di un utente
  */
-export async function getUserFCMTokens(userId) {
+export async function getUserFCMTokens(userId: string) {
   if (!userId) return [];
 
   try {
@@ -517,7 +522,7 @@ export async function getUserFCMTokens(userId) {
  *   permissionStatus: string
  * }>}
  */
-export async function initializeNotifications(userId) {
+export async function initializeNotifications(userId: string) {
   if (!isNotificationSupported()) {
     return {
       hasToken: false,
@@ -549,14 +554,15 @@ export async function initializeNotifications(userId) {
       wasRefreshed: result.wasRefreshed,
       permissionStatus,
     };
-  } catch (error) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('[initializeNotifications] Error:', error);
     return {
       hasToken: false,
       token: null,
       wasRefreshed: false,
       permissionStatus,
-      error: error.message,
+      error: errorMessage,
     };
   }
 }

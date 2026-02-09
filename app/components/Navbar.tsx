@@ -29,9 +29,9 @@ export function getMobileQuickActions(navStructure: any) {
 
   // Check which devices are enabled
   const devices = navStructure.devices || [];
-  const hasStove = devices.some(d => d.id === 'stove');
-  const hasThermostat = devices.some(d => d.id === 'thermostat');
-  const hasLights = devices.some(d => d.id === 'lights');
+  const hasStove = devices.some((d: any) => d.id === 'stove');
+  const hasThermostat = devices.some((d: any) => d.id === 'thermostat');
+  const hasLights = devices.some((d: any) => d.id === 'lights');
 
   // Priority 1: Stove (Orari + Errori)
   if (hasStove) {
@@ -85,18 +85,18 @@ export default function Navbar() {
   useEffect(() => {
     if (!userDropdownOpen && !settingsDropdownOpen && !desktopDeviceDropdown) return;
 
-    const handleClickOutside = (event) => {
-      if (userDropdownOpen && userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userDropdownOpen && userDropdownRef.current && !userDropdownRef.current.contains(event.target as Node)) {
         setUserDropdownOpen(false);
       }
 
-      if (settingsDropdownOpen && settingsDropdownRef.current && !settingsDropdownRef.current.contains(event.target)) {
+      if (settingsDropdownOpen && settingsDropdownRef.current && !settingsDropdownRef.current.contains(event.target as Node)) {
         setSettingsDropdownOpen(false);
       }
 
       if (desktopDeviceDropdown) {
         const ref = desktopDeviceRefs.current[desktopDeviceDropdown];
-        if (ref && !ref.contains(event.target)) {
+        if (ref && !ref.contains(event.target as Node)) {
           setDesktopDeviceDropdown(null);
         }
       }
@@ -108,7 +108,7 @@ export default function Navbar() {
 
   // Escape key to close everything
   useEffect(() => {
-    const handleEscape = (e) => {
+    const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setMobileMenuOpen(false);
         setUserDropdownOpen(false);
@@ -151,8 +151,8 @@ export default function Navbar() {
         if (configRes.ok) {
           const configData = await configRes.json();
           // Convert enabledDevices array to preferences object for navbar
-          const prefs = {};
-          (configData.enabledDevices || []).forEach(id => {
+          const prefs: Record<string, boolean> = {};
+          (configData.enabledDevices || []).forEach((id: string) => {
             prefs[id] = true;
           });
           setDevicePreferences(prefs);
@@ -165,10 +165,10 @@ export default function Navbar() {
     fetchData();
   }, []);
 
-  const isActive = (path) => pathname === path;
+  const isActive = (path: string) => pathname === path;
 
   // Icon mapping for quick navigation
-  const getIconForPath = (path) => {
+  const getIconForPath = (path: string) => {
     if (path === '/') return <Home className="w-5 h-5" />;
     if (path.includes('scheduler')) return <Calendar className="w-5 h-5" />;
     if (path.includes('errors')) return <AlertCircle className="w-5 h-5" />;

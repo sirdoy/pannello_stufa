@@ -10,6 +10,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
+// @ts-expect-error - No type definitions available
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 import {
   updatePreferenceSection,
@@ -102,16 +103,16 @@ interface CategorySectionProps {
  * Category Section Component
  */
 function CategorySection({ categoryId, config, preferences, onSave, isSaving }: CategorySectionProps) {
-  const categoryPrefs = preferences[categoryId] || {};
-  const isEnabled = categoryPrefs.enabled ?? DEFAULT_PREFERENCES[categoryId]?.enabled ?? true;
+  const categoryPrefs = (preferences as Record<string, any>)[categoryId] || {};
+  const isEnabled = categoryPrefs.enabled ?? (DEFAULT_PREFERENCES as Record<string, any>)[categoryId]?.enabled ?? true;
 
-  const handleFieldChange = (fieldKey, value) => {
+  const handleFieldChange = (fieldKey: string, value: any) => {
     const newPrefs = setNestedValue(categoryPrefs, fieldKey, value);
     onSave(categoryId, newPrefs);
   };
 
-  const masterField = config.fields.find(f => f.isMaster);
-  const subFields = config.fields.filter(f => !f.isMaster);
+  const masterField = config.fields.find((f: any) => f.isMaster);
+  const subFields = config.fields.filter((f: any) => !f.isMaster);
 
   return (
     <Card variant="glass" className="p-6">
@@ -133,7 +134,7 @@ function CategorySection({ categoryId, config, preferences, onSave, isSaving }: 
           <PreferenceToggle
             label={masterField.label}
             description={masterField.description}
-            checked={getNestedValue(categoryPrefs, masterField.key) ?? getNestedValue(DEFAULT_PREFERENCES[categoryId], masterField.key) ?? true}
+            checked={getNestedValue(categoryPrefs, masterField.key) ?? getNestedValue((DEFAULT_PREFERENCES as Record<string, any>)[categoryId], masterField.key) ?? true}
             onChange={(value) => handleFieldChange(masterField.key, value)}
             disabled={isSaving}
           />
@@ -142,13 +143,13 @@ function CategorySection({ categoryId, config, preferences, onSave, isSaving }: 
         {/* Sub fields (only visible when master is enabled) */}
         {isEnabled && subFields.length > 0 && (
           <div className="ml-4 pl-4 border-l-2 border-slate-700/50 [html:not(.dark)_&]:border-slate-200 space-y-1">
-            {subFields.map((field) => (
+            {subFields.map((field: any) => (
               <PreferenceToggle
                 key={field.key}
                 label={field.label}
                 description={field.description}
                 icon={field.icon}
-                checked={getNestedValue(categoryPrefs, field.key) ?? getNestedValue(DEFAULT_PREFERENCES[categoryId], field.key) ?? true}
+                checked={getNestedValue(categoryPrefs, field.key) ?? getNestedValue((DEFAULT_PREFERENCES as Record<string, any>)[categoryId], field.key) ?? true}
                 onChange={(value) => handleFieldChange(field.key, value)}
                 disabled={isSaving}
               />
@@ -187,7 +188,7 @@ export default function NotificationPreferencesPanel() {
   }, [hookError]);
 
   // Save section preferences using real-time sync
-  const saveSection = async (section, sectionPrefs) => {
+  const saveSection = async (section: string, sectionPrefs: any) => {
     if (!user?.sub) return;
 
     setError(null);
@@ -297,7 +298,7 @@ export default function NotificationPreferencesPanel() {
 
       {/* Render each category */}
       {categoryOrder.map((categoryId) => {
-        const config = NOTIFICATION_CATEGORIES_CONFIG[categoryId];
+        const config = (NOTIFICATION_CATEGORIES_CONFIG as Record<string, any>)[categoryId];
         if (!config) return null;
 
         return (

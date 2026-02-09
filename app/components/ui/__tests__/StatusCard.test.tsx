@@ -213,7 +213,7 @@ describe('StatusCard', () => {
       // Should only have ConnectionStatus text, not a Badge
       expect(screen.getByText('Online')).toBeInTheDocument();
       // The text "Online" is from ConnectionStatus, not a Badge
-      expect(screen.queryByRole('status').textContent).toContain('Online');
+      expect(screen.queryByRole('status')!.textContent).toContain('Online');
     });
   });
 

@@ -13,7 +13,7 @@ import Tooltip, { TooltipProvider, TooltipContent, TooltipTrigger } from '../Too
 expect.extend(toHaveNoViolations);
 
 // Test wrapper - TooltipProvider is required for Radix Tooltip
-const renderWithProvider = (ui) => render(<TooltipProvider>{ui}</TooltipProvider>);
+const renderWithProvider = (ui: React.ReactElement) => render(<TooltipProvider>{ui}</TooltipProvider>);
 
 describe('Tooltip', () => {
   describe('Rendering', () => {

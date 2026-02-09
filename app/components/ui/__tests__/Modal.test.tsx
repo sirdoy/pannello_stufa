@@ -207,7 +207,7 @@ describe('Modal Component', () => {
       expect(overlay).toBeInTheDocument();
 
       // Click the overlay (backdrop)
-      await user.click(overlay);
+      await user.click(overlay!);
 
       // Wait for the close handler to be called
       await waitFor(() => {

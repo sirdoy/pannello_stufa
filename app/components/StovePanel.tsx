@@ -188,7 +188,7 @@ export default function StovePanel() {
     setRefreshing(false);
   };
 
-  const handleFanChange = async (e) => {
+  const handleFanChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const level = Number(e.target.value);
     setFanLevel(level);
     await fetch(STOVE_ROUTES.setFan, {
@@ -198,7 +198,7 @@ export default function StovePanel() {
     await logStoveAction.setFan(level);
   };
 
-  const handlePowerChange = async (e) => {
+  const handlePowerChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const level = Number(e.target.value);
     setPowerLevel(level);
     await fetch(STOVE_ROUTES.setPower, {
@@ -267,7 +267,7 @@ export default function StovePanel() {
     }
   };
 
-  const getStatusBgColor = (status) => {
+  const getStatusBgColor = (status: string) => {
     if (!status) return 'bg-slate-50';
     if (status.includes('WORK')) return 'bg-sage-50 border-sage-200';
     if (status.includes('OFF')) return 'bg-slate-50 border-slate-200';
@@ -276,7 +276,7 @@ export default function StovePanel() {
     return 'bg-slate-50 border-slate-200';
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = (status: string) => {
     if (!status) return '❔';
     if (status.includes('WORK')) return '🔥';
     if (status.includes('OFF')) return '❄️';
@@ -286,7 +286,7 @@ export default function StovePanel() {
     return '❔';
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string) => {
     if (!status) return 'text-slate-500';
     if (status.includes('WORK')) return 'text-sage-600';
     if (status.includes('OFF')) return 'text-slate-500';

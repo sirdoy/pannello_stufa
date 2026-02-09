@@ -293,7 +293,7 @@ describe('Text', () => {
       const text = screen.getByText('Label');
       // Should only have one uppercase class from the label variant
       const classAttr = text.getAttribute('class');
-      const uppercaseCount = (classAttr.match(/\buppercase\b/g) || []).length;
+      const uppercaseCount = (classAttr!.match(/\buppercase\b/g) || []).length;
       expect(uppercaseCount).toBe(1);
     });
 

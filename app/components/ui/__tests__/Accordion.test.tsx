@@ -331,7 +331,7 @@ describe('Accordion Component', () => {
       const ariaControls = trigger.getAttribute('aria-controls');
 
       expect(ariaControls).toBeTruthy();
-      expect(document.getElementById(ariaControls)).toBeInTheDocument();
+      expect(document.getElementById(ariaControls!)).toBeInTheDocument();
     });
 
     test('content has role region when open', () => {

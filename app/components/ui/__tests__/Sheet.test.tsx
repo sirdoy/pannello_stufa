@@ -110,7 +110,7 @@ describe('Sheet Component', () => {
       const overlay = document.querySelector('.backdrop-blur-md');
       expect(overlay).toBeInTheDocument();
 
-      await user.click(overlay);
+      await user.click(overlay!);
 
       await waitFor(() => {
         expect(handleOpenChange).toHaveBeenCalledWith(false);

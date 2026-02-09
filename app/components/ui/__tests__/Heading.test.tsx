@@ -322,7 +322,7 @@ describe('Heading', () => {
       const ref = { current: null };
       render(<Heading ref={ref}>Title</Heading>);
       expect(ref.current).toBeInstanceOf(HTMLHeadingElement);
-      expect(ref.current.tagName).toBe('H2');
+      expect(ref.current!.tagName).toBe('H2');
     });
   });
 

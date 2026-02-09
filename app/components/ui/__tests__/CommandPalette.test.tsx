@@ -501,7 +501,7 @@ describe('CommandPalette', () => {
 
       // Items should have py-3 for 48px touch targets
       const item = screen.getByText('Dashboard').closest('[data-selected]');
-      expect(item.className).toContain('py-3');
+      expect(item!.className).toContain('py-3');
     });
 
     it('placeholder is visible', () => {

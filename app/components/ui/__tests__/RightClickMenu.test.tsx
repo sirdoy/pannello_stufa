@@ -68,7 +68,7 @@ const TestRightClickMenuWithCheckbox = ({
 /**
  * Test helper: RightClickMenu with groups and labels
  */
-const TestRightClickMenuWithGroups = (props) => (
+const TestRightClickMenuWithGroups = (props: any) => (
   <RightClickMenu {...props}>
     <RightClickMenu.Trigger asChild>
       <div data-testid="context-trigger">Right-click me</div>
@@ -603,7 +603,7 @@ describe('RightClickMenu Component', () => {
       const text = screen.getByText('View Details');
 
       // Icon's parent span should come before text's parent span
-      const iconParent = icon.parentElement;
+      const iconParent = icon!.parentElement;
       const textParent = text.parentElement;
 
       expect(item.firstElementChild).toBe(iconParent);

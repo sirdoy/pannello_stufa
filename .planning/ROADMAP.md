@@ -91,10 +91,17 @@ Plans:
 3. All useState/useRef/useContext hooks have explicit type arguments
 4. tsc --noEmit shows zero errors in components/ and app/components/
 
-**Plans**: TBD
+**Plans**: 8 plans
 
 Plans:
-- [ ] 45-01: TBD after phase planning
+- [ ] 45-01-PLAN.md — Fix LightsCard (52) + ThermostatCard (37) strict-mode errors
+- [ ] 45-02-PLAN.md — Fix StoveCard, GlassEffect, camera components strict-mode errors
+- [ ] 45-03-PLAN.md — Fix 20 UI source components strict-mode errors
+- [ ] 45-04-PLAN.md — Fix panels: PidAutomation, Sandbox, Notifications, Navbar, StovePanel
+- [ ] 45-05-PLAN.md — Fix scheduler, lights, navigation, standalone components
+- [ ] 45-06-PLAN.md — Fix Toast.test.tsx (48) + FormModal.test.tsx (26) strict-mode errors
+- [ ] 45-07-PLAN.md — Fix 18 remaining test files strict-mode errors
+- [ ] 45-08-PLAN.md — Gap sweep + final verification
 
 ---
 
@@ -175,7 +182,7 @@ Plans:
 | 6-10 | v2.0 | 21/21 | ✓ Complete | 2026-01-28 |
 | 1-5 | v1.0 | 29/29 | ✓ Complete | 2026-01-26 |
 | **44** | **v5.1** | **7/7** | **✓ Complete** | **2026-02-09** |
-| **45** | **v5.1** | **0/TBD** | **Not started** | **-** |
+| **45** | **v5.1** | **0/8** | **Planned** | **-** |
 | **46** | **v5.1** | **0/TBD** | **Not started** | **-** |
 | **47** | **v5.1** | **0/TBD** | **Not started** | **-** |
 | **48** | **v5.1** | **0/TBD** | **Not started** | **-** |

@@ -77,9 +77,9 @@ export default function LightsCard() {
   const selectedRoom = rooms.find(r => r.id === selectedRoomId) || rooms[0];
 
   // Extract grouped_light ID from room services
-  const getGroupedLightId = (room: any): string | undefined => {
+  const getGroupedLightId = (room: any): string | null => {
     if (!room?.services) return null;
-    const groupedLight = room.services.find(s => s.rtype === 'grouped_light');
+    const groupedLight = room.services.find((s: any) => s.rtype === 'grouped_light');
     return groupedLight?.rid || null;
   };
 
@@ -88,30 +88,30 @@ export default function LightsCard() {
   // Use 'children' to get individual lights for this room
   // In Hue API v2 (Local): children contains device IDs, light.owner.rid points to device
   // In Hue API v2 (Remote normalized): children may contain light IDs directly
-  const roomLights = lights.filter(light =>
-    selectedRoom?.children?.some(c =>
+  const roomLights = lights.filter((light: any) =>
+    selectedRoom?.children?.some((c: any) =>
       c.rid === light.id || // Remote API: light ID in children
       c.rid === light.owner?.rid // Local API: device ID in children, match via owner
     )
   );
-  const roomScenes = scenes.filter(scene =>
+  const roomScenes = scenes.filter((scene: any) =>
     scene.group?.rid === selectedRoom?.id
   );
 
   // Check if room has any color-capable lights
-  const hasColorLights = roomLights.some(light => supportsColor(light));
+  const hasColorLights = roomLights.some((light: any) => supportsColor(light));
 
   // Get lights associated with the room via services (more reliable than children)
   // This matches how isRoomOn calculates state
   const serviceLights = selectedRoom?.services
-    ?.map(s => lights.find(l => l.id === s.rid))
+    ?.map((s: any) => lights.find((l: any) => l.id === s.rid))
     .filter(Boolean) || [];
 
   // Use serviceLights if roomLights is empty (API inconsistency between children/services)
   const effectiveLights = roomLights.length > 0 ? roomLights : serviceLights;
 
   // Calculate lights on/off state for better UX
-  const lightsOnCount = effectiveLights.filter(light => light?.on?.on).length;
+  const lightsOnCount = effectiveLights.filter((light: any) => light?.on?.on).length;
   const lightsOffCount = effectiveLights.length - lightsOnCount;
   const allLightsOn = effectiveLights.length > 0 && lightsOnCount === effectiveLights.length;
   const allLightsOff = effectiveLights.length > 0 && lightsOffCount === effectiveLights.length;
@@ -122,23 +122,24 @@ export default function LightsCard() {
       setError(null);
 
       const response = await fetch('/api/hue/status');
-      const data = await response.json();
+      const data = await response.json() as { connected?: boolean; connection_mode?: string; remote_connected?: boolean };
 
       if (data.connected) {
         setConnected(true);
-        setConnectionMode(data.connection_mode || 'local');
+        setConnectionMode((data.connection_mode as 'local' | 'remote' | 'hybrid' | 'disconnected') || 'local');
         setRemoteConnected(data.remote_connected || false);
       } else {
         setConnected(false);
         setConnectionMode('disconnected');
         setRemoteConnected(false);
       }
-    } catch (err) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       console.error('Errore connessione Hue:', err);
       setConnected(false);
       setConnectionMode('disconnected');
       setRemoteConnected(false);
-      setError(err.message);
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -158,7 +159,11 @@ export default function LightsCard() {
         roomsRes.json(),
         lightsRes.json(),
         scenesRes.json(),
-      ]);
+      ]) as [
+        { rooms?: any[]; reconnect?: boolean; error?: string },
+        { lights?: any[]; reconnect?: boolean; error?: string },
+        { scenes?: any[]; reconnect?: boolean; error?: string }
+      ];
 
       if (roomsData.reconnect || lightsData.reconnect || scenesData.reconnect) {
         setConnected(false);
@@ -174,7 +179,7 @@ export default function LightsCard() {
       console.log('🔍 Client - Scenes received:', scenesData.scenes?.length || 0);
 
       // Sort rooms with 'Casa' first, then alphabetical
-      const sortedRooms = (roomsData.rooms || []).sort((a, b) => {
+      const sortedRooms = (roomsData.rooms || []).sort((a: any, b: any) => {
         if (a.metadata?.name === 'Casa') return -1;
         if (b.metadata?.name === 'Casa') return 1;
         return (a.metadata?.name || '').localeCompare(b.metadata?.name || '');
@@ -182,9 +187,10 @@ export default function LightsCard() {
       setRooms(sortedRooms);
       setLights(lightsData.lights || []);
       setScenes(scenesData.scenes || []);
-    } catch (err) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       console.error('Errore fetch dati Hue:', err);
-      setError(err.message);
+      setError(message);
     }
   }
 
@@ -195,7 +201,7 @@ export default function LightsCard() {
     setRefreshing(false);
   }
 
-  async function handleRoomToggle(roomId, on) {
+  async function handleRoomToggle(roomId: string | null | undefined, on: boolean) {
     try {
       setLoadingMessage(on ? 'Accensione luci...' : 'Spegnimento luci...');
       setRefreshing(true);
@@ -206,18 +212,19 @@ export default function LightsCard() {
         body: JSON.stringify({ on: { on } }),
       });
 
-      const data = await response.json();
+      const data = await response.json() as { error?: string };
       if (data.error) throw new Error(data.error);
       // Aggiorna dati dopo il comando
       await fetchData();
-    } catch (err) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
     } finally {
       setRefreshing(false);
     }
   }
 
-  async function handleBrightnessChange(roomId, brightness) {
+  async function handleBrightnessChange(roomId: string | null | undefined, brightness: string) {
     try {
       setLoadingMessage('Modifica luminosità...');
       setRefreshing(true);
@@ -230,18 +237,19 @@ export default function LightsCard() {
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json() as { error?: string };
       if (data.error) throw new Error(data.error);
       // Aggiorna dati dopo il comando
       await fetchData();
-    } catch (err) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
     } finally {
       setRefreshing(false);
     }
   }
 
-  async function handleSceneActivate(sceneId) {
+  async function handleSceneActivate(sceneId: string) {
     try {
       setLoadingMessage('Attivazione scena...');
       setRefreshing(true);
@@ -250,12 +258,13 @@ export default function LightsCard() {
         method: 'PUT',
       });
 
-      const data = await response.json();
+      const data = await response.json() as { error?: string };
       if (data.error) throw new Error(data.error);
       // Aggiorna dati dopo il comando
       await fetchData();
-    } catch (err) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
     } finally {
       setRefreshing(false);
     }
@@ -264,7 +273,7 @@ export default function LightsCard() {
   /**
    * Toggle all lights in the house (all rooms at once)
    */
-  async function handleAllLightsToggle(on) {
+  async function handleAllLightsToggle(on: boolean) {
     try {
       setLoadingMessage(on ? 'Accensione tutte le luci...' : 'Spegnimento tutte le luci...');
       setRefreshing(true);
@@ -272,12 +281,12 @@ export default function LightsCard() {
 
       // Get all grouped_light IDs from all rooms
       const groupedLightIds = rooms
-        .map(room => room.services?.find(s => s.rtype === 'grouped_light')?.rid)
+        .map((room: any) => room.services?.find((s: any) => s.rtype === 'grouped_light')?.rid)
         .filter(Boolean);
 
       // Toggle all rooms in parallel
       await Promise.all(
-        groupedLightIds.map(groupId =>
+        groupedLightIds.map((groupId: string) =>
           fetch(`/api/hue/rooms/${groupId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -288,8 +297,9 @@ export default function LightsCard() {
 
       // Refresh data after all commands
       await fetchData();
-    } catch (err) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
     } finally {
       setRefreshing(false);
     }
@@ -318,7 +328,7 @@ export default function LightsCard() {
         method: 'POST',
       });
 
-      const data = await response.json();
+      const data = await response.json() as { error?: string };
 
       if (data.error) {
         throw new Error(data.error);
@@ -326,9 +336,10 @@ export default function LightsCard() {
 
       // Refresh connection status
       await checkConnection();
-    } catch (err) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       console.error('Disconnect error:', err);
-      setError(err.message);
+      setError(message);
     } finally {
       setRefreshing(false);
     }
@@ -352,7 +363,7 @@ export default function LightsCard() {
         const errorText = await response.text();
         let errorMessage = `Errore HTTP ${response.status}`;
         try {
-          const errorData = JSON.parse(errorText);
+          const errorData = JSON.parse(errorText) as { error?: string };
           errorMessage = errorData.error || errorMessage;
         } catch {
           // Could not parse JSON, use status-based message
@@ -363,7 +374,7 @@ export default function LightsCard() {
         throw new Error(errorMessage);
       }
 
-      const data = await response.json();
+      const data = await response.json() as { bridges?: any[]; error?: string };
 
       if (data.error) {
         throw new Error(data.error);
@@ -384,9 +395,10 @@ export default function LightsCard() {
       } else {
         setPairingStep('selectBridge');
       }
-    } catch (err) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       console.error('Discovery error:', err);
-      setPairingError(err.message || 'Errore durante la ricerca del bridge');
+      setPairingError(message || 'Errore durante la ricerca del bridge');
       setPairing(false);
     }
   }
@@ -394,7 +406,7 @@ export default function LightsCard() {
   /**
    * Step 2: Pair with selected bridge (requires button press)
    */
-  async function handlePairWithBridge(bridge) {
+  async function handlePairWithBridge(bridge: any) {
     try {
       setPairingStep('pairing');
       setPairingError(null);
@@ -402,9 +414,9 @@ export default function LightsCard() {
 
       // Start countdown timer
       pairingTimerRef.current = setInterval(() => {
-        setPairingCountdown(prev => {
+        setPairingCountdown((prev: number) => {
           if (prev <= 1) {
-            clearInterval(pairingTimerRef.current);
+            if (pairingTimerRef.current) clearInterval(pairingTimerRef.current);
             return 0;
           }
           return prev - 1;
@@ -421,7 +433,7 @@ export default function LightsCard() {
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json() as { error?: string; success?: boolean };
 
       if (pairingTimerRef.current) {
         clearInterval(pairingTimerRef.current);
@@ -443,9 +455,10 @@ export default function LightsCard() {
           checkConnection();
         }, 2000);
       }
-    } catch (err) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       console.error('Pairing error:', err);
-      setPairingError(err.message);
+      setPairingError(message);
       if (pairingTimerRef.current) {
         clearInterval(pairingTimerRef.current);
       }
@@ -464,7 +477,7 @@ export default function LightsCard() {
   /**
    * Handle bridge selection from multiple bridges
    */
-  function handleSelectBridge(bridge) {
+  function handleSelectBridge(bridge: any) {
     setSelectedBridge(bridge);
     setPairingStep('waitingForButtonPress');
   }
@@ -506,7 +519,7 @@ export default function LightsCard() {
   }, []);
 
   // Build props for DeviceCard
-  const banners = [];
+  const banners: any[] = [];
 
   // No local bridge found - offer remote option
   if (pairing && pairingStep === 'noLocalBridge') {
@@ -545,7 +558,7 @@ export default function LightsCard() {
       icon: '🔗',
       title: 'Seleziona Bridge',
       description: `Trovati ${discoveredBridges.length} bridge sulla rete. Seleziona quello da connettere.`,
-      actions: discoveredBridges.map(bridge => ({
+      actions: discoveredBridges.map((bridge: any) => ({
         label: `${bridge.internalipaddress}`,
         onClick: () => handleSelectBridge(bridge),
         variant: selectedBridge?.id === bridge.id ? 'ember' : 'outline'
@@ -644,7 +657,7 @@ export default function LightsCard() {
   const getStatusBadge = () => {
     if (!connected || !connectionMode) return null;
 
-    const badges = {
+    const badges: Record<string, { icon: string; label: string; color: string }> = {
       'local': { icon: '📡', label: 'Local', color: 'sage' },
       'remote': { icon: '☁️', label: 'Cloud', color: 'ocean' },
       'hybrid': { icon: '🔄', label: 'Hybrid', color: 'warning' },
@@ -653,35 +666,35 @@ export default function LightsCard() {
     return badges[connectionMode] || null;
   };
 
-  const isRoomOn = selectedRoom?.services?.some(s => {
-    const light = lights.find(l => l.id === s.rid);
+  const isRoomOn = selectedRoom?.services?.some((s: any) => {
+    const light = lights.find((l: any) => l.id === s.rid);
     return light?.on?.on;
   }) || false;
 
   // Calculate total house lights state for quick control
-  const totalLightsOn = lights.filter(l => l.on?.on).length;
+  const totalLightsOn = lights.filter((l: any) => l.on?.on).length;
   const totalLightsOff = lights.length - totalLightsOn;
   const allHouseLightsOn = lights.length > 0 && totalLightsOn === lights.length;
   const allHouseLightsOff = lights.length > 0 && totalLightsOff === lights.length;
   const hasAnyLights = lights.length > 0;
 
   const avgBrightness = selectedRoom && effectiveLights.length > 0 ? Math.round(
-    effectiveLights.reduce((sum, l) => sum + (l.dimming?.brightness || 0), 0) / effectiveLights.length
+    effectiveLights.reduce((sum: number, l: any) => sum + (l.dimming?.brightness || 0), 0) / effectiveLights.length
   ) : 0;
 
   // Calculate perceived luminance of a hex color (0 = dark, 1 = bright)
-  const getLuminance = (hex) => {
-    const rgb = hex.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16) / 255) || [0, 0, 0];
-    const [r, g, b] = rgb.map(c => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+  const getLuminance = (hex: string): number => {
+    const rgb = hex.replace('#', '').match(/.{2}/g)?.map((x: string) => parseInt(x, 16) / 255) || [0, 0, 0];
+    const [r, g, b] = rgb.map((c: number) => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
   };
 
   // Determine if text should be light or dark based on background colors
-  const getContrastMode = (colors, brightness) => {
+  const getContrastMode = (colors: string[], brightness: number): 'light' | 'dark' | 'default' => {
     if (colors.length === 0) return 'default';
 
     // Calculate average luminance of all colors
-    const avgLuminance = colors.reduce((sum, color) => sum + getLuminance(color), 0) / colors.length;
+    const avgLuminance = colors.reduce((sum: number, color: string) => sum + getLuminance(color), 0) / colors.length;
 
     // Factor in brightness (higher brightness = lighter background)
     const effectiveLuminance = avgLuminance * (brightness / 100);
@@ -691,24 +704,24 @@ export default function LightsCard() {
   };
 
   // Calculate colors of ON lights for dynamic styling
-  const getRoomLightColors = () => {
-    const onLights = effectiveLights.filter(light => light?.on?.on);
+  const getRoomLightColors = (): { colors: string[]; avgBrightness: number } => {
+    const onLights = effectiveLights.filter((light: any) => light?.on?.on);
     if (onLights.length === 0) return { colors: [], avgBrightness: 0 };
 
     const colors = onLights
-      .map(light => {
+      .map((light: any) => {
         const hex = getCurrentColorHex(light);
         // If no color (white/CT only), use warm white
         return hex || '#FFE4B5';
       })
-      .filter(Boolean);
+      .filter(Boolean) as string[];
 
     // Remove duplicates
     const uniqueColors = [...new Set(colors)];
 
     // Calculate average brightness of ON lights only
     const onBrightness = Math.round(
-      onLights.reduce((sum, l) => sum + (l.dimming?.brightness || 100), 0) / onLights.length
+      onLights.reduce((sum: number, l: any) => sum + (l.dimming?.brightness || 100), 0) / onLights.length
     );
 
     return { colors: uniqueColors, avgBrightness: onBrightness };
@@ -759,7 +772,20 @@ export default function LightsCard() {
 
   // Adaptive UI classes based on background contrast
   // Following Ember Noir design system - use standard button variants
-  const adaptiveClasses = {
+  const adaptiveClasses: Record<'light' | 'dark' | 'default', {
+    heading: string;
+    text: string;
+    textSecondary: string;
+    badge: string;
+    badgeGlow: string;
+    statusOn: string;
+    statusOff: string;
+    buttonVariant: 'outline' | null;
+    buttonClass: string;
+    slider: string;
+    brightnessPanel: string;
+    brightnessValue: string;
+  }> = {
     // For bright backgrounds (yellow, white, etc.) - use dark UI elements
     light: {
       heading: 'text-slate-900',
@@ -843,7 +869,7 @@ export default function LightsCard() {
       loading={loading || refreshing || pairing}
       loadingMessage={pairingStep === 'discovering' ? 'Ricerca bridge...' : pairingStep === 'pairing' ? `Pairing in corso... ${pairingCountdown}s` : loadingMessage}
       skeletonComponent={loading ? <Skeleton.LightsCard /> : null}
-      statusBadge={getStatusBadge()}
+      statusBadge={getStatusBadge() as any}
       banners={banners}
       infoBoxes={infoBoxes}
       infoBoxesTitle="Informazioni"
@@ -920,12 +946,12 @@ export default function LightsCard() {
 
       {/* Room Selection */}
       <RoomSelector
-        rooms={rooms.map(room => ({
+        rooms={rooms.map((room: any) => ({
           id: room.id,
           name: room.metadata?.name || 'Stanza'
         }))}
-        selectedRoomId={selectedRoomId}
-        onChange={(e) => setSelectedRoomId(e.target.value)}
+        selectedRoomId={selectedRoomId || undefined}
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedRoomId(e.target.value)}
       />
 
       {/* Quick Actions Bar */}
@@ -936,7 +962,7 @@ export default function LightsCard() {
             aria-label={isRoomOn ? "Spegni Luci" : "Accendi Luci"}
             variant={isRoomOn ? 'ember' : 'subtle'}
             size="md"
-            onClick={() => handleRoomToggle(selectedRoomGroupedLightId, !isRoomOn)}
+            onClick={() => handleRoomToggle(selectedRoomGroupedLightId || undefined, !isRoomOn)}
             disabled={refreshing || !selectedRoomGroupedLightId}
           />
           {isRoomOn && (
@@ -944,11 +970,12 @@ export default function LightsCard() {
               <Sun className="w-4 h-4 text-warning-400 [html:not(.dark)_&]:text-warning-700" />
               <Slider
                 value={localBrightness !== null ? localBrightness : avgBrightness}
-                onChange={(value) => setLocalBrightness(value)}
-                onValueCommit={(value) => {
-                  handleBrightnessChange(selectedRoomGroupedLightId, value.toString());
+                onChange={((value: number | number[]) => setLocalBrightness(Array.isArray(value) ? value[0] : value)) as any}
+                onValueCommit={((value: number | number[]) => {
+                  const numValue = Array.isArray(value) ? value[0] : value;
+                  handleBrightnessChange(selectedRoomGroupedLightId || undefined, numValue.toString());
                   setLocalBrightness(null);
-                }}
+                }) as any}
                 min={1}
                 max={100}
                 variant="ember"
@@ -1113,15 +1140,17 @@ export default function LightsCard() {
                         {/* Slider - Design system component with commit-on-release pattern */}
                         <Slider
                           value={localBrightness !== null ? localBrightness : avgBrightness}
-                          onChange={(value) => {
+                          onChange={((value: number | number[]) => {
                             // Update local state during drag for smooth UI
-                            setLocalBrightness(value);
-                          }}
-                          onValueCommit={(value) => {
+                            const numValue = Array.isArray(value) ? value[0] : value;
+                            setLocalBrightness(numValue);
+                          }) as any}
+                          onValueCommit={((value: number | number[]) => {
                             // Commit to API on release (Radix onValueCommit)
-                            handleBrightnessChange(selectedRoomGroupedLightId, value.toString());
+                            const numValue = Array.isArray(value) ? value[0] : value;
+                            handleBrightnessChange(selectedRoomGroupedLightId || undefined, numValue.toString());
                             setLocalBrightness(null);
-                          }}
+                          }) as any}
                           min={1}
                           max={100}
                           variant="ember"
@@ -1137,24 +1166,24 @@ export default function LightsCard() {
                         <div className="flex items-center gap-2">
                           <ControlButton
                             type="decrement"
-                            variant={adaptive.buttonVariant || 'subtle'}
+                            variant={(adaptive.buttonVariant as any) || 'subtle'}
                             size="sm"
                             step={5}
-                            onChange={(delta) => {
+                            onChange={(delta: number) => {
                               const newValue = Math.max(1, avgBrightness + delta);
-                              handleBrightnessChange(selectedRoomGroupedLightId, newValue.toString());
+                              handleBrightnessChange(selectedRoomGroupedLightId || undefined, newValue.toString());
                             }}
                             disabled={refreshing || avgBrightness <= 1 || !selectedRoomGroupedLightId}
                             className={`flex-1 ${adaptive.buttonClass}`}
                           />
                           <ControlButton
                             type="increment"
-                            variant={adaptive.buttonVariant || 'subtle'}
+                            variant={(adaptive.buttonVariant as any) || 'subtle'}
                             size="sm"
                             step={5}
-                            onChange={(delta) => {
+                            onChange={(delta: number) => {
                               const newValue = Math.min(100, avgBrightness + delta);
-                              handleBrightnessChange(selectedRoomGroupedLightId, newValue.toString());
+                              handleBrightnessChange(selectedRoomGroupedLightId || undefined, newValue.toString());
                             }}
                             disabled={refreshing || avgBrightness >= 100 || !selectedRoomGroupedLightId}
                             className={`flex-1 ${adaptive.buttonClass}`}
@@ -1188,7 +1217,7 @@ export default function LightsCard() {
                     {/* Scrollable container */}
                     <div className="relative">
                       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
-                        {roomScenes.map((scene) => (
+                        {roomScenes.map((scene: any) => (
                           <Button
                             key={scene.id}
                             variant="subtle"

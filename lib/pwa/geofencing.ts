@@ -89,7 +89,7 @@ export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2
  * @param {PositionOptions} options - Geolocation options
  * @returns {Promise<GeolocationPosition>}
  */
-export function getCurrentPosition(options: PositionOptions = {}): Promise<GeolocationPosition> {
+function getCurrentPosition(options: PositionOptions = {}): Promise<GeolocationPosition> {
   return new Promise((resolve, reject) => {
     if (!isGeolocationSupported()) {
       reject(new Error('Geolocation not supported'));
@@ -113,7 +113,7 @@ export function getCurrentPosition(options: PositionOptions = {}): Promise<Geolo
  * Get saved geofence configuration
  * @returns {Promise<Object|null>}
  */
-export async function getGeofenceConfig(): Promise<GeofenceConfig | null> {
+async function getGeofenceConfig(): Promise<GeofenceConfig | null> {
   try {
     const result = await get<GeofenceConfig>(STORES.APP_STATE, GEOFENCE_KEY);
     return result ?? null;
@@ -133,7 +133,7 @@ export async function getGeofenceConfig(): Promise<GeofenceConfig | null> {
  * @param {Object} [config.actions] - Actions to perform on enter/exit
  * @returns {Promise<void>}
  */
-export async function saveGeofenceConfig(config: GeofenceConfig): Promise<void> {
+async function saveGeofenceConfig(config: GeofenceConfig): Promise<void> {
   try {
     await put(STORES.APP_STATE, {
       key: GEOFENCE_KEY,
@@ -156,7 +156,7 @@ export async function saveGeofenceConfig(config: GeofenceConfig): Promise<void> 
  * @param {Object} [options.actions] - Actions configuration
  * @returns {Promise<Object>} The saved configuration
  */
-export async function setCurrentLocationAsHome(options: GeofenceOptions = {}): Promise<GeofenceConfig> {
+async function setCurrentLocationAsHome(options: GeofenceOptions = {}): Promise<GeofenceConfig> {
   const position = await getCurrentPosition();
 
   const config: GeofenceConfig = {
@@ -180,7 +180,7 @@ export async function setCurrentLocationAsHome(options: GeofenceOptions = {}): P
  * Check if current position is inside the geofence
  * @returns {Promise<Object>} Status object with isHome, distance, etc.
  */
-export async function checkGeofenceStatus(): Promise<GeofenceStatus> {
+async function checkGeofenceStatus(): Promise<GeofenceStatus> {
   const config = await getGeofenceConfig();
 
   if (!config || !config.enabled) {
@@ -228,7 +228,7 @@ export async function checkGeofenceStatus(): Promise<GeofenceStatus> {
  * Enable geofencing
  * @returns {Promise<void>}
  */
-export async function enableGeofencing(): Promise<void> {
+async function enableGeofencing(): Promise<void> {
   const config = await getGeofenceConfig();
   if (config) {
     await saveGeofenceConfig({ ...config, enabled: true });
@@ -239,7 +239,7 @@ export async function enableGeofencing(): Promise<void> {
  * Disable geofencing
  * @returns {Promise<void>}
  */
-export async function disableGeofencing(): Promise<void> {
+async function disableGeofencing(): Promise<void> {
   const config = await getGeofenceConfig();
   if (config) {
     await saveGeofenceConfig({ ...config, enabled: false });
@@ -253,7 +253,7 @@ export async function disableGeofencing(): Promise<void> {
  * @param {Object} [actions.onArrive] - Action when arriving home
  * @returns {Promise<void>}
  */
-export async function updateGeofenceActions(actions: GeofenceActions): Promise<void> {
+async function updateGeofenceActions(actions: GeofenceActions): Promise<void> {
   const config = await getGeofenceConfig();
   if (config) {
     await saveGeofenceConfig({
@@ -267,7 +267,7 @@ export async function updateGeofenceActions(actions: GeofenceActions): Promise<v
  * Clear geofence configuration
  * @returns {Promise<void>}
  */
-export async function clearGeofenceConfig(): Promise<void> {
+async function clearGeofenceConfig(): Promise<void> {
   try {
     const { remove } = await import('./indexedDB');
     await remove(STORES.APP_STATE, GEOFENCE_KEY);
@@ -277,16 +277,3 @@ export async function clearGeofenceConfig(): Promise<void> {
   }
 }
 
-export default {
-  isSupported: isGeolocationSupported,
-  calculateDistance,
-  getCurrentPosition,
-  getConfig: getGeofenceConfig,
-  saveConfig: saveGeofenceConfig,
-  setCurrentLocationAsHome,
-  checkStatus: checkGeofenceStatus,
-  enable: enableGeofencing,
-  disable: disableGeofencing,
-  updateActions: updateGeofenceActions,
-  clear: clearGeofenceConfig,
-};

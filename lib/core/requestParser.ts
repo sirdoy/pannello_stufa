@@ -405,31 +405,3 @@ export async function getOptionalPathParam<T = string>(
   return params?.[paramName] ?? defaultValue;
 }
 
-// =============================================================================
-// EXPORT DEFAULT OBJECT
-// =============================================================================
-
-const requestParser = {
-  // JSON parsing
-  parseJson,
-  parseJsonOrThrow,
-
-  // Query parsing
-  parseQuery,
-  parseQueryObject,
-
-  // Validation
-  validateRequired,
-  validateEnum,
-  validateRange,
-  validateEmail,
-  validateString,
-  validateArray,
-  validateBoolean,
-
-  // Path parameters
-  getPathParam,
-  getOptionalPathParam,
-};
-
-export default requestParser;

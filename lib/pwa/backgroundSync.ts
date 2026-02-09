@@ -77,7 +77,7 @@ interface FormattedCommand extends QueuedCommand {
  * Check if Background Sync API is supported
  * @returns {boolean}
  */
-export function isBackgroundSyncSupported(): boolean {
+function isBackgroundSyncSupported(): boolean {
   return (
     typeof navigator !== 'undefined' &&
     'serviceWorker' in navigator &&
@@ -128,7 +128,7 @@ export async function queueCommand(
  * Register for Background Sync
  * Called when a command is queued
  */
-export async function registerSync(): Promise<void> {
+async function registerSync(): Promise<void> {
   if (!isBackgroundSyncSupported()) {
     console.log('[BackgroundSync] Background Sync not supported, using fallback');
     return;
@@ -365,18 +365,3 @@ export function formatCommandForDisplay(command: QueuedCommand): FormattedComman
 
 // Export sync tag for service worker
 export { SYNC_TAG };
-
-export default {
-  queueCommand,
-  processQueue,
-  getQueuedCommands,
-  getPendingCount,
-  clearFailedCommands,
-  retryCommand,
-  cancelCommand,
-  formatCommandForDisplay,
-  isBackgroundSyncSupported,
-  registerSync,
-  COMMAND_STATUS,
-  SYNC_TAG,
-};

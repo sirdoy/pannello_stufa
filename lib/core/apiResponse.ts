@@ -106,7 +106,7 @@ export function error(
  * @param apiError - ApiError instance
  * @returns NextResponse
  */
-export function fromApiError(apiError: ApiError): NextResponse {
+function fromApiError(apiError: ApiError): NextResponse {
   const response: Record<string, unknown> = {
     success: false,
     error: apiError.message,
@@ -222,16 +222,6 @@ export function badRequest(
   return error(message, ERROR_CODES.VALIDATION_ERROR, HTTP_STATUS.BAD_REQUEST, details);
 }
 
-/**
- * Validation error response (400)
- * Alias for badRequest with specific code
- * @param message - Error message
- * @param details - Validation details
- * @returns NextResponse
- */
-export function validationError(message: string, details: Record<string, unknown> | null = null): NextResponse {
-  return error(message, ERROR_CODES.INVALID_INPUT, HTTP_STATUS.BAD_REQUEST, details);
-}
 
 /**
  * Timeout response (504)
@@ -246,14 +236,6 @@ export function timeout(
   return error(message, ERROR_CODES.TIMEOUT, HTTP_STATUS.GATEWAY_TIMEOUT, details);
 }
 
-/**
- * Service unavailable response (503)
- * @param message - Error message
- * @returns NextResponse
- */
-export function serviceUnavailable(message: string = ERROR_MESSAGES[ERROR_CODES.SERVICE_UNAVAILABLE]): NextResponse {
-  return error(message, ERROR_CODES.SERVICE_UNAVAILABLE, HTTP_STATUS.SERVICE_UNAVAILABLE);
-}
 
 /**
  * Internal server error response (500)
@@ -346,36 +328,3 @@ export function redirect(url: string): Response {
 // EXPORT ALL UTILITIES
 // =============================================================================
 
-const apiResponse = {
-  // Success
-  success,
-  created,
-  noContent,
-
-  // Errors
-  error,
-  fromApiError,
-  handleError,
-
-  // Common errors
-  unauthorized,
-  forbidden,
-  notFound,
-  badRequest,
-  validationError,
-  timeout,
-  serviceUnavailable,
-  serverError,
-
-  // Device-specific
-  stoveOffline,
-  maintenanceRequired,
-  netatmoReconnect,
-  hueNotConnected,
-  hueNotOnLocalNetwork,
-
-  // Redirect
-  redirect,
-};
-
-export default apiResponse;

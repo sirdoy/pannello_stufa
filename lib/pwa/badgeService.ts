@@ -46,7 +46,7 @@ interface AlertData {
  * Check if Badge API is supported
  * @returns {boolean}
  */
-export function isBadgeSupported(): boolean {
+function isBadgeSupported(): boolean {
   return typeof navigator !== 'undefined' && 'setAppBadge' in navigator;
 }
 
@@ -54,7 +54,7 @@ export function isBadgeSupported(): boolean {
  * Get current badge count from IndexedDB
  * @returns {Promise<number>}
  */
-export async function getBadgeCount(): Promise<number> {
+async function getBadgeCount(): Promise<number> {
   try {
     const result = await get<BadgeState>(STORES.APP_STATE, BADGE_KEY);
     return result?.value || 0;
@@ -82,7 +82,7 @@ async function saveBadgeCount(count: number): Promise<void> {
  * @param {number} count - Number to show on badge
  * @returns {Promise<boolean>} Success status
  */
-export async function setBadgeCount(count: number): Promise<boolean> {
+async function setBadgeCount(count: number): Promise<boolean> {
   if (!isBadgeSupported()) {
     console.log('[BadgeService] Badge API not supported');
     return false;
@@ -130,40 +130,6 @@ export async function clearBadge(): Promise<boolean> {
   }
 }
 
-/**
- * Increment badge count by 1
- * @returns {Promise<number>} New badge count
- */
-export async function incrementBadge(): Promise<number> {
-  const current = await getBadgeCount();
-  const newCount = current + 1;
-  await setBadgeCount(newCount);
-  return newCount;
-}
-
-/**
- * Decrement badge count by 1 (min 0)
- * @returns {Promise<number>} New badge count
- */
-export async function decrementBadge(): Promise<number> {
-  const current = await getBadgeCount();
-  const newCount = Math.max(0, current - 1);
-  await setBadgeCount(newCount);
-  return newCount;
-}
-
-/**
- * Update badge based on active alerts
- * @param {Object} alerts - Alert counts
- * @param {number} alerts.errors - Number of active errors
- * @param {boolean} alerts.needsMaintenance - Whether maintenance is needed
- * @returns {Promise<number>} Total badge count
- */
-export async function updateBadgeFromAlerts({ errors = 0, needsMaintenance = false }: AlertData): Promise<number> {
-  const totalCount = errors + (needsMaintenance ? 1 : 0);
-  await setBadgeCount(totalCount);
-  return totalCount;
-}
 
 /**
  * Send message to Service Worker
@@ -185,35 +151,3 @@ async function notifyServiceWorker(type: string, data: Record<string, unknown> =
   }
 }
 
-/**
- * Initialize badge on app load
- * Syncs badge count from IndexedDB to actual badge
- * @returns {Promise<number>} Current badge count
- */
-export async function initializeBadge(): Promise<number> {
-  if (!isBadgeSupported()) {
-    return 0;
-  }
-
-  const count = await getBadgeCount();
-
-  if (count > 0) {
-    await navigator.setAppBadge!(count);
-  } else {
-    await navigator.clearAppBadge!();
-  }
-
-  console.log('[BadgeService] Badge initialized:', count);
-  return count;
-}
-
-export default {
-  isBadgeSupported,
-  getBadgeCount,
-  setBadgeCount,
-  clearBadge,
-  incrementBadge,
-  decrementBadge,
-  updateBadgeFromAlerts,
-  initializeBadge,
-};

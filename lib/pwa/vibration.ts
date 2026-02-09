@@ -119,27 +119,14 @@ export function vibrateCritical(): boolean {
 /**
  * Vibrate for notification
  */
-export function vibrateNotification(): boolean {
+function vibrateNotification(): boolean {
   return vibrate(VIBRATION_PATTERNS.NOTIFICATION);
 }
 
 /**
  * Vibrate for heartbeat (connection restored)
  */
-export function vibrateHeartbeat(): boolean {
+function vibrateHeartbeat(): boolean {
   return vibrate(VIBRATION_PATTERNS.HEARTBEAT);
 }
 
-export default {
-  isSupported: isVibrationSupported,
-  vibrate,
-  stop: stopVibration,
-  short: vibrateShort,
-  success: vibrateSuccess,
-  warning: vibrateWarning,
-  error: vibrateError,
-  critical: vibrateCritical,
-  notification: vibrateNotification,
-  heartbeat: vibrateHeartbeat,
-  patterns: VIBRATION_PATTERNS,
-};

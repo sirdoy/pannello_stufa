@@ -27,7 +27,7 @@ let dbInstance: IDBDatabase | null = null;
  * Open or get existing database connection
  * @returns {Promise<IDBDatabase>}
  */
-export async function openDB(): Promise<IDBDatabase> {
+async function openDB(): Promise<IDBDatabase> {
   if (dbInstance) {
     return dbInstance;
   }
@@ -162,7 +162,7 @@ export async function put<T = unknown>(storeName: string, value: T): Promise<IDB
  * @param {any} value - Value to store
  * @returns {Promise<any>} The key of the stored value
  */
-export async function add<T = unknown>(storeName: string, value: T): Promise<IDBValidKey> {
+async function add<T = unknown>(storeName: string, value: T): Promise<IDBValidKey> {
   const db = await openDB();
 
   return new Promise((resolve, reject) => {
@@ -199,7 +199,7 @@ export async function remove(storeName: string, key: string | number): Promise<v
  * @param {string} storeName - Store name
  * @returns {Promise<void>}
  */
-export async function clear(storeName: string): Promise<void> {
+async function clear(storeName: string): Promise<void> {
   const db = await openDB();
 
   return new Promise((resolve, reject) => {
@@ -217,7 +217,7 @@ export async function clear(storeName: string): Promise<void> {
  * @param {string} storeName - Store name
  * @returns {Promise<number>}
  */
-export async function count(storeName: string): Promise<number> {
+async function count(storeName: string): Promise<number> {
   const db = await openDB();
 
   return new Promise((resolve, reject) => {
@@ -234,20 +234,7 @@ export async function count(storeName: string): Promise<number> {
  * Check if IndexedDB is supported
  * @returns {boolean}
  */
-export function isSupported(): boolean {
+function isSupported(): boolean {
   return typeof indexedDB !== 'undefined';
 }
 
-export default {
-  openDB,
-  get,
-  getAll,
-  getByIndex,
-  put,
-  add,
-  remove,
-  clear,
-  count,
-  isSupported,
-  STORES,
-};

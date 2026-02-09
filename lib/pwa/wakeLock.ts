@@ -80,7 +80,7 @@ export function isWakeLockActive(): boolean {
  * Should be called when document becomes visible again
  * @returns {Promise<boolean>}
  */
-export async function reacquireWakeLock(): Promise<boolean> {
+async function reacquireWakeLock(): Promise<boolean> {
   if (!isWakeLockSupported()) {
     return false;
   }
@@ -93,10 +93,3 @@ export async function reacquireWakeLock(): Promise<boolean> {
   return requestWakeLock();
 }
 
-export default {
-  isSupported: isWakeLockSupported,
-  request: requestWakeLock,
-  release: releaseWakeLock,
-  isActive: isWakeLockActive,
-  reacquire: reacquireWakeLock,
-};

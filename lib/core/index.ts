@@ -35,7 +35,6 @@ export {
 
   // Error responses
   error,
-  fromApiError,
   handleError,
 
   // Common errors
@@ -43,9 +42,7 @@ export {
   forbidden,
   notFound,
   badRequest,
-  validationError,
   timeout,
-  serviceUnavailable,
   serverError,
 
   // Device-specific
@@ -57,9 +54,6 @@ export {
 
   // Redirect
   redirect,
-
-  // Default export
-  default as apiResponse,
 } from './apiResponse';
 
 // =============================================================================
@@ -67,27 +61,15 @@ export {
 // =============================================================================
 
 export {
-  // Auth middleware
-  withAuth,
-  withOptionalAuth,
-
   // Error handling
   withErrorHandler,
 
   // Combined
   withAuthAndErrorHandler,
-  protect,
 
   // Special
-  withAdmin,
   withCronSecret,
   withHueHandler,
-
-  // Utility
-  compose,
-
-  // Default export
-  default as middleware,
 } from './middleware';
 
 // =============================================================================
@@ -123,7 +105,4 @@ export {
   // Path parameters
   getPathParam,
   getOptionalPathParam,
-
-  // Default export
-  default as requestParser,
 } from './requestParser';

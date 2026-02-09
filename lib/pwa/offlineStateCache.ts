@@ -107,7 +107,7 @@ export async function getCachedState(deviceId: string): Promise<CachedDeviceStat
  * Get all cached device states
  * @returns {Promise<Array<{deviceId: string, state: Object, timestamp: string}>>}
  */
-export async function getAllCachedStates(): Promise<CachedDeviceState[]> {
+async function getAllCachedStates(): Promise<CachedDeviceState[]> {
   try {
     const states = await getAll<CachedDeviceState>(STORES.DEVICE_STATE);
     return states || [];
@@ -123,7 +123,7 @@ export async function getAllCachedStates(): Promise<CachedDeviceState[]> {
  * @param {Object} state - Device state data
  * @returns {Promise<void>}
  */
-export async function cacheState(deviceId: string, state: Record<string, unknown>): Promise<void> {
+async function cacheState(deviceId: string, state: Record<string, unknown>): Promise<void> {
   try {
     await put(STORES.DEVICE_STATE, {
       deviceId,
@@ -141,7 +141,7 @@ export async function cacheState(deviceId: string, state: Record<string, unknown
  * @param {string} deviceId - Device ID
  * @returns {Promise<Object|null>}
  */
-export async function getCachedStateFromSW(deviceId: string): Promise<CachedDeviceState | null> {
+async function getCachedStateFromSW(deviceId: string): Promise<CachedDeviceState | null> {
   if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) {
     return getCachedState(deviceId);
   }
@@ -282,13 +282,3 @@ export function getCacheAge(timestamp: string): string {
   return `${Math.round(ageMinutes / 1440)} giorni fa`;
 }
 
-export default {
-  getCachedState,
-  getAllCachedStates,
-  cacheState,
-  getCachedStateFromSW,
-  formatStoveStateForDisplay,
-  formatThermostatStateForDisplay,
-  getCacheAge,
-  DEVICE_IDS,
-};

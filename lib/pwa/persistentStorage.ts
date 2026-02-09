@@ -119,7 +119,7 @@ function formatBytes(bytes: number): string {
  * Get detailed storage breakdown (if available)
  * @returns {Promise<Object>}
  */
-export async function getStorageDetails(): Promise<StorageDetails> {
+async function getStorageDetails(): Promise<StorageDetails> {
   const estimate = await getStorageEstimate();
   const persisted = await isPersisted();
 
@@ -130,10 +130,3 @@ export async function getStorageDetails(): Promise<StorageDetails> {
   };
 }
 
-export default {
-  isSupported: isStorageSupported,
-  isPersisted,
-  request: requestPersistentStorage,
-  getEstimate: getStorageEstimate,
-  getDetails: getStorageDetails,
-};

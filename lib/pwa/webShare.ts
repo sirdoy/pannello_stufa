@@ -42,7 +42,7 @@ export function isShareSupported(): boolean {
  * Check if sharing files is supported
  * @returns {boolean}
  */
-export function isFileShareSupported(): boolean {
+function isFileShareSupported(): boolean {
   return 'canShare' in navigator;
 }
 
@@ -133,7 +133,7 @@ export async function shareThermostatStatus(thermostatData: ThermostatData): Pro
  * @param {Object} data.thermostat - Thermostat data
  * @returns {Promise<boolean>}
  */
-export async function shareDeviceSummary(data: DeviceSummaryData): Promise<boolean> {
+async function shareDeviceSummary(data: DeviceSummaryData): Promise<boolean> {
   const { stove, thermostat } = data;
 
   const lines = ['📊 Riepilogo Dispositivi', ''];
@@ -180,7 +180,7 @@ export async function shareApp(): Promise<boolean> {
  * @param {string} [error.timestamp] - When error occurred
  * @returns {Promise<boolean>}
  */
-export async function shareErrorLog(error: ErrorData): Promise<boolean> {
+async function shareErrorLog(error: ErrorData): Promise<boolean> {
   const timestamp = error.timestamp
     ? new Date(error.timestamp).toLocaleString('it-IT')
     : new Date().toLocaleString('it-IT');
@@ -198,13 +198,3 @@ export async function shareErrorLog(error: ErrorData): Promise<boolean> {
   });
 }
 
-export default {
-  isSupported: isShareSupported,
-  isFileSupported: isFileShareSupported,
-  share,
-  shareStoveStatus,
-  shareThermostatStatus,
-  shareDeviceSummary,
-  shareApp,
-  shareErrorLog,
-};

@@ -401,32 +401,6 @@ export async function clearRemoteTokens(): Promise<void> {
 }
 
 /**
- * Get Hue Remote status
- */
-export async function getRemoteStatus(): Promise<{ connected: boolean; remote_connected_at?: string | null; connection_mode?: string | null; last_connection_check?: string | null; updated_at?: string | null; error?: string }> {
-  try {
-    const hueRef = ref(db, getEnvironmentPath(HUE_BASE_REF));
-    const snapshot = await get(hueRef);
-
-    if (!snapshot.exists()) {
-      return { connected: false };
-    }
-
-    const data = snapshot.val() as Record<string, unknown>;
-    return {
-      connected: !!data.refresh_token,
-      remote_connected_at: (data.remote_connected_at as string | null) || null,
-      connection_mode: (data.connection_mode as string | null) || null,
-      last_connection_check: (data.last_connection_check as string | null) || null,
-      updated_at: (data.updated_at as string | null) || null,
-    };
-  } catch (err) {
-    console.error('❌ Error getting remote status:', err);
-    return { connected: false, error: (err as Error).message };
-  }
-}
-
-/**
  * Handle Remote API errors and return standardized error response
  * @param error - Error code
  * @returns Status code and reconnect flag
@@ -500,19 +474,3 @@ export async function proactiveTokenRefresh(thresholdMs = 24 * 60 * 60 * 1000): 
     return { refreshed: false, reason: 'error', error: (err as Error).message };
   }
 }
-
-const hueRemoteTokenHelper = {
-  getValidRemoteAccessToken,
-  forceTokenRefresh,
-  proactiveTokenRefresh,
-  exchangeCodeForTokens,
-  saveRemoteTokens,
-  setConnectionMode,
-  isRemoteConnected,
-  clearRemoteTokens,
-  clearTokenCache,
-  getRemoteStatus,
-  handleRemoteTokenError,
-};
-
-export default hueRemoteTokenHelper;

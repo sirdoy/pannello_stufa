@@ -3,21 +3,13 @@
  * Test basic bridge access
  */
 
-import { withAuthAndErrorHandler, success, serverError } from '@/lib/core';
+import { withAuthAndErrorHandler, success } from '@/lib/core';
 import HueApi from '@/lib/hue/hueApi';
-import { getValidAccessToken } from '@/lib/hue/hueTokenHelper';
 
 export const dynamic = 'force-dynamic';
 
 export const GET = withAuthAndErrorHandler(async () => {
-  const tokenResult = await getValidAccessToken() as any;
-
-  if (tokenResult.error) {
-    return serverError(tokenResult.message || tokenResult.error);
-  }
-
-  // This test route is using a stub that always throws
-  // HueApi requires (bridgeIp, applicationKey) but stub returns never
+  // This test route uses stub values for testing
   const hueApi = new HueApi('stub', 'stub');
 
   // Test 1: Bridge

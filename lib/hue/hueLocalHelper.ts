@@ -136,43 +136,6 @@ export async function getHueStatus(): Promise<HueStatus> {
   }
 }
 
-/**
- * Get connection mode from Firebase
- * @returns Connection mode or null if not set
- */
-export async function getConnectionMode(): Promise<ConnectionMode | null> {
-  try {
-    const hueRef = ref(db, getEnvironmentPath(HUE_BASE_REF));
-    const snapshot = await get(hueRef);
-
-    if (!snapshot.exists()) {
-      return null;
-    }
-
-    return (snapshot.val() as Record<string, unknown>).connection_mode as ConnectionMode || null;
-  } catch (error) {
-    console.error('❌ Get connection mode error:', error);
-    return null;
-  }
-}
-
-/**
- * Set connection mode in Firebase
- * @param mode - Connection mode
- */
-export async function setConnectionMode(mode: ConnectionMode): Promise<void> {
-  try {
-    const hueRef = ref(db, getEnvironmentPath(HUE_BASE_REF));
-    await update(hueRef, {
-      connection_mode: mode,
-      last_connection_check: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    });
-  } catch (error) {
-    console.error('❌ Set connection mode error:', error);
-    throw error;
-  }
-}
 
 /**
  * Get bridge username (used by both Local and Remote API)

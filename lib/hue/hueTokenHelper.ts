@@ -145,28 +145,3 @@ export async function getHueStatus() {
 }
 
 ============================================================================ */
-
-// Stub exports (prevent build errors)
-export async function getValidAccessToken(): Promise<never> {
-  throw new Error('Remote API not implemented yet. Using Local API (hueLocalHelper).');
-}
-
-export async function saveRefreshToken(): Promise<never> {
-  throw new Error('Remote API not implemented yet. Using Local API (hueLocalHelper).');
-}
-
-export async function saveInitialTokens(): Promise<never> {
-  throw new Error('Remote API not implemented yet. Using Local API (hueLocalHelper).');
-}
-
-export async function isHueConnected(): Promise<never> {
-  throw new Error('Remote API not implemented yet. Using Local API (hueLocalHelper).');
-}
-
-export async function clearHueData(): Promise<never> {
-  throw new Error('Remote API not implemented yet. Using Local API (hueLocalHelper).');
-}
-
-export async function getHueStatus(): Promise<never> {
-  throw new Error('Remote API not implemented yet. Using Local API (hueLocalHelper).');
-}

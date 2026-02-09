@@ -361,12 +361,3 @@ export async function createApplicationKey(bridgeIp: string, devicetype = 'panne
 }
 
 export default HueApi;
-
-// Stub exports per funzioni non ancora implementate (per evitare errori build)
-export async function exchangeCodeForTokens(): Promise<never> {
-  throw new Error('Not implemented');
-}
-
-export async function refreshAccessToken(): Promise<never> {
-  throw new Error('Not implemented');
-}

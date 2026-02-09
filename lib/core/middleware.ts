@@ -67,54 +67,7 @@ type UnauthHandler = (
 // AUTH MIDDLEWARE
 // =============================================================================
 
-/**
- * Wraps a route handler with Auth0 authentication
- * Automatically returns 401 if user is not authenticated
- *
- * @param handler - Route handler function
- *   Handler signature: (request, context, session) => Promise<NextResponse>
- * @returns Wrapped handler
- *
- * @example
- * export const GET = withAuth(async (request, context, session) => {
- *   console.log('User:', session.user.email);
- *   return success({ user: session.user });
- * });
- */
-export function withAuth(handler: AuthedHandler): UnauthHandler {
-  return async (request: NextRequest, context: RouteContext) => {
-    const session = await auth0.getSession(request);
 
-    if (!session?.user) {
-      return unauthorized();
-    }
-
-    return handler(request, context, session);
-  };
-}
-
-/**
- * Wraps a route handler with optional Auth0 authentication
- * Session is passed to handler but not required
- *
- * @param handler - Route handler function
- *   Handler signature: (request, context, session | null) => Promise<NextResponse>
- * @returns Wrapped handler
- *
- * @example
- * export const GET = withOptionalAuth(async (request, context, session) => {
- *   if (session?.user) {
- *     return success({ user: session.user });
- *   }
- *   return success({ user: null });
- * });
- */
-export function withOptionalAuth(handler: OptionalAuthHandler): UnauthHandler {
-  return async (request: NextRequest, context: RouteContext) => {
-    const session = await auth0.getSession(request);
-    return handler(request, context, session);
-  };
-}
 
 // =============================================================================
 // ERROR HANDLING MIDDLEWARE
@@ -149,6 +102,22 @@ export function withErrorHandler(handler: UnauthHandler, logContext: string | nu
 // =============================================================================
 
 /**
+ * Internal: Wraps a route handler with Auth0 authentication
+ * Automatically returns 401 if user is not authenticated
+ */
+function withAuth(handler: AuthedHandler): UnauthHandler {
+  return async (request: NextRequest, context: RouteContext) => {
+    const session = await auth0.getSession(request);
+
+    if (!session?.user) {
+      return unauthorized();
+    }
+
+    return handler(request, context, session);
+  };
+}
+
+/**
  * Combines auth and error handling middleware
  * Most common pattern for protected API routes
  *
@@ -167,46 +136,10 @@ export function withAuthAndErrorHandler(handler: AuthedHandler, logContext: stri
   return withErrorHandler(withAuth(handler), logContext);
 }
 
-/**
- * Alias for withAuthAndErrorHandler
- * Shorter name for common use case
- */
-export const protect = withAuthAndErrorHandler;
-
 // =============================================================================
 // ADMIN MIDDLEWARE
 // =============================================================================
 
-/**
- * Wraps a route handler with admin authorization
- * Checks if user is the admin user defined in ADMIN_USER_ID env var
- *
- * @param handler - Route handler function
- * @param logContext - Context for error logging (optional)
- * @returns Wrapped handler
- *
- * @example
- * export const POST = withAdmin(async (request, context, session) => {
- *   await adminOnlyOperation();
- *   return success({ done: true });
- * }, 'AdminAction');
- */
-export function withAdmin(handler: AuthedHandler, logContext: string | null = null): UnauthHandler {
-  return withErrorHandler(async (request: NextRequest, context: RouteContext) => {
-    const session = await auth0.getSession(request);
-
-    if (!session?.user) {
-      return unauthorized();
-    }
-
-    const adminUserId = process.env.ADMIN_USER_ID;
-    if (!adminUserId || session.user.sub !== adminUserId) {
-      return unauthorized('Accesso admin richiesto');
-    }
-
-    return handler(request, context, session);
-  }, logContext);
-}
 
 // =============================================================================
 // CRON/SECRET MIDDLEWARE
@@ -300,51 +233,4 @@ export function withHueHandler(handler: AuthedHandler, logContext: string | null
 // HELPER: COMBINE MULTIPLE MIDDLEWARE
 // =============================================================================
 
-/**
- * Combines multiple middleware functions
- * Executes from left to right (first middleware wraps outermost)
- *
- * @param middlewares - Middleware functions
- * @returns Combined middleware
- *
- * @example
- * const customMiddleware = compose(withErrorHandler, withAuth, withRateLimit);
- * export const GET = customMiddleware(async (request, context, session) => {
- *   return success({ data });
- * });
- */
-export function compose(...middlewares: Array<(handler: UnauthHandler) => UnauthHandler>): (handler: UnauthHandler) => UnauthHandler {
-  return (handler: UnauthHandler) => {
-    return middlewares.reduceRight(
-      (acc, middleware) => middleware(acc),
-      handler
-    );
-  };
-}
 
-// =============================================================================
-// EXPORT DEFAULT OBJECT
-// =============================================================================
-
-const middleware = {
-  // Auth
-  withAuth,
-  withOptionalAuth,
-
-  // Error handling
-  withErrorHandler,
-
-  // Combined
-  withAuthAndErrorHandler,
-  protect,
-
-  // Special
-  withAdmin,
-  withCronSecret,
-  withHueHandler,
-
-  // Utility
-  compose,
-};
-
-export default middleware;

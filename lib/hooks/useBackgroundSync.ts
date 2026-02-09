@@ -226,5 +226,3 @@ export function useBackgroundSync(): UseBackgroundSyncReturn {
     refreshCommands,
   };
 }
-
-export default useBackgroundSync;

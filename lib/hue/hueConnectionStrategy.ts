@@ -166,5 +166,3 @@ export class HueConnectionStrategy {
     throw new Error(`Invalid mode: ${mode}`);
   }
 }
-
-export default HueConnectionStrategy;

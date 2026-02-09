@@ -5,6 +5,7 @@ import { EndpointCard } from '@/app/debug/components/ApiTab';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 import Badge from '@/app/components/ui/Badge';
+import { subscribeToLocation, Location } from '@/lib/services/locationService';
 
 interface WeatherTabProps {
   autoRefresh: boolean;
@@ -12,6 +13,7 @@ interface WeatherTabProps {
 }
 
 export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabProps) {
+  const [location, setLocation] = useState<Location | null>(null);
   const [getResponses, setGetResponses] = useState<Record<string, any>>({});
   const [loadingGet, setLoadingGet] = useState<Record<string, boolean>>({});
   const [timings, setTimings] = useState<Record<string, number>>({});
@@ -49,9 +51,20 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
     }
   }, []);
 
+  // Subscribe to location updates
+  useEffect(() => {
+    const unsubscribe = subscribeToLocation((loc) => setLocation(loc));
+    return () => unsubscribe();
+  }, []);
+
+  const forecastUrl = location
+    ? `/api/weather/forecast?lat=${location.latitude}&lon=${location.longitude}`
+    : null;
+
   const fetchAllGetEndpoints = useCallback(() => {
-    fetchGetEndpoint('forecast', '/api/weather/forecast');
-  }, [fetchGetEndpoint]);
+    if (!forecastUrl) return;
+    fetchGetEndpoint('forecast', forecastUrl);
+  }, [fetchGetEndpoint, forecastUrl]);
 
   // Initial fetch
   useEffect(() => {
@@ -75,6 +88,15 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
 
   return (
     <div className="space-y-6">
+      {/* Location waiting state */}
+      {!location && (
+        <div className="bg-amber-900/20 [html:not(.dark)_&]:bg-amber-50 border border-amber-700/50 [html:not(.dark)_&]:border-amber-300 rounded-lg p-4">
+          <Text variant="secondary" size="sm">
+            Waiting for location data from Firebase config...
+          </Text>
+        </div>
+      )}
+
       {/* Cache Status */}
       {cacheStatus && (
         <div className="flex items-center gap-3">
@@ -103,12 +125,12 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
         <div className="space-y-3">
           <EndpointCard
             name="Weather Forecast"
-            url="/api/weather/forecast"
+            url={forecastUrl || '/api/weather/forecast'}
             externalUrl="https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=auto"
             response={getResponses.forecast}
             loading={loadingGet.forecast}
             timing={timings.forecast}
-            onRefresh={() => fetchGetEndpoint('forecast', '/api/weather/forecast')}
+            onRefresh={() => forecastUrl && fetchGetEndpoint('forecast', forecastUrl)}
             onCopyUrl={() =>
               copyUrlToClipboard(
                 'https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=auto'

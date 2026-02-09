@@ -319,7 +319,7 @@ describe('Heading', () => {
 
   describe('Ref Forwarding', () => {
     it('forwards ref to heading element', () => {
-      const ref = { current: null };
+      const ref = { current: null as HTMLHeadingElement | null };
       render(<Heading ref={ref}>Title</Heading>);
       expect(ref.current).toBeInstanceOf(HTMLHeadingElement);
       expect(ref.current!.tagName).toBe('H2');

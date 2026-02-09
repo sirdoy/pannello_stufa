@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 46 of 48 (API Page Strict Mode Compliance)
-Plan: 7 of 8 in current phase
+Plan: 8 of 8 in current phase
 Status: In Progress
-Last activity: 2026-02-09 - Multiple plans completed (46-05: scheduler/notifications/geocoding/health routes - 23 errors fixed; 46-07: design system page - 22 errors fixed)
+Last activity: 2026-02-09 - Completed 46-03-PLAN.md (Miscellaneous pages/hooks: 33 errors fixed across 12 files, 0 tsc errors)
 
-Progress: [████████████████████████████████████████████░░░░] 98% (231/228 estimated total plans)
+Progress: [████████████████████████████████████████████░░░░] 98% (233/228 estimated total plans)
 
 ## Performance Metrics
 
@@ -52,6 +52,8 @@ Progress: [███████████████████████
 | Phase 45 P08 | 169s | 2 tasks | 2 files |
 | Phase 46 P01 | 419s | 2 tasks | 1 file |
 | Phase 46 P02 | 445s | 2 tasks | 2 files |
+| Phase 46 P03 | 1250s | 2 tasks | 12 files |
+| Phase 46 P04 | 953s | 2 tasks | 13 files |
 | Phase 46 P05 | 657s | 2 tasks | 8 files |
 | Phase 46 P07 | 428s | 2 tasks | 2 files |
 
@@ -89,9 +91,17 @@ Recent decisions from PROJECT.md affecting v5.1 work:
 - [Phase 45-03]: @ts-expect-error for react-dom imports (BottomSheet, LoadingOverlay) - types exist but strict mode check fails
 - [Phase 45-08]: Parallel wave execution creates expected cascade effects - gap sweep pattern validates approach (16 errors caught and fixed)
 - [Phase 46-01]: Type assertions for component prop callbacks (parent DayOfWeek vs child string) - inline assertion pattern
+- [Phase 46-03]: Use @ts-expect-error for useNotificationPreferences and eslint-plugin-tailwindcss (no type definitions)
+- [Phase 46-03]: Use 'as const' for config object values to preserve literal types (colorScheme variants)
+- [Phase 46-03]: Type React event handlers explicitly (React.TouchEvent, React.MouseEvent) - don't rely on inference
+- [Phase 46-03]: Convert undefined to null with ?? null pattern for component props expecting null
+- [Phase 46-03]: Non-null assertion safe after redirect guards (redirect exits execution)
 - [Phase 46-01]: Null to undefined conversion for React props (saveStatus ?? undefined)
 - [Phase 46-02]: Error instanceof Error pattern for all catch blocks in page components
 - [Phase 46-02]: Null guards (value !== null) before comparisons with nullable state
+- [Phase 46-04]: Updated middleware AuthedHandler types to Promise<NextResponse<unknown>> (matches Next.js reality)
+- [Phase 46-04]: Remove local RouteContext interfaces that conflict with middleware generic RouteContext
+- [Phase 46-04]: Non-null assertions after validateRequired() calls (values guaranteed non-null)
 - [Phase 46-05]: Record<string, unknown> for Firebase multi-path updates (dynamic template literal paths)
 - [Phase 46-05]: Map 'low' priority to 'normal' in notification routes (NotificationPayload only supports high/normal)
 - [Phase 46-05]: Remove local RouteContext interfaces that conflict with middleware types
@@ -130,8 +140,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-09 13:25
-Stopped at: Completed 46-05-PLAN.md - Scheduler, notifications, geocoding, and health-monitoring API routes (23 errors fixed, 0 tsc errors remaining)
+Last session: 2026-02-09 13:34
+Stopped at: Completed 46-03-PLAN.md - Miscellaneous pages/hooks (33 errors fixed across 12 files, 0 tsc errors)
 Resume file: None — ready to continue with phase 46
 
 ---

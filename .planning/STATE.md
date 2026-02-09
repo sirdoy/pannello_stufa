@@ -11,19 +11,19 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 47 of 48 (Test Strict Mode and Index Access)
-Plan: 3 of 8 in current phase
+Plan: 5 of 8 in current phase
 Status: In Progress
-Last activity: 2026-02-09 - Completed 47-03-PLAN.md (Fixed 282 strict mode errors in remaining 20 test files, achieved 0 total tsc errors)
+Last activity: 2026-02-09 - Completed 47-05-PLAN.md (Fixed 117 noUncheckedIndexedAccess errors in design-system page and 8 scheduler components)
 
-Progress: [████████████████████████████████████████████░░░░] 99% (237/236 estimated total plans)
+Progress: [████████████████████████████████████████████░░░░] 99% (238/236 estimated total plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 229 plans (v1.0-v5.1)
+- Total plans completed: 230 plans (v1.0-v5.1)
 - Milestones shipped: 7 (v1.0, v2.0, v3.0, v3.1, v3.2, v4.0, v5.0)
 - Average milestone: ~32 plans
-- Current milestone: v5.1 (5 phases planned, phase 44 complete, phase 45 complete, phase 46 complete, phase 47 in progress - 3/8 plans done)
+- Current milestone: v5.1 (5 phases planned, phase 44 complete, phase 45 complete, phase 46 complete, phase 47 in progress - 5/8 plans done)
 
 **Recent Milestone Performance:**
 
@@ -61,6 +61,7 @@ Progress: [███████████████████████
 | Phase 47 P01 | 262s | 2 tasks | 3 files |
 | Phase 47 P02 | 313s | 2 tasks | 3 files |
 | Phase 47 P03 | 819s | 2 tasks | 20 files |
+| Phase 47 P05 | 683s | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -128,6 +129,9 @@ Recent decisions from PROJECT.md affecting v5.1 work:
 - [Phase 47-02]: Non-null assertions (!) safe for nextSlot when test setup guarantees data presence
 - [Phase 47-02]: Explicit React.ReactNode types required for all mock component props in strict mode
 - [Phase 47-02]: jest.Mock type annotations for test fixtures (mockRouter, mockSearchParams)
+- [Phase 47-05]: Non-null assertions for Record<string, T> with known compile-time keys (componentDocs.Button!)
+- [Phase 47-05]: Non-null assertions for guaranteed string format destructuring (time.split(':').map(Number))
+- [Phase 47-05]: Early return guards for array index access when bounds not guaranteed
 
 ### Pending Todos
 
@@ -157,9 +161,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-09 15:35
-Stopped at: Completed 47-02-PLAN.md (Fixed 74 strict mode errors in 3 mid-error test files: netatmoStoveSync, coordinationPauseCalculator, thermostat page test)
-Resume file: None — continue with 47-03
+Last session: 2026-02-09 15:48
+Stopped at: Completed 47-05-PLAN.md (Fixed 117 noUncheckedIndexedAccess errors in design-system page and 8 scheduler components)
+Resume file: None — continue with next plan in phase 47
 
 ---
 *State initialized: 2026-02-08 for v5.1 Tech Debt & Code Quality milestone*

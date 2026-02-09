@@ -140,10 +140,19 @@ Plans:
 4. Worker teardown warning resolved (no force-exit messages)
 5. All 3032+ tests passing green with zero failures
 
-**Plans**: TBD
+**Plans**: 10 plans
 
 Plans:
-- [ ] 47-01: TBD after phase planning
+- [ ] 47-01-PLAN.md — Fix high-error test files (coordinationEventLogger, healthLogger, notificationHistoryService) — 108 strict-mode errors
+- [ ] 47-02-PLAN.md — Fix mid-error test files (netatmoStoveSync, coordinationPauseCalculator, thermostat page) — 74 strict-mode errors
+- [ ] 47-03-PLAN.md — Fix 20 remaining test files — ~100 strict-mode errors
+- [ ] 47-04-PLAN.md — Enable noUncheckedIndexedAccess + fix lib/ files — 82 errors in 17 files
+- [ ] 47-05-PLAN.md — Fix scheduler components + design-system page — 117 noUncheckedIndexedAccess errors
+- [ ] 47-06-PLAN.md — Fix debug tabs + API routes — ~95 noUncheckedIndexedAccess errors
+- [ ] 47-07-PLAN.md — Fix remaining app/ source files — ~74 noUncheckedIndexedAccess errors
+- [ ] 47-08-PLAN.md — Fix test files for noUncheckedIndexedAccess — ~104 additional errors
+- [ ] 47-09-PLAN.md — Fix FormModal cancel test, DataTable filter test, worker teardown
+- [ ] 47-10-PLAN.md — Gap sweep and final verification
 
 ---
 
@@ -183,8 +192,8 @@ Plans:
 | **44** | **v5.1** | **7/7** | **✓ Complete** | **2026-02-09** |
 | **45** | **v5.1** | **8/8** | **✓ Complete** | **2026-02-09** |
 | **46** | **v5.1** | **8/8** | **✓ Complete** | **2026-02-09** |
-| **47** | **v5.1** | **0/TBD** | **Not started** | **-** |
+| **47** | **v5.1** | **0/10** | **Planned** | **-** |
 | **48** | **v5.1** | **0/TBD** | **Not started** | **-** |
 
 ---
-*Last updated: 2026-02-09 — Phase 46 complete (8/8 plans, verified passed)*
+*Last updated: 2026-02-09 — Phase 47 planned (10 plans in 4 waves)*

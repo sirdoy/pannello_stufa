@@ -132,11 +132,11 @@ describe('colorUtils', () => {
     });
 
     it('should return false for null light', () => {
-      expect(supportsColor(null)).toBe(false);
+      expect(supportsColor(null as any)).toBe(false);
     });
 
     it('should return false for undefined light', () => {
-      expect(supportsColor(undefined)).toBe(false);
+      expect(supportsColor(undefined as any)).toBe(false);
     });
   });
 

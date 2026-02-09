@@ -56,14 +56,14 @@ describe('offlineStateCache', () => {
 
       const result = formatStoveStateForDisplay(cachedData as any);
 
-      expect(result.isOn).toBe(true);
-      expect(result.status).toBe('on');
-      expect(result.temperature).toBe(22.5);
-      expect(result.exhaustTemp).toBe(150);
-      expect(result.setpoint).toBe(24);
-      expect(result.powerLevel).toBe(3);
-      expect(result.needsCleaning).toBe(false);
-      expect(result.isStale).toBe(false);
+      expect(result!.isOn).toBe(true);
+      expect(result!.status).toBe('on');
+      expect(result!.temperature).toBe(22.5);
+      expect(result!.exhaustTemp).toBe(150);
+      expect(result!.setpoint).toBe(24);
+      expect(result!.powerLevel).toBe(3);
+      expect(result!.needsCleaning).toBe(false);
+      expect(result!.isStale).toBe(false);
     });
 
     it('formats stove state correctly when off', () => {
@@ -77,8 +77,8 @@ describe('offlineStateCache', () => {
 
       const result = formatStoveStateForDisplay(cachedData as any);
 
-      expect(result.isOn).toBe(false);
-      expect(result.status).toBe('off');
+      expect(result!.isOn).toBe(false);
+      expect(result!.status).toBe('off');
     });
 
     it('marks data as stale after 30 minutes', () => {
@@ -90,8 +90,8 @@ describe('offlineStateCache', () => {
 
       const result = formatStoveStateForDisplay(cachedData as any);
 
-      expect(result.isStale).toBe(true);
-      expect(result.ageMinutes).toBeGreaterThan(30);
+      expect(result!.isStale).toBe(true);
+      expect(result!.ageMinutes).toBeGreaterThan(30);
     });
 
     it('handles alternative field names', () => {
@@ -108,11 +108,11 @@ describe('offlineStateCache', () => {
 
       const result = formatStoveStateForDisplay(cachedData as any);
 
-      expect(result.isOn).toBe(true);
-      expect(result.temperature).toBe(21);
-      expect(result.exhaustTemp).toBe(140);
-      expect(result.setpoint).toBe(23);
-      expect(result.powerLevel).toBe(2);
+      expect(result!.isOn).toBe(true);
+      expect(result!.temperature).toBe(21);
+      expect(result!.exhaustTemp).toBe(140);
+      expect(result!.setpoint).toBe(23);
+      expect(result!.powerLevel).toBe(2);
     });
 
     it('includes formatted cache timestamp', () => {
@@ -123,8 +123,8 @@ describe('offlineStateCache', () => {
 
       const result = formatStoveStateForDisplay(cachedData as any);
 
-      expect(result.cachedAtFormatted).toBeDefined();
-      expect(typeof result.cachedAtFormatted).toBe('string');
+      expect(result!.cachedAtFormatted).toBeDefined();
+      expect(typeof result!.cachedAtFormatted).toBe('string');
     });
   });
 
@@ -152,13 +152,13 @@ describe('offlineStateCache', () => {
 
       const result = formatThermostatStateForDisplay(cachedData as any);
 
-      expect(result.temperature).toBe(21.5);
-      expect(result.setpoint).toBe(22);
-      expect(result.humidity).toBe(45);
-      expect(result.isHeating).toBe(true);
-      expect(result.roomName).toBe('Soggiorno');
-      expect(result.roomCount).toBe(1);
-      expect(result.mode).toBe('schedule');
+      expect(result!.temperature).toBe(21.5);
+      expect(result!.setpoint).toBe(22);
+      expect(result!.humidity).toBe(45);
+      expect(result!.isHeating).toBe(true);
+      expect(result!.roomName).toBe('Soggiorno');
+      expect(result!.roomCount).toBe(1);
+      expect(result!.mode).toBe('schedule');
     });
 
     it('handles flat thermostat state', () => {
@@ -174,10 +174,10 @@ describe('offlineStateCache', () => {
 
       const result = formatThermostatStateForDisplay(cachedData as any);
 
-      expect(result.temperature).toBe(20);
-      expect(result.setpoint).toBe(21);
-      expect(result.humidity).toBe(50);
-      expect(result.roomName).toBe('Stanza');
+      expect(result!.temperature).toBe(20);
+      expect(result!.setpoint).toBe(21);
+      expect(result!.humidity).toBe(50);
+      expect(result!.roomName).toBe('Stanza');
     });
 
     it('marks data as stale after 30 minutes', () => {
@@ -189,7 +189,7 @@ describe('offlineStateCache', () => {
 
       const result = formatThermostatStateForDisplay(cachedData as any);
 
-      expect(result.isStale).toBe(true);
+      expect(result!.isStale).toBe(true);
     });
   });
 

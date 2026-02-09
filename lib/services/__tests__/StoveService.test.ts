@@ -56,7 +56,7 @@ import { igniteStove, shutdownStove } from '@/lib/stoveApi';
 import { syncLivingRoomWithStove } from '@/lib/netatmoStoveSync';
 
 describe('StoveService', () => {
-  let service;
+  let service: any;
 
   beforeEach(() => {
     jest.clearAllMocks();

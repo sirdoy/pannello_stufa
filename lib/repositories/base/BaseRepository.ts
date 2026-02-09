@@ -84,7 +84,7 @@ export abstract class BaseRepository<T = unknown> {
    */
   async transaction(subPath: string, updateFn: (current: T | null) => T | null): Promise<void> {
     const fullPath = this.resolvePath(subPath);
-    return adminDbTransaction(fullPath, updateFn);
+    await adminDbTransaction(fullPath, updateFn as (currentData: unknown) => unknown);
   }
 
   /**

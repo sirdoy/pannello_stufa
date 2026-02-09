@@ -202,10 +202,10 @@ describe('PIDController', () => {
 
     it('should handle null/undefined state gracefully', () => {
       const pid = new PIDController();
-      pid.setState(null);
+      pid.setState(null as any);
       expect(pid.getState().integral).toBe(0);
 
-      pid.setState(undefined);
+      pid.setState(undefined as any);
       expect(pid.getState().integral).toBe(0);
 
       pid.setState({});

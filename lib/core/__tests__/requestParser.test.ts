@@ -20,7 +20,7 @@ import {
 import { ApiError, ERROR_CODES } from '../apiErrors';
 
 // Helper to create mock request
-function createMockRequest(body: any = null, contentType = 'application/json', url = 'https://example.com/api/test') {
+function createMockRequest(body: any = null, contentType: string | undefined = 'application/json', url = 'https://example.com/api/test') {
   return {
     headers: {
       get: jest.fn((name: any) => {
@@ -96,7 +96,7 @@ describe('JSON Body Parsing', () => {
 describe('Query Parameter Parsing', () => {
   describe('parseQuery', () => {
     it('should return URLSearchParams', () => {
-      const request = createMockRequest(null, null, 'https://example.com/api?page=1&limit=10');
+      const request = createMockRequest(null, undefined, 'https://example.com/api?page=1&limit=10');
       const params = parseQuery(request);
 
       expect(params.get('page')).toBe('1');
@@ -106,7 +106,7 @@ describe('Query Parameter Parsing', () => {
 
   describe('parseQueryObject', () => {
     it('should return query params as object', () => {
-      const request = createMockRequest(null, null, 'https://example.com/api?name=test&active=true');
+      const request = createMockRequest(null, undefined, 'https://example.com/api?name=test&active=true');
       const obj = parseQueryObject(request);
 
       expect(obj).toEqual({ name: 'test', active: 'true' });
@@ -147,7 +147,7 @@ describe('Validation Utilities', () => {
 
       try {
         validateRequired(data, ['name', 'email', 'age']);
-      } catch (error) {
+      } catch (error: any) {
         expect(error.details.missing).toEqual(['name', 'email', 'age']);
       }
     });

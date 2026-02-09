@@ -20,7 +20,7 @@ jest.mock('../hueApi', () => {
 });
 
 describe('HueApi - Scene Management', () => {
-  let hueApi;
+  let hueApi: any;
 
   beforeEach(() => {
     hueApi = new HueApi('192.168.1.100', 'test-app-key');

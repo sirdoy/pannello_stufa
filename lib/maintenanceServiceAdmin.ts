@@ -41,7 +41,7 @@ export async function trackUsageHours(stoveStatus: string): Promise<TrackUsageRe
 
     const now = new Date();
 
-    const transactionResult = await adminDbTransaction(MAINTENANCE_REF, (currentData: MaintenanceData | null) => {
+    const transactionResult = await adminDbTransaction(MAINTENANCE_REF, ((currentData: MaintenanceData | null) => {
       if (!currentData) {
         return {
           currentHours: 0,
@@ -94,7 +94,7 @@ export async function trackUsageHours(stoveStatus: string): Promise<TrackUsageRe
       }
 
       return result as MaintenanceData & { _elapsedMinutes: number; _notificationData: unknown };
-    });
+    }) as (currentData: unknown) => unknown);
 
     const updatedData = transactionResult as MaintenanceData & { _notificationData?: unknown; _elapsedMinutes?: number };
     const notificationData = updatedData._notificationData || null;

@@ -20,10 +20,6 @@ import { getHueConnection } from '@/lib/hue/hueLocalHelper';
 
 export const dynamic = 'force-dynamic';
 
-interface RouteContext {
-  params: Promise<{ id: string }>;
-}
-
 interface SceneAction {
   target: {
     rid: string;
@@ -40,7 +36,7 @@ interface UpdateSceneRequestBody {
  * PUT /api/hue/scenes/[id]
  * Update scene name and/or actions
  */
-export const PUT = withAuthAndErrorHandler(async (request, context: RouteContext) => {
+export const PUT = withAuthAndErrorHandler(async (request, context, session) => {
   const sceneId = await getPathParam(context, 'id');
   const updates = await parseJsonOrThrow(request) as UpdateSceneRequestBody;
 
@@ -121,7 +117,7 @@ export const PUT = withAuthAndErrorHandler(async (request, context: RouteContext
  * DELETE /api/hue/scenes/[id]
  * Delete scene from Hue bridge
  */
-export const DELETE = withAuthAndErrorHandler(async (request, context: RouteContext) => {
+export const DELETE = withAuthAndErrorHandler(async (request, context, session) => {
   const sceneId = await getPathParam(context, 'id');
 
   // Get Hue connection from Firebase

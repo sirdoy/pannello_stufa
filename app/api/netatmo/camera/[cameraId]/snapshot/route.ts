@@ -12,10 +12,6 @@ import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-interface RouteContext {
-  params: Promise<{ cameraId: string }>;
-}
-
 interface CameraData {
   cameras?: Array<{
     id: string;
@@ -30,7 +26,7 @@ interface CameraData {
  * Returns snapshot URL for a specific camera
  * Protected: Requires Auth0 authentication
  */
-export const GET = withAuthAndErrorHandler(async (request: NextRequest, context: RouteContext) => {
+export const GET = withAuthAndErrorHandler(async (request: NextRequest, context, session) => {
   const cameraId = await getPathParam(context, 'cameraId');
   const accessToken = await requireNetatmoToken();
 
@@ -44,6 +40,10 @@ export const GET = withAuthAndErrorHandler(async (request: NextRequest, context:
     const homeId = await adminDbGet(homeIdPath);
     const homesData = await NETATMO_CAMERA_API.getCamerasData(accessToken, homeId as any);
     cameraData = { cameras: NETATMO_CAMERA_API.parseCameras(homesData as any) as any };
+  }
+
+  if (!cameraData.cameras) {
+    return notFound('Nessuna camera disponibile');
   }
 
   const camera = cameraData.cameras.find(c => c.id === cameraId);

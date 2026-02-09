@@ -48,20 +48,20 @@ type AuthedHandler = (
   request: NextRequest,
   context: RouteContext,
   session: Session
-) => Promise<NextResponse>;
+) => Promise<NextResponse<unknown>>;
 
 /** Route handler with optional authentication */
 type OptionalAuthHandler = (
   request: NextRequest,
   context: RouteContext,
   session: Session | null
-) => Promise<NextResponse>;
+) => Promise<NextResponse<unknown>>;
 
 /** Route handler without authentication */
 type UnauthHandler = (
   request: NextRequest,
   context: RouteContext
-) => Promise<NextResponse>;
+) => Promise<NextResponse<unknown>>;
 
 // =============================================================================
 // AUTH MIDDLEWARE

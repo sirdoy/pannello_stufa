@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 47 of 48 (Test Strict Mode and Index Access)
-Plan: 2 of 8 in current phase
+Plan: 3 of 8 in current phase
 Status: In Progress
-Last activity: 2026-02-09 - Completed 47-02-PLAN.md (Fixed 74 strict mode errors in 3 mid-error test files: netatmoStoveSync, coordinationPauseCalculator, thermostat page test)
+Last activity: 2026-02-09 - Completed 47-03-PLAN.md (Fixed 282 strict mode errors in remaining 20 test files, achieved 0 total tsc errors)
 
-Progress: [████████████████████████████████████████████░░░░] 99% (236/236 estimated total plans)
+Progress: [████████████████████████████████████████████░░░░] 99% (237/236 estimated total plans)
 
 ## Performance Metrics
 
@@ -23,7 +23,7 @@ Progress: [███████████████████████
 - Total plans completed: 229 plans (v1.0-v5.1)
 - Milestones shipped: 7 (v1.0, v2.0, v3.0, v3.1, v3.2, v4.0, v5.0)
 - Average milestone: ~32 plans
-- Current milestone: v5.1 (5 phases planned, phase 44 complete, phase 45 complete, phase 46 complete, phase 47 in progress - 2/8 plans done)
+- Current milestone: v5.1 (5 phases planned, phase 44 complete, phase 45 complete, phase 46 complete, phase 47 in progress - 3/8 plans done)
 
 **Recent Milestone Performance:**
 
@@ -60,6 +60,7 @@ Progress: [███████████████████████
 | Phase 46 P08 | 130 | 2 tasks | 0 files |
 | Phase 47 P01 | 262s | 2 tasks | 3 files |
 | Phase 47 P02 | 313s | 2 tasks | 3 files |
+| Phase 47 P03 | 819s | 2 tasks | 20 files |
 
 ## Accumulated Context
 
@@ -121,6 +122,9 @@ Recent decisions from PROJECT.md affecting v5.1 work:
 - [Phase 47-01]: Callback parameters in mockImplementation receive explicit `any` type
 - [Phase 47-01]: Test arrays with intentional empty values receive explicit type annotation
 - [Phase 47-02]: Record<string, any> type assertions for dynamic test object property access (appliedSetpoints, previousSetpoints)
+- [Phase 47-03]: Variable extraction pattern when TypeScript cannot infer non-null through chained property access
+- [Phase 47-03]: Pragmatic 'as any' for intentionally invalid test data (negative test cases)
+- [Phase 47-03]: Non-null assertions (!) required even after expect().not.toBeNull() matchers
 - [Phase 47-02]: Non-null assertions (!) safe for nextSlot when test setup guarantees data presence
 - [Phase 47-02]: Explicit React.ReactNode types required for all mock component props in strict mode
 - [Phase 47-02]: jest.Mock type annotations for test fixtures (mockRouter, mockSearchParams)

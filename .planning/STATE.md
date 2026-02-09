@@ -13,7 +13,7 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 Phase: 44 of 48 (Library Strict Mode Foundation)
 Plan: 6 of 7 in current phase
 Status: In progress
-Last activity: 2026-02-09 - Completed quick task 15: aggiungi la favicon
+Last activity: 2026-02-09 - Completed quick task 16: fix weather tab coordinates from config
 
 Progress: [████████████████████████████████████████████░░░░] 93% (214/228 estimated total plans)
 
@@ -71,6 +71,7 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 16 | fix weather tab coordinates from config | 2026-02-09 | 00f3184 | [16-fix-weather-tab-coordinates-from-config](./quick/16-fix-weather-tab-coordinates-from-config/) |
 | 15 | aggiungi la favicon | 2026-02-09 | 266bd24 | [15-aggiungi-la-favicon](./quick/15-aggiungi-la-favicon/) |
 
 ### Blockers/Concerns
@@ -94,9 +95,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-09 08:31
-Stopped at: Completed 44-06-PLAN.md (hooks & PWA strict mode, 39 errors fixed in 8 files)
-Resume file: None — ready to continue with 44-07
+Last session: 2026-02-09 08:44
+Stopped at: Completed quick-16 (fix weather tab coordinates from config, 2 files updated)
+Resume file: None — ready to continue with phase 44 or additional quick tasks
 
 ---
 *State initialized: 2026-02-08 for v5.1 Tech Debt & Code Quality milestone*

@@ -150,7 +150,7 @@ export default function LightsPage() {
       if (scenesData.error) throw new Error(scenesData.error);
 
       // Sort rooms with 'Casa' first, then alphabetical
-      const sortedRooms = (roomsData.rooms || []).sort((a, b) => {
+      const sortedRooms = (roomsData.rooms || []).sort((a: HueRoom, b: HueRoom) => {
         if (a.metadata?.name === 'Casa') return -1;
         if (b.metadata?.name === 'Casa') return 1;
         return (a.metadata?.name || '').localeCompare(b.metadata?.name || '');
@@ -160,7 +160,7 @@ export default function LightsPage() {
       setScenes(scenesData.scenes || []);
     } catch (err) {
       console.error('Errore fetch dati Hue:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     }
   }
 
@@ -185,7 +185,7 @@ export default function LightsPage() {
       if (data.error) throw new Error(data.error);
       await fetchData();
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setRefreshing(false);
     }
@@ -205,7 +205,7 @@ export default function LightsPage() {
       if (data.error) throw new Error(data.error);
       await fetchData();
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setRefreshing(false);
     }
@@ -227,7 +227,7 @@ export default function LightsPage() {
       if (data.error) throw new Error(data.error);
       await fetchData();
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setRefreshing(false);
     }
@@ -249,7 +249,7 @@ export default function LightsPage() {
       if (data.error) throw new Error(data.error);
       await fetchData();
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setRefreshing(false);
     }
@@ -276,7 +276,7 @@ export default function LightsPage() {
       setTimeout(() => setSuccess(null), 2000);
       await fetchData();
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setChangingColor(null);
     }
@@ -298,7 +298,7 @@ export default function LightsPage() {
       setSuccess(`Scena "${sceneName}" attivata`);
       setTimeout(() => setSuccess(null), 2000);
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setActivatingScene(null);
     }
@@ -330,26 +330,26 @@ export default function LightsPage() {
       setTimeout(() => setSuccess(null), 2000);
       await fetchData();
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setRefreshing(false);
     }
   }
 
   // Helper to get grouped_light ID
-  const getGroupedLightId = (room) => {
+  const getGroupedLightId = (room: HueRoom) => {
     if (!room?.services) return null;
-    const groupedLight = room.services.find(s => s.rtype === 'grouped_light');
+    const groupedLight = room.services.find((s) => s.rtype === 'grouped_light');
     return groupedLight?.rid || null;
   };
 
   // Helper to get room lights (use 'children' not 'services')
   // Local API: children contains device IDs, match via light.owner.rid
   // Remote API: children may contain light IDs directly
-  const getRoomLights = (room) => {
+  const getRoomLights = (room: HueRoom) => {
     if (!room?.children || !lights.length) return [];
-    return lights.filter(light =>
-      room.children.some(c =>
+    return lights.filter((light) =>
+      room.children?.some((c) =>
         c.rid === light.id || // Remote API: light ID in children
         c.rid === light.owner?.rid // Local API: device ID in children
       )
@@ -357,9 +357,9 @@ export default function LightsPage() {
   };
 
   // Helper to get room scenes
-  const getRoomScenes = (room) => {
+  const getRoomScenes = (room: HueRoom) => {
     if (!room?.id || !scenes.length) return [];
-    return scenes.filter(scene => scene.group?.rid === room.id);
+    return scenes.filter((scene) => scene.group?.rid === room.id);
   };
 
   // Disconnect from Hue
@@ -383,7 +383,7 @@ export default function LightsPage() {
       setScenes([]);
       setSuccess('Bridge Hue disconnesso');
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setRefreshing(false);
     }
@@ -434,7 +434,7 @@ export default function LightsPage() {
       }
     } catch (err) {
       console.error('Discovery error:', err);
-      setPairingError(err.message || 'Errore durante la ricerca del bridge');
+      setPairingError((err instanceof Error ? err.message : String(err)) || 'Errore durante la ricerca del bridge');
       setPairing(false);
     }
   }
@@ -449,7 +449,9 @@ export default function LightsPage() {
       pairingTimerRef.current = setInterval(() => {
         setPairingCountdown(prev => {
           if (prev <= 1) {
-            clearInterval(pairingTimerRef.current);
+            if (pairingTimerRef.current) {
+              clearInterval(pairingTimerRef.current);
+            }
             return 0;
           }
           return prev - 1;
@@ -489,7 +491,7 @@ export default function LightsPage() {
       }
     } catch (err) {
       console.error('Pairing error:', err);
-      setPairingError(err.message);
+      setPairingError(err instanceof Error ? err.message : String(err));
       if (pairingTimerRef.current) {
         clearInterval(pairingTimerRef.current);
       }
@@ -551,7 +553,7 @@ export default function LightsPage() {
       }
     } catch (err) {
       console.error('Remote pairing error:', err);
-      setPairingError(err.message);
+      setPairingError(err instanceof Error ? err.message : String(err));
       setPairingStep('remotePairingWait'); // Go back to wait state
     }
   }
@@ -977,7 +979,7 @@ export default function LightsPage() {
                       <div className="grid grid-cols-2 gap-3">
                         <Button
                           variant="subtle"
-                          onClick={() => handleRoomToggle(groupedLightId, true)}
+                          onClick={() => groupedLightId && handleRoomToggle(groupedLightId, true)}
                           disabled={refreshing || !groupedLightId}
                           size="sm"
                           icon="💡"
@@ -986,7 +988,7 @@ export default function LightsPage() {
                         </Button>
                         <Button
                           variant="subtle"
-                          onClick={() => handleRoomToggle(groupedLightId, false)}
+                          onClick={() => groupedLightId && handleRoomToggle(groupedLightId, false)}
                           disabled={refreshing || !groupedLightId}
                           size="sm"
                           icon="🌙"
@@ -1000,7 +1002,7 @@ export default function LightsPage() {
                     {allLightsOff && (
                       <Button
                         variant="ember"
-                        onClick={() => handleRoomToggle(groupedLightId, true)}
+                        onClick={() => groupedLightId && handleRoomToggle(groupedLightId, true)}
                         disabled={refreshing || !groupedLightId}
                         size="sm"
                         icon="💡"
@@ -1015,7 +1017,7 @@ export default function LightsPage() {
                     {allLightsOn && (
                       <Button
                         variant="subtle"
-                        onClick={() => handleRoomToggle(groupedLightId, false)}
+                        onClick={() => groupedLightId && handleRoomToggle(groupedLightId, false)}
                         disabled={refreshing || !groupedLightId}
                         size="sm"
                         icon="🌙"
@@ -1038,7 +1040,7 @@ export default function LightsPage() {
                         min={1}
                         max={100}
                         step={1}
-                        onChange={(value) => handleBrightnessChange(groupedLightId, value)}
+                        onChange={(value) => groupedLightId && handleBrightnessChange(groupedLightId, value as number)}
                         disabled={refreshing || !groupedLightId}
                         aria-label={`Luminosita stanza ${room.metadata?.name}`}
                       />
@@ -1069,7 +1071,7 @@ export default function LightsPage() {
                           {roomLights.map(light => {
                             const lightOn = light.on?.on;
                             const lightBrightness = light.dimming?.brightness || 0;
-                            const hasColor = supportsColor(light);
+                            const hasColor = supportsColor(light as any);
 
                             return (
                               <div
@@ -1129,7 +1131,7 @@ export default function LightsPage() {
                                         min={1}
                                         max={100}
                                         step={1}
-                                        onChange={(value) => handleLightBrightnessChange(light.id, value)}
+                                        onChange={(value) => handleLightBrightnessChange(light.id, value as number)}
                                         disabled={refreshing}
                                         aria-label={`Luminosita ${light.metadata?.name}`}
                                       />
@@ -1176,7 +1178,7 @@ export default function LightsPage() {
                           {roomScenes.map(scene => (
                             <button
                               key={scene.id}
-                              onClick={() => handleActivateScene(scene.id, scene.metadata?.name)}
+                              onClick={() => handleActivateScene(scene.id, scene.metadata?.name || '')}
                               disabled={activatingScene === scene.id}
                               className={cn(
                                 "relative p-4 rounded-xl border-2 transition-all active:scale-95",

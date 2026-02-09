@@ -241,6 +241,22 @@ describe('Card', () => {
       expect(screen.getByText('No Icon Title')).toBeInTheDocument();
     });
 
+    it('CardTitle uses default heading level 2', () => {
+      render(
+        <CardTitle>Default Level Title</CardTitle>
+      );
+      const heading = screen.getByRole('heading', { level: 2 });
+      expect(heading).toHaveTextContent('Default Level Title');
+    });
+
+    it('CardTitle accepts custom heading level', () => {
+      render(
+        <CardTitle level={3}>Custom Level Title</CardTitle>
+      );
+      const heading = screen.getByRole('heading', { level: 3 });
+      expect(heading).toHaveTextContent('Custom Level Title');
+    });
+
     it('CardContent renders with spacing', () => {
       const { container } = render(
         <CardContent>

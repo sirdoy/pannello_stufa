@@ -137,7 +137,7 @@ export default function CameraDashboard() {
 
   if (loading) {
     return (
-      <Section title="Videocamere" description="Caricamento..." spacing="lg">
+      <Section title="Videocamere" description="Caricamento..." spacing="lg" level={1}>
         <Grid cols={2} gap="lg">
           <Skeleton.Card className="min-h-[400px]" />
           <Skeleton.Card className="min-h-[400px]" />
@@ -149,12 +149,12 @@ export default function CameraDashboard() {
   // Needs re-authorization - token exists but missing camera scopes
   if (needsReauth) {
     return (
-      <Section title="Videocamere" spacing="lg">
+      <Section title="Videocamere" spacing="lg" level={1}>
         <Card>
           <CardContent className="py-8">
             <div className="text-center">
               <span className="text-5xl mb-4 block">📹</span>
-              <Heading level={3} className="mb-2">Autorizzazione richiesta</Heading>
+              <Heading level={2} className="mb-2">Autorizzazione richiesta</Heading>
               <Text variant="secondary" className="mb-6 max-w-md mx-auto">
                 L'accesso alle videocamere richiede una nuova autorizzazione con i permessi aggiornati.
                 Clicca il pulsante per riautorizzare Netatmo.
@@ -171,7 +171,7 @@ export default function CameraDashboard() {
 
   if (error) {
     return (
-      <Section title="Videocamere" spacing="lg">
+      <Section title="Videocamere" spacing="lg" level={1}>
         <Banner
           variant="error"
           title="Errore"
@@ -186,7 +186,7 @@ export default function CameraDashboard() {
 
   if (cameras.length === 0) {
     return (
-      <Section title="Videocamere" spacing="lg">
+      <Section title="Videocamere" spacing="lg" level={1}>
         <EmptyState
           icon="📹"
           title="Nessuna videocamera trovata"
@@ -206,6 +206,7 @@ export default function CameraDashboard() {
       title="Videocamere"
       description="Visualizza le tue videocamere Netatmo"
       spacing="lg"
+      level={1}
       action={
         <div className="flex gap-2">
           <Button
@@ -230,7 +231,7 @@ export default function CameraDashboard() {
         {/* Camera list */}
         <Card>
           <CardHeader>
-            <CardTitle icon="📹">Le tue telecamere</CardTitle>
+            <CardTitle icon="📹" level={2}>Le tue telecamere</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {cameras.map(camera => (
@@ -260,7 +261,7 @@ export default function CameraDashboard() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <Heading level={4} size="md" className="truncate">{camera.name}</Heading>
+                    <Heading level={3} size="md" className="truncate">{camera.name}</Heading>
                     <Text variant="tertiary" size="sm">
                       {NETATMO_CAMERA_API.getCameraTypeName(camera.type)}
                     </Text>
@@ -282,7 +283,7 @@ export default function CameraDashboard() {
         {selectedCamera && (
           <Card>
             <CardHeader>
-              <CardTitle icon="🎥">{selectedCamera.name}</CardTitle>
+              <CardTitle icon="🎥" level={2}>{selectedCamera.name}</CardTitle>
             </CardHeader>
             <CardContent>
               {/* Video/Snapshot toggle */}
@@ -373,7 +374,7 @@ export default function CameraDashboard() {
               </div>
 
               {/* Recent events for this camera */}
-              <Heading level={4} size="sm" className="mb-3">Eventi recenti</Heading>
+              <Heading level={3} size="sm" className="mb-3">Eventi recenti</Heading>
               {cameraEvents.length > 0 ? (
                 <div className="space-y-2 max-h-80 overflow-y-auto">
                   {cameraEvents.slice(0, 10).map(event => {

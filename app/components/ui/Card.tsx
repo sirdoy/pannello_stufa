@@ -129,14 +129,15 @@ const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
  */
 export interface CardTitleProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: React.ReactNode;
+  level?: 1 | 2 | 3 | 4 | 5 | 6;
 }
 
 const CardTitle = forwardRef<HTMLDivElement, CardTitleProps>(
-  function CardTitle({ children, icon, className, ...props }, ref) {
+  function CardTitle({ children, icon, level = 2, className, ...props }, ref) {
     return (
       <div ref={ref} className={cn('flex items-center gap-3', className)} {...props}>
         {icon && <span className="text-2xl sm:text-3xl">{icon}</span>}
-        <Heading level={2} size="lg">
+        <Heading level={level} size="lg">
           {children}
         </Heading>
       </div>

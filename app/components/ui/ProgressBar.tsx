@@ -11,6 +11,7 @@ export interface ProgressBarProps extends HTMLAttributes<HTMLDivElement> {
   size?: 'sm' | 'md' | 'lg';
   animated?: boolean;
   label?: string;
+  ariaLabel?: string;
   leftContent?: ReactNode;
   rightContent?: ReactNode;
   // Legacy prop
@@ -42,6 +43,7 @@ export default function ProgressBar({
   size = 'md',
   animated = true,
   label,
+  ariaLabel,
   leftContent,
   rightContent,
   className = '',
@@ -107,6 +109,7 @@ export default function ProgressBar({
           `.trim().replace(/\s+/g, ' ')}
           style={{ width: `${clampedValue}%` }}
           role="progressbar"
+          aria-label={ariaLabel || label || `${clampedValue}%`}
           aria-valuenow={clampedValue}
           aria-valuemin={0}
           aria-valuemax={100}

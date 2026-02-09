@@ -3,6 +3,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 /**
+ * BeforeInstallPromptEvent interface
+ * Non-standard DOM event for PWA installation
+ */
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
+/**
  * PWA Install Hook
  *
  * Provides utilities for PWA installation detection and prompting.
@@ -32,7 +41,7 @@ export function usePWAInstall(): { isInstalled: boolean; isInstallable: boolean;
   const [isDismissed, setIsDismissed] = useState(false);
 
   // Store the beforeinstallprompt event for later use
-  const deferredPromptRef = useRef(null);
+  const deferredPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
 
   /**
    * Check if app is running in standalone mode (installed as PWA)
@@ -52,7 +61,7 @@ export function usePWAInstall(): { isInstalled: boolean; isInstallable: boolean;
 
     // Listen for display mode changes
     const mediaQuery = window.matchMedia('(display-mode: standalone)');
-    const handleChange = (e) => setIsInstalled(e.matches);
+    const handleChange = (e: MediaQueryListEvent) => setIsInstalled(e.matches);
 
     if (mediaQuery.addEventListener) {
       mediaQuery.addEventListener('change', handleChange);
@@ -87,12 +96,12 @@ export function usePWAInstall(): { isInstalled: boolean; isInstallable: boolean;
    * This event fires when the browser determines the app is installable
    */
   useEffect(() => {
-    const handleBeforeInstallPrompt = (e) => {
+    const handleBeforeInstallPrompt = (e: Event) => {
       // Prevent the default browser install prompt
       e.preventDefault();
 
       // Store the event for later use
-      deferredPromptRef.current = e;
+      deferredPromptRef.current = e as BeforeInstallPromptEvent;
 
       // Update state to show our custom install UI
       setIsInstallable(true);

@@ -48,8 +48,8 @@ export interface UseBackgroundSyncReturn {
   hasFailedCommands: boolean;
   queueStoveCommand: (action: string, body?: Record<string, unknown>) => Promise<number>;
   refreshCommands: () => Promise<void>;
-  retryCommand: (id: string) => Promise<void>;
-  cancelCommand: (id: string) => Promise<void>;
+  retryCommand: (id: number) => Promise<void>;
+  cancelCommand: (id: number) => Promise<void>;
   clearFailedCommands: () => Promise<void>;
   triggerSync: () => Promise<void>;
 }
@@ -93,7 +93,7 @@ export function useBackgroundSync(): UseBackgroundSyncReturn {
       return;
     }
 
-    const handleMessage = (event) => {
+    const handleMessage = (event: MessageEvent) => {
       const { type, commandId, endpoint } = event.data || {};
 
       if (type === 'COMMAND_SYNCED') {
@@ -148,7 +148,7 @@ export function useBackgroundSync(): UseBackgroundSyncReturn {
    * @returns {Promise<number>} Command ID
    */
   const queueStoveCommand = useCallback(
-    async (action, data = {}) => {
+    async (action: string, data: Record<string, unknown> = {}) => {
       const endpoint = `stove/${action}`;
       const id = await queueCommand(endpoint, data);
       await refreshCommands();
@@ -162,7 +162,7 @@ export function useBackgroundSync(): UseBackgroundSyncReturn {
    * @param {number} commandId - Command ID
    */
   const handleRetry = useCallback(
-    async (commandId) => {
+    async (commandId: number) => {
       await retryCommand(commandId);
       await refreshCommands();
     },
@@ -174,7 +174,7 @@ export function useBackgroundSync(): UseBackgroundSyncReturn {
    * @param {number} commandId - Command ID
    */
   const handleCancel = useCallback(
-    async (commandId) => {
+    async (commandId: number) => {
       await cancelCommand(commandId);
       await refreshCommands();
     },

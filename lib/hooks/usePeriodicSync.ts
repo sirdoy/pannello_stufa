@@ -33,7 +33,7 @@ export function usePeriodicSync(options: { interval?: number } = {}): unknown {
   const [isRegistered, setIsRegistered] = useState(false);
   const [permission, setPermission] = useState('unknown');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Check support and status on mount
   useEffect(() => {
@@ -75,7 +75,7 @@ export function usePeriodicSync(options: { interval?: number } = {}): unknown {
 
       return success;
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
       return false;
     } finally {
       setLoading(false);
@@ -94,7 +94,7 @@ export function usePeriodicSync(options: { interval?: number } = {}): unknown {
       }
       return success;
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
       return false;
     } finally {
       setLoading(false);

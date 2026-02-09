@@ -25,7 +25,7 @@ export function useRoomStatus(): { rooms: unknown[]; loading: boolean; error: st
       }
 
       // Transform to room selector format
-      const roomList = (data.rooms || []).map(room => ({
+      const roomList = (data.rooms || []).map((room: any) => ({
         id: room.room_id,
         name: room.room_name,
         temperature: room.temperature,
@@ -37,7 +37,7 @@ export function useRoomStatus(): { rooms: unknown[]; loading: boolean; error: st
 
       setRooms(roomList);
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
     }

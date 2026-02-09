@@ -29,8 +29,8 @@ import { useState, useEffect, useCallback } from 'react';
 export function useOnlineStatus(): { isOnline: boolean; wasOffline: boolean; lastOnlineAt: Date | null; offlineSince: Date | null; checkConnection: () => Promise<boolean> } {
   const [isOnline, setIsOnline] = useState<boolean>(true);
   const [wasOffline, setWasOffline] = useState(false);
-  const [lastOnlineAt, setLastOnlineAt] = useState(null);
-  const [offlineSince, setOfflineSince] = useState(null);
+  const [lastOnlineAt, setLastOnlineAt] = useState<Date | null>(null);
+  const [offlineSince, setOfflineSince] = useState<Date | null>(null);
 
   /**
    * Check connection by attempting to fetch a small resource

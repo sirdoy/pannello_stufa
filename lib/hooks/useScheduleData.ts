@@ -30,11 +30,16 @@ import { NETATMO_ROUTES } from '@/lib/routes';
  *   </div>
  * );
  */
-export function useScheduleData(): { schedules: unknown[]; activeSchedule: unknown | null; loading: boolean; error: string | null; source: string | null; refetch: () => Promise<void> } {
-  const [schedules, setSchedules] = useState([]);
+interface Schedule {
+  selected?: boolean;
+  [key: string]: unknown;
+}
+
+export function useScheduleData(): { schedules: Schedule[]; activeSchedule: Schedule | null; loading: boolean; error: string | null; source: string | null; refetch: () => Promise<void> } {
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [source, setSource] = useState(null); // 'cache' | 'api'
+  const [error, setError] = useState<string | null>(null);
+  const [source, setSource] = useState<string | null>(null); // 'cache' | 'api'
 
   const fetchSchedules = useCallback(async () => {
     try {
@@ -66,7 +71,7 @@ export function useScheduleData(): { schedules: unknown[]; activeSchedule: unkno
       setSchedules(data.schedules || []);
       setSource(data._source);
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
       console.error('[useScheduleData] Fetch error:', err);
     } finally {
       setLoading(false);

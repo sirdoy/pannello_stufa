@@ -106,7 +106,7 @@ export async function getStoveSyncConfig(): Promise<StoveSyncConfig> {
  * @param {Array} rooms - Array of { id, name } objects for rooms to sync
  * @param {number} stoveTemperature - Temperature when stove is ON (default: 16)
  */
-export async function enableStoveSync(rooms, stoveTemperature = DEFAULT_STOVE_TEMPERATURE) {
+export async function enableStoveSync(rooms: StoveSyncRoom[] | any, stoveTemperature = DEFAULT_STOVE_TEMPERATURE) {
   // Handle both old single-room API and new multi-room API
   let roomsArray = rooms;
   if (!Array.isArray(rooms)) {
@@ -118,14 +118,14 @@ export async function enableStoveSync(rooms, stoveTemperature = DEFAULT_STOVE_TE
   const stoveSyncPath = getEnvironmentPath('netatmo/stoveSync');
   await adminDbSet(stoveSyncPath, {
     enabled: true,
-    rooms: roomsArray.map(r => ({ id: r.id, name: r.name, originalSetpoint: null })),
+    rooms: roomsArray.map((r: any) => ({ id: r.id, name: r.name, originalSetpoint: null })),
     stoveTemperature,
     stoveMode: false,
     lastSyncAt: Date.now(),
     lastSyncAction: 'enabled',
   });
 
-  const roomNames = roomsArray.map(r => r.name).join(', ');
+  const roomNames = roomsArray.map((r: any) => r.name).join(', ');
   console.log(`✅ Stove sync enabled for rooms: ${roomNames} at ${stoveTemperature}°C`);
 }
 
@@ -162,7 +162,7 @@ export async function disableStoveSync() {
  * @param {boolean} stoveIsOn - True if stove is ON (WORK/START status)
  * @returns {Object} Sync result
  */
-export async function syncLivingRoomWithStove(stoveIsOn) {
+export async function syncLivingRoomWithStove(stoveIsOn: boolean) {
   const config = await getStoveSyncConfig();
 
   // Check if sync is enabled
@@ -205,7 +205,7 @@ export async function syncLivingRoomWithStove(stoveIsOn) {
     return {
       synced: false,
       reason: 'error',
-      error: err.message,
+      error: err instanceof Error ? err.message : String(err),
     };
   }
 }
@@ -214,7 +214,7 @@ export async function syncLivingRoomWithStove(stoveIsOn) {
  * Set all configured rooms to stove mode (low temperature)
  * @private
  */
-async function setRoomsToStoveMode(config) {
+async function setRoomsToStoveMode(config: StoveSyncConfig) {
   const { accessToken, error } = await getValidAccessToken();
   if (error) {
     return {
@@ -279,8 +279,9 @@ async function setRoomsToStoveMode(config) {
         console.error(`❌ Failed to set room "${room.name}" to stove mode - API returned failure`);
       }
     } catch (err) {
-      results.push({ roomId: room.id, roomName: room.name, success: false, error: err.message });
-      console.error(`❌ Error setting room "${room.name}":`, err.message, err);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      results.push({ roomId: room.id, roomName: room.name, success: false, error: errorMessage });
+      console.error(`❌ Error setting room "${room.name}":`, errorMessage, err);
     }
   }
 
@@ -311,7 +312,7 @@ async function setRoomsToStoveMode(config) {
  * Return all configured rooms to schedule (stove off)
  * @private
  */
-async function setRoomsToSchedule(rooms) {
+async function setRoomsToSchedule(rooms: StoveSyncRoom[]) {
   const { accessToken, error } = await getValidAccessToken();
   if (error) {
     return {
@@ -351,8 +352,9 @@ async function setRoomsToSchedule(rooms) {
         console.error(`❌ Failed to restore room "${room.name}" to schedule`);
       }
     } catch (err) {
-      results.push({ roomId: room.id, roomName: room.name, success: false, error: err.message });
-      console.error(`❌ Error restoring room "${room.name}":`, err.message);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      results.push({ roomId: room.id, roomName: room.name, success: false, error: errorMessage });
+      console.error(`❌ Error restoring room "${room.name}":`, errorMessage);
     }
   }
 
@@ -385,7 +387,7 @@ async function setRoomsToSchedule(rooms) {
  * @param {boolean} stoveIsOn - Current stove state
  * @returns {Object} Enforcement result
  */
-export async function enforceStoveSyncSetpoints(stoveIsOn) {
+export async function enforceStoveSyncSetpoints(stoveIsOn: boolean) {
   const config = await getStoveSyncConfig();
 
   // Check if sync is enabled
@@ -467,7 +469,8 @@ export async function enforceStoveSyncSetpoints(stoveIsOn) {
             console.error(`❌ Failed to re-enforce room "${room.name}"`);
           }
         } catch (err) {
-          console.error(`❌ Error re-enforcing room "${room.name}":`, err.message);
+          const errorMessage = err instanceof Error ? err.message : String(err);
+          console.error(`❌ Error re-enforcing room "${room.name}":`, errorMessage);
         }
       }
 
@@ -502,7 +505,7 @@ export async function enforceStoveSyncSetpoints(stoveIsOn) {
  * @param {Object} previousSetpoints - { roomId: setpoint } to track pre-override values
  * @returns {Promise<Object>} Result with appliedSetpoints and previousSetpoints
  */
-export async function setRoomsToBoostMode(config, boostAmount = 2, previousSetpoints = {}) {
+export async function setRoomsToBoostMode(config: any, boostAmount = 2, previousSetpoints: Record<string, number> = {}) {
   const { homeId, rooms, accessToken } = config;
 
   if (!accessToken || !homeId || !rooms || rooms.length === 0) {
@@ -519,10 +522,10 @@ export async function setRoomsToBoostMode(config, boostAmount = 2, previousSetpo
   const homeStatus = await NETATMO_API.getHomeStatus(accessToken, homeId);
 
   const endtime = Math.floor(Date.now() / 1000) + MANUAL_SETPOINT_DURATION;
-  const appliedSetpoints = {};
-  const cappedRooms = [];
+  const appliedSetpoints: Record<string, any> = {};
+  const cappedRooms: string[] = [];
   const results = await Promise.allSettled(
-    rooms.map(async (room) => {
+    rooms.map(async (room: any) => {
       // Get current setpoint
       const roomStatus = homeStatus.rooms?.find(r => String(r.id) === String(room.id));
       const currentSetpoint = roomStatus?.therm_setpoint_temperature;
@@ -594,7 +597,7 @@ export async function setRoomsToBoostMode(config, boostAmount = 2, previousSetpo
  * @param {Object} previousSetpoints - { roomId: setpoint } from setRoomsToBoostMode
  * @returns {Promise<Object>} Result with restoredRooms array
  */
-export async function restoreRoomSetpoints(config, previousSetpoints) {
+export async function restoreRoomSetpoints(config: any, previousSetpoints: Record<string, number>) {
   const { homeId, rooms, accessToken } = config;
 
   if (!accessToken || !homeId || !rooms || rooms.length === 0) {
@@ -606,10 +609,10 @@ export async function restoreRoomSetpoints(config, previousSetpoints) {
   }
 
   const endtime = Math.floor(Date.now() / 1000) + MANUAL_SETPOINT_DURATION;
-  const restoredRooms = [];
+  const restoredRooms: any[] = [];
 
   const results = await Promise.allSettled(
-    rooms.map(async (room) => {
+    rooms.map(async (room: any) => {
       const previousSetpoint = previousSetpoints?.[room.id];
 
       if (previousSetpoint !== undefined && previousSetpoint !== null) {
@@ -677,7 +680,7 @@ export async function restoreRoomSetpoints(config, previousSetpoints) {
  * @param {string} currentStatus - Current stove status (WORK, START, STANDBY, etc.)
  * @param {string} previousStatus - Previous stove status
  */
-export async function checkStoveSyncOnStatusChange(currentStatus, previousStatus) {
+export async function checkStoveSyncOnStatusChange(currentStatus: string, previousStatus: string) {
   // Determine if stove is ON (WORK or START states)
   const currentlyOn = currentStatus === 'WORK' || currentStatus === 'START' ||
                       currentStatus?.includes('WORK') || currentStatus?.includes('START');

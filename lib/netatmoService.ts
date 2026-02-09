@@ -53,7 +53,7 @@ export async function getTopology(): Promise<unknown> {
 /**
  * Save complete topology to Firebase
  */
-export async function saveTopology(topology) {
+export async function saveTopology(topology: any) {
   await set(ref(db, getEnvironmentPath('netatmo/topology')), {
     ...topology,
     updated_at: Date.now(),
@@ -63,7 +63,7 @@ export async function saveTopology(topology) {
 /**
  * Get current status from Firebase
  */
-export async function getCurrentStatus() {
+export async function getCurrentStatus(): Promise<any> {
   const snapshot = await get(ref(db, getEnvironmentPath('netatmo/currentStatus')));
   return snapshot.exists() ? snapshot.val() : null;
 }
@@ -71,7 +71,7 @@ export async function getCurrentStatus() {
 /**
  * Save current status to Firebase
  */
-export async function saveCurrentStatus(status) {
+export async function saveCurrentStatus(status: any) {
   await set(ref(db, getEnvironmentPath('netatmo/currentStatus')), {
     ...status,
     updated_at: Date.now(),
@@ -81,7 +81,7 @@ export async function saveCurrentStatus(status) {
 /**
  * Get device config (device_id, module_id) from Firebase
  */
-export async function getDeviceConfig() {
+export async function getDeviceConfig(): Promise<any> {
   const snapshot = await get(ref(db, getEnvironmentPath('netatmo/deviceConfig')));
   return snapshot.exists() ? snapshot.val() : null;
 }
@@ -89,7 +89,7 @@ export async function getDeviceConfig() {
 /**
  * Save device config to Firebase
  */
-export async function saveDeviceConfig(deviceId, moduleId) {
+export async function saveDeviceConfig(deviceId: string, moduleId: string) {
   await set(ref(db, getEnvironmentPath('netatmo/deviceConfig')), {
     device_id: deviceId,
     module_id: moduleId,
@@ -103,7 +103,7 @@ export async function saveDeviceConfig(deviceId, moduleId) {
 /**
  * Get automation rules from Firebase
  */
-export async function getAutomationRules() {
+export async function getAutomationRules(): Promise<any> {
   const snapshot = await get(ref(db, getEnvironmentPath('netatmo/automation')));
   return snapshot.exists() ? snapshot.val() : null;
 }
@@ -114,7 +114,7 @@ export async function getAutomationRules() {
  *   id, name, enabled, trigger, conditions, actions
  * }
  */
-export async function saveAutomationRule(ruleId, rule) {
+export async function saveAutomationRule(ruleId: string, rule: any) {
   await set(ref(db, getEnvironmentPath(`netatmo/automation/${ruleId}`)), {
     ...rule,
     updated_at: Date.now(),
@@ -124,14 +124,14 @@ export async function saveAutomationRule(ruleId, rule) {
 /**
  * Delete automation rule
  */
-export async function deleteAutomationRule(ruleId) {
+export async function deleteAutomationRule(ruleId: string) {
   await set(ref(db, getEnvironmentPath(`netatmo/automation/${ruleId}`)), null);
 }
 
 /**
  * Toggle automation rule
  */
-export async function toggleAutomationRule(ruleId, enabled) {
+export async function toggleAutomationRule(ruleId: string, enabled: boolean) {
   await update(ref(db, getEnvironmentPath(`netatmo/automation/${ruleId}`)), {
     enabled,
     updated_at: Date.now(),
@@ -145,7 +145,7 @@ export async function toggleAutomationRule(ruleId, enabled) {
 /**
  * Check if Netatmo is connected
  */
-export async function isConnected() {
+export async function isConnected(): Promise<boolean> {
   const refreshToken = await getRefreshToken();
   const homeId = await getHomeId();
   return !!(refreshToken && homeId);
@@ -162,7 +162,7 @@ interface NetatmoHomeData {
 /**
  * Get room by ID from topology
  */
-export async function getRoomById(roomId) {
+export async function getRoomById(roomId: string) {
   const topology = await getTopology() as NetatmoHomeData | null;
   if (!topology?.rooms) return null;
   return topology.rooms.find((r: any) => r.id === roomId);
@@ -171,7 +171,7 @@ export async function getRoomById(roomId) {
 /**
  * Get module by ID from topology
  */
-export async function getModuleById(moduleId) {
+export async function getModuleById(moduleId: string) {
   const topology = await getTopology() as NetatmoHomeData | null;
   if (!topology?.modules) return null;
   return topology.modules.find((m: any) => m.id === moduleId);
@@ -203,7 +203,7 @@ export async function getRoomsWithTemperatures() {
  */
 export async function getRoomsNeedingHeating() {
   const rooms = await getRoomsWithTemperatures();
-  return rooms.filter(room => {
+  return rooms.filter((room: any) => {
     if (!room.temperature || !room.setpoint) return false;
     return room.temperature < room.setpoint - 0.5; // 0.5°C threshold
   });
@@ -215,7 +215,7 @@ export async function getRoomsNeedingHeating() {
 export async function isAnyRoomHeating() {
   const status = await getCurrentStatus();
   if (!status?.rooms) return false;
-  return status.rooms.some(room => room.heating);
+  return status.rooms.some((room: any) => room.heating);
 }
 
 /**
@@ -235,7 +235,7 @@ export async function getAverageTemperature() {
 /**
  * Log Netatmo action to Firebase
  */
-export async function logNetatmoAction(action, details, user) {
+export async function logNetatmoAction(action: string, details: any, user: any) {
   const { push, ref: dbRef } = await import('firebase/database');
 
   const logEntry = {

@@ -55,7 +55,7 @@ export function isVibrationSupported(): boolean {
  * @param {number|number[]} pattern - Duration in ms or pattern array
  * @returns {boolean} True if vibration started
  */
-export function vibrate(pattern: VibrationPattern = VIBRATION_PATTERNS.SHORT): boolean {
+export function vibrate(pattern: VibrationPattern = VIBRATION_PATTERNS.SHORT!): boolean {
   if (!isVibrationSupported()) {
     console.warn('[Vibration] API not supported');
     return false;

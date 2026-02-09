@@ -104,7 +104,7 @@ class HueRemoteApi {
       // Check for specific errors
       const errors = error.errors || [];
       if (errors.length > 0) {
-        const firstError = errors[0];
+        const firstError = errors[0]!;
         throw new Error(firstError.description || `Hue Remote API error: ${response.status}`);
       }
 

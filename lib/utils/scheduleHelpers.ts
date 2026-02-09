@@ -99,7 +99,7 @@ export function parseTimelineSlots(schedule: NetatmoSchedule | null | undefined)
   const timetable = schedule.timetable;
 
   for (let i = 0; i < timetable.length; i++) {
-    const slot = timetable[i];
+    const slot = timetable[i]!;
     const nextSlot = timetable[i + 1];
 
     // Find zone for this slot
@@ -108,7 +108,7 @@ export function parseTimelineSlots(schedule: NetatmoSchedule | null | undefined)
 
     // m_offset is minutes from Monday 00:00 (NOT per-day)
     const startOffset = slot.m_offset;
-    const endOffset = nextSlot ? nextSlot.m_offset : 10080; // Week ends at 10080 minutes (7 * 1440)
+    const endOffset = nextSlot?.m_offset ?? 10080; // Week ends at 10080 minutes (7 * 1440)
 
     // Calculate day (0-6) and minutes within day
     const startDay = Math.floor(startOffset / 1440);

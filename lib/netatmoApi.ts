@@ -466,7 +466,7 @@ async function syncHomeSchedule(accessToken: string, params: SyncHomeSchedulePar
 function parseRooms(homesData: NetatmoHome[]): ParsedRoom[] {
   if (!homesData || homesData.length === 0) return [];
 
-  const home = homesData[0]; // Usually single home
+  const home = homesData[0]!; // Usually single home
   return (home.rooms || []).map(room => {
     const parsed: ParsedRoom = {
       id: room.id,
@@ -491,7 +491,7 @@ function parseRooms(homesData: NetatmoHome[]): ParsedRoom[] {
 function parseModules(homesData: NetatmoHome[]): ParsedModule[] {
   if (!homesData || homesData.length === 0) return [];
 
-  const home = homesData[0];
+  const home = homesData[0]!;
   return (home.modules || []).map(module => {
     const parsed: Partial<ParsedModule> = {
       id: module.id,
@@ -644,7 +644,7 @@ function hasAnyLowBattery(modules: ParsedModule[]): boolean {
 function parseSchedules(homesData: NetatmoHome[]): ParsedSchedule[] {
   if (!homesData || homesData.length === 0) return [];
 
-  const home = homesData[0]; // Usually single home
+  const home = homesData[0]!; // Usually single home
 
   return (home.schedules || []).map(schedule => {
     const parsed: ParsedSchedule = {

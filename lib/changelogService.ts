@@ -68,7 +68,7 @@ export const getChangelogFromFirebase = async (): Promise<ChangelogEntry[]> => {
 export const getLatestVersion = async (): Promise<ChangelogEntry | null> => {
   try {
     const versions = await getChangelogFromFirebase();
-    return versions.length > 0 ? versions[0] : null;
+    return versions.length > 0 ? versions[0]! : null;
   } catch (error) {
     console.error('Errore nel recupero ultima versione:', error);
     return null;
@@ -82,9 +82,9 @@ export const getVersionType = (currentVersion: string, newVersion: string): Vers
   const [currentMajor, currentMinor, currentPatch] = currentVersion.split('.').map(Number);
   const [newMajor, newMinor, newPatch] = newVersion.split('.').map(Number);
 
-  if (newMajor > currentMajor) return 'major';
-  if (newMinor > currentMinor) return 'minor';
-  if (newPatch > currentPatch) return 'patch';
+  if (newMajor! > currentMajor!) return 'major';
+  if (newMinor! > currentMinor!) return 'minor';
+  if (newPatch! > currentPatch!) return 'patch';
   return 'patch'; // default
 };
 

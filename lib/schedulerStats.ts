@@ -77,8 +77,8 @@ export const FAN_LABELS: Record<1 | 2 | 3 | 4 | 5 | 6, FanLabel> = {
 function getIntervalDuration(interval: ScheduleInterval): number {
   const [startH, startM] = interval.start.split(':').map(Number);
   const [endH, endM] = interval.end.split(':').map(Number);
-  const startMinutes = startH * 60 + startM;
-  const endMinutes = endH * 60 + endM;
+  const startMinutes = startH! * 60 + startM!;
+  const endMinutes = endH! * 60 + endM!;
   return (endMinutes - startMinutes) / 60;
 }
 
@@ -159,7 +159,7 @@ export function getPowerGradient(power: number): string {
     4: 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)', // Orange
     5: 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)', // Red
   };
-  return gradients[power] || gradients[2];
+  return gradients[power] ?? gradients[2]!;
 }
 
 /**
@@ -173,7 +173,7 @@ export function getPowerBadgeClass(power: number): string {
     4: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
     5: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
   };
-  return classes[power] || classes[2];
+  return classes[power] ?? classes[2]!;
 }
 
 /**
@@ -186,5 +186,5 @@ export function getFanBadgeClass(fan: number): string {
     2: 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300',
     3: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300',
   };
-  return classes[intensity] || classes[2];
+  return classes[intensity] ?? classes[2]!;
 }

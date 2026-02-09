@@ -33,7 +33,7 @@ function getBestStreamUrl(m3u8Content: string, baseUrl: string): string | null {
     if (trimmed.startsWith('#EXT-X-STREAM-INF')) {
       // Parse bandwidth
       const bandwidthMatch = trimmed.match(/BANDWIDTH=(\d+)/);
-      const bandwidth = bandwidthMatch ? parseInt(bandwidthMatch[1], 10) : 0;
+      const bandwidth = bandwidthMatch ? parseInt(bandwidthMatch[1]!, 10) : 0;
 
       if (bandwidth > bestBandwidth) {
         bestBandwidth = bandwidth;
@@ -131,7 +131,7 @@ export async function downloadHlsAsMP4(hlsUrl: string, onProgress: (percent: num
     const progress = Math.round((i / segmentUrls.length) * 70);
     onProgress(progress, `Download segmento ${i + 1}/${segmentUrls.length}...`);
 
-    const response = await fetch(segmentUrls[i]);
+    const response = await fetch(segmentUrls[i]!);
     if (!response.ok) {
       throw new Error(`Failed to fetch segment ${i}: ${response.status}`);
     }

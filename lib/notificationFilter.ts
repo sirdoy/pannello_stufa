@@ -269,7 +269,7 @@ function isTimeInWindow(currentTime: string, startTime: string, endTime: string)
   // Convert HH:mm to minutes since midnight for comparison
   const toMinutes = (time: string): number => {
     const [hours, minutes] = time.split(':').map(Number);
-    return hours * 60 + minutes;
+    return hours! * 60 + minutes!;
   };
 
   const current = toMinutes(currentTime);

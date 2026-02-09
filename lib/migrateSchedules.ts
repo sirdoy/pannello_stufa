@@ -190,7 +190,7 @@ export async function migrateSchedulesToV2({ dryRun = false }: MigrationOptions 
       message: dryRun ? 'Dry run completed successfully' : 'Migration completed successfully',
       stats: {
         totalIntervals,
-        daysWithIntervals: DAYS_OF_WEEK.filter(day => defaultSlots[day].length > 0).length,
+        daysWithIntervals: DAYS_OF_WEEK.filter(day => defaultSlots[day]!.length > 0).length,
         modeMigrated: !!v1Data.mode
       }
     };

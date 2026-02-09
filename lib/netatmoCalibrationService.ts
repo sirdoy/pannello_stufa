@@ -76,7 +76,7 @@ export async function calibrateValvesServer(): Promise<CalibrationResult> {
     };
   }
 
-  const home = homesData[0];
+  const home = homesData[0]!;
   const schedules = home.schedules || [];
 
   // Find the currently selected schedule
@@ -134,7 +134,7 @@ export async function calibrateValvesServer(): Promise<CalibrationResult> {
     };
   }
 
-  const homeAfter = homesDataAfter[0];
+  const homeAfter = homesDataAfter[0]!;
   const schedulesAfter = homeAfter.schedules || [];
   const currentScheduleAfter = schedulesAfter.find(s => s.selected === true);
 

@@ -5,7 +5,7 @@
  * Tests TanStack Table integration, sorting, CVA variants, and accessibility.
  * Uses jest-axe for automated a11y violation detection.
  */
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import { createRef } from 'react';
@@ -138,9 +138,9 @@ describe('DataTable', () => {
 
       // Get all data rows (excluding header)
       const rows = screen.getAllByRole('row').slice(1);
-      expect(within(rows[0]).getByText('Alpha')).toBeInTheDocument();
-      expect(within(rows[1]).getByText('Beta')).toBeInTheDocument();
-      expect(within(rows[2]).getByText('Gamma')).toBeInTheDocument();
+      expect(within(rows[0]!).getByText('Alpha')).toBeInTheDocument();
+      expect(within(rows[1]!).getByText('Beta')).toBeInTheDocument();
+      expect(within(rows[2]!).getByText('Gamma')).toBeInTheDocument();
     });
 
     it('sorts data correctly when descending', async () => {
@@ -156,9 +156,9 @@ describe('DataTable', () => {
 
       // Get all data rows (excluding header)
       const rows = screen.getAllByRole('row').slice(1);
-      expect(within(rows[0]).getByText('Gamma')).toBeInTheDocument();
-      expect(within(rows[1]).getByText('Beta')).toBeInTheDocument();
-      expect(within(rows[2]).getByText('Alpha')).toBeInTheDocument();
+      expect(within(rows[0]!).getByText('Gamma')).toBeInTheDocument();
+      expect(within(rows[1]!).getByText('Beta')).toBeInTheDocument();
+      expect(within(rows[2]!).getByText('Alpha')).toBeInTheDocument();
     });
   });
 
@@ -267,7 +267,7 @@ describe('DataTable', () => {
       );
 
       const rows = screen.getAllByRole('row').slice(1); // Skip header
-      await user.click(rows[0]);
+      await user.click(rows[0]!);
 
       expect(onRowClick).toHaveBeenCalledTimes(1);
       expect(onRowClick).toHaveBeenCalledWith(
@@ -498,7 +498,7 @@ describe('DataTable', () => {
 
       // Click first row checkbox
       const checkboxes = screen.getAllByRole('checkbox');
-      await user.click(checkboxes[1]); // Skip select-all
+      await user.click(checkboxes[1]!); // Skip select-all
 
       expect(onSelectionChange).toHaveBeenCalled();
     });
@@ -518,7 +518,7 @@ describe('DataTable', () => {
 
       // Click first row checkbox
       const checkboxes = screen.getAllByRole('checkbox');
-      await user.click(checkboxes[1]); // Skip select-all
+      await user.click(checkboxes[1]!); // Skip select-all
 
       // Row click should not be triggered due to stopPropagation
       expect(onRowClick).not.toHaveBeenCalled();
@@ -533,11 +533,11 @@ describe('DataTable', () => {
 
       // Click first row checkbox
       const checkboxes = screen.getAllByRole('checkbox');
-      await user.click(checkboxes[1]); // Select first data row
+      await user.click(checkboxes[1]!); // Select first data row
 
       // Get data rows and check first one is selected
       const rows = screen.getAllByRole('row').slice(1);
-      expect(rows[0]).toHaveClass('bg-ember-500/10');
+      expect(rows[0]!).toHaveClass('bg-ember-500/10');
     });
   });
 
@@ -571,12 +571,13 @@ describe('DataTable', () => {
       const searchInput = screen.getByPlaceholderText('Search...');
       await user.type(searchInput, 'Alpha');
 
-      // Wait for debounce
-      await new Promise((resolve) => setTimeout(resolve, 350));
+      // Wait for debounce using waitFor (more reliable than setTimeout in full suite)
+      await waitFor(() => {
+        expect(screen.queryByText('Beta')).not.toBeInTheDocument();
+      }, { timeout: 1000 });
 
       // Only Alpha should be visible
       expect(screen.getByText('Alpha')).toBeInTheDocument();
-      expect(screen.queryByText('Beta')).not.toBeInTheDocument();
       expect(screen.queryByText('Gamma')).not.toBeInTheDocument();
     });
   });
@@ -616,7 +617,7 @@ describe('DataTable', () => {
       expect(firstDataRow).toHaveAttribute('aria-expanded', 'false');
 
       // Click to expand
-      await user.click(firstDataRow);
+      await user.click(firstDataRow!);
 
       // Should be expanded
       expect(firstDataRow).toHaveAttribute('aria-expanded', 'true');
@@ -634,7 +635,7 @@ describe('DataTable', () => {
 
       // Find expand button
       const expandButtons = screen.getAllByRole('button', { name: /expand row/i });
-      const firstExpandButton = expandButtons[0];
+      const firstExpandButton = expandButtons[0]!;
 
       // Initially not rotated
       const chevron = firstExpandButton.querySelector('svg');
@@ -664,7 +665,7 @@ describe('DataTable', () => {
 
       // Get first data row and expand
       const rows = screen.getAllByRole('row');
-      await user.click(rows[1]);
+      await user.click(rows[1]!);
 
       // Custom content should be visible
       expect(screen.getByTestId('custom-content')).toBeInTheDocument();
@@ -679,7 +680,7 @@ describe('DataTable', () => {
 
       // Get first data row and expand
       const rows = screen.getAllByRole('row');
-      await user.click(rows[1]);
+      await user.click(rows[1]!);
 
       // Should show JSON representation
       const expansionRow = document.querySelector('[data-expansion-row]');
@@ -719,7 +720,7 @@ describe('DataTable', () => {
 
       // Click expand button
       const expandButtons = screen.getAllByRole('button', { name: /expand row/i });
-      await user.click(expandButtons[0]);
+      await user.click(expandButtons[0]!);
 
       // Row click should not be triggered due to stopPropagation
       expect(onRowClick).not.toHaveBeenCalled();
@@ -732,7 +733,7 @@ describe('DataTable', () => {
       );
 
       const rows = screen.getAllByRole('row');
-      const firstDataRow = rows[1];
+      const firstDataRow = rows[1]!;
 
       // Initially collapsed
       expect(firstDataRow).toHaveAttribute('aria-expanded', 'false');
@@ -769,14 +770,14 @@ describe('DataTable', () => {
       const rows = screen.getAllByRole('row').slice(1); // Skip header
 
       // Focus first row
-      rows[0].focus();
-      expect(rows[0]).toHaveFocus();
+      rows[0]!.focus();
+      expect(rows[0]!).toHaveFocus();
 
       // Press ArrowDown
       await user.keyboard('{ArrowDown}');
 
       // Second row should be focused
-      expect(rows[1]).toHaveFocus();
+      expect(rows[1]!).toHaveFocus();
     });
 
     it('ArrowUp moves focus to previous row', async () => {
@@ -788,8 +789,8 @@ describe('DataTable', () => {
       const rows = screen.getAllByRole('row').slice(1); // Skip header
 
       // Focus second row
-      rows[1].focus();
-      expect(rows[1]).toHaveFocus();
+      rows[1]!.focus();
+      expect(rows[1]!).toHaveFocus();
 
       // Press ArrowUp
       await user.keyboard('{ArrowUp}');
@@ -805,7 +806,7 @@ describe('DataTable', () => {
       );
 
       const rows = screen.getAllByRole('row').slice(1);
-      const firstDataRow = rows[0];
+      const firstDataRow = rows[0]!;
 
       // Focus and press Enter
       firstDataRow.focus();

@@ -188,7 +188,7 @@ export async function getRecentHealthLogs(options: HealthLogFilter = {}) {
 
     const snapshot = await query.get();
 
-    const logs = [];
+    const logs: any[] = [];
     snapshot.forEach(doc => {
       logs.push({
         id: doc.id,
@@ -213,7 +213,7 @@ export async function getRecentHealthLogs(options: HealthLogFilter = {}) {
  * @param {string} runId - Parent document ID
  * @returns {Promise<Array>} Array of individual check documents
  */
-export async function getHealthCheckDetails(runId) {
+export async function getHealthCheckDetails(runId: string) {
   try {
     const db = getAdminFirestore();
 
@@ -223,7 +223,7 @@ export async function getHealthCheckDetails(runId) {
       .collection('checks')
       .get();
 
-    const checks = [];
+    const checks: any[] = [];
     snapshot.forEach(doc => {
       checks.push({
         id: doc.id,

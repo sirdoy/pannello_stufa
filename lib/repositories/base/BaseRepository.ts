@@ -64,7 +64,8 @@ export abstract class BaseRepository<T = unknown> {
   async push(subPath: string, data: Partial<T>): Promise<string> {
     const fullPath = this.resolvePath(subPath);
     const filteredData = this.filterUndefined(data);
-    return adminDbPush(fullPath, filteredData);
+    const key = await adminDbPush(fullPath, filteredData);
+    return key || '';
   }
 
   /**

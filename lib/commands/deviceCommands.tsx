@@ -244,7 +244,7 @@ export function getLightsCommands(): CommandGroup {
           const rooms = roomsData.rooms || [];
 
           for (const room of rooms) {
-            const groupedLightId = room.services?.find(s => s.rtype === 'grouped_light')?.rid;
+            const groupedLightId = room.services?.find((s: any) => s.rtype === 'grouped_light')?.rid;
             if (groupedLightId) {
               await executeLightsAction(`rooms/${groupedLightId}`, 'PUT', { on: { on: true } });
             }
@@ -261,7 +261,7 @@ export function getLightsCommands(): CommandGroup {
           const rooms = roomsData.rooms || [];
 
           for (const room of rooms) {
-            const groupedLightId = room.services?.find(s => s.rtype === 'grouped_light')?.rid;
+            const groupedLightId = room.services?.find((s: any) => s.rtype === 'grouped_light')?.rid;
             if (groupedLightId) {
               await executeLightsAction(`rooms/${groupedLightId}`, 'PUT', { on: { on: false } });
             }

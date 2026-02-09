@@ -200,7 +200,7 @@ export async function getSandboxStoveState(): Promise<SandboxStoveState & { erro
 /**
  * Aggiorna lo stato simulato della stufa
  */
-export async function updateSandboxStoveState(updates) {
+export async function updateSandboxStoveState(updates: any) {
   if (!isLocalEnvironment()) {
     throw new Error('Sandbox disponibile solo in localhost');
   }
@@ -310,7 +310,7 @@ export async function sandboxShutdown() {
 /**
  * Imposta potenza
  */
-export async function sandboxSetPower(power) {
+export async function sandboxSetPower(power: number) {
   if (!isLocalEnvironment()) {
     throw new Error('Sandbox disponibile solo in localhost');
   }
@@ -330,7 +330,7 @@ export async function sandboxSetPower(power) {
 /**
  * Imposta ventola
  */
-export async function sandboxSetFan(fan) {
+export async function sandboxSetFan(fan: number) {
   if (!isLocalEnvironment()) {
     throw new Error('Sandbox disponibile solo in localhost');
   }
@@ -369,7 +369,7 @@ export async function getSandboxMaintenance() {
 /**
  * Aggiorna ore lavorate manualmente
  */
-export async function updateSandboxMaintenanceHours(hours) {
+export async function updateSandboxMaintenanceHours(hours: number) {
   if (!isLocalEnvironment()) {
     throw new Error('Sandbox disponibile solo in localhost');
   }
@@ -410,7 +410,7 @@ export async function resetSandboxMaintenance() {
 /**
  * Imposta errore simulato
  */
-export async function setSandboxError(errorKey) {
+export async function setSandboxError(errorKey: string) {
   if (!isLocalEnvironment()) {
     throw new Error('Sandbox disponibile solo in localhost');
   }
@@ -450,7 +450,7 @@ export async function getSandboxSettings() {
 /**
  * Aggiorna settings sandbox
  */
-export async function updateSandboxSettings(settings) {
+export async function updateSandboxSettings(settings: any) {
   if (!isLocalEnvironment()) {
     throw new Error('Sandbox disponibile solo in localhost');
   }
@@ -465,7 +465,7 @@ export async function updateSandboxSettings(settings) {
 /**
  * Log azioni sandbox
  */
-async function logSandboxAction(action, details) {
+async function logSandboxAction(action: string, details: any) {
   try {
     const historyRef = ref(db, 'sandbox/history');
     const snapshot = await get(historyRef);

@@ -109,9 +109,10 @@ export async function trackUsageHours(stoveStatus: string): Promise<TrackUsageRe
       newCurrentHours: updatedData.currentHours,
       notificationData,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error tracking usage hours:', error);
-    return { tracked: false, error: error.message };
+    const message = error instanceof Error ? error.message : String(error);
+    return { tracked: false, error: message };
   }
 }
 

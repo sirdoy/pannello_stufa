@@ -108,7 +108,7 @@ export function determineConnectionStatus(
  * Detect state mismatch between expected and actual stove state
  * Uses both schedule and Netatmo heating demand as signals
  */
-export function detectStateMismatch(stoveResult, scheduleResult, netatmoResult) {
+export function detectStateMismatch(stoveResult: any, scheduleResult: any, netatmoResult: any) {
   // Can't detect mismatch if stove status unavailable
   if (stoveResult.status !== 'fulfilled') {
     return null;
@@ -193,7 +193,7 @@ export function detectStateMismatch(stoveResult, scheduleResult, netatmoResult) 
  * @param {string} status - Stove status description
  * @returns {string} 'ON' | 'STARTING' | 'OFF' | 'ERROR' | 'UNKNOWN'
  */
-function categorizeStoveStatus(status) {
+function categorizeStoveStatus(status: string) {
   if (!status) return 'UNKNOWN';
 
   const upperStatus = status.toUpperCase();
@@ -228,7 +228,7 @@ function categorizeStoveStatus(status) {
  * @param {string} userId - User ID
  * @returns {Promise<string|null>} 'ON' | 'OFF' | null
  */
-async function getExpectedStateFromSchedule(userId) {
+async function getExpectedStateFromSchedule(userId: string) {
   try {
     // Read scheduler mode
     const mode = await adminDbGet(`scheduler/mode`);

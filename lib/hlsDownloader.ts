@@ -84,8 +84,8 @@ export async function downloadHlsAsMP4(hlsUrl: string, onProgress: (percent: num
   onProgress(0, 'Caricamento playlist...');
 
   let currentUrl = hlsUrl;
-  let m3u8Content;
-  let baseUrl;
+  let m3u8Content: string | undefined;
+  let baseUrl = '';
 
   // Handle master playlist → media playlist resolution
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -111,6 +111,10 @@ export async function downloadHlsAsMP4(hlsUrl: string, onProgress: (percent: num
 
     // This is a media playlist, extract segments
     break;
+  }
+
+  if (!m3u8Content) {
+    throw new Error('No m3u8 content received');
   }
 
   const segmentUrls = parseM3u8(m3u8Content, baseUrl);

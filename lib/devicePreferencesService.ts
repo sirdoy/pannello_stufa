@@ -125,7 +125,7 @@ export async function toggleDevicePreference(userId: string, deviceId: string): 
  * All devices enabled by default except future ones (lights, sonos)
  */
 function getDefaultPreferences(): DevicePreferences {
-  const defaults = {};
+  const defaults: Record<string, boolean> = {};
 
   Object.values(DEVICE_CONFIG).forEach(device => {
     // Enable stove and thermostat by default, disable others

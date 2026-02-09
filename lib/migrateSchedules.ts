@@ -195,12 +195,13 @@ export async function migrateSchedulesToV2({ dryRun = false }: MigrationOptions 
       }
     };
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('❌ Migration failed:', error);
+    const message = error instanceof Error ? error.message : String(error);
     return {
       success: false,
       message: 'Migration failed',
-      error: error.message
+      error: message
     };
   }
 }
@@ -304,8 +305,9 @@ async function verifyMigration(originalSlots: Record<string, unknown[]>, origina
       errors
     };
 
-  } catch (error) {
-    errors.push(`Verification exception: ${error.message}`);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    errors.push(`Verification exception: ${message}`);
     return { success: false, errors };
   }
 }

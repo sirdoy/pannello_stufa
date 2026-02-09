@@ -13,7 +13,7 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 Phase: 44 of 48 (Library Strict Mode Foundation)
 Plan: 6 of 7 in current phase
 Status: In progress
-Last activity: 2026-02-09 — Completed 44-06 (hooks & PWA strict mode, 39 errors fixed)
+Last activity: 2026-02-09 - Completed quick task 15: aggiungi la favicon
 
 Progress: [████████████████████████████████████████████░░░░] 93% (214/228 estimated total plans)
 
@@ -66,6 +66,12 @@ Recent decisions from PROJECT.md affecting v5.1 work:
 ### Pending Todos
 
 None yet.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 15 | aggiungi la favicon | 2026-02-09 | 266bd24 | [15-aggiungi-la-favicon](./quick/15-aggiungi-la-favicon/) |
 
 ### Blockers/Concerns
 

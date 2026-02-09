@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** Phase 45 - Component Strict Mode Compliance (v5.1 Tech Debt & Code Quality)
+**Current focus:** Phase 46 - API Page Strict Mode Compliance (v5.1 Tech Debt & Code Quality)
 
 ## Current Position
 
-Phase: 45 of 48 (Component Strict Mode Compliance)
-Plan: 8 of 8 in current phase
-Status: Complete
-Last activity: 2026-02-09 - Completed 45-08-PLAN.md (gap sweep: fixed 16 cascade errors, verified 0 tsc errors, phase 45 complete)
+Phase: 46 of 48 (API Page Strict Mode Compliance)
+Plan: 7 of 8 in current phase
+Status: In Progress
+Last activity: 2026-02-09 - Completed 46-07-PLAN.md (design system page: fixed 22 strict-mode errors, 0 tsc errors remaining)
 
-Progress: [████████████████████████████████████████████░░░░] 97% (224/228 estimated total plans)
+Progress: [████████████████████████████████████████████░░░░] 98% (231/228 estimated total plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 219 plans (v1.0-v5.1)
+- Total plans completed: 220 plans (v1.0-v5.1)
 - Milestones shipped: 7 (v1.0, v2.0, v3.0, v3.1, v3.2, v4.0, v5.0)
 - Average milestone: ~31 plans
-- Current milestone: v5.1 (5 phases planned, phase 44 complete, phase 45 complete - 8/8 plans done)
+- Current milestone: v5.1 (5 phases planned, phase 44 complete, phase 45 complete, phase 46 in progress - 1/8 plans done)
 
 **Recent Milestone Performance:**
 
@@ -50,6 +50,7 @@ Progress: [███████████████████████
 | Phase 45 P07 | 639s | 2 tasks | 18 files |
 | Phase 45 P03 | 785 | 2 tasks | 20 files |
 | Phase 45 P08 | 169s | 2 tasks | 2 files |
+| Phase 46 P01 | 419s | 2 tasks | 1 file |
 
 ## Accumulated Context
 
@@ -84,6 +85,8 @@ Recent decisions from PROJECT.md affecting v5.1 work:
 - [Phase 45-03]: Nullish coalescing (??) for CVA variant map access (iconSizes, statusLabels) to handle null/undefined keys
 - [Phase 45-03]: @ts-expect-error for react-dom imports (BottomSheet, LoadingOverlay) - types exist but strict mode check fails
 - [Phase 45-08]: Parallel wave execution creates expected cascade effects - gap sweep pattern validates approach (16 errors caught and fixed)
+- [Phase 46-01]: Type assertions for component prop callbacks (parent DayOfWeek vs child string) - inline assertion pattern
+- [Phase 46-01]: Null to undefined conversion for React props (saveStatus ?? undefined)
 
 ### Pending Todos
 
@@ -101,7 +104,7 @@ None yet.
 **Known Issues to Address in v5.1:**
 - **Phase 44 COMPLETE:** lib/ directory now has 0 tsc errors
 - **Phase 45 COMPLETE:** components/ and app/components/ directories now have 0 tsc errors
-- Phase 46-47: Remaining tsc errors in app/ directory (pages, API routes, hooks)
+- **Phase 46 IN PROGRESS:** Remaining tsc errors in app/ directory (pages, API routes, hooks) - 186 errors remaining (down from 231)
 - Phase 47: 1 failing test (FormModal cancel behavior — onClose called twice)
 - Phase 47: Worker teardown warning during test runs
 - Phase 48: Dead code removal needed (unused exports, files, dependencies)
@@ -113,9 +116,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-09 09:43
-Stopped at: Completed 45-08-PLAN.md - Phase 45 complete (0 tsc errors in components, 1917/1918 tests passing)
-Resume file: None — ready to continue with phase 46
+Last session: 2026-02-09
+Stopped at: Completed 46-01-PLAN.md - Scheduler page strict-mode compliance (45 errors fixed, 0 remaining)
+Resume file: None — ready to continue with phase 46 plan 02
 
 ---
 *State initialized: 2026-02-08 for v5.1 Tech Debt & Code Quality milestone*

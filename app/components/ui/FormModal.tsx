@@ -225,6 +225,12 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
     onClose?.();
   }, [isLoading, onClose]);
 
+  // Handle cancel button click with event propagation control
+  const handleCancelClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent bubbling to Modal overlay which could trigger onClose again
+    handleClose();
+  }, [handleClose]);
+
   // Trigger shake animation on invalid fields
   const triggerShakeAnimation = useCallback((validationErrors: Record<string, any>) => {
     if (!formRef.current) return;
@@ -296,7 +302,7 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
 
   return (
     <Modal
-      {...({ ref, isOpen, onClose: handleClose, size, className: cn('relative', className), ...props } as any)}
+      {...({ ref, isOpen, size, className: cn('relative', className), ...props } as any)}
     >
       <Modal.Header>
         <Modal.Title>{title}</Modal.Title>
@@ -328,7 +334,7 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
           <Button
             type="button"
             variant="subtle"
-            onClick={handleClose}
+            onClick={handleCancelClick}
             disabled={isLoading}
           >
             {cancelLabel}

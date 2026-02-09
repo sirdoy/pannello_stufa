@@ -422,6 +422,9 @@ describe('FormModal', () => {
     test('calls onClose when cancel button is clicked', async () => {
       const user = userEvent.setup();
 
+      // Clear any prior calls from full suite test interference BEFORE render
+      mockOnClose.mockClear();
+
       render(
         <FormModal
           isOpen={true}

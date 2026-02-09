@@ -36,8 +36,8 @@ export default function IntervalBottomSheet({
       : `${minutes}min`;
   };
 
-  const powerLabel = POWER_LABELS[range.power];
-  const fanLabel = FAN_LABELS[range.fan];
+  const powerLabel = POWER_LABELS[range.power as keyof typeof POWER_LABELS];
+  const fanLabel = FAN_LABELS[range.fan as keyof typeof FAN_LABELS];
 
   return (
     <BottomSheet

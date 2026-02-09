@@ -82,7 +82,7 @@ export default function CreateSceneModal({
   }, [isOpen]);
 
   // Fetch lights when room is selected
-  const fetchRoomLights = useCallback(async (roomId) => {
+  const fetchRoomLights = useCallback(async (roomId: string) => {
     try {
       setLoadingLights(true);
       setError('');
@@ -93,19 +93,19 @@ export default function CreateSceneModal({
       if (data.error) throw new Error(data.error);
 
       // Filter lights for selected room
-      const selectedRoomObj = rooms.find(r => r.id === roomId);
-      const roomLights = data.lights.filter(light => {
+      const selectedRoomObj = rooms.find((r: HueRoom) => r.id === roomId);
+      const roomLights = data.lights.filter((light: HueLight) => {
         // Light belongs to room if it's in room's services
         return selectedRoomObj?.services?.some(
-          service => service.rid === light.id
+          (service: { rid: string }) => service.rid === light.id
         );
       });
 
       setLights(roomLights);
 
       // Pre-populate with current states (hybrid flow)
-      const initialConfigs = {};
-      roomLights.forEach(light => {
+      const initialConfigs: Record<string, LightConfig> = {};
+      roomLights.forEach((light: HueLight) => {
         initialConfigs[light.id] = {
           on: light.on?.on ?? true,
           brightness: light.dimming?.brightness ?? 100,
@@ -190,8 +190,8 @@ export default function CreateSceneModal({
     }
 
     // Build actions array for Hue API
-    const actions: SceneAction[] = lights.map(light => {
-      const config = lightConfigs[light.id] || { on: true, brightness: 100, color: null };
+    const actions: SceneAction[] = lights.map((light: HueLight) => {
+      const config: LightConfig = lightConfigs[light.id] || { on: true, brightness: 100, color: null };
 
       const action: SceneAction = {
         target: { rid: light.id, rtype: 'light' },

@@ -191,7 +191,7 @@ export default function DayEditPanel({
               range={range}
               isHighlighted={index === hoveredIndex || index === selectedIndex}
               onRemove={() => onDeleteInterval(index)}
-              onEdit={onEditIntervalModal ? () => onEditIntervalModal(index) : null}
+              onEdit={onEditIntervalModal ? () => onEditIntervalModal(index) : undefined}
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
               onClick={() => handleIntervalClick(index)}

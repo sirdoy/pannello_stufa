@@ -119,7 +119,9 @@ describe('DuplicateDayModal', () => {
 
     // Click confirm
     const confirmButton = screen.getByText(/Duplica su 2 giorni/i).closest('button');
-    fireEvent.click(confirmButton);
+    if (confirmButton) {
+      fireEvent.click(confirmButton);
+    }
 
     expect(mockOnConfirm).toHaveBeenCalledWith(['Martedì', 'Mercoledì']);
   });
@@ -136,7 +138,9 @@ describe('DuplicateDayModal', () => {
     );
 
     const cancelButton = screen.getByText('Annulla').closest('button');
-    fireEvent.click(cancelButton);
+    if (cancelButton) {
+      fireEvent.click(cancelButton);
+    }
 
     expect(mockOnCancel).toHaveBeenCalled();
   });
@@ -186,7 +190,9 @@ describe('DuplicateDayModal', () => {
     );
 
     const weekdaysButton = screen.getByText('Giorni feriali').closest('button');
-    fireEvent.click(weekdaysButton);
+    if (weekdaysButton) {
+      fireEvent.click(weekdaysButton);
+    }
 
     // Should show 5 days selected
     expect(screen.getByText('Duplica su 5 giorni')).toBeInTheDocument();
@@ -212,7 +218,9 @@ describe('DuplicateDayModal', () => {
     );
 
     const weekendButton = screen.getByText('Weekend').closest('button');
-    fireEvent.click(weekendButton);
+    if (weekendButton) {
+      fireEvent.click(weekendButton);
+    }
 
     // Should show 2 days selected
     expect(screen.getByText('Duplica su 2 giorni')).toBeInTheDocument();
@@ -236,7 +244,9 @@ describe('DuplicateDayModal', () => {
     );
 
     const allButton = screen.getByText('Tutti').closest('button');
-    fireEvent.click(allButton);
+    if (allButton) {
+      fireEvent.click(allButton);
+    }
 
     // Should show 6 days selected (all except Lunedì)
     expect(screen.getByText('Duplica su 6 giorni')).toBeInTheDocument();
@@ -263,7 +273,9 @@ describe('DuplicateDayModal', () => {
 
     // Select all days
     const allButton = screen.getByText('Tutti').closest('button');
-    fireEvent.click(allButton);
+    if (allButton) {
+      fireEvent.click(allButton);
+    }
     expect(screen.getByText('Duplica su 6 giorni')).toBeInTheDocument();
 
     // Deselect Martedì
@@ -389,8 +401,10 @@ describe('DuplicateDayModal', () => {
     // Button should be disabled
     expect(confirmButton).toBeDisabled();
 
-    // Try to click anyway
-    fireEvent.click(confirmButton);
+    // Try to click anyway (button is disabled but we test the behavior)
+    if (confirmButton) {
+      fireEvent.click(confirmButton);
+    }
 
     // onConfirm should not be called
     expect(mockOnConfirm).not.toHaveBeenCalled();

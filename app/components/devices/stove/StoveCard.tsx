@@ -958,17 +958,8 @@ export default function StoveCard() {
 
       {/* Main Status Card - Ember Noir with Context Menu */}
       <RightClickMenu>
-        <RightClickMenu.Trigger asChild>
-          <div
-            {...longPressBind()}
-            style={{
-              ...longPressPreventSelection,
-              transform: isPressed ? 'scale(0.98)' : 'scale(1)',
-              transition: 'transform 150ms cubic-bezier(0.4, 0, 0.2, 1)',
-            }}
-          >
-            <Card variant="elevated" padding={false} className="overflow-visible transition-all duration-500">
-              <div className="relative">
+        <Card variant="elevated" padding={false} className="overflow-visible transition-all duration-500">
+          <div className="relative">
                 {/* Modern Accent Bar with glow effect - pulses when stove is active */}
                 <CardAccentBar
                   colorTheme="ember"
@@ -1081,8 +1072,18 @@ export default function StoveCard() {
                 </div>
               )}
 
-              {/* Status Display Box - Ember Noir */}
-              <div className={`relative ${statusInfo.bgColor} rounded-2xl p-6 sm:p-8 ${statusInfo.glowColor} border ${statusInfo.borderColor} overflow-visible transition-all duration-500`} data-status-variant={statusDisplay.variant}>
+              {/* Status Display Box - Ember Noir - Wrapped in RightClickMenu.Trigger */}
+              <RightClickMenu.Trigger asChild>
+                <div
+                  {...longPressBind()}
+                  style={{
+                    ...longPressPreventSelection,
+                    transform: isPressed ? 'scale(0.98)' : 'scale(1)',
+                    transition: 'transform 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+                  }}
+                  className={`relative ${statusInfo.bgColor} rounded-2xl p-6 sm:p-8 ${statusInfo.glowColor} border ${statusInfo.borderColor} overflow-visible transition-all duration-500`}
+                  data-status-variant={statusDisplay.variant}
+                >
                     {/* Layout: Status Label + Icon + Info Boxes */}
                     <div className="relative">
                       {/* Status Label */}
@@ -1151,7 +1152,8 @@ export default function StoveCard() {
                         </div>
                       </div>
                     </div>
-              </div>
+                </div>
+              </RightClickMenu.Trigger>
 
               {/* Quick Actions Bar - Always visible */}
               <div className="flex items-center justify-center gap-3 mt-4">
@@ -1509,8 +1511,6 @@ export default function StoveCard() {
           </div>
               </div>
             </Card>
-          </div>
-        </RightClickMenu.Trigger>
         <RightClickMenu.Content>
           {stoveContextMenuItems.map((item, index) => (
             'separator' in item && item.separator ? (

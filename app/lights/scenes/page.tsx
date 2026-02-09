@@ -95,7 +95,7 @@ export default function ScenesPage() {
     } catch (err) {
       console.error('Errore connessione Hue:', err);
       setConnected(false);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
@@ -108,7 +108,7 @@ export default function ScenesPage() {
     checkConnection();
   }, [checkConnection]);
 
-  async function handleActivateScene(sceneId, sceneName) {
+  async function handleActivateScene(sceneId: string, sceneName: string) {
     try {
       setActivatingScene(sceneId);
       setError(null);
@@ -125,7 +125,7 @@ export default function ScenesPage() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error('Errore attivazione scena:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setActivatingScene(null);
     }
@@ -137,7 +137,7 @@ export default function ScenesPage() {
     setRefreshing(false);
   }
 
-  async function handleCreateScene(data) {
+  async function handleCreateScene(data: { name: string; [key: string]: any }) {
     try {
       setError(null);
 
@@ -157,11 +157,11 @@ export default function ScenesPage() {
 
     } catch (err) {
       console.error('Error creating scene:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     }
   }
 
-  async function handleUpdateScene(data) {
+  async function handleUpdateScene(data: { sceneId: string; [key: string]: any }) {
     try {
       setError(null);
 
@@ -183,13 +183,15 @@ export default function ScenesPage() {
 
     } catch (err) {
       console.error('Error updating scene:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     }
   }
 
   async function handleDeleteSceneConfirmed() {
     const scene = deleteConfirm;
     setDeleteConfirm(null); // Close dialog immediately
+
+    if (!scene) return;
 
     try {
       setError(null);
@@ -207,7 +209,7 @@ export default function ScenesPage() {
 
     } catch (err) {
       console.error('Error deleting scene:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
       // Re-fetch to revert optimistic update
       await fetchData();
     }
@@ -372,7 +374,7 @@ export default function ScenesPage() {
               {roomScenes.map(scene => (
                 <div key={scene.id} className="relative">
                   <button
-                    onClick={() => handleActivateScene(scene.id, scene.metadata?.name)}
+                    onClick={() => handleActivateScene(scene.id, scene.metadata?.name || 'Scena')}
                     disabled={activatingScene === scene.id}
                     className={`w-full relative p-6 rounded-2xl border-2 transition-all duration-200 active:scale-95 ${
                       activatingScene === scene.id
@@ -420,7 +422,7 @@ export default function ScenesPage() {
           {filteredScenes.map(scene => (
             <div key={scene.id} className="relative">
               <button
-                onClick={() => handleActivateScene(scene.id, scene.metadata?.name)}
+                onClick={() => handleActivateScene(scene.id, scene.metadata?.name || 'Scena')}
                 disabled={activatingScene === scene.id}
                 className={`w-full relative p-6 rounded-2xl border-2 transition-all duration-200 active:scale-95 ${
                   activatingScene === scene.id

@@ -36,7 +36,7 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
       setTimings((prev) => ({ ...prev, [name]: timing }));
       setGetResponses((prev) => ({ ...prev, [name]: data }));
     } catch (error) {
-      setGetResponses((prev) => ({ ...prev, [name]: { error: error.message } }));
+      setGetResponses((prev) => ({ ...prev, [name]: { error: error instanceof Error ? error.message : String(error) } }));
     } finally {
       setLoadingGet((prev) => ({ ...prev, [name]: false }));
     }

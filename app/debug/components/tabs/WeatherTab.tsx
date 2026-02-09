@@ -45,7 +45,7 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
         setCacheStatus(data.cached ? 'cached' : 'fresh');
       }
     } catch (error) {
-      setGetResponses((prev) => ({ ...prev, [name]: { error: error.message } }));
+      setGetResponses((prev) => ({ ...prev, [name]: { error: error instanceof Error ? error.message : String(error) } }));
     } finally {
       setLoadingGet((prev) => ({ ...prev, [name]: false }));
     }

@@ -44,7 +44,7 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
         setConnectionStatus(data.connection);
       }
     } catch (error) {
-      setGetResponses((prev) => ({ ...prev, [name]: { error: error.message } }));
+      setGetResponses((prev) => ({ ...prev, [name]: { error: error instanceof Error ? error.message : String(error) } }));
     } finally {
       setLoadingGet((prev) => ({ ...prev, [name]: false }));
     }
@@ -77,7 +77,7 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
         setTimeout(fetchAllGetEndpoints, 1000);
       }
     } catch (error) {
-      setPostResponses((prev) => ({ ...prev, [name]: { error: error.message } }));
+      setPostResponses((prev) => ({ ...prev, [name]: { error: error instanceof Error ? error.message : String(error) } }));
     } finally {
       setLoadingPost((prev) => ({ ...prev, [name]: false }));
     }

@@ -22,7 +22,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
 
   // External URL mapping
   const getExternalUrl = (endpoint: string): string | undefined => {
-    const mapping = {
+    const mapping: Record<string, string> = {
       '/api/stove/status': `${BASE_URL}/GetStatus/${API_KEY}`,
       '/api/stove/getPower': `${BASE_URL}/GetPower/${API_KEY}`,
       '/api/stove/getFan': `${BASE_URL}/GetFanLevel/${API_KEY}`,
@@ -41,7 +41,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
 
   const copyUrlToClipboard = async (endpoint: string) => {
     try {
-      await navigator.clipboard.writeText(getExternalUrl(endpoint));
+      await navigator.clipboard.writeText(getExternalUrl(endpoint) ?? '');
       setCopiedUrl(endpoint);
       setTimeout(() => setCopiedUrl(null), 2000);
     } catch (error) {
@@ -49,9 +49,9 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
     }
   };
 
-  const cleanApiResponse = (data) => {
+  const cleanApiResponse = (data: unknown) => {
     if (!data || typeof data !== 'object') return data;
-    const { isSandbox, ...cleanData } = data;
+    const { isSandbox, ...cleanData } = data as any;
     return cleanData;
   };
 
@@ -65,7 +65,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
       setTimings((prev) => ({ ...prev, [name]: timing }));
       setGetResponses((prev) => ({ ...prev, [name]: cleanApiResponse(data) }));
     } catch (error) {
-      setGetResponses((prev) => ({ ...prev, [name]: { error: error.message } }));
+      setGetResponses((prev) => ({ ...prev, [name]: { error: error instanceof Error ? error.message : String(error) } }));
     } finally {
       setLoadingGet((prev) => ({ ...prev, [name]: false }));
     }
@@ -100,7 +100,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
         setTimeout(fetchAllGetEndpoints, 1000);
       }
     } catch (error) {
-      setPostResponses((prev) => ({ ...prev, [name]: { error: error.message } }));
+      setPostResponses((prev) => ({ ...prev, [name]: { error: error instanceof Error ? error.message : String(error) } }));
     } finally {
       setLoadingPost((prev) => ({ ...prev, [name]: false }));
     }

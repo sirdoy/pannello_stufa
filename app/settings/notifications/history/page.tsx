@@ -8,13 +8,18 @@ import SettingsLayout from '@/app/components/SettingsLayout';
 import { Card, Button, Heading, Text, Skeleton, EmptyState, Badge, DataTable } from '@/app/components/ui';
 
 interface NotificationHistoryItem {
+  id: string;
   timestamp: number;
   type: 'error' | 'scheduler' | 'maintenance' | 'test' | 'generic';
   status: 'sent' | 'delivered' | 'failed';
   title: string;
   body: string;
+  deviceId?: string;
   [key: string]: any;
 }
+
+// Type for DataTable row
+type NotificationHistoryRow = NotificationHistoryItem;
 
 /**
  * Get Italian label for notification type
@@ -26,8 +31,8 @@ const getTypeLabel = (type: string) => {
     maintenance: 'Manutenzione',
     test: 'Test',
     generic: 'Sistema',
-  };
-  return labels[type] || type;
+  } as const;
+  return labels[type as keyof typeof labels] || type;
 };
 
 export default function NotificationHistoryPage() {
@@ -69,7 +74,7 @@ export default function NotificationHistoryPage() {
       {
         accessorKey: 'timestamp',
         header: 'Data',
-        cell: ({ getValue }) => {
+        cell: ({ getValue }: { getValue: () => number }) => {
           const date = new Date(getValue());
           return format(date, 'dd/MM/yyyy HH:mm', { locale: it });
         },
@@ -78,7 +83,7 @@ export default function NotificationHistoryPage() {
       {
         accessorKey: 'type',
         header: 'Tipo',
-        cell: ({ getValue }) => {
+        cell: ({ getValue }: { getValue: () => string }) => {
           const type = getValue();
           const variants = {
             scheduler: 'ocean',
@@ -86,9 +91,9 @@ export default function NotificationHistoryPage() {
             maintenance: 'warning',
             test: 'neutral',
             generic: 'neutral',
-          };
+          } as const;
           return (
-            <Badge variant={variants[type] || 'neutral'}>
+            <Badge variant={variants[type as keyof typeof variants] || 'neutral'}>
               {getTypeLabel(type)}
             </Badge>
           );
@@ -98,21 +103,21 @@ export default function NotificationHistoryPage() {
       {
         accessorKey: 'status',
         header: 'Stato',
-        cell: ({ getValue }) => {
+        cell: ({ getValue }: { getValue: () => string }) => {
           const status = getValue();
           const variants = {
             sent: 'ocean',
             delivered: 'sage',
             failed: 'danger',
-          };
+          } as const;
           const labels = {
             sent: 'Inviata',
             delivered: 'Consegnata',
             failed: 'Fallita',
-          };
+          } as const;
           return (
-            <Badge variant={variants[status] || 'neutral'}>
-              {labels[status] || status}
+            <Badge variant={variants[status as keyof typeof variants] || 'neutral'}>
+              {labels[status as keyof typeof labels] || status}
             </Badge>
           );
         },
@@ -121,7 +126,7 @@ export default function NotificationHistoryPage() {
       {
         accessorKey: 'title',
         header: 'Titolo',
-        cell: ({ getValue }) => (
+        cell: ({ getValue }: { getValue: () => string }) => (
           <Text className="max-w-[200px] truncate">{getValue()}</Text>
         ),
       },
@@ -217,8 +222,8 @@ export default function NotificationHistoryPage() {
             pageSize={25}
             pageSizeOptions={[25, 50, 100]}
             showRowCount
-            getRowId={(row) => row.id}
-            renderExpandedContent={(row) => (
+            getRowId={(row: NotificationHistoryRow) => row.id}
+            renderExpandedContent={(row: { original: NotificationHistoryRow }) => (
               <div className="space-y-2 p-4">
                 <Text variant="secondary" size="sm">
                   <strong>Messaggio:</strong> {row.original.body}

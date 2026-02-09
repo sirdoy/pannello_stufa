@@ -623,14 +623,17 @@ describe('netatmoApi', () => {
       const result = parseSchedules(homesData as any);
 
       expect(result).toHaveLength(1);
-      expect(result[0]!.zones).toHaveLength(2);
+      const schedule = result[0]!;
+      expect(schedule.zones).toHaveLength(2);
 
       // First zone should have temp
-      expect(result[0]!.zones[0]!).toHaveProperty('temp', 21);
+      const zone0 = schedule.zones![0]!;
+      expect(zone0).toHaveProperty('temp', 21);
 
       // Second zone should NOT have temp property (undefined filtered out)
-      expect(result[0]!.zones[1]!).not.toHaveProperty('temp');
-      expect(result[0]!.zones[1]!).toEqual({
+      const zone1 = schedule.zones![1]!;
+      expect(zone1).not.toHaveProperty('temp');
+      expect(zone1).toEqual({
         id: 1,
         name: 'Away',
         type: 5,
@@ -726,19 +729,23 @@ describe('netatmoApi', () => {
       const result = parseSchedules(homesData as any);
 
       expect(result).toHaveLength(1);
-      expect(result[0]!.zones).toHaveLength(3);
+      const schedule2 = result[0]!;
+      expect(schedule2.zones).toHaveLength(3);
 
       // First zone - single room, average of [21] = 21
-      expect(result[0]!.zones[0]!).toHaveProperty('temp', 21);
-      expect(result[0]!.zones[0]!).toHaveProperty('rooms_temp');
+      const zone0_2 = schedule2.zones![0]!;
+      expect(zone0_2).toHaveProperty('temp', 21);
+      expect(zone0_2).toHaveProperty('rooms_temp');
 
       // Second zone - multi-room, average of [14, 16] = 15
-      expect(result[0]!.zones[1]!).toHaveProperty('temp', 15);
-      expect(result[0]!.zones[1]!).toHaveProperty('rooms_temp');
-      expect(result[0]!.zones[1]!.rooms_temp).toHaveLength(2);
+      const zone1_2 = schedule2.zones![1]!;
+      expect(zone1_2).toHaveProperty('temp', 15);
+      expect(zone1_2).toHaveProperty('rooms_temp');
+      expect(zone1_2.rooms_temp).toHaveLength(2);
 
       // Third zone - Away with no rooms, should NOT have temp property
-      expect(result[0]!.zones[2]!).not.toHaveProperty('temp');
+      const zone2_2 = schedule2.zones![2]!;
+      expect(zone2_2).not.toHaveProperty('temp');
     });
   });
 });

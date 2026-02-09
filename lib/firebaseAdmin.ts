@@ -31,7 +31,7 @@ const INVALID_TOKEN_ERRORS = [
 function initializeFirebaseAdmin(): App {
   // Se già inizializzato, return existing app
   if (getApps().length > 0) {
-    return getApps()[0];
+    return getApps()[0]!;
   }
 
   // Verifica credenziali
@@ -389,7 +389,7 @@ export async function sendPushNotification(
       try {
         const response = await getMessaging().send({
           ...message,
-          token: tokenArray[0],
+          token: tokenArray[0]!,
         });
 
         console.log('✅ Notifica inviata:', response);
@@ -416,14 +416,15 @@ export async function sendPushNotification(
         };
       } catch (error: unknown) {
         // Look up device context for error logging
-        const deviceContext = await lookupDeviceIdForToken(tokenArray[0]).catch(() => null);
+        const firstToken = tokenArray[0]!;
+        const deviceContext = await lookupDeviceIdForToken(firstToken).catch(() => null);
 
         const errorCode = (error as any).code;
         const errorMessage = (error as any).message;
 
         // Track error with full context (fire-and-forget)
         trackNotificationError({
-          token: tokenArray[0],
+          token: firstToken,
           userId: deviceContext?.userId,
           deviceId: deviceContext?.deviceId,
           errorCode,
@@ -435,10 +436,10 @@ export async function sendPushNotification(
         // Check if token is invalid
         if (INVALID_TOKEN_ERRORS.includes(errorCode)) {
           console.warn(`⚠️ Invalid token detected: ${errorCode}`);
-          invalidTokens.push(tokenArray[0]);
+          invalidTokens.push(firstToken);
 
           // Remove invalid token asynchronously (don't block response)
-          removeInvalidToken(tokenArray[0]).catch(console.error);
+          removeInvalidToken(firstToken).catch(console.error);
         }
 
         // Log failed notification (non-blocking)
@@ -452,7 +453,7 @@ export async function sendPushNotification(
           successCount: 0,
           failureCount: 1,
           fcmErrors: [{
-            tokenPrefix: tokenArray[0].substring(0, 20),
+            tokenPrefix: firstToken.substring(0, 20),
             errorCode: errorCode || 'unknown',
             errorMessage: errorMessage || ''
           }],
@@ -484,15 +485,16 @@ export async function sendPushNotification(
 
       response.responses.forEach(async (resp, idx) => {
         if (!resp.success) {
+          const token = tokenArray[idx]!;
           // Look up device context for this token
-          const deviceContext = await lookupDeviceIdForToken(tokenArray[idx]).catch(() => null);
+          const deviceContext = await lookupDeviceIdForToken(token).catch(() => null);
 
           const errorCode = resp.error?.code;
 
           // Track error (fire-and-forget)
           errorTrackingPromises.push(
             trackNotificationError({
-              token: tokenArray[idx],
+              token,
               userId: deviceContext?.userId,
               deviceId: deviceContext?.deviceId,
               errorCode,
@@ -504,9 +506,9 @@ export async function sendPushNotification(
 
           if (errorCode && INVALID_TOKEN_ERRORS.includes(errorCode)) {
             console.warn(`⚠️ Invalid token at index ${idx}: ${errorCode}`);
-            invalidTokens.push(tokenArray[idx]);
+            invalidTokens.push(token);
           } else {
-            console.error(`❌ Errore token ${tokenArray[idx]}:`, resp.error);
+            console.error(`❌ Errore token ${token}:`, resp.error);
           }
         }
       });
@@ -525,7 +527,7 @@ export async function sendPushNotification(
     response.responses.forEach((resp, idx) => {
       if (!resp.success) {
         fcmErrors.push({
-          tokenPrefix: tokenArray[idx].substring(0, 20),
+          tokenPrefix: tokenArray[idx]!.substring(0, 20),
           errorCode: resp.error?.code || 'unknown',
           errorMessage: resp.error?.message || ''
         });

@@ -105,8 +105,8 @@ function createDateInRomeTimezone(baseDate: Date, targetHour: number, targetMinu
   });
 
   // Parse le ore
-  const romeHour = parseInt(romeTimeStr.split(', ')[1].split(':')[0]);
-  const utcHour = parseInt(utcTimeStr.split(', ')[1].split(':')[0]);
+  const romeHour = parseInt(romeTimeStr.split(', ')[1]!.split(':')[0]!);
+  const utcHour = parseInt(utcTimeStr.split(', ')[1]!.split(':')[0]!);
 
   // Calcola l'offset in ore (Rome è UTC+1 o UTC+2 con DST)
   let offsetHours = romeHour - utcHour;
@@ -151,18 +151,18 @@ export const getNextScheduledChange = async (): Promise<string | null> => {
       for (const interval of intervals) {
         const [startH, startM] = interval.start.split(':').map(Number);
         const [endH, endM] = interval.end.split(':').map(Number);
-        const startMin = startH * 60 + startM;
-        const endMin = endH * 60 + endM;
+        const startMin = startH! * 60 + startM!;
+        const endMin = endH! * 60 + endM!;
 
         if (startMin > currentMinutes) {
           // Prossimo start oggi
-          const changeDate = createDateInRomeTimezone(now, startH, startM);
+          const changeDate = createDateInRomeTimezone(now, startH!, startM!);
           return changeDate.toISOString();
         }
 
         if (endMin > currentMinutes && startMin <= currentMinutes) {
           // Siamo dentro un intervallo, prossimo cambio è la fine
-          const changeDate = createDateInRomeTimezone(now, endH, endM);
+          const changeDate = createDateInRomeTimezone(now, endH!, endM!);
           return changeDate.toISOString();
         }
       }
@@ -172,7 +172,7 @@ export const getNextScheduledChange = async (): Promise<string | null> => {
     const currentDayIndex = dayNames.indexOf(currentDayCapitalized);
     for (let i = 1; i <= 7; i++) {
       const nextDayIndex = (currentDayIndex + i) % 7;
-      const nextDay = dayNames[nextDayIndex];
+      const nextDay = dayNames[nextDayIndex]!;
 
       const nextDayPath = await getActiveScheduleDayPath(nextDay);
       const daySnapshot = await get(ref(db, nextDayPath));
@@ -180,11 +180,12 @@ export const getNextScheduledChange = async (): Promise<string | null> => {
         const intervals = daySnapshot.val() as ScheduleInterval[];
         if (intervals && intervals.length > 0) {
           // Prendi il primo intervallo del giorno
-          const [startH, startM] = intervals[0].start.split(':').map(Number);
+          const firstInterval = intervals[0]!;
+          const [startH, startM] = firstInterval.start.split(':').map(Number);
           // Crea una data per il giorno futuro
           const futureDate = new Date(now);
           futureDate.setDate(futureDate.getDate() + i);
-          const changeDate = createDateInRomeTimezone(futureDate, startH, startM);
+          const changeDate = createDateInRomeTimezone(futureDate, startH!, startM!);
           return changeDate.toISOString();
         }
       }
@@ -227,12 +228,12 @@ export const getNextScheduledAction = async (): Promise<NextScheduledAction | nu
       for (const interval of intervals) {
         const [startH, startM] = interval.start.split(':').map(Number);
         const [endH, endM] = interval.end.split(':').map(Number);
-        const startMin = startH * 60 + startM;
-        const endMin = endH * 60 + endM;
+        const startMin = startH! * 60 + startM!;
+        const endMin = endH! * 60 + endM!;
 
         if (startMin > currentMinutes) {
           // Prossimo start oggi
-          const changeDate = createDateInRomeTimezone(now, startH, startM);
+          const changeDate = createDateInRomeTimezone(now, startH!, startM!);
           return {
             timestamp: changeDate.toISOString(),
             action: 'ignite',
@@ -243,7 +244,7 @@ export const getNextScheduledAction = async (): Promise<NextScheduledAction | nu
 
         if (endMin > currentMinutes && startMin <= currentMinutes) {
           // Siamo dentro un intervallo, prossimo cambio è la fine
-          const changeDate = createDateInRomeTimezone(now, endH, endM);
+          const changeDate = createDateInRomeTimezone(now, endH!, endM!);
           return {
             timestamp: changeDate.toISOString(),
             action: 'shutdown',
@@ -256,7 +257,7 @@ export const getNextScheduledAction = async (): Promise<NextScheduledAction | nu
     const currentDayIndex = dayNames.indexOf(currentDayCapitalized);
     for (let i = 1; i <= 7; i++) {
       const nextDayIndex = (currentDayIndex + i) % 7;
-      const nextDay = dayNames[nextDayIndex];
+      const nextDay = dayNames[nextDayIndex]!;
 
       const nextDayPath = await getActiveScheduleDayPath(nextDay);
       const daySnapshot = await get(ref(db, nextDayPath));
@@ -264,12 +265,12 @@ export const getNextScheduledAction = async (): Promise<NextScheduledAction | nu
         const intervals = daySnapshot.val() as ScheduleInterval[];
         if (intervals && intervals.length > 0) {
           // Prendi il primo intervallo del giorno
-          const firstInterval = intervals[0];
+          const firstInterval = intervals[0]!;
           const [startH, startM] = firstInterval.start.split(':').map(Number);
           // Crea una data per il giorno futuro
           const futureDate = new Date(now);
           futureDate.setDate(futureDate.getDate() + i);
-          const changeDate = createDateInRomeTimezone(futureDate, startH, startM);
+          const changeDate = createDateInRomeTimezone(futureDate, startH!, startM!);
           return {
             timestamp: changeDate.toISOString(),
             action: 'ignite',

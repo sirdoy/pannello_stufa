@@ -31,33 +31,33 @@ interface ErrorCodeInfo {
 export const ERROR_CODES: Record<number, ErrorCodeInfo> = {
   0: {
     description: 'Nessun errore',
-    severity: ERROR_SEVERITY.INFO,
+    severity: ERROR_SEVERITY.INFO!,
     suggestion: 'La stufa funziona correttamente'
   },
   // ... (keeping all error codes exactly as in JS version for brevity)
   1: {
     description: 'Mancata accensione',
-    severity: ERROR_SEVERITY.ERROR,
+    severity: ERROR_SEVERITY.ERROR!,
     suggestion: 'Verificare: pellet nel serbatoio, pulizia braciere, candeletta funzionante'
   },
   3: {
     description: 'Pellet esaurito',
-    severity: ERROR_SEVERITY.CRITICAL,
+    severity: ERROR_SEVERITY.CRITICAL!,
     suggestion: 'Ricaricare il serbatoio pellet e riprovare'
   },
   4: {
     description: 'Temperatura fumi eccessiva',
-    severity: ERROR_SEVERITY.CRITICAL,
+    severity: ERROR_SEVERITY.CRITICAL!,
     suggestion: 'SPEGNERE LA STUFA. Controllare ventilatore fumi e pulizia scambiatore'
   },
   8: {
     description: 'Errore depressione',
-    severity: ERROR_SEVERITY.CRITICAL,
+    severity: ERROR_SEVERITY.CRITICAL!,
     suggestion: 'Controllare tiraggio camino, pulizia canna fumaria e pressostato'
   },
   13: {
     description: 'Allarme sicurezza termica',
-    severity: ERROR_SEVERITY.CRITICAL,
+    severity: ERROR_SEVERITY.CRITICAL!,
     suggestion: 'SPEGNERE LA STUFA. Temperatura eccessiva, attendere raffreddamento'
   },
 };
@@ -67,13 +67,13 @@ export const ERROR_CODES: Record<number, ErrorCodeInfo> = {
  */
 export function getErrorInfo(errorCode: number): ErrorCodeInfo {
   if (errorCode === 0) {
-    return ERROR_CODES[0];
+    return ERROR_CODES[0]!;
   }
 
   // If error code is not known, return generic error
-  return ERROR_CODES[errorCode] || {
+  return ERROR_CODES[errorCode] ?? {
     description: `Errore sconosciuto (codice ${errorCode})`,
-    severity: ERROR_SEVERITY.ERROR,
+    severity: ERROR_SEVERITY.ERROR!,
   };
 }
 

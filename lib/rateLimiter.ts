@@ -94,11 +94,11 @@ export function checkRateLimit(
   const now = Date.now();
 
   // Get limits (priority: customLimits > defaults for type > default)
-  const limits = customLimits || DEFAULT_RATE_LIMITS[notifType] || DEFAULT_RATE_LIMITS.default;
+  const limits = customLimits ?? DEFAULT_RATE_LIMITS[notifType] ?? DEFAULT_RATE_LIMITS.default!;
   const windowMs = limits.windowMinutes * 60 * 1000;
 
   // Get recent sends for this key
-  const sends = recentSends.get(key) || [];
+  const sends = recentSends.get(key) ?? [];
 
   // Filter to current window (remove timestamps outside window)
   const recentInWindow = sends.filter(ts => now - ts < windowMs);
@@ -169,10 +169,10 @@ export function getRateLimitStatus(userId: string, notifType: string): RateLimit
   const key = `${userId}:${notifType}`;
   const now = Date.now();
 
-  const limits = DEFAULT_RATE_LIMITS[notifType] || DEFAULT_RATE_LIMITS.default;
+  const limits = DEFAULT_RATE_LIMITS[notifType] ?? DEFAULT_RATE_LIMITS.default!;
   const windowMs = limits.windowMinutes * 60 * 1000;
 
-  const sends = recentSends.get(key) || [];
+  const sends = recentSends.get(key) ?? [];
   const recentInWindow = sends.filter(ts => now - ts < windowMs);
 
   let nextResetIn = 0;

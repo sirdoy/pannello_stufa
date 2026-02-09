@@ -405,7 +405,7 @@ export default function DesignSystemPage() {
                 {/* API Reference */}
                 <div>
                   <Text variant="label" size="xs" className="mb-3">API Reference</Text>
-                  <PropTable props={componentDocs.Button.props} />
+                  <PropTable props={componentDocs.Button!.props} />
                 </div>
 
                 <CardDivider />
@@ -413,16 +413,16 @@ export default function DesignSystemPage() {
                 {/* Code Example */}
                 <div>
                   <Text variant="label" size="xs" className="mb-3">Code Example</Text>
-                  <CodeBlock code={componentDocs.Button.codeExample} />
+                  <CodeBlock code={componentDocs.Button!.codeExample} />
                 </div>
 
                 <CardDivider />
 
                 {/* Accessibility */}
                 <AccessibilitySection
-                  keyboard={componentDocs.Button.keyboard}
-                  aria={componentDocs.Button.aria}
-                  screenReader={componentDocs.Button.screenReader}
+                  keyboard={componentDocs.Button!.keyboard}
+                  aria={componentDocs.Button!.aria}
+                  screenReader={componentDocs.Button!.screenReader}
                 />
               </div>
             </CardContent>
@@ -702,7 +702,7 @@ export default function DesignSystemPage() {
                 {/* Props Reference */}
                 <div>
                   <Text variant="label" size="xs" className="mb-3">Props Reference</Text>
-                  <PropTable props={componentDocs.Badge.props} />
+                  <PropTable props={componentDocs.Badge!.props} />
                 </div>
               </div>
             </CardContent>
@@ -731,12 +731,12 @@ export default function DesignSystemPage() {
                   <ConnectionStatus status="online" size="lg" />
                 </div>
                 <div className="mt-4">
-                  <PropTable props={componentDocs.ConnectionStatus.props} />
+                  <PropTable props={componentDocs.ConnectionStatus!.props} />
                 </div>
                 <AccessibilitySection
-                  keyboard={componentDocs.ConnectionStatus.keyboard}
-                  aria={componentDocs.ConnectionStatus.aria}
-                  screenReader={componentDocs.ConnectionStatus.screenReader}
+                  keyboard={componentDocs.ConnectionStatus!.keyboard}
+                  aria={componentDocs.ConnectionStatus!.aria}
+                  screenReader={componentDocs.ConnectionStatus!.screenReader}
                 />
               </CardContent>
             </Card>
@@ -759,12 +759,12 @@ export default function DesignSystemPage() {
                   <HealthIndicator status="warning" aria-label="Manutenzione richiesta" />
                 </div>
                 <div className="mt-4">
-                  <PropTable props={componentDocs.HealthIndicator.props} />
+                  <PropTable props={componentDocs.HealthIndicator!.props} />
                 </div>
                 <AccessibilitySection
-                  keyboard={componentDocs.HealthIndicator.keyboard}
-                  aria={componentDocs.HealthIndicator.aria}
-                  screenReader={componentDocs.HealthIndicator.screenReader}
+                  keyboard={componentDocs.HealthIndicator!.keyboard}
+                  aria={componentDocs.HealthIndicator!.aria}
+                  screenReader={componentDocs.HealthIndicator!.screenReader}
                 />
               </CardContent>
             </Card>
@@ -800,15 +800,15 @@ export default function DesignSystemPage() {
             </div>
             <Card variant="subtle">
               <CardContent>
-                <PropTable props={componentDocs.SmartHomeCard.props} />
+                <PropTable props={componentDocs.SmartHomeCard!.props} />
                 <div className="mt-4">
                   <Text variant="tertiary" size="xs" className="mb-2">Usage</Text>
-                  <CodeBlock code={componentDocs.SmartHomeCard.codeExample} />
+                  <CodeBlock code={componentDocs.SmartHomeCard!.codeExample} />
                 </div>
                 <AccessibilitySection
-                  keyboard={componentDocs.SmartHomeCard.keyboard}
-                  aria={componentDocs.SmartHomeCard.aria}
-                  screenReader={componentDocs.SmartHomeCard.screenReader}
+                  keyboard={componentDocs.SmartHomeCard!.keyboard}
+                  aria={componentDocs.SmartHomeCard!.aria}
+                  screenReader={componentDocs.SmartHomeCard!.screenReader}
                 />
               </CardContent>
             </Card>
@@ -844,11 +844,11 @@ export default function DesignSystemPage() {
             </div>
             <Card variant="subtle">
               <CardContent>
-                <PropTable props={componentDocs.StatusCard.props} />
+                <PropTable props={componentDocs.StatusCard!.props} />
                 <AccessibilitySection
-                  keyboard={componentDocs.StatusCard.keyboard}
-                  aria={componentDocs.StatusCard.aria}
-                  screenReader={componentDocs.StatusCard.screenReader}
+                  keyboard={componentDocs.StatusCard!.keyboard}
+                  aria={componentDocs.StatusCard!.aria}
+                  screenReader={componentDocs.StatusCard!.screenReader}
                 />
               </CardContent>
             </Card>
@@ -877,16 +877,16 @@ export default function DesignSystemPage() {
                   Long-press: hold button to continuously increment/decrement
                 </Text>
                 <div className="mt-4">
-                  <PropTable props={componentDocs.ControlButton.props} />
+                  <PropTable props={componentDocs.ControlButton!.props} />
                 </div>
                 <div className="mt-4">
                   <Text variant="tertiary" size="xs" className="mb-2">Usage</Text>
-                  <CodeBlock code={componentDocs.ControlButton.codeExample} />
+                  <CodeBlock code={componentDocs.ControlButton!.codeExample} />
                 </div>
                 <AccessibilitySection
-                  keyboard={componentDocs.ControlButton.keyboard}
-                  aria={componentDocs.ControlButton.aria}
-                  screenReader={componentDocs.ControlButton.screenReader}
+                  keyboard={componentDocs.ControlButton!.keyboard}
+                  aria={componentDocs.ControlButton!.aria}
+                  screenReader={componentDocs.ControlButton!.screenReader}
                 />
               </CardContent>
             </Card>
@@ -1089,16 +1089,16 @@ export default function DesignSystemPage() {
                   </div>
                   <div className="mt-4">
                     <Text variant="tertiary" size="xs" className="mb-2">Props Reference</Text>
-                    <PropTable props={componentDocs.Input.props} />
+                    <PropTable props={componentDocs.Input!.props} />
                   </div>
                   <div className="mt-4">
                     <Text variant="tertiary" size="xs" className="mb-2">Usage</Text>
-                    <CodeBlock code={componentDocs.Input.codeExample} />
+                    <CodeBlock code={componentDocs.Input!.codeExample} />
                   </div>
                   <AccessibilitySection
-                    keyboard={componentDocs.Input.keyboard}
-                    aria={componentDocs.Input.aria}
-                    screenReader={componentDocs.Input.screenReader}
+                    keyboard={componentDocs.Input!.keyboard}
+                    aria={componentDocs.Input!.aria}
+                    screenReader={componentDocs.Input!.screenReader}
                   />
                 </div>
 
@@ -1148,16 +1148,16 @@ export default function DesignSystemPage() {
                   </div>
                   <div className="mt-4">
                     <Text variant="tertiary" size="xs" className="mb-2">Props Reference</Text>
-                    <PropTable props={componentDocs.Select.props} />
+                    <PropTable props={componentDocs.Select!.props} />
                   </div>
                   <div className="mt-4">
                     <Text variant="tertiary" size="xs" className="mb-2">Usage</Text>
-                    <CodeBlock code={componentDocs.Select.codeExample} />
+                    <CodeBlock code={componentDocs.Select!.codeExample} />
                   </div>
                   <AccessibilitySection
-                    keyboard={componentDocs.Select.keyboard}
-                    aria={componentDocs.Select.aria}
-                    screenReader={componentDocs.Select.screenReader}
+                    keyboard={componentDocs.Select!.keyboard}
+                    aria={componentDocs.Select!.aria}
+                    screenReader={componentDocs.Select!.screenReader}
                   />
                 </div>
 
@@ -1229,16 +1229,16 @@ export default function DesignSystemPage() {
                   </div>
                   <div className="mt-4">
                     <Text variant="tertiary" size="xs" className="mb-2">Props Reference</Text>
-                    <PropTable props={componentDocs.Switch.props} />
+                    <PropTable props={componentDocs.Switch!.props} />
                   </div>
                   <div className="mt-4">
                     <Text variant="tertiary" size="xs" className="mb-2">Usage</Text>
-                    <CodeBlock code={componentDocs.Switch.codeExample} />
+                    <CodeBlock code={componentDocs.Switch!.codeExample} />
                   </div>
                   <AccessibilitySection
-                    keyboard={componentDocs.Switch.keyboard}
-                    aria={componentDocs.Switch.aria}
-                    screenReader={componentDocs.Switch.screenReader}
+                    keyboard={componentDocs.Switch!.keyboard}
+                    aria={componentDocs.Switch!.aria}
+                    screenReader={componentDocs.Switch!.screenReader}
                   />
                 </div>
 
@@ -1385,16 +1385,16 @@ export default function DesignSystemPage() {
                     </div>
                     <div className="mt-4">
                       <Text variant="tertiary" size="xs" className="mb-2">Props Reference</Text>
-                      <PropTable props={componentDocs.Checkbox.props} />
+                      <PropTable props={componentDocs.Checkbox!.props} />
                     </div>
                     <div className="mt-4">
                       <Text variant="tertiary" size="xs" className="mb-2">Usage</Text>
-                      <CodeBlock code={componentDocs.Checkbox.codeExample} />
+                      <CodeBlock code={componentDocs.Checkbox!.codeExample} />
                     </div>
                     <AccessibilitySection
-                      keyboard={componentDocs.Checkbox.keyboard}
-                      aria={componentDocs.Checkbox.aria}
-                      screenReader={componentDocs.Checkbox.screenReader}
+                      keyboard={componentDocs.Checkbox!.keyboard}
+                      aria={componentDocs.Checkbox!.aria}
+                      screenReader={componentDocs.Checkbox!.screenReader}
                     />
                   </div>
                 </div>
@@ -1516,12 +1516,12 @@ export default function DesignSystemPage() {
                     </Card>
                   </Modal>
                   <div className="mt-4">
-                    <PropTable props={componentDocs.Modal.props} />
+                    <PropTable props={componentDocs.Modal!.props} />
                   </div>
                   <AccessibilitySection
-                    keyboard={componentDocs.Modal.keyboard}
-                    aria={componentDocs.Modal.aria}
-                    screenReader={componentDocs.Modal.screenReader}
+                    keyboard={componentDocs.Modal!.keyboard}
+                    aria={componentDocs.Modal!.aria}
+                    screenReader={componentDocs.Modal!.screenReader}
                   />
                 </div>
 
@@ -1997,12 +1997,12 @@ export default function DesignSystemPage() {
                     </div>
                   </div>
                   <div className="mt-4">
-                    <PropTable props={componentDocs.Toast.props} />
+                    <PropTable props={componentDocs.Toast!.props} />
                   </div>
                   <AccessibilitySection
-                    keyboard={componentDocs.Toast.keyboard}
-                    aria={componentDocs.Toast.aria}
-                    screenReader={componentDocs.Toast.screenReader}
+                    keyboard={componentDocs.Toast!.keyboard}
+                    aria={componentDocs.Toast!.aria}
+                    screenReader={componentDocs.Toast!.screenReader}
                   />
                 </div>
               </div>

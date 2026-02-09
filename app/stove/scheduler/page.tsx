@@ -225,7 +225,7 @@ export default function WeeklyScheduler() {
 
     // Trova l'ultimo intervallo in ordine temporale
     const sorted = sortIntervals(daySchedule);
-    const lastEnd = sorted.length ? sorted[sorted.length - 1].end : '00:00';
+    const lastEnd = sorted.length ? sorted[sorted.length - 1]!.end : '00:00';
 
     // Check if day is full
     if (lastEnd >= '23:59') {
@@ -250,6 +250,7 @@ export default function WeeklyScheduler() {
 
   const handleEditIntervalRequest = (day: DayOfWeek, index: number): void => {
     const interval = schedule[day][index];
+    if (!interval) return;
     setAddIntervalModal({
       isOpen: true,
       mode: 'edit',
@@ -262,7 +263,7 @@ export default function WeeklyScheduler() {
 
   const incrementTime = (time: string, minutesToAdd: number): string => {
     const [h, m] = time.split(':').map(Number);
-    const total = h * 60 + m + minutesToAdd;
+    const total = h! * 60 + m! + minutesToAdd;
     const newH = String(Math.floor(total / 60) % 24).padStart(2, '0');
     const newM = String(total % 60).padStart(2, '0');
     return `${newH}:${newM}`;
@@ -285,6 +286,7 @@ export default function WeeklyScheduler() {
   const applyAdjacentLinksAndRemoveOverlaps = (intervals: ScheduleInterval[], changedIndex: number, originalStart: string, originalEnd: string, field: 'start' | 'end'): ScheduleInterval[] => {
     let result = [...intervals];
     const changedInterval = result[changedIndex];
+    if (!changedInterval) return result;
 
     // 1. Collegamento bidirezionale con intervalli adiacenti
     result = result.map((interval, idx) => {
@@ -325,11 +327,14 @@ export default function WeeklyScheduler() {
   const handleChange = async (day: DayOfWeek, index: number, field: string, value: string | number, isBlur = false) => {
     const originalSchedule = schedule[day];
     const originalInterval = originalSchedule[index];
+    if (!originalInterval) return;
     const originalStart = originalInterval.start;
     const originalEnd = originalInterval.end;
 
     let updated = [...originalSchedule];
-    updated[index] = { ...updated[index], [field]: value };
+    const currentInterval = updated[index];
+    if (!currentInterval) return;
+    updated[index] = { ...currentInterval, [field]: value };
 
     if (isBlur) {
       // Feature 4: Show saving indicator
@@ -338,12 +343,14 @@ export default function WeeklyScheduler() {
       try {
         // Al blur: applica tutte le validazioni e salva
         if (field === 'start' || field === 'end') {
-          let { start, end } = updated[index];
+          const intervalToUpdate = updated[index];
+          if (!intervalToUpdate) return;
+          let { start, end } = intervalToUpdate;
 
           // Validazione: end deve essere > start di almeno 15 minuti
           if (end <= start) {
             end = incrementTime(start, 15);
-            updated[index].end = end;
+            intervalToUpdate.end = end;
           }
 
           // Applica collegamento con adiacenti e rimuovi sovrapposizioni

@@ -128,7 +128,7 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
             url="/api/netatmo/homesdata"
             externalUrl="https://api.netatmo.com/api/homesdata"
             response={getResponses.homesdata}
-            loading={loadingGet.homesdata}
+            loading={loadingGet.homesdata ?? false}
             timing={timings.homesdata}
             onRefresh={() => fetchGetEndpoint('homesdata', '/api/netatmo/homesdata')}
             onCopyUrl={() => copyUrlToClipboard('https://api.netatmo.com/api/homesdata')}
@@ -140,7 +140,7 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
             url="/api/netatmo/homestatus"
             externalUrl="https://api.netatmo.com/api/homestatus"
             response={getResponses.homestatus}
-            loading={loadingGet.homestatus}
+            loading={loadingGet.homestatus ?? false}
             timing={timings.homestatus}
             onRefresh={() => fetchGetEndpoint('homestatus', '/api/netatmo/homestatus')}
             onCopyUrl={() => copyUrlToClipboard('https://api.netatmo.com/api/homestatus')}
@@ -151,7 +151,7 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
             name="Devices"
             url="/api/netatmo/devices"
             response={getResponses.devices}
-            loading={loadingGet.devices}
+            loading={loadingGet.devices ?? false}
             timing={timings.devices}
             onRefresh={() => fetchGetEndpoint('devices', '/api/netatmo/devices')}
             onCopyUrl={() => copyUrlToClipboard('/api/netatmo/devices')}
@@ -162,7 +162,7 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
             name="Devices Temperatures"
             url="/api/netatmo/devices-temperatures"
             response={getResponses.devicesTemps}
-            loading={loadingGet.devicesTemps}
+            loading={loadingGet.devicesTemps ?? false}
             timing={timings.devicesTemps}
             onRefresh={() => fetchGetEndpoint('devicesTemps', '/api/netatmo/devices-temperatures')}
             onCopyUrl={() => copyUrlToClipboard('/api/netatmo/devices-temperatures')}
@@ -173,7 +173,7 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
             name="Debug Info"
             url="/api/netatmo/debug"
             response={getResponses.debug}
-            loading={loadingGet.debug}
+            loading={loadingGet.debug ?? false}
             timing={timings.debug}
             onRefresh={() => fetchGetEndpoint('debug', '/api/netatmo/debug')}
             onCopyUrl={() => copyUrlToClipboard('/api/netatmo/debug')}
@@ -202,7 +202,7 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
               },
             ]}
             response={postResponses.setthermmode}
-            loading={loadingPost.setthermmode}
+            loading={loadingPost.setthermmode ?? false}
             timing={timings.setthermmode}
             onExecute={(values) => callPostEndpoint('setthermmode', '/api/netatmo/setthermmode', { mode: values.mode })}
             onCopyUrl={() => copyUrlToClipboard('https://api.netatmo.com/api/setthermmode')}
@@ -217,7 +217,7 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
               { name: 'temp', label: 'Temperature (°C)', type: 'number', min: 7, max: 30, defaultValue: '20' },
             ]}
             response={postResponses.setroomthermpoint}
-            loading={loadingPost.setroomthermpoint}
+            loading={loadingPost.setroomthermpoint ?? false}
             timing={timings.setroomthermpoint}
             onExecute={(values) => callPostEndpoint('setroomthermpoint', '/api/netatmo/setroomthermpoint', { temp: values.temp })}
             onCopyUrl={() => copyUrlToClipboard('https://api.netatmo.com/api/setroomthermpoint')}
@@ -228,7 +228,7 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
             name="Calibrate Valves"
             url="/api/netatmo/calibrate"
             response={postResponses.calibrate}
-            loading={loadingPost.calibrate}
+            loading={loadingPost.calibrate ?? false}
             timing={timings.calibrate}
             onExecute={() => callPostEndpoint('calibrate', '/api/netatmo/calibrate', {})}
             onCopyUrl={() => copyUrlToClipboard('/api/netatmo/calibrate')}

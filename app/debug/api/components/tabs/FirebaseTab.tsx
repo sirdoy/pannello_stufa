@@ -90,7 +90,7 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
             name="Health Check (Firebase Connection)"
             url="/api/health"
             response={getResponses.health}
-            loading={loadingGet.health}
+            loading={loadingGet.health ?? false}
             timing={timings.health}
             onRefresh={() => fetchGetEndpoint('health', '/api/health')}
             onCopyUrl={() => copyUrlToClipboard('/api/health')}
@@ -101,7 +101,7 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
             name="Schedules List"
             url="/api/schedules"
             response={getResponses.schedules}
-            loading={loadingGet.schedules}
+            loading={loadingGet.schedules ?? false}
             timing={timings.schedules}
             onRefresh={() => fetchGetEndpoint('schedules', '/api/schedules')}
             onCopyUrl={() => copyUrlToClipboard('/api/schedules')}
@@ -112,7 +112,7 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
             name="Active Schedule"
             url="/api/schedules/active"
             response={getResponses.schedulesActive}
-            loading={loadingGet.schedulesActive}
+            loading={loadingGet.schedulesActive ?? false}
             timing={timings.schedulesActive}
             onRefresh={() => fetchGetEndpoint('schedulesActive', '/api/schedules/active')}
             onCopyUrl={() => copyUrlToClipboard('/api/schedules/active')}
@@ -123,7 +123,7 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
             name="Location Config"
             url="/api/config/location"
             response={getResponses.locationConfig}
-            loading={loadingGet.locationConfig}
+            loading={loadingGet.locationConfig ?? false}
             timing={timings.locationConfig}
             onRefresh={() => fetchGetEndpoint('locationConfig', '/api/config/location')}
             onCopyUrl={() => copyUrlToClipboard('/api/config/location')}
@@ -134,7 +134,7 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
             name="Dashboard Config"
             url="/api/config/dashboard"
             response={getResponses.dashboardConfig}
-            loading={loadingGet.dashboardConfig}
+            loading={loadingGet.dashboardConfig ?? false}
             timing={timings.dashboardConfig}
             onRefresh={() => fetchGetEndpoint('dashboardConfig', '/api/config/dashboard')}
             onCopyUrl={() => copyUrlToClipboard('/api/config/dashboard')}

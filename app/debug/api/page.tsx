@@ -48,8 +48,9 @@ export default function ApiDebugPage() {
       if (!e.metaKey && !e.ctrlKey && !e.altKey) {
         const tabs: TabValue[] = ['stove', 'netatmo', 'hue', 'weather', 'firebase', 'scheduler'];
         const index = parseInt(e.key) - 1;
-        if (index >= 0 && index < tabs.length) {
-          setActiveTab(tabs[index]);
+        const selectedTab = tabs[index];
+        if (selectedTab) {
+          setActiveTab(selectedTab);
         }
       }
       // A: Toggle auto-refresh

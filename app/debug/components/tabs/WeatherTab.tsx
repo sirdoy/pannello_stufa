@@ -128,7 +128,7 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
             url={forecastUrl || '/api/weather/forecast'}
             externalUrl="https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=auto"
             response={getResponses.forecast}
-            loading={loadingGet.forecast}
+            loading={loadingGet.forecast ?? false}
             timing={timings.forecast}
             onRefresh={() => forecastUrl && fetchGetEndpoint('forecast', forecastUrl)}
             onCopyUrl={() =>

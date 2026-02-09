@@ -85,7 +85,8 @@ export default function DeliveryChart({ data = [], loading = false }: DeliveryCh
   const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     if (!active || !payload || payload.length === 0) return null;
 
-    const data = payload[0].payload;
+    const data = payload[0]?.payload;
+    if (!data) return null;
 
     return (
       <div className="bg-slate-900 [html:not(.dark)_&]:bg-white border border-white/10 [html:not(.dark)_&]:border-black/10 rounded-lg p-3 shadow-xl">

@@ -216,7 +216,7 @@ export default function StoveDebugPage() {
                 endpoint="/api/stove/status"
                 externalUrl={getExternalUrl('/api/stove/status')}
                 response={getResponses.status}
-                loading={loadingGet.status}
+                loading={loadingGet.status ?? false}
                 onRefresh={() => fetchGetEndpoint('status', '/api/stove/status')}
                 onCopyUrl={() => copyUrlToClipboard('/api/stove/status')}
                 isCopied={copiedUrl === '/api/stove/status'}
@@ -228,7 +228,7 @@ export default function StoveDebugPage() {
                 endpoint="/api/stove/getPower"
                 externalUrl={getExternalUrl('/api/stove/getPower')}
                 response={getResponses.power}
-                loading={loadingGet.power}
+                loading={loadingGet.power ?? false}
                 onRefresh={() => fetchGetEndpoint('power', '/api/stove/getPower')}
                 onCopyUrl={() => copyUrlToClipboard('/api/stove/getPower')}
                 isCopied={copiedUrl === '/api/stove/getPower'}
@@ -240,7 +240,7 @@ export default function StoveDebugPage() {
                 endpoint="/api/stove/getFan"
                 externalUrl={getExternalUrl('/api/stove/getFan')}
                 response={getResponses.fan}
-                loading={loadingGet.fan}
+                loading={loadingGet.fan ?? false}
                 onRefresh={() => fetchGetEndpoint('fan', '/api/stove/getFan')}
                 onCopyUrl={() => copyUrlToClipboard('/api/stove/getFan')}
                 isCopied={copiedUrl === '/api/stove/getFan'}
@@ -252,7 +252,7 @@ export default function StoveDebugPage() {
                 endpoint="/api/stove/getRoomTemperature"
                 externalUrl={getExternalUrl('/api/stove/getRoomTemperature')}
                 response={getResponses.roomTemp}
-                loading={loadingGet.roomTemp}
+                loading={loadingGet.roomTemp ?? false}
                 onRefresh={() => fetchGetEndpoint('roomTemp', '/api/stove/getRoomTemperature')}
                 onCopyUrl={() => copyUrlToClipboard('/api/stove/getRoomTemperature')}
                 isCopied={copiedUrl === '/api/stove/getRoomTemperature'}
@@ -264,7 +264,7 @@ export default function StoveDebugPage() {
                 endpoint="/api/stove/settings"
                 externalUrl={getExternalUrl('/api/stove/settings')}
                 response={getResponses.settings}
-                loading={loadingGet.settings}
+                loading={loadingGet.settings ?? false}
                 onRefresh={() => fetchGetEndpoint('settings', '/api/stove/settings')}
                 onCopyUrl={() => copyUrlToClipboard('/api/stove/settings')}
                 isCopied={copiedUrl === '/api/stove/settings'}
@@ -276,7 +276,7 @@ export default function StoveDebugPage() {
                 endpoint="/api/stove/getActualWaterTemperature"
                 externalUrl={getExternalUrl('/api/stove/getActualWaterTemperature')}
                 response={getResponses.actualWaterTemp}
-                loading={loadingGet.actualWaterTemp}
+                loading={loadingGet.actualWaterTemp ?? false}
                 onRefresh={() => fetchGetEndpoint('actualWaterTemp', '/api/stove/getActualWaterTemperature')}
                 onCopyUrl={() => copyUrlToClipboard('/api/stove/getActualWaterTemperature')}
                 isCopied={copiedUrl === '/api/stove/getActualWaterTemperature'}
@@ -288,7 +288,7 @@ export default function StoveDebugPage() {
                 endpoint="/api/stove/getWaterSetTemperature"
                 externalUrl={getExternalUrl('/api/stove/getWaterSetTemperature')}
                 response={getResponses.waterSetTemp}
-                loading={loadingGet.waterSetTemp}
+                loading={loadingGet.waterSetTemp ?? false}
                 onRefresh={() => fetchGetEndpoint('waterSetTemp', '/api/stove/getWaterSetTemperature')}
                 onCopyUrl={() => copyUrlToClipboard('/api/stove/getWaterSetTemperature')}
                 isCopied={copiedUrl === '/api/stove/getWaterSetTemperature'}
@@ -329,7 +329,7 @@ export default function StoveDebugPage() {
                         power: powerInput,
                       })
                     }
-                    loading={loadingPost.ignite}
+                    loading={loadingPost.ignite ?? false}
                   >
                     🔥 Ignite
                   </Button>
@@ -363,7 +363,7 @@ export default function StoveDebugPage() {
                         source: 'manual',
                       })
                     }
-                    loading={loadingPost.shutdown}
+                    loading={loadingPost.shutdown ?? false}
                   >
                     ⏹️ Shutdown
                   </Button>
@@ -411,7 +411,7 @@ export default function StoveDebugPage() {
                         source: 'manual',
                       })
                     }
-                    loading={loadingPost.setPower}
+                    loading={loadingPost.setPower ?? false}
                   >
                     Set Power
                   </Button>
@@ -459,7 +459,7 @@ export default function StoveDebugPage() {
                         source: 'manual',
                       })
                     }
-                    loading={loadingPost.setFan}
+                    loading={loadingPost.setFan ?? false}
                   >
                     Set Fan
                   </Button>
@@ -506,7 +506,7 @@ export default function StoveDebugPage() {
                         temperature: waterTempInput,
                       })
                     }
-                    loading={loadingPost.setWaterTemp}
+                    loading={loadingPost.setWaterTemp ?? false}
                   >
                     Set Water Temp
                   </Button>

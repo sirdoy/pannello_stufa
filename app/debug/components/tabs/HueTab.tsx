@@ -127,7 +127,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             url="/api/hue/status"
             externalUrl="https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource"
             response={getResponses.status}
-            loading={loadingGet.status}
+            loading={loadingGet.status ?? false}
             timing={timings.status}
             onRefresh={() => fetchGetEndpoint('status', '/api/hue/status')}
             onCopyUrl={() => copyUrlToClipboard('https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource')}
@@ -139,7 +139,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             url="/api/hue/lights"
             externalUrl="https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/light"
             response={getResponses.lights}
-            loading={loadingGet.lights}
+            loading={loadingGet.lights ?? false}
             timing={timings.lights}
             onRefresh={() => fetchGetEndpoint('lights', '/api/hue/lights')}
             onCopyUrl={() => copyUrlToClipboard('https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/light')}
@@ -151,7 +151,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             url="/api/hue/rooms"
             externalUrl="https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/room"
             response={getResponses.rooms}
-            loading={loadingGet.rooms}
+            loading={loadingGet.rooms ?? false}
             timing={timings.rooms}
             onRefresh={() => fetchGetEndpoint('rooms', '/api/hue/rooms')}
             onCopyUrl={() => copyUrlToClipboard('https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/room')}
@@ -163,7 +163,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             url="/api/hue/scenes"
             externalUrl="https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/scene"
             response={getResponses.scenes}
-            loading={loadingGet.scenes}
+            loading={loadingGet.scenes ?? false}
             timing={timings.scenes}
             onRefresh={() => fetchGetEndpoint('scenes', '/api/hue/scenes')}
             onCopyUrl={() => copyUrlToClipboard('https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/scene')}
@@ -188,7 +188,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
               { name: 'brightness', label: 'Brightness (0-100)', type: 'number', min: 0, max: 100, defaultValue: '50' },
             ]}
             response={postResponses.controlLight}
-            loading={loadingPost.controlLight}
+            loading={loadingPost.controlLight ?? false}
             timing={timings.controlLight}
             onExecute={(values) =>
               callPostEndpoint('controlLight', `/api/hue/lights/${values.lightId}`, {
@@ -210,7 +210,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
               { name: 'brightness', label: 'Brightness (0-100)', type: 'number', min: 0, max: 100, defaultValue: '50' },
             ]}
             response={postResponses.controlRoom}
-            loading={loadingPost.controlRoom}
+            loading={loadingPost.controlRoom ?? false}
             timing={timings.controlRoom}
             onExecute={(values) =>
               callPostEndpoint('controlRoom', `/api/hue/rooms/${values.roomId}`, {
@@ -228,7 +228,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             externalUrl="https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/scene/{id}"
             params={[{ name: 'sceneId', label: 'Scene ID', type: 'text', defaultValue: '' }]}
             response={postResponses.activateScene}
-            loading={loadingPost.activateScene}
+            loading={loadingPost.activateScene ?? false}
             timing={timings.activateScene}
             onExecute={(values) => callPostEndpoint('activateScene', `/api/hue/scenes/${values.sceneId}/activate`, {})}
             onCopyUrl={() => copyUrlToClipboard('https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/scene/{id}')}

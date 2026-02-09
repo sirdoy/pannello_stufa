@@ -118,7 +118,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
               { name: 'secret', label: 'CRON_SECRET', type: 'text', defaultValue: '' },
             ]}
             response={postResponses.schedulerCheck}
-            loading={loadingPost.schedulerCheck}
+            loading={loadingPost.schedulerCheck ?? false}
             timing={timings.schedulerCheck}
             onExecute={(values) => callPostEndpoint('schedulerCheck', `/api/scheduler/check?secret=${values.secret}`, {})}
             onCopyUrl={() => copyUrlToClipboard('/api/scheduler/check?secret=<CRON_SECRET>')}
@@ -129,7 +129,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
             name="Update Scheduler"
             url="/api/scheduler/update"
             response={postResponses.schedulerUpdate}
-            loading={loadingPost.schedulerUpdate}
+            loading={loadingPost.schedulerUpdate ?? false}
             timing={timings.schedulerUpdate}
             onExecute={() => callPostEndpoint('schedulerUpdate', '/api/scheduler/update', {})}
             onCopyUrl={() => copyUrlToClipboard('/api/scheduler/update')}
@@ -148,7 +148,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
             name="Notification Stats"
             url="/api/notifications/stats"
             response={getResponses.notificationStats}
-            loading={loadingGet.notificationStats}
+            loading={loadingGet.notificationStats ?? false}
             timing={timings.notificationStats}
             onRefresh={() => fetchGetEndpoint('notificationStats', '/api/notifications/stats')}
             onCopyUrl={() => copyUrlToClipboard('/api/notifications/stats')}
@@ -159,7 +159,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
             name="Health Monitoring Stats"
             url="/api/health-monitoring/stats"
             response={getResponses.healthMonitoringStats}
-            loading={loadingGet.healthMonitoringStats}
+            loading={loadingGet.healthMonitoringStats ?? false}
             timing={timings.healthMonitoringStats}
             onRefresh={() => fetchGetEndpoint('healthMonitoringStats', '/api/health-monitoring/stats')}
             onCopyUrl={() => copyUrlToClipboard('/api/health-monitoring/stats')}

@@ -139,7 +139,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
             url="/api/stove/status"
             externalUrl={getExternalUrl('/api/stove/status')}
             response={getResponses.status}
-            loading={loadingGet.status}
+            loading={loadingGet.status ?? false}
             timing={timings.status}
             onRefresh={() => fetchGetEndpoint('status', '/api/stove/status')}
             onCopyUrl={() => copyUrlToClipboard('/api/stove/status')}
@@ -151,7 +151,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
             url="/api/stove/getPower"
             externalUrl={getExternalUrl('/api/stove/getPower')}
             response={getResponses.power}
-            loading={loadingGet.power}
+            loading={loadingGet.power ?? false}
             timing={timings.power}
             onRefresh={() => fetchGetEndpoint('power', '/api/stove/getPower')}
             onCopyUrl={() => copyUrlToClipboard('/api/stove/getPower')}
@@ -163,7 +163,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
             url="/api/stove/getFan"
             externalUrl={getExternalUrl('/api/stove/getFan')}
             response={getResponses.fan}
-            loading={loadingGet.fan}
+            loading={loadingGet.fan ?? false}
             timing={timings.fan}
             onRefresh={() => fetchGetEndpoint('fan', '/api/stove/getFan')}
             onCopyUrl={() => copyUrlToClipboard('/api/stove/getFan')}
@@ -175,7 +175,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
             url="/api/stove/getRoomTemperature"
             externalUrl={getExternalUrl('/api/stove/getRoomTemperature')}
             response={getResponses.roomTemp}
-            loading={loadingGet.roomTemp}
+            loading={loadingGet.roomTemp ?? false}
             timing={timings.roomTemp}
             onRefresh={() => fetchGetEndpoint('roomTemp', '/api/stove/getRoomTemperature')}
             onCopyUrl={() => copyUrlToClipboard('/api/stove/getRoomTemperature')}
@@ -187,7 +187,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
             url="/api/stove/settings"
             externalUrl={getExternalUrl('/api/stove/settings')}
             response={getResponses.settings}
-            loading={loadingGet.settings}
+            loading={loadingGet.settings ?? false}
             timing={timings.settings}
             onRefresh={() => fetchGetEndpoint('settings', '/api/stove/settings')}
             onCopyUrl={() => copyUrlToClipboard('/api/stove/settings')}
@@ -199,7 +199,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
             url="/api/stove/getActualWaterTemperature"
             externalUrl={getExternalUrl('/api/stove/getActualWaterTemperature')}
             response={getResponses.actualWaterTemp}
-            loading={loadingGet.actualWaterTemp}
+            loading={loadingGet.actualWaterTemp ?? false}
             timing={timings.actualWaterTemp}
             onRefresh={() => fetchGetEndpoint('actualWaterTemp', '/api/stove/getActualWaterTemperature')}
             onCopyUrl={() => copyUrlToClipboard('/api/stove/getActualWaterTemperature')}
@@ -211,7 +211,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
             url="/api/stove/getWaterSetTemperature"
             externalUrl={getExternalUrl('/api/stove/getWaterSetTemperature')}
             response={getResponses.waterSetTemp}
-            loading={loadingGet.waterSetTemp}
+            loading={loadingGet.waterSetTemp ?? false}
             timing={timings.waterSetTemp}
             onRefresh={() => fetchGetEndpoint('waterSetTemp', '/api/stove/getWaterSetTemperature')}
             onCopyUrl={() => copyUrlToClipboard('/api/stove/getWaterSetTemperature')}
@@ -234,7 +234,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
               { name: 'power', label: 'Power Level (1-5)', type: 'number', min: 1, max: 5, defaultValue: '3' },
             ]}
             response={postResponses.ignite}
-            loading={loadingPost.ignite}
+            loading={loadingPost.ignite ?? false}
             timing={timings.ignite}
             onExecute={(values) => callPostEndpoint('ignite', '/api/stove/ignite', { source: 'manual', power: values.power })}
             onCopyUrl={() => copyUrlToClipboard('/api/stove/ignite')}
@@ -246,7 +246,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
             url="/api/stove/shutdown"
             externalUrl={getExternalUrl('/api/stove/shutdown')}
             response={postResponses.shutdown}
-            loading={loadingPost.shutdown}
+            loading={loadingPost.shutdown ?? false}
             timing={timings.shutdown}
             onExecute={() => callPostEndpoint('shutdown', '/api/stove/shutdown', { source: 'manual' })}
             onCopyUrl={() => copyUrlToClipboard('/api/stove/shutdown')}
@@ -261,7 +261,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
               { name: 'level', label: 'Level (1-5)', type: 'number', min: 1, max: 5, defaultValue: '3' },
             ]}
             response={postResponses.setPower}
-            loading={loadingPost.setPower}
+            loading={loadingPost.setPower ?? false}
             timing={timings.setPower}
             onExecute={(values) => callPostEndpoint('setPower', '/api/stove/setPower', { level: values.level, source: 'manual' })}
             onCopyUrl={() => copyUrlToClipboard('/api/stove/setPower')}
@@ -276,7 +276,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
               { name: 'level', label: 'Level (1-6)', type: 'number', min: 1, max: 6, defaultValue: '3' },
             ]}
             response={postResponses.setFan}
-            loading={loadingPost.setFan}
+            loading={loadingPost.setFan ?? false}
             timing={timings.setFan}
             onExecute={(values) => callPostEndpoint('setFan', '/api/stove/setFan', { level: values.level, source: 'manual' })}
             onCopyUrl={() => copyUrlToClipboard('/api/stove/setFan')}
@@ -291,7 +291,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
               { name: 'temperature', label: 'Temperature (30-80°C)', type: 'number', min: 30, max: 80, defaultValue: '50' },
             ]}
             response={postResponses.setWaterTemp}
-            loading={loadingPost.setWaterTemp}
+            loading={loadingPost.setWaterTemp ?? false}
             timing={timings.setWaterTemp}
             onExecute={(values) => callPostEndpoint('setWaterTemp', '/api/stove/setWaterTemperature', { temperature: values.temperature })}
             onCopyUrl={() => copyUrlToClipboard('/api/stove/setWaterTemperature')}

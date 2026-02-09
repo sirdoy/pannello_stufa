@@ -155,7 +155,7 @@ export default function NotificationsDashboard() {
       },
     };
 
-    return badges[status] || badges.unknown;
+    return badges[status] ?? badges.unknown!;
   };
 
   /**

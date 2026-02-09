@@ -72,6 +72,8 @@ export default function WeeklyTimeline({ schedule, selectedDay, onSelectDay }: W
                   return (
                     <div
                       key={idx}
+                      role="img"
+                      aria-label={`Intervallo ${interval.start} - ${interval.end}, potenza ${interval.power}, ventola ${interval.fan}`}
                       className="absolute top-0 bottom-0 transition-all duration-200 hover:opacity-90"
                       style={{
                         left: `${left}%`,

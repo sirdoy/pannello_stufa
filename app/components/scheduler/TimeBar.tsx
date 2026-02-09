@@ -70,6 +70,9 @@ export default function TimeBar({
           return (
             <div
               key={idx}
+              role="button"
+              aria-label={`Intervallo ${range.start} - ${range.end}, potenza ${range.power}, ventola ${range.fan}`}
+              tabIndex={0}
               className={`absolute top-0 bottom-0 transition-all duration-200 cursor-pointer ${
                 isActive
                   ? 'bg-gradient-to-r from-primary-500 to-accent-600 scale-y-110 z-10 shadow-lg'
@@ -83,6 +86,16 @@ export default function TimeBar({
                   onIntervalClick(idx, range);
                 } else {
                   onClick(idx);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  if (isMobile && onIntervalClick) {
+                    onIntervalClick(idx, range);
+                  } else {
+                    onClick(idx);
+                  }
                 }
               }}
             />

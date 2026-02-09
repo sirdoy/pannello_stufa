@@ -115,10 +115,17 @@ Plans:
 3. All dynamic property access uses proper type guards or optional chaining
 4. tsc --noEmit shows zero errors in app/ directory (excluding test files)
 
-**Plans**: TBD
+**Plans**: 8 plans
 
 Plans:
-- [ ] 46-01: TBD after phase planning
+- [ ] 46-01-PLAN.md -- Fix 45 strict-mode errors in stove scheduler page
+- [ ] 46-02-PLAN.md -- Fix lights page (24) and stove page (17) strict-mode errors
+- [ ] 46-03-PLAN.md -- Fix scenes, camera, notification history, log, hooks, and single-error pages (33 errors)
+- [ ] 46-04-PLAN.md -- Fix Hue, Netatmo, and Stove API route errors (22 errors)
+- [ ] 46-05-PLAN.md -- Fix scheduler check, notification, geocoding, and health API route errors (23 errors)
+- [ ] 46-06-PLAN.md -- Fix 18 debug tab components and debug pages (40 errors)
+- [ ] 46-07-PLAN.md -- Fix design-system page (20) and CodeBlock (2) strict-mode errors
+- [ ] 46-08-PLAN.md -- Gap sweep and final verification
 
 ---
 

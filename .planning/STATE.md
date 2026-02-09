@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** Phase 46 - API Page Strict Mode Compliance (v5.1 Tech Debt & Code Quality)
+**Current focus:** Phase 47 - Test Strict Mode and Index Access (v5.1 Tech Debt & Code Quality)
 
 ## Current Position
 
-Phase: 46 of 48 (API Page Strict Mode Compliance)
-Plan: 8 of 8 in current phase
-Status: Complete
-Last activity: 2026-02-09 - Completed 46-08-PLAN.md (Gap sweep and final verification: 0 cascade errors, phase 46 complete with 0 tsc errors in app/)
+Phase: 47 of 48 (Test Strict Mode and Index Access)
+Plan: 1 of 8 in current phase
+Status: In Progress
+Last activity: 2026-02-09 - Completed 47-01-PLAN.md (Fixed 108 strict mode errors in 3 high-error test files: coordinationEventLogger, healthLogger, notificationHistoryService)
 
-Progress: [████████████████████████████████████████████░░░░] 99% (234/228 estimated total plans)
+Progress: [████████████████████████████████████████████░░░░] 99% (235/236 estimated total plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 227 plans (v1.0-v5.1)
+- Total plans completed: 228 plans (v1.0-v5.1)
 - Milestones shipped: 7 (v1.0, v2.0, v3.0, v3.1, v3.2, v4.0, v5.0)
 - Average milestone: ~32 plans
-- Current milestone: v5.1 (5 phases planned, phase 44 complete, phase 45 complete, phase 46 complete - 8/8 plans done)
+- Current milestone: v5.1 (5 phases planned, phase 44 complete, phase 45 complete, phase 46 complete, phase 47 in progress - 1/8 plans done)
 
 **Recent Milestone Performance:**
 
@@ -58,6 +58,7 @@ Progress: [███████████████████████
 | Phase 46 P07 | 428s | 2 tasks | 2 files |
 | Phase 46 P08 | 130s | 2 tasks | 0 files |
 | Phase 46 P08 | 130 | 2 tasks | 0 files |
+| Phase 47 P01 | 262 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -115,6 +116,9 @@ Recent decisions from PROJECT.md affecting v5.1 work:
 - [Phase 46-07]: Explicit variant union types for component prop maps (Record<string, 'ember' | 'ocean' | ...>)
 - [Phase 46-08]: Parallel execution of plans 01-07 produced zero cascade effects
 - [Phase 46-08]: Phase 46 complete: 231 tsc errors in app/ resolved to 0 across 8 plans
+- [Phase 47-01]: Mock variables with dynamic properties use `any` type (not jest.Mock to avoid TS2339)
+- [Phase 47-01]: Callback parameters in mockImplementation receive explicit `any` type
+- [Phase 47-01]: Test arrays with intentional empty values receive explicit type annotation
 
 ### Pending Todos
 
@@ -144,9 +148,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-09 13:40
-Stopped at: Completed 46-08-PLAN.md - Phase 46 complete (gap sweep verified 0 cascade errors, all 231 tsc errors resolved)
-Resume file: None — phase 46 complete, ready for phase 47
+Last session: 2026-02-09 14:23
+Stopped at: Completed 47-01-PLAN.md (Fixed 108 strict mode errors in 3 high-error test files)
+Resume file: None — continue with 47-02
 
 ---
 *State initialized: 2026-02-08 for v5.1 Tech Debt & Code Quality milestone*

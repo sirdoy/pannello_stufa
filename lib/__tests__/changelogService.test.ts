@@ -128,9 +128,9 @@ describe('changelogService', () => {
 
       // ASSERT
       expect(result).toHaveLength(3);
-      expect(result[0].version).toBe('1.1.1'); // Most recent
-      expect(result[1].version).toBe('1.1.0');
-      expect(result[2].version).toBe('1.0.0'); // Oldest
+      expect(result[0]!.version).toBe('1.1.1'); // Most recent
+      expect(result[1]!.version).toBe('1.1.0');
+      expect(result[2]!.version).toBe('1.0.0'); // Oldest
     });
 
     test('returns empty array when no changelog exists', async () => {
@@ -184,7 +184,7 @@ describe('changelogService', () => {
 
       // ASSERT
       expect(result).toHaveLength(1);
-      expect(result[0].version).toBe('1.0.0');
+      expect(result[0]!.version).toBe('1.0.0');
     });
   });
 
@@ -362,11 +362,11 @@ describe('changelogService', () => {
       // Check that set was called with correct types
       const calls = mockSet.mock.calls;
       // First version (2.0.0) should be major compared to 1.1.0
-      expect((calls[0][1] as any).type).toBe('major');
+      expect((calls[0]![1] as any).type).toBe('major');
       // Second version (1.1.0) should be minor compared to 1.0.1
-      expect((calls[1][1] as any).type).toBe('minor');
+      expect((calls[1]![1] as any).type).toBe('minor');
       // Third version (1.0.1) should be patch compared to 1.0.0
-      expect((calls[2][1] as any).type).toBe('patch');
+      expect((calls[2]![1] as any).type).toBe('patch');
     });
 
     test('handles single version history', async () => {

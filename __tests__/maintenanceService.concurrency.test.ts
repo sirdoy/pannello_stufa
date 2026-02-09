@@ -172,7 +172,7 @@ describe('maintenanceService - Concurrency Tests', () => {
       expect(mockedFirebase.runTransaction).toHaveBeenCalled();
 
       // Verify the transaction function was called
-      const transactionFn = mockedFirebase.runTransaction.mock.calls[0][1];
+      const transactionFn = mockedFirebase.runTransaction.mock.calls[0]![1];
       const mockData = {
         currentHours: 0,
         targetHours: 50,
@@ -213,7 +213,7 @@ describe('maintenanceService - Concurrency Tests', () => {
       expect(result.tracked).toBe(true);
 
       // Verify the transaction function calculated elapsed time
-      const transactionFn = mockedFirebase.runTransaction.mock.calls[0][1];
+      const transactionFn = mockedFirebase.runTransaction.mock.calls[0]![1];
       const mockData = {
         currentHours: 10.0,
         targetHours: 50,
@@ -252,7 +252,7 @@ describe('maintenanceService - Concurrency Tests', () => {
       const result = await trackUsageHours('WORK');
 
       // Verify the transaction function set needsCleaning
-      const transactionFn = mockedFirebase.runTransaction.mock.calls[0][1];
+      const transactionFn = mockedFirebase.runTransaction.mock.calls[0]![1];
       const mockData = {
         currentHours: 49.98,
         targetHours: 50,
@@ -293,7 +293,7 @@ describe('maintenanceService - Concurrency Tests', () => {
       expect(result.tracked).toBe(true);
 
       // Verify notification data is included
-      const transactionFn = mockedFirebase.runTransaction.mock.calls[0][1];
+      const transactionFn = mockedFirebase.runTransaction.mock.calls[0]![1];
       const mockData = {
         currentHours: 39.9,
         targetHours: 50,

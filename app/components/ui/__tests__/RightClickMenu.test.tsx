@@ -543,11 +543,11 @@ describe('RightClickMenu Component', () => {
       });
 
       const { container } = render(<TestRightClickMenu />);
-      fireContextMenu(screen.getAllByTestId('context-trigger')[1]);
+      fireContextMenu(screen.getAllByTestId('context-trigger')[1]!);
 
       const results = await axe(container);
       expect(results).toHaveNoViolations();
-    });
+    }, 10000); // Increase timeout for axe audit in full suite
   });
 
   describe('Styling', () => {
@@ -598,7 +598,7 @@ describe('RightClickMenu Component', () => {
       expect(screen.getByTestId('icon-view')).toBeInTheDocument();
 
       // Check ordering - icon should be before text in DOM
-      const item = screen.getAllByRole('menuitem')[0];
+      const item = screen.getAllByRole('menuitem')[0]!;
       const icon = item.querySelector('[data-testid="icon-view"]');
       const text = screen.getByText('View Details');
 
@@ -606,7 +606,7 @@ describe('RightClickMenu Component', () => {
       const iconParent = icon!.parentElement;
       const textParent = text.parentElement;
 
-      expect(item.firstElementChild).toBe(iconParent);
+      expect(item!.firstElementChild).toBe(iconParent);
     });
 
     test('separator has correct styling', () => {

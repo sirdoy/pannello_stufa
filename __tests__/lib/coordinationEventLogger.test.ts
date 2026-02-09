@@ -298,7 +298,7 @@ describe('coordinationEventLogger', () => {
 
       const events = await getRecentCoordinationEvents();
 
-      expect(events[0].timestamp).toBe('2026-01-27T14:00:00.000Z');
+      expect(events[0]!.timestamp).toBe('2026-01-27T14:00:00.000Z');
     });
   });
 

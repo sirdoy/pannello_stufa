@@ -78,7 +78,7 @@ describe('errorMonitor', () => {
 
     test('returns known error code info when code is defined', () => {
       // ARRANGE: Temporarily add a known error
-      ERROR_CODES[5] = {
+      (ERROR_CODES as any)[5] = {
         description: 'Test Error',
         severity: ERROR_SEVERITY.CRITICAL,
       };
@@ -114,7 +114,7 @@ describe('errorMonitor', () => {
 
     test('returns true for critical error codes', () => {
       // ARRANGE: Add critical error temporarily
-      ERROR_CODES[10] = {
+      (ERROR_CODES as any)[10] = {
         description: 'Critical Test',
         severity: ERROR_SEVERITY.CRITICAL,
       };
@@ -269,9 +269,9 @@ describe('errorMonitor', () => {
 
       // ASSERT
       expect(result).toHaveLength(3);
-      expect(result[0].id).toBe('error3'); // Newest first (reversed)
-      expect(result[1].id).toBe('error2');
-      expect(result[2].id).toBe('error1');
+      expect(result[0]!.id).toBe('error3'); // Newest first (reversed)
+      expect(result[1]!.id).toBe('error2');
+      expect(result[2]!.id).toBe('error1');
       expect(query).toHaveBeenCalledWith('mock-ref', orderByChild('timestamp'), limitToLast(50));
     });
 
@@ -345,8 +345,8 @@ describe('errorMonitor', () => {
 
       // ASSERT
       expect(result).toHaveLength(2);
-      expect(result[0].id).toBe('error3');
-      expect(result[1].id).toBe('error1');
+      expect(result[0]!.id).toBe('error3');
+      expect(result[1]!.id).toBe('error1');
     });
 
     test('returns empty array when all errors are resolved', async () => {
@@ -536,7 +536,7 @@ describe('errorMonitor', () => {
 
     test('uses critical icon for critical errors', async () => {
       // ARRANGE
-      ERROR_CODES[99] = {
+      (ERROR_CODES as any)[99] = {
         description: 'Critical error',
         severity: ERROR_SEVERITY.CRITICAL,
       };

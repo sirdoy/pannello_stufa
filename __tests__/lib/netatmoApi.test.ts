@@ -135,7 +135,7 @@ describe('netatmoApi', () => {
         modules: ['module-2'],
         // No setpoint property (undefined filtered out)
       });
-      expect(result[1].setpoint).toBeUndefined();
+      expect(result[1]!.setpoint).toBeUndefined();
     });
 
     it('should handle empty homes data', () => {
@@ -196,13 +196,13 @@ describe('netatmoApi', () => {
         bridge: 'bridge-1',
         room_id: 'room-1',
       });
-      expect(result[1]).toEqual({
+      expect(result[1]!).toEqual({
         id: 'module-2',
         name: 'Relay',
         type: 'NRV',
       });
-      expect(result[1].bridge).toBeUndefined();
-      expect(result[1].room_id).toBeUndefined();
+      expect(result[1]!.bridge).toBeUndefined();
+      expect(result[1]!.room_id).toBeUndefined();
     });
 
     it('should handle empty modules', () => {
@@ -411,7 +411,7 @@ describe('netatmoApi', () => {
 
       const result = extractModulesWithStatus(homeStatus as any, topology as any);
 
-      expect(result[0].name).toBe('Valvola Soggiorno');
+      expect(result[0]!.name).toBe('Valvola Soggiorno');
     });
 
     it('should handle empty modules array', () => {

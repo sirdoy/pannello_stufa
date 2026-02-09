@@ -43,20 +43,20 @@ describe('scheduleHelpers', () => {
         zoneType: 1,
         zoneName: 'Night',
       });
-      expect(slots[0].durationPercent).toBeCloseTo((420 / 1440) * 100);
+      expect(slots[0]!.durationPercent).toBeCloseTo((420 / 1440) * 100);
 
       // Second slot: Monday 07:00-22:00 (Comfort)
-      expect(slots[1]).toMatchObject({
+      expect(slots[1]!).toMatchObject({
         day: 0,
         startMinutes: 420,
         endMinutes: 1320,
         zoneType: 0,
         zoneName: 'Comfort',
       });
-      expect(slots[1].durationPercent).toBeCloseTo((900 / 1440) * 100);
+      expect(slots[1]!.durationPercent).toBeCloseTo((900 / 1440) * 100);
 
       // Third slot: Monday 22:00-24:00 (Night, first segment)
-      expect(slots[2]).toMatchObject({
+      expect(slots[2]!).toMatchObject({
         day: 0,
         startMinutes: 1320,
         endMinutes: 1440,
@@ -84,9 +84,9 @@ describe('scheduleHelpers', () => {
 
       const slots = parseTimelineSlots(schedule);
 
-      expect(slots[0].day).toBe(0); // Monday
-      expect(slots[1].day).toBe(1); // Tuesday
-      expect(slots[2].day).toBe(2); // Wednesday
+      expect(slots[0]!.day).toBe(0); // Monday
+      expect(slots[1]!.day).toBe(1); // Tuesday
+      expect(slots[2]!.day).toBe(2); // Wednesday
     });
 
     it('should handle slots spanning multiple days', () => {
@@ -102,9 +102,9 @@ describe('scheduleHelpers', () => {
 
       // Should split into: Mon 20:00-24:00, Tue 00:00-24:00, Wed 00:00-02:00
       expect(slots.length).toBeGreaterThanOrEqual(3);
-      expect(slots[0].day).toBe(0); // Monday
-      expect(slots[0].startMinutes).toBe(1200);
-      expect(slots[0].endMinutes).toBe(1440);
+      expect(slots[0]!.day).toBe(0); // Monday
+      expect(slots[0]!.startMinutes).toBe(1200);
+      expect(slots[0]!.endMinutes).toBe(1440);
     });
 
     it('should return empty array for invalid input', () => {
@@ -126,7 +126,7 @@ describe('scheduleHelpers', () => {
       const slots = parseTimelineSlots(schedule);
 
       expect(slots).toHaveLength(1);
-      expect(slots[0].zoneName).toBe('Comfort');
+      expect(slots[0]!.zoneName).toBe('Comfort');
     });
 
     it('should include all zone types including Away', () => {

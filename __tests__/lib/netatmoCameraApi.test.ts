@@ -41,14 +41,14 @@ describe('netatmoCameraApi', () => {
       const result = parseCameras(input);
 
       expect(result).toHaveLength(1);
-      expect(result[0].id).toBe('cam1');
-      expect(result[0].name).toBe('Test Camera');
-      expect(result[0].type).toBe('NACamera');
-      expect(result[0].status).toBe('on');
-      expect(result[0].vpn_url).toBe('https://vpn.test.com');
-      expect(result[0].is_local).toBe(true);
-      expect(result[0].local_url).toBe('http://192.168.1.10');
-      expect(result[0].sd_status).toBe('on');
+      expect(result[0]!.id).toBe('cam1');
+      expect(result[0]!.name).toBe('Test Camera');
+      expect(result[0]!.type).toBe('NACamera');
+      expect(result[0]!.status).toBe('on');
+      expect(result[0]!.vpn_url).toBe('https://vpn.test.com');
+      expect(result[0]!.is_local).toBe(true);
+      expect(result[0]!.local_url).toBe('http://192.168.1.10');
+      expect(result[0]!.sd_status).toBe('on');
     });
 
     it('should filter out undefined optional properties', () => {
@@ -84,7 +84,7 @@ describe('netatmoCameraApi', () => {
 
       const result = parseCameras(input);
 
-      expect(result[0].light_mode_status).toBe('auto');
+      expect(result[0]!.light_mode_status).toBe('auto');
     });
   });
 
@@ -112,11 +112,11 @@ describe('netatmoCameraApi', () => {
       const result = parsePersons(input);
 
       expect(result).toHaveLength(1);
-      expect(result[0].id).toBe('person1');
-      expect(result[0].name).toBe('John');
-      expect(result[0].last_seen).toBe(1704067200);
-      expect(result[0].out_of_sight).toBe(false);
-      expect(result[0].face).toEqual({ id: 'face1', key: 'abc123' });
+      expect(result[0]!.id).toBe('person1');
+      expect(result[0]!.name).toBe('John');
+      expect(result[0]!.last_seen).toBe(1704067200);
+      expect(result[0]!.out_of_sight).toBe(false);
+      expect(result[0]!.face).toEqual({ id: 'face1', key: 'abc123' });
     });
 
     it('should handle person without pseudo', () => {
@@ -130,7 +130,7 @@ describe('netatmoCameraApi', () => {
 
       const result = parsePersons(input);
 
-      expect(result[0].name).toBe('Sconosciuto');
+      expect(result[0]!.name).toBe('Sconosciuto');
     });
   });
 
@@ -158,14 +158,14 @@ describe('netatmoCameraApi', () => {
       const result = parseEvents(input);
 
       expect(result).toHaveLength(1);
-      expect(result[0].id).toBe('event1');
-      expect(result[0].type).toBe('person');
-      expect(result[0].time).toBe(1704067200);
-      expect(result[0].camera_id).toBe('cam1');
-      expect(result[0].person_id).toBe('person1');
-      expect(result[0].snapshot).toEqual({ id: 'snap1', key: 'snapkey1' });
-      expect(result[0].video_id).toBe('video1');
-      expect(result[0].video_status).toBe('available');
+      expect(result[0]!.id).toBe('event1');
+      expect(result[0]!.type).toBe('person');
+      expect(result[0]!.time).toBe(1704067200);
+      expect(result[0]!.camera_id).toBe('cam1');
+      expect(result[0]!.person_id).toBe('person1');
+      expect(result[0]!.snapshot).toEqual({ id: 'snap1', key: 'snapkey1' });
+      expect(result[0]!.video_id).toBe('video1');
+      expect(result[0]!.video_status).toBe('available');
     });
 
     it('should filter out undefined optional properties', () => {
@@ -178,9 +178,9 @@ describe('netatmoCameraApi', () => {
 
       const result = parseEvents(input);
 
-      expect(result[0]).not.toHaveProperty('person_id');
-      expect(result[0]).not.toHaveProperty('snapshot');
-      expect(result[0]).not.toHaveProperty('video_id');
+      expect(result[0]!).not.toHaveProperty('person_id');
+      expect(result[0]!).not.toHaveProperty('snapshot');
+      expect(result[0]!).not.toHaveProperty('video_id');
     });
   });
 

@@ -829,7 +829,7 @@ describe('DataTable', () => {
       );
 
       const rows = screen.getAllByRole('row').slice(1);
-      const firstDataRow = rows[0];
+      const firstDataRow = rows[0]!;
 
       // Focus and press Space
       firstDataRow.focus();
@@ -846,7 +846,7 @@ describe('DataTable', () => {
       );
 
       const rows = screen.getAllByRole('row').slice(1);
-      const firstDataRow = rows[0];
+      const firstDataRow = rows[0]!;
 
       // Focus first row and expand it
       firstDataRow.focus();

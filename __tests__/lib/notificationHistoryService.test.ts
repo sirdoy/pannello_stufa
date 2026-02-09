@@ -180,7 +180,7 @@ describe('notificationHistoryService', () => {
         successCount: 2,
         failureCount: 0,
       });
-      expect(result.notifications[0].timestamp).toBe(mockTimestamp.toDate().toISOString());
+      expect(result.notifications[0]!.timestamp).toBe(mockTimestamp.toDate().toISOString());
     });
 
     it('should indicate hasMore when results exceed limit', async () => {

@@ -67,7 +67,7 @@ describe('useReducedMotion', () => {
 
       // Simulate user enabling reduced motion
       act(() => {
-        listeners[0]({ matches: false });
+        listeners[0]!({ matches: false });
       });
       expect(result.current).toBe(true);
     });
@@ -79,7 +79,7 @@ describe('useReducedMotion', () => {
 
       // Simulate user disabling reduced motion
       act(() => {
-        listeners[0]({ matches: true });
+        listeners[0]!({ matches: true });
       });
       expect(result.current).toBe(false);
     });

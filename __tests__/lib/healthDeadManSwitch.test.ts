@@ -46,7 +46,7 @@ describe('healthDeadManSwitch', () => {
       );
 
       // Verify timestamp format (ISO 8601)
-      const timestamp = mockedAdminDbSet.mock.calls[0][1];
+      const timestamp = mockedAdminDbSet.mock.calls[0]![1];
       expect(timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
 

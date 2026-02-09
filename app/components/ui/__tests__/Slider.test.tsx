@@ -435,8 +435,8 @@ describe('Slider Component', () => {
       );
 
       const sliders = screen.getAllByRole('slider');
-      sliders[0].focus();
-      fireEvent.keyDown(sliders[0], { key: 'ArrowRight' });
+      sliders[0]!.focus();
+      fireEvent.keyDown(sliders[0]!, { key: 'ArrowRight' });
 
       expect(handleChange).toHaveBeenCalledWith([21, 80]);
     });

@@ -44,6 +44,7 @@ Progress: [███████████████████████
 | Phase 44 P06 | 11s | 2 tasks | 8 files |
 | Phase 44 P07 | 663s | 2 tasks | 14 files |
 | Phase 45 P02 | 506s | 2 tasks | 6 files |
+| Phase 45 P04 | 644s | 2 tasks | 6 files |
 | Phase 45 P06 | 505s | 2 tasks | 2 files |
 | Phase 45 P07 | 639s | 2 tasks | 18 files |
 
@@ -71,6 +72,9 @@ Recent decisions from PROJECT.md affecting v5.1 work:
 - [Phase 44-07]: Non-null assertions (!) in tests for data known to exist
 - [Phase 45]: Use error instanceof Error checks for catch blocks in device components
 - [Phase 45]: WebGL context null checks: single guard in each function eliminates cascading errors
+- [Phase 45-04]: @ts-expect-error for useNotificationPreferences hook (no type definitions available)
+- [Phase 45-04]: Record<string, T> pattern for dynamic preference and room type access
+- [Phase 45-04]: Match Select component onChange signature with { target: { value: string | number } }
 
 ### Pending Todos
 

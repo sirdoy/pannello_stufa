@@ -18,7 +18,37 @@
  * - DND last: More complex (per-device timezone checks)
  */
 
-import { checkRateLimit } from './rateLimiter';
+import { checkRateLimit, RateLimitConfig } from './rateLimiter';
+
+/**
+ * FCM Token with device info
+ */
+interface TokenWithDevice {
+  token: string;
+  deviceId: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Notification preferences structure
+ */
+interface NotificationPreferences {
+  enabledTypes?: Record<string, boolean>;
+  rateLimits?: Record<string, unknown>;
+  dndWindows?: DndWindow[];
+  timezone?: string;
+  [key: string]: unknown;
+}
+
+/**
+ * DND Window configuration
+ */
+interface DndWindow {
+  enabled: boolean;
+  deviceId?: string;
+  startTime: string;
+  endTime: string;
+}
 
 /**
  * Filter notification based on user preferences
@@ -34,7 +64,12 @@ import { checkRateLimit } from './rateLimiter';
  *   - reason: string - Why filtered (if not allowed)
  *   - stats: Object - Filter statistics
  */
-export function filterNotificationByPreferences(userId, notifType, preferences, tokens) {
+export function filterNotificationByPreferences(
+  userId: string,
+  notifType: string,
+  preferences: NotificationPreferences,
+  tokens: TokenWithDevice[]
+) {
   // Safety check
   if (!userId || !notifType || !tokens || tokens.length === 0) {
     return {
@@ -71,7 +106,7 @@ export function filterNotificationByPreferences(userId, notifType, preferences, 
 
   // STAGE 2: Rate limit check
   // Check if this notification type is being sent too frequently
-  const userRateLimits = preferences?.rateLimits?.[notifType]; // User custom limits
+  const userRateLimits = preferences?.rateLimits?.[notifType] as RateLimitConfig | undefined; // User custom limits
   const rateLimitResult = checkRateLimit(userId, notifType, userRateLimits);
 
   if (!rateLimitResult.allowed) {
@@ -142,11 +177,16 @@ export function filterNotificationByPreferences(userId, notifType, preferences, 
  * @param {Array<Object>} tokens - FCM tokens with device info
  * @returns {Array<string>} Filtered FCM tokens (only devices not in DND)
  */
-function filterTokensByDND(userId, notifType, preferences, tokens) {
+function filterTokensByDND(
+  userId: string,
+  notifType: string,
+  preferences: NotificationPreferences,
+  tokens: TokenWithDevice[]
+): string[] {
   // CRITICAL notifications bypass DND (per CONTEXT.md)
   if (notifType === 'CRITICAL') {
     console.log(`🚨 CRITICAL notification bypasses DND for ${userId}`);
-    return tokens.map(t => t.token);
+    return tokens.map((t: TokenWithDevice) => t.token);
   }
 
   // Get DND windows from preferences
@@ -154,7 +194,7 @@ function filterTokensByDND(userId, notifType, preferences, tokens) {
 
   // If no DND windows configured, allow all tokens
   if (dndWindows.length === 0) {
-    return tokens.map(t => t.token);
+    return tokens.map((t: TokenWithDevice) => t.token);
   }
 
   const now = new Date();
@@ -185,10 +225,10 @@ function filterTokensByDND(userId, notifType, preferences, tokens) {
  * @param {string} timezone - User's timezone (e.g., 'Europe/Rome')
  * @returns {boolean} True if device is in DND
  */
-function isDeviceInDND(deviceId, dndWindows, now, timezone) {
+function isDeviceInDND(deviceId: string, dndWindows: DndWindow[], now: Date, timezone?: string): boolean {
   // Filter to windows for this device (or global windows without deviceId)
   const relevantWindows = dndWindows.filter(
-    w => w.enabled && (!w.deviceId || w.deviceId === deviceId)
+    (w: DndWindow) => w.enabled && (!w.deviceId || w.deviceId === deviceId)
   );
 
   if (relevantWindows.length === 0) {
@@ -225,9 +265,9 @@ function isDeviceInDND(deviceId, dndWindows, now, timezone) {
  * @param {string} endTime - Window end in HH:mm format
  * @returns {boolean} True if current time is in window
  */
-function isTimeInWindow(currentTime, startTime, endTime) {
+function isTimeInWindow(currentTime: string, startTime: string, endTime: string): boolean {
   // Convert HH:mm to minutes since midnight for comparison
-  const toMinutes = (time) => {
+  const toMinutes = (time: string): number => {
     const [hours, minutes] = time.split(':').map(Number);
     return hours * 60 + minutes;
   };
@@ -253,8 +293,8 @@ function isTimeInWindow(currentTime, startTime, endTime) {
  * @param {string} reason - Filter reason code
  * @returns {string} Human-readable message
  */
-export function getFilterMessage(reason) {
-  const messages = {
+export function getFilterMessage(reason: string): string {
+  const messages: Record<string, string> = {
     invalid_input: 'Invalid filter input (missing userId, type, or tokens)',
     type_disabled: 'Notification type disabled by user preferences',
     rate_limited: 'Rate limit exceeded, notification suppressed',

@@ -90,8 +90,8 @@ const LEGACY_TYPE_MAPPING = {
  * @param {string} legacyTypeId - Old notification type ID
  * @returns {string} New type name for Phase 3 schema
  */
-function getNewTypeName(legacyTypeId) {
-  return LEGACY_TYPE_MAPPING[legacyTypeId] || legacyTypeId;
+function getNewTypeName(legacyTypeId: string): string {
+  return LEGACY_TYPE_MAPPING[legacyTypeId as keyof typeof LEGACY_TYPE_MAPPING] || legacyTypeId;
 }
 
 /**
@@ -170,7 +170,7 @@ export async function triggerNotificationServer(
 ) {
   try {
     // Get notification type
-    const notificationType = NOTIFICATION_TYPES[typeId];
+    const notificationType = NOTIFICATION_TYPES[typeId as keyof typeof NOTIFICATION_TYPES];
 
     if (!notificationType) {
       console.warn(`Unknown notification type: ${typeId}`);
@@ -211,14 +211,21 @@ export async function triggerNotificationServer(
     // Map legacy type ID to new type name for filtering
     const newTypeName = getNewTypeName(typeId);
 
+    // Convert all data values to strings for NotificationPayload
+    const dataEntries = Object.entries(payload.data);
+    const stringData: Record<string, string> = {};
+    for (const [key, value] of dataEntries) {
+      stringData[key] = String(value);
+    }
+
     // Prepare notification for sending
     const notification = {
       title: payload.notification.title,
       body: payload.notification.body,
       icon: payload.notification.icon,
-      priority: payload.data.priority,
+      priority: payload.data.priority as 'high' | 'normal',
       data: {
-        ...payload.data,
+        ...stringData,
         // Override type with new type name for Phase 3 filtering
         type: newTypeName,
         // Keep legacy typeId for backward compatibility
@@ -241,11 +248,12 @@ export async function triggerNotificationServer(
       failureCount,
     };
 
-  } catch (error) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error(`[Notification] Error triggering ${typeId}:`, error);
     return {
       success: false,
-      error: error.message,
+      error: errorMessage,
     };
   }
 }
@@ -259,7 +267,11 @@ export async function triggerNotificationServer(
  * @param {Object} data - Dynamic data
  * @param {Object} options - Additional options
  */
-export async function triggerNotificationToAdmin(typeId, data = {}, options = {}) {
+export async function triggerNotificationToAdmin(
+  typeId: string,
+  data: Record<string, unknown> = {},
+  options: TriggerNotificationOptions = {}
+) {
   const adminUserId = process.env.ADMIN_USER_ID;
 
   if (!adminUserId) {
@@ -282,7 +294,7 @@ export async function triggerNotificationToAdmin(typeId, data = {}, options = {}
  * @param {string} userId - User ID
  * @param {Object} data - { message }
  */
-export async function triggerStoveStatusWorkServer(userId, data = {}) {
+export async function triggerStoveStatusWorkServer(userId: string, data: Record<string, unknown> = {}) {
   return triggerNotificationServer(userId, 'stove_status_work', data);
 }
 
@@ -291,7 +303,7 @@ export async function triggerStoveStatusWorkServer(userId, data = {}) {
  * @param {string} userId - User ID
  * @param {Object} data - { message, schedulerName }
  */
-export async function triggerStoveUnexpectedOffServer(userId, data = {}) {
+export async function triggerStoveUnexpectedOffServer(userId: string, data: Record<string, unknown> = {}) {
   return triggerNotificationServer(userId, 'stove_unexpected_off', data);
 }
 
@@ -301,7 +313,7 @@ export async function triggerStoveUnexpectedOffServer(userId, data = {}) {
  * @param {string} severity - 'info' | 'warning' | 'error' | 'critical'
  * @param {Object} data - { errorCode, description, message }
  */
-export async function triggerStoveErrorServer(userId, severity, data) {
+export async function triggerStoveErrorServer(userId: string, severity: string, data: Record<string, unknown>) {
   const typeId = `stove_error_${severity.toLowerCase()}`;
   return triggerNotificationServer(userId, typeId, data);
 }
@@ -312,7 +324,7 @@ export async function triggerStoveErrorServer(userId, severity, data) {
  * @param {string} action - 'ignition' | 'shutdown'
  * @param {Object} data - { message }
  */
-export async function triggerSchedulerActionServer(userId, action, data = {}) {
+export async function triggerSchedulerActionServer(userId: string, action: string, data: Record<string, unknown> = {}) {
   const typeId = `scheduler_${action.toLowerCase()}`;
   return triggerNotificationServer(userId, typeId, data);
 }
@@ -323,7 +335,7 @@ export async function triggerSchedulerActionServer(userId, action, data = {}) {
  * @param {number} threshold - 80 | 90 | 100
  * @param {Object} data - { remainingHours, message }
  */
-export async function triggerMaintenanceAlertServer(userId, threshold, data = {}) {
+export async function triggerMaintenanceAlertServer(userId: string, threshold: number, data: Record<string, unknown> = {}) {
   const typeId = `maintenance_${threshold}`;
   return triggerNotificationServer(userId, typeId, data);
 }
@@ -334,7 +346,7 @@ export async function triggerMaintenanceAlertServer(userId, threshold, data = {}
  * @param {string} type - 'temperature_low' | 'temperature_high' | 'setpoint_reached' | 'connection_lost'
  * @param {Object} data - { temperature, room, setpoint, message }
  */
-export async function triggerNetatmoAlertServer(userId, type, data = {}) {
+export async function triggerNetatmoAlertServer(userId: string, type: string, data: Record<string, unknown> = {}) {
   const typeId = `netatmo_${type}`;
   return triggerNotificationServer(userId, typeId, data);
 }
@@ -345,7 +357,7 @@ export async function triggerNetatmoAlertServer(userId, type, data = {}) {
  * @param {string} type - 'scene_activated' | 'connection_lost'
  * @param {Object} data - { sceneName, message }
  */
-export async function triggerHueAlertServer(userId, type, data = {}) {
+export async function triggerHueAlertServer(userId: string, type: string, data: Record<string, unknown> = {}) {
   const typeId = `hue_${type}`;
   return triggerNotificationServer(userId, typeId, data);
 }
@@ -356,7 +368,7 @@ export async function triggerHueAlertServer(userId, type, data = {}) {
  * @param {string} type - 'update' | 'offline_commands_synced'
  * @param {Object} data - { version, count, message }
  */
-export async function triggerSystemNotificationServer(userId, type, data = {}) {
+export async function triggerSystemNotificationServer(userId: string, type: string, data: Record<string, unknown> = {}) {
   const typeId = `system_${type}`;
   return triggerNotificationServer(userId, typeId, data);
 }
@@ -368,7 +380,7 @@ export async function triggerSystemNotificationServer(userId, type, data = {}) {
  * @param {string} body - Notification body
  * @param {Object} options - { url, priority }
  */
-export async function triggerGenericNotificationServer(userId, title, body, options = {}) {
+export async function triggerGenericNotificationServer(userId: string, title: string, body: string, options: Record<string, unknown> = {}) {
   return triggerNotificationServer(userId, 'generic', {
     title,
     body,
@@ -382,7 +394,7 @@ export async function triggerGenericNotificationServer(userId, title, body, opti
  * @param {string} alertType - 'connection_lost' | 'state_mismatch' | 'stove_error'
  * @param {Object} data - Alert data (expected, actual, errorCode, errorDescription, message)
  */
-export async function triggerHealthMonitoringAlertServer(userId, alertType, data = {}) {
+export async function triggerHealthMonitoringAlertServer(userId: string, alertType: string, data: Record<string, unknown> = {}) {
   const typeId = `monitoring_${alertType}`;
   return triggerNotificationServer(userId, typeId, data);
 }

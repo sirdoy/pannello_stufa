@@ -18,10 +18,6 @@ import { adminDbGet, adminDbUpdate, adminDbRemove } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
-interface RouteContext {
-  params: Promise<{ tokenKey: string }>;
-}
-
 interface UpdateDeviceBody {
   displayName: string;
 }
@@ -41,7 +37,7 @@ interface UpdateDeviceBody {
  * - 400: displayName validation error
  * - 404: Device not found or unauthorized
  */
-export const PATCH = withAuthAndErrorHandler(async (request, context: RouteContext, session) => {
+export const PATCH = withAuthAndErrorHandler(async (request, context, session) => {
   const userId = session.user.sub;
   const { tokenKey } = await context.params;
   const body = await parseJsonOrThrow(request) as UpdateDeviceBody;
@@ -90,7 +86,7 @@ export const PATCH = withAuthAndErrorHandler(async (request, context: RouteConte
  * - 200: { message, tokenKey }
  * - 404: Device not found or unauthorized
  */
-export const DELETE = withAuthAndErrorHandler(async (request, context: RouteContext, session) => {
+export const DELETE = withAuthAndErrorHandler(async (request, context, session) => {
   const userId = session.user.sub;
   const { tokenKey } = await context.params;
 

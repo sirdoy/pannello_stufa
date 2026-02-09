@@ -99,7 +99,7 @@ export async function POST(request: Request): Promise<Response> {
           title: 'Delivery Rate Alert',
           body: `Notification delivery rate dropped to ${deliveryRate.toFixed(1)}% (threshold: ${RATE_THRESHOLD}%). Check dashboard for details.`,
           icon: '/icons/icon-192.png',
-          priority: 'high',
+          priority: 'high' as const,
           data: {
             type: 'system_alert',
             url: '/debug/notifications',

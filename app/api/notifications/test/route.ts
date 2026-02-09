@@ -90,7 +90,7 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
   const { deviceToken, template, customTitle, customBody, broadcast, priority } = body;
 
   // Build notification from template or custom values
-  let notificationConfig;
+  let notificationConfig: NotificationTemplate;
 
   if (template && TEMPLATES[template]) {
     // Use template values
@@ -106,8 +106,10 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
   }
 
   // Custom title/body override template
-  // Priority from request overrides template
-  const finalPriority = priority || notificationConfig.priority;
+  // Priority from request overrides template (map 'low' to 'normal' for NotificationPayload compatibility)
+  const finalPriority: 'high' | 'normal' = priority
+    ? (priority === 'low' ? 'normal' : priority)
+    : notificationConfig.priority === 'low' ? 'normal' : notificationConfig.priority;
 
   const notification = {
     title: customTitle || notificationConfig.title,
@@ -116,10 +118,10 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
     priority: finalPriority,
     data: {
       type: notificationConfig.type,
-      priority: finalPriority, // Include in data for filtering
+      priority: finalPriority,
       url: '/settings/notifications',
       timestamp: sentAt,
-      isTest: true // Mark as test notification for history filtering
+      isTest: 'true' // Must be string to match NotificationPayload type
     },
   };
 
@@ -153,8 +155,8 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
   // Extract errors if any
   if (result.failureCount > 0 && result.responses) {
     trace.deliveryResults.errors = result.responses
-      .filter(r => !r.success)
-      .map(r => ({
+      .filter((r: any) => !r.success)
+      .map((r: any) => ({
         tokenPrefix: r.error?.message?.substring(0, 20) || 'unknown',
         errorCode: r.error?.code || 'unknown'
       }));

@@ -74,8 +74,14 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
   validateRequired(notification?.title, 'notification.title');
   validateRequired(notification?.body, 'notification.body');
 
-  // Send notification
-  const result = await sendNotificationToUser(userId, notification);
+  // Send notification - convert data values to strings if present
+  const notificationPayload = {
+    ...notification,
+    data: notification.data
+      ? Object.fromEntries(Object.entries(notification.data).map(([k, v]) => [k, String(v)]))
+      : undefined
+  };
+  const result = await sendNotificationToUser(userId, notificationPayload);
 
   if (result.success) {
     return success({

@@ -53,6 +53,8 @@ async function fetchWithRetry(url: string, retries = 3): Promise<Response> {
       throw error;
     }
   }
+  // TypeScript requires explicit return (though loop always returns or throws)
+  throw new Error('Fetch failed after retries');
 }
 
 /**

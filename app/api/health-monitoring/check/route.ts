@@ -147,7 +147,7 @@ export const GET = withCronSecret(async (request) => {
   const successCount = results.filter(r => r.status === 'fulfilled').length;
   const failureCount = results.filter(r => r.status === 'rejected').length;
   const mismatches = results
-    .filter((r): r is PromiseFulfilledResult<any> => r.status === 'fulfilled' && r.value?.stateMismatch?.detected)
+    .filter((r): r is PromiseFulfilledResult<any> => r.status === 'fulfilled' && (r.value?.stateMismatch?.detected ?? false))
     .map(r => ({
       userId: r.value.userId,
       expected: r.value.stateMismatch.expected,

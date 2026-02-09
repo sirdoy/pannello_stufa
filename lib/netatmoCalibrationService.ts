@@ -178,6 +178,4 @@ export async function calibrateValvesServer(): Promise<CalibrationResult> {
   };
 }
 
-export default {
-  calibrateValvesServer,
-};
+// Note: calibrateValvesServer is the only export from this module (already exported inline above)

@@ -304,11 +304,5 @@ export function getFilterMessage(reason: string): string {
   return messages[reason] || `Unknown filter reason: ${reason}`;
 }
 
-/**
- * Export internals for testing
- */
-export const _internals = {
-  filterTokensByDND,
-  isDeviceInDND,
-  isTimeInWindow,
-};
+// Note: _internals removed - not used in tests (checked notificationFilter.test.ts)
+// If needed for testing, use module mocking instead

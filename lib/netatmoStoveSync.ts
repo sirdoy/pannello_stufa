@@ -719,8 +719,9 @@ export async function getAvailableRoomsForSync() {
 
 /**
  * Get list of room IDs currently configured for stove sync
+ * Used internally only
  */
-export async function getSyncedRoomIds() {
+async function getSyncedRoomIds() {
   const config = await getStoveSyncConfig();
   if (!config.enabled || !config.rooms) {
     return [];
@@ -728,15 +729,4 @@ export async function getSyncedRoomIds() {
   return config.rooms.map(r => r.id);
 }
 
-export default {
-  getStoveSyncConfig,
-  enableStoveSync,
-  disableStoveSync,
-  syncLivingRoomWithStove,
-  enforceStoveSyncSetpoints,
-  checkStoveSyncOnStatusChange,
-  getAvailableRoomsForSync,
-  getSyncedRoomIds,
-  setRoomsToBoostMode,
-  restoreRoomSetpoints,
-};
+// Note: Functions are exported inline above. getSyncedRoomIds removed (not exported, used internally only).

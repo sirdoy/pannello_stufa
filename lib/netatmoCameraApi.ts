@@ -615,21 +615,12 @@ const NETATMO_CAMERA_API = {
 
 export default NETATMO_CAMERA_API;
 export {
-  getCamerasData,
-  getCameraEvents,
-  getEventsUntil,
   parseCameras,
   parsePersons,
   parseEvents,
   getSnapshotUrl,
-  getLiveStreamUrl,
   getEventSnapshotUrl,
-  getEventVideoUrl,
-  getEventVideoThumbnail,
-  getEventVideoDownloadUrl,
   getCameraTypeName,
   getEventTypeName,
   getEventIcon,
-  getSubTypeName,
-  getSubTypeIcon,
 };

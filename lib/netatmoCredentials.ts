@@ -20,7 +20,7 @@
  * @see https://dev.netatmo.com/apidocumentation/energy
  * @see https://dev.netatmo.com/apidocumentation/security
  */
-export const NETATMO_OAUTH_SCOPES = 'read_thermostat write_thermostat read_camera access_camera';
+const NETATMO_OAUTH_SCOPES = 'read_thermostat write_thermostat read_camera access_camera';
 
 /** Netatmo OAuth credentials (server-side) */
 export interface NetatmoCredentials {

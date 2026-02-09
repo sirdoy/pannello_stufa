@@ -371,23 +371,8 @@ export const NOTIFICATION_CATEGORIES = {
   },
 };
 
-/**
- * Get notification type by ID
- * @param {string} typeId - Type ID
- * @returns {Object|null}
- */
-export function getNotificationType(typeId: string) {
-  return NOTIFICATION_TYPES[typeId as keyof typeof NOTIFICATION_TYPES] || null;
-}
-
-/**
- * Get all notification types for a category
- * @param {string} categoryId - Category ID
- * @returns {Object[]}
- */
-export function getNotificationTypesByCategory(categoryId: string) {
-  return Object.values(NOTIFICATION_TYPES).filter(t => t.category === categoryId);
-}
+// Removed unused functions: getNotificationType, getNotificationTypesByCategory
+// These were not used in the codebase
 
 /**
  * Notification payload data
@@ -454,109 +439,6 @@ export function buildNotificationPayload(typeId: string, data: NotificationPaylo
   };
 }
 
-/**
- * Trigger notification (client-side)
- *
- * Invia una notifica all'utente corrente tramite API.
- * Le preferenze vengono verificate server-side.
- *
- * @param {string} typeId - Notification type ID (from NOTIFICATION_TYPES)
- * @param {Object} data - Dynamic data for the notification
- * @returns {Promise<Object>} Result with success/error
- */
-export async function triggerNotification(typeId: string, data: Record<string, unknown> = {}) {
-  try {
-    const response = await fetch('/api/notifications/trigger', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        typeId,
-        data,
-      }),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.error || 'Failed to trigger notification');
-    }
-
-    return result;
-
-  } catch (error: unknown) {
-    console.error('Error triggering notification:', error);
-    throw error;
-  }
-}
-
-/**
- * Helper: Trigger stove status work notification
- * @param {Object} data - { message }
- */
-export async function triggerStoveStatusWork(data: Record<string, unknown> = {}) {
-  return triggerNotification('stove_status_work', data);
-}
-
-/**
- * Helper: Trigger stove unexpected off notification
- * @param {Object} data - { message, schedulerName }
- */
-export async function triggerStoveUnexpectedOff(data: Record<string, unknown> = {}) {
-  return triggerNotification('stove_unexpected_off', data);
-}
-
-/**
- * Helper: Trigger stove error notification
- * @param {string} severity - 'info' | 'warning' | 'error' | 'critical'
- * @param {Object} data - { errorCode, description, message }
- */
-export async function triggerStoveError(severity: string, data: Record<string, unknown>) {
-  const typeId = `stove_error_${severity.toLowerCase()}`;
-  return triggerNotification(typeId, data);
-}
-
-/**
- * Helper: Trigger scheduler notification
- * @param {string} action - 'ignition' | 'shutdown'
- * @param {Object} data - { message }
- */
-export async function triggerSchedulerAction(action: string, data: Record<string, unknown> = {}) {
-  const typeId = `scheduler_${action.toLowerCase()}`;
-  return triggerNotification(typeId, data);
-}
-
-/**
- * Helper: Trigger maintenance notification
- * @param {number} threshold - 80 | 90 | 100
- * @param {Object} data - { remainingHours, message }
- */
-export async function triggerMaintenanceAlert(threshold: number, data: Record<string, unknown> = {}) {
-  const typeId = `maintenance_${threshold}`;
-  return triggerNotification(typeId, data);
-}
-
-/**
- * Helper: Trigger Netatmo notification
- * @param {string} type - 'temperature_low' | 'temperature_high' | 'setpoint_reached' | 'connection_lost'
- * @param {Object} data - { temperature, room, setpoint, message }
- */
-export async function triggerNetatmoAlert(type: string, data: Record<string, unknown> = {}) {
-  const typeId = `netatmo_${type}`;
-  return triggerNotification(typeId, data);
-}
-
-/**
- * Helper: Trigger generic notification
- * @param {string} title - Notification title
- * @param {string} body - Notification body
- * @param {Object} options - { url, priority }
- */
-export async function triggerGenericNotification(title: string, body: string, options: Record<string, unknown> = {}) {
-  return triggerNotification('generic', {
-    title,
-    body,
-    ...options,
-  });
-}
+// Removed unused functions: triggerNotification, triggerStoveStatusWork, triggerStoveUnexpectedOff,
+// triggerStoveError, triggerSchedulerAction, triggerMaintenanceAlert, triggerNetatmoAlert,
+// triggerGenericNotification - not used in codebase

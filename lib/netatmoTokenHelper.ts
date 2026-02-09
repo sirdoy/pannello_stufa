@@ -236,8 +236,9 @@ export async function clearCachedAccessToken(): Promise<void> {
 
 /**
  * Clear all Netatmo data (logout)
+ * Used internally only
  */
-export async function clearNetatmoData(): Promise<void> {
+async function clearNetatmoData(): Promise<void> {
   await adminDbSet(getEnvironmentPath('netatmo'), null);
 }
 
@@ -259,13 +260,4 @@ export function handleTokenError(error: TokenErrorType): TokenErrorHandling {
   };
 }
 
-const netatmoTokenHelper = {
-  getValidAccessToken,
-  isNetatmoConnected,
-  saveRefreshToken,
-  clearCachedAccessToken,
-  clearNetatmoData,
-  handleTokenError,
-};
-
-export default netatmoTokenHelper;
+// Note: Functions exported inline above. clearNetatmoData removed (was not used in codebase).

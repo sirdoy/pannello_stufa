@@ -258,33 +258,6 @@ export async function triggerNotificationServer(
   }
 }
 
-/**
- * Trigger notification to admin user
- *
- * Useful for system notifications that should go to the admin.
- *
- * @param {string} typeId - Notification type ID
- * @param {Object} data - Dynamic data
- * @param {Object} options - Additional options
- */
-export async function triggerNotificationToAdmin(
-  typeId: string,
-  data: Record<string, unknown> = {},
-  options: TriggerNotificationOptions = {}
-) {
-  const adminUserId = process.env.ADMIN_USER_ID;
-
-  if (!adminUserId) {
-    console.warn('[Notification] ADMIN_USER_ID not configured');
-    return {
-      success: false,
-      error: 'ADMIN_USER_ID not configured',
-    };
-  }
-
-  return triggerNotificationServer(adminUserId, typeId, data, options);
-}
-
 // =============================================================================
 // HELPER FUNCTIONS (shortcuts for common notification types)
 // =============================================================================
@@ -308,17 +281,6 @@ export async function triggerStoveUnexpectedOffServer(userId: string, data: Reco
 }
 
 /**
- * Trigger stove error notification
- * @param {string} userId - User ID
- * @param {string} severity - 'info' | 'warning' | 'error' | 'critical'
- * @param {Object} data - { errorCode, description, message }
- */
-export async function triggerStoveErrorServer(userId: string, severity: string, data: Record<string, unknown>) {
-  const typeId = `stove_error_${severity.toLowerCase()}`;
-  return triggerNotificationServer(userId, typeId, data);
-}
-
-/**
  * Trigger scheduler notification
  * @param {string} userId - User ID
  * @param {string} action - 'ignition' | 'shutdown'
@@ -331,7 +293,7 @@ export async function triggerSchedulerActionServer(userId: string, action: strin
 
 /**
  * Trigger maintenance notification
- * @param {string} userId - User ID (or use triggerNotificationToAdmin)
+ * @param {string} userId - User ID
  * @param {number} threshold - 80 | 90 | 100
  * @param {Object} data - { remainingHours, message }
  */
@@ -351,42 +313,12 @@ export async function triggerNetatmoAlertServer(userId: string, type: string, da
   return triggerNotificationServer(userId, typeId, data);
 }
 
-/**
- * Trigger Hue notification
- * @param {string} userId - User ID
- * @param {string} type - 'scene_activated' | 'connection_lost'
- * @param {Object} data - { sceneName, message }
- */
-export async function triggerHueAlertServer(userId: string, type: string, data: Record<string, unknown> = {}) {
-  const typeId = `hue_${type}`;
-  return triggerNotificationServer(userId, typeId, data);
-}
-
-/**
- * Trigger system notification
- * @param {string} userId - User ID
- * @param {string} type - 'update' | 'offline_commands_synced'
- * @param {Object} data - { version, count, message }
- */
-export async function triggerSystemNotificationServer(userId: string, type: string, data: Record<string, unknown> = {}) {
-  const typeId = `system_${type}`;
-  return triggerNotificationServer(userId, typeId, data);
-}
-
-/**
- * Trigger generic notification (bypasses preference check)
- * @param {string} userId - User ID
- * @param {string} title - Notification title
- * @param {string} body - Notification body
- * @param {Object} options - { url, priority }
- */
-export async function triggerGenericNotificationServer(userId: string, title: string, body: string, options: Record<string, unknown> = {}) {
-  return triggerNotificationServer(userId, 'generic', {
-    title,
-    body,
-    ...options,
-  });
-}
+// Removed unused functions (verified not used in production code):
+// - triggerNotificationToAdmin
+// - triggerStoveErrorServer
+// - triggerHueAlertServer
+// - triggerSystemNotificationServer
+// - triggerGenericNotificationServer
 
 /**
  * Trigger health monitoring alert

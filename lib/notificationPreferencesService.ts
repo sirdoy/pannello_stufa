@@ -162,6 +162,71 @@ export const DEFAULT_PREFERENCES = {
 };
 
 /**
+ * Get user notification preferences from Firebase via API
+ * @param {string} userId - User ID (Auth0 sub)
+ * @returns {Promise<Object>} User preferences
+ */
+async function getUserPreferences(userId: string) {
+  if (!userId) {
+    throw new Error('User ID required');
+  }
+
+  try {
+    const response = await fetch('/api/notifications/preferences', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch preferences');
+    }
+
+    const data = await response.json();
+    return data.preferences;
+
+  } catch (error) {
+    console.error('Error getting user preferences:', error);
+    // Return defaults in caso di errore
+    return DEFAULT_PREFERENCES;
+  }
+}
+
+/**
+ * Update user notification preferences via API
+ * @param {string} userId - User ID
+ * @param {Object} preferences - Preferences object (partial update supported)
+ * @returns {Promise<boolean>}
+ */
+async function updateUserPreferences(userId: string, preferences: Record<string, unknown>) {
+  if (!userId) {
+    throw new Error('User ID required');
+  }
+
+  try {
+    const response = await fetch('/api/notifications/preferences', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ preferences }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to update preferences');
+    }
+
+    return true;
+
+  } catch (error) {
+    console.error('Error updating user preferences:', error);
+    throw error;
+  }
+}
+
+/**
  * Update specific preference section via API
  * @param {string} userId - User ID
  * @param {string} section - 'errors'|'scheduler'|'maintenance'

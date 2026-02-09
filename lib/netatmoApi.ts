@@ -755,25 +755,18 @@ export {
 
   // Data
   getHomesData,
-  getDeviceList,
   getHomeStatus,
-  getThermState,
-  getRoomMeasure,
 
   // Control
   setRoomThermpoint,
   setThermMode,
   switchHomeSchedule,
-  syncHomeSchedule,
-  createSchedule,
-  renameHome,
 
   // Helpers
   parseRooms,
   parseModules,
   parseSchedules,
   extractTemperatures,
-  isHeatingActive,
   extractModulesWithStatus,
   getModulesWithLowBattery,
   hasAnyCriticalBattery,

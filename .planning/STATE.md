@@ -11,9 +11,9 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 48 of 48 (Dead Code Removal)
-Plan: 3 of 6 in current phase
+Plan: 5 of 6 in current phase
 Status: In Progress
-Last activity: 2026-02-09 - Completed 48-03-PLAN.md (41 unused exports removed from 18 lib/ core files, 0 tsc errors)
+Last activity: 2026-02-09 - Completed 48-05-PLAN.md (97 unused exports removed from lib/core+hue+pwa+app+types files, NETATMO_ROUTES fix, 0 tsc errors, 3034 tests pass)
 
 Progress: [████████████████████████████████████████████░░░░] 99% (246/246 estimated total plans)
 
@@ -70,6 +70,7 @@ Progress: [███████████████████████
 | Phase 48 P01 | 276s | 2 tasks | 39 files |
 | Phase 48 P02 | 425s | 2 tasks | 1 file |
 | Phase 48 P03 | 574s | 2 tasks | 18 files |
+| Phase 48 P05 | 2457s | 2 tasks | 27 files |
 
 ## Accumulated Context
 
@@ -162,6 +163,10 @@ Recent decisions from PROJECT.md affecting v5.1 work:
 - [Phase 48-01]: Used knip dependency analysis to identify unused files (39 files deleted: 31 source + 8 scripts/docs, 5,702 LOC removed)
 - [Phase 48-02]: Removed 4 unused dependencies: @radix-ui/react-dropdown-menu, @radix-ui/react-slot, baseline-browser-mapping, serwist (bundled in @serwist/next)
 - [Phase 48-03]: Removed 41 unused exports from 18 lib/ core files (auth, devices, firebase, coordination, environment, hlsDownloader, logService, routes, stoveState)
+- [Phase 48-05]: Removed 97 unused exports from lib/core+hue+pwa+app+types (66 lib/, 31 app/types/), fixed NETATMO_ROUTES blocking issue from plan 48-03/04
+- [Phase 48-05]: Internal function pattern: make functions internal when only used within same module (not export everything)
+- [Phase 48-05]: Lean barrel exports: only re-export what's consumed outside the module directory
+- [Phase 48-05]: Design system barrel pattern: UI component barrel exports preserved (intentional public API)
 
 ### Pending Todos
 
@@ -183,7 +188,7 @@ None yet.
 - **Phase 47 COMPLETE:** All files (source + tests) now have 0 tsc errors with strict: true + noUncheckedIndexedAccess: true
 - **Phase 47 COMPLETE:** All 3034 tests passing green with zero failures (gap sweep verified 0 cascade errors)
 - Worker teardown warning documented as cosmetic (React 19 expected behavior)
-- **Phase 48 IN PROGRESS:** Dead code removal (Plan 01/06 complete: unused files removed, 5 plans remaining for exports/dependencies)
+- **Phase 48 IN PROGRESS:** Dead code removal (Plan 05/06 complete: unused files removed, unused deps removed, unused exports removed from lib+app+types, 1 plan remaining for final gap sweep)
 
 **Technical Context:**
 - Errors span ~531 TypeScript source files + ~131 test files
@@ -192,9 +197,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-09 16:42
-Stopped at: Completed 48-03-PLAN.md (41 unused exports removed from 18 lib/ files, 0 tsc errors)
-Resume file: None — Ready for 48-04-PLAN.md
+Last session: 2026-02-09 17:14
+Stopped at: Completed 48-05-PLAN.md (97 unused exports removed from 27 files, NETATMO_ROUTES fix, 0 tsc errors, 3034 tests pass)
+Resume file: None — Ready for 48-06-PLAN.md (final gap sweep)
 
 ---
 *State initialized: 2026-02-08 for v5.1 Tech Debt & Code Quality milestone*

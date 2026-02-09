@@ -88,8 +88,8 @@ export const NETATMO_ROUTES = {
 export const CAMERA_ROUTES = {
   list: `${API_BASE}/netatmo/camera`,
   allEvents: `${API_BASE}/netatmo/camera/events`,
-  snapshot: (cameraId: string): string => `${API_BASE}/netatmo/camera/${cameraId}/snapshot`,
-  events: (cameraId: string): string => `${API_BASE}/netatmo/camera/${cameraId}/events`,
+  snapshot: (cameraId: string): string => `${API_BASE}/netatmo/camera/${encodeURIComponent(cameraId)}/snapshot`,
+  events: (cameraId: string): string => `${API_BASE}/netatmo/camera/${encodeURIComponent(cameraId)}/events`,
 } as const;
 
 // Logging endpoints

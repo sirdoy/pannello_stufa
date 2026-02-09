@@ -39,7 +39,7 @@ describe('errorMonitor', () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
-    delete global.Notification;
+    delete (global as any).Notification;
   });
 
   describe('ERROR_SEVERITY and ERROR_CODES constants', () => {
@@ -136,7 +136,7 @@ describe('errorMonitor', () => {
     });
 
     afterEach(() => {
-      delete global.fetch;
+      delete (global as any).fetch;
     });
 
     test('logs error to Firebase with correct structure', async () => {
@@ -254,7 +254,7 @@ describe('errorMonitor', () => {
       // ARRANGE
       const mockSnapshot = {
         exists: () => true,
-        forEach: (callback) => {
+        forEach: (callback: (snapshot: any) => void) => {
           callback({ key: 'error1', val: () => ({ errorCode: 1, timestamp: 1000 }) });
           callback({ key: 'error2', val: () => ({ errorCode: 2, timestamp: 2000 }) });
           callback({ key: 'error3', val: () => ({ errorCode: 3, timestamp: 3000 }) });
@@ -330,7 +330,7 @@ describe('errorMonitor', () => {
       // ARRANGE
       const mockSnapshot = {
         exists: () => true,
-        forEach: (callback) => {
+        forEach: (callback: (snapshot: any) => void) => {
           callback({ key: 'error1', val: () => ({ errorCode: 1, resolved: false }) });
           callback({ key: 'error2', val: () => ({ errorCode: 2, resolved: true }) });
           callback({ key: 'error3', val: () => ({ errorCode: 3, resolved: false }) });
@@ -353,7 +353,7 @@ describe('errorMonitor', () => {
       // ARRANGE
       const mockSnapshot = {
         exists: () => true,
-        forEach: (callback) => {
+        forEach: (callback: (snapshot: any) => void) => {
           callback({ key: 'error1', val: () => ({ errorCode: 1, resolved: true }) });
           callback({ key: 'error2', val: () => ({ errorCode: 2, resolved: true }) });
         },
@@ -390,7 +390,7 @@ describe('errorMonitor', () => {
     });
 
     afterEach(() => {
-      delete global.fetch;
+      delete (global as any).fetch;
     });
 
     test('marks error as resolved via API', async () => {
@@ -470,7 +470,7 @@ describe('errorMonitor', () => {
 
     test('returns true when previousErrorCode is undefined', () => {
       // ACT
-      const result = shouldNotify(5, undefined);
+      const result = shouldNotify(5, undefined as any);
 
       // ASSERT
       expect(result).toBe(true);
@@ -480,7 +480,7 @@ describe('errorMonitor', () => {
   describe('sendErrorNotification', () => {
     test('returns false when Notification API not supported', async () => {
       // ARRANGE
-      delete global.Notification;
+      delete (global as any).Notification;
 
       // ACT
       const result = await sendErrorNotification(5, 'Test error');

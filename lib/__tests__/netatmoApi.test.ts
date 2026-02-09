@@ -57,7 +57,7 @@ describe('netatmoApi control functions', () => {
       const callArgs = mockFetch.mock.calls[0][1];
       const bodyParams = new URLSearchParams(callArgs.body);
       expect(bodyParams.get('temp')).toBe('21');
-      expect(parseFloat(bodyParams.get('temp'))).toBe(21.0);
+      expect(parseFloat(bodyParams.get('temp')!)).toBe(21.0);
     });
 
     it('should keep decimal temperature as float', async () => {
@@ -70,7 +70,7 @@ describe('netatmoApi control functions', () => {
       const callArgs = mockFetch.mock.calls[0][1];
       const bodyParams = new URLSearchParams(callArgs.body);
       expect(bodyParams.get('temp')).toBe('21.5');
-      expect(parseFloat(bodyParams.get('temp'))).toBe(21.5);
+      expect(parseFloat(bodyParams.get('temp')!)).toBe(21.5);
     });
 
     it('should convert string temperature to float', async () => {
@@ -83,7 +83,7 @@ describe('netatmoApi control functions', () => {
       const callArgs = mockFetch.mock.calls[0][1];
       const bodyParams = new URLSearchParams(callArgs.body);
       expect(bodyParams.get('temp')).toBe('21');
-      expect(parseFloat(bodyParams.get('temp'))).toBe(21.0);
+      expect(parseFloat(bodyParams.get('temp')!)).toBe(21.0);
     });
 
     it('should use correct endpoint URL', async () => {

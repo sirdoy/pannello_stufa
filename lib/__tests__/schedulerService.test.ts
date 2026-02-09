@@ -313,7 +313,7 @@ describe('schedulerService', () => {
     test('handles Firebase error on save', async () => {
       // ARRANGE
       const day = 'Lunedì';
-      const intervals = [];
+      const intervals: any[] = [];
       (ref as jest.Mock).mockReturnValue('mock-ref');
       mockSet.mockRejectedValue(new Error('Firebase error'));
 

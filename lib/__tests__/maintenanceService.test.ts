@@ -273,8 +273,8 @@ describe('maintenanceService', () => {
       const result = await incrementUsageHours(1); // +0.0167 hours
 
       // ASSERT
-      expect(result.currentHours.toString()).toMatch(/^\d+\.\d{1,4}$/);
-      expect(result.currentHours.toString().split('.')[1]?.length || 0).toBeLessThanOrEqual(4);
+      expect(result.currentHours!.toString()).toMatch(/^\d+\.\d{1,4}$/);
+      expect(result.currentHours!.toString().split('.')[1]?.length || 0).toBeLessThanOrEqual(4);
     });
 
     test('throws error on Firebase failure', async () => {

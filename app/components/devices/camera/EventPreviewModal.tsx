@@ -36,7 +36,7 @@ export default function EventPreviewModal({ event, camera, onClose }: EventPrevi
   if (!event || !camera) return null;
 
   // Strip HTML tags from message
-  const stripHtml = (html: string | undefined): string | null => html?.replace(/<[^>]*>/g, '') || null;
+  const stripHtml = (html: string | undefined): string | undefined => html?.replace(/<[^>]*>/g, '') || undefined;
 
   // Get URLs
   const snapshotUrl = NETATMO_CAMERA_API.getEventSnapshotUrl(event as any);
@@ -132,7 +132,7 @@ export default function EventPreviewModal({ event, camera, onClose }: EventPrevi
           {isPlaying && videoUrl ? (
             <HlsPlayer
               src={videoUrl}
-              poster={previewUrl}
+              poster={previewUrl ?? undefined}
               className="w-full h-full"
               onError={() => setIsPlaying(false)}
               showControls={true}

@@ -124,7 +124,7 @@ export default function BatteryWarning({
   const deviceList = lowBatteryModules.map(module => {
     const typeName = getModuleTypeName(module.type);
     const name = module.name || module.id?.substring(0, 8) || 'Sconosciuto';
-    const stateLabel = getBatteryLabel(module.battery_state);
+    const stateLabel = module.battery_state ? getBatteryLabel(module.battery_state) : 'Sconosciuto';
     return `${typeName} "${name}" (${stateLabel})`;
   }).join(', ');
 

@@ -109,7 +109,7 @@ export default function CameraCard() {
     } catch (err) {
       console.error('Errore fetch cameras:', err);
       // Also check thrown errors for token issues
-      const errorMsg = err.message?.toLowerCase() || '';
+      const errorMsg = err instanceof Error ? err.message.toLowerCase() : String(err).toLowerCase();
       if (errorMsg.includes('invalid access token') ||
           errorMsg.includes('access_denied') ||
           errorMsg.includes('insufficient scope')) {
@@ -123,7 +123,7 @@ export default function CameraCard() {
           await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
           return fetchCameras(retryCount + 1);
         }
-        setError(err.message);
+        setError(err instanceof Error ? err.message : String(err));
         setConnected(false);
       }
     } finally {
@@ -286,7 +286,7 @@ export default function CameraCard() {
           aria-label="Cattura Snapshot"
           variant="subtle"
           size="md"
-          onClick={() => fetchSnapshot(selectedCameraId)}
+          onClick={() => selectedCameraId && fetchSnapshot(selectedCameraId)}
           disabled={snapshotLoading || !selectedCameraId}
         />
         {selectedCamera?.status === 'on' && (
@@ -342,8 +342,8 @@ export default function CameraCard() {
         {isLiveMode && selectedCamera?.status === 'on' ? (
           // Live video mode
           <HlsPlayer
-            src={NETATMO_CAMERA_API.getLiveStreamUrl(selectedCamera as any)}
-            poster={snapshotUrl}
+            src={NETATMO_CAMERA_API.getLiveStreamUrl(selectedCamera as any) || ''}
+            poster={snapshotUrl ?? undefined}
             className="w-full h-full"
             onError={() => {
               // Fallback to snapshot on live error

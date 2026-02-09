@@ -151,7 +151,7 @@ export default function HlsPlayer({
     const video = videoRef.current;
     if (!video || !src) return;
 
-    let hls = null;
+    let hls: any = null;
 
     const initPlayer = async () => {
       try {
@@ -203,7 +203,7 @@ export default function HlsPlayer({
           }
         });
 
-        hls.on(Hls.Events.ERROR, (event, data) => {
+        hls.on(Hls.Events.ERROR, (event: any, data: any) => {
           if (data.fatal) {
             switch (data.type) {
               case Hls.ErrorTypes.NETWORK_ERROR:

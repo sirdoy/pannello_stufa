@@ -42,8 +42,8 @@ export default function ThermostatCard() {
     id: string;
     name: string;
   }
-  const typedSchedules = schedules as ScheduleItem[];
-  const typedActiveSchedule = activeSchedule as ScheduleItem | undefined;
+  const typedSchedules = schedules as unknown as ScheduleItem[];
+  const typedActiveSchedule = activeSchedule as unknown as ScheduleItem | undefined;
   const [switchingSchedule, setSwitchingSchedule] = useState(false);
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);
 
@@ -86,8 +86,8 @@ export default function ThermostatCard() {
   const statusModules = status?.modules || [];
 
   // Merge topology modules with status modules to get battery/reachable info
-  const modulesWithStatus = topologyModules.map(topModule => {
-    const statModule = statusModules.find(m => m.id === topModule.id);
+  const modulesWithStatus = topologyModules.map((topModule: any) => {
+    const statModule = statusModules.find((m: any) => m.id === topModule.id);
     return {
       ...topModule,
       battery_state: statModule?.battery_state,
@@ -95,26 +95,26 @@ export default function ThermostatCard() {
     };
   });
 
-  const roomsWithStatus = rooms.map(room => {
-    const roomStatus = status?.rooms?.find(r => r.room_id === room.id);
+  const roomsWithStatus = rooms.map((room: any) => {
+    const roomStatus = status?.rooms?.find((r: any) => r.room_id === room.id);
 
     // Find modules for this room to check if offline (exclude relays and cameras)
-    const roomModules = room.modules?.map(moduleId =>
-      modulesWithStatus.find(m => m.id === moduleId)
-    ).filter(Boolean).filter(m => m.type !== 'NAPlug' && m.type !== 'NACamera' && m.type !== 'NOC') || [];
+    const roomModules = room.modules?.map((moduleId: string) =>
+      modulesWithStatus.find((m: any) => m.id === moduleId)
+    ).filter(Boolean).filter((m: any) => m.type !== 'NAPlug' && m.type !== 'NACamera' && m.type !== 'NOC') || [];
 
     // Check if room is offline (all modules unreachable)
-    const isOffline = roomModules.length > 0 && roomModules.every(m => m.reachable === false);
+    const isOffline = roomModules.length > 0 && roomModules.every((m: any) => m.reachable === false);
 
     // Check battery status
-    const hasLowBattery = roomModules.some(m =>
+    const hasLowBattery = roomModules.some((m: any) =>
       m.battery_state === 'low' || m.battery_state === 'very_low'
     );
-    const hasCriticalBattery = roomModules.some(m => m.battery_state === 'very_low');
+    const hasCriticalBattery = roomModules.some((m: any) => m.battery_state === 'very_low');
 
     // Determine device type
-    const hasThermostat = roomModules.some(m => m.type === 'NATherm1' || m.type === 'OTH');
-    const hasValve = roomModules.some(m => m.type === 'NRV');
+    const hasThermostat = roomModules.some((m: any) => m.type === 'NATherm1' || m.type === 'OTH');
+    const hasValve = roomModules.some((m: any) => m.type === 'NRV');
     const deviceType = hasThermostat ? 'thermostat' : hasValve ? 'valve' : 'unknown';
 
     return {
@@ -131,7 +131,7 @@ export default function ThermostatCard() {
       roomModules,
       deviceType,
     };
-  }).filter(room => {
+  }).filter((room: any) => {
     // Only show rooms that have at least one thermostat or valve device
     // Exclude rooms with only cameras or no thermostat/valve modules
     return room.deviceType === 'thermostat' || room.deviceType === 'valve';
@@ -150,12 +150,12 @@ export default function ThermostatCard() {
     }
   }, [roomsWithStatus, selectedRoomId]);
 
-  const selectedRoom = roomsWithStatus.find(r => r.id === selectedRoomId) || roomsWithStatus[0];
+  const selectedRoom = roomsWithStatus.find((r: any) => r.id === selectedRoomId) || roomsWithStatus[0];
   const mode = status?.mode || 'schedule';
-  const hasHeating = roomsWithStatus.some(r => r.heating);
+  const hasHeating = roomsWithStatus.some((r: any) => r.heating);
 
   // Filter only active rooms (heating or setpoint > temperature)
-  const activeRooms = roomsWithStatus.filter(room => {
+  const activeRooms = roomsWithStatus.filter((room: any) => {
     if (room.isOffline) return false;
     return room.heating === true ||
            (room.setpoint && room.temperature && room.setpoint > room.temperature);
@@ -206,7 +206,8 @@ export default function ThermostatCard() {
         }
         setConnected(false);
       }
-    } catch (err) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       console.error('Errore connessione termostato:', err);
       // Retry on network errors
       if (retryCount < MAX_RETRIES) {
@@ -216,7 +217,7 @@ export default function ThermostatCard() {
         return checkConnection(retryCount + 1);
       }
       setConnected(false);
-      setError(err.message);
+      setError(message);
     } finally {
       setLoading(false);
       setLoadingMessage('Caricamento...');
@@ -254,17 +255,18 @@ export default function ThermostatCard() {
       }
 
       setStatus(data);
-    } catch (err) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       console.error('Errore fetch status termostato:', err);
       // Retry on network errors (but not rate limit)
-      if (retryCount < MAX_RETRIES && !err.message.includes('concurrency limited')) {
+      if (retryCount < MAX_RETRIES && !message.includes('concurrency limited')) {
         console.log(`⏳ Status fetch error, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
         return fetchStatus(retryCount + 1);
       }
       // Don't show rate limit errors to user
-      if (!err.message.includes('concurrency limited')) {
-        setError(err.message);
+      if (!message.includes('concurrency limited')) {
+        setError(message);
       }
     }
   }
@@ -276,7 +278,7 @@ export default function ThermostatCard() {
     setRefreshing(false);
   }
 
-  async function handleModeChange(newMode) {
+  async function handleModeChange(newMode: string) {
     try {
       setLoadingMessage('Cambio modalità termostato...');
       setRefreshing(true);
@@ -287,18 +289,19 @@ export default function ThermostatCard() {
         body: JSON.stringify({ mode: newMode }),
       });
 
-      const data = await response.json();
+      const data = await response.json() as { error?: string };
       if (data.error) throw new Error(data.error);
       // Aggiorna status dopo il comando
       await fetchStatus();
-    } catch (err) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
     } finally {
       setRefreshing(false);
     }
   }
 
-  async function handleTemperatureChange(roomId, temp) {
+  async function handleTemperatureChange(roomId: string, temp: number) {
     try {
       setLoadingMessage('Modifica temperatura...');
       setRefreshing(true);
@@ -313,12 +316,13 @@ export default function ThermostatCard() {
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json() as { error?: string };
       if (data.error) throw new Error(data.error);
       // Aggiorna status dopo il comando
       await fetchStatus();
-    } catch (err) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
     } finally {
       setRefreshing(false);
     }
@@ -351,9 +355,10 @@ export default function ThermostatCard() {
 
       // Aggiorna status dopo il comando
       await fetchStatus();
-    } catch (err) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       console.error('Errore calibrazione valvole:', err);
-      setError(`Calibrazione fallita: ${err.message}`);
+      setError(`Calibrazione fallita: ${message}`);
       setCalibrationSuccess(false);
     } finally {
       setCalibrating(false);
@@ -381,8 +386,9 @@ export default function ThermostatCard() {
       // Refetch schedules to update active
       await refetchSchedules();
       setSelectedScheduleId(scheduleId);
-    } catch (err) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
     } finally {
       setSwitchingSchedule(false);
     }
@@ -394,7 +400,7 @@ export default function ThermostatCard() {
   };
 
   // Build props for DeviceCard
-  const banners = [];
+  const banners: any[] = [];
 
   // Error banner
   if (error) {
@@ -418,7 +424,7 @@ export default function ThermostatCard() {
       : `Batteria Bassa - ${count} dispositiv${count > 1 ? 'i' : 'o'}`;
 
     // Build description with device list
-    const deviceList = lowBatteryModules.map(m => {
+    const deviceList = lowBatteryModules.map((m: any) => {
       const typeName = m.type === 'NRV' ? 'Valvola' : m.type === 'NATherm1' ? 'Termostato' : m.type;
       const name = m.name || m.id?.substring(0, 8) || 'Sconosciuto';
       return `${typeName} "${name}"`;
@@ -441,7 +447,7 @@ export default function ThermostatCard() {
   const infoBoxes = topology ? [
     { icon: '🏠', label: 'Casa', value: topology.home_name || '-' },
     { icon: '🚪', label: 'Stanze', value: roomsWithStatus.length },
-    { icon: '📡', label: 'Dispositivi', value: modulesWithStatus.filter(m => m.type !== 'NAPlug' && m.type !== 'NACamera' && m.type !== 'NOC').length },
+    { icon: '📡', label: 'Dispositivi', value: modulesWithStatus.filter((m: any) => m.type !== 'NAPlug' && m.type !== 'NACamera' && m.type !== 'NOC').length },
     ...(hasLowBattery ? [{ icon: hasCriticalBattery ? '🪫' : '🔋', label: 'Batteria', value: `${lowBatteryModules.length} bassa` }] : []),
   ] : [];
 
@@ -488,7 +494,7 @@ export default function ThermostatCard() {
           <Divider label="Dispositivi Attivi" variant="gradient" spacing="medium" />
 
           <div className="mt-4 flex flex-wrap gap-2">
-            {activeRooms.map((room) => {
+            {activeRooms.map((room: any) => {
               // Device type icon
               const deviceIcon = room.deviceType === 'valve' ? '🔧' : room.deviceType === 'thermostat' ? '🌡️' : '📡';
 
@@ -513,7 +519,7 @@ export default function ThermostatCard() {
 
       {/* Room Selection - includes status indicators */}
       <RoomSelector
-        rooms={roomsWithStatus.map(room => ({
+        rooms={roomsWithStatus.map((room: any) => ({
           id: room.id,
           name: room.name,
           isOffline: room.isOffline,
@@ -521,8 +527,8 @@ export default function ThermostatCard() {
           hasCriticalBattery: room.hasCriticalBattery,
           heating: room.heating,
         }))}
-        selectedRoomId={selectedRoomId}
-        onChange={(e) => setSelectedRoomId(e.target.value)}
+        selectedRoomId={selectedRoomId || undefined}
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedRoomId(e.target.value)}
       />
 
       {/* Selected Room Temperature */}
@@ -645,7 +651,7 @@ export default function ThermostatCard() {
                   {/* Active Devices Summary - Shows which devices are controlling this room */}
                   {selectedRoom.roomModules && selectedRoom.roomModules.length > 0 && (
                     <div className="mt-3 flex items-center justify-center gap-2 flex-wrap">
-                      {selectedRoom.roomModules.map(module => {
+                      {selectedRoom.roomModules.map((module: any) => {
                         const isValve = module.type === 'NRV';
                         const isThermostat = module.type === 'NATherm1' || module.type === 'OTH';
                         const isReachable = module.reachable !== false;
@@ -778,7 +784,7 @@ export default function ThermostatCard() {
                 { id: 'off', icon: '⏸️', label: 'Off', color: 'slate' },
               ].map(({ id, icon, label, color }) => {
                 const isActive = mode === id;
-                const colorStyles = {
+                const colorStyles: Record<string, string> = {
                   sage: isActive
                     ? 'bg-sage-900/50 border-sage-400/60 ring-2 ring-sage-500/30 [html:not(.dark)_&]:bg-sage-100 [html:not(.dark)_&]:border-sage-400 [html:not(.dark)_&]:ring-sage-300/50'
                     : '',

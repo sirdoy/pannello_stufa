@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event';
 import { z } from 'zod';
 import FormModal from '../FormModal';
-import { Controller } from 'react-hook-form';
+import { Controller, type Control } from 'react-hook-form';
 
 // Mock useHaptic hook to avoid vibration API issues in tests
 jest.mock('@/app/hooks/useHaptic', () => ({
@@ -22,8 +22,14 @@ const testSchema = z.object({
   email: z.string().email('Invalid email address'),
 });
 
+// Test form data type
+type TestFormData = {
+  name: string;
+  email: string;
+};
+
 // Helper component to render form fields
-const TestFormFields = ({ control, isDisabled }) => (
+const TestFormFields = ({ control, isDisabled }: { control: Control<TestFormData>; isDisabled: boolean }) => (
   <>
     <Controller
       name="name"
@@ -166,7 +172,7 @@ describe('FormModal', () => {
           onSubmit={mockOnSubmit}
           title="Test Modal"
         >
-          {({ control, isDisabled }) => (
+          {({ control, isDisabled }: { control: Control<TestFormData>; isDisabled: boolean }) => (
             <TestFormFields control={control} isDisabled={isDisabled} />
           )}
         </FormModal>
@@ -190,7 +196,7 @@ describe('FormModal', () => {
           validationSchema={testSchema}
           defaultValues={{ name: '', email: '' }}
         >
-          {({ control, isDisabled }) => (
+          {({ control, isDisabled }: { control: Control<TestFormData>; isDisabled: boolean }) => (
             <TestFormFields control={control} isDisabled={isDisabled} />
           )}
         </FormModal>
@@ -220,7 +226,7 @@ describe('FormModal', () => {
           validationSchema={testSchema}
           defaultValues={{ name: '', email: '' }}
         >
-          {({ control, isDisabled }) => (
+          {({ control, isDisabled }: { control: Control<TestFormData>; isDisabled: boolean }) => (
             <TestFormFields control={control} isDisabled={isDisabled} />
           )}
         </FormModal>
@@ -248,7 +254,7 @@ describe('FormModal', () => {
           validationSchema={testSchema}
           defaultValues={{ name: '', email: '' }}
         >
-          {({ control, isDisabled }) => (
+          {({ control, isDisabled }: { control: Control<TestFormData>; isDisabled: boolean }) => (
             <TestFormFields control={control} isDisabled={isDisabled} />
           )}
         </FormModal>
@@ -268,8 +274,8 @@ describe('FormModal', () => {
   describe('Loading State', () => {
     test('disables form fields during submit', async () => {
       const user = userEvent.setup();
-      let resolveSubmit;
-      const slowSubmit = jest.fn(() => new Promise((resolve) => {
+      let resolveSubmit: (() => void) | undefined;
+      const slowSubmit = jest.fn(() => new Promise<void>((resolve) => {
         resolveSubmit = resolve;
       }));
 
@@ -282,7 +288,7 @@ describe('FormModal', () => {
           defaultValues={{ name: 'Test', email: 'test@test.com' }}
           validationSchema={testSchema}
         >
-          {({ control, isDisabled }) => (
+          {({ control, isDisabled }: { control: Control<TestFormData>; isDisabled: boolean }) => (
             <TestFormFields control={control} isDisabled={isDisabled} />
           )}
         </FormModal>
@@ -299,14 +305,14 @@ describe('FormModal', () => {
       expect(screen.getByText('Saving...')).toBeInTheDocument();
 
       await act(async () => {
-        resolveSubmit();
+        resolveSubmit?.();
       });
     });
 
     test('prevents close while loading', async () => {
       const user = userEvent.setup();
-      let resolveSubmit;
-      const slowSubmit = jest.fn(() => new Promise((resolve) => {
+      let resolveSubmit: (() => void) | undefined;
+      const slowSubmit = jest.fn(() => new Promise<void>((resolve) => {
         resolveSubmit = resolve;
       }));
 
@@ -319,7 +325,7 @@ describe('FormModal', () => {
           defaultValues={{ name: 'Test', email: 'test@test.com' }}
           validationSchema={testSchema}
         >
-          {({ control, isDisabled }) => (
+          {({ control, isDisabled }: { control: Control<TestFormData>; isDisabled: boolean }) => (
             <TestFormFields control={control} isDisabled={isDisabled} />
           )}
         </FormModal>
@@ -340,7 +346,7 @@ describe('FormModal', () => {
       expect(closeButton).toBeDisabled();
 
       await act(async () => {
-        resolveSubmit();
+        resolveSubmit?.();
       });
     });
   });
@@ -360,7 +366,7 @@ describe('FormModal', () => {
           defaultValues={{ name: 'Test', email: 'test@test.com' }}
           validationSchema={testSchema}
         >
-          {({ control, isDisabled }) => (
+          {({ control, isDisabled }: { control: Control<TestFormData>; isDisabled: boolean }) => (
             <TestFormFields control={control} isDisabled={isDisabled} />
           )}
         </FormModal>
@@ -389,7 +395,7 @@ describe('FormModal', () => {
           defaultValues={{ name: 'Test', email: 'test@test.com' }}
           validationSchema={testSchema}
         >
-          {({ control, isDisabled }) => (
+          {({ control, isDisabled }: { control: Control<TestFormData>; isDisabled: boolean }) => (
             <TestFormFields control={control} isDisabled={isDisabled} />
           )}
         </FormModal>
@@ -448,7 +454,7 @@ describe('FormModal', () => {
           defaultValues={{ name: 'Test Name', email: 'test@example.com' }}
           validationSchema={testSchema}
         >
-          {({ control, isDisabled }) => (
+          {({ control, isDisabled }: { control: Control<TestFormData>; isDisabled: boolean }) => (
             <TestFormFields control={control} isDisabled={isDisabled} />
           )}
         </FormModal>
@@ -477,7 +483,7 @@ describe('FormModal', () => {
           defaultValues={{ name: '', email: '' }}
           validationSchema={testSchema}
         >
-          {({ control, isDisabled }) => (
+          {({ control, isDisabled }: { control: Control<TestFormData>; isDisabled: boolean }) => (
             <TestFormFields control={control} isDisabled={isDisabled} />
           )}
         </FormModal>

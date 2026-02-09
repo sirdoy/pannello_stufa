@@ -106,7 +106,20 @@ export async function getNotificationHistory(userId: string, options: Notificati
     const snapshot = await query.get();
 
     // Extract notifications
-    const notifications = [];
+    const notifications: Array<{
+      id: string;
+      userId: string;
+      type: string;
+      status: string;
+      title: string;
+      body: string;
+      deviceCount: number;
+      successCount: number;
+      failureCount: number;
+      fcmErrors: Array<unknown>;
+      metadata: Record<string, unknown>;
+      timestamp: string;
+    }> = [];
     let lastDoc: QueryDocumentSnapshot<DocumentData, DocumentData> | null = null;
 
     snapshot.forEach((doc: QueryDocumentSnapshot<DocumentData, DocumentData>) => {
@@ -140,13 +153,20 @@ export async function getNotificationHistory(userId: string, options: Notificati
     const hasMore = snapshot.size > effectiveLimit;
 
     // Generate cursor for next page
-    let nextCursor = null;
-    if (hasMore && lastDoc) {
-      const cursorData = {
-        docId: lastDoc.id,
-        timestamp: lastDoc.data().timestamp.toDate().toISOString(),
-      };
-      nextCursor = Buffer.from(JSON.stringify(cursorData)).toString('base64');
+    let nextCursor: string | null = null;
+    if (hasMore) {
+      // lastDoc is guaranteed to be non-null here because we only set hasMore
+      // when we have more documents than effectiveLimit, and lastDoc is set
+      // when index === effectiveLimit - 1
+      if (lastDoc) {
+        const doc = lastDoc as QueryDocumentSnapshot<DocumentData, DocumentData>;
+        const lastDocData = doc.data();
+        const cursorData = {
+          docId: doc.id,
+          timestamp: lastDocData.timestamp.toDate().toISOString(),
+        };
+        nextCursor = Buffer.from(JSON.stringify(cursorData)).toString('base64');
+      }
     }
 
     return {

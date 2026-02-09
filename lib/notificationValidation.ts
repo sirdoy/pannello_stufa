@@ -13,7 +13,7 @@
  * @param {string} type - Type to validate
  * @returns {boolean} True if valid
  */
-export function isValidNotificationType(type) {
+export function isValidNotificationType(type: string) {
   const validTypes = ['scheduler', 'error', 'maintenance', 'test', 'generic'];
   return validTypes.includes(type);
 }
@@ -24,7 +24,7 @@ export function isValidNotificationType(type) {
  * @param {string} status - Status to validate
  * @returns {boolean} True if valid
  */
-export function isValidNotificationStatus(status) {
+export function isValidNotificationStatus(status: string) {
   const validStatuses = ['sent', 'delivered', 'failed'];
   return validStatuses.includes(status);
 }

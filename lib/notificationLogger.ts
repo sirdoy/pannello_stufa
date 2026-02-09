@@ -53,14 +53,25 @@ interface NotificationLogFilter {
  * @param {Object} [data.metadata] - Additional metadata
  * @returns {Promise<string>} Document ID
  */
-export async function logNotification(data) {
+export async function logNotification(data: {
+  userId?: string;
+  type?: string;
+  title?: string;
+  body?: string;
+  status?: string;
+  deviceCount?: number;
+  successCount?: number;
+  failureCount?: number;
+  fcmErrors?: Array<{ tokenPrefix: string; errorCode: string; errorMessage: string }>;
+  metadata?: Record<string, unknown>;
+}) {
   try {
     const db = getAdminFirestore();
 
     const logEntry = {
       timestamp: Timestamp.now(),
       type: data.type || 'generic',
-      status: data.status || (data.successCount > 0 ? 'sent' : 'failed'),
+      status: data.status || ((data.successCount ?? 0) > 0 ? 'sent' : 'failed'),
       userId: data.userId || 'unknown',
       deviceCount: data.deviceCount || 0,
       successCount: data.successCount || 0,
@@ -98,7 +109,16 @@ export async function logNotification(data) {
  * @param {Object} [data.metadata] - Additional metadata
  * @returns {Promise<string>} Document ID
  */
-export async function logNotificationError(data) {
+export async function logNotificationError(data: {
+  userId?: string;
+  type?: string;
+  title?: string;
+  body?: string;
+  errorCode?: string;
+  errorMessage?: string;
+  tokenPrefix?: string;
+  metadata?: Record<string, unknown>;
+}) {
   return logNotification({
     userId: data.userId || 'unknown',
     type: data.type || 'generic',
@@ -162,7 +182,11 @@ export async function getNotificationLogs(options: NotificationLogFilter = {}) {
 
     const snapshot = await query.get();
 
-    const logs = [];
+    const logs: Array<{
+      id: string;
+      timestamp: string;
+      [key: string]: unknown;
+    }> = [];
     snapshot.forEach(doc => {
       logs.push({
         id: doc.id,
@@ -239,7 +263,7 @@ const ALERT_COOLDOWN_MS = 60 * 60 * 1000; // 1 hour between alerts
  * @param {number} currentRate - Current delivery rate percentage
  * @returns {Promise<Object>} { shouldAlert: boolean, reason: string }
  */
-export async function shouldSendRateAlert(currentRate) {
+export async function shouldSendRateAlert(currentRate: number) {
   try {
     if (currentRate >= RATE_THRESHOLD) {
       return { shouldAlert: false, reason: 'Rate above threshold' };
@@ -252,7 +276,8 @@ export async function shouldSendRateAlert(currentRate) {
       return { shouldAlert: true, reason: 'First alert check' };
     }
 
-    const lastAlert = alertDoc.data().lastAlertSent?.toDate();
+    const data = alertDoc.data();
+    const lastAlert = data?.lastAlertSent?.toDate();
     if (!lastAlert) {
       return { shouldAlert: true, reason: 'No previous alert' };
     }
@@ -277,7 +302,7 @@ export async function shouldSendRateAlert(currentRate) {
  * @param {number} rate - Delivery rate at time of alert
  * @returns {Promise<void>}
  */
-export async function recordRateAlert(rate) {
+export async function recordRateAlert(rate: number) {
   try {
     const db = getAdminFirestore();
 
@@ -309,8 +334,8 @@ export async function getLastRateAlertInfo() {
 
     const data = alertDoc.data();
     return {
-      lastAlertSent: data.lastAlertSent?.toDate(),
-      deliveryRate: data.deliveryRate,
+      lastAlertSent: data?.lastAlertSent?.toDate(),
+      deliveryRate: data?.deliveryRate,
     };
   } catch (error) {
     console.error('❌ Error getting rate alert info:', error);

@@ -38,7 +38,7 @@ function getVapidKey() {
  * Debug logger
  * Note: Debug log API has been removed, using console only
  */
-function debugLog(message, data = {}) {
+function debugLog(message: string, data: Record<string, unknown> = {}): void {
   console.log(`[tokenRefresh] ${message}`, data);
 }
 
@@ -51,7 +51,11 @@ function debugLog(message, data = {}) {
  * @param {string} userId - User ID for server registration
  * @returns {Promise<{refreshed: boolean, token: string|null, error?: string}>}
  */
-export async function checkAndRefreshToken(userId) {
+export async function checkAndRefreshToken(userId: string): Promise<{
+  refreshed: boolean;
+  token: string | null;
+  error?: string;
+}> {
   if (typeof window === 'undefined') {
     return { refreshed: false, token: null, error: 'SSR' };
   }
@@ -95,17 +99,17 @@ export async function checkAndRefreshToken(userId) {
     try {
       await deleteToken(messaging);
       debugLog('Old token deleted');
-    } catch (deleteError) {
+    } catch (deleteError: unknown) {
       // If delete fails, continue anyway - we'll overwrite
-      debugLog('Delete token failed (continuing)', { error: deleteError.message });
+      debugLog('Delete token failed (continuing)', { error: (deleteError as Error).message });
     }
 
     // Step 2: Get service worker registration
     let registration = null;
     try {
       registration = await navigator.serviceWorker.getRegistration();
-    } catch (e) {
-      debugLog('Could not get SW registration', { error: e.message });
+    } catch (e: unknown) {
+      debugLog('Could not get SW registration', { error: (e as Error).message });
     }
 
     // Step 3: Get new token
@@ -149,8 +153,8 @@ export async function checkAndRefreshToken(userId) {
 
     // Step 6: Save new token locally
     await saveToken(newToken, {
-      deviceId: fingerprint?.deviceId || stored.deviceId,
-      deviceInfo: fingerprint?.deviceInfo || stored.deviceInfo,
+      deviceId: fingerprint?.deviceId ?? stored.deviceId ?? undefined,
+      deviceInfo: fingerprint?.deviceInfo ?? stored.deviceInfo ?? undefined,
       createdAt: new Date().toISOString(), // Reset creation date
     });
 
@@ -158,13 +162,13 @@ export async function checkAndRefreshToken(userId) {
 
     return { refreshed: true, token: newToken };
 
-  } catch (error) {
-    debugLog('Token refresh error', { error: error.message });
+  } catch (error: unknown) {
+    debugLog('Token refresh error', { error: (error as Error).message });
     console.error('[tokenRefresh] Error:', error);
 
     // Return stored token if refresh failed
     const stored = await loadToken();
-    return { refreshed: false, token: stored?.token || null, error: error.message };
+    return { refreshed: false, token: stored?.token || null, error: (error as Error).message };
   }
 }
 
@@ -177,7 +181,11 @@ export async function checkAndRefreshToken(userId) {
  * @param {string} userId - User ID
  * @returns {Promise<{hasToken: boolean, token: string|null, wasRefreshed: boolean}>}
  */
-export async function initializeTokenManagement(userId) {
+export async function initializeTokenManagement(userId: string): Promise<{
+  hasToken: boolean;
+  token: string | null;
+  wasRefreshed: boolean;
+}> {
   if (typeof window === 'undefined') {
     return { hasToken: false, token: null, wasRefreshed: false };
   }
@@ -211,7 +219,11 @@ export async function initializeTokenManagement(userId) {
  * @param {string} userId - User ID
  * @returns {Promise<{success: boolean, token: string|null, error?: string}>}
  */
-export async function forceTokenRefresh(userId) {
+export async function forceTokenRefresh(userId: string): Promise<{
+  success: boolean;
+  token: string | null;
+  error?: string;
+}> {
   if (typeof window === 'undefined') {
     return { success: false, token: null, error: 'SSR' };
   }
@@ -223,8 +235,8 @@ export async function forceTokenRefresh(userId) {
   if (stored) {
     // Modify stored data to force refresh
     await saveToken(stored.token, {
-      deviceId: stored.deviceId,
-      deviceInfo: stored.deviceInfo,
+      deviceId: stored.deviceId ?? undefined,
+      deviceInfo: stored.deviceInfo ?? undefined,
       createdAt: new Date(0).toISOString(), // Very old date
     });
   }

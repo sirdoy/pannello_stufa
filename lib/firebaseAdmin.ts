@@ -153,7 +153,7 @@ interface TokenRecord {
  * @param {string} token - FCM token to look up
  * @returns {Promise<{userId: string, deviceId: string} | null>}
  */
-async function lookupDeviceIdForToken(token) {
+async function lookupDeviceIdForToken(token: string): Promise<{ userId: string; deviceId: string } | null> {
   try {
     const db = getAdminDatabase();
     const usersRef = db.ref('users');
@@ -182,6 +182,16 @@ async function lookupDeviceIdForToken(token) {
   }
 }
 
+interface ErrorData {
+  token: string;
+  userId?: string;
+  deviceId?: string;
+  errorCode?: string;
+  errorMessage?: string;
+  notificationType?: string;
+  notificationTitle?: string;
+}
+
 /**
  * Track notification error to Firebase for diagnostics
  * Fire-and-forget pattern - does not block main send flow
@@ -196,7 +206,7 @@ async function lookupDeviceIdForToken(token) {
  * @param {string} errorData.notificationTitle - Notification title
  * @returns {Promise<string>} Push key of error log entry
  */
-async function trackNotificationError(errorData) {
+async function trackNotificationError(errorData: ErrorData): Promise<string | undefined> {
   try {
     const db = getAdminDatabase();
 
@@ -214,7 +224,7 @@ async function trackNotificationError(errorData) {
 
     const pushKey = await adminDbPush('notificationErrors', errorLog);
     console.log(`📝 Tracked notification error: ${errorLog.errorCode} (${pushKey})`);
-    return pushKey;
+    return pushKey ?? undefined;
   } catch (error) {
     console.error('❌ Error tracking notification error:', error);
     // Don't throw - this is fire-and-forget
@@ -227,7 +237,7 @@ async function trackNotificationError(errorData) {
  *
  * @param {string} invalidToken - The token to remove
  */
-async function removeInvalidToken(invalidToken) {
+async function removeInvalidToken(invalidToken: string): Promise<void> {
   try {
     const db = getAdminDatabase();
 
@@ -238,7 +248,7 @@ async function removeInvalidToken(invalidToken) {
 
     if (!snapshot.exists()) return;
 
-    const updates = {};
+    const updates: Record<string, null> = {};
 
     snapshot.forEach(userSnap => {
       const userId = userSnap.key;
@@ -268,7 +278,10 @@ async function removeInvalidToken(invalidToken) {
  * @param {Function} updateFunction - Function(currentData) => newData
  * @returns {Promise<any>} Committed data
  */
-export async function adminDbTransaction(path, updateFunction) {
+export async function adminDbTransaction(
+  path: string,
+  updateFunction: (currentData: unknown) => unknown
+): Promise<unknown> {
   const db = getAdminDatabase();
   const ref = db.ref(path);
 
@@ -279,6 +292,14 @@ export async function adminDbTransaction(path, updateFunction) {
   }
 
   return result.snapshot.val();
+}
+
+interface NotificationPayload {
+  title?: string;
+  body?: string;
+  data?: Record<string, string>;
+  icon?: string;
+  priority?: 'high' | 'normal';
 }
 
 /**
@@ -294,7 +315,11 @@ export async function adminDbTransaction(path, updateFunction) {
  * @param {string} [notification.priority] - Priorità (high|normal)
  * @param {string} [userId=null] - User ID for logging purposes
  */
-export async function sendPushNotification(tokens, notification, userId = null) {
+export async function sendPushNotification(
+  tokens: string | string[],
+  notification: NotificationPayload,
+  userId: string | null = null
+): Promise<any> {
   try {
     // Inizializza Admin SDK
     initializeFirebaseAdmin();
@@ -357,7 +382,7 @@ export async function sendPushNotification(tokens, notification, userId = null) 
     };
 
     // Track invalid tokens for removal
-    const invalidTokens = [];
+    const invalidTokens: string[] = [];
 
     // Invia a singolo token
     if (tokenArray.length === 1) {
@@ -389,24 +414,27 @@ export async function sendPushNotification(tokens, notification, userId = null) 
           failureCount: 0,
           responses: [{ success: true, messageId: response }],
         };
-      } catch (error) {
+      } catch (error: unknown) {
         // Look up device context for error logging
         const deviceContext = await lookupDeviceIdForToken(tokenArray[0]).catch(() => null);
+
+        const errorCode = (error as any).code;
+        const errorMessage = (error as any).message;
 
         // Track error with full context (fire-and-forget)
         trackNotificationError({
           token: tokenArray[0],
           userId: deviceContext?.userId,
           deviceId: deviceContext?.deviceId,
-          errorCode: error.code,
-          errorMessage: error.message,
+          errorCode,
+          errorMessage,
           notificationType: notification.data?.type || 'unknown',
           notificationTitle: notification.title,
         }).catch(console.error);
 
         // Check if token is invalid
-        if (INVALID_TOKEN_ERRORS.includes(error.code)) {
-          console.warn(`⚠️ Invalid token detected: ${error.code}`);
+        if (INVALID_TOKEN_ERRORS.includes(errorCode)) {
+          console.warn(`⚠️ Invalid token detected: ${errorCode}`);
           invalidTokens.push(tokenArray[0]);
 
           // Remove invalid token asynchronously (don't block response)
@@ -425,8 +453,8 @@ export async function sendPushNotification(tokens, notification, userId = null) 
           failureCount: 1,
           fcmErrors: [{
             tokenPrefix: tokenArray[0].substring(0, 20),
-            errorCode: error.code || 'unknown',
-            errorMessage: error.message || ''
+            errorCode: errorCode || 'unknown',
+            errorMessage: errorMessage || ''
           }],
           metadata: { source: 'api', isTest: notification.data?.type === 'test' }
         }).catch(err => console.error('Failed to log notification:', err));
@@ -452,12 +480,14 @@ export async function sendPushNotification(tokens, notification, userId = null) 
     // Check for invalid tokens and remove them
     if (response.failureCount > 0) {
       // Track errors and identify invalid tokens
-      const errorTrackingPromises = [];
+      const errorTrackingPromises: Promise<void>[] = [];
 
       response.responses.forEach(async (resp, idx) => {
         if (!resp.success) {
           // Look up device context for this token
           const deviceContext = await lookupDeviceIdForToken(tokenArray[idx]).catch(() => null);
+
+          const errorCode = resp.error?.code;
 
           // Track error (fire-and-forget)
           errorTrackingPromises.push(
@@ -465,15 +495,15 @@ export async function sendPushNotification(tokens, notification, userId = null) 
               token: tokenArray[idx],
               userId: deviceContext?.userId,
               deviceId: deviceContext?.deviceId,
-              errorCode: resp.error?.code,
+              errorCode,
               errorMessage: resp.error?.message,
               notificationType: notification.data?.type || 'unknown',
               notificationTitle: notification.title,
-            }).catch(console.error)
+            }).catch(console.error) as Promise<void>
           );
 
-          if (INVALID_TOKEN_ERRORS.includes(resp.error?.code)) {
-            console.warn(`⚠️ Invalid token at index ${idx}: ${resp.error.code}`);
+          if (errorCode && INVALID_TOKEN_ERRORS.includes(errorCode)) {
+            console.warn(`⚠️ Invalid token at index ${idx}: ${errorCode}`);
             invalidTokens.push(tokenArray[idx]);
           } else {
             console.error(`❌ Errore token ${tokenArray[idx]}:`, resp.error);
@@ -491,7 +521,7 @@ export async function sendPushNotification(tokens, notification, userId = null) 
     }
 
     // Build FCM errors array for logging
-    const fcmErrors = [];
+    const fcmErrors: Array<{ tokenPrefix: string; errorCode: string; errorMessage: string }> = [];
     response.responses.forEach((resp, idx) => {
       if (!resp.success) {
         fcmErrors.push({
@@ -537,7 +567,7 @@ export async function sendPushNotification(tokens, notification, userId = null) 
  * @param {string} userId - User ID (Auth0 sub)
  * @param {Object} notification - Dati notifica
  */
-export async function sendNotificationToUser(userId, notification) {
+export async function sendNotificationToUser(userId: string, notification: NotificationPayload): Promise<any> {
   try {
     // Recupera tutti i token dell'utente usando Admin SDK
     const tokensData = await adminDbGet(`users/${userId}/fcmTokens`);
@@ -552,7 +582,7 @@ export async function sendNotificationToUser(userId, notification) {
     }
 
     // Convert tokens to array with deviceId for filtering
-    const allTokens = Object.values(tokensData).map(t => ({
+    const allTokens = Object.values(tokensData as Record<string, TokenRecord>).map(t => ({
       token: t.token,
       deviceId: t.deviceId || 'unknown',
     }));
@@ -618,7 +648,7 @@ export async function sendNotificationToUser(userId, notification) {
  * Helper: Verifica se un token è valido
  * (Utile per cleanup token obsoleti/invalidi)
  */
-export async function verifyFCMToken(token) {
+export async function verifyFCMToken(token: string): Promise<boolean> {
   try {
     initializeFirebaseAdmin();
 
@@ -632,8 +662,8 @@ export async function verifyFCMToken(token) {
     }, true); // dry_run = true
 
     return true;
-  } catch (error) {
-    console.error('❌ Token invalido:', error.code);
+  } catch (error: unknown) {
+    console.error('❌ Token invalido:', (error as any).code);
     return false;
   }
 }

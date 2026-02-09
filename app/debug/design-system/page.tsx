@@ -49,6 +49,29 @@ import AccessibilitySection from './components/AccessibilitySection';
 import { componentDocs } from './data/component-docs';
 
 /**
+ * Local component interfaces for strict-mode compliance
+ */
+interface SectionShowcaseProps {
+  title: string;
+  icon: string;
+  docs?: string;
+  children: React.ReactNode;
+}
+
+interface ColorSwatchProps {
+  name: string;
+  description: string;
+  colors: string[];
+  usage: string;
+}
+
+interface WeatherIconDemoProps {
+  code: number;
+  label: string;
+  isNight?: boolean;
+}
+
+/**
  * Design System Showcase Page - Ember Noir v3.0
  *
  * **IMPORTANT**: This page is the SINGLE SOURCE OF TRUTH for UI components.
@@ -1232,7 +1255,7 @@ export default function DesignSystemPage() {
                       <Checkbox
                         id="checkbox-1"
                         checked={checkboxState}
-                        onChange={(e) => setCheckboxState(e.target.checked)}
+                        onChange={(e) => setCheckboxState('checked' in e.target ? e.target.checked : false)}
                         aria-label="Interactive Checkbox"
                       />
                       <Text variant="secondary" size="sm">Default (Ocean) - Click to toggle</Text>
@@ -2520,7 +2543,7 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
             defaultValues={{ name: '', email: '' }}
             successMessage="Item added successfully!"
           >
-            {({ control }) => (
+            {({ control }: { control: any }) => (
               <div className="space-y-4">
                 <Controller
                   name="name"
@@ -2693,16 +2716,16 @@ function DataTableDemo() {
     {
       accessorKey: 'name',
       header: 'Device Name',
-      cell: ({ getValue }) => (
+      cell: ({ getValue }: { getValue: () => string }) => (
         <Text>{getValue()}</Text>
       ),
     },
     {
       accessorKey: 'type',
       header: 'Type',
-      cell: ({ getValue }) => {
+      cell: ({ getValue }: { getValue: () => string }) => {
         const type = getValue();
-        const variants = {
+        const variants: Record<string, 'ember' | 'ocean' | 'sage' | 'neutral'> = {
           thermostat: 'ember',
           stove: 'ember',
           lights: 'sage',
@@ -2720,7 +2743,7 @@ function DataTableDemo() {
     {
       accessorKey: 'status',
       header: 'Status',
-      cell: ({ getValue }) => {
+      cell: ({ getValue }: { getValue: () => string }) => {
         const status = getValue();
         return (
           <Badge variant={status === 'online' ? 'sage' : 'neutral'}>
@@ -2733,7 +2756,7 @@ function DataTableDemo() {
     {
       accessorKey: 'lastUpdate',
       header: 'Last Update',
-      cell: ({ getValue }) => {
+      cell: ({ getValue }: { getValue: () => string }) => {
         const date = new Date(getValue());
         return (
           <Text variant="secondary" size="sm">
@@ -2761,8 +2784,8 @@ function DataTableDemo() {
       enableExpansion
       pageSize={5}
       showRowCount
-      getRowId={(row) => row.id}
-      renderExpandedContent={(row) => (
+      getRowId={(row: any) => row.id}
+      renderExpandedContent={(row: any) => (
         <div className="p-4 space-y-2">
           <Text variant="secondary" size="sm">
             <strong>Device ID:</strong> {row.original.id}
@@ -2782,7 +2805,7 @@ function DataTableDemo() {
 /**
  * Section wrapper with title and optional docs link (showcase-specific variant)
  */
-function SectionShowcase({ title, icon, docs, children }) {
+function SectionShowcase({ title, icon, docs, children }: SectionShowcaseProps) {
   // Generate anchor ID from title (lowercase, replace spaces with dashes)
   const anchorId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
@@ -2807,14 +2830,14 @@ function SectionShowcase({ title, icon, docs, children }) {
 /**
  * Color swatch display with usage notes
  */
-function ColorSwatch({ name, description, colors, usage }) {
+function ColorSwatch({ name, description, colors, usage }: ColorSwatchProps) {
   return (
     <Card variant="subtle">
       <CardContent>
         <Heading level={4} size="md" className="mb-2">{name}</Heading>
         <Text variant="tertiary" size="xs" className="mb-2">{description}</Text>
         <div className="flex gap-2 mb-3">
-          {colors.map((color) => (
+          {colors.map((color: string) => (
             <div
               key={color}
               className={`w-8 h-8 rounded-lg bg-${color} border border-white/10`}
@@ -2833,7 +2856,7 @@ function ColorSwatch({ name, description, colors, usage }) {
 /**
  * Weather icon demo with code and label
  */
-function WeatherIconDemo({ code, label, isNight = false }) {
+function WeatherIconDemo({ code, label, isNight = false }: WeatherIconDemoProps) {
   return (
     <div className="flex flex-col items-center gap-2 p-3 bg-slate-800/40 rounded-xl [html:not(.dark)_&]:bg-slate-100/80">
       <WeatherIcon code={code} isNight={isNight} size={32} className="text-ocean-400" />

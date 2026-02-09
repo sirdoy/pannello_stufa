@@ -137,7 +137,7 @@ export default function NotificationsDashboard() {
    * Get device status badge classes
    */
   const getStatusBadge = (status: string): { bg: string; text: string; label: string } => {
-    const badges = {
+    const badges: Record<string, { bg: string; text: string; label: string }> = {
       active: {
         bg: 'bg-sage-50 [html:not(.dark)_&]:bg-sage-50',
         text: 'text-sage-600 [html:not(.dark)_&]:text-sage-700',

@@ -413,10 +413,10 @@ export default function TestNotificationPage() {
                       </div>
                     )}
 
-                    {result.trace.deliveryResults.errors?.length > 0 && (
+                    {(result.trace?.deliveryResults?.errors?.length ?? 0) > 0 && (
                       <div className="mt-3 pt-3 border-t border-white/10">
                         <Text variant="tertiary" size="xs" className="mb-2">Errors:</Text>
-                        {result.trace.deliveryResults.errors.map((err, idx) => (
+                        {result.trace?.deliveryResults?.errors?.map((err, idx) => (
                           <Text key={idx} size="xs" variant="danger">
                             {err.errorCode} - {err.tokenPrefix}
                           </Text>

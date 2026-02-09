@@ -105,7 +105,7 @@ export default function StoveDebugPage() {
     } catch (error) {
       setGetResponses((prev) => ({
         ...prev,
-        [name]: { error: error.message },
+        [name]: { error: error instanceof Error ? error.message : String(error) },
       }));
     } finally {
       setLoadingGet((prev) => ({ ...prev, [name]: false }));
@@ -153,7 +153,7 @@ export default function StoveDebugPage() {
     } catch (error) {
       setPostResponses((prev) => ({
         ...prev,
-        [name]: { error: error.message },
+        [name]: { error: error instanceof Error ? error.message : String(error) },
       }));
     } finally {
       setLoadingPost((prev) => ({ ...prev, [name]: false }));

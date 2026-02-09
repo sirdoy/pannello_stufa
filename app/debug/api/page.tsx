@@ -124,27 +124,27 @@ export default function ApiDebugPage() {
 
           <div className="mt-6">
             <Tabs.Content value="stove">
-              <StoveTab autoRefresh={autoRefresh} refreshTrigger={lastRefresh} />
+              <StoveTab autoRefresh={autoRefresh} refreshTrigger={lastRefresh ?? 0} />
             </Tabs.Content>
 
             <Tabs.Content value="netatmo">
-              <NetatmoTab autoRefresh={autoRefresh} refreshTrigger={lastRefresh} />
+              <NetatmoTab autoRefresh={autoRefresh} refreshTrigger={lastRefresh ?? 0} />
             </Tabs.Content>
 
             <Tabs.Content value="hue">
-              <HueTab autoRefresh={autoRefresh} refreshTrigger={lastRefresh} />
+              <HueTab autoRefresh={autoRefresh} refreshTrigger={lastRefresh ?? 0} />
             </Tabs.Content>
 
             <Tabs.Content value="weather">
-              <WeatherTab autoRefresh={autoRefresh} refreshTrigger={lastRefresh} />
+              <WeatherTab autoRefresh={autoRefresh} refreshTrigger={lastRefresh ?? 0} />
             </Tabs.Content>
 
             <Tabs.Content value="firebase">
-              <FirebaseTab autoRefresh={autoRefresh} refreshTrigger={lastRefresh} />
+              <FirebaseTab autoRefresh={autoRefresh} refreshTrigger={lastRefresh ?? 0} />
             </Tabs.Content>
 
             <Tabs.Content value="scheduler">
-              <SchedulerTab autoRefresh={autoRefresh} refreshTrigger={lastRefresh} />
+              <SchedulerTab autoRefresh={autoRefresh} refreshTrigger={lastRefresh ?? 0} />
             </Tabs.Content>
           </div>
         </Tabs>

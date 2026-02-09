@@ -227,7 +227,7 @@ export function PostEndpointCard({
                       onChange={(e) => handleInputChange(param.name, e.target.value)}
                       className="flex-1 px-3 py-1.5 border border-slate-600 [html:not(.dark)_&]:border-slate-300 rounded-lg bg-slate-800 [html:not(.dark)_&]:bg-white text-slate-100 [html:not(.dark)_&]:text-slate-900"
                     >
-                      {param.options.map((opt) => (
+                      {param.options?.map((opt) => (
                         <option key={opt} value={opt}>
                           {opt}
                         </option>

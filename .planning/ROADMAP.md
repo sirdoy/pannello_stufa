@@ -54,7 +54,7 @@ See `.planning/milestones/` for full archives.
 
 **Context:** After completing v5.0 TypeScript migration, the codebase has ~1841 tsc errors when strict mode is enabled (768 noImplicitAny, 188 strictNullChecks, 419 type mismatch, 91 implicit index access, 436 noUncheckedIndexedAccess, 30 misc). These errors span ~531 source files + ~131 test files. Additionally, 1 test is failing (FormModal cancel behavior) and dead code needs removal.
 
-### Phase 44: Library Strict Mode Foundation
+### Phase 44: Library Strict Mode Foundation ✓
 
 **Goal**: Strict TypeScript enabled with foundational library utilities fully compliant
 
@@ -62,22 +62,18 @@ See `.planning/milestones/` for full archives.
 
 **Requirements**: STRICT-01, STRICT-02 (partial - lib/ files only)
 
-**Success Criteria** (what must be TRUE):
-1. `strict: true` enabled in tsconfig.json without breaking build
-2. All lib/ utilities have explicit parameter types and return types
-3. All lib/ functions handle null/undefined edge cases properly
-4. tsc --noEmit shows zero errors in lib/ directory
+**Completed**: 2026-02-09 | **Verified**: passed (4/4 must-haves)
 
-**Plans**: 7 plans
+**Plans**: 7/7 complete
 
 Plans:
-- [ ] 44-01-PLAN.md — Enable strict mode + fix miscellaneous lib/ files (health, sandbox, repositories, commands, migration)
-- [ ] 44-02-PLAN.md — Fix notification triggers + filter (notificationTriggers, notificationTriggersServer, notificationFilter)
-- [ ] 44-03-PLAN.md — Fix notification services (notificationService, notificationPreferencesService, notificationLogger, notificationHistoryService, notificationValidation)
-- [ ] 44-04-PLAN.md — Fix Firebase + services (firebaseAdmin, tokenRefresh, unifiedDeviceConfigService, StoveService, pidAutomationService)
-- [ ] 44-05-PLAN.md — Fix Netatmo + coordination + scheduler (netatmoStoveSync, netatmoService, coordinationOrchestrator, schedulerStats, schedulerService, + 3 small files)
-- [ ] 44-06-PLAN.md — Fix hooks + PWA (useGeofencing, useOnlineStatus, usePWAInstall, useBackgroundSync, usePeriodicSync, useScheduleData, useRoomStatus, pwa/geofencing)
-- [ ] 44-07-PLAN.md — Fix test files + final verification (5 test files, gap sweep, zero lib/ errors confirmed)
+- [x] 44-01-PLAN.md — Enable strict mode + fix miscellaneous lib/ files
+- [x] 44-02-PLAN.md — Fix notification triggers + filter
+- [x] 44-03-PLAN.md — Fix notification services
+- [x] 44-04-PLAN.md — Fix Firebase + services
+- [x] 44-05-PLAN.md — Fix Netatmo + coordination + scheduler
+- [x] 44-06-PLAN.md — Fix hooks + PWA
+- [x] 44-07-PLAN.md — Fix test files + final verification (zero lib/ errors confirmed)
 
 ---
 
@@ -178,11 +174,11 @@ Plans:
 | 11-18 | v3.0 | 52/52 | ✓ Complete | 2026-01-30 |
 | 6-10 | v2.0 | 21/21 | ✓ Complete | 2026-01-28 |
 | 1-5 | v1.0 | 29/29 | ✓ Complete | 2026-01-26 |
-| **44** | **v5.1** | **0/7** | **Planned** | **-** |
+| **44** | **v5.1** | **7/7** | **✓ Complete** | **2026-02-09** |
 | **45** | **v5.1** | **0/TBD** | **Not started** | **-** |
 | **46** | **v5.1** | **0/TBD** | **Not started** | **-** |
 | **47** | **v5.1** | **0/TBD** | **Not started** | **-** |
 | **48** | **v5.1** | **0/TBD** | **Not started** | **-** |
 
 ---
-*Last updated: 2026-02-08 — Phase 44 planned (7 plans, 3 waves)*
+*Last updated: 2026-02-09 — Phase 44 complete (7/7 plans, verified passed)*

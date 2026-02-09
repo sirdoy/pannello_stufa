@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 48 of 48 (Dead Code Removal)
-Plan: 2 of 6 in current phase
+Plan: 3 of 6 in current phase
 Status: In Progress
-Last activity: 2026-02-09 - Completed 48-02-PLAN.md (4 unused dependencies removed: 2 Radix UI + baseline-browser-mapping + serwist, 0 knip unused deps remaining)
+Last activity: 2026-02-09 - Completed 48-03-PLAN.md (41 unused exports removed from 18 lib/ core files, 0 tsc errors)
 
-Progress: [████████████████████████████████████████████░░░░] 99% (245/246 estimated total plans)
+Progress: [████████████████████████████████████████████░░░░] 99% (246/246 estimated total plans)
 
 ## Performance Metrics
 
@@ -69,6 +69,7 @@ Progress: [███████████████████████
 | Phase 47 P10 | 123s | 2 tasks | 0 files |
 | Phase 48 P01 | 276s | 2 tasks | 39 files |
 | Phase 48 P02 | 425s | 2 tasks | 1 file |
+| Phase 48 P03 | 574s | 2 tasks | 18 files |
 
 ## Accumulated Context
 
@@ -160,6 +161,7 @@ Recent decisions from PROJECT.md affecting v5.1 work:
 - [Phase 47-10]: Phase 47 complete: strict + noUncheckedIndexedAccess fully operational (0 tsc errors, 3034 tests passing)
 - [Phase 48-01]: Used knip dependency analysis to identify unused files (39 files deleted: 31 source + 8 scripts/docs, 5,702 LOC removed)
 - [Phase 48-02]: Removed 4 unused dependencies: @radix-ui/react-dropdown-menu, @radix-ui/react-slot, baseline-browser-mapping, serwist (bundled in @serwist/next)
+- [Phase 48-03]: Removed 41 unused exports from 18 lib/ core files (auth, devices, firebase, coordination, environment, hlsDownloader, logService, routes, stoveState)
 
 ### Pending Todos
 
@@ -190,9 +192,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-09 16:29
-Stopped at: Completed 48-02-PLAN.md (4 unused dependencies removed, 0 knip unused deps remaining)
-Resume file: None — Ready for 48-03-PLAN.md
+Last session: 2026-02-09 16:42
+Stopped at: Completed 48-03-PLAN.md (41 unused exports removed from 18 lib/ files, 0 tsc errors)
+Resume file: None — Ready for 48-04-PLAN.md
 
 ---
 *State initialized: 2026-02-08 for v5.1 Tech Debt & Code Quality milestone*

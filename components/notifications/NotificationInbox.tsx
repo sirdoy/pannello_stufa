@@ -92,7 +92,8 @@ export default function NotificationInbox() {
   }, [typeFilter, statusFilter]); // Reset on filter change
 
   // Handle filter changes
-  const handleTypeChange = (value: string) => {
+  const handleTypeChange = (event: { target: { value: string | number } }) => {
+    const value = String(event.target.value);
     setTypeFilter(value);
     setCursor(null);
     setNotifications([]);
@@ -100,7 +101,8 @@ export default function NotificationInbox() {
     setIsLoading(true);
   };
 
-  const handleStatusChange = (value: string) => {
+  const handleStatusChange = (event: { target: { value: string | number } }) => {
+    const value = String(event.target.value);
     setStatusFilter(value);
     setCursor(null);
     setNotifications([]);

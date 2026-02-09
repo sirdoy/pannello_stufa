@@ -94,7 +94,8 @@ export default function MonitoringTimeline() {
   }, [typeFilter, severityFilter]); // Reset on filter change
 
   // Handle filter changes
-  const handleTypeChange = (value: string) => {
+  const handleTypeChange = (event: { target: { value: string | number } }) => {
+    const value = String(event.target.value);
     setTypeFilter(value);
     setCursor(null);
     setEvents([]);
@@ -102,7 +103,8 @@ export default function MonitoringTimeline() {
     setIsLoading(true);
   };
 
-  const handleSeverityChange = (value: string) => {
+  const handleSeverityChange = (event: { target: { value: string | number } }) => {
+    const value = String(event.target.value);
     setSeverityFilter(value);
     setCursor(null);
     setEvents([]);

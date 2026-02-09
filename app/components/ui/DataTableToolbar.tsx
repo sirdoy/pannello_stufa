@@ -62,12 +62,12 @@ const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(
     bulkActions = [],
     className = '',
     ...props
-  }: DataTableToolbarProps<any>,
+  },
   ref
 ) {
   // Debounced search state
   const [searchValue, setSearchValue] = useState(globalFilter);
-  const debounceRef = useRef(null);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   // Sync search value with external globalFilter
   useEffect(() => {
@@ -76,7 +76,7 @@ const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(
 
   // Debounced search handler
   const handleSearchChange = useCallback(
-    (e) => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
       setSearchValue(value);
 
@@ -109,7 +109,7 @@ const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(
 
   // Handle removing a column filter
   const handleRemoveFilter = useCallback(
-    (columnId) => {
+    (columnId: string) => {
       if (table) {
         table.getColumn(columnId)?.setFilterValue(undefined);
       }
@@ -133,7 +133,7 @@ const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(
 
   // Handle bulk action click
   const handleBulkAction = useCallback(
-    (actionId) => {
+    (actionId: string) => {
       if (onBulkAction) {
         onBulkAction(actionId, selectedRows);
       }
@@ -142,7 +142,7 @@ const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(
   );
 
   // Format filter value for display
-  const formatFilterValue = (value) => {
+  const formatFilterValue = (value: any) => {
     if (Array.isArray(value)) {
       return value.join(', ');
     }
@@ -153,7 +153,7 @@ const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(
   };
 
   // Get column header name for display
-  const getColumnHeaderName = (columnId) => {
+  const getColumnHeaderName = (columnId: string) => {
     const column = table?.getColumn(columnId);
     const headerDef = column?.columnDef?.header;
     if (typeof headerDef === 'string') {
@@ -271,7 +271,7 @@ const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(
           )}
 
           {/* Column filter chips */}
-          {columnFilters.map((filter) => (
+          {columnFilters.map((filter: { id: string; value: any }) => (
             <Badge
               key={filter.id}
               variant="ocean"

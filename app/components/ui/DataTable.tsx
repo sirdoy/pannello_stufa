@@ -13,6 +13,7 @@ import {
   type SortingState,
   type ColumnFiltersState,
   type Row,
+  type Table,
 } from '@tanstack/react-table';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -83,7 +84,7 @@ export const dataTableVariants = cva(
  * @param {string|false} direction - 'asc', 'desc', or false
  * @returns {'ascending'|'descending'|'none'} ARIA sort attribute value
  */
-function getAriaSortValue(isSorted, direction) {
+function getAriaSortValue(isSorted: boolean | string, direction: 'asc' | 'desc' | false): 'ascending' | 'descending' | 'none' {
   if (!isSorted) return 'none';
   return direction === 'asc' ? 'ascending' : 'descending';
 }
@@ -97,7 +98,7 @@ function getAriaSortValue(isSorted, direction) {
  * @param {boolean} props.isSorted - Whether the column is sorted
  * @param {string|false} props.direction - Current sort direction
  */
-function SortIndicator({ isSorted, direction }) {
+function SortIndicator({ isSorted, direction }: { isSorted: boolean | string; direction: 'asc' | 'desc' | false }) {
   if (!isSorted) {
     return (
       <ChevronsUpDown
@@ -217,10 +218,10 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
   const baseColumns = useMemo(() => columnsProp ?? [], [columnsProp]);
 
   // Sorting state
-  const [sorting, setSorting] = useState([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   // Filtering state
-  const [columnFilters, setColumnFilters] = useState([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
 
   // Pagination state
@@ -237,7 +238,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
 
   // Responsive scroll indicator state
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
-  const scrollContainerRef = useRef(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Use controlled or internal selection state
   const isSelectionControlled = controlledSelectedRows !== undefined;
@@ -245,7 +246,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
 
   // Handle selection change
   const handleRowSelectionChange = useCallback(
-    (updaterOrValue) => {
+    (updaterOrValue: Record<string, boolean> | ((old: Record<string, boolean>) => Record<string, boolean>)) => {
       const newSelection =
         typeof updaterOrValue === 'function'
           ? updaterOrValue(rowSelection)
@@ -269,7 +270,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
     return {
       id: 'expand',
       header: () => null,
-      cell: ({ row }) =>
+      cell: ({ row }: { row: Row<any> }) =>
         row.getCanExpand() ? (
           <button
             onClick={(e) => {
@@ -299,7 +300,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
 
     return {
       id: 'select',
-      header: ({ table }) =>
+      header: ({ table }: { table: Table<any> }) =>
         selectionMode === 'multi' ? (
           <Checkbox
             checked={table.getIsAllPageRowsSelected()}
@@ -309,7 +310,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
             size="sm"
           />
         ) : null,
-      cell: ({ row }) => (
+      cell: ({ row }: { row: Row<any> }) => (
         <div
           onClick={(e) => e.stopPropagation()}
           className="flex items-center justify-center"
@@ -317,7 +318,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
           <Checkbox
             checked={row.getIsSelected()}
             disabled={!row.getCanSelect()}
-            onCheckedChange={row.toggleSelected}
+            onCheckedChange={(checked) => row.toggleSelected(typeof checked === 'boolean' ? checked : false)}
             aria-label={`Select row ${row.id}`}
             size="sm"
           />
@@ -341,7 +342,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
 
   // Row click handler
   const handleRowClick = useCallback(
-    (row) => {
+    (row: Row<any>) => {
       if (onRowClick) {
         onRowClick(row);
       }
@@ -351,7 +352,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
 
   // Handle pagination change with callback
   const handlePaginationChange = useCallback(
-    (updaterOrValue) => {
+    (updaterOrValue: { pageIndex: number; pageSize: number } | ((old: { pageIndex: number; pageSize: number }) => { pageIndex: number; pageSize: number })) => {
       setPagination((prev) => {
         const newPagination =
           typeof updaterOrValue === 'function'
@@ -682,7 +683,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
                   '[html:not(.dark)_&]:border-slate-300/60'
                 )}
               >
-                {pageSizeOptions.map((size) => (
+                {pageSizeOptions.map((size: number) => (
                   <option key={size} value={size}>
                     {size}
                   </option>

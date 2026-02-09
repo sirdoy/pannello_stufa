@@ -11,7 +11,7 @@ const API_BASE = '/api';
 // ========================================
 
 // Stove UI pages
-export const STOVE_UI_ROUTES = {
+const STOVE_UI_ROUTES = {
   main: '/stove',
   scheduler: '/stove/scheduler',
   maintenance: '/stove/maintenance',
@@ -19,18 +19,18 @@ export const STOVE_UI_ROUTES = {
 } as const;
 
 // Thermostat UI pages
-export const THERMOSTAT_UI_ROUTES = {
+const THERMOSTAT_UI_ROUTES = {
   main: '/thermostat',
   authorized: '/thermostat/authorized',
 } as const;
 
 // Camera UI pages
-export const CAMERA_UI_ROUTES = {
+const CAMERA_UI_ROUTES = {
   main: '/camera',
 } as const;
 
 // Global UI pages
-export const GLOBAL_UI_ROUTES = {
+const GLOBAL_UI_ROUTES = {
   home: '/',
   log: '/log',
   changelog: '/changelog',
@@ -57,12 +57,12 @@ export const STOVE_ROUTES = {
 } as const;
 
 // Scheduler endpoints
-export const SCHEDULER_ROUTES = {
+const SCHEDULER_ROUTES = {
   check: (secret: string): string => `${API_BASE}/scheduler/check?secret=${secret}`,
 } as const;
 
 // Netatmo endpoints
-export const NETATMO_ROUTES = {
+const NETATMO_ROUTES = {
   // Auth & topology
   callback: `${API_BASE}/netatmo/callback`,
   disconnect: `${API_BASE}/netatmo/disconnect`,
@@ -98,12 +98,12 @@ export const LOG_ROUTES = {
 } as const;
 
 // User endpoints
-export const USER_ROUTES = {
+const USER_ROUTES = {
   me: `${API_BASE}/user`,
 } as const;
 
 // Auth endpoints (Auth0 v4 - mounted by middleware)
-export const AUTH_ROUTES = {
+const AUTH_ROUTES = {
   login: '/auth/login',
   logout: '/auth/logout',
   callback: '/auth/callback',
@@ -111,7 +111,7 @@ export const AUTH_ROUTES = {
 } as const;
 
 // All routes combined for easy export
-export const API_ROUTES = {
+const API_ROUTES = {
   stove: STOVE_ROUTES,
   scheduler: SCHEDULER_ROUTES,
   netatmo: NETATMO_ROUTES,
@@ -120,5 +120,3 @@ export const API_ROUTES = {
   user: USER_ROUTES,
   auth: AUTH_ROUTES,
 } as const;
-
-export default API_ROUTES;

@@ -54,7 +54,7 @@ export async function updateStoveState(stateUpdate: StoveStateUpdate): Promise<v
 /**
  * Get current stove state from Firebase
  */
-export async function getStoveState(): Promise<StoveState | null> {
+async function getStoveState(): Promise<StoveState | null> {
   const path = getEnvironmentPath('stove/state');
 
   try {
@@ -69,7 +69,7 @@ export async function getStoveState(): Promise<StoveState | null> {
 /**
  * Initialize stove state in Firebase (if not exists)
  */
-export async function initializeStoveState(): Promise<void> {
+async function initializeStoveState(): Promise<void> {
   const existing = await getStoveState();
 
   if (!existing) {

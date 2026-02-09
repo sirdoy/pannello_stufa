@@ -316,7 +316,7 @@ async function verifyMigration(originalSlots: Record<string, unknown[]>, origina
  * CLI execution support
  * Usage: node -e "require('./lib/migrateSchedules').runMigration()"
  */
-export async function runMigration(): Promise<void> {
+async function runMigration(): Promise<void> {
   const result = await migrateSchedulesToV2();
   console.log('\n📋 Migration Result:', JSON.stringify(result, null, 2));
   process.exit(result.success ? 0 : 1);

@@ -86,7 +86,7 @@ export const logNetatmoAction = {
 /**
  * Log Philips Hue/Lights actions
  */
-export const logHueAction = {
+const logHueAction = {
   connect: (): Promise<void> => logUserAction('Connessione Hue', DEVICE_TYPES.LIGHTS),
   disconnect: (): Promise<void> => logUserAction('Disconnessione Hue', DEVICE_TYPES.LIGHTS),
   lightOn: (lightName: string): Promise<void> => logUserAction('Luce accesa', DEVICE_TYPES.LIGHTS, 'ON', { lightName }),

@@ -61,8 +61,8 @@ export default function TimeBar({
         {intervals.map((range, idx) => {
           const [startH, startM] = range.start.split(':').map(Number);
           const [endH, endM] = range.end.split(':').map(Number);
-          const start = startH * 60 + startM;
-          const end = endH * 60 + endM;
+          const start = startH! * 60 + startM!;
+          const end = endH! * 60 + endM!;
           const left = (start / totalMinutes) * 100;
           const width = ((end - start) / totalMinutes) * 100;
           const isActive = idx === hoveredIndex || idx === selectedIndex;
@@ -133,8 +133,8 @@ export default function TimeBar({
           {intervals.map((range, idx) => {
             const [startH, startM] = range.start.split(':').map(Number);
             const [endH, endM] = range.end.split(':').map(Number);
-            const start = startH * 60 + startM;
-            const end = endH * 60 + endM;
+            const start = startH! * 60 + startM!;
+            const end = endH! * 60 + endM!;
             const startLeft = (start / totalMinutes) * 100;
             const endLeft = (end / totalMinutes) * 100;
             return (

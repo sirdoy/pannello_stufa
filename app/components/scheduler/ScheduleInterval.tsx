@@ -54,7 +54,7 @@ export default function ScheduleInterval({
                 {(() => {
                   const [startH, startM] = range.start.split(':').map(Number);
                   const [endH, endM] = range.end.split(':').map(Number);
-                  const durationMin = (endH * 60 + endM) - (startH * 60 + startM);
+                  const durationMin = (endH! * 60 + endM!) - (startH! * 60 + startM!);
                   const hours = Math.floor(durationMin / 60);
                   const minutes = durationMin % 60;
                   return hours > 0

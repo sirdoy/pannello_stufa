@@ -63,7 +63,7 @@ export default function AddIntervalModal({
         // Calculate duration for duration mode
         const [startH, startM] = initialInterval.start.split(':').map(Number);
         const [endH, endM] = initialInterval.end.split(':').map(Number);
-        const durationMin = (endH * 60 + endM) - (startH * 60 + startM);
+        const durationMin = (endH! * 60 + endM!) - (startH! * 60 + startM!);
         if ([15, 30, 60, 120].includes(durationMin)) {
           setDurationPreset(durationMin);
         } else {
@@ -90,7 +90,7 @@ export default function AddIntervalModal({
     // Duration mode
     const minutes = durationPreset === 'custom' ? customMinutes : durationPreset;
     const [h, m] = start.split(':').map(Number);
-    const totalMinutes = h * 60 + m + minutes;
+    const totalMinutes = h! * 60 + m! + minutes;
     const endH = String(Math.floor(totalMinutes / 60) % 24).padStart(2, '0');
     const endM = String(totalMinutes % 60).padStart(2, '0');
     return `${endH}:${endM}`;
@@ -110,8 +110,8 @@ export default function AddIntervalModal({
     // Check if end time wraps to next day (start > end means crossing midnight)
     const [startH, startM] = start.split(':').map(Number);
     const [endH, endM] = calculatedEnd.split(':').map(Number);
-    const startMinutes = startH * 60 + startM;
-    const endMinutes = endH * 60 + endM;
+    const startMinutes = startH! * 60 + startM!;
+    const endMinutes = endH! * 60 + endM!;
 
     // Don't allow intervals that cross midnight
     if (endMinutes <= startMinutes) return false;
@@ -125,7 +125,7 @@ export default function AddIntervalModal({
     // Calculate duration from start/end
     const [startH, startM] = start.split(':').map(Number);
     const [endH, endM] = calculatedEnd.split(':').map(Number);
-    const duration = (endH * 60 + endM) - (startH * 60 + startM);
+    const duration = (endH! * 60 + endM!) - (startH! * 60 + startM!);
 
     onConfirm({
       start,

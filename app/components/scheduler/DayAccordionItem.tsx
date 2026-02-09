@@ -75,8 +75,8 @@ export default function DayAccordionItem({
     if (intervals.length === 0) return 'Nessun intervallo configurato';
 
     const sorted = [...intervals].sort((a, b) => a.start.localeCompare(b.start));
-    const first = sorted[0].start;
-    const last = sorted[sorted.length - 1].end;
+    const first = sorted[0]!.start;
+    const last = sorted[sorted.length - 1]!.end;
 
     return `${first} - ${last}`;
   };
@@ -88,8 +88,8 @@ export default function DayAccordionItem({
     const totalMinutes = intervals.reduce((sum, interval) => {
       const [startH, startM] = interval.start.split(':').map(Number);
       const [endH, endM] = interval.end.split(':').map(Number);
-      const start = startH * 60 + startM;
-      const end = endH * 60 + endM;
+      const start = startH! * 60 + startM!;
+      const end = endH! * 60 + endM!;
       return sum + (end - start);
     }, 0);
 
@@ -173,8 +173,8 @@ export default function DayAccordionItem({
                 const totalMinutes = 24 * 60;
                 const [startH, startM] = range.start.split(':').map(Number);
                 const [endH, endM] = range.end.split(':').map(Number);
-                const start = startH * 60 + startM;
-                const end = endH * 60 + endM;
+                const start = startH! * 60 + startM!;
+                const end = endH! * 60 + endM!;
                 const left = (start / totalMinutes) * 100;
                 const width = ((end - start) / totalMinutes) * 100;
 

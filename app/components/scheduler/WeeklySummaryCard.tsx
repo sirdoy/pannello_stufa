@@ -61,7 +61,7 @@ export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) 
               <div className="flex items-center justify-between text-sm">
                 <Text as="span" variant="secondary">Giorno più utilizzato</Text>
                 <Text as="span" className="text-primary-600 dark:text-primary-400">
-                  {stats.busiestDay} ({formatHours(stats.dailyHours[stats.busiestDay])})
+                  {stats.busiestDay} ({formatHours(stats.dailyHours[stats.busiestDay]!)})
                 </Text>
               </div>
             )}
@@ -142,5 +142,5 @@ function getPowerBarClass(level: number): string {
     4: 'bg-orange-500 dark:bg-orange-400',
     5: 'bg-red-500 dark:bg-red-400',
   };
-  return classes[level] || classes[2];
+  return classes[level] || classes[2]!;
 }

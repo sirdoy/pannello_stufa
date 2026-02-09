@@ -9,7 +9,7 @@ import React from 'react';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
-import { ToastProvider, ToastContext } from '../ToastProvider';
+import { ToastProvider, ToastContext, type ToastContextValue } from '../ToastProvider';
 import { useToast } from '@/app/hooks/useToast';
 import Toast, { ToastViewport, toastVariants } from '../Toast';
 import * as ToastPrimitive from '@radix-ui/react-toast';
@@ -19,7 +19,7 @@ expect.extend(toHaveNoViolations);
 /**
  * Test consumer component that exposes toast API
  */
-function TestConsumer({ onMount }) {
+function TestConsumer({ onMount }: { onMount?: (api: ToastContextValue) => void }) {
   const toastApi = useToast();
   React.useEffect(() => {
     onMount?.(toastApi);
@@ -30,7 +30,7 @@ function TestConsumer({ onMount }) {
 /**
  * Helper to render with ToastProvider
  */
-const renderWithProvider = (onMount) =>
+const renderWithProvider = (onMount?: (api: ToastContextValue) => void) =>
   render(
     <ToastProvider>
       <TestConsumer onMount={onMount} />
@@ -50,7 +50,7 @@ describe('ToastProvider', () => {
     });
 
     it('renders toast when triggered via context', async () => {
-      let toastApi;
+      let toastApi: ToastContextValue;
       renderWithProvider((api) => { toastApi = api; });
 
       act(() => {
@@ -65,7 +65,7 @@ describe('ToastProvider', () => {
 
   describe('Toast Stacking', () => {
     it('shows max 3 toasts at once', async () => {
-      let toastApi;
+      let toastApi: ToastContextValue;
       renderWithProvider((api) => { toastApi = api; });
 
       act(() => {
@@ -91,7 +91,7 @@ describe('ToastProvider', () => {
 
   describe('Convenience Methods', () => {
     it('success() creates success toast', async () => {
-      let toastApi;
+      let toastApi: ToastContextValue;
       renderWithProvider((api) => { toastApi = api; });
 
       act(() => {
@@ -104,7 +104,7 @@ describe('ToastProvider', () => {
     });
 
     it('error() creates error toast', async () => {
-      let toastApi;
+      let toastApi: ToastContextValue;
       renderWithProvider((api) => { toastApi = api; });
 
       act(() => {
@@ -117,7 +117,7 @@ describe('ToastProvider', () => {
     });
 
     it('warning() creates warning toast', async () => {
-      let toastApi;
+      let toastApi: ToastContextValue;
       renderWithProvider((api) => { toastApi = api; });
 
       act(() => {
@@ -130,7 +130,7 @@ describe('ToastProvider', () => {
     });
 
     it('info() creates info toast', async () => {
-      let toastApi;
+      let toastApi: ToastContextValue;
       renderWithProvider((api) => { toastApi = api; });
 
       act(() => {
@@ -145,10 +145,10 @@ describe('ToastProvider', () => {
 
   describe('Dismiss Methods', () => {
     it('dismiss() removes specific toast', async () => {
-      let toastApi;
+      let toastApi: ToastContextValue;
       renderWithProvider((api) => { toastApi = api; });
 
-      let toastId;
+      let toastId: number;
       act(() => {
         toastId = toastApi.info('To dismiss');
         toastApi.info('To keep');
@@ -170,7 +170,7 @@ describe('ToastProvider', () => {
     });
 
     it('dismissAll() removes all toasts', async () => {
-      let toastApi;
+      let toastApi: ToastContextValue;
       renderWithProvider((api) => { toastApi = api; });
 
       act(() => {
@@ -197,7 +197,7 @@ describe('ToastProvider', () => {
 
   describe('Toast with Options', () => {
     it('renders toast with title', async () => {
-      let toastApi;
+      let toastApi: ToastContextValue;
       renderWithProvider((api) => { toastApi = api; });
 
       act(() => {
@@ -230,7 +230,7 @@ describe('useToast', () => {
   });
 
   it('returns all API methods', () => {
-    let api;
+    let api: ToastContextValue | undefined;
     renderWithProvider((toastApi) => { api = toastApi; });
 
     expect(api).toHaveProperty('toast');
@@ -245,7 +245,7 @@ describe('useToast', () => {
 
 describe('Toast Component', () => {
   // Wrap Toast in Provider for Radix context
-  const renderToast = (props) =>
+  const renderToast = (props: any) =>
     render(
       <ToastPrimitive.Provider>
         <Toast open={true} {...props}>
@@ -333,7 +333,7 @@ describe('Toast Component', () => {
       // Render via ToastProvider for proper DOM structure (ol > li)
       // Note: Portal mock in JSDOM breaks parent-child li/ol relationship
       // so we disable listitem rule (valid in real browser)
-      let toastApi;
+      let toastApi: ToastContextValue;
       const { container } = render(
         <ToastProvider>
           <TestConsumer onMount={(api) => { toastApi = api; }} />
@@ -395,7 +395,7 @@ describe('Toast Component', () => {
     it('toast content is announced to screen readers via status semantics', async () => {
       // The Radix Toast system uses aria-live regions for announcements
       // ToastViewport renders as an ol element which Radix makes into a live region
-      let toastApi;
+      let toastApi: ToastContextValue;
       render(
         <ToastProvider>
           <TestConsumer onMount={(api) => { toastApi = api; }} />

@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+// @ts-expect-error no type definitions for react-syntax-highlighter
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+// @ts-expect-error no type definitions for react-syntax-highlighter styles
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import Button from '@/app/components/ui/Button';
 

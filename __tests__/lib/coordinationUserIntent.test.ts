@@ -138,7 +138,7 @@ describe('coordinationUserIntent', () => {
       // Both setpoint and mode change detected (hg mode sets temp to 7°C)
       expect(result.changes).toHaveLength(2);
       const modeChange = result.changes.find(c => c.type === 'mode_changed');
-      expect(modeChange.actual).toBe('hg');
+      expect(modeChange!.actual).toBe('hg');
     });
 
     it('detects mode change to off', async () => {
@@ -166,7 +166,7 @@ describe('coordinationUserIntent', () => {
       // Both setpoint and mode change detected (off mode sets temp to 7°C)
       expect(result.changes).toHaveLength(2);
       const modeChange = result.changes.find(c => c.type === 'mode_changed');
-      expect(modeChange.actual).toBe('off');
+      expect(modeChange!.actual).toBe('off');
     });
 
     it('no change detected when setpoint matches', async () => {
@@ -342,7 +342,7 @@ describe('coordinationUserIntent', () => {
 
     it('handles empty home status gracefully', async () => {
       // Mock empty home status
-      mockGetHomeStatus.mockResolvedValue(null);
+      mockGetHomeStatus.mockResolvedValue(null as any);
 
       const result = await detectUserIntent(
         'home123',

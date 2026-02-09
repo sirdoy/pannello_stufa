@@ -237,7 +237,7 @@ describe('useVersionCheck Hook', () => {
         expect(result.current.showWhatsNew).toBe(false);
       });
 
-      const dismissed = JSON.parse(localStorage.getItem('dismissedVersions'));
+      const dismissed = JSON.parse(localStorage.getItem('dismissedVersions') as string);
       expect(dismissed).toContain('1.5.0');
     });
 
@@ -264,7 +264,7 @@ describe('useVersionCheck Hook', () => {
         result.current.dismissWhatsNew(true);
       });
 
-      const dismissed = JSON.parse(localStorage.getItem('dismissedVersions'));
+      const dismissed = JSON.parse(localStorage.getItem('dismissedVersions') as string);
       expect(dismissed).toContain('1.4.0');
       expect(dismissed).toContain('1.5.0');
       expect(dismissed.length).toBe(2);

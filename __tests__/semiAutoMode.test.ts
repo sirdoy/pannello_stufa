@@ -130,7 +130,7 @@ describe('Semi-Auto Mode Activation', () => {
         const mode = await getFullSchedulerMode();
         if (mode.enabled && !mode.semiManual) {
           const nextChange = await getNextScheduledChange();
-          await setSemiManualMode(nextChange);
+          await setSemiManualMode(nextChange as string);
           modeChanged = true;
         }
       }
@@ -156,7 +156,7 @@ describe('Semi-Auto Mode Activation', () => {
         const mode = await getFullSchedulerMode();
         if (mode.enabled && !mode.semiManual) {
           const nextChange = await getNextScheduledChange();
-          await setSemiManualMode(nextChange);
+          await setSemiManualMode(nextChange as string);
           modeChanged = true;
         }
       }

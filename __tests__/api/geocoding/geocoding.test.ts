@@ -10,12 +10,12 @@ global.fetch = jest.fn() as jest.Mock;
 
 // Mock auth middleware
 jest.mock('@/lib/core', () => ({
-  withAuthAndErrorHandler: (handler, name) => handler,
-  success: (data) => ({
+  withAuthAndErrorHandler: (handler: any, name: string) => handler,
+  success: (data: any) => ({
     status: 200,
     json: async () => ({ success: true, ...data }),
   }),
-  badRequest: (message) => ({
+  badRequest: (message: string) => ({
     status: 400,
     json: async () => ({ success: false, error: message, code: 'VALIDATION_ERROR' }),
   }),

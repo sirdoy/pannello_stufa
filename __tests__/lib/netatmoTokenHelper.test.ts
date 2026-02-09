@@ -10,13 +10,13 @@ const mockAdminDbGet = jest.fn();
 const mockAdminDbSet = jest.fn();
 
 jest.mock('@/lib/firebaseAdmin', () => ({
-  adminDbGet: (...args) => mockAdminDbGet(...args),
-  adminDbSet: (...args) => mockAdminDbSet(...args),
+  adminDbGet: (...args: any[]) => mockAdminDbGet(...args),
+  adminDbSet: (...args: any[]) => mockAdminDbSet(...args),
 }));
 
 // Mock environment helper
 jest.mock('@/lib/environmentHelper', () => ({
-  getEnvironmentPath: (path) => `dev/${path}`,
+  getEnvironmentPath: (path: string) => `dev/${path}`,
 }));
 
 // Mock netatmo credentials resolver

@@ -90,7 +90,7 @@ describe('coordinationOrchestrator', () => {
       mockedCoordinationPreferences.getCoordinationPreferences.mockResolvedValue({
         ...mockPreferences,
         enabled: false,
-      });
+      } as any);
 
       const result = await processCoordinationCycle(mockUserId, 'WORK', mockHomeId);
 

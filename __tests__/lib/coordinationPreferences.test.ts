@@ -188,8 +188,8 @@ describe('coordinationPreferences', () => {
 
       expect(updatedPrefs.updatedAt).toBeDefined();
       expect(updatedPrefs.updatedAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
-      expect(updatedPrefs.updatedAt >= before).toBe(true);
-      expect(updatedPrefs.updatedAt <= after).toBe(true);
+      expect(updatedPrefs.updatedAt! >= before).toBe(true);
+      expect(updatedPrefs.updatedAt! <= after).toBe(true);
     });
 
     it('handles partial updates', async () => {
@@ -284,7 +284,7 @@ describe('coordinationPreferences', () => {
       };
 
       await expect(
-        updateCoordinationPreferences(testUserId, invalidUpdates)
+        updateCoordinationPreferences(testUserId, invalidUpdates as any)
       ).rejects.toThrow();
     });
   });

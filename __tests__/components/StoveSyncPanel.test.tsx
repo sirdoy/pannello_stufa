@@ -179,9 +179,9 @@ describe('StoveSyncPanel', () => {
 
     // Click temperature + button to make a change (triggers hasChanges)
     const buttons = screen.getAllByRole('button');
-    const plusButton = buttons.find(btn => btn.textContent.includes('+'));
+    const plusButton = buttons.find(btn => btn.textContent?.includes('+'));
     expect(plusButton).toBeTruthy();
-    fireEvent.click(plusButton);
+    fireEvent.click(plusButton!);
 
     // Save button should now appear
     await waitFor(() => {
@@ -194,7 +194,7 @@ describe('StoveSyncPanel', () => {
 
     // Click save
     const saveButton = screen.getByText('Salva modifiche').closest('button');
-    fireEvent.click(saveButton);
+    fireEvent.click(saveButton!);
 
     // Wait for fetch to be called with POST
     await waitFor(() => {

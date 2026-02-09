@@ -91,7 +91,7 @@ describe('POST /api/netatmo/setroomthermpoint', () => {
     (NETATMO_API.setRoomThermpoint as jest.Mock).mockResolvedValue(true);
   });
 
-  const createRequest = (body): any => {
+  const createRequest = (body: any): any => {
     return {
       json: async () => body,
     };

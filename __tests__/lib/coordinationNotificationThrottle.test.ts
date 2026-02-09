@@ -108,7 +108,7 @@ describe('coordinationNotificationThrottle', () => {
       recordNotificationSent(userId);
       const second = _internals.lastNotificationSent.get(userId);
 
-      expect(second).toBeGreaterThan(first);
+      expect(second).toBeGreaterThan(first!);
     });
   });
 
@@ -132,7 +132,7 @@ describe('coordinationNotificationThrottle', () => {
       const status = getThrottleStatus(userId);
 
       expect(status.lastSentAt).toBe(lastSent);
-      expect(status.nextAllowedAt).toBe(lastSent + _internals.GLOBAL_THROTTLE_MS);
+      expect(status.nextAllowedAt).toBe(lastSent! + _internals.GLOBAL_THROTTLE_MS);
       expect(status.waitSeconds).toBeCloseTo(30 * 60, -1); // ~30 minutes
     });
 

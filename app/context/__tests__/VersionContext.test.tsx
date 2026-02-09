@@ -22,7 +22,7 @@ import { getLatestVersion } from '@/lib/changelogService';
 
 describe('VersionContext', () => {
   // Helper to render hook with provider
-  const wrapper = ({ children }) => (
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
     <VersionProvider>{children}</VersionProvider>
   );
 
@@ -292,7 +292,7 @@ describe('VersionContext', () => {
         changes: ['New feature']
       };
 
-      let resolvePromise;
+      let resolvePromise: (() => void) | undefined;
       const mockPromise = new Promise(resolve => {
         resolvePromise = () => resolve(mockLatestVersion);
       });
@@ -301,7 +301,7 @@ describe('VersionContext', () => {
       const { result } = renderHook(() => useVersion(), { wrapper });
 
       // Start first check (this will wait on the promise)
-      let firstCheck;
+      let firstCheck: Promise<void> | undefined;
       act(() => {
         firstCheck = result.current.checkVersion();
       });
@@ -312,9 +312,9 @@ describe('VersionContext', () => {
       });
 
       // Now resolve the promise
-      resolvePromise();
+      resolvePromise!();
       await act(async () => {
-        await firstCheck;
+        await firstCheck!;
       });
 
       // Should only call once (mockReturnValueOnce ensures clean state)

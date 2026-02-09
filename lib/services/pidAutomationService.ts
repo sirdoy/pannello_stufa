@@ -89,7 +89,7 @@ export async function getPidConfig(userId: string | undefined): Promise<PIDConfi
  *   kd: 0.05,
  * });
  */
-export async function setPidConfig(userId, config) {
+export async function setPidConfig(userId: string, config: Partial<PIDConfig>): Promise<void> {
   if (!userId) {
     throw new Error('userId is required to save PID config');
   }
@@ -120,7 +120,7 @@ export async function setPidConfig(userId, config) {
  *
  * // Later: unsubscribe()
  */
-export function subscribeToPidConfig(userId, callback) {
+export function subscribeToPidConfig(userId: string, callback: (config: PIDConfig) => void): () => void {
   // Return noop unsubscribe if no userId
   if (!userId) {
     callback({ ...DEFAULT_PID_CONFIG });

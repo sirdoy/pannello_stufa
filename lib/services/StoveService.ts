@@ -105,7 +105,7 @@ export class StoveService {
    * @param {string} source - 'manual' or 'scheduler'
    * @returns {Promise<Object>} Result with mode change info
    */
-  async setFan(level, source = 'manual') {
+  async setFan(level: number, source: StoveCommandSource = 'manual'): Promise<any> {
     const result = await apiSetFan(level);
 
     await this.stoveStateRepo.updateState({
@@ -131,8 +131,8 @@ export class StoveService {
    * @param {string} source - 'manual' or 'scheduler'
    * @returns {Promise<Object>} Result with mode change info
    */
-  async setPower(level, source = 'manual') {
-    const result = await apiSetPower(level);
+  async setPower(level: number, source: StoveCommandSource = 'manual'): Promise<any> {
+    const result = await apiSetPower(level as StovePowerLevel);
 
     await this.stoveStateRepo.updateState({
       powerLevel: level,
@@ -161,7 +161,7 @@ export class StoveService {
     // Only activate semi-manual if scheduler is enabled and not already in semi-manual
     if (mode.enabled && !mode.semiManual) {
       const nextChange = await getNextScheduledChange();
-      await this.schedulerModeRepo.setSemiManual(nextChange);
+      await this.schedulerModeRepo.setSemiManual(nextChange ?? '');
       console.log('Modalita semi-manuale attivata per comando manuale');
       return { changed: true, returnToAutoAt: nextChange };
     }
@@ -171,9 +171,9 @@ export class StoveService {
 }
 
 // Singleton instance for convenience
-let instance = null;
+let instance: StoveService | null = null;
 
-export function getStoveService() {
+export function getStoveService(): StoveService {
   if (!instance) {
     instance = new StoveService();
   }

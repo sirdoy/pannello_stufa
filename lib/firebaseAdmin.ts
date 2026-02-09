@@ -589,7 +589,7 @@ export async function sendNotificationToUser(userId: string, notification: Notif
 
     // Fetch user notification preferences from RTDB
     // Fail-safe: if preferences unavailable, allow notification (better unwanted than missed critical)
-    let preferences;
+    let preferences: any;
     try {
       const prefs = await adminDbGet(`users/${userId}/settings/notifications`);
 
@@ -612,7 +612,7 @@ export async function sendNotificationToUser(userId: string, notification: Notif
     const filterResult = filterNotificationByPreferences(
       userId,
       notifType,
-      preferences,
+      preferences as any,
       allTokens
     );
 
@@ -622,7 +622,7 @@ export async function sendNotificationToUser(userId: string, notification: Notif
         success: false,
         error: 'FILTERED',
         reason: filterResult.reason,
-        message: getFilterMessage(filterResult.reason),
+        message: getFilterMessage(filterResult.reason ?? ''),
         stats: filterResult.stats,
       };
     }

@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 44 of 48 (Library Strict Mode Foundation)
-Plan: 5 of 7 in current phase
+Plan: 6 of 7 in current phase
 Status: In progress
-Last activity: 2026-02-09 — Completed 44-05 (Netatmo sync & coordination strict mode, 84 errors fixed)
+Last activity: 2026-02-09 — Completed 44-06 (hooks & PWA strict mode, 39 errors fixed)
 
-Progress: [████████████████████████████████████████████░░░░] 93% (213/228 estimated total plans)
+Progress: [████████████████████████████████████████████░░░░] 93% (214/228 estimated total plans)
 
 ## Performance Metrics
 
@@ -41,6 +41,7 @@ Progress: [███████████████████████
 | Phase 44 P02 | 676s | 2 tasks | 3 files |
 | Phase 44 P03 | 11s | 2 tasks | 5 files |
 | Phase 44 P05 | 697s | 2 tasks | 8 files |
+| Phase 44 P06 | 11 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -59,6 +60,8 @@ Recent decisions from PROJECT.md affecting v5.1 work:
 - [Phase 44-03]: Type assertion for Firestore QueryDocumentSnapshot when control flow narrowing fails
 - [Phase 44-05]: Non-null assertions for Intl.DateTimeFormat.formatToParts() (guaranteed by API)
 - [Phase 44-05]: Type-cast Record index access where dynamic keys validated at runtime
+- [Phase 44-06]: Export utility types (GeofenceConfig, GeofenceActions) from modules for hook consumption
+- [Phase 44-06]: BeforeInstallPromptEvent interface for non-standard PWA API
 
 ### Pending Todos
 
@@ -86,8 +89,8 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-09 08:31
-Stopped at: Completed 44-05-PLAN.md (Netatmo sync & coordination strict mode, 84 errors fixed in 8 files)
-Resume file: None — ready to continue with 44-06 through 44-07
+Stopped at: Completed 44-06-PLAN.md (hooks & PWA strict mode, 39 errors fixed in 8 files)
+Resume file: None — ready to continue with 44-07
 
 ---
 *State initialized: 2026-02-08 for v5.1 Tech Debt & Code Quality milestone*

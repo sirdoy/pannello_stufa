@@ -41,7 +41,9 @@ type DeviceId = DeviceType | string;
  * Get device metadata (name, icon, etc.) from registry
  */
 function getDeviceMetadata(deviceId: DeviceId): Record<string, unknown> | null {
-  return DEVICE_CONFIG[deviceId] || DISPLAY_ITEMS[deviceId] || null;
+  const deviceConfig = (DEVICE_CONFIG as Record<string, unknown>)[deviceId];
+  const displayItem = (DISPLAY_ITEMS as Record<string, unknown>)[deviceId];
+  return (deviceConfig as Record<string, unknown>) || (displayItem as Record<string, unknown>) || null;
 }
 
 /**
@@ -78,12 +80,18 @@ export function getDefaultDeviceConfig() {
   };
 }
 
+interface DeviceConfigData {
+  devices: Array<{ id: string; visible: boolean; order: number }>;
+  updatedAt: number;
+  version: number;
+}
+
 /**
  * Get unified device config (CLIENT-SIDE - uses client SDK)
  * @param {string} userId - Auth0 user ID
  * @returns {Promise<Object>} Device configuration
  */
-export async function getUnifiedDeviceConfig(userId) {
+export async function getUnifiedDeviceConfig(userId: string): Promise<DeviceConfigData> {
   if (!userId) {
     console.warn('getUnifiedDeviceConfig: no userId provided');
     return getDefaultDeviceConfig();
@@ -110,17 +118,17 @@ export async function getUnifiedDeviceConfig(userId) {
  * @param {string} userId - Auth0 user ID
  * @returns {Promise<Object>} Device configuration
  */
-export async function getUnifiedDeviceConfigAdmin(userId) {
+export async function getUnifiedDeviceConfigAdmin(userId: string): Promise<DeviceConfigData> {
   if (!userId) {
     console.warn('getUnifiedDeviceConfigAdmin: no userId provided');
     return getDefaultDeviceConfig();
   }
 
   try {
-    const existingConfig = await adminDbGet(`users/${userId}/deviceConfig`) as { version?: number } & Record<string, unknown> | null;
+    const existingConfig = await adminDbGet(`users/${userId}/deviceConfig`) as any;
 
     if (existingConfig && (existingConfig.version ?? 0) >= CONFIG_VERSION) {
-      return existingConfig;
+      return existingConfig as DeviceConfigData;
     }
 
     // Migration needed
@@ -140,7 +148,7 @@ export async function getUnifiedDeviceConfigAdmin(userId) {
  * @param {Object} config - Device configuration to save
  * @returns {Promise<void>}
  */
-export async function saveUnifiedDeviceConfigAdmin(userId, config) {
+export async function saveUnifiedDeviceConfigAdmin(userId: string, config: Partial<DeviceConfigData>): Promise<void> {
   if (!userId) {
     throw new Error('userId is required');
   }
@@ -161,17 +169,17 @@ export async function saveUnifiedDeviceConfigAdmin(userId, config) {
  * @param {Object|null} existingConfig - Existing config if any
  * @returns {Promise<Object>} Migrated config
  */
-async function migrateFromOldFormat(userId, existingConfig) {
+async function migrateFromOldFormat(userId: string, existingConfig: any): Promise<DeviceConfigData> {
   // If we have v2 config, just merge enabled + dashboardVisible into visible
   if (existingConfig && existingConfig.version === 2) {
-    const devices = (existingConfig.devices || []).map((d, index) => ({
+    const devices = (existingConfig.devices || []).map((d: any, index: number) => ({
       id: d.id,
       visible: d.enabled && d.dashboardVisible,
       order: d.dashboardOrder ?? index,
     }));
 
     // Add any missing devices
-    const existingIds = new Set(devices.map(d => d.id));
+    const existingIds = new Set(devices.map((d: any) => d.id));
     DEFAULT_DEVICE_ORDER.forEach(id => {
       if (!existingIds.has(id)) {
         devices.push({ id, visible: false, order: devices.length });
@@ -186,12 +194,12 @@ async function migrateFromOldFormat(userId, existingConfig) {
   }
 
   // Migrate from v1 (separate Firebase paths)
-  const oldDevicePrefs = await adminDbGet(`devicePreferences/${userId}`) || {};
-  const oldDashboardPrefs = await adminDbGet(`users/${userId}/dashboardPreferences`) as { cardOrder?: Array<{ id: string; visible?: boolean }> } | null || {};
+  const oldDevicePrefs = (await adminDbGet(`devicePreferences/${userId}`) || {}) as Record<string, any>;
+  const oldDashboardPrefs = (await adminDbGet(`users/${userId}/dashboardPreferences`) as { cardOrder?: Array<{ id: string; visible?: boolean }> } | null) || {};
   const oldCardOrder = oldDashboardPrefs.cardOrder || [];
 
-  const devices = [];
-  const processedIds = new Set();
+  const devices: Array<{ id: string; visible: boolean; order: number }> = [];
+  const processedIds = new Set<string>();
 
   // First, process cards from old dashboard order (preserves order)
   oldCardOrder.forEach((card, index) => {
@@ -211,13 +219,13 @@ async function migrateFromOldFormat(userId, existingConfig) {
   });
 
   // Add devices from preferences not in dashboard
-  Object.keys(oldDevicePrefs).forEach(deviceId => {
+  Object.keys(oldDevicePrefs).forEach((deviceId: string) => {
     if (processedIds.has(deviceId)) return;
     if (!getDeviceMetadata(deviceId)) return;
 
     devices.push({
       id: deviceId,
-      visible: oldDevicePrefs[deviceId] ?? false,
+      visible: (oldDevicePrefs as Record<string, any>)[deviceId] ?? false,
       order: devices.length,
     });
     processedIds.add(deviceId);
@@ -247,12 +255,12 @@ async function migrateFromOldFormat(userId, existingConfig) {
  * @param {Object} config - Unified device config
  * @returns {Array} Array of device IDs for navbar
  */
-export function getEnabledDevicesFromConfig(config) {
+export function getEnabledDevicesFromConfig(config: DeviceConfigData): string[] {
   if (!config || !config.devices) return [];
 
   return config.devices
-    .filter(d => d.visible && !isDisplayOnly(d.id))
-    .map(d => d.id);
+    .filter((d: any) => d.visible && !isDisplayOnly(d.id))
+    .map((d: any) => d.id);
 }
 
 /**
@@ -260,18 +268,23 @@ export function getEnabledDevicesFromConfig(config) {
  * @param {Object} config - Unified device config
  * @returns {Array} Array of { id, label, icon, visible }
  */
-export function getVisibleDashboardCards(config) {
+export function getVisibleDashboardCards(config: DeviceConfigData): Array<{
+  id: string;
+  label: string;
+  icon: string;
+  visible: boolean;
+}> {
   if (!config || !config.devices) return [];
 
   return config.devices
-    .filter(d => d.visible && hasHomepageCard(d.id))
-    .sort((a, b) => a.order - b.order)
-    .map(d => {
+    .filter((d: any) => d.visible && hasHomepageCard(d.id))
+    .sort((a: any, b: any) => a.order - b.order)
+    .map((d: any) => {
       const meta = getDeviceMetadata(d.id);
       return {
         id: d.id,
-        label: meta?.name || d.id,
-        icon: meta?.icon || '❓',
+        label: (meta as any)?.name || d.id,
+        icon: (meta as any)?.icon || '❓',
         visible: true,
       };
     });
@@ -282,20 +295,30 @@ export function getVisibleDashboardCards(config) {
  * @param {Object} config - Unified device config
  * @returns {Array} Array of device objects with metadata
  */
-export function getAllDevicesForSettings(config) {
+export function getAllDevicesForSettings(config: DeviceConfigData): Array<{
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  visible: boolean;
+  order: number;
+  isDisplayOnly: boolean;
+  hasHomepageCard: boolean;
+  description: string;
+}> {
   if (!config || !config.devices) {
     config = getDefaultDeviceConfig();
   }
 
   return config.devices
-    .sort((a, b) => a.order - b.order)
-    .map(d => {
+    .sort((a: any, b: any) => a.order - b.order)
+    .map((d: any) => {
       const meta = getDeviceMetadata(d.id);
       return {
         id: d.id,
-        name: meta?.name || d.id,
-        icon: meta?.icon || '❓',
-        color: meta?.color || 'neutral',
+        name: (meta as any)?.name || d.id,
+        icon: (meta as any)?.icon || '❓',
+        color: (meta as any)?.color || 'neutral',
         visible: d.visible,
         order: d.order,
         isDisplayOnly: isDisplayOnly(d.id),
@@ -308,8 +331,8 @@ export function getAllDevicesForSettings(config) {
 /**
  * Get device description for UI
  */
-function getDeviceDescription(deviceId) {
-  const descriptions = {
+function getDeviceDescription(deviceId: string): string {
+  const descriptions: Record<string, string> = {
     stove: 'Stufa a pellet Thermorossi',
     thermostat: 'Termostato Netatmo Energy',
     weather: 'Previsioni meteo locali (solo homepage)',

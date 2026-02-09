@@ -95,14 +95,14 @@ export default function CameraDashboard() {
     } catch (err) {
       console.error('Error fetching camera data:', err);
       // Also check thrown errors for token issues
-      const errorMsg = err.message?.toLowerCase() || '';
+      const errorMsg = err instanceof Error ? err.message.toLowerCase() : String(err).toLowerCase();
       if (errorMsg.includes('invalid access token') ||
           errorMsg.includes('access_denied') ||
           errorMsg.includes('insufficient scope')) {
         setNeedsReauth(true);
         setError('Autorizzazione videocamere mancante');
       } else {
-        setError(err.message);
+        setError(err instanceof Error ? err.message : String(err));
       }
     } finally {
       setLoading(false);
@@ -311,7 +311,7 @@ export default function CameraDashboard() {
                 {isLiveMode && selectedCamera.status === 'on' ? (
                   <HlsPlayer
                     src={NETATMO_CAMERA_API.getLiveStreamUrl(selectedCamera)}
-                    poster={snapshotUrls[selectedCamera.id]}
+                    poster={snapshotUrls[selectedCamera.id] ?? ''}
                     className="w-full h-full"
                     onError={() => setIsLiveMode(false)}
                   />

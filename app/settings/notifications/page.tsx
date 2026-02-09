@@ -29,6 +29,7 @@ import NotificationPermissionButton from '@/app/components/NotificationPermissio
 import NotificationPreferencesPanel from '@/app/components/NotificationPreferencesPanel';
 import NotificationSettingsForm from './NotificationSettingsForm';
 import Skeleton from '@/app/components/ui/Skeleton';
+// @ts-expect-error no type definitions for useNotificationPreferences
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 import type { NotificationPreferences } from '@/lib/schemas/notificationPreferences';
 

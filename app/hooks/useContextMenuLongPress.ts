@@ -62,7 +62,7 @@ export function useContextMenuLongPress(
 
   // Wrap callback to include haptic feedback
   const handleLongPress = useCallback(
-    (event, meta) => {
+    (event: React.TouchEvent | React.MouseEvent, meta: { context?: any }) => {
       if (haptic) {
         vibrateShort();
       }

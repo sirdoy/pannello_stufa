@@ -116,10 +116,10 @@ export default function ParsedEventsPage() {
   const displayedEvents = filteredEvents.slice(0, displayCount);
 
   // Get camera for an event
-  const getCameraForEvent = (event) => cameras.find(c => c.id === event.camera_id);
+  const getCameraForEvent = (event: ParsedEvent) => cameras.find(c => c.id === event.camera_id);
 
   // Strip HTML tags from message
-  const stripHtml = (html) => {
+  const stripHtml = (html: string) => {
     if (!html) return null;
     return html.replace(/<[^>]*>/g, '');
   };
@@ -373,7 +373,7 @@ export default function ParsedEventsPage() {
       {selectedEvent && (
         <EventPreviewModal
           event={selectedEvent}
-          camera={getCameraForEvent(selectedEvent)}
+          camera={getCameraForEvent(selectedEvent) ?? null}
           onClose={() => setSelectedEvent(null)}
         />
       )}

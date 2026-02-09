@@ -103,7 +103,7 @@ export function useLongPress(
    * Handle touch start - prevent scrolling during press
    */
   const handleTouchStart = useCallback(
-    (e) => {
+    (e: React.TouchEvent) => {
       e.preventDefault();
       start();
     },

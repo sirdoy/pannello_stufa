@@ -687,7 +687,7 @@ function SettingsPageContent() {
 
   const currentTab = searchParams.get('tab') || 'aspetto';
 
-  const handleTabChange = (value) => {
+  const handleTabChange = (value: string) => {
     router.push(`/settings?tab=${value}`, { scroll: false });
   };
 

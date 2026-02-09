@@ -480,7 +480,7 @@ function NetatmoContent() {
 
                 <div className="flex flex-wrap gap-2">
                   {['schedule', 'away', 'hg', 'off'].map((targetMode) => {
-                    const config = modeConfig[targetMode];
+                    const config = modeConfig[targetMode as keyof typeof modeConfig];
                     const isActive = mode === targetMode;
                     return (
                       <Button

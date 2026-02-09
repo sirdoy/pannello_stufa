@@ -53,7 +53,7 @@ export default function LogPage() {
     return () => unsubscribe();
   }, []);
 
-  const formatDate = (ts: number): string => {
+  const formatDate = (ts: string | number): string => {
     const d = new Date(ts);
     return d.toLocaleString('it-IT', {
       day: '2-digit',
@@ -113,7 +113,7 @@ export default function LogPage() {
   };
 
   const getDeviceBadge = (device?: string): { label: string; icon?: string; color: 'primary' | 'info' | 'warning' | 'success' | 'neutral' } => {
-    const config = DEVICE_CONFIG[device];
+    const config = device ? DEVICE_CONFIG[device as keyof typeof DEVICE_CONFIG] : undefined;
     if (!config) return { label: 'Sistema', color: 'neutral' };
 
     const colorMap = {
@@ -121,12 +121,12 @@ export default function LogPage() {
       info: 'info',
       warning: 'warning',
       success: 'success',
-    };
+    } as const;
 
     return {
       label: config.name,
       icon: config.icon,
-      color: colorMap[config.color] || 'neutral',
+      color: colorMap[config.color as keyof typeof colorMap] || 'neutral',
     };
   };
 

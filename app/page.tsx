@@ -32,7 +32,8 @@ export default async function Home() {
     redirect('/auth/login');
   }
 
-  const user = session.user;
+  // Non-null assertion safe here because redirect above will exit if null
+  const user = session!.user;
   const userId = user.sub;
 
   // Fetch unified device config server-side (with automatic migration)

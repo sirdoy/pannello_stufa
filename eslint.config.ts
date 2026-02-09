@@ -1,5 +1,6 @@
 import nextConfig from "eslint-config-next";
 import nextTypescript from "eslint-config-next/typescript";
+// @ts-expect-error eslint-plugin-tailwindcss has no type definitions
 import tailwindcss from "eslint-plugin-tailwindcss";
 
 const eslintConfig = [

@@ -429,10 +429,10 @@ function UnifiedDevicesContent() {
     if (index === 0) return;
     setDevices(prev => {
       const newDevices = [...prev];
-      [newDevices[index - 1], newDevices[index]] = [
-        newDevices[index],
-        newDevices[index - 1],
-      ];
+      const current = newDevices[index];
+      const previous = newDevices[index - 1];
+      if (!current || !previous) return prev;
+      [newDevices[index - 1], newDevices[index]] = [current, previous];
       return newDevices.map((d, i) => ({ ...d, order: i }));
     });
   };
@@ -442,10 +442,10 @@ function UnifiedDevicesContent() {
     if (index === devices.length - 1) return;
     setDevices(prev => {
       const newDevices = [...prev];
-      [newDevices[index], newDevices[index + 1]] = [
-        newDevices[index + 1],
-        newDevices[index],
-      ];
+      const current = newDevices[index];
+      const next = newDevices[index + 1];
+      if (!current || !next) return prev;
+      [newDevices[index], newDevices[index + 1]] = [next, current];
       return newDevices.map((d, i) => ({ ...d, order: i }));
     });
   };

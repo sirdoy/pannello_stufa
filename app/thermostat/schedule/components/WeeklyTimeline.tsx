@@ -52,7 +52,10 @@ export default function WeeklyTimeline({ schedule, className = '' }: WeeklyTimel
     // Group by day (0-6)
     const grouped: ImportedTimelineSlot[][] = Array(7).fill(null).map(() => []);
     allSlots.forEach(slot => {
-      grouped[slot.day].push(slot);
+      const daySlots = grouped[slot.day];
+      if (daySlots) {
+        daySlots.push(slot);
+      }
     });
 
     return grouped;
@@ -149,8 +152,8 @@ export default function WeeklyTimeline({ schedule, className = '' }: WeeklyTimel
 
                 {/* Slots container */}
                 <div className="flex rounded-lg overflow-hidden shadow-inner bg-slate-800/30">
-                  {slotsByDay[dayIndex].length > 0 ? (
-                    slotsByDay[dayIndex].map((slot, slotIndex) => (
+                  {(slotsByDay[dayIndex]?.length ?? 0) > 0 ? (
+                    slotsByDay[dayIndex]?.map((slot, slotIndex) => (
                       <TimelineSlot
                         key={`${dayIndex}-${slotIndex}`}
                         zoneType={slot.zoneType}

@@ -60,8 +60,8 @@ export default function WeeklyTimeline({ schedule, selectedDay, onSelectDay }: W
 
                 {/* Interval bars */}
                 {intervals.map((interval, idx) => {
-                  const [startH, startM] = interval.start.split(':').map(Number);
-                  const [endH, endM] = interval.end.split(':').map(Number);
+                  const [startH = 0, startM = 0] = interval.start.split(':').map(Number);
+                  const [endH = 0, endM = 0] = interval.end.split(':').map(Number);
                   const startMinutes = startH * 60 + startM;
                   const endMinutes = endH * 60 + endM;
                   const totalMinutes = 24 * 60;

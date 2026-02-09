@@ -70,10 +70,10 @@ export default function DashboardSettingsPage() {
     if (index === 0) return;
     setCards((prev) => {
       const newCards = [...prev];
-      [newCards[index - 1], newCards[index]] = [
-        newCards[index],
-        newCards[index - 1],
-      ];
+      const current = newCards[index];
+      const previous = newCards[index - 1];
+      if (!current || !previous) return prev;
+      [newCards[index - 1], newCards[index]] = [current, previous];
       return newCards;
     });
   };
@@ -83,10 +83,10 @@ export default function DashboardSettingsPage() {
     if (index === cards.length - 1) return;
     setCards((prev) => {
       const newCards = [...prev];
-      [newCards[index], newCards[index + 1]] = [
-        newCards[index + 1],
-        newCards[index],
-      ];
+      const current = newCards[index];
+      const next = newCards[index + 1];
+      if (!current || !next) return prev;
+      [newCards[index], newCards[index + 1]] = [next, current];
       return newCards;
     });
   };

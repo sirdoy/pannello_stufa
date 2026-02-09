@@ -685,7 +685,7 @@ export default function LightsCard() {
   // Calculate perceived luminance of a hex color (0 = dark, 1 = bright)
   const getLuminance = (hex: string): number => {
     const rgb = hex.replace('#', '').match(/.{2}/g)?.map((x: string) => parseInt(x, 16) / 255) || [0, 0, 0];
-    const [r, g, b] = rgb.map((c: number) => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+    const [r = 0, g = 0, b = 0] = rgb.map((c: number) => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
   };
 
@@ -970,10 +970,17 @@ export default function LightsCard() {
               <Sun className="w-4 h-4 text-warning-400 [html:not(.dark)_&]:text-warning-700" />
               <Slider
                 value={localBrightness !== null ? localBrightness : avgBrightness}
-                onChange={((value: number | number[]) => setLocalBrightness(Array.isArray(value) ? value[0] : value)) as any}
+                onChange={((value: number | number[]) => {
+                  const numValue = Array.isArray(value) ? value[0] : value;
+                  if (numValue !== undefined) {
+                    setLocalBrightness(numValue);
+                  }
+                }) as any}
                 onValueCommit={((value: number | number[]) => {
                   const numValue = Array.isArray(value) ? value[0] : value;
-                  handleBrightnessChange(selectedRoomGroupedLightId || undefined, numValue.toString());
+                  if (numValue !== undefined) {
+                    handleBrightnessChange(selectedRoomGroupedLightId || undefined, numValue.toString());
+                  }
                   setLocalBrightness(null);
                 }) as any}
                 min={1}
@@ -1143,12 +1150,16 @@ export default function LightsCard() {
                           onChange={((value: number | number[]) => {
                             // Update local state during drag for smooth UI
                             const numValue = Array.isArray(value) ? value[0] : value;
-                            setLocalBrightness(numValue);
+                            if (numValue !== undefined) {
+                              setLocalBrightness(numValue);
+                            }
                           }) as any}
                           onValueCommit={((value: number | number[]) => {
                             // Commit to API on release (Radix onValueCommit)
                             const numValue = Array.isArray(value) ? value[0] : value;
-                            handleBrightnessChange(selectedRoomGroupedLightId || undefined, numValue.toString());
+                            if (numValue !== undefined) {
+                              handleBrightnessChange(selectedRoomGroupedLightId || undefined, numValue.toString());
+                            }
                             setLocalBrightness(null);
                           }) as any}
                           min={1}

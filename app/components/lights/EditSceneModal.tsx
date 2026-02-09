@@ -139,33 +139,42 @@ export default function EditSceneModal({
   }, [selectedRoom, fetchRoomLights]);
 
   function handleLightToggle(lightId: string) {
-    setLightConfigs(prev => ({
-      ...prev,
-      [lightId]: {
-        ...prev[lightId],
-        on: !prev[lightId]?.on
-      }
-    }));
+    setLightConfigs(prev => {
+      const existing = prev[lightId] || { on: true, brightness: 100, color: null };
+      return {
+        ...prev,
+        [lightId]: {
+          ...existing,
+          on: !existing.on
+        }
+      };
+    });
   }
 
   function handleBrightnessChange(lightId: string, brightness: number) {
-    setLightConfigs(prev => ({
-      ...prev,
-      [lightId]: {
-        ...prev[lightId],
-        brightness: Number(brightness)
-      }
-    }));
+    setLightConfigs(prev => {
+      const existing = prev[lightId] || { on: true, brightness: 100, color: null };
+      return {
+        ...prev,
+        [lightId]: {
+          ...existing,
+          brightness: Number(brightness)
+        }
+      };
+    });
   }
 
   function handleColorChange(lightId: string, x: number, y: number) {
-    setLightConfigs(prev => ({
-      ...prev,
-      [lightId]: {
-        ...prev[lightId],
-        color: { x: Number(x), y: Number(y) }
-      }
-    }));
+    setLightConfigs(prev => {
+      const existing = prev[lightId] || { on: true, brightness: 100, color: null };
+      return {
+        ...prev,
+        [lightId]: {
+          ...existing,
+          color: { x: Number(x), y: Number(y) }
+        }
+      };
+    });
   }
 
   function handleConfirm() {

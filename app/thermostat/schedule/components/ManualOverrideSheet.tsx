@@ -43,12 +43,12 @@ export default function ManualOverrideSheet({
   // Auto-select first room when loaded
   useEffect(() => {
     const roomsTyped = rooms as Room[];
-    if (roomsTyped.length > 0 && !selectedRoomId) {
-      setSelectedRoomId(roomsTyped[0].id);
+    const firstRoom = roomsTyped[0];
+    if (roomsTyped.length > 0 && !selectedRoomId && firstRoom) {
+      setSelectedRoomId(firstRoom.id);
       // Pre-fill temperature from current setpoint
-      const room = roomsTyped[0];
-      if (room.setpoint) {
-        setTemperature(room.setpoint);
+      if (firstRoom.setpoint) {
+        setTemperature(firstRoom.setpoint);
       }
     }
   }, [rooms, selectedRoomId]);

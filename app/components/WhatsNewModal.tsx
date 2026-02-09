@@ -18,7 +18,12 @@ interface WhatsNewModalProps {
 
 export default function WhatsNewModal({ isOpen, onClose, dontShowAgain }: WhatsNewModalProps) {
   // Prendi la versione corrente dal VERSION_HISTORY
-  const currentVersionData = VERSION_HISTORY.find(v => v.version === APP_VERSION) || VERSION_HISTORY[0];
+  const currentVersionData = VERSION_HISTORY.find(v => v.version === APP_VERSION) || VERSION_HISTORY[0] || {
+    version: APP_VERSION,
+    date: new Date().toISOString(),
+    type: 'patch' as const,
+    changes: []
+  };
 
   if (!isOpen) return null;
 

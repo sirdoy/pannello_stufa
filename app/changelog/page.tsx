@@ -58,8 +58,8 @@ export default function ChangelogPage() {
   // Ordina versioni in modo semantico decrescente
   const sortVersions = (versions: VersionEntry[]): VersionEntry[] => {
     return [...versions].sort((a, b) => {
-      const [aMajor, aMinor, aPatch] = a.version.split('.').map(Number);
-      const [bMajor, bMinor, bPatch] = b.version.split('.').map(Number);
+      const [aMajor = 0, aMinor = 0, aPatch = 0] = a.version.split('.').map(Number);
+      const [bMajor = 0, bMinor = 0, bPatch = 0] = b.version.split('.').map(Number);
 
       if (bMajor !== aMajor) return bMajor - aMajor;
       if (bMinor !== aMinor) return bMinor - aMinor;

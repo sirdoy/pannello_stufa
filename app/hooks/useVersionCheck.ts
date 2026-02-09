@@ -116,8 +116,10 @@ function compareVersions(v1: string, v2: string): number {
   const parts2 = v2.split('.').map(Number);
 
   for (let i = 0; i < 3; i++) {
-    if (parts1[i] > parts2[i]) return 1;
-    if (parts1[i] < parts2[i]) return -1;
+    const p1 = parts1[i] ?? 0;
+    const p2 = parts2[i] ?? 0;
+    if (p1 > p2) return 1;
+    if (p1 < p2) return -1;
   }
 
   return 0;

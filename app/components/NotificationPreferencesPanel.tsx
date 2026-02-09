@@ -38,18 +38,26 @@ function getNestedValue(obj: any, path: string): any {
 function setNestedValue(obj: any, path: string, value: any): any {
   const keys = path.split('.');
   const result = { ...obj };
+  const firstKey = keys[0];
+
+  if (!firstKey) return result;
 
   if (keys.length === 1) {
-    result[keys[0]] = value;
+    result[firstKey] = value;
     return result;
   }
 
   let current: any = result;
   for (let i = 0; i < keys.length - 1; i++) {
-    current[keys[i]] = { ...current[keys[i]] };
-    current = current[keys[i]];
+    const key = keys[i];
+    if (!key) continue;
+    current[key] = { ...current[key] };
+    current = current[key];
   }
-  current[keys[keys.length - 1]] = value;
+  const lastKey = keys[keys.length - 1];
+  if (lastKey) {
+    current[lastKey] = value;
+  }
 
   return result;
 }

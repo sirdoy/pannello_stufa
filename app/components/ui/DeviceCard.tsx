@@ -214,6 +214,21 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
   // Check if context menu is enabled
   const hasContextMenu = contextMenuItems && contextMenuItems.length > 0;
 
+  // Context menu props (long-press handlers and transform styles)
+  // IMPORTANT: We override role to empty string to prevent Radix from adding role="button"
+  // to a div that contains block-level children (accessibility violation)
+  const contextMenuProps = hasContextMenu
+    ? {
+        role: '', // Override Radix's role="button" to fix accessibility error
+        ...longPressBind(),
+        style: {
+          ...(longPressPreventSelection as CSSProperties),
+          transform: isPressed ? 'scale(0.98)' : 'scale(1)',
+          transition: 'transform 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+        },
+      }
+    : {};
+
   // Card content (shared between with/without context menu)
   const cardContent = (
     <SmartHomeCard
@@ -226,6 +241,7 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
       error={hasErrorBanner}
       disabled={!connected}
       className={cn('relative', className)}
+      {...contextMenuProps}
       {...props}
     >
       {/* Status area with Badge and HealthIndicator */}
@@ -305,16 +321,7 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
       {hasContextMenu ? (
         <RightClickMenu>
           <RightClickMenu.Trigger asChild>
-            <div
-              {...longPressBind()}
-              style={{
-                ...(longPressPreventSelection as CSSProperties),
-                transform: isPressed ? 'scale(0.98)' : 'scale(1)',
-                transition: 'transform 150ms cubic-bezier(0.4, 0, 0.2, 1)',
-              }}
-            >
-              {cardContent}
-            </div>
+            {cardContent}
           </RightClickMenu.Trigger>
           <RightClickMenu.Content>
             {contextMenuItems.map((item, index) => (

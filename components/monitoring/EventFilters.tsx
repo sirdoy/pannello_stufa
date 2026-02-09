@@ -19,8 +19,8 @@ const SEVERITY_OPTIONS = [
 interface EventFiltersProps {
   type: string;
   severity: string;
-  onTypeChange: (value: string) => void;
-  onSeverityChange: (value: string) => void;
+  onTypeChange: (event: { target: { value: string | number } }) => void;
+  onSeverityChange: (event: { target: { value: string | number } }) => void;
 }
 
 export default function EventFilters({
@@ -35,19 +35,19 @@ export default function EventFilters({
   const isFiltered = type || severity;
 
   const handleClear = () => {
-    onTypeChange('');
-    onSeverityChange('');
+    onTypeChange({ target: { value: '' } });
+    onSeverityChange({ target: { value: '' } });
   };
 
   // Convert 'all' back to empty string for parent
-  const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    onTypeChange(value === 'all' ? '' : value);
+  const handleTypeChange = (event: { target: { value: string | number } }) => {
+    const value = String(event.target.value);
+    onTypeChange({ target: { value: value === 'all' ? '' : value } });
   };
 
-  const handleSeverityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    onSeverityChange(value === 'all' ? '' : value);
+  const handleSeverityChange = (event: { target: { value: string | number } }) => {
+    const value = String(event.target.value);
+    onSeverityChange({ target: { value: value === 'all' ? '' : value } });
   };
 
   return (

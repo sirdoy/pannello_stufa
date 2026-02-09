@@ -14,7 +14,7 @@ export default function VersionEnforcer() {
   return (
     <ForceUpdateModal
       show={needsUpdate}
-      firebaseVersion={firebaseVersion}
+      firebaseVersion={firebaseVersion || ''}
     />
   );
 }

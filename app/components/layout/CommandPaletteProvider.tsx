@@ -153,7 +153,7 @@ export default function CommandPaletteProvider({ children, commands: customComma
    * Detects Cmd+K (Mac) or Ctrl+K (Windows/Linux)
    */
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       // Check for Cmd+K (Mac) or Ctrl+K (Windows/Linux)
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         // CRITICAL: Prevent browser default (focus address bar, search bar)

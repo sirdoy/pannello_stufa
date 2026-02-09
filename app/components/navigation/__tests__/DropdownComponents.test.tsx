@@ -12,7 +12,13 @@ import { PageTransitionProvider } from '@/app/context/PageTransitionContext';
 
 // Mock next/link
 jest.mock('next/link', () => {
-  const MockLink = ({ children, href, onClick, className, style }) => (
+  const MockLink = ({ children, href, onClick, className, style }: {
+    children: React.ReactNode;
+    href: string;
+    onClick?: () => void;
+    className?: string;
+    style?: React.CSSProperties;
+  }) => (
     <a href={href} onClick={onClick} className={className} style={style}>
       {children}
     </a>
@@ -84,7 +90,9 @@ describe('DropdownComponents', () => {
         />
       );
       // Design system uses ember color for active state
-      expect(container.querySelector('a').className).toMatch(/bg-ember-500/);
+      const link = container.querySelector('a');
+      expect(link).not.toBeNull();
+      expect(link!.className).toMatch(/bg-ember-500/);
     });
   });
 

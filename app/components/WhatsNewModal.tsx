@@ -62,13 +62,13 @@ export default function WhatsNewModal({ isOpen, onClose, dontShowAgain }: WhatsN
         className="overflow-hidden relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.08] [html:not(.dark)_&]:before:from-black/[0.03] before:to-transparent before:pointer-events-none"
       >
         {/* Header con gradiente */}
-        <div className={`relative bg-gradient-to-r ${getVersionColor(currentVersionData.type)} p-8 text-white z-10`}>
+        <div className={`relative bg-gradient-to-r ${getVersionColor(currentVersionData.type || 'patch')} p-8 text-white z-10`}>
           <div className="flex items-center justify-between mb-4 relative z-10">
             <div className="flex items-center gap-3">
-              <Text as="span" className="text-5xl drop-shadow-lg">{getVersionIcon(currentVersionData.type)}</Text>
+              <Text as="span" className="text-5xl drop-shadow-lg">{getVersionIcon(currentVersionData.type || 'patch')}</Text>
               <div>
                 <Heading level={2} size="3xl" className="text-white">Novità!</Heading>
-                <Text size="sm" className="text-white/90 mt-1">{getVersionTypeLabel(currentVersionData.type)}</Text>
+                <Text size="sm" className="text-white/90 mt-1">{getVersionTypeLabel(currentVersionData.type || 'patch')}</Text>
               </div>
             </div>
 

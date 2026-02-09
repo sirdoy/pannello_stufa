@@ -178,7 +178,7 @@ export default function NotificationPreferencesPanel() {
   } = useNotificationPreferences(user?.sub);
 
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Sync hook error to local error state
   useEffect(() => {

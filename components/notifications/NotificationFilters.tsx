@@ -22,8 +22,8 @@ const STATUS_OPTIONS = [
 interface NotificationFiltersProps {
   type: string;
   status: string;
-  onTypeChange: (value: string) => void;
-  onStatusChange: (value: string) => void;
+  onTypeChange: (event: { target: { value: string | number } }) => void;
+  onStatusChange: (event: { target: { value: string | number } }) => void;
   onClear: () => void;
   isFiltered: boolean;
 }
@@ -41,14 +41,14 @@ export default function NotificationFilters({
   const statusValue = status || 'all';
 
   // Convert 'all' back to empty string for parent
-  const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    onTypeChange(value === 'all' ? '' : value);
+  const handleTypeChange = (event: { target: { value: string | number } }) => {
+    const value = String(event.target.value);
+    onTypeChange({ target: { value: value === 'all' ? '' : value } });
   };
 
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    onStatusChange(value === 'all' ? '' : value);
+  const handleStatusChange = (event: { target: { value: string | number } }) => {
+    const value = String(event.target.value);
+    onStatusChange({ target: { value: value === 'all' ? '' : value } });
   };
 
   return (

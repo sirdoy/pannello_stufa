@@ -188,7 +188,7 @@ export default function StovePanel() {
     setRefreshing(false);
   };
 
-  const handleFanChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleFanChange = async (e: { target: { value: string | number } }) => {
     const level = Number(e.target.value);
     setFanLevel(level);
     await fetch(STOVE_ROUTES.setFan, {
@@ -198,7 +198,7 @@ export default function StovePanel() {
     await logStoveAction.setFan(level);
   };
 
-  const handlePowerChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handlePowerChange = async (e: { target: { value: string | number } }) => {
     const level = Number(e.target.value);
     setPowerLevel(level);
     await fetch(STOVE_ROUTES.setPower, {

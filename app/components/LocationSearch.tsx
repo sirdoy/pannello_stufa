@@ -94,7 +94,7 @@ export default function LocationSearch({
           setError(data.error || 'Errore durante la ricerca');
         }
       } catch (err) {
-        if (err.name !== 'AbortError') {
+        if (err instanceof Error && err.name !== 'AbortError') {
           setError('Errore durante la ricerca. Riprova.');
         }
       } finally {
@@ -151,7 +151,7 @@ export default function LocationSearch({
         });
       }
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Errore durante la geolocalizzazione');
     } finally {
       setIsLocating(false);
     }

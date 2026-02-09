@@ -94,10 +94,13 @@ export default function NotificationPermissionButton({ onSuccess, onError }: Not
 
     } catch (err) {
       console.error('❌ Errore abilitazione notifiche:', err);
-      setError(err.message || 'Errore durante l\'abilitazione delle notifiche');
+      const errorMessage = err instanceof Error ? err.message : 'Errore durante l\'abilitazione delle notifiche';
+      setError(errorMessage);
 
       // Callback error
-      if (onError) onError(err);
+      if (onError && err instanceof Error) {
+        onError(err);
+      }
     } finally {
       setIsLoading(false);
     }

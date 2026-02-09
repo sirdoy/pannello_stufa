@@ -14,10 +14,10 @@ jest.mock('@/lib/firebaseAdmin', () => ({
 }));
 
 describe('notificationHistoryService', () => {
-  let mockDb;
-  let mockCollection;
-  let mockQuery;
-  let mockSnapshot;
+  let mockDb: any;
+  let mockCollection: any;
+  let mockQuery: any;
+  let mockSnapshot: any;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -70,7 +70,7 @@ describe('notificationHistoryService', () => {
 
       // Find the timestamp filter call
       const timestampFilterCall = mockQuery.where.mock.calls.find(
-        call => call[0] === 'timestamp'
+        (call: any) => call[0] === 'timestamp'
       );
 
       expect(timestampFilterCall).toBeDefined();
@@ -84,7 +84,7 @@ describe('notificationHistoryService', () => {
 
       // Find the timestamp filter call
       const timestampFilterCall = mockQuery.where.mock.calls.find(
-        call => call[0] === 'timestamp'
+        (call: any) => call[0] === 'timestamp'
       );
 
       expect(timestampFilterCall).toBeDefined();
@@ -240,7 +240,7 @@ describe('notificationHistoryService', () => {
       await getNotificationHistory('auth0|123');
 
       const timestampFilterCall = mockQuery.where.mock.calls.find(
-        call => call[0] === 'timestamp'
+        (call: any) => call[0] === 'timestamp'
       );
 
       expect(timestampFilterCall[1]).toBe('>=');

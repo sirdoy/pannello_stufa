@@ -17,7 +17,7 @@ describe('CameraDashboard Grid Props', () => {
     'app/(pages)/camera/CameraDashboard.tsx'
   );
 
-  let componentSource;
+  let componentSource: string;
 
   beforeAll(() => {
     componentSource = fs.readFileSync(componentPath, 'utf8');
@@ -50,9 +50,9 @@ describe('CameraDashboard Grid Props', () => {
 
     // Should have at least 2 Grid components with valid props
     expect(gapMatches).not.toBeNull();
-    expect(gapMatches.length).toBeGreaterThanOrEqual(2);
+    expect(gapMatches!.length).toBeGreaterThanOrEqual(2);
 
     expect(colsMatches).not.toBeNull();
-    expect(colsMatches.length).toBeGreaterThanOrEqual(2);
+    expect(colsMatches!.length).toBeGreaterThanOrEqual(2);
   });
 });

@@ -623,14 +623,14 @@ describe('netatmoApi', () => {
       const result = parseSchedules(homesData as any);
 
       expect(result).toHaveLength(1);
-      expect(result[0].zones).toHaveLength(2);
+      expect(result[0]!.zones).toHaveLength(2);
 
       // First zone should have temp
-      expect(result[0].zones[0]).toHaveProperty('temp', 21);
+      expect(result[0]!.zones[0]!).toHaveProperty('temp', 21);
 
       // Second zone should NOT have temp property (undefined filtered out)
-      expect(result[0].zones[1]).not.toHaveProperty('temp');
-      expect(result[0].zones[1]).toEqual({
+      expect(result[0]!.zones[1]!).not.toHaveProperty('temp');
+      expect(result[0]!.zones[1]!).toEqual({
         id: 1,
         name: 'Away',
         type: 5,
@@ -726,19 +726,19 @@ describe('netatmoApi', () => {
       const result = parseSchedules(homesData as any);
 
       expect(result).toHaveLength(1);
-      expect(result[0].zones).toHaveLength(3);
+      expect(result[0]!.zones).toHaveLength(3);
 
       // First zone - single room, average of [21] = 21
-      expect(result[0].zones[0]).toHaveProperty('temp', 21);
-      expect(result[0].zones[0]).toHaveProperty('rooms_temp');
+      expect(result[0]!.zones[0]!).toHaveProperty('temp', 21);
+      expect(result[0]!.zones[0]!).toHaveProperty('rooms_temp');
 
       // Second zone - multi-room, average of [14, 16] = 15
-      expect(result[0].zones[1]).toHaveProperty('temp', 15);
-      expect(result[0].zones[1]).toHaveProperty('rooms_temp');
-      expect(result[0].zones[1].rooms_temp).toHaveLength(2);
+      expect(result[0]!.zones[1]!).toHaveProperty('temp', 15);
+      expect(result[0]!.zones[1]!).toHaveProperty('rooms_temp');
+      expect(result[0]!.zones[1]!.rooms_temp).toHaveLength(2);
 
       // Third zone - Away with no rooms, should NOT have temp property
-      expect(result[0].zones[2]).not.toHaveProperty('temp');
+      expect(result[0]!.zones[2]!).not.toHaveProperty('temp');
     });
   });
 });

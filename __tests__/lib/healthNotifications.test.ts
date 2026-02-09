@@ -58,9 +58,9 @@ describe('Health Monitoring Notification Types', () => {
     test('builds connection_lost payload with default message', () => {
       const payload = buildNotificationPayload('monitoring_connection_lost', {});
 
-      expect(payload.notification.title).toBe('Stufa Disconnessa');
-      expect(payload.notification.body).toContain('non risponde');
-      expect(payload.data.priority).toBe('high');
+      expect(payload!.notification.title).toBe('Stufa Disconnessa');
+      expect(payload!.notification.body).toContain('non risponde');
+      expect(payload!.data.priority).toBe('high');
     });
 
     test('builds state_mismatch payload with custom data', () => {
@@ -70,10 +70,10 @@ describe('Health Monitoring Notification Types', () => {
         message: 'Custom mismatch message',
       });
 
-      expect(payload.notification.title).toBe('Anomalia Rilevata');
-      expect(payload.notification.body).toBe('Custom mismatch message');
-      expect((payload.data as any).expected).toBe('ON');
-      expect((payload.data as any).actual).toBe('STANDBY');
+      expect(payload!.notification.title).toBe('Anomalia Rilevata');
+      expect(payload!.notification.body).toBe('Custom mismatch message');
+      expect((payload!.data as any).expected).toBe('ON');
+      expect((payload!.data as any).actual).toBe('STANDBY');
     });
 
     test('builds stove_error payload with error code', () => {
@@ -82,9 +82,9 @@ describe('Health Monitoring Notification Types', () => {
         errorDescription: 'Mancanza pellet',
       });
 
-      expect(payload.notification.title).toBe('Errore Stufa Rilevato');
-      expect(payload.notification.body).toContain('AL03');
-      expect(payload.notification.body).toContain('Mancanza pellet');
+      expect(payload!.notification.title).toBe('Errore Stufa Rilevato');
+      expect(payload!.notification.body).toContain('AL03');
+      expect(payload!.notification.body).toContain('Mancanza pellet');
     });
   });
 });

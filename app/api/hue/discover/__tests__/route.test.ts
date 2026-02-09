@@ -19,7 +19,7 @@ const mockGetSession = auth0.getSession as jest.MockedFunction<typeof auth0.getS
 const mockDiscoverBridges = discoverBridges as jest.MockedFunction<typeof discoverBridges>;
 
 describe('GET /api/hue/discover', () => {
-  let mockRequest;
+  let mockRequest: Request;
   const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
   beforeEach(() => {

@@ -13,8 +13,8 @@ import { useReducedMotion } from '../useReducedMotion';
  * @param {boolean} matches - Whether 'no-preference' matches (motion allowed)
  * @returns {Function[]} Array of listeners for simulating preference changes
  */
-const mockMatchMedia = (matches) => {
-  const listeners = [];
+const mockMatchMedia = (matches: boolean): Array<(e: { matches: boolean }) => void> => {
+  const listeners: Array<(e: { matches: boolean }) => void> = [];
   const mockMediaQueryList = {
     matches,
     media: '(prefers-reduced-motion: no-preference)',

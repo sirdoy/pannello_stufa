@@ -92,10 +92,10 @@ describe('healthMonitoring', () => {
       const mismatch = detectStateMismatch(stoveResult, scheduleResult, netatmoResult);
 
       expect(mismatch).not.toBeNull();
-      expect(mismatch.detected).toBe(true);
-      expect(mismatch.expected).toBe('ON');
-      expect(mismatch.actual).toBe('STANDBY');
-      expect(mismatch.reason).toBe('should_be_on');
+      expect(mismatch!.detected).toBe(true);
+      expect(mismatch!.expected).toBe('ON');
+      expect(mismatch!.actual).toBe('STANDBY');
+      expect(mismatch!.reason).toBe('should_be_on');
     });
 
     it('detects mismatch when stove should be OFF but is ON', () => {
@@ -106,10 +106,10 @@ describe('healthMonitoring', () => {
       const mismatch = detectStateMismatch(stoveResult, scheduleResult, netatmoResult);
 
       expect(mismatch).not.toBeNull();
-      expect(mismatch.detected).toBe(true);
-      expect(mismatch.expected).toBe('OFF');
-      expect(mismatch.actual).toBe('WORK');
-      expect(mismatch.reason).toBe('should_be_off');
+      expect(mismatch!.detected).toBe(true);
+      expect(mismatch!.expected).toBe('OFF');
+      expect(mismatch!.actual).toBe('WORK');
+      expect(mismatch!.reason).toBe('should_be_off');
     });
 
     it('does not flag STARTING state as mismatch (grace period)', () => {
@@ -132,9 +132,9 @@ describe('healthMonitoring', () => {
       const mismatch = detectStateMismatch(stoveResult, scheduleResult, netatmoResult);
 
       expect(mismatch).not.toBeNull();
-      expect(mismatch.detected).toBe(true);
-      expect(mismatch.reason).toBe('stove_error');
-      expect(mismatch.errorDescription).toBe('Temperature sensor failure');
+      expect(mismatch!.detected).toBe(true);
+      expect(mismatch!.reason).toBe('stove_error');
+      expect(mismatch!.errorDescription).toBe('Temperature sensor failure');
     });
 
     it('detects coordination issue when Netatmo heating but stove OFF', () => {
@@ -145,9 +145,9 @@ describe('healthMonitoring', () => {
       const mismatch = detectStateMismatch(stoveResult, scheduleResult, netatmoResult);
 
       expect(mismatch).not.toBeNull();
-      expect(mismatch.detected).toBe(true);
-      expect(mismatch.reason).toBe('netatmo_heating_stove_off');
-      expect(mismatch.netatmoDemand).toBe('heating');
+      expect(mismatch!.detected).toBe(true);
+      expect(mismatch!.reason).toBe('netatmo_heating_stove_off');
+      expect(mismatch!.netatmoDemand).toBe('heating');
     });
 
     it('returns null when ON states match (WORK)', () => {

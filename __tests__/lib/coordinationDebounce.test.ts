@@ -40,9 +40,9 @@ describe('coordinationDebounce', () => {
       expect(_internals.activeTimers.has(userId)).toBe(true);
 
       const entry = _internals.activeTimers.get(userId);
-      expect(entry.targetState).toBe('ON');
-      expect(entry.duration).toBe(120000);
-      expect(entry.timer).toBeDefined();
+      expect(entry!.targetState).toBe('ON');
+      expect(entry!.duration).toBe(120000);
+      expect(entry!.timer).toBeDefined();
     });
 
     it('cancels existing timer for same user', async () => {
@@ -60,8 +60,8 @@ describe('coordinationDebounce', () => {
 
       // Only second timer should be active
       const entry = _internals.activeTimers.get(userId);
-      expect(entry.targetState).toBe('OFF');
-      expect(entry.duration).toBe(30000);
+      expect(entry!.targetState).toBe('OFF');
+      expect(entry!.duration).toBe(30000);
     });
 
     it('updates coordinationState.pendingDebounce to true', async () => {
@@ -213,8 +213,8 @@ describe('coordinationDebounce', () => {
       expect(_internals.activeTimers.has(userId)).toBe(true);
 
       const entry = _internals.activeTimers.get(userId);
-      expect(entry.targetState).toBe('ON');
-      expect(entry.duration).toBe(120000);
+      expect(entry!.targetState).toBe('ON');
+      expect(entry!.duration).toBe(120000);
     });
 
     it('applies 30s retry on OFF during debounce with targetState ON', async () => {
@@ -223,8 +223,8 @@ describe('coordinationDebounce', () => {
 
       // Start ON timer
       await handleStoveStateChange(userId, 'ON', callback);
-      expect(_internals.activeTimers.get(userId).targetState).toBe('ON');
-      expect(_internals.activeTimers.get(userId).duration).toBe(120000);
+      expect(_internals.activeTimers.get(userId)!.targetState).toBe('ON');
+      expect(_internals.activeTimers.get(userId)!.duration).toBe(120000);
 
       // Stove turns OFF → should cancel and start 30s retry
       const result = await handleStoveStateChange(userId, 'OFF', callback);
@@ -232,8 +232,8 @@ describe('coordinationDebounce', () => {
       expect(result).toEqual({ action: 'retry_started', delayMs: 30000 });
 
       const entry = _internals.activeTimers.get(userId);
-      expect(entry.targetState).toBe('OFF');
-      expect(entry.duration).toBe(30000);
+      expect(entry!.targetState).toBe('OFF');
+      expect(entry!.duration).toBe(30000);
     });
 
     it('executes immediately on OFF with no pending', async () => {

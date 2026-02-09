@@ -18,8 +18,8 @@ describe('netatmoCameraApi', () => {
   describe('parseCameras', () => {
     it('should return empty array for empty input', () => {
       expect(parseCameras([])).toEqual([]);
-      expect(parseCameras(null)).toEqual([]);
-      expect(parseCameras(undefined)).toEqual([]);
+      expect(parseCameras(null as any)).toEqual([]);
+      expect(parseCameras(undefined as any)).toEqual([]);
     });
 
     it('should parse cameras correctly', () => {
@@ -91,7 +91,7 @@ describe('netatmoCameraApi', () => {
   describe('parsePersons', () => {
     it('should return empty array for empty input', () => {
       expect(parsePersons([])).toEqual([]);
-      expect(parsePersons(null)).toEqual([]);
+      expect(parsePersons(null as any)).toEqual([]);
     });
 
     it('should parse persons correctly', () => {
@@ -137,7 +137,7 @@ describe('netatmoCameraApi', () => {
   describe('parseEvents', () => {
     it('should return empty array for empty input', () => {
       expect(parseEvents([])).toEqual([]);
-      expect(parseEvents(null)).toEqual([]);
+      expect(parseEvents(null as any)).toEqual([]);
     });
 
     it('should parse events correctly', () => {
@@ -254,8 +254,8 @@ describe('netatmoCameraApi', () => {
 
     it('should return type as fallback for unknown types', () => {
       expect(getCameraTypeName('UNKNOWN')).toBe('UNKNOWN');
-      expect(getCameraTypeName(null)).toBe('Camera');
-      expect(getCameraTypeName(undefined)).toBe('Camera');
+      expect(getCameraTypeName(null as any)).toBe('Camera');
+      expect(getCameraTypeName(undefined as any)).toBe('Camera');
     });
   });
 
@@ -271,7 +271,7 @@ describe('netatmoCameraApi', () => {
 
     it('should return type as fallback for unknown types', () => {
       expect(getEventTypeName('unknown')).toBe('unknown');
-      expect(getEventTypeName(null)).toBe('Evento');
+      expect(getEventTypeName(null as any)).toBe('Evento');
     });
   });
 
@@ -287,7 +287,7 @@ describe('netatmoCameraApi', () => {
 
     it('should return camera icon for unknown types', () => {
       expect(getEventIcon('unknown')).toBe('📷');
-      expect(getEventIcon(null)).toBe('📷');
+      expect(getEventIcon(null as any)).toBe('📷');
     });
   });
 

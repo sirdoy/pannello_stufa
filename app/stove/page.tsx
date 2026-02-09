@@ -218,7 +218,7 @@ export default function StovePage() {
         'stove/shutdown': '🌙 Stufa spenta (sincronizzato)',
         'stove/set-power': '⚡ Potenza impostata (sincronizzato)',
       };
-      const message = actionLabels[(lastSyncedCommand as any).endpoint] || 'Comando sincronizzato';
+      const message = actionLabels[(lastSyncedCommand as any).endpoint as keyof typeof actionLabels] || 'Comando sincronizzato';
       setToast({ message, variant: 'success' });
       fetchStatusAndUpdate();
     }
@@ -307,9 +307,9 @@ export default function StovePage() {
 
   useEffect(() => {
     if (!isLocalEnvironment()) return;
-    let unsubscribeState = null;
-    let unsubscribeMaintenance = null;
-    let unsubscribeError = null;
+    let unsubscribeState: (() => void) | null = null;
+    let unsubscribeMaintenance: (() => void) | null = null;
+    let unsubscribeError: (() => void) | null = null;
 
     async function setupSandboxListeners() {
       const enabled = await isSandboxEnabled();
@@ -530,7 +530,7 @@ export default function StovePage() {
     },
   };
 
-  const theme = themeColors[statusConfig.theme] || themeColors.slate;
+  const theme = themeColors[statusConfig.theme as keyof typeof themeColors] || themeColors.slate;
 
   // ─────────────────────────────────────────────────────────────
   // Loading State
@@ -597,7 +597,7 @@ export default function StovePage() {
                 title="Pulizia Stufa Richiesta"
                 description={
                   <>
-                    Raggiunte <strong>{maintenanceStatus.currentHours.toFixed(1)} ore</strong>.
+                    Raggiunte <strong>{maintenanceStatus?.currentHours.toFixed(1)} ore</strong>.
                     Effettua la pulizia prima di riaccendere.
                   </>
                 }
@@ -854,8 +854,8 @@ export default function StovePage() {
                 <ControlButton
                   type="decrement"
                   variant="subtle"
-                  onClick={() => fanLevel > 1 && handleFanChange(fanLevel - 1)}
-                  disabled={!fanLevel || fanLevel <= 1}
+                  onClick={() => fanLevel !== null && fanLevel > 1 && handleFanChange(fanLevel - 1)}
+                  disabled={fanLevel === null || fanLevel <= 1}
                 />
                 <div className="flex flex-col items-center px-6">
                   <Text variant="label" size="sm" className="mb-1">Livello</Text>
@@ -867,8 +867,8 @@ export default function StovePage() {
                 <ControlButton
                   type="increment"
                   variant="subtle"
-                  onClick={() => fanLevel < 6 && handleFanChange(fanLevel + 1)}
-                  disabled={!fanLevel || fanLevel >= 6}
+                  onClick={() => fanLevel !== null && fanLevel < 6 && handleFanChange(fanLevel + 1)}
+                  disabled={fanLevel === null || fanLevel >= 6}
                 />
               </div>
             </Card>
@@ -886,8 +886,8 @@ export default function StovePage() {
                 <ControlButton
                   type="decrement"
                   variant="ember"
-                  onClick={() => powerLevel > 1 && handlePowerChange(powerLevel - 1)}
-                  disabled={!powerLevel || powerLevel <= 1}
+                  onClick={() => powerLevel !== null && powerLevel > 1 && handlePowerChange(powerLevel - 1)}
+                  disabled={powerLevel === null || powerLevel <= 1}
                 />
                 <div className="flex flex-col items-center px-6">
                   <Text variant="label" size="sm" className="mb-1">Livello</Text>
@@ -899,8 +899,8 @@ export default function StovePage() {
                 <ControlButton
                   type="increment"
                   variant="ember"
-                  onClick={() => powerLevel < 5 && handlePowerChange(powerLevel + 1)}
-                  disabled={!powerLevel || powerLevel >= 5}
+                  onClick={() => powerLevel !== null && powerLevel < 5 && handlePowerChange(powerLevel + 1)}
+                  disabled={powerLevel === null || powerLevel >= 5}
                 />
               </div>
             </Card>

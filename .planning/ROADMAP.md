@@ -101,7 +101,7 @@ Plans:
 
 ---
 
-### Phase 46: API and Page Strict Mode Compliance
+### Phase 46: API and Page Strict Mode Compliance ✓
 
 **Goal**: All API routes and pages comply with strict TypeScript rules
 
@@ -109,23 +109,19 @@ Plans:
 
 **Requirements**: STRICT-02 (partial - API/pages), STRICT-03 (partial - API/pages), STRICT-04 (partial - API/pages), STRICT-05, STRICT-06
 
-**Success Criteria** (what must be TRUE):
-1. All API route handlers have fully typed request/response with proper validation
-2. All page components handle null/undefined from async data fetching
-3. All dynamic property access uses proper type guards or optional chaining
-4. tsc --noEmit shows zero errors in app/ directory (excluding test files)
+**Completed**: 2026-02-09 | **Verified**: passed (4/4 must-haves)
 
-**Plans**: 8 plans
+**Plans**: 8/8 complete
 
 Plans:
-- [ ] 46-01-PLAN.md -- Fix 45 strict-mode errors in stove scheduler page
-- [ ] 46-02-PLAN.md -- Fix lights page (24) and stove page (17) strict-mode errors
-- [ ] 46-03-PLAN.md -- Fix scenes, camera, notification history, log, hooks, and single-error pages (33 errors)
-- [ ] 46-04-PLAN.md -- Fix Hue, Netatmo, and Stove API route errors (22 errors)
-- [ ] 46-05-PLAN.md -- Fix scheduler check, notification, geocoding, and health API route errors (23 errors)
-- [ ] 46-06-PLAN.md -- Fix 18 debug tab components and debug pages (40 errors)
-- [ ] 46-07-PLAN.md -- Fix design-system page (20) and CodeBlock (2) strict-mode errors
-- [ ] 46-08-PLAN.md -- Gap sweep and final verification
+- [x] 46-01-PLAN.md — Fix 45 strict-mode errors in stove scheduler page
+- [x] 46-02-PLAN.md — Fix lights page (24) and stove page (17) strict-mode errors
+- [x] 46-03-PLAN.md — Fix scenes, camera, notification history, log, hooks, and single-error pages (33 errors)
+- [x] 46-04-PLAN.md — Fix Hue, Netatmo, and Stove API route errors (22 errors)
+- [x] 46-05-PLAN.md — Fix scheduler check, notification, geocoding, and health API route errors (23 errors)
+- [x] 46-06-PLAN.md — Fix 18 debug tab components and debug pages (40 errors)
+- [x] 46-07-PLAN.md — Fix design-system page (20) and CodeBlock (2) strict-mode errors
+- [x] 46-08-PLAN.md — Gap sweep and final verification
 
 ---
 
@@ -186,9 +182,9 @@ Plans:
 | 1-5 | v1.0 | 29/29 | ✓ Complete | 2026-01-26 |
 | **44** | **v5.1** | **7/7** | **✓ Complete** | **2026-02-09** |
 | **45** | **v5.1** | **8/8** | **✓ Complete** | **2026-02-09** |
-| **46** | **v5.1** | **0/TBD** | **Not started** | **-** |
+| **46** | **v5.1** | **8/8** | **✓ Complete** | **2026-02-09** |
 | **47** | **v5.1** | **0/TBD** | **Not started** | **-** |
 | **48** | **v5.1** | **0/TBD** | **Not started** | **-** |
 
 ---
-*Last updated: 2026-02-09 — Phase 45 complete (8/8 plans, verified passed)*
+*Last updated: 2026-02-09 — Phase 46 complete (8/8 plans, verified passed)*

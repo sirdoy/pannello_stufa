@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 47 of 48 (Test Strict Mode and Index Access)
-Plan: 6 of 8 in current phase
+Plan: 7 of 8 in current phase
 Status: In Progress
-Last activity: 2026-02-09 - Completed 47-06-PLAN.md (Fixed 103 noUncheckedIndexedAccess errors in 16 debug files and 8 API routes)
+Last activity: 2026-02-09 - Completed 47-07-PLAN.md (Fixed 75 noUncheckedIndexedAccess errors in 22 remaining source files, achieved 0 source file tsc errors)
 
-Progress: [████████████████████████████████████████████░░░░] 99% (239/236 estimated total plans)
+Progress: [████████████████████████████████████████████░░░░] 99% (240/236 estimated total plans)
 
 ## Performance Metrics
 
@@ -63,6 +63,7 @@ Progress: [███████████████████████
 | Phase 47 P03 | 819s | 2 tasks | 20 files |
 | Phase 47 P06 | 824s | 2 tasks | 24 files |
 | Phase 47 P05 | 683s | 2 tasks | 9 files |
+| Phase 47 P07 | 936s | 2 tasks | 25 files |
 
 ## Accumulated Context
 
@@ -132,6 +133,12 @@ Recent decisions from PROJECT.md affecting v5.1 work:
 - [Phase 47-02]: jest.Mock type annotations for test fixtures (mockRouter, mockSearchParams)
 - [Phase 47-06]: Record<string, boolean> property access requires ?? false in debug tabs (loading states)
 - [Phase 47-06]: Array index access requires optional chaining (arr?.[0]) or existence checks
+- [Phase 47-07]: Array default destructuring pattern (e.g., [r = 0, g = 0, b = 0]) for guaranteed non-undefined values
+- [Phase 47-07]: Non-null assertion (!) safe after nullish coalescing fallback to known-good default
+- [Phase 47-07]: Variable extraction pattern when TypeScript can't infer type narrowing through if-guard for object literal
+- [Phase 47-07]: Provide complete default objects for Record index access in setState updates (e.g., LightConfig defaults)
+- [Phase 47-07]: Optional chaining for mock object methods (jest.setup localStorageMock)
+- [Phase 47-07]: Nullish coalescing for array access in map iterations with sensible defaults
 - [Phase 47-06]: Netatmo API routes require explicit home existence checks after homesData[0] access
 - [Phase 47-05]: Non-null assertions for Record<string, T> with known compile-time keys (componentDocs.Button!)
 - [Phase 47-05]: Non-null assertions for guaranteed string format destructuring (time.split(':').map(Number))
@@ -154,6 +161,7 @@ None yet.
 - **Phase 44 COMPLETE:** lib/ directory now has 0 tsc errors
 - **Phase 45 COMPLETE:** components/ and app/components/ directories now have 0 tsc errors
 - **Phase 46 COMPLETE:** app/ directory (pages, API routes, hooks) now has 0 tsc errors - all 231 errors resolved
+- **Phase 47 Plan 07 COMPLETE:** All non-test source files now have 0 tsc errors with noUncheckedIndexedAccess enabled
 - Phase 47: 1 failing test (FormModal cancel behavior — onClose called twice)
 - Phase 47: Worker teardown warning during test runs
 - Phase 48: Dead code removal needed (unused exports, files, dependencies)
@@ -165,9 +173,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-09 14:48
-Stopped at: Completed 47-06-PLAN.md (Fixed 103 noUncheckedIndexedAccess errors in debug tabs and API routes)
-Resume file: None — continue with next plan in phase 47
+Last session: 2026-02-09 14:50
+Stopped at: Completed 47-07-PLAN.md (Fixed 75 noUncheckedIndexedAccess errors in 22 remaining source files + 2 discovered gaps, achieved 0 source file tsc errors)
+Resume file: None — continue with 47-08
 
 ---
 *State initialized: 2026-02-08 for v5.1 Tech Debt & Code Quality milestone*

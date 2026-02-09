@@ -232,7 +232,7 @@ async function cleanupTokensIfNeeded(): Promise<any> {
 
     let tokensScanned = 0;
     let tokensRemoved = 0;
-    const tokenUpdates = {};
+    const tokenUpdates: Record<string, unknown> = {};
 
     if (snapshot.exists()) {
       snapshot.forEach(userSnap => {
@@ -278,7 +278,7 @@ async function cleanupTokensIfNeeded(): Promise<any> {
     const errorsSnapshot = await errorsRef.once('value');
 
     let errorsRemoved = 0;
-    const errorUpdates = {};
+    const errorUpdates: Record<string, unknown> = {};
 
     if (errorsSnapshot.exists()) {
       errorsSnapshot.forEach(errorSnap => {
@@ -509,7 +509,7 @@ async function fetchStoveData(): Promise<any> {
     }
 
   } catch (error) {
-    console.error('❌ Critical error fetching stove data:', error.message);
+    console.error('❌ Critical error fetching stove data:', error instanceof Error ? error.message : String(error));
     statusFetchFailed = true;
   }
 
@@ -577,8 +577,9 @@ async function handleShutdown(ora: string): Promise<any> {
 
     return { success: true };
   } catch (error) {
-    console.error('❌ Failed to shutdown stove:', error.message);
-    return { success: false, error: error.message };
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('❌ Failed to shutdown stove:', errorMessage);
+    return { success: false, error: errorMessage };
   }
 }
 
@@ -591,7 +592,7 @@ async function handleLevelChanges(active: any, currentPowerLevel: number, curren
       await updateStoveState({ powerLevel: active.power, source: 'scheduler' });
       changeApplied = true;
     } catch (error) {
-      console.error('❌ Failed to set power:', error.message);
+      console.error('❌ Failed to set power:', error instanceof Error ? error.message : String(error));
     }
   }
 
@@ -601,7 +602,7 @@ async function handleLevelChanges(active: any, currentPowerLevel: number, curren
       await updateStoveState({ fanLevel: active.fan, source: 'scheduler' });
       changeApplied = true;
     } catch (error) {
-      console.error('❌ Failed to set fan:', error.message);
+      console.error('❌ Failed to set fan:', error instanceof Error ? error.message : String(error));
     }
   }
 
@@ -747,8 +748,9 @@ async function runPidAutomationIfEnabled(isOn: boolean, currentPowerLevel: numbe
     };
 
   } catch (error) {
-    console.error('❌ PID automation error:', error.message);
-    return { skipped: true, reason: 'exception', error: error.message };
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('❌ PID automation error:', errorMessage);
+    return { skipped: true, reason: 'exception', error: errorMessage };
   }
 }
 
@@ -874,7 +876,7 @@ export const GET = withCronSecret(async (_request) => {
   // Track maintenance hours
   const maintenanceTrack = await trackUsageHours(currentStatus);
   if (maintenanceTrack.tracked) {
-    console.log(`✅ Maintenance tracked: +${maintenanceTrack.elapsedMinutes}min → ${maintenanceTrack.newCurrentHours.toFixed(2)}h total`);
+    console.log(`✅ Maintenance tracked: +${maintenanceTrack.elapsedMinutes}min → ${(maintenanceTrack.newCurrentHours ?? 0).toFixed(2)}h total`);
 
     if (maintenanceTrack.notificationData) {
       await sendMaintenanceNotificationIfNeeded(maintenanceTrack.notificationData as any);
@@ -896,7 +898,7 @@ export const GET = withCronSecret(async (_request) => {
       console.log(`🔥 Stove sync: no action needed (reason: ${enforcementResult.reason})`);
     }
   } catch (syncError) {
-    console.error('❌ Stove sync enforcement error:', syncError.message);
+    console.error('❌ Stove sync enforcement error:', syncError instanceof Error ? syncError.message : String(syncError));
   }
 
   let changeApplied = false;

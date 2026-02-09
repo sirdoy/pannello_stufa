@@ -310,7 +310,7 @@ export default function CameraDashboard() {
               <div className="aspect-video bg-slate-800 [html:not(.dark)_&]:bg-slate-200 rounded-xl overflow-hidden mb-4 relative">
                 {isLiveMode && selectedCamera.status === 'on' ? (
                   <HlsPlayer
-                    src={NETATMO_CAMERA_API.getLiveStreamUrl(selectedCamera)}
+                    src={NETATMO_CAMERA_API.getLiveStreamUrl(selectedCamera) ?? ''}
                     poster={snapshotUrls[selectedCamera.id] ?? ''}
                     className="w-full h-full"
                     onError={() => setIsLiveMode(false)}

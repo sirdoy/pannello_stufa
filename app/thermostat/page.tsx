@@ -413,22 +413,22 @@ function NetatmoContent() {
     schedule: {
       label: 'Programmato',
       icon: '\u23F0',
-      colorScheme: 'sage',
+      colorScheme: 'sage' as const,
     },
     away: {
       label: 'Assenza',
       icon: '\uD83C\uDFC3',
-      colorScheme: 'warning',
+      colorScheme: 'warning' as const,
     },
     hg: {
       label: 'Antigelo',
       icon: '\u2744\uFE0F',
-      colorScheme: 'ocean',
+      colorScheme: 'ocean' as const,
     },
     off: {
       label: 'Off',
       icon: '\u23F8\uFE0F',
-      colorScheme: 'slate',
+      colorScheme: 'slate' as const,
     },
   };
 

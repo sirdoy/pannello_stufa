@@ -42,7 +42,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'stove.statusWork',
     defaultEnabled: true,
     title: () => 'Stufa in Funzione',
-    body: (data) => data.message || 'La stufa e ora in funzione (stato WORK)',
+    body: (data: NotificationData) => data.message || 'La stufa e ora in funzione (stato WORK)',
     icon: '/icons/icon-192.png',
     priority: 'normal',
     url: '/',
@@ -53,7 +53,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'stove.unexpectedOff',
     defaultEnabled: true,
     title: () => 'Spegnimento Imprevisto',
-    body: (data) => data.message || 'La stufa si e spenta mentre lo scheduler era attivo in automatico',
+    body: (data: NotificationData) => data.message || 'La stufa si e spenta mentre lo scheduler era attivo in automatico',
     icon: '/icons/icon-192.png',
     priority: 'high',
     url: '/stove/scheduler',
@@ -66,7 +66,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'errors.severityLevels.info',
     defaultEnabled: false,
     title: () => 'Informazione Stufa',
-    body: (data) => data.message || `Codice: ${data.errorCode}`,
+    body: (data: NotificationData) => data.message || `Codice: ${data.errorCode}`,
     icon: '/icons/icon-192.png',
     priority: 'normal',
     url: '/stove/errors',
@@ -77,7 +77,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'errors.severityLevels.warning',
     defaultEnabled: true,
     title: () => 'Avviso Stufa',
-    body: (data) => data.message || `Codice: ${data.errorCode}`,
+    body: (data: NotificationData) => data.message || `Codice: ${data.errorCode}`,
     icon: '/icons/icon-192.png',
     priority: 'normal',
     url: '/stove/errors',
@@ -88,7 +88,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'errors.severityLevels.error',
     defaultEnabled: true,
     title: () => 'Errore Stufa',
-    body: (data) => data.message || `Errore ${data.errorCode}: ${data.description || 'Richiesto intervento'}`,
+    body: (data: NotificationData) => data.message || `Errore ${data.errorCode}: ${data.description || 'Richiesto intervento'}`,
     icon: '/icons/icon-192.png',
     priority: 'high',
     url: '/stove/errors',
@@ -99,7 +99,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'errors.severityLevels.critical',
     defaultEnabled: true,
     title: () => 'ERRORE CRITICO Stufa',
-    body: (data) => data.message || `Errore critico ${data.errorCode}: Intervento immediato richiesto!`,
+    body: (data: NotificationData) => data.message || `Errore critico ${data.errorCode}: Intervento immediato richiesto!`,
     icon: '/icons/icon-192.png',
     priority: 'high',
     url: '/stove/errors',
@@ -112,7 +112,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'scheduler.ignition',
     defaultEnabled: true,
     title: () => 'Accensione Automatica',
-    body: (data) => data.message || 'La stufa e stata accesa automaticamente dallo scheduler',
+    body: (data: NotificationData) => data.message || 'La stufa e stata accesa automaticamente dallo scheduler',
     icon: '/icons/icon-192.png',
     priority: 'normal',
     url: '/stove/scheduler',
@@ -123,7 +123,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'scheduler.shutdown',
     defaultEnabled: true,
     title: () => 'Spegnimento Automatico',
-    body: (data) => data.message || 'La stufa e stata spenta automaticamente dallo scheduler',
+    body: (data: NotificationData) => data.message || 'La stufa e stata spenta automaticamente dallo scheduler',
     icon: '/icons/icon-192.png',
     priority: 'normal',
     url: '/stove/scheduler',
@@ -136,7 +136,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'maintenance.threshold80',
     defaultEnabled: true,
     title: () => 'Promemoria Manutenzione',
-    body: (data) => data.message || `Raggiunto 80% ore utilizzo. ${data.remainingHours?.toFixed(1) || '?'}h rimanenti.`,
+    body: (data: NotificationData) => data.message || `Raggiunto 80% ore utilizzo. ${data.remainingHours?.toFixed(1) || '?'}h rimanenti.`,
     icon: '/icons/icon-192.png',
     priority: 'normal',
     url: '/stove/maintenance',
@@ -147,7 +147,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'maintenance.threshold90',
     defaultEnabled: true,
     title: () => 'Attenzione Manutenzione',
-    body: (data) => data.message || `Raggiunto 90% ore utilizzo. ${data.remainingHours?.toFixed(1) || '?'}h rimanenti. Pianifica la pulizia.`,
+    body: (data: NotificationData) => data.message || `Raggiunto 90% ore utilizzo. ${data.remainingHours?.toFixed(1) || '?'}h rimanenti. Pianifica la pulizia.`,
     icon: '/icons/icon-192.png',
     priority: 'normal',
     url: '/stove/maintenance',
@@ -158,7 +158,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'maintenance.threshold100',
     defaultEnabled: true,
     title: () => 'MANUTENZIONE RICHIESTA',
-    body: (data) => data.message || 'Manutenzione obbligatoria! Accensione bloccata fino a pulizia.',
+    body: (data: NotificationData) => data.message || 'Manutenzione obbligatoria! Accensione bloccata fino a pulizia.',
     icon: '/icons/icon-192.png',
     priority: 'high',
     url: '/stove/maintenance',
@@ -171,7 +171,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'netatmo.temperatureLow',
     defaultEnabled: false,
     title: () => 'Temperatura Bassa',
-    body: (data) => data.message || `Temperatura scesa a ${data.temperature}°C in ${data.room || 'casa'}`,
+    body: (data: NotificationData) => data.message || `Temperatura scesa a ${data.temperature}°C in ${data.room || 'casa'}`,
     icon: '/icons/icon-192.png',
     priority: 'normal',
     url: '/thermostat',
@@ -182,7 +182,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'netatmo.temperatureHigh',
     defaultEnabled: false,
     title: () => 'Temperatura Alta',
-    body: (data) => data.message || `Temperatura salita a ${data.temperature}°C in ${data.room || 'casa'}`,
+    body: (data: NotificationData) => data.message || `Temperatura salita a ${data.temperature}°C in ${data.room || 'casa'}`,
     icon: '/icons/icon-192.png',
     priority: 'normal',
     url: '/thermostat',
@@ -193,7 +193,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'netatmo.setpointReached',
     defaultEnabled: false,
     title: () => 'Temperatura Raggiunta',
-    body: (data) => data.message || `Temperatura target di ${data.setpoint}°C raggiunta`,
+    body: (data: NotificationData) => data.message || `Temperatura target di ${data.setpoint}°C raggiunta`,
     icon: '/icons/icon-192.png',
     priority: 'normal',
     url: '/thermostat',
@@ -204,7 +204,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'netatmo.connectionLost',
     defaultEnabled: true,
     title: () => 'Connessione Netatmo Persa',
-    body: (data) => data.message || 'Il termostato Netatmo non risponde. Verifica la connessione.',
+    body: (data: NotificationData) => data.message || 'Il termostato Netatmo non risponde. Verifica la connessione.',
     icon: '/icons/icon-192.png',
     priority: 'high',
     url: '/thermostat',
@@ -217,7 +217,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'hue.sceneActivated',
     defaultEnabled: false,
     title: () => 'Scena Attivata',
-    body: (data) => data.message || `Scena "${data.sceneName}" attivata`,
+    body: (data: NotificationData) => data.message || `Scena "${data.sceneName}" attivata`,
     icon: '/icons/icon-192.png',
     priority: 'normal',
     url: '/hue',
@@ -228,7 +228,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'hue.connectionLost',
     defaultEnabled: true,
     title: () => 'Connessione Hue Persa',
-    body: (data) => data.message || 'Il bridge Philips Hue non risponde. Verifica la connessione.',
+    body: (data: NotificationData) => data.message || 'Il bridge Philips Hue non risponde. Verifica la connessione.',
     icon: '/icons/icon-192.png',
     priority: 'high',
     url: '/hue',
@@ -241,7 +241,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'system.updates',
     defaultEnabled: true,
     title: () => 'Aggiornamento Disponibile',
-    body: (data) => data.message || `Nuova versione ${data.version} disponibile`,
+    body: (data: NotificationData) => data.message || `Nuova versione ${data.version} disponibile`,
     icon: '/icons/icon-192.png',
     priority: 'normal',
     url: '/',
@@ -252,7 +252,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'system.offlineSync',
     defaultEnabled: true,
     title: () => 'Comandi Sincronizzati',
-    body: (data) => data.message || `${data.count || 1} comandi eseguiti dopo riconnessione`,
+    body: (data: NotificationData) => data.message || `${data.count || 1} comandi eseguiti dopo riconnessione`,
     icon: '/icons/icon-192.png',
     priority: 'normal',
     url: '/',
@@ -265,7 +265,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'monitoring.connectionLost',
     defaultEnabled: true,
     title: () => 'Stufa Disconnessa',
-    body: (data) => data.message || 'La stufa non risponde. Verifica la connessione.',
+    body: (data: NotificationData) => data.message || 'La stufa non risponde. Verifica la connessione.',
     icon: '/icons/icon-192.png',
     priority: 'high',
     url: '/monitoring',
@@ -276,7 +276,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'monitoring.stateMismatch',
     defaultEnabled: true,
     title: () => 'Anomalia Rilevata',
-    body: (data) => data.message || `Stufa dovrebbe essere ${data.expected} ma e ${data.actual}`,
+    body: (data: NotificationData) => data.message || `Stufa dovrebbe essere ${data.expected} ma e ${data.actual}`,
     icon: '/icons/icon-192.png',
     priority: 'high',
     url: '/monitoring',
@@ -287,7 +287,7 @@ export const NOTIFICATION_TYPES = {
     preferenceKey: 'monitoring.stoveError',
     defaultEnabled: true,
     title: () => 'Errore Stufa Rilevato',
-    body: (data) => data.message || `Errore AL${data.errorCode}: ${data.errorDescription || 'Richiesto intervento'}`,
+    body: (data: NotificationData) => data.message || `Errore AL${data.errorCode}: ${data.errorDescription || 'Richiesto intervento'}`,
     icon: '/icons/icon-192.png',
     priority: 'high',
     url: '/monitoring',
@@ -299,8 +299,8 @@ export const NOTIFICATION_TYPES = {
     category: 'generic',
     preferenceKey: null, // Always sent (no preference check)
     defaultEnabled: true,
-    title: (data) => data.title || 'Pannello Stufa',
-    body: (data) => data.body || data.message || 'Notifica',
+    title: (data: NotificationData) => data.title || 'Pannello Stufa',
+    body: (data: NotificationData) => data.body || data.message || 'Notifica',
     icon: '/icons/icon-192.png',
     priority: 'normal',
     url: '/',
@@ -376,8 +376,8 @@ export const NOTIFICATION_CATEGORIES = {
  * @param {string} typeId - Type ID
  * @returns {Object|null}
  */
-export function getNotificationType(typeId) {
-  return NOTIFICATION_TYPES[typeId] || null;
+export function getNotificationType(typeId: string) {
+  return NOTIFICATION_TYPES[typeId as keyof typeof NOTIFICATION_TYPES] || null;
 }
 
 /**
@@ -385,7 +385,7 @@ export function getNotificationType(typeId) {
  * @param {string} categoryId - Category ID
  * @returns {Object[]}
  */
-export function getNotificationTypesByCategory(categoryId) {
+export function getNotificationTypesByCategory(categoryId: string) {
   return Object.values(NOTIFICATION_TYPES).filter(t => t.category === categoryId);
 }
 
@@ -398,13 +398,36 @@ interface NotificationPayloadData {
 }
 
 /**
+ * Common notification data shape used in body functions
+ */
+interface NotificationData {
+  message?: string;
+  errorCode?: string;
+  description?: string;
+  remainingHours?: number;
+  temperature?: number;
+  room?: string;
+  setpoint?: number;
+  sceneName?: string;
+  version?: string;
+  count?: number;
+  expected?: string;
+  actual?: string;
+  errorDescription?: string;
+  title?: string;
+  body?: string;
+  schedulerName?: string;
+  [key: string]: unknown;
+}
+
+/**
  * Build notification payload from type and data
  * @param {string} typeId - Notification type ID
  * @param {Object} data - Dynamic data for the notification
  * @returns {Object} Notification payload
  */
 export function buildNotificationPayload(typeId: string, data: NotificationPayloadData = {}) {
-  const type = NOTIFICATION_TYPES[typeId];
+  const type = NOTIFICATION_TYPES[typeId as keyof typeof NOTIFICATION_TYPES];
 
   if (!type) {
     console.warn(`Unknown notification type: ${typeId}`);
@@ -441,7 +464,7 @@ export function buildNotificationPayload(typeId: string, data: NotificationPaylo
  * @param {Object} data - Dynamic data for the notification
  * @returns {Promise<Object>} Result with success/error
  */
-export async function triggerNotification(typeId, data = {}) {
+export async function triggerNotification(typeId: string, data: Record<string, unknown> = {}) {
   try {
     const response = await fetch('/api/notifications/trigger', {
       method: 'POST',
@@ -462,7 +485,7 @@ export async function triggerNotification(typeId, data = {}) {
 
     return result;
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error triggering notification:', error);
     throw error;
   }
@@ -472,7 +495,7 @@ export async function triggerNotification(typeId, data = {}) {
  * Helper: Trigger stove status work notification
  * @param {Object} data - { message }
  */
-export async function triggerStoveStatusWork(data = {}) {
+export async function triggerStoveStatusWork(data: Record<string, unknown> = {}) {
   return triggerNotification('stove_status_work', data);
 }
 
@@ -480,7 +503,7 @@ export async function triggerStoveStatusWork(data = {}) {
  * Helper: Trigger stove unexpected off notification
  * @param {Object} data - { message, schedulerName }
  */
-export async function triggerStoveUnexpectedOff(data = {}) {
+export async function triggerStoveUnexpectedOff(data: Record<string, unknown> = {}) {
   return triggerNotification('stove_unexpected_off', data);
 }
 
@@ -489,7 +512,7 @@ export async function triggerStoveUnexpectedOff(data = {}) {
  * @param {string} severity - 'info' | 'warning' | 'error' | 'critical'
  * @param {Object} data - { errorCode, description, message }
  */
-export async function triggerStoveError(severity, data) {
+export async function triggerStoveError(severity: string, data: Record<string, unknown>) {
   const typeId = `stove_error_${severity.toLowerCase()}`;
   return triggerNotification(typeId, data);
 }
@@ -499,7 +522,7 @@ export async function triggerStoveError(severity, data) {
  * @param {string} action - 'ignition' | 'shutdown'
  * @param {Object} data - { message }
  */
-export async function triggerSchedulerAction(action, data = {}) {
+export async function triggerSchedulerAction(action: string, data: Record<string, unknown> = {}) {
   const typeId = `scheduler_${action.toLowerCase()}`;
   return triggerNotification(typeId, data);
 }
@@ -509,7 +532,7 @@ export async function triggerSchedulerAction(action, data = {}) {
  * @param {number} threshold - 80 | 90 | 100
  * @param {Object} data - { remainingHours, message }
  */
-export async function triggerMaintenanceAlert(threshold, data = {}) {
+export async function triggerMaintenanceAlert(threshold: number, data: Record<string, unknown> = {}) {
   const typeId = `maintenance_${threshold}`;
   return triggerNotification(typeId, data);
 }
@@ -519,7 +542,7 @@ export async function triggerMaintenanceAlert(threshold, data = {}) {
  * @param {string} type - 'temperature_low' | 'temperature_high' | 'setpoint_reached' | 'connection_lost'
  * @param {Object} data - { temperature, room, setpoint, message }
  */
-export async function triggerNetatmoAlert(type, data = {}) {
+export async function triggerNetatmoAlert(type: string, data: Record<string, unknown> = {}) {
   const typeId = `netatmo_${type}`;
   return triggerNotification(typeId, data);
 }
@@ -530,7 +553,7 @@ export async function triggerNetatmoAlert(type, data = {}) {
  * @param {string} body - Notification body
  * @param {Object} options - { url, priority }
  */
-export async function triggerGenericNotification(title, body, options = {}) {
+export async function triggerGenericNotification(title: string, body: string, options: Record<string, unknown> = {}) {
   return triggerNotification('generic', {
     title,
     body,

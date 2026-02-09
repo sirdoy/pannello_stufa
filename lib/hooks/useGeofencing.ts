@@ -10,6 +10,9 @@ import {
   disableGeofencing,
   updateGeofenceActions,
   clearGeofenceConfig,
+  type GeofenceConfig,
+  type GeofenceStatus,
+  type GeofenceActions,
 } from '@/lib/pwa/geofencing';
 
 /**
@@ -35,7 +38,26 @@ import {
  *   onArriveHome: () => igniteStove(),
  * });
  */
-export function useGeofencing(options: { checkInterval?: number; onLeaveHome?: () => void; onArriveHome?: () => void } = {}): unknown {
+export interface UseGeofencingReturn {
+  isSupported: boolean;
+  isConfigured: boolean;
+  isEnabled: boolean;
+  isHome: boolean | null;
+  distance: number | null;
+  config: GeofenceConfig | null;
+  loading: boolean;
+  error: string | null;
+  permissionStatus: string;
+  setHomeLocation: (options?: { radius?: number; actions?: GeofenceActions }) => Promise<GeofenceConfig>;
+  enable: () => Promise<void>;
+  disable: () => Promise<void>;
+  updateActions: (actions: GeofenceActions) => Promise<void>;
+  clear: () => Promise<void>;
+  requestPermission: () => Promise<boolean>;
+  refresh: () => Promise<void>;
+}
+
+export function useGeofencing(options: { checkInterval?: number; onLeaveHome?: () => void; onArriveHome?: () => void } = {}): UseGeofencingReturn {
   const {
     checkInterval = 5 * 60 * 1000, // 5 minutes
     onLeaveHome,
@@ -45,15 +67,15 @@ export function useGeofencing(options: { checkInterval?: number; onLeaveHome?: (
   const [isSupported, setIsSupported] = useState(false);
   const [isConfigured, setIsConfigured] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
-  const [isHome, setIsHome] = useState(null);
-  const [distance, setDistance] = useState(null);
-  const [config, setConfig] = useState(null);
+  const [isHome, setIsHome] = useState<boolean | null>(null);
+  const [distance, setDistance] = useState<number | null>(null);
+  const [config, setConfig] = useState<GeofenceConfig | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [permissionStatus, setPermissionStatus] = useState('unknown');
 
-  const previousIsHome = useRef(null);
-  const watchId = useRef(null);
+  const previousIsHome = useRef<boolean | null>(null);
+  const watchId = useRef<number | null>(null);
 
   // Check support and load config on mount
   useEffect(() => {
@@ -117,7 +139,7 @@ export function useGeofencing(options: { checkInterval?: number; onLeaveHome?: (
 
         previousIsHome.current = status.isHome;
       } catch (err) {
-        setError(err.message);
+        setError(err instanceof Error ? err.message : 'Unknown error');
       }
     };
 
@@ -133,7 +155,7 @@ export function useGeofencing(options: { checkInterval?: number; onLeaveHome?: (
   }, [isSupported, isConfigured, isEnabled, checkInterval, onLeaveHome, onArriveHome]);
 
   // Set current location as home
-  const setHomeLocation = useCallback(async (options = {}) => {
+  const setHomeLocation = useCallback(async (options: { radius?: number; actions?: GeofenceActions } = {}) => {
     setLoading(true);
     setError(null);
 
@@ -147,7 +169,7 @@ export function useGeofencing(options: { checkInterval?: number; onLeaveHome?: (
       setDistance(0);
       return newConfig;
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
       throw err;
     } finally {
       setLoading(false);
@@ -167,7 +189,7 @@ export function useGeofencing(options: { checkInterval?: number; onLeaveHome?: (
   }, []);
 
   // Update actions
-  const updateActions = useCallback(async (actions) => {
+  const updateActions = useCallback(async (actions: GeofenceActions) => {
     await updateGeofenceActions(actions);
     const updatedConfig = await getGeofenceConfig();
     setConfig(updatedConfig);
@@ -191,7 +213,7 @@ export function useGeofencing(options: { checkInterval?: number; onLeaveHome?: (
       setPermissionStatus('granted');
       return true;
     } catch (err) {
-      if (err.code === 1) {
+      if (err instanceof GeolocationPositionError && err.code === 1) {
         setPermissionStatus('denied');
       }
       return false;
@@ -207,9 +229,9 @@ export function useGeofencing(options: { checkInterval?: number; onLeaveHome?: (
       const status = await checkGeofenceStatus();
       setIsHome(status.isHome);
       setDistance(status.distance);
-      setError(status.error || null);
+      setError(status.error ?? null);
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
     }

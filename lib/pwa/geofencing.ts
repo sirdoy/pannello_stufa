@@ -15,17 +15,17 @@ import { get, put, STORES } from './indexedDB';
 const GEOFENCE_KEY = 'geofence-config';
 const DEFAULT_RADIUS = 200; // meters
 
-interface GeofenceAction {
+export interface GeofenceAction {
   action: string;
   enabled: boolean;
 }
 
-interface GeofenceActions {
+export interface GeofenceActions {
   onLeave?: GeofenceAction;
   onArrive?: GeofenceAction;
 }
 
-interface GeofenceConfig {
+export interface GeofenceConfig {
   key?: string;
   latitude: number;
   longitude: number;
@@ -37,12 +37,12 @@ interface GeofenceConfig {
   updatedAt?: number;
 }
 
-interface GeofenceOptions {
+export interface GeofenceOptions {
   radius?: number;
   actions?: GeofenceActions;
 }
 
-interface GeofenceStatus {
+export interface GeofenceStatus {
   configured: boolean;
   enabled: boolean;
   isHome: boolean | null;
@@ -115,7 +115,8 @@ export function getCurrentPosition(options: PositionOptions = {}): Promise<Geolo
  */
 export async function getGeofenceConfig(): Promise<GeofenceConfig | null> {
   try {
-    return await get<GeofenceConfig>(STORES.APP_STATE, GEOFENCE_KEY);
+    const result = await get<GeofenceConfig>(STORES.APP_STATE, GEOFENCE_KEY);
+    return result ?? null;
   } catch (error) {
     console.error('[Geofencing] Error getting config:', error);
     return null;

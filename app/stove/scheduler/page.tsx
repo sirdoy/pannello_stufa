@@ -164,7 +164,7 @@ export default function WeeklyScheduler() {
   // Feature 1: Real-Time Firebase Sync - Listen for remote changes
   useEffect(() => {
     // Listen to active schedule ID changes first
-    let scheduleSlotsUnsubscribe;
+    let scheduleSlotsUnsubscribe: (() => void) | null = null;
 
     const activeIdRef = ref(db, 'schedules-v2/activeScheduleId');
     const activeIdUnsubscribe = onValue(activeIdRef, async (idSnapshot) => {
@@ -322,7 +322,7 @@ export default function WeeklyScheduler() {
     return result;
   };
 
-  const handleChange = async (day, index, field, value, isBlur = false) => {
+  const handleChange = async (day: DayOfWeek, index: number, field: string, value: string | number, isBlur = false) => {
     const originalSchedule = schedule[day];
     const originalInterval = originalSchedule[index];
     const originalStart = originalInterval.start;
@@ -474,7 +474,7 @@ export default function WeeklyScheduler() {
     }
   };
 
-  const handleRemoveIntervalRequest = (day, index) => {
+  const handleRemoveIntervalRequest = (day: DayOfWeek, index: number) => {
     setConfirmDialog({
       isOpen: true,
       day,
@@ -484,13 +484,16 @@ export default function WeeklyScheduler() {
 
   const handleConfirmRemoveInterval = async () => {
     const { day, intervalIndex } = confirmDialog;
-    const updated = schedule[day].filter((_, i) => i !== intervalIndex);
+    if (!day) return;
+    const updated = schedule[day].filter((_: unknown, i: number) => i !== intervalIndex);
     const updatedSchedule = { ...schedule, [day]: updated };
     setSchedule(updatedSchedule);
 
     try {
       await saveSchedule(day, updated);
-      await logSchedulerAction.removeInterval(day, intervalIndex);
+      if (intervalIndex !== null) {
+        await logSchedulerAction.removeInterval(day, intervalIndex);
+      }
 
       // Feature 2: Toast notification
       setToast({
@@ -513,15 +516,16 @@ export default function WeeklyScheduler() {
     setConfirmDialog({ isOpen: false, day: null, intervalIndex: null });
   };
 
-  const handleDuplicateDay = (sourceDay) => {
+  const handleDuplicateDay = (sourceDay: DayOfWeek) => {
     setDuplicateModal({
       isOpen: true,
       sourceDay,
     });
   };
 
-  const handleConfirmDuplicate = async (targetDays) => {
+  const handleConfirmDuplicate = async (targetDays: DayOfWeek[]) => {
     const { sourceDay } = duplicateModal;
+    if (!sourceDay) return;
     const sourceIntervals = schedule[sourceDay];
 
     if (!sourceIntervals || sourceIntervals.length === 0) {
@@ -535,7 +539,7 @@ export default function WeeklyScheduler() {
 
       for (const targetDay of targetDays) {
         // Deep copy intervals to avoid reference issues
-        const duplicatedIntervals = sourceIntervals.map(interval => ({ ...interval }));
+        const duplicatedIntervals = sourceIntervals.map((interval: ScheduleInterval) => ({ ...interval }));
         updatedSchedule[targetDay] = sortIntervals(duplicatedIntervals);
 
         // Save each day to Firebase
@@ -567,14 +571,15 @@ export default function WeeklyScheduler() {
     setDuplicateModal({ isOpen: false, sourceDay: null });
   };
 
-  const handleConfirmAddInterval = async ({ start, end, duration, power, fan }) => {
+  const handleConfirmAddInterval = async ({ start, end, duration, power, fan }: ScheduleInterval & { duration?: number }) => {
     const { day, mode, index } = addIntervalModal;
+    if (!day) return;
 
     const intervalData = { start, end, power, fan };
     const daySchedule = schedule[day];
     let newSchedule;
 
-    if (mode === 'edit') {
+    if (mode === 'edit' && index !== null) {
       // Edit mode: replace existing interval
       newSchedule = [...daySchedule];
       newSchedule[index] = intervalData;
@@ -639,7 +644,7 @@ export default function WeeklyScheduler() {
   };
 
   // Multi-schedule handlers
-  const handleSelectSchedule = async (scheduleId) => {
+  const handleSelectSchedule = async (scheduleId: string) => {
     try {
       await setActiveSchedule(scheduleId);
       setActiveScheduleId(scheduleId);
@@ -667,7 +672,7 @@ export default function WeeklyScheduler() {
     }
   };
 
-  const handleCreateSchedule = async ({ name, copyFromId }) => {
+  const handleCreateSchedule = async ({ name, copyFromId }: { name: string; copyFromId: string | null }) => {
     try {
       const newSchedule = await createSchedule(name, copyFromId);
 
@@ -684,14 +689,14 @@ export default function WeeklyScheduler() {
     } catch (error) {
       console.error('Error creating schedule:', error);
       setToast({
-        message: error.message || 'Errore creazione pianificazione',
+        message: error instanceof Error ? error.message : 'Errore creazione pianificazione',
         icon: '❌',
         variant: 'error',
       });
     }
   };
 
-  const handleRenameSchedule = async (scheduleId, newName) => {
+  const handleRenameSchedule = async (scheduleId: string, newName: string) => {
     try {
       await updateSchedule(scheduleId, { name: newName });
 
@@ -707,14 +712,14 @@ export default function WeeklyScheduler() {
     } catch (error) {
       console.error('Error renaming schedule:', error);
       setToast({
-        message: error.message || 'Errore rinomina pianificazione',
+        message: error instanceof Error ? error.message : 'Errore rinomina pianificazione',
         icon: '❌',
         variant: 'error',
       });
     }
   };
 
-  const handleDeleteSchedule = async (scheduleId) => {
+  const handleDeleteSchedule = async (scheduleId: string) => {
     try {
       await deleteSchedule(scheduleId);
 
@@ -730,7 +735,7 @@ export default function WeeklyScheduler() {
     } catch (error) {
       console.error('Error deleting schedule:', error);
       setToast({
-        message: error.message || 'Errore eliminazione pianificazione',
+        message: error instanceof Error ? error.message : 'Errore eliminazione pianificazione',
         icon: '❌',
         variant: 'error',
       });
@@ -845,8 +850,8 @@ export default function WeeklyScheduler() {
         onAddInterval={() => addTimeRange(selectedDay)}
         onEditIntervalModal={(index) => handleEditIntervalRequest(selectedDay, index)}
         onDeleteInterval={(index) => handleRemoveIntervalRequest(selectedDay, index)}
-        onDuplicate={handleDuplicateDay}
-        saveStatus={saveStatus.day === selectedDay ? saveStatus : null}
+        onDuplicate={(day: string) => handleDuplicateDay(day as DayOfWeek)}
+        saveStatus={saveStatus.day === selectedDay ? saveStatus : undefined}
       />
 
       {/* Confirm Delete Dialog */}
@@ -865,9 +870,9 @@ export default function WeeklyScheduler() {
       {/* Duplicate Day Modal */}
       <DuplicateDayModal
         isOpen={duplicateModal.isOpen}
-        sourceDay={duplicateModal.sourceDay}
-        excludeDays={[duplicateModal.sourceDay]}
-        onConfirm={handleConfirmDuplicate}
+        sourceDay={duplicateModal.sourceDay ?? ''}
+        excludeDays={[duplicateModal.sourceDay ?? '']}
+        onConfirm={(selectedDays: string[]) => handleConfirmDuplicate(selectedDays as DayOfWeek[])}
         onCancel={handleCancelDuplicate}
       />
 

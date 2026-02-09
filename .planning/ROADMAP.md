@@ -125,7 +125,7 @@ Plans:
 
 ---
 
-### Phase 47: Test Strict Mode and Index Access
+### Phase 47: Test Strict Mode and Index Access ✓
 
 **Goal**: All test files comply with strict mode and noUncheckedIndexedAccess enabled codebase-wide
 
@@ -133,26 +133,21 @@ Plans:
 
 **Requirements**: STRICT-02 (test files), STRICT-07, STRICT-08, TEST-01, TEST-02, TEST-03
 
-**Success Criteria** (what must be TRUE):
-1. All test files pass strict TypeScript checks with proper mock typing
-2. `noUncheckedIndexedAccess: true` enabled with proper undefined checks throughout codebase
-3. FormModal cancel test passes green (onClose called exactly once)
-4. Worker teardown warning resolved (no force-exit messages)
-5. All 3032+ tests passing green with zero failures
+**Completed**: 2026-02-09 | **Verified**: passed (5/5 must-haves)
 
-**Plans**: 10 plans
+**Plans**: 10/10 complete
 
 Plans:
-- [ ] 47-01-PLAN.md — Fix high-error test files (coordinationEventLogger, healthLogger, notificationHistoryService) — 108 strict-mode errors
-- [ ] 47-02-PLAN.md — Fix mid-error test files (netatmoStoveSync, coordinationPauseCalculator, thermostat page) — 74 strict-mode errors
-- [ ] 47-03-PLAN.md — Fix 20 remaining test files — ~100 strict-mode errors
-- [ ] 47-04-PLAN.md — Enable noUncheckedIndexedAccess + fix lib/ files — 82 errors in 17 files
-- [ ] 47-05-PLAN.md — Fix scheduler components + design-system page — 117 noUncheckedIndexedAccess errors
-- [ ] 47-06-PLAN.md — Fix debug tabs + API routes — ~95 noUncheckedIndexedAccess errors
-- [ ] 47-07-PLAN.md — Fix remaining app/ source files — ~74 noUncheckedIndexedAccess errors
-- [ ] 47-08-PLAN.md — Fix test files for noUncheckedIndexedAccess — ~104 additional errors
-- [ ] 47-09-PLAN.md — Fix FormModal cancel test, DataTable filter test, worker teardown
-- [ ] 47-10-PLAN.md — Gap sweep and final verification
+- [x] 47-01-PLAN.md — Fix high-error test files (coordinationEventLogger, healthLogger, notificationHistoryService) — 108 strict-mode errors
+- [x] 47-02-PLAN.md — Fix mid-error test files (netatmoStoveSync, coordinationPauseCalculator, thermostat page) — 74 strict-mode errors
+- [x] 47-03-PLAN.md — Fix 20 remaining test files — ~100 strict-mode errors
+- [x] 47-04-PLAN.md — Enable noUncheckedIndexedAccess + fix lib/ files — 82 errors in 17 files
+- [x] 47-05-PLAN.md — Fix scheduler components + design-system page — 117 noUncheckedIndexedAccess errors
+- [x] 47-06-PLAN.md — Fix debug tabs + API routes — ~95 noUncheckedIndexedAccess errors
+- [x] 47-07-PLAN.md — Fix remaining app/ source files — ~74 noUncheckedIndexedAccess errors
+- [x] 47-08-PLAN.md — Fix test files for noUncheckedIndexedAccess — ~104 additional errors
+- [x] 47-09-PLAN.md — Fix FormModal cancel test, DataTable filter test, worker teardown
+- [x] 47-10-PLAN.md — Gap sweep and final verification
 
 ---
 
@@ -192,8 +187,8 @@ Plans:
 | **44** | **v5.1** | **7/7** | **✓ Complete** | **2026-02-09** |
 | **45** | **v5.1** | **8/8** | **✓ Complete** | **2026-02-09** |
 | **46** | **v5.1** | **8/8** | **✓ Complete** | **2026-02-09** |
-| **47** | **v5.1** | **0/10** | **Planned** | **-** |
+| **47** | **v5.1** | **10/10** | **✓ Complete** | **2026-02-09** |
 | **48** | **v5.1** | **0/TBD** | **Not started** | **-** |
 
 ---
-*Last updated: 2026-02-09 — Phase 47 planned (10 plans in 4 waves)*
+*Last updated: 2026-02-09 — Phase 47 complete (10/10 plans, 0 tsc errors, 3034 tests green)*

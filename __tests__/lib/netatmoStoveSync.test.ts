@@ -574,13 +574,13 @@ describe('netatmoStoveSync', () => {
       const result = await setRoomsToBoostMode(config, 2, {});
 
       expect(result.success).toBe(true);
-      expect(result.appliedSetpoints['room-123']).toEqual({
+      expect((result.appliedSetpoints as Record<string, any>)['room-123']).toEqual({
         roomName: 'Salotto',
         previous: 20,
         applied: 22,
         capped: false,
       });
-      expect(result.previousSetpoints['room-123']).toBe(20);
+      expect((result.previousSetpoints as Record<string, any>)['room-123']).toBe(20);
       expect(result.cappedRooms).toEqual([]);
     });
 
@@ -599,7 +599,7 @@ describe('netatmoStoveSync', () => {
       const result = await setRoomsToBoostMode(config, 2, {});
 
       expect(result.success).toBe(true);
-      expect(result.appliedSetpoints['room-123']).toEqual({
+      expect((result.appliedSetpoints as Record<string, any>)['room-123']).toEqual({
         roomName: 'Salotto',
         previous: 29,
         applied: 30,
@@ -622,7 +622,7 @@ describe('netatmoStoveSync', () => {
 
       const result = await setRoomsToBoostMode(config, 2, {});
 
-      expect(result.previousSetpoints['room-123']).toBe(21);
+      expect((result.previousSetpoints as Record<string, any>)['room-123']).toBe(21);
     });
 
     it('should not overwrite existing previousSetpoints entry', async () => {
@@ -641,7 +641,7 @@ describe('netatmoStoveSync', () => {
       const result = await setRoomsToBoostMode(config, 2, existingPrevious);
 
       // Should keep original previous setpoint (19), not overwrite with current (21)
-      expect(result.previousSetpoints['room-123']).toBe(19);
+      expect((result.previousSetpoints as Record<string, any>)['room-123']).toBe(19);
     });
 
     it('should handle multiple rooms correctly', async () => {
@@ -668,9 +668,9 @@ describe('netatmoStoveSync', () => {
 
       expect(result.success).toBe(true);
       expect(Object.keys(result.appliedSetpoints)).toHaveLength(3);
-      expect(result.appliedSetpoints['room-123'].applied).toBe(22);
-      expect(result.appliedSetpoints['room-456'].applied).toBe(24);
-      expect(result.appliedSetpoints['room-789'].applied).toBe(20);
+      expect((result.appliedSetpoints as Record<string, any>)['room-123'].applied).toBe(22);
+      expect((result.appliedSetpoints as Record<string, any>)['room-456'].applied).toBe(24);
+      expect((result.appliedSetpoints as Record<string, any>)['room-789'].applied).toBe(20);
     });
 
     it('should return capped flag for rooms hitting limit', async () => {
@@ -693,8 +693,8 @@ describe('netatmoStoveSync', () => {
 
       const result = await setRoomsToBoostMode(config, 2, {});
 
-      expect(result.appliedSetpoints['room-123'].capped).toBe(true);
-      expect(result.appliedSetpoints['room-456'].capped).toBe(false);
+      expect((result.appliedSetpoints as Record<string, any>)['room-123'].capped).toBe(true);
+      expect((result.appliedSetpoints as Record<string, any>)['room-456'].capped).toBe(false);
     });
 
     it('should return cappedRooms array with room names', async () => {
@@ -752,9 +752,9 @@ describe('netatmoStoveSync', () => {
       const result = await setRoomsToBoostMode(config, 2, {});
 
       expect(result.success).toBe(true); // Some succeeded
-      expect(result.appliedSetpoints['room-123']).toBeDefined();
-      expect(result.appliedSetpoints['room-456']).toBeUndefined(); // Failed room not in results
-      expect(result.appliedSetpoints['room-789']).toBeDefined();
+      expect((result.appliedSetpoints as Record<string, any>)['room-123']).toBeDefined();
+      expect((result.appliedSetpoints as Record<string, any>)['room-456']).toBeUndefined(); // Failed room not in results
+      expect((result.appliedSetpoints as Record<string, any>)['room-789']).toBeDefined();
     });
   });
 
@@ -946,9 +946,9 @@ describe('netatmoStoveSync', () => {
       const result = await setRoomsToBoostMode(config, 2, {});
 
       expect(result.success).toBe(true);
-      expect(result.appliedSetpoints['room-123'].applied).toBe(21);
-      expect(result.appliedSetpoints['room-456'].applied).toBe(22);
-      expect(result.appliedSetpoints['room-789'].applied).toBe(23);
+      expect((result.appliedSetpoints as Record<string, any>)['room-123'].applied).toBe(21);
+      expect((result.appliedSetpoints as Record<string, any>)['room-456'].applied).toBe(22);
+      expect((result.appliedSetpoints as Record<string, any>)['room-789'].applied).toBe(23);
     });
 
     it('should handle partial zone failure gracefully', async () => {
@@ -981,9 +981,9 @@ describe('netatmoStoveSync', () => {
       const result = await setRoomsToBoostMode(config, 2, {});
 
       expect(result.success).toBe(true); // Others succeeded
-      expect(result.appliedSetpoints['room-123']).toBeDefined();
-      expect(result.appliedSetpoints['room-456']).toBeUndefined(); // Failed
-      expect(result.appliedSetpoints['room-789']).toBeDefined();
+      expect((result.appliedSetpoints as Record<string, any>)['room-123']).toBeDefined();
+      expect((result.appliedSetpoints as Record<string, any>)['room-456']).toBeUndefined(); // Failed
+      expect((result.appliedSetpoints as Record<string, any>)['room-789']).toBeDefined();
     });
 
     it('should respect per-zone boost configuration', async () => {
@@ -1018,9 +1018,9 @@ describe('netatmoStoveSync', () => {
       };
       const result3 = await setRoomsToBoostMode(config3, 1.5, {});
 
-      expect(result1.appliedSetpoints['room-123'].applied).toBe(22);
-      expect(result2.appliedSetpoints['room-456'].applied).toBe(23);
-      expect(result3.appliedSetpoints['room-789'].applied).toBe(21.5);
+      expect((result1.appliedSetpoints as Record<string, any>)['room-123'].applied).toBe(22);
+      expect((result2.appliedSetpoints as Record<string, any>)['room-456'].applied).toBe(23);
+      expect((result3.appliedSetpoints as Record<string, any>)['room-789'].applied).toBe(21.5);
     });
 
     it('should restore multiple zones correctly', async () => {
@@ -1086,12 +1086,12 @@ describe('netatmoStoveSync', () => {
       const result = await setRoomsToBoostMode(config, 2, {});
 
       expect(result.success).toBe(true);
-      expect(result.appliedSetpoints['room-123'].applied).toBe(30);
-      expect(result.appliedSetpoints['room-456'].applied).toBe(30);
-      expect(result.appliedSetpoints['room-789'].applied).toBe(30);
-      expect(result.appliedSetpoints['room-123'].capped).toBe(true);
-      expect(result.appliedSetpoints['room-456'].capped).toBe(true);
-      expect(result.appliedSetpoints['room-789'].capped).toBe(true);
+      expect((result.appliedSetpoints as Record<string, any>)['room-123'].applied).toBe(30);
+      expect((result.appliedSetpoints as Record<string, any>)['room-456'].applied).toBe(30);
+      expect((result.appliedSetpoints as Record<string, any>)['room-789'].applied).toBe(30);
+      expect((result.appliedSetpoints as Record<string, any>)['room-123'].capped).toBe(true);
+      expect((result.appliedSetpoints as Record<string, any>)['room-456'].capped).toBe(true);
+      expect((result.appliedSetpoints as Record<string, any>)['room-789'].capped).toBe(true);
       expect(result.cappedRooms).toEqual(['Salotto', 'Camera', 'Studio']);
     });
   });

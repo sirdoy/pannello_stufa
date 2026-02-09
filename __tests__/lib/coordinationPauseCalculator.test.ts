@@ -37,9 +37,9 @@ describe('coordinationPauseCalculator', () => {
       const result = calculatePauseUntil(monday10am, sampleSchedule);
 
       // Next slot is Monday 22:00 (m_offset: 1320)
-      expect(result.nextSlot.offset).toBe(1320);
-      expect(result.nextSlot.zoneName).toBe('Night');
-      expect(result.nextSlot.temp).toBe(18);
+      expect(result.nextSlot!.offset).toBe(1320);
+      expect(result.nextSlot!.zoneName).toBe('Night');
+      expect(result.nextSlot!.temp).toBe(18);
 
       // Wait time: 1320 - 600 = 720 minutes (12 hours)
       expect(result.waitMinutes).toBe(720);
@@ -57,8 +57,8 @@ describe('coordinationPauseCalculator', () => {
       const result = calculatePauseUntil(sunday8pm, sampleSchedule);
 
       // Should wrap to Monday 00:00 (m_offset: 0)
-      expect(result.nextSlot.offset).toBe(0);
-      expect(result.nextSlot.zoneName).toBe('Night');
+      expect(result.nextSlot!.offset).toBe(0);
+      expect(result.nextSlot!.zoneName).toBe('Night');
 
       // Wait time: 10080 - 9840 = 240 minutes (4 hours until Monday 00:00)
       expect(result.waitMinutes).toBe(240);
@@ -71,8 +71,8 @@ describe('coordinationPauseCalculator', () => {
       const result = calculatePauseUntil(monday7am, sampleSchedule);
 
       // Should return NEXT slot (Monday 22:00), not current slot
-      expect(result.nextSlot.offset).toBe(1320);
-      expect(result.nextSlot.zoneName).toBe('Night');
+      expect(result.nextSlot!.offset).toBe(1320);
+      expect(result.nextSlot!.zoneName).toBe('Night');
     });
 
     it('returns correct pauseUntil timestamp', () => {
@@ -110,7 +110,7 @@ describe('coordinationPauseCalculator', () => {
     it('handles invalid schedule gracefully', () => {
       const now = new Date('2024-01-08T10:00:00Z');
 
-      const result = calculatePauseUntil(now, null);
+      const result = calculatePauseUntil(now, null as any);
 
       expect(result.waitMinutes).toBe(60);
       expect(result.nextSlot).toBe(null);
@@ -131,10 +131,10 @@ describe('coordinationPauseCalculator', () => {
       const result = calculatePauseUntil(now, scheduleWithoutZones as any);
 
       // Should still find next slot
-      expect(result.nextSlot.offset).toBe(1320);
+      expect(result.nextSlot!.offset).toBe(1320);
       // Zone name should have fallback
-      expect(result.nextSlot.zoneName).toBe('Zone 2');
-      expect(result.nextSlot.temp).toBeUndefined();
+      expect(result.nextSlot!.zoneName).toBe('Zone 2');
+      expect(result.nextSlot!.temp).toBeUndefined();
     });
 
     it('works with timestamp input', () => {
@@ -144,7 +144,7 @@ describe('coordinationPauseCalculator', () => {
       const result = calculatePauseUntil(timestamp, sampleSchedule);
 
       // Should work same as Date input
-      expect(result.nextSlot.offset).toBe(1320);
+      expect(result.nextSlot!.offset).toBe(1320);
       expect(result.waitMinutes).toBe(720);
     });
 
@@ -165,7 +165,7 @@ describe('coordinationPauseCalculator', () => {
       const result = calculatePauseUntil(now, unsortedSchedule);
 
       // Should correctly find next slot after sorting
-      expect(result.nextSlot.offset).toBe(1320);
+      expect(result.nextSlot!.offset).toBe(1320);
     });
   });
 
@@ -181,8 +181,8 @@ describe('coordinationPauseCalculator', () => {
       // Current: 500 minutes (Monday 08:20)
       const nextSlot = getNextScheduleSlot(500, timetable);
 
-      expect(nextSlot.m_offset).toBe(720);
-      expect(nextSlot.zone_id).toBe(1);
+      expect(nextSlot!.m_offset).toBe(720);
+      expect(nextSlot!.zone_id).toBe(1);
     });
 
     it('wraps to first slot when at end', () => {
@@ -190,15 +190,15 @@ describe('coordinationPauseCalculator', () => {
       const nextSlot = getNextScheduleSlot(1200, timetable);
 
       // Should wrap to Monday 00:00
-      expect(nextSlot.m_offset).toBe(0);
-      expect(nextSlot.zone_id).toBe(1);
+      expect(nextSlot!.m_offset).toBe(0);
+      expect(nextSlot!.zone_id).toBe(1);
     });
 
     it('returns first slot when before all slots', () => {
       // Current: -10 minutes (shouldn't happen, but edge case)
       const nextSlot = getNextScheduleSlot(-10, timetable);
 
-      expect(nextSlot.m_offset).toBe(0);
+      expect(nextSlot!.m_offset).toBe(0);
     });
 
     it('handles exactly on slot boundary', () => {
@@ -206,7 +206,7 @@ describe('coordinationPauseCalculator', () => {
       const nextSlot = getNextScheduleSlot(720, timetable);
 
       // Should return NEXT slot
-      expect(nextSlot.m_offset).toBe(1080);
+      expect(nextSlot!.m_offset).toBe(1080);
     });
 
     it('returns null for empty timetable', () => {
@@ -225,7 +225,7 @@ describe('coordinationPauseCalculator', () => {
       const nextSlot = getNextScheduleSlot(100, unsorted);
 
       // Should find 360 (first after 100 when sorted)
-      expect(nextSlot.m_offset).toBe(360);
+      expect(nextSlot!.m_offset).toBe(360);
     });
   });
 
@@ -298,7 +298,7 @@ describe('coordinationPauseCalculator', () => {
 
       // Next slot at 07:00 (420 minutes)
       expect(result.waitMinutes).toBe(1); // Just 1 minute wait
-      expect(result.nextSlot.offset).toBe(420);
+      expect(result.nextSlot!.offset).toBe(420);
     });
 
     it('handles week wraparound correctly', () => {
@@ -308,7 +308,7 @@ describe('coordinationPauseCalculator', () => {
       const result = calculatePauseUntil(sunday2359, sampleSchedule);
 
       // Should wrap to Monday 00:00
-      expect(result.nextSlot.offset).toBe(0);
+      expect(result.nextSlot!.offset).toBe(0);
       expect(result.waitMinutes).toBeLessThan(10); // Very short wait
     });
   });

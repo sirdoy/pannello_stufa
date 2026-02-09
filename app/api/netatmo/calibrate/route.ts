@@ -60,7 +60,10 @@ export const POST = withAuthAndErrorHandler(async (request: NextRequest, _contex
   }
 
   const home = homesData[0]; // Usually single home
-  const schedules = home.schedules || [];
+  if (!home) {
+    return notFound('No home data available');
+  }
+  const schedules = home.schedules ?? [];
 
   // Find the currently selected schedule
   const currentSchedule = schedules.find(s => s.selected === true);

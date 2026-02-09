@@ -29,6 +29,9 @@ export const GET = withAuthAndErrorHandler(async () => {
   }
 
   const home = homesData[0];
+  if (!home) {
+    return notFound('No home data available');
+  }
   const homeId = home.id;
 
   // Get home status for real-time temperatures
@@ -36,7 +39,7 @@ export const GET = withAuthAndErrorHandler(async () => {
   const temperatures = NETATMO_API.extractTemperatures(homeStatus);
 
   // Enrich with room names from topology
-  const rooms = home.rooms || [];
+  const rooms = home.rooms ?? [];
   const results: TemperatureResult[] = temperatures.map(temp => {
     const room = rooms.find(r => r.id === temp.room_id);
     return {

@@ -146,7 +146,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
     });
 
     // Determine next cursor and hasMore flag
-    const nextCursor = events.length === limit ? events[events.length - 1].id : null;
+    const nextCursor = events.length === limit ? events[events.length - 1]?.id ?? null : null;
     const hasMore = events.length === limit;
 
     return success({

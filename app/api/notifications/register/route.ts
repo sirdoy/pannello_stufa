@@ -21,6 +21,7 @@
 import {
   withAuthAndErrorHandler,
   success,
+  notFound,
   parseJsonOrThrow,
   validateRequired,
 } from '@/lib/core';
@@ -87,6 +88,9 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
       // Device exists - update the existing entry
       const existingData = snapshot.val() as Record<string, ExistingTokenData>;
       const existingKey = Object.keys(existingData)[0];
+      if (!existingKey) {
+        return notFound('No existing token data found');
+      }
 
       await tokensRef.child(existingKey).update({
         token,
@@ -96,8 +100,8 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
         isPWA: isPWA || false,
         // Preserve createdAt from original registration
         // Update deviceInfo in case browser version changed
-        deviceInfo: deviceInfo || existingData[existingKey].deviceInfo,
-        displayName: displayName || existingData[existingKey].displayName,
+        deviceInfo: deviceInfo ?? existingData[existingKey]?.deviceInfo,
+        displayName: displayName ?? existingData[existingKey]?.displayName,
       });
 
       console.log(`FCM token updated for device ${deviceId} (user ${userId})`);

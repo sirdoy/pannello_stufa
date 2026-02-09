@@ -22,6 +22,9 @@ export const GET = withAuthAndErrorHandler(async () => {
   }
 
   const home = homesData[0]; // Usually single home
+  if (!home) {
+    return notFound('No home data available');
+  }
 
   // Save home_id to Firebase for future use
   const homeIdPath = getEnvironmentPath('netatmo/home_id');
@@ -38,7 +41,7 @@ export const GET = withAuthAndErrorHandler(async () => {
     home_name: home.name,
     rooms,
     modules,
-    schedules: home.schedules || [],
+    schedules: home.schedules ?? [],
     updated_at: Date.now(),
   });
 
@@ -47,6 +50,6 @@ export const GET = withAuthAndErrorHandler(async () => {
     home_name: home.name,
     rooms,
     modules,
-    schedules: home.schedules || [],
+    schedules: home.schedules ?? [],
   });
 }, 'Netatmo/HomesData');

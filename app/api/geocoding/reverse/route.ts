@@ -193,7 +193,7 @@ export const GET = withAuthAndErrorHandler(async (request) => {
     // Extract city from timezone (e.g., "Europe/Rome" -> "Roma")
     // This is a heuristic that works for major cities
     const timezoneParts = timezone.split('/');
-    const timezoneCity = timezoneParts[timezoneParts.length - 1].replace(/_/g, ' ');
+    const timezoneCity = (timezoneParts[timezoneParts.length - 1] ?? '').replace(/_/g, ' ');
 
     // If timezone city is a real city name (not just "Europe" or generic)
     // we can use it, otherwise use coordinates
@@ -212,8 +212,8 @@ export const GET = withAuthAndErrorHandler(async (request) => {
 
       if (cityResponse.ok) {
         const cityData = (await cityResponse.json()) as { results?: GeocodingResult[] };
-        if (cityData.results && cityData.results.length > 0) {
-          const result = cityData.results[0];
+        const result = cityData.results?.[0];
+        if (result) {
           return success({
             name: formatLocationName(result),
             latitude,

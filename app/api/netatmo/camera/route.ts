@@ -44,7 +44,7 @@ export const GET = withAuthAndErrorHandler(async () => {
   const events = NETATMO_CAMERA_API.parseEvents(allEvents as any);
 
   // Find the home_id that contains cameras (for future reference)
-  const cameraHomeId = cameras.length > 0 ? cameras[0].home_id : null;
+  const cameraHomeId = cameras.length > 0 ? cameras[0]?.home_id ?? null : null;
 
   // Save camera data to Firebase with environment-aware path
   const camerasPath = getEnvironmentPath('netatmo/cameras');

@@ -78,7 +78,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   return NextResponse.json({
     ready: true,
     versionsCount: VERSION_HISTORY.length,
-    latestVersion: VERSION_HISTORY[0].version,
+    latestVersion: VERSION_HISTORY[0]?.version ?? 'unknown',
     message: 'Use POST to sync',
   });
 }
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       success: true,
       message: 'Changelog sincronizzato con successo',
       versionsCount: VERSION_HISTORY.length,
-      latestVersion: VERSION_HISTORY[0].version,
+      latestVersion: VERSION_HISTORY[0]?.version ?? 'unknown',
       authMethod: method,
     });
   } catch (error) {

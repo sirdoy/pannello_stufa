@@ -12,7 +12,7 @@ import { PIDController } from '@/lib/utils/pidController';
  * Mirror of the computePidPreview function from PidAutomationPanel.
  * Cold start simulation: no accumulated integral/derivative, dt=5 min.
  */
-function computePidPreview(measured, setpoint, kp, ki, kd) {
+function computePidPreview(measured: number | null, setpoint: number | null, kp: number, ki: number, kd: number) {
   if (measured == null || setpoint == null) return null;
   const pid = new PIDController({ kp, ki, kd });
   return pid.compute(setpoint, measured, 5);
@@ -42,7 +42,7 @@ describe('PID Power Preview', () => {
     it('should return higher power when further below setpoint', () => {
       const smallError = computePidPreview(20, 21, 0.5, 0.1, 0.05);  // 1°C below
       const largeError = computePidPreview(17, 21, 0.5, 0.1, 0.05);  // 4°C below
-      expect(largeError).toBeGreaterThanOrEqual(smallError);
+      expect(largeError!).toBeGreaterThanOrEqual(smallError!);
     });
 
     it('should return minimum power when at or above setpoint', () => {
@@ -70,13 +70,13 @@ describe('PID Power Preview', () => {
     it('should respond to different kp values', () => {
       const lowKp = computePidPreview(18, 21, 0.2, 0.1, 0.05);
       const highKp = computePidPreview(18, 21, 2.0, 0.1, 0.05);
-      expect(highKp).toBeGreaterThanOrEqual(lowKp);
+      expect(highKp!).toBeGreaterThanOrEqual(lowKp!);
     });
 
     it('should respond to different ki values', () => {
       const lowKi = computePidPreview(18, 21, 0.5, 0.01, 0.05);
       const highKi = computePidPreview(18, 21, 0.5, 0.5, 0.05);
-      expect(highKi).toBeGreaterThanOrEqual(lowKi);
+      expect(highKi!).toBeGreaterThanOrEqual(lowKi!);
     });
 
     it('should produce consistent results with default gains', () => {

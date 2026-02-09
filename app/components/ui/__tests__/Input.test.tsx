@@ -88,7 +88,7 @@ describe('Input Component', () => {
       const input = screen.getByRole('textbox');
       const errorId = input.getAttribute('aria-describedby');
       expect(errorId).toBeTruthy();
-      const errorElement = document.getElementById(errorId);
+      const errorElement = document.getElementById(errorId!);
       expect(errorElement).toHaveTextContent('Error message');
     });
 
@@ -198,7 +198,7 @@ describe('Input Component', () => {
     });
 
     test('displays validation error', async () => {
-      const validate = (value) => (value.length < 3 ? 'Too short' : null);
+      const validate = (value: string) => (value.length < 3 ? 'Too short' : null);
       const user = userEvent.setup();
       render(<Input validate={validate} data-testid="input" />);
 
@@ -209,7 +209,7 @@ describe('Input Component', () => {
     });
 
     test('clears validation error when valid', async () => {
-      const validate = (value) => (value.length < 3 ? 'Too short' : null);
+      const validate = (value: string) => (value.length < 3 ? 'Too short' : null);
       const user = userEvent.setup();
       render(<Input validate={validate} data-testid="input" />);
 

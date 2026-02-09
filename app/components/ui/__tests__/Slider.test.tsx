@@ -456,7 +456,7 @@ describe('Slider Component', () => {
 
       // Fire pointerDown on the root element to trigger isDragging=true
       const root = screen.getByRole('slider').closest('[data-orientation]');
-      fireEvent.pointerDown(root);
+      fireEvent.pointerDown(root!);
 
       // Tooltip should now be visible - check for the tooltip element
       const slider = screen.getByRole('slider');
@@ -471,11 +471,11 @@ describe('Slider Component', () => {
       const root = screen.getByRole('slider').closest('[data-orientation]');
 
       // Pointer down shows tooltip
-      fireEvent.pointerDown(root);
+      fireEvent.pointerDown(root!);
       expect(screen.getByRole('slider').querySelector('div')).toBeInTheDocument();
 
       // Pointer up hides tooltip
-      fireEvent.pointerUp(root);
+      fireEvent.pointerUp(root!);
       expect(screen.getByRole('slider').querySelector('div')).not.toBeInTheDocument();
     });
   });

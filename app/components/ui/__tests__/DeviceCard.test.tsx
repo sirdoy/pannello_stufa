@@ -16,14 +16,14 @@ expect.extend(toHaveNoViolations);
 
 // Mock LoadingOverlay and Toast to avoid portal issues in tests
 jest.mock('../LoadingOverlay', () => {
-  return function MockLoadingOverlay({ show, message }) {
+  return function MockLoadingOverlay({ show, message }: { show: boolean; message: string }) {
     if (!show) return null;
     return <div data-testid="loading-overlay">{message}</div>;
   };
 });
 
 jest.mock('../Toast', () => {
-  return function MockToast({ message, type, onClose }) {
+  return function MockToast({ message, type, onClose }: { message: string; type: string; onClose: () => void }) {
     return (
       <div data-testid="toast" data-type={type}>
         {message}

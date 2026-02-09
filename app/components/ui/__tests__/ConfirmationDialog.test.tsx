@@ -235,7 +235,7 @@ describe('ConfirmationDialog', () => {
       expect(overlay).toBeInTheDocument();
 
       // Click the overlay
-      await user.click(overlay);
+      await user.click(overlay!);
 
       expect(onClose).not.toHaveBeenCalled();
     });
@@ -312,7 +312,7 @@ describe('ConfirmationDialog', () => {
 
       // Description content should be accessible
       const descId = dialog.getAttribute('aria-describedby');
-      const descElement = document.getElementById(descId);
+      const descElement = document.getElementById(descId!);
       expect(descElement).toHaveTextContent('Are you sure you want to proceed?');
     });
 
@@ -343,7 +343,7 @@ describe('ConfirmationDialog', () => {
       render(<ConfirmationDialog {...defaultProps} onClose={onClose} loading={false} />);
 
       const overlay = document.querySelector('.backdrop-blur-md');
-      await user.click(overlay);
+      await user.click(overlay!);
 
       await waitFor(() => {
         expect(onClose).toHaveBeenCalled();

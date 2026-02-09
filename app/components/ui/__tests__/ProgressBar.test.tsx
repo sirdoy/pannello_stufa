@@ -66,19 +66,19 @@ describe('ProgressBar Component', () => {
       const { container } = render(<ProgressBar value={50} />);
       const bar = container.querySelector('[role="progressbar"]');
       // The h-3 class is on the parent container, not the progress bar itself
-      expect(bar.parentElement).toHaveClass('h-3');
+      expect(bar!.parentElement).toHaveClass('h-3');
     });
 
     test('renders small size', () => {
       const { container } = render(<ProgressBar value={50} size="sm" />);
       const bar = container.querySelector('[role="progressbar"]');
-      expect(bar.parentElement).toHaveClass('h-2');
+      expect(bar!.parentElement).toHaveClass('h-2');
     });
 
     test('renders large size', () => {
       const { container } = render(<ProgressBar value={50} size="lg" />);
       const bar = container.querySelector('[role="progressbar"]');
-      expect(bar.parentElement).toHaveClass('h-4');
+      expect(bar!.parentElement).toHaveClass('h-4');
     });
   });
 

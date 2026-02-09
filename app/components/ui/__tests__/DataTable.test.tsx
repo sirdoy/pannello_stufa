@@ -296,7 +296,7 @@ describe('DataTable', () => {
 
   describe('Custom Row ID', () => {
     it('uses custom getRowId function', () => {
-      const customGetRowId = (row) => `custom-${row.id}`;
+      const customGetRowId = (row: any) => `custom-${row.id}`;
       render(
         <DataTable
           data={mockData}
@@ -649,7 +649,7 @@ describe('DataTable', () => {
 
     it('renderExpandedContent shows custom content', async () => {
       const user = userEvent.setup();
-      const renderExpandedContent = (row) => (
+      const renderExpandedContent = (row: any) => (
         <div data-testid="custom-content">Custom: {row.original.name}</div>
       );
 
@@ -688,7 +688,7 @@ describe('DataTable', () => {
     });
 
     it('getRowCanExpand controls which rows can expand', () => {
-      const getRowCanExpand = (row) => row.original.status === 'active';
+      const getRowCanExpand = (row: any) => row.original.status === 'active';
 
       render(
         <DataTable
@@ -913,7 +913,7 @@ describe('DataTable', () => {
 
       // Trigger scroll event to update indicator
       await userEvent.setup();
-      scrollContainer.dispatchEvent(new Event('scroll'));
+      scrollContainer!.dispatchEvent(new Event('scroll'));
 
       // Wait for state update
       await screen.findByRole('table');

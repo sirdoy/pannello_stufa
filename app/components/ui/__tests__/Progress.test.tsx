@@ -98,7 +98,7 @@ describe('Progress', () => {
 
   describe('Color Variants', () => {
     // Helper to get the indicator element (child of progressbar root)
-    const getIndicator = (container) => container.querySelector('[role="progressbar"] > div');
+    const getIndicator = (container: HTMLElement) => container.querySelector('[role="progressbar"] > div');
 
     it('applies ember variant by default', () => {
       const { container } = render(<Progress value={50} />);
@@ -133,7 +133,7 @@ describe('Progress', () => {
 
   describe('Indeterminate Animation', () => {
     // Helper to get the indicator element (child of progressbar root)
-    const getIndicator = (container) => container.querySelector('[role="progressbar"] > div');
+    const getIndicator = (container: HTMLElement) => container.querySelector('[role="progressbar"] > div');
 
     it('applies animation class when indeterminate', () => {
       const { container } = render(<Progress indeterminate />);
@@ -224,7 +224,7 @@ describe('Progress', () => {
      */
 
     // Helper to get the indicator element
-    const getIndicator = (container) => container.querySelector('[role="progressbar"] > div');
+    const getIndicator = (container: HTMLElement) => container.querySelector('[role="progressbar"] > div');
 
     it('indeterminate state has animation class (CSS handles reduction)', () => {
       const { container } = render(<Progress />);

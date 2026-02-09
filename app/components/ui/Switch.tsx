@@ -130,7 +130,7 @@ const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch(
   ref
 ) {
   // Handle change with backwards compatibility
-  const handleCheckedChange = (newChecked) => {
+  const handleCheckedChange = (newChecked: boolean) => {
     if (onCheckedChange) {
       onCheckedChange(newChecked);
     }

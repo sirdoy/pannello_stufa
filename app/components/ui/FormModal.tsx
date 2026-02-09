@@ -81,7 +81,7 @@ export interface FormModalProps {
 /**
  * Internal ErrorSummary component - displays all errors at top of form
  */
-function ErrorSummary({ errors }) {
+function ErrorSummary({ errors }: { errors: Record<string, any> }) {
   const errorList = Object.entries(errors).map(([field, error]) => ({
     field,
     message: (error as any)?.message || 'Invalid value',
@@ -176,7 +176,7 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
   // Track if form has been submitted at least once (for error summary display)
   const [hasSubmitted, setHasSubmitted] = useState(false);
   // Ref for triggering shake animation
-  const formRef = useRef(null);
+  const formRef = useRef<HTMLFormElement>(null);
   // Ref to track previous isOpen state for reset logic
   const wasOpenRef = useRef(false);
 
@@ -226,13 +226,13 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
   }, [isLoading, onClose]);
 
   // Trigger shake animation on invalid fields
-  const triggerShakeAnimation = useCallback((validationErrors) => {
+  const triggerShakeAnimation = useCallback((validationErrors: Record<string, any>) => {
     if (!formRef.current) return;
 
     const errorFields = Object.keys(validationErrors || errors);
     errorFields.forEach((fieldName) => {
-      const field = formRef.current.querySelector(`[data-field="${fieldName}"]`);
-      if (field) {
+      const field = formRef.current!.querySelector(`[data-field="${fieldName}"]`);
+      if (field && field instanceof HTMLElement) {
         // Remove class first to allow re-trigger
         field.classList.remove('animate-shake');
         // Force reflow
@@ -250,7 +250,7 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
   }, [errors]);
 
   // Handle form submission
-  const onFormSubmit = async (data) => {
+  const onFormSubmit = async (data: any) => {
     setHasSubmitted(true);
     setFormState('submitting');
 
@@ -270,7 +270,7 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
   };
 
   // Handle validation errors on submit
-  const onFormError = (validationErrors) => {
+  const onFormError = (validationErrors: Record<string, any>) => {
     setHasSubmitted(true);
 
     // Trigger shake animation on invalid fields

@@ -80,7 +80,7 @@ export default function RoomSelector({
         icon={icon}
         label={label}
         value={selectedRoomId || ''}
-        onChange={onChange}
+        onChange={onChange as (event: { target: { value: string | number } }) => void}
         options={roomOptions}
         className="text-base sm:text-lg"
       />

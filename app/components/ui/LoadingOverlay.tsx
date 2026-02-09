@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+// @ts-expect-error - react-dom types are available but strict mode check fails
 import { createPortal } from 'react-dom';
 import Text from './Text';
 

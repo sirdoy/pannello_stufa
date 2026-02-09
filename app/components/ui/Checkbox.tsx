@@ -141,7 +141,7 @@ const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(function Checkbox(
   const radixChecked = indeterminate ? 'indeterminate' : checked;
 
   // Handle change with backwards compatibility
-  const handleCheckedChange = (newChecked) => {
+  const handleCheckedChange = (newChecked: boolean | 'indeterminate') => {
     if (onCheckedChange) {
       onCheckedChange(newChecked);
     }
@@ -172,9 +172,9 @@ const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(function Checkbox(
     >
       <CheckboxPrimitive.Indicator className="text-white">
         {radixChecked === 'indeterminate' ? (
-          <Minus className={iconSizes[size]} strokeWidth={3} />
+          <Minus className={iconSizes[size ?? 'md']} strokeWidth={3} />
         ) : (
-          <Check className={iconSizes[size]} strokeWidth={3} />
+          <Check className={iconSizes[size ?? 'md']} strokeWidth={3} />
         )}
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>

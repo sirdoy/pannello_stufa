@@ -181,7 +181,7 @@ const SmartHomeCard = forwardRef<HTMLDivElement, SmartHomeCardProps>(function Sm
     >
       {/* Accent bar for theming */}
       <CardAccentBar
-        colorTheme={colorTheme}
+        colorTheme={colorTheme ?? 'ember'}
         animated={!disabled}
         size="md"
       />

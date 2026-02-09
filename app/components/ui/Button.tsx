@@ -301,13 +301,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
         )}
       >
         {icon && iconPosition === 'left' && (
-          <span className={iconSizes[size]} aria-hidden="true">
+          <span className={iconSizes[size ?? 'md']} aria-hidden="true">
             {icon}
           </span>
         )}
         {children && <span>{children}</span>}
         {icon && iconPosition === 'right' && (
-          <span className={iconSizes[size]} aria-hidden="true">
+          <span className={iconSizes[size ?? 'md']} aria-hidden="true">
             {icon}
           </span>
         )}

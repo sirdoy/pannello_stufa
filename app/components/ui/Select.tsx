@@ -335,7 +335,7 @@ function Select({
   const stringValue = value !== undefined && value !== null ? String(value) : undefined;
 
   // Handle value change - wrap in synthetic event for backwards compatibility
-  const handleValueChange = (newValue) => {
+  const handleValueChange = (newValue: string) => {
     // Find the original value type from options
     const option = options.find(opt => String(opt.value) === newValue);
     const originalValue = option ? option.value : newValue;

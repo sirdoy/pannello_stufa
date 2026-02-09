@@ -45,7 +45,7 @@ export default function StatusBadge({
   gradient,
 }: StatusBadgeProps) {
   // Auto-detect status color based on status text
-  const getAutoColor = (status) => {
+  const getAutoColor = (status: string | undefined) => {
     if (!status) return 'neutral';
     const s = status.toUpperCase();
     if (s.includes('WORK') || s.includes('ON') || s.includes('ACTIVE')) return 'ember';
@@ -58,7 +58,7 @@ export default function StatusBadge({
   };
 
   // Auto-detect icon based on status
-  const getAutoIcon = (status) => {
+  const getAutoIcon = (status: string | undefined) => {
     if (!status) return '❔';
     const s = status.toUpperCase();
     if (s.includes('WORK') || s.includes('FUNZIONE')) return '🔥';

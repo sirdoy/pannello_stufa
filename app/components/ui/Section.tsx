@@ -99,7 +99,7 @@ export default function Section({
     <Component className={cn(sectionVariants({ spacing }), className)} {...props}>
       {/* Header with title, description, action */}
       {hasHeader && (
-        <div className={headerSpacingMap[spacing] || headerSpacingMap.md}>
+        <div className={headerSpacingMap[spacing ?? 'md'] || headerSpacingMap.md}>
           {/* Category indicator + subtitle */}
           {(subtitle || title) && (
             <div className="flex items-center gap-3 mb-2">

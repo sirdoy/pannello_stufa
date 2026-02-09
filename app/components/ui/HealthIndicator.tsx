@@ -98,11 +98,11 @@ const HealthIndicator = forwardRef<HTMLSpanElement, HealthIndicatorProps>(functi
   ref
 ) {
   // Get display label (custom or default)
-  const displayLabel = label || statusLabels[status] || statusLabels.ok;
+  const displayLabel = label || statusLabels[status ?? 'ok'] || statusLabels.ok;
 
   // Get icon component for status
-  const IconComponent = iconMap[status] || iconMap.ok;
-  const iconSize = iconSizes[size] || iconSizes.md;
+  const IconComponent = iconMap[status ?? 'ok'] || iconMap.ok;
+  const iconSize = iconSizes[size ?? 'md'] || iconSizes.md;
 
   return (
     <span

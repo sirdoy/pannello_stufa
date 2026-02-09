@@ -94,7 +94,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
   /**
    * Dismiss a specific toast by ID
    */
-  const dismiss = useCallback((id) => {
+  const dismiss = useCallback((id: number) => {
     setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
 

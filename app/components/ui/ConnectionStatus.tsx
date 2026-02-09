@@ -102,7 +102,7 @@ const ConnectionStatus = forwardRef<HTMLSpanElement, ConnectionStatusProps>(func
   ref
 ) {
   // Get display label (custom or default)
-  const displayLabel = label || statusLabels[status] || statusLabels.unknown;
+  const displayLabel = label || statusLabels[status ?? 'unknown'] || statusLabels.unknown;
 
   return (
     <span

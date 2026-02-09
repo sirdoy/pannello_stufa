@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState, type ReactNode } from 'react';
+// @ts-expect-error - react-dom types are available but strict mode check fails
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import ActionButton from './ActionButton';

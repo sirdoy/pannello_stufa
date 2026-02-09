@@ -134,7 +134,7 @@ const Slider = forwardRef<HTMLSpanElement, SliderProps>(function Slider(
   })();
 
   // Handle value change - unwrap for single-thumb mode
-  const handleValueChange = useCallback((values) => {
+  const handleValueChange = useCallback((values: number[]) => {
     setInternalValue(values);
 
     // Call appropriate callback

@@ -146,8 +146,8 @@ export function CardAccentCorner({
     'bottom-right': 'bottom-0 right-0 rounded-br-2xl',
   };
 
-  const gradient = themes[colorTheme] || themes.ember;
-  const position = positions[corner] || positions['top-left'];
+  const gradient = themes[colorTheme as keyof typeof themes] || themes.ember;
+  const position = positions[corner as keyof typeof positions] || positions['top-left'];
 
   return (
     <div className={`absolute ${position} z-10 ${className}`}>

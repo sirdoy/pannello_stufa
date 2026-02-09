@@ -76,12 +76,12 @@ export async function processCoordinationCycle(
       });
     } else {
       // Still paused
-      const remainingMs = state.pausedUntil - now;
-      console.log(`⏸️ [Coordination] Automation paused until ${new Date(state.pausedUntil).toISOString()}`);
+      const remainingMs = state.pausedUntil ? state.pausedUntil - now : 0;
+      console.log(`⏸️ [Coordination] Automation paused until ${state.pausedUntil ? new Date(state.pausedUntil).toISOString() : 'unknown'}`);
       return {
         action: 'skipped',
         reason: 'paused',
-        pausedUntil: state.pausedUntil,
+        pausedUntil: state.pausedUntil ?? undefined,
         remainingMs,
       };
     }
@@ -251,13 +251,13 @@ export async function processCoordinationCycle(
       return {
         action: 'debouncing',
         reason: 'stove_on_debounce',
-        remainingMs: debounceResult.delayMs,
+        remainingMs: debounceResult.delayMs ?? undefined,
       };
     } else if (debounceResult.action === 'retry_started') {
       return {
         action: 'retry_timer',
         reason: 'early_shutoff',
-        remainingMs: debounceResult.delayMs,
+        remainingMs: debounceResult.delayMs ?? undefined,
       };
     } else if (debounceResult.action === 'executed_immediately') {
       return {
@@ -289,7 +289,7 @@ export async function processCoordinationCycle(
  *   - cappedRooms: array of room names that hit 30°C cap
  *   - previousSetpoints: object mapping roomId to previous setpoint
  */
-export async function applySetpointBoost(userId, homeId, preferences) {
+export async function applySetpointBoost(userId: string, homeId: string, preferences: any) {
   console.log(`🔥 [Coordination] Applying setpoint boost for ${userId}`);
 
   // Get access token
@@ -310,8 +310,8 @@ export async function applySetpointBoost(userId, homeId, preferences) {
   const previousSetpoints = state.previousSetpoints || {};
 
   // Build room list with boost amounts
-  const enabledZones = preferences.zones.filter(z => z.enabled);
-  const rooms = enabledZones.map(z => ({
+  const enabledZones = preferences.zones.filter((z: any) => z.enabled);
+  const rooms = enabledZones.map((z: any) => ({
     id: z.roomId,
     name: z.roomName,
   }));
@@ -331,7 +331,7 @@ export async function applySetpointBoost(userId, homeId, preferences) {
     );
 
     if (result.success) {
-      const roomInfo = result.appliedSetpoints[zone.roomId];
+      const roomInfo = (result.appliedSetpoints as Record<string, any>)[zone.roomId];
       if (roomInfo) {
         results.push({
           roomId: zone.roomId,
@@ -378,7 +378,7 @@ export async function applySetpointBoost(userId, homeId, preferences) {
  *   - success: boolean
  *   - restoredRooms: array of restored room info
  */
-export async function restorePreviousSetpoints(userId, homeId) {
+export async function restorePreviousSetpoints(userId: string, homeId: string) {
   console.log(`❄️ [Coordination] Restoring previous setpoints for ${userId}`);
 
   // Get access token
@@ -439,7 +439,7 @@ export async function restorePreviousSetpoints(userId, homeId) {
  *   - reason: string|null ('global_throttle' if blocked)
  *   - waitSeconds: number (if throttled)
  */
-export async function sendCoordinationNotification(userId, type, data) {
+export async function sendCoordinationNotification(userId: string, type: string, data: any) {
   // Check throttle
   const throttleCheck = shouldSendCoordinationNotification(userId);
 
@@ -474,7 +474,7 @@ export async function sendCoordinationNotification(userId, type, data) {
   switch (type) {
     case 'coordination_applied':
       {
-        const rooms = data.appliedRooms?.map(r => r.roomName).join(', ') || 'stanze';
+        const rooms = data.appliedRooms?.map((r: any) => r.roomName).join(', ') || 'stanze';
         const boostInfo = data.appliedRooms?.[0]?.boost ? `+${data.appliedRooms[0].boost}°C` : '+N°C';
         body = `Boost ${boostInfo} applicato (${rooms})`;
       }
@@ -482,7 +482,7 @@ export async function sendCoordinationNotification(userId, type, data) {
 
     case 'coordination_restored':
       {
-        const rooms = data.restoredRooms?.map(r => r.roomName).join(', ') || 'stanze';
+        const rooms = data.restoredRooms?.map((r: any) => r.roomName).join(', ') || 'stanze';
         body = `Setpoint ripristinati (${rooms})`;
       }
       break;

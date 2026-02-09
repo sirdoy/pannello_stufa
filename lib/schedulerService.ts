@@ -72,9 +72,9 @@ function createDateInRomeTimezone(baseDate: Date, targetHour: number, targetMinu
   });
 
   const parts = formatter.formatToParts(baseDate);
-  const day = parseInt(parts.find(p => p.type === 'day').value);
-  const month = parseInt(parts.find(p => p.type === 'month').value);
-  const year = parseInt(parts.find(p => p.type === 'year').value);
+  const day = parseInt(parts.find(p => p.type === 'day')!.value);
+  const month = parseInt(parts.find(p => p.type === 'month')!.value);
+  const year = parseInt(parts.find(p => p.type === 'year')!.value);
 
   // Crea una stringa ISO per il target time in formato neutro
   const targetDateStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}T${targetHour.toString().padStart(2, '0')}:${targetMinute.toString().padStart(2, '0')}:00`;
@@ -135,10 +135,10 @@ export const getNextScheduledChange = async (): Promise<string | null> => {
     });
 
     const dayNames = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
-    const currentDay = formatter.formatToParts(now).find(p => p.type === 'weekday').value;
+    const currentDay = formatter.formatToParts(now).find(p => p.type === 'weekday')!.value;
     const currentDayCapitalized = currentDay.charAt(0).toUpperCase() + currentDay.slice(1);
-    const currentHour = parseInt(formatter.formatToParts(now).find(p => p.type === 'hour').value);
-    const currentMinute = parseInt(formatter.formatToParts(now).find(p => p.type === 'minute').value);
+    const currentHour = parseInt(formatter.formatToParts(now).find(p => p.type === 'hour')!.value);
+    const currentMinute = parseInt(formatter.formatToParts(now).find(p => p.type === 'minute')!.value);
     const currentMinutes = currentHour * 60 + currentMinute;
 
     // Cerca nel giorno corrente (active schedule)
@@ -211,10 +211,10 @@ export const getNextScheduledAction = async (): Promise<NextScheduledAction | nu
     });
 
     const dayNames = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
-    const currentDay = formatter.formatToParts(now).find(p => p.type === 'weekday').value;
+    const currentDay = formatter.formatToParts(now).find(p => p.type === 'weekday')!.value;
     const currentDayCapitalized = currentDay.charAt(0).toUpperCase() + currentDay.slice(1);
-    const currentHour = parseInt(formatter.formatToParts(now).find(p => p.type === 'hour').value);
-    const currentMinute = parseInt(formatter.formatToParts(now).find(p => p.type === 'minute').value);
+    const currentHour = parseInt(formatter.formatToParts(now).find(p => p.type === 'hour')!.value);
+    const currentMinute = parseInt(formatter.formatToParts(now).find(p => p.type === 'minute')!.value);
     const currentMinutes = currentHour * 60 + currentMinute;
 
     // Cerca nel giorno corrente (active schedule)

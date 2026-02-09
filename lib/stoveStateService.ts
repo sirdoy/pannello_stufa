@@ -37,10 +37,10 @@ export async function updateStoveState(stateUpdate: StoveStateUpdate): Promise<v
     // Filter out undefined values (Firebase doesn't accept undefined)
     const filteredUpdates = Object.entries(updates).reduce((acc, [key, value]) => {
       if (value !== undefined && value !== null) {
-        acc[key] = value;
+        (acc as Record<string, any>)[key] = value;
       }
       return acc;
-    }, {});
+    }, {} as Record<string, any>);
 
     await adminDbUpdate(path, filteredUpdates);
 

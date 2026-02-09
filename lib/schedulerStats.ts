@@ -89,10 +89,10 @@ export function calculateWeeklyStats(schedule: WeeklySchedule): WeeklyStats {
   const stats = {
     totalHours: 0,
     totalIntervals: 0,
-    dailyHours: {},
-    powerDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-    fanDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 },
-    busiestDay: null,
+    dailyHours: {} as Record<string, number>,
+    powerDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } as PowerDistribution,
+    fanDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 } as FanDistribution,
+    busiestDay: null as string | null,
     avgPerDay: 0,
     weekdaysTotal: 0,
     weekendTotal: 0,
@@ -110,8 +110,8 @@ export function calculateWeeklyStats(schedule: WeeklySchedule): WeeklyStats {
 
       stats.totalHours += duration;
       stats.totalIntervals++;
-      stats.powerDistribution[interval.power] += duration;
-      stats.fanDistribution[interval.fan] += duration;
+      stats.powerDistribution[interval.power as keyof PowerDistribution] += duration;
+      stats.fanDistribution[interval.fan as keyof FanDistribution] += duration;
 
       dayTotal += duration;
 
@@ -152,7 +152,7 @@ export function getDayTotalHours(intervals: ScheduleInterval[]): number {
  * Get power level gradient color for visualization
  */
 export function getPowerGradient(power: number): string {
-  const gradients = {
+  const gradients: Record<number, string> = {
     1: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)', // Blue
     2: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', // Green
     3: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)', // Yellow
@@ -166,7 +166,7 @@ export function getPowerGradient(power: number): string {
  * Get power level badge classes
  */
 export function getPowerBadgeClass(power: number): string {
-  const classes = {
+  const classes: Record<number, string> = {
     1: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
     2: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
     3: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300',
@@ -181,7 +181,7 @@ export function getPowerBadgeClass(power: number): string {
  */
 export function getFanBadgeClass(fan: number): string {
   const intensity = Math.ceil(fan / 2); // Group: V1-2=low, V3-4=med, V5-6=high
-  const classes = {
+  const classes: Record<number, string> = {
     1: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300',
     2: 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300',
     3: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300',

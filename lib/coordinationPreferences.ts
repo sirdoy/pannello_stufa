@@ -36,7 +36,7 @@ export async function getCoordinationPreferences(
     return getDefaultCoordinationPreferences();
   }
 
-  return prefs;
+  return prefs as CoordinationPreferences;
 }
 
 /**

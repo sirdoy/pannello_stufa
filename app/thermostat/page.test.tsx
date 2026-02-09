@@ -26,35 +26,35 @@ jest.mock('@/lib/routes', () => ({
 
 // Mock UI components to avoid complex rendering
 jest.mock('@/app/components/ui', () => {
-  const MockPageLayout = ({ children, header }) => (
+  const MockPageLayout = ({ children, header }: { children: React.ReactNode; header: React.ReactNode }) => (
     <div data-testid="page-layout">
       {header}
       {children}
     </div>
   );
-  MockPageLayout.Header = ({ title, description }) => (
+  MockPageLayout.Header = ({ title, description }: { title: string; description: string }) => (
     <header data-testid="page-header">
       <h1>{title}</h1>
       <p>{description}</p>
     </header>
   );
-  const MockTabs = ({ children }) => <div data-testid="tabs">{children}</div>;
-  MockTabs.List = ({ children }) => <div data-testid="tabs-list">{children}</div>;
-  MockTabs.Trigger = ({ children, value }) => <button data-value={value}>{children}</button>;
-  MockTabs.Content = ({ children }) => <div>{children}</div>;
+  const MockTabs = ({ children }: { children: React.ReactNode }) => <div data-testid="tabs">{children}</div>;
+  MockTabs.List = ({ children }: { children: React.ReactNode }) => <div data-testid="tabs-list">{children}</div>;
+  MockTabs.Trigger = ({ children, value }: { children: React.ReactNode; value: string }) => <button data-value={value}>{children}</button>;
+  MockTabs.Content = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
 
   return {
-    Card: ({ children }) => <div data-testid="card">{children}</div>,
-    Button: ({ children, onClick }) => <button onClick={onClick}>{children}</button>,
+    Card: ({ children }: { children: React.ReactNode }) => <div data-testid="card">{children}</div>,
+    Button: ({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) => <button onClick={onClick}>{children}</button>,
     Skeleton: {
       NetatmoPage: () => <div data-testid="skeleton">Loading...</div>,
     },
-    ErrorAlert: ({ message }) => <div data-testid="error">{message}</div>,
-    Banner: ({ children }) => <div>{children}</div>,
-    Heading: ({ children }) => <h1>{children}</h1>,
-    Text: ({ children }) => <span>{children}</span>,
-    Grid: ({ children }) => <div>{children}</div>,
-    InfoBox: ({ title, children }) => <div data-testid="info-box"><strong>{title}</strong>{children}</div>,
+    ErrorAlert: ({ message }: { message: string }) => <div data-testid="error">{message}</div>,
+    Banner: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    Heading: ({ children }: { children: React.ReactNode }) => <h1>{children}</h1>,
+    Text: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
+    Grid: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    InfoBox: ({ title, children }: { title: string; children: React.ReactNode }) => <div data-testid="info-box"><strong>{title}</strong>{children}</div>,
     PageLayout: MockPageLayout,
     Tabs: MockTabs,
   };
@@ -79,8 +79,8 @@ jest.mock('@/app/components/netatmo/StoveSyncPanel', () => {
 });
 
 describe('NetatmoPage - setState-in-render fix', () => {
-  let mockRouter;
-  let mockSearchParams;
+  let mockRouter: { replace: jest.Mock; push: jest.Mock };
+  let mockSearchParams: { get: jest.Mock };
 
   beforeEach(() => {
     mockRouter = {

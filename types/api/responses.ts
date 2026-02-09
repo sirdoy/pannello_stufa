@@ -28,17 +28,6 @@ export type ApiResponse<T = Record<string, unknown>> =
   | ApiSuccessResponse<T>
   | ApiErrorResponse;
 
-/** Type guard to check if response is successful */
-export function isApiSuccess<T>(
-  response: ApiResponse<T>
-): response is ApiSuccessResponse<T> {
-  return response.success === true;
-}
-
-/** Type guard to check if response is an error */
-export function isApiError(response: ApiResponse): response is ApiErrorResponse {
-  return response.success === false;
-}
 
 /**
  * Stove status response

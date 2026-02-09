@@ -277,7 +277,7 @@ interface JsonDisplayProps {
   data: any;
 }
 
-export function JsonDisplay({ data }: JsonDisplayProps) {
+function JsonDisplay({ data }: JsonDisplayProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {

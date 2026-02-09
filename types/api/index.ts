@@ -13,6 +13,3 @@ export type {
   StoveStatusResponse,
   PaginatedResponse,
 } from './responses';
-
-// Type guards
-export { isApiSuccess, isApiError } from './responses';

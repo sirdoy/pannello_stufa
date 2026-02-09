@@ -107,7 +107,7 @@ export function getUVIndexLabel(uvIndex: number | null | undefined): string {
  *
  * Snow codes: 71-77 (snow), 85-86 (snow showers)
  */
-export function isSnowCode(weatherCode: number): boolean {
+function isSnowCode(weatherCode: number): boolean {
   return (weatherCode >= 71 && weatherCode <= 77) || (weatherCode >= 85 && weatherCode <= 86);
 }
 
@@ -125,7 +125,7 @@ export function isSnowCode(weatherCode: number): boolean {
  * getPrecipitationLabel(60, 71) // "Probabile neve" (snow code)
  * getPrecipitationLabel(85, 63) // "Pioggia prevista" (rain code)
  */
-export function getPrecipitationLabel(percent: number | null | undefined, weatherCode: number | null = null): string | null {
+function getPrecipitationLabel(percent: number | null | undefined, weatherCode: number | null = null): string | null {
   if (percent === null || percent === undefined || isNaN(percent)) {
     return null;
   }

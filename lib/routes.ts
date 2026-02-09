@@ -62,7 +62,7 @@ const SCHEDULER_ROUTES = {
 } as const;
 
 // Netatmo endpoints
-const NETATMO_ROUTES = {
+export const NETATMO_ROUTES = {
   // Auth & topology
   callback: `${API_BASE}/netatmo/callback`,
   disconnect: `${API_BASE}/netatmo/disconnect`,

@@ -109,6 +109,7 @@ export default function GlassEffect({
     `;
 
     function compileShader(source: string, type: number): WebGLShader | null {
+      if (!gl) return null;
       const shader = gl.createShader(type);
       if (!shader) return null;
 
@@ -126,7 +127,7 @@ export default function GlassEffect({
     const vs = compileShader(vertexShaderSource, gl.VERTEX_SHADER);
     const fs = compileShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
 
-    if (!vs || !fs) {
+    if (!vs || !fs || !gl) {
       setWebglError(true);
       return;
     }
@@ -169,7 +170,7 @@ export default function GlassEffect({
     };
 
     function resize() {
-      if (!canvas) return;
+      if (!canvas || !gl) return;
       const rect = canvas.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2.0);
       const w = Math.floor(rect.width * dpr);
@@ -185,7 +186,7 @@ export default function GlassEffect({
     }
 
     function animate() {
-      if (!canvas) return;
+      if (!canvas || !gl) return;
       resize();
       const currentTime = (performance.now() - startTime) * 0.001;
 

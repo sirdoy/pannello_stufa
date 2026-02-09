@@ -224,12 +224,13 @@ export default function StoveCard() {
   // Show toast when background sync command completes
   useEffect(() => {
     if (lastSyncedCommand) {
-      const actionLabels = {
+      const actionLabels: Record<string, string> = {
         'stove/ignite': '🔥 Stufa accesa (comando sincronizzato)',
         'stove/shutdown': '🌙 Stufa spenta (comando sincronizzato)',
         'stove/set-power': '⚡ Potenza impostata (comando sincronizzato)',
       };
-      const message = actionLabels[(lastSyncedCommand as any).endpoint] || 'Comando sincronizzato';
+      const endpoint = (lastSyncedCommand as any).endpoint;
+      const message = endpoint && endpoint in actionLabels ? actionLabels[endpoint] : 'Comando sincronizzato';
       setToast({ message, variant: 'success' });
       // Refresh status after sync
       fetchStatusAndUpdate();
@@ -244,7 +245,7 @@ export default function StoveCard() {
     fetchStatusAndUpdate();
 
     pollingStartedRef.current = true;
-    let timeoutId = null;
+    let timeoutId: NodeJS.Timeout | null = null;
 
     const scheduleNextPoll = () => {
       // Adaptive polling intervals:
@@ -359,9 +360,9 @@ export default function StoveCard() {
   useEffect(() => {
     if (!isLocalEnvironment()) return;
 
-    let unsubscribeState = null;
-    let unsubscribeMaintenance = null;
-    let unsubscribeError = null;
+    let unsubscribeState: (() => void) | null = null;
+    let unsubscribeMaintenance: (() => void) | null = null;
+    let unsubscribeError: (() => void) | null = null;
 
     async function setupSandboxListeners() {
       const enabled = await isSandboxEnabled();
@@ -423,7 +424,7 @@ export default function StoveCard() {
     setRefreshing(false);
   };
 
-  const handleFanChange = async (e) => {
+  const handleFanChange = async (e: React.ChangeEvent<HTMLInputElement> | { target: { value: string } }) => {
     const level = Number(e.target.value);
     setLoadingMessage('Modifica livello ventola...');
     setLoading(true);
@@ -458,7 +459,7 @@ export default function StoveCard() {
     setLoading(false);
   };
 
-  const handlePowerChange = async (e) => {
+  const handlePowerChange = async (e: React.ChangeEvent<HTMLInputElement> | { target: { value: string } }) => {
     const level = Number(e.target.value);
     setLoadingMessage('Modifica livello potenza...');
     setLoading(true);
@@ -613,7 +614,7 @@ export default function StoveCard() {
   };
 
   // Status mapping: technical name → user-friendly display (Ember Noir Design)
-  const getStatusInfo = (status) => {
+  const getStatusInfo = (status: string | null) => {
     if (!status) {
       return {
         label: 'CARICAMENTO...',
@@ -775,8 +776,8 @@ export default function StoveCard() {
    * Map CVA variants to glow/shadow effects for status box
    * Preserves elaborate visual design while using design system tokens
    */
-  const getStatusGlow = (variant) => {
-    const glows = {
+  const getStatusGlow = (variant: string) => {
+    const glows: Record<string, string> = {
       ember: 'shadow-ember-glow',
       sage: 'shadow-[0_0_20px_rgba(96,115,96,0.3)]',
       ocean: 'shadow-[0_0_30px_rgba(67,125,174,0.3)]',
@@ -791,7 +792,7 @@ export default function StoveCard() {
    * Get status display properties using CVA variants
    * Returns variant names for Badge and health status for HealthIndicator
    */
-  const getStatusDisplay = (status) => {
+  const getStatusDisplay = (status: string | null) => {
     if (!status) {
       return {
         label: 'CARICAMENTO...',
@@ -1176,7 +1177,7 @@ export default function StoveCard() {
                       aria-label="Diminuisci Potenza"
                       variant="ghost"
                       size="sm"
-                      onClick={() => handlePowerChange({ target: { value: (powerLevel - 1).toString() }})}
+                      onClick={() => powerLevel && handlePowerChange({ target: { value: (powerLevel - 1).toString() }})}
                       disabled={loading || !powerLevel || powerLevel <= 1}
                       className="p-2"
                     >
@@ -1187,7 +1188,7 @@ export default function StoveCard() {
                       aria-label="Aumenta Potenza"
                       variant="ghost"
                       size="sm"
-                      onClick={() => handlePowerChange({ target: { value: (powerLevel + 1).toString() }})}
+                      onClick={() => powerLevel && handlePowerChange({ target: { value: (powerLevel + 1).toString() }})}
                       disabled={loading || !powerLevel || powerLevel >= 5}
                       className="p-2"
                     >
@@ -1421,7 +1422,7 @@ export default function StoveCard() {
                         type="decrement"
                         variant="subtle"
                         onClick={() => {
-                          if (fanLevel > 1) {
+                          if (fanLevel && fanLevel > 1) {
                             const newLevel = fanLevel - 1;
                             handleFanChange({ target: { value: newLevel.toString() } });
                           }
@@ -1445,7 +1446,7 @@ export default function StoveCard() {
                         type="increment"
                         variant="subtle"
                         onClick={() => {
-                          if (fanLevel < 6) {
+                          if (fanLevel && fanLevel < 6) {
                             const newLevel = fanLevel + 1;
                             handleFanChange({ target: { value: newLevel.toString() } });
                           }
@@ -1472,7 +1473,7 @@ export default function StoveCard() {
                         type="decrement"
                         variant="ember"
                         onClick={() => {
-                          if (powerLevel > 1) {
+                          if (powerLevel && powerLevel > 1) {
                             const newLevel = powerLevel - 1;
                             handlePowerChange({ target: { value: newLevel.toString() } });
                           }
@@ -1496,7 +1497,7 @@ export default function StoveCard() {
                         type="increment"
                         variant="ember"
                         onClick={() => {
-                          if (powerLevel < 5) {
+                          if (powerLevel && powerLevel < 5) {
                             const newLevel = powerLevel + 1;
                             handlePowerChange({ target: { value: newLevel.toString() } });
                           }

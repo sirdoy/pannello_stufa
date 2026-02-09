@@ -6,16 +6,16 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** Phase 47 - Test Strict Mode and Index Access (v5.1 Tech Debt & Code Quality)
+**Current focus:** Phase 48 - Dead Code Removal (v5.1 Tech Debt & Code Quality)
 
 ## Current Position
 
-Phase: 47 of 48 (Test Strict Mode and Index Access)
-Plan: 10 of 10 in current phase
-Status: Complete
-Last activity: 2026-02-09 - Completed 47-10-PLAN.md (Gap sweep: 0 cascade errors, 0 tsc errors, 3034 tests passing - Phase 47 COMPLETE)
+Phase: 48 of 48 (Dead Code Removal)
+Plan: 1 of 6 in current phase
+Status: In Progress
+Last activity: 2026-02-09 - Completed 48-01-PLAN.md (39 unused files deleted: 31 source + 8 scripts/docs, 5,702 LOC removed, knip shows only 2 false positives)
 
-Progress: [████████████████████████████████████████████░░░░] 99% (243/246 estimated total plans)
+Progress: [████████████████████████████████████████████░░░░] 99% (244/246 estimated total plans)
 
 ## Performance Metrics
 
@@ -68,6 +68,7 @@ Progress: [███████████████████████
 | Phase 47 P09 | 2379s | 2 tasks | 3 files |
 | Phase 47 P10 | 123s | 2 tasks | 0 files |
 | Phase 47 P10 | 123 | 2 tasks | 0 files |
+| Phase 48 P01 | 276 | 2 tasks | 39 files |
 
 ## Accumulated Context
 
@@ -157,6 +158,7 @@ Recent decisions from PROJECT.md affecting v5.1 work:
 - [Phase 47-09]: Worker teardown warnings documented as cosmetic (React 19 expected behavior)
 - [Phase 47-10]: Zero cascade errors from Wave 1-3 parallel execution (gap sweep pattern validates approach)
 - [Phase 47-10]: Phase 47 complete: strict + noUncheckedIndexedAccess fully operational (0 tsc errors, 3034 tests passing)
+- [Phase 48-01]: Used knip dependency analysis to identify unused files (39 files deleted: 31 source + 8 scripts/docs, 5,702 LOC removed)
 
 ### Pending Todos
 
@@ -178,7 +180,7 @@ None yet.
 - **Phase 47 COMPLETE:** All files (source + tests) now have 0 tsc errors with strict: true + noUncheckedIndexedAccess: true
 - **Phase 47 COMPLETE:** All 3034 tests passing green with zero failures (gap sweep verified 0 cascade errors)
 - Worker teardown warning documented as cosmetic (React 19 expected behavior)
-- **REMAINING:** Phase 48: Dead code removal needed (unused exports, files, dependencies)
+- **Phase 48 IN PROGRESS:** Dead code removal (Plan 01/06 complete: unused files removed, 5 plans remaining for exports/dependencies)
 
 **Technical Context:**
 - Errors span ~531 TypeScript source files + ~131 test files
@@ -187,9 +189,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-09 15:45
-Stopped at: Completed 47-10-PLAN.md (Gap sweep: 0 cascade errors, Phase 47 COMPLETE)
-Resume file: None — Phase 47 complete, ready for Phase 48
+Last session: 2026-02-09 17:23
+Stopped at: Completed 48-01-PLAN.md (39 unused files deleted, knip shows only 2 false positives)
+Resume file: None — Ready for 48-02-PLAN.md
 
 ---
 *State initialized: 2026-02-08 for v5.1 Tech Debt & Code Quality milestone*

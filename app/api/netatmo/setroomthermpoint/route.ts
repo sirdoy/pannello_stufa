@@ -67,8 +67,8 @@ export const POST = withAuthAndErrorHandler(async (request: NextRequest, _contex
   // Build request params
   const params: ThermPointParams = {
     home_id: homeId,
-    room_id,
-    mode,
+    room_id: room_id!,
+    mode: mode!,
   };
 
   if (mode === 'manual') {

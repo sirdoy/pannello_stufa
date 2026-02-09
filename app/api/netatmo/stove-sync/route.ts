@@ -158,7 +158,6 @@ export const POST = withAuthAndErrorHandler(async (request: NextRequest, _contex
 
       const syncResult = await syncLivingRoomWithStove(stoveIsOn!) as SyncResult;
       result = {
-        synced: syncResult.synced,
         ...syncResult,
         config: await getStoveSyncConfig(),
       };

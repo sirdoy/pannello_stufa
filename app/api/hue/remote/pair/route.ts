@@ -67,7 +67,7 @@ export const POST = withAuthAndErrorHandler(async () => {
     // The response might be an array with success/error objects
     if (Array.isArray(linkButtonData)) {
       const hasError = (linkButtonData as LinkButtonError[]).find(item => item.error);
-      if (hasError) {
+      if (hasError && hasError.error) {
         console.error('❌ [Hue Remote Pair] Link button error:', hasError.error);
         // Error 101 = link button not pressed
         if (hasError.error.type === 101) {
@@ -127,7 +127,7 @@ export const POST = withAuthAndErrorHandler(async () => {
       const successItem = (createUserData as CreateUserResponse[]).find(item => item.success);
       const errorItem = (createUserData as CreateUserResponse[]).find(item => item.error);
 
-      if (errorItem) {
+      if (errorItem && errorItem.error) {
         console.error('❌ [Hue Remote Pair] Create user error:', errorItem.error);
 
         // Error 101 = link button not pressed
@@ -146,7 +146,7 @@ export const POST = withAuthAndErrorHandler(async () => {
         );
       }
 
-      if (successItem && successItem.success.username) {
+      if (successItem && successItem.success && successItem.success.username) {
         const username = successItem.success.username;
         const clientkey = successItem.success.clientkey || null;
 

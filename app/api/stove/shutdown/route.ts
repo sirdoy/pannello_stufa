@@ -15,5 +15,5 @@ export const POST = withAuthAndErrorHandler(async (request) => {
   const stoveService = getStoveService();
   const result = await stoveService.shutdown(source);
 
-  return success(result);
+  return success(result as Record<string, unknown>);
 }, 'Stove/Shutdown');

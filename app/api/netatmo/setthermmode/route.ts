@@ -57,7 +57,7 @@ export const POST = withAuthAndErrorHandler(async (request: NextRequest, _contex
   // Build request params
   const params: ThermModeParams = {
     home_id: homeId,
-    mode,
+    mode: mode!,
   };
 
   if (endtime && (mode === 'away' || mode === 'hg')) {

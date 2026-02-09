@@ -166,10 +166,15 @@ Plans:
 4. Production build completes successfully in under 35 seconds
 5. Development server runs without errors or warnings with strict config
 
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- [ ] 48-01: TBD after phase planning
+- [ ] 48-01-PLAN.md — Remove unused files (~39 files: deprecated components, unused services, scripts, type barrels)
+- [ ] 48-02-PLAN.md — Remove unused dependencies from package.json (2-4 packages)
+- [ ] 48-03-PLAN.md — Remove unused exports from lib/ core files (auth, devices, firebase, coordination)
+- [ ] 48-04-PLAN.md — Remove unused exports from lib/ service files (netatmo, notifications, tokens, schemas)
+- [ ] 48-05-PLAN.md — Remove unused exports from lib/core+hue+pwa, app/ files, and barrel cleanup
+- [ ] 48-06-PLAN.md — Final verification and gap sweep
 
 ---
 
@@ -188,7 +193,7 @@ Plans:
 | **45** | **v5.1** | **8/8** | **✓ Complete** | **2026-02-09** |
 | **46** | **v5.1** | **8/8** | **✓ Complete** | **2026-02-09** |
 | **47** | **v5.1** | **10/10** | **✓ Complete** | **2026-02-09** |
-| **48** | **v5.1** | **0/TBD** | **Not started** | **-** |
+| **48** | **v5.1** | **0/6** | **Planned** | **-** |
 
 ---
 *Last updated: 2026-02-09 — Phase 47 complete (10/10 plans, 0 tsc errors, 3034 tests green)*

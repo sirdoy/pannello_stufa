@@ -1,68 +1,53 @@
 import { withAuthAndErrorHandler, success, notFound, requireNetatmoToken } from '@/lib/core';
+import NETATMO_API from '@/lib/netatmoApi';
 
 export const dynamic = 'force-dynamic';
 
-interface DeviceModule {
-  _id: string;
-  module_name?: string;
-  measured?: {
-    temperature?: number;
-  };
-  [key: string]: unknown;
-}
-
-interface Device {
-  _id: string;
-  modules?: DeviceModule[];
-  [key: string]: unknown;
-}
-
-interface DeviceListResponse {
-  body?: {
-    devices?: Device[];
-  };
-}
-
 interface TemperatureResult {
-  device_id: string;
-  module_id: string;
-  name: string;
-  temperature: number;
+  room_id: string;
+  room_name: string;
+  temperature?: number;
+  setpoint?: number;
+  mode?: string;
+  heating: boolean;
 }
 
 /**
  * GET /api/netatmo/devices-temperatures
- * Retrieves temperatures from all Netatmo devices/modules
+ * Retrieves temperatures from all Netatmo rooms (Energy API)
  * Protected: Requires Auth0 authentication
+ *
+ * Note: Uses homesdata + homestatus (Energy API) instead of deprecated devicelist endpoint
  */
 export const GET = withAuthAndErrorHandler(async () => {
   const accessToken = await requireNetatmoToken();
 
-  // Call /devicelist to get modules
-  const deviceRes = await fetch('https://api.netatmo.com/api/devicelist', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+  // Get homes data for home_id and room names
+  const homesData = await NETATMO_API.getHomesData(accessToken);
+  if (!homesData || homesData.length === 0) {
+    return notFound('Nessuna casa trovata');
+  }
+
+  const home = homesData[0];
+  const homeId = home.id;
+
+  // Get home status for real-time temperatures
+  const homeStatus = await NETATMO_API.getHomeStatus(accessToken, homeId);
+  const temperatures = NETATMO_API.extractTemperatures(homeStatus);
+
+  // Enrich with room names from topology
+  const rooms = home.rooms || [];
+  const results: TemperatureResult[] = temperatures.map(temp => {
+    const room = rooms.find(r => r.id === temp.room_id);
+    return {
+      room_id: temp.room_id,
+      room_name: room?.name || temp.room_id,
+      temperature: temp.temperature,
+      setpoint: temp.setpoint,
+      mode: temp.mode,
+      heating: temp.heating,
+    };
   });
 
-  const deviceData = await deviceRes.json() as DeviceListResponse;
-  if (!deviceData.body?.devices?.length) {
-    return notFound('Nessun dispositivo trovato');
-  }
-
-  const results: TemperatureResult[] = [];
-  for (const device of deviceData.body.devices) {
-    const device_id = device._id;
-    for (const dev of device.modules || []) {
-      const module_id = dev._id;
-      const temperature = dev.measured?.temperature;
-      const name = dev.module_name || module_id;
-
-      if (temperature !== undefined) {
-        results.push({ device_id, module_id, name, temperature });
-      }
-    }
-  }
-
-  return success({ temperatures: results });
+  return success({ temperatures: results, home_id: homeId });
 }, 'Netatmo/DevicesTemperatures');

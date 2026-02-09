@@ -102,6 +102,7 @@ export default function MaintenancePage() {
   if (isLoading || loading) {
     return (
       <div className="flex items-center justify-center py-20">
+        <Heading level={1} className="sr-only">Manutenzione</Heading>
         <Text variant="tertiary">Caricamento...</Text>
       </div>
     );
@@ -110,6 +111,7 @@ export default function MaintenancePage() {
   if (!user) {
     return (
       <div className="flex items-center justify-center py-20">
+        <Heading level={1} className="sr-only">Manutenzione</Heading>
         <Card variant="glass" className="p-8 text-center">
           <Text variant="tertiary" className="mb-4">Accesso non autorizzato</Text>
           <Link href="/auth/login">
@@ -252,11 +254,11 @@ export default function MaintenancePage() {
         {/* Info Card */}
         <Card variant="glass" className="p-6 sm:p-8 bg-ocean-50/50 [html:not(.dark)_&]:bg-ocean-50/50 bg-ocean-900/10 border border-ocean-200 [html:not(.dark)_&]:border-ocean-200 border-ocean-800">
           <Heading level={3} variant="subtle" className="mb-2">ℹ️ Come Funziona</Heading>
-          <ul className="space-y-1">
-            <Text variant="tertiary" size="sm">• Il contatore aumenta automaticamente ogni minuto quando la stufa è in funzione (status WORK)</Text>
-            <Text variant="tertiary" size="sm">• Al raggiungimento delle ore impostate, apparirà un banner di richiesta pulizia</Text>
-            <Text variant="tertiary" size="sm">• La stufa non potrà essere accesa (né manualmente né automaticamente) finché non confermi la pulizia</Text>
-            <Text variant="tertiary" size="sm">• Dopo la conferma, il contatore si azzererà automaticamente</Text>
+          <ul className="space-y-1 list-disc list-inside">
+            <li><Text variant="tertiary" size="sm" as="span">Il contatore aumenta automaticamente ogni minuto quando la stufa è in funzione (status WORK)</Text></li>
+            <li><Text variant="tertiary" size="sm" as="span">Al raggiungimento delle ore impostate, apparirà un banner di richiesta pulizia</Text></li>
+            <li><Text variant="tertiary" size="sm" as="span">La stufa non potrà essere accesa (né manualmente né automaticamente) finché non confermi la pulizia</Text></li>
+            <li><Text variant="tertiary" size="sm" as="span">Dopo la conferma, il contatore si azzererà automaticamente</Text></li>
           </ul>
         </Card>
       </div>

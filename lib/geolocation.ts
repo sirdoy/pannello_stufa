@@ -34,7 +34,7 @@ export interface GeolocationError extends Error {
  * Error codes for geolocation failures
  * Standardized codes that map to browser GeolocationPositionError codes
  */
-export const GEOLOCATION_ERRORS = {
+const GEOLOCATION_ERRORS = {
   NOT_SUPPORTED: 'GEOLOCATION_NOT_SUPPORTED',
   PERMISSION_DENIED: 'PERMISSION_DENIED',
   POSITION_UNAVAILABLE: 'POSITION_UNAVAILABLE',
@@ -46,7 +46,7 @@ export const GEOLOCATION_ERRORS = {
  * Italian error messages for UI display
  * Maps error codes to user-friendly messages
  */
-export const GEOLOCATION_ERROR_MESSAGES = {
+const GEOLOCATION_ERROR_MESSAGES = {
   [GEOLOCATION_ERRORS.NOT_SUPPORTED]: 'Geolocalizzazione non supportata dal browser',
   [GEOLOCATION_ERRORS.PERMISSION_DENIED]: 'Permesso di geolocalizzazione negato',
   [GEOLOCATION_ERRORS.POSITION_UNAVAILABLE]: 'Posizione non disponibile',

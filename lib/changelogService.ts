@@ -119,5 +119,3 @@ const changelogService = {
   getVersionType,
   syncVersionHistoryToFirebase,
 };
-
-export default changelogService;

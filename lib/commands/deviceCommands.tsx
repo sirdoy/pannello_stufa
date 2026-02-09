@@ -101,7 +101,7 @@ async function executeLightsAction(endpoint: string, method: string = 'PUT', bod
 /**
  * Get stove commands
  */
-export function getStoveCommands(): CommandGroup {
+function getStoveCommands(): CommandGroup {
   return {
     heading: 'Stufa',
     items: [
@@ -178,7 +178,7 @@ export function getStoveCommands(): CommandGroup {
 /**
  * Get thermostat commands
  */
-export function getThermostatCommands(): CommandGroup {
+function getThermostatCommands(): CommandGroup {
   return {
     heading: 'Termostato',
     items: [
@@ -228,7 +228,7 @@ export function getThermostatCommands(): CommandGroup {
 /**
  * Get lights commands
  */
-export function getLightsCommands(): CommandGroup {
+function getLightsCommands(): CommandGroup {
   return {
     heading: 'Luci',
     items: [
@@ -291,5 +291,3 @@ export function getDeviceCommands(): CommandGroup[] {
     getLightsCommands(),
   ];
 }
-
-export default getDeviceCommands;

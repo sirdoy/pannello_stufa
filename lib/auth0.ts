@@ -65,7 +65,7 @@ interface RouteContext {
  * @param handler - Async function that receives NextRequest
  * @returns Wrapped handler compatible with App Router
  */
-export function withAuth(
+function withAuth(
   handler: (request: NextRequest, context: RouteContext) => Promise<NextResponse>
 ): (request: NextRequest, context: RouteContext) => Promise<NextResponse> {
   return async function wrappedHandler(request: NextRequest, context: RouteContext): Promise<NextResponse> {

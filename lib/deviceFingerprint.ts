@@ -64,7 +64,7 @@ export interface DeviceFingerprint {
  * @param {string} userAgent - Navigator.userAgent string
  * @returns {Object} Parsed device information
  */
-export function parseUserAgent(userAgent: string | null | undefined): ParsedDeviceInfo {
+function parseUserAgent(userAgent: string | null | undefined): ParsedDeviceInfo {
   if (!userAgent) {
     return {
       browser: { name: 'Unknown', version: '' },
@@ -187,7 +187,7 @@ export function getCurrentDeviceFingerprint(): DeviceFingerprint | null {
  * @param {Object} fp2 - Second fingerprint
  * @returns {boolean} True if same device
  */
-export function isSameDevice(fp1: DeviceFingerprint | null | undefined, fp2: DeviceFingerprint | null | undefined): boolean {
+function isSameDevice(fp1: DeviceFingerprint | null | undefined, fp2: DeviceFingerprint | null | undefined): boolean {
   if (!fp1?.deviceId || !fp2?.deviceId) return false;
   return fp1.deviceId === fp2.deviceId;
 }
@@ -197,7 +197,7 @@ export function isSameDevice(fp1: DeviceFingerprint | null | undefined, fp2: Dev
  * @param {Object} deviceInfo - Device info from fingerprint
  * @returns {string} Formatted string
  */
-export function formatDeviceInfo(deviceInfo: DeviceInfo | null | undefined): string {
+function formatDeviceInfo(deviceInfo: DeviceInfo | null | undefined): string {
   if (!deviceInfo) return 'Unknown device';
 
   const parts: string[] = [];

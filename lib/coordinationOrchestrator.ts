@@ -537,9 +537,3 @@ export async function sendCoordinationNotification(userId: string, type: string,
   }
 }
 
-export default {
-  processCoordinationCycle,
-  applySetpointBoost,
-  restorePreviousSetpoints,
-  sendCoordinationNotification,
-};

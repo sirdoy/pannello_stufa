@@ -18,4 +18,4 @@ const firestore: Firestore = getFirestore(app);
 
 // Export app instance (necessaria per Firebase Messaging)
 // Export both Realtime Database and Firestore
-export { app, db, db as database, firestore };
+export { db, db as database };

@@ -32,7 +32,7 @@ export function isDevelopment(): boolean {
  * Get Firebase path prefix for current environment
  * @returns {string} - Empty string for production, 'dev/' for development
  */
-export function getEnvironmentPrefix(): string {
+function getEnvironmentPrefix(): string {
   return isDevelopment() ? 'dev/' : '';
 }
 
@@ -59,14 +59,14 @@ export function getEnvironmentPath(basePath: string): string {
  * Get current environment name
  * @returns {'development' | 'production'}
  */
-export function getEnvironmentName(): 'development' | 'production' {
+function getEnvironmentName(): 'development' | 'production' {
   return isDevelopment() ? 'development' : 'production';
 }
 
 /**
  * Log environment info (useful for debugging)
  */
-export function logEnvironmentInfo(): void {
+function logEnvironmentInfo(): void {
   const env = getEnvironmentName();
   const prefix = getEnvironmentPrefix();
 

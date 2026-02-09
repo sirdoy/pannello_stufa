@@ -28,7 +28,7 @@ export type DevicePreferences = Record<string, boolean>;
 /**
  * Get device preferences for a user (CLIENT-SIDE - uses client SDK)
  */
-export async function getDevicePreferences(userId: string): Promise<DevicePreferences> {
+async function getDevicePreferences(userId: string): Promise<DevicePreferences> {
   if (!userId) {
     console.warn('getDevicePreferences: no userId provided');
     return getDefaultPreferences();
@@ -108,7 +108,7 @@ export async function updateDevicePreferences(userId: string, preferences: Parti
  * @param {string} deviceId - Device ID to toggle
  * @returns {Promise<boolean>} New enabled state
  */
-export async function toggleDevicePreference(userId: string, deviceId: string): Promise<boolean> {
+async function toggleDevicePreference(userId: string, deviceId: string): Promise<boolean> {
   // Use Admin SDK since this is a write operation
   const prefs = await getDevicePreferencesAdmin(userId);
   const newState = !prefs[deviceId];
@@ -140,7 +140,7 @@ function getDefaultPreferences(): DevicePreferences {
  * @param {string} userId - Auth0 user ID
  * @returns {Promise<Array>} Array of enabled device configs
  */
-export async function getEnabledDevicesForUser(userId: string): Promise<unknown[]> {
+async function getEnabledDevicesForUser(userId: string): Promise<unknown[]> {
   const preferences = await getDevicePreferences(userId);
 
   return Object.values(DEVICE_CONFIG).filter(device => {
@@ -154,7 +154,7 @@ export async function getEnabledDevicesForUser(userId: string): Promise<unknown[
  * @param {string} deviceId - Device ID
  * @returns {Promise<boolean>} Whether device is enabled
  */
-export async function isDeviceEnabled(userId: string, deviceId: string): Promise<boolean> {
+async function isDeviceEnabled(userId: string, deviceId: string): Promise<boolean> {
   const preferences = await getDevicePreferences(userId);
   return preferences[deviceId] === true;
 }

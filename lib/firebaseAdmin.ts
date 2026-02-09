@@ -650,7 +650,7 @@ export async function sendNotificationToUser(userId: string, notification: Notif
  * Helper: Verifica se un token è valido
  * (Utile per cleanup token obsoleti/invalidi)
  */
-export async function verifyFCMToken(token: string): Promise<boolean> {
+async function verifyFCMToken(token: string): Promise<boolean> {
   try {
     initializeFirebaseAdmin();
 

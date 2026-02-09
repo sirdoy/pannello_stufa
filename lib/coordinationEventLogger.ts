@@ -258,8 +258,3 @@ export async function getCoordinationStats(
   }
 }
 
-export default {
-  logCoordinationEvent,
-  getRecentCoordinationEvents,
-  getCoordinationStats,
-};

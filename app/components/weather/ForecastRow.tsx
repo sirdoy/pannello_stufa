@@ -46,7 +46,7 @@ export function ForecastRow({ forecast, onDayClick }: ForecastRowProps) {
   return (
     <div
       className="grid grid-cols-5 gap-2"
-      role="list"
+      role="group"
       aria-label="Previsioni 5 giorni"
     >
       {forecast.slice(0, 5).map((day, index) => (

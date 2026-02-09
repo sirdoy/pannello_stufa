@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 44 of 48 (Library Strict Mode Foundation)
-Plan: 6 of 7 in current phase
-Status: In progress
-Last activity: 2026-02-09 - Completed quick task 16: fix weather tab coordinates from config
+Plan: 7 of 7 in current phase
+Status: Phase 44 complete
+Last activity: 2026-02-09 - Completed 44-07-PLAN.md (lib/ test strict-mode completion)
 
-Progress: [████████████████████████████████████████████░░░░] 93% (214/228 estimated total plans)
+Progress: [████████████████████████████████████████████░░░░] 94% (215/228 estimated total plans)
 
 ## Performance Metrics
 
@@ -41,7 +41,8 @@ Progress: [███████████████████████
 | Phase 44 P02 | 676s | 2 tasks | 3 files |
 | Phase 44 P03 | 11s | 2 tasks | 5 files |
 | Phase 44 P05 | 697s | 2 tasks | 8 files |
-| Phase 44 P06 | 11 | 2 tasks | 8 files |
+| Phase 44 P06 | 11s | 2 tasks | 8 files |
+| Phase 44 P07 | 663s | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -62,6 +63,9 @@ Recent decisions from PROJECT.md affecting v5.1 work:
 - [Phase 44-05]: Type-cast Record index access where dynamic keys validated at runtime
 - [Phase 44-06]: Export utility types (GeofenceConfig, GeofenceActions) from modules for hook consumption
 - [Phase 44-06]: BeforeInstallPromptEvent interface for non-standard PWA API
+- [Phase 44-07]: Transaction callback type assertions for adminDbTransaction with typed parameters
+- [Phase 44-07]: Test-specific pragmatic any for intentional null/undefined test cases
+- [Phase 44-07]: Non-null assertions (!) in tests for data known to exist
 
 ### Pending Todos
 
@@ -77,13 +81,11 @@ None yet.
 ### Blockers/Concerns
 
 **Known Issues to Address in v5.1:**
-- Phase 44-47: ~1841 tsc errors with strict mode enabled
-  - 768 noImplicitAny errors (parameters, variables, binding elements)
-  - 188 strictNullChecks errors (null/undefined handling)
-  - 419 type mismatch errors (arguments, assignments, property access)
-  - 91 implicit index access errors (dynamic property access)
-  - 436 noUncheckedIndexedAccess errors (array/object indexing)
-  - 30 misc errors (module declarations, spread types, etc.)
+- **Phase 44 COMPLETE:** lib/ directory now has 0 tsc errors (down from initial count)
+- Phase 45-47: ~1197 tsc errors remaining with strict mode enabled
+  - Primary focus: app/ directory (~400 errors)
+  - Secondary: components/ directory (~500 errors)
+  - Final: gap closure and verification (~100 errors)
 - Phase 47: 1 failing test (FormModal cancel behavior — onClose called twice)
 - Phase 47: Worker teardown warning during test runs
 - Phase 48: Dead code removal needed (unused exports, files, dependencies)
@@ -95,9 +97,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-09 08:44
-Stopped at: Completed quick-16 (fix weather tab coordinates from config, 2 files updated)
-Resume file: None — ready to continue with phase 44 or additional quick tasks
+Last session: 2026-02-09 08:55
+Stopped at: Completed 44-07-PLAN.md (lib/ test strict-mode completion, phase 44 complete)
+Resume file: None — ready to continue with phase 45 (app/ strict-mode) or additional quick tasks
 
 ---
 *State initialized: 2026-02-08 for v5.1 Tech Debt & Code Quality milestone*

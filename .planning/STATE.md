@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 47 of 48 (Test Strict Mode and Index Access)
-Plan: 5 of 8 in current phase
+Plan: 6 of 8 in current phase
 Status: In Progress
-Last activity: 2026-02-09 - Completed 47-05-PLAN.md (Fixed 117 noUncheckedIndexedAccess errors in design-system page and 8 scheduler components)
+Last activity: 2026-02-09 - Completed 47-06-PLAN.md (Fixed 103 noUncheckedIndexedAccess errors in 16 debug files and 8 API routes)
 
-Progress: [████████████████████████████████████████████░░░░] 99% (238/236 estimated total plans)
+Progress: [████████████████████████████████████████████░░░░] 99% (239/236 estimated total plans)
 
 ## Performance Metrics
 
@@ -61,6 +61,7 @@ Progress: [███████████████████████
 | Phase 47 P01 | 262s | 2 tasks | 3 files |
 | Phase 47 P02 | 313s | 2 tasks | 3 files |
 | Phase 47 P03 | 819s | 2 tasks | 20 files |
+| Phase 47 P06 | 824s | 2 tasks | 24 files |
 | Phase 47 P05 | 683s | 2 tasks | 9 files |
 
 ## Accumulated Context
@@ -129,6 +130,9 @@ Recent decisions from PROJECT.md affecting v5.1 work:
 - [Phase 47-02]: Non-null assertions (!) safe for nextSlot when test setup guarantees data presence
 - [Phase 47-02]: Explicit React.ReactNode types required for all mock component props in strict mode
 - [Phase 47-02]: jest.Mock type annotations for test fixtures (mockRouter, mockSearchParams)
+- [Phase 47-06]: Record<string, boolean> property access requires ?? false in debug tabs (loading states)
+- [Phase 47-06]: Array index access requires optional chaining (arr?.[0]) or existence checks
+- [Phase 47-06]: Netatmo API routes require explicit home existence checks after homesData[0] access
 - [Phase 47-05]: Non-null assertions for Record<string, T> with known compile-time keys (componentDocs.Button!)
 - [Phase 47-05]: Non-null assertions for guaranteed string format destructuring (time.split(':').map(Number))
 - [Phase 47-05]: Early return guards for array index access when bounds not guaranteed
@@ -161,8 +165,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-09 15:48
-Stopped at: Completed 47-05-PLAN.md (Fixed 117 noUncheckedIndexedAccess errors in design-system page and 8 scheduler components)
+Last session: 2026-02-09 14:48
+Stopped at: Completed 47-06-PLAN.md (Fixed 103 noUncheckedIndexedAccess errors in debug tabs and API routes)
 Resume file: None — continue with next plan in phase 47
 
 ---

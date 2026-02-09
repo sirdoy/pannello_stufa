@@ -146,7 +146,7 @@ export default function ParsedEventsPage() {
 
   if (loading) {
     return (
-      <Section title="Eventi Camera" description="Caricamento..." spacing="lg">
+      <Section title="Eventi Camera" description="Caricamento..." spacing="lg" level={1}>
         <div className="space-y-4">
           {[...Array(5)].map((_, i) => (
             <Skeleton.Card key={i} className="h-24" />
@@ -158,7 +158,7 @@ export default function ParsedEventsPage() {
 
   if (error) {
     return (
-      <Section title="Eventi Camera" spacing="lg">
+      <Section title="Eventi Camera" spacing="lg" level={1}>
         <Banner
           variant="error"
           title="Errore"
@@ -178,7 +178,7 @@ export default function ParsedEventsPage() {
 
   if (events.length === 0) {
     return (
-      <Section title="Eventi Camera" spacing="lg">
+      <Section title="Eventi Camera" spacing="lg" level={1}>
         <EmptyState
           icon="📹"
           title="Nessun evento registrato"
@@ -203,6 +203,7 @@ export default function ParsedEventsPage() {
       title="Eventi Camera"
       description={eventsDescription}
       spacing="lg"
+      level={1}
       action={
         <div className="flex gap-2">
           <Button
@@ -258,7 +259,7 @@ export default function ParsedEventsPage() {
         {Object.entries(groupedEvents).map(([date, dateEvents]) => (
           <Card key={date}>
             <CardHeader>
-              <CardTitle icon="📅">
+              <CardTitle icon="📅" level={2}>
                 {date}
                 <span className="ml-2 text-sm font-normal text-slate-400">
                   ({dateEvents.length} {dateEvents.length === 1 ? 'evento' : 'eventi'})

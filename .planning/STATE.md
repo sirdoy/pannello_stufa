@@ -6,14 +6,14 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** Phase 44 - Library Strict Mode Foundation (v5.1 Tech Debt & Code Quality)
+**Current focus:** Phase 45 - Component Strict Mode Compliance (v5.1 Tech Debt & Code Quality)
 
 ## Current Position
 
-Phase: 44 of 48 (Library Strict Mode Foundation)
-Plan: 7 of 7 in current phase
-Status: Phase 44 complete
-Last activity: 2026-02-09 - Completed 44-07-PLAN.md (lib/ test strict-mode completion)
+Phase: 45 of 48 (Component Strict Mode Compliance)
+Plan: 2 of 8 in current phase
+Status: In progress
+Last activity: 2026-02-09 - Completed 45-02-PLAN.md (device components strict-mode compliance)
 
 Progress: [████████████████████████████████████████████░░░░] 94% (215/228 estimated total plans)
 
@@ -43,6 +43,8 @@ Progress: [███████████████████████
 | Phase 44 P05 | 697s | 2 tasks | 8 files |
 | Phase 44 P06 | 11s | 2 tasks | 8 files |
 | Phase 44 P07 | 663s | 2 tasks | 14 files |
+| Phase 45 P06 | 505 | 2 tasks | 2 files |
+| Phase 45 P02 | 506 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -66,6 +68,8 @@ Recent decisions from PROJECT.md affecting v5.1 work:
 - [Phase 44-07]: Transaction callback type assertions for adminDbTransaction with typed parameters
 - [Phase 44-07]: Test-specific pragmatic any for intentional null/undefined test cases
 - [Phase 44-07]: Non-null assertions (!) in tests for data known to exist
+- [Phase 45]: Use error instanceof Error checks for catch blocks in device components
+- [Phase 45]: WebGL context null checks: single guard in each function eliminates cascading errors
 
 ### Pending Todos
 

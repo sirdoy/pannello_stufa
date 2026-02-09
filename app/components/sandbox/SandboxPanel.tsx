@@ -89,7 +89,7 @@ export default function SandboxPanel() {
       setTestIntervalStart(`${startHour}:${startMin}`);
       setTestIntervalEnd(`${endHour}:${startMin}`);
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
@@ -114,12 +114,12 @@ export default function SandboxPanel() {
     checkEnvironment();
   }, [checkEnvironment]);
 
-  async function handleUpdateState(updates) {
+  async function handleUpdateState(updates: any) {
     try {
       await updateSandboxStoveState(updates);
       await loadData();
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     }
   }
 
@@ -128,7 +128,7 @@ export default function SandboxPanel() {
       await updateSandboxMaintenanceHours(Number(newHours));
       await loadData();
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     }
   }
 
@@ -137,25 +137,25 @@ export default function SandboxPanel() {
       await resetSandboxMaintenance();
       await loadData();
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     }
   }
 
-  async function handleSetError(errorKey) {
+  async function handleSetError(errorKey: string) {
     try {
       await setSandboxError(errorKey);
       await loadData();
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     }
   }
 
-  async function handleUpdateSettings(key, value) {
+  async function handleUpdateSettings(key: string, value: any) {
     try {
       await updateSandboxSettings({ [key]: value });
       await loadData();
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     }
   }
 
@@ -165,7 +165,7 @@ export default function SandboxPanel() {
         await resetSandbox();
         await loadData();
       } catch (err) {
-        setError(err.message);
+        setError(err instanceof Error ? err.message : String(err));
       }
     }
   }
@@ -176,7 +176,7 @@ export default function SandboxPanel() {
       await setSchedulerMode(!schedulerMode.enabled);
       await loadData();
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     }
   }
 
@@ -185,7 +185,7 @@ export default function SandboxPanel() {
       await clearSemiManualMode();
       await loadData();
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     }
   }
 
@@ -215,7 +215,7 @@ export default function SandboxPanel() {
       setError(null);
       alert(`✅ Intervallo di test creato per ${today}!\n${testIntervalStart} - ${testIntervalEnd} (P${testIntervalPower}, V${testIntervalFan})`);
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     }
   }
 
@@ -227,7 +227,7 @@ export default function SandboxPanel() {
         await saveSchedule(today, []);
         await loadData();
       } catch (err) {
-        setError(err.message);
+        setError(err instanceof Error ? err.message : String(err));
       }
     }
   }
@@ -464,6 +464,7 @@ export default function SandboxPanel() {
           </Button>
           {Object.entries(SANDBOX_ERRORS).map(([key, value]) => {
             if (key === 'NONE') return null;
+            if (!value || !value.code || !value.description) return null;
             return (
               <Button
                 key={key}

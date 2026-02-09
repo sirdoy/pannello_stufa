@@ -78,11 +78,11 @@ function ManualSetpointInput({ value, onChange, disabled }: ManualSetpointInputP
   const MAX_TEMP = 25;
   const STEP = 0.5;
 
-  const handleSliderChange = (e) => {
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(parseFloat(e.target.value));
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseFloat(e.target.value);
     if (!isNaN(newValue) && newValue >= MIN_TEMP && newValue <= MAX_TEMP) {
       onChange(newValue);
@@ -336,10 +336,18 @@ function TemperatureDisplay({ room, manualSetpoint, kp, ki, kd }: TemperatureDis
   );
 }
 
+interface AdvancedSettingsProps {
+  kp: number;
+  ki: number;
+  kd: number;
+  onChange: (gain: string, value: number) => void;
+  disabled: boolean;
+}
+
 /**
  * Advanced Settings (PID Gains) - Collapsible
  */
-function AdvancedSettings({ kp, ki, kd, onChange, disabled }) {
+function AdvancedSettings({ kp, ki, kd, onChange, disabled }: AdvancedSettingsProps) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -427,27 +435,36 @@ function AdvancedSettings({ kp, ki, kd, onChange, disabled }) {
   );
 }
 
+interface PIDConfig {
+  enabled: boolean;
+  targetRoomId: string | null;
+  manualSetpoint: number;
+  kp: number;
+  ki: number;
+  kd: number;
+}
+
 export default function PidAutomationPanel() {
   const { user, isLoading: userLoading } = useUser();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
   // Config state
   const [enabled, setEnabled] = useState(false);
-  const [targetRoomId, setTargetRoomId] = useState(null);
+  const [targetRoomId, setTargetRoomId] = useState<string | null>(null);
   const [manualSetpoint, setManualSetpoint] = useState(20);
   const [kp, setKp] = useState(0.5);
   const [ki, setKi] = useState(0.1);
   const [kd, setKd] = useState(0.05);
 
   // Rooms from Netatmo
-  const [rooms, setRooms] = useState([]);
+  const [rooms, setRooms] = useState<RoomData[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
 
   // Original config for reset
-  const [originalConfig, setOriginalConfig] = useState(null);
+  const [originalConfig, setOriginalConfig] = useState<PIDConfig | null>(null);
 
   // Load config and rooms on mount
   useEffect(() => {
@@ -487,7 +504,7 @@ export default function PidAutomationPanel() {
         return () => unsubscribe();
       } catch (err) {
         console.error('Error loading PID config:', err);
-        setError(err.message);
+        setError(err instanceof Error ? err.message : String(err));
         setLoading(false);
       }
     };
@@ -496,25 +513,25 @@ export default function PidAutomationPanel() {
   }, [user, userLoading]);
 
   // Track changes
-  const handleEnabledChange = (value) => {
+  const handleEnabledChange = (value: boolean) => {
     setEnabled(value);
     setHasChanges(true);
     setSuccess(false);
   };
 
-  const handleRoomChange = (roomId) => {
+  const handleRoomChange = (roomId: string | null) => {
     setTargetRoomId(roomId);
     setHasChanges(true);
     setSuccess(false);
   };
 
-  const handleSetpointChange = (value) => {
+  const handleSetpointChange = (value: number) => {
     setManualSetpoint(value);
     setHasChanges(true);
     setSuccess(false);
   };
 
-  const handleGainChange = (gain, value) => {
+  const handleGainChange = (gain: string, value: number) => {
     if (gain === 'kp') setKp(value);
     else if (gain === 'ki') setKi(value);
     else if (gain === 'kd') setKd(value);
@@ -550,7 +567,7 @@ export default function PidAutomationPanel() {
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       console.error('Error saving PID config:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setSaving(false);
     }
@@ -571,7 +588,7 @@ export default function PidAutomationPanel() {
   };
 
   // Get selected room for temperature display
-  const selectedRoom = rooms.find((r) => String(r.room_id) === String(targetRoomId));
+  const selectedRoom = rooms.find((r) => String(r.room_id) === String(targetRoomId)) || null;
 
   // Loading state
   if (userLoading || loading) {
@@ -635,7 +652,7 @@ export default function PidAutomationPanel() {
           </div>
           <Toggle
             checked={enabled}
-            onChange={handleEnabledChange}
+            onCheckedChange={handleEnabledChange}
             disabled={saving}
             label="Abilita automazione PID"
             size="md"

@@ -68,7 +68,7 @@ function RoomCheckbox({ room, selected, onChange, disabled }: RoomCheckboxProps)
 }
 
 function getRoomTypeIcon(type: string): string {
-  const types = {
+  const types: Record<string, string> = {
     livingroom: '🛋️',
     bedroom: '🛏️',
     kitchen: '🍳',
@@ -80,7 +80,7 @@ function getRoomTypeIcon(type: string): string {
 }
 
 function getRoomTypeLabel(type: string): string {
-  const types = {
+  const types: Record<string, string> = {
     livingroom: 'Soggiorno',
     bedroom: 'Camera',
     kitchen: 'Cucina',
@@ -131,7 +131,7 @@ export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) 
       // Initialize form state from config
       setEnabled(data.config?.enabled || false);
       setStoveTemperature(data.config?.stoveTemperature || 16);
-      setSelectedRoomIds(data.config?.rooms?.map(r => r.id) || []);
+      setSelectedRoomIds(data.config?.rooms?.map((r: RoomData) => r.id) || []);
 
     } catch (err) {
       console.error('Error fetching stove sync config:', err);
@@ -181,7 +181,7 @@ export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) 
 
       const rooms = selectedRoomIds.map(id => {
         const room = availableRooms.find(r => r.id === id);
-        return { id: room.id, name: room.name };
+        return { id: room?.id || id, name: room?.name || 'Unknown' };
       });
 
       const response = await fetch(NETATMO_ROUTES.stoveSync, {
@@ -262,7 +262,7 @@ export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) 
     // Reset to saved config
     setEnabled(config?.enabled || false);
     setStoveTemperature(config?.stoveTemperature || 16);
-    setSelectedRoomIds(config?.rooms?.map(r => r.id) || []);
+    setSelectedRoomIds(config?.rooms?.map((r: RoomData) => r.id) || []);
     setHasChanges(false);
     setSuccess(false);
     setError(null);
@@ -489,7 +489,7 @@ export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) 
               <>
                 <li>
                   <Text variant="tertiary" size="sm">
-                    • Stanze: <strong>{config.rooms.map(r => r.name).join(', ')}</strong>
+                    • Stanze: <strong>{config.rooms.map((r: RoomData) => r.name).join(', ')}</strong>
                   </Text>
                 </li>
                 <li>

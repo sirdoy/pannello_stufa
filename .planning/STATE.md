@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 51 of 54 (E2E Test Improvements)
-Plan: 03 completed
-Status: Phase 51 in progress - Notification delivery test and CI workflow complete
-Last activity: 2026-02-10 - Completed quick task 19: rimuovi tutti i comandi long-press da mobile
+Plan: 04 completed
+Status: Phase 51 in progress - Missing dotenv dependency added for local E2E test execution
+Last activity: 2026-02-10 - Completed plan 51-04: Add missing dotenv dependency
 
-Progress: [████████░░] 85.9% (258 of 300+ estimated total plans)
+Progress: [████████░░] 86.3% (259 of 300+ estimated total plans)
 
 ## Performance Metrics
 
@@ -63,6 +63,7 @@ Progress: [████████░░] 85.9% (258 of 300+ estimated total pl
 | 51-01 | 2.6 min | 3 | 5 | 2026-02-10 | Complete ✅ |
 | 51-02 | 2 min | 2 | 3 | 2026-02-10 | Complete ✅ |
 | 51-03 | 1.9 min | 2 | 3 | 2026-02-10 | Complete ✅ |
+| 51-04 | 1.0 min | 1 | 1 | 2026-02-10 | Complete ✅ |
 
 ## Accumulated Context
 
@@ -104,6 +105,7 @@ Recent decisions affecting v6.0 work (full log in PROJECT.md):
 - [Phase 51-03]: Notification tests validate UI only, no FCM service worker interaction (Playwright cannot test Push API)
 - [Phase 51-03]: GitHub encrypted secrets for all Auth0 and Firebase credentials (user configures secrets in repository settings)
 - [Phase 51-03]: Blob reporter in CI for compact binary artifacts (suitable for merging parallel results)
+- [Phase 51-04]: dotenv ^16.4.5 chosen for Playwright config: Caret range allows patch updates, matches ecosystem standard
 
 ### Pending Todos
 
@@ -135,10 +137,10 @@ None yet for v6.0. Use `/gsd:add-todo` to capture ideas during execution.
 ## Session Continuity
 
 Last session: 2026-02-10
-Stopped at: Completed Phase 51 Plan 03 (Notification delivery test and CI workflow)
+Stopped at: Completed Phase 51 Plan 04 (Add missing dotenv dependency)
 Resume file: None
 
-Next action: Continue Phase 51 (Plan 03: GitHub Actions CI workflow) or next phase
+Next action: Continue Phase 51 or next phase
 
 ---
 *State updated: 2026-02-10 after completing Quick Task 18*

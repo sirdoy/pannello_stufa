@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Power, Plus, Minus, Calendar, Home, Snowflake, Settings, RefreshCw } from 'lucide-react';
+import { Plus, Minus, Calendar, Settings, RefreshCw } from 'lucide-react';
 import { NETATMO_ROUTES } from '@/lib/routes';
 import { getNetatmoAuthUrl } from '@/lib/netatmoCredentials';
 import { cn } from '@/lib/utils/cn';
@@ -680,34 +680,6 @@ export default function ThermostatCard() {
                     </div>
                   )}
                 </div>
-                )}
-
-                {/* Quick Actions Bar - Icon buttons */}
-                {!selectedRoom.isOffline && (
-                  <div className="flex items-center justify-center gap-3 mt-4">
-                    {/* Mode Quick Cycle */}
-                    <Button
-                      aria-label={`Modalita attuale: ${mode}. Clicca per cambiare`}
-                      variant="subtle"
-                      size="md"
-                      className="p-3"
-                      onClick={() => {
-                        // Cycle: schedule -> away -> hg -> off -> schedule
-                        const modes = ['schedule', 'away', 'hg', 'off'];
-                        const nextIndex = (modes.indexOf(mode) + 1) % modes.length;
-                        const nextMode = modes[nextIndex];
-                        if (nextMode) {
-                          handleModeChange(nextMode);
-                        }
-                      }}
-                      disabled={refreshing}
-                    >
-                      {mode === 'schedule' ? <Calendar className="w-5 h-5" /> :
-                       mode === 'away' ? <Home className="w-5 h-5" /> :
-                       mode === 'hg' ? <Snowflake className="w-5 h-5" /> :
-                       <Power className="w-5 h-5" />}
-                    </Button>
-                  </div>
                 )}
 
                 {/* Quick temperature controls - Ember Noir */}

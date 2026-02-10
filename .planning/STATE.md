@@ -13,7 +13,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 50 of 54 (Cron Automation Configuration)
 Plan: 04 completed (PHASE COMPLETE)
 Status: Phase 50 complete - Cron automation verified end-to-end
-Last activity: 2026-02-10 - Completed quick task 17: rimuovi comandi duplicati dalle card homepage
+Last activity: 2026-02-10 - Completed quick task 18: rimuovi le quick actions da tutte le card
 
 Progress: [████████░░] 85.0% (255 of 300+ estimated total plans)
 
@@ -95,6 +95,7 @@ None yet for v6.0. Use `/gsd:add-todo` to capture ideas during execution.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 18 | remove Quick Actions bars from all device cards | 2026-02-10 | 102a823 | [18-rimuovi-le-quick-actions-da-tutte-le-car](./quick/18-rimuovi-le-quick-actions-da-tutte-le-car/) |
 | 17 | remove duplicate controls from homepage device cards | 2026-02-10 | 9c96af6 | [17-rimuovi-comandi-duplicati-dalle-card-hom](./quick/17-rimuovi-comandi-duplicati-dalle-card-hom/) |
 | 16 | fix weather tab coordinates from config | 2026-02-09 | 00f3184 | [16-fix-weather-tab-coordinates-from-config](./quick/16-fix-weather-tab-coordinates-from-config/) |
 | 15 | aggiungi la favicon | 2026-02-09 | 266bd24 | [15-aggiungi-la-favicon](./quick/15-aggiungi-la-favicon/) |
@@ -115,10 +116,10 @@ None yet for v6.0. Use `/gsd:add-todo` to capture ideas during execution.
 ## Session Continuity
 
 Last session: 2026-02-10
-Stopped at: Completed Quick Task 17 (Remove duplicate controls from homepage device cards)
+Stopped at: Completed Quick Task 18 (Remove Quick Actions bars from device cards)
 Resume file: None
 
 Next action: Start Phase 51 (Testing Automation) or continue v6.0 roadmap
 
 ---
-*State updated: 2026-02-10 after completing Quick Task 17*
+*State updated: 2026-02-10 after completing Quick Task 18*

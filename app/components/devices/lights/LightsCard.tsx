@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Power, Sun, Palette, Settings, RefreshCw } from 'lucide-react';
+import { Power, Palette, Settings, RefreshCw } from 'lucide-react';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
 import RoomSelector from '../../ui/RoomSelector';
@@ -965,33 +965,6 @@ export default function LightsCard() {
             onClick={() => handleRoomToggle(selectedRoomGroupedLightId || undefined, !isRoomOn)}
             disabled={refreshing || !selectedRoomGroupedLightId}
           />
-          {isRoomOn && (
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800/50 border border-slate-700/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
-              <Sun className="w-4 h-4 text-warning-400 [html:not(.dark)_&]:text-warning-700" />
-              <Slider
-                value={localBrightness !== null ? localBrightness : avgBrightness}
-                onChange={((value: number | number[]) => {
-                  const numValue = Array.isArray(value) ? value[0] : value;
-                  if (numValue !== undefined) {
-                    setLocalBrightness(numValue);
-                  }
-                }) as any}
-                onValueCommit={((value: number | number[]) => {
-                  const numValue = Array.isArray(value) ? value[0] : value;
-                  if (numValue !== undefined) {
-                    handleBrightnessChange(selectedRoomGroupedLightId || undefined, numValue.toString());
-                  }
-                  setLocalBrightness(null);
-                }) as any}
-                min={1}
-                max={100}
-                variant="ember"
-                className="w-24"
-                aria-label="Luminosita"
-                disabled={refreshing || !selectedRoomGroupedLightId}
-              />
-            </div>
-          )}
         </div>
       )}
 

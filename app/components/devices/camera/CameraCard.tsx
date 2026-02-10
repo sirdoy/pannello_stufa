@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { RefreshCw, Camera, Video, Image, Activity, Settings } from 'lucide-react';
+import { RefreshCw, Camera, Activity, Settings } from 'lucide-react';
 import { CAMERA_ROUTES, NETATMO_ROUTES } from '@/lib/routes';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
@@ -290,15 +290,6 @@ export default function CameraCard() {
           onClick={() => selectedCameraId && fetchSnapshot(selectedCameraId)}
           disabled={snapshotLoading || !selectedCameraId}
         />
-        {selectedCamera?.status === 'on' && (
-          <Button.Icon
-            icon={(isLiveMode ? <Image className="w-5 h-5" /> : <Video className="w-5 h-5" />) as any}
-            aria-label={isLiveMode ? "Mostra Snapshot" : "Mostra Live"}
-            variant="subtle"
-            size="md"
-            onClick={() => setIsLiveMode(!isLiveMode)}
-          />
-        )}
       </div>
 
       {/* Camera selector if multiple */}

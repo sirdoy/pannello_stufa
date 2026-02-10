@@ -1,0 +1,154 @@
+# Requirements: Pannello Stufa v6.0
+
+**Defined:** 2026-02-10
+**Core Value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
+
+## v6.0 Requirements
+
+Requirements for v6.0 Operations, PWA & Analytics. Each maps to roadmap phases.
+
+### Cron Automation
+
+- [ ] **CRON-01**: Health monitoring stufa gira automaticamente ogni 5 minuti senza intervento manuale
+- [ ] **CRON-02**: Coordinazione stufa-termostato gira automaticamente ogni 5 minuti
+- [ ] **CRON-03**: Scheduler check esegue tutte le operazioni entro il timeout Vercel (orchestrator pattern con fire-and-forget)
+- [ ] **CRON-04**: Dead man's switch monitora che il cron stesso stia girando (alerta se >15 min senza esecuzione)
+- [ ] **CRON-05**: Log di esecuzione cron visibili nella monitoring dashboard con timestamp e durata
+
+### Persistent Rate Limiting
+
+- [ ] **RATE-01**: Rate limiter notifiche usa Firebase RTDB transactions invece di in-memory Map
+- [ ] **RATE-02**: Rate limits persistono tra cold starts Vercel (nessun reset al deploy)
+- [ ] **RATE-03**: Sliding window algorithm con cleanup automatico delle finestre scadute
+- [ ] **RATE-04**: Rate limiter Netatmo API migrato a Firebase RTDB (stesso pattern)
+- [ ] **RATE-05**: Feature flag per rollout graduale (in-memory fallback se Firebase non risponde)
+
+### E2E Test Improvements
+
+- [ ] **E2E-01**: Playwright auth setup con OAuth flow Auth0 reale (non mocked)
+- [ ] **E2E-02**: Session state caching per evitare login ripetuti (storageState pattern)
+- [ ] **E2E-03**: Test flow critico: accensione stufa con verifica stato
+- [ ] **E2E-04**: Test flow critico: cambio schedule termostato
+- [ ] **E2E-05**: Test flow critico: invio notifica push e verifica delivery
+- [ ] **E2E-06**: CI integration con GitHub Actions (test automatici su PR)
+
+### Interactive Push Notifications
+
+- [ ] **PUSH-01**: Notifica stufa ha action button "Spegni stufa" che esegue spegnimento direttamente
+- [ ] **PUSH-02**: Notifica termostato ha action button "Imposta manuale" per override temperatura
+- [ ] **PUSH-03**: Service worker gestisce notificationclick con action detection e chiamata API
+- [ ] **PUSH-04**: Payload FCM platform-specific (iOS aps.category, Android notification.clickAction)
+- [ ] **PUSH-05**: Graceful degradation su piattaforme che non supportano action buttons (fallback a tap → open app)
+- [ ] **PUSH-06**: Action buttons funzionano anche offline via Background Sync (queue + execute on reconnect)
+
+### PWA Offline & Install
+
+- [ ] **PWA-01**: Banner "Sei offline" visibile quando connessione assente con timestamp ultimo aggiornamento
+- [ ] **PWA-02**: Indicatore staleness su StoveCard e ThermostatCard quando dati cached > 30 secondi
+- [ ] **PWA-03**: Controlli dispositivi disabilitati quando offline (previene azioni su stato stale)
+- [ ] **PWA-04**: Coda comandi offline visibile all'utente (contatore comandi pendenti)
+- [ ] **PWA-05**: Toast di conferma quando comandi offline vengono sincronizzati al ripristino connessione
+- [ ] **PWA-06**: Install prompt PWA appare dopo 2+ visite (beforeinstallprompt event)
+- [ ] **PWA-07**: Install prompt ha UI guidata con benefici (offline, notifiche, home screen)
+- [ ] **PWA-08**: Install prompt può essere chiuso e non riappare per 30 giorni (localStorage tracking)
+
+### Analytics Dashboard
+
+- [ ] **ANLY-01**: Consent banner GDPR prima di qualsiasi tracking (blocca analytics senza consenso)
+- [ ] **ANLY-02**: Modalità "Solo essenziali" funzionale senza consenso analytics
+- [ ] **ANLY-03**: Tracking ore di accensione stufa per giorno con breakdown per power level
+- [ ] **ANLY-04**: Stima consumo pellet basata su power level × durata (formula euristica)
+- [ ] **ANLY-05**: Grafico timeline utilizzo stufa (ultimi 7/30/90 giorni selezionabili)
+- [ ] **ANLY-06**: Grafico consumo pellet stimato con totale periodo e media giornaliera
+- [ ] **ANLY-07**: Correlazione meteo-consumi: grafico sovrapposto temperatura esterna vs consumo
+- [ ] **ANLY-08**: Stats cards con totali: ore totali, kg pellet stimati, costo stimato, % automazione
+- [ ] **ANLY-09**: Aggregazione giornaliera via cron endpoint (RTDB events → RTDB daily stats)
+- [ ] **ANLY-10**: Dashboard pagina /analytics con Recharts (pattern esistente notification dashboard)
+- [ ] **ANLY-11**: Utente può calibrare stima pellet ("Ho riempito X kg oggi") per migliorare accuratezza
+
+## Future Requirements (v6.1+)
+
+### Analytics Enhancements
+- **ANLY-F01**: ML-based pellet consumption prediction con weather data
+- **ANLY-F02**: Export dati analytics in CSV
+- **ANLY-F03**: Notifiche automatiche quando consumo pellet anomalo
+- **ANLY-F04**: Confronto consumi anno su anno
+
+### PWA Enhancements
+- **PWA-F01**: Notification action undo (annulla azione entro 5 secondi)
+- **PWA-F02**: Widget-style quick controls per home screen
+- **PWA-F03**: Haptic feedback su azioni dispositivi (mobile)
+
+### Testing Enhancements
+- **E2E-F01**: Token refresh E2E testing (richiede clock manipulation)
+- **E2E-F02**: Visual regression testing con screenshot comparison
+- **E2E-F03**: Performance budget testing automatico
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Playwright migration da Cypress | 3034 test esistenti, ROI troppo basso per migrazione |
+| Redis per rate limiting | Firebase RTDB transactions sufficienti, no infrastruttura aggiuntiva |
+| Real-time pellet sensor | Hardware out of scope, solo stima software |
+| Complex ML models per consumi | Euristica sufficiente per v6.0, ML in v6.1+ |
+| Third-party analytics (GA, Mixpanel) | Privacy-first approach, Firebase only |
+| Cron UI builder | Over-engineering, configurazione via codice sufficiente |
+| Notifiche email/SMS | Già escluse in v1.0 |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| RATE-01 | Phase 49 | Pending |
+| RATE-02 | Phase 49 | Pending |
+| RATE-03 | Phase 49 | Pending |
+| RATE-04 | Phase 49 | Pending |
+| RATE-05 | Phase 49 | Pending |
+| CRON-01 | Phase 50 | Pending |
+| CRON-02 | Phase 50 | Pending |
+| CRON-03 | Phase 50 | Pending |
+| CRON-04 | Phase 50 | Pending |
+| CRON-05 | Phase 50 | Pending |
+| E2E-01 | Phase 51 | Pending |
+| E2E-02 | Phase 51 | Pending |
+| E2E-03 | Phase 51 | Pending |
+| E2E-04 | Phase 51 | Pending |
+| E2E-05 | Phase 51 | Pending |
+| E2E-06 | Phase 51 | Pending |
+| PUSH-01 | Phase 52 | Pending |
+| PUSH-02 | Phase 52 | Pending |
+| PUSH-03 | Phase 52 | Pending |
+| PUSH-04 | Phase 52 | Pending |
+| PUSH-05 | Phase 52 | Pending |
+| PUSH-06 | Phase 52 | Pending |
+| PWA-01 | Phase 53 | Pending |
+| PWA-02 | Phase 53 | Pending |
+| PWA-03 | Phase 53 | Pending |
+| PWA-04 | Phase 53 | Pending |
+| PWA-05 | Phase 53 | Pending |
+| PWA-06 | Phase 53 | Pending |
+| PWA-07 | Phase 53 | Pending |
+| PWA-08 | Phase 53 | Pending |
+| ANLY-01 | Phase 54 | Pending |
+| ANLY-02 | Phase 54 | Pending |
+| ANLY-03 | Phase 54 | Pending |
+| ANLY-04 | Phase 54 | Pending |
+| ANLY-05 | Phase 54 | Pending |
+| ANLY-06 | Phase 54 | Pending |
+| ANLY-07 | Phase 54 | Pending |
+| ANLY-08 | Phase 54 | Pending |
+| ANLY-09 | Phase 54 | Pending |
+| ANLY-10 | Phase 54 | Pending |
+| ANLY-11 | Phase 54 | Pending |
+
+**Coverage:**
+- v6.0 requirements: 42 total
+- Mapped to phases: 42
+- Unmapped: 0 ✓
+
+---
+*Requirements defined: 2026-02-10*
+*Last updated: 2026-02-10 after initial definition*

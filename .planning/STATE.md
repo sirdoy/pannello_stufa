@@ -6,14 +6,14 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** Phase 48 - Dead Code Removal (v5.1 Tech Debt & Code Quality)
+**Current focus:** v5.1 Milestone Complete — all 5 phases (44-48) shipped
 
 ## Current Position
 
 Phase: 48 of 48 (Dead Code Removal)
 Plan: 6 of 6 in current phase
-Status: Complete
-Last activity: 2026-02-10 - Completed 48-06-PLAN.md (Phase 48 complete: 40 files deleted, 4 deps removed, 203 exports eliminated, v5.1 milestone achieved)
+Status: MILESTONE COMPLETE (v5.1)
+Last activity: 2026-02-10 - Phase 48 verified passed (6/6 must-haves, 0 tsc errors, 3034 tests, v5.1 milestone shipped)
 
 Progress: [████████████████████████████████████████████████] 100% (246/246 estimated total plans)
 
@@ -21,7 +21,7 @@ Progress: [███████████████████████
 
 **Velocity:**
 - Total plans completed: 230 plans (v1.0-v5.1)
-- Milestones shipped: 7 (v1.0, v2.0, v3.0, v3.1, v3.2, v4.0, v5.0)
+- Milestones shipped: 8 (v1.0, v2.0, v3.0, v3.1, v3.2, v4.0, v5.0, v5.1)
 - Average milestone: ~32 plans
 - Current milestone: v5.1 (5 phases planned, ALL COMPLETE - phases 44-48 done)
 

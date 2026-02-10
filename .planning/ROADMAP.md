@@ -9,7 +9,7 @@
 - ✅ **v3.2 Dashboard & Weather** — Phases 25-29 (shipped 2026-02-03)
 - ✅ **v4.0 Advanced UI Components** — Phases 30-36 (shipped 2026-02-05)
 - ✅ **v5.0 TypeScript Migration** — Phases 37-43 (shipped 2026-02-08)
-- 🚧 **v5.1 Tech Debt & Code Quality** — Phases 44-48 (in progress)
+- ✅ **v5.1 Tech Debt & Code Quality** — Phases 44-48 (shipped 2026-02-10)
 
 ## Phases
 
@@ -48,7 +48,7 @@ See `.planning/milestones/` for full archives.
 
 ---
 
-## 🚧 v5.1 Tech Debt & Code Quality
+## ✅ v5.1 Tech Debt & Code Quality
 
 **Milestone Goal:** Achieve a pristine codebase — zero tsc errors everywhere (including tests), all tests green, stricter TypeScript compiler options (strict: true, noUncheckedIndexedAccess), and dead code removed.
 
@@ -151,7 +151,7 @@ Plans:
 
 ---
 
-### Phase 48: Dead Code Removal and Final Verification
+### Phase 48: Dead Code Removal and Final Verification ✓
 
 **Goal**: Codebase cleaned of unused code and all quality checks passing
 
@@ -159,22 +159,17 @@ Plans:
 
 **Requirements**: DEAD-01, DEAD-02, DEAD-03
 
-**Success Criteria** (what must be TRUE):
-1. Zero unused exports detected (verified by ESLint or ts-prune)
-2. Zero unused files in codebase (verified by dependency analysis)
-3. package.json contains only actively used dependencies (no orphaned packages)
-4. Production build completes successfully in under 35 seconds
-5. Development server runs without errors or warnings with strict config
+**Completed**: 2026-02-10 | **Verified**: passed (6/6 must-haves)
 
-**Plans**: 6 plans
+**Plans**: 6/6 complete
 
 Plans:
-- [ ] 48-01-PLAN.md — Remove unused files (~39 files: deprecated components, unused services, scripts, type barrels)
-- [ ] 48-02-PLAN.md — Remove unused dependencies from package.json (2-4 packages)
-- [ ] 48-03-PLAN.md — Remove unused exports from lib/ core files (auth, devices, firebase, coordination)
-- [ ] 48-04-PLAN.md — Remove unused exports from lib/ service files (netatmo, notifications, tokens, schemas)
-- [ ] 48-05-PLAN.md — Remove unused exports from lib/core+hue+pwa, app/ files, and barrel cleanup
-- [ ] 48-06-PLAN.md — Final verification and gap sweep
+- [x] 48-01-PLAN.md — Remove unused files (~39 files: deprecated components, unused services, scripts, type barrels)
+- [x] 48-02-PLAN.md — Remove unused dependencies from package.json (4 packages)
+- [x] 48-03-PLAN.md — Remove unused exports from lib/ core files (auth, devices, firebase, coordination)
+- [x] 48-04-PLAN.md — Remove unused exports from lib/ service files (netatmo, notifications, tokens, schemas)
+- [x] 48-05-PLAN.md — Remove unused exports from lib/core+hue+pwa, app/ files, and barrel cleanup
+- [x] 48-06-PLAN.md — Final verification and gap sweep
 
 ---
 
@@ -193,7 +188,7 @@ Plans:
 | **45** | **v5.1** | **8/8** | **✓ Complete** | **2026-02-09** |
 | **46** | **v5.1** | **8/8** | **✓ Complete** | **2026-02-09** |
 | **47** | **v5.1** | **10/10** | **✓ Complete** | **2026-02-09** |
-| **48** | **v5.1** | **0/6** | **Planned** | **-** |
+| **48** | **v5.1** | **6/6** | **✓ Complete** | **2026-02-10** |
 
 ---
-*Last updated: 2026-02-09 — Phase 47 complete (10/10 plans, 0 tsc errors, 3034 tests green)*
+*Last updated: 2026-02-10 — Phase 48 complete (6/6 plans, 0 tsc errors, 3034 tests green, v5.1 milestone complete)*

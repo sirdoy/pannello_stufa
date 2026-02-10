@@ -96,6 +96,11 @@ describe('FormModal', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.clearAllTimers(); // Clear any pending timers from previous tests
+  });
+
+  afterEach(() => {
+    jest.clearAllTimers(); // Clean up any timers created during the test
   });
 
   describe('Basic Rendering', () => {

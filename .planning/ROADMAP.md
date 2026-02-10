@@ -66,10 +66,10 @@ See `.planning/milestones/` for full archives.
 **Plans**: 4 plans
 
 Plans:
-- [ ] 49-01-PLAN.md — Persistent notification rate limiter (TDD, Firebase RTDB transactions)
-- [ ] 49-02-PLAN.md — Persistent Netatmo API rate limiter (TDD, dual-window: 50/10s + 400/1h)
-- [ ] 49-03-PLAN.md — Persistent coordination throttle (TDD, 30-min global window)
-- [ ] 49-04-PLAN.md — Feature flag integration + consumer migration (async API, fallback)
+- [x] 49-01-PLAN.md — Persistent notification rate limiter (TDD, Firebase RTDB transactions)
+- [x] 49-02-PLAN.md — Persistent Netatmo API rate limiter (TDD, dual-window: 50/10s + 400/1h)
+- [x] 49-03-PLAN.md — Persistent coordination throttle (TDD, 30-min global window)
+- [x] 49-04-PLAN.md — Feature flag integration + consumer migration (async API, fallback)
 
 ### Phase 50: Cron Automation Configuration
 **Goal**: Background automation operational with external HTTP scheduler triggering health monitoring, coordination checks, and dead man's switch tracking every 5 minutes.
@@ -184,7 +184,7 @@ Phases execute in numeric order: 49 → 50 → 51 → 52 → 53 → 54
 | 11-18 | v3.0 | 52/52 | ✓ Complete | 2026-01-30 |
 | 6-10 | v2.0 | 21/21 | ✓ Complete | 2026-01-28 |
 | 1-5 | v1.0 | 29/29 | ✓ Complete | 2026-01-26 |
-| 49 | v6.0 | 0/TBD | Not started | - |
+| 49 | v6.0 | 4/4 | ✓ Complete | 2026-02-10 |
 | 50 | v6.0 | 0/TBD | Not started | - |
 | 51 | v6.0 | 0/TBD | Not started | - |
 | 52 | v6.0 | 0/TBD | Not started | - |

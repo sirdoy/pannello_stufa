@@ -163,7 +163,7 @@ describe('coordinationOrchestrator', () => {
         waitMinutes: 60,
       });
 
-      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockReturnValue({
+      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockResolvedValue({
         allowed: true,
       });
 
@@ -247,7 +247,7 @@ describe('coordinationOrchestrator', () => {
         ],
       });
 
-      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockReturnValue({
+      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockResolvedValue({
         allowed: true,
       });
 
@@ -400,7 +400,7 @@ describe('coordinationOrchestrator', () => {
     });
 
     test('respects throttle', async () => {
-      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockReturnValue({
+      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockResolvedValue({
         allowed: false,
         waitSeconds: 1200,
         reason: 'global_throttle',
@@ -415,7 +415,7 @@ describe('coordinationOrchestrator', () => {
     });
 
     test('calls triggerNotificationServer when allowed', async () => {
-      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockReturnValue({
+      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockResolvedValue({
         allowed: true,
       });
 
@@ -443,7 +443,7 @@ describe('coordinationOrchestrator', () => {
     });
 
     test('records notification sent', async () => {
-      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockReturnValue({
+      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockResolvedValue({
         allowed: true,
       });
 
@@ -458,7 +458,7 @@ describe('coordinationOrchestrator', () => {
     });
 
     test('formats messages correctly', async () => {
-      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockReturnValue({
+      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockResolvedValue({
         allowed: true,
       });
 
@@ -500,7 +500,7 @@ describe('coordinationOrchestrator', () => {
     });
 
     test('returns throttle info when blocked', async () => {
-      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockReturnValue({
+      (coordinationNotificationThrottle.shouldSendCoordinationNotification as any).mockResolvedValue({
         allowed: false,
         waitSeconds: 600,
         reason: 'global_throttle',

@@ -42,27 +42,27 @@ describe('GET /api/netatmo/schedules - Integration Logic', () => {
     expect(getCached).toHaveBeenCalledWith('schedules', expect.any(Function));
   });
 
-  it('should check rate limit before API call', () => {
+  it('should check rate limit before API call', async () => {
     const userId = 'user-123';
 
-    (checkNetatmoRateLimit as jest.Mock).mockReturnValue({
+    (checkNetatmoRateLimit as jest.Mock).mockResolvedValue({
       allowed: true,
       currentCount: 10,
       remaining: 390,
       limit: 400,
     });
 
-    const rateCheck = checkNetatmoRateLimit(userId);
+    const rateCheck = await checkNetatmoRateLimit(userId);
 
     expect(rateCheck.allowed).toBe(true);
     expect((rateCheck as any).remaining).toBe(390);
     expect(checkNetatmoRateLimit).toHaveBeenCalledWith(userId);
   });
 
-  it('should track API call on cache miss', () => {
+  it('should track API call on cache miss', async () => {
     const userId = 'user-456';
 
-    trackNetatmoApiCall(userId);
+    await trackNetatmoApiCall(userId);
 
     expect(trackNetatmoApiCall).toHaveBeenCalledWith(userId);
   });
@@ -90,17 +90,17 @@ describe('GET /api/netatmo/schedules - Integration Logic', () => {
     expect(NETATMO_API.parseSchedules).toHaveBeenCalledWith(mockHomesData);
   });
 
-  it('should return 429 details when rate limit exceeded', () => {
+  it('should return 429 details when rate limit exceeded', async () => {
     const userId = 'user-789';
 
-    (checkNetatmoRateLimit as jest.Mock).mockReturnValue({
+    (checkNetatmoRateLimit as jest.Mock).mockResolvedValue({
       allowed: false,
       currentCount: 400,
       limit: 400,
       resetInSeconds: 1800,
     });
 
-    const rateCheck = checkNetatmoRateLimit(userId);
+    const rateCheck = await checkNetatmoRateLimit(userId);
 
     expect(rateCheck.allowed).toBe(false);
     expect((rateCheck as any).resetInSeconds).toBe(1800);
@@ -142,39 +142,39 @@ describe('POST /api/netatmo/schedules - Integration Logic', () => {
     expect(invalidateCache).toHaveBeenCalledWith('schedules');
   });
 
-  it('should check rate limit before switch', () => {
+  it('should check rate limit before switch', async () => {
     const userId = 'user-switch';
 
-    (checkNetatmoRateLimit as jest.Mock).mockReturnValue({
+    (checkNetatmoRateLimit as jest.Mock).mockResolvedValue({
       allowed: true,
       currentCount: 5,
       remaining: 395,
       limit: 400,
     });
 
-    const rateCheck = checkNetatmoRateLimit(userId);
+    const rateCheck = await checkNetatmoRateLimit(userId);
 
     expect(rateCheck.allowed).toBe(true);
     expect((rateCheck as any).remaining).toBe(395);
   });
 
-  it('should track API call after switch', () => {
+  it('should track API call after switch', async () => {
     const userId = 'user-track';
 
-    trackNetatmoApiCall(userId);
+    await trackNetatmoApiCall(userId);
 
     expect(trackNetatmoApiCall).toHaveBeenCalledWith(userId);
   });
 
-  it('should handle rate limit exceeded', () => {
-    (checkNetatmoRateLimit as jest.Mock).mockReturnValue({
+  it('should handle rate limit exceeded', async () => {
+    (checkNetatmoRateLimit as jest.Mock).mockResolvedValue({
       allowed: false,
       currentCount: 400,
       limit: 400,
       resetInSeconds: 600,
     });
 
-    const rateCheck = checkNetatmoRateLimit('user-blocked');
+    const rateCheck = await checkNetatmoRateLimit('user-blocked');
 
     expect(rateCheck.allowed).toBe(false);
     expect((rateCheck as any).resetInSeconds).toBe(600);

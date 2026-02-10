@@ -27,7 +27,7 @@ describe('netatmoRateLimiter', () => {
   });
 
   describe('Constants', () => {
-    it('should export correct rate limit constants', () => {
+    it('should export correct rate limit constants', async () => {
       expect(NETATMO_RATE_LIMIT).toBe(500);
       expect(NETATMO_CONSERVATIVE_LIMIT).toBe(400);
     });
@@ -36,8 +36,8 @@ describe('netatmoRateLimiter', () => {
   describe('checkNetatmoRateLimit', () => {
     const testUserId = 'test-user-123';
 
-    it('should allow request when under limit', () => {
-      const result = checkNetatmoRateLimit(testUserId);
+    it('should allow request when under limit', async () => {
+      const result = await checkNetatmoRateLimit(testUserId);
 
       expect(result.allowed).toBe(true);
       expect(result.currentCount).toBe(0);
@@ -47,7 +47,7 @@ describe('netatmoRateLimiter', () => {
       expect(result.limit).toBe(400);
     });
 
-    it('should block request when limit reached', () => {
+    it('should block request when limit reached', async () => {
       // Simulate user reaching limit
       const userData = {
         count: 400,
@@ -55,7 +55,7 @@ describe('netatmoRateLimiter', () => {
       };
       _internals.userApiCalls.set(testUserId, userData);
 
-      const result = checkNetatmoRateLimit(testUserId);
+      const result = await checkNetatmoRateLimit(testUserId);
 
       expect(result.allowed).toBe(false);
       expect(result.currentCount).toBe(400);
@@ -66,7 +66,7 @@ describe('netatmoRateLimiter', () => {
       }
     });
 
-    it('should reset counter after window expires', () => {
+    it('should reset counter after window expires', async () => {
       // Set user at limit
       const pastTime = Date.now() - (61 * 60 * 1000); // 61 minutes ago
       const userData = {
@@ -78,7 +78,7 @@ describe('netatmoRateLimiter', () => {
       // Advance time by 61 minutes
       jest.advanceTimersByTime(61 * 60 * 1000);
 
-      const result = checkNetatmoRateLimit(testUserId);
+      const result = await checkNetatmoRateLimit(testUserId);
 
       expect(result.allowed).toBe(true);
       expect(result.currentCount).toBe(0); // Counter reset
@@ -87,7 +87,7 @@ describe('netatmoRateLimiter', () => {
       }
     });
 
-    it('should return correct remaining count', () => {
+    it('should return correct remaining count', async () => {
       // User has made 100 calls
       const userData = {
         count: 100,
@@ -95,7 +95,7 @@ describe('netatmoRateLimiter', () => {
       };
       _internals.userApiCalls.set(testUserId, userData);
 
-      const result = checkNetatmoRateLimit(testUserId);
+      const result = await checkNetatmoRateLimit(testUserId);
 
       expect(result.allowed).toBe(true);
       expect(result.currentCount).toBe(100);
@@ -105,7 +105,7 @@ describe('netatmoRateLimiter', () => {
       expect(result.limit).toBe(400);
     });
 
-    it('should handle multiple users independently', () => {
+    it('should handle multiple users independently', async () => {
       const user1 = 'user-1';
       const user2 = 'user-2';
 
@@ -116,8 +116,8 @@ describe('netatmoRateLimiter', () => {
       });
 
       // User 2 has no calls
-      const result1 = checkNetatmoRateLimit(user1);
-      const result2 = checkNetatmoRateLimit(user2);
+      const result1 = await checkNetatmoRateLimit(user1);
+      const result2 = await checkNetatmoRateLimit(user2);
 
       expect(result1.allowed).toBe(false);
       expect(result2.allowed).toBe(true);
@@ -130,29 +130,29 @@ describe('netatmoRateLimiter', () => {
   describe('trackNetatmoApiCall', () => {
     const testUserId = 'test-user-456';
 
-    it('should increment counter for user', () => {
+    it('should increment counter for user', async () => {
       // Track first call
-      const result1 = trackNetatmoApiCall(testUserId);
+      const result1 = await await trackNetatmoApiCall(testUserId);
       expect(result1.count).toBe(1);
       expect(result1.remaining).toBe(399);
 
       // Track second call
-      const result2 = trackNetatmoApiCall(testUserId);
+      const result2 = await await trackNetatmoApiCall(testUserId);
       expect(result2.count).toBe(2);
       expect(result2.remaining).toBe(398);
     });
 
-    it('should create new entry for new user', () => {
+    it('should create new entry for new user', async () => {
       expect(_internals.userApiCalls.has(testUserId)).toBe(false);
 
-      const result = trackNetatmoApiCall(testUserId);
+      const result = await await trackNetatmoApiCall(testUserId);
 
       expect(_internals.userApiCalls.has(testUserId)).toBe(true);
       expect(result.count).toBe(1);
       expect(result.limit).toBe(400);
     });
 
-    it('should reset count when window expires', () => {
+    it('should reset count when window expires', async () => {
       // Set user with old window
       const pastTime = Date.now() - (70 * 60 * 1000); // 70 minutes ago
       _internals.userApiCalls.set(testUserId, {
@@ -164,13 +164,13 @@ describe('netatmoRateLimiter', () => {
       jest.advanceTimersByTime(70 * 60 * 1000);
 
       // Track new call - should reset to 1
-      const result = trackNetatmoApiCall(testUserId);
+      const result = await await trackNetatmoApiCall(testUserId);
 
       expect(result.count).toBe(1);
       expect(result.remaining).toBe(399);
     });
 
-    it('should return zero remaining when at limit', () => {
+    it('should return zero remaining when at limit', async () => {
       // Set user just below limit
       _internals.userApiCalls.set(testUserId, {
         count: 399,
@@ -178,7 +178,7 @@ describe('netatmoRateLimiter', () => {
       });
 
       // Track call that reaches limit
-      const result = trackNetatmoApiCall(testUserId);
+      const result = await await trackNetatmoApiCall(testUserId);
 
       expect(result.count).toBe(400);
       expect(result.remaining).toBe(0);
@@ -188,7 +188,7 @@ describe('netatmoRateLimiter', () => {
   describe('getNetatmoRateLimitStatus', () => {
     const testUserId = 'test-user-789';
 
-    it('should return correct status for tracked user', () => {
+    it('should return correct status for tracked user', async () => {
       const now = Date.now();
       const userData = {
         count: 150,
@@ -196,7 +196,7 @@ describe('netatmoRateLimiter', () => {
       };
       _internals.userApiCalls.set(testUserId, userData);
 
-      const status = getNetatmoRateLimitStatus(testUserId);
+      const status = await getNetatmoRateLimitStatus(testUserId);
 
       expect(status.currentCount).toBe(150);
       expect(status.limit).toBe(400);
@@ -206,8 +206,8 @@ describe('netatmoRateLimiter', () => {
       expect(status.nextResetIn).toBeLessThanOrEqual(3600);
     });
 
-    it('should return zero count for untracked user', () => {
-      const status = getNetatmoRateLimitStatus('untracked-user');
+    it('should return zero count for untracked user', async () => {
+      const status = await getNetatmoRateLimitStatus('untracked-user');
 
       expect(status.currentCount).toBe(0);
       expect(status.limit).toBe(400);
@@ -215,7 +215,7 @@ describe('netatmoRateLimiter', () => {
       expect(status.nextResetIn).toBe(0);
     });
 
-    it('should return zero count for expired window', () => {
+    it('should return zero count for expired window', async () => {
       const pastTime = Date.now() - (65 * 60 * 1000); // 65 minutes ago
       _internals.userApiCalls.set(testUserId, {
         count: 200,
@@ -225,14 +225,14 @@ describe('netatmoRateLimiter', () => {
       // Advance time
       jest.advanceTimersByTime(65 * 60 * 1000);
 
-      const status = getNetatmoRateLimitStatus(testUserId);
+      const status = await getNetatmoRateLimitStatus(testUserId);
 
       expect(status.currentCount).toBe(0);
       expect(status.remaining).toBe(400);
       expect(status.nextResetIn).toBe(0);
     });
 
-    it('should calculate nextResetIn correctly', () => {
+    it('should calculate nextResetIn correctly', async () => {
       const now = Date.now();
       const halfHourAgo = now - (30 * 60 * 1000);
 
@@ -241,7 +241,7 @@ describe('netatmoRateLimiter', () => {
         windowStart: halfHourAgo,
       });
 
-      const status = getNetatmoRateLimitStatus(testUserId);
+      const status = await getNetatmoRateLimitStatus(testUserId);
 
       // Should reset in ~30 minutes (1800 seconds)
       expect(status.nextResetIn).toBeGreaterThan(1790);
@@ -250,7 +250,7 @@ describe('netatmoRateLimiter', () => {
   });
 
   describe('cleanupOldEntries', () => {
-    it('should remove expired entries', () => {
+    it('should remove expired entries', async () => {
       const now = Date.now();
 
       // Add user with expired window (3 hours old)
@@ -277,7 +277,7 @@ describe('netatmoRateLimiter', () => {
       expect(_internals.userApiCalls.size).toBe(1);
     });
 
-    it('should not remove entries within retention period', () => {
+    it('should not remove entries within retention period', async () => {
       const now = Date.now();
 
       // Add user with window 1.5 hours old (within 2 hour retention)
@@ -294,7 +294,7 @@ describe('netatmoRateLimiter', () => {
       expect(_internals.userApiCalls.has('user-1')).toBe(true);
     });
 
-    it('should handle empty Map gracefully', () => {
+    it('should handle empty Map gracefully', async () => {
       expect(_internals.userApiCalls.size).toBe(0);
 
       // Should not throw
@@ -305,29 +305,29 @@ describe('netatmoRateLimiter', () => {
   describe('Integration: check and track flow', () => {
     const testUserId = 'integration-user';
 
-    it('should allow tracking after check passes', () => {
-      const checkResult = checkNetatmoRateLimit(testUserId);
+    it('should allow tracking after check passes', async () => {
+      const checkResult = await checkNetatmoRateLimit(testUserId);
       expect(checkResult.allowed).toBe(true);
 
-      const trackResult = trackNetatmoApiCall(testUserId);
+      const trackResult = await await trackNetatmoApiCall(testUserId);
       expect(trackResult.count).toBe(1);
 
       // Check again - should show updated count
-      const checkResult2 = checkNetatmoRateLimit(testUserId);
+      const checkResult2 = await checkNetatmoRateLimit(testUserId);
       expect(checkResult2.currentCount).toBe(1);
       if (checkResult2.allowed) {
         expect(checkResult2.remaining).toBe(399);
       }
     });
 
-    it('should enforce limit across check-track cycles', () => {
+    it('should enforce limit across check-track cycles', async () => {
       // Simulate 400 API calls
       for (let i = 0; i < 400; i++) {
-        trackNetatmoApiCall(testUserId);
+        await trackNetatmoApiCall(testUserId);
       }
 
       // 401st check should block
-      const checkResult = checkNetatmoRateLimit(testUserId);
+      const checkResult = await checkNetatmoRateLimit(testUserId);
       expect(checkResult.allowed).toBe(false);
       expect(checkResult.currentCount).toBe(400);
     });

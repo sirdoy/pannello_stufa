@@ -182,7 +182,6 @@ function SortIndicator({ isSorted, direction }: { isSorted: boolean | string; di
  * <DataTable
  *   data={data}
  *   columns={columns}
- *   onRowClick={(row) => console.log(row.original)}
  * />
  */
 const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataTable(

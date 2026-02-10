@@ -69,7 +69,6 @@ export async function shouldSendCoordinationNotificationPersistent(
 
   // No previous notification → allowed
   if (!data || !data.lastSentAt) {
-    console.log(`✅ Coordination notification allowed for ${userId} (first notification)`);
     return {
       allowed: true,
       waitSeconds: 0,
@@ -84,9 +83,6 @@ export async function shouldSendCoordinationNotificationPersistent(
   // Still within throttle window → blocked
   if (timeSinceLastMs < GLOBAL_THROTTLE_MS) {
     const waitSeconds = Math.ceil(remainingMs / 1000);
-    console.log(
-      `⏱️ Coordination notification throttled for ${userId} (wait ${waitSeconds}s, global window)`
-    );
     return {
       allowed: false,
       waitSeconds,
@@ -95,7 +91,6 @@ export async function shouldSendCoordinationNotificationPersistent(
   }
 
   // Window expired → allowed
-  console.log(`✅ Coordination notification allowed for ${userId} (window expired)`);
   return {
     allowed: true,
     waitSeconds: 0,
@@ -121,7 +116,6 @@ export async function recordNotificationSentPersistent(userId: string): Promise<
 
   await adminDbSet(path, { lastSentAt: now });
 
-  console.log(`📝 Coordination notification recorded for ${userId} (next allowed in 30 min)`);
 }
 
 /**
@@ -175,7 +169,6 @@ export async function clearThrottlePersistent(userId: string): Promise<boolean> 
   }
 
   await adminDbRemove(path);
-  console.log(`🧹 Cleared persistent throttle for ${userId}`);
 
   return true;
 }

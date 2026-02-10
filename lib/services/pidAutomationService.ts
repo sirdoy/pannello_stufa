@@ -115,7 +115,6 @@ export async function setPidConfig(userId: string, config: Partial<PIDConfig>): 
  *
  * @example
  * const unsubscribe = subscribeToPidConfig(session.user.sub, (config) => {
- *   console.log('PID config updated:', config);
  * });
  *
  * // Later: unsubscribe()

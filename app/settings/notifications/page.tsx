@@ -77,13 +77,6 @@ export default function NotificationsSettingsPage() {
 
         if (result.hasToken && result.token) {
           setCurrentDeviceToken(result.token);
-          console.log('[NotificationsPage] Token loaded from storage:', {
-            hasToken: result.hasToken,
-            wasRefreshed: result.wasRefreshed,
-            permissionStatus: result.permissionStatus,
-          });
-        } else {
-          console.log('[NotificationsPage] No stored token found');
         }
       } catch (error) {
         console.error('[NotificationsPage] Error loading token:', error);
@@ -287,7 +280,6 @@ export default function NotificationsSettingsPage() {
         </Heading>
         <NotificationPermissionButton
           onSuccess={(token) => {
-            console.log('Notifiche attivate, token:', token);
           }}
           onError={(error) => {
             console.error('Errore attivazione:', error);

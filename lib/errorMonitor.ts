@@ -265,7 +265,6 @@ export async function sendErrorPushNotification(
       const shouldSend = await shouldSendErrorNotification(userId, errorInfo.severity);
 
       if (!shouldSend) {
-        console.log(`⏭️ Error notification skipped (user preferences): ${errorCode} - ${errorInfo.severity}`);
         return false;
       }
     } catch (prefError) {
@@ -306,7 +305,6 @@ export async function sendErrorPushNotification(
       return false;
     }
 
-    console.log('✅ Push notification sent for error', errorCode);
     return true;
 
   } catch (error) {

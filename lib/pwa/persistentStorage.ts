@@ -61,13 +61,11 @@ export async function requestPersistentStorage(): Promise<boolean> {
     // Check if already persisted
     const alreadyPersisted = await navigator.storage.persisted();
     if (alreadyPersisted) {
-      console.log('[PersistentStorage] Already persisted');
       return true;
     }
 
     // Request persistence
     const granted = await navigator.storage.persist();
-    console.log('[PersistentStorage] Request result:', granted);
     return granted;
   } catch (error) {
     console.error('[PersistentStorage] Error requesting:', error);

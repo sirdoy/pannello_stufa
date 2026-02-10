@@ -67,7 +67,6 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
-    console.log('🧹 Starting token cleanup...');
 
     const db = getAdminDatabase();
     const usersRef = db.ref('users');
@@ -102,7 +101,6 @@ export async function POST(request: Request): Promise<Response> {
           // No timestamp - consider stale
           updates[`users/${userId}/fcmTokens/${tokenKey}`] = null;
           removed++;
-          console.log(`🗑️ Removing token without timestamp (user ${userId})`);
           return;
         }
 
@@ -113,7 +111,6 @@ export async function POST(request: Request): Promise<Response> {
           updates[`users/${userId}/fcmTokens/${tokenKey}`] = null;
           removed++;
           const ageDays = Math.floor(age / (24 * 60 * 60 * 1000));
-          console.log(`🗑️ Removing stale token (${ageDays} days old, user ${userId})`);
         }
       });
     });
@@ -123,7 +120,6 @@ export async function POST(request: Request): Promise<Response> {
       await db.ref().update(updates);
     }
 
-    console.log(`✅ Token cleanup complete: removed ${removed} of ${scanned} tokens`);
 
     // Cleanup old error logs (30 days retention per 02-CONTEXT.md)
     const ERROR_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
@@ -148,8 +144,6 @@ export async function POST(request: Request): Promise<Response> {
       }
     }
 
-    console.log(`✅ Error cleanup complete: removed ${errorsRemoved} old error logs`);
-    console.log(`✅ Cleanup complete: removed ${removed} tokens and ${errorsRemoved} error logs`);
 
     return Response.json({
       success: true,

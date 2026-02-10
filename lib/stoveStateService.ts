@@ -44,7 +44,6 @@ export async function updateStoveState(stateUpdate: StoveStateUpdate): Promise<v
 
     await adminDbUpdate(path, filteredUpdates);
 
-    console.log('[StoveStateService] State updated:', Object.keys(filteredUpdates).join(', '));
   } catch (error) {
     console.error('[StoveStateService] Failed to update Firebase state:', error);
     // Non-critical error - don't throw (API action already succeeded)
@@ -82,6 +81,5 @@ async function initializeStoveState(): Promise<void> {
       errorDescription: '',
       source: 'init',
     });
-    console.log('[StoveStateService] State initialized');
   }
 }

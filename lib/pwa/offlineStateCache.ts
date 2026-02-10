@@ -16,8 +16,6 @@
  * // Get cached stove state
  * const stoveState = await getCachedState('stove');
  * if (stoveState) {
- *   console.log('Last known temperature:', stoveState.state.temperature);
- *   console.log('Cached at:', stoveState.timestamp);
  * }
  */
 
@@ -93,7 +91,6 @@ export async function getCachedState(deviceId: string): Promise<CachedDeviceStat
   try {
     const cached = await get<CachedDeviceState>(STORES.DEVICE_STATE, deviceId);
     if (cached) {
-      console.log(`[OfflineStateCache] Retrieved cached state for ${deviceId}`);
       return cached;
     }
     return null;
@@ -130,7 +127,6 @@ async function cacheState(deviceId: string, state: Record<string, unknown>): Pro
       state,
       timestamp: new Date().toISOString(),
     });
-    console.log(`[OfflineStateCache] Cached state for ${deviceId}`);
   } catch (error) {
     console.error(`[OfflineStateCache] Failed to cache state for ${deviceId}:`, error);
   }

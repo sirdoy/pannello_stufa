@@ -50,7 +50,6 @@ function shouldSendCoordinationNotificationInMemory(userId: string): ThrottleRes
 
   // No previous notification → allowed
   if (!lastSent) {
-    console.log(`✅ Coordination notification allowed for ${userId} (first notification)`);
     return {
       allowed: true,
       waitSeconds: 0,
@@ -65,9 +64,6 @@ function shouldSendCoordinationNotificationInMemory(userId: string): ThrottleRes
   // Still within throttle window → blocked
   if (timeSinceLastMs < GLOBAL_THROTTLE_MS) {
     const waitSeconds = Math.ceil(remainingMs / 1000);
-    console.log(
-      `⏱️ Coordination notification throttled for ${userId} (wait ${waitSeconds}s, global window)`
-    );
     return {
       allowed: false,
       waitSeconds,
@@ -76,7 +72,6 @@ function shouldSendCoordinationNotificationInMemory(userId: string): ThrottleRes
   }
 
   // Window expired → allowed
-  console.log(`✅ Coordination notification allowed for ${userId} (window expired)`);
   return {
     allowed: true,
     waitSeconds: 0,
@@ -102,7 +97,6 @@ interface ThrottleStatus {
 function recordNotificationSentInMemory(userId: string): void {
   const now = Date.now();
   lastNotificationSent.set(userId, now);
-  console.log(`📝 Coordination notification recorded for ${userId} (next allowed in 30 min)`);
 }
 
 /**
@@ -143,7 +137,6 @@ function clearThrottleInMemory(userId: string): boolean {
   lastNotificationSent.delete(userId);
 
   if (existed) {
-    console.log(`🧹 Cleared throttle for ${userId}`);
   }
 
   return existed;
@@ -167,7 +160,6 @@ function cleanupOldEntries(): void {
   }
 
   if (totalCleaned > 0) {
-    console.log(`🧹 Throttle cleanup: removed ${totalCleaned} expired entries`);
   }
 }
 

@@ -17,7 +17,6 @@
  *
  *   // Real-time updates
  *   const unsubscribe = subscribeToLocation((location) => {
- *     console.log('Location changed:', location);
  *   });
  */
 
@@ -55,7 +54,6 @@ const getLocationPath = (): string => getEnvironmentPath('config/location');
  * @example
  * const location = await getLocation();
  * if (location) {
- *   console.log(`${location.latitude}, ${location.longitude}`);
  * }
  */
 export async function getLocation(): Promise<Location | null> {

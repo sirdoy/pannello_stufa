@@ -62,14 +62,12 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
-    console.log('📊 Starting delivery rate check...');
 
     // Get delivery stats for last hour
     const stats = await getDeliveryStats(CHECK_PERIOD_HOURS);
     const deliveryRate = stats.deliveryRate;
     const belowThreshold = deliveryRate < RATE_THRESHOLD;
 
-    console.log(`📊 Delivery rate: ${deliveryRate.toFixed(1)}% (${stats.sent + stats.delivered}/${stats.total})`);
 
     // Check if alert should be sent
     const alertCheck = await shouldSendRateAlert(deliveryRate);
@@ -111,7 +109,6 @@ export async function POST(request: Request): Promise<Response> {
         const result = await sendNotificationToUser(targetUserId, notification);
 
         if (result.success) {
-          console.log(`🚨 Alert sent to admin (user: ${targetUserId})`);
           await recordRateAlert(deliveryRate);
           alertSent = true;
         } else {
@@ -121,7 +118,6 @@ export async function POST(request: Request): Promise<Response> {
         console.warn('⚠️ No admin user found to send alert');
       }
     } else {
-      console.log(`✅ No alert needed: ${alertCheck.reason}`);
     }
 
     const checkResult = {
@@ -143,7 +139,6 @@ export async function POST(request: Request): Promise<Response> {
       },
     };
 
-    console.log(`✅ Rate check complete: ${deliveryRate.toFixed(1)}% - Alert sent: ${alertSent}`);
 
     return Response.json(checkResult);
 

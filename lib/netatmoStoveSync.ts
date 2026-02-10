@@ -126,7 +126,6 @@ export async function enableStoveSync(rooms: StoveSyncRoom[] | any, stoveTempera
   });
 
   const roomNames = roomsArray.map((r: any) => r.name).join(', ');
-  console.log(`✅ Stove sync enabled for rooms: ${roomNames} at ${stoveTemperature}°C`);
 }
 
 /**
@@ -152,7 +151,6 @@ export async function disableStoveSync() {
     lastSyncAction: 'disabled',
   });
 
-  console.log('✅ Stove sync disabled');
 }
 
 /**
@@ -250,13 +248,6 @@ async function setRoomsToStoveMode(config: StoveSyncConfig) {
       const roomStatus = homeStatus.rooms?.find(r => String(r.id) === String(room.id));
       const currentSetpoint = roomStatus?.therm_setpoint_temperature;
 
-      console.log(`🔧 Setting room "${room.name}" (ID: ${room.id}):`, {
-        currentSetpoint,
-        targetTemp: config.stoveTemperature,
-        endtime: new Date(endtime * 1000).toISOString(),
-        homeId,
-      });
-
       // Set room to stove temperature
       const success = await NETATMO_API.setRoomThermpoint(accessToken, {
         home_id: homeId as string,
@@ -273,7 +264,6 @@ async function setRoomsToStoveMode(config: StoveSyncConfig) {
           originalSetpoint: currentSetpoint,
         });
         results.push({ roomId: room.id, roomName: room.name, success: true });
-        console.log(`✅ Room "${room.name}" set to ${config.stoveTemperature}°C (stove mode) - API returned success`);
       } else {
         results.push({ roomId: room.id, roomName: room.name, success: false, error: 'API call failed' });
         console.error(`❌ Failed to set room "${room.name}" to stove mode - API returned failure`);
@@ -346,7 +336,6 @@ async function setRoomsToSchedule(rooms: StoveSyncRoom[]) {
 
       if (success) {
         results.push({ roomId: room.id, roomName: room.name, success: true });
-        console.log(`✅ Room "${room.name}" returned to schedule (stove off)`);
       } else {
         results.push({ roomId: room.id, roomName: room.name, success: false, error: 'API call failed' });
         console.error(`❌ Failed to restore room "${room.name}" to schedule`);
@@ -397,7 +386,6 @@ export async function enforceStoveSyncSetpoints(stoveIsOn: boolean) {
 
   // Case 1: stoveMode doesn't match stove state → full sync needed
   if (stoveIsOn !== config.stoveMode) {
-    console.log(`🔥 Stove sync enforcement: stove ${stoveIsOn ? 'ON' : 'OFF'}, stoveMode was ${config.stoveMode}`);
     return await syncLivingRoomWithStove(stoveIsOn);
   }
 
@@ -448,7 +436,6 @@ export async function enforceStoveSyncSetpoints(stoveIsOn: boolean) {
 
     // Re-apply setpoints to rooms that have drifted
     if (roomsNeedingFix.length > 0) {
-      console.log(`🔄 Stove sync: ${roomsNeedingFix.length} room(s) have incorrect setpoints, re-enforcing...`);
 
       const endtime = Math.floor(Date.now() / 1000) + MANUAL_SETPOINT_DURATION;
       let fixedCount = 0;
@@ -571,7 +558,6 @@ export async function setRoomsToBoostMode(config: any, boostAmount = 2, previous
         capped,
       };
 
-      console.log(`✅ Room "${room.name}" boost applied: ${currentSetpoint}°C → ${newSetpoint}°C${capped ? ' (capped at 30°C)' : ''}`);
     })
   );
 
@@ -636,7 +622,6 @@ export async function restoreRoomSetpoints(config: any, previousSetpoints: Recor
           hadPrevious: true,
         });
 
-        console.log(`✅ Room "${room.name}" restored to previous setpoint: ${previousSetpoint}°C`);
       } else {
         // No previous setpoint - return to schedule
         const success = await NETATMO_API.setRoomThermpoint(accessToken, {
@@ -656,7 +641,6 @@ export async function restoreRoomSetpoints(config: any, previousSetpoints: Recor
           hadPrevious: false,
         });
 
-        console.log(`✅ Room "${room.name}" returned to schedule (no previous setpoint)`);
       }
     })
   );
@@ -689,7 +673,6 @@ export async function checkStoveSyncOnStatusChange(currentStatus: string, previo
 
   // Only sync if there's a state change
   if (currentlyOn !== wasOn) {
-    console.log(`🔥 Stove state changed: ${previousStatus} → ${currentStatus}`);
     return await syncLivingRoomWithStove(currentlyOn);
   }
 

@@ -87,7 +87,6 @@ export default function NotificationPermissionButton({ onSuccess, onError }: Not
         // Callback success
         if (onSuccess) onSuccess(token);
 
-        console.log('✅ Notifiche abilitate con successo');
       } else {
         throw new Error('Permesso notifiche non concesso');
       }

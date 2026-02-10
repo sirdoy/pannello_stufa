@@ -66,7 +66,6 @@ export const POST = withAuthAndErrorHandler(async (request) => {
   // Save to Firebase using Admin SDK
   const errorId = await adminDbPush('errors', errorLog);
 
-  console.log(`Errore stufa loggato: ${errorCode} - ${errorDescription} (${severity})`);
 
   return success({
     message: 'Errore loggato con successo',

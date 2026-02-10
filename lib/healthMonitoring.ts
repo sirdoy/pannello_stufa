@@ -287,7 +287,6 @@ async function getNetatmoHeatingDemand() {
     const homeId = process.env.NETATMO_HOME_ID;
 
     if (!homeId) {
-      console.log('⚠️ NETATMO_HOME_ID not configured - skipping demand check');
       return null;
     }
 
@@ -295,7 +294,6 @@ async function getNetatmoHeatingDemand() {
     const tokenData = await adminDbGet('netatmo/accessToken') as { token?: string } | null;
 
     if (!tokenData || !tokenData.token) {
-      console.log('⚠️ Netatmo token not available - skipping demand check');
       return null;
     }
 

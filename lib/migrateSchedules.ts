@@ -63,16 +63,13 @@ export interface MigrationResult {
  * @returns {Promise<Object>} Migration result with status and details
  */
 export async function migrateSchedulesToV2({ dryRun = false }: MigrationOptions = {}): Promise<MigrationResult> {
-  console.log('🔄 Starting migration: /stoveScheduler → /schedules-v2');
   if (dryRun) {
-    console.log('🔍 DRY RUN MODE - No changes will be written to Firebase');
   }
 
   try {
     // Step 1: Check if v2 already exists
     const v2Exists = await adminDbGet('schedules-v2');
     if (v2Exists) {
-      console.log('✅ Migration already completed - /schedules-v2 exists');
       return {
         success: true,
         alreadyMigrated: true,
@@ -81,11 +78,9 @@ export async function migrateSchedulesToV2({ dryRun = false }: MigrationOptions 
     }
 
     // Step 2: Read all v1 data (read-only, never delete)
-    console.log('📖 Reading v1 data from /stoveScheduler...');
     const v1Data = await adminDbGet('stoveScheduler') as Record<string, unknown> | null;
 
     if (!v1Data) {
-      console.log('⚠️  No v1 data found - creating fresh v2 structure');
       // Create minimal v2 structure
       await createFreshV2Structure(dryRun);
       return {
@@ -98,7 +93,6 @@ export async function migrateSchedulesToV2({ dryRun = false }: MigrationOptions 
     }
 
     // Step 3: Extract slots for "default" schedule
-    console.log('📦 Extracting schedule slots...');
     const defaultSlots: Record<string, unknown[]> = {};
     let totalIntervals = 0;
 
@@ -111,7 +105,6 @@ export async function migrateSchedulesToV2({ dryRun = false }: MigrationOptions 
       }
     }
 
-    console.log(`✅ Extracted ${totalIntervals} intervals across ${DAYS_OF_WEEK.length} days`);
 
     // Step 4: Create default schedule object
     const now = new Date().toISOString();
@@ -125,11 +118,7 @@ export async function migrateSchedulesToV2({ dryRun = false }: MigrationOptions 
 
     // Step 5: Create v2 structure
     if (dryRun) {
-      console.log('💾 [DRY RUN] Would create /schedules-v2 structure...');
-      console.log('  - schedules-v2/schedules/default:', JSON.stringify(defaultSchedule, null, 2));
-      console.log('  - schedules-v2/activeScheduleId: "default"');
     } else {
-      console.log('💾 Creating /schedules-v2 structure...');
       await adminDbSet('schedules-v2/schedules/default', defaultSchedule);
       await adminDbSet('schedules-v2/activeScheduleId', 'default');
     }
@@ -138,9 +127,7 @@ export async function migrateSchedulesToV2({ dryRun = false }: MigrationOptions 
     const modeData = v1Data.mode as SchedulerModeData | undefined;
     if (modeData) {
       if (dryRun) {
-        console.log('⚙️  [DRY RUN] Would migrate mode settings:', modeData);
       } else {
-        console.log('⚙️  Migrating mode settings...');
         await adminDbSet('schedules-v2/mode', modeData);
       }
     } else {
@@ -151,7 +138,6 @@ export async function migrateSchedulesToV2({ dryRun = false }: MigrationOptions 
         lastUpdated: now
       };
       if (dryRun) {
-        console.log('⚙️  [DRY RUN] Would create default mode:', defaultMode);
       } else {
         await adminDbSet('schedules-v2/mode', defaultMode);
       }
@@ -159,7 +145,6 @@ export async function migrateSchedulesToV2({ dryRun = false }: MigrationOptions 
 
     // Step 7: Verify integrity (skip in dry-run)
     if (!dryRun) {
-      console.log('🔍 Verifying migration integrity...');
       const verification = await verifyMigration(defaultSlots, v1Data.mode);
 
       if (!verification.success) {
@@ -171,17 +156,10 @@ export async function migrateSchedulesToV2({ dryRun = false }: MigrationOptions 
         };
       }
     } else {
-      console.log('🔍 [DRY RUN] Skipping verification (no data written)');
     }
 
     if (dryRun) {
-      console.log('✅ Dry run completed successfully!');
-      console.log(`📊 Would migrate ${totalIntervals} intervals to /schedules-v2/schedules/default`);
-      console.log(`🎯 Would set active schedule: default`);
     } else {
-      console.log('✅ Migration completed successfully!');
-      console.log(`📊 Migrated ${totalIntervals} intervals to /schedules-v2/schedules/default`);
-      console.log(`🎯 Active schedule: default`);
     }
 
     return {
@@ -232,10 +210,6 @@ async function createFreshV2Structure(dryRun: boolean = false): Promise<void> {
   };
 
   if (dryRun) {
-    console.log('[DRY RUN] Would create:');
-    console.log('  - schedules-v2/schedules/default:', JSON.stringify(defaultSchedule, null, 2));
-    console.log('  - schedules-v2/activeScheduleId: "default"');
-    console.log('  - schedules-v2/mode:', JSON.stringify(defaultMode, null, 2));
   } else {
     await adminDbSet('schedules-v2/schedules/default', defaultSchedule);
     await adminDbSet('schedules-v2/activeScheduleId', 'default');
@@ -318,6 +292,5 @@ async function verifyMigration(originalSlots: Record<string, unknown[]>, origina
  */
 async function runMigration(): Promise<void> {
   const result = await migrateSchedulesToV2();
-  console.log('\n📋 Migration Result:', JSON.stringify(result, null, 2));
   process.exit(result.success ? 0 : 1);
 }

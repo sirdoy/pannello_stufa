@@ -128,7 +128,6 @@ export default function DesignSystemPage() {
   // FormModal demo handler
   const handleFormSubmit = async (data: any): Promise<void> => {
     await new Promise(r => setTimeout(r, 1500)); // Simulate API call
-    console.log('Form submitted:', data);
   };
 
   return (
@@ -1865,15 +1864,11 @@ export default function DesignSystemPage() {
                     {
                       heading: 'Navigation',
                       items: [
-                        { id: 'demo-home', label: 'Dashboard', icon: <Home className="w-4 h-4" aria-hidden="true" />, shortcut: 'Cmd+D', onSelect: () => console.log('Navigate home') },
-                        { id: 'demo-settings', label: 'Settings', icon: <Settings className="w-4 h-4" aria-hidden="true" />, shortcut: 'Cmd+,', onSelect: () => console.log('Navigate settings') },
                       ]
                     },
                     {
                       heading: 'Actions',
                       items: [
-                        { id: 'demo-power', label: 'Toggle Power', icon: <Power className="w-4 h-4" aria-hidden="true" />, onSelect: () => console.log('Toggle power') },
-                        { id: 'demo-theme', label: 'Toggle Theme', icon: <Moon className="w-4 h-4" aria-hidden="true" />, onSelect: () => console.log('Toggle theme') },
                       ]
                     },
                   ]}

@@ -98,7 +98,6 @@ export async function logHealthCheckRun(
       duration: options.duration || 0,
     });
 
-    console.log(`📝 Logged health check run: ${parentDoc.id} (${successCount}/${results.length} successful)`);
 
     // Create subcollection documents for individual checks (batch writes for efficiency)
     if (results.length > 0) {
@@ -139,7 +138,6 @@ export async function logHealthCheckRun(
       });
 
       await batch.commit();
-      console.log(`✅ Logged ${results.length} individual health checks to subcollection`);
     }
 
     return parentDoc.id;

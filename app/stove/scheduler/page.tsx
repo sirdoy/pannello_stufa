@@ -186,7 +186,6 @@ export default function WeeklyScheduler() {
         const isLocalUpdate = lastLocalSave && (now - lastLocalSave < 2000);
 
         if (!isLocalUpdate) {
-          console.log('[Scheduler] Aggiornamento remoto ricevuto');
 
           // Update local state with remote data
           const remoteSchedule = daysOfWeek.reduce((acc, day) => {

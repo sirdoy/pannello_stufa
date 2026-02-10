@@ -88,11 +88,9 @@ class HueRemoteApi {
 
       // Handle 401 - Token expired, try to refresh and retry
       if (response.status === 401 && !isRetry) {
-        console.log('🔄 [Hue Remote API] Token expired, attempting refresh...');
 
         const refreshResult = await forceTokenRefresh();
         if (refreshResult.accessToken) {
-          console.log('✅ [Hue Remote API] Token refreshed, retrying request...');
           this.updateAccessToken(refreshResult.accessToken);
           return this.request(endpoint, options, true); // Retry once
         }

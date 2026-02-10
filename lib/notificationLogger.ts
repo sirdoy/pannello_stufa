@@ -84,7 +84,6 @@ export async function logNotification(data: {
 
     const docRef = await db.collection('notificationLogs').add(logEntry);
 
-    console.log(`📝 Logged notification: ${logEntry.type} - ${logEntry.status} (${docRef.id})`);
 
     return docRef.id;
   } catch (error) {
@@ -202,7 +201,6 @@ export async function recordRateAlert(rate: number) {
       deliveryRate: rate,
     });
 
-    console.log(`🚨 Recorded rate alert: ${rate}%`);
   } catch (error) {
     console.error('❌ Error recording rate alert:', error);
     // Don't throw - recording failures shouldn't break alert flow

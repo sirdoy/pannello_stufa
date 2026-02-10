@@ -67,7 +67,6 @@ export async function saveWeatherToCache(lat: number, lon: number, data: unknown
       data,
       timestamp: Date.now(),
     });
-    console.log(`✅ Weather cached at: ${cacheKey}`);
   } catch (error) {
     console.error('[WeatherCacheService] Error saving cache:', error);
     throw error;
@@ -82,7 +81,6 @@ export async function invalidateWeatherCache(lat: number, lon: number): Promise<
   try {
     const cacheKey = getCacheKey(lat, lon);
     await adminDbRemove(cacheKey);
-    console.log(`🗑️ Weather cache invalidated: ${cacheKey}`);
   } catch (error) {
     console.error('[WeatherCacheService] Error invalidating cache:', error);
     throw error;

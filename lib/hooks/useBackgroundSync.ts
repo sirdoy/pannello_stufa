@@ -97,7 +97,6 @@ export function useBackgroundSync(): UseBackgroundSyncReturn {
       const { type, commandId, endpoint } = event.data || {};
 
       if (type === 'COMMAND_SYNCED') {
-        console.log('[useBackgroundSync] Command synced:', commandId, endpoint);
         setLastSyncedCommand({ commandId, endpoint, timestamp: Date.now() });
         refreshCommands();
 
@@ -116,7 +115,6 @@ export function useBackgroundSync(): UseBackgroundSyncReturn {
   // Listen for online/offline events to trigger sync
   useEffect(() => {
     const handleOnline = async () => {
-      console.log('[useBackgroundSync] Online - triggering sync');
       setIsProcessing(true);
 
       try {
@@ -194,7 +192,6 @@ export function useBackgroundSync(): UseBackgroundSyncReturn {
    */
   const triggerSync = useCallback(async () => {
     if (!navigator.onLine) {
-      console.log('[useBackgroundSync] Cannot sync - offline');
       return;
     }
 

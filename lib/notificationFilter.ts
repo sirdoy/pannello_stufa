@@ -90,7 +90,6 @@ export async function filterNotificationByPreferences(
   const typeEnabled = preferences?.enabledTypes?.[notifType] ?? true; // Default to enabled
 
   if (!typeEnabled) {
-    console.log(`🚫 Type disabled: ${userId}:${notifType}`);
     return {
       allowed: false,
       allowedTokens: [],
@@ -110,9 +109,6 @@ export async function filterNotificationByPreferences(
   const rateLimitResult = await checkRateLimit(userId, notifType, userRateLimits);
 
   if (!rateLimitResult.allowed) {
-    console.log(
-      `⏱️ Rate limit hit for ${userId}:${notifType}, suppressed ${rateLimitResult.suppressedCount} in window`
-    );
     return {
       allowed: false,
       allowedTokens: [],
@@ -135,7 +131,6 @@ export async function filterNotificationByPreferences(
   const filteredCount = tokens.length - allowedTokens.length;
 
   if (allowedTokens.length === 0) {
-    console.log(`🌙 All devices in DND: ${userId}:${notifType} (${filteredCount} filtered)`);
     return {
       allowed: false,
       allowedTokens: [],
@@ -150,10 +145,6 @@ export async function filterNotificationByPreferences(
   }
 
   // Notification allowed
-  console.log(
-    `✅ Notification allowed: ${userId}:${notifType} - ${allowedTokens.length}/${tokens.length} devices (${filteredCount} in DND)`
-  );
-
   return {
     allowed: true,
     allowedTokens,
@@ -185,7 +176,6 @@ function filterTokensByDND(
 ): string[] {
   // CRITICAL notifications bypass DND (per CONTEXT.md)
   if (notifType === 'CRITICAL') {
-    console.log(`🚨 CRITICAL notification bypasses DND for ${userId}`);
     return tokens.map((t: TokenWithDevice) => t.token);
   }
 
@@ -209,7 +199,6 @@ function filterTokensByDND(
     if (!inDND) {
       allowedTokens.push(tokenObj.token);
     } else {
-      console.log(`🌙 Device ${deviceId} in DND, filtering token`);
     }
   }
 

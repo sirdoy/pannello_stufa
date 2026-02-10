@@ -359,14 +359,12 @@ async function setRoomThermpoint(accessToken: string, params: SetRoomThermpointP
     temp: params.temp !== undefined ? parseFloat(params.temp.toString()) : undefined,
   };
 
-  console.log('🌡️ Calling Netatmo setRoomThermpoint API:', normalizedParams);
 
   const data = await makeRequest('setroomthermpoint', accessToken, {
     method: 'POST',
     body: normalizedParams as Record<string, unknown>,
   });
 
-  console.log('🌡️ Netatmo API response:', data);
 
   return data.status === 'ok';
 }

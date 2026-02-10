@@ -155,7 +155,6 @@ export const POST = withAuthAndErrorHandler(async (req: NextRequest, session?: a
   // Invalidate cache after successful switch
   await invalidateCache('schedules');
 
-  console.log(`✅ Schedule switched to ${scheduleId} by ${userId}`);
 
   return success({
     success: true,

@@ -60,7 +60,6 @@ export type CacheResult<T> = CacheHit<T> | CacheMiss<T>;
  * });
  *
  * if (result.source === 'cache') {
- *   console.log(`Cache hit (age: ${result.age_seconds}s)`);
  * }
  */
 export async function getCached<T>(
@@ -81,7 +80,6 @@ export async function getCached<T>(
       // Check if cache is still valid
       if (age < CACHE_TTL_MS) {
         const ageSeconds = Math.floor(age / 1000);
-        console.log(`✅ Cache HIT for "${cacheKey}" (age: ${ageSeconds}s)`);
 
         return {
           data: cached.data,
@@ -90,13 +88,10 @@ export async function getCached<T>(
         };
       }
 
-      console.log(`⏰ Cache EXPIRED for "${cacheKey}" (age: ${Math.floor(age / 1000)}s)`);
     } else {
-      console.log(`❌ Cache MISS for "${cacheKey}"`);
     }
 
     // Cache miss or expired - fetch fresh data
-    console.log(`🔄 Fetching fresh data for "${cacheKey}"...`);
     const freshData = await fetchFn();
 
     // Store in cache with timestamp
@@ -105,7 +100,6 @@ export async function getCached<T>(
       cached_at: Date.now(),
     });
 
-    console.log(`✅ Cache STORED for "${cacheKey}"`);
 
     return {
       data: freshData,
@@ -133,7 +127,6 @@ export async function invalidateCache(cacheKey: string): Promise<boolean> {
     // Delete cache entry
     await adminDbSet(cachePath, null);
 
-    console.log(`🗑️ Cache INVALIDATED for "${cacheKey}"`);
     return true;
 
   } catch (error) {

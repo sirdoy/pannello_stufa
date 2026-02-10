@@ -84,7 +84,6 @@ async function saveBadgeCount(count: number): Promise<void> {
  */
 async function setBadgeCount(count: number): Promise<boolean> {
   if (!isBadgeSupported()) {
-    console.log('[BadgeService] Badge API not supported');
     return false;
   }
 
@@ -98,7 +97,6 @@ async function setBadgeCount(count: number): Promise<boolean> {
     }
 
     await saveBadgeCount(safeCount);
-    console.log('[BadgeService] Badge set to:', safeCount);
     return true;
   } catch (error) {
     console.error('[BadgeService] Failed to set badge:', error);
@@ -122,7 +120,6 @@ export async function clearBadge(): Promise<boolean> {
     // Also notify Service Worker
     await notifyServiceWorker('CLEAR_BADGE');
 
-    console.log('[BadgeService] Badge cleared');
     return true;
   } catch (error) {
     console.error('[BadgeService] Failed to clear badge:', error);

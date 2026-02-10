@@ -60,7 +60,6 @@ function initializeFirebaseAdmin(): App {
     databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
   });
 
-  console.log('✅ Firebase Admin SDK inizializzato');
   return app;
 }
 
@@ -223,7 +222,6 @@ async function trackNotificationError(errorData: ErrorData): Promise<string | un
     };
 
     const pushKey = await adminDbPush('notificationErrors', errorLog);
-    console.log(`📝 Tracked notification error: ${errorLog.errorCode} (${pushKey})`);
     return pushKey ?? undefined;
   } catch (error) {
     console.error('❌ Error tracking notification error:', error);
@@ -258,14 +256,12 @@ async function removeInvalidToken(invalidToken: string): Promise<void> {
         const typedTokenData = tokenData as TokenRecord;
         if (typedTokenData.token === invalidToken) {
           updates[`users/${userId}/fcmTokens/${tokenKey}`] = null;
-          console.log(`🗑️ Removing invalid token for user ${userId}`);
         }
       });
     });
 
     if (Object.keys(updates).length > 0) {
       await db.ref().update(updates);
-      console.log(`✅ Removed ${Object.keys(updates).length} invalid token(s)`);
     }
   } catch (error) {
     console.error('❌ Error removing invalid token:', error);
@@ -392,7 +388,6 @@ export async function sendPushNotification(
           token: tokenArray[0]!,
         });
 
-        console.log('✅ Notifica inviata:', response);
 
         // Log notification (non-blocking)
         logNotification({
@@ -476,7 +471,6 @@ export async function sendPushNotification(
       tokens: tokenArray,
     });
 
-    console.log(`✅ Notifiche inviate: ${response.successCount}/${tokenArray.length}`);
 
     // Check for invalid tokens and remove them
     if (response.failureCount > 0) {
@@ -619,7 +613,6 @@ export async function sendNotificationToUser(userId: string, notification: Notif
     );
 
     if (!filterResult.allowed) {
-      console.log(`🚫 Notification filtered: ${filterResult.reason} for user ${userId}`);
       return {
         success: false,
         error: 'FILTERED',
@@ -631,7 +624,6 @@ export async function sendNotificationToUser(userId: string, notification: Notif
 
     // Log filter stats if any devices were filtered
     if (filterResult.stats.filteredByDND > 0) {
-      console.log(`📊 Filter stats for user ${userId}:`, filterResult.stats);
     }
 
     // Use filtered tokens (string array)

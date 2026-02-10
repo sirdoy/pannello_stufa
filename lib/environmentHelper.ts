@@ -70,12 +70,8 @@ function logEnvironmentInfo(): void {
   const env = getEnvironmentName();
   const prefix = getEnvironmentPrefix();
 
-  console.log('🌍 Environment:', env);
-  console.log('📁 Firebase prefix:', prefix || '(none)');
 
   if (typeof window !== 'undefined') {
-    console.log('🔗 Hostname:', window.location.hostname);
   } else {
-    console.log('⚙️ NODE_ENV:', process.env.NODE_ENV);
   }
 }

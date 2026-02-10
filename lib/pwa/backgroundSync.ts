@@ -110,7 +110,6 @@ export async function queueCommand(
   // Save to IndexedDB
   const id = await put(STORES.COMMAND_QUEUE, command);
 
-  console.log(`[BackgroundSync] Command queued: ${endpoint}`, { id, data });
 
   // Try to register for Background Sync
   await registerSync();
@@ -130,14 +129,12 @@ export async function queueCommand(
  */
 async function registerSync(): Promise<void> {
   if (!isBackgroundSyncSupported()) {
-    console.log('[BackgroundSync] Background Sync not supported, using fallback');
     return;
   }
 
   try {
     const registration = await navigator.serviceWorker.ready as ServiceWorkerRegistrationWithSync;
     await registration.sync.register(SYNC_TAG);
-    console.log('[BackgroundSync] Sync registered:', SYNC_TAG);
   } catch (error) {
     console.error('[BackgroundSync] Failed to register sync:', error);
   }
@@ -156,11 +153,9 @@ export async function processQueue(): Promise<ProcessQueueResult> {
   );
 
   if (pendingCommands.length === 0) {
-    console.log('[BackgroundSync] No pending commands to process');
     return { processed: 0, failed: 0 };
   }
 
-  console.log(`[BackgroundSync] Processing ${pendingCommands.length} pending commands`);
 
   let processed = 0;
   let failed = 0;
@@ -180,7 +175,6 @@ export async function processQueue(): Promise<ProcessQueueResult> {
       await remove(STORES.COMMAND_QUEUE, command.id!);
       processed++;
 
-      console.log(`[BackgroundSync] Command completed: ${command.endpoint}`);
     } catch (error) {
       console.error(`[BackgroundSync] Command failed: ${command.endpoint}`, error);
 
@@ -284,7 +278,6 @@ export async function clearFailedCommands(): Promise<number> {
     await remove(STORES.COMMAND_QUEUE, command.id!);
   }
 
-  console.log(`[BackgroundSync] Cleared ${failed.length} failed commands`);
   return failed.length;
 }
 
@@ -328,7 +321,6 @@ export async function retryCommand(commandId: number): Promise<boolean> {
 export async function cancelCommand(commandId: number): Promise<boolean> {
   try {
     await remove(STORES.COMMAND_QUEUE, commandId);
-    console.log('[BackgroundSync] Command cancelled:', commandId);
     return true;
   } catch (error) {
     console.error('[BackgroundSync] Failed to cancel command:', error);

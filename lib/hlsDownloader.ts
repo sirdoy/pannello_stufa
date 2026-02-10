@@ -97,13 +97,11 @@ async function downloadHlsAsMP4(hlsUrl: string, onProgress: (percent: number, me
     m3u8Content = await m3u8Response.text();
     baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
 
-    console.log('[HLS Download] Playlist content:', m3u8Content.substring(0, 500));
 
     // Check if this is a master playlist
     if (isMasterPlaylist(m3u8Content)) {
       const streamUrl = getBestStreamUrl(m3u8Content, baseUrl);
       if (streamUrl) {
-        console.log('[HLS Download] Master playlist detected, following to:', streamUrl);
         currentUrl = streamUrl;
         continue;
       }
@@ -118,7 +116,6 @@ async function downloadHlsAsMP4(hlsUrl: string, onProgress: (percent: number, me
   }
 
   const segmentUrls = parseM3u8(m3u8Content, baseUrl);
-  console.log('[HLS Download] Found segment URLs:', segmentUrls.length, segmentUrls.slice(0, 3));
 
   if (segmentUrls.length === 0) {
     throw new Error('No segments found in playlist. Content: ' + m3u8Content.substring(0, 200));
@@ -141,7 +138,6 @@ async function downloadHlsAsMP4(hlsUrl: string, onProgress: (percent: number, me
     segments.push(new Uint8Array(buffer));
   }
 
-  console.log('[HLS Download] Downloaded segments:', segments.length, 'Total bytes:', totalBytes);
 
   // If segments are empty, throw error
   if (totalBytes === 0) {
@@ -158,7 +154,6 @@ async function downloadHlsAsMP4(hlsUrl: string, onProgress: (percent: number, me
     offset += segment.byteLength;
   }
 
-  console.log('[HLS Download] Final TS size:', totalBytes);
   onProgress(100, 'Completato!');
 
   return new Blob([tsData], { type: 'video/mp2t' });

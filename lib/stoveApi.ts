@@ -97,14 +97,12 @@ export async function fetchWithRetry(url: string, timeout: number = DEFAULT_TIME
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       if (attempt > 0) {
-        console.log(`[Stove API] Retry attempt ${attempt}/${maxRetries} for ${url}`);
       }
 
       const response = await fetchWithTimeout(url, timeout);
 
       // Success - return response
       if (attempt > 0) {
-        console.log(`[Stove API] Success on attempt ${attempt + 1}`);
       }
       return response;
 
@@ -118,7 +116,6 @@ export async function fetchWithRetry(url: string, timeout: number = DEFAULT_TIME
 
       // Log retry info
       if (attempt < maxRetries) {
-        console.log(`[Stove API] Timeout on attempt ${attempt + 1}, retrying...`);
       }
     }
   }

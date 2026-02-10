@@ -79,7 +79,6 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
 
   await adminDbUpdate('maintenance', updates);
 
-  console.log(`Pulizia stufa confermata - ore reset da ${maintenanceData.currentHours.toFixed(2)}h a 0h`);
 
   return success({
     message: 'Pulizia confermata con successo',

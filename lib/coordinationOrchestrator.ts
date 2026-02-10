@@ -47,13 +47,11 @@ export async function processCoordinationCycle(
   stoveStatus: string,
   homeId: string
 ): Promise<CoordinationResult> {
-  console.log(`🔄 [Coordination] Starting cycle for ${userId}, stove: ${stoveStatus}`);
 
   // Step 1: Get coordination preferences
   const preferences = await getCoordinationPreferences(userId);
 
   if (!preferences.enabled) {
-    console.log(`⏭️ [Coordination] Skipped: coordination disabled for ${userId}`);
     return {
       action: 'skipped',
       reason: 'disabled',
@@ -68,7 +66,6 @@ export async function processCoordinationCycle(
   if (state.automationPaused) {
     if (state.pausedUntil && now > state.pausedUntil) {
       // Pause expired - clear it
-      console.log(`✅ [Coordination] Pause expired, resuming automation`);
       await updateCoordinationState({
         automationPaused: false,
         pausedUntil: null,
@@ -77,7 +74,6 @@ export async function processCoordinationCycle(
     } else {
       // Still paused
       const remainingMs = state.pausedUntil ? state.pausedUntil - now : 0;
-      console.log(`⏸️ [Coordination] Automation paused until ${state.pausedUntil ? new Date(state.pausedUntil).toISOString() : 'unknown'}`);
       return {
         action: 'skipped',
         reason: 'paused',
@@ -103,7 +99,6 @@ export async function processCoordinationCycle(
       const intentResult = await detectUserIntent(homeId, roomIds, expectedSetpoints, accessToken);
 
       if (intentResult.manualChange) {
-        console.log(`🚫 [Coordination] Manual change detected:`, intentResult.reason);
 
         // Get schedule for pause calculation
         let pauseUntil = Date.now() + (60 * 60 * 1000); // Default: 1 hour
@@ -166,7 +161,6 @@ export async function processCoordinationCycle(
     const callback = async () => {
       if (stoveOn) {
         // Stove ON: Apply boost
-        console.log(`🔥 [Coordination] Applying setpoint boost`);
         const result = await applySetpointBoost(userId, homeId, preferences);
 
         if (result.success) {
@@ -215,7 +209,6 @@ export async function processCoordinationCycle(
         }
       } else {
         // Stove OFF: Restore setpoints
-        console.log(`❄️ [Coordination] Restoring previous setpoints`);
         const result = await restorePreviousSetpoints(userId, homeId);
 
         if (result.success) {
@@ -290,7 +283,6 @@ export async function processCoordinationCycle(
  *   - previousSetpoints: object mapping roomId to previous setpoint
  */
 export async function applySetpointBoost(userId: string, homeId: string, preferences: any) {
-  console.log(`🔥 [Coordination] Applying setpoint boost for ${userId}`);
 
   // Get access token
   const { accessToken, error } = await getValidAccessToken();
@@ -357,7 +349,6 @@ export async function applySetpointBoost(userId: string, homeId: string, prefere
     previousSetpoints: updatedPreviousSetpoints,
   });
 
-  console.log(`✅ [Coordination] Boost applied to ${results.length} rooms, ${cappedRooms.length} capped`);
 
   return {
     success: results.length > 0,
@@ -379,7 +370,6 @@ export async function applySetpointBoost(userId: string, homeId: string, prefere
  *   - restoredRooms: array of restored room info
  */
 export async function restorePreviousSetpoints(userId: string, homeId: string) {
-  console.log(`❄️ [Coordination] Restoring previous setpoints for ${userId}`);
 
   // Get access token
   const { accessToken, error } = await getValidAccessToken();
@@ -416,7 +406,6 @@ export async function restorePreviousSetpoints(userId: string, homeId: string) {
       previousSetpoints: null,
     });
 
-    console.log(`✅ [Coordination] Restored ${result.restoredRooms.length} rooms`);
   }
 
   return result;
@@ -444,7 +433,6 @@ export async function sendCoordinationNotification(userId: string, type: string,
   const throttleCheck = await shouldSendCoordinationNotification(userId);
 
   if (!throttleCheck.allowed) {
-    console.log(`⏱️ [Coordination] Notification throttled: ${type}, wait ${throttleCheck.waitSeconds}s`);
 
     // Log throttled notification event (fire-and-forget)
     // Note: We don't have stoveStatus here, so we'll use 'UNKNOWN'
@@ -523,13 +511,11 @@ export async function sendCoordinationNotification(userId: string, type: string,
     // Record notification sent for throttle
     await recordNotificationSent(userId);
 
-    console.log(`📨 [Coordination] Notification sent: ${type}`);
     return {
       sent: true,
       reason: null,
     };
   } else {
-    console.log(`📭 [Coordination] Notification not sent: ${result.error || result.reason}`);
     return {
       sent: false,
       reason: result.error || result.reason,

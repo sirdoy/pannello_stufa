@@ -54,7 +54,6 @@ export function VersionProvider({ children }: { children: ReactNode }) {
 
     // Non mostrare modal bloccante in ambiente locale
     if (isDevelopment()) {
-      console.log('🔧 Ambiente locale: versioning enforcement disabilitato');
       return;
     }
 
@@ -75,7 +74,6 @@ export function VersionProvider({ children }: { children: ReactNode }) {
 
       if (comparison < 0) {
         // Versione locale è INFERIORE → update necessario
-        console.log(`⚠️ Update richiesto: ${APP_VERSION} → ${latest.version}`);
         setNeedsUpdate(true);
         setFirebaseVersion(latest.version);
       } else {

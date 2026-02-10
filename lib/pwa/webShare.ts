@@ -62,12 +62,10 @@ export async function share(data: ShareData): Promise<boolean> {
 
   try {
     await navigator.share(data);
-    console.log('[WebShare] Shared successfully');
     return true;
   } catch (error) {
     if ((error as Error).name === 'AbortError') {
       // User cancelled - not an error
-      console.log('[WebShare] Share cancelled by user');
       return false;
     }
     console.error('[WebShare] Error:', error);

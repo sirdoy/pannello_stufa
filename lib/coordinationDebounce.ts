@@ -88,7 +88,6 @@ export async function startDebounceTimer(
 
   // Create timer
   const timer = setTimeout(async () => {
-    console.log(`⏰ Debounce timer expired for ${userId} (${targetState})`);
 
     // Remove from Map
     activeTimers.delete(userId);
@@ -121,7 +120,6 @@ export async function startDebounceTimer(
     debounceStartedAt: startedAt,
   });
 
-  console.log(`⏱️ Debounce timer started for ${userId}: ${targetState} (${delayMs}ms)`);
 
   return { started: true, duration: delayMs };
 }
@@ -148,7 +146,6 @@ export async function cancelDebounceTimer(userId: string): Promise<CancelResult>
     debounceStartedAt: null,
   });
 
-  console.log(`🚫 Debounce timer cancelled for ${userId}`);
 
   return { cancelled: true };
 }
@@ -204,7 +201,6 @@ export async function handleStoveStateChange(
   const entry = activeTimers.get(userId);
   const hasPending = !!entry;
 
-  console.log(`🔄 Stove state change: ${newState}, pending: ${hasPending}, targetState: ${entry?.targetState || 'none'}`);
 
   // Case 1: Stove ON with no pending debounce → Start 2-min timer
   if (newState === 'ON' && !hasPending) {
@@ -221,14 +217,12 @@ export async function handleStoveStateChange(
 
   // Case 3: Stove OFF with no pending debounce → Execute immediately
   if (newState === 'OFF' && !hasPending) {
-    console.log(`⚡ Immediate execution: stove OFF with no pending debounce`);
     await callback();
     return { action: 'executed_immediately', delayMs: 0 };
   }
 
   // Case 4: State matches targetState → No change needed
   if (hasPending && newState === entry.targetState) {
-    console.log(`✓ State matches targetState (${newState}), no action needed`);
     return { action: 'no_change', delayMs: null };
   }
 
@@ -257,7 +251,6 @@ function cleanupOldEntries(): void {
   }
 
   if (totalCleaned > 0) {
-    console.log(`🧹 Debounce cleanup: removed ${totalCleaned} stale entries`);
   }
 }
 

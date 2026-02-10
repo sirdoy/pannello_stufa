@@ -30,7 +30,6 @@ export default function PWAInitializer() {
             const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
               scope: '/',
             });
-            console.log('[PWAInitializer] Service Worker registered:', registration.scope);
           } catch (swError) {
             console.error('[PWAInitializer] Service Worker registration failed:', swError);
           }
@@ -42,7 +41,6 @@ export default function PWAInitializer() {
         // 3. Request persistent storage (won't prompt user, just requests)
         const persisted = await requestPersistentStorage();
         if (persisted) {
-          console.log('[PWAInitializer] Persistent storage granted');
         }
 
         // 4. Listen for visibility changes to clear badge when app becomes visible
@@ -73,11 +71,7 @@ export default function PWAInitializer() {
     const initNotifications = async () => {
       try {
         // Initialize token management (loads existing token, refreshes if needed)
-        const result = await initializeNotifications(user.sub);
-        console.log('[PWAInitializer] Notifications initialized:', {
-          hasToken: result.hasToken,
-          wasRefreshed: result.wasRefreshed,
-        });
+        await initializeNotifications(user.sub);
       } catch (error) {
         console.error('[PWAInitializer] Error initializing notifications:', error);
       }
@@ -89,7 +83,6 @@ export default function PWAInitializer() {
   // Setup foreground message listener
   useEffect(() => {
     const unsubscribe = onForegroundMessage((payload) => {
-      console.log('[PWAInitializer] Foreground notification received:', payload);
       // The notification will be shown automatically by onForegroundMessage
     });
 

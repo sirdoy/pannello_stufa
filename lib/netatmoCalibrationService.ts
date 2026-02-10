@@ -109,7 +109,6 @@ export async function calibrateValvesServer(): Promise<CalibrationResult> {
     };
   }
 
-  console.log(`🔄 Switching to schedule: ${alternativeSchedule.name}`);
 
   // Switch to alternative schedule
   const switched1 = await NETATMO_API.switchHomeSchedule(accessToken, homeId, alternativeSchedule.id);
@@ -140,7 +139,6 @@ export async function calibrateValvesServer(): Promise<CalibrationResult> {
 
   // If schedule changed during calibration, don't switch back (respect user's choice)
   if (currentScheduleAfter && currentScheduleAfter.id !== alternativeSchedule.id) {
-    console.log(`⚠️ Schedule changed during calibration (now: ${currentScheduleAfter.name}). Keeping user's selection.`);
     return {
       calibrated: true,
       schedule_name: currentScheduleAfter.name || 'Unknown',
@@ -149,7 +147,6 @@ export async function calibrateValvesServer(): Promise<CalibrationResult> {
     };
   }
 
-  console.log(`🔄 Switching back to schedule: ${currentSchedule.name}`);
 
   // Switch back to original schedule
   const switched2 = await NETATMO_API.switchHomeSchedule(accessToken, homeId, currentSchedule.id);

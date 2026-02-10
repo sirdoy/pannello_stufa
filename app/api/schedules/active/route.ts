@@ -58,7 +58,6 @@ export const POST = withAuthAndErrorHandler(async (request) => {
   // Atomic update of active schedule ID
   await adminDbSet('schedules-v2/activeScheduleId', scheduleId);
 
-  console.log(`Active schedule changed to: ${scheduleId} (${schedule.name})`);
 
   return success({
     activeScheduleId: scheduleId,

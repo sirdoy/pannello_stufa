@@ -330,7 +330,6 @@ export async function getFCMToken(userId: string) {
     });
     await debugLog('Token salvato in local storage');
 
-    console.log('✅ FCM token salvato:', token);
     return token;
 
   } catch (error: unknown) {
@@ -355,7 +354,6 @@ export function onForegroundMessage(callback?: (payload: unknown) => void) {
   const messaging = getMessaging();
 
   const unsubscribe = onMessage(messaging, (payload) => {
-    console.log('📬 Notifica ricevuta (foreground):', payload);
 
     // Mostra notifica anche in foreground
     if (payload.notification) {
@@ -505,7 +503,6 @@ export async function cleanupOldTokens(userId) {
 
       if (now - createdAt > MAX_AGE) {
         // Richiede Admin SDK - chiamare /api/notifications/cleanup
-        console.log('🗑️ Token obsoleto trovato:', tokenKey);
       }
     }
 

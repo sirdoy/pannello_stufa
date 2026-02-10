@@ -71,7 +71,6 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
   // Save theme to Firebase using Admin SDK
   await adminDbSet(`users/${userId}/preferences/theme`, theme);
 
-  console.log(`Tema aggiornato per user ${userId}: ${theme}`);
 
   return success({
     message: 'Tema aggiornato con successo',

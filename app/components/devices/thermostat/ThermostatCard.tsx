@@ -182,7 +182,6 @@ export default function ThermostatCard() {
       if (data.reconnect) {
         // Token expired/invalid - retry once in case token was just refreshed
         if (retryCount < MAX_RETRIES) {
-          console.log(`⏳ Token issue detected, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
           setLoadingMessage('Verifica token in corso...');
           await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
           return checkConnection(retryCount + 1);
@@ -199,7 +198,6 @@ export default function ThermostatCard() {
       } else {
         // Other error - retry once for transient issues
         if (retryCount < MAX_RETRIES && !data.reconnect) {
-          console.log(`⏳ Connection error, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
           setLoadingMessage('Nuovo tentativo...');
           await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
           return checkConnection(retryCount + 1);
@@ -211,7 +209,6 @@ export default function ThermostatCard() {
       console.error('Errore connessione termostato:', err);
       // Retry on network errors
       if (retryCount < MAX_RETRIES) {
-        console.log(`⏳ Network error, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
         setLoadingMessage('Nuovo tentativo...');
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
         return checkConnection(retryCount + 1);
@@ -237,7 +234,6 @@ export default function ThermostatCard() {
       if (data.reconnect) {
         // Token issue during polling - retry once before disconnecting
         if (retryCount < MAX_RETRIES) {
-          console.log(`⏳ Status fetch token issue, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
           await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
           return fetchStatus(retryCount + 1);
         }
@@ -260,7 +256,6 @@ export default function ThermostatCard() {
       console.error('Errore fetch status termostato:', err);
       // Retry on network errors (but not rate limit)
       if (retryCount < MAX_RETRIES && !message.includes('concurrency limited')) {
-        console.log(`⏳ Status fetch error, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
         return fetchStatus(retryCount + 1);
       }

@@ -30,7 +30,6 @@ export default function AxeDevtools() {
         // Initialize with 1 second debounce to avoid spam during rapid updates
         axe.default(React, ReactDOM, 1000);
 
-        console.log('[Accessibility] axe-core-react initialized - violations will be logged to console');
       })
       .catch(() => {
         // Silently fail if axe-core not installed

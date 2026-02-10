@@ -57,7 +57,6 @@ export function validateHealthMonitoringEnv(): ValidationResult {
 
   // Log validation result
   if (valid) {
-    console.log('✅ Health monitoring environment validation passed');
     if (warnings.length > 0) {
       console.warn(`⚠️ Optional env vars missing: ${warnings.join(', ')}`);
     }
@@ -114,7 +113,6 @@ export function validateNetatmoEnv(): NetatmoValidationResult {
     warnings.push('Using dev Netatmo credentials in production environment');
   }
 
-  console.log(`✅ Netatmo environment detected: ${environment}`);
   if (warnings.length > 0) {
     console.warn(`⚠️ Netatmo warnings: ${warnings.join(', ')}`);
   }

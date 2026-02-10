@@ -136,7 +136,6 @@ export interface BannerProps extends VariantProps<typeof bannerVariants> {
  *   title="Connection Lost"
  *   description="Attempting to reconnect..."
  *   dismissible
- *   onDismiss={() => console.log('dismissed')}
  * />
  */
 export default function Banner({

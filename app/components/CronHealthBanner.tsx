@@ -22,7 +22,6 @@ export default function CronHealthBanner({ variant = 'banner' }: CronHealthBanne
         const snapshot = await get(ref(db, 'cronHealth/lastCall'));
         if (snapshot.exists()) {
           const lastCall = snapshot.val();
-          console.log('🔍 Firebase cronHealth/lastCall (manual fetch):', lastCall);
           setLastCallTime(lastCall);
         }
       } catch (error) {
@@ -40,7 +39,6 @@ export default function CronHealthBanner({ variant = 'banner' }: CronHealthBanne
     // Check every 30 seconds if cron is healthy
     const checkCronHealth = () => {
       if (!lastCallTime) {
-        console.log('🔍 lastCallTime è null, skip check');
         return;
       }
 
@@ -48,15 +46,6 @@ export default function CronHealthBanner({ variant = 'banner' }: CronHealthBanne
       const now = new Date();
       const diffMs = now.getTime() - lastCallDate.getTime();
       const diffMinutes = Math.floor(diffMs / 1000 / 60);
-
-      console.log('🔍 Cron Health Check:', {
-        lastCallTime,
-        lastCallDate: lastCallDate.toISOString(),
-        now: now.toISOString(),
-        diffMs,
-        diffMinutes,
-        showBanner: diffMinutes > 5
-      });
 
       setMinutesSinceLastCall(diffMinutes);
       setShowBanner(diffMinutes > 5);

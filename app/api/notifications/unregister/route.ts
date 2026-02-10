@@ -25,7 +25,6 @@ export const DELETE = withAuthAndErrorHandler(async (request, context, session) 
   // Rimuovi tutti i token dell'utente
   await adminDbRemove(`users/${userId}/fcmTokens`);
 
-  console.log(`FCM tokens rimossi per user ${userId}`);
 
   return success({
     message: 'Notifiche disattivate con successo',

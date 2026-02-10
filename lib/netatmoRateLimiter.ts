@@ -95,10 +95,6 @@ function checkNetatmoRateLimitInMemory(userId: string): RateLimitCheckResult {
     const windowEnd = userData.windowStart + WINDOW_MS;
     const resetInSeconds = Math.ceil((windowEnd - now) / 1000);
 
-    console.log(
-      `⏱️ Netatmo rate limit hit: ${userId} - ${userData.count}/${NETATMO_CONSERVATIVE_LIMIT} in window`
-    );
-
     return {
       allowed: false,
       currentCount: userData.count,
@@ -109,10 +105,6 @@ function checkNetatmoRateLimitInMemory(userId: string): RateLimitCheckResult {
 
   // Allowed
   const remaining = NETATMO_CONSERVATIVE_LIMIT - userData.count;
-
-  console.log(
-    `✅ Netatmo rate limit OK: ${userId} - ${userData.count}/${NETATMO_CONSERVATIVE_LIMIT} (${remaining} remaining)`
-  );
 
   return {
     allowed: true,
@@ -146,10 +138,6 @@ function trackNetatmoApiCallInMemory(userId: string): RateLimitTrackResult {
   userApiCalls.set(userId, userData);
 
   const remaining = Math.max(0, NETATMO_CONSERVATIVE_LIMIT - userData.count);
-
-  console.log(
-    `📊 Netatmo API call tracked: ${userId} - ${userData.count}/${NETATMO_CONSERVATIVE_LIMIT} (${remaining} remaining)`
-  );
 
   return {
     count: userData.count,
@@ -211,7 +199,6 @@ function cleanupOldEntries(): void {
   }
 
   if (totalCleaned > 0) {
-    console.log(`🧹 Netatmo rate limiter cleanup: removed ${totalCleaned} expired entries`);
   }
 }
 

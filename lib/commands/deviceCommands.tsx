@@ -207,7 +207,6 @@ function getThermostatCommands(): CommandGroup {
         shortcut: '⌘↑',
         // Note: This requires knowing which room is selected - show info toast
         onSelect: () => {
-          console.log('[CommandPalette] Temperature adjustment requires room selection - navigate to thermostat page');
           window.location.href = '/thermostat';
         },
       },
@@ -217,7 +216,6 @@ function getThermostatCommands(): CommandGroup {
         icon: <Minus className="w-4 h-4" />,
         shortcut: '⌘↓',
         onSelect: () => {
-          console.log('[CommandPalette] Temperature adjustment requires room selection - navigate to thermostat page');
           window.location.href = '/thermostat';
         },
       },

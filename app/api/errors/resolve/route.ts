@@ -70,7 +70,6 @@ export const POST = withAuthAndErrorHandler(async (request) => {
 
   await adminDbUpdate(`errors/${errorId}`, updates);
 
-  console.log(`Errore stufa risolto: ${errorId} (${errorData.errorCode})`);
 
   return success({
     message: 'Errore risolto con successo',

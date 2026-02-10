@@ -87,13 +87,11 @@ export function useOnlineStatus(): { isOnline: boolean; wasOffline: boolean; las
         }, 5000);
       }
 
-      console.log('[useOnlineStatus] Connection restored');
     };
 
     const handleOffline = () => {
       setIsOnline(false);
       setOfflineSince(new Date());
-      console.log('[useOnlineStatus] Connection lost');
     };
 
     window.addEventListener('online', handleOnline);

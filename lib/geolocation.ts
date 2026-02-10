@@ -63,7 +63,6 @@ const GEOLOCATION_ERROR_MESSAGES = {
  * @example
  * try {
  *   const location = await getCurrentLocation();
- *   console.log(`Lat: ${location.latitude}, Lon: ${location.longitude}`);
  * } catch (error) {
  *   if (error.code === GEOLOCATION_ERRORS.PERMISSION_DENIED) {
  *     // Show permission denied UI

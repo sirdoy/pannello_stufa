@@ -38,7 +38,6 @@ export async function updateDeadManSwitch(): Promise<boolean> {
   try {
     const timestamp = new Date().toISOString();
     await adminDbSet(DEAD_MAN_SWITCH_PATH, timestamp);
-    console.log(`✅ Dead man's switch updated: ${timestamp}`);
     return true;
   } catch (error) {
     console.error('❌ Failed to update dead man\'s switch:', error);
@@ -105,7 +104,6 @@ export async function alertDeadManSwitch(
     const adminUserId = process.env.ADMIN_USER_ID;
 
     if (!adminUserId) {
-      console.log('⚠️ ADMIN_USER_ID not configured - cannot send dead man\'s switch alert');
       return;
     }
 
@@ -127,7 +125,6 @@ export async function alertDeadManSwitch(
     });
 
     if (result.success) {
-      console.log(`✅ Dead man's switch alert sent: ${reason}`);
     } else {
       console.error(`❌ Failed to send dead man's switch alert: ${result.error}`);
     }

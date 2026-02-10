@@ -416,7 +416,6 @@ error('Failed to save', { duration: 8000 });
   title="Connection Lost"
   description="Attempting to reconnect..."
   dismissible
-  onDismiss={() => console.log('dismissed')}
 />
 
 {/* Persistent dismissal */}
@@ -1052,7 +1051,6 @@ const handleChange = (delta) => {
   data={data}
   columns={columns}
   enableSelection
-  onSelectionChange={(rows) => console.log('Selected:', rows)}
 />`,
   },
 };

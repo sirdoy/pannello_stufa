@@ -63,7 +63,6 @@ export async function logCronExecution(result: CronExecutionInput): Promise<void
 
     // Write to Firebase
     await adminDbSet(`cronExecutions/${key}`, logEntry);
-    console.log(`✅ Cron execution logged: ${result.status} (${result.mode}, ${result.duration}ms)`);
 
     // Cleanup old entries (fire-and-forget)
     cleanupOldEntries().catch(error => {
@@ -142,7 +141,6 @@ async function cleanupOldEntries(): Promise<void> {
       for (const key of entriesToDelete) {
         await adminDbSet(`cronExecutions/${key}`, null);
       }
-      console.log(`🧹 Cleaned up ${entriesToDelete.length} old cron execution log(s)`);
     }
 
   } catch (error) {

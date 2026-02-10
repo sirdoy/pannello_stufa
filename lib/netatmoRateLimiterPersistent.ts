@@ -98,10 +98,6 @@ export async function checkNetatmoRateLimitPersistent(userId: string): Promise<R
       const oldestInWindow = Math.min(...recentBurstCalls);
       const resetInSeconds = Math.ceil((oldestInWindow + NETATMO_BURST_WINDOW_MS - now) / 1000);
 
-      console.log(
-        `⏱️ Netatmo burst limit hit: ${userId} - ${recentBurstCalls.length}/${NETATMO_BURST_LIMIT} in 10s window`
-      );
-
       return {
         allowed: false,
         currentCount: recentBurstCalls.length,
@@ -129,10 +125,6 @@ export async function checkNetatmoRateLimitPersistent(userId: string): Promise<R
       const windowEnd = windowStart + NETATMO_HOURLY_WINDOW_MS;
       const resetInSeconds = Math.ceil((windowEnd - now) / 1000);
 
-      console.log(
-        `⏱️ Netatmo hourly limit hit: ${userId} - ${currentCount}/${NETATMO_HOURLY_LIMIT} in 1h window`
-      );
-
       return {
         allowed: false,
         currentCount,
@@ -150,10 +142,6 @@ export async function checkNetatmoRateLimitPersistent(userId: string): Promise<R
     const isHourlyMoreRestrictive = hourlyRemaining < burstRemaining;
     const reportCount = isHourlyMoreRestrictive ? currentCount : recentBurstCalls.length;
     const reportLimit = isHourlyMoreRestrictive ? NETATMO_HOURLY_LIMIT : NETATMO_BURST_LIMIT;
-
-    console.log(
-      `✅ Netatmo rate limit OK: ${userId} - burst: ${recentBurstCalls.length}/${NETATMO_BURST_LIMIT}, hourly: ${currentCount}/${NETATMO_HOURLY_LIMIT}`
-    );
 
     return {
       allowed: true,
@@ -221,10 +209,6 @@ export async function trackNetatmoApiCallPersistent(userId: string): Promise<Rat
     const burstRemaining = NETATMO_BURST_LIMIT - burstCount;
     const hourlyRemaining = NETATMO_HOURLY_LIMIT - hourlyResult.count;
     const remaining = Math.max(0, Math.min(burstRemaining, hourlyRemaining));
-
-    console.log(
-      `📊 Netatmo API call tracked: ${userId} - burst: ${burstCount}/${NETATMO_BURST_LIMIT}, hourly: ${hourlyResult.count}/${NETATMO_HOURLY_LIMIT}`
-    );
 
     return {
       count: burstCount, // Report burst count

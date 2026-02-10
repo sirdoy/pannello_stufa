@@ -39,7 +39,6 @@ function getVapidKey() {
  * Note: Debug log API has been removed, using console only
  */
 function debugLog(message: string, data: Record<string, unknown> = {}): void {
-  console.log(`[tokenRefresh] ${message}`, data);
 }
 
 /**

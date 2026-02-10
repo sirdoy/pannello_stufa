@@ -62,12 +62,6 @@ export const GET = withAuthAndErrorHandler(async (request: NextRequest) => {
   // Parse all events
   const parsedEvents = NETATMO_CAMERA_API.parseEvents(allEvents as any);
 
-  // Debug logging
-  console.log('[Camera Events]', {
-    totalEvents: parsedEvents.length,
-    cameraFilter: cameraId || 'all',
-  });
-
   return success({
     events: parsedEvents,
     cameras,

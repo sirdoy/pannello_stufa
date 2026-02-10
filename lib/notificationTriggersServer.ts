@@ -189,7 +189,6 @@ export async function triggerNotificationServer(
       const prefCheck = checkTypeEnabled(preferences, newTypeName);
 
       if (!prefCheck.shouldSend) {
-        console.log(`[Notification] Skipped ${typeId} (${newTypeName}) for ${userId}: ${prefCheck.reason}`);
         return {
           success: true,
           skipped: true,
@@ -240,7 +239,6 @@ export async function triggerNotificationServer(
     const successCount = 'successCount' in result ? result.successCount : 0;
     const failureCount = 'failureCount' in result ? result.failureCount : 0;
 
-    console.log(`[Notification] Sent ${typeId} to ${userId}: ${successCount} success, ${failureCount} failed`);
 
     return {
       success: result.success,

@@ -65,12 +65,10 @@ export const POST = withAuthAndErrorHandler(async (request) => {
   // Check if current hours >= new threshold
   if (maintenanceData.currentHours >= targetHours && !maintenanceData.needsCleaning) {
     updates.needsCleaning = true;
-    console.log(`Soglia raggiunta: ${maintenanceData.currentHours}h >= ${targetHours}h - needsCleaning=true`);
   }
 
   await adminDbUpdate('maintenance', updates);
 
-  console.log(`Target ore manutenzione aggiornato: ${targetHours}h`);
 
   return success({
     message: 'Soglia manutenzione aggiornata',

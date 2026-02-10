@@ -209,7 +209,6 @@ export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) 
 
       // Refresh parent data to reflect config changes
       if (onSyncComplete) {
-        console.log('🔄 Refreshing thermostat data after config save...');
         await onSyncComplete();
       }
 
@@ -246,7 +245,6 @@ export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) 
 
       // Refresh parent data after disable
       if (onSyncComplete) {
-        console.log('🔄 Refreshing thermostat data after disable...');
         await onSyncComplete();
       }
 
@@ -323,7 +321,6 @@ export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) 
       // Refresh parent data to show updated setpoints
       // Add small delay to allow Netatmo API to propagate changes
       if (onSyncComplete) {
-        console.log('🔄 Refreshing thermostat data after sync (2s delay for API propagation)...');
         setTimeout(async () => {
           await onSyncComplete();
         }, 2000);

@@ -72,7 +72,6 @@ export const GET = withAuthAndErrorHandler(async (request) => {
   const resolvedParam = searchParams.get('resolved');
   const resolved = resolvedParam !== null ? resolvedParam === 'true' : null;
 
-  console.log('🔍 Querying notification errors:', { limit, errorCode, since, resolved });
 
   const db = getAdminDatabase();
   const errorsRef = db.ref('notificationErrors');
@@ -119,7 +118,6 @@ export const GET = withAuthAndErrorHandler(async (request) => {
   // Apply limit
   const limitedErrors = errors.slice(0, limit);
 
-  console.log(`✅ Found ${limitedErrors.length} errors (total: ${errors.length})`);
 
   return success({
     errors: limitedErrors,
@@ -151,7 +149,6 @@ export const POST = withAuthAndErrorHandler(async (request) => {
     return badRequest('Missing errorId');
   }
 
-  console.log('✅ Marking error as resolved:', errorId);
 
   const db = getAdminDatabase();
   const errorRef = db.ref(`notificationErrors/${errorId}`);
@@ -165,7 +162,6 @@ export const POST = withAuthAndErrorHandler(async (request) => {
   // Update resolved status
   await errorRef.update({ resolved: true });
 
-  console.log('✅ Error marked as resolved:', errorId);
 
   return success({
     resolved: errorId,

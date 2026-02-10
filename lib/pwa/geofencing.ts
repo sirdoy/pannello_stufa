@@ -142,7 +142,6 @@ async function saveGeofenceConfig(config: GeofenceConfig): Promise<void> {
       enabled: config.enabled ?? true,
       updatedAt: Date.now(),
     });
-    console.log('[Geofencing] Config saved:', config);
   } catch (error) {
     console.error('[Geofencing] Error saving config:', error);
     throw error;
@@ -271,7 +270,6 @@ async function clearGeofenceConfig(): Promise<void> {
   try {
     const { remove } = await import('./indexedDB');
     await remove(STORES.APP_STATE, GEOFENCE_KEY);
-    console.log('[Geofencing] Config cleared');
   } catch (error) {
     console.error('[Geofencing] Error clearing config:', error);
   }

@@ -245,7 +245,6 @@ export const GET = withCronSecret(async (request) => {
     }).catch(() => {});
   }
 
-  console.log(`✅ [Coordination] Cycle complete: ${result.action} (${duration}ms)`);
 
   return success(response);
 }, 'Coordination/Enforce');

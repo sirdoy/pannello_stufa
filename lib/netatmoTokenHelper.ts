@@ -231,7 +231,6 @@ export async function saveRefreshToken(token: string): Promise<void> {
  */
 export async function clearCachedAccessToken(): Promise<void> {
   await adminDbSet(getEnvironmentPath('netatmo/access_token_cache'), null);
-  console.log('🗑️ Cleared cached access token');
 }
 
 /**

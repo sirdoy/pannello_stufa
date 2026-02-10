@@ -103,7 +103,6 @@ serwist.addEventListeners();
  */
 self.addEventListener('push', (event) => {
   if (!event.data) {
-    console.log('[sw.ts] Push event without data');
     return;
   }
 
@@ -111,11 +110,9 @@ self.addEventListener('push', (event) => {
   try {
     payload = event.data.json();
   } catch {
-    console.log('[sw.ts] Push data is not JSON:', event.data.text());
     return;
   }
 
-  console.log('[sw.ts] Push notification received:', payload);
 
   const notificationTitle = payload.notification?.title || 'Pannello Stufa';
   const notificationOptions = {
@@ -141,7 +138,6 @@ self.addEventListener('push', (event) => {
  * Opens the app or focuses existing window when user clicks notification
  */
 self.addEventListener('notificationclick', (event) => {
-  console.log('[sw.ts] Notification clicked:', event.notification);
 
   event.notification.close();
 
@@ -174,7 +170,6 @@ self.addEventListener('notificationclick', (event) => {
  * Notification close handler (optional analytics)
  */
 self.addEventListener('notificationclose', (event) => {
-  console.log('[sw.ts] Notification dismissed:', event.notification.tag);
 });
 
 // ============================================
@@ -295,22 +290,18 @@ async function executeCommand(command: any): Promise<void> {
  * Process all pending commands in the queue
  */
 async function processCommandQueue(): Promise<void> {
-  console.log('[sw.ts] Processing command queue...');
 
   const commands = await getPendingCommands();
   if (commands.length === 0) {
-    console.log('[sw.ts] No pending commands');
     return;
   }
 
-  console.log(`[sw.ts] Found ${commands.length} pending commands`);
 
   for (const command of commands) {
     try {
       await updateCommandStatus(command.id, 'processing');
       await executeCommand(command);
       await removeCommand(command.id);
-      console.log(`[sw.ts] Command ${command.id} completed: ${command.endpoint}`);
 
       // Notify clients of successful sync
       const clients = await self.clients.matchAll({ type: 'window' });
@@ -339,7 +330,6 @@ async function processCommandQueue(): Promise<void> {
  * Triggered when connection is restored and sync is registered
  */
 self.addEventListener('sync', (event: SyncEvent) => {
-  console.log('[sw.ts] Sync event received:', event.tag);
 
   if (event.tag === SYNC_TAG) {
     event.waitUntil(processCommandQueue());
@@ -356,17 +346,14 @@ self.addEventListener('sync', (event: SyncEvent) => {
  */
 async function updateBadge(count: number): Promise<void> {
   if (!('setAppBadge' in navigator)) {
-    console.log('[sw.ts] Badge API not supported');
     return;
   }
 
   try {
     if (count > 0) {
       await (navigator as any).setAppBadge(count);
-      console.log('[sw.ts] Badge updated:', count);
     } else {
       await (navigator as any).clearAppBadge();
-      console.log('[sw.ts] Badge cleared');
     }
   } catch (error) {
     console.error('[sw.ts] Failed to update badge:', error);
@@ -467,7 +454,6 @@ self.addEventListener('fetch', (event: FetchEvent) => {
           return response;
         })
         .catch((error) => {
-          console.log('[sw.ts] Stove status fetch failed, using cache');
           throw error;
         })
     );
@@ -490,7 +476,6 @@ self.addEventListener('fetch', (event: FetchEvent) => {
           return response;
         })
         .catch((error) => {
-          console.log('[sw.ts] Thermostat status fetch failed, using cache');
           throw error;
         })
     );
@@ -546,7 +531,6 @@ self.addEventListener('message', async (event) => {
       break;
 
     default:
-      console.log('[sw.ts] Unknown message type:', type);
   }
 });
 
@@ -562,7 +546,6 @@ const PERIODIC_SYNC_TAG = 'check-stove-status';
  * Note: Only supported in Chrome/Edge
  */
 self.addEventListener('periodicsync', (event: any) => {
-  console.log('[sw.ts] Periodic sync event:', event.tag);
 
   if (event.tag === PERIODIC_SYNC_TAG) {
     event.waitUntil(checkStoveStatusBackground());
@@ -574,7 +557,6 @@ self.addEventListener('periodicsync', (event: any) => {
  * Sends notification if there's an issue
  */
 async function checkStoveStatusBackground(): Promise<void> {
-  console.log('[sw.ts] Checking stove status in background...');
 
   try {
     const response = await fetch('/api/stove/status');
@@ -615,7 +597,6 @@ async function checkStoveStatusBackground(): Promise<void> {
       await incrementBadge();
     }
 
-    console.log('[sw.ts] Background status check completed');
   } catch (error) {
     console.error('[sw.ts] Background status check failed:', error);
   }
@@ -637,7 +618,6 @@ self.addEventListener('message', async (event) => {
             minInterval: data?.interval || 15 * 60 * 1000, // Default 15 minutes
           });
           event.ports[0]?.postMessage({ success: true });
-          console.log('[sw.ts] Periodic sync registered');
         } else {
           event.ports[0]?.postMessage({
             success: false,
@@ -657,7 +637,6 @@ self.addEventListener('message', async (event) => {
         if ('periodicSync' in self.registration) {
           await (self.registration as any).periodicSync.unregister(PERIODIC_SYNC_TAG);
           event.ports[0]?.postMessage({ success: true });
-          console.log('[sw.ts] Periodic sync unregistered');
         }
       } catch (error) {
         event.ports[0]?.postMessage({
@@ -698,4 +677,3 @@ self.addEventListener('message', async (event) => {
 // Service Worker Lifecycle
 // ============================================
 
-console.log('[sw.ts] Service Worker loaded - Serwist v9 with Background Sync, Periodic Sync, Badges, and Offline Cache');

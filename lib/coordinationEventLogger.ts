@@ -114,7 +114,6 @@ export async function logCoordinationEvent(event: CoordinationEvent): Promise<st
 
     const docRef = await db.collection('coordinationEvents').add(eventDoc);
 
-    console.log(`📝 Logged coordination event: ${event.eventType}/${event.action} (${docRef.id})`);
 
     return docRef.id;
 

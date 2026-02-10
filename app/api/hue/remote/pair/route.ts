@@ -24,7 +24,6 @@ const APP_NAME = 'pannello-stufa';
 const DEVICE_NAME = 'pwa-remote';
 
 export const POST = withAuthAndErrorHandler(async () => {
-  console.log('🔐 [Hue Remote Pair] Starting remote pairing...');
 
   // Step 1: Get valid access token
   const { accessToken, error: tokenError, message } = await getValidRemoteAccessToken();
@@ -38,11 +37,9 @@ export const POST = withAuthAndErrorHandler(async () => {
     );
   }
 
-  console.log('✅ [Hue Remote Pair] Access token obtained');
 
   // Step 2: Enable link button mode via Remote API
   // This tells the cloud that we want to pair (user must have pressed physical button)
-  console.log('🔗 [Hue Remote Pair] Enabling link button mode...');
 
   try {
     interface LinkButtonError {
@@ -62,7 +59,6 @@ export const POST = withAuthAndErrorHandler(async () => {
     });
 
     const linkButtonData = await linkButtonResponse.json() as unknown;
-    console.log('📥 [Hue Remote Pair] Link button response:', JSON.stringify(linkButtonData));
 
     // The response might be an array with success/error objects
     if (Array.isArray(linkButtonData)) {
@@ -94,7 +90,6 @@ export const POST = withAuthAndErrorHandler(async () => {
   }
 
   // Step 3: Create username (application key) via Remote API
-  console.log('🔑 [Hue Remote Pair] Creating application key...');
 
   try {
     const createUserResponse = await fetch(`${HUE_REMOTE_BASE}/bridge/`, {
@@ -120,7 +115,6 @@ export const POST = withAuthAndErrorHandler(async () => {
     }
 
     const createUserData = await createUserResponse.json() as unknown;
-    console.log('📥 [Hue Remote Pair] Create user response:', JSON.stringify(createUserData));
 
     // Parse response - should be array with success containing username
     if (Array.isArray(createUserData) && createUserData.length > 0) {
@@ -150,7 +144,6 @@ export const POST = withAuthAndErrorHandler(async () => {
         const username = successItem.success.username;
         const clientkey = successItem.success.clientkey || null;
 
-        console.log('✅ [Hue Remote Pair] Username created:', username.substring(0, 8) + '...');
 
         // Step 4: Save username to Firebase
         const hueRef = ref(db, getEnvironmentPath('hue'));
@@ -161,13 +154,10 @@ export const POST = withAuthAndErrorHandler(async () => {
           updated_at: new Date().toISOString(),
         });
 
-        console.log('✅ [Hue Remote Pair] Username saved to Firebase');
 
         // Update connection mode to 'remote' (since we paired via cloud)
         await setConnectionMode('remote');
-        console.log('✅ [Hue Remote Pair] Connection mode set to remote');
 
-        console.log('🎉 [Hue Remote Pair] Remote pairing completed successfully!');
 
         return success({
           paired: true,

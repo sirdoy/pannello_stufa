@@ -189,7 +189,6 @@ export default function StoveCard() {
 
       // Only sync if not initial load (previousStatusRef.current !== null)
       if (hasChanges && previousStatusRef.current !== null) {
-        console.log('[StoveCard] External change detected, syncing to Firebase for multi-device updates');
         try {
           await fetch('/api/stove/sync-external-state', {
             method: 'POST',
@@ -276,7 +275,6 @@ export default function StoveCard() {
         const staleThreshold = usePollingFallback ? 30 : (status !== 'spento' ? 30 : 90);
 
         if (!isFirebaseConnected || timeSinceUpdate > staleThreshold || usePollingFallback) {
-          console.log(`[StoveCard] Adaptive polling (${interval}ms) - ${usePollingFallback ? 'fallback' : status !== 'spento' ? 'stove on' : 'stove off'}`);
           fetchStatusAndUpdate();
         }
 
@@ -306,7 +304,6 @@ export default function StoveCard() {
         console.warn('[StoveCard] Firebase disconnected, activating polling fallback');
         setUsePollingFallback(true);
       } else if (connected) {
-        console.log('[StoveCard] Firebase connected');
         isFirstConnectionRef.current = false;
         // Keep polling fallback for 30s after reconnection to ensure sync
         setTimeout(() => {
@@ -329,7 +326,6 @@ export default function StoveCard() {
         const data = snapshot.val();
 
         if (data) {
-          console.log('[StoveCard] Firebase state update:', data);
 
           // Update all state from Firebase
           if (data.status !== undefined) setStatus(data.status);
@@ -369,14 +365,12 @@ export default function StoveCard() {
       const enabled = await isSandboxEnabled();
 
       if (enabled) {
-        console.log('[Sandbox] Real-time sync attivo');
 
         // Listener per stato stufa
         const stateRef = ref(db, 'sandbox/stoveState');
         unsubscribeState = onValue(stateRef, (snapshot) => {
           const data = snapshot.val();
           if (data) {
-            console.log('[Sandbox] Aggiornamento stato:', data);
             setStatus(data.status || '...');
             setFanLevel(data.fan ?? null);
             setPowerLevel(data.power ?? null);
@@ -387,7 +381,6 @@ export default function StoveCard() {
         const errorRef = ref(db, 'sandbox/error');
         unsubscribeError = onValue(errorRef, (snapshot) => {
           const error = snapshot.val();
-          console.log('[Sandbox] Aggiornamento errore:', error);
           if (error) {
             const errorCode = parseInt(error.code.replace('AL', '')) || 1;
             setErrorCode(errorCode);
@@ -403,7 +396,6 @@ export default function StoveCard() {
         unsubscribeMaintenance = onValue(maintenanceRef, async (snapshot) => {
           const data = snapshot.val();
           if (data) {
-            console.log('[Sandbox] Aggiornamento manutenzione:', data);
             await fetchMaintenanceStatus();
           }
         });
@@ -440,7 +432,6 @@ export default function StoveCard() {
 
     // Se la modalità è cambiata, mostra notifica e aggiorna UI immediatamente
     if (data.modeChanged) {
-      console.log('[StoveCard] Modalità cambiata in semi-manuale', data);
 
       setToast({
         message: 'Modalità cambiata in Semi-Manuale',
@@ -475,7 +466,6 @@ export default function StoveCard() {
 
     // Se la modalità è cambiata, mostra notifica e aggiorna UI immediatamente
     if (data.modeChanged) {
-      console.log('[StoveCard] Modalità cambiata in semi-manuale', data);
 
       setToast({
         message: 'Modalità cambiata in Semi-Manuale',

@@ -114,10 +114,6 @@ function checkRateLimitInMemory(
     const oldestInWindow = Math.min(...recentInWindow);
     const nextAllowedIn = (oldestInWindow + windowMs) - now;
 
-    console.log(
-      `⏱️ Rate limit hit: ${userId}:${notifType} - ${recentInWindow.length}/${limits.maxPerWindow} in ${limits.windowMinutes}min window`
-    );
-
     return {
       allowed: false,
       suppressedCount: recentInWindow.length,
@@ -128,10 +124,6 @@ function checkRateLimitInMemory(
   // Allowed - track this send
   recentInWindow.push(now);
   recentSends.set(key, recentInWindow);
-
-  console.log(
-    `✅ Rate limit OK: ${userId}:${notifType} - ${recentInWindow.length}/${limits.maxPerWindow} in window`
-  );
 
   return {
     allowed: true,
@@ -157,7 +149,6 @@ function clearRateLimitForUserInMemory(userId: string): number {
     }
   }
 
-  console.log(`🧹 Cleared ${clearedCount} rate limit entries for user ${userId}`);
   return clearedCount;
 }
 
@@ -218,7 +209,6 @@ function cleanupOldEntries(): void {
   }
 
   if (totalCleaned > 0) {
-    console.log(`🧹 Rate limiter cleanup: removed ${totalCleaned} expired entries`);
   }
 }
 

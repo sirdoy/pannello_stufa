@@ -106,7 +106,6 @@ export const POST = withAuthAndErrorHandler(async (request) => {
 
   await adminDbSet(`schedules-v2/schedules/${scheduleId}`, newSchedule);
 
-  console.log(`✅ Schedule created: ${scheduleId} (${name})`);
 
   return success({
     schedule: {

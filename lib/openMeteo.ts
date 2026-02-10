@@ -126,8 +126,6 @@ export function interpretWeatherCode(code: number): WeatherCondition {
  *
  * @example
  * const forecast = await fetchWeatherForecast(45.4642, 9.19);
- * console.log(forecast.current.temperature_2m); // Current temperature
- * console.log(forecast.daily.temperature_2m_max); // Array of max temps for 5 days
  */
 export async function fetchWeatherForecast(latitude: number, longitude: number): Promise<WeatherForecast> {
   // Round coordinates to 4 decimals (~11m precision)
@@ -162,7 +160,6 @@ export async function fetchWeatherForecast(latitude: number, longitude: number):
  *
  * @example
  * const airQuality = await fetchAirQuality(45.4642, 9.19);
- * console.log(airQuality.current.european_aqi); // Current European AQI
  */
 export async function fetchAirQuality(latitude: number, longitude: number): Promise<AirQualityData> {
   // Round coordinates to 4 decimals (~11m precision)

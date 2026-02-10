@@ -79,7 +79,6 @@ export default function CameraCard() {
       if (data.reconnect) {
         // Token issue - retry once in case token was just refreshed
         if (retryCount < MAX_RETRIES) {
-          console.log(`⏳ Camera token issue, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
           await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
           return fetchCameras(retryCount + 1);
         }
@@ -120,7 +119,6 @@ export default function CameraCard() {
       } else {
         // Retry on network errors
         if (retryCount < MAX_RETRIES) {
-          console.log(`⏳ Camera fetch error, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
           await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
           return fetchCameras(retryCount + 1);
         }

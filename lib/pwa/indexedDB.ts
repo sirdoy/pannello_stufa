@@ -74,7 +74,6 @@ async function openDB(): Promise<IDBDatabase> {
         db.createObjectStore(STORES.APP_STATE, { keyPath: 'key' });
       }
 
-      console.log('[IndexedDB] Database upgraded to version', DB_VERSION);
     };
   });
 }

@@ -63,7 +63,6 @@ async function sendSchedulerNotification(action: string, details: string = ''): 
     const adminUserId = process.env.ADMIN_USER_ID;
 
     if (!adminUserId) {
-      console.log('⚠️ ADMIN_USER_ID non configurato - notifiche scheduler disabilitate');
       return;
     }
 
@@ -78,9 +77,7 @@ async function sendSchedulerNotification(action: string, details: string = ''): 
     });
 
     if (result.skipped) {
-      console.log(`⏭️ Scheduler notification skipped: ${result.reason}`);
     } else if (result.success) {
-      console.log(`✅ Notifica scheduler inviata: ${action}`);
     } else {
       console.error(`❌ Errore invio notifica scheduler: ${result.error}`);
     }
@@ -106,7 +103,6 @@ async function calibrateValvesIfNeeded(): Promise<any> {
       };
     }
 
-    console.log('🔧 Avvio calibrazione automatica valvole Netatmo (ogni 12h)...');
 
     // Call service directly instead of HTTP request
     const result = await calibrateValvesServer() as any;
@@ -117,7 +113,6 @@ async function calibrateValvesIfNeeded(): Promise<any> {
     }
 
     await adminDbSet(calibrationPath, now);
-    console.log('✅ Calibrazione automatica valvole completata');
 
     return {
       calibrated: true,
@@ -155,7 +150,6 @@ async function refreshWeatherIfNeeded(): Promise<any> {
       };
     }
 
-    console.log('🌤️ Avvio refresh automatico weather (ogni 30 min)...');
 
     // Read location from Firebase
     const locationPath = getEnvironmentPath('config/location');
@@ -180,7 +174,6 @@ async function refreshWeatherIfNeeded(): Promise<any> {
     // Update last refresh timestamp
     await adminDbSet(lastRefreshPath, now);
 
-    console.log(`✅ Weather refresh completato per ${name || 'Unknown'}`);
 
     return {
       refreshed: true,
@@ -219,7 +212,6 @@ async function cleanupTokensIfNeeded(): Promise<any> {
       };
     }
 
-    console.log('🧹 Avvio cleanup automatico token FCM (ogni 7 giorni)...');
 
     const db = getAdminDatabase();
 
@@ -251,7 +243,6 @@ async function cleanupTokensIfNeeded(): Promise<any> {
             // No timestamp - consider stale
             tokenUpdates[`users/${userId}/fcmTokens/${tokenKey}`] = null;
             tokensRemoved++;
-            console.log(`[Cleanup] Removing token without timestamp (user ${userId})`);
             return;
           }
 
@@ -262,7 +253,6 @@ async function cleanupTokensIfNeeded(): Promise<any> {
             tokenUpdates[`users/${userId}/fcmTokens/${tokenKey}`] = null;
             tokensRemoved++;
             const ageDays = Math.floor(age / (24 * 60 * 60 * 1000));
-            console.log(`[Cleanup] Removing stale token (${ageDays} days old, user ${userId})`);
           }
         });
       });
@@ -299,7 +289,6 @@ async function cleanupTokensIfNeeded(): Promise<any> {
     // Update last cleanup timestamp
     await adminDbSet(lastCleanupPath, now);
 
-    console.log(`✅ Token cleanup completato: ${tokensRemoved}/${tokensScanned} tokens, ${errorsRemoved} errors rimossi`);
 
     return {
       cleaned: true,
@@ -332,7 +321,6 @@ async function sendMaintenanceNotificationIfNeeded(notificationData: {
 
   const adminUserId = process.env.ADMIN_USER_ID;
   if (!adminUserId) {
-    console.log('⚠️ ADMIN_USER_ID non configurato - notifiche manutenzione disabilitate');
     return;
   }
 
@@ -354,9 +342,7 @@ async function sendMaintenanceNotificationIfNeeded(notificationData: {
     });
 
     if (result.skipped) {
-      console.log(`⏭️ Maintenance notification skipped: ${result.reason}`);
     } else if (result.success) {
-      console.log(`✅ Notifica manutenzione inviata: ${notificationLevel}%`);
     } else {
       console.error(`❌ Errore invio notifica manutenzione: ${result.error}`);
     }
@@ -392,7 +378,6 @@ async function sendStoveStatusWorkNotification(currentStatus: string): Promise<v
     await triggerStoveStatusWorkServer(adminUserId, {
       message: 'La stufa e ora in funzione (stato WORK)',
     });
-    console.log('✅ Notifica stove_status_work inviata');
 
     // Save notification timestamp
     await adminDbSet(lastNotifyPath, now);
@@ -439,7 +424,6 @@ async function checkAndNotifyUnexpectedOff(active: any, isOn: boolean, statusFet
     await triggerStoveUnexpectedOffServer(adminUserId, {
       message: `La stufa si e spenta durante l'orario programmato (${active.start}-${active.end})`,
     });
-    console.log('⚠️ Notifica stove_unexpected_off inviata');
 
     // Save notification timestamp
     await adminDbSet(unexpectedOffPath, now);
@@ -523,7 +507,6 @@ async function handleIgnition(active: any, ora: string): Promise<any> {
     if (confirmStatusData) {
       const confirmStatus = confirmStatusData.StatusDescription || 'unknown';
       if (confirmStatus.includes('WORK') || confirmStatus.includes('START')) {
-        console.log('⚠️ Race condition detected: Stove already on (confirmed) - skipping ignition');
         return { skipped: true, reason: 'ALREADY_ON' };
       }
     }
@@ -547,7 +530,6 @@ async function handleIgnition(active: any, ora: string): Promise<any> {
 
     syncLivingRoomWithStove(true).then((result: any) => {
       if (result.synced) {
-        console.log(`✅ Netatmo stove sync: ${result.roomNames || 'Rooms'} set to ${result.temperature}°C`);
       }
     }).catch((err: any) => console.error('❌ Netatmo stove sync error:', err));
 
@@ -572,7 +554,6 @@ async function handleShutdown(ora: string): Promise<any> {
 
     syncLivingRoomWithStove(false).then((result: any) => {
       if (result.synced) {
-        console.log(`✅ Netatmo stove sync: ${result.roomNames || 'Rooms'} returned to schedule`);
       }
     }).catch((err: any) => console.error('❌ Netatmo stove sync error:', err));
 
@@ -723,7 +704,6 @@ async function runPidAutomationIfEnabled(isOn: boolean, currentPowerLevel: numbe
 
     // Check if power level needs adjustment
     if (targetPower !== currentPowerLevel) {
-      console.log(`🎯 PID: ${measured.toFixed(1)}°C -> ${setpoint.toFixed(1)}°C target, power ${currentPowerLevel} -> ${targetPower}`);
 
       // Apply new power level
       await setPowerLevel(targetPower as any);
@@ -767,10 +747,8 @@ async function runPidAutomationIfEnabled(isOn: boolean, currentPowerLevel: numbe
 export const GET = withCronSecret(async (_request) => {
   // Save cron health timestamp
   const cronHealthTimestamp = new Date().toISOString();
-  console.log(`🔄 Tentativo salvataggio Firebase cronHealth/lastCall: ${cronHealthTimestamp}`);
 
   await adminDbSet('cronHealth/lastCall', cronHealthTimestamp);
-  console.log(`✅ Cron health updated: ${cronHealthTimestamp}`);
 
   // Record start time for execution logging
   const startTime = Date.now();
@@ -813,7 +791,6 @@ export const GET = withCronSecret(async (_request) => {
         returnToAutoAt: modeData.returnToAutoAt
       });
     }
-    console.log('Ritorno in modalità automatica dallo stato semi-manuale');
   }
 
   // Parse current time in Rome timezone
@@ -874,21 +851,18 @@ export const GET = withCronSecret(async (_request) => {
   // Auto-calibrate Netatmo valves every 12h (async, don't wait)
   calibrateValvesIfNeeded().then((result) => {
     if (result.calibrated) {
-      console.log(`✅ Calibrazione automatica completata - prossima: ${result.nextCalibration}`);
     }
   }).catch(err => console.error('❌ Errore calibrazione:', err));
 
   // Weather refresh every 30 minutes (async, don't wait)
   refreshWeatherIfNeeded().then((result) => {
     if (result.refreshed) {
-      console.log(`✅ Weather refresh completato - prossimo: ${result.nextRefresh}`);
     }
   }).catch(err => console.error('❌ Errore weather refresh:', err.message));
 
   // Token cleanup every 7 days (async, don't wait)
   cleanupTokensIfNeeded().then((result) => {
     if (result.cleaned) {
-      console.log(`✅ Token cleanup completato - prossimo: ${result.nextCleanup}`);
     }
   }).catch(err => console.error('❌ Errore token cleanup:', err.message));
 
@@ -896,14 +870,12 @@ export const GET = withCronSecret(async (_request) => {
   // Refreshes token if expiring within 24 hours to avoid manual reconnection
   proactiveTokenRefresh().then((result) => {
     if (result.refreshed) {
-      console.log('✅ Hue token refreshed proactively');
     }
   }).catch(err => console.error('❌ Hue token refresh error:', err.message));
 
   // Track maintenance hours
   const maintenanceTrack = await trackUsageHours(currentStatus);
   if (maintenanceTrack.tracked) {
-    console.log(`✅ Maintenance tracked: +${maintenanceTrack.elapsedMinutes}min → ${(maintenanceTrack.newCurrentHours ?? 0).toFixed(2)}h total`);
 
     if (maintenanceTrack.notificationData) {
       await sendMaintenanceNotificationIfNeeded(maintenanceTrack.notificationData as any);
@@ -913,16 +885,12 @@ export const GET = withCronSecret(async (_request) => {
   // Continuous stove sync enforcement - verify actual Netatmo setpoints, not just Firebase stoveMode
   // This handles both state mismatches AND setpoint expiration (8-hour manual setpoints)
   try {
-    console.log(`🔥 Stove sync check: isOn=${isOn}, status=${currentStatus}`);
     const enforcementResult = await enforceStoveSyncSetpoints(isOn) as any;
     if (enforcementResult.enforced || enforcementResult.synced) {
       if (enforcementResult.action === 'setpoint_enforcement') {
-        console.log(`✅ Stove sync enforcement: ${enforcementResult.fixedCount} room(s) re-synced (setpoints had drifted)`);
       } else {
-        console.log(`✅ Stove sync enforced: ${enforcementResult.roomNames} ${isOn ? `set to ${enforcementResult.temperature}°C` : 'returned to schedule'}`);
       }
     } else {
-      console.log(`🔥 Stove sync: no action needed (reason: ${enforcementResult.reason})`);
     }
   } catch (syncError) {
     console.error('❌ Stove sync enforcement error:', syncError instanceof Error ? syncError.message : String(syncError));
@@ -934,7 +902,6 @@ export const GET = withCronSecret(async (_request) => {
     if (!isOn) {
       // Safety check - skip ignition if status fetch failed
       if (statusFetchFailed) {
-        console.log('⚠️ Accensione schedulata saltata - stato stufa sconosciuto (safety)');
         const duration = Date.now() - startTime;
         logCronExecution({
           status: 'STATUS_UNAVAILABLE',
@@ -955,7 +922,6 @@ export const GET = withCronSecret(async (_request) => {
       // Check maintenance before scheduled ignition
       const maintenanceAllowed = await canIgnite();
       if (!maintenanceAllowed) {
-        console.log('⚠️ Accensione schedulata bloccata - manutenzione richiesta');
         const duration = Date.now() - startTime;
         logCronExecution({
           status: 'MANUTENZIONE_RICHIESTA',
@@ -1009,11 +975,8 @@ export const GET = withCronSecret(async (_request) => {
     runPidAutomationIfEnabled(isOn, currentPowerLevel, modeData.semiManual, schedulerEnabled)
       .then((result) => {
         if (result.adjusted) {
-          console.log(`🎯 PID automation: adjusted power from ${result.from} to ${result.to} (${result.roomName}: ${result.temperature}°C -> ${result.setpoint}°C)`);
         } else if (result.skipped) {
-          console.log(`🎯 PID automation: skipped (${result.reason})`);
         } else {
-          console.log(`🎯 PID automation: no change needed (power=${result.currentPower}, temp=${result.temperature}°C, setpoint=${result.setpoint}°C)`);
         }
       })
       .catch((err: any) => console.error('❌ PID automation error:', err.message));
@@ -1035,7 +998,6 @@ export const GET = withCronSecret(async (_request) => {
       semiManual: false,
       lastUpdated: new Date().toISOString()
     });
-    console.log('Cambio scheduler applicato - modalità semi-manuale disattivata');
   }
 
   const duration = Date.now() - startTime;

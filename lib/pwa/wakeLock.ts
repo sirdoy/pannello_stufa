@@ -31,11 +31,9 @@ export async function requestWakeLock(): Promise<boolean> {
     wakeLock = await navigator.wakeLock.request('screen');
 
     wakeLock.addEventListener('release', () => {
-      console.log('[WakeLock] Released');
       wakeLock = null;
     });
 
-    console.log('[WakeLock] Acquired');
     return true;
   } catch (error) {
     // Wake lock request can fail if:
@@ -59,7 +57,6 @@ export async function releaseWakeLock(): Promise<boolean> {
   try {
     await wakeLock.release();
     wakeLock = null;
-    console.log('[WakeLock] Released manually');
     return true;
   } catch (error) {
     console.error('[WakeLock] Release failed:', error);

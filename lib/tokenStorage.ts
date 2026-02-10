@@ -38,7 +38,6 @@ export async function requestPersistentStorage(): Promise<boolean> {
   if (navigator.storage && navigator.storage.persist) {
     try {
       const isPersisted = await navigator.storage.persist();
-      console.log(`[tokenStorage] Persistent storage: ${isPersisted}`);
       return isPersisted;
     } catch (e) {
       console.warn('[tokenStorage] Could not request persistent storage:', e);
@@ -86,7 +85,6 @@ export async function saveToken(token: string, metadata: Partial<FCMToken> & { d
   // Save to IndexedDB (primary)
   try {
     await (db as Dexie & { tokens: Dexie.Table<TokenStorageRecord, string> }).tokens.put(tokenData);
-    console.log('[tokenStorage] Saved to IndexedDB');
   } catch (e) {
     console.error('[tokenStorage] IndexedDB save failed:', e);
   }
@@ -94,7 +92,6 @@ export async function saveToken(token: string, metadata: Partial<FCMToken> & { d
   // Save to localStorage (fallback)
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tokenData));
-    console.log('[tokenStorage] Saved to localStorage');
   } catch (e) {
     console.error('[tokenStorage] localStorage save failed:', e);
   }
@@ -111,7 +108,6 @@ export async function loadToken(): Promise<TokenStorageRecord | null> {
   try {
     const record = await (db as Dexie & { tokens: Dexie.Table<TokenStorageRecord, string> }).tokens.get(TOKEN_ID);
     if (record?.token) {
-      console.log('[tokenStorage] Loaded from IndexedDB');
       return record;
     }
   } catch (e) {
@@ -124,7 +120,6 @@ export async function loadToken(): Promise<TokenStorageRecord | null> {
     if (stored) {
       const data = JSON.parse(stored) as TokenStorageRecord;
       if (data?.token) {
-        console.log('[tokenStorage] Loaded from localStorage (fallback)');
         // Sync back to IndexedDB if it was missing
         try {
           await (db as Dexie & { tokens: Dexie.Table<TokenStorageRecord, string> }).tokens.put({ ...data, id: TOKEN_ID });
@@ -178,7 +173,6 @@ export async function clearToken(): Promise<void> {
   // Clear IndexedDB
   try {
     await (db as Dexie & { tokens: Dexie.Table<TokenStorageRecord, string> }).tokens.delete(TOKEN_ID);
-    console.log('[tokenStorage] Cleared from IndexedDB');
   } catch (e) {
     console.warn('[tokenStorage] IndexedDB clear failed:', e);
   }
@@ -186,7 +180,6 @@ export async function clearToken(): Promise<void> {
   // Clear localStorage
   try {
     localStorage.removeItem(STORAGE_KEY);
-    console.log('[tokenStorage] Cleared from localStorage');
   } catch (e) {
     console.warn('[tokenStorage] localStorage clear failed:', e);
   }

@@ -104,7 +104,6 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
         displayName: displayName ?? existingData[existingKey]?.displayName,
       });
 
-      console.log(`FCM token updated for device ${deviceId} (user ${userId})`);
 
       return success({
         message: 'Token FCM aggiornato con successo',
@@ -132,7 +131,6 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
   const tokenKey = sanitizeFirebaseKey(token);
   await tokensRef.child(tokenKey).set(tokenData);
 
-  console.log(`FCM token registrato per nuovo device ${deviceId || 'unknown'} (user ${userId})`);
 
   return success({
     message: 'Token FCM registrato con successo',

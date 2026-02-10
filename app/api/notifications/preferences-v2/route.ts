@@ -58,7 +58,6 @@ export const PUT = withAuthAndErrorHandler(async (request, context, session) => 
   // Save to RTDB using Admin SDK
   await adminDbSet(`users/${userId}/settings/notifications`, update);
 
-  console.log(`✅ Notification preferences saved for user ${userId}`);
 
   return success({
     message: 'Preferenze salvate con successo',

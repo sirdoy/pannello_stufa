@@ -36,7 +36,6 @@ async function sendNetatmoConnectionLostNotification(): Promise<void> {
     await triggerNetatmoAlertServer(adminUserId, 'connection_lost', {
       message: 'Il termostato Netatmo richiede riconnessione. Verifica le credenziali.',
     });
-    console.log('⚠️ Notifica netatmo_connection_lost inviata');
 
     // Save notification timestamp
     await adminDbSet(lastNotifyPath, now);

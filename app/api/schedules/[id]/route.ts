@@ -89,7 +89,6 @@ export const PUT = withAuthAndErrorHandler(async (request, context) => {
 
   await adminDbSet(`schedules-v2/schedules/${id}`, updatedSchedule);
 
-  console.log(`Schedule updated: ${id}`);
 
   return success({
     schedule: { id, ...updatedSchedule }
@@ -126,7 +125,6 @@ export const DELETE = withAuthAndErrorHandler(async (request, context) => {
   // Delete schedule
   await adminDbSet(`schedules-v2/schedules/${id}`, null);
 
-  console.log(`Schedule deleted: ${id} (${schedule.name})`);
 
   return success({
     message: `Schedule '${schedule.name}' deleted successfully`

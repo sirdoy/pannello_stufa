@@ -173,9 +173,6 @@ export default function LightsCard() {
       if (lightsData.error) throw new Error(lightsData.error);
       if (scenesData.error) throw new Error(scenesData.error);
 
-      console.log('🔍 Client - Rooms received:', roomsData.rooms?.length || 0, roomsData.rooms);
-      console.log('🔍 Client - Lights received:', lightsData.lights?.length || 0);
-      console.log('🔍 Client - Scenes received:', scenesData.scenes?.length || 0);
 
       // Sort rooms with 'Casa' first, then alphabetical
       const sortedRooms = (roomsData.rooms || []).sort((a: any, b: any) => {

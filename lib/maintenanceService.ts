@@ -197,7 +197,6 @@ export async function trackUsageHours(stoveStatus: string): Promise<TrackUsageRe
       // Check if threshold reached
       if (newCurrentHours >= currentData.targetHours && !currentData.needsCleaning) {
         currentData.needsCleaning = true;
-        console.log(`⚠️ Maintenance threshold reached: ${newCurrentHours.toFixed(2)}h / ${currentData.targetHours}h`);
       }
 
       // Check if notification should be sent and update lastNotificationLevel atomically

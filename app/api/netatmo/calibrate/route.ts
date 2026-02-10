@@ -72,10 +72,6 @@ export const POST = withAuthAndErrorHandler(async (request: NextRequest, _contex
     return badRequest('Nessuno schedule attivo trovato');
   }
 
-  console.log('Triggering valve calibration via synchomeschedule');
-  console.log('Home ID:', homeId);
-  console.log('Schedule ID:', currentSchedule.id);
-  console.log('Schedule Name:', currentSchedule.name);
 
   // Validate that zones and timetable exist
   if (!currentSchedule.zones || !Array.isArray(currentSchedule.zones)) {
@@ -94,7 +90,6 @@ export const POST = withAuthAndErrorHandler(async (request: NextRequest, _contex
   // Netatmo valves calibrate automatically when schedule configuration changes
   // We'll switch to a different schedule (if available) and back to trigger recalibration
 
-  console.log('Available schedules:', schedules.length);
 
   if (schedules.length < 2) {
     return badRequest('Calibrazione automatica richiede almeno 2 schedule configurati', {
@@ -109,7 +104,6 @@ export const POST = withAuthAndErrorHandler(async (request: NextRequest, _contex
     return badRequest('Nessuno schedule alternativo trovato');
   }
 
-  console.log('Switching to alternative schedule:', alternativeSchedule.name);
 
   // Switch to alternative schedule
   const switched1 = await NETATMO_API.switchHomeSchedule(accessToken, homeId, alternativeSchedule.id);
@@ -121,7 +115,6 @@ export const POST = withAuthAndErrorHandler(async (request: NextRequest, _contex
   // Wait 2 seconds
   await new Promise(resolve => setTimeout(resolve, 2000));
 
-  console.log('Switching back to original schedule:', currentSchedule.name);
 
   // Switch back to original schedule - this triggers calibration
   const switched2 = await NETATMO_API.switchHomeSchedule(accessToken, homeId, currentSchedule.id);
@@ -130,7 +123,6 @@ export const POST = withAuthAndErrorHandler(async (request: NextRequest, _contex
     return serverError('Errore durante ripristino schedule');
   }
 
-  console.log('Valve calibration triggered successfully');
 
   // Log action
   const logEntry = {

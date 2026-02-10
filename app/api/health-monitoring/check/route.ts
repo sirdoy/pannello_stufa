@@ -93,7 +93,6 @@ export const GET = withCronSecret(async (request) => {
     // Check throttle BEFORE attempting to send
     const throttleCheck = await shouldSendCoordinationNotification(userId);
     if (!throttleCheck.allowed) {
-      console.log(`⏱️ Health alert throttled for ${userId} (wait ${throttleCheck.waitSeconds}s)`);
       continue;
     }
 
@@ -139,7 +138,6 @@ export const GET = withCronSecret(async (request) => {
     Promise.allSettled(notificationPromises).then(results => {
       const sent = results.filter(r => r.status === 'fulfilled').length;
       const failed = results.filter(r => r.status === 'rejected').length;
-      console.log(`📬 Health alerts sent: ${sent} success, ${failed} failed`);
     });
   }
 
@@ -155,7 +153,6 @@ export const GET = withCronSecret(async (request) => {
     }));
 
   // 8. Log summary
-  console.log(`✅ Health check complete: ${successCount}/${users.length} users, ${mismatches.length} mismatches, ${notificationPromises.length} alerts triggered`);
 
   return success({
     checked: users.length,

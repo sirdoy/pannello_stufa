@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useState, type ReactNode, type CSSProperties } from 'react';
+import { forwardRef, useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils/cn';
 import SmartHomeCard, { type SmartHomeCardProps } from './SmartHomeCard';
 import Button from './Button';
@@ -11,7 +11,6 @@ import Toast from './Toast';
 import InfoBox from './InfoBox';
 import HealthIndicator from './HealthIndicator';
 import RightClickMenu from './RightClickMenu';
-import { useContextMenuLongPress, longPressPreventSelection } from '@/app/hooks/useContextMenuLongPress';
 import { Heading, EmptyState, Divider } from './index';
 
 export interface ContextMenuItem {
@@ -126,10 +125,6 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
   },
   ref
 ) {
-  // Context menu state - trigger callback when long-pressed
-  const { bind: longPressBind, isPressed } = useContextMenuLongPress(() => {
-    onContextMenu?.();
-  });
   // Map legacy color names to new names
   const normalizeColorTheme = (theme: string): 'ember' | 'ocean' | 'sage' | 'warning' | 'danger' => {
     const colorMap: Record<string, 'ember' | 'ocean' | 'sage' | 'warning' | 'danger'> = {
@@ -214,19 +209,11 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
   // Check if context menu is enabled
   const hasContextMenu = contextMenuItems && contextMenuItems.length > 0;
 
-  // Context menu props (long-press handlers and transform styles)
+  // Context menu props (override role to prevent accessibility violation)
   // IMPORTANT: We override role to empty string to prevent Radix from adding role="button"
   // to a div that contains block-level children (accessibility violation)
   const contextMenuProps = hasContextMenu
-    ? {
-        role: '', // Override Radix's role="button" to fix accessibility error
-        ...longPressBind(),
-        style: {
-          ...(longPressPreventSelection as CSSProperties),
-          transform: isPressed ? 'scale(0.98)' : 'scale(1)',
-          transition: 'transform 150ms cubic-bezier(0.4, 0, 0.2, 1)',
-        },
-      }
+    ? { role: '' } // Override Radix's role="button" to fix accessibility error
     : {};
 
   // Card content (shared between with/without context menu)

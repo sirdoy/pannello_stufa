@@ -37,7 +37,6 @@ import RightClickMenu from '@/app/components/ui/RightClickMenu';
 import CommandPalette from '@/app/components/ui/CommandPalette';
 import Kbd from '@/app/components/ui/Kbd';
 import DataTable from '@/app/components/ui/DataTable';
-import { useContextMenuLongPress, longPressPreventSelection } from '@/app/hooks/useContextMenuLongPress';
 import { WeatherIcon, getWeatherLabel } from '@/app/components/weather/WeatherIcon';
 import { useState, useMemo } from 'react';
 import { z } from 'zod';

@@ -29,7 +29,6 @@ import RightClickMenu from '../../ui/RightClickMenu';
 import { Divider, Heading, Text, EmptyState, Badge, HealthIndicator } from '../../ui';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
-import { useContextMenuLongPress, longPressPreventSelection } from '@/app/hooks/useContextMenuLongPress';
 
 /**
  * StoveCard - Complete stove control for homepage
@@ -911,12 +910,6 @@ export default function StoveCard() {
   const statusInfo = getStatusInfo(status);
   const statusDisplay = getStatusDisplay(status);
 
-  // Context menu state and long-press support
-  const [contextMenuOpen, setContextMenuOpen] = useState(false);
-  const { bind: longPressBind, isPressed } = useContextMenuLongPress(() => {
-    setContextMenuOpen(true);
-  });
-
   // Context menu items for extended actions
   const stoveContextMenuItems = [
     {
@@ -1079,12 +1072,6 @@ export default function StoveCard() {
               {/* Status Display Box - Ember Noir - Wrapped in RightClickMenu.Trigger */}
               <RightClickMenu.Trigger asChild>
                 <div
-                  {...longPressBind()}
-                  style={{
-                    ...longPressPreventSelection,
-                    transform: isPressed ? 'scale(0.98)' : 'scale(1)',
-                    transition: 'transform 150ms cubic-bezier(0.4, 0, 0.2, 1)',
-                  }}
                   className={`relative ${statusInfo.bgColor} rounded-2xl p-6 sm:p-8 ${statusInfo.glowColor} border ${statusInfo.borderColor} overflow-visible transition-all duration-500`}
                   data-status-variant={statusDisplay.variant}
                 >

@@ -95,6 +95,7 @@ None yet for v6.0. Use `/gsd:add-todo` to capture ideas during execution.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 17 | remove duplicate controls from homepage device cards | 2026-02-10 | 9c96af6 | [17-rimuovi-comandi-duplicati-dalle-card-hom](./quick/17-rimuovi-comandi-duplicati-dalle-card-hom/) |
 | 16 | fix weather tab coordinates from config | 2026-02-09 | 00f3184 | [16-fix-weather-tab-coordinates-from-config](./quick/16-fix-weather-tab-coordinates-from-config/) |
 | 15 | aggiungi la favicon | 2026-02-09 | 266bd24 | [15-aggiungi-la-favicon](./quick/15-aggiungi-la-favicon/) |
 
@@ -114,10 +115,10 @@ None yet for v6.0. Use `/gsd:add-todo` to capture ideas during execution.
 ## Session Continuity
 
 Last session: 2026-02-10
-Stopped at: Completed 50-04-PLAN.md (Cron automation verification) - PHASE 50 COMPLETE
+Stopped at: Completed Quick Task 17 (Remove duplicate controls from homepage device cards)
 Resume file: None
 
 Next action: Start Phase 51 (Testing Automation) or continue v6.0 roadmap
 
 ---
-*State updated: 2026-02-10 after completing Phase 50 Plan 04 (PHASE COMPLETE)*
+*State updated: 2026-02-10 after completing Quick Task 17*

@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 
 ## Current Position
 
-Phase: 51 of 54 (E2E Test Improvements) — COMPLETE
-Plan: 04/04 completed
-Status: Phase 51 complete — E2E test infrastructure with real Auth0, session caching, 20 tests, CI workflow
-Last activity: 2026-02-10 - Completed quick task 21: pulisci i console log presenti nel sito che non riguardano warning o error
+Phase: 52 of 54 (Interactive Push Notifications)
+Plan: 01/03 completed
+Status: Phase 52 Plan 01 complete — Interactive notification foundation (action constants, feature detection, FCM payload enhancement)
+Last activity: 2026-02-10 - Completed 52-01: Interactive Push Notification Foundation
 
-Progress: [████████░░] 86.3% (259 of 300+ estimated total plans)
+Progress: [████████░░] 86.7% (260 of 300+ estimated total plans)
 
 ## Performance Metrics
 
@@ -65,6 +65,12 @@ Progress: [████████░░] 86.3% (259 of 300+ estimated total pl
 | 51-03 | 1.9 min | 2 | 3 | 2026-02-10 | Complete ✅ |
 | 51-04 | 1.0 min | 1 | 1 | 2026-02-10 | Complete ✅ |
 
+**v6.0 Phase 52 Execution:**
+
+| Plan | Duration | Tasks | Files | Date | Status |
+|------|----------|-------|-------|------|--------|
+| 52-01 | 2.9 min | 2 | 3 | 2026-02-10 | Complete ✅ |
+
 ## Accumulated Context
 
 ### Decisions
@@ -106,6 +112,9 @@ Recent decisions affecting v6.0 work (full log in PROJECT.md):
 - [Phase 51-03]: GitHub encrypted secrets for all Auth0 and Firebase credentials (user configures secrets in repository settings)
 - [Phase 51-03]: Blob reporter in CI for compact binary artifacts (suitable for merging parallel results)
 - [Phase 51-04]: dotenv ^16.4.5 chosen for Playwright config: Caret range allows patch updates, matches ecosystem standard
+- [Phase 52-01]: Const objects over enums for action constants: Better tree-shaking, no runtime overhead, still type-safe with `as const`
+- [Phase 52-01]: Standalone feature detection in notificationActions.ts: Avoids circular dependencies with notificationService.ts
+- [Phase 52-01]: Platform-specific payload fields: webpush.actions for Chrome/Edge, apns.category for iOS (future-proof), android.clickAction for Android intents
 
 ### Pending Todos
 
@@ -139,10 +148,10 @@ None yet for v6.0. Use `/gsd:add-todo` to capture ideas during execution.
 ## Session Continuity
 
 Last session: 2026-02-10
-Stopped at: Quick task 21 complete (removed 390 console.log statements from 95 source files)
+Stopped at: Completed 52-01-PLAN.md (Interactive Push Notification Foundation)
 Resume file: None
 
-Next action: Plan Phase 52 (Interactive Push Notifications)
+Next action: Execute 52-02-PLAN.md (Service Worker Action Handlers)
 
 ---
-*State updated: 2026-02-10 after completing quick task 21*
+*State updated: 2026-02-10 after completing Phase 52 Plan 01*

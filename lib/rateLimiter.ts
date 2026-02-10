@@ -1,13 +1,14 @@
 /**
  * Rate Limiter for Notifications
  *
- * In-memory rate limiting scoped to notification TYPE (not category)
- * Prevents notification spam by enforcing configurable time windows per type
+ * Feature-flagged rate limiting with persistent fallback.
+ * When USE_PERSISTENT_RATE_LIMITER=true, uses Firebase RTDB.
+ * When false or Firebase fails, falls back to in-memory limiter.
  *
  * Design:
  * - Per-type rate limits (scheduler_success, ERROR, CRITICAL, etc.)
- * - In-memory Map storage: userId:notifType -> [timestamps]
- * - Automatic cleanup to prevent memory leaks
+ * - Feature flag controls implementation (persistent vs in-memory)
+ * - Graceful fallback on Firebase errors
  * - Respects user custom limits from preferences
  *
  * Rate Limiting Strategy (per 03-CONTEXT.md):
@@ -16,6 +17,9 @@
  * - Routine notifications more conservative (max 1 per 5 min)
  * - User preferences can override defaults
  */
+
+// Feature flag: enables Firebase RTDB-backed persistent rate limiting
+const USE_PERSISTENT = process.env.USE_PERSISTENT_RATE_LIMITER === 'true';
 
 /** Rate limit configuration */
 export interface RateLimitConfig {
@@ -78,14 +82,14 @@ const DEFAULT_RATE_LIMITS: Record<string, RateLimitConfig> = {
 };
 
 /**
- * Check if notification is allowed by rate limit
+ * Check if notification is allowed by rate limit (in-memory implementation)
  *
  * @param userId - User ID (Auth0 sub)
  * @param notifType - Notification type (e.g., 'scheduler_success', 'CRITICAL')
  * @param customLimits - Optional custom limits { windowMinutes, maxPerWindow }
  * @returns Result object with allowed status and timing info
  */
-export function checkRateLimit(
+function checkRateLimitInMemory(
   userId: string,
   notifType: string,
   customLimits: RateLimitConfig | null = null
@@ -137,13 +141,13 @@ export function checkRateLimit(
 }
 
 /**
- * Clear all rate limit entries for a user
+ * Clear all rate limit entries for a user (in-memory implementation)
  * Useful for testing and user-requested reset
  *
  * @param userId - User ID to clear
  * @returns Number of entries cleared
  */
-export function clearRateLimitForUser(userId: string): number {
+function clearRateLimitForUserInMemory(userId: string): number {
   let clearedCount = 0;
 
   for (const key of recentSends.keys()) {
@@ -158,14 +162,14 @@ export function clearRateLimitForUser(userId: string): number {
 }
 
 /**
- * Get current rate limit status for a user+type
+ * Get current rate limit status for a user+type (in-memory implementation)
  * Useful for debugging and UI display
  *
  * @param userId - User ID
  * @param notifType - Notification type
  * @returns Status object with counts and timing
  */
-export function getRateLimitStatus(userId: string, notifType: string): RateLimitStatus {
+function getRateLimitStatusInMemory(userId: string, notifType: string): RateLimitStatus {
   const key = `${userId}:${notifType}`;
   const now = Date.now();
 
@@ -226,6 +230,77 @@ if (typeof process !== 'undefined') {
   process.on('exit', () => {
     clearInterval(cleanupInterval);
   });
+}
+
+/**
+ * Check if notification is allowed by rate limit (feature-flagged)
+ *
+ * Uses Firebase RTDB-backed persistent limiter when USE_PERSISTENT_RATE_LIMITER=true,
+ * otherwise falls back to in-memory limiter.
+ *
+ * @param userId - User ID (Auth0 sub)
+ * @param notifType - Notification type (e.g., 'scheduler_success', 'CRITICAL')
+ * @param customLimits - Optional custom limits { windowMinutes, maxPerWindow }
+ * @returns Promise<Result object with allowed status and timing info>
+ */
+export async function checkRateLimit(
+  userId: string,
+  notifType: string,
+  customLimits: RateLimitConfig | null = null
+): Promise<RateLimitResult> {
+  if (!USE_PERSISTENT) {
+    return checkRateLimitInMemory(userId, notifType, customLimits);
+  }
+
+  try {
+    const { checkRateLimitPersistent } = await import('./rateLimiterPersistent');
+    return await checkRateLimitPersistent(userId, notifType, customLimits);
+  } catch (error) {
+    console.warn('Persistent rate limiter failed, falling back to in-memory:', error);
+    return checkRateLimitInMemory(userId, notifType, customLimits);
+  }
+}
+
+/**
+ * Clear all rate limit entries for a user (feature-flagged)
+ *
+ * @param userId - User ID to clear
+ * @returns Promise<void> (persistent version doesn't return count)
+ */
+export async function clearRateLimitForUser(userId: string): Promise<void> {
+  if (!USE_PERSISTENT) {
+    clearRateLimitForUserInMemory(userId);
+    return;
+  }
+
+  try {
+    const { clearRateLimitPersistentForUser } = await import('./rateLimiterPersistent');
+    await clearRateLimitPersistentForUser(userId);
+  } catch (error) {
+    console.warn('Persistent rate limiter failed, falling back to in-memory:', error);
+    clearRateLimitForUserInMemory(userId);
+  }
+}
+
+/**
+ * Get current rate limit status for a user+type (feature-flagged)
+ *
+ * @param userId - User ID
+ * @param notifType - Notification type
+ * @returns Promise<Status object with counts and timing>
+ */
+export async function getRateLimitStatus(userId: string, notifType: string): Promise<RateLimitStatus> {
+  if (!USE_PERSISTENT) {
+    return getRateLimitStatusInMemory(userId, notifType);
+  }
+
+  try {
+    const { getRateLimitPersistentStatus } = await import('./rateLimiterPersistent');
+    return await getRateLimitPersistentStatus(userId, notifType);
+  } catch (error) {
+    console.warn('Persistent rate limiter failed, falling back to in-memory:', error);
+    return getRateLimitStatusInMemory(userId, notifType);
+  }
 }
 
 /**

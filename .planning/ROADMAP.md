@@ -107,12 +107,13 @@ Plans:
   4. GitHub Actions CI runs E2E tests automatically on every PR
   5. Test flakiness eliminated (Auth0 rate limiting and session leakage avoided)
 
-**Plans**: 3 plans
+**Plans**: 4 plans (3 original + 1 gap closure)
 
 Plans:
 - [ ] 51-01-PLAN.md — Playwright config + Auth0 auth setup + session caching + helpers
 - [ ] 51-02-PLAN.md — Auth smoke tests + stove ignition + thermostat schedule flow tests
 - [ ] 51-03-PLAN.md — Notification delivery flow test + GitHub Actions CI workflow
+- [ ] 51-04-PLAN.md — Gap closure: add missing dotenv dependency to package.json
 
 ### Phase 52: Interactive Push Notifications
 **Goal**: Action buttons in notifications allow direct device control ("Spegni stufa", "Imposta manuale") with platform-specific payloads for iOS and Android.

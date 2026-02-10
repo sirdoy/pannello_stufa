@@ -85,10 +85,13 @@ Plans:
   4. Dead man's switch alerts if cron stops running (>15 min without execution)
   5. Cron execution logs visible in monitoring dashboard with timestamp and duration
 
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 50-01: TBD during phase planning
+- [ ] 50-01-PLAN.md — GitHub Actions cron workflow (5-min schedule, dual endpoint trigger)
+- [ ] 50-02-PLAN.md — Cron execution logger service (TDD, Firebase RTDB)
+- [ ] 50-03-PLAN.md — Scheduler logging integration + cron-executions API route
+- [ ] 50-04-PLAN.md — End-to-end verification (secrets config + manual test)
 
 ### Phase 51: E2E Test Improvements
 **Goal**: Realistic Auth0 testing with session state caching validates security foundation and critical user flows without mocking authentication.

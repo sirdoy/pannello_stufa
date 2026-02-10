@@ -13,7 +13,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 51 of 54 (E2E Test Improvements)
 Plan: 03 completed
 Status: Phase 51 in progress - Notification delivery test and CI workflow complete
-Last activity: 2026-02-10 - Completed 51-03-PLAN.md
+Last activity: 2026-02-10 - Completed quick task 19: rimuovi tutti i comandi long-press da mobile
 
 Progress: [████████░░] 85.9% (258 of 300+ estimated total plans)
 
@@ -113,6 +113,7 @@ None yet for v6.0. Use `/gsd:add-todo` to capture ideas during execution.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 19 | rimuovi tutti i comandi long-press da mobile | 2026-02-10 | ed4689f | [19-rimuovi-tutti-i-comandi-long-press-da-mo](./quick/19-rimuovi-tutti-i-comandi-long-press-da-mo/) |
 | 18 | remove Quick Actions bars from all device cards | 2026-02-10 | 102a823 | [18-rimuovi-le-quick-actions-da-tutte-le-car](./quick/18-rimuovi-le-quick-actions-da-tutte-le-car/) |
 | 17 | remove duplicate controls from homepage device cards | 2026-02-10 | 9c96af6 | [17-rimuovi-comandi-duplicati-dalle-card-hom](./quick/17-rimuovi-comandi-duplicati-dalle-card-hom/) |
 | 16 | fix weather tab coordinates from config | 2026-02-09 | 00f3184 | [16-fix-weather-tab-coordinates-from-config](./quick/16-fix-weather-tab-coordinates-from-config/) |

@@ -129,10 +129,12 @@ Plans:
   4. Action buttons function offline via Background Sync (queue and execute on reconnect)
   5. Platforms without action button support gracefully degrade to tap-to-open behavior
 
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 52-01: TBD during phase planning
+- [ ] 52-01-PLAN.md — Action constants, feature detection, and server-side FCM payload enhancement
+- [ ] 52-02-PLAN.md — Service worker action display and notificationclick handler with offline support
+- [ ] 52-03-PLAN.md — Notification trigger wiring and unit tests
 
 ### Phase 53: PWA Offline Improvements
 **Goal**: Offline mode enhanced with staleness indicators, command queuing UI, and guided PWA install prompt for safer device control and improved mobile experience.

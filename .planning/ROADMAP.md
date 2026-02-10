@@ -63,10 +63,13 @@ See `.planning/milestones/` for full archives.
   4. Expired rate limit windows are automatically cleaned up without manual intervention
   5. Feature flag allows gradual rollout with fallback to in-memory limiter if Firebase unavailable
 
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 49-01: TBD during phase planning
+- [ ] 49-01-PLAN.md — Persistent notification rate limiter (TDD, Firebase RTDB transactions)
+- [ ] 49-02-PLAN.md — Persistent Netatmo API rate limiter (TDD, dual-window: 50/10s + 400/1h)
+- [ ] 49-03-PLAN.md — Persistent coordination throttle (TDD, 30-min global window)
+- [ ] 49-04-PLAN.md — Feature flag integration + consumer migration (async API, fallback)
 
 ### Phase 50: Cron Automation Configuration
 **Goal**: Background automation operational with external HTTP scheduler triggering health monitoring, coordination checks, and dead man's switch tracking every 5 minutes.

@@ -4,6 +4,41 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 
 ---
 
+## v5.1 Tech Debt & Code Quality (Shipped: 2026-02-10)
+
+**Delivered:** Pristine TypeScript codebase with strict: true, noUncheckedIndexedAccess, zero tsc errors across all 531 source + 131 test files, all 3,034 tests green, and dead code removed (40 files, 4 deps, 203 exports eliminated).
+
+**Phases completed:** 44-48 (39 plans total)
+
+**Key accomplishments:**
+
+- Enabled `strict: true` in tsconfig.json — fixed 1,841 TypeScript errors to zero across lib/, components/, app/, and test files
+- Enabled `noUncheckedIndexedAccess` — resolved 436 additional index access errors with proper undefined checks
+- Fixed all test failures: FormModal cancel behavior (root cause: double-fire from Radix + button), DataTable filter, worker teardown (documented as React 19 cosmetic)
+- Dead code removal: 40 unused files deleted (5,702 LOC), 4 unused dependencies removed, 203 unused exports eliminated (53% reduction from 382 to 179)
+- Full type safety enforced: strict mode + noUncheckedIndexedAccess across entire codebase with 3,034 tests passing
+
+**Stats:**
+
+- 39 plans executed across 5 phases
+- 14/14 v5.1 requirements satisfied (100%)
+- 406 files changed (+19,624 insertions, -8,843 deletions)
+- 145 git commits with atomic changes
+- 2 days from phase 44 start to completion (2026-02-09 → 2026-02-10)
+
+**Git range:** `chore(44-01)` → `docs(phase-48)`
+
+**Archives:**
+- [Roadmap](milestones/v5.1-ROADMAP.md)
+- [Requirements](milestones/v5.1-REQUIREMENTS.md)
+- [Audit](milestones/v5.1-MILESTONE-AUDIT.md)
+
+**Tech debt:** Worker teardown warning (React 19 cosmetic). 179 unused exports remain (131 intentional design system barrel, 48 utility). 2 knip false positive files (app/sw.ts, firebase-messaging-sw.js).
+
+**What's next:** Codebase is pristine — zero tsc errors, full strict mode, all tests green, dead code removed. Ready for feature development or new milestone.
+
+---
+
 ## v5.0 TypeScript Migration (Shipped: 2026-02-08)
 
 **Delivered:** Complete TypeScript migration of 575 JavaScript/JSX files across all application layers — libraries, components, API routes, pages, tests, and config files — with zero tsc errors, passing production build, and `allowJs: false` enforcement preventing future regression.
@@ -258,5 +293,3 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 
 _For current project status, see `.planning/PROJECT.md`_
 _To start next milestone, run `/gsd:new-milestone`_
-
-

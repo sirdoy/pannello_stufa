@@ -148,8 +148,7 @@ describe('ControlButton Component', () => {
       render(<ControlButton type="increment" step={1} onChange={onChange} />);
       const button = screen.getByRole('button');
 
-      fireEvent.mouseDown(button);
-      fireEvent.mouseUp(button);
+      fireEvent.click(button);
 
       expect(onChange).toHaveBeenCalledWith(1);
     });
@@ -160,8 +159,7 @@ describe('ControlButton Component', () => {
       render(<ControlButton type="decrement" step={1} onChange={onChange} />);
       const button = screen.getByRole('button');
 
-      fireEvent.mouseDown(button);
-      fireEvent.mouseUp(button);
+      fireEvent.click(button);
 
       expect(onChange).toHaveBeenCalledWith(-1);
     });
@@ -172,8 +170,7 @@ describe('ControlButton Component', () => {
       render(<ControlButton type="increment" step={0.5} onChange={onChange} />);
       const button = screen.getByRole('button');
 
-      fireEvent.mouseDown(button);
-      fireEvent.mouseUp(button);
+      fireEvent.click(button);
 
       expect(onChange).toHaveBeenCalledWith(0.5);
     });
@@ -184,100 +181,9 @@ describe('ControlButton Component', () => {
       render(<ControlButton type="decrement" step={0.5} onChange={onChange} />);
       const button = screen.getByRole('button');
 
-      fireEvent.mouseDown(button);
-      fireEvent.mouseUp(button);
+      fireEvent.click(button);
 
       expect(onChange).toHaveBeenCalledWith(-0.5);
-    });
-  });
-
-  describe('Long Press Behavior', () => {
-    test('triggers repeat after delay on long press', () => {
-      const onChange = jest.fn();
-      render(
-        <ControlButton
-          type="increment"
-          step={1}
-          longPressDelay={400}
-          longPressInterval={100}
-          onChange={onChange}
-        />
-      );
-      const button = screen.getByRole('button');
-
-      act(() => {
-        fireEvent.mouseDown(button);
-      });
-
-      // Initial call
-      expect(onChange).toHaveBeenCalledTimes(1);
-
-      // Advance past delay + 2 intervals
-      act(() => {
-        jest.advanceTimersByTime(600);
-      });
-
-      // Initial + 2 intervals = 3 calls
-      expect(onChange).toHaveBeenCalledTimes(3);
-
-      act(() => {
-        fireEvent.mouseUp(button);
-      });
-    });
-
-    test('stops repeating on mouseup', () => {
-      const onChange = jest.fn();
-      render(<ControlButton type="increment" onChange={onChange} />);
-      const button = screen.getByRole('button');
-
-      act(() => {
-        fireEvent.mouseDown(button);
-      });
-
-      expect(onChange).toHaveBeenCalledTimes(1);
-
-      act(() => {
-        fireEvent.mouseUp(button);
-      });
-
-      // Advance time - should not call again
-      act(() => {
-        jest.advanceTimersByTime(1000);
-      });
-
-      expect(onChange).toHaveBeenCalledTimes(1);
-    });
-
-    test('uses custom longPressDelay', () => {
-      const onChange = jest.fn();
-      render(
-        <ControlButton
-          type="increment"
-          longPressDelay={200}
-          longPressInterval={100}
-          onChange={onChange}
-        />
-      );
-      const button = screen.getByRole('button');
-
-      act(() => {
-        fireEvent.mouseDown(button);
-      });
-
-      // Initial call
-      expect(onChange).toHaveBeenCalledTimes(1);
-
-      // Advance 350ms (past 200ms delay + 100ms + 50ms buffer)
-      act(() => {
-        jest.advanceTimersByTime(350);
-      });
-
-      // Should have repeated at least once (initial + at least 1 interval)
-      expect(onChange.mock.calls.length).toBeGreaterThanOrEqual(2);
-
-      act(() => {
-        fireEvent.mouseUp(button);
-      });
     });
   });
 
@@ -314,40 +220,6 @@ describe('ControlButton Component', () => {
     });
   });
 
-  describe('Haptic Feedback', () => {
-    test('calls vibrateShort when haptic=true (default)', () => {
-      const onChange = jest.fn();
-      render(<ControlButton onChange={onChange} />);
-      const button = screen.getByRole('button');
-
-      act(() => {
-        fireEvent.mouseDown(button);
-      });
-
-      expect(vibrateShort).toHaveBeenCalledTimes(1);
-
-      act(() => {
-        fireEvent.mouseUp(button);
-      });
-    });
-
-    test('does not call vibrateShort when haptic=false', () => {
-      const onChange = jest.fn();
-      render(<ControlButton haptic={false} onChange={onChange} />);
-      const button = screen.getByRole('button');
-
-      act(() => {
-        fireEvent.mouseDown(button);
-      });
-
-      expect(vibrateShort).not.toHaveBeenCalled();
-
-      act(() => {
-        fireEvent.mouseUp(button);
-      });
-    });
-  });
-
   describe('Legacy onClick Support', () => {
     test('calls onClick when provided (legacy)', () => {
       jest.useRealTimers();
@@ -358,8 +230,7 @@ describe('ControlButton Component', () => {
       render(<ControlButton onClick={onClick} />);
       const button = screen.getByRole('button');
 
-      fireEvent.mouseDown(button);
-      fireEvent.mouseUp(button);
+      fireEvent.click(button);
 
       expect(onClick).toHaveBeenCalled();
       warnSpy.mockRestore();

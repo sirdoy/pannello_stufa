@@ -5,7 +5,6 @@ import { forwardRef } from 'react';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
-import { useLongPress } from '@/app/hooks/useLongPress';
 
 /**
  * ControlButton Variants - CVA Configuration
@@ -111,12 +110,6 @@ export interface ControlButtonProps
   onChange?: (delta: number) => void;
   /** Step size for increment/decrement (default: 1) */
   step?: number;
-  /** Initial delay before repeat (default: 400ms) */
-  longPressDelay?: number;
-  /** Repeat interval (default: 100ms) */
-  longPressInterval?: number;
-  /** Enable haptic feedback (default: true) */
-  haptic?: boolean;
   /** @deprecated Use onChange instead */
   onClick?: () => void;
 }
@@ -135,9 +128,6 @@ const ControlButton = forwardRef<HTMLButtonElement, ControlButtonProps>(function
     disabled = false,
     onChange,
     step = 1,
-    longPressDelay = 400,
-    longPressInterval = 100,
-    haptic = true,
     onClick, // Legacy prop
     className,
     ...props
@@ -161,21 +151,11 @@ const ControlButton = forwardRef<HTMLButtonElement, ControlButtonProps>(function
     }
   };
 
-  // Get long-press handlers
-  const longPressHandlers = useLongPress(handlePress, {
-    delay: longPressDelay,
-    interval: longPressInterval,
-    haptic,
-  });
-
   // Symbol based on type
   const symbol = type === 'increment' ? '+' : '−';
 
   // Aria label based on type
   const ariaLabel = type === 'increment' ? 'Incrementa' : 'Decrementa';
-
-  // Only attach handlers if not disabled
-  const eventHandlers = disabled ? {} : longPressHandlers;
 
   return (
     <button
@@ -184,7 +164,7 @@ const ControlButton = forwardRef<HTMLButtonElement, ControlButtonProps>(function
       disabled={disabled}
       aria-label={ariaLabel}
       className={cn(controlButtonVariants({ variant, size }), className)}
-      {...eventHandlers}
+      onClick={disabled ? undefined : handlePress}
       {...props}
     >
       {symbol}

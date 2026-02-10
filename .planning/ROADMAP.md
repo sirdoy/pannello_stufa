@@ -132,9 +132,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 52-01-PLAN.md — Action constants, feature detection, and server-side FCM payload enhancement
-- [ ] 52-02-PLAN.md — Service worker action display and notificationclick handler with offline support
-- [ ] 52-03-PLAN.md — Notification trigger wiring and unit tests
+- [x] 52-01-PLAN.md — Action constants, feature detection, and server-side FCM payload enhancement
+- [x] 52-02-PLAN.md — Service worker action display and notificationclick handler with offline support
+- [x] 52-03-PLAN.md — Notification trigger wiring and unit tests
 
 ### Phase 53: PWA Offline Improvements
 **Goal**: Offline mode enhanced with staleness indicators, command queuing UI, and guided PWA install prompt for safer device control and improved mobile experience.
@@ -195,7 +195,7 @@ Phases execute in numeric order: 49 → 50 → 51 → 52 → 53 → 54
 | 49 | v6.0 | 4/4 | ✓ Complete | 2026-02-10 |
 | 50 | v6.0 | 4/4 | ✓ Complete | 2026-02-10 |
 | 51 | v6.0 | 4/4 | ✓ Complete | 2026-02-10 |
-| 52 | v6.0 | 0/TBD | Not started | - |
+| 52 | v6.0 | 3/3 | ✓ Complete | 2026-02-10 |
 | 53 | v6.0 | 0/TBD | Not started | - |
 | 54 | v6.0 | 0/TBD | Not started | - |
 
@@ -205,4 +205,4 @@ Phases execute in numeric order: 49 → 50 → 51 → 52 → 53 → 54
 **v6.0 Requirements:** 42 total (100% coverage validated)
 **Depth:** Comprehensive (6 phases for 42 requirements)
 **Created:** 2026-02-10
-**Last updated:** 2026-02-10 — Phase 51 complete
+**Last updated:** 2026-02-10 — Phase 52 complete

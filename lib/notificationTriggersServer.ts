@@ -21,6 +21,7 @@ import {
   buildNotificationPayload,
 } from '@/lib/notificationTriggers';
 import { getDefaultPreferences } from '@/lib/schemas/notificationPreferences';
+import { getActionsForNotificationType, type NotificationActionDef } from '@/lib/notificationActions';
 
 /**
  * Notification preferences data from Firebase
@@ -217,6 +218,9 @@ export async function triggerNotificationServer(
       stringData[key] = String(value);
     }
 
+    // Determine action buttons for this notification type
+    const actions = getActionsForNotificationType(typeId);
+
     // Prepare notification for sending
     const notification = {
       title: payload.notification.title,
@@ -230,6 +234,9 @@ export async function triggerNotificationServer(
         // Keep legacy typeId for backward compatibility
         legacyTypeId: typeId,
       },
+      // Include action buttons for supported notification types
+      // Stove errors get "Spegni stufa", thermostat alerts get "Imposta manuale"
+      ...(actions && { actions }),
     };
 
     // Send notification (will pass through Phase 3 filter chain)

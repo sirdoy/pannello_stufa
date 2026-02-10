@@ -33,6 +33,11 @@
  * - icon: Icona della notifica
  * - priority: 'high' | 'normal'
  * - url: URL a cui navigare quando si clicca la notifica
+ *
+ * Action buttons:
+ * - Stove error/status types automatically get "Spegni stufa" + "Dettagli" buttons
+ * - Netatmo types automatically get "Imposta manuale" + "Dettagli" buttons
+ * - Action mapping is in lib/notificationActions.ts (getActionsForNotificationType)
  */
 export const NOTIFICATION_TYPES = {
   // === STOVE STATUS ===
@@ -47,6 +52,7 @@ export const NOTIFICATION_TYPES = {
     priority: 'normal',
     url: '/',
   },
+  // Action buttons: "Spegni stufa", "Dettagli" (via lib/notificationActions.ts)
   stove_unexpected_off: {
     id: 'stove_unexpected_off',
     category: 'stove',
@@ -60,6 +66,7 @@ export const NOTIFICATION_TYPES = {
   },
 
   // === ERRORS ===
+  // Action buttons: "Spegni stufa", "Dettagli" (via lib/notificationActions.ts)
   stove_error_info: {
     id: 'stove_error_info',
     category: 'errors',
@@ -71,6 +78,7 @@ export const NOTIFICATION_TYPES = {
     priority: 'normal',
     url: '/stove/errors',
   },
+  // Action buttons: "Spegni stufa", "Dettagli" (via lib/notificationActions.ts)
   stove_error_warning: {
     id: 'stove_error_warning',
     category: 'errors',
@@ -82,6 +90,7 @@ export const NOTIFICATION_TYPES = {
     priority: 'normal',
     url: '/stove/errors',
   },
+  // Action buttons: "Spegni stufa", "Dettagli" (via lib/notificationActions.ts)
   stove_error_error: {
     id: 'stove_error_error',
     category: 'errors',
@@ -93,6 +102,7 @@ export const NOTIFICATION_TYPES = {
     priority: 'high',
     url: '/stove/errors',
   },
+  // Action buttons: "Spegni stufa", "Dettagli" (via lib/notificationActions.ts)
   stove_error_critical: {
     id: 'stove_error_critical',
     category: 'errors',
@@ -165,6 +175,7 @@ export const NOTIFICATION_TYPES = {
   },
 
   // === NETATMO (placeholder per future implementazioni) ===
+  // Action buttons: "Imposta manuale", "Dettagli" (via lib/notificationActions.ts)
   netatmo_temperature_low: {
     id: 'netatmo_temperature_low',
     category: 'netatmo',
@@ -176,6 +187,7 @@ export const NOTIFICATION_TYPES = {
     priority: 'normal',
     url: '/thermostat',
   },
+  // Action buttons: "Imposta manuale", "Dettagli" (via lib/notificationActions.ts)
   netatmo_temperature_high: {
     id: 'netatmo_temperature_high',
     category: 'netatmo',
@@ -187,6 +199,7 @@ export const NOTIFICATION_TYPES = {
     priority: 'normal',
     url: '/thermostat',
   },
+  // Action buttons: "Imposta manuale", "Dettagli" (via lib/notificationActions.ts)
   netatmo_setpoint_reached: {
     id: 'netatmo_setpoint_reached',
     category: 'netatmo',
@@ -198,6 +211,7 @@ export const NOTIFICATION_TYPES = {
     priority: 'normal',
     url: '/thermostat',
   },
+  // Action buttons: "Imposta manuale", "Dettagli" (via lib/notificationActions.ts)
   netatmo_connection_lost: {
     id: 'netatmo_connection_lost',
     category: 'netatmo',

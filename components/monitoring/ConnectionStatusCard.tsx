@@ -76,7 +76,7 @@ export default function ConnectionStatusCard({ stats, error, onRetry }: Connecti
     return (
       <Card>
         <CardHeader>
-          <Heading level={3} variant="subtle">
+          <Heading level={2} variant="subtle">
             Stove Connection
           </Heading>
         </CardHeader>
@@ -124,7 +124,7 @@ export default function ConnectionStatusCard({ stats, error, onRetry }: Connecti
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between w-full">
-          <Heading level={3} variant="subtle">
+          <Heading level={2} variant="subtle">
             Stove Connection
           </Heading>
           <div className="flex items-center gap-2">

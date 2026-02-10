@@ -126,7 +126,12 @@ self.addEventListener('push', (event) => {
       ...payload.data,
     },
     vibrate: payload.data?.priority === 'high' ? [200, 100, 200] : [100],
-  } as NotificationOptions & { vibrate?: number[] };
+    // Include action buttons from FCM payload (Chrome/Edge/Opera only)
+    // iOS Safari ignores this array (no support for notification actions)
+    ...(payload.notification?.actions && {
+      actions: payload.notification.actions,
+    }),
+  } as NotificationOptions & { vibrate?: number[]; actions?: Array<{ action: string; title: string; icon?: string }> };
 
   event.waitUntil(
     self.registration.showNotification(notificationTitle, notificationOptions)
@@ -134,36 +139,170 @@ self.addEventListener('push', (event) => {
 });
 
 /**
- * Notification click handler
- * Opens the app or focuses existing window when user clicks notification
+ * Execute a notification action (online: immediate API call, offline: queue for sync)
+ */
+async function executeNotificationAction(
+  endpoint: string,
+  data: Record<string, string>
+): Promise<void> {
+  if (navigator.onLine) {
+    try {
+      const response = await fetch(`/api/${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        // Show success notification
+        await self.registration.showNotification('Comando eseguito', {
+          body: getActionSuccessMessage(endpoint),
+          icon: '/icons/icon-192.png',
+          badge: '/icons/icon-72.png',
+          tag: `action-success-${endpoint.replace('/', '-')}`,
+        });
+      } else {
+        // Show failure notification
+        await self.registration.showNotification('Errore comando', {
+          body: `Impossibile eseguire il comando. Riprova dall'app.`,
+          icon: '/icons/icon-192.png',
+          badge: '/icons/icon-72.png',
+          tag: `action-error-${endpoint.replace('/', '-')}`,
+        });
+      }
+    } catch (error) {
+      console.error('[sw.ts] Action execution failed:', error);
+      // Network error - queue for later
+      await queueActionForSync(endpoint, data);
+    }
+  } else {
+    // Offline - queue for Background Sync
+    await queueActionForSync(endpoint, data);
+  }
+}
+
+/**
+ * Queue an action for Background Sync execution
+ * Uses existing IndexedDB commandQueue store
+ */
+async function queueActionForSync(
+  endpoint: string,
+  data: Record<string, string>
+): Promise<void> {
+  try {
+    const db = await openDB();
+    const transaction = db.transaction(COMMAND_QUEUE_STORE, 'readwrite');
+    const store = transaction.objectStore(COMMAND_QUEUE_STORE);
+
+    const command = {
+      endpoint,
+      method: 'POST',
+      data: { ...data, source: 'notification-action-offline' },
+      status: 'pending',
+      timestamp: new Date().toISOString(),
+      retries: 0,
+      lastError: null,
+    };
+
+    store.add(command);
+
+    await new Promise<void>((resolve, reject) => {
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error);
+    });
+
+    // Register Background Sync
+    try {
+      await self.registration.sync.register(SYNC_TAG);
+    } catch {
+      // SyncManager not supported - will retry on next online event
+    }
+
+    // Show "queued" notification (tag prevents duplicates from repeated clicks)
+    await self.registration.showNotification('Comando in coda', {
+      body: 'Il comando verra eseguito al ripristino della connessione',
+      icon: '/icons/icon-192.png',
+      badge: '/icons/icon-72.png',
+      tag: `action-queued-${endpoint.replace('/', '-')}`,
+    });
+  } catch (error) {
+    console.error('[sw.ts] Failed to queue action:', error);
+  }
+}
+
+/**
+ * Get success message for action type
+ */
+function getActionSuccessMessage(endpoint: string): string {
+  switch (endpoint) {
+    case 'stove/shutdown':
+      return 'Stufa spenta con successo';
+    default:
+      return 'Comando eseguito con successo';
+  }
+}
+
+/**
+ * Open app at specified URL, focusing existing window if available
+ */
+async function openAppUrl(url: string): Promise<void> {
+  const clientList = await self.clients.matchAll({
+    type: 'window',
+    includeUncontrolled: true,
+  });
+
+  // If app is already open, focus it and navigate
+  for (const client of clientList) {
+    if (client.url.includes(self.location.origin) && 'focus' in client) {
+      await client.focus();
+      if ('navigate' in client) {
+        await (client as WindowClient).navigate(url);
+      }
+      return;
+    }
+  }
+
+  // Otherwise open new window
+  if (self.clients.openWindow) {
+    await self.clients.openWindow(url);
+  }
+}
+
+/**
+ * Notification click handler with action button support
+ *
+ * Handles three scenarios:
+ * 1. Action button click (event.action has value) - execute action directly
+ * 2. Notification body click (event.action is empty) - open app at URL
+ * 3. Offline action - queue via Background Sync
  */
 self.addEventListener('notificationclick', (event) => {
-
   event.notification.close();
 
-  const urlToOpen = event.notification.data?.url || '/';
+  const notificationData = event.notification.data || {};
+  const clickedAction = event.action; // empty string if body clicked
 
-  event.waitUntil(
-    self.clients
-      .matchAll({ type: 'window', includeUncontrolled: true })
-      .then((clientList) => {
-        // If app is already open, focus it and navigate
-        for (const client of clientList) {
-          if (client.url.includes(self.location.origin) && 'focus' in client) {
-            client.focus();
-            if ('navigate' in client) {
-              (client as WindowClient).navigate(urlToOpen);
-            }
-            return;
-          }
-        }
+  if (clickedAction === NOTIFICATION_ACTION_IDS.STOVE_SHUTDOWN) {
+    // User clicked "Spegni stufa" action button
+    event.waitUntil(executeNotificationAction('stove/shutdown', {
+      source: 'notification-action',
+      type: notificationData.type || 'unknown',
+    }));
 
-        // Otherwise open new window
-        if (self.clients.openWindow) {
-          return self.clients.openWindow(urlToOpen);
-        }
-      })
-  );
+  } else if (clickedAction === NOTIFICATION_ACTION_IDS.THERMOSTAT_MANUAL) {
+    // User clicked "Imposta manuale" action button - open thermostat page in manual mode
+    event.waitUntil(openAppUrl('/thermostat?mode=manual'));
+
+  } else if (clickedAction === NOTIFICATION_ACTION_IDS.STOVE_VIEW_DETAILS || clickedAction === NOTIFICATION_ACTION_IDS.THERMOSTAT_VIEW) {
+    // User clicked "Dettagli" - open app at notification URL
+    const url = notificationData.url || '/';
+    event.waitUntil(openAppUrl(url));
+
+  } else {
+    // User clicked notification body (no action) - open app
+    const urlToOpen = notificationData.url || '/';
+    event.waitUntil(openAppUrl(urlToOpen));
+  }
 });
 
 /**
@@ -171,6 +310,17 @@ self.addEventListener('notificationclick', (event) => {
  */
 self.addEventListener('notificationclose', (event) => {
 });
+
+// ============================================
+// Notification Action Constants
+// ============================================
+// Duplicated from lib/notificationActions.ts (SW compiled separately by Serwist)
+const NOTIFICATION_ACTION_IDS = {
+  STOVE_SHUTDOWN: 'stove-shutdown',
+  STOVE_VIEW_DETAILS: 'view-details',
+  THERMOSTAT_MANUAL: 'thermostat-manual',
+  THERMOSTAT_VIEW: 'thermostat-view',
+} as const;
 
 // ============================================
 // Background Sync Handlers
@@ -579,7 +729,12 @@ async function checkStoveStatusBackground(): Promise<void> {
         requireInteraction: true,
         data: { url: '/' },
         vibrate: [200, 100, 200, 100, 200],
-      } as NotificationOptions & { vibrate?: number[] });
+        // Add action buttons for quick shutdown
+        actions: [
+          { action: NOTIFICATION_ACTION_IDS.STOVE_SHUTDOWN, title: 'Spegni stufa' },
+          { action: NOTIFICATION_ACTION_IDS.STOVE_VIEW_DETAILS, title: 'Dettagli' },
+        ],
+      } as NotificationOptions & { vibrate?: number[]; actions?: Array<{ action: string; title: string }> });
 
       await incrementBadge();
     }

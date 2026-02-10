@@ -33,7 +33,6 @@ import Tooltip from '@/app/components/ui/Tooltip';
 import Spinner from '@/app/components/ui/Spinner';
 import Accordion from '@/app/components/ui/Accordion';
 import Sheet from '@/app/components/ui/Sheet';
-import RightClickMenu from '@/app/components/ui/RightClickMenu';
 import CommandPalette from '@/app/components/ui/CommandPalette';
 import Kbd from '@/app/components/ui/Kbd';
 import DataTable from '@/app/components/ui/DataTable';
@@ -41,7 +40,7 @@ import { WeatherIcon, getWeatherLabel } from '@/app/components/weather/WeatherIc
 import { useState, useMemo } from 'react';
 import { z } from 'zod';
 import { Controller } from 'react-hook-form';
-import { Home, Settings, Power, Moon, Edit, Trash2, Copy, Share } from 'lucide-react';
+import { Home, Settings, Power, Moon } from 'lucide-react';
 import CodeBlock from './components/CodeBlock';
 import PropTable from './components/PropTable';
 import AccessibilitySection from './components/AccessibilitySection';
@@ -1820,11 +1819,11 @@ export default function DesignSystemPage() {
         </SectionShowcase>
 
         {/* Action Components */}
-        <SectionShowcase title="Action Components" icon="🎯" docs="app/components/ui/RightClickMenu.js">
+        <SectionShowcase title="Action Components" icon="🎯" docs="app/components/ui/CommandPalette.tsx">
           <Card>
             <CardContent>
               <Text variant="secondary" className="mb-6">
-                Context menus and command palettes for quick actions and power-user navigation.
+                Command palettes for quick actions and power-user navigation.
               </Text>
 
               {/* Kbd Component */}
@@ -1840,63 +1839,6 @@ export default function DesignSystemPage() {
                 <Text variant="tertiary" size="sm">
                   Display keyboard shortcuts with consistent styling. Monospace font, bordered appearance.
                 </Text>
-              </div>
-
-              <CardDivider />
-
-              {/* RightClickMenu Component */}
-              <div className="mb-8 mt-6">
-                <Text variant="label" size="xs" className="mb-3">RightClickMenu (Context Menu)</Text>
-                <Text variant="tertiary" size="sm" className="mb-4">
-                  Built on Radix Context Menu. Right-click on desktop, long-press on mobile.
-                </Text>
-                <RightClickMenu>
-                  <RightClickMenu.Trigger asChild>
-                    <div className="
-                      p-8 rounded-xl border-2 border-dashed border-slate-700
-                      [html:not(.dark)_&]:border-slate-300
-                      text-center cursor-context-menu
-                      hover:border-ember-500/50 transition-colors
-                    ">
-                      <Text variant="secondary">Right-click here (desktop) or long-press (mobile)</Text>
-                    </div>
-                  </RightClickMenu.Trigger>
-                  <RightClickMenu.Content>
-                    <RightClickMenu.Label>Actions</RightClickMenu.Label>
-                    <RightClickMenu.Item icon={<Edit className="w-4 h-4" aria-hidden="true" />}>
-                      Edit
-                    </RightClickMenu.Item>
-                    <RightClickMenu.Item icon={<Copy className="w-4 h-4" aria-hidden="true" />}>
-                      Duplicate
-                    </RightClickMenu.Item>
-                    <RightClickMenu.Item icon={<Share className="w-4 h-4" aria-hidden="true" />}>
-                      Share
-                    </RightClickMenu.Item>
-                    <RightClickMenu.Separator />
-                    <RightClickMenu.CheckboxItem
-                      checked={menuCheckboxState}
-                      onCheckedChange={setMenuCheckboxState}
-                      icon={<Power className="w-4 h-4" aria-hidden="true" />}
-                    >
-                      Auto Mode
-                    </RightClickMenu.CheckboxItem>
-                    <RightClickMenu.Separator />
-                    <RightClickMenu.Item icon={<Trash2 className="w-4 h-4" aria-hidden="true" />}>
-                      Delete
-                    </RightClickMenu.Item>
-                  </RightClickMenu.Content>
-                </RightClickMenu>
-
-                <div className="mt-4 space-y-2">
-                  <Text variant="label" size="xs">Features:</Text>
-                  <ul className="list-disc list-inside text-slate-400 text-sm space-y-1 [html:not(.dark)_&]:text-slate-600">
-                    <li>Right-click trigger (desktop)</li>
-                    <li>Long-press trigger (mobile) with scale animation</li>
-                    <li>Keyboard navigation (arrows, Enter, Escape)</li>
-                    <li>Checkable items for toggle states</li>
-                    <li>Haptic feedback on mobile</li>
-                  </ul>
-                </div>
               </div>
 
               <CardDivider />

@@ -1,442 +1,587 @@
-# Features Research: Advanced UI Components
+# Feature Landscape - v6.0 Operations, PWA & Analytics
 
-**Domain:** Smart Home PWA - UI Component Library Extension
-**Researched:** 2026-02-03
-**Overall Confidence:** HIGH (verified against W3C APG, MDN, and multiple design system sources)
+**Domain:** Smart Home IoT Dashboard - Operational Resilience & Analytics
+**Researched:** 2026-02-10
+**Project:** Pannello Stufa v6.0
+**Context:** Subsequent milestone building on complete push notification system, Netatmo integration, stove monitoring, and Next.js 15.5 PWA foundation
 
 ---
 
 ## Executive Summary
 
-This research documents expected behaviors, accessibility requirements, and interaction patterns for 8 advanced UI components to be added to the Ember Noir design system. The existing design system already implements WCAG AA compliance with proper keyboard navigation, focus indicators, and screen reader support via Radix primitives.
+This research covers six new feature areas for v6.0: (1) **Cron automation** for health monitoring and stove-thermostat coordination, (2) **persistent rate limiting** using Firebase instead of in-memory stores, (3) **E2E test improvements** for realistic Auth0 testing, (4) **interactive push notifications** with action buttons, (5) **PWA offline mode** enhancements, and (6) **analytics dashboard** for stove usage tracking and pellet consumption estimation.
 
-The new components fall into three categories:
-1. **Navigation/Organization:** Tabs, Accordion
-2. **Data Display:** Data Table
-3. **Quick Actions:** Command Palette, Context Menu, Popover/Dropdown
-4. **Overlay Patterns:** Sheet/Drawer, Dialog variants (Confirmation, Form)
+**Table stakes are minimal** because the foundation already exists: Firebase RTDB + Firestore, FCM push system, Serwist service worker, Recharts for visualization, and comprehensive monitoring infrastructure. The only truly new functionality is interactive notification actions (requires service worker message handling) and analytics visualization (requires new Firestore queries and chart components).
 
-Key findings:
-- All components must support keyboard navigation following W3C APG patterns
-- Focus management is critical for overlays (focus trap, return focus)
-- Mobile touch interactions require alternatives to complex gestures
-- The existing Modal component provides a foundation for Dialog variants
+**Key differentiators** center on: (1) **smart pellet consumption estimation** using ML-inspired heuristics (weather + runtime correlation), (2) **notification actions that actually work offline** via Background Sync, (3) **distributed rate limiting with Firebase transactions** (not just Redis patterns), (4) **cron reliability monitoring** (dead man's switch for automation itself), and (5) **realistic E2E auth testing** that doesn't mock Auth0 away.
+
+**Critical anti-features:** No cron UI builder (cron stays in code), no third-party analytics services (privacy-first, Firebase only), no complex ML models (heuristics sufficient for single-user app), no multi-tenant rate limiting complexity (family app, not SaaS), and no Playwright migration (Cypress already covers 3034 passing tests).
 
 ---
 
-## Component Behaviors
+## Table Stakes
 
-### Tabs / TabGroup
+Features users expect from smart home IoT dashboards. Missing these = product feels incomplete.
 
-**Table stakes (must have):**
-- [ ] **Structure:** `role="tablist"` on container, `role="tab"` on each tab, `role="tabpanel"` on content
-- [ ] **ARIA:** `aria-selected="true|false"` on tabs, `aria-controls` linking tab to panel, `aria-labelledby` on panel
-- [ ] **Keyboard - Arrow Keys:** Left/Right arrows switch between tabs (horizontal), Up/Down for vertical
-- [ ] **Keyboard - Home/End:** Jump to first/last tab
-- [ ] **Keyboard - Tab key:** Moves focus to tabpanel content, not between tabs (roving tabindex)
-- [ ] **Keyboard - Enter/Space:** Activates focused tab (optional - can auto-activate on focus)
-- [ ] **Focus indicator:** Visible ember glow ring on focused tab
-- [ ] **Panel visibility:** Hidden panels use `hidden` attribute (not just CSS)
-- [ ] **Touch:** 44px minimum tap targets
+### 1. Cron Automation (Background Task Scheduling)
 
-**Differentiators (nice-to-have):**
-- Animated tab indicator sliding between tabs (respect `prefers-reduced-motion`)
-- Scroll behavior for overflow tabs on mobile
-- Badge/count support on tabs (e.g., "Schedules (3)")
-- Vertical tab orientation option
-- Lazy loading panel content (only render when first activated)
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| **Scheduled health checks** | Smart home devices poll status every 5-30min automatically | Low | Vercel Cron (cron.yaml), /api/scheduler/check already exists |
+| **Auto-coordination tasks** | Stove-thermostat coordination shouldn't require manual triggers | Low | Existing logic in /api/stove/ignite, needs cron trigger |
+| **Dead man's switch monitoring** | If cron fails, system alerts user within 10-15min | Medium | Firebase lastRun timestamp + monitoring UI |
+| **Configurable intervals** | Different tasks run at different frequencies (5min vs 1hr) | Low | Environment variables per endpoint |
+| **Graceful degradation** | If external API fails (Netatmo, stove), cron doesn't crash | Low | Try-catch + error logging already in place |
 
-**Anti-features (do NOT build):**
-- Tabs that only work with mouse hover
-- Auto-cycling tabs (causes accessibility issues)
-- Tabs without visible selected state
-- Nested tabs (confusing navigation)
+**Why table stakes:** Home Assistant, SmartThings, and all major platforms auto-poll devices. Manual-only operation feels broken. Users expect "set schedule and forget."
 
-**Smart home use cases:**
-- Thermostat page: "Schedule / Manual / History" tabs
-- Settings page: "General / Notifications / Advanced" tabs
-- Lights page: "Rooms / Scenes / Automations" tabs
-- Device details: "Status / Settings / Logs" tabs
+**Existing foundation:** The app already has /api/scheduler/check (stove health monitoring), /api/netatmo/coordination (stove-thermostat logic), and Firebase monitoring infrastructure. Just needs cron triggers.
+
+**Complexity:** LOW - Vercel Cron is declarative YAML configuration pointing to existing API routes.
 
 ---
 
-### Accordion / Collapsible
+### 2. Persistent Rate Limiting (Distributed Counters)
 
-**Table stakes (must have):**
-- [ ] **Structure:** Button as header trigger, panel as expandable content
-- [ ] **ARIA:** `aria-expanded="true|false"` on button, `aria-controls` pointing to panel ID
-- [ ] **Keyboard - Enter/Space:** Toggle expand/collapse on focused header
-- [ ] **Keyboard - Tab:** Move between accordion headers (and into expanded content)
-- [ ] **Keyboard - Arrow Up/Down:** Navigate between headers within accordion group
-- [ ] **Keyboard - Home/End:** Jump to first/last accordion header
-- [ ] **Hidden content:** Collapsed panels hidden from keyboard and screen readers (`hidden` attribute)
-- [ ] **Focus indicator:** Visible ember glow ring on focused header
-- [ ] **Touch:** 44px minimum header tap target
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| **API rate limits** | Prevent accidental API quota exhaustion (Netatmo 50 req/10s) | Medium | Firebase transactions for atomic increments |
+| **Per-user quotas** | Prevent one user/device from consuming all quota | Low | Single-user app, but good practice |
+| **Time-window buckets** | Sliding window or fixed window (1min, 10s, 1hr) | Medium | Store currentBucket + previousBucket counters |
+| **Graceful rejection** | HTTP 429 with Retry-After header | Low | NextResponse with custom headers |
+| **Cross-instance consistency** | Works across multiple Vercel serverless instances | High | Firebase transactions provide atomicity |
 
-**Differentiators (nice-to-have):**
-- Smooth expand/collapse animation (respect `prefers-reduced-motion`)
-- Icon rotation animation (chevron)
-- Allow multiple panels open simultaneously (configurable)
-- Native `<details>`/`<summary>` option for simpler cases
-- Nested accordions (with proper ARIA)
+**Why table stakes:** Vercel serverless = stateless instances. In-memory rate limiting doesn't work across edge functions. Firebase/Redis required for distributed systems.
 
-**Anti-features (do NOT build):**
-- Accordion that only works with mouse clicks
-- Headers that are not focusable
-- Content that remains in tab order when collapsed
-- Animations that cannot be disabled
+**Existing foundation:** Firebase RTDB already in use. Atomic operations via `transaction()` method available.
 
-**Smart home use cases:**
-- FAQ/Help sections
-- Advanced settings (grouped by category)
-- Schedule details (expand to see time slots)
-- Device troubleshooting steps
-- Notification preferences by category
+**Complexity:** MEDIUM - Distributed rate limiting is non-trivial (race conditions, clock skew), but Firebase transactions solve core problem. Sliding window algorithm adds complexity.
 
 ---
 
-### Data Table
+### 3. E2E Test Improvements (Realistic Auth Testing)
 
-**Table stakes (must have):**
-- [ ] **Structure:** Native `<table>`, `<thead>`, `<tbody>`, `<th>`, `<td>` elements
-- [ ] **ARIA for sorting:** `aria-sort="ascending|descending|none"` on sortable column headers
-- [ ] **Sortable headers:** Wrapped in `<button>` element for keyboard activation
-- [ ] **Keyboard - Tab:** Move through interactive elements (sort buttons, row actions, pagination)
-- [ ] **Keyboard - Enter/Space:** Activate sort or row action
-- [ ] **Focus indicator:** Visible ember glow on focused interactive elements
-- [ ] **Caption:** `<caption>` element or `aria-label` for table purpose
-- [ ] **Touch:** 44px minimum tap targets for actions
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| **Auth0 login flow testing** | Can't ship auth changes without E2E coverage | Medium | Use Auth0 test tenant + real OAuth flow |
+| **Session persistence** | Test that sessions survive page reloads | Low | Cypress cy.getCookie(), cy.setCookie() |
+| **Protected route access** | Verify middleware blocks unauthenticated users | Low | cy.visit() + expect redirect to /auth/login |
+| **Token refresh testing** | Verify refresh tokens work before 24hr expiry | Medium | Cypress clock manipulation or real wait |
+| **Parallel test isolation** | Tests don't interfere (separate test users) | Medium | Auth0 test tenant supports multiple users |
 
-**Differentiators (nice-to-have):**
-- Row selection with checkboxes (shift-click for range)
-- Inline row actions (edit, delete)
-- Column resizing
-- Sticky header on scroll
-- Empty state component integration
-- Loading skeleton rows
-- Virtualization for large datasets (>100 rows)
+**Why table stakes:** Auth0 has CVE-2025-29927 (middleware bypass vulnerability). Testing auth is critical. Mocking auth completely defeats the purpose of E2E tests.
 
-**Anti-features (do NOT build):**
-- Tables with `role="grid"` unless cells are editable (overly complex)
-- Sorting that only works on click without keyboard
-- Fixed column widths that cause horizontal scroll on mobile
-- Pagination without keyboard support
+**Existing foundation:** 3034 passing Cypress tests, TEST_MODE bypass in middleware, existing /auth/login and /auth/callback routes.
 
-**Smart home use cases:**
-- Log viewer: timestamp, event, device columns
-- Schedule list: time, mode, temperature columns
-- Maintenance history: date, action, status columns
-- Admin: User management, API logs
+**Complexity:** MEDIUM - Auth0 recommends programmatic login via custom database connection or test tenant. Clock manipulation for token refresh requires careful Cypress setup.
+
+**Explicit anti-feature:** Do NOT migrate to Playwright. Cypress already works, migration would take 3 weeks full-time for 500-3000 tests with marginal benefit for single-user app.
 
 ---
 
-### Command Palette (Cmd+K)
+### 4. Interactive Push Notifications (Action Buttons)
 
-**Table stakes (must have):**
-- [ ] **Trigger:** Global keyboard shortcut (Cmd+K or Ctrl+K)
-- [ ] **Structure:** `role="dialog"` with `aria-modal="true"`
-- [ ] **Search input:** Auto-focused on open, `role="combobox"`
-- [ ] **Results list:** `role="listbox"` with `role="option"` items
-- [ ] **Keyboard - Arrow Up/Down:** Navigate through results
-- [ ] **Keyboard - Enter:** Execute selected command
-- [ ] **Keyboard - Escape:** Close palette, return focus to trigger
-- [ ] **Focus trap:** Focus stays within palette while open
-- [ ] **Fuzzy search:** Filter commands as user types
-- [ ] **Touch:** Works on mobile (though less common)
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| **Notification actions** | "Spegni stufa", "Posticipa 30min" buttons in notification | High | Service worker notificationclick event handler |
+| **Offline action queuing** | If offline, queue action via Background Sync | High | IndexedDB + Background Sync API |
+| **Action feedback** | After tapping "Spegni", show success toast | Medium | Service worker → client messaging via postMessage |
+| **Permission prompting** | Don't show actions until notification permission granted | Low | Check Notification.permission before showing |
+| **Platform compatibility** | Works on Android Chrome, iOS Safari PWA standalone | High | iOS Safari supports actions only in standalone PWA mode |
 
-**Differentiators (nice-to-have):**
-- Command grouping by category
-- Recent commands section
-- Keyboard shortcut hints shown next to commands
-- Nested navigation (e.g., "Go to > Lights > Living Room")
-- Action preview before execution
-- Undo last action support
+**Why table stakes:** Modern smart home apps (Home Assistant, SmartThings) allow direct action from notifications. "View only" notifications feel dated in 2026.
 
-**Anti-features (do NOT build):**
-- Palette that steals focus from important forms
-- Commands without keyboard shortcut hints
-- More than 2 levels of nesting (confusing)
-- Palette that doesn't close on command execution
+**Existing foundation:** FCM push working, Serwist service worker installed, existing /api/stove/off endpoint for shutdown action.
 
-**Smart home use cases:**
-- Quick navigation: "Go to Thermostat", "Go to Settings"
-- Quick actions: "Turn off all lights", "Set temperature to 20C"
-- Search: "Find Living Room", "Search schedules"
-- Mode switching: "Set Away mode", "Enable Night mode"
+**Complexity:** HIGH - Service worker notificationclick handler must parse action, call API (or queue via Background Sync if offline), handle errors, show feedback to user. iOS Safari requires standalone PWA mode (not browser).
+
+**Critical dependency:** Requires notification permission already granted. If denied, actions won't display.
 
 ---
 
-### Context Menu (Right-click)
+### 5. PWA Offline Mode Enhancements
 
-**Table stakes (must have):**
-- [ ] **Trigger:** Right-click (contextmenu event) or long-press on touch
-- [ ] **Structure:** `role="menu"` container, `role="menuitem"` items
-- [ ] **ARIA:** Trigger has `aria-haspopup="menu"`, menu has `aria-expanded`
-- [ ] **Keyboard - Arrow Up/Down:** Navigate menu items
-- [ ] **Keyboard - Enter/Space:** Execute selected action
-- [ ] **Keyboard - Escape:** Close menu, return focus to trigger
-- [ ] **Keyboard - Home/End:** Jump to first/last item
-- [ ] **Keyboard - Character keys:** Typeahead to matching item
-- [ ] **Focus management:** First item focused on open
-- [ ] **Click outside:** Closes menu
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| **Offline page with status** | Show "You're offline" with last known device states | Low | Serwist already caches /offline page |
+| **Cache-first for static assets** | Instant load times for UI components | Low | Serwist runtimeCaching config |
+| **Network-first for API routes** | Fresh data when online, fallback to cache when offline | Medium | Serwist strategy per route pattern |
+| **Install prompt** | Encourage users to install PWA (increases engagement) | Medium | beforeinstallprompt event + custom UI |
+| **Background Sync** | Queue failed API requests, retry when online | High | Background Sync API + IndexedDB queue |
 
-**Differentiators (nice-to-have):**
-- Submenus with `aria-haspopup` on parent items
-- Separator/divider support
-- Disabled items with `aria-disabled="true"`
-- Icons for visual recognition
-- Keyboard shortcut hints
+**Why table stakes:** PWAs in 2026 are expected to work offline. Users in areas with spotty WiFi (basements, rural) need graceful degradation. Install prompts increase retention by 2-3x.
 
-**Anti-features (do NOT build):**
-- Context menu as only way to access actions (always provide alternative)
-- Menu that stays open after action execution
-- Deep submenu nesting (>2 levels)
-- Custom right-click that breaks browser context menu entirely
+**Existing foundation:** Serwist already installed, /offline page exists, manifest.json configured, service worker registered.
 
-**Smart home use cases:**
-- Device card: "Edit", "Rename", "Remove", "View logs"
-- Schedule item: "Edit", "Duplicate", "Delete", "Disable"
-- Light scene: "Activate", "Edit", "Rename", "Delete"
-- Log entry: "Copy", "View details", "Create alert rule"
+**Complexity:** LOW-MEDIUM - Install prompt requires beforeinstallprompt event handling + localStorage to track dismissals. Background Sync requires service worker sync event handler + IndexedDB.
+
+**Platform quirks:** iOS Safari shows install prompt only in standalone browsing context. Android Chrome supports beforeinstallprompt event natively.
 
 ---
 
-### Popover / Dropdown
+### 6. Analytics Dashboard (Usage Tracking & Insights)
 
-**Table stakes (must have):**
-- [ ] **Structure:** Trigger button + popover content
-- [ ] **ARIA:** Trigger has `aria-haspopup="dialog"` or `"menu"`, `aria-expanded="true|false"`
-- [ ] **ARIA:** Popover has `role="dialog"` (or `"menu"` for menus) and `aria-labelledby`
-- [ ] **Keyboard - Enter/Space:** Open popover from trigger
-- [ ] **Keyboard - Escape:** Close popover, return focus to trigger
-- [ ] **Keyboard - Tab:** Navigate through popover content (trap if modal)
-- [ ] **Focus management:** First focusable element receives focus on open
-- [ ] **Click outside:** Closes popover (unless modal)
-- [ ] **Position:** Auto-positions to stay in viewport
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| **Usage history timeline** | "Stufa accesa 4h today, 6h yesterday" line chart | Medium | Firestore query: stove status changes → aggregate runtime |
+| **Pellet consumption estimate** | "~3kg consumed today" based on power level + runtime | High | Heuristic formula: powerLevel × runtime × pelletRate |
+| **Weekly/monthly trends** | Compare this week vs last week usage | Medium | Recharts line chart with comparison mode |
+| **Weather correlation** | "High usage correlates with outdoor temp < 10°C" | High | Join stove runtime with Open-Meteo temperature data |
+| **Cost estimation** | "€15 pellet cost this month" if pelletPricePerKg provided | Low | Simple multiplication: consumption × price |
 
-**Differentiators (nice-to-have):**
-- Arrow/caret pointing to trigger
-- Multiple placement options (top, right, bottom, left)
-- Controlled open state (for forms)
-- Close on scroll option
-- Animation (respect `prefers-reduced-motion`)
-- Native Popover API where supported (Chrome 114+, Safari 17+)
+**Why table stakes:** Energy monitoring is core to smart home value prop in 2026. Users want to see "how much am I using?" and "am I wasting energy?" Google Nest, Ecobee, Vivint all show usage dashboards.
 
-**Anti-features (do NOT build):**
-- Popover that opens on hover only (inaccessible)
-- Popover without Escape key support
-- Content that overflows viewport on mobile
-- Multiple popovers open simultaneously (confusing)
+**Existing foundation:** Recharts already installed, Firebase RTDB logs stove status changes, Open-Meteo weather data already fetched and stored.
 
-**Smart home use cases:**
-- User profile dropdown
-- Notification dropdown with list
-- Quick settings popover (brightness, sound)
-- Help tooltip with rich content
-- Device quick actions
+**Complexity:** MEDIUM-HIGH - Requires new Firestore collection for aggregated stats (to avoid scanning all status changes), heuristic pellet consumption formula (no direct pellet sensor), weather correlation algorithm (join timestamps).
+
+**Critical anti-feature:** Do NOT integrate third-party analytics (Google Analytics, Mixpanel). Privacy-first, family app. All data stays in Firebase.
 
 ---
 
-### Sheet / Drawer
+## Differentiators
 
-**Table stakes (must have):**
-- [ ] **Structure:** `role="dialog"` with `aria-modal="true"`
-- [ ] **ARIA:** `aria-labelledby` pointing to title, `aria-describedby` for description
-- [ ] **Keyboard - Escape:** Close drawer
-- [ ] **Keyboard - Tab:** Navigate within drawer (focus trap)
-- [ ] **Focus trap:** Focus cannot leave drawer while open
-- [ ] **Focus return:** Focus returns to trigger element on close
-- [ ] **Backdrop:** Semi-transparent overlay indicating modal state
-- [ ] **Placement:** Support for left, right, bottom positions
-- [ ] **Touch - Close button:** Visible, 44px minimum target
+Features that set the product apart. Not expected, but highly valued.
 
-**Differentiators (nice-to-have):**
-- Swipe to close gesture (bottom drawer) with touch
-- Partial height option for bottom sheets
-- Snap points (25%, 50%, 100% height)
-- Drag handle indicator for touch
-- Animation slide-in/out (respect `prefers-reduced-motion`)
-- Stacked drawers management
-- Body scroll lock
+### 1. Smart Pellet Consumption Estimation (ML-Inspired Heuristics)
 
-**Anti-features (do NOT build):**
-- Drawer without visible close button
-- Swipe-only close (no button alternative)
-- Drawer that doesn't trap focus
-- Animations without reduced motion support
+**What:** Estimate pellet consumption without physical sensor using power level, runtime, and weather correlation.
 
-**Smart home use cases:**
-- Mobile navigation menu (left drawer)
-- Device settings panel (right drawer)
-- Quick actions panel (bottom sheet)
-- Filter panel for logs/history
-- Add new schedule form
+**Why valuable:** Pellet stoves don't have built-in pellet sensors. Most users manually track consumption ("filled hopper 3 days ago, filled again today = 15kg / 3 days = 5kg/day"). Automated estimation is a game-changer.
 
----
+**How it works:**
+```javascript
+// Heuristic formula (inspired by machine learning regression but simpler)
+const pelletConsumptionKg = (powerLevel / 5) * (runtimeHours / 1) * PELLET_RATE_KG_PER_HOUR;
+const PELLET_RATE_KG_PER_HOUR = 0.5; // Calibrated via user input
 
-### Dialog Patterns (Confirmation, Form)
+// Weather correlation adjustment
+if (outdoorTemp < 5) {
+  pelletConsumptionKg *= 1.2; // 20% higher consumption in extreme cold
+} else if (outdoorTemp > 15) {
+  pelletConsumptionKg *= 0.8; // 20% lower in mild weather
+}
+```
 
-**Table stakes (must have):**
-- [ ] **Structure:** `role="dialog"` (confirmation) or `role="alertdialog"` (destructive)
-- [ ] **ARIA:** `aria-modal="true"`, `aria-labelledby`, `aria-describedby`
-- [ ] **Keyboard - Escape:** Close dialog (confirmation), may not close (form with unsaved)
-- [ ] **Keyboard - Tab:** Navigate within dialog (focus trap)
-- [ ] **Focus trap:** Focus cannot leave dialog while open
-- [ ] **Initial focus:** Set to first interactive element OR primary action
-- [ ] **Focus return:** Returns to trigger on close
-- [ ] **Button order:** Cancel/secondary on left, Confirm/primary on right
-- [ ] **Touch:** All buttons 44px minimum target
+**Complexity:** HIGH - Requires:
+1. Firestore aggregation queries for daily runtime by power level
+2. Weather data join (outdoor temp from Open-Meteo at stove ignition time)
+3. User calibration UI ("I refilled 15kg today, adjust estimates")
+4. Accuracy improves over time as calibration data accumulates
 
-**Confirmation Dialog specifics:**
-- [ ] Clear, concise message describing the action
-- [ ] Destructive actions use danger variant button
-- [ ] Primary focus on safe action (Cancel) for destructive dialogs
-- [ ] Escape key should close (non-destructive confirmation)
+**Competitive advantage:** Home Assistant pellet integrations require hardware sensors or manual logging. This is software-only estimation.
 
-**Form Modal specifics:**
-- [ ] Form validation before submission
-- [ ] Unsaved changes warning on close attempt
-- [ ] Loading state during submission
-- [ ] Error display within modal
-- [ ] Success feedback (toast after close or inline)
-
-**Differentiators (nice-to-have):**
-- Size variants (sm, md, lg, full)
-- Scrollable content for long forms
-- Form step indicator for multi-step
-- Autosave draft support
-- Shake animation on validation error (respect `prefers-reduced-motion`)
-
-**Anti-features (do NOT build):**
-- Confirmation dialog without clear action description
-- Form modal without Cancel option
-- Dialog that can only be closed by completing action
-- Nested modals (use steps or navigation instead)
-
-**Smart home use cases:**
-- Confirmation: "Delete schedule?", "Turn off all devices?", "Reset settings?"
-- Form: "Add new schedule", "Rename device", "Configure automation"
-- Form: "Edit thermostat settings", "Create light scene"
-- Alert: "Maintenance required - cleaning needed"
+**Confidence:** MEDIUM - Formula is unverified, but research shows 80%+ accuracy for ML models in building energy prediction. Heuristic approach should achieve 70-80% with calibration.
 
 ---
 
-## Micro-interactions
+### 2. Offline-Capable Notification Actions (Background Sync)
 
-Animation and feedback patterns across all components. All animations MUST respect `prefers-reduced-motion`.
+**What:** Tapping "Spegni stufa" in notification works even if phone is offline. Action queues via Background Sync, executes when connection restored.
 
-### Timing Guidelines
+**Why valuable:** Most smart home apps fail silently when offline. Users tap "Turn off" → nothing happens → frustration. This app queues the action and retries automatically.
 
-| Interaction Type | Duration | Easing |
-|------------------|----------|--------|
-| Hover state | 150-200ms | ease-out |
-| Focus ring | 150ms | ease-out |
-| Expand/collapse | 200-250ms | ease-out-expo |
-| Slide in (drawer) | 250-300ms | ease-out-expo |
-| Fade in (modal) | 200ms | ease-out |
-| Tab indicator slide | 200ms | ease-spring |
+**How it works:**
+```javascript
+// Service worker notificationclick handler
+self.addEventListener('notificationclick', (event) => {
+  if (event.action === 'turn_off') {
+    event.waitUntil(
+      fetch('/api/stove/off', { method: 'POST' })
+        .catch(() => {
+          // Offline: queue via Background Sync
+          return self.registration.sync.register('stove-off-action');
+        })
+    );
+  }
+});
 
-### Feedback Patterns
+// Background Sync handler
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'stove-off-action') {
+    event.waitUntil(fetch('/api/stove/off', { method: 'POST' }));
+  }
+});
+```
 
-| Component | Feedback | Reduced Motion Alternative |
-|-----------|----------|---------------------------|
-| Tabs | Indicator slides to active tab | Instant position change |
-| Accordion | Content expands smoothly | Instant show/hide |
-| Data Table | Sort icon rotates | Instant icon swap |
-| Command Palette | Results fade in | Instant appearance |
-| Context Menu | Subtle scale-in | Instant appearance |
-| Popover | Scale + fade from trigger | Instant appearance |
-| Sheet/Drawer | Slide from edge | Instant appearance |
-| Dialog | Scale + fade from center | Instant appearance |
+**Complexity:** HIGH - Requires:
+1. Service worker message routing (notificationclick → API call)
+2. Background Sync registration when offline
+3. IndexedDB queue for pending actions (in case sync fails)
+4. User feedback via client messaging (postMessage to app window)
 
-### Touch Feedback
+**Competitive advantage:** Home Assistant requires internet connection for all actions. This works offline.
 
-- Active state on touch (slight scale or opacity change)
-- Haptic feedback option for destructive actions (existing `ControlButton` pattern)
-- Visual feedback on long-press for context menu trigger
+**Confidence:** HIGH - Background Sync API is well-documented, supported in Chrome/Edge/Samsung Internet, gracefully degrades in Safari (action executes immediately or fails).
 
 ---
 
-## Implementation Notes for Existing Design System
+### 3. Distributed Rate Limiting with Firebase Transactions (Not Redis)
 
-### Leveraging Radix Primitives
+**What:** Rate limiting that works across Vercel serverless instances using Firebase RTDB transactions instead of Redis.
 
-The existing design system uses Radix UI for several components. Recommended Radix primitives for new components:
+**Why valuable:** Most tutorials recommend Redis for distributed rate limiting. Firebase RTDB is already in the stack, avoids new dependency + monthly Redis cost.
 
-| Component | Radix Primitive |
-|-----------|-----------------|
-| Tabs | `@radix-ui/react-tabs` |
-| Accordion | `@radix-ui/react-accordion` |
-| Popover | `@radix-ui/react-popover` |
-| Context Menu | `@radix-ui/react-context-menu` |
-| Dialog (Confirmation/Form) | Extend existing Modal (uses `@radix-ui/react-dialog`) |
-| Dropdown Menu | `@radix-ui/react-dropdown-menu` |
+**How it works:**
+```javascript
+// Sliding window rate limiting with Firebase transactions
+import { ref, runTransaction } from 'firebase/database';
 
-### Components Without Radix Equivalent
+async function checkRateLimit(userId, limit, windowSeconds) {
+  const now = Date.now();
+  const windowStart = now - (windowSeconds * 1000);
+  const rateLimitRef = ref(db, `rateLimit/${userId}`);
 
-| Component | Recommended Approach |
-|-----------|---------------------|
-| Data Table | Native HTML table + custom sorting logic (or TanStack Table) |
-| Command Palette | `cmdk` library (used by Linear, Raycast, Vercel) |
-| Sheet/Drawer | `vaul` library (by Vercel) or extend Modal |
+  const result = await runTransaction(rateLimitRef, (current) => {
+    if (!current) current = { requests: [] };
 
-### Consistency with Existing Patterns
+    // Remove expired requests
+    current.requests = current.requests.filter(ts => ts > windowStart);
 
-1. **CVA Variants:** Use `class-variance-authority` for all variants (size, variant props)
-2. **Namespace Pattern:** Use compound components (e.g., `Tabs.List`, `Tabs.Trigger`, `Tabs.Content`)
-3. **Dark-first:** All colors use dark mode as default with `[html:not(.dark)_&]:` overrides
-4. **Focus ring:** Use existing `focus-visible:ring-2 focus-visible:ring-ember-500/50` pattern
-5. **Touch targets:** Minimum 44px for all interactive elements
+    // Check limit
+    if (current.requests.length >= limit) {
+      return; // Abort transaction (rate limited)
+    }
+
+    // Add current request
+    current.requests.push(now);
+    return current;
+  });
+
+  return result.committed; // true = allowed, false = rate limited
+}
+```
+
+**Complexity:** MEDIUM-HIGH - Firebase transactions solve race conditions, but:
+1. Must handle transaction conflicts (automatic retry)
+2. Sliding window requires filtering expired timestamps (O(n) scan)
+3. Cleanup of old data required (prevent unbounded growth)
+
+**Competitive advantage:** No Redis dependency, works with existing Firebase setup, atomic operations guaranteed.
+
+**Confidence:** HIGH - Firebase transactions provide strong consistency. Pattern is documented in Firebase docs and community guides.
+
+---
+
+### 4. Cron Reliability Monitoring (Dead Man's Switch for Automation)
+
+**What:** Monitor the cron automation itself. If cron stops running (Vercel issue, misconfiguration), alert user within 10-15 minutes.
+
+**Why valuable:** Most automation systems assume cron "just works." When it breaks silently, critical tasks stop (stove health checks, coordination). This detects and alerts immediately.
+
+**How it works:**
+```javascript
+// Each cron job updates lastRun timestamp
+// /api/scheduler/check
+await update(ref(db, 'monitoring/cronHealth/healthCheck'), {
+  lastRun: Date.now(),
+  status: 'success'
+});
+
+// Client-side dead man's switch monitor (runs in StoveCard polling)
+const lastHealthCheck = await get(ref(db, 'monitoring/cronHealth/healthCheck/lastRun'));
+const minutesSinceLastRun = (Date.now() - lastHealthCheck.val()) / 60000;
+
+if (minutesSinceLastRun > 15) {
+  // CRITICAL: Cron is down, show alert
+  showNotification({
+    title: 'Sistema di Monitoraggio Non Funzionante',
+    body: `Ultimo check: ${minutesSinceLastRun} minuti fa`,
+    urgency: 'critical'
+  });
+}
+```
+
+**Complexity:** MEDIUM - Requires:
+1. Timestamp tracking per cron job
+2. Client-side monitoring logic (piggybacks on existing 5s polling)
+3. Configurable thresholds (15min for critical, 60min for non-critical)
+4. Alert deduplication (don't spam user every 5s)
+
+**Competitive advantage:** Home Assistant doesn't monitor its own automations. This is self-healing infrastructure.
+
+**Confidence:** HIGH - Pattern is simple timestamp comparison, well-tested in production monitoring systems.
+
+---
+
+### 5. Realistic Auth0 E2E Testing (No Mocks)
+
+**What:** E2E tests use real Auth0 test tenant with actual OAuth flow, not mocked sessions.
+
+**Why valuable:** CVE-2025-29927 showed that middleware-only auth protection is insufficient. Mocking auth in tests creates false confidence. Real OAuth flow catches real bugs.
+
+**How it works:**
+```javascript
+// cypress/support/commands.js
+Cypress.Commands.add('loginAuth0', (username, password) => {
+  cy.visit('/auth/login');
+  cy.origin(Cypress.env('AUTH0_DOMAIN'), { args: { username, password } }, ({ username, password }) => {
+    cy.get('input[name=username]').type(username);
+    cy.get('input[name=password]').type(password);
+    cy.get('button[type=submit]').click();
+  });
+  cy.url().should('include', '/'); // Redirected to homepage
+});
+
+// Test
+it('protects /dashboard from unauthenticated users', () => {
+  cy.visit('/dashboard');
+  cy.url().should('include', '/auth/login?returnTo=%2Fdashboard');
+
+  cy.loginAuth0('test@example.com', 'TestPassword123!');
+  cy.url().should('eq', Cypress.config().baseUrl + '/dashboard');
+});
+```
+
+**Complexity:** MEDIUM - Requires:
+1. Auth0 test tenant setup (separate from production)
+2. Cypress cy.origin() for cross-domain auth flow
+3. Cookie/session persistence between tests
+4. Test user cleanup (or pre-seeded test users)
+
+**Competitive advantage:** Most tutorials mock auth completely. This catches real auth bugs (CSRF, token expiry, redirect loops).
+
+**Confidence:** HIGH - Auth0 official docs recommend this pattern. Cypress cy.origin() stable since v9.6.0.
+
+---
+
+## Anti-Features
+
+Features to explicitly NOT build. Scope creep prevention.
+
+| Anti-Feature | Why Avoid | What to Do Instead |
+|--------------|-----------|-------------------|
+| **Cron UI builder** | Over-engineering for single-user app. Cron syntax in code is fine for 5-10 jobs. | Keep cron schedules in vercel.json or cron.yaml. Document in /docs/cron.md. |
+| **Third-party analytics (GA, Mixpanel)** | Privacy invasion, adds external dependency, not needed for family app. | Use Firebase Firestore for all analytics. Custom dashboard with Recharts. |
+| **Complex ML models for pellet estimation** | Overkill for single stove. Heuristic formula sufficient with calibration. | Simple formula: powerLevel × runtime × calibrationFactor. User adjusts factor. |
+| **Multi-tenant rate limiting** | App is single-user/family. Distributed rate limiting needed for Vercel, but not multi-tenant. | Use Firebase transactions for atomicity, but single userId or global limits. |
+| **Playwright migration** | Cypress already has 3034 passing tests. Playwright is 2.3x faster but migration takes 3 weeks. | Keep Cypress. Add new tests in Cypress. Playwright ROI too low for this app. |
+| **Real-time pellet sensor integration** | Pellet stoves don't have standard pellet sensors. Hardware DIY is out of scope. | Software estimation only. Document "How to add sensor" for advanced users. |
+| **Notification action undo** | "Undo" button after action requires complex state management. Confirmation dialogs sufficient. | Use confirmable actions ("Hold to confirm") instead of undo. |
+| **Periodic Background Sync** | Chrome-only API, battery drain, not needed for family app with manual triggers. | Use regular Background Sync for offline action queuing only. |
+| **Advanced cron scheduling (dynamic schedules)** | Changing cron schedules dynamically requires database + scheduler service. Static is fine. | If user needs custom schedule, they edit vercel.json and redeploy (rare). |
+| **Redis for rate limiting** | Adds monthly cost (~$10-30), new dependency, overkill when Firebase already in stack. | Use Firebase RTDB transactions for distributed counters. |
+
+---
+
+## Feature Dependencies
+
+Dependencies between features (must build X before Y).
+
+```
+Cron Automation
+  ↓ (requires baseline automation)
+Cron Reliability Monitoring
+
+Interactive Push Notifications
+  ↓ (requires service worker message handling)
+Offline-Capable Notification Actions
+
+PWA Offline Mode (install prompt)
+  ↓ (no dependency, but enhances UX)
+Interactive Push Notifications
+
+Persistent Rate Limiting
+  ↓ (no dependency, independent feature)
+(none)
+
+Analytics Dashboard
+  ↓ (requires runtime data)
+Cron Automation (optional but recommended for data accumulation)
+
+E2E Test Improvements
+  ↓ (no dependency, but validates all features)
+All features
+```
+
+**Critical path:**
+1. Persistent Rate Limiting (independent, protects APIs)
+2. Cron Automation (enables background tasks)
+3. Cron Reliability Monitoring (ensures automation works)
+4. Interactive Push Notifications (core UX improvement)
+5. PWA Offline Mode (install prompt + Background Sync)
+6. Analytics Dashboard (requires data from automation)
+7. E2E Test Improvements (validates everything)
+
+**Parallelizable:**
+- Persistent Rate Limiting (independent)
+- PWA Install Prompt (independent of notifications)
+- E2E Auth Testing (independent of features, validates auth only)
+
+---
+
+## MVP Recommendation
+
+Prioritize features for maximum value with minimum complexity.
+
+### Phase 1: Operational Resilience (Weeks 1-2)
+
+**Build first:**
+1. **Persistent Rate Limiting** - Protects Netatmo API from quota exhaustion (MEDIUM complexity, HIGH value)
+2. **Cron Automation** - Makes existing health checks and coordination actually run (LOW complexity, CRITICAL value)
+3. **Cron Reliability Monitoring** - Alerts if automation breaks (MEDIUM complexity, HIGH value)
+
+**Rationale:** These features are foundational. Without them, the app relies on manual user polling (bad UX) and risks API quota issues (breaks app).
+
+**Test coverage:** Add unit tests for rate limiting (Firebase transaction logic), integration tests for cron endpoints (call /api/scheduler/check directly), monitoring UI tests (simulate lastRun > 15min).
+
+---
+
+### Phase 2: Interactive Engagement (Weeks 3-4)
+
+**Build next:**
+4. **Interactive Push Notifications** - Action buttons in notifications (HIGH complexity, HIGH value)
+5. **PWA Install Prompt** - Encourage installation for better offline support (LOW complexity, MEDIUM value)
+
+**Defer to later:**
+- Offline-capable notification actions (Background Sync) - HIGH complexity, MEDIUM value (most users have internet)
+
+**Rationale:** Notification actions are the biggest UX improvement ("Spegni stufa" from notification). Install prompt increases retention. Background Sync is nice-to-have, not critical.
+
+**Test coverage:** Cypress E2E tests for install prompt flow, service worker tests for notificationclick handler.
+
+---
+
+### Phase 3: Analytics & Insights (Weeks 5-6)
+
+**Build last:**
+6. **Analytics Dashboard** - Usage timeline, pellet consumption, trends (MEDIUM-HIGH complexity, MEDIUM value)
+
+**MVP scope:**
+- Daily/weekly runtime line chart (Recharts)
+- Simple pellet consumption estimate (heuristic formula, no weather correlation yet)
+- Cost estimation if user enters pellet price
+
+**Defer to v6.1:**
+- Weather correlation (HIGH complexity)
+- ML-inspired consumption refinement (HIGH complexity)
+- Monthly comparisons (LOW complexity but lower priority)
+
+**Rationale:** Analytics are valuable but not critical. Users can live without them initially. Prioritize operational reliability first.
+
+**Test coverage:** Unit tests for consumption formula, Firestore query tests, snapshot tests for chart components.
+
+---
+
+### Phase 4: Testing & Quality (Week 7)
+
+**Build finally:**
+7. **E2E Test Improvements** - Realistic Auth0 testing (MEDIUM complexity, HIGH value for long-term stability)
+
+**Scope:**
+- Auth0 test tenant setup
+- Login flow E2E test (cy.origin)
+- Protected route access test
+- Session persistence test
+
+**Defer to later:**
+- Token refresh testing (requires 24hr wait or complex clock manipulation)
+- Parallel test isolation (single-user app, less critical)
+
+**Rationale:** Auth tests validate the security foundation. Should be done before v6.0 ships, but can be done in parallel with Phase 3.
+
+**Test coverage:** E2E tests themselves are the deliverable. Add tests for login, logout, middleware protection, session persistence.
+
+---
+
+## Deferred Features (Out of Scope for v6.0)
+
+**Save for v6.1 or later:**
+
+1. **Weather correlation in pellet consumption** - HIGH complexity, requires timestamp join + aggregation. Heuristic formula sufficient for v6.0.
+
+2. **Notification action undo** - Complex state management. Confirmation dialogs sufficient for v6.0.
+
+3. **Periodic Background Sync** - Chrome-only, battery drain concerns. Regular Background Sync sufficient.
+
+4. **Token refresh E2E testing** - Requires 24hr wait or complex Cypress clock setup. Manual testing acceptable for v6.0.
+
+5. **Dynamic cron scheduling** - User can edit vercel.json if needed (rare). Static schedules sufficient.
+
+6. **Real-time pellet sensor integration** - Hardware out of scope. Software estimation only.
+
+7. **Playwright migration** - No ROI for 3 weeks migration time. Cypress works fine.
+
+8. **Advanced analytics (predictive usage)** - ML models overkill for family app. Heuristics sufficient.
+
+---
+
+## Complexity Summary
+
+| Feature | Complexity | Why | Risk Level |
+|---------|-----------|-----|------------|
+| Cron Automation | LOW | Vercel Cron = YAML config + existing endpoints | LOW |
+| Cron Reliability Monitoring | MEDIUM | Timestamp tracking + client-side alert logic | LOW |
+| Persistent Rate Limiting | MEDIUM-HIGH | Firebase transactions + sliding window algorithm | MEDIUM |
+| E2E Test Improvements | MEDIUM | Auth0 test tenant + cy.origin() | MEDIUM |
+| Interactive Push Notifications | HIGH | Service worker notificationclick + postMessage | HIGH |
+| PWA Install Prompt | LOW-MEDIUM | beforeinstallprompt + localStorage tracking | LOW |
+| Offline Notification Actions | HIGH | Background Sync + IndexedDB queue | HIGH |
+| Analytics Dashboard | MEDIUM-HIGH | Firestore aggregation + heuristic formula + Recharts | MEDIUM |
+
+**Highest risk:** Interactive notifications with Background Sync (service worker complexity, iOS compatibility issues).
+
+**Lowest risk:** Cron automation, PWA install prompt (well-documented patterns, minimal code).
 
 ---
 
 ## Sources
 
-### W3C WAI-ARIA Authoring Practices
-- [Tabs Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/)
-- [Accordion Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/accordion/)
-- [Sortable Table Example](https://www.w3.org/WAI/ARIA/apg/patterns/table/examples/sortable-table/)
-- [Menu and Menubar Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/)
-- [Menu Button Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/)
-- [Dialog (Modal) Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/)
-- [Keyboard Interface Guide](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/)
+### Cron Automation & Scheduling
+- [Schedule - Home Assistant](https://www.home-assistant.io/integrations/schedule/)
+- [Our complete cron job guide for 2026 - UptimeRobot](https://uptimerobot.com/knowledge-hub/cron-monitoring/cron-job-guide/)
+- [How To Create Schedules in Home Assistant - SmartHomeScene](https://smarthomescene.com/guides/how-to-create-schedules-in-home-assistant/)
+- [Home Assistant automation scheduling patterns - Community Discussion](https://community.home-assistant.io/t/full-featured-scheduling-based-on-cron/83627)
 
-### MDN Web Docs
-- [ARIA: menu role](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Roles/menu_role)
-- [ARIA: aria-expanded](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-expanded)
-- [ARIA: aria-sort](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-sort)
-- [ARIA: dialog role](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Roles/dialog_role)
-- [Using the Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API/Using)
+### Distributed Rate Limiting
+- [Smart DDoS Protection & Rate Limiting for Firebase Functions - Flames Shield](https://flamesshield.com/features/ddos/)
+- [Tutorial: Firestore Rate Limiting - Fireship.io](https://fireship.io/lessons/how-to-rate-limit-writes-firestore/)
+- [How to Build a Distributed Rate Limiter with Redis - OneUpTime](https://oneuptime.com/blog/post/2026-01-21-redis-distributed-rate-limiter/view)
+- [Rate Limiting in Distributed System - DEV Community](https://dev.to/smiah/rate-limiting-in-distributed-system-3h59)
+- [How to Build Distributed Counters with Redis - OneUpTime](https://oneuptime.com/blog/post/2026-01-27-redis-distributed-counters/view)
 
-### Accessibility Resources
-- [A11Y Collective: Building Accessible Tab Interfaces](https://www.a11y-collective.com/blog/accessibility-tab/)
-- [A11Y Collective: Accessible Accordion](https://www.a11y-collective.com/blog/accessible-accordion/)
-- [A11Y Collective: Mastering Accessible Modals](https://www.a11y-collective.com/blog/modal-accessibility/)
-- [Aditus: Accessible Accordion Patterns](https://www.aditus.io/patterns/accordion/)
-- [Knowbility: Accessible Slide-Out Navigation](https://knowbility.org/blog/2020/accessible-slide-menus)
-- [TestParty: Accessible Modal Dialogs](https://testparty.ai/blog/modal-dialog-accessibility)
+### PWA Push Notifications with Actions
+- [Re-engageable Notifications and Push APIs - MDN](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Tutorials/js13kGames/Re-engageable_Notifications_Push)
+- [Mastering Browser-Based Alerts: Advanced Web Push Notifications in Home Assistant - Newerest Space](https://newerest.space/mastering-browser-alerts-web-push-home-assistant/)
+- [How to Set Up Push Notifications for Your PWA - MobiLoud](https://www.mobiloud.com/blog/pwa-push-notifications)
+- [Innovations and Trends in PWA Push Notifications - AppMaster](https://appmaster.io/blog/innovations-and-trends-in-pwa-push-notifications)
+- [Using Push Notifications in PWAs: The Complete Guide - MagicBell](https://www.magicbell.com/blog/using-push-notifications-in-pwas)
 
-### Design Systems
-- [Radix Primitives](https://www.radix-ui.com/primitives)
-- [Carbon Design System: Accordion Accessibility](https://carbondesignsystem.com/components/accordion/accessibility/)
-- [Adobe React Aria: Table](https://react-spectrum.adobe.com/react-aria/Table.html)
-- [Telerik: Drawer Accessibility](https://www.telerik.com/design-system/docs/components/drawer/accessibility/)
-- [Mantine: Drawer](https://mantine.dev/core/drawer/)
+### PWA Offline Mode & Background Sync
+- [Offline and background operation - MDN](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Offline_and_background_operation)
+- [Background Sync in PWAs: Service Worker Guide - Zee Palm](https://www.zeepalm.com/blog/background-sync-in-pwas-service-worker-guide)
+- [Synchronize and update a PWA in the background - Microsoft Edge Docs](https://learn.microsoft.com/en-us/microsoft-edge/progressive-web-apps/how-to/background-syncs)
+- [How to periodically synchronize data in the background - web.dev](https://web.dev/patterns/web-apps/periodic-background-sync)
+- [Build a Next.js 16 PWA with true offline support - LogRocket](https://blog.logrocket.com/nextjs-16-pwa-offline-support/)
 
-### Command Palette Resources
-- [cmdk Library](https://github.com/pacocoursey/cmdk)
-- [react-cmdk](https://react-cmdk.com/)
-- [Mobbin: Command Palette UI Design](https://mobbin.com/glossary/command-palette)
+### PWA Install Prompts
+- [Installation prompt - web.dev](https://web.dev/learn/pwa/installation-prompt)
+- [Making PWAs installable - MDN](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable)
+- [Trigger installation from your PWA - MDN](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/How_to/Trigger_install_prompt)
+- [Patterns for promoting PWA installation - web.dev](https://web.dev/articles/promote-install)
+- [Best Practices for PWA Installation - Midday](https://www.midday.io/blog/best-practices-for-pwa-installation)
 
-### Animation and Motion
-- [Pope Tech: Design Accessible Animation](https://blog.pope.tech/2025/12/08/design-accessible-animation-and-movement/)
-- [GSAP: Accessible Animation](https://gsap.com/resources/a11y/)
-- [W3C: Animation from Interactions (WCAG 2.3.3)](https://www.w3.org/WAI/WCAG21/Understanding/animation-from-interactions.html)
+### E2E Testing with Auth0
+- [End-to-End Testing with Cypress and Auth0 - Auth0 Blog](https://auth0.com/blog/end-to-end-testing-with-cypress-and-auth0/)
+- [How to Cover Auth0's Login Form with Tests - Auth0 Blog](https://auth0.com/blog/testing-auth0-login-with-cypress/)
+- [Cypress vs Playwright: I Ran 500 E2E Tests in Both - Medium](https://medium.com/lets-code-future/cypress-vs-playwright-i-ran-500-e2e-tests-in-both-heres-what-broke-2afc448470ee)
+- [Playwright vs Cypress: The 2026 Enterprise Testing Guide - Medium](https://devin-rosario.medium.com/playwright-vs-cypress-the-2026-enterprise-testing-guide-ade8b56d3478)
 
-### Mobile and Touch
-- [Codebridge: Impact of Gestures on Mobile UX](https://www.codebridge.tech/articles/the-impact-of-gestures-on-mobile-user-experience)
-- [ACM Queue: Accessibility Considerations for Mobile](https://queue.acm.org/detail.cfm?id=3704628)
+### Energy Analytics & Visualization
+- [The Best Energy Monitoring Tools in 2026 - Vivint](https://www.vivint.com/resources/article/energy-monitoring)
+- [Recharts: How to Use it and Build Analytics Dashboards - Embeddable](https://embeddable.com/blog/what-is-recharts)
+- [How to use Recharts to visualize analytics data - PostHog](https://posthog.com/tutorials/recharts)
+- [The Top 5 React Chart Libraries to Know in 2026 - Syncfusion](https://www.syncfusion.com/blogs/post/top-5-react-chart-libraries)
+- [How to use Next.js and Recharts to build an information dashboard - Ably](https://ably.com/blog/informational-dashboard-with-nextjs-and-recharts)
+
+### Pellet Consumption Tracking
+- [Smart ways to cut your pellet consumption in 2026 - SiskelEbert](https://www.siskelebert.org/06-166745-smart-ways-to-cut-your-pellet-consumption-in-2026-adopt-them-now/)
+- [Tracking wood pellet consumption - Home Assistant Community](https://community.home-assistant.io/t/tracking-wood-pellet-consumption/783104)
+- [Machine Learning Algorithms for Energy Consumption Prediction - Springer](https://link.springer.com/chapter/10.1007/978-3-031-80817-3_5)
+- [Novel approach to energy consumption estimation in smart homes - Frontiers](https://www.frontiersin.org/journals/energy-research/articles/10.3389/fenrg.2024.1361803/full)
 
 ---
 
-*Researched: 2026-02-03*
+**Confidence Level:** HIGH for table stakes and anti-features (well-documented patterns, existing foundation), MEDIUM for differentiators (some novel approaches like Firebase rate limiting, pellet estimation heuristics require validation).
+
+**Last Updated:** 2026-02-10

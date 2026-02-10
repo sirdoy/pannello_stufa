@@ -1,766 +1,522 @@
-# Domain Pitfalls: Netatmo Schedule Management & Stove Monitoring
+# Pitfalls Research
 
-**Domain:** Thermostat Schedule Management + Appliance Monitoring Integration
-**Researched:** 2026-01-26
+**Domain:** Operations Automation + PWA Improvements + Analytics (v6.0)
+**Researched:** 2026-02-10
 **Confidence:** HIGH
 
 ## Critical Pitfalls
 
-### Pitfall 1: Netatmo Rate Limiting - Inconsistent Per-User vs Per-Application Limits
+### Pitfall 1: Serverless Cron Persistent State Assumption
 
 **What goes wrong:**
-App hits "Maximum API usage reached" (error code 26) even with minimal requests. Users report "thermostat stopped responding" during normal use. Rate limit violations cause 3-hour API lockouts. The limit behavior changed in early 2026: single-user apps get 500 calls/hour, but apps with 2+ users are subject to shared application limits (much lower per user).
+Developers assume Vercel cron jobs maintain in-memory state between executions, leading to broken rate limiters, PID controller state loss, and stale session data. The current in-memory rate limiter will reset on every cold start, allowing DoS attacks to bypass rate limits.
 
 **Why it happens:**
-- Using shared OAuth application (like Home Assistant Cloud) instead of personal application
-- Polling thermostat status too frequently (every 5s like stove polling)
-- Not caching schedule data locally - refetching on every page load
-- Multiple API calls per user action (getNick → homesdata → homestatus → setthermpoint = 4 calls)
-- Token refresh requests counting against quota (refresh every 3 hours = 8 calls/day minimum)
-- Batching not used for multi-room operations (setting 3 rooms = 3 API calls instead of 1)
+Vercel serverless functions are stateless — each execution starts fresh with no shared memory between invocations. Node-cron patterns work locally but silently fail in production because the process starts, handles one request, then gets destroyed. There is no error and no warning.
 
 **How to avoid:**
-1. **Use personal application credentials**: Create dedicated Netatmo app per deployment (not shared)
-2. **Conservative polling**: Poll thermostat status every 60s minimum (not 5s like stove)
-3. **Local caching**: Store schedule data in Firebase, TTL 5 minutes, refresh only on user action
-4. **Batch operations**: Use single API call for multi-room setpoint changes
-5. **Smart token refresh**: Only refresh when token expires (3 hours), not on every request
-6. **Rate limit tracking**: Store API call count in memory, warn at 80% threshold
-7. **Exponential backoff**: On 429 error, wait 60s → 120s → 300s before retry
+1. **Migrate to Firebase RTDB for ALL persistent state**:
+   - Rate limiter: Store `requests/{userId}/{endpoint}/count` with timestamp
+   - PID automation: Already implemented at `pidAutomation/state` (good pattern)
+   - Cron health: Already using `cronHealth/lastCall` (correct)
+   - Dead man's switch: Already using `healthMonitoring/lastCheck` (correct)
+
+2. **Implement sliding window rate limiting**:
+   ```typescript
+   // BAD - In-memory (resets on cold start)
+   const rateLimiter = new Map<string, number>();
+
+   // GOOD - Firebase RTDB persistent
+   const path = `rateLimit/${userId}/${endpoint}/${timestamp}`;
+   const count = await adminDbGet(path) || 0;
+   await adminDbSet(path, count + 1);
+   // Cleanup old windows with transaction
+   ```
+
+3. **Test with forced cold starts**: Deploy to Vercel, wait 15+ minutes between requests to verify state persistence.
 
 **Warning signs:**
-- Error 26 "User Usage exceeded" in API responses
-- Netatmo API returns 429 Too Many Requests
-- Sudden API failures after adding 2nd user
-- API works in development but fails in production (more users)
-- Token refresh fails with rate limit error
-
-**Prevention strategy:**
-```javascript
-// lib/netatmo/rateLimiter.js
-const callsPerHour = new Map(); // userId -> {count, resetAt}
-
-export async function checkRateLimit(userId) {
-  const now = Date.now();
-  const userLimit = callsPerHour.get(userId) || {count: 0, resetAt: now + 3600000};
-
-  if (now > userLimit.resetAt) {
-    // Reset window
-    callsPerHour.set(userId, {count: 1, resetAt: now + 3600000});
-    return {allowed: true, remaining: 499};
-  }
-
-  if (userLimit.count >= 450) { // 90% of 500 limit
-    return {allowed: false, remaining: 0, resetAt: userLimit.resetAt};
-  }
-
-  userLimit.count++;
-  callsPerHour.set(userId, userLimit);
-  return {allowed: true, remaining: 500 - userLimit.count};
-}
-```
+- Rate limiter works for consecutive requests but resets after idle periods
+- PID controller "forgets" integral/derivative terms between cron runs
+- Users bypass rate limits by waiting for function cold start
+- Cron interval tracking shows gaps or resets
 
 **Phase to address:**
-**Phase 1: Netatmo API Foundation** - Implement rate limiter and caching before schedule CRUD
-**Phase 2: Schedule Management** - Batch operations, local schedule cache
+Phase 49 (Persistent Rate Limiting) - MUST complete before Phase 50 (Cron Configuration)
 
 ---
 
-### Pitfall 2: Setpoint Override vs Schedule Modification Confusion
+### Pitfall 2: Vercel Function Timeout During Cron Orchestration
 
 **What goes wrong:**
-User intends temporary override when stove turns on, but app permanently modifies the schedule. When stove turns off, temperature doesn't return to original schedule. User's carefully programmed weekly schedule gets corrupted with stove-triggered changes. Schedule editor shows unexpected temperatures that user didn't set.
+The scheduler cron endpoint (`/api/scheduler/check`) performs 10+ operations sequentially (stove status, ignition, Netatmo sync, valve calibration, weather refresh, token cleanup, PID automation) and exceeds Vercel's 10-second default timeout, causing partial execution and data corruption.
 
 **Why it happens:**
-- Using `switchSchedule` API instead of `setThermpoint` for temporary overrides
-- Confusing "change current temperature" (setpoint) with "change schedule" (modify timetable)
-- No expiration time on setpoint overrides (endtime parameter missing)
-- Stove ON/OFF events trigger schedule modifications instead of mode changes
-- Not distinguishing between user manual changes vs automated stove sync changes
-- Existing code in `stove-sync/route.js` calls `syncLivingRoomWithStove` without clear setpoint semantics
+Heavy work in cron jobs — the current implementation performs all maintenance tasks inline. Vercel enforces a 10-second default timeout (60 seconds max), but the cron job can take longer if:
+- Stove API is slow (3-5 seconds)
+- Netatmo calibration iterates multiple valves (2-3 seconds per valve)
+- Weather fetch has network latency (1-2 seconds)
+- Multiple notifications triggered (FCM API calls)
 
 **How to avoid:**
-1. **NEVER modify schedules programmatically**: Only users can modify schedules via UI
-2. **Use setThermpoint with endtime**: Set temporary override with explicit expiration
-3. **Mode awareness**: Use `setThermmode` with `manual` mode for overrides, not schedule switches
-4. **Auto-return to schedule**: Always set endtime parameter (e.g., 2 hours) for temp overrides
-5. **Visual indicators**: UI shows "Override active until 18:00" vs "Schedule active"
-6. **Clear semantics in code**: Rename `syncLivingRoomWithStove` to `overrideSetpointForStove`
-7. **Audit trail**: Log setpoint changes separately from schedule changes
+1. **Refactor to publish-subscribe pattern**:
+   ```typescript
+   // BAD - All work inline (current implementation)
+   export const GET = withCronSecret(async () => {
+     await fetchStoveStatus();      // 3-5s
+     await trackMaintenance();      // 1-2s
+     await calibrateValves();       // 6-9s (3 valves × 2-3s)
+     await refreshWeather();        // 1-2s
+     await cleanupTokens();         // 2-3s
+     await runPIDAutomation();      // 1-2s
+     // TOTAL: 14-24 seconds → TIMEOUT!
+   });
+
+   // GOOD - Orchestrator delegates to worker routes
+   export const GET = withCronSecret(async () => {
+     await adminDbSet('cronHealth/lastCall', new Date().toISOString());
+
+     // Fire-and-forget workers (already partially implemented)
+     Promise.all([
+       fetch('/api/maintenance/track').catch(logError),
+       fetch('/api/netatmo/calibrate').catch(logError),
+       fetch('/api/weather/refresh').catch(logError),
+       fetch('/api/notifications/cleanup').catch(logError),
+     ]);
+
+     // Only blocking: critical path (scheduler logic)
+     const result = await executeSchedulerLogic();
+     return success(result);
+   });
+   ```
+
+2. **Set maxDuration in route config**:
+   ```typescript
+   export const dynamic = 'force-dynamic';
+   export const maxDuration = 60; // Max for Hobby plan
+   ```
+
+3. **Monitor with dead man's switch**: Already implemented in `healthDeadManSwitch.ts` (correct pattern).
 
 **Warning signs:**
-- User reports "my schedule changed by itself"
-- Schedule editor shows unexpected temperature values
-- Temperature doesn't return to schedule after stove turns off
-- Setpoint changes persist across days
-- Schedule sync between app and Netatmo thermostat physical device diverges
-
-**Prevention strategy:**
-```javascript
-// CORRECT - Temporary override
-await setThermpoint({
-  home_id: homeId,
-  room_id: roomId,
-  mode: 'manual',
-  temp: 16, // Lower temp when stove is on
-  endtime: Math.floor(Date.now() / 1000) + 7200 // 2 hours from now
-});
-
-// WRONG - Schedule modification
-await switchSchedule({schedule_id: newScheduleId}); // DON'T DO THIS FOR STOVE SYNC
-```
+- `FUNCTION_INVOCATION_TIMEOUT` errors in Vercel logs
+- Partial state updates (stove ignited but notification not sent)
+- Cron health timestamp updated but maintenance not tracked
+- Dead man's switch alerts firing despite cron executing
 
 **Phase to address:**
-**Phase 1: Netatmo API Foundation** - Understand setThermpoint vs schedule APIs
-**Phase 2: Stove-Thermostat Integration Fix** - Reimplement sync with correct semantics
+Phase 50 (Cron Configuration) - Split monolithic handler into orchestrator + workers
 
 ---
 
-### Pitfall 3: OAuth Token Lifecycle - Refresh Token Invalidation on Rotation
+### Pitfall 3: FCM Interactive Notifications Platform-Specific Payload Structure
 
 **What goes wrong:**
-Netatmo API returns 401 Unauthorized after 3 hours. Token refresh request succeeds but subsequent API calls still fail. App shows "Please reconnect Netatmo" even though user just authenticated. Multiple devices using same account invalidate each other's tokens. Token stored in Firebase becomes stale but app doesn't detect it.
+Action buttons work on Android but fail silently on iOS, or notification data exceeds platform limits (4KB iOS, 2KB Android), causing dropped notifications without user-visible errors.
 
 **Why it happens:**
-- Netatmo rotates BOTH access_token AND refresh_token on every `/oauth2/token` call
-- Old refresh_token is immediately invalidated after successful refresh
-- Race condition: Two devices refresh simultaneously, one gets 401 because other invalidated token
-- Not storing new refresh_token from refresh response (using old one for next refresh)
-- Token refresh logic missing or commented out (like in push notification system initially)
-- Firebase update fails silently, leaving stale token in database
+FCM notification payloads have different structures for Android vs iOS, and the current implementation sends uniform payloads. iOS requires `aps.category` with registered notification categories, while Android uses `android.actions`. Data size limits vary by platform.
 
 **How to avoid:**
-1. **Always save new refresh_token**: Update Firebase with BOTH tokens from response
-2. **Atomic token refresh**: Use Firebase transaction to prevent race conditions
-3. **Single refresh coordinator**: Deduplicate concurrent refresh attempts (in-memory lock)
-4. **Detect 401 errors**: Catch "Invalid refresh token" and trigger re-authentication flow
-5. **Token metadata**: Store `lastRefreshed`, `expiresAt` timestamps in Firebase
-6. **Proactive refresh**: Refresh at 2.5 hours instead of waiting for 3-hour expiration
-7. **Reconnect UI flow**: Clear UX when re-authentication required (not just error message)
+1. **Platform-specific payload construction**:
+   ```typescript
+   // BAD - Uniform payload (current pattern)
+   const message = {
+     notification: { title, body },
+     data: { actionUrl, type },
+     token,
+   };
+
+   // GOOD - Platform-specific
+   const payload = token.platform === 'ios' ? {
+     notification: { title, body },
+     apns: {
+       payload: {
+         aps: {
+           category: 'STOVE_ERROR',        // Must match iOS registration
+           'mutable-content': 1,
+         },
+       },
+     },
+     data: { actionUrl, type },             // Max 4KB
+     token,
+   } : {
+     notification: { title, body },
+     android: {
+       notification: {
+         clickAction: 'FLUTTER_NOTIFICATION_CLICK',
+       },
+     },
+     data: {
+       actionUrl,
+       type,
+       actions: JSON.stringify([           // Max 2KB
+         { action: 'VIEW', title: 'Visualizza' },
+         { action: 'DISMISS', title: 'Chiudi' },
+       ]),
+     },
+     token,
+   };
+   ```
+
+2. **Validate payload size before sending**:
+   ```typescript
+   const payloadSize = JSON.stringify(payload).length;
+   const maxSize = platform === 'ios' ? 4096 : 2048;
+   if (payloadSize > maxSize) {
+     console.error(`Payload too large: ${payloadSize}/${maxSize}`);
+     // Truncate or simplify payload
+   }
+   ```
+
+3. **Track platform in FCM token metadata**: Already storing `platform: 'ios|other'` in Firebase (correct).
 
 **Warning signs:**
-- 401 errors after exactly 3 hours of use
-- Error message: "Invalid refresh token"
-- Users report "Netatmo disconnects randomly"
-- Multiple "Please reconnect" prompts per day
-- Token refresh returns 200 but doesn't actually work
-
-**Prevention strategy:**
-```javascript
-// lib/netatmo/tokenRefresh.js
-const refreshLock = new Map(); // userId -> Promise
-
-export async function refreshNetatmoToken(userId) {
-  // Deduplicate concurrent refreshes
-  if (refreshLock.has(userId)) {
-    return await refreshLock.get(userId);
-  }
-
-  const refreshPromise = (async () => {
-    try {
-      const tokenData = await firebase.get(`netatmo/tokens/${userId}`);
-
-      const response = await fetch('https://api.netatmo.com/oauth2/token', {
-        method: 'POST',
-        body: new URLSearchParams({
-          grant_type: 'refresh_token',
-          refresh_token: tokenData.refresh_token,
-          client_id: process.env.NETATMO_CLIENT_ID,
-          client_secret: process.env.NETATMO_CLIENT_SECRET,
-        }),
-      });
-
-      if (!response.ok) {
-        // Invalid refresh token - trigger reconnect flow
-        await firebase.update(`netatmo/tokens/${userId}`, {
-          status: 'reconnect_required',
-          errorAt: Date.now(),
-        });
-        return {reconnectRequired: true};
-      }
-
-      const tokens = await response.json();
-
-      // CRITICAL: Store BOTH new tokens atomically
-      await firebase.update(`netatmo/tokens/${userId}`, {
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token, // NEW token, not old one
-        lastRefreshed: Date.now(),
-        expiresAt: Date.now() + (tokens.expires_in * 1000),
-      });
-
-      return {accessToken: tokens.access_token};
-    } finally {
-      refreshLock.delete(userId);
-    }
-  })();
-
-  refreshLock.set(userId, refreshPromise);
-  return await refreshPromise;
-}
-```
+- Notifications arrive on Android but not iOS
+- Action buttons visible only on specific devices
+- Silent failures in FCM delivery reports (Firebase Console)
+- `PayloadTooLarge` errors in server logs
 
 **Phase to address:**
-**Phase 1: Netatmo API Foundation** - Implement robust token lifecycle BEFORE any features
+Phase 52 (Interactive Push Notifications) - Implement platform-specific payloads
 
 ---
 
-### Pitfall 4: Cron Job Silent Failures - No Health Monitoring
+### Pitfall 4: Auth0 Session State Leakage in Playwright E2E Tests
 
 **What goes wrong:**
-Cron job stops running but no alerts are triggered. Stove monitoring fails silently for hours/days. Developer discovers issue only when user reports "monitoring doesn't work." Cron service (cron-job.org) times out but system doesn't detect it. Webhook receives 500 error but no retry happens.
+Tests pass locally but fail in CI with "Session expired" or "Unauthorized" errors because Auth0 session state persists between test runs in storageState, causing race conditions and false positives.
 
 **Why it happens:**
-- No dead man's switch: System doesn't detect cron job NOT running
-- Cron job execution not logged in Firebase (no audit trail)
-- Timeout errors (>30s) not caught and reported
-- External cron service downtime not monitored
-- No "last successful run" timestamp in database
-- Cron job errors caught but not logged/alerted
-- CRON_SECRET validation fails silently (wrong secret = silent skip)
+Playwright's `storageState` caches cookies and localStorage across test runs for performance, but Auth0 uses short-lived refresh tokens that expire. Tests succeed on first run (fresh login) but fail on subsequent runs (stale session). CI environments have unpredictable cold start delays.
 
 **How to avoid:**
-1. **Heartbeat tracking**: Store `lastRunAt` timestamp in Firebase on every execution
-2. **Dead man's switch**: Alert if `lastRunAt > 10 minutes ago`
-3. **Execution logging**: Log every run with status (success/failure/timeout)
-4. **Error reporting**: On cron failure, trigger push notification to admin
-5. **Health check endpoint**: `/api/cron/health` returns last run status
-6. **Timeout handling**: Set explicit 25s timeout, log if exceeded
-7. **Retry logic**: On transient failures (network, rate limit), retry 3x with backoff
+1. **Separate auth fixture with explicit lifecycle**:
+   ```typescript
+   // BAD - Global storageState (shared across tests)
+   test.use({ storageState: 'auth.json' });
+
+   // GOOD - Per-test auth with cleanup
+   test.beforeEach(async ({ page }) => {
+     // Fresh login for each test
+     await page.goto('/auth/login');
+     await page.fill('input[name="email"]', process.env.TEST_USER_EMAIL);
+     await page.fill('input[name="password"]', process.env.TEST_USER_PASSWORD);
+     await page.click('button[type="submit"]');
+     await page.waitForURL('/');
+   });
+
+   test.afterEach(async ({ page }) => {
+     // Explicit logout to clear session
+     await page.goto('/auth/logout');
+   });
+   ```
+
+2. **Mock Auth0 in CI environments**:
+   ```typescript
+   // Use TEST_MODE=true to bypass Auth0 middleware
+   if (process.env.CI === 'true') {
+     // Inject mock session directly
+     await page.addInitScript(() => {
+       localStorage.setItem('@@auth0spajs@@::mock', JSON.stringify({
+         body: {
+           decodedToken: {
+             user: { sub: 'test|123', email: 'test@example.com' },
+           },
+         },
+       }));
+     });
+   }
+   ```
+
+3. **Add session expiry checks**: Test with stale session to verify graceful degradation.
 
 **Warning signs:**
-- Firebase shows `cronHealth/lastCall` > 10 minutes old
-- No entries in cron execution log for extended period
-- Stove monitoring alerts not triggering despite known issues
-- Users report "monitoring stopped" but no error visible in logs
-- Cron-job.org dashboard shows failures but app doesn't know
-
-**Prevention strategy:**
-```javascript
-// app/api/cron/stove-monitor/route.js
-export async function GET(request) {
-  const startTime = Date.now();
-
-  try {
-    // Verify CRON_SECRET
-    const secret = request.nextUrl.searchParams.get('secret');
-    if (secret !== process.env.CRON_SECRET) {
-      // Log authentication failure
-      await firebase.push('cron/errors', {
-        type: 'auth_failed',
-        timestamp: Date.now(),
-        ip: request.headers.get('x-forwarded-for'),
-      });
-      return Response.json({error: 'Unauthorized'}, {status: 401});
-    }
-
-    // Update heartbeat FIRST
-    await firebase.update('cronHealth', {
-      stoveMonitor: {
-        lastRunAt: Date.now(),
-        status: 'running',
-      }
-    });
-
-    // Execute monitoring with timeout
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Timeout')), 25000)
-    );
-
-    const monitoringResult = await Promise.race([
-      performStoveMonitoring(),
-      timeoutPromise
-    ]);
-
-    // Log successful execution
-    await firebase.push('cron/executions', {
-      job: 'stove-monitor',
-      status: 'success',
-      duration: Date.now() - startTime,
-      timestamp: Date.now(),
-      result: monitoringResult,
-    });
-
-    return Response.json({success: true});
-
-  } catch (error) {
-    // Log failure
-    await firebase.push('cron/executions', {
-      job: 'stove-monitor',
-      status: 'error',
-      error: error.message,
-      duration: Date.now() - startTime,
-      timestamp: Date.now(),
-    });
-
-    // Alert admin via push notification
-    await triggerNotification({
-      type: 'CRITICAL',
-      category: 'system',
-      title: 'Cron Job Failed',
-      body: `Stove monitoring failed: ${error.message}`,
-    });
-
-    return Response.json({error: error.message}, {status: 500});
-  }
-}
-
-// Separate health check endpoint
-export async function GET_health() {
-  const health = await firebase.get('cronHealth/stoveMonitor');
-  const lastRun = health?.lastRunAt || 0;
-  const minutesSinceLastRun = (Date.now() - lastRun) / 60000;
-
-  return Response.json({
-    healthy: minutesSinceLastRun < 10,
-    lastRunAt: lastRun,
-    minutesSinceLastRun: Math.round(minutesSinceLastRun),
-  });
-}
-```
+- Tests pass locally but fail in GitHub Actions
+- Intermittent "Unauthorized" errors in E2E suite
+- Auth0 rate limiting errors in CI logs
+- Session cookie timestamps show reuse across test runs
 
 **Phase to address:**
-**Phase 3: Stove Monitoring Cron** - Implement health tracking and error reporting
-**Phase 4: Monitoring Dashboard** - Visualize cron health and execution history
+Phase 51 (E2E Test Improvements) - Implement auth fixtures with lifecycle management
 
 ---
 
-### Pitfall 5: State Synchronization Race Conditions - Stove vs Thermostat
+### Pitfall 5: Service Worker Cache Stale State During Offline Mode
 
 **What goes wrong:**
-Stove turns on, triggers Netatmo setpoint override, but stove immediately turns off (maintenance needed), leaving thermostat in overridden state. User manually adjusts thermostat via Netatmo app, but PWA overwrites it 60s later during polling. Two devices (phone + tablet) trigger conflicting thermostat commands simultaneously. Cron job and user manual action race to set setpoint, final state is unpredictable.
+Users see outdated stove status (e.g., "OFF" when actually "ON") because the service worker serves stale cached responses without indicating data freshness, leading to dangerous user actions (attempting to ignite already-running stove).
 
 **Why it happens:**
-- No state locking: Multiple sources can modify thermostat simultaneously
-- Polling-based sync: PWA polls stove status, reacts with delay (5-60s lag)
-- No conflict resolution: Last-write-wins without considering timestamps
-- Stove state changes rapidly (ON → OFF → ON within 2 minutes)
-- Not detecting user manual changes on physical thermostat
-- No transaction semantics: Read-modify-write pattern without atomicity
-- Cron job and user action both call Netatmo API concurrently
+Serwist's `NetworkFirst` strategy caches `/api/stove/status` responses for 1 minute, but offline mode extends this indefinitely. The current implementation shows cached data without warning users it may be stale. IndexedDB `deviceState` stores timestamp but UI doesn't check it.
 
 **How to avoid:**
-1. **Debounce rapid changes**: Wait 2 minutes of stable stove state before syncing
-2. **Timestamp-based conflict resolution**: Only apply sync if stove state change is newer
-3. **User override priority**: If user manually adjusted thermostat, don't auto-sync for 30 minutes
-4. **State machine**: Track sync state (idle → pending → synced → user_override)
-5. **Firebase atomic operations**: Use transactions for state updates
-6. **Cron coordination**: Lock mechanism prevents concurrent cron + user actions
-7. **Detect external changes**: Poll Netatmo homestatus to detect physical thermostat changes
+1. **Add staleness indicator to cached responses**:
+   ```typescript
+   // In service worker (app/sw.ts)
+   self.addEventListener('fetch', (event) => {
+     if (event.request.url.includes('/api/stove/status')) {
+       event.respondWith(
+         caches.match(event.request).then((response) => {
+           if (response) {
+             const cachedTime = new Date(response.headers.get('Date'));
+             const age = Date.now() - cachedTime.getTime();
+
+             // Clone response and add staleness header
+             const clonedResponse = response.clone();
+             clonedResponse.headers.set('X-Cache-Age', age.toString());
+             clonedResponse.headers.set('X-Cache-Stale', age > 30000 ? 'true' : 'false');
+
+             return clonedResponse;
+           }
+           return fetch(event.request);
+         })
+       );
+     }
+   });
+   ```
+
+2. **UI warns when data is stale**:
+   ```typescript
+   const cacheAge = parseInt(response.headers.get('X-Cache-Age') || '0');
+   const isStale = cacheAge > 30000; // 30 seconds
+
+   if (isStale) {
+     showBanner({
+       variant: 'warning',
+       title: 'Dati non aggiornati',
+       description: `Ultimo aggiornamento: ${formatAge(cacheAge)} fa`,
+     });
+   }
+   ```
+
+3. **Enhanced offline page**: Already implemented in `app/offline/page.tsx` with stale warning (correct pattern).
 
 **Warning signs:**
-- Thermostat oscillates between temperatures rapidly
-- User reports "thermostat ignores my manual changes"
-- Firebase shows conflicting state updates within seconds
-- Setpoint override doesn't expire as expected
-- Temperature jumps unexpectedly after stove state changes
-
-**Prevention strategy:**
-```javascript
-// lib/stoveThermostatSync.js
-const syncState = {
-  lastSyncAt: 0,
-  lastStoveState: null,
-  stoveStateChangedAt: 0,
-  userOverrideUntil: 0,
-};
-
-export async function syncStoveWithThermostat(currentStoveState) {
-  const now = Date.now();
-
-  // Check if user recently overrode (manual change on thermostat)
-  if (now < syncState.userOverrideUntil) {
-    return {skipped: true, reason: 'user_override_active'};
-  }
-
-  // Detect stove state change
-  if (currentStoveState !== syncState.lastStoveState) {
-    syncState.lastStoveState = currentStoveState;
-    syncState.stoveStateChangedAt = now;
-    return {skipped: true, reason: 'state_change_debounce'};
-  }
-
-  // Wait for stable state (2 minutes)
-  const timeSinceChange = now - syncState.stoveStateChangedAt;
-  if (timeSinceChange < 120000) {
-    return {skipped: true, reason: 'waiting_for_stable_state', waitRemaining: 120000 - timeSinceChange};
-  }
-
-  // Check if already synced recently (don't re-sync)
-  if (now - syncState.lastSyncAt < 300000) { // 5 minutes
-    return {skipped: true, reason: 'recently_synced'};
-  }
-
-  // Perform atomic sync with Firebase transaction
-  const syncResult = await firebase.transaction('netatmo/syncState', async (state) => {
-    // Check if another process already syncing
-    if (state?.syncing) {
-      return null; // Abort transaction
-    }
-
-    // Mark as syncing
-    return {
-      syncing: true,
-      syncStartedAt: now,
-      targetState: currentStoveState,
-    };
-  });
-
-  if (!syncResult.committed) {
-    return {skipped: true, reason: 'concurrent_sync_in_progress'};
-  }
-
-  try {
-    // Execute Netatmo API call
-    const result = await setThermpoint({
-      room_id: syncConfig.roomId,
-      mode: 'manual',
-      temp: currentStoveState === 'ON' ? 16 : 19,
-      endtime: now + 7200, // 2 hours
-    });
-
-    syncState.lastSyncAt = now;
-
-    // Clear syncing flag
-    await firebase.update('netatmo/syncState', {
-      syncing: false,
-      lastSyncedAt: now,
-    });
-
-    return {synced: true, result};
-
-  } catch (error) {
-    // Clear syncing flag on error
-    await firebase.update('netatmo/syncState', {syncing: false});
-    throw error;
-  }
-}
-
-// Detect user manual override
-export async function detectUserOverride() {
-  const currentSetpoint = await getNetatmoCurrentSetpoint();
-  const expectedSetpoint = syncState.lastStoveState === 'ON' ? 16 : 19;
-
-  if (Math.abs(currentSetpoint - expectedSetpoint) > 1) {
-    // User changed temperature manually
-    syncState.userOverrideUntil = Date.now() + 1800000; // 30 minutes
-    return true;
-  }
-  return false;
-}
-```
+- User reports stove status doesn't match physical state
+- Actions succeed in UI but fail server-side
+- Offline banner shows recent timestamp but data is old
+- IndexedDB deviceState timestamps older than 5 minutes
 
 **Phase to address:**
-**Phase 2: Stove-Thermostat Integration Fix** - Implement debouncing and conflict resolution
-**Phase 3: Stove Monitoring Cron** - Add user override detection
+Phase 53 (PWA Offline Improvements) - Add cache staleness indicators
 
 ---
 
-### Pitfall 6: Alert Fatigue - Over-Monitoring Without Aggregation
+### Pitfall 6: Analytics GDPR Violation Through Implicit Consent
 
 **What goes wrong:**
-User receives 50 push notifications in 1 hour: "Stove connection lost", "Stove connection restored", repeat 25 times. Monitoring detects transient network issues and alerts on every poll (every 60s). User disables ALL notifications at OS level due to spam. Critical alerts (fire, CO2) get ignored because user is desensitized. Dashboard shows 1000 "warnings" that are all noise.
+The app tracks pellet consumption, stove usage patterns, and weather correlation without explicit user consent, violating GDPR Article 6 (lawful basis) and facing €20M fines or 4% global revenue.
 
 **Why it happens:**
-- Alert on every anomaly detection without state tracking
-- No distinction between transient issues (network blip) vs persistent problems
-- Rate limiting from v1.0 push notification system not applied to monitoring alerts
-- Alerting for INFO/DEBUG level events (connection retry succeeded)
-- No aggregation: 10 identical errors in 10 minutes = 10 separate notifications
-- Missing alert deduplication window (send at most once per 30 minutes for same issue)
-- Monitoring every metric: temperature, connection, fan, power, errors all trigger alerts
+Developers assume "legitimate interest" covers analytics for device functionality, but GDPR requires opt-in consent for non-essential tracking. Energy usage patterns are potentially identifiable (can infer occupancy, habits). Firebase Analytics is a data processor under GDPR — app owner is the controller.
 
 **How to avoid:**
-1. **Alert deduplication**: Same alert type → max 1 notification per 30 minutes
-2. **Severity-based alerting**: Only CRITICAL and ERROR levels trigger notifications by default
-3. **Transient vs persistent**: Only alert if issue persists for 3+ consecutive checks
-4. **Alert aggregation**: Batch multiple related issues into single notification
-5. **Smart rate limiting**: Different limits per alert category (errors: 5/hour, warnings: 1/hour)
-6. **Monitoring dashboard**: Surface INFO/WARNING in UI, not via push notifications
-7. **Escalation ladder**: First occurrence → dashboard only, 3+ occurrences → notification
+1. **Implement consent banner before ANY analytics**:
+   ```typescript
+   // BAD - Track without consent (current pattern would do this)
+   await logAnalytics('stove_ignited', { power, source });
+
+   // GOOD - Check consent first
+   const consent = await getUserConsent();
+   if (consent.analytics) {
+     await logAnalytics('stove_ignited', { power, source });
+   }
+   ```
+
+2. **Consent categories with granular control**:
+   ```typescript
+   interface ConsentPreferences {
+     essential: boolean;      // Always true (functional cookies)
+     analytics: boolean;      // Opt-in required
+     personalization: boolean; // Opt-in required
+   }
+
+   // Store in Firebase: users/{userId}/consent
+   ```
+
+3. **Anonymous aggregation only**:
+   ```typescript
+   // BAD - User-identifiable
+   await logEvent('pellet_consumption', { userId, amount: 15 });
+
+   // GOOD - Aggregated, non-identifiable
+   await logEvent('pellet_consumption', {
+     amount_bucket: '10-20kg',  // Binned
+     timestamp: hourBucket(now), // Hourly aggregation
+     // No userId
+   });
+   ```
+
+4. **Right to deletion**: Implement `/api/user/delete-analytics` endpoint.
 
 **Warning signs:**
-- User notification count > 20/day per device
-- High notification dismiss rate without engagement
-- User disables notifications at OS level (can't detect in app)
-- Support complaints: "Too many alerts"
-- Firebase shows same alert type repeated every minute
-
-**Prevention strategy:**
-```javascript
-// lib/monitoring/alertManager.js
-const alertState = new Map(); // alertKey -> {lastSentAt, occurrences, firstSeenAt}
-
-export async function evaluateAlert(alert) {
-  const alertKey = `${alert.type}:${alert.device}:${alert.errorCode || 'general'}`;
-  const now = Date.now();
-  const state = alertState.get(alertKey) || {
-    lastSentAt: 0,
-    occurrences: 0,
-    firstSeenAt: now,
-  };
-
-  // Increment occurrence counter
-  state.occurrences++;
-  state.lastSeenAt = now;
-  alertState.set(alertKey, state);
-
-  // Transient issue filter: Only alert if persists 3+ checks
-  if (state.occurrences < 3) {
-    return {shouldAlert: false, reason: 'waiting_for_persistence'};
-  }
-
-  // Deduplication window: Max 1 notification per 30 minutes
-  const timeSinceLastAlert = now - state.lastSentAt;
-  if (timeSinceLastAlert < 1800000) {
-    return {shouldAlert: false, reason: 'deduplication_window', nextAlertIn: 1800000 - timeSinceLastAlert};
-  }
-
-  // Severity-based rate limiting
-  const rateLimit = getRateLimitForSeverity(alert.severity);
-  const recentAlerts = await getRecentAlerts(alert.severity, rateLimit.window);
-  if (recentAlerts.length >= rateLimit.max) {
-    return {shouldAlert: false, reason: 'rate_limit_exceeded'};
-  }
-
-  // Check user preferences (respect DND, severity filters)
-  const userPrefs = await getUserNotificationPreferences(alert.userId);
-  if (!shouldNotifyBasedOnPreferences(alert, userPrefs)) {
-    return {shouldAlert: false, reason: 'user_preferences'};
-  }
-
-  // Alert approved - send notification
-  state.lastSentAt = now;
-  alertState.set(alertKey, state);
-
-  // Aggregate message if multiple occurrences
-  const message = state.occurrences > 3
-    ? `${alert.message} (${state.occurrences} times in ${Math.round((now - state.firstSeenAt) / 60000)} minutes)`
-    : alert.message;
-
-  return {
-    shouldAlert: true,
-    message,
-    metadata: {
-      occurrences: state.occurrences,
-      firstSeenAt: state.firstSeenAt,
-      duration: now - state.firstSeenAt,
-    },
-  };
-}
-
-function getRateLimitForSeverity(severity) {
-  switch (severity) {
-    case 'CRITICAL': return {max: 10, window: 3600000}; // 10/hour
-    case 'ERROR': return {max: 5, window: 3600000}; // 5/hour
-    case 'WARNING': return {max: 1, window: 3600000}; // 1/hour
-    case 'INFO': return {max: 0, window: 0}; // No notifications
-    default: return {max: 0, window: 0};
-  }
-}
-
-// Clear alert state when issue resolved
-export function clearAlertState(alertKey) {
-  alertState.delete(alertKey);
-}
-```
+- No consent banner on first app load
+- Analytics events fire before user interaction
+- User IDs in analytics payloads
+- Firebase Analytics enabled in manifest without consent check
 
 **Phase to address:**
-**Phase 3: Stove Monitoring Cron** - Implement alert evaluation and deduplication
-**Phase 4: Monitoring Dashboard** - Surface INFO/WARNING in UI without notifications
+Phase 54 (Analytics Dashboard) - Implement consent management BEFORE any tracking
 
 ---
 
-## Moderate Pitfalls
+## Technical Debt Patterns
 
-### Pitfall 7: Schedule CRUD Without Validation - Corrupt Schedule Data
-
-**What goes wrong:**
-User creates schedule with overlapping time slots (06:00-08:00 and 07:00-09:00 both set). Schedule saved successfully but Netatmo API rejects it on activation. Schedule deleted but was the "active" schedule, leaving system in broken state. Temperature values outside valid range (10-30°C) saved to Firebase. Schedule has no slots for certain days of week (missing Sunday).
-
-**Prevention:**
-- Validate schedule before saving: No overlaps, 7 days covered, temps 10-30°C
-- Prevent deletion of active schedule (must switch to another first)
-- Validate against Netatmo API schema before Firebase save
-- UI validation + server-side validation (defense in depth)
-
-**Phase to address:**
-**Phase 2: Schedule Management** - Comprehensive validation in schedule CRUD
+| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
+|----------|-------------------|----------------|-----------------|
+| Skipping consent banner for "internal use only" | Faster MVP launch | GDPR violations, €20M fines, reputational damage | **Never** (even single-user apps can be audited) |
+| Using in-memory rate limiter | Simpler code, no DB dependency | DoS vulnerability, broken in serverless | **Never** in production (only local dev) |
+| Uniform FCM payload for all platforms | Fewer code paths | iOS notifications fail silently | **Never** (action buttons are core feature) |
+| Reusing Auth0 session across E2E tests | Faster test suite (no repeated logins) | Flaky CI, false positives, hard-to-debug failures | Local dev only (CI must use fresh sessions) |
+| Serving stale cache without staleness indicator | Better perceived performance | Safety risk (users act on outdated state) | **Never** for device control apps |
+| Inline cron operations (no orchestrator) | Simpler mental model | Timeout errors, partial execution | Small apps (<3 operations), non-critical tasks |
+| localStorage for offline device state | Standard API, simple usage | 5-10MB limit, string-only, sync blocking | **Never** (use IndexedDB for structured data) |
 
 ---
-
-### Pitfall 8: Polling Frequency Trade-offs - Battery vs Responsiveness
-
-**What goes wrong:**
-Polling Netatmo every 5s like stove causes rate limit violations and drains mobile battery. Polling every 5 minutes feels laggy (user changes temp, app doesn't update for 5 minutes). WebSocket/SSE not supported by Netatmo API, forcing polling. PWA in background on iOS stops polling silently.
-
-**Prevention:**
-- Adaptive polling: 60s when app in foreground, 5 minutes in background
-- User-action triggered refresh: Manual change → immediate refresh
-- Smart polling: Only poll if user viewing thermostat page (not on homepage)
-- Local optimistic updates: Update UI immediately, reconcile with API response
-
-**Phase to address:**
-**Phase 1: Netatmo API Foundation** - Implement adaptive polling strategy
-
----
-
-### Pitfall 9: Multi-Room Coordination - Partial Failures
-
-**What goes wrong:**
-User enables stove sync for 3 rooms (Living Room, Kitchen, Bedroom). API call to set Living Room succeeds, Kitchen fails (rate limit), Bedroom not attempted. System state is inconsistent: some rooms synced, others not. User doesn't know which rooms are synced.
-
-**Prevention:**
-- Batch API calls with rollback on partial failure
-- Track per-room sync status in Firebase
-- UI shows sync status per room (synced, failed, pending)
-- Retry failed rooms automatically
-
-**Phase to address:**
-**Phase 2: Stove-Thermostat Integration Fix** - Implement robust multi-room handling
-
----
-
-### Pitfall 10: Environment Variable Confusion - Dev vs Prod Credentials
-
-**What goes wrong:**
-Developer uses production Netatmo credentials in localhost development. Localhost callback URL (http://localhost:3000/api/netatmo/callback) doesn't match production whitelist, OAuth fails. Production deployment uses `NETATMO_CLIENT_ID_DEV` instead of `NETATMO_CLIENT_ID`. Firebase paths mixed: dev code writes to production `/netatmo/` path.
-
-**Prevention:**
-- Use `*_DEV` env vars for localhost (already partially implemented)
-- Separate Firebase paths: `dev/netatmo/` vs `netatmo/` (existing pattern)
-- Validate redirect URI matches env in callback handler
-- Clear documentation of which env vars needed in which environments
-
-**Phase to address:**
-**Phase 1: Netatmo API Foundation** - Document and validate environment setup
-
----
-
-## "Looks Done But Isn't" Checklist
-
-- [ ] **Rate limiting implemented**: Often missing request counting and throttling
-- [ ] **Token refresh working**: Often implemented but doesn't save new refresh_token
-- [ ] **Setpoint vs schedule distinction**: Often confused, leading to schedule corruption
-- [ ] **Cron health monitoring**: Often missing dead man's switch and error reporting
-- [ ] **Alert deduplication**: Often missing, causing notification spam
-- [ ] **Multi-room atomicity**: Often partial failure handling missing
-- [ ] **State synchronization**: Often race conditions between cron and user actions
-- [ ] **Schedule validation**: Often client-side only, no server-side checks
-- [ ] **User override detection**: Often missing, auto-sync fights user changes
-- [ ] **Adaptive polling**: Often fixed polling rate regardless of app state
-- [ ] **Error recovery**: Often fails permanently instead of retry with backoff
-- [ ] **Environment separation**: Often dev and prod credentials mixed
 
 ## Integration Gotchas
 
 | Integration | Common Mistake | Correct Approach |
 |-------------|----------------|------------------|
-| Netatmo OAuth | Not saving new refresh_token after refresh | Always update both access + refresh tokens |
-| Schedule API | Using `switchSchedule` for temp overrides | Use `setThermpoint` with `endtime` parameter |
-| Rate Limiting | Counting only explicit API calls | Include token refreshes, redirects in quota |
-| Cron Monitoring | Only logging errors | Log every execution + dead man's switch |
-| Stove-Thermostat Sync | Immediate sync on state change | Debounce 2 minutes for stable state |
-| Multi-Device | Last-write-wins | Timestamp-based conflict resolution |
-| Alert System | Alert on every anomaly | Require 3+ consecutive failures |
-| Polling | Fixed rate polling | Adaptive: 60s foreground, 5min background |
-| Schedule CRUD | Client validation only | Client + server validation |
-| Firebase Paths | Mixing dev/prod paths | Use `dev/` prefix for development |
+| **Vercel Cron** | Using `vercel.json` `crons` field for 5-minute intervals | Use external service (cron-job.org, EasyCron) — Vercel cron minimum is 1 hour for Hobby plan |
+| **Firebase RTDB** | Assuming transactions prevent all race conditions | Transactions work per-path only; use separate paths for concurrent updates (e.g., `rateLimit/{userId}/{endpoint}` not `rateLimit/{userId}`) |
+| **FCM (iOS)** | Sending notifications to PWA without app installed | Check `fcmTokens/{token}/isPWA` flag; iOS requires PWA installed (Safari Add to Home) |
+| **Auth0 + Playwright** | Using global `storageState` for all tests | Per-test fixtures with `beforeEach` login and `afterEach` logout |
+| **Serwist** | Using Turbopack (Next.js 16 default) | Serwist requires Webpack — update `package.json`: `"build": "next build --webpack"` |
+| **IndexedDB** | Assuming synchronous reads like localStorage | Always use async/await: `const data = await get(STORES.DEVICE_STATE, 'stove')` |
+| **Open-Meteo API** | Caching weather indefinitely | Refresh every 30 minutes (already implemented in `refreshWeatherIfNeeded()` — good pattern) |
+| **Firebase Analytics** | Enabling by default in `manifest.json` | Disable until consent obtained: `ga_config.anonymize_ip: true`, check consent before `logEvent()` |
+
+---
 
 ## Performance Traps
 
 | Trap | Symptoms | Prevention | When It Breaks |
 |------|----------|------------|----------------|
-| Over-polling Netatmo | Rate limit errors, battery drain | Poll 60s foreground, 5min background | >500 requests/hour |
-| No schedule caching | Slow page loads, quota waste | Cache 5 minutes, refresh on user action | Every page load fetches |
-| Unbatched multi-room ops | API quota exhaustion | Use batch endpoints when available | >3 rooms configured |
-| Synchronous cron execution | Timeout errors (>30s) | Background processing with timeouts | Complex monitoring logic |
-| No request deduplication | Duplicate API calls | Debounce user actions, dedupe cron | User clicks rapidly |
-| Full schedule on every poll | Large payload, slow parsing | Delta updates or cached schedules | Schedule has >50 time slots |
-| Alert storm | Database write quota exhaustion | Deduplication + rate limiting | >100 alerts/hour |
+| **Sequential cron operations** | Timeout errors, partial execution | Parallelize independent tasks with `Promise.all()` | >3 operations OR total time >8s |
+| **N+1 FCM token queries** | Slow notification delivery (2-3s per user) | Batch Firebase reads: `db.ref('users').once('value')` instead of per-user queries | >10 active users |
+| **Uncompressed notification payloads** | `PayloadTooLarge` errors | Compress JSON, remove whitespace, truncate long strings | Payload >2KB (Android), >4KB (iOS) |
+| **Service worker precaching all pages** | Laggy SW installation (5-10s), poor UX | Cache in groups of 10: `precacheController.addToCacheList(chunk)` in loop | >50 static pages |
+| **Polling stove API every 1 second** | Stove API rate limits, battery drain | 5-second polling (current implementation is correct) | <5s interval |
+| **Storing full weather forecast in RTDB** | Firebase bandwidth costs, slow reads | Store only next 24h: `weatherCache/{lat}_{lon}/forecast` with TTL | Forecast >7 days |
+| **Blocking cron on notification delivery** | Cron timeout if FCM is slow | Fire-and-forget: `sendNotification().catch(logError)` (already partially implemented) | >5 notifications per cron run |
+
+---
 
 ## Security Mistakes
 
 | Mistake | Risk | Prevention |
 |---------|------|------------|
-| CRON_SECRET not validated | Unauthorized monitoring execution | HMAC validation with timing-safe comparison |
-| Netatmo client secret in client bundle | API credential leak | Server-side only, never expose to client |
-| No CSRF protection on OAuth callback | Account takeover | Validate state parameter in callback |
-| Firebase rules allow unauthenticated access | Data leak, unauthorized control | Require Auth0 authentication for all paths |
-| Schedule data not validated server-side | Injection attacks, corrupt data | Zod validation on all schedule operations |
-| Logging sensitive data (access tokens) | Token leak via logs | Never log full tokens, use last 4 chars only |
+| **Exposing CRON_SECRET in client code** | Attackers can trigger cron manually, DoS attack | Only use in server-side routes, verify header: `Authorization: Bearer ${CRON_SECRET}` |
+| **No rate limiting on `/api/notifications/send`** | Spam notifications to all users | Implement persistent rate limiter (Phase 49) BEFORE Phase 52 (notifications) |
+| **Storing FCM tokens without encryption** | Token theft → unauthorized notifications | Tokens are not sensitive (per FCM docs), but apply Firebase Security Rules: deny client writes |
+| **Analytics tracking before consent** | GDPR violation, €20M fine | Implement consent banner (Phase 54), gate ALL analytics with consent check |
+| **Stale Auth0 sessions in E2E tests** | Session fixation attack surface | Always logout in `afterEach`, never commit `storageState.json` |
+| **Admin endpoints without auth check** | Unauthorized access to sync, cleanup, etc. | Use `withAdminSecret()` middleware (already implemented for `/api/admin/sync-changelog`) |
+| **Unvalidated cron webhook URLs** | SSRF attack, internal network scanning | Whitelist allowed domains: `ALLOWED_CRON_PROVIDERS = ['cron-job.org', 'easycron.com']` |
+
+---
+
+## UX Pitfalls
+
+| Pitfall | User Impact | Better Approach |
+|---------|-------------|-----------------|
+| **No visual feedback during offline command queuing** | User retries → duplicate commands | Show toast: "Comando in coda (offline)" with pending count |
+| **Stale cache served without warning** | User acts on wrong state → safety risk | Banner: "⚠️ Dati non aggiornati (X minuti fa)" |
+| **Silent notification permission denial** | User expects alerts, never receives them | Persistent banner: "Attiva notifiche per ricevere avvisi stufa" |
+| **No progress indicator during cron operations** | User doesn't know if action succeeded | Real-time status: "🔄 Accensione in corso..." via WebSocket or polling |
+| **Consent banner blocks entire UI** | User can't access emergency controls | Allow "Essential only" mode → functional controls work, analytics disabled |
+| **E2E test failures not visible to developers** | Broken features ship to production | Require CI passing for PRs, Slack notifications on failure |
+| **Analytics dashboard shows empty state** | User thinks feature is broken | "Raccogli dati per 24h prima di visualizzare grafici" placeholder |
+
+---
+
+## "Looks Done But Isn't" Checklist
+
+- [ ] **Persistent Rate Limiter:** Often missing cleanup of old rate limit windows — verify garbage collection runs (e.g., delete entries older than 1 hour)
+- [ ] **Interactive Notifications:** Often missing platform detection — verify `fcmTokens/{token}/platform` is set and payload changes per platform
+- [ ] **Offline Mode:** Often missing staleness indicator — verify UI shows "⚠️ Dati non aggiornati" when cache age >30 seconds
+- [ ] **E2E Tests:** Often missing session cleanup — verify `afterEach` logs out and no `storageState.json` committed
+- [ ] **Analytics Consent:** Often missing consent persistence — verify Firebase stores `users/{userId}/consent` and checks before every `logEvent()`
+- [ ] **Cron Orchestration:** Often missing error handling for parallel tasks — verify `Promise.all()` has `.catch()` on each operation
+- [ ] **FCM Payload Size:** Often missing size validation — verify logs show payload size before sending (should be <2KB Android, <4KB iOS)
+- [ ] **Weather Cache TTL:** Often missing expiry check — verify `weatherCache/{location}/timestamp` is checked and refetch if stale
+- [ ] **Dead Man's Switch:** Often missing alert delivery confirmation — verify notification actually sends when cron goes stale (test by pausing cron for 15 minutes)
+- [ ] **PID State Persistence:** Often missing state restoration — verify `pidAutomation/state` is read on every cron run and integral/derivative terms persist
+
+---
 
 ## Recovery Strategies
 
 | Pitfall | Recovery Cost | Recovery Steps |
 |---------|---------------|----------------|
-| Rate Limit Exceeded | LOW | Wait 1 hour, implement rate limiter for future |
-| Invalid Refresh Token | MEDIUM | User must re-authenticate via OAuth flow |
-| Corrupted Schedule | MEDIUM | Restore from backup or recreate manually |
-| Cron Health Monitoring Missing | LOW | Add dead man's switch, retroactively analyze logs |
-| Alert Fatigue | HIGH | Cannot recover - user disabled notifications at OS level |
-| Schedule Modified Instead of Override | MEDIUM | Restore schedule from backup or user must re-program |
-| Multi-Room Partial Failure | LOW | Retry failed rooms automatically |
-| Token Rotation Race Condition | MEDIUM | Implement atomic token updates with transactions |
+| **In-memory rate limiter bypassed** | MEDIUM | 1. Deploy persistent rate limiter immediately 2. Monitor Firebase RTDB for abuse patterns 3. Temporarily increase rate limits if false positives |
+| **Cron timeout causing partial execution** | LOW | 1. Check Vercel logs for `FUNCTION_INVOCATION_TIMEOUT` 2. Increase `maxDuration` to 60s 3. Refactor to orchestrator pattern (Phase 50) |
+| **iOS notifications not working** | LOW | 1. Check Firebase Console delivery reports 2. Verify iOS PWA installation 3. Re-register FCM token with correct platform flag |
+| **E2E tests flaky in CI** | LOW | 1. Clear `storageState.json` from repo 2. Implement per-test login fixture 3. Add Auth0 mock for CI environment |
+| **Stale cache causing safety issue** | HIGH | 1. Immediately disable offline mode in service worker 2. Add prominent "⚠️ DATI NON RECENTI" warning 3. Implement cache staleness headers |
+| **GDPR violation (no consent)** | CRITICAL | 1. Disable ALL analytics immediately 2. Deploy consent banner (blocking) 3. Purge historical analytics data 4. Notify users of data deletion |
+| **Weather cache stale** | LOW | 1. Force refresh: `DELETE /weatherCache` in Firebase Console 2. Verify `refreshWeatherIfNeeded()` runs in cron 3. Check Open-Meteo API rate limits |
+| **FCM payload too large** | MEDIUM | 1. Truncate notification body to 100 chars 2. Remove unnecessary data fields 3. Implement payload size logging before send |
+
+---
 
 ## Pitfall-to-Phase Mapping
 
 | Pitfall | Prevention Phase | Verification |
 |---------|------------------|--------------|
-| Netatmo Rate Limiting | Phase 1: API Foundation | Track call count, verify <450/hour per user |
-| Setpoint vs Schedule Confusion | Phase 2: Integration Fix | Verify schedules unchanged after stove sync |
-| OAuth Token Invalidation | Phase 1: API Foundation | Token refresh works after 3 hours |
-| Cron Silent Failures | Phase 3: Monitoring Cron | Dead man's switch triggers if no run for 10min |
-| State Sync Race Conditions | Phase 2: Integration Fix | No conflicting updates in Firebase logs |
-| Alert Fatigue | Phase 3: Monitoring Cron | Max 5 notifications/hour during testing |
-| Schedule Validation Missing | Phase 2: Schedule Management | Invalid schedules rejected server-side |
-| Polling Frequency Issues | Phase 1: API Foundation | Battery drain acceptable, updates responsive |
-| Multi-Room Partial Failures | Phase 2: Integration Fix | All rooms sync or none (atomicity) |
-| Environment Variable Confusion | Phase 1: API Foundation | Dev uses dev credentials, prod uses prod |
-
-## Sources
-
-### Official Documentation (HIGH Confidence)
-- [Netatmo Connect Energy API Documentation](https://dev.netatmo.com/apidocumentation/energy)
-- [Netatmo setthermpoint API](https://dev.netatmo.com/en-US/doc/methods/setthermpoint)
-- [Netatmo switchSchedule API](https://dev.netatmo.com/en-US/resources/technical/reference/thermostat/switchschedule)
-
-### Technical Issues & Discussions (MEDIUM Confidence)
-- [Inconsistent Rate Limits for Netatmo Home + Control API](https://helpcenter.netatmo.com/hc/en-us/community/posts/29846852785298-Inconsistent-Rate-Limits-for-Netatmo-Home-Control-API)
-- [Getting error 26 "User Usage exceeded"](https://helpcenter.netatmo.com/hc/en-us/community/posts/19767427948434-Getting-error-26-User-Usage-exceeded-for-a-few-hours-now)
-- [Netatmo error Maximum api usage reached · Issue #158845](https://github.com/home-assistant/core/issues/158845)
-- [API token invalid after 3 hours despite refresh](https://helpcenter.netatmo.com/hc/en-us/community/posts/19506310228242-API-token-invalid-after-3-hours-despite-refresh)
-- [Rate limits with Netatmo Weather Station](https://community.home-assistant.io/t/rate-limits-with-netatmo-weather-station/188680)
-
-### Cron Job Monitoring (HIGH Confidence)
-- [How to Monitor Cron Jobs in 2026: A Complete Guide](https://dev.to/cronmonitor/how-to-monitor-cron-jobs-in-2026-a-complete-guide-28g9)
-- [10 Best Cron Job Monitoring Tools in 2026](https://betterstack.com/community/comparisons/cronjob-monitoring-tools/)
-- [Cron Job Monitoring: Never Miss a Failed Background Task](https://web-alert.io/blog/cron-job-monitoring-background-tasks)
-- [Our complete cron job guide for 2026](https://uptimerobot.com/knowledge-hub/cron-monitoring/cron-job-guide/)
-
-### Thermostat Best Practices (MEDIUM Confidence)
-- [Setpoints, Intelligent Recovery, and More—Your Thermostat, Decoded](https://www.davidenergy.com/blog/fb-your-thermostat-decoded)
-- [How To Temporarily Override Schedules Using Thermostat Setpoints](https://support.asairhome.com/hc/en-us/articles/360055408392-How-To-Temporarily-Override-Schedules-Using-Thermostat-Setpoints)
-- [Programmable Thermostats | Department of Energy](https://www.energy.gov/energysaver/programmable-thermostats)
-
-### Smart Home Alert Fatigue (MEDIUM Confidence)
-- [How to Reduce Temperature Alarm Fatigue in 2026: 8 Proven Strategies](https://envigilance.com/temperature-monitoring/alarm-fatigue/)
-- [Smart Home Trends to Look for in 2026](https://smarthomewizards.com/smart-home-trends-to-look-for/)
-
-### Distributed Systems State Synchronization (MEDIUM Confidence)
-- [The Art of Staying in Sync: How Distributed Systems Avoid Race Conditions](https://medium.com/@alexglushenkov/the-art-of-staying-in-sync-how-distributed-systems-avoid-race-conditions-f59b58817e02)
-- [Top 7 Practices for Real-Time Data Synchronization](https://www.serverion.com/uncategorized/top-7-practices-for-real-time-data-synchronization/)
-
-### Known Patterns from Project Code (HIGH Confidence)
-- Existing stove-sync implementation in `app/api/netatmo/stove-sync/route.js`
-- Rate limiting pattern from v1.0 push notification system
-- CRON_SECRET validation pattern from existing cron jobs
-- Firebase transaction patterns from existing codebase
-- Environment detection pattern (`*_DEV` vars for localhost)
+| In-memory rate limiter | Phase 49 (Persistent Rate Limiting) | Load test: 100 requests → only 10 succeed, state persists after 15-min idle |
+| Cron timeout | Phase 50 (Cron Configuration) | Monitor: all operations complete <10s, no `FUNCTION_INVOCATION_TIMEOUT` errors |
+| Auth0 session leakage | Phase 51 (E2E Test Improvements) | CI passes: 10 consecutive test runs with fresh sessions each time |
+| Platform-specific FCM payloads | Phase 52 (Interactive Push Notifications) | Manual test: action buttons work on iOS Safari PWA AND Android Chrome |
+| Stale cache without warning | Phase 53 (PWA Offline Improvements) | Offline test: UI shows "⚠️ Dati non aggiornati (X min fa)" after 30 seconds |
+| Analytics without consent | Phase 54 (Analytics Dashboard) | Audit: Firebase Analytics disabled until banner accepted, no events before consent |
+| Service worker Turbopack conflict | Phase 53 (PWA Offline Improvements) | Build succeeds: `public/sw.js` generated, Webpack used despite Next.js 16 default |
+| PID state loss on cold start | Phase 49 (Persistent Rate Limiting) | Cron test: PID integral persists across 2+ hour gap between cron runs |
 
 ---
 
-**Pitfalls research for:** Netatmo Schedule Management & Stove Monitoring Integration
-**Researched:** 2026-01-26
-**Confidence:** HIGH (Netatmo API patterns verified with official docs, cron monitoring validated with 2026 tooling guides)
-**Next step:** Use these pitfalls to inform roadmap phase structure, validation criteria, and success metrics
+## Sources
+
+**Vercel Serverless & Cron:**
+- [Cron Jobs in Next.js: Serverless vs Serverful | Medium](https://yagyaraj234.medium.com/running-cron-jobs-in-nextjs-guide-for-serverful-and-stateless-server-542dd0db0c4c)
+- [How to use cron jobs with Vercel? · vercel/vercel · Discussion #5344](https://github.com/vercel/vercel/discussions/5344)
+- [What can I do about Vercel Functions timing out? | Vercel Knowledge Base](https://vercel.com/kb/guide/what-can-i-do-about-vercel-serverless-functions-timing-out)
+- [Testing Next.js Cron Jobs Locally | Medium](https://medium.com/@quentinmousset/testing-next-js-cron-jobs-locally-my-journey-from-frustration-to-solution-6ffb2e774d7a)
+
+**Firebase Rate Limiting & Persistent Storage:**
+- [Realtime Database Limits | Firebase](https://firebase.google.com/docs/database/usage/limits)
+- [Rate limiting - Firestore and Firebase cloud functions](https://ramblings.mcpher.com/going-serverless-with-firebase/rate-limiting-firestore-and-firebase-cloud-functions/)
+- [firebase-functions-rate-limiter GitHub](https://github.com/Jblew/firebase-functions-rate-limiter)
+
+**FCM Interactive Notifications:**
+- [Implementing Action Buttons in Push Notifications using Firebase and Notifee | Medium](https://medium.com/@hassem_mahboob/implementing-action-buttons-in-push-notifications-using-firebase-and-notifee-f5743bdb28bc)
+- [Firebase Cloud Messaging troubleshooting & FAQ](https://firebase.google.com/docs/cloud-messaging/troubleshooting)
+- [Customize a message across platforms | FCM](https://firebase.google.com/docs/cloud-messaging/customize-messages/cross-platform)
+
+**PWA Offline Mode & Serwist:**
+- [Build a Next.js 16 PWA with true offline support - LogRocket](https://blog.logrocket.com/nextjs-16-pwa-offline-support/)
+- [Offline mode not working · serwist/serwist · Discussion #205](https://github.com/serwist/serwist/discussions/205)
+- [Building Native-Like Offline Experience in Next.js PWAs | Fishtank](https://www.getfishtank.com/insights/building-native-like-offline-experience-in-nextjs-pwas)
+
+**Playwright & Auth0 E2E Testing:**
+- [End-to-End Testing Auth Flows with Playwright and Next.js](https://testdouble.com/insights/how-to-test-auth-flows-with-playwright-and-next-js)
+- [Authentication | Playwright](https://playwright.dev/docs/auth)
+- [Mock auth0 login and MFA flow for E2E testing - Auth0 Community](https://community.auth0.com/t/mock-auth0-login-and-mfa-flow-for-e2e-testing-using-playwright/131872)
+- [Playwright e2e test fails in CI with real Auth0 login flow · Issue #37158](https://github.com/microsoft/playwright/issues/37158)
+
+**Analytics & GDPR:**
+- [GDPR Compliance Checklist for Next.js Apps | Medium](https://medium.com/@kidane10g/gdpr-compliance-checklist-for-next-js-apps-801c9ea75780)
+- [Privacy and Security in Firebase](https://firebase.google.com/support/privacy)
+- [@next/third-parties Google Analytics compliance · Discussion #67440](https://github.com/vercel/next.js/discussions/67440)
+- [Best Privacy-Compliant Analytics Tools for 2026](https://www.mitzu.io/post/best-privacy-compliant-analytics-tools-for-2026)
+
+**Smart Home IoT & Energy Analytics:**
+- [Smart energy management: real-time prediction and optimization for IoT-enabled smart homes](https://www.tandfonline.com/doi/full/10.1080/23311916.2024.2390674)
+- [Predictive Analytics of Energy Usage by IoT-Based Smart Home Appliances](https://dl.acm.org/doi/10.1145/3426970)
+
+---
+
+*Pitfalls research for: v6.0 Operations, PWA & Analytics*
+*Researched: 2026-02-10*

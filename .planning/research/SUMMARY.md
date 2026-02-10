@@ -1,235 +1,323 @@
-# Project Research Summary - Design System Evolution
+# Project Research Summary
 
-**Project:** Pannello Stufa v3.0 Design System Evolution
-**Domain:** PWA Component Library & Design System Completion
-**Researched:** 2026-01-28
+**Project:** Pannello Stufa v6.0
+**Domain:** Smart Home IoT Dashboard - Operations, PWA & Analytics
+**Researched:** 2026-02-10
 **Confidence:** HIGH
 
 ## Executive Summary
 
-Pannello Stufa requires a production-grade design system built on **custom components using Radix UI primitives** with **Atomic Design methodology** (Atoms → Molecules → Organisms). The current system has 12 foundational components but lacks complex interactive patterns (Dialog, Dropdown, Slider, Tooltip) and consistent accessibility implementation.
+v6.0 enhances the existing Next.js 15.5 PWA with operational automation, PWA improvements, and usage analytics. This is an **evolutionary enhancement** — all features integrate with existing patterns (Firebase RTDB/Firestore split, HMAC webhooks, Serwist service worker, Recharts visualization). No major architectural changes or new frameworks required.
 
-The recommended approach combines **headless UI primitives for complex patterns** (Radix provides battle-tested accessibility, focus management, keyboard navigation) with **custom-built simple components** controlled via class-variance-authority for type-safe variant APIs. This gives full control over Ember Noir v2 styling while avoiding 100+ hours of accessibility edge case development. Bundle impact: ~68KB gzipped for complete primitive set versus 500KB+ for full UI frameworks that would conflict with existing design system.
+The recommended approach builds on the validated v5.1 foundation (104K lines TypeScript strict mode, 3034 tests, zero tsc errors). Most features leverage existing stack: Firebase for persistent rate limiting, Serwist for offline mode, FCM for interactive notifications, Recharts for analytics visualization. Only **one new dependency** required: `idb` (IndexedDB wrapper for service worker, 1.19kB). Optional second dependency: `@omgovich/firebase-functions-rate-limiter` (evaluate during implementation — custom Firestore implementation likely sufficient).
 
-**Critical risks:** Partial adoption (inconsistent UI), accessibility regressions (keyboard nav/focus management), dark mode token failures (hard-coded colors), and performance degradation (bundle bloat from poor tree-shaking). Mitigation: establish ESLint enforcement, comprehensive jest-axe testing, semantic design tokens only, and bundle size budgets with CI gates.
+**Key risks and mitigations:** (1) **Serverless state loss** — solved with Firebase RTDB transactions for rate limits and PID automation state (already validated pattern). (2) **Cron timeout** — refactor to orchestrator + fire-and-forget workers (existing pattern in scheduler/check route). (3) **FCM platform differences** — iOS requires platform-specific payload structure (detected via stored token metadata). (4) **GDPR analytics violation** — implement consent banner before ANY tracking (critical blocker for Phase 54). (5) **Stale cache safety** — add staleness indicators to offline UI (essential for device control app).
 
 ## Key Findings
 
 ### Recommended Stack
 
-**Foundation:** Radix UI primitives for complex patterns + CVA for variant management + jest-axe for accessibility testing.
+v6.0 requires minimal stack additions. **Core finding: NO major changes needed** — existing Serwist, Firebase, Recharts cover 90% of requirements.
 
 **Core technologies:**
-- **@radix-ui/react-dialog** (v1.1.4): Modal/Dialog components — handles focus trapping, ESC close, backdrop, portal rendering, ARIA patterns you shouldn't build from scratch
-- **@radix-ui/react-dropdown-menu** (v2.1.4): Dropdown menus — keyboard navigation (arrows, typeahead), nested menus, collision detection
-- **@radix-ui/react-select** (v2.1.8): Custom select dropdowns — native select has poor styling, Radix provides accessible alternative with search/multi-select
-- **@radix-ui/react-tooltip** (v2.1.8): Tooltips — positioning engine, viewport collision detection, keyboard triggers
-- **@radix-ui/react-slider** (implied): Range controls — essential for temperature/brightness but missing from current system
-- **class-variance-authority** (v0.7.1): Type-safe variant APIs — standardizes your existing ad-hoc variant logic, provides autocomplete, works seamlessly with Tailwind
-- **clsx + tailwind-merge** (v2.1.1 + v2.7.0): Conditional class merging + conflict resolution — canonical "cn utility" pattern (25KB total)
-- **jest-axe + @axe-core/react** (v10.0.0 + v4.10.2): Automated accessibility testing — catches ~70% of WCAG violations, runtime console warnings in dev
-- **lucide-react** (v0.562.0 KEEP): Icon system already installed — 1,500+ consistent icons, tree-shakable, correct choice verified
+- **Firebase RTDB** (existing): Persistent rate limiting via transactions, cron health monitoring, PID automation state — replaces in-memory Map (critical for serverless)
+- **Firestore** (existing): Historical analytics aggregation (monthly rollups), complex queries for dashboard — RTDB for real-time events, Firestore for long-term storage
+- **Serwist v9** (existing): Enhanced offline mode with staleness indicators, install prompt handling, Background Sync for command queuing — no alternative needed
+- **Recharts** (existing): Analytics visualization (usage timeline, pellet consumption, weather correlation) — pattern already proven in notification dashboard
+- **idb v8.0.3** (NEW): IndexedDB wrapper for service worker (replaces raw IndexedDB boilerplate) — reduces code by 60%, better TypeScript support
+
+**Critical version notes:**
+- Next.js 16 defaults to Turbopack — must use `--webpack` flag for Serwist build
+- @omgovich/firebase-functions-rate-limiter (fork) is only viable option for library-based rate limiting (original abandoned 4 years ago)
+- Playwright auth state pattern requires v1.18+ (current v1.52.0 compatible)
 
 **What NOT to add:**
-- Full UI frameworks (MUI, Chakra): 500KB-2MB, fight Tailwind, override Ember Noir design system
-- Storybook (defer post-milestone): 100+ dependencies, React 19 compatibility issues, single-developer project already has `/debug/design-system` page
-- Tailwind v4 migration: Zero functional benefit, configuration paradigm change (JS → CSS), current setup already exposes CSS variables
-- CSS-in-JS (Styled Components, Emotion): Runtime cost, conflicts with Tailwind, Server Components compatibility issues
-- Animation libraries (Framer Motion): 40KB, existing Tailwind animations + Radix hooks sufficient
+- No separate cron service (node-cron, bull) — external HTTP scheduler (GitHub Actions, Upstash) + existing webhook pattern
+- No Redis for rate limiting — Firebase RTDB transactions provide atomicity
+- No Chart.js/Victory — Recharts already working
+- No Playwright migration — Cypress covers 3034 tests (migration ROI too low)
 
 ### Expected Features
 
 **Must have (table stakes):**
-- **Checkbox** — form controls for preferences (LOW effort, missing)
-- **Switch** — better mobile UX for toggles (LOW effort, missing)
-- **Slider** — essential for temperature/brightness controls (MEDIUM effort, missing)
-- **Modal/Dialog** — pattern exists but no reusable component (MEDIUM effort, critical)
-- **Toast System** — upgrade existing to support queue + positioning + types (MEDIUM effort, partially implemented)
-- **Tooltip** — contextual help for controls (MEDIUM effort, missing)
-- **Keyboard Navigation** — full keyboard accessibility, logical tab order (MEDIUM effort, needs audit)
-- **Touch Targets** — 44px minimum across all interactive elements (LOW effort, needs audit)
-- **Focus Management** — visible ember-glow indicators in all themes (LOW effort, needs consistency)
+- **Cron automation** — Smart home platforms auto-poll devices every 5-30min (manual-only feels broken). Existing `/api/scheduler/check` needs external HTTP trigger.
+- **Persistent rate limiting** — Vercel serverless = stateless, in-memory Map resets on cold starts (DoS vulnerability). Firebase RTDB transactions required.
+- **Interactive push notifications** — Modern smart home apps (Home Assistant, SmartThings) allow direct action from notifications. "View only" notifications feel dated in 2026.
+- **Offline mode indicators** — PWAs must show "You're offline" with last known state. Silent stale data is a safety risk for device control apps.
+- **Analytics dashboard** — Energy monitoring core to smart home value prop (Google Nest, Ecobee all show usage dashboards). Users want "how much am I using?"
 
 **Should have (competitive):**
-- **StatusCard** — unify stove/thermostat/Hue patterns (MEDIUM effort, inconsistent)
-- **DeviceCard** — consistent device display component (MEDIUM effort, inconsistent)
-- **Badge** — generic variant extracted from StatusBadge (LOW effort)
-- **Radio Group** — mutually exclusive options (MEDIUM effort, upcoming settings)
-- **Tabs** — organize dense settings screens (MEDIUM effort, useful but not blocking)
-- **Reduced Motion** — respect prefers-reduced-motion (LOW effort, partially implemented)
+- **Smart pellet estimation** — Pellet stoves lack built-in sensors. Software-only estimation (power level × runtime × weather correlation) is a differentiator vs Home Assistant (which requires hardware sensors).
+- **Offline-capable notification actions** — Background Sync allows "Spegni stufa" button to work offline, queue action, execute when connection restored. Most smart home apps fail silently when offline.
+- **Cron reliability monitoring** — Dead man's switch for automation itself. If cron stops running (Vercel issue), alert user within 10-15 minutes. Home Assistant doesn't monitor its own automations.
+- **Realistic Auth0 E2E testing** — Real OAuth flow (not mocked) catches real bugs (CVE-2025-29927 showed middleware-only auth insufficient). Most tutorials mock auth completely.
 
 **Defer (v2+):**
-- **Accordion** — collapsible sections (MEDIUM effort, nice-to-have)
-- **Combobox** — searchable select (HIGH effort, not needed unless device list grows)
-- **Command Palette** — power user ⌘K navigation (HIGH effort, not essential for smart home)
-- **Drag-and-Drop** — reorder devices, customize layout (HIGH effort, customization milestone)
-- **Gauge Display** — radial gauge for temperature/humidity (MEDIUM effort, visual enhancement)
-- **Chart Component** — time series data visualization (HIGH effort, belongs in analytics milestone)
+- **Weather correlation in pellet consumption** — HIGH complexity (timestamp joins, aggregation). Heuristic formula sufficient for v6.0.
+- **Notification action undo** — Complex state management. Confirmation dialogs sufficient.
+- **Token refresh E2E testing** — Requires 24hr wait or complex clock setup. Manual testing acceptable for v6.0.
+- **Playwright migration** — No ROI for 3 weeks migration. Cypress works fine.
+- **Real-time pellet sensor integration** — Hardware out of scope. Software estimation only.
 
 ### Architecture Approach
 
-**Atomic Design with Server-First Client Islands:** Four-tier hierarchy (Atoms → Molecules → Organisms → Templates) with clear dependency flow. Components default to Server Components, mark `'use client'` only where necessary.
+v6.0 integrates via **existing patterns** — HMAC webhooks (withCronSecret), Firebase RTDB/Firestore split (real-time vs historical), service worker message handlers (notificationclick), Serwist strategies (NetworkFirst with fallback). No new architectural paradigms introduced.
 
 **Major components:**
-1. **Foundation Layer (Atoms)** — Icon, Text, Heading, Divider — no dependencies, semantic HTML, zero client-side logic
-2. **Core Components (Atoms)** — Button, Badge, Input, Card, Skeleton — depend on Foundation, minimal props (<10), composition over configuration
-3. **Form Controls (Molecules)** — Checkbox, Switch, Slider, Select, Radio Group — depend on Core + Radix primitives, WCAG AA compliance mandatory
-4. **Feedback Components (Molecules)** — Banner, Toast, Modal/Dialog, Tooltip — depend on Core + Layout, focus management, ARIA attributes
-5. **Layout Components (Molecules)** — Section, Grid, Tabs — depend on Foundation, responsive breakpoints (375px, 768px, 1024px, 1920px)
-6. **Smart Home Components (Organisms)** — StatusBadge, ControlButton, StatusCard, DeviceCard, TimelineItem — depend on Core + Layout, real-time status indicators
 
-**Key patterns:**
-- **Flat-File Open Code:** Copy components into codebase (not npm dependencies) — shadcn/ui philosophy of owned source code
-- **Design Token Foundation:** All colors from CSS variables (`var(--color-bg-surface)`), never hard-coded hex — semantic tokens enable dark mode
-- **CVA Variant API:** Standardized variant management — replaces manual switch statements, provides type-safety and autocomplete
-- **Bottom-Up Build Order:** Foundation → Core → Form Controls → Feedback → Smart Home — respect dependency hierarchy
+1. **Cron Orchestrator** — External HTTP scheduler (GitHub Actions or Upstash) triggers existing `/api/scheduler/check` webhook. Refactor to fire-and-forget pattern for parallel tasks (already partially implemented). Pattern: `withCronSecret` middleware validates HMAC. Updates `cronHealth/lastCall` timestamp for dead man's switch monitoring.
+
+2. **Persistent Rate Limiter** — Firebase RTDB replaces in-memory Map. Pattern: `runTransaction()` for atomic counter increments (existing pattern in `netatmoRateLimiter.ts`). Schema: `/rateLimits/{userId}/{notifType}/timestamps`. Cleanup via cron job (daily pruning of old windows).
+
+3. **Interactive Notification Handler** — Service worker `notificationclick` event parses action from data payload, executes API call (or queues via Background Sync if offline). FCM payload includes `actions` array (platform-specific: iOS requires `apns.aps.category`, Android uses `android.notification.clickAction`). Pattern already exists in `app/sw.ts:143-171`, needs action detection enhancement.
+
+4. **Offline State Manager** — Serwist NetworkFirst with cache staleness headers (`X-Cache-Age`, `X-Cache-Stale`). UI hook (`useOnlineStatus`) detects navigator.onLine, shows banner when offline, disables controls, displays cached state with timestamp warning. IndexedDB command queue (already implemented for Background Sync) gets UI feedback layer.
+
+5. **Analytics Pipeline** — **RTDB for real-time events** (1-day retention) → **daily aggregation cron** → **RTDB for daily stats** (90-day retention) → **monthly aggregation cron** → **Firestore for historical data** (unlimited retention, complex queries). Client dashboard fetches RTDB daily stats for selected range (7/30/90 days), visualizes with Recharts (existing pattern from notification dashboard).
+
+**Data flow changes:**
+- Before: In-memory rate limit → cold start resets state
+- After: Firebase RTDB transaction → persists across deployments
+- Before: Notification tap → open app
+- After: Notification action button → service worker API call → success notification
+- Before: Offline → stale cache served silently
+- After: Offline → staleness indicator + cached state warning + command queuing UI
 
 ### Critical Pitfalls
 
-1. **Partial Component Adoption (CRITICAL)** — Some pages use design system, others use inline styles/old components. After 6 months only 40% adoption. **Prevention:** Create Storybook catalog, ESLint rules blocking old imports, migration tracker spreadsheet, code review checklist, 80%+ adoption target. **Warning signs:** New PRs contain inline styles, multiple button implementations, developers asking "how do I..." for existing patterns.
+1. **Serverless state loss** — In-memory rate limiter resets on cold starts, allowing DoS bypass. **Solution:** Firebase RTDB transactions for ALL persistent state (rate limits, PID automation, cron health). Test with 15+ minute idle periods. Pattern already validated in `netatmoRateLimiter.ts`.
 
-2. **Accessibility Regressions (CRITICAL)** — Using `<div onClick>` instead of `<button>`, missing focus traps in modals, broken keyboard navigation, color contrast failures. **Prevention:** Semantic HTML first, WCAG AA checklist before merge, keyboard testing (tab through every component), focus management (modals trap focus), jest-axe + manual screen reader testing. **Warning signs:** Can't tab to interactive elements, Lighthouse accessibility <90, screen reader announces incorrectly.
+2. **Cron timeout** — Sequential operations (stove status + maintenance + calibration + weather + cleanup + PID) exceed 10s Vercel timeout, causing partial execution. **Solution:** Refactor to orchestrator + fire-and-forget workers (Promise.all with .catch). Set `maxDuration = 60` in route config. Dead man's switch monitors completion.
 
-3. **Dark Mode Token Mistakes (CRITICAL)** — Hard-coded hex values break theme switching, flash of unstyled content, white text on white background in dark mode. **Prevention:** Semantic design tokens (`--color-bg-surface` not `--color-gray-100`), CSS variables only (never hex), ESLint blocking hex values, contrast testing both themes. **Warning signs:** `grep -r "#[0-9a-f]{6}"` returns >20 results, dark mode toggle doesn't affect all components, FOUC on load.
+3. **FCM platform payload differences** — Action buttons work on Android but fail silently on iOS (requires `aps.category` with registered categories). Data size limits differ (4KB iOS, 2KB Android). **Solution:** Platform-specific payload construction based on stored token metadata (`fcmTokens/{token}/platform`). Validate payload size before sending.
 
-4. **Component API Over-Engineering (HIGH)** — 847-line Button with 35 props trying to handle every edge case. **Prevention:** Start minimal (one use case), max 10 props rule, composition over configuration (separate IconButton, ButtonWithIcon), YAGNI principle (only add features when 3+ real use cases exist). **Warning signs:** Component >200 lines, developers say "I don't know which props to use", documentation longer than code.
+4. **Auth0 session leakage in E2E tests** — Playwright storageState caches cookies across test runs, causing "Session expired" errors in CI. **Solution:** Per-test login fixture with beforeEach/afterEach lifecycle. Never commit storageState.json. Use TEST_MODE bypass in CI if needed.
 
-5. **Performance Regressions (HIGH)** — Bundle grows from 150KB to 450KB, importing entire icon library (500 icons for 3 used), no tree-shaking. **Prevention:** Named imports only, tree-shakeable exports, lazy load heavy components, bundle analysis before/after, zero-runtime CSS (Tailwind not CSS-in-JS), 200KB performance budget in CI. **Warning signs:** Webpack bundle size warnings, Lighthouse performance score decreases, mobile users report "app feels slow".
+5. **Stale cache safety risk** — Users act on outdated stove status (offline mode serves stale cache without warning), leading to dangerous actions (ignite already-running stove). **Solution:** Add cache staleness headers (`X-Cache-Age`) in service worker, UI shows "⚠️ Dati non aggiornati (X minuti fa)" banner when age >30 seconds. Disable controls when offline.
+
+6. **GDPR violation** — Tracking analytics without explicit consent violates GDPR Article 6, facing €20M fines. **Solution:** Implement consent banner BEFORE ANY analytics tracking. Gate all `logAnalytics()` calls with consent check. Store `users/{userId}/consent` in Firebase. Right to deletion endpoint required.
 
 ## Implications for Roadmap
 
-Based on research, suggested 5-phase structure following bottom-up dependency hierarchy and risk mitigation:
+Based on research, suggested 6-phase structure:
 
-### Phase 1: Foundation & Tooling (Week 1-2)
-**Rationale:** Establish infrastructure before building components — prevents token mistakes, enforces consistency from day one
-**Delivers:** CVA utility, jest-axe setup, design token audit, ESLint rules, component adoption tracker
-**Addresses:** Critical pitfalls #3 (dark mode tokens), #1 (partial adoption prevention)
-**Avoids:** Building components without consistency/accessibility framework
-**Research needs:** None — well-documented patterns
-**Dependencies:** None (sets foundation for all subsequent phases)
+### Phase 49: Persistent Rate Limiting
+**Rationale:** Foundation for all other features. Current in-memory rate limiter breaks in serverless (DoS vulnerability). Must complete before Phase 50 (cron) and Phase 52 (interactive notifications).
 
-### Phase 2: Core Interactive Components (Week 3-4)
-**Rationale:** Close functional gaps with most-needed components first — Checkbox, Switch, Slider, Modal essential for settings/controls
-**Delivers:** 6 missing table-stakes components (Checkbox, Switch, Slider, Modal/Dialog, enhanced Toast, Tooltip)
-**Uses:** Radix primitives (Dialog, Switch, Checkbox, Tooltip, Slider)
-**Implements:** Form Controls + Feedback Molecules from architecture
-**Addresses:** Must-have features, accessibility requirements (WCAG AA)
-**Avoids:** Building complex patterns from scratch (pitfall #2)
-**Research needs:** None — Radix provides documented patterns
-**Dependencies:** Phase 1 (needs CVA + testing infrastructure)
+**Delivers:** Firebase RTDB-backed rate limiter with transaction safety, sliding window algorithm, automatic cleanup, feature flag for gradual rollout.
 
-### Phase 3: Consistency Refactoring (Week 5-6)
-**Rationale:** Unify inconsistent patterns now that tooling exists — StatusCard/DeviceCard appear 8+ times with variations
-**Delivers:** Standardized StatusCard, DeviceCard, Badge, Radio Group components
-**Addresses:** Should-have features, code duplication reduction
-**Avoids:** Over-engineering (pitfall #4) — these are refinements of existing patterns
-**Research needs:** None — refactoring existing code
-**Dependencies:** Phase 2 (may use Dialog/Toast in cards)
+**Addresses:** Critical pitfall #1 (state loss), MEDIUM complexity from STACK.md (Firebase transactions solve core problem).
 
-### Phase 4: Accessibility & Performance Audit (Week 7-8)
-**Rationale:** Systematic validation after components built — catch regressions before production deployment
-**Delivers:** Keyboard navigation audit, touch target audit, reduced motion wrapper, bundle size optimization
-**Addresses:** Must-have accessibility patterns, performance budget enforcement
-**Avoids:** Accessibility regressions (pitfall #2), performance degradation (pitfall #5)
-**Research needs:** None — testing/auditing phase
-**Dependencies:** Phases 2-3 (needs all components built)
+**Avoids:** DoS attacks via cold start exploitation, API quota exhaustion (Netatmo 50 req/10s limit).
 
-### Phase 5: Documentation & Adoption (Week 9-10)
-**Rationale:** Document everything, track migration, achieve 80%+ adoption target — prevents partial adoption failure
-**Delivers:** Updated Storybook (or `/debug/design-system`), migration tracker showing 80%+ pages using design system, deprecated component removal
-**Addresses:** Documentation debt (pitfall #7), partial adoption prevention (pitfall #1)
-**Avoids:** Components exist but unused, knowledge locked in developer's head
-**Research needs:** None — documentation/cleanup phase
-**Dependencies:** Phases 1-4 (needs complete component library)
+**Estimated effort:** 1 day (lib/rateLimiterPersistent.ts + tests + 24h monitoring).
+
+**Research flag:** Standard pattern (Firebase RTDB transactions already proven in netatmoRateLimiter.ts) — skip `/gsd:research-phase`.
+
+---
+
+### Phase 50: Cron Automation Configuration
+**Rationale:** Enables all background tasks (health monitoring, coordination, weather refresh). Existing endpoints already operational, just need HTTP trigger configuration.
+
+**Delivers:** External HTTP scheduler setup (GitHub Actions cron.yml or Upstash), refactored `/api/scheduler/check` to orchestrator + fire-and-forget workers, `maxDuration = 60` config, dead man's switch integration.
+
+**Uses:** HMAC webhook pattern (withCronSecret middleware already implemented).
+
+**Implements:** Cron Orchestrator component from ARCHITECTURE.md.
+
+**Avoids:** Critical pitfall #2 (timeout), ensures <10s critical path execution.
+
+**Estimated effort:** 0.5 days (configuration + refactoring existing code).
+
+**Research flag:** Standard pattern (cron-job.org or GitHub Actions well-documented) — skip `/gsd:research-phase`.
+
+---
+
+### Phase 51: E2E Test Improvements
+**Rationale:** Validates security foundation before shipping new features. Auth0 CVE-2025-29927 showed mocking auth defeats E2E purpose. Can run parallel to Phase 52-53.
+
+**Delivers:** Playwright auth.setup.ts with session state caching, 5 critical flow tests (ignite, thermostat, schedule, notification, PWA install), CI integration with GitHub Actions.
+
+**Addresses:** Critical pitfall #4 (session leakage), MEDIUM complexity from FEATURES.md (Auth0 test tenant + cy.origin).
+
+**Avoids:** False positives from stale sessions, flaky CI tests, Auth0 rate limiting.
+
+**Estimated effort:** 1.5 days (setup + 5 tests + CI integration).
+
+**Research flag:** Standard pattern (Playwright auth docs comprehensive) — skip `/gsd:research-phase`.
+
+---
+
+### Phase 52: Interactive Push Notifications
+**Rationale:** Biggest UX improvement (action buttons in notifications). Depends on Phase 49 (rate limiter) to prevent notification spam. Independent of Phase 50 (cron) and Phase 53 (offline).
+
+**Delivers:** FCM action buttons (platform-specific payloads), service worker notificationclick handler with action detection, server-side notification triggers with action arrays, manual test on Android Chrome + iOS Safari PWA.
+
+**Addresses:** Table stakes feature from FEATURES.md (HIGH value, HIGH complexity), Critical pitfall #3 (platform differences).
+
+**Implements:** Interactive Notification Handler component from ARCHITECTURE.md.
+
+**Avoids:** Silent iOS failures (platform detection + graceful degradation), payload size errors (2KB Android, 4KB iOS limits).
+
+**Estimated effort:** 1 day (service worker + 4 notification triggers).
+
+**Research flag:** **Needs deeper research** during planning — FCM platform-specific payload structure complex, iOS category registration unclear from sources.
+
+---
+
+### Phase 53: PWA Offline Improvements
+**Rationale:** Safety enhancement (stale cache warning critical for device control app). Builds on Phase 52 (notification actions can queue offline). Independent of Phase 50-51.
+
+**Delivers:** useOnlineStatus hook, offline banner + cached state UI in StoveCard/ThermostatCard, cache staleness headers in service worker, command queue UI feedback (pending count + sync success toast), install prompt (beforeinstallprompt event + localStorage tracking).
+
+**Addresses:** Table stakes feature from FEATURES.md (offline indicators), Critical pitfall #5 (stale cache safety).
+
+**Implements:** Offline State Manager component from ARCHITECTURE.md.
+
+**Avoids:** Users acting on outdated state (safety risk), silent command failures (queuing feedback).
+
+**Estimated effort:** 2 days (1.5 offline UI + 0.5 install prompt).
+
+**Research flag:** Standard pattern (Serwist + beforeinstallprompt well-documented) — skip `/gsd:research-phase`, but note Next.js 16 Turbopack conflict requires `--webpack` flag.
+
+---
+
+### Phase 54: Analytics Dashboard
+**Rationale:** Final feature (requires data accumulation from Phase 50 cron). MUST implement consent banner before ANY tracking (GDPR blocker).
+
+**Delivers:** Consent banner (blocking, granular categories), analyticsLogger.ts (event collection to RTDB), /api/analytics/aggregate-daily cron endpoint, /app/analytics/page.tsx dashboard (usage timeline, pellet consumption, weather correlation charts), stats cards (totals, automation %).
+
+**Addresses:** Table stakes feature from FEATURES.md (analytics dashboard MEDIUM-HIGH complexity), Critical pitfall #6 (GDPR violation).
+
+**Implements:** Analytics Pipeline component from ARCHITECTURE.md.
+
+**Avoids:** €20M GDPR fines (consent-first), unbounded Firestore growth (2-year TTL policy).
+
+**Estimated effort:** 4 days (1 consent + 1 collection + 1 aggregation + 2 dashboard).
+
+**Research flag:** **Needs research** during planning — GDPR consent implementation patterns, Firestore aggregation query optimization, pellet consumption estimation formula validation.
+
+---
 
 ### Phase Ordering Rationale
 
-- **Foundation first:** Design tokens, CVA, testing infrastructure prevent mistakes in all subsequent phases (addresses pitfalls #3, #2)
-- **Core components second:** Close functional gaps before refactoring — avoid premature optimization
-- **Consistency third:** Refactor with tooling in place — CVA standardizes variant APIs, jest-axe catches accessibility regressions
-- **Audit fourth:** Test systematically after build phase — catch issues before production
-- **Documentation last:** Document complete system — Storybook with all components and examples
+**Sequential dependencies:**
+- Phase 49 (rate limiting) → Phase 52 (notifications) — prevent notification spam
+- Phase 50 (cron) → Phase 54 (analytics) — data accumulation for dashboard
+- Phase 52 (notifications) → Phase 53 (offline actions) — Background Sync integration
 
-**Dependency chain:**
-- Phase 2 depends on Phase 1 (needs CVA + testing)
-- Phase 3 depends on Phase 2 (may compose Dialog/Toast in cards)
-- Phase 4 depends on Phases 2-3 (tests complete component set)
-- Phase 5 depends on Phases 1-4 (documents complete system)
+**Parallelizable:**
+- Phase 51 (E2E tests) — independent, validates auth only
+- Phase 53 (PWA offline) — after Phase 52, can run parallel to Phase 54
+
+**Critical path:** 49 → 50 → 52 → 53 → 54 (with Phase 51 parallel to 52-53).
+
+**Risk mitigation order:**
+- Phase 49 first — fixes DoS vulnerability (serverless state loss)
+- Phase 50 second — enables automation before analytics data collection
+- Phase 54 last — requires consent banner (GDPR blocker, no shortcuts allowed)
+
+**Complexity sequencing:**
+- LOW → MEDIUM → HIGH: Start with rate limiting (MEDIUM, proven pattern), end with analytics (HIGH, new patterns)
+- Standard patterns first (49-51), novel patterns last (52-54)
 
 ### Research Flags
 
-**Phases with standard patterns (skip research-phase):**
-- **Phase 1:** Design token management well-documented (Tailwind + CVA canonical pattern)
-- **Phase 2:** Radix UI official docs provide complete implementation examples with accessibility guidance
-- **Phase 3:** Refactoring existing code (no new patterns)
-- **Phase 4:** Accessibility/performance auditing uses standard tooling (jest-axe, Lighthouse, bundle-analyzer)
-- **Phase 5:** Documentation/migration uses established patterns (Storybook or existing `/debug/design-system`)
+**Needs `/gsd:research-phase` during planning:**
 
-**No phases need `/gsd:research-phase`** — All patterns are industry-standard with comprehensive documentation from Radix UI, CVA, Tailwind, and WCAG 2.2 specifications.
+- **Phase 52 (Interactive Push Notifications)** — FCM platform-specific payload structure complex. iOS category registration process unclear. Action button limitations vary by platform (2 actions Android, 4 actions iOS). Research needed: official FCM docs for apns.aps.category structure, iOS UNNotificationCategory registration in PWA context.
+
+- **Phase 54 (Analytics Dashboard)** — Three sub-areas need research:
+  1. GDPR consent implementation patterns (banner UI, consent storage, retroactive data deletion)
+  2. Firestore aggregation query optimization (write-time vs read-time aggregation, cost tradeoffs)
+  3. Pellet consumption estimation formula validation (powerLevel × runtime heuristic accuracy, weather correlation algorithm)
+
+**Standard patterns (skip research-phase):**
+
+- **Phase 49 (Persistent Rate Limiting)** — Firebase RTDB transactions already validated in netatmoRateLimiter.ts. Sliding window algorithm well-documented.
+- **Phase 50 (Cron Configuration)** — HMAC webhook pattern exists (withCronSecret). GitHub Actions cron syntax standard. Fire-and-forget Promise.all pattern proven.
+- **Phase 51 (E2E Tests)** — Playwright auth state pattern official docs comprehensive. Auth0 test tenant setup straightforward.
+- **Phase 53 (PWA Offline)** — Serwist NetworkFirst + beforeinstallprompt event well-documented. useOnlineStatus hook standard React pattern. Note: Next.js 16 Turbopack conflict documented in sources (requires `--webpack` flag).
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Radix UI is industry standard (1,500+ production apps), verified with official docs and ecosystem consensus. CVA + clsx + tailwind-merge canonical pattern (7M+ weekly downloads). jest-axe v10.0.0 confirmed current, verified React 19 compatibility. |
-| Features | MEDIUM-HIGH | Foundation components verified with shadcn/ui, Radix UI, Material UI, Carbon Design System. Smart home patterns inferred from Home Assistant 2026.1, ThingsBoard, general IoT best practices (no official "smart home design system" exists). Complexity estimates based on Radix primitives + typical React development. |
-| Architecture | HIGH | Atomic Design methodology verified from Brad Frost (original author) and 2026 Next.js best practices. Server-first client islands confirmed Next.js 15 App Router canonical pattern. Component hierarchy validated against shadcn/ui architecture (most successful implementation of this pattern). |
-| Pitfalls | MEDIUM-HIGH | Design system adoption failures well-documented in recent 2025-2026 sources (Figr, Knapsack, Netguru). Accessibility standards verified with WCAG 2.2 official requirements. Performance optimization validated with framework-specific 2026 guides. Some component API design relies on general best practices rather than project-specific verification. |
+| Stack | HIGH | Existing technologies cover 90% of requirements. Only 1 new dependency (idb). Versions verified compatible. No major framework changes. |
+| Features | HIGH | Table stakes well-defined (smart home platform comparisons clear). Differentiators validated (pellet estimation novel but feasible). Anti-features explicit (no Playwright migration). |
+| Architecture | HIGH | All patterns already exist in codebase (HMAC webhooks, Firebase splits, service worker handlers, Recharts). Integration points documented with line numbers. No architectural rewrites. |
+| Pitfalls | HIGH | Sources authoritative (official Vercel/Firebase/FCM docs, Anthropic research, Auth0 community). All 6 critical pitfalls have proven solutions. Recovery strategies documented. |
 
 **Overall confidence:** HIGH
 
+Research quality indicators met:
+- Official sources for all critical technologies (Vercel serverless limits, Firebase transaction safety, FCM payload structure, Playwright auth patterns)
+- Existing codebase validation (Firebase RTDB pattern proven in netatmoRateLimiter.ts, Recharts proven in notification dashboard, service worker handlers exist)
+- Pitfall prevention documented (each pitfall maps to specific phase, recovery steps provided)
+- Stack decisions justified (NO Redis, NO Playwright migration, NO complex ML models — pragmatic choices)
+
 ### Gaps to Address
 
-**Gap: Smart home component patterns** — No canonical "IoT design system" specification exists. StatusCard, DeviceCard, TimelineItem patterns inferred from observing Home Assistant, ThingsBoard, Grafana. **Resolution:** Build minimal viable components in Phase 2, validate with user testing, iterate based on feedback. Pattern extraction (Phase 3) happens after seeing actual usage.
+**Gap 1: FCM iOS category registration in PWA context**
+- Research shows iOS requires `aps.category` matching registered UNNotificationCategory, but unclear how to register categories in PWA (not native app)
+- **Handling:** Needs deeper research in Phase 52 planning. Fallback: iOS action buttons only work if PWA installed (standalone mode), document limitation for users.
 
-**Gap: Storybook vs `/debug/design-system`** — Recommendation defers Storybook due to React 19 compatibility issues and single-developer context. **Resolution:** Phase 5 documents components in existing `/debug/design-system` page with comprehensive examples. Revisit Storybook post-milestone if team grows or visual regression testing becomes priority.
+**Gap 2: Pellet consumption estimation accuracy**
+- Heuristic formula (powerLevel × runtime × weatherFactor) unverified. Research shows ML models achieve 80%+ accuracy, but heuristic approach accuracy unknown.
+- **Handling:** Start with simple formula, add user calibration UI ("I refilled 15kg today"), improve with feedback data. Weather correlation deferred to v6.1 (HIGH complexity).
 
-**Gap: Component adoption enforcement** — ESLint rules can block old imports but can't force design system usage in new code. **Resolution:** Phase 5 includes migration tracker (spreadsheet showing adoption %), code review checklist, and team training. Set 80%+ adoption goal, allocate cleanup sprint if needed.
+**Gap 3: Firestore vs RTDB cost tradeoffs for analytics**
+- Research recommends RTDB for real-time, Firestore for historical, but cost implications unclear for 90-day daily stats (potential duplication)
+- **Handling:** Start with RTDB-only (90-day retention, simple queries). Migrate to Firestore monthly rollups only if RTDB queries become slow (>10 users, >1000 data points).
 
-**Gap: Manual accessibility testing coverage** — jest-axe catches ~70% of WCAG violations, 30% require manual testing (color contrast in JSDOM, screen reader compatibility). **Resolution:** Phase 4 includes manual keyboard navigation testing and spot-checks with VoiceOver/NVDA. Full WCAG AA certification audit deferred to post-milestone if compliance critical.
+**Gap 4: External HTTP scheduler free tier limits**
+- GitHub Actions cron: 5-minute minimum interval (acceptable), but unknown reliability for critical health checks
+- Upstash: Free tier unknown limits
+- **Handling:** Start with GitHub Actions (zero cost). Monitor reliability for 1 week. Migrate to Upstash if >5% missed executions (dead man's switch will alert).
+
+**Gap 5: Consent banner UX optimization**
+- GDPR requires opt-in, but modal blocking UI may frustrate users on first load
+- **Handling:** Allow "Essential only" mode → functional controls work, analytics disabled. Persistent banner (non-blocking) for "Enable analytics" after user explores app.
 
 ## Sources
 
 ### Primary (HIGH confidence)
 
-**Stack Research:**
-- [Radix UI Official Documentation](https://www.radix-ui.com/primitives) — Component primitives, accessibility patterns
-- [Headless UI vs Radix: Which One is Better in 2025?](https://www.subframe.com/tips/headless-ui-vs-radix) — Comparative analysis
-- [Class Variance Authority Official Documentation](https://cva.style/docs) — Variant API patterns
-- [jest-axe npm](https://www.npmjs.com/package/jest-axe) — Version 10.0.0 verification
-- [Tailwind CSS v4.0](https://tailwindcss.com/blog/tailwindcss-v4) — Design tokens, configuration
+**Stack recommendations:**
+- [Vercel Cron Jobs Documentation](https://vercel.com/docs/cron-jobs) — serverless cron patterns, CRON_SECRET authentication
+- [Firebase Realtime Database Transactions](https://firebase.google.com/docs/database/web/read-and-write#save_data_as_transactions) — atomic operations for rate limiting
+- [idb - npm](https://www.npmjs.com/package/idb) — IndexedDB wrapper for service workers
+- [Serwist Documentation](https://serwist.pages.dev/docs) — Next.js 15+ PWA configuration
+- [Playwright Authentication](https://playwright.dev/docs/auth) — session state reuse patterns
 
-**Features Research:**
-- [shadcn/ui Component Library](https://ui.shadcn.com/) — Foundation component inventory
-- [Radix UI Primitives Releases](https://www.radix-ui.com/primitives/docs/overview/releases) — Component coverage
-- [Carbon Design System — Accessibility](https://carbondesignsystem.com/guidelines/accessibility/overview/) — WCAG patterns
-- [Home Assistant 2026.1 Release](https://www.home-assistant.io/blog/2026/01/07/release-20261) — Smart home dashboard patterns
+**Feature validation:**
+- [Home Assistant Schedule Integration](https://www.home-assistant.io/integrations/schedule/) — smart home automation patterns
+- [Google Nest Energy History](https://support.google.com/googlenest/answer/9247296) — energy analytics UX patterns
+- [Firebase Cloud Messaging Web Push](https://firebase.google.com/docs/cloud-messaging/js/receive) — notification action buttons
 
-**Architecture Research:**
-- [Atomic Design Methodology by Brad Frost](https://atomicdesign.bradfrost.com/chapter-2/) — Original specification
-- [Next.js 15 App Router Architecture](https://www.yogijs.tech/blog/nextjs-project-architecture-app-router) — Server-first patterns
-- [Building the Ultimate Design System (2026)](https://medium.com/@padmacnu/building-the-ultimate-design-system-a-complete-architecture-guide-for-2026-6dfcab0e9999) — Component organization
+**Architecture patterns:**
+- [End-to-End Testing Auth Flows with Playwright and Next.js](https://testdouble.com/insights/how-to-test-auth-flows-with-playwright-and-next-js) — session state management
+- [Tutorial: Firestore Rate Limiting | Fireship.io](https://fireship.io/lessons/how-to-rate-limit-writes-firestore/) — distributed rate limiting patterns
+- [Build an Offline-First Mood Journal PWA with Next.js & IndexedDB](https://www.wellally.tech/blog/build-offline-first-pwa-nextjs-indexeddb) — offline state management
 
-**Pitfalls Research:**
-- [Why Design Systems Fail | Knapsack](https://www.knapsack.cloud/blog/why-design-systems-fail) — Adoption patterns
-- [Design System Adoption Pitfalls](https://www.netguru.com/blog/design-system-adoption-pitfalls) — Common failures
-- [Accessibility in Design Systems](https://www.supernova.io/blog/accessibility-in-design-systems-a-comprehensive-approach-through-documentation-and-assets) — WCAG integration
-- [Dark Mode with Design Tokens in Tailwind CSS](https://www.richinfante.com/2024/10/21/tailwind-dark-mode-design-tokens-themes-css) — Token management
+**Pitfall prevention:**
+- [What can I do about Vercel Functions timing out? | Vercel KB](https://vercel.com/kb/guide/what-can-i-do-about-vercel-serverless-functions-timing-out) — serverless timeout mitigation
+- [Implementing Action Buttons in Push Notifications using Firebase and Notifee](https://medium.com/@hassem_mahboob/implementing-action-buttons-in-push-notifications-using-firebase-and-notifee-f5743bdb28bc) — platform-specific FCM payloads
+- [GDPR Compliance Checklist for Next.js Apps](https://medium.com/@kidane10g/gdpr-compliance-checklist-for-next-js-apps-801c9ea75780) — consent implementation
 
 ### Secondary (MEDIUM confidence)
 
-- [15 Best React UI Libraries for 2026](https://www.builder.io/blog/react-component-libraries-2026) — Ecosystem comparison
-- [React UI libraries in 2025](https://makersden.io/blog/react-ui-libs-2025-comparing-shadcn-radix-mantine-mui-chakra) — Framework analysis
-- [Smart Home Dashboard Design (DevelopEx)](https://developex.com/blog/smart-home-dashboard-ux-design/) — IoT UX patterns
-- [Component API Design Guidelines](https://alanbsmith.medium.com/component-api-design-3ff378458511) — Best practices
+- [Cron Jobs in Next.js: Serverless vs Serverful](https://yagyaraj234.medium.com/running-cron-jobs-in-nextjs-guide-for-serverful-and-stateless-server-542dd0db0c4c) — comparison of cron approaches
+- [How to Build a Distributed Rate Limiter with Redis](https://oneuptime.com/blog/post/2026-01-21-redis-distributed-rate-limiter/view) — alternative rate limiting patterns (Redis comparison)
+- [Cypress vs Playwright: I Ran 500 E2E Tests in Both](https://medium.com/lets-code-future/cypress-vs-playwright-i-ran-500-e2e-tests-in-both-heres-what-broke-2afc448470ee) — E2E framework comparison (validates Cypress retention decision)
 
-### Tertiary (LOW confidence, needs validation)
+### Tertiary (LOW confidence)
 
-- Smart home component patterns (StatusCard, DeviceCard) — Inferred from multiple dashboard examples, no canonical specification
-- Complexity estimates (1-2 hours LOW, 3-5 hours MEDIUM, 6-10 hours HIGH) — Based on Radix primitives + typical React development, not project-specific timing
+- [Tracking wood pellet consumption - Home Assistant Community](https://community.home-assistant.io/t/tracking-wood-pellet-consumption/783104) — community approaches to pellet estimation (no validation)
+- [Novel approach to energy consumption estimation in smart homes](https://www.frontiersin.org/journals/energy-research/articles/10.3389/fenrg.2024.1361803/full) — ML models for energy prediction (academic, not production-tested)
 
 ---
-*Research completed: 2026-01-28*
+*Research completed: 2026-02-10*
 *Ready for roadmap: yes*
-*Suggested phases: 5 (Foundation → Core Components → Consistency → Audit → Documentation)*
-*Research needs: None (all phases use well-documented patterns)*
+*Total plans required: 6 phases (49-54)*
+*Estimated implementation: 10 days (1 rate limiting + 0.5 cron + 1.5 E2E + 1 notifications + 2 offline + 4 analytics)*

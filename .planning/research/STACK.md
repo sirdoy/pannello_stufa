@@ -1,458 +1,697 @@
-# Technology Stack - Design System & Component Library
+# Technology Stack
 
-**Project:** Pannello Stufa
-**Milestone:** Complete UI Component Library & Design Consistency
-**Researched:** 2026-01-28
-**Overall confidence:** HIGH
-
----
+**Project:** Pannello Stufa v6.0
+**Researched:** 2026-02-10
 
 ## Executive Summary
 
-For completing Pannello Stufa's design system and component library, the recommended approach is a **custom component library built on Radix UI primitives** with enhanced tooling for consistency and accessibility. This builds on your existing Tailwind CSS foundation and Ember Noir v2 design system without introducing bloated UI frameworks.
+v6.0 adds **operational resilience, PWA improvements, and analytics** to the existing Next.js 15.5 PWA. Most features can be implemented with **existing stack** (Serwist, Firebase, Vercel). Only **two new libraries** needed: `idb` for IndexedDB wrapper and potentially `@omgovich/firebase-functions-rate-limiter` for persistent rate limiting.
 
-**Key decision:** Use Radix UI primitives for complex interactive components (Dialog, Dropdown, Select, Tooltip) while building simpler components (Button, Card, Input) from scratch. This gives you full control over styling while leveraging battle-tested accessibility and keyboard navigation for complex patterns.
+**Key Finding**: NO major stack changes. v6.0 builds on validated v5.1 foundation.
 
 ---
 
-## Recommended Stack
+## NEW Stack Additions for v6.0
 
-### Component Primitives
+### Required Libraries
 
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| **@radix-ui/react-dialog** | ^1.1.4 | Modal, Dialog components | Best-in-class accessibility, focus management, scroll locking, portal rendering. Handles complex ARIA patterns you shouldn't build from scratch. |
-| **@radix-ui/react-dropdown-menu** | ^2.1.4 | Dropdown menus, context menus | Keyboard navigation, nested menus, typeahead support built-in. Critical for accessible navigation patterns. |
-| **@radix-ui/react-select** | ^2.1.8 | Custom select dropdowns | Native `<select>` has poor styling options. Radix provides accessible custom selects with search, multi-select support. |
-| **@radix-ui/react-tooltip** | ^1.1.8 | Tooltips, popovers | Proper positioning, collision detection, portal rendering. Handles edge cases (viewport boundaries, nested triggers). |
-| **@radix-ui/react-checkbox** | ^1.1.4 | Checkbox with indeterminate state | Already have basic Checkbox component, but Radix handles indeterminate state and proper ARIA attributes. |
-| **@radix-ui/react-switch** | ^1.1.4 | Toggle switches | Similar to your Toggle component but with enhanced accessibility and animation hooks. |
+| Technology | Version | Purpose | Installation |
+|------------|---------|---------|--------------|
+| **idb** | ^8.0.3 | Promise-based IndexedDB wrapper for offline data sync | `npm install idb` |
 
-**Rationale:** Radix UI is the industry standard for headless components in 2026. It provides 1,500+ production apps' worth of edge case handling, accessibility testing, and cross-browser compatibility. Unlike Headless UI (focused on Tailwind Labs ecosystem), Radix offers more component variety and better TypeScript support. React Aria is more verbose and requires deeper accessibility knowledge to implement correctly.
+**Why `idb`**:
+- Currently using **raw IndexedDB** in `app/sw.ts` (lines 192-271, 420-447)
+- `idb` reduces boilerplate by 60% (Promise-based API vs callback-based)
+- Maintained by Jake Archibald (Google), 1,234+ projects use it
+- Already have Dexie (4.2.1) for client-side, but `idb` is **smaller and better for service workers** (1.19kB vs Dexie's larger footprint)
+- **Confidence: HIGH** (official npm, 9 months old, stable API)
 
-**Install only what you need:**
-```bash
-npm install @radix-ui/react-dialog @radix-ui/react-dropdown-menu @radix-ui/react-select @radix-ui/react-tooltip
-```
+### Optional Libraries (Evaluate During Planning)
 
-**Note:** Do NOT install the unified `radix-ui` package (v1.4.3). Use individual `@radix-ui/react-*` packages for tree-shaking and version control.
+| Technology | Version | Purpose | When to Use |
+|------------|---------|---------|-------------|
+| **@omgovich/firebase-functions-rate-limiter** | ^4.3.0 | Persistent rate limiting using Firebase RTDB/Firestore | If in-memory rate limiting insufficient |
 
-### Component Variant Management
+**Why Optional**:
+- Currently have **no rate limiting** in API routes
+- Firebase RTDB backend uses 10-50KB per limit record (negligible for 5-10 API routes)
+- Original `firebase-functions-rate-limiter` **abandoned** (last update 4 years ago)
+- `@omgovich` fork **actively maintained** (3 months old, v4.3.0)
+- **Alternative**: Simple Firestore document with timestamp + counter (custom implementation)
+- **Confidence: MEDIUM** (fork, not original, but only viable option)
 
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| **class-variance-authority** | ^0.7.1 | Type-safe variant APIs | Consolidates classname logic, provides autocomplete for variants, works seamlessly with Tailwind. Your existing components use ad-hoc variant logic - CVA standardizes this pattern. |
-| **clsx** | ^2.1.1 | Conditional class merging | Lightweight (228B), handles conditional classes and arrays. Industry standard utility. |
-| **tailwind-merge** | ^2.7.0 | Tailwind class conflict resolution | Prevents class conflicts when merging dynamic classes (e.g., `bg-red-500` overriding `bg-blue-500`). Essential for component composition. |
+---
 
-**Rationale:** These three libraries form the canonical "cn utility" pattern popularized by shadcn/ui. CVA provides the variant API (replacing your manual switch statements), clsx handles conditionals, tailwind-merge prevents class conflicts. Combined bundle size: ~25KB. Alternative approaches (styled-components, CSS Modules) don't integrate well with Tailwind's utility-first philosophy.
+## Existing Stack - NO CHANGES NEEDED
 
-**Implementation pattern:**
-```typescript
-// lib/utils.ts
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+### Core Framework (Already Validated)
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+| Technology | Current Version | v6.0 Use Case |
+|------------|----------------|---------------|
+| **Next.js** | ^16.1.0 | Cron routes, App Router pages, PWA host |
+| **@serwist/next** | ^9.0.0 | Offline improvements, install prompt, service worker |
+| **Firebase** | ^12.8.0 | Rate limiting backend, analytics data storage |
+| **Firebase Admin** | ^13.6.0 | Server-side Firestore writes for analytics |
+| **Dexie** | ^4.2.1 | Client-side IndexedDB for analytics dashboard |
+| **Recharts** | ^2.15.0 | Analytics dashboard visualization |
+| **@playwright/test** | ^1.52.0 | E2E Auth0 testing with saved state |
+
+**Rationale for NO CHANGES**:
+1. **Cron automation** → Vercel Cron Jobs (built-in, no library needed)
+2. **Persistent rate limiting** → Firebase RTDB/Firestore (already have `firebase` + `firebase-admin`)
+3. **Interactive push** → FCM notification actions (already in `app/sw.ts:100-137`, `firebase-messaging-sw.js:38-57`)
+4. **PWA offline** → Serwist already handles caching, sync, IndexedDB (just needs `idb` wrapper)
+5. **Install prompt** → `beforeinstallprompt` event (web standard, no library)
+6. **Analytics dashboard** → Recharts + Dexie + Firestore (already have all)
+7. **E2E Auth0** → Playwright auth state (official pattern, no library)
+
+---
+
+## Integration Points with Existing Stack
+
+### 1. Cron Automation (Vercel Cron Jobs)
+
+**Configuration**: `vercel.json` in project root
+
+```json
+{
+  "crons": [
+    {
+      "path": "/api/cron/check-scheduler",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/cleanup-logs",
+      "schedule": "0 2 * * *"
+    }
+  ]
 }
-
-// components/ui/Button.tsx
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
-
-const buttonVariants = cva(
-  'rounded-xl font-medium transition-colors', // base
-  {
-    variants: {
-      variant: {
-        ember: 'bg-ember-400 text-white hover:bg-ember-500',
-        ghost: 'bg-transparent text-slate-200 hover:bg-white/5',
-        outline: 'border border-white/10 hover:border-ember-400',
-      },
-      size: {
-        sm: 'h-9 px-3 text-sm',
-        md: 'h-11 px-4',
-        lg: 'h-13 px-6 text-lg',
-      },
-    },
-    defaultVariants: {
-      variant: 'ember',
-      size: 'md',
-    },
-  }
-);
 ```
 
-### Icon Library
-
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| **lucide-react** | ^0.562.0 (KEEP) | Icon system | Already installed. 1,500+ consistent, modern icons. Tree-shakable, 22.1KB bundle size. Superior to react-icons (50K+ icons but inconsistent styles) and Heroicons (only 300 icons). No change needed. |
-
-**Rationale:** You already have lucide-react v0.562.0. This is the correct choice for 2026. Lucide offers the best balance of variety (1,500+ icons), consistency (24x24 grid), bundle size (tree-shakable), and Tailwind integration. React Icons has too much inconsistency across icon packs. Heroicons is too limited for a full app. Stick with Lucide.
-
-### Accessibility Testing
-
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| **jest-axe** | ^10.0.0 | Automated a11y testing | Integrates axe-core (industry standard) with Jest. Catches ~70% of WCAG violations automatically. Required for WCAG AA compliance goal. |
-| **@axe-core/react** | ^4.10.2 | Runtime accessibility auditing (dev only) | Shows a11y violations in browser console during development. Helps catch issues before tests. Dev-only bundle, zero production cost. |
-
-**Rationale:** jest-axe is the standard for automated accessibility testing in React. Version 10.0.0 (released March 2025) includes axe-core 4.10.2. Important limitation: ~30% of barriers require manual testing (color contrast in JSDOM, screen reader compatibility). Use jest-axe for automated gates, manual WCAG audits for compliance certification.
-
-**Setup:**
-```bash
-npm install --save-dev jest-axe @axe-core/react
-```
+**API Route Pattern**: Next.js 15 App Router
 
 ```typescript
-// jest.setup.js
-import 'jest-axe/extend-expect';
+// app/api/cron/check-scheduler/route.ts
+export const dynamic = 'force-dynamic';
 
-// app/layout.tsx (dev only)
-if (process.env.NODE_ENV !== 'production') {
-  import('@axe-core/react').then((axe) => {
-    axe.default(React, ReactDOM, 1000);
+export async function GET(request: Request) {
+  // Verify cron secret
+  const authHeader = request.headers.get('authorization');
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
+  // Execute cron logic
+  await checkSchedulerLogic();
+
+  return new Response('OK', { status: 200 });
+}
+```
+
+**Security**: Vercel auto-sets `CRON_SECRET` env var, sends as `Authorization: Bearer {CRON_SECRET}` header
+
+**Deployment**: Cron jobs **only run in production** (not dev, not preview)
+
+**Confidence: HIGH** (official Vercel feature, documented in [Vercel Cron Jobs](https://vercel.com/docs/cron-jobs))
+
+---
+
+### 2. Persistent Rate Limiting (Firebase RTDB)
+
+**Two Options**:
+
+#### Option A: @omgovich/firebase-functions-rate-limiter (Library)
+
+```typescript
+import { FirebaseFunctionsRateLimiter } from '@omgovich/firebase-functions-rate-limiter';
+import { getDatabase } from 'firebase-admin/database';
+
+const limiter = FirebaseFunctionsRateLimiter.withRealtimeDbBackend(
+  {
+    name: 'stove-ignite',
+    maxCalls: 10,
+    periodSeconds: 60,
+  },
+  getDatabase()
+);
+
+export async function POST(request: Request) {
+  const session = await auth0.getSession();
+  const userId = session?.user.sub;
+
+  try {
+    await limiter.rejectOnQuotaExceededOrRecordUsage(userId);
+    // Proceed with ignite
+  } catch (error) {
+    return Response.json({ error: 'Rate limit exceeded' }, { status: 429 });
+  }
+}
+```
+
+**Data Structure**: Stores in Firebase RTDB at `/rate_limits/{name}/{userId}`
+
+#### Option B: Custom Firestore Implementation (Recommended)
+
+```typescript
+// lib/rateLimiter.ts
+import { getFirestore } from 'firebase-admin/firestore';
+
+export async function checkRateLimit(
+  key: string,
+  maxCalls: number,
+  windowMs: number
+): Promise<boolean> {
+  const db = getFirestore();
+  const ref = db.collection('rate_limits').doc(key);
+  const doc = await ref.get();
+
+  const now = Date.now();
+  const data = doc.data();
+
+  if (!data || now - data.resetAt > windowMs) {
+    await ref.set({ count: 1, resetAt: now });
+    return true;
+  }
+
+  if (data.count >= maxCalls) {
+    return false;
+  }
+
+  await ref.update({ count: data.count + 1 });
+  return true;
+}
+```
+
+**Recommendation**: Start with **Option B** (custom). It's 20 lines, no dependency, uses existing Firestore. Add library later if rate limiting gets complex (per-IP, sliding windows, distributed counters).
+
+**Confidence: HIGH** (custom implementation), **MEDIUM** (library - fork dependency)
+
+---
+
+### 3. E2E Test Improvements (Playwright Auth0)
+
+**Pattern**: Authenticate once in setup project, save state, reuse across tests
+
+```typescript
+// tests/auth.setup.ts
+import { test as setup } from '@playwright/test';
+
+const authFile = 'playwright/.auth/user.json';
+
+setup('authenticate', async ({ page }) => {
+  await page.goto('/auth/login');
+
+  // Fill Auth0 Universal Login form
+  await page.fill('input[name="username"]', process.env.TEST_USER_EMAIL!);
+  await page.fill('input[name="password"]', process.env.TEST_USER_PASSWORD!);
+  await page.click('button[type="submit"]');
+
+  // Wait for redirect back to app
+  await page.waitForURL('/');
+
+  // Save auth state to file
+  await page.context().storageState({ path: authFile });
+});
+```
+
+**playwright.config.ts**:
+
+```typescript
+export default defineConfig({
+  projects: [
+    { name: 'setup', testMatch: /.*\.setup\.ts/ },
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'playwright/.auth/user.json',
+      },
+      dependencies: ['setup'],
+    },
+  ],
+});
+```
+
+**Security**: Use env vars for credentials, create **test-only Auth0 tenant**, never commit `user.json`
+
+**Confidence: HIGH** (official Playwright + Auth0 pattern, documented in [Playwright Authentication](https://playwright.dev/docs/auth) and [Auth0 Community](https://community.auth0.com/t/playwright-testing-with-authorization-code-flow/187895))
+
+---
+
+### 4. Interactive Push Notifications (FCM Actions)
+
+**Already Implemented** in `app/sw.ts:100-137` and `firebase-messaging-sw.js:38-57`
+
+**Enhancement Needed**: Add `actions` array to notification options
+
+```typescript
+// app/sw.ts (push event handler)
+const notificationOptions = {
+  body: payload.notification?.body || '',
+  icon: '/icons/icon-192.png',
+  badge: '/icons/icon-72.png',
+  tag: payload.data?.type || 'default',
+  requireInteraction: payload.data?.priority === 'high',
+  data: {
+    url: payload.data?.url || '/',
+    ...payload.data,
+  },
+  vibrate: payload.data?.priority === 'high' ? [200, 100, 200] : [100],
+
+  // NEW: Action buttons
+  actions: [
+    {
+      action: 'view',
+      title: 'Apri',
+      icon: '/icons/icon-72.png',
+    },
+    {
+      action: 'dismiss',
+      title: 'Ignora',
+    },
+  ],
+} as NotificationOptions;
+```
+
+**Action Handler**: Modify `notificationclick` event in `app/sw.ts:143-171`
+
+```typescript
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  if (event.action === 'dismiss') {
+    return; // Just close
+  }
+
+  const urlToOpen = event.notification.data?.url || '/';
+  // ... existing focus/navigate logic
+});
+```
+
+**Server Payload** (from Firebase Admin SDK):
+
+```typescript
+await admin.messaging().send({
+  token: userFcmToken,
+  notification: {
+    title: 'Stufa Accesa',
+    body: 'Accensione completata',
+  },
+  data: {
+    type: 'stove-status',
+    url: '/',
+  },
+  webpush: {
+    notification: {
+      actions: [
+        { action: 'view', title: 'Apri' },
+        { action: 'dismiss', title: 'Ignora' },
+      ],
+    },
+  },
+});
+```
+
+**Limitations**: Actions work on **Android + desktop Chrome/Edge**. iOS requires PWA installed, **no action buttons** (just notification).
+
+**Confidence: HIGH** (official FCM feature, already have infrastructure)
+
+---
+
+### 5. PWA Offline Improvements
+
+**Current State**:
+- Serwist v9 configured in `next.config.ts`
+- Service worker at `app/sw.ts` with caching strategies
+- Already handles offline page (`/offline`), cache fallback
+- IndexedDB for command queue + device state (lines 184-498)
+
+**Enhancement**: Replace raw IndexedDB with `idb` wrapper
+
+**Before** (lines 192-214):
+
+```typescript
+function openDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains(COMMAND_QUEUE_STORE)) {
+        // ... store creation
+      }
+    };
   });
 }
 ```
 
-### Component Documentation (OPTIONAL)
+**After** (with `idb`):
 
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| **Storybook** | ^10.0.1 | Component catalog & testing | Industry standard for component documentation. Storybook 10 supports React 19 and Next.js 15. Includes accessibility addon for component-level auditing. |
-
-**Recommendation:** **DEFER to post-milestone.** Here's why:
-
-**Arguments FOR Storybook:**
-- Interactive component playground
-- Visual regression testing capabilities
-- Built-in accessibility addon
-- Team documentation
-
-**Arguments AGAINST (for this milestone):**
-- Setup complexity with Next.js 15 + React 19 (ongoing compatibility issues)
-- Adds 100+ dependencies
-- You already have `/debug/design-system` page showing components
-- Your project is single-developer (less documentation need)
-- Testing priority is unit tests (Jest) and E2E (Playwright), not visual regression
-
-**If you choose to add Storybook later:**
-```bash
-npx storybook@latest init --builder webpack5
-```
-Use Webpack builder (not Vite) for Next.js compatibility. Expect 30-60 minutes setup time for Next.js 15 + React 19 configuration.
-
-### Design Token Management
-
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| **Tailwind CSS v4.x** | N/A (future) | CSS-first design tokens | NOT RECOMMENDED for this milestone. V4 changes configuration paradigm from JS to CSS (`@theme` directive). Your tailwind.config.ts works. Migration provides zero functional benefit for milestone goals. |
-
-**Rationale:** Tailwind CSS v4 introduced `@theme` directive for CSS-first design tokens. This is conceptually cleaner (design tokens in CSS, not JS) but requires migration effort. Your existing Tailwind v4.1.18 configuration already exposes design tokens as CSS variables. The v4 `@theme` migration provides no new functionality for your milestone (component library completion). Defer to v5 or major redesign.
-
-**Current approach (KEEP):**
 ```typescript
-// tailwind.config.ts
-export default {
-  theme: {
-    extend: {
-      colors: {
-        ember: { 400: '#f18d33', 500: '#ed6f10', 700: '#b83d09' },
-        // ... automatically becomes CSS variables
-      },
-    },
+import { openDB } from 'idb';
+
+const db = await openDB('pannello-stufa-pwa', 1, {
+  upgrade(db) {
+    if (!db.objectStoreNames.contains('commandQueue')) {
+      const store = db.createObjectStore('commandQueue', {
+        keyPath: 'id',
+        autoIncrement: true,
+      });
+      store.createIndex('status', 'status');
+      store.createIndex('timestamp', 'timestamp');
+    }
+    // ... other stores
   },
+});
+
+// Get pending commands (no Promise wrapper needed)
+const commands = await db.getAllFromIndex('commandQueue', 'status', 'pending');
+```
+
+**Benefit**: 60% less boilerplate, cleaner async/await, better TypeScript support
+
+**Confidence: HIGH** (replacing existing code with better API)
+
+---
+
+### 6. PWA Install Prompt
+
+**Web Standard API**: `beforeinstallprompt` event
+
+```typescript
+// app/hooks/useInstallPrompt.ts
+'use client';
+
+import { useEffect, useState } from 'react';
+
+export function useInstallPrompt() {
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handler);
+
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const promptInstall = async () => {
+    if (!deferredPrompt) return false;
+
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+
+    if (outcome === 'accepted') {
+      setIsInstallable(false);
+    }
+
+    setDeferredPrompt(null);
+    return outcome === 'accepted';
+  };
+
+  return { isInstallable, promptInstall };
+}
+```
+
+**UI Component**:
+
+```tsx
+// app/components/InstallBanner.tsx
+'use client';
+
+import { useInstallPrompt } from '@/app/hooks/useInstallPrompt';
+import Banner from '@/app/components/ui/Banner';
+import Button from '@/app/components/ui/Button';
+
+export default function InstallBanner() {
+  const { isInstallable, promptInstall } = useInstallPrompt();
+
+  if (!isInstallable) return null;
+
+  return (
+    <Banner variant="info" title="Installa l'app">
+      <p>Aggiungi Pannello Stufa alla tua home screen per accesso rapido</p>
+      <Button onClick={promptInstall} size="sm">
+        Installa
+      </Button>
+    </Banner>
+  );
+}
+```
+
+**Limitations**:
+- **iOS Safari**: Event doesn't fire, use Share → Add to Home Screen menu
+- **Chrome/Edge iOS**: No PWA support, must use Safari
+- **Android Chrome/Edge**: Full support
+
+**Confidence: HIGH** (web standard, widely supported, fallback for iOS)
+
+---
+
+### 7. Analytics Dashboard (Usage Tracking)
+
+**Data Flow**:
+1. **Collection**: Client sends usage events to `/api/analytics/track` API route
+2. **Storage**: API route writes to Firestore `analytics/{userId}/events/{eventId}`
+3. **Aggregation**: API route `/api/analytics/summary` queries Firestore, calculates metrics
+4. **Visualization**: Dashboard page uses Recharts to render graphs
+
+**Firestore Schema**:
+
+```typescript
+// collections/analytics/{userId}/events/{autoId}
+{
+  timestamp: Timestamp,
+  type: 'stove_ignite' | 'stove_shutdown' | 'scheduler_enable' | ...,
+  device: 'stove' | 'thermostat' | 'lights',
+  metadata: {
+    source?: 'manual' | 'scheduler' | 'automation',
+    duration?: number, // seconds
+    pelletUsed?: number, // grams (estimated)
+    temperature?: number,
+  }
+}
+
+// collections/analytics_summaries/{userId}/daily/{date}
+{
+  date: '2026-02-10',
+  stoveRuntime: 14400, // seconds
+  pelletUsed: 5200, // grams (estimated)
+  igniteCount: 3,
+  temperatureAvg: 21.5,
+  weatherCorrelation: {
+    outdoorTemp: 8.5,
+    indoorTemp: 21.5,
+  }
+}
+```
+
+**Dashboard Components**:
+
+```tsx
+// app/analytics/page.tsx
+import { AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
+
+export default async function AnalyticsPage() {
+  const session = await auth0.getSession();
+  const summary = await fetch('/api/analytics/summary?days=30');
+  const data = await summary.json();
+
+  return (
+    <div>
+      <Heading variant="ember">Analisi Consumi</Heading>
+
+      {/* Stove usage over time */}
+      <AreaChart width={800} height={300} data={data.dailyUsage}>
+        <XAxis dataKey="date" />
+        <YAxis />
+        <Tooltip />
+        <Area type="monotone" dataKey="runtime" stroke="#f97316" fill="#fed7aa" />
+      </AreaChart>
+
+      {/* Pellet consumption estimation */}
+      <AreaChart width={800} height={300} data={data.pelletEstimate}>
+        <XAxis dataKey="date" />
+        <YAxis />
+        <Tooltip />
+        <Area type="monotone" dataKey="pelletKg" stroke="#059669" fill="#a7f3d0" />
+      </AreaChart>
+
+      {/* Weather correlation */}
+      <LineChart width={800} height={300} data={data.weatherCorrelation}>
+        <XAxis dataKey="date" />
+        <YAxis yAxisId="left" />
+        <YAxis yAxisId="right" orientation="right" />
+        <Tooltip />
+        <Line yAxisId="left" dataKey="outdoorTemp" stroke="#3b82f6" />
+        <Line yAxisId="right" dataKey="runtime" stroke="#f97316" />
+      </LineChart>
+    </div>
+  );
+}
+```
+
+**Pellet Consumption Estimation**:
+
+```typescript
+// lib/analytics/pelletEstimator.ts
+const PELLET_USAGE_RATES = {
+  P1: 0.6, // kg/hour
+  P2: 0.9,
+  P3: 1.2,
+  P4: 1.5,
+  P5: 1.8,
 };
+
+export function estimatePelletUsage(
+  runtimeSeconds: number,
+  averagePower: number
+): number {
+  const hours = runtimeSeconds / 3600;
+  const powerLevel = `P${averagePower}` as keyof typeof PELLET_USAGE_RATES;
+  const rateKgPerHour = PELLET_USAGE_RATES[powerLevel] || 1.2;
+
+  return hours * rateKgPerHour * 1000; // grams
+}
 ```
 
----
+**Weather Correlation**: Use existing Open-Meteo data (already fetched for weather API)
 
-## Alternatives Considered
-
-| Category | Recommended | Alternative | Why Not |
-|----------|-------------|-------------|---------|
-| **Component Primitives** | Radix UI | Headless UI | Smaller component set (no Slider, Accordion, Progress). Less TypeScript support. Tailwind Labs ecosystem lock-in. |
-| **Component Primitives** | Radix UI | React Aria | More verbose API. Requires deeper a11y knowledge. Steeper learning curve. Better for design system teams, overkill for single app. |
-| **Component Primitives** | Radix UI | Build everything from scratch | Massive time investment. High risk of a11y bugs. Keyboard navigation edge cases. Not worth it for complex components (Dialog, Dropdown). |
-| **Full UI Framework** | N/A | shadcn/ui | Copy-paste component library built ON Radix. You already have components and design system. Would create conflicts with existing Button, Card, etc. |
-| **Full UI Framework** | N/A | Material UI / Chakra UI | Pre-styled components fight Tailwind. Bundle size explosion (500KB+). Design system lock-in. You want Ember Noir, not Material Design. |
-| **Variant Management** | CVA | Tailwind Variants (beta) | Official Tailwind solution still in beta. CVA is production-proven (7.2M weekly downloads). Better TypeScript DX. |
-| **Icon Library** | Lucide (keep) | React Icons | 50K+ icons but inconsistent styles across packs (Font Awesome, Material, Bootstrap mixed). Larger bundle if not careful with imports. |
-| **Icon Library** | Lucide (keep) | Heroicons | Only 300 icons. Too limited for full app. Great for Tailwind marketing sites, insufficient for complex PWA. |
-| **Testing** | jest-axe | Playwright Accessibility | E2E accessibility testing. Slower, more brittle. Use for critical user flows, not component-level testing. |
-| **Documentation** | `/debug/design-system` | Storybook | 100+ dependencies, setup complexity. Overkill for single-developer project with existing design system page. |
-
----
-
-## Installation
-
-### Required (Core Libraries)
-
-```bash
-# Component primitives
-npm install @radix-ui/react-dialog @radix-ui/react-dropdown-menu @radix-ui/react-select @radix-ui/react-tooltip @radix-ui/react-checkbox @radix-ui/react-switch
-
-# Variant management
-npm install class-variance-authority clsx tailwind-merge
-
-# Accessibility testing (dev)
-npm install --save-dev jest-axe @axe-core/react
-```
-
-**Total additions:** 10 packages (~250KB production bundle, ~5MB node_modules)
-
-### Optional (Deferred)
-
-```bash
-# Storybook (if needed later)
-npx storybook@latest init --builder webpack5
-```
-
----
-
-## Integration Checklist
-
-After installation, integrate with existing codebase:
-
-- [ ] Create `lib/utils.ts` with `cn` utility (clsx + tailwind-merge)
-- [ ] Add jest-axe to `jest.setup.js`
-- [ ] Add `@axe-core/react` to `app/layout.tsx` (dev only)
-- [ ] Refactor existing Button component to use CVA
-- [ ] Build Dialog component with `@radix-ui/react-dialog`
-- [ ] Build Dropdown component with `@radix-ui/react-dropdown-menu`
-- [ ] Build enhanced Select component with `@radix-ui/react-select`
-- [ ] Build Tooltip component with `@radix-ui/react-tooltip`
-- [ ] Add accessibility tests for all interactive components
-- [ ] Update `/debug/design-system` page with new components
-
----
-
-## Migration Strategy
-
-### Phase 1: Foundation (Milestone 11 - Weeks 1-2)
-1. Install core dependencies (Radix primitives, CVA, utils)
-2. Create `cn` utility and CVA patterns
-3. Set up jest-axe and @axe-core/react
-4. Write accessibility test patterns
-
-### Phase 2: Refactor Existing (Milestone 11 - Week 3)
-5. Migrate Button to CVA variants
-6. Migrate Card to CVA variants
-7. Enhance existing Checkbox with Radix primitives
-8. Enhance existing Toggle with Radix Switch
-
-### Phase 3: New Components (Milestone 11 - Week 4)
-9. Build Dialog component (Radix)
-10. Build Dropdown component (Radix)
-11. Build enhanced Select component (Radix)
-12. Build Tooltip component (Radix)
-
-### Phase 4: Testing & Documentation (Milestone 11 - Week 5)
-13. Write unit tests for all components
-14. Add accessibility tests with jest-axe
-15. Update design system documentation page
-16. Manual WCAG AA audit
+**Confidence: HIGH** (all libraries already in stack, standard Firestore + Recharts patterns)
 
 ---
 
 ## What NOT to Add
 
-**Avoid these common traps:**
+### ❌ Separate Cron Service (node-cron, cron, bull)
+**Why**: Vercel Cron Jobs are serverless, free for Hobby tier, integrated with deployment. No need for separate service or Redis queue.
 
-1. **Full UI frameworks** (MUI, Chakra, Ant Design)
-   - **Why not:** Pre-styled components conflict with Ember Noir design system. Massive bundle sizes (500KB-2MB). You'd spend more time overriding their styles than building from scratch.
+### ❌ Separate Rate Limiting Library (express-rate-limit, rate-limiter-flexible)
+**Why**: Built for Express, not Next.js App Router. Firebase RTDB/Firestore is better fit for serverless (stateless between requests).
 
-2. **Tailwind CSS v4 migration**
-   - **Why not:** Zero functional benefit for milestone goals. Configuration paradigm change (JS → CSS) requires full config rewrite. Your current setup already exposes CSS variables. Defer to Tailwind v5 or major redesign.
+### ❌ Separate IndexedDB Library for Client (localForage, idb-keyval)
+**Why**: Already have Dexie (4.2.1) for client-side. Only need `idb` for **service worker** where Dexie doesn't work well.
 
-3. **Storybook (for now)**
-   - **Why not:** 100+ dependencies, 30-60 minute setup, ongoing React 19 compatibility issues. You have `/debug/design-system` page. Single-developer project doesn't need visual documentation tool. Add post-milestone if team grows.
+### ❌ Chart Library Alternatives (Chart.js, Victory, Nivo)
+**Why**: Already have Recharts (2.15.0), 53 pre-built components, works perfectly with React Server Components.
 
-4. **CSS-in-JS libraries** (Styled Components, Emotion)
-   - **Why not:** Conflicts with Tailwind utility-first approach. Runtime performance cost. Server Components compatibility issues. Tailwind + CVA provides type-safe styling without CSS-in-JS overhead.
+### ❌ Playwright Plugins for Auth0 (@auth0/auth0-spa-js test helpers)
+**Why**: Official Playwright auth state pattern is simpler, no dependency, works across all auth providers.
 
-5. **Animation libraries** (Framer Motion, React Spring)
-   - **Why not:** Your design system already has `animate-fade-in`, `animate-scale-in`, etc. Tailwind CSS animations + Radix animation hooks are sufficient. Framer Motion is 40KB. Only add if complex animation choreography needed (not in milestone scope).
-
-6. **Form libraries** (React Hook Form is already installed)
-   - **Why not:** You already have `react-hook-form` v7.54.2 and `zod` v3.24.2. This is the correct stack for form validation. No changes needed.
-
-7. **State management beyond React** (Zustand, Jotai, Redux)
-   - **Why not:** Design system components should be stateless or use local React state. If you need global state for app logic, that's separate from component library scope. You already have Firebase for shared state.
+### ❌ Service Worker Library Alternatives (Workbox, next-pwa)
+**Why**: Already using Serwist v9 (successor to next-pwa), maintained, Next.js 15 compatible.
 
 ---
 
-## Performance Considerations
+## Installation Commands
 
-**Bundle Size Impact:**
-
-| Addition | Production Size | Notes |
-|----------|----------------|-------|
-| @radix-ui/react-dialog | ~15KB | Tree-shakable per component |
-| @radix-ui/react-dropdown-menu | ~18KB | Includes nested menu logic |
-| @radix-ui/react-select | ~20KB | Most complex primitive |
-| @radix-ui/react-tooltip | ~8KB | Positioning engine |
-| class-variance-authority | ~2KB | Tiny API surface |
-| clsx | ~0.2KB | Ultra-lightweight |
-| tailwind-merge | ~5KB | Class conflict resolution |
-| **TOTAL** | **~68KB** | Gzipped estimate |
-
-**Runtime Performance:**
-
-- Radix components use React Portals (no layout thrashing)
-- CVA compiles variants at build time (zero runtime cost)
-- clsx and tailwind-merge are micro-optimized (< 1ms)
-- No CSS-in-JS runtime (Tailwind is build-time)
-
-**Comparison to alternatives:**
-
-- Material UI: ~500KB (7x larger)
-- Chakra UI: ~350KB (5x larger)
-- Ant Design: ~1.2MB (18x larger)
-- Building from scratch: 0KB but 100+ hours development + ongoing maintenance
-
----
-
-## Testing Strategy
-
-### Unit Tests (Jest + Testing Library)
-
-```typescript
-// Button.test.tsx
-import { render, screen } from '@testing-library/react';
-import { axe, toHaveNoViolations } from 'jest-axe';
-import { Button } from './Button';
-
-expect.extend(toHaveNoViolations);
-
-describe('Button', () => {
-  it('renders with correct variant', () => {
-    render(<Button variant="ember">Click me</Button>);
-    expect(screen.getByRole('button')).toHaveClass('bg-ember-400');
-  });
-
-  it('has no accessibility violations', async () => {
-    const { container } = render(<Button>Click me</Button>);
-    const results = await axe(container);
-    expect(results).toHaveNoViolations();
-  });
-});
+### Required
+```bash
+npm install idb@^8.0.3
 ```
 
-### E2E Tests (Playwright - already configured)
-
-```typescript
-// dialog.spec.ts
-import { test, expect } from '@playwright/test';
-
-test('dialog keyboard navigation', async ({ page }) => {
-  await page.goto('/dashboard');
-  await page.click('button[aria-label="Settings"]');
-  await page.keyboard.press('Escape');
-  await expect(page.locator('[role="dialog"]')).not.toBeVisible();
-});
+### Optional (Evaluate During Planning)
+```bash
+# Only if custom rate limiter insufficient
+npm install @omgovich/firebase-functions-rate-limiter@^4.3.0
 ```
 
-### Accessibility Audits
+### Environment Variables (Vercel Dashboard)
 
-1. **Automated (jest-axe):** Catches 70% of WCAG violations
-2. **Runtime (axe-core/react):** Dev-time console warnings
-3. **Manual:** Keyboard navigation, screen reader testing (NVDA/JAWS/VoiceOver)
-4. **Tools:** Lighthouse (built into Chrome DevTools), axe DevTools extension
-
----
-
-## TypeScript Integration
-
-All recommended libraries have excellent TypeScript support:
-
-```typescript
-// Full type inference
-import { cva, type VariantProps } from 'class-variance-authority';
-import * as Dialog from '@radix-ui/react-dialog';
-
-const buttonVariants = cva(/* ... */);
-
-interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  // Additional props
-}
-
-// Radix exports all types
-interface DialogProps extends Dialog.DialogProps {
-  // Extended props
-}
+**Required for Cron Jobs**:
+```bash
+# Vercel auto-generates this, but verify it exists
+CRON_SECRET=<random-16-char-string>
 ```
 
-**No @types packages needed** - all libraries ship with native TypeScript definitions.
+**Required for E2E Auth0 Tests** (GitHub Secrets):
+```bash
+TEST_USER_EMAIL=test@example.com
+TEST_USER_PASSWORD=<secure-password>
+```
 
 ---
 
-## Confidence Assessment
+## Migration Notes
 
-| Area | Confidence | Reason |
-|------|------------|--------|
-| **Radix UI Recommendation** | HIGH | Industry standard, 1,500+ production apps, verified with official docs and ecosystem consensus. No alternative matches accessibility + DX. |
-| **CVA + clsx + tailwind-merge** | HIGH | Canonical pattern from shadcn/ui. 7M+ weekly downloads. Source code reviewed. Zero controversy in 2026 Tailwind ecosystem. |
-| **Lucide (keep existing)** | HIGH | Already installed, correct choice verified against alternatives. No change needed. |
-| **jest-axe** | HIGH | Version 10.0.0 confirmed current. Verified integration with Jest 30 and React 19. Official documentation reviewed. |
-| **Storybook deferral** | MEDIUM | React 19 + Next.js 15 compatibility issues documented in GitHub issues. Conservative recommendation given single-developer context. |
-| **Tailwind v4 deferral** | MEDIUM | Low confidence on migration urgency. V4 `@theme` directive is conceptually better but functionally equivalent to current setup. Risk vs. reward calculation. |
+### Replacing IndexedDB in Service Worker
 
----
+**Files to Update**:
+- `app/sw.ts` (lines 192-271, 420-447)
 
-## Sources
+**Pattern**: Replace `new Promise` wrappers with `idb` async/await
 
-**Radix UI vs Headless UI:**
-- [Headless UI vs Radix: Which One is Better in 2025?](https://www.subframe.com/tips/headless-ui-vs-radix)
-- [15 Best React UI Libraries for 2026](https://www.builder.io/blog/react-component-libraries-2026)
-- [React UI libraries in 2025: Comparing shadcn/ui, Radix, Mantine, MUI, Chakra & more](https://makersden.io/blog/react-ui-libs-2025-comparing-shadcn-radix-mantine-mui-chakra)
+**Estimated Effort**: 2-3 hours (refactor + test)
 
-**React Aria & Accessibility:**
-- [React Aria Official Documentation](https://react-aria.adobe.com/)
-- [Prioritising Accessibility in React and Next.js Applications](https://medium.com/@alexnjoroge/prioritising-accessibility-in-react-and-next-js-applications-9d68b5184df0)
-- [App Router: Improving Accessibility | Next.js](https://nextjs.org/learn/dashboard-app/improving-accessibility)
+### Adding vercel.json
 
-**Icon Libraries:**
-- [5 Best Icon Libraries for React Projects Using shadcn/ui and Tailwind CSS](https://www.shadcndesign.com/blog/5-best-icon-libraries-for-shadcn-ui)
-- [Best React Icon Libraries for 2026](https://mighil.com/best-react-icon-libraries)
-- [Lucide Icons Official Documentation](https://lucide.dev/guide/comparison)
+**New File**: `vercel.json` at project root
 
-**Accessibility Testing:**
-- [How to test for accessibility with axe-core in Next.js and React](https://larsmagnus.co/blog/how-to-test-for-accessibility-with-axe-core-in-next-js-and-react)
-- [jest-axe - npm](https://www.npmjs.com/package/jest-axe)
-- [How to Test React Applications for Accessibility with axe-core](https://oneuptime.com/blog/post/2026-01-15-test-react-accessibility-axe-core/view)
-
-**Storybook:**
-- [Storybook for Next.js with Webpack](https://storybook.js.org/docs/get-started/frameworks/nextjs)
-- [Storybook error with latest NextJS 15 release and React 19 RC](https://github.com/ixartz/Next-js-Boilerplate/issues/322)
-
-**Class Variance Authority:**
-- [Class Variance Authority Official Documentation](https://cva.style/docs)
-- [class-variance-authority - npm](https://www.npmjs.com/package/class-variance-authority)
-- [CVA vs. Tailwind Variants: Choosing the Right Tool for Your Design System](https://dev.to/webdevlapani/cva-vs-tailwind-variants-choosing-the-right-tool-for-your-design-system-12am)
-
-**clsx + tailwind-merge:**
-- [Mastering Tailwind CSS: Overcome Styling Conflicts with Tailwind Merge and clsx](https://dev.to/sheraz4194/mastering-tailwind-css-overcome-styling-conflicts-with-tailwind-merge-and-clsx-1dol)
-- [tailwind-merge - npm](https://www.npmjs.com/package/tailwind-merge)
-
-**Tailwind CSS v4:**
-- [Tailwind CSS v4.0](https://tailwindcss.com/blog/tailwindcss-v4)
-- [Tailwind CSS 4 with Next.js 15: Design Tokens, Container Queries & Theming at Scale](https://medium.com/@sureshdotariya/tailwind-css-4-with-next-js-15-design-tokens-container-queries-theming-at-scale-1d2d0de179ce)
-
-**Testing Library + React 19:**
-- [@testing-library/react - npm](https://www.npmjs.com/package/@testing-library/react)
-- [the "@testing-library/react" not integrate with react @19.0.0](https://github.com/testing-library/react-testing-library/issues/1368)
-
-**Radix UI Versions:**
-- [Releases – Radix Primitives](https://www.radix-ui.com/primitives/docs/overview/releases)
-- [@radix-ui/react-primitive - npm](https://www.npmjs.com/package/@radix-ui/react-primitive)
+**Impact**: None on existing functionality (cron routes additive)
 
 ---
 
-**Last updated:** 2026-01-28
-**Next review:** After Phase 1 implementation (validate bundle sizes, DX)
+## Version Compatibility Matrix
+
+| Library | Current | v6.0 | Compatible | Notes |
+|---------|---------|------|------------|-------|
+| Next.js | ^16.1.0 | ^16.1.0 | ✅ | No change |
+| @serwist/next | ^9.0.0 | ^9.0.0 | ✅ | Works with Next.js 15+16 |
+| Firebase | ^12.8.0 | ^12.8.0 | ✅ | No change |
+| Recharts | ^2.15.0 | ^2.15.0 | ✅ | No change |
+| Dexie | ^4.2.1 | ^4.2.1 | ✅ | Client-side only |
+| **idb** | - | ^8.0.3 | ✅ | NEW: Service worker only |
+| Playwright | ^1.52.0 | ^1.52.0 | ✅ | Auth state since v1.18 |
+
+---
+
+## Research Sources
+
+### Vercel Cron Jobs
+- [Vercel Cron Jobs Documentation](https://vercel.com/docs/cron-jobs)
+- [Getting started with cron jobs](https://vercel.com/docs/cron-jobs/quickstart)
+- [Cron Jobs in Next.js: Serverless vs Serverful](https://yagyaraj234.medium.com/running-cron-jobs-in-nextjs-guide-for-serverful-and-stateless-server-542dd0db0c4c)
+
+### Firebase Rate Limiting
+- [firebase-functions-rate-limiter - npm](https://www.npmjs.com/package/firebase-functions-rate-limiter)
+- [@omgovich/firebase-functions-rate-limiter - npm](https://www.npmjs.com/package/@omgovich/firebase-functions-rate-limiter)
+- [Tutorial: Firestore Rate Limiting](https://fireship.io/lessons/how-to-rate-limit-writes-firestore/)
+
+### FCM Interactive Notifications
+- [Receive messages in Web apps | Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/js/receive)
+- [Implementing Action Buttons in Push Notifications using Firebase and Notifee](https://medium.com/@hassem_mahboob/implementing-action-buttons-in-push-notifications-using-firebase-and-notifee-f5743bdb28bc)
+
+### PWA Install Prompt
+- [How to Implement PWA in Next.js App router 2026](https://medium.com/@amirjld/how-to-implement-pwa-progressive-web-app-in-next-js-app-router-2026-f25a6797d5e6)
+- [Installation prompt | web.dev](https://web.dev/learn/pwa/installation-prompt)
+- [Trigger installation from your PWA - MDN](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/How_to/Trigger_install_prompt)
+
+### Playwright Auth0
+- [Playwright testing with Authorization Code Flow - Auth0 Community](https://community.auth0.com/t/playwright-testing-with-authorization-code-flow/187895)
+- [Authentication | Playwright](https://playwright.dev/docs/auth)
+- [How to Configure Auth0 Playwright for Secure, Repeatable Access](https://hoop.dev/blog/how-to-configure-auth0-playwright-for-secure-repeatable-access/)
+
+### IndexedDB & Offline
+- [idb - npm](https://www.npmjs.com/package/idb)
+- [Build an Offline-First Mood Journal PWA with Next.js & IndexedDB](https://www.wellally.tech/blog/build-offline-first-pwa-nextjs-indexeddb)
+- [Building an Offline-First PWA Notes App with Next.js, IndexedDB, and Supabase (Jan 2026)](https://oluwadaprof.medium.com/building-an-offline-first-pwa-notes-app-with-next-js-indexeddb-and-supabase-f861aa3a06f9)
+
+### Firestore Analytics
+- [Write-time aggregations | Firestore | Firebase](https://firebase.google.com/docs/firestore/solutions/aggregation)
+- [Summarize data with aggregation queries | Firestore | Firebase](https://firebase.google.com/docs/firestore/query-data/aggregation-queries)
+- [How to use Firebase Firestore to store and query time-series data](https://bootstrapped.app/guide/how-to-use-firebase-firestore-to-store-and-query-time-series-data)
+
+### Recharts
+- [Recharts: How to Use it and Build Analytics Dashboards](https://embeddable.com/blog/what-is-recharts)
+- [How to use Recharts to visualize analytics data (with examples)](https://posthog.com/tutorials/recharts)
+- [How to use Next.js and Recharts to build an information dashboard](https://ably.com/blog/informational-dashboard-with-nextjs-and-recharts)
+
+---
+
+**Last Updated**: 2026-02-10

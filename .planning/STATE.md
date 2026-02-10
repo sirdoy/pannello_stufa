@@ -100,6 +100,10 @@ Recent decisions affecting v6.0 work (full log in PROJECT.md):
 - [Phase 51-02]: Stove and thermostat tests are read-only to avoid triggering actions on real devices
 - [Phase 51-02]: Accessibility-first selectors (getByRole, text patterns) more resilient than CSS classes
 - [Phase 51-02]: 15-second timeouts account for dashboard API polling delays (5-15s intervals)
+- [Phase 51-03]: CI builds app first, then uses npm run start for stability (playwright.config.ts uses process.env.CI)
+- [Phase 51-03]: Notification tests validate UI only, no FCM service worker interaction (Playwright cannot test Push API)
+- [Phase 51-03]: GitHub encrypted secrets for all Auth0 and Firebase credentials (user configures secrets in repository settings)
+- [Phase 51-03]: Blob reporter in CI for compact binary artifacts (suitable for merging parallel results)
 
 ### Pending Todos
 
@@ -130,7 +134,7 @@ None yet for v6.0. Use `/gsd:add-todo` to capture ideas during execution.
 ## Session Continuity
 
 Last session: 2026-02-10
-Stopped at: Completed Phase 51 Plan 02 (Auth smoke tests and critical flow E2E tests)
+Stopped at: Completed Phase 51 Plan 03 (Notification delivery test and CI workflow)
 Resume file: None
 
 Next action: Continue Phase 51 (Plan 03: GitHub Actions CI workflow) or next phase

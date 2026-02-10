@@ -77,6 +77,7 @@ export default function StoveCard() {
   const [isFirebaseConnected, setIsFirebaseConnected] = useState(true);
   const [usePollingFallback, setUsePollingFallback] = useState(false);
   const lastFirebaseUpdateRef = useRef<number | null>(null);
+  const isFirstConnectionRef = useRef(true);
 
   // Refs for tracking previous values (for Firebase sync on external changes)
   const previousStatusRef = useRef(null);
@@ -302,11 +303,13 @@ export default function StoveCard() {
       const connected = snapshot.val();
       setIsFirebaseConnected(connected);
 
-      if (!connected) {
+      // Skip warning on initial mount (Firebase starts as disconnected before connecting)
+      if (!connected && !isFirstConnectionRef.current) {
         console.warn('[StoveCard] Firebase disconnected, activating polling fallback');
         setUsePollingFallback(true);
-      } else {
+      } else if (connected) {
         console.log('[StoveCard] Firebase connected');
+        isFirstConnectionRef.current = false;
         // Keep polling fallback for 30s after reconnection to ensure sync
         setTimeout(() => {
           setUsePollingFallback(false);

@@ -6,16 +6,16 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** Phase 50 - Cron Automation Configuration (v6.0 Operations, PWA & Analytics)
+**Current focus:** Phase 51 - Testing Automation (v6.0 Operations, PWA & Analytics)
 
 ## Current Position
 
-Phase: 50 of 54 (Cron Automation Configuration)
-Plan: 04 completed (PHASE COMPLETE)
-Status: Phase 50 complete - Cron automation verified end-to-end
-Last activity: 2026-02-10 - Completed quick task 18: rimuovi le quick actions da tutte le card
+Phase: 51 of 54 (E2E Test Improvements)
+Plan: 01 completed
+Status: Phase 51 started - Playwright infrastructure with Auth0 session caching complete
+Last activity: 2026-02-10 - Completed 51-01-PLAN.md
 
-Progress: [████████░░] 85.0% (255 of 300+ estimated total plans)
+Progress: [████████░░] 85.3% (256 of 300+ estimated total plans)
 
 ## Performance Metrics
 
@@ -56,6 +56,12 @@ Progress: [████████░░] 85.0% (255 of 300+ estimated total pl
 | 50-03 | 7 min | 2 | 3 | 2026-02-10 | Complete ✅ |
 | 50-04 | 2 min | 2 | 0 | 2026-02-10 | Complete ✅ |
 
+**v6.0 Phase 51 Execution:**
+
+| Plan | Duration | Tasks | Files | Date | Status |
+|------|----------|-------|-------|------|--------|
+| 51-01 | 2.6 min | 3 | 5 | 2026-02-10 | Complete ✅ |
+
 ## Accumulated Context
 
 ### Decisions
@@ -86,6 +92,8 @@ Recent decisions affecting v6.0 work (full log in PROJECT.md):
 - [Phase 50-03]: Execution details (giorno, ora, schedule) included for dashboard visibility
 - [Phase 50-04]: GitHub Actions secrets (VERCEL_APP_URL, CRON_SECRET) configured via gh CLI for secure external cron invocation
 - [Phase 50-04]: Manual workflow_dispatch trigger confirmed end-to-end automation before production schedule activation
+- [Phase 51-01]: Session caching via storageState prevents redundant Auth0 logins (single login per test run)
+- [Phase 51-01]: Single worker in CI prevents Auth0 rate limiting during parallel test execution
 
 ### Pending Todos
 

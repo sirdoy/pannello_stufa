@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Power, Palette, Settings, RefreshCw } from 'lucide-react';
+import { Palette, Settings, RefreshCw } from 'lucide-react';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
 import RoomSelector from '../../ui/RoomSelector';
@@ -953,20 +953,6 @@ export default function LightsCard() {
         selectedRoomId={selectedRoomId || undefined}
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedRoomId(e.target.value)}
       />
-
-      {/* Quick Actions Bar */}
-      {selectedRoom && (
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <Button.Icon
-            icon={<Power className="w-5 h-5" /> as any}
-            aria-label={isRoomOn ? "Spegni Luci" : "Accendi Luci"}
-            variant={isRoomOn ? 'ember' : 'subtle'}
-            size="md"
-            onClick={() => handleRoomToggle(selectedRoomGroupedLightId || undefined, !isRoomOn)}
-            disabled={refreshing || !selectedRoomGroupedLightId}
-          />
-        </div>
-      )}
 
       {/* Selected Room Controls */}
       {selectedRoom ? (

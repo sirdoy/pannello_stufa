@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { RefreshCw, Camera, Activity, Settings } from 'lucide-react';
+import { RefreshCw, Activity, Settings } from 'lucide-react';
 import { CAMERA_ROUTES, NETATMO_ROUTES } from '@/lib/routes';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
@@ -280,18 +280,6 @@ export default function CameraCard() {
       ]}
       contextMenuItems={cameraContextMenuItems}
     >
-      {/* Quick Actions */}
-      <div className="flex items-center justify-center gap-3 mb-4">
-        <Button.Icon
-          icon={<Camera className="w-5 h-5" /> as any}
-          aria-label="Cattura Snapshot"
-          variant="subtle"
-          size="md"
-          onClick={() => selectedCameraId && fetchSnapshot(selectedCameraId)}
-          disabled={snapshotLoading || !selectedCameraId}
-        />
-      </div>
-
       {/* Camera selector if multiple */}
       {cameras.length > 1 && (
         <div className="flex gap-2 mb-4 overflow-x-auto pb-2 -mx-2 px-2">

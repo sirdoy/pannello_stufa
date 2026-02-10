@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 51 of 54 (E2E Test Improvements)
-Plan: 01 completed
-Status: Phase 51 started - Playwright infrastructure with Auth0 session caching complete
-Last activity: 2026-02-10 - Completed 51-01-PLAN.md
+Plan: 02 completed
+Status: Phase 51 in progress - Auth smoke tests and critical flow E2E tests complete
+Last activity: 2026-02-10 - Completed 51-02-PLAN.md
 
-Progress: [████████░░] 85.3% (256 of 300+ estimated total plans)
+Progress: [████████░░] 85.6% (257 of 300+ estimated total plans)
 
 ## Performance Metrics
 
@@ -61,6 +61,8 @@ Progress: [████████░░] 85.3% (256 of 300+ estimated total pl
 | Plan | Duration | Tasks | Files | Date | Status |
 |------|----------|-------|-------|------|--------|
 | 51-01 | 2.6 min | 3 | 5 | 2026-02-10 | Complete ✅ |
+| 51-02 | 2 min | 2 | 3 | 2026-02-10 | Complete ✅ |
+| Phase 51 P03 | 1.9 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -94,6 +96,10 @@ Recent decisions affecting v6.0 work (full log in PROJECT.md):
 - [Phase 50-04]: Manual workflow_dispatch trigger confirmed end-to-end automation before production schedule activation
 - [Phase 51-01]: Session caching via storageState prevents redundant Auth0 logins (single login per test run)
 - [Phase 51-01]: Single worker in CI prevents Auth0 rate limiting during parallel test execution
+- [Phase 51-02]: Auth smoke tests explicitly clear storageState to test real Auth0 login flow (feature tests use cached session)
+- [Phase 51-02]: Stove and thermostat tests are read-only to avoid triggering actions on real devices
+- [Phase 51-02]: Accessibility-first selectors (getByRole, text patterns) more resilient than CSS classes
+- [Phase 51-02]: 15-second timeouts account for dashboard API polling delays (5-15s intervals)
 
 ### Pending Todos
 
@@ -124,10 +130,10 @@ None yet for v6.0. Use `/gsd:add-todo` to capture ideas during execution.
 ## Session Continuity
 
 Last session: 2026-02-10
-Stopped at: Completed Quick Task 18 (Remove Quick Actions bars from device cards)
+Stopped at: Completed Phase 51 Plan 02 (Auth smoke tests and critical flow E2E tests)
 Resume file: None
 
-Next action: Start Phase 51 (Testing Automation) or continue v6.0 roadmap
+Next action: Continue Phase 51 (Plan 03: GitHub Actions CI workflow) or next phase
 
 ---
 *State updated: 2026-02-10 after completing Quick Task 18*

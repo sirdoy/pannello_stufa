@@ -110,10 +110,10 @@ Plans:
 **Plans**: 4 plans (3 original + 1 gap closure)
 
 Plans:
-- [ ] 51-01-PLAN.md — Playwright config + Auth0 auth setup + session caching + helpers
-- [ ] 51-02-PLAN.md — Auth smoke tests + stove ignition + thermostat schedule flow tests
-- [ ] 51-03-PLAN.md — Notification delivery flow test + GitHub Actions CI workflow
-- [ ] 51-04-PLAN.md — Gap closure: add missing dotenv dependency to package.json
+- [x] 51-01-PLAN.md — Playwright config + Auth0 auth setup + session caching + helpers
+- [x] 51-02-PLAN.md — Auth smoke tests + stove ignition + thermostat schedule flow tests
+- [x] 51-03-PLAN.md — Notification delivery flow test + GitHub Actions CI workflow
+- [x] 51-04-PLAN.md — Gap closure: add missing dotenv dependency to package.json
 
 ### Phase 52: Interactive Push Notifications
 **Goal**: Action buttons in notifications allow direct device control ("Spegni stufa", "Imposta manuale") with platform-specific payloads for iOS and Android.
@@ -192,7 +192,7 @@ Phases execute in numeric order: 49 → 50 → 51 → 52 → 53 → 54
 | 1-5 | v1.0 | 29/29 | ✓ Complete | 2026-01-26 |
 | 49 | v6.0 | 4/4 | ✓ Complete | 2026-02-10 |
 | 50 | v6.0 | 4/4 | ✓ Complete | 2026-02-10 |
-| 51 | v6.0 | 0/TBD | Not started | - |
+| 51 | v6.0 | 4/4 | ✓ Complete | 2026-02-10 |
 | 52 | v6.0 | 0/TBD | Not started | - |
 | 53 | v6.0 | 0/TBD | Not started | - |
 | 54 | v6.0 | 0/TBD | Not started | - |
@@ -203,4 +203,4 @@ Phases execute in numeric order: 49 → 50 → 51 → 52 → 53 → 54
 **v6.0 Requirements:** 42 total (100% coverage validated)
 **Depth:** Comprehensive (6 phases for 42 requirements)
 **Created:** 2026-02-10
-**Last updated:** 2026-02-10 — Phase 50 complete
+**Last updated:** 2026-02-10 — Phase 51 complete

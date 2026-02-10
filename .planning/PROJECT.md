@@ -8,6 +8,19 @@ PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (co
 
 I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
+## Current Milestone: v6.0 Operations, PWA & Analytics
+
+**Goal:** Rendere l'app operativa al 100% (cron, resilienza), migliorare l'esperienza mobile (notifiche interattive, offline, installazione PWA), e aggiungere analytics storiche su utilizzo stufa e correlazione meteo.
+
+**Target features:**
+- Cron automation operativa (health monitoring + coordination)
+- Rate limiter persistente (Firebase-based)
+- E2E tests con Auth0 realistico
+- Health checks migliorati e Firestore index auto-deploy
+- Notifiche push interattive con action buttons
+- Offline mode migliorato e PWA install prompt guidato
+- Dashboard analytics: storico stufa, consumo pellet, trend, correlazione meteo
+
 ## Current State
 
 **Version:** v5.1 (shipped 2026-02-10)
@@ -359,7 +372,18 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-(No active requirements — start next milestone with `/gsd:new-milestone`)
+<!-- v6.0 scope — defined in REQUIREMENTS.md -->
+- [ ] Cron automation operativa per health monitoring e coordination
+- [ ] Rate limiter persistente (Firebase-based)
+- [ ] E2E tests migliorati con Auth0 realistico
+- [ ] Health checks robusti e Firestore index automation
+- [ ] Notifiche push interattive con action buttons
+- [ ] PWA offline mode migliorato
+- [ ] PWA install prompt guidato
+- [ ] Dashboard analytics storico stufa
+- [ ] Stima consumo pellet
+- [ ] Correlazione meteo-consumi con suggerimenti
+- [ ] Grafici trend e pattern detection
 
 ### Out of Scope
 
@@ -367,7 +391,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Notifiche SMS — Costo elevato, non core value
 - Notifiche programmate dall'utente — Scheduler già gestisce timing automatico
 - Ricche media notifications (v1) — Complessità rinviata a v2
-- Notifiche con azioni interattive (v1) — Possibile v2 enhancement
+- Notifiche con azioni interattive (v1) — Moved to v6.0 scope
 - Supporto altri provider (OneSignal, Pusher) — Firebase FCM sufficiente
 - Real-time read receipts — Privacy concerns, battery drain
 - Unlimited history retention — Database bloat + GDPR liability (90-day max)
@@ -503,4 +527,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Deployment**: Vercel (current hosting platform)
 
 ---
-*Last updated: 2026-02-10 after v5.1 milestone completion (Tech Debt & Code Quality)*
+*Last updated: 2026-02-10 after v6.0 milestone start (Operations, PWA & Analytics)*

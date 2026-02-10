@@ -6,16 +6,14 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** v5.1 Milestone Complete — ready for next milestone
+**Current focus:** v6.0 Operations, PWA & Analytics
 
 ## Current Position
 
-Phase: 48 of 48 (Dead Code Removal)
-Plan: 6 of 6 in current phase
-Status: MILESTONE COMPLETE (v5.1)
-Last activity: 2026-02-10 - v5.1 milestone archived
-
-Progress: [████████████████████████████████████████████████] 100% (248/248 total plans shipped)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-10 — Milestone v6.0 started
 
 ## Performance Metrics
 
@@ -57,15 +55,15 @@ None yet.
 
 No active blockers. Codebase is pristine and ready for feature development.
 
-**Pre-existing operational items:**
+**Pre-existing operational items (being addressed in v6.0):**
 - Cron automation not operational (requires cron-job.org setup)
 - Firestore indexes require manual deployment
 
 ## Session Continuity
 
 Last session: 2026-02-10
-Stopped at: v5.1 milestone archived, ready for next milestone
-Resume file: None — use `/gsd:new-milestone` for next work
+Stopped at: Defining v6.0 requirements
+Resume file: None — defining requirements in this session
 
 ---
-*State updated: 2026-02-10 after v5.1 milestone completion*
+*State updated: 2026-02-10 after v6.0 milestone start*

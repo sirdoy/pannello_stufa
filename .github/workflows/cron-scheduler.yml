@@ -1,0 +1,55 @@
+name: Cron Scheduler
+
+on:
+  schedule:
+    # Every 5 minutes
+    - cron: '*/5 * * * *'
+  workflow_dispatch:  # Allow manual trigger for testing
+
+jobs:
+  scheduler:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - name: Health Monitoring Check
+        run: |
+          echo "🔍 Checking health monitoring..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" "${{ secrets.VERCEL_APP_URL }}/api/health-monitoring/check?secret=${{ secrets.CRON_SECRET }}")
+
+          HTTP_BODY=$(echo "$RESPONSE" | head -n -1)
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n 1)
+
+          echo "Response: $HTTP_BODY"
+          echo "Status: $HTTP_CODE"
+
+          if [ "$HTTP_CODE" -ne 200 ]; then
+            echo "❌ Health monitoring check failed with status $HTTP_CODE"
+            exit 1
+          fi
+
+          echo "✅ Health monitoring check completed"
+
+      - name: Scheduler Check
+        run: |
+          echo "📅 Checking scheduler..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" "${{ secrets.VERCEL_APP_URL }}/api/scheduler/check?secret=${{ secrets.CRON_SECRET }}")
+
+          HTTP_BODY=$(echo "$RESPONSE" | head -n -1)
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n 1)
+
+          echo "Response: $HTTP_BODY"
+          echo "Status: $HTTP_CODE"
+
+          if [ "$HTTP_CODE" -ne 200 ]; then
+            echo "❌ Scheduler check failed with status $HTTP_CODE"
+            exit 1
+          fi
+
+          echo "✅ Scheduler check completed"
+
+      - name: Summary
+        run: |
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          echo "🎉 Cron job completed at $TIMESTAMP (UTC)"
+          echo "✅ Both health monitoring and scheduler checks passed"

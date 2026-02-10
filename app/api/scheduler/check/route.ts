@@ -43,6 +43,7 @@ import { proactiveTokenRefresh } from '@/lib/hue/hueRemoteTokenHelper';
 import { fetchWeatherForecast } from '@/lib/openMeteo';
 import { saveWeatherToCache } from '@/lib/weatherCacheService';
 import { PIDController } from '@/lib/utils/pidController';
+import { logCronExecution } from '@/lib/cronExecutionLogger';
 
 export const dynamic = 'force-dynamic';
 
@@ -771,11 +772,21 @@ export const GET = withCronSecret(async (_request) => {
   await adminDbSet('cronHealth/lastCall', cronHealthTimestamp);
   console.log(`✅ Cron health updated: ${cronHealthTimestamp}`);
 
+  // Record start time for execution logging
+  const startTime = Date.now();
+
   // Check if scheduler mode is enabled
   const modeData = ((await adminDbGet('schedules-v2/mode')) as any) || { enabled: false, semiManual: false };
   const schedulerEnabled = modeData.enabled;
 
   if (!schedulerEnabled) {
+    const duration = Date.now() - startTime;
+    logCronExecution({
+      status: 'MODALITA_MANUALE',
+      mode: 'manual',
+      duration,
+    }).catch(err => console.error('❌ Cron execution log error:', err));
+
     return success({
       status: 'MODALITA_MANUALE',
       message: 'Scheduler disattivato - modalità manuale attiva'
@@ -788,6 +799,14 @@ export const GET = withCronSecret(async (_request) => {
     const now = new Date();
 
     if (!returnToAutoAt || now < returnToAutoAt) {
+      const duration = Date.now() - startTime;
+      logCronExecution({
+        status: 'MODALITA_SEMI_MANUALE',
+        mode: 'semi-manual',
+        duration,
+        details: { returnToAutoAt: modeData.returnToAutoAt },
+      }).catch(err => console.error('❌ Cron execution log error:', err));
+
       return success({
         status: 'MODALITA_SEMI_MANUALE',
         message: 'Modalità semi-manuale attiva - in attesa del prossimo cambio scheduler',
@@ -820,6 +839,14 @@ export const GET = withCronSecret(async (_request) => {
   const intervals = (await adminDbGet(`schedules-v2/schedules/${activeScheduleId}/slots/${giorno}`) as any[] | null);
 
   if (!intervals) {
+    const duration = Date.now() - startTime;
+    logCronExecution({
+      status: 'NO_SCHEDULE',
+      mode: 'auto',
+      duration,
+      details: { giorno, ora },
+    }).catch(err => console.error('❌ Cron execution log error:', err));
+
     return success({ message: 'Nessuno scheduler', giorno, ora });
   }
 
@@ -908,6 +935,14 @@ export const GET = withCronSecret(async (_request) => {
       // Safety check - skip ignition if status fetch failed
       if (statusFetchFailed) {
         console.log('⚠️ Accensione schedulata saltata - stato stufa sconosciuto (safety)');
+        const duration = Date.now() - startTime;
+        logCronExecution({
+          status: 'STATUS_UNAVAILABLE',
+          mode: 'auto',
+          duration,
+          details: { giorno, ora },
+        }).catch(err => console.error('❌ Cron execution log error:', err));
+
         return success({
           status: 'STATUS_UNAVAILABLE',
           message: 'Accensione schedulata saltata per sicurezza - stato stufa non disponibile',
@@ -921,6 +956,14 @@ export const GET = withCronSecret(async (_request) => {
       const maintenanceAllowed = await canIgnite();
       if (!maintenanceAllowed) {
         console.log('⚠️ Accensione schedulata bloccata - manutenzione richiesta');
+        const duration = Date.now() - startTime;
+        logCronExecution({
+          status: 'MANUTENZIONE_RICHIESTA',
+          mode: 'auto',
+          duration,
+          details: { giorno, ora },
+        }).catch(err => console.error('❌ Cron execution log error:', err));
+
         return success({
           status: 'MANUTENZIONE_RICHIESTA',
           message: 'Accensione schedulata bloccata - manutenzione stufa richiesta',
@@ -932,6 +975,14 @@ export const GET = withCronSecret(async (_request) => {
 
       const ignitionResult = await handleIgnition(active, ora);
       if (ignitionResult.skipped) {
+        const duration = Date.now() - startTime;
+        logCronExecution({
+          status: ignitionResult.reason,
+          mode: 'auto',
+          duration,
+          details: { giorno, ora },
+        }).catch(err => console.error('❌ Cron execution log error:', err));
+
         return success({
           status: ignitionResult.reason,
           message: ignitionResult.reason === 'ALREADY_ON'
@@ -986,6 +1037,14 @@ export const GET = withCronSecret(async (_request) => {
     });
     console.log('Cambio scheduler applicato - modalità semi-manuale disattivata');
   }
+
+  const duration = Date.now() - startTime;
+  logCronExecution({
+    status: active ? 'ACCESA' : 'SPENTA',
+    mode: 'auto',
+    duration,
+    details: { giorno, ora, activeSchedule: active || null },
+  }).catch(err => console.error('❌ Cron execution log error:', err));
 
   return success({
     status: active ? 'ACCESA' : 'SPENTA',

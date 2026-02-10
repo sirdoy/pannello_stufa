@@ -511,3 +511,6 @@ export async function cleanupOldTokens(userId) {
   }
 }
 */
+
+// Re-export notification action capabilities for client-side feature detection
+export { supportsNotificationActions, getNotificationCapabilities } from './notificationActions';

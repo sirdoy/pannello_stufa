@@ -17,6 +17,7 @@ import { getFirestore, Firestore } from 'firebase-admin/firestore';
 import { logNotification } from './notificationLogger';
 import { filterNotificationByPreferences, getFilterMessage } from './notificationFilter';
 import { getDefaultPreferences } from './schemas/notificationPreferences';
+import { getActionsForNotificationType, ACTION_CATEGORIES, type NotificationActionDef } from './notificationActions';
 
 // Error codes that indicate token is permanently invalid
 const INVALID_TOKEN_ERRORS = [
@@ -296,6 +297,25 @@ interface NotificationPayload {
   data?: Record<string, string>;
   icon?: string;
   priority?: 'high' | 'normal';
+  actions?: NotificationActionDef[];
+}
+
+/**
+ * Helper: Get category for notification actions based on notification type
+ * Used for iOS aps.category and Android clickAction
+ */
+function getCategoryForActions(notificationType?: string): string {
+  if (!notificationType) return ACTION_CATEGORIES.STOVE_STATUS;
+  if (notificationType.startsWith('stove_error') || notificationType === 'CRITICAL' || notificationType === 'ERROR') {
+    return ACTION_CATEGORIES.STOVE_ERROR;
+  }
+  if (notificationType.startsWith('netatmo') || notificationType === 'status') {
+    return ACTION_CATEGORIES.THERMOSTAT_ALERT;
+  }
+  if (notificationType === 'maintenance') {
+    return ACTION_CATEGORIES.MAINTENANCE;
+  }
+  return ACTION_CATEGORIES.STOVE_STATUS;
 }
 
 /**
@@ -309,6 +329,7 @@ interface NotificationPayload {
  * @param {Object} [notification.data] - Dati custom aggiuntivi
  * @param {string} [notification.icon] - URL icona
  * @param {string} [notification.priority] - Priorità (high|normal)
+ * @param {NotificationActionDef[]} [notification.actions] - Action buttons
  * @param {string} [userId=null] - User ID for logging purposes
  */
 export async function sendPushNotification(
@@ -344,6 +365,10 @@ export async function sendPushNotification(
           priority: (notification.priority === 'high' ? 'high' : 'default') as 'high' | 'default',
           defaultSound: true,
           defaultVibrateTimings: true,
+          // Add click action for Android intent filtering when actions present
+          ...(notification.actions && notification.actions.length > 0 && {
+            clickAction: getCategoryForActions(notification.data?.type),
+          }),
         },
       },
       apns: {
@@ -359,6 +384,11 @@ export async function sendPushNotification(
               'content-available': 1,
               priority: 10,
             }),
+            // Add category for action buttons (iOS native apps)
+            // iOS Safari PWA doesn't render actions but category is future-proof
+            ...(notification.actions && notification.actions.length > 0 && {
+              category: getCategoryForActions(notification.data?.type),
+            }),
           },
         },
       },
@@ -370,6 +400,14 @@ export async function sendPushNotification(
           badge: '/icons/icon-72.png',
           requireInteraction: notification.priority === 'high',
           vibrate: notification.priority === 'high' ? [200, 100, 200] : [100],
+          // Add notification actions if provided
+          ...(notification.actions && notification.actions.length > 0 && {
+            actions: notification.actions.map(a => ({
+              action: a.action,
+              title: a.title,
+              ...(a.icon && { icon: a.icon }),
+            })),
+          }),
         },
         fcmOptions: {
           link: notification.data?.url || '/',

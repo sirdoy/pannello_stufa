@@ -10,16 +10,7 @@ import LoadingOverlay from './LoadingOverlay';
 import Toast from './Toast';
 import InfoBox from './InfoBox';
 import HealthIndicator from './HealthIndicator';
-import RightClickMenu from './RightClickMenu';
 import { Heading, EmptyState, Divider } from './index';
-
-export interface ContextMenuItem {
-  icon?: ReactNode;
-  label: string;
-  onSelect?: () => void;
-  disabled?: boolean;
-  separator?: boolean;
-}
 
 interface StatusBadge {
   label: string;
@@ -86,9 +77,6 @@ export interface DeviceCardProps extends Omit<SmartHomeCardProps, 'headerActions
   onToastClose?: () => void;
   // New props (v3.0 API)
   healthStatus?: 'ok' | 'warning' | 'error' | 'critical';
-  // Context menu props (v4.0)
-  contextMenuItems?: ContextMenuItem[];
-  onContextMenu?: () => void;
 }
 
 const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCard(
@@ -118,9 +106,6 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
     size = 'default',
     healthStatus,
     isLoading,
-    // Context menu props (v4.0)
-    contextMenuItems = [],
-    onContextMenu,
     ...props
   },
   ref
@@ -206,17 +191,7 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
   // Check if there are error banners
   const hasErrorBanner = banners.some((b) => b.variant === 'error');
 
-  // Check if context menu is enabled
-  const hasContextMenu = contextMenuItems && contextMenuItems.length > 0;
-
-  // Context menu props (override role to prevent accessibility violation)
-  // IMPORTANT: We override role to empty string to prevent Radix from adding role="button"
-  // to a div that contains block-level children (accessibility violation)
-  const contextMenuProps = hasContextMenu
-    ? { role: '' } // Override Radix's role="button" to fix accessibility error
-    : {};
-
-  // Card content (shared between with/without context menu)
+  // Card content
   const cardContent = (
     <SmartHomeCard
       ref={ref}
@@ -228,7 +203,6 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
       error={hasErrorBanner}
       disabled={!connected}
       className={cn('relative', className)}
-      {...contextMenuProps}
       {...props}
     >
       {/* Status area with Badge and HealthIndicator */}
@@ -305,32 +279,7 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
 
   return (
     <>
-      {hasContextMenu ? (
-        <RightClickMenu>
-          <RightClickMenu.Trigger asChild>
-            {cardContent}
-          </RightClickMenu.Trigger>
-          <RightClickMenu.Content>
-            {contextMenuItems.map((item, index) => (
-              item.separator ? (
-                <RightClickMenu.Separator key={index} />
-              ) : (
-                <RightClickMenu.Item
-                  key={item.label}
-                  icon={item.icon}
-                  onSelect={item.onSelect}
-                  disabled={item.disabled}
-                >
-                  {item.label}
-                </RightClickMenu.Item>
-              )
-            ))}
-          </RightClickMenu.Content>
-        </RightClickMenu>
-      ) : (
-        cardContent
-      )}
-
+      {cardContent}
       {/* Toast Notification - rendered outside SmartHomeCard */}
       {toast?.show && (
         <Toast {...(toast as any)} onClose={onToastClose} />

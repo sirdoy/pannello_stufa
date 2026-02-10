@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { Plus, Minus, Settings, Activity, RefreshCw } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
 import { getFullSchedulerMode, getNextScheduledAction } from '@/lib/schedulerService';
 import { clearSemiManualMode } from '@/lib/schedulerApiClient';
 import { STOVE_ROUTES } from '@/lib/routes';
@@ -25,7 +25,6 @@ import CronHealthBanner from '../../CronHealthBanner';
 import Toast from '../../ui/Toast';
 import LoadingOverlay from '../../ui/LoadingOverlay';
 import CardAccentBar from '../../ui/CardAccentBar';
-import RightClickMenu from '../../ui/RightClickMenu';
 import { Divider, Heading, Text, EmptyState, Badge, HealthIndicator } from '../../ui';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
@@ -910,26 +909,6 @@ export default function StoveCard() {
   const statusInfo = getStatusInfo(status);
   const statusDisplay = getStatusDisplay(status);
 
-  // Context menu items for extended actions
-  const stoveContextMenuItems = [
-    {
-      icon: <Settings className="w-4 h-4" />,
-      label: 'Impostazioni Stufa',
-      onSelect: () => router.push('/stove/settings'),
-    },
-    {
-      icon: <Activity className="w-4 h-4" />,
-      label: 'Log Attivita',
-      onSelect: () => router.push('/stove/logs'),
-    },
-    { separator: true },
-    {
-      icon: <RefreshCw className="w-4 h-4" />,
-      label: 'Aggiorna Stato',
-      onSelect: handleManualRefresh,
-    },
-  ];
-
   if (initialLoading) {
     return <Skeleton.StovePanel />;
   }
@@ -953,8 +932,7 @@ export default function StoveCard() {
         />
       )}
 
-      {/* Main Status Card - Ember Noir with Context Menu */}
-      <RightClickMenu>
+      {/* Main Status Card - Ember Noir */}
         <Card variant="elevated" padding={false} className="overflow-visible transition-all duration-500">
           <div className="relative">
                 {/* Modern Accent Bar with glow effect - pulses when stove is active */}
@@ -1069,8 +1047,7 @@ export default function StoveCard() {
                 </div>
               )}
 
-              {/* Status Display Box - Ember Noir - Wrapped in RightClickMenu.Trigger */}
-              <RightClickMenu.Trigger asChild>
+              {/* Status Display Box - Ember Noir */}
                 <div
                   className={`relative ${statusInfo.bgColor} rounded-2xl p-6 sm:p-8 ${statusInfo.glowColor} border ${statusInfo.borderColor} overflow-visible transition-all duration-500`}
                   data-status-variant={statusDisplay.variant}
@@ -1144,7 +1121,6 @@ export default function StoveCard() {
                       </div>
                     </div>
                 </div>
-              </RightClickMenu.Trigger>
             </div>
 
             {/* PRIMARY ACTIONS - Smart button based on state (like LightsCard) */}
@@ -1444,23 +1420,6 @@ export default function StoveCard() {
           </div>
               </div>
             </Card>
-        <RightClickMenu.Content>
-          {stoveContextMenuItems.map((item, index) => (
-            'separator' in item && item.separator ? (
-              <RightClickMenu.Separator key={index} />
-            ) : (
-              <RightClickMenu.Item
-                key={'label' in item ? item.label : index}
-                icon={'icon' in item ? item.icon : undefined}
-                onSelect={'onSelect' in item ? item.onSelect : undefined}
-                disabled={'disabled' in item ? (item.disabled as boolean) : undefined}
-              >
-                {'label' in item && item.label}
-              </RightClickMenu.Item>
-            )
-          ))}
-        </RightClickMenu.Content>
-      </RightClickMenu>
 
       {/* Toast Notification */}
       {toast && (

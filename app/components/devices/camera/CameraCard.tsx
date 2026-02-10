@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { RefreshCw, Activity, Settings } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { CAMERA_ROUTES, NETATMO_ROUTES } from '@/lib/routes';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
@@ -243,26 +243,6 @@ export default function CameraCard() {
     );
   }
 
-  // Context menu items for extended actions
-  const cameraContextMenuItems = [
-    {
-      icon: 'Activity' as any,
-      label: 'Eventi Camera',
-      onSelect: () => router.push('/camera/events'),
-    },
-    {
-      icon: 'Settings' as any,
-      label: 'Impostazioni',
-      onSelect: () => router.push('/camera/settings'),
-    },
-    { separator: true } as any,
-    {
-      icon: 'RefreshCw' as any,
-      label: 'Aggiorna',
-      onSelect: handleRefresh,
-    },
-  ];
-
   return (
     <DeviceCard
       icon="📹"
@@ -278,7 +258,6 @@ export default function CameraCard() {
           onClick: () => router.push('/camera'),
         },
       ]}
-      contextMenuItems={cameraContextMenuItems}
     >
       {/* Camera selector if multiple */}
       {cameras.length > 1 && (

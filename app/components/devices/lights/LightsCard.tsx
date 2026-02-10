@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Palette, Settings, RefreshCw } from 'lucide-react';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
 import RoomSelector from '../../ui/RoomSelector';
@@ -837,26 +836,6 @@ export default function LightsCard() {
 
   const adaptive = adaptiveClasses[contrastMode];
 
-  // Context menu items for extended actions
-  const lightsContextMenuItems = connected ? [
-    {
-      icon: <Settings className="w-4 h-4" />,
-      label: 'Impostazioni Luci',
-      onSelect: () => router.push('/lights/settings'),
-    },
-    {
-      icon: <Palette className="w-4 h-4" />,
-      label: 'Controllo Colore',
-      onSelect: () => router.push('/lights'),
-    },
-    { separator: true },
-    {
-      icon: <RefreshCw className="w-4 h-4" />,
-      label: 'Aggiorna',
-      onSelect: handleRefresh,
-    },
-  ] : [];
-
   return (
     <DeviceCard
       icon="💡"
@@ -874,7 +853,6 @@ export default function LightsCard() {
       infoBoxes={infoBoxes}
       infoBoxesTitle="Informazioni"
       footerActions={footerActions as any}
-      contextMenuItems={lightsContextMenuItems as any}
     >
       {/* Quick All-House Control */}
       {hasAnyLights && (

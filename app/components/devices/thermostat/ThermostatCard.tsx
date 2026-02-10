@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Minus, Calendar, Settings, RefreshCw } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
 import { NETATMO_ROUTES } from '@/lib/routes';
 import { getNetatmoAuthUrl } from '@/lib/netatmoCredentials';
 import { cn } from '@/lib/utils/cn';
@@ -451,26 +451,6 @@ export default function ThermostatCard() {
     ...(hasLowBattery ? [{ icon: hasCriticalBattery ? '🪫' : '🔋', label: 'Batteria', value: `${lowBatteryModules.length} bassa` }] : []),
   ] : [];
 
-  // Context menu items for extended actions
-  const thermostatContextMenuItems = connected ? [
-    {
-      icon: <Settings className="w-4 h-4" />,
-      label: 'Impostazioni Termostato',
-      onSelect: () => router.push('/thermostat/settings'),
-    },
-    {
-      icon: <Calendar className="w-4 h-4" />,
-      label: 'Programmazioni',
-      onSelect: () => router.push('/thermostat/schedules'),
-    },
-    { separator: true },
-    {
-      icon: <RefreshCw className="w-4 h-4" />,
-      label: 'Aggiorna',
-      onSelect: handleRefresh,
-    },
-  ] : [];
-
   return (
     <DeviceCard
       icon="🌡️"
@@ -486,7 +466,6 @@ export default function ThermostatCard() {
       banners={banners}
       infoBoxes={infoBoxes}
       infoBoxesTitle="Informazioni"
-      contextMenuItems={thermostatContextMenuItems as any}
     >
       {/* Active Devices List - Shows only actively heating rooms */}
       {activeRooms.length > 0 && (

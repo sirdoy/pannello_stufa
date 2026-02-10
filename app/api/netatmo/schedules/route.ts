@@ -24,7 +24,7 @@ export const GET = withAuthAndErrorHandler(async (req: NextRequest, session?: an
   const userId = session?.user?.sub || 'anonymous';
 
   // Rate limit check
-  const rateCheck = checkNetatmoRateLimit(userId);
+  const rateCheck = await checkNetatmoRateLimit(userId);
   if (!rateCheck.allowed) {
     return NextResponse.json(
       {
@@ -49,7 +49,7 @@ export const GET = withAuthAndErrorHandler(async (req: NextRequest, session?: an
     try {
       const result = await getCached('schedules', async () => {
         // Track API call (only for actual API calls, not cache hits)
-        trackNetatmoApiCall(userId);
+        await trackNetatmoApiCall(userId);
 
         const homeId = await adminDbGet(getEnvironmentPath('netatmo/home_id')) as string | null;
         if (!homeId) {
@@ -111,7 +111,7 @@ export const POST = withAuthAndErrorHandler(async (req: NextRequest, session?: a
   const userId = session?.user?.sub || 'anonymous';
 
   // Rate limit check
-  const rateCheck = checkNetatmoRateLimit(userId);
+  const rateCheck = await checkNetatmoRateLimit(userId);
   if (!rateCheck.allowed) {
     return NextResponse.json(
       {

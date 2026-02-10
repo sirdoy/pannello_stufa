@@ -58,13 +58,13 @@ interface DndWindow {
  * @param {Object} preferences - User notification preferences from Firebase
  * @param {Array<Object>} tokens - Array of FCM tokens with device info
  *   Each token: { token: string, deviceId: string, ... }
- * @returns {Object} Filter result:
+ * @returns {Promise<Object>} Filter result:
  *   - allowed: boolean - Whether notification should be sent
  *   - allowedTokens: Array<string> - Filtered FCM tokens (after DND)
  *   - reason: string - Why filtered (if not allowed)
  *   - stats: Object - Filter statistics
  */
-export function filterNotificationByPreferences(
+export async function filterNotificationByPreferences(
   userId: string,
   notifType: string,
   preferences: NotificationPreferences,
@@ -107,7 +107,7 @@ export function filterNotificationByPreferences(
   // STAGE 2: Rate limit check
   // Check if this notification type is being sent too frequently
   const userRateLimits = preferences?.rateLimits?.[notifType] as RateLimitConfig | undefined; // User custom limits
-  const rateLimitResult = checkRateLimit(userId, notifType, userRateLimits);
+  const rateLimitResult = await checkRateLimit(userId, notifType, userRateLimits);
 
   if (!rateLimitResult.allowed) {
     console.log(

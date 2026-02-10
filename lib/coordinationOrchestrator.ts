@@ -441,7 +441,7 @@ export async function restorePreviousSetpoints(userId: string, homeId: string) {
  */
 export async function sendCoordinationNotification(userId: string, type: string, data: any) {
   // Check throttle
-  const throttleCheck = shouldSendCoordinationNotification(userId);
+  const throttleCheck = await shouldSendCoordinationNotification(userId);
 
   if (!throttleCheck.allowed) {
     console.log(`⏱️ [Coordination] Notification throttled: ${type}, wait ${throttleCheck.waitSeconds}s`);
@@ -521,7 +521,7 @@ export async function sendCoordinationNotification(userId: string, type: string,
 
   if (result.success && !result.skipped) {
     // Record notification sent for throttle
-    recordNotificationSent(userId);
+    await recordNotificationSent(userId);
 
     console.log(`📨 [Coordination] Notification sent: ${type}`);
     return {

@@ -91,7 +91,7 @@ export const GET = withCronSecret(async (request) => {
     };
 
     // Check throttle BEFORE attempting to send
-    const throttleCheck = shouldSendCoordinationNotification(userId);
+    const throttleCheck = await shouldSendCoordinationNotification(userId);
     if (!throttleCheck.allowed) {
       console.log(`⏱️ Health alert throttled for ${userId} (wait ${throttleCheck.waitSeconds}s)`);
       continue;
@@ -104,7 +104,7 @@ export const GET = withCronSecret(async (request) => {
           message: connectionStatus === 'offline'
             ? 'La stufa non risponde (timeout). Verifica la connessione.'
             : 'Errore di connessione alla stufa. Verifica il sistema.',
-        }).then(() => recordNotificationSent(userId))
+        }).then(async () => await recordNotificationSent(userId))
       );
       continue; // Don't send multiple notifications per user
     }
@@ -118,7 +118,7 @@ export const GET = withCronSecret(async (request) => {
             errorCode: stateMismatch.actual.replace('ERROR (AL', '').replace(')', ''),
             errorDescription: stateMismatch.errorDescription,
             message: `Errore stufa: ${stateMismatch.actual}`,
-          }).then(() => recordNotificationSent(userId))
+          }).then(async () => await recordNotificationSent(userId))
         );
       } else {
         // State mismatch (should_be_on, should_be_off, netatmo_heating_stove_off)
@@ -128,7 +128,7 @@ export const GET = withCronSecret(async (request) => {
             actual: stateMismatch.actual,
             reason: stateMismatch.reason,
             message: `Anomalia: stufa dovrebbe essere ${stateMismatch.expected} ma e ${stateMismatch.actual}`,
-          }).then(() => recordNotificationSent(userId))
+          }).then(async () => await recordNotificationSent(userId))
         );
       }
     }

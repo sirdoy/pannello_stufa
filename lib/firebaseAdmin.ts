@@ -611,7 +611,7 @@ export async function sendNotificationToUser(userId: string, notification: Notif
     const notifType = notification.data?.type || notification.data?.notificationType || 'INFO';
 
     // Apply preference filters (type toggles + rate limits + DND windows)
-    const filterResult = filterNotificationByPreferences(
+    const filterResult = await filterNotificationByPreferences(
       userId,
       notifType,
       preferences as any,

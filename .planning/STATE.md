@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 49 of 54 (Persistent Rate Limiting)
-Plan: 2 of 4 complete (01, 03)
-Status: Wave 1 partially complete (plan 02 pending)
-Last activity: 2026-02-10 — Completed 49-01-PLAN.md (persistent rate limiter)
+Plan: 3 of 4 complete (01, 02, 03)
+Status: Wave 1 complete, wave 2 not started
+Last activity: 2026-02-10 — Completed 49-02-PLAN.md (persistent Netatmo rate limiter)
 
-Progress: [████████░░] 82.5% (248 of 300+ estimated total plans)
+Progress: [████████░░] 82.7% (249 of 300+ estimated total plans)
 
 ## Performance Metrics
 
@@ -43,6 +43,7 @@ Progress: [████████░░] 82.5% (248 of 300+ estimated total pl
 |------|----------|-------|-------|------|--------|
 | 49-01 | 4 min | 1 | 2 | 2026-02-10 | Complete ✅ |
 | Phase 49 P01 | 223 | 1 tasks | 2 files |
+| Phase 49 P02 | 349 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -59,6 +60,8 @@ Recent decisions affecting v6.0 work (full log in PROJECT.md):
 - [Phase 49-01]: Pure transaction callbacks with no side effects (prevents duplication on retry)
 - [Phase 49-01]: 2-hour max retention prevents unbounded array growth in Firebase
 - [Phase 49-01]: Module independence: Copy rate limit config instead of importing (no shared state)
+- [Phase 49-02]: Dual-window enforcement for Netatmo: 50 req/10s burst + 400 req/hour conservative (both limits enforced)
+- [Phase 49-02]: Separate RTDB paths for Netatmo windows: netatmo_api_10s (timestamps array) + netatmo_api_1h (counter)
 
 ### Pending Todos
 

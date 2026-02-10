@@ -6,43 +6,52 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** v6.0 Operations, PWA & Analytics
+**Current focus:** Phase 49 - Persistent Rate Limiting (v6.0 Operations, PWA & Analytics)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-02-10 — Milestone v6.0 started
+Phase: 49 of 54 (Persistent Rate Limiting)
+Plan: Ready to plan Phase 49
+Status: Roadmap created, awaiting phase planning
+Last activity: 2026-02-10 — v6.0 roadmap created with 6 phases (49-54)
+
+Progress: [████████░░] 82.2% (247 of 300+ estimated total plans)
 
 ## Performance Metrics
 
-**Velocity:**
-- Total plans completed: 248 plans (v1.0-v5.1)
-- Milestones shipped: 8 (v1.0, v2.0, v3.0, v3.1, v3.2, v4.0, v5.0, v5.1)
-- Average milestone: ~31 plans
-- Latest milestone: v5.1 (5 phases, 39 plans, 2 days)
+**Velocity (v5.0-v5.1):**
+- Total plans completed: 247 (v1.0-v5.1)
+- v5.0 milestone: 56 plans in 4 days
+- v5.1 milestone: 39 plans in 2 days
 
-**Recent Milestone Performance:**
+**By Phase (recent milestones):**
 
-| Milestone | Phases | Plans | Duration | Avg/Plan |
-|-----------|--------|-------|----------|----------|
-| v5.1 | 5 | 39 | 2 days | ~74 min |
-| v5.0 | 7 | 56 | 4 days | ~90 min |
-| v4.0 | 7 | 24 | 2 days | ~120 min |
-| v3.2 | 5 | 13 | 2 days | ~220 min |
+| Phase | Plans | Milestone | Duration |
+|-------|-------|-----------|----------|
+| 37-43 | 56 | v5.0 TypeScript | 4 days |
+| 44-48 | 39 | v5.1 Tech Debt | 2 days |
+| 49-54 | TBD | v6.0 Operations | Starting |
 
-**Trend:** Consistently improving — v5.1 fastest per-plan execution yet
+**Recent Trend:**
+- Parallel execution enabled (5-agent waves)
+- Comprehensive depth setting
+- Yolo mode active (autonomous execution with verification)
 
 ## Accumulated Context
 
 ### Decisions
 
-All milestone decisions archived in PROJECT.md Key Decisions table.
+Recent decisions affecting v6.0 work (full log in PROJECT.md):
+
+- **Firebase RTDB for rate limiting**: Transactions provide atomicity without Redis complexity (Phase 49 foundation)
+- **GitHub Actions for cron**: External HTTP scheduler, no stateful server needed (Phase 50 approach)
+- **Playwright auth state pattern**: Session caching prevents redundant Auth0 logins (Phase 51 implementation)
+- **Platform-specific FCM payloads**: iOS requires aps.category, Android uses clickAction (Phase 52 complexity)
+- **Consent-first analytics**: GDPR compliance blocks all tracking without explicit opt-in (Phase 54 blocker)
 
 ### Pending Todos
 
-None yet.
+None yet for v6.0. Use `/gsd:add-todo` to capture ideas during execution.
 
 ### Quick Tasks Completed
 
@@ -53,17 +62,24 @@ None yet.
 
 ### Blockers/Concerns
 
-No active blockers. Codebase is pristine and ready for feature development.
+**v6.0 Risks (from research):**
+- Phase 49: Serverless state loss if Firebase transactions fail (feature flag mitigation)
+- Phase 50: Vercel 10s timeout for cron orchestrator (fire-and-forget pattern required)
+- Phase 52: iOS notification category registration in PWA unclear (needs deeper research during planning)
+- Phase 54: GDPR consent banner UX must not block essential controls (essential mode implementation critical)
 
-**Pre-existing operational items (being addressed in v6.0):**
-- Cron automation not operational (requires cron-job.org setup)
-- Firestore indexes require manual deployment
+**Known Issues (carried from v5.1):**
+- Worker teardown warning (React 19 cosmetic, documented as not actionable)
+- 179 unused exports remain (131 intentional design system barrel, 48 utility)
+- 2 knip false positives (app/sw.ts, firebase-messaging-sw.js)
 
 ## Session Continuity
 
 Last session: 2026-02-10
-Stopped at: Defining v6.0 requirements
-Resume file: None — defining requirements in this session
+Stopped at: v6.0 roadmap creation complete, 42/42 requirements mapped to 6 phases
+Resume file: None (ready to start Phase 49 planning)
+
+Next action: `/gsd:plan-phase 49`
 
 ---
-*State updated: 2026-02-10 after v6.0 milestone start*
+*State updated: 2026-02-10 after v6.0 roadmap creation*

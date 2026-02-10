@@ -10,6 +10,7 @@
 - ✅ **v4.0 Advanced UI Components** — Phases 30-36 (shipped 2026-02-05)
 - ✅ **v5.0 TypeScript Migration** — Phases 37-43 (shipped 2026-02-08)
 - ✅ **v5.1 Tech Debt & Code Quality** — Phases 44-48 (shipped 2026-02-10)
+- 🚧 **v6.0 Operations, PWA & Analytics** — Phases 49-54 (in progress)
 
 ## Phases
 
@@ -44,7 +45,131 @@ See `.planning/milestones/` for full archives.
 
 </details>
 
+## 🚧 v6.0 Operations, PWA & Analytics (In Progress)
+
+**Milestone Goal:** Rendere l'app operativa al 100% (cron, resilienza), migliorare l'esperienza mobile (notifiche interattive, offline, installazione PWA), e aggiungere analytics storiche su utilizzo stufa e correlazione meteo.
+
+### Phase 49: Persistent Rate Limiting
+**Goal**: Firebase RTDB-backed rate limiter with transaction safety replaces in-memory Map, preventing DoS attacks via cold start exploitation and API quota exhaustion.
+
+**Depends on**: Nothing (foundation phase)
+
+**Requirements**: RATE-01, RATE-02, RATE-03, RATE-04, RATE-05
+
+**Success Criteria** (what must be TRUE):
+  1. Rate limits persist across Vercel cold starts and deployments (no reset to zero)
+  2. Sliding window algorithm prevents notification spam even during state loss scenarios
+  3. Netatmo API rate limiter prevents quota exhaustion (50 req/10s limit enforced)
+  4. Expired rate limit windows are automatically cleaned up without manual intervention
+  5. Feature flag allows gradual rollout with fallback to in-memory limiter if Firebase unavailable
+
+**Plans**: TBD
+
+Plans:
+- [ ] 49-01: TBD during phase planning
+
+### Phase 50: Cron Automation Configuration
+**Goal**: Background automation operational with external HTTP scheduler triggering health monitoring, coordination checks, and dead man's switch tracking every 5 minutes.
+
+**Depends on**: Phase 49 (rate limiter prevents notification spam from cron)
+
+**Requirements**: CRON-01, CRON-02, CRON-03, CRON-04, CRON-05
+
+**Success Criteria** (what must be TRUE):
+  1. Health monitoring runs automatically every 5 minutes without manual trigger
+  2. Stove-thermostat coordination executes automatically every 5 minutes
+  3. Cron orchestrator completes all operations within Vercel timeout (fire-and-forget pattern)
+  4. Dead man's switch alerts if cron stops running (>15 min without execution)
+  5. Cron execution logs visible in monitoring dashboard with timestamp and duration
+
+**Plans**: TBD
+
+Plans:
+- [ ] 50-01: TBD during phase planning
+
+### Phase 51: E2E Test Improvements
+**Goal**: Realistic Auth0 testing with session state caching validates security foundation and critical user flows without mocking authentication.
+
+**Depends on**: Nothing (independent validation phase, can run parallel to Phase 52-53)
+
+**Requirements**: E2E-01, E2E-02, E2E-03, E2E-04, E2E-05, E2E-06
+
+**Success Criteria** (what must be TRUE):
+  1. E2E tests use real Auth0 OAuth flow without mocked authentication
+  2. Session state caching prevents redundant logins across test runs
+  3. Critical flow tests pass: stove ignition, thermostat schedule change, notification delivery
+  4. GitHub Actions CI runs E2E tests automatically on every PR
+  5. Test flakiness eliminated (Auth0 rate limiting and session leakage avoided)
+
+**Plans**: TBD
+
+Plans:
+- [ ] 51-01: TBD during phase planning
+
+### Phase 52: Interactive Push Notifications
+**Goal**: Action buttons in notifications allow direct device control ("Spegni stufa", "Imposta manuale") with platform-specific payloads for iOS and Android.
+
+**Depends on**: Phase 49 (rate limiter prevents action button spam)
+
+**Requirements**: PUSH-01, PUSH-02, PUSH-03, PUSH-04, PUSH-05, PUSH-06
+
+**Success Criteria** (what must be TRUE):
+  1. Stove notifications have "Spegni stufa" action button that executes shutdown directly
+  2. Thermostat notifications have "Imposta manuale" action button for temperature override
+  3. Action buttons work on Android Chrome and iOS Safari PWA (platform-specific payloads)
+  4. Action buttons function offline via Background Sync (queue and execute on reconnect)
+  5. Platforms without action button support gracefully degrade to tap-to-open behavior
+
+**Plans**: TBD
+
+Plans:
+- [ ] 52-01: TBD during phase planning
+
+### Phase 53: PWA Offline Improvements
+**Goal**: Offline mode enhanced with staleness indicators, command queuing UI, and guided PWA install prompt for safer device control and improved mobile experience.
+
+**Depends on**: Phase 52 (notification actions can queue offline via Background Sync)
+
+**Requirements**: PWA-01, PWA-02, PWA-03, PWA-04, PWA-05, PWA-06, PWA-07, PWA-08
+
+**Success Criteria** (what must be TRUE):
+  1. Offline banner visible when connection lost with timestamp of last successful update
+  2. Device cards show staleness indicator when cached data older than 30 seconds
+  3. Device controls disabled when offline to prevent actions on stale state
+  4. Pending offline commands visible to user with sync confirmation toast on reconnect
+  5. PWA install prompt appears after 2+ visits with guided UI and 30-day dismissal tracking
+
+**Plans**: TBD
+
+Plans:
+- [ ] 53-01: TBD during phase planning
+
+### Phase 54: Analytics Dashboard
+**Goal**: GDPR-compliant usage analytics with pellet consumption estimation, historical trends, weather correlation, and user calibration for stove optimization insights.
+
+**Depends on**: Phase 50 (cron enables data collection aggregation)
+
+**Requirements**: ANLY-01, ANLY-02, ANLY-03, ANLY-04, ANLY-05, ANLY-06, ANLY-07, ANLY-08, ANLY-09, ANLY-10, ANLY-11
+
+**Success Criteria** (what must be TRUE):
+  1. Consent banner blocks all analytics tracking until user grants permission (GDPR compliance)
+  2. Essential mode functional without analytics consent (device controls work)
+  3. Analytics dashboard shows daily stove usage hours with power level breakdown
+  4. Pellet consumption estimated based on power level and runtime with user calibration option
+  5. Historical charts visualize usage trends (7/30/90 days) and weather correlation
+  6. Daily aggregation cron processes real-time events into queryable stats automatically
+
+**Plans**: TBD
+
+Plans:
+- [ ] 54-01: TBD during phase planning
+
 ## Progress
+
+**Execution Order:**
+Phases execute in numeric order: 49 → 50 → 51 → 52 → 53 → 54
+
+**Critical Path:** 49 → 50 → 52 → 53 → 54 (Phase 51 can run parallel to 52-53)
 
 | Phase | Milestone | Plans | Status | Completed |
 |-------|-----------|-------|--------|-----------|
@@ -56,6 +181,17 @@ See `.planning/milestones/` for full archives.
 | 11-18 | v3.0 | 52/52 | ✓ Complete | 2026-01-30 |
 | 6-10 | v2.0 | 21/21 | ✓ Complete | 2026-01-28 |
 | 1-5 | v1.0 | 29/29 | ✓ Complete | 2026-01-26 |
+| 49 | v6.0 | 0/TBD | Not started | - |
+| 50 | v6.0 | 0/TBD | Not started | - |
+| 51 | v6.0 | 0/TBD | Not started | - |
+| 52 | v6.0 | 0/TBD | Not started | - |
+| 53 | v6.0 | 0/TBD | Not started | - |
+| 54 | v6.0 | 0/TBD | Not started | - |
 
 ---
-*Last updated: 2026-02-10 — v5.1 milestone archived*
+
+**v6.0 Phases:** 6 phases (49-54)
+**v6.0 Requirements:** 42 total (100% coverage validated)
+**Depth:** Comprehensive (6 phases for 42 requirements)
+**Created:** 2026-02-10
+**Last updated:** 2026-02-10 — v6.0 roadmap created

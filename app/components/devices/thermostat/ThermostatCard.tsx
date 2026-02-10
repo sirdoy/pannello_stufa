@@ -685,33 +685,6 @@ export default function ThermostatCard() {
                 {/* Quick Actions Bar - Icon buttons */}
                 {!selectedRoom.isOffline && (
                   <div className="flex items-center justify-center gap-3 mt-4">
-                    {/* Temperature Adjustment */}
-                    {selectedRoom.setpoint && (
-                      <div className="flex items-center gap-1 px-2 py-1 rounded-xl bg-slate-800/50 border border-slate-700/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
-                        <Button
-                          aria-label="Diminuisci Temperatura"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleTemperatureChange(selectedRoom.id, selectedRoom.setpoint - 0.5)}
-                          disabled={refreshing || selectedRoom.setpoint <= 15}
-                          className="p-2"
-                        >
-                          <Minus className="w-4 h-4" />
-                        </Button>
-                        <span className="text-sm font-bold text-ocean-400 [html:not(.dark)_&]:text-ocean-600 w-10 text-center">{selectedRoom.setpoint}°</span>
-                        <Button
-                          aria-label="Aumenta Temperatura"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleTemperatureChange(selectedRoom.id, selectedRoom.setpoint + 0.5)}
-                          disabled={refreshing || selectedRoom.setpoint >= 30}
-                          className="p-2"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    )}
-
                     {/* Mode Quick Cycle */}
                     <Button
                       aria-label={`Modalita attuale: ${mode}. Clicca per cambiare`}

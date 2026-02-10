@@ -1173,33 +1173,6 @@ export default function StoveCard() {
                   <Power className="w-5 h-5" />
                 </Button>
 
-                {/* Power Level Controls (only when stove is in WORK mode) */}
-                {status?.toUpperCase().includes('WORK') && (
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-xl bg-slate-800/50 border border-slate-700/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
-                    <Button
-                      aria-label="Diminuisci Potenza"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => powerLevel && handlePowerChange({ target: { value: (powerLevel - 1).toString() }})}
-                      disabled={loading || !powerLevel || powerLevel <= 1}
-                      className="p-2"
-                    >
-                      <Minus className="w-4 h-4" />
-                    </Button>
-                    <span className="text-sm font-bold text-ember-400 [html:not(.dark)_&]:text-ember-600 w-6 text-center">{powerLevel}</span>
-                    <Button
-                      aria-label="Aumenta Potenza"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => powerLevel && handlePowerChange({ target: { value: (powerLevel + 1).toString() }})}
-                      disabled={loading || !powerLevel || powerLevel >= 5}
-                      className="p-2"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </Button>
-                  </div>
-                )}
-
                 {/* Fan Control (only when stove is in WORK mode) */}
                 {status?.toUpperCase().includes('WORK') && (
                   <Button

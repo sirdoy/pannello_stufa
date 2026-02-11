@@ -13,9 +13,9 @@ See: .planning/PROJECT.md (updated 2026-02-11)
 Phase: 55 of 60 (Retry Infrastructure)
 Plan: 2 of TBD in current phase
 Status: In progress
-Last activity: 2026-02-11 — Completed 55-02 (Idempotency Manager)
+Last activity: 2026-02-11 — Completed 55-01 (Core Retry Infrastructure) and 55-02 (Idempotency Manager)
 
-Progress: [████████████████████░░░] 83% (277/336 estimated plans total)
+Progress: [████████████████████░░░] 83% (278/336 estimated plans total)
 
 ## Performance Metrics
 
@@ -47,7 +47,14 @@ Progress: [████████████████████░░░
 - Phase 54: 9 plans
 - Trend: Stable velocity with comprehensive mode
 
-*Updated after roadmap creation*
+**Recent Phase 55 Metrics:**
+
+| Phase-Plan | Duration | Tasks | Files | Tests |
+|------------|----------|-------|-------|-------|
+| 55-01 | 13 min | 2 | 4 | 39 |
+| 55-02 | 3 min | 1 | 4 | 10 |
+
+*Updated 2026-02-11*
 
 ## Accumulated Context
 
@@ -64,6 +71,7 @@ Recent decisions affecting current work:
 - v6.0: Fire-and-forget analytics (errors logged but never thrown)
 - v5.1: Parallel wave execution (5 agents in parallel for independent plans)
 - v5.0: git mv for TS migration (preserves git blame and history)
+- [Phase 55]: Map<string, number> for deduplication (not WeakMap)
 
 ### Pending Todos
 
@@ -84,6 +92,6 @@ Stopped at: Completed Phase 55 Plan 02 (Idempotency Manager) - ready for plan 03
 Resume file: None
 
 **Phase 55 Progress:**
-- Plan 01: Circuit breaker (TBD)
-- Plan 02: Idempotency manager ✓ COMPLETE (177s, 10 tests, commit 54da7fa)
+- Plan 01: Core Retry Infrastructure ✓ COMPLETE (13 min, 39 tests, commits d711733, 2645c3d)
+- Plan 02: Idempotency Manager ✓ COMPLETE (3 min, 10 tests, commit 54da7fa)
 - Plan 03+: TBD

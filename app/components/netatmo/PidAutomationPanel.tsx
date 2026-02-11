@@ -46,6 +46,7 @@ function RoomSelector({ rooms, selectedRoomId, onChange, disabled }: RoomSelecto
         value={selectedRoomId || ''}
         onChange={(e) => onChange(e.target.value || null)}
         disabled={disabled}
+        aria-label="Stanza da monitorare"
         className="w-full px-4 py-3 rounded-xl bg-slate-800/60 [html:not(.dark)_&]:bg-white/80
                    border border-white/10 [html:not(.dark)_&]:border-slate-200
                    text-white [html:not(.dark)_&]:text-slate-900
@@ -115,6 +116,7 @@ function ManualSetpointInput({ value, onChange, disabled }: ManualSetpointInputP
           value={value}
           onChange={handleSliderChange}
           disabled={disabled}
+          aria-label="Setpoint target"
           className="w-full h-2 rounded-lg appearance-none cursor-pointer
                      bg-slate-700 [html:not(.dark)_&]:bg-slate-200
                      accent-ember-500
@@ -149,6 +151,7 @@ function ManualSetpointInput({ value, onChange, disabled }: ManualSetpointInputP
             value={value}
             onChange={handleInputChange}
             disabled={disabled}
+            aria-label="Setpoint target in gradi"
             className="w-24 px-3 py-2 text-center text-2xl font-bold rounded-xl
                        bg-slate-800/60 [html:not(.dark)_&]:bg-white/80
                        border border-ember-500/50

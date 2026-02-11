@@ -639,29 +639,29 @@ export default function ThermostatCard() {
                     data-component="temperature-display"
                   >
                     {/* Current Temperature Box */}
-                    <div className="relative overflow-hidden rounded-2xl bg-slate-800/60 backdrop-blur-xl border border-white/10 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                    <div className="relative overflow-hidden rounded-2xl bg-ocean-900/40 backdrop-blur-xl border border-ocean-500/30 [html:not(.dark)_&]:bg-ocean-50/80 [html:not(.dark)_&]:border-ocean-200">
                       <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
-                        <Text variant="label" size="xs" className="mb-2 font-display">
+                        <Text variant="label" size="xs" className="mb-2 font-display text-ocean-300 [html:not(.dark)_&]:text-ocean-600">
                           Attuale
                         </Text>
                         <div className="flex items-baseline gap-1">
-                          <Text className="text-4xl sm:text-5xl font-display text-slate-100 leading-none [html:not(.dark)_&]:text-slate-900">
+                          <Text className="text-4xl sm:text-5xl font-display text-ocean-100 leading-none [html:not(.dark)_&]:text-ocean-700">
                             {selectedRoom.temperature}
                           </Text>
-                          <Text as="span" className="text-2xl sm:text-3xl text-slate-400 [html:not(.dark)_&]:text-slate-500">°</Text>
+                          <Text as="span" className="text-2xl sm:text-3xl text-ocean-400/70 [html:not(.dark)_&]:text-ocean-500">°</Text>
                         </div>
                       </div>
                     </div>
 
                     {/* Target Temperature Box */}
                     {selectedRoom.setpoint && (
-                      <div className="relative overflow-hidden rounded-2xl bg-ocean-900/40 backdrop-blur-xl border border-ocean-500/30 [html:not(.dark)_&]:bg-ocean-50/80 [html:not(.dark)_&]:border-ocean-200">
+                      <div className="relative overflow-hidden rounded-2xl bg-ocean-900/50 backdrop-blur-xl border border-ocean-500/40 [html:not(.dark)_&]:bg-ocean-100/80 [html:not(.dark)_&]:border-ocean-300">
                         <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
-                          <Text variant="tertiary" size="xs" uppercase tracking className="mb-2 font-display">
+                          <Text variant="label" size="xs" className="mb-2 font-display text-ocean-300 [html:not(.dark)_&]:text-ocean-600">
                             Target
                           </Text>
                           <div className="flex items-baseline gap-1">
-                            <Text variant="tertiary" className="text-4xl sm:text-5xl font-display leading-none [html:not(.dark)_&]:text-ocean-600">
+                            <Text className="text-4xl sm:text-5xl font-display text-ocean-200 leading-none [html:not(.dark)_&]:text-ocean-700">
                               {selectedRoom.setpoint}
                             </Text>
                             <Text as="span" className="text-2xl sm:text-3xl text-ocean-400/70 [html:not(.dark)_&]:text-ocean-500">°</Text>

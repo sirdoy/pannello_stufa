@@ -11,13 +11,13 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 53 of 54 (PWA Offline Improvements) — IN PROGRESS
-Plan: 02/05 completed
-Status: Staleness detection and command expiration implemented with TDD
-Last activity: 2026-02-11 - Completed 53-02-PLAN.md (Staleness Detection and Command Expiration)
+Plan: 04/05 completed
+Status: PWA install prompt with 2+ visit requirement, 30-day dismissal, and iOS fallback
+Last activity: 2026-02-11 - Completed 53-04-PLAN.md (PWA Install Prompt)
 
-Progress: [████████░░] 87.3% (262 of 300+ estimated total plans)
+Progress: [████████░░] 87.7% (264 of 300+ estimated total plans)
 
-Next action: Continue Phase 53 execution (plans 03-05)
+Next action: Continue Phase 53 execution (plan 05)
 
 ## Performance Metrics
 
@@ -81,6 +81,7 @@ Next action: Continue Phase 53 execution (plans 03-05)
 |------|----------|-------|-------|------|--------|
 | 53-01 | 4.0 min | 2 | 2 | 2026-02-11 | Complete ✅ |
 | 53-02 | 4.4 min | 2 | 4 | 2026-02-11 | Complete ✅ |
+| 53-04 | 5.6 min | 2 | 5 | 2026-02-11 | Complete ✅ |
 
 ## Accumulated Context
 
@@ -131,6 +132,10 @@ Recent decisions affecting v6.0 work (full log in PROJECT.md):
 - [Phase 52-03]: getActionsForNotificationType called in triggerNotificationServer: Automatic action injection based on notification type before payload send
 - [Phase 53-02]: 30-second staleness threshold balances data freshness with UI responsiveness
 - [Phase 53-02]: 1-hour command expiration for safety-critical endpoints prevents dangerous stale-intent execution
+- [Phase 53-04]: localStorage for visit tracking chosen over cookies: Simpler API, no expiration management, sufficient for client-side feature
+- [Phase 53-04]: Custom bottom sheet instead of external library: Per CLAUDE.md rule (no npm install), design system has needed primitives
+- [Phase 53-04]: 30-day dismissal cooldown balances user experience with install opportunity maintenance
+- [Phase 53-04]: 2+ visits requirement avoids annoying first-time visitors while ensuring genuine interest
 - [Phase 53-02]: 5-second polling interval for staleness updates provides real-time info without excessive re-renders
 
 ### Pending Todos
@@ -165,10 +170,10 @@ None yet for v6.0. Use `/gsd:add-todo` to capture ideas during execution.
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Completed 53-02-PLAN.md (Staleness Detection and Command Expiration)
+Stopped at: Completed 53-04-PLAN.md (PWA Install Prompt)
 Resume file: None
 
-Next action: Continue Phase 53 execution (plans 03-05)
+Next action: Continue Phase 53 execution (plan 05)
 
 ---
-*State updated: 2026-02-11 after completing Phase 53 Plan 02*
+*State updated: 2026-02-11 after completing Phase 53 Plan 04*

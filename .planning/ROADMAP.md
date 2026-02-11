@@ -150,10 +150,14 @@ Plans:
   4. Pending offline commands visible to user with sync confirmation toast on reconnect
   5. PWA install prompt appears after 2+ visits with guided UI and 30-day dismissal tracking
 
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 53-01: TBD during phase planning
+- [ ] 53-01-PLAN.md — Enhanced OfflineBanner with Ember Noir styling and command queue UI
+- [ ] 53-02-PLAN.md — Staleness detection service and useDeviceStaleness hook (TDD)
+- [ ] 53-03-PLAN.md — Device cards offline safety (control hiding, staleness UI, command expiration)
+- [ ] 53-04-PLAN.md — PWA install prompt bottom sheet with visit tracking and iOS fallback
+- [ ] 53-05-PLAN.md — Integration wiring (InstallPrompt in layout, reconnect sync toast)
 
 ### Phase 54: Analytics Dashboard
 **Goal**: GDPR-compliant usage analytics with pellet consumption estimation, historical trends, weather correlation, and user calibration for stove optimization insights.
@@ -196,7 +200,7 @@ Phases execute in numeric order: 49 → 50 → 51 → 52 → 53 → 54
 | 50 | v6.0 | 4/4 | ✓ Complete | 2026-02-10 |
 | 51 | v6.0 | 4/4 | ✓ Complete | 2026-02-10 |
 | 52 | v6.0 | 3/3 | ✓ Complete | 2026-02-10 |
-| 53 | v6.0 | 0/TBD | Not started | - |
+| 53 | v6.0 | 0/5 | Planned | - |
 | 54 | v6.0 | 0/TBD | Not started | - |
 
 ---

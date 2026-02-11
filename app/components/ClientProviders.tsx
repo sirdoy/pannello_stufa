@@ -11,6 +11,7 @@ import PWAInitializer from './PWAInitializer';
 import AxeDevtools from './AxeDevtools';
 import CommandPaletteProvider from './layout/CommandPaletteProvider';
 import InstallPrompt from '@/app/components/pwa/InstallPrompt';
+import ConsentBanner from '@/app/components/analytics/ConsentBanner';
 import { ReactNode } from 'react';
 
 interface ClientProvidersProps {
@@ -33,6 +34,7 @@ export default function ClientProviders({ children }: ClientProvidersProps) {
                 <AxeDevtools />
                 <PWAInitializer />
                 <OfflineBanner fixed showPendingCount />
+                <ConsentBanner />
                 {children}
                 <InstallPrompt />
               </CommandPaletteProvider>

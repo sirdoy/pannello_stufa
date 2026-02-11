@@ -66,10 +66,14 @@ See `.planning/milestones/` for full archives.
 4. Stove ignite/shutdown commands use idempotency keys to prevent duplicate physical actions
 5. Request deduplication prevents double-tap from sending duplicate commands within 2-second window
 
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 55-01: TBD
+- [ ] 55-01-PLAN.md — Retry client with exponential backoff + deduplication manager (TDD)
+- [ ] 55-02-PLAN.md — Idempotency key manager with Firebase RTDB storage (TDD)
+- [ ] 55-03-PLAN.md — Persistent error toasts + useRetryableCommand hook
+- [ ] 55-04-PLAN.md — Server-side idempotency middleware (withIdempotency)
+- [ ] 55-05-PLAN.md — Device card integration + API route wiring + visual verification
 
 ---
 

@@ -10,6 +10,7 @@ import { OfflineBanner } from '@/app/components/ui';
 import PWAInitializer from './PWAInitializer';
 import AxeDevtools from './AxeDevtools';
 import CommandPaletteProvider from './layout/CommandPaletteProvider';
+import InstallPrompt from '@/app/components/pwa/InstallPrompt';
 import { ReactNode } from 'react';
 
 interface ClientProvidersProps {
@@ -33,6 +34,7 @@ export default function ClientProviders({ children }: ClientProvidersProps) {
                 <PWAInitializer />
                 <OfflineBanner fixed showPendingCount />
                 {children}
+                <InstallPrompt />
               </CommandPaletteProvider>
             </ToastProvider>
           </VersionProvider>

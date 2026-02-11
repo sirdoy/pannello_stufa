@@ -254,8 +254,8 @@ export default function Navbar() {
               </Text>
             </TransitionLink>
 
-            {/* Desktop Navigation - Hidden on mobile */}
-            <nav className="hidden lg:flex items-center gap-3">
+            {/* Desktop Navigation - Now hidden (replaced by hamburger menu) */}
+            <nav className="hidden items-center gap-3">
 
               {/* Device Dropdowns */}
               {navStructure.devices.map(device => (
@@ -422,9 +422,9 @@ export default function Navbar() {
             {/* User & Menu Buttons */}
             <div className="flex items-center gap-3">
 
-              {/* Desktop User Dropdown */}
+              {/* Desktop User Dropdown - Now hidden (replaced by hamburger menu) */}
               {user && (
-                <div className="hidden lg:block relative" ref={userDropdownRef}>
+                <div className="hidden relative" ref={userDropdownRef}>
                   <button
                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                     className={`
@@ -499,7 +499,7 @@ export default function Navbar() {
               top-[calc(4rem+env(safe-area-inset-top))]
               bg-slate-950/60
               backdrop-blur-md
-              z-[9000] lg:hidden
+              z-[9000]
               [html:not(.dark)_&]:bg-slate-900/40
             "
             onClick={() => setMobileMenuOpen(false)}
@@ -512,7 +512,7 @@ export default function Navbar() {
             top-[calc(4rem+env(safe-area-inset-top))]
             bg-slate-900/95
             backdrop-blur-2xl
-            z-[9001] lg:hidden
+            z-[9001]
             overflow-y-auto
             animate-fade-in-down
             [html:not(.dark)_&]:bg-white/95
@@ -630,7 +630,7 @@ export default function Navbar() {
 
       {/* Mobile Bottom Navigation - Ember Noir Style */}
       <nav className="
-        fixed bottom-0 left-0 right-0 z-50 lg:hidden
+        fixed bottom-0 left-0 right-0 z-50
         bg-slate-900/90
         backdrop-blur-xl
         border-t border-white/[0.06]

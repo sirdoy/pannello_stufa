@@ -7,6 +7,7 @@ import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 import { Copy, Check } from 'lucide-react';
 import { API_KEY } from '@/lib/stoveApi';
+import { canTrackAnalytics } from '@/lib/analyticsConsentService';
 
 interface StoveApiResponse {
   [key: string]: any;
@@ -133,9 +134,13 @@ export default function StoveDebugPage() {
   const callPostEndpoint = async (name: string, url: string, body: any = null): Promise<void> => {
     setLoadingPost((prev) => ({ ...prev, [name]: true }));
     try {
+      const consent = canTrackAnalytics() ? 'granted' : 'denied';
       const options: RequestInit = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-analytics-consent': consent,
+        },
       };
       if (body) {
         options.body = JSON.stringify(body);

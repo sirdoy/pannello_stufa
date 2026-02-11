@@ -55,6 +55,7 @@ None. Use `/gsd:add-todo` to capture ideas during next milestone.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 24 | il banner di analytics su mobile appare sotto il menu hamburger | 2026-02-11 | 7b5f422 | [24-il-banner-di-analytics-su-mobile-appare-](./quick/24-il-banner-di-analytics-su-mobile-appare-/) |
 | 23 | fai in modo che anche su desktop ci sia il menu hamburger | 2026-02-11 | c53b0d5 | [23-fai-in-modo-che-anche-su-desktop-ci-sia-](./quick/23-fai-in-modo-che-anche-su-desktop-ci-sia-/) |
 | 22 | crea sistema di logging automatico per tuning PID | 2026-02-11 | 4ff9367 | [22-crea-sistema-di-logging-automatico-per-t](./quick/22-crea-sistema-di-logging-automatico-per-t/) |
 | 21 | pulisci i console.log presenti nel sito | 2026-02-10 | efc18c6 | [21-pulisci-i-console-log-presenti-nel-sito-](./quick/21-pulisci-i-console-log-presenti-nel-sito-/) |
@@ -77,10 +78,10 @@ None. Use `/gsd:add-todo` to capture ideas during next milestone.
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: v6.0 milestone archived
+Stopped at: Completed quick task 24 (ConsentBanner z-index fix)
 Resume file: None
 
 Next action: `/gsd:new-milestone` to start next milestone cycle
 
 ---
-*State updated: 2026-02-11 after v6.0 milestone completion*
+*State updated: 2026-02-11 after quick task 24 completion*

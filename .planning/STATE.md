@@ -13,7 +13,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 53 of 54 (PWA Offline Improvements) — COMPLETE ✅
 Plan: 05/05 completed
 Status: All PWA offline improvements integrated and tested
-Last activity: 2026-02-11 - Completed quick task 22: crea sistema di logging automatico per tuning PID
+Last activity: 2026-02-11 - Completed quick task 23: fai in modo che anche su desktop ci sia il menu hamburger
 
 Progress: [████████░░] 88.3% (267 of 302 estimated total plans)
 
@@ -149,6 +149,7 @@ None yet for v6.0. Use `/gsd:add-todo` to capture ideas during execution.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 23 | fai in modo che anche su desktop ci sia il menu hamburger | 2026-02-11 | c53b0d5 | [23-fai-in-modo-che-anche-su-desktop-ci-sia-](./quick/23-fai-in-modo-che-anche-su-desktop-ci-sia-/) |
 | 22 | crea sistema di logging automatico per tuning PID | 2026-02-11 | 4ff9367 | [22-crea-sistema-di-logging-automatico-per-t](./quick/22-crea-sistema-di-logging-automatico-per-t/) |
 | 21 | pulisci i console.log presenti nel sito | 2026-02-10 | efc18c6 | [21-pulisci-i-console-log-presenti-nel-sito-](./quick/21-pulisci-i-console-log-presenti-nel-sito-/) |
 | 20 | rimuovi i context menu con tasto destro dalle card | 2026-02-10 | 08ff45e | [20-rimuovi-i-context-menu-con-tasto-destro-](./quick/20-rimuovi-i-context-menu-con-tasto-destro-/) |
@@ -174,7 +175,7 @@ None yet for v6.0. Use `/gsd:add-todo` to capture ideas during execution.
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Completed Quick Task 22 (PID Tuning Log System)
+Stopped at: Completed Quick Task 23 (Desktop Hamburger Menu)
 Resume file: None
 
 Next action: Start Phase 54 execution (Analytics & Consent Management)

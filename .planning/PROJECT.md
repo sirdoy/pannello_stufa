@@ -2,84 +2,27 @@
 
 ## What This Is
 
-PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (con gestione schedule complete), luci Philips Hue. Include sistema notifiche push production-ready, monitoring automatico stufa, e integrazioni intelligenti tra dispositivi. Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
+PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (con gestione schedule complete), luci Philips Hue. Include sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, rate limiting persistente Firebase RTDB, offline mode avanzato con staleness indicators, PWA install prompt guidato, e analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
 
 ## Core Value
 
 I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-## Current Milestone: v6.0 Operations, PWA & Analytics
-
-**Goal:** Rendere l'app operativa al 100% (cron, resilienza), migliorare l'esperienza mobile (notifiche interattive, offline, installazione PWA), e aggiungere analytics storiche su utilizzo stufa e correlazione meteo.
-
-**Target features:**
-- Cron automation operativa (health monitoring + coordination)
-- Rate limiter persistente (Firebase-based)
-- E2E tests con Auth0 realistico
-- Health checks migliorati e Firestore index auto-deploy
-- Notifiche push interattive con action buttons
-- Offline mode migliorato e PWA install prompt guidato
-- Dashboard analytics: storico stufa, consumo pellet, trend, correlazione meteo
-
 ## Current State
 
-**Version:** v5.1 (shipped 2026-02-10)
-**Status:** Production-ready, pristine TypeScript codebase with strict mode
-
-**Shipped Capabilities (v1.0 + v2.0 + v3.0 + v3.1 + v3.2 + v4.0):**
-- ✅ Push notification system with token persistence and multi-device support
-- ✅ Admin dashboard with delivery metrics and 7-day trends
-- ✅ User preferences with type toggles, DND hours, rate limiting
-- ✅ Notification history with infinite scroll and device management
-- ✅ Comprehensive E2E test suite (32 tests, 3 browsers) with CI/CD integration
-- ✅ Netatmo schedule management (view, switch, manual overrides)
-- ✅ Automated stove health monitoring with dead man's switch
-- ✅ Intelligent stove-thermostat coordination with user intent detection
-- ✅ Monitoring dashboard with connection status, timeline, and push alerts
-- ✅ Complete schedule UI with 7-day timeline and override management
-- ✅ **Complete UI component library** (25+ components with CVA type-safe variants)
-- ✅ **Radix UI accessibility primitives** (Checkbox, Switch, RadioGroup, Select, Slider, Dialog, Tooltip, Toast)
-- ✅ **Design token system** (semantic CSS variables, @theme directive, ESLint enforcement)
-- ✅ **Full page migration** (all pages use consistent design system components)
-- ✅ **WCAG AA accessibility** (172 axe tests, 436 keyboard navigation tests)
-- ✅ **Interactive documentation** (/debug/design-system with PropTable, examples)
-- ✅ **100% design system compliance** (all device cards use Button, Slider, Badge components)
-- ✅ **Zero raw HTML elements** in device components (no raw `<button>` or `<input>`)
-- ✅ **CVA variants everywhere** (colorScheme prop, InfoBox variant, adaptive styling)
-- ✅ **Weather display** with Open-Meteo API (15-min cache, Italian translations, 5-day forecast)
-- ✅ **WeatherCard UI** (current conditions, forecast scroll, indoor/outdoor comparison, trend indicators)
-- ✅ **Location settings** (city autocomplete, geolocation with iOS PWA handling, Firebase persistence)
-- ✅ **Dashboard customization** (card reorder/hide, per-user Firebase preferences)
-- ✅ **Dynamic home page** (renders cards in user's saved order with registry pattern)
-- ✅ **Advanced UI components** (12 new: Popover, Tabs, Accordion, Sheet, RightClickMenu, CommandPalette, Kbd, ConfirmationDialog, FormModal, DataTable, DataTableToolbar, DataTableRow)
-- ✅ **Command Palette (Cmd+K)** with fuzzy search and device commands
-- ✅ **Context Menu on all device cards** (right-click desktop, long-press mobile)
-- ✅ **Quick actions on device cards** (power toggle, temperature/brightness controls)
-- ✅ **Full-featured DataTable** (sorting, filtering, pagination, row expansion, keyboard navigation)
-- ✅ **CSS animation system** (duration/ease/stagger tokens with reduced motion support)
-- ✅ **419+ component tests** for v4.0 components
-- ✅ **Full TypeScript migration** (575 files, 0 tsc errors, production build passes)
-- ✅ **Type safety enforced** (allowJs: false, 24 shared type definition files)
-- ✅ **3028+ tests passing** in TypeScript with jest.mocked() patterns
-- ✅ **Strict TypeScript** (strict: true + noUncheckedIndexedAccess, 1,841 errors fixed to zero)
-- ✅ **All 3,034 tests green** (FormModal fix, worker teardown resolved)
-- ✅ **Dead code removed** (40 files, 4 deps, 203 exports eliminated — 53% reduction)
-
-**Operational Setup Required:**
-- Cron webhook configuration for health monitoring (1-min frequency)
-- Cron webhook configuration for coordination enforcement (1-min frequency)
-- Firestore index deployment (`firebase deploy --only firestore:indexes`)
-- Token cleanup cron configuration (from v1.0)
+**Version:** v6.0 (shipped 2026-02-11)
+**Status:** Production-ready, fully operational with automated monitoring and analytics
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
-- Firebase (Realtime Database for tokens/cache, Firestore for history)
+- Firebase (Realtime Database for tokens/cache/analytics, Firestore for history)
 - Auth0 for authentication
 - Playwright for E2E testing
 - Recharts for visualization
 - CVA (class-variance-authority) for type-safe component variants
 - Radix UI primitives for accessible interactions
-- ~104,000 lines TypeScript (fully migrated v5.0)
+- GitHub Actions for cron automation (5-min schedule)
+- ~104,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
 
 ## Requirements
 
@@ -189,301 +132,136 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ Visual consistency verified across all pages — v3.1
 
 **v3.2 Dashboard Customization & Weather (Shipped 2026-02-03):**
-
-**Weather Display:**
-- ✓ **WEATHER-01**: Current temperature and "feels like" — v3.2 (Phase 26)
-- ✓ **WEATHER-02**: Weather condition icon (sunny, cloudy, rain, snow) — v3.2 (Phase 26)
-- ✓ **WEATHER-03**: Current humidity percentage — v3.2 (Phase 26)
-- ✓ **WEATHER-04**: Current wind speed — v3.2 (Phase 26)
-- ✓ **WEATHER-05**: 5-day forecast with high/low temperatures — v3.2 (Phase 26)
-- ✓ **WEATHER-06**: Loading skeleton while weather fetches — v3.2 (Phase 26)
-- ✓ **WEATHER-07**: Error state with retry option — v3.2 (Phase 26)
-- ✓ **WEATHER-08**: "Updated X minutes ago" timestamp — v3.2 (Phase 26)
-- ✓ **WEATHER-09**: Temperature trend indicator (rising/falling) — v3.2 (Phase 27)
-- ✓ **WEATHER-10**: Indoor/outdoor temperature comparison — v3.2 (Phase 26)
-
-**Location Settings:**
-- ✓ **LOC-01**: Manual city entry in settings — v3.2 (Phase 27)
-- ✓ **LOC-02**: Autocomplete suggestions when typing — v3.2 (Phase 27)
-- ✓ **LOC-03**: "Use my location" geolocation — v3.2 (Phase 27)
-- ✓ **LOC-04**: Geolocation error handling (iOS PWA) — v3.2 (Phase 27)
-- ✓ **LOC-05**: Location persistence in Firebase — v3.2 (Phase 27)
-- ✓ **LOC-06**: Location name in WeatherCard — v3.2 (Phase 27)
-
-**Dashboard Customization:**
-- ✓ **DASH-01**: Dashboard layout settings page — v3.2 (Phase 28)
-- ✓ **DASH-02**: Reorder cards using up/down buttons — v3.2 (Phase 28)
-- ✓ **DASH-03**: Toggle card visibility (show/hide) — v3.2 (Phase 28)
-- ✓ **DASH-04**: Card order persists in Firebase — v3.2 (Phase 28)
-- ✓ **DASH-05**: Home page renders cards in saved order — v3.2 (Phase 29)
-- ✓ **DASH-06**: Weather card reorderable like other cards — v3.2 (Phase 29)
-
-**Infrastructure:**
-- ✓ **INFRA-01**: Weather API with Open-Meteo, 15-min cache — v3.2 (Phase 25)
-- ✓ **INFRA-02**: Dashboard preferences in Firebase RTDB — v3.2 (Phase 28)
-- ✓ **INFRA-03**: Location settings in Firebase RTDB — v3.2 (Phase 27)
-- ✓ **INFRA-04**: Geolocation 10-second timeout — v3.2 (Phase 25)
+- ✓ Weather display with Open-Meteo API (current conditions, 5-day forecast, trends) — v3.2
+- ✓ Location settings with geocoding, geolocation, Firebase persistence — v3.2
+- ✓ Dashboard customization with per-user card reorder and visibility — v3.2
+- ✓ Dynamic home page rendering from user preferences — v3.2
 
 **v4.0 Advanced UI Components (Shipped 2026-02-05):**
-
-**Tabs:**
-- ✓ **TABS-01**: User can switch between tabs using click/tap — v4.0 (Phase 30)
-- ✓ **TABS-02**: User can navigate tabs with arrow keys — v4.0 (Phase 30)
-- ✓ **TABS-03**: Active tab is visually distinct with focus indicator — v4.0 (Phase 30)
-- ✓ **TABS-04**: Screen reader announces tab role and selection state — v4.0 (Phase 30)
-- ✓ **TABS-05**: Tabs support horizontal and vertical orientation — v4.0 (Phase 30)
-
-**Accordion:**
-- ✓ **ACCR-01**: User can expand/collapse sections by clicking header — v4.0 (Phase 31)
-- ✓ **ACCR-02**: User can toggle sections with Enter/Space keys — v4.0 (Phase 31)
-- ✓ **ACCR-03**: Expanded state communicated via aria-expanded — v4.0 (Phase 31)
-- ✓ **ACCR-04**: Accordion supports single-open and multiple-open modes — v4.0 (Phase 31)
-- ✓ **ACCR-05**: Collapse/expand has smooth height animation — v4.0 (Phase 31)
-
-**Data Table:**
-- ✓ **DTBL-01**: User can sort columns by clicking header — v4.0 (Phase 34)
-- ✓ **DTBL-02**: Sort direction indicated visually (asc/desc icons) — v4.0 (Phase 34)
-- ✓ **DTBL-03**: User can select rows via checkbox — v4.0 (Phase 34)
-- ✓ **DTBL-04**: User can navigate cells with arrow keys — v4.0 (Phase 34)
-- ✓ **DTBL-05**: User can filter columns via filter controls — v4.0 (Phase 34)
-- ✓ **DTBL-06**: User can paginate large datasets — v4.0 (Phase 34)
-- ✓ **DTBL-07**: User can expand rows to see details — v4.0 (Phase 34)
-- ✓ **DTBL-08**: Screen reader announces sort state and selection — v4.0 (Phase 34)
-- ✓ **DTBL-09**: Table is responsive (horizontal scroll on mobile) — v4.0 (Phase 34)
-
-**Command Palette:**
-- ✓ **CMDK-01**: User can open palette with Cmd+K (Mac) or Ctrl+K (Windows) — v4.0 (Phase 32)
-- ✓ **CMDK-02**: User can search commands with fuzzy matching — v4.0 (Phase 32)
-- ✓ **CMDK-03**: User can navigate results with arrow keys — v4.0 (Phase 32)
-- ✓ **CMDK-04**: User can execute command with Enter — v4.0 (Phase 32)
-- ✓ **CMDK-06**: Escape closes palette and returns focus — v4.0 (Phase 32)
-
-**Context Menu:**
-- ✓ **CTXM-01**: User can open menu via right-click on desktop — v4.0 (Phase 32)
-- ✓ **CTXM-02**: User can open menu via long-press on mobile — v4.0 (Phase 32)
-- ✓ **CTXM-03**: User can navigate menu items with arrow keys — v4.0 (Phase 32)
-- ✓ **CTXM-04**: User can select item with Enter — v4.0 (Phase 32)
-- ✓ **CTXM-05**: Escape closes menu — v4.0 (Phase 32)
-- ✓ **CTXM-06**: Menu positions within viewport (collision detection) — v4.0 (Phase 32)
-
-**Popover:**
-- ✓ **POPV-01**: User can open popover by clicking trigger — v4.0 (Phase 30)
-- ✓ **POPV-02**: Popover positions automatically (top/bottom/left/right) — v4.0 (Phase 30)
-- ✓ **POPV-03**: Click outside closes popover — v4.0 (Phase 30)
-- ✓ **POPV-04**: Escape closes popover — v4.0 (Phase 30)
-- ✓ **POPV-05**: Focus trapped within popover when open — v4.0 (Phase 30)
-
-**Sheet/Drawer:**
-- ✓ **SHEE-01**: Sheet slides in from edge (bottom/right) — v4.0 (Phase 31)
-- ✓ **SHEE-02**: Backdrop appears and click closes sheet — v4.0 (Phase 31)
-- ✓ **SHEE-03**: Escape closes sheet — v4.0 (Phase 31)
-- ✓ **SHEE-04**: Focus trapped within sheet — v4.0 (Phase 31)
-- ✓ **SHEE-05**: Focus returns to trigger on close — v4.0 (Phase 31)
-
-**Dialog Patterns:**
-- ✓ **DLGC-01**: Confirmation dialog has cancel/confirm buttons — v4.0 (Phase 33)
-- ✓ **DLGC-02**: Destructive actions use danger styling — v4.0 (Phase 33)
-- ✓ **DLGC-03**: Focus starts on cancel button (safe default) — v4.0 (Phase 33)
-- ✓ **DLGF-01**: Form modal integrates with form validation — v4.0 (Phase 33)
-- ✓ **DLGF-02**: Form modal shows loading state during submit — v4.0 (Phase 33)
-- ✓ **DLGF-03**: Form modal displays validation errors inline — v4.0 (Phase 33)
-
-**Micro-interactions:**
-- ✓ **ANIM-01**: Components use polished CSS transitions (ease curves) — v4.0 (Phase 35)
-- ✓ **ANIM-02**: Stagger effects on list/grid items — v4.0 (Phase 35)
-- ✓ **ANIM-03**: Spring physics for interactive elements — v4.0 (Phase 35)
-- ✓ **ANIM-04**: Reduced motion respected (prefers-reduced-motion) — v4.0 (Phase 35)
-
-**Quick Actions:**
-- ✓ **QACT-01**: Device cards have visible quick action icon buttons — v4.0 (Phase 36)
-- ✓ **QACT-02**: Device cards support context menu on right-click/long-press — v4.0 (Phase 36)
-- ✓ **QACT-03**: Quick actions are consistent across all device types — v4.0 (Phase 36)
-
-**Application Integration:**
-- ✓ **APPL-01**: Tabs used on thermostat page (Schedule/Manual/History) — v4.0 (Phase 36)
-- ✓ **APPL-02**: Accordion used for expandable device details — v4.0 (Phase 36)
-- ✓ **APPL-03**: Data Table used for notification history — v4.0 (Phase 36)
-- ✓ **APPL-04**: Command Palette accessible from any page — v4.0 (Phase 36)
-- ✓ **APPL-05**: Context Menu on all device cards — v4.0 (Phase 36)
-- ✓ **APPL-06**: Sheet used for mobile-friendly forms — v4.0 (Phase 36)
-- ✓ **APPL-07**: Confirmation Dialog for destructive actions — v4.0 (Phase 36)
-- ✓ **APPL-08**: All pages use new components consistently — v4.0 (Phase 36)
+- ✓ 12 advanced components (Popover, Tabs, Accordion, Sheet, RightClickMenu, CommandPalette, etc.) — v4.0
+- ✓ Command Palette (Cmd+K) with fuzzy search and device commands — v4.0
+- ✓ Context Menu on all device cards — v4.0
+- ✓ Full-featured DataTable with sorting, filtering, pagination — v4.0
+- ✓ CSS animation token system with reduced motion support — v4.0
+- ✓ 419+ component tests — v4.0
 
 **v5.0 TypeScript Migration (Shipped 2026-02-08):**
-
-**TypeScript Setup:**
-- ✓ **SETUP-01**: TypeScript installato e configurato (tsconfig.json) — v5.0 (Phase 37)
-- ✓ **SETUP-02**: allowJs abilitato per migrazione incrementale → disabilitato al termine — v5.0 (Phase 37, 43)
-- ✓ **SETUP-03**: Path aliases configurati (@/components, @/lib, etc.) — v5.0 (Phase 37)
-- ✓ **SETUP-04**: ESLint configurato per TypeScript — v5.0 (Phase 37)
-
-**Type Definitions:**
-- ✓ **TYPE-01**: Types condivisi per Firebase data structures — v5.0 (Phase 37)
-- ✓ **TYPE-02**: Types per API responses/requests patterns — v5.0 (Phase 37)
-- ✓ **TYPE-03**: Types per React component props comuni — v5.0 (Phase 37)
-- ✓ **TYPE-04**: Types per configurazioni e constants — v5.0 (Phase 37)
-
-**Source Migration:**
-- ✓ **LIB-01**: Tutti i file lib/ convertiti a .ts (116 file) — v5.0 (Phase 38)
-- ✓ **LIB-02**: Hooks convertiti a .ts (lib/hooks/, app/hooks/) — v5.0 (Phase 38)
-- ✓ **LIB-03**: Utilities e helpers tipizzati — v5.0 (Phase 38)
-- ✓ **LIB-04**: Services e repositories tipizzati — v5.0 (Phase 38)
-- ✓ **COMP-01**: Design system components convertiti a .tsx (64 file) — v5.0 (Phase 39)
-- ✓ **COMP-02**: Application components convertiti a .tsx (~50 file) — v5.0 (Phase 39)
-- ✓ **COMP-03**: Props definite con interface/type per ogni component — v5.0 (Phase 39)
-- ✓ **API-01**: Tutti gli API routes convertiti a .ts (90 file) — v5.0 (Phase 40)
-- ✓ **API-02**: Request/Response types per ogni endpoint — v5.0 (Phase 40)
-- ✓ **API-03**: Middleware e utility API tipizzati — v5.0 (Phase 40)
-- ✓ **PAGE-01**: Layout e page files convertiti a .tsx — v5.0 (Phase 41)
-- ✓ **PAGE-02**: Context providers convertiti a .tsx — v5.0 (Phase 41)
-- ✓ **PAGE-03**: Loading/Error/Not-found states tipizzati — v5.0 (Phase 41)
-
-**Testing & Verification:**
-- ✓ **TEST-01**: Test files lib/ convertiti a .ts — v5.0 (Phase 42)
-- ✓ **TEST-02**: Test files components/ convertiti a .tsx — v5.0 (Phase 42)
-- ✓ **TEST-03**: Jest configurato per TypeScript — v5.0 (Phase 42)
-- ✓ **TEST-04**: Tutti i test passano dopo migrazione — v5.0 (Phase 42, 43)
-- ✓ **VERIFY-01**: npm run build completa senza errori — v5.0 (Phase 43)
-- ✓ **VERIFY-02**: tsc --noEmit passa (type check) — v5.0 (Phase 43)
-- ✓ **VERIFY-03**: Zero file .js/.jsx rimanenti (escluso config) — v5.0 (Phase 43)
-- ✓ **VERIFY-04**: Dev server funziona correttamente — v5.0 (Phase 43)
+- ✓ 575 files migrated from JavaScript to TypeScript — v5.0
+- ✓ Zero tsc errors, production build verified — v5.0
+- ✓ `allowJs: false` enforced — v5.0
+- ✓ 3028+ tests passing in TypeScript — v5.0
 
 **v5.1 Tech Debt & Code Quality (Shipped 2026-02-10):**
+- ✓ `strict: true` + `noUncheckedIndexedAccess` enabled — v5.1
+- ✓ 1,841 + 436 TypeScript errors fixed to zero — v5.1
+- ✓ 40 unused files, 4 deps, 203 exports eliminated — v5.1
+- ✓ All 3,034 tests green — v5.1
 
-**TypeScript Strict Mode:**
-- ✓ **STRICT-01**: `strict: true` enabled in tsconfig.json — v5.1 (Phase 44)
-- ✓ **STRICT-02**: All `noImplicitAny` errors fixed (~768 errors) — v5.1 (Phase 44-47)
-- ✓ **STRICT-03**: All `strictNullChecks` errors fixed (~188 errors) — v5.1 (Phase 44-46)
-- ✓ **STRICT-04**: All type mismatch errors fixed (~419 errors) — v5.1 (Phase 44-46)
-- ✓ **STRICT-05**: All implicit index access errors fixed (~91 errors) — v5.1 (Phase 46)
-- ✓ **STRICT-06**: All remaining strict errors fixed (~30 errors) — v5.1 (Phase 46)
-- ✓ **STRICT-07**: `noUncheckedIndexedAccess` enabled (~436 errors fixed) — v5.1 (Phase 47)
-- ✓ **STRICT-08**: `tsc --noEmit` passes with strict + noUncheckedIndexedAccess (0 errors) — v5.1 (Phase 47)
+**v6.0 Operations, PWA & Analytics (Shipped 2026-02-11):**
 
-**Test Fixes:**
-- ✓ **TEST-01**: FormModal cancel behavior fixed — v5.1 (Phase 47)
-- ✓ **TEST-02**: Worker teardown warning resolved (documented as React 19 cosmetic) — v5.1 (Phase 47)
-- ✓ **TEST-03**: All 3,034 tests passing green — v5.1 (Phase 47-48)
+**Persistent Rate Limiting:**
+- ✓ **RATE-01**: Rate limiter notifiche usa Firebase RTDB transactions — v6.0 (Phase 49)
+- ✓ **RATE-02**: Rate limits persistono tra cold starts Vercel — v6.0 (Phase 49)
+- ✓ **RATE-03**: Sliding window con cleanup automatico — v6.0 (Phase 49)
+- ✓ **RATE-04**: Rate limiter Netatmo API migrato a Firebase RTDB — v6.0 (Phase 49)
+- ✓ **RATE-05**: Feature flag per rollout graduale — v6.0 (Phase 49)
 
-**Dead Code Removal:**
-- ✓ **DEAD-01**: 203 unused exports removed (53% reduction) — v5.1 (Phase 48)
-- ✓ **DEAD-02**: 40 unused files removed (5,702 LOC) — v5.1 (Phase 48)
-- ✓ **DEAD-03**: 4 unused dependencies removed — v5.1 (Phase 48)
+**Cron Automation:**
+- ✓ **CRON-01**: Health monitoring automatico ogni 5 minuti — v6.0 (Phase 50)
+- ✓ **CRON-02**: Coordinazione stufa-termostato automatica — v6.0 (Phase 50)
+- ✓ **CRON-03**: Scheduler entro timeout Vercel (fire-and-forget) — v6.0 (Phase 50)
+- ✓ **CRON-04**: Dead man's switch per cron — v6.0 (Phase 50)
+- ✓ **CRON-05**: Log esecuzione cron in dashboard — v6.0 (Phase 50)
+
+**E2E Test Improvements:**
+- ✓ **E2E-01**: Playwright auth setup con Auth0 reale — v6.0 (Phase 51)
+- ✓ **E2E-02**: Session state caching (storageState) — v6.0 (Phase 51)
+- ✓ **E2E-03**: Test accensione stufa — v6.0 (Phase 51)
+- ✓ **E2E-04**: Test cambio schedule termostato — v6.0 (Phase 51)
+- ✓ **E2E-05**: Test invio notifica push — v6.0 (Phase 51)
+- ✓ **E2E-06**: CI GitHub Actions — v6.0 (Phase 51)
+
+**Interactive Push Notifications:**
+- ✓ **PUSH-01**: Action button "Spegni stufa" — v6.0 (Phase 52)
+- ✓ **PUSH-02**: Action button "Imposta manuale" — v6.0 (Phase 52)
+- ✓ **PUSH-03**: Service worker notificationclick handler — v6.0 (Phase 52)
+- ✓ **PUSH-04**: Platform-specific FCM payloads — v6.0 (Phase 52)
+- ✓ **PUSH-05**: Graceful degradation — v6.0 (Phase 52)
+- ✓ **PUSH-06**: Offline Background Sync — v6.0 (Phase 52)
+
+**PWA Offline & Install:**
+- ✓ **PWA-01**: Banner "Sei offline" con timestamp — v6.0 (Phase 53)
+- ✓ **PWA-02**: Staleness indicator su device cards — v6.0 (Phase 53)
+- ✓ **PWA-03**: Controlli disabilitati offline — v6.0 (Phase 53)
+- ✓ **PWA-04**: Coda comandi offline visibile — v6.0 (Phase 53)
+- ✓ **PWA-05**: Toast conferma sync — v6.0 (Phase 53)
+- ✓ **PWA-06**: Install prompt dopo 2+ visite — v6.0 (Phase 53)
+- ✓ **PWA-07**: UI guidata install — v6.0 (Phase 53)
+- ✓ **PWA-08**: Dismissal 30 giorni — v6.0 (Phase 53)
+
+**Analytics Dashboard:**
+- ✓ **ANLY-01**: Consent banner GDPR — v6.0 (Phase 54)
+- ✓ **ANLY-02**: Modalità essenziali senza consenso — v6.0 (Phase 54)
+- ✓ **ANLY-03**: Tracking ore accensione con power level — v6.0 (Phase 54)
+- ✓ **ANLY-04**: Stima consumo pellet — v6.0 (Phase 54)
+- ✓ **ANLY-05**: Grafico timeline utilizzo — v6.0 (Phase 54)
+- ✓ **ANLY-06**: Grafico consumo pellet — v6.0 (Phase 54)
+- ✓ **ANLY-07**: Correlazione meteo-consumi — v6.0 (Phase 54)
+- ✓ **ANLY-08**: Stats cards con totali — v6.0 (Phase 54)
+- ✓ **ANLY-09**: Aggregazione giornaliera via cron — v6.0 (Phase 54)
+- ✓ **ANLY-10**: Dashboard pagina /analytics — v6.0 (Phase 54)
+- ✓ **ANLY-11**: Calibrazione stima pellet — v6.0 (Phase 54)
 
 ### Active
 
-<!-- v6.0 scope — defined in REQUIREMENTS.md -->
-- [ ] Cron automation operativa per health monitoring e coordination
-- [ ] Rate limiter persistente (Firebase-based)
-- [ ] E2E tests migliorati con Auth0 realistico
-- [ ] Health checks robusti e Firestore index automation
-- [ ] Notifiche push interattive con action buttons
-- [ ] PWA offline mode migliorato
-- [ ] PWA install prompt guidato
-- [ ] Dashboard analytics storico stufa
-- [ ] Stima consumo pellet
-- [ ] Correlazione meteo-consumi con suggerimenti
-- [ ] Grafici trend e pattern detection
+<!-- Next milestone scope — to be defined via /gsd:new-milestone -->
+
+(No active requirements — define next milestone with `/gsd:new-milestone`)
 
 ### Out of Scope
 
 - Notifiche email — Solo push notifications, no email
 - Notifiche SMS — Costo elevato, non core value
 - Notifiche programmate dall'utente — Scheduler già gestisce timing automatico
-- Ricche media notifications (v1) — Complessità rinviata a v2
-- Notifiche con azioni interattive (v1) — Moved to v6.0 scope
 - Supporto altri provider (OneSignal, Pusher) — Firebase FCM sufficiente
 - Real-time read receipts — Privacy concerns, battery drain
 - Unlimited history retention — Database bloat + GDPR liability (90-day max)
 - Silent background sync — iOS PWA unsupported
 - Guaranteed delivery — FCM doesn't guarantee, false expectations
+- Redis per rate limiting — Firebase RTDB transactions sufficient (validated v6.0)
+- Real-time pellet sensor — Hardware out of scope, software estimation only
+- Complex ML models per consumi — Euristica sufficient, ML deferred to future
+- Third-party analytics (GA, Mixpanel) — Privacy-first approach, Firebase only
+- Cron UI builder — Configuration via code sufficient
 
 ## Context
 
 **Codebase:**
 - Next.js 15.5 PWA con App Router
-- Firebase Realtime Database per storage
+- Firebase Realtime Database per storage e analytics
 - Firestore per notification history
 - Auth0 per autenticazione
-- Service Worker (Serwist) per offline capability
+- Service Worker (Serwist) per offline capability e notification actions
 - Multi-device smart home control (stufa, termostato, luci)
 - CVA + Radix UI design system (37+ components)
-- ~100,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
+- ~104,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
 - 531 TypeScript source files, 3,034 tests passing
+- GitHub Actions cron (5-min schedule) per health monitoring e coordination
+- GDPR-compliant analytics con consent banner
 
-**v5.1 Milestone (2026-02-09 → 2026-02-10):**
-- 5 phases executed (39 plans total)
-- 14/14 requirements satisfied (100%)
-- 1,841 TypeScript strict errors fixed to zero
-- 436 noUncheckedIndexedAccess errors fixed
-- 40 unused files deleted, 4 deps removed, 203 exports eliminated
-- All 3,034 tests green, FormModal cancel fix
-- 406 files changed (+19,624 insertions, -8,843 deletions)
-
-**v5.0 Milestone (2026-02-05 → 2026-02-08):**
-- 7 phases executed (56 plans total)
-- 24/24 requirements satisfied (100%)
-- 575 files migrated from JavaScript to TypeScript
-- 759 files changed (+45,658 insertions, -8,084 deletions)
-- Production build verified (30.5s, 49 routes)
-- allowJs: false enforced (prevents future JS regression)
-- 4 days from phase 37 start to completion
-
-**v4.0 Milestone (2026-02-04 → 2026-02-05):**
-- 7 phases executed (24 plans total)
-- 55/55 requirements satisfied (100%)
-- 12 new advanced UI components (Popover, Tabs, Accordion, Sheet, RightClickMenu, CommandPalette, Kbd, ConfirmationDialog, FormModal, DataTable, DataTableToolbar, DataTableRow)
-- Command Palette with fuzzy search and device commands
-- Context menus on all device cards with quick actions
-- CSS animation token system with reduced motion support
-- 419+ new component tests
-
-**v3.2 Milestone (2026-02-02 → 2026-02-03):**
-- 5 phases executed (13 plans total)
-- 26/26 requirements satisfied (100%)
-- Weather API with Open-Meteo (15-min cache, stale-while-revalidate)
-- WeatherCard with forecast, trends, indoor/outdoor comparison
-- Location settings with geocoding and geolocation
-- Dashboard customization with per-user preferences
-- Home page dynamic card rendering with registry pattern
-
-**v3.1 Milestone (2026-01-30 → 2026-02-02):**
-- 6 phases executed (13 plans total)
-- 22/22 requirements satisfied (100%)
-- All device cards 100% design system compliant
-- Zero raw HTML elements in device components
-- CVA variants for all conditional styling
-- Button colorScheme prop for mode-specific coloring
-
-**v3.0 Milestone (2026-01-28 → 2026-01-30):**
-- 8 phases executed (52 plans total)
-- 48/48 requirements satisfied (100%)
-- Complete UI component library with type-safe variants
-- Radix UI primitives for all interactive components
-- WCAG AA accessibility verified (172 axe tests)
-- All application pages migrated to design system
-- Interactive documentation at /debug/design-system
-
-**v2.0 Milestone (2026-01-27 → 2026-01-28):**
-- 5 phases executed (21 plans total)
-- 22/22 requirements satisfied (100%)
-- Netatmo schedule management complete
-- Stove health monitoring operational
-- Stove-thermostat coordination working
-
-**v1.0 Milestone (2026-01-23 → 2026-01-26):**
-- 5 phases executed (29 plans total)
-- 31/31 requirements satisfied (100%)
-- Push notification system complete
-- E2E test coverage comprehensive
+**v6.0 Milestone (2026-02-10 → 2026-02-11):**
+- 6 phases executed (29 plans total)
+- 42/42 requirements satisfied (100%)
+- 267 files changed (+30,256 insertions, -3,302 deletions)
+- 151 git commits with atomic changes
+- 2 days from phase 49 start to completion
 
 **Known Issues:**
-- Cron automation not operational (requires cron-job.org setup)
-- Rate limiter in-memory only (consider Redis for multi-instance)
-- Auth0 mock in E2E tests is placeholder
-- Firestore indexes require manual deployment
 - Worker teardown warning (React 19 cosmetic, not actionable)
 - 179 unused exports remain (131 intentional design system barrel, 48 utility)
+- 2 knip false positives (app/sw.ts, firebase-messaging-sw.js)
+- iOS notification category registration in PWA needs verification
+- Consent enforcement is caller responsibility (not middleware-enforced)
 
 **User Feedback:**
 - None yet (awaiting operational deployment)
@@ -495,17 +273,13 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 | Dual persistence (IndexedDB + localStorage) | Prevents token loss across browser restarts | ✓ Good — Browser restart survival verified (v1.0) |
 | Firebase Realtime Database for tokens | Low latency, consistency with project architecture | ✓ Good — Multi-device support working (v1.0) |
 | Firestore for notification history | Complex queries, pagination support | ✓ Good — Cursor-based pagination performant (v1.0) |
-| Non-blocking fire-and-forget logging | Logging failures shouldn't block notifications | ✓ Good — No notification failures due to logging (v1.0) |
+| Non-blocking fire-and-forget logging | Logging failures shouldn't block notifications | ✓ Good — Pattern reused in analytics (v1.0, v6.0) |
 | RTDB migration for preferences | Architectural consistency, real-time sync | ✓ Good — Cross-device sync instant (v1.0) |
-| In-memory rate limiting | Fast, simple for single-instance deployment | ⚠️ Revisit — Consider Redis for multi-instance (v2) |
 | HMAC-secured cron webhook | Security without API key rotation | ✓ Good — Timing-safe comparison prevents attacks (v1.0) |
 | Breaking changes OK | Permette refactoring completo senza vincoli legacy | ✓ Good — Enabled dual persistence implementation (v1.0) |
 | Firebase FCM retained | Già integrato, multi-platform support, affidabile | ✓ Good — Leveraged existing infrastructure (v1.0) |
 | Open-Meteo API | Free, no API key, reliable, comprehensive data | ✓ Good — Weather infrastructure operational (v3.2) |
-| In-memory weather cache | Simple for single-instance, 15-min TTL sufficient | ✓ Good — Fast responses, no Redis needed (v3.2) |
 | Per-user dashboard prefs | Proper isolation, Firebase RTDB consistency | ✓ Good — Users have independent preferences (v3.2) |
-| Menu-based card reorder | Simpler, more accessible than drag-drop | ✓ Good — Works on all devices (v3.2) |
-| Server-side prefs fetch | Faster than API route for Server Components | ✓ Good — Reduced latency on home page (v3.2) |
 | Card component registry | Easy extension, clean code, reduced lines | ✓ Good — Adding cards is trivial (v3.2) |
 | git mv for TS migration | Preserves git blame and history | ✓ Good — Full history retained (v5.0) |
 | Pragmatic `as any` for external APIs | Hue/Netatmo/OpenMeteo have no official TS types | ✓ Good — Unblocked migration (v5.0) |
@@ -514,9 +288,15 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 | Parallel wave execution | 5 agents in parallel for independent plans | ✓ Good — 4x faster phase execution (v5.0) |
 | Enable strict: true incrementally | Fix lib/ → components → app/ → tests layer by layer | ✓ Good — Zero cascade regressions (v5.1) |
 | noUncheckedIndexedAccess | Full index safety across arrays and objects | ✓ Good — Catches real bugs at compile time (v5.1) |
-| Pragmatic non-null assertions | Use `!` after known-good guards (API guarantees, test setup) | ✓ Good — Clean code without unnecessary checks (v5.1) |
 | knip for dead code analysis | Automated unused file/dep/export detection | ✓ Good — Found 40 files, 4 deps, 203 exports (v5.1) |
-| Preserve design system barrel exports | Intentional public API even if unused internally | ✓ Good — Maintains library API surface (v5.1) |
+| Firebase RTDB for rate limiting | Transactions provide atomicity without Redis | ✓ Good — Survives cold starts, no extra infra (v6.0) |
+| GitHub Actions for cron | External HTTP scheduler, no stateful server | ✓ Good — 5-min schedule operational (v6.0) |
+| Playwright with real Auth0 | Session caching prevents redundant logins | ✓ Good — Realistic E2E without mocks (v6.0) |
+| Platform-specific FCM payloads | iOS aps.category, Android clickAction | ✓ Good — Cross-platform actions (v6.0) |
+| Consent-first analytics | GDPR blocks all tracking without opt-in | ✓ Good — Compliant by default (v6.0) |
+| Fire-and-forget analytics | Errors logged but never thrown | ✓ Good — Analytics never blocks stove control (v6.0) |
+| 7-day retention for analytics events | Balances dashboard utility with storage costs | ✓ Good — Matches cronExecutionLogger pattern (v6.0) |
+| Visual parity GDPR buttons | Accept/Reject identical styling per EU 2026 | ✓ Good — No dark patterns (v6.0) |
 
 ## Constraints
 
@@ -525,6 +305,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Tech stack**: Next.js 15.5, Firebase 12.8.0, React 19.2.0
 - **Node runtime**: Firebase Admin SDK richiede Node.js runtime (no Edge)
 - **Deployment**: Vercel (current hosting platform)
+- **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-02-10 after v6.0 milestone start (Operations, PWA & Analytics)*
+*Last updated: 2026-02-11 after v6.0 milestone (Operations, PWA & Analytics)*

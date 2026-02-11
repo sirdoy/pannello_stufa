@@ -4,6 +4,41 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 
 ---
 
+## v6.0 Operations, PWA & Analytics (Shipped: 2026-02-11)
+
+**Delivered:** Full operational stack with persistent rate limiting, automated cron scheduling, Playwright E2E tests with real Auth0, interactive push notifications with action buttons, enhanced PWA offline mode with staleness indicators and install prompt, and GDPR-compliant analytics dashboard with pellet consumption estimation, usage charts, and weather correlation.
+
+**Phases completed:** 49-54 (29 plans total)
+
+**Key accomplishments:**
+
+- Firebase RTDB persistent rate limiter with transaction safety — notification and Netatmo rate limits survive cold starts and deployments
+- GitHub Actions cron automation with 5-minute schedule triggering health monitoring, coordination, and dead man's switch tracking
+- Playwright E2E test infrastructure with real Auth0 OAuth flow, session state caching, and GitHub Actions CI pipeline
+- Interactive push notifications with "Spegni stufa" and "Imposta manuale" action buttons, platform-specific FCM payloads (iOS/Android/Web), and offline Background Sync
+- PWA offline enhancements: Ember Noir offline banner, staleness indicators on device cards, disabled controls when offline, command queue UI, and guided install prompt with visit tracking
+- GDPR-compliant analytics dashboard: consent banner blocking all tracking, pellet consumption estimation with user calibration, usage/consumption/weather correlation charts, daily aggregation cron, and consent header enforcement
+
+**Stats:**
+
+- 29 plans executed across 6 phases
+- 42/42 v6.0 requirements satisfied (100%)
+- 267 files changed (+30,256 insertions, -3,302 deletions)
+- 151 git commits with atomic changes
+- 2 days from phase 49 start to completion (2026-02-10 → 2026-02-11)
+
+**Git range:** `feat(49-01)` → `docs(phase-54)`
+
+**Archives:**
+- [Roadmap](milestones/v6.0-ROADMAP.md)
+- [Requirements](milestones/v6.0-REQUIREMENTS.md)
+
+**Tech debt:** Worker teardown warning persists (React 19 cosmetic). iOS notification category registration in PWA needs deeper verification. Consent enforcement is caller responsibility (not middleware-enforced).
+
+**What's next:** App fully operational with cron automation, interactive notifications, offline resilience, and analytics. Ready for user feedback and next milestone planning.
+
+---
+
 ## v5.1 Tech Debt & Code Quality (Shipped: 2026-02-10)
 
 **Delivered:** Pristine TypeScript codebase with strict: true, noUncheckedIndexedAccess, zero tsc errors across all 531 source + 131 test files, all 3,034 tests green, and dead code removed (40 files, 4 deps, 203 exports eliminated).
@@ -293,3 +328,5 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 
 _For current project status, see `.planning/PROJECT.md`_
 _To start next milestone, run `/gsd:new-milestone`_
+
+

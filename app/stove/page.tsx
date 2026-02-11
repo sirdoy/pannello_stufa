@@ -21,6 +21,15 @@ import ErrorAlert from '@/app/components/ui/ErrorAlert';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
 import { formatHoursToHHMM } from '@/lib/formatUtils';
+import { canTrackAnalytics } from '@/lib/analyticsConsentService';
+
+/**
+ * Build analytics consent headers for fetch calls
+ */
+const getAnalyticsHeaders = (): HeadersInit => {
+  const consent = canTrackAnalytics() ? 'granted' : 'denied';
+  return { 'x-analytics-consent': consent };
+};
 
 /**
  * Stove Command Center
@@ -386,6 +395,7 @@ export default function StovePage() {
 
     const response = await fetch(STOVE_ROUTES.setPower, {
       method: 'POST',
+      headers: getAnalyticsHeaders(),
       body: JSON.stringify({ level: newLevel, source: 'manual' }),
     });
 
@@ -413,6 +423,7 @@ export default function StovePage() {
     setLoading(true);
     await fetch(STOVE_ROUTES.ignite, {
       method: 'POST',
+      headers: getAnalyticsHeaders(),
       body: JSON.stringify({ source: 'manual' }),
     });
     await logStoveAction.ignite();
@@ -431,6 +442,7 @@ export default function StovePage() {
     setLoading(true);
     await fetch(STOVE_ROUTES.shutdown, {
       method: 'POST',
+      headers: getAnalyticsHeaders(),
       body: JSON.stringify({ source: 'manual' }),
     });
     await logStoveAction.shutdown();

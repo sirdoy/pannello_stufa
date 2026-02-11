@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 
 Phase: 54 of 54 (Analytics Dashboard & Consent Management) — IN PROGRESS
 Plan: 02/08 completed
-Status: Pellet estimation service implemented with TDD
-Last activity: 2026-02-11 - Completed Phase 54 Plan 02: Pellet Consumption Estimation Service
+Status: Analytics foundation complete (types, consent, event logger)
+Last activity: 2026-02-11 - Completed Phase 54 Plan 01: Analytics Foundation
 
 Progress: [████████░░] 88.6% (269 of 302 estimated total plans)
 
@@ -89,6 +89,7 @@ Next action: Continue Phase 54 execution (remaining 6 plans)
 
 | Plan | Duration | Tasks | Files | Date | Status |
 |------|----------|-------|-------|------|--------|
+| 54-01 | 5.7 min | 2 | 5 | 2026-02-11 | Complete ✅ |
 | 54-02 | 3.6 min | 1 | 2 | 2026-02-11 | Complete ✅ |
 
 ## Accumulated Context
@@ -103,6 +104,9 @@ Recent decisions affecting v6.0 work (full log in PROJECT.md):
 - **Playwright auth state pattern**: Session caching prevents redundant Auth0 logins (Phase 51 implementation)
 - **Platform-specific FCM payloads**: iOS requires aps.category, Android uses clickAction (Phase 52 complexity)
 - **Consent-first analytics**: GDPR compliance blocks all tracking without explicit opt-in (Phase 54 blocker)
+- [Phase 54-01]: Consent enforcement is caller responsibility: Event logger is server-side only; client code checks canTrackAnalytics(), API routes check X-Analytics-Consent header, scheduler logs unconditionally
+- [Phase 54-01]: Fire-and-forget pattern for analytics: Errors logged but never thrown to prevent analytics failures from blocking stove control
+- [Phase 54-01]: 7-day default retention for analytics events: Balances dashboard utility with storage costs, matches cronExecutionLogger pattern
 - [Phase 49-01]: Pure transaction callbacks with no side effects (prevents duplication on retry)
 - [Phase 49-01]: 2-hour max retention prevents unbounded array growth in Firebase
 - [Phase 49-01]: Module independence: Copy rate limit config instead of importing (no shared state)

@@ -1099,7 +1099,7 @@ export default function StoveCard() {
 
               {/* Status Display Box - Ember Noir */}
                 <div
-                  className={`relative ${statusInfo.bgColor} rounded-2xl p-6 sm:p-8 ${statusInfo.glowColor} border ${statusInfo.borderColor} overflow-visible transition-all duration-500 ${staleness?.isStale ? 'opacity-60' : ''}`}
+                  className={`relative ${statusInfo.bgColor} rounded-2xl p-6 sm:p-8 ${statusInfo.glowColor} border ${statusInfo.borderColor} overflow-visible transition-all duration-500`}
                   data-status-variant={statusDisplay.variant}
                 >
                     {/* Layout: Status Label + Icon + Info Boxes */}

@@ -605,7 +605,7 @@ export default function ThermostatCard() {
                   selectedRoom.heating
                     ? 'bg-gradient-to-br from-ember-900/40 via-slate-900/60 to-flame-900/30 border-ember-500/40 shadow-ember-glow [html:not(.dark)_&]:from-ember-100/80 [html:not(.dark)_&]:via-ember-50/90 [html:not(.dark)_&]:to-flame-100/70 [html:not(.dark)_&]:border-ember-300 [html:not(.dark)_&]:shadow-[0_0_20px_rgba(237,111,16,0.15)]'
                     : 'bg-gradient-to-br from-ocean-900/30 via-slate-900/60 to-ocean-800/20 border-ocean-500/30 [html:not(.dark)_&]:from-ocean-100/80 [html:not(.dark)_&]:via-ocean-50/90 [html:not(.dark)_&]:to-ocean-100/70 [html:not(.dark)_&]:border-ocean-200'
-                } ${staleness?.isStale ? 'opacity-60' : ''}`}>
+                }`}>
                   {/* Heating Badge - with light mode */}
                   {selectedRoom.heating && (
                     <div className="absolute -top-2 -right-2 z-20">

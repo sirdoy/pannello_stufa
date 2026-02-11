@@ -565,10 +565,10 @@ async function handleShutdown(ora: string): Promise<any> {
   }
 }
 
-async function handleLevelChanges(active: any, currentPowerLevel: number, currentFanLevel: number): Promise<any> {
+async function handleLevelChanges(active: any, currentPowerLevel: number, currentFanLevel: number, skipPower = false): Promise<any> {
   let changeApplied = false;
 
-  if (currentPowerLevel !== active.power) {
+  if (!skipPower && currentPowerLevel !== active.power) {
     try {
       await setPowerLevel(active.power);
       await updateStoveState({ powerLevel: active.power, source: 'scheduler' });
@@ -597,33 +597,39 @@ async function handleLevelChanges(active: any, currentPowerLevel: number, curren
  * Adjusts stove power level based on living room temperature vs thermostat setpoint
  * using a PID controller algorithm.
  *
- * @param {boolean} isOn - Whether stove is currently ON
+ * @param {string} currentStatus - Current stove status description
  * @param {number} currentPowerLevel - Current stove power level (1-5)
  * @param {boolean} semiManual - Whether scheduler is in semi-manual mode
  * @param {boolean} schedulerEnabled - Whether scheduler is enabled
  * @returns {Object} - { skipped, reason } or { adjusted, from, to, temperature, setpoint }
  */
-async function runPidAutomationIfEnabled(isOn: boolean, currentPowerLevel: number, semiManual: boolean, schedulerEnabled: boolean): Promise<any> {
+async function runPidAutomationIfEnabled(currentStatus: string, currentPowerLevel: number, semiManual: boolean, schedulerEnabled: boolean, scheduledPower: number): Promise<any> {
+  const pidBoostPath = getEnvironmentPath('pidAutomation/boost');
+
   try {
-    // Skip if stove is not ON
-    if (!isOn) {
-      return { skipped: true, reason: 'stove_off' };
+    // Skip if stove is not in WORK state (not during START or other states)
+    if (!currentStatus.includes('WORK')) {
+      await adminDbSet(pidBoostPath, { active: false });
+      return { skipped: true, reason: 'stove_not_in_work' };
     }
 
     // Skip if not in automatic mode (semi-manual or manual)
     if (semiManual || !schedulerEnabled) {
+      await adminDbSet(pidBoostPath, { active: false });
       return { skipped: true, reason: 'not_auto_mode' };
     }
 
     // Get admin user ID for single-user system
     const adminUserId = process.env.ADMIN_USER_ID;
     if (!adminUserId) {
+      await adminDbSet(pidBoostPath, { active: false });
       return { skipped: true, reason: 'no_admin_user' };
     }
 
     // Read PID config from Firebase
     const pidConfig = await adminDbGet(`users/${adminUserId}/pidAutomation`) as any;
     if (!pidConfig || !pidConfig.enabled) {
+      await adminDbSet(pidBoostPath, { active: false });
       return { skipped: true, reason: 'pid_disabled' };
     }
 
@@ -709,6 +715,14 @@ async function runPidAutomationIfEnabled(isOn: boolean, currentPowerLevel: numbe
       await setPowerLevel(targetPower as any);
       await updateStoveState({ powerLevel: targetPower, source: 'pid_automation' as any });
 
+      // Save boost state: PID is overriding scheduled power
+      await adminDbSet(pidBoostPath, {
+        active: true,
+        powerLevel: targetPower,
+        scheduledPower,
+        appliedAt: now,
+      });
+
       return {
         adjusted: true,
         from: currentPowerLevel,
@@ -717,6 +731,11 @@ async function runPidAutomationIfEnabled(isOn: boolean, currentPowerLevel: numbe
         setpoint: setpoint,
         roomName: targetRoom.name,
       };
+    }
+
+    // No change needed — if PID agrees with schedule, clear boost
+    if (targetPower === scheduledPower) {
+      await adminDbSet(pidBoostPath, { active: false });
     }
 
     return {
@@ -966,22 +985,35 @@ export const GET = withCronSecret(async (_request) => {
       }
     }
 
+    // Read PID boost state from Firebase
+    const pidBoostPath = getEnvironmentPath('pidAutomation/boost');
+    const pidBoost = await adminDbGet(pidBoostPath) as { active?: boolean; powerLevel?: number } | null;
+    const pidBoostActive = !!(pidBoost?.active && pidBoost?.powerLevel);
+
     // Handle power/fan level changes (from schedule)
-    const levelsChanged = await handleLevelChanges(active, currentPowerLevel, currentFanLevel);
+    // Skip power change if PID boost is active — PID manages power
+    const levelsChanged = await handleLevelChanges(active, currentPowerLevel, currentFanLevel, pidBoostActive);
     changeApplied = changeApplied || levelsChanged;
 
-    // Run PID automation if enabled (async, don't block main flow)
+    // When boost is active, stove is at PID-set power (currentPowerLevel from fetch).
+    // When no boost, scheduler just applied active.power.
+    const effectivePower = pidBoostActive ? currentPowerLevel : active.power;
+
+    // Run PID automation if enabled (awaited to ensure power change completes in serverless)
     // This may override the scheduled power level based on temperature feedback
-    runPidAutomationIfEnabled(isOn, currentPowerLevel, modeData.semiManual, schedulerEnabled)
-      .then((result) => {
-        if (result.adjusted) {
-        } else if (result.skipped) {
-        } else {
-        }
-      })
-      .catch((err: any) => console.error('❌ PID automation error:', err.message));
+    const pidResult = await runPidAutomationIfEnabled(
+      currentStatus,
+      effectivePower,
+      modeData.semiManual,
+      schedulerEnabled,
+      active.power   // scheduledPower — always from schedule
+    );
 
   } else {
+    // Clear PID boost when no active schedule
+    const pidBoostPath = getEnvironmentPath('pidAutomation/boost');
+    await adminDbSet(pidBoostPath, { active: false });
+
     // No active schedule - turn off if on
     if (isOn) {
       const shutdownResult = await handleShutdown(ora);

@@ -6,18 +6,18 @@ See: .planning/PROJECT.md (updated 2026-02-11)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** v6.0 milestone complete. Ready for next milestone planning.
+**Current focus:** v7.0 Performance & Resilience
 
 ## Current Position
 
-Phase: 54 of 54 — v6.0 MILESTONE COMPLETE
-Plan: All complete
-Status: v6.0 archived, ready for next milestone
-Last activity: 2026-02-11 - v6.0 milestone archived
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-11 — Milestone v7.0 started
 
-Progress: [██████████] 100% (all milestones through v6.0 shipped)
+Progress: [░░░░░░░░░░] 0%
 
-Next action: `/gsd:new-milestone` to define next milestone
+Next action: Define requirements and create roadmap
 
 ## Performance Metrics
 
@@ -78,10 +78,10 @@ None. Use `/gsd:add-todo` to capture ideas during next milestone.
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Completed quick task 24 (ConsentBanner z-index fix)
+Stopped at: Starting v7.0 milestone (Performance & Resilience)
 Resume file: None
 
-Next action: `/gsd:new-milestone` to start next milestone cycle
+Next action: Define requirements → create roadmap
 
 ---
-*State updated: 2026-02-11 after quick task 24 completion*
+*State updated: 2026-02-11 after v7.0 milestone initialization*

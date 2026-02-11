@@ -10,8 +10,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v6.0 (shipped 2026-02-11)
-**Status:** Production-ready, fully operational with automated monitoring and analytics
+**Version:** v7.0 (in progress)
+**Status:** Performance & resilience hardening
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -212,11 +212,19 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ **ANLY-10**: Dashboard pagina /analytics — v6.0 (Phase 54)
 - ✓ **ANLY-11**: Calibrazione stima pellet — v6.0 (Phase 54)
 
+## Current Milestone: v7.0 Performance & Resilience
+
+**Goal:** Harden the app with smart retry strategies, adaptive polling, error boundaries, component refactoring, critical path test coverage, and FCM token cleanup.
+
+**Target features:**
+- Smart retry with exponential backoff (auto-retry network errors, manual retry device errors)
+- Adaptive polling via Page Visibility API (5s active → 30s background → pause hidden)
+- Global error boundaries and graceful degradation
+- Break up StoveCard (1217 lines), LightsCard (1186 lines), stove/page.tsx (1054 lines)
+- Unit tests for /api/scheduler/check (652 lines, critical path, zero coverage)
+- Cron-based FCM token cleanup (unbounded accumulation)
+
 ### Active
-
-<!-- Next milestone scope — to be defined via /gsd:new-milestone -->
-
-(No active requirements — define next milestone with `/gsd:new-milestone`)
 
 ### Out of Scope
 

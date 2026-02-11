@@ -466,7 +466,6 @@ export default function Navbar() {
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="
-                  lg:hidden
                   p-2.5
                   rounded-xl
                   bg-white/[0.04] dark:bg-white/[0.04]

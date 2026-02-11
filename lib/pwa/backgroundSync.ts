@@ -20,6 +20,7 @@
  */
 
 import { put, getAll, getByIndex, remove, STORES } from './indexedDB';
+import { isCommandExpired } from './stalenessDetector';
 
 // SyncManager interface (not in all TypeScript DOM libs yet)
 interface SyncManager {
@@ -162,6 +163,15 @@ export async function processQueue(): Promise<ProcessQueueResult> {
 
   for (const command of pendingCommands) {
     try {
+      // Check command expiration (safety: stale-intent protection)
+      if (isCommandExpired({ endpoint: command.endpoint, timestamp: command.timestamp })) {
+        // Remove expired command from queue
+        await remove(STORES.COMMAND_QUEUE, command.id!);
+        console.warn(`[BackgroundSync] Command expired (${command.endpoint}, queued at ${command.timestamp})`);
+        failed++; // Count as failed for reporting
+        continue;
+      }
+
       // Mark as processing
       await put(STORES.COMMAND_QUEUE, {
         ...command,

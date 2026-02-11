@@ -56,7 +56,7 @@ export default function ConsentBanner() {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 md:max-w-lg md:mx-auto">
+    <div className="fixed bottom-4 left-4 right-4 z-[9999] md:max-w-lg md:mx-auto">
       <Card variant="glass" padding>
         <Heading level={4} variant="default" className="mb-2">
           Analytics & Usage Statistics

@@ -8,7 +8,7 @@
  * Netatmo valves to recalibrate automatically.
  */
 
-import { adminDbGet, adminDbPush } from '@/lib/firebaseAdmin';
+import { adminDbGet, adminDbPush, adminDbSet } from '@/lib/firebaseAdmin';
 import NETATMO_API from '@/lib/netatmoApi';
 import { getValidAccessToken } from '@/lib/netatmoTokenHelper';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
@@ -79,9 +79,26 @@ export async function calibrateValvesServer(): Promise<CalibrationResult> {
   const home = homesData[0]!;
   const schedules = home.schedules || [];
 
-  // Find the currently selected schedule
-  const currentSchedule = schedules.find(s => s.selected === true);
-  if (!currentSchedule) {
+  // BUGFIX: Restore to user's manually selected schedule (if available) instead of API's current schedule
+  // This preserves user intent across calibration cycles
+  const userSchedulePath = getEnvironmentPath('netatmo/userSelectedScheduleId');
+  const userSelectedId = await adminDbGet(userSchedulePath) as string | null;
+
+  // Find the target schedule to restore after calibration
+  let targetSchedule;
+  if (userSelectedId) {
+    // Try to use user's manually selected schedule
+    targetSchedule = schedules.find(s => s.id === userSelectedId);
+    if (!targetSchedule) {
+      // User's schedule no longer exists (deleted?) - fall back to current
+      targetSchedule = schedules.find(s => s.selected === true);
+    }
+  } else {
+    // No user selection stored yet - use current
+    targetSchedule = schedules.find(s => s.selected === true);
+  }
+
+  if (!targetSchedule) {
     return {
       calibrated: false,
       reason: 'no_schedule',
@@ -98,8 +115,8 @@ export async function calibrateValvesServer(): Promise<CalibrationResult> {
     };
   }
 
-  // Find alternative schedule
-  const alternativeSchedule = schedules.find(s => s.id !== currentSchedule.id);
+  // Find alternative schedule (different from target)
+  const alternativeSchedule = schedules.find(s => s.id !== targetSchedule.id);
 
   if (!alternativeSchedule) {
     return {
@@ -139,6 +156,8 @@ export async function calibrateValvesServer(): Promise<CalibrationResult> {
 
   // If schedule changed during calibration, don't switch back (respect user's choice)
   if (currentScheduleAfter && currentScheduleAfter.id !== alternativeSchedule.id) {
+    // User changed it manually - update stored selection and keep their choice
+    await adminDbSet(userSchedulePath, currentScheduleAfter.id);
     return {
       calibrated: true,
       schedule_name: currentScheduleAfter.name || 'Unknown',
@@ -148,8 +167,8 @@ export async function calibrateValvesServer(): Promise<CalibrationResult> {
   }
 
 
-  // Switch back to original schedule
-  const switched2 = await NETATMO_API.switchHomeSchedule(accessToken, homeId, currentSchedule.id);
+  // Switch back to target schedule (user's last manual selection or current)
+  const switched2 = await NETATMO_API.switchHomeSchedule(accessToken, homeId, targetSchedule.id);
   if (!switched2) {
     return {
       calibrated: false,
@@ -161,8 +180,8 @@ export async function calibrateValvesServer(): Promise<CalibrationResult> {
   // Log calibration
   const calibrationEntry: CalibrationEntry = {
     timestamp: Date.now(),
-    schedule_id: currentSchedule.id,
-    schedule_name: currentSchedule.name || 'Unknown',
+    schedule_id: targetSchedule.id,
+    schedule_name: targetSchedule.name || 'Unknown',
     triggered_by: 'cron',
     status: 'success',
   };
@@ -170,7 +189,7 @@ export async function calibrateValvesServer(): Promise<CalibrationResult> {
 
   return {
     calibrated: true,
-    schedule_name: currentSchedule.name || 'Unknown',
+    schedule_name: targetSchedule.name || 'Unknown',
     timestamp: Date.now(),
   };
 }

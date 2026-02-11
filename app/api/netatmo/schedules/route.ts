@@ -1,6 +1,6 @@
 import { withAuthAndErrorHandler, success, badRequest } from '@/lib/core';
 import { requireNetatmoToken } from '@/lib/core/netatmoHelpers';
-import { adminDbGet } from '@/lib/firebaseAdmin';
+import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 import { getCached, invalidateCache } from '@/lib/netatmoCacheService';
 import { checkNetatmoRateLimit, trackNetatmoApiCall } from '@/lib/netatmoRateLimiter';
@@ -155,6 +155,10 @@ export const POST = withAuthAndErrorHandler(async (req: NextRequest, session?: a
   // Invalidate cache after successful switch
   await invalidateCache('schedules');
 
+  // BUGFIX: Store user's manually selected schedule ID to preserve it across auto-calibration cycles
+  // Calibration service will restore to this ID instead of reading from Netatmo API
+  const userSchedulePath = getEnvironmentPath('netatmo/userSelectedScheduleId');
+  await adminDbSet(userSchedulePath, scheduleId);
 
   return success({
     success: true,

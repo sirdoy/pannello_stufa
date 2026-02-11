@@ -153,11 +153,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 53-01-PLAN.md — Enhanced OfflineBanner with Ember Noir styling and command queue UI
-- [ ] 53-02-PLAN.md — Staleness detection service and useDeviceStaleness hook (TDD)
-- [ ] 53-03-PLAN.md — Device cards offline safety (control hiding, staleness UI, command expiration)
-- [ ] 53-04-PLAN.md — PWA install prompt bottom sheet with visit tracking and iOS fallback
-- [ ] 53-05-PLAN.md — Integration wiring (InstallPrompt in layout, reconnect sync toast)
+- [x] 53-01-PLAN.md — Enhanced OfflineBanner with Ember Noir styling and command queue UI
+- [x] 53-02-PLAN.md — Staleness detection service and useDeviceStaleness hook (TDD)
+- [x] 53-03-PLAN.md — Device cards offline safety (control hiding, staleness UI, command expiration)
+- [x] 53-04-PLAN.md — PWA install prompt bottom sheet with visit tracking and iOS fallback
+- [x] 53-05-PLAN.md — Integration wiring (InstallPrompt in layout, reconnect sync toast)
 
 ### Phase 54: Analytics Dashboard
 **Goal**: GDPR-compliant usage analytics with pellet consumption estimation, historical trends, weather correlation, and user calibration for stove optimization insights.
@@ -200,7 +200,7 @@ Phases execute in numeric order: 49 → 50 → 51 → 52 → 53 → 54
 | 50 | v6.0 | 4/4 | ✓ Complete | 2026-02-10 |
 | 51 | v6.0 | 4/4 | ✓ Complete | 2026-02-10 |
 | 52 | v6.0 | 3/3 | ✓ Complete | 2026-02-10 |
-| 53 | v6.0 | 0/5 | Planned | - |
+| 53 | v6.0 | 5/5 | ✓ Complete | 2026-02-11 |
 | 54 | v6.0 | 0/TBD | Not started | - |
 
 ---
@@ -209,4 +209,4 @@ Phases execute in numeric order: 49 → 50 → 51 → 52 → 53 → 54
 **v6.0 Requirements:** 42 total (100% coverage validated)
 **Depth:** Comprehensive (6 phases for 42 requirements)
 **Created:** 2026-02-10
-**Last updated:** 2026-02-10 — Phase 52 complete
+**Last updated:** 2026-02-11 — Phase 53 complete

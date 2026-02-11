@@ -174,16 +174,17 @@ Plans:
   5. Historical charts visualize usage trends (7/30/90 days) and weather correlation
   6. Daily aggregation cron processes real-time events into queryable stats automatically
 
-**Plans**: 7 plans
+**Plans**: 8 plans
 
 Plans:
 - [ ] 54-01-PLAN.md — Analytics types, consent service, and event logger (foundation)
 - [ ] 54-02-PLAN.md — Pellet consumption estimation service (TDD)
 - [ ] 54-03-PLAN.md — Aggregation service and cron endpoint
-- [ ] 54-04-PLAN.md — GDPR consent banner UI component
+- [ ] 54-04-PLAN.md — GDPR consent banner UI component + ClientProviders wiring
 - [ ] 54-05-PLAN.md — Analytics stats API, calibrate API, and StatsCards
 - [ ] 54-06-PLAN.md — Dashboard charts (Usage, Consumption, Weather Correlation)
 - [ ] 54-07-PLAN.md — Dashboard page assembly with period selector and calibration modal
+- [ ] 54-08-PLAN.md — Stove event instrumentation (ignite/shutdown/power API routes + scheduler)
 
 ## Progress
 

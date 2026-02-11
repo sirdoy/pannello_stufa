@@ -81,42 +81,44 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| RETRY-01 | Pending | Pending |
-| RETRY-02 | Pending | Pending |
-| RETRY-03 | Pending | Pending |
-| RETRY-04 | Pending | Pending |
-| RETRY-05 | Pending | Pending |
-| RETRY-06 | Pending | Pending |
-| POLL-01 | Pending | Pending |
-| POLL-02 | Pending | Pending |
-| POLL-03 | Pending | Pending |
-| POLL-04 | Pending | Pending |
-| POLL-05 | Pending | Pending |
-| ERR-01 | Pending | Pending |
-| ERR-02 | Pending | Pending |
-| ERR-03 | Pending | Pending |
-| ERR-04 | Pending | Pending |
-| ERR-05 | Pending | Pending |
-| ERR-06 | Pending | Pending |
-| REFAC-01 | Pending | Pending |
-| REFAC-02 | Pending | Pending |
-| REFAC-03 | Pending | Pending |
-| REFAC-04 | Pending | Pending |
-| REFAC-05 | Pending | Pending |
-| TEST-01 | Pending | Pending |
-| TEST-02 | Pending | Pending |
-| TEST-03 | Pending | Pending |
-| TEST-04 | Pending | Pending |
-| TOKEN-01 | Pending | Pending |
-| TOKEN-02 | Pending | Pending |
-| TOKEN-03 | Pending | Pending |
-| TOKEN-04 | Pending | Pending |
+| RETRY-01 | Phase 55 | Pending |
+| RETRY-02 | Phase 55 | Pending |
+| RETRY-03 | Phase 55 | Pending |
+| RETRY-04 | Phase 55 | Pending |
+| RETRY-05 | Phase 55 | Pending |
+| RETRY-06 | Phase 55 | Pending |
+| POLL-01 | Phase 57 | Pending |
+| POLL-02 | Phase 57 | Pending |
+| POLL-03 | Phase 57 | Pending |
+| POLL-04 | Phase 57 | Pending |
+| POLL-05 | Phase 57 | Pending |
+| ERR-01 | Phase 56 | Pending |
+| ERR-02 | Phase 56 | Pending |
+| ERR-03 | Phase 56 | Pending |
+| ERR-04 | Phase 56 | Pending |
+| ERR-05 | Phase 56 | Pending |
+| ERR-06 | Phase 56 | Pending |
+| REFAC-01 | Phase 58 | Pending |
+| REFAC-02 | Phase 59 | Pending |
+| REFAC-03 | Phase 59 | Pending |
+| REFAC-04 | Phase 58, 59 | Pending |
+| REFAC-05 | Phase 58, 59 | Pending |
+| TEST-01 | Phase 60 | Pending |
+| TEST-02 | Phase 60 | Pending |
+| TEST-03 | Phase 60 | Pending |
+| TEST-04 | Phase 60 | Pending |
+| TOKEN-01 | Phase 60 | Pending |
+| TOKEN-02 | Phase 60 | Pending |
+| TOKEN-03 | Phase 60 | Pending |
+| TOKEN-04 | Phase 60 | Pending |
 
 **Coverage:**
 - v7.0 requirements: 30 total
-- Mapped to phases: 0
-- Unmapped: 30 ⚠️
+- Mapped to phases: 30
+- Unmapped: 0 ✓
+
+**Note:** REFAC-04 and REFAC-05 apply to both Phase 58 (StoveCard) and Phase 59 (LightsCard & stove/page.tsx) as they describe the refactoring pattern used in both phases.
 
 ---
 *Requirements defined: 2026-02-11*
-*Last updated: 2026-02-11 after initial definition*
+*Last updated: 2026-02-11 after roadmap creation*

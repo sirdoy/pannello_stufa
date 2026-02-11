@@ -11,6 +11,7 @@
 - ✅ **v5.0 TypeScript Migration** — Phases 37-43 (shipped 2026-02-08)
 - ✅ **v5.1 Tech Debt & Code Quality** — Phases 44-48 (shipped 2026-02-10)
 - ✅ **v6.0 Operations, PWA & Analytics** — Phases 49-54 (shipped 2026-02-11)
+- 🚧 **v7.0 Performance & Resilience** — Phases 55-60 (in progress)
 
 ## Phases
 
@@ -44,7 +45,149 @@ See `.planning/milestones/` for full archives.
 
 </details>
 
+---
+
+### 🚧 v7.0 Performance & Resilience (In Progress)
+
+**Milestone Goal:** Harden the application with smart retry strategies for transient failures, adaptive polling for resource efficiency, graceful error boundaries, component refactoring for large files (1000+ LOC), critical path test coverage, and automated FCM token cleanup.
+
+#### Phase 55: Retry Infrastructure
+
+**Goal**: Device commands and API calls recover automatically from transient failures with exponential backoff and idempotency protection.
+
+**Depends on**: Nothing (first phase)
+
+**Requirements**: RETRY-01, RETRY-02, RETRY-03, RETRY-04, RETRY-05, RETRY-06
+
+**Success Criteria** (what must be TRUE):
+1. User sees toast notification when device command fails with network error
+2. Transient network errors auto-retry up to 3 times without user intervention
+3. Device-offline errors show toast with manual "Retry" button (no auto-retry)
+4. Stove ignite/shutdown commands use idempotency keys to prevent duplicate physical actions
+5. Request deduplication prevents double-tap from sending duplicate commands within 2-second window
+
+**Plans**: TBD
+
+Plans:
+- [ ] 55-01: TBD
+
+---
+
+#### Phase 56: Error Boundaries
+
+**Goal**: Application continues functioning when individual device cards crash, showing fallback UI instead of blank screen.
+
+**Depends on**: Phase 55
+
+**Requirements**: ERR-01, ERR-02, ERR-03, ERR-04, ERR-05, ERR-06
+
+**Success Criteria** (what must be TRUE):
+1. Unhandled error in StoveCard displays fallback UI without crashing entire dashboard
+2. Unhandled error in LightsCard displays fallback UI without affecting other device cards
+3. Error boundaries show user-friendly message with "Try Again" button that resets component
+4. Clicking "Try Again" clears error state and re-mounts component with fresh data
+5. Validation errors (needsCleaning, maintenance alerts) bypass error boundary and show proper UI
+6. Component errors automatically log to Firebase Analytics for monitoring
+
+**Plans**: TBD
+
+Plans:
+- [ ] 56-01: TBD
+
+---
+
+#### Phase 57: Adaptive Polling
+
+**Goal**: Polling automatically adjusts based on tab visibility and network conditions to reduce resource usage without compromising safety.
+
+**Depends on**: Phase 56
+
+**Requirements**: POLL-01, POLL-02, POLL-03, POLL-04, POLL-05
+
+**Success Criteria** (what must be TRUE):
+1. Polling stops when browser tab becomes hidden (Page Visibility API)
+2. Polling resumes immediately when tab becomes visible again
+3. Stove status maintains fixed 5-second interval when tab is active (never adaptive)
+4. Non-critical data (weather, FCM tokens) reduces polling frequency on slow network
+5. Staleness indicator appears on device cards when data is older than expected refresh interval
+
+**Plans**: TBD
+
+Plans:
+- [ ] 57-01: TBD
+
+---
+
+#### Phase 58: StoveCard Refactoring
+
+**Goal**: StoveCard split into maintainable sub-components using orchestrator pattern with single polling loop and error boundary per section.
+
+**Depends on**: Phase 57
+
+**Requirements**: REFAC-01, REFAC-04, REFAC-05
+
+**Success Criteria** (what must be TRUE):
+1. StoveCard main file reduced from 1510 LOC to ~200 LOC orchestrator
+2. StoveCard functionality split into 5-6 sub-components of 150-250 LOC each
+3. Single polling loop in orchestrator prevents request multiplication
+4. Complex state logic extracted into custom hooks for reusability
+5. Parent orchestrator manages state, children are presentational components receiving props
+
+**Plans**: TBD
+
+Plans:
+- [ ] 58-01: TBD
+
+---
+
+#### Phase 59: LightsCard & Page Refactoring
+
+**Goal**: LightsCard and stove/page.tsx split using orchestrator pattern established in Phase 58.
+
+**Depends on**: Phase 58
+
+**Requirements**: REFAC-02, REFAC-03, REFAC-04, REFAC-05
+
+**Success Criteria** (what must be TRUE):
+1. LightsCard reduced from 1203 LOC to ~200 LOC orchestrator with 4-5 sub-components
+2. stove/page.tsx reduced from 1066 LOC to ~200 LOC orchestrator with 4 sub-components
+3. Both components follow Phase 58 orchestrator pattern (single polling, props-based data flow)
+4. Complex state logic extracted into reusable custom hooks
+5. Visual output and functionality unchanged after refactoring
+
+**Plans**: TBD
+
+Plans:
+- [ ] 59-01: TBD
+
+---
+
+#### Phase 60: Critical Path Testing & Token Cleanup
+
+**Goal**: Scheduler check route has comprehensive unit test coverage and automated FCM token cleanup prevents unbounded growth.
+
+**Depends on**: Phase 59
+
+**Requirements**: TEST-01, TEST-02, TEST-03, TEST-04, TOKEN-01, TOKEN-02, TOKEN-03, TOKEN-04
+
+**Success Criteria** (what must be TRUE):
+1. /api/scheduler/check has unit tests covering all execution paths (OFF → START → WORK transitions)
+2. Scheduler tests cover error scenarios (API timeout, invalid state, stove offline)
+3. Scheduler route achieves 80%+ branch coverage per Jest coverage report
+4. Automated cron job deletes stale FCM tokens based on last delivery timestamp (not app open)
+5. Active tokens (recent notification delivery) never deleted by cleanup process
+6. Token cleanup logs all deletions to Firebase for audit trail
+
+**Plans**: TBD
+
+Plans:
+- [ ] 60-01: TBD
+
+---
+
 ## Progress
+
+**Execution Order:** Phases 55 → 56 → 57 → 58 → 59 → 60
 
 | Phase | Milestone | Plans | Status | Completed |
 |-------|-----------|-------|--------|-----------|
@@ -57,9 +200,15 @@ See `.planning/milestones/` for full archives.
 | 37-43 | v5.0 | 56/56 | ✓ Complete | 2026-02-08 |
 | 44-48 | v5.1 | 39/39 | ✓ Complete | 2026-02-10 |
 | 49-54 | v6.0 | 29/29 | ✓ Complete | 2026-02-11 |
+| 55 | v7.0 | 0/? | Not started | - |
+| 56 | v7.0 | 0/? | Not started | - |
+| 57 | v7.0 | 0/? | Not started | - |
+| 58 | v7.0 | 0/? | Not started | - |
+| 59 | v7.0 | 0/? | Not started | - |
+| 60 | v7.0 | 0/? | Not started | - |
 
-**Total:** 9 milestones, 54 phases, 276 plans shipped
+**Total:** 9 milestones shipped, 54 phases complete, 276 plans executed
 
 ---
 
-**Last updated:** 2026-02-11 — v6.0 milestone complete
+*Roadmap updated: 2026-02-11 — v7.0 phases defined*

@@ -1,347 +1,454 @@
-# Feature Landscape - v6.0 Operations, PWA & Analytics
+# Feature Landscape - v7.0 Performance & Resilience
 
-**Domain:** Smart Home IoT Dashboard - Operational Resilience & Analytics
-**Researched:** 2026-02-10
-**Project:** Pannello Stufa v6.0
-**Context:** Subsequent milestone building on complete push notification system, Netatmo integration, stove monitoring, and Next.js 15.5 PWA foundation
+**Domain:** Production Hardening for Smart Home PWA
+**Researched:** 2026-02-11
+**Project:** Pannello Stufa v7.0
+**Context:** Performance & resilience hardening for existing Next.js 15.5 PWA after successful v6.0 operations/analytics milestone
 
 ---
 
 ## Executive Summary
 
-This research covers six new feature areas for v6.0: (1) **Cron automation** for health monitoring and stove-thermostat coordination, (2) **persistent rate limiting** using Firebase instead of in-memory stores, (3) **E2E test improvements** for realistic Auth0 testing, (4) **interactive push notifications** with action buttons, (5) **PWA offline mode** enhancements, and (6) **analytics dashboard** for stove usage tracking and pellet consumption estimation.
+This research covers six hardening domains for production resilience: (1) **Retry strategies** with exponential backoff for device control commands, (2) **Adaptive polling** with Visibility API to optimize resource usage, (3) **Error boundaries** at feature level for graceful degradation, (4) **Component splitting** for StoveCard/LightsCard/stove page (1000+ line files), (5) **Critical path testing** with Playwright for login-to-control flows, and (6) **Token lifecycle management** with automated 30-day cleanup.
 
-**Table stakes are minimal** because the foundation already exists: Firebase RTDB + Firestore, FCM push system, Serwist service worker, Recharts for visualization, and comprehensive monitoring infrastructure. The only truly new functionality is interactive notification actions (requires service worker message handling) and analytics visualization (requires new Firestore queries and chart components).
+**Table stakes are fundamental**: Production apps without retry logic feel broken, apps that poll hidden tabs waste battery, apps without error boundaries crash completely, large components slow parse times, critical paths without E2E tests break in production, and unbounded FCM tokens bloat databases. These are not nice-to-have features—they're reliability requirements.
 
-**Key differentiators** center on: (1) **smart pellet consumption estimation** using ML-inspired heuristics (weather + runtime correlation), (2) **notification actions that actually work offline** via Background Sync, (3) **distributed rate limiting with Firebase transactions** (not just Redis patterns), (4) **cron reliability monitoring** (dead man's switch for automation itself), and (5) **realistic E2E auth testing** that doesn't mock Auth0 away.
+**Key differentiators** center on: (1) **Adaptive polling with state machine** (not just visibility toggle), (2) **Granular loading states** per device (not spinner-of-death), (3) **Automatic error recovery** with user-friendly fallbacks, and (4) **Component health monitoring** via error boundary logging.
 
-**Critical anti-features:** No cron UI builder (cron stays in code), no third-party analytics services (privacy-first, Firebase only), no complex ML models (heuristics sufficient for single-user app), no multi-tenant rate limiting complexity (family app, not SaaS), and no Playwright migration (Cypress already covers 3034 passing tests).
+**Critical anti-features:** No 100% E2E coverage (3-5 flows sufficient), no premature micro-frontends (component splitting adequate), no global error handler only (crashes whole app), no manual token management UI (needs automation), no infinite retries (battery drain), no real-time everything (polling adequate for thermostat control).
 
 ---
 
 ## Table Stakes
 
-Features users expect from smart home IoT dashboards. Missing these = product feels incomplete.
+Features users expect from production apps. Missing these = product feels broken or unreliable.
 
-### 1. Cron Automation (Background Task Scheduling)
+### 1. Error Recovery (Error Boundaries)
 
 | Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| **Scheduled health checks** | Smart home devices poll status every 5-30min automatically | Low | Vercel Cron (cron.yaml), /api/scheduler/check already exists |
-| **Auto-coordination tasks** | Stove-thermostat coordination shouldn't require manual triggers | Low | Existing logic in /api/stove/ignite, needs cron trigger |
-| **Dead man's switch monitoring** | If cron fails, system alerts user within 10-15min | Medium | Firebase lastRun timestamp + monitoring UI |
-| **Configurable intervals** | Different tasks run at different frequencies (5min vs 1hr) | Low | Environment variables per endpoint |
-| **Graceful degradation** | If external API fails (Netatmo, stove), cron doesn't crash | Low | Try-catch + error logging already in place |
+|---------|--------------|-------------|-------|
+| **Feature-level boundaries** | One component error shouldn't crash entire app | Medium | StoveCard, LightsCard, SchedulerCard boundaries |
+| **Fallback UI** | User sees "Something went wrong" not white screen | Low | Simple ErrorFallback component with reload button |
+| **Error logging** | Production errors tracked in analytics | Low | componentDidCatch → Firebase Analytics |
+| **Reset capability** | User can retry without page reload | Low | Reset button in fallback updates error state |
+| **Nested boundaries** | Critical sections (ignite button) have own boundary | Medium | Extra protection for high-risk operations |
 
-**Why table stakes:** Home Assistant, SmartThings, and all major platforms auto-poll devices. Manual-only operation feels broken. Users expect "set schedule and forget."
+**Why table stakes:** React error boundaries are production standard since 2017. Apps without them feel unstable. Users expect graceful degradation, not crashes.
 
-**Existing foundation:** The app already has /api/scheduler/check (stove health monitoring), /api/netatmo/coordination (stove-thermostat logic), and Firebase monitoring infrastructure. Just needs cron triggers.
+**Existing foundation:** None currently. One unhandled error in any component crashes the whole app.
 
-**Complexity:** LOW - Vercel Cron is declarative YAML configuration pointing to existing API routes.
+**Complexity:** MEDIUM - Must be class components (no hooks equivalent), requires testing error scenarios, needs logging infrastructure.
+
+**Pattern:**
+```typescript
+class StoveErrorBoundary extends React.Component {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, info) {
+    logToAnalytics('stove_error', {
+      error: error.message,
+      componentStack: info.componentStack
+    });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <ErrorFallback onReset={() => this.setState({ hasError: false })} />;
+    }
+    return this.props.children;
+  }
+}
+```
 
 ---
 
-### 2. Persistent Rate Limiting (Distributed Counters)
+### 2. Background Tab Optimization (Visibility API)
 
 | Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| **API rate limits** | Prevent accidental API quota exhaustion (Netatmo 50 req/10s) | Medium | Firebase transactions for atomic increments |
-| **Per-user quotas** | Prevent one user/device from consuming all quota | Low | Single-user app, but good practice |
-| **Time-window buckets** | Sliding window or fixed window (1min, 10s, 1hr) | Medium | Store currentBucket + previousBucket counters |
-| **Graceful rejection** | HTTP 429 with Retry-After header | Low | NextResponse with custom headers |
-| **Cross-instance consistency** | Works across multiple Vercel serverless instances | High | Firebase transactions provide atomicity |
+|---------|--------------|-------------|-------|
+| **Stop polling when hidden** | OS throttles hidden tabs anyway, explicit stop = courteous | Low | document.visibilityState === 'hidden' |
+| **Resume on tab visible** | User expects fresh data when returning | Low | visibilitychange event listener |
+| **Battery consideration** | Mobile users notice battery drain from background polling | Low | 80% resource savings reported |
+| **Bandwidth savings** | Cellular users pay per MB | Low | 5-second polling wastes data when tab hidden |
 
-**Why table stakes:** Vercel serverless = stateless instances. In-memory rate limiting doesn't work across edge functions. Firebase/Redis required for distributed systems.
+**Why table stakes:** Chrome throttles background tabs to 1 request/minute after 5 minutes hidden. Explicit handling prevents conflicts. Users expect apps to respect system resources.
 
-**Existing foundation:** Firebase RTDB already in use. Atomic operations via `transaction()` method available.
+**Existing foundation:** Current polling is unconditional 5-second setInterval. Wastes resources 24/7 if tab stays open but hidden.
 
-**Complexity:** MEDIUM - Distributed rate limiting is non-trivial (race conditions, clock skew), but Firebase transactions solve core problem. Sliding window algorithm adds complexity.
+**Complexity:** LOW - Visibility API is standard (IE10+), simple event listener, minimal code change.
+
+**Pattern:**
+```typescript
+function useVisibilityChange() {
+  const [isVisible, setIsVisible] = useState(!document.hidden);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => setIsVisible(!document.hidden);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
+  return isVisible;
+}
+
+// Usage in polling hook
+useEffect(() => {
+  if (!isVisible) return; // Don't poll when tab hidden
+  const id = setInterval(pollDevices, 5000);
+  return () => clearInterval(id);
+}, [isVisible]);
+```
 
 ---
 
-### 3. E2E Test Improvements (Realistic Auth Testing)
+### 3. Retry on Failure (Exponential Backoff)
 
 | Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| **Auth0 login flow testing** | Can't ship auth changes without E2E coverage | Medium | Use Auth0 test tenant + real OAuth flow |
-| **Session persistence** | Test that sessions survive page reloads | Low | Cypress cy.getCookie(), cy.setCookie() |
-| **Protected route access** | Verify middleware blocks unauthenticated users | Low | cy.visit() + expect redirect to /auth/login |
-| **Token refresh testing** | Verify refresh tokens work before 24hr expiry | Medium | Cypress clock manipulation or real wait |
-| **Parallel test isolation** | Tests don't interfere (separate test users) | Medium | Auth0 test tenant supports multiple users |
+|---------|--------------|-------------|-------|
+| **Automatic retry** | Network is unreliable, users expect "it just works" | Medium | 3-5 retries max before surfacing error |
+| **Exponential delays** | 10ms → 20ms → 40ms → 80ms prevents retry storms | Low | Standard pattern: baseDelay * 2^attempt |
+| **Max retry limit** | Prevents infinite loops and battery drain | Low | 3 retries = 4 total attempts (initial + 3 retries) |
+| **User feedback** | After max retries, show actionable error | Low | "Device offline. Check WiFi and try again." |
+| **Idempotency** | POST requests don't duplicate on retry | Medium | Idempotency keys for stove ignite/shutdown |
 
-**Why table stakes:** Auth0 has CVE-2025-29927 (middleware bypass vulnerability). Testing auth is critical. Mocking auth completely defeats the purpose of E2E tests.
+**Why table stakes:** Production apps without retry logic fail on first network glitch. Users perceive as "app is broken" not "my WiFi is spotty."
 
-**Existing foundation:** 3034 passing Cypress tests, TEST_MODE bypass in middleware, existing /auth/login and /auth/callback routes.
+**Existing foundation:** Zero retry logic. Any network failure immediately surfaces error to user.
 
-**Complexity:** MEDIUM - Auth0 recommends programmatic login via custom database connection or test tenant. Clock manipulation for token refresh requires careful Cypress setup.
+**Complexity:** MEDIUM - Exponential backoff is simple, but idempotency for POST requests requires backend changes (idempotency key validation).
 
-**Explicit anti-feature:** Do NOT migrate to Playwright. Cypress already works, migration would take 3 weeks full-time for 500-3000 tests with marginal benefit for single-user app.
+**Pattern:**
+```typescript
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries = 3,
+  baseDelay = 10
+): Promise<T> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (attempt === maxRetries) throw error;
+      const delay = baseDelay * Math.pow(2, attempt);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  throw new Error('Unreachable');
+}
+
+// Usage
+await retryWithBackoff(() =>
+  fetch('/api/stove/ignite', {
+    method: 'POST',
+    headers: { 'Idempotency-Key': crypto.randomUUID() }
+  })
+);
+```
 
 ---
 
-### 4. Interactive Push Notifications (Action Buttons)
+### 4. Load Time <3s (Code Splitting)
 
 | Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| **Notification actions** | "Spegni stufa", "Posticipa 30min" buttons in notification | High | Service worker notificationclick event handler |
-| **Offline action queuing** | If offline, queue action via Background Sync | High | IndexedDB + Background Sync API |
-| **Action feedback** | After tapping "Spegni", show success toast | Medium | Service worker → client messaging via postMessage |
-| **Permission prompting** | Don't show actions until notification permission granted | Low | Check Notification.permission before showing |
-| **Platform compatibility** | Works on Android Chrome, iOS Safari PWA standalone | High | iOS Safari supports actions only in standalone PWA mode |
+|---------|--------------|-------------|-------|
+| **Page-level splitting** | Next.js automatic, ensures fast initial load | Low | Already implemented by Next.js |
+| **Component lazy loading** | Large modals/charts load only when needed | Low | next/dynamic for StoveSettingsModal, charts |
+| **Client-side only components** | Browser-specific code (Hue color picker) loads client-side | Low | ssr: false in dynamic import |
+| **Loading states** | Suspense fallback prevents layout shift | Low | <Spinner /> during lazy load |
 
-**Why table stakes:** Modern smart home apps (Home Assistant, SmartThings) allow direct action from notifications. "View only" notifications feel dated in 2026.
+**Why table stakes:** Google Core Web Vitals threshold is 2.5s for Largest Contentful Paint (LCP). Users bounce above 3s load time. Next.js 15 apps expected to be fast.
 
-**Existing foundation:** FCM push working, Serwist service worker installed, existing /api/stove/off endpoint for shutdown action.
+**Existing foundation:** Next.js automatic page-level splitting active. Manual dynamic imports not used for large components.
 
-**Complexity:** HIGH - Service worker notificationclick handler must parse action, call API (or queue via Background Sync if offline), handle errors, show feedback to user. iOS Safari requires standalone PWA mode (not browser).
+**Complexity:** LOW - Next.js `next/dynamic` wraps React.lazy + Suspense. Minimal code change for immediate benefit.
 
-**Critical dependency:** Requires notification permission already granted. If denied, actions won't display.
+**Pattern:**
+```typescript
+import dynamic from 'next/dynamic';
+
+// Modal loaded only when opened
+const StoveSettingsModal = dynamic(() => import('./StoveSettingsModal'), {
+  loading: () => <Spinner />,
+  ssr: false, // Client-side only
+});
+
+// Chart loaded only in viewport
+const TemperatureChart = dynamic(() => import('./TemperatureChart'));
+```
 
 ---
 
-### 5. PWA Offline Mode Enhancements
+### 5. Critical Path Tests (E2E Flows)
 
 | Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| **Offline page with status** | Show "You're offline" with last known device states | Low | Serwist already caches /offline page |
-| **Cache-first for static assets** | Instant load times for UI components | Low | Serwist runtimeCaching config |
-| **Network-first for API routes** | Fresh data when online, fallback to cache when offline | Medium | Serwist strategy per route pattern |
-| **Install prompt** | Encourage users to install PWA (increases engagement) | Medium | beforeinstallprompt event + custom UI |
-| **Background Sync** | Queue failed API requests, retry when online | High | Background Sync API + IndexedDB queue |
+|---------|--------------|-------------|-------|
+| **Login → control flow** | Core user journey must not break in production | Medium | Playwright: login → dashboard → ignite → verify |
+| **3-5 critical flows** | Not 100% coverage, just critical paths | Medium | Login, stove control, scheduler, lights, logout |
+| **Real Auth0 integration** | No mocks—real OAuth flow catches real bugs | Medium | Playwright auth setup with session reuse |
+| **CI integration** | Tests run on PR, block merge if failing | Low | GitHub Actions with Playwright |
+| **Failure debugging** | Screenshots/videos on failure | Low | Playwright automatic trace on failure |
 
-**Why table stakes:** PWAs in 2026 are expected to work offline. Users in areas with spotty WiFi (basements, rural) need graceful degradation. Install prompts increase retention by 2-3x.
+**Why table stakes:** Playwright/Cypress are production standard in 2026. Critical flows breaking in production = incident. /api/scheduler/check (652 lines) has zero tests = high risk.
 
-**Existing foundation:** Serwist already installed, /offline page exists, manifest.json configured, service worker registered.
+**Existing foundation:** Cypress 3034 tests exist, but no E2E critical path tests with real Auth0. TEST_MODE bypass used everywhere.
 
-**Complexity:** LOW-MEDIUM - Install prompt requires beforeinstallprompt event handling + localStorage to track dismissals. Background Sync requires service worker sync event handler + IndexedDB.
+**Complexity:** MEDIUM - Playwright auth requires session caching, careful selector strategy, understanding of Auth0 redirect flow. 2026 consensus favors Playwright over Cypress for new tests.
 
-**Platform quirks:** iOS Safari shows install prompt only in standalone browsing context. Android Chrome supports beforeinstallprompt event natively.
+**Pattern:**
+```typescript
+// tests/e2e/critical-flows.spec.ts
+import { test, expect } from '@playwright/test';
+
+test('User can control stove from dashboard', async ({ page }) => {
+  // 1. Login (session cached from setup)
+  await page.goto('/');
+
+  // 2. Navigate to stove
+  await page.getByRole('link', { name: 'Stove' }).click();
+  await expect(page).toHaveURL('/stove');
+
+  // 3. Verify status loads
+  await expect(page.getByTestId('stove-status')).toBeVisible();
+
+  // 4. Ignite stove
+  await page.getByRole('button', { name: 'Ignite' }).click();
+  await expect(page.getByText('Ignition started')).toBeVisible();
+
+  // 5. Verify state update (polling should reflect change within 10s)
+  await expect(page.getByTestId('stove-status'))
+    .toContainText('Igniting', { timeout: 10000 });
+});
+```
 
 ---
 
-### 6. Analytics Dashboard (Usage Tracking & Insights)
+### 6. Token Lifecycle Management (Automated Cleanup)
 
 | Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| **Usage history timeline** | "Stufa accesa 4h today, 6h yesterday" line chart | Medium | Firestore query: stove status changes → aggregate runtime |
-| **Pellet consumption estimate** | "~3kg consumed today" based on power level + runtime | High | Heuristic formula: powerLevel × runtime × pelletRate |
-| **Weekly/monthly trends** | Compare this week vs last week usage | Medium | Recharts line chart with comparison mode |
-| **Weather correlation** | "High usage correlates with outdoor temp < 10°C" | High | Join stove runtime with Open-Meteo temperature data |
-| **Cost estimation** | "€15 pellet cost this month" if pelletPricePerKg provided | Low | Simple multiplication: consumption × price |
+|---------|--------------|-------------|-------|
+| **30-day staleness detection** | FCM recommends monthly token refresh | Low | Firebase query: timestamp < now - 30days |
+| **Automatic deletion** | Manual cleanup doesn't scale, users forget | Medium | Scheduled Firebase Function (daily cron) |
+| **Timestamp on update** | Track when token last used | Low | Update timestamp on every token refresh |
+| **Expired token removal** | Android tokens expire after 270 days | Low | Firebase Function filters and deletes |
+| **Metrics accuracy** | Stale tokens skew delivery rates in console | Low | Cleanup improves FCM dashboard accuracy |
 
-**Why table stakes:** Energy monitoring is core to smart home value prop in 2026. Users want to see "how much am I using?" and "am I wasting energy?" Google Nest, Ecobee, Vivint all show usage dashboards.
+**Why table stakes:** Firebase official best practice. Tokens accumulate unbounded without cleanup. Delivery metrics become meaningless with 50% stale tokens.
 
-**Existing foundation:** Recharts already installed, Firebase RTDB logs stove status changes, Open-Meteo weather data already fetched and stored.
+**Existing foundation:** FCM tokens stored in Firebase RTDB. No cleanup logic exists. Tokens accumulate forever.
 
-**Complexity:** MEDIUM-HIGH - Requires new Firestore collection for aggregated stats (to avoid scanning all status changes), heuristic pellet consumption formula (no direct pellet sensor), weather correlation algorithm (join timestamps).
+**Complexity:** LOW-MEDIUM - Firebase Function scheduled via Pub/Sub cron. Query and delete logic is straightforward. Testing requires time manipulation.
 
-**Critical anti-feature:** Do NOT integrate third-party analytics (Google Analytics, Mixpanel). Privacy-first, family app. All data stays in Firebase.
+**Pattern:**
+```typescript
+// functions/cleanupTokens.ts
+export const cleanupStaleTokens = functions.pubsub
+  .schedule('0 2 * * *') // 2 AM daily
+  .onRun(async () => {
+    const now = Date.now();
+    const staleThreshold = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+    const tokensRef = admin.database().ref('fcmTokens');
+    const snapshot = await tokensRef.once('value');
+    const tokens = snapshot.val();
+
+    const batch = [];
+    for (const [userId, userTokens] of Object.entries(tokens)) {
+      for (const [token, data] of Object.entries(userTokens)) {
+        if (now - data.timestamp > staleThreshold) {
+          batch.push(tokensRef.child(`${userId}/${token}`).remove());
+        }
+      }
+    }
+
+    await Promise.all(batch);
+    console.log(`Cleaned up ${batch.length} stale tokens`);
+  });
+```
 
 ---
 
 ## Differentiators
 
-Features that set the product apart. Not expected, but highly valued.
+Features that set product apart. Not expected, but highly valued.
 
-### 1. Smart Pellet Consumption Estimation (ML-Inspired Heuristics)
+### 1. Adaptive Polling (State Machine)
 
-**What:** Estimate pellet consumption without physical sensor using power level, runtime, and weather correlation.
+**What:** Polling intervals adjust dynamically based on user activity, errors, and visibility—not just on/off.
 
-**Why valuable:** Pellet stoves don't have built-in pellet sensors. Most users manually track consumption ("filled hopper 3 days ago, filled again today = 15kg / 3 days = 5kg/day"). Automated estimation is a game-changer.
-
-**How it works:**
-```javascript
-// Heuristic formula (inspired by machine learning regression but simpler)
-const pelletConsumptionKg = (powerLevel / 5) * (runtimeHours / 1) * PELLET_RATE_KG_PER_HOUR;
-const PELLET_RATE_KG_PER_HOUR = 0.5; // Calibrated via user input
-
-// Weather correlation adjustment
-if (outdoorTemp < 5) {
-  pelletConsumptionKg *= 1.2; // 20% higher consumption in extreme cold
-} else if (outdoorTemp > 15) {
-  pelletConsumptionKg *= 0.8; // 20% lower in mild weather
-}
-```
-
-**Complexity:** HIGH - Requires:
-1. Firestore aggregation queries for daily runtime by power level
-2. Weather data join (outdoor temp from Open-Meteo at stove ignition time)
-3. User calibration UI ("I refilled 15kg today, adjust estimates")
-4. Accuracy improves over time as calibration data accumulates
-
-**Competitive advantage:** Home Assistant pellet integrations require hardware sensors or manual logging. This is software-only estimation.
-
-**Confidence:** MEDIUM - Formula is unverified, but research shows 80%+ accuracy for ML models in building energy prediction. Heuristic approach should achieve 70-80% with calibration.
-
----
-
-### 2. Offline-Capable Notification Actions (Background Sync)
-
-**What:** Tapping "Spegni stufa" in notification works even if phone is offline. Action queues via Background Sync, executes when connection restored.
-
-**Why valuable:** Most smart home apps fail silently when offline. Users tap "Turn off" → nothing happens → frustration. This app queues the action and retries automatically.
+**Why valuable:** Most apps toggle polling binary (on when visible, off when hidden). Adaptive polling goes further: fast when user actively controlling, slow when idle, paused on errors with backoff.
 
 **How it works:**
-```javascript
-// Service worker notificationclick handler
-self.addEventListener('notificationclick', (event) => {
-  if (event.action === 'turn_off') {
-    event.waitUntil(
-      fetch('/api/stove/off', { method: 'POST' })
-        .catch(() => {
-          // Offline: queue via Background Sync
-          return self.registration.sync.register('stove-off-action');
-        })
-    );
-  }
-});
+```typescript
+type PollingState = 'active' | 'idle' | 'hidden' | 'error';
 
-// Background Sync handler
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'stove-off-action') {
-    event.waitUntil(fetch('/api/stove/off', { method: 'POST' }));
-  }
-});
-```
+function useAdaptivePolling(callback: () => void) {
+  const [state, setState] = useState<PollingState>('idle');
+  const isVisible = useVisibilityChange();
 
-**Complexity:** HIGH - Requires:
-1. Service worker message routing (notificationclick → API call)
-2. Background Sync registration when offline
-3. IndexedDB queue for pending actions (in case sync fails)
-4. User feedback via client messaging (postMessage to app window)
+  const intervals = {
+    active: 5000,  // 5s when user actively controlling
+    idle: 30000,   // 30s when no interaction for 2 minutes
+    hidden: null,  // Stop when tab hidden
+    error: null,   // Pause on error, restart with exponential backoff
+  };
 
-**Competitive advantage:** Home Assistant requires internet connection for all actions. This works offline.
-
-**Confidence:** HIGH - Background Sync API is well-documented, supported in Chrome/Edge/Samsung Internet, gracefully degrades in Safari (action executes immediately or fails).
-
----
-
-### 3. Distributed Rate Limiting with Firebase Transactions (Not Redis)
-
-**What:** Rate limiting that works across Vercel serverless instances using Firebase RTDB transactions instead of Redis.
-
-**Why valuable:** Most tutorials recommend Redis for distributed rate limiting. Firebase RTDB is already in the stack, avoids new dependency + monthly Redis cost.
-
-**How it works:**
-```javascript
-// Sliding window rate limiting with Firebase transactions
-import { ref, runTransaction } from 'firebase/database';
-
-async function checkRateLimit(userId, limit, windowSeconds) {
-  const now = Date.now();
-  const windowStart = now - (windowSeconds * 1000);
-  const rateLimitRef = ref(db, `rateLimit/${userId}`);
-
-  const result = await runTransaction(rateLimitRef, (current) => {
-    if (!current) current = { requests: [] };
-
-    // Remove expired requests
-    current.requests = current.requests.filter(ts => ts > windowStart);
-
-    // Check limit
-    if (current.requests.length >= limit) {
-      return; // Abort transaction (rate limited)
+  useEffect(() => {
+    if (!isVisible) {
+      setState('hidden');
+      return;
     }
 
-    // Add current request
-    current.requests.push(now);
-    return current;
-  });
+    const interval = intervals[state];
+    if (!interval) return;
 
-  return result.committed; // true = allowed, false = rate limited
+    const id = setInterval(callback, interval);
+    return () => clearInterval(id);
+  }, [state, isVisible, callback]);
+
+  return {
+    markActive: () => setState('active'),
+    markIdle: () => setState('idle'),
+    markError: () => setState('error'),
+  };
 }
 ```
 
-**Complexity:** MEDIUM-HIGH - Firebase transactions solve race conditions, but:
-1. Must handle transaction conflicts (automatic retry)
-2. Sliding window requires filtering expired timestamps (O(n) scan)
-3. Cleanup of old data required (prevent unbounded growth)
+**Complexity:** MEDIUM - State machine for polling states, idle detection via user interaction tracking, error backoff logic.
 
-**Competitive advantage:** No Redis dependency, works with existing Firebase setup, atomic operations guaranteed.
+**Competitive advantage:** Home Assistant, SmartThings poll at fixed intervals. This adapts to user behavior.
 
-**Confidence:** HIGH - Firebase transactions provide strong consistency. Pattern is documented in Firebase docs and community guides.
+**Confidence:** MEDIUM - Pattern documented in community articles, not official React guide. Requires validation for battery impact.
 
 ---
 
-### 4. Cron Reliability Monitoring (Dead Man's Switch for Automation)
+### 2. Granular Loading States (Per-Device)
 
-**What:** Monitor the cron automation itself. If cron stops running (Vercel issue, misconfiguration), alert user within 10-15 minutes.
+**What:** Each device shows its own loading indicator during control operations, not app-wide spinner.
 
-**Why valuable:** Most automation systems assume cron "just works." When it breaks silently, critical tasks stop (stove health checks, coordination). This detects and alerts immediately.
+**Why valuable:** When turning off stove, user sees "Spegnimento..." on stove card only. Lights, thermostat remain interactive. Spinner-of-death blocks entire UI.
 
 **How it works:**
-```javascript
-// Each cron job updates lastRun timestamp
-// /api/scheduler/check
-await update(ref(db, 'monitoring/cronHealth/healthCheck'), {
-  lastRun: Date.now(),
-  status: 'success'
-});
+```typescript
+// Per-device loading state
+function StoveCard() {
+  const [loading, setLoading] = useState<'ignite' | 'shutdown' | null>(null);
 
-// Client-side dead man's switch monitor (runs in StoveCard polling)
-const lastHealthCheck = await get(ref(db, 'monitoring/cronHealth/healthCheck/lastRun'));
-const minutesSinceLastRun = (Date.now() - lastHealthCheck.val()) / 60000;
+  async function handleIgnite() {
+    setLoading('ignite');
+    try {
+      await retryWithBackoff(() => fetch('/api/stove/ignite', { method: 'POST' }));
+    } finally {
+      setLoading(null);
+    }
+  }
 
-if (minutesSinceLastRun > 15) {
-  // CRITICAL: Cron is down, show alert
-  showNotification({
-    title: 'Sistema di Monitoraggio Non Funzionante',
-    body: `Ultimo check: ${minutesSinceLastRun} minuti fa`,
-    urgency: 'critical'
-  });
+  return (
+    <Card>
+      <Button
+        onClick={handleIgnite}
+        disabled={loading !== null}
+      >
+        {loading === 'ignite' ? <Spinner /> : 'Accendi'}
+      </Button>
+    </Card>
+  );
 }
 ```
 
-**Complexity:** MEDIUM - Requires:
-1. Timestamp tracking per cron job
-2. Client-side monitoring logic (piggybacks on existing 5s polling)
-3. Configurable thresholds (15min for critical, 60min for non-critical)
-4. Alert deduplication (don't spam user every 5s)
+**Complexity:** LOW - State management already exists per component. Just needs loading state extraction.
 
-**Competitive advantage:** Home Assistant doesn't monitor its own automations. This is self-healing infrastructure.
+**Competitive advantage:** Better UX than global loading overlay. Allows multi-device operations in parallel.
 
-**Confidence:** HIGH - Pattern is simple timestamp comparison, well-tested in production monitoring systems.
+**Confidence:** HIGH - Standard React pattern, no research needed.
 
 ---
 
-### 5. Realistic Auth0 E2E Testing (No Mocks)
+### 3. Automatic Error Recovery
 
-**What:** E2E tests use real Auth0 test tenant with actual OAuth flow, not mocked sessions.
+**What:** Error boundaries not only catch errors but attempt automatic recovery (retry component mount, refetch data).
 
-**Why valuable:** CVE-2025-29927 showed that middleware-only auth protection is insufficient. Mocking auth in tests creates false confidence. Real OAuth flow catches real bugs.
+**Why valuable:** Most error boundaries just show fallback UI. This tries to recover first, falls back only if recovery fails.
 
 **How it works:**
-```javascript
-// cypress/support/commands.js
-Cypress.Commands.add('loginAuth0', (username, password) => {
-  cy.visit('/auth/login');
-  cy.origin(Cypress.env('AUTH0_DOMAIN'), { args: { username, password } }, ({ username, password }) => {
-    cy.get('input[name=username]').type(username);
-    cy.get('input[name=password]').type(password);
-    cy.get('button[type=submit]').click();
+```typescript
+class SmartErrorBoundary extends React.Component {
+  state = { hasError: false, retryCount: 0 };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, info) {
+    logToAnalytics('error_caught', { error, info });
+
+    // Attempt automatic recovery (max 2 retries)
+    if (this.state.retryCount < 2) {
+      setTimeout(() => {
+        this.setState({ hasError: false, retryCount: this.state.retryCount + 1 });
+      }, 1000 * Math.pow(2, this.state.retryCount)); // Exponential backoff
+    }
+  }
+
+  render() {
+    if (this.state.hasError && this.state.retryCount >= 2) {
+      return <ErrorFallback onReset={() => this.setState({ hasError: false, retryCount: 0 })} />;
+    }
+    return this.props.children;
+  }
+}
+```
+
+**Complexity:** MEDIUM-HIGH - Requires retry logic in error boundary, careful to avoid infinite loops, needs to distinguish transient vs permanent errors.
+
+**Competitive advantage:** Most apps show error and give up. This tries to recover automatically.
+
+**Confidence:** MEDIUM - Pattern is novel, requires validation to ensure no infinite retry loops.
+
+---
+
+### 4. Component Health Monitoring
+
+**What:** Error boundaries log errors to analytics, dashboard shows component error rates over time.
+
+**Why valuable:** Proactive error detection—"LightsCard had 15 errors last week, needs investigation" before users complain.
+
+**How it works:**
+```typescript
+// Error boundary logs to Firebase Analytics
+componentDidCatch(error, info) {
+  logEvent(analytics, 'component_error', {
+    component: this.props.componentName, // 'StoveCard'
+    error: error.message,
+    timestamp: Date.now(),
   });
-  cy.url().should('include', '/'); // Redirected to homepage
-});
+}
 
-// Test
-it('protects /dashboard from unauthenticated users', () => {
-  cy.visit('/dashboard');
-  cy.url().should('include', '/auth/login?returnTo=%2Fdashboard');
+// Analytics dashboard queries Firestore
+const errorsByComponent = await getDocs(
+  query(
+    collection(db, 'analytics_events'),
+    where('name', '==', 'component_error'),
+    where('timestamp', '>', Date.now() - 7 * 24 * 60 * 60 * 1000) // Last 7 days
+  )
+);
 
-  cy.loginAuth0('test@example.com', 'TestPassword123!');
-  cy.url().should('eq', Cypress.config().baseUrl + '/dashboard');
+// Aggregate and display
+const errorCounts = {};
+errorsByComponent.forEach(doc => {
+  const component = doc.data().params.component;
+  errorCounts[component] = (errorCounts[component] || 0) + 1;
 });
 ```
 
-**Complexity:** MEDIUM - Requires:
-1. Auth0 test tenant setup (separate from production)
-2. Cypress cy.origin() for cross-domain auth flow
-3. Cookie/session persistence between tests
-4. Test user cleanup (or pre-seeded test users)
+**Complexity:** MEDIUM-HIGH - Requires logging infrastructure, Firestore queries, analytics dashboard UI.
 
-**Competitive advantage:** Most tutorials mock auth completely. This catches real auth bugs (CSRF, token expiry, redirect loops).
+**Competitive advantage:** Proactive vs reactive error handling. Catch patterns before production incidents.
 
-**Confidence:** HIGH - Auth0 official docs recommend this pattern. Cypress cy.origin() stable since v9.6.0.
+**Confidence:** MEDIUM - Requires observability infrastructure (already have Firebase Analytics, but need dashboard UI).
 
 ---
 
@@ -351,16 +458,14 @@ Features to explicitly NOT build. Scope creep prevention.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| **Cron UI builder** | Over-engineering for single-user app. Cron syntax in code is fine for 5-10 jobs. | Keep cron schedules in vercel.json or cron.yaml. Document in /docs/cron.md. |
-| **Third-party analytics (GA, Mixpanel)** | Privacy invasion, adds external dependency, not needed for family app. | Use Firebase Firestore for all analytics. Custom dashboard with Recharts. |
-| **Complex ML models for pellet estimation** | Overkill for single stove. Heuristic formula sufficient with calibration. | Simple formula: powerLevel × runtime × calibrationFactor. User adjusts factor. |
-| **Multi-tenant rate limiting** | App is single-user/family. Distributed rate limiting needed for Vercel, but not multi-tenant. | Use Firebase transactions for atomicity, but single userId or global limits. |
-| **Playwright migration** | Cypress already has 3034 passing tests. Playwright is 2.3x faster but migration takes 3 weeks. | Keep Cypress. Add new tests in Cypress. Playwright ROI too low for this app. |
-| **Real-time pellet sensor integration** | Pellet stoves don't have standard pellet sensors. Hardware DIY is out of scope. | Software estimation only. Document "How to add sensor" for advanced users. |
-| **Notification action undo** | "Undo" button after action requires complex state management. Confirmation dialogs sufficient. | Use confirmable actions ("Hold to confirm") instead of undo. |
-| **Periodic Background Sync** | Chrome-only API, battery drain, not needed for family app with manual triggers. | Use regular Background Sync for offline action queuing only. |
-| **Advanced cron scheduling (dynamic schedules)** | Changing cron schedules dynamically requires database + scheduler service. Static is fine. | If user needs custom schedule, they edit vercel.json and redeploy (rare). |
-| **Redis for rate limiting** | Adds monthly cost (~$10-30), new dependency, overkill when Firebase already in stack. | Use Firebase RTDB transactions for distributed counters. |
+| **100% E2E Coverage** | Slow (20min builds), flaky, expensive; critical paths sufficient | 3-5 Playwright flows: login, stove control, scheduler, lights, logout |
+| **Premature Micro-Frontends** | Over-engineering for single team, complexity explosion | Component splitting + lazy loading adequate |
+| **Global Error Handler Only** | One boundary = whole app crashes on any error | Feature-level boundaries: StoveCard, LightsCard, SchedulerCard |
+| **Manual Token Management UI** | Users can't diagnose "which tokens are stale", needs automation | Scheduled Firebase Function, no UI |
+| **Infinite Retries** | Battery drain, cost escalation, masks real problems | Max 3-5 retries, exponential backoff, then surface error |
+| **Real-Time Everything** | WebSockets complexity, cost, overkill for thermostat (updates every 5min) | Polling with Visibility API adequate |
+| **Component Library Migration** | Rewriting 37 design system components for marginal DX gain | Refactor existing components, don't rebuild from scratch |
+| **Playwright Migration (from Cypress)** | 3 weeks full-time for 3034 tests, marginal ROI for family app | Add new E2E critical path tests in Playwright, keep Cypress unit tests |
 
 ---
 
@@ -369,219 +474,830 @@ Features to explicitly NOT build. Scope creep prevention.
 Dependencies between features (must build X before Y).
 
 ```
-Cron Automation
-  ↓ (requires baseline automation)
-Cron Reliability Monitoring
+Error Boundaries
+  ↓ (required foundation)
+Component Splitting (split points need boundaries)
 
-Interactive Push Notifications
-  ↓ (requires service worker message handling)
-Offline-Capable Notification Actions
+Adaptive Polling
+  ↓ (builds on)
+Visibility API Polling (foundation)
 
-PWA Offline Mode (install prompt)
-  ↓ (no dependency, but enhances UX)
-Interactive Push Notifications
+Retry Logic
+  ↓ (requires)
+Idempotency (POST requests need idempotency keys)
 
-Persistent Rate Limiting
-  ↓ (no dependency, independent feature)
+Code Splitting
+  ↓ (enables)
+Component Splitting (smaller components = easier to lazy load)
+
+Critical Path Tests
+  ↓ (validates)
+All features (tests verify retry, error boundaries, polling work)
+
+Token Cleanup
+  ↓ (no dependency, independent)
 (none)
-
-Analytics Dashboard
-  ↓ (requires runtime data)
-Cron Automation (optional but recommended for data accumulation)
-
-E2E Test Improvements
-  ↓ (no dependency, but validates all features)
-All features
 ```
 
 **Critical path:**
-1. Persistent Rate Limiting (independent, protects APIs)
-2. Cron Automation (enables background tasks)
-3. Cron Reliability Monitoring (ensures automation works)
-4. Interactive Push Notifications (core UX improvement)
-5. PWA Offline Mode (install prompt + Background Sync)
-6. Analytics Dashboard (requires data from automation)
-7. E2E Test Improvements (validates everything)
+1. Error Boundaries (foundation for reliability)
+2. Retry Logic (foundation for resilience)
+3. Visibility API Polling (quick win, low complexity)
+4. Component Splitting (enables lazy loading, improves maintainability)
+5. Adaptive Polling (builds on visibility API)
+6. Critical Path Tests (validates all features)
+7. Token Cleanup (independent, can run in parallel)
 
 **Parallelizable:**
-- Persistent Rate Limiting (independent)
-- PWA Install Prompt (independent of notifications)
-- E2E Auth Testing (independent of features, validates auth only)
+- Token Cleanup (Firebase Function, independent)
+- Visibility API Polling (low complexity, no dependencies)
+- Code Splitting (Next.js feature, no custom logic needed)
 
 ---
 
 ## MVP Recommendation
 
-Prioritize features for maximum value with minimum complexity.
+Prioritize features for maximum reliability improvement with minimum complexity.
 
-### Phase 1: Operational Resilience (Weeks 1-2)
+### Phase 1: Resilience Foundation (Week 1)
 
 **Build first:**
-1. **Persistent Rate Limiting** - Protects Netatmo API from quota exhaustion (MEDIUM complexity, HIGH value)
-2. **Cron Automation** - Makes existing health checks and coordination actually run (LOW complexity, CRITICAL value)
-3. **Cron Reliability Monitoring** - Alerts if automation breaks (MEDIUM complexity, HIGH value)
+1. **Error Boundaries** - Prevents app crashes (MEDIUM complexity, CRITICAL value)
+   - Global boundary for catastrophic errors
+   - Feature boundaries: StoveCard, LightsCard, SchedulerCard
+   - ErrorFallback component with reset button
 
-**Rationale:** These features are foundational. Without them, the app relies on manual user polling (bad UX) and risks API quota issues (breaks app).
+2. **Retry Logic** - Makes unreliable networks feel reliable (MEDIUM complexity, HIGH value)
+   - Exponential backoff helper function
+   - Apply to device control endpoints (/api/stove/ignite, /api/lights/control)
+   - Max 3 retries, surface error after
 
-**Test coverage:** Add unit tests for rate limiting (Firebase transaction logic), integration tests for cron endpoints (call /api/scheduler/check directly), monitoring UI tests (simulate lastRun > 15min).
+3. **Visibility API Polling** - 80% resource savings (LOW complexity, HIGH value)
+   - Stop polling when tab hidden
+   - Resume when tab visible
+   - 5-line change to existing polling logic
+
+**Rationale:** These are table stakes. Without error boundaries, one bug crashes the app. Without retry, first network glitch breaks UX. Without visibility API, battery drains unnecessarily.
+
+**Test coverage:** Unit tests for retry logic, integration tests for error boundaries (throw error in child, verify fallback), Cypress test for visibility (simulate tab hidden).
+
+**Estimated effort:** 3-5 days
 
 ---
 
-### Phase 2: Interactive Engagement (Weeks 3-4)
+### Phase 2: Performance Optimization (Week 2)
 
 **Build next:**
-4. **Interactive Push Notifications** - Action buttons in notifications (HIGH complexity, HIGH value)
-5. **PWA Install Prompt** - Encourage installation for better offline support (LOW complexity, MEDIUM value)
+4. **Component Splitting** - Maintainability + load time (MEDIUM complexity, MEDIUM-HIGH value)
+   - Split StoveCard (1217 lines) → StoveStatus, StoveControls, StoveSchedule
+   - Split LightsCard (1186 lines) → LightsList, LightControl, LightGroups
+   - Split stove/page.tsx (1054 lines) → Compose smaller components
+   - Preserve existing tests, update imports
+
+5. **Code Splitting (Lazy Loading)** - Fast load times (LOW complexity, MEDIUM value)
+   - Lazy load StoveSettingsModal, LightsSettingsModal
+   - Lazy load TemperatureChart, ConsumptionChart
+   - ssr: false for client-only components (Hue color picker)
+
+**Rationale:** 1000+ line components slow parse time, harder to maintain, harder to test. Splitting improves DX and load time. Lazy loading defers non-critical code.
+
+**Test coverage:** Snapshot tests for split components (verify rendered output identical), unit tests for new component boundaries.
+
+**Estimated effort:** 5-7 days
+
+---
+
+### Phase 3: Advanced Resilience (Week 3)
+
+**Build later:**
+6. **Adaptive Polling** - Beyond visibility toggle (MEDIUM complexity, MEDIUM value)
+   - Polling state machine: active (5s), idle (30s), hidden (stop), error (backoff)
+   - Idle detection: no user interaction for 2 minutes
+   - Error backoff: pause on error, resume with exponential backoff
+
+7. **Granular Loading States** - Better UX (LOW complexity, LOW-MEDIUM value)
+   - Per-device loading indicators
+   - Optimistic updates with rollback on error
 
 **Defer to later:**
-- Offline-capable notification actions (Background Sync) - HIGH complexity, MEDIUM value (most users have internet)
+- Automatic error recovery (complex, requires validation)
+- Component health monitoring (requires observability infrastructure)
 
-**Rationale:** Notification actions are the biggest UX improvement ("Spegni stufa" from notification). Install prompt increases retention. Background Sync is nice-to-have, not critical.
+**Rationale:** Adaptive polling is nice-to-have, not critical. Users can live with visibility-based polling. Granular loading is polish, not functionality.
 
-**Test coverage:** Cypress E2E tests for install prompt flow, service worker tests for notificationclick handler.
+**Test coverage:** Unit tests for polling state machine, Cypress tests for loading states.
 
----
-
-### Phase 3: Analytics & Insights (Weeks 5-6)
-
-**Build last:**
-6. **Analytics Dashboard** - Usage timeline, pellet consumption, trends (MEDIUM-HIGH complexity, MEDIUM value)
-
-**MVP scope:**
-- Daily/weekly runtime line chart (Recharts)
-- Simple pellet consumption estimate (heuristic formula, no weather correlation yet)
-- Cost estimation if user enters pellet price
-
-**Defer to v6.1:**
-- Weather correlation (HIGH complexity)
-- ML-inspired consumption refinement (HIGH complexity)
-- Monthly comparisons (LOW complexity but lower priority)
-
-**Rationale:** Analytics are valuable but not critical. Users can live without them initially. Prioritize operational reliability first.
-
-**Test coverage:** Unit tests for consumption formula, Firestore query tests, snapshot tests for chart components.
+**Estimated effort:** 3-5 days
 
 ---
 
-### Phase 4: Testing & Quality (Week 7)
+### Phase 4: Quality Gates (Week 4)
 
 **Build finally:**
-7. **E2E Test Improvements** - Realistic Auth0 testing (MEDIUM complexity, HIGH value for long-term stability)
+8. **Critical Path Tests** - Catch regressions (MEDIUM complexity, HIGH value)
+   - Playwright setup with Auth0 session caching
+   - Login → Dashboard → Control Stove → Verify State
+   - 3-5 critical flows: login, stove control, scheduler, lights, logout
+   - CI integration: GitHub Actions, fail PR if tests fail
 
-**Scope:**
-- Auth0 test tenant setup
-- Login flow E2E test (cy.origin)
-- Protected route access test
-- Session persistence test
+9. **Token Lifecycle Cleanup** - Operational hygiene (LOW-MEDIUM complexity, MEDIUM value)
+   - Firebase Function: daily cron at 2 AM
+   - Delete tokens with timestamp > 30 days old
+   - Log cleanup count to Firebase Analytics
 
-**Defer to later:**
-- Token refresh testing (requires 24hr wait or complex clock manipulation)
-- Parallel test isolation (single-user app, less critical)
+**Rationale:** Tests validate all features work together. Token cleanup is operational must-have but not user-facing.
 
-**Rationale:** Auth tests validate the security foundation. Should be done before v6.0 ships, but can be done in parallel with Phase 3.
+**Test coverage:** E2E tests themselves are the deliverable. Unit test for token cleanup logic.
 
-**Test coverage:** E2E tests themselves are the deliverable. Add tests for login, logout, middleware protection, session persistence.
+**Estimated effort:** 5-7 days
 
 ---
 
-## Deferred Features (Out of Scope for v6.0)
+## Deferred Features (Out of Scope for v7.0)
 
-**Save for v6.1 or later:**
+**Save for v7.1 or later:**
 
-1. **Weather correlation in pellet consumption** - HIGH complexity, requires timestamp join + aggregation. Heuristic formula sufficient for v6.0.
+1. **Automatic error recovery** - Complex retry logic in error boundaries, risk of infinite loops. Manual reset sufficient for v7.0.
 
-2. **Notification action undo** - Complex state management. Confirmation dialogs sufficient for v6.0.
+2. **Component health monitoring dashboard** - Requires observability infrastructure, analytics dashboard UI. Error logging sufficient for v7.0.
 
-3. **Periodic Background Sync** - Chrome-only, battery drain concerns. Regular Background Sync sufficient.
+3. **WebSocket real-time updates** - Complexity, cost, overkill for thermostat. Polling adequate.
 
-4. **Token refresh E2E testing** - Requires 24hr wait or complex Cypress clock setup. Manual testing acceptable for v6.0.
+4. **Advanced code splitting** (route-based prefetching) - Next.js automatic splitting sufficient. Diminishing returns.
 
-5. **Dynamic cron scheduling** - User can edit vercel.json if needed (rare). Static schedules sufficient.
+5. **Comprehensive E2E coverage** - 3-5 critical flows sufficient. Full coverage = weeks of work for marginal benefit.
 
-6. **Real-time pellet sensor integration** - Hardware out of scope. Software estimation only.
+6. **Service worker cache strategies** - Already have Serwist offline mode from v6.0. Further optimization low priority.
 
-7. **Playwright migration** - No ROI for 3 weeks migration time. Cypress works fine.
-
-8. **Advanced analytics (predictive usage)** - ML models overkill for family app. Heuristics sufficient.
+7. **Performance monitoring (Lighthouse CI)** - Useful but not critical. Manual Lighthouse audits sufficient for v7.0.
 
 ---
 
 ## Complexity Summary
 
-| Feature | Complexity | Why | Risk Level |
-|---------|-----------|-----|------------|
-| Cron Automation | LOW | Vercel Cron = YAML config + existing endpoints | LOW |
-| Cron Reliability Monitoring | MEDIUM | Timestamp tracking + client-side alert logic | LOW |
-| Persistent Rate Limiting | MEDIUM-HIGH | Firebase transactions + sliding window algorithm | MEDIUM |
-| E2E Test Improvements | MEDIUM | Auth0 test tenant + cy.origin() | MEDIUM |
-| Interactive Push Notifications | HIGH | Service worker notificationclick + postMessage | HIGH |
-| PWA Install Prompt | LOW-MEDIUM | beforeinstallprompt + localStorage tracking | LOW |
-| Offline Notification Actions | HIGH | Background Sync + IndexedDB queue | HIGH |
-| Analytics Dashboard | MEDIUM-HIGH | Firestore aggregation + heuristic formula + Recharts | MEDIUM |
+| Feature | Complexity | Effort | Risk Level |
+|---------|-----------|--------|------------|
+| Error Boundaries | MEDIUM | 2-3 days | LOW |
+| Retry Logic | MEDIUM | 2-3 days | LOW |
+| Visibility API Polling | LOW | 1 day | LOW |
+| Component Splitting | MEDIUM | 5-7 days | MEDIUM |
+| Code Splitting (Lazy) | LOW | 2-3 days | LOW |
+| Adaptive Polling | MEDIUM | 3-5 days | MEDIUM |
+| Granular Loading States | LOW | 2-3 days | LOW |
+| Critical Path Tests | MEDIUM | 5-7 days | HIGH |
+| Token Cleanup | LOW-MEDIUM | 2-3 days | LOW |
 
-**Highest risk:** Interactive notifications with Background Sync (service worker complexity, iOS compatibility issues).
+**Highest risk:** Critical path E2E tests (Auth0 integration complexity, Playwright learning curve, flakiness potential).
 
-**Lowest risk:** Cron automation, PWA install prompt (well-documented patterns, minimal code).
+**Lowest risk:** Visibility API polling, code splitting (well-documented, minimal code change).
+
+**Total estimated effort:** 25-35 days (5-7 weeks with buffer)
+
+---
+
+## Implementation Patterns
+
+### Error Boundaries (Class Component Required)
+
+```typescript
+// src/components/errors/ErrorBoundary.tsx
+import React, { Component, ReactNode } from 'react';
+import { logEvent } from '@/lib/analytics';
+import ErrorFallback from './ErrorFallback';
+
+interface Props {
+  children: ReactNode;
+  componentName: string; // For logging
+}
+
+interface State {
+  hasError: boolean;
+}
+
+class ErrorBoundary extends Component<Props, State> {
+  state: State = { hasError: false };
+
+  static getDerivedStateFromError(): State {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
+    logEvent('component_error', {
+      component: this.props.componentName,
+      error: error.message,
+      stack: error.stack,
+      componentStack: info.componentStack,
+    });
+  }
+
+  handleReset = () => {
+    this.setState({ hasError: false });
+  };
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <ErrorFallback
+          componentName={this.props.componentName}
+          onReset={this.handleReset}
+        />
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+export default ErrorBoundary;
+```
+
+### Retry with Exponential Backoff
+
+```typescript
+// src/lib/retry.ts
+export class RetryError extends Error {
+  constructor(
+    message: string,
+    public attempts: number,
+    public lastError: Error
+  ) {
+    super(message);
+    this.name = 'RetryError';
+  }
+}
+
+export async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  options: {
+    maxRetries?: number;
+    baseDelay?: number;
+    maxDelay?: number;
+    onRetry?: (attempt: number, error: Error) => void;
+  } = {}
+): Promise<T> {
+  const {
+    maxRetries = 3,
+    baseDelay = 10,
+    maxDelay = 5000,
+    onRetry,
+  } = options;
+
+  let lastError: Error;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      if (attempt === maxRetries) {
+        throw new RetryError(
+          `Failed after ${attempt + 1} attempts`,
+          attempt + 1,
+          lastError
+        );
+      }
+
+      const delay = Math.min(baseDelay * Math.pow(2, attempt), maxDelay);
+      onRetry?.(attempt + 1, lastError);
+
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+
+  throw lastError!;
+}
+
+// Usage example
+import { retryWithBackoff } from '@/lib/retry';
+
+async function igniteStove() {
+  return retryWithBackoff(
+    () => fetch('/api/stove/ignite', {
+      method: 'POST',
+      headers: { 'Idempotency-Key': crypto.randomUUID() }
+    }),
+    {
+      maxRetries: 3,
+      onRetry: (attempt, error) => {
+        console.log(`Retry attempt ${attempt}: ${error.message}`);
+        toast.info(`Tentativo ${attempt} in corso...`);
+      }
+    }
+  );
+}
+```
+
+### Visibility API Hook
+
+```typescript
+// src/hooks/useVisibilityChange.ts
+import { useState, useEffect } from 'react';
+
+export function useVisibilityChange(): boolean {
+  const [isVisible, setIsVisible] = useState(() => !document.hidden);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      setIsVisible(!document.hidden);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  return isVisible;
+}
+
+// Usage in polling component
+import { useVisibilityChange } from '@/hooks/useVisibilityChange';
+
+export function StoveCard() {
+  const isVisible = useVisibilityChange();
+
+  useEffect(() => {
+    if (!isVisible) return; // Stop polling when tab hidden
+
+    const pollStoveStatus = async () => {
+      // Fetch stove status
+    };
+
+    const intervalId = setInterval(pollStoveStatus, 5000);
+    return () => clearInterval(intervalId);
+  }, [isVisible]);
+
+  // ...
+}
+```
+
+### Adaptive Polling Hook
+
+```typescript
+// src/hooks/useAdaptivePolling.ts
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useVisibilityChange } from './useVisibilityChange';
+
+type PollingState = 'active' | 'idle' | 'hidden' | 'error';
+
+interface AdaptivePollingOptions {
+  activeInterval?: number;
+  idleInterval?: number;
+  idleTimeout?: number;
+  errorBackoffBase?: number;
+  errorBackoffMax?: number;
+}
+
+export function useAdaptivePolling(
+  callback: () => void | Promise<void>,
+  options: AdaptivePollingOptions = {}
+) {
+  const {
+    activeInterval = 5000,
+    idleInterval = 30000,
+    idleTimeout = 120000, // 2 minutes
+    errorBackoffBase = 1000,
+    errorBackoffMax = 60000,
+  } = options;
+
+  const [state, setState] = useState<PollingState>('idle');
+  const [errorCount, setErrorCount] = useState(0);
+  const isVisible = useVisibilityChange();
+  const lastActivityRef = useRef(Date.now());
+
+  // Track user activity
+  const markActivity = useCallback(() => {
+    lastActivityRef.current = Date.now();
+    if (state !== 'active') setState('active');
+  }, [state]);
+
+  // Check for idle state
+  useEffect(() => {
+    const checkIdle = setInterval(() => {
+      const timeSinceActivity = Date.now() - lastActivityRef.current;
+      if (timeSinceActivity > idleTimeout && state === 'active') {
+        setState('idle');
+      }
+    }, 5000);
+
+    return () => clearInterval(checkIdle);
+  }, [idleTimeout, state]);
+
+  // Main polling effect
+  useEffect(() => {
+    if (!isVisible) {
+      setState('hidden');
+      return;
+    }
+
+    if (state === 'hidden') {
+      setState('idle');
+    }
+
+    if (state === 'error') {
+      // Exponential backoff on error
+      const backoffDelay = Math.min(
+        errorBackoffBase * Math.pow(2, errorCount),
+        errorBackoffMax
+      );
+
+      const timeoutId = setTimeout(() => {
+        setState('idle');
+        setErrorCount(0);
+      }, backoffDelay);
+
+      return () => clearTimeout(timeoutId);
+    }
+
+    const interval = state === 'active' ? activeInterval : idleInterval;
+
+    const executeCallback = async () => {
+      try {
+        await callback();
+        setErrorCount(0); // Reset error count on success
+      } catch (error) {
+        console.error('Polling error:', error);
+        setErrorCount(prev => prev + 1);
+        setState('error');
+      }
+    };
+
+    const intervalId = setInterval(executeCallback, interval);
+
+    // Execute immediately on interval change
+    executeCallback();
+
+    return () => clearInterval(intervalId);
+  }, [state, isVisible, callback, activeInterval, idleInterval, errorCount, errorBackoffBase, errorBackoffMax]);
+
+  return {
+    state,
+    markActivity,
+    forceActive: () => setState('active'),
+    forceIdle: () => setState('idle'),
+  };
+}
+```
+
+### Component Splitting (Presentational/Container Pattern)
+
+```typescript
+// Before: StoveCard.tsx (1217 lines)
+
+// After: Composition of smaller components
+
+// src/components/stove/StoveCard.tsx (orchestrator, ~100 lines)
+import ErrorBoundary from '@/components/errors/ErrorBoundary';
+import StoveStatus from './StoveStatus';
+import StoveControls from './StoveControls';
+import StoveSchedule from './StoveSchedule';
+
+export function StoveCard() {
+  const { markActivity } = useAdaptivePolling(pollStoveStatus);
+
+  return (
+    <ErrorBoundary componentName="StoveCard">
+      <Card>
+        <StoveStatus />
+        <StoveControls onAction={markActivity} />
+        <StoveSchedule />
+      </Card>
+    </ErrorBoundary>
+  );
+}
+
+// src/components/stove/StoveStatus.tsx (~150 lines)
+export function StoveStatus() {
+  const stoveState = useStoveState();
+  return <StatusDisplay state={stoveState} />;
+}
+
+// src/components/stove/StoveControls.tsx (~200 lines)
+interface Props {
+  onAction: () => void;
+}
+
+export function StoveControls({ onAction }: Props) {
+  const [loading, setLoading] = useState<'ignite' | 'shutdown' | null>(null);
+
+  async function handleIgnite() {
+    setLoading('ignite');
+    onAction(); // Mark activity for adaptive polling
+    try {
+      await retryWithBackoff(() => igniteStove());
+    } finally {
+      setLoading(null);
+    }
+  }
+
+  return <ControlPanel loading={loading} onIgnite={handleIgnite} />;
+}
+
+// src/components/stove/StoveSchedule.tsx (~150 lines)
+export function StoveSchedule() {
+  const schedule = useSchedule();
+  return <ScheduleDisplay schedule={schedule} />;
+}
+```
+
+### Lazy Loading (Next.js Dynamic Import)
+
+```typescript
+// src/app/stove/page.tsx
+import dynamic from 'next/dynamic';
+import StoveCard from '@/components/stove/StoveCard';
+
+// Lazy load heavy components
+const StoveSettingsModal = dynamic(
+  () => import('@/components/stove/StoveSettingsModal'),
+  {
+    loading: () => <Spinner />,
+    ssr: false, // Client-side only (uses localStorage)
+  }
+);
+
+const TemperatureChart = dynamic(
+  () => import('@/components/stove/TemperatureChart'),
+  {
+    loading: () => <ChartSkeleton />,
+  }
+);
+
+export default function StovePage() {
+  const [showSettings, setShowSettings] = useState(false);
+
+  return (
+    <div>
+      <StoveCard />
+
+      {/* Chart loads on scroll into viewport */}
+      <TemperatureChart />
+
+      {/* Modal loads only when opened */}
+      {showSettings && (
+        <StoveSettingsModal onClose={() => setShowSettings(false)} />
+      )}
+    </div>
+  );
+}
+```
+
+### Critical Path Test (Playwright)
+
+```typescript
+// tests/e2e/critical-flows.spec.ts
+import { test, expect } from '@playwright/test';
+
+test.describe('Critical User Flows', () => {
+  test.beforeEach(async ({ page }) => {
+    // Assumes auth state saved from global setup
+    await page.goto('/');
+  });
+
+  test('User can control stove from dashboard', async ({ page }) => {
+    // Navigate to stove page
+    await page.getByRole('link', { name: /stufa/i }).click();
+    await expect(page).toHaveURL(/\/stove/);
+
+    // Verify status loads
+    const statusCard = page.getByTestId('stove-status');
+    await expect(statusCard).toBeVisible();
+    await expect(statusCard).toContainText(/stato/i);
+
+    // Ignite stove
+    const igniteButton = page.getByRole('button', { name: /accendi/i });
+    await igniteButton.click();
+
+    // Verify optimistic update
+    await expect(page.getByText(/accensione in corso/i)).toBeVisible();
+
+    // Verify polling updates status (within 10 seconds)
+    await expect(statusCard).toContainText(/igniting|accensione/i, {
+      timeout: 10000,
+    });
+  });
+
+  test('User can view and edit schedule', async ({ page }) => {
+    await page.goto('/stove');
+
+    // Open scheduler
+    const scheduleButton = page.getByRole('button', { name: /programma/i });
+    await scheduleButton.click();
+
+    // Verify scheduler modal
+    const modal = page.getByRole('dialog');
+    await expect(modal).toBeVisible();
+    await expect(modal).toContainText(/orari/i);
+
+    // Add schedule (example)
+    await page.getByLabel(/ora accensione/i).fill('07:00');
+    await page.getByRole('button', { name: /salva/i }).click();
+
+    // Verify success toast
+    await expect(page.getByText(/salvato/i)).toBeVisible();
+  });
+
+  test('Protected routes redirect unauthenticated users', async ({ browser }) => {
+    // Create new incognito context (no auth state)
+    const context = await browser.newContext();
+    const page = await context.newPage();
+
+    // Try to access protected route
+    await page.goto('/stove');
+
+    // Should redirect to login
+    await expect(page).toHaveURL(/\/auth\/login/);
+    await expect(page.getByText(/sign in/i)).toBeVisible();
+
+    await context.close();
+  });
+});
+```
+
+### Token Cleanup (Firebase Function)
+
+```typescript
+// functions/src/cleanupTokens.ts
+import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
+
+export const cleanupStaleTokens = functions.pubsub
+  .schedule('0 2 * * *') // Daily at 2 AM
+  .timeZone('Europe/Rome')
+  .onRun(async (context) => {
+    const now = Date.now();
+    const staleThreshold = 30 * 24 * 60 * 60 * 1000; // 30 days in ms
+
+    const db = admin.database();
+    const tokensRef = db.ref('fcmTokens');
+
+    try {
+      const snapshot = await tokensRef.once('value');
+      const allTokens = snapshot.val();
+
+      if (!allTokens) {
+        console.log('No tokens to clean up');
+        return null;
+      }
+
+      const deletions: Promise<void>[] = [];
+      let staleCount = 0;
+
+      for (const [userId, userTokens] of Object.entries(allTokens)) {
+        if (!userTokens || typeof userTokens !== 'object') continue;
+
+        for (const [tokenId, tokenData] of Object.entries(userTokens as Record<string, any>)) {
+          const timestamp = tokenData?.timestamp;
+
+          if (!timestamp || (now - timestamp) > staleThreshold) {
+            deletions.push(
+              tokensRef.child(`${userId}/${tokenId}`).remove()
+            );
+            staleCount++;
+          }
+        }
+      }
+
+      await Promise.all(deletions);
+
+      console.log(`Cleaned up ${staleCount} stale FCM tokens`);
+
+      // Log to analytics for monitoring
+      await db.ref('monitoring/tokenCleanup').push({
+        timestamp: now,
+        tokensDeleted: staleCount,
+      });
+
+      return null;
+    } catch (error) {
+      console.error('Error cleaning up tokens:', error);
+      throw error;
+    }
+  });
+```
+
+---
+
+## Research Confidence
+
+| Feature Category | Confidence | Source Quality |
+|------------------|------------|----------------|
+| Error Boundaries | HIGH | Official React docs, recent 2026 articles |
+| Retry Strategies | HIGH | Official patterns, established npm packages |
+| Visibility API | HIGH | MDN, established browser API |
+| Code Splitting | HIGH | Official Next.js docs (v16.1.6, Feb 2026) |
+| Token Lifecycle | HIGH | Official Firebase docs |
+| Critical Path Testing | MEDIUM-HIGH | Playwright best practices 2026, industry consensus |
+| Component Splitting | HIGH | React patterns, authoritative sources |
+| Adaptive Polling | MEDIUM | Community patterns, no official guide |
+
+---
+
+## Key Insights
+
+### Error Boundaries (Critical Foundation)
+
+- **Must be class components** — No hooks equivalent exists yet (react-error-boundary package is alternative)
+- **Don't catch:** Event handlers, async code (setTimeout, promises), errors in boundary itself
+- **Strategic placement:** Feature-level (StoveCard, LightsCard), not global-only or component-level
+- **Production pattern:** Log to analytics in componentDidCatch, not just console.error
+- **User experience:** Show actionable fallback ("Something went wrong. Retry?"), not cryptic messages
+
+### Retry Logic (Network Resilience)
+
+- **Standard pattern:** 10ms → 20ms → 40ms → 80ms → 160ms (exponential backoff)
+- **Max retries:** 3-5 attempts, then surface error (never infinite)
+- **Idempotency:** POST requests need idempotency keys to prevent duplicate actions
+- **User feedback:** Show retry attempt number, don't leave users guessing
+- **Error surfacing:** After max retries, show actionable message ("Check WiFi, try again")
+
+### Polling Optimization (Resource Efficiency)
+
+- **Visibility API:** Supported IE10+, simple event listener, 80% resource savings
+- **Battery impact:** Mobile OS throttles hidden tabs to 1req/min after 5 minutes anyway
+- **Bandwidth:** Cellular users notice unnecessary polling
+- **Adaptive patterns:** Beyond visibility—active/idle/error states for smart intervals
+- **User expectations:** App should respect system resources, feel "native"
+
+### Code Splitting (Load Performance)
+
+- **Next.js automatic:** Page-level splitting built-in, zero config
+- **Manual splitting:** next/dynamic for Client Components, modals, charts
+- **SSR consideration:** ssr: false for browser-only code (localStorage, window)
+- **Loading states:** Suspense fallback prevents layout shift, improves perceived performance
+- **Bundle analysis:** @next/bundle-analyzer identifies bloat
+
+### Token Lifecycle (Operational Hygiene)
+
+- **FCM staleness:** 30 days inactive = stale, 270 days = expired (Android)
+- **Cleanup frequency:** Daily/weekly scheduled function adequate
+- **Timestamp tracking:** Update on every token refresh, not just registration
+- **Metrics impact:** Stale tokens skew FCM console delivery rates
+- **Resubscription:** Monthly topic resubscription auto-heals inactive devices
+
+### Testing Strategy (Quality Gates)
+
+- **E2E scope:** 3-5 critical flows (login, core features), not full coverage
+- **Tool choice 2026:** Playwright > Cypress for new tests (speed, reliability)
+- **CI integration:** Fast tests first, E2E gated (don't block on slow tests)
+- **Auth testing:** Real Auth0 flow, not mocks (catches real bugs)
+- **Focus:** User journeys over line coverage metrics
+
+### Component Splitting (Maintainability)
+
+- **Threshold:** 200-300 lines = consider splitting, 1000+ lines = must split
+- **Patterns:** Presentational/Container, Custom Hooks extraction, Composition
+- **Testing benefit:** Smaller components = easier to test in isolation
+- **TypeScript benefit:** Explicit prop types at component boundaries
+- **DX impact:** Easier to navigate, review, maintain
 
 ---
 
 ## Sources
 
-### Cron Automation & Scheduling
-- [Schedule - Home Assistant](https://www.home-assistant.io/integrations/schedule/)
-- [Our complete cron job guide for 2026 - UptimeRobot](https://uptimerobot.com/knowledge-hub/cron-monitoring/cron-job-guide/)
-- [How To Create Schedules in Home Assistant - SmartHomeScene](https://smarthomescene.com/guides/how-to-create-schedules-in-home-assistant/)
-- [Home Assistant automation scheduling patterns - Community Discussion](https://community.home-assistant.io/t/full-featured-scheduling-based-on-cron/83627)
+### Error Boundaries
+- [Error Boundaries – React (Official Docs)](https://react.dev/reference/react/Component)
+- [How to Implement Error Boundaries for Graceful Error Handling in React (2026)](https://oneuptime.com/blog/post/2026-01-15-react-error-boundaries/view)
+- [Advanced React Error Boundaries for Production Apps | Medium](https://medium.com/@asiandigitalhub/advanced-react-error-boundaries-for-production-apps-f9ad9d2ae966)
+- [Error Handling in React Apps: A Complete Guide | Medium](https://medium.com/@rajeevranjan2k11/error-handling-in-react-apps-a-complete-guide-to-error-boundaries-and-best-practices-094aa0e4a641)
 
-### Distributed Rate Limiting
-- [Smart DDoS Protection & Rate Limiting for Firebase Functions - Flames Shield](https://flamesshield.com/features/ddos/)
-- [Tutorial: Firestore Rate Limiting - Fireship.io](https://fireship.io/lessons/how-to-rate-limit-writes-firestore/)
-- [How to Build a Distributed Rate Limiter with Redis - OneUpTime](https://oneuptime.com/blog/post/2026-01-21-redis-distributed-rate-limiter/view)
-- [Rate Limiting in Distributed System - DEV Community](https://dev.to/smiah/rate-limiting-in-distributed-system-3h59)
-- [How to Build Distributed Counters with Redis - OneUpTime](https://oneuptime.com/blog/post/2026-01-27-redis-distributed-counters/view)
+### Code Splitting & Lazy Loading
+- [Guides: Lazy Loading | Next.js (Official, v16.1.6, 2026-02-09)](https://nextjs.org/docs/app/guides/lazy-loading)
+- [Mastering Lazy Loading in Next.js 15: Advanced Patterns for Peak Performance (2026)](https://medium.com/@sureshdotariya/mastering-lazy-loading-in-next-js-15-advanced-patterns-for-peak-performance-75e0bd574c76)
+- [Dynamic imports and code splitting with Next.js - LogRocket](https://blog.logrocket.com/dynamic-imports-code-splitting-next-js/)
+- [How to Use Code Splitting to Reduce Initial Load Times in Next.js | Blazity](https://blazity.com/blog/code-splitting-next-js)
 
-### PWA Push Notifications with Actions
-- [Re-engageable Notifications and Push APIs - MDN](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Tutorials/js13kGames/Re-engageable_Notifications_Push)
-- [Mastering Browser-Based Alerts: Advanced Web Push Notifications in Home Assistant - Newerest Space](https://newerest.space/mastering-browser-alerts-web-push-home-assistant/)
-- [How to Set Up Push Notifications for Your PWA - MobiLoud](https://www.mobiloud.com/blog/pwa-push-notifications)
-- [Innovations and Trends in PWA Push Notifications - AppMaster](https://appmaster.io/blog/innovations-and-trends-in-pwa-push-notifications)
-- [Using Push Notifications in PWAs: The Complete Guide - MagicBell](https://www.magicbell.com/blog/using-push-notifications-in-pwas)
+### Adaptive Polling & Visibility API
+- [Implementing Polling in React: A Guide for Efficient Real-Time Data Fetching | Medium](https://medium.com/@sfcofc/implementing-polling-in-react-a-guide-for-efficient-real-time-data-fetching-47f0887c54a7)
+- [Modern JavaScript Polling: Adaptive Strategies That Actually Work (Part 1) | Medium](https://medium.com/tech-pulse-by-collatzinc/modern-javascript-polling-adaptive-strategies-that-actually-work-part-1-9909f5946730)
+- [Enhancing User Experience with React Polling in Real-Time Apps | DhiWise](https://www.dhiwise.com/post/a-guide-to-real-time-applications-with-react-polling)
 
-### PWA Offline Mode & Background Sync
-- [Offline and background operation - MDN](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Offline_and_background_operation)
-- [Background Sync in PWAs: Service Worker Guide - Zee Palm](https://www.zeepalm.com/blog/background-sync-in-pwas-service-worker-guide)
-- [Synchronize and update a PWA in the background - Microsoft Edge Docs](https://learn.microsoft.com/en-us/microsoft-edge/progressive-web-apps/how-to/background-syncs)
-- [How to periodically synchronize data in the background - web.dev](https://web.dev/patterns/web-apps/periodic-background-sync)
-- [Build a Next.js 16 PWA with true offline support - LogRocket](https://blog.logrocket.com/nextjs-16-pwa-offline-support/)
+### Retry Strategies & Exponential Backoff
+- [How to Implement Retry Logic with Exponential Backoff in React (2026)](https://oneuptime.com/blog/post/2026-01-15-retry-logic-exponential-backoff-react/view)
+- [Retrying API Calls with Exponential Backoff in JavaScript](https://bpaulino.com/entries/retrying-api-calls-with-exponential-backoff)
+- [How to implement an exponential backoff retry strategy in Javascript - Advanced Web Machinery](https://advancedweb.hu/how-to-implement-an-exponential-backoff-retry-strategy-in-javascript/)
+- [exponential-backoff - npm](https://www.npmjs.com/package/exponential-backoff)
 
-### PWA Install Prompts
-- [Installation prompt - web.dev](https://web.dev/learn/pwa/installation-prompt)
-- [Making PWAs installable - MDN](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable)
-- [Trigger installation from your PWA - MDN](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/How_to/Trigger_install_prompt)
-- [Patterns for promoting PWA installation - web.dev](https://web.dev/articles/promote-install)
-- [Best Practices for PWA Installation - Midday](https://www.midday.io/blog/best-practices-for-pwa-installation)
+### FCM Token Lifecycle Management
+- [Best practices for FCM registration token management | Firebase (Official)](https://firebase.google.com/docs/cloud-messaging/manage-tokens)
+- [Managing Cloud Messaging Tokens | Firebase Blog](https://firebase.blog/posts/2023/04/managing-cloud-messaging-tokens/)
+- [Lifecycle of Push Notification based Device Tokens | Medium](https://medium.com/@chunilalkukreja/lifecycle-of-fcm-device-tokens-61681bb6fbcf)
 
-### E2E Testing with Auth0
-- [End-to-End Testing with Cypress and Auth0 - Auth0 Blog](https://auth0.com/blog/end-to-end-testing-with-cypress-and-auth0/)
-- [How to Cover Auth0's Login Form with Tests - Auth0 Blog](https://auth0.com/blog/testing-auth0-login-with-cypress/)
-- [Cypress vs Playwright: I Ran 500 E2E Tests in Both - Medium](https://medium.com/lets-code-future/cypress-vs-playwright-i-ran-500-e2e-tests-in-both-heres-what-broke-2afc448470ee)
-- [Playwright vs Cypress: The 2026 Enterprise Testing Guide - Medium](https://devin-rosario.medium.com/playwright-vs-cypress-the-2026-enterprise-testing-guide-ade8b56d3478)
+### Critical Path Testing with Playwright
+- [15 Best Practices for Playwright testing in 2026 | BrowserStack](https://www.browserstack.com/guide/playwright-best-practices)
+- [Why Testers Will Switch to Playwright in 2026 | Testleaf](https://www.testleaf.com/blog/why-testers-switch-to-playwright-2026-guide/)
+- [Testing Next.js Applications: A Complete Guide To Catching Bugs Before QA Does (2026)](https://trillionclues.medium.com/testing-next-js-applications-a-complete-guide-to-catching-bugs-before-qa-does-a1db8d1a0a3b)
+- [Testing in 2026: Jest, React Testing Library, and Full Stack Testing Strategies](https://www.nucamp.co/blog/testing-in-2026-jest-react-testing-library-and-full-stack-testing-strategies)
 
-### Energy Analytics & Visualization
-- [The Best Energy Monitoring Tools in 2026 - Vivint](https://www.vivint.com/resources/article/energy-monitoring)
-- [Recharts: How to Use it and Build Analytics Dashboards - Embeddable](https://embeddable.com/blog/what-is-recharts)
-- [How to use Recharts to visualize analytics data - PostHog](https://posthog.com/tutorials/recharts)
-- [The Top 5 React Chart Libraries to Know in 2026 - Syncfusion](https://www.syncfusion.com/blogs/post/top-5-react-chart-libraries)
-- [How to use Next.js and Recharts to build an information dashboard - Ably](https://ably.com/blog/informational-dashboard-with-nextjs-and-recharts)
-
-### Pellet Consumption Tracking
-- [Smart ways to cut your pellet consumption in 2026 - SiskelEbert](https://www.siskelebert.org/06-166745-smart-ways-to-cut-your-pellet-consumption-in-2026-adopt-them-now/)
-- [Tracking wood pellet consumption - Home Assistant Community](https://community.home-assistant.io/t/tracking-wood-pellet-consumption/783104)
-- [Machine Learning Algorithms for Energy Consumption Prediction - Springer](https://link.springer.com/chapter/10.1007/978-3-031-80817-3_5)
-- [Novel approach to energy consumption estimation in smart homes - Frontiers](https://www.frontiersin.org/journals/energy-research/articles/10.3389/fenrg.2024.1361803/full)
+### Component Refactoring Patterns
+- [Common Sense Refactoring of a Messy React Component | Alex Kondov](https://alexkondov.com/refactoring-a-messy-react-component/)
+- [Refactoring components in React with custom hooks | CodeScene](https://codescene.com/engineering-blog/refactoring-components-in-react-with-custom-hooks)
+- [Building Reusable React Components in 2026 | Medium](https://medium.com/@romko.kozak/building-reusable-react-components-in-2026-a461d30f8ce4)
+- [Modularizing React Applications with Established UI Patterns | Martin Fowler](https://martinfowler.com/articles/modularizing-react-apps.html)
 
 ---
 
-**Confidence Level:** HIGH for table stakes and anti-features (well-documented patterns, existing foundation), MEDIUM for differentiators (some novel approaches like Firebase rate limiting, pellet estimation heuristics require validation).
+**Confidence Level:** HIGH for table stakes and implementation patterns (official docs, established practices), MEDIUM for differentiators (adaptive polling, component health monitoring require validation).
 
-**Last Updated:** 2026-02-10
+**Last Updated:** 2026-02-11

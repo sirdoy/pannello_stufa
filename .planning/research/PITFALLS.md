@@ -1,522 +1,640 @@
-# Pitfalls Research
+# Domain Pitfalls
 
-**Domain:** Operations Automation + PWA Improvements + Analytics (v6.0)
-**Researched:** 2026-02-10
-**Confidence:** HIGH
+**Domain:** Performance & Resilience for IoT Control PWA
+**Researched:** 2026-02-11
 
 ## Critical Pitfalls
 
-### Pitfall 1: Serverless Cron Persistent State Assumption
+Mistakes that cause rewrites, safety incidents, or major production issues.
 
-**What goes wrong:**
-Developers assume Vercel cron jobs maintain in-memory state between executions, leading to broken rate limiters, PID controller state loss, and stale session data. The current in-memory rate limiter will reset on every cold start, allowing DoS attacks to bypass rate limits.
+### Pitfall 1: Non-Idempotent Retry on Safety-Critical Operations
+**What goes wrong:** Retrying `ignite` or `shutdown` commands without idempotency keys causes duplicate physical actions. Thundering herd on transient failures triggers multiple ignition attempts, potentially dangerous for physical stove control.
 
-**Why it happens:**
-Vercel serverless functions are stateless — each execution starts fresh with no shared memory between invocations. Node-cron patterns work locally but silently fail in production because the process starts, handles one request, then gets destroyed. There is no error and no warning.
+**Why it happens:** Developers add retry logic without considering physical device state vs. API state. Network timeout doesn't mean action failed—stove may have received ignite command but response was lost.
 
-**How to avoid:**
-1. **Migrate to Firebase RTDB for ALL persistent state**:
-   - Rate limiter: Store `requests/{userId}/{endpoint}/count` with timestamp
-   - PID automation: Already implemented at `pidAutomation/state` (good pattern)
-   - Cron health: Already using `cronHealth/lastCall` (correct)
-   - Dead man's switch: Already using `healthMonitoring/lastCheck` (correct)
+**Consequences:**
+- Multiple ignition attempts if first times out
+- Shutdown commands queued that execute after successful ignition
+- Race conditions between manual UI actions and retry logic
+- Safety implications: physical device in unknown state
 
-2. **Implement sliding window rate limiting**:
+**Prevention:**
+1. **Server-side idempotency tokens** for all mutation operations
+2. **Read-verify-write pattern**: Check stove state before retry
+3. **Exponential backoff with jitter** ([OneUpTime](https://oneuptime.com/blog/post/2026-01-15-retry-logic-exponential-backoff-react/view))
+   - Formula: `baseDelay * 2^failureCount + jitter`, capped at maxDelay
+   - Prevents thundering herd synchronization
+4. **Retry budgets**: Cap total retries across all clients ([Encore](https://encore.dev/blog/thundering-herd-problem))
+5. **Only retry safe operations**: Ignite/shutdown are NOT idempotent without state verification
+
+**Detection:**
+- Firebase logs show duplicate ignite/shutdown entries within seconds
+- Stove state transitions don't match UI action count
+- Multiple `source: 'manual'` entries without user confirmation
+
+**Project-specific:**
+- `/api/stove/ignite` already blocks if `needsCleaning: true` (docs/api-routes.md:14)
+- Add idempotency: `POST /api/stove/ignite {idempotencyKey, source}`
+- Verify stove OFF before ignite retry, ON before shutdown retry
+
+---
+
+### Pitfall 2: Layered Retries Amplification
+**What goes wrong:** App retries + fetch retry + API route retry + Thermorossi Cloud retry = multiplicative explosion. 3 layers × 3 attempts = 27 requests for single user action.
+
+**Why it happens:** Each layer adds retry logic independently without coordination. Google's retry guidance explicitly calls this out as anti-pattern ([ThinhDA](https://thinhdanggroup.github.io/retry-without-thundering-herds/)).
+
+**Consequences:**
+- Single transient failure cascades into stampede
+- API rate limits hit, blocking legitimate requests
+- User sees "loading" for 30+ seconds
+- Firebase quota exhausted on retry storms
+
+**Prevention:**
+1. **Single retry layer**: Choose ONE place (recommend: API route level)
+2. **Disable browser fetch retry**: Use `signal: AbortSignal.timeout(5000)`
+3. **Monitor retry depth**: Log layer that initiated retry
+4. **Circuit breaker at API boundary**: Stop retries after 3 consecutive failures
+
+**Detection:**
+- Network tab shows multiple identical requests
+- API route logs show same `idempotencyKey` multiple times
+- Firebase write quota spikes without user activity increase
+
+**Project-specific:**
+- StoveCard polling already at 5s interval (architecture.md:104)
+- Don't add fetch retry—polling provides natural retry
+- Add retry ONLY at `/api/stove/*` routes, not in component
+
+---
+
+### Pitfall 3: Adaptive Polling Breaks Real-Time Requirements
+**What goes wrong:** Adaptive polling algorithm reduces frequency during low activity, causing 30-second display staleness. User sees "ON" while stove already shutdown, presses shutdown again → error.
+
+**Why it happens:** IoT frameworks often poll too slow for real-time OR waste battery with high frequency ([IEEE RT-IFTTT](https://ieeexplore.ieee.org/document/8277299/)). Adaptive algorithms optimize for battery, not UX.
+
+**Consequences:**
+- Stale status display misleads user decisions
+- Automation conflicts: scheduler thinks stove OFF (stale poll), attempts ignite while actually ON
+- Thermostat coordination broken: 2-minute debounce relies on accurate stove state
+- User loses trust in system accuracy
+
+**Prevention:**
+1. **Fixed 5s polling for critical status** (current StoveCard pattern is correct)
+2. **Adaptive ONLY for non-critical metrics** (pellet level, weather)
+3. **Staleness indicator**: Show "Last updated 23s ago" if poll fails
+4. **Exponential backoff on error, NOT success**: Slow down only if API unavailable
+
+**Detection:**
+- User reports "wrong status" or "delayed updates"
+- Firebase timestamps show >10s gaps in status snapshots
+- Automation actions conflict with recent manual actions
+- Stove state transitions happen between polls (invisible to UI)
+
+**Project-specific:**
+- Keep `setInterval(fetchStatus, 5000)` fixed (architecture.md:183)
+- Weather can use 30-minute adaptive (cron already does this, api-routes.md:79)
+- Token cleanup 7-day adaptive (api-routes.md:80)
+- **NEVER** make stove status adaptive
+
+---
+
+### Pitfall 4: Error Boundaries Swallow Safety Alerts
+**What goes wrong:** Error boundary catches "stove needsCleaning" validation error, shows generic "Something went wrong" instead of maintenance alert. User bypasses safety check.
+
+**Why it happens:** Next.js error boundaries catch ALL errors in tree, including expected validation errors that should show specific UI ([Next.js Docs](https://nextjs.org/docs/app/getting-started/error-handling)).
+
+**Consequences:**
+- Safety validations silently fail
+- User doesn't know WHY ignite blocked
+- Attempts ignite repeatedly, hits rate limit
+- Maintenance tracking broken: no notification sent
+
+**Prevention:**
+1. **Expected errors throw custom class**: `throw new ValidationError('needsCleaning')`
+2. **Error boundary checks error type**: Only catch `Error`, not `ValidationError`
+3. **Validation errors return JSX, not throw**: Render `<MaintenanceAlert />` instead of throwing
+4. **Error boundaries for UNEXPECTED errors only**: Network failures, Firebase crashes
+5. **Use error.digest for production**: Next.js strips messages in production ([Better Stack](https://betterstack.com/community/guides/scaling-nodejs/error-handling-nextjs/))
+
+**Detection:**
+- Generic error screens when specific validation should show
+- Firebase logs show validation errors but UI shows error boundary
+- User clicks "Try again" repeatedly without seeing root cause
+- Maintenance alerts don't trigger despite `needsCleaning: true`
+
+**Project-specific:**
+- StoveCard needs maintenance banner (architecture.md:131) BEFORE error boundary
+- Expected validations: `needsCleaning`, `already_on`, `already_off`
+- Wrap only status fetch in error boundary, not controls
+- Custom error class: `lib/errors/StoveValidationError.ts`
+
+---
+
+### Pitfall 5: Component Splitting Breaks Stove State Management
+**What goes wrong:** Splitting StoveCard into `<StoveStatus />`, `<StoveControls />`, `<MaintenanceBanner />` causes 3 separate polling loops. Race condition: banner shows "needsCleaning" while controls show fan/power sliders.
+
+**Why it happens:** Developers optimize bundle size by code-splitting, but each component independently fetches state ([React Context Performance](https://oneuptime.com/blog/post/2026-01-24-react-context-performance-issues/view)).
+
+**Consequences:**
+- 3× polling load (15 req/min instead of 5)
+- UI inconsistency: components show different stove states
+- Context re-render cascade: status update triggers all children
+- Firebase RTDB quota hit faster
+- User sees flickering state changes
+
+**Prevention:**
+1. **Hoist state to parent**: Single `useStoveStatus()` in StoveCard
+2. **Pass props down**: `<StoveControls status={status} />`
+3. **Memoize context value**: `useMemo` for expensive computations
+4. **Split by update frequency, not domain**: Fast-changing (status) vs. slow (config)
+5. **State colocation**: Keep state close to where it's used ([Kent C. Dodds](https://kentcdodds.com/blog/application-state-management-with-react))
+
+**Detection:**
+- Network tab shows multiple `/api/stove/status` calls per 5s interval
+- React DevTools shows cascading re-renders
+- Firebase quota usage 3× expected
+- UI shows inconsistent state across same component's children
+
+**Project-specific:**
+- StoveCard already correct pattern (architecture.md:162-204)
+- **DON'T** split into separate files with independent polling
+- **DO** extract pure presentation components without state
+- Use `React.memo` on `<FanLevelDisplay />` if re-render expensive
+
+---
+
+### Pitfall 6: FCM Token Cleanup Deletes Active Devices
+**What goes wrong:** Token cleanup job deletes tokens inactive >30 days, but user has PWA installed and receives notifications—they just haven't opened app. Next critical alert fails silently.
+
+**Why it happens:** "Inactive" defined by app open, not notification delivery ([Firebase Best Practices](https://firebase.google.com/docs/cloud-messaging/manage-tokens)). Background notifications don't count as activity.
+
+**Consequences:**
+- Stove ignition failure notification not delivered
+- User doesn't know automation failed
+- Safety issue: stove runs unsupervised
+- Firebase shows "successful send" but no device receives
+
+**Prevention:**
+1. **Track last_notification_received**: Update timestamp on FCM delivery receipt
+2. **270-day inactivity window**: Firebase marks tokens expired after 9 months ([Netguru](https://www.netguru.com/blog/why-mobile-push-notification-architecture-fails))
+3. **Don't cleanup based on app_opened**: Use delivery metrics
+4. **Unsubscribe from topics only**: Remove topic mappings, keep token ([Firebase Managing Tokens](https://firebase.blog/posts/2023/04/managing-cloud-messaging-tokens/))
+5. **Cron cleanup log**: Record which tokens deleted for audit
+
+**Detection:**
+- User reports "stopped getting notifications" but token in database
+- Firebase delivery reports show "invalid token" for recently cleaned tokens
+- Cleanup job deletes tokens that received notification last week
+- Production incidents correlate with cleanup job execution
+
+**Project-specific:**
+- Current cleanup: 7-day interval (api-routes.md:80)
+- Change criteria: `lastNotificationDelivered` not `lastAppOpened`
+- Keep tokens that delivered notification within 30 days
+- Log cleanup: `firebase/tokenCleanupLog/{timestamp}`
+
+---
+
+## Moderate Pitfalls
+
+Issues that cause user frustration or operational overhead, but recoverable.
+
+### Pitfall 7: Scheduler Cron Retry Creates Duplicate Actions
+**What goes wrong:** GitHub Actions cron fails mid-execution, retries 3× by default. Each retry calls `/api/scheduler/check`, triggering 3 ignition commands.
+
+**Why it happens:** GitHub Actions has implicit retry on workflow failure. Cron job is NOT idempotent without tracking execution ID.
+
+**Prevention:**
+1. **Idempotency key in cron**: `GET /api/scheduler/check?secret=xxx&executionId={timestamp}`
+2. **Deduplication window**: Ignore requests with same executionId within 2 minutes
+3. **Disable GitHub Actions retry**: `retry: { automatic: false }` in workflow
+4. **Log cron executions**: Track start/end, detect overlapping calls
+
+**Detection:**
+- Firebase shows duplicate scheduler actions within 1 minute
+- Stove state changes twice in same minute
+- GitHub Actions logs show multiple workflow runs at same cron time
+
+**Project-specific:**
+- Cron already unified (api-routes.md:61-90)
+- Add: `cron/lastExecutionId` to Firebase
+- Check: If executionId seen in last 2 minutes, return early
+
+---
+
+### Pitfall 8: Thermostat-Stove Coordination Debounce Race
+**What goes wrong:** Stove status changes faster than 2-minute debounce window. Thermostat adjustment queued, but stove already shut down. Valve opens → wastes heat.
+
+**Why it happens:** Debouncing delays action until "silence period" ([Zigbee2MQTT](https://github.com/koenkk/zigbee2mqtt/issues/29724)). If stove state oscillates, debounce never fires or fires with stale intent.
+
+**Prevention:**
+1. **Throttle instead of debounce**: First action immediate, ignore subsequent for 2 min
+2. **Re-validate before action**: Check stove state when debounce fires
+3. **Cancel pending on conflict**: Clear debounce timer if stove turns OFF
+4. **Separate coordination logic**: Don't couple polling and coordination
+
+**Detection:**
+- Thermostat adjusts after stove already off
+- Firebase shows coordination actions with stale stove state
+- User reports "thermostat changes when stove not running"
+
+**Project-specific:**
+- Current: 2-minute debounce (project context)
+- Add: `if (!stove.isOn) clearTimeout(debounceTimer);`
+- Log coordination attempts with stove state snapshot
+
+---
+
+### Pitfall 9: useEffect Polling Race Condition
+**What goes wrong:** User navigates away from StoveCard while poll in-flight. Poll resolves after unmount, calls `setStatus` on unmounted component → React warning + memory leak.
+
+**Why it happens:** useEffect cleanup doesn't abort fetch by default ([Max Rozen](https://maxrozen.com/race-conditions-fetching-data-react-with-useeffect)).
+
+**Prevention:**
+1. **AbortController pattern**:
    ```typescript
-   // BAD - In-memory (resets on cold start)
-   const rateLimiter = new Map<string, number>();
-
-   // GOOD - Firebase RTDB persistent
-   const path = `rateLimit/${userId}/${endpoint}/${timestamp}`;
-   const count = await adminDbGet(path) || 0;
-   await adminDbSet(path, count + 1);
-   // Cleanup old windows with transaction
+   useEffect(() => {
+     const controller = new AbortController();
+     fetch('/api/stove/status', { signal: controller.signal });
+     return () => controller.abort();
+   }, []);
    ```
+2. **Boolean ignore flag**: Set `let ignore = false` in effect, `return () => ignore = true`
+3. **Only update if mounted**: Check flag before setState
 
-3. **Test with forced cold starts**: Deploy to Vercel, wait 15+ minutes between requests to verify state persistence.
+**Detection:**
+- React warning: "Can't perform state update on unmounted component"
+- Memory usage grows with navigation (leaked intervals)
+- Firebase shows ongoing polls after user left page
 
-**Warning signs:**
-- Rate limiter works for consecutive requests but resets after idle periods
-- PID controller "forgets" integral/derivative terms between cron runs
-- Users bypass rate limits by waiting for function cold start
-- Cron interval tracking shows gaps or resets
-
-**Phase to address:**
-Phase 49 (Persistent Rate Limiting) - MUST complete before Phase 50 (Cron Configuration)
-
----
-
-### Pitfall 2: Vercel Function Timeout During Cron Orchestration
-
-**What goes wrong:**
-The scheduler cron endpoint (`/api/scheduler/check`) performs 10+ operations sequentially (stove status, ignition, Netatmo sync, valve calibration, weather refresh, token cleanup, PID automation) and exceeds Vercel's 10-second default timeout, causing partial execution and data corruption.
-
-**Why it happens:**
-Heavy work in cron jobs — the current implementation performs all maintenance tasks inline. Vercel enforces a 10-second default timeout (60 seconds max), but the cron job can take longer if:
-- Stove API is slow (3-5 seconds)
-- Netatmo calibration iterates multiple valves (2-3 seconds per valve)
-- Weather fetch has network latency (1-2 seconds)
-- Multiple notifications triggered (FCM API calls)
-
-**How to avoid:**
-1. **Refactor to publish-subscribe pattern**:
-   ```typescript
-   // BAD - All work inline (current implementation)
-   export const GET = withCronSecret(async () => {
-     await fetchStoveStatus();      // 3-5s
-     await trackMaintenance();      // 1-2s
-     await calibrateValves();       // 6-9s (3 valves × 2-3s)
-     await refreshWeather();        // 1-2s
-     await cleanupTokens();         // 2-3s
-     await runPIDAutomation();      // 1-2s
-     // TOTAL: 14-24 seconds → TIMEOUT!
-   });
-
-   // GOOD - Orchestrator delegates to worker routes
-   export const GET = withCronSecret(async () => {
-     await adminDbSet('cronHealth/lastCall', new Date().toISOString());
-
-     // Fire-and-forget workers (already partially implemented)
-     Promise.all([
-       fetch('/api/maintenance/track').catch(logError),
-       fetch('/api/netatmo/calibrate').catch(logError),
-       fetch('/api/weather/refresh').catch(logError),
-       fetch('/api/notifications/cleanup').catch(logError),
-     ]);
-
-     // Only blocking: critical path (scheduler logic)
-     const result = await executeSchedulerLogic();
-     return success(result);
-   });
-   ```
-
-2. **Set maxDuration in route config**:
-   ```typescript
-   export const dynamic = 'force-dynamic';
-   export const maxDuration = 60; // Max for Hobby plan
-   ```
-
-3. **Monitor with dead man's switch**: Already implemented in `healthDeadManSwitch.ts` (correct pattern).
-
-**Warning signs:**
-- `FUNCTION_INVOCATION_TIMEOUT` errors in Vercel logs
-- Partial state updates (stove ignited but notification not sent)
-- Cron health timestamp updated but maintenance not tracked
-- Dead man's switch alerts firing despite cron executing
-
-**Phase to address:**
-Phase 50 (Cron Configuration) - Split monolithic handler into orchestrator + workers
+**Project-specific:**
+- StoveCard polling (architecture.md:174-185)
+- Add AbortController to all fetch calls
+- Cleanup: `clearInterval` already present, add abort
 
 ---
 
-### Pitfall 3: FCM Interactive Notifications Platform-Specific Payload Structure
+### Pitfall 10: Error Boundary in Same Segment as Layout
+**What goes wrong:** Error boundary `app/error.tsx` doesn't catch errors from `app/layout.tsx` because boundary nested inside layout ([Next.js Docs](https://nextjs.org/docs/app/api-reference/file-conventions/error)).
 
-**What goes wrong:**
-Action buttons work on Android but fail silently on iOS, or notification data exceeds platform limits (4KB iOS, 2KB Android), causing dropped notifications without user-visible errors.
+**Why it happens:** Next.js convention: error.js wraps page.js, not layout.js.
 
-**Why it happens:**
-FCM notification payloads have different structures for Android vs iOS, and the current implementation sends uniform payloads. iOS requires `aps.category` with registered notification categories, while Android uses `android.actions`. Data size limits vary by platform.
+**Prevention:**
+1. **Global error boundary**: Place in parent segment `/error.tsx` not `/dashboard/error.tsx`
+2. **Layout errors caught by parent**: App-level boundary catches layout crashes
+3. **'use client' required**: Error components must be client-side
 
-**How to avoid:**
-1. **Platform-specific payload construction**:
-   ```typescript
-   // BAD - Uniform payload (current pattern)
-   const message = {
-     notification: { title, body },
-     data: { actionUrl, type },
-     token,
-   };
+**Detection:**
+- Layout error shows Next.js default error, not custom boundary
+- Error boundary works on page errors but not navbar crashes
 
-   // GOOD - Platform-specific
-   const payload = token.platform === 'ios' ? {
-     notification: { title, body },
-     apns: {
-       payload: {
-         aps: {
-           category: 'STOVE_ERROR',        // Must match iOS registration
-           'mutable-content': 1,
-         },
-       },
-     },
-     data: { actionUrl, type },             // Max 4KB
-     token,
-   } : {
-     notification: { title, body },
-     android: {
-       notification: {
-         clickAction: 'FLUTTER_NOTIFICATION_CLICK',
-       },
-     },
-     data: {
-       actionUrl,
-       type,
-       actions: JSON.stringify([           // Max 2KB
-         { action: 'VIEW', title: 'Visualizza' },
-         { action: 'DISMISS', title: 'Chiudi' },
-       ]),
-     },
-     token,
-   };
-   ```
-
-2. **Validate payload size before sending**:
-   ```typescript
-   const payloadSize = JSON.stringify(payload).length;
-   const maxSize = platform === 'ios' ? 4096 : 2048;
-   if (payloadSize > maxSize) {
-     console.error(`Payload too large: ${payloadSize}/${maxSize}`);
-     // Truncate or simplify payload
-   }
-   ```
-
-3. **Track platform in FCM token metadata**: Already storing `platform: 'ios|other'` in Firebase (correct).
-
-**Warning signs:**
-- Notifications arrive on Android but not iOS
-- Action buttons visible only on specific devices
-- Silent failures in FCM delivery reports (Firebase Console)
-- `PayloadTooLarge` errors in server logs
-
-**Phase to address:**
-Phase 52 (Interactive Push Notifications) - Implement platform-specific payloads
+**Project-specific:**
+- Add: `/app/error.tsx` for global errors
+- Current: Device-specific boundaries in cards
+- Layout errors caught at root level only
 
 ---
 
-### Pitfall 4: Auth0 Session State Leakage in Playwright E2E Tests
+## Minor Pitfalls
 
-**What goes wrong:**
-Tests pass locally but fail in CI with "Session expired" or "Unauthorized" errors because Auth0 session state persists between test runs in storageState, causing race conditions and false positives.
+Small issues that cause confusion but easy to fix.
 
-**Why it happens:**
-Playwright's `storageState` caches cookies and localStorage across test runs for performance, but Auth0 uses short-lived refresh tokens that expire. Tests succeed on first run (fresh login) but fail on subsequent runs (stale session). CI environments have unpredictable cold start delays.
+### Pitfall 11: SSR Error Boundaries Don't Work
+**What goes wrong:** Error during server-side rendering shows 500 page instead of error boundary fallback.
 
-**How to avoid:**
-1. **Separate auth fixture with explicit lifecycle**:
-   ```typescript
-   // BAD - Global storageState (shared across tests)
-   test.use({ storageState: 'auth.json' });
+**Why it happens:** componentDidCatch doesn't work with SSR ([Dave Inside](https://daveinside.com/blog/handling-runtime-errors-when-server-side-rendering-with-nextjs/)).
 
-   // GOOD - Per-test auth with cleanup
-   test.beforeEach(async ({ page }) => {
-     // Fresh login for each test
-     await page.goto('/auth/login');
-     await page.fill('input[name="email"]', process.env.TEST_USER_EMAIL);
-     await page.fill('input[name="password"]', process.env.TEST_USER_PASSWORD);
-     await page.click('button[type="submit"]');
-     await page.waitForURL('/');
-   });
+**Prevention:**
+1. **Try-catch in server components**: Wrap data fetch in try-catch
+2. **Error boundaries for client errors**: Use boundaries for client-side crashes
+3. **Optional chaining**: `data?.field` prevents undefined crashes
 
-   test.afterEach(async ({ page }) => {
-     // Explicit logout to clear session
-     await page.goto('/auth/logout');
-   });
-   ```
-
-2. **Mock Auth0 in CI environments**:
-   ```typescript
-   // Use TEST_MODE=true to bypass Auth0 middleware
-   if (process.env.CI === 'true') {
-     // Inject mock session directly
-     await page.addInitScript(() => {
-       localStorage.setItem('@@auth0spajs@@::mock', JSON.stringify({
-         body: {
-           decodedToken: {
-             user: { sub: 'test|123', email: 'test@example.com' },
-           },
-         },
-       }));
-     });
-   }
-   ```
-
-3. **Add session expiry checks**: Test with stale session to verify graceful degradation.
-
-**Warning signs:**
-- Tests pass locally but fail in GitHub Actions
-- Intermittent "Unauthorized" errors in E2E suite
-- Auth0 rate limiting errors in CI logs
-- Session cookie timestamps show reuse across test runs
-
-**Phase to address:**
-Phase 51 (E2E Test Improvements) - Implement auth fixtures with lifecycle management
+**Project-specific:**
+- StoveCard is client component ('use client')
+- Server components: Wrap Firebase calls in try-catch
+- Don't rely on boundaries for SSR data fetch errors
 
 ---
 
-### Pitfall 5: Service Worker Cache Stale State During Offline Mode
+### Pitfall 12: Testing Critical Paths with Brittle Selectors
+**What goes wrong:** Test uses `getByTestId('stove-power-slider')`, refactor changes test ID → test breaks despite functionality working.
 
-**What goes wrong:**
-Users see outdated stove status (e.g., "OFF" when actually "ON") because the service worker serves stale cached responses without indicating data freshness, leading to dangerous user actions (attempting to ignite already-running stove).
+**Why it happens:** Implementation-detail testing instead of user behavior ([React Testing Library](https://www.nucamp.co/blog/testing-in-2026-jest-react-testing-library-and-full-stack-testing-strategies)).
 
-**Why it happens:**
-Serwist's `NetworkFirst` strategy caches `/api/stove/status` responses for 1 minute, but offline mode extends this indefinitely. The current implementation shows cached data without warning users it may be stale. IndexedDB `deviceState` stores timestamp but UI doesn't check it.
+**Prevention:**
+1. **Semantic queries**: `getByRole('slider', { name: 'Power Level' })`
+2. **User-facing text**: `getByText('Accendi Stufa')`
+3. **Accessibility labels**: `getByLabelText('Fan Level')`
+4. **Avoid**: testId, CSS selectors, component internals
 
-**How to avoid:**
-1. **Add staleness indicator to cached responses**:
-   ```typescript
-   // In service worker (app/sw.ts)
-   self.addEventListener('fetch', (event) => {
-     if (event.request.url.includes('/api/stove/status')) {
-       event.respondWith(
-         caches.match(event.request).then((response) => {
-           if (response) {
-             const cachedTime = new Date(response.headers.get('Date'));
-             const age = Date.now() - cachedTime.getTime();
+**Detection:**
+- Tests break on harmless refactors (rename variable, restructure DOM)
+- Test passes but feature actually broken (false positive)
+- CI fails on design system updates without logic changes
 
-             // Clone response and add staleness header
-             const clonedResponse = response.clone();
-             clonedResponse.headers.set('X-Cache-Age', age.toString());
-             clonedResponse.headers.set('X-Cache-Stale', age > 30000 ? 'true' : 'false');
-
-             return clonedResponse;
-           }
-           return fetch(event.request);
-         })
-       );
-     }
-   });
-   ```
-
-2. **UI warns when data is stale**:
-   ```typescript
-   const cacheAge = parseInt(response.headers.get('X-Cache-Age') || '0');
-   const isStale = cacheAge > 30000; // 30 seconds
-
-   if (isStale) {
-     showBanner({
-       variant: 'warning',
-       title: 'Dati non aggiornati',
-       description: `Ultimo aggiornamento: ${formatAge(cacheAge)} fa`,
-     });
-   }
-   ```
-
-3. **Enhanced offline page**: Already implemented in `app/offline/page.tsx` with stale warning (correct pattern).
-
-**Warning signs:**
-- User reports stove status doesn't match physical state
-- Actions succeed in UI but fail server-side
-- Offline banner shows recent timestamp but data is old
-- IndexedDB deviceState timestamps older than 5 minutes
-
-**Phase to address:**
-Phase 53 (PWA Offline Improvements) - Add cache staleness indicators
+**Project-specific:**
+- 3034 tests passing (MEMORY.md)
+- Review critical paths: ignite, shutdown, scheduler
+- Replace testId with `getByRole` where present
 
 ---
 
-### Pitfall 6: Analytics GDPR Violation Through Implicit Consent
+### Pitfall 13: E2E Test Ice Cream Cone Anti-Pattern
+**What goes wrong:** 200 Playwright E2E tests, 10 unit tests. CI takes 15 minutes, flaky tests 30% of runs, hard to debug failures.
 
-**What goes wrong:**
-The app tracks pellet consumption, stove usage patterns, and weather correlation without explicit user consent, violating GDPR Article 6 (lawful basis) and facing €20M fines or 4% global revenue.
+**Why it happens:** "Test through UI" feels comprehensive but creates slow, brittle suite ([React Testing Anti-Patterns](https://itnext.io/unveiling-6-anti-patterns-in-react-test-code-pitfalls-to-avoid-fd7e5a3a7360)).
 
-**Why it happens:**
-Developers assume "legitimate interest" covers analytics for device functionality, but GDPR requires opt-in consent for non-essential tracking. Energy usage patterns are potentially identifiable (can infer occupancy, habits). Firebase Analytics is a data processor under GDPR — app owner is the controller.
+**Prevention:**
+1. **Testing pyramid**: Many unit, some integration, few E2E
+2. **E2E for top 3-5 flows only**: Ignite via scheduler, manual shutdown, maintenance alert
+3. **Delete unreliable E2E**: If test "sometimes red" and not critical, remove it
+4. **Push checks down**: Test stove state logic in unit tests, not E2E
 
-**How to avoid:**
-1. **Implement consent banner before ANY analytics**:
-   ```typescript
-   // BAD - Track without consent (current pattern would do this)
-   await logAnalytics('stove_ignited', { power, source });
+**Detection:**
+- CI runtime grows linearly with features
+- Flaky test reruns common
+- E2E failures hard to reproduce locally
+- More E2E than unit tests in suite
 
-   // GOOD - Check consent first
-   const consent = await getUserConsent();
-   if (consent.analytics) {
-     await logAnalytics('stove_ignited', { power, source });
-   }
-   ```
-
-2. **Consent categories with granular control**:
-   ```typescript
-   interface ConsentPreferences {
-     essential: boolean;      // Always true (functional cookies)
-     analytics: boolean;      // Opt-in required
-     personalization: boolean; // Opt-in required
-   }
-
-   // Store in Firebase: users/{userId}/consent
-   ```
-
-3. **Anonymous aggregation only**:
-   ```typescript
-   // BAD - User-identifiable
-   await logEvent('pellet_consumption', { userId, amount: 15 });
-
-   // GOOD - Aggregated, non-identifiable
-   await logEvent('pellet_consumption', {
-     amount_bucket: '10-20kg',  // Binned
-     timestamp: hourBucket(now), // Hourly aggregation
-     // No userId
-   });
-   ```
-
-4. **Right to deletion**: Implement `/api/user/delete-analytics` endpoint.
-
-**Warning signs:**
-- No consent banner on first app load
-- Analytics events fire before user interaction
-- User IDs in analytics payloads
-- Firebase Analytics enabled in manifest without consent check
-
-**Phase to address:**
-Phase 54 (Analytics Dashboard) - Implement consent management BEFORE any tracking
+**Project-specific:**
+- Playwright exists (MEMORY.md Phase 51)
+- Limit E2E to: Auth flow, scheduler auto-ignite, manual shutdown
+- Unit test: `canIgnite()`, `trackUsageHours()`, PID logic
 
 ---
 
-## Technical Debt Patterns
+### Pitfall 14: Production Error Messages Leak Secrets
+**What goes wrong:** Error boundary shows Firebase path `dev/stove/status` in production, reveals environment structure.
 
-| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
-|----------|-------------------|----------------|-----------------|
-| Skipping consent banner for "internal use only" | Faster MVP launch | GDPR violations, €20M fines, reputational damage | **Never** (even single-user apps can be audited) |
-| Using in-memory rate limiter | Simpler code, no DB dependency | DoS vulnerability, broken in serverless | **Never** in production (only local dev) |
-| Uniform FCM payload for all platforms | Fewer code paths | iOS notifications fail silently | **Never** (action buttons are core feature) |
-| Reusing Auth0 session across E2E tests | Faster test suite (no repeated logins) | Flaky CI, false positives, hard-to-debug failures | Local dev only (CI must use fresh sessions) |
-| Serving stale cache without staleness indicator | Better perceived performance | Safety risk (users act on outdated state) | **Never** for device control apps |
-| Inline cron operations (no orchestrator) | Simpler mental model | Timeout errors, partial execution | Small apps (<3 operations), non-critical tasks |
-| localStorage for offline device state | Standard API, simple usage | 5-10MB limit, string-only, sync blocking | **Never** (use IndexedDB for structured data) |
+**Why it happens:** Next.js strips error.message in production but not custom error details ([Better Stack](https://betterstack.com/community/guides/scaling-nodejs/error-handling-nextjs/)).
 
----
+**Prevention:**
+1. **Use error.digest**: Next.js provides safe digest in production
+2. **Generic user message**: "Unable to connect. Please try again."
+3. **Log full error server-side**: Send details to monitoring, not client
+4. **Sanitize stack traces**: Remove file paths, credentials
 
-## Integration Gotchas
+**Detection:**
+- Production error shows internal paths
+- API keys visible in browser console
+- User reports seeing "technical" error messages
 
-| Integration | Common Mistake | Correct Approach |
-|-------------|----------------|------------------|
-| **Vercel Cron** | Using `vercel.json` `crons` field for 5-minute intervals | Use external service (cron-job.org, EasyCron) — Vercel cron minimum is 1 hour for Hobby plan |
-| **Firebase RTDB** | Assuming transactions prevent all race conditions | Transactions work per-path only; use separate paths for concurrent updates (e.g., `rateLimit/{userId}/{endpoint}` not `rateLimit/{userId}`) |
-| **FCM (iOS)** | Sending notifications to PWA without app installed | Check `fcmTokens/{token}/isPWA` flag; iOS requires PWA installed (Safari Add to Home) |
-| **Auth0 + Playwright** | Using global `storageState` for all tests | Per-test fixtures with `beforeEach` login and `afterEach` logout |
-| **Serwist** | Using Turbopack (Next.js 16 default) | Serwist requires Webpack — update `package.json`: `"build": "next build --webpack"` |
-| **IndexedDB** | Assuming synchronous reads like localStorage | Always use async/await: `const data = await get(STORES.DEVICE_STATE, 'stove')` |
-| **Open-Meteo API** | Caching weather indefinitely | Refresh every 30 minutes (already implemented in `refreshWeatherIfNeeded()` — good pattern) |
-| **Firebase Analytics** | Enabling by default in `manifest.json` | Disable until consent obtained: `ga_config.anonymize_ip: true`, check consent before `logEvent()` |
+**Project-specific:**
+- Firebase paths in errors (getEnvironmentPath usage)
+- Sanitize: Replace path with generic "database error"
+- Log full error to Firebase for debugging
 
 ---
 
-## Performance Traps
+### Pitfall 15: Retry-After Header Ignored
+**What goes wrong:** API returns 429 with `Retry-After: 60`, client retries immediately → banned for 10 minutes.
 
-| Trap | Symptoms | Prevention | When It Breaks |
-|------|----------|------------|----------------|
-| **Sequential cron operations** | Timeout errors, partial execution | Parallelize independent tasks with `Promise.all()` | >3 operations OR total time >8s |
-| **N+1 FCM token queries** | Slow notification delivery (2-3s per user) | Batch Firebase reads: `db.ref('users').once('value')` instead of per-user queries | >10 active users |
-| **Uncompressed notification payloads** | `PayloadTooLarge` errors | Compress JSON, remove whitespace, truncate long strings | Payload >2KB (Android), >4KB (iOS) |
-| **Service worker precaching all pages** | Laggy SW installation (5-10s), poor UX | Cache in groups of 10: `precacheController.addToCacheList(chunk)` in loop | >50 static pages |
-| **Polling stove API every 1 second** | Stove API rate limits, battery drain | 5-second polling (current implementation is correct) | <5s interval |
-| **Storing full weather forecast in RTDB** | Firebase bandwidth costs, slow reads | Store only next 24h: `weatherCache/{lat}_{lon}/forecast` with TTL | Forecast >7 days |
-| **Blocking cron on notification delivery** | Cron timeout if FCM is slow | Fire-and-forget: `sendNotification().catch(logError)` (already partially implemented) | >5 notifications per cron run |
+**Why it happens:** Exponential backoff ignores server-provided retry timing.
 
----
+**Prevention:**
+1. **Respect Retry-After**: Parse header, wait specified duration
+2. **Max of server vs. exponential**: Use longer of the two
+3. **Circuit breaker on 429**: Stop retries, show "Rate limited" message
 
-## Security Mistakes
+**Detection:**
+- Repeated 429 errors in logs
+- Ban duration increases (10 min → 1 hour)
+- User sees "loading" during rate limit period
 
-| Mistake | Risk | Prevention |
-|---------|------|------------|
-| **Exposing CRON_SECRET in client code** | Attackers can trigger cron manually, DoS attack | Only use in server-side routes, verify header: `Authorization: Bearer ${CRON_SECRET}` |
-| **No rate limiting on `/api/notifications/send`** | Spam notifications to all users | Implement persistent rate limiter (Phase 49) BEFORE Phase 52 (notifications) |
-| **Storing FCM tokens without encryption** | Token theft → unauthorized notifications | Tokens are not sensitive (per FCM docs), but apply Firebase Security Rules: deny client writes |
-| **Analytics tracking before consent** | GDPR violation, €20M fine | Implement consent banner (Phase 54), gate ALL analytics with consent check |
-| **Stale Auth0 sessions in E2E tests** | Session fixation attack surface | Always logout in `afterEach`, never commit `storageState.json` |
-| **Admin endpoints without auth check** | Unauthorized access to sync, cleanup, etc. | Use `withAdminSecret()` middleware (already implemented for `/api/admin/sync-changelog`) |
-| **Unvalidated cron webhook URLs** | SSRF attack, internal network scanning | Whitelist allowed domains: `ALLOWED_CRON_PROVIDERS = ['cron-job.org', 'easycron.com']` |
+**Project-specific:**
+- Thermorossi Cloud might rate limit
+- Check response headers before retry
+- Circuit breaker in `/api/stove/*` routes
 
 ---
 
-## UX Pitfalls
+## Phase-Specific Warnings
 
-| Pitfall | User Impact | Better Approach |
-|---------|-------------|-----------------|
-| **No visual feedback during offline command queuing** | User retries → duplicate commands | Show toast: "Comando in coda (offline)" with pending count |
-| **Stale cache served without warning** | User acts on wrong state → safety risk | Banner: "⚠️ Dati non aggiornati (X minuti fa)" |
-| **Silent notification permission denial** | User expects alerts, never receives them | Persistent banner: "Attiva notifiche per ricevere avvisi stufa" |
-| **No progress indicator during cron operations** | User doesn't know if action succeeded | Real-time status: "🔄 Accensione in corso..." via WebSocket or polling |
-| **Consent banner blocks entire UI** | User can't access emergency controls | Allow "Essential only" mode → functional controls work, analytics disabled |
-| **E2E test failures not visible to developers** | Broken features ship to production | Require CI passing for PRs, Slack notifications on failure |
-| **Analytics dashboard shows empty state** | User thinks feature is broken | "Raccogli dati per 24h prima di visualizzare grafici" placeholder |
+Flags for potential pitfalls during implementation phases.
 
----
-
-## "Looks Done But Isn't" Checklist
-
-- [ ] **Persistent Rate Limiter:** Often missing cleanup of old rate limit windows — verify garbage collection runs (e.g., delete entries older than 1 hour)
-- [ ] **Interactive Notifications:** Often missing platform detection — verify `fcmTokens/{token}/platform` is set and payload changes per platform
-- [ ] **Offline Mode:** Often missing staleness indicator — verify UI shows "⚠️ Dati non aggiornati" when cache age >30 seconds
-- [ ] **E2E Tests:** Often missing session cleanup — verify `afterEach` logs out and no `storageState.json` committed
-- [ ] **Analytics Consent:** Often missing consent persistence — verify Firebase stores `users/{userId}/consent` and checks before every `logEvent()`
-- [ ] **Cron Orchestration:** Often missing error handling for parallel tasks — verify `Promise.all()` has `.catch()` on each operation
-- [ ] **FCM Payload Size:** Often missing size validation — verify logs show payload size before sending (should be <2KB Android, <4KB iOS)
-- [ ] **Weather Cache TTL:** Often missing expiry check — verify `weatherCache/{location}/timestamp` is checked and refetch if stale
-- [ ] **Dead Man's Switch:** Often missing alert delivery confirmation — verify notification actually sends when cron goes stale (test by pausing cron for 15 minutes)
-- [ ] **PID State Persistence:** Often missing state restoration — verify `pidAutomation/state` is read on every cron run and integral/derivative terms persist
+| Phase Topic | Likely Pitfall | Mitigation | Priority |
+|-------------|---------------|------------|----------|
+| **Retry Logic for API Routes** | Layered retries (Pitfall 2), non-idempotent ignite/shutdown (Pitfall 1) | Single retry layer at API boundary, idempotency keys, read-verify-write | CRITICAL |
+| **Adaptive Polling** | Breaking real-time stove status (Pitfall 3), race conditions in useEffect (Pitfall 9) | Fixed 5s for critical, adaptive only for weather/tokens, AbortController cleanup | CRITICAL |
+| **Error Boundaries** | Swallowing safety alerts (Pitfall 4), layout errors (Pitfall 10), SSR errors (Pitfall 11) | Custom error classes, validate before throw, try-catch in server components | HIGH |
+| **Component Refactoring** | State duplication (Pitfall 5), polling multiplication | Hoist state to parent, pass props, single source of truth | HIGH |
+| **Testing Critical Paths** | Brittle selectors (Pitfall 12), E2E ice cream cone (Pitfall 13) | Semantic queries, testing pyramid, limit E2E to top 3 flows | MEDIUM |
+| **FCM Token Cleanup** | Deleting active devices (Pitfall 6) | Track delivery receipts not app opens, 270-day window, audit logs | MEDIUM |
+| **Scheduler Retry** | Duplicate cron actions (Pitfall 7) | Execution ID deduplication, disable GitHub Actions retry | MEDIUM |
+| **Thermostat Coordination** | Debounce race with stove state (Pitfall 8) | Throttle instead of debounce, re-validate before action | LOW |
 
 ---
 
-## Recovery Strategies
+## Integration Pitfalls
 
-| Pitfall | Recovery Cost | Recovery Steps |
-|---------|---------------|----------------|
-| **In-memory rate limiter bypassed** | MEDIUM | 1. Deploy persistent rate limiter immediately 2. Monitor Firebase RTDB for abuse patterns 3. Temporarily increase rate limits if false positives |
-| **Cron timeout causing partial execution** | LOW | 1. Check Vercel logs for `FUNCTION_INVOCATION_TIMEOUT` 2. Increase `maxDuration` to 60s 3. Refactor to orchestrator pattern (Phase 50) |
-| **iOS notifications not working** | LOW | 1. Check Firebase Console delivery reports 2. Verify iOS PWA installation 3. Re-register FCM token with correct platform flag |
-| **E2E tests flaky in CI** | LOW | 1. Clear `storageState.json` from repo 2. Implement per-test login fixture 3. Add Auth0 mock for CI environment |
-| **Stale cache causing safety issue** | HIGH | 1. Immediately disable offline mode in service worker 2. Add prominent "⚠️ DATI NON RECENTI" warning 3. Implement cache staleness headers |
-| **GDPR violation (no consent)** | CRITICAL | 1. Disable ALL analytics immediately 2. Deploy consent banner (blocking) 3. Purge historical analytics data 4. Notify users of data deletion |
-| **Weather cache stale** | LOW | 1. Force refresh: `DELETE /weatherCache` in Firebase Console 2. Verify `refreshWeatherIfNeeded()` runs in cron 3. Check Open-Meteo API rate limits |
-| **FCM payload too large** | MEDIUM | 1. Truncate notification body to 100 chars 2. Remove unnecessary data fields 3. Implement payload size logging before send |
+Cross-feature interactions that cause unexpected failures.
+
+### Integration 1: Retry + Polling Interaction
+**Scenario:** API route retries stove status fetch (network timeout), while StoveCard polls every 5s. Results in 2 parallel status requests, one returns stale cache.
+
+**Prevention:**
+- Disable retry on GET requests (polling provides retry)
+- Enable retry only on POST (ignite/shutdown)
+- Cache-Control: no-cache on status endpoints
 
 ---
 
-## Pitfall-to-Phase Mapping
+### Integration 2: Error Boundary + Maintenance Alert
+**Scenario:** Error boundary catches needsCleaning validation, maintenance alert never renders. User sees generic error.
 
-| Pitfall | Prevention Phase | Verification |
-|---------|------------------|--------------|
-| In-memory rate limiter | Phase 49 (Persistent Rate Limiting) | Load test: 100 requests → only 10 succeed, state persists after 15-min idle |
-| Cron timeout | Phase 50 (Cron Configuration) | Monitor: all operations complete <10s, no `FUNCTION_INVOCATION_TIMEOUT` errors |
-| Auth0 session leakage | Phase 51 (E2E Test Improvements) | CI passes: 10 consecutive test runs with fresh sessions each time |
-| Platform-specific FCM payloads | Phase 52 (Interactive Push Notifications) | Manual test: action buttons work on iOS Safari PWA AND Android Chrome |
-| Stale cache without warning | Phase 53 (PWA Offline Improvements) | Offline test: UI shows "⚠️ Dati non aggiornati (X min fa)" after 30 seconds |
-| Analytics without consent | Phase 54 (Analytics Dashboard) | Audit: Firebase Analytics disabled until banner accepted, no events before consent |
-| Service worker Turbopack conflict | Phase 53 (PWA Offline Improvements) | Build succeeds: `public/sw.js` generated, Webpack used despite Next.js 16 default |
-| PID state loss on cold start | Phase 49 (Persistent Rate Limiting) | Cron test: PID integral persists across 2+ hour gap between cron runs |
+**Prevention:**
+- Render maintenance alert BEFORE error boundary scope
+- Validation returns UI component, doesn't throw
+- Error boundary wraps only status fetch, not controls
+
+---
+
+### Integration 3: Component Splitting + Context Re-renders
+**Scenario:** Split StoveCard into 5 components, all consume `useStoveContext()`. Status update triggers 5 re-renders, each triggers useEffect → 5 polling loops.
+
+**Prevention:**
+- Memoize context value with useMemo
+- Split contexts by update frequency
+- Use React.memo on pure components
+
+---
+
+### Integration 4: FCM Cleanup + Scheduler Notifications
+**Scenario:** Cleanup deletes token Sunday 2am. Scheduler attempts ignite Monday 6am, notification fails. User doesn't know automation failed.
+
+**Prevention:**
+- Track last_notification_delivered, not last_app_opened
+- Test cleanup: Send notification after cleanup job
+- Fallback: SMS if FCM delivery fails (future feature)
+
+---
+
+### Integration 5: Cron Retry + Idempotency
+**Scenario:** Cron fails during stove ignite, GitHub Actions retries. Each retry calls `/api/scheduler/check`, ignite succeeds on retry 2, but retry 3 also executes → second ignite fails with "already_on".
+
+**Prevention:**
+- Track cron executionId in Firebase
+- Deduplication window: 2 minutes
+- Log all cron calls with result
+
+---
+
+## Anti-Patterns Specific to IoT Control
+
+Patterns to explicitly avoid in device control systems.
+
+### Anti-Pattern 1: "Fire and Forget" for Safety-Critical Actions
+**What:** Send ignite command, don't verify it succeeded.
+
+**Why bad:** Network failure looks like success. Stove doesn't ignite, scheduler thinks it did, doesn't retry.
+
+**Instead:** Poll status after command, verify expected state within 30s, alert if mismatch.
+
+---
+
+### Anti-Pattern 2: Client-Side State as Source of Truth
+**What:** Track stove state in React state, update Firebase after.
+
+**Why bad:** Page refresh loses state. Multiple devices show different state. Firebase and UI desync.
+
+**Instead:** Firebase is source of truth. React state is cache. Poll to sync.
+
+---
+
+### Anti-Pattern 3: Ignoring Partial Failures
+**What:** Batch operation: ignite stove + adjust thermostat. Ignite succeeds, thermostat fails. UI shows success.
+
+**Why bad:** User thinks both succeeded. Thermostat never adjusted. Coordination broken.
+
+**Instead:** Explicit transaction or rollback. If step 2 fails, revert step 1. Show partial failure in UI.
+
+---
+
+### Anti-Pattern 4: Polling Without Exponential Backoff on Error
+**What:** API unavailable (Firebase down). Poll continues every 5s, hammers failing service.
+
+**Why bad:** Amplifies outage load. Drains battery. User sees constant loading state.
+
+**Instead:** Exponential backoff on consecutive errors: 5s → 10s → 20s → 40s. Reset on success.
+
+---
+
+### Anti-Pattern 5: Assuming API Idempotency
+**What:** Retry failed API call without checking if it partially succeeded.
+
+**Why bad:** Thermorossi Cloud might have processed ignite but response timed out. Retry → duplicate ignite attempt → error.
+
+**Instead:** Read state before retry. If state matches intent, don't retry.
+
+---
+
+## Success Criteria for Phases
+
+Checklist to validate pitfall prevention during implementation.
+
+### Retry Logic Phase
+- [ ] Idempotency keys on all POST /api/stove/* routes
+- [ ] Read-verify-write before retry (check stove state)
+- [ ] Exponential backoff with jitter implemented
+- [ ] Retry budget: max 3 attempts per 10-minute window
+- [ ] Circuit breaker opens after 5 consecutive failures
+- [ ] Layering check: retry only at API boundary, not component
+- [ ] Test: Simulate network timeout during ignite, verify no duplicate
+
+### Adaptive Polling Phase
+- [ ] Stove status remains fixed 5s polling
+- [ ] Weather uses 30-minute adaptive (already in cron)
+- [ ] Token cleanup 7-day adaptive (already in cron)
+- [ ] Staleness indicator if poll >10s old
+- [ ] AbortController cleanup in all useEffect polling
+- [ ] Test: Network disconnect for 30s, verify staleness shown
+
+### Error Boundary Phase
+- [ ] Custom ValidationError class for expected errors
+- [ ] Error boundaries check error.constructor before catching
+- [ ] Maintenance alerts render before error boundary scope
+- [ ] Global /app/error.tsx for layout errors
+- [ ] Server components use try-catch for data fetch
+- [ ] Production errors use error.digest, not full message
+- [ ] Test: Trigger needsCleaning, verify alert shown not error boundary
+
+### Component Refactoring Phase
+- [ ] Single useStoveStatus() hook in parent
+- [ ] Child components receive status via props
+- [ ] Context value memoized with useMemo
+- [ ] Network tab shows single poll per 5s interval
+- [ ] React DevTools shows no cascading re-renders
+- [ ] Test: Split component, verify polling count unchanged
+
+### Testing Phase
+- [ ] Critical paths use getByRole, not getByTestId
+- [ ] E2E limited to: auth, scheduler ignite, manual shutdown
+- [ ] Unit tests cover: canIgnite, trackUsageHours, PID logic
+- [ ] Flaky tests deleted or fixed (not ignored)
+- [ ] Testing pyramid ratio: 70% unit, 20% integration, 10% E2E
+- [ ] Test: Refactor component structure, verify tests still pass
+
+### FCM Cleanup Phase
+- [ ] Cleanup uses lastNotificationDelivered not lastAppOpened
+- [ ] 270-day inactivity window (not 30)
+- [ ] Cleanup logs written to firebase/tokenCleanupLog
+- [ ] Test notification delivery after cleanup job
+- [ ] Manual token restoration procedure documented
+- [ ] Test: Cleanup, send notification, verify delivery
 
 ---
 
 ## Sources
 
-**Vercel Serverless & Cron:**
-- [Cron Jobs in Next.js: Serverless vs Serverful | Medium](https://yagyaraj234.medium.com/running-cron-jobs-in-nextjs-guide-for-serverful-and-stateless-server-542dd0db0c4c)
-- [How to use cron jobs with Vercel? · vercel/vercel · Discussion #5344](https://github.com/vercel/vercel/discussions/5344)
-- [What can I do about Vercel Functions timing out? | Vercel Knowledge Base](https://vercel.com/kb/guide/what-can-i-do-about-vercel-serverless-functions-timing-out)
-- [Testing Next.js Cron Jobs Locally | Medium](https://medium.com/@quentinmousset/testing-next-js-cron-jobs-locally-my-journey-from-frustration-to-solution-6ffb2e774d7a)
+### Retry & Resilience
+- [OneUpTime - Retry Logic with Exponential Backoff in React](https://oneuptime.com/blog/post/2026-01-15-retry-logic-exponential-backoff-react/view)
+- [ThinhDA - Retries Without Thundering Herds](https://thinhdanggroup.github.io/retry-without-thundering-herds/)
+- [Microsoft Azure - Retry Storm Antipattern](https://learn.microsoft.com/en-us/azure/architecture/antipatterns/retry-storm/)
+- [Encore - Thundering Herd Problem](https://encore.dev/blog/thundering-herd-problem)
 
-**Firebase Rate Limiting & Persistent Storage:**
-- [Realtime Database Limits | Firebase](https://firebase.google.com/docs/database/usage/limits)
-- [Rate limiting - Firestore and Firebase cloud functions](https://ramblings.mcpher.com/going-serverless-with-firebase/rate-limiting-firestore-and-firebase-cloud-functions/)
-- [firebase-functions-rate-limiter GitHub](https://github.com/Jblew/firebase-functions-rate-limiter)
+### Error Handling
+- [Next.js - Error Handling Docs](https://nextjs.org/docs/app/getting-started/error-handling)
+- [Better Stack - Error Handling in Next.js](https://betterstack.com/community/guides/scaling-nodejs/error-handling-nextjs/)
+- [Dave Inside - SSR Error Handling](https://daveinside.com/blog/handling-runtime-errors-when-server-side-rendering-with-nextjs/)
 
-**FCM Interactive Notifications:**
-- [Implementing Action Buttons in Push Notifications using Firebase and Notifee | Medium](https://medium.com/@hassem_mahboob/implementing-action-buttons-in-push-notifications-using-firebase-and-notifee-f5743bdb28bc)
-- [Firebase Cloud Messaging troubleshooting & FAQ](https://firebase.google.com/docs/cloud-messaging/troubleshooting)
-- [Customize a message across platforms | FCM](https://firebase.google.com/docs/cloud-messaging/customize-messages/cross-platform)
+### Adaptive Polling & IoT
+- [IEEE - RT-IFTTT Real-Time IoT Framework](https://ieeexplore.ieee.org/document/8277299/)
+- [MDPI - Polling Mechanisms for Industrial IoT](https://www.mdpi.com/1999-5903/16/4/130)
+- [MDPI - NetAP-ML Machine Learning Adaptive Polling](https://www.mdpi.com/1424-8220/23/3/1484)
 
-**PWA Offline Mode & Serwist:**
-- [Build a Next.js 16 PWA with true offline support - LogRocket](https://blog.logrocket.com/nextjs-16-pwa-offline-support/)
-- [Offline mode not working · serwist/serwist · Discussion #205](https://github.com/serwist/serwist/discussions/205)
-- [Building Native-Like Offline Experience in Next.js PWAs | Fishtank](https://www.getfishtank.com/insights/building-native-like-offline-experience-in-nextjs-pwas)
+### React State & Performance
+- [OneUpTime - React Context Performance Issues](https://oneuptime.com/blog/post/2026-01-24-react-context-performance-issues/view)
+- [Kent C. Dodds - Application State Management with React](https://kentcdodds.com/blog/application-state-management-with-react)
+- [React.dev - Choosing State Structure](https://react.dev/learn/choosing-the-state-structure)
 
-**Playwright & Auth0 E2E Testing:**
-- [End-to-End Testing Auth Flows with Playwright and Next.js](https://testdouble.com/insights/how-to-test-auth-flows-with-playwright-and-next-js)
-- [Authentication | Playwright](https://playwright.dev/docs/auth)
-- [Mock auth0 login and MFA flow for E2E testing - Auth0 Community](https://community.auth0.com/t/mock-auth0-login-and-mfa-flow-for-e2e-testing-using-playwright/131872)
-- [Playwright e2e test fails in CI with real Auth0 login flow · Issue #37158](https://github.com/microsoft/playwright/issues/37158)
+### Testing
+- [Nucamp - Testing in 2026: Jest & React Testing Library](https://www.nucamp.co/blog/testing-in-2026-jest-react-testing-library-and-full-stack-testing-strategies)
+- [ITNEXT - 6 Anti-Patterns in React Test Code](https://itnext.io/unveiling-6-anti-patterns-in-react-test-code-pitfalls-to-avoid-fd7e5a3a7360)
+- [Trio - Best Practices for React UI Testing](https://trio.dev/best-practices-for-react-ui-testing/)
 
-**Analytics & GDPR:**
-- [GDPR Compliance Checklist for Next.js Apps | Medium](https://medium.com/@kidane10g/gdpr-compliance-checklist-for-next-js-apps-801c9ea75780)
-- [Privacy and Security in Firebase](https://firebase.google.com/support/privacy)
-- [@next/third-parties Google Analytics compliance · Discussion #67440](https://github.com/vercel/next.js/discussions/67440)
-- [Best Privacy-Compliant Analytics Tools for 2026](https://www.mitzu.io/post/best-privacy-compliant-analytics-tools-for-2026)
+### Firebase & FCM
+- [Firebase - Best Practices for FCM Registration Token Management](https://firebase.google.com/docs/cloud-messaging/manage-tokens)
+- [Firebase Blog - Managing Cloud Messaging Tokens](https://firebase.blog/posts/2023/04/managing-cloud-messaging-tokens/)
+- [Netguru - Why Mobile Push Notification Architecture Fails](https://www.netguru.com/blog/why-mobile-push-notification-architecture-fails)
+- [Medium - Lifecycle of Push Notification Device Tokens](https://medium.com/@chunilalkukreja/lifecycle-of-fcm-device-tokens-61681bb6fbcf)
 
-**Smart Home IoT & Energy Analytics:**
-- [Smart energy management: real-time prediction and optimization for IoT-enabled smart homes](https://www.tandfonline.com/doi/full/10.1080/23311916.2024.2390674)
-- [Predictive Analytics of Energy Usage by IoT-Based Smart Home Appliances](https://dl.acm.org/doi/10.1145/3426970)
+### React useEffect & Race Conditions
+- [Max Rozen - Fixing Race Conditions in React with useEffect](https://maxrozen.com/race-conditions-fetching-data-react-with-useeffect)
+- [React.dev - useEffect Reference](https://react.dev/reference/react/useEffect)
+- [Wisdom Geek - Avoiding Race Conditions in useEffect](https://www.wisdomgeek.com/development/web-development/react/avoiding-race-conditions-memory-leaks-react-useeffect/)
+
+### IoT Coordination
+- [Zigbee2MQTT - Debounce and Throttle](https://github.com/koenkk/zigbee2mqtt/issues/29724)
+- [Tomek Dev - Throttle vs Debounce Real Examples](https://tomekdev.com/posts/throttle-vs-debounce-on-real-examples)
+- [IoT Business News - Enterprise IoT Autonomous Operations](https://iotbusinessnews.com/2026/02/10/from-connected-devices-to-autonomous-operations-what-enterprise-iot-is-really-becoming/)
+
+### IoT Security
+- [ConnectWise - Secure IoT Devices Best Practices](https://www.connectwise.com/blog/how-to-secure-iot-devices)
+- [Device Authority - Industrial IoT Security Threats 2025](https://deviceauthority.com/industrial-iot-security-threats-top-risks-and-mitigation-strategies-2025/)
+- [Claroty - Cybersecurity Guide to Industrial Control Systems](https://claroty.com/blog/cybersecurity-dictionary-industrial-control-systems-ics-security)
 
 ---
 
-*Pitfalls research for: v6.0 Operations, PWA & Analytics*
-*Researched: 2026-02-10*
+**Last Updated:** 2026-02-11
+**Confidence:** HIGH (verified with official docs, research papers, production post-mortems)

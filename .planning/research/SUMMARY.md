@@ -1,323 +1,309 @@
 # Project Research Summary
 
-**Project:** Pannello Stufa v6.0
-**Domain:** Smart Home IoT Dashboard - Operations, PWA & Analytics
-**Researched:** 2026-02-10
+**Project:** Pannello Stufa v7.0 — Performance & Resilience Hardening
+**Domain:** Smart Home IoT Control PWA
+**Researched:** 2026-02-11
 **Confidence:** HIGH
 
 ## Executive Summary
 
-v6.0 enhances the existing Next.js 15.5 PWA with operational automation, PWA improvements, and usage analytics. This is an **evolutionary enhancement** — all features integrate with existing patterns (Firebase RTDB/Firestore split, HMAC webhooks, Serwist service worker, Recharts visualization). No major architectural changes or new frameworks required.
+Pannello Stufa is a production Next.js 15.5 PWA controlling a Thermorossi stove, Netatmo thermostat, and Philips Hue lights. After six successful milestones (v6.0 just completed), the v7.0 focus is hardening: retry strategies for transient failures, adaptive polling for resource efficiency, error boundaries for graceful degradation, component splitting for 1200-1500 LOC monolithic files, and automated FCM token cleanup.
 
-The recommended approach builds on the validated v5.1 foundation (104K lines TypeScript strict mode, 3034 tests, zero tsc errors). Most features leverage existing stack: Firebase for persistent rate limiting, Serwist for offline mode, FCM for interactive notifications, Recharts for analytics visualization. Only **one new dependency** required: `idb` (IndexedDB wrapper for service worker, 1.19kB). Optional second dependency: `@omgovich/firebase-functions-rate-limiter` (evaluate during implementation — custom Firestore implementation likely sufficient).
+**The recommended approach is incremental enhancement:** The existing architecture (PWA hooks, Firebase RTDB, Auth0) provides solid foundation. Critical changes include (1) adding @lifeomic/attempt for exponential backoff retry on device commands, (2) using native Page Visibility API for adaptive polling (no library needed), (3) implementing error boundaries at feature level (StoveCard, LightsCard), (4) splitting large components using orchestrator pattern with error boundary per section, and (5) extending the existing 7-day token cleanup with retry logic and delivery-based staleness tracking. All changes are additive—no breaking refactors required.
 
-**Key risks and mitigations:** (1) **Serverless state loss** — solved with Firebase RTDB transactions for rate limits and PID automation state (already validated pattern). (2) **Cron timeout** — refactor to orchestrator + fire-and-forget workers (existing pattern in scheduler/check route). (3) **FCM platform differences** — iOS requires platform-specific payload structure (detected via stored token metadata). (4) **GDPR analytics violation** — implement consent banner before ANY tracking (critical blocker for Phase 54). (5) **Stale cache safety** — add staleness indicators to offline UI (essential for device control app).
+**Key risks center on safety-critical device control:** Non-idempotent retries could trigger duplicate ignite commands (physical safety issue), layered retry amplification (component + API + external service) causes request storms, adaptive polling that slows critical stove status creates coordination failures with thermostat/scheduler, and error boundaries that swallow maintenance alerts bypass safety validations. Mitigation requires idempotency keys on POST routes, single retry layer at API boundary only, fixed 5s polling for stove status (never adaptive), and custom ValidationError class to distinguish expected errors from crashes.
 
 ## Key Findings
 
 ### Recommended Stack
 
-v6.0 requires minimal stack additions. **Core finding: NO major changes needed** — existing Serwist, Firebase, Recharts cover 90% of requirements.
+**Single new dependency:** @lifeomic/attempt v3.1.1 provides production-grade exponential backoff with jitter, timeout, and error handlers. Alternative (exponential-backoff npm) lacks timeout/abort support. Manual retry implementation is error-prone and lacks jitter for thundering herd prevention.
 
 **Core technologies:**
-- **Firebase RTDB** (existing): Persistent rate limiting via transactions, cron health monitoring, PID automation state — replaces in-memory Map (critical for serverless)
-- **Firestore** (existing): Historical analytics aggregation (monthly rollups), complex queries for dashboard — RTDB for real-time events, Firestore for long-term storage
-- **Serwist v9** (existing): Enhanced offline mode with staleness indicators, install prompt handling, Background Sync for command queuing — no alternative needed
-- **Recharts** (existing): Analytics visualization (usage timeline, pellet consumption, weather correlation) — pattern already proven in notification dashboard
-- **idb v8.0.3** (NEW): IndexedDB wrapper for service worker (replaces raw IndexedDB boilerplate) — reduces code by 60%, better TypeScript support
+- **Next.js 16.1.0 App Router:** error.tsx file convention provides granular error boundaries at route segment level—use at `/app/error.tsx` (global), `/app/(authenticated)/error.tsx` (auth-only), and `/app/(authenticated)/dashboard/error.tsx` (per-feature)
+- **React 19.2.0:** Error boundaries (class components), React.lazy + Suspense for code splitting, native support stable in React 18+
+- **TypeScript 5.x (strict mode enabled):** Type safety for retry logic, polling state machines, error boundary props
+- **Page Visibility API (browser built-in):** No library needed—`document.visibilityState` check before polling reduces Firebase RTDB calls by 50% when tabs hidden
+- **Jest 30.2.0 built-in coverage:** Use `jest --coverage --collectCoverageFrom='app/api/**/*.ts'` for critical API route testing—80% branch coverage threshold recommended
 
-**Critical version notes:**
-- Next.js 16 defaults to Turbopack — must use `--webpack` flag for Serwist build
-- @omgovich/firebase-functions-rate-limiter (fork) is only viable option for library-based rate limiting (original abandoned 4 years ago)
-- Playwright auth state pattern requires v1.18+ (current v1.52.0 compatible)
-
-**What NOT to add:**
-- No separate cron service (node-cron, bull) — external HTTP scheduler (GitHub Actions, Upstash) + existing webhook pattern
-- No Redis for rate limiting — Firebase RTDB transactions provide atomicity
-- No Chart.js/Victory — Recharts already working
-- No Playwright migration — Cypress covers 3034 tests (migration ROI too low)
+**What NOT to use:**
+- ❌ react-error-boundary package (Next.js App Router provides native error.tsx)
+- ❌ Polling libraries like react-query/swr (over-engineered for simple visibility-aware polling)
+- ❌ Global-only error boundaries (errors bubble up—need granular boundaries)
+- ❌ Custom error boundary class components at component-instance level (too granular)
 
 ### Expected Features
 
 **Must have (table stakes):**
-- **Cron automation** — Smart home platforms auto-poll devices every 5-30min (manual-only feels broken). Existing `/api/scheduler/check` needs external HTTP trigger.
-- **Persistent rate limiting** — Vercel serverless = stateless, in-memory Map resets on cold starts (DoS vulnerability). Firebase RTDB transactions required.
-- **Interactive push notifications** — Modern smart home apps (Home Assistant, SmartThings) allow direct action from notifications. "View only" notifications feel dated in 2026.
-- **Offline mode indicators** — PWAs must show "You're offline" with last known state. Silent stale data is a safety risk for device control apps.
-- **Analytics dashboard** — Energy monitoring core to smart home value prop (Google Nest, Ecobee all show usage dashboards). Users want "how much am I using?"
+- **Error boundaries** at feature level (StoveCard, LightsCard, SchedulerCard)—one component error shouldn't crash entire app
+- **Exponential backoff retry** for device commands (3-5 retries, 200ms → 5s with jitter)—production apps without retry feel broken
+- **Visibility API polling** stop/resume—OS throttles hidden tabs anyway, explicit handling prevents conflicts and saves 80% resources
+- **Component splitting** for 1000+ LOC files (StoveCard 1510 LOC, LightsCard 1203 LOC)—improves maintainability and parse time
+- **Token cleanup automation** with 30-day staleness detection—Firebase best practice, prevents unbounded growth
 
 **Should have (competitive):**
-- **Smart pellet estimation** — Pellet stoves lack built-in sensors. Software-only estimation (power level × runtime × weather correlation) is a differentiator vs Home Assistant (which requires hardware sensors).
-- **Offline-capable notification actions** — Background Sync allows "Spegni stufa" button to work offline, queue action, execute when connection restored. Most smart home apps fail silently when offline.
-- **Cron reliability monitoring** — Dead man's switch for automation itself. If cron stops running (Vercel issue), alert user within 10-15 minutes. Home Assistant doesn't monitor its own automations.
-- **Realistic Auth0 E2E testing** — Real OAuth flow (not mocked) catches real bugs (CVE-2025-29927 showed middleware-only auth insufficient). Most tutorials mock auth completely.
+- **Adaptive polling state machine** (active 5s / idle 30s / hidden stop / error backoff)—beyond simple visibility toggle
+- **Granular loading states** per device, not app-wide spinner—better UX for multi-device operations
+- **Automatic error recovery** in boundaries (2 retry attempts before fallback)—most apps just show error
+- **Component health monitoring** via error boundary logging to Firebase Analytics—proactive error detection
 
 **Defer (v2+):**
-- **Weather correlation in pellet consumption** — HIGH complexity (timestamp joins, aggregation). Heuristic formula sufficient for v6.0.
-- **Notification action undo** — Complex state management. Confirmation dialogs sufficient.
-- **Token refresh E2E testing** — Requires 24hr wait or complex clock setup. Manual testing acceptable for v6.0.
-- **Playwright migration** — No ROI for 3 weeks migration. Cypress works fine.
-- **Real-time pellet sensor integration** — Hardware out of scope. Software estimation only.
+- WebSocket real-time updates (polling adequate for thermostat control)
+- Service worker advanced cache strategies (Serwist offline mode already exists)
+- Performance monitoring Lighthouse CI (manual audits sufficient)
+- Comprehensive E2E coverage (3-5 critical flows sufficient)
 
 ### Architecture Approach
 
-v6.0 integrates via **existing patterns** — HMAC webhooks (withCronSecret), Firebase RTDB/Firestore split (real-time vs historical), service worker message handlers (notificationclick), Serwist strategies (NetworkFirst with fallback). No new architectural paradigms introduced.
+**Orchestrator pattern with error boundary isolation:** Large monolithic components (StoveCard 1510 LOC) split into orchestrator (~200 LOC) managing state and polling, plus 5-6 subcomponents (~150-250 LOC each) for presentation. Single `useAdaptivePolling()` hook in orchestrator prevents polling multiplication. Each logical section wrapped in `DeviceErrorBoundary` for graceful degradation. Pass data via props to avoid context re-render cascades.
 
 **Major components:**
+1. **Retry utility** (`lib/utils/retry.ts`) — centralized exponential backoff with presets (DEVICE_COMMAND, API_CALL, BACKGROUND_SYNC)
+2. **Adaptive polling hook** (`lib/hooks/useAdaptivePolling.ts`) — visibility/network-aware polling state machine, integrates with existing `useOnlineStatus` hook
+3. **Error boundaries** (`app/components/error-boundaries/DeviceErrorBoundary.tsx`) — class component with logging to Firebase Analytics, custom ValidationError handling
+4. **Token cleanup service** (`lib/services/tokenCleanupService.ts`) — extracted from API route, adds retry logic and delivery-based staleness tracking
 
-1. **Cron Orchestrator** — External HTTP scheduler (GitHub Actions or Upstash) triggers existing `/api/scheduler/check` webhook. Refactor to fire-and-forget pattern for parallel tasks (already partially implemented). Pattern: `withCronSecret` middleware validates HMAC. Updates `cronHealth/lastCall` timestamp for dead man's switch monitoring.
-
-2. **Persistent Rate Limiter** — Firebase RTDB replaces in-memory Map. Pattern: `runTransaction()` for atomic counter increments (existing pattern in `netatmoRateLimiter.ts`). Schema: `/rateLimits/{userId}/{notifType}/timestamps`. Cleanup via cron job (daily pruning of old windows).
-
-3. **Interactive Notification Handler** — Service worker `notificationclick` event parses action from data payload, executes API call (or queues via Background Sync if offline). FCM payload includes `actions` array (platform-specific: iOS requires `apns.aps.category`, Android uses `android.notification.clickAction`). Pattern already exists in `app/sw.ts:143-171`, needs action detection enhancement.
-
-4. **Offline State Manager** — Serwist NetworkFirst with cache staleness headers (`X-Cache-Age`, `X-Cache-Stale`). UI hook (`useOnlineStatus`) detects navigator.onLine, shows banner when offline, disables controls, displays cached state with timestamp warning. IndexedDB command queue (already implemented for Background Sync) gets UI feedback layer.
-
-5. **Analytics Pipeline** — **RTDB for real-time events** (1-day retention) → **daily aggregation cron** → **RTDB for daily stats** (90-day retention) → **monthly aggregation cron** → **Firestore for historical data** (unlimited retention, complex queries). Client dashboard fetches RTDB daily stats for selected range (7/30/90 days), visualizes with Recharts (existing pattern from notification dashboard).
-
-**Data flow changes:**
-- Before: In-memory rate limit → cold start resets state
-- After: Firebase RTDB transaction → persists across deployments
-- Before: Notification tap → open app
-- After: Notification action button → service worker API call → success notification
-- Before: Offline → stale cache served silently
-- After: Offline → staleness indicator + cached state warning + command queuing UI
+**Integration with existing patterns:** Preserves self-contained device card pattern (all device info inside card boundaries), keeps Firebase RTDB listeners in orchestrators, enhances existing Background Sync with retry logic, maintains PWA offline strategies.
 
 ### Critical Pitfalls
 
-1. **Serverless state loss** — In-memory rate limiter resets on cold starts, allowing DoS bypass. **Solution:** Firebase RTDB transactions for ALL persistent state (rate limits, PID automation, cron health). Test with 15+ minute idle periods. Pattern already validated in `netatmoRateLimiter.ts`.
+1. **Non-idempotent retry on ignite/shutdown** — duplicate physical actions if network timeout doesn't mean action failed. **Prevention:** Server-side idempotency keys, read-verify-write pattern (check stove state before retry), only retry safe operations.
 
-2. **Cron timeout** — Sequential operations (stove status + maintenance + calibration + weather + cleanup + PID) exceed 10s Vercel timeout, causing partial execution. **Solution:** Refactor to orchestrator + fire-and-forget workers (Promise.all with .catch). Set `maxDuration = 60` in route config. Dead man's switch monitors completion.
+2. **Layered retry amplification** — app retry + API route retry + external service retry = 27 requests for single action. **Prevention:** Single retry layer at API boundary only, disable browser fetch retry, monitor retry depth.
 
-3. **FCM platform payload differences** — Action buttons work on Android but fail silently on iOS (requires `aps.category` with registered categories). Data size limits differ (4KB iOS, 2KB Android). **Solution:** Platform-specific payload construction based on stored token metadata (`fcmTokens/{token}/platform`). Validate payload size before sending.
+3. **Adaptive polling breaks real-time** — slowing stove status polling to 30s causes stale display, automation conflicts. **Prevention:** Fixed 5s for critical stove status (never adaptive), adaptive only for weather/tokens, staleness indicator if >10s old.
 
-4. **Auth0 session leakage in E2E tests** — Playwright storageState caches cookies across test runs, causing "Session expired" errors in CI. **Solution:** Per-test login fixture with beforeEach/afterEach lifecycle. Never commit storageState.json. Use TEST_MODE bypass in CI if needed.
+4. **Error boundaries swallow safety alerts** — `needsCleaning` validation error shows generic fallback instead of maintenance alert. **Prevention:** Custom ValidationError class, render validation UI before error boundary scope, boundaries wrap unexpected errors only.
 
-5. **Stale cache safety risk** — Users act on outdated stove status (offline mode serves stale cache without warning), leading to dangerous actions (ignite already-running stove). **Solution:** Add cache staleness headers (`X-Cache-Age`) in service worker, UI shows "⚠️ Dati non aggiornati (X minuti fa)" banner when age >30 seconds. Disable controls when offline.
+5. **Component splitting multiplies polling** — split into subcomponents with independent polling = 3× server requests. **Prevention:** Hoist state to parent orchestrator, single polling loop, pass data via props to children.
 
-6. **GDPR violation** — Tracking analytics without explicit consent violates GDPR Article 6, facing €20M fines. **Solution:** Implement consent banner BEFORE ANY analytics tracking. Gate all `logAnalytics()` calls with consent check. Store `users/{userId}/consent` in Firebase. Right to deletion endpoint required.
+6. **Token cleanup deletes active devices** — inactive by "app open" metric, but user receives background notifications. **Prevention:** Track `lastNotificationDelivered` not `lastAppOpened`, 270-day window (not 30), audit logs.
 
 ## Implications for Roadmap
 
-Based on research, suggested 6-phase structure:
+Based on research, suggested 5-phase structure with 3-4 weeks execution:
 
-### Phase 49: Persistent Rate Limiting
-**Rationale:** Foundation for all other features. Current in-memory rate limiter breaks in serverless (DoS vulnerability). Must complete before Phase 50 (cron) and Phase 52 (interactive notifications).
+### Phase 1: Resilience Foundation (Week 1)
+**Rationale:** Error boundaries and retry logic are table stakes—without them, transient failures crash the app or feel broken to users. Must come first as foundation for all other phases.
 
-**Delivers:** Firebase RTDB-backed rate limiter with transaction safety, sliding window algorithm, automatic cleanup, feature flag for gradual rollout.
+**Delivers:**
+- `lib/utils/retry.ts` with exponential backoff + presets
+- `app/components/error-boundaries/DeviceErrorBoundary.tsx`
+- Error boundaries on homepage device cards
+- Retry logic on device command handlers (ignite, shutdown, lights control)
 
-**Addresses:** Critical pitfall #1 (state loss), MEDIUM complexity from STACK.md (Firebase transactions solve core problem).
+**Addresses:**
+- FEATURES.md table stakes: error recovery, retry on failure
+- PITFALLS.md critical: non-idempotent retry (#1), layered amplification (#2), error boundaries swallow alerts (#4)
 
-**Avoids:** DoS attacks via cold start exploitation, API quota exhaustion (Netatmo 50 req/10s limit).
+**Avoids:** Layered retries (single layer at API boundary), non-idempotent operations (read-verify-write pattern), swallowing validations (custom error classes)
 
-**Estimated effort:** 1 day (lib/rateLimiterPersistent.ts + tests + 24h monitoring).
+**Test coverage:** Unit tests for retry logic (backoff, jitter, shouldRetry), integration tests for error boundaries (throw error, verify fallback)
 
-**Research flag:** Standard pattern (Firebase RTDB transactions already proven in netatmoRateLimiter.ts) — skip `/gsd:research-phase`.
-
----
-
-### Phase 50: Cron Automation Configuration
-**Rationale:** Enables all background tasks (health monitoring, coordination, weather refresh). Existing endpoints already operational, just need HTTP trigger configuration.
-
-**Delivers:** External HTTP scheduler setup (GitHub Actions cron.yml or Upstash), refactored `/api/scheduler/check` to orchestrator + fire-and-forget workers, `maxDuration = 60` config, dead man's switch integration.
-
-**Uses:** HMAC webhook pattern (withCronSecret middleware already implemented).
-
-**Implements:** Cron Orchestrator component from ARCHITECTURE.md.
-
-**Avoids:** Critical pitfall #2 (timeout), ensures <10s critical path execution.
-
-**Estimated effort:** 0.5 days (configuration + refactoring existing code).
-
-**Research flag:** Standard pattern (cron-job.org or GitHub Actions well-documented) — skip `/gsd:research-phase`.
+**Estimated effort:** 3-5 days
 
 ---
 
-### Phase 51: E2E Test Improvements
-**Rationale:** Validates security foundation before shipping new features. Auth0 CVE-2025-29927 showed mocking auth defeats E2E purpose. Can run parallel to Phase 52-53.
+### Phase 2: Polling Optimization (Week 1-2)
+**Rationale:** Resource efficiency improves UX (battery life) and operational costs (Firebase RTDB reads). Quick wins with low complexity—Page Visibility API is browser built-in.
 
-**Delivers:** Playwright auth.setup.ts with session state caching, 5 critical flow tests (ignite, thermostat, schedule, notification, PWA install), CI integration with GitHub Actions.
+**Delivers:**
+- `lib/hooks/useAdaptivePolling.ts` with visibility/network awareness
+- Replace fixed polling in StoveCard, LightsCard, ThermostatCard
+- AbortController cleanup for race condition prevention
 
-**Addresses:** Critical pitfall #4 (session leakage), MEDIUM complexity from FEATURES.md (Auth0 test tenant + cy.origin).
+**Uses:**
+- STACK.md: Page Visibility API (browser built-in)
+- Existing: `useOnlineStatus` hook for network awareness
 
-**Avoids:** False positives from stale sessions, flaky CI tests, Auth0 rate limiting.
+**Implements:**
+- ARCHITECTURE.md: Adaptive polling integration with existing PWA patterns
 
-**Estimated effort:** 1.5 days (setup + 5 tests + CI integration).
+**Addresses:**
+- FEATURES.md table stakes: background tab optimization, visibility API
+- PITFALLS.md critical: adaptive polling breaks real-time (#3), useEffect race condition (#9)
 
-**Research flag:** Standard pattern (Playwright auth docs comprehensive) — skip `/gsd:research-phase`.
+**Avoids:** Making stove status adaptive (fixed 5s), polling without cleanup (AbortController)
 
----
-
-### Phase 52: Interactive Push Notifications
-**Rationale:** Biggest UX improvement (action buttons in notifications). Depends on Phase 49 (rate limiter) to prevent notification spam. Independent of Phase 50 (cron) and Phase 53 (offline).
-
-**Delivers:** FCM action buttons (platform-specific payloads), service worker notificationclick handler with action detection, server-side notification triggers with action arrays, manual test on Android Chrome + iOS Safari PWA.
-
-**Addresses:** Table stakes feature from FEATURES.md (HIGH value, HIGH complexity), Critical pitfall #3 (platform differences).
-
-**Implements:** Interactive Notification Handler component from ARCHITECTURE.md.
-
-**Avoids:** Silent iOS failures (platform detection + graceful degradation), payload size errors (2KB Android, 4KB iOS limits).
-
-**Estimated effort:** 1 day (service worker + 4 notification triggers).
-
-**Research flag:** **Needs deeper research** during planning — FCM platform-specific payload structure complex, iOS category registration unclear from sources.
+**Estimated effort:** 2-3 days
 
 ---
 
-### Phase 53: PWA Offline Improvements
-**Rationale:** Safety enhancement (stale cache warning critical for device control app). Builds on Phase 52 (notification actions can queue offline). Independent of Phase 50-51.
+### Phase 3: Component Splitting — Stove (Week 2)
+**Rationale:** StoveCard (1510 LOC) is most complex, splitting provides blueprint pattern for other components. Enables lazy loading in later optimizations.
 
-**Delivers:** useOnlineStatus hook, offline banner + cached state UI in StoveCard/ThermostatCard, cache staleness headers in service worker, command queue UI feedback (pending count + sync success toast), install prompt (beforeinstallprompt event + localStorage tracking).
+**Delivers:**
+- `app/components/devices/stove/components/` directory with 5-6 subcomponents
+- StoveCard refactored to orchestrator pattern (~200 LOC)
+- Error boundary per logical section
+- Single polling loop (prevents multiplication)
 
-**Addresses:** Table stakes feature from FEATURES.md (offline indicators), Critical pitfall #5 (stale cache safety).
+**Uses:**
+- STACK.md: React.lazy + Suspense for future lazy loading
+- ARCHITECTURE.md: Orchestrator pattern with props-based data flow
 
-**Implements:** Offline State Manager component from ARCHITECTURE.md.
+**Implements:**
+- ARCHITECTURE.md: Component splitting integration, error boundary hierarchy
 
-**Avoids:** Users acting on outdated state (safety risk), silent command failures (queuing feedback).
+**Addresses:**
+- FEATURES.md table stakes: load time <3s (code splitting foundation)
+- PITFALLS.md critical: component splitting multiplies polling (#5), context re-renders (#3 integration)
 
-**Estimated effort:** 2 days (1.5 offline UI + 0.5 install prompt).
+**Avoids:** Polling in subcomponents (hoist to parent), split too small (<200 LOC per component), context consumption in every child
 
-**Research flag:** Standard pattern (Serwist + beforeinstallprompt well-documented) — skip `/gsd:research-phase`, but note Next.js 16 Turbopack conflict requires `--webpack` flag.
+**Test coverage:** Snapshot tests for split components (verify output identical), unit tests for orchestrator data flow
+
+**Estimated effort:** 5-7 days
 
 ---
 
-### Phase 54: Analytics Dashboard
-**Rationale:** Final feature (requires data accumulation from Phase 50 cron). MUST implement consent banner before ANY tracking (GDPR blocker).
+### Phase 4: Component Splitting — Lights & Page (Week 3)
+**Rationale:** Follows established pattern from Phase 3. LightsCard (1203 LOC) and stove/page.tsx (1066 LOC) benefit from same orchestrator approach.
 
-**Delivers:** Consent banner (blocking, granular categories), analyticsLogger.ts (event collection to RTDB), /api/analytics/aggregate-daily cron endpoint, /app/analytics/page.tsx dashboard (usage timeline, pellet consumption, weather correlation charts), stats cards (totals, automation %).
+**Delivers:**
+- `app/components/devices/lights/components/` directory with 4-5 subcomponents
+- `app/stove/components/` directory with 4 subcomponents
+- LightsCard and stove/page.tsx refactored to orchestrators
 
-**Addresses:** Table stakes feature from FEATURES.md (analytics dashboard MEDIUM-HIGH complexity), Critical pitfall #6 (GDPR violation).
+**Uses:** Phase 3 orchestrator pattern
 
-**Implements:** Analytics Pipeline component from ARCHITECTURE.md.
+**Addresses:**
+- FEATURES.md table stakes: component splitting (remaining large files)
+- FEATURES.md should have: granular loading states per device
 
-**Avoids:** €20M GDPR fines (consent-first), unbounded Firestore growth (2-year TTL policy).
+**Avoids:** Same pitfalls as Phase 3 (now documented pattern to follow)
 
-**Estimated effort:** 4 days (1 consent + 1 collection + 1 aggregation + 2 dashboard).
+**Estimated effort:** 5-7 days
 
-**Research flag:** **Needs research** during planning — GDPR consent implementation patterns, Firestore aggregation query optimization, pellet consumption estimation formula validation.
+---
+
+### Phase 5: Token Cleanup & Polish (Week 4)
+**Rationale:** Operational hygiene—prevents unbounded FCM token growth. Independent of other phases, can run in parallel with Phase 4 if resources allow.
+
+**Delivers:**
+- `lib/services/tokenCleanupService.ts` extracted from API route
+- Retry logic for cleanup operations
+- Delivery-based staleness tracking (not app-open based)
+- Client-side cleanup trigger (on app open if >7 days)
+- Audit logging to `firebase/tokenCleanupLog`
+
+**Uses:**
+- STACK.md: @lifeomic/attempt for cleanup retry
+- ARCHITECTURE.md: Token cleanup integration with existing cron
+
+**Addresses:**
+- FEATURES.md table stakes: token lifecycle management with 30-day staleness
+- PITFALLS.md critical: cleanup deletes active devices (#6)
+
+**Avoids:** App-open metric (use delivery), 30-day window (use 270-day), no audit trail (add logging)
+
+**Estimated effort:** 2-3 days
 
 ---
 
 ### Phase Ordering Rationale
 
-**Sequential dependencies:**
-- Phase 49 (rate limiting) → Phase 52 (notifications) — prevent notification spam
-- Phase 50 (cron) → Phase 54 (analytics) — data accumulation for dashboard
-- Phase 52 (notifications) → Phase 53 (offline actions) — Background Sync integration
+**Dependencies:**
+- Phase 1 is foundational—retry utility and error boundaries needed by later phases
+- Phase 2 builds on Phase 1 (adaptive polling uses retry on error)
+- Phase 3 uses Phase 1 boundaries and Phase 2 polling hook
+- Phase 4 follows Phase 3 pattern (established orchestrator approach)
+- Phase 5 is independent (can parallelize with Phase 4)
 
-**Parallelizable:**
-- Phase 51 (E2E tests) — independent, validates auth only
-- Phase 53 (PWA offline) — after Phase 52, can run parallel to Phase 54
+**Groupings:**
+- Week 1: Core resilience patterns (retry + error + polling)
+- Week 2-3: Component refactoring (apply patterns to large files)
+- Week 4: Operational hygiene (token cleanup, polish)
 
-**Critical path:** 49 → 50 → 52 → 53 → 54 (with Phase 51 parallel to 52-53).
-
-**Risk mitigation order:**
-- Phase 49 first — fixes DoS vulnerability (serverless state loss)
-- Phase 50 second — enables automation before analytics data collection
-- Phase 54 last — requires consent banner (GDPR blocker, no shortcuts allowed)
-
-**Complexity sequencing:**
-- LOW → MEDIUM → HIGH: Start with rate limiting (MEDIUM, proven pattern), end with analytics (HIGH, new patterns)
-- Standard patterns first (49-51), novel patterns last (52-54)
+**Risk mitigation:**
+- Early phases address safety-critical pitfalls (non-idempotent retry, error swallowing)
+- Component splitting after patterns established (avoid multiplying polling loops)
+- Token cleanup last (least user-facing, independent)
 
 ### Research Flags
 
-**Needs `/gsd:research-phase` during planning:**
+**Phases needing deeper research during planning:**
+- **None expected** — all phases use well-documented patterns. Error boundaries (React official docs), exponential backoff (OneUpTime 2026 guide), Page Visibility API (MDN), component splitting (React patterns).
 
-- **Phase 52 (Interactive Push Notifications)** — FCM platform-specific payload structure complex. iOS category registration process unclear. Action button limitations vary by platform (2 actions Android, 4 actions iOS). Research needed: official FCM docs for apns.aps.category structure, iOS UNNotificationCategory registration in PWA context.
+**Phases with standard patterns (skip research-phase):**
+- **Phase 1:** Error boundaries and retry are established React/API patterns
+- **Phase 2:** Page Visibility API is browser standard, well-documented
+- **Phase 3-4:** Component refactoring follows React best practices
+- **Phase 5:** Firebase token management is official best practice
 
-- **Phase 54 (Analytics Dashboard)** — Three sub-areas need research:
-  1. GDPR consent implementation patterns (banner UI, consent storage, retroactive data deletion)
-  2. Firestore aggregation query optimization (write-time vs read-time aggregation, cost tradeoffs)
-  3. Pellet consumption estimation formula validation (powerLevel × runtime heuristic accuracy, weather correlation algorithm)
-
-**Standard patterns (skip research-phase):**
-
-- **Phase 49 (Persistent Rate Limiting)** — Firebase RTDB transactions already validated in netatmoRateLimiter.ts. Sliding window algorithm well-documented.
-- **Phase 50 (Cron Configuration)** — HMAC webhook pattern exists (withCronSecret). GitHub Actions cron syntax standard. Fire-and-forget Promise.all pattern proven.
-- **Phase 51 (E2E Tests)** — Playwright auth state pattern official docs comprehensive. Auth0 test tenant setup straightforward.
-- **Phase 53 (PWA Offline)** — Serwist NetworkFirst + beforeinstallprompt event well-documented. useOnlineStatus hook standard React pattern. Note: Next.js 16 Turbopack conflict documented in sources (requires `--webpack` flag).
+**If implementation blockers arise:**
+- Use `/gsd:research-phase` for specific questions (e.g., "How to test error boundaries with Cypress")
+- Most likely candidates: Testing strategy (Phase 1), Race condition edge cases (Phase 2)
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Existing technologies cover 90% of requirements. Only 1 new dependency (idb). Versions verified compatible. No major framework changes. |
-| Features | HIGH | Table stakes well-defined (smart home platform comparisons clear). Differentiators validated (pellet estimation novel but feasible). Anti-features explicit (no Playwright migration). |
-| Architecture | HIGH | All patterns already exist in codebase (HMAC webhooks, Firebase splits, service worker handlers, Recharts). Integration points documented with line numbers. No architectural rewrites. |
-| Pitfalls | HIGH | Sources authoritative (official Vercel/Firebase/FCM docs, Anthropic research, Auth0 community). All 6 critical pitfalls have proven solutions. Recovery strategies documented. |
+| Stack | HIGH | Official docs for Next.js, React, Page Visibility API; established npm package (@lifeomic/attempt) |
+| Features | HIGH | Table stakes validated with official React error boundary docs, Firebase best practices, 2026 industry articles |
+| Architecture | HIGH | Based on existing codebase analysis (actual LOC counts, current patterns), Next.js App Router conventions |
+| Pitfalls | HIGH | Verified with official docs, production post-mortems (Microsoft Azure retry storm, Firebase token lifecycle), IEEE research papers |
 
 **Overall confidence:** HIGH
 
-Research quality indicators met:
-- Official sources for all critical technologies (Vercel serverless limits, Firebase transaction safety, FCM payload structure, Playwright auth patterns)
-- Existing codebase validation (Firebase RTDB pattern proven in netatmoRateLimiter.ts, Recharts proven in notification dashboard, service worker handlers exist)
-- Pitfall prevention documented (each pitfall maps to specific phase, recovery steps provided)
-- Stack decisions justified (NO Redis, NO Playwright migration, NO complex ML models — pragmatic choices)
+**Reasoning:**
+- Existing codebase provides solid foundation (PWA patterns, Firebase integration, Auth0 working)
+- All recommendations use official/standard APIs (no experimental libraries)
+- Pitfalls documented with real-world examples and mitigation strategies
+- Phase structure follows natural dependencies (retry → polling → splitting)
+- Risk areas clearly identified with prevention strategies
 
 ### Gaps to Address
 
-**Gap 1: FCM iOS category registration in PWA context**
-- Research shows iOS requires `aps.category` matching registered UNNotificationCategory, but unclear how to register categories in PWA (not native app)
-- **Handling:** Needs deeper research in Phase 52 planning. Fallback: iOS action buttons only work if PWA installed (standalone mode), document limitation for users.
+**Playwright E2E testing strategy:** Research mentions Playwright for critical path testing (FEATURES.md Phase 4), but existing codebase has Cypress 3034 tests. During Phase 1 planning, decide: (1) Add new E2E in Playwright for critical flows only, or (2) Use existing Cypress for integration tests. Recommendation: Add 3-5 Playwright flows for critical paths (login → ignite → verify), keep Cypress unit tests.
 
-**Gap 2: Pellet consumption estimation accuracy**
-- Heuristic formula (powerLevel × runtime × weatherFactor) unverified. Research shows ML models achieve 80%+ accuracy, but heuristic approach accuracy unknown.
-- **Handling:** Start with simple formula, add user calibration UI ("I refilled 15kg today"), improve with feedback data. Weather correlation deferred to v6.1 (HIGH complexity).
+**Idempotency key implementation:** PITFALLS.md emphasizes server-side idempotency for ignite/shutdown, but current API routes don't have this. During Phase 1 planning, design idempotency key storage: (1) In-memory cache (Redis-like), (2) Firebase RTDB `idempotencyKeys/{key}/{timestamp}`, or (3) Request deduplication based on stove state. Recommendation: Option 2 (Firebase RTDB) for simplicity, 2-minute TTL.
 
-**Gap 3: Firestore vs RTDB cost tradeoffs for analytics**
-- Research recommends RTDB for real-time, Firestore for historical, but cost implications unclear for 90-day daily stats (potential duplication)
-- **Handling:** Start with RTDB-only (90-day retention, simple queries). Migrate to Firestore monthly rollups only if RTDB queries become slow (>10 users, >1000 data points).
+**Error boundary logging integration:** ARCHITECTURE.md mentions logging to Firebase Analytics, but FEATURES.md component health monitoring is deferred to v7.1. During Phase 1 implementation, use simple `logEvent(analytics, 'component_error', {...})` for basic tracking, defer dashboard UI.
 
-**Gap 4: External HTTP scheduler free tier limits**
-- GitHub Actions cron: 5-minute minimum interval (acceptable), but unknown reliability for critical health checks
-- Upstash: Free tier unknown limits
-- **Handling:** Start with GitHub Actions (zero cost). Monitor reliability for 1 week. Migrate to Upstash if >5% missed executions (dead man's switch will alert).
-
-**Gap 5: Consent banner UX optimization**
-- GDPR requires opt-in, but modal blocking UI may frustrate users on first load
-- **Handling:** Allow "Essential only" mode → functional controls work, analytics disabled. Persistent banner (non-blocking) for "Enable analytics" after user explores app.
+**Token cleanup migration path:** Current cleanup in `/api/scheduler/check` route (652 LOC). During Phase 5 planning, decide: (1) Extract to service and call from route, or (2) New dedicated `/api/admin/cleanup-tokens` route. Recommendation: Option 1 (extract to service) for backward compatibility with existing cron.
 
 ## Sources
 
 ### Primary (HIGH confidence)
 
-**Stack recommendations:**
-- [Vercel Cron Jobs Documentation](https://vercel.com/docs/cron-jobs) — serverless cron patterns, CRON_SECRET authentication
-- [Firebase Realtime Database Transactions](https://firebase.google.com/docs/database/web/read-and-write#save_data_as_transactions) — atomic operations for rate limiting
-- [idb - npm](https://www.npmjs.com/package/idb) — IndexedDB wrapper for service workers
-- [Serwist Documentation](https://serwist.pages.dev/docs) — Next.js 15+ PWA configuration
-- [Playwright Authentication](https://playwright.dev/docs/auth) — session state reuse patterns
+**Stack Research:**
+- Next.js App Router Error Handling (https://nextjs.org/docs/app/getting-started/error-handling)
+- React Error Boundaries (https://legacy.reactjs.org/docs/error-boundaries.html)
+- @lifeomic/attempt npm (https://www.npmjs.com/package/@lifeomic/attempt)
+- Page Visibility API MDN (https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API)
+- Firebase FCM Token Management (https://firebase.google.com/docs/cloud-messaging/manage-tokens)
 
-**Feature validation:**
-- [Home Assistant Schedule Integration](https://www.home-assistant.io/integrations/schedule/) — smart home automation patterns
-- [Google Nest Energy History](https://support.google.com/googlenest/answer/9247296) — energy analytics UX patterns
-- [Firebase Cloud Messaging Web Push](https://firebase.google.com/docs/cloud-messaging/js/receive) — notification action buttons
+**Features Research:**
+- OneUpTime — Error Boundaries & Retry Logic in React 2026 (https://oneuptime.com/blog/post/2026-01-15-react-error-boundaries/view)
+- Next.js 15 Lazy Loading Guide v16.1.6 2026-02-09 (https://nextjs.org/docs/app/guides/lazy-loading)
+- Firebase Blog — Managing Cloud Messaging Tokens (https://firebase.blog/posts/2023/04/managing-cloud-messaging-tokens/)
+- BrowserStack — 15 Best Practices for Playwright 2026 (https://www.browserstack.com/guide/playwright-best-practices)
 
-**Architecture patterns:**
-- [End-to-End Testing Auth Flows with Playwright and Next.js](https://testdouble.com/insights/how-to-test-auth-flows-with-playwright-and-next-js) — session state management
-- [Tutorial: Firestore Rate Limiting | Fireship.io](https://fireship.io/lessons/how-to-rate-limit-writes-firestore/) — distributed rate limiting patterns
-- [Build an Offline-First Mood Journal PWA with Next.js & IndexedDB](https://www.wellally.tech/blog/build-offline-first-pwa-nextjs-indexeddb) — offline state management
+**Architecture Research:**
+- Existing codebase analysis: StoveCard.tsx (1510 LOC), LightsCard.tsx (1203 LOC), stove/page.tsx (1066 LOC)
+- docs/architecture.md — Self-contained device card pattern
+- docs/pwa.md — PWA architecture with useOnlineStatus, useDeviceStaleness, useBackgroundSync hooks
 
-**Pitfall prevention:**
-- [What can I do about Vercel Functions timing out? | Vercel KB](https://vercel.com/kb/guide/what-can-i-do-about-vercel-serverless-functions-timing-out) — serverless timeout mitigation
-- [Implementing Action Buttons in Push Notifications using Firebase and Notifee](https://medium.com/@hassem_mahboob/implementing-action-buttons-in-push-notifications-using-firebase-and-notifee-f5743bdb28bc) — platform-specific FCM payloads
-- [GDPR Compliance Checklist for Next.js Apps](https://medium.com/@kidane10g/gdpr-compliance-checklist-for-next-js-apps-801c9ea75780) — consent implementation
+**Pitfalls Research:**
+- Microsoft Azure — Retry Storm Antipattern (https://learn.microsoft.com/en-us/azure/architecture/antipatterns/retry-storm/)
+- ThinhDA — Retries Without Thundering Herds (https://thinhdanggroup.github.io/retry-without-thundering-herds/)
+- IEEE — RT-IFTTT Real-Time IoT Framework (https://ieeexplore.ieee.org/document/8277299/)
+- Max Rozen — Race Conditions in React useEffect (https://maxrozen.com/race-conditions-fetching-data-react-with-useeffect)
 
 ### Secondary (MEDIUM confidence)
 
-- [Cron Jobs in Next.js: Serverless vs Serverful](https://yagyaraj234.medium.com/running-cron-jobs-in-nextjs-guide-for-serverful-and-stateless-server-542dd0db0c4c) — comparison of cron approaches
-- [How to Build a Distributed Rate Limiter with Redis](https://oneuptime.com/blog/post/2026-01-21-redis-distributed-rate-limiter/view) — alternative rate limiting patterns (Redis comparison)
-- [Cypress vs Playwright: I Ran 500 E2E Tests in Both](https://medium.com/lets-code-future/cypress-vs-playwright-i-ran-500-e2e-tests-in-both-heres-what-broke-2afc448470ee) — E2E framework comparison (validates Cypress retention decision)
+- Medium — Modern JavaScript Polling: Adaptive Strategies (https://medium.com/tech-pulse-by-collatzinc/modern-javascript-polling-adaptive-strategies-that-actually-work-part-1-9909f5946730)
+- Medium — Advanced React Error Boundaries for Production Apps (https://medium.com/@asiandigitalhub/advanced-react-error-boundaries-for-production-apps-f9ad9d2ae966)
+- Kent C. Dodds — Application State Management with React (https://kentcdodds.com/blog/application-state-management-with-react)
+- LogRocket — Dynamic Imports and Code Splitting with Next.js (https://blog.logrocket.com/dynamic-imports-code-splitting-next-js/)
 
 ### Tertiary (LOW confidence)
 
-- [Tracking wood pellet consumption - Home Assistant Community](https://community.home-assistant.io/t/tracking-wood-pellet-consumption/783104) — community approaches to pellet estimation (no validation)
-- [Novel approach to energy consumption estimation in smart homes](https://www.frontiersin.org/journals/energy-research/articles/10.3389/fenrg.2024.1361803/full) — ML models for energy prediction (academic, not production-tested)
+- None — all recommendations backed by official docs or authoritative 2026 sources
 
 ---
-*Research completed: 2026-02-10*
+
+*Research completed: 2026-02-11*
 *Ready for roadmap: yes*
-*Total plans required: 6 phases (49-54)*
-*Estimated implementation: 10 days (1 rate limiting + 0.5 cron + 1.5 E2E + 1 notifications + 2 offline + 4 analytics)*
+*Synthesized from: STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md*

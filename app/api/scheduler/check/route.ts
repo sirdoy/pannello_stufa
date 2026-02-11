@@ -21,6 +21,7 @@ import {
 import { adminDbGet, adminDbSet, adminDbUpdate, getAdminDatabase } from '@/lib/firebaseAdmin';
 import { canIgnite, trackUsageHours } from '@/lib/maintenanceServiceAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
+import { logPidTuningEntry, cleanupOldLogs } from '@/lib/services/pidTuningLogService';
 import {
   triggerStoveStatusWorkServer,
   triggerStoveUnexpectedOffServer,
@@ -707,6 +708,34 @@ async function runPidAutomationIfEnabled(currentStatus: string, currentPowerLeve
       initialized: newState.initialized,
       lastRun: now,
     });
+
+    // Log tuning data for analysis
+    try {
+      await logPidTuningEntry(adminUserId, {
+        roomTemp: measured,
+        powerLevel: currentPowerLevel,
+        setpoint: setpoint,
+        pidOutput: targetPower,
+        error: setpoint - measured,
+        integral: newState.integral,
+        derivative: newState.prevError, // prevError represents derivative term
+        roomId: targetRoomId,
+        roomName: targetRoom.name,
+      });
+    } catch (logError) {
+      // Don't fail PID automation if logging fails
+      console.error('Failed to log PID tuning data:', logError instanceof Error ? logError.message : String(logError));
+    }
+
+    // Cleanup old logs once per day (check if last cleanup was >24h ago)
+    const lastCleanup = pidState?.lastCleanup ?? 0;
+    if (now - lastCleanup > 24 * 60 * 60 * 1000) {
+      cleanupOldLogs(adminUserId).catch(err =>
+        console.error('Failed to cleanup old PID logs:', err)
+      );
+      // Update lastCleanup timestamp in pidState (will be saved next run)
+      await adminDbSet(`${pidStatePath}/lastCleanup`, now);
+    }
 
     // Check if power level needs adjustment
     if (targetPower !== currentPowerLevel) {

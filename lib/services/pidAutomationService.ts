@@ -11,7 +11,7 @@
  *   await setPidConfig(userId, { enabled: true, targetRoomId: 'room123' });
  */
 
-import { ref, onValue, set } from 'firebase/database';
+import { ref, onValue } from 'firebase/database';
 import { db } from '@/lib/firebase';
 
 /**
@@ -68,17 +68,19 @@ export async function getPidConfig(userId: string | undefined): Promise<PIDConfi
 }
 
 /**
- * Set PID automation config for a user
+ * Set PID automation config for a user via server-side API route.
+ * Uses Admin SDK on the server to bypass client-side Firebase rules.
  *
- * @param {string} userId - Auth0 user ID (required)
+ * @param {string} _userId - Auth0 user ID (kept for API compatibility, auth handled by session)
  * @param {Object} config - Configuration to save
  * @param {boolean} config.enabled - Whether PID automation is enabled
  * @param {string|null} config.targetRoomId - Netatmo room ID to monitor
+ * @param {number} config.manualSetpoint - Manual setpoint temperature (optional)
  * @param {number} config.kp - Proportional gain (optional)
  * @param {number} config.ki - Integral gain (optional)
  * @param {number} config.kd - Derivative gain (optional)
  * @returns {Promise<void>}
- * @throws {Error} If userId is not provided
+ * @throws {Error} If save fails
  *
  * @example
  * await setPidConfig(session.user.sub, {
@@ -89,21 +91,17 @@ export async function getPidConfig(userId: string | undefined): Promise<PIDConfi
  *   kd: 0.05,
  * });
  */
-export async function setPidConfig(userId: string, config: Partial<PIDConfig>): Promise<void> {
-  if (!userId) {
-    throw new Error('userId is required to save PID config');
+export async function setPidConfig(_userId: string, config: Partial<PIDConfig>): Promise<void> {
+  const response = await fetch('/api/user/pid-config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(config),
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.error || `Failed to save PID config: ${response.status}`);
   }
-
-  const pidRef = ref(db, getPidPath(userId));
-
-  // Merge with defaults and add timestamp
-  const fullConfig = {
-    ...DEFAULT_PID_CONFIG,
-    ...config,
-    updatedAt: Date.now(),
-  };
-
-  await set(pidRef, fullConfig);
 }
 
 /**

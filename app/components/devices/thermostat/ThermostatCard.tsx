@@ -12,6 +12,10 @@ import RoomSelector from '../../ui/RoomSelector';
 import { Divider, Heading, Text, Button, EmptyState, Spinner, Select, Badge } from '../../ui';
 import BatteryWarning, { ModuleBatteryList } from './BatteryWarning';
 import { useScheduleData } from '@/lib/hooks/useScheduleData';
+import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
+import { useDeviceStaleness } from '@/lib/hooks/useDeviceStaleness';
+import { formatDistanceToNow } from 'date-fns';
+import { it } from 'date-fns/locale';
 
 /**
  * ThermostatCard - Complete thermostat control for homepage
@@ -36,6 +40,10 @@ export default function ThermostatCard() {
 
   // Schedule management
   const { schedules, activeSchedule, loading: scheduleLoading, refetch: refetchSchedules } = useScheduleData();
+
+  // Online status and staleness tracking
+  const { isOnline } = useOnlineStatus();
+  const staleness = useDeviceStaleness('thermostat');
 
   // Type assertion for schedules data (from useScheduleData hook)
   interface ScheduleItem {
@@ -274,6 +282,9 @@ export default function ThermostatCard() {
   }
 
   async function handleModeChange(newMode: string) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     try {
       setLoadingMessage('Cambio modalità termostato...');
       setRefreshing(true);
@@ -282,6 +293,7 @@ export default function ThermostatCard() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode: newMode }),
+        signal: controller.signal,
       });
 
       const data = await response.json() as { error?: string };
@@ -289,14 +301,23 @@ export default function ThermostatCard() {
       // Aggiorna status dopo il comando
       await fetchStatus();
     } catch (err: unknown) {
+      if ((err as Error).name === 'AbortError') {
+        setError('Connessione persa — azione annullata');
+        setRefreshing(false);
+        return;
+      }
       const message = err instanceof Error ? err.message : String(err);
       setError(message);
     } finally {
+      clearTimeout(timeoutId);
       setRefreshing(false);
     }
   }
 
   async function handleTemperatureChange(roomId: string, temp: number) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     try {
       setLoadingMessage('Modifica temperatura...');
       setRefreshing(true);
@@ -309,6 +330,7 @@ export default function ThermostatCard() {
           mode: 'manual',
           temp,
         }),
+        signal: controller.signal,
       });
 
       const data = await response.json() as { error?: string };
@@ -316,14 +338,23 @@ export default function ThermostatCard() {
       // Aggiorna status dopo il comando
       await fetchStatus();
     } catch (err: unknown) {
+      if ((err as Error).name === 'AbortError') {
+        setError('Connessione persa — azione annullata');
+        setRefreshing(false);
+        return;
+      }
       const message = err instanceof Error ? err.message : String(err);
       setError(message);
     } finally {
+      clearTimeout(timeoutId);
       setRefreshing(false);
     }
   }
 
   async function handleCalibrateValves() {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     try {
       setLoadingMessage('Calibrazione valvole...');
       setRefreshing(true);
@@ -334,6 +365,7 @@ export default function ThermostatCard() {
       const response = await fetch(NETATMO_ROUTES.calibrate, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
       });
 
       const data = await response.json();
@@ -351,11 +383,18 @@ export default function ThermostatCard() {
       // Aggiorna status dopo il comando
       await fetchStatus();
     } catch (err: unknown) {
+      if ((err as Error).name === 'AbortError') {
+        setError('Connessione persa — azione annullata');
+        setCalibrating(false);
+        setRefreshing(false);
+        return;
+      }
       const message = err instanceof Error ? err.message : String(err);
       console.error('Errore calibrazione valvole:', err);
       setError(`Calibrazione fallita: ${message}`);
       setCalibrationSuccess(false);
     } finally {
+      clearTimeout(timeoutId);
       setCalibrating(false);
       setRefreshing(false);
     }
@@ -363,6 +402,9 @@ export default function ThermostatCard() {
 
   async function handleScheduleChange(scheduleId: string) {
     if (!scheduleId || scheduleId === typedActiveSchedule?.id) return;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
     try {
       setSwitchingSchedule(true);
@@ -373,6 +415,7 @@ export default function ThermostatCard() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ scheduleId }),
+        signal: controller.signal,
       });
 
       const data = await response.json();
@@ -382,9 +425,15 @@ export default function ThermostatCard() {
       await refetchSchedules();
       setSelectedScheduleId(scheduleId);
     } catch (err: unknown) {
+      if ((err as Error).name === 'AbortError') {
+        setError('Connessione persa — azione annullata');
+        setSwitchingSchedule(false);
+        return;
+      }
       const message = err instanceof Error ? err.message : String(err);
       setError(message);
     } finally {
+      clearTimeout(timeoutId);
       setSwitchingSchedule(false);
     }
   }
@@ -556,7 +605,7 @@ export default function ThermostatCard() {
                   selectedRoom.heating
                     ? 'bg-gradient-to-br from-ember-900/40 via-slate-900/60 to-flame-900/30 border-ember-500/40 shadow-ember-glow [html:not(.dark)_&]:from-ember-100/80 [html:not(.dark)_&]:via-ember-50/90 [html:not(.dark)_&]:to-flame-100/70 [html:not(.dark)_&]:border-ember-300 [html:not(.dark)_&]:shadow-[0_0_20px_rgba(237,111,16,0.15)]'
                     : 'bg-gradient-to-br from-ocean-900/30 via-slate-900/60 to-ocean-800/20 border-ocean-500/30 [html:not(.dark)_&]:from-ocean-100/80 [html:not(.dark)_&]:via-ocean-50/90 [html:not(.dark)_&]:to-ocean-100/70 [html:not(.dark)_&]:border-ocean-200'
-                }`}>
+                } ${staleness?.isStale ? 'opacity-60' : ''}`}>
                   {/* Heating Badge - with light mode */}
                   {selectedRoom.heating && (
                     <div className="absolute -top-2 -right-2 z-20">
@@ -653,11 +702,20 @@ export default function ThermostatCard() {
                       })}
                     </div>
                   )}
+
+                  {/* Staleness Indicator */}
+                  {staleness?.cachedAt && (
+                    <div className="mt-4 text-center">
+                      <Text variant="tertiary" size="sm">
+                        Ultimo aggiornamento: {formatDistanceToNow(new Date(staleness.cachedAt), { addSuffix: true, locale: it })}
+                      </Text>
+                    </div>
+                  )}
                 </div>
                 )}
 
                 {/* Quick temperature controls - Ember Noir */}
-                {selectedRoom.setpoint && !selectedRoom.isOffline && (
+                {isOnline && selectedRoom.setpoint && !selectedRoom.isOffline && (
                   <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-4 sm:p-5 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
                     <div className="flex items-center gap-3">
                       <Button
@@ -697,6 +755,8 @@ export default function ThermostatCard() {
             {/* Separator */}
             <Divider label="Modalità" variant="gradient" spacing="large" />
 
+            {isOnline ? (
+              <>
             {/* Mode Control - Redesigned for better readability */}
             <div className="grid grid-cols-4 gap-3 sm:gap-4">
               {[
@@ -825,6 +885,14 @@ export default function ThermostatCard() {
                 {calibrating ? 'Calibrazione...' : 'Tara Valvole'}
               </Button>
             </div>
+              </>
+            ) : (
+              <div className="p-6 text-center">
+                <Text variant="secondary" size="sm">
+                  Controlli non disponibili offline
+                </Text>
+              </div>
+            )}
 
       {/* Actions */}
       <div className="mt-4 sm:mt-5">

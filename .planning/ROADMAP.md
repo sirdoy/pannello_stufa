@@ -185,7 +185,7 @@ Plans:
 - [x] 54-06-PLAN.md — Dashboard charts (Usage, Consumption, Weather Correlation)
 - [x] 54-07-PLAN.md — Dashboard page assembly with period selector and calibration modal
 - [x] 54-08-PLAN.md — Stove event instrumentation (ignite/shutdown/power API routes + scheduler)
-- [ ] 54-09-PLAN.md — Gap closure: client consent header on stove fetch calls
+- [x] 54-09-PLAN.md — Gap closure: client consent header on stove fetch calls
 
 ## Progress
 
@@ -209,7 +209,7 @@ Phases execute in numeric order: 49 → 50 → 51 → 52 → 53 → 54
 | 51 | v6.0 | 4/4 | ✓ Complete | 2026-02-10 |
 | 52 | v6.0 | 3/3 | ✓ Complete | 2026-02-10 |
 | 53 | v6.0 | 5/5 | ✓ Complete | 2026-02-11 |
-| 54 | v6.0 | 0/TBD | Not started | - |
+| 54 | v6.0 | 9/9 | ✓ Complete | 2026-02-11 |
 
 ---
 
@@ -217,4 +217,4 @@ Phases execute in numeric order: 49 → 50 → 51 → 52 → 53 → 54
 **v6.0 Requirements:** 42 total (100% coverage validated)
 **Depth:** Comprehensive (6 phases for 42 requirements)
 **Created:** 2026-02-10
-**Last updated:** 2026-02-11 — Phase 53 complete
+**Last updated:** 2026-02-11 — Phase 54 complete (v6.0 milestone complete)

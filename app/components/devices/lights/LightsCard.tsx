@@ -1067,7 +1067,7 @@ export default function LightsCard() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span className="text-xl">☀️</span>
-                            <Heading level={4} size="sm" variant={adaptive.heading ? 'default' : undefined} className={`font-display ${adaptive.heading}`}>Luminosità</Heading>
+                            <Text size="sm" variant={adaptive.heading ? 'body' : undefined} className={`font-bold font-display ${adaptive.heading}`}>Luminosità</Text>
                           </div>
                           <span className={`text-2xl sm:text-3xl font-black font-display ${
                             adaptive.brightnessValue

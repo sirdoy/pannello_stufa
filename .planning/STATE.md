@@ -129,6 +129,9 @@ Recent decisions affecting v6.0 work (full log in PROJECT.md):
 - [Phase 52-02]: Duplicate action constants in SW file: Serwist compiles SW separately, can't import from lib at build time
 - [Phase 52-02]: Tag-based notification deduplication: Prevents spam from repeated action clicks (action-success/error/queued-{endpoint})
 - [Phase 52-03]: getActionsForNotificationType called in triggerNotificationServer: Automatic action injection based on notification type before payload send
+- [Phase 53-02]: 30-second staleness threshold balances data freshness with UI responsiveness
+- [Phase 53-02]: 1-hour command expiration for safety-critical endpoints prevents dangerous stale-intent execution
+- [Phase 53-02]: 5-second polling interval for staleness updates provides real-time info without excessive re-renders
 
 ### Pending Todos
 
@@ -161,11 +164,11 @@ None yet for v6.0. Use `/gsd:add-todo` to capture ideas during execution.
 
 ## Session Continuity
 
-Last session: 2026-02-10
-Stopped at: Completed 52-03-PLAN.md (Wire Notification Actions Into Trigger System)
+Last session: 2026-02-11
+Stopped at: Completed 53-02-PLAN.md (Staleness Detection and Command Expiration)
 Resume file: None
 
-Next action: Phase 52 Complete — Review phase completion and move to Phase 53
+Next action: Continue Phase 53 execution (plans 03-05)
 
 ---
-*State updated: 2026-02-10 after completing Phase 52 Plan 03*
+*State updated: 2026-02-11 after completing Phase 53 Plan 02*

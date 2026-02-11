@@ -480,6 +480,12 @@ export default function PidAutomationPanel() {
         const roomsData = await roomsResponse.json();
 
         if (roomsData.error) {
+          // Rate limiting error - don't show to user, just skip this load
+          if (roomsData.error.includes('concurrency limited')) {
+            console.warn('⚠️ Netatmo rate limit - skipping this load');
+            setLoading(false);
+            return;
+          }
           throw new Error(roomsData.error);
         }
 
@@ -503,8 +509,12 @@ export default function PidAutomationPanel() {
 
         return () => unsubscribe();
       } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
         console.error('Error loading PID config:', err);
-        setError(err instanceof Error ? err.message : String(err));
+        // Don't show rate limit errors to user
+        if (!message.includes('concurrency limited')) {
+          setError(message);
+        }
         setLoading(false);
       }
     };

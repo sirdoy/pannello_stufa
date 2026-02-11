@@ -1,6 +1,7 @@
 import { withAuthAndErrorHandler, success, parseJson } from '@/lib/core';
 import { validateShutdownInput } from '@/lib/validators';
 import { getStoveService } from '@/lib/services/StoveService';
+import { logAnalyticsEvent } from '@/lib/analyticsEventLogger';
 
 /**
  * POST /api/stove/shutdown
@@ -14,6 +15,15 @@ export const POST = withAuthAndErrorHandler(async (request) => {
 
   const stoveService = getStoveService();
   const result = await stoveService.shutdown(source);
+
+  // Analytics: log stove shutdown event (fire-and-forget, consent-gated)
+  const consent = request.headers.get('x-analytics-consent');
+  if (consent === 'granted') {
+    logAnalyticsEvent({
+      eventType: 'stove_shutdown',
+      source: source ?? 'manual',
+    }).catch(() => {}); // Fire-and-forget
+  }
 
   return success(result as Record<string, unknown>);
 }, 'Stove/Shutdown');

@@ -1,6 +1,7 @@
 import { withAuthAndErrorHandler, success, parseJson } from '@/lib/core';
 import { validateIgniteInput } from '@/lib/validators';
 import { getStoveService } from '@/lib/services/StoveService';
+import { logAnalyticsEvent } from '@/lib/analyticsEventLogger';
 
 /**
  * POST /api/stove/ignite
@@ -14,6 +15,16 @@ export const POST = withAuthAndErrorHandler(async (request) => {
 
   const stoveService = getStoveService();
   const result = await stoveService.ignite(power, source);
+
+  // Analytics: log stove ignite event (fire-and-forget, consent-gated)
+  const consent = request.headers.get('x-analytics-consent');
+  if (consent === 'granted') {
+    logAnalyticsEvent({
+      eventType: 'stove_ignite',
+      powerLevel: power,
+      source: source ?? 'manual',
+    }).catch(() => {}); // Fire-and-forget
+  }
 
   return success(result as Record<string, unknown>);
 }, 'Stove/Ignite');

@@ -1,6 +1,7 @@
 import { withAuthAndErrorHandler, success, parseJsonOrThrow } from '@/lib/core';
 import { validateSetPowerInput } from '@/lib/validators';
 import { getStoveService } from '@/lib/services/StoveService';
+import { logAnalyticsEvent } from '@/lib/analyticsEventLogger';
 
 /**
  * POST /api/stove/setPower
@@ -14,6 +15,16 @@ export const POST = withAuthAndErrorHandler(async (request) => {
 
   const stoveService = getStoveService();
   const result = await stoveService.setPower(level, source);
+
+  // Analytics: log power change event (fire-and-forget, consent-gated)
+  const consent = request.headers.get('x-analytics-consent');
+  if (consent === 'granted') {
+    logAnalyticsEvent({
+      eventType: 'power_change',
+      powerLevel: level,
+      source: source ?? 'manual',
+    }).catch(() => {}); // Fire-and-forget
+  }
 
   // Maintain backward-compatible response format
   if (result.modeChanged) {

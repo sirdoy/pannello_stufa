@@ -38,3 +38,17 @@ export interface StoveCommand {
   action: 'power_on' | 'power_off' | 'set_power' | 'set_temperature';
   value?: number;
 }
+
+/** PID tuning log entry for analysis and optimization */
+export interface PIDTuningLogEntry {
+  timestamp: number; // Unix timestamp in milliseconds
+  roomTemp: number; // Measured room temperature (°C)
+  powerLevel: number; // Current stove power level (1-5)
+  setpoint: number; // Target temperature (°C)
+  pidOutput: number; // Computed PID output (1-5)
+  error: number; // Current error (setpoint - measured)
+  integral: number; // Integral term state
+  derivative: number; // Derivative term (change in error)
+  roomId: string; // Netatmo room ID being monitored
+  roomName: string; // Room display name
+}

@@ -6,15 +6,57 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import StoveSyncPanel from '@/app/components/netatmo/StoveSyncPanel';
 
+// Mock Auth0 useUser hook
+jest.mock('@auth0/nextjs-auth0/client', () => ({
+  useUser: jest.fn(),
+}));
+
 // Mock fetch
 global.fetch = jest.fn() as jest.Mock;
 
 describe('StoveSyncPanel', () => {
+  const mockUseUser = require('@auth0/nextjs-auth0/client').useUser;
+  const mockUser = { sub: 'auth0|123', email: 'test@example.com' };
+
   beforeEach(() => {
     jest.clearAllMocks();
+    // Default: authenticated user
+    mockUseUser.mockReturnValue({ user: mockUser, isLoading: false });
   });
 
-  it('should render loading skeleton initially', () => {
+  it('should render loading skeleton while auth is loading', () => {
+    // Auth is still loading
+    mockUseUser.mockReturnValue({ user: null, isLoading: true });
+
+    const { container } = render(<StoveSyncPanel />);
+
+    // Should show skeleton while auth is loading
+    const skeleton = container.querySelector('[class*="animate-shimmer"]');
+    const hasSkeletonStyle = container.innerHTML.includes('bg-slate-700/50');
+    expect(skeleton || hasSkeletonStyle).toBeTruthy();
+  });
+
+  it('should show not authenticated message when user is not logged in', () => {
+    // Auth finished loading, no user
+    mockUseUser.mockReturnValue({ user: null, isLoading: false });
+
+    render(<StoveSyncPanel />);
+
+    // Should show auth required message
+    expect(screen.getByText(/Devi essere autenticato/i)).toBeInTheDocument();
+  });
+
+  it('should not fetch config until user is authenticated', () => {
+    // Auth is still loading
+    mockUseUser.mockReturnValue({ user: null, isLoading: true });
+
+    render(<StoveSyncPanel />);
+
+    // fetch should NOT be called yet
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('should render loading skeleton while fetching config', () => {
     // Mock fetch to never resolve (stays in loading state)
     (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
 

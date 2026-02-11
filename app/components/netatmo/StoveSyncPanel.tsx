@@ -13,6 +13,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useUser } from '@auth0/nextjs-auth0/client';
 import { Card, Button, Banner, Skeleton, Heading, Text } from '@/app/components/ui';
 import Toggle from '@/app/components/ui/Toggle';
 import { NETATMO_ROUTES, STOVE_ROUTES } from '@/lib/routes';
@@ -92,6 +93,7 @@ function getRoomTypeLabel(type: string): string {
 }
 
 export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) {
+  const { user, isLoading: userLoading } = useUser();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [syncing, setSyncing] = useState(false);
@@ -110,8 +112,15 @@ export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) 
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
+    // Wait for auth to be verified before fetching config
+    if (userLoading) return;
+    if (!user) {
+      // Auth loaded but no user - stop loading state
+      setLoading(false);
+      return;
+    }
     fetchConfig();
-  }, []);
+  }, [user, userLoading]);
 
   async function fetchConfig() {
     try {
@@ -334,10 +343,22 @@ export default function StoveSyncPanel({ onSyncComplete }: StoveSyncPanelProps) 
     }
   }
 
-  if (loading) {
+  // Loading state (including auth loading)
+  if (userLoading || loading) {
     return (
       <Card variant="glass" className="p-6">
         <Skeleton className="h-64" />
+      </Card>
+    );
+  }
+
+  // Not authenticated
+  if (!user) {
+    return (
+      <Card variant="glass" className="p-6">
+        <Text variant="secondary">
+          Devi essere autenticato per configurare la sincronizzazione.
+        </Text>
       </Card>
     );
   }

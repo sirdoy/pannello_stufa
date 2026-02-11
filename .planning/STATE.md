@@ -11,13 +11,13 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 54 of 54 (Analytics Dashboard & Consent Management) — IN PROGRESS
-Plan: 5/8 completed (54-01, 54-02, 54-03, 54-04, 54-08)
-Status: GDPR consent banner complete (visual parity, global rendering)
-Last activity: 2026-02-11 - Completed Phase 54 Plan 04: GDPR Consent Banner
+Plan: 6/8 completed (54-01, 54-02, 54-03, 54-04, 54-05, 54-06, 54-08)
+Status: Analytics chart components complete (usage, consumption, weather correlation)
+Last activity: 2026-02-11 - Completed Phase 54 Plan 06: Analytics Chart Components
 
-Progress: [█████████░] 89.4% (271 of 303 estimated total plans)
+Progress: [█████████░] 89.7% (272 of 303 estimated total plans)
 
-Next action: Continue Phase 54 execution (remaining 3 plans: 54-05, 54-06, 54-07)
+Next action: Continue Phase 54 execution (remaining 2 plans: 54-07)
 
 ## Performance Metrics
 
@@ -93,7 +93,10 @@ Next action: Continue Phase 54 execution (remaining 3 plans: 54-05, 54-06, 54-07
 | 54-02 | 3.6 min | 1 | 2 | 2026-02-11 | Complete ✅ |
 | 54-03 | 4.5 min | 2 | 3 | 2026-02-11 | Complete ✅ |
 | 54-04 | 5.4 min | 3 | 3 | 2026-02-11 | Complete ✅ |
+| 54-05 | 3.4 min | 2 | 4 | 2026-02-11 | Complete ✅ |
+| 54-06 | 3.8 min | 2 | 3 | 2026-02-11 | Complete ✅ |
 | 54-08 | TBD | 2 | 4 | 2026-02-11 | Complete ✅ |
+| Phase 54 P05 | 4.0 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -158,6 +161,11 @@ Recent decisions affecting v6.0 work (full log in PROJECT.md):
 - [Phase 53-02]: 5-second polling interval for staleness updates provides real-time info without excessive re-renders
 - [Phase 54-08]: Consent enforcement at call site: API routes check X-Analytics-Consent header, scheduler logs unconditionally
 - [Phase 54-08]: Fire-and-forget analytics pattern: .catch(() => {}) ensures analytics never blocks stove operations
+- [Phase 54-06]: Power level color scheme: slate→amber→ember→orange→red (low to high heat intensity)
+- [Phase 54-06]: Ocean blue (#437dae) for temperature line: Contrasts with warm ember palette
+- [Phase 54-05]: Stats API reads pre-aggregated daily stats and applies user calibration factor for period totals
+- [Phase 54-05]: Period filtering in-memory after Firebase fetch (simple and sufficient for expected data volume)
+- [Phase 54-05]: Calibration factor rounded to 4 decimals for precision/readability balance
 
 ### Pending Todos
 

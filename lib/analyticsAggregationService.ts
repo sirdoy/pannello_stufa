@@ -113,7 +113,11 @@ export async function aggregateDailyStats(dateKey: string): Promise<DailyStats> 
 
     // Round all values to 2 decimal places
     Object.keys(byPowerLevel).forEach(level => {
-      byPowerLevel[parseInt(level)] = parseFloat(byPowerLevel[parseInt(level)].toFixed(2));
+      const levelNum = parseInt(level);
+      const hours = byPowerLevel[levelNum];
+      if (hours !== undefined) {
+        byPowerLevel[levelNum] = parseFloat(hours.toFixed(2));
+      }
     });
     automationHours = parseFloat(automationHours.toFixed(2));
     manualHours = parseFloat(manualHours.toFixed(2));

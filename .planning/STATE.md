@@ -166,6 +166,7 @@ Recent decisions affecting v6.0 work (full log in PROJECT.md):
 - [Phase 54-05]: Stats API reads pre-aggregated daily stats and applies user calibration factor for period totals
 - [Phase 54-05]: Period filtering in-memory after Firebase fetch (simple and sufficient for expected data volume)
 - [Phase 54-05]: Calibration factor rounded to 4 decimals for precision/readability balance
+- [Phase 54-05]: StatsCards uses lucide-react icons per project standard (no emoji placeholders)
 
 ### Pending Todos
 

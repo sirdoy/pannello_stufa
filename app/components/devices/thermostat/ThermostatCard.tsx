@@ -15,6 +15,7 @@ import { useScheduleData } from '@/lib/hooks/useScheduleData';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useDeviceStaleness } from '@/lib/hooks/useDeviceStaleness';
 import { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
+import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 
@@ -57,7 +58,6 @@ export default function ThermostatCard() {
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);
 
   const connectionCheckedRef = useRef(false);
-  const pollingStartedRef = useRef(false);
 
   // Retry infrastructure - one hook per command type
   const netatmoModeCmd = useRetryableCommand({ device: 'netatmo', action: 'setMode' });
@@ -79,20 +79,13 @@ export default function ThermostatCard() {
     checkConnection();
   }, []);
 
-  // Poll status every 30 seconds if connected
-  useEffect(() => {
-    if (!topology) return;
-    if (pollingStartedRef.current) return;
-    pollingStartedRef.current = true;
-
-    fetchStatus();
-    const interval = setInterval(fetchStatus, 30000);
-
-    return () => {
-      clearInterval(interval);
-      pollingStartedRef.current = false;
-    };
-  }, [topology]);
+  // Poll status every 30 seconds - pauses when tab hidden
+  useAdaptivePolling({
+    callback: fetchStatus,
+    interval: topology ? 30000 : null, // Only poll when connected (topology exists)
+    alwaysActive: false, // Non-critical: pause when hidden
+    immediate: true,
+  });
 
   // Get rooms with status (includes stove sync info)
   // Shows ALL rooms including offline ones

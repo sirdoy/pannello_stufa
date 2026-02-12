@@ -9,6 +9,7 @@ import { Divider, Heading, Button, ControlButton, EmptyState, Text, Slider } fro
 import { cn } from '@/lib/utils/cn';
 import { supportsColor, getCurrentColorHex } from '@/lib/hue/colorUtils';
 import { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
+import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 
 /**
  * LightsCard - Complete Philips Hue lights control for homepage
@@ -42,7 +43,6 @@ export default function LightsCard() {
   const [pairingError, setPairingError] = useState<string | null>(null);
 
   const connectionCheckedRef = useRef(false);
-  const pollingStartedRef = useRef(false);
   const pairingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Retry infrastructure - use general hooks for room/scene commands
@@ -56,20 +56,13 @@ export default function LightsCard() {
     checkConnection();
   }, []);
 
-  // Poll data every 30 seconds if connected
-  useEffect(() => {
-    if (!connected) return;
-    if (pollingStartedRef.current) return;
-    pollingStartedRef.current = true;
-
-    fetchData();
-    const interval = setInterval(fetchData, 30000);
-
-    return () => {
-      clearInterval(interval);
-      pollingStartedRef.current = false;
-    };
-  }, [connected]);
+  // Poll data every 30 seconds - pauses when tab hidden
+  useAdaptivePolling({
+    callback: fetchData,
+    interval: connected ? 30000 : null, // Only poll when connected
+    alwaysActive: false, // Non-critical: pause when hidden
+    immediate: true,
+  });
 
   // Auto-select first room
   useEffect(() => {

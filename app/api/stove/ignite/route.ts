@@ -1,4 +1,4 @@
-import { withAuthAndErrorHandler, success, parseJson } from '@/lib/core';
+import { withAuthAndErrorHandler, withIdempotency, success, parseJson } from '@/lib/core';
 import { validateIgniteInput } from '@/lib/validators';
 import { getStoveService } from '@/lib/services/StoveService';
 import { logAnalyticsEvent } from '@/lib/analyticsEventLogger';
@@ -8,23 +8,27 @@ import { logAnalyticsEvent } from '@/lib/analyticsEventLogger';
  * Ignites the stove
  * Supports sandbox mode in localhost
  * Protected: Requires Auth0 authentication
+ * Idempotent: Returns cached response for duplicate Idempotency-Key
  */
-export const POST = withAuthAndErrorHandler(async (request) => {
-  const body = await parseJson(request);
-  const { power, source } = validateIgniteInput(body);
+export const POST = withAuthAndErrorHandler(
+  withIdempotency(async (request) => {
+    const body = await parseJson(request);
+    const { power, source } = validateIgniteInput(body);
 
-  const stoveService = getStoveService();
-  const result = await stoveService.ignite(power, source);
+    const stoveService = getStoveService();
+    const result = await stoveService.ignite(power, source);
 
-  // Analytics: log stove ignite event (fire-and-forget, consent-gated)
-  const consent = request.headers.get('x-analytics-consent');
-  if (consent === 'granted') {
-    logAnalyticsEvent({
-      eventType: 'stove_ignite',
-      powerLevel: power,
-      source: source ?? 'manual',
-    }).catch(() => {}); // Fire-and-forget
-  }
+    // Analytics: log stove ignite event (fire-and-forget, consent-gated)
+    const consent = request.headers.get('x-analytics-consent');
+    if (consent === 'granted') {
+      logAnalyticsEvent({
+        eventType: 'stove_ignite',
+        powerLevel: power,
+        source: source ?? 'manual',
+      }).catch(() => {}); // Fire-and-forget
+    }
 
-  return success(result as Record<string, unknown>);
-}, 'Stove/Ignite');
+    return success(result as Record<string, unknown>);
+  }),
+  'Stove/Ignite'
+);

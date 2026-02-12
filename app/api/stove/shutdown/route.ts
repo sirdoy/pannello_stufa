@@ -1,4 +1,4 @@
-import { withAuthAndErrorHandler, success, parseJson } from '@/lib/core';
+import { withAuthAndErrorHandler, withIdempotency, success, parseJson } from '@/lib/core';
 import { validateShutdownInput } from '@/lib/validators';
 import { getStoveService } from '@/lib/services/StoveService';
 import { logAnalyticsEvent } from '@/lib/analyticsEventLogger';
@@ -8,22 +8,26 @@ import { logAnalyticsEvent } from '@/lib/analyticsEventLogger';
  * Shuts down the stove
  * Supports sandbox mode in localhost
  * Protected: Requires Auth0 authentication
+ * Idempotent: Returns cached response for duplicate Idempotency-Key
  */
-export const POST = withAuthAndErrorHandler(async (request) => {
-  const body = await parseJson(request);
-  const { source } = validateShutdownInput(body);
+export const POST = withAuthAndErrorHandler(
+  withIdempotency(async (request) => {
+    const body = await parseJson(request);
+    const { source } = validateShutdownInput(body);
 
-  const stoveService = getStoveService();
-  const result = await stoveService.shutdown(source);
+    const stoveService = getStoveService();
+    const result = await stoveService.shutdown(source);
 
-  // Analytics: log stove shutdown event (fire-and-forget, consent-gated)
-  const consent = request.headers.get('x-analytics-consent');
-  if (consent === 'granted') {
-    logAnalyticsEvent({
-      eventType: 'stove_shutdown',
-      source: source ?? 'manual',
-    }).catch(() => {}); // Fire-and-forget
-  }
+    // Analytics: log stove shutdown event (fire-and-forget, consent-gated)
+    const consent = request.headers.get('x-analytics-consent');
+    if (consent === 'granted') {
+      logAnalyticsEvent({
+        eventType: 'stove_shutdown',
+        source: source ?? 'manual',
+      }).catch(() => {}); // Fire-and-forget
+    }
 
-  return success(result as Record<string, unknown>);
-}, 'Stove/Shutdown');
+    return success(result as Record<string, unknown>);
+  }),
+  'Stove/Shutdown'
+);

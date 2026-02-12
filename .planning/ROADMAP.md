@@ -140,10 +140,12 @@ Plans:
 4. Complex state logic extracted into custom hooks for reusability
 5. Parent orchestrator manages state, children are presentational components receiving props
 
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 58-01: TBD
+- [ ] 58-01-PLAN.md — Extract custom hooks (useStoveData, useStoveCommands) and status utilities
+- [ ] 58-02-PLAN.md — Extract StoveStatus, StovePrimaryActions, StoveBanners sub-components
+- [ ] 58-03-PLAN.md — Extract StoveModeControl, StoveAdjustments, StoveMaintenance and finalize orchestrator
 
 ---
 

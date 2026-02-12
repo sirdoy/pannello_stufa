@@ -1,9 +1,10 @@
 'use client';
 
-import { Badge, Heading, Text } from '../../ui';
+import { Badge, Heading, Text } from '../../../ui';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 import type { getStatusInfo, getStatusDisplay } from '../stoveStatusUtils';
+import type { StalenessInfo } from '@/lib/pwa/stalenessDetector';
 
 interface StoveStatusProps {
   status: string;
@@ -11,7 +12,7 @@ interface StoveStatusProps {
   powerLevel: number | null;
   errorCode: number;
   sandboxMode: boolean;
-  staleness: { isStale: boolean; cachedAt: string | null } | null;
+  staleness: StalenessInfo | null;
   isVisible: boolean;
   statusInfo: ReturnType<typeof getStatusInfo>;
   statusDisplay: ReturnType<typeof getStatusDisplay>;
@@ -135,7 +136,7 @@ export default function StoveStatus({
         {staleness?.cachedAt && (
           <div className="mt-4 text-center">
             <Text variant="tertiary" size="sm">
-              Ultimo aggiornamento: {formatDistanceToNow(new Date(staleness.cachedAt), { addSuffix: true, locale: it })}
+              Ultimo aggiornamento: {formatDistanceToNow(staleness.cachedAt instanceof Date ? staleness.cachedAt : new Date(staleness.cachedAt), { addSuffix: true, locale: it })}
             </Text>
           </div>
         )}

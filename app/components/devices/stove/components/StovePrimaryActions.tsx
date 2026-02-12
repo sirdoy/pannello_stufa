@@ -1,7 +1,7 @@
 'use client';
 
-import Button from '../../ui/Button';
-import { Text } from '../../ui';
+import Button from '../../../ui/Button';
+import { Text } from '../../../ui';
 
 interface StovePrimaryActionsProps {
   isAccesa: boolean;

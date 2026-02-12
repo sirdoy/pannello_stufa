@@ -1,10 +1,10 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import ErrorAlert from '../../ui/ErrorAlert';
-import Banner from '../../ui/Banner';
-import Button from '../../ui/Button';
-import { Text } from '../../ui';
+import ErrorAlert from '../../../ui/ErrorAlert';
+import Banner from '../../../ui/Banner';
+import Button from '../../../ui/Button';
+import { Text } from '../../../ui';
 
 interface StoveBannersProps {
   errorCode: number;

@@ -119,9 +119,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 57-01-PLAN.md — Core hooks: useVisibility, useNetworkQuality, useAdaptivePolling (TDD)
-- [ ] 57-02-PLAN.md — ThermostatCard, LightsCard, CronHealthBanner integration
-- [ ] 57-03-PLAN.md — StoveCard visibility-aware staleness + useDeviceStaleness pause
+- [x] 57-01-PLAN.md — Core hooks: useVisibility, useNetworkQuality, useAdaptivePolling (TDD)
+- [x] 57-02-PLAN.md — ThermostatCard, LightsCard, CronHealthBanner integration
+- [x] 57-03-PLAN.md — StoveCard visibility-aware staleness + useDeviceStaleness pause
 
 ---
 
@@ -209,12 +209,12 @@ Plans:
 | 49-54 | v6.0 | 29/29 | ✓ Complete | 2026-02-11 |
 | 55 | v7.0 | 5/5 | ✓ Complete | 2026-02-12 |
 | 56 | v7.0 | 2/2 | ✓ Complete | 2026-02-12 |
-| 57 | v7.0 | 0/? | Not started | - |
+| 57 | v7.0 | 3/3 | ✓ Complete | 2026-02-12 |
 | 58 | v7.0 | 0/? | Not started | - |
 | 59 | v7.0 | 0/? | Not started | - |
 | 60 | v7.0 | 0/? | Not started | - |
 
-**Total:** 9 milestones shipped, 56 phases complete, 283 plans executed
+**Total:** 9 milestones shipped, 57 phases complete, 286 plans executed
 
 ---
 

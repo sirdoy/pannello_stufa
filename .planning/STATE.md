@@ -6,23 +6,23 @@ See: .planning/PROJECT.md (updated 2026-02-11)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** Phase 56 in progress — Error Boundaries foundation complete
+**Current focus:** Phase 56 in progress — Feature-level error boundaries complete
 
 ## Current Position
 
 Phase: 56 of 60 (Error Boundaries)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: In Progress
-Last activity: 2026-02-12 — Completed 56-01 (Error Boundaries Foundation)
+Last activity: 2026-02-12 — Completed 56-02 (Feature-Level Error Boundaries)
 
-Progress: [████████████████████░░░] 84% (282/336 estimated plans total)
+Progress: [████████████████████░░░] 84% (283/336 estimated plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 282 (phases 1-55 complete, 56 in progress)
+- Total plans completed: 283 (phases 1-55 complete, 56 in progress)
 - Average duration: ~15 min (estimated)
-- Total execution time: ~70 hours across 6 milestones
+- Total execution time: ~71 hours across 6 milestones
 
 **By Milestone:**
 
@@ -52,8 +52,9 @@ Progress: [████████████████████░░░
 | Phase-Plan | Duration | Tasks | Files | Tests |
 |------------|----------|-------|-------|-------|
 | 56-01 | 6 min | 2 | 9 | 12 |
+| 56-02 | 6 min | 2 | 8 | 13 |
 
-**Phase 56 In Progress:** 6 minutes, 1/4 plans complete, 9 files created/modified, 12 tests
+**Phase 56 In Progress:** 12 minutes, 2/4 plans complete, 17 files created/modified, 25 tests
 
 **Recent Phase 55 Metrics:**
 
@@ -93,6 +94,9 @@ Recent decisions affecting current work:
 - [Phase 56]: ValidationError bypasses error boundaries via instanceof check (safety-critical errors propagate)
 - [Phase 56]: Error logging is operational, not analytics (no consent check required per GDPR)
 - [Phase 56]: component_error events filtered from analytics aggregation (not usage statistics)
+- [Phase 56]: react-error-boundary library over manual Error Boundary implementation (battle-tested, hooks support)
+- [Phase 56]: Server Component (page.tsx) renders Client Component error boundaries (valid Next.js pattern)
+- [Phase 56]: DEVICE_META map provides fallback for unknown device IDs (⚠️ icon, raw card.id)
 
 ### Pending Todos
 
@@ -108,12 +112,13 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-12T09:44:29Z
-Stopped at: Completed 56-01 (Error Boundaries Foundation) - Phase 56 plan 1 of 4
+Last session: 2026-02-12T10:04:12Z
+Stopped at: Completed 56-02 (Feature-Level Error Boundaries) - Phase 56 plan 2 of 4
 Resume file: None
 
 **Phase 56 Progress:**
 - Plan 01: Error Boundaries Foundation ✓ COMPLETE (6 min, 12 tests, commits 16ba9e3, ef8fb4a)
+- Plan 02: Feature-Level Error Boundaries ✓ COMPLETE (6 min, 13 tests, commits 12e5f3d, aa085ee)
 
 **Phase 55 Progress (COMPLETE):**
 - Plan 01: Core Retry Infrastructure ✓ COMPLETE (13 min, 39 tests, commits d711733, 2645c3d)

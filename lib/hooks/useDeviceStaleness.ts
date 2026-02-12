@@ -3,14 +3,16 @@
  *
  * React hook for real-time device staleness monitoring.
  * Polls every 5 seconds to update staleness information.
+ * Pauses polling when tab is hidden (non-critical monitoring).
  *
  * @module useDeviceStaleness
  */
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { getDeviceStaleness, type StalenessInfo } from '@/lib/pwa/stalenessDetector';
+import { useVisibility } from './useVisibility';
 
 /**
  * Hook for monitoring device data staleness
@@ -38,30 +40,32 @@ import { getDeviceStaleness, type StalenessInfo } from '@/lib/pwa/stalenessDetec
  */
 export function useDeviceStaleness(deviceId: string): StalenessInfo | null {
   const [staleness, setStaleness] = useState<StalenessInfo | null>(null);
+  const isVisible = useVisibility();
+
+  const fetchStaleness = useCallback(async () => {
+    try {
+      const info = await getDeviceStaleness(deviceId);
+      setStaleness(info);
+    } catch (error) {
+      console.error(`[useDeviceStaleness] Error fetching staleness for ${deviceId}:`, error);
+      // Keep previous state on error, don't set to null
+    }
+  }, [deviceId]);
 
   useEffect(() => {
-    // Fetch immediately
-    const fetchStaleness = async () => {
-      try {
-        const info = await getDeviceStaleness(deviceId);
-        setStaleness(info);
-      } catch (error) {
-        console.error(`[useDeviceStaleness] Error fetching staleness for ${deviceId}:`, error);
-        // Keep previous state on error, don't set to null
-      }
-    };
+    // Don't poll when tab is hidden (staleness display is non-critical)
+    if (!isVisible) return;
 
-    // Initial fetch
+    // Fetch immediately when becoming visible
     fetchStaleness();
 
-    // Poll every 5 seconds
+    // Poll every 5 seconds while visible
     const intervalId = setInterval(fetchStaleness, 5000);
 
-    // Cleanup interval on unmount or deviceId change
     return () => {
       clearInterval(intervalId);
     };
-  }, [deviceId]);
+  }, [deviceId, isVisible, fetchStaleness]);
 
   return staleness;
 }

@@ -7,9 +7,15 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { useDeviceStaleness } from '../useDeviceStaleness';
 import * as stalenessDetector from '@/lib/pwa/stalenessDetector';
+import { useVisibility } from '../useVisibility';
 
 // Mock staleness detector
 jest.mock('@/lib/pwa/stalenessDetector');
+
+// Mock useVisibility
+jest.mock('../useVisibility', () => ({
+  useVisibility: jest.fn(() => true), // Default: visible
+}));
 
 describe('useDeviceStaleness', () => {
   beforeEach(() => {
@@ -191,5 +197,85 @@ describe('useDeviceStaleness', () => {
     });
 
     expect(result.current).toBeNull();
+  });
+
+  it('pauses polling when tab is hidden', () => {
+    jest.mocked(useVisibility).mockReturnValue(false);
+    const mockStaleness = {
+      isStale: false,
+      cachedAt: new Date(),
+      ageSeconds: 5,
+    };
+    jest.mocked(stalenessDetector.getDeviceStaleness).mockResolvedValue(mockStaleness);
+
+    renderHook(() => useDeviceStaleness('stove'));
+
+    // Should not call getDeviceStaleness when hidden
+    expect(stalenessDetector.getDeviceStaleness).not.toHaveBeenCalled();
+
+    // Advance time - should not poll
+    jest.advanceTimersByTime(10000);
+    expect(stalenessDetector.getDeviceStaleness).not.toHaveBeenCalled();
+  });
+
+  it('resumes polling when tab becomes visible', async () => {
+    const mockStaleness = {
+      isStale: false,
+      cachedAt: new Date(),
+      ageSeconds: 5,
+    };
+    jest.mocked(stalenessDetector.getDeviceStaleness).mockResolvedValue(mockStaleness);
+
+    // Start hidden
+    jest.mocked(useVisibility).mockReturnValue(false);
+    const { rerender } = renderHook(() => useDeviceStaleness('stove'));
+
+    // Verify no call when hidden
+    expect(stalenessDetector.getDeviceStaleness).not.toHaveBeenCalled();
+
+    // Become visible
+    jest.mocked(useVisibility).mockReturnValue(true);
+    rerender();
+
+    // Should fetch immediately on visibility restore
+    await waitFor(() => {
+      expect(stalenessDetector.getDeviceStaleness).toHaveBeenCalled();
+    });
+
+    const firstCallCount = jest.mocked(stalenessDetector.getDeviceStaleness).mock.calls.length;
+
+    // Should resume interval polling
+    jest.advanceTimersByTime(5000);
+    await waitFor(() => {
+      expect(stalenessDetector.getDeviceStaleness).toHaveBeenCalledTimes(firstCallCount + 1);
+    });
+  });
+
+  it('stops polling when visibility is lost again', async () => {
+    const mockStaleness = {
+      isStale: false,
+      cachedAt: new Date(),
+      ageSeconds: 5,
+    };
+    jest.mocked(stalenessDetector.getDeviceStaleness).mockResolvedValue(mockStaleness);
+
+    // Start visible
+    jest.mocked(useVisibility).mockReturnValue(true);
+    const { rerender } = renderHook(() => useDeviceStaleness('stove'));
+
+    // Wait for initial fetch
+    await waitFor(() => {
+      expect(stalenessDetector.getDeviceStaleness).toHaveBeenCalled();
+    });
+
+    const callsWhileVisible = jest.mocked(stalenessDetector.getDeviceStaleness).mock.calls.length;
+
+    // Hide tab
+    jest.mocked(useVisibility).mockReturnValue(false);
+    rerender();
+
+    // Advance time - should not poll when hidden
+    jest.advanceTimersByTime(10000);
+    expect(stalenessDetector.getDeviceStaleness).toHaveBeenCalledTimes(callsWhileVisible);
   });
 });

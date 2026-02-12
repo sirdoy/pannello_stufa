@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { ref, get } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import Banner from './ui/Banner';
 import Button from './ui/Button';
+import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
+import { useNetworkQuality } from '@/lib/hooks/useNetworkQuality';
 
 interface CronHealthBannerProps {
   variant?: 'banner' | 'inline';
@@ -14,48 +16,48 @@ export default function CronHealthBanner({ variant = 'banner' }: CronHealthBanne
   const [showBanner, setShowBanner] = useState(false);
   const [lastCallTime, setLastCallTime] = useState<string | null>(null);
   const [minutesSinceLastCall, setMinutesSinceLastCall] = useState(0);
+  const networkQuality = useNetworkQuality();
 
-  useEffect(() => {
-    // Manual polling instead of listener (workaround for stale data)
-    const fetchCronHealth = async () => {
-      try {
-        const snapshot = await get(ref(db, 'cronHealth/lastCall'));
-        if (snapshot.exists()) {
-          const lastCall = snapshot.val();
-          setLastCallTime(lastCall);
-        }
-      } catch (error) {
-        console.error('❌ Error fetching cronHealth:', error);
+  // Fetch cron health data
+  const fetchCronHealth = useCallback(async () => {
+    try {
+      const snapshot = await get(ref(db, 'cronHealth/lastCall'));
+      if (snapshot.exists()) {
+        const lastCall = snapshot.val();
+        setLastCallTime(lastCall);
       }
-    };
-
-    fetchCronHealth(); // Initial fetch
-    const interval = setInterval(fetchCronHealth, 30000); // Poll every 30s
-
-    return () => clearInterval(interval);
+    } catch (error) {
+      console.error('[CronHealthBanner] Error fetching cronHealth:', error);
+    }
   }, []);
 
-  useEffect(() => {
-    // Check every 30 seconds if cron is healthy
-    const checkCronHealth = () => {
-      if (!lastCallTime) {
-        return;
-      }
+  // Network-aware polling: 30s on fast/unknown, 60s on slow
+  const cronInterval = networkQuality === 'slow' ? 60000 : 30000;
 
-      const lastCallDate = new Date(lastCallTime);
-      const now = new Date();
-      const diffMs = now.getTime() - lastCallDate.getTime();
-      const diffMinutes = Math.floor(diffMs / 1000 / 60);
+  useAdaptivePolling({
+    callback: fetchCronHealth,
+    interval: cronInterval,
+    alwaysActive: false, // Non-critical: pause when hidden
+    immediate: true,
+  });
 
-      setMinutesSinceLastCall(diffMinutes);
-      setShowBanner(diffMinutes > 5);
-    };
-
-    checkCronHealth();
-    const interval = setInterval(checkCronHealth, 30000); // Check every 30s
-
-    return () => clearInterval(interval);
+  // Check staleness of cron data
+  const checkCronHealth = useCallback(() => {
+    if (!lastCallTime) return;
+    const lastCallDate = new Date(lastCallTime);
+    const now = new Date();
+    const diffMs = now.getTime() - lastCallDate.getTime();
+    const diffMinutes = Math.floor(diffMs / 1000 / 60);
+    setMinutesSinceLastCall(diffMinutes);
+    setShowBanner(diffMinutes > 5);
   }, [lastCallTime]);
+
+  useAdaptivePolling({
+    callback: checkCronHealth,
+    interval: 30000,
+    alwaysActive: false,
+    immediate: true,
+  });
 
   if (!showBanner) return null;
 

@@ -49,6 +49,10 @@ export async function logAnalyticsEvent(
       source: event.source,
       ...(event.powerLevel !== undefined && { powerLevel: event.powerLevel }),
       ...(event.userId && { userId: event.userId }),
+      ...(event.component && { component: event.component }),
+      ...(event.errorMessage && { errorMessage: event.errorMessage }),
+      ...(event.errorStack && { errorStack: event.errorStack }),
+      ...(event.device && { device: event.device }),
     };
 
     // Write to Firebase RTDB (environment-specific path)

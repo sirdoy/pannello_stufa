@@ -116,10 +116,12 @@ Plans:
 4. Non-critical data (weather, FCM tokens) reduces polling frequency on slow network
 5. Staleness indicator appears on device cards when data is older than expected refresh interval
 
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 57-01: TBD
+- [ ] 57-01-PLAN.md — Core hooks: useVisibility, useNetworkQuality, useAdaptivePolling (TDD)
+- [ ] 57-02-PLAN.md — ThermostatCard, LightsCard, CronHealthBanner integration
+- [ ] 57-03-PLAN.md — StoveCard visibility-aware staleness + useDeviceStaleness pause
 
 ---
 

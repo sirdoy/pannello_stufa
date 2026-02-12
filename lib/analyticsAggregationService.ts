@@ -80,7 +80,8 @@ export async function aggregateDailyStats(dateKey: string): Promise<DailyStats> 
         // Start new session
         sessionStart = eventTime;
         currentPowerLevel = event.powerLevel ?? 1;
-        currentSource = event.source;
+        // After filtering component_error events, source is guaranteed to be one of the usage types
+        currentSource = event.source as 'manual' | 'scheduler' | 'automation';
 
       } else if (event.eventType === 'power_change') {
         if (sessionStart) {

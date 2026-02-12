@@ -143,9 +143,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 58-01-PLAN.md — Extract custom hooks (useStoveData, useStoveCommands) and status utilities
-- [ ] 58-02-PLAN.md — Extract StoveStatus, StovePrimaryActions, StoveBanners sub-components
-- [ ] 58-03-PLAN.md — Extract StoveModeControl, StoveAdjustments, StoveMaintenance and finalize orchestrator
+- [x] 58-01-PLAN.md — Extract custom hooks (useStoveData, useStoveCommands) and status utilities
+- [x] 58-02-PLAN.md — Extract StoveStatus, StovePrimaryActions, StoveBanners sub-components
+- [x] 58-03-PLAN.md — Extract StoveModeControl, StoveAdjustments, StoveMaintenance and finalize orchestrator
 
 ---
 
@@ -212,7 +212,7 @@ Plans:
 | 55 | v7.0 | 5/5 | ✓ Complete | 2026-02-12 |
 | 56 | v7.0 | 2/2 | ✓ Complete | 2026-02-12 |
 | 57 | v7.0 | 3/3 | ✓ Complete | 2026-02-12 |
-| 58 | v7.0 | 0/? | Not started | - |
+| 58 | v7.0 | 3/3 | ✓ Complete | 2026-02-12 |
 | 59 | v7.0 | 0/? | Not started | - |
 | 60 | v7.0 | 0/? | Not started | - |
 

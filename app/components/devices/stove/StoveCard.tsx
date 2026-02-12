@@ -29,6 +29,7 @@ import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
 import { useDeviceStaleness } from '@/lib/hooks/useDeviceStaleness';
 import { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
+import { useVisibility } from '@/lib/hooks/useVisibility';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 
@@ -47,6 +48,7 @@ export default function StoveCard() {
 
   // Staleness tracking
   const staleness = useDeviceStaleness('stove');
+  const isVisible = useVisibility();
 
   // Retry infrastructure - one hook per command type
   const igniteCmd = useRetryableCommand({ device: 'stove', action: 'ignite' });
@@ -1017,6 +1019,15 @@ export default function StoveCard() {
                 <div className="absolute -top-2 -right-2 z-30">
                   <Badge variant="danger" size="sm" pulse icon={<span>⚠️</span>}>
                     ERR {errorCode}
+                  </Badge>
+                </div>
+              )}
+
+              {/* Staleness Warning Badge - only when visible AND data is stale */}
+              {isVisible && staleness?.isStale && errorCode === 0 && (
+                <div className="absolute -top-2 -right-2 z-30">
+                  <Badge variant="warning" size="sm" icon={<span>⏱️</span>}>
+                    Dati non aggiornati
                   </Badge>
                 </div>
               )}

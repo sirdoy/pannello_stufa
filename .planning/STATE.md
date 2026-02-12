@@ -11,18 +11,18 @@ See: .planning/PROJECT.md (updated 2026-02-11)
 ## Current Position
 
 Phase: 57 of 60 (Adaptive Polling)
-Plan: 2 of 2 in current phase
+Plan: 3 of 3 in current phase
 Status: Complete
-Last activity: 2026-02-12 — Completed 57-02-PLAN.md (Adaptive Polling Integration)
+Last activity: 2026-02-12 — Completed 57-03-PLAN.md (Stove Staleness Integration)
 
-Progress: [████████████████████░░░] 85% (285/336 estimated plans total)
+Progress: [████████████████████░░░] 85% (286/336 estimated plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 285 (phases 1-57 complete)
+- Total plans completed: 286 (phases 1-57 complete)
 - Average duration: ~15 min (estimated)
-- Total execution time: ~71 hours across 6 milestones
+- Total execution time: ~72 hours across 6 milestones
 
 **By Milestone:**
 
@@ -53,8 +53,9 @@ Progress: [████████████████████░░░
 |------------|----------|-------|-------|-------|
 | 57-01 | 4 min | 2 | 6 | 21 |
 | 57-02 | 2 min | 2 | 4 | 4 |
+| 57-03 | 4 min | 2 | 3 | 18 |
 
-**Phase 57 Total:** 6 minutes, 2 plans, 10 files created/modified, 25 tests
+**Phase 57 Total:** 10 minutes, 3 plans, 13 files created/modified, 43 tests
 
 **Recent Phase 56 Metrics:**
 
@@ -112,8 +113,9 @@ Recent decisions affecting current work:
 - [Phase 57]: Ref pattern (Dan Abramov) for callback storage avoids stale closures in intervals
 - [Phase 57]: Network multiplier: 30s fast/unknown, 60s slow for CronHealthBanner
 - [Phase 57]: Two polling loops in CronHealthBanner: fetch + check (different concerns)
-- [Phase 57]: Network multiplier: 30s fast/unknown, 60s slow for CronHealthBanner
-- [Phase 57]: Two polling loops in CronHealthBanner: fetch + check (different concerns)
+- [Phase 57]: StoveCard polling is safety-critical and NEVER pauses (only staleness display is visibility-aware)
+- [Phase 57]: useDeviceStaleness pauses 5s IndexedDB polling when tab hidden (non-critical UI concern)
+- [Phase 57]: Staleness badge only shows when tab visible AND data stale (no point showing when user can't see)
 
 ### Pending Todos
 
@@ -129,13 +131,14 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-12T13:59:57Z
-Stopped at: Phase 57 (Adaptive Polling) COMPLETE — Plan 02 (Adaptive Polling Integration)
+Last session: 2026-02-12T14:01:40Z
+Stopped at: Phase 57 (Adaptive Polling) COMPLETE — Plan 03 (Stove Staleness Integration)
 Resume file: None
 
 **Phase 57 Progress:**
 - Plan 01: Adaptive Polling Foundation ✓ COMPLETE (4 min, 21 tests, commits b7c13b7, 6205766)
 - Plan 02: Adaptive Polling Integration ✓ COMPLETE (2 min, 4 tests, commits 9a4f648, f973c7b)
+- Plan 03: Stove Staleness Integration ✓ COMPLETE (4 min, 18 tests, commits ed7a0ff, fb3f650)
 
 **Phase 56 Progress:**
 - Plan 01: Error Boundaries Foundation ✓ COMPLETE (6 min, 12 tests, commits 16ba9e3, ef8fb4a)

@@ -51,7 +51,8 @@ export interface ToastProviderProps {
  * ToastProvider Component
  *
  * Wraps the app to provide toast notifications with stacking behavior.
- * Max 3 toasts visible at once, oldest removed when new ones added.
+ * Max 5 toasts visible at once, oldest removed when new ones added.
+ * Error toasts are persistent (duration: Infinity) and require manual dismissal.
  *
  * @example
  * // In layout.js
@@ -62,6 +63,7 @@ export interface ToastProviderProps {
  * // In any component
  * const { success, error } = useToast();
  * success('Saved successfully!');
+ * error('Failed!'); // Persistent, must be manually dismissed
  */
 export function ToastProvider({ children }: ToastProviderProps) {
   const [toasts, setToasts] = useState<ToastData[]>([]);
@@ -73,8 +75,11 @@ export function ToastProvider({ children }: ToastProviderProps) {
   const toast = useCallback(({ variant = 'info', message, title, duration, action }: ToastOptions) => {
     const id = ++toastIdRef.current;
 
-    // Default duration: 5000ms, 8000ms for errors
-    const defaultDuration = variant === 'error' ? 8000 : 5000;
+    // Default duration: 5000ms for most variants, 0 (persistent) for errors
+    const defaultDuration = variant === 'error' ? 0 : 5000;
+
+    // Convert duration: 0 to Infinity for Radix (persistent toast)
+    const radixDuration = (duration ?? defaultDuration) === 0 ? Infinity : (duration ?? defaultDuration);
 
     setToasts(prev => [
       ...prev,
@@ -83,7 +88,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
         variant,
         message,
         title,
-        duration: duration ?? defaultDuration,
+        duration: radixDuration,
         action,
       },
     ]);
@@ -118,8 +123,8 @@ export function ToastProvider({ children }: ToastProviderProps) {
   const info = useCallback((message: string, opts: Partial<ToastOptions> = {}) =>
     toast({ variant: 'info', message, ...opts }), [toast]);
 
-  // Only show max 3 toasts, slice from end (newest on top)
-  const visibleToasts = toasts.slice(-3);
+  // Only show max 5 toasts (increased for persistent error toasts), slice from end (newest on top)
+  const visibleToasts = toasts.slice(-5);
 
   return (
     <ToastContext.Provider value={{ toast, dismiss, dismissAll, success, error, warning, info }}>

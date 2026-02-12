@@ -64,7 +64,7 @@ describe('ToastProvider', () => {
   });
 
   describe('Toast Stacking', () => {
-    it('shows max 3 toasts at once', async () => {
+    it('shows max 5 toasts at once', async () => {
       let toastApi: ToastContextValue;
       renderWithProvider((api) => { toastApi = api; });
 
@@ -74,13 +74,17 @@ describe('ToastProvider', () => {
         toastApi.info('Toast 3');
         toastApi.info('Toast 4');
         toastApi.info('Toast 5');
+        toastApi.info('Toast 6');
+        toastApi.info('Toast 7');
       });
 
       await waitFor(() => {
-        // Only 3 should be visible (newest 3)
+        // Only 5 should be visible (newest 5)
         expect(screen.getByText('Toast 3')).toBeInTheDocument();
         expect(screen.getByText('Toast 4')).toBeInTheDocument();
         expect(screen.getByText('Toast 5')).toBeInTheDocument();
+        expect(screen.getByText('Toast 6')).toBeInTheDocument();
+        expect(screen.getByText('Toast 7')).toBeInTheDocument();
 
         // Oldest should be removed from view
         expect(screen.queryByText('Toast 1')).not.toBeInTheDocument();

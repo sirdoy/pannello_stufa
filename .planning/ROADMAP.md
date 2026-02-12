@@ -93,10 +93,11 @@ Plans:
 5. Validation errors (needsCleaning, maintenance alerts) bypass error boundary and show proper UI
 6. Component errors automatically log to Firebase Analytics for monitoring
 
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 56-01: TBD
+- [ ] 56-01-PLAN.md — Foundation: ValidationError class, error analytics API, global error.tsx
+- [ ] 56-02-PLAN.md — Feature error boundaries, homepage integration, tests
 
 ---
 
@@ -205,7 +206,7 @@ Plans:
 | 44-48 | v5.1 | 39/39 | ✓ Complete | 2026-02-10 |
 | 49-54 | v6.0 | 29/29 | ✓ Complete | 2026-02-11 |
 | 55 | v7.0 | 5/5 | ✓ Complete | 2026-02-12 |
-| 56 | v7.0 | 0/? | Not started | - |
+| 56 | v7.0 | 0/2 | Planned | - |
 | 57 | v7.0 | 0/? | Not started | - |
 | 58 | v7.0 | 0/? | Not started | - |
 | 59 | v7.0 | 0/? | Not started | - |

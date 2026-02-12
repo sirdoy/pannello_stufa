@@ -70,6 +70,7 @@ export {
   // Special
   withCronSecret,
   withHueHandler,
+  withIdempotency,
 } from './middleware';
 
 // =============================================================================

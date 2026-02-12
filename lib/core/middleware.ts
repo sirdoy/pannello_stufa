@@ -230,6 +230,76 @@ export function withHueHandler(handler: AuthedHandler, logContext: string | null
 }
 
 // =============================================================================
+// IDEMPOTENCY MIDDLEWARE
+// =============================================================================
+
+/**
+ * Wraps a route handler with idempotency key checking.
+ * If Idempotency-Key header is present:
+ *   - Checks Firebase RTDB for cached result at `idempotency/results/{key}`
+ *   - If found, returns cached result (200) without executing handler
+ *   - If not found, executes handler, caches result, returns response
+ * If no Idempotency-Key header, executes handler normally (backwards compatible).
+ *
+ * @param handler - Route handler function
+ * @param logContext - Context for error logging (optional)
+ * @returns Wrapped handler
+ *
+ * @example
+ * export const POST = withIdempotency(
+ *   withAuthAndErrorHandler(async (request, context, session) => {
+ *     await executeCommand();
+ *     return success({ executed: true });
+ *   }, 'StoveIgnite'),
+ *   'StoveIgnite'
+ * );
+ */
+export function withIdempotency(handler: AuthedHandler, logContext?: string): AuthedHandler {
+  return async (request, context, session) => {
+    const idempotencyKey = request.headers.get('Idempotency-Key');
+
+    if (!idempotencyKey) {
+      // No key — process normally (backwards compatible)
+      return handler(request, context, session);
+    }
+
+    // Check for cached result
+    const { ref, get, set } = await import('firebase/database');
+    const { db } = await import('@/lib/firebase');
+    const resultRef = ref(db, `idempotency/results/${idempotencyKey}`);
+    const existing = await get(resultRef);
+
+    if (existing.exists()) {
+      const cached = existing.val();
+      // Return cached result
+      return NextResponse.json(cached.data, { status: cached.status });
+    }
+
+    // Execute handler
+    const response = await handler(request, context, session);
+
+    // Cache result (only for successful responses)
+    if (response.ok) {
+      try {
+        const cloned = response.clone();
+        const data = await cloned.json();
+        await set(resultRef, {
+          data,
+          status: response.status,
+          timestamp: Date.now(),
+          expiresAt: Date.now() + 60 * 60 * 1000, // 1 hour TTL (matches client)
+        });
+      } catch {
+        // Cache failure should not break the response
+        console.warn(`[Idempotency] Failed to cache result for key ${idempotencyKey}`, logContext);
+      }
+    }
+
+    return response;
+  };
+}
+
+// =============================================================================
 // HELPER: COMBINE MULTIPLE MIDDLEWARE
 // =============================================================================
 

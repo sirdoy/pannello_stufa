@@ -29,7 +29,10 @@ import type { AnalyticsEvent, DailyStats } from '@/types/analytics';
 export async function aggregateDailyStats(dateKey: string): Promise<DailyStats> {
   try {
     // Get raw events for date
-    const events = await getAnalyticsEventsForDate(dateKey);
+    const rawEvents = await getAnalyticsEventsForDate(dateKey);
+
+    // Filter out component_error events (not relevant for usage statistics)
+    const events = rawEvents.filter(event => event.eventType !== 'component_error');
 
     if (events.length === 0) {
       return createEmptyStats(dateKey);

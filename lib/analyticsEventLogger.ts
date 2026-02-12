@@ -92,6 +92,39 @@ export async function getAnalyticsEventsForDate(dateKey: string): Promise<Analyt
 }
 
 /**
+ * Log component error to Firebase RTDB
+ *
+ * Fire-and-forget pattern: logs component errors for monitoring and debugging.
+ * Used by error boundaries to track component failures.
+ * Errors are logged but never thrown to avoid blocking caller.
+ *
+ * NOTE: This function does NOT check consent. Error logging is operational,
+ * not analytics tracking per GDPR (logging errors is necessary for app function).
+ *
+ * @param params - Error details (device, component, message, stack)
+ */
+export async function logComponentError(params: {
+  device?: string;
+  component: string;
+  message: string;
+  stack?: string;
+}): Promise<void> {
+  try {
+    await logAnalyticsEvent({
+      eventType: 'component_error',
+      source: 'error_boundary',
+      component: params.component,
+      errorMessage: params.message,
+      errorStack: params.stack,
+      device: params.device,
+    });
+  } catch (error) {
+    console.error('❌ Failed to log component error (non-blocking):', error);
+    // Don't throw - this is fire-and-forget
+  }
+}
+
+/**
  * Cleanup analytics events older than retention period
  *
  * Fire-and-forget pattern: removes old entries to prevent unbounded growth.

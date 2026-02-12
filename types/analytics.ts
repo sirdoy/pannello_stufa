@@ -14,10 +14,10 @@
 export type ConsentState = 'unknown' | 'granted' | 'denied';
 
 /** Analytics event types for stove operations */
-export type AnalyticsEventType = 'stove_ignite' | 'stove_shutdown' | 'power_change';
+export type AnalyticsEventType = 'stove_ignite' | 'stove_shutdown' | 'power_change' | 'component_error';
 
 /** Event source classification */
-export type AnalyticsEventSource = 'manual' | 'scheduler' | 'automation';
+export type AnalyticsEventSource = 'manual' | 'scheduler' | 'automation' | 'error_boundary';
 
 /** Analytics event logged to Firebase RTDB */
 export interface AnalyticsEvent {
@@ -31,6 +31,14 @@ export interface AnalyticsEvent {
   source: AnalyticsEventSource;
   /** User ID if manual action (Auth0 sub) */
   userId?: string;
+  /** Component name for component_error events */
+  component?: string;
+  /** Error message for component_error events */
+  errorMessage?: string;
+  /** Error stack trace for component_error events */
+  errorStack?: string;
+  /** Device ID for component_error events */
+  device?: string;
 }
 
 /** Daily aggregated statistics */

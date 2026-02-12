@@ -69,11 +69,11 @@ See `.planning/milestones/` for full archives.
 **Plans**: 5 plans
 
 Plans:
-- [ ] 55-01-PLAN.md — Retry client with exponential backoff + deduplication manager (TDD)
-- [ ] 55-02-PLAN.md — Idempotency key manager with Firebase RTDB storage (TDD)
-- [ ] 55-03-PLAN.md — Persistent error toasts + useRetryableCommand hook
-- [ ] 55-04-PLAN.md — Server-side idempotency middleware (withIdempotency)
-- [ ] 55-05-PLAN.md — Device card integration + API route wiring + visual verification
+- [x] 55-01-PLAN.md — Retry client with exponential backoff + deduplication manager (TDD)
+- [x] 55-02-PLAN.md — Idempotency key manager with Firebase RTDB storage (TDD)
+- [x] 55-03-PLAN.md — Persistent error toasts + useRetryableCommand hook
+- [x] 55-04-PLAN.md — Server-side idempotency middleware (withIdempotency)
+- [x] 55-05-PLAN.md — Device card integration + API route wiring + visual verification
 
 ---
 
@@ -204,14 +204,14 @@ Plans:
 | 37-43 | v5.0 | 56/56 | ✓ Complete | 2026-02-08 |
 | 44-48 | v5.1 | 39/39 | ✓ Complete | 2026-02-10 |
 | 49-54 | v6.0 | 29/29 | ✓ Complete | 2026-02-11 |
-| 55 | v7.0 | 0/? | Not started | - |
+| 55 | v7.0 | 5/5 | ✓ Complete | 2026-02-12 |
 | 56 | v7.0 | 0/? | Not started | - |
 | 57 | v7.0 | 0/? | Not started | - |
 | 58 | v7.0 | 0/? | Not started | - |
 | 59 | v7.0 | 0/? | Not started | - |
 | 60 | v7.0 | 0/? | Not started | - |
 
-**Total:** 9 milestones shipped, 54 phases complete, 276 plans executed
+**Total:** 9 milestones shipped, 55 phases complete, 281 plans executed
 
 ---
 

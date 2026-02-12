@@ -6,7 +6,7 @@ See: .planning/PROJECT.md (updated 2026-02-11)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** Phase 55 - Retry Infrastructure
+**Current focus:** Phase 55 complete — ready for Phase 56 (Error Boundaries)
 
 ## Current Position
 

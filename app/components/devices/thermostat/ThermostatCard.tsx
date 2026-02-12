@@ -14,6 +14,7 @@ import BatteryWarning, { ModuleBatteryList } from './BatteryWarning';
 import { useScheduleData } from '@/lib/hooks/useScheduleData';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useDeviceStaleness } from '@/lib/hooks/useDeviceStaleness';
+import { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 
@@ -57,6 +58,12 @@ export default function ThermostatCard() {
 
   const connectionCheckedRef = useRef(false);
   const pollingStartedRef = useRef(false);
+
+  // Retry infrastructure - one hook per command type
+  const netatmoModeCmd = useRetryableCommand({ device: 'netatmo', action: 'setMode' });
+  const netatmoTempCmd = useRetryableCommand({ device: 'netatmo', action: 'setTemp' });
+  const netatmoCalibrateCmd = useRetryableCommand({ device: 'netatmo', action: 'calibrate' });
+  const netatmoScheduleCmd = useRetryableCommand({ device: 'netatmo', action: 'setSchedule' });
 
   // Sync selectedScheduleId with activeSchedule
   useEffect(() => {
@@ -282,47 +289,36 @@ export default function ThermostatCard() {
   }
 
   async function handleModeChange(newMode: string) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
     try {
       setLoadingMessage('Cambio modalità termostato...');
       setRefreshing(true);
       setError(null);
-      const response = await fetch(NETATMO_ROUTES.setThermMode, {
+      const response = await netatmoModeCmd.execute(NETATMO_ROUTES.setThermMode, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode: newMode }),
-        signal: controller.signal,
       });
 
-      const data = await response.json() as { error?: string };
-      if (data.error) throw new Error(data.error);
-      // Aggiorna status dopo il comando
-      await fetchStatus();
-    } catch (err: unknown) {
-      if ((err as Error).name === 'AbortError') {
-        setError('Connessione persa — azione annullata');
-        setRefreshing(false);
-        return;
+      if (response) {
+        const data = await response.json() as { error?: string };
+        if (data.error) throw new Error(data.error);
+        await fetchStatus();
       }
+      // If response is null, request was deduplicated (silently blocked)
+    } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       setError(message);
     } finally {
-      clearTimeout(timeoutId);
       setRefreshing(false);
     }
   }
 
   async function handleTemperatureChange(roomId: string, temp: number) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
     try {
       setLoadingMessage('Modifica temperatura...');
       setRefreshing(true);
       setError(null);
-      const response = await fetch((NETATMO_ROUTES as any).setRoomThermpoint, {
+      const response = await netatmoTempCmd.execute((NETATMO_ROUTES as any).setRoomThermpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -330,31 +326,23 @@ export default function ThermostatCard() {
           mode: 'manual',
           temp,
         }),
-        signal: controller.signal,
       });
 
-      const data = await response.json() as { error?: string };
-      if (data.error) throw new Error(data.error);
-      // Aggiorna status dopo il comando
-      await fetchStatus();
-    } catch (err: unknown) {
-      if ((err as Error).name === 'AbortError') {
-        setError('Connessione persa — azione annullata');
-        setRefreshing(false);
-        return;
+      if (response) {
+        const data = await response.json() as { error?: string };
+        if (data.error) throw new Error(data.error);
+        await fetchStatus();
       }
+      // If response is null, request was deduplicated (silently blocked)
+    } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       setError(message);
     } finally {
-      clearTimeout(timeoutId);
       setRefreshing(false);
     }
   }
 
   async function handleCalibrateValves() {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
     try {
       setLoadingMessage('Calibrazione valvole...');
       setRefreshing(true);
@@ -362,39 +350,33 @@ export default function ThermostatCard() {
       setCalibrating(true);
       setCalibrationSuccess(null);
 
-      const response = await fetch(NETATMO_ROUTES.calibrate, {
+      const response = await netatmoCalibrateCmd.execute(NETATMO_ROUTES.calibrate, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
       });
 
-      const data = await response.json();
+      if (response) {
+        const data = await response.json();
 
-      if (data.error) {
-        throw new Error(data.error);
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        if (data.success) {
+          setCalibrationSuccess(true);
+          // Clear success message after 5 seconds
+          setTimeout(() => setCalibrationSuccess(null), 5000);
+        }
+
+        await fetchStatus();
       }
-
-      if (data.success) {
-        setCalibrationSuccess(true);
-        // Clear success message after 5 seconds
-        setTimeout(() => setCalibrationSuccess(null), 5000);
-      }
-
-      // Aggiorna status dopo il comando
-      await fetchStatus();
+      // If response is null, request was deduplicated (silently blocked)
     } catch (err: unknown) {
-      if ((err as Error).name === 'AbortError') {
-        setError('Connessione persa — azione annullata');
-        setCalibrating(false);
-        setRefreshing(false);
-        return;
-      }
       const message = err instanceof Error ? err.message : String(err);
       console.error('Errore calibrazione valvole:', err);
       setError(`Calibrazione fallita: ${message}`);
       setCalibrationSuccess(false);
     } finally {
-      clearTimeout(timeoutId);
       setCalibrating(false);
       setRefreshing(false);
     }
@@ -403,37 +385,30 @@ export default function ThermostatCard() {
   async function handleScheduleChange(scheduleId: string) {
     if (!scheduleId || scheduleId === typedActiveSchedule?.id) return;
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
     try {
       setSwitchingSchedule(true);
       setLoadingMessage('Cambio programmazione...');
       setError(null);
 
-      const response = await fetch(NETATMO_ROUTES.schedules, {
+      const response = await netatmoScheduleCmd.execute(NETATMO_ROUTES.schedules, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ scheduleId }),
-        signal: controller.signal,
       });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Errore cambio programmazione');
+      if (response) {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Errore cambio programmazione');
 
-      // Refetch schedules to update active
-      await refetchSchedules();
-      setSelectedScheduleId(scheduleId);
-    } catch (err: unknown) {
-      if ((err as Error).name === 'AbortError') {
-        setError('Connessione persa — azione annullata');
-        setSwitchingSchedule(false);
-        return;
+        // Refetch schedules to update active
+        await refetchSchedules();
+        setSelectedScheduleId(scheduleId);
       }
+      // If response is null, request was deduplicated (silently blocked)
+    } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       setError(message);
     } finally {
-      clearTimeout(timeoutId);
       setSwitchingSchedule(false);
     }
   }
@@ -445,6 +420,24 @@ export default function ThermostatCard() {
 
   // Build props for DeviceCard
   const banners: any[] = [];
+
+  // Retry Infrastructure Error Banner
+  if (netatmoModeCmd.lastError || netatmoTempCmd.lastError || netatmoCalibrateCmd.lastError || netatmoScheduleCmd.lastError) {
+    banners.push({
+      variant: 'error',
+      description: (netatmoModeCmd.lastError || netatmoTempCmd.lastError || netatmoCalibrateCmd.lastError || netatmoScheduleCmd.lastError)?.message,
+      actions: [
+        {
+          label: 'Riprova',
+          onClick: () => {
+            const failedCmd = [netatmoModeCmd, netatmoTempCmd, netatmoCalibrateCmd, netatmoScheduleCmd].find(cmd => cmd.lastError);
+            failedCmd?.retry();
+          },
+          variant: 'ghost'
+        }
+      ]
+    });
+  }
 
   // Error banner
   if (error) {

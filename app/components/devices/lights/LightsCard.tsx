@@ -8,6 +8,7 @@ import RoomSelector from '../../ui/RoomSelector';
 import { Divider, Heading, Button, ControlButton, EmptyState, Text, Slider } from '../../ui';
 import { cn } from '@/lib/utils/cn';
 import { supportsColor, getCurrentColorHex } from '@/lib/hue/colorUtils';
+import { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
 
 /**
  * LightsCard - Complete Philips Hue lights control for homepage
@@ -43,6 +44,10 @@ export default function LightsCard() {
   const connectionCheckedRef = useRef(false);
   const pollingStartedRef = useRef(false);
   const pairingTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Retry infrastructure - use general hooks for room/scene commands
+  const hueRoomCmd = useRetryableCommand({ device: 'hue', action: 'room' });
+  const hueSceneCmd = useRetryableCommand({ device: 'hue', action: 'scene' });
 
   // Check connection on mount
   useEffect(() => {
@@ -202,16 +207,18 @@ export default function LightsCard() {
       setLoadingMessage(on ? 'Accensione luci...' : 'Spegnimento luci...');
       setRefreshing(true);
       setError(null);
-      const response = await fetch(`/api/hue/rooms/${roomId}`, {
+      const response = await hueRoomCmd.execute(`/api/hue/rooms/${roomId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ on: { on } }),
       });
 
-      const data = await response.json() as { error?: string };
-      if (data.error) throw new Error(data.error);
-      // Aggiorna dati dopo il comando
-      await fetchData();
+      if (response) {
+        const data = await response.json() as { error?: string };
+        if (data.error) throw new Error(data.error);
+        await fetchData();
+      }
+      // If response is null, request was deduplicated (silently blocked)
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       setError(message);
@@ -225,7 +232,7 @@ export default function LightsCard() {
       setLoadingMessage('Modifica luminosità...');
       setRefreshing(true);
       setError(null);
-      const response = await fetch(`/api/hue/rooms/${roomId}`, {
+      const response = await hueRoomCmd.execute(`/api/hue/rooms/${roomId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -233,10 +240,12 @@ export default function LightsCard() {
         }),
       });
 
-      const data = await response.json() as { error?: string };
-      if (data.error) throw new Error(data.error);
-      // Aggiorna dati dopo il comando
-      await fetchData();
+      if (response) {
+        const data = await response.json() as { error?: string };
+        if (data.error) throw new Error(data.error);
+        await fetchData();
+      }
+      // If response is null, request was deduplicated (silently blocked)
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       setError(message);
@@ -250,14 +259,16 @@ export default function LightsCard() {
       setLoadingMessage('Attivazione scena...');
       setRefreshing(true);
       setError(null);
-      const response = await fetch(`/api/hue/scenes/${sceneId}/activate`, {
+      const response = await hueSceneCmd.execute(`/api/hue/scenes/${sceneId}/activate`, {
         method: 'PUT',
       });
 
-      const data = await response.json() as { error?: string };
-      if (data.error) throw new Error(data.error);
-      // Aggiorna dati dopo il comando
-      await fetchData();
+      if (response) {
+        const data = await response.json() as { error?: string };
+        if (data.error) throw new Error(data.error);
+        await fetchData();
+      }
+      // If response is null, request was deduplicated (silently blocked)
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       setError(message);
@@ -280,10 +291,10 @@ export default function LightsCard() {
         .map((room: any) => room.services?.find((s: any) => s.rtype === 'grouped_light')?.rid)
         .filter(Boolean);
 
-      // Toggle all rooms in parallel
+      // Toggle all rooms in parallel using retry infrastructure
       await Promise.all(
         groupedLightIds.map((groupId: string) =>
-          fetch(`/api/hue/rooms/${groupId}`, {
+          hueRoomCmd.execute(`/api/hue/rooms/${groupId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ on: { on } }),
@@ -516,6 +527,24 @@ export default function LightsCard() {
 
   // Build props for DeviceCard
   const banners: any[] = [];
+
+  // Retry Infrastructure Error Banner
+  if (hueRoomCmd.lastError || hueSceneCmd.lastError) {
+    banners.push({
+      variant: 'error',
+      description: (hueRoomCmd.lastError || hueSceneCmd.lastError)?.message,
+      actions: [
+        {
+          label: 'Riprova',
+          onClick: () => {
+            const failedCmd = [hueRoomCmd, hueSceneCmd].find(cmd => cmd.lastError);
+            failedCmd?.retry();
+          },
+          variant: 'ghost'
+        }
+      ]
+    });
+  }
 
   // No local bridge found - offer remote option
   if (pairing && pairingStep === 'noLocalBridge') {

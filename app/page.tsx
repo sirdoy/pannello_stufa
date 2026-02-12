@@ -10,6 +10,7 @@ import {
   getVisibleDashboardCards,
 } from '@/lib/services/unifiedDeviceConfigService';
 import { Grid, EmptyState } from './components/ui';
+import { DeviceCardErrorBoundary } from './components/ErrorBoundary';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +21,15 @@ const CARD_COMPONENTS: Record<string, React.ComponentType> = {
   weather: WeatherCardWrapper,
   lights: LightsCard,
   camera: CameraCard,
+};
+
+// Device metadata for error boundaries
+const DEVICE_META: Record<string, { name: string; icon: string }> = {
+  stove: { name: 'Stufa', icon: '🔥' },
+  thermostat: { name: 'Termostato', icon: '🌡️' },
+  weather: { name: 'Meteo', icon: '☀️' },
+  lights: { name: 'Luci', icon: '💡' },
+  camera: { name: 'Camera', icon: '📷' },
 };
 
 export default async function Home() {
@@ -60,7 +70,12 @@ export default async function Home() {
               className="animate-spring-in"
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <CardComponent />
+              <DeviceCardErrorBoundary
+                deviceName={DEVICE_META[card.id]?.name ?? card.id}
+                deviceIcon={DEVICE_META[card.id]?.icon ?? '⚠️'}
+              >
+                <CardComponent />
+              </DeviceCardErrorBoundary>
             </div>
           );
         })}

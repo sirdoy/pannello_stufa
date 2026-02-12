@@ -123,7 +123,8 @@
       "Bash(firebase database:get:*)",
       "Bash(npx -y firebase-tools database:get:*)",
       "Bash(git status:*)",
-      "Bash(du -sh:*)"
+      "Bash(du -sh:*)",
+      "Bash(git merge:*)"
     ],
     "deny": [],
     "ask": []

@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-02-11)
 
 ## Current Position
 
-Phase: 57 of 60 (Adaptive Polling)
-Plan: 3 of 3 in current phase
-Status: Complete
-Last activity: 2026-02-12 — Completed 57-03-PLAN.md (Stove Staleness Integration)
+Phase: 58 of 60 (StoveCard Refactoring)
+Plan: 1 of 3 in current phase
+Status: In Progress
+Last activity: 2026-02-12 — Completed 58-01-PLAN.md (Extract Stove Hooks and Utilities)
 
-Progress: [████████████████████░░░] 85% (286/336 estimated plans total)
+Progress: [████████████████████░░░] 85% (287/336 estimated plans total)
 
 ## Performance Metrics
 
@@ -46,6 +46,14 @@ Progress: [████████████████████░░░
 - Phase 53: 5 plans
 - Phase 54: 9 plans
 - Trend: Stable velocity with comprehensive mode
+
+**Recent Phase 58 Metrics:**
+
+| Phase-Plan | Duration | Tasks | Files | Tests |
+|------------|----------|-------|-------|-------|
+| 58-01 | 7 min | 2 | 6 | 55 |
+
+**Phase 58 Total (In Progress):** 7 minutes, 1 plan, 6 files created, 55 tests
 
 **Recent Phase 57 Metrics:**
 
@@ -132,10 +140,13 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-12T14:01:40Z
-Stopped at: Phase 57 (Adaptive Polling) COMPLETE — Plan 03 (Stove Staleness Integration)
+Stopped at: Phase 58 (StoveCard Refactoring) — Plan 01 (Extract Stove Hooks and Utilities)
 Resume file: None
 
-**Phase 57 Progress:**
+**Phase 58 Progress:**
+- Plan 01: Extract Stove Hooks and Utilities ✓ COMPLETE (7 min, 55 tests, commits b4385a9, efa9538)
+
+**Phase 57 Progress (COMPLETE):**
 - Plan 01: Adaptive Polling Foundation ✓ COMPLETE (4 min, 21 tests, commits b7c13b7, 6205766)
 - Plan 02: Adaptive Polling Integration ✓ COMPLETE (2 min, 4 tests, commits 9a4f648, f973c7b)
 - Plan 03: Stove Staleness Integration ✓ COMPLETE (4 min, 18 tests, commits ed7a0ff, fb3f650)

@@ -22,13 +22,13 @@ import ErrorAlert from '../../ui/ErrorAlert';
 import Banner from '../../ui/Banner';
 import MaintenanceBar from '../../MaintenanceBar';
 import CronHealthBanner from '../../CronHealthBanner';
-import Toast from '../../ui/Toast';
 import LoadingOverlay from '../../ui/LoadingOverlay';
 import CardAccentBar from '../../ui/CardAccentBar';
 import { Divider, Heading, Text, EmptyState, Badge, HealthIndicator } from '../../ui';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
 import { useDeviceStaleness } from '@/lib/hooks/useDeviceStaleness';
+import { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 
@@ -47,6 +47,12 @@ export default function StoveCard() {
 
   // Staleness tracking
   const staleness = useDeviceStaleness('stove');
+
+  // Retry infrastructure - one hook per command type
+  const igniteCmd = useRetryableCommand({ device: 'stove', action: 'ignite' });
+  const shutdownCmd = useRetryableCommand({ device: 'stove', action: 'shutdown' });
+  const setFanCmd = useRetryableCommand({ device: 'stove', action: 'setFan' });
+  const setPowerCmd = useRetryableCommand({ device: 'stove', action: 'setPower' });
 
   const [status, setStatus] = useState<string>('...');
   const [fanLevel, setFanLevel] = useState<number | null>(null);
@@ -70,9 +76,6 @@ export default function StoveCard() {
 
   // Sandbox mode
   const [sandboxMode, setSandboxMode] = useState(false);
-
-  // Toast notification
-  const [toast, setToast] = useState<any>(null);
 
   // Loading overlay message
   const [loadingMessage, setLoadingMessage] = useState('Caricamento...');
@@ -225,21 +228,12 @@ export default function StoveCard() {
     }
   }, [checkVersion, user?.sub]);
 
-  // Show toast when background sync command completes
+  // Refresh status when background sync command completes
   useEffect(() => {
     if (lastSyncedCommand) {
-      const actionLabels: Record<string, string> = {
-        'stove/ignite': '🔥 Stufa accesa (comando sincronizzato)',
-        'stove/shutdown': '🌙 Stufa spenta (comando sincronizzato)',
-        'stove/set-power': '⚡ Potenza impostata (comando sincronizzato)',
-      };
-      const endpoint = (lastSyncedCommand as any).endpoint;
-      const message = endpoint && endpoint in actionLabels ? actionLabels[endpoint] : 'Comando sincronizzato';
-      setToast({ message, variant: 'success' });
-      // Refresh status after sync
       fetchStatusAndUpdate();
     }
-  }, [lastSyncedCommand]);
+  }, [lastSyncedCommand, fetchStatusAndUpdate]);
 
   // Adaptive polling (active only if Firebase fails or for validation)
   useEffect(() => {
@@ -429,48 +423,27 @@ export default function StoveCard() {
     setLoading(true);
     setFanLevel(level);
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
     try {
-      const response = await fetch(STOVE_ROUTES.setFan, {
+      const response = await setFanCmd.execute(STOVE_ROUTES.setFan, {
         method: 'POST',
         body: JSON.stringify({ level, source: 'manual' }),
-        signal: controller.signal,
       });
 
-      const data = await response.json();
+      if (response) {
+        const data = await response.json();
 
-    // Se la modalità è cambiata, mostra notifica e aggiorna UI immediatamente
-    if (data.modeChanged) {
+        // Se la modalità è cambiata, aggiorna UI immediatamente
+        if (data.modeChanged) {
+          setSemiManualMode(true);
+          setReturnToAutoAt(data.returnToAutoAt || null);
+          setNextScheduledAction(null);
+        }
 
-      setToast({
-        message: 'Modalità cambiata in Semi-Manuale',
-        icon: '⚙️',
-        variant: 'warning'
-      });
-
-      // Aggiorna immediatamente lo stato locale (non aspettare Firebase)
-      setSemiManualMode(true);
-      setReturnToAutoAt(data.returnToAutoAt || null);
-      setNextScheduledAction(null);
-    }
-
-      await logStoveAction.setFan(level);
-      // Aggiorna status dopo il comando
-      await fetchStatusAndUpdate();
-    } catch (error) {
-      if ((error as Error).name === 'AbortError') {
-        setToast({
-          message: 'Connessione persa — azione annullata',
-          variant: 'error',
-        });
-        setLoading(false);
-        return;
+        await logStoveAction.setFan(level);
+        await fetchStatusAndUpdate();
       }
-      throw error;
+      // If response is null, request was deduplicated (silently blocked)
     } finally {
-      clearTimeout(timeoutId);
       setLoading(false);
     }
   };
@@ -481,48 +454,27 @@ export default function StoveCard() {
     setLoading(true);
     setPowerLevel(level);
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
     try {
-      const response = await fetch(STOVE_ROUTES.setPower, {
+      const response = await setPowerCmd.execute(STOVE_ROUTES.setPower, {
         method: 'POST',
         body: JSON.stringify({ level, source: 'manual' }),
-        signal: controller.signal,
       });
 
-      const data = await response.json();
+      if (response) {
+        const data = await response.json();
 
-    // Se la modalità è cambiata, mostra notifica e aggiorna UI immediatamente
-    if (data.modeChanged) {
+        // Se la modalità è cambiata, aggiorna UI immediatamente
+        if (data.modeChanged) {
+          setSemiManualMode(true);
+          setReturnToAutoAt(data.returnToAutoAt || null);
+          setNextScheduledAction(null);
+        }
 
-      setToast({
-        message: 'Modalità cambiata in Semi-Manuale',
-        icon: '⚙️',
-        variant: 'warning'
-      });
-
-      // Aggiorna immediatamente lo stato locale (non aspettare Firebase)
-      setSemiManualMode(true);
-      setReturnToAutoAt(data.returnToAutoAt || null);
-      setNextScheduledAction(null);
-    }
-
-      await logStoveAction.setPower(level);
-      // Aggiorna status dopo il comando
-      await fetchStatusAndUpdate();
-    } catch (error) {
-      if ((error as Error).name === 'AbortError') {
-        setToast({
-          message: 'Connessione persa — azione annullata',
-          variant: 'error',
-        });
-        setLoading(false);
-        return;
+        await logStoveAction.setPower(level);
+        await fetchStatusAndUpdate();
       }
-      throw error;
+      // If response is null, request was deduplicated (silently blocked)
     } finally {
-      clearTimeout(timeoutId);
       setLoading(false);
     }
   };
@@ -540,31 +492,17 @@ export default function StoveCard() {
   const handleIgnite = async () => {
     setLoadingMessage('Accensione stufa...');
     setLoading(true);
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
     try {
-      await fetch(STOVE_ROUTES.ignite, {
+      const response = await igniteCmd.execute(STOVE_ROUTES.ignite, {
         method: 'POST',
         body: JSON.stringify({ source: 'manual' }),
-        signal: controller.signal,
       });
-      await logStoveAction.ignite();
-      // Aggiorna status dopo il comando
-      await fetchStatusAndUpdate();
-    } catch (error) {
-      if ((error as Error).name === 'AbortError') {
-        setToast({
-          message: 'Connessione persa — azione annullata',
-          variant: 'error',
-        });
-        setLoading(false);
-        return;
+      if (response) {
+        await logStoveAction.ignite();
+        await fetchStatusAndUpdate();
       }
-      throw error;
+      // If response is null, request was deduplicated (silently blocked)
     } finally {
-      clearTimeout(timeoutId);
       setLoading(false);
     }
   };
@@ -572,31 +510,17 @@ export default function StoveCard() {
   const handleShutdown = async () => {
     setLoadingMessage('Spegnimento stufa...');
     setLoading(true);
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
     try {
-      await fetch(STOVE_ROUTES.shutdown, {
+      const response = await shutdownCmd.execute(STOVE_ROUTES.shutdown, {
         method: 'POST',
         body: JSON.stringify({ source: 'manual' }),
-        signal: controller.signal,
       });
-      await logStoveAction.shutdown();
-      // Aggiorna status dopo il comando
-      await fetchStatusAndUpdate();
-    } catch (error) {
-      if ((error as Error).name === 'AbortError') {
-        setToast({
-          message: 'Connessione persa — azione annullata',
-          variant: 'error',
-        });
-        setLoading(false);
-        return;
+      if (response) {
+        await logStoveAction.shutdown();
+        await fetchStatusAndUpdate();
       }
-      throw error;
+      // If response is null, request was deduplicated (silently blocked)
     } finally {
-      clearTimeout(timeoutId);
       setLoading(false);
     }
   };
@@ -1194,7 +1118,7 @@ export default function StoveCard() {
                     size="lg"
                     icon="🔥"
                     onClick={handleIgnite}
-                    disabled={loading || needsMaintenance}
+                    disabled={!isOnline || igniteCmd.isExecuting || loading || needsMaintenance}
                     className="h-20 sm:h-24 text-base sm:text-lg font-bold font-display"
                   >
                     ACCENDI
@@ -1204,7 +1128,7 @@ export default function StoveCard() {
                     size="lg"
                     icon="❄️"
                     onClick={handleShutdown}
-                    disabled={loading}
+                    disabled={!isOnline || shutdownCmd.isExecuting || loading}
                     className="h-20 sm:h-24 text-base sm:text-lg font-bold font-display"
                   >
                     SPEGNI
@@ -1219,7 +1143,7 @@ export default function StoveCard() {
                   size="lg"
                   icon="🔥"
                   onClick={handleIgnite}
-                  disabled={loading || needsMaintenance}
+                  disabled={!isOnline || igniteCmd.isExecuting || loading || needsMaintenance}
                   className="w-full h-20 sm:h-24 text-base sm:text-lg font-bold font-display ring-2 ring-ember-500/30 ring-offset-2 ring-offset-slate-900 [html:not(.dark)_&]:ring-offset-white"
                 >
                   ACCENDI
@@ -1233,8 +1157,8 @@ export default function StoveCard() {
                   size="lg"
                   icon="❄️"
                   onClick={handleShutdown}
-                  disabled={loading}
-                  className="w-full h-20 sm:h-24 text-base sm:text-lg font-bold font-display"
+                  disabled={!isOnline || shutdownCmd.isExecuting || loading}
+                  className="w-full h-20 sm:h-24 text-base sm:text-lg font-display"
                 >
                   SPEGNI
                 </Button>
@@ -1360,6 +1284,31 @@ export default function StoveCard() {
               <CronHealthBanner variant="inline" />
             </div>
               </>
+            )}
+
+            {/* Retry Infrastructure Error Banner */}
+            {(igniteCmd.lastError || shutdownCmd.lastError || setFanCmd.lastError || setPowerCmd.lastError) && (
+              <div className="mt-4 sm:mt-6">
+                <Banner variant="error">
+                  <div className="flex items-center justify-between w-full">
+                    <Text variant="body">
+                      {(igniteCmd.lastError || shutdownCmd.lastError || setFanCmd.lastError || setPowerCmd.lastError)?.message}
+                    </Text>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        // Retry the failed command
+                        const failedCmd = [igniteCmd, shutdownCmd, setFanCmd, setPowerCmd]
+                          .find(cmd => cmd.lastError);
+                        failedCmd?.retry();
+                      }}
+                    >
+                      Riprova
+                    </Button>
+                  </div>
+                </Banner>
+              </div>
             )}
 
             {/* Maintenance Status */}
@@ -1493,18 +1442,6 @@ export default function StoveCard() {
           </div>
               </div>
             </Card>
-
-      {/* Toast Notification */}
-      {toast && (
-        <Toast
-          variant={toast.variant}
-          duration={3000}
-          open={!!toast}
-          onOpenChange={(open) => !open && setToast(null)}
-        >
-          {toast.message}
-        </Toast>
-      )}
     </div>
   );
 }

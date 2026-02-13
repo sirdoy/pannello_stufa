@@ -85,5 +85,5 @@ export function getStovePageTheme(themeKey: string): StovePageTheme {
     },
   };
 
-  return themeColors[themeKey] || themeColors.slate;
+  return themeColors[themeKey] ?? themeColors['slate']!;
 }

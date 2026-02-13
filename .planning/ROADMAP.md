@@ -68,11 +68,11 @@ See `.planning/milestones/` for full archives.
 4. API proxy routes return Fritz!Box data with RFC 9457 error handling
 5. Connectivity check endpoint detects TR-064 disabled and returns setup guide link
 
-**Plans:** TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 61-01: TBD
-- [ ] 61-02: TBD
+- [ ] 61-01-PLAN.md — Fritz!Box client, cache, rate limiter, error codes, and device registry
+- [ ] 61-02-PLAN.md — API proxy routes (health, devices, bandwidth, wan) with tests
 
 ---
 
@@ -226,4 +226,4 @@ Plans:
 
 ---
 
-*Roadmap updated: 2026-02-13 — v8.0 Fritz!Box Network Monitor roadmap created*
+*Roadmap updated: 2026-02-13 — Phase 61 planned (2 plans)*

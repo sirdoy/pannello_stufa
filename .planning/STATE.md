@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-02-11)
 
 ## Current Position
 
-Phase: 59 of 60 (LightsCard Page Refactoring)
-Plan: 4 of 4 in current phase
-Status: Complete
-Last activity: 2026-02-13 — Completed 59-04-PLAN.md (Stove Page Orchestrator)
+Phase: 60 of 60 (Critical Path Testing & Token Cleanup)
+Plan: 1 of 4 in current phase
+Status: In Progress
+Last activity: 2026-02-13 — Completed 60-01-PLAN.md (Token Cleanup Service Extraction)
 
-Progress: [████████████████████░░░] 87% (293/336 estimated plans total)
+Progress: [████████████████████░░░] 87% (294/336 estimated plans total)
 
 ## Performance Metrics
 
@@ -104,6 +104,7 @@ Progress: [████████████████████░░░
 | Phase 59 P02 | 5 | 2 tasks | 8 files | 75 tests |
 | Phase 59 P03 | 3 | 2 tasks | 2 files | 12 tests |
 | Phase 59 P04 | 7 | 2 tasks | 7 files | 7 tests |
+| Phase 60 P01 | 6 | 2 tasks | 4 files | 0 tests |
 
 ## Accumulated Context
 
@@ -152,7 +153,10 @@ Recent decisions affecting current work:
 - [Phase 59]: Orchestrator pattern: stove/page reuses StoveCard hooks, adds page-specific offline queueing
 - [Phase 59]: Stove/page orchestrator reduced from 1066 LOC to 189 LOC (-82% reduction)
 - [Phase 59]: Derived display properties (infoBoxes, footerActions, statusBadge) kept inline in orchestrator (<10 lines each)
-- [Phase 59]: Orchestrator pattern: stove/page reuses StoveCard hooks, adds page-specific offline queueing
+- [Phase 60]: Token cleanup extracted to shared service (lib/services/tokenCleanupService.ts)
+- [Phase 60]: Fire-and-forget pattern for lastUsed updates after FCM delivery (non-blocking)
+- [Phase 60]: Audit trail logs deleted tokens to tokenCleanupHistory path with full context
+- [Phase 60]: 7-day cleanup interval check remains in scheduler route (cron schedule concern)
 
 ### Pending Todos
 
@@ -168,9 +172,15 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-13T10:50:00Z
-Stopped at: Phase 59 Plan 04 (Stove Page Orchestrator) — COMPLETE
+Last session: 2026-02-13T10:22:00Z
+Stopped at: Phase 60 Plan 01 (Token Cleanup Service Extraction) — COMPLETE
 Resume file: None
+
+**Phase 60 Progress:**
+- Plan 01: Token Cleanup Service Extraction ✓ COMPLETE (6 min, 0 tests, commits 40905de, a1f19c0)
+- Plan 02: Delivery Tracking & Manual Cleanup (PENDING)
+- Plan 03: Unit Tests (PENDING)
+- Plan 04: Integration Tests (PENDING)
 
 **Phase 59 Progress (COMPLETE):**
 - Plan 01: Extract Lights Hooks ✓ COMPLETE (9 min, 47 tests, commits b6ad0c7, 52d8686)

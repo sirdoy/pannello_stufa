@@ -104,7 +104,7 @@ export interface UseLightsDataReturn {
   setPairingStep: (step: UseLightsDataReturn['pairingStep']) => void;
   setDiscoveredBridges: (bridges: any[]) => void;
   setSelectedBridge: (bridge: any) => void;
-  setPairingCountdown: (val: number) => void;
+  setPairingCountdown: React.Dispatch<React.SetStateAction<number>>;
   pairingTimerRef: React.MutableRefObject<NodeJS.Timeout | null>;
 }
 

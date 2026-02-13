@@ -4,7 +4,7 @@
  */
 
 /** Device type union */
-export type DeviceTypeId = 'stove' | 'thermostat' | 'camera' | 'lights' | 'sonos';
+export type DeviceTypeId = 'stove' | 'thermostat' | 'camera' | 'lights' | 'sonos' | 'network';
 
 /** Color palette type */
 export type DeviceColor = 'primary' | 'info' | 'ocean' | 'warning' | 'success';
@@ -18,6 +18,7 @@ export const DEVICE_TYPES = {
   CAMERA: 'camera',
   LIGHTS: 'lights',
   SONOS: 'sonos',
+  NETWORK: 'network',
 } as const;
 
 /** Display item configuration */
@@ -170,6 +171,21 @@ export const DEVICE_CONFIG: Record<DeviceTypeId, DeviceConfig> = {
       hasSearch: true,
     },
   },
+  [DEVICE_TYPES.NETWORK]: {
+    id: 'network',
+    name: 'Rete',
+    icon: '🌐',
+    color: 'info',
+    enabled: true,
+    routes: {
+      main: '/network',
+    },
+    features: {
+      hasScheduler: false,
+      hasMaintenance: false,
+      hasErrors: false,
+    },
+  },
 };
 
 /**
@@ -185,7 +201,7 @@ const ALL_DASHBOARD_ITEMS: Record<string, DeviceConfig | DisplayItem> = {
  * Default order for dashboard items (new users)
  * Defines initial order and visibility
  */
-export const DEFAULT_DEVICE_ORDER: string[] = ['stove', 'thermostat', 'weather', 'lights', 'camera', 'sonos'];
+export const DEFAULT_DEVICE_ORDER: string[] = ['stove', 'thermostat', 'weather', 'lights', 'camera', 'network', 'sonos'];
 
 /** Color class configuration */
 interface ColorClasses {

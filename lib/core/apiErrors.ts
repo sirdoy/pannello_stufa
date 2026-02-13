@@ -80,6 +80,11 @@ export const ERROR_CODES = {
   HUE_NOT_ON_LOCAL_NETWORK: 'HUE_NOT_ON_LOCAL_NETWORK',
   HUE_ERROR: 'HUE_ERROR',
 
+  // Fritz!Box-specific
+  TR064_NOT_ENABLED: 'TR064_NOT_ENABLED',
+  FRITZBOX_TIMEOUT: 'FRITZBOX_TIMEOUT',
+  FRITZBOX_NOT_CONFIGURED: 'FRITZBOX_NOT_CONFIGURED',
+
   // Weather-specific
   WEATHER_API_ERROR: 'WEATHER_API_ERROR',
 
@@ -141,6 +146,11 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ERROR_CODES.HUE_LINK_BUTTON_NOT_PRESSED]: 'Premi il pulsante sul bridge Hue',
   [ERROR_CODES.HUE_NOT_ON_LOCAL_NETWORK]: 'Non sei sulla rete locale del bridge Hue',
   [ERROR_CODES.HUE_ERROR]: 'Errore Philips Hue',
+
+  // Fritz!Box
+  [ERROR_CODES.TR064_NOT_ENABLED]: 'TR-064 non abilitato sul router',
+  [ERROR_CODES.FRITZBOX_TIMEOUT]: 'Fritz!Box non raggiungibile',
+  [ERROR_CODES.FRITZBOX_NOT_CONFIGURED]: 'Fritz!Box non configurato',
 
   // Weather
   [ERROR_CODES.WEATHER_API_ERROR]: 'Errore API meteo',
@@ -297,6 +307,31 @@ export class ApiError extends Error {
       ERROR_CODES.HUE_NOT_ON_LOCAL_NETWORK,
       'Bridge Hue non raggiungibile. Assicurati di essere sulla stessa rete locale.',
       HTTP_STATUS.SERVICE_UNAVAILABLE
+    );
+  }
+
+  static fritzboxNotConfigured(): ApiError {
+    return new ApiError(
+      ERROR_CODES.FRITZBOX_NOT_CONFIGURED,
+      'Fritz!Box non configurato. Verifica le variabili d\'ambiente.',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
+  }
+
+  static tr064NotEnabled(details: Record<string, unknown> | null = null): ApiError {
+    return new ApiError(
+      ERROR_CODES.TR064_NOT_ENABLED,
+      'TR-064 non abilitato sul router. Abilita TR-064 nelle impostazioni del Fritz!Box.',
+      HTTP_STATUS.FORBIDDEN,
+      details
+    );
+  }
+
+  static fritzboxTimeout(): ApiError {
+    return new ApiError(
+      ERROR_CODES.FRITZBOX_TIMEOUT,
+      'Fritz!Box non raggiungibile. Verifica la connessione.',
+      HTTP_STATUS.GATEWAY_TIMEOUT
     );
   }
 }

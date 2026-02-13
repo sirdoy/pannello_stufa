@@ -54,6 +54,10 @@ export type ErrorCode =
   | 'HUE_LINK_BUTTON_NOT_PRESSED'
   | 'HUE_NOT_ON_LOCAL_NETWORK'
   | 'HUE_ERROR'
+  // Fritz!Box-specific
+  | 'TR064_NOT_ENABLED'
+  | 'FRITZBOX_TIMEOUT'
+  | 'FRITZBOX_NOT_CONFIGURED'
   // Weather-specific
   | 'WEATHER_API_ERROR'
   // Config

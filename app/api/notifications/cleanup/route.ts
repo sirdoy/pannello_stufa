@@ -17,28 +17,9 @@
  * }
  */
 
-import { getAdminDatabase } from '@/lib/firebaseAdmin';
+import { cleanupStaleTokens } from '@/lib/services/tokenCleanupService';
 
 export const dynamic = 'force-dynamic';
-
-interface TokenData {
-  lastUsed?: string;
-  createdAt?: string;
-  [key: string]: unknown;
-}
-
-interface UserSnapshot {
-  fcmTokens?: Record<string, TokenData>;
-  [key: string]: unknown;
-}
-
-interface ErrorData {
-  timestamp: string;
-  [key: string]: unknown;
-}
-
-// Tokens inactive for >90 days are considered stale
-const STALE_THRESHOLD_MS = 90 * 24 * 60 * 60 * 1000;
 
 /**
  * POST /api/notifications/cleanup
@@ -67,89 +48,25 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
+    // Delegate to shared service
+    const result = await cleanupStaleTokens();
 
-    const db = getAdminDatabase();
-    const usersRef = db.ref('users');
-    const snapshot = await usersRef.once('value');
-
-    if (!snapshot.exists()) {
-      return Response.json({
-        success: true,
-        removed: 0,
-        scanned: 0,
-        timestamp: new Date().toISOString(),
-        message: 'No users found',
-      });
+    if (!result.cleaned) {
+      return Response.json(
+        {
+          error: 'Cleanup failed',
+          reason: result.reason,
+          message: result.error,
+        },
+        { status: 500 }
+      );
     }
-
-    const now = Date.now();
-    const updates: Record<string, null> = {};
-    let scanned = 0;
-    let removed = 0;
-
-    snapshot.forEach(userSnap => {
-      const userId = userSnap.key as string;
-      const tokens = userSnap.child('fcmTokens').val() as Record<string, TokenData> | null || {};
-
-      Object.entries(tokens).forEach(([tokenKey, tokenData]) => {
-        scanned++;
-
-        // Use lastUsed if available, otherwise fall back to createdAt
-        const lastActivity = tokenData.lastUsed || tokenData.createdAt;
-
-        if (!lastActivity) {
-          // No timestamp - consider stale
-          updates[`users/${userId}/fcmTokens/${tokenKey}`] = null;
-          removed++;
-          return;
-        }
-
-        const lastActivityTime = new Date(lastActivity).getTime();
-        const age = now - lastActivityTime;
-
-        if (age > STALE_THRESHOLD_MS) {
-          updates[`users/${userId}/fcmTokens/${tokenKey}`] = null;
-          removed++;
-          const ageDays = Math.floor(age / (24 * 60 * 60 * 1000));
-        }
-      });
-    });
-
-    // Apply all deletions in single batch update
-    if (Object.keys(updates).length > 0) {
-      await db.ref().update(updates);
-    }
-
-
-    // Cleanup old error logs (30 days retention per 02-CONTEXT.md)
-    const ERROR_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
-    const errorCutoff = new Date(now - ERROR_RETENTION_MS).toISOString();
-
-    const errorsRef = db.ref('notificationErrors');
-    const errorsSnapshot = await errorsRef.once('value');
-
-    let errorsRemoved = 0;
-    if (errorsSnapshot.exists()) {
-      const errorUpdates: Record<string, null> = {};
-      errorsSnapshot.forEach(errorSnap => {
-        const error = errorSnap.val() as ErrorData;
-        if (error.timestamp && error.timestamp < errorCutoff) {
-          errorUpdates[`notificationErrors/${errorSnap.key}`] = null;
-          errorsRemoved++;
-        }
-      });
-
-      if (Object.keys(errorUpdates).length > 0) {
-        await db.ref().update(errorUpdates);
-      }
-    }
-
 
     return Response.json({
       success: true,
-      removed,
-      scanned,
-      errorsRemoved,
+      removed: result.tokensRemoved,
+      scanned: result.tokensScanned,
+      errorsRemoved: result.errorsRemoved,
       timestamp: new Date().toISOString(),
     });
 

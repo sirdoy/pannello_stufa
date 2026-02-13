@@ -22,6 +22,7 @@ import { adminDbGet, adminDbSet, adminDbUpdate, getAdminDatabase } from '@/lib/f
 import { canIgnite, trackUsageHours } from '@/lib/maintenanceServiceAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 import { logPidTuningEntry, cleanupOldLogs } from '@/lib/services/pidTuningLogService';
+import { cleanupStaleTokens } from '@/lib/services/tokenCleanupService';
 import {
   triggerStoveStatusWorkServer,
   triggerStoveUnexpectedOffServer,
@@ -196,7 +197,7 @@ async function refreshWeatherIfNeeded(): Promise<any> {
 
 /**
  * Cleanup stale FCM tokens if interval has passed (every 7 days)
- * Following same pattern as calibrateValvesIfNeeded()
+ * Delegates to shared tokenCleanupService (TOKEN-01)
  */
 async function cleanupTokensIfNeeded(): Promise<any> {
   try {
@@ -214,92 +215,14 @@ async function cleanupTokensIfNeeded(): Promise<any> {
       };
     }
 
+    // Delegate to shared service
+    const result = await cleanupStaleTokens();
 
-    const db = getAdminDatabase();
-
-    // Constants
-    const STALE_THRESHOLD_MS = 90 * 24 * 60 * 60 * 1000; // 90 days
-    const ERROR_RETENTION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
-
-    // Step 1: Cleanup stale FCM tokens
-    const usersRef = db.ref('users');
-    const snapshot = await usersRef.once('value');
-
-    let tokensScanned = 0;
-    let tokensRemoved = 0;
-    const tokenUpdates: Record<string, unknown> = {};
-
-    if (snapshot.exists()) {
-      snapshot.forEach(userSnap => {
-        const userId = userSnap.key;
-        const tokens = userSnap.child('fcmTokens').val() || {};
-
-        Object.entries(tokens).forEach(([tokenKey, tokenData]) => {
-          tokensScanned++;
-          const data = tokenData as { lastUsed?: string; createdAt?: string };
-
-          // Use lastUsed if available, otherwise fall back to createdAt
-          const lastActivity = data.lastUsed || data.createdAt;
-
-          if (!lastActivity) {
-            // No timestamp - consider stale
-            tokenUpdates[`users/${userId}/fcmTokens/${tokenKey}`] = null;
-            tokensRemoved++;
-            return;
-          }
-
-          const lastActivityTime = new Date(lastActivity).getTime();
-          const age = now - lastActivityTime;
-
-          if (age > STALE_THRESHOLD_MS) {
-            tokenUpdates[`users/${userId}/fcmTokens/${tokenKey}`] = null;
-            tokensRemoved++;
-            const ageDays = Math.floor(age / (24 * 60 * 60 * 1000));
-          }
-        });
-      });
-
-      // Apply token deletions in single batch update
-      if (Object.keys(tokenUpdates).length > 0) {
-        await db.ref().update(tokenUpdates);
-      }
+    if (result.cleaned) {
+      await adminDbSet(lastCleanupPath, now);
     }
 
-    // Step 2: Cleanup old error logs (30 days retention)
-    const errorCutoff = new Date(now - ERROR_RETENTION_MS).toISOString();
-    const errorsRef = db.ref('notificationErrors');
-    const errorsSnapshot = await errorsRef.once('value');
-
-    let errorsRemoved = 0;
-    const errorUpdates: Record<string, unknown> = {};
-
-    if (errorsSnapshot.exists()) {
-      errorsSnapshot.forEach(errorSnap => {
-        const error = errorSnap.val();
-        if (error?.timestamp && error.timestamp < errorCutoff) {
-          errorUpdates[`notificationErrors/${errorSnap.key}`] = null;
-          errorsRemoved++;
-        }
-      });
-
-      // Apply error deletions in single batch update
-      if (Object.keys(errorUpdates).length > 0) {
-        await db.ref().update(errorUpdates);
-      }
-    }
-
-    // Update last cleanup timestamp
-    await adminDbSet(lastCleanupPath, now);
-
-
-    return {
-      cleaned: true,
-      timestamp: now,
-      tokensRemoved,
-      tokensScanned,
-      errorsRemoved,
-      nextCleanup: new Date(now + SEVEN_DAYS).toISOString(),
-    };
+    return result;
 
   } catch (error) {
     console.error('❌ Errore cleanup token:', error);

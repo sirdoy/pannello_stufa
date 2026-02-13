@@ -71,8 +71,8 @@ See `.planning/milestones/` for full archives.
 **Plans:** 2 plans
 
 Plans:
-- [ ] 61-01-PLAN.md — Fritz!Box client, cache, rate limiter, error codes, and device registry
-- [ ] 61-02-PLAN.md — API proxy routes (health, devices, bandwidth, wan) with tests
+- [x] 61-01-PLAN.md — Fritz!Box client, cache, rate limiter, error codes, and device registry
+- [x] 61-02-PLAN.md — API proxy routes (health, devices, bandwidth, wan) with tests
 
 ---
 
@@ -220,10 +220,11 @@ Plans:
 | 44-48 | v5.1 | 39/39 | ✓ Complete | 2026-02-10 |
 | 49-54 | v6.0 | 29/29 | ✓ Complete | 2026-02-11 |
 | 55-60 | v7.0 | 22/22 | ✓ Complete | 2026-02-13 |
-| 61-67 | v8.0 | 0/TBD | Not started | - |
+| 61 | v8.0 | 2/2 | ✓ Complete | 2026-02-13 |
+| 62-67 | v8.0 | 0/TBD | Not started | - |
 
-**Total:** 10 milestones shipped, 60 phases complete, 298 plans executed
+**Total:** 10 milestones shipped, 61 phases complete, 300 plans executed
 
 ---
 
-*Roadmap updated: 2026-02-13 — Phase 61 planned (2 plans)*
+*Roadmap updated: 2026-02-13 — Phase 61 complete (2/2 plans, verified)*

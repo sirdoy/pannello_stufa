@@ -77,6 +77,7 @@ import { fetchWeatherForecast } from '@/lib/openMeteo';
 import { saveWeatherToCache } from '@/lib/weatherCacheService';
 import { logCronExecution } from '@/lib/cronExecutionLogger';
 import { logAnalyticsEvent } from '@/lib/analyticsEventLogger';
+import { cleanupStaleTokens } from '@/lib/services/tokenCleanupService';
 
 // Create typed mock references
 const mockAdminDbGet = jest.mocked(adminDbGet);
@@ -102,6 +103,12 @@ const mockTriggerSchedulerActionServer = jest.mocked(triggerSchedulerActionServe
 const mockTriggerMaintenanceAlertServer = jest.mocked(triggerMaintenanceAlertServer);
 const mockTriggerStoveStatusWorkServer = jest.mocked(triggerStoveStatusWorkServer);
 const mockTriggerStoveUnexpectedOffServer = jest.mocked(triggerStoveUnexpectedOffServer);
+const mockCleanupStaleTokens = jest.mocked(cleanupStaleTokens);
+const mockFetchWeatherForecast = jest.mocked(fetchWeatherForecast);
+const mockSaveWeatherToCache = jest.mocked(saveWeatherToCache);
+
+// Helper to flush microtasks for fire-and-forget promise testing
+const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
 
 describe('Scheduler Check Route', () => {
   beforeEach(() => {
@@ -139,6 +146,8 @@ describe('Scheduler Check Route', () => {
     // Default fire-and-forget mocks
     mockCalibrateValvesServer.mockResolvedValue({ calibrated: false } as any);
     mockProactiveTokenRefresh.mockResolvedValue({ refreshed: false } as any);
+    mockFetchWeatherForecast.mockResolvedValue({ temperature: 15 } as any);
+    mockSaveWeatherToCache.mockResolvedValue(undefined as any);
 
     // Default notification mocks
     mockTriggerSchedulerActionServer.mockResolvedValue({ success: true, skipped: false } as any);
@@ -1929,5 +1938,626 @@ describe('Scheduler Check Route', () => {
       jest.useRealTimers();
     });
 
+  });
+
+  describe('Fire-and-Forget Helper Branches - calibrateValvesIfNeeded', () => {
+    it('skips calibration when too soon (within 12 hours)', async () => {
+      const now = Date.now();
+
+      // Mock recent calibration
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path.includes('lastAutoCalibration')) return now - 1000; // 1 second ago
+        return null;
+      });
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify calibration NOT called
+      expect(mockCalibrateValvesServer).not.toHaveBeenCalled();
+    });
+
+    it('performs successful calibration and saves timestamp', async () => {
+      // Mock calibration success
+      mockCalibrateValvesServer.mockResolvedValue({ calibrated: true } as any);
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify calibration called
+      expect(mockCalibrateValvesServer).toHaveBeenCalled();
+
+      // Verify timestamp saved
+      expect(mockAdminDbSet).toHaveBeenCalledWith(
+        expect.stringContaining('lastAutoCalibration'),
+        expect.any(Number)
+      );
+    });
+
+    it('logs error when calibration fails', async () => {
+      // Mock calibration failure
+      mockCalibrateValvesServer.mockResolvedValue({
+        calibrated: false,
+        error: 'No valves found',
+      } as any);
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify error logged
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining('Calibrazione automatica fallita'),
+        expect.any(String)
+      );
+    });
+
+    it('handles calibration exception gracefully', async () => {
+      // Mock calibration rejection
+      mockCalibrateValvesServer.mockRejectedValue(new Error('Network timeout'));
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [],
+      });
+
+      const request = createMockRequest();
+      const response = await GET(request);
+      await flushPromises();
+
+      // Route should still return 200
+      expect(response.status).toBe(200);
+
+      // Verify error logged
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining('Errore calibrazione automatica'),
+        expect.any(Error)
+      );
+    });
+  });
+
+  describe('Fire-and-Forget Helper Branches - refreshWeatherIfNeeded', () => {
+    it('skips weather refresh when too soon (within 30 minutes)', async () => {
+      const now = Date.now();
+
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path.includes('lastWeatherRefresh')) return now - 60000; // 1 minute ago
+        return null;
+      });
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify weather fetch NOT called
+      expect(mockFetchWeatherForecast).not.toHaveBeenCalled();
+    });
+
+    it('skips weather refresh when location not configured', async () => {
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path.includes('lastWeatherRefresh')) return null;
+        if (path.includes('config/location')) return null; // No location
+        return null;
+      });
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify warning logged
+      expect(console.warn).toHaveBeenCalledWith(
+        expect.stringContaining('location not configured')
+      );
+
+      // Verify weather fetch NOT called
+      expect(mockFetchWeatherForecast).not.toHaveBeenCalled();
+    });
+
+    it('performs successful weather refresh and saves timestamp', async () => {
+      const weatherData = { temperature: 18, forecast: [] };
+      mockFetchWeatherForecast.mockResolvedValue(weatherData as any);
+
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path.includes('lastWeatherRefresh')) return null;
+        if (path.includes('config/location')) return { latitude: 45.4, longitude: 9.2, name: 'Milan' };
+        return null;
+      });
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify weather fetch called
+      expect(mockFetchWeatherForecast).toHaveBeenCalledWith(45.4, 9.2);
+
+      // Verify cache saved
+      expect(mockSaveWeatherToCache).toHaveBeenCalledWith(45.4, 9.2, weatherData);
+
+      // Verify timestamp saved
+      expect(mockAdminDbSet).toHaveBeenCalledWith(
+        expect.stringContaining('lastWeatherRefresh'),
+        expect.any(Number)
+      );
+    });
+
+    it('handles weather fetch exception gracefully', async () => {
+      mockFetchWeatherForecast.mockRejectedValue(new Error('API timeout'));
+
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path.includes('lastWeatherRefresh')) return null;
+        if (path.includes('config/location')) return { latitude: 45.4, longitude: 9.2 };
+        return null;
+      });
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [],
+      });
+
+      const request = createMockRequest();
+      const response = await GET(request);
+      await flushPromises();
+
+      // Route should still return 200
+      expect(response.status).toBe(200);
+
+      // Verify error logged
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining('Errore refresh weather'),
+        expect.any(Error)
+      );
+    });
+  });
+
+  describe('Fire-and-Forget Helper Branches - cleanupTokensIfNeeded', () => {
+    it('skips token cleanup when too soon (within 7 days)', async () => {
+      const now = Date.now();
+
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path.includes('lastTokenCleanup')) return now - 86400000; // 1 day ago
+        return null;
+      });
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify cleanup NOT called
+      expect(mockCleanupStaleTokens).not.toHaveBeenCalled();
+    });
+
+    it('performs successful cleanup and saves timestamp', async () => {
+      mockCleanupStaleTokens.mockResolvedValue({
+        cleaned: true,
+        tokensScanned: 10,
+        tokensRemoved: 3,
+        errorsRemoved: 1,
+        deletedTokens: [],
+      } as any);
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify cleanup called
+      expect(mockCleanupStaleTokens).toHaveBeenCalled();
+
+      // Verify timestamp saved
+      expect(mockAdminDbSet).toHaveBeenCalledWith(
+        expect.stringContaining('lastTokenCleanup'),
+        expect.any(Number)
+      );
+    });
+
+    it('does not save timestamp when cleanup returns cleaned:false', async () => {
+      mockCleanupStaleTokens.mockResolvedValue({
+        cleaned: false,
+        reason: 'no_tokens',
+        tokensScanned: 0,
+        tokensRemoved: 0,
+        errorsRemoved: 0,
+        deletedTokens: [],
+      } as any);
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify cleanup called
+      expect(mockCleanupStaleTokens).toHaveBeenCalled();
+
+      // Verify timestamp NOT saved for lastTokenCleanup path
+      const cleanupCalls = mockAdminDbSet.mock.calls.filter(
+        call => call[0]?.toString().includes('lastTokenCleanup')
+      );
+      expect(cleanupCalls).toHaveLength(0);
+    });
+  });
+
+  describe('Fire-and-Forget Helper Branches - sendMaintenanceNotificationIfNeeded', () => {
+    it('handles skipped notification result', async () => {
+      mockTrackUsageHours.mockResolvedValue({
+        tracked: true,
+        notificationData: {
+          notificationLevel: 90,
+          percentage: 90,
+          remainingHours: 5,
+        },
+      } as any);
+
+      mockTriggerMaintenanceAlertServer.mockResolvedValue({
+        success: false,
+        skipped: true,
+      } as any);
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // No error should be logged for skipped
+      const errorCalls = (console.error as jest.Mock).mock.calls.filter(
+        call => call[0]?.toString().includes('manutenzione')
+      );
+      expect(errorCalls).toHaveLength(0);
+    });
+
+    it('logs error when notification fails', async () => {
+      mockTrackUsageHours.mockResolvedValue({
+        tracked: true,
+        notificationData: {
+          notificationLevel: 90,
+          percentage: 90,
+          remainingHours: 5,
+        },
+      } as any);
+
+      mockTriggerMaintenanceAlertServer.mockResolvedValue({
+        success: false,
+        skipped: false,
+        error: 'Rate limited',
+      } as any);
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify error logged
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining('manutenzione'),
+        'Rate limited'
+      );
+    });
+
+    it('handles notification exception', async () => {
+      mockTrackUsageHours.mockResolvedValue({
+        tracked: true,
+        notificationData: {
+          notificationLevel: 90,
+          percentage: 90,
+          remainingHours: 5,
+        },
+      } as any);
+
+      mockTriggerMaintenanceAlertServer.mockRejectedValue(new Error('Network error'));
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [],
+      });
+
+      const request = createMockRequest();
+      const response = await GET(request);
+      await flushPromises();
+
+      // Route should still return 200
+      expect(response.status).toBe(200);
+
+      // Verify error logged
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining('manutenzione'),
+        expect.any(Error)
+      );
+    });
+  });
+
+  describe('Fire-and-Forget Helper Branches - sendStoveStatusWorkNotification', () => {
+    it('sends WORK notification and saves timestamp', async () => {
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockTriggerStoveStatusWorkServer.mockResolvedValue({ success: true } as any);
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify notification sent
+      expect(mockTriggerStoveStatusWorkServer).toHaveBeenCalled();
+
+      // Verify timestamp saved
+      expect(mockAdminDbSet).toHaveBeenCalledWith(
+        expect.stringContaining('lastWorkNotification'),
+        expect.any(Number)
+      );
+    });
+
+    it('handles WORK notification exception', async () => {
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockTriggerStoveStatusWorkServer.mockRejectedValue(new Error('Push failed'));
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [],
+      });
+
+      const request = createMockRequest();
+      const response = await GET(request);
+      await flushPromises();
+
+      // Route should still return 200
+      expect(response.status).toBe(200);
+
+      // Verify error logged
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining('stove_status_work'),
+        expect.any(Error)
+      );
+    });
+
+    it('does not send WORK notification when stove is not in WORK status', async () => {
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'START', Result: 0 } as any);
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify notification NOT sent
+      expect(mockTriggerStoveStatusWorkServer).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Fire-and-Forget Helper Branches - checkAndNotifyUnexpectedOff', () => {
+    it('saves timestamp when unexpected off notification sent', async () => {
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockTriggerStoveUnexpectedOffServer.mockResolvedValue({ success: true } as any);
+
+      const testTime = new Date('2025-02-12T18:00:00.000Z').getTime();
+
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path === 'schedules-v2/activeScheduleId') return 'default';
+        if (path.includes('schedules-v2/schedules/') && path.includes('/slots/')) {
+          return [{ start: '18:00', end: '22:00', power: 4, fan: 3 }];
+        }
+        if (path === 'scheduler/lastIgnitionInterval') {
+          return { interval: '18:00-22:00', timestamp: testTime - 600000 };
+        }
+        if (path === 'scheduler/lastUnexpectedOffNotification') return null;
+        if (path === 'pidAutomation/boost') return { active: false };
+        return null;
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify timestamp saved
+      expect(mockAdminDbSet).toHaveBeenCalledWith(
+        expect.stringContaining('lastUnexpectedOffNotification'),
+        expect.any(Number)
+      );
+    });
+
+    it('handles unexpected off notification exception', async () => {
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockTriggerStoveUnexpectedOffServer.mockRejectedValue(new Error('Push failed'));
+
+      const testTime = new Date('2025-02-12T18:00:00.000Z').getTime();
+
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path === 'schedules-v2/activeScheduleId') return 'default';
+        if (path.includes('schedules-v2/schedules/') && path.includes('/slots/')) {
+          return [{ start: '18:00', end: '22:00', power: 4, fan: 3 }];
+        }
+        if (path === 'scheduler/lastIgnitionInterval') {
+          return { interval: '18:00-22:00', timestamp: testTime - 600000 };
+        }
+        if (path === 'scheduler/lastUnexpectedOffNotification') return null;
+        if (path === 'pidAutomation/boost') return { active: false };
+        return null;
+      });
+
+      const request = createMockRequest();
+      const response = await GET(request);
+      await flushPromises();
+
+      // Route should still return 200
+      expect(response.status).toBe(200);
+
+      // Verify error logged
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining('stove_unexpected_off'),
+        expect.any(Error)
+      );
+    });
+
+    it('does not notify when no previous ignition tracked', async () => {
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path === 'schedules-v2/activeScheduleId') return 'default';
+        if (path.includes('schedules-v2/schedules/') && path.includes('/slots/')) {
+          return [{ start: '18:00', end: '22:00', power: 4, fan: 3 }];
+        }
+        if (path === 'scheduler/lastIgnitionInterval') return null; // No previous ignition
+        if (path === 'pidAutomation/boost') return { active: false };
+        return null;
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify notification NOT sent
+      expect(mockTriggerStoveUnexpectedOffServer).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Fire-and-Forget Helper Branches - sendSchedulerNotification', () => {
+    it('handles skipped scheduler notification', async () => {
+      mockIgniteStove.mockResolvedValue(undefined as any);
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockTriggerSchedulerActionServer.mockResolvedValue({
+        success: false,
+        skipped: true,
+      } as any);
+
+      const mockUpdateStoveState = jest.mocked(updateStoveState);
+      mockUpdateStoveState.mockResolvedValue(undefined as any);
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
+      });
+
+      // Use real timers for this test
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // No error should be logged for skipped
+      const errorCalls = (console.error as jest.Mock).mock.calls.filter(
+        call => call[0]?.toString().includes('notifica scheduler')
+      );
+      expect(errorCalls).toHaveLength(0);
+    });
+
+    it('logs error when scheduler notification fails', async () => {
+      mockIgniteStove.mockResolvedValue(undefined as any);
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockTriggerSchedulerActionServer.mockResolvedValue({
+        success: false,
+        skipped: false,
+        error: 'Failed to send',
+      } as any);
+
+      const mockUpdateStoveState = jest.mocked(updateStoveState);
+      mockUpdateStoveState.mockResolvedValue(undefined as any);
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify error logged
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining('Errore invio notifica scheduler'),
+        'Failed to send'
+      );
+    });
+
+    it('handles scheduler notification exception', async () => {
+      mockIgniteStove.mockResolvedValue(undefined as any);
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockTriggerSchedulerActionServer.mockRejectedValue(new Error('Network error'));
+
+      const mockUpdateStoveState = jest.mocked(updateStoveState);
+      mockUpdateStoveState.mockResolvedValue(undefined as any);
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
+      });
+
+      const request = createMockRequest();
+      const response = await GET(request);
+      await flushPromises();
+
+      // Route should still return 200
+      expect(response.status).toBe(200);
+
+      // Verify error logged
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining('Errore invio notifica scheduler'),
+        expect.any(Error)
+      );
+    });
   });
 });

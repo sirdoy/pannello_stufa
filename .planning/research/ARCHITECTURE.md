@@ -1,883 +1,864 @@
-# Architecture Research: Performance & Resilience Integration
+# Architecture Research: Fritz!Box Network Monitoring Integration
 
-**Domain:** Next.js 15.5 PWA Integration Patterns
-**Researched:** 2026-02-11
+**Domain:** Network monitoring device integration (Fritz!Box)
+**Researched:** 2026-02-13
 **Confidence:** HIGH
 
-## Executive Summary
+## Integration Overview
 
-This research covers integration of retry strategies, adaptive polling hooks, error boundaries, and component splitting patterns into the existing Next.js 15.5 App Router PWA architecture. The codebase already has foundational PWA patterns (Background Sync, IndexedDB, staleness detection) and large monolithic components requiring splitting.
-
-**Key Finding:** The architecture is well-suited for incremental enhancement. Existing hooks (useOnlineStatus, useDeviceStaleness, useBackgroundSync) provide solid foundation. Main challenges are:
-1. Large components (1200-1500 LOC) lack error boundaries
-2. Fixed 5s polling lacks visibility/network awareness
-3. No retry layer for device commands
-4. Token cleanup is manual-only (risk of unbounded growth)
-
-## Current Architecture Overview
+Fritz!Box network monitoring integrates into the existing Pannello Stufa smart home PWA using established patterns. The integration follows the **device card registry pattern** with **orchestrator architecture** and **server-side API proxy** used throughout the codebase.
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                     CLIENT LAYER (React)                         │
-├─────────────────────────────────────────────────────────────────┤
-│  Device Cards (1200-1500 LOC each, needs splitting)             │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │
-│  │ StoveCard   │  │ LightsCard  │  │ Thermostat  │              │
-│  │ (1510 LOC)  │  │ (1203 LOC)  │  │ Card        │              │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘              │
-│         │                 │                 │                    │
-│  ┌──────┴─────────────────┴─────────────────┴──────┐            │
-│  │        PWA Hooks (existing foundation)           │            │
-│  │  useOnlineStatus | useDeviceStaleness |          │            │
-│  │  useBackgroundSync                               │            │
-│  └──────────────────────────────────────────────────┘            │
-├─────────────────────────────────────────────────────────────────┤
-│                    API ROUTES LAYER                              │
-│  /api/stove/*  /api/hue/*  /api/netatmo/*                       │
-│  /api/scheduler/check (652 LOC, needs test coverage)            │
-├─────────────────────────────────────────────────────────────────┤
-│                    SERVICES LAYER                                │
-│  stoveApi | netatmoStoveSync | maintenanceService               │
-├─────────────────────────────────────────────────────────────────┤
-│                    DATA LAYER                                    │
-│  Firebase RTDB | Firestore | IndexedDB (PWA)                    │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                        CLIENT LAYER                                  │
+├─────────────────────────────────────────────────────────────────────┤
+│  Dashboard (app/page.tsx)                                            │
+│    ├─ StoveCard (existing)                                           │
+│    ├─ ThermostatCard (existing)                                      │
+│    ├─ LightsCard (existing)                                          │
+│    └─ NetworkCard (NEW)  ←── Orchestrator pattern                   │
+│         ├─ useNetworkData() ←── Polling + state                     │
+│         ├─ useNetworkCommands() ←── Actions                         │
+│         └─ Presentational components                                 │
+├─────────────────────────────────────────────────────────────────────┤
+│                        API PROXY LAYER                               │
+├─────────────────────────────────────────────────────────────────────┤
+│  app/api/network/                                                    │
+│    ├─ status/route.ts ←── Connection check                          │
+│    ├─ devices/route.ts ←── List devices with pagination             │
+│    ├─ devices/[id]/route.ts ←── Device details                      │
+│    └─ bandwidth/route.ts ←── Aggregate bandwidth stats              │
+│         │                                                             │
+│         ├─ Middleware: withAuthAndErrorHandler                       │
+│         ├─ Rate limiting: lib/rateLimiter (NEW)                     │
+│         └─ Calls: Fritz!Box REST API with X-API-Key                 │
+├─────────────────────────────────────────────────────────────────────┤
+│                        EXTERNAL API                                  │
+├─────────────────────────────────────────────────────────────────────┤
+│  Fritz!Box REST API                                                  │
+│    ├─ Authentication: X-API-Key header                              │
+│    ├─ Rate limit: 10 req/min                                        │
+│    ├─ Pagination: limit/offset                                      │
+│    └─ Errors: RFC 9457 Problem Details                              │
+├─────────────────────────────────────────────────────────────────────┤
+│                        DATA PERSISTENCE                              │
+├─────────────────────────────────────────────────────────────────────┤
+│  Firebase RTDB                                                       │
+│    └─ network/                                                       │
+│         ├─ lastDevicesFetch (TTL cache)                             │
+│         ├─ devices (cached list)                                    │
+│         └─ rateLimits/ (request tracking)                           │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
-## Integration Points for New Patterns
+---
 
-### 1. Retry Strategy Integration
+## New Components
 
-**Where:** Create `lib/utils/retry.ts` service
+### Dashboard Card
 
-**Integration Points:**
-- **Device commands** (stove ignite/shutdown, lights toggle, thermostat setpoint)
-- **API routes** with external dependencies (Thermorossi API, Netatmo OAuth, Hue Bridge)
-- **Background Sync** retry logic (currently 3 fixed attempts)
+**File:** `app/components/devices/network/NetworkCard.tsx`
 
-**Current State:**
-- Background Sync has basic retry (3 attempts, no backoff)
-- Device commands fail silently or show toast
-- No centralized retry configuration
+**Responsibilities:**
+- Display connection status (online/offline)
+- Show active devices count
+- Show aggregate bandwidth usage (down/up)
+- Connection button when not configured
+- Link to full `/network` page
 
-**Recommended Architecture:**
+**Pattern:** Orchestrator (hooks + presentational components)
+
+**Structure:**
+```typescript
+NetworkCard (orchestrator ~200 LOC)
+  ├─ useNetworkData() // Polling, state, Firebase cache
+  │   ├─ useAdaptivePolling() // Tab visibility, network quality
+  │   ├─ useVisibility()
+  │   └─ Firebase: 5-min TTL cache (like Netatmo)
+  │
+  ├─ useNetworkCommands() // No commands for read-only monitoring
+  │
+  └─ Presentational components
+      ├─ NetworkStatus (connection indicator)
+      ├─ NetworkSummary (devices count, bandwidth)
+      └─ NetworkBanners (error, API rate limit)
+```
+
+**Design System:**
+- `DeviceCard` wrapper (like LightsCard)
+- `colorTheme="ocean"` (network theme)
+- `HealthIndicator` for connection status
+- `Badge` for device counts
+- `Banner` for errors (API rate limit, connection issues)
+
+---
+
+### Full Network Page
+
+**File:** `app/network/page.tsx`
+
+**Sections:**
+1. **Overview** - Aggregate stats (total devices, bandwidth usage)
+2. **Active Devices** - Paginated table with device list
+3. **Device Details** - Selected device bandwidth history
+4. **Settings** - API key configuration, refresh interval
+
+**Components:**
+```
+app/network/
+  ├─ page.tsx (server component, auth check)
+  └─ components/
+      ├─ NetworkOverview.tsx
+      ├─ DevicesTable.tsx (pagination, sorting)
+      ├─ DeviceDetails.tsx (bandwidth chart)
+      └─ NetworkSettings.tsx
+```
+
+---
+
+### API Proxy Routes
+
+**Directory:** `app/api/network/`
+
+| Route | Method | Purpose | Notes |
+|-------|--------|---------|-------|
+| `/api/network/status` | GET | Connection check | Returns `{ connected: boolean, api_key_valid: boolean }` |
+| `/api/network/devices` | GET | List devices | Supports `?limit=20&offset=0` pagination |
+| `/api/network/devices/[id]` | GET | Device details | Returns device info + bandwidth stats |
+| `/api/network/bandwidth` | GET | Aggregate stats | Total bandwidth across all devices |
+
+**Middleware Stack:**
+```typescript
+export const GET = withAuthAndErrorHandler(async (request, context, session) => {
+  // Rate limit check (10 req/min to Fritz!Box API)
+  await checkRateLimit('network', session.user.sub);
+
+  // Call Fritz!Box REST API
+  const response = await fetch(`${FRITZBOX_API_URL}/devices`, {
+    headers: {
+      'X-API-Key': process.env.FRITZBOX_API_KEY,
+    },
+  });
+
+  // Handle RFC 9457 errors
+  if (!response.ok) {
+    const problem = await response.json();
+    throw new Error(problem.detail || 'Fritz!Box API error');
+  }
+
+  // Cache in Firebase (5-min TTL)
+  await cacheNetworkData(data);
+
+  return success({ devices: data });
+}, 'Network/Devices');
+```
+
+---
+
+### Supporting Libraries
+
+**File:** `lib/network/fritzboxApi.ts`
+
+**Responsibilities:**
+- Fritz!Box REST API wrapper
+- Request/response types
+- Error mapping (RFC 9457 → app errors)
+
+**Example:**
+```typescript
+export interface FritzBoxDevice {
+  id: string;
+  name: string;
+  ip: string;
+  mac: string;
+  online: boolean;
+  bandwidth: {
+    download: number; // bytes/sec
+    upload: number;
+  };
+}
+
+export async function getDevices(
+  limit: number = 20,
+  offset: number = 0
+): Promise<{ devices: FritzBoxDevice[]; total: number }> {
+  const response = await fetch(
+    `${process.env.FRITZBOX_API_URL}/devices?limit=${limit}&offset=${offset}`,
+    {
+      headers: {
+        'X-API-Key': process.env.FRITZBOX_API_KEY!,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    // RFC 9457 error handling
+    const problem = await response.json();
+    throw new FritzBoxError(problem.detail, problem.type);
+  }
+
+  return response.json();
+}
+```
+
+**File:** `lib/rateLimiter.ts` (NEW)
+
+**Responsibilities:**
+- Track API requests to Fritz!Box (10 req/min limit)
+- Firebase RTDB for persistence
+- Per-user tracking
+- Sliding window algorithm
+
+**Example:**
+```typescript
+export async function checkRateLimit(
+  apiName: string,
+  userId: string
+): Promise<void> {
+  const now = Date.now();
+  const windowMs = 60 * 1000; // 1 minute
+  const maxRequests = 10;
+
+  const rateLimitRef = ref(db, `network/rateLimits/${userId}`);
+  const snapshot = await get(rateLimitRef);
+
+  const requests = snapshot.val() || [];
+  const recentRequests = requests.filter(
+    (ts: number) => ts > now - windowMs
+  );
+
+  if (recentRequests.length >= maxRequests) {
+    throw new Error('RATE_LIMIT_EXCEEDED');
+  }
+
+  // Record this request
+  await update(rateLimitRef, {
+    requests: [...recentRequests, now],
+  });
+}
+```
+
+---
+
+## Modified Components
+
+### Dashboard Registry
+
+**File:** `app/page.tsx`
+
+**Change:** Add NetworkCard to `CARD_COMPONENTS` registry.
 
 ```typescript
-// lib/utils/retry.ts
-export interface RetryOptions {
-  maxAttempts: number;
-  initialDelay: number;
-  maxDelay: number;
-  backoffMultiplier: number;
-  shouldRetry?: (error: Error) => boolean;
-  onRetry?: (attempt: number, error: Error) => void;
-}
+const CARD_COMPONENTS: Record<string, React.ComponentType> = {
+  stove: StoveCard,
+  thermostat: ThermostatCard,
+  weather: WeatherCardWrapper,
+  lights: LightsCard,
+  camera: CameraCard,
+  network: NetworkCard, // NEW
+};
 
-export async function withRetry<T>(
-  fn: () => Promise<T>,
-  options: Partial<RetryOptions> = {}
-): Promise<T> {
-  // Exponential backoff with jitter
-  // Network-aware (check navigator.onLine)
-  // Abort signal support
-}
-
-// Presets for common scenarios
-export const RETRY_PRESETS = {
-  DEVICE_COMMAND: { maxAttempts: 3, initialDelay: 1000, maxDelay: 10000 },
-  API_CALL: { maxAttempts: 5, initialDelay: 500, maxDelay: 30000 },
-  BACKGROUND_SYNC: { maxAttempts: 3, initialDelay: 2000, maxDelay: 60000 },
+const DEVICE_META: Record<string, { name: string; icon: string }> = {
+  stove: { name: 'Stufa', icon: '🔥' },
+  thermostat: { name: 'Termostato', icon: '🌡️' },
+  weather: { name: 'Meteo', icon: '☀️' },
+  lights: { name: 'Luci', icon: '💡' },
+  camera: { name: 'Camera', icon: '📷' },
+  network: { name: 'Rete', icon: '🌐' }, // NEW
 };
 ```
 
-**Modified Components:**
-- `app/components/devices/stove/StoveCard.tsx` — wrap fetch calls
-- `app/components/devices/lights/LightsCard.tsx` — wrap API calls
-- `lib/pwa/backgroundSync.ts` — replace fixed retry
-- `lib/stoveApi.ts` — add retry layer for external API
+**Impact:** Card automatically appears in dashboard when enabled in unified device config.
 
-**Data Flow:**
+---
 
-```
-[User clicks Ignite]
-    ↓
-[StoveCard handler] → withRetry(igniteStove, RETRY_PRESETS.DEVICE_COMMAND)
-    ↓ (attempt 1 fails, network error)
-[Retry logic] → wait 1000ms + jitter
-    ↓ (attempt 2 fails, 503 error)
-[Retry logic] → wait 2000ms + jitter
-    ↓ (attempt 3 succeeds)
-[Update UI] ← [Success response]
-```
+### Device Config
 
-### 2. Adaptive Polling Hook Integration
+**File:** `lib/devices/deviceTypes.ts`
 
-**Where:** Create `lib/hooks/useAdaptivePolling.ts`
-
-**Integration Points:**
-- **StoveCard polling** (currently fixed 5s, 1510 LOC component)
-- **LightsCard polling** (currently fixed 30s, 1203 LOC component)
-- **ThermostatCard polling** (currently fixed 30s)
-- **StovePage polling** (1066 LOC, same pattern as StoveCard)
-
-**Current State:**
-- Fixed intervals: 5s (stove), 30s (lights/thermostat)
-- Polls even when tab hidden (battery drain)
-- No backoff on errors
-- No network awareness
-
-**Recommended Architecture:**
+**Change:** Add `network` device type.
 
 ```typescript
-// lib/hooks/useAdaptivePolling.ts
-export interface AdaptivePollingOptions {
-  baseInterval: number;          // Normal interval (5000ms)
-  slowInterval: number;           // When tab hidden (30000ms)
-  errorInterval: number;          // After error (10000ms)
-  offlineInterval: number;        // When offline (stop polling)
-  maxErrorBackoff: number;        // Max backoff after repeated errors
-  enabled?: boolean;              // Manual enable/disable
-  pauseWhenHidden?: boolean;      // Use Page Visibility API
-  networkAware?: boolean;         // Use navigator.onLine
-}
+export type DeviceTypeId =
+  | 'stove'
+  | 'thermostat'
+  | 'camera'
+  | 'lights'
+  | 'sonos'
+  | 'network'; // NEW
 
-export function useAdaptivePolling(
-  fetchFn: () => Promise<void>,
-  options: AdaptivePollingOptions
-): {
-  isPolling: boolean;
-  currentInterval: number;
-  pause: () => void;
-  resume: () => void;
-  triggerNow: () => Promise<void>;
-}
+export const DEVICE_TYPES = {
+  STOVE: 'stove',
+  THERMOSTAT: 'thermostat',
+  CAMERA: 'camera',
+  LIGHTS: 'lights',
+  SONOS: 'sonos',
+  NETWORK: 'network', // NEW
+} as const;
+
+export const DEVICE_CONFIG: Record<DeviceTypeId, DeviceConfig> = {
+  // ... existing devices
+  [DEVICE_TYPES.NETWORK]: {
+    id: 'network',
+    name: 'Rete',
+    icon: '🌐',
+    color: 'ocean',
+    enabled: false, // Start disabled
+    routes: {
+      main: '/network',
+    },
+    features: {
+      hasScheduler: false,
+      hasMaintenance: false,
+      hasErrors: false,
+    },
+  },
+};
 ```
 
-**Modified Components:**
-- `app/components/devices/stove/StoveCard.tsx` — replace `setInterval` with `useAdaptivePolling`
-- `app/components/devices/lights/LightsCard.tsx` — same
-- `app/components/devices/thermostat/ThermostatCard.tsx` — same
-- `app/stove/page.tsx` — same
+**Impact:** Device available in settings, can be enabled/disabled, navbar item auto-generated.
 
-**Data Flow:**
+---
+
+### Navbar
+
+**File:** `app/components/Navbar.tsx`
+
+**Change:** None required — device menu auto-generates from `DEVICE_CONFIG`.
+
+**Impact:** `/network` link appears automatically when device is enabled.
+
+---
+
+## Data Flow
+
+### Dashboard Card Polling
 
 ```
-[Page loads]
-    ↓
-[useAdaptivePolling] → start polling at baseInterval (5s)
-    ↓ (tab hidden detected via Page Visibility API)
-[useAdaptivePolling] → switch to slowInterval (30s)
-    ↓ (tab visible again)
-[useAdaptivePolling] → switch to baseInterval (5s)
-    ↓ (fetch error detected)
-[useAdaptivePolling] → switch to errorInterval (10s), increment backoff
-    ↓ (offline detected via useOnlineStatus)
-[useAdaptivePolling] → pause polling
-    ↓ (online again)
-[useAdaptivePolling] → resume at baseInterval (5s)
+1. NetworkCard mounts
+     ↓
+2. useNetworkData() → useAdaptivePolling(callback, 30000ms)
+     ↓
+3. Every 30s (or on tab visibility restore):
+     ↓
+4. fetch('/api/network/status')
+     ↓
+5. API route checks Firebase cache (TTL: 5 min)
+     ├─ Cache hit → Return cached data
+     └─ Cache miss → Call Fritz!Box API
+           ↓
+6. Fritz!Box REST API (X-API-Key auth)
+     ↓
+7. Rate limit check (10 req/min)
+     ↓
+8. Response cached in Firebase
+     ↓
+9. Return to client → Update state → Re-render
 ```
 
-**Page Visibility Integration:**
+**Key Points:**
+- **Adaptive polling:** Pauses when tab hidden (unless `alwaysActive: true`)
+- **Firebase cache:** Reduces Fritz!Box API calls (10 req/min limit)
+- **Retry client:** Auto-retries transient errors (network, timeout)
+- **Error boundaries:** Crashes isolated to NetworkCard (doesn't break dashboard)
 
+---
+
+### Full Page Pagination
+
+```
+1. User visits /network
+     ↓
+2. Server component checks Auth0 session
+     ├─ No session → Redirect to /auth/login
+     └─ Valid session → Render page
+           ↓
+3. Client component loads
+     ↓
+4. fetch('/api/network/devices?limit=20&offset=0')
+     ↓
+5. API route → Fritz!Box API pagination
+     ↓
+6. Return { devices: [...], total: 150 }
+     ↓
+7. Client renders table with pagination controls
+     ↓
+8. User clicks "Next" → offset=20
+     ↓
+9. Repeat fetch with new offset
+```
+
+**Pagination Pattern:**
+- **Limit/offset:** Simple, allows jumping to arbitrary pages
+- **Total count:** Included in response for pagination UI
+- **Trade-off:** Offset pagination can skip/duplicate if data changes (acceptable for network monitoring)
+
+---
+
+## Architectural Patterns
+
+### Pattern 1: Orchestrator Card
+
+**What:** Separate state/commands (hooks) from presentation (components).
+
+**Why used here:**
+- Consistent with existing StoveCard, LightsCard, ThermostatCard
+- Easy to test (hooks testable separately from UI)
+- Single polling loop guarantee (only in useNetworkData)
+
+**Example:**
 ```typescript
-// Use existing pattern from useOnlineStatus.ts
-useEffect(() => {
-  if (typeof document === 'undefined') return;
+// NetworkCard.tsx (orchestrator)
+export default function NetworkCard() {
+  const networkData = useNetworkData(); // All state
+  const commands = useNetworkCommands(networkData); // All actions (none for read-only)
 
-  const handleVisibilityChange = () => {
-    if (document.hidden && pauseWhenHidden) {
-      // Switch to slowInterval or pause
-    } else {
-      // Resume normal polling
-    }
-  };
-
-  document.addEventListener('visibilitychange', handleVisibilityChange);
-  return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-}, [pauseWhenHidden]);
-```
-
-### 3. Error Boundary Integration
-
-**Where:** Create `app/components/error-boundaries/`
-
-**Integration Points:**
-- **Device Cards wrapper** (catches render errors in StoveCard/LightsCard)
-- **Page-level boundaries** (catches errors in stove/page.tsx)
-- **Form boundaries** (catches errors in modals/forms)
-
-**Current State:**
-- **NO** error boundaries anywhere
-- Client component errors crash entire page
-- Silent failures in async operations
-
-**Recommended Architecture:**
-
-```typescript
-// app/components/error-boundaries/DeviceErrorBoundary.tsx
-'use client';
-
-import { Component, ReactNode } from 'react';
-import { Banner } from '@/app/components/ui';
-
-interface Props {
-  children: ReactNode;
-  deviceName: string;
-  fallback?: ReactNode;
-  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
-}
-
-interface State {
-  hasError: boolean;
-  error: Error | null;
-}
-
-export class DeviceErrorBoundary extends Component<Props, State> {
-  state: State = { hasError: false, error: null };
-
-  static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error(`[DeviceErrorBoundary] ${this.props.deviceName}:`, error);
-    this.props.onError?.(error, errorInfo);
-
-    // Log to Firebase for monitoring
-    logError(error, {
-      component: this.props.deviceName,
-      stack: errorInfo.componentStack,
-    });
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return this.props.fallback || (
-        <Banner
-          variant="error"
-          title={`Errore ${this.props.deviceName}`}
-          description="Si è verificato un errore. Ricarica la pagina."
-          actions={
-            <button onClick={() => this.setState({ hasError: false, error: null })}>
-              Riprova
-            </button>
-          }
-        />
-      );
-    }
-
-    return this.props.children;
-  }
-}
-```
-
-**Modified Components:**
-- `app/page.tsx` — wrap device cards
-- `app/stove/page.tsx` — wrap main content
-- `app/components/FormModal.tsx` — wrap form content
-
-**Usage Pattern:**
-
-```tsx
-// app/page.tsx
-import { DeviceErrorBoundary } from '@/app/components/error-boundaries/DeviceErrorBoundary';
-
-export default function HomePage() {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <DeviceErrorBoundary deviceName="Stufa">
-        <StoveCard />
-      </DeviceErrorBoundary>
-
-      <DeviceErrorBoundary deviceName="Luci">
-        <LightsCard />
-      </DeviceErrorBoundary>
-    </div>
+    <DeviceCard colorTheme="ocean" connected={networkData.connected}>
+      <NetworkStatus status={networkData.status} />
+      <NetworkSummary devices={networkData.devices} bandwidth={networkData.bandwidth} />
+    </DeviceCard>
   );
 }
-```
 
-**Error Boundary Hierarchy:**
+// useNetworkData.ts (hook)
+export function useNetworkData() {
+  const [status, setStatus] = useState(null);
 
-```
-[RootErrorBoundary] (app/layout.tsx)
-    ↓
-[PageErrorBoundary] (app/page.tsx)
-    ↓
-[DeviceErrorBoundary] (per device card)
-    ↓
-[FormErrorBoundary] (per modal/form)
-```
-
-### 4. Component Splitting Integration
-
-**Where:** Create subcomponents in `app/components/devices/stove/components/`
-
-**Components Requiring Split:**
-
-| Component | Current LOC | Target LOC per file | Split Strategy |
-|-----------|-------------|---------------------|----------------|
-| StoveCard.tsx | 1510 | <300 | 5-6 subcomponents |
-| LightsCard.tsx | 1203 | <300 | 4-5 subcomponents |
-| stove/page.tsx | 1066 | <300 | 4 subcomponents |
-| api/scheduler/check/route.ts | 652 | <300 | 3 service modules |
-
-**StoveCard Split Architecture:**
-
-```
-app/components/devices/stove/
-├── StoveCard.tsx                    (~200 LOC - orchestrator)
-└── components/
-    ├── StoveStatus.tsx              (~150 LOC - status display)
-    ├── StoveControls.tsx            (~200 LOC - buttons/sliders)
-    ├── StoveSchedulerInfo.tsx       (~150 LOC - scheduler banner)
-    ├── StoveMaintenanceBar.tsx      (~100 LOC - maintenance UI)
-    ├── StoveCronHealthBanner.tsx    (~80 LOC - cron status)
-    └── StoveErrorAlert.tsx          (~100 LOC - error display)
-```
-
-**LightsCard Split Architecture:**
-
-```
-app/components/devices/lights/
-├── LightsCard.tsx                   (~200 LOC - orchestrator)
-└── components/
-    ├── LightsRoomSelector.tsx       (~120 LOC - room dropdown)
-    ├── LightsRoomControls.tsx       (~250 LOC - toggle/brightness/color)
-    ├── LightsSceneList.tsx          (~150 LOC - scene buttons)
-    ├── LightsPairingFlow.tsx        (~250 LOC - bridge pairing)
-    └── LightsConnectionStatus.tsx   (~100 LOC - connection banner)
-```
-
-**stove/page.tsx Split Architecture:**
-
-```
-app/stove/
-├── page.tsx                         (~200 LOC - orchestrator)
-└── components/
-    ├── StoveStatusSection.tsx       (~200 LOC - status/controls)
-    ├── StoveSchedulerSection.tsx    (~250 LOC - scheduler controls)
-    ├── StoveMaintenanceSection.tsx  (~200 LOC - maintenance panel)
-    └── StoveHistorySection.tsx      (~200 LOC - action history)
-```
-
-**Orchestrator Pattern (StoveCard.tsx):**
-
-```typescript
-// app/components/devices/stove/StoveCard.tsx (~200 LOC)
-'use client';
-
-import { useState, useEffect, useCallback } from 'react';
-import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
-import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
-import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
-import { Card } from '@/app/components/ui';
-import { DeviceErrorBoundary } from '@/app/components/error-boundaries/DeviceErrorBoundary';
-
-// Import subcomponents
-import StoveStatus from './components/StoveStatus';
-import StoveControls from './components/StoveControls';
-import StoveSchedulerInfo from './components/StoveSchedulerInfo';
-import StoveMaintenanceBar from './components/StoveMaintenanceBar';
-import StoveCronHealthBanner from './components/StoveCronHealthBanner';
-import StoveErrorAlert from './components/StoveErrorAlert';
-
-export default function StoveCard() {
-  // State (consolidated to orchestrator)
-  const [status, setStatus] = useState<string>('...');
-  const [fanLevel, setFanLevel] = useState<number | null>(null);
-  const [powerLevel, setPowerLevel] = useState<number | null>(null);
-  const [schedulerMode, setSchedulerMode] = useState<any>(null);
-  const [maintenanceStatus, setMaintenanceStatus] = useState<any>(null);
-
-  // Hooks
-  const { isOnline } = useOnlineStatus();
-  const { queueStoveCommand } = useBackgroundSync();
-
-  // Data fetching (centralized)
-  const fetchAllData = useCallback(async () => {
-    const [statusRes, fanRes, powerRes, modeRes, mainRes] = await Promise.all([
-      fetch('/api/stove/status'),
-      fetch('/api/stove/fan'),
-      fetch('/api/stove/power'),
-      fetch('/api/scheduler/mode'),
-      fetch('/api/maintenance/status'),
-    ]);
-    // ... update state
-  }, []);
-
-  // Adaptive polling
-  const { isPolling, triggerNow } = useAdaptivePolling(fetchAllData, {
-    baseInterval: 5000,
-    slowInterval: 30000,
-    errorInterval: 10000,
-    pauseWhenHidden: true,
-    networkAware: true,
+  useAdaptivePolling({
+    callback: async () => {
+      const res = await fetch('/api/network/status');
+      setStatus(await res.json());
+    },
+    interval: 30000, // 30s
   });
 
-  // Render with error boundary per section
-  return (
-    <Card liquid>
-      <DeviceErrorBoundary deviceName="Stufa - Status">
-        <StoveStatus status={status} />
-      </DeviceErrorBoundary>
-
-      <DeviceErrorBoundary deviceName="Stufa - Controls">
-        <StoveControls
-          fanLevel={fanLevel}
-          powerLevel={powerLevel}
-          onCommand={(cmd) => queueStoveCommand(cmd)}
-        />
-      </DeviceErrorBoundary>
-
-      <DeviceErrorBoundary deviceName="Stufa - Scheduler">
-        <StoveSchedulerInfo mode={schedulerMode} />
-      </DeviceErrorBoundary>
-
-      <DeviceErrorBoundary deviceName="Stufa - Maintenance">
-        <StoveMaintenanceBar status={maintenanceStatus} />
-      </DeviceErrorBoundary>
-    </Card>
-  );
+  return { status, connected: status?.connected };
 }
 ```
 
-**Subcomponent Pattern (StoveControls.tsx):**
+---
 
+### Pattern 2: Server-Side API Proxy
+
+**What:** Next.js API routes proxy external APIs, hide secrets server-side.
+
+**Why used here:**
+- Fritz!Box API key stays server-side (never exposed to client)
+- Rate limiting enforced before external API call
+- Response transformation (RFC 9457 → app error format)
+- Firebase caching layer
+
+**Example:**
 ```typescript
-// app/components/devices/stove/components/StoveControls.tsx (~200 LOC)
-'use client';
+// app/api/network/devices/route.ts
+export const GET = withAuthAndErrorHandler(async (request, context, session) => {
+  // Rate limit (10 req/min)
+  await checkRateLimit('network', session.user.sub);
 
-import { useState } from 'react';
-import { Button, ControlButton } from '@/app/components/ui';
-import { withRetry, RETRY_PRESETS } from '@/lib/utils/retry';
-
-interface StoveControlsProps {
-  fanLevel: number | null;
-  powerLevel: number | null;
-  onCommand: (cmd: any) => Promise<void>;
-}
-
-export default function StoveControls({ fanLevel, powerLevel, onCommand }: StoveControlsProps) {
-  const [loading, setLoading] = useState(false);
-
-  const handleIgnite = async () => {
-    setLoading(true);
-    try {
-      await withRetry(
-        () => onCommand({ action: 'ignite', power: powerLevel }),
-        RETRY_PRESETS.DEVICE_COMMAND
-      );
-      // Success toast
-    } catch (err) {
-      // Error toast
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="space-y-4">
-      <Button onClick={handleIgnite} loading={loading}>
-        Accendi Stufa
-      </Button>
-      {/* ... other controls */}
-    </div>
-  );
-}
-```
-
-**Build Order for Component Splitting:**
-
-1. **Create error boundaries** (foundational, needed before splitting)
-2. **Create retry utility** (needed for subcomponents)
-3. **Create adaptive polling hook** (needed for orchestrators)
-4. **Split StoveCard** (most complex, highest value)
-5. **Split LightsCard** (second most complex)
-6. **Split stove/page.tsx** (reuses StoveCard patterns)
-7. **Split API routes** (scheduler/check route)
-
-### 5. Automatic Token Cleanup Integration
-
-**Where:** Extend `app/api/scheduler/check/route.ts`
-
-**Current State:**
-- Token cleanup runs every 7 days (line 201-312)
-- Manual trigger only (no failures handled)
-- Unbounded accumulation if cron fails
-
-**Integration Points:**
-- **Cron route** (already has cleanup, needs retry)
-- **Client-side trigger** (new: cleanup on app open if >7 days)
-- **Service Worker** (new: cleanup during background sync)
-
-**Recommended Architecture:**
-
-```typescript
-// lib/services/tokenCleanupService.ts
-export interface CleanupResult {
-  cleaned: boolean;
-  tokensRemoved: number;
-  tokensScanned: number;
-  errorsRemoved: number;
-  nextCleanup: string;
-  reason?: string;
-}
-
-export async function cleanupTokensIfNeeded(
-  forceRun = false
-): Promise<CleanupResult> {
-  // Check last cleanup timestamp
-  // Return early if <7 days and !forceRun
-  // Run cleanup with retry logic
-  // Update timestamp
-}
-
-// Retry wrapper for cleanup
-export async function cleanupWithRetry(): Promise<CleanupResult> {
-  return withRetry(
-    () => cleanupTokensIfNeeded(),
-    {
-      maxAttempts: 3,
-      initialDelay: 5000,
-      shouldRetry: (err) => err.message.includes('Firebase'),
-    }
-  );
-}
-```
-
-**Modified Files:**
-- `app/api/scheduler/check/route.ts` — wrap cleanup with retry
-- `lib/services/tokenCleanupService.ts` — new service module
-- `app/sw.ts` — add cleanup trigger during periodic sync
-
-**Client-Side Trigger (app open):**
-
-```typescript
-// app/layout.tsx (or PWA initializer)
-useEffect(() => {
-  const checkCleanup = async () => {
-    const lastCleanup = localStorage.getItem('lastTokenCleanup');
-    if (!lastCleanup) return;
-
-    const sevenDays = 7 * 24 * 60 * 60 * 1000;
-    if (Date.now() - Number(lastCleanup) > sevenDays) {
-      // Trigger cleanup API
-      await fetch('/api/admin/cleanup-tokens', { method: 'POST' });
-      localStorage.setItem('lastTokenCleanup', String(Date.now()));
-    }
-  };
-
-  checkCleanup();
-}, []);
-```
-
-**Service Worker Integration:**
-
-```typescript
-// app/sw.ts
-import { cleanupTokensIfNeeded } from '@/lib/services/tokenCleanupService';
-
-self.addEventListener('periodicsync', (event: any) => {
-  if (event.tag === 'token-cleanup') {
-    event.waitUntil(cleanupTokensIfNeeded(true));
+  // Check Firebase cache (5-min TTL)
+  const cached = await getNetworkCache('devices');
+  if (cached && Date.now() - cached.timestamp < 5 * 60 * 1000) {
+    return success(cached.data);
   }
+
+  // Call external API
+  const response = await fetch(`${FRITZBOX_API_URL}/devices`, {
+    headers: { 'X-API-Key': process.env.FRITZBOX_API_KEY! },
+  });
+
+  if (!response.ok) {
+    // RFC 9457 error handling
+    const problem = await response.json();
+    throw new Error(problem.detail);
+  }
+
+  const data = await response.json();
+
+  // Cache response
+  await setNetworkCache('devices', data);
+
+  return success(data);
+}, 'Network/Devices');
+```
+
+**Benefits:**
+- Environment variables (API key) never leak to client
+- Rate limiting prevents quota exhaustion
+- Caching reduces external API calls
+- Error transformation (RFC 9457 → friendly messages)
+
+---
+
+### Pattern 3: Adaptive Polling with Visibility
+
+**What:** Pause polling when tab hidden, resume immediately when visible.
+
+**Why used here:**
+- Saves bandwidth (no requests when user not looking)
+- Fresh data on tab restore (immediate fetch)
+- Consistent with other device cards (StoveCard, LightsCard)
+
+**Example:**
+```typescript
+useAdaptivePolling({
+  callback: fetchNetworkStatus,
+  interval: 30000, // 30s
+  alwaysActive: false, // Pause when tab hidden
+  immediate: true, // Fetch on mount
 });
 ```
 
-## Data Flow Changes
+**Trade-offs:**
+- **Pros:** Lower bandwidth, better battery, fresh data on restore
+- **Cons:** Data can be stale if tab hidden for long periods
+- **For network monitoring:** `alwaysActive: false` is correct (not safety-critical like stove maintenance)
 
-### Before (Current State)
+---
 
-```
-[StoveCard Component - 1510 LOC monolith]
-    ↓
-[Fixed 5s polling, no visibility awareness]
-    ↓
-[Fetch /api/stove/status - no retry]
-    ↓ (fails)
-[Silent failure or toast, no recovery]
+### Pattern 4: Firebase TTL Cache
+
+**What:** Cache external API responses in Firebase RTDB with timestamp-based expiration.
+
+**Why used here:**
+- Fritz!Box API has 10 req/min rate limit
+- Multiple tabs/users share cache
+- Persistent across page reloads
+- Fallback if external API down
+
+**Example:**
+```typescript
+// lib/network/cache.ts
+export async function getNetworkCache(key: string): Promise<CachedData | null> {
+  const ref = ref(db, `network/cache/${key}`);
+  const snapshot = await get(ref);
+
+  if (!snapshot.exists()) return null;
+
+  const cached = snapshot.val();
+  const age = Date.now() - cached.timestamp;
+
+  // 5-min TTL (like Netatmo)
+  if (age > 5 * 60 * 1000) {
+    return null; // Expired
+  }
+
+  return cached;
+}
+
+export async function setNetworkCache(key: string, data: any): Promise<void> {
+  const ref = ref(db, `network/cache/${key}`);
+  await set(ref, {
+    data,
+    timestamp: Date.now(),
+  });
+}
 ```
 
-### After (Enhanced Architecture)
+**Trade-offs:**
+- **Pros:** Reduces API calls, shares cache across users, persists across reloads
+- **Cons:** Data can be stale up to TTL duration
+- **For network monitoring:** 5-min TTL acceptable (not real-time critical)
 
+---
+
+## Error Handling
+
+### RFC 9457 Problem Details
+
+Fritz!Box API returns errors in RFC 9457 format:
+
+```json
+{
+  "type": "https://fritzbox.example/errors/rate-limit",
+  "title": "Rate Limit Exceeded",
+  "status": 429,
+  "detail": "Maximum 10 requests per minute exceeded",
+  "instance": "/api/devices"
+}
 ```
-[StoveCard Orchestrator - 200 LOC]
-    ↓
-[useAdaptivePolling - visibility/network aware]
-    ↓ (switches to 30s when tab hidden)
-[withRetry wrapper - 3 attempts with backoff]
-    ↓ (attempt 1 fails)
-[Retry with backoff - 1000ms + jitter]
-    ↓ (attempt 2 succeeds)
-[DeviceErrorBoundary - per subcomponent]
-    ↓
-[StoveStatus/Controls/Maintenance - isolated components]
+
+**Mapping to App Errors:**
+
+```typescript
+// lib/network/fritzboxApi.ts
+export class FritzBoxError extends Error {
+  constructor(
+    public detail: string,
+    public type: string,
+    public status?: number
+  ) {
+    super(detail);
+    this.name = 'FritzBoxError';
+  }
+}
+
+// Error handling in API route
+try {
+  const response = await fetch(FRITZBOX_API_URL);
+
+  if (!response.ok) {
+    const problem = await response.json();
+
+    if (problem.status === 429) {
+      // Rate limit exceeded
+      throw new FritzBoxError(
+        'Limite richieste API superato (10 req/min)',
+        problem.type,
+        429
+      );
+    }
+
+    throw new FritzBoxError(problem.detail, problem.type, problem.status);
+  }
+} catch (error) {
+  // Middleware handles FritzBoxError → user-friendly banner
+  return handleError(error, 'Network/API');
+}
 ```
+
+**UI Display:**
+
+```tsx
+// NetworkCard banners
+{error && (
+  <Banner
+    variant="error"
+    icon="⚠️"
+    title="Errore Rete"
+    description={error.message}
+    dismissible
+    onDismiss={() => setError(null)}
+  />
+)}
+
+{rateLimitExceeded && (
+  <Banner
+    variant="warning"
+    icon="⏱️"
+    title="Limite Richieste API"
+    description="Troppe richieste. Riprova tra 1 minuto."
+    compact
+  />
+)}
+```
+
+---
+
+### Retry Strategy
+
+```typescript
+// lib/retry/retryClient.ts (existing)
+const TRANSIENT_ERROR_CODES = new Set([
+  'NETWORK_ERROR',
+  'TIMEOUT',
+  'SERVICE_UNAVAILABLE',
+]);
+
+// Used automatically by fetch wrapper
+const response = await retryFetch('/api/network/status', {
+  maxAttempts: 3,
+  initialDelay: 1000, // 1s
+  backoffMultiplier: 2,
+});
+```
+
+**Non-retryable errors:**
+- `RATE_LIMIT_EXCEEDED` (429) — Must wait 1 minute
+- `UNAUTHORIZED` (401) — API key invalid
+- `NOT_FOUND` (404) — Device doesn't exist
+
+**Retryable errors:**
+- `NETWORK_ERROR` — Transient network issue
+- `TIMEOUT` — Request timeout
+- `SERVICE_UNAVAILABLE` (503) — Fritz!Box temporarily down
+
+---
 
 ## Scaling Considerations
 
 | Scale | Architecture Adjustments |
 |-------|--------------------------|
-| Current (1 user) | Monolithic components work but are hard to maintain |
-| Post-split (1 user) | Easier maintenance, better error isolation, same performance |
-| Future (5-10 users) | Adaptive polling reduces server load, retry reduces failed requests |
+| 1 user | Current architecture works perfectly. Dashboard card + full page. |
+| 5-10 users | Firebase cache shared across users. 10 req/min limit shared → effective 1-2 req/user/min. May need per-user rate limit tracking. |
+| 100+ users | Fritz!Box API rate limit becomes bottleneck. Consider: local Fritz!Box polling service (bypass REST API), dedicated backend with websockets for real-time updates, separate Fritz!Box instances per household. |
 
-### Performance Implications
+**Bottleneck Analysis:**
 
-**Adaptive Polling:**
-- **Savings:** 83% fewer requests when tab hidden (5s → 30s)
-- **Battery:** ~40% battery savings on mobile (Page Visibility API)
-- **Network:** Pauses during offline (0 failed requests)
+1. **First bottleneck:** Fritz!Box 10 req/min rate limit
+   - **Fix:** Increase Firebase cache TTL (5 min → 10 min)
+   - **Fix:** Per-user rate limit tracking (prevent one user exhausting quota)
 
-**Component Splitting:**
-- **Bundle size:** Minimal increase (~5-10KB gzipped for hooks/boundaries)
-- **Render performance:** Slightly better (smaller components, easier React reconciliation)
-- **Developer experience:** Significantly better (200 LOC files vs 1500 LOC)
+2. **Second bottleneck:** Firebase RTDB read/write limits
+   - **Fix:** Use Firebase RTDB transactions for rate limit tracking
+   - **Fix:** Batch cache writes
 
-**Retry Logic:**
-- **Success rate:** +15-20% (recovers transient failures)
-- **Latency:** Slight increase on failures (backoff delays)
-- **Server load:** Minimal increase (controlled backoff, max 3 attempts)
+**For Pannello Stufa (1-5 users):** Current architecture sufficient. No scaling changes needed.
 
-## Anti-Patterns to Avoid
+---
 
-### Anti-Pattern 1: Error Boundary per Component Instance
+## Anti-Patterns
 
-**What people do:**
-```tsx
-<DeviceErrorBoundary>
-  <Button onClick={handleIgnite} />
-</DeviceErrorBoundary>
-```
+### Anti-Pattern 1: Client-Side API Key Storage
 
-**Why it's wrong:** Too granular, adds unnecessary component tree depth, makes debugging harder.
+**What people do:** Store Fritz!Box API key in environment variable with `NEXT_PUBLIC_` prefix.
+
+**Why it's wrong:**
+- API key exposed to client (visible in browser DevTools)
+- Anyone can extract key and abuse quota
+- Security risk if key has admin privileges
 
 **Do this instead:**
-```tsx
-<DeviceErrorBoundary deviceName="Stufa - Controls">
-  <StoveControls /> {/* Boundary wraps logical section */}
-</DeviceErrorBoundary>
-```
+- Server-side only: `FRITZBOX_API_KEY` (no `NEXT_PUBLIC_`)
+- All Fritz!Box API calls through Next.js API routes
+- Middleware validates Auth0 session before proxying
 
-### Anti-Pattern 2: Polling in Every Subcomponent
+---
 
-**What people do:**
-```tsx
-// StoveStatus.tsx
-useEffect(() => {
-  const interval = setInterval(fetchStatus, 5000);
-  return () => clearInterval(interval);
-}, []);
+### Anti-Pattern 2: No Rate Limiting
 
-// StoveControls.tsx
-useEffect(() => {
-  const interval = setInterval(fetchStatus, 5000);
-  return () => clearInterval(interval);
-}, []);
-```
+**What people do:** Call Fritz!Box API directly from client on every render/poll.
 
-**Why it's wrong:** Multiple polling loops, N× server requests, state synchronization issues.
+**Why it's wrong:**
+- Quickly exhausts 10 req/min quota
+- No coordination between tabs/users
+- API returns 429, app unusable
 
 **Do this instead:**
-```tsx
-// StoveCard.tsx (orchestrator)
-const { data } = useAdaptivePolling(fetchAllData, { baseInterval: 5000 });
+- Server-side rate limiter with Firebase persistence
+- Shared quota across users (or per-user tracking)
+- Firebase cache reduces API calls (5-min TTL)
 
-// Pass data down to subcomponents
-<StoveStatus status={data.status} />
-<StoveControls fanLevel={data.fanLevel} />
-```
+---
 
-### Anti-Pattern 3: Retry Logic in UI Components
+### Anti-Pattern 3: Polling Without Visibility Awareness
 
-**What people do:**
-```tsx
-const handleIgnite = async () => {
-  for (let i = 0; i < 3; i++) {
-    try {
-      await fetch('/api/stove/ignite');
-      break;
-    } catch (err) {
-      await new Promise(r => setTimeout(r, 1000 * i));
-    }
-  }
-};
-```
+**What people do:** `setInterval()` polling that runs even when tab hidden.
 
-**Why it's wrong:** Retry logic mixed with UI code, no backoff strategy, hard to test, duplicated across components.
+**Why it's wrong:**
+- Wastes bandwidth on hidden tabs
+- Drains mobile battery
+- Unnecessary API quota consumption
 
 **Do this instead:**
-```tsx
-import { withRetry, RETRY_PRESETS } from '@/lib/utils/retry';
+- `useAdaptivePolling()` hook (existing)
+- Pauses when tab hidden (`alwaysActive: false`)
+- Resumes + fetches immediately on tab restore
 
-const handleIgnite = async () => {
-  await withRetry(
-    () => fetch('/api/stove/ignite'),
-    RETRY_PRESETS.DEVICE_COMMAND
-  );
-};
-```
+---
 
-### Anti-Pattern 4: Split Components Too Small
+### Anti-Pattern 4: Ignoring RFC 9457 Error Structure
 
-**What people do:** Create 20+ components with 50 LOC each
+**What people do:** Treat all errors as generic `{ error: string }`.
 
-**Why it's wrong:** Over-engineering, hard to navigate, prop drilling nightmare
+**Why it's wrong:**
+- Loses valuable error context (type, instance, detail)
+- Can't distinguish rate limit vs auth vs network errors
+- Poor UX (generic "Error occurred" messages)
 
-**Do this instead:** Target 200-300 LOC per component, split only when:
-- Logical boundary exists (status vs controls vs scheduler)
-- Component exceeds 400 LOC
-- Reusability opportunity exists
+**Do this instead:**
+- Parse RFC 9457 `type`, `status`, `detail`
+- Map to app-specific error codes
+- Display user-friendly messages with context
 
-## Migration Path (Build Order)
+---
 
-### Phase 1: Foundation (Week 1)
-1. Create `lib/utils/retry.ts` with tests
-2. Create `lib/hooks/useAdaptivePolling.ts` with tests
-3. Create error boundary components
-4. Add error boundaries to homepage (app/page.tsx)
+## Integration Checklist
 
-**Dependencies:** None
-**Risk:** Low (additive changes)
+### Phase 1: Foundation
 
-### Phase 2: Polling Migration (Week 2)
-1. Replace polling in StoveCard with useAdaptivePolling
-2. Replace polling in LightsCard with useAdaptivePolling
-3. Replace polling in ThermostatCard with useAdaptivePolling
-4. Add retry logic to device command handlers
+- [ ] Add `network` device type to `lib/devices/deviceTypes.ts`
+- [ ] Create `lib/network/fritzboxApi.ts` (API wrapper)
+- [ ] Create `lib/rateLimiter.ts` (10 req/min enforcement)
+- [ ] Add environment variables (`FRITZBOX_API_URL`, `FRITZBOX_API_KEY`)
 
-**Dependencies:** Phase 1 complete
-**Risk:** Medium (behavior change, needs testing)
+### Phase 2: API Routes
 
-### Phase 3: Component Splitting - Stove (Week 3)
-1. Create `app/components/devices/stove/components/` directory
-2. Extract StoveStatus component
-3. Extract StoveControls component (with retry)
-4. Extract StoveSchedulerInfo component
-5. Extract StoveMaintenanceBar component
-6. Refactor StoveCard to orchestrator pattern
+- [ ] `app/api/network/status/route.ts` (connection check)
+- [ ] `app/api/network/devices/route.ts` (list with pagination)
+- [ ] `app/api/network/devices/[id]/route.ts` (device details)
+- [ ] `app/api/network/bandwidth/route.ts` (aggregate stats)
 
-**Dependencies:** Phase 2 complete
-**Risk:** Medium (large refactor, needs thorough testing)
+### Phase 3: Dashboard Card
 
-### Phase 4: Component Splitting - Lights (Week 4)
-1. Create `app/components/devices/lights/components/` directory
-2. Extract LightsRoomSelector component
-3. Extract LightsRoomControls component
-4. Extract LightsPairingFlow component
-5. Refactor LightsCard to orchestrator pattern
+- [ ] `app/components/devices/network/NetworkCard.tsx` (orchestrator)
+- [ ] `app/components/devices/network/hooks/useNetworkData.ts` (polling + state)
+- [ ] `app/components/devices/network/components/NetworkStatus.tsx` (presentational)
+- [ ] `app/components/devices/network/components/NetworkSummary.tsx` (presentational)
+- [ ] `app/components/devices/network/components/NetworkBanners.tsx` (error handling)
+- [ ] Add to `app/page.tsx` registry
 
-**Dependencies:** Phase 3 complete
-**Risk:** Low (follows established pattern)
+### Phase 4: Full Page
 
-### Phase 5: Token Cleanup & Polish (Week 5)
-1. Extract token cleanup to service module
-2. Add retry logic to cleanup
-3. Add client-side cleanup trigger
-4. Add Service Worker cleanup integration
-5. Split stove/page.tsx (bonus if time permits)
+- [ ] `app/network/page.tsx` (server component with auth)
+- [ ] `app/network/components/NetworkOverview.tsx` (aggregate stats)
+- [ ] `app/network/components/DevicesTable.tsx` (pagination)
+- [ ] `app/network/components/DeviceDetails.tsx` (bandwidth chart)
+- [ ] `app/network/components/NetworkSettings.tsx` (API config)
 
-**Dependencies:** Phase 1-4 complete
-**Risk:** Low (isolated changes)
+### Phase 5: Testing
 
-## Integration with Existing Patterns
+- [ ] Unit tests: `lib/network/fritzboxApi.test.ts`
+- [ ] Unit tests: `lib/rateLimiter.test.ts`
+- [ ] Integration tests: `app/api/network/devices/route.test.ts`
+- [ ] Component tests: `app/components/devices/network/NetworkCard.test.tsx`
+- [ ] E2E tests: Network page pagination, rate limit handling
 
-### PWA Integration
+### Phase 6: Documentation
 
-**Existing Hooks (Keep):**
-- `useOnlineStatus` — used by useAdaptivePolling for network awareness
-- `useBackgroundSync` — enhanced with retry logic
-- `useDeviceStaleness` — used for stale data warnings
+- [ ] Update `docs/architecture.md` (add network device section)
+- [ ] Update `docs/api-routes.md` (add network API endpoints)
+- [ ] Update `docs/firebase.md` (add network cache schema)
+- [ ] Create `docs/setup/fritzbox-setup.md` (API key setup guide)
 
-**New Hooks:**
-- `useAdaptivePolling` — uses useOnlineStatus internally
-- `useRetry` (optional) — hook wrapper for withRetry utility
+---
 
-### Self-Contained Device Card Pattern (Preserved)
+## Build Order Recommendations
 
-Current pattern: All device-specific info inside card boundaries
+**Order by dependencies:**
 
-```tsx
-// BEFORE (current - preserved)
-<Card liquid>
-  {needsMaintenance && <Banner variant="warning" />}
-  <StatusDisplay />
-  <Controls />
-</Card>
+1. **Device registry** (`lib/devices/deviceTypes.ts`) — No deps
+2. **API wrapper** (`lib/network/fritzboxApi.ts`) — No deps
+3. **Rate limiter** (`lib/rateLimiter.ts`) — Depends on Firebase
+4. **API routes** (`app/api/network/*`) — Depends on #2, #3
+5. **Dashboard card** (`app/components/devices/network/NetworkCard.tsx`) — Depends on #4
+6. **Full page** (`app/network/page.tsx`) — Depends on #4, #5 (reuses components)
+7. **Testing** — Depends on all above
 
-// AFTER (enhanced with boundaries)
-<Card liquid>
-  <DeviceErrorBoundary deviceName="Stufa">
-    {needsMaintenance && <Banner variant="warning" />}
-    <StoveStatus />
-    <StoveControls />
-  </DeviceErrorBoundary>
-</Card>
-```
+**Rationale:**
+- Bottom-up (infrastructure → API → UI)
+- Each layer testable independently
+- Dashboard card validates API before building full page
+- Full page reuses NetworkCard components (DRY)
 
-### Firebase Pattern (Unchanged)
+**Estimated LOC:**
+- Device registry: +30 LOC (modify existing file)
+- API wrapper: ~150 LOC
+- Rate limiter: ~100 LOC
+- API routes: ~400 LOC (4 routes × ~100 LOC)
+- Dashboard card: ~200 LOC (orchestrator) + ~150 LOC (components/hooks)
+- Full page: ~300 LOC (page) + ~400 LOC (components)
+- Tests: ~800 LOC
 
-Keep existing Firebase listeners in orchestrators:
+**Total:** ~2,530 LOC (similar to LightsCard integration)
 
-```tsx
-// StoveCard.tsx orchestrator
-useEffect(() => {
-  const unsubscribe = onValue(ref(db, 'stove/status'), (snapshot) => {
-    setStatus(snapshot.val());
-  });
-  return () => unsubscribe();
-}, []);
-```
-
-## Testing Strategy
-
-### Unit Tests
-
-**New Utilities:**
-- `lib/utils/retry.ts` — test backoff, jitter, shouldRetry, abort
-- `lib/hooks/useAdaptivePolling.ts` — test interval switching, pause/resume
-- `lib/services/tokenCleanupService.ts` — test cleanup logic, timestamp checks
-
-**Error Boundaries:**
-- `DeviceErrorBoundary` — test error capture, fallback render, reset
-
-### Integration Tests
-
-**Component Splitting:**
-- StoveCard orchestrator — test data flow to subcomponents
-- StoveControls — test retry on command failures
-- Adaptive polling — test visibility changes, network changes
-
-### E2E Tests (Playwright)
-
-**Resilience Scenarios:**
-- Offline → Online transition (Background Sync + retry)
-- Tab visibility changes (adaptive polling)
-- Device command failures (retry + error boundary)
+---
 
 ## Sources
 
-**Existing Codebase Analysis:**
-- `app/components/devices/stove/StoveCard.tsx` (1510 LOC) — HIGH confidence
-- `app/components/devices/lights/LightsCard.tsx` (1203 LOC) — HIGH confidence
-- `app/stove/page.tsx` (1066 LOC) — HIGH confidence
-- `app/api/scheduler/check/route.ts` (652 LOC) — HIGH confidence
-- `lib/hooks/useOnlineStatus.ts` — HIGH confidence (existing PWA patterns)
-- `lib/hooks/useDeviceStaleness.ts` — HIGH confidence (polling pattern)
-- `lib/pwa/backgroundSync.ts` — HIGH confidence (retry pattern)
-- `docs/architecture.md` — HIGH confidence (self-contained pattern)
-- `docs/pwa.md` — HIGH confidence (PWA architecture)
+Fritz!Box API and network monitoring patterns:
+- [How can I monitor the Internet bandwidth of an AVM Fritzbox router? | Paessler Knowledge Base](https://kb.paessler.com/en/topic/38313-how-can-i-monitor-the-internet-bandwidth-of-an-avm-fritzbox-router)
+- [Structure and API — fritzconnection 1.4 documentation](https://fritzconnection.readthedocs.io/en/1.4.2/sources/api.html)
+- [Monitoring per-device traffic on FritzBox](https://marcoperetti.com/monitoring-per-device-traffic-on-fritzbox/)
+- [Fritzbox Network Devices Monitoring | Netdata](https://www.netdata.cloud/monitoring-101/fritzbox-monitoring/)
 
-**Next.js Patterns:**
-- Next.js 15.5 App Router — HIGH confidence (official docs)
-- React Error Boundaries — HIGH confidence (React 18 docs)
-- Page Visibility API — HIGH confidence (MDN)
-
-**LOC Measurements:**
-- Actual file line counts via `wc -l` — HIGH confidence
+RFC 9457 Problem Details and pagination best practices:
+- [Problem Details (RFC 9457): Doing API Errors Well](https://swagger.io/blog/problem-details-rfc9457-doing-api-errors-well/)
+- [Pagination Best Practices in REST API Design | Speakeasy](https://www.speakeasy.com/api-design/pagination)
+- [RFC 9457 - Problem Details for HTTP APIs](https://datatracker.ietf.org/doc/html/rfc9457)
 
 ---
-*Architecture research for: Performance & Resilience Integration*
-*Researched: 2026-02-11*
-*Confidence: HIGH (based on existing codebase patterns)*
+
+*Architecture research for: Fritz!Box Network Monitoring Integration*
+*Researched: 2026-02-13*
+*Confidence: HIGH (existing patterns validated, external API specs confirmed)*

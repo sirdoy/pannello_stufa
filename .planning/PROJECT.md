@@ -2,7 +2,7 @@
 
 ## What This Is
 
-PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (con gestione schedule complete), luci Philips Hue. Include sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, rate limiting persistente Firebase RTDB, offline mode avanzato con staleness indicators, PWA install prompt guidato, e analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
+PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (con gestione schedule complete), luci Philips Hue. Include sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, rate limiting persistente Firebase RTDB, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API, e componenti refactored con orchestrator pattern (~85% LOC reduction). Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
 
 ## Core Value
 
@@ -10,8 +10,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v7.0 (in progress)
-**Status:** Performance & resilience hardening
+**Version:** v7.0 (shipped 2026-02-13)
+**Status:** Performance & Resilience complete
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -21,6 +21,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Recharts for visualization
 - CVA (class-variance-authority) for type-safe component variants
 - Radix UI primitives for accessible interactions
+- react-error-boundary for crash isolation
 - GitHub Actions for cron automation (5-min schedule)
 - ~104,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
 
@@ -157,6 +158,50 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ 40 unused files, 4 deps, 203 exports eliminated — v5.1
 - ✓ All 3,034 tests green — v5.1
 
+**v7.0 Performance & Resilience (Shipped 2026-02-13):**
+
+**Request Resilience:**
+- ✓ **RETRY-01**: User sees toast when device command fails — v7.0 (Phase 55)
+- ✓ **RETRY-02**: Transient errors auto-retry with exponential backoff (max 3) — v7.0 (Phase 55)
+- ✓ **RETRY-03**: Device-offline errors show toast with manual Retry — v7.0 (Phase 55)
+- ✓ **RETRY-04**: Stove safety commands use idempotency keys — v7.0 (Phase 55)
+- ✓ **RETRY-05**: Request deduplication prevents double-tap — v7.0 (Phase 55)
+- ✓ **RETRY-06**: Single retry layer at API boundary — v7.0 (Phase 55)
+
+**Adaptive Polling:**
+- ✓ **POLL-01**: Polling pauses when tab hidden — v7.0 (Phase 57)
+- ✓ **POLL-02**: Polling resumes when tab visible — v7.0 (Phase 57)
+- ✓ **POLL-03**: Stove keeps fixed interval (safety-critical) — v7.0 (Phase 57)
+- ✓ **POLL-04**: Non-critical data adapts to slow network — v7.0 (Phase 57)
+- ✓ **POLL-05**: Staleness indicator shows when data old — v7.0 (Phase 57)
+
+**Error Handling:**
+- ✓ **ERR-01**: Global error boundary with fallback UI — v7.0 (Phase 56)
+- ✓ **ERR-02**: Feature-level boundaries isolate device cards — v7.0 (Phase 56)
+- ✓ **ERR-03**: User-friendly message with "Try Again" action — v7.0 (Phase 56)
+- ✓ **ERR-04**: Retry-from-error resets and re-mounts — v7.0 (Phase 56)
+- ✓ **ERR-05**: Errors logged to analytics (fire-and-forget) — v7.0 (Phase 56)
+- ✓ **ERR-06**: ValidationError bypasses boundaries (safety) — v7.0 (Phase 56)
+
+**Component Refactoring:**
+- ✓ **REFAC-01**: StoveCard split (1510→188 LOC, -87%) — v7.0 (Phase 58)
+- ✓ **REFAC-02**: LightsCard split (1225→184 LOC, -85%) — v7.0 (Phase 59)
+- ✓ **REFAC-03**: stove/page.tsx split (1066→189 LOC, -82%) — v7.0 (Phase 59)
+- ✓ **REFAC-04**: Complex state logic in custom hooks — v7.0 (Phase 58, 59)
+- ✓ **REFAC-05**: Orchestrator pattern (parent state, children presentational) — v7.0 (Phase 58, 59)
+
+**Critical Path Testing:**
+- ✓ **TEST-01**: Unit tests for scheduler check all paths — v7.0 (Phase 60)
+- ✓ **TEST-02**: Tests cover state transitions (OFF→START→WORK) — v7.0 (Phase 60)
+- ✓ **TEST-03**: Tests cover error scenarios — v7.0 (Phase 60)
+- ✓ **TEST-04**: 80%+ branch coverage on scheduler route (80.07%) — v7.0 (Phase 60)
+
+**Token Lifecycle:**
+- ✓ **TOKEN-01**: Automated cleanup via cron — v7.0 (Phase 60)
+- ✓ **TOKEN-02**: Stale tokens by last delivery timestamp — v7.0 (Phase 60)
+- ✓ **TOKEN-03**: Cleanup logs for audit trail — v7.0 (Phase 60)
+- ✓ **TOKEN-04**: Active tokens never deleted — v7.0 (Phase 60)
+
 **v6.0 Operations, PWA & Analytics (Shipped 2026-02-11):**
 
 **Persistent Rate Limiting:**
@@ -212,19 +257,9 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ **ANLY-10**: Dashboard pagina /analytics — v6.0 (Phase 54)
 - ✓ **ANLY-11**: Calibrazione stima pellet — v6.0 (Phase 54)
 
-## Current Milestone: v7.0 Performance & Resilience
-
-**Goal:** Harden the app with smart retry strategies, adaptive polling, error boundaries, component refactoring, critical path test coverage, and FCM token cleanup.
-
-**Target features:**
-- Smart retry with exponential backoff (auto-retry network errors, manual retry device errors)
-- Adaptive polling via Page Visibility API (5s active → 30s background → pause hidden)
-- Global error boundaries and graceful degradation
-- Break up StoveCard (1217 lines), LightsCard (1186 lines), stove/page.tsx (1054 lines)
-- Unit tests for /api/scheduler/check (652 lines, critical path, zero coverage)
-- Cron-based FCM token cleanup (unbounded accumulation)
-
 ### Active
+
+(No active milestone — run `/gsd:new-milestone` to start next)
 
 ### Out of Scope
 
@@ -252,17 +287,19 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Service Worker (Serwist) per offline capability e notification actions
 - Multi-device smart home control (stufa, termostato, luci)
 - CVA + Radix UI design system (37+ components)
+- react-error-boundary per crash isolation
 - ~104,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
-- 531 TypeScript source files, 3,034 tests passing
+- 531 TypeScript source files, 3,500+ tests passing
 - GitHub Actions cron (5-min schedule) per health monitoring e coordination
 - GDPR-compliant analytics con consent banner
+- 10 milestones shipped, 60 phases, 298 plans executed
 
-**v6.0 Milestone (2026-02-10 → 2026-02-11):**
-- 6 phases executed (29 plans total)
-- 42/42 requirements satisfied (100%)
-- 267 files changed (+30,256 insertions, -3,302 deletions)
-- 151 git commits with atomic changes
-- 2 days from phase 49 start to completion
+**v7.0 Milestone (2026-02-11 → 2026-02-13):**
+- 6 phases executed (22 plans total)
+- 30/30 requirements satisfied (100%)
+- 145 files changed (+31,231 insertions, -4,121 deletions)
+- 82 git commits with atomic changes
+- 2 days from phase 55 start to completion
 
 **Known Issues:**
 - Worker teardown warning (React 19 cosmetic, not actionable)
@@ -270,6 +307,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - 2 knip false positives (app/sw.ts, firebase-messaging-sw.js)
 - iOS notification category registration in PWA needs verification
 - Consent enforcement is caller responsibility (not middleware-enforced)
+- Visual parity human verification pending for refactored LightsCard and stove/page.tsx
+- 3 pre-existing vibration API test warnings
 
 **User Feedback:**
 - None yet (awaiting operational deployment)
@@ -305,6 +344,14 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 | Fire-and-forget analytics | Errors logged but never thrown | ✓ Good — Analytics never blocks stove control (v6.0) |
 | 7-day retention for analytics events | Balances dashboard utility with storage costs | ✓ Good — Matches cronExecutionLogger pattern (v6.0) |
 | Visual parity GDPR buttons | Accept/Reject identical styling per EU 2026 | ✓ Good — No dark patterns (v6.0) |
+| Exponential backoff retry client | Auto-retry transient network errors, manual retry device-offline | ✓ Good — Single retry layer prevents amplification (v7.0) |
+| Firebase RTDB idempotency keys | Dual storage (by ID + by hash) with 1-hour TTL | ✓ Good — Prevents duplicate stove commands (v7.0) |
+| react-error-boundary library | Battle-tested, hooks support, better than manual implementation | ✓ Good — Clean error isolation per device card (v7.0) |
+| ValidationError bypass | Safety-critical errors (needsCleaning) propagate through boundaries | ✓ Good — Safety alerts never swallowed (v7.0) |
+| Page Visibility API for polling | Pause non-critical polling when tab hidden | ✓ Good — Resource savings without safety compromise (v7.0) |
+| alwaysActive flag for stove | Stove polling never pauses regardless of visibility | ✓ Good — Safety-critical polling preserved (v7.0) |
+| Orchestrator pattern for components | Custom hooks + presentational sub-components, ~200 LOC orchestrator | ✓ Good — 82-87% LOC reduction, testable (v7.0) |
+| Token cleanup by delivery timestamp | lastUsed updated on FCM delivery, not app open | ✓ Good — Accurate stale detection (v7.0) |
 
 ## Constraints
 
@@ -316,4 +363,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-02-11 after v6.0 milestone (Operations, PWA & Analytics)*
+*Last updated: 2026-02-13 after v7.0 milestone (Performance & Resilience)*

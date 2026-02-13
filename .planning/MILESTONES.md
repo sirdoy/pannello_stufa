@@ -4,6 +4,43 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 
 ---
 
+## v7.0 Performance & Resilience (Shipped: 2026-02-13)
+
+**Delivered:** Application hardened with smart retry strategies for transient failures, adaptive polling for resource efficiency, graceful error boundaries for crash isolation, orchestrator pattern refactoring reducing 3 largest components by 82-87%, comprehensive scheduler route test coverage, and automated FCM token cleanup with audit trail.
+
+**Phases completed:** 55-60 (22 plans total)
+
+**Key accomplishments:**
+
+- Retry infrastructure with exponential backoff, request deduplication (2-second window), and Firebase RTDB idempotency keys preventing duplicate stove safety commands
+- Error boundaries (global + feature-level) isolating device card crashes with "Try Again" recovery, ValidationError bypass for safety-critical alerts, and fire-and-forget error logging
+- Adaptive polling via Page Visibility API — pauses when tab hidden, adapts to network quality (30s fast / 60s slow), stove safety polling never pauses (alwaysActive flag)
+- Orchestrator pattern refactoring: StoveCard 1510→188 LOC (-87%), LightsCard 1225→184 LOC (-85%), stove/page 1066→189 LOC (-82%) with custom hooks and presentational sub-components
+- Scheduler route unit tests: 112 tests covering state transitions (OFF→START→WORK), error scenarios, fire-and-forget paths, achieving 80.07% branch coverage
+- Automated FCM token cleanup service with delivery-based staleness detection (lastUsed timestamp), Firebase audit trail, and cron-triggered execution
+
+**Stats:**
+
+- 22 plans executed across 6 phases
+- 30/30 v7.0 requirements satisfied (100%)
+- 145 files changed (+31,231 insertions, -4,121 deletions)
+- 495+ new tests across milestone
+- 82 git commits with atomic changes
+- 2 days from phase 55 start to completion (2026-02-11 → 2026-02-13)
+
+**Git range:** `test(55-02)` (54da7fa) → `docs(60-05)` (85af0e5)
+
+**Archives:**
+- [Roadmap](milestones/v7.0-ROADMAP.md)
+- [Requirements](milestones/v7.0-REQUIREMENTS.md)
+- [Audit](milestones/v7.0-MILESTONE-AUDIT.md)
+
+**Tech debt:** Monitor component_error events in production. Consider error boundaries for modal components. 3 pre-existing vibration API test warnings. Visual parity human verification pending for refactored components. Scheduler route at 80.07% (fire-and-forget helpers hard to test further).
+
+**What's next:** Application is resilient with retry, error boundaries, adaptive polling, clean component architecture, and comprehensive test coverage. Ready for user feedback and next milestone planning.
+
+---
+
 ## v6.0 Operations, PWA & Analytics (Shipped: 2026-02-11)
 
 **Delivered:** Full operational stack with persistent rate limiting, automated cron scheduling, Playwright E2E tests with real Auth0, interactive push notifications with action buttons, enhanced PWA offline mode with staleness indicators and install prompt, and GDPR-compliant analytics dashboard with pellet consumption estimation, usage charts, and weather correlation.
@@ -328,5 +365,4 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 
 _For current project status, see `.planning/PROJECT.md`_
 _To start next milestone, run `/gsd:new-milestone`_
-
 

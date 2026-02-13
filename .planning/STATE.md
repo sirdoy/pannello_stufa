@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-02-11)
 ## Current Position
 
 Phase: 60 of 60 (Critical Path Testing & Token Cleanup)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: In Progress
-Last activity: 2026-02-13 — Completed 60-01-PLAN.md (Token Cleanup Service Extraction)
+Last activity: 2026-02-13 — Completed 60-02-PLAN.md (Scheduler Check Route Unit Tests)
 
-Progress: [████████████████████░░░] 87% (294/336 estimated plans total)
+Progress: [████████████████████░░░] 88% (295/336 estimated plans total)
 
 ## Performance Metrics
 
@@ -57,6 +57,13 @@ Progress: [████████████████████░░░
 | 59-04 | 7 min | 2 | 7 | 7 |
 
 **Phase 59 Total (COMPLETE):** 24 minutes, 4 plans, 21 files created/modified, 141 tests
+
+**Recent Phase 60 Metrics:**
+
+| Phase-Plan | Duration | Tasks | Files | Tests |
+|------------|----------|-------|-------|-------|
+| 60-01 | 6 min | 2 | 4 | 0 |
+| 60-02 | 8 min | 2 | 1 | 25 |
 
 **Recent Phase 58 Metrics:**
 
@@ -105,6 +112,7 @@ Progress: [████████████████████░░░
 | Phase 59 P03 | 3 | 2 tasks | 2 files | 12 tests |
 | Phase 59 P04 | 7 | 2 tasks | 7 files | 7 tests |
 | Phase 60 P01 | 6 | 2 tasks | 4 files | 0 tests |
+| Phase 60 P02 | 8 | 2 tasks | 1 file | 25 tests |
 
 ## Accumulated Context
 
@@ -157,6 +165,9 @@ Recent decisions affecting current work:
 - [Phase 60]: Fire-and-forget pattern for lastUsed updates after FCM delivery (non-blocking)
 - [Phase 60]: Audit trail logs deleted tokens to tokenCleanupHistory path with full context
 - [Phase 60]: 7-day cleanup interval check remains in scheduler route (cron schedule concern)
+- [Phase 60]: Mock implementation over mockResolvedValueOnce chains for reliable complex route testing
+- [Phase 60]: Empty array vs null for intervals matters (null causes early return before side effects)
+- [Phase 60]: NextResponse.json in Jest mocks (Jest environment lacks global Response)
 
 ### Pending Todos
 
@@ -172,15 +183,15 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-13T10:22:00Z
-Stopped at: Phase 60 Plan 01 (Token Cleanup Service Extraction) — COMPLETE
+Last session: 2026-02-13T10:25:00Z
+Stopped at: Phase 60 Plan 02 (Scheduler Check Route Unit Tests) — COMPLETE
 Resume file: None
 
 **Phase 60 Progress:**
 - Plan 01: Token Cleanup Service Extraction ✓ COMPLETE (6 min, 0 tests, commits 40905de, a1f19c0)
-- Plan 02: Delivery Tracking & Manual Cleanup (PENDING)
-- Plan 03: Unit Tests (PENDING)
-- Plan 04: Integration Tests (PENDING)
+- Plan 02: Scheduler Check Route Unit Tests ✓ COMPLETE (8 min, 25 tests, commit e4d8fc4)
+- Plan 03: PID Route Unit Tests (PENDING)
+- Plan 04: Ignite/Shutdown Route Tests (PENDING)
 
 **Phase 59 Progress (COMPLETE):**
 - Plan 01: Extract Lights Hooks ✓ COMPLETE (9 min, 47 tests, commits b6ad0c7, 52d8686)

@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 61 (Foundation & Infrastructure)
-Plan: —
-Status: Ready for planning
-Last activity: 2026-02-13 — v8.0 roadmap created
+Plan: 02
+Status: Ready for execution
+Last activity: 2026-02-13 — Completed 61-01-PLAN.md (Fritz!Box Foundation)
 
-Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (Phase 61 of 67)
+Progress: [█░░░░░░░░░░░░░░░░░░░] 5% (Phase 61, Plan 1 of 2 complete)
 
 ## Performance Metrics
 
@@ -44,6 +44,7 @@ Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (Pha
 - Estimated plans: 14-21 (2-3 plans per phase, comprehensive depth)
 - Requirements: 32 (INFRA:6, DASH:5, WAN:3, DEV:5, BW:4, HIST:3, CAT:3, CORR:3)
 - Estimated duration: 3-4 days
+| Phase 61 P01 | 7 | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -58,7 +59,13 @@ Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (Pha
 - RFC 9457 error handling with specific error types
 - No new dependencies (Recharts, DataTable, date-fns already installed)
 
+**Phase 61 execution decisions:**
+- [Phase 61-01]: Use placeholder API endpoints in FritzBoxClient (actual TR-064 paths TBD in Plan 02)
+- [Phase 61-01]: 60s cache TTL balances freshness vs 10 req/min rate limit
+
 Decisions are also logged in PROJECT.md Key Decisions table.
+- [Phase 61-01]: Use placeholder API endpoints in FritzBoxClient (actual TR-064 paths TBD in Plan 02)
+- [Phase 61-01]: 60s cache TTL balances freshness vs 10 req/min rate limit
 
 ### Pending Todos
 

@@ -6,7 +6,7 @@ See: .planning/PROJECT.md (updated 2026-02-11)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** Phase 58 complete — ready for Phase 59
+**Current focus:** Phase 59 complete — ready for Phase 60
 
 ## Current Position
 

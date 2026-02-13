@@ -190,13 +190,14 @@ Plans:
 5. Active tokens (recent notification delivery) never deleted by cleanup process
 6. Token cleanup logs all deletions to Firebase for audit trail
 
-**Plans**: 4 plans
+**Plans**: 5 plans
 
 Plans:
-- [ ] 60-01-PLAN.md — Extract token cleanup to shared service, update lastUsed on FCM delivery, add audit trail
-- [ ] 60-02-PLAN.md — Scheduler check route tests: modes, early returns, stove data fetch, side effects
-- [ ] 60-03-PLAN.md — Token cleanup service unit tests (TDD)
-- [ ] 60-04-PLAN.md — Scheduler state transitions, error scenarios, PID, 80%+ branch coverage
+- [x] 60-01-PLAN.md — Extract token cleanup to shared service, update lastUsed on FCM delivery, add audit trail
+- [x] 60-02-PLAN.md — Scheduler check route tests: modes, early returns, stove data fetch, side effects
+- [x] 60-03-PLAN.md — Token cleanup service unit tests (TDD)
+- [x] 60-04-PLAN.md — Scheduler state transitions, error scenarios, PID, 80%+ branch coverage
+- [ ] 60-05-PLAN.md — Gap closure: fire-and-forget helper branch coverage to reach 80%+ target
 
 ---
 
@@ -220,7 +221,7 @@ Plans:
 | 57 | v7.0 | 3/3 | ✓ Complete | 2026-02-12 |
 | 58 | v7.0 | 3/3 | ✓ Complete | 2026-02-12 |
 | 59 | v7.0 | 4/4 | ✓ Complete | 2026-02-13 |
-| 60 | v7.0 | 0/4 | Not started | - |
+| 60 | v7.0 | 4/5 | In progress | - |
 
 **Total:** 9 milestones shipped, 58 phases complete, 290 plans executed
 

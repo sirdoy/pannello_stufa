@@ -147,6 +147,41 @@ interface TokenRecord {
 }
 
 /**
+ * Update lastUsed timestamp for a token after successful FCM delivery (TOKEN-02)
+ * Fire-and-forget pattern - does not block main send flow
+ *
+ * @param {string} userId - User ID
+ * @param {string} tokenString - FCM token that was successfully delivered
+ */
+async function updateTokenLastUsed(userId: string, tokenString: string): Promise<void> {
+  try {
+    const tokensData = await adminDbGet(`users/${userId}/fcmTokens`) as Record<string, TokenRecord> | null;
+
+    if (!tokensData) {
+      return; // User has no tokens (shouldn't happen but safety check)
+    }
+
+    // Find the token key by matching the token string
+    const tokenEntry = Object.entries(tokensData).find(([_, data]) => data.token === tokenString);
+
+    if (!tokenEntry) {
+      return; // Token not found (may have been deleted)
+    }
+
+    const [tokenKey] = tokenEntry;
+
+    // Update lastUsed timestamp
+    await adminDbUpdate(`users/${userId}/fcmTokens/${tokenKey}`, {
+      lastUsed: new Date().toISOString(),
+    });
+
+  } catch (error) {
+    // Fire-and-forget: log but don't throw
+    console.error('❌ Error updating token lastUsed:', error);
+  }
+}
+
+/**
  * Look up deviceId for a given FCM token
  * Used to enrich error logs with device context
  *
@@ -426,6 +461,10 @@ export async function sendPushNotification(
           token: tokenArray[0]!,
         });
 
+        // Update lastUsed for successful delivery (fire-and-forget, TOKEN-02)
+        if (userId) {
+          updateTokenLastUsed(userId, tokenArray[0]!).catch(() => {});
+        }
 
         // Log notification (non-blocking)
         logNotification({
@@ -509,6 +548,11 @@ export async function sendPushNotification(
       tokens: tokenArray,
     });
 
+    // Update lastUsed for successfully delivered tokens (fire-and-forget, TOKEN-02)
+    if (userId && response.successCount > 0) {
+      const successfulTokens = tokenArray.filter((_, idx) => response.responses[idx]?.success);
+      Promise.all(successfulTokens.map(token => updateTokenLastUsed(userId, token))).catch(() => {});
+    }
 
     // Check for invalid tokens and remove them
     if (response.failureCount > 0) {

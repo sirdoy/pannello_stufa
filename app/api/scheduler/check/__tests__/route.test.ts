@@ -718,4 +718,384 @@ describe('Scheduler Check Route', () => {
       expect(mockTriggerStoveUnexpectedOffServer).not.toHaveBeenCalled();
     });
   });
+
+  describe('State Transitions - Ignition', () => {
+    it('ignites stove when schedule is active and stove is OFF', async () => {
+      // Mock igniteStove to succeed
+      mockIgniteStove.mockResolvedValue(undefined as any);
+
+      // Mock stove as OFF
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+
+      // Mock updateStoveState
+      const mockUpdateStoveState = jest.mocked(updateStoveState);
+      mockUpdateStoveState.mockResolvedValue(undefined as any);
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z')); // 19:00 Rome time in winter
+
+      // Setup: automatic mode, active schedule, maintenance allowed
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path === 'schedules-v2/activeScheduleId') return 'default';
+        if (path.includes('schedules-v2/schedules/') && path.includes('/slots/')) {
+          return [{ start: '18:00', end: '22:00', power: 4, fan: 3 }];
+        }
+        if (path === 'pidAutomation/boost') return { active: false };
+        if (path.includes('pidAutomation/state')) return null;
+        return null;
+      });
+
+      const request = createMockRequest();
+      const response = await GET(request);
+      const data = await getResponseData(response);
+
+      expect(response.status).toBe(200);
+      expect(data.status).toBe('ACCESA');
+
+      // Verify ignition flow
+      expect(mockIgniteStove).toHaveBeenCalledWith(4);
+      expect(mockUpdateStoveState).toHaveBeenCalledWith(expect.objectContaining({
+        status: 'START',
+        source: 'scheduler',
+      }));
+      expect(mockTriggerSchedulerActionServer).toHaveBeenCalledWith(
+        'admin-test-user',
+        'ignition',
+        expect.objectContaining({
+          message: expect.stringContaining('accesa automaticamente'),
+        })
+      );
+      expect(mockSyncLivingRoomWithStove).toHaveBeenCalledWith(true);
+
+      jest.useRealTimers();
+    });
+
+    it('skips ignition when confirmation status shows stove already ON (ALREADY_ON race condition)', async () => {
+      // First status fetch: OFF
+      // Second status fetch (confirmation): ON
+      mockGetStoveStatus
+        .mockResolvedValueOnce({ StatusDescription: 'Spento', Result: 0 } as any)
+        .mockResolvedValueOnce({ StatusDescription: 'WORK 1', Result: 0 } as any);
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
+      });
+
+      const request = createMockRequest();
+      const response = await GET(request);
+      const data = await getResponseData(response);
+
+      expect(response.status).toBe(200);
+      expect(data.status).toBe('ALREADY_ON');
+      expect(data.message).toContain('race condition');
+
+      // Verify ignition NOT attempted
+      expect(mockIgniteStove).not.toHaveBeenCalled();
+
+      jest.useRealTimers();
+    });
+
+    it('skips ignition when confirmation status fetch fails (CONFIRMATION_FAILED)', async () => {
+      // First status fetch: OFF
+      // Second status fetch (confirmation): Error
+      mockGetStoveStatus
+        .mockResolvedValueOnce({ StatusDescription: 'Spento', Result: 0 } as any)
+        .mockRejectedValueOnce(new Error('Network timeout'));
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
+      });
+
+      const request = createMockRequest();
+      const response = await GET(request);
+      const data = await getResponseData(response);
+
+      expect(response.status).toBe(200);
+      expect(data.status).toBe('CONFIRMATION_FAILED');
+      expect(data.message).toContain('impossibile confermare');
+
+      // Verify ignition NOT attempted
+      expect(mockIgniteStove).not.toHaveBeenCalled();
+
+      jest.useRealTimers();
+    });
+
+    it('tracks ignition interval for unexpected off detection', async () => {
+      // Mock successful ignition
+      mockIgniteStove.mockResolvedValue(undefined as any);
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+
+      const mockUpdateStoveState = jest.mocked(updateStoveState);
+      mockUpdateStoveState.mockResolvedValue(undefined as any);
+
+      jest.useFakeTimers();
+      const testTime = new Date('2025-02-12T18:00:00.000Z');
+      jest.setSystemTime(testTime);
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+
+      // Verify ignition interval tracked
+      expect(mockAdminDbSet).toHaveBeenCalledWith(
+        'scheduler/lastIgnitionInterval',
+        expect.objectContaining({
+          interval: '18:00-22:00',
+          timestamp: expect.any(Number),
+        })
+      );
+
+      jest.useRealTimers();
+    });
+
+    it('logs analytics event on successful ignition', async () => {
+      mockIgniteStove.mockResolvedValue(undefined as any);
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+
+      const mockUpdateStoveState = jest.mocked(updateStoveState);
+      mockUpdateStoveState.mockResolvedValue(undefined as any);
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+
+      // Verify analytics event logged
+      expect(mockLogAnalyticsEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: 'stove_ignite',
+          source: 'scheduler',
+          powerLevel: 4,
+        })
+      );
+
+      jest.useRealTimers();
+    });
+  });
+
+  describe('State Transitions - Shutdown', () => {
+    it('shuts down stove when no active schedule and stove is ON', async () => {
+      // Mock stove as ON
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockShutdownStove.mockResolvedValue(undefined as any);
+
+      const mockUpdateStoveState = jest.mocked(updateStoveState);
+      mockUpdateStoveState.mockResolvedValue(undefined as any);
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T08:00:00.000Z')); // 09:00 Rome time, outside schedule
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }], // Current time outside this
+      });
+
+      const request = createMockRequest();
+      const response = await GET(request);
+      const data = await getResponseData(response);
+
+      expect(response.status).toBe(200);
+      expect(data.status).toBe('SPENTA');
+
+      // Verify shutdown flow
+      expect(mockShutdownStove).toHaveBeenCalled();
+      expect(mockUpdateStoveState).toHaveBeenCalledWith(expect.objectContaining({
+        status: 'STANDBY',
+        source: 'scheduler',
+      }));
+      expect(mockTriggerSchedulerActionServer).toHaveBeenCalledWith(
+        'admin-test-user',
+        'shutdown',
+        expect.objectContaining({
+          message: expect.stringContaining('spenta automaticamente'),
+        })
+      );
+      expect(mockSyncLivingRoomWithStove).toHaveBeenCalledWith(false);
+
+      jest.useRealTimers();
+    });
+
+    it('does not shutdown when no active schedule and stove already OFF', async () => {
+      // Mock stove as OFF
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T08:00:00.000Z'));
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+
+      // Verify shutdown NOT called
+      expect(mockShutdownStove).not.toHaveBeenCalled();
+
+      jest.useRealTimers();
+    });
+
+    it('logs analytics event on successful shutdown', async () => {
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockShutdownStove.mockResolvedValue(undefined as any);
+
+      const mockUpdateStoveState = jest.mocked(updateStoveState);
+      mockUpdateStoveState.mockResolvedValue(undefined as any);
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T08:00:00.000Z'));
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+
+      // Verify analytics event logged
+      expect(mockLogAnalyticsEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: 'stove_shutdown',
+          source: 'scheduler',
+        })
+      );
+
+      jest.useRealTimers();
+    });
+  });
+
+  describe('Level Adjustments', () => {
+    it('adjusts power level when schedule power differs from current', async () => {
+      // Mock stove ON at power 2, schedule wants power 4
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockGetPowerLevel.mockResolvedValue({ Result: 2 } as any);
+      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+      mockSetPowerLevel.mockResolvedValue(undefined as any);
+
+      const mockUpdateStoveState = jest.mocked(updateStoveState);
+      mockUpdateStoveState.mockResolvedValue(undefined as any);
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+
+      // Verify power level adjusted
+      expect(mockSetPowerLevel).toHaveBeenCalledWith(4);
+
+      jest.useRealTimers();
+    });
+
+    it('adjusts fan level when schedule fan differs from current', async () => {
+      // Mock stove ON at fan 2, schedule wants fan 4
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
+      mockGetFanLevel.mockResolvedValue({ Result: 2 } as any);
+      mockSetFanLevel.mockResolvedValue(undefined as any);
+
+      const mockUpdateStoveState = jest.mocked(updateStoveState);
+      mockUpdateStoveState.mockResolvedValue(undefined as any);
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 4 }],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+
+      // Verify fan level adjusted
+      expect(mockSetFanLevel).toHaveBeenCalledWith(4);
+
+      jest.useRealTimers();
+    });
+
+    it('skips power adjustment when PID boost is active', async () => {
+      // Mock stove ON at power 3 (PID-set), schedule wants power 4
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockGetPowerLevel.mockResolvedValue({ Result: 3 } as any);
+      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
+
+      // Mock PID boost active
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path === 'schedules-v2/activeScheduleId') return 'default';
+        if (path.includes('schedules-v2/schedules/') && path.includes('/slots/')) {
+          return [{ start: '18:00', end: '22:00', power: 4, fan: 3 }];
+        }
+        if (path === 'pidAutomation/boost') return { active: true, powerLevel: 3 };
+        if (path.includes('pidAutomation/state')) return null;
+        if (path.includes('pidAutomation')) return null; // PID config disabled
+        return null;
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+
+      // Verify power NOT adjusted (PID boost active)
+      expect(mockSetPowerLevel).not.toHaveBeenCalled();
+
+      // Fan should still adjust (not managed by PID)
+      // In this case both are 3, so no change anyway
+
+      jest.useRealTimers();
+    });
+
+    it('does not adjust levels when already matching schedule', async () => {
+      // Mock stove at power 4 fan 3, schedule also power 4 fan 3
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
+      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+
+      // Verify neither level adjusted
+      expect(mockSetPowerLevel).not.toHaveBeenCalled();
+      expect(mockSetFanLevel).not.toHaveBeenCalled();
+
+      jest.useRealTimers();
+    });
+  });
 });

@@ -164,10 +164,13 @@ Plans:
 4. Complex state logic extracted into reusable custom hooks
 5. Visual output and functionality unchanged after refactoring
 
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 59-01: TBD
+- [x] 59-01-PLAN.md — Extract useLightsData and useLightsCommands hooks
+- [x] 59-02-PLAN.md — Create LightsBanners, LightsHouseControl, LightsRoomControl, LightsScenes components
+- [ ] 59-03-PLAN.md — Refactor LightsCard.tsx as orchestrator (wire hooks + components)
+- [ ] 59-04-PLAN.md — Refactor stove/page.tsx as orchestrator (reuse StoveCard hooks + page-specific components)
 
 ---
 
@@ -213,7 +216,7 @@ Plans:
 | 56 | v7.0 | 2/2 | ✓ Complete | 2026-02-12 |
 | 57 | v7.0 | 3/3 | ✓ Complete | 2026-02-12 |
 | 58 | v7.0 | 3/3 | ✓ Complete | 2026-02-12 |
-| 59 | v7.0 | 0/? | Not started | - |
+| 59 | v7.0 | 2/4 | In progress | - |
 | 60 | v7.0 | 0/? | Not started | - |
 
 **Total:** 9 milestones shipped, 57 phases complete, 286 plans executed

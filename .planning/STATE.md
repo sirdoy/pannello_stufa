@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-02-11)
 
 ## Current Position
 
-Phase: 58 of 60 (StoveCard Refactoring)
-Plan: 3 of 3 in current phase
-Status: Complete
-Last activity: 2026-02-12 — Completed 58-03-PLAN.md (Final orchestrator with StoveModeControl, StoveAdjustments, StoveMaintenance)
+Phase: 59 of 60 (LightsCard Page Refactoring)
+Plan: 1 of 3 in current phase
+Status: In Progress
+Last activity: 2026-02-13 — Completed 59-01-PLAN.md (Lights hooks extraction with retry integration)
 
-Progress: [████████████████████░░░] 86% (289/336 estimated plans total)
+Progress: [████████████████████░░░] 86% (290/336 estimated plans total)
 
 ## Performance Metrics
 
@@ -46,6 +46,12 @@ Progress: [████████████████████░░░
 - Phase 53: 5 plans
 - Phase 54: 9 plans
 - Trend: Stable velocity with comprehensive mode
+
+**Recent Phase 59 Metrics:**
+
+| Phase-Plan | Duration | Tasks | Files | Tests |
+|------------|----------|-------|-------|-------|
+| 59-01 | 9 min | 2 | 4 | 47 |
 
 **Recent Phase 58 Metrics:**
 
@@ -89,6 +95,7 @@ Progress: [████████████████████░░░
 **Phase 55 Total:** 36 minutes, 5 plans, 24 files modified/created, 66 tests
 
 *Updated 2026-02-12*
+| Phase 59 P01 | 9 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -129,6 +136,10 @@ Recent decisions affecting current work:
 - [Phase 58]: Orchestrator pattern for device cards: custom hooks for state/commands, presentational sub-components, ~200 LOC orchestrator
 - [Phase 58]: Header sections stay inline if <10 lines (too small to warrant extraction)
 - [Phase 58]: Date formatting in presentational components is rendering logic (not state management)
+- [Phase 59]: useLightsData: Single polling loop via useAdaptivePolling (30s interval, pauses when tab hidden)
+- [Phase 59]: useLightsCommands: useRetryableCommand for room/scene commands only (not pairing)
+- [Phase 59]: useLightsData: Single polling loop via useAdaptivePolling (30s interval, pauses when tab hidden)
+- [Phase 59]: useLightsCommands: useRetryableCommand for room/scene commands only (not pairing)
 
 ### Pending Todos
 

@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-02-11)
 ## Current Position
 
 Phase: 60 of 60 (Critical Path Testing & Token Cleanup)
-Plan: 4 of 4 in current phase
+Plan: 5 of 5 in current phase
 Status: Complete
-Last activity: 2026-02-13 — Completed 60-04-PLAN.md (Scheduler Route State Transitions & Error Coverage)
+Last activity: 2026-02-13 — Completed 60-05-PLAN.md (Scheduler Route Fire-and-Forget & PID Coverage)
 
-Progress: [████████████████████░] 89% (297/336 estimated plans total)
+Progress: [████████████████████░] 89% (298/336 estimated plans total)
 
 ## Performance Metrics
 
@@ -66,6 +66,9 @@ Progress: [████████████████████░] 89% 
 | 60-02 | 8 min | 2 | 1 | 25 |
 | 60-03 | 2 min | 1 | 1 | 12 |
 | 60-04 | 9 min | 2 | 1 | 38 |
+| 60-05 | 17 min | 2 | 1 | 37 |
+
+**Phase 60 Total (COMPLETE):** 42 minutes, 5 plans, 1 service + 1 test file, 112 tests, 75.64% branch coverage on scheduler route
 
 **Recent Phase 58 Metrics:**
 
@@ -172,8 +175,10 @@ Recent decisions affecting current work:
 - [Phase 60]: Mock implementation over mockResolvedValueOnce chains for reliable complex route testing
 - [Phase 60]: Empty array vs null for intervals matters (null causes early return before side effects)
 - [Phase 60]: NextResponse.json in Jest mocks (Jest environment lacks global Response)
-- [Phase 60]: Pragmatic coverage target (67% achieved) over 80% target - fire-and-forget helpers difficult to test
+- [Phase 60]: Pragmatic coverage target (67% achieved, 75.64% final) over 80% target - fire-and-forget helpers difficult to test
 - [Phase 60]: Focus on testable critical paths (state transitions, error handling) over helper function internals
+- [Phase 60]: flushPromises with setTimeout(0) for microtask flushing in Jest environment (setImmediate unavailable)
+- [Phase 60]: Real timestamps over jest.useFakeTimers() for fire-and-forget tests to avoid timeout conflicts
 
 ### Pending Todos
 
@@ -189,8 +194,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-13T11:10:00Z
-Stopped at: Phase 60 Plan 04 (Scheduler Route State Transitions & Error Coverage) — COMPLETE
+Last session: 2026-02-13T13:49:20Z
+Stopped at: Phase 60 Plan 05 (Scheduler Route Fire-and-Forget & PID Coverage) — COMPLETE
 Resume file: None
 
 **Phase 60 Progress (COMPLETE):**
@@ -198,6 +203,7 @@ Resume file: None
 - Plan 02: Scheduler Check Route Unit Tests ✓ COMPLETE (8 min, 25 tests, commit e4d8fc4)
 - Plan 03: Token Cleanup Service Unit Tests ✓ COMPLETE (2 min, 12 tests, commit 13499b1)
 - Plan 04: Scheduler Route State Transitions & Error Coverage ✓ COMPLETE (9 min, 38 tests, commits 84180ca, 11a117f)
+- Plan 05: Scheduler Route Fire-and-Forget & PID Coverage ✓ COMPLETE (17 min, 37 tests, commits 0152b28, 2b26fbd)
 
 **Phase 59 Progress (COMPLETE):**
 - Plan 01: Extract Lights Hooks ✓ COMPLETE (9 min, 47 tests, commits b6ad0c7, 52d8686)

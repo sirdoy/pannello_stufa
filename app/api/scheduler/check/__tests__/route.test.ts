@@ -108,7 +108,12 @@ const mockFetchWeatherForecast = jest.mocked(fetchWeatherForecast);
 const mockSaveWeatherToCache = jest.mocked(saveWeatherToCache);
 
 // Helper to flush microtasks for fire-and-forget promise testing
-const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
+// Uses Promise.resolve() chain which works with both real and fake timers
+const flushPromises = async () => {
+  for (let i = 0; i < 10; i++) {
+    await Promise.resolve();
+  }
+};
 
 describe('Scheduler Check Route', () => {
   beforeEach(() => {
@@ -1944,16 +1949,14 @@ describe('Scheduler Check Route', () => {
     it('skips calibration when too soon (within 12 hours)', async () => {
       const now = Date.now();
 
-      // Mock recent calibration
+      // Mock with recent calibration timestamp — must include all scheduler paths
       mockAdminDbGet.mockImplementation(async (path: string) => {
         if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path === 'schedules-v2/activeScheduleId') return 'default';
+        if (path.includes('schedules-v2/schedules/') && path.includes('/slots/')) return [];
         if (path.includes('lastAutoCalibration')) return now - 1000; // 1 second ago
+        if (path === 'pidAutomation/boost') return { active: false };
         return null;
-      });
-
-      setupSchedulerMocks({
-        mode: { enabled: true, semiManual: false },
-        intervals: [],
       });
 
       const request = createMockRequest();
@@ -2087,16 +2090,15 @@ describe('Scheduler Check Route', () => {
       const weatherData = { temperature: 18, forecast: [] };
       mockFetchWeatherForecast.mockResolvedValue(weatherData as any);
 
+      // Must include all scheduler paths — setupSchedulerMocks would override
       mockAdminDbGet.mockImplementation(async (path: string) => {
         if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path === 'schedules-v2/activeScheduleId') return 'default';
+        if (path.includes('schedules-v2/schedules/') && path.includes('/slots/')) return [];
         if (path.includes('lastWeatherRefresh')) return null;
         if (path.includes('config/location')) return { latitude: 45.4, longitude: 9.2, name: 'Milan' };
+        if (path === 'pidAutomation/boost') return { active: false };
         return null;
-      });
-
-      setupSchedulerMocks({
-        mode: { enabled: true, semiManual: false },
-        intervals: [],
       });
 
       const request = createMockRequest();
@@ -2119,16 +2121,15 @@ describe('Scheduler Check Route', () => {
     it('handles weather fetch exception gracefully', async () => {
       mockFetchWeatherForecast.mockRejectedValue(new Error('API timeout'));
 
+      // Must include all scheduler paths — setupSchedulerMocks would override
       mockAdminDbGet.mockImplementation(async (path: string) => {
         if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path === 'schedules-v2/activeScheduleId') return 'default';
+        if (path.includes('schedules-v2/schedules/') && path.includes('/slots/')) return [];
         if (path.includes('lastWeatherRefresh')) return null;
         if (path.includes('config/location')) return { latitude: 45.4, longitude: 9.2 };
+        if (path === 'pidAutomation/boost') return { active: false };
         return null;
-      });
-
-      setupSchedulerMocks({
-        mode: { enabled: true, semiManual: false },
-        intervals: [],
       });
 
       const request = createMockRequest();
@@ -2150,15 +2151,14 @@ describe('Scheduler Check Route', () => {
     it('skips token cleanup when too soon (within 7 days)', async () => {
       const now = Date.now();
 
+      // Must include all scheduler paths — setupSchedulerMocks would override
       mockAdminDbGet.mockImplementation(async (path: string) => {
         if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path === 'schedules-v2/activeScheduleId') return 'default';
+        if (path.includes('schedules-v2/schedules/') && path.includes('/slots/')) return [];
         if (path.includes('lastTokenCleanup')) return now - 86400000; // 1 day ago
+        if (path === 'pidAutomation/boost') return { active: false };
         return null;
-      });
-
-      setupSchedulerMocks({
-        mode: { enabled: true, semiManual: false },
-        intervals: [],
       });
 
       const request = createMockRequest();
@@ -2284,10 +2284,9 @@ describe('Scheduler Check Route', () => {
       await GET(request);
       await flushPromises();
 
-      // Verify error logged
+      // Verify error logged (route uses template literal: single string argument)
       expect(console.error).toHaveBeenCalledWith(
-        expect.stringContaining('manutenzione'),
-        'Rate limited'
+        expect.stringContaining('Rate limited')
       );
     });
 
@@ -2363,10 +2362,10 @@ describe('Scheduler Check Route', () => {
       // Route should still return 200
       expect(response.status).toBe(200);
 
-      // Verify error logged
+      // Verify error logged (route logs error.message, which is a string)
       expect(console.error).toHaveBeenCalledWith(
         expect.stringContaining('stove_status_work'),
-        expect.any(Error)
+        expect.any(String)
       );
     });
 
@@ -2392,7 +2391,10 @@ describe('Scheduler Check Route', () => {
       mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
       mockTriggerStoveUnexpectedOffServer.mockResolvedValue({ success: true } as any);
 
-      const testTime = new Date('2025-02-12T18:00:00.000Z').getTime();
+      // Need fake timers to ensure time is within the 18:00-22:00 interval
+      jest.useFakeTimers();
+      const testTime = new Date('2025-02-12T18:30:00.000Z').getTime(); // 19:30 Rome time
+      jest.setSystemTime(testTime);
 
       mockAdminDbGet.mockImplementation(async (path: string) => {
         if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
@@ -2417,13 +2419,18 @@ describe('Scheduler Check Route', () => {
         expect.stringContaining('lastUnexpectedOffNotification'),
         expect.any(Number)
       );
+
+      jest.useRealTimers();
     });
 
     it('handles unexpected off notification exception', async () => {
       mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
       mockTriggerStoveUnexpectedOffServer.mockRejectedValue(new Error('Push failed'));
 
-      const testTime = new Date('2025-02-12T18:00:00.000Z').getTime();
+      // Need fake timers to ensure time is within the 18:00-22:00 interval
+      jest.useFakeTimers();
+      const testTime = new Date('2025-02-12T18:30:00.000Z').getTime(); // 19:30 Rome time
+      jest.setSystemTime(testTime);
 
       mockAdminDbGet.mockImplementation(async (path: string) => {
         if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
@@ -2446,11 +2453,13 @@ describe('Scheduler Check Route', () => {
       // Route should still return 200
       expect(response.status).toBe(200);
 
-      // Verify error logged
+      // Verify error logged (route logs error.message, which is a string)
       expect(console.error).toHaveBeenCalledWith(
         expect.stringContaining('stove_unexpected_off'),
-        expect.any(Error)
+        expect.any(String)
       );
+
+      jest.useRealTimers();
     });
 
     it('does not notify when no previous ignition tracked', async () => {
@@ -2488,12 +2497,15 @@ describe('Scheduler Check Route', () => {
       const mockUpdateStoveState = jest.mocked(updateStoveState);
       mockUpdateStoveState.mockResolvedValue(undefined as any);
 
+      // Need fake timers to ensure time is within the interval for ignition to trigger
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:30:00.000Z')); // 19:30 Rome time
+
       setupSchedulerMocks({
         mode: { enabled: true, semiManual: false },
         intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
       });
 
-      // Use real timers for this test
       const request = createMockRequest();
       await GET(request);
       await flushPromises();
@@ -2503,6 +2515,8 @@ describe('Scheduler Check Route', () => {
         call => call[0]?.toString().includes('notifica scheduler')
       );
       expect(errorCalls).toHaveLength(0);
+
+      jest.useRealTimers();
     });
 
     it('logs error when scheduler notification fails', async () => {
@@ -2517,6 +2531,10 @@ describe('Scheduler Check Route', () => {
       const mockUpdateStoveState = jest.mocked(updateStoveState);
       mockUpdateStoveState.mockResolvedValue(undefined as any);
 
+      // Need fake timers to ensure time is within the interval for ignition to trigger
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:30:00.000Z')); // 19:30 Rome time
+
       setupSchedulerMocks({
         mode: { enabled: true, semiManual: false },
         intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
@@ -2526,11 +2544,12 @@ describe('Scheduler Check Route', () => {
       await GET(request);
       await flushPromises();
 
-      // Verify error logged
+      // Verify error logged (route uses template literal: single string argument)
       expect(console.error).toHaveBeenCalledWith(
-        expect.stringContaining('Errore invio notifica scheduler'),
-        'Failed to send'
+        expect.stringContaining('Failed to send')
       );
+
+      jest.useRealTimers();
     });
 
     it('handles scheduler notification exception', async () => {
@@ -2540,6 +2559,10 @@ describe('Scheduler Check Route', () => {
 
       const mockUpdateStoveState = jest.mocked(updateStoveState);
       mockUpdateStoveState.mockResolvedValue(undefined as any);
+
+      // Need fake timers to ensure time is within the interval for ignition to trigger
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:30:00.000Z')); // 19:30 Rome time
 
       setupSchedulerMocks({
         mode: { enabled: true, semiManual: false },
@@ -2558,6 +2581,8 @@ describe('Scheduler Check Route', () => {
         expect.stringContaining('Errore invio notifica scheduler'),
         expect.any(Error)
       );
+
+      jest.useRealTimers();
     });
   });
 

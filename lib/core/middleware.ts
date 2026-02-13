@@ -267,12 +267,18 @@ export function withIdempotency(handler: AuthedHandler, logContext?: string): Au
     const { ref, get, set } = await import('firebase/database');
     const { db } = await import('@/lib/firebase');
     const resultRef = ref(db, `idempotency/results/${idempotencyKey}`);
-    const existing = await get(resultRef);
 
-    if (existing.exists()) {
-      const cached = existing.val();
-      // Return cached result
-      return NextResponse.json(cached.data, { status: cached.status });
+    try {
+      const existing = await get(resultRef);
+
+      if (existing.exists()) {
+        const cached = existing.val();
+        // Return cached result
+        return NextResponse.json(cached.data, { status: cached.status });
+      }
+    } catch {
+      // Firebase access denied or unavailable — skip cache check, execute handler normally
+      console.warn(`[Idempotency] Cache check failed for key ${idempotencyKey}`, logContext);
     }
 
     // Execute handler

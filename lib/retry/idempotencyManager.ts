@@ -1,8 +1,5 @@
-import { ref, get, set, remove } from 'firebase/database';
-import { db } from '@/lib/firebase';
-
 /**
- * Represents an idempotency key record stored in Firebase RTDB.
+ * Represents an idempotency key record stored in memory.
  */
 export interface IdempotencyRecord {
   key: string;
@@ -15,16 +12,18 @@ export interface IdempotencyRecord {
 /**
  * Manages idempotency keys for device commands to prevent duplicate physical actions.
  *
- * Keys are stored in Firebase RTDB with a 1-hour TTL. The same endpoint+body combination
+ * Keys are stored in an in-memory Map with a 1-hour TTL. The same endpoint+body combination
  * within the TTL window returns the same idempotency key, preventing duplicate commands
  * from being executed on physical devices.
  *
- * Storage structure:
- * - `idempotency/keys/{key}`: Full record with endpoint, body hash, timestamps
- * - `idempotency/lookup/{hash}`: Lookup entry mapping endpoint+body hash to key
+ * The server-side `withIdempotency` middleware handles the actual dedup check
+ * using Firebase RTDB via admin SDK. This client-side manager only ensures
+ * rapid duplicate clicks get the same key.
  */
 export class IdempotencyManager {
   private readonly TTL_MS = 60 * 60 * 1000; // 1 hour
+  private readonly lookupCache = new Map<string, { key: string; expiresAt: number }>();
+  private readonly keyCache = new Map<string, IdempotencyRecord>();
 
   /**
    * Generates a new UUID-based idempotency key.
@@ -46,19 +45,18 @@ export class IdempotencyManager {
    */
   async registerKey(endpoint: string, body: Record<string, unknown>): Promise<string> {
     const bodyHash = this.createHash(endpoint, body);
-    const lookupPath = `idempotency/lookup/${bodyHash}`;
-    const lookupRef = ref(db, lookupPath);
 
     // Check if we already have a key for this combination
-    const lookupSnapshot = await get(lookupRef);
-    if (lookupSnapshot.exists()) {
-      const lookupData = lookupSnapshot.val() as { key: string; expiresAt: number };
+    const existing = this.lookupCache.get(bodyHash);
+    if (existing) {
       const now = Date.now();
-
       // If key hasn't expired, return existing key
-      if (lookupData.expiresAt > now) {
-        return lookupData.key;
+      if (existing.expiresAt > now) {
+        return existing.key;
       }
+      // Expired - clean up
+      this.lookupCache.delete(bodyHash);
+      this.keyCache.delete(existing.key);
     }
 
     // Generate new key
@@ -72,35 +70,26 @@ export class IdempotencyManager {
       expiresAt: now + this.TTL_MS,
     };
 
-    // Store in both locations
-    const keyRef = ref(db, `idempotency/keys/${key}`);
-    await set(keyRef, record);
-    await set(lookupRef, { key, expiresAt: record.expiresAt });
+    // Store in both caches
+    this.keyCache.set(key, record);
+    this.lookupCache.set(bodyHash, { key, expiresAt: record.expiresAt });
 
     return key;
   }
 
   /**
-   * Cleans up expired idempotency keys from Firebase RTDB.
+   * Cleans up expired idempotency keys from memory.
    *
    * @returns The number of keys removed
    */
   async cleanupExpired(): Promise<number> {
-    const keysRef = ref(db, 'idempotency/keys');
-    const snapshot = await get(keysRef);
-
-    if (!snapshot.exists()) {
-      return 0;
-    }
-
-    const keys = snapshot.val() as Record<string, IdempotencyRecord>;
     const now = Date.now();
     let removedCount = 0;
 
-    for (const [keyId, record] of Object.entries(keys)) {
+    for (const [keyId, record] of this.keyCache.entries()) {
       if (record.expiresAt <= now) {
-        const keyRef = ref(db, `idempotency/keys/${keyId}`);
-        await remove(keyRef);
+        this.keyCache.delete(keyId);
+        this.lookupCache.delete(record.bodyHash);
         removedCount++;
       }
     }
@@ -109,16 +98,14 @@ export class IdempotencyManager {
   }
 
   /**
-   * Creates a sanitized hash from endpoint and body for use as Firebase key.
-   * Firebase keys cannot contain: . $ # [ ] /
+   * Creates a sanitized hash from endpoint and body.
    *
    * @param endpoint - The API endpoint
    * @param body - The request body
-   * @returns A sanitized hash string safe for Firebase keys
+   * @returns A hash string
    */
   private createHash(endpoint: string, body: Record<string, unknown>): string {
     const raw = `${endpoint}:${JSON.stringify(body)}`;
-    // Sanitize for Firebase: replace forbidden characters with underscores
     return raw.replace(/[.$/[\]]/g, '_');
   }
 }

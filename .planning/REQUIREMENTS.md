@@ -96,44 +96,46 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | — | Pending |
-| INFRA-02 | — | Pending |
-| INFRA-03 | — | Pending |
-| INFRA-04 | — | Pending |
-| INFRA-05 | — | Pending |
-| INFRA-06 | — | Pending |
-| DASH-01 | — | Pending |
-| DASH-02 | — | Pending |
-| DASH-03 | — | Pending |
-| DASH-04 | — | Pending |
-| DASH-05 | — | Pending |
-| WAN-01 | — | Pending |
-| WAN-02 | — | Pending |
-| WAN-03 | — | Pending |
-| DEV-01 | — | Pending |
-| DEV-02 | — | Pending |
-| DEV-03 | — | Pending |
-| DEV-04 | — | Pending |
-| DEV-05 | — | Pending |
-| BW-01 | — | Pending |
-| BW-02 | — | Pending |
-| BW-03 | — | Pending |
-| BW-04 | — | Pending |
-| HIST-01 | — | Pending |
-| HIST-02 | — | Pending |
-| HIST-03 | — | Pending |
-| CAT-01 | — | Pending |
-| CAT-02 | — | Pending |
-| CAT-03 | — | Pending |
-| CORR-01 | — | Pending |
-| CORR-02 | — | Pending |
-| CORR-03 | — | Pending |
+| INFRA-01 | Phase 61 | Pending |
+| INFRA-02 | Phase 61 | Pending |
+| INFRA-03 | Phase 61 | Pending |
+| INFRA-04 | Phase 61 | Pending |
+| INFRA-05 | Phase 61 | Pending |
+| INFRA-06 | Phase 61 | Pending |
+| DASH-01 | Phase 62 | Pending |
+| DASH-02 | Phase 62 | Pending |
+| DASH-03 | Phase 62 | Pending |
+| DASH-04 | Phase 62 | Pending |
+| DASH-05 | Phase 62 | Pending |
+| WAN-01 | Phase 63 | Pending |
+| WAN-02 | Phase 63 | Pending |
+| WAN-03 | Phase 63 | Pending |
+| DEV-01 | Phase 63 | Pending |
+| DEV-02 | Phase 63 | Pending |
+| DEV-03 | Phase 63 | Pending |
+| DEV-04 | Phase 63 | Pending |
+| DEV-05 | Phase 63 | Pending |
+| BW-01 | Phase 64 | Pending |
+| BW-02 | Phase 64 | Pending |
+| BW-03 | Phase 64 | Pending |
+| BW-04 | Phase 64 | Pending |
+| HIST-01 | Phase 65 | Pending |
+| HIST-02 | Phase 65 | Pending |
+| HIST-03 | Phase 65 | Pending |
+| CAT-01 | Phase 66 | Pending |
+| CAT-02 | Phase 66 | Pending |
+| CAT-03 | Phase 66 | Pending |
+| CORR-01 | Phase 67 | Pending |
+| CORR-02 | Phase 67 | Pending |
+| CORR-03 | Phase 67 | Pending |
 
 **Coverage:**
 - v8.0 requirements: 32 total
-- Mapped to phases: 0
-- Unmapped: 32
+- Mapped to phases: 32
+- Unmapped: 0
+
+**Coverage validation:** 100% - All 32 v8.0 requirements mapped to phases 61-67
 
 ---
 *Requirements defined: 2026-02-13*
-*Last updated: 2026-02-13 after initial definition*
+*Last updated: 2026-02-13 after v8.0 roadmap creation*

@@ -6,16 +6,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** v8.0 Fritz!Box Network Monitor — defining requirements
+**Current focus:** v8.0 Fritz!Box Network Monitor — Phase 61: Foundation & Infrastructure
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 61 (Foundation & Infrastructure)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-02-13 — Milestone v8.0 started
+Status: Ready for planning
+Last activity: 2026-02-13 — v8.0 roadmap created
 
-Progress: [░░░░░░░░░░░░░░░░░░░░] 0%
+Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (Phase 61 of 67)
 
 ## Performance Metrics
 
@@ -39,11 +39,26 @@ Progress: [░░░░░░░░░░░░░░░░░░░░] 0%
 | v6.0 Operations & PWA | 49-54 | 29 | 2 days |
 | v7.0 Performance & Resilience | 55-60 | 22 | 2 days |
 
+**v8.0 Target:**
+- Phases: 7 (61-67)
+- Estimated plans: 14-21 (2-3 plans per phase, comprehensive depth)
+- Requirements: 32 (INFRA:6, DASH:5, WAN:3, DEV:5, BW:4, HIST:3, CAT:3, CORR:3)
+- Estimated duration: 3-4 days
+
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
+**v8.0 Architecture decisions:**
+- Server-side API proxy pattern (keeps Fritz!Box API key secure)
+- Rate limiting with 6-second delay between requests (10 req/min limit)
+- Firebase RTDB cache with 60s TTL (balances freshness vs rate limit)
+- Orchestrator pattern for NetworkCard (consistent with StoveCard/LightsCard)
+- Adaptive polling with 30s visible/5min hidden intervals
+- RFC 9457 error handling with specific error types
+- No new dependencies (Recharts, DataTable, date-fns already installed)
+
+Decisions are also logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
 
@@ -51,10 +66,19 @@ None.
 
 ### Blockers/Concerns
 
-None.
+**Pitfalls to address during execution:**
+1. Rate limit budget exhaustion (10 req/min vs 400 req/hr Netatmo)
+2. Self-hosted API connectivity (myfritz.net may timeout when off-network)
+3. Large dataset rendering (1440+ bandwidth records for 7-day view)
+4. Sequential API waterfall (parallelize with Promise.all)
+5. Stale router cache (parse cache_age_seconds from responses)
+6. TR-064 configuration verification (setup guide required)
+
+See `.planning/research/PITFALLS-fritzbox.md` for full details.
 
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: v8.0 milestone initialization
+Stopped at: v8.0 roadmap creation complete
+Next step: `/gsd:plan-phase 61` to create foundation implementation plan
 Resume file: None

@@ -2560,4 +2560,694 @@ describe('Scheduler Check Route', () => {
       );
     });
   });
+
+  describe('PID Deep Internals - Advanced Scenarios', () => {
+    const mockLogPidTuningEntry = jest.mocked(logPidTuningEntry);
+    const mockCleanupOldLogs = jest.mocked(cleanupOldLogs);
+
+    beforeEach(() => {
+      // Reset PID-specific mocks
+      mockLogPidTuningEntry.mockResolvedValue(undefined as any);
+      mockCleanupOldLogs.mockResolvedValue(undefined as any);
+    });
+
+    it('adjusts power level when PID output differs from current', async () => {
+      // Mock stove in WORK state at power 4
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
+      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+      mockSetPowerLevel.mockResolvedValue(undefined as any);
+
+      const mockUpdateStoveState = jest.mocked(updateStoveState);
+      mockUpdateStoveState.mockResolvedValue(undefined as any);
+
+      // Mock PID Controller to return different power level
+      const { PIDController } = require('@/lib/utils/pidController');
+      const mockCompute = jest.fn().mockReturnValue(3); // PID wants power 3, current is 4
+      const mockGetState = jest.fn().mockReturnValue({ integral: 0.5, prevError: -0.2, initialized: true });
+      const mockSetState = jest.fn();
+      jest.mocked(PIDController).mockImplementation(() => ({
+        compute: mockCompute,
+        setState: mockSetState,
+        getState: mockGetState,
+      } as any));
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
+
+      // Mock PID config and Netatmo data
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path === 'schedules-v2/activeScheduleId') return 'default';
+        if (path.includes('schedules-v2/schedules/') && path.includes('/slots/')) {
+          return [{ start: '18:00', end: '22:00', power: 4, fan: 3 }];
+        }
+        if (path === 'pidAutomation/boost') return { active: false };
+        if (path.includes('users/') && path.includes('pidAutomation')) {
+          return {
+            enabled: true,
+            targetRoomId: 'room123',
+            kp: 0.5,
+            ki: 0.1,
+            kd: 0.05,
+            manualSetpoint: 21,
+          };
+        }
+        if (path === 'netatmo/currentStatus') {
+          return {
+            rooms: {
+              room123: { room_id: 'room123', name: 'Living Room', temperature: 20.5 },
+            },
+          };
+        }
+        if (path.includes('pidAutomation/state')) return null;
+        return null;
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+
+      // Verify power level adjusted to 3
+      expect(mockSetPowerLevel).toHaveBeenCalledWith(3);
+
+      // Verify stove state updated with PID source
+      expect(mockUpdateStoveState).toHaveBeenCalledWith(
+        expect.objectContaining({
+          powerLevel: 3,
+          source: 'pid_automation',
+        })
+      );
+
+      // Verify boost state saved
+      expect(mockAdminDbSet).toHaveBeenCalledWith(
+        expect.stringContaining('pidAutomation/boost'),
+        expect.objectContaining({
+          active: true,
+          powerLevel: 3,
+          scheduledPower: 4,
+          appliedAt: expect.any(Number),
+        })
+      );
+
+      // Verify analytics logged
+      expect(mockLogAnalyticsEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: 'power_change',
+          powerLevel: 3,
+          source: 'automation',
+        })
+      );
+
+      jest.useRealTimers();
+    });
+
+    it('does not adjust power when PID output matches current', async () => {
+      // Mock stove in WORK state at power 4
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
+      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+
+      // Mock PID Controller to return same power level
+      const { PIDController } = require('@/lib/utils/pidController');
+      const mockCompute = jest.fn().mockReturnValue(4); // PID wants power 4, current is 4
+      const mockGetState = jest.fn().mockReturnValue({ integral: 0, prevError: 0, initialized: true });
+      const mockSetState = jest.fn();
+      jest.mocked(PIDController).mockImplementation(() => ({
+        compute: mockCompute,
+        setState: mockSetState,
+        getState: mockGetState,
+      } as any));
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
+
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path === 'schedules-v2/activeScheduleId') return 'default';
+        if (path.includes('schedules-v2/schedules/') && path.includes('/slots/')) {
+          return [{ start: '18:00', end: '22:00', power: 4, fan: 3 }];
+        }
+        if (path === 'pidAutomation/boost') return { active: false };
+        if (path.includes('users/') && path.includes('pidAutomation')) {
+          return {
+            enabled: true,
+            targetRoomId: 'room123',
+            manualSetpoint: 21,
+          };
+        }
+        if (path === 'netatmo/currentStatus') {
+          return {
+            rooms: {
+              room123: { room_id: 'room123', name: 'Living Room', temperature: 21 },
+            },
+          };
+        }
+        if (path.includes('pidAutomation/state')) return null;
+        return null;
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+
+      // Verify power NOT adjusted
+      expect(mockSetPowerLevel).not.toHaveBeenCalled();
+
+      // Verify boost cleared (PID agrees with schedule)
+      expect(mockAdminDbSet).toHaveBeenCalledWith(
+        expect.stringContaining('pidAutomation/boost'),
+        { active: false }
+      );
+
+      jest.useRealTimers();
+    });
+
+    it('restores PID state from previous run', async () => {
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
+      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+
+      const { PIDController } = require('@/lib/utils/pidController');
+      const mockCompute = jest.fn().mockReturnValue(4);
+      const mockGetState = jest.fn().mockReturnValue({ integral: 1.5, prevError: 0.3, initialized: true });
+      const mockSetState = jest.fn();
+      jest.mocked(PIDController).mockImplementation(() => ({
+        compute: mockCompute,
+        setState: mockSetState,
+        getState: mockGetState,
+      } as any));
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
+
+      // Mock previous PID state
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path === 'schedules-v2/activeScheduleId') return 'default';
+        if (path.includes('schedules-v2/schedules/') && path.includes('/slots/')) {
+          return [{ start: '18:00', end: '22:00', power: 4, fan: 3 }];
+        }
+        if (path === 'pidAutomation/boost') return { active: false };
+        if (path.includes('users/') && path.includes('pidAutomation')) {
+          return {
+            enabled: true,
+            targetRoomId: 'room123',
+            manualSetpoint: 21,
+          };
+        }
+        if (path === 'netatmo/currentStatus') {
+          return {
+            rooms: {
+              room123: { room_id: 'room123', name: 'Living Room', temperature: 21 },
+            },
+          };
+        }
+        if (path.includes('pidAutomation/state')) {
+          return {
+            integral: 1.5,
+            prevError: 0.3,
+            initialized: true,
+            lastRun: Date.now() - 300000, // 5 minutes ago
+          };
+        }
+        return null;
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+
+      // Verify setState called with restored values
+      expect(mockSetState).toHaveBeenCalledWith({
+        integral: 1.5,
+        prevError: 0.3,
+        initialized: true,
+      });
+
+      jest.useRealTimers();
+    });
+
+    it('logs PID tuning entry after compute', async () => {
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
+      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+
+      const { PIDController } = require('@/lib/utils/pidController');
+      const mockCompute = jest.fn().mockReturnValue(4);
+      const mockGetState = jest.fn().mockReturnValue({ integral: 0.2, prevError: 0.1, initialized: true });
+      const mockSetState = jest.fn();
+      jest.mocked(PIDController).mockImplementation(() => ({
+        compute: mockCompute,
+        setState: mockSetState,
+        getState: mockGetState,
+      } as any));
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
+
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path === 'schedules-v2/activeScheduleId') return 'default';
+        if (path.includes('schedules-v2/schedules/') && path.includes('/slots/')) {
+          return [{ start: '18:00', end: '22:00', power: 4, fan: 3 }];
+        }
+        if (path === 'pidAutomation/boost') return { active: false };
+        if (path.includes('users/') && path.includes('pidAutomation')) {
+          return {
+            enabled: true,
+            targetRoomId: 'room123',
+            manualSetpoint: 21,
+          };
+        }
+        if (path === 'netatmo/currentStatus') {
+          return {
+            rooms: {
+              room123: { room_id: 'room123', name: 'Living Room', temperature: 20.5 },
+            },
+          };
+        }
+        if (path.includes('pidAutomation/state')) return null;
+        return null;
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+
+      // Verify logPidTuningEntry called
+      expect(mockLogPidTuningEntry).toHaveBeenCalledWith(
+        'admin-test-user',
+        expect.objectContaining({
+          roomTemp: 20.5,
+          powerLevel: 4,
+          setpoint: 21,
+          pidOutput: 4,
+          error: 0.5,
+          integral: 0.2,
+          roomId: 'room123',
+          roomName: 'Living Room',
+        })
+      );
+
+      jest.useRealTimers();
+    });
+
+    it('handles PID tuning log failure gracefully', async () => {
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
+      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+
+      // Mock logPidTuningEntry to fail
+      mockLogPidTuningEntry.mockRejectedValue(new Error('DB write error'));
+
+      const { PIDController } = require('@/lib/utils/pidController');
+      const mockCompute = jest.fn().mockReturnValue(4);
+      const mockGetState = jest.fn().mockReturnValue({ integral: 0, prevError: 0, initialized: true });
+      const mockSetState = jest.fn();
+      jest.mocked(PIDController).mockImplementation(() => ({
+        compute: mockCompute,
+        setState: mockSetState,
+        getState: mockGetState,
+      } as any));
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
+
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path === 'schedules-v2/activeScheduleId') return 'default';
+        if (path.includes('schedules-v2/schedules/') && path.includes('/slots/')) {
+          return [{ start: '18:00', end: '22:00', power: 4, fan: 3 }];
+        }
+        if (path === 'pidAutomation/boost') return { active: false };
+        if (path.includes('users/') && path.includes('pidAutomation')) {
+          return {
+            enabled: true,
+            targetRoomId: 'room123',
+            manualSetpoint: 21,
+          };
+        }
+        if (path === 'netatmo/currentStatus') {
+          return {
+            rooms: {
+              room123: { room_id: 'room123', name: 'Living Room', temperature: 21 },
+            },
+          };
+        }
+        if (path.includes('pidAutomation/state')) return null;
+        return null;
+      });
+
+      const request = createMockRequest();
+      const response = await GET(request);
+
+      // Route should still return 200 (logging failure doesn't stop PID)
+      expect(response.status).toBe(200);
+
+      // Verify error logged
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to log PID tuning data'),
+        expect.any(String)
+      );
+
+      jest.useRealTimers();
+    });
+
+    it('triggers cleanup of old logs when last cleanup >24h ago', async () => {
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
+      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+
+      const { PIDController } = require('@/lib/utils/pidController');
+      const mockCompute = jest.fn().mockReturnValue(4);
+      const mockGetState = jest.fn().mockReturnValue({ integral: 0, prevError: 0, initialized: true });
+      const mockSetState = jest.fn();
+      jest.mocked(PIDController).mockImplementation(() => ({
+        compute: mockCompute,
+        setState: mockSetState,
+        getState: mockGetState,
+      } as any));
+
+      jest.useFakeTimers();
+      const now = new Date('2025-02-12T18:00:00.000Z').getTime();
+      jest.setSystemTime(now);
+
+      // Mock PID state with old lastCleanup
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path === 'schedules-v2/activeScheduleId') return 'default';
+        if (path.includes('schedules-v2/schedules/') && path.includes('/slots/')) {
+          return [{ start: '18:00', end: '22:00', power: 4, fan: 3 }];
+        }
+        if (path === 'pidAutomation/boost') return { active: false };
+        if (path.includes('users/') && path.includes('pidAutomation')) {
+          return {
+            enabled: true,
+            targetRoomId: 'room123',
+            manualSetpoint: 21,
+          };
+        }
+        if (path === 'netatmo/currentStatus') {
+          return {
+            rooms: {
+              room123: { room_id: 'room123', name: 'Living Room', temperature: 21 },
+            },
+          };
+        }
+        if (path.includes('pidAutomation/state')) {
+          return {
+            integral: 0,
+            prevError: 0,
+            initialized: true,
+            lastRun: now - 300000,
+            lastCleanup: now - (25 * 60 * 60 * 1000), // 25 hours ago
+          };
+        }
+        return null;
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify cleanupOldLogs called
+      expect(mockCleanupOldLogs).toHaveBeenCalledWith('admin-test-user');
+
+      // Verify lastCleanup timestamp updated
+      expect(mockAdminDbSet).toHaveBeenCalledWith(
+        expect.stringContaining('pidAutomation/state/lastCleanup'),
+        expect.any(Number)
+      );
+
+      jest.useRealTimers();
+    });
+
+    it('skips PID when no targetRoomId in config', async () => {
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
+      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
+
+      // Mock PID config WITHOUT targetRoomId
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path === 'schedules-v2/activeScheduleId') return 'default';
+        if (path.includes('schedules-v2/schedules/') && path.includes('/slots/')) {
+          return [{ start: '18:00', end: '22:00', power: 4, fan: 3 }];
+        }
+        if (path === 'pidAutomation/boost') return { active: false };
+        if (path.includes('users/') && path.includes('pidAutomation')) {
+          return {
+            enabled: true,
+            // NO targetRoomId
+            manualSetpoint: 21,
+          };
+        }
+        if (path.includes('pidAutomation/state')) return null;
+        return null;
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+
+      // Verify PID skipped (no power adjustment)
+      expect(mockSetPowerLevel).not.toHaveBeenCalled();
+
+      jest.useRealTimers();
+    });
+
+    it('handles cleanup old logs exception gracefully', async () => {
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
+      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+
+      // Mock cleanupOldLogs to reject
+      mockCleanupOldLogs.mockRejectedValue(new Error('DB error'));
+
+      const { PIDController } = require('@/lib/utils/pidController');
+      const mockCompute = jest.fn().mockReturnValue(4);
+      const mockGetState = jest.fn().mockReturnValue({ integral: 0, prevError: 0, initialized: true });
+      const mockSetState = jest.fn();
+      jest.mocked(PIDController).mockImplementation(() => ({
+        compute: mockCompute,
+        setState: mockSetState,
+        getState: mockGetState,
+      } as any));
+
+      jest.useFakeTimers();
+      const now = new Date('2025-02-12T18:00:00.000Z').getTime();
+      jest.setSystemTime(now);
+
+      // Mock PID state with old lastCleanup
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path === 'schedules-v2/activeScheduleId') return 'default';
+        if (path.includes('schedules-v2/schedules/') && path.includes('/slots/')) {
+          return [{ start: '18:00', end: '22:00', power: 4, fan: 3 }];
+        }
+        if (path === 'pidAutomation/boost') return { active: false };
+        if (path.includes('users/') && path.includes('pidAutomation')) {
+          return {
+            enabled: true,
+            targetRoomId: 'room123',
+            manualSetpoint: 21,
+          };
+        }
+        if (path === 'netatmo/currentStatus') {
+          return {
+            rooms: {
+              room123: { room_id: 'room123', name: 'Living Room', temperature: 21 },
+            },
+          };
+        }
+        if (path.includes('pidAutomation/state')) {
+          return {
+            integral: 0,
+            prevError: 0,
+            initialized: true,
+            lastRun: now - 300000,
+            lastCleanup: now - (25 * 60 * 60 * 1000), // 25 hours ago
+          };
+        }
+        return null;
+      });
+
+      const request = createMockRequest();
+      const response = await GET(request);
+      await flushPromises();
+
+      // Route should still return 200
+      expect(response.status).toBe(200);
+
+      // Verify error logged (fire-and-forget catch handler)
+      await flushPromises(); // Wait for promise catch to execute
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to cleanup old PID logs'),
+        expect.any(Error)
+      );
+
+      jest.useRealTimers();
+    });
+  });
+
+  describe('Additional Coverage - logCronExecution Errors', () => {
+    it('handles logCronExecution rejection gracefully', async () => {
+      // Mock logCronExecution to reject
+      mockLogCronExecution.mockRejectedValue(new Error('DB write error'));
+
+      setupSchedulerMocks({
+        mode: { enabled: false },
+      });
+
+      const request = createMockRequest();
+      const response = await GET(request);
+
+      // Route should still return 200
+      expect(response.status).toBe(200);
+
+      // Error is logged via catch handler
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining('Cron execution log error'),
+        expect.any(Error)
+      );
+    });
+  });
+
+  describe('Additional Coverage - syncLivingRoomWithStove Handlers', () => {
+    it('handles syncLivingRoomWithStove success in ignition flow', async () => {
+      mockIgniteStove.mockResolvedValue(undefined as any);
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockSyncLivingRoomWithStove.mockResolvedValue({ synced: true } as any);
+
+      const mockUpdateStoveState = jest.mocked(updateStoveState);
+      mockUpdateStoveState.mockResolvedValue(undefined as any);
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify sync called
+      expect(mockSyncLivingRoomWithStove).toHaveBeenCalledWith(true);
+
+      jest.useRealTimers();
+    });
+
+    it('handles syncLivingRoomWithStove exception in ignition flow', async () => {
+      mockIgniteStove.mockResolvedValue(undefined as any);
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockSyncLivingRoomWithStove.mockRejectedValue(new Error('Netatmo timeout'));
+
+      const mockUpdateStoveState = jest.mocked(updateStoveState);
+      mockUpdateStoveState.mockResolvedValue(undefined as any);
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
+      });
+
+      const request = createMockRequest();
+      const response = await GET(request);
+      await flushPromises();
+
+      // Route should still return 200 (sync is fire-and-forget)
+      expect(response.status).toBe(200);
+
+      jest.useRealTimers();
+    });
+
+    it('handles syncLivingRoomWithStove success in shutdown flow', async () => {
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockShutdownStove.mockResolvedValue(undefined as any);
+      mockSyncLivingRoomWithStove.mockResolvedValue({ synced: true } as any);
+
+      const mockUpdateStoveState = jest.mocked(updateStoveState);
+      mockUpdateStoveState.mockResolvedValue(undefined as any);
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T08:00:00.000Z'));
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify sync called with false
+      expect(mockSyncLivingRoomWithStove).toHaveBeenCalledWith(false);
+
+      jest.useRealTimers();
+    });
+
+    it('handles syncLivingRoomWithStove exception in shutdown flow', async () => {
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockShutdownStove.mockResolvedValue(undefined as any);
+      mockSyncLivingRoomWithStove.mockRejectedValue(new Error('Netatmo timeout'));
+
+      const mockUpdateStoveState = jest.mocked(updateStoveState);
+      mockUpdateStoveState.mockResolvedValue(undefined as any);
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T08:00:00.000Z'));
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
+      });
+
+      const request = createMockRequest();
+      const response = await GET(request);
+      await flushPromises();
+
+      // Route should still return 200
+      expect(response.status).toBe(200);
+
+      jest.useRealTimers();
+    });
+  });
+
+  describe('Additional Coverage - logAnalyticsEvent Power Change Handler', () => {
+    it('handles logAnalyticsEvent exception during power change', async () => {
+      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockGetPowerLevel.mockResolvedValue({ Result: 2 } as any);
+      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+      mockSetPowerLevel.mockResolvedValue(undefined as any);
+      mockLogAnalyticsEvent.mockRejectedValue(new Error('Analytics service down'));
+
+      const mockUpdateStoveState = jest.mocked(updateStoveState);
+      mockUpdateStoveState.mockResolvedValue(undefined as any);
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
+      });
+
+      const request = createMockRequest();
+      const response = await GET(request);
+      await flushPromises();
+
+      // Route should still return 200 (analytics is fire-and-forget)
+      expect(response.status).toBe(200);
+
+      // Verify power was set despite analytics failure
+      expect(mockSetPowerLevel).toHaveBeenCalledWith(4);
+
+      jest.useRealTimers();
+    });
+  });
 });

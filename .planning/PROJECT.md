@@ -259,7 +259,16 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-(No active milestone — run `/gsd:new-milestone` to start next)
+## Current Milestone: v8.0 Fritz!Box Network Monitor
+
+**Goal:** Add Fritz!Box network monitoring as a new device in the PWA — dashboard card with connection/device/bandwidth summary plus a dedicated /network page with device list, bandwidth charts, WAN status, and device history.
+
+**Target features:**
+- NetworkCard dashboard component (WAN status, device count, bandwidth)
+- Dedicated /network page with 4 sections (WAN, devices, bandwidth charts, device history)
+- Server-side proxy API routes for Fritz!Box API (API key in env)
+- Adaptive polling with existing useAdaptivePolling pattern
+- Orchestrator pattern (hooks + presentational sub-components)
 
 ### Out of Scope
 
@@ -363,4 +372,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-02-13 after v7.0 milestone (Performance & Resilience)*
+*Last updated: 2026-02-13 after v8.0 milestone initialization (Fritz!Box Network Monitor)*

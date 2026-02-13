@@ -6,16 +6,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** v7.0 milestone shipped — ready for next milestone planning
+**Current focus:** v8.0 Fritz!Box Network Monitor — defining requirements
 
 ## Current Position
 
-Phase: 60 of 60 (all phases complete)
-Plan: N/A — milestone shipped
-Status: v7.0 Complete
-Last activity: 2026-02-13 — v7.0 Performance & Resilience milestone shipped
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-13 — Milestone v8.0 started
 
-Progress: [████████████████████] 100% (298 plans total across 10 milestones)
+Progress: [░░░░░░░░░░░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -51,10 +51,10 @@ None.
 
 ### Blockers/Concerns
 
-None — all v7.0 concerns resolved.
+None.
 
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: v7.0 milestone completion
+Stopped at: v8.0 milestone initialization
 Resume file: None

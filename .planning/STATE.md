@@ -6,21 +6,21 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** v8.0 Fritz!Box Network Monitor — Phase 62: Dashboard Card
+**Current focus:** v8.0 Fritz!Box Network Monitor — Phase 63: WAN Status & Device List
 
 ## Current Position
 
-Phase: 62 (Dashboard Card)
-Plan: 02 (Phase 62 Plan 02 complete - 2 of 3 plans done)
+Phase: 63 (WAN Status & Device List)
+Plan: 02 (Phase 63 Plan 02 complete - 1 of 2 plans done)
 Status: In progress
-Last activity: 2026-02-15 — Completed 62-02-PLAN.md (NetworkCard UI Component)
+Last activity: 2026-02-15 — Completed 63-02-PLAN.md (Device List Table Components)
 
-Progress: [████░░░░░░░░░░░░░░░░] 24% (Phase 62 Plan 02 complete, 2 of 3 plans done)
+Progress: [█████░░░░░░░░░░░░░░░] 25% (Phase 63 Plan 02 complete, 1 of 2 plans done)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 301 (phases 1-61 complete, phase 62 in progress)
+- Total plans completed: 303 (phases 1-62 complete, phase 63 in progress)
 - Average duration: ~15 min (estimated)
 - Total execution time: ~75 hours across 10 milestones
 
@@ -52,6 +52,7 @@ Progress: [████░░░░░░░░░░░░░░░░] 24% (Ph
 | Phase 61 P02 | 5 | 2 | 8 |
 | Phase 62 P01 | 13 | 2 | 6 |
 | Phase 62 P02 | 6 | 2 | 7 |
+| Phase 63 P02 | 4 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,12 @@ Progress: [████░░░░░░░░░░░░░░░░] 24% (Ph
 - [Phase 62-02]: Uptime formatter shows days+hours, hours+minutes, or minutes only
 - [Phase 62-02]: Setup banner shown inside card when Fritz!Box TR-064 not enabled
 
+**Phase 63 execution decisions:**
+- [Phase 63-02]: Status filter tabs (All/Online/Offline) added for quick filtering alongside global search
+- [Phase 63-02]: Italian locale for date formatting (date-fns/locale/it) with formatDistanceToNow
+- [Phase 63-02]: Pre-sorting online devices first, then alphabetical by name (localeCompare 'it')
+- [Phase 63-02]: Badge-only design (not dot+text) for device status, consistent with NetworkCard
+
 Decisions are also logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
@@ -103,6 +110,6 @@ See `.planning/research/PITFALLS-fritzbox.md` for full details.
 ## Session Continuity
 
 Last session: 2026-02-15
-Stopped at: Completed Phase 62 Plan 02 (NetworkCard UI Component) - 2 tasks, 7 files, 13 tests (40 total network tests)
-Next step: Continue with Phase 62 Plan 03 (if exists) or Phase 63 (Network Detail Page)
+Stopped at: Completed Phase 63 Plan 02 (Device List Table Components) - 2 tasks, 4 files, 20 tests
+Next step: Continue with Phase 63 Plan 03 (WAN Status Card) or Phase 64
 Resume file: None

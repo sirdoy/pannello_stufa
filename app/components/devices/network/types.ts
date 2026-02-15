@@ -1,0 +1,86 @@
+/**
+ * Type definitions for NetworkCard data layer
+ *
+ * Defines all TypeScript interfaces for Fritz!Box network monitoring:
+ * - API response types (bandwidth, devices, WAN)
+ * - Sparkline data structures
+ * - Health status types
+ * - Hook return types
+ */
+
+// API response types (matching Fritz!Box API route responses from Phase 61)
+
+export interface BandwidthData {
+  download: number;    // Mbps
+  upload: number;      // Mbps
+  timestamp: number;   // Unix timestamp ms
+}
+
+export interface DeviceData {
+  id: string;
+  name: string;
+  ip: string;
+  mac: string;
+  active: boolean;
+  type?: 'lan' | 'wlan' | 'guest';
+}
+
+export interface WanData {
+  connected: boolean;
+  uptime: number;       // Seconds
+  externalIp?: string;
+  linkSpeed?: number;   // Mbps
+  timestamp: number;
+}
+
+// Sparkline data point
+export interface SparklinePoint {
+  time: number;   // Unix timestamp ms
+  mbps: number;
+}
+
+// Health status
+export type NetworkHealthStatus = 'excellent' | 'good' | 'degraded' | 'poor';
+
+// Maps to DeviceCard healthStatus prop
+export type DeviceCardHealthStatus = 'ok' | 'warning' | 'error' | 'critical';
+
+// Error types for Fritz!Box API
+export interface NetworkError {
+  type: 'setup' | 'timeout' | 'rate_limited' | 'generic';
+  message: string;
+  retryAfter?: number;
+}
+
+// Hook return type
+export interface UseNetworkDataReturn {
+  // Core data
+  bandwidth: BandwidthData | null;
+  devices: DeviceData[];
+  wan: WanData | null;
+
+  // Sparkline buffers
+  downloadHistory: SparklinePoint[];
+  uploadHistory: SparklinePoint[];
+
+  // Status
+  loading: boolean;
+  connected: boolean;
+  stale: boolean;
+  lastUpdated: number | null;
+
+  // Health
+  health: NetworkHealthStatus;
+  healthMapped: DeviceCardHealthStatus;
+
+  // Error
+  error: NetworkError | null;
+
+  // Derived
+  activeDeviceCount: number;
+}
+
+// Commands return type
+export interface UseNetworkCommandsReturn {
+  navigateToNetwork: () => void;
+}

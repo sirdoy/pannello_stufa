@@ -26,17 +26,17 @@ Requirements for Fritz!Box Network Monitor. Each maps to roadmap phases.
 
 ### WAN Status
 
-- [ ] **WAN-01**: User can see external IP address with copy-to-clipboard button
-- [ ] **WAN-02**: User can see WAN connection status with uptime duration
-- [ ] **WAN-03**: User can see DNS server and connection type info
+- [x] **WAN-01**: User can see external IP address with copy-to-clipboard button
+- [x] **WAN-02**: User can see WAN connection status with uptime duration
+- [x] **WAN-03**: User can see DNS server and connection type info
 
 ### Device List
 
-- [ ] **DEV-01**: User can see device list with name, IP, MAC, and online/offline status badge
-- [ ] **DEV-02**: User can sort device list by any column (name, IP, status, bandwidth)
-- [ ] **DEV-03**: User can search/filter devices by name, IP, or MAC address
-- [ ] **DEV-04**: Device list paginated (25 per page) with existing DataTable component
-- [ ] **DEV-05**: Offline devices show last seen timestamp
+- [x] **DEV-01**: User can see device list with name, IP, MAC, and online/offline status badge
+- [x] **DEV-02**: User can sort device list by any column (name, IP, status, bandwidth)
+- [x] **DEV-03**: User can search/filter devices by name, IP, or MAC address
+- [x] **DEV-04**: Device list paginated (25 per page) with existing DataTable component
+- [x] **DEV-05**: Offline devices show last seen timestamp
 
 ### Bandwidth
 
@@ -107,14 +107,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DASH-03 | Phase 62 | Complete |
 | DASH-04 | Phase 62 | Complete |
 | DASH-05 | Phase 62 | Complete |
-| WAN-01 | Phase 63 | Pending |
-| WAN-02 | Phase 63 | Pending |
-| WAN-03 | Phase 63 | Pending |
-| DEV-01 | Phase 63 | Pending |
-| DEV-02 | Phase 63 | Pending |
-| DEV-03 | Phase 63 | Pending |
-| DEV-04 | Phase 63 | Pending |
-| DEV-05 | Phase 63 | Pending |
+| WAN-01 | Phase 63 | Complete |
+| WAN-02 | Phase 63 | Complete |
+| WAN-03 | Phase 63 | Complete |
+| DEV-01 | Phase 63 | Complete |
+| DEV-02 | Phase 63 | Complete |
+| DEV-03 | Phase 63 | Complete |
+| DEV-04 | Phase 63 | Complete |
+| DEV-05 | Phase 63 | Complete |
 | BW-01 | Phase 64 | Pending |
 | BW-02 | Phase 64 | Pending |
 | BW-03 | Phase 64 | Pending |

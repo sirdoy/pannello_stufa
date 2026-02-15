@@ -115,7 +115,7 @@ Plans:
 5. User can search devices by name, IP, or MAC address with instant filtering
 6. Offline devices show "Last seen X minutes ago" timestamp
 
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 
 Plans:
 - [ ] 63-01-PLAN.md — Extend types, CopyableIp clipboard component, WanStatusCard with InfoBox grid

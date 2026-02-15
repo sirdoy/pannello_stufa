@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 63 (WAN Status & Device List)
-Plan: 02 (Phase 63 Plan 02 complete - 1 of 2 plans done)
+Plan: 01 (Phase 63 Plan 01 complete - 1 of 2 plans done)
 Status: In progress
-Last activity: 2026-02-15 — Completed 63-02-PLAN.md (Device List Table Components)
+Last activity: 2026-02-15 — Completed 63-01-PLAN.md (WAN Status Card & CopyableIp Component)
 
-Progress: [█████░░░░░░░░░░░░░░░] 25% (Phase 63 Plan 02 complete, 1 of 2 plans done)
+Progress: [█████░░░░░░░░░░░░░░░] 25% (Phase 63 Plan 01 complete, 1 of 2 plans done)
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ Progress: [█████░░░░░░░░░░░░░░░] 25% (Ph
 | Phase 61 P02 | 5 | 2 | 8 |
 | Phase 62 P01 | 13 | 2 | 6 |
 | Phase 62 P02 | 6 | 2 | 7 |
+| Phase 63 P01 | 8 | 2 | 5 |
 | Phase 63 P02 | 4 | 2 tasks | 4 files |
 
 ## Accumulated Context
@@ -84,6 +85,10 @@ Progress: [█████░░░░░░░░░░░░░░░] 25% (Ph
 - [Phase 62-02]: Setup banner shown inside card when Fritz!Box TR-064 not enabled
 
 **Phase 63 execution decisions:**
+- [Phase 63-01]: Plain button element in CopyableIp instead of design system Button to avoid haptic feedback test complexity
+- [Phase 63-01]: Configured jest.useFakeTimers with doNotFake: ['nextTick', 'setImmediate'] to allow async clipboard promises
+- [Phase 63-01]: Clipboard API made configurable in tests (configurable:true) to work with userEvent's clipboard stub override
+- [Phase 63-01]: Uptime formatted as days+hours, hours+minutes, or minutes only based on duration
 - [Phase 63-02]: Status filter tabs (All/Online/Offline) added for quick filtering alongside global search
 - [Phase 63-02]: Italian locale for date formatting (date-fns/locale/it) with formatDistanceToNow
 - [Phase 63-02]: Pre-sorting online devices first, then alphabetical by name (localeCompare 'it')
@@ -110,6 +115,6 @@ See `.planning/research/PITFALLS-fritzbox.md` for full details.
 ## Session Continuity
 
 Last session: 2026-02-15
-Stopped at: Completed Phase 63 Plan 02 (Device List Table Components) - 2 tasks, 4 files, 20 tests
-Next step: Continue with Phase 63 Plan 03 (WAN Status Card) or Phase 64
+Stopped at: Completed Phase 63 Plan 01 (WAN Status Card & CopyableIp Component) - 2 tasks, 5 files, 14 tests (34 total network tests)
+Next step: Continue with Phase 63 Plan 02 (already complete) or Phase 64 (Bandwidth Monitoring)
 Resume file: None

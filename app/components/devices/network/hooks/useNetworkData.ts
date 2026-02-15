@@ -77,10 +77,10 @@ export function useNetworkData(): UseNetworkDataReturn {
           };
 
           // Map RFC 9457 error codes to NetworkError
-          if (errorData.code === 'TR064_NOT_ENABLED') {
+          if (errorData.code === 'TR064_NOT_ENABLED' || errorData.code === 'FRITZBOX_NOT_CONFIGURED') {
             setError({
               type: 'setup',
-              message: errorData.message || 'TR-064 non abilitato su Fritz!Box'
+              message: errorData.message || 'Fritz!Box non configurato'
             });
           } else if (errorData.code === 'FRITZBOX_TIMEOUT') {
             // Timeout - mark stale but keep cached data

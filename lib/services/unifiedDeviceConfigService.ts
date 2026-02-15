@@ -128,7 +128,18 @@ export async function getUnifiedDeviceConfigAdmin(userId: string): Promise<Devic
     const existingConfig = await adminDbGet(`users/${userId}/deviceConfig`) as any;
 
     if (existingConfig && (existingConfig.version ?? 0) >= CONFIG_VERSION) {
-      return existingConfig as DeviceConfigData;
+      // Backfill any new devices added to DEFAULT_DEVICE_ORDER after user's config was saved
+      const config = existingConfig as DeviceConfigData;
+      const existingIds = new Set(config.devices.map(d => d.id));
+      const missing = DEFAULT_DEVICE_ORDER.filter(id => !existingIds.has(id));
+      if (missing.length > 0) {
+        for (const id of missing) {
+          config.devices.push({ id, visible: false, order: config.devices.length });
+        }
+        config.updatedAt = Date.now();
+        await adminDbSet(`users/${userId}/deviceConfig`, config);
+      }
+      return config;
     }
 
     // Migration needed
@@ -339,6 +350,7 @@ function getDeviceDescription(deviceId: string): string {
     lights: 'Luci Philips Hue',
     camera: 'Videocamera di sorveglianza',
     sonos: 'Sistema audio Sonos (solo menu)',
+    network: 'Rete Fritz!Box (solo homepage)',
   };
 
   return descriptions[deviceId] || 'Dispositivo smart home';

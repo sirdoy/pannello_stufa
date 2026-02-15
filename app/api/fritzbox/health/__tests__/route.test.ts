@@ -45,17 +45,19 @@ describe('GET /api/fritzbox/health', () => {
   });
 
   it('should return 200 with connected status on successful ping', async () => {
-    mockFritzboxClient.ping.mockResolvedValue(undefined);
+    mockFritzboxClient.ping.mockResolvedValue({
+      status: 'ok',
+      cache_age_seconds: 25,
+      providers: { fritzbox: 'ok' },
+    });
 
     const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
 
     expect(response.status).toBe(200);
-    expect(data).toEqual({
-      success: true,
-      status: 'connected',
-      tr064Enabled: true,
-    });
+    expect(data.success).toBe(true);
+    expect(data.status).toBe('connected');
+    expect(data.providers).toEqual({ fritzbox: 'ok' });
     expect(mockFritzboxClient.ping).toHaveBeenCalled();
   });
 

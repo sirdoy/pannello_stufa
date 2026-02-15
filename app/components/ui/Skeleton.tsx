@@ -778,3 +778,57 @@ Skeleton.SchedulePage = function SkeletonSchedulePage() {
     </div>
   );
 };
+
+/**
+ * Skeleton.NetworkCard - Skeleton for NetworkCard component - Sage theme
+ */
+Skeleton.NetworkCard = function SkeletonNetworkCard() {
+  // Internal SkeletonPulse component
+  const SkeletonPulse = ({ className = '' }: { className?: string }) => (
+    <div
+      className={`relative overflow-hidden rounded-xl bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 ${className}`}
+    >
+      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent [html:not(.dark)_&]:via-slate-400/40" />
+    </div>
+  );
+
+  // Import Card and CardAccentBar from local scope
+  const Card = Skeleton.Card;
+
+  return (
+    <Card className="overflow-visible transition-all duration-500">
+      {/* Sage accent bar */}
+      <div className="h-1 bg-gradient-to-r from-emerald-500/50 via-teal-500/50 to-emerald-600/50" />
+
+      <div className="p-5 sm:p-6">
+        {/* Header skeleton */}
+        <div className="flex items-center gap-3 mb-4">
+          <SkeletonPulse className="w-8 h-8 rounded-lg" />
+          <SkeletonPulse className="w-24 h-6 rounded" />
+        </div>
+
+        {/* Status bar skeleton */}
+        <SkeletonPulse className="w-full h-10 rounded-lg mb-4" />
+
+        {/* Bandwidth hero skeleton */}
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <SkeletonPulse className="w-20 h-8 rounded mb-2" />
+            <SkeletonPulse className="w-full h-10 rounded" />
+          </div>
+          <div>
+            <SkeletonPulse className="w-20 h-8 rounded mb-2" />
+            <SkeletonPulse className="w-full h-10 rounded" />
+          </div>
+        </div>
+
+        {/* Info boxes skeleton */}
+        <div className="grid grid-cols-3 gap-2.5">
+          <SkeletonPulse className="h-16 rounded-lg" />
+          <SkeletonPulse className="h-16 rounded-lg" />
+          <SkeletonPulse className="h-16 rounded-lg" />
+        </div>
+      </div>
+    </Card>
+  );
+};

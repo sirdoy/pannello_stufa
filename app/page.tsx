@@ -4,6 +4,7 @@ import ThermostatCard from './components/devices/thermostat/ThermostatCard';
 import CameraCard from './components/devices/camera/CameraCard';
 import LightsCard from './components/devices/lights/LightsCard';
 import WeatherCardWrapper from './components/devices/weather/WeatherCardWrapper';
+import NetworkCard from './components/devices/network/NetworkCard';
 import SandboxPanel from './components/sandbox/SandboxPanel';
 import {
   getUnifiedDeviceConfigAdmin,
@@ -21,6 +22,7 @@ const CARD_COMPONENTS: Record<string, React.ComponentType> = {
   weather: WeatherCardWrapper,
   lights: LightsCard,
   camera: CameraCard,
+  network: NetworkCard,
 };
 
 // Device metadata for error boundaries
@@ -30,6 +32,7 @@ const DEVICE_META: Record<string, { name: string; icon: string }> = {
   weather: { name: 'Meteo', icon: '☀️' },
   lights: { name: 'Luci', icon: '💡' },
   camera: { name: 'Camera', icon: '📷' },
+  network: { name: 'Rete', icon: '📡' },
 };
 
 export default async function Home() {

@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 62 (Dashboard Card)
-Plan: 01 (Phase 62 Plan 01 complete - 1 of 3 plans done)
+Plan: 02 (Phase 62 Plan 02 complete - 2 of 3 plans done)
 Status: In progress
-Last activity: 2026-02-15 — Completed 62-01-PLAN.md (NetworkCard Data Layer)
+Last activity: 2026-02-15 — Completed 62-02-PLAN.md (NetworkCard UI Component)
 
-Progress: [██░░░░░░░░░░░░░░░░░░] 12% (Phase 62 Plan 01 complete, 1 of 3 plans done)
+Progress: [████░░░░░░░░░░░░░░░░] 24% (Phase 62 Plan 02 complete, 2 of 3 plans done)
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Progress: [██░░░░░░░░░░░░░░░░░░] 12% (Ph
 | Phase 61 P01 | 7 | 3 | 11 |
 | Phase 61 P02 | 5 | 2 | 8 |
 | Phase 62 P01 | 13 | 2 | 6 |
+| Phase 62 P02 | 6 | 2 | 7 |
 
 ## Accumulated Context
 
@@ -76,6 +77,10 @@ Progress: [██░░░░░░░░░░░░░░░░░░] 12% (Ph
 - [Phase 62-01]: Sparkline buffer capped at 12 points (6 minutes at 30s interval) via .slice(-12)
 - [Phase 62-01]: API errors preserve cached data and set stale flag (never clear state)
 - [Phase 62-01]: Hysteresis requires 2 consecutive readings to prevent status flapping
+- [Phase 62-02]: Unique SVG gradient IDs using React useId() to prevent conflicts
+- [Phase 62-02]: Recharts sparklines with isAnimationActive=false for performance
+- [Phase 62-02]: Uptime formatter shows days+hours, hours+minutes, or minutes only
+- [Phase 62-02]: Setup banner shown inside card when Fritz!Box TR-064 not enabled
 
 Decisions are also logged in PROJECT.md Key Decisions table.
 
@@ -98,6 +103,6 @@ See `.planning/research/PITFALLS-fritzbox.md` for full details.
 ## Session Continuity
 
 Last session: 2026-02-15
-Stopped at: Completed Phase 62 Plan 01 (NetworkCard Data Layer) - 2 tasks, 6 files, 27 tests
-Next step: Continue with Phase 62 Plan 02 (NetworkCard UI Component)
+Stopped at: Completed Phase 62 Plan 02 (NetworkCard UI Component) - 2 tasks, 7 files, 13 tests (40 total network tests)
+Next step: Continue with Phase 62 Plan 03 (if exists) or Phase 63 (Network Detail Page)
 Resume file: None

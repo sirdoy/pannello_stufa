@@ -91,7 +91,7 @@ Plans:
 4. User can click NetworkCard to navigate to full /network page
 5. User sees network health indicator (excellent/good/degraded/poor) based on uptime and bandwidth saturation
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 62-01-PLAN.md — Types, hooks (useNetworkData + useNetworkCommands), health algorithm with hysteresis

@@ -18,11 +18,11 @@ Requirements for Fritz!Box Network Monitor. Each maps to roadmap phases.
 
 ### Dashboard Card
 
-- [ ] **DASH-01**: NetworkCard displays WAN connection status badge (online/offline)
-- [ ] **DASH-02**: NetworkCard shows connected device count
-- [ ] **DASH-03**: NetworkCard shows current aggregate bandwidth (download/upload Mbps)
-- [ ] **DASH-04**: NetworkCard links to /network page for full details
-- [ ] **DASH-05**: Network health indicator (excellent/good/degraded/poor) based on WAN uptime and bandwidth saturation
+- [x] **DASH-01**: NetworkCard displays WAN connection status badge (online/offline)
+- [x] **DASH-02**: NetworkCard shows connected device count
+- [x] **DASH-03**: NetworkCard shows current aggregate bandwidth (download/upload Mbps)
+- [x] **DASH-04**: NetworkCard links to /network page for full details
+- [x] **DASH-05**: Network health indicator (excellent/good/degraded/poor) based on WAN uptime and bandwidth saturation
 
 ### WAN Status
 
@@ -102,11 +102,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-04 | Phase 61 | Pending |
 | INFRA-05 | Phase 61 | Pending |
 | INFRA-06 | Phase 61 | Pending |
-| DASH-01 | Phase 62 | Pending |
-| DASH-02 | Phase 62 | Pending |
-| DASH-03 | Phase 62 | Pending |
-| DASH-04 | Phase 62 | Pending |
-| DASH-05 | Phase 62 | Pending |
+| DASH-01 | Phase 62 | Complete |
+| DASH-02 | Phase 62 | Complete |
+| DASH-03 | Phase 62 | Complete |
+| DASH-04 | Phase 62 | Complete |
+| DASH-05 | Phase 62 | Complete |
 | WAN-01 | Phase 63 | Pending |
 | WAN-02 | Phase 63 | Pending |
 | WAN-03 | Phase 63 | Pending |

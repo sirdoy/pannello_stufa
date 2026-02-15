@@ -23,6 +23,8 @@ export interface DeviceData {
   mac: string;
   active: boolean;
   type?: 'lan' | 'wlan' | 'guest';
+  bandwidth?: number;   // Mbps (may not be available yet)
+  lastSeen?: number;    // Unix timestamp ms when last active
 }
 
 export interface WanData {
@@ -30,6 +32,9 @@ export interface WanData {
   uptime: number;       // Seconds
   externalIp?: string;
   linkSpeed?: number;   // Mbps
+  dns?: string;         // DNS server(s), e.g. "8.8.8.8, 8.8.4.4"
+  gateway?: string;     // Default gateway IP
+  connectionType?: string;  // 'DHCP' | 'PPPoE' | 'Static'
   timestamp: number;
 }
 

@@ -40,10 +40,10 @@ Requirements for Fritz!Box Network Monitor. Each maps to roadmap phases.
 
 ### Bandwidth
 
-- [ ] **BW-01**: User can see real-time bandwidth chart with upload and download lines (Mbps)
-- [ ] **BW-02**: User can select time range for bandwidth chart (1h, 24h, 7d)
-- [ ] **BW-03**: Chart uses data decimation for 7-day view (max 500 data points)
-- [ ] **BW-04**: Bandwidth data polled with adaptive polling (30s visible, 5min hidden)
+- [x] **BW-01**: User can see real-time bandwidth chart with upload and download lines (Mbps)
+- [x] **BW-02**: User can select time range for bandwidth chart (1h, 24h, 7d)
+- [x] **BW-03**: Chart uses data decimation for 7-day view (max 500 data points)
+- [x] **BW-04**: Bandwidth data polled with adaptive polling (30s visible, 5min hidden)
 
 ### Device History
 
@@ -115,10 +115,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DEV-03 | Phase 63 | Complete |
 | DEV-04 | Phase 63 | Complete |
 | DEV-05 | Phase 63 | Complete |
-| BW-01 | Phase 64 | Pending |
-| BW-02 | Phase 64 | Pending |
-| BW-03 | Phase 64 | Pending |
-| BW-04 | Phase 64 | Pending |
+| BW-01 | Phase 64 | Complete |
+| BW-02 | Phase 64 | Complete |
+| BW-03 | Phase 64 | Complete |
+| BW-04 | Phase 64 | Complete |
 | HIST-01 | Phase 65 | Pending |
 | HIST-02 | Phase 65 | Pending |
 | HIST-03 | Phase 65 | Pending |

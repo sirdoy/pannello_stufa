@@ -138,7 +138,7 @@ Plans:
 3. Chart uses data decimation for 7-day view (renders <1s on mobile with 1440+ data points)
 4. Bandwidth data refreshes automatically with adaptive polling (30s visible, 5min hidden)
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 64-01-PLAN.md — LTTB decimation algorithm + useBandwidthHistory hook (TDD, data layer)

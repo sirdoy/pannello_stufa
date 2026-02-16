@@ -53,9 +53,9 @@ Requirements for Fritz!Box Network Monitor. Each maps to roadmap phases.
 
 ### Device Categorization
 
-- [ ] **CAT-01**: Devices auto-categorized by MAC vendor lookup (IoT, mobile, PC, smart home, unknown)
-- [ ] **CAT-02**: User can override device category manually
-- [ ] **CAT-03**: Categories displayed with color-coded badges in device list
+- [x] **CAT-01**: Devices auto-categorized by MAC vendor lookup (IoT, mobile, PC, smart home, unknown)
+- [x] **CAT-02**: User can override device category manually
+- [x] **CAT-03**: Categories displayed with color-coded badges in device list
 
 ### Bandwidth Correlation
 
@@ -122,9 +122,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | HIST-01 | Phase 65 | Complete |
 | HIST-02 | Phase 65 | Complete |
 | HIST-03 | Phase 65 | Complete |
-| CAT-01 | Phase 66 | Pending |
-| CAT-02 | Phase 66 | Pending |
-| CAT-03 | Phase 66 | Pending |
+| CAT-01 | Phase 66 | Complete |
+| CAT-02 | Phase 66 | Complete |
+| CAT-03 | Phase 66 | Complete |
 | CORR-01 | Phase 67 | Pending |
 | CORR-02 | Phase 67 | Pending |
 | CORR-03 | Phase 67 | Pending |

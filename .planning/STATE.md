@@ -6,22 +6,22 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** v8.0 Fritz!Box Network Monitor — Phase 64: Bandwidth Visualization
+**Current focus:** v8.0 Fritz!Box Network Monitor — Phase 65: Device History Timeline
 
 ## Current Position
 
-Phase: 64 (Bandwidth Visualization)
-Plan: 02 (Phase 64 in progress - 2 of 3 plans done)
+Phase: 65 (Device History Timeline)
+Plan: 01 (Phase 65 in progress - 1 of 3 plans done)
 Status: In Progress
-Last activity: 2026-02-16 — Completed 64-02-PLAN.md (Bandwidth Chart UI)
+Last activity: 2026-02-16 — Completed 65-01-PLAN.md (Device Event Logger Foundation)
 
-Progress: [████████████░░░░░░░░] 67% (Phase 64 plan 2/3 complete)
+Progress: [█████████████░░░░░░░] 69% (Phase 65 plan 1/3 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 308 (phases 1-63 complete, phase 64 in progress)
-- Average duration: ~15 min (estimated)
+- Total plans completed: 309 (phases 1-64 complete, phase 65 in progress)
+- Average duration: ~8 min (recent trend)
 - Total execution time: ~75 hours across 10 milestones
 
 **By Milestone:**
@@ -57,6 +57,7 @@ Progress: [████████████░░░░░░░░] 67% (Ph
 | Phase 63 P03 | 3 | 2 | 2 |
 | Phase 64 P01 | 4 | 2 | 5 |
 | Phase 64 P02 | 5 | 2 | 6 |
+| Phase 65 P01 | 7 | 2 | 4 |
 
 ## Accumulated Context
 
@@ -112,6 +113,13 @@ Progress: [████████████░░░░░░░░] 67% (Ph
 - [Phase 64-02]: Collecting state shows chart with progress overlay when <10 points
 - [Phase 64-02]: isAnimationActive=false and dot=false for Recharts Line performance optimization
 
+**Phase 65 execution decisions:**
+- [Phase 65-01]: Date-keyed Firebase paths for efficient range queries: {YYYY-MM-DD}/{timestamp}_{mac}_{eventType}
+- [Phase 65-01]: MAC address colon-to-dash replacement for Firebase key compatibility (`:` not allowed in keys)
+- [Phase 65-01]: Parallel date node queries with Promise.all for multi-day ranges (3x faster than sequential)
+- [Phase 65-01]: Map-based API for device state tracking (better iteration and immutability vs plain object)
+- [Phase 65-01]: date-fns eachDayOfInterval for date range generation (avoid hand-rolled date math bugs)
+
 Decisions are also logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
@@ -133,6 +141,6 @@ See `.planning/research/PITFALLS-fritzbox.md` for full details.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed Phase 64 Plan 02 (Bandwidth Chart UI) - BandwidthChart + TimeRangeSelector + /network page integration (2 tasks, 6 files, 72 tests)
-Next step: Continue Phase 64 execution (1 plan remaining)
+Stopped at: Completed Phase 65 Plan 01 (Device Event Logger Foundation) - Date-keyed Firebase event storage with TDD coverage (2 tasks, 4 files, 15 tests)
+Next step: Continue Phase 65 execution (2 plans remaining: API endpoint, timeline UI)
 Resume file: None

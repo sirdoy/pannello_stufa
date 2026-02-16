@@ -11,16 +11,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 65 (Device History Timeline)
-Plan: 01 (Phase 65 in progress - 1 of 3 plans done)
+Plan: 02 (Phase 65 in progress - 2 of 3 plans done)
 Status: In Progress
-Last activity: 2026-02-16 — Completed 65-01-PLAN.md (Device Event Logger Foundation)
+Last activity: 2026-02-16 — Completed 65-02-PLAN.md (Device Event API Integration)
 
-Progress: [█████████████░░░░░░░] 69% (Phase 65 plan 1/3 complete)
+Progress: [█████████████░░░░░░░] 69% (Phase 65 plan 2/3 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 309 (phases 1-64 complete, phase 65 in progress)
+- Total plans completed: 310 (phases 1-64 complete, phase 65 in progress - 2 of 3 plans done)
 - Average duration: ~8 min (recent trend)
 - Total execution time: ~75 hours across 10 milestones
 
@@ -58,6 +58,7 @@ Progress: [█████████████░░░░░░░] 69% (Ph
 | Phase 64 P01 | 4 | 2 | 5 |
 | Phase 64 P02 | 5 | 2 | 6 |
 | Phase 65 P01 | 7 | 2 | 4 |
+| Phase 65 P02 | 10 | 2 | 4 |
 
 ## Accumulated Context
 
@@ -119,6 +120,17 @@ Progress: [█████████████░░░░░░░] 69% (Ph
 - [Phase 65-01]: Parallel date node queries with Promise.all for multi-day ranges (3x faster than sequential)
 - [Phase 65-01]: Map-based API for device state tracking (better iteration and immutability vs plain object)
 - [Phase 65-01]: date-fns eachDayOfInterval for date range generation (avoid hand-rolled date math bugs)
+- [Phase 65-02]: Event detection as fire-and-forget side-effect (never breaks device list response)
+- [Phase 65-02]: Try/catch wrapper around event detection to isolate failures
+- [Phase 65-02]: Time range helper function with switch for 1h/24h/7d calculations
+- [Phase 65-02]: Client-side device filtering (after Firebase query) for simplicity
+- [Phase 65-02]: Invalid range parameter defaults to 24h (safe fallback)
+- [Phase 65-03]: TimeRangeSelector reused via type casting (BandwidthTimeRange and DeviceHistoryTimeRange have identical values)
+- [Phase 65-03]: Device filter dropdown uses Radix Select with "Tutti i dispositivi" as null filter option
+- [Phase 65-03]: Date grouping uses format(timestamp, 'yyyy-MM-dd') as key for stable grouping
+- [Phase 65-03]: Italian locale headers formatted as 'EEEE, d MMMM yyyy' (e.g., "giovedì, 15 febbraio 2024")
+- [Phase 65-03]: DeviceEventItem shows relative time (formatDistanceToNow) alongside absolute time (HH:mm:ss)
+- [Phase 65-03]: Timeline sorted newest date first, events within date sorted newest first
 
 Decisions are also logged in PROJECT.md Key Decisions table.
 
@@ -144,3 +156,11 @@ Last session: 2026-02-16
 Stopped at: Completed Phase 65 Plan 01 (Device Event Logger Foundation) - Date-keyed Firebase event storage with TDD coverage (2 tasks, 4 files, 15 tests)
 Next step: Continue Phase 65 execution (2 plans remaining: API endpoint, timeline UI)
 Resume file: None
+
+**Phase 65-03 UI decisions:**
+- TimeRangeSelector reused via type casting (BandwidthTimeRange and DeviceHistoryTimeRange have identical values)
+- Device filter dropdown uses Radix Select with "Tutti i dispositivi" as null filter option
+- Date grouping uses format(timestamp, 'yyyy-MM-dd') as key for stable grouping
+- Italian locale headers formatted as 'EEEE, d MMMM yyyy' (e.g., "giovedì, 15 febbraio 2024")
+- DeviceEventItem shows relative time (formatDistanceToNow) alongside absolute time (HH:mm:ss)
+- Timeline sorted newest date first, events within date sorted newest first

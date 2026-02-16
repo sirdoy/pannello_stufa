@@ -1,4 +1,4 @@
-import { adminDbGet, adminDbUpdate } from '@/lib/firebaseAdmin';
+import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 import {
   categorizeByVendor,
@@ -12,7 +12,7 @@ jest.mock('@/lib/firebaseAdmin');
 jest.mock('@/lib/environmentHelper');
 
 const mockAdminDbGet = jest.mocked(adminDbGet);
-const mockAdminDbUpdate = jest.mocked(adminDbUpdate);
+const mockAdminDbSet = jest.mocked(adminDbSet);
 const mockGetEnvironmentPath = jest.mocked(getEnvironmentPath);
 
 describe('deviceCategories', () => {
@@ -110,7 +110,7 @@ describe('deviceCategories', () => {
       expect(mockGetEnvironmentPath).toHaveBeenCalledWith(
         'network/deviceCategories/aa_bb_cc_dd_ee_ff'
       );
-      expect(mockAdminDbUpdate).toHaveBeenCalledWith(
+      expect(mockAdminDbSet).toHaveBeenCalledWith(
         'test-env/network/deviceCategories/aa_bb_cc_dd_ee_ff',
         expect.objectContaining({
           category: 'iot',
@@ -119,7 +119,7 @@ describe('deviceCategories', () => {
         })
       );
 
-      const savedData = mockAdminDbUpdate.mock.calls[0]?.[1] as {
+      const savedData = mockAdminDbSet.mock.calls[0]?.[1] as {
         overriddenAt: number;
       };
       expect(savedData.overriddenAt).toBeGreaterThanOrEqual(beforeTimestamp);

@@ -1,4 +1,4 @@
-import { adminDbGet, adminDbUpdate } from '@/lib/firebaseAdmin';
+import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 import type { DeviceCategory, CategoryOverride } from '@/types/firebase/network';
 
@@ -104,7 +104,7 @@ export async function saveCategoryOverride(
     isManualOverride: true,
   };
 
-  await adminDbUpdate(path, override);
+  await adminDbSet(path, override);
 }
 
 /**

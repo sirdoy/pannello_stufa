@@ -47,9 +47,9 @@ Requirements for Fritz!Box Network Monitor. Each maps to roadmap phases.
 
 ### Device History
 
-- [ ] **HIST-01**: User can see device connection/disconnection events as a timeline
-- [ ] **HIST-02**: User can filter history by specific device
-- [ ] **HIST-03**: History shows last 24h by default with option for 7-day view
+- [x] **HIST-01**: User can see device connection/disconnection events as a timeline
+- [x] **HIST-02**: User can filter history by specific device
+- [x] **HIST-03**: History shows last 24h by default with option for 7-day view
 
 ### Device Categorization
 
@@ -119,9 +119,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BW-02 | Phase 64 | Complete |
 | BW-03 | Phase 64 | Complete |
 | BW-04 | Phase 64 | Complete |
-| HIST-01 | Phase 65 | Pending |
-| HIST-02 | Phase 65 | Pending |
-| HIST-03 | Phase 65 | Pending |
+| HIST-01 | Phase 65 | Complete |
+| HIST-02 | Phase 65 | Complete |
+| HIST-03 | Phase 65 | Complete |
 | CAT-01 | Phase 66 | Pending |
 | CAT-02 | Phase 66 | Pending |
 | CAT-03 | Phase 66 | Pending |

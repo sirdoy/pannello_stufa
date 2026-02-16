@@ -75,10 +75,12 @@ export default function DeviceHistoryTimeline({
   const deviceOptions = useMemo(() => {
     return [
       { value: 'all', label: 'Tutti i dispositivi' },
-      ...devices.map((device) => ({
-        value: device.mac,
-        label: device.name,
-      })),
+      ...devices
+        .filter((device) => device.mac)
+        .map((device) => ({
+          value: device.mac,
+          label: device.name || device.mac,
+        })),
     ];
   }, [devices]);
 

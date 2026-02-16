@@ -11,16 +11,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 66 (Device Categorization)
-Plan: 03 (Phase 66 in progress - 3 of 3 plans done)
+Plan: 04 (Phase 66 complete - 4 of 4 plans done)
 Status: Complete
-Last activity: 2026-02-16 — Completed 66-02-PLAN.md (Vendor Lookup & Category Override API Routes)
+Last activity: 2026-02-16 — Completed 66-04-PLAN.md (End-to-End Device Categorization Integration)
 
-Progress: [████████████████████] 100% (Phase 66 complete - all 3 plans done)
+Progress: [████████████████████] 100% (Phase 66 complete - all 4 plans done)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 313 (phases 1-66 complete)
+- Total plans completed: 314 (phases 1-66 complete)
 - Average duration: ~6 min (recent trend)
 - Total execution time: ~76 hours across 10 milestones
 
@@ -63,6 +63,7 @@ Progress: [████████████████████] 100% (P
 | Phase 66 P01 | 6 | 2 | 5 |
 | Phase 66 P02 | 7 | 2 | 4 |
 | Phase 66 P03 | 5 | 2 | 5 |
+| Phase 66 P04 | 8 | 3 | 6 |
 
 ## Accumulated Context
 
@@ -147,6 +148,11 @@ Progress: [████████████████████] 100% (P
 - [Phase 66-03]: Category column positioned at index 3 (after Name, IP, MAC, before Status, Bandwidth)
 - [Phase 66-03]: Enhanced DataTable mock to render category column cells for thorough testing
 - [Phase 66-03]: Badge onClick only active when onCategoryChange prop provided (enables inline editing)
+- [Phase 66-04]: Firebase override checked BEFORE vendor cache in vendor-lookup API (priority chain: override → cache → macvendors.com)
+- [Phase 66-04]: Fire-and-forget enrichment with silent failure — self-heals on next poll for failed MACs
+- [Phase 66-04]: Batch vendor-lookup calls (5 at a time) to prevent API overwhelm
+- [Phase 66-04]: Set diff via enrichedMacsRef prevents re-enrichment on every poll cycle
+- [Phase 66-04]: Optimistic UI updates via updateDeviceCategory (no loading states, fails silently)
 
 Decisions are also logged in PROJECT.md Key Decisions table.
 
@@ -169,6 +175,6 @@ See `.planning/research/PITFALLS-fritzbox.md` for full details.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed Phase 66 Plan 02 (Vendor Lookup & Category Override API Routes) - Authenticated endpoints with 7-day cache, manual override (2 tasks, 4 files, 12 tests)
+Stopped at: Completed Phase 66 Plan 04 (End-to-End Device Categorization Integration) - Gap closure plan wiring three orphaned layers into working feature (3 tasks, 6 files, 23 tests, 8 min)
 Next step: Phase 67 planning - Next phase in v8.0 roadmap
 Resume file: None

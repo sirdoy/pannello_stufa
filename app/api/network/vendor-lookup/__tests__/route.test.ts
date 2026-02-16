@@ -14,7 +14,7 @@ jest.mock('@/lib/auth0', () => ({
 
 import { GET } from '../route';
 import { getCachedVendor, cacheVendor, fetchVendorName } from '@/lib/network/vendorCache';
-import { categorizeByVendor } from '@/lib/network/deviceCategories';
+import { categorizeByVendor, getCategoryOverride } from '@/lib/network/deviceCategories';
 import { auth0 } from '@/lib/auth0';
 
 const mockGetSession = jest.mocked(auth0.getSession);
@@ -22,6 +22,7 @@ const mockGetCachedVendor = jest.mocked(getCachedVendor);
 const mockCacheVendor = jest.mocked(cacheVendor);
 const mockFetchVendorName = jest.mocked(fetchVendorName);
 const mockCategorizeByVendor = jest.mocked(categorizeByVendor);
+const mockGetCategoryOverride = jest.mocked(getCategoryOverride);
 
 describe('GET /api/network/vendor-lookup', () => {
   const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
@@ -31,6 +32,8 @@ describe('GET /api/network/vendor-lookup', () => {
     jest.clearAllMocks();
     // Default: authenticated user
     mockGetSession.mockResolvedValue(mockSession as any);
+    // Default: no override
+    mockGetCategoryOverride.mockResolvedValue(null);
     // Mock console methods to suppress output
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
@@ -153,5 +156,42 @@ describe('GET /api/network/vendor-lookup', () => {
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
     expect(data.category).toBe('unknown');
+  });
+
+  it('should return overridden category when Firebase override exists', async () => {
+    mockGetCategoryOverride.mockResolvedValue('pc');
+    const mockRequest = new Request(`http://localhost:3000/api/network/vendor-lookup?mac=${testMac}`);
+
+    const response = await GET(mockRequest as any, {} as any);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data).toEqual({
+      success: true,
+      vendor: '',
+      category: 'pc',
+      cached: true,
+      overridden: true,
+    });
+    // Must NOT proceed to vendor cache or macvendors.com
+    expect(mockGetCachedVendor).not.toHaveBeenCalled();
+    expect(mockFetchVendorName).not.toHaveBeenCalled();
+  });
+
+  it('should proceed to vendor lookup when no override exists', async () => {
+    mockGetCategoryOverride.mockResolvedValue(null);
+    mockGetCachedVendor.mockResolvedValue(null);
+    mockFetchVendorName.mockResolvedValue('Dell Inc.');
+    mockCategorizeByVendor.mockReturnValue('pc');
+    const mockRequest = new Request(`http://localhost:3000/api/network/vendor-lookup?mac=${testMac}`);
+
+    const response = await GET(mockRequest as any, {} as any);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.category).toBe('pc');
+    expect(data.overridden).toBeUndefined();
+    expect(mockGetCategoryOverride).toHaveBeenCalledWith(testMac);
+    expect(mockFetchVendorName).toHaveBeenCalledWith(testMac);
   });
 });

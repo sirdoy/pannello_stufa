@@ -1,6 +1,6 @@
 import { withAuthAndErrorHandler, success, ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core';
 import { getCachedVendor, cacheVendor, fetchVendorName } from '@/lib/network/vendorCache';
-import { categorizeByVendor } from '@/lib/network/deviceCategories';
+import { categorizeByVendor, getCategoryOverride } from '@/lib/network/deviceCategories';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +10,12 @@ export const GET = withAuthAndErrorHandler(async (request) => {
 
   if (!mac) {
     throw new ApiError(ERROR_CODES.VALIDATION_ERROR, 'Indirizzo MAC richiesto', HTTP_STATUS.BAD_REQUEST);
+  }
+
+  // 0. Check for manual override in Firebase (highest priority)
+  const override = await getCategoryOverride(mac);
+  if (override) {
+    return success({ vendor: '', category: override, cached: true, overridden: true });
   }
 
   // 1. Check vendor cache (7-day TTL)

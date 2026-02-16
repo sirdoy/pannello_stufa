@@ -13,7 +13,7 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 Phase: 67 (Bandwidth Correlation) — LAST COMPLETED
 Plan: Complete
 Status: v8.0 Milestone Shipped
-Last activity: 2026-02-16 — v8.0 Fritz!Box Network Monitor milestone archived
+Last activity: 2026-02-16 - Completed quick task 25: Add network API debug tab with all endpoints from API.md
 
 Progress: [██████████████████████] 100% (v8.0 complete — 7 phases, 18 plans, 32/32 requirements)
 
@@ -53,6 +53,12 @@ None.
 ### Blockers/Concerns
 
 None — milestone complete.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 25 | Add network API debug tab with all endpoints from API.md | 2026-02-16 | 5b89be9 | [25-add-network-api-debug-tab-with-all-endpo](./quick/25-add-network-api-debug-tab-with-all-endpo/) |
 
 ## Session Continuity
 

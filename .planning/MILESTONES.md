@@ -366,3 +366,41 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 _For current project status, see `.planning/PROJECT.md`_
 _To start next milestone, run `/gsd:new-milestone`_
 
+
+## v8.0 Fritz!Box Network Monitor (Shipped: 2026-02-16)
+
+**Delivered:** Fritz!Box network monitoring integrated as a new device in the PWA — dashboard card with connection/device/bandwidth summary, dedicated /network page with WAN status, paginated device list with search/sort/categorization, real-time bandwidth charts with LTTB decimation, device history timeline with Firebase event logging, MAC vendor auto-categorization with manual override, and bandwidth-stove power correlation with GDPR consent gating.
+
+**Phases completed:** 61-67 (18 plans, 38 tasks)
+
+**Key accomplishments:**
+
+- Fritz!Box API integration with rate limiting (10 req/min, 6s delay), 60s Firebase RTDB cache, secure server-side proxy routes, and RFC 9457 error handling
+- NetworkCard dashboard component with health algorithm (hysteresis-based status), sparkline buffering, adaptive polling, and setup guide for TR-064 configuration
+- Dedicated /network page with WAN status details (external IP copy, uptime, DNS), paginated device list (25/page) with search/sort/filter and Italian locale formatting
+- Real-time bandwidth visualization with LTTB decimation algorithm (10080 → 500 points), dual upload/download Recharts LineChart, and time range selection (1h/24h/7d)
+- Device history timeline with date-keyed Firebase event logging, fire-and-forget event detection, date-grouped Italian display, and per-device filtering
+- Device auto-categorization by MAC vendor lookup (40+ keyword mappings, 7-day cache, macvendors.com API) with manual override persistence and color-coded badges with inline editing
+- Bandwidth-stove power correlation with Pearson analysis, dual y-axis chart (step chart for power levels), Italian insight text, and GDPR analytics consent gate
+
+**Stats:**
+
+- 18 plans executed across 7 phases
+- 32/32 v8.0 requirements satisfied (100%)
+- 136 files changed (+25,643 insertions, -89 deletions)
+- 229+ new tests across milestone
+- 81 git commits with atomic changes
+- 3 days from phase 61 start to completion (2026-02-13 → 2026-02-16)
+
+**Git range:** `feat(61-01)` (c359453) → `docs(phase-67)` (2dff5c7)
+
+**Archives:**
+- [Roadmap](milestones/v8.0-ROADMAP.md)
+- [Requirements](milestones/v8.0-REQUIREMENTS.md)
+
+**Tech debt:** INFRA requirements unchecked in traceability (Phase 61 complete but tracking not updated). Rate limit budget shared across all Fritz!Box API calls (10 req/min). Self-hosted API connectivity depends on myfritz.net. Plain button in CopyableIp (avoided design system Button for test simplicity).
+
+**What's next:** Fritz!Box network monitoring fully operational. Consider advanced monitoring (guest network, anomaly detection, per-device usage tracking) for future milestones.
+
+---
+

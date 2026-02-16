@@ -2,7 +2,7 @@
 
 ## What This Is
 
-PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (con gestione schedule complete), luci Philips Hue. Include sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, rate limiting persistente Firebase RTDB, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API, e componenti refactored con orchestrator pattern (~85% LOC reduction). Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
+PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (con gestione schedule complete), luci Philips Hue, monitoraggio rete Fritz!Box. Include sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, rate limiting persistente Firebase RTDB, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Monitoraggio rete Fritz!Box con dashboard card, pagina dedicata /network con WAN status, device list con categorizzazione automatica, bandwidth charts con decimation LTTB, device history timeline, e correlazione bandwidth-stufa con consent gate. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API, e componenti refactored con orchestrator pattern (~85% LOC reduction). Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
 
 ## Core Value
 
@@ -10,20 +10,21 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v7.0 (shipped 2026-02-13)
-**Status:** Performance & Resilience complete
+**Version:** v8.0 (shipped 2026-02-16)
+**Status:** Fritz!Box Network Monitor complete
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
-- Firebase (Realtime Database for tokens/cache/analytics, Firestore for history)
+- Firebase (Realtime Database for tokens/cache/analytics/network events, Firestore for history)
 - Auth0 for authentication
 - Playwright for E2E testing
-- Recharts for visualization
+- Recharts for visualization (bandwidth charts, correlation, analytics)
 - CVA (class-variance-authority) for type-safe component variants
 - Radix UI primitives for accessible interactions
 - react-error-boundary for crash isolation
 - GitHub Actions for cron automation (5-min schedule)
-- ~104,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
+- Fritz!Box TR-064 API integration via server-side proxy
+- ~106,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
 
 ## Requirements
 
@@ -202,6 +203,48 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ **TOKEN-03**: Cleanup logs for audit trail — v7.0 (Phase 60)
 - ✓ **TOKEN-04**: Active tokens never deleted — v7.0 (Phase 60)
 
+**v8.0 Fritz!Box Network Monitor (Shipped 2026-02-16):**
+
+**Infrastructure:**
+- ✓ **INFRA-01**: Server-side proxy API routes for Fritz!Box API — v8.0 (Phase 61)
+- ✓ **INFRA-02**: Fritz!Box client with rate limiting (10 req/min) — v8.0 (Phase 61)
+- ✓ **INFRA-03**: Firebase RTDB cache with 60s TTL — v8.0 (Phase 61)
+- ✓ **INFRA-04**: Network device in device registry — v8.0 (Phase 61)
+- ✓ **INFRA-05**: RFC 9457 error handling — v8.0 (Phase 61)
+- ✓ **INFRA-06**: Fritz!Box connectivity check with setup guide — v8.0 (Phase 61)
+
+**Dashboard & Network Page:**
+- ✓ **DASH-01**: NetworkCard WAN status badge — v8.0 (Phase 62)
+- ✓ **DASH-02**: Connected device count — v8.0 (Phase 62)
+- ✓ **DASH-03**: Aggregate bandwidth display — v8.0 (Phase 62)
+- ✓ **DASH-04**: NetworkCard links to /network — v8.0 (Phase 62)
+- ✓ **DASH-05**: Health indicator with hysteresis — v8.0 (Phase 62)
+- ✓ **WAN-01**: External IP with copy-to-clipboard — v8.0 (Phase 63)
+- ✓ **WAN-02**: WAN status with uptime — v8.0 (Phase 63)
+- ✓ **WAN-03**: DNS server and connection info — v8.0 (Phase 63)
+- ✓ **DEV-01**: Device list with name/IP/MAC/status — v8.0 (Phase 63)
+- ✓ **DEV-02**: Sort by any column — v8.0 (Phase 63)
+- ✓ **DEV-03**: Search/filter devices — v8.0 (Phase 63)
+- ✓ **DEV-04**: Paginated (25/page) with DataTable — v8.0 (Phase 63)
+- ✓ **DEV-05**: Offline devices show last seen — v8.0 (Phase 63)
+
+**Bandwidth & History:**
+- ✓ **BW-01**: Real-time bandwidth chart (upload/download) — v8.0 (Phase 64)
+- ✓ **BW-02**: Time range selection (1h/24h/7d) — v8.0 (Phase 64)
+- ✓ **BW-03**: LTTB data decimation for 7-day view — v8.0 (Phase 64)
+- ✓ **BW-04**: Adaptive polling (30s/5min) — v8.0 (Phase 64)
+- ✓ **HIST-01**: Device event timeline — v8.0 (Phase 65)
+- ✓ **HIST-02**: Filter by device — v8.0 (Phase 65)
+- ✓ **HIST-03**: 24h default with 7-day option — v8.0 (Phase 65)
+
+**Categorization & Correlation:**
+- ✓ **CAT-01**: MAC vendor auto-categorization — v8.0 (Phase 66)
+- ✓ **CAT-02**: Manual category override — v8.0 (Phase 66)
+- ✓ **CAT-03**: Color-coded category badges — v8.0 (Phase 66)
+- ✓ **CORR-01**: Bandwidth-stove power chart overlay — v8.0 (Phase 67)
+- ✓ **CORR-02**: Analytics consent gate — v8.0 (Phase 67)
+- ✓ **CORR-03**: Correlation insight text — v8.0 (Phase 67)
+
 **v6.0 Operations, PWA & Analytics (Shipped 2026-02-11):**
 
 **Persistent Rate Limiting:**
@@ -259,16 +302,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-## Current Milestone: v8.0 Fritz!Box Network Monitor
-
-**Goal:** Add Fritz!Box network monitoring as a new device in the PWA — dashboard card with connection/device/bandwidth summary plus a dedicated /network page with device list, bandwidth charts, WAN status, and device history.
-
-**Target features:**
-- NetworkCard dashboard component (WAN status, device count, bandwidth)
-- Dedicated /network page with 4 sections (WAN, devices, bandwidth charts, device history)
-- Server-side proxy API routes for Fritz!Box API (API key in env)
-- Adaptive polling with existing useAdaptivePolling pattern
-- Orchestrator pattern (hooks + presentational sub-components)
+(No active requirements — next milestone not yet defined)
 
 ### Out of Scope
 
@@ -290,25 +324,26 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 **Codebase:**
 - Next.js 15.5 PWA con App Router
-- Firebase Realtime Database per storage e analytics
+- Firebase Realtime Database per storage, analytics, network events
 - Firestore per notification history
 - Auth0 per autenticazione
 - Service Worker (Serwist) per offline capability e notification actions
-- Multi-device smart home control (stufa, termostato, luci)
+- Multi-device smart home control (stufa, termostato, luci, rete Fritz!Box)
 - CVA + Radix UI design system (37+ components)
 - react-error-boundary per crash isolation
-- ~104,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
-- 531 TypeScript source files, 3,500+ tests passing
+- Fritz!Box TR-064 API via server-side proxy con rate limiting
+- ~106,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
+- 550+ TypeScript source files, 3,700+ tests passing
 - GitHub Actions cron (5-min schedule) per health monitoring e coordination
 - GDPR-compliant analytics con consent banner
-- 10 milestones shipped, 60 phases, 298 plans executed
+- 11 milestones shipped, 67 phases, 316 plans executed
 
-**v7.0 Milestone (2026-02-11 → 2026-02-13):**
-- 6 phases executed (22 plans total)
-- 30/30 requirements satisfied (100%)
-- 145 files changed (+31,231 insertions, -4,121 deletions)
-- 82 git commits with atomic changes
-- 2 days from phase 55 start to completion
+**v8.0 Milestone (2026-02-13 → 2026-02-16):**
+- 7 phases executed (18 plans, 38 tasks)
+- 32/32 requirements satisfied (100%)
+- 136 files changed (+25,643 insertions, -89 deletions)
+- 81 git commits with atomic changes
+- 3 days from phase 61 start to completion
 
 **Known Issues:**
 - Worker teardown warning (React 19 cosmetic, not actionable)
@@ -318,6 +353,9 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Consent enforcement is caller responsibility (not middleware-enforced)
 - Visual parity human verification pending for refactored LightsCard and stove/page.tsx
 - 3 pre-existing vibration API test warnings
+- Fritz!Box rate limit budget shared across all API calls (10 req/min)
+- Self-hosted Fritz!Box API connectivity depends on myfritz.net (may timeout off-network)
+- CopyableIp uses plain button instead of design system Button (test simplicity)
 
 **User Feedback:**
 - None yet (awaiting operational deployment)
@@ -361,6 +399,13 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 | alwaysActive flag for stove | Stove polling never pauses regardless of visibility | ✓ Good — Safety-critical polling preserved (v7.0) |
 | Orchestrator pattern for components | Custom hooks + presentational sub-components, ~200 LOC orchestrator | ✓ Good — 82-87% LOC reduction, testable (v7.0) |
 | Token cleanup by delivery timestamp | lastUsed updated on FCM delivery, not app open | ✓ Good — Accurate stale detection (v7.0) |
+| Server-side API proxy for Fritz!Box | API key never exposed to client, rate limiting on server | ✓ Good — Secure integration (v8.0) |
+| Fritz!Box rate limiting (10 req/min, 6s delay) | Prevents overwhelming home router with API calls | ✓ Good — Balanced with 60s cache TTL (v8.0) |
+| Firebase RTDB for network event logging | Date-keyed paths for efficient range queries, fire-and-forget pattern | ✓ Good — Multi-day queries via Promise.all (v8.0) |
+| LTTB decimation algorithm | Reduces 10080 → 500 data points for 7-day bandwidth chart | ✓ Good — Renders <1s on mobile (v8.0) |
+| MAC vendor auto-categorization | macvendors.com API with 7-day cache, Firebase override priority | ✓ Good — Self-heals on failure, batch enrichment (v8.0) |
+| Pearson correlation for bandwidth-stove | Minute-aligned buffering, consent-gated, Italian insight text | ✓ Good — Meaningful analysis with 30+ data points (v8.0) |
+| No new dependencies for v8.0 | Recharts, DataTable, date-fns already in codebase | ✓ Good — Zero dependency growth (v8.0) |
 
 ## Constraints
 
@@ -372,4 +417,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-02-13 after v8.0 milestone initialization (Fritz!Box Network Monitor)*
+*Last updated: 2026-02-16 after v8.0 milestone completion (Fritz!Box Network Monitor shipped)*

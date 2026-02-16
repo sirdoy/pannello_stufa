@@ -32,17 +32,17 @@ export function decimateLTTB(data: TimeSeriesPoint[], threshold: number): TimeSe
   }
 
   if (threshold === 1) {
-    return data.length > 0 ? [data[0]] : [];
+    return data.length > 0 ? [data[0]!] : [];
   }
 
   if (threshold === 2) {
-    return [data[0], data[data.length - 1]];
+    return [data[0]!, data[data.length - 1]!];
   }
 
   const sampled: TimeSeriesPoint[] = [];
 
   // Always keep first point
-  sampled.push(data[0]);
+  sampled.push(data[0]!);
 
   // Bucket size for the middle points (excluding first and last)
   const bucketSize = (data.length - 2) / (threshold - 2);
@@ -68,8 +68,8 @@ export function decimateLTTB(data: TimeSeriesPoint[], threshold: number): TimeSe
 
     for (let j = nextBucketStart; j < nextBucketEnd; j++) {
       if (j < data.length) {
-        avgTime += data[j].time;
-        avgValue += data[j].value;
+        avgTime += data[j]!.time;
+        avgValue += data[j]!.value;
         nextBucketLength++;
       }
     }
@@ -83,11 +83,11 @@ export function decimateLTTB(data: TimeSeriesPoint[], threshold: number): TimeSe
     let maxArea = -1;
     let maxAreaIndex = bucketStart;
 
-    const prevPoint = data[selectedIndex];
+    const prevPoint = data[selectedIndex]!;
 
     for (let j = bucketStart; j < bucketEnd; j++) {
       if (j < data.length) {
-        const point = data[j];
+        const point = data[j]!;
 
         // Calculate triangle area
         // Formula: 0.5 * |((ax - cx)(by - ay)) - ((ax - bx)(cy - ay))|
@@ -107,12 +107,12 @@ export function decimateLTTB(data: TimeSeriesPoint[], threshold: number): TimeSe
     }
 
     // Add the point with the largest triangle area
-    sampled.push(data[maxAreaIndex]);
+    sampled.push(data[maxAreaIndex]!);
     selectedIndex = maxAreaIndex;
   }
 
   // Always keep last point
-  sampled.push(data[data.length - 1]);
+  sampled.push(data[data.length - 1]!);
 
   return sampled;
 }

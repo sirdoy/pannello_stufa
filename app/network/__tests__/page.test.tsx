@@ -142,12 +142,13 @@ describe('NetworkPage', () => {
       };
 
       const device1 = {
+        id: 'dev-01',
         name: 'Device 1',
         ip: '192.168.1.10',
         mac: 'AA:BB:CC:DD:EE:01',
         active: true,
-        bandwidth: null,
-        lastSeen: null,
+        bandwidth: undefined,
+        lastSeen: undefined,
       };
 
       mockedUseNetworkData.mockReturnValue(
@@ -208,28 +209,31 @@ describe('NetworkPage', () => {
 
       const devices = [
         {
+          id: 'dev-01',
           name: 'Device 1',
           ip: '192.168.1.10',
           mac: 'AA:BB:CC:DD:EE:01',
           active: true,
-          bandwidth: null,
-          lastSeen: null,
+          bandwidth: undefined,
+          lastSeen: undefined,
         },
         {
+          id: 'dev-02',
           name: 'Device 2',
           ip: '192.168.1.11',
           mac: 'AA:BB:CC:DD:EE:02',
           active: false,
-          bandwidth: null,
+          bandwidth: undefined,
           lastSeen: Date.now() - 3600000,
         },
         {
+          id: 'dev-03',
           name: 'Device 3',
           ip: '192.168.1.12',
           mac: 'AA:BB:CC:DD:EE:03',
           active: true,
-          bandwidth: null,
-          lastSeen: null,
+          bandwidth: undefined,
+          lastSeen: undefined,
         },
       ];
 
@@ -292,12 +296,13 @@ describe('NetworkPage', () => {
 
       const devices = [
         {
+          id: 'dev-01',
           name: 'Device 1',
           ip: '192.168.1.10',
           mac: 'AA:BB:CC:DD:EE:01',
           active: true,
-          bandwidth: null,
-          lastSeen: null,
+          bandwidth: undefined,
+          lastSeen: undefined,
         },
       ];
 

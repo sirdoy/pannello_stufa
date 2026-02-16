@@ -101,7 +101,7 @@ describe('useBandwidthHistory', () => {
 
       expect(result.current.pointCount).toBe(10080);
       // Oldest points should be dropped
-      expect(result.current.chartData[0].time).toBe(now + 20 * 1000); // First 20 dropped
+      expect(result.current.chartData[0]!.time).toBe(now + 20 * 1000); // First 20 dropped
     });
   });
 
@@ -123,8 +123,8 @@ describe('useBandwidthHistory', () => {
 
       expect(result.current.timeRange).toBe('1h');
       expect(result.current.chartData.length).toBe(2); // Only last 2 within 1h
-      expect(result.current.chartData[0].download).toBe(40);
-      expect(result.current.chartData[1].download).toBe(50);
+      expect(result.current.chartData[0]!.download).toBe(40);
+      expect(result.current.chartData[1]!.download).toBe(50);
     });
 
     it('filters data by time range 24h (only last 24 hours)', () => {
@@ -144,8 +144,8 @@ describe('useBandwidthHistory', () => {
 
       expect(result.current.timeRange).toBe('24h');
       expect(result.current.chartData.length).toBe(2); // Only last 2 within 24h
-      expect(result.current.chartData[0].download).toBe(40);
-      expect(result.current.chartData[1].download).toBe(50);
+      expect(result.current.chartData[0]!.download).toBe(40);
+      expect(result.current.chartData[1]!.download).toBe(50);
     });
 
     it('filters data by time range 7d (full 7-day buffer)', () => {
@@ -166,8 +166,8 @@ describe('useBandwidthHistory', () => {
 
       expect(result.current.timeRange).toBe('7d');
       expect(result.current.chartData.length).toBe(3); // Only last 3 within 7d (10d point excluded)
-      expect(result.current.chartData[0].download).toBe(30);
-      expect(result.current.chartData[2].download).toBe(50);
+      expect(result.current.chartData[0]!.download).toBe(30);
+      expect(result.current.chartData[2]!.download).toBe(50);
     });
 
     it('setTimeRange updates the active time range', () => {

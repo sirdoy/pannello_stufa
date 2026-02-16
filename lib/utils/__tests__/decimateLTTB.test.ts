@@ -127,7 +127,7 @@ describe('decimateLTTB', () => {
       const result = decimateLTTB(data, 200);
 
       for (let i = 1; i < result.length; i++) {
-        expect(result[i].time).toBeGreaterThan(result[i - 1].time);
+        expect(result[i]!.time).toBeGreaterThan(result[i - 1]!.time);
       }
     });
 

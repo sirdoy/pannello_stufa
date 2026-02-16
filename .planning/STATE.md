@@ -11,16 +11,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 67 (Bandwidth Correlation)
-Plan: 01 (In progress - 1 of 2 plans done)
-Status: In Progress
-Last activity: 2026-02-16 — Completed 67-01-PLAN.md (Bandwidth Correlation Data Layer)
+Plan: 02 (Complete - 2 of 2 plans done)
+Status: Complete
+Last activity: 2026-02-16 — Completed 67-02-PLAN.md (Bandwidth Correlation UI Layer)
 
-Progress: [█████████████████████] 50% (Phase 67 - 1 of 2 plans done)
+Progress: [██████████████████████] 100% (Phase 67 - 2 of 2 plans done)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 315 (phases 1-66 complete, phase 67 in progress)
+- Total plans completed: 316 (phases 1-67 complete)
 - Average duration: ~6 min (recent trend)
 - Total execution time: ~76 hours across 10 milestones
 
@@ -65,6 +65,7 @@ Progress: [█████████████████████] 50% 
 | Phase 66 P03 | 5 | 2 | 5 |
 | Phase 66 P04 | 8 | 3 | 6 |
 | Phase 67 P01 | 4 | 2 | 5 |
+| Phase 67 P02 | 6 | 2 | 5 |
 
 ## Accumulated Context
 
@@ -164,6 +165,12 @@ Progress: [█████████████████████] 50% 
 - [Phase 67-01]: Coefficient thresholds: strong >0.7, moderate >0.3, none -0.3 to 0.3 (from research)
 - [Phase 67-01]: Active hours calculation assumes ~30s between measurements
 - [Phase 67-01]: Status transitions: stove-off (no data) → collecting (<30) → ready (30+)
+- [Phase 67-02]: Dual y-axis chart with bandwidth (left, Mbps) and power level (right, 1-5 domain [0,6])
+- [Phase 67-02]: Step chart (type="stepAfter") for power level line (discrete values are more accurate)
+- [Phase 67-02]: Lightweight stove power polling (30s interval, fire-and-forget) independent from full stove page polling
+- [Phase 67-02]: SSR-safe consent check using useState + useEffect pattern (avoids hydration mismatch)
+- [Phase 67-02]: Consent-denied state shows informational Card (user knows feature exists, encourages opt-in)
+- [Phase 67-02]: Color-coded insight levels — emerald for positive, ember for negative, slate for none
 
 Decisions are also logged in PROJECT.md Key Decisions table.
 
@@ -186,6 +193,6 @@ See `.planning/research/PITFALLS-fritzbox.md` for full details.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed Phase 67 Plan 01 (Bandwidth Correlation Data Layer) - TDD implementation of Pearson correlation utility and useBandwidthCorrelation hook (2 tasks, 5 files, 20 tests, 4 min)
-Next step: Phase 67 Plan 02 - Bandwidth Correlation UI Layer (chart + insight components)
+Stopped at: Completed Phase 67 Plan 02 (Bandwidth Correlation UI Layer) - Dual y-axis chart + Italian insight display + consent-gated orchestrator integration (2 tasks, 5 files, 15 tests, 6 min)
+Next step: Phase 67 complete - Ready for next phase
 Resume file: None

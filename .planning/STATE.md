@@ -6,21 +6,21 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** v8.0 Fritz!Box Network Monitor — Phase 65: Device History Timeline
+**Current focus:** v8.0 Fritz!Box Network Monitor — Phase 67: Bandwidth Correlation
 
 ## Current Position
 
-Phase: 66 (Device Categorization)
-Plan: 04 (Phase 66 complete - 4 of 4 plans done)
-Status: Complete
-Last activity: 2026-02-16 — Completed 66-04-PLAN.md (End-to-End Device Categorization Integration)
+Phase: 67 (Bandwidth Correlation)
+Plan: 01 (In progress - 1 of 2 plans done)
+Status: In Progress
+Last activity: 2026-02-16 — Completed 67-01-PLAN.md (Bandwidth Correlation Data Layer)
 
-Progress: [████████████████████] 100% (Phase 66 complete - all 4 plans done)
+Progress: [█████████████████████] 50% (Phase 67 - 1 of 2 plans done)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 314 (phases 1-66 complete)
+- Total plans completed: 315 (phases 1-66 complete, phase 67 in progress)
 - Average duration: ~6 min (recent trend)
 - Total execution time: ~76 hours across 10 milestones
 
@@ -64,6 +64,7 @@ Progress: [████████████████████] 100% (P
 | Phase 66 P02 | 7 | 2 | 4 |
 | Phase 66 P03 | 5 | 2 | 5 |
 | Phase 66 P04 | 8 | 3 | 6 |
+| Phase 67 P01 | 4 | 2 | 5 |
 
 ## Accumulated Context
 
@@ -154,6 +155,16 @@ Progress: [████████████████████] 100% (P
 - [Phase 66-04]: Set diff via enrichedMacsRef prevents re-enrichment on every poll cycle
 - [Phase 66-04]: Optimistic UI updates via updateDeviceCategory (no loading states, fails silently)
 
+**Phase 67 execution decisions:**
+- [Phase 67-01]: Minute-level timestamp alignment (`Math.round(timestamp / 60000) * 60000`) prevents duplicate points from 30s polling
+- [Phase 67-01]: Averaging strategy when same minute receives multiple data points (smoother correlation analysis)
+- [Phase 67-01]: MIN_CORRELATION_POINTS=30 chosen as minimum for meaningful Pearson correlation
+- [Phase 67-01]: MAX_CORRELATION_POINTS=2000 buffer cap (7-day max at 1-minute intervals)
+- [Phase 67-01]: Null powerLevel filtering (stove off points completely excluded from buffer)
+- [Phase 67-01]: Coefficient thresholds: strong >0.7, moderate >0.3, none -0.3 to 0.3 (from research)
+- [Phase 67-01]: Active hours calculation assumes ~30s between measurements
+- [Phase 67-01]: Status transitions: stove-off (no data) → collecting (<30) → ready (30+)
+
 Decisions are also logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
@@ -175,6 +186,6 @@ See `.planning/research/PITFALLS-fritzbox.md` for full details.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed Phase 66 Plan 04 (End-to-End Device Categorization Integration) - Gap closure plan wiring three orphaned layers into working feature (3 tasks, 6 files, 23 tests, 8 min)
-Next step: Phase 67 planning - Next phase in v8.0 roadmap
+Stopped at: Completed Phase 67 Plan 01 (Bandwidth Correlation Data Layer) - TDD implementation of Pearson correlation utility and useBandwidthCorrelation hook (2 tasks, 5 files, 20 tests, 4 min)
+Next step: Phase 67 Plan 02 - Bandwidth Correlation UI Layer (chart + insight components)
 Resume file: None

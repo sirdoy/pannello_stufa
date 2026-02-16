@@ -6,21 +6,21 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** v8.0 Fritz!Box Network Monitor — Phase 63: WAN Status & Device List
+**Current focus:** v8.0 Fritz!Box Network Monitor — Phase 64: Bandwidth Visualization
 
 ## Current Position
 
-Phase: 63 (WAN Status & Device List)
-Plan: 03 (Phase 63 complete - 3 of 3 plans done)
-Status: Complete
-Last activity: 2026-02-15 — Completed 63-03-PLAN.md (Network Page Orchestrator)
+Phase: 64 (Bandwidth Visualization)
+Plan: 01 (Phase 64 in progress - 1 of 3 plans done)
+Status: In Progress
+Last activity: 2026-02-16 — Completed 64-01-PLAN.md (Data Layer with LTTB decimation)
 
-Progress: [████████████████████] 100% (Phase 63 complete, all 3 plans done)
+Progress: [██████░░░░░░░░░░░░░░] 33% (Phase 64 plan 1/3 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 306 (phases 1-63 complete)
+- Total plans completed: 307 (phases 1-63 complete, phase 64 in progress)
 - Average duration: ~15 min (estimated)
 - Total execution time: ~75 hours across 10 milestones
 
@@ -55,6 +55,7 @@ Progress: [████████████████████] 100% (P
 | Phase 63 P01 | 8 | 2 | 5 |
 | Phase 63 P02 | 4 | 2 | 4 |
 | Phase 63 P03 | 3 | 2 | 2 |
+| Phase 64 P01 | 4 | 2 | 5 |
 
 ## Accumulated Context
 
@@ -98,6 +99,13 @@ Progress: [████████████████████] 100% (P
 - [Phase 63-03]: Loading guard checks loading=true AND empty data (shows skeleton only on initial load, not refresh)
 - [Phase 63-03]: Mock component strategy in tests to isolate page orchestration logic
 
+**Phase 64 execution decisions:**
+- [Phase 64-01]: Default to 24h time range per research recommendation (balance detail vs context)
+- [Phase 64-01]: Decimate using download Mbps as selection criterion (primary user metric)
+- [Phase 64-01]: Hook is passive accumulator — page orchestrator feeds data to avoid duplicate polling
+- [Phase 64-01]: Buffer caps at 10080 points (7-day max, 1-minute intervals)
+- [Phase 64-01]: Decimation applied only when filtered data exceeds 500 points
+
 Decisions are also logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
@@ -118,7 +126,7 @@ See `.planning/research/PITFALLS-fritzbox.md` for full details.
 
 ## Session Continuity
 
-Last session: 2026-02-15
-Stopped at: Completed Phase 63 Plan 03 (Network Page Orchestrator) - Phase 63 COMPLETE (3 plans, 11 files, 41 tests)
-Next step: Phase 64 (Bandwidth Monitoring with real-time charts)
+Last session: 2026-02-16
+Stopped at: Completed Phase 64 Plan 01 (Data Layer) - LTTB decimation + useBandwidthHistory hook (2 tasks, 5 files, 27 tests)
+Next step: Phase 64 Plan 02 (BandwidthChart component with Recharts)
 Resume file: None

@@ -89,3 +89,26 @@ export interface UseNetworkDataReturn {
 export interface UseNetworkCommandsReturn {
   navigateToNetwork: () => void;
 }
+
+// Bandwidth history types (Phase 64)
+
+// Bandwidth history point for chart data
+export interface BandwidthHistoryPoint {
+  time: number;      // Unix timestamp ms
+  download: number;  // Mbps
+  upload: number;    // Mbps
+}
+
+// Time range options for bandwidth chart
+export type BandwidthTimeRange = '1h' | '24h' | '7d';
+
+// useBandwidthHistory return type
+export interface UseBandwidthHistoryReturn {
+  chartData: BandwidthHistoryPoint[];
+  timeRange: BandwidthTimeRange;
+  setTimeRange: (range: BandwidthTimeRange) => void;
+  addDataPoint: (bandwidth: BandwidthData) => void;
+  pointCount: number;          // Raw points in buffer before decimation
+  isEmpty: boolean;            // No data collected yet
+  isCollecting: boolean;       // < 10 points (chart not yet meaningful)
+}

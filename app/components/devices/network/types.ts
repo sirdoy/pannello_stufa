@@ -132,3 +132,32 @@ export interface DeviceEvent {
 
 // Time range options for device history
 export type DeviceHistoryTimeRange = '1h' | '24h' | '7d';
+
+// Bandwidth correlation types (Phase 67)
+
+export interface CorrelationDataPoint {
+  time: number;          // Unix timestamp ms (rounded to nearest minute)
+  bandwidth: number;     // Download Mbps
+  powerLevel: number;    // Stove power level (1-5)
+}
+
+export type CorrelationInsightLevel = 'strong-positive' | 'moderate-positive' | 'none' | 'moderate-negative' | 'strong-negative';
+
+export interface CorrelationInsight {
+  coefficient: number;           // Raw Pearson r (-1 to +1)
+  level: CorrelationInsightLevel;
+  description: string;           // Italian human-readable text
+  dataPointCount: number;        // Number of paired points used
+  activeHours: number;           // Approximate hours of stove activity
+}
+
+export type CorrelationStatus = 'ready' | 'collecting' | 'insufficient' | 'stove-off';
+
+export interface UseBandwidthCorrelationReturn {
+  chartData: CorrelationDataPoint[];
+  insight: CorrelationInsight | null;
+  status: CorrelationStatus;
+  addDataPoint: (bandwidth: number, powerLevel: number | null, timestamp: number) => void;
+  pointCount: number;
+  minPoints: number;
+}

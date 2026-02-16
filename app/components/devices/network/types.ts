@@ -8,6 +8,8 @@
  * - Hook return types
  */
 
+import type { DeviceCategory } from '@/types/firebase/network';
+
 // API response types (matching Fritz!Box API route responses from Phase 61)
 
 export interface BandwidthData {
@@ -25,6 +27,7 @@ export interface DeviceData {
   type?: 'lan' | 'wlan' | 'guest';
   bandwidth?: number;   // Mbps (may not be available yet)
   lastSeen?: number;    // Unix timestamp ms when last active
+  category?: DeviceCategory;  // Device category (Phase 66)
 }
 
 export interface WanData {

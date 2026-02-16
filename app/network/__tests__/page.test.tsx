@@ -76,11 +76,12 @@ jest.mock('../components/WanStatusCard', () => ({
 
 jest.mock('../components/DeviceListTable', () => ({
   __esModule: true,
-  default: ({ devices, isStale }: any) => (
+  default: ({ devices, isStale, onCategoryChange }: any) => (
     <div
       data-testid="device-list-table"
       data-count={devices.length}
       data-stale={isStale}
+      data-has-on-category-change={!!onCategoryChange}
     />
   ),
 }));
@@ -136,6 +137,7 @@ function createMockNetworkData(overrides: Partial<UseNetworkDataReturn> = {}): U
     healthMapped: 'error',
     error: null,
     activeDeviceCount: 0,
+    updateDeviceCategory: jest.fn(),
     ...overrides,
   };
 }
@@ -563,6 +565,30 @@ describe('NetworkPage', () => {
       expect(timeline).toHaveAttribute('data-time-range', '7d');
       expect(timeline).toHaveAttribute('data-device-filter', 'AA:BB:CC:DD:EE:FF');
       expect(timeline).toHaveAttribute('data-device-count', '1');
+    });
+  });
+
+  describe('Category Override Integration', () => {
+    it('passes onCategoryChange callback to DeviceListTable', () => {
+      const wanData = {
+        connected: true,
+        uptime: 3600,
+        externalIp: '1.2.3.4',
+        timestamp: Date.now(),
+      };
+
+      mockedUseNetworkData.mockReturnValue(
+        createMockNetworkData({
+          loading: false,
+          wan: wanData,
+          devices: [],
+        })
+      );
+
+      render(<NetworkPage />);
+
+      const deviceTable = screen.getByTestId('device-list-table');
+      expect(deviceTable).toHaveAttribute('data-has-on-category-change', 'true');
     });
   });
 });

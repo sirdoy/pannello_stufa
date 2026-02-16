@@ -14,7 +14,7 @@
 
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { PageLayout, Skeleton, Button, Heading } from '@/app/components/ui';
 import { useNetworkData } from '@/app/components/devices/network/hooks/useNetworkData';
@@ -24,6 +24,7 @@ import WanStatusCard from './components/WanStatusCard';
 import DeviceListTable from './components/DeviceListTable';
 import BandwidthChart from './components/BandwidthChart';
 import DeviceHistoryTimeline from './components/DeviceHistoryTimeline';
+import type { DeviceCategory } from '@/types/firebase/network';
 
 export default function NetworkPage() {
   const router = useRouter();
@@ -32,6 +33,25 @@ export default function NetworkPage() {
   const deviceHistory = useDeviceHistory();
 
   const handleBack = () => router.push('/');
+
+  // Handle category override - calls API and updates UI optimistically
+  const handleCategoryChange = useCallback(async (mac: string, category: DeviceCategory) => {
+    try {
+      const response = await fetch('/api/network/category-override', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mac, category }),
+      });
+
+      if (response.ok) {
+        // Optimistic update: immediately reflect in UI
+        networkData.updateDeviceCategory(mac, category);
+      }
+    } catch {
+      // Override failed — dropdown already closed, no action needed
+      // Category will be re-fetched on next poll (fire-and-forget, self-heals)
+    }
+  }, [networkData.updateDeviceCategory]);
 
   // Feed bandwidth data from polling into history buffer
   useEffect(() => {
@@ -82,6 +102,7 @@ export default function NetworkPage() {
         <DeviceListTable
           devices={networkData.devices}
           isStale={networkData.stale}
+          onCategoryChange={handleCategoryChange}
         />
 
         {/* Bandwidth Chart - below device list */}

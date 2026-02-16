@@ -19,14 +19,17 @@ import { useRouter } from 'next/navigation';
 import { PageLayout, Skeleton, Button, Heading } from '@/app/components/ui';
 import { useNetworkData } from '@/app/components/devices/network/hooks/useNetworkData';
 import { useBandwidthHistory } from './hooks/useBandwidthHistory';
+import { useDeviceHistory } from './hooks/useDeviceHistory';
 import WanStatusCard from './components/WanStatusCard';
 import DeviceListTable from './components/DeviceListTable';
 import BandwidthChart from './components/BandwidthChart';
+import DeviceHistoryTimeline from './components/DeviceHistoryTimeline';
 
 export default function NetworkPage() {
   const router = useRouter();
   const networkData = useNetworkData();
   const bandwidthHistory = useBandwidthHistory();
+  const deviceHistory = useDeviceHistory();
 
   const handleBack = () => router.push('/');
 
@@ -45,6 +48,7 @@ export default function NetworkPage() {
         <Skeleton className="h-[280px] rounded-2xl" />
         <Skeleton className="h-[400px] rounded-2xl" />
         <Skeleton className="h-[380px] rounded-2xl" />
+        <Skeleton className="h-[300px] rounded-2xl" />
       </div>
     );
   }
@@ -88,6 +92,18 @@ export default function NetworkPage() {
           isEmpty={bandwidthHistory.isEmpty}
           isCollecting={bandwidthHistory.isCollecting}
           pointCount={bandwidthHistory.pointCount}
+        />
+
+        {/* Device History Timeline - below bandwidth chart */}
+        <DeviceHistoryTimeline
+          events={deviceHistory.events}
+          isLoading={deviceHistory.isLoading}
+          isEmpty={deviceHistory.isEmpty}
+          timeRange={deviceHistory.timeRange}
+          onTimeRangeChange={deviceHistory.setTimeRange}
+          deviceFilter={deviceHistory.deviceFilter}
+          onDeviceFilterChange={deviceHistory.setDeviceFilter}
+          devices={networkData.devices}
         />
       </div>
     </PageLayout>

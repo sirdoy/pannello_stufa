@@ -15,6 +15,7 @@ import userEvent from '@testing-library/user-event';
 import NetworkPage from '../page';
 import { useNetworkData } from '@/app/components/devices/network/hooks/useNetworkData';
 import { useBandwidthHistory } from '../hooks/useBandwidthHistory';
+import { useDeviceHistory } from '../hooks/useDeviceHistory';
 import type { UseNetworkDataReturn } from '@/app/components/devices/network/types';
 
 // Mock useNetworkData hook
@@ -34,6 +35,23 @@ jest.mock('../hooks/useBandwidthHistory', () => ({
     pointCount: 0,
     isEmpty: true,
     isCollecting: false,
+  })),
+}));
+
+// Mock useDeviceHistory hook
+const mockSetDeviceTimeRange = jest.fn();
+const mockSetDeviceFilter = jest.fn();
+const mockRefresh = jest.fn();
+jest.mock('../hooks/useDeviceHistory', () => ({
+  useDeviceHistory: jest.fn(() => ({
+    events: [],
+    timeRange: '24h',
+    setTimeRange: mockSetDeviceTimeRange,
+    deviceFilter: null,
+    setDeviceFilter: mockSetDeviceFilter,
+    isLoading: false,
+    isEmpty: true,
+    refresh: mockRefresh,
   })),
 }));
 
@@ -81,8 +99,24 @@ jest.mock('../components/BandwidthChart', () => ({
   ),
 }));
 
+jest.mock('../components/DeviceHistoryTimeline', () => ({
+  __esModule: true,
+  default: ({ events, isLoading, isEmpty, timeRange, deviceFilter, devices }: any) => (
+    <div
+      data-testid="device-history-timeline"
+      data-event-count={events.length}
+      data-is-loading={isLoading}
+      data-is-empty={isEmpty}
+      data-time-range={timeRange}
+      data-device-filter={deviceFilter}
+      data-device-count={devices.length}
+    />
+  ),
+}));
+
 const mockedUseNetworkData = useNetworkData as jest.MockedFunction<typeof useNetworkData>;
 const mockedUseBandwidthHistory = useBandwidthHistory as jest.MockedFunction<typeof useBandwidthHistory>;
+const mockedUseDeviceHistory = useDeviceHistory as jest.MockedFunction<typeof useDeviceHistory>;
 
 /**
  * Helper: Create mock UseNetworkDataReturn with all required fields
@@ -111,6 +145,9 @@ describe('NetworkPage', () => {
     jest.clearAllMocks();
     mockAddDataPoint.mockClear();
     mockSetTimeRange.mockClear();
+    mockSetDeviceTimeRange.mockClear();
+    mockSetDeviceFilter.mockClear();
+    mockRefresh.mockClear();
   });
 
   describe('Loading State', () => {
@@ -444,9 +481,88 @@ describe('NetworkPage', () => {
 
       const { container } = render(<NetworkPage />);
 
-      // Should have 4 skeleton blocks now (title + WAN + devices + chart)
+      // Should have 5 skeleton blocks now (title + WAN + devices + chart + timeline)
       const skeletons = container.querySelectorAll('.rounded-xl, .rounded-2xl');
-      expect(skeletons.length).toBeGreaterThanOrEqual(4);
+      expect(skeletons.length).toBeGreaterThanOrEqual(5);
+    });
+  });
+
+  describe('Device History Timeline Integration', () => {
+    it('renders DeviceHistoryTimeline component on page', () => {
+      mockedUseNetworkData.mockReturnValue(
+        createMockNetworkData({
+          loading: false,
+          wan: {
+            connected: true,
+            uptime: 3600,
+            externalIp: '1.2.3.4',
+            timestamp: Date.now(),
+          },
+          devices: [],
+        })
+      );
+
+      render(<NetworkPage />);
+
+      expect(screen.getByTestId('device-history-timeline')).toBeInTheDocument();
+    });
+
+    it('passes device history data to DeviceHistoryTimeline', () => {
+      const mockEvents = [
+        {
+          deviceMac: 'AA:BB:CC:DD:EE:FF',
+          deviceName: 'Device 1',
+          deviceIp: '192.168.1.100',
+          eventType: 'connected' as const,
+          timestamp: Date.now(),
+        },
+      ];
+
+      const mockDevices = [
+        {
+          id: 'dev-01',
+          name: 'Device 1',
+          ip: '192.168.1.100',
+          mac: 'AA:BB:CC:DD:EE:FF',
+          active: true,
+          bandwidth: undefined,
+          lastSeen: undefined,
+        },
+      ];
+
+      mockedUseDeviceHistory.mockReturnValue({
+        events: mockEvents,
+        timeRange: '7d',
+        setTimeRange: mockSetDeviceTimeRange,
+        deviceFilter: 'AA:BB:CC:DD:EE:FF',
+        setDeviceFilter: mockSetDeviceFilter,
+        isLoading: false,
+        isEmpty: false,
+        refresh: mockRefresh,
+      });
+
+      mockedUseNetworkData.mockReturnValue(
+        createMockNetworkData({
+          loading: false,
+          wan: {
+            connected: true,
+            uptime: 3600,
+            externalIp: '1.2.3.4',
+            timestamp: Date.now(),
+          },
+          devices: mockDevices,
+        })
+      );
+
+      render(<NetworkPage />);
+
+      const timeline = screen.getByTestId('device-history-timeline');
+      expect(timeline).toHaveAttribute('data-event-count', '1');
+      expect(timeline).toHaveAttribute('data-is-loading', 'false');
+      expect(timeline).toHaveAttribute('data-is-empty', 'false');
+      expect(timeline).toHaveAttribute('data-time-range', '7d');
+      expect(timeline).toHaveAttribute('data-device-filter', 'AA:BB:CC:DD:EE:FF');
+      expect(timeline).toHaveAttribute('data-device-count', '1');
     });
   });
 });

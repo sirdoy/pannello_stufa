@@ -153,14 +153,6 @@ See `.planning/research/PITFALLS-fritzbox.md` for full details.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed Phase 65 Plan 01 (Device Event Logger Foundation) - Date-keyed Firebase event storage with TDD coverage (2 tasks, 4 files, 15 tests)
-Next step: Continue Phase 65 execution (2 plans remaining: API endpoint, timeline UI)
+Stopped at: Completed Phase 65 Plan 03 (Device History Timeline UI) - Timeline with date grouping, device filtering, and Italian locale (2 tasks, 7 files, 18 tests)
+Next step: Phase 65 complete (all 3 plans done), ready to move to Phase 66 (Device Categories)
 Resume file: None
-
-**Phase 65-03 UI decisions:**
-- TimeRangeSelector reused via type casting (BandwidthTimeRange and DeviceHistoryTimeRange have identical values)
-- Device filter dropdown uses Radix Select with "Tutti i dispositivi" as null filter option
-- Date grouping uses format(timestamp, 'yyyy-MM-dd') as key for stable grouping
-- Italian locale headers formatted as 'EEEE, d MMMM yyyy' (e.g., "giovedì, 15 febbraio 2024")
-- DeviceEventItem shows relative time (formatDistanceToNow) alongside absolute time (HH:mm:ss)
-- Timeline sorted newest date first, events within date sorted newest first

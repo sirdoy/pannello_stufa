@@ -371,9 +371,9 @@ function DebugPageContent() {
 
         {/* Keyboard shortcuts hint */}
         <div className="flex flex-wrap gap-2 text-xs text-slate-500 [html:not(.dark)_&]:text-slate-600">
-          <span className="px-2 py-1 bg-slate-800 [html:not(.dark)_&]:bg-slate-100 rounded">1-9: Switch tabs</span>
-          <span className="px-2 py-1 bg-slate-800 [html:not(.dark)_&]:bg-slate-100 rounded">Cmd+R: Refresh</span>
-          <span className="px-2 py-1 bg-slate-800 [html:not(.dark)_&]:bg-slate-100 rounded">A: Auto-refresh</span>
+          <span className="px-2 py-1 bg-slate-800 text-slate-200 [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-700 rounded">1-9: Switch tabs</span>
+          <span className="px-2 py-1 bg-slate-800 text-slate-200 [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-700 rounded">Cmd+R: Refresh</span>
+          <span className="px-2 py-1 bg-slate-800 text-slate-200 [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-700 rounded">A: Auto-refresh</span>
         </div>
 
         <Card variant="glass" className="p-6">

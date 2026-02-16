@@ -112,3 +112,17 @@ export interface UseBandwidthHistoryReturn {
   isEmpty: boolean;            // No data collected yet
   isCollecting: boolean;       // < 10 points (chart not yet meaningful)
 }
+
+// Device history types (Phase 65)
+
+// Device event for timeline
+export interface DeviceEvent {
+  deviceMac: string;
+  deviceName: string;
+  deviceIp: string;
+  eventType: 'connected' | 'disconnected';
+  timestamp: number; // Unix timestamp ms
+}
+
+// Time range options for device history
+export type DeviceHistoryTimeRange = '1h' | '24h' | '7d';

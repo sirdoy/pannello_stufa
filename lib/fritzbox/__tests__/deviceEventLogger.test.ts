@@ -4,37 +4,28 @@
  * Tests Firebase RTDB event logging, querying, and state tracking
  */
 
-import { jest } from '@jest/globals';
-import { logDeviceEvent, getDeviceEvents, getDeviceStates, updateDeviceStates } from '../deviceEventLogger';
 import type { DeviceEvent } from '@/app/components/devices/network/types';
 
-// Mock Firebase Admin
+// Mock Firebase Admin and Environment Helper BEFORE imports
 jest.mock('@/lib/firebaseAdmin');
 jest.mock('@/lib/environmentHelper');
 
-const mockAdminDbSet = jest.fn<(path: string, data: unknown) => Promise<void>>();
-const mockAdminDbGet = jest.fn<(path: string) => Promise<unknown>>();
-const mockGetEnvironmentPath = jest.fn<(basePath: string) => string>();
+// NOW import the module under test and mocked modules
+import { logDeviceEvent, getDeviceEvents, getDeviceStates, updateDeviceStates } from '../deviceEventLogger';
+import { adminDbSet, adminDbGet } from '@/lib/firebaseAdmin';
+import { getEnvironmentPath } from '@/lib/environmentHelper';
+
+// Get references to the mocked functions
+const mockedAdminDbSet = jest.mocked(adminDbSet);
+const mockedAdminDbGet = jest.mocked(adminDbGet);
+const mockedGetEnvironmentPath = jest.mocked(getEnvironmentPath);
 
 describe('deviceEventLogger', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Setup default mocks
-    const firebaseAdmin = jest.requireMock('@/lib/firebaseAdmin') as {
-      adminDbSet: typeof mockAdminDbSet;
-      adminDbGet: typeof mockAdminDbGet;
-    };
-    firebaseAdmin.adminDbSet = mockAdminDbSet;
-    firebaseAdmin.adminDbGet = mockAdminDbGet;
-
-    const environmentHelper = jest.requireMock('@/lib/environmentHelper') as {
-      getEnvironmentPath: typeof mockGetEnvironmentPath;
-    };
-    environmentHelper.getEnvironmentPath = mockGetEnvironmentPath;
-
     // Default environment path behavior
-    mockGetEnvironmentPath.mockImplementation((path: string) => `dev/${path}`);
+    mockedGetEnvironmentPath.mockImplementation((path: string) => `dev/${path}`);
   });
 
   describe('logDeviceEvent', () => {
@@ -49,7 +40,7 @@ describe('deviceEventLogger', () => {
 
       await logDeviceEvent(event);
 
-      expect(mockAdminDbSet).toHaveBeenCalledWith(
+      expect(mockedAdminDbSet).toHaveBeenCalledWith(
         'dev/fritzbox/device_events/2024-02-15/1708000000000_AA-BB-CC-DD-EE-FF_connected',
         event
       );
@@ -66,7 +57,7 @@ describe('deviceEventLogger', () => {
 
       await logDeviceEvent(event);
 
-      expect(mockAdminDbSet).toHaveBeenCalledWith(
+      expect(mockedAdminDbSet).toHaveBeenCalledWith(
         'dev/fritzbox/device_events/2024-02-15/1708000000000_AA-BB-CC-DD-EE-FF_disconnected',
         event
       );
@@ -83,14 +74,14 @@ describe('deviceEventLogger', () => {
 
       await logDeviceEvent(event);
 
-      expect(mockAdminDbSet).toHaveBeenCalledWith(
+      expect(mockedAdminDbSet).toHaveBeenCalledWith(
         expect.stringContaining('00-11-22-33-44-55'),
         event
       );
     });
 
     it('should use getEnvironmentPath for environment-aware paths', async () => {
-      mockGetEnvironmentPath.mockReturnValue('prod/fritzbox/device_events');
+      mockedGetEnvironmentPath.mockReturnValue('prod/fritzbox/device_events');
 
       const event: DeviceEvent = {
         deviceMac: 'AA:BB:CC:DD:EE:FF',
@@ -102,7 +93,7 @@ describe('deviceEventLogger', () => {
 
       await logDeviceEvent(event);
 
-      expect(mockGetEnvironmentPath).toHaveBeenCalledWith('fritzbox/device_events');
+      expect(mockedGetEnvironmentPath).toHaveBeenCalledWith('fritzbox/device_events');
     });
   });
 
@@ -112,7 +103,7 @@ describe('deviceEventLogger', () => {
       const startTime = 1708000000000; // 2024-02-15T14:13:20.000Z
       const endTime = 1708020000000;   // 2024-02-15T19:46:40.000Z
 
-      mockAdminDbGet.mockResolvedValue({
+      mockedAdminDbGet.mockResolvedValue({
         '1708005000000_AA-BB-CC-DD-EE-FF_connected': {
           deviceMac: 'AA:BB:CC:DD:EE:FF',
           deviceName: 'iPhone',
@@ -139,8 +130,8 @@ describe('deviceEventLogger', () => {
       const events = await getDeviceEvents(startTime, endTime);
 
       // Should read single date node
-      expect(mockAdminDbGet).toHaveBeenCalledTimes(1);
-      expect(mockAdminDbGet).toHaveBeenCalledWith('dev/fritzbox/device_events/2024-02-15');
+      expect(mockedAdminDbGet).toHaveBeenCalledTimes(1);
+      expect(mockedAdminDbGet).toHaveBeenCalledWith('dev/fritzbox/device_events/2024-02-15');
 
       // Should return 3 events sorted newest first
       expect(events).toHaveLength(3);
@@ -155,7 +146,7 @@ describe('deviceEventLogger', () => {
       const endTime = 1708200000000;   // 2024-02-17
 
       // Mock different data for each date
-      mockAdminDbGet
+      mockedAdminDbGet
         .mockResolvedValueOnce({
           '1708005000000_AA-BB-CC-DD-EE-FF_connected': {
             deviceMac: 'AA:BB:CC:DD:EE:FF',
@@ -187,10 +178,10 @@ describe('deviceEventLogger', () => {
       const events = await getDeviceEvents(startTime, endTime);
 
       // Should read 3 date nodes
-      expect(mockAdminDbGet).toHaveBeenCalledTimes(3);
-      expect(mockAdminDbGet).toHaveBeenCalledWith('dev/fritzbox/device_events/2024-02-15');
-      expect(mockAdminDbGet).toHaveBeenCalledWith('dev/fritzbox/device_events/2024-02-16');
-      expect(mockAdminDbGet).toHaveBeenCalledWith('dev/fritzbox/device_events/2024-02-17');
+      expect(mockedAdminDbGet).toHaveBeenCalledTimes(3);
+      expect(mockedAdminDbGet).toHaveBeenCalledWith('dev/fritzbox/device_events/2024-02-15');
+      expect(mockedAdminDbGet).toHaveBeenCalledWith('dev/fritzbox/device_events/2024-02-16');
+      expect(mockedAdminDbGet).toHaveBeenCalledWith('dev/fritzbox/device_events/2024-02-17');
 
       // Should merge and sort
       expect(events).toHaveLength(3);
@@ -203,7 +194,7 @@ describe('deviceEventLogger', () => {
       const startTime = 1708005000000; // Filter start
       const endTime = 1708015000000;   // Filter end
 
-      mockAdminDbGet.mockResolvedValue({
+      mockedAdminDbGet.mockResolvedValue({
         '1708000000000_AA-BB-CC-DD-EE-FF_connected': {
           timestamp: 1708000000000, // Before range
           deviceMac: 'AA:BB:CC:DD:EE:FF',
@@ -235,7 +226,7 @@ describe('deviceEventLogger', () => {
     });
 
     it('should return empty array if no data exists', async () => {
-      mockAdminDbGet.mockResolvedValue(null);
+      mockedAdminDbGet.mockResolvedValue(null);
 
       const events = await getDeviceEvents(1708000000000, 1708100000000);
 
@@ -243,7 +234,7 @@ describe('deviceEventLogger', () => {
     });
 
     it('should handle date node with no events', async () => {
-      mockAdminDbGet.mockResolvedValue({});
+      mockedAdminDbGet.mockResolvedValue({});
 
       const events = await getDeviceEvents(1708000000000, 1708100000000);
 
@@ -253,17 +244,17 @@ describe('deviceEventLogger', () => {
 
   describe('getDeviceStates', () => {
     it('should return empty Map if no states exist', async () => {
-      mockAdminDbGet.mockResolvedValue(null);
+      mockedAdminDbGet.mockResolvedValue(null);
 
       const states = await getDeviceStates();
 
-      expect(mockAdminDbGet).toHaveBeenCalledWith('dev/fritzbox/device_states');
+      expect(mockedAdminDbGet).toHaveBeenCalledWith('dev/fritzbox/device_states');
       expect(states).toBeInstanceOf(Map);
       expect(states.size).toBe(0);
     });
 
     it('should return populated Map with existing states', async () => {
-      mockAdminDbGet.mockResolvedValue({
+      mockedAdminDbGet.mockResolvedValue({
         'AA:BB:CC:DD:EE:FF': { active: true, lastSeen: 1708000000000 },
         'BB:CC:DD:EE:FF:00': { active: false, lastSeen: 1707990000000 },
       });
@@ -277,11 +268,11 @@ describe('deviceEventLogger', () => {
     });
 
     it('should use getEnvironmentPath for environment-aware paths', async () => {
-      mockAdminDbGet.mockResolvedValue(null);
+      mockedAdminDbGet.mockResolvedValue(null);
 
       await getDeviceStates();
 
-      expect(mockGetEnvironmentPath).toHaveBeenCalledWith('fritzbox/device_states');
+      expect(mockedGetEnvironmentPath).toHaveBeenCalledWith('fritzbox/device_states');
     });
   });
 
@@ -294,7 +285,7 @@ describe('deviceEventLogger', () => {
 
       await updateDeviceStates(states);
 
-      expect(mockAdminDbSet).toHaveBeenCalledWith(
+      expect(mockedAdminDbSet).toHaveBeenCalledWith(
         'dev/fritzbox/device_states',
         {
           'AA:BB:CC:DD:EE:FF': { active: true, lastSeen: 1708000000000 },
@@ -308,7 +299,7 @@ describe('deviceEventLogger', () => {
 
       await updateDeviceStates(states);
 
-      expect(mockAdminDbSet).toHaveBeenCalledWith(
+      expect(mockedAdminDbSet).toHaveBeenCalledWith(
         'dev/fritzbox/device_states',
         {}
       );
@@ -319,7 +310,7 @@ describe('deviceEventLogger', () => {
 
       await updateDeviceStates(states);
 
-      expect(mockGetEnvironmentPath).toHaveBeenCalledWith('fritzbox/device_states');
+      expect(mockedGetEnvironmentPath).toHaveBeenCalledWith('fritzbox/device_states');
     });
   });
 });

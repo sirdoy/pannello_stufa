@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 ## Current Position
 
-Phase: 65 (Device History Timeline)
-Plan: 02 (Phase 65 in progress - 2 of 3 plans done)
+Phase: 66 (Device Categorization)
+Plan: 01 (Phase 66 started - 1 of 3 plans done)
 Status: In Progress
-Last activity: 2026-02-16 — Completed 65-02-PLAN.md (Device Event API Integration)
+Last activity: 2026-02-16 — Completed 66-01-PLAN.md (Device Categorization Foundation)
 
-Progress: [█████████████░░░░░░░] 69% (Phase 65 plan 2/3 complete)
+Progress: [█████████████░░░░░░░] 69% (Phase 66 plan 1/3 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 310 (phases 1-64 complete, phase 65 in progress - 2 of 3 plans done)
-- Average duration: ~8 min (recent trend)
+- Total plans completed: 311 (phases 1-65 complete, phase 66 in progress - 1 of 3 plans done)
+- Average duration: ~7 min (recent trend)
 - Total execution time: ~75 hours across 10 milestones
 
 **By Milestone:**
@@ -59,6 +59,8 @@ Progress: [█████████████░░░░░░░] 69% (Ph
 | Phase 64 P02 | 5 | 2 | 6 |
 | Phase 65 P01 | 7 | 2 | 4 |
 | Phase 65 P02 | 10 | 2 | 4 |
+| Phase 65 P03 | 7 | 2 | 7 |
+| Phase 66 P01 | 6 | 2 | 5 |
 
 ## Accumulated Context
 
@@ -132,6 +134,12 @@ Progress: [█████████████░░░░░░░] 69% (Ph
 - [Phase 65-03]: DeviceEventItem shows relative time (formatDistanceToNow) alongside absolute time (HH:mm:ss)
 - [Phase 65-03]: Timeline sorted newest date first, events within date sorted newest first
 
+**Phase 66 execution decisions:**
+- [Phase 66-01]: Vendor categorization uses case-insensitive partial matching via includes() for flexibility
+- [Phase 66-01]: adminDbSet chosen over adminDbUpdate for override storage (clearer semantics, avoids type constraint)
+- [Phase 66-01]: ASUS categorized as 'pc' (removed duplicate 'smart-home' entry, laptops more common)
+- [Phase 66-01]: macvendors.com API returns null on any error, never throws (resilient fire-and-forget pattern)
+
 Decisions are also logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
@@ -153,6 +161,6 @@ See `.planning/research/PITFALLS-fritzbox.md` for full details.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed Phase 65 Plan 03 (Device History Timeline UI) - Timeline with date grouping, device filtering, and Italian locale (2 tasks, 7 files, 18 tests)
-Next step: Phase 65 complete (all 3 plans done), ready to move to Phase 66 (Device Categories)
+Stopped at: Completed Phase 66 Plan 01 (Device Categorization Foundation) - Vendor mapping, Firebase cache, manual overrides (2 tasks, 5 files, 36 tests)
+Next step: Phase 66 plan 2 of 3 - API routes for device category lookup and override management
 Resume file: None

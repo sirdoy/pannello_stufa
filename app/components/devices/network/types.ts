@@ -86,6 +86,9 @@ export interface UseNetworkDataReturn {
 
   // Derived
   activeDeviceCount: number;
+
+  // Actions
+  updateDeviceCategory: (mac: string, category: DeviceCategory) => void;
 }
 
 // Commands return type

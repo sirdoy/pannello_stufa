@@ -27,6 +27,7 @@ import type {
   NetworkError,
   UseNetworkDataReturn,
 } from '../types';
+import type { DeviceCategory } from '@/types/firebase/network';
 
 /**
  * Custom hook for Fritz!Box network data management
@@ -50,9 +51,76 @@ export function useNetworkData(): UseNetworkDataReturn {
   const healthRef = useRef<NetworkHealthStatus>('poor');
   const consecutiveReadingsRef = useRef<number>(0);
 
+  // Ref to track MACs that have been enriched with categories
+  const enrichedMacsRef = useRef<Set<string>>(new Set());
+
   // Visibility tracking for adaptive polling
   const isVisible = useVisibility();
   const interval = isVisible ? 30000 : 300000; // 30s visible, 5min hidden
+
+  /**
+   * Enrich devices with categories via vendor-lookup API.
+   * Only enriches new/unenriched MACs (not in enrichedMacsRef).
+   * Fire-and-forget with silent failure — self-heals on next poll.
+   */
+  const enrichDevicesWithCategories = useCallback(async (rawDevices: DeviceData[]): Promise<DeviceData[]> => {
+    try {
+      // Find MACs that need enrichment (not in enrichedMacsRef)
+      const unenrichedDevices = rawDevices.filter(
+        d => d.mac && !enrichedMacsRef.current.has(d.mac)
+      );
+
+      if (unenrichedDevices.length === 0) {
+        // All devices already enriched — skip API calls
+        return rawDevices;
+      }
+
+      // Batch enrichment with rate limiting (5 at a time to avoid overwhelming API)
+      const enrichedData = [...rawDevices];
+      const batchSize = 5;
+
+      for (let i = 0; i < unenrichedDevices.length; i += batchSize) {
+        const batch = unenrichedDevices.slice(i, i + batchSize);
+
+        const results = await Promise.allSettled(
+          batch.map(async (device) => {
+            const response = await fetch(`/api/network/vendor-lookup?mac=${encodeURIComponent(device.mac)}`);
+            if (!response.ok) return null;
+
+            const data = await response.json() as {
+              vendor?: string;
+              category?: DeviceCategory;
+              cached?: boolean;
+              overridden?: boolean;
+            };
+
+            return { mac: device.mac, category: data.category };
+          })
+        );
+
+        // Update enrichedData with successful results
+        results.forEach((result, idx) => {
+          if (result.status === 'fulfilled' && result.value) {
+            const { mac, category } = result.value;
+            const deviceIndex = enrichedData.findIndex(d => d.mac === mac);
+            if (deviceIndex !== -1 && category) {
+              const device = enrichedData[deviceIndex];
+              enrichedData[deviceIndex] = {
+                ...device,
+                category
+              } as DeviceData;
+              enrichedMacsRef.current.add(mac);
+            }
+          }
+        });
+      }
+
+      return enrichedData;
+    } catch {
+      // Silent failure — return devices unchanged, will retry on next poll
+      return rawDevices;
+    }
+  }, []);
 
   // Fetch data from Fritz!Box API routes
   const fetchData = useCallback(async () => {
@@ -123,8 +191,17 @@ export function useNetworkData(): UseNetworkDataReturn {
         setUploadHistory(prev => [...prev, { time: now, mbps: bw.upload }].slice(-12));
       }
 
-      setDevices(devData.devices || []);
+      const rawDevices = devData.devices || [];
+      setDevices(rawDevices);
       setWan(wanData.wan || null);
+
+      // Fire-and-forget category enrichment (non-blocking, self-heals on next poll)
+      enrichDevicesWithCategories(rawDevices).then(enrichedDevices => {
+        setDevices(enrichedDevices);
+      }).catch(() => {
+        // Intentional silent failure: category enrichment is non-critical.
+        // Self-heals on next poll — unenriched MACs will be retried.
+      });
 
       // Update health
       const newHealthResult = computeNetworkHealth({
@@ -158,7 +235,7 @@ export function useNetworkData(): UseNetworkDataReturn {
     } finally {
       setLoading(false);
     }
-  }, []); // No dependencies - stable callback
+  }, [enrichDevicesWithCategories]);
 
   // Adaptive polling - 30s visible, 5min hidden
   useAdaptivePolling({
@@ -167,6 +244,15 @@ export function useNetworkData(): UseNetworkDataReturn {
     alwaysActive: false,  // Non-safety-critical monitoring
     immediate: true,      // Fetch on mount
   });
+
+  // Update a single device's category (used by manual overrides)
+  const updateDeviceCategory = useCallback((mac: string, category: DeviceCategory) => {
+    setDevices(prev => prev.map(d =>
+      d.mac === mac ? { ...d, category } : d
+    ));
+    // Mark as enriched so polling doesn't overwrite manual override
+    enrichedMacsRef.current.add(mac);
+  }, []);
 
   // Derived state
   const connected = useMemo(() => wan?.connected ?? false, [wan]);
@@ -198,5 +284,8 @@ export function useNetworkData(): UseNetworkDataReturn {
 
     // Derived
     activeDeviceCount,
+
+    // Actions
+    updateDeviceCategory,
   };
 }

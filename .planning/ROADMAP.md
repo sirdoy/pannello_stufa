@@ -181,12 +181,13 @@ Plans:
 2. User can manually override category for any device with changes persisting in Firebase
 3. Categories displayed with color-coded badges in device list for quick visual identification
 
-**Plans:** 3 plans
+**Plans:** 4 plans (3 executed + 1 gap closure)
 
 Plans:
-- [ ] 66-01-PLAN.md — Category types, vendor mapping heuristics, vendor cache, override storage (TDD)
-- [ ] 66-02-PLAN.md — Vendor lookup API route + category override API route with tests
-- [ ] 66-03-PLAN.md — DeviceCategoryBadge component + DeviceListTable category column with inline edit
+- [x] 66-01-PLAN.md — Category types, vendor mapping heuristics, vendor cache, override storage (TDD)
+- [x] 66-02-PLAN.md — Vendor lookup API route + category override API route with tests
+- [x] 66-03-PLAN.md — DeviceCategoryBadge component + DeviceListTable category column with inline edit
+- [ ] 66-04-PLAN.md — Gap closure: wire auto-categorization + manual override end-to-end integration
 
 ---
 

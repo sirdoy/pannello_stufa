@@ -159,10 +159,12 @@ Plans:
 2. User can filter history to show events for a specific device
 3. Timeline shows last 24h by default with option to expand to 7-day view
 
-**Plans:** TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 65-01: TBD
+- [ ] 65-01-PLAN.md — Device event logger with date-keyed Firebase storage (TDD)
+- [ ] 65-02-PLAN.md — Event detection in devices endpoint + history query API
+- [ ] 65-03-PLAN.md — Timeline UI components + useDeviceHistory hook + page integration
 
 ---
 

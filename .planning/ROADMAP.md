@@ -204,7 +204,7 @@ Plans:
 2. Correlation feature only visible to users who granted analytics consent (canTrackAnalytics gate)
 3. User sees summary insight text explaining bandwidth-heating correlation patterns
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 67-01-PLAN.md — Pearson correlation utility + useBandwidthCorrelation hook with TDD (data layer)

@@ -59,9 +59,9 @@ Requirements for Fritz!Box Network Monitor. Each maps to roadmap phases.
 
 ### Bandwidth Correlation
 
-- [ ] **CORR-01**: User can see chart overlay of network bandwidth and stove power level
-- [ ] **CORR-02**: Correlation feature gated behind analytics consent (canTrackAnalytics)
-- [ ] **CORR-03**: User can see summary insight text for bandwidth-heating correlation
+- [x] **CORR-01**: User can see chart overlay of network bandwidth and stove power level
+- [x] **CORR-02**: Correlation feature gated behind analytics consent (canTrackAnalytics)
+- [x] **CORR-03**: User can see summary insight text for bandwidth-heating correlation
 
 ## Future Requirements
 
@@ -125,9 +125,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CAT-01 | Phase 66 | Complete |
 | CAT-02 | Phase 66 | Complete |
 | CAT-03 | Phase 66 | Complete |
-| CORR-01 | Phase 67 | Pending |
-| CORR-02 | Phase 67 | Pending |
-| CORR-03 | Phase 67 | Pending |
+| CORR-01 | Phase 67 | Complete |
+| CORR-02 | Phase 67 | Complete |
+| CORR-03 | Phase 67 | Complete |
 
 **Coverage:**
 - v8.0 requirements: 32 total

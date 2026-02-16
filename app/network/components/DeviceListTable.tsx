@@ -4,12 +4,15 @@ import { useMemo, useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/app/components/ui';
 import DeviceStatusBadge from './DeviceStatusBadge';
+import DeviceCategoryBadge from './DeviceCategoryBadge';
 import type { DeviceData } from '@/app/components/devices/network/types';
+import type { DeviceCategory } from '@/types/firebase/network';
 import { Card, Heading, Badge } from '@/app/components/ui';
 
 interface DeviceListTableProps {
   devices: DeviceData[];
   isStale: boolean;
+  onCategoryChange?: (mac: string, category: DeviceCategory) => void;
 }
 
 type StatusFilter = 'all' | 'online' | 'offline';
@@ -23,12 +26,14 @@ type StatusFilter = 'all' | 'online' | 'offline';
  * @param {Object} props - Component props
  * @param {DeviceData[]} props.devices - Array of network devices to display
  * @param {boolean} props.isStale - Whether the data is stale (currently unused)
+ * @param {(mac: string, category: DeviceCategory) => void} [props.onCategoryChange] - Optional callback for category changes
  *
  * @example
  * <DeviceListTable devices={devices} isStale={false} />
  */
-export function DeviceListTable({ devices, isStale }: DeviceListTableProps) {
+export function DeviceListTable({ devices, isStale, onCategoryChange }: DeviceListTableProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [editingMac, setEditingMac] = useState<string | null>(null);
 
   // Column definitions
   const columns = useMemo<ColumnDef<DeviceData>[]>(() => [
@@ -64,6 +69,45 @@ export function DeviceListTable({ devices, isStale }: DeviceListTableProps) {
       ),
     },
     {
+      accessorKey: 'category',
+      header: 'Categoria',
+      enableSorting: true,
+      enableGlobalFilter: false,
+      cell: ({ row }) => {
+        const mac = row.original.mac;
+        const category = row.original.category ?? 'unknown';
+
+        if (editingMac === mac) {
+          return (
+            <select
+              value={category}
+              onChange={(e) => {
+                const newCategory = e.target.value as DeviceCategory;
+                onCategoryChange?.(mac, newCategory);
+                setEditingMac(null);
+              }}
+              onBlur={() => setEditingMac(null)}
+              autoFocus
+              className="bg-slate-800 text-slate-200 text-xs rounded px-2 py-1 border border-white/10 focus:border-ember-400 focus:outline-none"
+            >
+              <option value="iot">IoT</option>
+              <option value="mobile">Mobile</option>
+              <option value="pc">PC</option>
+              <option value="smart-home">Smart Home</option>
+              <option value="unknown">Sconosciuto</option>
+            </select>
+          );
+        }
+
+        return (
+          <DeviceCategoryBadge
+            category={category}
+            onClick={onCategoryChange ? () => setEditingMac(mac) : undefined}
+          />
+        );
+      },
+    },
+    {
       accessorKey: 'active',
       header: 'Stato',
       enableSorting: true,
@@ -95,7 +139,7 @@ export function DeviceListTable({ devices, isStale }: DeviceListTableProps) {
         return <span className="text-slate-300">{bandwidth.toFixed(1)} Mbps</span>;
       },
     },
-  ], []);
+  ], [editingMac, onCategoryChange]);
 
   // Sort devices: online first, then by name
   const sortedDevices = useMemo(() => {

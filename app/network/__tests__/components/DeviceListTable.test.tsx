@@ -27,15 +27,25 @@ jest.mock('@/app/components/ui', () => ({
       data-density={density}
       data-striped={striped}
     >
-      {data.map((d: any, i: number) => (
-        <div
-          key={i}
-          data-testid={`row-${i}`}
-          data-name={d.name}
-          data-ip={d.ip}
-          data-active={d.active}
-        />
-      ))}
+      {data.map((d: any, i: number) => {
+        // Render the category column cell for testing
+        const categoryColumn = columns.find((col: any) => col.accessorKey === 'category');
+        return (
+          <div
+            key={i}
+            data-testid={`row-${i}`}
+            data-name={d.name}
+            data-ip={d.ip}
+            data-active={d.active}
+          >
+            {categoryColumn && categoryColumn.cell && (
+              <div data-testid={`category-cell-${i}`}>
+                {categoryColumn.cell({ row: { original: d } })}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   )),
   Card: ({ children, className }: any) => <div className={className}>{children}</div>,
@@ -48,6 +58,21 @@ jest.mock('@/app/components/ui', () => ({
   ),
 }));
 
+// Mock DeviceCategoryBadge component
+jest.mock('../../components/DeviceCategoryBadge', () => ({
+  __esModule: true,
+  default: jest.fn(({ category, onClick }) => (
+    <div
+      data-testid="category-badge"
+      data-category={category}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+    >
+      {category}
+    </div>
+  )),
+}));
+
 describe('DeviceListTable', () => {
   const mockDevices: DeviceData[] = [
     {
@@ -58,6 +83,7 @@ describe('DeviceListTable', () => {
       active: true,
       bandwidth: 45.2,
       lastSeen: Date.now(),
+      category: 'mobile',
     },
     {
       id: '2',
@@ -67,6 +93,7 @@ describe('DeviceListTable', () => {
       active: false,
       bandwidth: 0,
       lastSeen: Date.now() - 3600000,
+      category: 'smart-home',
     },
     {
       id: '3',
@@ -76,6 +103,7 @@ describe('DeviceListTable', () => {
       active: true,
       bandwidth: 12.8,
       lastSeen: Date.now(),
+      // No category - should default to 'unknown'
     },
     {
       id: '4',
@@ -98,11 +126,11 @@ describe('DeviceListTable', () => {
       expect(dataTable).toHaveAttribute('data-page-size', '25');
     });
 
-    it('passes all 5 columns to DataTable', () => {
+    it('passes all 6 columns to DataTable', () => {
       render(<DeviceListTable devices={mockDevices} isStale={false} />);
 
       const dataTable = screen.getByTestId('data-table');
-      expect(dataTable).toHaveAttribute('data-columns', '5');
+      expect(dataTable).toHaveAttribute('data-columns', '6');
     });
 
     it('passes density and striped props to DataTable', () => {
@@ -234,12 +262,85 @@ describe('DeviceListTable', () => {
     // The actual column definitions (enableGlobalFilter, etc.) are tested
     // through the component implementation and TypeScript types.
 
-    it('passes 5 columns with correct types', () => {
+    it('passes 6 columns with correct types', () => {
       render(<DeviceListTable devices={mockDevices} isStale={false} />);
 
       const dataTable = screen.getByTestId('data-table');
-      // 5 columns: name, IP, MAC, status, bandwidth
-      expect(dataTable).toHaveAttribute('data-columns', '5');
+      // 6 columns: name, IP, MAC, category, status, bandwidth
+      expect(dataTable).toHaveAttribute('data-columns', '6');
+    });
+  });
+
+  describe('Category column', () => {
+    it('renders category column with header "Categoria"', () => {
+      // This is implicitly tested through the column count being 6
+      // The actual header rendering is handled by DataTable
+      render(<DeviceListTable devices={mockDevices} isStale={false} />);
+
+      const dataTable = screen.getByTestId('data-table');
+      expect(dataTable).toHaveAttribute('data-columns', '6');
+    });
+
+    it('shows DeviceCategoryBadge for each device with correct category', () => {
+      render(<DeviceListTable devices={mockDevices} isStale={false} />);
+
+      const badges = screen.getAllByTestId('category-badge');
+      expect(badges).toHaveLength(4);
+
+      // After sorting: online devices first (A, C), then offline (B, D)
+      // Device A (row 0) has category 'mobile'
+      expect(badges[0]).toHaveAttribute('data-category', 'mobile');
+
+      // Device C (row 1) has no category, defaults to 'unknown'
+      expect(badges[1]).toHaveAttribute('data-category', 'unknown');
+
+      // Device B (row 2) has category 'smart-home'
+      expect(badges[2]).toHaveAttribute('data-category', 'smart-home');
+
+      // Device D (row 3) has no category, defaults to 'unknown'
+      expect(badges[3]).toHaveAttribute('data-category', 'unknown');
+    });
+
+    it('shows "unknown" badge when device has no category', () => {
+      render(<DeviceListTable devices={mockDevices} isStale={false} />);
+
+      const badges = screen.getAllByTestId('category-badge');
+
+      // Device C (row 1) and Device D (row 3) have no category, should default to 'unknown'
+      expect(badges[1]).toHaveAttribute('data-category', 'unknown');
+      expect(badges[3]).toHaveAttribute('data-category', 'unknown');
+    });
+
+    it('clicking a badge opens category dropdown when onCategoryChange provided', () => {
+      const handleCategoryChange = jest.fn();
+      render(<DeviceListTable devices={mockDevices} isStale={false} onCategoryChange={handleCategoryChange} />);
+
+      const badges = screen.getAllByTestId('category-badge');
+
+      // Click first badge (Device A - mobile)
+      fireEvent.click(badges[0]);
+
+      // Dropdown should appear
+      const dropdown = screen.getByRole('combobox');
+      expect(dropdown).toBeInTheDocument();
+      expect(dropdown).toHaveValue('mobile');
+    });
+
+    it('selecting a category from dropdown calls onCategoryChange with mac and new category', () => {
+      const handleCategoryChange = jest.fn();
+      render(<DeviceListTable devices={mockDevices} isStale={false} onCategoryChange={handleCategoryChange} />);
+
+      const badges = screen.getAllByTestId('category-badge');
+
+      // Click first badge (Device A - mobile)
+      fireEvent.click(badges[0]);
+
+      // Change dropdown value
+      const dropdown = screen.getByRole('combobox');
+      fireEvent.change(dropdown, { target: { value: 'pc' } });
+
+      // onCategoryChange should be called with Device A's MAC and new category
+      expect(handleCategoryChange).toHaveBeenCalledWith('AA:BB:CC:DD:EE:01', 'pc');
     });
   });
 });

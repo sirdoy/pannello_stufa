@@ -10,7 +10,7 @@ import {
   getUnifiedDeviceConfigAdmin,
   getVisibleDashboardCards,
 } from '@/lib/services/unifiedDeviceConfigService';
-import { Grid, EmptyState } from './components/ui';
+import { EmptyState } from './components/ui';
 import { DeviceCardErrorBoundary } from './components/ErrorBoundary';
 
 export const dynamic = 'force-dynamic';
@@ -55,34 +55,59 @@ export default async function Home() {
   // Get visible dashboard cards (enabled && dashboardVisible, sorted by order)
   const visibleCards = getVisibleDashboardCards(deviceConfig);
 
+  // Precompute left/right columns by index parity (even→left, odd→right)
+  const leftColumn: Array<{ card: typeof visibleCards[number]; flatIndex: number }> = [];
+  const rightColumn: Array<{ card: typeof visibleCards[number]; flatIndex: number }> = [];
+  visibleCards.forEach((card, i) => {
+    if (i % 2 === 0) {
+      leftColumn.push({ card, flatIndex: i });
+    } else {
+      rightColumn.push({ card, flatIndex: i });
+    }
+  });
+
+  // Shared card renderer — used by both mobile and desktop layouts
+  const renderCard = (card: typeof visibleCards[number], flatIndex: number) => {
+    const CardComponent = CARD_COMPONENTS[card.id];
+    if (!CardComponent) return null;
+    return (
+      <div
+        key={card.id}
+        className="animate-spring-in transition-all duration-300 ease-out"
+        style={{ animationDelay: `${flatIndex * 100}ms` }}
+      >
+        <DeviceCardErrorBoundary
+          deviceName={DEVICE_META[card.id]?.name ?? card.id}
+          deviceIcon={DEVICE_META[card.id]?.icon ?? '⚠️'}
+        >
+          <CardComponent />
+        </DeviceCardErrorBoundary>
+      </div>
+    );
+  };
+
   return (
     <section className="py-8 sm:py-12 lg:py-16">
       <h1 className="sr-only">Dashboard</h1>
       {/* Sandbox Panel - Solo in localhost quando abilitato */}
       <SandboxPanel />
 
-      {/* Devices grid using new Grid component */}
-      <Grid cols={2} gap="lg">
-        {visibleCards.map((card, index) => {
-          const CardComponent = CARD_COMPONENTS[card.id];
-          if (!CardComponent) return null;
+      {/* Devices masonry layout */}
 
-          return (
-            <div
-              key={card.id}
-              className="animate-spring-in"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <DeviceCardErrorBoundary
-                deviceName={DEVICE_META[card.id]?.name ?? card.id}
-                deviceIcon={DEVICE_META[card.id]?.icon ?? '⚠️'}
-              >
-                <CardComponent />
-              </DeviceCardErrorBoundary>
-            </div>
-          );
-        })}
-      </Grid>
+      {/* Mobile: single column, flat order (LAYOUT-03) */}
+      <div className="flex flex-col gap-6 sm:hidden">
+        {visibleCards.map((card, index) => renderCard(card, index))}
+      </div>
+
+      {/* Desktop: two-column masonry (LAYOUT-01, LAYOUT-02) */}
+      <div className="hidden sm:flex sm:flex-row gap-8 lg:gap-10">
+        <div className="flex flex-col gap-8 lg:gap-10 flex-1 min-w-0">
+          {leftColumn.map(({ card, flatIndex }) => renderCard(card, flatIndex))}
+        </div>
+        <div className="flex flex-col gap-8 lg:gap-10 flex-1 min-w-0">
+          {rightColumn.map(({ card, flatIndex }) => renderCard(card, flatIndex))}
+        </div>
+      </div>
 
       {/* Empty State using new EmptyState component */}
       {visibleCards.length === 0 && (

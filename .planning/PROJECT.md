@@ -8,6 +8,15 @@ PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (co
 
 I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
+## Current Milestone: v8.1 Masonry Dashboard
+
+**Goal:** Layout masonry per le card della home su desktop — le card riempiono gli spazi vuoti verticali mantenendo l'ordine impostato dall'utente.
+
+**Target features:**
+- Masonry layout su desktop (2 colonne) che elimina i gap verticali tra card di altezza diversa
+- Mobile invariato (1 colonna, layout lineare)
+- Ordine card rispettato come da impostazioni utente
+
 ## Current State
 
 **Version:** v8.0 (shipped 2026-02-16)
@@ -302,7 +311,10 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-(No active requirements — next milestone not yet defined)
+**v8.1 Masonry Dashboard:**
+- [ ] Masonry layout per card dashboard su desktop
+- [ ] Ordine card preservato dalle impostazioni utente
+- [ ] Mobile layout invariato (1 colonna)
 
 ### Out of Scope
 
@@ -417,4 +429,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-02-16 after v8.0 milestone completion (Fritz!Box Network Monitor shipped)*
+*Last updated: 2026-02-17 after v8.1 milestone start (Masonry Dashboard)*

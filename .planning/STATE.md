@@ -6,16 +6,14 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-**Current focus:** Planning next milestone
+**Current focus:** v8.1 Masonry Dashboard
 
 ## Current Position
 
-Phase: 67 (Bandwidth Correlation) — LAST COMPLETED
-Plan: Complete
-Status: v8.0 Milestone Shipped
-Last activity: 2026-02-17 - Completed quick task 30: Bypass Auth0 in local env, handle Firebase data correctly without auth
-
-Progress: [██████████████████████] 100% (v8.0 complete — 7 phases, 18 plans, 32/32 requirements)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-17 — Milestone v8.1 started
 
 ## Performance Metrics
 

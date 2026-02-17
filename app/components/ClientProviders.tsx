@@ -18,13 +18,31 @@ interface ClientProvidersProps {
   children: ReactNode;
 }
 
+// Client-side bypass flag — requires NEXT_PUBLIC_BYPASS_AUTH=true in .env.local
+const BYPASS_AUTH = process.env.NEXT_PUBLIC_BYPASS_AUTH === 'true';
+
+const MOCK_USER = BYPASS_AUTH
+  ? {
+      sub: 'local-dev-user',
+      email: 'dev@localhost',
+      name: 'Local Dev User',
+      nickname: 'dev',
+      picture: '',
+    }
+  : undefined;
+
 /**
  * Wrapper per tutti i provider client-side
  * Permette di usare Context in layout.js (Server Component)
+ *
+ * When NEXT_PUBLIC_BYPASS_AUTH=true: passes mock user to Auth0Provider as SWR
+ * fallback, so useUser() returns the mock user immediately without Auth0 auth.
+ * The /auth/profile route also returns the mock user in bypass mode, so SWR
+ * revalidation keeps returning the mock user consistently.
  */
 export default function ClientProviders({ children }: ClientProvidersProps) {
   return (
-    <Auth0Provider>
+    <Auth0Provider user={MOCK_USER}>
       <ThemeScript />
       <ThemeProvider>
         <PageTransitionProvider>

@@ -26,7 +26,7 @@ import Badge from '@/app/components/ui/Badge';
 import Skeleton from '@/app/components/ui/Skeleton';
 import { Heading, Text } from '@/app/components/ui';
 import LocationSearch from '@/app/components/LocationSearch';
-import { Palette, MapPin, Smartphone, ChevronUp, ChevronDown, FlaskConical } from 'lucide-react';
+import { Palette, MapPin, Smartphone, ChevronUp, ChevronDown, FlaskConical, Network } from 'lucide-react';
 import SandboxToggle from '@/app/components/sandbox/SandboxToggle';
 
 /**
@@ -664,6 +664,258 @@ function UnifiedDevicesContent() {
 }
 
 /**
+ * FritzBoxContent - Fritz!Box credentials configuration
+ * Credentials saved here are stored in Firebase RTDB and shared across all devices.
+ */
+interface FritzBoxSaveMessage {
+  type: 'success' | 'error';
+  text: string;
+}
+
+function FritzBoxContent() {
+  const { user } = useUser();
+  const [apiUrl, setApiUrl] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [isConfigured, setIsConfigured] = useState(false);
+  const [updatedAt, setUpdatedAt] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<FritzBoxSaveMessage | null>(null);
+
+  useEffect(() => {
+    const fetchCredentials = async () => {
+      try {
+        const response = await fetch('/api/config/fritzbox');
+        if (response.ok) {
+          const data = await response.json() as {
+            configured: boolean;
+            apiUrl?: string;
+            username?: string;
+            updatedAt?: number;
+          };
+          if (data.configured) {
+            setIsConfigured(true);
+            setApiUrl(data.apiUrl ?? '');
+            setUsername(data.username ?? '');
+            setUpdatedAt(data.updatedAt ?? null);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching Fritz!Box credentials:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchCredentials();
+    } else {
+      setIsLoading(false);
+    }
+  }, [user]);
+
+  const handleSave = async () => {
+    if (!apiUrl.trim() || !username.trim() || !password.trim()) {
+      setSaveMessage({ type: 'error', text: 'Tutti i campi sono obbligatori' });
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveMessage(null);
+
+    try {
+      const response = await fetch('/api/config/fritzbox', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiUrl: apiUrl.trim(), username: username.trim(), password: password.trim() }),
+      });
+
+      if (response.ok) {
+        setIsConfigured(true);
+        setUpdatedAt(Date.now());
+        setPassword('');
+        setSaveMessage({ type: 'success', text: 'Credenziali salvate! Fritz!Box disponibile su tutti i dispositivi.' });
+        setTimeout(() => setSaveMessage(null), 4000);
+      } else {
+        const data = await response.json() as { error?: string };
+        setSaveMessage({ type: 'error', text: data.error ?? 'Errore durante il salvataggio' });
+      }
+    } catch {
+      setSaveMessage({ type: 'error', text: 'Errore di connessione' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleRemove = async () => {
+    setIsRemoving(true);
+    setSaveMessage(null);
+
+    try {
+      const response = await fetch('/api/config/fritzbox', { method: 'DELETE' });
+
+      if (response.ok) {
+        setIsConfigured(false);
+        setApiUrl('');
+        setUsername('');
+        setPassword('');
+        setUpdatedAt(null);
+        setSaveMessage({ type: 'success', text: 'Credenziali rimosse.' });
+        setTimeout(() => setSaveMessage(null), 3000);
+      } else {
+        setSaveMessage({ type: 'error', text: 'Errore durante la rimozione' });
+      }
+    } catch {
+      setSaveMessage({ type: 'error', text: 'Errore di connessione' });
+    } finally {
+      setIsRemoving(false);
+    }
+  };
+
+  if (isLoading) {
+    return <Skeleton className="h-64 w-full" />;
+  }
+
+  return (
+    <div className="space-y-6 mt-6">
+      <Text variant="secondary">
+        Configura le credenziali Fritz!Box per il monitoraggio della rete
+      </Text>
+
+      {/* Status banner */}
+      {isConfigured && (
+        <Banner variant="success" compact={false}>
+          <div>
+            <strong>Fritz!Box configurato</strong>
+            {updatedAt && (
+              <span className="text-xs ml-2 opacity-75">
+                (aggiornato il {new Date(updatedAt).toLocaleDateString('it-IT')})
+              </span>
+            )}
+          </div>
+          <p className="text-sm mt-1">
+            URL: {apiUrl} — Utente: {username}
+          </p>
+        </Banner>
+      )}
+
+      {/* Credentials form */}
+      <Card variant="glass" className="p-6 sm:p-8">
+        <Heading level={2} size="lg" className="mb-4">
+          {isConfigured ? 'Aggiorna Credenziali' : 'Configura Fritz!Box'}
+        </Heading>
+
+        <div className="space-y-4">
+          {/* API URL */}
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1.5">
+              URL API HomeAssistant
+            </label>
+            <input
+              type="url"
+              value={apiUrl}
+              onChange={(e) => setApiUrl(e.target.value)}
+              placeholder="http://192.168.1.1:8000"
+              className="w-full px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-600 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-ember-500 focus:ring-1 focus:ring-ember-500 transition-colors"
+              disabled={isSaving}
+            />
+            <Text variant="tertiary" size="xs" className="mt-1">
+              Indirizzo del proxy HomeAssistant Network API
+            </Text>
+          </div>
+
+          {/* Username */}
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1.5">
+              Nome utente
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="admin"
+              autoComplete="username"
+              className="w-full px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-600 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-ember-500 focus:ring-1 focus:ring-ember-500 transition-colors"
+              disabled={isSaving}
+            />
+          </div>
+
+          {/* Password */}
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1.5">
+              Password{isConfigured && <span className="text-slate-400 font-normal ml-1">(lascia vuoto per non modificarla)</span>}
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={isConfigured ? '••••••••' : 'password'}
+              autoComplete="current-password"
+              className="w-full px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-600 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-ember-500 focus:ring-1 focus:ring-ember-500 transition-colors"
+              disabled={isSaving}
+            />
+          </div>
+
+          {/* Save feedback */}
+          {saveMessage && (
+            <Banner
+              variant={saveMessage.type === 'success' ? 'success' : 'error'}
+              compact
+            >
+              {saveMessage.text}
+            </Banner>
+          )}
+
+          {/* Actions */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            <Button
+              variant="ember"
+              onClick={handleSave}
+              disabled={isSaving || isRemoving}
+              className="flex-1 sm:flex-initial"
+            >
+              {isSaving ? 'Salvataggio...' : isConfigured ? 'Aggiorna credenziali' : 'Salva credenziali'}
+            </Button>
+
+            {isConfigured && (
+              <Button
+                variant="danger"
+                onClick={handleRemove}
+                disabled={isSaving || isRemoving}
+                className="flex-1 sm:flex-initial"
+              >
+                {isRemoving ? 'Rimozione...' : 'Rimuovi credenziali'}
+              </Button>
+            )}
+          </div>
+        </div>
+      </Card>
+
+      {/* Info card */}
+      <Card
+        variant="glass"
+        className="p-6 sm:p-8 bg-ocean-50/50 [html:not(.dark)_&]:bg-ocean-50/50 bg-ocean-900/10 border border-ocean-200 [html:not(.dark)_&]:border-ocean-200 border-ocean-800"
+      >
+        <div className="flex gap-3">
+          <div className="text-2xl">ℹ️</div>
+          <div className="flex-1">
+            <Heading level={3} size="md" variant="info" className="mb-1">
+              Configurazione Condivisa
+            </Heading>
+            <Text variant="info" size="sm">
+              Le credenziali vengono salvate su Firebase e condivise automaticamente su tutti i dispositivi.
+              Una volta configurato, Fritz!Box funzionerà sia da locale che da remoto.
+            </Text>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+/**
  * SandboxContent - Sandbox testing toggle
  */
 function SandboxContent() {
@@ -718,12 +970,14 @@ function SettingsPageContent() {
           <Tabs.Trigger value="aspetto" icon={<Palette size={18} />}>Aspetto</Tabs.Trigger>
           <Tabs.Trigger value="posizione" icon={<MapPin size={18} />}>Posizione</Tabs.Trigger>
           <Tabs.Trigger value="dispositivi" icon={<Smartphone size={18} />}>Dispositivi</Tabs.Trigger>
+          <Tabs.Trigger value="rete" icon={<Network size={18} />}>Rete</Tabs.Trigger>
           <Tabs.Trigger value="sandbox" icon={<FlaskConical size={18} />}>Sandbox</Tabs.Trigger>
         </Tabs.List>
 
         <Tabs.Content value="aspetto"><ThemeContent /></Tabs.Content>
         <Tabs.Content value="posizione"><LocationContent /></Tabs.Content>
         <Tabs.Content value="dispositivi"><UnifiedDevicesContent /></Tabs.Content>
+        <Tabs.Content value="rete"><FritzBoxContent /></Tabs.Content>
         <Tabs.Content value="sandbox"><SandboxContent /></Tabs.Content>
       </Tabs>
     </SettingsLayout>

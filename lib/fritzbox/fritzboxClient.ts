@@ -7,6 +7,10 @@
  * - Response transformation to internal types
  * - Configuration validation
  *
+ * Credential resolution order:
+ *   1. Firebase RTDB (config/fritzbox) - shared across all devices
+ *   2. Environment variables (HOMEASSISTANT_API_URL, HOMEASSISTANT_USER, HOMEASSISTANT_PASSWORD) - local fallback
+ *
  * Endpoints used (generic, not fritzbox-specific namespace):
  *   /health          - No auth
  *   /api/v1/devices  - JWT required
@@ -16,14 +20,88 @@
 
 import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
 
-// Read API credentials from environment at module scope
-const API_URL = process.env.HOMEASSISTANT_API_URL;
-const API_USER = process.env.HOMEASSISTANT_USER;
-const API_PASSWORD = process.env.HOMEASSISTANT_PASSWORD;
-
 // JWT token cache (in-memory, module scope)
 let cachedToken: string | null = null;
 let tokenExpiry = 0;
+
+/**
+ * Cached credentials resolved from Firebase or env vars.
+ * Cache is invalidated when credentials are saved via the config API.
+ */
+interface ResolvedCredentials {
+  apiUrl: string;
+  username: string;
+  password: string;
+}
+
+let credentialCache: ResolvedCredentials | null = null;
+let credentialCacheExpiry = 0;
+const CREDENTIAL_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+/**
+ * Invalidate the in-memory credential cache.
+ * Called when credentials are saved or deleted via the config API.
+ */
+export function invalidateFritzBoxCredentialCache(): void {
+  credentialCache = null;
+  credentialCacheExpiry = 0;
+  // Also invalidate JWT token cache since credentials changed
+  cachedToken = null;
+  tokenExpiry = 0;
+}
+
+/**
+ * Resolve Fritz!Box credentials.
+ * Priority: Firebase RTDB > environment variables
+ *
+ * Firebase RTDB is the source of truth for multi-device setups.
+ * Environment variables serve as local fallback for backward compatibility.
+ */
+async function resolveCredentials(): Promise<ResolvedCredentials> {
+  // Return cached credentials if still valid
+  if (credentialCache && Date.now() < credentialCacheExpiry) {
+    return credentialCache;
+  }
+
+  // Try Firebase RTDB first
+  try {
+    const { adminDbGet } = await import('@/lib/firebaseAdmin');
+    const { getEnvironmentPath } = await import('@/lib/environmentHelper');
+
+    const path = getEnvironmentPath('config/fritzbox');
+    const stored = (await adminDbGet(path)) as {
+      apiUrl: string;
+      username: string;
+      password: string;
+      updatedAt: number;
+    } | null;
+
+    if (stored?.apiUrl && stored.username && stored.password) {
+      credentialCache = {
+        apiUrl: stored.apiUrl,
+        username: stored.username,
+        password: stored.password,
+      };
+      credentialCacheExpiry = Date.now() + CREDENTIAL_CACHE_TTL_MS;
+      return credentialCache;
+    }
+  } catch {
+    // Firebase unavailable — fall through to env vars
+  }
+
+  // Fall back to environment variables
+  const apiUrl = process.env.HOMEASSISTANT_API_URL;
+  const username = process.env.HOMEASSISTANT_USER;
+  const password = process.env.HOMEASSISTANT_PASSWORD;
+
+  if (!apiUrl || !username || !password) {
+    throw ApiError.fritzboxNotConfigured();
+  }
+
+  credentialCache = { apiUrl, username, password };
+  credentialCacheExpiry = Date.now() + CREDENTIAL_CACHE_TTL_MS;
+  return credentialCache;
+}
 
 /**
  * Fritz!Box API Client
@@ -39,18 +117,16 @@ class FritzBoxClient {
       return cachedToken;
     }
 
-    if (!API_URL || !API_USER || !API_PASSWORD) {
-      throw ApiError.fritzboxNotConfigured();
-    }
+    const credentials = await resolveCredentials();
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
+      const response = await fetch(`${credentials.apiUrl}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `username=${encodeURIComponent(API_USER)}&password=${encodeURIComponent(API_PASSWORD)}`,
+        body: `username=${encodeURIComponent(credentials.username)}&password=${encodeURIComponent(credentials.password)}`,
         signal: controller.signal,
       });
 
@@ -96,9 +172,7 @@ class FritzBoxClient {
   ): Promise<unknown> {
     const { timeout = 15000, requiresAuth = true } = options;
 
-    if (!API_URL) {
-      throw ApiError.fritzboxNotConfigured();
-    }
+    const credentials = await resolveCredentials();
 
     // Setup timeout with AbortController
     const controller = new AbortController();
@@ -111,7 +185,7 @@ class FritzBoxClient {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch(`${API_URL}${endpoint}`, {
+      const response = await fetch(`${credentials.apiUrl}${endpoint}`, {
         headers,
         signal: controller.signal,
       });
@@ -123,7 +197,7 @@ class FritzBoxClient {
         cachedToken = null;
         tokenExpiry = 0;
         const freshToken = await this.getToken();
-        const retryResponse = await fetch(`${API_URL}${endpoint}`, {
+        const retryResponse = await fetch(`${credentials.apiUrl}${endpoint}`, {
           headers: { Authorization: `Bearer ${freshToken}` },
         });
         if (!retryResponse.ok) {

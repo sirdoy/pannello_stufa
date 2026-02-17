@@ -13,6 +13,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Skeleton from '../../ui/Skeleton';
 import { SmartHomeCard } from '../../ui';
 import { HealthIndicator, Banner } from '../../ui';
@@ -43,16 +44,14 @@ export default function NetworkCard() {
             compact={false}
           >
             <p className="text-sm text-slate-300 mb-3">
-              Per monitorare la rete è necessario abilitare TR-064 sul Fritz!Box.
+              Per monitorare la rete configura le credenziali Fritz!Box nelle impostazioni.
             </p>
-            <a
-              href="https://en.avm.de/service/fritzbox/fritzbox-7590/knowledge-base/publication/show/894_Setting-up-FRITZ-Box-for-access-over-HTTPS/"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/settings?tab=rete"
               className="text-sm text-sage-400 hover:text-sage-300 underline"
             >
-              Guida configurazione →
-            </a>
+              Vai alle impostazioni Rete →
+            </Link>
           </Banner>
         </SmartHomeCard.Controls>
       </SmartHomeCard>

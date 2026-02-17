@@ -13,6 +13,7 @@
 - ✅ **v6.0 Operations, PWA & Analytics** — Phases 49-54 (shipped 2026-02-11)
 - ✅ **v7.0 Performance & Resilience** — Phases 55-60 (shipped 2026-02-13)
 - ✅ **v8.0 Fritz!Box Network Monitor** — Phases 61-67 (shipped 2026-02-16)
+- 🚧 **v8.1 Masonry Dashboard** — Phases 68-69 (in progress)
 
 ## Phases
 
@@ -50,6 +51,49 @@ See `.planning/milestones/` for full archives.
 
 ---
 
+### 🚧 v8.1 Masonry Dashboard (In Progress)
+
+**Milestone Goal:** Replace the uniform two-column grid on the dashboard home with a masonry layout that eliminates vertical gaps between cards of different heights, while preserving Firebase-configured card order and leaving mobile untouched.
+
+**Approach:** Two-column flexbox split by index parity — even-indexed cards into a left `flex flex-col` column, odd-indexed cards into a right `flex flex-col` column. Pure server component change, zero new dependencies, SSR-safe, PWA-cache-safe.
+
+- [ ] **Phase 68: Core Masonry Layout** - Replace `<Grid cols={2}>` with two-column flexbox split in `app/page.tsx`
+- [ ] **Phase 69: Edge Cases, Error Boundary & Tests** - Min-height on error fallback, edge case handling, unit tests for column assignment
+
+## Phase Details
+
+### Phase 68: Core Masonry Layout
+**Goal**: Users see dashboard cards fill vertical space with no gaps — shorter cards no longer leave blank space below them on desktop
+**Depends on**: Nothing (first phase of v8.1)
+**Requirements**: LAYOUT-01, LAYOUT-02, LAYOUT-03, ANIM-01, ANIM-02
+**Success Criteria** (what must be TRUE):
+  1. On desktop, two cards side-by-side have no vertical gap below the shorter card — the column below it continues immediately with the next card
+  2. Card order matches Firebase settings — the first configured card appears top-left, second top-right, third below the first, and so on
+  3. On mobile (< sm breakpoint), cards stack in a single column in the same order as configured — no layout change visible
+  4. Existing spring-in entrance animation plays per card with staggered delay matching the card's flat index in the user's configured order
+  5. When a card's content height changes (polling update, expand/collapse), the card wrapper transitions height smoothly rather than snapping
+**Plans**: TBD
+
+Plans:
+- [ ] 68-01: Replace grid with masonry flexbox columns in app/page.tsx and add ANIM-02 CSS transition
+
+### Phase 69: Edge Cases, Error Boundary & Tests
+**Goal**: Layout handles all real-world card count variations correctly and never collapses a column — verified by unit tests
+**Depends on**: Phase 68
+**Requirements**: EDGE-01, EDGE-02, EDGE-03
+**Success Criteria** (what must be TRUE):
+  1. With only 1 visible card, the card occupies the left column (or full width) without the right column creating a visual half-width gap
+  2. With an odd number of visible cards (3, 5), the left column has one more card than the right — the right column ends without any blank space artifacts
+  3. When a card's error boundary fallback renders, the fallback has sufficient minimum height so the column does not visually collapse to near-zero
+  4. Unit tests cover column assignment for 0, 1, 2, 3, 5, and 6 visible card counts — all assertions green
+**Plans**: TBD
+
+Plans:
+- [ ] 69-01: Edge case handling and error boundary min-height
+- [ ] 69-02: Unit tests for column split logic and all edge cases
+
+---
+
 ## Progress
 
 | Phase | Milestone | Plans | Status | Completed |
@@ -65,9 +109,11 @@ See `.planning/milestones/` for full archives.
 | 49-54 | v6.0 | 29/29 | ✓ Complete | 2026-02-11 |
 | 55-60 | v7.0 | 22/22 | ✓ Complete | 2026-02-13 |
 | 61-67 | v8.0 | 18/18 | ✓ Complete | 2026-02-16 |
+| 68. Core Masonry Layout | v8.1 | 0/TBD | Not started | - |
+| 69. Edge Cases & Tests | v8.1 | 0/TBD | Not started | - |
 
-**Total:** 11 milestones shipped, 67 phases complete, 316 plans executed
+**Total:** 11 milestones shipped, 67 phases complete, 316 plans executed + v8.1 in progress
 
 ---
 
-*Roadmap updated: 2026-02-16 — v8.0 Fritz!Box Network Monitor shipped*
+*Roadmap updated: 2026-02-17 — v8.1 Masonry Dashboard phases 68-69 added*

@@ -2,18 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-16)
+See: .planning/PROJECT.md (updated 2026-02-17)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-
-**Current focus:** v8.1 Masonry Dashboard
+**Current focus:** v8.1 Masonry Dashboard — Phase 68: Core Masonry Layout
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-02-17 — Milestone v8.1 started
+Phase: 68 of 69 (Core Masonry Layout)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-02-17 — Roadmap created for v8.1 (phases 68-69)
+
+Progress: [░░░░░░░░░░] 0% (v8.1)
 
 ## Performance Metrics
 
@@ -44,28 +45,22 @@ Last activity: 2026-02-17 — Milestone v8.1 started
 
 See PROJECT.md Key Decisions table for full history.
 
+Recent decisions affecting v8.1:
+- Two-column flexbox split by index parity (even→left, odd→right) chosen over CSS columns (column-first ordering breaks Firebase card order) and JS masonry hook (overkill for 6 cards, requires client boundary)
+- Zero new dependencies — Tailwind `flex flex-col` utilities, no library additions
+- app/page.tsx is a server component — approach must be SSR-safe (flexbox split is pure array logic, no hydration risk)
+- ANIM-02 (smooth height transitions) via CSS `transition` on card wrapper divs — no JS needed
+
 ### Pending Todos
 
 None.
 
 ### Blockers/Concerns
 
-None — milestone complete.
-
-### Quick Tasks Completed
-
-| # | Description | Date | Commit | Directory |
-|---|-------------|------|--------|-----------|
-| 25 | Add network API debug tab with all endpoints from API.md | 2026-02-16 | 5b89be9 | [25-add-network-api-debug-tab-with-all-endpo](./quick/25-add-network-api-debug-tab-with-all-endpo/) |
-| 26 | Consolidate network API routes under /api/fritzbox/ namespace | 2026-02-17 | 68a677f | [26-nella-parte-network-utilizza-solo-le-chi](./quick/26-nella-parte-network-utilizza-solo-le-chi/) |
-| 27 | Use historical bandwidth data for network health and charts | 2026-02-17 | 7a4f061 | [27-use-historical-bandwidth-data-for-networ](./quick/27-use-historical-bandwidth-data-for-networ/) |
-| 28 | Replace Firebase bandwidth persistence with external API proxy | 2026-02-17 | d371f3b | [28-replace-firebase-bandwidth-persistence-w](./quick/28-replace-firebase-bandwidth-persistence-w/) |
-| 29 | Seed home card sparklines and health with historical bandwidth data | 2026-02-17 | ec410d6 | [29-seed-home-card-sparklines-and-health-wit](./quick/29-seed-home-card-sparklines-and-health-wit/) |
-| 30 | Bypass Auth0 in local env, handle Firebase data correctly without auth | 2026-02-17 | 6b92f6a | [30-bypass-auth0-in-local-env-handle-firebas](./quick/30-bypass-auth0-in-local-env-handle-firebas/) |
+- Read actual `app/page.tsx` before writing Phase 68 plan — current card map loop, `DeviceCardErrorBoundary` props, `EmptyState` usage, and `animate-spring-in` application must be confirmed from file (may have evolved since research)
 
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed quick-30: Bypass Auth0 in local env, handle Firebase data correctly without auth
-Next step: Start next milestone with /gsd:new-milestone
+Stopped at: Roadmap created for v8.1 — phases 68-69 defined, ready to plan phase 68
 Resume file: None

@@ -44,20 +44,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LAYOUT-01 | — | Pending |
-| LAYOUT-02 | — | Pending |
-| LAYOUT-03 | — | Pending |
-| ANIM-01 | — | Pending |
-| ANIM-02 | — | Pending |
-| EDGE-01 | — | Pending |
-| EDGE-02 | — | Pending |
-| EDGE-03 | — | Pending |
+| LAYOUT-01 | Phase 68 | Pending |
+| LAYOUT-02 | Phase 68 | Pending |
+| LAYOUT-03 | Phase 68 | Pending |
+| ANIM-01 | Phase 68 | Pending |
+| ANIM-02 | Phase 68 | Pending |
+| EDGE-01 | Phase 69 | Pending |
+| EDGE-02 | Phase 69 | Pending |
+| EDGE-03 | Phase 69 | Pending |
 
 **Coverage:**
 - v8.1 requirements: 8 total
-- Mapped to phases: 0
-- Unmapped: 8
+- Mapped to phases: 8
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-17*
-*Last updated: 2026-02-17 after initial definition*
+*Last updated: 2026-02-17 — traceability updated after roadmap creation (phases 68-69)*

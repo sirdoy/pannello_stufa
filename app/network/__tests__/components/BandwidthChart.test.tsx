@@ -54,12 +54,46 @@ describe('BandwidthChart', () => {
         onTimeRangeChange={mockOnTimeRangeChange}
         isEmpty={true}
         isCollecting={false}
+        isLoading={false}
         pointCount={0}
       />
     );
 
     expect(screen.getByText(/Raccolta dati banda in corso/i)).toBeInTheDocument();
     expect(screen.getByText(/Torna tra qualche minuto/i)).toBeInTheDocument();
+  });
+
+  it('shows loading state when isLoading is true and data is empty', () => {
+    render(
+      <BandwidthChart
+        data={[]}
+        timeRange="24h"
+        onTimeRangeChange={mockOnTimeRangeChange}
+        isEmpty={false}
+        isCollecting={false}
+        isLoading={true}
+        pointCount={0}
+      />
+    );
+
+    expect(screen.getByText(/Caricamento storico banda/i)).toBeInTheDocument();
+  });
+
+  it('does not show loading state when data is already present', () => {
+    render(
+      <BandwidthChart
+        data={sampleData}
+        timeRange="24h"
+        onTimeRangeChange={mockOnTimeRangeChange}
+        isEmpty={false}
+        isCollecting={false}
+        isLoading={true}
+        pointCount={3}
+      />
+    );
+
+    expect(screen.queryByText(/Caricamento storico banda/i)).not.toBeInTheDocument();
+    expect(screen.getByTestId('responsive-container')).toBeInTheDocument();
   });
 
   it('shows collecting state with point count when isCollecting is true', () => {
@@ -70,6 +104,7 @@ describe('BandwidthChart', () => {
         onTimeRangeChange={mockOnTimeRangeChange}
         isEmpty={false}
         isCollecting={true}
+        isLoading={false}
         pointCount={5}
       />
     );
@@ -85,6 +120,7 @@ describe('BandwidthChart', () => {
         onTimeRangeChange={mockOnTimeRangeChange}
         isEmpty={false}
         isCollecting={false}
+        isLoading={false}
         pointCount={100}
       />
     );
@@ -101,6 +137,7 @@ describe('BandwidthChart', () => {
         onTimeRangeChange={mockOnTimeRangeChange}
         isEmpty={false}
         isCollecting={false}
+        isLoading={false}
         pointCount={100}
       />
     );
@@ -118,6 +155,7 @@ describe('BandwidthChart', () => {
         onTimeRangeChange={mockOnTimeRangeChange}
         isEmpty={false}
         isCollecting={false}
+        isLoading={false}
         pointCount={100}
       />
     );
@@ -133,6 +171,7 @@ describe('BandwidthChart', () => {
         onTimeRangeChange={mockOnTimeRangeChange}
         isEmpty={false}
         isCollecting={false}
+        isLoading={false}
         pointCount={100}
       />
     );
@@ -155,6 +194,7 @@ describe('BandwidthChart', () => {
         onTimeRangeChange={mockOnTimeRangeChange}
         isEmpty={false}
         isCollecting={false}
+        isLoading={false}
         pointCount={100}
       />
     );
@@ -177,6 +217,7 @@ describe('BandwidthChart', () => {
         onTimeRangeChange={mockOnTimeRangeChange}
         isEmpty={true}
         isCollecting={false}
+        isLoading={false}
         pointCount={0}
       />
     );

@@ -82,9 +82,22 @@ export function useBandwidthHistory(): UseBandwidthHistoryReturn {
    * Add a new bandwidth data point to the history buffer.
    * Automatically caps at MAX_POINTS by dropping oldest points.
    * Called from page orchestrator as new polling data arrives.
+   *
+   * Deduplicates by bandwidth.timestamp: the server-side 60s cache can return
+   * the same response (same timestamp) for two consecutive 30s polls, which would
+   * create duplicate entries in the history buffer. We skip the point if an entry
+   * with the same timestamp already exists as the last point.
    */
   const addDataPoint = useCallback((bandwidth: BandwidthData) => {
     setHistory((prev) => {
+      // Deduplicate: skip if the last point has the same timestamp.
+      // This handles the case where the 60s server cache returns the same
+      // bandwidth response (same fetched_at) for two consecutive 30s polls.
+      const lastPoint = prev[prev.length - 1];
+      if (lastPoint && lastPoint.time === bandwidth.timestamp) {
+        return prev;
+      }
+
       const newPoint: BandwidthHistoryPoint = {
         time: bandwidth.timestamp,
         download: bandwidth.download,

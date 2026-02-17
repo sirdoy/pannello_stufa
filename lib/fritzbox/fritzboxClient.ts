@@ -192,6 +192,14 @@ class FritzBoxClient {
   }
 
   /**
+   * Debug: Make an authenticated request and return the raw response.
+   * Used by debug endpoints to inspect external API response format.
+   */
+  async debugRequest(endpoint: string): Promise<unknown> {
+    return this.request(endpoint);
+  }
+
+  /**
    * Get network devices connected to Fritz!Box
    *
    * Raw: { devices: [{ ip, name, mac, status: 0|1 }], is_stale, fetched_at }
@@ -237,42 +245,19 @@ class FritzBoxClient {
   /**
    * Get historical bandwidth data
    *
-   * Raw: { items: [{ timestamp, bytes_sent, bytes_received, upstream_rate, downstream_rate }], total_count, limit, offset }
+   * Raw: { records: [{ timestamp, bytes_sent, bytes_received, upstream_rate, downstream_rate }], hours_requested, record_count }
    * Returns: array of { time, download, upload } points sorted ascending
    */
   async getBandwidthHistory(hours: number = 24): Promise<Array<{ time: number; download: number; upload: number }>> {
-    // Fetch all pages
-    const limit = 1000;
-    let offset = 0;
-    const allItems: Array<{ timestamp: number; upstream_rate: number; downstream_rate: number }> = [];
+    type HistoryRecord = { timestamp: number; bytes_sent: number; bytes_received: number; upstream_rate: number; downstream_rate: number };
+    type HistoryResponse = { records: HistoryRecord[]; hours_requested: number; record_count: number };
 
-    // First request to get total_count
-    const firstPage = (await this.request(`/api/v1/history/bandwidth?hours=${hours}&limit=${limit}&offset=0`)) as {
-      items: Array<{ timestamp: number; bytes_sent: number; bytes_received: number; upstream_rate: number; downstream_rate: number }>;
-      total_count: number;
-      limit: number;
-      offset: number;
-    };
+    const data = (await this.request(`/api/v1/history/bandwidth?hours=${hours}`)) as HistoryResponse;
 
-    allItems.push(...firstPage.items);
-    const totalCount = firstPage.total_count;
-
-    // Fetch remaining pages in parallel if needed
-    if (totalCount > limit) {
-      const remainingPages = [];
-      for (offset = limit; offset < totalCount; offset += limit) {
-        remainingPages.push(
-          this.request(`/api/v1/history/bandwidth?hours=${hours}&limit=${limit}&offset=${offset}`) as Promise<typeof firstPage>
-        );
-      }
-      const pages = await Promise.all(remainingPages);
-      for (const page of pages) {
-        allItems.push(...page.items);
-      }
-    }
+    const records = data.records ?? [];
 
     // Transform: timestamp (Unix seconds) → ms, rates (bps) → Mbps
-    return allItems
+    return records
       .map(item => ({
         time: item.timestamp * 1000,
         download: item.downstream_rate / 1_000_000,

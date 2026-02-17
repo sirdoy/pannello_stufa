@@ -220,34 +220,65 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
         </div>
       </div>
 
-      {/* History Section */}
+      {/* Bandwidth History Section */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          📜 History
+          📈 Bandwidth History
         </Heading>
         <div className="space-y-3">
           <EndpointCard
-            name="Device History"
+            name="Bandwidth History (1h)"
+            url="/api/fritzbox/bandwidth-history?range=1h"
+            externalUrl={`${EXTERNAL_BASE}/api/v1/history/bandwidth?hours=1`}
+            response={getResponses.bwHistory1h}
+            loading={loadingGet.bwHistory1h ?? false}
+            timing={timings.bwHistory1h}
+            onRefresh={() => fetchGetEndpoint('bwHistory1h', '/api/fritzbox/bandwidth-history?range=1h')}
+            onCopyUrl={() => copyUrlToClipboard(`${EXTERNAL_BASE}/api/v1/history/bandwidth?hours=1`)}
+            isCopied={copiedUrl === `${EXTERNAL_BASE}/api/v1/history/bandwidth?hours=1`}
+          />
+          <EndpointCard
+            name="Bandwidth History (24h)"
+            url="/api/fritzbox/bandwidth-history?range=24h"
+            externalUrl={`${EXTERNAL_BASE}/api/v1/history/bandwidth?hours=24`}
+            response={getResponses.bwHistory24h}
+            loading={loadingGet.bwHistory24h ?? false}
+            timing={timings.bwHistory24h}
+            onRefresh={() => fetchGetEndpoint('bwHistory24h', '/api/fritzbox/bandwidth-history?range=24h')}
+            onCopyUrl={() => copyUrlToClipboard(`${EXTERNAL_BASE}/api/v1/history/bandwidth?hours=24`)}
+            isCopied={copiedUrl === `${EXTERNAL_BASE}/api/v1/history/bandwidth?hours=24`}
+          />
+          <EndpointCard
+            name="Bandwidth History (7d)"
+            url="/api/fritzbox/bandwidth-history?range=7d"
+            externalUrl={`${EXTERNAL_BASE}/api/v1/history/bandwidth?hours=168`}
+            response={getResponses.bwHistory7d}
+            loading={loadingGet.bwHistory7d ?? false}
+            timing={timings.bwHistory7d}
+            onRefresh={() => fetchGetEndpoint('bwHistory7d', '/api/fritzbox/bandwidth-history?range=7d')}
+            onCopyUrl={() => copyUrlToClipboard(`${EXTERNAL_BASE}/api/v1/history/bandwidth?hours=168`)}
+            isCopied={copiedUrl === `${EXTERNAL_BASE}/api/v1/history/bandwidth?hours=168`}
+          />
+        </div>
+      </div>
+
+      {/* Device History Section */}
+      <div>
+        <Heading level={2} size="lg" className="mb-4">
+          📜 Device History
+        </Heading>
+        <div className="space-y-3">
+          <EndpointCard
+            name="Device History (24h)"
             url="/api/fritzbox/history?range=24h"
-            externalUrl={`${EXTERNAL_BASE}/api/v1/history/devices?hours=24&page=1`}
+            externalUrl={`${EXTERNAL_BASE}/api/v1/history/devices?hours=24&limit=100&offset=0`}
             response={getResponses.deviceHistory}
             loading={loadingGet.deviceHistory ?? false}
             timing={timings.deviceHistory}
             onRefresh={() => fetchGetEndpoint('deviceHistory', '/api/fritzbox/history?range=24h')}
-            onCopyUrl={() => copyUrlToClipboard(`${EXTERNAL_BASE}/api/v1/history/devices?hours=24&page=1`)}
-            isCopied={copiedUrl === `${EXTERNAL_BASE}/api/v1/history/devices?hours=24&page=1`}
+            onCopyUrl={() => copyUrlToClipboard(`${EXTERNAL_BASE}/api/v1/history/devices?hours=24&limit=100&offset=0`)}
+            isCopied={copiedUrl === `${EXTERNAL_BASE}/api/v1/history/devices?hours=24&limit=100&offset=0`}
           />
-          <div className="bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50 border border-slate-700 [html:not(.dark)_&]:border-slate-300 rounded-lg p-4">
-            <Text variant="secondary" size="sm">
-              <strong>External-only endpoints (no proxy):</strong>
-              <br />
-              <code className="text-xs">{EXTERNAL_BASE}/api/v1/history/bandwidth?hours=24&page=1</code>
-              <br />
-              <code className="text-xs">{EXTERNAL_BASE}/api/v1/fritzbox/history/bandwidth?hours=24&page=1</code>
-              <br />
-              <code className="text-xs">{EXTERNAL_BASE}/api/v1/fritzbox/history/devices?hours=24&page=1</code>
-            </Text>
-          </div>
         </div>
       </div>
 

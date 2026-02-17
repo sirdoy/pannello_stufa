@@ -103,6 +103,34 @@ describe('useBandwidthHistory', () => {
       // Oldest points should be dropped
       expect(result.current.chartData[0]!.time).toBe(now + 20 * 1000); // First 20 dropped
     });
+
+    it('deduplicates points with the same timestamp (server cache hit scenario)', () => {
+      const { result } = renderHook(() => useBandwidthHistory());
+      const now = Date.now();
+
+      act(() => {
+        // Simulate two polls returning the same bandwidth.timestamp (60s server cache)
+        result.current.addDataPoint(createBandwidthData(now, 50, 10));
+        result.current.addDataPoint(createBandwidthData(now, 55, 12)); // same timestamp, different values
+      });
+
+      // Only 1 point should be stored (second is a duplicate)
+      expect(result.current.pointCount).toBe(1);
+      expect(result.current.chartData[0]!.download).toBe(50);
+    });
+
+    it('accepts points with different timestamps (normal polling)', () => {
+      const { result } = renderHook(() => useBandwidthHistory());
+      const now = Date.now();
+
+      act(() => {
+        result.current.addDataPoint(createBandwidthData(now, 50, 10));
+        result.current.addDataPoint(createBandwidthData(now + 30000, 55, 12)); // 30s later
+      });
+
+      // Both points should be stored
+      expect(result.current.pointCount).toBe(2);
+    });
   });
 
   describe('Time range filtering', () => {

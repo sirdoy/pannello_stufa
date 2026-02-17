@@ -35,6 +35,7 @@ jest.mock('../hooks/useBandwidthHistory', () => ({
     pointCount: 0,
     isEmpty: true,
     isCollecting: false,
+    isLoading: false,
   })),
 }));
 

@@ -161,6 +161,7 @@ export default function NetworkPage() {
           onTimeRangeChange={bandwidthHistory.setTimeRange}
           isEmpty={bandwidthHistory.isEmpty}
           isCollecting={bandwidthHistory.isCollecting}
+          isLoading={bandwidthHistory.isLoading}
           pointCount={bandwidthHistory.pointCount}
         />
 

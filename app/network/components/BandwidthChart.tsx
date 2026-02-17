@@ -22,6 +22,7 @@ interface BandwidthChartProps {
   onTimeRangeChange: (range: BandwidthTimeRange) => void;
   isEmpty: boolean;
   isCollecting: boolean;
+  isLoading?: boolean;
   pointCount: number;
 }
 
@@ -97,6 +98,7 @@ export default function BandwidthChart({
   onTimeRangeChange,
   isEmpty,
   isCollecting,
+  isLoading = false,
   pointCount,
 }: BandwidthChartProps) {
   // Tick formatter based on time range
@@ -118,6 +120,17 @@ export default function BandwidthChart({
           <TimeRangeSelector value={timeRange} onChange={onTimeRangeChange} />
         )}
       </div>
+
+      {/* Loading State */}
+      {isLoading && data.length === 0 && (
+        <div className="h-[300px] flex items-center justify-center">
+          <div className="text-center">
+            <Text variant="secondary">
+              Caricamento storico banda...
+            </Text>
+          </div>
+        </div>
+      )}
 
       {/* Empty State */}
       {isEmpty && (

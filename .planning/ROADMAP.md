@@ -72,10 +72,10 @@ See `.planning/milestones/` for full archives.
   3. On mobile (< sm breakpoint), cards stack in a single column in the same order as configured — no layout change visible
   4. Existing spring-in entrance animation plays per card with staggered delay matching the card's flat index in the user's configured order
   5. When a card's content height changes (polling update, expand/collapse), the card wrapper transitions height smoothly rather than snapping
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 68-01: Replace grid with masonry flexbox columns in app/page.tsx and add ANIM-02 CSS transition
+- [ ] 68-01-PLAN.md — Replace Grid with masonry flexbox layout (mobile flat + desktop parity columns) and ANIM-02 CSS transition
 
 ### Phase 69: Edge Cases, Error Boundary & Tests
 **Goal**: Layout handles all real-world card count variations correctly and never collapses a column — verified by unit tests
@@ -109,7 +109,7 @@ Plans:
 | 49-54 | v6.0 | 29/29 | ✓ Complete | 2026-02-11 |
 | 55-60 | v7.0 | 22/22 | ✓ Complete | 2026-02-13 |
 | 61-67 | v8.0 | 18/18 | ✓ Complete | 2026-02-16 |
-| 68. Core Masonry Layout | v8.1 | 0/TBD | Not started | - |
+| 68. Core Masonry Layout | v8.1 | 0/1 | Planned | - |
 | 69. Edge Cases & Tests | v8.1 | 0/TBD | Not started | - |
 
 **Total:** 11 milestones shipped, 67 phases complete, 316 plans executed + v8.1 in progress

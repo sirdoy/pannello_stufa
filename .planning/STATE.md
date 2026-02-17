@@ -13,7 +13,7 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 Phase: 67 (Bandwidth Correlation) — LAST COMPLETED
 Plan: Complete
 Status: v8.0 Milestone Shipped
-Last activity: 2026-02-16 - Completed quick task 25: Add network API debug tab with all endpoints from API.md
+Last activity: 2026-02-17 - Completed quick task 26: Consolidate network API routes under /api/fritzbox/ namespace
 
 Progress: [██████████████████████] 100% (v8.0 complete — 7 phases, 18 plans, 32/32 requirements)
 
@@ -59,10 +59,11 @@ None — milestone complete.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 25 | Add network API debug tab with all endpoints from API.md | 2026-02-16 | 5b89be9 | [25-add-network-api-debug-tab-with-all-endpo](./quick/25-add-network-api-debug-tab-with-all-endpo/) |
+| 26 | Consolidate network API routes under /api/fritzbox/ namespace | 2026-02-17 | 127ce9b | [26-nella-parte-network-utilizza-solo-le-chi](./quick/26-nella-parte-network-utilizza-solo-le-chi/) |
 
 ## Session Continuity
 
-Last session: 2026-02-16
-Stopped at: v8.0 milestone archived
+Last session: 2026-02-17
+Stopped at: Completed quick-26: Consolidate network API routes under /api/fritzbox/ namespace
 Next step: Start next milestone with /gsd:new-milestone
 Resume file: None

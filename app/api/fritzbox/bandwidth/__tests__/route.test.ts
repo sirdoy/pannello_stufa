@@ -12,13 +12,15 @@ jest.mock('@/lib/auth0', () => ({
 }));
 
 import { GET } from '../route';
-import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fritzbox';
+import { fritzboxClient, getCachedData, checkRateLimitFritzBox, appendBandwidthReading, cleanupOldBandwidthHistory } from '@/lib/fritzbox';
 import { auth0 } from '@/lib/auth0';
 
 const mockGetSession = jest.mocked(auth0.getSession);
 const mockFritzboxClient = jest.mocked(fritzboxClient);
 const mockGetCachedData = jest.mocked(getCachedData);
 const mockCheckRateLimit = jest.mocked(checkRateLimitFritzBox);
+const mockAppendBandwidthReading = jest.mocked(appendBandwidthReading);
+const mockCleanupOldBandwidthHistory = jest.mocked(cleanupOldBandwidthHistory);
 
 describe('GET /api/fritzbox/bandwidth', () => {
   let mockRequest: Request;
@@ -37,6 +39,9 @@ describe('GET /api/fritzbox/bandwidth', () => {
     mockGetSession.mockResolvedValue(mockSession as any);
     // Default: rate limit allows
     mockCheckRateLimit.mockResolvedValue({ allowed: true, suppressedCount: 0, nextAllowedIn: 0 });
+    // Fire-and-forget persistence functions: resolve silently
+    mockAppendBandwidthReading.mockResolvedValue(undefined);
+    mockCleanupOldBandwidthHistory.mockResolvedValue(undefined);
     // Mock console methods to suppress output
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});

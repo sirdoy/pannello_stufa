@@ -203,6 +203,19 @@ export function useNetworkData(): UseNetworkDataReturn {
         // Self-heals on next poll — unenriched MACs will be retried.
       });
 
+      // Compute average saturation over last 30 min from sparkline history (trend-awareness)
+      const THIRTY_MIN_MS = 30 * 60 * 1000;
+      const cutoff = Date.now() - THIRTY_MIN_MS;
+      const recentDownload = downloadHistory.filter(p => p.time >= cutoff);
+      const recentUpload = uploadHistory.filter(p => p.time >= cutoff);
+      const linkSpd = wanData.wan?.linkSpeed ?? 100;
+      let historicalAvgSaturation: number | undefined;
+      if (recentDownload.length >= 3) { // Need at least 3 points for meaningful average
+        const avgDown = recentDownload.reduce((s, p) => s + p.mbps, 0) / recentDownload.length;
+        const avgUp = recentUpload.reduce((s, p) => s + p.mbps, 0) / Math.max(recentUpload.length, 1);
+        historicalAvgSaturation = Math.max(avgDown, avgUp) / linkSpd;
+      }
+
       // Update health
       const newHealthResult = computeNetworkHealth({
         wanConnected: wanData.wan?.connected ?? false,
@@ -212,6 +225,7 @@ export function useNetworkData(): UseNetworkDataReturn {
         linkSpeedMbps: wanData.wan?.linkSpeed,
         previousHealth: healthRef.current,
         consecutiveReadings: consecutiveReadingsRef.current,
+        historicalAvgSaturation,
       });
 
       setHealth(newHealthResult.health);

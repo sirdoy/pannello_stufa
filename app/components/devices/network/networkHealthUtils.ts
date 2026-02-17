@@ -20,6 +20,7 @@ export interface ComputeNetworkHealthParams {
   linkSpeedMbps?: number;    // max capacity
   previousHealth: NetworkHealthStatus;
   consecutiveReadings: number;  // how many consecutive readings of current previousHealth
+  historicalAvgSaturation?: number; // Average saturation over last 30 min (0-1), undefined if not enough data
 }
 
 export interface ComputeNetworkHealthResult {
@@ -48,6 +49,7 @@ export function computeNetworkHealth(params: ComputeNetworkHealthParams): Comput
     linkSpeedMbps = 100, // Default 100 Mbps if unknown
     previousHealth,
     consecutiveReadings,
+    historicalAvgSaturation,
   } = params;
 
   // Rule 1: WAN disconnected → immediate 'poor' (bypass hysteresis)
@@ -55,20 +57,26 @@ export function computeNetworkHealth(params: ComputeNetworkHealthParams): Comput
     return { health: 'poor', consecutiveReadings: 0 };
   }
 
-  // Rule 2: Calculate bandwidth saturation
+  // Rule 2: Calculate bandwidth saturation from current reading
   const maxBandwidth = Math.max(downloadMbps, uploadMbps);
   const saturation = maxBandwidth / linkSpeedMbps;
+
+  // Use weighted average if historical data available: 30% current, 70% historical trend
+  // This reduces flapping from single noisy readings
+  const effectiveSaturation = historicalAvgSaturation !== undefined
+    ? 0.3 * saturation + 0.7 * historicalAvgSaturation
+    : saturation;
 
   // Rule 3: Compute raw health status based on thresholds
   let computedHealth: NetworkHealthStatus;
 
-  if (wanUptime >= 24 * 3600 && saturation < 0.7) {
+  if (wanUptime >= 24 * 3600 && effectiveSaturation < 0.7) {
     // Uptime >= 24h AND saturation < 70%
     computedHealth = 'excellent';
-  } else if (wanUptime >= 3600 && saturation < 0.85) {
+  } else if (wanUptime >= 3600 && effectiveSaturation < 0.85) {
     // Uptime >= 1h AND saturation < 85%
     computedHealth = 'good';
-  } else if (wanUptime >= 600 && saturation < 0.95) {
+  } else if (wanUptime >= 600 && effectiveSaturation < 0.95) {
     // Uptime >= 10min AND saturation < 95%
     computedHealth = 'degraded';
   } else {

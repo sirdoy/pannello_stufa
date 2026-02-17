@@ -13,7 +13,7 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 Phase: 67 (Bandwidth Correlation) — LAST COMPLETED
 Plan: Complete
 Status: v8.0 Milestone Shipped
-Last activity: 2026-02-17 - Completed quick task 26: Consolidate network API routes under /api/fritzbox/ namespace
+Last activity: 2026-02-17 - Completed quick task 27: Use historical bandwidth data for network health and charts
 
 Progress: [██████████████████████] 100% (v8.0 complete — 7 phases, 18 plans, 32/32 requirements)
 
@@ -60,10 +60,11 @@ None — milestone complete.
 |---|-------------|------|--------|-----------|
 | 25 | Add network API debug tab with all endpoints from API.md | 2026-02-16 | 5b89be9 | [25-add-network-api-debug-tab-with-all-endpo](./quick/25-add-network-api-debug-tab-with-all-endpo/) |
 | 26 | Consolidate network API routes under /api/fritzbox/ namespace | 2026-02-17 | 68a677f | [26-nella-parte-network-utilizza-solo-le-chi](./quick/26-nella-parte-network-utilizza-solo-le-chi/) |
+| 27 | Use historical bandwidth data for network health and charts | 2026-02-17 | 7a4f061 | [27-use-historical-bandwidth-data-for-networ](./quick/27-use-historical-bandwidth-data-for-networ/) |
 
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed quick-26: Consolidate network API routes under /api/fritzbox/ namespace
+Stopped at: Completed quick-27: Use historical bandwidth data for network health and charts
 Next step: Start next milestone with /gsd:new-milestone
 Resume file: None

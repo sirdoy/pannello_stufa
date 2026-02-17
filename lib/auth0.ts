@@ -75,7 +75,10 @@ const auth0Config = BYPASS_AUTH ? {} : {
 // This ensures auth0.getSession() in server pages returns the mock session without any
 // changes to those pages.
 export const auth0 = BYPASS_AUTH
-  ? ({ getSession: async () => MOCK_SESSION } as unknown as Auth0Client)
+  ? ({
+      getSession: async () => MOCK_SESSION,
+      middleware: async () => undefined,
+    } as unknown as Auth0Client)
   : new Auth0Client(auth0Config);
 
 /** Route context interface */

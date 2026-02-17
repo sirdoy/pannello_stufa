@@ -1,230 +1,207 @@
-# Feature Landscape: Fritz!Box Network Monitoring
+# Feature Landscape: Masonry Layout for Dashboard
 
-**Domain:** Home network monitoring dashboard
-**Researched:** 2026-02-13
+**Domain:** Dashboard card layout — masonry for smart home PWA
+**Researched:** 2026-02-17
+
+## Context
+
+Adding masonry layout to an existing dashboard home page. Current state:
+- 6 device cards (stove, thermostat, weather, lights, camera, network)
+- Standard CSS Grid: 2 cols desktop (`grid-cols-1 sm:grid-cols-2`), 1 col mobile
+- User-configurable card order (up/down buttons in settings, saved to Firebase)
+- Staggered `animate-spring-in` entrance animation (CSS keyframe, 100ms delay per index)
+- Error boundaries wrap each card (`DeviceCardErrorBoundary`)
+- Cards have varying heights (stove card is tall, weather card moderate, network card varies by data)
+
+---
 
 ## Table Stakes
 
-Features users expect in a network monitoring UI. Missing = product feels incomplete.
+Features users expect from masonry. Missing = layout feels broken or incomplete.
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| **Device list with online/offline status** | Core functionality — users need to know what's connected | Low | Badge variant for online/offline, existing ConnectionStatus component |
-| **Device identification (name, IP, MAC)** | Users need to identify devices quickly | Low | Display in DataTable, name editable via API |
-| **Real-time bandwidth usage** | Standard expectation from router monitoring tools | Medium | Chart with upload/download, polling every 5-10s |
-| **Current WAN connection status** | Users need to know if internet is up | Low | Badge + uptime display, existing HealthIndicator component |
-| **WAN uptime tracking** | Expected for connection reliability monitoring | Low | Display formatted uptime, already in API data |
-| **Responsive mobile layout** | PWA requirement — users monitor from phones | Low | Grid → stack pattern exists (StoveCard, LightsCard) |
-| **Device connection/disconnection events** | Users expect to see when devices join/leave network | Medium | Timeline or list of recent events with timestamps |
-| **Bandwidth chart visualization** | Standard for network tools — visualize traffic over time | Medium | Line/area chart, similar to analytics UsageChart |
-| **External IP display** | Basic info users check in router interface | Low | Text display with copy-to-clipboard |
+| **Gap elimination between cards** | The point of masonry — no empty vertical space below shorter cards | Low | CSS multi-column or JS layout engine both achieve this |
+| **Consistent column width** | Cards should align to grid, not float freely | Low | Same column count as current (2 desktop, 1 mobile) |
+| **Mobile unchanged (1 col stacked)** | Mobile single-column layout needs no masonry; adding it breaks readability | Low | Masonry only activates at `sm:` breakpoint and above |
+| **No content jumping on load** | Layout should stabilize once cards render; cards shifting after data load is jarring | Medium | Cards with polling (stove, thermostat) can change height mid-session — must handle gracefully |
+| **Error boundary cards still sized correctly** | If a card errors, its error fallback should occupy a reasonable height in the column | Low | DeviceCardErrorBoundary fallback needs a min-height to prevent column distortion |
+| **User card order respected** | User-configured order (from settings) must be the primary sort key; masonry fills vertically within that constraint | Medium-High | This is the fundamental tension — see Anti-Features |
+| **Gap between columns** | Horizontal gap must exist between columns, matching current `gap-8 lg:gap-10` | Low | Gap must be explicit; CSS multi-column has a known `column-gap` only issue |
+
+---
 
 ## Differentiators
 
-Features that set product apart from basic router interfaces. Not expected, but valued.
+Features that go beyond the visual baseline. Not expected but noticeably improve the experience.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| **Smart device naming suggestions** | Better UX than router defaults ("android-xyz") | Medium | AI or pattern matching based on manufacturer, port activity |
-| **Historical device presence tracking** | See patterns: "Device connects every weekday 9-5pm" | Medium | Timeline visualization, requires 7-day history storage |
-| **Bandwidth correlation with stove heating** | Unique to smart home context — IoT impact visibility | High | Joins Fritz!Box + Stove analytics data, requires consent |
-| **Device categorization (IoT, mobile, PC)** | Organizes large device lists | Medium | Auto-detect via MAC vendor + user override |
-| **Anomaly detection (unusual bandwidth)** | Proactive alerts for security/performance | High | Requires baseline calculation, notification integration |
-| **Guest network monitoring** | Separate visibility for guest devices | Medium | Fritz!Box supports guest network tracking |
-| **Data usage per-device over time** | Track which devices consume most data | High | Requires per-device history API, Fritz!Box may not expose |
-| **Network health score** | Glanceable dashboard metric (like HealthIndicator) | Low | Aggregate WAN status + device count + bandwidth % |
-| **Quick device blocking** | One-click parental controls/security | Medium | API must support device blocking, ethical considerations |
+| **Smooth entrance animation preserved** | Staggered spring-in should still work; cards animating into their masonry positions looks polished | Medium | Need to preserve `animate-spring-in` with `animationDelay` per index; FLIP transition for repositioning is overkill at 6 cards |
+| **No layout reflow after card data loads** | Cards that expand (e.g., stove showing maintenance banner) don't cause visible column re-balancing | High | Requires either fixed card heights or a JS layout engine with `ResizeObserver` |
+| **Skeleton loading at correct approx height** | Skeleton placeholder matches approximate card height so layout doesn't jump dramatically when real content appears | Medium | Stove card ~480px, weather ~320px, network ~260px — skeletons should approximate these |
+| **Column balance maintained across visible set** | If user hides cards, remaining cards still distribute evenly across columns | Medium | Layout engine must re-run when `visibleCards` changes |
+
+---
 
 ## Anti-Features
 
-Features to explicitly NOT build (scope creep or privacy concerns).
+Features to explicitly NOT build for this milestone.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| **Deep packet inspection UI** | Privacy violation, overkill for home use | Show aggregate bandwidth, not specific URLs/apps |
-| **Always-on video surveillance of network traffic** | Performance impact, privacy violation | Snapshot polling every 5-10s, not streaming |
-| **Network security scanner** | Complex, requires pentesting expertise | Show basic health status, link to Fritz!Box admin |
-| **DNS query logging UI** | Privacy-invasive, sensitive data | Leave to Fritz!Box admin interface if needed |
-| **Port forwarding management** | Complex, dangerous for non-technical users | Link to Fritz!Box admin for advanced features |
-| **Firmware update UI** | Risky if botched, router-specific | Show update available notification, link to admin |
-| **Device fingerprinting beyond MAC vendor** | Privacy violation, surveillance-like | Basic device info only (IP, MAC, vendor, name) |
+| **Algorithm-driven column assignment** | True masonry (place card in shortest column regardless of user order) breaks user-configured order. Home Assistant community explicitly identified this as "the masonry layout doesn't make sense" — cards end up in arbitrary positions that differ from the user's intended sequence | Use a two-column CSS approach that respects DOM order: column 1 gets odd cards (1, 3, 5), column 2 gets even cards (2, 4, 6). User order is the primary sort key. |
+| **Drag-and-drop reorder on the home page** | Home Assistant explicitly found that masonry + drag-and-drop "cannot co-exist" predictably — users don't understand which column a dragged card will land in | Keep reorder in settings page (up/down buttons), masonry layout is display-only |
+| **FLIP animation on column repositioning** | At 6 cards with low update frequency, FLIP adds complexity with no perceptible benefit. Repositioning only happens when visibility changes (rare) | Accept instant reposition when card visibility changes; entrance animation already covers the "in" case |
+| **Native CSS Grid masonry (`grid-template-rows: masonry`)** | Browser support is still limited (Firefox Nightly, Safari TP only as of 2026-02); production use requires polyfill or JS fallback anyway | Use CSS multi-column (`columns: 2`) or explicit two-column flexbox — both have universal support |
+| **Auto-column count based on viewport** | Dashboard is defined as 2 cols desktop, 1 col mobile. Auto-column logic adds complexity and would break the user's mental model of the layout | Keep fixed column counts: 1 mobile, 2 desktop |
+| **Per-card spanning (wide cards)** | Spanning across 2 columns in masonry requires JS measurement and breaks column balance | All cards are same width (1 column). Not needed for this project. |
+| **Infinite scroll / virtualized masonry** | Only 6 cards — virtualization is engineering overkill | Simple layout only |
+
+---
 
 ## Feature Dependencies
 
 ```
-WAN Status Display → (no dependencies)
-Device List → (no dependencies)
-Bandwidth Chart → Device List (to show per-device option)
-Device History Timeline → Device List (historical data)
-Network Health Score → WAN Status + Device List + Bandwidth Chart
-Bandwidth Correlation (differentiator) → Analytics Consent + Stove Analytics Data
+Masonry column layout
+  └── Existing card order from Firebase (visibleCards array, already sorted by user order)
+  └── Error boundary fallback min-height (card must not collapse to 0px)
+  └── Mobile unchanged (layout applies only at sm: breakpoint)
+
+No-jump loading
+  └── Requires approximate card heights for skeleton OR accepting initial reflow
+  └── Cards with ResizeObserver (for dynamic height changes mid-session)
+
+Entrance animation
+  └── `animate-spring-in` + animationDelay continues working (applies to wrapper div)
+  └── Must not conflict with CSS column layout (column items don't need special treatment)
 ```
 
-## MVP Recommendation
+---
 
-**Phase 1: Core Monitoring (Table Stakes)**
+## "Good Masonry" vs "Broken Masonry"
 
-Prioritize:
-1. **NetworkCard** (dashboard summary)
-   - WAN status badge (online/offline, uptime)
-   - Connected device count
-   - Current bandwidth usage (up/down)
-   - Network health indicator
-   - Link to /network page
-2. **Device List (DataTable)**
-   - Name (editable), IP, MAC, Status badge
-   - Sorting, filtering, pagination (existing DataTable component)
-   - Last seen timestamp for offline devices
-3. **Bandwidth Chart**
-   - Real-time line chart (upload/download Mbps)
-   - Time range selector (1h, 6h, 24h, 7d)
-   - Uses existing Recharts from analytics page
-4. **WAN Status Panel**
-   - External IP (with copy button)
-   - Connection status badge
-   - Uptime duration
-   - Reconnection count (if available)
+### Good masonry looks like:
+- Stove card (tall) and thermostat card (medium) sit side by side, both start at the top. Weather card appears below the shorter one with no empty gap between them.
+- After a card errors and shows its compact error fallback, the column below it fills the space naturally — no large white gap.
+- When the user hides a card in settings and returns to the home page, cards redistribute into the two columns without visible "jumping."
+- On first load, cards spring in one by one (staggered 100ms) and settle into their masonry positions.
+- On mobile: unchanged single-column stack, top-to-bottom in user-configured order.
 
-**Phase 2: Historical & Differentiators**
+### Broken masonry looks like:
+- Card 1 appears in the right column because card 2 happened to load taller, swapping their visual positions relative to user-configured order.
+- Large white gaps appear in a column because a card loaded with less content than expected.
+- After 5 seconds (stove polling), the stove card grows taller and pushes cards below it down, causing a visible re-layout jump.
+- The error boundary card collapses to near-zero height, leaving a half-column empty.
+- Horizontal gap between columns differs from vertical gap (broken gap spec in CSS multi-column).
 
-Defer to Phase 2:
-5. **Device History Timeline**
-   - Connection/disconnection events
-   - Visual timeline (last 24h, 7d)
-   - Filter by device
-6. **Network Health Score**
-   - Aggregate metric (0-100)
-   - Factors: WAN uptime, device count anomalies, bandwidth saturation
-   - HealthIndicator component with "excellent/good/degraded/poor"
-7. **Device Categorization**
-   - Auto-detect: IoT, mobile, PC, smart home, unknown
-   - User override with Select component
-   - Color-coded badges per category
+---
 
-**Phase 3: Advanced (If Time Permits)**
+## Implementation Approach (Opinionated)
 
-8. **Bandwidth Correlation with Stove**
-   - Requires analytics consent
-   - Chart overlay: network bandwidth + stove power
-   - Insight: "Network usage spikes when stove heats"
+### Recommended: Two-Column Flexbox with DOM Order
 
-## Integration with Existing Patterns
+The simplest approach that preserves user order AND eliminates gaps is:
 
-### Leverages Existing Components
+```
+Column A: visibleCards[0], visibleCards[2], visibleCards[4]
+Column B: visibleCards[1], visibleCards[3], visibleCards[5]
+```
 
-| Component | Use Case | Notes |
-|-----------|----------|-------|
-| **DataTable** | Device list with sorting/filtering | Already supports pagination, keyboard nav |
-| **Badge** | Device status, WAN status | Variants: sage (online), neutral (offline) |
-| **HealthIndicator** | Network health score | Existing ok/warning/critical variants |
-| **Card** | NetworkCard layout | Use elevated variant with hover |
-| **SmartHomeCard** | NetworkCard structure | Icon 📡, colorTheme "ocean" |
-| **Recharts (LineChart)** | Bandwidth chart | Similar to UsageChart in analytics |
-| **Button.Icon** | Copy IP button | Use existing icon button pattern |
-| **Text** | Timestamps, metrics display | Use variant="secondary" for metadata |
-| **Heading** | Section titles | level={2-3}, variant="ember" for accents |
+Implemented as two `<div className="flex flex-col gap-8">` side by side in a flex container. Each card renders at its natural height. No algorithm, no DOM reordering, no JS measurement.
 
-### Follows Existing Patterns
+**Why not CSS multi-column (`columns: 2`):** Multi-column is column-first (reads top-to-bottom in column 1, then column 2). User order 1,2,3,4,5,6 becomes visual order 1,3,5 on left and 2,4,6 on right. This violates the "left-to-right reading order" expectation for a 2-column grid — user expects card 2 to the right of card 1, not card 3.
 
-| Pattern | Where Used | How to Apply |
-|---------|-------------|--------------|
-| **Orchestrator (hooks + presentational)** | StoveCard, LightsCard | useNetworkData + useNetworkCommands hooks |
-| **Self-Contained Card** | All device cards | All NetworkCard info inside card, no external banners |
-| **Adaptive Polling** | useVisibility hook | Poll bandwidth every 5s when visible, pause when hidden |
-| **Offline Staleness** | useNetworkQuality | Show staleness indicator if data > 30s old |
-| **Device Registry** | lib/devices/deviceTypes.ts | Add NETWORK device config with routes, features |
-| **Analytics Consent** | ConsentBanner | Check canTrackAnalytics() before correlation features |
+**Why not CSS Grid masonry:** Browser support insufficient for production without polyfill.
 
-### New Components Required
+### Column Assignment Rule
 
-| Component | Purpose | Complexity |
-|-----------|---------|------------|
-| **NetworkCard.tsx** | Dashboard summary card | Low (follows SmartHomeCard pattern) |
-| **DeviceTable.tsx** | Device list with DataTable | Low (wraps existing DataTable) |
-| **BandwidthChart.tsx** | Real-time bandwidth line chart | Medium (Recharts + polling) |
-| **WANStatusPanel.tsx** | WAN info panel | Low (text + badges) |
-| **DeviceHistoryTimeline.tsx** | Timeline visualization (Phase 2) | High (custom timeline rendering) |
-| **NetworkHealthScore.tsx** | Aggregate health metric (Phase 2) | Medium (calculation logic + HealthIndicator) |
+Cards are split by index: even-index → left column, odd-index → right column. This means:
+- Card at position 0 → left
+- Card at position 1 → right
+- Card at position 2 → left
+- etc.
+
+This preserves user intent: card 1 is top-left (most prominent), card 2 is top-right, then alternating down.
+
+### Height Change Handling
+
+Cards with polling (stove 5s, thermostat varies) can change height after load. Accept this: when a card's height changes, the column grows naturally and only content below it shifts — this is the same as any normal document reflow and is not perceptually jarring at 6 items.
+
+Do NOT add ResizeObserver-triggered JS re-balancing. At 6 cards, the benefit is zero and the complexity is significant.
+
+---
 
 ## Complexity Breakdown
 
-### Low Complexity (1-2h each)
-- NetworkCard dashboard summary
-- WAN Status Panel
-- Device Registry config
-- Device identification display (IP, MAC, name)
+### Low Complexity (< 1h)
+- Two-column flexbox layout in `app/page.tsx` (replace `<Grid cols={2}>` with two flex column divs)
+- Mobile unchanged (conditional rendering: masonry on `sm:`, stack below)
+- Preserve `animate-spring-in` + `animationDelay` on each card wrapper
 
-### Medium Complexity (3-5h each)
-- Device List with DataTable integration
-- Bandwidth Chart with real-time polling
-- Device connection/disconnection events
-- Device categorization
-- Historical device presence tracking
+### Medium Complexity (2-4h)
+- Error boundary fallback min-height (coordinate with DeviceCardErrorBoundary)
+- Empty state when all cards hidden (existing `<EmptyState>` component, behavior unchanged)
+- Testing: verify column assignment matches expected user order with various card counts
 
-### High Complexity (6-8h each)
-- Device History Timeline visualization
-- Bandwidth correlation with stove analytics
-- Anomaly detection logic
-- Network Health Score calculation
+### High Complexity (not recommended for this milestone)
+- No-jump loading with skeleton height approximation
+- FLIP animations on column rebalancing
+- ResizeObserver-driven dynamic rebalancing
 
-## API Requirements
+---
 
-Based on question context, API provides:
+## Integration with Existing Patterns
 
-| Endpoint | Data | Polling Frequency |
-|----------|------|-------------------|
-| `/api/fritz/devices` | Device list (IP, name, MAC, status) | 10s (stale data acceptable) |
-| `/api/fritz/bandwidth` | Current up/down speeds, bytes sent/received | 5s (real-time needed) |
-| `/api/fritz/wan` | External IP, connection status, uptime | 30s (slow-changing) |
-| `/api/fritz/history/devices` | Device connection events (7 days) | 60s (historical) |
-| `/api/fritz/history/bandwidth` | Bandwidth history (7 days) | 60s (historical) |
+| Existing Pattern | How Masonry Interacts |
+|------------------|-----------------------|
+| `Grid` component (`app/components/ui/Grid.tsx`) | Replace `<Grid cols={2}>` on homepage with masonry-aware wrapper; keep `Grid` component untouched |
+| `animate-spring-in` CSS keyframe | Continues working — applies to the `<div>` wrapper around each card, unaffected by column layout |
+| `DeviceCardErrorBoundary` | Must receive `className="min-h-[160px]"` or similar to prevent 0-height collapsed columns |
+| `visibleCards` array (sorted by user order) | Split into left/right arrays by index: `visibleCards.filter((_, i) => i % 2 === 0)` for left column |
+| `EmptyState` | Span full width when shown (flex container, add `w-full` wrapper) |
 
-**Note:** Verify API supports device name updates (PUT `/api/fritz/devices/:mac`).
+---
 
 ## Mobile Considerations
 
-PWA-specific patterns for mobile network monitoring:
+Mobile (< `sm:` breakpoint) is unchanged: single column, top-to-bottom in user order. The masonry wrapper only activates at `sm:` and above. This is a hard requirement from the project context.
 
-| Feature | Mobile Pattern |
-|---------|----------------|
-| **NetworkCard** | Full-width card, stack metrics vertically |
-| **Device List** | Horizontal scroll for DataTable on small screens |
-| **Bandwidth Chart** | Responsive Recharts, reduce time range options (1h, 24h only) |
-| **WAN Status** | Collapsible panel, show only critical info initially |
-| **Timeline** | Horizontal scroll with touch gestures |
+---
 
 ## Testing Considerations
 
-| Test Type | Focus Area |
+| Test Case | Importance |
 |-----------|------------|
-| **Unit** | Device filtering, status mapping, uptime formatting |
-| **Integration** | Polling hooks, DataTable sorting/filtering |
-| **E2E** | NetworkCard → /network navigation, device list interaction |
-| **Accessibility** | Keyboard nav in DataTable, screen reader announcements for status changes |
+| 6 visible cards → 3 per column, correct assignment (0,2,4 left / 1,3,5 right) | Critical |
+| 5 visible cards → 3 left, 2 right | High |
+| 1 visible card → 1 left, right empty | High |
+| 0 visible cards → EmptyState renders full-width | Medium |
+| Error boundary in any position → no collapsed column | High |
+| Mobile viewport → single column stack, masonry divs not rendered | Critical |
+| `animate-spring-in` fires for all cards with correct delay | Medium |
+
+---
 
 ## Sources
 
-**Network Monitoring Dashboard Features:**
-- [Home Assistant 2026.1 Dashboard Update](https://www.home-assistant.io/blog/2026/01/07/release-20261/)
-- [Network Monitoring Dashboard Features & Benefits - Motadata](https://www.motadata.com/blog/network-monitoring-dashboard/)
-- [Network Monitoring Dashboard Tools - Domotz](https://www.domotz.com/features/network-monitoring-dashboards.php)
+**CSS Masonry & Layout Approaches:**
+- [MDN: Masonry layout (CSS Grid Module Level 3)](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Grid_layout/Masonry_layout)
+- [CSS-Tricks: Making a Masonry Layout That Works Today](https://css-tricks.com/making-a-masonry-layout-that-works-today/)
+- [Smashing Magazine: Masonry in CSS — Should Grid Evolve Or Stand Aside?](https://www.smashingmagazine.com/2025/05/masonry-css-should-grid-evolve-stand-aside-new-module/)
+- [Tobias Ahlin: CSS masonry with flexbox, :nth-child(), and order](https://tobiasahlin.com/blog/masonry-with-css/)
 
-**Router Monitoring UI Best Practices:**
-- [How to Monitor Router Traffic - Comparitech](https://www.comparitech.com/net-admin/how-to-monitor-router-traffic/)
-- [How to Monitor Network Devices - Obkio](https://obkio.com/blog/how-to-monitor-network-devices/)
-- [Best Bandwidth Monitoring Tools - Zenarmor](https://www.zenarmor.com/docs/network-basics/6-best-bandwidth-monitoring-tools)
+**Home Assistant Masonry — Real-world UX Failures:**
+- [Home Assistant Masonry View Documentation](https://www.home-assistant.io/dashboards/masonry/)
+- [HA Community: Masonry Layout Doesn't Make Sense](https://community.home-assistant.io/t/masonry-layout-doesnt-make-sense/527497)
+- [HA Blog: Dashboard Chapter 1 — Moving Away from Masonry](https://www.home-assistant.io/blog/2024/03/04/dashboard-chapter-1/)
 
-**Fritz!Box Capabilities:**
-- [Fritz!Box Network Devices Monitoring - Netdata](https://www.netdata.cloud/monitoring-101/fritzbox-monitoring/)
-- [Real-time Traffic Analysis on Fritz!Box - ntop](https://www.ntop.org/how-to-use-ntopng-for-realtime-traffic-analysis-on-fritzbox-routers/)
-- [AVM Fritz!Box WAN Interface Sensor - PRTG](https://www.paessler.com/manuals/prtg/avm_fritzbox_wan_interface_v2_sensor)
+**React Masonry Libraries (Considered, Not Recommended for This Use Case):**
+- [react-masonry-css](https://github.com/paulcollett/react-masonry-css) — dependency-free, simple API, but column-first DOM order breaks user-order expectation
+- [Masonic](https://github.com/jaredLunde/masonic) — virtualized, overkill for 6 cards
 
-**UI Design Patterns:**
-- [Table vs List vs Cards - UX Patterns](https://uxpatterns.dev/pattern-guide/table-vs-list-vs-cards)
-- [Card UI Design Best Practices - Eleken](https://www.eleken.co/blog-posts/card-ui-examples-and-best-practices-for-product-owners)
-- [Timeline Visualization - KronoGraph](https://cambridge-intelligence.com/kronograph/)
+**MUI Masonry (Sequential Mode):**
+- [React Masonry component - Material UI](https://mui.com/material-ui/react-masonry/) — sequential mode fills left-to-right, closest to what's needed; but importing MUI for one component is not justified
 
-**Device Tracking & History:**
-- [Router History Logs & Connected Devices - TheLinuxCode](https://thelinuxcode.com/how-to-check-router-history-logs-connected-devices-and-what-you-can-and-cant-see-in-2026/)
-- [MAC Address Tracker - ManageEngine](https://www.manageengine.com/products/oputils/mac-address-tracker.html)
-- [Network Bandwidth Visualization - Kentik](https://www.kentik.com/kentipedia/bandwidth-utilization-monitoring/)
+**SAP Fiori Masonry Guidelines:**
+- [Masonry Layout - SAP Fiori for iOS Design Guidelines](https://experience.sap.com/fiori-design-ios/article/masonry-layout/) — use 3 columns for regular size class, 1 for compact

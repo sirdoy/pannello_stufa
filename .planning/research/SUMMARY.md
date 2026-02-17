@@ -1,309 +1,173 @@
 # Project Research Summary
 
-**Project:** Pannello Stufa v7.0 — Performance & Resilience Hardening
-**Domain:** Smart Home IoT Control PWA
-**Researched:** 2026-02-11
+**Project:** Pannello Stufa — v8.1 Masonry Dashboard Layout
+**Domain:** CSS masonry layout for Next.js 15.5 PWA dashboard
+**Researched:** 2026-02-17
 **Confidence:** HIGH
 
 ## Executive Summary
 
-Pannello Stufa is a production Next.js 15.5 PWA controlling a Thermorossi stove, Netatmo thermostat, and Philips Hue lights. After six successful milestones (v6.0 just completed), the v7.0 focus is hardening: retry strategies for transient failures, adaptive polling for resource efficiency, error boundaries for graceful degradation, component splitting for 1200-1500 LOC monolithic files, and automated FCM token cleanup.
+This milestone adds masonry layout to the existing 6-card smart home dashboard: no empty vertical gaps below shorter cards on desktop (2 columns), mobile stays unchanged (1 column), and user-configured Firebase card order is fully respected. The research produced four distinct recommendations that conflict on key tradeoffs. This summary resolves the conflict with a clear, opinionated recommendation.
 
-**The recommended approach is incremental enhancement:** The existing architecture (PWA hooks, Firebase RTDB, Auth0) provides solid foundation. Critical changes include (1) adding @lifeomic/attempt for exponential backoff retry on device commands, (2) using native Page Visibility API for adaptive polling (no library needed), (3) implementing error boundaries at feature level (StoveCard, LightsCard), (4) splitting large components using orchestrator pattern with error boundary per section, and (5) extending the existing 7-day token cleanup with retry logic and delivery-based staleness tracking. All changes are additive—no breaking refactors required.
+The core tension is: **CSS columns is SSR-safe and requires zero JS, but fills column-first (cards 0,2,4 on left / 1,3,5 on right), violating the user's expected left-to-right reading order.** The pitfalls researcher explicitly flagged CSS columns ordering as a critical pitfall (Pitfall 3). JS-based approaches (ResizeObserver hook) preserve row-first order but require a client component boundary. The simplest approach — explicit two-column flexbox split by index — preserves order, requires no hooks, no client boundary, and no new dependencies.
 
-**Key risks center on safety-critical device control:** Non-idempotent retries could trigger duplicate ignite commands (physical safety issue), layered retry amplification (component + API + external service) causes request storms, adaptive polling that slows critical stove status creates coordination failures with thermostat/scheduler, and error boundaries that swallow maintenance alerts bypass safety validations. Mitigation requires idempotency keys on POST routes, single retry layer at API boundary only, fixed 5s polling for stove status (never adaptive), and custom ValidationError class to distinguish expected errors from crashes.
+**Recommendation: Two-column flexbox split with explicit column arrays.** Split `visibleCards` by index at render time — even-indexed cards into a left flex column, odd-indexed cards into a right flex column. This is pure JSX that runs in the existing server component with zero new dependencies, no hydration mismatch, and no client boundary. Card 0 appears top-left, card 1 top-right, card 2 second-left — exactly matching user expectation from the Firebase-configured order. Vertical gaps are eliminated because each column is an independent `flex flex-col` container. This is also the safest approach for the PWA: service worker caches the HTML structure, and since there are no JS-calculated positions, the cached HTML is always valid. If true height-balancing masonry becomes necessary in a future milestone (12+ cards, dramatic height disparities), the stack researcher's `useMasonryGrid` hook is the documented next step.
 
 ## Key Findings
 
 ### Recommended Stack
 
-**Single new dependency:** @lifeomic/attempt v3.1.1 provides production-grade exponential backoff with jitter, timeout, and error handlers. Alternative (exponential-backoff npm) lacks timeout/abort support. Manual retry implementation is error-prone and lacks jitter for thundering herd prevention.
+No new dependencies are required. Every JS masonry library evaluated is either unmaintained (`react-masonry-css`, abandoned 5 years ago), has SSR issues with Next.js App Router (`react-responsive-masonry`, GitHub issue #127), requires known aspect ratios at render time (`@masonry-grid/react`), or fills column-first breaking user order. CSS native masonry (`grid-template-rows: masonry`) has 0% stable browser support as of Feb 2026 — Chrome and Apple disagree on the spec. The two-column flexbox split requires no new files beyond `app/page.tsx` changes and tests.
+
+See [STACK-masonry-layout.md](STACK-masonry-layout.md) for full library-by-library evaluation.
 
 **Core technologies:**
-- **Next.js 16.1.0 App Router:** error.tsx file convention provides granular error boundaries at route segment level—use at `/app/error.tsx` (global), `/app/(authenticated)/error.tsx` (auth-only), and `/app/(authenticated)/dashboard/error.tsx` (per-feature)
-- **React 19.2.0:** Error boundaries (class components), React.lazy + Suspense for code splitting, native support stable in React 18+
-- **TypeScript 5.x (strict mode enabled):** Type safety for retry logic, polling state machines, error boundary props
-- **Page Visibility API (browser built-in):** No library needed—`document.visibilityState` check before polling reduces Firebase RTDB calls by 50% when tabs hidden
-- **Jest 30.2.0 built-in coverage:** Use `jest --coverage --collectCoverageFrom='app/api/**/*.ts'` for critical API route testing—80% branch coverage threshold recommended
-
-**What NOT to use:**
-- ❌ react-error-boundary package (Next.js App Router provides native error.tsx)
-- ❌ Polling libraries like react-query/swr (over-engineered for simple visibility-aware polling)
-- ❌ Global-only error boundaries (errors bubble up—need granular boundaries)
-- ❌ Custom error boundary class components at component-instance level (too granular)
+- **Tailwind CSS `flex flex-col` utilities**: Two side-by-side flex columns — no new primitives, pattern already used throughout project
+- **Existing `Grid` component** (`app/components/ui/Grid.tsx`): Left untouched; masonry replaces only the homepage grid usage
+- **No new hook, no client boundary**: Index-based column split (`i % 2 === 0`) is plain array logic executable in the server component
 
 ### Expected Features
 
+See [FEATURES.md](FEATURES.md) for full analysis with complexity ratings.
+
 **Must have (table stakes):**
-- **Error boundaries** at feature level (StoveCard, LightsCard, SchedulerCard)—one component error shouldn't crash entire app
-- **Exponential backoff retry** for device commands (3-5 retries, 200ms → 5s with jitter)—production apps without retry feel broken
-- **Visibility API polling** stop/resume—OS throttles hidden tabs anyway, explicit handling prevents conflicts and saves 80% resources
-- **Component splitting** for 1000+ LOC files (StoveCard 1510 LOC, LightsCard 1203 LOC)—improves maintainability and parse time
-- **Token cleanup automation** with 30-day staleness detection—Firebase best practice, prevents unbounded growth
+- Gap elimination between cards — no empty vertical space below shorter cards in a column
+- Firebase card order respected — user's configured flat order maps predictably to visual positions (0=top-left, 1=top-right, 2=second-left)
+- Mobile unchanged — single-column stack, masonry only at `sm:` breakpoint
+- Spring entrance animation preserved — `animate-spring-in` with 100ms delay per index continues working
+- Error boundary cards at reasonable height — compact fallback must not leave a column visually collapsed
 
-**Should have (competitive):**
-- **Adaptive polling state machine** (active 5s / idle 30s / hidden stop / error backoff)—beyond simple visibility toggle
-- **Granular loading states** per device, not app-wide spinner—better UX for multi-device operations
-- **Automatic error recovery** in boundaries (2 retry attempts before fallback)—most apps just show error
-- **Component health monitoring** via error boundary logging to Firebase Analytics—proactive error detection
+**Should have (differentiators):**
+- Column balance maintained when cards are hidden — even/odd split adapts cleanly to 5, 4, 3 visible cards
+- Animation stagger remains coherent — flat index order produces visually sensible cascade
 
-**Defer (v2+):**
-- WebSocket real-time updates (polling adequate for thermostat control)
-- Service worker advanced cache strategies (Serwist offline mode already exists)
-- Performance monitoring Lighthouse CI (manual audits sufficient)
-- Comprehensive E2E coverage (3-5 critical flows sufficient)
+**Defer (out of scope for this milestone):**
+- Skeleton heights approximating card content (complex, low ROI for 6 cards)
+- FLIP animation on card visibility change (overkill at 6 cards, high complexity)
+- ResizeObserver-driven dynamic height rebalancing (adds complexity, flex flow handles gracefully)
+- Drag-and-drop reorder on home page (incompatible with masonry in general — confirmed by Home Assistant post-mortem)
 
 ### Architecture Approach
 
-**Orchestrator pattern with error boundary isolation:** Large monolithic components (StoveCard 1510 LOC) split into orchestrator (~200 LOC) managing state and polling, plus 5-6 subcomponents (~150-250 LOC each) for presentation. Single `useAdaptivePolling()` hook in orchestrator prevents polling multiplication. Each logical section wrapped in `DeviceErrorBoundary` for graceful degradation. Pass data via props to avoid context re-render cascades.
+Three researchers recommended three different architecture patterns; the fourth (pitfalls) correctly identified the fatal flaw in one of them. The synthesis picks the simplest viable approach:
 
-**Major components:**
-1. **Retry utility** (`lib/utils/retry.ts`) — centralized exponential backoff with presets (DEVICE_COMMAND, API_CALL, BACKGROUND_SYNC)
-2. **Adaptive polling hook** (`lib/hooks/useAdaptivePolling.ts`) — visibility/network-aware polling state machine, integrates with existing `useOnlineStatus` hook
-3. **Error boundaries** (`app/components/error-boundaries/DeviceErrorBoundary.tsx`) — class component with logging to Firebase Analytics, custom ValidationError handling
-4. **Token cleanup service** (`lib/services/tokenCleanupService.ts`) — extracted from API route, adds retry logic and delivery-based staleness tracking
+**Explicit two-column flexbox split in `app/page.tsx`.** Replace the single `<Grid cols={2} gap="lg">` map with two parallel flex column divs, each receiving cards split by index parity. This is a server component change — no client boundary needed. The `Grid` component (`Grid.tsx`) is left untouched. The pattern is extractable to a `MasonryColumns` server component if code clarity warrants it, but the inline form is acceptable given the scope.
 
-**Integration with existing patterns:** Preserves self-contained device card pattern (all device info inside card boundaries), keeps Firebase RTDB listeners in orchestrators, enhances existing Background Sync with retry logic, maintains PWA offline strategies.
+**Why not extend Grid.tsx with CSS columns (architecture researcher's approach):** CSS `column-count` distributes items top-to-bottom within each column before starting the next. With variable card heights (the whole point of masonry), the column split point is height-determined at paint time, not at array-index time. Users who configured "Stove first, Thermostat second" will see Thermostat below Stove in column 1 rather than at the top of column 2. This breaks the mental model that card order = visual sequence.
+
+**Why not `useMasonryGrid` hook (stack researcher's approach):** Technically correct true masonry, but requires a `'use client'` component boundary, a ~40-line hook, and ResizeObserver logic. For 6 cards with content-driven polling, the CSS flow of two flex columns already eliminates gaps without measurement. The complexity cost exceeds the benefit at this scale.
+
+**Major components affected:**
+1. `app/page.tsx` — Replace `<Grid cols={2} gap="lg">` with two-column flex layout, split `visibleCards` by index parity
+2. `DeviceCardErrorBoundary` — Add `min-height` to fallback to prevent visually empty column halves
+3. `app/components/ui/__tests__/Grid.test.tsx` — No change required (Grid.tsx untouched)
+4. New tests for column assignment logic (index → column mapping, edge cases)
 
 ### Critical Pitfalls
 
-1. **Non-idempotent retry on ignite/shutdown** — duplicate physical actions if network timeout doesn't mean action failed. **Prevention:** Server-side idempotency keys, read-verify-write pattern (check stove state before retry), only retry safe operations.
+See [PITFALLS-masonry-layout.md](PITFALLS-masonry-layout.md) for full analysis with detection and prevention strategies.
 
-2. **Layered retry amplification** — app retry + API route retry + external service retry = 27 requests for single action. **Prevention:** Single retry layer at API boundary only, disable browser fetch retry, monitor retry depth.
+1. **CSS columns ordering breaks Firebase card order (Pitfall 3)** — CSS `column-count` fills column-first; user order [stove, thermostat, lights, network] becomes column1=[stove, lights] / column2=[thermostat, network], not the expected row-first assignment. Prevention: use explicit index-based array split into two flex columns instead of CSS columns.
 
-3. **Adaptive polling breaks real-time** — slowing stove status polling to 30s causes stale display, automation conflicts. **Prevention:** Fixed 5s for critical stove status (never adaptive), adaptive only for weather/tokens, staleness indicator if >10s old.
+2. **SSR hydration mismatch from JS masonry (Pitfall 1)** — Libraries reading `window.innerWidth` or `getBoundingClientRect` on server crash or cause mismatch. Prevention: the flexbox split runs at server render time with pure array logic — zero hydration risk.
 
-4. **Error boundaries swallow safety alerts** — `needsCleaning` validation error shows generic fallback instead of maintenance alert. **Prevention:** Custom ValidationError class, render validation UI before error boundary scope, boundaries wrap unexpected errors only.
+3. **PWA offline cache invalidation (Pitfall 10)** — JS masonry positions cached in HTML shell diverge from recalculated positions on next load, causing a flash. Prevention: flexbox split is pure HTML structure with Tailwind classes — cached HTML is always valid regardless of card heights.
 
-5. **Component splitting multiplies polling** — split into subcomponents with independent polling = 3× server requests. **Prevention:** Hoist state to parent orchestrator, single polling loop, pass data via props to children.
+4. **Native CSS masonry not production-ready (Pitfall 2)** — `grid-template-rows: masonry` silently falls back to standard grid on Chrome and Firefox (0% stable support). Prevention: do not use it.
 
-6. **Token cleanup deletes active devices** — inactive by "app open" metric, but user receives background notifications. **Prevention:** Track `lastNotificationDelivered` not `lastAppOpened`, 270-day window (not 30), audit logs.
+5. **Error boundary fallback collapses column (Pitfall 9)** — `DeviceCardErrorBoundary` compact fallback (~60px) where a card normally occupies 400px leaves a visual half-column gap. Prevention: add `min-height` to fallback matching approximate card height category.
 
 ## Implications for Roadmap
 
-Based on research, suggested 5-phase structure with 3-4 weeks execution:
+This is a small, focused milestone. The research supports a two-phase implementation: core layout change, then polish and tests.
 
-### Phase 1: Resilience Foundation (Week 1)
-**Rationale:** Error boundaries and retry logic are table stakes—without them, transient failures crash the app or feel broken to users. Must come first as foundation for all other phases.
+### Phase 1: Core Masonry Layout
+**Rationale:** All layout logic is in `app/page.tsx`; all card components are untouched. The column split is simple enough to implement, verify visually, and test in a single plan. This is the primary deliverable.
+**Delivers:** Two-column desktop masonry with Firebase order preserved, mobile unchanged at `sm:` breakpoint, spring animation working per card with correct stagger.
+**Implements:** Index-based flex column split, gap elimination between cards, `animate-spring-in` with `animationDelay` preserved per card in both columns.
+**Avoids:** CSS columns ordering problem (Pitfall 3), SSR hydration mismatch (Pitfall 1), PWA cache flash (Pitfall 10).
 
-**Delivers:**
-- `lib/utils/retry.ts` with exponential backoff + presets
-- `app/components/error-boundaries/DeviceErrorBoundary.tsx`
-- Error boundaries on homepage device cards
-- Retry logic on device command handlers (ignite, shutdown, lights control)
+**Files changed:**
+- `app/page.tsx` — Replace `<Grid cols={2}>` with two `flex flex-col` column divs
 
-**Addresses:**
-- FEATURES.md table stakes: error recovery, retry on failure
-- PITFALLS.md critical: non-idempotent retry (#1), layered amplification (#2), error boundaries swallow alerts (#4)
+### Phase 2: Error Boundary Polish and Tests
+**Rationale:** Error boundary height and edge cases (0 visible cards, 1 visible card) are important polish items, separable from the core layout change. Tests must be written after the column assignment contract is finalized.
+**Delivers:** Error fallback with appropriate `min-height` per card size category, `EmptyState` spanning full width, unit tests for all column assignment edge cases.
+**Implements:** `DeviceCardErrorBoundary` fallback height, `EmptyState` full-width wrapper, test matrix for 0/1/3/5/6 card counts.
+**Avoids:** Column collapse from compact error fallback (Pitfall 9), regression risk from untested column logic.
 
-**Avoids:** Layered retries (single layer at API boundary), non-idempotent operations (read-verify-write pattern), swallowing validations (custom error classes)
-
-**Test coverage:** Unit tests for retry logic (backoff, jitter, shouldRetry), integration tests for error boundaries (throw error, verify fallback)
-
-**Estimated effort:** 3-5 days
-
----
-
-### Phase 2: Polling Optimization (Week 1-2)
-**Rationale:** Resource efficiency improves UX (battery life) and operational costs (Firebase RTDB reads). Quick wins with low complexity—Page Visibility API is browser built-in.
-
-**Delivers:**
-- `lib/hooks/useAdaptivePolling.ts` with visibility/network awareness
-- Replace fixed polling in StoveCard, LightsCard, ThermostatCard
-- AbortController cleanup for race condition prevention
-
-**Uses:**
-- STACK.md: Page Visibility API (browser built-in)
-- Existing: `useOnlineStatus` hook for network awareness
-
-**Implements:**
-- ARCHITECTURE.md: Adaptive polling integration with existing PWA patterns
-
-**Addresses:**
-- FEATURES.md table stakes: background tab optimization, visibility API
-- PITFALLS.md critical: adaptive polling breaks real-time (#3), useEffect race condition (#9)
-
-**Avoids:** Making stove status adaptive (fixed 5s), polling without cleanup (AbortController)
-
-**Estimated effort:** 2-3 days
-
----
-
-### Phase 3: Component Splitting — Stove (Week 2)
-**Rationale:** StoveCard (1510 LOC) is most complex, splitting provides blueprint pattern for other components. Enables lazy loading in later optimizations.
-
-**Delivers:**
-- `app/components/devices/stove/components/` directory with 5-6 subcomponents
-- StoveCard refactored to orchestrator pattern (~200 LOC)
-- Error boundary per logical section
-- Single polling loop (prevents multiplication)
-
-**Uses:**
-- STACK.md: React.lazy + Suspense for future lazy loading
-- ARCHITECTURE.md: Orchestrator pattern with props-based data flow
-
-**Implements:**
-- ARCHITECTURE.md: Component splitting integration, error boundary hierarchy
-
-**Addresses:**
-- FEATURES.md table stakes: load time <3s (code splitting foundation)
-- PITFALLS.md critical: component splitting multiplies polling (#5), context re-renders (#3 integration)
-
-**Avoids:** Polling in subcomponents (hoist to parent), split too small (<200 LOC per component), context consumption in every child
-
-**Test coverage:** Snapshot tests for split components (verify output identical), unit tests for orchestrator data flow
-
-**Estimated effort:** 5-7 days
-
----
-
-### Phase 4: Component Splitting — Lights & Page (Week 3)
-**Rationale:** Follows established pattern from Phase 3. LightsCard (1203 LOC) and stove/page.tsx (1066 LOC) benefit from same orchestrator approach.
-
-**Delivers:**
-- `app/components/devices/lights/components/` directory with 4-5 subcomponents
-- `app/stove/components/` directory with 4 subcomponents
-- LightsCard and stove/page.tsx refactored to orchestrators
-
-**Uses:** Phase 3 orchestrator pattern
-
-**Addresses:**
-- FEATURES.md table stakes: component splitting (remaining large files)
-- FEATURES.md should have: granular loading states per device
-
-**Avoids:** Same pitfalls as Phase 3 (now documented pattern to follow)
-
-**Estimated effort:** 5-7 days
-
----
-
-### Phase 5: Token Cleanup & Polish (Week 4)
-**Rationale:** Operational hygiene—prevents unbounded FCM token growth. Independent of other phases, can run in parallel with Phase 4 if resources allow.
-
-**Delivers:**
-- `lib/services/tokenCleanupService.ts` extracted from API route
-- Retry logic for cleanup operations
-- Delivery-based staleness tracking (not app-open based)
-- Client-side cleanup trigger (on app open if >7 days)
-- Audit logging to `firebase/tokenCleanupLog`
-
-**Uses:**
-- STACK.md: @lifeomic/attempt for cleanup retry
-- ARCHITECTURE.md: Token cleanup integration with existing cron
-
-**Addresses:**
-- FEATURES.md table stakes: token lifecycle management with 30-day staleness
-- PITFALLS.md critical: cleanup deletes active devices (#6)
-
-**Avoids:** App-open metric (use delivery), 30-day window (use 270-day), no audit trail (add logging)
-
-**Estimated effort:** 2-3 days
-
----
+**Files changed:**
+- `DeviceCardErrorBoundary` or its call site in `app/page.tsx` — add `min-height`
+- New test file for column split logic
 
 ### Phase Ordering Rationale
 
-**Dependencies:**
-- Phase 1 is foundational—retry utility and error boundaries needed by later phases
-- Phase 2 builds on Phase 1 (adaptive polling uses retry on error)
-- Phase 3 uses Phase 1 boundaries and Phase 2 polling hook
-- Phase 4 follows Phase 3 pattern (established orchestrator approach)
-- Phase 5 is independent (can parallelize with Phase 4)
-
-**Groupings:**
-- Week 1: Core resilience patterns (retry + error + polling)
-- Week 2-3: Component refactoring (apply patterns to large files)
-- Week 4: Operational hygiene (token cleanup, polish)
-
-**Risk mitigation:**
-- Early phases address safety-critical pitfalls (non-idempotent retry, error swallowing)
-- Component splitting after patterns established (avoid multiplying polling loops)
-- Token cleanup last (least user-facing, independent)
+- Phase 1 first: the layout change is the core deliverable and unblocks visual verification of all polish items.
+- Phase 2 second: error boundary height requires seeing the layout in place to judge appropriate min-heights; tests can only be written after the implementation contract is finalized.
+- Total estimated effort: 3-5 hours across both phases. Both can be planned and executed in a single roadmap pass with two plans.
 
 ### Research Flags
 
-**Phases needing deeper research during planning:**
-- **None expected** — all phases use well-documented patterns. Error boundaries (React official docs), exponential backoff (OneUpTime 2026 guide), Page Visibility API (MDN), component splitting (React patterns).
+Phases with standard patterns (skip additional research-phase):
+- **Both phases:** Pattern is fully documented. Flexbox column split is well-understood, Tailwind utilities are standard, test patterns follow existing dashboard tests. The `app/page.tsx` structure should be read directly before writing the plan, but no domain research is needed.
 
-**Phases with standard patterns (skip research-phase):**
-- **Phase 1:** Error boundaries and retry are established React/API patterns
-- **Phase 2:** Page Visibility API is browser standard, well-documented
-- **Phase 3-4:** Component refactoring follows React best practices
-- **Phase 5:** Firebase token management is official best practice
+One gap requiring a file read before planning (not full research):
+- **`app/page.tsx` current structure**: Read the actual card map loop, `DeviceCardErrorBoundary` props, and `EmptyState` usage to confirm the implementation contract before writing the plan.
 
-**If implementation blockers arise:**
-- Use `/gsd:research-phase` for specific questions (e.g., "How to test error boundaries with Cypress")
-- Most likely candidates: Testing strategy (Phase 1), Race condition edge cases (Phase 2)
+## The Approach Conflict Resolved
+
+For clarity, the explicit synthesis of four conflicting researcher opinions:
+
+| Researcher | Recommendation | Verdict |
+|------------|---------------|---------|
+| Stack researcher | `useMasonryGrid` hook + ResizeObserver + CSS Grid `grid-row: span N` | Technically correct true masonry; oversized for 6 static-count cards; requires client boundary. Reserve for future milestone if needed. |
+| Features researcher | Two-column flexbox split by index parity | Simple, preserves order, SSR-safe, no new dependencies. **Adopted.** |
+| Architecture researcher | Extend `Grid.tsx` with CSS `columns` masonry prop | SSR-safe but column-first ordering breaks user expectation. Pitfall 3 is disqualifying. |
+| Pitfalls researcher | CSS columns with caveat; flagged ordering as critical | Correctly identified the disqualifying pitfall; aligns with features researcher's recommendation. |
+
+**Winner: Two-column flexbox split (features researcher).** It is the only approach that is simultaneously SSR-safe, PWA-safe, preserves Firebase card order, requires no new dependencies, requires no client component boundary, and requires no new hooks.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Official docs for Next.js, React, Page Visibility API; established npm package (@lifeomic/attempt) |
-| Features | HIGH | Table stakes validated with official React error boundary docs, Firebase best practices, 2026 industry articles |
-| Architecture | HIGH | Based on existing codebase analysis (actual LOC counts, current patterns), Next.js App Router conventions |
-| Pitfalls | HIGH | Verified with official docs, production post-mortems (Microsoft Azure retry storm, Firebase token lifecycle), IEEE research papers |
+| Stack | HIGH | All library rejections verified with official sources (caniuse, npm pages, GitHub issues). CSS native masonry 0% support confirmed Feb 2026. |
+| Features | HIGH | Table stakes obvious for a masonry layout. Anti-features derived from Home Assistant real-world masonry failures, confirmed by community post-mortem. |
+| Architecture | MEDIUM | The recommended approach (flexbox split) was not the primary recommendation of any single researcher but correctly resolves the ordering constraint. Needs one pass through actual `app/page.tsx` before plan writing. |
+| Pitfalls | HIGH | SSR and CSS masonry pitfalls verified with official docs (MDN, Chrome team blog, caniuse). Card ordering pitfall verified against CSS column-flow behavior (well-documented). PWA pitfall is project-specific and consistent with Phase 53 implementation. |
 
-**Overall confidence:** HIGH
-
-**Reasoning:**
-- Existing codebase provides solid foundation (PWA patterns, Firebase integration, Auth0 working)
-- All recommendations use official/standard APIs (no experimental libraries)
-- Pitfalls documented with real-world examples and mitigation strategies
-- Phase structure follows natural dependencies (retry → polling → splitting)
-- Risk areas clearly identified with prevention strategies
+**Overall confidence:** HIGH for the approach direction. The implementation detail (how to wire up the flex split in `app/page.tsx`) requires reading the current file before writing the plan, but the approach itself has no open questions.
 
 ### Gaps to Address
 
-**Playwright E2E testing strategy:** Research mentions Playwright for critical path testing (FEATURES.md Phase 4), but existing codebase has Cypress 3034 tests. During Phase 1 planning, decide: (1) Add new E2E in Playwright for critical flows only, or (2) Use existing Cypress for integration tests. Recommendation: Add 3-5 Playwright flows for critical paths (login → ignite → verify), keep Cypress unit tests.
-
-**Idempotency key implementation:** PITFALLS.md emphasizes server-side idempotency for ignite/shutdown, but current API routes don't have this. During Phase 1 planning, design idempotency key storage: (1) In-memory cache (Redis-like), (2) Firebase RTDB `idempotencyKeys/{key}/{timestamp}`, or (3) Request deduplication based on stove state. Recommendation: Option 2 (Firebase RTDB) for simplicity, 2-minute TTL.
-
-**Error boundary logging integration:** ARCHITECTURE.md mentions logging to Firebase Analytics, but FEATURES.md component health monitoring is deferred to v7.1. During Phase 1 implementation, use simple `logEvent(analytics, 'component_error', {...})` for basic tracking, defer dashboard UI.
-
-**Token cleanup migration path:** Current cleanup in `/api/scheduler/check` route (652 LOC). During Phase 5 planning, decide: (1) Extract to service and call from route, or (2) New dedicated `/api/admin/cleanup-tokens` route. Recommendation: Option 1 (extract to service) for backward compatibility with existing cron.
+- **`app/page.tsx` exact structure**: The card map loop, `DeviceCardErrorBoundary` props signature, `EmptyState` usage, and current `animate-spring-in` application must be confirmed from the actual file before writing the implementation plan. The research was done from documentation; the file may have evolved.
+- **Animation stagger with column split**: The flat `index` from `visibleCards.map` still produces the correct user-order stagger (card 0 at 0ms, card 1 at 100ms...) because the flat index IS the user's intended sequence. Confirm this is applied to the wrapper div in the column, not to the column container itself.
+- **`EmptyState` width handling**: When `visibleCards.length === 0`, the two-column flex wrapper must gracefully hand off to the full-width `EmptyState`. The current `EmptyState` usage in `app/page.tsx` must be confirmed — it should span both columns, not render inside one of them.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-
-**Stack Research:**
-- Next.js App Router Error Handling (https://nextjs.org/docs/app/getting-started/error-handling)
-- React Error Boundaries (https://legacy.reactjs.org/docs/error-boundaries.html)
-- @lifeomic/attempt npm (https://www.npmjs.com/package/@lifeomic/attempt)
-- Page Visibility API MDN (https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API)
-- Firebase FCM Token Management (https://firebase.google.com/docs/cloud-messaging/manage-tokens)
-
-**Features Research:**
-- OneUpTime — Error Boundaries & Retry Logic in React 2026 (https://oneuptime.com/blog/post/2026-01-15-react-error-boundaries/view)
-- Next.js 15 Lazy Loading Guide v16.1.6 2026-02-09 (https://nextjs.org/docs/app/guides/lazy-loading)
-- Firebase Blog — Managing Cloud Messaging Tokens (https://firebase.blog/posts/2023/04/managing-cloud-messaging-tokens/)
-- BrowserStack — 15 Best Practices for Playwright 2026 (https://www.browserstack.com/guide/playwright-best-practices)
-
-**Architecture Research:**
-- Existing codebase analysis: StoveCard.tsx (1510 LOC), LightsCard.tsx (1203 LOC), stove/page.tsx (1066 LOC)
-- docs/architecture.md — Self-contained device card pattern
-- docs/pwa.md — PWA architecture with useOnlineStatus, useDeviceStaleness, useBackgroundSync hooks
-
-**Pitfalls Research:**
-- Microsoft Azure — Retry Storm Antipattern (https://learn.microsoft.com/en-us/azure/architecture/antipatterns/retry-storm/)
-- ThinhDA — Retries Without Thundering Herds (https://thinhdanggroup.github.io/retry-without-thundering-herds/)
-- IEEE — RT-IFTTT Real-Time IoT Framework (https://ieeexplore.ieee.org/document/8277299/)
-- Max Rozen — Race Conditions in React useEffect (https://maxrozen.com/race-conditions-fetching-data-react-with-useeffect)
+- [caniuse: grid-template-rows masonry](https://caniuse.com/mdn-css_properties_grid-template-rows_masonry) — 0% stable support confirmed
+- [Chrome Developers: CSS Masonry Update](https://developer.chrome.com/blog/masonry-update) — Chrome 140+ flag only
+- [WebKit blog: CSS masonry syntax](https://webkit.org/blog/16026/css-masonry-syntax/) — spec disagreement ongoing
+- [MDN: CSS Masonry Layout](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Grid_layout/Masonry_layout) — experimental status confirmed
+- [Next.js: Hydration Error Docs](https://nextjs.org/docs/messages/react-hydration-error) — SSR mismatch behavior
+- [MDN: Grid Layout and Accessibility](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Grid_layout/Accessibility) — DOM/visual order rules
+- [W3C CSS WG: Masonry Accessibility Issue #5675](https://github.com/w3c/csswg-drafts/issues/5675) — ordering implications
 
 ### Secondary (MEDIUM confidence)
-
-- Medium — Modern JavaScript Polling: Adaptive Strategies (https://medium.com/tech-pulse-by-collatzinc/modern-javascript-polling-adaptive-strategies-that-actually-work-part-1-9909f5946730)
-- Medium — Advanced React Error Boundaries for Production Apps (https://medium.com/@asiandigitalhub/advanced-react-error-boundaries-for-production-apps-f9ad9d2ae966)
-- Kent C. Dodds — Application State Management with React (https://kentcdodds.com/blog/application-state-management-with-react)
-- LogRocket — Dynamic Imports and Code Splitting with Next.js (https://blog.logrocket.com/dynamic-imports-code-splitting-next-js/)
+- [CSS-Tricks: Piecing together masonry approaches](https://css-tricks.com/piecing-together-approaches-for-a-css-masonry-layout/) — CSS columns order problem documented
+- [CSS-Tricks: Making masonry that works today](https://css-tricks.com/making-a-masonry-layout-that-works-today/) — Grid row-span technique (reserve approach)
+- [Cruip: True masonry with Next.js](https://cruip.com/how-to-create-a-true-masonry-with-nextjs/) — custom hook approach documented (reserve approach)
+- [react-responsive-masonry GitHub issue #127](https://github.com/cedricdelpoux/react-responsive-masonry/issues/127) — SSR issue confirmed
+- [Home Assistant Blog: Moving Away from Masonry](https://www.home-assistant.io/blog/2024/03/04/dashboard-chapter-1/) — real-world UX failures from true masonry on dashboards
+- [HA Community: Masonry Layout Doesn't Make Sense](https://community.home-assistant.io/t/masonry-layout-doesnt-make-sense/527497) — user expectations documented
+- [MUI Masonry SSR Issue #32688](https://github.com/mui/material-ui/issues/32688) — hydration mismatch with JS masonry confirmed
 
 ### Tertiary (LOW confidence)
-
-- None — all recommendations backed by official docs or authoritative 2026 sources
+- None relied upon for recommendations.
 
 ---
-
-*Research completed: 2026-02-11*
+*Research completed: 2026-02-17*
 *Ready for roadmap: yes*
-*Synthesized from: STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md*
+*Synthesized from: STACK-masonry-layout.md, FEATURES.md, ARCHITECTURE.md, PITFALLS-masonry-layout.md*

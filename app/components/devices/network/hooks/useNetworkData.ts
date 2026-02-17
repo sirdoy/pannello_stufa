@@ -4,8 +4,9 @@
  * Encapsulates all Fritz!Box network state management:
  * - Polling via useAdaptivePolling (30s visible / 5min hidden)
  * - Data fetching from 3 Fritz!Box API routes
- * - Sparkline data buffering (max 12 points)
- * - Health computation with hysteresis
+ * - Sparkline data buffering (max 120 points = 1h at 30s)
+ * - Seeds sparklines with historical bandwidth data on mount
+ * - Health computation with hysteresis (trend-aware via historical avg)
  * - Error handling that preserves cached data
  * - Staleness tracking
  *
@@ -20,6 +21,7 @@ import { useVisibility } from '@/lib/hooks/useVisibility';
 import { computeNetworkHealth, mapHealthToDeviceCard } from '../networkHealthUtils';
 import type {
   BandwidthData,
+  BandwidthHistoryPoint,
   DeviceData,
   WanData,
   SparklinePoint,
@@ -28,6 +30,9 @@ import type {
   UseNetworkDataReturn,
 } from '../types';
 import type { DeviceCategory } from '@/types/firebase/network';
+
+// 1h of data at 30s polling interval
+const SPARKLINE_MAX_POINTS = 120;
 
 /**
  * Custom hook for Fritz!Box network data management
@@ -53,6 +58,32 @@ export function useNetworkData(): UseNetworkDataReturn {
 
   // Ref to track MACs that have been enriched with categories
   const enrichedMacsRef = useRef<Set<string>>(new Set());
+
+  // Seed sparklines with historical data on mount (fire-and-forget)
+  useEffect(() => {
+    const loadHistory = async () => {
+      try {
+        const res = await fetch('/api/fritzbox/bandwidth-history?range=1h');
+        if (!res.ok) return;
+
+        const json = await res.json() as {
+          success?: boolean;
+          data?: { points?: BandwidthHistoryPoint[] };
+        };
+
+        const points = json.data?.points;
+        if (points && points.length > 0) {
+          const sorted = [...points].sort((a, b) => a.time - b.time);
+          setDownloadHistory(sorted.map(p => ({ time: p.time, mbps: p.download })));
+          setUploadHistory(sorted.map(p => ({ time: p.time, mbps: p.upload })));
+        }
+      } catch {
+        // Silent failure — sparklines will populate from polling
+      }
+    };
+
+    void loadHistory();
+  }, []);
 
   // Visibility tracking for adaptive polling
   const isVisible = useVisibility();
@@ -185,10 +216,10 @@ export function useNetworkData(): UseNetworkDataReturn {
       if (bw) {
         setBandwidth(bw);
 
-        // Update sparkline buffers (max 12 points = 6 min at 30s interval)
+        // Append to sparkline buffers (max 120 points = 1h at 30s interval)
         const now = Date.now();
-        setDownloadHistory(prev => [...prev, { time: now, mbps: bw.download }].slice(-12));
-        setUploadHistory(prev => [...prev, { time: now, mbps: bw.upload }].slice(-12));
+        setDownloadHistory(prev => [...prev, { time: now, mbps: bw.download }].slice(-SPARKLINE_MAX_POINTS));
+        setUploadHistory(prev => [...prev, { time: now, mbps: bw.upload }].slice(-SPARKLINE_MAX_POINTS));
       }
 
       const rawDevices = devData.devices || [];

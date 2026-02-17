@@ -212,8 +212,8 @@ describe('useNetworkData', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    // Trigger many manual fetches to exceed the 12-point limit
-    for (let i = 0; i < 20; i++) {
+    // Trigger many manual fetches to exceed the 120-point limit
+    for (let i = 0; i < 130; i++) {
       await mockUseAdaptivePolling.mock.calls[0]?.[0].callback();
       // Small delay to allow state updates
       await new Promise(resolve => setTimeout(resolve, 10));
@@ -221,18 +221,18 @@ describe('useNetworkData', () => {
 
     // Wait for buffer to stabilize
     await waitFor(() => {
-      expect(result.current.downloadHistory.length).toBeLessThanOrEqual(12);
+      expect(result.current.downloadHistory.length).toBeLessThanOrEqual(120);
     });
 
-    // Should cap at 12 (might be slightly less if some updates are batched)
-    expect(result.current.downloadHistory.length).toBeLessThanOrEqual(12);
-    expect(result.current.uploadHistory.length).toBeLessThanOrEqual(12);
+    // Should cap at 120 (1h at 30s interval)
+    expect(result.current.downloadHistory.length).toBeLessThanOrEqual(120);
+    expect(result.current.uploadHistory.length).toBeLessThanOrEqual(120);
 
-    // If we have 12 points, verify oldest are removed
-    if (result.current.downloadHistory.length === 12) {
+    // If we have 120 points, verify oldest are removed
+    if (result.current.downloadHistory.length === 120) {
       // Last point should be from a later poll than first point
       const firstMbps = result.current.downloadHistory[0]?.mbps || 0;
-      const lastMbps = result.current.downloadHistory[11]?.mbps || 0;
+      const lastMbps = result.current.downloadHistory[119]?.mbps || 0;
       expect(lastMbps).toBeGreaterThan(firstMbps);
     }
   });

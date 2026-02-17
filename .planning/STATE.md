@@ -59,7 +59,7 @@ None — milestone complete.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 25 | Add network API debug tab with all endpoints from API.md | 2026-02-16 | 5b89be9 | [25-add-network-api-debug-tab-with-all-endpo](./quick/25-add-network-api-debug-tab-with-all-endpo/) |
-| 26 | Consolidate network API routes under /api/fritzbox/ namespace | 2026-02-17 | 127ce9b | [26-nella-parte-network-utilizza-solo-le-chi](./quick/26-nella-parte-network-utilizza-solo-le-chi/) |
+| 26 | Consolidate network API routes under /api/fritzbox/ namespace | 2026-02-17 | 68a677f | [26-nella-parte-network-utilizza-solo-le-chi](./quick/26-nella-parte-network-utilizza-solo-le-chi/) |
 
 ## Session Continuity
 

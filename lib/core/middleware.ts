@@ -64,6 +64,16 @@ type UnauthHandler = (
 ) => Promise<NextResponse<unknown>>;
 
 // =============================================================================
+// DEV BYPASS
+// =============================================================================
+
+const BYPASS_AUTH = process.env.BYPASS_AUTH === 'true';
+
+const DEV_SESSION: Session = {
+  user: { sub: 'local-dev-user', email: 'dev@localhost' },
+};
+
+// =============================================================================
 // AUTH MIDDLEWARE
 // =============================================================================
 
@@ -103,10 +113,15 @@ export function withErrorHandler(handler: UnauthHandler, logContext: string | nu
 
 /**
  * Internal: Wraps a route handler with Auth0 authentication
- * Automatically returns 401 if user is not authenticated
+ * Automatically returns 401 if user is not authenticated.
+ * When BYPASS_AUTH=true, provides a mock session (dev only).
  */
 function withAuth(handler: AuthedHandler): UnauthHandler {
   return async (request: NextRequest, context: RouteContext) => {
+    if (BYPASS_AUTH) {
+      return handler(request, context, DEV_SESSION);
+    }
+
     const session = await auth0.getSession(request);
 
     if (!session?.user) {

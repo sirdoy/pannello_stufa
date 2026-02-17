@@ -1,12 +1,36 @@
 import { Auth0Client } from '@auth0/nextjs-auth0/server';
 import { NextRequest, NextResponse } from 'next/server';
 
+// =============================================================================
+// DEV BYPASS
+// =============================================================================
+
+const BYPASS_AUTH = process.env.BYPASS_AUTH === 'true';
+const DEV_USER_ID = 'local-dev-user';
+
+const MOCK_SESSION = {
+  user: {
+    sub: DEV_USER_ID,
+    email: 'dev@localhost',
+    name: 'Local Dev User',
+    nickname: 'dev',
+    picture: '',
+  },
+  accessToken: 'mock-access-token',
+  tokenType: 'Bearer',
+};
+
+// =============================================================================
+// AUTH0 CLIENT
+// =============================================================================
+
 // Auth0 v4 configuration
 // Map existing env vars to v4 expected names
 const issuerBaseUrl = process.env.AUTH0_ISSUER_BASE_URL;
 const domain = issuerBaseUrl?.replace(/^https?:\/\//, '') || process.env.AUTH0_DOMAIN;
 
-const auth0Config = {
+// Guard config construction so it doesn't throw when env vars are missing in bypass mode
+const auth0Config = BYPASS_AUTH ? {} : {
   domain,
   clientId: process.env.AUTH0_CLIENT_ID,
   clientSecret: process.env.AUTH0_CLIENT_SECRET,
@@ -47,7 +71,12 @@ const auth0Config = {
   }
 };
 
-export const auth0 = new Auth0Client(auth0Config);
+// When BYPASS_AUTH=true, export a stub that returns MOCK_SESSION without calling real Auth0.
+// This ensures auth0.getSession() in server pages returns the mock session without any
+// changes to those pages.
+export const auth0 = BYPASS_AUTH
+  ? ({ getSession: async () => MOCK_SESSION } as unknown as Auth0Client)
+  : new Auth0Client(auth0Config);
 
 /** Route context interface */
 interface RouteContext {

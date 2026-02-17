@@ -13,7 +13,7 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 Phase: 67 (Bandwidth Correlation) — LAST COMPLETED
 Plan: Complete
 Status: v8.0 Milestone Shipped
-Last activity: 2026-02-17 - Completed quick task 29: Seed home card sparklines and health with historical bandwidth data
+Last activity: 2026-02-17 - Completed quick task 30: Bypass Auth0 in local env, handle Firebase paths with mock userId
 
 Progress: [██████████████████████] 100% (v8.0 complete — 7 phases, 18 plans, 32/32 requirements)
 
@@ -63,10 +63,11 @@ None — milestone complete.
 | 27 | Use historical bandwidth data for network health and charts | 2026-02-17 | 7a4f061 | [27-use-historical-bandwidth-data-for-networ](./quick/27-use-historical-bandwidth-data-for-networ/) |
 | 28 | Replace Firebase bandwidth persistence with external API proxy | 2026-02-17 | d371f3b | [28-replace-firebase-bandwidth-persistence-w](./quick/28-replace-firebase-bandwidth-persistence-w/) |
 | 29 | Seed home card sparklines and health with historical bandwidth data | 2026-02-17 | ec410d6 | [29-seed-home-card-sparklines-and-health-wit](./quick/29-seed-home-card-sparklines-and-health-wit/) |
+| 30 | Bypass Auth0 in local env, handle Firebase paths with mock userId | 2026-02-17 | c19f8e1 | [30-bypass-auth0-in-local-env-handle-firebas](./quick/30-bypass-auth0-in-local-env-handle-firebas/) |
 
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed quick-29: Seed home card sparklines and health with historical bandwidth data
+Stopped at: Completed quick-30: Bypass Auth0 in local env, handle Firebase paths with mock userId
 Next step: Start next milestone with /gsd:new-milestone
 Resume file: None

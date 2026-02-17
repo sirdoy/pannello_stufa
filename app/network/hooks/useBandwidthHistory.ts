@@ -53,10 +53,12 @@ export function useBandwidthHistory(): UseBandwidthHistoryReturn {
 
       const json = await response.json() as {
         success?: boolean;
-        data?: { points?: BandwidthHistoryPoint[]; range?: string; totalCount?: number };
+        points?: BandwidthHistoryPoint[];
+        range?: string;
+        totalCount?: number;
       };
 
-      const points = json.data?.points ?? [];
+      const points = json.points ?? [];
       if (points.length > 0) {
         // Sort ascending by time (oldest first — for chart rendering)
         const sorted = [...points].sort((a, b) => a.time - b.time);

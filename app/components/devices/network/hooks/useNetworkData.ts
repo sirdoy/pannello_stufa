@@ -68,10 +68,10 @@ export function useNetworkData(): UseNetworkDataReturn {
 
         const json = await res.json() as {
           success?: boolean;
-          data?: { points?: BandwidthHistoryPoint[] };
+          points?: BandwidthHistoryPoint[];
         };
 
-        const points = json.data?.points;
+        const points = json.points;
         if (points && points.length > 0) {
           const sorted = [...points].sort((a, b) => a.time - b.time);
           setDownloadHistory(sorted.map(p => ({ time: p.time, mbps: p.download })));

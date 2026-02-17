@@ -1,6 +1,6 @@
 /**
  * Tests for Network Category Override Route
- * POST /api/network/category-override
+ * POST /api/fritzbox/category-override
  */
 
 // Mock dependencies before imports
@@ -18,7 +18,7 @@ import { auth0 } from '@/lib/auth0';
 const mockGetSession = jest.mocked(auth0.getSession);
 const mockSaveCategoryOverride = jest.mocked(saveCategoryOverride);
 
-describe('POST /api/network/category-override', () => {
+describe('POST /api/fritzbox/category-override', () => {
   const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
   const testMac = 'AA:BB:CC:DD:EE:FF';
 

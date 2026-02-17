@@ -1,6 +1,6 @@
 /**
  * Tests for Network Vendor Lookup Route
- * GET /api/network/vendor-lookup?mac=XX:XX:XX:XX:XX:XX
+ * GET /api/fritzbox/vendor-lookup?mac=XX:XX:XX:XX:XX:XX
  */
 
 // Mock dependencies before imports
@@ -24,7 +24,7 @@ const mockFetchVendorName = jest.mocked(fetchVendorName);
 const mockCategorizeByVendor = jest.mocked(categorizeByVendor);
 const mockGetCategoryOverride = jest.mocked(getCategoryOverride);
 
-describe('GET /api/network/vendor-lookup', () => {
+describe('GET /api/fritzbox/vendor-lookup', () => {
   const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
   const testMac = 'AA:BB:CC:DD:EE:FF';
 
@@ -41,7 +41,7 @@ describe('GET /api/network/vendor-lookup', () => {
 
   it('should return 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
-    const mockRequest = new Request(`http://localhost:3000/api/network/vendor-lookup?mac=${testMac}`);
+    const mockRequest = new Request(`http://localhost:3000/api/fritzbox/vendor-lookup?mac=${testMac}`);
 
     const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
@@ -52,7 +52,7 @@ describe('GET /api/network/vendor-lookup', () => {
   });
 
   it('should return 400 when MAC parameter missing', async () => {
-    const mockRequest = new Request('http://localhost:3000/api/network/vendor-lookup');
+    const mockRequest = new Request('http://localhost:3000/api/fritzbox/vendor-lookup');
 
     const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
@@ -69,7 +69,7 @@ describe('GET /api/network/vendor-lookup', () => {
       category: 'mobile',
       timestamp: Date.now() - 1000,
     });
-    const mockRequest = new Request(`http://localhost:3000/api/network/vendor-lookup?mac=${testMac}`);
+    const mockRequest = new Request(`http://localhost:3000/api/fritzbox/vendor-lookup?mac=${testMac}`);
 
     const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
@@ -89,7 +89,7 @@ describe('GET /api/network/vendor-lookup', () => {
     mockGetCachedVendor.mockResolvedValue(null);
     mockFetchVendorName.mockResolvedValue('Samsung Electronics');
     mockCategorizeByVendor.mockReturnValue('mobile');
-    const mockRequest = new Request(`http://localhost:3000/api/network/vendor-lookup?mac=${testMac}`);
+    const mockRequest = new Request(`http://localhost:3000/api/fritzbox/vendor-lookup?mac=${testMac}`);
 
     const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
@@ -114,7 +114,7 @@ describe('GET /api/network/vendor-lookup', () => {
     mockGetCachedVendor.mockResolvedValue(null);
     mockFetchVendorName.mockResolvedValue(null);
     mockCategorizeByVendor.mockReturnValue('unknown');
-    const mockRequest = new Request(`http://localhost:3000/api/network/vendor-lookup?mac=${testMac}`);
+    const mockRequest = new Request(`http://localhost:3000/api/fritzbox/vendor-lookup?mac=${testMac}`);
 
     const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
@@ -133,7 +133,7 @@ describe('GET /api/network/vendor-lookup', () => {
     mockGetCachedVendor.mockResolvedValue(null);
     mockFetchVendorName.mockResolvedValue(null);
     mockCategorizeByVendor.mockReturnValue('unknown');
-    const mockRequest = new Request(`http://localhost:3000/api/network/vendor-lookup?mac=${testMac}`);
+    const mockRequest = new Request(`http://localhost:3000/api/fritzbox/vendor-lookup?mac=${testMac}`);
 
     await GET(mockRequest as any, {} as any);
 
@@ -148,7 +148,7 @@ describe('GET /api/network/vendor-lookup', () => {
     mockGetCachedVendor.mockResolvedValue(null);
     mockFetchVendorName.mockResolvedValue(null); // API returns null on failure
     mockCategorizeByVendor.mockReturnValue('unknown');
-    const mockRequest = new Request(`http://localhost:3000/api/network/vendor-lookup?mac=${testMac}`);
+    const mockRequest = new Request(`http://localhost:3000/api/fritzbox/vendor-lookup?mac=${testMac}`);
 
     const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
@@ -160,7 +160,7 @@ describe('GET /api/network/vendor-lookup', () => {
 
   it('should return overridden category when Firebase override exists', async () => {
     mockGetCategoryOverride.mockResolvedValue('pc');
-    const mockRequest = new Request(`http://localhost:3000/api/network/vendor-lookup?mac=${testMac}`);
+    const mockRequest = new Request(`http://localhost:3000/api/fritzbox/vendor-lookup?mac=${testMac}`);
 
     const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
@@ -183,7 +183,7 @@ describe('GET /api/network/vendor-lookup', () => {
     mockGetCachedVendor.mockResolvedValue(null);
     mockFetchVendorName.mockResolvedValue('Dell Inc.');
     mockCategorizeByVendor.mockReturnValue('pc');
-    const mockRequest = new Request(`http://localhost:3000/api/network/vendor-lookup?mac=${testMac}`);
+    const mockRequest = new Request(`http://localhost:3000/api/fritzbox/vendor-lookup?mac=${testMac}`);
 
     const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();

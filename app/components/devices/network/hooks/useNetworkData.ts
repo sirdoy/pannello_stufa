@@ -182,9 +182,14 @@ export function useNetworkData(): UseNetworkDataReturn {
               message: errorData.message || 'Fritz!Box non configurato'
             });
           } else if (errorData.code === 'FRITZBOX_TIMEOUT') {
-            // Timeout - mark stale but keep cached data
             setStale(true);
-            // DON'T clear existing data
+            // Show error only if no cached data to display
+            if (!bandwidth && !wan) {
+              setError({
+                type: 'generic',
+                message: 'Fritz!Box non raggiungibile. Verifica che il server API sia attivo.'
+              });
+            }
           } else if (errorData.code === 'RATE_LIMITED') {
             setError({
               type: 'rate_limited',

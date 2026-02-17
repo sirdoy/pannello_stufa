@@ -58,6 +58,31 @@ export default function NetworkCard() {
     );
   }
 
+  // Generic or connection error (no cached data available)
+  if (networkData.error?.type === 'generic' || networkData.error?.type === 'rate_limited') {
+    return (
+      <SmartHomeCard icon="📡" title="Rete" colorTheme="sage">
+        <SmartHomeCard.Controls>
+          <Banner
+            variant="warning"
+            title="Errore connessione"
+            compact={false}
+          >
+            <p className="text-sm text-slate-300 mb-3">
+              {networkData.error.message}
+            </p>
+            <Link
+              href="/settings?tab=rete"
+              className="text-sm text-sage-400 hover:text-sage-300 underline"
+            >
+              Verifica impostazioni Rete →
+            </Link>
+          </Banner>
+        </SmartHomeCard.Controls>
+      </SmartHomeCard>
+    );
+  }
+
   // Main card - clickable, navigates to /network page
   return (
     <div

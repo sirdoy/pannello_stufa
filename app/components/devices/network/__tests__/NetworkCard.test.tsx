@@ -70,6 +70,7 @@ describe('NetworkCard', () => {
     healthMapped: 'ok',
     error: null,
     activeDeviceCount: 2,
+    updateDeviceCategory: jest.fn(),
     ...overrides,
   });
 
@@ -103,7 +104,25 @@ describe('NetworkCard', () => {
       render(<NetworkCard />);
 
       expect(screen.getByText('Configura Fritz!Box')).toBeInTheDocument();
-      expect(screen.getByText(/abilitare TR-064/i)).toBeInTheDocument();
+      expect(screen.getByText(/configura le credenziali Fritz!Box/i)).toBeInTheDocument();
+    });
+  });
+
+  describe('Generic error state', () => {
+    it('shows error banner for generic errors', () => {
+      mockUseNetworkData.mockReturnValue(
+        createMockData({
+          error: {
+            type: 'generic',
+            message: 'Fritz!Box non raggiungibile',
+          },
+        })
+      );
+
+      render(<NetworkCard />);
+
+      expect(screen.getByText('Errore connessione')).toBeInTheDocument();
+      expect(screen.getByText('Fritz!Box non raggiungibile')).toBeInTheDocument();
     });
   });
 

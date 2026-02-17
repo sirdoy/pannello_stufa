@@ -682,6 +682,7 @@ function FritzBoxContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
   const [saveMessage, setSaveMessage] = useState<FritzBoxSaveMessage | null>(null);
 
   useEffect(() => {
@@ -771,6 +772,37 @@ function FritzBoxContent() {
       setSaveMessage({ type: 'error', text: 'Errore di connessione' });
     } finally {
       setIsRemoving(false);
+    }
+  };
+
+  const handleTestConnection = async () => {
+    setIsTesting(true);
+    setSaveMessage(null);
+
+    try {
+      const response = await fetch('/api/fritzbox/bandwidth');
+
+      if (response.ok) {
+        const data = await response.json() as { bandwidth?: { download: number; upload: number } };
+        const bw = data.bandwidth;
+        setSaveMessage({
+          type: 'success',
+          text: bw
+            ? `Connessione OK! Download: ${bw.download.toFixed(1)} Mbps, Upload: ${bw.upload.toFixed(1)} Mbps`
+            : 'Connessione OK, ma nessun dato bandwidth ricevuto'
+        });
+        setTimeout(() => setSaveMessage(null), 6000);
+      } else {
+        const errorData = await response.json() as { code?: string; message?: string };
+        setSaveMessage({
+          type: 'error',
+          text: `Errore (${errorData.code ?? response.status}): ${errorData.message ?? 'Connessione fallita'}`
+        });
+      }
+    } catch {
+      setSaveMessage({ type: 'error', text: 'Impossibile raggiungere il server API' });
+    } finally {
+      setIsTesting(false);
     }
   };
 
@@ -880,14 +912,24 @@ function FritzBoxContent() {
             </Button>
 
             {isConfigured && (
-              <Button
-                variant="danger"
-                onClick={handleRemove}
-                disabled={isSaving || isRemoving}
-                className="flex-1 sm:flex-initial"
-              >
-                {isRemoving ? 'Rimozione...' : 'Rimuovi credenziali'}
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  onClick={handleTestConnection}
+                  disabled={isSaving || isRemoving || isTesting}
+                  className="flex-1 sm:flex-initial"
+                >
+                  {isTesting ? 'Test in corso...' : 'Testa connessione'}
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={handleRemove}
+                  disabled={isSaving || isRemoving}
+                  className="flex-1 sm:flex-initial"
+                >
+                  {isRemoving ? 'Rimozione...' : 'Rimuovi credenziali'}
+                </Button>
+              </>
             )}
           </div>
         </div>

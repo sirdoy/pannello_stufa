@@ -75,7 +75,7 @@ export default function NetworkPage() {
   // Handle category override - calls API and updates UI optimistically
   const handleCategoryChange = useCallback(async (mac: string, category: DeviceCategory) => {
     try {
-      const response = await fetch('/api/network/category-override', {
+      const response = await fetch('/api/fritzbox/category-override', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mac, category }),

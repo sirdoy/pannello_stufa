@@ -72,8 +72,8 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
     fetchGetEndpoint('bandwidth', '/api/fritzbox/bandwidth');
     fetchGetEndpoint('wan', '/api/fritzbox/wan');
     fetchGetEndpoint('deviceHistory', '/api/fritzbox/history?range=24h');
-    fetchGetEndpoint('vendorLookup', '/api/network/vendor-lookup?mac=AA:BB:CC:DD:EE:FF');
-    fetchGetEndpoint('categoryOverride', '/api/network/category-override');
+    fetchGetEndpoint('vendorLookup', '/api/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF');
+    fetchGetEndpoint('categoryOverride', '/api/fritzbox/category-override');
   }, [fetchGetEndpoint]);
 
   // Initial fetch
@@ -259,13 +259,13 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
         <div className="space-y-3">
           <EndpointCard
             name="Vendor Lookup"
-            url="/api/network/vendor-lookup?mac=AA:BB:CC:DD:EE:FF"
+            url="/api/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF"
             response={getResponses.vendorLookup}
             loading={loadingGet.vendorLookup ?? false}
             timing={timings.vendorLookup}
-            onRefresh={() => fetchGetEndpoint('vendorLookup', '/api/network/vendor-lookup?mac=AA:BB:CC:DD:EE:FF')}
-            onCopyUrl={() => copyUrlToClipboard('/api/network/vendor-lookup?mac=AA:BB:CC:DD:EE:FF')}
-            isCopied={copiedUrl === '/api/network/vendor-lookup?mac=AA:BB:CC:DD:EE:FF'}
+            onRefresh={() => fetchGetEndpoint('vendorLookup', '/api/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF')}
+            onCopyUrl={() => copyUrlToClipboard('/api/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF')}
+            isCopied={copiedUrl === '/api/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF'}
           />
           <div className="bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50 border border-slate-700 [html:not(.dark)_&]:border-slate-300 rounded-lg p-4">
             <Text variant="secondary" size="sm">
@@ -274,13 +274,13 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
           </div>
           <EndpointCard
             name="Category Override"
-            url="/api/network/category-override"
+            url="/api/fritzbox/category-override"
             response={getResponses.categoryOverride}
             loading={loadingGet.categoryOverride ?? false}
             timing={timings.categoryOverride}
-            onRefresh={() => fetchGetEndpoint('categoryOverride', '/api/network/category-override')}
-            onCopyUrl={() => copyUrlToClipboard('/api/network/category-override')}
-            isCopied={copiedUrl === '/api/network/category-override'}
+            onRefresh={() => fetchGetEndpoint('categoryOverride', '/api/fritzbox/category-override')}
+            onCopyUrl={() => copyUrlToClipboard('/api/fritzbox/category-override')}
+            isCopied={copiedUrl === '/api/fritzbox/category-override'}
           />
         </div>
       </div>

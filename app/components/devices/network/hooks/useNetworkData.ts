@@ -84,7 +84,7 @@ export function useNetworkData(): UseNetworkDataReturn {
 
         const results = await Promise.allSettled(
           batch.map(async (device) => {
-            const response = await fetch(`/api/network/vendor-lookup?mac=${encodeURIComponent(device.mac)}`);
+            const response = await fetch(`/api/fritzbox/vendor-lookup?mac=${encodeURIComponent(device.mac)}`);
             if (!response.ok) return null;
 
             const data = await response.json() as {

@@ -257,6 +257,7 @@ describe('useBandwidthHistory', () => {
       expect(result.current).toHaveProperty('pointCount');
       expect(result.current).toHaveProperty('isEmpty');
       expect(result.current).toHaveProperty('isCollecting');
+      expect(result.current).toHaveProperty('isLoading');
     });
   });
 });

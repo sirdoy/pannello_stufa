@@ -115,8 +115,9 @@ export interface UseBandwidthHistoryReturn {
   setTimeRange: (range: BandwidthTimeRange) => void;
   addDataPoint: (bandwidth: BandwidthData) => void;
   pointCount: number;          // Raw points in buffer before decimation
-  isEmpty: boolean;            // No data collected yet
+  isEmpty: boolean;            // No data collected yet (after loading completes)
   isCollecting: boolean;       // < 10 points (chart not yet meaningful)
+  isLoading: boolean;          // True while loading historical data from server
 }
 
 // Device history types (Phase 65)

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { decimateLTTB, type TimeSeriesPoint } from '@/lib/utils/decimateLTTB';
 import type {
   BandwidthData,
@@ -26,6 +26,7 @@ const TIME_RANGE_MS: Record<BandwidthTimeRange, number> = {
  * Manages bandwidth data history with automatic buffering, time range filtering, and decimation.
  *
  * Key features:
+ * - Loads 7 days of persisted history from Firebase RTDB on mount (immediately pre-populates chart)
  * - Buffers up to 7 days of data (10080 points max)
  * - Filters by time range (1h, 24h, 7d)
  * - Automatically decimates to 500 points when filtered data exceeds threshold
@@ -36,10 +37,49 @@ const TIME_RANGE_MS: Record<BandwidthTimeRange, number> = {
 export function useBandwidthHistory(): UseBandwidthHistoryReturn {
   const [history, setHistory] = useState<BandwidthHistoryPoint[]>([]);
   const [timeRange, setTimeRange] = useState<BandwidthTimeRange>('24h');
+  const [isLoading, setIsLoading] = useState(true);
+
+  /**
+   * Load stored bandwidth history from server on mount.
+   * Fetches 7 days of history so chart pre-populates immediately on page open.
+   * Silently fails — chart will still work with live polling data.
+   */
+  const loadHistoryFromServer = useCallback(async () => {
+    try {
+      const response = await fetch('/api/fritzbox/bandwidth-history?range=7d');
+      if (!response.ok) {
+        return;
+      }
+
+      const json = await response.json() as {
+        success?: boolean;
+        data?: { points?: BandwidthHistoryPoint[]; range?: string; totalCount?: number };
+      };
+
+      const points = json.data?.points ?? [];
+      if (points.length > 0) {
+        // Sort ascending by time (oldest first — for chart rendering)
+        const sorted = [...points].sort((a, b) => a.time - b.time);
+        // Cap at MAX_POINTS (drop oldest if server returned more)
+        const capped = sorted.length > MAX_POINTS ? sorted.slice(-MAX_POINTS) : sorted;
+        setHistory(capped);
+      }
+    } catch {
+      // Silent failure — chart still works with live polling data
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Load historical data from server on mount
+  useEffect(() => {
+    void loadHistoryFromServer();
+  }, [loadHistoryFromServer]);
 
   /**
    * Add a new bandwidth data point to the history buffer.
    * Automatically caps at MAX_POINTS by dropping oldest points.
+   * Called from page orchestrator as new polling data arrives.
    */
   const addDataPoint = useCallback((bandwidth: BandwidthData) => {
     setHistory((prev) => {
@@ -102,8 +142,8 @@ export function useBandwidthHistory(): UseBandwidthHistoryReturn {
 
   // Derived status
   const pointCount = history.length;
-  const isEmpty = history.length === 0;
-  const isCollecting = history.length > 0 && history.length < COLLECTING_THRESHOLD;
+  const isEmpty = history.length === 0 && !isLoading;
+  const isCollecting = history.length > 0 && history.length < COLLECTING_THRESHOLD && !isLoading;
 
   return {
     chartData,
@@ -113,5 +153,6 @@ export function useBandwidthHistory(): UseBandwidthHistoryReturn {
     pointCount,
     isEmpty,
     isCollecting,
+    isLoading,
   };
 }

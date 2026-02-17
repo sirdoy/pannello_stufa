@@ -1,5 +1,5 @@
 import { withAuthAndErrorHandler, success, ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core';
-import { fritzboxClient, getCachedData, checkRateLimitFritzBox, appendBandwidthReading, cleanupOldBandwidthHistory } from '@/lib/fritzbox';
+import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fritzbox';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,10 +30,6 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
   // 2. Fetch with cache (60s TTL)
   const bandwidth = await getCachedData('bandwidth', () => fritzboxClient.getBandwidth());
 
-  // 3. Fire-and-forget: persist to RTDB + cleanup old data
-  appendBandwidthReading(bandwidth).catch(() => {});
-  cleanupOldBandwidthHistory().catch(() => {});
-
-  // 4. Return data
+  // 3. Return data
   return success({ bandwidth });
 }, 'FritzBox/Bandwidth');

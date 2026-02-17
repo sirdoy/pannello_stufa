@@ -235,6 +235,53 @@ class FritzBoxClient {
   }
 
   /**
+   * Get historical bandwidth data
+   *
+   * Raw: { items: [{ timestamp, bytes_sent, bytes_received, upstream_rate, downstream_rate }], total_count, limit, offset }
+   * Returns: array of { time, download, upload } points sorted ascending
+   */
+  async getBandwidthHistory(hours: number = 24): Promise<Array<{ time: number; download: number; upload: number }>> {
+    // Fetch all pages
+    const limit = 1000;
+    let offset = 0;
+    const allItems: Array<{ timestamp: number; upstream_rate: number; downstream_rate: number }> = [];
+
+    // First request to get total_count
+    const firstPage = (await this.request(`/api/v1/history/bandwidth?hours=${hours}&limit=${limit}&offset=0`)) as {
+      items: Array<{ timestamp: number; bytes_sent: number; bytes_received: number; upstream_rate: number; downstream_rate: number }>;
+      total_count: number;
+      limit: number;
+      offset: number;
+    };
+
+    allItems.push(...firstPage.items);
+    const totalCount = firstPage.total_count;
+
+    // Fetch remaining pages in parallel if needed
+    if (totalCount > limit) {
+      const remainingPages = [];
+      for (offset = limit; offset < totalCount; offset += limit) {
+        remainingPages.push(
+          this.request(`/api/v1/history/bandwidth?hours=${hours}&limit=${limit}&offset=${offset}`) as Promise<typeof firstPage>
+        );
+      }
+      const pages = await Promise.all(remainingPages);
+      for (const page of pages) {
+        allItems.push(...page.items);
+      }
+    }
+
+    // Transform: timestamp (Unix seconds) → ms, rates (bps) → Mbps
+    return allItems
+      .map(item => ({
+        time: item.timestamp * 1000,
+        download: item.downstream_rate / 1_000_000,
+        upload: item.upstream_rate / 1_000_000,
+      }))
+      .sort((a, b) => a.time - b.time);
+  }
+
+  /**
    * Get WAN connection status
    *
    * Raw: { external_ip, is_connected, is_linked, uptime, max_upstream_bps, max_downstream_bps, ... }

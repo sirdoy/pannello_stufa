@@ -14,4 +14,3 @@ export { getCachedData, invalidateCache, CACHE_TTL_MS } from './fritzboxCache';
 export { checkRateLimitFritzBox, FRITZBOX_RATE_LIMIT } from './fritzboxRateLimiter';
 export { FRITZBOX_ERROR_CODES } from './fritzboxErrors';
 export { logDeviceEvent, getDeviceEvents, getDeviceStates, updateDeviceStates } from './deviceEventLogger';
-export { appendBandwidthReading, getBandwidthHistory, cleanupOldBandwidthHistory } from './bandwidthHistoryLogger';

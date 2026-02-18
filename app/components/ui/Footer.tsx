@@ -4,6 +4,7 @@ import type { HTMLAttributes } from 'react';
 import Link from 'next/link';
 import { APP_VERSION, APP_AUTHOR } from '@/lib/version';
 import { useVersionCheck } from '@/app/hooks/useVersionCheck';
+import { cn } from '@/lib/utils/cn';
 import WhatsNewModal from '../WhatsNewModal';
 import Text from './Text';
 
@@ -22,15 +23,15 @@ export default function Footer({ className = '', ...props }: FooterProps) {
   return (
     <>
       <footer
-        className={`
-          w-full pt-6 pb-28 lg:pb-8 mt-auto
-          bg-slate-900/95 backdrop-blur-xl
-          border-t border-slate-700/50
-          relative z-10
-          [html:not(.dark)_&]:bg-white/95
-          [html:not(.dark)_&]:border-slate-200/50
-          ${className}
-        `}
+        className={cn(
+          'w-full pt-6 pb-28 lg:pb-8 mt-auto',
+          'bg-slate-900/95 backdrop-blur-xl',
+          'border-t border-slate-700/50',
+          'relative z-10',
+          '[html:not(.dark)_&]:bg-white/95',
+          '[html:not(.dark)_&]:border-slate-200/50',
+          className,
+        )}
         {...props}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -49,18 +50,18 @@ export default function Footer({ className = '', ...props }: FooterProps) {
               <Text variant="tertiary" size="sm" as="span" className="hidden sm:inline">•</Text>
               <Link
                 href="/changelog"
-                className="
-                  group flex items-center gap-1.5 px-3 py-1.5 sm:px-0 sm:py-0
-                  rounded-xl sm:rounded-none
-                  bg-slate-800/50 sm:bg-transparent
-                  hover:bg-slate-700/50 sm:hover:bg-transparent
-                  [html:not(.dark)_&]:bg-slate-100/50 [html:not(.dark)_&]:sm:bg-transparent
-                  [html:not(.dark)_&]:hover:bg-slate-200/50 [html:not(.dark)_&]:sm:hover:bg-transparent
-                  transition-all duration-200
-                  active:scale-95 sm:active:scale-100
-                  touch-manipulation
-                  relative
-                "
+                className={cn(
+                  'group flex items-center gap-1.5 px-3 py-1.5 sm:px-0 sm:py-0',
+                  'rounded-xl sm:rounded-none',
+                  'bg-slate-800/50 sm:bg-transparent',
+                  'hover:bg-slate-700/50 sm:hover:bg-transparent',
+                  '[html:not(.dark)_&]:bg-slate-100/50 [html:not(.dark)_&]:sm:bg-transparent',
+                  '[html:not(.dark)_&]:hover:bg-slate-200/50 [html:not(.dark)_&]:sm:hover:bg-transparent',
+                  'transition-all duration-200',
+                  'active:scale-95 sm:active:scale-100',
+                  'touch-manipulation',
+                  'relative',
+                )}
               >
                 <Text variant="tertiary" size="sm" as="span" className="group-hover:text-ember-400 [html:not(.dark)_&]:group-hover:text-ember-600 transition-colors">Versione</Text>
                 <Text variant="body" size="base" as="strong" className="group-hover:text-ember-400 [html:not(.dark)_&]:group-hover:text-ember-600 transition-colors">
@@ -77,17 +78,17 @@ export default function Footer({ className = '', ...props }: FooterProps) {
                       e.preventDefault();
                       handleBadgeClick();
                     }}
-                    className="
-                      absolute -top-1 -right-1 sm:-top-2 sm:-right-2
-                      px-2 py-0.5 sm:px-2.5 sm:py-1
-                      text-[10px] sm:text-xs font-bold font-display
-                      text-white bg-gradient-to-r from-ember-500 to-flame-600
-                      rounded-full shadow-ember-glow-sm
-                      animate-pulse cursor-pointer
-                      hover:scale-110 active:scale-95
-                      transition-transform duration-200
-                      touch-manipulation
-                    "
+                    className={cn(
+                      'absolute -top-1 -right-1 sm:-top-2 sm:-right-2',
+                      'px-2 py-0.5 sm:px-2.5 sm:py-1',
+                      'text-[10px] sm:text-xs font-bold font-display',
+                      'text-white bg-gradient-to-r from-ember-500 to-flame-600',
+                      'rounded-full shadow-ember-glow-sm',
+                      'animate-pulse cursor-pointer',
+                      'hover:scale-110 active:scale-95',
+                      'transition-transform duration-200',
+                      'touch-manipulation',
+                    )}
                     title="Nuova versione disponibile! Tocca per nascondere"
                     role="button"
                     aria-label="Nuova versione disponibile"

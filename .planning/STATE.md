@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v9.0 Performance Optimization — Phase 70 ready to plan
+**Current focus:** v9.0 Performance Optimization — Phase 70 complete, ready for Phase 71
 
 ## Current Position
 
 Phase: 70 of 74 (Measurement Baseline + Quick Wins)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-02-18 - Completed 70-01: Bundle analyzer + baseline measurement script
+Plan: 2 of 2 in current phase (COMPLETE)
+Status: Phase complete
+Last activity: 2026-02-18 - Completed 70-02: Self-hosted fonts + Web Vitals pipeline
 
-Progress: [█░░░░░░░░░] 13% (v9.0 — 1/8 plans)
+Progress: [██░░░░░░░░] 25% (v9.0 — 2/8 plans)
 
 ## Performance Metrics
 
@@ -45,6 +45,9 @@ Recent decisions affecting v9.0:
 - [70-01]: Phase 70 is the fixed reference baseline for --compare in all v9.0 phases (not rolling)
 - [70-01]: @next/bundle-analyzer added to package.json only (npm install not run per project rules)
 - [70-01]: Shared chunk detection uses multi-route reference counting to match Next.js First Load JS accounting
+- [70-02]: Web Vitals are not consent-gated — treated as technical infrastructure data, not user behavioral analytics
+- [70-02]: adjustFontFallback: true on both fonts prevents CLS during font swap window
+- [70-02]: No weight array needed for variable fonts (Outfit, Space Grotesk) — single WOFF2 covers all weights
 
 ### Pending Todos
 
@@ -64,5 +67,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 70-01-PLAN.md (bundle analyzer + baseline script)
-Resume file: .planning/phases/70-measurement-baseline-quick-wins/70-02-PLAN.md
+Stopped at: Completed 70-02-PLAN.md (self-hosted fonts + Web Vitals pipeline)
+Resume file: .planning/phases/71-react-compiler/ (next phase)

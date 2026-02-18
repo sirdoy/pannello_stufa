@@ -50,7 +50,7 @@ See `.planning/milestones/` for full archives.
 
 **Milestone Goal:** Make the app fast — reduce bundle size, establish measurable baselines, eliminate interaction sluggishness, and optimize the heaviest page (dashboard) for real users.
 
-- [ ] **Phase 70: Measurement Baseline + Quick Wins** - Establish bundle/Lighthouse baselines; apply zero-risk font and resource hint optimizations
+- [x] **Phase 70: Measurement Baseline + Quick Wins** - Establish bundle/Lighthouse baselines; apply zero-risk font and resource hint optimizations
 - [ ] **Phase 71: React Compiler** - Enable auto-memoization across all compliant components; isolate in its own phase for clean regression attribution
 - [ ] **Phase 72: Code Splitting** - Lazy-load Recharts on sub-pages; ensure PWA offline shell remains intact after chunk changes
 - [ ] **Phase 73: Render Optimization** - Eliminate Recharts poll-tick re-renders, stagger dashboard fetches, debounce thermostat writes
@@ -72,7 +72,7 @@ See `.planning/milestones/` for full archives.
 
 Plans:
 - [x] 70-01-PLAN.md — Bundle analyzer + baseline capture script
-- [ ] 70-02-PLAN.md — Font self-hosting + preconnect hints + Web Vitals pipeline + dashboard
+- [x] 70-02-PLAN.md — Font self-hosting + preconnect hints + Web Vitals pipeline + dashboard
 
 ### Phase 71: React Compiler
 **Goal**: Auto-memoization is enabled across all Rules-of-React-compliant components and hooks, replacing manual useMemo/useCallback calls; all 3,700+ existing tests remain green; any non-compliant component is individually opted out rather than blocking the whole compiler.

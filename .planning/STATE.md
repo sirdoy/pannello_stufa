@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v9.0 Performance Optimization — Phase 70 complete, ready for Phase 71
+**Current focus:** v9.0 Performance Optimization — Phase 71 complete, ready for Phase 72
 
 ## Current Position
 
-Phase: 70 of 74 (Measurement Baseline + Quick Wins)
-Plan: 2 of 2 in current phase (COMPLETE)
+Phase: 71 of 74 (React Compiler)
+Plan: 1 of 1 in current phase (COMPLETE)
 Status: Phase complete
-Last activity: 2026-02-18 - Completed 70-02: Self-hosted fonts + Web Vitals pipeline
+Last activity: 2026-02-18 - Completed 71-01: React Compiler 1.0 enabled globally
 
-Progress: [██░░░░░░░░] 25% (v9.0 — 2/8 plans)
+Progress: [███░░░░░░░] 37% (v9.0 — 3/8 plans)
 
 ## Performance Metrics
 
@@ -48,6 +48,9 @@ Recent decisions affecting v9.0:
 - [70-02]: Web Vitals are not consent-gated — treated as technical infrastructure data, not user behavioral analytics
 - [70-02]: adjustFontFallback: true on both fonts prevents CLS during font swap window
 - [70-02]: No weight array needed for variable fonts (Outfit, Space Grotesk) — single WOFF2 covers all weights
+- [71-01]: All 28 failing tests are pre-existing (confirmed by toggling reactCompiler flag) — no compiler regressions
+- [71-01]: No "use no memo" opt-outs required — 271/271 components pass healthcheck, zero new failures
+- [71-01]: React Compiler causes zero new failures; COMP-01, COMP-02, COMP-03 all satisfied
 
 ### Pending Todos
 
@@ -67,5 +70,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 70-02-PLAN.md (self-hosted fonts + Web Vitals pipeline)
-Resume file: .planning/phases/71-react-compiler/ (next phase)
+Stopped at: Completed 71-01-PLAN.md (React Compiler 1.0 enablement)
+Resume file: .planning/phases/72-bundle-splits/ (next phase)

@@ -51,7 +51,7 @@ See `.planning/milestones/` for full archives.
 **Milestone Goal:** Make the app fast — reduce bundle size, establish measurable baselines, eliminate interaction sluggishness, and optimize the heaviest page (dashboard) for real users.
 
 - [x] **Phase 70: Measurement Baseline + Quick Wins** - Establish bundle/Lighthouse baselines; apply zero-risk font and resource hint optimizations
-- [ ] **Phase 71: React Compiler** - Enable auto-memoization across all compliant components; isolate in its own phase for clean regression attribution
+- [x] **Phase 71: React Compiler** - Enable auto-memoization across all compliant components; isolate in its own phase for clean regression attribution
 - [ ] **Phase 72: Code Splitting** - Lazy-load Recharts on sub-pages; ensure PWA offline shell remains intact after chunk changes
 - [ ] **Phase 73: Render Optimization** - Eliminate Recharts poll-tick re-renders, stagger dashboard fetches, debounce thermostat writes
 - [ ] **Phase 74: Suspense Streaming (Conditional)** - Stream dashboard cards independently if Phase 70-73 results show LCP/TTI still needs improvement
@@ -85,7 +85,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 71-01-PLAN.md — Healthcheck + compiler enablement + regression verification
+- [x] 71-01-PLAN.md — Healthcheck + compiler enablement + regression verification
 
 ### Phase 72: Code Splitting
 **Goal**: Recharts chart code is deferred on the /network and /analytics sub-pages so it only downloads when a user actually visits those pages; the consent-gated correlation chart never downloads JS for users without analytics consent; the PWA offline shell continues to serve all six dashboard cards without ChunkLoadError after the build.

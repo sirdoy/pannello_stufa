@@ -88,7 +88,9 @@ export const NETATMO_ROUTES = {
 export const CAMERA_ROUTES = {
   list: `${API_BASE}/netatmo/camera`,
   allEvents: `${API_BASE}/netatmo/camera/events`,
-  snapshot: (cameraId: string): string => `${API_BASE}/netatmo/camera/${encodeURIComponent(cameraId)}/snapshot`,
+  // Use query parameter instead of path segment to avoid Turbopack routing issues
+  // with MAC address IDs containing colons (e.g., 70:ee:50:3b:1f:4f).
+  snapshot: (cameraId: string): string => `${API_BASE}/netatmo/camera/snapshot?cameraId=${encodeURIComponent(cameraId)}`,
   events: (cameraId: string): string => `${API_BASE}/netatmo/camera/${encodeURIComponent(cameraId)}/events`,
 } as const;
 

@@ -2,8 +2,9 @@ import {
   withAuthAndErrorHandler,
   success,
   notFound,
+  badRequest,
   requireNetatmoToken,
-  getPathParam,
+  parseQuery,
 } from '@/lib/core';
 import { adminDbGet } from '@/lib/firebaseAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
@@ -22,12 +23,21 @@ interface CameraData {
 }
 
 /**
- * GET /api/netatmo/camera/[cameraId]/snapshot
+ * GET /api/netatmo/camera/snapshot?cameraId=<id>
  * Returns snapshot URL for a specific camera
  * Protected: Requires Auth0 authentication
+ *
+ * Uses query parameter instead of path segment to avoid Turbopack routing issues
+ * with MAC address IDs that contain colons (e.g., 70:ee:50:3b:1f:4f).
  */
-export const GET = withAuthAndErrorHandler(async (request: NextRequest, context, session) => {
-  const cameraId = await getPathParam(context, 'cameraId');
+export const GET = withAuthAndErrorHandler(async (request: NextRequest, _context, _session) => {
+  const params = parseQuery(request);
+  const cameraId = params.get('cameraId');
+
+  if (!cameraId) {
+    return badRequest('Parametro cameraId mancante');
+  }
+
   const accessToken = await requireNetatmoToken();
 
   // Get cameras from Firebase or API (use environment-aware path)
@@ -36,9 +46,7 @@ export const GET = withAuthAndErrorHandler(async (request: NextRequest, context,
 
   if (!cameraData?.cameras) {
     // Fetch fresh data
-    const homeIdPath = getEnvironmentPath('netatmo/home_id');
-    const homeId = await adminDbGet(homeIdPath);
-    const homesData = await NETATMO_CAMERA_API.getCamerasData(accessToken, homeId as any);
+    const homesData = await NETATMO_CAMERA_API.getCamerasData(accessToken);
     cameraData = { cameras: NETATMO_CAMERA_API.parseCameras(homesData as any) as any };
   }
 

@@ -68,11 +68,11 @@ See `.planning/milestones/` for full archives.
   3. Developer can run `ANALYZE=true npm run build -- --webpack` and open `client.html` to inspect per-route JS bundle composition
   4. User's browser sends preconnect requests to Firebase RTDB, Auth0, and Netatmo API domains before any app JS fires its first API call
   5. Web Vitals (LCP, INP, CLS, FCP, TTFB) are reported to console/analytics pipeline on every production page load, establishing a before/after comparison baseline for phases 71-74
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 70-01: Bundle analyzer + Lighthouse baseline capture
-- [ ] 70-02: Font self-hosting via next/font + preconnect hints + web-vitals pipeline
+- [ ] 70-01-PLAN.md — Bundle analyzer + baseline capture script
+- [ ] 70-02-PLAN.md — Font self-hosting + preconnect hints + Web Vitals pipeline + dashboard
 
 ### Phase 71: React Compiler
 **Goal**: Auto-memoization is enabled across all Rules-of-React-compliant components and hooks, replacing manual useMemo/useCallback calls; all 3,700+ existing tests remain green; any non-compliant component is individually opted out rather than blocking the whole compiler.

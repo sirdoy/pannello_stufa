@@ -52,7 +52,7 @@ See `.planning/milestones/` for full archives.
 
 - [x] **Phase 70: Measurement Baseline + Quick Wins** - Establish bundle/Lighthouse baselines; apply zero-risk font and resource hint optimizations
 - [x] **Phase 71: React Compiler** - Enable auto-memoization across all compliant components; isolate in its own phase for clean regression attribution
-- [ ] **Phase 72: Code Splitting** - Lazy-load Recharts on sub-pages; ensure PWA offline shell remains intact after chunk changes
+- [x] **Phase 72: Code Splitting** - Lazy-load Recharts on sub-pages; ensure PWA offline shell remains intact after chunk changes
 - [ ] **Phase 73: Render Optimization** - Eliminate Recharts poll-tick re-renders, stagger dashboard fetches, debounce thermostat writes
 - [ ] **Phase 74: Suspense Streaming (Conditional)** - Stream dashboard cards independently if Phase 70-73 results show LCP/TTI still needs improvement
 
@@ -99,7 +99,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 72-01-PLAN.md — Dynamic-import Recharts charts on /network and /analytics with consent-gated loading
+- [x] 72-01-PLAN.md — Dynamic-import Recharts charts on /network and /analytics with consent-gated loading
 
 ### Phase 73: Render Optimization
 **Goal**: Recharts charts stop re-rendering on every polling tick; the six dashboard device cards stagger their initial data fetches so no thundering herd fires on mount; thermostat setpoint writes are debounced to reduce unnecessary API calls during rapid input.
@@ -151,7 +151,7 @@ Phases execute in numeric order: 70 → 71 → 72 → 73 → 74
 | 68-69 | v8.1 | 3/3 | ✓ Complete | 2026-02-18 |
 | 70. Measurement Baseline + Quick Wins | v9.0 | Complete    | 2026-02-18 | 2026-02-18 |
 | 71. React Compiler | v9.0 | Complete    | 2026-02-18 | - |
-| 72. Code Splitting | v9.0 | 0/1 | Not started | - |
+| 72. Code Splitting | v9.0 | 1/1 | Complete | 8dafcb0, e88e692 |
 | 73. Render Optimization | v9.0 | 0/2 | Not started | - |
 | 74. Suspense Streaming (Conditional) | v9.0 | 0/2 | Not started | - |
 

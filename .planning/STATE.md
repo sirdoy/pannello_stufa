@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v9.0 Performance Optimization — Phase 71 complete, ready for Phase 72
+**Current focus:** v9.0 Performance Optimization — Phase 72 in progress (Plan 01 complete)
 
 ## Current Position
 
-Phase: 71 of 74 (React Compiler)
+Phase: 72 of 74 (Code Splitting)
 Plan: 1 of 1 in current phase (COMPLETE)
 Status: Phase complete
-Last activity: 2026-02-18 - Completed 71-01: React Compiler 1.0 enabled globally
+Last activity: 2026-02-18 - Completed 72-01: Dynamic imports for all Recharts chart components
 
-Progress: [███░░░░░░░] 37% (v9.0 — 3/8 plans)
+Progress: [████░░░░░░] 50% (v9.0 — 4/8 plans)
 
 ## Performance Metrics
 
@@ -51,6 +51,8 @@ Recent decisions affecting v9.0:
 - [71-01]: All 28 failing tests are pre-existing (confirmed by toggling reactCompiler flag) — no compiler regressions
 - [71-01]: No "use no memo" opt-outs required — 271/271 components pass healthcheck, zero new failures
 - [71-01]: React Compiler causes zero new failures; COMP-01, COMP-02, COMP-03 all satisfied
+- [72-01]: SPLIT-03 (consent-gated non-fetch) achieved with zero extra code — existing {hasConsent && (...)} gate prevents component mount, browser never requests chunk
+- [72-01]: Loading skeleton heights match actual chart ResponsiveContainer heights to prevent layout shift (380px, 360px, 300px, 300px, 350px)
 
 ### Pending Todos
 
@@ -70,5 +72,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 71-01-PLAN.md (React Compiler 1.0 enablement)
-Resume file: .planning/phases/72-bundle-splits/ (next phase)
+Stopped at: Completed 72-01-PLAN.md (Code Splitting — dynamic imports for Recharts)
+Resume file: .planning/phases/72-code-splitting/ (phase complete, next: 73)

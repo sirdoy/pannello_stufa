@@ -96,10 +96,10 @@ Plans:
   2. First Load JS for /analytics route is reduced (verified by bundle analyzer — chart chunks absent from initial payload)
   3. User without analytics consent never triggers a network request for the BandwidthCorrelationChart JS chunk (verified via DevTools Network tab with consent denied)
   4. After building with new dynamic imports, user can load the dashboard offline and all six device cards render without ChunkLoadError (verified by DevTools Network offline mode + hard refresh)
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 72-01: Recharts lazy loading on /network and /analytics + PWA offline shell verification
+- [ ] 72-01-PLAN.md — Dynamic-import Recharts charts on /network and /analytics with consent-gated loading
 
 ### Phase 73: Render Optimization
 **Goal**: Recharts charts stop re-rendering on every polling tick; the six dashboard device cards stagger their initial data fetches so no thundering herd fires on mount; thermostat setpoint writes are debounced to reduce unnecessary API calls during rapid input.

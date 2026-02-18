@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { outfit, spaceGrotesk } from './fonts';
 import Navbar from './components/Navbar';
 import { Footer } from './components/ui';
 import ClientProviders from './components/ClientProviders';
@@ -31,9 +32,13 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="it" data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang="it" data-scroll-behavior="smooth" className={`${outfit.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
     <head>
       <meta name="view-transition" content="same-origin" />
+      {/* Preconnect: critical API domains */}
+      <link rel="preconnect" href="https://pannellostufa-default-rtdb.europe-west1.firebasedatabase.app" />
+      <link rel="preconnect" href="https://pannellostufa.firebaseapp.com" />
+      <link rel="preconnect" href="https://pannellostufa.eu.auth0.com" />
       <AppleSplashScreens />
       <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />

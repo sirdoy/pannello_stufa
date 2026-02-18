@@ -10,8 +10,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v8.1 (shipped 2026-02-18)
-**Status:** Masonry Dashboard complete — all 12 milestones shipped
+**Version:** v9.0 (in progress)
+**Status:** Performance Optimization — comprehensive bundle, load, and interaction speed improvements
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -318,7 +318,12 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-(None — next milestone not yet planned)
+**v9.0 Performance Optimization:**
+- [ ] Bundle size reduction (code splitting, lazy loading, tree shaking)
+- [ ] Dashboard page load optimization (heaviest page — all device cards + weather + polling)
+- [ ] Interaction responsiveness (reduce re-renders, memoization)
+- [ ] App-wide performance improvements (route-based splitting, component-level lazy loading)
+- [ ] Performance audit and baseline measurement
 
 ### Out of Scope
 
@@ -435,5 +440,16 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Deployment**: Vercel (current hosting platform)
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
+## Current Milestone: v9.0 Performance Optimization
+
+**Goal:** Make the app fast — reduce bundle size, optimize page loads (especially dashboard), and eliminate interaction sluggishness across all pages.
+
+**Target features:**
+- Performance audit with baseline measurements
+- Bundle size reduction via code splitting and lazy loading
+- Dashboard load optimization (heaviest page)
+- Interaction responsiveness (memoization, reduced re-renders)
+- App-wide route-based and component-level optimizations
+
 ---
-*Last updated: 2026-02-18 after v8.1 milestone completion (Masonry Dashboard shipped)*
+*Last updated: 2026-02-18 after v9.0 milestone start (Performance Optimization)*

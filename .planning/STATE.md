@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Planning next milestone
+**Current focus:** v9.0 Performance Optimization
 
 ## Current Position
 
-Phase: 69 of 69 (all complete)
-Plan: All plans complete
-Status: v8.1 Masonry Dashboard shipped
-Last activity: 2026-02-18 — Milestone v8.1 archived
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-18 — Milestone v9.0 started
 
-Progress: [██████████] 100% (v8.1 complete)
+Progress: [░░░░░░░░░░] 0% (requirements phase)
 
 ## Performance Metrics
 
@@ -57,5 +57,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Milestone v8.1 archived, ready for next milestone
+Stopped at: Milestone v9.0 started, defining requirements
 Resume file: None

@@ -2,10 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Settings } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import StatsCards from '@/app/components/analytics/StatsCards';
-import UsageChart from '@/app/components/analytics/UsageChart';
-import ConsumptionChart from '@/app/components/analytics/ConsumptionChart';
-import WeatherCorrelation from '@/app/components/analytics/WeatherCorrelation';
 import PeriodSelector from '@/app/components/analytics/PeriodSelector';
 import CalibrationModal from '@/app/components/analytics/CalibrationModal';
 import ConsentBanner from '@/app/components/analytics/ConsentBanner';
@@ -14,8 +12,45 @@ import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
+import { Skeleton } from '@/app/components/ui';
 import { canTrackAnalytics, getConsentState } from '@/lib/analyticsConsentService';
 import type { DailyStats, AnalyticsPeriod } from '@/types/analytics';
+
+const UsageChart = dynamic(
+  () => import('@/app/components/analytics/UsageChart'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[300px] flex items-center justify-center">
+        <Skeleton className="w-full h-full rounded-lg" />
+      </div>
+    ),
+  }
+);
+
+const ConsumptionChart = dynamic(
+  () => import('@/app/components/analytics/ConsumptionChart'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[300px] flex items-center justify-center">
+        <Skeleton className="w-full h-full rounded-lg" />
+      </div>
+    ),
+  }
+);
+
+const WeatherCorrelation = dynamic(
+  () => import('@/app/components/analytics/WeatherCorrelation'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[350px] flex items-center justify-center">
+        <Skeleton className="w-full h-full rounded-lg" />
+      </div>
+    ),
+  }
+);
 
 /**
  * Analytics Dashboard Page

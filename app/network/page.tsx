@@ -16,6 +16,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { PageLayout, Skeleton, Button, Heading, Card, Text } from '@/app/components/ui';
 import { useNetworkData } from '@/app/components/devices/network/hooks/useNetworkData';
 import { useBandwidthHistory } from './hooks/useBandwidthHistory';
@@ -24,10 +25,32 @@ import { useBandwidthCorrelation } from './hooks/useBandwidthCorrelation';
 import { canTrackAnalytics, getConsentState } from '@/lib/analyticsConsentService';
 import WanStatusCard from './components/WanStatusCard';
 import DeviceListTable from './components/DeviceListTable';
-import BandwidthChart from './components/BandwidthChart';
-import BandwidthCorrelationChart from './components/BandwidthCorrelationChart';
 import CorrelationInsight from './components/CorrelationInsight';
 import DeviceHistoryTimeline from './components/DeviceHistoryTimeline';
+
+const BandwidthChart = dynamic(
+  () => import('./components/BandwidthChart'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="bg-slate-800/30 [html:not(.dark)_&]:bg-white rounded-2xl p-6 h-[380px] flex items-center justify-center">
+        <Skeleton className="w-full h-full rounded-xl" />
+      </div>
+    ),
+  }
+);
+
+const BandwidthCorrelationChart = dynamic(
+  () => import('./components/BandwidthCorrelationChart'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="bg-slate-800/30 [html:not(.dark)_&]:bg-white rounded-2xl p-6 h-[360px] flex items-center justify-center">
+        <Skeleton className="w-full h-full rounded-xl" />
+      </div>
+    ),
+  }
+);
 import { STOVE_ROUTES } from '@/lib/routes';
 import type { DeviceCategory } from '@/types/firebase/network';
 

@@ -82,10 +82,10 @@ Plans:
   1. `npx react-compiler-healthcheck` output is reviewed and any high-risk files (ThermostatCard, orchestrator hooks) are identified before the compiler is enabled
   2. User sees no regressions in device card behavior, stove control, or scheduler interactions after compiler enablement (all 3,700+ tests pass)
   3. User benefits from reduced re-render overhead — React DevTools Profiler shows fewer highlighted re-renders on polling ticks for orchestrator hooks (useStoveData, useNetworkData)
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 71-01: React Compiler healthcheck + enable + regression verification
+- [ ] 71-01-PLAN.md — Healthcheck + compiler enablement + regression verification
 
 ### Phase 72: Code Splitting
 **Goal**: Recharts chart code is deferred on the /network and /analytics sub-pages so it only downloads when a user actually visits those pages; the consent-gated correlation chart never downloads JS for users without analytics consent; the PWA offline shell continues to serve all six dashboard cards without ChunkLoadError after the build.
@@ -150,7 +150,7 @@ Phases execute in numeric order: 70 → 71 → 72 → 73 → 74
 | 61-67 | v8.0 | 18/18 | ✓ Complete | 2026-02-16 |
 | 68-69 | v8.1 | 3/3 | ✓ Complete | 2026-02-18 |
 | 70. Measurement Baseline + Quick Wins | v9.0 | Complete    | 2026-02-18 | 2026-02-18 |
-| 71. React Compiler | v9.0 | 0/1 | Not started | - |
+| 71. React Compiler | v9.0 | 0/1 | Planned | - |
 | 72. Code Splitting | v9.0 | 0/1 | Not started | - |
 | 73. Render Optimization | v9.0 | 0/2 | Not started | - |
 | 74. Suspense Streaming (Conditional) | v9.0 | 0/2 | Not started | - |

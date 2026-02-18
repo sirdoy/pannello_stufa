@@ -1,4 +1,5 @@
 import { auth0 } from '@/lib/auth0';
+import { splitIntoColumns } from '@/lib/utils/dashboardColumns';
 import StoveCard from './components/devices/stove/StoveCard';
 import ThermostatCard from './components/devices/thermostat/ThermostatCard';
 import CameraCard from './components/devices/camera/CameraCard';
@@ -56,15 +57,7 @@ export default async function Home() {
   const visibleCards = getVisibleDashboardCards(deviceConfig);
 
   // Precompute left/right columns by index parity (even→left, odd→right)
-  const leftColumn: Array<{ card: typeof visibleCards[number]; flatIndex: number }> = [];
-  const rightColumn: Array<{ card: typeof visibleCards[number]; flatIndex: number }> = [];
-  visibleCards.forEach((card, i) => {
-    if (i % 2 === 0) {
-      leftColumn.push({ card, flatIndex: i });
-    } else {
-      rightColumn.push({ card, flatIndex: i });
-    }
-  });
+  const { left: leftColumn, right: rightColumn } = splitIntoColumns(visibleCards);
 
   // Shared card renderer — used by both mobile and desktop layouts
   const renderCard = (card: typeof visibleCards[number], flatIndex: number) => {
@@ -99,14 +92,16 @@ export default async function Home() {
         {visibleCards.map((card, index) => renderCard(card, index))}
       </div>
 
-      {/* Desktop: two-column masonry (LAYOUT-01, LAYOUT-02) */}
+      {/* Desktop: two-column masonry (LAYOUT-01, LAYOUT-02, EDGE-01) */}
       <div className="hidden sm:flex sm:flex-row gap-8 lg:gap-10">
-        <div className="flex flex-col gap-8 lg:gap-10 flex-1 min-w-0">
+        <div className={`flex flex-col gap-8 lg:gap-10 min-w-0 ${rightColumn.length === 0 ? 'w-full' : 'flex-1'}`}>
           {leftColumn.map(({ card, flatIndex }) => renderCard(card, flatIndex))}
         </div>
-        <div className="flex flex-col gap-8 lg:gap-10 flex-1 min-w-0">
-          {rightColumn.map(({ card, flatIndex }) => renderCard(card, flatIndex))}
-        </div>
+        {rightColumn.length > 0 && (
+          <div className="flex flex-col gap-8 lg:gap-10 flex-1 min-w-0">
+            {rightColumn.map(({ card, flatIndex }) => renderCard(card, flatIndex))}
+          </div>
+        )}
       </div>
 
       {/* Empty State using new EmptyState component */}

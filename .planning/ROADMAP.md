@@ -57,7 +57,7 @@ See `.planning/milestones/` for full archives.
 
 **Approach:** Two-column flexbox split by index parity — even-indexed cards into a left `flex flex-col` column, odd-indexed cards into a right `flex flex-col` column. Pure server component change, zero new dependencies, SSR-safe, PWA-cache-safe.
 
-- [ ] **Phase 68: Core Masonry Layout** - Replace `<Grid cols={2}>` with two-column flexbox split in `app/page.tsx`
+- [x] **Phase 68: Core Masonry Layout** - Replace `<Grid cols={2}>` with two-column flexbox split in `app/page.tsx` (completed 2026-02-18)
 - [ ] **Phase 69: Edge Cases, Error Boundary & Tests** - Min-height on error fallback, edge case handling, unit tests for column assignment
 
 ## Phase Details
@@ -109,7 +109,7 @@ Plans:
 | 49-54 | v6.0 | 29/29 | ✓ Complete | 2026-02-11 |
 | 55-60 | v7.0 | 22/22 | ✓ Complete | 2026-02-13 |
 | 61-67 | v8.0 | 18/18 | ✓ Complete | 2026-02-16 |
-| 68. Core Masonry Layout | v8.1 | 0/1 | Planned | - |
+| 68. Core Masonry Layout | v8.1 | Complete    | 2026-02-18 | - |
 | 69. Edge Cases & Tests | v8.1 | 0/TBD | Not started | - |
 
 **Total:** 11 milestones shipped, 67 phases complete, 316 plans executed + v8.1 in progress

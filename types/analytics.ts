@@ -84,3 +84,25 @@ export interface CalibrationSettings {
 
 /** Analytics dashboard period filter options */
 export type AnalyticsPeriod = 7 | 30 | 90;
+
+/** Web Vitals metric name (Core Web Vitals + supplementary) */
+export type WebVitalName = 'LCP' | 'INP' | 'CLS' | 'FCP' | 'TTFB';
+
+/** Web Vitals rating thresholds */
+export type WebVitalRating = 'good' | 'needs-improvement' | 'poor';
+
+/** Web Vitals event stored in Firebase RTDB */
+export interface WebVitalEvent {
+  /** Metric name (LCP, INP, CLS, FCP, TTFB) */
+  name: WebVitalName;
+  /** Metric value (ms for timing, unitless for CLS) */
+  value: number;
+  /** Rating based on Core Web Vitals thresholds */
+  rating: WebVitalRating;
+  /** Unique metric ID (for deduplication) */
+  id: string;
+  /** Page URL path */
+  url: string;
+  /** ISO 8601 timestamp */
+  timestamp: string;
+}

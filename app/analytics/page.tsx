@@ -9,6 +9,7 @@ import WeatherCorrelation from '@/app/components/analytics/WeatherCorrelation';
 import PeriodSelector from '@/app/components/analytics/PeriodSelector';
 import CalibrationModal from '@/app/components/analytics/CalibrationModal';
 import ConsentBanner from '@/app/components/analytics/ConsentBanner';
+import WebVitalsCard from '@/app/components/analytics/WebVitalsCard';
 import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
 import Heading from '@/app/components/ui/Heading';
@@ -105,6 +106,12 @@ export default function AnalyticsPage() {
             </Button>
           </div>
         )}
+      </div>
+
+      {/* Web Performance — always visible (not consent-gated) */}
+      <div className="mb-6">
+        <Heading level={2} variant="default" className="mb-4">Web Performance</Heading>
+        <WebVitalsCard />
       </div>
 
       {/* Consent denied state */}

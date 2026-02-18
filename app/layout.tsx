@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { outfit, spaceGrotesk } from './fonts';
+import { WebVitals } from './_components/WebVitals';
 import Navbar from './components/Navbar';
 import { Footer } from './components/ui';
 import ClientProviders from './components/ClientProviders';
@@ -83,6 +84,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </a>
 
     <ClientProviders>
+      <WebVitals />
       <VersionEnforcer />
       <Navbar />
       <main id="main-content" className="flex-1 pt-2 pb-12 px-4 sm:px-6 lg:px-8">

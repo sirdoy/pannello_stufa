@@ -66,7 +66,7 @@ See `.planning/milestones/` for full archives.
   1. User sees fonts rendered without a Google Fonts CDN network request on cold load (verified via DevTools Network tab — no requests to fonts.googleapis.com or fonts.gstatic.com)
   2. User experiences zero layout shift from font loading (CLS score 0 in Lighthouse — font space reserved before swap)
   3. Developer can run `ANALYZE=true npm run build -- --webpack` and open `client.html` to inspect per-route JS bundle composition
-  4. User's browser sends preconnect requests to Firebase RTDB, Auth0, and Netatmo API domains before any app JS fires its first API call
+  4. User's browser sends preconnect requests to Firebase RTDB and Auth0 domains before any app JS fires its first API call (Netatmo excluded — server-proxied, never called from browser)
   5. Web Vitals (LCP, INP, CLS, FCP, TTFB) are reported to console/analytics pipeline on every production page load, establishing a before/after comparison baseline for phases 71-74
 **Plans**: 2 plans
 
@@ -149,7 +149,7 @@ Phases execute in numeric order: 70 → 71 → 72 → 73 → 74
 | 55-60 | v7.0 | 22/22 | ✓ Complete | 2026-02-13 |
 | 61-67 | v8.0 | 18/18 | ✓ Complete | 2026-02-16 |
 | 68-69 | v8.1 | 3/3 | ✓ Complete | 2026-02-18 |
-| 70. Measurement Baseline + Quick Wins | v9.0 | 1/2 | In progress | 2026-02-18 |
+| 70. Measurement Baseline + Quick Wins | v9.0 | Complete    | 2026-02-18 | 2026-02-18 |
 | 71. React Compiler | v9.0 | 0/1 | Not started | - |
 | 72. Code Splitting | v9.0 | 0/1 | Not started | - |
 | 73. Render Optimization | v9.0 | 0/2 | Not started | - |

@@ -1,5 +1,11 @@
 import type { NextConfig } from 'next';
 import withSerwistInit from '@serwist/next';
+// @ts-expect-error — @next/bundle-analyzer ships CommonJS types not fully compatible with ESM import
+import withBundleAnalyzer from '@next/bundle-analyzer';
+
+const withAnalyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
 
 const withSerwist = withSerwistInit({
   swSrc: 'app/sw.ts',
@@ -35,4 +41,4 @@ const nextConfig: NextConfig = {
   turbopack: {},
 };
 
-export default withSerwist(nextConfig);
+export default withAnalyzer(withSerwist(nextConfig));

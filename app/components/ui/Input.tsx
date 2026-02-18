@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { forwardRef, useId, useState, useCallback } from 'react';
+import { forwardRef, useId, useState, useCallback, useEffect } from 'react';
 import * as Label from '@radix-ui/react-label';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
@@ -169,6 +169,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     }
   }, [isControlled, validate, onChange]);
 
+  // Defer input rendering to avoid hydration mismatch from browser extensions
+  // (e.g. LastPass injecting data-lastpass-icon-root into the DOM before hydration)
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   // Determine if we need extra padding for clear button
   const needsClearPadding = clearable && currentValue;
 
@@ -190,46 +195,60 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       )}
 
       {/* Input wrapper for positioning clear button */}
-      <div className="relative" suppressHydrationWarning>
-        <input
-          ref={ref}
-          type={type}
-          id={inputId}
-          // Use controlled mode if: externally controlled OR we need internal control
-          value={isControlled || needsInternalControl ? currentValue : undefined}
-          defaultValue={!isControlled && !needsInternalControl ? defaultValue : undefined}
-          onChange={handleChange}
-          maxLength={maxLength}
-          disabled={disabled}
-          aria-invalid={displayError ? 'true' : undefined}
-          aria-describedby={displayError ? errorId : undefined}
-          className={cn(
-            inputVariants({ variant: computedVariant }),
-            needsClearPadding && 'pr-10',
-            className
-          )}
-          {...props}
-        />
+      <div className="relative">
+        {mounted ? (
+          <>
+            <input
+              ref={ref}
+              type={type}
+              id={inputId}
+              // Use controlled mode if: externally controlled OR we need internal control
+              value={isControlled || needsInternalControl ? currentValue : undefined}
+              defaultValue={!isControlled && !needsInternalControl ? defaultValue : undefined}
+              onChange={handleChange}
+              maxLength={maxLength}
+              disabled={disabled}
+              aria-invalid={displayError ? 'true' : undefined}
+              aria-describedby={displayError ? errorId : undefined}
+              className={cn(
+                inputVariants({ variant: computedVariant }),
+                needsClearPadding && 'pr-10',
+                className
+              )}
+              {...props}
+            />
 
-        {/* Clear button */}
-        {clearable && currentValue && !disabled && (
-          <button
-            type="button"
-            onClick={handleClear}
-            aria-label="Clear input"
-            className={cn(
-              'absolute right-3 top-1/2 -translate-y-1/2',
-              'p-1 rounded-full',
-              'text-slate-400 hover:text-slate-200',
-              'hover:bg-slate-700/50',
-              'transition-colors duration-150',
-              '[html:not(.dark)_&]:text-slate-500',
-              '[html:not(.dark)_&]:hover:text-slate-700',
-              '[html:not(.dark)_&]:hover:bg-slate-200/50'
+            {/* Clear button */}
+            {clearable && currentValue && !disabled && (
+              <button
+                type="button"
+                onClick={handleClear}
+                aria-label="Clear input"
+                className={cn(
+                  'absolute right-3 top-1/2 -translate-y-1/2',
+                  'p-1 rounded-full',
+                  'text-slate-400 hover:text-slate-200',
+                  'hover:bg-slate-700/50',
+                  'transition-colors duration-150',
+                  '[html:not(.dark)_&]:text-slate-500',
+                  '[html:not(.dark)_&]:hover:text-slate-700',
+                  '[html:not(.dark)_&]:hover:bg-slate-200/50'
+                )}
+              >
+                <X className="h-4 w-4" />
+              </button>
             )}
-          >
-            <X className="h-4 w-4" />
-          </button>
+          </>
+        ) : (
+          /* SSR placeholder — matches input dimensions to prevent layout shift.
+             No <input> tag means password manager extensions cannot inject DOM nodes. */
+          <div
+            role="presentation"
+            className={cn(
+              inputVariants({ variant: computedVariant }),
+              className
+            )}
+          />
         )}
       </div>
 

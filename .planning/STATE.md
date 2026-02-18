@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v9.0 Performance Optimization
+**Current focus:** v9.0 Performance Optimization — Phase 70 ready to plan
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-02-18 — Milestone v9.0 started
+Phase: 70 of 74 (Measurement Baseline + Quick Wins)
+Plan: 0 of 2 in current phase
+Status: Ready to plan
+Last activity: 2026-02-18 — v9.0 roadmap created (5 phases, 21 requirements, phases 70-74)
 
-Progress: [░░░░░░░░░░] 0% (requirements phase)
+Progress: [░░░░░░░░░░] 0% (v9.0 — 0/8 plans)
 
 ## Performance Metrics
 
@@ -23,22 +23,14 @@ Progress: [░░░░░░░░░░] 0% (requirements phase)
 - Average duration: ~6 min (recent trend)
 - Total execution time: ~78 hours across 12 milestones
 
-**By Milestone:**
+**By Milestone (recent):**
 
 | Milestone | Phases | Plans | Duration |
 |-----------|--------|-------|----------|
-| v1.0 Push Notifications | 1-5 | 29 | 4 days |
-| v2.0 Netatmo & Monitoring | 6-10 | 21 | 1.4 days |
-| v3.0 Design System | 11-18 | 52 | 3 days |
-| v3.1 Design Compliance | 19-24 | 13 | 4 days |
-| v3.2 Dashboard & Weather | 25-29 | 13 | 2 days |
-| v4.0 Advanced Components | 30-36 | 24 | 2 days |
-| v5.0 TypeScript Migration | 37-43 | 56 | 4 days |
-| v5.1 Tech Debt & Quality | 44-48 | 39 | 2 days |
-| v6.0 Operations & PWA | 49-54 | 29 | 2 days |
 | v7.0 Performance & Resilience | 55-60 | 22 | 2 days |
 | v8.0 Fritz!Box Network Monitor | 61-67 | 18 | 3 days |
 | v8.1 Masonry Dashboard | 68-69 | 3 | 1 day |
+| v9.0 Performance Optimization | 70-74 | 8 (est.) | TBD |
 
 ## Accumulated Context
 
@@ -46,16 +38,22 @@ Progress: [░░░░░░░░░░] 0% (requirements phase)
 
 See PROJECT.md Key Decisions table for full history.
 
+Recent decisions affecting v9.0:
+- [v9.0 research]: `next/dynamic` does NOT reduce First Load JS for always-visible dashboard cards (Client Components in App Router) — only effective on sub-page Recharts components
+- [v9.0 research]: React Compiler must be isolated in Phase 71 alone for clean regression attribution
+- [v9.0 research]: Phase 74 (Suspense) is conditional — only execute if Phase 70-73 results show LCP/TTI still insufficient
+
 ### Pending Todos
 
 None.
 
 ### Blockers/Concerns
 
-None.
+- [Phase 74]: Suspense streaming has a known conflict between `deviceConfig` server-fetch pattern and per-card Suspense boundaries. Requires dedicated research before planning. Use `/gsd:research-phase` for Phase 74.
+- [Phase 73]: `useAdaptivePolling` hook must be read before planning Phase 73 to confirm `initialDelay` is achievable without architectural changes. Confirm stove hook uses Firebase RTDB listener (not polling) as primary path — safety-critical.
 
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Milestone v9.0 started, defining requirements
+Stopped at: v9.0 roadmap written — ROADMAP.md, STATE.md, REQUIREMENTS.md traceability updated
 Resume file: None

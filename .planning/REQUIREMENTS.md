@@ -76,33 +76,33 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MEAS-01 | — | Pending |
-| MEAS-02 | — | Pending |
-| MEAS-03 | — | Pending |
-| MEAS-04 | — | Pending |
-| FONT-01 | — | Pending |
-| FONT-02 | — | Pending |
-| FONT-03 | — | Pending |
-| COMP-01 | — | Pending |
-| COMP-02 | — | Pending |
-| COMP-03 | — | Pending |
-| SPLIT-01 | — | Pending |
-| SPLIT-02 | — | Pending |
-| SPLIT-03 | — | Pending |
-| SPLIT-04 | — | Pending |
-| REND-01 | — | Pending |
-| REND-02 | — | Pending |
-| REND-03 | — | Pending |
-| REND-04 | — | Pending |
-| SUSP-01 | — | Pending |
-| SUSP-02 | — | Pending |
-| SUSP-03 | — | Pending |
+| MEAS-01 | Phase 70 | Pending |
+| MEAS-02 | Phase 70 | Pending |
+| MEAS-03 | Phase 70 | Pending |
+| MEAS-04 | Phase 70 | Pending |
+| FONT-01 | Phase 70 | Pending |
+| FONT-02 | Phase 70 | Pending |
+| FONT-03 | Phase 70 | Pending |
+| COMP-01 | Phase 71 | Pending |
+| COMP-02 | Phase 71 | Pending |
+| COMP-03 | Phase 71 | Pending |
+| SPLIT-01 | Phase 72 | Pending |
+| SPLIT-02 | Phase 72 | Pending |
+| SPLIT-03 | Phase 72 | Pending |
+| SPLIT-04 | Phase 72 | Pending |
+| REND-01 | Phase 73 | Pending |
+| REND-02 | Phase 73 | Pending |
+| REND-03 | Phase 73 | Pending |
+| REND-04 | Phase 73 | Pending |
+| SUSP-01 | Phase 74 | Pending |
+| SUSP-02 | Phase 74 | Pending |
+| SUSP-03 | Phase 74 | Pending |
 
 **Coverage:**
 - v9.0 requirements: 21 total
-- Mapped to phases: 0
-- Unmapped: 21 (pending roadmap creation)
+- Mapped to phases: 21
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-18*
-*Last updated: 2026-02-18 after initial definition*
+*Last updated: 2026-02-18 — traceability populated after roadmap creation (phases 70-74)*

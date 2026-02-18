@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server';
 import { auth0 } from '@/lib/auth0';
 
 export async function proxy(req) {
+  // Block /debug pages in production
+  if (process.env.NODE_ENV === 'production' && req.nextUrl.pathname.startsWith('/debug')) {
+    return NextResponse.rewrite(new URL('/not-found', req.url));
+  }
+
   // Bypass authentication in test mode (Playwright)
   if (process.env.TEST_MODE === 'true') {
     return NextResponse.next();

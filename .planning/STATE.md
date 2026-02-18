@@ -9,17 +9,17 @@ See: .planning/PROJECT.md (updated 2026-02-17)
 
 ## Current Position
 
-Phase: 68 of 69 (Core Masonry Layout)
-Plan: 1 of 1 in current phase
-Status: Phase 68 complete — plan 01 executed
-Last activity: 2026-02-18 — Plan 68-01 complete (masonry layout)
+Phase: 69 of 69 (Edge Cases & Error Boundary Tests)
+Plan: 1 of 3 in current phase
+Status: Plan 69-01 complete — utility extraction, EDGE-01 fix, EDGE-03 fix
+Last activity: 2026-02-18 — Plan 69-01 complete (splitIntoColumns utility + layout fixes)
 
-Progress: [█████░░░░░] 50% (v8.1 — 1/2 phases complete)
+Progress: [██████░░░░] 67% (v8.1 — 1.5/2 phases complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 317 (phases 1-68 plan 01 complete)
+- Total plans completed: 318 (phases 1-69 plan 01 complete)
 - Average duration: ~6 min (recent trend)
 - Total execution time: ~78 hours across 11 milestones
 
@@ -52,6 +52,8 @@ Recent decisions affecting v8.1:
 - ANIM-02 (smooth height transitions) via CSS `transition` on card wrapper divs — no JS needed
 - Dual render blocks (sm:hidden flat list + hidden sm:flex masonry) prevent mobile column-first ordering pitfall
 - renderCard helper uses flatIndex (not column-local index) for correct stagger animation delay
+- EDGE-01: Right column div removed from DOM entirely when empty — prevents invisible flex-1 space-grabber claiming 50% width for 1-card layout
+- EDGE-03: ErrorFallback min-h-[160px] on Card prevents column collapse; h-full on inner div ensures centering within height floor
 
 ### Pending Todos
 
@@ -64,5 +66,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 68-01-PLAN.md — masonry layout live, user approved, ready for phase 69
+Stopped at: Completed 69-01-PLAN.md — splitIntoColumns utility, EDGE-01 single-card layout fix, EDGE-03 ErrorFallback min-height
 Resume file: None

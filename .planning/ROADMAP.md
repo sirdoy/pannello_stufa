@@ -89,7 +89,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 69-01-PLAN.md — Extract splitIntoColumns utility, fix EDGE-01 single-card layout, add EDGE-03 ErrorFallback min-height
+- [x] 69-01-PLAN.md — Extract splitIntoColumns utility, fix EDGE-01 single-card layout, add EDGE-03 ErrorFallback min-height (completed 2026-02-18)
 - [ ] 69-02-PLAN.md — TDD: Unit tests for column assignment covering 0, 1, 2, 3, 5, 6 card counts
 
 ---
@@ -110,9 +110,9 @@ Plans:
 | 55-60 | v7.0 | 22/22 | ✓ Complete | 2026-02-13 |
 | 61-67 | v8.0 | 18/18 | ✓ Complete | 2026-02-16 |
 | 68. Core Masonry Layout | v8.1 | Complete    | 2026-02-18 | - |
-| 69. Edge Cases & Tests | v8.1 | 0/2 | Not started | - |
+| 69. Edge Cases & Tests | v8.1 | 1/2 | In progress | - |
 
-**Total:** 11 milestones shipped, 67 phases complete, 316 plans executed + v8.1 in progress
+**Total:** 11 milestones shipped, 67 phases complete, 318 plans executed + v8.1 in progress
 
 ---
 

@@ -110,11 +110,11 @@ Plans:
   2. User experiences smooth chart display with no visible animation restart on polling updates (isAnimationActive={false} on all chart series)
   3. User's browser fires staggered initial API calls on dashboard load — network waterfall shows stove at t=0, thermostat ~50ms, lights ~100ms, weather ~250ms, camera ~400ms, network ~500ms (not all six within 100ms)
   4. User's thermostat setpoint input triggers at most one API write per 500ms burst of adjustments (verified by monitoring network requests during rapid slider movement)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 73-01: Recharts stable data references + animation disable
-- [ ] 73-02: Polling stagger via initialDelay + thermostat write debounce
+- [ ] 73-01-PLAN.md — Chart memoization (React.memo + isAnimationActive={false}) for analytics charts and NetworkBandwidth
+- [ ] 73-02-PLAN.md — Polling stagger via useAdaptivePolling initialDelay + thermostat debounced setpoint writes
 
 ### Phase 74: Suspense Streaming (Conditional)
 **Goal**: Dashboard cards stream in progressively as their data resolves, so the user sees the first card (stove, safety-critical) within ~300ms of navigation rather than waiting for all six cards to complete their fetches; the page shell renders immediately with skeleton fallbacks for each card.
@@ -152,7 +152,7 @@ Phases execute in numeric order: 70 → 71 → 72 → 73 → 74
 | 70. Measurement Baseline + Quick Wins | v9.0 | Complete    | 2026-02-18 | 2026-02-18 |
 | 71. React Compiler | v9.0 | Complete    | 2026-02-18 | - |
 | 72. Code Splitting | v9.0 | Complete    | 2026-02-18 | 8dafcb0, e88e692 |
-| 73. Render Optimization | v9.0 | 0/2 | Not started | - |
+| 73. Render Optimization | v9.0 | 0/2 | Planned | - |
 | 74. Suspense Streaming (Conditional) | v9.0 | 0/2 | Not started | - |
 
 **Total:** 12 milestones shipped, 69 phases complete, 322 plans executed + 5 phases planned (v9.0)

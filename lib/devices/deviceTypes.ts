@@ -323,18 +323,20 @@ export const SETTINGS_MENU: Record<string, SettingsMenuItem> = {
     route: '/changelog',
     description: 'Versioni e aggiornamenti',
   },
-  DEBUG: {
-    id: 'debug',
-    name: 'Debug',
-    icon: '🐛',
-    route: '/debug',
-    description: 'Stufa, log, notifiche, transizioni, meteo',
-  },
-  DESIGN_SYSTEM: {
-    id: 'design-system',
-    name: 'Design System',
-    icon: '🎨',
-    route: '/debug/design-system',
-    description: 'Documentazione componenti UI',
-  },
+  ...(process.env.NODE_ENV !== 'production' ? {
+    DEBUG: {
+      id: 'debug',
+      name: 'Debug',
+      icon: '🐛',
+      route: '/debug',
+      description: 'Stufa, log, notifiche, transizioni, meteo',
+    },
+    DESIGN_SYSTEM: {
+      id: 'design-system',
+      name: 'Design System',
+      icon: '🎨',
+      route: '/debug/design-system',
+      description: 'Documentazione componenti UI',
+    },
+  } : {}),
 };

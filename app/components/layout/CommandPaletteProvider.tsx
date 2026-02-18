@@ -120,12 +120,12 @@ export default function CommandPaletteProvider({ children, commands: customComma
           shortcut: '⌘,',
           onSelect: () => router.push('/settings'),
         },
-        {
+        ...(process.env.NODE_ENV !== 'production' ? [{
           id: 'nav-debug',
           label: 'Debug',
           icon: <Bug className="w-4 h-4" />,
           onSelect: () => router.push('/debug'),
-        },
+        }] : []),
       ],
     },
     // Device commands from module

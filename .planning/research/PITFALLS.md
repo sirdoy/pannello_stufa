@@ -1,640 +1,306 @@
-# Domain Pitfalls
+# Pitfalls Research
 
-**Domain:** Performance & Resilience for IoT Control PWA
-**Researched:** 2026-02-11
+**Domain:** Performance optimization for existing Next.js 15.5 + React 19 PWA (smart home dashboard)
+**Researched:** 2026-02-18
+**Confidence:** HIGH for pitfalls 1-7 (verified with official docs + community issues); MEDIUM for React Compiler section (new feature, limited production data)
+
+---
 
 ## Critical Pitfalls
 
-Mistakes that cause rewrites, safety incidents, or major production issues.
+### Pitfall 1: `next/dynamic` with `ssr: false` Breaking the PWA Offline Shell
 
-### Pitfall 1: Non-Idempotent Retry on Safety-Critical Operations
-**What goes wrong:** Retrying `ignite` or `shutdown` commands without idempotency keys causes duplicate physical actions. Thundering herd on transient failures triggers multiple ignition attempts, potentially dangerous for physical stove control.
+**What goes wrong:**
+Lazy-loading device cards with `dynamic(() => import(...), { ssr: false })` excludes those components from the server-rendered HTML. When a user visits the dashboard offline, the service worker serves the cached HTML shell, but the dynamically imported JS chunks for the cards may not be in Serwist's precache manifest. The result is a blank dashboard with `ChunkLoadError` failures that crash error boundaries — irrecoverably in some cases.
 
-**Why it happens:** Developers add retry logic without considering physical device state vs. API state. Network timeout doesn't mean action failed—stove may have received ignite command but response was lost.
+**Why it happens:**
+Serwist precaches the JS chunks listed in `__SW_MANIFEST` at build time. When code-splitting via `next/dynamic` is added after a PWA is already deployed, the new chunk filenames (hashed) may not be automatically added to the precache manifest. The existing `StaleWhileRevalidate` rule for `request.destination === 'script'` only fires for previously-fetched scripts — not for chunks the user has never loaded before going offline. Developers assume the SW covers all JS, but it only covers what has been fetched at least once.
 
-**Consequences:**
-- Multiple ignition attempts if first times out
-- Shutdown commands queued that execute after successful ignition
-- Race conditions between manual UI actions and retry logic
-- Safety implications: physical device in unknown state
+**How to avoid:**
+- Keep all six device card components (StoveCard, ThermostatCard, LightsCard, etc.) as static imports in `app/page.tsx`. The dashboard page is already `force-dynamic` with Auth0 session gating — static chunk precaching is the right trade-off here.
+- Apply `next/dynamic` only to components that appear on user interaction (modals, analytics panels, PidAutomationPanel, scheduler page) or on sub-pages that are not dashboard entry points.
+- After any code-split introduction, run `next build --webpack` locally and open `public/sw.js` — verify that the new chunk names appear in the precache array.
+- Add a Playwright test that: loads dashboard, goes offline (DevTools Network → Offline), hard-refreshes, asserts all six cards render without error.
 
-**Prevention:**
-1. **Server-side idempotency tokens** for all mutation operations
-2. **Read-verify-write pattern**: Check stove state before retry
-3. **Exponential backoff with jitter** ([OneUpTime](https://oneuptime.com/blog/post/2026-01-15-retry-logic-exponential-backoff-react/view))
-   - Formula: `baseDelay * 2^failureCount + jitter`, capped at maxDelay
-   - Prevents thundering herd synchronization
-4. **Retry budgets**: Cap total retries across all clients ([Encore](https://encore.dev/blog/thundering-herd-problem))
-5. **Only retry safe operations**: Ignite/shutdown are NOT idempotent without state verification
+**Warning signs:**
+- Deployed build shows blank cards in offline mode after optimization changes
+- Console shows `ChunkLoadError: Loading chunk X failed` in service worker context
+- Lighthouse PWA audit fails "Works offline" criterion post-optimization
+- `public/sw.js` precache array shrinks in entry count after adding `next/dynamic`
 
-**Detection:**
-- Firebase logs show duplicate ignite/shutdown entries within seconds
-- Stove state transitions don't match UI action count
-- Multiple `source: 'manual'` entries without user confirmation
-
-**Project-specific:**
-- `/api/stove/ignite` already blocks if `needsCleaning: true` (docs/api-routes.md:14)
-- Add idempotency: `POST /api/stove/ignite {idempotencyKey, source}`
-- Verify stove OFF before ignite retry, ON before shutdown retry
+**Phase to address:** First phase that introduces code splitting. Must be verified before any other optimization phases proceed.
 
 ---
 
-### Pitfall 2: Layered Retries Amplification
-**What goes wrong:** App retries + fetch retry + API route retry + Thermorossi Cloud retry = multiplicative explosion. 3 layers × 3 attempts = 27 requests for single user action.
+### Pitfall 2: `next/dynamic` Not Reducing First Load JS for Already-Client Components
 
-**Why it happens:** Each layer adds retry logic independently without coordination. Google's retry guidance explicitly calls this out as anti-pattern ([ThinhDA](https://thinhdanggroup.github.io/retry-without-thundering-herds/)).
+**What goes wrong:**
+Every device card is already a Client Component (`'use client'`). Wrapping them with `next/dynamic` from `app/page.tsx` (a Server Component) does not split them out of the initial JS bundle. Next.js includes Client Component chunks in the initial payload regardless of how they are imported. Developers apply `next/dynamic` expecting bundle size reduction, measure nothing, conclude "optimization didn't work," and waste multiple days chasing a non-existent win.
 
-**Consequences:**
-- Single transient failure cascades into stampede
-- API rate limits hit, blocking legitimate requests
-- User sees "loading" for 30+ seconds
-- Firebase quota exhausted on retry storms
+**Why it happens:**
+This is a documented behavior (vercel/next.js #49454). In the App Router, `next/dynamic` / `React.lazy` achieve code splitting by deferring the import until render time. But all Client Component modules that a Server Component tree references are bundled into the initial client payload — Next.js pre-fetches the entire client tree via the RSC payload. `next/dynamic` on a `'use client'` component simply does not split it.
 
-**Prevention:**
-1. **Single retry layer**: Choose ONE place (recommend: API route level)
-2. **Disable browser fetch retry**: Use `signal: AbortSignal.timeout(5000)`
-3. **Monitor retry depth**: Log layer that initiated retry
-4. **Circuit breaker at API boundary**: Stop retries after 3 consecutive failures
+**How to avoid:**
+- Run `@next/bundle-analyzer` before any lazy-loading changes. Record baseline `First Load JS` per route from the build output (`next build --webpack`). Any optimization that does not produce a measurable reduction in this number is not helping.
+- Target `next/dynamic` only for components not present in the initial render: modals, expanded views, PidAutomationPanel (which appears conditionally), the SandboxPanel (already present — verify it's hidden by env var and conditionally rendered).
+- Analytics chart components (ConsumptionChart, UsageChart, WeatherCorrelation, BandwidthCorrelationChart) live on sub-pages (`/analytics`, `/network`) — they are already naturally split by route. Do not add extra `next/dynamic` wrappers.
 
-**Detection:**
-- Network tab shows multiple identical requests
-- API route logs show same `idempotencyKey` multiple times
-- Firebase write quota spikes without user activity increase
+**Warning signs:**
+- `next build` output shows `First Load JS` unchanged after adding `next/dynamic` wrappers
+- Bundle analyzer shows device card chunks still in the main dashboard bundle entry
+- Time spent adding `next/dynamic` calls across 20+ components with no measurable result
 
-**Project-specific:**
-- StoveCard polling already at 5s interval (architecture.md:104)
-- Don't add fetch retry—polling provides natural retry
-- Add retry ONLY at `/api/stove/*` routes, not in component
+**Phase to address:** Bundle analysis phase (measure first, then target). Do this before any lazy-loading implementation.
 
 ---
 
-### Pitfall 3: Adaptive Polling Breaks Real-Time Requirements
-**What goes wrong:** Adaptive polling algorithm reduces frequency during low activity, causing 30-second display staleness. User sees "ON" while stove already shutdown, presses shutdown again → error.
+### Pitfall 3: Recharts Causing Full Chart Re-Renders on Every Polling Tick
 
-**Why it happens:** IoT frameworks often poll too slow for real-time OR waste battery with high frequency ([IEEE RT-IFTTT](https://ieeexplore.ieee.org/document/8277299/)). Adaptive algorithms optimize for battery, not UX.
+**What goes wrong:**
+Every 30 seconds, `useNetworkData` appends new points to the sparkline buffer, triggering a state update in `NetworkCard`, which re-renders `NetworkBandwidth` (containing Recharts `AreaChart`). Since Recharts renders as SVG with a DOM node per data point, and `ResponsiveContainer` recalculates dimensions on each render, the entire chart SVG is torn down and rebuilt. With 120 data points (1h at 30s intervals), each poll causes significant SVG reconciliation work — visually manifesting as chart flicker and jank in the rest of the card.
 
-**Consequences:**
-- Stale status display misleads user decisions
-- Automation conflicts: scheduler thinks stove OFF (stale poll), attempts ignite while actually ON
-- Thermostat coordination broken: 2-minute debounce relies on accurate stove state
-- User loses trust in system accuracy
+**Why it happens:**
+Recharts components are not memoized by default. When the parent state changes, Recharts re-renders even if only one new point was appended and all other props are unchanged. The `data` array is a new reference on every poll tick (any array spread/concat creates a new object), so `React.memo` on the chart component provides no benefit without also stabilizing the data reference. Recharts also has a known animation system that restarts on every re-render, which is what causes the visible flicker.
 
-**Prevention:**
-1. **Fixed 5s polling for critical status** (current StoveCard pattern is correct)
-2. **Adaptive ONLY for non-critical metrics** (pellet level, weather)
-3. **Staleness indicator**: Show "Last updated 23s ago" if poll fails
-4. **Exponential backoff on error, NOT success**: Slow down only if API unavailable
+**How to avoid:**
+- Wrap chart components in `React.memo` AND stabilize `data` with `useMemo`, keyed on a stable value (array length + last data point timestamp), not the array reference itself.
+- Set `isAnimationActive={false}` on all Recharts series elements (`Area`, `Line`, `Bar`) — animation restarts on every re-render and is the primary source of the visible flicker. If initial mount animation is desired, use a `useRef` one-shot flag.
+- Import only needed Recharts components directly: `import { AreaChart, Area, ResponsiveContainer } from 'recharts'` — Recharts does not tree-shake well from sub-path imports in v2.x. The barrel import pulls the full library.
+- Consider using a circular buffer ref pattern for sparkline data: maintain the array in a `useRef` (mutable, no re-render), and push to React state only on a debounced schedule (not every single poll tick).
 
-**Detection:**
-- User reports "wrong status" or "delayed updates"
-- Firebase timestamps show >10s gaps in status snapshots
-- Automation actions conflict with recent manual actions
-- Stove state transitions happen between polls (invisible to UI)
+**Warning signs:**
+- React DevTools Profiler shows chart components in every poll-tick flame graph
+- Visible chart "flash" or "reboot" visible every 30s in NetworkCard
+- Chrome Performance tab shows a long task (>50ms) triggered by a polling state update
+- Recharts appears in flame graph even when user has not scrolled to the chart section
 
-**Project-specific:**
-- Keep `setInterval(fetchStatus, 5000)` fixed (architecture.md:183)
-- Weather can use 30-minute adaptive (cron already does this, api-routes.md:79)
-- Token cleanup 7-day adaptive (api-routes.md:80)
-- **NEVER** make stove status adaptive
+**Phase to address:** Rendering optimization phase (after bundle analysis). Address chart-specific memoization before a global memoization sweep.
 
 ---
 
-### Pitfall 4: Error Boundaries Swallow Safety Alerts
-**What goes wrong:** Error boundary catches "stove needsCleaning" validation error, shows generic "Something went wrong" instead of maintenance alert. User bypasses safety check.
+### Pitfall 4: Manual Memoization Conflicting with React Compiler (If Enabled)
 
-**Why it happens:** Next.js error boundaries catch ALL errors in tree, including expected validation errors that should show specific UI ([Next.js Docs](https://nextjs.org/docs/app/getting-started/error-handling)).
+**What goes wrong:**
+React Compiler (`babel-plugin-react-compiler`, GA since October 2025) performs automatic memoization. If enabled on this codebase, it may conflict with existing manual `useMemo`/`useCallback` calls. More critically: the compiler skips optimizing components that violate the Rules of React (mutations in render, missing deps). With 106K lines accumulated over 12 milestones, there will be edge-case violations — and the compiler bails out silently on affected components, leaving them unoptimized without any warning.
 
-**Consequences:**
-- Safety validations silently fail
-- User doesn't know WHY ignite blocked
-- Attempts ignite repeatedly, hits rate limit
-- Maintenance tracking broken: no notification sent
+**Why it happens:**
+The React Compiler is opt-in and requires strictly Rules-of-React-compliant code. Real-world production codebases have subtle violations. When the compiler bails out on a component, it gets zero automatic optimization but there is no visible error — only silence. Real-world testing has shown the compiler fixed only 1 of 8 identified re-render cases in existing codebases. It is not a silver bullet for pre-existing re-render problems.
 
-**Prevention:**
-1. **Expected errors throw custom class**: `throw new ValidationError('needsCleaning')`
-2. **Error boundary checks error type**: Only catch `Error`, not `ValidationError`
-3. **Validation errors return JSX, not throw**: Render `<MaintenanceAlert />` instead of throwing
-4. **Error boundaries for UNEXPECTED errors only**: Network failures, Firebase crashes
-5. **Use error.digest for production**: Next.js strips messages in production ([Better Stack](https://betterstack.com/community/guides/scaling-nodejs/error-handling-nextjs/))
+**How to avoid:**
+- Do not enable the React Compiler in the same phase that introduces other optimizations. Treat it as a separate, late-phase addition with dedicated before/after measurement.
+- Run `npx react-compiler-healthcheck` before enabling the compiler. It reports which components have Rules of React violations that cause bail-outs.
+- Preserve existing `useCallback`/`useMemo` wrappers around callbacks passed to `useAdaptivePolling` — these are at integration boundaries where reference identity stability matters regardless of the compiler.
+- The compiler does not fix the Recharts re-render issue (Pitfall 3) — SVG DOM reconciliation work happens regardless of memoization level.
+- Do not enable React Compiler to avoid fixing real performance problems; it is a complement to, not a substitute for, correct memoization design.
 
-**Detection:**
-- Generic error screens when specific validation should show
-- Firebase logs show validation errors but UI shows error boundary
-- User clicks "Try again" repeatedly without seeing root cause
-- Maintenance alerts don't trigger despite `needsCleaning: true`
+**Warning signs:**
+- After enabling the compiler, React DevTools Profiler shows components re-rendering at the same rate as before — the compiler bailed out silently
+- `react-compiler-healthcheck` reports violations in device card hooks or utility functions
+- Test suite failures after enabling compiler due to changed effect timing or reference semantics
 
-**Project-specific:**
-- StoveCard needs maintenance banner (architecture.md:131) BEFORE error boundary
-- Expected validations: `needsCleaning`, `already_on`, `already_off`
-- Wrap only status fetch in error boundary, not controls
-- Custom error class: `lib/errors/StoveValidationError.ts`
+**Phase to address:** Late phase, only after manual optimization impact has been measured and validated. Not phase 1.
 
 ---
 
-### Pitfall 5: Component Splitting Breaks Stove State Management
-**What goes wrong:** Splitting StoveCard into `<StoveStatus />`, `<StoveControls />`, `<MaintenanceBanner />` causes 3 separate polling loops. Race condition: banner shows "needsCleaning" while controls show fan/power sliders.
+### Pitfall 5: Service Worker Serving Stale JS Chunks After Deployment
 
-**Why it happens:** Developers optimize bundle size by code-splitting, but each component independently fetches state ([React Context Performance](https://oneuptime.com/blog/post/2026-01-24-react-context-performance-issues/view)).
+**What goes wrong:**
+The Serwist config uses `StaleWhileRevalidate` for `request.destination === 'script'`. After a new deployment (new hashed chunk filenames), users with the installed PWA continue to receive the old JS chunks from the `static-resources` cache. When the new `sw.js` activates (via `skipWaiting: true`), it tries to run new page code using old cached component chunks — causing hydration mismatches or runtime errors. Users must manually clear site data or wait for the SW update cycle to complete cleanly.
 
-**Consequences:**
-- 3× polling load (15 req/min instead of 5)
-- UI inconsistency: components show different stove states
-- Context re-render cascade: status update triggers all children
-- Firebase RTDB quota hit faster
-- User sees flickering state changes
+**Why it happens:**
+`StaleWhileRevalidate` serves the cached version immediately and updates in background. If a user navigates before the background update completes, they get stale JS executing against a fresh HTML shell from the server. This is amplified by `skipWaiting: true` — the new SW activates immediately without waiting for old clients to be released, creating a window where new SW + old cached JS coexist.
 
-**Prevention:**
-1. **Hoist state to parent**: Single `useStoveStatus()` in StoveCard
-2. **Pass props down**: `<StoveControls status={status} />`
-3. **Memoize context value**: `useMemo` for expensive computations
-4. **Split by update frequency, not domain**: Fast-changing (status) vs. slow (config)
-5. **State colocation**: Keep state close to where it's used ([Kent C. Dodds](https://kentcdodds.com/blog/application-state-management-with-react))
+**How to avoid:**
+- Do not add new runtime caching rules for JS chunks during this optimization milestone. The existing `StaleWhileRevalidate` is already aggressive for scripts.
+- If code splitting is added, newly split chunks should appear in Serwist's precache (in `__SW_MANIFEST`) rather than relying on runtime caching.
+- After any build that changes the chunk graph (new `next/dynamic` calls), verify the generated `public/sw.js` manifest includes the new chunk names.
+- Implement a `controllerchange` listener + toast: when the SW updates, show "Una nuova versione dell'app e disponibile" with a reload button. This mitigates the stale chunk problem without removing `skipWaiting`.
+- Never change script cache strategy to `CacheFirst` — this would make stale chunk problems catastrophic (zero background update).
 
-**Detection:**
-- Network tab shows multiple `/api/stove/status` calls per 5s interval
-- React DevTools shows cascading re-renders
-- Firebase quota usage 3× expected
-- UI shows inconsistent state across same component's children
+**Warning signs:**
+- Console errors: `Uncaught SyntaxError: Unexpected token '<'` (HTML served instead of JS for a missing chunk)
+- Hydration mismatch errors in production after deployment: `Text content does not match server-rendered HTML`
+- Users report broken dashboard that resolves after hard refresh
+- Error boundary shows unrecoverable crash shortly after a new deploy
 
-**Project-specific:**
-- StoveCard already correct pattern (architecture.md:162-204)
-- **DON'T** split into separate files with independent polling
-- **DO** extract pure presentation components without state
-- Use `React.memo` on `<FanLevelDisplay />` if re-render expensive
+**Phase to address:** Any phase that introduces code splitting. Must validate SW manifest after every build.
 
 ---
 
-### Pitfall 6: FCM Token Cleanup Deletes Active Devices
-**What goes wrong:** Token cleanup job deletes tokens inactive >30 days, but user has PWA installed and receives notifications—they just haven't opened app. Next critical alert fails silently.
+### Pitfall 6: Independent Polling Hooks Creating a "Thundering Herd" on Dashboard Load
 
-**Why it happens:** "Inactive" defined by app open, not notification delivery ([Firebase Best Practices](https://firebase.google.com/docs/cloud-messaging/manage-tokens)). Background notifications don't count as activity.
+**What goes wrong:**
+All six device cards mount simultaneously on the dashboard. Each card's data hook fires its initial `fetch` immediately on mount (`immediate: true` is the default in `useAdaptivePolling`). This results in 6+ concurrent API calls firing within the same ~100ms window. On Vercel's serverless infrastructure, this can trigger 6 cold starts simultaneously, saturate the Firebase RTDB rate limiter, and create visible loading jank as all cards enter loading states and resolve at random times.
 
-**Consequences:**
-- Stove ignition failure notification not delivered
-- User doesn't know automation failed
-- Safety issue: stove runs unsupervised
-- Firebase shows "successful send" but no device receives
+**Why it happens:**
+The `immediate: true` default in `useAdaptivePolling` is correct for data freshness, but there is no stagger or priority ordering between cards. The masonry layout renders all cards in a single React pass, so all `useEffect` hooks run in the same browser task queue flush. Each card acts independently — none knows the others are also initializing.
 
-**Prevention:**
-1. **Track last_notification_received**: Update timestamp on FCM delivery receipt
-2. **270-day inactivity window**: Firebase marks tokens expired after 9 months ([Netguru](https://www.netguru.com/blog/why-mobile-push-notification-architecture-fails))
-3. **Don't cleanup based on app_opened**: Use delivery metrics
-4. **Unsubscribe from topics only**: Remove topic mappings, keep token ([Firebase Managing Tokens](https://firebase.blog/posts/2023/04/managing-cloud-messaging-tokens/))
-5. **Cron cleanup log**: Record which tokens deleted for audit
+**How to avoid:**
+- Add a configurable `initialDelay` parameter to `useAdaptivePolling`. Non-critical cards below the fold can be delayed without user-visible impact.
+- Priority order: stove (safety-critical, delay=0) → thermostat (50ms) → lights (100ms) → weather (250ms) → camera (400ms) → network (500ms).
+- The stove hook uses Firebase RTDB listeners (not polling) as the primary data path — verify this behavior is maintained and not accidentally converted to pure polling during optimization work.
+- For Vercel cold starts: consider adding a warmup ping to the most-called API routes on SW registration (after dashboard load settles), not on initial load.
 
-**Detection:**
-- User reports "stopped getting notifications" but token in database
-- Firebase delivery reports show "invalid token" for recently cleaned tokens
-- Cleanup job deletes tokens that received notification last week
-- Production incidents correlate with cleanup job execution
+**Warning signs:**
+- Chrome Network tab shows 6+ parallel API requests firing within <100ms of page load
+- Vercel function logs show simultaneous cold starts from the same user session
+- Firebase RTDB console shows rate limit warnings during initial load
+- All cards show skeleton states simultaneously and resolve at random, unpredictable times
 
-**Project-specific:**
-- Current cleanup: 7-day interval (api-routes.md:80)
-- Change criteria: `lastNotificationDelivered` not `lastAppOpened`
-- Keep tokens that delivered notification within 30 days
-- Log cleanup: `firebase/tokenCleanupLog/{timestamp}`
+**Phase to address:** Rendering optimization phase (after bundle analysis). Requires testing with DevTools Network throttling to observe.
 
 ---
 
-## Moderate Pitfalls
+### Pitfall 7: `force-dynamic` Conflict with ISR or Static Segment Optimization
 
-Issues that cause user frustration or operational overhead, but recoverable.
+**What goes wrong:**
+`app/page.tsx` exports `export const dynamic = 'force-dynamic'` because it reads the Auth0 session. This is correct. If optimization work attempts to introduce `revalidate` exports to any Server Component in the dashboard import chain, Next.js throws `app/ Static to Dynamic Error` — a runtime error that occurs when a page initially generated statically tries to switch to dynamic at request time. This error appears only in production, not in development.
 
-### Pitfall 7: Scheduler Cron Retry Creates Duplicate Actions
-**What goes wrong:** GitHub Actions cron fails mid-execution, retries 3× by default. Each retry calls `/api/scheduler/check`, triggering 3 ignition commands.
+**Why it happens:**
+`force-dynamic` is a page-level opt-out of static generation. The App Router propagates this through the segment. If any component or utility imported by the dashboard adds `export const revalidate = 60`, there is a conflict. Next.js 15's caching model has undergone multiple revisions and the correct behavior is not always obvious.
 
-**Why it happens:** GitHub Actions has implicit retry on workflow failure. Cron job is NOT idempotent without tracking execution ID.
+**How to avoid:**
+- Do not add `revalidate` exports to any component or segment imported by `app/page.tsx`.
+- Performance optimization for dashboard server-side work should target `getUnifiedDeviceConfigAdmin` and `getVisibleDashboardCards` specifically — use React's `cache()` function to memoize per-request if called more than once in the request tree.
+- Sub-routes (`/stove`, `/thermostat`, `/lights`, `/network`) can independently use ISR if they do not call `auth0.getSession()` in their root — verify this before adding `revalidate`.
+- Before any optimization changes, run `next build --webpack` and record which routes show `●` (dynamic) vs `○` (static). Use this baseline to catch unexpected changes.
 
-**Prevention:**
-1. **Idempotency key in cron**: `GET /api/scheduler/check?secret=xxx&executionId={timestamp}`
-2. **Deduplication window**: Ignore requests with same executionId within 2 minutes
-3. **Disable GitHub Actions retry**: `retry: { automatic: false }` in workflow
-4. **Log cron executions**: Track start/end, detect overlapping calls
+**Warning signs:**
+- Production deployment shows `Error: Static generation failed` for previously working routes
+- `next build` output shows route rendering modes changing unexpectedly after optimization changes
+- Server logs show `app/ Static to Dynamic Error` only in production (never in dev)
 
-**Detection:**
-- Firebase shows duplicate scheduler actions within 1 minute
-- Stove state changes twice in same minute
-- GitHub Actions logs show multiple workflow runs at same cron time
-
-**Project-specific:**
-- Cron already unified (api-routes.md:61-90)
-- Add: `cron/lastExecutionId` to Firebase
-- Check: If executionId seen in last 2 minutes, return early
+**Phase to address:** Bundle analysis / inventory phase (first). Map which routes are currently dynamic vs. static before any optimization begins.
 
 ---
 
-### Pitfall 8: Thermostat-Stove Coordination Debounce Race
-**What goes wrong:** Stove status changes faster than 2-minute debounce window. Thermostat adjustment queued, but stove already shut down. Valve opens → wastes heat.
+## Technical Debt Patterns
 
-**Why it happens:** Debouncing delays action until "silence period" ([Zigbee2MQTT](https://github.com/koenkk/zigbee2mqtt/issues/29724)). If stove state oscillates, debounce never fires or fires with stale intent.
+Shortcuts that seem reasonable but create long-term problems.
 
-**Prevention:**
-1. **Throttle instead of debounce**: First action immediate, ignore subsequent for 2 min
-2. **Re-validate before action**: Check stove state when debounce fires
-3. **Cancel pending on conflict**: Clear debounce timer if stove turns OFF
-4. **Separate coordination logic**: Don't couple polling and coordination
-
-**Detection:**
-- Thermostat adjusts after stove already off
-- Firebase shows coordination actions with stale stove state
-- User reports "thermostat changes when stove not running"
-
-**Project-specific:**
-- Current: 2-minute debounce (project context)
-- Add: `if (!stove.isOn) clearTimeout(debounceTimer);`
-- Log coordination attempts with stove state snapshot
+| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
+|----------|-------------------|----------------|-----------------|
+| Wrap all device card components in `React.memo` globally | Feels like quick render reduction | Memo comparison cost can exceed render cost for simple components; hides actual root causes | Never as first step — profile first, target specifically |
+| Add `isAnimationActive={false}` to Recharts without memoizing data | Removes visible chart flicker | Data still creates new array references on every poll, causing full SVG re-render | Acceptable as partial fix while full memoization is implemented |
+| Use `next/dynamic` on every heavy-looking component | Feels like optimization | Adds Suspense fallback complexity, potential ChunkLoadError offline, no bundle benefit for always-visible Client Components | Only for components NOT in the initial render path |
+| Enable React Compiler org-wide immediately | Automatic memoization everywhere | Compiler bails out silently on Rules of React violations; fixes fewer re-renders than expected in production codebases | Only after running `react-compiler-healthcheck` and validating on a subset |
+| Disable service worker in DevTools during performance testing | Eliminates SW as variable | Produces measurements that don't reflect production PWA behavior (SW adds latency, stale chunk risk) | Acceptable for isolated JS bundle size measurement only |
 
 ---
 
-### Pitfall 9: useEffect Polling Race Condition
-**What goes wrong:** User navigates away from StoveCard while poll in-flight. Poll resolves after unmount, calls `setStatus` on unmounted component → React warning + memory leak.
+## Integration Gotchas
 
-**Why it happens:** useEffect cleanup doesn't abort fetch by default ([Max Rozen](https://maxrozen.com/race-conditions-fetching-data-react-with-useeffect)).
+Common mistakes when connecting components within this specific stack.
 
-**Prevention:**
-1. **AbortController pattern**:
-   ```typescript
-   useEffect(() => {
-     const controller = new AbortController();
-     fetch('/api/stove/status', { signal: controller.signal });
-     return () => controller.abort();
-   }, []);
-   ```
-2. **Boolean ignore flag**: Set `let ignore = false` in effect, `return () => ignore = true`
-3. **Only update if mounted**: Check flag before setState
-
-**Detection:**
-- React warning: "Can't perform state update on unmounted component"
-- Memory usage grows with navigation (leaked intervals)
-- Firebase shows ongoing polls after user left page
-
-**Project-specific:**
-- StoveCard polling (architecture.md:174-185)
-- Add AbortController to all fetch calls
-- Cleanup: `clearInterval` already present, add abort
+| Integration | Common Mistake | Correct Approach |
+|-------------|----------------|------------------|
+| **Recharts + `React.memo`** | Wrapping chart in `React.memo` but passing `data={chartPoints}` where `chartPoints` is a new array reference every render | Memoize the data array with `useMemo` keyed on a stable value (last timestamp + length), then wrap chart in `React.memo` |
+| **Serwist + `next/dynamic`** | Assuming `StaleWhileRevalidate` for scripts covers newly-split chunks | New chunks must appear in Serwist's `__SW_MANIFEST` precache; verify `public/sw.js` contains new chunk names after build |
+| **Firebase RTDB + dashboard mount** | All 6 cards attaching Firebase listeners and firing initial fetches simultaneously | Stagger non-critical initial fetches with `initialDelay`; keep stove listener at delay=0 (safety-critical) |
+| **Auth0 `getSession` + Server Component optimization** | Calling `auth0.getSession()` in multiple Server Components within the same request tree | Use React's `cache()` function to memoize `auth0.getSession()` per request — call once, reuse across the tree |
+| **`useAdaptivePolling` + inline `callback`** | Passing an inline arrow function as `callback` without `useCallback` wrapping | The hook uses a ref internally to avoid stale closures, but still creates a new closure on every render if the callback is not stabilized — use `useCallback` |
+| **`next/dynamic` + `ssr: false` on sub-page charts** | Using `ssr: false` for analytics charts on sub-pages where it is not needed | Charts on sub-pages are Client Components already; `ssr: false` adds complexity without benefit. Only use it for browser-API-dependent code that cannot run on the server |
+| **Vercel serverless + Firebase Admin** | Firebase Admin SDK cold-starting on every API call | Firebase Admin uses a module-level singleton (`getApps().length` check); verify `lib/firebase-admin.ts` follows this pattern throughout — do not import Admin SDK inside route handler bodies |
 
 ---
 
-### Pitfall 10: Error Boundary in Same Segment as Layout
-**What goes wrong:** Error boundary `app/error.tsx` doesn't catch errors from `app/layout.tsx` because boundary nested inside layout ([Next.js Docs](https://nextjs.org/docs/app/api-reference/file-conventions/error)).
+## Performance Traps
 
-**Why it happens:** Next.js convention: error.js wraps page.js, not layout.js.
+Patterns that look fine but create specific failure modes in this stack.
 
-**Prevention:**
-1. **Global error boundary**: Place in parent segment `/error.tsx` not `/dashboard/error.tsx`
-2. **Layout errors caught by parent**: App-level boundary catches layout crashes
-3. **'use client' required**: Error components must be client-side
-
-**Detection:**
-- Layout error shows Next.js default error, not custom boundary
-- Error boundary works on page errors but not navbar crashes
-
-**Project-specific:**
-- Add: `/app/error.tsx` for global errors
-- Current: Device-specific boundaries in cards
-- Layout errors caught at root level only
+| Trap | Symptoms | Prevention | When It Breaks |
+|------|----------|------------|----------------|
+| **Recharts SVG DOM node count** | Chart renders slow; CPU usage spikes during poll | Use LTTB decimation (already implemented for bandwidth charts) for all time-series; set `isAnimationActive={false}` | Immediately with 120-point sparklines; bad with 1h+ data accumulation |
+| **6 simultaneous cold starts on load** | P95 LCP >3s on fresh session; Vercel function logs show burst cold starts | Stagger initial fetch calls with `initialDelay` parameter | Always present on initial load; worse with new deployments that flush the function warm pool |
+| **`ResponsiveContainer` resize observer** | Chart dimensions recalculate on every window resize causing cascading re-renders | Wrap chart container in a stable-height div; avoid nesting `ResponsiveContainer` inside dynamically-sized flex containers | Immediately visible on any window resize |
+| **Multiple `useEffect` polling loops accumulating** | Memory usage grows over long sessions; polling frequency doubles | Ensure every polling `useEffect` has a proper cleanup; `useAdaptivePolling` already handles this — verify any new data hooks follow the same pattern | Long sessions (>30 min active use in a single tab) |
+| **Service worker fetch interceptor overhead** | The `fetch` listener in `sw.ts` clones and parses response bodies for `/api/stove/status` and `/api/netatmo/status` on every call | Ensure JSON.parse errors are swallowed (they are); add timing to verify SW overhead stays below 5ms | Always present; becomes visible if response clone logic grows in scope |
 
 ---
 
-## Minor Pitfalls
+## UX Pitfalls
 
-Small issues that cause confusion but easy to fix.
+Common user experience mistakes when adding performance optimizations.
 
-### Pitfall 11: SSR Error Boundaries Don't Work
-**What goes wrong:** Error during server-side rendering shows 500 page instead of error boundary fallback.
-
-**Why it happens:** componentDidCatch doesn't work with SSR ([Dave Inside](https://daveinside.com/blog/handling-runtime-errors-when-server-side-rendering-with-nextjs/)).
-
-**Prevention:**
-1. **Try-catch in server components**: Wrap data fetch in try-catch
-2. **Error boundaries for client errors**: Use boundaries for client-side crashes
-3. **Optional chaining**: `data?.field` prevents undefined crashes
-
-**Project-specific:**
-- StoveCard is client component ('use client')
-- Server components: Wrap Firebase calls in try-catch
-- Don't rely on boundaries for SSR data fetch errors
+| Pitfall | User Impact | Better Approach |
+|---------|-------------|-----------------|
+| **Lazy loading cards with Suspense causing layout shifts** | If skeleton dimensions don't match final card dimensions, layout shifts (CLS score penalty) | Dashboard cards already have `Skeleton.StovePanel` and equivalents — use these exact skeletons as Suspense fallbacks if lazy loading is ever introduced for cards |
+| **Chart animation on every data update** | Users perceive charts as "broken" or "refreshing" — disorienting at 30-second intervals | Set `isAnimationActive={false}` for all chart series elements; keep animation only on initial mount using a one-shot `useRef` flag |
+| **Optimizing for bundle size metrics while ignoring user experience** | Smaller bundle reports but slower Time to Interactive | Measure Core Web Vitals (LCP, INP, CLS) in production, not just bundle size. A 20KB reduction that adds a 200ms Suspense waterfall is a regression |
+| **No notification when PWA updates** | Users stuck on old version after deployment; UI behaves unexpectedly | Implement `controllerchange` listener + toast: "Una nuova versione e disponibile — Aggiorna" with a reload button. This project already has `reloadOnOnline: true` — extend the pattern to cover SW updates |
+| **Showing loading skeletons for cached/fast data** | Cards that resolve in <100ms still flash a skeleton, making the app feel slower | Add a minimum skeleton display time threshold (100ms) — show skeleton only if data has not resolved within that window |
 
 ---
 
-### Pitfall 12: Testing Critical Paths with Brittle Selectors
-**What goes wrong:** Test uses `getByTestId('stove-power-slider')`, refactor changes test ID → test breaks despite functionality working.
+## "Looks Done But Isn't" Checklist
 
-**Why it happens:** Implementation-detail testing instead of user behavior ([React Testing Library](https://www.nucamp.co/blog/testing-in-2026-jest-react-testing-library-and-full-stack-testing-strategies)).
+Things that appear complete but are missing critical verification.
 
-**Prevention:**
-1. **Semantic queries**: `getByRole('slider', { name: 'Power Level' })`
-2. **User-facing text**: `getByText('Accendi Stufa')`
-3. **Accessibility labels**: `getByLabelText('Fan Level')`
-4. **Avoid**: testId, CSS selectors, component internals
-
-**Detection:**
-- Tests break on harmless refactors (rename variable, restructure DOM)
-- Test passes but feature actually broken (false positive)
-- CI fails on design system updates without logic changes
-
-**Project-specific:**
-- 3034 tests passing (MEMORY.md)
-- Review critical paths: ignite, shutdown, scheduler
-- Replace testId with `getByRole` where present
+- [ ] **Code splitting:** After adding any `next/dynamic`, test offline mode explicitly — load dashboard, go DevTools Network → Offline, hard-refresh, verify all six device cards render from SW cache without error
+- [ ] **Recharts memoization:** Run React DevTools Profiler for 2 polling cycles — chart components must not appear in the flame graph if data has not changed
+- [ ] **Bundle size:** Compare `First Load JS` per route in `next build` output before and after optimization — any change that does not reduce this number is not helping
+- [ ] **Service worker manifest:** Open `public/sw.js` after each build, search for new chunk filenames — confirm they appear in the precache array
+- [ ] **Polling stagger:** Chrome Network tab on initial dashboard load — no more than 2 parallel API requests should fire in the first 100ms
+- [ ] **React Compiler (if enabled):** Run `npx react-compiler-healthcheck` — zero violations before enabling compiler in production; all existing 3000+ tests must remain green
+- [ ] **`force-dynamic` not broken:** Run `next build --webpack` after any Server Component changes — route rendering modes must not change from the pre-optimization baseline
 
 ---
 
-### Pitfall 13: E2E Test Ice Cream Cone Anti-Pattern
-**What goes wrong:** 200 Playwright E2E tests, 10 unit tests. CI takes 15 minutes, flaky tests 30% of runs, hard to debug failures.
+## Recovery Strategies
 
-**Why it happens:** "Test through UI" feels comprehensive but creates slow, brittle suite ([React Testing Anti-Patterns](https://itnext.io/unveiling-6-anti-patterns-in-react-test-code-pitfalls-to-avoid-fd7e5a3a7360)).
+When pitfalls occur despite prevention, how to recover.
 
-**Prevention:**
-1. **Testing pyramid**: Many unit, some integration, few E2E
-2. **E2E for top 3-5 flows only**: Ignite via scheduler, manual shutdown, maintenance alert
-3. **Delete unreliable E2E**: If test "sometimes red" and not critical, remove it
-4. **Push checks down**: Test stove state logic in unit tests, not E2E
-
-**Detection:**
-- CI runtime grows linearly with features
-- Flaky test reruns common
-- E2E failures hard to reproduce locally
-- More E2E than unit tests in suite
-
-**Project-specific:**
-- Playwright exists (MEMORY.md Phase 51)
-- Limit E2E to: Auth flow, scheduler auto-ignite, manual shutdown
-- Unit test: `canIgnite()`, `trackUsageHours()`, PID logic
+| Pitfall | Recovery Cost | Recovery Steps |
+|---------|---------------|----------------|
+| PWA offline broken by code splitting | HIGH | Revert `next/dynamic` changes, deploy, validate offline mode. Re-introduce with explicit Serwist precache configuration covering new chunks |
+| Stale chunk error after deployment | MEDIUM | Deploy SW update notification (toast + reload button); for immediate relief use `Cache-Control: no-cache` header on the SW registration endpoint |
+| Recharts re-renders not fixed by `React.memo` | LOW | Remove `React.memo` wrappers, fix the data reference stability at source (circular buffer or `useMemo` on stable key) — this is the root cause, not the symptom |
+| React Compiler breaks existing tests | MEDIUM | Disable compiler (`babel-plugin-react-compiler` removal from babel config), re-run full test suite to confirm 3000+ tests pass, investigate violations with healthcheck tool before re-enabling |
+| Thundering herd cold starts | LOW | Add `initialDelay` to non-critical `useAdaptivePolling` calls; immediately deployable without structural changes |
+| `force-dynamic` conflict with ISR | HIGH | Remove `revalidate` exports from any component in the dashboard import tree; run `next build` to verify route modes return to baseline |
 
 ---
 
-### Pitfall 14: Production Error Messages Leak Secrets
-**What goes wrong:** Error boundary shows Firebase path `dev/stove/status` in production, reveals environment structure.
+## Pitfall-to-Phase Mapping
 
-**Why it happens:** Next.js strips error.message in production but not custom error details ([Better Stack](https://betterstack.com/community/guides/scaling-nodejs/error-handling-nextjs/)).
+How roadmap phases should address these pitfalls.
 
-**Prevention:**
-1. **Use error.digest**: Next.js provides safe digest in production
-2. **Generic user message**: "Unable to connect. Please try again."
-3. **Log full error server-side**: Send details to monitoring, not client
-4. **Sanitize stack traces**: Remove file paths, credentials
-
-**Detection:**
-- Production error shows internal paths
-- API keys visible in browser console
-- User reports seeing "technical" error messages
-
-**Project-specific:**
-- Firebase paths in errors (getEnvironmentPath usage)
-- Sanitize: Replace path with generic "database error"
-- Log full error to Firebase for debugging
-
----
-
-### Pitfall 15: Retry-After Header Ignored
-**What goes wrong:** API returns 429 with `Retry-After: 60`, client retries immediately → banned for 10 minutes.
-
-**Why it happens:** Exponential backoff ignores server-provided retry timing.
-
-**Prevention:**
-1. **Respect Retry-After**: Parse header, wait specified duration
-2. **Max of server vs. exponential**: Use longer of the two
-3. **Circuit breaker on 429**: Stop retries, show "Rate limited" message
-
-**Detection:**
-- Repeated 429 errors in logs
-- Ban duration increases (10 min → 1 hour)
-- User sees "loading" during rate limit period
-
-**Project-specific:**
-- Thermorossi Cloud might rate limit
-- Check response headers before retry
-- Circuit breaker in `/api/stove/*` routes
-
----
-
-## Phase-Specific Warnings
-
-Flags for potential pitfalls during implementation phases.
-
-| Phase Topic | Likely Pitfall | Mitigation | Priority |
-|-------------|---------------|------------|----------|
-| **Retry Logic for API Routes** | Layered retries (Pitfall 2), non-idempotent ignite/shutdown (Pitfall 1) | Single retry layer at API boundary, idempotency keys, read-verify-write | CRITICAL |
-| **Adaptive Polling** | Breaking real-time stove status (Pitfall 3), race conditions in useEffect (Pitfall 9) | Fixed 5s for critical, adaptive only for weather/tokens, AbortController cleanup | CRITICAL |
-| **Error Boundaries** | Swallowing safety alerts (Pitfall 4), layout errors (Pitfall 10), SSR errors (Pitfall 11) | Custom error classes, validate before throw, try-catch in server components | HIGH |
-| **Component Refactoring** | State duplication (Pitfall 5), polling multiplication | Hoist state to parent, pass props, single source of truth | HIGH |
-| **Testing Critical Paths** | Brittle selectors (Pitfall 12), E2E ice cream cone (Pitfall 13) | Semantic queries, testing pyramid, limit E2E to top 3 flows | MEDIUM |
-| **FCM Token Cleanup** | Deleting active devices (Pitfall 6) | Track delivery receipts not app opens, 270-day window, audit logs | MEDIUM |
-| **Scheduler Retry** | Duplicate cron actions (Pitfall 7) | Execution ID deduplication, disable GitHub Actions retry | MEDIUM |
-| **Thermostat Coordination** | Debounce race with stove state (Pitfall 8) | Throttle instead of debounce, re-validate before action | LOW |
-
----
-
-## Integration Pitfalls
-
-Cross-feature interactions that cause unexpected failures.
-
-### Integration 1: Retry + Polling Interaction
-**Scenario:** API route retries stove status fetch (network timeout), while StoveCard polls every 5s. Results in 2 parallel status requests, one returns stale cache.
-
-**Prevention:**
-- Disable retry on GET requests (polling provides retry)
-- Enable retry only on POST (ignite/shutdown)
-- Cache-Control: no-cache on status endpoints
-
----
-
-### Integration 2: Error Boundary + Maintenance Alert
-**Scenario:** Error boundary catches needsCleaning validation, maintenance alert never renders. User sees generic error.
-
-**Prevention:**
-- Render maintenance alert BEFORE error boundary scope
-- Validation returns UI component, doesn't throw
-- Error boundary wraps only status fetch, not controls
-
----
-
-### Integration 3: Component Splitting + Context Re-renders
-**Scenario:** Split StoveCard into 5 components, all consume `useStoveContext()`. Status update triggers 5 re-renders, each triggers useEffect → 5 polling loops.
-
-**Prevention:**
-- Memoize context value with useMemo
-- Split contexts by update frequency
-- Use React.memo on pure components
-
----
-
-### Integration 4: FCM Cleanup + Scheduler Notifications
-**Scenario:** Cleanup deletes token Sunday 2am. Scheduler attempts ignite Monday 6am, notification fails. User doesn't know automation failed.
-
-**Prevention:**
-- Track last_notification_delivered, not last_app_opened
-- Test cleanup: Send notification after cleanup job
-- Fallback: SMS if FCM delivery fails (future feature)
-
----
-
-### Integration 5: Cron Retry + Idempotency
-**Scenario:** Cron fails during stove ignite, GitHub Actions retries. Each retry calls `/api/scheduler/check`, ignite succeeds on retry 2, but retry 3 also executes → second ignite fails with "already_on".
-
-**Prevention:**
-- Track cron executionId in Firebase
-- Deduplication window: 2 minutes
-- Log all cron calls with result
-
----
-
-## Anti-Patterns Specific to IoT Control
-
-Patterns to explicitly avoid in device control systems.
-
-### Anti-Pattern 1: "Fire and Forget" for Safety-Critical Actions
-**What:** Send ignite command, don't verify it succeeded.
-
-**Why bad:** Network failure looks like success. Stove doesn't ignite, scheduler thinks it did, doesn't retry.
-
-**Instead:** Poll status after command, verify expected state within 30s, alert if mismatch.
-
----
-
-### Anti-Pattern 2: Client-Side State as Source of Truth
-**What:** Track stove state in React state, update Firebase after.
-
-**Why bad:** Page refresh loses state. Multiple devices show different state. Firebase and UI desync.
-
-**Instead:** Firebase is source of truth. React state is cache. Poll to sync.
-
----
-
-### Anti-Pattern 3: Ignoring Partial Failures
-**What:** Batch operation: ignite stove + adjust thermostat. Ignite succeeds, thermostat fails. UI shows success.
-
-**Why bad:** User thinks both succeeded. Thermostat never adjusted. Coordination broken.
-
-**Instead:** Explicit transaction or rollback. If step 2 fails, revert step 1. Show partial failure in UI.
-
----
-
-### Anti-Pattern 4: Polling Without Exponential Backoff on Error
-**What:** API unavailable (Firebase down). Poll continues every 5s, hammers failing service.
-
-**Why bad:** Amplifies outage load. Drains battery. User sees constant loading state.
-
-**Instead:** Exponential backoff on consecutive errors: 5s → 10s → 20s → 40s. Reset on success.
-
----
-
-### Anti-Pattern 5: Assuming API Idempotency
-**What:** Retry failed API call without checking if it partially succeeded.
-
-**Why bad:** Thermorossi Cloud might have processed ignite but response timed out. Retry → duplicate ignite attempt → error.
-
-**Instead:** Read state before retry. If state matches intent, don't retry.
-
----
-
-## Success Criteria for Phases
-
-Checklist to validate pitfall prevention during implementation.
-
-### Retry Logic Phase
-- [ ] Idempotency keys on all POST /api/stove/* routes
-- [ ] Read-verify-write before retry (check stove state)
-- [ ] Exponential backoff with jitter implemented
-- [ ] Retry budget: max 3 attempts per 10-minute window
-- [ ] Circuit breaker opens after 5 consecutive failures
-- [ ] Layering check: retry only at API boundary, not component
-- [ ] Test: Simulate network timeout during ignite, verify no duplicate
-
-### Adaptive Polling Phase
-- [ ] Stove status remains fixed 5s polling
-- [ ] Weather uses 30-minute adaptive (already in cron)
-- [ ] Token cleanup 7-day adaptive (already in cron)
-- [ ] Staleness indicator if poll >10s old
-- [ ] AbortController cleanup in all useEffect polling
-- [ ] Test: Network disconnect for 30s, verify staleness shown
-
-### Error Boundary Phase
-- [ ] Custom ValidationError class for expected errors
-- [ ] Error boundaries check error.constructor before catching
-- [ ] Maintenance alerts render before error boundary scope
-- [ ] Global /app/error.tsx for layout errors
-- [ ] Server components use try-catch for data fetch
-- [ ] Production errors use error.digest, not full message
-- [ ] Test: Trigger needsCleaning, verify alert shown not error boundary
-
-### Component Refactoring Phase
-- [ ] Single useStoveStatus() hook in parent
-- [ ] Child components receive status via props
-- [ ] Context value memoized with useMemo
-- [ ] Network tab shows single poll per 5s interval
-- [ ] React DevTools shows no cascading re-renders
-- [ ] Test: Split component, verify polling count unchanged
-
-### Testing Phase
-- [ ] Critical paths use getByRole, not getByTestId
-- [ ] E2E limited to: auth, scheduler ignite, manual shutdown
-- [ ] Unit tests cover: canIgnite, trackUsageHours, PID logic
-- [ ] Flaky tests deleted or fixed (not ignored)
-- [ ] Testing pyramid ratio: 70% unit, 20% integration, 10% E2E
-- [ ] Test: Refactor component structure, verify tests still pass
-
-### FCM Cleanup Phase
-- [ ] Cleanup uses lastNotificationDelivered not lastAppOpened
-- [ ] 270-day inactivity window (not 30)
-- [ ] Cleanup logs written to firebase/tokenCleanupLog
-- [ ] Test notification delivery after cleanup job
-- [ ] Manual token restoration procedure documented
-- [ ] Test: Cleanup, send notification, verify delivery
+| Pitfall | Prevention Phase | Verification |
+|---------|------------------|--------------|
+| PWA offline broken by code splitting (Pitfall 1) | Phase that introduces `next/dynamic` | Playwright test: load dashboard → go offline → assert all 6 cards render |
+| `next/dynamic` no bundle reduction (Pitfall 2) | Bundle analysis phase (Phase 1 of any perf milestone) | `next build` output: `First Load JS` must decrease after optimization |
+| Recharts re-renders on every poll (Pitfall 3) | Rendering optimization phase | React DevTools Profiler: chart components absent from poll-tick flame graph |
+| React Compiler conflicts (Pitfall 4) | Late optimization phase (last) | `react-compiler-healthcheck` passes; all 3000+ existing tests remain green |
+| Stale JS chunks after deployment (Pitfall 5) | Code splitting phase | `public/sw.js` manifest contains new chunk names after build |
+| Thundering herd on page load (Pitfall 6) | Rendering optimization phase | Chrome Network tab: fewer than 3 parallel API calls in first 100ms |
+| `force-dynamic` conflict with ISR (Pitfall 7) | Bundle analysis / inventory phase (Phase 1) | `next build` route table: no unexpected changes to `○` (static) vs `●` (dynamic) |
 
 ---
 
 ## Sources
 
-### Retry & Resilience
-- [OneUpTime - Retry Logic with Exponential Backoff in React](https://oneuptime.com/blog/post/2026-01-15-retry-logic-exponential-backoff-react/view)
-- [ThinhDA - Retries Without Thundering Herds](https://thinhdanggroup.github.io/retry-without-thundering-herds/)
-- [Microsoft Azure - Retry Storm Antipattern](https://learn.microsoft.com/en-us/azure/architecture/antipatterns/retry-storm/)
-- [Encore - Thundering Herd Problem](https://encore.dev/blog/thundering-herd-problem)
-
-### Error Handling
-- [Next.js - Error Handling Docs](https://nextjs.org/docs/app/getting-started/error-handling)
-- [Better Stack - Error Handling in Next.js](https://betterstack.com/community/guides/scaling-nodejs/error-handling-nextjs/)
-- [Dave Inside - SSR Error Handling](https://daveinside.com/blog/handling-runtime-errors-when-server-side-rendering-with-nextjs/)
-
-### Adaptive Polling & IoT
-- [IEEE - RT-IFTTT Real-Time IoT Framework](https://ieeexplore.ieee.org/document/8277299/)
-- [MDPI - Polling Mechanisms for Industrial IoT](https://www.mdpi.com/1999-5903/16/4/130)
-- [MDPI - NetAP-ML Machine Learning Adaptive Polling](https://www.mdpi.com/1424-8220/23/3/1484)
-
-### React State & Performance
-- [OneUpTime - React Context Performance Issues](https://oneuptime.com/blog/post/2026-01-24-react-context-performance-issues/view)
-- [Kent C. Dodds - Application State Management with React](https://kentcdodds.com/blog/application-state-management-with-react)
-- [React.dev - Choosing State Structure](https://react.dev/learn/choosing-the-state-structure)
-
-### Testing
-- [Nucamp - Testing in 2026: Jest & React Testing Library](https://www.nucamp.co/blog/testing-in-2026-jest-react-testing-library-and-full-stack-testing-strategies)
-- [ITNEXT - 6 Anti-Patterns in React Test Code](https://itnext.io/unveiling-6-anti-patterns-in-react-test-code-pitfalls-to-avoid-fd7e5a3a7360)
-- [Trio - Best Practices for React UI Testing](https://trio.dev/best-practices-for-react-ui-testing/)
-
-### Firebase & FCM
-- [Firebase - Best Practices for FCM Registration Token Management](https://firebase.google.com/docs/cloud-messaging/manage-tokens)
-- [Firebase Blog - Managing Cloud Messaging Tokens](https://firebase.blog/posts/2023/04/managing-cloud-messaging-tokens/)
-- [Netguru - Why Mobile Push Notification Architecture Fails](https://www.netguru.com/blog/why-mobile-push-notification-architecture-fails)
-- [Medium - Lifecycle of Push Notification Device Tokens](https://medium.com/@chunilalkukreja/lifecycle-of-fcm-device-tokens-61681bb6fbcf)
-
-### React useEffect & Race Conditions
-- [Max Rozen - Fixing Race Conditions in React with useEffect](https://maxrozen.com/race-conditions-fetching-data-react-with-useeffect)
-- [React.dev - useEffect Reference](https://react.dev/reference/react/useEffect)
-- [Wisdom Geek - Avoiding Race Conditions in useEffect](https://www.wisdomgeek.com/development/web-development/react/avoiding-race-conditions-memory-leaks-react-useeffect/)
-
-### IoT Coordination
-- [Zigbee2MQTT - Debounce and Throttle](https://github.com/koenkk/zigbee2mqtt/issues/29724)
-- [Tomek Dev - Throttle vs Debounce Real Examples](https://tomekdev.com/posts/throttle-vs-debounce-on-real-examples)
-- [IoT Business News - Enterprise IoT Autonomous Operations](https://iotbusinessnews.com/2026/02/10/from-connected-devices-to-autonomous-operations-what-enterprise-iot-is-really-becoming/)
-
-### IoT Security
-- [ConnectWise - Secure IoT Devices Best Practices](https://www.connectwise.com/blog/how-to-secure-iot-devices)
-- [Device Authority - Industrial IoT Security Threats 2025](https://deviceauthority.com/industrial-iot-security-threats-top-risks-and-mitigation-strategies-2025/)
-- [Claroty - Cybersecurity Guide to Industrial Control Systems](https://claroty.com/blog/cybersecurity-dictionary-industrial-control-systems-ics-security)
+- [Next.js Lazy Loading — official docs](https://nextjs.org/docs/app/guides/lazy-loading)
+- [vercel/next.js #49454 — React lazy / next/dynamic don't reduce First Load JS in App Router](https://github.com/vercel/next.js/issues/49454)
+- [vercel/next.js #61066 — Dynamic Import of Client Component from Server Component Not Code Split](https://github.com/vercel/next.js/issues/61066)
+- [vercel/next.js #63918 — App crashes on dynamic import failure (ChunkLoadError irrecoverable)](https://github.com/vercel/next.js/issues/63918)
+- [vercel/next.js #47173 — ChunkLoadError on deployment with next/dynamic since Next 13.2.4](https://github.com/vercel/next.js/issues/47173)
+- [Recharts performance issues with large data — recharts #1146](https://github.com/recharts/recharts/issues/1146)
+- [Recharts code splitting — recharts #1260](https://github.com/recharts/recharts/issues/1260)
+- [React Compiler v1.0 release blog (October 2025)](https://react.dev/blog/2025/10/07/react-compiler-1)
+- [React Compiler — real-world testing: fixed only 1 of 8 re-render cases](https://www.developerway.com/posts/i-tried-react-compiler)
+- [Serwist with Next.js — getting started](https://serwist.pages.dev/docs/next/getting-started)
+- [Next.js PWA offline support with dynamic routes — Discussion #82498](https://github.com/vercel/next.js/discussions/82498)
+- [Vercel cold starts — official guidance](https://vercel.com/kb/guide/how-can-i-improve-serverless-function-lambda-cold-start-performance-on-vercel)
+- [Vercel Fluid compute — solves cold starts](https://vercel.com/blog/scale-to-one-how-fluid-solves-cold-starts)
+- [Next.js App Static to Dynamic Error — official docs](https://nextjs.org/docs/messages/app-static-to-dynamic-error)
+- [React memo — react.dev reference](https://react.dev/reference/react/memo)
+- [Efficient polling in React with visibility awareness](https://medium.com/@atulbanwar/efficient-polling-in-react-5f8c51c8fb1a)
+- [Firebase RTDB optimize performance — official](https://firebase.google.com/docs/database/usage/optimize)
+- [Auth0 nextjs-auth0 v4 — client-side session cache refresh issue #1937](https://github.com/auth0/nextjs-auth0/issues/1937)
+- [React Compiler migration guide](https://stevekinney.com/courses/react-performance/react-compiler-migration-guide)
+- [Next.js production checklist](https://nextjs.org/docs/app/guides/production-checklist)
+- [Recharts performance guide — official](https://recharts.github.io/en-US/guide/performance/)
 
 ---
-
-**Last Updated:** 2026-02-11
-**Confidence:** HIGH (verified with official docs, research papers, production post-mortems)
+*Pitfalls research for: Performance optimization of existing Next.js 15.5 + React 19 PWA (pannello-stufa v1.77.0)*
+*Researched: 2026-02-18*

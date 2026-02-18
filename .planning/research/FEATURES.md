@@ -1,46 +1,75 @@
-# Feature Landscape: Masonry Layout for Dashboard
+# Feature Research: Performance Optimization
 
-**Domain:** Dashboard card layout — masonry for smart home PWA
-**Researched:** 2026-02-17
+**Domain:** Next.js 15 PWA — Smart Home Dashboard Performance
+**Researched:** 2026-02-18
+**Confidence:** HIGH (Core Web Vitals targets and Next.js optimization APIs verified via official docs; project-specific gaps identified by inspecting actual source files)
 
-## Context
+---
 
-Adding masonry layout to an existing dashboard home page. Current state:
-- 6 device cards (stove, thermostat, weather, lights, camera, network)
-- Standard CSS Grid: 2 cols desktop (`grid-cols-1 sm:grid-cols-2`), 1 col mobile
-- User-configurable card order (up/down buttons in settings, saved to Firebase)
-- Staggered `animate-spring-in` entrance animation (CSS keyframe, 100ms delay per index)
-- Error boundaries wrap each card (`DeviceCardErrorBoundary`)
-- Cards have varying heights (stove card is tall, weather card moderate, network card varies by data)
+## Context: What Already Exists
+
+These optimizations are ALREADY implemented. Do not re-build them.
+
+| Already Built | Location |
+|---------------|----------|
+| Adaptive polling (pauses when tab hidden via Page Visibility API) | `lib/hooks/useAdaptivePolling.ts`, `useVisibility.ts`, `useNetworkQuality.ts` |
+| Network-quality-aware polling rate adjustment | `lib/hooks/useNetworkQuality.ts` |
+| Error boundaries (global + per-device card) | `app/components/ErrorBoundary/` |
+| Retry client with exponential backoff | `lib/hooks/useRetryableCommand.ts` |
+| Service worker with offline support (Serwist) | `app/sw.ts`, `@serwist/next` |
+| Staleness tracking per device | `lib/hooks/useDeviceStaleness.ts` |
+| Skeleton loading within cards | `app/components/ui/Skeleton` (used in ThermostatCard) |
+| Orchestrator pattern (thin card + hooks + presentational) | StoveCard, LightsCard, NetworkCard, stove/page |
+| HLS.js dynamic import (already lazy-loaded) | `app/components/devices/camera/HlsPlayer.tsx` line 177 |
+| Masonry flexbox layout | `app/page.tsx` |
+| GDPR consent gating for analytics | `app/components/analytics/ConsentBanner.tsx` |
+
+---
+
+## Performance Metrics Targets
+
+"Fast" for this dashboard means:
+
+| Metric | Target (Good) | Acceptable | Current State |
+|--------|--------------|------------|---------------|
+| **LCP** (Largest Contentful Paint) | < 2.5s | < 4.0s | Unknown — no measurement baseline |
+| **FCP** (First Contentful Paint) | < 1.8s | < 3.0s | Likely poor: Google Fonts via external CDN, all cards eager-loaded |
+| **INP** (Interaction to Next Paint) | < 200ms | < 500ms | Unknown |
+| **CLS** (Cumulative Layout Shift) | < 0.1 | < 0.25 | Risk: cards render with varying heights, skeleton gaps |
+| **TTI** (Time to Interactive) | < 3.8s | < 7.3s | Likely poor: 6 client components + multiple polling hooks bootstrap simultaneously |
+| **JS Bundle (First Load)** | < 200KB gzipped | < 400KB | Unknown — no bundle analysis ever done |
+| **Font Load** | Self-hosted, no external request | preconnect hint | Currently external Google Fonts CDN — network round-trip on every cold load |
+
+Source: [Core Web Vitals 2025 Guide](https://uxify.com/blog/post/core-web-vitals), [Lighthouse Performance Scoring](https://developer.chrome.com/docs/lighthouse/performance/performance-scoring)
 
 ---
 
 ## Table Stakes
 
-Features users expect from masonry. Missing = layout feels broken or incomplete.
+Features users expect. Missing = dashboard feels slow or broken. These directly address reported symptoms: "slow page loads, sluggish interactions, large bundle size."
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| **Gap elimination between cards** | The point of masonry — no empty vertical space below shorter cards | Low | CSS multi-column or JS layout engine both achieve this |
-| **Consistent column width** | Cards should align to grid, not float freely | Low | Same column count as current (2 desktop, 1 mobile) |
-| **Mobile unchanged (1 col stacked)** | Mobile single-column layout needs no masonry; adding it breaks readability | Low | Masonry only activates at `sm:` breakpoint and above |
-| **No content jumping on load** | Layout should stabilize once cards render; cards shifting after data load is jarring | Medium | Cards with polling (stove, thermostat) can change height mid-session — must handle gracefully |
-| **Error boundary cards still sized correctly** | If a card errors, its error fallback should occupy a reasonable height in the column | Low | DeviceCardErrorBoundary fallback needs a min-height to prevent column distortion |
-| **User card order respected** | User-configured order (from settings) must be the primary sort key; masonry fills vertically within that constraint | Medium-High | This is the fundamental tension — see Anti-Features |
-| **Gap between columns** | Horizontal gap must exist between columns, matching current `gap-8 lg:gap-10` | Low | Gap must be explicit; CSS multi-column has a known `column-gap` only issue |
+| Feature | Why Expected | Complexity | Dependency on Existing Arch | Notes |
+|---------|--------------|------------|-----------------------------|-------|
+| **Baseline measurement (bundle analyzer + Lighthouse)** | Cannot optimize what you cannot measure. All other optimizations are blind without this. | LOW | None — pure tooling | Add `@next/bundle-analyzer`. Run Lighthouse on dashboard. Captures baseline before any changes. Must be Phase 1. |
+| **Font self-hosting via next/font** | Google Fonts on external CDN adds 1-3 RTT on cold load, blocks FCP. next/font eliminates external request, ships fonts with app, zero layout shift via `size-adjust` | LOW | globals.css currently imports from `fonts.googleapis.com` — must replace both CSS import and CSS var declarations | Migrate Outfit + Space Grotesk to `next/font/google`. Removes external network dependency. HIGH confidence: official Next.js docs. |
+| **Dynamic imports for heavy device cards** | Dashboard loads all 6 cards synchronously. Cards not in first viewport (below fold on mobile) block initial parse. next/dynamic with Suspense enables progressive rendering | MEDIUM | page.tsx has static imports; all cards are 'use client'. Cards already have error boundaries that can double as Suspense boundaries | ThermostatCard (897 LOC), NetworkCard, WeatherCard are candidates. StoveCard is always above the fold — keep static or prioritize. |
+| **optimizePackageImports for icon/UI libraries** | lucide-react ships 1000+ icons; Radix UI has many primitives. Without barrel-file optimization, importing any named export loads the full barrel. Next.js has this built-in for lucide-react but not all Radix packages | LOW | next.config.ts — single config change | Add `@radix-ui/*` packages to `optimizePackageImports`. lucide-react is already optimized by default in Next.js 16. Confirmed via [Next.js docs](https://nextjs.org/docs/app/api-reference/config/next-config-js/optimizePackageImports). |
+| **React Compiler (auto-memoization)** | 60 manual `useCallback/useMemo/React.memo` calls in device components. React Compiler (stable in Next.js 16 via `reactCompiler: true`) auto-memoizes at compile time, eliminating defensive memoization bugs and reducing re-renders by 25-40% | MEDIUM | next.config.ts — one config flag. Project runs Next 16.1.0 + React 19.2.0 — both support stable compiler. Build time increases; must validate no regressions | Verify test suite passes with compiler enabled. If breakage: use `"use no memo"` directive in specific files as escape hatch. Source: [React Compiler v1.0](https://react.dev/blog/2025/10/07/react-compiler-1). |
+| **Recharts dynamic import** | Recharts is ~40KB gzipped. It's used in 7 chart components across analytics, network, and debug pages — none of which are on the dashboard homepage. Yet Recharts loads on every page because it's statically imported in components bundled with layout. | MEDIUM | NetworkBandwidth.tsx is on the dashboard (homepage) — must stay or get a lightweight fallback. Analytics + debug pages can fully defer Recharts. | Wrap Recharts-heavy analytics/debug pages in next/dynamic. NetworkBandwidth uses only `ResponsiveContainer + AreaChart + Area` — consider a CSS-only sparkline instead for the dashboard card, deferring full Recharts to /network page. |
 
 ---
 
 ## Differentiators
 
-Features that go beyond the visual baseline. Not expected but noticeably improve the experience.
+Features that noticeably improve the experience beyond baseline. Not minimum, but high value-to-effort ratio for this dashboard.
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| **Smooth entrance animation preserved** | Staggered spring-in should still work; cards animating into their masonry positions looks polished | Medium | Need to preserve `animate-spring-in` with `animationDelay` per index; FLIP transition for repositioning is overkill at 6 cards |
-| **No layout reflow after card data loads** | Cards that expand (e.g., stove showing maintenance banner) don't cause visible column re-balancing | High | Requires either fixed card heights or a JS layout engine with `ResizeObserver` |
-| **Skeleton loading at correct approx height** | Skeleton placeholder matches approximate card height so layout doesn't jump dramatically when real content appears | Medium | Stove card ~480px, weather ~320px, network ~260px — skeletons should approximate these |
-| **Column balance maintained across visible set** | If user hides cards, remaining cards still distribute evenly across columns | Medium | Layout engine must re-run when `visibleCards` changes |
+| Feature | Value Proposition | Complexity | Dependency on Existing Arch | Notes |
+|---------|-------------------|------------|-----------------------------|-------|
+| **Suspense streaming per card (loading.tsx shell)** | Dashboard renders a static shell immediately (header, layout structure) while each card streams in independently. First card appears in ~300ms instead of waiting for all 6. Matches Next.js 15 streaming model | MEDIUM | page.tsx currently has no Suspense wrapping. Each DeviceCardErrorBoundary is already a boundary — it can also serve as a Suspense boundary with a skeleton fallback | Move data fetching inside each card with Suspense. This conflicts with current pattern of server-side auth + config fetch in page.tsx — deviceConfig must still be fetched server-side, but card data can move into each card's own fetch. |
+| **Staggered card entrance with prefers-reduced-motion** | animate-spring-in with 100ms delay per card already exists. Adding `@media (prefers-reduced-motion: reduce)` to disable animation avoids forcing animation-related compositing on low-power devices. Also resolves potential CLS from delayed card appearance | LOW | globals.css — add media query. Already have `useReducedMotion` hook in `app/hooks/useReducedMotion.ts` | Add CSS: `@media (prefers-reduced-motion: reduce) { .animate-spring-in { animation: none; } }`. Zero JS change required. |
+| **Lightweight sparkline for NetworkBandwidth card** | Recharts on the dashboard homepage for a 5-point mini area chart is heavyweight. A 200-byte SVG sparkline (pure CSS/SVG path) renders faster, removes Recharts from the critical path for the main dashboard, and achieves the same visual goal | HIGH | Replaces `ResponsiveContainer + AreaChart + Area` in NetworkBandwidth.tsx. Recharts stays for /network page charts (correlation, full bandwidth history). Requires implementing a small SVG path calculation utility | Alternative: dynamic import NetworkBandwidth with ssr:false in a 'use client' wrapper — simpler, still removes from critical path. |
+| **Debounced/batched Firebase writes on rapid user actions** | ThermostatCard setpoint adjustments fire API calls on every +/- click. Rapid clicking causes multiple Firebase RTDB writes + API calls. Debouncing (already have useDebounce hook) gives 50-80% reduction in API calls during quick adjustments | LOW | useDebounce hook already exists in `app/hooks/useDebounce.ts`. Apply in ThermostatCard's calibration and setpoint handlers | Scope: ThermostatCard temperature adjustments. Debounce window: 500ms. Uses existing hook — minimal code change. |
+| **Resource hints for API domains** | Add `<link rel="preconnect">` in layout.tsx for Firebase RTDB, Auth0, and Netatmo API domains. Eliminates DNS + TLS handshake time on first API call. 100-300ms saving on cold load | LOW | layout.tsx head section — add 3-4 link tags | Confirmed domains from API routes: Firebase RTDB (`*.firebaseio.com`), Auth0 domain (`*.auth0.com`), Netatmo (`api.netatmo.com`). Zero JS change. |
 
 ---
 
@@ -50,158 +79,114 @@ Features to explicitly NOT build for this milestone.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| **Algorithm-driven column assignment** | True masonry (place card in shortest column regardless of user order) breaks user-configured order. Home Assistant community explicitly identified this as "the masonry layout doesn't make sense" — cards end up in arbitrary positions that differ from the user's intended sequence | Use a two-column CSS approach that respects DOM order: column 1 gets odd cards (1, 3, 5), column 2 gets even cards (2, 4, 6). User order is the primary sort key. |
-| **Drag-and-drop reorder on the home page** | Home Assistant explicitly found that masonry + drag-and-drop "cannot co-exist" predictably — users don't understand which column a dragged card will land in | Keep reorder in settings page (up/down buttons), masonry layout is display-only |
-| **FLIP animation on column repositioning** | At 6 cards with low update frequency, FLIP adds complexity with no perceptible benefit. Repositioning only happens when visibility changes (rare) | Accept instant reposition when card visibility changes; entrance animation already covers the "in" case |
-| **Native CSS Grid masonry (`grid-template-rows: masonry`)** | Browser support is still limited (Firefox Nightly, Safari TP only as of 2026-02); production use requires polyfill or JS fallback anyway | Use CSS multi-column (`columns: 2`) or explicit two-column flexbox — both have universal support |
-| **Auto-column count based on viewport** | Dashboard is defined as 2 cols desktop, 1 col mobile. Auto-column logic adds complexity and would break the user's mental model of the layout | Keep fixed column counts: 1 mobile, 2 desktop |
-| **Per-card spanning (wide cards)** | Spanning across 2 columns in masonry requires JS measurement and breaks column balance | All cards are same width (1 column). Not needed for this project. |
-| **Infinite scroll / virtualized masonry** | Only 6 cards — virtualization is engineering overkill | Simple layout only |
+| **Full server-side rendering for device cards** | Device cards poll live IoT data (stove state, Netatmo temp, Hue lights). SSR would require server-side polling infrastructure, invalidation strategy, and adds complexity without meaningful user benefit. Users visit dashboard after auth — cold SSR is not the bottleneck. | Keep cards as 'use client' with client-side polling. Optimize the client-side startup cost instead (dynamic imports + React Compiler). |
+| **React Query / SWR for data fetching** | Project already has working retry client + adaptive polling hooks (60+ usages). Migrating data fetching to SWR or TanStack Query would rewrite ALL device hooks — massive scope, high regression risk, 0 benefit to end-user performance. | Use existing patterns. If deduplication is needed for shared data (e.g., multiple cards reading same Firebase key), add a lightweight in-memory cache in the existing service layer. |
+| **Virtualization of dashboard cards** | TanStack Virtual makes sense for 100+ items. Dashboard has a maximum of 6 cards. Virtualization overhead (ResizeObserver, scroll listeners, absolute positioning) adds more cost than it saves at 6 items. | Simple static layout. Already built the masonry layout — no further layout work needed. |
+| **WebAssembly for chart calculations** | LTTB decimation for bandwidth charts (already in network hooks) is the only compute-heavy operation. It runs on thousands of points but still completes in <2ms on any modern device. WASM optimization is engineering theater at this scale. | Keep LTTB in TypeScript as-is. |
+| **Service worker pre-caching of API responses** | Stale smart home data is dangerous: a cached "stove is off" response when the stove is actually on could mask a safety state. Service worker already handles offline fallback appropriately. Aggressively pre-caching IoT data inverts this safety guarantee. | Service worker caches static assets (JS, CSS, fonts) only. API responses remain network-first or cache-with-staleness-indicator (already implemented via useDeviceStaleness). |
+| **Separate chunk per device card** | Code-splitting each of 6 cards into its own JS chunk creates 6 HTTP requests instead of 1. At current card sizes (188-897 LOC), the chunk overhead exceeds the parse savings. HTTP/2 mitigates this slightly, but chunking 6 small files is net negative. | Use next/dynamic to lazy-load cards that are below the fold or rarely seen — but group them into 1-2 logical chunks, not 6 individual ones. |
+| **Manual useMemo/useCallback audit and addition** | There are 60 existing memoization calls. Adding more is counter-productive: React Compiler (already enabled in this milestone) handles memoization automatically. Adding manual memos creates stale closure bugs and conflicts with compiler output. | Enable React Compiler, remove unnecessary manual memos where compiler flags them. |
+| **Font subsetting / self-hosting custom WOFF2 files** | next/font/google handles subsetting automatically based on `subsets` parameter. Manual WOFF2 generation and hosting adds build pipeline complexity with no benefit over next/font's built-in handling. | Use `next/font/google` with `subsets: ['latin']`. Done. |
 
 ---
 
 ## Feature Dependencies
 
 ```
-Masonry column layout
-  └── Existing card order from Firebase (visibleCards array, already sorted by user order)
-  └── Error boundary fallback min-height (card must not collapse to 0px)
-  └── Mobile unchanged (layout applies only at sm: breakpoint)
+Baseline Measurement (Phase 1)
+    └──informs──> All optimization phases (prioritization depends on what's actually slow)
 
-No-jump loading
-  └── Requires approximate card heights for skeleton OR accepting initial reflow
-  └── Cards with ResizeObserver (for dynamic height changes mid-session)
+Font Self-Hosting
+    └──requires──> Remove @import from globals.css
+    └──requires──> Add next/font declarations to layout.tsx
+    └──conflicts──> CSS variable declarations (must be renamed or updated)
 
-Entrance animation
-  └── `animate-spring-in` + animationDelay continues working (applies to wrapper div)
-  └── Must not conflict with CSS column layout (column items don't need special treatment)
+optimizePackageImports
+    └──requires──> next.config.ts change only
+    └──no conflicts
+
+React Compiler
+    └──requires──> reactCompiler: true in next.config.ts
+    └──requires──> Test suite validation (60 memoization calls may conflict)
+    └──enhances──> All client components (automatic memoization)
+    └──conflicts with──> Manual useMemo/useCallback (compiler may warn about conflicts)
+
+Dynamic Imports (card lazy loading)
+    └──requires──> 'use client' wrapper for ssr:false usage
+    └──requires──> Skeleton fallback for Suspense boundary
+    └──enhances──> Suspense streaming per card
+    └──conflicts──> Static imports in page.tsx (must be removed)
+
+Suspense Streaming per Card
+    └──requires──> Dynamic imports OR Suspense wrapping of existing cards
+    └──requires──> Skeleton components per card type (some already exist)
+    └──conflicts with──> page.tsx's current pattern of passing server-fetched deviceConfig to CARD_COMPONENTS registry
+
+Recharts Dynamic Import
+    └──requires──> next/dynamic in analytics + debug pages
+    └──NetworkBandwidth dashboard sparkline: independent (alternative approach)
+    └──no conflict with /network page charts (stays static there)
+
+Resource Hints (preconnect)
+    └──requires──> layout.tsx head update only
+    └──no conflicts
 ```
 
----
+### Dependency Notes
 
-## "Good Masonry" vs "Broken Masonry"
-
-### Good masonry looks like:
-- Stove card (tall) and thermostat card (medium) sit side by side, both start at the top. Weather card appears below the shorter one with no empty gap between them.
-- After a card errors and shows its compact error fallback, the column below it fills the space naturally — no large white gap.
-- When the user hides a card in settings and returns to the home page, cards redistribute into the two columns without visible "jumping."
-- On first load, cards spring in one by one (staggered 100ms) and settle into their masonry positions.
-- On mobile: unchanged single-column stack, top-to-bottom in user-configured order.
-
-### Broken masonry looks like:
-- Card 1 appears in the right column because card 2 happened to load taller, swapping their visual positions relative to user-configured order.
-- Large white gaps appear in a column because a card loaded with less content than expected.
-- After 5 seconds (stove polling), the stove card grows taller and pushes cards below it down, causing a visible re-layout jump.
-- The error boundary card collapses to near-zero height, leaving a half-column empty.
-- Horizontal gap between columns differs from vertical gap (broken gap spec in CSS multi-column).
+- **Baseline measurement must be Phase 1:** All other optimizations are prioritized by what the bundle analyzer and Lighthouse reveal. If fonts aren't actually blocking LCP, font optimization drops in priority.
+- **React Compiler conflicts with defensive memoization:** Enabling compiler with existing `useMemo/useCallback` calls is safe (compiler skips opted-out code), but may produce console warnings. The 60 existing calls should be audited — some may be removable, which improves readability without changing behavior.
+- **Dynamic imports conflict with page.tsx CARD_COMPONENTS registry:** The current pattern maps card IDs to static component references. Converting to dynamic imports requires changing values in the registry from `StoveCard` to `dynamic(() => import('./StoveCard'))`. This is a surgical change to one file.
 
 ---
 
-## Implementation Approach (Opinionated)
+## Feature Prioritization Matrix
 
-### Recommended: Two-Column Flexbox with DOM Order
+| Feature | User Value | Implementation Cost | Priority | Phase Recommendation |
+|---------|------------|---------------------|----------|---------------------|
+| Baseline measurement | HIGH (enables everything else) | LOW | P1 | Phase 1, Plan 1 |
+| Font self-hosting (next/font) | HIGH (FCP improvement, removes external request) | LOW | P1 | Phase 1, Plan 2 |
+| optimizePackageImports | MEDIUM (bundle size, build speed) | LOW | P1 | Phase 1, Plan 2 (same plan as font) |
+| Resource hints (preconnect) | MEDIUM (cold load API latency) | LOW | P1 | Phase 1, Plan 2 |
+| React Compiler | HIGH (automatic re-render reduction) | MEDIUM (validation needed) | P1 | Phase 2 |
+| Dynamic imports for heavy cards | HIGH (initial JS parse reduction) | MEDIUM | P1 | Phase 2 |
+| Recharts dynamic import | MEDIUM-HIGH (40KB off critical path) | MEDIUM | P2 | Phase 2 or 3 |
+| Suspense streaming per card | HIGH (perceived performance, progressive reveal) | HIGH | P2 | Phase 3 |
+| Debounced Firebase writes | LOW-MEDIUM (API efficiency, not user-visible) | LOW | P2 | Phase 3 |
+| prefers-reduced-motion CSS | LOW-MEDIUM (accessibility + performance on low-power) | LOW | P2 | Phase 3 |
+| Lightweight sparkline for NetworkBandwidth | MEDIUM (removes Recharts from critical path) | HIGH | P3 | Phase 4 (if needed after bundle analysis) |
 
-The simplest approach that preserves user order AND eliminates gaps is:
-
-```
-Column A: visibleCards[0], visibleCards[2], visibleCards[4]
-Column B: visibleCards[1], visibleCards[3], visibleCards[5]
-```
-
-Implemented as two `<div className="flex flex-col gap-8">` side by side in a flex container. Each card renders at its natural height. No algorithm, no DOM reordering, no JS measurement.
-
-**Why not CSS multi-column (`columns: 2`):** Multi-column is column-first (reads top-to-bottom in column 1, then column 2). User order 1,2,3,4,5,6 becomes visual order 1,3,5 on left and 2,4,6 on right. This violates the "left-to-right reading order" expectation for a 2-column grid — user expects card 2 to the right of card 1, not card 3.
-
-**Why not CSS Grid masonry:** Browser support insufficient for production without polyfill.
-
-### Column Assignment Rule
-
-Cards are split by index: even-index → left column, odd-index → right column. This means:
-- Card at position 0 → left
-- Card at position 1 → right
-- Card at position 2 → left
-- etc.
-
-This preserves user intent: card 1 is top-left (most prominent), card 2 is top-right, then alternating down.
-
-### Height Change Handling
-
-Cards with polling (stove 5s, thermostat varies) can change height after load. Accept this: when a card's height changes, the column grows naturally and only content below it shifts — this is the same as any normal document reflow and is not perceptually jarring at 6 items.
-
-Do NOT add ResizeObserver-triggered JS re-balancing. At 6 cards, the benefit is zero and the complexity is significant.
+**Priority key:**
+- P1: High impact, low effort — ship first
+- P2: High impact, higher effort — ship after P1 validates direction
+- P3: Nice to have — defer until baseline metrics prove it's needed
 
 ---
 
-## Complexity Breakdown
+## "Fast" for a Smart Home Dashboard
 
-### Low Complexity (< 1h)
-- Two-column flexbox layout in `app/page.tsx` (replace `<Grid cols={2}>` with two flex column divs)
-- Mobile unchanged (conditional rendering: masonry on `sm:`, stack below)
-- Preserve `animate-spring-in` + `animationDelay` on each card wrapper
+Real-world expectations for a dashboard used daily by one household, accessed primarily via Safari on iOS (PWA installed to home screen):
 
-### Medium Complexity (2-4h)
-- Error boundary fallback min-height (coordinate with DeviceCardErrorBoundary)
-- Empty state when all cards hidden (existing `<EmptyState>` component, behavior unchanged)
-- Testing: verify column assignment matches expected user order with various card counts
-
-### High Complexity (not recommended for this milestone)
-- No-jump loading with skeleton height approximation
-- FLIP animations on column rebalancing
-- ResizeObserver-driven dynamic rebalancing
-
----
-
-## Integration with Existing Patterns
-
-| Existing Pattern | How Masonry Interacts |
-|------------------|-----------------------|
-| `Grid` component (`app/components/ui/Grid.tsx`) | Replace `<Grid cols={2}>` on homepage with masonry-aware wrapper; keep `Grid` component untouched |
-| `animate-spring-in` CSS keyframe | Continues working — applies to the `<div>` wrapper around each card, unaffected by column layout |
-| `DeviceCardErrorBoundary` | Must receive `className="min-h-[160px]"` or similar to prevent 0-height collapsed columns |
-| `visibleCards` array (sorted by user order) | Split into left/right arrays by index: `visibleCards.filter((_, i) => i % 2 === 0)` for left column |
-| `EmptyState` | Span full width when shown (flex container, add `w-full` wrapper) |
-
----
-
-## Mobile Considerations
-
-Mobile (< `sm:` breakpoint) is unchanged: single column, top-to-bottom in user order. The masonry wrapper only activates at `sm:` and above. This is a hard requirement from the project context.
-
----
-
-## Testing Considerations
-
-| Test Case | Importance |
-|-----------|------------|
-| 6 visible cards → 3 per column, correct assignment (0,2,4 left / 1,3,5 right) | Critical |
-| 5 visible cards → 3 left, 2 right | High |
-| 1 visible card → 1 left, right empty | High |
-| 0 visible cards → EmptyState renders full-width | Medium |
-| Error boundary in any position → no collapsed column | High |
-| Mobile viewport → single column stack, masonry divs not rendered | Critical |
-| `animate-spring-in` fires for all cards with correct delay | Medium |
+- **Cold load (first visit after closing app):** User expects the layout shell to appear in <1s, with card skeletons in place. Real data within 2-3s. Currently: all 6 card components block initial render simultaneously.
+- **Warm load (app re-opened from recents):** Service worker serves shell instantly. Cached stale data shows immediately with staleness indicator (already implemented). Re-validation happens in background.
+- **Interactions (button presses, setpoint changes):** Response must feel <200ms (INP target). Current: no known issues, but React Compiler will reduce re-render overhead.
+- **Navigation (dashboard → stove page → back):** Page transition already implemented. Re-entry to cached dashboard should not re-fetch everything.
+- **Battery/network efficiency:** Polling pauses when tab hidden (already done). Font loading from CDN adds 1 external request on every cold load — eliminating it with next/font is the most impactful single change.
 
 ---
 
 ## Sources
 
-**CSS Masonry & Layout Approaches:**
-- [MDN: Masonry layout (CSS Grid Module Level 3)](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Grid_layout/Masonry_layout)
-- [CSS-Tricks: Making a Masonry Layout That Works Today](https://css-tricks.com/making-a-masonry-layout-that-works-today/)
-- [Smashing Magazine: Masonry in CSS — Should Grid Evolve Or Stand Aside?](https://www.smashingmagazine.com/2025/05/masonry-css-should-grid-evolve-stand-aside-new-module/)
-- [Tobias Ahlin: CSS masonry with flexbox, :nth-child(), and order](https://tobiasahlin.com/blog/masonry-with-css/)
+- [Next.js optimizePackageImports](https://nextjs.org/docs/app/api-reference/config/next-config-js/optimizePackageImports) — HIGH confidence
+- [Next.js Lazy Loading Guide](https://nextjs.org/docs/app/guides/lazy-loading) — HIGH confidence
+- [Next.js Font Optimization](https://nextjs.org/docs/app/getting-started/fonts) — HIGH confidence
+- [React Compiler v1.0 Release](https://react.dev/blog/2025/10/07/react-compiler-1) — HIGH confidence
+- [Next.js 16 Release Notes](https://nextjs.org/blog/next-16) — HIGH confidence (reactCompiler: true stable)
+- [Core Web Vitals Targets 2025](https://uxify.com/blog/post/core-web-vitals) — MEDIUM confidence (third party, but consistent with Google's published thresholds)
+- [Recharts bundle size ~40KB gzipped](https://bundlephobia.com/package/recharts) — MEDIUM confidence (bundlephobia, not versioned to exact installed version)
+- [Vercel: How we optimized package imports in Next.js](https://vercel.com/blog/how-we-optimized-package-imports-in-next-js) — HIGH confidence
 
-**Home Assistant Masonry — Real-world UX Failures:**
-- [Home Assistant Masonry View Documentation](https://www.home-assistant.io/dashboards/masonry/)
-- [HA Community: Masonry Layout Doesn't Make Sense](https://community.home-assistant.io/t/masonry-layout-doesnt-make-sense/527497)
-- [HA Blog: Dashboard Chapter 1 — Moving Away from Masonry](https://www.home-assistant.io/blog/2024/03/04/dashboard-chapter-1/)
+---
 
-**React Masonry Libraries (Considered, Not Recommended for This Use Case):**
-- [react-masonry-css](https://github.com/paulcollett/react-masonry-css) — dependency-free, simple API, but column-first DOM order breaks user-order expectation
-- [Masonic](https://github.com/jaredLunde/masonic) — virtualized, overkill for 6 cards
-
-**MUI Masonry (Sequential Mode):**
-- [React Masonry component - Material UI](https://mui.com/material-ui/react-masonry/) — sequential mode fills left-to-right, closest to what's needed; but importing MUI for one component is not justified
-
-**SAP Fiori Masonry Guidelines:**
-- [Masonry Layout - SAP Fiori for iOS Design Guidelines](https://experience.sap.com/fiori-design-ios/article/masonry-layout/) — use 3 columns for regular size class, 1 for compact
+*Feature research for: Next.js 15.5 PWA — Performance Optimization milestone*
+*Researched: 2026-02-18*

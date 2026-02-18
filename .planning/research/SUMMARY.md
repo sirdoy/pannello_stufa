@@ -1,173 +1,213 @@
 # Project Research Summary
 
-**Project:** Pannello Stufa — v8.1 Masonry Dashboard Layout
-**Domain:** CSS masonry layout for Next.js 15.5 PWA dashboard
-**Researched:** 2026-02-17
-**Confidence:** HIGH
+**Project:** Pannello Stufa — Performance Optimization Milestone
+**Domain:** Next.js 16.1 PWA (smart home dashboard) — bundle analysis, code splitting, interaction optimization
+**Researched:** 2026-02-18
+**Confidence:** HIGH (primary sources: Next.js 16.1.6 official docs, React docs, verified npm registry versions)
 
 ## Executive Summary
 
-This milestone adds masonry layout to the existing 6-card smart home dashboard: no empty vertical gaps below shorter cards on desktop (2 columns), mobile stays unchanged (1 column), and user-configured Firebase card order is fully respected. The research produced four distinct recommendations that conflict on key tradeoffs. This summary resolves the conflict with a clear, opinionated recommendation.
+This milestone targets measurable performance improvements on an already well-engineered Next.js 16.1 + React 19 PWA smart home dashboard. The codebase is mature (v1.77.0, 322+ plans, 575 TypeScript files, strict mode, 3034 tests) with strong foundations already in place: adaptive polling, error boundaries, orchestrator component pattern, service worker with offline support, and LTTB-decimated bandwidth charts. The optimization work is additive, not structural. The biggest wins come from four specific changes: font self-hosting via `next/font`, measuring baseline with `@next/bundle-analyzer`, enabling React Compiler (`reactCompiler: true`), and lazy-loading Recharts chart components on sub-pages.
 
-The core tension is: **CSS columns is SSR-safe and requires zero JS, but fills column-first (cards 0,2,4 on left / 1,3,5 on right), violating the user's expected left-to-right reading order.** The pitfalls researcher explicitly flagged CSS columns ordering as a critical pitfall (Pitfall 3). JS-based approaches (ResizeObserver hook) preserve row-first order but require a client component boundary. The simplest approach — explicit two-column flexbox split by index — preserves order, requires no hooks, no client boundary, and no new dependencies.
+The most important finding from combined research is a critical constraint inversion: the obvious approach of applying `next/dynamic` to all six device cards will NOT reduce First Load JS in Next.js App Router because device cards are already Client Components — App Router includes all Client Component chunks in the initial payload regardless of `next/dynamic` usage (confirmed by vercel/next.js #49454 and #61066). `next/dynamic` only splits components that are NOT in the initial render path. This means dynamic imports are useful for Recharts charts on sub-pages, conditional modals, and consent-gated panels — not for always-visible dashboard cards. Every phase must measure bundle size before and after, not assume improvement.
 
-**Recommendation: Two-column flexbox split with explicit column arrays.** Split `visibleCards` by index at render time — even-indexed cards into a left flex column, odd-indexed cards into a right flex column. This is pure JSX that runs in the existing server component with zero new dependencies, no hydration mismatch, and no client boundary. Card 0 appears top-left, card 1 top-right, card 2 second-left — exactly matching user expectation from the Firebase-configured order. Vertical gaps are eliminated because each column is an independent `flex flex-col` container. This is also the safest approach for the PWA: service worker caches the HTML structure, and since there are no JS-calculated positions, the cached HTML is always valid. If true height-balancing masonry becomes necessary in a future milestone (12+ cards, dramatic height disparities), the stack researcher's `useMasonryGrid` hook is the documented next step.
+The secondary critical risk is the PWA offline shell. Any code splitting introduced via `next/dynamic` creates new hashed chunk filenames that must appear in Serwist's `__SW_MANIFEST` precache or the offline experience will break with `ChunkLoadError`. Additionally, React Compiler (stable since October 2025) offers automatic memoization but requires health-checking the codebase first (`npx react-compiler-healthcheck`) because it silently bails out on Rules of React violations without warning. These risks are fully avoidable with the verification steps documented in PITFALLS.md.
 
 ## Key Findings
 
 ### Recommended Stack
 
-No new dependencies are required. Every JS masonry library evaluated is either unmaintained (`react-masonry-css`, abandoned 5 years ago), has SSR issues with Next.js App Router (`react-responsive-masonry`, GitHub issue #127), requires known aspect ratios at render time (`@masonry-grid/react`), or fills column-first breaking user order. CSS native masonry (`grid-template-rows: masonry`) has 0% stable browser support as of Feb 2026 — Chrome and Apple disagree on the spec. The two-column flexbox split requires no new files beyond `app/page.tsx` changes and tests.
+Full details: `.planning/research/STACK.md`
 
-See [STACK-masonry-layout.md](STACK-masonry-layout.md) for full library-by-library evaluation.
+The minimal install surface is two packages: `@next/bundle-analyzer` (devDependency) and `web-vitals@5.1.0` (runtime, 3KB gzipped). Everything else — `next/dynamic`, `React.lazy`, `useTransition`, `useDeferredValue`, React Compiler — is built into the already-installed Next.js 16.1.3 and React 19.2.3. The project uses webpack for production builds (required by Serwist) and Turbopack for development, so `@next/bundle-analyzer` targets the webpack production artifact correctly.
 
 **Core technologies:**
-- **Tailwind CSS `flex flex-col` utilities**: Two side-by-side flex columns — no new primitives, pattern already used throughout project
-- **Existing `Grid` component** (`app/components/ui/Grid.tsx`): Left untouched; masonry replaces only the homepage grid usage
-- **No new hook, no client boundary**: Index-based column split (`i % 2 === 0`) is plain array logic executable in the server component
+- `@next/bundle-analyzer@16.1.6`: Production bundle analysis — generates `client.html`, `server.html`, `edge.html` reports. Run with `ANALYZE=true npm run build -- --webpack`. Identifies actual large chunks (current build has 4 chunks over 399 KB each).
+- `web-vitals@5.1.0`: Real User Monitoring — `onLCP`, `onINP`, `onCLS`, `onFCP`, `onTTFB`. INP replaces FID (March 2024). Attribution build provides INP breakdown. Integrates with `useReportWebVitals` in `app/layout.tsx`.
+- `next/dynamic` (built-in): Code splitting — only effective for components NOT in the initial Client Component render path. Useful for Recharts charts on sub-pages, conditional panels. `ssr: false` requires `'use client'` context.
+- `useTransition` / `useDeferredValue` (React 19 built-in): Interaction optimization — wrap polling `setState` calls to avoid blocking user interactions (INP impact); defer Recharts renders during data updates.
+- `babel-plugin-react-compiler` (devDependency): Required by `reactCompiler: true` in `next.config.ts`. Stable as of October 2025, fully supported by Next.js 16.
+
+**Critical version note:** `lucide-react`, `recharts`, and `date-fns` are already in Next.js's default `optimizePackageImports` list. Adding them explicitly to `next.config.ts` would be redundant — no config change needed.
+
+**Critical constraint (confirmed HIGH confidence):** `ssr: false` in `dynamic()` is NOT supported in Server Components. `app/page.tsx` is a Server Component — omit `ssr` entirely when calling `dynamic()` from there. Only Client Component pages (`app/network/page.tsx`, `app/analytics/page.tsx`) can use `{ ssr: false }`.
 
 ### Expected Features
 
-See [FEATURES.md](FEATURES.md) for full analysis with complexity ratings.
+Full details: `.planning/research/FEATURES.md`
 
-**Must have (table stakes):**
-- Gap elimination between cards — no empty vertical space below shorter cards in a column
-- Firebase card order respected — user's configured flat order maps predictably to visual positions (0=top-left, 1=top-right, 2=second-left)
-- Mobile unchanged — single-column stack, masonry only at `sm:` breakpoint
-- Spring entrance animation preserved — `animate-spring-in` with 100ms delay per index continues working
-- Error boundary cards at reasonable height — compact fallback must not leave a column visually collapsed
+**Must have (table stakes — without these optimization work is blind or broken):**
+- Baseline measurement (bundle analyzer + Lighthouse) — cannot optimize what you cannot measure; must be Phase 1
+- Font self-hosting via `next/font/google` — Google Fonts CDN adds 1-3 RTT on every cold load; eliminates the most impactful single external network request
+- Resource hints (preconnect to Firebase RTDB, Auth0, Netatmo API) — eliminates DNS+TLS handshake on first API call; zero JS change
+- React Compiler (`reactCompiler: true`) — auto-memoization of all components; replaces 60 existing manual `useMemo`/`useCallback` calls with safer compile-time memoization
+- Recharts lazy loading on analytics/network sub-pages — Recharts is ~40KB gzipped; can be fully deferred with `dynamic({ ssr: false })` on pages where it is NOT in initial render
+- Core Web Vitals measurement (`web-vitals` + `useReportWebVitals`) — production pipeline to validate optimization impact
 
-**Should have (differentiators):**
-- Column balance maintained when cards are hidden — even/odd split adapts cleanly to 5, 4, 3 visible cards
-- Animation stagger remains coherent — flat index order produces visually sensible cascade
+**Should have (high value-to-effort ratio):**
+- Suspense streaming per card — dashboard shell renders immediately while each card streams independently; first card visible ~300ms instead of waiting for all 6
+- Polling stagger via `initialDelay` in `useAdaptivePolling` — prevents thundering herd: all 6 cards currently fire initial fetches within 100ms; priority order: stove (delay=0, safety-critical) → thermostat (50ms) → lights (100ms) → weather (250ms) → camera (400ms) → network (500ms)
+- Recharts animation disabled on updates (`isAnimationActive={false}`) — animations restart on every poll tick causing visible chart flicker every 30s
+- Debounced Firebase writes for thermostat setpoint — `useDebounce` hook already exists; 500ms window reduces rapid-click API calls by 50-80%
 
-**Defer (out of scope for this milestone):**
-- Skeleton heights approximating card content (complex, low ROI for 6 cards)
-- FLIP animation on card visibility change (overkill at 6 cards, high complexity)
-- ResizeObserver-driven dynamic height rebalancing (adds complexity, flex flow handles gracefully)
-- Drag-and-drop reorder on home page (incompatible with masonry in general — confirmed by Home Assistant post-mortem)
+**Defer to later (low value or high complexity):**
+- Lightweight SVG sparkline replacing Recharts in NetworkBandwidth card — HIGH complexity; `next/dynamic` wrapper achieves similar goal at lower cost
+- ThermostatCard orchestrator refactor (897 LOC) — HIGH risk; React Compiler handles it partially without refactoring; separate milestone
+- Service Worker API response pre-caching — dangerous for IoT data (stale "stove is off" could mask a safety state)
+- Virtualization of dashboard cards — 6 cards max; TanStack Virtual is for 100+ item lists
+- React Query/SWR migration — rewrites all 60+ polling hooks; high regression risk, zero user-visible benefit
+- Manual `useMemo`/`useCallback` audit and additions — React Compiler makes this counterproductive; compiler handles memoization automatically
+
+**Already built — do not rebuild:**
+Adaptive polling (`useAdaptivePolling`, `useVisibility`, `useNetworkQuality`), error boundaries, retry client, service worker offline support, LTTB decimation, orchestrator pattern, GDPR consent gating, staleness indicators, skeleton loading states.
 
 ### Architecture Approach
 
-Three researchers recommended three different architecture patterns; the fourth (pitfalls) correctly identified the fatal flaw in one of them. The synthesis picks the simplest viable approach:
+Full details: `.planning/research/ARCHITECTURE-performance-optimization.md`
 
-**Explicit two-column flexbox split in `app/page.tsx`.** Replace the single `<Grid cols={2} gap="lg">` map with two parallel flex column divs, each receiving cards split by index parity. This is a server component change — no client boundary needed. The `Grid` component (`Grid.tsx`) is left untouched. The pattern is extractable to a `MasonryColumns` server component if code clarity warrants it, but the inline form is acceptable given the scope.
+The optimization architecture has four distinct layers: bundle optimization (config-level), code splitting (import-site changes only), render optimization (React Compiler + targeted memoization), and the already-complete polling efficiency layer. No new directories or components are needed. All changes are configuration modifications and import-site changes in existing files. The server/client boundary in `app/page.tsx` (Server Component) already provides correct architecture — client JS for page orchestration is zero, and the masonry layout + column assignment (`splitIntoColumns`) runs server-side at zero client cost.
 
-**Why not extend Grid.tsx with CSS columns (architecture researcher's approach):** CSS `column-count` distributes items top-to-bottom within each column before starting the next. With variable card heights (the whole point of masonry), the column split point is height-determined at paint time, not at array-index time. Users who configured "Stove first, Thermostat second" will see Thermostat below Stove in column 1 rather than at the top of column 2. This breaks the mental model that card order = visual sequence.
+**Major components and their optimization status:**
 
-**Why not `useMasonryGrid` hook (stack researcher's approach):** Technically correct true masonry, but requires a `'use client'` component boundary, a ~40-line hook, and ResizeObserver logic. For 6 cards with content-driven polling, the CSS flow of two flex columns already eliminates gaps without measurement. The complexity cost exceeds the benefit at this scale.
+| File | Action | Rationale |
+|------|--------|-----------|
+| `next.config.ts` | MODIFY: chain `withBundleAnalyzer`, add `reactCompiler: true` | Bundle analysis + auto-memoization |
+| `app/layout.tsx` | MODIFY: add `next/font` declarations, `useReportWebVitals`, preconnect hints | Font self-hosting + Web Vitals + API domain preconnect |
+| `app/page.tsx` (Server Component) | MODIFY: `dynamic()` for below-fold cards | Code splitting — omit `ssr: false` (Server Component constraint) |
+| `app/network/page.tsx` (`'use client'`) | MODIFY: `dynamic({ ssr: false })` for BandwidthChart, BandwidthCorrelationChart | Recharts deferred on sub-page |
+| `app/analytics/page.tsx` (`'use client'`) | MODIFY: `dynamic({ ssr: false })` for UsageChart, ConsumptionChart, WeatherCorrelation | Recharts deferred on sub-page |
+| `app/components/ui/Skeleton.tsx` | MODIFY if needed: ensure named skeleton variants exist for lazy-loaded components | Loading fallbacks for dynamic() |
+| No new components or directories | | Optimizations are config + import-site changes |
 
-**Major components affected:**
-1. `app/page.tsx` — Replace `<Grid cols={2} gap="lg">` with two-column flex layout, split `visibleCards` by index parity
-2. `DeviceCardErrorBoundary` — Add `min-height` to fallback to prevent visually empty column halves
-3. `app/components/ui/__tests__/Grid.test.tsx` — No change required (Grid.tsx untouched)
-4. New tests for column assignment logic (index → column mapping, edge cases)
+**Current build state (from `.next/static/chunks/` observed):** 4 chunks over 399 KB each (total static JS ~5.9 MB uncompressed). Contents of large chunks are unknown without running the bundle analyzer — this is the first deliverable of Phase 1.
 
 ### Critical Pitfalls
 
-See [PITFALLS-masonry-layout.md](PITFALLS-masonry-layout.md) for full analysis with detection and prevention strategies.
+Full details: `.planning/research/PITFALLS.md`
 
-1. **CSS columns ordering breaks Firebase card order (Pitfall 3)** — CSS `column-count` fills column-first; user order [stove, thermostat, lights, network] becomes column1=[stove, lights] / column2=[thermostat, network], not the expected row-first assignment. Prevention: use explicit index-based array split into two flex columns instead of CSS columns.
+1. **`next/dynamic` does not reduce First Load JS for Client Components** — App Router bundles all Client Component chunks into the initial payload. Measure with `@next/bundle-analyzer` before adding any `dynamic()` wrappers; if `First Load JS` does not decrease, the optimization did nothing. Target `next/dynamic` only for components absent from initial render: Recharts charts on sub-pages, consent-gated panels, conditional modals.
 
-2. **SSR hydration mismatch from JS masonry (Pitfall 1)** — Libraries reading `window.innerWidth` or `getBoundingClientRect` on server crash or cause mismatch. Prevention: the flexbox split runs at server render time with pure array logic — zero hydration risk.
+2. **PWA offline shell broken by code splitting** — New `next/dynamic` calls create new hashed chunk filenames that may not appear in Serwist's `__SW_MANIFEST` precache. After any build that adds code splitting, open `public/sw.js` and verify new chunk names are in the precache array. Test explicitly: load dashboard, DevTools Network → Offline, hard-refresh, assert all 6 cards render without `ChunkLoadError`.
 
-3. **PWA offline cache invalidation (Pitfall 10)** — JS masonry positions cached in HTML shell diverge from recalculated positions on next load, causing a flash. Prevention: flexbox split is pure HTML structure with Tailwind classes — cached HTML is always valid regardless of card heights.
+3. **Recharts SVG re-renders on every polling tick** — Recharts is not memoized by default. The `data` array creates a new reference on every poll tick (spread/concat), so `React.memo` alone provides no benefit. Must also stabilize `data` with `useMemo` keyed on `lastTimestamp + length`. Set `isAnimationActive={false}` on all series — animation restarts on every re-render and causes visible chart flicker every 30s.
 
-4. **Native CSS masonry not production-ready (Pitfall 2)** — `grid-template-rows: masonry` silently falls back to standard grid on Chrome and Firefox (0% stable support). Prevention: do not use it.
+4. **React Compiler silently bails out on Rules of React violations** — Compiler skips optimizing non-compliant components without any warning. Run `npx react-compiler-healthcheck` before enabling. ThermostatCard (897 LOC, 15+ `useState` calls) is highest-risk — use `"use no memo"` directive as escape hatch. Do not enable React Compiler in the same phase as other optimizations; it must be isolated to attribute any regressions.
 
-5. **Error boundary fallback collapses column (Pitfall 9)** — `DeviceCardErrorBoundary` compact fallback (~60px) where a card normally occupies 400px leaves a visual half-column gap. Prevention: add `min-height` to fallback matching approximate card height category.
+5. **Thundering herd on dashboard load** — All 6 device cards fire initial fetches within ~100ms of mount (no stagger in current implementation). Add `initialDelay` parameter to `useAdaptivePolling`. Keep stove at delay=0 (safety-critical; uses Firebase RTDB listener as primary path — verify this is not accidentally converted to polling during optimization work).
+
+6. **Stale JS chunks after deployment** — `StaleWhileRevalidate` for scripts serves old cached chunks when new deployment changes chunk filenames. Implement `controllerchange` listener + toast: "Una nuova versione dell'app è disponibile" with reload button. Never change script cache strategy to `CacheFirst`.
+
+7. **`force-dynamic` conflict with ISR** — `app/page.tsx` exports `force-dynamic` for Auth0 session. Do not add `revalidate` exports to any component in the dashboard import tree. Map current route rendering modes with `next build` before any optimization; use as baseline to detect unexpected changes.
 
 ## Implications for Roadmap
 
-This is a small, focused milestone. The research supports a two-phase implementation: core layout change, then polish and tests.
+Based on combined research, the natural phase structure follows a measure-first discipline: you cannot know which optimizations are worth doing until you have the bundle analyzer output and a Lighthouse baseline. The ordering is informed by dependencies — measurement enables everything, React Compiler must be isolated, sub-page code splitting is safe and confirmed effective, runtime optimization addresses a different axis than bundle size.
 
-### Phase 1: Core Masonry Layout
-**Rationale:** All layout logic is in `app/page.tsx`; all card components are untouched. The column split is simple enough to implement, verify visually, and test in a single plan. This is the primary deliverable.
-**Delivers:** Two-column desktop masonry with Firebase order preserved, mobile unchanged at `sm:` breakpoint, spring animation working per card with correct stagger.
-**Implements:** Index-based flex column split, gap elimination between cards, `animate-spring-in` with `animationDelay` preserved per card in both columns.
-**Avoids:** CSS columns ordering problem (Pitfall 3), SSR hydration mismatch (Pitfall 1), PWA cache flash (Pitfall 10).
+### Phase 1: Measurement Baseline + Zero-Risk Quick Wins
 
-**Files changed:**
-- `app/page.tsx` — Replace `<Grid cols={2}>` with two `flex flex-col` column divs
+**Rationale:** All other optimization decisions depend on what the bundle analyzer reveals. Font self-hosting and resource hints are zero-risk, high-impact changes that require no measurement to justify. Establish the baseline, then apply the three changes that are unconditionally correct regardless of what the analysis shows.
+**Delivers:** Bundle analyzer infrastructure (`@next/bundle-analyzer`), Lighthouse baseline metrics captured, self-hosted fonts via `next/font/google` eliminating external CDN request from every cold load, preconnect hints for Firebase RTDB/Auth0/Netatmo API domains, `web-vitals` measurement pipeline in production, route rendering mode baseline from `next build` output.
+**Addresses:** Baseline measurement (P1), font self-hosting (P1), resource hints (P1), `web-vitals` setup (P1)
+**Avoids:** Pitfall 2 (measure before adding `next/dynamic` to avoid chasing non-existent wins), Pitfall 7 (map route rendering modes before any changes so unexpected changes are caught)
+**Research flag:** Standard patterns — skip research-phase. `@next/bundle-analyzer`, `next/font`, and `useReportWebVitals` are all official Next.js patterns with direct docs references and no ambiguity.
 
-### Phase 2: Error Boundary Polish and Tests
-**Rationale:** Error boundary height and edge cases (0 visible cards, 1 visible card) are important polish items, separable from the core layout change. Tests must be written after the column assignment contract is finalized.
-**Delivers:** Error fallback with appropriate `min-height` per card size category, `EmptyState` spanning full width, unit tests for all column assignment edge cases.
-**Implements:** `DeviceCardErrorBoundary` fallback height, `EmptyState` full-width wrapper, test matrix for 0/1/3/5/6 card counts.
-**Avoids:** Column collapse from compact error fallback (Pitfall 9), regression risk from untested column logic.
+### Phase 2: React Compiler
 
-**Files changed:**
-- `DeviceCardErrorBoundary` or its call site in `app/page.tsx` — add `min-height`
-- New test file for column split logic
+**Rationale:** Must be a dedicated phase with before/after measurement. The compiler is a cross-cutting optimization touching all components — enabling it alongside other changes would make it impossible to attribute regressions. Run `npx react-compiler-healthcheck` first; results determine scope.
+**Delivers:** Automatic memoization of all compliant components and hooks; reduced re-render overhead for orchestrator hooks (`useStoveData`, `useNetworkData`); stable function references from all polling hooks. If ThermostatCard causes issues, `"use no memo"` isolates it without blocking the rest.
+**Uses:** `babel-plugin-react-compiler` (devDependency), `reactCompiler: true` in `next.config.ts`
+**Implements:** Render optimization layer — compile-time auto-memoization
+**Avoids:** Pitfall 4 (run healthcheck first, isolate in dedicated phase, keep all 3034 tests green)
+**Research flag:** Standard patterns for config change. However, the healthcheck output for this specific codebase is unknown — treat the first run as a discovery step. If healthcheck reports violations in critical hooks, a plan to fix those violations may be needed before enabling the compiler.
+
+### Phase 3: Recharts Lazy Loading on Sub-pages
+
+**Rationale:** Sub-pages (`/network`, `/analytics`) are `'use client'` files. `dynamic({ ssr: false })` is valid here and IS a real code split that reduces First Load JS for those routes — sub-pages are not in the initial dashboard render path. The consent-gated `BandwidthCorrelationChart` is the ideal candidate: its JS never downloads if consent is denied, eliminating a network request unconditionally.
+**Delivers:** Recharts deferred on network and analytics pages; consent-gated chart chunk never loaded without consent; BandwidthChart and correlation chart show Skeleton while chunks download; verified `public/sw.js` manifest contains new chunk names.
+**Uses:** `next/dynamic` with `ssr: false` in `'use client'` page files; existing `Skeleton` components as loading fallbacks
+**Implements:** Code splitting layer for sub-pages
+**Avoids:** Pitfall 1 (confirmed real code splits on sub-pages — not dashboard cards where dynamic() doesn't help), Pitfall 5 (verify new chunk names in `public/sw.js` manifest after build)
+**Research flag:** Standard patterns — well-documented Next.js lazy loading pattern for Client Component pages. No additional research needed.
+
+### Phase 4: Runtime Render Optimization
+
+**Rationale:** Addresses the runtime performance issues that persist regardless of bundle size: Recharts re-rendering on every poll tick, all 6 cards firing API calls simultaneously on mount, and visible chart flicker. These require profiling to confirm impact (React DevTools Profiler + Chrome Network tab) and then targeted fixes. Comes after Phase 1 so Lighthouse baseline and profiling targets are known.
+**Delivers:** Recharts chart components absent from poll-tick flame graph; `isAnimationActive={false}` eliminating 30s visible chart refresh; `initialDelay` staggering in `useAdaptivePolling` reducing simultaneous initial API calls; debounced thermostat setpoint writes using existing `useDebounce` hook.
+**Uses:** `useMemo` for stable Recharts data references, `React.memo` on chart components, existing `useDebounce` hook, `initialDelay` parameter addition to `useAdaptivePolling`
+**Implements:** Polling efficiency layer improvements; Recharts render optimization
+**Avoids:** Pitfall 3 (stabilize data reference + disable animation), Pitfall 6 (stagger initial fetches; stove delay stays at 0)
+**Research flag:** Needs file inspection before planning — read `useAdaptivePolling` hook API before designing `initialDelay` parameter; confirm stove hook uses Firebase RTDB listener as primary path (not polling) to avoid breaking safety-critical behavior.
+
+### Phase 5: Suspense Streaming (Conditional)
+
+**Rationale:** This phase should only be planned if Phase 1 baseline shows poor LCP/TTI metrics that Phases 2-4 did not resolve. Suspense streaming enables the dashboard shell to render immediately while each card streams independently. The dependency conflict between `page.tsx`'s `deviceConfig` server-fetch pattern and per-card Suspense boundaries requires careful planning.
+**Delivers:** Dashboard shell visible in <500ms; each card streams independently; first card visible ~300ms instead of waiting for all 6. Perceived performance improvement even without bundle size change.
+**Uses:** Suspense boundaries wrapping existing card components (can reuse `DeviceCardErrorBoundary` as combined Suspense+error boundary)
+**Implements:** Suspense streaming pattern from Next.js App Router
+**Avoids:** Pitfall 2 (no `next/dynamic` on dashboard cards — use Suspense wrapping on Server Component instead; cards remain static imports), Pitfall 1 (static imports, not dynamic, so SW precache is unaffected)
+**Research flag:** Needs research-phase — the interaction between `deviceConfig` server-fetch and per-card Suspense boundaries requires careful planning. The current pattern of passing `deviceConfig` through the `CARD_COMPONENTS` registry conflicts with independent per-card streaming; this conflict must be resolved in research before planning.
 
 ### Phase Ordering Rationale
 
-- Phase 1 first: the layout change is the core deliverable and unblocks visual verification of all polish items.
-- Phase 2 second: error boundary height requires seeing the layout in place to judge appropriate min-heights; tests can only be written after the implementation contract is finalized.
-- Total estimated effort: 3-5 hours across both phases. Both can be planned and executed in a single roadmap pass with two plans.
+- **Phase 1 must be first:** All other phases depend on knowing which chunks are actually large and what the Lighthouse baseline is. Skipping this produces blind optimization that may yield no user-visible improvement.
+- **Phase 2 (React Compiler) is second:** It is a cross-cutting change. Running it before code-splitting changes means any test failures are attributable to the compiler alone. Requires the Phase 1 bundle baseline for before/after comparison.
+- **Phase 3 (Recharts sub-pages) is third:** Confirmed real code splits — sub-pages are route-split by Next.js App Router; adding `dynamic({ ssr: false })` for Recharts on those pages produces measurable bundle reduction for those routes. Independent of Phase 2.
+- **Phase 4 (runtime optimization) is fourth:** Addresses a different axis than bundle size — rendering behavior during polling. Requires Phase 1 profiling data to target correctly. Independent of Phase 3.
+- **Phase 5 (Suspense streaming) is conditional:** Only plan this if Phase 1-4 results show TTI/LCP still needs improvement. High complexity, high value if needed.
 
 ### Research Flags
 
-Phases with standard patterns (skip additional research-phase):
-- **Both phases:** Pattern is fully documented. Flexbox column split is well-understood, Tailwind utilities are standard, test patterns follow existing dashboard tests. The `app/page.tsx` structure should be read directly before writing the plan, but no domain research is needed.
+Phases likely needing deeper research or file inspection during planning:
+- **Phase 5 (Suspense streaming):** The `deviceConfig` server-fetch conflict with per-card Suspense boundaries is complex. How `auth0.getSession()` interacts with Suspense boundaries in App Router needs verification before planning. Use `/gsd:research-phase` for this phase.
+- **Phase 4 (polling stagger):** Read `lib/hooks/useAdaptivePolling.ts` and `lib/hooks/useStoveData.ts` (or equivalent stove hook) before planning. Confirm `initialDelay` is achievable without architectural changes and that the stove hook uses Firebase RTDB listener as primary path.
 
-One gap requiring a file read before planning (not full research):
-- **`app/page.tsx` current structure**: Read the actual card map loop, `DeviceCardErrorBoundary` props, and `EmptyState` usage to confirm the implementation contract before writing the plan.
-
-## The Approach Conflict Resolved
-
-For clarity, the explicit synthesis of four conflicting researcher opinions:
-
-| Researcher | Recommendation | Verdict |
-|------------|---------------|---------|
-| Stack researcher | `useMasonryGrid` hook + ResizeObserver + CSS Grid `grid-row: span N` | Technically correct true masonry; oversized for 6 static-count cards; requires client boundary. Reserve for future milestone if needed. |
-| Features researcher | Two-column flexbox split by index parity | Simple, preserves order, SSR-safe, no new dependencies. **Adopted.** |
-| Architecture researcher | Extend `Grid.tsx` with CSS `columns` masonry prop | SSR-safe but column-first ordering breaks user expectation. Pitfall 3 is disqualifying. |
-| Pitfalls researcher | CSS columns with caveat; flagged ordering as critical | Correctly identified the disqualifying pitfall; aligns with features researcher's recommendation. |
-
-**Winner: Two-column flexbox split (features researcher).** It is the only approach that is simultaneously SSR-safe, PWA-safe, preserves Firebase card order, requires no new dependencies, requires no client component boundary, and requires no new hooks.
+Phases with standard patterns (skip research-phase):
+- **Phase 1:** `@next/bundle-analyzer`, `next/font`, `web-vitals`, `useReportWebVitals`, preconnect — all official Next.js patterns with direct docs references.
+- **Phase 2:** `reactCompiler: true` — Next.js 16 first-class support, official docs cover the exact config. The discovery element is the healthcheck output, not the pattern itself.
+- **Phase 3:** `dynamic({ ssr: false })` in Client Component pages — textbook Next.js lazy loading pattern with no ambiguity.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All library rejections verified with official sources (caniuse, npm pages, GitHub issues). CSS native masonry 0% support confirmed Feb 2026. |
-| Features | HIGH | Table stakes obvious for a masonry layout. Anti-features derived from Home Assistant real-world masonry failures, confirmed by community post-mortem. |
-| Architecture | MEDIUM | The recommended approach (flexbox split) was not the primary recommendation of any single researcher but correctly resolves the ordering constraint. Needs one pass through actual `app/page.tsx` before plan writing. |
-| Pitfalls | HIGH | SSR and CSS masonry pitfalls verified with official docs (MDN, Chrome team blog, caniuse). Card ordering pitfall verified against CSS column-flow behavior (well-documented). PWA pitfall is project-specific and consistent with Phase 53 implementation. |
+| Stack | HIGH | All versions verified from npm registry 2026-02-18. `package.json` inspected directly. The `next/dynamic` App Router limitation (no bundle reduction for Client Components) confirmed by official GitHub issues #49454 and #61066. |
+| Features | HIGH | Table stakes features verified via official Next.js docs. Anti-features strongly justified (react-query migration risk, virtualization overhead at 6 cards). The "already built" inventory confirmed by inspecting actual source files in the codebase. |
+| Architecture | HIGH | Official docs for all patterns. `ssr: false` restriction in Server Components confirmed by Next.js docs with explicit build-time error message. All changes are import-site-only — no structural changes needed. |
+| Pitfalls | HIGH (1-6) / MEDIUM (React Compiler) | Critical pitfalls 1-2, 5-7 verified with official GitHub issues and docs. Pitfall 3 (Recharts re-renders) verified with Recharts GitHub issues. React Compiler (Pitfall 4) real-world data is limited — single published study showing "fixed only 1 of 8 re-render cases" is not a systematic benchmark. |
 
-**Overall confidence:** HIGH for the approach direction. The implementation detail (how to wire up the flex split in `app/page.tsx`) requires reading the current file before writing the plan, but the approach itself has no open questions.
+**Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **`app/page.tsx` exact structure**: The card map loop, `DeviceCardErrorBoundary` props signature, `EmptyState` usage, and current `animate-spring-in` application must be confirmed from the actual file before writing the implementation plan. The research was done from documentation; the file may have evolved.
-- **Animation stagger with column split**: The flat `index` from `visibleCards.map` still produces the correct user-order stagger (card 0 at 0ms, card 1 at 100ms...) because the flat index IS the user's intended sequence. Confirm this is applied to the wrapper div in the column, not to the column container itself.
-- **`EmptyState` width handling**: When `visibleCards.length === 0`, the two-column flex wrapper must gracefully hand off to the full-width `EmptyState`. The current `EmptyState` usage in `app/page.tsx` must be confirmed — it should span both columns, not render inside one of them.
+- **Actual chunk composition:** Research identified 4 chunks over 399 KB in the existing `.next/` build, but without running the bundle analyzer it is unknown whether these contain Recharts, Firebase SDK, Auth0, or application code. This gap resolves itself in Phase 1, Plan 1.
+- **React Compiler healthcheck result:** Unknown how many components violate Rules of React. ThermostatCard (897 LOC) is highest-risk. Healthcheck run in Phase 2, Plan 1 reveals actual scope.
+- **Actual LCP/INP/CLS metrics:** No Lighthouse baseline exists. Current state is "likely poor" for FCP (external Google Fonts CDN) but "unknown" for INP and CLS. Phase 1, Plan 2 establishes this baseline.
+- **`useAdaptivePolling` stagger API:** Whether the hook can accept `initialDelay` without architectural changes needs file inspection before Phase 4 planning. Read `lib/hooks/useAdaptivePolling.ts` directly.
+- **Stove data hook primary path:** Must confirm the stove hook uses Firebase RTDB listener (not polling) as primary data path before adding `initialDelay` to polling hooks. Safety-critical — cannot risk accidentally converting the stove to polling-only.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- [caniuse: grid-template-rows masonry](https://caniuse.com/mdn-css_properties_grid-template-rows_masonry) — 0% stable support confirmed
-- [Chrome Developers: CSS Masonry Update](https://developer.chrome.com/blog/masonry-update) — Chrome 140+ flag only
-- [WebKit blog: CSS masonry syntax](https://webkit.org/blog/16026/css-masonry-syntax/) — spec disagreement ongoing
-- [MDN: CSS Masonry Layout](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Grid_layout/Masonry_layout) — experimental status confirmed
-- [Next.js: Hydration Error Docs](https://nextjs.org/docs/messages/react-hydration-error) — SSR mismatch behavior
-- [MDN: Grid Layout and Accessibility](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Grid_layout/Accessibility) — DOM/visual order rules
-- [W3C CSS WG: Masonry Accessibility Issue #5675](https://github.com/w3c/csswg-drafts/issues/5675) — ordering implications
+- Next.js 16.1 official docs (v16.1.6, verified 2026-02-11): Lazy Loading, Package Bundling, `optimizePackageImports`, `reactCompiler`, Font Optimization, `@next/bundle-analyzer`
+- Next.js 16.1 release blog (2025-12-18): `next experimental-analyze`, Turbopack file system caching stable, `next dev --inspect`
+- React Compiler v1.0 blog post (react.dev, October 2025): stable release, auto-memoization behavior, opt-out pattern (`"use no memo"`)
+- React docs (current): `useTransition`, `useDeferredValue`, `React.memo`
+- npm registry (verified 2026-02-18): `web-vitals@5.1.0`, `@next/bundle-analyzer@16.1.6`
+- vercel/next.js GitHub issues: #49454, #61066 (Client Component dynamic import limitations in App Router), #63918 (ChunkLoadError irrecoverable), #47173 (ChunkLoadError on next/dynamic deployment)
+- Serwist Next.js getting started docs
+- Vercel blog: "How we optimized package imports in Next.js"
+- Project codebase (directly inspected 2026-02-18): `next.config.ts`, `package.json`, `app/page.tsx`, `NetworkBandwidth.tsx`, `app/hooks/`
 
 ### Secondary (MEDIUM confidence)
-- [CSS-Tricks: Piecing together masonry approaches](https://css-tricks.com/piecing-together-approaches-for-a-css-masonry-layout/) — CSS columns order problem documented
-- [CSS-Tricks: Making masonry that works today](https://css-tricks.com/making-a-masonry-layout-that-works-today/) — Grid row-span technique (reserve approach)
-- [Cruip: True masonry with Next.js](https://cruip.com/how-to-create-a-true-masonry-with-nextjs/) — custom hook approach documented (reserve approach)
-- [react-responsive-masonry GitHub issue #127](https://github.com/cedricdelpoux/react-responsive-masonry/issues/127) — SSR issue confirmed
-- [Home Assistant Blog: Moving Away from Masonry](https://www.home-assistant.io/blog/2024/03/04/dashboard-chapter-1/) — real-world UX failures from true masonry on dashboards
-- [HA Community: Masonry Layout Doesn't Make Sense](https://community.home-assistant.io/t/masonry-layout-doesnt-make-sense/527497) — user expectations documented
-- [MUI Masonry SSR Issue #32688](https://github.com/mui/material-ui/issues/32688) — hydration mismatch with JS masonry confirmed
+- Core Web Vitals 2025 targets (uxify.com) — consistent with Google's published thresholds but third-party source
+- Recharts bundle size from bundlephobia — not versioned to exact installed version; directionally correct
+- React 19 `useMemo`/`useCallback` in React Compiler context (stevekinney.com)
+- Next.js App Router lazy loading vs React.lazy community discussion (WebSearch 2025)
 
 ### Tertiary (LOW confidence)
-- None relied upon for recommendations.
+- developerway.com React Compiler real-world test ("fixed only 1 of 8 re-render cases") — single study, not systematic benchmark; treat React Compiler impact as optimistic-but-uncertain
 
 ---
-*Research completed: 2026-02-17*
+*Research completed: 2026-02-18*
 *Ready for roadmap: yes*
-*Synthesized from: STACK-masonry-layout.md, FEATURES.md, ARCHITECTURE.md, PITFALLS-masonry-layout.md*
+*Synthesized from: STACK.md, FEATURES.md, ARCHITECTURE-performance-optimization.md, PITFALLS.md*

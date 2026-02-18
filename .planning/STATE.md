@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 Phase: 70 of 74 (Measurement Baseline + Quick Wins)
 Plan: 0 of 2 in current phase
 Status: Ready to plan
-Last activity: 2026-02-18 — v9.0 roadmap created (5 phases, 21 requirements, phases 70-74)
+Last activity: 2026-02-18 - Completed quick task 31: Hide debug and design-system pages in production
 
 Progress: [░░░░░░░░░░] 0% (v9.0 — 0/8 plans)
 
@@ -51,6 +51,12 @@ None.
 
 - [Phase 74]: Suspense streaming has a known conflict between `deviceConfig` server-fetch pattern and per-card Suspense boundaries. Requires dedicated research before planning. Use `/gsd:research-phase` for Phase 74.
 - [Phase 73]: `useAdaptivePolling` hook must be read before planning Phase 73 to confirm `initialDelay` is achievable without architectural changes. Confirm stove hook uses Firebase RTDB listener (not polling) as primary path — safety-critical.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 31 | Hide debug and design-system pages in production | 2026-02-18 | 991f470 | [31-hide-debug-and-design-system-pages-in-pr](./quick/31-hide-debug-and-design-system-pages-in-pr/) |
 
 ## Session Continuity
 

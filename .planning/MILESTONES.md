@@ -404,3 +404,38 @@ _To start next milestone, run `/gsd:new-milestone`_
 
 ---
 
+
+## v8.1 Masonry Dashboard (Shipped: 2026-02-18)
+
+**Delivered:** Masonry dashboard layout replacing CSS Grid with two-column flexbox split by index parity — eliminates vertical gaps between cards of different heights on desktop while preserving Firebase-configured card order and leaving mobile untouched. Edge cases handled for all card counts, error boundary fallback with minimum height, and unit test coverage.
+
+**Phases completed:** 68-69 (3 plans, 5 tasks)
+
+**Key accomplishments:**
+
+- Two-column flexbox masonry layout replacing CSS Grid — cards fill vertical space with no gaps, parity-based column assignment (even→left, odd→right) preserves Firebase card order
+- Dual render blocks (sm:hidden flat list + hidden sm:flex masonry) prevent mobile column-first ordering pitfall
+- splitIntoColumns pure utility extracted for testability — generic array-to-columns function with flatIndex tracking for animation stagger
+- EDGE-01 fix: right column removed from DOM entirely when empty (1-card fills full width), EDGE-03 fix: ErrorFallback min-h-[160px] prevents column collapse
+- Unit tests covering all edge-case card counts (0, 1, 2, 3, 5, 6) with explicit flatIndex assertions for animation stagger correctness
+
+**Stats:**
+
+- 3 plans executed across 2 phases
+- 8/8 v8.1 requirements satisfied (100%)
+- 24 files changed (+3,465 insertions, -1,248 deletions)
+- 19 git commits with atomic changes
+- 1 day from phase 68 start to completion (2026-02-17 → 2026-02-18)
+
+**Git range:** `docs: start milestone v8.1` (06d261c) → `fix(ci)` (a358b57)
+
+**Archives:**
+- [Roadmap](milestones/v8.1-ROADMAP.md)
+- [Requirements](milestones/v8.1-REQUIREMENTS.md)
+
+**Tech debt:** None accumulated during v8.1.
+
+**What's next:** Dashboard layout optimized. Consider next milestone for new features or operational improvements.
+
+---
+

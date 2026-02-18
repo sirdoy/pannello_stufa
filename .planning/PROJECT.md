@@ -2,25 +2,16 @@
 
 ## What This Is
 
-PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (con gestione schedule complete), luci Philips Hue, monitoraggio rete Fritz!Box. Include sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, rate limiting persistente Firebase RTDB, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Monitoraggio rete Fritz!Box con dashboard card, pagina dedicata /network con WAN status, device list con categorizzazione automatica, bandwidth charts con decimation LTTB, device history timeline, e correlazione bandwidth-stufa con consent gate. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API, e componenti refactored con orchestrator pattern (~85% LOC reduction). Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
+PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (con gestione schedule complete), luci Philips Hue, monitoraggio rete Fritz!Box. Include sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, rate limiting persistente Firebase RTDB, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Monitoraggio rete Fritz!Box con dashboard card, pagina dedicata /network con WAN status, device list con categorizzazione automatica, bandwidth charts con decimation LTTB, device history timeline, e correlazione bandwidth-stufa con consent gate. Dashboard home con masonry layout (flexbox two-column split) che elimina gap verticali tra card di altezze diverse. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API, e componenti refactored con orchestrator pattern (~85% LOC reduction). Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
 
 ## Core Value
 
 I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-## Current Milestone: v8.1 Masonry Dashboard
-
-**Goal:** Layout masonry per le card della home su desktop — le card riempiono gli spazi vuoti verticali mantenendo l'ordine impostato dall'utente.
-
-**Target features:**
-- Masonry layout su desktop (2 colonne) che elimina i gap verticali tra card di altezza diversa
-- Mobile invariato (1 colonna, layout lineare)
-- Ordine card rispettato come da impostazioni utente
-
 ## Current State
 
-**Version:** v8.0 (shipped 2026-02-16)
-**Status:** Fritz!Box Network Monitor complete
+**Version:** v8.1 (shipped 2026-02-18)
+**Status:** Masonry Dashboard complete — all 12 milestones shipped
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -254,6 +245,22 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ **CORR-02**: Analytics consent gate — v8.0 (Phase 67)
 - ✓ **CORR-03**: Correlation insight text — v8.0 (Phase 67)
 
+**v8.1 Masonry Dashboard (Shipped 2026-02-18):**
+
+**Layout:**
+- ✓ **LAYOUT-01**: Masonry layout su desktop (2 colonne, nessun gap verticale) — v8.1 (Phase 68)
+- ✓ **LAYOUT-02**: Ordine card rispetta impostazioni utente (parity split) — v8.1 (Phase 68)
+- ✓ **LAYOUT-03**: Layout mobile invariato (colonna singola) — v8.1 (Phase 68)
+
+**Animation:**
+- ✓ **ANIM-01**: Spring-in stagger animation con flat-index delay — v8.1 (Phase 68)
+- ✓ **ANIM-02**: Transizione smooth altezza card (transition-all) — v8.1 (Phase 68)
+
+**Edge Cases:**
+- ✓ **EDGE-01**: Single card full-width (right column removed from DOM) — v8.1 (Phase 69)
+- ✓ **EDGE-02**: Odd card count corretto (left.length === right.length + 1) — v8.1 (Phase 69)
+- ✓ **EDGE-03**: ErrorFallback min-h-[160px] previene collasso colonna — v8.1 (Phase 69)
+
 **v6.0 Operations, PWA & Analytics (Shipped 2026-02-11):**
 
 **Persistent Rate Limiting:**
@@ -311,10 +318,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-**v8.1 Masonry Dashboard:**
-- [ ] Masonry layout per card dashboard su desktop
-- [ ] Ordine card preservato dalle impostazioni utente
-- [ ] Mobile layout invariato (1 colonna)
+(None — next milestone not yet planned)
 
 ### Out of Scope
 
@@ -348,14 +352,14 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - 550+ TypeScript source files, 3,700+ tests passing
 - GitHub Actions cron (5-min schedule) per health monitoring e coordination
 - GDPR-compliant analytics con consent banner
-- 11 milestones shipped, 67 phases, 316 plans executed
+- 12 milestones shipped, 69 phases, 322 plans executed
 
-**v8.0 Milestone (2026-02-13 → 2026-02-16):**
-- 7 phases executed (18 plans, 38 tasks)
-- 32/32 requirements satisfied (100%)
-- 136 files changed (+25,643 insertions, -89 deletions)
-- 81 git commits with atomic changes
-- 3 days from phase 61 start to completion
+**v8.1 Milestone (2026-02-17 → 2026-02-18):**
+- 2 phases executed (3 plans, 5 tasks)
+- 8/8 requirements satisfied (100%)
+- 24 files changed (+3,465 insertions, -1,248 deletions)
+- 19 git commits with atomic changes
+- 1 day from phase 68 start to completion
 
 **Known Issues:**
 - Worker teardown warning (React 19 cosmetic, not actionable)
@@ -418,6 +422,9 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 | MAC vendor auto-categorization | macvendors.com API with 7-day cache, Firebase override priority | ✓ Good — Self-heals on failure, batch enrichment (v8.0) |
 | Pearson correlation for bandwidth-stove | Minute-aligned buffering, consent-gated, Italian insight text | ✓ Good — Meaningful analysis with 30+ data points (v8.0) |
 | No new dependencies for v8.0 | Recharts, DataTable, date-fns already in codebase | ✓ Good — Zero dependency growth (v8.0) |
+| Two-column flexbox split by parity | CSS columns fill column-first (breaks order), Grid masonry spec unstable, JS libraries overkill | ✓ Good — SSR-safe, zero deps, preserves Firebase order (v8.1) |
+| Dual render blocks (sm:hidden + hidden sm:flex) | Single responsive block risks column-first ordering on mobile | ✓ Good — Mobile stays flat, desktop gets masonry (v8.1) |
+| splitIntoColumns pure utility extraction | Testable in isolation, reusable pattern | ✓ Good — 7 unit tests covering all edge cases (v8.1) |
 
 ## Constraints
 
@@ -429,4 +436,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-02-17 after v8.1 milestone start (Masonry Dashboard)*
+*Last updated: 2026-02-18 after v8.1 milestone completion (Masonry Dashboard shipped)*

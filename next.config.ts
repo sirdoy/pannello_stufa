@@ -17,6 +17,7 @@ const withSerwist = withSerwistInit({
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  reactCompiler: true, // Phase 71: auto-memoization via React Compiler 1.0
   env: {
     NEXT_PUBLIC_TEST_MODE: process.env.TEST_MODE || 'false',
   },

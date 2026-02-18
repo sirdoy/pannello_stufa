@@ -71,7 +71,7 @@ See `.planning/milestones/` for full archives.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 70-01-PLAN.md — Bundle analyzer + baseline capture script
+- [x] 70-01-PLAN.md — Bundle analyzer + baseline capture script
 - [ ] 70-02-PLAN.md — Font self-hosting + preconnect hints + Web Vitals pipeline + dashboard
 
 ### Phase 71: React Compiler
@@ -149,7 +149,7 @@ Phases execute in numeric order: 70 → 71 → 72 → 73 → 74
 | 55-60 | v7.0 | 22/22 | ✓ Complete | 2026-02-13 |
 | 61-67 | v8.0 | 18/18 | ✓ Complete | 2026-02-16 |
 | 68-69 | v8.1 | 3/3 | ✓ Complete | 2026-02-18 |
-| 70. Measurement Baseline + Quick Wins | v9.0 | 0/2 | Not started | - |
+| 70. Measurement Baseline + Quick Wins | v9.0 | 1/2 | In progress | 2026-02-18 |
 | 71. React Compiler | v9.0 | 0/1 | Not started | - |
 | 72. Code Splitting | v9.0 | 0/1 | Not started | - |
 | 73. Render Optimization | v9.0 | 0/2 | Not started | - |

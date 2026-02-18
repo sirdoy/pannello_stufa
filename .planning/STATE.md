@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 70 of 74 (Measurement Baseline + Quick Wins)
-Plan: 0 of 2 in current phase
-Status: Ready to plan
-Last activity: 2026-02-18 - Completed quick task 31: Hide debug and design-system pages in production
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-18 - Completed 70-01: Bundle analyzer + baseline measurement script
 
-Progress: [░░░░░░░░░░] 0% (v9.0 — 0/8 plans)
+Progress: [█░░░░░░░░░] 13% (v9.0 — 1/8 plans)
 
 ## Performance Metrics
 
@@ -42,6 +42,9 @@ Recent decisions affecting v9.0:
 - [v9.0 research]: `next/dynamic` does NOT reduce First Load JS for always-visible dashboard cards (Client Components in App Router) — only effective on sub-page Recharts components
 - [v9.0 research]: React Compiler must be isolated in Phase 71 alone for clean regression attribution
 - [v9.0 research]: Phase 74 (Suspense) is conditional — only execute if Phase 70-73 results show LCP/TTI still insufficient
+- [70-01]: Phase 70 is the fixed reference baseline for --compare in all v9.0 phases (not rolling)
+- [70-01]: @next/bundle-analyzer added to package.json only (npm install not run per project rules)
+- [70-01]: Shared chunk detection uses multi-route reference counting to match Next.js First Load JS accounting
 
 ### Pending Todos
 
@@ -61,5 +64,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Phase 70 context gathered
-Resume file: .planning/phases/70-measurement-baseline-quick-wins/70-CONTEXT.md
+Stopped at: Completed 70-01-PLAN.md (bundle analyzer + baseline script)
+Resume file: .planning/phases/70-measurement-baseline-quick-wins/70-02-PLAN.md

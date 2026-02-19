@@ -36,9 +36,9 @@ Requirements for performance optimization milestone. Each maps to roadmap phases
 ### Render Optimization
 
 - [x] **REND-01**: User sees smooth chart updates without full SVG re-render on polling ticks
-- [ ] **REND-02**: User experiences staggered dashboard card loading (no thundering herd)
+- [x] **REND-02**: User experiences staggered dashboard card loading (no thundering herd)
 - [x] **REND-03**: User benefits from stable data references preventing unnecessary re-renders
-- [ ] **REND-04**: User experiences debounced thermostat writes reducing API calls
+- [x] **REND-04**: User experiences debounced thermostat writes reducing API calls
 
 ### Suspense Streaming (Conditional)
 
@@ -91,9 +91,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SPLIT-03 | Phase 72 | Pending |
 | SPLIT-04 | Phase 72 | Pending |
 | REND-01 | Phase 73 | Complete |
-| REND-02 | Phase 73 | Pending |
+| REND-02 | Phase 73 | Complete |
 | REND-03 | Phase 73 | Complete |
-| REND-04 | Phase 73 | Pending |
+| REND-04 | Phase 73 | Complete |
 | SUSP-01 | Phase 74 | Pending |
 | SUSP-02 | Phase 74 | Pending |
 | SUSP-03 | Phase 74 | Pending |

@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v9.0 Performance Optimization — Phase 73 in progress (Plan 01 complete)
+**Current focus:** v9.0 Performance Optimization — Phase 73 complete
 
 ## Current Position
 
 Phase: 73 of 74 (Render Optimization)
-Plan: 1 of 2 in current phase (73-01 COMPLETE)
-Status: In progress
-Last activity: 2026-02-19 - Completed 73-01: React.memo + isAnimationActive on 4 chart components
+Plan: 2 of 2 in current phase (COMPLETE)
+Status: Phase complete
+Last activity: 2026-02-19 - Completed 73-02: initialDelay stagger for 5 dashboard cards + thermostat debounced writes
 
-Progress: [█████░░░░░] 62% (v9.0 — 5/8 plans)
+Progress: [██████░░░░] 75% (v9.0 — 6/8 plans)
 
 ## Performance Metrics
 
@@ -55,6 +55,11 @@ Recent decisions affecting v9.0:
 - [72-01]: Loading skeleton heights match actual chart ResponsiveContainer heights to prevent layout shift (380px, 360px, 300px, 300px, 350px)
 - [Phase 73-render-optimization]: React.memo wrapping sufficient for analytics charts — not on polling hot-path, no useMemo needed for data stabilization
 - [Phase 73-render-optimization]: NetworkBandwidth memo prevents re-renders from WAN/device changes, correctly re-renders on new bandwidth data
+- [73-02]: initialDelay default=0 preserves full backward-compatibility — no changes to existing callers except the 5 dashboard hooks
+- [73-02]: Visibility-restore effect does NOT need delayDone guard — visibility changes after mount, delay has already elapsed
+- [73-02]: useStoveData is NOT modified — uses Firebase RTDB onValue() listener; safety-critical path untouched
+- [73-02]: CameraCard uses setTimeout(400ms) directly (not initialDelay) — uses custom useEffect pattern, not useAdaptivePolling
+- [73-02]: WeatherCardWrapper uses setTimeout(250ms) with timeout ref cleanup — location fires synchronously from localStorage cache
 
 ### Pending Todos
 
@@ -73,5 +78,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 73-01-PLAN.md (Render Optimization — React.memo + animation disable for chart components)
-Resume file: .planning/phases/73-render-optimization/ (73-02 next)
+Stopped at: Completed 73-02-PLAN.md (Render Optimization — initialDelay stagger + thermostat debounce)
+Resume file: .planning/phases/74-suspense-streaming/ (next phase, conditional)

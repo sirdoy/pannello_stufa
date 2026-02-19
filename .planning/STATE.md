@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v9.0 Performance Optimization — Phase 72 in progress (Plan 01 complete)
+**Current focus:** v9.0 Performance Optimization — Phase 73 in progress (Plan 01 complete)
 
 ## Current Position
 
-Phase: 72 of 74 (Code Splitting)
-Plan: 1 of 1 in current phase (COMPLETE)
-Status: Phase complete
-Last activity: 2026-02-18 - Completed 72-01: Dynamic imports for all Recharts chart components
+Phase: 73 of 74 (Render Optimization)
+Plan: 1 of 2 in current phase (73-01 COMPLETE)
+Status: In progress
+Last activity: 2026-02-19 - Completed 73-01: React.memo + isAnimationActive on 4 chart components
 
-Progress: [████░░░░░░] 50% (v9.0 — 4/8 plans)
+Progress: [█████░░░░░] 62% (v9.0 — 5/8 plans)
 
 ## Performance Metrics
 
@@ -53,6 +53,8 @@ Recent decisions affecting v9.0:
 - [71-01]: React Compiler causes zero new failures; COMP-01, COMP-02, COMP-03 all satisfied
 - [72-01]: SPLIT-03 (consent-gated non-fetch) achieved with zero extra code — existing {hasConsent && (...)} gate prevents component mount, browser never requests chunk
 - [72-01]: Loading skeleton heights match actual chart ResponsiveContainer heights to prevent layout shift (380px, 360px, 300px, 300px, 350px)
+- [Phase 73-render-optimization]: React.memo wrapping sufficient for analytics charts — not on polling hot-path, no useMemo needed for data stabilization
+- [Phase 73-render-optimization]: NetworkBandwidth memo prevents re-renders from WAN/device changes, correctly re-renders on new bandwidth data
 
 ### Pending Todos
 
@@ -61,7 +63,6 @@ None.
 ### Blockers/Concerns
 
 - [Phase 74]: Suspense streaming has a known conflict between `deviceConfig` server-fetch pattern and per-card Suspense boundaries. Requires dedicated research before planning. Use `/gsd:research-phase` for Phase 74.
-- [Phase 73]: `useAdaptivePolling` hook must be read before planning Phase 73 to confirm `initialDelay` is achievable without architectural changes. Confirm stove hook uses Firebase RTDB listener (not polling) as primary path — safety-critical.
 
 ### Quick Tasks Completed
 
@@ -71,6 +72,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-18
-Stopped at: Completed 72-01-PLAN.md (Code Splitting — dynamic imports for Recharts)
-Resume file: .planning/phases/72-code-splitting/ (phase complete, next: 73)
+Last session: 2026-02-19
+Stopped at: Completed 73-01-PLAN.md (Render Optimization — React.memo + animation disable for chart components)
+Resume file: .planning/phases/73-render-optimization/ (73-02 next)

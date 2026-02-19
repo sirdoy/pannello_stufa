@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v9.0 Performance Optimization — Phase 73 complete
+**Current focus:** v9.0 Performance Optimization — Phase 74 in progress
 
 ## Current Position
 
-Phase: 73 of 74 (Render Optimization)
-Plan: 2 of 2 in current phase (COMPLETE)
-Status: Phase complete
-Last activity: 2026-02-19 - Completed 73-02: initialDelay stagger for 5 dashboard cards + thermostat debounced writes
+Phase: 74 of 74 (Suspense Streaming)
+Plan: 1 of 2 in current phase (COMPLETE)
+Status: Plan 74-01 complete
+Last activity: 2026-02-19 - Completed 74-01: loading.tsx skeleton + DashboardCards async Server Component + synchronous page.tsx shell
 
-Progress: [██████░░░░] 75% (v9.0 — 6/8 plans)
+Progress: [███████░░░] 87% (v9.0 — 7/8 plans)
 
 ## Performance Metrics
 
@@ -38,7 +38,13 @@ Progress: [██████░░░░] 75% (v9.0 — 6/8 plans)
 
 See PROJECT.md Key Decisions table for full history.
 
-Recent decisions affecting v9.0:
+Recent decisions affecting v9.0 (Phase 74 additions):
+- [74-01]: loading.tsx has no animation classes — skeletons use own shimmer, adding animate-spring-in before hydration would be incorrect
+- [74-01]: DashboardCards renders a fragment, not <section> — outer section shell stays in page.tsx for correct HTML structure
+- [74-01]: redirect() imported at top level in DashboardCards (not dynamic import) — Server Component, dynamic import pattern was only needed in old async page.tsx
+- [74-01]: DashboardSkeleton (from ./loading) used as Suspense fallback so hard nav (loading.tsx) and soft nav (Suspense) show identical skeletons
+
+Recent decisions affecting v9.0 (Phases 70-73):
 - [v9.0 research]: `next/dynamic` does NOT reduce First Load JS for always-visible dashboard cards (Client Components in App Router) — only effective on sub-page Recharts components
 - [v9.0 research]: React Compiler must be isolated in Phase 71 alone for clean regression attribution
 - [v9.0 research]: Phase 74 (Suspense) is conditional — only execute if Phase 70-73 results show LCP/TTI still insufficient
@@ -67,7 +73,7 @@ None.
 
 ### Blockers/Concerns
 
-- [Phase 74]: Suspense streaming has a known conflict between `deviceConfig` server-fetch pattern and per-card Suspense boundaries. Requires dedicated research before planning. Use `/gsd:research-phase` for Phase 74.
+None.
 
 ### Quick Tasks Completed
 
@@ -78,5 +84,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 73-02-PLAN.md (Render Optimization — initialDelay stagger + thermostat debounce)
-Resume file: .planning/phases/74-suspense-streaming/ (next phase, conditional)
+Stopped at: Completed 74-01-PLAN.md (Suspense Streaming — loading.tsx skeleton + DashboardCards async component)
+Resume file: .planning/phases/74-suspense-streaming/74-02-PLAN.md (next plan)

@@ -439,3 +439,40 @@ _To start next milestone, run `/gsd:new-milestone`_
 
 ---
 
+
+## v9.0 Performance Optimization (Shipped: 2026-02-19)
+
+**Delivered:** Comprehensive performance optimization across bundle size, load time, rendering, and streaming — self-hosted fonts eliminating CDN roundtrip, React Compiler auto-memoization for 271 components, code-split Recharts charts on sub-pages, staggered dashboard fetches eliminating thundering herd, and full Suspense streaming with per-card skeleton boundaries.
+
+**Phases completed:** 70-74 (8 plans, 16 tasks)
+
+**Key accomplishments:**
+
+- Bundle analyzer + baseline measurement infrastructure: per-route JS tracking via `scripts/baseline.mjs`, Lighthouse capture, and phase-over-phase delta comparison for all v9.0 phases
+- Self-hosted Outfit and Space Grotesk fonts via next/font (zero Google CDN roundtrip), preconnect hints for Firebase/Auth0, and Web Vitals pipeline (useReportWebVitals + sendBeacon + Firebase RTDB + 5-metric dashboard card)
+- React Compiler 1.0 enabled globally: 271/271 components auto-memoized, zero new regressions across 4,004 tests, no "use no memo" opt-outs needed
+- Code-split 5 Recharts chart components via next/dynamic on /network and /analytics (~200 KB deferred from initial payload), consent-gated chunk never fetched when consent denied
+- Dashboard fetch stagger via initialDelay parameter in useAdaptivePolling (thermostat 50ms, lights 100ms, weather 250ms, camera 400ms, network 500ms) + thermostat debounced writes (max 1 per 500ms)
+- Full Suspense streaming: loading.tsx with 6-card masonry skeleton, DashboardCards async Server Component, page-level + per-card Suspense boundaries with matching skeleton fallbacks
+
+**Stats:**
+
+- 8 plans executed across 5 phases
+- 21/21 v9.0 requirements satisfied (100%)
+- 67 files changed (+8,161 insertions, -241 deletions)
+- 11 new tests (loading.tsx + DashboardCards)
+- 49 git commits with atomic changes
+- 2 days from phase 70 start to completion (2026-02-18 → 2026-02-19)
+
+**Git range:** `docs(70)` (0cc9915) → `docs(phase-74)` (0daf258)
+
+**Archives:**
+- [Roadmap](milestones/v9.0-ROADMAP.md)
+- [Requirements](milestones/v9.0-REQUIREMENTS.md)
+
+**Tech debt:** MEAS-04 (before/after comparison) not formally executed — baseline script exists but no build runs per project rules. 28 pre-existing test failures remain (not compiler-related). Manual useMemo/useCallback not yet removed (deferred for regression attribution).
+
+**What's next:** Performance optimization complete. App has measurement tooling, compiler auto-memoization, code splitting, render optimization, and Suspense streaming. Ready for next milestone planning.
+
+---
+

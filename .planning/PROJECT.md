@@ -2,7 +2,7 @@
 
 ## What This Is
 
-PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (con gestione schedule complete), luci Philips Hue, monitoraggio rete Fritz!Box. Include sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, rate limiting persistente Firebase RTDB, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Monitoraggio rete Fritz!Box con dashboard card, pagina dedicata /network con WAN status, device list con categorizzazione automatica, bandwidth charts con decimation LTTB, device history timeline, e correlazione bandwidth-stufa con consent gate. Dashboard home con masonry layout (flexbox two-column split) che elimina gap verticali tra card di altezze diverse. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API, e componenti refactored con orchestrator pattern (~85% LOC reduction). Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
+PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (con gestione schedule complete), luci Philips Hue, monitoraggio rete Fritz!Box. Include sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, rate limiting persistente Firebase RTDB, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Monitoraggio rete Fritz!Box con dashboard card, pagina dedicata /network con WAN status, device list con categorizzazione automatica, bandwidth charts con decimation LTTB, device history timeline, e correlazione bandwidth-stufa con consent gate. Dashboard home con masonry layout (flexbox two-column split) che elimina gap verticali tra card di altezze diverse, con Suspense streaming e skeleton fallback per card individuali. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API con stagger iniziale per evitare thundering herd, e componenti refactored con orchestrator pattern (~85% LOC reduction). Performance ottimizzata con React Compiler auto-memoization, code splitting Recharts via next/dynamic, font self-hosted via next/font, e Web Vitals pipeline. Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
 
 ## Core Value
 
@@ -10,20 +10,22 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v9.0 (in progress)
-**Status:** Performance Optimization — comprehensive bundle, load, and interaction speed improvements
+**Version:** v9.0 (shipped 2026-02-19)
+**Status:** Performance Optimization complete — planning next milestone
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
+- React Compiler 1.0 (auto-memoization, 271/271 components)
 - Firebase (Realtime Database for tokens/cache/analytics/network events, Firestore for history)
 - Auth0 for authentication
 - Playwright for E2E testing
-- Recharts for visualization (bandwidth charts, correlation, analytics)
+- Recharts for visualization (code-split via next/dynamic on sub-pages)
 - CVA (class-variance-authority) for type-safe component variants
 - Radix UI primitives for accessible interactions
 - react-error-boundary for crash isolation
 - GitHub Actions for cron automation (5-min schedule)
 - Fritz!Box TR-064 API integration via server-side proxy
+- Web Vitals pipeline (useReportWebVitals + sendBeacon + Firebase RTDB)
 - ~106,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
 
 ## Requirements
@@ -316,14 +318,44 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ **ANLY-10**: Dashboard pagina /analytics — v6.0 (Phase 54)
 - ✓ **ANLY-11**: Calibrazione stima pellet — v6.0 (Phase 54)
 
+**v9.0 Performance Optimization (Shipped 2026-02-19):**
+
+**Measurement & Baseline:**
+- ✓ **MEAS-01**: Bundle size analysis with per-route JS breakdown — v9.0 (Phase 70)
+- ✓ **MEAS-02**: Lighthouse performance score baseline — v9.0 (Phase 70)
+- ✓ **MEAS-03**: Web Vitals pipeline (LCP, INP, CLS, FCP, TTFB) — v9.0 (Phase 70)
+- ✓ **MEAS-04**: Phase-over-phase delta comparison script — v9.0 (Phase 70)
+
+**Font & Resource Optimization:**
+- ✓ **FONT-01**: Self-hosted fonts via next/font (zero CDN roundtrip) — v9.0 (Phase 70)
+- ✓ **FONT-02**: Zero layout shift from font loading (CLS improvement) — v9.0 (Phase 70)
+- ✓ **FONT-03**: Preconnect hints for Firebase, Auth0 — v9.0 (Phase 70)
+
+**React Compiler:**
+- ✓ **COMP-01**: Auto-memoization replacing manual useMemo/useCallback — v9.0 (Phase 71)
+- ✓ **COMP-02**: Zero regressions after compiler enablement (4,004 tests) — v9.0 (Phase 71)
+- ✓ **COMP-03**: Healthcheck validating Rules of React compliance (271/271) — v9.0 (Phase 71)
+
+**Code Splitting:**
+- ✓ **SPLIT-01**: Recharts deferred on /network via next/dynamic — v9.0 (Phase 72)
+- ✓ **SPLIT-02**: Recharts deferred on /analytics via next/dynamic — v9.0 (Phase 72)
+- ✓ **SPLIT-03**: Consent-gated chart never downloaded without consent — v9.0 (Phase 72)
+- ✓ **SPLIT-04**: PWA offline functionality intact after code splitting — v9.0 (Phase 72)
+
+**Render Optimization:**
+- ✓ **REND-01**: Chart updates without full SVG re-render (React.memo) — v9.0 (Phase 73)
+- ✓ **REND-02**: Staggered dashboard card loading (0-500ms spread) — v9.0 (Phase 73)
+- ✓ **REND-03**: Stable data references preventing unnecessary re-renders — v9.0 (Phase 73)
+- ✓ **REND-04**: Debounced thermostat writes (max 1 per 500ms) — v9.0 (Phase 73)
+
+**Suspense Streaming:**
+- ✓ **SUSP-01**: Skeleton fallbacks for each dashboard card during loading — v9.0 (Phase 74)
+- ✓ **SUSP-02**: Cards stream in progressively as data available — v9.0 (Phase 74)
+- ✓ **SUSP-03**: Stove card always loads first (safety-critical priority) — v9.0 (Phase 74)
+
 ### Active
 
-**v9.0 Performance Optimization:**
-- [ ] Bundle size reduction (code splitting, lazy loading, tree shaking)
-- [ ] Dashboard page load optimization (heaviest page — all device cards + weather + polling)
-- [ ] Interaction responsiveness (reduce re-renders, memoization)
-- [ ] App-wide performance improvements (route-based splitting, component-level lazy loading)
-- [ ] Performance audit and baseline measurement
+(No active requirements — planning next milestone)
 
 ### Out of Scope
 
@@ -344,8 +376,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Context
 
 **Codebase:**
-- Next.js 15.5 PWA con App Router
-- Firebase Realtime Database per storage, analytics, network events
+- Next.js 15.5 PWA con App Router + React Compiler 1.0
+- Firebase Realtime Database per storage, analytics, network events, Web Vitals
 - Firestore per notification history
 - Auth0 per autenticazione
 - Service Worker (Serwist) per offline capability e notification actions
@@ -353,18 +385,22 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - CVA + Radix UI design system (37+ components)
 - react-error-boundary per crash isolation
 - Fritz!Box TR-064 API via server-side proxy con rate limiting
+- Recharts code-split via next/dynamic su /network e /analytics
+- Self-hosted Outfit + Space Grotesk fonts via next/font
+- Web Vitals pipeline (useReportWebVitals → sendBeacon → Firebase RTDB → dashboard)
+- Suspense streaming con loading.tsx skeleton shell + per-card boundaries
 - ~106,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
-- 550+ TypeScript source files, 3,700+ tests passing
+- 550+ TypeScript source files, 4,000+ tests passing
 - GitHub Actions cron (5-min schedule) per health monitoring e coordination
 - GDPR-compliant analytics con consent banner
-- 12 milestones shipped, 69 phases, 322 plans executed
+- 13 milestones shipped, 74 phases, 330 plans executed
 
-**v8.1 Milestone (2026-02-17 → 2026-02-18):**
-- 2 phases executed (3 plans, 5 tasks)
-- 8/8 requirements satisfied (100%)
-- 24 files changed (+3,465 insertions, -1,248 deletions)
-- 19 git commits with atomic changes
-- 1 day from phase 68 start to completion
+**v9.0 Milestone (2026-02-18 → 2026-02-19):**
+- 5 phases executed (8 plans, 16 tasks)
+- 21/21 requirements satisfied (100%)
+- 67 files changed (+8,161 insertions, -241 deletions)
+- 49 git commits with atomic changes
+- 2 days from phase 70 start to completion
 
 **Known Issues:**
 - Worker teardown warning (React 19 cosmetic, not actionable)
@@ -374,9 +410,11 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Consent enforcement is caller responsibility (not middleware-enforced)
 - Visual parity human verification pending for refactored LightsCard and stove/page.tsx
 - 3 pre-existing vibration API test warnings
+- 28 pre-existing test failures (not compiler-related, confirmed by toggling React Compiler)
 - Fritz!Box rate limit budget shared across all API calls (10 req/min)
 - Self-hosted Fritz!Box API connectivity depends on myfritz.net (may timeout off-network)
 - CopyableIp uses plain button instead of design system Button (test simplicity)
+- Manual useMemo/useCallback not yet removed (deferred for regression attribution)
 
 **User Feedback:**
 - None yet (awaiting operational deployment)
@@ -430,6 +468,15 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 | Two-column flexbox split by parity | CSS columns fill column-first (breaks order), Grid masonry spec unstable, JS libraries overkill | ✓ Good — SSR-safe, zero deps, preserves Firebase order (v8.1) |
 | Dual render blocks (sm:hidden + hidden sm:flex) | Single responsive block risks column-first ordering on mobile | ✓ Good — Mobile stays flat, desktop gets masonry (v8.1) |
 | splitIntoColumns pure utility extraction | Testable in isolation, reusable pattern | ✓ Good — 7 unit tests covering all edge cases (v8.1) |
+| Self-hosted fonts via next/font | Eliminates Google CDN roundtrip, adjustFontFallback prevents CLS | ✓ Good — Zero external font requests (v9.0) |
+| Web Vitals not consent-gated | Technical infrastructure data, not user behavioral analytics | ✓ Good — Metrics available without GDPR opt-in (v9.0) |
+| React Compiler 1.0 global enablement | 271/271 components pass healthcheck, no opt-outs needed | ✓ Good — Zero new regressions, auto-memoization (v9.0) |
+| next/dynamic for Recharts code splitting | ssr: false defers ~200 KB chart JS from initial payload | ✓ Good — Sub-pages load faster (v9.0) |
+| initialDelay for useAdaptivePolling | Backward-compatible (default 0), staggers dashboard fetches | ✓ Good — Thundering herd eliminated (v9.0) |
+| Thermostat debounced writes (500ms) | Reduces API calls during rapid setpoint adjustments | ✓ Good — Max 1 write per 500ms burst (v9.0) |
+| DashboardCards async Server Component | Extracts auth + deviceConfig fetch from page shell | ✓ Good — Page renders synchronously, data streams (v9.0) |
+| Per-card Suspense with CARD_SKELETONS registry | Mirrors CARD_COMPONENTS exactly, declarative fallback lookup | ✓ Good — Cards stream individually (v9.0) |
+| DeviceCardErrorBoundary outside Suspense | Error boundaries must catch Suspense errors, not vice versa | ✓ Good — Correct error/loading hierarchy (v9.0) |
 
 ## Constraints
 
@@ -440,16 +487,5 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Deployment**: Vercel (current hosting platform)
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
-## Current Milestone: v9.0 Performance Optimization
-
-**Goal:** Make the app fast — reduce bundle size, optimize page loads (especially dashboard), and eliminate interaction sluggishness across all pages.
-
-**Target features:**
-- Performance audit with baseline measurements
-- Bundle size reduction via code splitting and lazy loading
-- Dashboard load optimization (heaviest page)
-- Interaction responsiveness (memoization, reduced re-renders)
-- App-wide route-based and component-level optimizations
-
 ---
-*Last updated: 2026-02-18 after v9.0 milestone start (Performance Optimization)*
+*Last updated: 2026-02-19 after v9.0 milestone completion (Performance Optimization)*

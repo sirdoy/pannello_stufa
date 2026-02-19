@@ -54,7 +54,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 71: React Compiler** - Enable auto-memoization across all compliant components; isolate in its own phase for clean regression attribution
 - [x] **Phase 72: Code Splitting** - Lazy-load Recharts on sub-pages; ensure PWA offline shell remains intact after chunk changes
 - [x] **Phase 73: Render Optimization** - Eliminate Recharts poll-tick re-renders, stagger dashboard fetches, debounce thermostat writes (completed 2026-02-19)
-- [ ] **Phase 74: Suspense Streaming (Conditional)** - Stream dashboard cards independently if Phase 70-73 results show LCP/TTI still needs improvement
+- [x] **Phase 74: Suspense Streaming (Conditional)** - Stream dashboard cards independently if Phase 70-73 results show LCP/TTI still needs improvement (completed 2026-02-19)
 
 ## Phase Details
 
@@ -153,7 +153,7 @@ Phases execute in numeric order: 70 → 71 → 72 → 73 → 74
 | 71. React Compiler | v9.0 | Complete    | 2026-02-18 | - |
 | 72. Code Splitting | v9.0 | Complete    | 2026-02-18 | 8dafcb0, e88e692 |
 | 73. Render Optimization | 2/2 | Complete    | 2026-02-19 | - |
-| 74. Suspense Streaming (Conditional) | 1/2 | In Progress|  | - |
+| 74. Suspense Streaming (Conditional) | 2/2 | Complete   | 2026-02-19 | - |
 
 **Total:** 12 milestones shipped, 69 phases complete, 322 plans executed + 5 phases planned (v9.0)
 

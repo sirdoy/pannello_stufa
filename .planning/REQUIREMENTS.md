@@ -44,7 +44,7 @@ Requirements for performance optimization milestone. Each maps to roadmap phases
 
 - [x] **SUSP-01**: User sees skeleton fallbacks for each dashboard card during loading
 - [x] **SUSP-02**: User sees cards stream in progressively as data becomes available
-- [ ] **SUSP-03**: User's stove card always loads first (safety-critical priority)
+- [x] **SUSP-03**: User's stove card always loads first (safety-critical priority)
 
 ## Future Requirements
 
@@ -96,7 +96,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | REND-04 | Phase 73 | Complete |
 | SUSP-01 | Phase 74 | Complete |
 | SUSP-02 | Phase 74 | Complete |
-| SUSP-03 | Phase 74 | Pending |
+| SUSP-03 | Phase 74 | Complete |
 
 **Coverage:**
 - v9.0 requirements: 21 total

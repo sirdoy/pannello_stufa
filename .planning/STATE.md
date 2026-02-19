@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v9.0 Performance Optimization — Phase 74 in progress
+**Current focus:** v9.0 Performance Optimization — Phase 74 COMPLETE
 
 ## Current Position
 
-Phase: 74 of 74 (Suspense Streaming)
-Plan: 1 of 2 in current phase (COMPLETE)
-Status: Plan 74-01 complete
-Last activity: 2026-02-19 - Completed 74-01: loading.tsx skeleton + DashboardCards async Server Component + synchronous page.tsx shell
+Phase: 74 of 74 (Suspense Streaming) — COMPLETE
+Plan: 2 of 2 in current phase (COMPLETE)
+Status: Phase 74 complete — all 2 plans done
+Last activity: 2026-02-19 - Completed 74-02: per-card Suspense boundaries in DashboardCards + unit tests for DashboardCards and loading.tsx
 
-Progress: [███████░░░] 87% (v9.0 — 7/8 plans)
+Progress: [██████████] 100% (v9.0 — 8/8 plans)
 
 ## Performance Metrics
 
@@ -30,7 +30,7 @@ Progress: [███████░░░] 87% (v9.0 — 7/8 plans)
 | v7.0 Performance & Resilience | 55-60 | 22 | 2 days |
 | v8.0 Fritz!Box Network Monitor | 61-67 | 18 | 3 days |
 | v8.1 Masonry Dashboard | 68-69 | 3 | 1 day |
-| v9.0 Performance Optimization | 70-74 | 8 (est.) | TBD |
+| v9.0 Performance Optimization | 70-74 | 8 | ~70 min |
 
 ## Accumulated Context
 
@@ -66,6 +66,8 @@ Recent decisions affecting v9.0 (Phases 70-73):
 - [73-02]: useStoveData is NOT modified — uses Firebase RTDB onValue() listener; safety-critical path untouched
 - [73-02]: CameraCard uses setTimeout(400ms) directly (not initialDelay) — uses custom useEffect pattern, not useAdaptivePolling
 - [73-02]: WeatherCardWrapper uses setTimeout(250ms) with timeout ref cleanup — location fires synchronously from localStorage cache
+- [Phase 74-suspense-streaming]: DeviceCardErrorBoundary wraps OUTSIDE Suspense; Suspense wraps INSIDE — error boundaries must catch Suspense errors
+- [Phase 74-suspense-streaming]: CARD_SKELETONS registry: same 6 card IDs as CARD_COMPONENTS, mapped to Skeleton.* sub-components for declarative Suspense fallbacks
 
 ### Pending Todos
 
@@ -84,5 +86,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 74-01-PLAN.md (Suspense Streaming — loading.tsx skeleton + DashboardCards async component)
-Resume file: .planning/phases/74-suspense-streaming/74-02-PLAN.md (next plan)
+Stopped at: Completed 74-02-PLAN.md (Suspense Streaming — per-card Suspense boundaries + unit tests for DashboardCards and loading.tsx)
+Resume file: None — Phase 74 complete; v9.0 milestone complete

@@ -259,6 +259,52 @@ describe('useAdaptivePolling', () => {
     expect(callCount).toBe(11); // 1 + 10
   });
 
+  it('delays first callback when initialDelay is set', () => {
+    const callback = jest.fn();
+
+    renderHook(() =>
+      useAdaptivePolling({
+        callback,
+        interval: 1000,
+        immediate: true,
+        initialDelay: 500,
+      })
+    );
+
+    // Should NOT call immediately
+    expect(callback).toHaveBeenCalledTimes(0);
+
+    // Advance past delay
+    act(() => {
+      jest.advanceTimersByTime(500);
+    });
+
+    // Now immediate call should fire
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    // Then regular interval continues
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    expect(callback).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not delay when initialDelay is 0 (default)', () => {
+    const callback = jest.fn();
+
+    renderHook(() =>
+      useAdaptivePolling({
+        callback,
+        interval: 1000,
+        immediate: true,
+        initialDelay: 0,
+      })
+    );
+
+    // Should call immediately (same as default behavior)
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
+
   it('does not call immediately on visibility restore when alwaysActive is true', () => {
     const callback = jest.fn();
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useVisibility } from './useVisibility';
 
 /**
@@ -31,6 +31,13 @@ export interface UseAdaptivePollingOptions {
    * Default: true
    */
   immediate?: boolean;
+
+  /**
+   * Delay in milliseconds before the first fetch and interval setup.
+   * Used to stagger dashboard card initial API calls (avoid thundering herd).
+   * Default: 0 (no delay — immediate behavior unchanged)
+   */
+  initialDelay?: number;
 }
 
 /**
@@ -41,32 +48,46 @@ export interface UseAdaptivePollingOptions {
  * - Resumes polling and calls immediately when tab becomes visible again
  * - Respects interval changes (null = pause)
  * - Avoids stale closures using ref pattern
+ * - Supports initialDelay to stagger dashboard card initial fetches
  *
  * @see https://overreacted.io/making-setinterval-declarative-with-react-hooks/
  */
 export function useAdaptivePolling(options: UseAdaptivePollingOptions): void {
-  const { callback, interval, alwaysActive = false, immediate = true } = options;
+  const { callback, interval, alwaysActive = false, immediate = true, initialDelay = 0 } = options;
 
   const isVisible = useVisibility();
   const savedCallback = useRef(callback);
   const hasRunImmediate = useRef(false);
   const wasVisible = useRef(isVisible);
 
+  // Delay gate: when initialDelay > 0, defer first fetch and interval setup
+  const [delayDone, setDelayDone] = useState(initialDelay === 0);
+
   // Update savedCallback ref whenever callback changes (avoid stale closures)
   useEffect(() => {
     savedCallback.current = callback;
   }, [callback]);
 
+  // Effect: Resolve the initial delay gate
+  useEffect(() => {
+    if (initialDelay === 0) return;
+    const t = setTimeout(() => setDelayDone(true), initialDelay);
+    return () => clearTimeout(t);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Effect: Run callback immediately on mount if immediate is true
   useEffect(() => {
+    if (!delayDone) return;
     if (immediate && interval !== null && !hasRunImmediate.current) {
       savedCallback.current();
       hasRunImmediate.current = true;
     }
-  }, [immediate, interval]);
+  }, [delayDone, immediate, interval]);
 
   // Effect: Manage interval based on visibility and interval value
   useEffect(() => {
+    if (!delayDone) return;
+
     // Don't set up interval if explicitly paused
     if (interval === null) {
       return;
@@ -87,7 +108,7 @@ export function useAdaptivePolling(options: UseAdaptivePollingOptions): void {
     return () => {
       clearInterval(id);
     };
-  }, [interval, isVisible, alwaysActive]);
+  }, [delayDone, interval, isVisible, alwaysActive]);
 
   // Effect: Call immediately when tab becomes visible again
   useEffect(() => {

@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { auth0 } from '@/lib/auth0';
 import { splitIntoColumns } from '@/lib/utils/dashboardColumns';
@@ -13,6 +14,7 @@ import {
 } from '@/lib/services/unifiedDeviceConfigService';
 import { EmptyState } from './ui';
 import { DeviceCardErrorBoundary } from './ErrorBoundary';
+import Skeleton from '@/app/components/ui/Skeleton';
 
 // Card component registry - maps card IDs to React components
 const CARD_COMPONENTS: Record<string, React.ComponentType> = {
@@ -22,6 +24,16 @@ const CARD_COMPONENTS: Record<string, React.ComponentType> = {
   lights: LightsCard,
   camera: CameraCard,
   network: NetworkCard,
+};
+
+// Skeleton registry - maps card IDs to their skeleton components
+const CARD_SKELETONS: Record<string, React.ComponentType> = {
+  stove: Skeleton.StovePanel,
+  thermostat: Skeleton.ThermostatCard,
+  weather: Skeleton.WeatherCard,
+  lights: Skeleton.LightsCard,
+  camera: Skeleton.CameraCard,
+  network: Skeleton.NetworkCard,
 };
 
 // Device metadata for error boundaries
@@ -42,6 +54,9 @@ const DEVICE_META: Record<string, { name: string; icon: string }> = {
  *
  * Auth: redirects to /auth/login if no valid session is found.
  * Layout: matches loading.tsx masonry (even→left, odd→right).
+ *
+ * Each card is wrapped in a per-card Suspense boundary with its matching skeleton
+ * fallback, inside a DeviceCardErrorBoundary for error isolation.
  */
 export default async function DashboardCards() {
   const session = await auth0.getSession();
@@ -68,6 +83,7 @@ export default async function DashboardCards() {
   // Shared card renderer — used by both mobile and desktop layouts
   const renderCard = (card: typeof visibleCards[number], flatIndex: number) => {
     const CardComponent = CARD_COMPONENTS[card.id];
+    const CardSkeleton = CARD_SKELETONS[card.id];
     if (!CardComponent) return null;
     return (
       <div
@@ -79,7 +95,9 @@ export default async function DashboardCards() {
           deviceName={DEVICE_META[card.id]?.name ?? card.id}
           deviceIcon={DEVICE_META[card.id]?.icon ?? '⚠️'}
         >
-          <CardComponent />
+          <Suspense fallback={CardSkeleton ? <CardSkeleton /> : null}>
+            <CardComponent />
+          </Suspense>
         </DeviceCardErrorBoundary>
       </div>
     );

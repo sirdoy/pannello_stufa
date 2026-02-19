@@ -124,11 +124,11 @@ Plans:
   1. User sees a skeleton fallback for each of the six dashboard cards within ~300ms of page navigation (dashboard shell renders immediately before any device data resolves)
   2. User sees cards stream in one at a time as each device's data becomes available — the page does not wait for all six cards before showing any of them
   3. User's stove card is always the first card to become visible (safety-critical priority), regardless of network conditions or the order other cards resolve
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 74-01: Research Suspense + deviceConfig conflict resolution
-- [ ] 74-02: Suspense boundaries per card with priority stove streaming
+- [ ] 74-01-PLAN.md — loading.tsx skeleton shell + page.tsx restructure with async DashboardCards server component
+- [ ] 74-02-PLAN.md — Per-card Suspense boundaries with skeleton fallbacks + unit tests
 
 ## Progress
 

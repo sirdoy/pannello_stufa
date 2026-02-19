@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import {
   BarChart,
   Bar,
@@ -52,7 +53,7 @@ interface CustomTooltipProps {
  * - Y-axis: pellet kg
  * - Summary: total kg, daily average, estimated cost
  */
-export default function ConsumptionChart({ data = [], loading = false }: ConsumptionChartProps) {
+const ConsumptionChart = memo(function ConsumptionChart({ data = [], loading = false }: ConsumptionChartProps) {
   if (loading) {
     return (
       <div className="h-[300px] flex items-center justify-center bg-slate-800/30 [html:not(.dark)_&]:bg-slate-100 rounded-lg">
@@ -183,6 +184,7 @@ export default function ConsumptionChart({ data = [], loading = false }: Consump
             fill="#ed6f10"
             name="Pellet (kg)"
             radius={[4, 4, 0, 0]}
+            isAnimationActive={false}
           />
         </BarChart>
       </ResponsiveContainer>
@@ -201,4 +203,6 @@ export default function ConsumptionChart({ data = [], loading = false }: Consump
       </div>
     </>
   );
-}
+});
+
+export default ConsumptionChart;

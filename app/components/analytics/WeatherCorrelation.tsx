@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import {
   ComposedChart,
   Bar,
@@ -55,7 +56,7 @@ interface CustomTooltipProps {
  * - Dual Y-axes for different scales
  * - Requires weather data from cron
  */
-export default function WeatherCorrelation({ data = [], loading = false }: WeatherCorrelationProps) {
+const WeatherCorrelation = memo(function WeatherCorrelation({ data = [], loading = false }: WeatherCorrelationProps) {
   if (loading) {
     return (
       <div className="h-[350px] flex items-center justify-center bg-slate-800/30 [html:not(.dark)_&]:bg-slate-100 rounded-lg">
@@ -199,6 +200,7 @@ export default function WeatherCorrelation({ data = [], loading = false }: Weath
           fill="#ed6f10"
           name="Pellet (kg)"
           radius={[4, 4, 0, 0]}
+          isAnimationActive={false}
         />
 
         {/* Line: Temperature */}
@@ -211,8 +213,11 @@ export default function WeatherCorrelation({ data = [], loading = false }: Weath
           dot={{ fill: '#437dae', r: 4 }}
           activeDot={{ r: 6 }}
           name="Temperature (°C)"
+          isAnimationActive={false}
         />
       </ComposedChart>
     </ResponsiveContainer>
   );
-}
+});
+
+export default WeatherCorrelation;

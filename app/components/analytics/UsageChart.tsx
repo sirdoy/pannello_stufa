@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import {
   BarChart,
   Bar,
@@ -56,7 +57,7 @@ interface CustomTooltipProps {
  * - Y-axis: hours
  * - Color scheme: slate → amber → ember → orange → red (low to high heat)
  */
-export default function UsageChart({ data = [], loading = false }: UsageChartProps) {
+const UsageChart = memo(function UsageChart({ data = [], loading = false }: UsageChartProps) {
   if (loading) {
     return (
       <div className="h-[300px] flex items-center justify-center bg-slate-800/30 [html:not(.dark)_&]:bg-slate-100 rounded-lg">
@@ -176,6 +177,7 @@ export default function UsageChart({ data = [], loading = false }: UsageChartPro
           fill="#94a3b8"
           name="Level 1"
           radius={[0, 0, 0, 0]}
+          isAnimationActive={false}
         />
         <Bar
           dataKey="level2"
@@ -183,6 +185,7 @@ export default function UsageChart({ data = [], loading = false }: UsageChartPro
           fill="#f59e0b"
           name="Level 2"
           radius={[0, 0, 0, 0]}
+          isAnimationActive={false}
         />
         <Bar
           dataKey="level3"
@@ -190,6 +193,7 @@ export default function UsageChart({ data = [], loading = false }: UsageChartPro
           fill="#ed6f10"
           name="Level 3"
           radius={[0, 0, 0, 0]}
+          isAnimationActive={false}
         />
         <Bar
           dataKey="level4"
@@ -197,6 +201,7 @@ export default function UsageChart({ data = [], loading = false }: UsageChartPro
           fill="#ea580c"
           name="Level 4"
           radius={[0, 0, 0, 0]}
+          isAnimationActive={false}
         />
         <Bar
           dataKey="level5"
@@ -204,8 +209,11 @@ export default function UsageChart({ data = [], loading = false }: UsageChartPro
           fill="#dc2626"
           name="Level 5"
           radius={[4, 4, 0, 0]}
+          isAnimationActive={false}
         />
       </BarChart>
     </ResponsiveContainer>
   );
-}
+});
+
+export default UsageChart;

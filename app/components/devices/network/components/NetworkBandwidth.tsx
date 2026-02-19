@@ -9,7 +9,7 @@
 
 'use client';
 
-import { useId } from 'react';
+import { memo, useId } from 'react';
 import { ResponsiveContainer, AreaChart, Area } from 'recharts';
 import type { BandwidthData, SparklinePoint } from '../types';
 
@@ -19,7 +19,7 @@ export interface NetworkBandwidthProps {
   uploadHistory: SparklinePoint[];
 }
 
-export default function NetworkBandwidth({
+const NetworkBandwidth = memo(function NetworkBandwidth({
   bandwidth,
   downloadHistory,
   uploadHistory,
@@ -143,4 +143,6 @@ export default function NetworkBandwidth({
       </div>
     </div>
   );
-}
+});
+
+export default NetworkBandwidth;

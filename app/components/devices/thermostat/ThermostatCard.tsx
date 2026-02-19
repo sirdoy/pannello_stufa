@@ -16,6 +16,7 @@ import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useDeviceStaleness } from '@/lib/hooks/useDeviceStaleness';
 import { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
+import { useDebounce } from '@/app/hooks/useDebounce';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 
@@ -36,6 +37,10 @@ export default function ThermostatCard() {
   const [calibrating, setCalibrating] = useState(false);
   const [calibrationSuccess, setCalibrationSuccess] = useState<boolean | null>(null);
   const [batteryWarningDismissed, setBatteryWarningDismissed] = useState(false);
+
+  // Pending setpoint for debounced thermostat writes
+  const [pendingSetpoint, setPendingSetpoint] = useState<number | null>(null);
+  const debouncedSetpoint = useDebounce(pendingSetpoint, 500);
 
   // Loading overlay message
   const [loadingMessage, setLoadingMessage] = useState('Caricamento...');
@@ -72,6 +77,25 @@ export default function ThermostatCard() {
     }
   }, [activeSchedule, selectedScheduleId]);
 
+  // Debounced thermostat write: fire API call only after 500ms of no setpoint changes
+  useEffect(() => {
+    if (debouncedSetpoint === null) return;
+    const room = topology?.rooms?.find((r: any) => r.id === selectedRoomId);
+    if (!room) return;
+    const roomStatus = status?.rooms?.find((r: any) => r.room_id === room.id);
+    if (debouncedSetpoint === roomStatus?.setpoint) {
+      setPendingSetpoint(null); // No change needed
+      return;
+    }
+    handleTemperatureChange(room.id, debouncedSetpoint);
+    setPendingSetpoint(null);
+  }, [debouncedSetpoint]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Reset pending setpoint on room change to prevent cross-room writes
+  useEffect(() => {
+    setPendingSetpoint(null);
+  }, [selectedRoomId]);
+
   // Check connection on mount
   useEffect(() => {
     if (connectionCheckedRef.current) return;
@@ -80,11 +104,13 @@ export default function ThermostatCard() {
   }, []);
 
   // Poll status every 30 seconds - pauses when tab hidden
+  // initialDelay: 50ms stagger to avoid thundering herd on dashboard mount
   useAdaptivePolling({
     callback: fetchStatus,
     interval: topology ? 30000 : null, // Only poll when connected (topology exists)
     alwaysActive: false, // Non-critical: pause when hidden
     immediate: true,
+    initialDelay: 50,
   });
 
   // Get rooms with status (includes stove sync info)
@@ -707,7 +733,10 @@ export default function ThermostatCard() {
                       <Button
                         variant="subtle"
                         size="lg"
-                        onClick={() => handleTemperatureChange(selectedRoom.id, selectedRoom.setpoint - 0.5)}
+                        onClick={() => {
+                          const current = pendingSetpoint ?? selectedRoom.setpoint;
+                          setPendingSetpoint(parseFloat((current - 0.5).toFixed(1)));
+                        }}
                         disabled={refreshing}
                         className="flex-1 h-16 sm:h-18 text-lg font-bold font-display"
                       >
@@ -715,12 +744,15 @@ export default function ThermostatCard() {
                       </Button>
                       <div className="flex flex-col items-center justify-center px-4">
                         <Text variant="label" size="xs" className="font-display">Target</Text>
-                        <Text variant="tertiary" className="text-2xl sm:text-3xl font-display">{selectedRoom.setpoint}°</Text>
+                        <Text variant="tertiary" className="text-2xl sm:text-3xl font-display">{pendingSetpoint ?? selectedRoom.setpoint}°</Text>
                       </div>
                       <Button
                         variant="subtle"
                         size="lg"
-                        onClick={() => handleTemperatureChange(selectedRoom.id, selectedRoom.setpoint + 0.5)}
+                        onClick={() => {
+                          const current = pendingSetpoint ?? selectedRoom.setpoint;
+                          setPendingSetpoint(parseFloat((current + 0.5).toFixed(1)));
+                        }}
                         disabled={refreshing}
                         className="flex-1 h-16 sm:h-18 text-lg font-bold font-display"
                       >

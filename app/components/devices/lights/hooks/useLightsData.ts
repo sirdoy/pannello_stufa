@@ -229,11 +229,13 @@ export function useLightsData(): UseLightsDataReturn {
   }
 
   // Poll data every 30 seconds - pauses when tab hidden
+  // initialDelay: 100ms stagger to avoid thundering herd on dashboard mount
   useAdaptivePolling({
     callback: fetchData,
     interval: connected ? 30000 : null, // Only poll when connected
     alwaysActive: false, // Non-critical: pause when hidden
     immediate: true,
+    initialDelay: 100,
   });
 
   // Auto-select first room

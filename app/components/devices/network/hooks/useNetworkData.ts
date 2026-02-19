@@ -288,11 +288,13 @@ export function useNetworkData(): UseNetworkDataReturn {
   }, [enrichDevicesWithCategories]);
 
   // Adaptive polling - 30s visible, 5min hidden
+  // initialDelay: 500ms stagger to avoid thundering herd on dashboard mount
   useAdaptivePolling({
     callback: fetchData,
     interval,
     alwaysActive: false,  // Non-safety-critical monitoring
     immediate: true,      // Fetch on mount
+    initialDelay: 500,
   });
 
   // Update a single device's category (used by manual overrides)

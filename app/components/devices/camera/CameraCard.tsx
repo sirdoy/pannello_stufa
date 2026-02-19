@@ -42,12 +42,13 @@ export default function CameraCard() {
 
   const connectionCheckedRef = useRef(false);
 
-  // Check connection on mount
+  // Check connection on mount — staggered 400ms to avoid thundering herd on dashboard mount
   useEffect(() => {
     if (connectionCheckedRef.current) return;
     connectionCheckedRef.current = true;
-    fetchCameras();
-  }, []);
+    const t = setTimeout(() => fetchCameras(), 400);
+    return () => clearTimeout(t);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-select first camera
   useEffect(() => {

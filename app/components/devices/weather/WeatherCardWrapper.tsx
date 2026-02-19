@@ -81,12 +81,15 @@ export default function WeatherCardWrapper() {
 
   // Subscribe to location changes on mount
   useEffect(() => {
+    let weatherTimeout: ReturnType<typeof setTimeout> | null = null;
     const unsubscribe = subscribeToLocation((loc) => {
       setLocation(loc);
 
       // If location has coordinates, fetch weather
       if (loc?.latitude && loc?.longitude) {
-        fetchWeather(loc.latitude, loc.longitude);
+        // Stagger initial weather fetch (250ms after mount) to avoid thundering herd
+        if (weatherTimeout) clearTimeout(weatherTimeout);
+        weatherTimeout = setTimeout(() => fetchWeather(loc.latitude!, loc.longitude!), 250);
       } else {
         // No location configured - show empty state
         setIsLoading(false);
@@ -94,8 +97,11 @@ export default function WeatherCardWrapper() {
       }
     });
 
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
+    // Cleanup subscription and pending timeout on unmount
+    return () => {
+      unsubscribe();
+      if (weatherTimeout) clearTimeout(weatherTimeout);
+    };
   }, [fetchWeather]);
 
   // Retry handler - refetch weather with current location

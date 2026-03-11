@@ -9,9 +9,10 @@ import { db } from '../firebase';
 import { getEnvironmentPath } from '../environmentHelper';
 
 const HUE_BASE_REF = 'hue';
-const HUE_TOKEN_ENDPOINT = 'https://api.meethue.com/oauth2/token';
+const HUE_TOKEN_ENDPOINT = 'https://api.meethue.com/v2/oauth2/token';
 // Note: Philips Hue uses the same token endpoint for refresh (standard OAuth2)
-const HUE_REFRESH_ENDPOINT = 'https://api.meethue.com/oauth2/token';
+// Migrated from v1 (/oauth2/token) to v2 (/v2/oauth2/token) — v1 deprecated since July 2020
+const HUE_REFRESH_ENDPOINT = 'https://api.meethue.com/v2/oauth2/token';
 
 interface TokenCache {
   accessToken: string | null;
@@ -162,11 +163,21 @@ async function performTokenRefresh(): Promise<TokenResult> {
 
     const { refresh_token } = snapshot.val() as { refresh_token: string };
 
+    // Validate required env vars before attempting refresh
+    const clientId = process.env.NEXT_PUBLIC_HUE_CLIENT_ID;
+    const clientSecret = process.env.HUE_CLIENT_SECRET;
+
+    if (!clientId || !clientSecret) {
+      console.error('❌ [Hue Token] Missing NEXT_PUBLIC_HUE_CLIENT_ID or HUE_CLIENT_SECRET');
+      return {
+        accessToken: null,
+        error: 'CONFIG_ERROR',
+        message: 'Configurazione Hue Remote incompleta: client_id o client_secret mancante.',
+      };
+    }
+
     // Exchange refresh token for access token
-    const authHeader = generateBasicAuthHeader(
-      process.env.NEXT_PUBLIC_HUE_CLIENT_ID!,
-      process.env.HUE_CLIENT_SECRET!
-    );
+    const authHeader = generateBasicAuthHeader(clientId, clientSecret);
 
     const response = await fetch(HUE_REFRESH_ENDPOINT, {
       method: 'POST',
@@ -200,12 +211,14 @@ async function performTokenRefresh(): Promise<TokenResult> {
     // Handle errors from Hue OAuth API
     if (data.error || !response.ok) {
       // Token is invalid/expired - clear from Firebase
-      // Also treat 500 errors and "unrecognizable" errors as token invalidation
+      // Also treat 500 errors, "unrecognizable" errors, and client auth failures as token invalidation
       const isTokenInvalid =
         data.error === 'invalid_grant' ||
         data.error === 'invalid_token' ||
+        data.error === 'invalid_client' ||
         response.status === 500 ||
-        (data.error_description && data.error_description.includes('unrecognizable'));
+        (data.error_description && data.error_description.includes('unrecognizable')) ||
+        (data.error_description && data.error_description.includes('Client authentication failed'));
 
       if (isTokenInvalid) {
         console.error('❌ [Hue Token] Token invalid, clearing...');
@@ -410,6 +423,7 @@ export function handleRemoteTokenError(error: string): { status: number; reconne
     'NOT_CONNECTED': 401,
     'TOKEN_EXPIRED': 401,
     'TOKEN_ERROR': 500,
+    'CONFIG_ERROR': 500,
     'NO_ACCESS_TOKEN': 500,
     'NETWORK_ERROR': 500,
   };

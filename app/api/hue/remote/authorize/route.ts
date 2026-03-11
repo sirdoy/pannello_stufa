@@ -51,7 +51,8 @@ export const GET = withErrorHandler(async (request) => {
   const baseUrl = new URL(request.url);
   const redirectUri = `${baseUrl.protocol}//${baseUrl.host}/api/hue/remote/callback`;
 
-  // Build Philips Hue authorization URL (v1 API uses /oauth2/auth)
+  // Build Philips Hue authorization URL (v1 API — /oauth2/auth)
+  // Note: Token endpoints migrated to /v2/oauth2/token, but auth endpoint remains at /oauth2/auth
   const authUrl = new URL('https://api.meethue.com/oauth2/auth');
   authUrl.searchParams.set('clientid', clientId);
   authUrl.searchParams.set('appid', appId);

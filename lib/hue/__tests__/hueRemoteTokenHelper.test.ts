@@ -44,6 +44,20 @@ describe('hueRemoteTokenHelper', () => {
   });
 
   describe('getValidRemoteAccessToken', () => {
+    const originalEnv = process.env;
+
+    beforeEach(() => {
+      process.env = {
+        ...originalEnv,
+        NEXT_PUBLIC_HUE_CLIENT_ID: 'test-client-id',
+        HUE_CLIENT_SECRET: 'test-client-secret',
+      };
+    });
+
+    afterEach(() => {
+      process.env = originalEnv;
+    });
+
     it('should return access token when refresh succeeds', async () => {
       const { ref, get, update } = require('firebase/database');
 
@@ -76,7 +90,7 @@ describe('hueRemoteTokenHelper', () => {
       });
 
       expect(fetch).toHaveBeenCalledWith(
-        'https://api.meethue.com/oauth2/token',
+        'https://api.meethue.com/v2/oauth2/token',
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
@@ -198,7 +212,7 @@ describe('hueRemoteTokenHelper', () => {
       });
 
       expect(fetch).toHaveBeenCalledWith(
-        'https://api.meethue.com/oauth2/token',
+        'https://api.meethue.com/v2/oauth2/token',
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
@@ -307,6 +321,98 @@ describe('hueRemoteTokenHelper', () => {
         status: 500,
         reconnect: false,
       });
+
+      expect(handleRemoteTokenError('CONFIG_ERROR')).toEqual({
+        status: 500,
+        reconnect: false,
+      });
+    });
+  });
+
+  describe('invalid_client error handling', () => {
+    const originalEnv = process.env;
+
+    beforeEach(() => {
+      process.env = {
+        ...originalEnv,
+        NEXT_PUBLIC_HUE_CLIENT_ID: 'test-client-id',
+        HUE_CLIENT_SECRET: 'test-client-secret',
+      };
+    });
+
+    afterEach(() => {
+      process.env = originalEnv;
+    });
+
+    it('should treat invalid_client as token expired with reconnect', async () => {
+      const { get } = require('firebase/database');
+
+      // Mock Firebase get (has refresh token, no cached access_token)
+      (get as jest.Mock).mockResolvedValue({
+        exists: () => true,
+        val: () => ({
+          refresh_token: 'some-token',
+          access_token: null,
+        }),
+      });
+
+      // Mock Hue OAuth returning invalid_client
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 401,
+        headers: { get: () => 'application/json' },
+        text: async () => JSON.stringify({
+          error: 'invalid_client',
+          error_description: 'Client authentication failed (e.g., unknown client)',
+        }),
+      });
+
+      const result = await getValidRemoteAccessToken();
+
+      expect(result).toEqual({
+        accessToken: null,
+        error: 'TOKEN_EXPIRED',
+        message: expect.any(String),
+        reconnect: true,
+      });
+    });
+  });
+
+  describe('missing env vars', () => {
+    const originalEnv = process.env;
+
+    beforeEach(() => {
+      process.env = { ...originalEnv };
+      delete process.env.NEXT_PUBLIC_HUE_CLIENT_ID;
+      delete process.env.HUE_CLIENT_SECRET;
+    });
+
+    afterEach(() => {
+      process.env = originalEnv;
+    });
+
+    it('should return CONFIG_ERROR when client credentials are missing', async () => {
+      const { get } = require('firebase/database');
+
+      // Mock Firebase get (has refresh token)
+      (get as jest.Mock).mockResolvedValue({
+        exists: () => true,
+        val: () => ({
+          refresh_token: 'some-token',
+          access_token: null,
+        }),
+      });
+
+      const result = await getValidRemoteAccessToken();
+
+      expect(result).toEqual({
+        accessToken: null,
+        error: 'CONFIG_ERROR',
+        message: expect.stringContaining('client_id o client_secret'),
+      });
+
+      // Should not call fetch when env vars are missing
+      expect(fetch).not.toHaveBeenCalled();
     });
   });
 });

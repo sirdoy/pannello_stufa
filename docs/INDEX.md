@@ -28,8 +28,6 @@ Indice documentazione Pannello Stufa. **Ottimizzato per token efficiency**.
 | [design-system.md](design-system.md) | Ember Noir v2 |
 | [ui-components.md](ui-components.md) | Component API |
 | [ui-modal.md](ui-modal.md) | Modal patterns |
-| [page-transitions.md](page-transitions.md) | View Transitions API |
-| [components/navigation.md](components/navigation.md) | Navbar component |
 
 **Live preview**: `/debug/design-system`
 
@@ -60,42 +58,17 @@ Indice documentazione Pannello Stufa. **Ottimizzato per token efficiency**.
 | [versioning.md](versioning.md) | Semantic versioning |
 | [deployment.md](deployment.md) | Deploy workflow |
 
-## Security
-
-| File | Contenuto |
-|------|-----------|
-| [security/](security/) | Firebase rules, verification reports |
-
 ## Reference
 
 | File | Contenuto |
 |------|-----------|
 | [stove-status-mapping.md](stove-status-mapping.md) | Thermorossi status codes |
-| [visual-screenshots.md](visual-screenshots.md) | UI screenshots |
-
-## Archive
-
-Documentazione storica: [archive/](archive/)
 
 ---
 
-**Docs attivi**: 30 file | **Archive**: 28 file | **Last Updated**: 2026-01-21
+**Docs attivi**: 23 file | **Last Updated**: 2026-03-14
 
 ---
-
-## Optimization Summary (v1.76.0)
-
-| File | Before | After | Saved |
-|------|--------|-------|-------|
-| api-routes.md | 779 | 236 | **70%** |
-| troubleshooting.md | 763 | 209 | **73%** |
-| testing.md + E2E | 859 | 200 | 77% |
-| firebase.md + security | 1143 | 190 | 83% |
-| ui-components.md | 1001 | 240 | 76% |
-| design-system.md | 1719 | 240 | 86% |
-| patterns.md | 1515 | 200 | 87% |
-| netatmo-setup.md | 481 | 115 | 76% |
-| **Total** | **8260** | **1630** | **80%** |
 
 **Principi**:
 - Tabelle > prose verbose

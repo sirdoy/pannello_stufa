@@ -15,6 +15,7 @@
 - ✅ **v8.0 Fritz!Box Network Monitor** — Phases 61-67 (shipped 2026-02-16)
 - ✅ **v8.1 Masonry Dashboard** — Phases 68-69 (shipped 2026-02-18)
 - ✅ **v9.0 Performance Optimization** — Phases 70-74 (shipped 2026-02-19)
+- 🚧 **v10.0 Netatmo API Migration** — Phases 75-79 (in progress)
 
 ## Phases
 
@@ -44,6 +45,77 @@ See `.planning/milestones/` for full archives.
 
 </details>
 
+### 🚧 v10.0 Netatmo API Migration (In Progress)
+
+**Milestone Goal:** Replace all direct Netatmo Cloud API calls with local HomeAssistant Network API proxy calls, eliminate OAuth token management from the Next.js app, and clean up all dead code. Authentication becomes a single API Key header.
+
+- [ ] **Phase 75: API Client Foundation + Energy Read** - New proxy client with X-API-Key auth, homestatus and homesdata read endpoints migrated
+- [ ] **Phase 76: Energy Control Endpoints** - All write/control endpoints migrated (setpoint, mode, schedule switch, sync, measurements)
+- [ ] **Phase 77: Camera Migration** - All six camera endpoints migrated (status, stream URLs, snapshot, events, monitoring toggle, event snapshots)
+- [ ] **Phase 78: Valve + Health** - Dedicated valve endpoints and health monitoring cron migrated to proxy
+- [ ] **Phase 79: Cleanup** - Dead code deleted (OAuth helpers, rate limiter, cache service, callback route, env vars), tests updated
+
+## Phase Details
+
+### Phase 75: API Client Foundation + Energy Read
+**Goal**: The Netatmo integration communicates with the local proxy instead of api.netatmo.com, with a shared client handling API Key auth and proxy-specific response shapes
+**Depends on**: Nothing (first phase of milestone)
+**Requirements**: API-01, API-02, API-03, API-04, ENERGY-01, ENERGY-02
+**Success Criteria** (what must be TRUE):
+  1. Thermostat dashboard card loads room temperatures from the proxy `/homestatus` endpoint without hitting api.netatmo.com
+  2. Home topology (rooms, modules) loads from proxy `/homesdata` without Netatmo OAuth tokens
+  3. When the proxy reports `data_freshness: STALE`, the app surfaces a staleness indicator to the user
+  4. When the proxy returns an RFC 9457 error, the frontend receives and handles it correctly (error boundary or toast)
+  5. All Netatmo Next.js routes use a single shared client configured with the proxy base URL and X-API-Key header
+**Plans**: TBD
+
+### Phase 76: Energy Control Endpoints
+**Goal**: Users can control the thermostat (set temperature, change mode, switch schedule, sync schedule, view historical measurements) through the proxy
+**Depends on**: Phase 75
+**Requirements**: ENERGY-03, ENERGY-04, ENERGY-05, ENERGY-06, ENERGY-07
+**Success Criteria** (what must be TRUE):
+  1. User can adjust room setpoint temperature and the command is sent to proxy `/setroomthermpoint`
+  2. User can change thermostat mode (schedule/away/frost guard) via proxy `/setthermmode`
+  3. User can switch between pre-configured schedules via proxy `/switchhomeschedule`
+  4. Schedule sync via proxy `/synchomeschedule` completes without error
+  5. Historical room measurement chart loads data from proxy `/getroommeasure` (SQLite aggregation tiers)
+**Plans**: TBD
+
+### Phase 77: Camera Migration
+**Goal**: Users can view camera status, watch live streams, take snapshots, browse events, and toggle monitoring — all served through the proxy
+**Depends on**: Phase 75
+**Requirements**: CAM-01, CAM-02, CAM-03, CAM-04, CAM-05, CAM-06
+**Success Criteria** (what must be TRUE):
+  1. Camera status (online/offline, monitoring state) loads from proxy `/camera/status`
+  2. Live stream URLs (HLS, VPN + local variants) load from proxy `/camera/{id}/stream` and play in the camera card
+  3. User can take a camera snapshot served from proxy `/camera/{id}/snapshot`
+  4. Camera events list loads from proxy `/camera/events` (SQLite-backed, 7-day retention)
+  5. User can toggle camera monitoring on/off via proxy `/camera/{id}/monitoring`
+  6. Event snapshot binary loads from proxy `/camera/events/{id}/snapshot`
+**Plans**: TBD
+
+### Phase 78: Valve + Health
+**Goal**: Valve status is read from a dedicated proxy endpoint, valve calibration uses the correct proxy route, and health monitoring cron uses the proxy health endpoint instead of custom token checks
+**Depends on**: Phase 75
+**Requirements**: VALVE-01, VALVE-02, HEALTH-01, HEALTH-02
+**Success Criteria** (what must be TRUE):
+  1. Valve status (battery, signal, open percentage) loads from proxy `/valves` without parsing from homestatus
+  2. Valve calibration triggers via proxy `/valves/calibrate` (no longer uses synchomeschedule workaround)
+  3. Health monitoring dashboard shows Netatmo provider health (token status, data freshness, rate limit usage) from proxy `/health`
+  4. Cron health check uses proxy `/health` endpoint; custom token validation code is no longer called
+**Plans**: TBD
+
+### Phase 79: Cleanup
+**Goal**: All obsolete Netatmo infrastructure is deleted — OAuth token helper, credentials, rate limiter, cache service, OAuth callback route, and related env vars are gone; tests reflect new proxy patterns
+**Depends on**: Phase 76, Phase 77, Phase 78
+**Requirements**: CLEAN-01, CLEAN-02, CLEAN-03, CLEAN-04, CLEAN-05, CLEAN-06, CLEAN-07
+**Success Criteria** (what must be TRUE):
+  1. `lib/netatmoTokenHelper.ts`, `lib/netatmoCredentials.ts`, `lib/netatmoRateLimiter.ts`, `lib/netatmoRateLimiterPersistent.ts`, and `lib/netatmoCacheService.ts` no longer exist in the codebase
+  2. `app/api/netatmo/callback/` route no longer exists
+  3. `NETATMO_CLIENT_SECRET`, `NEXT_PUBLIC_NETATMO_CLIENT_ID`, and `NEXT_PUBLIC_NETATMO_REDIRECT_URI` env vars are removed from all config files and documentation
+  4. All Netatmo-related tests pass using proxy mock patterns (no OAuth token setup in test fixtures)
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -61,9 +133,14 @@ See `.planning/milestones/` for full archives.
 | 61-67 | v8.0 | 18/18 | ✓ Complete | 2026-02-16 |
 | 68-69 | v8.1 | 3/3 | ✓ Complete | 2026-02-18 |
 | 70-74 | v9.0 | 8/8 | ✓ Complete | 2026-02-19 |
+| 75. API Client Foundation + Energy Read | v10.0 | 0/TBD | Not started | - |
+| 76. Energy Control Endpoints | v10.0 | 0/TBD | Not started | - |
+| 77. Camera Migration | v10.0 | 0/TBD | Not started | - |
+| 78. Valve + Health | v10.0 | 0/TBD | Not started | - |
+| 79. Cleanup | v10.0 | 0/TBD | Not started | - |
 
-**Total:** 13 milestones shipped, 74 phases complete, 330 plans executed
+**Total:** 13 milestones shipped, 74 phases complete, 330 plans executed — v10.0 in progress
 
 ---
 
-*Roadmap updated: 2026-02-19 — v9.0 Performance Optimization shipped*
+*Roadmap updated: 2026-03-14 — v10.0 Netatmo API Migration roadmap created*

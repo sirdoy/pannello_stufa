@@ -76,40 +76,40 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| API-01 | Pending | Pending |
-| API-02 | Pending | Pending |
-| API-03 | Pending | Pending |
-| API-04 | Pending | Pending |
-| ENERGY-01 | Pending | Pending |
-| ENERGY-02 | Pending | Pending |
-| ENERGY-03 | Pending | Pending |
-| ENERGY-04 | Pending | Pending |
-| ENERGY-05 | Pending | Pending |
-| ENERGY-06 | Pending | Pending |
-| ENERGY-07 | Pending | Pending |
-| VALVE-01 | Pending | Pending |
-| VALVE-02 | Pending | Pending |
-| CAM-01 | Pending | Pending |
-| CAM-02 | Pending | Pending |
-| CAM-03 | Pending | Pending |
-| CAM-04 | Pending | Pending |
-| CAM-05 | Pending | Pending |
-| CAM-06 | Pending | Pending |
-| HEALTH-01 | Pending | Pending |
-| HEALTH-02 | Pending | Pending |
-| CLEAN-01 | Pending | Pending |
-| CLEAN-02 | Pending | Pending |
-| CLEAN-03 | Pending | Pending |
-| CLEAN-04 | Pending | Pending |
-| CLEAN-05 | Pending | Pending |
-| CLEAN-06 | Pending | Pending |
-| CLEAN-07 | Pending | Pending |
+| API-01 | Phase 75 | Pending |
+| API-02 | Phase 75 | Pending |
+| API-03 | Phase 75 | Pending |
+| API-04 | Phase 75 | Pending |
+| ENERGY-01 | Phase 75 | Pending |
+| ENERGY-02 | Phase 75 | Pending |
+| ENERGY-03 | Phase 76 | Pending |
+| ENERGY-04 | Phase 76 | Pending |
+| ENERGY-05 | Phase 76 | Pending |
+| ENERGY-06 | Phase 76 | Pending |
+| ENERGY-07 | Phase 76 | Pending |
+| VALVE-01 | Phase 78 | Pending |
+| VALVE-02 | Phase 78 | Pending |
+| CAM-01 | Phase 77 | Pending |
+| CAM-02 | Phase 77 | Pending |
+| CAM-03 | Phase 77 | Pending |
+| CAM-04 | Phase 77 | Pending |
+| CAM-05 | Phase 77 | Pending |
+| CAM-06 | Phase 77 | Pending |
+| HEALTH-01 | Phase 78 | Pending |
+| HEALTH-02 | Phase 78 | Pending |
+| CLEAN-01 | Phase 79 | Pending |
+| CLEAN-02 | Phase 79 | Pending |
+| CLEAN-03 | Phase 79 | Pending |
+| CLEAN-04 | Phase 79 | Pending |
+| CLEAN-05 | Phase 79 | Pending |
+| CLEAN-06 | Phase 79 | Pending |
+| CLEAN-07 | Phase 79 | Pending |
 
 **Coverage:**
 - v10.0 requirements: 28 total
-- Mapped to phases: 0
-- Unmapped: 28 ⚠️
+- Mapped to phases: 28
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-14*
-*Last updated: 2026-03-14 after initial definition*
+*Last updated: 2026-03-14 — traceability mapped after roadmap creation*

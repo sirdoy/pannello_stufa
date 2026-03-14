@@ -355,7 +355,17 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-(No active requirements — planning next milestone)
+## Current Milestone: v10.0 Netatmo API Migration
+
+**Goal:** Migrate entire Netatmo integration from direct api.netatmo.com calls to local HomeAssistant Network API proxy (https://pdupun8zpr7exw43.myfritz.net/api/v1/netatmo/), eliminating OAuth token management, rate limiting, and caching from the Next.js app.
+
+**Target features:**
+- Replace all direct Netatmo Cloud API calls with local proxy API
+- Switch authentication from Netatmo OAuth to API Key (X-API-Key header)
+- Remove obsolete token management, rate limiting, and caching code
+- Adapt response parsing to new API response formats (SQLite-backed data)
+- Add new capabilities: health endpoint, dedicated valve status, camera stream URLs
+- Delete dead code (OAuth flow, credentials, token helper, rate limiter, cache service)
 
 ### Out of Scope
 
@@ -488,4 +498,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-02-19 after v9.0 milestone completion (Performance Optimization)*
+*Last updated: 2026-03-14 after v10.0 milestone start (Netatmo API Migration)*

@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-19)
+See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Planning next milestone
+**Current focus:** v10.0 Netatmo API Migration
 
 ## Current Position
 
-Phase: — (between milestones)
+Phase: Not started (defining requirements)
 Plan: —
-Status: v9.0 Performance Optimization shipped 2026-02-19
-Last activity: 2026-03-14 - Completed quick task 32: controlla e pulisci tutta la documentazione inutile
+Status: Defining requirements
+Last activity: 2026-03-14 — Milestone v10.0 started
 
-Progress: [██████████] 100% (v9.0 complete — 13 milestones shipped)
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -55,6 +55,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-19
-Stopped at: v9.0 milestone archived
-Resume file: None — start next milestone with /gsd:new-milestone
+Last session: 2026-03-14
+Stopped at: Defining v10.0 requirements
+Resume file: None

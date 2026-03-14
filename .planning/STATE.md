@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 Phase: — (between milestones)
 Plan: —
 Status: v9.0 Performance Optimization shipped 2026-02-19
-Last activity: 2026-02-19 - Completed v9.0 milestone archival
+Last activity: 2026-03-14 - Completed quick task 32: controlla e pulisci tutta la documentazione inutile
 
 Progress: [██████████] 100% (v9.0 complete — 13 milestones shipped)
 
@@ -51,6 +51,7 @@ None.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 31 | Hide debug and design-system pages in production | 2026-02-18 | 991f470 | [31-hide-debug-and-design-system-pages-in-pr](./quick/31-hide-debug-and-design-system-pages-in-pr/) |
+| 32 | controlla e pulisci tutta la documentazione inutile | 2026-03-14 | c2940eb | [32-controlla-e-pulisci-tutta-la-documentazi](./quick/32-controlla-e-pulisci-tutta-la-documentazi/) |
 
 ## Session Continuity
 

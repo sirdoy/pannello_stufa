@@ -1,193 +1,91 @@
 /**
  * @jest-environment node
  *
- * Integration tests for Netatmo Schedules API routes
- * Tests the integration of cache service, rate limiter, and Netatmo API
+ * Tests for GET /api/netatmo/schedules
+ * Migrated to use Netatmo proxy (getProxyHomesdata) — no legacy OAuth, cache, or rate limiter.
  */
 
-import { getCached, invalidateCache } from '@/lib/netatmoCacheService';
-import { checkNetatmoRateLimit, trackNetatmoApiCall } from '@/lib/netatmoRateLimiter';
-import NETATMO_API from '@/lib/netatmoApi';
-import { adminDbGet } from '@/lib/firebaseAdmin';
+import { GET } from '@/app/api/netatmo/schedules/route';
+import { getProxyHomesdata } from '@/lib/netatmoProxy';
+import type { NetatmoProxyHomesdataResponse } from '@/types/netatmoProxy';
 
 // Mock dependencies
-jest.mock('@/lib/netatmoCacheService');
-jest.mock('@/lib/netatmoRateLimiter');
-jest.mock('@/lib/netatmoApi');
-jest.mock('@/lib/firebaseAdmin');
+jest.mock('@/lib/netatmoProxy');
+jest.mock('@/lib/core', () => ({
+  withAuthAndErrorHandler: (fn: Function) => fn,
+  success: (data: unknown) => ({ ok: true, data }),
+  badRequest: (msg: string) => ({ ok: false, error: msg, status: 400 }),
+}));
 
-describe('GET /api/netatmo/schedules - Integration Logic', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+// GET is the inner handler (no request arg needed due to mock above)
+const callGET = () => (GET as unknown as () => Promise<unknown>)();
 
-  it('should use cache service with correct key', async () => {
-    const mockSchedules = [
-      { id: 'schedule-1', name: 'Morning', type: 'therm', selected: true },
-      { id: 'schedule-2', name: 'Evening', type: 'therm', selected: false },
-    ];
+const mockGetProxyHomesdata = getProxyHomesdata as jest.MockedFunction<typeof getProxyHomesdata>;
 
-    (getCached as jest.Mock).mockResolvedValue({
-      data: mockSchedules,
-      source: 'cache',
-      age_seconds: 120,
-    });
-
-    // Call cache service with 'schedules' key
-    const result = await getCached('schedules', async () => mockSchedules);
-
-    expect(result.data).toEqual(mockSchedules);
-    expect(result.source).toBe('cache');
-    expect((result as any).age_seconds).toBe(120);
-    expect(getCached).toHaveBeenCalledWith('schedules', expect.any(Function));
-  });
-
-  it('should check rate limit before API call', async () => {
-    const userId = 'user-123';
-
-    (checkNetatmoRateLimit as jest.Mock).mockResolvedValue({
-      allowed: true,
-      currentCount: 10,
-      remaining: 390,
-      limit: 400,
-    });
-
-    const rateCheck = await checkNetatmoRateLimit(userId);
-
-    expect(rateCheck.allowed).toBe(true);
-    expect((rateCheck as any).remaining).toBe(390);
-    expect(checkNetatmoRateLimit).toHaveBeenCalledWith(userId);
-  });
-
-  it('should track API call on cache miss', async () => {
-    const userId = 'user-456';
-
-    await trackNetatmoApiCall(userId);
-
-    expect(trackNetatmoApiCall).toHaveBeenCalledWith(userId);
-  });
-
-  it('should parse schedules from homesdata', () => {
-    const mockHomesData = [
+const mockProxyResponse: NetatmoProxyHomesdataResponse = {
+  body: {
+    homes: [
       {
+        id: 'home-1',
+        name: 'Casa Mia',
+        rooms: [],
+        modules: [],
         schedules: [
-          { id: 'schedule-1', name: 'Morning', type: 'therm', selected: true },
-          { id: 'schedule-2', name: 'Evening', type: 'therm', selected: false },
+          { id: 'schedule-1', name: 'Morning', selected: true, type: 'therm', timetable: [] },
+          { id: 'schedule-2', name: 'Evening', selected: false, type: 'therm', timetable: [] },
         ],
       },
-    ];
+    ],
+  },
+  status: 'ok',
+  time_exec: 0.1,
+  time_server: 1700000000,
+};
 
-    const mockParsedSchedules = [
-      { id: 'schedule-1', name: 'Morning', type: 'therm', selected: true },
-      { id: 'schedule-2', name: 'Evening', type: 'therm', selected: false },
-    ];
-
-    (NETATMO_API.parseSchedules as jest.Mock).mockReturnValue(mockParsedSchedules);
-
-    const result = NETATMO_API.parseSchedules(mockHomesData as any);
-
-    expect(result).toEqual(mockParsedSchedules);
-    expect(NETATMO_API.parseSchedules).toHaveBeenCalledWith(mockHomesData);
-  });
-
-  it('should return 429 details when rate limit exceeded', async () => {
-    const userId = 'user-789';
-
-    (checkNetatmoRateLimit as jest.Mock).mockResolvedValue({
-      allowed: false,
-      currentCount: 400,
-      limit: 400,
-      resetInSeconds: 1800,
-    });
-
-    const rateCheck = await checkNetatmoRateLimit(userId);
-
-    expect(rateCheck.allowed).toBe(false);
-    expect((rateCheck as any).resetInSeconds).toBe(1800);
-  });
-});
-
-describe('POST /api/netatmo/schedules - Integration Logic', () => {
+describe('GET /api/netatmo/schedules', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should call switchHomeSchedule with correct parameters', async () => {
-    const mockAccessToken = 'mock-token';
-    const mockHomeId = 'home-123';
-    const mockScheduleId = 'schedule-2';
+  it('should return schedules from proxy homesdata', async () => {
+    mockGetProxyHomesdata.mockResolvedValue(mockProxyResponse);
 
-    (NETATMO_API.switchHomeSchedule as jest.Mock).mockResolvedValue(true);
+    const result = await callGET();
 
-    const result = await NETATMO_API.switchHomeSchedule(
-      mockAccessToken,
-      mockHomeId,
-      mockScheduleId
-    );
-
-    expect(result).toBe(true);
-    expect(NETATMO_API.switchHomeSchedule).toHaveBeenCalledWith(
-      mockAccessToken,
-      mockHomeId,
-      mockScheduleId
-    );
+    expect(mockGetProxyHomesdata).toHaveBeenCalledTimes(1);
+    expect((result as any).ok).toBe(true);
+    expect((result as any).data.schedules).toHaveLength(2);
+    expect((result as any).data.schedules[0]).toMatchObject({
+      id: 'schedule-1',
+      name: 'Morning',
+      selected: true,
+    });
   });
 
-  it('should invalidate cache after successful switch', async () => {
-    (invalidateCache as jest.Mock).mockResolvedValue(true);
-
-    const result = await invalidateCache('schedules');
-
-    expect(result).toBe(true);
-    expect(invalidateCache).toHaveBeenCalledWith('schedules');
-  });
-
-  it('should check rate limit before switch', async () => {
-    const userId = 'user-switch';
-
-    (checkNetatmoRateLimit as jest.Mock).mockResolvedValue({
-      allowed: true,
-      currentCount: 5,
-      remaining: 395,
-      limit: 400,
+  it('should return empty array when proxy returns no homes', async () => {
+    mockGetProxyHomesdata.mockResolvedValue({
+      ...mockProxyResponse,
+      body: { homes: [] },
     });
 
-    const rateCheck = await checkNetatmoRateLimit(userId);
+    const result = await callGET();
 
-    expect(rateCheck.allowed).toBe(true);
-    expect((rateCheck as any).remaining).toBe(395);
+    expect((result as any).ok).toBe(true);
+    expect((result as any).data.schedules).toEqual([]);
   });
 
-  it('should track API call after switch', async () => {
-    const userId = 'user-track';
+  it('should propagate proxy ApiError', async () => {
+    const { ApiError, ERROR_CODES, HTTP_STATUS } = await import('@/lib/core/apiErrors');
+    mockGetProxyHomesdata.mockRejectedValue(
+      new ApiError(ERROR_CODES.SERVICE_UNAVAILABLE, 'Proxy unavailable', HTTP_STATUS.SERVICE_UNAVAILABLE)
+    );
 
-    await trackNetatmoApiCall(userId);
-
-    expect(trackNetatmoApiCall).toHaveBeenCalledWith(userId);
+    await expect(callGET()).rejects.toThrow('Proxy unavailable');
   });
 
-  it('should handle rate limit exceeded', async () => {
-    (checkNetatmoRateLimit as jest.Mock).mockResolvedValue({
-      allowed: false,
-      currentCount: 400,
-      limit: 400,
-      resetInSeconds: 600,
-    });
-
-    const rateCheck = await checkNetatmoRateLimit('user-blocked');
-
-    expect(rateCheck.allowed).toBe(false);
-    expect((rateCheck as any).resetInSeconds).toBe(600);
-  });
-
-  it('should retrieve home_id from Firebase', async () => {
-    const mockHomeId = 'home-456';
-
-    (adminDbGet as jest.Mock).mockResolvedValue(mockHomeId);
-
-    const homeId = await adminDbGet('dev/netatmo/home_id');
-
-    expect(homeId).toBe(mockHomeId);
-    expect(adminDbGet).toHaveBeenCalledWith('dev/netatmo/home_id');
+  it('should NOT export a POST handler', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const routeModule = await import('@/app/api/netatmo/schedules/route');
+    expect((routeModule as any).POST).toBeUndefined();
   });
 });

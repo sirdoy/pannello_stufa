@@ -136,3 +136,46 @@ export interface RFC9457ProblemDetail {
   detail: string;
   instance?: string;
 }
+
+// =============================================================================
+// CONTROL ENDPOINT TYPES
+// =============================================================================
+
+/** POST /setroomthermpoint request body */
+export interface SetRoomThermpointRequest {
+  home_id: string;
+  room_id: string;
+  mode: 'manual' | 'home';
+  temp?: number;      // Required when mode is 'manual'; range 5.0–30.0
+  endtime?: number;   // Unix timestamp when mode expires
+}
+
+/** POST /setthermmode request body */
+export interface SetThermmodeRequest {
+  home_id: string;
+  mode: 'schedule' | 'away' | 'hg';
+  endtime?: number;
+}
+
+/** POST /setthermmode response */
+export interface SetThermmodeResponse {
+  status: string;
+  confirmed_mode: string | null;  // null if read-back confirmation failed
+  netatmo_response: Record<string, unknown>;
+}
+
+/** POST /switchhomeschedule request body */
+export interface SwitchHomeScheduleRequest {
+  home_id: string;
+  schedule_id: string;
+}
+
+/**
+ * Generic proxy control response.
+ * Returned by setroomthermpoint, switchhomeschedule, synchomeschedule, createnewhomeschedule.
+ */
+export interface ProxyControlResponse {
+  status: string;
+  time_exec: number;
+  time_server: number;
+}

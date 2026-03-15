@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { CAMERA_ROUTES, NETATMO_ROUTES } from '@/lib/routes';
+import { CAMERA_ROUTES } from '@/lib/routes';
 import {
   Section,
   Grid,
@@ -17,22 +17,24 @@ import {
   EmptyState,
   Skeleton,
 } from '@/app/components/ui';
-import NETATMO_CAMERA_API, { ParsedCamera, ParsedEvent } from '@/lib/netatmoCameraApi';
+import { getCameraTypeName, getEventTypeName, getEventIcon } from '@/lib/netatmoCameraApi';
 import HlsPlayer from '@/app/components/devices/camera/HlsPlayer';
 import EventPreviewModal from '@/app/components/devices/camera/EventPreviewModal';
+import type { CameraStatus, CameraEvent, DataFreshness } from '@/types/netatmoProxy';
 
 export default function CameraDashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [needsReauth, setNeedsReauth] = useState<boolean>(false);
-  const [cameras, setCameras] = useState<ParsedCamera[]>([]);
-  const [events, setEvents] = useState<ParsedEvent[]>([]);
+  const [cameras, setCameras] = useState<CameraStatus[]>([]);
+  const [events, setEvents] = useState<CameraEvent[]>([]);
+  const [dataFreshness, setDataFreshness] = useState<DataFreshness | null>(null);
   const [selectedCameraId, setSelectedCameraId] = useState<string | null>(null);
   const [snapshotUrls, setSnapshotUrls] = useState<Record<string, string>>({});
+  const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [isLiveMode, setIsLiveMode] = useState<boolean>(false);
-  const [selectedEvent, setSelectedEvent] = useState<ParsedEvent | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<CameraEvent | null>(null);
 
   const fetchedRef = useRef<boolean>(false);
 
@@ -46,91 +48,81 @@ export default function CameraDashboard() {
     try {
       setLoading(true);
       setError(null);
-      setNeedsReauth(false);
 
-      const response = await fetch(CAMERA_ROUTES.list);
-      const data: any = await response.json();
+      // Split fetches: status + events separately
+      const [statusRes, eventsRes] = await Promise.all([
+        fetch(CAMERA_ROUTES.status),
+        fetch(CAMERA_ROUTES.allEvents),
+      ]);
 
-      // Check if needs reconnection
-      if (data.reconnect) {
-        setNeedsReauth(true);
-        setError('Richiesta autorizzazione camera');
-        return;
+      const statusData = await statusRes.json() as { cameras?: CameraStatus[]; data_freshness?: DataFreshness; error?: string };
+      const eventsData = await eventsRes.json() as { events?: CameraEvent[]; count?: number; error?: string };
+
+      if (!statusRes.ok || statusData.error) {
+        throw new Error(statusData.error ?? `Errore ${statusRes.status}`);
       }
 
-      if (data.error) {
-        // Check if error is related to invalid token or missing scopes
-        const errorLower = data.error.toLowerCase();
-        if (errorLower.includes('invalid access token') ||
-            errorLower.includes('access_denied') ||
-            errorLower.includes('insufficient scope')) {
-          setNeedsReauth(true);
-          setError('Autorizzazione videocamere mancante');
-          return;
-        }
-        throw new Error(data.error);
-      }
-
-      setCameras(data.cameras || []);
-      setEvents(data.events || []);
+      setCameras(statusData.cameras ?? []);
+      setDataFreshness(statusData.data_freshness ?? null);
+      setEvents(eventsData.events ?? []);
 
       // Fetch snapshots for all cameras
       const urls: Record<string, string> = {};
-      for (const camera of data.cameras || []) {
+      for (const camera of statusData.cameras ?? []) {
         try {
-          const snapRes = await fetch(CAMERA_ROUTES.snapshot(camera.id));
-          const snapData = await snapRes.json();
+          const snapRes = await fetch(CAMERA_ROUTES.snapshot(camera.camera_id));
+          const snapData = await snapRes.json() as { snapshot_url?: string };
           if (snapData.snapshot_url) {
-            urls[camera.id] = snapData.snapshot_url;
+            urls[camera.camera_id] = snapData.snapshot_url;
           }
         } catch (e) {
-          console.error(`Error fetching snapshot for ${camera.id}:`, e);
+          console.error(`Error fetching snapshot for ${camera.camera_id}:`, e);
         }
       }
       setSnapshotUrls(urls);
 
-      if (data.cameras?.length > 0 && !selectedCameraId) {
-        setSelectedCameraId(data.cameras[0].id);
+      const firstCamera = statusData.cameras?.[0];
+      if (firstCamera && !selectedCameraId) {
+        setSelectedCameraId(firstCamera.camera_id);
       }
     } catch (err) {
       console.error('Error fetching camera data:', err);
-      // Also check thrown errors for token issues
-      const errorMsg = err instanceof Error ? err.message.toLowerCase() : String(err).toLowerCase();
-      if (errorMsg.includes('invalid access token') ||
-          errorMsg.includes('access_denied') ||
-          errorMsg.includes('insufficient scope')) {
-        setNeedsReauth(true);
-        setError('Autorizzazione videocamere mancante');
-      } else {
-        setError(err instanceof Error ? err.message : String(err));
-      }
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function fetchStreamUrl(cameraId: string) {
+    try {
+      const response = await fetch(CAMERA_ROUTES.stream(cameraId));
+      const data = await response.json() as { vpn_streams?: { high: string }; is_local?: boolean; local_streams?: { high: string } };
+      if (data.is_local && data.local_streams?.high) {
+        setStreamUrl(data.local_streams.high);
+      } else if (data.vpn_streams?.high) {
+        setStreamUrl(data.vpn_streams.high);
+      }
+    } catch (err) {
+      console.error('Error fetching stream URL:', err);
     }
   }
 
   async function handleRefresh() {
     setRefreshing(true);
     fetchedRef.current = false;
+    setStreamUrl(null);
     await fetchData();
     setRefreshing(false);
   }
 
-  async function handleReauthorize() {
-    try {
-      setLoading(true);
-      // Disconnect first to clear old token without camera scopes
-      await fetch(NETATMO_ROUTES.disconnect, { method: 'POST' });
-      // Redirect to netatmo to reconnect with new scopes (including camera)
-      router.push('/netatmo');
-    } catch (err) {
-      console.error('Errore disconnessione:', err);
-      setError('Errore durante la disconnessione');
-      setLoading(false);
+  function handleEnterLiveMode() {
+    if (selectedCameraId) {
+      setIsLiveMode(true);
+      fetchStreamUrl(selectedCameraId);
     }
   }
 
-  const selectedCamera = cameras.find(c => c.id === selectedCameraId);
+  const selectedCamera = cameras.find(c => c.camera_id === selectedCameraId);
   const cameraEvents = selectedCameraId
     ? events.filter(e => e.camera_id === selectedCameraId)
     : events;
@@ -142,29 +134,6 @@ export default function CameraDashboard() {
           <Skeleton.Card className="min-h-[400px]" />
           <Skeleton.Card className="min-h-[400px]" />
         </Grid>
-      </Section>
-    );
-  }
-
-  // Needs re-authorization - token exists but missing camera scopes
-  if (needsReauth) {
-    return (
-      <Section title="Videocamere" spacing="lg" level={1}>
-        <Card>
-          <CardContent className="py-8">
-            <div className="text-center">
-              <span className="text-5xl mb-4 block">📹</span>
-              <Heading level={2} className="mb-2">Autorizzazione richiesta</Heading>
-              <Text variant="secondary" className="mb-6 max-w-md mx-auto">
-                L'accesso alle videocamere richiede una nuova autorizzazione con i permessi aggiornati.
-                Clicca il pulsante per riautorizzare Netatmo.
-              </Text>
-              <Button variant="ember" onClick={handleReauthorize}>
-                Riautorizza Netatmo
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
       </Section>
     );
   }
@@ -190,16 +159,13 @@ export default function CameraDashboard() {
         <EmptyState
           icon="📹"
           title="Nessuna videocamera trovata"
-          description="Non sono state trovate videocamere Netatmo nel tuo account. Assicurati di aver autorizzato l'accesso alle videocamere."
+          description="Non sono state trovate videocamere Netatmo nel tuo account."
         />
-        <div className="text-center mt-4">
-          <Button variant="ember" onClick={handleReauthorize}>
-            Riautorizza Netatmo
-          </Button>
-        </div>
       </Section>
     );
   }
+
+  const isStale = dataFreshness === 'UNREACHABLE';
 
   return (
     <Section
@@ -227,6 +193,15 @@ export default function CameraDashboard() {
         </div>
       }
     >
+      {/* Staleness banner */}
+      {isStale && (
+        <Banner
+          variant="warning"
+          title="Dati non aggiornati"
+          description="La videocamera potrebbe essere offline. I dati mostrati potrebbero non essere recenti."
+        />
+      )}
+
       <Grid cols={2} gap="lg">
         {/* Camera list */}
         <Card>
@@ -236,21 +211,21 @@ export default function CameraDashboard() {
           <CardContent className="space-y-4">
             {cameras.map(camera => (
               <div
-                key={camera.id}
+                key={camera.camera_id}
                 className={`p-4 rounded-xl cursor-pointer transition-all duration-200 ${
-                  selectedCameraId === camera.id
+                  selectedCameraId === camera.camera_id
                     ? 'bg-ocean-500/20 border-2 border-ocean-500 [html:not(.dark)_&]:bg-ocean-100 [html:not(.dark)_&]:border-ocean-400'
                     : 'bg-slate-800/50 hover:bg-slate-700/50 border-2 border-transparent [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:hover:bg-slate-200'
                 }`}
-                onClick={() => setSelectedCameraId(camera.id)}
+                onClick={() => setSelectedCameraId(camera.camera_id)}
               >
                 <div className="flex items-center gap-4">
                   {/* Snapshot thumbnail */}
                   <div className="w-24 h-16 rounded-lg overflow-hidden bg-slate-700 [html:not(.dark)_&]:bg-slate-200 flex-shrink-0">
-                    {snapshotUrls[camera.id] ? (
+                    {snapshotUrls[camera.camera_id] ? (
                       <img
-                        src={snapshotUrls[camera.id]}
-                        alt={camera.name}
+                        src={snapshotUrls[camera.camera_id]}
+                        alt={camera.name ?? camera.camera_id}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -261,9 +236,9 @@ export default function CameraDashboard() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <Heading level={3} size="md" className="truncate">{camera.name}</Heading>
+                    <Heading level={3} size="md" className="truncate">{camera.name ?? camera.camera_id}</Heading>
                     <Text variant="tertiary" size="sm">
-                      {NETATMO_CAMERA_API.getCameraTypeName(camera.type)}
+                      {getCameraTypeName(camera.device_type ?? '')}
                     </Text>
                     <div className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium ${
                       camera.status === 'on'
@@ -283,11 +258,11 @@ export default function CameraDashboard() {
         {selectedCamera && (
           <Card>
             <CardHeader>
-              <CardTitle icon="🎥" level={2}>{selectedCamera.name}</CardTitle>
+              <CardTitle icon="🎥" level={2}>{selectedCamera.name ?? selectedCamera.camera_id}</CardTitle>
             </CardHeader>
             <CardContent>
               {/* Video/Snapshot toggle */}
-              {selectedCamera.status === 'on' && (
+              {selectedCamera.status === 'on' && !isStale && (
                 <div className="flex gap-2 mb-4">
                   <Button
                     variant={!isLiveMode ? 'ember' : 'subtle'}
@@ -299,7 +274,7 @@ export default function CameraDashboard() {
                   <Button
                     variant={isLiveMode ? 'ember' : 'subtle'}
                     size="sm"
-                    onClick={() => setIsLiveMode(true)}
+                    onClick={handleEnterLiveMode}
                   >
                     Live
                   </Button>
@@ -308,17 +283,17 @@ export default function CameraDashboard() {
 
               {/* Video preview */}
               <div className="aspect-video bg-slate-800 [html:not(.dark)_&]:bg-slate-200 rounded-xl overflow-hidden mb-4 relative">
-                {isLiveMode && selectedCamera.status === 'on' ? (
+                {isLiveMode && selectedCamera.status === 'on' && streamUrl ? (
                   <HlsPlayer
-                    src={NETATMO_CAMERA_API.getLiveStreamUrl(selectedCamera) ?? ''}
-                    poster={snapshotUrls[selectedCamera.id] ?? ''}
+                    src={streamUrl}
+                    poster={snapshotUrls[selectedCamera.camera_id] ?? ''}
                     className="w-full h-full"
                     onError={() => setIsLiveMode(false)}
                   />
-                ) : snapshotUrls[selectedCamera.id] ? (
+                ) : snapshotUrls[selectedCamera.camera_id] ? (
                   <img
-                    src={snapshotUrls[selectedCamera.id]}
-                    alt={selectedCamera.name}
+                    src={snapshotUrls[selectedCamera.camera_id]}
+                    alt={selectedCamera.name ?? selectedCamera.camera_id}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -345,7 +320,7 @@ export default function CameraDashboard() {
                 <div className="p-3 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-100 rounded-lg">
                   <Text variant="label" size="xs">Tipo</Text>
                   <Text variant="body" size="sm" className="mt-1">
-                    {NETATMO_CAMERA_API.getCameraTypeName(selectedCamera.type)}
+                    {getCameraTypeName(selectedCamera.device_type ?? '')}
                   </Text>
                 </div>
                 <div className="p-3 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-100 rounded-lg">
@@ -362,79 +337,55 @@ export default function CameraDashboard() {
                     </Text>
                   </div>
                 )}
-                {selectedCamera.light_mode_status && (
-                  <div className="p-3 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-100 rounded-lg">
-                    <Text variant="label" size="xs">Luce</Text>
-                    <Text variant="body" size="sm" className="mt-1">
-                      {selectedCamera.light_mode_status === 'on' ? 'Accesa' :
-                       selectedCamera.light_mode_status === 'auto' ? 'Auto' : 'Spenta'}
-                    </Text>
-                  </div>
-                )}
               </div>
 
               {/* Recent events for this camera */}
               <Heading level={3} size="sm" className="mb-3">Eventi recenti</Heading>
               {cameraEvents.length > 0 ? (
                 <div className="space-y-2 max-h-80 overflow-y-auto">
-                  {cameraEvents.slice(0, 10).map(event => {
-                    // Use snapshot URL for preview
-                    const snapshotUrl = NETATMO_CAMERA_API.getEventSnapshotUrl(event);
-                    const hasVideo = event.video_id && event.video_status !== 'deleted';
-
-                    return (
-                      <button
-                        key={event.id}
-                        onClick={() => setSelectedEvent(event)}
-                        className="w-full flex items-center gap-3 p-2 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-100 rounded-lg hover:bg-slate-700/50 [html:not(.dark)_&]:hover:bg-slate-200 transition-colors cursor-pointer text-left"
-                      >
-                        {/* Snapshot preview */}
-                        <div className="relative w-20 h-12 rounded-md overflow-hidden bg-slate-700 [html:not(.dark)_&]:bg-slate-200 flex-shrink-0">
-                          {snapshotUrl ? (
-                            <img
-                              src={snapshotUrl}
-                              alt={NETATMO_CAMERA_API.getEventTypeName(event.type)}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.style.display = 'none';
-                                (target.nextSibling as HTMLElement).style.display = 'flex';
-                              }}
-                            />
-                          ) : null}
-                          <div className={`absolute inset-0 items-center justify-center ${snapshotUrl ? 'hidden' : 'flex'}`}>
-                            <span className="text-lg opacity-60">
-                              {NETATMO_CAMERA_API.getEventIcon(event.type)}
-                            </span>
-                          </div>
-                          {/* Play overlay if video available */}
-                          {hasVideo && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                              <div className="w-6 h-6 rounded-full bg-white/90 flex items-center justify-center">
-                                <svg className="w-3 h-3 text-slate-900 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M8 5v14l11-7z" />
-                                </svg>
-                              </div>
-                            </div>
-                          )}
+                  {cameraEvents.slice(0, 10).map(event => (
+                    <button
+                      key={event.event_id}
+                      onClick={() => setSelectedEvent(event)}
+                      className="w-full flex items-center gap-3 p-2 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-100 rounded-lg hover:bg-slate-700/50 [html:not(.dark)_&]:hover:bg-slate-200 transition-colors cursor-pointer text-left"
+                    >
+                      {/* Snapshot preview */}
+                      <div className="relative w-20 h-12 rounded-md overflow-hidden bg-slate-700 [html:not(.dark)_&]:bg-slate-200 flex-shrink-0">
+                        {event.snapshot_url ? (
+                          <img
+                            src={event.snapshot_url}
+                            alt={getEventTypeName(event.event_type)}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const sibling = target.nextSibling as HTMLElement | null;
+                              if (sibling) sibling.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div className={`absolute inset-0 items-center justify-center ${event.snapshot_url ? 'hidden' : 'flex'}`}>
+                          <span className="text-lg opacity-60">
+                            {getEventIcon(event.event_type)}
+                          </span>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <Text variant="body" size="sm">
-                            {NETATMO_CAMERA_API.getEventTypeName(event.type)}
-                          </Text>
-                          <Text variant="tertiary" size="xs">
-                            {new Date(event.time * 1000).toLocaleString('it-IT', {
-                              weekday: 'short',
-                              day: '2-digit',
-                              month: 'short',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </Text>
-                        </div>
-                      </button>
-                    );
-                  })}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <Text variant="body" size="sm">
+                          {getEventTypeName(event.event_type)}
+                        </Text>
+                        <Text variant="tertiary" size="xs">
+                          {new Date(event.timestamp * 1000).toLocaleString('it-IT', {
+                            weekday: 'short',
+                            day: '2-digit',
+                            month: 'short',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </Text>
+                      </div>
+                    </button>
+                  ))}
                 </div>
               ) : (
                 <div className="text-center py-6">
@@ -447,10 +398,9 @@ export default function CameraDashboard() {
       </Grid>
 
       {/* Event preview modal */}
-      {selectedEvent && selectedCamera && (
+      {selectedEvent && (
         <EventPreviewModal
           event={selectedEvent}
-          camera={selectedCamera}
           onClose={() => setSelectedEvent(null)}
         />
       )}

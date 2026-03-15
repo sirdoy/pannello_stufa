@@ -3,24 +3,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { RefreshCw } from 'lucide-react';
-import { CAMERA_ROUTES, NETATMO_ROUTES } from '@/lib/routes';
+import { CAMERA_ROUTES } from '@/lib/routes';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
 import { Text, Button } from '../../ui';
-import NETATMO_CAMERA_API from '@/lib/netatmoCameraApi';
+import { getCameraTypeName } from '@/lib/netatmoCameraApi';
 import HlsPlayer from './HlsPlayer';
-
-interface NetatmoCamera {
-  id: string;
-  name: string;
-  status: 'on' | 'off';
-  type: string;
-  is_local?: boolean;
-  home_id?: string;
-  home_name?: string;
-  vpn_url?: string;
-  [key: string]: any;
-}
+import type { CameraStatus, DataFreshness } from '@/types/netatmoProxy';
 
 /**
  * CameraCard - Camera summary view for homepage
@@ -31,14 +20,15 @@ export default function CameraCard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [connected, setConnected] = useState(false);
-  const [needsReauth, setNeedsReauth] = useState(false); // Token exists but missing camera scopes
-  const [cameras, setCameras] = useState<NetatmoCamera[]>([]);
+  const [cameras, setCameras] = useState<CameraStatus[]>([]);
+  const [dataFreshness, setDataFreshness] = useState<DataFreshness | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedCameraId, setSelectedCameraId] = useState<string | null>(null);
   const [snapshotUrl, setSnapshotUrl] = useState<string | null>(null);
   const [snapshotLoading, setSnapshotLoading] = useState(false);
   const [snapshotError, setSnapshotError] = useState(false);
   const [isLiveMode, setIsLiveMode] = useState(false);
+  const [streamUrl, setStreamUrl] = useState<string | null>(null);
 
   const connectionCheckedRef = useRef(false);
 
@@ -54,7 +44,7 @@ export default function CameraCard() {
   useEffect(() => {
     const firstCamera = cameras[0];
     if (cameras.length > 0 && !selectedCameraId && firstCamera) {
-      setSelectedCameraId(firstCamera.id);
+      setSelectedCameraId(firstCamera.camera_id);
     }
   }, [cameras, selectedCameraId]);
 
@@ -72,60 +62,32 @@ export default function CameraCard() {
     try {
       setLoading(true);
       setError(null);
-      setNeedsReauth(false);
 
-      const response = await fetch(CAMERA_ROUTES.list);
-      const data = await response.json();
+      const response = await fetch(CAMERA_ROUTES.status);
+      const data = await response.json() as { cameras?: CameraStatus[]; data_freshness?: DataFreshness | null; error?: string };
 
-      if (data.reconnect) {
-        // Token issue - retry once in case token was just refreshed
+      if (!response.ok || data.error) {
+        // Retry on server errors
         if (retryCount < MAX_RETRIES) {
           await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
           return fetchCameras(retryCount + 1);
         }
         setConnected(false);
-        setNeedsReauth(false);
-        setError('Richiesta autorizzazione camera');
+        setError(data.error ?? `Errore ${response.status}`);
         return;
       }
 
-      if (data.error) {
-        // Check if error is related to invalid token or missing scopes
-        const errorLower = data.error.toLowerCase();
-        if (errorLower.includes('invalid access token') ||
-            errorLower.includes('access_denied') ||
-            errorLower.includes('insufficient scope')) {
-          // Token exists but doesn't have camera permissions - no retry needed
-          setConnected(false);
-          setNeedsReauth(true);
-          setError('Autorizzazione videocamere mancante');
-          return;
-        }
-        throw new Error(data.error);
-      }
-
       setConnected(true);
-      setNeedsReauth(false);
-      setCameras(data.cameras || []);
+      setCameras(data.cameras ?? []);
+      setDataFreshness(data.data_freshness ?? null);
     } catch (err) {
       console.error('Errore fetch cameras:', err);
-      // Also check thrown errors for token issues
-      const errorMsg = err instanceof Error ? err.message.toLowerCase() : String(err).toLowerCase();
-      if (errorMsg.includes('invalid access token') ||
-          errorMsg.includes('access_denied') ||
-          errorMsg.includes('insufficient scope')) {
-        setNeedsReauth(true);
-        setError('Autorizzazione videocamere mancante');
-        setConnected(false);
-      } else {
-        // Retry on network errors
-        if (retryCount < MAX_RETRIES) {
-          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
-          return fetchCameras(retryCount + 1);
-        }
-        setError(err instanceof Error ? err.message : String(err));
-        setConnected(false);
+      if (retryCount < MAX_RETRIES) {
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+        return fetchCameras(retryCount + 1);
       }
+      setError(err instanceof Error ? err.message : String(err));
+      setConnected(false);
     } finally {
       setLoading(false);
     }
@@ -136,7 +98,7 @@ export default function CameraCard() {
       setSnapshotLoading(true);
       setSnapshotError(false);
       const response = await fetch(CAMERA_ROUTES.snapshot(cameraId));
-      const data = await response.json();
+      const data = await response.json() as { snapshot_url?: string };
 
       if (data.snapshot_url) {
         setSnapshotUrl(data.snapshot_url);
@@ -151,6 +113,20 @@ export default function CameraCard() {
     }
   }
 
+  async function fetchStreamUrl(cameraId: string) {
+    try {
+      const response = await fetch(CAMERA_ROUTES.stream(cameraId));
+      const data = await response.json() as { vpn_streams?: { high: string }; is_local?: boolean; local_streams?: { high: string } };
+      if (data.is_local && data.local_streams?.high) {
+        setStreamUrl(data.local_streams.high);
+      } else if (data.vpn_streams?.high) {
+        setStreamUrl(data.vpn_streams.high);
+      }
+    } catch (err) {
+      console.error('Errore fetch stream URL:', err);
+    }
+  }
+
   async function handleRefresh() {
     setRefreshing(true);
     connectionCheckedRef.current = false;
@@ -161,12 +137,21 @@ export default function CameraCard() {
     setRefreshing(false);
   }
 
-  const selectedCamera = cameras.find(c => c.id === selectedCameraId);
+  function handleEnterLiveMode() {
+    if (selectedCameraId) {
+      setIsLiveMode(true);
+      fetchStreamUrl(selectedCameraId);
+    }
+  }
+
+  const selectedCamera = cameras.find(c => c.camera_id === selectedCameraId);
+  const isStale = dataFreshness === 'UNREACHABLE';
 
   // Get status badge based on camera state
   const getStatusBadge = () => {
     if (!connected) return { label: 'Non connesso', color: 'neutral' };
     if (cameras.length === 0) return { label: 'Nessuna camera', color: 'neutral' };
+    if (isStale) return { label: 'Dati non aggiornati', color: 'warning' };
     if (selectedCamera?.status === 'on') return { label: 'Attiva', color: 'sage' };
     return { label: 'Inattiva', color: 'warning' };
   };
@@ -176,36 +161,7 @@ export default function CameraCard() {
     return <Skeleton.CameraCard />;
   }
 
-  // Needs re-authorization - token exists but missing camera scopes
-  if (needsReauth) {
-    const handleReauthorize = async () => {
-      try {
-        setLoading(true);
-        // Disconnect first to clear old token without camera scopes
-        await fetch(NETATMO_ROUTES.disconnect, { method: 'POST' });
-        // Redirect to netatmo to reconnect with new scopes (including camera)
-        router.push('/netatmo');
-      } catch (err) {
-        console.error('Errore disconnessione:', err);
-        setError('Errore durante la disconnessione');
-        setLoading(false);
-      }
-    };
-
-    return (
-      <DeviceCard
-        icon="📹"
-        title="Videocamera"
-        colorTheme="ocean"
-        connected={false}
-        connectionError="L'accesso alle videocamere richiede una nuova autorizzazione con i permessi aggiornati."
-        onConnect={handleReauthorize}
-        connectButtonLabel="Riautorizza Netatmo"
-      />
-    );
-  }
-
-  // Not connected state - redirect to netatmo for OAuth
+  // Error state - standard error card with retry
   if (!connected) {
     return (
       <DeviceCard
@@ -213,9 +169,12 @@ export default function CameraCard() {
         title="Videocamera"
         colorTheme="ocean"
         connected={false}
-        connectionError="Collega il tuo account Netatmo per visualizzare le videocamere."
-        onConnect={() => router.push('/netatmo')}
-        connectButtonLabel="Connetti Netatmo"
+        connectionError={error ?? 'Errore di connessione alle videocamere.'}
+        onConnect={() => {
+          connectionCheckedRef.current = false;
+          void fetchCameras();
+        }}
+        connectButtonLabel="Riprova"
       />
     );
   }
@@ -258,25 +217,32 @@ export default function CameraCard() {
         },
       ]}
     >
+      {/* Staleness banner */}
+      {isStale && (
+        <div className="mb-3 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs">
+          Dati non aggiornati — la videocamera potrebbe essere offline
+        </div>
+      )}
+
       {/* Camera selector if multiple */}
       {cameras.length > 1 && (
         <div className="flex gap-2 mb-4 overflow-x-auto pb-2 -mx-2 px-2">
           {cameras.map(camera => (
             <Button
-              key={camera.id}
-              variant={selectedCameraId === camera.id ? 'ember' : 'subtle'}
+              key={camera.camera_id}
+              variant={selectedCameraId === camera.camera_id ? 'ember' : 'subtle'}
               size="sm"
-              onClick={() => setSelectedCameraId(camera.id)}
+              onClick={() => setSelectedCameraId(camera.camera_id)}
               className="whitespace-nowrap"
             >
-              {camera.name}
+              {camera.name ?? camera.camera_id}
             </Button>
           ))}
         </div>
       )}
 
       {/* Video/Snapshot toggle */}
-      {selectedCamera?.status === 'on' && (
+      {selectedCamera?.status === 'on' && !isStale && (
         <div className="flex gap-2 mb-3">
           <Button
             variant={!isLiveMode ? 'ember' : 'subtle'}
@@ -288,7 +254,7 @@ export default function CameraCard() {
           <Button
             variant={isLiveMode ? 'ember' : 'subtle'}
             size="sm"
-            onClick={() => setIsLiveMode(true)}
+            onClick={handleEnterLiveMode}
           >
             Live
           </Button>
@@ -297,10 +263,10 @@ export default function CameraCard() {
 
       {/* Video preview */}
       <div className="relative aspect-video bg-slate-800 rounded-xl overflow-hidden mb-4">
-        {isLiveMode && selectedCamera?.status === 'on' ? (
+        {isLiveMode && selectedCamera?.status === 'on' && streamUrl ? (
           // Live video mode
           <HlsPlayer
-            src={NETATMO_CAMERA_API.getLiveStreamUrl(selectedCamera as any) || ''}
+            src={streamUrl}
             poster={snapshotUrl ?? undefined}
             className="w-full h-full"
             onError={() => {
@@ -320,7 +286,7 @@ export default function CameraCard() {
             ) : snapshotUrl && !snapshotError ? (
               <img
                 src={snapshotUrl}
-                alt={`Snapshot ${selectedCamera?.name}`}
+                alt={`Snapshot ${selectedCamera?.name ?? ''}`}
                 className="w-full h-full object-cover"
                 onError={() => setSnapshotError(true)}
               />
@@ -363,7 +329,7 @@ export default function CameraCard() {
       {selectedCamera && (
         <div className="flex items-center gap-2 text-sm">
           <Text variant="tertiary">
-            {NETATMO_CAMERA_API.getCameraTypeName(selectedCamera.type)}
+            {getCameraTypeName(selectedCamera.device_type ?? '')}
           </Text>
         </div>
       )}

@@ -15,17 +15,18 @@ import {
   EmptyState,
   Skeleton,
 } from '@/app/components/ui';
-import NETATMO_CAMERA_API, { ParsedCamera, ParsedEvent } from '@/lib/netatmoCameraApi';
+import { getEventTypeName, getEventIcon } from '@/lib/netatmoCameraApi';
 import EventPreviewModal from '@/app/components/devices/camera/EventPreviewModal';
+import type { CameraStatus, CameraEvent } from '@/types/netatmoProxy';
 
-export default function ParsedEventsPage() {
+export default function CameraEventsPage() {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [cameras, setCameras] = useState<ParsedCamera[]>([]);
-  const [events, setEvents] = useState<ParsedEvent[]>([]);
+  const [cameras, setCameras] = useState<CameraStatus[]>([]);
+  const [events, setEvents] = useState<CameraEvent[]>([]);
   const [selectedCameraId, setSelectedCameraId] = useState<string>('all');
-  const [selectedEvent, setSelectedEvent] = useState<ParsedEvent | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<CameraEvent | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [totalEvents, setTotalEvents] = useState<number>(0);
   const [displayCount, setDisplayCount] = useState<number>(20);
@@ -45,18 +46,23 @@ export default function ParsedEventsPage() {
       setLoading(true);
       setError(null);
 
-      // Fetch all events at once (API returns up to ~200)
-      const response = await fetch(CAMERA_ROUTES.allEvents);
-      const data: any = await response.json();
+      // Fetch events and camera list in parallel
+      const [eventsRes, statusRes] = await Promise.all([
+        fetch(CAMERA_ROUTES.allEvents),
+        fetch(CAMERA_ROUTES.status),
+      ]);
 
-      if (data.reconnect || data.error) {
-        throw new Error(data.error || 'Autorizzazione richiesta');
+      const eventsData = await eventsRes.json() as { events?: CameraEvent[]; count?: number; error?: string };
+      const statusData = await statusRes.json() as { cameras?: CameraStatus[]; error?: string };
+
+      if (!eventsRes.ok || eventsData.error) {
+        throw new Error(eventsData.error ?? `Errore ${eventsRes.status}`);
       }
 
-      setCameras(data.cameras || []);
-      setEvents(data.events || []);
-      setTotalEvents(data.total || 0);
-      setDisplayCount(20); // Reset to initial display count
+      setCameras(statusData.cameras ?? []);
+      setEvents(eventsData.events ?? []);
+      setTotalEvents(eventsData.count ?? eventsData.events?.length ?? 0);
+      setDisplayCount(20);
     } catch (err) {
       console.error('Error fetching camera events:', err);
       setError(err instanceof Error ? err.message : 'Errore sconosciuto');
@@ -73,7 +79,7 @@ export default function ParsedEventsPage() {
   // Filter events by selected camera
   const filteredEvents = selectedCameraId === 'all'
     ? events
-    : events.filter((e: ParsedEvent) => e.camera_id === selectedCameraId);
+    : events.filter((e: CameraEvent) => e.camera_id === selectedCameraId);
 
   // Check if there are more events to show
   const hasMore = displayCount < filteredEvents.length;
@@ -116,8 +122,8 @@ export default function ParsedEventsPage() {
   // Events to display (limited by displayCount for virtual scrolling)
   const displayedEvents = filteredEvents.slice(0, displayCount);
 
-  // Get camera for an event
-  const getCameraForEvent = (event: ParsedEvent) => cameras.find(c => c.id === event.camera_id);
+  // Get camera name for an event
+  const getCameraName = (event: CameraEvent) => cameras.find(c => c.camera_id === event.camera_id)?.name ?? null;
 
   // Strip HTML tags from message
   const stripHtml = (html: string) => {
@@ -126,10 +132,10 @@ export default function ParsedEventsPage() {
   };
 
   // Group events by date
-  const groupEventsByDate = (events: ParsedEvent[]): Record<string, ParsedEvent[]> => {
-    const groups: Record<string, ParsedEvent[]> = {};
-    events.forEach(event => {
-      const date = new Date(event.time * 1000).toLocaleDateString('it-IT', {
+  const groupEventsByDate = (evts: CameraEvent[]): Record<string, CameraEvent[]> => {
+    const groups: Record<string, CameraEvent[]> = {};
+    evts.forEach(event => {
+      const date = new Date(event.timestamp * 1000).toLocaleDateString('it-IT', {
         weekday: 'long',
         day: '2-digit',
         month: 'long',
@@ -240,16 +246,16 @@ export default function ParsedEventsPage() {
           </Button>
           {cameras.map(camera => (
             <Button
-              key={camera.id}
-              variant={selectedCameraId === camera.id ? 'ember' : 'subtle'}
+              key={camera.camera_id}
+              variant={selectedCameraId === camera.camera_id ? 'ember' : 'subtle'}
               size="sm"
               onClick={() => {
-                setSelectedCameraId(camera.id);
+                setSelectedCameraId(camera.camera_id);
                 setDisplayCount(20);
               }}
               className="whitespace-nowrap"
             >
-              {camera.name}
+              {camera.name ?? camera.camera_id}
             </Button>
           ))}
         </div>
@@ -270,63 +276,45 @@ export default function ParsedEventsPage() {
             <CardContent>
               <div className="space-y-2">
                 {dateEvents.map(event => {
-                  const camera = getCameraForEvent(event);
-                  // Prefer snapshot URL for preview (more reliable)
-                  const snapshotUrl = NETATMO_CAMERA_API.getEventSnapshotUrl(event);
-                  const hasVideo = event.video_id && event.video_status !== 'deleted';
+                  const cameraName = getCameraName(event);
 
                   return (
                     <button
-                      key={event.id}
+                      key={event.event_id}
                       onClick={() => setSelectedEvent(event)}
                       className="w-full flex items-center gap-4 p-3 rounded-xl bg-slate-800/50 [html:not(.dark)_&]:bg-slate-100 hover:bg-slate-700/50 [html:not(.dark)_&]:hover:bg-slate-200 hover:ring-2 hover:ring-ocean-500 transition-all text-left group"
                     >
                       {/* Snapshot preview */}
                       <div className="relative w-32 h-20 sm:w-40 sm:h-24 rounded-lg overflow-hidden bg-slate-900 [html:not(.dark)_&]:bg-slate-200 flex-shrink-0">
-                        {snapshotUrl ? (
+                        {event.snapshot_url ? (
                           <img
-                            src={snapshotUrl}
-                            alt={NETATMO_CAMERA_API.getEventTypeName(event.type)}
+                            src={event.snapshot_url}
+                            alt={getEventTypeName(event.event_type)}
                             className="w-full h-full object-cover"
                             onError={(e) => {
                               (e.target as HTMLImageElement).style.display = 'none';
                             }}
                           />
                         ) : null}
-                        <div className={`absolute inset-0 flex items-center justify-center ${snapshotUrl ? 'opacity-0' : ''}`}>
+                        <div className={`absolute inset-0 flex items-center justify-center ${event.snapshot_url ? 'opacity-0' : ''}`}>
                           <span className="text-2xl opacity-60">
-                            {NETATMO_CAMERA_API.getEventIcon(event.type)}
+                            {getEventIcon(event.event_type)}
                           </span>
                         </div>
-
-                        {/* Play overlay - only for events with video */}
-                        {hasVideo && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
-                            <div className="w-10 h-10 rounded-full bg-white/90 group-hover:bg-white flex items-center justify-center shadow-lg transition-all group-hover:scale-110">
-                              <svg className="w-5 h-5 text-slate-900 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M8 5v14l11-7z" />
-                              </svg>
-                            </div>
-                          </div>
-                        )}
                       </div>
 
                       {/* Event info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-lg">
-                            {event.sub_type
-                              ? NETATMO_CAMERA_API.getSubTypeIcon(event.sub_type)
-                              : NETATMO_CAMERA_API.getEventIcon(event.type)}
+                            {getEventIcon(event.event_type)}
                           </span>
                           <Text variant="body">
-                            {event.sub_type
-                              ? NETATMO_CAMERA_API.getSubTypeName(event.sub_type)
-                              : NETATMO_CAMERA_API.getEventTypeName(event.type)}
+                            {getEventTypeName(event.event_type)}
                           </Text>
                         </div>
 
-                        {/* Event message from Netatmo (if available) */}
+                        {/* Event message (if available) */}
                         {event.message && (
                           <Text variant="secondary" size="sm" className="line-clamp-2">
                             {stripHtml(event.message)}
@@ -335,19 +323,14 @@ export default function ParsedEventsPage() {
 
                         <div className="flex items-center gap-3 mt-1 flex-wrap">
                           <Text variant="tertiary" size="xs">
-                            🕐 {new Date(event.time * 1000).toLocaleTimeString('it-IT', {
+                            🕐 {new Date(event.timestamp * 1000).toLocaleTimeString('it-IT', {
                               hour: '2-digit',
                               minute: '2-digit',
                             })}
                           </Text>
-                          {cameras.length > 1 && camera && (
+                          {cameras.length > 1 && cameraName && (
                             <Text variant="tertiary" size="xs">
-                              📹 {camera.name}
-                            </Text>
-                          )}
-                          {hasVideo && (
-                            <Text variant="sage" size="xs">
-                              🎬 Video
+                              📹 {cameraName}
                             </Text>
                           )}
                         </div>
@@ -374,7 +357,6 @@ export default function ParsedEventsPage() {
       {selectedEvent && (
         <EventPreviewModal
           event={selectedEvent}
-          camera={getCameraForEvent(selectedEvent) ?? null}
           onClose={() => setSelectedEvent(null)}
         />
       )}

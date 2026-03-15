@@ -100,7 +100,7 @@ Plans:
   4. Camera events list loads from proxy `/camera/events` (SQLite-backed, 7-day retention)
   5. User can toggle camera monitoring on/off via proxy `/camera/{id}/monitoring`
   6. Event snapshot binary loads from proxy `/camera/events/{id}/snapshot`
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 Plans:
 - [ ] 77-01-PLAN.md — Camera proxy types + convenience wrappers + tests
 - [ ] 77-02-PLAN.md — Create/migrate all 6 camera API routes + update CAMERA_ROUTES
@@ -147,7 +147,7 @@ Plans:
 | 70-74 | v9.0 | 8/8 | ✓ Complete | 2026-02-19 |
 | 75. API Client Foundation + Energy Read | 2/2 | Complete    | 2026-03-15 | - |
 | 76. Energy Control Endpoints | 4/4 | Complete    | 2026-03-15 | - |
-| 77. Camera Migration | 1/3 | In Progress|  | - |
+| 77. Camera Migration | 2/3 | In Progress|  | - |
 | 78. Valve + Health | v10.0 | 0/TBD | Not started | - |
 | 79. Cleanup | v10.0 | 0/TBD | Not started | - |
 

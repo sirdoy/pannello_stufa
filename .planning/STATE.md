@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v10.0
 milestone_name: Netatmo API Migration
 status: executing
-stopped_at: Completed 77-01-PLAN.md
-last_updated: "2026-03-15T12:30:04.721Z"
+stopped_at: Completed 77-02-PLAN.md
+last_updated: "2026-03-15T12:38:50.893Z"
 last_activity: 2026-03-15 — 75-01 Netatmo proxy client + types complete
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
   percent: 5
 ---
 
@@ -52,6 +52,7 @@ Progress: [█░░░░░░░░░] 5% (v10.0)
 | Phase 76-energy-control-endpoints P03 | 5 | 2 tasks | 6 files |
 | Phase 76 P02 | 347 | 2 tasks | 6 files |
 | Phase 77-camera-migration P01 | 213 | 2 tasks | 3 files |
+| Phase 77-camera-migration P02 | 10 | 1 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,9 @@ See PROJECT.md Key Decisions table for full history. Relevant to v10.0:
 - [Phase 76]: Failure-only logging: adminDbPush in catch block with error field, no success logging
 - [Phase 77-camera-migration]: getProxyCameraEventSnapshot uses raw fetch (binary endpoint): returns Response directly for streaming, not parsed JSON
 - [Phase 77-camera-migration]: Camera proxy types use proxy field names (event_id, event_type, timestamp) not old Netatmo API field names
+- [Phase 77-camera-migration]: Old [cameraId]/events route deleted — proxy aggregates all events, camera_id filtering is a client concern
+- [Phase 77-camera-migration]: [Phase 77-02]: Binary JPEG streamed via NextResponse(response.body) with image/jpeg headers, Cache-Control max-age=3600
+- [Phase 77-camera-migration]: [Phase 77-02]: Camera monitoring POST validates camera_id + monitoring ('on'|'off'); failure-only logging via adminDbPush
 
 ### Pending Todos
 
@@ -97,6 +101,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15T12:30:04.715Z
-Stopped at: Completed 77-01-PLAN.md
+Last session: 2026-03-15T12:38:38.268Z
+Stopped at: Completed 77-02-PLAN.md
 Resume file: None

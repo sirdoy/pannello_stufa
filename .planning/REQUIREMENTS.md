@@ -10,7 +10,7 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 ### API Client
 
 - [x] **API-01**: Next.js API routes proxy Netatmo calls through local API (`/api/v1/netatmo/`) instead of `api.netatmo.com`
-- [ ] **API-02**: Authentication uses API Key (`X-API-Key` header) instead of Netatmo OAuth tokens
+- [x] **API-02**: Authentication uses API Key (`X-API-Key` header) instead of Netatmo OAuth tokens
 - [x] **API-03**: API client handles `data_freshness` field (`LIVE`/`STALE`/`UNREACHABLE`) from proxy responses
 - [x] **API-04**: API client propagates RFC 9457 error responses from proxy to frontend
 
@@ -50,7 +50,7 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 - [x] **CLEAN-03**: Delete `lib/netatmoRateLimiter.ts` + `netatmoRateLimiterPersistent.ts` (rate limiting in proxy)
 - [x] **CLEAN-04**: Delete `lib/netatmoCacheService.ts` (caching in proxy)
 - [x] **CLEAN-05**: Delete OAuth callback route `app/api/netatmo/callback/` (OAuth flow removed)
-- [ ] **CLEAN-06**: Remove Netatmo OAuth env vars (`NETATMO_CLIENT_SECRET`, `NEXT_PUBLIC_NETATMO_CLIENT_ID`, `NEXT_PUBLIC_NETATMO_REDIRECT_URI`)
+- [x] **CLEAN-06**: Remove Netatmo OAuth env vars (`NETATMO_CLIENT_SECRET`, `NEXT_PUBLIC_NETATMO_CLIENT_ID`, `NEXT_PUBLIC_NETATMO_REDIRECT_URI`)
 - [x] **CLEAN-07**: Update all tests to match new API proxy patterns
 
 ## Future Requirements
@@ -77,7 +77,7 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | API-01 | Phase 75 | Complete |
-| API-02 | Phase 80 | Pending |
+| API-02 | Phase 80 | Complete |
 | API-03 | Phase 75 | Complete |
 | API-04 | Phase 75 | Complete |
 | ENERGY-01 | Phase 75 | Complete |
@@ -102,7 +102,7 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 | CLEAN-03 | Phase 79 | Complete |
 | CLEAN-04 | Phase 79 | Complete |
 | CLEAN-05 | Phase 79 | Complete |
-| CLEAN-06 | Phase 80 | Pending |
+| CLEAN-06 | Phase 80 | Complete |
 | CLEAN-07 | Phase 79 | Complete |
 
 **Coverage:**

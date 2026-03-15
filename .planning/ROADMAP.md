@@ -146,7 +146,7 @@ Plans:
   2. `NETATMO_ROUTES` includes a `switchhomeschedule` key pointing to the correct route
   3. `ThermostatCard.tsx` and `ScheduleSelector.tsx` call `/api/netatmo/switchhomeschedule` with `{ home_id, schedule_id }` body
   4. "Switch Heating Schedule" E2E flow completes without errors
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
 - [ ] 80-01-PLAN.md — Align env var name NETATMO_API_KEY to NETATMO_PROXY_API_KEY across validator, docs, config
 - [ ] 80-02-PLAN.md — Wire switchhomeschedule route to frontend (NETATMO_ROUTES, ScheduleSelector, ThermostatCard)
@@ -184,7 +184,7 @@ Plans:
 | 77. Camera Migration | 3/3 | Complete    | 2026-03-15 | - |
 | 78. Valve + Health | 2/2 | Complete    | 2026-03-15 | - |
 | 79. Cleanup | 2/2 | Complete    | 2026-03-15 | - |
-| 80. Fix Env Var & Schedule Wiring | 0/2 | Planned | - | - |
+| 80. Fix Env Var & Schedule Wiring | 1/2 | In Progress|  | - |
 | 81. Fix StoveSync & Debug Panel Cleanup | 0/0 | Planned | - | - |
 
 **Total:** 13 milestones shipped, 74 phases complete, 330 plans executed — v10.0 in progress

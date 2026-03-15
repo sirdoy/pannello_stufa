@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v10.0
 milestone_name: Netatmo API Migration
 status: executing
-stopped_at: Completed 79-02-PLAN.md
-last_updated: "2026-03-15T17:18:20.751Z"
+stopped_at: Completed 80-01-PLAN.md
+last_updated: "2026-03-15T18:22:32.654Z"
 last_activity: 2026-03-15 — 75-01 Netatmo proxy client + types complete
 progress:
-  total_phases: 5
+  total_phases: 7
   completed_phases: 5
-  total_plans: 13
-  completed_plans: 13
+  total_plans: 15
+  completed_plans: 14
   percent: 5
 ---
 
@@ -58,6 +58,7 @@ Progress: [█░░░░░░░░░] 5% (v10.0)
 | Phase 78-valve-health P02 | 12 | 2 tasks | 7 files |
 | Phase 79-cleanup P01 | 15 | 3 tasks | 42 files |
 | Phase 79-cleanup P02 | 25 | 2 tasks | 17 files |
+| Phase 80-fix-env-var-schedule-wiring P01 | 7 | 1 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -95,6 +96,7 @@ See PROJECT.md Key Decisions table for full history. Relevant to v10.0:
 - [Phase 79-cleanup]: All dead Netatmo OAuth infrastructure deleted — proxy owns token management, rate limiting, caching
 - [Phase 79-cleanup]: Coordination orchestrator chain (9 modules) fully removed — proxy handles stove sync coordination
 - [Phase 79-cleanup]: Battery utils inlined in homestatus route; stoveSync route constant kept for StoveSyncPanel; coordinationThrottlePersistent dynamic imports removed
+- [Phase 80-fix-env-var-schedule-wiring]: NETATMO_PROXY_API_KEY is the canonical env var name — runtime (netatmoProxy.ts) was already correct; validator and docs aligned to match
 
 ### Pending Todos
 
@@ -115,6 +117,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15T17:13:10.182Z
-Stopped at: Completed 79-02-PLAN.md
+Last session: 2026-03-15T18:22:32.650Z
+Stopped at: Completed 80-01-PLAN.md
 Resume file: None

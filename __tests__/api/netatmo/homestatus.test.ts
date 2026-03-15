@@ -22,6 +22,9 @@ jest.mock('@/lib/core', () => ({
   notFound: (msg: string) => ({ ok: false, error: msg, status: 404 }),
 }));
 
+// GET is the inner handler (no request arg needed due to mock above)
+const callGET = () => (GET as unknown as () => Promise<unknown>)();
+
 const mockGetProxyHomestatus = getProxyHomestatus as jest.MockedFunction<typeof getProxyHomestatus>;
 const mockAdminDbGet = adminDbGet as jest.MockedFunction<typeof adminDbGet>;
 const mockAdminDbSet = adminDbSet as jest.MockedFunction<typeof adminDbSet>;
@@ -77,7 +80,7 @@ describe('GET /api/netatmo/homestatus', () => {
       return null;
     });
 
-    const result = await GET();
+    const result = await callGET();
 
     expect(mockGetProxyHomestatus).toHaveBeenCalledTimes(1);
     expect((result as any).ok).toBe(true);
@@ -109,7 +112,7 @@ describe('GET /api/netatmo/homestatus', () => {
       return null;
     });
 
-    const result = await GET();
+    const result = await callGET();
 
     expect((result as any).data.data_freshness).toBe('LIVE');
   });
@@ -122,7 +125,7 @@ describe('GET /api/netatmo/homestatus', () => {
       return null;
     });
 
-    const result = await GET();
+    const result = await callGET();
 
     expect((result as any).data.data_freshness).toBe('STALE');
   });
@@ -140,7 +143,7 @@ describe('GET /api/netatmo/homestatus', () => {
       return null;
     });
 
-    const result = await GET();
+    const result = await callGET();
     const rooms = (result as any).data.rooms;
 
     const room1 = rooms.find((r: any) => r.room_id === 'room-1');
@@ -160,7 +163,7 @@ describe('GET /api/netatmo/homestatus', () => {
       return null;
     });
 
-    const result = await GET();
+    const result = await callGET();
     const data = (result as any).data;
 
     expect(data.modules).toBeDefined();
@@ -178,7 +181,7 @@ describe('GET /api/netatmo/homestatus', () => {
       return null;
     });
 
-    await GET();
+    await callGET();
 
     expect(mockAdminDbSet).toHaveBeenCalledWith(
       'test/netatmo/currentStatus',
@@ -211,7 +214,7 @@ describe('GET /api/netatmo/homestatus', () => {
       return null;
     });
 
-    const result = await GET();
+    const result = await callGET();
     const rooms = (result as any).data.rooms;
 
     expect(rooms[0]!.room_type).toBe('unknown');
@@ -224,7 +227,7 @@ describe('GET /api/netatmo/homestatus', () => {
     );
     mockAdminDbGet.mockResolvedValue(null);
 
-    await expect(GET()).rejects.toThrow('Proxy unavailable');
+    await expect(callGET()).rejects.toThrow('Proxy unavailable');
   });
 
   it('should handle null heating_power_request as heating: false', async () => {
@@ -248,7 +251,7 @@ describe('GET /api/netatmo/homestatus', () => {
       return null;
     });
 
-    const result = await GET();
+    const result = await callGET();
     const rooms = (result as any).data.rooms;
 
     expect(rooms[0]!.heating).toBe(false);

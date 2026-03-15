@@ -22,6 +22,9 @@ jest.mock('@/lib/core', () => ({
   notFound: (msg: string) => ({ ok: false, error: msg, status: 404 }),
 }));
 
+// GET is the inner handler (no request arg needed due to mock above)
+const callGET = () => (GET as unknown as () => Promise<unknown>)();
+
 const mockGetProxyHomesdata = getProxyHomesdata as jest.MockedFunction<typeof getProxyHomesdata>;
 const mockAdminDbSet = adminDbSet as jest.MockedFunction<typeof adminDbSet>;
 const mockGetEnvironmentPath = getEnvironmentPath as jest.MockedFunction<typeof getEnvironmentPath>;
@@ -67,7 +70,7 @@ describe('GET /api/netatmo/homesdata', () => {
   it('should call proxy and return stripped home data', async () => {
     mockGetProxyHomesdata.mockResolvedValue(mockProxyResponse);
 
-    const result = await GET();
+    const result = await callGET();
 
     expect(mockGetProxyHomesdata).toHaveBeenCalledTimes(1);
     expect((result as any).ok).toBe(true);
@@ -83,7 +86,7 @@ describe('GET /api/netatmo/homesdata', () => {
   it('should NOT include the body/status/time_exec envelope in response', async () => {
     mockGetProxyHomesdata.mockResolvedValue(mockProxyResponse);
 
-    const result = await GET();
+    const result = await callGET();
     const data = (result as any).data;
 
     // Should NOT have Netatmo envelope fields
@@ -96,7 +99,7 @@ describe('GET /api/netatmo/homesdata', () => {
   it('should save home_id to Firebase', async () => {
     mockGetProxyHomesdata.mockResolvedValue(mockProxyResponse);
 
-    await GET();
+    await callGET();
 
     expect(mockAdminDbSet).toHaveBeenCalledWith(
       'test/netatmo/home_id',
@@ -107,7 +110,7 @@ describe('GET /api/netatmo/homesdata', () => {
   it('should save topology to Firebase with correct structure', async () => {
     mockGetProxyHomesdata.mockResolvedValue(mockProxyResponse);
 
-    await GET();
+    await callGET();
 
     expect(mockAdminDbSet).toHaveBeenCalledWith(
       'test/netatmo/topology',
@@ -132,7 +135,7 @@ describe('GET /api/netatmo/homesdata', () => {
       body: { homes: [] },
     });
 
-    const result = await GET();
+    const result = await callGET();
 
     expect((result as any).ok).toBe(false);
     expect((result as any).status).toBe(404);
@@ -144,13 +147,13 @@ describe('GET /api/netatmo/homesdata', () => {
       new ApiError(ERROR_CODES.SERVICE_UNAVAILABLE, 'Proxy unavailable', HTTP_STATUS.SERVICE_UNAVAILABLE)
     );
 
-    await expect(GET()).rejects.toThrow('Proxy unavailable');
+    await expect(callGET()).rejects.toThrow('Proxy unavailable');
   });
 
   it('should pass through rooms with proxy field names', async () => {
     mockGetProxyHomesdata.mockResolvedValue(mockProxyResponse);
 
-    const result = await GET();
+    const result = await callGET();
     const rooms = (result as any).data.rooms;
 
     // Rooms should have proxy field names (id, name, type, module_ids)
@@ -174,7 +177,7 @@ describe('GET /api/netatmo/homesdata', () => {
     };
     mockGetProxyHomesdata.mockResolvedValue(responseWithNoSchedules);
 
-    const result = await GET();
+    const result = await callGET();
     expect((result as any).data.schedules).toEqual([]);
   });
 });

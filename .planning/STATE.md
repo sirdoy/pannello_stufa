@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v10.0
 milestone_name: Netatmo API Migration
 status: executing
-stopped_at: Completed 76-04-PLAN.md
-last_updated: "2026-03-15T11:44:06.103Z"
+stopped_at: Completed 76-03-PLAN.md
+last_updated: "2026-03-15T11:44:34.293Z"
 last_activity: 2026-03-15 — 75-01 Netatmo proxy client + types complete
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 5
   percent: 5
 ---
 
@@ -49,6 +49,7 @@ Progress: [█░░░░░░░░░] 5% (v10.0)
 | Phase 75 P02 | 20 | 2 tasks | 4 files |
 | Phase 76 P01 | 3 | 2 tasks | 2 files |
 | Phase 76-energy-control-endpoints P04 | 3 | 1 tasks | 3 files |
+| Phase 76-energy-control-endpoints P03 | 5 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,8 @@ See PROJECT.md Key Decisions table for full history. Relevant to v10.0:
 - [Phase 76]: Double assertion (as unknown as Record<string, unknown>) used for typed request bodies in netatmoProxyPost wrappers
 - [Phase 76]: netatmoProxyPost mirrors netatmoProxyGet: same env var check, AbortController, RFC 9457 parsing, 401/503/other mapping
 - [Phase 76-energy-control-endpoints]: Double assertion for RoomMeasureResponse passed to success() — consistent with existing pattern in 76-01
+- [Phase 76-energy-control-endpoints]: ProxyControlResponse requires double assertion cast for success() — same pattern as getroommeasure route
+- [Phase 76-energy-control-endpoints]: Schedule switch POST moves from /schedules to dedicated /switchhomeschedule route with Firebase userSelectedScheduleId write
 
 ### Pending Todos
 
@@ -87,6 +90,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15T11:44:06.098Z
-Stopped at: Completed 76-04-PLAN.md
+Last session: 2026-03-15T11:44:28.465Z
+Stopped at: Completed 76-03-PLAN.md
 Resume file: None

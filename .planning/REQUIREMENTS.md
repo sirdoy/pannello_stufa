@@ -45,11 +45,11 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 
 ### Cleanup
 
-- [ ] **CLEAN-01**: Delete `lib/netatmoTokenHelper.ts` (token management now in proxy)
-- [ ] **CLEAN-02**: Delete `lib/netatmoCredentials.ts` (OAuth credentials not needed)
-- [ ] **CLEAN-03**: Delete `lib/netatmoRateLimiter.ts` + `netatmoRateLimiterPersistent.ts` (rate limiting in proxy)
-- [ ] **CLEAN-04**: Delete `lib/netatmoCacheService.ts` (caching in proxy)
-- [ ] **CLEAN-05**: Delete OAuth callback route `app/api/netatmo/callback/` (OAuth flow removed)
+- [x] **CLEAN-01**: Delete `lib/netatmoTokenHelper.ts` (token management now in proxy)
+- [x] **CLEAN-02**: Delete `lib/netatmoCredentials.ts` (OAuth credentials not needed)
+- [x] **CLEAN-03**: Delete `lib/netatmoRateLimiter.ts` + `netatmoRateLimiterPersistent.ts` (rate limiting in proxy)
+- [x] **CLEAN-04**: Delete `lib/netatmoCacheService.ts` (caching in proxy)
+- [x] **CLEAN-05**: Delete OAuth callback route `app/api/netatmo/callback/` (OAuth flow removed)
 - [ ] **CLEAN-06**: Remove Netatmo OAuth env vars (`NETATMO_CLIENT_SECRET`, `NEXT_PUBLIC_NETATMO_CLIENT_ID`, `NEXT_PUBLIC_NETATMO_REDIRECT_URI`)
 - [ ] **CLEAN-07**: Update all tests to match new API proxy patterns
 
@@ -97,11 +97,11 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 | CAM-06 | Phase 77 | Complete |
 | HEALTH-01 | Phase 78 | Complete |
 | HEALTH-02 | Phase 78 | Complete |
-| CLEAN-01 | Phase 79 | Pending |
-| CLEAN-02 | Phase 79 | Pending |
-| CLEAN-03 | Phase 79 | Pending |
-| CLEAN-04 | Phase 79 | Pending |
-| CLEAN-05 | Phase 79 | Pending |
+| CLEAN-01 | Phase 79 | Complete |
+| CLEAN-02 | Phase 79 | Complete |
+| CLEAN-03 | Phase 79 | Complete |
+| CLEAN-04 | Phase 79 | Complete |
+| CLEAN-05 | Phase 79 | Complete |
 | CLEAN-06 | Phase 79 | Pending |
 | CLEAN-07 | Phase 79 | Pending |
 

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v10.0
 milestone_name: Netatmo API Migration
 status: executing
-stopped_at: Phase 79 context gathered
-last_updated: "2026-03-15T16:43:26.741Z"
+stopped_at: Completed 79-01-PLAN.md
+last_updated: "2026-03-15T16:56:12.273Z"
 last_activity: 2026-03-15 — 75-01 Netatmo proxy client + types complete
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 13
+  completed_plans: 12
   percent: 5
 ---
 
@@ -56,6 +56,7 @@ Progress: [█░░░░░░░░░] 5% (v10.0)
 | Phase 77-camera-migration P03 | 367 | 2 tasks | 6 files |
 | Phase 78 P01 | 12 | 2 tasks | 6 files |
 | Phase 78-valve-health P02 | 12 | 2 tasks | 7 files |
+| Phase 79-cleanup P01 | 15 | 3 tasks | 42 files |
 
 ## Accumulated Context
 
@@ -90,6 +91,8 @@ See PROJECT.md Key Decisions table for full history. Relevant to v10.0:
 - [Phase 78]: Calibration service failure reasons simplified to auth_error|proxy_error — all schedule-switching failure reasons removed
 - [Phase 78-valve-health]: Cron health check writes proxy health snapshot to netatmo/proxyHealth on every run; no push notification on degradation per user decision
 - [Phase 78-valve-health]: On proxy /health failure: writes unreachable record { provider_status: 'unreachable', data_freshness: 'UNREACHABLE', checked_at }
+- [Phase 79-cleanup]: All dead Netatmo OAuth infrastructure deleted — proxy owns token management, rate limiting, caching
+- [Phase 79-cleanup]: Coordination orchestrator chain (9 modules) fully removed — proxy handles stove sync coordination
 
 ### Pending Todos
 
@@ -110,6 +113,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15T16:43:26.736Z
-Stopped at: Phase 79 context gathered
-Resume file: .planning/phases/79-cleanup/79-CONTEXT.md
+Last session: 2026-03-15T16:56:12.269Z
+Stopped at: Completed 79-01-PLAN.md
+Resume file: None

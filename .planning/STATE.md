@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v10.0
 milestone_name: Netatmo API Migration
-status: planning
-stopped_at: Phase 75 context gathered
-last_updated: "2026-03-15T10:37:20.868Z"
-last_activity: 2026-03-14 — v10.0 roadmap created, 5 phases defined (75-79)
+status: in-progress
+stopped_at: Phase 75 Plan 01 complete
+last_updated: "2026-03-15T11:00:00.000Z"
+last_activity: 2026-03-15 — 75-01 complete (Netatmo proxy client + types)
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 1
+  completed_plans: 1
+  percent: 5
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 75 of 79 (API Client Foundation + Energy Read)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-03-14 — v10.0 roadmap created, 5 phases defined (75-79)
+Plan: 1 of TBD in current phase
+Status: In progress — Plan 01 complete
+Last activity: 2026-03-15 — 75-01 Netatmo proxy client + types complete
 
-Progress: [░░░░░░░░░░] 0% (v10.0)
+Progress: [█░░░░░░░░░] 5% (v10.0)
 
 ## Performance Metrics
 
@@ -55,6 +55,9 @@ See PROJECT.md Key Decisions table for full history. Relevant to v10.0:
 - Pragmatic `as any` for external APIs (no official Netatmo TS types) — continue pattern
 - Server-side proxy pattern (same as Fritz!Box) — API key never exposed to client
 - Firebase RTDB rate limiter to be deleted in Phase 79 (proxy now owns rate limiting)
+- Function module (not class) for netatmoProxy client — no JWT state, simpler and testable (75-01)
+- RFC 9457 detail field used as ApiError message; statusText as fallback (75-01)
+- 401 -> UNAUTHORIZED, 503 -> SERVICE_UNAVAILABLE, others -> EXTERNAL_API_ERROR (75-01)
 
 ### Pending Todos
 
@@ -75,6 +78,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15T10:37:20.864Z
-Stopped at: Phase 75 context gathered
-Resume file: .planning/phases/75-api-client-foundation-energy-read/75-CONTEXT.md
+Last session: 2026-03-15T11:00:00.000Z
+Stopped at: Completed 75-01-PLAN.md
+Resume file: .planning/phases/75-api-client-foundation-energy-read/75-01-SUMMARY.md

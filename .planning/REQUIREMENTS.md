@@ -9,10 +9,10 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 
 ### API Client
 
-- [ ] **API-01**: Next.js API routes proxy Netatmo calls through local API (`/api/v1/netatmo/`) instead of `api.netatmo.com`
-- [ ] **API-02**: Authentication uses API Key (`X-API-Key` header) instead of Netatmo OAuth tokens
-- [ ] **API-03**: API client handles `data_freshness` field (`LIVE`/`STALE`/`UNREACHABLE`) from proxy responses
-- [ ] **API-04**: API client propagates RFC 9457 error responses from proxy to frontend
+- [x] **API-01**: Next.js API routes proxy Netatmo calls through local API (`/api/v1/netatmo/`) instead of `api.netatmo.com`
+- [x] **API-02**: Authentication uses API Key (`X-API-Key` header) instead of Netatmo OAuth tokens
+- [x] **API-03**: API client handles `data_freshness` field (`LIVE`/`STALE`/`UNREACHABLE`) from proxy responses
+- [x] **API-04**: API client propagates RFC 9457 error responses from proxy to frontend
 
 ### Energy (Thermostat)
 
@@ -76,10 +76,10 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| API-01 | Phase 75 | Pending |
-| API-02 | Phase 75 | Pending |
-| API-03 | Phase 75 | Pending |
-| API-04 | Phase 75 | Pending |
+| API-01 | Phase 75 | Complete |
+| API-02 | Phase 75 | Complete |
+| API-03 | Phase 75 | Complete |
+| API-04 | Phase 75 | Complete |
 | ENERGY-01 | Phase 75 | Pending |
 | ENERGY-02 | Phase 75 | Pending |
 | ENERGY-03 | Phase 76 | Pending |

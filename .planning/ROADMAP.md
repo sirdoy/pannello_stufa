@@ -136,7 +136,7 @@ Plans:
 | 61-67 | v8.0 | 18/18 | ✓ Complete | 2026-02-16 |
 | 68-69 | v8.1 | 3/3 | ✓ Complete | 2026-02-18 |
 | 70-74 | v9.0 | 8/8 | ✓ Complete | 2026-02-19 |
-| 75. API Client Foundation + Energy Read | 2/2 | Complete   | 2026-03-15 | - |
+| 75. API Client Foundation + Energy Read | 2/2 | Complete    | 2026-03-15 | - |
 | 76. Energy Control Endpoints | v10.0 | 0/TBD | Not started | - |
 | 77. Camera Migration | v10.0 | 0/TBD | Not started | - |
 | 78. Valve + Health | v10.0 | 0/TBD | Not started | - |

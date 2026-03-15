@@ -31,12 +31,12 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 
 ### Camera
 
-- [ ] **CAM-01**: Camera status via proxy `/camera/status`
-- [ ] **CAM-02**: Camera stream URLs via proxy `/camera/{id}/stream` (HLS with VPN + local)
-- [ ] **CAM-03**: Camera snapshot via proxy `/camera/{id}/snapshot`
-- [ ] **CAM-04**: Camera events via proxy `/camera/events` (SQLite-backed, 7-day retention)
-- [ ] **CAM-05**: Camera monitoring toggle via proxy `/camera/{id}/monitoring`
-- [ ] **CAM-06**: Event snapshot binary via proxy `/camera/events/{id}/snapshot`
+- [x] **CAM-01**: Camera status via proxy `/camera/status`
+- [x] **CAM-02**: Camera stream URLs via proxy `/camera/{id}/stream` (HLS with VPN + local)
+- [x] **CAM-03**: Camera snapshot via proxy `/camera/{id}/snapshot`
+- [x] **CAM-04**: Camera events via proxy `/camera/events` (SQLite-backed, 7-day retention)
+- [x] **CAM-05**: Camera monitoring toggle via proxy `/camera/{id}/monitoring`
+- [x] **CAM-06**: Event snapshot binary via proxy `/camera/events/{id}/snapshot`
 
 ### Health & Monitoring
 
@@ -89,12 +89,12 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 | ENERGY-07 | Phase 76 | Complete |
 | VALVE-01 | Phase 78 | Pending |
 | VALVE-02 | Phase 78 | Pending |
-| CAM-01 | Phase 77 | Pending |
-| CAM-02 | Phase 77 | Pending |
-| CAM-03 | Phase 77 | Pending |
-| CAM-04 | Phase 77 | Pending |
-| CAM-05 | Phase 77 | Pending |
-| CAM-06 | Phase 77 | Pending |
+| CAM-01 | Phase 77 | Complete |
+| CAM-02 | Phase 77 | Complete |
+| CAM-03 | Phase 77 | Complete |
+| CAM-04 | Phase 77 | Complete |
+| CAM-05 | Phase 77 | Complete |
+| CAM-06 | Phase 77 | Complete |
 | HEALTH-01 | Phase 78 | Pending |
 | HEALTH-02 | Phase 78 | Pending |
 | CLEAN-01 | Phase 79 | Pending |

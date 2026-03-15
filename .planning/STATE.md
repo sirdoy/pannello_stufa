@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v10.0
 milestone_name: Netatmo API Migration
 status: executing
-stopped_at: Phase 77 plans created and verified
-last_updated: "2026-03-15T12:24:34.934Z"
+stopped_at: Completed 77-01-PLAN.md
+last_updated: "2026-03-15T12:30:04.721Z"
 last_activity: 2026-03-15 — 75-01 Netatmo proxy client + types complete
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 9
-  completed_plans: 6
+  completed_plans: 7
   percent: 5
 ---
 
@@ -51,6 +51,7 @@ Progress: [█░░░░░░░░░] 5% (v10.0)
 | Phase 76-energy-control-endpoints P04 | 3 | 1 tasks | 3 files |
 | Phase 76-energy-control-endpoints P03 | 5 | 2 tasks | 6 files |
 | Phase 76 P02 | 347 | 2 tasks | 6 files |
+| Phase 77-camera-migration P01 | 213 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,8 @@ See PROJECT.md Key Decisions table for full history. Relevant to v10.0:
 - [Phase 76]: home_id sourced from request body not Firebase for setroomthermpoint and setthermmode
 - [Phase 76]: VALID_MODES for setroomthermpoint narrowed to manual+home; setthermmode to schedule+away+hg
 - [Phase 76]: Failure-only logging: adminDbPush in catch block with error field, no success logging
+- [Phase 77-camera-migration]: getProxyCameraEventSnapshot uses raw fetch (binary endpoint): returns Response directly for streaming, not parsed JSON
+- [Phase 77-camera-migration]: Camera proxy types use proxy field names (event_id, event_type, timestamp) not old Netatmo API field names
 
 ### Pending Todos
 
@@ -94,6 +97,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15T12:24:34.928Z
-Stopped at: Phase 77 plans created and verified
-Resume file: .planning/phases/77-camera-migration/77-01-PLAN.md
+Last session: 2026-03-15T12:30:04.715Z
+Stopped at: Completed 77-01-PLAN.md
+Resume file: None

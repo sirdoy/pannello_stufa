@@ -82,7 +82,12 @@ Plans:
   3. User can switch between pre-configured schedules via proxy `/switchhomeschedule`
   4. Schedule sync via proxy `/synchomeschedule` completes without error
   5. Historical room measurement chart loads data from proxy `/getroommeasure` (SQLite aggregation tiers)
-**Plans**: TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 76-01-PLAN.md — Extend proxy client with netatmoProxyPost + 5 convenience wrappers + control types
+- [ ] 76-02-PLAN.md — Migrate setroomthermpoint + setthermmode routes to proxy (TDD)
+- [ ] 76-03-PLAN.md — Migrate schedules GET, create switchhomeschedule + synchomeschedule + createnewhomeschedule routes (TDD)
+- [ ] 76-04-PLAN.md — Create getroommeasure GET route — thin proxy with scale validation (TDD)
 
 ### Phase 77: Camera Migration
 **Goal**: Users can view camera status, watch live streams, take snapshots, browse events, and toggle monitoring — all served through the proxy
@@ -137,7 +142,7 @@ Plans:
 | 68-69 | v8.1 | 3/3 | ✓ Complete | 2026-02-18 |
 | 70-74 | v9.0 | 8/8 | ✓ Complete | 2026-02-19 |
 | 75. API Client Foundation + Energy Read | 2/2 | Complete    | 2026-03-15 | - |
-| 76. Energy Control Endpoints | v10.0 | 0/TBD | Not started | - |
+| 76. Energy Control Endpoints | v10.0 | 0/4 | Not started | - |
 | 77. Camera Migration | v10.0 | 0/TBD | Not started | - |
 | 78. Valve + Health | v10.0 | 0/TBD | Not started | - |
 | 79. Cleanup | v10.0 | 0/TBD | Not started | - |
@@ -146,4 +151,4 @@ Plans:
 
 ---
 
-*Roadmap updated: 2026-03-15 — Phase 75 planned (2 plans)*
+*Roadmap updated: 2026-03-15 — Phase 76 planned (4 plans)*

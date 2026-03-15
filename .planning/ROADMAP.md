@@ -54,7 +54,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 77: Camera Migration** - All six camera endpoints migrated (status, stream URLs, snapshot, events, monitoring toggle, event snapshots) (completed 2026-03-15)
 - [x] **Phase 78: Valve + Health** - Dedicated valve endpoints and health monitoring cron migrated to proxy (completed 2026-03-15)
 - [x] **Phase 79: Cleanup** - Dead code deleted (OAuth helpers, rate limiter, cache service, callback route, env vars), tests updated (completed 2026-03-15)
-- [ ] **Phase 80: Fix Env Var & Schedule Wiring** - Align env var names, wire switchhomeschedule to frontend
+- [x] **Phase 80: Fix Env Var & Schedule Wiring** - Align env var names, wire switchhomeschedule to frontend (completed 2026-03-15)
 - [ ] **Phase 81: Fix StoveSync & Debug Panel Cleanup** - Remove stoveSync 404, clean debug panel deleted routes
 
 ## Phase Details
@@ -146,7 +146,7 @@ Plans:
   2. `NETATMO_ROUTES` includes a `switchhomeschedule` key pointing to the correct route
   3. `ThermostatCard.tsx` and `ScheduleSelector.tsx` call `/api/netatmo/switchhomeschedule` with `{ home_id, schedule_id }` body
   4. "Switch Heating Schedule" E2E flow completes without errors
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 80-01-PLAN.md — Align env var name NETATMO_API_KEY to NETATMO_PROXY_API_KEY across validator, docs, config
 - [ ] 80-02-PLAN.md — Wire switchhomeschedule route to frontend (NETATMO_ROUTES, ScheduleSelector, ThermostatCard)
@@ -184,7 +184,7 @@ Plans:
 | 77. Camera Migration | 3/3 | Complete    | 2026-03-15 | - |
 | 78. Valve + Health | 2/2 | Complete    | 2026-03-15 | - |
 | 79. Cleanup | 2/2 | Complete    | 2026-03-15 | - |
-| 80. Fix Env Var & Schedule Wiring | 1/2 | In Progress|  | - |
+| 80. Fix Env Var & Schedule Wiring | 2/2 | Complete   | 2026-03-15 | - |
 | 81. Fix StoveSync & Debug Panel Cleanup | 0/0 | Planned | - | - |
 
 **Total:** 13 milestones shipped, 74 phases complete, 330 plans executed — v10.0 in progress

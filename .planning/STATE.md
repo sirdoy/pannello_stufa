@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v10.0
 milestone_name: Netatmo API Migration
 status: executing
-stopped_at: Completed 80-01-PLAN.md
-last_updated: "2026-03-15T18:22:32.654Z"
+stopped_at: Completed 80-02-PLAN.md
+last_updated: "2026-03-15T18:26:55.418Z"
 last_activity: 2026-03-15 — 75-01 Netatmo proxy client + types complete
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 15
-  completed_plans: 14
+  completed_plans: 15
   percent: 5
 ---
 
@@ -59,6 +59,7 @@ Progress: [█░░░░░░░░░] 5% (v10.0)
 | Phase 79-cleanup P01 | 15 | 3 tasks | 42 files |
 | Phase 79-cleanup P02 | 25 | 2 tasks | 17 files |
 | Phase 80-fix-env-var-schedule-wiring P01 | 7 | 1 tasks | 6 files |
+| Phase 80-fix-env-var-schedule-wiring P02 | 6 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -97,6 +98,8 @@ See PROJECT.md Key Decisions table for full history. Relevant to v10.0:
 - [Phase 79-cleanup]: Coordination orchestrator chain (9 modules) fully removed — proxy handles stove sync coordination
 - [Phase 79-cleanup]: Battery utils inlined in homestatus route; stoveSync route constant kept for StoveSyncPanel; coordinationThrottlePersistent dynamic imports removed
 - [Phase 80-fix-env-var-schedule-wiring]: NETATMO_PROXY_API_KEY is the canonical env var name — runtime (netatmoProxy.ts) was already correct; validator and docs aligned to match
+- [Phase 80-fix-env-var-schedule-wiring]: GET /schedules returns home_id from homes[0].id — avoids second API call in consumers
+- [Phase 80-fix-env-var-schedule-wiring]: Schedule switching: POST to /api/netatmo/switchhomeschedule with { home_id, schedule_id } body — ScheduleSelector and ThermostatCard both wired to NETATMO_ROUTES.switchHomeSchedule
 
 ### Pending Todos
 
@@ -117,6 +120,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15T18:22:32.650Z
-Stopped at: Completed 80-01-PLAN.md
+Last session: 2026-03-15T18:26:55.414Z
+Stopped at: Completed 80-02-PLAN.md
 Resume file: None

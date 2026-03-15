@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v10.0
 milestone_name: Netatmo API Migration
-status: in-progress
-stopped_at: Phase 75 Plan 01 complete
-last_updated: "2026-03-15T11:00:00.000Z"
-last_activity: 2026-03-15 — 75-01 complete (Netatmo proxy client + types)
+status: executing
+stopped_at: Completed 75-02-PLAN.md
+last_updated: "2026-03-15T11:11:03.277Z"
+last_activity: 2026-03-15 — 75-01 Netatmo proxy client + types complete
 progress:
   total_phases: 5
-  completed_phases: 0
-  total_plans: 1
-  completed_plans: 1
+  completed_phases: 1
+  total_plans: 2
+  completed_plans: 2
   percent: 5
 ---
 
@@ -46,6 +46,7 @@ Progress: [█░░░░░░░░░] 5% (v10.0)
 | v8.0 Fritz!Box Network Monitor | 61-67 | 18 | 3 days |
 | v8.1 Masonry Dashboard | 68-69 | 3 | 1 day |
 | v9.0 Performance Optimization | 70-74 | 8 | 2 days |
+| Phase 75 P02 | 20 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -58,6 +59,9 @@ See PROJECT.md Key Decisions table for full history. Relevant to v10.0:
 - Function module (not class) for netatmoProxy client — no JWT state, simpler and testable (75-01)
 - RFC 9457 detail field used as ApiError message; statusText as fallback (75-01)
 - 401 -> UNAUTHORIZED, 503 -> SERVICE_UNAVAILABLE, others -> EXTERNAL_API_ERROR (75-01)
+- [Phase 75]: homestatus modules sourced from Firebase topology — proxy homestatus lacks module data
+- [Phase 75]: homesdata proxy objects pass through with native field names, no re-parsing needed
+- [Phase 75]: mode field omitted from homestatus — proxy lacks therm_mode, deferred to Phase 76
 
 ### Pending Todos
 
@@ -78,6 +82,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15T11:00:00.000Z
-Stopped at: Completed 75-01-PLAN.md
-Resume file: .planning/phases/75-api-client-foundation-energy-read/75-01-SUMMARY.md
+Last session: 2026-03-15T11:11:03.273Z
+Stopped at: Completed 75-02-PLAN.md
+Resume file: None

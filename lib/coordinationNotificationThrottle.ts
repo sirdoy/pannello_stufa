@@ -1,14 +1,12 @@
 /**
  * Coordination Notification Throttle Service
  *
- * Feature-flagged throttle with persistent fallback.
- * When USE_PERSISTENT_RATE_LIMITER=true, uses Firebase RTDB.
- * When false or Firebase fails, falls back to in-memory throttle.
+ * Uses Firebase RTDB for persistent throttle state.
+ * Falls back to in-memory throttle on Firebase errors.
  *
  * Design:
- * - DIFFERENT from rateLimiter.js which is per-notification-type
+ * - DIFFERENT from rateLimiter which is per-notification-type
  * - This service is GLOBAL per user (one window for all coordination events)
- * - Feature flag controls implementation (persistent vs in-memory)
  * - Graceful fallback on Firebase errors
  * - Does NOT send notifications - only decides if sending is allowed
  *

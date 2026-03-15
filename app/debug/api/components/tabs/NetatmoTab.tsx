@@ -39,9 +39,9 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
       setTimings((prev) => ({ ...prev, [name]: timing }));
       setGetResponses((prev) => ({ ...prev, [name]: data }));
 
-      // Check connection status from response
-      if (name === 'debug' && data.connection) {
-        setConnectionStatus(data.connection);
+      // Check connection status from health response
+      if (name === 'health' && data.provider_status) {
+        setConnectionStatus(data.provider_status === 'ok' ? 'connected' : 'disconnected');
       }
     } catch (error) {
       setGetResponses((prev) => ({ ...prev, [name]: { error: error instanceof Error ? error.message : String(error) } }));
@@ -54,9 +54,9 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
     fetchGetEndpoint('health', '/api/netatmo/health');
     fetchGetEndpoint('homesdata', '/api/netatmo/homesdata');
     fetchGetEndpoint('homestatus', '/api/netatmo/homestatus');
-    fetchGetEndpoint('devices', '/api/netatmo/devices');
-    fetchGetEndpoint('devicesTemps', '/api/netatmo/devices-temperatures');
-    fetchGetEndpoint('debug', '/api/netatmo/debug');
+    fetchGetEndpoint('valves', '/api/netatmo/valves');
+    fetchGetEndpoint('cameraStatus', '/api/netatmo/camera/status');
+    fetchGetEndpoint('schedules', '/api/netatmo/schedules');
   }, [fetchGetEndpoint]);
 
   const callPostEndpoint = async (name: string, url: string, body: any) => {
@@ -138,58 +138,56 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
           <EndpointCard
             name="Homes Data"
             url="/api/netatmo/homesdata"
-            externalUrl="https://api.netatmo.com/api/homesdata"
             response={getResponses.homesdata}
             loading={loadingGet.homesdata ?? false}
             timing={timings.homesdata}
             onRefresh={() => fetchGetEndpoint('homesdata', '/api/netatmo/homesdata')}
-            onCopyUrl={() => copyUrlToClipboard('https://api.netatmo.com/api/homesdata')}
-            isCopied={copiedUrl === 'https://api.netatmo.com/api/homesdata'}
+            onCopyUrl={() => copyUrlToClipboard('/api/netatmo/homesdata')}
+            isCopied={copiedUrl === '/api/netatmo/homesdata'}
           />
 
           <EndpointCard
             name="Home Status"
             url="/api/netatmo/homestatus"
-            externalUrl="https://api.netatmo.com/api/homestatus"
             response={getResponses.homestatus}
             loading={loadingGet.homestatus ?? false}
             timing={timings.homestatus}
             onRefresh={() => fetchGetEndpoint('homestatus', '/api/netatmo/homestatus')}
-            onCopyUrl={() => copyUrlToClipboard('https://api.netatmo.com/api/homestatus')}
-            isCopied={copiedUrl === 'https://api.netatmo.com/api/homestatus'}
+            onCopyUrl={() => copyUrlToClipboard('/api/netatmo/homestatus')}
+            isCopied={copiedUrl === '/api/netatmo/homestatus'}
           />
 
           <EndpointCard
-            name="Devices"
-            url="/api/netatmo/devices"
-            response={getResponses.devices}
-            loading={loadingGet.devices ?? false}
-            timing={timings.devices}
-            onRefresh={() => fetchGetEndpoint('devices', '/api/netatmo/devices')}
-            onCopyUrl={() => copyUrlToClipboard('/api/netatmo/devices')}
-            isCopied={copiedUrl === '/api/netatmo/devices'}
+            name="Valves"
+            url="/api/netatmo/valves"
+            response={getResponses.valves}
+            loading={loadingGet.valves ?? false}
+            timing={timings.valves}
+            onRefresh={() => fetchGetEndpoint('valves', '/api/netatmo/valves')}
+            onCopyUrl={() => copyUrlToClipboard('/api/netatmo/valves')}
+            isCopied={copiedUrl === '/api/netatmo/valves'}
           />
 
           <EndpointCard
-            name="Devices Temperatures"
-            url="/api/netatmo/devices-temperatures"
-            response={getResponses.devicesTemps}
-            loading={loadingGet.devicesTemps ?? false}
-            timing={timings.devicesTemps}
-            onRefresh={() => fetchGetEndpoint('devicesTemps', '/api/netatmo/devices-temperatures')}
-            onCopyUrl={() => copyUrlToClipboard('/api/netatmo/devices-temperatures')}
-            isCopied={copiedUrl === '/api/netatmo/devices-temperatures'}
+            name="Camera Status"
+            url="/api/netatmo/camera/status"
+            response={getResponses.cameraStatus}
+            loading={loadingGet.cameraStatus ?? false}
+            timing={timings.cameraStatus}
+            onRefresh={() => fetchGetEndpoint('cameraStatus', '/api/netatmo/camera/status')}
+            onCopyUrl={() => copyUrlToClipboard('/api/netatmo/camera/status')}
+            isCopied={copiedUrl === '/api/netatmo/camera/status'}
           />
 
           <EndpointCard
-            name="Debug Info"
-            url="/api/netatmo/debug"
-            response={getResponses.debug}
-            loading={loadingGet.debug ?? false}
-            timing={timings.debug}
-            onRefresh={() => fetchGetEndpoint('debug', '/api/netatmo/debug')}
-            onCopyUrl={() => copyUrlToClipboard('/api/netatmo/debug')}
-            isCopied={copiedUrl === '/api/netatmo/debug'}
+            name="Schedules"
+            url="/api/netatmo/schedules"
+            response={getResponses.schedules}
+            loading={loadingGet.schedules ?? false}
+            timing={timings.schedules}
+            onRefresh={() => fetchGetEndpoint('schedules', '/api/netatmo/schedules')}
+            onCopyUrl={() => copyUrlToClipboard('/api/netatmo/schedules')}
+            isCopied={copiedUrl === '/api/netatmo/schedules'}
           />
         </div>
       </div>
@@ -203,7 +201,6 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
           <PostEndpointCard
             name="Set Therm Mode"
             url="/api/netatmo/setthermmode"
-            externalUrl="https://api.netatmo.com/api/setthermmode"
             params={[
               {
                 name: 'mode',
@@ -217,14 +214,13 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
             loading={loadingPost.setthermmode ?? false}
             timing={timings.setthermmode}
             onExecute={(values) => callPostEndpoint('setthermmode', '/api/netatmo/setthermmode', { mode: values.mode })}
-            onCopyUrl={() => copyUrlToClipboard('https://api.netatmo.com/api/setthermmode')}
-            isCopied={copiedUrl === 'https://api.netatmo.com/api/setthermmode'}
+            onCopyUrl={() => copyUrlToClipboard('/api/netatmo/setthermmode')}
+            isCopied={copiedUrl === '/api/netatmo/setthermmode'}
           />
 
           <PostEndpointCard
             name="Set Room Therm Point"
             url="/api/netatmo/setroomthermpoint"
-            externalUrl="https://api.netatmo.com/api/setroomthermpoint"
             params={[
               { name: 'temp', label: 'Temperature (°C)', type: 'number', min: 7, max: 30, defaultValue: '20' },
             ]}
@@ -232,8 +228,8 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
             loading={loadingPost.setroomthermpoint ?? false}
             timing={timings.setroomthermpoint}
             onExecute={(values) => callPostEndpoint('setroomthermpoint', '/api/netatmo/setroomthermpoint', { temp: values.temp })}
-            onCopyUrl={() => copyUrlToClipboard('https://api.netatmo.com/api/setroomthermpoint')}
-            isCopied={copiedUrl === 'https://api.netatmo.com/api/setroomthermpoint'}
+            onCopyUrl={() => copyUrlToClipboard('/api/netatmo/setroomthermpoint')}
+            isCopied={copiedUrl === '/api/netatmo/setroomthermpoint'}
           />
 
           <PostEndpointCard

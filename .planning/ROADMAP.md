@@ -100,7 +100,11 @@ Plans:
   4. Camera events list loads from proxy `/camera/events` (SQLite-backed, 7-day retention)
   5. User can toggle camera monitoring on/off via proxy `/camera/{id}/monitoring`
   6. Event snapshot binary loads from proxy `/camera/events/{id}/snapshot`
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 77-01-PLAN.md — Camera proxy types + convenience wrappers + tests
+- [ ] 77-02-PLAN.md — Create/migrate all 6 camera API routes + update CAMERA_ROUTES
+- [ ] 77-03-PLAN.md — Update frontend components + clean up netatmoCameraApi.ts
 
 ### Phase 78: Valve + Health
 **Goal**: Valve status is read from a dedicated proxy endpoint, valve calibration uses the correct proxy route, and health monitoring cron uses the proxy health endpoint instead of custom token checks
@@ -143,7 +147,7 @@ Plans:
 | 70-74 | v9.0 | 8/8 | ✓ Complete | 2026-02-19 |
 | 75. API Client Foundation + Energy Read | 2/2 | Complete    | 2026-03-15 | - |
 | 76. Energy Control Endpoints | 4/4 | Complete    | 2026-03-15 | - |
-| 77. Camera Migration | v10.0 | 0/TBD | Not started | - |
+| 77. Camera Migration | v10.0 | 0/3 | Planned | - |
 | 78. Valve + Health | v10.0 | 0/TBD | Not started | - |
 | 79. Cleanup | v10.0 | 0/TBD | Not started | - |
 
@@ -151,4 +155,4 @@ Plans:
 
 ---
 
-*Roadmap updated: 2026-03-15 — Phase 76 planned (4 plans)*
+*Roadmap updated: 2026-03-15 — Phase 77 planned (3 plans)*

@@ -50,7 +50,7 @@ See `.planning/milestones/` for full archives.
 **Milestone Goal:** Replace all direct Netatmo Cloud API calls with local HomeAssistant Network API proxy calls, eliminate OAuth token management from the Next.js app, and clean up all dead code. Authentication becomes a single API Key header.
 
 - [x] **Phase 75: API Client Foundation + Energy Read** - New proxy client with X-API-Key auth, homestatus and homesdata read endpoints migrated (completed 2026-03-15)
-- [ ] **Phase 76: Energy Control Endpoints** - All write/control endpoints migrated (setpoint, mode, schedule switch, sync, measurements)
+- [x] **Phase 76: Energy Control Endpoints** - All write/control endpoints migrated (setpoint, mode, schedule switch, sync, measurements) (completed 2026-03-15)
 - [ ] **Phase 77: Camera Migration** - All six camera endpoints migrated (status, stream URLs, snapshot, events, monitoring toggle, event snapshots)
 - [ ] **Phase 78: Valve + Health** - Dedicated valve endpoints and health monitoring cron migrated to proxy
 - [ ] **Phase 79: Cleanup** - Dead code deleted (OAuth helpers, rate limiter, cache service, callback route, env vars), tests updated
@@ -82,7 +82,7 @@ Plans:
   3. User can switch between pre-configured schedules via proxy `/switchhomeschedule`
   4. Schedule sync via proxy `/synchomeschedule` completes without error
   5. Historical room measurement chart loads data from proxy `/getroommeasure` (SQLite aggregation tiers)
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 Plans:
 - [ ] 76-01-PLAN.md — Extend proxy client with netatmoProxyPost + 5 convenience wrappers + control types
 - [ ] 76-02-PLAN.md — Migrate setroomthermpoint + setthermmode routes to proxy (TDD)
@@ -142,7 +142,7 @@ Plans:
 | 68-69 | v8.1 | 3/3 | ✓ Complete | 2026-02-18 |
 | 70-74 | v9.0 | 8/8 | ✓ Complete | 2026-02-19 |
 | 75. API Client Foundation + Energy Read | 2/2 | Complete    | 2026-03-15 | - |
-| 76. Energy Control Endpoints | 3/4 | In Progress|  | - |
+| 76. Energy Control Endpoints | 4/4 | Complete   | 2026-03-15 | - |
 | 77. Camera Migration | v10.0 | 0/TBD | Not started | - |
 | 78. Valve + Health | v10.0 | 0/TBD | Not started | - |
 | 79. Cleanup | v10.0 | 0/TBD | Not started | - |

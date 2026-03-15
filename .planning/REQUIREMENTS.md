@@ -40,8 +40,8 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 
 ### Health & Monitoring
 
-- [ ] **HEALTH-01**: Netatmo provider health via proxy `/health` (token status, data freshness, rate limit usage)
-- [ ] **HEALTH-02**: Health monitoring cron uses proxy health endpoint instead of custom token checks
+- [x] **HEALTH-01**: Netatmo provider health via proxy `/health` (token status, data freshness, rate limit usage)
+- [x] **HEALTH-02**: Health monitoring cron uses proxy health endpoint instead of custom token checks
 
 ### Cleanup
 
@@ -95,8 +95,8 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 | CAM-04 | Phase 77 | Complete |
 | CAM-05 | Phase 77 | Complete |
 | CAM-06 | Phase 77 | Complete |
-| HEALTH-01 | Phase 78 | Pending |
-| HEALTH-02 | Phase 78 | Pending |
+| HEALTH-01 | Phase 78 | Complete |
+| HEALTH-02 | Phase 78 | Complete |
 | CLEAN-01 | Phase 79 | Pending |
 | CLEAN-02 | Phase 79 | Pending |
 | CLEAN-03 | Phase 79 | Pending |

@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v10.0
 milestone_name: Netatmo API Migration
 status: executing
-stopped_at: Completed 78-01-PLAN.md
-last_updated: "2026-03-15T16:10:12.361Z"
+stopped_at: Completed 78-02-PLAN.md
+last_updated: "2026-03-15T16:10:22.413Z"
 last_activity: 2026-03-15 — 75-01 Netatmo proxy client + types complete
 progress:
   total_phases: 5
@@ -88,6 +88,8 @@ See PROJECT.md Key Decisions table for full history. Relevant to v10.0:
 - [Phase 77-camera-migration]: EventPreviewModal now accepts only CameraEvent (camera prop removed) — video playback out of scope per REQUIREMENTS.md
 - [Phase 77-camera-migration]: Stream URL fetched on-demand when user clicks Live, not on component mount
 - [Phase 78]: Calibration service failure reasons simplified to auth_error|proxy_error — all schedule-switching failure reasons removed
+- [Phase 78-valve-health]: Cron health check writes proxy health snapshot to netatmo/proxyHealth on every run; no push notification on degradation per user decision
+- [Phase 78-valve-health]: On proxy /health failure: writes unreachable record { provider_status: 'unreachable', data_freshness: 'UNREACHABLE', checked_at }
 
 ### Pending Todos
 
@@ -108,6 +110,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15T16:10:02.186Z
-Stopped at: Completed 78-01-PLAN.md
+Last session: 2026-03-15T16:10:22.408Z
+Stopped at: Completed 78-02-PLAN.md
 Resume file: None

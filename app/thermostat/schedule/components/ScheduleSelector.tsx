@@ -14,6 +14,7 @@ interface ScheduleSelectorProps {
   schedules?: Schedule[];
   activeSchedule?: Schedule | null;
   onScheduleChanged?: () => void;
+  homeId?: string; // needed for switchhomeschedule body
 }
 
 /**
@@ -23,6 +24,7 @@ export default function ScheduleSelector({
   schedules = [],
   activeSchedule,
   onScheduleChanged,
+  homeId,
 }: ScheduleSelectorProps) {
   const [switching, setSwitching] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,15 +32,19 @@ export default function ScheduleSelector({
 
   const handleSwitch = async (): Promise<void> => {
     if (!selectedId || selectedId === activeSchedule?.id) return;
+    if (!homeId) {
+      setError('Home ID non disponibile');
+      return;
+    }
 
     try {
       setSwitching(true);
       setError(null);
 
-      const res = await fetch(NETATMO_ROUTES.schedules, {
+      const res = await fetch(NETATMO_ROUTES.switchHomeSchedule, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scheduleId: selectedId }),
+        body: JSON.stringify({ home_id: homeId, schedule_id: selectedId }),
       });
 
       const data = await res.json();

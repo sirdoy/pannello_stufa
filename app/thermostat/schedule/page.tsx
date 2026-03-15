@@ -25,7 +25,7 @@ interface Schedule {
 
 function ScheduleContent() {
   const router = useRouter();
-  const { schedules, activeSchedule, loading, error, refetch } = useScheduleData();
+  const { schedules, activeSchedule, homeId, loading, error, refetch } = useScheduleData();
   const { rooms, refetch: refetchRooms } = useRoomStatus();
   const [showOverrideSheet, setShowOverrideSheet] = useState<boolean>(false);
 
@@ -94,6 +94,7 @@ function ScheduleContent() {
           schedules={schedules as Schedule[]}
           activeSchedule={activeSchedule as Schedule}
           onScheduleChanged={refetch}
+          homeId={homeId ?? undefined}
         />
       </Card>
 

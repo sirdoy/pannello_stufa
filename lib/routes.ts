@@ -70,6 +70,7 @@ export const NETATMO_ROUTES = {
   // Status & data
   homeStatus: `${API_BASE}/netatmo/homestatus`,
   schedules: `${API_BASE}/netatmo/schedules`,
+  switchHomeSchedule: `${API_BASE}/netatmo/switchhomeschedule`,
 
   // Control
   setRoomThermpoint: `${API_BASE}/netatmo/setroomthermpoint`,

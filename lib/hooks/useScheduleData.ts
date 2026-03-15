@@ -35,8 +35,9 @@ interface Schedule {
   [key: string]: unknown;
 }
 
-export function useScheduleData(): { schedules: Schedule[]; activeSchedule: Schedule | null; loading: boolean; error: string | null; source: string | null; refetch: () => Promise<void> } {
+export function useScheduleData(): { schedules: Schedule[]; activeSchedule: Schedule | null; homeId: string | null; loading: boolean; error: string | null; source: string | null; refetch: () => Promise<void> } {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [homeId, setHomeId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [source, setSource] = useState<string | null>(null); // 'cache' | 'api'
@@ -69,6 +70,7 @@ export function useScheduleData(): { schedules: Schedule[]; activeSchedule: Sche
       }
 
       setSchedules(data.schedules || []);
+      setHomeId(data.home_id || null);
       setSource(data._source);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -89,6 +91,7 @@ export function useScheduleData(): { schedules: Schedule[]; activeSchedule: Sche
   return {
     schedules,
     activeSchedule,
+    homeId,
     loading,
     error,
     source,

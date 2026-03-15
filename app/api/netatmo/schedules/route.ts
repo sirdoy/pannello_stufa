@@ -11,6 +11,7 @@ export const dynamic = 'force-dynamic';
  */
 export const GET = withAuthAndErrorHandler(async (_request: NextRequest) => {
   const homesdataResponse = await getProxyHomesdata();
-  const schedules = homesdataResponse.body.homes[0]?.schedules ?? [];
-  return success({ schedules });
+  const home = homesdataResponse.body.homes[0];
+  const schedules = home?.schedules ?? [];
+  return success({ schedules, home_id: home?.id });
 }, 'Netatmo/Schedules');

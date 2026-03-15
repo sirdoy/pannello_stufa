@@ -55,7 +55,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 78: Valve + Health** - Dedicated valve endpoints and health monitoring cron migrated to proxy (completed 2026-03-15)
 - [x] **Phase 79: Cleanup** - Dead code deleted (OAuth helpers, rate limiter, cache service, callback route, env vars), tests updated (completed 2026-03-15)
 - [x] **Phase 80: Fix Env Var & Schedule Wiring** - Align env var names, wire switchhomeschedule to frontend (completed 2026-03-15)
-- [ ] **Phase 81: Fix StoveSync & Debug Panel Cleanup** - Remove stoveSync 404, clean debug panel deleted routes
+- [x] **Phase 81: Fix StoveSync & Debug Panel Cleanup** - Remove stoveSync 404, clean debug panel deleted routes (completed 2026-03-15)
 
 ## Phase Details
 
@@ -161,7 +161,7 @@ Plans:
   2. Both `NetatmoTab` variants (debug/api and debug) no longer call `/api/netatmo/devices`, `/devices-temperatures`, or `/debug`
   3. `coordinationNotificationThrottle.ts` JSDoc no longer references `USE_PERSISTENT_RATE_LIMITER`
   4. Debug panel Netatmo tab loads without 404 errors
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [ ] 81-01-PLAN.md — Delete StoveSyncPanel + disconnect route, clean debug NetatmoTab endpoints, fix stale JSDoc
 
@@ -188,7 +188,7 @@ Plans:
 | 78. Valve + Health | 2/2 | Complete    | 2026-03-15 | - |
 | 79. Cleanup | 2/2 | Complete    | 2026-03-15 | - |
 | 80. Fix Env Var & Schedule Wiring | 2/2 | Complete    | 2026-03-15 | - |
-| 81. Fix StoveSync & Debug Panel Cleanup | 0/1 | Planned | - | - |
+| 81. Fix StoveSync & Debug Panel Cleanup | 1/1 | Complete   | 2026-03-15 | - |
 
 **Total:** 13 milestones shipped, 74 phases complete, 330 plans executed — v10.0 in progress
 

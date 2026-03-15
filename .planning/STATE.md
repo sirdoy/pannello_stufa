@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v10.0
 milestone_name: Netatmo API Migration
 status: executing
-stopped_at: Phase 81 context gathered
-last_updated: "2026-03-15T18:44:47.266Z"
+stopped_at: Completed 81-fix-stovesync-debug-cleanup 81-01-PLAN.md
+last_updated: "2026-03-15T18:59:25.634Z"
 last_activity: 2026-03-15 — 75-01 Netatmo proxy client + types complete
 progress:
   total_phases: 7
-  completed_phases: 6
-  total_plans: 15
-  completed_plans: 15
+  completed_phases: 7
+  total_plans: 16
+  completed_plans: 16
   percent: 5
 ---
 
@@ -60,6 +60,7 @@ Progress: [█░░░░░░░░░] 5% (v10.0)
 | Phase 79-cleanup P02 | 25 | 2 tasks | 17 files |
 | Phase 80-fix-env-var-schedule-wiring P01 | 7 | 1 tasks | 6 files |
 | Phase 80-fix-env-var-schedule-wiring P02 | 6 | 2 tasks | 7 files |
+| Phase 81-fix-stovesync-debug-cleanup P01 | 6 | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,9 @@ See PROJECT.md Key Decisions table for full history. Relevant to v10.0:
 - [Phase 80-fix-env-var-schedule-wiring]: NETATMO_PROXY_API_KEY is the canonical env var name — runtime (netatmoProxy.ts) was already correct; validator and docs aligned to match
 - [Phase 80-fix-env-var-schedule-wiring]: GET /schedules returns home_id from homes[0].id — avoids second API call in consumers
 - [Phase 80-fix-env-var-schedule-wiring]: Schedule switching: POST to /api/netatmo/switchhomeschedule with { home_id, schedule_id } body — ScheduleSelector and ThermostatCard both wired to NETATMO_ROUTES.switchHomeSchedule
+- [Phase 81-fix-stovesync-debug-cleanup]: StoveSyncPanel deleted entirely - proxy handles stove sync coordination
+- [Phase 81-fix-stovesync-debug-cleanup]: disconnect route deleted - proxy owns auth token management, client-side disconnect meaningless
+- [Phase 81-fix-stovesync-debug-cleanup]: debug NetatmoTab connectionStatus now reads from /health provider_status instead of deleted /debug endpoint
 
 ### Pending Todos
 
@@ -120,6 +124,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15T18:44:47.263Z
-Stopped at: Phase 81 context gathered
-Resume file: .planning/phases/81-fix-stovesync-debug-cleanup/81-CONTEXT.md
+Last session: 2026-03-15T18:59:25.627Z
+Stopped at: Completed 81-fix-stovesync-debug-cleanup 81-01-PLAN.md
+Resume file: None

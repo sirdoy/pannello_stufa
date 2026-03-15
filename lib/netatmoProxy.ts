@@ -38,6 +38,9 @@ import type {
   SetMonitoringRequest,
   SetMonitoringResponse,
   CameraEventsResponse,
+  ValveStatusResponse,
+  CalibrateBatchResponse,
+  NetatmoHealthResponse,
 } from '@/types/netatmoProxy';
 
 const DEFAULT_TIMEOUT_MS = 15_000;
@@ -362,6 +365,40 @@ export async function proxySetCameraMonitoring(
 export async function getProxyCameraEvents(hours?: number): Promise<CameraEventsResponse> {
   const endpoint = hours !== undefined ? `/camera/events?hours=${hours}` : '/camera/events';
   return netatmoProxyGet<CameraEventsResponse>(endpoint);
+}
+
+// =============================================================================
+// VALVE WRAPPERS
+// =============================================================================
+
+/**
+ * Get all valve modules with battery level, RF signal, reachability, and calibration state.
+ * Calls GET /valves on the Netatmo proxy.
+ */
+export async function getProxyValves(): Promise<ValveStatusResponse> {
+  return netatmoProxyGet<ValveStatusResponse>('/valves');
+}
+
+/**
+ * Trigger calibration on all valves simultaneously.
+ * Calls POST /valves/calibrate on the Netatmo proxy with an empty body.
+ * The proxy handles calibration natively — no schedule-switching workaround needed.
+ */
+export async function proxyCalibrateValves(): Promise<CalibrateBatchResponse> {
+  return netatmoProxyPost<CalibrateBatchResponse>('/valves/calibrate', {});
+}
+
+// =============================================================================
+// HEALTH WRAPPERS
+// =============================================================================
+
+/**
+ * Get the current health status of the Netatmo proxy.
+ * Calls GET /health on the Netatmo proxy.
+ * Returns token lifecycle status, rate limit usage, and data freshness.
+ */
+export async function getProxyHealth(): Promise<NetatmoHealthResponse> {
+  return netatmoProxyGet<NetatmoHealthResponse>('/health');
 }
 
 /**

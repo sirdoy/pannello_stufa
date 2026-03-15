@@ -311,3 +311,72 @@ export interface CameraEventsResponse {
   events: CameraEvent[];
   count: number;
 }
+
+// =============================================================================
+// VALVE TYPES
+// =============================================================================
+
+/**
+ * A single valve module with battery, signal, and calibration state.
+ * All fields except module_id are nullable — values may be absent if the
+ * valve has never reported or is offline.
+ */
+export interface ValveStatus {
+  module_id: string;
+  module_name: string | null;
+  room_id: string | null;
+  room_name: string | null;
+  battery_level: string | null;   // "high" | "medium" | "low" | "very_low"
+  rf_strength: number | null;
+  reachable: boolean | null;
+  calibrating: boolean | null;
+}
+
+/**
+ * Full response from proxy GET /valves
+ */
+export interface ValveStatusResponse {
+  valves: ValveStatus[];
+  data_freshness: DataFreshness;
+}
+
+/**
+ * Result for a single valve in a batch calibration operation.
+ */
+export interface CalibrateBatchResult {
+  module_id: string;
+  status: 'accepted' | 'error';
+  error?: string;
+}
+
+/**
+ * Full response from proxy POST /valves/calibrate
+ * The proxy triggers calibration on all valves simultaneously.
+ */
+export interface CalibrateBatchResponse {
+  status: 'accepted';
+  results: CalibrateBatchResult[];
+  poll_endpoint: string;
+}
+
+// =============================================================================
+// HEALTH TYPES
+// =============================================================================
+
+/**
+ * Health status response from proxy GET /health endpoint.
+ * Provides token lifecycle status, rate limit usage, and data freshness metrics.
+ */
+export interface NetatmoHealthResponse {
+  token_status: 'valid' | 'expiring' | 'expired';
+  expires_at: number;
+  last_refresh_at: number | null;
+  consecutive_failures: number;
+  last_error: string | null;
+  provider_status: 'ok' | 'degraded' | 'down';
+  data_freshness: DataFreshness;
+  token_source: 'sqlite' | 'secrets_toml';
+  requests_this_hour: number;
+  rate_limit_ceiling: number;
+  last_poll_at: number | null;
+}

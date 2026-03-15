@@ -403,15 +403,20 @@ export default function ThermostatCard() {
   async function handleScheduleChange(scheduleId: string) {
     if (!scheduleId || scheduleId === typedActiveSchedule?.id) return;
 
+    if (!topology?.home_id) {
+      setError('Home ID non disponibile');
+      return;
+    }
+
     try {
       setSwitchingSchedule(true);
       setLoadingMessage('Cambio programmazione...');
       setError(null);
 
-      const response = await netatmoScheduleCmd.execute(NETATMO_ROUTES.schedules, {
+      const response = await netatmoScheduleCmd.execute(NETATMO_ROUTES.switchHomeSchedule, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scheduleId }),
+        body: JSON.stringify({ home_id: topology.home_id, schedule_id: scheduleId }),
       });
 
       if (response) {

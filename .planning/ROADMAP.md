@@ -51,7 +51,7 @@ See `.planning/milestones/` for full archives.
 
 - [x] **Phase 75: API Client Foundation + Energy Read** - New proxy client with X-API-Key auth, homestatus and homesdata read endpoints migrated (completed 2026-03-15)
 - [x] **Phase 76: Energy Control Endpoints** - All write/control endpoints migrated (setpoint, mode, schedule switch, sync, measurements) (completed 2026-03-15)
-- [ ] **Phase 77: Camera Migration** - All six camera endpoints migrated (status, stream URLs, snapshot, events, monitoring toggle, event snapshots)
+- [x] **Phase 77: Camera Migration** - All six camera endpoints migrated (status, stream URLs, snapshot, events, monitoring toggle, event snapshots) (completed 2026-03-15)
 - [ ] **Phase 78: Valve + Health** - Dedicated valve endpoints and health monitoring cron migrated to proxy
 - [ ] **Phase 79: Cleanup** - Dead code deleted (OAuth helpers, rate limiter, cache service, callback route, env vars), tests updated
 
@@ -100,7 +100,7 @@ Plans:
   4. Camera events list loads from proxy `/camera/events` (SQLite-backed, 7-day retention)
   5. User can toggle camera monitoring on/off via proxy `/camera/{id}/monitoring`
   6. Event snapshot binary loads from proxy `/camera/events/{id}/snapshot`
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [ ] 77-01-PLAN.md — Camera proxy types + convenience wrappers + tests
 - [ ] 77-02-PLAN.md — Create/migrate all 6 camera API routes + update CAMERA_ROUTES
@@ -147,7 +147,7 @@ Plans:
 | 70-74 | v9.0 | 8/8 | ✓ Complete | 2026-02-19 |
 | 75. API Client Foundation + Energy Read | 2/2 | Complete    | 2026-03-15 | - |
 | 76. Energy Control Endpoints | 4/4 | Complete    | 2026-03-15 | - |
-| 77. Camera Migration | 2/3 | In Progress|  | - |
+| 77. Camera Migration | 3/3 | Complete   | 2026-03-15 | - |
 | 78. Valve + Health | v10.0 | 0/TBD | Not started | - |
 | 79. Cleanup | v10.0 | 0/TBD | Not started | - |
 

@@ -47,6 +47,7 @@ import { saveWeatherToCache } from '@/lib/weatherCacheService';
 import { PIDController } from '@/lib/utils/pidController';
 import { logCronExecution } from '@/lib/cronExecutionLogger';
 import { logAnalyticsEvent } from '@/lib/analyticsEventLogger';
+import { getProxyHealth } from '@/lib/netatmoProxy';
 
 export const dynamic = 'force-dynamic';
 
@@ -1010,6 +1011,30 @@ export const GET = withCronSecret(async (_request) => {
       enabled: modeData.enabled || false,
       semiManual: false,
       lastUpdated: new Date().toISOString()
+    });
+  }
+
+  // Netatmo proxy health check — snapshot to Firebase on every cron run
+  try {
+    const health = await getProxyHealth();
+    const healthPath = getEnvironmentPath('netatmo/proxyHealth');
+    await adminDbSet(healthPath, {
+      provider_status: health.provider_status,
+      data_freshness: health.data_freshness,
+      token_status: health.token_status,
+      consecutive_failures: health.consecutive_failures,
+      requests_this_hour: health.requests_this_hour,
+      rate_limit_ceiling: health.rate_limit_ceiling,
+      last_poll_at: health.last_poll_at,
+      checked_at: Date.now(),
+    });
+  } catch (healthError) {
+    // On proxy /health failure: write unreachable status
+    const healthPath = getEnvironmentPath('netatmo/proxyHealth');
+    await adminDbSet(healthPath, {
+      provider_status: 'unreachable',
+      data_freshness: 'UNREACHABLE',
+      checked_at: Date.now(),
     });
   }
 

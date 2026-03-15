@@ -51,6 +51,7 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
   }, []);
 
   const fetchAllGetEndpoints = useCallback(() => {
+    fetchGetEndpoint('health', '/api/netatmo/health');
     fetchGetEndpoint('homesdata', '/api/netatmo/homesdata');
     fetchGetEndpoint('homestatus', '/api/netatmo/homestatus');
     fetchGetEndpoint('devices', '/api/netatmo/devices');
@@ -123,6 +124,17 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
           📥 GET Endpoints
         </Heading>
         <div className="space-y-3">
+          <EndpointCard
+            name="Proxy Health"
+            url="/api/netatmo/health"
+            response={getResponses.health}
+            loading={loadingGet.health ?? false}
+            timing={timings.health}
+            onRefresh={() => fetchGetEndpoint('health', '/api/netatmo/health')}
+            onCopyUrl={() => copyUrlToClipboard('/api/netatmo/health')}
+            isCopied={copiedUrl === '/api/netatmo/health'}
+          />
+
           <EndpointCard
             name="Homes Data"
             url="/api/netatmo/homesdata"

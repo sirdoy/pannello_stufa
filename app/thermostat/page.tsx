@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { Card, Button, Skeleton, ErrorAlert, Banner, Heading, Text, Grid, InfoBox, PageLayout } from '@/app/components/ui';
 import RoomCard from '@/app/components/netatmo/RoomCard';
 import BatteryWarning, { ModuleBatteryList } from '@/app/components/devices/thermostat/BatteryWarning';
-import StoveSyncPanel from '@/app/components/netatmo/StoveSyncPanel';
 import ThermostatTabs from './components/ThermostatTabs';
 import { NETATMO_ROUTES } from '@/lib/routes';
 import { Calendar, Clock } from 'lucide-react';
@@ -296,18 +295,6 @@ function NetatmoContent() {
             <Button variant="ember" onClick={checkConnection}>
               🔄 Riprova
             </Button>
-            <Button
-              variant="subtle"
-              onClick={async () => {
-                // ✅ Clear token from Firebase before reconnecting
-                await fetch(NETATMO_ROUTES.disconnect, { method: 'POST' });
-                setConnected(false);
-                setError(null);
-                setTopology(null);
-              }}
-            >
-              🔗 Riconnetti Account
-            </Button>
           </div>
         </Card>
       </PageLayout>
@@ -573,11 +560,6 @@ function NetatmoContent() {
         }
         manualContent={
           <>
-            {/* Stove Sync Panel */}
-            <div className="mb-6">
-              <StoveSyncPanel onSyncComplete={fetchStatus} />
-            </div>
-
             {/* Rooms Grid */}
             <Grid cols={3} gap="md">
               {sortedRooms.map(room => (

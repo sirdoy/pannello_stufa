@@ -12,7 +12,6 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import SettingsLayout from '@/app/components/SettingsLayout';
-import StoveSyncPanel from '@/app/components/netatmo/StoveSyncPanel';
 import PidAutomationPanel from '@/app/components/netatmo/PidAutomationPanel';
 import { Skeleton, Card, Text } from '@/app/components/ui';
 
@@ -52,9 +51,6 @@ export default function ThermostatSettingsPage() {
   return (
     <SettingsLayout title="Impostazioni termostato" icon="🌡️">
       <div className="space-y-6">
-        {/* Stove Sync Panel */}
-        <StoveSyncPanel />
-
         {/* PID Automation Panel */}
         <PidAutomationPanel />
       </div>

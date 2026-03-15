@@ -72,12 +72,6 @@ jest.mock('@/app/components/devices/thermostat/BatteryWarning', () => ({
   ModuleBatteryList: () => <div>Battery List</div>,
 }));
 
-jest.mock('@/app/components/netatmo/StoveSyncPanel', () => {
-  return function StoveSyncPanel() {
-    return <div>Stove Sync Panel</div>;
-  };
-});
-
 describe('NetatmoPage - setState-in-render fix', () => {
   let mockRouter: { replace: jest.Mock; push: jest.Mock };
   let mockSearchParams: { get: jest.Mock };

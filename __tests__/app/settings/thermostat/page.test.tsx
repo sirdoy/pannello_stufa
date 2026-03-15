@@ -29,12 +29,6 @@ jest.mock('@/app/components/SettingsLayout', () => {
   };
 });
 
-jest.mock('@/app/components/netatmo/StoveSyncPanel', () => {
-  return function MockStoveSyncPanel() {
-    return <div data-testid="stove-sync-panel">StoveSyncPanel</div>;
-  };
-});
-
 jest.mock('@/app/components/netatmo/PidAutomationPanel', () => {
   return function MockPidAutomationPanel() {
     return <div data-testid="pid-automation-panel">PidAutomationPanel</div>;
@@ -64,7 +58,6 @@ describe('ThermostatSettingsPage - Auth Race Condition Fix', () => {
     expect(skeleton).toBeTruthy();
 
     // Should NOT show actual content yet
-    expect(screen.queryByTestId('stove-sync-panel')).not.toBeInTheDocument();
     expect(screen.queryByTestId('pid-automation-panel')).not.toBeInTheDocument();
   });
 
@@ -93,8 +86,7 @@ describe('ThermostatSettingsPage - Auth Race Condition Fix', () => {
     // Should show settings layout
     expect(screen.getByText('Impostazioni termostato')).toBeInTheDocument();
 
-    // Should show both panels
-    expect(screen.getByTestId('stove-sync-panel')).toBeInTheDocument();
+    // Should show PID automation panel
     expect(screen.getByTestId('pid-automation-panel')).toBeInTheDocument();
 
     // Should NOT redirect
@@ -107,8 +99,7 @@ describe('ThermostatSettingsPage - Auth Race Condition Fix', () => {
 
     const { container } = render(<ThermostatSettingsPage />);
 
-    // Verify panels are not rendered (so they can't make API calls)
-    expect(screen.queryByTestId('stove-sync-panel')).not.toBeInTheDocument();
+    // Verify panel is not rendered (so it can't make API calls)
     expect(screen.queryByTestId('pid-automation-panel')).not.toBeInTheDocument();
 
     // Verify only skeleton is shown
@@ -121,8 +112,8 @@ describe('ThermostatSettingsPage - Auth Race Condition Fix', () => {
     const { rerender } = render(<ThermostatSettingsPage />);
     mockUseUser.mockReturnValue({ user: null, isLoading: true });
 
-    // Should show skeleton
-    expect(screen.queryByTestId('stove-sync-panel')).not.toBeInTheDocument();
+    // Should show skeleton (no panels yet)
+    expect(screen.queryByTestId('pid-automation-panel')).not.toBeInTheDocument();
 
     // Auth completes - user is authenticated
     const mockUser = { sub: 'auth0|123', email: 'test@example.com' };
@@ -131,7 +122,6 @@ describe('ThermostatSettingsPage - Auth Race Condition Fix', () => {
 
     // Should now show content
     await waitFor(() => {
-      expect(screen.getByTestId('stove-sync-panel')).toBeInTheDocument();
       expect(screen.getByTestId('pid-automation-panel')).toBeInTheDocument();
     });
   });

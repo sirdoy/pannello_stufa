@@ -54,6 +54,8 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 77: Camera Migration** - All six camera endpoints migrated (status, stream URLs, snapshot, events, monitoring toggle, event snapshots) (completed 2026-03-15)
 - [x] **Phase 78: Valve + Health** - Dedicated valve endpoints and health monitoring cron migrated to proxy (completed 2026-03-15)
 - [x] **Phase 79: Cleanup** - Dead code deleted (OAuth helpers, rate limiter, cache service, callback route, env vars), tests updated (completed 2026-03-15)
+- [ ] **Phase 80: Fix Env Var & Schedule Wiring** - Align env var names, wire switchhomeschedule to frontend
+- [ ] **Phase 81: Fix StoveSync & Debug Panel Cleanup** - Remove stoveSync 404, clean debug panel deleted routes
 
 ## Phase Details
 
@@ -134,6 +136,28 @@ Plans:
 - [ ] 79-01-PLAN.md — Delete dead modules, routes, UI components, and tests (~45 files)
 - [ ] 79-02-PLAN.md — Update live code, env config, docs, and fix affected tests
 
+### Phase 80: Fix Env Var & Schedule Wiring
+**Goal**: Env var names are consistent across validator/docs/runtime, and schedule switching works end-to-end from frontend through the proxy switchhomeschedule route
+**Depends on**: Phase 79
+**Requirements**: API-02, CLEAN-06, ENERGY-05
+**Gap Closure:** Closes gaps from audit
+**Success Criteria** (what must be TRUE):
+  1. `envValidator.ts` and `.env.example` reference `NETATMO_PROXY_API_KEY` (matching `netatmoProxy.ts`)
+  2. `NETATMO_ROUTES` includes a `switchhomeschedule` key pointing to the correct route
+  3. `ThermostatCard.tsx` and `ScheduleSelector.tsx` call `/api/netatmo/switchhomeschedule` with `{ home_id, schedule_id }` body
+  4. "Switch Heating Schedule" E2E flow completes without errors
+
+### Phase 81: Fix StoveSync & Debug Panel Cleanup
+**Goal**: StoveSyncPanel no longer calls a deleted route, debug panel Netatmo tab no longer references deleted endpoints, and stale JSDoc is cleaned up
+**Depends on**: Phase 80
+**Requirements**: CLEAN-02
+**Gap Closure:** Closes gaps from audit
+**Success Criteria** (what must be TRUE):
+  1. `NETATMO_ROUTES.stoveSync` is removed or points to a valid endpoint (StoveSyncPanel gracefully handles absence)
+  2. Both `NetatmoTab` variants (debug/api and debug) no longer call `/api/netatmo/devices`, `/devices-temperatures`, or `/debug`
+  3. `coordinationNotificationThrottle.ts` JSDoc no longer references `USE_PERSISTENT_RATE_LIMITER`
+  4. Debug panel Netatmo tab loads without 404 errors
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -156,9 +180,11 @@ Plans:
 | 77. Camera Migration | 3/3 | Complete    | 2026-03-15 | - |
 | 78. Valve + Health | 2/2 | Complete    | 2026-03-15 | - |
 | 79. Cleanup | 2/2 | Complete    | 2026-03-15 | - |
+| 80. Fix Env Var & Schedule Wiring | 0/0 | Planned | - | - |
+| 81. Fix StoveSync & Debug Panel Cleanup | 0/0 | Planned | - | - |
 
 **Total:** 13 milestones shipped, 74 phases complete, 330 plans executed — v10.0 in progress
 
 ---
 
-*Roadmap updated: 2026-03-15 — Phase 79 planned (2 plans)*
+*Roadmap updated: 2026-03-15 — Gap closure phases 80-81 added*

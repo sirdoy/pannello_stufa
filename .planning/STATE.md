@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v10.0
 milestone_name: Netatmo API Migration
 status: executing
-stopped_at: Phase 78 context gathered
-last_updated: "2026-03-15T15:57:38.796Z"
+stopped_at: Completed 78-01-PLAN.md
+last_updated: "2026-03-15T16:10:12.361Z"
 last_activity: 2026-03-15 — 75-01 Netatmo proxy client + types complete
 progress:
   total_phases: 5
-  completed_phases: 3
-  total_plans: 9
-  completed_plans: 9
+  completed_phases: 4
+  total_plans: 11
+  completed_plans: 11
   percent: 5
 ---
 
@@ -54,6 +54,8 @@ Progress: [█░░░░░░░░░] 5% (v10.0)
 | Phase 77-camera-migration P01 | 213 | 2 tasks | 3 files |
 | Phase 77-camera-migration P02 | 10 | 1 tasks | 11 files |
 | Phase 77-camera-migration P03 | 367 | 2 tasks | 6 files |
+| Phase 78 P01 | 12 | 2 tasks | 6 files |
+| Phase 78-valve-health P02 | 12 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -85,6 +87,7 @@ See PROJECT.md Key Decisions table for full history. Relevant to v10.0:
 - [Phase 77-camera-migration]: DataFreshness is a string union ('LIVE'|'STALE'|'UNREACHABLE'), not an object — components use dataFreshness === 'UNREACHABLE' directly
 - [Phase 77-camera-migration]: EventPreviewModal now accepts only CameraEvent (camera prop removed) — video playback out of scope per REQUIREMENTS.md
 - [Phase 77-camera-migration]: Stream URL fetched on-demand when user clicks Live, not on component mount
+- [Phase 78]: Calibration service failure reasons simplified to auth_error|proxy_error — all schedule-switching failure reasons removed
 
 ### Pending Todos
 
@@ -105,6 +108,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15T15:57:38.791Z
-Stopped at: Phase 78 context gathered
-Resume file: .planning/phases/78-valve-health/78-CONTEXT.md
+Last session: 2026-03-15T16:10:02.186Z
+Stopped at: Completed 78-01-PLAN.md
+Resume file: None

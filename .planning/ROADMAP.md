@@ -52,7 +52,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 75: API Client Foundation + Energy Read** - New proxy client with X-API-Key auth, homestatus and homesdata read endpoints migrated (completed 2026-03-15)
 - [x] **Phase 76: Energy Control Endpoints** - All write/control endpoints migrated (setpoint, mode, schedule switch, sync, measurements) (completed 2026-03-15)
 - [x] **Phase 77: Camera Migration** - All six camera endpoints migrated (status, stream URLs, snapshot, events, monitoring toggle, event snapshots) (completed 2026-03-15)
-- [ ] **Phase 78: Valve + Health** - Dedicated valve endpoints and health monitoring cron migrated to proxy
+- [x] **Phase 78: Valve + Health** - Dedicated valve endpoints and health monitoring cron migrated to proxy (completed 2026-03-15)
 - [ ] **Phase 79: Cleanup** - Dead code deleted (OAuth helpers, rate limiter, cache service, callback route, env vars), tests updated
 
 ## Phase Details
@@ -115,7 +115,7 @@ Plans:
   2. Valve calibration triggers via proxy `/valves/calibrate` (no longer uses synchomeschedule workaround)
   3. Health monitoring dashboard shows Netatmo provider health (token status, data freshness, rate limit usage) from proxy `/health`
   4. Cron health check uses proxy `/health` endpoint; custom token validation code is no longer called
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 78-01-PLAN.md — Valve types + proxy wrappers + GET route + calibrate rewrite + service rewrite
 - [ ] 78-02-PLAN.md — Health types + proxy wrapper + GET route + cron migration + debug tab
@@ -151,7 +151,7 @@ Plans:
 | 75. API Client Foundation + Energy Read | 2/2 | Complete    | 2026-03-15 | - |
 | 76. Energy Control Endpoints | 4/4 | Complete    | 2026-03-15 | - |
 | 77. Camera Migration | 3/3 | Complete    | 2026-03-15 | - |
-| 78. Valve + Health | v10.0 | 0/2 | Not started | - |
+| 78. Valve + Health | 2/2 | Complete   | 2026-03-15 | - |
 | 79. Cleanup | v10.0 | 0/TBD | Not started | - |
 
 **Total:** 13 milestones shipped, 74 phases complete, 330 plans executed — v10.0 in progress

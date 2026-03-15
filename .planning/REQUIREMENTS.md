@@ -26,8 +26,8 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 
 ### Valve
 
-- [ ] **VALVE-01**: Valve status via dedicated proxy `/valves` endpoint (replaces parsing from homestatus)
-- [ ] **VALVE-02**: Valve calibration via proxy `/valves/calibrate` (replaces synchomeschedule workaround)
+- [x] **VALVE-01**: Valve status via dedicated proxy `/valves` endpoint (replaces parsing from homestatus)
+- [x] **VALVE-02**: Valve calibration via proxy `/valves/calibrate` (replaces synchomeschedule workaround)
 
 ### Camera
 
@@ -87,8 +87,8 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 | ENERGY-05 | Phase 76 | Complete |
 | ENERGY-06 | Phase 76 | Complete |
 | ENERGY-07 | Phase 76 | Complete |
-| VALVE-01 | Phase 78 | Pending |
-| VALVE-02 | Phase 78 | Pending |
+| VALVE-01 | Phase 78 | Complete |
+| VALVE-02 | Phase 78 | Complete |
 | CAM-01 | Phase 77 | Complete |
 | CAM-02 | Phase 77 | Complete |
 | CAM-03 | Phase 77 | Complete |

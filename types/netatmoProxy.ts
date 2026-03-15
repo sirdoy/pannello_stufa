@@ -179,3 +179,40 @@ export interface ProxyControlResponse {
   time_exec: number;
   time_server: number;
 }
+
+// =============================================================================
+// ROOM MEASURE TYPES
+// =============================================================================
+
+/** Raw measurement item (scale=max or scale=30min) */
+export interface NetatmoRawMeasurement {
+  home_id: string; room_id: string; room_name: string | null;
+  temperature: number | null; therm_setpoint_temperature: number | null;
+  heating_power_request: number | null; timestamp: number;
+}
+
+/** Hourly aggregation item (scale=1hour) */
+export interface NetatmoHourlyMeasurement {
+  home_id: string; room_id: string; room_name: string | null;
+  avg_temperature: number | null; min_temperature: number | null;
+  max_temperature: number | null; avg_heating_power: number | null;
+  sample_count: number; hour_timestamp: number;
+}
+
+/** Daily aggregation item (scale=1day) */
+export interface NetatmoDailyMeasurement {
+  home_id: string; room_id: string; room_name: string | null;
+  avg_temperature: number | null; min_temperature: number | null;
+  max_temperature: number | null; avg_heating_power: number | null;
+  sample_count: number; day_timestamp: number;
+}
+
+export type NetatmoMeasurement = NetatmoRawMeasurement | NetatmoHourlyMeasurement | NetatmoDailyMeasurement;
+
+/** Paginated response from GET /getroommeasure */
+export interface RoomMeasureResponse {
+  items: NetatmoMeasurement[];
+  total: number;
+  limit: number;
+  offset: number;
+}

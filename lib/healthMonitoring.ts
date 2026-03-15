@@ -9,7 +9,7 @@
  */
 
 import { getStoveStatus } from './stoveApi';
-import { getHomeStatus } from './netatmoApi';
+import { getProxyHomestatus } from './netatmoProxy';
 import { adminDbGet } from './firebaseAdmin';
 
 // Stove state categories for mismatch detection
@@ -284,28 +284,15 @@ async function getExpectedStateFromSchedule(userId: string) {
  */
 async function getNetatmoHeatingDemand() {
   try {
-    const homeId = process.env.NETATMO_HOME_ID;
+    // Fetch home status via proxy (no token management needed)
+    const proxyResponse = await getProxyHomestatus();
 
-    if (!homeId) {
-      return null;
-    }
-
-    // Get Netatmo access token from Firebase RTDB
-    const tokenData = await adminDbGet('netatmo/accessToken') as { token?: string } | null;
-
-    if (!tokenData || !tokenData.token) {
-      return null;
-    }
-
-    // Fetch home status
-    const homeStatus = await getHomeStatus(tokenData.token, homeId);
-
-    if (!homeStatus.rooms || homeStatus.rooms.length === 0) {
+    if (!proxyResponse.rooms || proxyResponse.rooms.length === 0) {
       return 'idle';
     }
 
     // Check if any room is actively heating
-    const isHeating = homeStatus.rooms.some(room => {
+    const isHeating = proxyResponse.rooms.some(room => {
       return room.heating_power_request && room.heating_power_request > 0;
     });
 

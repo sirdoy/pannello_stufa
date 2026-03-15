@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Minus } from 'lucide-react';
 import { NETATMO_ROUTES } from '@/lib/routes';
-import { getNetatmoAuthUrl } from '@/lib/netatmoCredentials';
 import { cn } from '@/lib/utils/cn';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
@@ -432,11 +431,6 @@ export default function ThermostatCard() {
     }
   }
 
-  const handleAuth = () => {
-    // Use centralized OAuth URL with all scopes
-    window.location.href = getNetatmoAuthUrl('thermostat');
-  };
-
   // Build props for DeviceCard
   const banners: any[] = [];
 
@@ -513,8 +507,6 @@ export default function ThermostatCard() {
       title="Termostato"
       colorTheme="ocean"
       connected={connected}
-      onConnect={handleAuth}
-      connectButtonLabel="Connetti Netatmo"
       connectInfoRoute="/thermostat"
       loading={loading || refreshing || calibrating || switchingSchedule}
       loadingMessage={loadingMessage}

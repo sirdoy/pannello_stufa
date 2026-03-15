@@ -64,24 +64,17 @@ const SCHEDULER_ROUTES = {
 // Netatmo endpoints
 export const NETATMO_ROUTES = {
   // Auth & topology
-  callback: `${API_BASE}/netatmo/callback`,
   disconnect: `${API_BASE}/netatmo/disconnect`,
   homesData: `${API_BASE}/netatmo/homesdata`,
-  devices: `${API_BASE}/netatmo/devices`,
 
   // Status & data
   homeStatus: `${API_BASE}/netatmo/homestatus`,
-  temperature: `${API_BASE}/netatmo/temperature`,
-  devicesTemperatures: `${API_BASE}/netatmo/devices-temperatures`,
   schedules: `${API_BASE}/netatmo/schedules`,
 
   // Control
   setRoomThermpoint: `${API_BASE}/netatmo/setroomthermpoint`,
   setThermMode: `${API_BASE}/netatmo/setthermmode`,
   calibrate: `${API_BASE}/netatmo/calibrate`,
-
-  // Stove-valve sync
-  stoveSync: `${API_BASE}/netatmo/stove-sync`,
 } as const;
 
 // Camera endpoints (Netatmo Security)

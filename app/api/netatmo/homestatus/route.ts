@@ -1,9 +1,19 @@
-import { withAuthAndErrorHandler, success, badRequest } from '@/lib/core';
+import { withAuthAndErrorHandler, success } from '@/lib/core';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
-import NETATMO_API from '@/lib/netatmoApi';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 import { getProxyHomestatus } from '@/lib/netatmoProxy';
 import type { DataFreshness } from '@/types/netatmoProxy';
+
+// Battery classification utilities (pure functions, previously in netatmoApi)
+function getModulesWithLowBattery(modules: any[]): any[] {
+  return modules.filter(m => m.battery_state === 'low' || m.battery_state === 'very_low');
+}
+function hasAnyCriticalBattery(modules: any[]): boolean {
+  return modules.some(m => m.battery_state === 'very_low');
+}
+function hasAnyLowBattery(modules: any[]): boolean {
+  return modules.some(m => m.battery_state === 'low' || m.battery_state === 'very_low');
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -103,10 +113,10 @@ export const GET = withAuthAndErrorHandler(async () => {
   // Get modules from Firebase topology (proxy homestatus does not include modules)
   const modulesFromTopology = (topology?.modules ?? []) as ModuleWithStatus[];
 
-  // Battery classification using pure utility functions from netatmoApi
-  const lowBatteryModules = NETATMO_API.getModulesWithLowBattery(modulesFromTopology as any);
-  const hasCriticalBattery = NETATMO_API.hasAnyCriticalBattery(modulesFromTopology as any);
-  const hasLowBattery = NETATMO_API.hasAnyLowBattery(modulesFromTopology as any);
+  // Battery classification using inlined pure utility functions
+  const lowBatteryModules = getModulesWithLowBattery(modulesFromTopology as any);
+  const hasCriticalBattery = hasAnyCriticalBattery(modulesFromTopology as any);
+  const hasLowBattery = hasAnyLowBattery(modulesFromTopology as any);
 
   // Save current status to Firebase (same path as before)
   const statusToSave: Record<string, unknown> = {

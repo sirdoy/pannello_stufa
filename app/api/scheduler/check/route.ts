@@ -39,7 +39,6 @@ import {
   setFanLevel,
 } from '@/lib/stoveApi';
 import { updateStoveState } from '@/lib/stoveStateService';
-import { syncLivingRoomWithStove, enforceStoveSyncSetpoints } from '@/lib/netatmoStoveSync';
 import { calibrateValvesServer } from '@/lib/netatmoCalibrationService';
 import { proactiveTokenRefresh } from '@/lib/hue/hueRemoteTokenHelper';
 import { fetchWeatherForecast } from '@/lib/openMeteo';
@@ -461,11 +460,6 @@ async function handleIgnition(active: any, ora: string): Promise<any> {
 
     await sendSchedulerNotification('IGNITE', `Stufa accesa automaticamente alle ${ora} (P${active.power}, V${active.fan})`);
 
-    syncLivingRoomWithStove(true).then((result: any) => {
-      if (result.synced) {
-      }
-    }).catch((err: any) => console.error('❌ Netatmo stove sync error:', err));
-
     return { success: true };
   } catch (error) {
     console.error('❌ Failed to ignite stove:', error instanceof Error ? error.message : 'Unknown error');
@@ -490,11 +484,6 @@ async function handleShutdown(ora: string): Promise<any> {
     }).catch(() => {});
 
     await sendSchedulerNotification('SHUTDOWN', `Stufa spenta automaticamente alle ${ora}`);
-
-    syncLivingRoomWithStove(false).then((result: any) => {
-      if (result.synced) {
-      }
-    }).catch((err: any) => console.error('❌ Netatmo stove sync error:', err));
 
     return { success: true };
   } catch (error) {
@@ -881,20 +870,6 @@ export const GET = withCronSecret(async (_request) => {
     if (maintenanceTrack.notificationData) {
       await sendMaintenanceNotificationIfNeeded(maintenanceTrack.notificationData as any);
     }
-  }
-
-  // Continuous stove sync enforcement - verify actual Netatmo setpoints, not just Firebase stoveMode
-  // This handles both state mismatches AND setpoint expiration (8-hour manual setpoints)
-  try {
-    const enforcementResult = await enforceStoveSyncSetpoints(isOn) as any;
-    if (enforcementResult.enforced || enforcementResult.synced) {
-      if (enforcementResult.action === 'setpoint_enforcement') {
-      } else {
-      }
-    } else {
-    }
-  } catch (syncError) {
-    console.error('❌ Stove sync enforcement error:', syncError instanceof Error ? syncError.message : String(syncError));
   }
 
   let changeApplied = false;

@@ -15,7 +15,6 @@ import {
   setPowerLevel as apiSetPower,
 } from '@/lib/stoveApi';
 import { getNextScheduledChange } from '@/lib/schedulerService';
-import { syncLivingRoomWithStove } from '@/lib/netatmoStoveSync';
 import { ApiError } from '@/lib/core';
 import type { StoveCommand, StovePowerLevel } from '@/types/firebase';
 
@@ -61,12 +60,6 @@ export class StoveService {
       await this.handleManualCommandMode();
     }
 
-    // Sync Netatmo thermostats with stove state (async, don't block response)
-    syncLivingRoomWithStove(true).then((syncResult) => {
-      if (syncResult.synced && 'roomNames' in syncResult && 'temperature' in syncResult) {
-      }
-    }).catch(err => console.error('Netatmo stove sync error (ignite):', err.message));
-
     return result;
   }
 
@@ -87,12 +80,6 @@ export class StoveService {
     if (source === 'manual') {
       await this.handleManualCommandMode();
     }
-
-    // Sync Netatmo thermostats with stove state (async, don't block response)
-    syncLivingRoomWithStove(false).then((syncResult) => {
-      if (syncResult.synced && 'roomNames' in syncResult) {
-      }
-    }).catch(err => console.error('Netatmo stove sync error (shutdown):', err.message));
 
     return result;
   }

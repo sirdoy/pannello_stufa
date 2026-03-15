@@ -151,7 +151,7 @@ Plans:
 | 75. API Client Foundation + Energy Read | 2/2 | Complete    | 2026-03-15 | - |
 | 76. Energy Control Endpoints | 4/4 | Complete    | 2026-03-15 | - |
 | 77. Camera Migration | 3/3 | Complete    | 2026-03-15 | - |
-| 78. Valve + Health | 2/2 | Complete   | 2026-03-15 | - |
+| 78. Valve + Health | 2/2 | Complete    | 2026-03-15 | - |
 | 79. Cleanup | v10.0 | 0/TBD | Not started | - |
 
 **Total:** 13 milestones shipped, 74 phases complete, 330 plans executed — v10.0 in progress

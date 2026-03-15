@@ -1,57 +1,33 @@
 # Netatmo Setup
 
-OAuth 2.0 integration for Netatmo Energy API.
+Local proxy integration for Netatmo Energy API. No OAuth required — the proxy handles token lifecycle.
 
 ---
 
 ## Quick Setup
 
-1. **Create Netatmo app**: [dev.netatmo.com/apps](https://dev.netatmo.com/apps)
-   - **Redirect URI**: `http://localhost:3001/api/netatmo/callback` (dev) / `https://your-domain/api/netatmo/callback` (prod)
-   - **Scopes**: `read_thermostat`, `write_thermostat`
-
-2. **Add credentials** to `.env.local`:
+1. **Configure proxy credentials** in `.env.local`:
    ```bash
-   NEXT_PUBLIC_NETATMO_CLIENT_ID=xxx
-   NETATMO_CLIENT_SECRET=xxx
-   NEXT_PUBLIC_NETATMO_REDIRECT_URI=http://localhost:3001/api/netatmo/callback
+   NETATMO_PROXY_URL=http://your-homeassistant-host:port/api/v1/netatmo
+   NETATMO_API_KEY=your-proxy-api-key
    ```
 
-3. **Test**: Visit `/netatmo` → "Connetti con Netatmo"
+2. **Test connection**: Visit the thermostat card on the dashboard — it will connect via the proxy automatically.
 
 ---
 
-## Dual Credentials (Dev + Prod)
+## Proxy Architecture
 
-Create **two Netatmo apps** to isolate environments:
+All Netatmo API calls go through a local HomeAssistant Network API proxy:
 
-```bash
-# .env.local (both sets)
-# Development
-NEXT_PUBLIC_NETATMO_CLIENT_ID_DEV=xxx
-NETATMO_CLIENT_SECRET_DEV=xxx
-NEXT_PUBLIC_NETATMO_REDIRECT_URI_DEV=http://localhost:3001/api/netatmo/callback
-
-# Production
-NEXT_PUBLIC_NETATMO_CLIENT_ID=xxx
-NETATMO_CLIENT_SECRET=xxx
-NEXT_PUBLIC_NETATMO_REDIRECT_URI=https://your-app.vercel.app/api/netatmo/callback
+```
+App → NETATMO_PROXY_URL (local network) → Netatmo Cloud
 ```
 
-Vercel: Add **only production** credentials (no `_DEV` suffix).
-
----
-
-## OAuth Flow
-
-1. User clicks "Connetti" → Redirect to Netatmo authorize
-2. User approves → Redirect to `/api/netatmo/callback?code=xxx`
-3. Callback exchanges code for `refresh_token` → Saved to Firebase
-4. Redirect to `/netatmo/authorized` → Success page → Dashboard
-
-**Firebase paths**:
-- Development: `dev/netatmo/refresh_token`
-- Production: `netatmo/refresh_token`
+**Benefits:**
+- No OAuth credentials in this app
+- Proxy handles token refresh, rate limiting, and caching
+- API key authentication (simpler than OAuth 2.0)
 
 ---
 
@@ -70,16 +46,11 @@ Vercel: Add **only production** credentials (no `_DEV` suffix).
 
 ### Daily Valve Calibration
 
-Cron job auto-calibrates valves every 24h. Path: `netatmo/lastAutoCalibration`
+Cron job auto-calibrates valves every 12 hours. Path: `netatmo/lastAutoCalibration`
 
 ### Stove-Valve Sync
 
-Living room valve set to 16C when stove is ON.
-
-```javascript
-// GET/POST /api/netatmo/stove-sync
-{ action: "enable"|"disable"|"sync", roomId, stoveTemperature: 16 }
-```
+Proxy coordinates stove sync — setpoints are managed by the proxy directly.
 
 ---
 
@@ -87,10 +58,10 @@ Living room valve set to 16C when stove is ON.
 
 | Error | Fix |
 |-------|-----|
-| "Missing CLIENT_ID" | Add `_DEV` credentials to `.env.local` |
-| "Redirect URI mismatch" | Check URI registered in Netatmo portal |
-| "Invalid client" | Verify CLIENT_ID and SECRET |
-| Works locally not prod | Add credentials to Vercel |
+| "NETATMO_PROXY_URL missing" | Add proxy URL to `.env.local` |
+| "NETATMO_API_KEY missing" | Add API key to `.env.local` |
+| Connection timeout | Verify proxy host is reachable on local network |
+| 401 Unauthorized | Check NETATMO_API_KEY matches proxy configuration |
 
 ---
 
@@ -98,11 +69,11 @@ Living room valve set to 16C when stove is ON.
 
 ```
 netatmo/
-├── refresh_token
-├── home_id
 ├── topology/
 ├── currentStatus/
-└── stoveSync/
+├── stoveSync/
+├── lastAutoCalibration
+└── proxyHealth/
 ```
 
 ---

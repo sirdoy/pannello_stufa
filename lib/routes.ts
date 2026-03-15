@@ -75,6 +75,9 @@ export const NETATMO_ROUTES = {
   setRoomThermpoint: `${API_BASE}/netatmo/setroomthermpoint`,
   setThermMode: `${API_BASE}/netatmo/setthermmode`,
   calibrate: `${API_BASE}/netatmo/calibrate`,
+
+  // Stove-valve sync (StoveSyncPanel settings UI)
+  stoveSync: `${API_BASE}/netatmo/stove-sync`,
 } as const;
 
 // Camera endpoints (Netatmo Security)

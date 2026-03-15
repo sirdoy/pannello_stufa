@@ -141,25 +141,13 @@ export async function GET(request) {
 
 ---
 
-## Netatmo Credentials
+## Netatmo Proxy
 
-### Environment Detection
+All Netatmo API calls go through a local proxy. Configure via env vars:
 
-| Environment | Credentials | Firebase Path |
-|-------------|-------------|---------------|
-| localhost | `*_DEV` vars | `dev/netatmo/` |
-| Production | Base vars | `netatmo/` |
-
-### Usage
-
-```javascript
-// Server-side
-import { getNetatmoCredentials } from '@/lib/netatmoCredentials';
-const { clientId, clientSecret, redirectUri } = getNetatmoCredentials();
-
-// Client-side
-import { getNetatmoCredentialsClient } from '@/lib/netatmoCredentials';
-const { clientId, redirectUri } = getNetatmoCredentialsClient();
+```bash
+NETATMO_PROXY_URL=http://your-proxy-host:port/api/v1/netatmo
+NETATMO_API_KEY=your-proxy-api-key
 ```
 
 **Setup completo**: [setup/netatmo-setup.md](./setup/netatmo-setup.md)

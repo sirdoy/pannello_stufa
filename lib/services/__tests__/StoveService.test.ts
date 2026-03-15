@@ -1,7 +1,7 @@
 /**
  * StoveService Tests
  *
- * Tests for stove ignite/shutdown operations with Netatmo thermostat sync
+ * Tests for stove ignite/shutdown operations
  */
 
 // Mock problematic dependencies BEFORE importing the service
@@ -41,62 +41,32 @@ jest.mock('@/lib/schedulerService', () => ({
   getNextScheduledChange: jest.fn().mockResolvedValue(null),
 }));
 
-jest.mock('@/lib/netatmoStoveSync', () => ({
-  syncLivingRoomWithStove: jest.fn().mockResolvedValue({
-    synced: true,
-    roomNames: 'Living Room',
-    temperature: 16,
-  }),
-}));
-
 // Now import the service and mocks
 import { StoveService } from '../StoveService';
 import { MaintenanceRepository } from '@/lib/repositories/MaintenanceRepository';
 import { igniteStove, shutdownStove } from '@/lib/stoveApi';
-import { syncLivingRoomWithStove } from '@/lib/netatmoStoveSync';
 
 describe('StoveService', () => {
   let service: any;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (syncLivingRoomWithStove as jest.Mock).mockResolvedValue({
-      synced: true,
-      roomNames: 'Living Room',
-      temperature: 16,
-    });
     service = new StoveService();
   });
 
   describe('ignite', () => {
-    it('should call syncLivingRoomWithStove(true) after successful ignition', async () => {
-      await service.ignite(3, 'manual');
-
-      // Wait for async sync operation
-      await new Promise(resolve => setTimeout(resolve, 10));
-
-      expect(igniteStove).toHaveBeenCalledWith(3);
-      expect(syncLivingRoomWithStove).toHaveBeenCalledWith(true);
-    });
-
-    it('should still sync thermostats for scheduler source', async () => {
-      await service.ignite(4, 'scheduler');
-
-      // Wait for async sync operation
-      await new Promise(resolve => setTimeout(resolve, 10));
-
-      expect(igniteStove).toHaveBeenCalledWith(4);
-      expect(syncLivingRoomWithStove).toHaveBeenCalledWith(true);
-    });
-
-    it('should not block on sync errors', async () => {
-      (syncLivingRoomWithStove as jest.Mock).mockRejectedValue(new Error('Netatmo unavailable'));
-
-      // Should not throw, even if sync fails
+    it('should call igniteStove after successful ignition', async () => {
       const result = await service.ignite(3, 'manual');
 
+      expect(igniteStove).toHaveBeenCalledWith(3);
       expect(result).toEqual({ success: true });
-      expect(syncLivingRoomWithStove).toHaveBeenCalledWith(true);
+    });
+
+    it('should call igniteStove for scheduler source', async () => {
+      const result = await service.ignite(4, 'scheduler');
+
+      expect(igniteStove).toHaveBeenCalledWith(4);
+      expect(result).toEqual({ success: true });
     });
 
     it('should not sync when maintenance check fails', async () => {
@@ -108,39 +78,23 @@ describe('StoveService', () => {
 
       await expect(serviceWithBlockedMaintenance.ignite(3, 'manual')).rejects.toThrow();
 
-      expect(syncLivingRoomWithStove).not.toHaveBeenCalled();
+      expect(igniteStove).not.toHaveBeenCalled();
     });
   });
 
   describe('shutdown', () => {
-    it('should call syncLivingRoomWithStove(false) after successful shutdown', async () => {
-      await service.shutdown('manual');
-
-      // Wait for async sync operation
-      await new Promise(resolve => setTimeout(resolve, 10));
-
-      expect(shutdownStove).toHaveBeenCalled();
-      expect(syncLivingRoomWithStove).toHaveBeenCalledWith(false);
-    });
-
-    it('should still sync thermostats for scheduler source', async () => {
-      await service.shutdown('scheduler');
-
-      // Wait for async sync operation
-      await new Promise(resolve => setTimeout(resolve, 10));
-
-      expect(shutdownStove).toHaveBeenCalled();
-      expect(syncLivingRoomWithStove).toHaveBeenCalledWith(false);
-    });
-
-    it('should not block on sync errors', async () => {
-      (syncLivingRoomWithStove as jest.Mock).mockRejectedValue(new Error('Netatmo unavailable'));
-
-      // Should not throw, even if sync fails
+    it('should call shutdownStove after successful shutdown', async () => {
       const result = await service.shutdown('manual');
 
+      expect(shutdownStove).toHaveBeenCalled();
       expect(result).toEqual({ success: true });
-      expect(syncLivingRoomWithStove).toHaveBeenCalledWith(false);
+    });
+
+    it('should call shutdownStove for scheduler source', async () => {
+      const result = await service.shutdown('scheduler');
+
+      expect(shutdownStove).toHaveBeenCalled();
+      expect(result).toEqual({ success: true });
     });
   });
 });

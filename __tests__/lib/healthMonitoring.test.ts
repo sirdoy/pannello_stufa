@@ -17,11 +17,11 @@ import {
 
 // Mock dependencies
 jest.mock('../../lib/stoveApi');
-jest.mock('../../lib/netatmoApi');
+jest.mock('../../lib/netatmoProxy');
 jest.mock('../../lib/firebaseAdmin');
 
 import { getStoveStatus } from '../../lib/stoveApi';
-import { getHomeStatus } from '../../lib/netatmoApi';
+import { getProxyHomestatus } from '../../lib/netatmoProxy';
 import { adminDbGet } from '../../lib/firebaseAdmin';
 
 describe('healthMonitoring', () => {
@@ -183,9 +183,11 @@ describe('healthMonitoring', () => {
       (getStoveStatus as jest.Mock).mockResolvedValue({ StatusDescription: 'WORK', Error: 0 });
       (adminDbGet as jest.Mock)
         .mockResolvedValueOnce('auto') // mode
-        .mockResolvedValueOnce([{ day: 1, start: 0, end: 1440, enabled: true }]) // schedule
-        .mockResolvedValueOnce({ token: 'fake-token' }); // Netatmo token
-      (getHomeStatus as jest.Mock).mockResolvedValue({ rooms: [{ heating_power_request: 50 }] });
+        .mockResolvedValueOnce([{ day: 1, start: 0, end: 1440, enabled: true }]); // schedule
+      (getProxyHomestatus as jest.Mock).mockResolvedValue({
+        rooms: [{ room_id: 'r1', room_name: 'Living', heating_power_request: 50, temperature: null, therm_setpoint_temperature: null }],
+        data_freshness: 'LIVE',
+      });
 
       const health = await checkUserStoveHealth(userId);
 
@@ -206,8 +208,8 @@ describe('healthMonitoring', () => {
       (getStoveStatus as jest.Mock).mockResolvedValue({ StatusDescription: 'WORK', Error: 0 });
       (adminDbGet as jest.Mock)
         .mockResolvedValueOnce('auto')
-        .mockResolvedValueOnce([{ day: 1, start: 0, end: 1440, enabled: true }])
-        .mockRejectedValueOnce(new Error('Netatmo API error'));
+        .mockResolvedValueOnce([{ day: 1, start: 0, end: 1440, enabled: true }]);
+      (getProxyHomestatus as jest.Mock).mockRejectedValue(new Error('Proxy error'));
 
       const health = await checkUserStoveHealth(userId);
 
@@ -240,7 +242,7 @@ describe('healthMonitoring', () => {
       // All APIs fail
       (getStoveStatus as jest.Mock).mockRejectedValue(new Error('Network error'));
       (adminDbGet as jest.Mock).mockRejectedValue(new Error('Firebase error'));
-      (getHomeStatus as jest.Mock).mockRejectedValue(new Error('Netatmo error'));
+      (getProxyHomestatus as jest.Mock).mockRejectedValue(new Error('Proxy error'));
 
       const health = await checkUserStoveHealth(userId);
 

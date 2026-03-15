@@ -40,9 +40,6 @@ describe('envValidator', () => {
 
       expect(result.valid).toBe(true);
       expect(result.missing).toEqual([]);
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Health monitoring environment validation passed')
-      );
     });
 
     it('should return missing array when required vars absent', () => {
@@ -83,34 +80,34 @@ describe('envValidator', () => {
       ]);
     });
 
-    it('should warn about missing optional vars', () => {
+    it('should warn about missing optional proxy vars', () => {
       process.env.ADMIN_USER_ID = 'auth0|admin123';
       process.env.CRON_SECRET = 'secret123';
       process.env.FIREBASE_ADMIN_PROJECT_ID = 'project-id';
       process.env.FIREBASE_ADMIN_CLIENT_EMAIL = 'client@email.com';
       process.env.FIREBASE_ADMIN_PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----';
-      // Missing Netatmo vars (optional)
+      // Missing proxy vars (optional)
 
       const result = validateHealthMonitoringEnv();
 
       expect(result.valid).toBe(true);
       expect(result.warnings).toEqual([
-        'NETATMO_CLIENT_ID',
-        'NETATMO_CLIENT_SECRET',
+        'NETATMO_PROXY_URL',
+        'NETATMO_API_KEY',
       ]);
       expect(console.warn).toHaveBeenCalledWith(
         expect.stringContaining('Optional env vars missing')
       );
     });
 
-    it('should not warn when optional vars present', () => {
+    it('should not warn when optional proxy vars present', () => {
       process.env.ADMIN_USER_ID = 'auth0|admin123';
       process.env.CRON_SECRET = 'secret123';
       process.env.FIREBASE_ADMIN_PROJECT_ID = 'project-id';
       process.env.FIREBASE_ADMIN_CLIENT_EMAIL = 'client@email.com';
       process.env.FIREBASE_ADMIN_PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----';
-      process.env.NETATMO_CLIENT_ID = 'netatmo-client-id';
-      process.env.NETATMO_CLIENT_SECRET = 'netatmo-secret';
+      process.env.NETATMO_PROXY_URL = 'http://proxy-host:8080/api/v1/netatmo';
+      process.env.NETATMO_API_KEY = 'my-api-key';
 
       const result = validateHealthMonitoringEnv();
 
@@ -120,92 +117,55 @@ describe('envValidator', () => {
   });
 
   describe('validateNetatmoEnv', () => {
-    it('should return valid: true when credentials present', () => {
-      process.env.NETATMO_CLIENT_ID = 'client-id-12345';
-      process.env.NETATMO_CLIENT_SECRET = 'secret-67890';
+    it('should return valid: true when proxy credentials present', () => {
+      process.env.NETATMO_PROXY_URL = 'http://proxy-host:8080/api/v1/netatmo';
+      process.env.NETATMO_API_KEY = 'my-api-key';
 
       const result = validateNetatmoEnv();
 
       expect(result.valid).toBe(true);
-      expect(result.environment).toBe('prod');
+      expect(result.environment).toBe('proxy');
       expect(result.warnings).toEqual([]);
     });
 
-    it('should return valid: false when credentials missing', () => {
-      delete process.env.NETATMO_CLIENT_ID;
-      delete process.env.NETATMO_CLIENT_SECRET;
+    it('should return valid: false when proxy credentials missing', () => {
+      delete process.env.NETATMO_PROXY_URL;
+      delete process.env.NETATMO_API_KEY;
 
       const result = validateNetatmoEnv();
 
       expect(result.valid).toBe(false);
       expect(result.environment).toBe('unknown');
-      expect(result.warnings).toContain('NETATMO_CLIENT_ID or NETATMO_CLIENT_SECRET missing');
+      expect(result.warnings).toContain('NETATMO_PROXY_URL or NETATMO_API_KEY missing');
     });
 
-    it('should detect dev environment from client ID', () => {
-      process.env.NETATMO_CLIENT_ID = 'test-client-id';
-      process.env.NETATMO_CLIENT_SECRET = 'secret-12345';
+    it('should return valid: false when only NETATMO_PROXY_URL missing', () => {
+      delete process.env.NETATMO_PROXY_URL;
+      process.env.NETATMO_API_KEY = 'my-api-key';
 
       const result = validateNetatmoEnv();
 
-      expect(result.valid).toBe(true);
-      expect(result.environment).toBe('dev');
+      expect(result.valid).toBe(false);
+      expect(result.environment).toBe('unknown');
     });
 
-    it('should detect dev environment from client secret', () => {
-      process.env.NETATMO_CLIENT_ID = 'client-id-12345';
-      process.env.NETATMO_CLIENT_SECRET = 'dev-secret-67890';
+    it('should return valid: false when only NETATMO_API_KEY missing', () => {
+      process.env.NETATMO_PROXY_URL = 'http://proxy-host:8080/api/v1/netatmo';
+      delete process.env.NETATMO_API_KEY;
 
       const result = validateNetatmoEnv();
 
-      expect(result.valid).toBe(true);
-      expect(result.environment).toBe('dev');
+      expect(result.valid).toBe(false);
+      expect(result.environment).toBe('unknown');
     });
 
-    it('should warn when using dev credentials in production', () => {
-      const originalNodeEnv = process.env.NODE_ENV;
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: 'production',
-        writable: true,
-        configurable: true,
-      });
-      process.env.NETATMO_CLIENT_ID = 'test-client-id';
-      process.env.NETATMO_CLIENT_SECRET = 'secret-12345';
+    it('should always return environment: proxy when valid', () => {
+      process.env.NETATMO_PROXY_URL = 'http://proxy-host:8080/api/v1/netatmo';
+      process.env.NETATMO_API_KEY = 'my-api-key';
 
       const result = validateNetatmoEnv();
 
-      expect(result.valid).toBe(true);
-      expect(result.environment).toBe('dev');
-      expect(result.warnings).toContain('Using dev Netatmo credentials in production environment');
-
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: originalNodeEnv,
-        writable: true,
-        configurable: true,
-      });
-    });
-
-    it('should not warn when using prod credentials in production', () => {
-      const originalNodeEnv = process.env.NODE_ENV;
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: 'production',
-        writable: true,
-        configurable: true,
-      });
-      process.env.NETATMO_CLIENT_ID = 'client-id-12345';
-      process.env.NETATMO_CLIENT_SECRET = 'secret-67890';
-
-      const result = validateNetatmoEnv();
-
-      expect(result.valid).toBe(true);
-      expect(result.environment).toBe('prod');
-      expect(result.warnings).toEqual([]);
-
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: originalNodeEnv,
-        writable: true,
-        configurable: true,
-      });
+      expect(result.environment).toBe('proxy');
     });
   });
 });

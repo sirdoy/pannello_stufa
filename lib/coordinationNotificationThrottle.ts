@@ -21,9 +21,6 @@
  * "Global throttle - max 1 notification total every 30 minutes across all coordination events"
  */
 
-// Feature flag: enables Firebase RTDB-backed persistent rate limiting
-const USE_PERSISTENT = process.env.USE_PERSISTENT_RATE_LIMITER === 'true';
-
 /**
  * Throttle check result
  */
@@ -174,81 +171,40 @@ if (typeof process !== 'undefined') {
 }
 
 /**
- * Check if coordination notification is allowed for user (feature-flagged)
+ * Check if coordination notification is allowed for user
  *
- * Uses Firebase RTDB-backed persistent throttle when USE_PERSISTENT_RATE_LIMITER=true,
- * otherwise falls back to in-memory throttle.
+ * Uses in-memory throttle (persistent Firebase throttle removed in Phase 79).
  */
 export async function shouldSendCoordinationNotification(userId: string): Promise<ThrottleResult> {
-  if (!USE_PERSISTENT) {
-    return shouldSendCoordinationNotificationInMemory(userId);
-  }
-
-  try {
-    const { shouldSendCoordinationNotificationPersistent } = await import('./coordinationThrottlePersistent');
-    return await shouldSendCoordinationNotificationPersistent(userId);
-  } catch (error) {
-    console.warn('Persistent coordination throttle failed, falling back to in-memory:', error);
-    return shouldSendCoordinationNotificationInMemory(userId);
-  }
+  return shouldSendCoordinationNotificationInMemory(userId);
 }
 
 /**
- * Record that a coordination notification was sent (feature-flagged)
+ * Record that a coordination notification was sent
  *
  * MUST be called after successfully sending notification
  * Updates the timestamp to start new 30-minute window
  */
 export async function recordNotificationSent(userId: string): Promise<void> {
-  if (!USE_PERSISTENT) {
-    return recordNotificationSentInMemory(userId);
-  }
-
-  try {
-    const { recordNotificationSentPersistent } = await import('./coordinationThrottlePersistent');
-    return await recordNotificationSentPersistent(userId);
-  } catch (error) {
-    console.warn('Persistent coordination throttle failed, falling back to in-memory:', error);
-    return recordNotificationSentInMemory(userId);
-  }
+  return recordNotificationSentInMemory(userId);
 }
 
 /**
- * Get throttle status for a user (feature-flagged)
+ * Get throttle status for a user
  *
  * Useful for debugging and UI display
  */
 export async function getThrottleStatus(userId: string): Promise<ThrottleStatus> {
-  if (!USE_PERSISTENT) {
-    return getThrottleStatusInMemory(userId);
-  }
-
-  try {
-    const { getThrottlePersistentStatus } = await import('./coordinationThrottlePersistent');
-    return await getThrottlePersistentStatus(userId);
-  } catch (error) {
-    console.warn('Persistent coordination throttle failed, falling back to in-memory:', error);
-    return getThrottleStatusInMemory(userId);
-  }
+  return getThrottleStatusInMemory(userId);
 }
 
 /**
- * Clear throttle for a user (feature-flagged)
+ * Clear throttle for a user
  *
  * Useful for testing and admin overrides
  */
 export async function clearThrottle(userId: string): Promise<boolean> {
-  if (!USE_PERSISTENT) {
-    return clearThrottleInMemory(userId);
-  }
-
-  try {
-    const { clearThrottlePersistent } = await import('./coordinationThrottlePersistent');
-    return await clearThrottlePersistent(userId);
-  } catch (error) {
-    console.warn('Persistent coordination throttle failed, falling back to in-memory:', error);
-    return clearThrottleInMemory(userId);
-  }
+  return clearThrottleInMemory(userId);
 }
 
 /**

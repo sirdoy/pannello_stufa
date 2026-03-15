@@ -29,7 +29,6 @@ jest.mock('@/lib/services/pidTuningLogService');
 jest.mock('@/lib/notificationTriggersServer');
 jest.mock('@/lib/stoveApi');
 jest.mock('@/lib/stoveStateService');
-jest.mock('@/lib/netatmoStoveSync');
 jest.mock('@/lib/netatmoCalibrationService');
 jest.mock('@/lib/hue/hueRemoteTokenHelper');
 jest.mock('@/lib/openMeteo');
@@ -70,7 +69,6 @@ import {
   setFanLevel,
 } from '@/lib/stoveApi';
 import { updateStoveState } from '@/lib/stoveStateService';
-import { syncLivingRoomWithStove, enforceStoveSyncSetpoints } from '@/lib/netatmoStoveSync';
 import { calibrateValvesServer } from '@/lib/netatmoCalibrationService';
 import { proactiveTokenRefresh } from '@/lib/hue/hueRemoteTokenHelper';
 import { fetchWeatherForecast } from '@/lib/openMeteo';
@@ -97,8 +95,6 @@ const mockLogAnalyticsEvent = jest.mocked(logAnalyticsEvent);
 const mockGetEnvironmentPath = jest.mocked(getEnvironmentPath);
 const mockCalibrateValvesServer = jest.mocked(calibrateValvesServer);
 const mockProactiveTokenRefresh = jest.mocked(proactiveTokenRefresh);
-const mockEnforceStoveSyncSetpoints = jest.mocked(enforceStoveSyncSetpoints);
-const mockSyncLivingRoomWithStove = jest.mocked(syncLivingRoomWithStove);
 const mockTriggerSchedulerActionServer = jest.mocked(triggerSchedulerActionServer);
 const mockTriggerMaintenanceAlertServer = jest.mocked(triggerMaintenanceAlertServer);
 const mockTriggerStoveStatusWorkServer = jest.mocked(triggerStoveStatusWorkServer);
@@ -143,10 +139,6 @@ describe('Scheduler Check Route', () => {
     // Default maintenance mock
     mockTrackUsageHours.mockResolvedValue({ tracked: false } as any);
     mockCanIgnite.mockResolvedValue(true);
-
-    // Default Netatmo sync mocks
-    mockEnforceStoveSyncSetpoints.mockResolvedValue({ enforced: false, synced: false } as any);
-    mockSyncLivingRoomWithStove.mockResolvedValue({ synced: false } as any);
 
     // Default fire-and-forget mocks
     mockCalibrateValvesServer.mockResolvedValue({ calibrated: false } as any);
@@ -627,18 +619,6 @@ describe('Scheduler Check Route', () => {
       );
     });
 
-    it('calls enforceStoveSyncSetpoints', async () => {
-      setupSchedulerMocks({
-        mode: { enabled: true, semiManual: false },
-        intervals: [],
-      });
-
-      const request = createMockRequest();
-      await GET(request);
-
-      // Verify enforceStoveSyncSetpoints called
-      expect(mockEnforceStoveSyncSetpoints).toHaveBeenCalledWith(expect.any(Boolean));
-    });
   });
 
   describe('Maintenance Blocks Ignition', () => {
@@ -780,7 +760,6 @@ describe('Scheduler Check Route', () => {
           message: expect.stringContaining('accesa automaticamente'),
         })
       );
-      expect(mockSyncLivingRoomWithStove).toHaveBeenCalledWith(true);
 
       jest.useRealTimers();
     });
@@ -943,7 +922,6 @@ describe('Scheduler Check Route', () => {
           message: expect.stringContaining('spenta automaticamente'),
         })
       );
-      expect(mockSyncLivingRoomWithStove).toHaveBeenCalledWith(false);
 
       jest.useRealTimers();
     });
@@ -1234,27 +1212,6 @@ describe('Scheduler Check Route', () => {
       jest.useRealTimers();
     });
 
-    it('handles enforceStoveSyncSetpoints error gracefully', async () => {
-      // Mock enforceStoveSyncSetpoints to reject
-      mockEnforceStoveSyncSetpoints.mockRejectedValue(new Error('Netatmo timeout'));
-
-      setupSchedulerMocks({
-        mode: { enabled: true, semiManual: false },
-        intervals: [],
-      });
-
-      const request = createMockRequest();
-      const response = await GET(request);
-
-      // Route should still return 200
-      expect(response.status).toBe(200);
-
-      // Verify error was logged
-      expect(console.error).toHaveBeenCalledWith(
-        expect.stringContaining('Stove sync enforcement error'),
-        expect.any(String)
-      );
-    });
   });
 
   describe('PID Automation', () => {
@@ -3134,112 +3091,6 @@ describe('Scheduler Check Route', () => {
         expect.stringContaining('Cron execution log error'),
         expect.any(Error)
       );
-    });
-  });
-
-  describe('Additional Coverage - syncLivingRoomWithStove Handlers', () => {
-    it('handles syncLivingRoomWithStove success in ignition flow', async () => {
-      mockIgniteStove.mockResolvedValue(undefined as any);
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
-      mockSyncLivingRoomWithStove.mockResolvedValue({ synced: true } as any);
-
-      const mockUpdateStoveState = jest.mocked(updateStoveState);
-      mockUpdateStoveState.mockResolvedValue(undefined as any);
-
-      jest.useFakeTimers();
-      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
-
-      setupSchedulerMocks({
-        mode: { enabled: true, semiManual: false },
-        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
-      });
-
-      const request = createMockRequest();
-      await GET(request);
-      await flushPromises();
-
-      // Verify sync called
-      expect(mockSyncLivingRoomWithStove).toHaveBeenCalledWith(true);
-
-      jest.useRealTimers();
-    });
-
-    it('handles syncLivingRoomWithStove exception in ignition flow', async () => {
-      mockIgniteStove.mockResolvedValue(undefined as any);
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
-      mockSyncLivingRoomWithStove.mockRejectedValue(new Error('Netatmo timeout'));
-
-      const mockUpdateStoveState = jest.mocked(updateStoveState);
-      mockUpdateStoveState.mockResolvedValue(undefined as any);
-
-      jest.useFakeTimers();
-      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
-
-      setupSchedulerMocks({
-        mode: { enabled: true, semiManual: false },
-        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
-      });
-
-      const request = createMockRequest();
-      const response = await GET(request);
-      await flushPromises();
-
-      // Route should still return 200 (sync is fire-and-forget)
-      expect(response.status).toBe(200);
-
-      jest.useRealTimers();
-    });
-
-    it('handles syncLivingRoomWithStove success in shutdown flow', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockShutdownStove.mockResolvedValue(undefined as any);
-      mockSyncLivingRoomWithStove.mockResolvedValue({ synced: true } as any);
-
-      const mockUpdateStoveState = jest.mocked(updateStoveState);
-      mockUpdateStoveState.mockResolvedValue(undefined as any);
-
-      jest.useFakeTimers();
-      jest.setSystemTime(new Date('2025-02-12T08:00:00.000Z'));
-
-      setupSchedulerMocks({
-        mode: { enabled: true, semiManual: false },
-        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
-      });
-
-      const request = createMockRequest();
-      await GET(request);
-      await flushPromises();
-
-      // Verify sync called with false
-      expect(mockSyncLivingRoomWithStove).toHaveBeenCalledWith(false);
-
-      jest.useRealTimers();
-    });
-
-    it('handles syncLivingRoomWithStove exception in shutdown flow', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockShutdownStove.mockResolvedValue(undefined as any);
-      mockSyncLivingRoomWithStove.mockRejectedValue(new Error('Netatmo timeout'));
-
-      const mockUpdateStoveState = jest.mocked(updateStoveState);
-      mockUpdateStoveState.mockResolvedValue(undefined as any);
-
-      jest.useFakeTimers();
-      jest.setSystemTime(new Date('2025-02-12T08:00:00.000Z'));
-
-      setupSchedulerMocks({
-        mode: { enabled: true, semiManual: false },
-        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
-      });
-
-      const request = createMockRequest();
-      const response = await GET(request);
-      await flushPromises();
-
-      // Route should still return 200
-      expect(response.status).toBe(200);
-
-      jest.useRealTimers();
     });
   });
 

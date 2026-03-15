@@ -21,7 +21,7 @@ export interface ValidationResult {
 
 export interface NetatmoValidationResult {
   valid: boolean;
-  environment: 'dev' | 'prod' | 'unknown';
+  environment: 'proxy' | 'unknown';
   warnings: string[];
 }
 
@@ -43,8 +43,8 @@ export function validateHealthMonitoringEnv(): ValidationResult {
   ];
 
   const optional = [
-    'NETATMO_CLIENT_ID',
-    'NETATMO_CLIENT_SECRET',
+    'NETATMO_PROXY_URL',
+    'NETATMO_API_KEY',
   ];
 
   // Check required variables
@@ -73,44 +73,26 @@ export function validateHealthMonitoringEnv(): ValidationResult {
 
 /**
  * Validate Netatmo-specific environment variables
- * Detects dev vs prod credentials
+ * Checks for proxy credentials (NETATMO_PROXY_URL + NETATMO_API_KEY)
  *
  * @returns {Object} Validation result
- *   - valid: boolean - Netatmo credentials present
- *   - environment: 'dev' | 'prod' | 'unknown' - Credential type
+ *   - valid: boolean - Proxy credentials present
+ *   - environment: 'proxy' | 'unknown' - Always 'proxy' when valid
  *   - warnings: string[] - Configuration warnings
  */
 export function validateNetatmoEnv(): NetatmoValidationResult {
-  const clientId = process.env.NETATMO_CLIENT_ID;
-  const clientSecret = process.env.NETATMO_CLIENT_SECRET;
+  const proxyUrl = process.env.NETATMO_PROXY_URL;
+  const apiKey = process.env.NETATMO_API_KEY;
 
   const warnings: string[] = [];
 
-  // Check if credentials are present
-  if (!clientId || !clientSecret) {
+  // Check if proxy credentials are present
+  if (!proxyUrl || !apiKey) {
     return {
       valid: false,
       environment: 'unknown',
-      warnings: ['NETATMO_CLIENT_ID or NETATMO_CLIENT_SECRET missing'],
+      warnings: ['NETATMO_PROXY_URL or NETATMO_API_KEY missing'],
     };
-  }
-
-  // Detect dev vs prod credentials
-  // Dev credentials typically contain 'test', 'dev', or are shorter
-  let environment: 'dev' | 'prod' | 'unknown' = 'prod';
-
-  if (
-    clientId.toLowerCase().includes('test') ||
-    clientId.toLowerCase().includes('dev') ||
-    clientSecret.toLowerCase().includes('test') ||
-    clientSecret.toLowerCase().includes('dev')
-  ) {
-    environment = 'dev';
-  }
-
-  // Check for common misconfigurations in prod
-  if (environment === 'dev' && process.env.NODE_ENV === 'production') {
-    warnings.push('Using dev Netatmo credentials in production environment');
   }
 
   if (warnings.length > 0) {
@@ -119,7 +101,7 @@ export function validateNetatmoEnv(): NetatmoValidationResult {
 
   return {
     valid: true,
-    environment,
+    environment: 'proxy',
     warnings,
   };
 }

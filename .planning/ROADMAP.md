@@ -67,7 +67,10 @@ See `.planning/milestones/` for full archives.
   3. When the proxy reports `data_freshness: STALE`, the app surfaces a staleness indicator to the user
   4. When the proxy returns an RFC 9457 error, the frontend receives and handles it correctly (error boundary or toast)
   5. All Netatmo Next.js routes use a single shared client configured with the proxy base URL and X-API-Key header
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 75-01-PLAN.md — Proxy client module with X-API-Key auth, types, and RFC 9457 error handling
+- [ ] 75-02-PLAN.md — Migrate homestatus and homesdata routes to use proxy client
 
 ### Phase 76: Energy Control Endpoints
 **Goal**: Users can control the thermostat (set temperature, change mode, switch schedule, sync schedule, view historical measurements) through the proxy
@@ -133,7 +136,7 @@ See `.planning/milestones/` for full archives.
 | 61-67 | v8.0 | 18/18 | ✓ Complete | 2026-02-16 |
 | 68-69 | v8.1 | 3/3 | ✓ Complete | 2026-02-18 |
 | 70-74 | v9.0 | 8/8 | ✓ Complete | 2026-02-19 |
-| 75. API Client Foundation + Energy Read | v10.0 | 0/TBD | Not started | - |
+| 75. API Client Foundation + Energy Read | v10.0 | 0/2 | Not started | - |
 | 76. Energy Control Endpoints | v10.0 | 0/TBD | Not started | - |
 | 77. Camera Migration | v10.0 | 0/TBD | Not started | - |
 | 78. Valve + Health | v10.0 | 0/TBD | Not started | - |
@@ -143,4 +146,4 @@ See `.planning/milestones/` for full archives.
 
 ---
 
-*Roadmap updated: 2026-03-14 — v10.0 Netatmo API Migration roadmap created*
+*Roadmap updated: 2026-03-15 — Phase 75 planned (2 plans)*

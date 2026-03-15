@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v10.0
 milestone_name: Netatmo API Migration
 status: executing
-stopped_at: Completed 75-02-PLAN.md
-last_updated: "2026-03-15T11:14:06.385Z"
+stopped_at: Phase 76 context gathered
+last_updated: "2026-03-15T11:26:43.847Z"
 last_activity: 2026-03-15 — 75-01 Netatmo proxy client + types complete
 progress:
   total_phases: 5
@@ -82,6 +82,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15T11:11:03.273Z
-Stopped at: Completed 75-02-PLAN.md
-Resume file: None
+Last session: 2026-03-15T11:26:43.841Z
+Stopped at: Phase 76 context gathered
+Resume file: .planning/phases/76-energy-control-endpoints/76-CONTEXT.md

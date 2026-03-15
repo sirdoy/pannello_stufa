@@ -50,8 +50,8 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 - [x] **CLEAN-03**: Delete `lib/netatmoRateLimiter.ts` + `netatmoRateLimiterPersistent.ts` (rate limiting in proxy)
 - [x] **CLEAN-04**: Delete `lib/netatmoCacheService.ts` (caching in proxy)
 - [x] **CLEAN-05**: Delete OAuth callback route `app/api/netatmo/callback/` (OAuth flow removed)
-- [ ] **CLEAN-06**: Remove Netatmo OAuth env vars (`NETATMO_CLIENT_SECRET`, `NEXT_PUBLIC_NETATMO_CLIENT_ID`, `NEXT_PUBLIC_NETATMO_REDIRECT_URI`)
-- [ ] **CLEAN-07**: Update all tests to match new API proxy patterns
+- [x] **CLEAN-06**: Remove Netatmo OAuth env vars (`NETATMO_CLIENT_SECRET`, `NEXT_PUBLIC_NETATMO_CLIENT_ID`, `NEXT_PUBLIC_NETATMO_REDIRECT_URI`)
+- [x] **CLEAN-07**: Update all tests to match new API proxy patterns
 
 ## Future Requirements
 
@@ -102,8 +102,8 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 | CLEAN-03 | Phase 79 | Complete |
 | CLEAN-04 | Phase 79 | Complete |
 | CLEAN-05 | Phase 79 | Complete |
-| CLEAN-06 | Phase 79 | Pending |
-| CLEAN-07 | Phase 79 | Pending |
+| CLEAN-06 | Phase 79 | Complete |
+| CLEAN-07 | Phase 79 | Complete |
 
 **Coverage:**
 - v10.0 requirements: 28 total

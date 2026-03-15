@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v10.0
 milestone_name: Netatmo API Migration
 status: executing
-stopped_at: Completed 79-01-PLAN.md
-last_updated: "2026-03-15T16:56:12.273Z"
+stopped_at: Completed 79-02-PLAN.md
+last_updated: "2026-03-15T17:13:10.185Z"
 last_activity: 2026-03-15 — 75-01 Netatmo proxy client + types complete
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 13
-  completed_plans: 12
+  completed_plans: 13
   percent: 5
 ---
 
@@ -57,6 +57,7 @@ Progress: [█░░░░░░░░░] 5% (v10.0)
 | Phase 78 P01 | 12 | 2 tasks | 6 files |
 | Phase 78-valve-health P02 | 12 | 2 tasks | 7 files |
 | Phase 79-cleanup P01 | 15 | 3 tasks | 42 files |
+| Phase 79-cleanup P02 | 25 | 2 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -93,6 +94,7 @@ See PROJECT.md Key Decisions table for full history. Relevant to v10.0:
 - [Phase 78-valve-health]: On proxy /health failure: writes unreachable record { provider_status: 'unreachable', data_freshness: 'UNREACHABLE', checked_at }
 - [Phase 79-cleanup]: All dead Netatmo OAuth infrastructure deleted — proxy owns token management, rate limiting, caching
 - [Phase 79-cleanup]: Coordination orchestrator chain (9 modules) fully removed — proxy handles stove sync coordination
+- [Phase 79-cleanup]: Battery utils inlined in homestatus route; stoveSync route constant kept for StoveSyncPanel; coordinationThrottlePersistent dynamic imports removed
 
 ### Pending Todos
 
@@ -113,6 +115,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15T16:56:12.269Z
-Stopped at: Completed 79-01-PLAN.md
+Last session: 2026-03-15T17:13:10.182Z
+Stopped at: Completed 79-02-PLAN.md
 Resume file: None

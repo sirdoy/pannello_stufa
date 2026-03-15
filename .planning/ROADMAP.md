@@ -53,7 +53,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 76: Energy Control Endpoints** - All write/control endpoints migrated (setpoint, mode, schedule switch, sync, measurements) (completed 2026-03-15)
 - [x] **Phase 77: Camera Migration** - All six camera endpoints migrated (status, stream URLs, snapshot, events, monitoring toggle, event snapshots) (completed 2026-03-15)
 - [x] **Phase 78: Valve + Health** - Dedicated valve endpoints and health monitoring cron migrated to proxy (completed 2026-03-15)
-- [ ] **Phase 79: Cleanup** - Dead code deleted (OAuth helpers, rate limiter, cache service, callback route, env vars), tests updated
+- [x] **Phase 79: Cleanup** - Dead code deleted (OAuth helpers, rate limiter, cache service, callback route, env vars), tests updated (completed 2026-03-15)
 
 ## Phase Details
 
@@ -129,7 +129,7 @@ Plans:
   2. `app/api/netatmo/callback/` route no longer exists
   3. `NETATMO_CLIENT_SECRET`, `NEXT_PUBLIC_NETATMO_CLIENT_ID`, and `NEXT_PUBLIC_NETATMO_REDIRECT_URI` env vars are removed from all config files and documentation
   4. All Netatmo-related tests pass using proxy mock patterns (no OAuth token setup in test fixtures)
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 79-01-PLAN.md — Delete dead modules, routes, UI components, and tests (~45 files)
 - [ ] 79-02-PLAN.md — Update live code, env config, docs, and fix affected tests
@@ -155,7 +155,7 @@ Plans:
 | 76. Energy Control Endpoints | 4/4 | Complete    | 2026-03-15 | - |
 | 77. Camera Migration | 3/3 | Complete    | 2026-03-15 | - |
 | 78. Valve + Health | 2/2 | Complete    | 2026-03-15 | - |
-| 79. Cleanup | 1/2 | In Progress|  | - |
+| 79. Cleanup | 2/2 | Complete   | 2026-03-15 | - |
 
 **Total:** 13 milestones shipped, 74 phases complete, 330 plans executed — v10.0 in progress
 

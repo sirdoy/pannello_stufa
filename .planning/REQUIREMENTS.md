@@ -22,7 +22,7 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 - [x] **ENERGY-04**: Set thermostat mode via proxy `/setthermmode`
 - [x] **ENERGY-05**: Switch schedule via proxy `/switchhomeschedule`
 - [x] **ENERGY-06**: Sync schedule via proxy `/synchomeschedule`
-- [ ] **ENERGY-07**: Historical room measurements via proxy `/getroommeasure` (SQLite aggregation tiers)
+- [x] **ENERGY-07**: Historical room measurements via proxy `/getroommeasure` (SQLite aggregation tiers)
 
 ### Valve
 
@@ -86,7 +86,7 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 | ENERGY-04 | Phase 76 | Complete |
 | ENERGY-05 | Phase 76 | Complete |
 | ENERGY-06 | Phase 76 | Complete |
-| ENERGY-07 | Phase 76 | Pending |
+| ENERGY-07 | Phase 76 | Complete |
 | VALVE-01 | Phase 78 | Pending |
 | VALVE-02 | Phase 78 | Pending |
 | CAM-01 | Phase 77 | Pending |

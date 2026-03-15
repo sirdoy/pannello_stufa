@@ -216,3 +216,98 @@ export interface RoomMeasureResponse {
   limit: number;
   offset: number;
 }
+
+// =============================================================================
+// CAMERA TYPES
+// =============================================================================
+
+/**
+ * A single camera device from the proxy /camera/status endpoint.
+ * All fields except camera_id are nullable — values may be absent if the
+ * camera has never reported or is offline.
+ */
+export interface CameraStatus {
+  camera_id: string;
+  name: string | null;
+  device_type: string | null;   // e.g. "NOC" (Presence), "NACamera" (Welcome)
+  status: string | null;        // "on" | "off"
+  sd_status: string | null;     // "on" | "off"
+  alim_status: string | null;   // "on" | "off"
+  firmware: string | null;
+  is_local: boolean | null;
+}
+
+/**
+ * Full response from proxy GET /camera/status
+ */
+export interface CameraStatusResponse {
+  cameras: CameraStatus[];
+  data_freshness: DataFreshness;
+}
+
+/**
+ * HLS stream URL set (high, medium, low quality levels).
+ */
+export interface StreamUrls {
+  high: string;
+  medium: string;
+  low: string;
+}
+
+/**
+ * Response from proxy GET /camera/{camera_id}/stream
+ * VPN stream URLs expire every 3 hours; local_streams only present when is_local=true.
+ */
+export interface CameraStreamResponse {
+  camera_id: string;
+  vpn_streams: StreamUrls;
+  is_local: boolean;
+  local_streams?: StreamUrls;
+}
+
+/**
+ * Response from proxy GET /camera/{camera_id}/snapshot
+ * Returns a URL, not binary data.
+ */
+export interface CameraSnapshotUrlResponse {
+  camera_id: string;
+  snapshot_url: string;
+}
+
+/**
+ * Request body for POST /camera/{camera_id}/monitoring
+ */
+export interface SetMonitoringRequest {
+  monitoring: 'on' | 'off';
+}
+
+/**
+ * Response from proxy POST /camera/{camera_id}/monitoring
+ */
+export interface SetMonitoringResponse {
+  camera_id: string;
+  monitoring: 'on' | 'off';
+  status: 'applied';
+}
+
+/**
+ * A single camera event from the proxy /camera/events endpoint.
+ * Uses proxy field names (event_id, event_type, timestamp) — not old Netatmo API field names.
+ */
+export interface CameraEvent {
+  event_id: string;
+  camera_id: string;
+  event_type: 'movement' | 'person' | 'sound';  // other values may appear for future camera types
+  timestamp: number;         // Unix timestamp
+  message: string | null;
+  snapshot_url: string | null;
+  person_id: string | null;
+}
+
+/**
+ * Full response from proxy GET /camera/events
+ */
+export interface CameraEventsResponse {
+  events: CameraEvent[];
+  count: number;
+}

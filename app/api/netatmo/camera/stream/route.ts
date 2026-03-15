@@ -1,16 +1,13 @@
 import { withAuthAndErrorHandler, success, badRequest, parseQuery } from '@/lib/core';
-import { getProxyCameraSnapshot } from '@/lib/netatmoProxy';
+import { getProxyCameraStream } from '@/lib/netatmoProxy';
 import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/netatmo/camera/snapshot?cameraId=<id>
- * Returns snapshot URL for a specific camera from proxy.
+ * GET /api/netatmo/camera/stream?cameraId=<id>
+ * Returns stream URLs for a specific camera from proxy.
  * Protected: Requires Auth0 authentication
- *
- * Uses query parameter instead of path segment to avoid Turbopack routing issues
- * with MAC address IDs that contain colons (e.g., 70:ee:50:3b:1f:4f).
  */
 export const GET = withAuthAndErrorHandler(async (request: NextRequest) => {
   const cameraId = parseQuery(request).get('cameraId');
@@ -19,6 +16,6 @@ export const GET = withAuthAndErrorHandler(async (request: NextRequest) => {
     return badRequest('Parametro cameraId mancante');
   }
 
-  const result = await getProxyCameraSnapshot(cameraId);
+  const result = await getProxyCameraStream(cameraId);
   return success(result as unknown as Record<string, unknown>);
-}, 'Netatmo/CameraSnapshot');
+}, 'Netatmo/CameraStream');

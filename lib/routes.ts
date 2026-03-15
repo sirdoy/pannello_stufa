@@ -86,12 +86,16 @@ export const NETATMO_ROUTES = {
 
 // Camera endpoints (Netatmo Security)
 export const CAMERA_ROUTES = {
-  list: `${API_BASE}/netatmo/camera`,
+  status: `${API_BASE}/netatmo/camera/status`,
   allEvents: `${API_BASE}/netatmo/camera/events`,
+  monitoring: `${API_BASE}/netatmo/camera/monitoring`,
   // Use query parameter instead of path segment to avoid Turbopack routing issues
   // with MAC address IDs containing colons (e.g., 70:ee:50:3b:1f:4f).
+  stream: (cameraId: string): string => `${API_BASE}/netatmo/camera/stream?cameraId=${encodeURIComponent(cameraId)}`,
   snapshot: (cameraId: string): string => `${API_BASE}/netatmo/camera/snapshot?cameraId=${encodeURIComponent(cameraId)}`,
-  events: (cameraId: string): string => `${API_BASE}/netatmo/camera/${encodeURIComponent(cameraId)}/events`,
+  eventSnapshot: (eventId: string): string => `${API_BASE}/netatmo/camera/events/${encodeURIComponent(eventId)}/snapshot`,
+  // Keep old 'list' as alias for backward compat during migration
+  list: `${API_BASE}/netatmo/camera`,
 } as const;
 
 // Logging endpoints

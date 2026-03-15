@@ -147,7 +147,7 @@ All Netatmo API calls go through a local proxy. Configure via env vars:
 
 ```bash
 NETATMO_PROXY_URL=http://your-proxy-host:port/api/v1/netatmo
-NETATMO_API_KEY=your-proxy-api-key
+NETATMO_PROXY_API_KEY=your-proxy-api-key
 ```
 
 **Setup completo**: [setup/netatmo-setup.md](./setup/netatmo-setup.md)

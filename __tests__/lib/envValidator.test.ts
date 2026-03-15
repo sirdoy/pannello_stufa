@@ -93,7 +93,7 @@ describe('envValidator', () => {
       expect(result.valid).toBe(true);
       expect(result.warnings).toEqual([
         'NETATMO_PROXY_URL',
-        'NETATMO_API_KEY',
+        'NETATMO_PROXY_API_KEY',
       ]);
       expect(console.warn).toHaveBeenCalledWith(
         expect.stringContaining('Optional env vars missing')
@@ -107,7 +107,7 @@ describe('envValidator', () => {
       process.env.FIREBASE_ADMIN_CLIENT_EMAIL = 'client@email.com';
       process.env.FIREBASE_ADMIN_PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----';
       process.env.NETATMO_PROXY_URL = 'http://proxy-host:8080/api/v1/netatmo';
-      process.env.NETATMO_API_KEY = 'my-api-key';
+      process.env.NETATMO_PROXY_API_KEY = 'my-api-key';
 
       const result = validateHealthMonitoringEnv();
 
@@ -119,7 +119,7 @@ describe('envValidator', () => {
   describe('validateNetatmoEnv', () => {
     it('should return valid: true when proxy credentials present', () => {
       process.env.NETATMO_PROXY_URL = 'http://proxy-host:8080/api/v1/netatmo';
-      process.env.NETATMO_API_KEY = 'my-api-key';
+      process.env.NETATMO_PROXY_API_KEY = 'my-api-key';
 
       const result = validateNetatmoEnv();
 
@@ -130,18 +130,18 @@ describe('envValidator', () => {
 
     it('should return valid: false when proxy credentials missing', () => {
       delete process.env.NETATMO_PROXY_URL;
-      delete process.env.NETATMO_API_KEY;
+      delete process.env.NETATMO_PROXY_API_KEY;
 
       const result = validateNetatmoEnv();
 
       expect(result.valid).toBe(false);
       expect(result.environment).toBe('unknown');
-      expect(result.warnings).toContain('NETATMO_PROXY_URL or NETATMO_API_KEY missing');
+      expect(result.warnings).toContain('NETATMO_PROXY_URL or NETATMO_PROXY_API_KEY missing');
     });
 
     it('should return valid: false when only NETATMO_PROXY_URL missing', () => {
       delete process.env.NETATMO_PROXY_URL;
-      process.env.NETATMO_API_KEY = 'my-api-key';
+      process.env.NETATMO_PROXY_API_KEY = 'my-api-key';
 
       const result = validateNetatmoEnv();
 
@@ -149,9 +149,9 @@ describe('envValidator', () => {
       expect(result.environment).toBe('unknown');
     });
 
-    it('should return valid: false when only NETATMO_API_KEY missing', () => {
+    it('should return valid: false when only NETATMO_PROXY_API_KEY missing', () => {
       process.env.NETATMO_PROXY_URL = 'http://proxy-host:8080/api/v1/netatmo';
-      delete process.env.NETATMO_API_KEY;
+      delete process.env.NETATMO_PROXY_API_KEY;
 
       const result = validateNetatmoEnv();
 
@@ -161,7 +161,7 @@ describe('envValidator', () => {
 
     it('should always return environment: proxy when valid', () => {
       process.env.NETATMO_PROXY_URL = 'http://proxy-host:8080/api/v1/netatmo';
-      process.env.NETATMO_API_KEY = 'my-api-key';
+      process.env.NETATMO_PROXY_API_KEY = 'my-api-key';
 
       const result = validateNetatmoEnv();
 

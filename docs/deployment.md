@@ -32,7 +32,7 @@ AUTH0_CLIENT_SECRET=...
 
 # Netatmo Proxy
 NETATMO_PROXY_URL=http://your-proxy-host:port/api/v1/netatmo
-NETATMO_API_KEY=your-proxy-api-key
+NETATMO_PROXY_API_KEY=your-proxy-api-key
 
 # Secrets
 CRON_SECRET=your-cron-secret

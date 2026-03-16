@@ -191,6 +191,9 @@ Plans:
   1. Camera UI component includes a monitoring toggle button/switch
   2. Toggle calls `/api/netatmo/camera/{id}/monitoring` with correct POST body
   3. "Camera monitoring toggle" E2E flow completes without errors
+**Plans:** 1 plan
+Plans:
+- [ ] 83-01-PLAN.md — Add monitoring toggle to CameraCard and CameraDashboard using Switch component
 
 ## Progress
 
@@ -217,10 +220,10 @@ Plans:
 | 80. Fix Env Var & Schedule Wiring | 2/2 | Complete    | 2026-03-15 | - |
 | 81. Fix StoveSync & Debug Panel Cleanup | 1/1 | Complete    | 2026-03-15 | - |
 | 82. Fix Thermostat Control + Build Error | 1/1 | Complete    | 2026-03-16 | - |
-| 83. Camera Monitoring Toggle UI | 0/0 | Not Started | - | - |
+| 83. Camera Monitoring Toggle UI | 0/1 | Not Started | - | - |
 
 **Total:** 13 milestones shipped, 74 phases complete, 330 plans executed — v10.0 in progress
 
 ---
 
-*Roadmap updated: 2026-03-16 — Phase 82 plan created*
+*Roadmap updated: 2026-03-16 — Phase 83 plan created*

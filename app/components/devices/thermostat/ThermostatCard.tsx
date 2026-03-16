@@ -132,7 +132,8 @@ export default function ThermostatCard() {
     const roomStatus = status?.rooms?.find((r: any) => r.room_id === room.id);
 
     // Find modules for this room to check if offline (exclude relays and cameras)
-    const roomModules = room.modules?.map((moduleId: string) =>
+    const roomModuleIds = room.module_ids ?? room.modules ?? [];
+    const roomModules = roomModuleIds.map((moduleId: string) =>
       modulesWithStatus.find((m: any) => m.id === moduleId)
     ).filter(Boolean).filter((m: any) => m.type !== 'NAPlug' && m.type !== 'NACamera' && m.type !== 'NOC') || [];
 

@@ -21,6 +21,7 @@ interface NetatmoTopology {
 interface NetatmoRoom {
   id: string;
   name?: string;
+  module_ids?: string[];
   modules?: string[];
   [key: string]: unknown;
 }
@@ -330,7 +331,8 @@ function NetatmoContent() {
     const roomStatus = status?.rooms?.find(r => r.room_id === room.id);
 
     // Find modules for this room (exclude relays - NAPlug and cameras - NACamera, NOC), with battery info
-    const roomModules = room.modules?.map(moduleId => {
+    const roomModuleIds = room.module_ids ?? room.modules ?? [];
+    const roomModules = roomModuleIds.map(moduleId => {
       return modulesWithBattery.find(m => m.id === moduleId);
     }).filter(Boolean).filter(m => m!.type !== 'NAPlug' && m!.type !== 'NACamera' && m!.type !== 'NOC') as NetatmoModule[] || [];
 

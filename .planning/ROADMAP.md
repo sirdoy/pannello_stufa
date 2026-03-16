@@ -56,6 +56,8 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 79: Cleanup** - Dead code deleted (OAuth helpers, rate limiter, cache service, callback route, env vars), tests updated (completed 2026-03-15)
 - [x] **Phase 80: Fix Env Var & Schedule Wiring** - Align env var names, wire switchhomeschedule to frontend (completed 2026-03-15)
 - [x] **Phase 81: Fix StoveSync & Debug Panel Cleanup** - Remove stoveSync 404, clean debug panel deleted routes (completed 2026-03-15)
+- [ ] **Phase 82: Fix Thermostat Control + Build Error** - Add home_id to thermostat POST bodies, fix camera route type, remap mode:'off'
+- [ ] **Phase 83: Camera Monitoring Toggle UI** - Wire camera monitoring route to frontend toggle
 
 ## Phase Details
 
@@ -165,6 +167,28 @@ Plans:
 Plans:
 - [ ] 81-01-PLAN.md — Delete StoveSyncPanel + disconnect route, clean debug NetatmoTab endpoints, fix stale JSDoc
 
+### Phase 82: Fix Thermostat Control + Build Error
+**Goal**: All thermostat control actions (set temperature, change mode) work end-to-end through the proxy, and production build passes without type errors
+**Depends on**: Phase 81
+**Requirements**: ENERGY-03, ENERGY-04
+**Gap Closure:** Closes gaps from audit
+**Success Criteria** (what must be TRUE):
+  1. `npm run build` completes without type errors (camera event snapshot route typed correctly)
+  2. All `setroomthermpoint` callers (RoomCard, ThermostatCard, ManualOverrideSheet, ActiveOverrideBadge) include `home_id` in POST body
+  3. All `setthermmode` callers (ThermostatCard, thermostat/page.tsx) include `home_id` in POST body
+  4. RoomCard "off" action sends `mode: 'home'` instead of `mode: 'off'` (matching VALID_MODES)
+  5. "Set room temperature" and "Set thermostat mode" E2E flows complete without 400 errors
+
+### Phase 83: Camera Monitoring Toggle UI
+**Goal**: Users can toggle camera monitoring on/off from the camera UI, completing the CAM-05 E2E flow
+**Depends on**: Phase 82
+**Requirements**: CAM-05
+**Gap Closure:** Closes gaps from audit
+**Success Criteria** (what must be TRUE):
+  1. Camera UI component includes a monitoring toggle button/switch
+  2. Toggle calls `/api/netatmo/camera/{id}/monitoring` with correct POST body
+  3. "Camera monitoring toggle" E2E flow completes without errors
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -189,9 +213,11 @@ Plans:
 | 79. Cleanup | 2/2 | Complete    | 2026-03-15 | - |
 | 80. Fix Env Var & Schedule Wiring | 2/2 | Complete    | 2026-03-15 | - |
 | 81. Fix StoveSync & Debug Panel Cleanup | 1/1 | Complete    | 2026-03-15 | - |
+| 82. Fix Thermostat Control + Build Error | 0/0 | Not Started | - | - |
+| 83. Camera Monitoring Toggle UI | 0/0 | Not Started | - | - |
 
 **Total:** 13 milestones shipped, 74 phases complete, 330 plans executed — v10.0 in progress
 
 ---
 
-*Roadmap updated: 2026-03-15 — Phase 81 plans created*
+*Roadmap updated: 2026-03-16 — Gap closure phases 82-83 added*

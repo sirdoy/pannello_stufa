@@ -18,8 +18,8 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 
 - [x] **ENERGY-01**: Room temperatures served from proxy `/homestatus` (SQLite-backed, no direct Netatmo call)
 - [x] **ENERGY-02**: Home topology served from proxy `/homesdata` (cached, no direct Netatmo call)
-- [x] **ENERGY-03**: Set room temperature via proxy `/setroomthermpoint`
-- [x] **ENERGY-04**: Set thermostat mode via proxy `/setthermmode`
+- [ ] **ENERGY-03**: Set room temperature via proxy `/setroomthermpoint`
+- [ ] **ENERGY-04**: Set thermostat mode via proxy `/setthermmode`
 - [x] **ENERGY-05**: Switch schedule via proxy `/switchhomeschedule`
 - [x] **ENERGY-06**: Sync schedule via proxy `/synchomeschedule`
 - [x] **ENERGY-07**: Historical room measurements via proxy `/getroommeasure` (SQLite aggregation tiers)
@@ -82,8 +82,8 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 | API-04 | Phase 75 | Complete |
 | ENERGY-01 | Phase 75 | Complete |
 | ENERGY-02 | Phase 75 | Complete |
-| ENERGY-03 | Phase 76 | Complete |
-| ENERGY-04 | Phase 76 | Complete |
+| ENERGY-03 | Phase 82 | Pending |
+| ENERGY-04 | Phase 82 | Pending |
 | ENERGY-05 | Phase 80 | Complete |
 | ENERGY-06 | Phase 76 | Complete |
 | ENERGY-07 | Phase 76 | Complete |
@@ -107,11 +107,11 @@ Requirements for Netatmo API Migration. Each maps to roadmap phases.
 
 **Coverage:**
 - v10.0 requirements: 28 total
-- Satisfied: 24
-- Pending (gap closure): 4 (API-02, ENERGY-05, CLEAN-02, CLEAN-06)
+- Satisfied: 26
+- Pending (gap closure): 2 (ENERGY-03, ENERGY-04)
 - Mapped to phases: 28
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-14*
-*Last updated: 2026-03-15 — gap closure phases 80-81 added*
+*Last updated: 2026-03-16 — gap closure phases 82-83 added*

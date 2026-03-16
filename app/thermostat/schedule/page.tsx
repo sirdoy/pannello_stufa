@@ -126,6 +126,7 @@ function ScheduleContent() {
               <ActiveOverrideBadge
                 key={room.id}
                 room={room as Room}
+                homeId={homeId ?? undefined}
                 onCancelled={() => {
                   refetchRooms();
                   refetch(); // Also refresh schedules
@@ -161,6 +162,7 @@ function ScheduleContent() {
       <ManualOverrideSheet
         isOpen={showOverrideSheet}
         onClose={() => setShowOverrideSheet(false)}
+        homeId={homeId ?? undefined}
         onOverrideCreated={() => {
           refetchRooms();
           refetch();

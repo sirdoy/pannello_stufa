@@ -17,6 +17,7 @@ interface Room {
 
 interface ActiveOverrideBadgeProps {
   room: Room;
+  homeId?: string;
   onCancelled?: () => void;
 }
 
@@ -25,6 +26,7 @@ interface ActiveOverrideBadgeProps {
  */
 export default function ActiveOverrideBadge({
   room,
+  homeId,
   onCancelled,
 }: ActiveOverrideBadgeProps) {
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
@@ -55,6 +57,7 @@ export default function ActiveOverrideBadge({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          home_id: homeId,
           room_id: room.id,
           mode: 'home', // Return to schedule
         }),

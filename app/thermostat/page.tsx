@@ -238,7 +238,7 @@ function NetatmoContent() {
       const response = await fetch(NETATMO_ROUTES.setThermMode, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: newMode }),
+        body: JSON.stringify({ home_id: topology?.home_id, mode: newMode }),
       });
 
       const data = await response.json();
@@ -568,6 +568,7 @@ function NetatmoContent() {
                 <RoomCard
                   key={room.id}
                   room={room as any}
+                  homeId={topology?.home_id}
                   onRefresh={fetchStatus}
                 />
               ))}

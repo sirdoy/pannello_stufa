@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
  * Streams binary JPEG snapshot for a specific camera event from proxy.
  * Protected: Requires Auth0 authentication
  */
-export const GET = withAuthAndErrorHandler(async (_request: unknown, context: unknown) => {
+export const GET = withAuthAndErrorHandler(async (_request, context) => {
   const eventId = await getPathParam(context, 'eventId');
 
   const response = await getProxyCameraEventSnapshot(eventId);

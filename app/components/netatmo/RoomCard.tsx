@@ -32,10 +32,11 @@ interface RoomCardProps {
     roomModules?: ModuleData[];
     [key: string]: unknown;
   };
+  homeId?: string;
   onRefresh?: () => Promise<void>;
 }
 
-export default function RoomCard({ room, onRefresh }: RoomCardProps) {
+export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingTemp, setEditingTemp] = useState(false);
@@ -104,6 +105,7 @@ export default function RoomCard({ room, onRefresh }: RoomCardProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          home_id: homeId,
           room_id: room.id,
           mode: 'manual',
           temp,
@@ -134,6 +136,7 @@ export default function RoomCard({ room, onRefresh }: RoomCardProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          home_id: homeId,
           room_id: room.id,
           mode: 'home',
         }),
@@ -162,8 +165,9 @@ export default function RoomCard({ room, onRefresh }: RoomCardProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          home_id: homeId,
           room_id: room.id,
-          mode: 'off',
+          mode: 'home',
         }),
       });
 

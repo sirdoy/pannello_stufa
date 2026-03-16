@@ -20,6 +20,7 @@ interface ManualOverrideSheetProps {
   isOpen: boolean;
   onClose: () => void;
   onOverrideCreated?: () => void;
+  homeId?: string;
 }
 
 /**
@@ -29,6 +30,7 @@ export default function ManualOverrideSheet({
   isOpen,
   onClose,
   onOverrideCreated,
+  homeId,
 }: ManualOverrideSheetProps) {
   const { rooms, loading: roomsLoading } = useRoomStatus();
 
@@ -76,6 +78,7 @@ export default function ManualOverrideSheet({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          home_id: homeId,
           room_id: selectedRoomId,
           mode: 'manual',
           temp: temperature,

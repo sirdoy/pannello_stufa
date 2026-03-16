@@ -2,7 +2,7 @@
 
 ## What This Is
 
-PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (con gestione schedule complete), luci Philips Hue, monitoraggio rete Fritz!Box. Include sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, rate limiting persistente Firebase RTDB, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Monitoraggio rete Fritz!Box con dashboard card, pagina dedicata /network con WAN status, device list con categorizzazione automatica, bandwidth charts con decimation LTTB, device history timeline, e correlazione bandwidth-stufa con consent gate. Dashboard home con masonry layout (flexbox two-column split) che elimina gap verticali tra card di altezze diverse, con Suspense streaming e skeleton fallback per card individuali. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API con stagger iniziale per evitare thundering herd, e componenti refactored con orchestrator pattern (~85% LOC reduction). Performance ottimizzata con React Compiler auto-memoization, code splitting Recharts via next/dynamic, font self-hosted via next/font, e Web Vitals pipeline. Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
+PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (via local HomeAssistant proxy con API Key auth), luci Philips Hue, monitoraggio rete Fritz!Box. Integrazione Netatmo migrata da Cloud API diretta a proxy locale — OAuth eliminato, autenticazione semplificata a singolo header X-API-Key, dati serviti da SQLite locale. Include sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Monitoraggio rete Fritz!Box con dashboard card, pagina dedicata /network con WAN status, device list con categorizzazione automatica, bandwidth charts con decimation LTTB, device history timeline, e correlazione bandwidth-stufa con consent gate. Dashboard home con masonry layout (flexbox two-column split) che elimina gap verticali tra card di altezze diverse, con Suspense streaming e skeleton fallback per card individuali. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API con stagger iniziale per evitare thundering herd, e componenti refactored con orchestrator pattern (~85% LOC reduction). Performance ottimizzata con React Compiler auto-memoization, code splitting Recharts via next/dynamic, font self-hosted via next/font, e Web Vitals pipeline. Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
 
 ## Core Value
 
@@ -10,8 +10,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v9.0 (shipped 2026-02-19)
-**Status:** Performance Optimization complete — planning next milestone
+**Version:** v10.0 (shipped 2026-03-16)
+**Status:** Netatmo API Migration complete — planning next milestone
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -25,8 +25,9 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - react-error-boundary for crash isolation
 - GitHub Actions for cron automation (5-min schedule)
 - Fritz!Box TR-064 API integration via server-side proxy
+- Netatmo integration via local HomeAssistant proxy (X-API-Key auth, SQLite-backed)
 - Web Vitals pipeline (useReportWebVitals + sendBeacon + Firebase RTDB)
-- ~106,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
+- ~102,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
 
 ## Requirements
 
@@ -353,19 +354,43 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ **SUSP-02**: Cards stream in progressively as data available — v9.0 (Phase 74)
 - ✓ **SUSP-03**: Stove card always loads first (safety-critical priority) — v9.0 (Phase 74)
 
+**v10.0 Netatmo API Migration (Shipped 2026-03-16):**
+
+**API Client:**
+- ✓ **API-01**: Netatmo calls proxied through local API — v10.0 (Phase 75)
+- ✓ **API-02**: X-API-Key authentication replacing OAuth — v10.0 (Phase 75, 80)
+- ✓ **API-03**: Data freshness handling (LIVE/STALE/UNREACHABLE) — v10.0 (Phase 75)
+- ✓ **API-04**: RFC 9457 error propagation — v10.0 (Phase 75)
+
+**Energy (Thermostat):**
+- ✓ **ENERGY-01**: Room temperatures from proxy /homestatus — v10.0 (Phase 75)
+- ✓ **ENERGY-02**: Home topology from proxy /homesdata — v10.0 (Phase 75)
+- ✓ **ENERGY-03**: Set room temperature via proxy — v10.0 (Phase 76, 82)
+- ✓ **ENERGY-04**: Set thermostat mode via proxy — v10.0 (Phase 76, 82)
+- ✓ **ENERGY-05**: Switch schedule via proxy — v10.0 (Phase 76, 80)
+- ✓ **ENERGY-06**: Sync schedule via proxy — v10.0 (Phase 76)
+- ✓ **ENERGY-07**: Historical measurements via proxy — v10.0 (Phase 76)
+
+**Camera:**
+- ✓ **CAM-01**: Camera status via proxy — v10.0 (Phase 77)
+- ✓ **CAM-02**: Camera stream URLs via proxy — v10.0 (Phase 77)
+- ✓ **CAM-03**: Camera snapshot via proxy — v10.0 (Phase 77)
+- ✓ **CAM-04**: Camera events via proxy — v10.0 (Phase 77)
+- ✓ **CAM-05**: Camera monitoring toggle via proxy — v10.0 (Phase 77, 83)
+- ✓ **CAM-06**: Event snapshot binary via proxy — v10.0 (Phase 77)
+
+**Valve & Health:**
+- ✓ **VALVE-01**: Valve status via dedicated proxy endpoint — v10.0 (Phase 78)
+- ✓ **VALVE-02**: Valve calibration via proxy — v10.0 (Phase 78)
+- ✓ **HEALTH-01**: Netatmo provider health via proxy — v10.0 (Phase 78)
+- ✓ **HEALTH-02**: Cron health check uses proxy — v10.0 (Phase 78)
+
+**Cleanup:**
+- ✓ **CLEAN-01** through **CLEAN-07**: All OAuth infrastructure deleted — v10.0 (Phase 79, 80, 81)
+
 ### Active
 
-## Current Milestone: v10.0 Netatmo API Migration
-
-**Goal:** Migrate entire Netatmo integration from direct api.netatmo.com calls to local HomeAssistant Network API proxy (https://pdupun8zpr7exw43.myfritz.net/api/v1/netatmo/), eliminating OAuth token management, rate limiting, and caching from the Next.js app.
-
-**Target features:**
-- Replace all direct Netatmo Cloud API calls with local proxy API
-- Switch authentication from Netatmo OAuth to API Key (X-API-Key header)
-- Remove obsolete token management, rate limiting, and caching code
-- Adapt response parsing to new API response formats (SQLite-backed data)
-- Add new capabilities: health endpoint, dedicated valve status, camera stream URLs
-- Delete dead code (OAuth flow, credentials, token helper, rate limiter, cache service)
+(No active requirements — planning next milestone)
 
 ### Out of Scope
 
@@ -395,22 +420,23 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - CVA + Radix UI design system (37+ components)
 - react-error-boundary per crash isolation
 - Fritz!Box TR-064 API via server-side proxy con rate limiting
+- Netatmo integration via local HomeAssistant proxy (X-API-Key auth, SQLite-backed data)
 - Recharts code-split via next/dynamic su /network e /analytics
 - Self-hosted Outfit + Space Grotesk fonts via next/font
 - Web Vitals pipeline (useReportWebVitals → sendBeacon → Firebase RTDB → dashboard)
 - Suspense streaming con loading.tsx skeleton shell + per-card boundaries
-- ~106,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
+- ~102,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
 - 550+ TypeScript source files, 4,000+ tests passing
 - GitHub Actions cron (5-min schedule) per health monitoring e coordination
 - GDPR-compliant analytics con consent banner
-- 13 milestones shipped, 74 phases, 330 plans executed
+- 14 milestones shipped, 83 phases, 348 plans executed
 
-**v9.0 Milestone (2026-02-18 → 2026-02-19):**
-- 5 phases executed (8 plans, 16 tasks)
-- 21/21 requirements satisfied (100%)
-- 67 files changed (+8,161 insertions, -241 deletions)
-- 49 git commits with atomic changes
-- 2 days from phase 70 start to completion
+**v10.0 Milestone (2026-03-15 → 2026-03-16):**
+- 9 phases executed (18 plans)
+- 28/28 requirements satisfied (100%)
+- 173 files changed (+12,606 insertions, -16,454 deletions)
+- 88 git commits with atomic changes
+- 2 days from phase 75 start to completion
 
 **Known Issues:**
 - Worker teardown warning (React 19 cosmetic, not actionable)
@@ -425,6 +451,9 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Self-hosted Fritz!Box API connectivity depends on myfritz.net (may timeout off-network)
 - CopyableIp uses plain button instead of design system Button (test simplicity)
 - Manual useMemo/useCallback not yet removed (deferred for regression attribution)
+- 3 Netatmo routes without frontend consumer (synchomeschedule, createnewhomeschedule, getroommeasure)
+- Netatmo proxy connectivity depends on myfritz.net (same risk as Fritz!Box)
+- Nyquist validation missing for v10.0 phases (75-83)
 
 **User Feedback:**
 - None yet (awaiting operational deployment)
@@ -487,6 +516,11 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 | DashboardCards async Server Component | Extracts auth + deviceConfig fetch from page shell | ✓ Good — Page renders synchronously, data streams (v9.0) |
 | Per-card Suspense with CARD_SKELETONS registry | Mirrors CARD_COMPONENTS exactly, declarative fallback lookup | ✓ Good — Cards stream individually (v9.0) |
 | DeviceCardErrorBoundary outside Suspense | Error boundaries must catch Suspense errors, not vice versa | ✓ Good — Correct error/loading hierarchy (v9.0) |
+| Local proxy replacing Netatmo Cloud API | Eliminates OAuth complexity, single API key auth, SQLite-backed data | ✓ Good — Net -3,848 lines, simpler architecture (v10.0) |
+| Function module for proxy client | No JWT state to manage, simpler than class-based Fritz!Box client | ✓ Good — Testable, consistent pattern (v10.0) |
+| RFC 9457 error mapping | Structured error responses from proxy mapped to ApiError instances | ✓ Good — Frontend error boundaries handle cleanly (v10.0) |
+| Audit-driven gap closure phases | Milestone audit identified integration gaps before shipping | ✓ Good — Caught home_id missing, camera toggle missing (v10.0) |
+| homeId as optional prop threading | Pass from topology state through component tree, not re-fetched | ✓ Good — Single source of truth (v10.0) |
 
 ## Constraints
 
@@ -498,4 +532,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-14 after v10.0 milestone start (Netatmo API Migration)*
+*Last updated: 2026-03-16 after v10.0 milestone completion (Netatmo API Migration)*

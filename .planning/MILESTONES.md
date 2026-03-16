@@ -1,5 +1,41 @@
 # Project Milestones: Pannello Stufa
 
+## v10.0 Netatmo API Migration (Shipped: 2026-03-16)
+
+**Delivered:** Complete migration of Netatmo integration from direct Cloud API to local HomeAssistant Network API proxy — new proxy client with X-API-Key auth replacing OAuth, all energy/camera/valve/health endpoints migrated, dead OAuth infrastructure deleted (net -3,848 lines), and integration gaps closed via audit-driven gap closure phases.
+
+**Phases completed:** 75-83 (18 plans total)
+
+**Key accomplishments:**
+
+- New Netatmo proxy client (`lib/netatmoProxy.ts`) with X-API-Key authentication, RFC 9457 error mapping, and AbortController timeouts — replaces entire OAuth token management flow
+- All energy control endpoints migrated: thermostat setpoint, mode switching, schedule management, room measurements — all routed through local proxy with SQLite-backed data
+- Complete camera migration: status, live stream URLs (HLS with VPN + local), snapshots, events (7-day SQLite retention), monitoring toggle, and event snapshot binary streaming
+- Valve status + health monitoring migrated to dedicated proxy endpoints; cron health check writes proxy health snapshots to Firebase
+- Dead code cleanup: OAuth helpers, rate limiter, cache service, credentials, callback route, coordination orchestrator chain (9 modules) — net deletion of ~16,000 lines
+- Audit-driven gap closure (Phases 80-83): env var alignment, schedule switching wiring, debug panel cleanup, thermostat home_id fix, camera monitoring toggle UI
+
+**Stats:**
+
+- 18 plans executed across 9 phases
+- 28/28 v10.0 requirements satisfied (100%)
+- 173 files changed (+12,606 insertions, -16,454 deletions)
+- 88 git commits with atomic changes
+- 2 days from phase 75 start to completion (2026-03-15 → 2026-03-16)
+
+**Git range:** `feat(75-01)` (2462ce8) → `docs(phase-83)` (3d44459)
+
+**Archives:**
+- [Roadmap](milestones/v10.0-ROADMAP.md)
+- [Requirements](milestones/v10.0-REQUIREMENTS.md)
+- [Audit](milestones/v10.0-MILESTONE-AUDIT.md)
+
+**Tech debt:** 3 routes without frontend consumer (synchomeschedule, createnewhomeschedule, getroommeasure). Empty disconnect/ directory shell. Nyquist validation missing for all 9 phases. SUMMARY frontmatter gaps in 76-02, 78-01.
+
+**What's next:** Netatmo integration fully migrated to local proxy. OAuth infrastructure eliminated. Ready for next milestone planning.
+
+---
+
 Historical record of shipped milestones for the Pannello Stufa smart home control PWA.
 
 ---

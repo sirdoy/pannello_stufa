@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v10.0
 milestone_name: Netatmo API Migration
 status: executing
-stopped_at: Completed 82-fix-thermostat-control-build 82-01-PLAN.md
-last_updated: "2026-03-16T10:40:54.506Z"
+stopped_at: Phase 83 context gathered
+last_updated: "2026-03-16T10:43:37.797Z"
 last_activity: 2026-03-15 — 75-01 Netatmo proxy client + types complete
 progress:
   total_phases: 9
@@ -127,6 +127,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-16T10:38:23.449Z
-Stopped at: Completed 82-fix-thermostat-control-build 82-01-PLAN.md
-Resume file: None
+Last session: 2026-03-16T10:43:37.789Z
+Stopped at: Phase 83 context gathered
+Resume file: .planning/phases/83-camera-monitoring-toggle-ui/83-CONTEXT.md

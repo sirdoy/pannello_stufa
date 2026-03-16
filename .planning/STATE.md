@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v10.0
 milestone_name: Netatmo API Migration
 status: executing
-stopped_at: Completed 81-fix-stovesync-debug-cleanup 81-01-PLAN.md
-last_updated: "2026-03-15T19:04:16.187Z"
+stopped_at: Completed 82-fix-thermostat-control-build 82-01-PLAN.md
+last_updated: "2026-03-16T10:38:23.455Z"
 last_activity: 2026-03-15 — 75-01 Netatmo proxy client + types complete
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 16
-  completed_plans: 16
+  total_phases: 9
+  completed_phases: 8
+  total_plans: 17
+  completed_plans: 17
   percent: 5
 ---
 
@@ -61,6 +61,7 @@ Progress: [█░░░░░░░░░] 5% (v10.0)
 | Phase 80-fix-env-var-schedule-wiring P01 | 7 | 1 tasks | 6 files |
 | Phase 80-fix-env-var-schedule-wiring P02 | 6 | 2 tasks | 7 files |
 | Phase 81-fix-stovesync-debug-cleanup P01 | 6 | 2 tasks | 11 files |
+| Phase 82 P01 | 175 | 1 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,8 @@ See PROJECT.md Key Decisions table for full history. Relevant to v10.0:
 - [Phase 81-fix-stovesync-debug-cleanup]: StoveSyncPanel deleted entirely - proxy handles stove sync coordination
 - [Phase 81-fix-stovesync-debug-cleanup]: disconnect route deleted - proxy owns auth token management, client-side disconnect meaningless
 - [Phase 81-fix-stovesync-debug-cleanup]: debug NetatmoTab connectionStatus now reads from /health provider_status instead of deleted /debug endpoint
+- [Phase 82]: homeId passed as optional prop through component trees rather than fetched independently
+- [Phase 82]: RoomCard mode:'off' replaced with mode:'home' since API VALID_MODES for setroomthermpoint is only ['manual', 'home']
 
 ### Pending Todos
 
@@ -124,6 +127,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15T18:59:25.627Z
-Stopped at: Completed 81-fix-stovesync-debug-cleanup 81-01-PLAN.md
+Last session: 2026-03-16T10:38:23.449Z
+Stopped at: Completed 82-fix-thermostat-control-build 82-01-PLAN.md
 Resume file: None

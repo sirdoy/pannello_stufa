@@ -56,7 +56,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 79: Cleanup** - Dead code deleted (OAuth helpers, rate limiter, cache service, callback route, env vars), tests updated (completed 2026-03-15)
 - [x] **Phase 80: Fix Env Var & Schedule Wiring** - Align env var names, wire switchhomeschedule to frontend (completed 2026-03-15)
 - [x] **Phase 81: Fix StoveSync & Debug Panel Cleanup** - Remove stoveSync 404, clean debug panel deleted routes (completed 2026-03-15)
-- [ ] **Phase 82: Fix Thermostat Control + Build Error** - Add home_id to thermostat POST bodies, fix camera route type, remap mode:'off'
+- [x] **Phase 82: Fix Thermostat Control + Build Error** - Add home_id to thermostat POST bodies, fix camera route type, remap mode:'off' (completed 2026-03-16)
 - [ ] **Phase 83: Camera Monitoring Toggle UI** - Wire camera monitoring route to frontend toggle
 
 ## Phase Details
@@ -178,7 +178,7 @@ Plans:
   3. All `setthermmode` callers (ThermostatCard, thermostat/page.tsx) include `home_id` in POST body
   4. RoomCard "off" action sends `mode: 'home'` instead of `mode: 'off'` (matching VALID_MODES)
   5. "Set room temperature" and "Set thermostat mode" E2E flows complete without 400 errors
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [ ] 82-01-PLAN.md — Fix camera snapshot route type, add home_id to all thermostat POST callers, remap mode:'off' to 'home'
 
@@ -216,7 +216,7 @@ Plans:
 | 79. Cleanup | 2/2 | Complete    | 2026-03-15 | - |
 | 80. Fix Env Var & Schedule Wiring | 2/2 | Complete    | 2026-03-15 | - |
 | 81. Fix StoveSync & Debug Panel Cleanup | 1/1 | Complete    | 2026-03-15 | - |
-| 82. Fix Thermostat Control + Build Error | 0/1 | Not Started | - | - |
+| 82. Fix Thermostat Control + Build Error | 1/1 | Complete   | 2026-03-16 | - |
 | 83. Camera Monitoring Toggle UI | 0/0 | Not Started | - | - |
 
 **Total:** 13 milestones shipped, 74 phases complete, 330 plans executed — v10.0 in progress

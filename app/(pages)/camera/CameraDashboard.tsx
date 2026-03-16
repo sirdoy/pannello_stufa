@@ -16,6 +16,7 @@ import {
   Banner,
   EmptyState,
   Skeleton,
+  Switch,
 } from '@/app/components/ui';
 import { getCameraTypeName, getEventTypeName, getEventIcon } from '@/lib/netatmoCameraApi';
 import HlsPlayer from '@/app/components/devices/camera/HlsPlayer';
@@ -35,6 +36,8 @@ export default function CameraDashboard() {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [isLiveMode, setIsLiveMode] = useState<boolean>(false);
   const [selectedEvent, setSelectedEvent] = useState<CameraEvent | null>(null);
+  const [monitoringStates, setMonitoringStates] = useState<Record<string, boolean>>({});
+  const [monitoringLoading, setMonitoringLoading] = useState<Record<string, boolean>>({});
 
   const fetchedRef = useRef<boolean>(false);
 
@@ -65,6 +68,13 @@ export default function CameraDashboard() {
       setCameras(statusData.cameras ?? []);
       setDataFreshness(statusData.data_freshness ?? null);
       setEvents(eventsData.events ?? []);
+
+      // Initialize monitoring states from camera status
+      const initialMonitoring: Record<string, boolean> = {};
+      for (const camera of statusData.cameras ?? []) {
+        initialMonitoring[camera.camera_id] = camera.status === 'on';
+      }
+      setMonitoringStates(initialMonitoring);
 
       // Fetch snapshots for all cameras
       const urls: Record<string, string> = {};
@@ -119,6 +129,30 @@ export default function CameraDashboard() {
     if (selectedCameraId) {
       setIsLiveMode(true);
       fetchStreamUrl(selectedCameraId);
+    }
+  }
+
+  async function handleMonitoringToggle(cameraId: string, newValue: boolean) {
+    if (monitoringLoading[cameraId] ?? false) return;
+    const previousValue = monitoringStates[cameraId] ?? false;
+    setMonitoringStates(prev => ({ ...prev, [cameraId]: newValue })); // optimistic
+    setMonitoringLoading(prev => ({ ...prev, [cameraId]: true }));
+    try {
+      const res = await fetch(CAMERA_ROUTES.monitoring, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          camera_id: cameraId,
+          monitoring: newValue ? 'on' : 'off',
+        }),
+      });
+      if (!res.ok) {
+        setMonitoringStates(prev => ({ ...prev, [cameraId]: previousValue })); // rollback
+      }
+    } catch {
+      setMonitoringStates(prev => ({ ...prev, [cameraId]: previousValue })); // rollback
+    } finally {
+      setMonitoringLoading(prev => ({ ...prev, [cameraId]: false }));
     }
   }
 
@@ -328,6 +362,22 @@ export default function CameraDashboard() {
                   <Text variant={selectedCamera.status === 'on' ? 'sage' : 'secondary'} size="sm" className="mt-1">
                     {selectedCamera.status === 'on' ? 'Attiva' : 'Inattiva'}
                   </Text>
+                </div>
+                <div className="p-3 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-100 rounded-lg">
+                  <Text variant="label" size="xs">Monitoraggio</Text>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Switch
+                      checked={monitoringStates[selectedCamera.camera_id] ?? false}
+                      onCheckedChange={(val) => handleMonitoringToggle(selectedCamera.camera_id, val)}
+                      disabled={isStale || (monitoringLoading[selectedCamera.camera_id] ?? false)}
+                      size="sm"
+                      variant="ocean"
+                      label="Monitoraggio camera"
+                    />
+                    <Text variant={monitoringStates[selectedCamera.camera_id] ? 'sage' : 'secondary'} size="sm">
+                      {monitoringStates[selectedCamera.camera_id] ? 'Attivo' : 'Disattivo'}
+                    </Text>
+                  </div>
                 </div>
                 {selectedCamera.sd_status && (
                   <div className="p-3 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-100 rounded-lg">

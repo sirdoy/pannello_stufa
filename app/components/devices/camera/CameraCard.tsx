@@ -6,7 +6,7 @@ import { RefreshCw } from 'lucide-react';
 import { CAMERA_ROUTES } from '@/lib/routes';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
-import { Text, Button } from '../../ui';
+import { Text, Button, Switch } from '../../ui';
 import { getCameraTypeName } from '@/lib/netatmoCameraApi';
 import HlsPlayer from './HlsPlayer';
 import type { CameraStatus, DataFreshness } from '@/types/netatmoProxy';
@@ -29,6 +29,8 @@ export default function CameraCard() {
   const [snapshotError, setSnapshotError] = useState(false);
   const [isLiveMode, setIsLiveMode] = useState(false);
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
+  const [monitoringOn, setMonitoringOn] = useState<boolean>(false);
+  const [monitoringLoading, setMonitoringLoading] = useState(false);
 
   const connectionCheckedRef = useRef(false);
 
@@ -54,6 +56,14 @@ export default function CameraCard() {
       fetchSnapshot(selectedCameraId);
     }
   }, [selectedCameraId]);
+
+  // Sync monitoring state from selected camera
+  useEffect(() => {
+    const camera = cameras.find(c => c.camera_id === selectedCameraId);
+    if (camera) {
+      setMonitoringOn(camera.status === 'on');
+    }
+  }, [selectedCameraId, cameras]);
 
   async function fetchCameras(retryCount: number = 0) {
     const MAX_RETRIES = 1;
@@ -141,6 +151,30 @@ export default function CameraCard() {
     if (selectedCameraId) {
       setIsLiveMode(true);
       fetchStreamUrl(selectedCameraId);
+    }
+  }
+
+  async function handleMonitoringToggle(newValue: boolean) {
+    if (!selectedCameraId || monitoringLoading || dataFreshness === 'UNREACHABLE') return;
+    const previousValue = monitoringOn;
+    setMonitoringOn(newValue); // optimistic
+    setMonitoringLoading(true);
+    try {
+      const res = await fetch(CAMERA_ROUTES.monitoring, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          camera_id: selectedCameraId,
+          monitoring: newValue ? 'on' : 'off',
+        }),
+      });
+      if (!res.ok) {
+        setMonitoringOn(previousValue); // rollback
+      }
+    } catch {
+      setMonitoringOn(previousValue); // rollback
+    } finally {
+      setMonitoringLoading(false);
     }
   }
 
@@ -325,12 +359,25 @@ export default function CameraCard() {
         )}
       </div>
 
-      {/* Camera info */}
+      {/* Camera info + monitoring toggle */}
       {selectedCamera && (
-        <div className="flex items-center gap-2 text-sm">
+        <div className="flex items-center justify-between gap-2 text-sm">
           <Text variant="tertiary">
             {getCameraTypeName(selectedCamera.device_type ?? '')}
           </Text>
+          <div className="flex items-center gap-2">
+            <Text variant="tertiary" size="xs">
+              {monitoringOn ? 'Monitoraggio attivo' : 'Monitoraggio disattivo'}
+            </Text>
+            <Switch
+              checked={monitoringOn}
+              onCheckedChange={handleMonitoringToggle}
+              disabled={isStale || monitoringLoading}
+              size="sm"
+              variant="ocean"
+              label="Monitoraggio camera"
+            />
+          </div>
         </div>
       )}
     </DeviceCard>

@@ -33,15 +33,11 @@ const mockCameraStatusResponse: CameraStatusResponse = {
       status: 'on',
       sd_status: 'on',
       alim_status: 'on',
-      firmware: 174,
+      firmware: '174',    // string per CameraStatus type
       is_local: false,
     },
   ],
-  data_freshness: {
-    fetched_at: '2026-03-15T12:00:00Z',
-    age_seconds: 30,
-    source: 'cache',
-  },
+  data_freshness: 'LIVE',  // DataFreshness = 'LIVE' | 'STALE' | 'UNREACHABLE'
 };
 
 const callGET = () =>
@@ -79,15 +75,25 @@ describe('GET /api/netatmo/camera/status', () => {
     });
   });
 
-  it('should return data_freshness from proxy response', async () => {
+  it('should return data_freshness string from proxy response', async () => {
     mockGetProxyCameraStatus.mockResolvedValue(mockCameraStatusResponse);
 
     const result = await callGET();
 
-    expect((result as any).data.data_freshness).toMatchObject({
-      source: 'cache',
-      age_seconds: 30,
+    // DataFreshness is a string union: 'LIVE' | 'STALE' | 'UNREACHABLE'
+    expect((result as any).data.data_freshness).toBe('LIVE');
+  });
+
+  it('should return STALE data_freshness when proxy returns stale data', async () => {
+    mockGetProxyCameraStatus.mockResolvedValue({
+      cameras: [],
+      data_freshness: 'STALE',
     });
+
+    const result = await callGET();
+
+    expect((result as any).ok).toBe(true);
+    expect((result as any).data.data_freshness).toBe('STALE');
   });
 
   it('should propagate proxy errors', async () => {
@@ -103,7 +109,7 @@ describe('GET /api/netatmo/camera/status', () => {
   it('should return empty cameras array when proxy returns no cameras', async () => {
     mockGetProxyCameraStatus.mockResolvedValue({
       cameras: [],
-      data_freshness: { fetched_at: '2026-03-15T12:00:00Z', age_seconds: 0, source: 'live' },
+      data_freshness: 'LIVE',
     });
 
     const result = await callGET();

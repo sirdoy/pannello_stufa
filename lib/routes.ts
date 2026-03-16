@@ -87,8 +87,6 @@ export const CAMERA_ROUTES = {
   stream: (cameraId: string): string => `${API_BASE}/netatmo/camera/stream?cameraId=${encodeURIComponent(cameraId)}`,
   snapshot: (cameraId: string): string => `${API_BASE}/netatmo/camera/snapshot?cameraId=${encodeURIComponent(cameraId)}`,
   eventSnapshot: (eventId: string): string => `${API_BASE}/netatmo/camera/events/${encodeURIComponent(eventId)}/snapshot`,
-  // Keep old 'list' as alias for backward compat during migration
-  list: `${API_BASE}/netatmo/camera`,
 } as const;
 
 // Logging endpoints

@@ -32,7 +32,10 @@ export default function CameraDashboard() {
   const [dataFreshness, setDataFreshness] = useState<DataFreshness | null>(null);
   const [selectedCameraId, setSelectedCameraId] = useState<string | null>(null);
   const [snapshotUrls, setSnapshotUrls] = useState<Record<string, string>>({});
+  const [snapshotErrors, setSnapshotErrors] = useState<Record<string, boolean>>({});
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
+  const [streamLoading, setStreamLoading] = useState<boolean>(false);
+  const [streamError, setStreamError] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [isLiveMode, setIsLiveMode] = useState<boolean>(false);
   const [selectedEvent, setSelectedEvent] = useState<CameraEvent | null>(null);
@@ -47,7 +50,7 @@ export default function CameraDashboard() {
     fetchData();
   }, []);
 
-  async function fetchData(): Promise<void> {
+  async function fetchData(bustCache = false): Promise<void> {
     try {
       setLoading(true);
       setError(null);
@@ -76,20 +79,16 @@ export default function CameraDashboard() {
       }
       setMonitoringStates(initialMonitoring);
 
-      // Fetch snapshots for all cameras
+      // Build snapshot URLs — the API route redirects to the Netatmo CDN snapshot URL.
+      // Append a timestamp when bustCache=true (explicit refresh) to bypass browser cache.
+      const cacheParam = bustCache ? `&t=${Date.now()}` : '';
       const urls: Record<string, string> = {};
       for (const camera of statusData.cameras ?? []) {
-        try {
-          const snapRes = await fetch(CAMERA_ROUTES.snapshot(camera.camera_id));
-          const snapData = await snapRes.json() as { snapshot_url?: string };
-          if (snapData.snapshot_url) {
-            urls[camera.camera_id] = snapData.snapshot_url;
-          }
-        } catch (e) {
-          console.error(`Error fetching snapshot for ${camera.camera_id}:`, e);
-        }
+        urls[camera.camera_id] = CAMERA_ROUTES.snapshot(camera.camera_id) + cacheParam;
       }
       setSnapshotUrls(urls);
+      // Reset snapshot errors on data refresh so images are retried
+      setSnapshotErrors({});
 
       const firstCamera = statusData.cameras?.[0];
       if (firstCamera && !selectedCameraId) {
@@ -104,16 +103,29 @@ export default function CameraDashboard() {
   }
 
   async function fetchStreamUrl(cameraId: string) {
+    setStreamLoading(true);
+    setStreamError(false);
     try {
       const response = await fetch(CAMERA_ROUTES.stream(cameraId));
+      if (!response.ok) {
+        console.error('Error fetching stream URL:', response.status, response.statusText);
+        setStreamError(true);
+        return;
+      }
       const data = await response.json() as { vpn_streams?: { high: string }; is_local?: boolean; local_streams?: { high: string } };
       if (data.is_local && data.local_streams?.high) {
         setStreamUrl(data.local_streams.high);
       } else if (data.vpn_streams?.high) {
         setStreamUrl(data.vpn_streams.high);
+      } else {
+        // Proxy responded OK but no stream URL available
+        setStreamError(true);
       }
     } catch (err) {
       console.error('Error fetching stream URL:', err);
+      setStreamError(true);
+    } finally {
+      setStreamLoading(false);
     }
   }
 
@@ -121,13 +133,15 @@ export default function CameraDashboard() {
     setRefreshing(true);
     fetchedRef.current = false;
     setStreamUrl(null);
-    await fetchData();
+    await fetchData(true); // bustCache=true: append timestamp to snapshot URLs
     setRefreshing(false);
   }
 
   function handleEnterLiveMode() {
     if (selectedCameraId) {
       setIsLiveMode(true);
+      setStreamUrl(null);
+      setStreamError(false);
       fetchStreamUrl(selectedCameraId);
     }
   }
@@ -256,11 +270,12 @@ export default function CameraDashboard() {
                 <div className="flex items-center gap-4">
                   {/* Snapshot thumbnail */}
                   <div className="w-24 h-16 rounded-lg overflow-hidden bg-slate-700 [html:not(.dark)_&]:bg-slate-200 flex-shrink-0">
-                    {snapshotUrls[camera.camera_id] ? (
+                    {snapshotUrls[camera.camera_id] && !snapshotErrors[camera.camera_id] ? (
                       <img
                         src={snapshotUrls[camera.camera_id]}
                         alt={camera.name ?? camera.camera_id}
                         className="w-full h-full object-cover"
+                        onError={() => setSnapshotErrors(prev => ({ ...prev, [camera.camera_id]: true }))}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
@@ -318,17 +333,35 @@ export default function CameraDashboard() {
               {/* Video preview */}
               <div className="aspect-video bg-slate-800 [html:not(.dark)_&]:bg-slate-200 rounded-xl overflow-hidden mb-4 relative">
                 {isLiveMode && selectedCamera.status === 'on' && streamUrl ? (
+                  // Live video mode — stream URL obtained
                   <HlsPlayer
                     src={streamUrl}
                     poster={snapshotUrls[selectedCamera.camera_id] ?? ''}
                     className="w-full h-full"
-                    onError={() => setIsLiveMode(false)}
+                    onError={() => {
+                      setIsLiveMode(false);
+                      setStreamError(true);
+                    }}
                   />
-                ) : snapshotUrls[selectedCamera.camera_id] ? (
+                ) : isLiveMode && streamLoading ? (
+                  // Stream URL is being fetched
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-2">
+                    <div className="w-8 h-8 border-2 border-ocean-500 border-t-transparent rounded-full animate-spin" />
+                    <Text variant="secondary">Connessione al live...</Text>
+                  </div>
+                ) : isLiveMode && streamError ? (
+                  // Stream fetch failed
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-2">
+                    <span className="text-4xl opacity-50">📡</span>
+                    <Text variant="secondary">Live non disponibile</Text>
+                  </div>
+                ) : snapshotUrls[selectedCamera.camera_id] && !snapshotErrors[selectedCamera.camera_id] ? (
+                  // Snapshot mode — URL redirects to Netatmo CDN
                   <img
                     src={snapshotUrls[selectedCamera.camera_id]}
                     alt={selectedCamera.name ?? selectedCamera.camera_id}
                     className="w-full h-full object-cover"
+                    onError={() => setSnapshotErrors(prev => ({ ...prev, [selectedCamera.camera_id]: true }))}
                   />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center gap-2">

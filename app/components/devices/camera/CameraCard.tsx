@@ -25,10 +25,11 @@ export default function CameraCard() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedCameraId, setSelectedCameraId] = useState<string | null>(null);
   const [snapshotUrl, setSnapshotUrl] = useState<string | null>(null);
-  const [snapshotLoading, setSnapshotLoading] = useState(false);
   const [snapshotError, setSnapshotError] = useState(false);
   const [isLiveMode, setIsLiveMode] = useState(false);
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
+  const [streamLoading, setStreamLoading] = useState(false);
+  const [streamError, setStreamError] = useState(false);
   const [monitoringOn, setMonitoringOn] = useState<boolean>(false);
   const [monitoringLoading, setMonitoringLoading] = useState(false);
 
@@ -50,10 +51,12 @@ export default function CameraCard() {
     }
   }, [cameras, selectedCameraId]);
 
-  // Fetch snapshot when camera selected
+  // Set snapshot URL when camera is selected — the API route proxies the binary JPEG server-side
+  // so we can use the URL directly as <img src> without CORS issues
   useEffect(() => {
     if (selectedCameraId) {
-      fetchSnapshot(selectedCameraId);
+      setSnapshotError(false);
+      setSnapshotUrl(CAMERA_ROUTES.snapshot(selectedCameraId));
     }
   }, [selectedCameraId]);
 
@@ -103,53 +106,50 @@ export default function CameraCard() {
     }
   }
 
-  async function fetchSnapshot(cameraId: string) {
-    try {
-      setSnapshotLoading(true);
-      setSnapshotError(false);
-      const response = await fetch(CAMERA_ROUTES.snapshot(cameraId));
-      const data = await response.json() as { snapshot_url?: string };
-
-      if (data.snapshot_url) {
-        setSnapshotUrl(data.snapshot_url);
-      } else {
-        setSnapshotError(true);
-      }
-    } catch (err) {
-      console.error('Errore fetch snapshot:', err);
-      setSnapshotError(true);
-    } finally {
-      setSnapshotLoading(false);
-    }
-  }
-
   async function fetchStreamUrl(cameraId: string) {
+    setStreamLoading(true);
+    setStreamError(false);
     try {
       const response = await fetch(CAMERA_ROUTES.stream(cameraId));
+      if (!response.ok) {
+        console.error('Errore fetch stream URL:', response.status, response.statusText);
+        setStreamError(true);
+        return;
+      }
       const data = await response.json() as { vpn_streams?: { high: string }; is_local?: boolean; local_streams?: { high: string } };
       if (data.is_local && data.local_streams?.high) {
         setStreamUrl(data.local_streams.high);
       } else if (data.vpn_streams?.high) {
         setStreamUrl(data.vpn_streams.high);
+      } else {
+        // Proxy responded OK but no stream URL available
+        setStreamError(true);
       }
     } catch (err) {
       console.error('Errore fetch stream URL:', err);
+      setStreamError(true);
+    } finally {
+      setStreamLoading(false);
     }
   }
 
   async function handleRefresh() {
     setRefreshing(true);
     connectionCheckedRef.current = false;
-    await fetchCameras();
+    // Bust snapshot cache by appending a new timestamp — forces a fresh image load
     if (selectedCameraId) {
-      await fetchSnapshot(selectedCameraId);
+      setSnapshotError(false);
+      setSnapshotUrl(CAMERA_ROUTES.snapshot(selectedCameraId) + `&t=${Date.now()}`);
     }
+    await fetchCameras();
     setRefreshing(false);
   }
 
   function handleEnterLiveMode() {
     if (selectedCameraId) {
       setIsLiveMode(true);
+      setStreamUrl(null);
+      setStreamError(false);
       fetchStreamUrl(selectedCameraId);
     }
   }
@@ -298,7 +298,7 @@ export default function CameraCard() {
       {/* Video preview */}
       <div className="relative aspect-video bg-slate-800 rounded-xl overflow-hidden mb-4">
         {isLiveMode && selectedCamera?.status === 'on' && streamUrl ? (
-          // Live video mode
+          // Live video mode — stream URL obtained, HLS player active
           <HlsPlayer
             src={streamUrl}
             poster={snapshotUrl ?? undefined}
@@ -306,18 +306,25 @@ export default function CameraCard() {
             onError={() => {
               // Fallback to snapshot on live error
               setIsLiveMode(false);
+              setStreamError(true);
             }}
           />
+        ) : isLiveMode && streamLoading ? (
+          // Stream URL is being fetched
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+            <div className="w-8 h-8 border-2 border-ocean-500 border-t-transparent rounded-full animate-spin" />
+            <Text variant="secondary" size="sm">Connessione al live...</Text>
+          </div>
+        ) : isLiveMode && streamError ? (
+          // Stream fetch failed
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+            <span className="text-3xl opacity-50">📡</span>
+            <Text variant="secondary" size="sm">Live non disponibile</Text>
+          </div>
         ) : (
-          // Snapshot mode
+          // Snapshot mode — URL points to /api/netatmo/camera/snapshot which redirects to Netatmo CDN
           <>
-            {snapshotLoading ? (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="animate-pulse">
-                  <Text variant="secondary">Caricamento...</Text>
-                </div>
-              </div>
-            ) : snapshotUrl && !snapshotError ? (
+            {snapshotUrl && !snapshotError ? (
               <img
                 src={snapshotUrl}
                 alt={`Snapshot ${selectedCamera?.name ?? ''}`}

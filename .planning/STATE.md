@@ -4,7 +4,7 @@ milestone: v10.0
 milestone_name: Netatmo API Migration
 status: executing
 stopped_at: Completed 82-fix-thermostat-control-build 82-01-PLAN.md
-last_updated: "2026-03-16T10:38:23.455Z"
+last_updated: "2026-03-16T10:40:54.506Z"
 last_activity: 2026-03-15 — 75-01 Netatmo proxy client + types complete
 progress:
   total_phases: 9

@@ -220,7 +220,7 @@ Plans:
 | 80. Fix Env Var & Schedule Wiring | 2/2 | Complete    | 2026-03-15 | - |
 | 81. Fix StoveSync & Debug Panel Cleanup | 1/1 | Complete    | 2026-03-15 | - |
 | 82. Fix Thermostat Control + Build Error | 1/1 | Complete    | 2026-03-16 | - |
-| 83. Camera Monitoring Toggle UI | 1/1 | Complete   | 2026-03-16 | - |
+| 83. Camera Monitoring Toggle UI | 1/1 | Complete    | 2026-03-16 | - |
 
 **Total:** 13 milestones shipped, 74 phases complete, 330 plans executed — v10.0 in progress
 

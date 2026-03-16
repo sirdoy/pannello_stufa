@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v10.0
 milestone_name: Netatmo API Migration
 status: executing
-stopped_at: Phase 83 context gathered
-last_updated: "2026-03-16T10:43:37.797Z"
+stopped_at: Completed 83-01-PLAN.md
+last_updated: "2026-03-16T10:55:55.993Z"
 last_activity: 2026-03-15 — 75-01 Netatmo proxy client + types complete
 progress:
   total_phases: 9
-  completed_phases: 8
-  total_plans: 17
-  completed_plans: 17
+  completed_phases: 9
+  total_plans: 18
+  completed_plans: 18
   percent: 5
 ---
 
@@ -62,6 +62,7 @@ Progress: [█░░░░░░░░░] 5% (v10.0)
 | Phase 80-fix-env-var-schedule-wiring P02 | 6 | 2 tasks | 7 files |
 | Phase 81-fix-stovesync-debug-cleanup P01 | 6 | 2 tasks | 11 files |
 | Phase 82 P01 | 175 | 1 tasks | 7 files |
+| Phase 83 P01 | 206 | 1 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -107,6 +108,8 @@ See PROJECT.md Key Decisions table for full history. Relevant to v10.0:
 - [Phase 81-fix-stovesync-debug-cleanup]: debug NetatmoTab connectionStatus now reads from /health provider_status instead of deleted /debug endpoint
 - [Phase 82]: homeId passed as optional prop through component trees rather than fetched independently
 - [Phase 82]: RoomCard mode:'off' replaced with mode:'home' since API VALID_MODES for setroomthermpoint is only ['manual', 'home']
+- [Phase 83]: CameraCard uses single boolean monitoringOn state; CameraDashboard uses Record maps for per-camera state
+- [Phase 83]: Monitoring states initialized from camera.status in fetchData; CameraCard syncs via separate useEffect on selectedCamera change
 
 ### Pending Todos
 
@@ -127,6 +130,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-16T10:43:37.789Z
-Stopped at: Phase 83 context gathered
-Resume file: .planning/phases/83-camera-monitoring-toggle-ui/83-CONTEXT.md
+Last session: 2026-03-16T10:55:55.984Z
+Stopped at: Completed 83-01-PLAN.md
+Resume file: None

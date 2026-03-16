@@ -57,7 +57,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 80: Fix Env Var & Schedule Wiring** - Align env var names, wire switchhomeschedule to frontend (completed 2026-03-15)
 - [x] **Phase 81: Fix StoveSync & Debug Panel Cleanup** - Remove stoveSync 404, clean debug panel deleted routes (completed 2026-03-15)
 - [x] **Phase 82: Fix Thermostat Control + Build Error** - Add home_id to thermostat POST bodies, fix camera route type, remap mode:'off' (completed 2026-03-16)
-- [ ] **Phase 83: Camera Monitoring Toggle UI** - Wire camera monitoring route to frontend toggle
+- [x] **Phase 83: Camera Monitoring Toggle UI** - Wire camera monitoring route to frontend toggle (completed 2026-03-16)
 
 ## Phase Details
 
@@ -191,7 +191,7 @@ Plans:
   1. Camera UI component includes a monitoring toggle button/switch
   2. Toggle calls `/api/netatmo/camera/{id}/monitoring` with correct POST body
   3. "Camera monitoring toggle" E2E flow completes without errors
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [ ] 83-01-PLAN.md — Add monitoring toggle to CameraCard and CameraDashboard using Switch component
 
@@ -220,7 +220,7 @@ Plans:
 | 80. Fix Env Var & Schedule Wiring | 2/2 | Complete    | 2026-03-15 | - |
 | 81. Fix StoveSync & Debug Panel Cleanup | 1/1 | Complete    | 2026-03-15 | - |
 | 82. Fix Thermostat Control + Build Error | 1/1 | Complete    | 2026-03-16 | - |
-| 83. Camera Monitoring Toggle UI | 0/1 | Not Started | - | - |
+| 83. Camera Monitoring Toggle UI | 1/1 | Complete   | 2026-03-16 | - |
 
 **Total:** 13 milestones shipped, 74 phases complete, 330 plans executed — v10.0 in progress
 

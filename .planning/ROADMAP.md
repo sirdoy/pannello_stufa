@@ -178,6 +178,9 @@ Plans:
   3. All `setthermmode` callers (ThermostatCard, thermostat/page.tsx) include `home_id` in POST body
   4. RoomCard "off" action sends `mode: 'home'` instead of `mode: 'off'` (matching VALID_MODES)
   5. "Set room temperature" and "Set thermostat mode" E2E flows complete without 400 errors
+**Plans:** 1 plan
+Plans:
+- [ ] 82-01-PLAN.md — Fix camera snapshot route type, add home_id to all thermostat POST callers, remap mode:'off' to 'home'
 
 ### Phase 83: Camera Monitoring Toggle UI
 **Goal**: Users can toggle camera monitoring on/off from the camera UI, completing the CAM-05 E2E flow
@@ -213,11 +216,11 @@ Plans:
 | 79. Cleanup | 2/2 | Complete    | 2026-03-15 | - |
 | 80. Fix Env Var & Schedule Wiring | 2/2 | Complete    | 2026-03-15 | - |
 | 81. Fix StoveSync & Debug Panel Cleanup | 1/1 | Complete    | 2026-03-15 | - |
-| 82. Fix Thermostat Control + Build Error | 0/0 | Not Started | - | - |
+| 82. Fix Thermostat Control + Build Error | 0/1 | Not Started | - | - |
 | 83. Camera Monitoring Toggle UI | 0/0 | Not Started | - | - |
 
 **Total:** 13 milestones shipped, 74 phases complete, 330 plans executed — v10.0 in progress
 
 ---
 
-*Roadmap updated: 2026-03-16 — Gap closure phases 82-83 added*
+*Roadmap updated: 2026-03-16 — Phase 82 plan created*

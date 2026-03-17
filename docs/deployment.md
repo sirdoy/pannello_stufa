@@ -30,9 +30,9 @@ AUTH0_ISSUER_BASE_URL=...
 AUTH0_CLIENT_ID=...
 AUTH0_CLIENT_SECRET=...
 
-# Netatmo Proxy
-NETATMO_PROXY_URL=http://your-proxy-host:port/api/v1/netatmo
-NETATMO_PROXY_API_KEY=your-proxy-api-key
+# HA Proxy (Fritz!Box + Netatmo via HomeAssistant)
+HA_API_URL=http://your-homeassistant-host:port
+HA_API_KEY=your-ha-api-key
 
 # Secrets
 CRON_SECRET=your-cron-secret

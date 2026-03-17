@@ -18,7 +18,7 @@ Requirements for API Unification & Raspberry Pi Monitor milestone.
 - [x] **API-07**: Netatmo client migrated to shared HA client (separate env vars removed)
 - [x] **API-08**: Netatmo convenience wrappers preserved on top of shared transport
 - [x] **API-09**: Netatmo API routes updated to use new client (no behavior change)
-- [ ] **API-10**: Old client modules deleted after migration verified
+- [x] **API-10**: Old client modules deleted after migration verified
 
 ### Raspberry Pi (New Device)
 
@@ -69,7 +69,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | API-07 | Phase 86 | Complete |
 | API-08 | Phase 86 | Complete |
 | API-09 | Phase 86 | Complete |
-| API-10 | Phase 87 | Pending |
+| API-10 | Phase 87 | Complete |
 | RASPI-01 | Phase 88 | Pending |
 | RASPI-02 | Phase 88 | Pending |
 | RASPI-03 | Phase 88 | Pending |

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: API Unification & Raspberry Pi Monitor
 status: planning
-stopped_at: Phase 87 context gathered
-last_updated: "2026-03-17T15:51:22.827Z"
+stopped_at: Completed 87-02-PLAN.md
+last_updated: "2026-03-17T16:06:46.826Z"
 last_activity: 2026-03-17 — Phase 86 complete (3/3 plans, 7/7 verification)
 progress:
   total_phases: 7
   completed_phases: 3
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 7
+  completed_plans: 6
   percent: 43
 ---
 
@@ -51,6 +51,7 @@ Progress: [████░░░░░░] 43% (3/7 phases)
 | Phase 85 P01 | 15 | 3 tasks | 6 files |
 | Phase 86 P01 | 8 | 2 tasks | 2 files |
 | Phase 86 P02 | 320 | 3 tasks | 5 files |
+| Phase 87 P02 | 4 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,7 @@ Recent decisions relevant to v11.0:
 - [Phase 86]: validateNetatmoEnv simplified — removed unreachable warnings array, returns directly
 - [Phase 86]: getroommeasure RoomMeasureResponse type import removed — handled by getProxyRoomMeasure wrapper
 - [Phase 86]: getroommeasure RoomMeasureResponse type import kept — mockProxyResponse fixture still typed explicitly
+- [Phase 87]: Docs-only env var replacements: NETATMO_PROXY_URL/NETATMO_PROXY_API_KEY → HA_API_URL/HA_API_KEY in four files
 
 ### Pending Todos
 
@@ -90,6 +92,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-17T15:51:22.822Z
-Stopped at: Phase 87 context gathered
-Resume file: .planning/phases/87-client-cleanup/87-CONTEXT.md
+Last session: 2026-03-17T16:06:40.823Z
+Stopped at: Completed 87-02-PLAN.md
+Resume file: None

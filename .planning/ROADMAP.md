@@ -115,7 +115,7 @@ Plans:
   1. No unused exports in Fritz!Box or Netatmo wrapper modules (confirmed by knip)
   2. Documentation files reference only HA_API_URL/HA_API_KEY — no stale NETATMO_PROXY_* references
   3. Zero tsc errors and all tests pass
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
 - [ ] 87-01-PLAN.md — Dead export verification with knip + removal of any unused exports
 - [ ] 87-02-PLAN.md — Documentation cleanup: update 4 docs files to HA_API_URL/HA_API_KEY
@@ -178,7 +178,7 @@ Plans:
 | 84. Shared HA API Client | 1/1 | Complete    | 2026-03-17 | - |
 | 85. Fritz!Box Migration | 1/1 | Complete    | 2026-03-17 | - |
 | 86. Netatmo Migration | 3/3 | Complete    | 2026-03-17 | - |
-| 87. Client Cleanup | v11.0 | 0/2 | Planning complete | - |
+| 87. Client Cleanup | 1/2 | In Progress|  | - |
 | 88. Raspberry Pi API Layer | v11.0 | 0/TBD | Not started | - |
 | 89. Raspberry Pi Dashboard Card | v11.0 | 0/TBD | Not started | - |
 | 90. Raspberry Pi Page + Cron | v11.0 | 0/TBD | Not started | - |

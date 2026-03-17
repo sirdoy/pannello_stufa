@@ -6,7 +6,7 @@
  */
 
 import { GET } from '@/app/api/netatmo/getroommeasure/route';
-import { netatmoProxyGet } from '@/lib/netatmoProxy';
+import { getProxyRoomMeasure } from '@/lib/netatmoProxy';
 import type { RoomMeasureResponse } from '@/types/netatmoProxy';
 
 // Mock dependencies
@@ -17,7 +17,7 @@ jest.mock('@/lib/core', () => ({
   badRequest: (msg: string) => ({ ok: false, error: msg, status: 400 }),
 }));
 
-const mockNetatmoProxyGet = netatmoProxyGet as jest.MockedFunction<typeof netatmoProxyGet>;
+const mockGetProxyRoomMeasure = getProxyRoomMeasure as jest.MockedFunction<typeof getProxyRoomMeasure>;
 
 // Helper: call GET with query params as a plain object
 const callGET = (params: Record<string, string>) =>
@@ -49,16 +49,15 @@ describe('GET /api/netatmo/getroommeasure', () => {
     jest.clearAllMocks();
   });
 
-  it('should call netatmoProxyGet with room_id and scale, returning success(proxyResponse)', async () => {
-    mockNetatmoProxyGet.mockResolvedValue(mockProxyResponse);
+  it('should call getProxyRoomMeasure with room_id and scale, returning success(proxyResponse)', async () => {
+    mockGetProxyRoomMeasure.mockResolvedValue(mockProxyResponse);
 
     const result = await callGET({ room_id: 'room-1', scale: '1hour' });
 
-    expect(mockNetatmoProxyGet).toHaveBeenCalledTimes(1);
-    const calledUrl = (mockNetatmoProxyGet as jest.Mock).mock.calls[0][0] as string;
-    expect(calledUrl).toContain('/getroommeasure');
-    expect(calledUrl).toContain('room_id=room-1');
-    expect(calledUrl).toContain('scale=1hour');
+    expect(mockGetProxyRoomMeasure).toHaveBeenCalledTimes(1);
+    const calledParams = mockGetProxyRoomMeasure.mock.calls[0]![0] as URLSearchParams;
+    expect(calledParams.get('room_id')).toBe('room-1');
+    expect(calledParams.get('scale')).toBe('1hour');
     expect((result as any).ok).toBe(true);
     expect((result as any).data).toEqual(mockProxyResponse);
   });
@@ -66,7 +65,7 @@ describe('GET /api/netatmo/getroommeasure', () => {
   it('should return badRequest when room_id is missing', async () => {
     const result = await callGET({ scale: '1hour' });
 
-    expect(mockNetatmoProxyGet).not.toHaveBeenCalled();
+    expect(mockGetProxyRoomMeasure).not.toHaveBeenCalled();
     expect((result as any).ok).toBe(false);
     expect((result as any).status).toBe(400);
     expect((result as any).error).toContain('room_id');
@@ -75,23 +74,23 @@ describe('GET /api/netatmo/getroommeasure', () => {
   it('should return badRequest when scale is invalid', async () => {
     const result = await callGET({ room_id: 'room-1', scale: '5min' });
 
-    expect(mockNetatmoProxyGet).not.toHaveBeenCalled();
+    expect(mockGetProxyRoomMeasure).not.toHaveBeenCalled();
     expect((result as any).ok).toBe(false);
     expect((result as any).status).toBe(400);
     expect((result as any).error).toContain('5min');
   });
 
   it('should default scale to 1hour when not provided', async () => {
-    mockNetatmoProxyGet.mockResolvedValue(mockProxyResponse);
+    mockGetProxyRoomMeasure.mockResolvedValue(mockProxyResponse);
 
     await callGET({ room_id: 'room-1' });
 
-    const calledUrl = (mockNetatmoProxyGet as jest.Mock).mock.calls[0][0] as string;
-    expect(calledUrl).toContain('scale=1hour');
+    const calledParams = mockGetProxyRoomMeasure.mock.calls[0]![0] as URLSearchParams;
+    expect(calledParams.get('scale')).toBe('1hour');
   });
 
   it('should forward start, end, limit, offset params in the query string', async () => {
-    mockNetatmoProxyGet.mockResolvedValue(mockProxyResponse);
+    mockGetProxyRoomMeasure.mockResolvedValue(mockProxyResponse);
 
     await callGET({
       room_id: 'room-1',
@@ -102,16 +101,16 @@ describe('GET /api/netatmo/getroommeasure', () => {
       offset: '10',
     });
 
-    const calledUrl = (mockNetatmoProxyGet as jest.Mock).mock.calls[0][0] as string;
-    expect(calledUrl).toContain('start=1700000000');
-    expect(calledUrl).toContain('end=1700086400');
-    expect(calledUrl).toContain('limit=50');
-    expect(calledUrl).toContain('offset=10');
+    const calledParams = mockGetProxyRoomMeasure.mock.calls[0]![0] as URLSearchParams;
+    expect(calledParams.get('start')).toBe('1700000000');
+    expect(calledParams.get('end')).toBe('1700086400');
+    expect(calledParams.get('limit')).toBe('50');
+    expect(calledParams.get('offset')).toBe('10');
   });
 
   it('should propagate proxy ApiError without catching it', async () => {
     const error = new Error('Proxy connection failed');
-    mockNetatmoProxyGet.mockRejectedValue(error);
+    mockGetProxyRoomMeasure.mockRejectedValue(error);
 
     await expect(callGET({ room_id: 'room-1', scale: '1hour' })).rejects.toThrow('Proxy connection failed');
   });

@@ -1,11 +1,11 @@
 ---
 gsd_state_version: 1.0
-milestone: null
-milestone_name: null
-status: idle
+milestone: v11.0
+milestone_name: API Unification & Raspberry Pi Monitor
+status: defining_requirements
 stopped_at: null
-last_updated: "2026-03-16T12:15:00.000Z"
-last_activity: 2026-03-16 — v10.0 Netatmo API Migration milestone completed
+last_updated: "2026-03-17T00:00:00.000Z"
+last_activity: 2026-03-17 — Milestone v11.0 started
 progress:
   total_phases: 0
   completed_phases: 0
@@ -18,19 +18,19 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-16)
+See: .planning/PROJECT.md (updated 2026-03-17)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Planning next milestone
+**Current focus:** v11.0 API Unification & Raspberry Pi Monitor
 
 ## Current Position
 
-Phase: None (between milestones)
-Plan: N/A
-Status: Idle — v10.0 shipped, planning next milestone
-Last activity: 2026-03-16 — v10.0 Netatmo API Migration milestone completed
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-17 — Milestone v11.0 started
 
-Progress: Complete (v10.0)
+Progress: Not started
 
 ## Performance Metrics
 

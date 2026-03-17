@@ -10,8 +10,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v10.0 (shipped 2026-03-16)
-**Status:** Netatmo API Migration complete — planning next milestone
+**Version:** v11.0 (started 2026-03-17)
+**Status:** API Unification & Raspberry Pi Monitor — in progress
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -388,9 +388,21 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 **Cleanup:**
 - ✓ **CLEAN-01** through **CLEAN-07**: All OAuth infrastructure deleted — v10.0 (Phase 79, 80, 81)
 
+## Current Milestone: v11.0 API Unification & Raspberry Pi Monitor
+
+**Goal:** Unify Fritz!Box and Netatmo proxy clients behind a shared HomeAssistant API transport (single base URL + API Key), and add Raspberry Pi as new device for monitoring the HomeAssistant server health.
+
+**Target features:**
+- Shared HomeAssistant API client (single base URL + X-API-Key auth for all providers)
+- Fritz!Box migration from JWT to API Key auth via shared client
+- Netatmo migration from separate env vars to shared client
+- Raspberry Pi dashboard card (CPU, RAM, disk, temperature, uptime)
+- Raspberry Pi dedicated page with detailed system stats
+- Raspberry Pi device registration in device registry
+
 ### Active
 
-(No active requirements — planning next milestone)
+(Defined in REQUIREMENTS.md)
 
 ### Out of Scope
 
@@ -532,4 +544,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-16 after v10.0 milestone completion (Netatmo API Migration)*
+*Last updated: 2026-03-17 after v11.0 milestone start (API Unification & Raspberry Pi Monitor)*

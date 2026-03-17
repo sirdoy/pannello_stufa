@@ -26,7 +26,7 @@ Requirements for API Unification & Raspberry Pi Monitor milestone.
 - [x] **RASPI-02**: TypeScript types matching API response schemas
 - [x] **RASPI-03**: Next.js API routes proxying Raspberry Pi endpoints
 - [x] **RASPI-04**: Raspberry Pi registered in device registry with adaptive polling
-- [ ] **RASPI-05**: RaspiCard dashboard component (CPU%, RAM%, disk%, temperature, health badge)
+- [x] **RASPI-05**: RaspiCard dashboard component (CPU%, RAM%, disk%, temperature, health badge)
 - [ ] **RASPI-06**: Dedicated /raspi page with full system stats (uptime, load avgs, network I/O, process count)
 - [x] **RASPI-07**: Error boundary and loading skeleton for RaspiCard
 - [ ] **RASPI-08**: Raspberry Pi health included in 5-min cron monitoring check
@@ -74,7 +74,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RASPI-02 | Phase 88 | Complete |
 | RASPI-03 | Phase 88 | Complete |
 | RASPI-04 | Phase 89 | Complete |
-| RASPI-05 | Phase 89 | Pending |
+| RASPI-05 | Phase 89 | Complete |
 | RASPI-07 | Phase 89 | Complete |
 | RASPI-06 | Phase 90 | Pending |
 | RASPI-08 | Phase 90 | Pending |

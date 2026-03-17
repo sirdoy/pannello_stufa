@@ -64,7 +64,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 86: Netatmo Migration** - Migrate Netatmo client and routes to shared transport, remove separate env vars (completed 2026-03-17)
 - [x] **Phase 87: Client Cleanup** - Dead export verification and documentation cleanup after migration (completed 2026-03-17)
 - [x] **Phase 88: Raspberry Pi API Layer** - Proxy client functions, TypeScript types, and Next.js API routes for all Raspberry Pi endpoints (completed 2026-03-17)
-- [ ] **Phase 89: Raspberry Pi Dashboard Card** - RaspiCard component in device registry with adaptive polling, error boundary, and skeleton
+- [x] **Phase 89: Raspberry Pi Dashboard Card** - RaspiCard component in device registry with adaptive polling, error boundary, and skeleton (completed 2026-03-17)
 - [ ] **Phase 90: Raspberry Pi Page + Cron** - Dedicated /raspi page with full stats and cron health integration
 
 ## Phase Details
@@ -141,7 +141,7 @@ Plans:
   2. The card uses adaptive polling and respects Page Visibility API (pauses when tab hidden)
   3. If the Raspberry Pi proxy is unreachable, an error boundary shows a fallback UI without crashing the dashboard
   4. A skeleton placeholder appears during initial data load
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 89-01-PLAN.md — Device registry + useRaspiData hook + Skeleton.RaspiCard
 - [ ] 89-02-PLAN.md — RaspiCard component + DashboardCards wiring + integration tests
@@ -181,7 +181,7 @@ Plans:
 | 86. Netatmo Migration | 3/3 | Complete    | 2026-03-17 | - |
 | 87. Client Cleanup | 2/2 | Complete    | 2026-03-17 | - |
 | 88. Raspberry Pi API Layer | 1/1 | Complete    | 2026-03-17 | - |
-| 89. Raspberry Pi Dashboard Card | 1/2 | In Progress|  | - |
+| 89. Raspberry Pi Dashboard Card | 2/2 | Complete   | 2026-03-17 | - |
 | 90. Raspberry Pi Page + Cron | v11.0 | 0/TBD | Not started | - |
 
 **Total:** 14 milestones shipped, 83 phases complete, 348 plans executed. v11.0 in progress (7 phases planned, phases 84-90).

@@ -1,0 +1,89 @@
+# Requirements: Pannello Stufa v11.0
+
+**Defined:** 2026-03-17
+**Core Value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
+
+## v11.0 Requirements
+
+Requirements for API Unification & Raspberry Pi Monitor milestone.
+
+### API Client (Shared Infrastructure)
+
+- [ ] **API-01**: Shared HA proxy client module with single base URL + X-API-Key auth
+- [ ] **API-02**: Generic GET/POST helpers with AbortController timeout and RFC 9457 error mapping
+- [ ] **API-03**: Single env var pair (HA_API_URL + HA_API_KEY) replacing all provider-specific vars
+- [ ] **API-04**: Fritz!Box client migrated to shared HA client (JWT login flow removed)
+- [ ] **API-05**: Fritz!Box API routes updated to use new client (no behavior change)
+- [ ] **API-06**: Fritz!Box caching and rate limiting preserved on top of shared transport
+- [ ] **API-07**: Netatmo client migrated to shared HA client (separate env vars removed)
+- [ ] **API-08**: Netatmo convenience wrappers preserved on top of shared transport
+- [ ] **API-09**: Netatmo API routes updated to use new client (no behavior change)
+- [ ] **API-10**: Old client modules deleted after migration verified
+
+### Raspberry Pi (New Device)
+
+- [ ] **RASPI-01**: Proxy client functions for all 4 Raspberry Pi endpoints (health, cpu, memory, disk, system)
+- [ ] **RASPI-02**: TypeScript types matching API response schemas
+- [ ] **RASPI-03**: Next.js API routes proxying Raspberry Pi endpoints
+- [ ] **RASPI-04**: Raspberry Pi registered in device registry with adaptive polling
+- [ ] **RASPI-05**: RaspiCard dashboard component (CPU%, RAM%, disk%, temperature, health badge)
+- [ ] **RASPI-06**: Dedicated /raspi page with full system stats (uptime, load avgs, network I/O, process count)
+- [ ] **RASPI-07**: Error boundary and loading skeleton for RaspiCard
+- [ ] **RASPI-08**: Raspberry Pi health included in 5-min cron monitoring check
+
+## Future Requirements
+
+### DIRIGERA Integration (Deferred)
+
+- **DIRIGERA-01**: IKEA contact sensor dashboard card
+- **DIRIGERA-02**: IKEA motion sensor dashboard card
+- **DIRIGERA-03**: Dedicated /sensors page with history and telemetry
+
+### Thermorossi Proxy Migration (Deferred)
+
+- **STOVE-01**: Migrate stove from WiNet cloud to local proxy API
+- **STOVE-02**: Remove WiNet direct dependency
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| DIRIGERA sensors integration | Deferred — user explicitly excluded from v11.0 |
+| Thermorossi proxy migration | Deferred — user explicitly excluded from v11.0 |
+| Raspberry Pi historical data / charts | No persistence on proxy (live data only, no database) |
+| Raspberry Pi process list | API only exposes count, not individual processes |
+| JWT login fallback | API Key auth replaces JWT entirely, no backward compatibility |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| API-01 | Pending | Pending |
+| API-02 | Pending | Pending |
+| API-03 | Pending | Pending |
+| API-04 | Pending | Pending |
+| API-05 | Pending | Pending |
+| API-06 | Pending | Pending |
+| API-07 | Pending | Pending |
+| API-08 | Pending | Pending |
+| API-09 | Pending | Pending |
+| API-10 | Pending | Pending |
+| RASPI-01 | Pending | Pending |
+| RASPI-02 | Pending | Pending |
+| RASPI-03 | Pending | Pending |
+| RASPI-04 | Pending | Pending |
+| RASPI-05 | Pending | Pending |
+| RASPI-06 | Pending | Pending |
+| RASPI-07 | Pending | Pending |
+| RASPI-08 | Pending | Pending |
+
+**Coverage:**
+- v11.0 requirements: 18 total
+- Mapped to phases: 0
+- Unmapped: 18 ⚠️
+
+---
+*Requirements defined: 2026-03-17*
+*Last updated: 2026-03-17 after initial definition*

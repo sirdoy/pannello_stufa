@@ -10,5 +10,5 @@ export const dynamic = 'force-dynamic';
  */
 export const GET = withAuthAndErrorHandler(async () => {
   const data = await raspiClient.getCpu();
-  return success(data);
+  return success(data as unknown as Record<string, unknown>);
 }, 'Raspi/Cpu');

@@ -351,6 +351,7 @@ function getDeviceDescription(deviceId: string): string {
     camera: 'Videocamera di sorveglianza',
     sonos: 'Sistema audio Sonos (solo menu)',
     network: 'Rete Fritz!Box (solo homepage)',
+    raspi: 'Raspberry Pi system monitor',
   };
 
   return descriptions[deviceId] || 'Dispositivo smart home';

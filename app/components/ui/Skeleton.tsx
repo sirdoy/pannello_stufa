@@ -780,6 +780,42 @@ Skeleton.SchedulePage = function SkeletonSchedulePage() {
 };
 
 /**
+ * Skeleton.RaspiCard - Skeleton for RaspiCard component - Success/green theme
+ */
+Skeleton.RaspiCard = function SkeletonRaspiCard() {
+  const SkeletonPulse = ({ className = '' }: { className?: string }) => (
+    <div
+      className={`relative overflow-hidden rounded-xl bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 ${className}`}
+    >
+      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent [html:not(.dark)_&]:via-slate-400/40" />
+    </div>
+  );
+
+  const Card = Skeleton.Card;
+
+  return (
+    <Card className="overflow-visible transition-all duration-500">
+      {/* Success green accent bar */}
+      <div className="h-1 bg-gradient-to-r from-success-500/50 via-success-400/50 to-success-600/50" />
+      <div className="p-5 sm:p-6">
+        {/* Header skeleton */}
+        <div className="flex items-center gap-3 mb-4">
+          <SkeletonPulse className="w-8 h-8 rounded-lg" />
+          <SkeletonPulse className="w-32 h-6 rounded" />
+        </div>
+        {/* 4 metric boxes (CPU, RAM, Disk, Temp) in 2x2 grid */}
+        <div className="grid grid-cols-2 gap-3">
+          <SkeletonPulse className="h-20 rounded-lg" />
+          <SkeletonPulse className="h-20 rounded-lg" />
+          <SkeletonPulse className="h-20 rounded-lg" />
+          <SkeletonPulse className="h-20 rounded-lg" />
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+/**
  * Skeleton.NetworkCard - Skeleton for NetworkCard component - Sage theme
  */
 Skeleton.NetworkCard = function SkeletonNetworkCard() {

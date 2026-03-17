@@ -4,7 +4,7 @@
  */
 
 /** Device type union */
-export type DeviceTypeId = 'stove' | 'thermostat' | 'camera' | 'lights' | 'sonos' | 'network';
+export type DeviceTypeId = 'stove' | 'thermostat' | 'camera' | 'lights' | 'sonos' | 'network' | 'raspi';
 
 /** Color palette type */
 export type DeviceColor = 'primary' | 'info' | 'ocean' | 'warning' | 'success';
@@ -19,6 +19,7 @@ export const DEVICE_TYPES = {
   LIGHTS: 'lights',
   SONOS: 'sonos',
   NETWORK: 'network',
+  RASPI: 'raspi',
 } as const;
 
 /** Display item configuration */
@@ -186,6 +187,19 @@ export const DEVICE_CONFIG: Record<DeviceTypeId, DeviceConfig> = {
       hasErrors: false,
     },
   },
+  [DEVICE_TYPES.RASPI]: {
+    id: 'raspi',
+    name: 'Raspberry Pi',
+    icon: '\uD83D\uDDA5\uFE0F',
+    color: 'success',
+    enabled: true,
+    routes: { main: '/raspi' },
+    features: {
+      hasScheduler: false,
+      hasMaintenance: false,
+      hasErrors: false,
+    },
+  },
 };
 
 /**
@@ -201,7 +215,7 @@ const ALL_DASHBOARD_ITEMS: Record<string, DeviceConfig | DisplayItem> = {
  * Default order for dashboard items (new users)
  * Defines initial order and visibility
  */
-export const DEFAULT_DEVICE_ORDER: string[] = ['stove', 'thermostat', 'weather', 'lights', 'camera', 'network', 'sonos'];
+export const DEFAULT_DEVICE_ORDER: string[] = ['stove', 'thermostat', 'weather', 'lights', 'camera', 'network', 'raspi', 'sonos'];
 
 /** Color class configuration */
 interface ColorClasses {

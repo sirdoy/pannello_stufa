@@ -2,11 +2,11 @@
  * Tests for Netatmo Proxy Camera Convenience Wrappers
  *
  * Tests cover:
- * - getProxyCameraStatus    → GET /camera/status
- * - getProxyCameraStream    → GET /camera/{cameraId}/stream
- * - getProxyCameraSnapshot  → GET /camera/{cameraId}/snapshot
- * - proxySetCameraMonitoring → POST /camera/{cameraId}/monitoring
- * - getProxyCameraEvents    → GET /camera/events (with and without hours param)
+ * - getProxyCameraStatus    → GET /api/v1/netatmo/camera/status
+ * - getProxyCameraStream    → GET /api/v1/netatmo/camera/{cameraId}/stream
+ * - getProxyCameraSnapshot  → GET /api/v1/netatmo/camera/{cameraId}/snapshot
+ * - proxySetCameraMonitoring → POST /api/v1/netatmo/camera/{cameraId}/monitoring
+ * - getProxyCameraEvents    → GET /api/v1/netatmo/camera/events (with and without hours param)
  * - getProxyCameraEventSnapshot → raw binary fetch (returns Response, not JSON)
  */
 
@@ -19,7 +19,7 @@ import {
   getProxyCameraEventSnapshot,
 } from '@/lib/netatmoProxy';
 
-// Mock global fetch (used by all wrappers — both JSON wrappers via netatmoProxyGet/Post
+// Mock global fetch (used by all wrappers — both JSON wrappers via haGet/haPost
 // and the binary wrapper directly)
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
@@ -39,13 +39,13 @@ function mockJsonResponse(data: unknown, status = 200): Partial<Response> {
 describe('Camera convenience wrappers', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.NETATMO_PROXY_URL = TEST_PROXY_URL;
-    process.env.NETATMO_PROXY_API_KEY = TEST_API_KEY;
+    process.env.HA_API_URL = TEST_PROXY_URL;
+    process.env.HA_API_KEY = TEST_API_KEY;
   });
 
   afterEach(() => {
-    delete process.env.NETATMO_PROXY_URL;
-    delete process.env.NETATMO_PROXY_API_KEY;
+    delete process.env.HA_API_URL;
+    delete process.env.HA_API_KEY;
   });
 
   // ---------------------------------------------------------------------------
@@ -53,13 +53,13 @@ describe('Camera convenience wrappers', () => {
   // ---------------------------------------------------------------------------
 
   describe('getProxyCameraStatus', () => {
-    it('calls GET /camera/status', async () => {
+    it('calls GET /api/v1/netatmo/camera/status', async () => {
       mockFetch.mockResolvedValueOnce(mockJsonResponse({ cameras: [], data_freshness: 'LIVE' }));
 
       await getProxyCameraStatus();
 
       const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
-      expect(url).toBe(`${TEST_PROXY_URL}/camera/status`);
+      expect(url).toBe(`${TEST_PROXY_URL}/api/v1/netatmo/camera/status`);
     });
 
     it('returns CameraStatusResponse', async () => {
@@ -95,7 +95,7 @@ describe('Camera convenience wrappers', () => {
   describe('getProxyCameraStream', () => {
     const cameraId = '70:ee:50:aa:bb:cc';
 
-    it('calls GET /camera/{cameraId}/stream with correct path', async () => {
+    it('calls GET /api/v1/netatmo/camera/{cameraId}/stream with correct path', async () => {
       mockFetch.mockResolvedValueOnce(mockJsonResponse({
         camera_id: cameraId,
         vpn_streams: { high: 'https://h.m3u8', medium: 'https://m.m3u8', low: 'https://l.m3u8' },
@@ -105,7 +105,7 @@ describe('Camera convenience wrappers', () => {
       await getProxyCameraStream(cameraId);
 
       const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
-      expect(url).toBe(`${TEST_PROXY_URL}/camera/${cameraId}/stream`);
+      expect(url).toBe(`${TEST_PROXY_URL}/api/v1/netatmo/camera/${cameraId}/stream`);
     });
 
     it('returns CameraStreamResponse with local_streams when is_local=true', async () => {
@@ -140,7 +140,7 @@ describe('Camera convenience wrappers', () => {
   describe('getProxyCameraSnapshot', () => {
     const cameraId = '70:ee:50:aa:bb:cc';
 
-    it('calls GET /camera/{cameraId}/snapshot with correct path', async () => {
+    it('calls GET /api/v1/netatmo/camera/{cameraId}/snapshot with correct path', async () => {
       mockFetch.mockResolvedValueOnce(mockJsonResponse({
         camera_id: cameraId,
         snapshot_url: 'https://v.netatmo.com/snapshot_720.jpg',
@@ -149,7 +149,7 @@ describe('Camera convenience wrappers', () => {
       await getProxyCameraSnapshot(cameraId);
 
       const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
-      expect(url).toBe(`${TEST_PROXY_URL}/camera/${cameraId}/snapshot`);
+      expect(url).toBe(`${TEST_PROXY_URL}/api/v1/netatmo/camera/${cameraId}/snapshot`);
     });
 
     it('returns CameraSnapshotUrlResponse', async () => {
@@ -173,7 +173,7 @@ describe('Camera convenience wrappers', () => {
   describe('proxySetCameraMonitoring', () => {
     const cameraId = '70:ee:50:aa:bb:cc';
 
-    it('calls POST /camera/{cameraId}/monitoring with correct path', async () => {
+    it('calls POST /api/v1/netatmo/camera/{cameraId}/monitoring with correct path', async () => {
       mockFetch.mockResolvedValueOnce(mockJsonResponse({
         camera_id: cameraId,
         monitoring: 'on',
@@ -183,7 +183,7 @@ describe('Camera convenience wrappers', () => {
       await proxySetCameraMonitoring(cameraId, { monitoring: 'on' });
 
       const [url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
-      expect(url).toBe(`${TEST_PROXY_URL}/camera/${cameraId}/monitoring`);
+      expect(url).toBe(`${TEST_PROXY_URL}/api/v1/netatmo/camera/${cameraId}/monitoring`);
       expect(options.method).toBe('POST');
     });
 
@@ -221,22 +221,22 @@ describe('Camera convenience wrappers', () => {
   // ---------------------------------------------------------------------------
 
   describe('getProxyCameraEvents', () => {
-    it('calls GET /camera/events without query param when no hours provided', async () => {
+    it('calls GET /api/v1/netatmo/camera/events without query param when no hours provided', async () => {
       mockFetch.mockResolvedValueOnce(mockJsonResponse({ events: [], count: 0 }));
 
       await getProxyCameraEvents();
 
       const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
-      expect(url).toBe(`${TEST_PROXY_URL}/camera/events`);
+      expect(url).toBe(`${TEST_PROXY_URL}/api/v1/netatmo/camera/events`);
     });
 
-    it('calls GET /camera/events?hours=N when hours is provided', async () => {
+    it('calls GET /api/v1/netatmo/camera/events?hours=N when hours is provided', async () => {
       mockFetch.mockResolvedValueOnce(mockJsonResponse({ events: [], count: 0 }));
 
       await getProxyCameraEvents(72);
 
       const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
-      expect(url).toBe(`${TEST_PROXY_URL}/camera/events?hours=72`);
+      expect(url).toBe(`${TEST_PROXY_URL}/api/v1/netatmo/camera/events?hours=72`);
     });
 
     it('returns CameraEventsResponse', async () => {
@@ -279,7 +279,7 @@ describe('Camera convenience wrappers', () => {
 
       expect(mockFetch).toHaveBeenCalledTimes(1);
       const [url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
-      expect(url).toBe(`${TEST_PROXY_URL}/camera/events/${eventId}/snapshot`);
+      expect(url).toBe(`${TEST_PROXY_URL}/api/v1/netatmo/camera/events/${eventId}/snapshot`);
       expect((options.headers as Record<string, string>)['X-API-Key']).toBe(TEST_API_KEY);
     });
 

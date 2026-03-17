@@ -2,7 +2,7 @@
  * Tests for Netatmo Proxy Client
  *
  * Tests cover:
- * - X-API-Key header sent on every request
+ * - X-API-Key header sent on every request (via haGet transport)
  * - Successful JSON parsing on 200
  * - RFC 9457 error detail extraction on 4xx
  * - ApiError SERVICE_UNAVAILABLE on 503
@@ -11,7 +11,7 @@
  * - Convenience wrapper endpoints
  */
 
-import { netatmoProxyGet, getProxyHomestatus, getProxyHomesdata } from '@/lib/netatmoProxy';
+import { getProxyHomestatus, getProxyHomesdata } from '@/lib/netatmoProxy';
 import { ApiError, ERROR_CODES } from '@/lib/core/apiErrors';
 
 // Mock global fetch
@@ -21,16 +21,16 @@ global.fetch = mockFetch;
 const TEST_PROXY_URL = 'https://proxy.example.com';
 const TEST_API_KEY = 'test-api-key-12345';
 
-describe('netatmoProxyGet', () => {
+describe('haGet transport (via getProxyHomestatus)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.NETATMO_PROXY_URL = TEST_PROXY_URL;
-    process.env.NETATMO_PROXY_API_KEY = TEST_API_KEY;
+    process.env.HA_API_URL = TEST_PROXY_URL;
+    process.env.HA_API_KEY = TEST_API_KEY;
   });
 
   afterEach(() => {
-    delete process.env.NETATMO_PROXY_URL;
-    delete process.env.NETATMO_PROXY_API_KEY;
+    delete process.env.HA_API_URL;
+    delete process.env.HA_API_KEY;
   });
 
   describe('request headers', () => {
@@ -40,7 +40,7 @@ describe('netatmoProxyGet', () => {
         json: async () => ({ data: 'test' }),
       });
 
-      await netatmoProxyGet('/homestatus');
+      await getProxyHomestatus();
 
       expect(mockFetch).toHaveBeenCalledTimes(1);
       const [_url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
@@ -53,22 +53,22 @@ describe('netatmoProxyGet', () => {
         json: async () => ({}),
       });
 
-      await netatmoProxyGet('/homestatus');
+      await getProxyHomestatus();
 
       const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
-      expect(url).toBe(`${TEST_PROXY_URL}/homestatus`);
+      expect(url).toBe(`${TEST_PROXY_URL}/api/v1/netatmo/homestatus`);
     });
   });
 
   describe('successful responses', () => {
     it('returns parsed JSON body on 200', async () => {
-      const responseData = { rooms: [], data_freshness: 'LIVE' };
+      const responseData = { rooms: [], data_freshness: 'LIVE' as const };
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => responseData,
       });
 
-      const result = await netatmoProxyGet<typeof responseData>('/homestatus');
+      const result = await getProxyHomestatus();
       expect(result).toEqual(responseData);
     });
   });
@@ -88,15 +88,9 @@ describe('netatmoProxyGet', () => {
         json: async () => problemDetail,
       });
 
-      await expect(netatmoProxyGet('/homestatus')).rejects.toThrow(ApiError);
+      await expect(getProxyHomestatus()).rejects.toThrow(ApiError);
 
-      try {
-        await netatmoProxyGet('/homestatus');
-      } catch {
-        // re-mock for second call
-      }
-
-      // Verify error properties from the first call
+      // Verify error properties
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 401,
@@ -106,7 +100,7 @@ describe('netatmoProxyGet', () => {
 
       let caught: ApiError | undefined;
       try {
-        await netatmoProxyGet('/homestatus');
+        await getProxyHomestatus();
       } catch (e) {
         caught = e as ApiError;
       }
@@ -126,7 +120,7 @@ describe('netatmoProxyGet', () => {
 
       let caught: ApiError | undefined;
       try {
-        await netatmoProxyGet('/homestatus');
+        await getProxyHomestatus();
       } catch (e) {
         caught = e as ApiError;
       }
@@ -145,7 +139,7 @@ describe('netatmoProxyGet', () => {
 
       let caught: ApiError | undefined;
       try {
-        await netatmoProxyGet('/homestatus');
+        await getProxyHomestatus();
       } catch (e) {
         caught = e as ApiError;
       }
@@ -161,7 +155,7 @@ describe('netatmoProxyGet', () => {
 
       let caught: ApiError | undefined;
       try {
-        await netatmoProxyGet('/homestatus', { timeout: 100 });
+        await getProxyHomestatus();
       } catch (e) {
         caught = e as ApiError;
       }
@@ -170,34 +164,34 @@ describe('netatmoProxyGet', () => {
       expect(caught?.code).toBe(ERROR_CODES.TIMEOUT);
     });
 
-    it('throws ApiError when NETATMO_PROXY_URL is missing', async () => {
-      delete process.env.NETATMO_PROXY_URL;
+    it('throws ApiError when HA_API_URL is missing', async () => {
+      delete process.env.HA_API_URL;
 
       let caught: ApiError | undefined;
       try {
-        await netatmoProxyGet('/homestatus');
+        await getProxyHomestatus();
       } catch (e) {
         caught = e as ApiError;
       }
 
       expect(caught).toBeInstanceOf(ApiError);
       expect(caught?.code).toBe(ERROR_CODES.EXTERNAL_API_ERROR);
-      expect(caught?.message).toContain('NETATMO_PROXY_URL');
+      expect(caught?.message).toContain('HA_API_URL');
     });
 
-    it('throws ApiError when NETATMO_PROXY_API_KEY is missing', async () => {
-      delete process.env.NETATMO_PROXY_API_KEY;
+    it('throws ApiError when HA_API_KEY is missing', async () => {
+      delete process.env.HA_API_KEY;
 
       let caught: ApiError | undefined;
       try {
-        await netatmoProxyGet('/homestatus');
+        await getProxyHomestatus();
       } catch (e) {
         caught = e as ApiError;
       }
 
       expect(caught).toBeInstanceOf(ApiError);
       expect(caught?.code).toBe(ERROR_CODES.EXTERNAL_API_ERROR);
-      expect(caught?.message).toContain('NETATMO_PROXY_API_KEY');
+      expect(caught?.message).toContain('HA_API_KEY');
     });
   });
 });
@@ -205,17 +199,17 @@ describe('netatmoProxyGet', () => {
 describe('getProxyHomestatus', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.NETATMO_PROXY_URL = TEST_PROXY_URL;
-    process.env.NETATMO_PROXY_API_KEY = TEST_API_KEY;
+    process.env.HA_API_URL = TEST_PROXY_URL;
+    process.env.HA_API_KEY = TEST_API_KEY;
   });
 
   afterEach(() => {
-    delete process.env.NETATMO_PROXY_URL;
-    delete process.env.NETATMO_PROXY_API_KEY;
+    delete process.env.HA_API_URL;
+    delete process.env.HA_API_KEY;
   });
 
-  it('calls the /homestatus endpoint', async () => {
-    const responseData = { rooms: [], data_freshness: 'LIVE' };
+  it('calls the /api/v1/netatmo/homestatus endpoint', async () => {
+    const responseData = { rooms: [], data_freshness: 'LIVE' as const };
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => responseData,
@@ -224,7 +218,7 @@ describe('getProxyHomestatus', () => {
     await getProxyHomestatus();
 
     const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe(`${TEST_PROXY_URL}/homestatus`);
+    expect(url).toBe(`${TEST_PROXY_URL}/api/v1/netatmo/homestatus`);
   });
 
   it('returns typed homestatus response', async () => {
@@ -257,16 +251,16 @@ describe('getProxyHomestatus', () => {
 describe('getProxyHomesdata', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.NETATMO_PROXY_URL = TEST_PROXY_URL;
-    process.env.NETATMO_PROXY_API_KEY = TEST_API_KEY;
+    process.env.HA_API_URL = TEST_PROXY_URL;
+    process.env.HA_API_KEY = TEST_API_KEY;
   });
 
   afterEach(() => {
-    delete process.env.NETATMO_PROXY_URL;
-    delete process.env.NETATMO_PROXY_API_KEY;
+    delete process.env.HA_API_URL;
+    delete process.env.HA_API_KEY;
   });
 
-  it('calls the /homesdata endpoint', async () => {
+  it('calls the /api/v1/netatmo/homesdata endpoint', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ body: { homes: [] }, status: 'ok', time_exec: 0.1, time_server: 1773330200 }),
@@ -275,7 +269,7 @@ describe('getProxyHomesdata', () => {
     await getProxyHomesdata();
 
     const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe(`${TEST_PROXY_URL}/homesdata`);
+    expect(url).toBe(`${TEST_PROXY_URL}/api/v1/netatmo/homesdata`);
   });
 
   it('returns typed homesdata response', async () => {

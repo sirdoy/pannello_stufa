@@ -173,7 +173,7 @@ Plans:
 | 70-74 | v9.0 | 8/8 | ✓ Complete | 2026-02-19 |
 | 75-83 | v10.0 | 18/18 | ✓ Complete | 2026-03-16 |
 | 84. Shared HA API Client | 1/1 | Complete    | 2026-03-17 | - |
-| 85. Fritz!Box Migration | 1/1 | Complete   | 2026-03-17 | - |
+| 85. Fritz!Box Migration | 1/1 | Complete    | 2026-03-17 | - |
 | 86. Netatmo Migration | v11.0 | 0/TBD | Not started | - |
 | 87. Client Cleanup | v11.0 | 0/TBD | Not started | - |
 | 88. Raspberry Pi API Layer | v11.0 | 0/TBD | Not started | - |

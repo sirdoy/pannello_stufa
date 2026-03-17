@@ -101,10 +101,11 @@ Plans:
   1. Netatmo API routes return the same data as before the migration (no behavior change)
   2. Netatmo-specific env vars (`NETATMO_PROXY_URL`, `NETATMO_API_KEY`, etc.) are absent from `.env.local` and code references
   3. All Netatmo convenience wrappers (setpoint, mode, schedule, measurements, camera, valve, health) remain callable and functional
-**Plans:** 2/2 plans complete
+**Plans:** 3 plans (2 execute + 1 gap closure)
 Plans:
 - [ ] 86-01-PLAN.md — Migrate netatmoProxy.ts transport to haGet/haPost, add HA env vars
 - [ ] 86-02-PLAN.md — Update tests, envValidator, and getroommeasure route
+- [ ] 86-03-PLAN.md — Gap closure: fix getroommeasure route test (netatmoProxyGet -> getProxyRoomMeasure)
 
 ### Phase 87: Client Cleanup
 **Goal**: The codebase contains only the shared client — old Fritz!Box and Netatmo client modules deleted
@@ -175,7 +176,7 @@ Plans:
 | 75-83 | v10.0 | 18/18 | ✓ Complete | 2026-03-16 |
 | 84. Shared HA API Client | 1/1 | Complete    | 2026-03-17 | - |
 | 85. Fritz!Box Migration | 1/1 | Complete    | 2026-03-17 | - |
-| 86. Netatmo Migration | 2/2 | Complete   | 2026-03-17 | - |
+| 86. Netatmo Migration | 3/3 | In progress | 2026-03-17 | - |
 | 87. Client Cleanup | v11.0 | 0/TBD | Not started | - |
 | 88. Raspberry Pi API Layer | v11.0 | 0/TBD | Not started | - |
 | 89. Raspberry Pi Dashboard Card | v11.0 | 0/TBD | Not started | - |
@@ -185,4 +186,4 @@ Plans:
 
 ---
 
-*Roadmap updated: 2026-03-17 — Phase 86 planned (2 plans)*
+*Roadmap updated: 2026-03-17 — Phase 86 gap closure plan added (86-03)*

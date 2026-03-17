@@ -77,7 +77,9 @@ See `.planning/milestones/` for full archives.
   1. A single `HA_API_URL` + `HA_API_KEY` env var pair replaces all provider-specific connection vars
   2. Generic GET and POST helpers handle AbortController timeouts and map RFC 9457 errors to ApiError instances
   3. The shared client module is importable and TypeScript-typed with zero tsc errors
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 84-01-PLAN.md — TDD: shared haGet/haPost client with types and tests
 
 ### Phase 85: Fritz!Box Migration
 **Goal**: Fritz!Box uses the shared HA client — JWT login flow gone, all routes behave identically to before
@@ -158,7 +160,7 @@ See `.planning/milestones/` for full archives.
 | 68-69 | v8.1 | 3/3 | ✓ Complete | 2026-02-18 |
 | 70-74 | v9.0 | 8/8 | ✓ Complete | 2026-02-19 |
 | 75-83 | v10.0 | 18/18 | ✓ Complete | 2026-03-16 |
-| 84. Shared HA API Client | v11.0 | 0/TBD | Not started | - |
+| 84. Shared HA API Client | v11.0 | 0/1 | Not started | - |
 | 85. Fritz!Box Migration | v11.0 | 0/TBD | Not started | - |
 | 86. Netatmo Migration | v11.0 | 0/TBD | Not started | - |
 | 87. Client Cleanup | v11.0 | 0/TBD | Not started | - |
@@ -170,4 +172,4 @@ See `.planning/milestones/` for full archives.
 
 ---
 
-*Roadmap updated: 2026-03-17 — v11.0 API Unification & Raspberry Pi Monitor roadmap created*
+*Roadmap updated: 2026-03-17 — Phase 84 planned (1 plan)*

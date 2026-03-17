@@ -62,7 +62,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 84: Shared HA API Client** - Build the single base URL + X-API-Key transport used by all providers (completed 2026-03-17)
 - [x] **Phase 85: Fritz!Box Migration** - Migrate Fritz!Box client and routes to shared transport, remove JWT login (completed 2026-03-17)
 - [x] **Phase 86: Netatmo Migration** - Migrate Netatmo client and routes to shared transport, remove separate env vars (completed 2026-03-17)
-- [ ] **Phase 87: Client Cleanup** - Delete old Fritz!Box and Netatmo client modules after migration verified
+- [ ] **Phase 87: Client Cleanup** - Dead export verification and documentation cleanup after migration
 - [ ] **Phase 88: Raspberry Pi API Layer** - Proxy client functions, TypeScript types, and Next.js API routes for all Raspberry Pi endpoints
 - [ ] **Phase 89: Raspberry Pi Dashboard Card** - RaspiCard component in device registry with adaptive polling, error boundary, and skeleton
 - [ ] **Phase 90: Raspberry Pi Page + Cron** - Dedicated /raspi page with full stats and cron health integration
@@ -108,16 +108,17 @@ Plans:
 - [ ] 86-03-PLAN.md — Gap closure: fix getroommeasure route test (netatmoProxyGet -> getProxyRoomMeasure)
 
 ### Phase 87: Client Cleanup
-**Goal**: The codebase contains only the shared client — old Fritz!Box and Netatmo client modules deleted
+**Goal**: Zero dead exports in wrapper modules, documentation references only HA_API_URL/HA_API_KEY
 **Depends on**: Phase 85, Phase 86
 **Requirements**: API-10
 **Success Criteria** (what must be TRUE):
-  1. Old Fritz!Box client module file(s) are absent from the repository
-  2. Old Netatmo client module file(s) are absent from the repository
-  3. Zero tsc errors and all tests pass after deletion
+  1. No unused exports in Fritz!Box or Netatmo wrapper modules (confirmed by knip)
+  2. Documentation files reference only HA_API_URL/HA_API_KEY — no stale NETATMO_PROXY_* references
+  3. Zero tsc errors and all tests pass
 **Plans:** 2 plans
 Plans:
-- [ ] 85-01-PLAN.md — Migrate Fritz!Box client to haGet, rewrite tests, delete credential config
+- [ ] 87-01-PLAN.md — Dead export verification with knip + removal of any unused exports
+- [ ] 87-02-PLAN.md — Documentation cleanup: update 4 docs files to HA_API_URL/HA_API_KEY
 
 ### Phase 88: Raspberry Pi API Layer
 **Goal**: The server side can reach and type all Raspberry Pi endpoints — proxy functions, types, and routes ready for frontend consumption
@@ -177,7 +178,7 @@ Plans:
 | 84. Shared HA API Client | 1/1 | Complete    | 2026-03-17 | - |
 | 85. Fritz!Box Migration | 1/1 | Complete    | 2026-03-17 | - |
 | 86. Netatmo Migration | 3/3 | Complete    | 2026-03-17 | - |
-| 87. Client Cleanup | v11.0 | 0/TBD | Not started | - |
+| 87. Client Cleanup | v11.0 | 0/2 | Planning complete | - |
 | 88. Raspberry Pi API Layer | v11.0 | 0/TBD | Not started | - |
 | 89. Raspberry Pi Dashboard Card | v11.0 | 0/TBD | Not started | - |
 | 90. Raspberry Pi Page + Cron | v11.0 | 0/TBD | Not started | - |
@@ -186,4 +187,4 @@ Plans:
 
 ---
 
-*Roadmap updated: 2026-03-17 — Phase 86 gap closure plan added (86-03)*
+*Roadmap updated: 2026-03-17 — Phase 87 plans created (2 plans, wave 1)*

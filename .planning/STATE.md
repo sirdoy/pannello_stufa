@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: API Unification & Raspberry Pi Monitor
 status: planning
-stopped_at: Completed 86-02-PLAN.md
-last_updated: "2026-03-17T11:45:38.214Z"
+stopped_at: Completed 86-03-PLAN.md
+last_updated: "2026-03-17T15:43:23.569Z"
 last_activity: 2026-03-17 — Roadmap created (7 phases, 18 requirements mapped)
 progress:
   total_phases: 7
   completed_phases: 3
-  total_plans: 4
-  completed_plans: 4
+  total_plans: 5
+  completed_plans: 5
   percent: 0
 ---
 
@@ -71,6 +71,7 @@ Recent decisions relevant to v11.0:
 - [Phase 86]: netatmoProxyGet describe block renamed to test transport via getProxyHomestatus wrapper
 - [Phase 86]: validateNetatmoEnv simplified — removed unreachable warnings array, returns directly
 - [Phase 86]: getroommeasure RoomMeasureResponse type import removed — handled by getProxyRoomMeasure wrapper
+- [Phase 86]: getroommeasure RoomMeasureResponse type import kept — mockProxyResponse fixture still typed explicitly
 
 ### Pending Todos
 
@@ -89,6 +90,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-17T11:45:38.208Z
-Stopped at: Completed 86-02-PLAN.md
+Last session: 2026-03-17T15:43:18.453Z
+Stopped at: Completed 86-03-PLAN.md
 Resume file: None

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: API Unification & Raspberry Pi Monitor
 status: planning
-stopped_at: Phase 85 context gathered
-last_updated: "2026-03-17T10:37:53.181Z"
+stopped_at: Completed 85-01-PLAN.md
+last_updated: "2026-03-17T10:52:50.649Z"
 last_activity: 2026-03-17 — Roadmap created (7 phases, 18 requirements mapped)
 progress:
   total_phases: 7
-  completed_phases: 1
-  total_plans: 1
-  completed_plans: 1
+  completed_phases: 2
+  total_plans: 2
+  completed_plans: 2
   percent: 0
 ---
 
@@ -48,6 +48,7 @@ Progress: [░░░░░░░░░░] 0% (0/7 phases)
 | v9.0 Performance Optimization | 70-74 | 8 | 2 days |
 | v10.0 Netatmo API Migration | 75-83 | 18 | 2 days |
 | Phase 84 P01 | 198 | 2 tasks | 3 files |
+| Phase 85 P01 | 15 | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -62,6 +63,8 @@ Recent decisions relevant to v11.0:
 - [Phase 84]: Function module for haClient (no class): simpler transport, matches v10.0 Netatmo pattern
 - [Phase 84]: RFC9457ProblemDetail moved to types/haClient.ts as single source of truth for all providers
 - [Phase 84]: RATE_LIMITED (429) explicit mapping added — improvement over netatmoProxy.ts which missed this
+- [Phase 85]: Function module pattern for fritzboxClient — matches netatmoProxy.ts, consistent across all HA providers
+- [Phase 85]: Fritz!Box credential config route deleted — X-API-Key env var replaces Firebase RTDB credential storage
 
 ### Pending Todos
 
@@ -80,6 +83,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-17T10:37:53.177Z
-Stopped at: Phase 85 context gathered
-Resume file: .planning/phases/85-fritz-box-migration/85-CONTEXT.md
+Last session: 2026-03-17T10:52:50.645Z
+Stopped at: Completed 85-01-PLAN.md
+Resume file: None

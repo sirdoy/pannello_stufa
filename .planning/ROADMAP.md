@@ -60,7 +60,7 @@ See `.planning/milestones/` for full archives.
 #### Phases
 
 - [x] **Phase 84: Shared HA API Client** - Build the single base URL + X-API-Key transport used by all providers (completed 2026-03-17)
-- [ ] **Phase 85: Fritz!Box Migration** - Migrate Fritz!Box client and routes to shared transport, remove JWT login
+- [x] **Phase 85: Fritz!Box Migration** - Migrate Fritz!Box client and routes to shared transport, remove JWT login (completed 2026-03-17)
 - [ ] **Phase 86: Netatmo Migration** - Migrate Netatmo client and routes to shared transport, remove separate env vars
 - [ ] **Phase 87: Client Cleanup** - Delete old Fritz!Box and Netatmo client modules after migration verified
 - [ ] **Phase 88: Raspberry Pi API Layer** - Proxy client functions, TypeScript types, and Next.js API routes for all Raspberry Pi endpoints
@@ -89,7 +89,7 @@ Plans:
   1. Fritz!Box API routes return the same data as before the migration (no behavior change)
   2. Fritz!Box JWT login code is absent from the codebase
   3. Rate limiting (10 req/min) and Firebase RTDB caching (60s TTL) continue to function on top of shared transport
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [ ] 85-01-PLAN.md — Migrate Fritz!Box client to haGet, rewrite tests, delete credential config
 
@@ -173,7 +173,7 @@ Plans:
 | 70-74 | v9.0 | 8/8 | ✓ Complete | 2026-02-19 |
 | 75-83 | v10.0 | 18/18 | ✓ Complete | 2026-03-16 |
 | 84. Shared HA API Client | 1/1 | Complete    | 2026-03-17 | - |
-| 85. Fritz!Box Migration | v11.0 | 0/1 | Planned | - |
+| 85. Fritz!Box Migration | 1/1 | Complete   | 2026-03-17 | - |
 | 86. Netatmo Migration | v11.0 | 0/TBD | Not started | - |
 | 87. Client Cleanup | v11.0 | 0/TBD | Not started | - |
 | 88. Raspberry Pi API Layer | v11.0 | 0/TBD | Not started | - |

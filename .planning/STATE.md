@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: API Unification & Raspberry Pi Monitor
 status: planning
-stopped_at: Completed 87-02-PLAN.md
-last_updated: "2026-03-17T16:06:46.826Z"
+stopped_at: Completed 87-01-PLAN.md
+last_updated: "2026-03-17T16:10:31.052Z"
 last_activity: 2026-03-17 — Phase 86 complete (3/3 plans, 7/7 verification)
 progress:
   total_phases: 7
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 7
-  completed_plans: 6
+  completed_plans: 7
   percent: 43
 ---
 
@@ -52,6 +52,7 @@ Progress: [████░░░░░░] 43% (3/7 phases)
 | Phase 86 P01 | 8 | 2 tasks | 2 files |
 | Phase 86 P02 | 320 | 3 tasks | 5 files |
 | Phase 87 P02 | 4 | 2 tasks | 4 files |
+| Phase 87-client-cleanup P01 | 4 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,8 @@ Recent decisions relevant to v11.0:
 - [Phase 86]: getroommeasure RoomMeasureResponse type import removed — handled by getProxyRoomMeasure wrapper
 - [Phase 86]: getroommeasure RoomMeasureResponse type import kept — mockProxyResponse fixture still typed explicitly
 - [Phase 87]: Docs-only env var replacements: NETATMO_PROXY_URL/NETATMO_PROXY_API_KEY → HA_API_URL/HA_API_KEY in four files
+- [Phase 87-01]: Removed invalidateCache, CACHE_TTL_MS, FRITZBOX_RATE_LIMIT, FRITZBOX_ERROR_CODES from fritzbox barrel — only live route-consumed exports remain
+- [Phase 87-01]: FRITZBOX_ERROR_CODES unexported in fritzboxErrors.ts — no route files consume it; fritzboxErrors.ts file kept per plan constraint
 
 ### Pending Todos
 
@@ -92,6 +95,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-17T16:06:40.823Z
-Stopped at: Completed 87-02-PLAN.md
+Last session: 2026-03-17T16:10:31.047Z
+Stopped at: Completed 87-01-PLAN.md
 Resume file: None

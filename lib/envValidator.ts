@@ -43,8 +43,8 @@ export function validateHealthMonitoringEnv(): ValidationResult {
   ];
 
   const optional = [
-    'NETATMO_PROXY_URL',
-    'NETATMO_PROXY_API_KEY',
+    'HA_API_URL',
+    'HA_API_KEY',
   ];
 
   // Check required variables
@@ -73,7 +73,7 @@ export function validateHealthMonitoringEnv(): ValidationResult {
 
 /**
  * Validate Netatmo-specific environment variables
- * Checks for proxy credentials (NETATMO_PROXY_URL + NETATMO_PROXY_API_KEY)
+ * Checks for shared HA proxy credentials (HA_API_URL + HA_API_KEY)
  *
  * @returns {Object} Validation result
  *   - valid: boolean - Proxy credentials present
@@ -81,27 +81,21 @@ export function validateHealthMonitoringEnv(): ValidationResult {
  *   - warnings: string[] - Configuration warnings
  */
 export function validateNetatmoEnv(): NetatmoValidationResult {
-  const proxyUrl = process.env.NETATMO_PROXY_URL;
-  const apiKey = process.env.NETATMO_PROXY_API_KEY;
-
-  const warnings: string[] = [];
+  const haUrl = process.env.HA_API_URL;
+  const apiKey = process.env.HA_API_KEY;
 
   // Check if proxy credentials are present
-  if (!proxyUrl || !apiKey) {
+  if (!haUrl || !apiKey) {
     return {
       valid: false,
       environment: 'unknown',
-      warnings: ['NETATMO_PROXY_URL or NETATMO_PROXY_API_KEY missing'],
+      warnings: ['HA_API_URL or HA_API_KEY missing'],
     };
-  }
-
-  if (warnings.length > 0) {
-    console.warn(`⚠️ Netatmo warnings: ${warnings.join(', ')}`);
   }
 
   return {
     valid: true,
     environment: 'proxy',
-    warnings,
+    warnings: [],
   };
 }

@@ -141,7 +141,7 @@ Plans:
   2. The card uses adaptive polling and respects Page Visibility API (pauses when tab hidden)
   3. If the Raspberry Pi proxy is unreachable, an error boundary shows a fallback UI without crashing the dashboard
   4. A skeleton placeholder appears during initial data load
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
 - [ ] 89-01-PLAN.md — Device registry + useRaspiData hook + Skeleton.RaspiCard
 - [ ] 89-02-PLAN.md — RaspiCard component + DashboardCards wiring + integration tests
@@ -181,7 +181,7 @@ Plans:
 | 86. Netatmo Migration | 3/3 | Complete    | 2026-03-17 | - |
 | 87. Client Cleanup | 2/2 | Complete    | 2026-03-17 | - |
 | 88. Raspberry Pi API Layer | 1/1 | Complete    | 2026-03-17 | - |
-| 89. Raspberry Pi Dashboard Card | v11.0 | 0/2 | Not started | - |
+| 89. Raspberry Pi Dashboard Card | 1/2 | In Progress|  | - |
 | 90. Raspberry Pi Page + Cron | v11.0 | 0/TBD | Not started | - |
 
 **Total:** 14 milestones shipped, 83 phases complete, 348 plans executed. v11.0 in progress (7 phases planned, phases 84-90).

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: API Unification & Raspberry Pi Monitor
 status: planning
-stopped_at: Completed 88-01-PLAN.md
-last_updated: "2026-03-17T16:39:43.979Z"
+stopped_at: Completed 89-01-PLAN.md
+last_updated: "2026-03-17T17:10:38.291Z"
 last_activity: 2026-03-17 — Phase 86 complete (3/3 plans, 7/7 verification)
 progress:
   total_phases: 7
   completed_phases: 5
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 10
+  completed_plans: 9
   percent: 43
 ---
 
@@ -54,6 +54,7 @@ Progress: [████░░░░░░] 43% (3/7 phases)
 | Phase 87 P02 | 4 | 2 tasks | 4 files |
 | Phase 87-client-cleanup P01 | 4 | 1 tasks | 2 files |
 | Phase 88 P01 | 400 | 2 tasks | 14 files |
+| Phase 89 P01 | 7 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,8 @@ Recent decisions relevant to v11.0:
 - [Phase 87-01]: Removed invalidateCache, CACHE_TTL_MS, FRITZBOX_RATE_LIMIT, FRITZBOX_ERROR_CODES from fritzbox barrel — only live route-consumed exports remain
 - [Phase 87-01]: FRITZBOX_ERROR_CODES unexported in fritzboxErrors.ts — no route files consume it; fritzboxErrors.ts file kept per plan constraint
 - [Phase 88]: Type assertion (as unknown as Record<string,unknown>) for success() calls in raspi routes — follows established codebase pattern
+- [Phase 89]: initialDelay: 600ms for raspi hook (stagger offset from NetworkCard's 500ms), alwaysActive: false (non-safety-critical)
+- [Phase 89]: Health thresholds: disk>90/mem>95=error, cpu>80/mem>80/disk>75/temp>70=warning, else ok
 
 ### Pending Todos
 
@@ -97,6 +100,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-17T16:36:48.268Z
-Stopped at: Completed 88-01-PLAN.md
+Last session: 2026-03-17T17:10:38.267Z
+Stopped at: Completed 89-01-PLAN.md
 Resume file: None

@@ -2,7 +2,7 @@
  * Fritz!Box Integration
  *
  * Barrel export for all Fritz!Box lib modules
- * - Client: API communication with auth, timeout, error handling
+ * - Client: haGet-based function module (X-API-Key auth via shared HA proxy)
  * - Cache: 60s TTL cache layer with Firebase RTDB
  * - Rate Limiter: 10 req/min persistent rate limiting
  * - Errors: Fritz!Box-specific error codes

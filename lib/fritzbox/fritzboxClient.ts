@@ -1,376 +1,139 @@
 /**
  * Fritz!Box Client
  *
- * Handles communication with HomeAssistant Network API
- * - JWT authentication with auto-login and token caching
- * - Timeout handling (15s default, 10s for health checks)
- * - Response transformation to internal types
- * - Configuration validation
+ * Thin wrapper around the shared HA proxy client (haGet).
+ * Handles response transformation from raw API format to internal types.
+ * Auth is handled by haGet via X-API-Key header (no JWT, no credentials).
  *
- * Credential resolution order:
- *   1. Firebase RTDB (config/fritzbox) - shared across all devices
- *   2. Environment variables (HOMEASSISTANT_API_URL, HOMEASSISTANT_USER, HOMEASSISTANT_PASSWORD) - local fallback
+ * Endpoints:
+ *   /health              - Proxy health check
+ *   /api/v1/devices      - Network device list
+ *   /api/v1/bandwidth    - Current bandwidth stats
+ *   /api/v1/history/bandwidth - Historical bandwidth data
+ *   /api/v1/wan          - WAN connection status
+ */
+
+import { haGet } from '@/lib/haClient';
+
+/**
+ * Ping API to check connectivity
+ * Uses /health endpoint with a 10s timeout
+ */
+async function ping(): Promise<unknown> {
+  return haGet<unknown>('/health', { timeout: 10_000 });
+}
+
+/**
+ * Debug: Make a request and return the raw response.
+ * Used by debug endpoints to inspect external API response format.
+ */
+async function debugRequest(endpoint: string): Promise<unknown> {
+  return haGet<unknown>(endpoint);
+}
+
+/**
+ * Get network devices connected to Fritz!Box
  *
- * Endpoints used (generic, not fritzbox-specific namespace):
- *   /health          - No auth
- *   /api/v1/devices  - JWT required
- *   /api/v1/bandwidth - JWT required
- *   /api/v1/wan      - JWT required
+ * Raw: { devices: [{ ip, name, mac, status: 0|1 }], is_stale, fetched_at }
+ * Returns: array of transformed devices
  */
+async function getDevices(): Promise<Array<{ id: string; name: string; ip: string; mac: string; active: boolean }>> {
+  const raw = await haGet<{
+    devices: Array<{ ip: string; name: string; mac: string; status: number }>;
+    is_stale: boolean;
+    fetched_at: string;
+  }>('/api/v1/devices');
 
-import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
-
-// JWT token cache (in-memory, module scope)
-let cachedToken: string | null = null;
-let tokenExpiry = 0;
-
-/**
- * Cached credentials resolved from Firebase or env vars.
- * Cache is invalidated when credentials are saved via the config API.
- */
-interface ResolvedCredentials {
-  apiUrl: string;
-  username: string;
-  password: string;
-}
-
-let credentialCache: ResolvedCredentials | null = null;
-let credentialCacheExpiry = 0;
-const CREDENTIAL_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
-
-/**
- * Invalidate the in-memory credential cache.
- * Called when credentials are saved or deleted via the config API.
- */
-export function invalidateFritzBoxCredentialCache(): void {
-  credentialCache = null;
-  credentialCacheExpiry = 0;
-  // Also invalidate JWT token cache since credentials changed
-  cachedToken = null;
-  tokenExpiry = 0;
+  return (raw.devices || []).map(d => ({
+    id: d.mac || d.ip, // Use MAC as ID, fallback to IP
+    name: d.name || d.ip,
+    ip: d.ip,
+    mac: d.mac,
+    active: d.status === 1,
+  }));
 }
 
 /**
- * Resolve Fritz!Box credentials.
- * Priority: Firebase RTDB > environment variables
+ * Get bandwidth usage statistics
  *
- * Firebase RTDB is the source of truth for multi-device setups.
- * Environment variables serve as local fallback for backward compatibility.
+ * Raw: { upstream_bps, downstream_bps, is_stale, fetched_at }
+ * Returns: transformed BandwidthData
  */
-async function resolveCredentials(): Promise<ResolvedCredentials> {
-  // Return cached credentials if still valid
-  if (credentialCache && Date.now() < credentialCacheExpiry) {
-    return credentialCache;
-  }
+async function getBandwidth(): Promise<{ download: number; upload: number; timestamp: number }> {
+  const raw = await haGet<{
+    upstream_bps: number;
+    downstream_bps: number;
+    is_stale: boolean;
+    fetched_at: string;
+  }>('/api/v1/bandwidth');
 
-  // Try Firebase RTDB first
-  try {
-    const { adminDbGet } = await import('@/lib/firebaseAdmin');
-    const { getEnvironmentPath } = await import('@/lib/environmentHelper');
-
-    const path = getEnvironmentPath('config/fritzbox');
-    const stored = (await adminDbGet(path)) as {
-      apiUrl: string;
-      username: string;
-      password: string;
-      updatedAt: number;
-    } | null;
-
-    if (stored?.apiUrl && stored.username && stored.password) {
-      credentialCache = {
-        apiUrl: stored.apiUrl,
-        username: stored.username,
-        password: stored.password,
-      };
-      credentialCacheExpiry = Date.now() + CREDENTIAL_CACHE_TTL_MS;
-      return credentialCache;
-    }
-  } catch {
-    // Firebase unavailable — fall through to env vars
-  }
-
-  // Fall back to environment variables
-  const apiUrl = process.env.HOMEASSISTANT_API_URL;
-  const username = process.env.HOMEASSISTANT_USER;
-  const password = process.env.HOMEASSISTANT_PASSWORD;
-
-  if (!apiUrl || !username || !password) {
-    throw ApiError.fritzboxNotConfigured();
-  }
-
-  credentialCache = { apiUrl, username, password };
-  credentialCacheExpiry = Date.now() + CREDENTIAL_CACHE_TTL_MS;
-  return credentialCache;
+  return {
+    download: raw.downstream_bps / 1_000_000, // bps → Mbps
+    upload: raw.upstream_bps / 1_000_000,
+    timestamp: new Date(raw.fetched_at).getTime(),
+  };
 }
 
 /**
- * Fritz!Box API Client
- * Singleton class for HomeAssistant Network API communication
+ * Get historical bandwidth data
+ *
+ * Raw: { records: [{ timestamp, bytes_sent, bytes_received, upstream_rate, downstream_rate }], hours_requested, record_count }
+ * Returns: array of { time, download, upload } points sorted ascending
  */
-class FritzBoxClient {
-  /**
-   * Get a valid JWT token, logging in if needed
-   */
-  private async getToken(): Promise<string> {
-    // Return cached token if still valid (with 60s margin)
-    if (cachedToken && Date.now() < tokenExpiry - 60_000) {
-      return cachedToken;
-    }
+async function getBandwidthHistory(hours: number = 24): Promise<Array<{ time: number; download: number; upload: number }>> {
+  type HistoryRecord = { timestamp: number; bytes_sent: number; bytes_received: number; upstream_rate: number; downstream_rate: number };
+  type HistoryResponse = { records: HistoryRecord[]; hours_requested: number; record_count: number };
 
-    const credentials = await resolveCredentials();
+  const data = await haGet<HistoryResponse>(`/api/v1/history/bandwidth?hours=${hours}`);
+  const records = data.records ?? [];
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-    try {
-      const response = await fetch(`${credentials.apiUrl}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `username=${encodeURIComponent(credentials.username)}&password=${encodeURIComponent(credentials.password)}`,
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (response.status === 401) {
-        throw ApiError.fritzboxNotConfigured();
-      }
-
-      if (!response.ok) {
-        throw new ApiError(
-          ERROR_CODES.EXTERNAL_API_ERROR,
-          `Login failed: ${response.statusText}`,
-          HTTP_STATUS.BAD_GATEWAY
-        );
-      }
-
-      const data = (await response.json()) as { access_token: string; token_type: string };
-      cachedToken = data.access_token;
-      // Default JWT expiry: 30 min from now
-      tokenExpiry = Date.now() + 30 * 60 * 1000;
-      return cachedToken;
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error instanceof ApiError) throw error;
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw ApiError.fritzboxTimeout();
-      }
-      throw new ApiError(
-        ERROR_CODES.EXTERNAL_API_ERROR,
-        `Login failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        HTTP_STATUS.BAD_GATEWAY
-      );
-    }
-  }
-
-  /**
-   * Make authenticated request to the API
-   */
-  private async request(
-    endpoint: string,
-    options: { timeout?: number; requiresAuth?: boolean } = {}
-  ): Promise<unknown> {
-    const { timeout = 15000, requiresAuth = true } = options;
-
-    const credentials = await resolveCredentials();
-
-    // Setup timeout with AbortController
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-    try {
-      const headers: Record<string, string> = {};
-      if (requiresAuth) {
-        const token = await this.getToken();
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      const response = await fetch(`${credentials.apiUrl}${endpoint}`, {
-        headers,
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      // Handle 401 - token expired or invalid, retry once with fresh token
-      if (response.status === 401 && requiresAuth) {
-        cachedToken = null;
-        tokenExpiry = 0;
-        const freshToken = await this.getToken();
-        const retryResponse = await fetch(`${credentials.apiUrl}${endpoint}`, {
-          headers: { Authorization: `Bearer ${freshToken}` },
-        });
-        if (!retryResponse.ok) {
-          throw ApiError.fritzboxNotConfigured();
-        }
-        return await retryResponse.json();
-      }
-
-      // Handle 503 - service unavailable (router unreachable)
-      if (response.status === 503) {
-        throw ApiError.fritzboxTimeout();
-      }
-
-      // Handle 429 - rate limited by upstream API
-      if (response.status === 429) {
-        throw new ApiError(
-          ERROR_CODES.RATE_LIMITED,
-          'Upstream API rate limit exceeded',
-          HTTP_STATUS.TOO_MANY_REQUESTS
-        );
-      }
-
-      // Handle other errors
-      if (!response.ok) {
-        let detail = response.statusText;
-        try {
-          const errorBody = (await response.json()) as { detail?: string; error?: { message?: string } };
-          if (errorBody.detail) detail = errorBody.detail;
-          else if (errorBody.error?.message) detail = errorBody.error.message;
-        } catch {
-          // ignore parse errors
-        }
-        throw new ApiError(
-          ERROR_CODES.EXTERNAL_API_ERROR,
-          `Fritz!Box API error: ${detail}`,
-          HTTP_STATUS.BAD_GATEWAY
-        );
-      }
-
-      return await response.json();
-    } catch (error) {
-      clearTimeout(timeoutId);
-
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw ApiError.fritzboxTimeout();
-      }
-
-      if (error instanceof ApiError) {
-        throw error;
-      }
-
-      throw new ApiError(
-        ERROR_CODES.EXTERNAL_API_ERROR,
-        `Fritz!Box request failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        HTTP_STATUS.BAD_GATEWAY
-      );
-    }
-  }
-
-  /**
-   * Ping API to check connectivity
-   * Uses /health endpoint (no auth required)
-   */
-  async ping(): Promise<unknown> {
-    return this.request('/health', { timeout: 10000, requiresAuth: false });
-  }
-
-  /**
-   * Debug: Make an authenticated request and return the raw response.
-   * Used by debug endpoints to inspect external API response format.
-   */
-  async debugRequest(endpoint: string): Promise<unknown> {
-    return this.request(endpoint);
-  }
-
-  /**
-   * Get network devices connected to Fritz!Box
-   *
-   * Raw: { devices: [{ ip, name, mac, status: 0|1 }], is_stale, fetched_at }
-   * Returns: array of transformed devices
-   */
-  async getDevices(): Promise<Array<{ id: string; name: string; ip: string; mac: string; active: boolean }>> {
-    const raw = (await this.request('/api/v1/devices')) as {
-      devices: Array<{ ip: string; name: string; mac: string; status: number }>;
-      is_stale: boolean;
-      fetched_at: string;
-    };
-
-    return (raw.devices || []).map(d => ({
-      id: d.mac || d.ip, // Use MAC as ID, fallback to IP
-      name: d.name || d.ip,
-      ip: d.ip,
-      mac: d.mac,
-      active: d.status === 1,
-    }));
-  }
-
-  /**
-   * Get bandwidth usage statistics
-   *
-   * Raw: { upstream_bps, downstream_bps, bytes_sent, bytes_received, is_stale, fetched_at }
-   * Returns: transformed BandwidthData
-   */
-  async getBandwidth(): Promise<{ download: number; upload: number; timestamp: number }> {
-    const raw = (await this.request('/api/v1/bandwidth')) as {
-      upstream_bps: number;
-      downstream_bps: number;
-      is_stale: boolean;
-      fetched_at: string;
-    };
-
-    return {
-      download: raw.downstream_bps / 1_000_000, // bps → Mbps
-      upload: raw.upstream_bps / 1_000_000,
-      timestamp: new Date(raw.fetched_at).getTime(),
-    };
-  }
-
-  /**
-   * Get historical bandwidth data
-   *
-   * Raw: { records: [{ timestamp, bytes_sent, bytes_received, upstream_rate, downstream_rate }], hours_requested, record_count }
-   * Returns: array of { time, download, upload } points sorted ascending
-   */
-  async getBandwidthHistory(hours: number = 24): Promise<Array<{ time: number; download: number; upload: number }>> {
-    type HistoryRecord = { timestamp: number; bytes_sent: number; bytes_received: number; upstream_rate: number; downstream_rate: number };
-    type HistoryResponse = { records: HistoryRecord[]; hours_requested: number; record_count: number };
-
-    const data = (await this.request(`/api/v1/history/bandwidth?hours=${hours}`)) as HistoryResponse;
-
-    const records = data.records ?? [];
-
-    // Transform: timestamp (Unix seconds) → ms, rates (bps) → Mbps
-    return records
-      .map(item => ({
-        time: item.timestamp * 1000,
-        download: item.downstream_rate / 1_000_000,
-        upload: item.upstream_rate / 1_000_000,
-      }))
-      .sort((a, b) => a.time - b.time);
-  }
-
-  /**
-   * Get WAN connection status
-   *
-   * Raw: { external_ip, is_connected, is_linked, uptime, max_upstream_bps, max_downstream_bps, ... }
-   * Returns: transformed WanData
-   */
-  async getWanStatus(): Promise<{
-    connected: boolean; uptime: number; externalIp?: string; linkSpeed?: number; timestamp: number;
-  }> {
-    const raw = (await this.request('/api/v1/wan')) as {
-      external_ip: string;
-      is_connected: boolean;
-      is_linked: boolean;
-      uptime: number;
-      max_downstream_bps: number;
-      max_upstream_bps: number;
-      is_stale: boolean;
-      fetched_at: string;
-    };
-
-    return {
-      connected: raw.is_connected,
-      uptime: raw.uptime,
-      externalIp: raw.external_ip || undefined,
-      linkSpeed: raw.max_downstream_bps ? raw.max_downstream_bps / 1_000_000 : undefined,
-      timestamp: new Date(raw.fetched_at).getTime(),
-    };
-  }
+  // Transform: timestamp (Unix seconds) → ms, rates (bps) → Mbps
+  return records
+    .map(item => ({
+      time: item.timestamp * 1000,
+      download: item.downstream_rate / 1_000_000,
+      upload: item.upstream_rate / 1_000_000,
+    }))
+    .sort((a, b) => a.time - b.time);
 }
 
 /**
- * Singleton instance of FritzBoxClient
+ * Get WAN connection status
+ *
+ * Raw: { external_ip, is_connected, is_linked, uptime, max_upstream_bps, max_downstream_bps, ... }
+ * Returns: transformed WanData
  */
-export const fritzboxClient = new FritzBoxClient();
+async function getWanStatus(): Promise<{
+  connected: boolean; uptime: number; externalIp?: string; linkSpeed?: number; timestamp: number;
+}> {
+  const raw = await haGet<{
+    external_ip: string;
+    is_connected: boolean;
+    is_linked: boolean;
+    uptime: number;
+    max_downstream_bps: number;
+    max_upstream_bps: number;
+    is_stale: boolean;
+    fetched_at: string;
+  }>('/api/v1/wan');
+
+  return {
+    connected: raw.is_connected,
+    uptime: raw.uptime,
+    externalIp: raw.external_ip || undefined,
+    linkSpeed: raw.max_downstream_bps ? raw.max_downstream_bps / 1_000_000 : undefined,
+    timestamp: new Date(raw.fetched_at).getTime(),
+  };
+}
+
+/**
+ * Fritz!Box client object — preserves existing route call patterns (fritzboxClient.method())
+ */
+export const fritzboxClient = {
+  ping,
+  debugRequest,
+  getDevices,
+  getBandwidth,
+  getBandwidthHistory,
+  getWanStatus,
+};

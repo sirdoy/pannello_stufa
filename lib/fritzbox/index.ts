@@ -3,14 +3,12 @@
  *
  * Barrel export for all Fritz!Box lib modules
  * - Client: haGet-based function module (X-API-Key auth via shared HA proxy)
- * - Cache: 60s TTL cache layer with Firebase RTDB
- * - Rate Limiter: 10 req/min persistent rate limiting
- * - Errors: Fritz!Box-specific error codes
+ * - Cache: 60s TTL cache layer with Firebase RTDB (getCachedData)
+ * - Rate Limiter: 10 req/min persistent rate limiting (checkRateLimitFritzBox)
  * - Event Logger: Device connection event logging and querying
  */
 
 export { fritzboxClient } from './fritzboxClient';
-export { getCachedData, invalidateCache, CACHE_TTL_MS } from './fritzboxCache';
-export { checkRateLimitFritzBox, FRITZBOX_RATE_LIMIT } from './fritzboxRateLimiter';
-export { FRITZBOX_ERROR_CODES } from './fritzboxErrors';
+export { getCachedData } from './fritzboxCache';
+export { checkRateLimitFritzBox } from './fritzboxRateLimiter';
 export { logDeviceEvent, getDeviceEvents, getDeviceStates, updateDeviceStates } from './deviceEventLogger';

@@ -89,7 +89,9 @@ Plans:
   1. Fritz!Box API routes return the same data as before the migration (no behavior change)
   2. Fritz!Box JWT login code is absent from the codebase
   3. Rate limiting (10 req/min) and Firebase RTDB caching (60s TTL) continue to function on top of shared transport
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 85-01-PLAN.md — Migrate Fritz!Box client to haGet, rewrite tests, delete credential config
 
 ### Phase 86: Netatmo Migration
 **Goal**: Netatmo uses the shared HA client — provider-specific env vars gone, all routes behave identically to before
@@ -99,7 +101,9 @@ Plans:
   1. Netatmo API routes return the same data as before the migration (no behavior change)
   2. Netatmo-specific env vars (`NETATMO_PROXY_URL`, `NETATMO_API_KEY`, etc.) are absent from `.env.local` and code references
   3. All Netatmo convenience wrappers (setpoint, mode, schedule, measurements, camera, valve, health) remain callable and functional
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 85-01-PLAN.md — Migrate Fritz!Box client to haGet, rewrite tests, delete credential config
 
 ### Phase 87: Client Cleanup
 **Goal**: The codebase contains only the shared client — old Fritz!Box and Netatmo client modules deleted
@@ -109,7 +113,9 @@ Plans:
   1. Old Fritz!Box client module file(s) are absent from the repository
   2. Old Netatmo client module file(s) are absent from the repository
   3. Zero tsc errors and all tests pass after deletion
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 85-01-PLAN.md — Migrate Fritz!Box client to haGet, rewrite tests, delete credential config
 
 ### Phase 88: Raspberry Pi API Layer
 **Goal**: The server side can reach and type all Raspberry Pi endpoints — proxy functions, types, and routes ready for frontend consumption
@@ -119,7 +125,9 @@ Plans:
   1. API routes for Raspberry Pi health, CPU, memory, disk, and system endpoints are reachable from the browser
   2. TypeScript types match all API response schemas with zero tsc errors
   3. RFC 9457 errors from the Raspberry Pi proxy surface as ApiError instances in the frontend
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 85-01-PLAN.md — Migrate Fritz!Box client to haGet, rewrite tests, delete credential config
 
 ### Phase 89: Raspberry Pi Dashboard Card
 **Goal**: Raspberry Pi appears in the home dashboard with a live health summary and integrates into the device registry
@@ -130,7 +138,9 @@ Plans:
   2. The card uses adaptive polling and respects Page Visibility API (pauses when tab hidden)
   3. If the Raspberry Pi proxy is unreachable, an error boundary shows a fallback UI without crashing the dashboard
   4. A skeleton placeholder appears during initial data load
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 85-01-PLAN.md — Migrate Fritz!Box client to haGet, rewrite tests, delete credential config
 
 ### Phase 90: Raspberry Pi Page + Cron
 **Goal**: Users can navigate to /raspi for detailed system stats, and the 5-min cron includes Raspberry Pi health
@@ -140,7 +150,9 @@ Plans:
   1. Navigating to /raspi shows full system stats: uptime, load averages, network I/O, and process count
   2. The 5-minute GitHub Actions cron check reports Raspberry Pi health alongside stove and thermostat status
   3. If the Raspberry Pi is unreachable during a cron run, the check logs the failure without aborting other health checks
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 85-01-PLAN.md — Migrate Fritz!Box client to haGet, rewrite tests, delete credential config
 
 ## Progress
 
@@ -161,7 +173,7 @@ Plans:
 | 70-74 | v9.0 | 8/8 | ✓ Complete | 2026-02-19 |
 | 75-83 | v10.0 | 18/18 | ✓ Complete | 2026-03-16 |
 | 84. Shared HA API Client | 1/1 | Complete    | 2026-03-17 | - |
-| 85. Fritz!Box Migration | v11.0 | 0/TBD | Not started | - |
+| 85. Fritz!Box Migration | v11.0 | 0/1 | Planned | - |
 | 86. Netatmo Migration | v11.0 | 0/TBD | Not started | - |
 | 87. Client Cleanup | v11.0 | 0/TBD | Not started | - |
 | 88. Raspberry Pi API Layer | v11.0 | 0/TBD | Not started | - |
@@ -172,4 +184,4 @@ Plans:
 
 ---
 
-*Roadmap updated: 2026-03-17 — Phase 84 planned (1 plan)*
+*Roadmap updated: 2026-03-17 — Phase 85 planned (1 plan)*

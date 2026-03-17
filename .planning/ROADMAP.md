@@ -63,7 +63,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 85: Fritz!Box Migration** - Migrate Fritz!Box client and routes to shared transport, remove JWT login (completed 2026-03-17)
 - [x] **Phase 86: Netatmo Migration** - Migrate Netatmo client and routes to shared transport, remove separate env vars (completed 2026-03-17)
 - [x] **Phase 87: Client Cleanup** - Dead export verification and documentation cleanup after migration (completed 2026-03-17)
-- [ ] **Phase 88: Raspberry Pi API Layer** - Proxy client functions, TypeScript types, and Next.js API routes for all Raspberry Pi endpoints
+- [x] **Phase 88: Raspberry Pi API Layer** - Proxy client functions, TypeScript types, and Next.js API routes for all Raspberry Pi endpoints (completed 2026-03-17)
 - [ ] **Phase 89: Raspberry Pi Dashboard Card** - RaspiCard component in device registry with adaptive polling, error boundary, and skeleton
 - [ ] **Phase 90: Raspberry Pi Page + Cron** - Dedicated /raspi page with full stats and cron health integration
 
@@ -128,7 +128,7 @@ Plans:
   1. API routes for Raspberry Pi health, CPU, memory, disk, and system endpoints are reachable from the browser
   2. TypeScript types match all API response schemas with zero tsc errors
   3. RFC 9457 errors from the Raspberry Pi proxy surface as ApiError instances in the frontend
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [ ] 88-01-PLAN.md — Types, client module, barrel, 5 API routes, and tests
 
@@ -179,7 +179,7 @@ Plans:
 | 85. Fritz!Box Migration | 1/1 | Complete    | 2026-03-17 | - |
 | 86. Netatmo Migration | 3/3 | Complete    | 2026-03-17 | - |
 | 87. Client Cleanup | 2/2 | Complete    | 2026-03-17 | - |
-| 88. Raspberry Pi API Layer | v11.0 | 0/1 | Not started | - |
+| 88. Raspberry Pi API Layer | 1/1 | Complete   | 2026-03-17 | - |
 | 89. Raspberry Pi Dashboard Card | v11.0 | 0/TBD | Not started | - |
 | 90. Raspberry Pi Page + Cron | v11.0 | 0/TBD | Not started | - |
 

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: API Unification & Raspberry Pi Monitor
 status: planning
-stopped_at: Completed 86-01-PLAN.md
-last_updated: "2026-03-17T11:36:42.441Z"
+stopped_at: Completed 86-02-PLAN.md
+last_updated: "2026-03-17T11:45:38.214Z"
 last_activity: 2026-03-17 — Roadmap created (7 phases, 18 requirements mapped)
 progress:
   total_phases: 7
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -50,6 +50,7 @@ Progress: [░░░░░░░░░░] 0% (0/7 phases)
 | Phase 84 P01 | 198 | 2 tasks | 3 files |
 | Phase 85 P01 | 15 | 3 tasks | 6 files |
 | Phase 86 P01 | 8 | 2 tasks | 2 files |
+| Phase 86 P02 | 320 | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,9 @@ Recent decisions relevant to v11.0:
 - [Phase 85]: Function module pattern for fritzboxClient — matches netatmoProxy.ts, consistent across all HA providers
 - [Phase 85]: Fritz!Box credential config route deleted — X-API-Key env var replaces Firebase RTDB credential storage
 - [Phase 86]: netatmoProxyGet/netatmoProxyPost deleted — haGet/haPost from haClient.ts are the shared transport
+- [Phase 86]: netatmoProxyGet describe block renamed to test transport via getProxyHomestatus wrapper
+- [Phase 86]: validateNetatmoEnv simplified — removed unreachable warnings array, returns directly
+- [Phase 86]: getroommeasure RoomMeasureResponse type import removed — handled by getProxyRoomMeasure wrapper
 
 ### Pending Todos
 
@@ -85,6 +89,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-17T11:36:42.436Z
-Stopped at: Completed 86-01-PLAN.md
+Last session: 2026-03-17T11:45:38.208Z
+Stopped at: Completed 86-02-PLAN.md
 Resume file: None

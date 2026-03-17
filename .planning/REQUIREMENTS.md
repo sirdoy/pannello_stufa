@@ -17,7 +17,7 @@ Requirements for API Unification & Raspberry Pi Monitor milestone.
 - [x] **API-06**: Fritz!Box caching and rate limiting preserved on top of shared transport
 - [x] **API-07**: Netatmo client migrated to shared HA client (separate env vars removed)
 - [x] **API-08**: Netatmo convenience wrappers preserved on top of shared transport
-- [ ] **API-09**: Netatmo API routes updated to use new client (no behavior change)
+- [x] **API-09**: Netatmo API routes updated to use new client (no behavior change)
 - [ ] **API-10**: Old client modules deleted after migration verified
 
 ### Raspberry Pi (New Device)
@@ -68,7 +68,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | API-06 | Phase 85 | Complete |
 | API-07 | Phase 86 | Complete |
 | API-08 | Phase 86 | Complete |
-| API-09 | Phase 86 | Pending |
+| API-09 | Phase 86 | Complete |
 | API-10 | Phase 87 | Pending |
 | RASPI-01 | Phase 88 | Pending |
 | RASPI-02 | Phase 88 | Pending |

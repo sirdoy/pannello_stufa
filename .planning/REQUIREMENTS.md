@@ -9,9 +9,9 @@ Requirements for API Unification & Raspberry Pi Monitor milestone.
 
 ### API Client (Shared Infrastructure)
 
-- [ ] **API-01**: Shared HA proxy client module with single base URL + X-API-Key auth
-- [ ] **API-02**: Generic GET/POST helpers with AbortController timeout and RFC 9457 error mapping
-- [ ] **API-03**: Single env var pair (HA_API_URL + HA_API_KEY) replacing all provider-specific vars
+- [x] **API-01**: Shared HA proxy client module with single base URL + X-API-Key auth
+- [x] **API-02**: Generic GET/POST helpers with AbortController timeout and RFC 9457 error mapping
+- [x] **API-03**: Single env var pair (HA_API_URL + HA_API_KEY) replacing all provider-specific vars
 - [ ] **API-04**: Fritz!Box client migrated to shared HA client (JWT login flow removed)
 - [ ] **API-05**: Fritz!Box API routes updated to use new client (no behavior change)
 - [ ] **API-06**: Fritz!Box caching and rate limiting preserved on top of shared transport
@@ -60,9 +60,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| API-01 | Phase 84 | Pending |
-| API-02 | Phase 84 | Pending |
-| API-03 | Phase 84 | Pending |
+| API-01 | Phase 84 | Complete |
+| API-02 | Phase 84 | Complete |
+| API-03 | Phase 84 | Complete |
 | API-04 | Phase 85 | Pending |
 | API-05 | Phase 85 | Pending |
 | API-06 | Phase 85 | Pending |

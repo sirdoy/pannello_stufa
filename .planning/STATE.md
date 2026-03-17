@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: API Unification & Raspberry Pi Monitor
-status: ready_to_plan
-stopped_at: null
-last_updated: "2026-03-17T00:00:00.000Z"
-last_activity: 2026-03-17 — Roadmap created, 7 phases defined (84-90)
+status: planning
+stopped_at: Completed 84-01-PLAN.md
+last_updated: "2026-03-17T10:30:40.328Z"
+last_activity: 2026-03-17 — Roadmap created (7 phases, 18 requirements mapped)
 progress:
   total_phases: 7
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  completed_phases: 1
+  total_plans: 1
+  completed_plans: 1
   percent: 0
 ---
 
@@ -47,6 +47,7 @@ Progress: [░░░░░░░░░░] 0% (0/7 phases)
 | v8.0 Fritz!Box Network Monitor | 61-67 | 18 | 3 days |
 | v9.0 Performance Optimization | 70-74 | 8 | 2 days |
 | v10.0 Netatmo API Migration | 75-83 | 18 | 2 days |
+| Phase 84 P01 | 198 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -58,6 +59,9 @@ Recent decisions relevant to v11.0:
 - [v10.0]: Function module for proxy client — no JWT state, simpler than class-based Fritz!Box client
 - [v10.0]: RFC 9457 error mapping — structured errors from proxy mapped to ApiError instances
 - [v8.0]: Server-side proxy for Fritz!Box — API key never exposed to client, rate limiting on server
+- [Phase 84]: Function module for haClient (no class): simpler transport, matches v10.0 Netatmo pattern
+- [Phase 84]: RFC9457ProblemDetail moved to types/haClient.ts as single source of truth for all providers
+- [Phase 84]: RATE_LIMITED (429) explicit mapping added — improvement over netatmoProxy.ts which missed this
 
 ### Pending Todos
 
@@ -76,6 +80,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-17
-Stopped at: Roadmap created for v11.0 (phases 84-90, 18 requirements mapped)
+Last session: 2026-03-17T10:30:40.324Z
+Stopped at: Completed 84-01-PLAN.md
 Resume file: None

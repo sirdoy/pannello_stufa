@@ -141,13 +141,13 @@ export async function GET(request) {
 
 ---
 
-## Netatmo Proxy
+## HA Proxy (Netatmo + Fritz!Box)
 
-All Netatmo API calls go through a local proxy. Configure via env vars:
+All Netatmo and Fritz!Box API calls go through a shared HomeAssistant proxy. Configure via env vars:
 
 ```bash
-NETATMO_PROXY_URL=http://your-proxy-host:port/api/v1/netatmo
-NETATMO_PROXY_API_KEY=your-proxy-api-key
+HA_API_URL=http://your-homeassistant-host:port
+HA_API_KEY=your-ha-api-key
 ```
 
 **Setup completo**: [setup/netatmo-setup.md](./setup/netatmo-setup.md)

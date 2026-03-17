@@ -8,8 +8,8 @@ Local proxy integration for Netatmo Energy API. No OAuth required — the proxy 
 
 1. **Configure proxy credentials** in `.env.local`:
    ```bash
-   NETATMO_PROXY_URL=http://your-homeassistant-host:port/api/v1/netatmo
-   NETATMO_PROXY_API_KEY=your-proxy-api-key
+   HA_API_URL=http://your-homeassistant-host:port
+   HA_API_KEY=your-proxy-api-key
    ```
 
 2. **Test connection**: Visit the thermostat card on the dashboard — it will connect via the proxy automatically.
@@ -21,7 +21,7 @@ Local proxy integration for Netatmo Energy API. No OAuth required — the proxy 
 All Netatmo API calls go through a local HomeAssistant Network API proxy:
 
 ```
-App → NETATMO_PROXY_URL (local network) → Netatmo Cloud
+App → HA_API_URL/api/v1/netatmo (local network) → Netatmo Cloud
 ```
 
 **Benefits:**
@@ -58,10 +58,10 @@ Proxy coordinates stove sync — setpoints are managed by the proxy directly.
 
 | Error | Fix |
 |-------|-----|
-| "NETATMO_PROXY_URL missing" | Add proxy URL to `.env.local` |
-| "NETATMO_PROXY_API_KEY missing" | Add API key to `.env.local` |
+| "HA_API_URL missing" | Add HA_API_URL to `.env.local` |
+| "HA_API_KEY missing" | Add HA_API_KEY to `.env.local` |
 | Connection timeout | Verify proxy host is reachable on local network |
-| 401 Unauthorized | Check NETATMO_PROXY_API_KEY matches proxy configuration |
+| 401 Unauthorized | Check HA_API_KEY matches proxy configuration |
 
 ---
 

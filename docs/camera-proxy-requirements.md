@@ -5,7 +5,7 @@ Date: 2026-03-16
 
 ## Current Issues
 
-The Netatmo proxy (`NETATMO_PROXY_URL`) serves camera data but two features are broken:
+The Netatmo proxy (`HA_API_URL`) serves camera data but two features are broken:
 
 1. **Live snapshot/stream**: `GET /camera/{camera_id}/snapshot` returns 503 "Camera VPN URL not available"
 2. **Event snapshots**: `GET /camera/events` returns `snapshot_url` with Azure Blob SAS tokens that expire after ~5 minutes. The proxy caches these in SQLite at detection time and never refreshes them.

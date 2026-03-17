@@ -60,30 +60,30 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| API-01 | Pending | Pending |
-| API-02 | Pending | Pending |
-| API-03 | Pending | Pending |
-| API-04 | Pending | Pending |
-| API-05 | Pending | Pending |
-| API-06 | Pending | Pending |
-| API-07 | Pending | Pending |
-| API-08 | Pending | Pending |
-| API-09 | Pending | Pending |
-| API-10 | Pending | Pending |
-| RASPI-01 | Pending | Pending |
-| RASPI-02 | Pending | Pending |
-| RASPI-03 | Pending | Pending |
-| RASPI-04 | Pending | Pending |
-| RASPI-05 | Pending | Pending |
-| RASPI-06 | Pending | Pending |
-| RASPI-07 | Pending | Pending |
-| RASPI-08 | Pending | Pending |
+| API-01 | Phase 84 | Pending |
+| API-02 | Phase 84 | Pending |
+| API-03 | Phase 84 | Pending |
+| API-04 | Phase 85 | Pending |
+| API-05 | Phase 85 | Pending |
+| API-06 | Phase 85 | Pending |
+| API-07 | Phase 86 | Pending |
+| API-08 | Phase 86 | Pending |
+| API-09 | Phase 86 | Pending |
+| API-10 | Phase 87 | Pending |
+| RASPI-01 | Phase 88 | Pending |
+| RASPI-02 | Phase 88 | Pending |
+| RASPI-03 | Phase 88 | Pending |
+| RASPI-04 | Phase 89 | Pending |
+| RASPI-05 | Phase 89 | Pending |
+| RASPI-07 | Phase 89 | Pending |
+| RASPI-06 | Phase 90 | Pending |
+| RASPI-08 | Phase 90 | Pending |
 
 **Coverage:**
 - v11.0 requirements: 18 total
-- Mapped to phases: 0
-- Unmapped: 18 ⚠️
+- Mapped to phases: 18
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-17*
-*Last updated: 2026-03-17 after initial definition*
+*Last updated: 2026-03-17 — traceability updated after roadmap creation (phases 84-90)*

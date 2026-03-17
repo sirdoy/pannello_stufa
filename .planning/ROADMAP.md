@@ -16,6 +16,7 @@
 - ✅ **v8.1 Masonry Dashboard** — Phases 68-69 (shipped 2026-02-18)
 - ✅ **v9.0 Performance Optimization** — Phases 70-74 (shipped 2026-02-19)
 - ✅ **v10.0 Netatmo API Migration** — Phases 75-83 (shipped 2026-03-16)
+- 🚧 **v11.0 API Unification & Raspberry Pi Monitor** — Phases 84-90 (in progress)
 
 ## Phases
 
@@ -52,6 +53,93 @@ See `.planning/milestones/` for full archives.
 
 </details>
 
+### 🚧 v11.0 API Unification & Raspberry Pi Monitor (In Progress)
+
+**Milestone Goal:** Unify Fritz!Box and Netatmo behind a single shared HomeAssistant API transport, and add Raspberry Pi as a new monitored device on the dashboard.
+
+#### Phases
+
+- [ ] **Phase 84: Shared HA API Client** - Build the single base URL + X-API-Key transport used by all providers
+- [ ] **Phase 85: Fritz!Box Migration** - Migrate Fritz!Box client and routes to shared transport, remove JWT login
+- [ ] **Phase 86: Netatmo Migration** - Migrate Netatmo client and routes to shared transport, remove separate env vars
+- [ ] **Phase 87: Client Cleanup** - Delete old Fritz!Box and Netatmo client modules after migration verified
+- [ ] **Phase 88: Raspberry Pi API Layer** - Proxy client functions, TypeScript types, and Next.js API routes for all Raspberry Pi endpoints
+- [ ] **Phase 89: Raspberry Pi Dashboard Card** - RaspiCard component in device registry with adaptive polling, error boundary, and skeleton
+- [ ] **Phase 90: Raspberry Pi Page + Cron** - Dedicated /raspi page with full stats and cron health integration
+
+## Phase Details
+
+### Phase 84: Shared HA API Client
+**Goal**: A single, reusable HomeAssistant proxy client module exists that all provider clients will build on
+**Depends on**: Nothing (first phase of milestone)
+**Requirements**: API-01, API-02, API-03
+**Success Criteria** (what must be TRUE):
+  1. A single `HA_API_URL` + `HA_API_KEY` env var pair replaces all provider-specific connection vars
+  2. Generic GET and POST helpers handle AbortController timeouts and map RFC 9457 errors to ApiError instances
+  3. The shared client module is importable and TypeScript-typed with zero tsc errors
+**Plans**: TBD
+
+### Phase 85: Fritz!Box Migration
+**Goal**: Fritz!Box uses the shared HA client — JWT login flow gone, all routes behave identically to before
+**Depends on**: Phase 84
+**Requirements**: API-04, API-05, API-06
+**Success Criteria** (what must be TRUE):
+  1. Fritz!Box API routes return the same data as before the migration (no behavior change)
+  2. Fritz!Box JWT login code is absent from the codebase
+  3. Rate limiting (10 req/min) and Firebase RTDB caching (60s TTL) continue to function on top of shared transport
+**Plans**: TBD
+
+### Phase 86: Netatmo Migration
+**Goal**: Netatmo uses the shared HA client — provider-specific env vars gone, all routes behave identically to before
+**Depends on**: Phase 84
+**Requirements**: API-07, API-08, API-09
+**Success Criteria** (what must be TRUE):
+  1. Netatmo API routes return the same data as before the migration (no behavior change)
+  2. Netatmo-specific env vars (`NETATMO_PROXY_URL`, `NETATMO_API_KEY`, etc.) are absent from `.env.local` and code references
+  3. All Netatmo convenience wrappers (setpoint, mode, schedule, measurements, camera, valve, health) remain callable and functional
+**Plans**: TBD
+
+### Phase 87: Client Cleanup
+**Goal**: The codebase contains only the shared client — old Fritz!Box and Netatmo client modules deleted
+**Depends on**: Phase 85, Phase 86
+**Requirements**: API-10
+**Success Criteria** (what must be TRUE):
+  1. Old Fritz!Box client module file(s) are absent from the repository
+  2. Old Netatmo client module file(s) are absent from the repository
+  3. Zero tsc errors and all tests pass after deletion
+**Plans**: TBD
+
+### Phase 88: Raspberry Pi API Layer
+**Goal**: The server side can reach and type all Raspberry Pi endpoints — proxy functions, types, and routes ready for frontend consumption
+**Depends on**: Phase 84
+**Requirements**: RASPI-01, RASPI-02, RASPI-03
+**Success Criteria** (what must be TRUE):
+  1. API routes for Raspberry Pi health, CPU, memory, disk, and system endpoints are reachable from the browser
+  2. TypeScript types match all API response schemas with zero tsc errors
+  3. RFC 9457 errors from the Raspberry Pi proxy surface as ApiError instances in the frontend
+**Plans**: TBD
+
+### Phase 89: Raspberry Pi Dashboard Card
+**Goal**: Raspberry Pi appears in the home dashboard with a live health summary and integrates into the device registry
+**Depends on**: Phase 88
+**Requirements**: RASPI-04, RASPI-05, RASPI-07
+**Success Criteria** (what must be TRUE):
+  1. RaspiCard is visible on the dashboard showing CPU%, RAM%, disk%, temperature, and a health badge
+  2. The card uses adaptive polling and respects Page Visibility API (pauses when tab hidden)
+  3. If the Raspberry Pi proxy is unreachable, an error boundary shows a fallback UI without crashing the dashboard
+  4. A skeleton placeholder appears during initial data load
+**Plans**: TBD
+
+### Phase 90: Raspberry Pi Page + Cron
+**Goal**: Users can navigate to /raspi for detailed system stats, and the 5-min cron includes Raspberry Pi health
+**Depends on**: Phase 89
+**Requirements**: RASPI-06, RASPI-08
+**Success Criteria** (what must be TRUE):
+  1. Navigating to /raspi shows full system stats: uptime, load averages, network I/O, and process count
+  2. The 5-minute GitHub Actions cron check reports Raspberry Pi health alongside stove and thermostat status
+  3. If the Raspberry Pi is unreachable during a cron run, the check logs the failure without aborting other health checks
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -70,9 +158,16 @@ See `.planning/milestones/` for full archives.
 | 68-69 | v8.1 | 3/3 | ✓ Complete | 2026-02-18 |
 | 70-74 | v9.0 | 8/8 | ✓ Complete | 2026-02-19 |
 | 75-83 | v10.0 | 18/18 | ✓ Complete | 2026-03-16 |
+| 84. Shared HA API Client | v11.0 | 0/TBD | Not started | - |
+| 85. Fritz!Box Migration | v11.0 | 0/TBD | Not started | - |
+| 86. Netatmo Migration | v11.0 | 0/TBD | Not started | - |
+| 87. Client Cleanup | v11.0 | 0/TBD | Not started | - |
+| 88. Raspberry Pi API Layer | v11.0 | 0/TBD | Not started | - |
+| 89. Raspberry Pi Dashboard Card | v11.0 | 0/TBD | Not started | - |
+| 90. Raspberry Pi Page + Cron | v11.0 | 0/TBD | Not started | - |
 
-**Total:** 14 milestones shipped, 83 phases complete, 348 plans executed
+**Total:** 14 milestones shipped, 83 phases complete, 348 plans executed. v11.0 in progress (7 phases planned, phases 84-90).
 
 ---
 
-*Roadmap updated: 2026-03-16 — v10.0 Netatmo API Migration shipped*
+*Roadmap updated: 2026-03-17 — v11.0 API Unification & Raspberry Pi Monitor roadmap created*

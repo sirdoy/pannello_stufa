@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: API Unification & Raspberry Pi Monitor
-status: defining_requirements
+status: ready_to_plan
 stopped_at: null
 last_updated: "2026-03-17T00:00:00.000Z"
-last_activity: 2026-03-17 — Milestone v11.0 started
+last_activity: 2026-03-17 — Roadmap created, 7 phases defined (84-90)
 progress:
-  total_phases: 0
+  total_phases: 7
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,31 +21,30 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-17)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v11.0 API Unification & Raspberry Pi Monitor
+**Current focus:** v11.0 API Unification & Raspberry Pi Monitor — Phase 84 ready to plan
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-17 — Milestone v11.0 started
+Phase: 84 of 90 (Shared HA API Client)
+Plan: — (not started)
+Status: Ready to plan
+Last activity: 2026-03-17 — Roadmap created (7 phases, 18 requirements mapped)
 
-Progress: Not started
+Progress: [░░░░░░░░░░] 0% (0/7 phases)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed (all milestones): 348
 - v10.0 average: 2.0 plans/phase (18 plans / 9 phases)
-- v9.0 average: ~1.6 plans/phase (8 plans / 5 phases)
-- v8.0 average: ~2.6 plans/phase (18 plans / 7 phases)
+- v9.0 average: 1.6 plans/phase (8 plans / 5 phases)
+- v8.0 average: 2.6 plans/phase (18 plans / 7 phases)
 
 **By Milestone (recent):**
 
 | Milestone | Phases | Plans | Duration |
 |-----------|--------|-------|----------|
 | v8.0 Fritz!Box Network Monitor | 61-67 | 18 | 3 days |
-| v8.1 Masonry Dashboard | 68-69 | 3 | 1 day |
 | v9.0 Performance Optimization | 70-74 | 8 | 2 days |
 | v10.0 Netatmo API Migration | 75-83 | 18 | 2 days |
 
@@ -54,6 +53,11 @@ Progress: Not started
 ### Decisions
 
 See PROJECT.md Key Decisions table for full history.
+
+Recent decisions relevant to v11.0:
+- [v10.0]: Function module for proxy client — no JWT state, simpler than class-based Fritz!Box client
+- [v10.0]: RFC 9457 error mapping — structured errors from proxy mapped to ApiError instances
+- [v8.0]: Server-side proxy for Fritz!Box — API key never exposed to client, rate limiting on server
 
 ### Pending Todos
 
@@ -72,6 +76,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-16
-Stopped at: v10.0 milestone completed
+Last session: 2026-03-17
+Stopped at: Roadmap created for v11.0 (phases 84-90, 18 requirements mapped)
 Resume file: None

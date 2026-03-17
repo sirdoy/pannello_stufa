@@ -160,7 +160,7 @@ Plans:
 | 68-69 | v8.1 | 3/3 | ✓ Complete | 2026-02-18 |
 | 70-74 | v9.0 | 8/8 | ✓ Complete | 2026-02-19 |
 | 75-83 | v10.0 | 18/18 | ✓ Complete | 2026-03-16 |
-| 84. Shared HA API Client | 1/1 | Complete   | 2026-03-17 | - |
+| 84. Shared HA API Client | 1/1 | Complete    | 2026-03-17 | - |
 | 85. Fritz!Box Migration | v11.0 | 0/TBD | Not started | - |
 | 86. Netatmo Migration | v11.0 | 0/TBD | Not started | - |
 | 87. Client Cleanup | v11.0 | 0/TBD | Not started | - |

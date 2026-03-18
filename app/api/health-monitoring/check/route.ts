@@ -18,6 +18,7 @@ import {
   withCronSecret,
   success,
 } from '@/lib/core';
+import { raspiClient } from '@/lib/raspi';
 import { updateDeadManSwitch } from '@/lib/healthDeadManSwitch';
 import { checkUserStoveHealth } from '@/lib/healthMonitoring';
 import { logHealthCheckRun } from '@/lib/healthLogger';
@@ -152,6 +153,16 @@ export const GET = withCronSecret(async (request) => {
       actual: r.value.stateMismatch.actual,
     }));
 
+  // 7b. Check Raspberry Pi health (informational, isolated)
+  let raspiStatus: 'ok' | 'unreachable' = 'unreachable';
+  try {
+    await raspiClient.getHealth();
+    raspiStatus = 'ok';
+  } catch (err) {
+    console.warn('⚠️ Raspberry Pi health check failed:', err);
+    // Do NOT throw — stove/thermostat checks already complete
+  }
+
   // 8. Log summary
 
   return success({
@@ -159,6 +170,7 @@ export const GET = withCronSecret(async (request) => {
     successCount,
     failureCount,
     mismatches,
+    raspiStatus,
     timestamp: Date.now(),
     duration,
   });

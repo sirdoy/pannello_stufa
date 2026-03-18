@@ -62,7 +62,7 @@ See `.planning/milestones/` for full archives.
 **Milestone Goal:** Fix all failing tests and remove accumulated tech debt — the codebase runs a clean test suite with zero ordering dependencies, and no dead code or stale configuration remains.
 
 - [x] **Phase 92: Jest Configuration** - Exclude Playwright files and eliminate flaky ordering dependencies (completed 2026-03-18)
-- [ ] **Phase 93: API & Infrastructure Test Fixes** - Fix 8 failing test suites in server-side code
+- [x] **Phase 93: API & Infrastructure Test Fixes** - Fix 8 failing test suites in server-side code (completed 2026-03-18)
 - [ ] **Phase 94: Component & Hook Test Fixes** - Fix 4 failing test suites in UI and hooks
 - [ ] **Phase 95: Tech Debt Cleanup** - Remove manual memoization and stale env vars
 
@@ -94,7 +94,7 @@ Plans:
   6. `healthDeadManSwitch.test.ts` — ADMIN_USER_ID skip test passes
   7. `fritzbox/history.test.ts` — all 6 range/filter/empty tests pass
   8. `fritzbox/devices-events.test.ts` — all 6 event detection tests pass
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 - [ ] 93-01-PLAN.md — Fix middleware dynamic imports + changelog missing logs (TFIX-01, TFIX-02)
@@ -142,7 +142,7 @@ Plans:
 | 75-83 | v10.0 | 18/18 | ✓ Complete | 2026-03-16 |
 | 84-91 | v11.0 | 13/13 | ✓ Complete | 2026-03-18 |
 | 92. Jest Configuration | 1/1 | Complete    | 2026-03-18 | - |
-| 93. API & Infrastructure Test Fixes | 2/3 | In Progress|  | - |
+| 93. API & Infrastructure Test Fixes | 3/3 | Complete   | 2026-03-18 | - |
 | 94. Component & Hook Test Fixes | v11.1 | 0/TBD | Not started | - |
 | 95. Tech Debt Cleanup | v11.1 | 0/TBD | Not started | - |
 

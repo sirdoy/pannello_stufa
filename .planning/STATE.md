@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.1
 milestone_name: Test Suite & Tech Debt Cleanup
 status: planning
-stopped_at: Completed 93-02-PLAN.md
-last_updated: "2026-03-18T12:22:34.054Z"
+stopped_at: Completed 93-01-PLAN.md
+last_updated: "2026-03-18T12:25:13.978Z"
 last_activity: 2026-03-18 — Roadmap created, ready to plan Phase 92
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -50,6 +50,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 92-jest-configuration P01 | 28 | 2 tasks | 6 files |
 | Phase 93-api-infrastructure-test-fixes P03 | 70s | 2 tasks | 2 files |
 | Phase 93 P02 | 73s | 2 tasks | 4 files |
+| Phase 93-api-infrastructure-test-fixes P01 | 4 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,7 @@ Recent decisions affecting v11.1:
 - [Phase 93-api-infrastructure-test-fixes]: History route uses standalone getDeviceEvents(startTime, endTime) — not fritzboxClient method
 - [Phase 93-api-infrastructure-test-fixes]: Devices-events test rewritten to test current route behavior (cache + rate limit), negative assertions document event detection moved to HA proxy
 - [Phase 93]: Added console.log calls in 4 lib files to match test spy assertions — operational logs providing retry, maintenance, and scheduler diagnostics
+- [Phase 93-api-infrastructure-test-fixes]: TFIX-01 root cause was twofold: dynamic imports bypass Jest mocks AND NextResponseMock missing ok/clone() — both fixed in middleware.ts and jest.setup.ts
 
 ### Phase Structure
 
@@ -90,6 +92,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-18T12:22:34.050Z
-Stopped at: Completed 93-02-PLAN.md
+Last session: 2026-03-18T12:25:13.974Z
+Stopped at: Completed 93-01-PLAN.md
 Resume file: None

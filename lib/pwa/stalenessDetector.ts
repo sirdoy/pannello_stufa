@@ -66,7 +66,7 @@ export interface Command {
  *   console.log(`Data is ${staleness.ageSeconds} seconds old`);
  * }
  */
-export async function getDeviceStaleness(deviceId: string): Promise<StalenessInfo> {
+export async function getDeviceStaleness(deviceId: string, thresholdMs?: number): Promise<StalenessInfo> {
   try {
     const cached = await get<CachedDeviceState>(STORES.DEVICE_STATE, deviceId);
 
@@ -85,7 +85,7 @@ export async function getDeviceStaleness(deviceId: string): Promise<StalenessInf
     const ageSeconds = Math.floor(ageMs / 1000);
 
     return {
-      isStale: ageMs >= STALENESS_THRESHOLD,
+      isStale: ageMs >= (thresholdMs ?? STALENESS_THRESHOLD),
       cachedAt,
       ageSeconds,
     };

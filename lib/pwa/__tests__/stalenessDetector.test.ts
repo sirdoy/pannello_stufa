@@ -95,6 +95,23 @@ describe('stalenessDetector', () => {
 
       expect(result.isStale).toBe(true); // At threshold = stale
     });
+
+    it('uses custom threshold when provided', async () => {
+      const now = Date.now();
+      jest.mocked(indexedDB.get).mockResolvedValue({
+        deviceId: 'stove',
+        state: {},
+        timestamp: new Date(now - 60000).toISOString(), // 60s ago
+      });
+
+      // Default threshold (30s) — should be stale
+      const defaultResult = await getDeviceStaleness('stove');
+      expect(defaultResult.isStale).toBe(true);
+
+      // Custom threshold (90s) — should NOT be stale
+      const customResult = await getDeviceStaleness('stove', 90000);
+      expect(customResult.isStale).toBe(false);
+    });
   });
 
   describe('isCommandExpired', () => {

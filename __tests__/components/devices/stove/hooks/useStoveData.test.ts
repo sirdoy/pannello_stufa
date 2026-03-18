@@ -13,7 +13,7 @@ import * as errorMonitor from '@/lib/errorMonitor';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
 import { useDeviceStaleness } from '@/lib/hooks/useDeviceStaleness';
-import { useVisibility } from '@/lib/hooks/useVisibility';
+import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 
 // Mock all external dependencies
 jest.mock('@/lib/schedulerService');
@@ -23,13 +23,13 @@ jest.mock('@/lib/errorMonitor');
 jest.mock('@/lib/hooks/useOnlineStatus');
 jest.mock('@/lib/hooks/useBackgroundSync');
 jest.mock('@/lib/hooks/useDeviceStaleness');
-jest.mock('@/lib/hooks/useVisibility');
-jest.mock('firebase/database', () => ({
-  ref: jest.fn(),
-  onValue: jest.fn(() => jest.fn()),
-}));
-jest.mock('@/lib/firebase', () => ({
-  db: {},
+jest.mock('@/lib/hooks/useAdaptivePolling', () => ({
+  useAdaptivePolling: jest.fn((opts: any) => {
+    // Call callback immediately to simulate immediate:true
+    if (opts.immediate !== false && opts.interval !== null) {
+      opts.callback();
+    }
+  }),
 }));
 
 describe('useStoveData', () => {
@@ -65,7 +65,6 @@ describe('useStoveData', () => {
     });
 
     jest.mocked(useDeviceStaleness).mockReturnValue(null);
-    jest.mocked(useVisibility).mockReturnValue(true);
 
     jest.mocked(sandboxService.isLocalEnvironment).mockReturnValue(false);
     jest.mocked(errorMonitor.logError).mockResolvedValue(undefined);

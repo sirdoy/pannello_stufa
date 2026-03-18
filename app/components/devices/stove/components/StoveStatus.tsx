@@ -5,6 +5,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 import type { getStatusInfo, getStatusDisplay } from '../stoveStatusUtils';
 import type { StalenessInfo } from '@/lib/pwa/stalenessDetector';
+import { useVisibility } from '@/lib/hooks/useVisibility';
 
 interface StoveStatusProps {
   status: string;
@@ -13,7 +14,6 @@ interface StoveStatusProps {
   errorCode: number;
   sandboxMode: boolean;
   staleness: StalenessInfo | null;
-  isVisible: boolean;
   statusInfo: ReturnType<typeof getStatusInfo>;
   statusDisplay: ReturnType<typeof getStatusDisplay>;
 }
@@ -25,10 +25,10 @@ export default function StoveStatus({
   errorCode,
   sandboxMode,
   staleness,
-  isVisible,
   statusInfo,
   statusDisplay,
 }: StoveStatusProps) {
+  const isVisible = useVisibility();
   return (
     <div className="mb-6 relative">
       {/* Sandbox Badge */}

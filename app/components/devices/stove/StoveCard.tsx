@@ -132,7 +132,6 @@ export default function StoveCard() {
               errorCode={stoveData.errorCode}
               sandboxMode={stoveData.sandboxMode}
               staleness={stoveData.staleness}
-              isVisible={stoveData.isVisible}
               statusInfo={statusInfo}
               statusDisplay={statusDisplay}
             />

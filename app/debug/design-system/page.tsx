@@ -37,7 +37,7 @@ import CommandPalette from '@/app/components/ui/CommandPalette';
 import Kbd from '@/app/components/ui/Kbd';
 import DataTable from '@/app/components/ui/DataTable';
 import { WeatherIcon, getWeatherLabel } from '@/app/components/weather/WeatherIcon';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { z } from 'zod';
 import { Controller } from 'react-hook-form';
 import { Home, Settings, Power, Moon } from 'lucide-react';
@@ -2639,16 +2639,16 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
  */
 function DataTableDemo() {
   // Sample data
-  const sampleData = useMemo(() => [
+  const sampleData = [
     { id: '1', name: 'Thermostat Living Room', type: 'thermostat', status: 'online', lastUpdate: new Date('2026-02-05T08:00:00Z') },
     { id: '2', name: 'Stove Main', type: 'stove', status: 'online', lastUpdate: new Date('2026-02-05T07:45:00Z') },
     { id: '3', name: 'Lights Bedroom', type: 'lights', status: 'offline', lastUpdate: new Date('2026-02-04T22:30:00Z') },
     { id: '4', name: 'Sensor Kitchen', type: 'sensor', status: 'online', lastUpdate: new Date('2026-02-05T08:05:00Z') },
     { id: '5', name: 'Camera Garage', type: 'camera', status: 'offline', lastUpdate: new Date('2026-02-03T15:20:00Z') },
-  ], []);
+  ];
 
   // Column definitions
-  const columns = useMemo(() => [
+  const columns = [
     {
       accessorKey: 'name',
       header: 'Device Name',
@@ -2708,7 +2708,7 @@ function DataTableDemo() {
       },
       sortingFn: 'datetime',
     },
-  ], []);
+  ];
 
   return (
     <DataTable

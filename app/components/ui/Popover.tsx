@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { forwardRef, useState, useCallback, useRef } from 'react';
+import { forwardRef, useState, useRef } from 'react';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
@@ -196,21 +196,18 @@ function Popover({
   const isControlled = controlledOpen !== undefined;
   const isOpen = isControlled ? controlledOpen : uncontrolledOpen;
 
-  const handleOpenChange = useCallback(
-    (newOpen: boolean) => {
-      if (!isControlled) {
-        setUncontrolledOpen(newOpen);
-      }
-      onOpenChange?.(newOpen);
-    },
-    [isControlled, onOpenChange]
-  );
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!isControlled) {
+      setUncontrolledOpen(newOpen);
+    }
+    onOpenChange?.(newOpen);
+  };
 
   // Hover mode handlers - use refs to persist across renders
   const openTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleMouseEnter = useCallback(() => {
+  const handleMouseEnter = () => {
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = null;
@@ -218,9 +215,9 @@ function Popover({
     openTimeoutRef.current = setTimeout(() => {
       handleOpenChange(true);
     }, openDelay);
-  }, [handleOpenChange, openDelay]);
+  };
 
-  const handleMouseLeave = useCallback(() => {
+  const handleMouseLeave = () => {
     if (openTimeoutRef.current) {
       clearTimeout(openTimeoutRef.current);
       openTimeoutRef.current = null;
@@ -228,7 +225,7 @@ function Popover({
     closeTimeoutRef.current = setTimeout(() => {
       handleOpenChange(false);
     }, closeDelay);
-  }, [handleOpenChange, closeDelay]);
+  };
 
   // For hover mode, we wrap in a div with mouse handlers
   if (triggerMode === 'hover') {

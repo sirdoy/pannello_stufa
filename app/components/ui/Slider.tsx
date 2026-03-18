@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { forwardRef, useState, useCallback } from 'react';
+import { forwardRef, useState } from 'react';
 import * as SliderPrimitive from '@radix-ui/react-slider';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
@@ -134,7 +134,7 @@ const Slider = forwardRef<HTMLSpanElement, SliderProps>(function Slider(
   })();
 
   // Handle value change - unwrap for single-thumb mode
-  const handleValueChange = useCallback((values: number[]) => {
+  const handleValueChange = (values: number[]) => {
     setInternalValue(values);
 
     // Call appropriate callback
@@ -151,16 +151,16 @@ const Slider = forwardRef<HTMLSpanElement, SliderProps>(function Slider(
         }
       }
     }
-  }, [range, onValueChange, onChange]);
+  };
 
   // Track dragging for tooltip
-  const handlePointerDown = useCallback(() => {
+  const handlePointerDown = () => {
     setIsDragging(true);
-  }, []);
+  };
 
-  const handlePointerUp = useCallback(() => {
+  const handlePointerUp = () => {
     setIsDragging(false);
-  }, []);
+  };
 
   // Get display values for tooltips
   const displayValues = valueProp !== undefined ? normalizedValue : internalValue;

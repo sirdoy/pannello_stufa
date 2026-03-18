@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { forwardRef, useId, useState, useCallback, useEffect } from 'react';
+import { forwardRef, useId, useState, useEffect } from 'react';
 import * as Label from '@radix-ui/react-label';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
@@ -121,31 +121,28 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   const computedVariant = displayError ? 'error' : externalVariant;
 
   // Handle input changes
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = e.target.value;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
 
-      // Update internal state for uncontrolled mode
-      if (!isControlled) {
-        setInternalValue(newValue);
-      }
+    // Update internal state for uncontrolled mode
+    if (!isControlled) {
+      setInternalValue(newValue);
+    }
 
-      // Run validation if provided
-      if (validate) {
-        const error = validate(newValue);
-        setValidationError(error);
-      }
+    // Run validation if provided
+    if (validate) {
+      const error = validate(newValue);
+      setValidationError(error);
+    }
 
-      // Call external onChange
-      if (onChange) {
-        onChange(e);
-      }
-    },
-    [isControlled, validate, onChange]
-  );
+    // Call external onChange
+    if (onChange) {
+      onChange(e);
+    }
+  };
 
   // Handle clear button click
-  const handleClear = useCallback(() => {
+  const handleClear = () => {
     // Create a synthetic event for controlled components
     const syntheticEvent = {
       target: { value: '' },
@@ -167,7 +164,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     if (onChange) {
       onChange(syntheticEvent);
     }
-  }, [isControlled, validate, onChange]);
+  };
 
   // Defer input rendering to avoid hydration mismatch from browser extensions
   // (e.g. LastPass injecting data-lastpass-icon-root into the DOM before hydration)

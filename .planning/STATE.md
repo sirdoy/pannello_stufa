@@ -1,11 +1,11 @@
 ---
 gsd_state_version: 1.0
-milestone: none
-milestone_name: none
-status: idle
-stopped_at: v11.1 milestone completed
-last_updated: "2026-03-18T15:40:00.000Z"
-last_activity: 2026-03-18 — v11.1 milestone shipped
+milestone: v12.0
+milestone_name: Data Fetching Simplification & E2E Verification
+status: defining_requirements
+stopped_at: requirements defined
+last_updated: "2026-03-18T16:00:00.000Z"
+last_activity: 2026-03-18 — Milestone v12.0 started
 progress:
   total_phases: 0
   completed_phases: 0
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-18)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Planning next milestone
+**Current focus:** v12.0 Data Fetching Simplification & E2E Verification
 
 ## Current Position
 
-Phase: —
+Phase: Not started (defining requirements)
 Plan: —
-Status: Idle (between milestones)
-Last activity: 2026-03-18 — v11.1 Test Suite & Tech Debt Cleanup shipped
+Status: Defining requirements
+Last activity: 2026-03-18 — Milestone v12.0 started
 
 ## Performance Metrics
 
@@ -71,5 +71,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: v11.1 milestone completed
+Stopped at: Requirements defined for v12.0
 Resume file: None

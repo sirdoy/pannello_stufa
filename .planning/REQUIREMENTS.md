@@ -50,30 +50,30 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| POLL-01 | — | Pending |
-| POLL-02 | — | Pending |
-| POLL-03 | — | Pending |
-| POLL-04 | — | Pending |
-| POLL-05 | — | Pending |
-| POLL-06 | — | Pending |
-| POLL-07 | — | Pending |
-| POLL-08 | — | Pending |
-| E2E-01 | — | Pending |
-| E2E-02 | — | Pending |
-| E2E-03 | — | Pending |
-| E2E-04 | — | Pending |
-| E2E-05 | — | Pending |
-| E2E-06 | — | Pending |
-| E2E-07 | — | Pending |
-| E2E-08 | — | Pending |
-| E2E-09 | — | Pending |
-| E2E-10 | — | Pending |
+| POLL-01 | Phase 96 | Pending |
+| POLL-02 | Phase 96 | Pending |
+| POLL-03 | Phase 96 | Pending |
+| POLL-04 | Phase 96 | Pending |
+| POLL-05 | Phase 96 | Pending |
+| POLL-06 | Phase 96 | Pending |
+| POLL-07 | Phase 96 | Pending |
+| POLL-08 | Phase 96 | Pending |
+| E2E-01 | Phase 97 | Pending |
+| E2E-02 | Phase 97 | Pending |
+| E2E-03 | Phase 97 | Pending |
+| E2E-04 | Phase 97 | Pending |
+| E2E-05 | Phase 97 | Pending |
+| E2E-06 | Phase 97 | Pending |
+| E2E-07 | Phase 97 | Pending |
+| E2E-08 | Phase 97 | Pending |
+| E2E-09 | Phase 97 | Pending |
+| E2E-10 | Phase 97 | Pending |
 
 **Coverage:**
 - v12.0 requirements: 18 total
-- Mapped to phases: 0
-- Unmapped: 18 ⚠️
+- Mapped to phases: 18
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-18*
-*Last updated: 2026-03-18 after initial definition*
+*Last updated: 2026-03-18 — traceability filled after roadmap creation*

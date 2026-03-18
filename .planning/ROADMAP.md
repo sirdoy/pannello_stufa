@@ -18,6 +18,7 @@
 - ✅ **v10.0 Netatmo API Migration** — Phases 75-83 (shipped 2026-03-16)
 - ✅ **v11.0 API Unification & Raspberry Pi Monitor** — Phases 84-91 (shipped 2026-03-18)
 - ✅ **v11.1 Test Suite & Tech Debt Cleanup** — Phases 92-95 (shipped 2026-03-18)
+- 🚧 **v12.0 Data Fetching Simplification & E2E Verification** — Phases 96-97 (in progress)
 
 ## Phases
 
@@ -67,6 +68,49 @@ See `.planning/milestones/` for full archives.
 
 </details>
 
+### 🚧 v12.0 Data Fetching Simplification & E2E Verification (In Progress)
+
+**Milestone Goal:** Ridurre il carico sul server unificando tutto il polling a 60s via useAdaptivePolling, rimuovendo il Firebase RTDB listener real-time della stufa e sync-external-state, ed aggiungere Playwright tests che verificano ogni pagina carica correttamente.
+
+#### Phase 96: Polling Simplification
+
+- [ ] **Phase 96: Polling Simplification** - Unify all device hooks to 60s useAdaptivePolling, remove Firebase RTDB stove listener and sync-external-state
+
+#### Phase 97: E2E Page Verification
+
+- [ ] **Phase 97: E2E Page Verification** - Playwright tests verifying every app page loads without errors
+
+## Phase Details
+
+### Phase 96: Polling Simplification
+**Goal**: All device polling runs through useAdaptivePolling at 60s intervals, with the Firebase RTDB real-time listener and sync-external-state removed from the stove hook
+**Depends on**: Nothing (first phase of milestone)
+**Requirements**: POLL-01, POLL-02, POLL-03, POLL-04, POLL-05, POLL-06, POLL-07, POLL-08
+**Success Criteria** (what must be TRUE):
+  1. StoveCard fetches data on a 60s interval via useAdaptivePolling with no Firebase RTDB listener attached
+  2. No call to sync-external-state exists anywhere in the stove data fetching path
+  3. ThermostatCard, LightsCard, NetworkCard, and RaspiCard each poll at 60s (visible) and 5min (hidden)
+  4. useDeviceStaleness no longer runs a 5s polling loop — threshold check happens at 60s or on demand
+**Plans**: TBD
+
+Plans:
+- [ ] 96-01: Rewrite stove hook to use useAdaptivePolling (remove RTDB listener and sync-external-state)
+- [ ] 96-02: Extend remaining card hooks polling intervals to 60s
+
+### Phase 97: E2E Page Verification
+**Goal**: Every application page has a Playwright test that verifies it loads, shows content, and produces no console errors
+**Depends on**: Phase 96
+**Requirements**: E2E-01, E2E-02, E2E-03, E2E-04, E2E-05, E2E-06, E2E-07, E2E-08, E2E-09, E2E-10
+**Success Criteria** (what must be TRUE):
+  1. Homepage Playwright test confirms all visible dashboard cards render without JS errors
+  2. Each device page (/stove, /thermostat, /lights, /network, /raspi) has a test confirming data section is visible
+  3. Support pages (/analytics, /settings, /admin) each have a test confirming the page loads without error state
+  4. No page produces a console error or enters an infinite loading state during any test run
+**Plans**: TBD
+
+Plans:
+- [ ] 97-01: Write Playwright page-load tests for all app pages
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -87,9 +131,11 @@ See `.planning/milestones/` for full archives.
 | 75-83 | v10.0 | 18/18 | ✓ Complete | 2026-03-16 |
 | 84-91 | v11.0 | 13/13 | ✓ Complete | 2026-03-18 |
 | 92-95 | v11.1 | 9/9 | ✓ Complete | 2026-03-18 |
+| 96 | v12.0 | 0/TBD | Not started | - |
+| 97 | v12.0 | 0/TBD | Not started | - |
 
-**Total:** 16 milestones shipped, 95 phases complete, 370 plans executed.
+**Total:** 16 milestones shipped, 95 phases complete, 370 plans executed. v12.0 in progress.
 
 ---
 
-*Roadmap updated: 2026-03-18 — v11.1 milestone shipped*
+*Roadmap updated: 2026-03-18 — v12.0 milestone started*

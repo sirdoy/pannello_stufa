@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v12.0
 milestone_name: Data Fetching Simplification & E2E Verification
-status: defining_requirements
-stopped_at: requirements defined
-last_updated: "2026-03-18T16:00:00.000Z"
-last_activity: 2026-03-18 — Milestone v12.0 started
+status: ready_to_plan
+stopped_at: roadmap created
+last_updated: "2026-03-18T17:00:00.000Z"
+last_activity: 2026-03-18 — Roadmap created for v12.0 (2 phases, 18 requirements)
 progress:
-  total_phases: 0
+  total_phases: 2
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,14 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-18)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v12.0 Data Fetching Simplification & E2E Verification
+**Current focus:** v12.0 — Phase 96: Polling Simplification
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-18 — Milestone v12.0 started
+Phase: 96 of 97 (Polling Simplification)
+Plan: — (ready to plan)
+Status: Ready to plan
+Last activity: 2026-03-18 — Roadmap created, 2 phases mapped to 18 requirements
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -53,6 +55,10 @@ Last activity: 2026-03-18 — Milestone v12.0 started
 
 See PROJECT.md Key Decisions table for full history.
 
+Recent decisions affecting current work:
+- v11.1: React Compiler replaces manual memoization — confirms polling simplification is the right next lever for server load reduction
+- v7.0: alwaysActive flag for stove polling (safety-critical) — Phase 96 must NOT regress this: stove hook rewrite must preserve always-on polling behavior
+
 ### Pending Todos
 
 None.
@@ -61,15 +67,8 @@ None.
 
 None.
 
-### Quick Tasks Completed
-
-| # | Description | Date | Commit | Directory |
-|---|-------------|------|--------|-----------|
-| 31 | Hide debug and design-system pages in production | 2026-02-18 | 991f470 | [31-hide-debug-and-design-system-pages-in-pr](./quick/31-hide-debug-and-design-system-pages-in-pr/) |
-| 32 | controlla e pulisci tutta la documentazione inutile | 2026-03-14 | c2940eb | [32-controlla-e-pulisci-tutta-la-documentazi](./quick/32-controlla-e-pulisci-tutta-la-documentazi/) |
-
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Requirements defined for v12.0
+Stopped at: Roadmap created for v12.0. Ready to plan Phase 96.
 Resume file: None

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: API Unification & Raspberry Pi Monitor
 status: planning
-stopped_at: Completed 90-02-PLAN.md
-last_updated: "2026-03-18T07:41:48.519Z"
+stopped_at: Completed 90-01-PLAN.md
+last_updated: "2026-03-18T07:42:27.721Z"
 last_activity: 2026-03-17 — Phase 86 complete (3/3 plans, 7/7 verification)
 progress:
   total_phases: 7
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 12
-  completed_plans: 11
+  completed_plans: 12
   percent: 43
 ---
 
@@ -57,6 +57,7 @@ Progress: [████░░░░░░] 43% (3/7 phases)
 | Phase 89 P01 | 7 | 2 tasks | 5 files |
 | Phase 89 P02 | 17 minutes | 2 tasks | 4 files |
 | Phase 90 P02 | 4 minutes | 1 tasks | 2 files |
+| Phase 90 P01 | 4 | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,8 @@ Recent decisions relevant to v11.0:
 - [Phase 89]: colorTheme=sage for RaspiCard — consistent with NetworkCard infrastructure theme
 - [Phase 89]: RaspiStats is purely presentational — no useState/useEffect, receives data prop only
 - [Phase 90]: raspiStatus is informational — Pi failure uses console.warn (not error/notification), isolated try/catch preserves stove/thermostat checks
+- [Phase 90]: useRaspiFullData fetches all 4 endpoints in parallel — same pattern as useRaspiData but exposes all 16 fields for detail page
+- [Phase 90]: RaspiCard navigation wraps only data-present state — loading/error states not clickable, matches NetworkCard pattern
 
 ### Pending Todos
 
@@ -105,6 +108,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-18T07:41:48.515Z
-Stopped at: Completed 90-02-PLAN.md
+Last session: 2026-03-18T07:42:27.717Z
+Stopped at: Completed 90-01-PLAN.md
 Resume file: None

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { EndpointCard, PostEndpointCard } from '@/app/debug/components/ApiTab';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
@@ -28,7 +28,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
     }
   };
 
-  const fetchGetEndpoint = useCallback(async (name: string, url: string) => {
+  const fetchGetEndpoint = async (name: string, url: string) => {
     setLoadingGet((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {
@@ -42,12 +42,12 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
     } finally {
       setLoadingGet((prev) => ({ ...prev, [name]: false }));
     }
-  }, []);
+  };
 
-  const fetchAllGetEndpoints = useCallback(() => {
+  const fetchAllGetEndpoints = () => {
     fetchGetEndpoint('notificationStats', '/api/notifications/stats');
     fetchGetEndpoint('healthMonitoringStats', '/api/health-monitoring/stats');
-  }, [fetchGetEndpoint]);
+  };
 
   const callPostEndpoint = async (name: string, url: string, body: any) => {
     setLoadingPost((prev) => ({ ...prev, [name]: true }));

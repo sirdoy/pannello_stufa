@@ -94,8 +94,8 @@ See `.planning/milestones/` for full archives.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 96-01-PLAN.md — Rewrite stove hook (Firebase RTDB removal, useAdaptivePolling adoption, consumer cleanup)
-- [ ] 96-02-PLAN.md — Update remaining device hooks to 60s + useDeviceStaleness to 60s
+- [x] 96-01-PLAN.md — Rewrite stove hook (Firebase RTDB removal, useAdaptivePolling adoption, consumer cleanup)
+- [x] 96-02-PLAN.md — Update remaining device hooks to 60s + useDeviceStaleness to 60s
 
 ### Phase 97: E2E Page Verification
 **Goal**: Every application page has a Playwright test that verifies it loads, shows content, and produces no console errors
@@ -106,10 +106,10 @@ Plans:
   2. Each device page (/stove, /thermostat, /lights, /network, /raspi) has a test confirming data section is visible
   3. Support pages (/analytics, /settings, /admin) each have a test confirming the page loads without error state
   4. No page produces a console error or enters an infinite loading state during any test run
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 97-01: Write Playwright page-load tests for all app pages
+- [ ] 97-01-PLAN.md — Playwright smoke tests for all 9 app pages (homepage, 5 device pages, 3 support pages)
 
 ## Progress
 
@@ -131,11 +131,11 @@ Plans:
 | 75-83 | v10.0 | 18/18 | ✓ Complete | 2026-03-16 |
 | 84-91 | v11.0 | 13/13 | ✓ Complete | 2026-03-18 |
 | 92-95 | v11.1 | 9/9 | ✓ Complete | 2026-03-18 |
-| 96 | 2/2 | Complete    | 2026-03-18 | - |
-| 97 | v12.0 | 0/TBD | Not started | - |
+| 96 | v12.0 | 2/2 | ✓ Complete | 2026-03-18 |
+| 97 | v12.0 | 0/1 | Not started | - |
 
-**Total:** 16 milestones shipped, 95 phases complete, 370 plans executed. v12.0 in progress.
+**Total:** 16 milestones shipped, 96 phases complete, 372 plans executed. v12.0 in progress.
 
 ---
 
-*Roadmap updated: 2026-03-18 — Phase 96 planned (2 plans)*
+*Roadmap updated: 2026-03-18 — Phase 97 planned (1 plan)*

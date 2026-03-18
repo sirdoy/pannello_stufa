@@ -57,6 +57,7 @@ const customJestConfig: Config = {
     '<rootDir>/node_modules/',
     '<rootDir>/out/',
     '<rootDir>/__tests__/__utils__/',
+    '<rootDir>/tests/',   // Playwright .spec.ts files
   ],
 
   // Module file extensions

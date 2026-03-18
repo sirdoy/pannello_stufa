@@ -51,6 +51,12 @@ describe('StoveService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset MaintenanceRepository to default (canIgnite=true) so tests that override it
+    // (e.g. 'should not sync when maintenance check fails') don't leak into subsequent tests
+    // when running in randomized order. clearAllMocks() does not reset mockImplementation.
+    (MaintenanceRepository as jest.Mock).mockImplementation(() => ({
+      canIgnite: jest.fn().mockResolvedValue(true),
+    }));
     service = new StoveService();
   });
 

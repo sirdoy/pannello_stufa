@@ -20,6 +20,10 @@ jest.mock('../useVisibility', () => ({
 describe('useDeviceStaleness', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset useVisibility to default (visible=true) after clearAllMocks
+    // clearAllMocks() does not reset mockReturnValue, so tests that set it to false
+    // would leak into subsequent tests when run in randomized order.
+    jest.mocked(useVisibility).mockReturnValue(true);
     jest.useFakeTimers();
   });
 

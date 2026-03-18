@@ -19,7 +19,7 @@ const mockGetEnvironmentPath = jest.mocked(getEnvironmentPath);
 
 describe('weatherCacheService', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
     // Default: identity function (production-like, no prefix)
     mockGetEnvironmentPath.mockImplementation((path: string) => path);
   });

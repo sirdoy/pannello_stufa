@@ -108,9 +108,9 @@ describe('ThermostatSettingsPage - Auth Race Condition Fix', () => {
   });
 
   it('should handle auth state transitions correctly', async () => {
-    // Start with loading state
-    const { rerender } = render(<ThermostatSettingsPage />);
+    // Start with loading state — set mock BEFORE render so component sees correct initial state
     mockUseUser.mockReturnValue({ user: null, isLoading: true });
+    const { rerender } = render(<ThermostatSettingsPage />);
 
     // Should show skeleton (no panels yet)
     expect(screen.queryByTestId('pid-automation-panel')).not.toBeInTheDocument();

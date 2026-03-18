@@ -1,0 +1,79 @@
+# Requirements: Pannello Stufa
+
+**Defined:** 2026-03-18
+**Core Value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
+
+## v11.1 Requirements
+
+Requirements for test suite cleanup and tech debt resolution.
+
+### Jest Configuration
+
+- [ ] **JEST-01**: Playwright .spec.ts files excluded from Jest runner
+- [ ] **JEST-02**: Flaky tests pass reliably in full suite run (no ordering dependency)
+
+### Test Fixes — API & Infrastructure
+
+- [ ] **TFIX-01**: middleware.test.ts — withIdempotency tests pass (3 tests)
+- [ ] **TFIX-02**: changelogService.test.ts — saveVersion/syncVersion tests pass (4 tests)
+- [ ] **TFIX-03**: stoveApi.test.ts — fetchWithRetry retry logging test passes (1 test)
+- [ ] **TFIX-04**: maintenanceService.test.ts — needsCleaning threshold test passes (1 test)
+- [ ] **TFIX-05**: schedulerService.test.ts — save/set/clear schedule tests pass (5 tests)
+- [ ] **TFIX-06**: healthDeadManSwitch.test.ts — ADMIN_USER_ID skip test passes (1 test)
+- [ ] **TFIX-07**: fritzbox/history.test.ts — range/filter/empty tests pass (6 tests)
+- [ ] **TFIX-08**: fritzbox/devices-events.test.ts — event detection tests pass (6 tests)
+
+### Test Fixes — Components & Hooks
+
+- [ ] **TFIX-09**: StovePrimaryActions.test.tsx — disable state tests pass (3 tests)
+- [ ] **TFIX-10**: useNetworkData.test.ts — stale flag timeout test passes (1 test)
+- [ ] **TFIX-11**: useDeviceHistory.test.ts — fetch/refresh tests pass (2 tests)
+- [ ] **TFIX-12**: VersionContext.test.tsx — version check tests pass (4 tests)
+
+### Tech Debt Cleanup
+
+- [ ] **DEBT-01**: Remove manual useMemo/useCallback replaced by React Compiler
+- [ ] **DEBT-02**: Remove stale env vars from .env.local (8 HOMEASSISTANT_*/NETATMO_* vars)
+
+## Future Requirements
+
+None — this is a cleanup milestone.
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| New test coverage for untested code | This milestone fixes existing tests only |
+| Nyquist validation for v10.0/v11.0 | Metadata-only, no runtime impact |
+| 3 Netatmo routes without frontend consumer | Working API routes, consumers deferred |
+| Remove 179 unused exports | 131 are intentional design system barrel exports |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| JEST-01 | — | Pending |
+| JEST-02 | — | Pending |
+| TFIX-01 | — | Pending |
+| TFIX-02 | — | Pending |
+| TFIX-03 | — | Pending |
+| TFIX-04 | — | Pending |
+| TFIX-05 | — | Pending |
+| TFIX-06 | — | Pending |
+| TFIX-07 | — | Pending |
+| TFIX-08 | — | Pending |
+| TFIX-09 | — | Pending |
+| TFIX-10 | — | Pending |
+| TFIX-11 | — | Pending |
+| TFIX-12 | — | Pending |
+| DEBT-01 | — | Pending |
+| DEBT-02 | — | Pending |
+
+**Coverage:**
+- v11.1 requirements: 16 total
+- Mapped to phases: 0
+- Unmapped: 16 ⚠️
+
+---
+*Requirements defined: 2026-03-18*
+*Last updated: 2026-03-18 after initial definition*

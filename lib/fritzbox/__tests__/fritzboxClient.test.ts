@@ -37,27 +37,28 @@ describe('fritzboxClient', () => {
   });
 
   describe('getDevices()', () => {
-    it('transforms raw device response (status->active, mac->id)', async () => {
+    it('transforms paginated device response (status->active, mac->id)', async () => {
       mockHaGet.mockResolvedValue({
-        devices: [
-          { ip: '192.168.178.25', name: 'iPhone', mac: 'AA:BB:CC:DD:EE:FF', status: 1 },
-          { ip: '192.168.178.30', name: 'Printer', mac: '11:22:33:44:55:66', status: 0 },
+        items: [
+          { ip: '192.168.178.25', name: 'iPhone', mac: 'AA:BB:CC:DD:EE:FF', status: 1, provider_type: 'fritzbox' },
+          { ip: '192.168.178.30', name: 'Printer', mac: '11:22:33:44:55:66', status: 0, provider_type: 'fritzbox' },
         ],
-        is_stale: false,
-        fetched_at: '2026-02-13T14:00:00Z',
+        total_count: 2,
+        limit: 1000,
+        offset: 0,
       });
 
       const result = await fritzboxClient.getDevices();
 
-      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/devices');
+      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/fritzbox/devices?limit=1000');
       expect(result).toEqual([
         { id: 'AA:BB:CC:DD:EE:FF', name: 'iPhone', ip: '192.168.178.25', mac: 'AA:BB:CC:DD:EE:FF', active: true },
         { id: '11:22:33:44:55:66', name: 'Printer', ip: '192.168.178.30', mac: '11:22:33:44:55:66', active: false },
       ]);
     });
 
-    it('returns empty array when devices is empty', async () => {
-      mockHaGet.mockResolvedValue({ devices: [], is_stale: false, fetched_at: '2026-02-13T14:00:00Z' });
+    it('returns empty array when items is empty', async () => {
+      mockHaGet.mockResolvedValue({ items: [], total_count: 0, limit: 1000, offset: 0 });
       const result = await fritzboxClient.getDevices();
       expect(result).toEqual([]);
     });
@@ -68,18 +69,52 @@ describe('fritzboxClient', () => {
       mockHaGet.mockResolvedValue({
         upstream_bps: 50_000_000,
         downstream_bps: 250_000_000,
+        bytes_sent: 45678901234,
+        bytes_received: 123456789012,
         is_stale: false,
         fetched_at: '2026-02-13T14:00:00Z',
       });
 
       const result = await fritzboxClient.getBandwidth();
 
-      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/bandwidth');
+      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/fritzbox/bandwidth');
       expect(result).toEqual({
         download: 250,
         upload: 50,
         timestamp: new Date('2026-02-13T14:00:00Z').getTime(),
       });
+    });
+
+    it('uses Date.now() when fetched_at is null', async () => {
+      const now = Date.now();
+      mockHaGet.mockResolvedValue({
+        upstream_bps: 0,
+        downstream_bps: 0,
+        bytes_sent: 0,
+        bytes_received: 0,
+        is_stale: true,
+        fetched_at: null,
+      });
+
+      const result = await fritzboxClient.getBandwidth();
+
+      expect(result.timestamp).toBeGreaterThanOrEqual(now);
+    });
+
+    it('handles non-standard ISO 8601 with duplicate timezone (offset+Z)', async () => {
+      mockHaGet.mockResolvedValue({
+        upstream_bps: 1_000_000,
+        downstream_bps: 10_000_000,
+        bytes_sent: 0,
+        bytes_received: 0,
+        is_stale: false,
+        fetched_at: '2026-03-18T09:01:49.196496+00:00Z',
+      });
+
+      const result = await fritzboxClient.getBandwidth();
+
+      expect(result.timestamp).toBe(new Date('2026-03-18T09:01:49.196496+00:00').getTime());
+      expect(result.download).toBe(10);
     });
   });
 
@@ -98,7 +133,7 @@ describe('fritzboxClient', () => {
 
       const result = await fritzboxClient.getWanStatus();
 
-      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/wan');
+      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/fritzbox/wan');
       expect(result).toEqual({
         connected: true,
         uptime: 345678,
@@ -110,23 +145,30 @@ describe('fritzboxClient', () => {
   });
 
   describe('getBandwidthHistory()', () => {
-    it('converts timestamps to ms and rates to Mbps, sorted ascending', async () => {
+    it('converts paginated timestamps to ms and rates to Mbps, sorted ascending', async () => {
       mockHaGet.mockResolvedValue({
-        records: [
-          { timestamp: 1707840000, bytes_sent: 0, bytes_received: 0, upstream_rate: 10_000_000, downstream_rate: 100_000_000 },
-          { timestamp: 1707836400, bytes_sent: 0, bytes_received: 0, upstream_rate: 5_000_000, downstream_rate: 50_000_000 },
+        items: [
+          { timestamp: 1707840000, bytes_sent: 0, bytes_received: 0, upstream_rate: 10_000_000, downstream_rate: 100_000_000, latency_ms: null, connection_uptime: null, external_ip: null, connection_type: null },
+          { timestamp: 1707836400, bytes_sent: 0, bytes_received: 0, upstream_rate: 5_000_000, downstream_rate: 50_000_000, latency_ms: null, connection_uptime: null, external_ip: null, connection_type: null },
         ],
-        hours_requested: 24,
-        record_count: 2,
+        total_count: 2,
+        limit: 1000,
+        offset: 0,
       });
 
       const result = await fritzboxClient.getBandwidthHistory(24);
 
-      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/history/bandwidth?hours=24');
+      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/fritzbox/history/bandwidth?hours=24&limit=1000');
       expect(result).toEqual([
         { time: 1707836400000, download: 50, upload: 5 },
         { time: 1707840000000, download: 100, upload: 10 },
       ]);
+    });
+
+    it('returns empty array when no records', async () => {
+      mockHaGet.mockResolvedValue({ items: [], total_count: 0, limit: 1000, offset: 0 });
+      const result = await fritzboxClient.getBandwidthHistory(1);
+      expect(result).toEqual([]);
     });
   });
 

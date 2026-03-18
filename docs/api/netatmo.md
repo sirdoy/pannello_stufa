@@ -1494,7 +1494,7 @@ curl -s "YOUR_BASE_URL/api/v1/netatmo/camera/events?hours=72" \
 
 ### GET /camera/events/{event_id}/snapshot
 
-Return a binary JPEG snapshot for a specific camera event. Fetches the snapshot from the Netatmo CDN URL stored in SQLite and proxies the raw bytes. This is the only binary endpoint in the platform.
+Return a binary JPEG snapshot for a specific camera event. Serves the JPEG snapshot stored in SQLite BLOB cache at event detection time. This is the only binary endpoint in the platform.
 
 **Authentication:** Required (JWT Bearer or API Key)
 
@@ -1529,6 +1529,5 @@ curl -s YOUR_BASE_URL/api/v1/netatmo/camera/events/EVENT_ID/snapshot \
 | Status | Condition | Example |
 |--------|-----------|---------|
 | 401 | Missing or invalid authentication | `{"detail": "Not authenticated"}` |
-| 404 | event_id not found in DB, or event has no snapshot_url | `{"detail": "Event 'abc123' not found"}` |
-| 502 | Netatmo CDN returned HTTP error or snapshot fetch failed | `{"detail": "Upstream error: ..."}` |
+| 404 | event_id not found in DB, or snapshot_blob IS NULL (not cached) | `{"detail": "Event 'abc123' not found"}` |
 | 503 | Provider not initialized or DOWN | `{"detail": "Netatmo provider is currently unavailable"}` |

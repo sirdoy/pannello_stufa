@@ -901,6 +901,73 @@ curl "YOUR_BASE_URL/api/v1/fritzbox/history/devices?hours=24&limit=100" \
 
 ---
 
+### GET /api/v1/fritzbox/history/device-events
+
+Device connection/disconnection events — computed by comparing consecutive snapshots. Only state changes are returned (not raw snapshots).
+
+**Authentication:** Required (JWT Bearer or API Key)
+
+**Query Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `hours` | integer | 24 | Hours of history (1-168) |
+| `mac` | string | — | Filter by MAC address |
+| `limit` | integer | 100 | Items per page (1-1000) |
+| `offset` | integer | 0 | Items to skip |
+
+**Response:**
+
+```json
+{
+  "items": [
+    {
+      "timestamp": 1773824500,
+      "mac": "AA:BB:CC:DD:EE:FF",
+      "name": "iPhone-Federico",
+      "ip": "192.168.178.25",
+      "event_type": "connected"
+    },
+    {
+      "timestamp": 1773820900,
+      "mac": "AA:BB:CC:DD:EE:FF",
+      "name": "iPhone-Federico",
+      "ip": "192.168.178.25",
+      "event_type": "disconnected"
+    }
+  ],
+  "total_count": 42,
+  "limit": 100,
+  "offset": 0
+}
+```
+
+```typescript
+interface DeviceEventRecord {
+  timestamp: number;
+  mac: string;
+  name: string;
+  ip: string;
+  event_type: "connected" | "disconnected";
+}
+```
+
+**curl:**
+
+```bash
+curl "YOUR_BASE_URL/api/v1/fritzbox/history/device-events?hours=24&limit=100" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Filter by device:**
+
+```bash
+curl "YOUR_BASE_URL/api/v1/fritzbox/history/device-events?hours=48&mac=AA:BB:CC:DD:EE:FF" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+---
+
 ### GET /api/v1/fritzbox/history/bandwidth/hourly
 
 Hourly bandwidth aggregations (avg/min/max per hour). Use for 1-30 day charts.

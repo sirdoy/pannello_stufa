@@ -183,7 +183,7 @@ Plans:
 | 87. Client Cleanup | 2/2 | Complete    | 2026-03-17 | - |
 | 88. Raspberry Pi API Layer | 1/1 | Complete    | 2026-03-17 | - |
 | 89. Raspberry Pi Dashboard Card | 2/2 | Complete    | 2026-03-17 | - |
-| 90. Raspberry Pi Page + Cron | 2/2 | Complete   | 2026-03-18 | - |
+| 90. Raspberry Pi Page + Cron | 2/2 | Complete    | 2026-03-18 | - |
 
 **Total:** 14 milestones shipped, 83 phases complete, 348 plans executed. v11.0 in progress (7 phases planned, phases 84-90).
 

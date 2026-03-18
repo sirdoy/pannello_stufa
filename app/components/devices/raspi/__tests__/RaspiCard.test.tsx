@@ -1,9 +1,14 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import RaspiCard from '../RaspiCard';
 import { useRaspiData } from '../hooks/useRaspiData';
 import type { UseRaspiDataReturn } from '../hooks/useRaspiData';
 
 jest.mock('../hooks/useRaspiData');
+
+const mockPush = jest.fn();
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
 const mockUseRaspiData = jest.mocked(useRaspiData);
 
 // Mock SmartHomeCard and HealthIndicator as pass-through
@@ -94,5 +99,23 @@ describe('RaspiCard', () => {
     });
     render(<RaspiCard />);
     expect(screen.getByText('—')).toBeInTheDocument();
+  });
+
+  it('navigates to /raspi when data card is clicked', () => {
+    mockUseRaspiData.mockReturnValue(baseData);
+    render(<RaspiCard />);
+    const link = screen.getByRole('link');
+    fireEvent.click(link);
+    expect(mockPush).toHaveBeenCalledWith('/raspi');
+  });
+
+  it('does not navigate when in error state', () => {
+    mockUseRaspiData.mockReturnValue({
+      ...baseData,
+      data: null,
+      error: 'Raspberry Pi non raggiungibile',
+    });
+    render(<RaspiCard />);
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 });

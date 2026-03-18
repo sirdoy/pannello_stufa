@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.1
 milestone_name: Test Suite & Tech Debt Cleanup
 status: planning
-stopped_at: Phase 93 context gathered
-last_updated: "2026-03-18T12:05:47.086Z"
+stopped_at: Completed 93-02-PLAN.md
+last_updated: "2026-03-18T12:22:34.054Z"
 last_activity: 2026-03-18 — Roadmap created, ready to plan Phase 92
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 1
-  completed_plans: 1
+  total_plans: 4
+  completed_plans: 3
   percent: 0
 ---
 
@@ -48,6 +48,8 @@ Progress: [░░░░░░░░░░] 0%
 | v10.0 Netatmo API Migration | 75-83 | 18 | 2 days |
 | v11.0 API Unification & Raspberry Pi | 84-91 | 13 | 2 days |
 | Phase 92-jest-configuration P01 | 28 | 2 tasks | 6 files |
+| Phase 93-api-infrastructure-test-fixes P03 | 70s | 2 tasks | 2 files |
+| Phase 93 P02 | 73s | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -60,6 +62,9 @@ Recent decisions affecting v11.1:
 - [v11.0]: 8 stale env vars (HOMEASSISTANT_*, NETATMO_*) remain in .env.local after migration, flagged for cleanup
 - [Phase 92-jest-configuration]: testPathIgnorePatterns used to exclude <rootDir>/tests/ from Jest (JEST-01)
 - [Phase 92-jest-configuration]: clearAllMocks does not reset mockReturnValue/mockImplementation — 4 suites fixed with explicit beforeEach resets (JEST-02)
+- [Phase 93-api-infrastructure-test-fixes]: History route uses standalone getDeviceEvents(startTime, endTime) — not fritzboxClient method
+- [Phase 93-api-infrastructure-test-fixes]: Devices-events test rewritten to test current route behavior (cache + rate limit), negative assertions document event detection moved to HA proxy
+- [Phase 93]: Added console.log calls in 4 lib files to match test spy assertions — operational logs providing retry, maintenance, and scheduler diagnostics
 
 ### Phase Structure
 
@@ -85,6 +90,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-18T12:05:47.082Z
-Stopped at: Phase 93 context gathered
-Resume file: .planning/phases/93-api-infrastructure-test-fixes/93-CONTEXT.md
+Last session: 2026-03-18T12:22:34.050Z
+Stopped at: Completed 93-02-PLAN.md
+Resume file: None

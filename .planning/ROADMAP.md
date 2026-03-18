@@ -94,7 +94,7 @@ Plans:
   6. `healthDeadManSwitch.test.ts` — ADMIN_USER_ID skip test passes
   7. `fritzbox/history.test.ts` — all 6 range/filter/empty tests pass
   8. `fritzbox/devices-events.test.ts` — all 6 event detection tests pass
-**Plans:** 3 plans
+**Plans:** 2/3 plans executed
 
 Plans:
 - [ ] 93-01-PLAN.md — Fix middleware dynamic imports + changelog missing logs (TFIX-01, TFIX-02)
@@ -142,7 +142,7 @@ Plans:
 | 75-83 | v10.0 | 18/18 | ✓ Complete | 2026-03-16 |
 | 84-91 | v11.0 | 13/13 | ✓ Complete | 2026-03-18 |
 | 92. Jest Configuration | 1/1 | Complete    | 2026-03-18 | - |
-| 93. API & Infrastructure Test Fixes | v11.1 | 0/3 | Not started | - |
+| 93. API & Infrastructure Test Fixes | 2/3 | In Progress|  | - |
 | 94. Component & Hook Test Fixes | v11.1 | 0/TBD | Not started | - |
 | 95. Tech Debt Cleanup | v11.1 | 0/TBD | Not started | - |
 

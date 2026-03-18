@@ -16,12 +16,12 @@ Requirements for test suite cleanup and tech debt resolution.
 
 - [ ] **TFIX-01**: middleware.test.ts — withIdempotency tests pass (3 tests)
 - [ ] **TFIX-02**: changelogService.test.ts — saveVersion/syncVersion tests pass (4 tests)
-- [ ] **TFIX-03**: stoveApi.test.ts — fetchWithRetry retry logging test passes (1 test)
-- [ ] **TFIX-04**: maintenanceService.test.ts — needsCleaning threshold test passes (1 test)
-- [ ] **TFIX-05**: schedulerService.test.ts — save/set/clear schedule tests pass (5 tests)
-- [ ] **TFIX-06**: healthDeadManSwitch.test.ts — ADMIN_USER_ID skip test passes (1 test)
-- [ ] **TFIX-07**: fritzbox/history.test.ts — range/filter/empty tests pass (6 tests)
-- [ ] **TFIX-08**: fritzbox/devices-events.test.ts — event detection tests pass (6 tests)
+- [x] **TFIX-03**: stoveApi.test.ts — fetchWithRetry retry logging test passes (1 test)
+- [x] **TFIX-04**: maintenanceService.test.ts — needsCleaning threshold test passes (1 test)
+- [x] **TFIX-05**: schedulerService.test.ts — save/set/clear schedule tests pass (5 tests)
+- [x] **TFIX-06**: healthDeadManSwitch.test.ts — ADMIN_USER_ID skip test passes (1 test)
+- [x] **TFIX-07**: fritzbox/history.test.ts — range/filter/empty tests pass (6 tests)
+- [x] **TFIX-08**: fritzbox/devices-events.test.ts — event detection tests pass (6 tests)
 
 ### Test Fixes — Components & Hooks
 
@@ -56,12 +56,12 @@ None — this is a cleanup milestone.
 | JEST-02 | Phase 92 | Complete |
 | TFIX-01 | Phase 93 | Pending |
 | TFIX-02 | Phase 93 | Pending |
-| TFIX-03 | Phase 93 | Pending |
-| TFIX-04 | Phase 93 | Pending |
-| TFIX-05 | Phase 93 | Pending |
-| TFIX-06 | Phase 93 | Pending |
-| TFIX-07 | Phase 93 | Pending |
-| TFIX-08 | Phase 93 | Pending |
+| TFIX-03 | Phase 93 | Complete |
+| TFIX-04 | Phase 93 | Complete |
+| TFIX-05 | Phase 93 | Complete |
+| TFIX-06 | Phase 93 | Complete |
+| TFIX-07 | Phase 93 | Complete |
+| TFIX-08 | Phase 93 | Complete |
 | TFIX-09 | Phase 94 | Pending |
 | TFIX-10 | Phase 94 | Pending |
 | TFIX-11 | Phase 94 | Pending |

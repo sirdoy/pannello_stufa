@@ -14,8 +14,8 @@ Requirements for test suite cleanup and tech debt resolution.
 
 ### Test Fixes — API & Infrastructure
 
-- [ ] **TFIX-01**: middleware.test.ts — withIdempotency tests pass (3 tests)
-- [ ] **TFIX-02**: changelogService.test.ts — saveVersion/syncVersion tests pass (4 tests)
+- [x] **TFIX-01**: middleware.test.ts — withIdempotency tests pass (3 tests)
+- [x] **TFIX-02**: changelogService.test.ts — saveVersion/syncVersion tests pass (4 tests)
 - [x] **TFIX-03**: stoveApi.test.ts — fetchWithRetry retry logging test passes (1 test)
 - [x] **TFIX-04**: maintenanceService.test.ts — needsCleaning threshold test passes (1 test)
 - [x] **TFIX-05**: schedulerService.test.ts — save/set/clear schedule tests pass (5 tests)
@@ -25,10 +25,10 @@ Requirements for test suite cleanup and tech debt resolution.
 
 ### Test Fixes — Components & Hooks
 
-- [ ] **TFIX-09**: StovePrimaryActions.test.tsx — disable state tests pass (3 tests)
+- [x] **TFIX-09**: StovePrimaryActions.test.tsx — disable state tests pass (3 tests)
 - [ ] **TFIX-10**: useNetworkData.test.ts — stale flag timeout test passes (1 test)
 - [ ] **TFIX-11**: useDeviceHistory.test.ts — fetch/refresh tests pass (2 tests)
-- [ ] **TFIX-12**: VersionContext.test.tsx — version check tests pass (4 tests)
+- [x] **TFIX-12**: VersionContext.test.tsx — version check tests pass (4 tests)
 
 ### Tech Debt Cleanup
 
@@ -54,18 +54,18 @@ None — this is a cleanup milestone.
 |-------------|-------|--------|
 | JEST-01 | Phase 92 | Complete |
 | JEST-02 | Phase 92 | Complete |
-| TFIX-01 | Phase 93 | Pending |
-| TFIX-02 | Phase 93 | Pending |
+| TFIX-01 | Phase 93 | Complete |
+| TFIX-02 | Phase 93 | Complete |
 | TFIX-03 | Phase 93 | Complete |
 | TFIX-04 | Phase 93 | Complete |
 | TFIX-05 | Phase 93 | Complete |
 | TFIX-06 | Phase 93 | Complete |
 | TFIX-07 | Phase 93 | Complete |
 | TFIX-08 | Phase 93 | Complete |
-| TFIX-09 | Phase 94 | Pending |
+| TFIX-09 | Phase 94 | Complete |
 | TFIX-10 | Phase 94 | Pending |
 | TFIX-11 | Phase 94 | Pending |
-| TFIX-12 | Phase 94 | Pending |
+| TFIX-12 | Phase 94 | Complete |
 | DEBT-01 | Phase 95 | Pending |
 | DEBT-02 | Phase 95 | Pending |
 

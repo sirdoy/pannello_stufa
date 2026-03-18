@@ -57,7 +57,7 @@ See `.planning/milestones/` for full archives.
 
 </details>
 
-### 🚧 v11.1 Test Suite & Tech Debt Cleanup (In Progress)
+### v11.1 Test Suite & Tech Debt Cleanup (In Progress)
 
 **Milestone Goal:** Fix all failing tests and remove accumulated tech debt — the codebase runs a clean test suite with zero ordering dependencies, and no dead code or stale configuration remains.
 
@@ -124,7 +124,12 @@ Plans:
   1. No `useMemo` or `useCallback` calls remain in component/hook files that React Compiler already handles
   2. `.env.local` contains no `HOMEASSISTANT_*` or `NETATMO_*` variables (the 8 stale vars from pre-v11.0)
   3. All tests continue to pass after memoization removal (React Compiler handles it transparently)
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 95-01-PLAN.md — Remove useMemo/useCallback from 15 high-density hook and component files (DEBT-01)
+- [ ] 95-02-PLAN.md — Remove useMemo/useCallback from 48 remaining files (DEBT-01)
+- [ ] 95-03-PLAN.md — Delete 8 stale env vars from .env.local (DEBT-02)
 
 ## Progress
 
@@ -148,10 +153,10 @@ Plans:
 | 92. Jest Configuration | 1/1 | Complete    | 2026-03-18 | - |
 | 93. API & Infrastructure Test Fixes | 3/3 | Complete    | 2026-03-18 | - |
 | 94. Component & Hook Test Fixes | 2/2 | Complete    | 2026-03-18 | - |
-| 95. Tech Debt Cleanup | v11.1 | 0/TBD | Not started | - |
+| 95. Tech Debt Cleanup | v11.1 | 0/3 | Not started | - |
 
 **Total:** 15 milestones shipped, 91 phases complete, 361 plans executed. 4 phases planned for v11.1.
 
 ---
 
-*Roadmap updated: 2026-03-18 — Phase 94 planned (2 plans)*
+*Roadmap updated: 2026-03-18 — Phase 95 planned (3 plans)*

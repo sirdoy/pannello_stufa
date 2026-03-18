@@ -64,7 +64,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 92: Jest Configuration** - Exclude Playwright files and eliminate flaky ordering dependencies (completed 2026-03-18)
 - [x] **Phase 93: API & Infrastructure Test Fixes** - Fix 8 failing test suites in server-side code (completed 2026-03-18)
 - [x] **Phase 94: Component & Hook Test Fixes** - Fix 4 failing test suites in UI and hooks (completed 2026-03-18)
-- [ ] **Phase 95: Tech Debt Cleanup** - Remove manual memoization and stale env vars
+- [x] **Phase 95: Tech Debt Cleanup** - Remove manual memoization and stale env vars (completed 2026-03-18)
 
 ## Phase Details
 
@@ -124,7 +124,7 @@ Plans:
   1. No `useMemo` or `useCallback` calls remain in component/hook files that React Compiler already handles
   2. `.env.local` contains no `HOMEASSISTANT_*` or `NETATMO_*` variables (the 8 stale vars from pre-v11.0)
   3. All tests continue to pass after memoization removal (React Compiler handles it transparently)
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 - [ ] 95-01-PLAN.md — Remove useMemo/useCallback from 15 high-density hook and component files (DEBT-01)
@@ -153,7 +153,7 @@ Plans:
 | 92. Jest Configuration | 1/1 | Complete    | 2026-03-18 | - |
 | 93. API & Infrastructure Test Fixes | 3/3 | Complete    | 2026-03-18 | - |
 | 94. Component & Hook Test Fixes | 2/2 | Complete    | 2026-03-18 | - |
-| 95. Tech Debt Cleanup | 2/3 | In Progress|  | - |
+| 95. Tech Debt Cleanup | 3/3 | Complete   | 2026-03-18 | - |
 
 **Total:** 15 milestones shipped, 91 phases complete, 361 plans executed. 4 phases planned for v11.1.
 

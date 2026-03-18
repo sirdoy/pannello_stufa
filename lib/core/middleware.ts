@@ -23,6 +23,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth0 } from '@/lib/auth0';
 import { unauthorized, handleError } from './apiResponse';
+import { ref, get, set } from 'firebase/database';
+import { db } from '@/lib/firebase';
 
 // =============================================================================
 // TYPE DEFINITIONS
@@ -279,8 +281,6 @@ export function withIdempotency(handler: AuthedHandler, logContext?: string): Au
     }
 
     // Check for cached result
-    const { ref, get, set } = await import('firebase/database');
-    const { db } = await import('@/lib/firebase');
     const resultRef = ref(db, `idempotency/results/${idempotencyKey}`);
 
     try {

@@ -255,21 +255,27 @@ jest.mock('next/navigation', () => ({
 // Mock Next.js server (updated for Next.js 16)
 // Use mockImplementation to survive jest.clearAllMocks()
 const nextResponseJsonImpl = (body: unknown, init?: { status?: number; headers?: HeadersInit }) => {
+  const status = init?.status || 200;
   const response = {
-    status: init?.status || 200,
+    status,
+    ok: status >= 200 && status < 300,
     headers: new Headers(init?.headers || {}),
     json: async () => body,
+    clone: () => ({ ...response, json: async () => body }),
   };
   return response;
 };
 
 // Create NextResponse as a constructor function with static methods
 function NextResponseMock(body: any, init?: { status?: number; headers?: HeadersInit }) {
+  const status = init?.status || 200;
   return {
     body,
-    status: init?.status || 200,
+    status,
+    ok: status >= 200 && status < 300,
     headers: new Headers(init?.headers || {}),
     json: async () => body,
+    clone: function() { return { ...this }; },
   };
 }
 

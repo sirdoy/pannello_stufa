@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v12.0
 milestone_name: Data Fetching Simplification & E2E Verification
-status: ready_to_plan
-stopped_at: roadmap created
-last_updated: "2026-03-18T17:00:00.000Z"
-last_activity: 2026-03-18 — Roadmap created for v12.0 (2 phases, 18 requirements)
+status: planning
+stopped_at: Phase 96 context gathered
+last_updated: "2026-03-18T18:02:18.378Z"
+last_activity: 2026-03-18 — Roadmap created, 2 phases mapped to 18 requirements
 progress:
   total_phases: 2
   completed_phases: 0
@@ -69,6 +69,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-18
-Stopped at: Roadmap created for v12.0. Ready to plan Phase 96.
-Resume file: None
+Last session: 2026-03-18T18:02:18.371Z
+Stopped at: Phase 96 context gathered
+Resume file: .planning/phases/96-polling-simplification/96-CONTEXT.md

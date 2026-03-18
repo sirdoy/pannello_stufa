@@ -2,7 +2,7 @@
 
 ## What This Is
 
-PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo (via local HomeAssistant proxy con API Key auth), luci Philips Hue, monitoraggio rete Fritz!Box. Integrazione Netatmo migrata da Cloud API diretta a proxy locale — OAuth eliminato, autenticazione semplificata a singolo header X-API-Key, dati serviti da SQLite locale. Include sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Monitoraggio rete Fritz!Box con dashboard card, pagina dedicata /network con WAN status, device list con categorizzazione automatica, bandwidth charts con decimation LTTB, device history timeline, e correlazione bandwidth-stufa con consent gate. Dashboard home con masonry layout (flexbox two-column split) che elimina gap verticali tra card di altezze diverse, con Suspense streaming e skeleton fallback per card individuali. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API con stagger iniziale per evitare thundering herd, e componenti refactored con orchestrator pattern (~85% LOC reduction). Performance ottimizzata con React Compiler auto-memoization, code splitting Recharts via next/dynamic, font self-hosted via next/font, e Web Vitals pipeline. Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
+PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo, luci Philips Hue, monitoraggio rete Fritz!Box, e monitoraggio server Raspberry Pi — tutti i dispositivi collegati tramite un unico client HomeAssistant API condiviso (singolo base URL + X-API-Key auth). Include sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Monitoraggio rete Fritz!Box con dashboard card, pagina dedicata /network con WAN status, device list con categorizzazione automatica, bandwidth charts con decimation LTTB, device history timeline, e correlazione bandwidth-stufa con consent gate. Monitoraggio Raspberry Pi con dashboard card (CPU/RAM/disk/temp/health) e pagina dedicata /raspi con statistiche complete. Dashboard home con masonry layout (flexbox two-column split) che elimina gap verticali tra card di altezze diverse, con Suspense streaming e skeleton fallback per card individuali. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API con stagger iniziale per evitare thundering herd, e componenti refactored con orchestrator pattern (~85% LOC reduction). Performance ottimizzata con React Compiler auto-memoization, code splitting Recharts via next/dynamic, font self-hosted via next/font, e Web Vitals pipeline. Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
 
 ## Core Value
 
@@ -10,8 +10,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v11.0 (started 2026-03-17)
-**Status:** API Unification & Raspberry Pi Monitor — in progress
+**Version:** v11.0 (shipped 2026-03-18)
+**Status:** API Unification & Raspberry Pi Monitor — complete
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -25,9 +25,11 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - react-error-boundary for crash isolation
 - GitHub Actions for cron automation (5-min schedule)
 - Fritz!Box TR-064 API integration via server-side proxy
+- Shared HomeAssistant API client (`haGet`/`haPost`) for all providers (Fritz!Box, Netatmo, Raspberry Pi)
 - Netatmo integration via local HomeAssistant proxy (X-API-Key auth, SQLite-backed)
+- Raspberry Pi monitoring (health, CPU, memory, disk, system) via shared HA client
 - Web Vitals pipeline (useReportWebVitals + sendBeacon + Firebase RTDB)
-- ~102,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
+- ~103,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
 
 ## Requirements
 
@@ -388,21 +390,33 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 **Cleanup:**
 - ✓ **CLEAN-01** through **CLEAN-07**: All OAuth infrastructure deleted — v10.0 (Phase 79, 80, 81)
 
-## Current Milestone: v11.0 API Unification & Raspberry Pi Monitor
+**v11.0 API Unification & Raspberry Pi Monitor (Shipped 2026-03-18):**
 
-**Goal:** Unify Fritz!Box and Netatmo proxy clients behind a shared HomeAssistant API transport (single base URL + API Key), and add Raspberry Pi as new device for monitoring the HomeAssistant server health.
+**Shared API Infrastructure:**
+- ✓ **API-01**: Shared HA proxy client with single base URL + X-API-Key auth — v11.0 (Phase 84)
+- ✓ **API-02**: Generic GET/POST helpers with AbortController timeout + RFC 9457 — v11.0 (Phase 84)
+- ✓ **API-03**: Single env var pair (HA_API_URL + HA_API_KEY) — v11.0 (Phase 84)
+- ✓ **API-04**: Fritz!Box migrated to shared client (JWT removed) — v11.0 (Phase 85)
+- ✓ **API-05**: Fritz!Box routes no behavior change — v11.0 (Phase 85)
+- ✓ **API-06**: Fritz!Box caching + rate limiting preserved — v11.0 (Phase 85)
+- ✓ **API-07**: Netatmo migrated to shared client (env vars removed) — v11.0 (Phase 86)
+- ✓ **API-08**: Netatmo convenience wrappers preserved — v11.0 (Phase 86)
+- ✓ **API-09**: Netatmo routes no behavior change — v11.0 (Phase 86)
+- ✓ **API-10**: Dead client modules cleaned up — v11.0 (Phase 87)
 
-**Target features:**
-- Shared HomeAssistant API client (single base URL + X-API-Key auth for all providers)
-- Fritz!Box migration from JWT to API Key auth via shared client
-- Netatmo migration from separate env vars to shared client
-- Raspberry Pi dashboard card (CPU, RAM, disk, temperature, uptime)
-- Raspberry Pi dedicated page with detailed system stats
-- Raspberry Pi device registration in device registry
+**Raspberry Pi Monitoring:**
+- ✓ **RASPI-01**: Proxy client for 5 endpoints — v11.0 (Phase 88)
+- ✓ **RASPI-02**: TypeScript types matching API schemas — v11.0 (Phase 88)
+- ✓ **RASPI-03**: Next.js API routes proxying endpoints — v11.0 (Phase 88)
+- ✓ **RASPI-04**: Device registry + adaptive polling — v11.0 (Phase 89)
+- ✓ **RASPI-05**: RaspiCard (CPU%, RAM%, disk%, temp, badge) — v11.0 (Phase 89)
+- ✓ **RASPI-06**: /raspi page with full system stats — v11.0 (Phase 90)
+- ✓ **RASPI-07**: Error boundary + loading skeleton — v11.0 (Phase 89)
+- ✓ **RASPI-08**: Cron health includes Raspberry Pi — v11.0 (Phase 90)
 
 ### Active
 
-(Defined in REQUIREMENTS.md)
+(No active requirements — run `/gsd:new-milestone` to define next)
 
 ### Out of Scope
 
@@ -428,7 +442,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Firestore per notification history
 - Auth0 per autenticazione
 - Service Worker (Serwist) per offline capability e notification actions
-- Multi-device smart home control (stufa, termostato, luci, rete Fritz!Box)
+- Multi-device smart home control (stufa, termostato, luci, rete Fritz!Box, Raspberry Pi)
 - CVA + Radix UI design system (37+ components)
 - react-error-boundary per crash isolation
 - Fritz!Box TR-064 API via server-side proxy con rate limiting
@@ -438,17 +452,17 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Web Vitals pipeline (useReportWebVitals → sendBeacon → Firebase RTDB → dashboard)
 - Suspense streaming con loading.tsx skeleton shell + per-card boundaries
 - ~102,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
-- 550+ TypeScript source files, 4,000+ tests passing
-- GitHub Actions cron (5-min schedule) per health monitoring e coordination
+- 560+ TypeScript source files, 4,000+ tests passing
+- GitHub Actions cron (5-min schedule) per health monitoring e coordination (stove, thermostat, Raspberry Pi)
 - GDPR-compliant analytics con consent banner
-- 14 milestones shipped, 86 phases, 353 plans executed
+- 15 milestones shipped, 91 phases, 361 plans executed
 
-**v10.0 Milestone (2026-03-15 → 2026-03-16):**
-- 9 phases executed (18 plans)
-- 28/28 requirements satisfied (100%)
-- 173 files changed (+12,606 insertions, -16,454 deletions)
-- 88 git commits with atomic changes
-- 2 days from phase 75 start to completion
+**v11.0 Milestone (2026-03-17 → 2026-03-18):**
+- 8 phases executed (13 plans)
+- 18/18 requirements satisfied (100%)
+- 113 files changed (+13,189 insertions, -1,764 deletions)
+- 83 git commits with atomic changes
+- 2 days from phase 84 start to completion
 
 **Known Issues:**
 - Worker teardown warning (React 19 cosmetic, not actionable)
@@ -465,7 +479,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Manual useMemo/useCallback not yet removed (deferred for regression attribution)
 - 3 Netatmo routes without frontend consumer (synchomeschedule, createnewhomeschedule, getroommeasure)
 - Netatmo proxy connectivity depends on myfritz.net (same risk as Fritz!Box)
-- Nyquist validation missing for v10.0 phases (75-83)
+- Nyquist validation missing for v10.0 phases (75-83) and partial for v11.0 phases (84-91)
+- 8 stale env vars in .env.local (HOMEASSISTANT_*, NETATMO_* — unused after v11.0 migration)
 
 **User Feedback:**
 - None yet (awaiting operational deployment)
@@ -533,6 +548,12 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 | RFC 9457 error mapping | Structured error responses from proxy mapped to ApiError instances | ✓ Good — Frontend error boundaries handle cleanly (v10.0) |
 | Audit-driven gap closure phases | Milestone audit identified integration gaps before shipping | ✓ Good — Caught home_id missing, camera toggle missing (v10.0) |
 | homeId as optional prop threading | Pass from topology state through component tree, not re-fetched | ✓ Good — Single source of truth (v10.0) |
+| Shared haClient function module | Single transport for all HA providers, eliminates duplicated fetch logic | ✓ Good — 3 providers share one client (v11.0) |
+| X-API-Key replacing JWT + OAuth | One env var pair for all providers, no token refresh complexity | ✓ Good — Dramatic simplification (v11.0) |
+| Function module for all provider clients | Consistent pattern: fritzboxClient, netatmoProxy, raspiClient as function modules | ✓ Good — No class state, testable, matches haClient (v11.0) |
+| Raspberry Pi informational cron | Pi failure uses console.warn, isolated try/catch, never blocks stove/thermostat | ✓ Good — Non-critical monitoring doesn't affect safety-critical paths (v11.0) |
+| 302 redirect for camera snapshot | Browser loads CDN URL directly, resilient to server network topology | ✓ Good — Handles proxy deployment variations (v11.0) |
+| SERVICE_UNAVAILABLE retry (5 attempts) | Proxy warm-up is transient, not fatal — 3s delay between retries | ✓ Good — Schedule/room data loads reliably after cold start (v11.0) |
 
 ## Constraints
 
@@ -544,4 +565,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-17 after Phase 86 (Netatmo Migration complete, 3 phases of v11.0 done)*
+*Last updated: 2026-03-18 after v11.0 milestone (API Unification & Raspberry Pi Monitor shipped)*

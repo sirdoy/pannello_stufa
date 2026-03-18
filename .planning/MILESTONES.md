@@ -1,5 +1,41 @@
 # Project Milestones: Pannello Stufa
 
+## v11.0 API Unification & Raspberry Pi Monitor (Shipped: 2026-03-18)
+
+**Delivered:** Unified Fritz!Box and Netatmo behind a shared HomeAssistant API transport (single base URL + X-API-Key auth), added Raspberry Pi as a new monitored device with dashboard card, dedicated page, and cron health integration, and formalized camera/schedule bug fixes from debug sessions.
+
+**Phases completed:** 84-91 (13 plans total)
+
+**Key accomplishments:**
+
+- Shared HomeAssistant API client (`lib/haClient.ts`) with `haGet`/`haPost` transport, X-API-Key auth, AbortController timeouts, and RFC 9457 error mapping — eliminates duplicated fetch logic across providers
+- Fritz!Box migration from JWT login to function module pattern on shared transport — credential config route deleted, all tests rewritten
+- Netatmo migration from separate env vars to shared transport — `netatmoProxyGet`/`netatmoProxyPost` eliminated, all wrappers preserved on `haGet`/`haPost`
+- Dead export cleanup with knip verification: 4 unused exports removed from Fritz!Box barrel, documentation updated to HA_API_URL/HA_API_KEY
+- Complete Raspberry Pi monitoring: API client (5 endpoints), TypeScript types, 5 API routes, RaspiCard dashboard component (CPU/RAM/disk/temp/health badge), dedicated /raspi page with full system stats, cron health integration
+- Bug fix verification: camera snapshot 302 redirect for CDN resilience, stream loading/error states, schedule/room 503 retry with 5-attempt warm-up handling
+
+**Stats:**
+
+- 13 plans executed across 8 phases
+- 18/18 v11.0 requirements satisfied (100%)
+- 113 files changed (+13,189 insertions, -1,764 deletions)
+- 83 git commits with atomic changes
+- 2 days from phase 84 start to completion (2026-03-17 → 2026-03-18)
+
+**Git range:** `feat(84-01)` (4e5c74c) → `docs(v11.0)` (b5aaf56)
+
+**Archives:**
+- [Roadmap](milestones/v11.0-ROADMAP.md)
+- [Requirements](milestones/v11.0-REQUIREMENTS.md)
+- [Audit](milestones/v11.0-MILESTONE-AUDIT.md)
+
+**Tech debt:** SUMMARY frontmatter `requirements_completed` empty on 7/8 phases (metadata only). Nyquist validation partial (0/8 compliant). 8 stale env vars in .env.local (advisory). Phase 91 browser verification pending.
+
+**What's next:** All providers unified behind shared HA client. Raspberry Pi monitoring operational. Ready for next milestone planning.
+
+---
+
 ## v10.0 Netatmo API Migration (Shipped: 2026-03-16)
 
 **Delivered:** Complete migration of Netatmo integration from direct Cloud API to local HomeAssistant Network API proxy — new proxy client with X-API-Key auth replacing OAuth, all energy/camera/valve/health endpoints migrated, dead OAuth infrastructure deleted (net -3,848 lines), and integration gaps closed via audit-driven gap closure phases.

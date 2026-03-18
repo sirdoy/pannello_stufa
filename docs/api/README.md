@@ -2,7 +2,7 @@
 
 **Base URL:** `https://pdupun8zpr7exw43.myfritz.net`
 
-This API exposes real-time and historical data from your home network via a modular REST interface. Each data provider (Fritz!Box, Netatmo, DIRIGERA) is mounted under its own path prefix. All endpoints require authentication.
+This API exposes real-time and historical data from your home network via a modular REST interface. Each data provider (Fritz!Box, DIRIGERA, Netatmo, Thermorossi, Raspberry Pi) is mounted under its own path prefix. All endpoints require authentication.
 
 ---
 
@@ -10,13 +10,15 @@ This API exposes real-time and historical data from your home network via a modu
 
 | Provider | Prefix | Description |
 |----------|--------|-------------|
-| [FritzBox](./fritzbox.md) | `/api/v1/fritzbox` | Devices, bandwidth, WAN, WiFi, telephony, network services, history |
+| [FritzBox](./fritzbox.md) | `/api/v1/fritzbox` | Devices, bandwidth, WAN, WiFi, telephony, network services, history — 21 endpoints |
 | [Netatmo](./netatmo.md) | `/api/v1/netatmo` | Energy (thermostat control, room temperatures, schedules), valve calibration (NRV status and calibration), and security camera (status, streams, snapshots, monitoring, events) — 21 endpoints |
-| [DIRIGERA](./dirigera.md) | `/api/v1/dirigera` | IKEA smart home — contact and motion sensors |
+| [DIRIGERA](./dirigera.md) | `/api/v1/dirigera` | IKEA smart home — contact and motion sensors, telemetry, history — 8 endpoints |
+| [Thermorossi](./thermorossi.md) | `/api/v1/thermorossi` | Pellet stove — state monitoring, history, and remote controls — 13 endpoints |
+| [Raspberry Pi](./raspberry-pi.md) | `/api/v1/raspi` | System stats — CPU, RAM, disk, temperature, uptime, network — 5 endpoints |
 
 See also: [Netatmo Setup Guide](../NETATMO_SETUP.md)
 
-> **Note:** Automation endpoints (`/api/v1/automations`) are scaffolded in the codebase but not yet operational. Full automation support is deferred to v2.4+.
+> **Note:** Automation endpoints (`/api/v1/automations`) are scaffolded in the codebase but not yet operational. Full automation support is deferred to a future milestone.
 
 ---
 

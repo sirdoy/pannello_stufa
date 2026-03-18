@@ -2,9 +2,24 @@
 
 **Base path:** `/api/v1/dirigera`
 
-IKEA DIRIGERA hub integration for smart sensors (contact and motion). All data is served from an in-memory cache polled from the hub. Sensor events are persisted to SQLite for history queries.
+IKEA DIRIGERA hub integration for smart sensors (contact and motion/occupancy) — 8 endpoints. All data is served from an in-memory cache polled from the hub. Sensor events are persisted to SQLite for history queries. Motion sensors use DIRIGERA's `occupancySensor` device type; companion `lightSensor` illuminance data is automatically merged by room.
 
 All endpoints require authentication via JWT Bearer token or API Key (`X-API-Key` header). See [Authentication](./README.md#authentication) for details.
+
+---
+
+## Quick Reference
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/v1/dirigera/health` | Hub connection status and firmware version |
+| `GET` | `/api/v1/dirigera/sensors` | All sensors (contact and motion) |
+| `GET` | `/api/v1/dirigera/sensors/contact` | Contact (open/close) sensors only |
+| `GET` | `/api/v1/dirigera/sensors/motion` | Motion/occupancy sensors only |
+| `GET` | `/api/v1/dirigera/sensors/summary` | Fleet-wide sensor summary |
+| `GET` | `/api/v1/dirigera/history` | Paginated sensor event history |
+| `GET` | `/api/v1/dirigera/stats` | Aggregation and retention statistics |
+| `GET` | `/api/v1/dirigera/telemetry` | Paginated sensor telemetry history (battery, light level) |
 
 ---
 
@@ -20,6 +35,8 @@ All endpoints require authentication via JWT Bearer token or API Key (`X-API-Key
   - [GET /history](#get-history)
 - [Statistics](#statistics)
   - [GET /stats](#get-stats)
+- [Telemetry](#telemetry)
+  - [GET /telemetry](#get-telemetry)
 
 ---
 
@@ -93,7 +110,7 @@ Return the full list of DIRIGERA sensors. Includes all sensor types (contact and
     },
     {
       "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
-      "type": "motionSensor",
+      "type": "occupancySensor",
       "custom_name": "MYGGBETT Soggiorno",
       "room": "Soggiorno",
       "firmware_version": "24056010",
@@ -113,7 +130,7 @@ Return the full list of DIRIGERA sensors. Includes all sensor types (contact and
 ```typescript
 interface DirigeraSensor {
   id: string;
-  type: "openCloseSensor" | "motionSensor" | string;
+  type: "openCloseSensor" | "occupancySensor" | string;
   custom_name: string;
   room: string | null;
   firmware_version: string | null;
@@ -228,7 +245,7 @@ curl -s YOUR_BASE_URL/api/v1/dirigera/sensors/contact \
 
 ### GET /sensors/motion
 
-Return only motion sensors. Filters to `motionSensor` type. Each sensor includes `data_freshness` and `light_level` fields.
+Return only motion/occupancy sensors. Filters to `occupancySensor` device type. Each sensor includes `data_freshness` and `light_level` fields. Companion `lightSensor` illuminance is automatically merged by room name.
 
 **Authentication:** Required (JWT Bearer or API Key)
 
@@ -241,7 +258,7 @@ Return only motion sensors. Filters to `motionSensor` type. Each sensor includes
   "sensors": [
     {
       "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
-      "type": "motionSensor",
+      "type": "occupancySensor",
       "custom_name": "MYGGBETT Soggiorno",
       "room": "Soggiorno",
       "firmware_version": "24056010",
@@ -488,6 +505,84 @@ interface DirigeraStatsResponse {
 
 ```bash
 curl -s YOUR_BASE_URL/api/v1/dirigera/stats \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Error responses:**
+
+| Status | Condition |
+|--------|-----------|
+| 401 | Missing or invalid authentication |
+
+---
+
+## Telemetry
+
+### GET /telemetry
+
+Return paginated sensor telemetry history. Records battery percentage and light
+level sampled every 5 minutes by the poller. Supports filtering by sensor and
+time range.
+
+**Authentication:** Required (JWT Bearer or API Key)
+
+**Query Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `sensor_id` | string | null | Filter readings for a specific sensor ID |
+| `start` | integer | null | Start of time range (Unix seconds, inclusive) |
+| `end` | integer | null | End of time range (Unix seconds, exclusive) |
+| `limit` | integer | `100` | Max readings per page (1-1000) |
+| `offset` | integer | `0` | Number of readings to skip |
+
+**Response (200):**
+
+```json
+{
+  "telemetry": [
+    {
+      "id": 1042,
+      "sensor_id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "battery_percentage": 75,
+      "light_level": 42,
+      "timestamp": 1773330000
+    }
+  ],
+  "total": 1042,
+  "limit": 100,
+  "offset": 0
+}
+```
+
+**TypeScript type:**
+
+```typescript
+interface SensorTelemetryReading {
+  id: number;
+  sensor_id: string;
+  battery_percentage: number | null;
+  light_level: number | null;
+  timestamp: number;   // Unix timestamp (seconds)
+}
+
+interface SensorTelemetryResponse {
+  telemetry: SensorTelemetryReading[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+```
+
+**curl:**
+
+```bash
+# All telemetry (paginated)
+curl -s "YOUR_BASE_URL/api/v1/dirigera/telemetry?limit=50&offset=0" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Filter by sensor and time range
+curl -s "YOUR_BASE_URL/api/v1/dirigera/telemetry?sensor_id=YOUR_SENSOR_ID&start=1773000000" \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 

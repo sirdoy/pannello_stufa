@@ -5,9 +5,9 @@ milestone_name: Test Suite & Tech Debt Cleanup
 status: active
 stopped_at: null
 last_updated: "2026-03-18"
-last_activity: 2026-03-18 — Milestone v11.1 started
+last_activity: 2026-03-18 — Roadmap created, 4 phases defined (92-95)
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,14 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-18)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v11.1 Test Suite & Tech Debt Cleanup
+**Current focus:** v11.1 Test Suite & Tech Debt Cleanup — Phase 92 ready to plan
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 92 of 95 (Jest Configuration)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-03-18 — Milestone v11.1 started
+Status: Ready to plan
+Last activity: 2026-03-18 — Roadmap created, ready to plan Phase 92
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -52,9 +54,16 @@ Last activity: 2026-03-18 — Milestone v11.1 started
 
 See PROJECT.md Key Decisions table for full history.
 
-### Roadmap Evolution
+Recent decisions affecting v11.1:
+- [v11.0]: React Compiler 1.0 handles all memoization — manual useMemo/useCallback deferred for removal here
+- [v11.0]: 8 stale env vars (HOMEASSISTANT_*, NETATMO_*) remain in .env.local after migration, flagged for cleanup
 
-None pending — milestone starting.
+### Phase Structure
+
+- Phase 92: Jest Configuration (JEST-01, JEST-02) — foundational, must run first
+- Phase 93: API & Infrastructure Test Fixes (TFIX-01 through TFIX-08) — 8 suites, ~27 failing tests
+- Phase 94: Component & Hook Test Fixes (TFIX-09 through TFIX-12) — 4 suites, ~10 failing tests
+- Phase 95: Tech Debt Cleanup (DEBT-01, DEBT-02) — safe last, after all tests green
 
 ### Pending Todos
 
@@ -74,5 +83,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Defining requirements for v11.1
+Stopped at: Roadmap created for v11.1 — ready to plan Phase 92
 Resume file: None

@@ -52,28 +52,28 @@ None — this is a cleanup milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| JEST-01 | — | Pending |
-| JEST-02 | — | Pending |
-| TFIX-01 | — | Pending |
-| TFIX-02 | — | Pending |
-| TFIX-03 | — | Pending |
-| TFIX-04 | — | Pending |
-| TFIX-05 | — | Pending |
-| TFIX-06 | — | Pending |
-| TFIX-07 | — | Pending |
-| TFIX-08 | — | Pending |
-| TFIX-09 | — | Pending |
-| TFIX-10 | — | Pending |
-| TFIX-11 | — | Pending |
-| TFIX-12 | — | Pending |
-| DEBT-01 | — | Pending |
-| DEBT-02 | — | Pending |
+| JEST-01 | Phase 92 | Pending |
+| JEST-02 | Phase 92 | Pending |
+| TFIX-01 | Phase 93 | Pending |
+| TFIX-02 | Phase 93 | Pending |
+| TFIX-03 | Phase 93 | Pending |
+| TFIX-04 | Phase 93 | Pending |
+| TFIX-05 | Phase 93 | Pending |
+| TFIX-06 | Phase 93 | Pending |
+| TFIX-07 | Phase 93 | Pending |
+| TFIX-08 | Phase 93 | Pending |
+| TFIX-09 | Phase 94 | Pending |
+| TFIX-10 | Phase 94 | Pending |
+| TFIX-11 | Phase 94 | Pending |
+| TFIX-12 | Phase 94 | Pending |
+| DEBT-01 | Phase 95 | Pending |
+| DEBT-02 | Phase 95 | Pending |
 
 **Coverage:**
 - v11.1 requirements: 16 total
-- Mapped to phases: 0
-- Unmapped: 16 ⚠️
+- Mapped to phases: 16
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-18*
-*Last updated: 2026-03-18 after initial definition*
+*Last updated: 2026-03-18 — traceability mapped after roadmap creation*

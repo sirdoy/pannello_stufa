@@ -1,6 +1,5 @@
 'use client';
 
-import { useMemo } from 'react';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale/it';
 import { Card, Heading, Text, Select } from '@/app/components/ui';
@@ -46,7 +45,7 @@ export default function DeviceHistoryTimeline({
   devices,
 }: DeviceHistoryTimelineProps) {
   // Group events by date
-  const groupedEvents = useMemo<GroupedEvents[]>(() => {
+  const groupedEvents = ((): GroupedEvents[] => {
     if (events.length === 0) {
       return [];
     }
@@ -69,20 +68,18 @@ export default function DeviceHistoryTimeline({
         events: dateEvents,
       }))
       .sort((a, b) => b.date.localeCompare(a.date)); // Sort newest first
-  }, [events]);
+  })();
 
   // Device filter options
-  const deviceOptions = useMemo(() => {
-    return [
-      { value: 'all', label: 'Tutti i dispositivi' },
-      ...devices
-        .filter((device) => device.mac)
-        .map((device) => ({
-          value: device.mac,
-          label: device.name || device.mac,
-        })),
-    ];
-  }, [devices]);
+  const deviceOptions = [
+    { value: 'all', label: 'Tutti i dispositivi' },
+    ...devices
+      .filter((device) => device.mac)
+      .map((device) => ({
+        value: device.mac,
+        label: device.name || device.mac,
+      })),
+  ];
 
   const handleDeviceFilterChange = (event: { target: { value: string | number } }) => {
     const value = event.target.value;

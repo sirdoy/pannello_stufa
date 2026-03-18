@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import type { DeviceEvent, DeviceHistoryTimeRange } from '@/app/components/devices/network/types';
 
 export interface UseDeviceHistoryReturn {
@@ -28,7 +28,7 @@ export function useDeviceHistory(): UseDeviceHistoryReturn {
   const [deviceFilter, setDeviceFilter] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchEvents = useCallback(async () => {
+  const fetchEvents = async () => {
     setIsLoading(true);
 
     try {
@@ -53,12 +53,13 @@ export function useDeviceHistory(): UseDeviceHistoryReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [timeRange, deviceFilter]);
+  };
 
   // Fetch events when filters change
   useEffect(() => {
     void fetchEvents();
-  }, [fetchEvents]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeRange, deviceFilter]);
 
   return {
     events,

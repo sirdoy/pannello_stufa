@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { decimateLTTB, type TimeSeriesPoint } from '@/lib/utils/decimateLTTB';
 import type {
   BandwidthData,
@@ -44,7 +44,7 @@ export function useBandwidthHistory(): UseBandwidthHistoryReturn {
    * Fetches 7 days of history so chart pre-populates immediately on page open.
    * Silently fails — chart will still work with live polling data.
    */
-  const loadHistoryFromServer = useCallback(async () => {
+  const loadHistoryFromServer = async () => {
     try {
       const response = await fetch('/api/fritzbox/bandwidth-history?range=7d');
       if (!response.ok) {
@@ -71,12 +71,13 @@ export function useBandwidthHistory(): UseBandwidthHistoryReturn {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
   // Load historical data from server on mount
   useEffect(() => {
     void loadHistoryFromServer();
-  }, [loadHistoryFromServer]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /**
    * Add a new bandwidth data point to the history buffer.
@@ -88,7 +89,7 @@ export function useBandwidthHistory(): UseBandwidthHistoryReturn {
    * create duplicate entries in the history buffer. We skip the point if an entry
    * with the same timestamp already exists as the last point.
    */
-  const addDataPoint = useCallback((bandwidth: BandwidthData) => {
+  const addDataPoint = (bandwidth: BandwidthData) => {
     setHistory((prev) => {
       // Deduplicate: skip if the last point has the same timestamp.
       // This handles the case where the 60s server cache returns the same
@@ -113,13 +114,13 @@ export function useBandwidthHistory(): UseBandwidthHistoryReturn {
 
       return updated;
     });
-  }, []);
+  };
 
   /**
    * Filter history by time range and decimate if necessary.
    * Uses download Mbps as the selection criterion for LTTB.
    */
-  const chartData = useMemo(() => {
+  const chartData = (() => {
     if (history.length === 0) {
       return [];
     }
@@ -153,7 +154,7 @@ export function useBandwidthHistory(): UseBandwidthHistoryReturn {
         upload: original?.upload ?? 0, // Should always find, but fallback to 0
       };
     });
-  }, [history, timeRange]);
+  })();
 
   // Derived status
   const pointCount = history.length;

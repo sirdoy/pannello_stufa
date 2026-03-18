@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState } from 'react';
 import { calculatePearsonCorrelation } from '@/lib/utils/pearsonCorrelation';
 import type {
   CorrelationDataPoint,
@@ -33,8 +33,7 @@ export function useBandwidthCorrelation(): UseBandwidthCorrelationReturn {
    * Add data point with minute-level timestamp alignment
    * Averages bandwidth and powerLevel when same minute already exists
    */
-  const addDataPoint = useCallback(
-    (bandwidth: number, powerLevel: number | null, timestamp: number) => {
+  const addDataPoint = (bandwidth: number, powerLevel: number | null, timestamp: number) => {
       // Filter out stove-off data points
       if (powerLevel === null) {
         return;
@@ -77,14 +76,12 @@ export function useBandwidthCorrelation(): UseBandwidthCorrelationReturn {
 
         return updated;
       });
-    },
-    []
-  );
+  };
 
   /**
    * Compute correlation insight from chart data
    */
-  const insight = useMemo<CorrelationInsight | null>(() => {
+  const insight = ((): CorrelationInsight | null => {
     if (chartData.length < MIN_CORRELATION_POINTS) {
       return null;
     }
@@ -134,12 +131,12 @@ export function useBandwidthCorrelation(): UseBandwidthCorrelationReturn {
       dataPointCount: chartData.length,
       activeHours,
     };
-  }, [chartData]);
+  })();
 
   /**
    * Determine status based on data state
    */
-  const status = useMemo<CorrelationStatus>(() => {
+  const status = ((): CorrelationStatus => {
     if (chartData.length === 0) {
       return 'stove-off';
     }
@@ -147,7 +144,7 @@ export function useBandwidthCorrelation(): UseBandwidthCorrelationReturn {
       return 'collecting';
     }
     return 'ready';
-  }, [chartData.length]);
+  })();
 
   return {
     chartData,

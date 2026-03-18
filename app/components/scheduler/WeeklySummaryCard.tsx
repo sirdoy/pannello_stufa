@@ -1,6 +1,5 @@
 'use client';
 
-import { useMemo } from 'react';
 import Card from '../ui/Card';
 import Heading from '../ui/Heading';
 import Text from '../ui/Text';
@@ -12,7 +11,7 @@ export interface WeeklySummaryCardProps {
 }
 
 export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) {
-  const stats = useMemo(() => calculateWeeklyStats(schedule), [schedule]);
+  const stats = calculateWeeklyStats(schedule);
 
   // Format hours with 1 decimal
   const formatHours = (hours: number) => hours.toFixed(1) + 'h';

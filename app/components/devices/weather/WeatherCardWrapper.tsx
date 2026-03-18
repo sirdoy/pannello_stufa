@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { WeatherCard } from '@/app/components/weather';
 import { subscribeToLocation } from '@/lib/services/locationService';
 
@@ -59,8 +59,8 @@ export default function WeatherCardWrapper() {
   const [error, setError] = useState<Error | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Memoized weather fetch function
-  const fetchWeather = useCallback(async (lat: number, lon: number) => {
+  // Weather fetch function
+  const fetchWeather = async (lat: number, lon: number) => {
     setIsLoading(true);
     setError(null);
 
@@ -77,7 +77,7 @@ export default function WeatherCardWrapper() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
   // Subscribe to location changes on mount
   useEffect(() => {

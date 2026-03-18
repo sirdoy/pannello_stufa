@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Button from '../ui/Button';
 import ActionButton from '../ui/ActionButton';
 import Card from '../ui/Card';
@@ -82,7 +82,7 @@ export default function CreateSceneModal({
   }, [isOpen]);
 
   // Fetch lights when room is selected
-  const fetchRoomLights = useCallback(async (roomId: string) => {
+  const fetchRoomLights = async (roomId: string) => {
     try {
       setLoadingLights(true);
       setError('');
@@ -124,7 +124,7 @@ export default function CreateSceneModal({
     } finally {
       setLoadingLights(false);
     }
-  }, [rooms]);
+  };
 
   useEffect(() => {
     if (selectedRoom) {

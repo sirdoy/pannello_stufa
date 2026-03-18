@@ -8,7 +8,7 @@
  * Changes propagate instantly across devices.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 // @ts-expect-error - No type definitions available
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';

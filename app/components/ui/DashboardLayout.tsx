@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, createContext, useContext, useState, useCallback, type ReactNode, type ComponentPropsWithoutRef, type Dispatch, type SetStateAction } from 'react';
+import { forwardRef, createContext, useContext, useState, type ReactNode, type ComponentPropsWithoutRef, type Dispatch, type SetStateAction } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 
@@ -405,13 +405,13 @@ const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(functio
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const toggle = useCallback(() => {
+  const toggle = () => {
     setCollapsed(prev => !prev);
-  }, []);
+  };
 
-  const toggleMobile = useCallback(() => {
+  const toggleMobile = () => {
     setMobileOpen(prev => !prev);
-  }, []);
+  };
 
   const contextValue = {
     collapsed,

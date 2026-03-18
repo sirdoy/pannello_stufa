@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { ref, get } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import Banner from './ui/Banner';
@@ -19,7 +19,7 @@ export default function CronHealthBanner({ variant = 'banner' }: CronHealthBanne
   const networkQuality = useNetworkQuality();
 
   // Fetch cron health data
-  const fetchCronHealth = useCallback(async () => {
+  const fetchCronHealth = async () => {
     try {
       const snapshot = await get(ref(db, 'cronHealth/lastCall'));
       if (snapshot.exists()) {
@@ -29,7 +29,7 @@ export default function CronHealthBanner({ variant = 'banner' }: CronHealthBanne
     } catch (error) {
       console.error('[CronHealthBanner] Error fetching cronHealth:', error);
     }
-  }, []);
+  };
 
   // Network-aware polling: 30s on fast/unknown, 60s on slow
   const cronInterval = networkQuality === 'slow' ? 60000 : 30000;
@@ -42,7 +42,7 @@ export default function CronHealthBanner({ variant = 'banner' }: CronHealthBanne
   });
 
   // Check staleness of cron data
-  const checkCronHealth = useCallback(() => {
+  const checkCronHealth = () => {
     if (!lastCallTime) return;
     const lastCallDate = new Date(lastCallTime);
     const now = new Date();
@@ -50,7 +50,7 @@ export default function CronHealthBanner({ variant = 'banner' }: CronHealthBanne
     const diffMinutes = Math.floor(diffMs / 1000 / 60);
     setMinutesSinceLastCall(diffMinutes);
     setShowBanner(diffMinutes > 5);
-  }, [lastCallTime]);
+  };
 
   useAdaptivePolling({
     callback: checkCronHealth,

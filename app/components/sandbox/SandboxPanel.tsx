@@ -1,7 +1,7 @@
 'use client';
 
 import { clearSemiManualMode } from '@/lib/schedulerApiClient';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import Banner from '../ui/Banner';
@@ -58,7 +58,7 @@ export default function SandboxPanel() {
   const [testIntervalPower, setTestIntervalPower] = useState<number>(3);
   const [testIntervalFan, setTestIntervalFan] = useState<number>(3);
 
-  const loadData = useCallback(async () => {
+  const loadData = async () => {
     try {
       setLoading(true);
       const [state, maint, sett, hist, schedMode] = await Promise.all([
@@ -93,9 +93,9 @@ export default function SandboxPanel() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  const checkEnvironment = useCallback(async () => {
+  const checkEnvironment = async () => {
     const local = isLocalEnvironment();
     setIsLocal(local);
 
@@ -108,11 +108,12 @@ export default function SandboxPanel() {
       }
     }
     setLoading(false);
-  }, [loadData]);
+  };
 
   useEffect(() => {
     checkEnvironment();
-  }, [checkEnvironment]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleUpdateState(updates: any) {
     try {

@@ -94,7 +94,12 @@ Plans:
   6. `healthDeadManSwitch.test.ts` — ADMIN_USER_ID skip test passes
   7. `fritzbox/history.test.ts` — all 6 range/filter/empty tests pass
   8. `fritzbox/devices-events.test.ts` — all 6 event detection tests pass
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 93-01-PLAN.md — Fix middleware dynamic imports + changelog missing logs (TFIX-01, TFIX-02)
+- [ ] 93-02-PLAN.md — Add missing logs to stoveApi, maintenance, scheduler, health (TFIX-03, TFIX-04, TFIX-05, TFIX-06)
+- [ ] 93-03-PLAN.md — Fix Fritz!Box history route + rewrite stale devices-events test (TFIX-07, TFIX-08)
 
 ### Phase 94: Component & Hook Test Fixes
 **Goal**: All component and hook test suites pass with no skipped or failing assertions
@@ -137,7 +142,7 @@ Plans:
 | 75-83 | v10.0 | 18/18 | ✓ Complete | 2026-03-16 |
 | 84-91 | v11.0 | 13/13 | ✓ Complete | 2026-03-18 |
 | 92. Jest Configuration | 1/1 | Complete    | 2026-03-18 | - |
-| 93. API & Infrastructure Test Fixes | v11.1 | 0/TBD | Not started | - |
+| 93. API & Infrastructure Test Fixes | v11.1 | 0/3 | Not started | - |
 | 94. Component & Hook Test Fixes | v11.1 | 0/TBD | Not started | - |
 | 95. Tech Debt Cleanup | v11.1 | 0/TBD | Not started | - |
 
@@ -145,4 +150,4 @@ Plans:
 
 ---
 
-*Roadmap updated: 2026-03-18 — Phase 92 planned (1 plan)*
+*Roadmap updated: 2026-03-18 — Phase 93 planned (3 plans)*

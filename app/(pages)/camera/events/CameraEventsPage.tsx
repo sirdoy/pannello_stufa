@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { CAMERA_ROUTES } from '@/lib/routes';
 import {
@@ -72,9 +72,9 @@ export default function CameraEventsPage() {
   }
 
   // Virtual scrolling - show more events when scrolling
-  const handleLoadMore = useCallback((): void => {
+  const handleLoadMore = (): void => {
     setDisplayCount(prev => prev + 20);
-  }, []);
+  };
 
   // Filter events by selected camera
   const filteredEvents = selectedCameraId === 'all'

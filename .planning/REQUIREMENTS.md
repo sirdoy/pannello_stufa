@@ -12,11 +12,11 @@ Requirements for Data Fetching Simplification & E2E Verification milestone.
 - [ ] **POLL-01**: StoveCard usa useAdaptivePolling (60s) invece del polling loop custom
 - [ ] **POLL-02**: Firebase RTDB real-time listener della stufa rimosso
 - [ ] **POLL-03**: sync-external-state call rimossa dal ciclo fetch stufa
-- [ ] **POLL-04**: ThermostatCard polling esteso a 60s (da 30s)
-- [ ] **POLL-05**: LightsCard polling esteso a 60s (da 30s)
-- [ ] **POLL-06**: NetworkCard polling esteso a 60s visible / 5min hidden (da 30s/5min)
-- [ ] **POLL-07**: RaspiCard polling esteso a 60s visible / 5min hidden (da 30s/5min)
-- [ ] **POLL-08**: useDeviceStaleness polling rimosso o esteso a 60s (da 5s)
+- [x] **POLL-04**: ThermostatCard polling esteso a 60s (da 30s)
+- [x] **POLL-05**: LightsCard polling esteso a 60s (da 30s)
+- [x] **POLL-06**: NetworkCard polling esteso a 60s visible / 5min hidden (da 30s/5min)
+- [x] **POLL-07**: RaspiCard polling esteso a 60s visible / 5min hidden (da 30s/5min)
+- [x] **POLL-08**: useDeviceStaleness polling rimosso o esteso a 60s (da 5s)
 
 ### E2E Page Verification
 
@@ -53,11 +53,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | POLL-01 | Phase 96 | Pending |
 | POLL-02 | Phase 96 | Pending |
 | POLL-03 | Phase 96 | Pending |
-| POLL-04 | Phase 96 | Pending |
-| POLL-05 | Phase 96 | Pending |
-| POLL-06 | Phase 96 | Pending |
-| POLL-07 | Phase 96 | Pending |
-| POLL-08 | Phase 96 | Pending |
+| POLL-04 | Phase 96 | Complete |
+| POLL-05 | Phase 96 | Complete |
+| POLL-06 | Phase 96 | Complete |
+| POLL-07 | Phase 96 | Complete |
+| POLL-08 | Phase 96 | Complete |
 | E2E-01 | Phase 97 | Pending |
 | E2E-02 | Phase 97 | Pending |
 | E2E-03 | Phase 97 | Pending |

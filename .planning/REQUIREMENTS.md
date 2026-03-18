@@ -33,7 +33,7 @@ Requirements for test suite cleanup and tech debt resolution.
 ### Tech Debt Cleanup
 
 - [ ] **DEBT-01**: Remove manual useMemo/useCallback replaced by React Compiler
-- [ ] **DEBT-02**: Remove stale env vars from .env.local (8 HOMEASSISTANT_*/NETATMO_* vars)
+- [x] **DEBT-02**: Remove stale env vars from .env.local (8 HOMEASSISTANT_*/NETATMO_* vars)
 
 ## Future Requirements
 
@@ -67,7 +67,7 @@ None — this is a cleanup milestone.
 | TFIX-11 | Phase 94 | Complete |
 | TFIX-12 | Phase 94 | Complete |
 | DEBT-01 | Phase 95 | Pending |
-| DEBT-02 | Phase 95 | Pending |
+| DEBT-02 | Phase 95 | Complete |
 
 **Coverage:**
 - v11.1 requirements: 16 total

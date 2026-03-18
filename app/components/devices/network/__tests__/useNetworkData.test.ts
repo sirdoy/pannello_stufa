@@ -224,7 +224,7 @@ describe('useNetworkData', () => {
       expect(result.current.downloadHistory.length).toBeLessThanOrEqual(120);
     });
 
-    // Should cap at 120 (1h at 30s interval)
+    // Should cap at 120 (2h at 60s interval)
     expect(result.current.downloadHistory.length).toBeLessThanOrEqual(120);
     expect(result.current.uploadHistory.length).toBeLessThanOrEqual(120);
 

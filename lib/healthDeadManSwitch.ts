@@ -104,6 +104,7 @@ export async function alertDeadManSwitch(
     const adminUserId = process.env.ADMIN_USER_ID;
 
     if (!adminUserId) {
+      console.log('[DeadManSwitch] ADMIN_USER_ID not configured, skipping alert');
       return;
     }
 

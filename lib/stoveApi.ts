@@ -116,6 +116,7 @@ export async function fetchWithRetry(url: string, timeout: number = DEFAULT_TIME
 
       // Log retry info
       if (attempt < maxRetries) {
+        console.log(`Timeout on attempt ${attempt + 1}/${maxRetries + 1}. Retrying...`);
       }
     }
   }

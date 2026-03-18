@@ -63,7 +63,7 @@ See `.planning/milestones/` for full archives.
 
 - [x] **Phase 92: Jest Configuration** - Exclude Playwright files and eliminate flaky ordering dependencies (completed 2026-03-18)
 - [x] **Phase 93: API & Infrastructure Test Fixes** - Fix 8 failing test suites in server-side code (completed 2026-03-18)
-- [ ] **Phase 94: Component & Hook Test Fixes** - Fix 4 failing test suites in UI and hooks
+- [x] **Phase 94: Component & Hook Test Fixes** - Fix 4 failing test suites in UI and hooks (completed 2026-03-18)
 - [ ] **Phase 95: Tech Debt Cleanup** - Remove manual memoization and stale env vars
 
 ## Phase Details
@@ -110,7 +110,7 @@ Plans:
   2. `useNetworkData.test.ts` — stale flag timeout test passes
   3. `useDeviceHistory.test.ts` — both fetch/refresh tests pass
   4. `VersionContext.test.tsx` — all 4 version check tests pass
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 94-01-PLAN.md — Fix StovePrimaryActions role queries + VersionContext console.log calls (TFIX-09, TFIX-12)
@@ -147,7 +147,7 @@ Plans:
 | 84-91 | v11.0 | 13/13 | ✓ Complete | 2026-03-18 |
 | 92. Jest Configuration | 1/1 | Complete    | 2026-03-18 | - |
 | 93. API & Infrastructure Test Fixes | 3/3 | Complete    | 2026-03-18 | - |
-| 94. Component & Hook Test Fixes | 1/2 | In Progress|  | - |
+| 94. Component & Hook Test Fixes | 2/2 | Complete   | 2026-03-18 | - |
 | 95. Tech Debt Cleanup | v11.1 | 0/TBD | Not started | - |
 
 **Total:** 15 milestones shipped, 91 phases complete, 361 plans executed. 4 phases planned for v11.1.

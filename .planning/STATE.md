@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.1
 milestone_name: Test Suite & Tech Debt Cleanup
 status: planning
-stopped_at: Completed 94-01-PLAN.md
-last_updated: "2026-03-18T13:13:47.048Z"
+stopped_at: Completed 94-02-PLAN.md
+last_updated: "2026-03-18T13:14:43.505Z"
 last_activity: 2026-03-18 — Roadmap created, ready to plan Phase 92
 progress:
   total_phases: 4
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 6
-  completed_plans: 5
+  completed_plans: 6
   percent: 0
 ---
 
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 93 P02 | 73s | 2 tasks | 4 files |
 | Phase 93-api-infrastructure-test-fixes P01 | 4 | 2 tasks | 3 files |
 | Phase 94-component-hook-test-fixes P01 | 77s | 2 tasks | 2 files |
+| Phase 94 P02 | 3m | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,8 @@ Recent decisions affecting v11.1:
 - [Phase 93-api-infrastructure-test-fixes]: TFIX-01 root cause was twofold: dynamic imports bypass Jest mocks AND NextResponseMock missing ok/clone() — both fixed in middleware.ts and jest.setup.ts
 - [Phase 94]: getByRole('button') resolves to actual <button> element — getByText resolves to inner <span>, use role queries for disable assertions
 - [Phase 94]: Added operational console.log diagnostics to VersionContext.checkVersion() for local-env skip and update-required messages (TFIX-12)
+- [Phase 94]: Refs (bandwidthRef/wanRef) preferred over adding state to useCallback deps to avoid re-renders
+- [Phase 94]: useDeviceHistory test mocks corrected to flat API shape; hook source was already correct
 
 ### Phase Structure
 
@@ -95,6 +98,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-18T13:13:47.044Z
-Stopped at: Completed 94-01-PLAN.md
+Last session: 2026-03-18T13:14:43.501Z
+Stopped at: Completed 94-02-PLAN.md
 Resume file: None

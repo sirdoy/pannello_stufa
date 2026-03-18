@@ -26,8 +26,8 @@ Requirements for test suite cleanup and tech debt resolution.
 ### Test Fixes — Components & Hooks
 
 - [x] **TFIX-09**: StovePrimaryActions.test.tsx — disable state tests pass (3 tests)
-- [ ] **TFIX-10**: useNetworkData.test.ts — stale flag timeout test passes (1 test)
-- [ ] **TFIX-11**: useDeviceHistory.test.ts — fetch/refresh tests pass (2 tests)
+- [x] **TFIX-10**: useNetworkData.test.ts — stale flag timeout test passes (1 test)
+- [x] **TFIX-11**: useDeviceHistory.test.ts — fetch/refresh tests pass (2 tests)
 - [x] **TFIX-12**: VersionContext.test.tsx — version check tests pass (4 tests)
 
 ### Tech Debt Cleanup
@@ -63,8 +63,8 @@ None — this is a cleanup milestone.
 | TFIX-07 | Phase 93 | Complete |
 | TFIX-08 | Phase 93 | Complete |
 | TFIX-09 | Phase 94 | Complete |
-| TFIX-10 | Phase 94 | Pending |
-| TFIX-11 | Phase 94 | Pending |
+| TFIX-10 | Phase 94 | Complete |
+| TFIX-11 | Phase 94 | Complete |
 | TFIX-12 | Phase 94 | Complete |
 | DEBT-01 | Phase 95 | Pending |
 | DEBT-02 | Phase 95 | Pending |

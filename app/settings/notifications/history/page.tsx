@@ -1,7 +1,7 @@
 'use client';
 
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import SettingsLayout from '@/app/components/SettingsLayout';
@@ -69,8 +69,7 @@ export default function NotificationHistoryPage() {
   }, [user]);
 
   // Column definitions
-  const columns = useMemo(
-    () => [
+  const columns = [
       {
         accessorKey: 'timestamp',
         header: 'Data',
@@ -130,9 +129,7 @@ export default function NotificationHistoryPage() {
           <Text className="max-w-[200px] truncate">{getValue()}</Text>
         ),
       },
-    ],
-    []
-  );
+  ];
 
   // Loading state
   if (userLoading) {

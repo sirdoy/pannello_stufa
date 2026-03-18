@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Settings } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import StatsCards from '@/app/components/analytics/StatsCards';
@@ -87,7 +87,7 @@ export default function AnalyticsPage() {
   }, []);
 
   // Fetch stats from API
-  const fetchStats = useCallback(async () => {
+  const fetchStats = async () => {
     if (!hasConsent) return;
     setLoading(true);
     setError(null);
@@ -103,7 +103,7 @@ export default function AnalyticsPage() {
     } finally {
       setLoading(false);
     }
-  }, [period, hasConsent]);
+  };
 
   // Fetch on period change
   useEffect(() => {

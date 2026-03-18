@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { parseTimelineSlots, DAY_NAMES, formatTimeFromMinutes, ZONE_COLORS, TimelineSlot as ImportedTimelineSlot } from '@/lib/utils/scheduleHelpers';
 import TimelineSlot from './TimelineSlot';
 import { Text } from '@/app/components/ui';
@@ -42,7 +42,7 @@ export default function WeeklyTimeline({ schedule, className = '' }: WeeklyTimel
   }, []);
 
   // Parse schedule into day-grouped slots
-  const slotsByDay = useMemo((): ImportedTimelineSlot[][] => {
+  const slotsByDay = ((): ImportedTimelineSlot[][] => {
     if (!schedule?.timetable || !schedule?.zones) {
       return Array(7).fill([]);
     }
@@ -59,10 +59,10 @@ export default function WeeklyTimeline({ schedule, className = '' }: WeeklyTimel
     });
 
     return grouped;
-  }, [schedule]);
+  })();
 
   // Get unique zones used in the schedule for legend
-  const usedZones = useMemo(() => {
+  const usedZones = (() => {
     if (!schedule?.zones) return [];
     const zoneTypes = new Set<number>();
     schedule.zones.forEach(z => zoneTypes.add(z.type));
@@ -71,7 +71,7 @@ export default function WeeklyTimeline({ schedule, className = '' }: WeeklyTimel
       type,
       ...(ZONE_COLORS[type] || defaultColor)
     }));
-  }, [schedule]);
+  })();
 
   if (!schedule) {
     return (

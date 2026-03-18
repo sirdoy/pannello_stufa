@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, Button, Skeleton, EmptyState, Heading, Text, Banner } from '@/app/components/ui';
 import CreateSceneModal from '@/app/components/lights/CreateSceneModal';
@@ -42,7 +42,7 @@ export default function ScenesPage() {
 
   const connectionCheckedRef = useRef<boolean>(false);
 
-  const fetchData = useCallback(async (): Promise<void> => {
+  const fetchData = async (): Promise<void> => {
     try {
       setError(null);
 
@@ -76,9 +76,9 @@ export default function ScenesPage() {
       console.error('Errore fetch scene Hue:', err);
       setError(err instanceof Error ? err.message : 'Errore sconosciuto');
     }
-  }, []);
+  };
 
-  const checkConnection = useCallback(async (): Promise<void> => {
+  const checkConnection = async (): Promise<void> => {
     try {
       setLoading(true);
       setError(null);
@@ -99,7 +99,7 @@ export default function ScenesPage() {
     } finally {
       setLoading(false);
     }
-  }, [fetchData]);
+  };
 
   // Check connection on mount
   useEffect(() => {

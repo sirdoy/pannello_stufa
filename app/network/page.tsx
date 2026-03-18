@@ -14,7 +14,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { PageLayout, Skeleton, Button, Heading, Card, Text } from '@/app/components/ui';
@@ -96,7 +96,7 @@ export default function NetworkPage() {
   }, [hasConsent]);
 
   // Handle category override - calls API and updates UI optimistically
-  const handleCategoryChange = useCallback(async (mac: string, category: DeviceCategory) => {
+  const handleCategoryChange = async (mac: string, category: DeviceCategory) => {
     try {
       const response = await fetch('/api/fritzbox/category-override', {
         method: 'POST',
@@ -112,7 +112,7 @@ export default function NetworkPage() {
       // Override failed — dropdown already closed, no action needed
       // Category will be re-fetched on next poll (fire-and-forget, self-heals)
     }
-  }, [networkData.updateDeviceCategory]);
+  };
 
   // Feed bandwidth data from polling into history buffer
   useEffect(() => {

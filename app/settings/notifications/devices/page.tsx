@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import SettingsLayout from '@/app/components/SettingsLayout';
 import { Card, Button, Heading, Text, Skeleton, EmptyState, Banner } from '@/app/components/ui';
@@ -29,7 +29,7 @@ export default function DeviceManagementPage() {
   const [currentToken, setCurrentToken] = useState<string | null>(null);
 
   // Fetch devices
-  const fetchDevices = useCallback(async () => {
+  const fetchDevices = async () => {
     try {
       setError(null);
       const res = await fetch('/api/notifications/devices');
@@ -46,7 +46,7 @@ export default function DeviceManagementPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
   // Get current device token
   useEffect(() => {

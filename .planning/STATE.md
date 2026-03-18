@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.1
 milestone_name: Test Suite & Tech Debt Cleanup
 status: planning
-stopped_at: Completed 95-03-PLAN.md
-last_updated: "2026-03-18T13:44:41.581Z"
+stopped_at: Completed 95-01-PLAN.md
+last_updated: "2026-03-18T14:01:06.606Z"
 last_activity: 2026-03-18 — Roadmap created, ready to plan Phase 92
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
   percent: 0
 ---
 
@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 94-component-hook-test-fixes P01 | 77s | 2 tasks | 2 files |
 | Phase 94 P02 | 3m | 2 tasks | 2 files |
 | Phase 95-tech-debt-cleanup P03 | 3 | 1 tasks | 1 files |
+| Phase 95-tech-debt-cleanup P01 | 16m | 2 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,7 @@ Recent decisions affecting v11.1:
 - [Phase 94]: Refs (bandwidthRef/wanRef) preferred over adding state to useCallback deps to avoid re-renders
 - [Phase 94]: useDeviceHistory test mocks corrected to flat API shape; hook source was already correct
 - [Phase 95-tech-debt-cleanup]: 8 stale env vars removed from .env.local: HOMEASSISTANT_API_URL/USER/PASSWORD (pre-v11.0) and NETATMO_CLIENT_ID/SECRET/REDIRECT_URI + NEXT_PUBLIC variants (pre-v10.0 OAuth)
+- [Phase 95-01]: DataTable retained 5 useMemo calls for TanStack Table referential stability (correctness requirement, not optimization)
 
 ### Phase Structure
 
@@ -100,6 +102,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-18T13:44:41.576Z
-Stopped at: Completed 95-03-PLAN.md
+Last session: 2026-03-18T14:01:06.595Z
+Stopped at: Completed 95-01-PLAN.md
 Resume file: None

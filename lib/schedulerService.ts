@@ -296,6 +296,7 @@ export const saveSchedule = async (day: string, intervals: ScheduleInterval[]): 
     // Also update the schedule's updatedAt timestamp
     const activeId = await getActiveScheduleId();
     await set(ref(db, `schedules-v2/schedules/${activeId}/updatedAt`), new Date().toISOString());
+    console.log(`Scheduler salvato per ${day}`);
   } catch (error) {
     console.error('Errore nel salvataggio scheduler:', error);
   }
@@ -338,6 +339,7 @@ export const setSchedulerMode = async (enabled: boolean): Promise<void> => {
       enabled: enabled,
       lastUpdated: new Date().toISOString()
     });
+    console.log(`Modalità scheduler impostata su: ${enabled ? 'attiva' : 'disattiva'}`);
   } catch (error) {
     console.error('Errore nel salvataggio modalità scheduler:', error);
   }
@@ -381,6 +383,7 @@ export const setSemiManualMode = async (nextScheduledChange: string): Promise<vo
       returnToAutoAt: nextScheduledChange,
       lastUpdated: new Date().toISOString()
     });
+    console.log(`Modalità semi-manuale attivata. Ritorno automatico previsto: ${nextScheduledChange}`);
   } catch (error) {
     console.error('Errore nell\'attivazione modalità semi-manuale:', error);
   }
@@ -394,6 +397,7 @@ export const clearSemiManualMode = async (): Promise<void> => {
       semiManual: false,
       lastUpdated: new Date().toISOString()
     });
+    console.log('Modalità semi-manuale disattivata. Ritorno in automatico.');
   } catch (error) {
     console.error('Errore nella disattivazione modalità semi-manuale:', error);
   }

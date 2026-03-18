@@ -110,7 +110,11 @@ Plans:
   2. `useNetworkData.test.ts` — stale flag timeout test passes
   3. `useDeviceHistory.test.ts` — both fetch/refresh tests pass
   4. `VersionContext.test.tsx` — all 4 version check tests pass
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 94-01-PLAN.md — Fix StovePrimaryActions role queries + VersionContext console.log calls (TFIX-09, TFIX-12)
+- [ ] 94-02-PLAN.md — Fix useNetworkData stale closure + useDeviceHistory response key (TFIX-10, TFIX-11)
 
 ### Phase 95: Tech Debt Cleanup
 **Goal**: Manual memoization removed and stale environment variables deleted — the codebase reflects current architecture with no dead configuration
@@ -143,11 +147,11 @@ Plans:
 | 84-91 | v11.0 | 13/13 | ✓ Complete | 2026-03-18 |
 | 92. Jest Configuration | 1/1 | Complete    | 2026-03-18 | - |
 | 93. API & Infrastructure Test Fixes | 3/3 | Complete    | 2026-03-18 | - |
-| 94. Component & Hook Test Fixes | v11.1 | 0/TBD | Not started | - |
+| 94. Component & Hook Test Fixes | v11.1 | 0/2 | Not started | - |
 | 95. Tech Debt Cleanup | v11.1 | 0/TBD | Not started | - |
 
 **Total:** 15 milestones shipped, 91 phases complete, 361 plans executed. 4 phases planned for v11.1.
 
 ---
 
-*Roadmap updated: 2026-03-18 — Phase 93 planned (3 plans)*
+*Roadmap updated: 2026-03-18 — Phase 94 planned (2 plans)*

@@ -1,5 +1,40 @@
 # Project Milestones: Pannello Stufa
 
+## v11.1 Test Suite & Tech Debt Cleanup (Shipped: 2026-03-18)
+
+**Delivered:** Clean test suite with zero ordering dependencies, all 12 failing test suites fixed (37 tests), ~179 useMemo/useCallback call-sites removed (React Compiler handles auto-memoization), and 8 stale environment variables deleted — net -264 lines of code cleanup.
+
+**Phases completed:** 92-95 (9 plans total)
+
+**Key accomplishments:**
+
+- Playwright .spec.ts files excluded from Jest via testPathIgnorePatterns, test ordering independence verified with `test:random` script, 4 flaky suites fixed (mock bleed via resetAllMocks + explicit beforeEach resets)
+- 8 API/infrastructure test suites fixed: middleware static imports for Jest mock interception, changelog console.log diagnostics, stoveApi/maintenance/scheduler/health operational logging, Fritz!Box history route standalone function + devices-events test rewrite
+- 4 component/hook test suites fixed: StovePrimaryActions getByRole ARIA queries, VersionContext console.log diagnostics, useNetworkData bandwidthRef/wanRef stale closure fix, useDeviceHistory flat API mock shape
+- ~179 useMemo/useCallback call-sites removed across 63 files — React Compiler 1.0 handles auto-memoization transparently (5 DataTable useMemo retained for TanStack Table referential stability)
+- 8 stale env vars deleted from .env.local: HOMEASSISTANT_API_URL/USER/PASSWORD (pre-v11.0) and NETATMO_CLIENT_ID/SECRET/REDIRECT_URI + NEXT_PUBLIC variants (pre-v10.0 OAuth)
+
+**Stats:**
+
+- 9 plans executed across 4 phases
+- 16/16 v11.1 requirements satisfied (100%)
+- 79 files changed (+792 insertions, -1,056 deletions, net -264 LOC)
+- 57 git commits with atomic changes
+- 1 day (2026-03-18)
+
+**Git range:** `docs(92)` (e4246fc) → `docs(phase-95)` (0e0b489)
+
+**Archives:**
+- [Roadmap](milestones/v11.1-ROADMAP.md)
+- [Requirements](milestones/v11.1-REQUIREMENTS.md)
+- [Audit](milestones/v11.1-MILESTONE-AUDIT.md)
+
+**Tech debt:** 1 FormModal isolation flake (pre-existing). DataTable retains 5 useMemo for TanStack Table referential stability (intentional). Nyquist partial (1/4 phases compliant).
+
+**What's next:** Test suite clean, tech debt resolved. Ready for next milestone planning.
+
+---
+
 ## v11.0 API Unification & Raspberry Pi Monitor (Shipped: 2026-03-18)
 
 **Delivered:** Unified Fritz!Box and Netatmo behind a shared HomeAssistant API transport (single base URL + X-API-Key auth), added Raspberry Pi as a new monitored device with dashboard card, dedicated page, and cron health integration, and formalized camera/schedule bug fixes from debug sessions.

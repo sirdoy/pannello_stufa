@@ -80,6 +80,45 @@
 
 ---
 
+## Milestone: v11.1 — Test Suite & Tech Debt Cleanup
+
+**Shipped:** 2026-03-18
+**Phases:** 4 | **Plans:** 9
+
+### What Was Built
+- Jest runner scoped correctly: Playwright .spec.ts excluded, test ordering independence verified with `test:random`
+- 12 failing test suites fixed across API/infrastructure (8) and component/hook (4) layers — 37 tests total
+- ~179 useMemo/useCallback call-sites removed across 63 files (React Compiler handles it)
+- 8 stale environment variables deleted from .env.local
+
+### What Worked
+- Foundational-first ordering: Phase 92 (Jest config) before 93-94 (test fixes) before 95 (cleanup) prevented cascading failures
+- Root cause analysis on each failing suite (not just patching assertions) — e.g., TFIX-01 was two separate issues (dynamic import + missing NextResponseMock properties)
+- Phase 95 ran last (after all tests green) so memoization removal could be verified against a clean baseline
+- Small focused plans (1-2 tasks each, most completing in seconds to minutes) — fast cycle times
+
+### What Was Inefficient
+- summary-extract tool returned null for all one_liners — frontmatter field either missing or not in expected format
+- STATE.md progress percent stuck at 0% despite all 9 plans being complete — same frontmatter sync issue from v11.0
+- Phase 95-02 needed a small follow-up commit (CameraEventsPage.tsx) caught during documentation — easy to miss files in large refactoring sweeps
+
+### Patterns Established
+- `resetAllMocks` + explicit `beforeEach` resets as standard for preventing mock bleed between tests
+- Static imports required for Jest mock interception — dynamic `await import()` bypasses module mocks
+- getByRole (not getByText) for testing disabled state on buttons (inner span has no disabled attribute)
+
+### Key Lessons
+1. **Mock bleed is the #1 flaky test cause** — clearAllMocks doesn't reset mockReturnValue, only call counts. Use resetAllMocks or explicit beforeEach.
+2. **React Compiler makes manual memoization pure tech debt** — removal across 63 files caused zero test failures
+3. **Cleanup milestones are fast** — 4 phases, 9 plans, 1 day. Budget them after feature milestones to keep the codebase healthy.
+4. **SUMMARY frontmatter needs standardization** — one_liner field not consistently populated, affecting milestone tooling
+
+### Cost Observations
+- Model mix: balanced profile (sonnet executors, sonnet verifiers)
+- Notable: Entire milestone completed in 1 day — smallest milestone yet (net -264 LOC), typical for cleanup work
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -89,6 +128,7 @@
 | v9.0 | 5 | 8 | Performance optimization — measurement-first |
 | v10.0 | 9 | 18 | API migration — audit-driven gap closure |
 | v11.0 | 8 | 13 | Transport unification + new device onboarding |
+| v11.1 | 4 | 9 | Test cleanup + memoization removal |
 
 ### Cumulative Quality
 
@@ -97,6 +137,7 @@
 | v9.0 | 4,004+ | React Compiler zero regressions | +7,920 |
 | v10.0 | 4,000+ | 28/28 requirements | -3,848 |
 | v11.0 | 4,000+ | 18/18 requirements | +11,425 |
+| v11.1 | 4,000+ | 16/16 requirements | -264 |
 
 ### Top Lessons (Verified Across Milestones)
 
@@ -104,3 +145,4 @@
 2. **Parallel execution** — independent phases run well in parallel with agent-based execution (verified v5.0, v8.0, v10.0)
 3. **Proxy pattern is reliable** — server-side proxy with rate limiting works for Fritz!Box, Netatmo, and Raspberry Pi (verified v8.0, v10.0, v11.0)
 4. **Established patterns accelerate** — new device onboarding follows Fritz!Box's proxy/card/page/cron template (verified v11.0)
+5. **Cleanup milestones after feature milestones** — v11.1 cleaned up v9.0-v11.0 tech debt in 1 day, keeping codebase healthy (verified v11.1)

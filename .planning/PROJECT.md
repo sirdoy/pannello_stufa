@@ -10,8 +10,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v11.0 (shipped 2026-03-18)
-**Status:** API Unification & Raspberry Pi Monitor — complete
+**Version:** v11.1 (shipped 2026-03-18)
+**Status:** Test Suite & Tech Debt Cleanup — complete
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -29,7 +29,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Netatmo integration via local HomeAssistant proxy (X-API-Key auth, SQLite-backed)
 - Raspberry Pi monitoring (health, CPU, memory, disk, system) via shared HA client
 - Web Vitals pipeline (useReportWebVitals + sendBeacon + Firebase RTDB)
-- ~103,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
+- ~103,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false, React Compiler auto-memoization)
 
 ## Requirements
 
@@ -414,18 +414,21 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ **RASPI-07**: Error boundary + loading skeleton — v11.0 (Phase 89)
 - ✓ **RASPI-08**: Cron health includes Raspberry Pi — v11.0 (Phase 90)
 
-## Current Milestone: v11.1 Test Suite & Tech Debt Cleanup
+**v11.1 Test Suite & Tech Debt Cleanup (Shipped 2026-03-18):**
 
-**Goal:** Fix all failing tests, remove unnecessary tests, add missing coverage, and clean up accumulated tech debt.
+**Test Infrastructure:**
+- ✓ **JEST-01**: Playwright .spec.ts files excluded from Jest runner — v11.1 (Phase 92)
+- ✓ **JEST-02**: Flaky tests pass reliably in full suite run (no ordering dependency) — v11.1 (Phase 92)
+- ✓ **TFIX-01** through **TFIX-08**: All 8 API/infrastructure test suites fixed — v11.1 (Phase 93)
+- ✓ **TFIX-09** through **TFIX-12**: All 4 component/hook test suites fixed — v11.1 (Phase 94)
 
-**Target features:**
-- Fix all ~50 failing unit tests across 12+ suites
-- Exclude Playwright .spec.ts files from Jest runner
-- Fix flaky tests (ordering/environment isolation)
-- Remove stale env vars and dead code
-- Remove manual useMemo/useCallback (React Compiler handles it)
+**Tech Debt:**
+- ✓ **DEBT-01**: ~179 useMemo/useCallback call-sites removed (React Compiler handles it) — v11.1 (Phase 95)
+- ✓ **DEBT-02**: 8 stale env vars removed from .env.local — v11.1 (Phase 95)
 
 ### Active
+
+(No active milestone — run `/gsd:new-milestone` to start next)
 
 ### Out of Scope
 
@@ -464,7 +467,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - 560+ TypeScript source files, 4,000+ tests passing
 - GitHub Actions cron (5-min schedule) per health monitoring e coordination (stove, thermostat, Raspberry Pi)
 - GDPR-compliant analytics con consent banner
-- 15 milestones shipped, 91 phases, 361 plans executed
+- 16 milestones shipped, 95 phases, 370 plans executed
 
 **v11.0 Milestone (2026-03-17 → 2026-03-18):**
 - 8 phases executed (13 plans)
@@ -481,15 +484,14 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Consent enforcement is caller responsibility (not middleware-enforced)
 - Visual parity human verification pending for refactored LightsCard and stove/page.tsx
 - 3 pre-existing vibration API test warnings
-- 28 pre-existing test failures (not compiler-related, confirmed by toggling React Compiler)
+- 1 FormModal isolation flake in full-suite runs (pre-existing, passes in isolation)
 - Fritz!Box rate limit budget shared across all API calls (10 req/min)
 - Self-hosted Fritz!Box API connectivity depends on myfritz.net (may timeout off-network)
 - CopyableIp uses plain button instead of design system Button (test simplicity)
-- Manual useMemo/useCallback not yet removed (deferred for regression attribution)
 - 3 Netatmo routes without frontend consumer (synchomeschedule, createnewhomeschedule, getroommeasure)
 - Netatmo proxy connectivity depends on myfritz.net (same risk as Fritz!Box)
-- Nyquist validation missing for v10.0 phases (75-83) and partial for v11.0 phases (84-91)
-- 8 stale env vars in .env.local (HOMEASSISTANT_*, NETATMO_* — unused after v11.0 migration)
+- Nyquist validation missing for v10.0 phases (75-83) and partial for v11.0/v11.1 phases
+- DataTable retains 5 useMemo for TanStack Table referential stability (intentional exception)
 
 **User Feedback:**
 - None yet (awaiting operational deployment)
@@ -563,6 +565,11 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 | Raspberry Pi informational cron | Pi failure uses console.warn, isolated try/catch, never blocks stove/thermostat | ✓ Good — Non-critical monitoring doesn't affect safety-critical paths (v11.0) |
 | 302 redirect for camera snapshot | Browser loads CDN URL directly, resilient to server network topology | ✓ Good — Handles proxy deployment variations (v11.0) |
 | SERVICE_UNAVAILABLE retry (5 attempts) | Proxy warm-up is transient, not fatal — 3s delay between retries | ✓ Good — Schedule/room data loads reliably after cold start (v11.0) |
+| testPathIgnorePatterns for Playwright | Cleanly separates Jest unit tests from Playwright E2E .spec.ts files | ✓ Good — No false failures from Playwright discovery (v11.1) |
+| resetAllMocks + explicit beforeEach | clearAllMocks doesn't reset mockReturnValue/mockImplementation | ✓ Good — 4 flaky suites fixed, ordering-independent (v11.1) |
+| Static imports for Jest mock interception | Dynamic `await import()` inside functions bypasses Jest module mocks | ✓ Good — withIdempotency tests pass reliably (v11.1) |
+| React Compiler replaces manual memoization | 271/271 components auto-memoized, manual useMemo/useCallback redundant | ✓ Good — ~179 call-sites removed, net -264 LOC (v11.1) |
+| DataTable useMemo exception | TanStack Table requires stable references for columns/data config | ✓ Good — 5 useMemo retained as intentional exception (v11.1) |
 
 ## Constraints
 
@@ -574,4 +581,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-18 after v11.1 milestone start (Test Suite & Tech Debt Cleanup)*
+*Last updated: 2026-03-18 after v11.1 milestone completion*

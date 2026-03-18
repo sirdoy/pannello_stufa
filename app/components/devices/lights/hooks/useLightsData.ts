@@ -228,11 +228,11 @@ export function useLightsData(): UseLightsDataReturn {
     setRefreshing(false);
   }
 
-  // Poll data every 30 seconds - pauses when tab hidden
+  // Poll data every 60 seconds - pauses when tab hidden
   // initialDelay: 100ms stagger to avoid thundering herd on dashboard mount
   useAdaptivePolling({
     callback: fetchData,
-    interval: connected ? 30000 : null, // Only poll when connected
+    interval: connected ? 60000 : null, // Only poll when connected
     alwaysActive: false, // Non-critical: pause when hidden
     immediate: true,
     initialDelay: 100,

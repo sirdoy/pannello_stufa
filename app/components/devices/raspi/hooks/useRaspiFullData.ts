@@ -39,7 +39,7 @@ export function useRaspiFullData(): UseRaspiFullDataReturn {
   const dataRef = useRef<RaspiFullData | null>(null);
 
   const isVisible = useVisibility();
-  const interval = isVisible ? 30000 : 300000;
+  const interval = isVisible ? 60000 : 300000;
 
   const fetchData = async () => {
     try {

@@ -2,9 +2,9 @@
  * useNetworkData Hook
  *
  * Encapsulates all Fritz!Box network state management:
- * - Polling via useAdaptivePolling (30s visible / 5min hidden)
+ * - Polling via useAdaptivePolling (60s visible / 5min hidden)
  * - Data fetching from 3 Fritz!Box API routes
- * - Sparkline data buffering (max 120 points = 1h at 30s)
+ * - Sparkline data buffering (max 120 points = 2h at 60s)
  * - Seeds sparklines with historical bandwidth data on mount
  * - Health computation with hysteresis (trend-aware via historical avg)
  * - Error handling that preserves cached data
@@ -31,7 +31,7 @@ import type {
 } from '../types';
 import type { DeviceCategory } from '@/types/firebase/network';
 
-// 1h of data at 30s polling interval
+// 2h of data at 60s polling interval
 const SPARKLINE_MAX_POINTS = 120;
 
 /**
@@ -91,7 +91,7 @@ export function useNetworkData(): UseNetworkDataReturn {
 
   // Visibility tracking for adaptive polling
   const isVisible = useVisibility();
-  const interval = isVisible ? 30000 : 300000; // 30s visible, 5min hidden
+  const interval = isVisible ? 60000 : 300000; // 60s visible, 5min hidden
 
   /**
    * Enrich devices with categories via vendor-lookup API.
@@ -226,7 +226,7 @@ export function useNetworkData(): UseNetworkDataReturn {
         setBandwidth(bw);
         bandwidthRef.current = bw;
 
-        // Append to sparkline buffers (max 120 points = 1h at 30s interval)
+        // Append to sparkline buffers (max 120 points = 2h at 60s interval)
         const now = Date.now();
         setDownloadHistory(prev => [...prev, { time: now, mbps: bw.download }].slice(-SPARKLINE_MAX_POINTS));
         setUploadHistory(prev => [...prev, { time: now, mbps: bw.upload }].slice(-SPARKLINE_MAX_POINTS));
@@ -293,7 +293,7 @@ export function useNetworkData(): UseNetworkDataReturn {
     }
   };
 
-  // Adaptive polling - 30s visible, 5min hidden
+  // Adaptive polling - 60s visible, 5min hidden
   // initialDelay: 500ms stagger to avoid thundering herd on dashboard mount
   useAdaptivePolling({
     callback: fetchData,

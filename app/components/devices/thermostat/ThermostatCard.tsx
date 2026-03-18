@@ -102,11 +102,11 @@ export default function ThermostatCard() {
     checkConnection();
   }, []);
 
-  // Poll status every 30 seconds - pauses when tab hidden
+  // Poll status every 60 seconds - pauses when tab hidden
   // initialDelay: 50ms stagger to avoid thundering herd on dashboard mount
   useAdaptivePolling({
     callback: fetchStatus,
-    interval: topology ? 30000 : null, // Only poll when connected (topology exists)
+    interval: topology ? 60000 : null, // Only poll when connected (topology exists)
     alwaysActive: false, // Non-critical: pause when hidden
     immediate: true,
     initialDelay: 50,

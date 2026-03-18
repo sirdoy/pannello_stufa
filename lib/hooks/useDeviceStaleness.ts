@@ -2,7 +2,7 @@
  * useDeviceStaleness Hook
  *
  * React hook for real-time device staleness monitoring.
- * Polls every 5 seconds to update staleness information.
+ * Polls every 60 seconds to update staleness information.
  * Pauses polling when tab is hidden (non-critical monitoring).
  *
  * @module useDeviceStaleness
@@ -17,7 +17,7 @@ import { useVisibility } from './useVisibility';
 /**
  * Hook for monitoring device data staleness
  *
- * Provides real-time staleness information that updates every 5 seconds.
+ * Provides real-time staleness information that updates every 60 seconds.
  * Returns null initially until first fetch completes.
  *
  * @param deviceId - Device ID to monitor
@@ -38,13 +38,13 @@ import { useVisibility } from './useVisibility';
  *   );
  * }
  */
-export function useDeviceStaleness(deviceId: string): StalenessInfo | null {
+export function useDeviceStaleness(deviceId: string, thresholdMs?: number): StalenessInfo | null {
   const [staleness, setStaleness] = useState<StalenessInfo | null>(null);
   const isVisible = useVisibility();
 
   const fetchStaleness = async () => {
     try {
-      const info = await getDeviceStaleness(deviceId);
+      const info = await getDeviceStaleness(deviceId, thresholdMs);
       setStaleness(info);
     } catch (error) {
       console.error(`[useDeviceStaleness] Error fetching staleness for ${deviceId}:`, error);
@@ -59,14 +59,14 @@ export function useDeviceStaleness(deviceId: string): StalenessInfo | null {
     // Fetch immediately when becoming visible
     fetchStaleness();
 
-    // Poll every 5 seconds while visible
-    const intervalId = setInterval(fetchStaleness, 5000);
+    // Poll every 60 seconds while visible
+    const intervalId = setInterval(fetchStaleness, 60000);
 
     return () => {
       clearInterval(intervalId);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deviceId, isVisible]);
+  }, [deviceId, isVisible, thresholdMs]);
 
   return staleness;
 }

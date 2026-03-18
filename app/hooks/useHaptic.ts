@@ -1,6 +1,5 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
 import {
   vibrateShort,
   vibrateSuccess,
@@ -37,7 +36,7 @@ export interface UseHapticReturn {
  */
 export function useHaptic(pattern: HapticPattern = 'short'): UseHapticReturn {
   // Map pattern names to vibration functions
-  const vibrationFunction = useMemo(() => {
+  const vibrationFunction = (() => {
     switch (pattern) {
       case 'success':
         return vibrateSuccess;
@@ -49,15 +48,15 @@ export function useHaptic(pattern: HapticPattern = 'short'): UseHapticReturn {
       default:
         return vibrateShort;
     }
-  }, [pattern]);
+  })();
 
-  // Memoize trigger function to avoid re-renders
-  const trigger = useCallback(() => {
+  // Trigger function
+  const trigger = () => {
     vibrationFunction();
-  }, [vibrationFunction]);
+  };
 
   // Check if haptic is supported on this device
-  const isSupported = useMemo(() => isVibrationSupported(), []);
+  const isSupported = isVibrationSupported();
 
   return {
     trigger,

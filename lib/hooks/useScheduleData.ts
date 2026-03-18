@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { NETATMO_ROUTES } from '@/lib/routes';
 
 /**
@@ -56,7 +56,7 @@ export function useScheduleData(): { schedules: Schedule[]; activeSchedule: Sche
   // Track the active retry timeout so we can clear it on unmount
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const fetchSchedules = useCallback(async (isRetry = false) => {
+  const fetchSchedules = async (isRetry = false) => {
     if (!isRetry) {
       // Reset retry counter on explicit (non-retry) invocations
       retryCountRef.current = 0;
@@ -127,17 +127,17 @@ export function useScheduleData(): { schedules: Schedule[]; activeSchedule: Sche
         setLoading(false);
       }
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  };
 
   // Wrapper exposed to consumers: always resets retry state
-  const refetch = useCallback(async () => {
+  const refetch = async () => {
     if (retryTimeoutRef.current !== null) {
       clearTimeout(retryTimeoutRef.current);
       retryTimeoutRef.current = null;
     }
     retryCountRef.current = 0;
     await fetchSchedules(false);
-  }, [fetchSchedules]);
+  };
 
   // Initial fetch on mount
   useEffect(() => {
@@ -149,7 +149,8 @@ export function useScheduleData(): { schedules: Schedule[]; activeSchedule: Sche
         retryTimeoutRef.current = null;
       }
     };
-  }, [fetchSchedules]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Derive active schedule from schedules array
   const activeSchedule = schedules.find(s => s.selected) || null;

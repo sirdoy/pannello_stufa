@@ -10,7 +10,7 @@
 
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { getDeviceStaleness, type StalenessInfo } from '@/lib/pwa/stalenessDetector';
 import { useVisibility } from './useVisibility';
 
@@ -42,7 +42,7 @@ export function useDeviceStaleness(deviceId: string): StalenessInfo | null {
   const [staleness, setStaleness] = useState<StalenessInfo | null>(null);
   const isVisible = useVisibility();
 
-  const fetchStaleness = useCallback(async () => {
+  const fetchStaleness = async () => {
     try {
       const info = await getDeviceStaleness(deviceId);
       setStaleness(info);
@@ -50,7 +50,7 @@ export function useDeviceStaleness(deviceId: string): StalenessInfo | null {
       console.error(`[useDeviceStaleness] Error fetching staleness for ${deviceId}:`, error);
       // Keep previous state on error, don't set to null
     }
-  }, [deviceId]);
+  };
 
   useEffect(() => {
     // Don't poll when tab is hidden (staleness display is non-critical)
@@ -65,7 +65,8 @@ export function useDeviceStaleness(deviceId: string): StalenessInfo | null {
     return () => {
       clearInterval(intervalId);
     };
-  }, [deviceId, isVisible, fetchStaleness]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deviceId, isVisible]);
 
   return staleness;
 }

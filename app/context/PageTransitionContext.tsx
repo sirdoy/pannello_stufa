@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, useRef, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useRef, useEffect, ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 
 /**
@@ -81,7 +81,7 @@ export function PageTransitionProvider({ children }: { children: ReactNode }) {
    * Start page transition
    * Usa View Transitions API se disponibile, altrimenti fallback CSS
    */
-  const startTransition = useCallback(async (callback?: () => void | Promise<void>): Promise<void> => {
+  const startTransition = async (callback?: () => void | Promise<void>): Promise<void> => {
     // Set transitioning state
     setIsTransitioning(true);
 
@@ -126,7 +126,7 @@ export function PageTransitionProvider({ children }: { children: ReactNode }) {
       document.documentElement.removeAttribute('data-transition-direction');
       document.documentElement.removeAttribute('data-transition-phase');
     }
-  }, [transitionType, direction]);
+  };
 
   const value = {
     startTransition,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useVisibility } from '@/lib/hooks/useVisibility';
 import type { CpuResponse, MemoryResponse, DiskResponse, SystemResponse } from '@/types/raspi';
@@ -45,7 +45,7 @@ export function useRaspiData(): UseRaspiDataReturn {
   const isVisible = useVisibility();
   const interval = isVisible ? 30000 : 300000;
 
-  const fetchData = useCallback(async () => {
+  const fetchData = async () => {
     try {
       setError(null);
       const [cpuRes, memRes, diskRes, sysRes] = await Promise.all([
@@ -84,7 +84,7 @@ export function useRaspiData(): UseRaspiDataReturn {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   useAdaptivePolling({
     callback: fetchData,

@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 import { getLatestVersion } from '@/lib/changelogService';
 import { APP_VERSION } from '@/lib/version';
 import { isDevelopment } from '@/lib/environmentHelper';
@@ -48,7 +48,7 @@ export function VersionProvider({ children }: { children: ReactNode }) {
    * Controlla versione Firebase vs locale
    * Può essere chiamata on-demand da qualsiasi componente
    */
-  const checkVersion = useCallback(async (): Promise<void> => {
+  const checkVersion = async (): Promise<void> => {
     // Evita check simultanei usando ref interno invece di state dependency
     if (isChecking) return;
 
@@ -88,8 +88,7 @@ export function VersionProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsChecking(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Rimuovo isChecking dalle dependencies per stabilizzare la funzione
+  };
 
   const value = {
     needsUpdate,

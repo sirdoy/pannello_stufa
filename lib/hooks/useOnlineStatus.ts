@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 /**
  * Hook for monitoring online/offline status
@@ -36,7 +36,7 @@ export function useOnlineStatus(): { isOnline: boolean; wasOffline: boolean; las
    * Check connection by attempting to fetch a small resource
    * More reliable than navigator.onLine alone
    */
-  const checkConnection = useCallback(async () => {
+  const checkConnection = async () => {
     // navigator.onLine is false = definitely offline
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
       return false;
@@ -53,7 +53,7 @@ export function useOnlineStatus(): { isOnline: boolean; wasOffline: boolean; las
       // If fetch fails, try navigator.onLine as fallback
       return typeof navigator !== 'undefined' ? navigator.onLine : true;
     }
-  }, []);
+  };
 
   // Initialize state on mount
   useEffect(() => {
@@ -131,7 +131,8 @@ export function useOnlineStatus(): { isOnline: boolean; wasOffline: boolean; las
     );
 
     return () => clearInterval(interval);
-  }, [isOnline, offlineSince, checkConnection]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOnline, offlineSince]);
 
   return {
     isOnline,

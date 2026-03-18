@@ -20,7 +20,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
   incrementVisitCount,
   isDismissed,
@@ -94,7 +94,7 @@ export function useInstallPrompt(): UseInstallPromptReturn {
    * Trigger native install prompt
    * Returns true if user accepted, false if dismissed or failed
    */
-  const install = useCallback(async (): Promise<boolean> => {
+  const install = async (): Promise<boolean> => {
     if (!deferredPrompt) {
       return false;
     }
@@ -115,15 +115,15 @@ export function useInstallPrompt(): UseInstallPromptReturn {
       // Prompt failed (already called, browser doesn't support, etc.)
       return false;
     }
-  }, [deferredPrompt]);
+  };
 
   /**
    * Dismiss prompt with 30-day cooldown
    */
-  const dismiss = useCallback(() => {
+  const dismiss = () => {
     dismissPrompt();
     setCanInstall(false);
-  }, []);
+  };
 
   return {
     canInstall,

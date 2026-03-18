@@ -1,12 +1,12 @@
 import { withAuthAndErrorHandler, success } from '@/lib/core';
-import { fritzboxClient } from '@/lib/fritzbox';
+import { getDeviceEvents } from '@/lib/fritzbox';
 import type { DeviceHistoryTimeRange } from '@/app/components/devices/network/types';
 
 export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/fritzbox/history
- * Retrieves device connection/disconnection events from HA proxy.
+ * Retrieves device connection/disconnection events from Firebase RTDB.
  * Events are state changes only (connected/disconnected), not raw snapshots.
  * Protected: Requires Auth0 authentication
  *
@@ -37,7 +37,15 @@ export const GET = withAuthAndErrorHandler(async (request) => {
     : '24h';
 
   const hours = getTimeRangeHours(range);
-  const events = await fritzboxClient.getDeviceEvents(hours, deviceParam ?? undefined);
+  const now = Date.now();
+  const startTime = now - hours * 60 * 60 * 1000;
+  const endTime = now;
+  const allEvents = await getDeviceEvents(startTime, endTime);
+
+  // Filter by device MAC if specified
+  const events = deviceParam
+    ? allEvents.filter(e => e.deviceMac === deviceParam)
+    : allEvents;
 
   return success({
     events,

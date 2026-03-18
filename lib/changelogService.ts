@@ -32,6 +32,7 @@ export const saveVersionToFirebase = async (
       type,
       timestamp: new Date().toISOString(),
     });
+    console.log(`Versione ${version} salvata su Firebase`);
   } catch (error) {
     console.error('Errore nel salvataggio versione su Firebase:', error);
   }
@@ -104,6 +105,7 @@ export const syncVersionHistoryToFirebase = async (versionHistory: any[]): Promi
 
       await saveVersionToFirebase(version.version, version.date, version.changes, type);
     }
+    console.log('VERSION_HISTORY sincronizzato con Firebase');
   } catch (error) {
     console.error('Errore nella sincronizzazione:', error);
     throw error; // Re-throw to allow API to handle it

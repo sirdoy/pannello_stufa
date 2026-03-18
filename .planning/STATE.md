@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v11.0
-milestone_name: API Unification & Raspberry Pi Monitor
-status: complete
-stopped_at: Milestone v11.0 shipped
+milestone: v11.1
+milestone_name: Test Suite & Tech Debt Cleanup
+status: active
+stopped_at: null
 last_updated: "2026-03-18"
-last_activity: 2026-03-18 — v11.0 milestone archived
+last_activity: 2026-03-18 — Milestone v11.1 started
 progress:
-  total_phases: 8
-  completed_phases: 8
-  total_plans: 13
-  completed_plans: 13
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,16 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-18)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v11.0 shipped — ready for next milestone planning
+**Current focus:** v11.1 Test Suite & Tech Debt Cleanup
 
 ## Current Position
 
-Phase: All complete (91 phases, 15 milestones)
+Phase: Not started (defining requirements)
 Plan: —
-Status: Milestone v11.0 shipped
-Last activity: 2026-03-18 — v11.0 milestone archived
-
-Progress: [██████████] 100% (8/8 phases)
+Status: Defining requirements
+Last activity: 2026-03-18 — Milestone v11.1 started
 
 ## Performance Metrics
 
@@ -56,7 +54,7 @@ See PROJECT.md Key Decisions table for full history.
 
 ### Roadmap Evolution
 
-None pending — milestone complete.
+None pending — milestone starting.
 
 ### Pending Todos
 
@@ -76,5 +74,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Milestone v11.0 shipped
+Stopped at: Defining requirements for v11.1
 Resume file: None

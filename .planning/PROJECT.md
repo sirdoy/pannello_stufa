@@ -414,9 +414,18 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ **RASPI-07**: Error boundary + loading skeleton — v11.0 (Phase 89)
 - ✓ **RASPI-08**: Cron health includes Raspberry Pi — v11.0 (Phase 90)
 
-### Active
+## Current Milestone: v11.1 Test Suite & Tech Debt Cleanup
 
-(No active requirements — run `/gsd:new-milestone` to define next)
+**Goal:** Fix all failing tests, remove unnecessary tests, add missing coverage, and clean up accumulated tech debt.
+
+**Target features:**
+- Fix all ~50 failing unit tests across 12+ suites
+- Exclude Playwright .spec.ts files from Jest runner
+- Fix flaky tests (ordering/environment isolation)
+- Remove stale env vars and dead code
+- Remove manual useMemo/useCallback (React Compiler handles it)
+
+### Active
 
 ### Out of Scope
 
@@ -565,4 +574,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-18 after v11.0 milestone (API Unification & Raspberry Pi Monitor shipped)*
+*Last updated: 2026-03-18 after v11.1 milestone start (Test Suite & Tech Debt Cleanup)*

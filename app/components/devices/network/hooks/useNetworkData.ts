@@ -59,6 +59,10 @@ export function useNetworkData(): UseNetworkDataReturn {
   // Ref to track MACs that have been enriched with categories
   const enrichedMacsRef = useRef<Set<string>>(new Set());
 
+  // Refs for stale-closure-safe reads of bandwidth/wan in fetchData error guards
+  const bandwidthRef = useRef<BandwidthData | null>(null);
+  const wanRef = useRef<WanData | null>(null);
+
   // Seed sparklines with historical data on mount (fire-and-forget)
   useEffect(() => {
     const loadHistory = async () => {
@@ -184,7 +188,7 @@ export function useNetworkData(): UseNetworkDataReturn {
           } else if (errorData.code === 'FRITZBOX_TIMEOUT') {
             setStale(true);
             // Show error only if no cached data to display
-            if (!bandwidth && !wan) {
+            if (!bandwidthRef.current && !wanRef.current) {
               setError({
                 type: 'generic',
                 message: 'Fritz!Box non raggiungibile. Verifica che il server API sia attivo.'
@@ -220,6 +224,7 @@ export function useNetworkData(): UseNetworkDataReturn {
       const bw = bwData.bandwidth;
       if (bw) {
         setBandwidth(bw);
+        bandwidthRef.current = bw;
 
         // Append to sparkline buffers (max 120 points = 1h at 30s interval)
         const now = Date.now();
@@ -230,6 +235,7 @@ export function useNetworkData(): UseNetworkDataReturn {
       const rawDevices = devData.devices || [];
       setDevices(rawDevices);
       setWan(wanData.wan || null);
+      wanRef.current = wanData.wan || null;
 
       // Fire-and-forget category enrichment (non-blocking, self-heals on next poll)
       enrichDevicesWithCategories(rawDevices).then(enrichedDevices => {
@@ -275,7 +281,7 @@ export function useNetworkData(): UseNetworkDataReturn {
     } catch (err) {
       // Network error — keep cached data, mark stale
       setStale(true);
-      if (!bandwidth && !wan) {
+      if (!bandwidthRef.current && !wanRef.current) {
         // No cached data at all — set generic error
         setError({
           type: 'generic',

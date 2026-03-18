@@ -16,7 +16,7 @@
 - ✅ **v8.1 Masonry Dashboard** — Phases 68-69 (shipped 2026-02-18)
 - ✅ **v9.0 Performance Optimization** — Phases 70-74 (shipped 2026-02-19)
 - ✅ **v10.0 Netatmo API Migration** — Phases 75-83 (shipped 2026-03-16)
-- 🚧 **v11.0 API Unification & Raspberry Pi Monitor** — Phases 84-90 (in progress)
+- 🚧 **v11.0 API Unification & Raspberry Pi Monitor** — Phases 84-91 (in progress)
 
 ## Phases
 
@@ -66,6 +66,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 88: Raspberry Pi API Layer** - Proxy client functions, TypeScript types, and Next.js API routes for all Raspberry Pi endpoints (completed 2026-03-17)
 - [x] **Phase 89: Raspberry Pi Dashboard Card** - RaspiCard component in device registry with adaptive polling, error boundary, and skeleton (completed 2026-03-17)
 - [x] **Phase 90: Raspberry Pi Page + Cron** - Dedicated /raspi page with full stats and cron health integration (completed 2026-03-18)
+- [ ] **Phase 91: Bug Fix Verification** - Formalize and verify camera snapshot/live + schedule 503 retry fixes from debug sessions (planned)
 
 ## Phase Details
 
@@ -185,8 +186,18 @@ Plans:
 | 89. Raspberry Pi Dashboard Card | 2/2 | Complete    | 2026-03-17 | - |
 | 90. Raspberry Pi Page + Cron | 2/2 | Complete    | 2026-03-18 | - |
 
-**Total:** 14 milestones shipped, 83 phases complete, 348 plans executed. v11.0 in progress (7 phases planned, phases 84-90).
+**Total:** 14 milestones shipped, 83 phases complete, 348 plans executed. v11.0 in progress (8 phases planned, phases 84-91).
+
+### Phase 91: Correzione problemi dati Rete e Netatmo camera
+
+**Goal:** Formalize and verify bug fixes from debug sessions (camera snapshot 302 redirect, stream error states, schedule/room 503 retry logic) — all code already committed at d33d210
+**Requirements**: CAM-01, CAM-02, CAM-03, SCHED-01, ROOM-01
+**Depends on:** Phase 90
+**Plans:** 1 plan
+
+Plans:
+- [ ] 91-01-PLAN.md — Verify tests, document fixes, close debug files, browser verification checkpoint
 
 ---
 
-*Roadmap updated: 2026-03-18 — Phase 90 plans created (2 plans, wave 1)*
+*Roadmap updated: 2026-03-18 — Phase 91 plans created (1 plan, wave 1)*

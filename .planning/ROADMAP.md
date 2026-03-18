@@ -61,7 +61,7 @@ See `.planning/milestones/` for full archives.
 
 **Milestone Goal:** Fix all failing tests and remove accumulated tech debt — the codebase runs a clean test suite with zero ordering dependencies, and no dead code or stale configuration remains.
 
-- [ ] **Phase 92: Jest Configuration** - Exclude Playwright files and eliminate flaky ordering dependencies
+- [x] **Phase 92: Jest Configuration** - Exclude Playwright files and eliminate flaky ordering dependencies (completed 2026-03-18)
 - [ ] **Phase 93: API & Infrastructure Test Fixes** - Fix 8 failing test suites in server-side code
 - [ ] **Phase 94: Component & Hook Test Fixes** - Fix 4 failing test suites in UI and hooks
 - [ ] **Phase 95: Tech Debt Cleanup** - Remove manual memoization and stale env vars
@@ -76,7 +76,7 @@ See `.planning/milestones/` for full archives.
   1. Running `npm test` does not pick up any Playwright `.spec.ts` files
   2. Running the full test suite produces the same pass/fail results regardless of which order suites execute
   3. No test fails due to shared global state leaked from a previously-run suite
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 92-01-PLAN.md — Exclude Playwright files from Jest and validate ordering independence
@@ -136,7 +136,7 @@ Plans:
 | 70-74 | v9.0 | 8/8 | ✓ Complete | 2026-02-19 |
 | 75-83 | v10.0 | 18/18 | ✓ Complete | 2026-03-16 |
 | 84-91 | v11.0 | 13/13 | ✓ Complete | 2026-03-18 |
-| 92. Jest Configuration | v11.1 | 0/1 | Not started | - |
+| 92. Jest Configuration | 1/1 | Complete   | 2026-03-18 | - |
 | 93. API & Infrastructure Test Fixes | v11.1 | 0/TBD | Not started | - |
 | 94. Component & Hook Test Fixes | v11.1 | 0/TBD | Not started | - |
 | 95. Tech Debt Cleanup | v11.1 | 0/TBD | Not started | - |

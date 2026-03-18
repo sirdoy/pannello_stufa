@@ -9,8 +9,8 @@ Requirements for test suite cleanup and tech debt resolution.
 
 ### Jest Configuration
 
-- [ ] **JEST-01**: Playwright .spec.ts files excluded from Jest runner
-- [ ] **JEST-02**: Flaky tests pass reliably in full suite run (no ordering dependency)
+- [x] **JEST-01**: Playwright .spec.ts files excluded from Jest runner
+- [x] **JEST-02**: Flaky tests pass reliably in full suite run (no ordering dependency)
 
 ### Test Fixes — API & Infrastructure
 
@@ -52,8 +52,8 @@ None — this is a cleanup milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| JEST-01 | Phase 92 | Pending |
-| JEST-02 | Phase 92 | Pending |
+| JEST-01 | Phase 92 | Complete |
+| JEST-02 | Phase 92 | Complete |
 | TFIX-01 | Phase 93 | Pending |
 | TFIX-02 | Phase 93 | Pending |
 | TFIX-03 | Phase 93 | Pending |

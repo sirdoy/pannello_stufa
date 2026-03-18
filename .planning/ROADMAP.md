@@ -76,7 +76,10 @@ See `.planning/milestones/` for full archives.
   1. Running `npm test` does not pick up any Playwright `.spec.ts` files
   2. Running the full test suite produces the same pass/fail results regardless of which order suites execute
   3. No test fails due to shared global state leaked from a previously-run suite
-**Plans**: TBD
+**Plans:** 1 plan
+
+Plans:
+- [ ] 92-01-PLAN.md — Exclude Playwright files from Jest and validate ordering independence
 
 ### Phase 93: API & Infrastructure Test Fixes
 **Goal**: All server-side and infrastructure test suites pass with no skipped or failing assertions
@@ -133,7 +136,7 @@ See `.planning/milestones/` for full archives.
 | 70-74 | v9.0 | 8/8 | ✓ Complete | 2026-02-19 |
 | 75-83 | v10.0 | 18/18 | ✓ Complete | 2026-03-16 |
 | 84-91 | v11.0 | 13/13 | ✓ Complete | 2026-03-18 |
-| 92. Jest Configuration | v11.1 | 0/TBD | Not started | - |
+| 92. Jest Configuration | v11.1 | 0/1 | Not started | - |
 | 93. API & Infrastructure Test Fixes | v11.1 | 0/TBD | Not started | - |
 | 94. Component & Hook Test Fixes | v11.1 | 0/TBD | Not started | - |
 | 95. Tech Debt Cleanup | v11.1 | 0/TBD | Not started | - |
@@ -142,4 +145,4 @@ See `.planning/milestones/` for full archives.
 
 ---
 
-*Roadmap updated: 2026-03-18 — v11.1 roadmap created*
+*Roadmap updated: 2026-03-18 — Phase 92 planned (1 plan)*

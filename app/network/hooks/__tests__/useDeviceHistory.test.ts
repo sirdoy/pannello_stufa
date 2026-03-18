@@ -29,7 +29,7 @@ describe('useDeviceHistory', () => {
     mockFetch.mockResolvedValueOnce({
       json: async () => ({
         success: true,
-        data: { events: mockEvents },
+        events: mockEvents,
       }),
     });
 
@@ -54,7 +54,7 @@ describe('useDeviceHistory', () => {
     mockFetch.mockResolvedValue({
       json: async () => ({
         success: true,
-        data: { events: [] },
+        events: [],
       }),
     });
 
@@ -80,7 +80,7 @@ describe('useDeviceHistory', () => {
     mockFetch.mockResolvedValue({
       json: async () => ({
         success: true,
-        data: { events: [] },
+        events: [],
       }),
     });
 
@@ -137,7 +137,7 @@ describe('useDeviceHistory', () => {
     mockFetch.mockResolvedValueOnce({
       json: async () => ({
         success: true,
-        data: { events: [] },
+        events: [],
       }),
     });
 
@@ -165,7 +165,7 @@ describe('useDeviceHistory', () => {
     mockFetch.mockResolvedValue({
       json: async () => ({
         success: true,
-        data: { events: mockEvents },
+        events: mockEvents,
       }),
     });
 

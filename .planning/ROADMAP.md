@@ -74,7 +74,7 @@ See `.planning/milestones/` for full archives.
 
 #### Phase 96: Polling Simplification
 
-- [ ] **Phase 96: Polling Simplification** - Unify all device hooks to 60s useAdaptivePolling, remove Firebase RTDB stove listener and sync-external-state
+- [x] **Phase 96: Polling Simplification** - Unify all device hooks to 60s useAdaptivePolling, remove Firebase RTDB stove listener and sync-external-state (completed 2026-03-18)
 
 #### Phase 97: E2E Page Verification
 
@@ -131,7 +131,7 @@ Plans:
 | 75-83 | v10.0 | 18/18 | ✓ Complete | 2026-03-16 |
 | 84-91 | v11.0 | 13/13 | ✓ Complete | 2026-03-18 |
 | 92-95 | v11.1 | 9/9 | ✓ Complete | 2026-03-18 |
-| 96 | 1/2 | In Progress|  | - |
+| 96 | 2/2 | Complete   | 2026-03-18 | - |
 | 97 | v12.0 | 0/TBD | Not started | - |
 
 **Total:** 16 milestones shipped, 95 phases complete, 370 plans executed. v12.0 in progress.

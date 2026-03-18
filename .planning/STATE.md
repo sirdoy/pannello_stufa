@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v12.0
 milestone_name: Data Fetching Simplification & E2E Verification
 status: planning
-stopped_at: Completed 96-02-PLAN.md
-last_updated: "2026-03-18T18:24:43.572Z"
+stopped_at: Completed 96-01-PLAN.md
+last_updated: "2026-03-18T18:31:24.688Z"
 last_activity: 2026-03-18 — Roadmap created, 2 phases mapped to 18 requirements
 progress:
   total_phases: 2
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 96 of 97 (Polling Simplification)
-Plan: — (ready to plan)
-Status: Ready to plan
-Last activity: 2026-03-18 — Roadmap created, 2 phases mapped to 18 requirements
+Plan: 1 of 1 complete
+Status: Phase 96 complete — ready for Phase 97
+Last activity: 2026-03-18 — Phase 96 Plan 01: stove polling simplification complete
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -49,6 +49,7 @@ Progress: [░░░░░░░░░░] 0%
 | v11.0 API Unification & Raspberry Pi | 84-91 | 13 | 2 days |
 | v11.1 Test Suite & Tech Debt Cleanup | 92-95 | 9 | 1 day |
 | Phase 96 P02 | 3m43s | 2 tasks | 7 files |
+| Phase 96 P01 | 9 | 2 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -60,6 +61,8 @@ Recent decisions affecting current work:
 - v11.1: React Compiler replaces manual memoization — confirms polling simplification is the right next lever for server load reduction
 - v7.0: alwaysActive flag for stove polling (safety-critical) — Phase 96 must NOT regress this: stove hook rewrite must preserve always-on polling behavior
 - [Phase 96]: SPARKLINE_MAX_POINTS stays at 120 — 2h of sparkline history at 60s is acceptable and preferable to reducing history
+- [Phase 96]: useAdaptivePolling(60s, alwaysActive:true) replaces custom Firebase RTDB + polling loop in useStoveData
+- [Phase 96]: Stove-specific staleness thresholds: 90s when on, 180s when off via optional thresholdMs param
 
 ### Pending Todos
 
@@ -71,6 +74,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-18T18:24:43.566Z
-Stopped at: Completed 96-02-PLAN.md
+Last session: 2026-03-18T18:31:24.683Z
+Stopped at: Completed 96-01-PLAN.md
 Resume file: None

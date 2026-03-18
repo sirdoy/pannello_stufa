@@ -9,9 +9,9 @@ Requirements for Data Fetching Simplification & E2E Verification milestone.
 
 ### Polling Simplification
 
-- [ ] **POLL-01**: StoveCard usa useAdaptivePolling (60s) invece del polling loop custom
-- [ ] **POLL-02**: Firebase RTDB real-time listener della stufa rimosso
-- [ ] **POLL-03**: sync-external-state call rimossa dal ciclo fetch stufa
+- [x] **POLL-01**: StoveCard usa useAdaptivePolling (60s) invece del polling loop custom
+- [x] **POLL-02**: Firebase RTDB real-time listener della stufa rimosso
+- [x] **POLL-03**: sync-external-state call rimossa dal ciclo fetch stufa
 - [x] **POLL-04**: ThermostatCard polling esteso a 60s (da 30s)
 - [x] **POLL-05**: LightsCard polling esteso a 60s (da 30s)
 - [x] **POLL-06**: NetworkCard polling esteso a 60s visible / 5min hidden (da 30s/5min)
@@ -50,9 +50,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| POLL-01 | Phase 96 | Pending |
-| POLL-02 | Phase 96 | Pending |
-| POLL-03 | Phase 96 | Pending |
+| POLL-01 | Phase 96 | Complete |
+| POLL-02 | Phase 96 | Complete |
+| POLL-03 | Phase 96 | Complete |
 | POLL-04 | Phase 96 | Complete |
 | POLL-05 | Phase 96 | Complete |
 | POLL-06 | Phase 96 | Complete |

@@ -66,7 +66,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 88: Raspberry Pi API Layer** - Proxy client functions, TypeScript types, and Next.js API routes for all Raspberry Pi endpoints (completed 2026-03-17)
 - [x] **Phase 89: Raspberry Pi Dashboard Card** - RaspiCard component in device registry with adaptive polling, error boundary, and skeleton (completed 2026-03-17)
 - [x] **Phase 90: Raspberry Pi Page + Cron** - Dedicated /raspi page with full stats and cron health integration (completed 2026-03-18)
-- [ ] **Phase 91: Bug Fix Verification** - Formalize and verify camera snapshot/live + schedule 503 retry fixes from debug sessions (planned)
+- [x] **Phase 91: Bug Fix Verification** - Formalize and verify camera snapshot/live + schedule 503 retry fixes from debug sessions (planned) (completed 2026-03-18)
 
 ## Phase Details
 
@@ -193,7 +193,7 @@ Plans:
 **Goal:** Formalize and verify bug fixes from debug sessions (camera snapshot 302 redirect, stream error states, schedule/room 503 retry logic) — all code already committed at d33d210
 **Requirements**: CAM-01, CAM-02, CAM-03, SCHED-01, ROOM-01
 **Depends on:** Phase 90
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 91-01-PLAN.md — Verify tests, document fixes, close debug files, browser verification checkpoint

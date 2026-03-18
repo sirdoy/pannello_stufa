@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: API Unification & Raspberry Pi Monitor
 status: planning
-stopped_at: Completed 90-01-PLAN.md
-last_updated: "2026-03-18T07:45:53.851Z"
+stopped_at: Completed 91-01-PLAN.md
+last_updated: "2026-03-18T08:18:57.177Z"
 last_activity: 2026-03-17 — Phase 86 complete (3/3 plans, 7/7 verification)
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 12
-  completed_plans: 12
+  total_phases: 8
+  completed_phases: 8
+  total_plans: 13
+  completed_plans: 13
   percent: 43
 ---
 
@@ -58,6 +58,7 @@ Progress: [████░░░░░░] 43% (3/7 phases)
 | Phase 89 P02 | 17 minutes | 2 tasks | 4 files |
 | Phase 90 P02 | 4 minutes | 1 tasks | 2 files |
 | Phase 90 P01 | 4 | 2 tasks | 10 files |
+| Phase 91 P01 | 10 minutes | 1 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -90,6 +91,12 @@ Recent decisions relevant to v11.0:
 - [Phase 90]: raspiStatus is informational — Pi failure uses console.warn (not error/notification), isolated try/catch preserves stove/thermostat checks
 - [Phase 90]: useRaspiFullData fetches all 4 endpoints in parallel — same pattern as useRaspiData but exposes all 16 fields for detail page
 - [Phase 90]: RaspiCard navigation wraps only data-present state — loading/error states not clickable, matches NetworkCard pattern
+- [Phase 91]: 302 redirect for camera snapshot: browser loads CDN URL directly — resilient to server-side network topology issues
+- [Phase 91]: SERVICE_UNAVAILABLE retry (MAX_RETRIES=5, RETRY_DELAY_MS=3000): proxy warm-up is transient, not a fatal error
+
+### Roadmap Evolution
+
+- Phase 91 added: Correzione problemi dati Rete e Netatmo camera
 
 ### Pending Todos
 
@@ -108,6 +115,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-18T07:42:27.717Z
-Stopped at: Completed 90-01-PLAN.md
+Last session: 2026-03-18T08:18:57.173Z
+Stopped at: Completed 91-01-PLAN.md
 Resume file: None

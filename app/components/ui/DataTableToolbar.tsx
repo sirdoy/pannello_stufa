@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
+import { forwardRef, useState, useEffect, useRef, type ReactNode } from 'react';
 import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import Input from './Input';
@@ -75,25 +75,22 @@ const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(
   }, [globalFilter]);
 
   // Debounced search handler
-  const handleSearchChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setSearchValue(value);
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchValue(value);
 
-      // Clear previous timeout
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
+    // Clear previous timeout
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    // Debounce 300ms
+    debounceRef.current = setTimeout(() => {
+      if (onGlobalFilterChange) {
+        onGlobalFilterChange(value);
       }
-
-      // Debounce 300ms
-      debounceRef.current = setTimeout(() => {
-        if (onGlobalFilterChange) {
-          onGlobalFilterChange(value);
-        }
-      }, 300);
-    },
-    [onGlobalFilterChange]
-  );
+    }, 300);
+  };
 
   // Cleanup on unmount
   useEffect(() => {
@@ -108,38 +105,32 @@ const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(
   const columnFilters = table?.getState?.()?.columnFilters ?? [];
 
   // Handle removing a column filter
-  const handleRemoveFilter = useCallback(
-    (columnId: string) => {
-      if (table) {
-        table.getColumn(columnId)?.setFilterValue(undefined);
-      }
-    },
-    [table]
-  );
+  const handleRemoveFilter = (columnId: string) => {
+    if (table) {
+      table.getColumn(columnId)?.setFilterValue(undefined);
+    }
+  };
 
   // Handle clearing all filters
-  const handleClearAllFilters = useCallback(() => {
+  const handleClearAllFilters = () => {
     if (table) {
       table.resetColumnFilters();
       if (onGlobalFilterChange) {
         onGlobalFilterChange('');
       }
     }
-  }, [table, onGlobalFilterChange]);
+  };
 
   // Get selected rows
   const selectedRows = table?.getSelectedRowModel?.()?.rows ?? [];
   const selectedCount = selectedRows.length;
 
   // Handle bulk action click
-  const handleBulkAction = useCallback(
-    (actionId: string) => {
-      if (onBulkAction) {
-        onBulkAction(actionId, selectedRows);
-      }
-    },
-    [onBulkAction, selectedRows]
-  );
+  const handleBulkAction = (actionId: string) => {
+    if (onBulkAction) {
+      onBulkAction(actionId, selectedRows);
+    }
+  };
 
   // Format filter value for display
   const formatFilterValue = (value: any) => {

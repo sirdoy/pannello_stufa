@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useCallback, type ReactNode, type ComponentPropsWithoutRef } from 'react';
+import { forwardRef, type ReactNode, type ComponentPropsWithoutRef } from 'react';
 import { Command } from 'cmdk';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import * as VisuallyHiddenPrimitive from '@radix-ui/react-visually-hidden';
@@ -72,7 +72,7 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
   /**
    * Handle command selection with haptic feedback
    */
-  const handleSelect = useCallback((callback?: () => void) => {
+  const handleSelect = (callback?: () => void) => {
     // Execute the command
     if (typeof callback === 'function') {
       callback();
@@ -85,7 +85,7 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
     if (typeof navigator !== 'undefined' && navigator.vibrate) {
       navigator.vibrate([10, 20, 10]); // Confirmation pattern
     }
-  }, [onOpenChange]);
+  };
 
   return (
     <Command.Dialog

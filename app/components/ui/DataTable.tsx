@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useMemo, useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { forwardRef, useMemo, useState, useEffect, useRef, type ReactNode } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
@@ -212,7 +212,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
   },
   ref
 ) {
-  // CRITICAL: Memoize data and columns to prevent infinite re-renders
+  // Stable references required by TanStack Table (new objects = state reset)
   const data = useMemo(() => dataProp ?? [], [dataProp]);
   const baseColumns = useMemo(() => columnsProp ?? [], [columnsProp]);
 
@@ -244,28 +244,25 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
   const rowSelection = isSelectionControlled ? controlledSelectedRows : internalRowSelection;
 
   // Handle selection change
-  const handleRowSelectionChange = useCallback(
-    (updaterOrValue: Record<string, boolean> | ((old: Record<string, boolean>) => Record<string, boolean>)) => {
-      const newSelection =
-        typeof updaterOrValue === 'function'
-          ? updaterOrValue(rowSelection)
-          : updaterOrValue;
+  const handleRowSelectionChange = (updaterOrValue: Record<string, boolean> | ((old: Record<string, boolean>) => Record<string, boolean>)) => {
+    const newSelection =
+      typeof updaterOrValue === 'function'
+        ? updaterOrValue(rowSelection)
+        : updaterOrValue;
 
-      if (!isSelectionControlled) {
-        setInternalRowSelection(newSelection);
-      }
+    if (!isSelectionControlled) {
+      setInternalRowSelection(newSelection);
+    }
 
-      if (onSelectionChange) {
-        onSelectionChange(newSelection);
-      }
-    },
-    [isSelectionControlled, rowSelection, onSelectionChange]
-  );
+    if (onSelectionChange) {
+      onSelectionChange(newSelection);
+    }
+  };
 
   // Create expansion column when enableExpansion is true
+  // Stable reference required: TanStack Table resets expanded state on new column objects
   const expansionColumn = useMemo(() => {
     if (!enableExpansion) return null;
-
     return {
       id: 'expand',
       header: () => null,
@@ -294,9 +291,9 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
   }, [enableExpansion]);
 
   // Create selection column when selectionMode !== 'none'
+  // Stable reference required: TanStack Table resets selection state on new column objects
   const selectionColumn = useMemo(() => {
     if (selectionMode === 'none') return null;
-
     return {
       id: 'select',
       header: ({ table }: { table: Table<any> }) =>
@@ -329,6 +326,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
   }, [selectionMode]);
 
   // Merge expansion, selection, and user columns
+  // Stable reference required: TanStack Table resets state on new array instance
   const columns = useMemo(() => {
     const extraColumns = [];
     if (selectionColumn) extraColumns.push(selectionColumn);
@@ -340,34 +338,28 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
   const extraColumnsCount = (selectionColumn ? 1 : 0) + (expansionColumn ? 1 : 0);
 
   // Row click handler
-  const handleRowClick = useCallback(
-    (row: Row<any>) => {
-      if (onRowClick) {
-        onRowClick(row);
-      }
-    },
-    [onRowClick]
-  );
+  const handleRowClick = (row: Row<any>) => {
+    if (onRowClick) {
+      onRowClick(row);
+    }
+  };
 
   // Handle pagination change with callback
-  const handlePaginationChange = useCallback(
-    (updaterOrValue: { pageIndex: number; pageSize: number } | ((old: { pageIndex: number; pageSize: number }) => { pageIndex: number; pageSize: number })) => {
-      setPagination((prev) => {
-        const newPagination =
-          typeof updaterOrValue === 'function'
-            ? updaterOrValue(prev)
-            : updaterOrValue;
+  const handlePaginationChange = (updaterOrValue: { pageIndex: number; pageSize: number } | ((old: { pageIndex: number; pageSize: number }) => { pageIndex: number; pageSize: number })) => {
+    setPagination((prev) => {
+      const newPagination =
+        typeof updaterOrValue === 'function'
+          ? updaterOrValue(prev)
+          : updaterOrValue;
 
-        // Call onPageChange callback if provided and page changed
-        if (onPageChange && newPagination.pageIndex !== prev.pageIndex) {
-          onPageChange(newPagination.pageIndex);
-        }
+      // Call onPageChange callback if provided and page changed
+      if (onPageChange && newPagination.pageIndex !== prev.pageIndex) {
+        onPageChange(newPagination.pageIndex);
+      }
 
-        return newPagination;
-      });
-    },
-    [onPageChange]
-  );
+      return newPagination;
+    });
+  };
 
   // Initialize TanStack Table
   const table = useReactTable({
@@ -407,7 +399,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
   const endRow = Math.min((pageIndex + 1) * pageSize, totalRows);
 
   // Generate page numbers (max 5 visible with ellipsis)
-  const getPageNumbers = useCallback(() => {
+  const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
 
@@ -451,7 +443,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
     }
 
     return pages;
-  }, [pageIndex, pageCount]);
+  };
 
   const pageNumbers = getPageNumbers();
 

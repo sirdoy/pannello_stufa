@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { createContext, useCallback, useState, useRef } from 'react';
+import { createContext, useState, useRef } from 'react';
 import * as ToastPrimitive from '@radix-ui/react-toast';
 import Toast, { ToastViewport } from './Toast';
 
@@ -72,7 +72,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
   /**
    * Create a new toast notification
    */
-  const toast = useCallback(({ variant = 'info', message, title, duration, action }: ToastOptions) => {
+  const toast = ({ variant = 'info', message, title, duration, action }: ToastOptions) => {
     const id = ++toastIdRef.current;
 
     // Default duration: 5000ms for most variants, 0 (persistent) for errors
@@ -94,34 +94,34 @@ export function ToastProvider({ children }: ToastProviderProps) {
     ]);
 
     return id;
-  }, []);
+  };
 
   /**
    * Dismiss a specific toast by ID
    */
-  const dismiss = useCallback((id: number) => {
+  const dismiss = (id: number) => {
     setToasts(prev => prev.filter(t => t.id !== id));
-  }, []);
+  };
 
   /**
    * Dismiss all toasts
    */
-  const dismissAll = useCallback(() => {
+  const dismissAll = () => {
     setToasts([]);
-  }, []);
+  };
 
   // Convenience methods for common toast types
-  const success = useCallback((message: string, opts: Partial<ToastOptions> = {}) =>
-    toast({ variant: 'success', message, ...opts }), [toast]);
+  const success = (message: string, opts: Partial<ToastOptions> = {}) =>
+    toast({ variant: 'success', message, ...opts });
 
-  const error = useCallback((message: string, opts: Partial<ToastOptions> = {}) =>
-    toast({ variant: 'error', message, ...opts }), [toast]);
+  const error = (message: string, opts: Partial<ToastOptions> = {}) =>
+    toast({ variant: 'error', message, ...opts });
 
-  const warning = useCallback((message: string, opts: Partial<ToastOptions> = {}) =>
-    toast({ variant: 'warning', message, ...opts }), [toast]);
+  const warning = (message: string, opts: Partial<ToastOptions> = {}) =>
+    toast({ variant: 'warning', message, ...opts });
 
-  const info = useCallback((message: string, opts: Partial<ToastOptions> = {}) =>
-    toast({ variant: 'info', message, ...opts }), [toast]);
+  const info = (message: string, opts: Partial<ToastOptions> = {}) =>
+    toast({ variant: 'info', message, ...opts });
 
   // Only show max 5 toasts (increased for persistent error toasts), slice from end (newest on top)
   const visibleToasts = toasts.slice(-5);

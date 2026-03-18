@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useEffect, useState, useRef, useCallback, useMemo, type ReactNode } from 'react';
+import { forwardRef, useEffect, useState, useRef, type ReactNode } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, Check, X } from 'lucide-react';
@@ -180,11 +180,8 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
   // Ref to track previous isOpen state for reset logic
   const wasOpenRef = useRef(false);
 
-  // Memoize resolver to prevent re-initialization on every render
-  const resolver = useMemo(
-    () => (validationSchema ? zodResolver(validationSchema) : undefined),
-    [validationSchema]
-  );
+  // Resolver for React Hook Form validation
+  const resolver = validationSchema ? zodResolver(validationSchema) : undefined;
 
   // Initialize React Hook Form
   const form = useForm({
@@ -220,19 +217,19 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
   }, [isOpen, reset]); // Note: defaultValues intentionally excluded to prevent infinite loop
 
   // Handle close with loading prevention
-  const handleClose = useCallback(() => {
+  const handleClose = () => {
     if (isLoading) return; // Prevent close while submitting
     onClose?.();
-  }, [isLoading, onClose]);
+  };
 
   // Handle cancel button click with event propagation control
-  const handleCancelClick = useCallback((e: React.MouseEvent) => {
+  const handleCancelClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent bubbling to Modal overlay which could trigger onClose again
     handleClose();
-  }, [handleClose]);
+  };
 
   // Trigger shake animation on invalid fields
-  const triggerShakeAnimation = useCallback((validationErrors: Record<string, any>) => {
+  const triggerShakeAnimation = (validationErrors: Record<string, any>) => {
     if (!formRef.current) return;
 
     const errorFields = Object.keys(validationErrors || errors);
@@ -253,7 +250,7 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
         field.addEventListener('animationend', handleAnimationEnd);
       }
     });
-  }, [errors]);
+  };
 
   // Handle form submission
   const onFormSubmit = async (data: any) => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/app/components/ui';
 import DeviceStatusBadge from './DeviceStatusBadge';
@@ -36,7 +36,7 @@ export function DeviceListTable({ devices, isStale, onCategoryChange }: DeviceLi
   const [editingMac, setEditingMac] = useState<string | null>(null);
 
   // Column definitions
-  const columns = useMemo<ColumnDef<DeviceData>[]>(() => [
+  const columns: ColumnDef<DeviceData>[] = [
     {
       accessorKey: 'name',
       header: 'Nome',
@@ -139,31 +139,27 @@ export function DeviceListTable({ devices, isStale, onCategoryChange }: DeviceLi
         return <span className="text-slate-300">{bandwidth.toFixed(1)} Mbps</span>;
       },
     },
-  ], [editingMac, onCategoryChange]);
+  ];
 
   // Sort devices: online first, then by name
-  const sortedDevices = useMemo(() => {
-    return [...devices].sort((a, b) => {
-      // Primary sort: online devices first
-      if (a.active !== b.active) {
-        return a.active ? -1 : 1;
-      }
-      // Secondary sort: alphabetical by name
-      return a.name.localeCompare(b.name, 'it');
-    });
-  }, [devices]);
+  const sortedDevices = [...devices].sort((a, b) => {
+    // Primary sort: online devices first
+    if (a.active !== b.active) {
+      return a.active ? -1 : 1;
+    }
+    // Secondary sort: alphabetical by name
+    return a.name.localeCompare(b.name, 'it');
+  });
 
   // Filter devices by status
-  const filteredDevices = useMemo(() => {
-    if (statusFilter === 'all') return sortedDevices;
-    if (statusFilter === 'online') return sortedDevices.filter(d => d.active);
-    if (statusFilter === 'offline') return sortedDevices.filter(d => !d.active);
-    return sortedDevices;
-  }, [sortedDevices, statusFilter]);
+  const filteredDevices = statusFilter === 'all' ? sortedDevices
+    : statusFilter === 'online' ? sortedDevices.filter(d => d.active)
+    : statusFilter === 'offline' ? sortedDevices.filter(d => !d.active)
+    : sortedDevices;
 
   // Count devices by status
-  const onlineCount = useMemo(() => devices.filter(d => d.active).length, [devices]);
-  const offlineCount = useMemo(() => devices.filter(d => !d.active).length, [devices]);
+  const onlineCount = devices.filter(d => d.active).length;
+  const offlineCount = devices.filter(d => !d.active).length;
 
   return (
     <Card variant="elevated" className="p-4 sm:p-6 space-y-4">

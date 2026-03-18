@@ -11,7 +11,7 @@
 
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useVersion } from '@/app/context/VersionContext';
@@ -63,38 +63,32 @@ export default function StovePage() {
   const isWorking = stoveData.status?.toUpperCase().includes('WORK');
 
   // Page-level ignite/shutdown with offline queueing
-  const handlePageIgnite = useCallback(async () => {
+  const handlePageIgnite = async () => {
     if (!stoveData.isOnline) {
       await queueStoveCommand('ignite', { source: 'manual' });
       setToast({ message: 'Comando in coda - eseguito al ripristino connessione', variant: 'warning' });
       return;
     }
     await commands.handleIgnite();
-  }, [stoveData.isOnline, queueStoveCommand, commands]);
+  };
 
-  const handlePageShutdown = useCallback(async () => {
+  const handlePageShutdown = async () => {
     if (!stoveData.isOnline) {
       await queueStoveCommand('shutdown', { source: 'manual' });
       setToast({ message: 'Comando in coda - eseguito al ripristino connessione', variant: 'warning' });
       return;
     }
     await commands.handleShutdown();
-  }, [stoveData.isOnline, queueStoveCommand, commands]);
+  };
 
   // Fan/Power wrappers to adapt number → event interface
-  const handlePageFanChange = useCallback(
-    async (newLevel: number) => {
-      await commands.handleFanChange({ target: { value: String(newLevel) } });
-    },
-    [commands]
-  );
+  const handlePageFanChange = async (newLevel: number) => {
+    await commands.handleFanChange({ target: { value: String(newLevel) } });
+  };
 
-  const handlePagePowerChange = useCallback(
-    async (newLevel: number) => {
-      await commands.handlePowerChange({ target: { value: String(newLevel) } });
-    },
-    [commands]
-  );
+  const handlePagePowerChange = async (newLevel: number) => {
+    await commands.handlePowerChange({ target: { value: String(newLevel) } });
+  };
 
   // Loading skeleton guard
   if (stoveData.initialLoading) {

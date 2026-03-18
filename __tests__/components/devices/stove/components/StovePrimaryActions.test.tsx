@@ -47,19 +47,19 @@ describe('StovePrimaryActions', () => {
 
   it('disables ACCENDI when needsMaintenance is true', () => {
     render(<StovePrimaryActions {...defaultProps} needsMaintenance={true} isSpenta={true} />);
-    const button = screen.getByText('ACCENDI');
+    const button = screen.getByRole('button', { name: /ACCENDI/i });
     expect(button).toBeDisabled();
   });
 
   it('disables buttons when loading is true', () => {
     render(<StovePrimaryActions {...defaultProps} loading={true} isSpenta={true} />);
-    const button = screen.getByText('ACCENDI');
+    const button = screen.getByRole('button', { name: /ACCENDI/i });
     expect(button).toBeDisabled();
   });
 
   it('disables buttons when command is executing', () => {
     render(<StovePrimaryActions {...defaultProps} igniteCmd={{ isExecuting: true }} isSpenta={true} />);
-    const button = screen.getByText('ACCENDI');
+    const button = screen.getByRole('button', { name: /ACCENDI/i });
     expect(button).toBeDisabled();
   });
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { EndpointCard, PostEndpointCard } from '../ApiTab';
 import Heading from '@/app/components/ui/Heading';
 import Badge from '@/app/components/ui/Badge';
@@ -29,7 +29,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
     }
   };
 
-  const fetchGetEndpoint = useCallback(async (name: string, url: string) => {
+  const fetchGetEndpoint = async (name: string, url: string) => {
     setLoadingGet((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {
@@ -48,14 +48,14 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
     } finally {
       setLoadingGet((prev) => ({ ...prev, [name]: false }));
     }
-  }, []);
+  };
 
-  const fetchAllGetEndpoints = useCallback(() => {
+  const fetchAllGetEndpoints = () => {
     fetchGetEndpoint('status', '/api/hue/status');
     fetchGetEndpoint('lights', '/api/hue/lights');
     fetchGetEndpoint('rooms', '/api/hue/rooms');
     fetchGetEndpoint('scenes', '/api/hue/scenes');
-  }, [fetchGetEndpoint]);
+  };
 
   const callPostEndpoint = async (name: string, url: string, body: any) => {
     setLoadingPost((prev) => ({ ...prev, [name]: true }));

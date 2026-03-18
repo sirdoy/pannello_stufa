@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { EndpointCard } from '../ApiTab';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
@@ -26,7 +26,7 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
     }
   };
 
-  const fetchGetEndpoint = useCallback(async (name: string, url: string) => {
+  const fetchGetEndpoint = async (name: string, url: string) => {
     setLoadingGet((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {
@@ -40,15 +40,15 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
     } finally {
       setLoadingGet((prev) => ({ ...prev, [name]: false }));
     }
-  }, []);
+  };
 
-  const fetchAllGetEndpoints = useCallback(() => {
+  const fetchAllGetEndpoints = () => {
     fetchGetEndpoint('health', '/api/health');
     fetchGetEndpoint('schedules', '/api/schedules');
     fetchGetEndpoint('schedulesActive', '/api/schedules/active');
     fetchGetEndpoint('locationConfig', '/api/config/location');
     fetchGetEndpoint('dashboardConfig', '/api/config/dashboard');
-  }, [fetchGetEndpoint]);
+  };
 
   // Initial fetch
   useEffect(() => {

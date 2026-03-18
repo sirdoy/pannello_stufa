@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { EndpointCard } from '../ApiTab';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
@@ -30,7 +30,7 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
     }
   };
 
-  const fetchGetEndpoint = useCallback(async (name: string, url: string) => {
+  const fetchGetEndpoint = async (name: string, url: string) => {
     setLoadingGet((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {
@@ -49,7 +49,7 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
     } finally {
       setLoadingGet((prev) => ({ ...prev, [name]: false }));
     }
-  }, []);
+  };
 
   // Subscribe to location updates
   useEffect(() => {
@@ -61,10 +61,10 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
     ? `/api/weather/forecast?lat=${location.latitude}&lon=${location.longitude}`
     : null;
 
-  const fetchAllGetEndpoints = useCallback(() => {
+  const fetchAllGetEndpoints = () => {
     if (!forecastUrl) return;
     fetchGetEndpoint('forecast', forecastUrl);
-  }, [fetchGetEndpoint, forecastUrl]);
+  };
 
   // Initial fetch
   useEffect(() => {

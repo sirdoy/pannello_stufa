@@ -14,7 +14,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getFullSchedulerMode, getNextScheduledAction } from '@/lib/schedulerService';
 import { STOVE_ROUTES } from '@/lib/routes';
 import { logError, shouldNotify } from '@/lib/errorMonitor';
@@ -182,7 +182,7 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
     }
   };
 
-  const fetchSchedulerMode = useCallback(async () => {
+  const fetchSchedulerMode = async () => {
     try {
       const mode = await getFullSchedulerMode();
       setSchedulerEnabled(mode.enabled);
@@ -198,18 +198,18 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
     } catch (err) {
       console.error('Errore modalità scheduler:', err);
     }
-  }, []);
+  };
 
-  const fetchMaintenanceStatus = useCallback(async () => {
+  const fetchMaintenanceStatus = async () => {
     try {
       const status = await getMaintenanceStatus();
       setMaintenanceStatus(status);
     } catch (err) {
       console.error('Errore stato manutenzione:', err);
     }
-  }, []);
+  };
 
-  const fetchStatusAndUpdate = useCallback(async () => {
+  const fetchStatusAndUpdate = async () => {
     try {
       // Check sandbox mode
       if (isLocalEnvironment()) {
@@ -289,7 +289,7 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
     } finally {
       setInitialLoading(false);
     }
-  }, [checkVersion, fetchSchedulerMode, fetchMaintenanceStatus, userId]);
+  };
 
   // Refresh status when background sync command completes
   useEffect(() => {

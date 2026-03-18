@@ -13,7 +13,6 @@
 
 'use client';
 
-import { useCallback } from 'react';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { getNextScheduledAction } from '@/lib/schedulerService';
 import { clearSemiManualMode } from '@/lib/schedulerApiClient';
@@ -88,7 +87,7 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
   const setPowerCmd = useRetryableCommand({ device: 'stove', action: 'setPower' });
 
   // Command handlers
-  const handleIgnite = useCallback(async () => {
+  const handleIgnite = async () => {
     stoveData.setLoadingMessage('Accensione stufa...');
     stoveData.setLoading(true);
     try {
@@ -104,9 +103,9 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
     } finally {
       stoveData.setLoading(false);
     }
-  }, [igniteCmd, stoveData]);
+  };
 
-  const handleShutdown = useCallback(async () => {
+  const handleShutdown = async () => {
     stoveData.setLoadingMessage('Spegnimento stufa...');
     stoveData.setLoading(true);
     try {
@@ -122,75 +121,69 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
     } finally {
       stoveData.setLoading(false);
     }
-  }, [shutdownCmd, stoveData]);
+  };
 
-  const handleFanChange = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement> | { target: { value: string } }) => {
-      const level = Number(e.target.value);
-      stoveData.setLoadingMessage('Modifica livello ventola...');
-      stoveData.setLoading(true);
+  const handleFanChange = async (e: React.ChangeEvent<HTMLInputElement> | { target: { value: string } }) => {
+    const level = Number(e.target.value);
+    stoveData.setLoadingMessage('Modifica livello ventola...');
+    stoveData.setLoading(true);
 
-      try {
-        const response = await setFanCmd.execute(STOVE_ROUTES.setFan, {
-          method: 'POST',
-          body: JSON.stringify({ level, source: 'manual' }),
-        });
+    try {
+      const response = await setFanCmd.execute(STOVE_ROUTES.setFan, {
+        method: 'POST',
+        body: JSON.stringify({ level, source: 'manual' }),
+      });
 
-        if (response) {
-          const data = await response.json();
+      if (response) {
+        const data = await response.json();
 
-          // Se la modalità è cambiata, aggiorna UI immediatamente
-          if (data.modeChanged) {
-            stoveData.setSemiManualMode(true);
-            stoveData.setReturnToAutoAt(data.returnToAutoAt || null);
-            stoveData.setNextScheduledAction(null);
-          }
-
-          await logStoveAction.setFan(level);
-          await stoveData.fetchStatusAndUpdate();
+        // Se la modalità è cambiata, aggiorna UI immediatamente
+        if (data.modeChanged) {
+          stoveData.setSemiManualMode(true);
+          stoveData.setReturnToAutoAt(data.returnToAutoAt || null);
+          stoveData.setNextScheduledAction(null);
         }
-        // If response is null, request was deduplicated (silently blocked)
-      } finally {
-        stoveData.setLoading(false);
+
+        await logStoveAction.setFan(level);
+        await stoveData.fetchStatusAndUpdate();
       }
-    },
-    [setFanCmd, stoveData]
-  );
+      // If response is null, request was deduplicated (silently blocked)
+    } finally {
+      stoveData.setLoading(false);
+    }
+  };
 
-  const handlePowerChange = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement> | { target: { value: string } }) => {
-      const level = Number(e.target.value);
-      stoveData.setLoadingMessage('Modifica livello potenza...');
-      stoveData.setLoading(true);
+  const handlePowerChange = async (e: React.ChangeEvent<HTMLInputElement> | { target: { value: string } }) => {
+    const level = Number(e.target.value);
+    stoveData.setLoadingMessage('Modifica livello potenza...');
+    stoveData.setLoading(true);
 
-      try {
-        const response = await setPowerCmd.execute(STOVE_ROUTES.setPower, {
-          method: 'POST',
-          body: JSON.stringify({ level, source: 'manual' }),
-        });
+    try {
+      const response = await setPowerCmd.execute(STOVE_ROUTES.setPower, {
+        method: 'POST',
+        body: JSON.stringify({ level, source: 'manual' }),
+      });
 
-        if (response) {
-          const data = await response.json();
+      if (response) {
+        const data = await response.json();
 
-          // Se la modalità è cambiata, aggiorna UI immediatamente
-          if (data.modeChanged) {
-            stoveData.setSemiManualMode(true);
-            stoveData.setReturnToAutoAt(data.returnToAutoAt || null);
-            stoveData.setNextScheduledAction(null);
-          }
-
-          await logStoveAction.setPower(level);
-          await stoveData.fetchStatusAndUpdate();
+        // Se la modalità è cambiata, aggiorna UI immediatamente
+        if (data.modeChanged) {
+          stoveData.setSemiManualMode(true);
+          stoveData.setReturnToAutoAt(data.returnToAutoAt || null);
+          stoveData.setNextScheduledAction(null);
         }
-        // If response is null, request was deduplicated (silently blocked)
-      } finally {
-        stoveData.setLoading(false);
-      }
-    },
-    [setPowerCmd, stoveData]
-  );
 
-  const handleClearSemiManual = useCallback(async () => {
+        await logStoveAction.setPower(level);
+        await stoveData.fetchStatusAndUpdate();
+      }
+      // If response is null, request was deduplicated (silently blocked)
+    } finally {
+      stoveData.setLoading(false);
+    }
+  };
+
+  const handleClearSemiManual = async () => {
     await clearSemiManualMode();
     await logSchedulerAction.clearSemiManual();
     stoveData.setSemiManualMode(false);
@@ -198,9 +191,9 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
 
     const nextAction = await getNextScheduledAction();
     stoveData.setNextScheduledAction(nextAction);
-  }, [stoveData]);
+  };
 
-  const handleSetManualMode = useCallback(async () => {
+  const handleSetManualMode = async () => {
     // Use existing API: operation setSchedulerMode with enabled: false
     await fetch('/api/scheduler/update', {
       method: 'POST',
@@ -212,9 +205,9 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
     });
     stoveData.setSchedulerEnabled(false);
     stoveData.setSemiManualMode(false);
-  }, [stoveData]);
+  };
 
-  const handleSetAutomaticMode = useCallback(async () => {
+  const handleSetAutomaticMode = async () => {
     // Use existing API: operation clearSemiManualMode then setSchedulerMode
     await fetch('/api/scheduler/update', {
       method: 'POST',
@@ -239,9 +232,9 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
     stoveData.setSemiManualMode(false);
     const nextAction = await getNextScheduledAction();
     stoveData.setNextScheduledAction(nextAction);
-  }, [stoveData]);
+  };
 
-  const handleConfirmCleaning = useCallback(async () => {
+  const handleConfirmCleaning = async () => {
     stoveData.setCleaningInProgress(true);
     try {
       await confirmCleaning(user);
@@ -251,13 +244,13 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
     } finally {
       stoveData.setCleaningInProgress(false);
     }
-  }, [user, stoveData]);
+  };
 
-  const handleManualRefresh = useCallback(async () => {
+  const handleManualRefresh = async () => {
     stoveData.setLoading(true);
     await stoveData.fetchStatusAndUpdate();
     stoveData.setLoading(false);
-  }, [stoveData]);
+  };
 
   return {
     // Command handlers

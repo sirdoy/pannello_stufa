@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, createContext, useContext, type ReactNode } from 'react';
+import { useState, useEffect, createContext, useContext, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import CommandPalette from '@/app/components/ui/CommandPalette';
 import { getDeviceCommands } from '@/lib/commands/deviceCommands';
@@ -77,7 +77,7 @@ export default function CommandPaletteProvider({ children, commands: customComma
    * - Device commands (from deviceCommands.js)
    * - Global actions
    */
-  const defaultCommands = useMemo(() => [
+  const defaultCommands = [
     // Navigation
     {
       heading: 'Navigazione',
@@ -143,7 +143,7 @@ export default function CommandPaletteProvider({ children, commands: customComma
         },
       ],
     },
-  ], [router]);
+  ];
 
   // Merge custom commands with defaults if provided
   const commands = customCommands || defaultCommands;
@@ -175,16 +175,16 @@ export default function CommandPaletteProvider({ children, commands: customComma
   /**
    * Open the command palette programmatically
    */
-  const openPalette = useCallback(() => {
+  const openPalette = () => {
     setOpen(true);
-  }, []);
+  };
 
   /**
    * Close the command palette programmatically
    */
-  const closePalette = useCallback(() => {
+  const closePalette = () => {
     setOpen(false);
-  }, []);
+  };
 
   // Context value
   const contextValue = {

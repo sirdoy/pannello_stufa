@@ -7,7 +7,6 @@
 
 'use client';
 
-import { useCallback } from 'react';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import type { UseNetworkCommandsReturn } from '../types';
 
@@ -28,9 +27,9 @@ export interface UseNetworkCommandsParams {
 export function useNetworkCommands(params: UseNetworkCommandsParams): UseNetworkCommandsReturn {
   const { router } = params;
 
-  const navigateToNetwork = useCallback(() => {
+  const navigateToNetwork = () => {
     router.push('/network');
-  }, [router]);
+  };
 
   return {
     navigateToNetwork,

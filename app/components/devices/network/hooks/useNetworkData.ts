@@ -15,7 +15,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useVisibility } from '@/lib/hooks/useVisibility';
 import { computeNetworkHealth, mapHealthToDeviceCard } from '../networkHealthUtils';
@@ -98,7 +98,7 @@ export function useNetworkData(): UseNetworkDataReturn {
    * Only enriches new/unenriched MACs (not in enrichedMacsRef).
    * Fire-and-forget with silent failure — self-heals on next poll.
    */
-  const enrichDevicesWithCategories = useCallback(async (rawDevices: DeviceData[]): Promise<DeviceData[]> => {
+  const enrichDevicesWithCategories = async (rawDevices: DeviceData[]): Promise<DeviceData[]> => {
     try {
       // Find MACs that need enrichment (not in enrichedMacsRef)
       const unenrichedDevices = rawDevices.filter(
@@ -155,10 +155,10 @@ export function useNetworkData(): UseNetworkDataReturn {
       // Silent failure — return devices unchanged, will retry on next poll
       return rawDevices;
     }
-  }, []);
+  };
 
   // Fetch data from Fritz!Box API routes
-  const fetchData = useCallback(async () => {
+  const fetchData = async () => {
     try {
       setError(null);
 
@@ -291,7 +291,7 @@ export function useNetworkData(): UseNetworkDataReturn {
     } finally {
       setLoading(false);
     }
-  }, [enrichDevicesWithCategories]);
+  };
 
   // Adaptive polling - 30s visible, 5min hidden
   // initialDelay: 500ms stagger to avoid thundering herd on dashboard mount
@@ -304,18 +304,18 @@ export function useNetworkData(): UseNetworkDataReturn {
   });
 
   // Update a single device's category (used by manual overrides)
-  const updateDeviceCategory = useCallback((mac: string, category: DeviceCategory) => {
+  const updateDeviceCategory = (mac: string, category: DeviceCategory) => {
     setDevices(prev => prev.map(d =>
       d.mac === mac ? { ...d, category } : d
     ));
     // Mark as enriched so polling doesn't overwrite manual override
     enrichedMacsRef.current.add(mac);
-  }, []);
+  };
 
   // Derived state
-  const connected = useMemo(() => wan?.connected ?? false, [wan]);
-  const activeDeviceCount = useMemo(() => devices.filter(d => d.active).length, [devices]);
-  const healthMapped = useMemo(() => mapHealthToDeviceCard(health), [health]);
+  const connected = wan?.connected ?? false;
+  const activeDeviceCount = devices.filter(d => d.active).length;
+  const healthMapped = mapHealthToDeviceCard(health);
 
   return {
     // Core data

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
   queueCommand,
   getQueuedCommands,
@@ -64,7 +64,7 @@ export function useBackgroundSync(): UseBackgroundSyncReturn {
   /**
    * Refresh command lists from IndexedDB
    */
-  const refreshCommands = useCallback(async () => {
+  const refreshCommands = async () => {
     try {
       const pending = await getQueuedCommands(COMMAND_STATUS.PENDING);
       const failed = await getQueuedCommands(COMMAND_STATUS.FAILED);
@@ -75,7 +75,7 @@ export function useBackgroundSync(): UseBackgroundSyncReturn {
     } catch (error) {
       console.error('[useBackgroundSync] Failed to refresh commands:', error);
     }
-  }, []);
+  };
 
   // Initial load and periodic refresh
   useEffect(() => {
@@ -145,52 +145,43 @@ export function useBackgroundSync(): UseBackgroundSyncReturn {
    * @param {Object} data - Command payload
    * @returns {Promise<number>} Command ID
    */
-  const queueStoveCommand = useCallback(
-    async (action: string, data: Record<string, unknown> = {}) => {
-      const endpoint = `stove/${action}`;
-      const id = await queueCommand(endpoint, data);
-      await refreshCommands();
-      return id;
-    },
-    [refreshCommands]
-  );
+  const queueStoveCommand = async (action: string, data: Record<string, unknown> = {}) => {
+    const endpoint = `stove/${action}`;
+    const id = await queueCommand(endpoint, data);
+    await refreshCommands();
+    return id;
+  };
 
   /**
    * Retry a failed command
    * @param {number} commandId - Command ID
    */
-  const handleRetry = useCallback(
-    async (commandId: number) => {
-      await retryCommand(commandId);
-      await refreshCommands();
-    },
-    [refreshCommands]
-  );
+  const handleRetry = async (commandId: number) => {
+    await retryCommand(commandId);
+    await refreshCommands();
+  };
 
   /**
    * Cancel a pending command
    * @param {number} commandId - Command ID
    */
-  const handleCancel = useCallback(
-    async (commandId: number) => {
-      await cancelCommand(commandId);
-      await refreshCommands();
-    },
-    [refreshCommands]
-  );
+  const handleCancel = async (commandId: number) => {
+    await cancelCommand(commandId);
+    await refreshCommands();
+  };
 
   /**
    * Clear all failed commands
    */
-  const handleClearFailed = useCallback(async () => {
+  const handleClearFailed = async () => {
     await clearFailedCommands();
     await refreshCommands();
-  }, [refreshCommands]);
+  };
 
   /**
    * Manually trigger queue processing
    */
-  const triggerSync = useCallback(async () => {
+  const triggerSync = async () => {
     if (!navigator.onLine) {
       return;
     }
@@ -202,7 +193,7 @@ export function useBackgroundSync(): UseBackgroundSyncReturn {
       setIsProcessing(false);
       await refreshCommands();
     }
-  }, [refreshCommands]);
+  };
 
   return {
     // State

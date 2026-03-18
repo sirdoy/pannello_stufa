@@ -14,7 +14,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { supportsColor, getCurrentColorHex } from '@/lib/hue/colorUtils';
 
@@ -255,9 +255,7 @@ export function useLightsData(): UseLightsDataReturn {
   }, []);
 
   // Derived state computations
-  const selectedRoom = useMemo(() => {
-    return rooms.find(r => r.id === selectedRoomId) || rooms[0];
-  }, [rooms, selectedRoomId]);
+  const selectedRoom = rooms.find(r => r.id === selectedRoomId) || rooms[0];
 
   // Extract grouped_light ID from room services
   const getGroupedLightId = (room: any): string | null => {
@@ -266,94 +264,52 @@ export function useLightsData(): UseLightsDataReturn {
     return groupedLight?.rid || null;
   };
 
-  const selectedRoomGroupedLightId = useMemo(() => {
-    return getGroupedLightId(selectedRoom);
-  }, [selectedRoom]);
+  const selectedRoomGroupedLightId = getGroupedLightId(selectedRoom);
 
   // Use 'children' to get individual lights for this room
-  const roomLights = useMemo(() => {
-    return lights.filter((light: any) =>
-      selectedRoom?.children?.some((c: any) =>
-        c.rid === light.id || // Remote API: light ID in children
-        c.rid === light.owner?.rid // Local API: device ID in children, match via owner
-      )
-    );
-  }, [lights, selectedRoom]);
+  const roomLights = lights.filter((light: any) =>
+    selectedRoom?.children?.some((c: any) =>
+      c.rid === light.id || // Remote API: light ID in children
+      c.rid === light.owner?.rid // Local API: device ID in children, match via owner
+    )
+  );
 
-  const roomScenes = useMemo(() => {
-    return scenes.filter((scene: any) =>
-      scene.group?.rid === selectedRoom?.id
-    );
-  }, [scenes, selectedRoom]);
+  const roomScenes = scenes.filter((scene: any) =>
+    scene.group?.rid === selectedRoom?.id
+  );
 
   // Check if room has any color-capable lights
-  const hasColorLights = useMemo(() => {
-    return roomLights.some((light: any) => supportsColor(light));
-  }, [roomLights]);
+  const hasColorLights = roomLights.some((light: any) => supportsColor(light));
 
   // Get lights associated with the room via services (more reliable than children)
-  const serviceLights = useMemo(() => {
-    return selectedRoom?.services
-      ?.map((s: any) => lights.find((l: any) => l.id === s.rid))
-      .filter(Boolean) || [];
-  }, [selectedRoom, lights]);
+  const serviceLights = selectedRoom?.services
+    ?.map((s: any) => lights.find((l: any) => l.id === s.rid))
+    .filter(Boolean) || [];
 
   // Use serviceLights if roomLights is empty (API inconsistency between children/services)
-  const effectiveLights = useMemo(() => {
-    return roomLights.length > 0 ? roomLights : serviceLights;
-  }, [roomLights, serviceLights]);
+  const effectiveLights = roomLights.length > 0 ? roomLights : serviceLights;
 
   // Calculate lights on/off state for better UX
-  const lightsOnCount = useMemo(() => {
-    return effectiveLights.filter((light: any) => light?.on?.on).length;
-  }, [effectiveLights]);
-
-  const lightsOffCount = useMemo(() => {
-    return effectiveLights.length - lightsOnCount;
-  }, [effectiveLights, lightsOnCount]);
-
-  const allLightsOn = useMemo(() => {
-    return effectiveLights.length > 0 && lightsOnCount === effectiveLights.length;
-  }, [effectiveLights, lightsOnCount]);
-
-  const allLightsOff = useMemo(() => {
-    return effectiveLights.length > 0 && lightsOffCount === effectiveLights.length;
-  }, [effectiveLights, lightsOffCount]);
-
-  const isRoomOn = useMemo(() => {
-    return selectedRoom?.services?.some((s: any) => {
-      const light = lights.find((l: any) => l.id === s.rid);
-      return light?.on?.on;
-    }) || false;
-  }, [selectedRoom, lights]);
+  const lightsOnCount = effectiveLights.filter((light: any) => light?.on?.on).length;
+  const lightsOffCount = effectiveLights.length - lightsOnCount;
+  const allLightsOn = effectiveLights.length > 0 && lightsOnCount === effectiveLights.length;
+  const allLightsOff = effectiveLights.length > 0 && lightsOffCount === effectiveLights.length;
+  const isRoomOn = selectedRoom?.services?.some((s: any) => {
+    const light = lights.find((l: any) => l.id === s.rid);
+    return light?.on?.on;
+  }) || false;
 
   // Calculate total house lights state for quick control
-  const totalLightsOn = useMemo(() => {
-    return lights.filter((l: any) => l.on?.on).length;
-  }, [lights]);
-
-  const totalLightsOff = useMemo(() => {
-    return lights.length - totalLightsOn;
-  }, [lights, totalLightsOn]);
-
-  const allHouseLightsOn = useMemo(() => {
-    return lights.length > 0 && totalLightsOn === lights.length;
-  }, [lights, totalLightsOn]);
-
-  const allHouseLightsOff = useMemo(() => {
-    return lights.length > 0 && totalLightsOff === lights.length;
-  }, [lights, totalLightsOff]);
-
-  const hasAnyLights = useMemo(() => {
-    return lights.length > 0;
-  }, [lights]);
-
-  const avgBrightness = useMemo(() => {
-    if (!selectedRoom || effectiveLights.length === 0) return 0;
-    return Math.round(
-      effectiveLights.reduce((sum: number, l: any) => sum + (l.dimming?.brightness || 0), 0) / effectiveLights.length
-    );
-  }, [selectedRoom, effectiveLights]);
+  const totalLightsOn = lights.filter((l: any) => l.on?.on).length;
+  const totalLightsOff = lights.length - totalLightsOn;
+  const allHouseLightsOn = lights.length > 0 && totalLightsOn === lights.length;
+  const allHouseLightsOff = lights.length > 0 && totalLightsOff === lights.length;
+  const hasAnyLights = lights.length > 0;
+  const avgBrightness = !selectedRoom || effectiveLights.length === 0
+    ? 0
+    : Math.round(
+        effectiveLights.reduce((sum: number, l: any) => sum + (l.dimming?.brightness || 0), 0) / effectiveLights.length
+      );
 
   // Dynamic styling computations
 
@@ -402,9 +358,7 @@ export function useLightsData(): UseLightsDataReturn {
     return { colors: uniqueColors, avgBrightness: onBrightness };
   };
 
-  const { colors: roomColors, avgBrightness: roomOnBrightness } = useMemo(() => {
-    return getRoomLightColors();
-  }, [effectiveLights]);
+  const { colors: roomColors, avgBrightness: roomOnBrightness } = getRoomLightColors();
 
   // Generate dynamic style based on room light colors
   const getRoomControlStyle = (): Record<string, string> | null => {
@@ -442,14 +396,10 @@ export function useLightsData(): UseLightsDataReturn {
     };
   };
 
-  const dynamicRoomStyle = useMemo(() => {
-    return getRoomControlStyle();
-  }, [isRoomOn, roomColors, roomOnBrightness]);
+  const dynamicRoomStyle = getRoomControlStyle();
 
   // Determine contrast mode for adaptive UI
-  const contrastMode = useMemo(() => {
-    return dynamicRoomStyle ? getContrastMode(roomColors, roomOnBrightness) : 'default';
-  }, [dynamicRoomStyle, roomColors, roomOnBrightness]);
+  const contrastMode = dynamicRoomStyle ? getContrastMode(roomColors, roomOnBrightness) : 'default';
 
   // Adaptive UI classes based on background contrast
   const adaptiveClasses: Record<'light' | 'dark' | 'default', AdaptiveClasses> = {

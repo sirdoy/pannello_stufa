@@ -19,7 +19,6 @@ describe('StoveBanners', () => {
     needsMaintenance: false,
     maintenanceStatus: null,
     cleaningInProgress: false,
-    isFirebaseConnected: true,
     hasPendingCommands: false,
     pendingCommands: [],
     igniteCmd: { lastError: null, retry: mockRetry },
@@ -46,11 +45,6 @@ describe('StoveBanners', () => {
     render(<StoveBanners {...defaultProps} needsMaintenance={true} maintenanceStatus={maintenanceStatus} />);
     expect(screen.getByText('Pulizia Stufa Richiesta')).toBeInTheDocument();
     expect(screen.getByText(/25.5 ore/)).toBeInTheDocument();
-  });
-
-  it('renders Firebase banner when isFirebaseConnected is false', () => {
-    render(<StoveBanners {...defaultProps} isFirebaseConnected={false} />);
-    expect(screen.getByText('Connessione Firebase Interrotta')).toBeInTheDocument();
   });
 
   it('renders pending commands banner when hasPendingCommands is true', () => {

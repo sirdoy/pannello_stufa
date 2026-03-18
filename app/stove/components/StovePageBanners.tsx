@@ -19,7 +19,6 @@ export interface StovePageBannersProps {
   needsMaintenance: boolean;
   maintenanceStatus: any;
   cleaningInProgress: boolean;
-  isFirebaseConnected: boolean;
   hasPendingCommands: boolean;
   pendingCommands: unknown[];
   onConfirmCleaning: () => void;
@@ -33,7 +32,6 @@ export default function StovePageBanners(props: StovePageBannersProps) {
     needsMaintenance,
     maintenanceStatus,
     cleaningInProgress,
-    isFirebaseConnected,
     hasPendingCommands,
     pendingCommands,
     onConfirmCleaning,
@@ -90,25 +88,15 @@ export default function StovePageBanners(props: StovePageBannersProps) {
         </div>
       )}
 
-      {/* Connection Status Banner */}
-      {(!isFirebaseConnected || hasPendingCommands) && (
-        <div className="mb-6 space-y-3">
-          {!isFirebaseConnected && (
-            <Banner
-              variant="warning"
-              icon="⚠️"
-              title="Connessione Interrotta"
-              description="Aggiornamenti ogni 10 secondi."
-            />
-          )}
-          {hasPendingCommands && (
-            <Banner
-              variant="info"
-              icon="⏳"
-              title={`${pendingCommands.length} comando/i in attesa`}
-              description="Verranno eseguiti al ripristino connessione."
-            />
-          )}
+      {/* Pending commands banner */}
+      {hasPendingCommands && (
+        <div className="mb-6">
+          <Banner
+            variant="info"
+            icon="⏳"
+            title={`${pendingCommands.length} comando/i in attesa`}
+            description="Verranno eseguiti al ripristino connessione."
+          />
         </div>
       )}
     </>

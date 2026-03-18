@@ -85,13 +85,10 @@ const createMockStoveData = (overrides = {}) => ({
   cleaningInProgress: false,
   sandboxMode: false,
   loadingMessage: '',
-  isFirebaseConnected: true,
-  usePollingFallback: false,
   isOnline: true,
   hasPendingCommands: false,
   pendingCommands: [],
   staleness: null,
-  isVisible: true,
   isAccesa: false,
   isSpenta: true,
   needsMaintenance: false,
@@ -214,7 +211,6 @@ describe('StovePage', () => {
       needsMaintenance: true,
       maintenanceStatus: { needsCleaning: true, currentHours: 50 },
       cleaningInProgress: false,
-      isFirebaseConnected: true,
       hasPendingCommands: false,
       pendingCommands: [],
     });
@@ -230,7 +226,6 @@ describe('StovePage', () => {
     expect(bannersProps.needsMaintenance).toBe(true);
     expect(bannersProps.maintenanceStatus).toEqual({ needsCleaning: true, currentHours: 50 });
     expect(bannersProps.cleaningInProgress).toBe(false);
-    expect(bannersProps.isFirebaseConnected).toBe(true);
     expect(bannersProps.hasPendingCommands).toBe(false);
   });
 });

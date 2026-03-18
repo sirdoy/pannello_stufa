@@ -12,7 +12,6 @@ interface StoveBannersProps {
   needsMaintenance: boolean;
   maintenanceStatus: any;
   cleaningInProgress: boolean;
-  isFirebaseConnected: boolean;
   hasPendingCommands: boolean;
   pendingCommands: any[];
   igniteCmd: { lastError: Error | null; retry: () => void };
@@ -29,7 +28,6 @@ export default function StoveBanners({
   needsMaintenance,
   maintenanceStatus,
   cleaningInProgress,
-  isFirebaseConnected,
   hasPendingCommands,
   pendingCommands,
   igniteCmd,
@@ -85,18 +83,6 @@ export default function StoveBanners({
                 </Button>
               </>
             }
-          />
-        </div>
-      )}
-
-      {/* Firebase Connection Status */}
-      {!isFirebaseConnected && (
-        <div className="mb-6">
-          <Banner
-            variant="warning"
-            icon="⚠️"
-            title="Connessione Firebase Interrotta"
-            description="Aggiornamenti in tempo reale non disponibili. Dati aggiornati ogni 10 secondi."
           />
         </div>
       )}

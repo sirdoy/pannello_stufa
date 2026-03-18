@@ -123,7 +123,6 @@ export default function StovePage() {
           needsMaintenance={stoveData.needsMaintenance}
           maintenanceStatus={stoveData.maintenanceStatus}
           cleaningInProgress={stoveData.cleaningInProgress}
-          isFirebaseConnected={stoveData.isFirebaseConnected}
           hasPendingCommands={stoveData.hasPendingCommands}
           pendingCommands={stoveData.pendingCommands}
           onConfirmCleaning={commands.handleConfirmCleaning}

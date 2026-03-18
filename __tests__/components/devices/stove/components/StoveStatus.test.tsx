@@ -2,6 +2,13 @@ import { render, screen } from '@testing-library/react';
 import StoveStatus from '@/app/components/devices/stove/components/StoveStatus';
 import { getStatusInfo, getStatusDisplay } from '@/app/components/devices/stove/stoveStatusUtils';
 
+// Mock useVisibility to control visibility state in tests
+jest.mock('@/lib/hooks/useVisibility', () => ({
+  useVisibility: jest.fn().mockReturnValue(true),
+}));
+
+import { useVisibility } from '@/lib/hooks/useVisibility';
+
 describe('StoveStatus', () => {
   const defaultProps = {
     status: 'WORK',
@@ -10,10 +17,13 @@ describe('StoveStatus', () => {
     errorCode: 0,
     sandboxMode: false,
     staleness: null,
-    isVisible: true,
     statusInfo: getStatusInfo('WORK'),
     statusDisplay: getStatusDisplay('WORK'),
   };
+
+  beforeEach(() => {
+    jest.mocked(useVisibility).mockReturnValue(true);
+  });
 
   it('renders status label', () => {
     render(<StoveStatus {...defaultProps} />);
@@ -39,12 +49,13 @@ describe('StoveStatus', () => {
   });
 
   it('shows staleness badge when isVisible and isStale', () => {
+    jest.mocked(useVisibility).mockReturnValue(true);
     const staleness = {
       isStale: true,
       cachedAt: new Date('2024-01-01T12:00:00Z'),
       lastFetch: new Date('2024-01-01T12:00:00Z'),
     };
-    render(<StoveStatus {...defaultProps} staleness={staleness} isVisible={true} />);
+    render(<StoveStatus {...defaultProps} staleness={staleness} />);
     expect(screen.getByText('Dati non aggiornati')).toBeInTheDocument();
   });
 
@@ -54,18 +65,19 @@ describe('StoveStatus', () => {
       cachedAt: new Date('2024-01-01T12:00:00Z'),
       lastFetch: new Date('2024-01-01T12:00:00Z'),
     };
-    render(<StoveStatus {...defaultProps} errorCode={5} staleness={staleness} isVisible={true} />);
+    render(<StoveStatus {...defaultProps} errorCode={5} staleness={staleness} />);
     expect(screen.queryByText('Dati non aggiornati')).not.toBeInTheDocument();
     expect(screen.getByText('ERR 5')).toBeInTheDocument();
   });
 
   it('does NOT show staleness badge when tab is not visible', () => {
+    jest.mocked(useVisibility).mockReturnValue(false);
     const staleness = {
       isStale: true,
       cachedAt: new Date('2024-01-01T12:00:00Z'),
       lastFetch: new Date('2024-01-01T12:00:00Z'),
     };
-    render(<StoveStatus {...defaultProps} staleness={staleness} isVisible={false} />);
+    render(<StoveStatus {...defaultProps} staleness={staleness} />);
     expect(screen.queryByText('Dati non aggiornati')).not.toBeInTheDocument();
   });
 

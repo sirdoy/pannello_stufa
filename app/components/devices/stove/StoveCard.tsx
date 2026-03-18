@@ -78,7 +78,6 @@ export default function StoveCard() {
         needsMaintenance={stoveData.needsMaintenance}
         maintenanceStatus={stoveData.maintenanceStatus}
         cleaningInProgress={stoveData.cleaningInProgress}
-        isFirebaseConnected={stoveData.isFirebaseConnected}
         hasPendingCommands={stoveData.hasPendingCommands}
         pendingCommands={stoveData.pendingCommands}
         igniteCmd={commands.igniteCmd}

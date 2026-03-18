@@ -154,7 +154,7 @@ Plans:
   1. Navigating to /raspi shows full system stats: uptime, load averages, network I/O, and process count
   2. The 5-minute GitHub Actions cron check reports Raspberry Pi health alongside stove and thermostat status
   3. If the Raspberry Pi is unreachable during a cron run, the check logs the failure without aborting other health checks
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
 - [ ] 90-01-PLAN.md — /raspi page with useRaspiFullData hook, orchestrator, presentational components, RaspiCard navigation
 - [ ] 90-02-PLAN.md — Cron health check integration with raspiClient.getHealth()
@@ -183,7 +183,7 @@ Plans:
 | 87. Client Cleanup | 2/2 | Complete    | 2026-03-17 | - |
 | 88. Raspberry Pi API Layer | 1/1 | Complete    | 2026-03-17 | - |
 | 89. Raspberry Pi Dashboard Card | 2/2 | Complete    | 2026-03-17 | - |
-| 90. Raspberry Pi Page + Cron | v11.0 | 0/2 | Not started | - |
+| 90. Raspberry Pi Page + Cron | 1/2 | In Progress|  | - |
 
 **Total:** 14 milestones shipped, 83 phases complete, 348 plans executed. v11.0 in progress (7 phases planned, phases 84-90).
 

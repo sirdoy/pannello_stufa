@@ -59,8 +59,6 @@ export interface UseStoveDataReturn {
   maintenanceStatus: any;
   cleaningInProgress: boolean;
 
-  // Sandbox state
-  sandboxMode: boolean;
   loadingMessage: string;
 
   // PWA state
@@ -122,9 +120,6 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
   // Maintenance states
   const [maintenanceStatus, setMaintenanceStatus] = useState<any>(null);
   const [cleaningInProgress, setCleaningInProgress] = useState(false);
-
-  // Sandbox mode
-  const [sandboxMode, setSandboxMode] = useState(false);
 
   // Loading overlay message
   const [loadingMessage, setLoadingMessage] = useState('Caricamento...');
@@ -255,8 +250,6 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
     maintenanceStatus,
     cleaningInProgress,
 
-    // Sandbox state
-    sandboxMode,
     loadingMessage,
 
     // PWA state

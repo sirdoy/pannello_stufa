@@ -12,7 +12,6 @@ interface StoveStatusProps {
   fanLevel: number | null;
   powerLevel: number | null;
   errorCode: number;
-  sandboxMode: boolean;
   staleness: StalenessInfo | null;
   statusInfo: ReturnType<typeof getStatusInfo>;
   statusDisplay: ReturnType<typeof getStatusDisplay>;
@@ -23,7 +22,6 @@ export default function StoveStatus({
   fanLevel,
   powerLevel,
   errorCode,
-  sandboxMode,
   staleness,
   statusInfo,
   statusDisplay,
@@ -31,15 +29,6 @@ export default function StoveStatus({
   const isVisible = useVisibility();
   return (
     <div className="mb-6 relative">
-      {/* Sandbox Badge */}
-      {sandboxMode && (
-        <div className="absolute -top-2 -left-2 z-30">
-          <Badge variant="ocean" size="sm" pulse icon={<span>🧪</span>}>
-            SANDBOX
-          </Badge>
-        </div>
-      )}
-
       {/* Error Badge */}
       {errorCode !== 0 && (
         <div className="absolute -top-2 -right-2 z-30">

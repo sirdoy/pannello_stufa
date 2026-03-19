@@ -136,7 +136,6 @@ export default function StovePage() {
           fanLevel={stoveData.fanLevel}
           powerLevel={stoveData.powerLevel}
           errorCode={stoveData.errorCode}
-          sandboxMode={stoveData.sandboxMode}
           isAccesa={stoveData.isAccesa}
           isSpenta={stoveData.isSpenta}
           isOnline={stoveData.isOnline}

@@ -129,7 +129,6 @@ export default function StoveCard() {
               fanLevel={stoveData.fanLevel}
               powerLevel={stoveData.powerLevel}
               errorCode={stoveData.errorCode}
-              sandboxMode={stoveData.sandboxMode}
               staleness={stoveData.staleness}
               statusInfo={statusInfo}
               statusDisplay={statusDisplay}

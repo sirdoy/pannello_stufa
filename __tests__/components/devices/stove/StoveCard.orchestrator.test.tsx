@@ -72,7 +72,7 @@ const mockUseStoveCommands = useStoveCommands as jest.MockedFunction<typeof useS
 
 describe('StoveCard Orchestrator', () => {
   const defaultStoveData = {
-    status: 'WORK',
+    status: 'working',
     fanLevel: 3,
     powerLevel: 2,
     loading: false,
@@ -80,7 +80,6 @@ describe('StoveCard Orchestrator', () => {
     initialLoading: false,
     errorCode: 0,
     errorDescription: '',
-    sandboxMode: false,
     loadingMessage: '',
     isOnline: true,
     isAccesa: true,
@@ -175,22 +174,22 @@ describe('StoveCard Orchestrator', () => {
     expect(screen.queryByTestId('stove-mode-control')).not.toBeInTheDocument();
   });
 
-  it('renders StoveAdjustments when isOnline=true AND status includes WORK', () => {
+  it('renders StoveAdjustments when isOnline=true AND status is working', () => {
     mockUseStoveData.mockReturnValue({
       ...defaultStoveData,
       isOnline: true,
-      status: 'WORK',
+      status: 'working',
     } as any);
 
     render(<StoveCard />);
     expect(screen.getByTestId('stove-adjustments')).toBeInTheDocument();
   });
 
-  it('does NOT render StoveAdjustments when status is OFF', () => {
+  it('does NOT render StoveAdjustments when status is off', () => {
     mockUseStoveData.mockReturnValue({
       ...defaultStoveData,
       isOnline: true,
-      status: 'OFF',
+      status: 'off',
     } as any);
 
     render(<StoveCard />);
@@ -201,7 +200,7 @@ describe('StoveCard Orchestrator', () => {
     mockUseStoveData.mockReturnValue({
       ...defaultStoveData,
       isOnline: false,
-      status: 'WORK',
+      status: 'working',
     } as any);
 
     render(<StoveCard />);

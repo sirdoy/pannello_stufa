@@ -11,14 +11,13 @@ import { useVisibility } from '@/lib/hooks/useVisibility';
 
 describe('StoveStatus', () => {
   const defaultProps = {
-    status: 'WORK',
+    status: 'working',
     fanLevel: 3,
     powerLevel: 2,
     errorCode: 0,
-    sandboxMode: false,
     staleness: null,
-    statusInfo: getStatusInfo('WORK'),
-    statusDisplay: getStatusDisplay('WORK'),
+    statusInfo: getStatusInfo('working'),
+    statusDisplay: getStatusDisplay('working'),
   };
 
   beforeEach(() => {
@@ -36,11 +35,6 @@ describe('StoveStatus', () => {
     expect(screen.getByText('Potenza')).toBeInTheDocument();
     expect(screen.getByText('3')).toBeInTheDocument();
     expect(screen.getByText('2')).toBeInTheDocument();
-  });
-
-  it('shows sandbox badge when sandboxMode is true', () => {
-    render(<StoveStatus {...defaultProps} sandboxMode={true} />);
-    expect(screen.getByText('SANDBOX')).toBeInTheDocument();
   });
 
   it('shows error badge when errorCode > 0', () => {

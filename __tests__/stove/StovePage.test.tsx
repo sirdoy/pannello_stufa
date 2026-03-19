@@ -69,7 +69,7 @@ const MockStovePageHero = jest.mocked(StovePageHero);
 const MockStovePageAdjustments = jest.mocked(StovePageAdjustments);
 
 const createMockStoveData = (overrides = {}) => ({
-  status: 'OFF',
+  status: 'off',
   fanLevel: 3,
   powerLevel: 2,
   loading: false,
@@ -83,7 +83,6 @@ const createMockStoveData = (overrides = {}) => ({
   errorDescription: '',
   maintenanceStatus: null,
   cleaningInProgress: false,
-  sandboxMode: false,
   loadingMessage: '',
   isOnline: true,
   hasPendingCommands: false,
@@ -139,11 +138,10 @@ describe('StovePage', () => {
 
   it('renders StovePageHero with correct data props', () => {
     const mockData = createMockStoveData({
-      status: 'WORK',
+      status: 'working',
       fanLevel: 4,
       powerLevel: 3,
       errorCode: 0,
-      sandboxMode: true,
     });
     mockUseStoveData.mockReturnValue(mockData);
 
@@ -152,21 +150,20 @@ describe('StovePage', () => {
     // Verify component was called with key data props
     const heroProps = MockStovePageHero.mock.calls[0]?.[0];
     expect(heroProps).toBeDefined();
-    expect(heroProps.status).toBe('WORK');
+    expect(heroProps.status).toBe('working');
     expect(heroProps.fanLevel).toBe(4);
     expect(heroProps.powerLevel).toBe(3);
     expect(heroProps.errorCode).toBe(0);
-    expect(heroProps.sandboxMode).toBe(true);
   });
 
   it('renders StovePageAdjustments only when status includes WORK', () => {
     // Not WORK status
-    mockUseStoveData.mockReturnValue(createMockStoveData({ status: 'OFF' }));
+    mockUseStoveData.mockReturnValue(createMockStoveData({ status: 'off' }));
     const { rerender } = render(<StovePage />);
     expect(screen.queryByTestId('stove-page-adjustments')).not.toBeInTheDocument();
 
     // WORK status
-    mockUseStoveData.mockReturnValue(createMockStoveData({ status: 'WORK' }));
+    mockUseStoveData.mockReturnValue(createMockStoveData({ status: 'working' }));
     rerender(<StovePage />);
     expect(screen.getByTestId('stove-page-adjustments')).toBeInTheDocument();
   });
@@ -177,7 +174,7 @@ describe('StovePage', () => {
   });
 
   it('applies correct theme classes based on status', () => {
-    mockUseStoveData.mockReturnValue(createMockStoveData({ status: 'WORK' }));
+    mockUseStoveData.mockReturnValue(createMockStoveData({ status: 'working' }));
 
     const { container } = render(<StovePage />);
 

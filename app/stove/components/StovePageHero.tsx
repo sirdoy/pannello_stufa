@@ -3,7 +3,7 @@
  *
  * Immersive hero section for stove/page.tsx:
  * - Decorative background pattern
- * - Sandbox/error badges
+ * - Error badges
  * - Large status icon and label
  * - Metrics grid (fan + power gauges)
  * - Primary action buttons (ACCENDI/SPEGNI)
@@ -22,7 +22,6 @@ export interface StovePageHeroProps {
   fanLevel: number | null;
   powerLevel: number | null;
   errorCode: number;
-  sandboxMode: boolean;
   isAccesa: boolean;
   isSpenta: boolean;
   isOnline: boolean;
@@ -46,7 +45,6 @@ export default function StovePageHero(props: StovePageHeroProps) {
     fanLevel,
     powerLevel,
     errorCode,
-    sandboxMode,
     isAccesa,
     isSpenta,
     needsMaintenance,
@@ -79,14 +77,9 @@ export default function StovePageHero(props: StovePageHeroProps) {
       </div>
 
       {/* Badges */}
-      <div className="absolute top-4 left-4 right-4 flex justify-between z-20">
-        {sandboxMode && (
-          <div className="bg-ocean-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full shadow-lg">
-            <span className="text-xs font-bold">🧪 SANDBOX</span>
-          </div>
-        )}
+      <div className="absolute top-4 left-4 right-4 flex justify-end z-20">
         {errorCode !== 0 && (
-          <div className="bg-danger-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full shadow-lg ml-auto animate-pulse">
+          <div className="bg-danger-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full shadow-lg animate-pulse">
             <span className="text-xs font-bold">⚠️ ERR {errorCode}</span>
           </div>
         )}

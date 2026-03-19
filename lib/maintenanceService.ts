@@ -34,7 +34,6 @@ export interface MaintenanceStatus extends MaintenanceData {
 
 /**
  * Get maintenance data from Firebase
- * Se sandbox è attivo in localhost, legge da sandbox/maintenance
  */
 export async function getMaintenanceData(): Promise<MaintenanceData> {
   try {

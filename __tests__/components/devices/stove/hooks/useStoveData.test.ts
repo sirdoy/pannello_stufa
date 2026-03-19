@@ -12,7 +12,6 @@ import * as sandboxService from '@/lib/sandboxService';
 import * as errorMonitor from '@/lib/errorMonitor';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
-import { useDeviceStaleness } from '@/lib/hooks/useDeviceStaleness';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 
 // Mock all external dependencies
@@ -22,7 +21,6 @@ jest.mock('@/lib/sandboxService');
 jest.mock('@/lib/errorMonitor');
 jest.mock('@/lib/hooks/useOnlineStatus');
 jest.mock('@/lib/hooks/useBackgroundSync');
-jest.mock('@/lib/hooks/useDeviceStaleness');
 jest.mock('@/lib/hooks/useAdaptivePolling', () => ({
   useAdaptivePolling: jest.fn((opts: any) => {
     // Call callback immediately to simulate immediate:true
@@ -64,8 +62,6 @@ describe('useStoveData', () => {
       triggerSync: jest.fn(),
     });
 
-    jest.mocked(useDeviceStaleness).mockReturnValue(null);
-
     jest.mocked(sandboxService.isLocalEnvironment).mockReturnValue(false);
     jest.mocked(errorMonitor.logError).mockResolvedValue(undefined);
     jest.mocked(errorMonitor.shouldNotify).mockReturnValue(false);
@@ -78,14 +74,17 @@ describe('useStoveData', () => {
       currentHours: 10,
     });
 
-    // Mock fetch globally
+    // Mock fetch globally with proxy-shaped response
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: jest.fn().mockResolvedValue({
-        StatusDescription: 'OFF',
-        Error: 0,
-        ErrorDescription: '',
-        Result: 3,
+        stove_state: 'off',
+        power_level: null,
+        fan_level: null,
+        data_freshness: 'LIVE',
+        last_poll_at: '2026-03-19T12:00:00Z',
+        error_code: null,
+        error_description: null,
       }),
     });
   });
@@ -118,13 +117,31 @@ describe('useStoveData', () => {
     });
   });
 
-  it('sets status from API response', async () => {
+  it('does not call /stove/getFan or /stove/getPower endpoints', async () => {
+    renderHook(() =>
+      useStoveData({
+        checkVersion: mockCheckVersion,
+        userId: mockUserId,
+      })
+    );
+
+    await waitFor(() => {
+      expect(global.fetch).not.toHaveBeenCalledWith(expect.stringContaining('/stove/getFan'));
+      expect(global.fetch).not.toHaveBeenCalledWith(expect.stringContaining('/stove/getPower'));
+    });
+  });
+
+  it('sets status from proxy stove_state field', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: jest.fn().mockResolvedValue({
-        StatusDescription: 'WORK PHASE 1',
-        Error: 0,
-        ErrorDescription: '',
+        stove_state: 'working',
+        power_level: 3,
+        fan_level: 4,
+        data_freshness: 'LIVE',
+        last_poll_at: '2026-03-19T12:00:00Z',
+        error_code: null,
+        error_description: null,
       }),
     });
 
@@ -136,18 +153,156 @@ describe('useStoveData', () => {
     );
 
     await waitFor(() => {
-      expect(result.current.status).toBe('WORK PHASE 1');
+      expect(result.current.status).toBe('working');
       expect(result.current.initialLoading).toBe(false);
     });
   });
 
-  it('returns isAccesa true when status includes WORK', async () => {
+  it('sets power_level and fan_level from single status response', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: jest.fn().mockResolvedValue({
-        StatusDescription: 'WORK PHASE 2',
-        Error: 0,
-        ErrorDescription: '',
+        stove_state: 'working',
+        power_level: 3,
+        fan_level: 4,
+        data_freshness: 'LIVE',
+        last_poll_at: '2026-03-19T12:00:00Z',
+        error_code: null,
+        error_description: null,
+      }),
+    });
+
+    const { result } = renderHook(() =>
+      useStoveData({
+        checkVersion: mockCheckVersion,
+        userId: mockUserId,
+      })
+    );
+
+    await waitFor(() => {
+      expect(result.current.powerLevel).toBe(3);
+      expect(result.current.fanLevel).toBe(4);
+    });
+  });
+
+  it('sets staleness to { isStale: true } when data_freshness is STALE', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({
+        stove_state: 'working',
+        power_level: 3,
+        fan_level: 4,
+        data_freshness: 'STALE',
+        last_poll_at: '2026-03-19T11:00:00Z',
+        error_code: null,
+        error_description: null,
+      }),
+    });
+
+    const { result } = renderHook(() =>
+      useStoveData({
+        checkVersion: mockCheckVersion,
+        userId: mockUserId,
+      })
+    );
+
+    await waitFor(() => {
+      expect(result.current.staleness?.isStale).toBe(true);
+    });
+  });
+
+  it('sets staleness to null when data_freshness is LIVE', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({
+        stove_state: 'working',
+        power_level: 3,
+        fan_level: 4,
+        data_freshness: 'LIVE',
+        last_poll_at: '2026-03-19T12:00:00Z',
+        error_code: null,
+        error_description: null,
+      }),
+    });
+
+    const { result } = renderHook(() =>
+      useStoveData({
+        checkVersion: mockCheckVersion,
+        userId: mockUserId,
+      })
+    );
+
+    await waitFor(() => {
+      expect(result.current.staleness).toBeNull();
+    });
+  });
+
+  it('populates errorCode and errorDescription when stove_state is alarm', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({
+        stove_state: 'alarm',
+        power_level: null,
+        fan_level: null,
+        data_freshness: 'LIVE',
+        last_poll_at: '2026-03-19T12:00:00Z',
+        error_code: 7,
+        error_description: 'Sonda fumi',
+      }),
+    });
+
+    jest.mocked(errorMonitor.shouldNotify).mockReturnValue(false);
+
+    const { result } = renderHook(() =>
+      useStoveData({
+        checkVersion: mockCheckVersion,
+        userId: mockUserId,
+      })
+    );
+
+    await waitFor(() => {
+      expect(result.current.errorCode).toBe(7);
+      expect(result.current.errorDescription).toBe('Sonda fumi');
+    });
+  });
+
+  it('clears errorCode to 0 when stove_state is not alarm', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({
+        stove_state: 'working',
+        power_level: 3,
+        fan_level: 4,
+        data_freshness: 'LIVE',
+        last_poll_at: '2026-03-19T12:00:00Z',
+        error_code: null,
+        error_description: null,
+      }),
+    });
+
+    const { result } = renderHook(() =>
+      useStoveData({
+        checkVersion: mockCheckVersion,
+        userId: mockUserId,
+      })
+    );
+
+    await waitFor(() => {
+      expect(result.current.errorCode).toBe(0);
+    });
+  });
+
+  it('returns isAccesa true for working status', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({
+        stove_state: 'working',
+        power_level: 3,
+        fan_level: 4,
+        data_freshness: 'LIVE',
+        last_poll_at: '2026-03-19T12:00:00Z',
+        error_code: null,
+        error_description: null,
       }),
     });
 
@@ -163,13 +318,123 @@ describe('useStoveData', () => {
     });
   });
 
-  it('returns isSpenta true when status includes OFF', async () => {
+  it('returns isAccesa true for igniting status', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: jest.fn().mockResolvedValue({
-        StatusDescription: 'OFF',
-        Error: 0,
-        ErrorDescription: '',
+        stove_state: 'igniting',
+        power_level: null,
+        fan_level: null,
+        data_freshness: 'LIVE',
+        last_poll_at: '2026-03-19T12:00:00Z',
+        error_code: null,
+        error_description: null,
+      }),
+    });
+
+    const { result } = renderHook(() =>
+      useStoveData({
+        checkVersion: mockCheckVersion,
+        userId: mockUserId,
+      })
+    );
+
+    await waitFor(() => {
+      expect(result.current.isAccesa).toBe(true);
+    });
+  });
+
+  it('returns isAccesa true for modulating status', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({
+        stove_state: 'modulating',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: '2026-03-19T12:00:00Z',
+        error_code: null,
+        error_description: null,
+      }),
+    });
+
+    const { result } = renderHook(() =>
+      useStoveData({
+        checkVersion: mockCheckVersion,
+        userId: mockUserId,
+      })
+    );
+
+    await waitFor(() => {
+      expect(result.current.isAccesa).toBe(true);
+    });
+  });
+
+  it('returns isSpenta true for off status', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({
+        stove_state: 'off',
+        power_level: null,
+        fan_level: null,
+        data_freshness: 'LIVE',
+        last_poll_at: '2026-03-19T12:00:00Z',
+        error_code: null,
+        error_description: null,
+      }),
+    });
+
+    const { result } = renderHook(() =>
+      useStoveData({
+        checkVersion: mockCheckVersion,
+        userId: mockUserId,
+      })
+    );
+
+    await waitFor(() => {
+      expect(result.current.isSpenta).toBe(true);
+    });
+  });
+
+  it('returns isSpenta true for alarm status', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({
+        stove_state: 'alarm',
+        power_level: null,
+        fan_level: null,
+        data_freshness: 'LIVE',
+        last_poll_at: '2026-03-19T12:00:00Z',
+        error_code: 7,
+        error_description: 'Test error',
+      }),
+    });
+
+    jest.mocked(errorMonitor.shouldNotify).mockReturnValue(false);
+
+    const { result } = renderHook(() =>
+      useStoveData({
+        checkVersion: mockCheckVersion,
+        userId: mockUserId,
+      })
+    );
+
+    await waitFor(() => {
+      expect(result.current.isSpenta).toBe(true);
+    });
+  });
+
+  it('returns isSpenta true for standby status', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({
+        stove_state: 'standby',
+        power_level: null,
+        fan_level: null,
+        data_freshness: 'LIVE',
+        last_poll_at: '2026-03-19T12:00:00Z',
+        error_code: null,
+        error_description: null,
       }),
     });
 
@@ -196,15 +461,21 @@ describe('useStoveData', () => {
     expect(typeof result.current.fetchStatusAndUpdate).toBe('function');
   });
 
-  it('logs errors when error code is non-zero', async () => {
+  it('logs errors when stove_state is alarm with non-zero error_code', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: jest.fn().mockResolvedValue({
-        StatusDescription: 'ERROR CODE 5',
-        Error: 5,
-        ErrorDescription: 'Test error',
+        stove_state: 'alarm',
+        power_level: null,
+        fan_level: null,
+        data_freshness: 'LIVE',
+        last_poll_at: '2026-03-19T12:00:00Z',
+        error_code: 5,
+        error_description: 'Test error',
       }),
     });
+
+    jest.mocked(errorMonitor.shouldNotify).mockReturnValue(false);
 
     renderHook(() =>
       useStoveData({
@@ -218,7 +489,7 @@ describe('useStoveData', () => {
         5,
         'Test error',
         expect.objectContaining({
-          status: 'ERROR CODE 5',
+          status: 'alarm',
           source: 'status_monitor',
         })
       );

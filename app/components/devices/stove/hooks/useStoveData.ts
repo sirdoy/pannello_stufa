@@ -3,10 +3,11 @@
  *
  * Encapsulates all stove state management:
  * - Polling via useAdaptivePolling (60s, alwaysActive:true)
- * - Staleness tracking (90s threshold when on, 180s when off)
+ * - Staleness tracking from proxy data_freshness field
  * - Error monitoring
  *
  * This hook guarantees SINGLE polling loop for StoveCard.
+ * Reads stove_state, power_level, fan_level from single /stove/status fetch.
  */
 
 'use client';
@@ -19,8 +20,8 @@ import { getMaintenanceStatus } from '@/lib/maintenanceService';
 import { isSandboxEnabled, isLocalEnvironment } from '@/lib/sandboxService';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
-import { useDeviceStaleness } from '@/lib/hooks/useDeviceStaleness';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
+import type { ThermorossiStatusResponse } from '@/types/thermorossiProxy';
 import type { StalenessInfo } from '@/lib/pwa/stalenessDetector';
 
 /**
@@ -101,7 +102,7 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
   const { hasPendingCommands, pendingCommands, lastSyncedCommand } = useBackgroundSync();
 
   // Core state
-  const [status, setStatus] = useState<string>('...');
+  const [status, setStatus] = useState<string>('off');
   const [fanLevel, setFanLevel] = useState<number | null>(null);
   const [powerLevel, setPowerLevel] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -129,41 +130,18 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
   // Loading overlay message
   const [loadingMessage, setLoadingMessage] = useState('Caricamento...');
 
-  // Derived state (computed before staleness call so threshold can depend on it)
-  const isAccesa = status?.includes('WORK') || status?.includes('START');
-  const isSpenta = status?.includes('OFF') || status?.includes('ERROR') || status?.includes('WAIT');
+  // Staleness state — derived from proxy data_freshness field
+  const [isStale, setIsStale] = useState(false);
+
+  // Staleness object: null when LIVE, { isStale: true } when STALE
+  const staleness: StalenessInfo | null = isStale
+    ? { isStale: true, cachedAt: null, ageSeconds: 0 }
+    : null;
+
+  // Derived state — exact equality against proxy StoveState values
+  const isAccesa = status === 'working' || status === 'igniting' || status === 'modulating';
+  const isSpenta = status === 'off' || status === 'alarm' || status === 'standby';
   const needsMaintenance = maintenanceStatus?.needsCleaning || false;
-
-  // Staleness thresholds: 90s when stove is on, 180s when off (1.5x the 60s polling interval)
-  const stoveStalenessThreshold = isAccesa ? 90000 : 180000;
-  const staleness = useDeviceStaleness('stove', stoveStalenessThreshold);
-
-  // Fetch functions
-  const fetchFanLevel = async () => {
-    try {
-      const res = await fetch(STOVE_ROUTES.getFan);
-      const json = await res.json();
-      const level = json?.Result ?? 3;
-      setFanLevel(level);
-      return level;
-    } catch (err) {
-      console.error('Errore livello ventola:', err);
-      return null;
-    }
-  };
-
-  const fetchPowerLevel = async () => {
-    try {
-      const res = await fetch(STOVE_ROUTES.getPower);
-      const json = await res.json();
-      const level = json?.Result ?? 2;
-      setPowerLevel(level);
-      return level;
-    } catch (err) {
-      console.error('Errore livello potenza:', err);
-      return null;
-    }
-  };
 
   const fetchSchedulerMode = async () => {
     try {
@@ -201,42 +179,46 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
       }
 
       const res = await fetch(STOVE_ROUTES.status);
-      const json = await res.json();
-      const newStatus = json?.StatusDescription || 'sconosciuto';
-      const newErrorCode = json?.Error ?? 0;
-      const newErrorDescription = json?.ErrorDescription || '';
+      if (!res.ok) throw new Error(`Status fetch failed: ${res.status}`);
+      const json = await res.json() as ThermorossiStatusResponse;
 
-      setStatus(newStatus);
-      setErrorCode(newErrorCode);
-      setErrorDescription(newErrorDescription);
+      const { stove_state, power_level, fan_level, data_freshness, error_code, error_description } = json;
 
-      if (newErrorCode !== 0) {
-        await logError(newErrorCode, newErrorDescription, {
-          status: newStatus,
-          source: 'status_monitor',
-        });
+      setStatus(stove_state);
+      setFanLevel(fan_level);
+      setPowerLevel(power_level);
+      setIsStale(data_freshness === 'STALE');
 
-        if (shouldNotify(newErrorCode, previousErrorCode.current)) {
-          // Browser notification (immediate)
-          // await sendErrorNotification(newErrorCode, newErrorDescription);
+      if (stove_state === 'alarm') {
+        const code = error_code ?? 0;
+        const desc = error_description ?? '';
+        setErrorCode(code);
+        setErrorDescription(desc);
+        if (code !== 0) {
+          await logError(code, desc, { status: stove_state, source: 'status_monitor' });
+          if (shouldNotify(code, previousErrorCode.current)) {
+            // Browser notification (immediate)
+            // await sendErrorNotification(code, desc);
 
-          // Push notification (to all user devices)
-          // if (userId) {
-          //   await sendErrorPushNotification(newErrorCode, newErrorDescription, userId);
-          // }
+            // Push notification (to all user devices)
+            // if (userId) {
+            //   await sendErrorPushNotification(code, desc, userId);
+            // }
+          }
         }
+        previousErrorCode.current = code;
+      } else {
+        setErrorCode(0);
+        setErrorDescription('');
+        previousErrorCode.current = 0;
       }
 
-      previousErrorCode.current = newErrorCode;
-
-      await fetchFanLevel();
-      await fetchPowerLevel();
       await fetchSchedulerMode();
       await fetchMaintenanceStatus();
       await checkVersion();
     } catch (err) {
       console.error('Errore stato:', err);
-      setStatus('errore');
+      setStatus('off');
     } finally {
       setInitialLoading(false);
     }

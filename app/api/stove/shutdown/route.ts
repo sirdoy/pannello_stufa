@@ -1,33 +1,32 @@
 import { withAuthAndErrorHandler, withIdempotency, success, parseJson } from '@/lib/core';
-import { validateShutdownInput } from '@/lib/validators';
-import { getStoveService } from '@/lib/services/StoveService';
+import { sendShutdown } from '@/lib/thermorossiProxy';
 import { logAnalyticsEvent } from '@/lib/analyticsEventLogger';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/stove/shutdown
- * Shuts down the stove
- * Supports sandbox mode in localhost
+ * Shuts down the stove via HA proxy.
  * Protected: Requires Auth0 authentication
  * Idempotent: Returns cached response for duplicate Idempotency-Key
  */
 export const POST = withAuthAndErrorHandler(
   withIdempotency(async (request) => {
     const body = await parseJson(request);
-    const { source } = validateShutdownInput(body);
+    const source = (body?.['source'] as string) ?? 'manual';
 
-    const stoveService = getStoveService();
-    const result = await stoveService.shutdown(source);
+    const data = await sendShutdown();
 
     // Analytics: log stove shutdown event (fire-and-forget, consent-gated)
     const consent = request.headers.get('x-analytics-consent');
     if (consent === 'granted') {
       logAnalyticsEvent({
         eventType: 'stove_shutdown',
-        source: source ?? 'manual',
+        source,
       }).catch(() => {}); // Fire-and-forget
     }
 
-    return success(result as Record<string, unknown>);
+    return success(data as unknown as Record<string, unknown>, null, 202);
   }),
   'Stove/Shutdown'
 );

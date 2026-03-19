@@ -1,34 +1,32 @@
 import { withAuthAndErrorHandler, withIdempotency, success, parseJson } from '@/lib/core';
-import { validateIgniteInput } from '@/lib/validators';
-import { getStoveService } from '@/lib/services/StoveService';
+import { sendIgnit } from '@/lib/thermorossiProxy';
 import { logAnalyticsEvent } from '@/lib/analyticsEventLogger';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/stove/ignite
- * Ignites the stove
- * Supports sandbox mode in localhost
+ * Ignites the stove via HA proxy.
  * Protected: Requires Auth0 authentication
  * Idempotent: Returns cached response for duplicate Idempotency-Key
  */
 export const POST = withAuthAndErrorHandler(
   withIdempotency(async (request) => {
     const body = await parseJson(request);
-    const { power, source } = validateIgniteInput(body);
+    const source = (body?.['source'] as string) ?? 'manual';
 
-    const stoveService = getStoveService();
-    const result = await stoveService.ignite(power, source);
+    const data = await sendIgnit();
 
     // Analytics: log stove ignite event (fire-and-forget, consent-gated)
     const consent = request.headers.get('x-analytics-consent');
     if (consent === 'granted') {
       logAnalyticsEvent({
         eventType: 'stove_ignite',
-        powerLevel: power,
-        source: source ?? 'manual',
+        source,
       }).catch(() => {}); // Fire-and-forget
     }
 
-    return success(result as Record<string, unknown>);
+    return success(data as unknown as Record<string, unknown>, null, 202);
   }),
   'Stove/Ignite'
 );

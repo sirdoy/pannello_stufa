@@ -1,42 +1,33 @@
 import { withAuthAndErrorHandler, withIdempotency, success, parseJsonOrThrow } from '@/lib/core';
-import { validateSetPowerInput } from '@/lib/validators';
-import { getStoveService } from '@/lib/services/StoveService';
+import { setPower } from '@/lib/thermorossiProxy';
 import { logAnalyticsEvent } from '@/lib/analyticsEventLogger';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/stove/setPower
- * Sets the power level
- * Supports sandbox mode in localhost
+ * Sets the power level via HA proxy.
+ * Body: { value: number }
  * Protected: Requires Auth0 authentication
  * Idempotent: Returns cached response for duplicate Idempotency-Key
  */
 export const POST = withAuthAndErrorHandler(
   withIdempotency(async (request) => {
     const body = await parseJsonOrThrow(request);
-    const { level, source } = validateSetPowerInput(body);
+    const value = body['value'] as number;
 
-    const stoveService = getStoveService();
-    const result = await stoveService.setPower(level, source);
+    const data = await setPower(value);
 
     // Analytics: log power change event (fire-and-forget, consent-gated)
     const consent = request.headers.get('x-analytics-consent');
     if (consent === 'granted') {
       logAnalyticsEvent({
         eventType: 'power_change',
-        powerLevel: level,
-        source: source ?? 'manual',
+        powerLevel: value,
       }).catch(() => {}); // Fire-and-forget
     }
 
-    // Maintain backward-compatible response format
-    if (result.modeChanged) {
-      return success({
-        ...result,
-        newMode: 'semi-manual',
-      });
-    }
-
-    return success(result);
+    return success(data as unknown as Record<string, unknown>, null, 202);
   }),
   'Stove/SetPower'
 );

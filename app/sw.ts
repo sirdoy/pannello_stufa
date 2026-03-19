@@ -37,20 +37,6 @@ const serwist = new Serwist({
         networkTimeoutSeconds: 10,
       }),
     },
-    // Stove API - Network First with short cache
-    {
-      matcher: ({ url }) => url.hostname === 'wsthermorossi.cloudwinet.it',
-      handler: new NetworkFirst({
-        cacheName: 'stove-api-cache',
-        plugins: [
-          new ExpirationPlugin({
-            maxEntries: 50,
-            maxAgeSeconds: 60, // 1 minute
-          }),
-        ],
-        networkTimeoutSeconds: 10,
-      }),
-    },
     // Images - Cache First for performance
     {
       matcher: ({ request }) => request.destination === 'image',

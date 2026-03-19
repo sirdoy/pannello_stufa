@@ -4,7 +4,7 @@ milestone: v12.0
 milestone_name: Data Fetching Simplification & E2E Verification
 status: completed
 stopped_at: Completed 98-01-PLAN.md
-last_updated: "2026-03-19T08:38:55.912Z"
+last_updated: "2026-03-19T08:41:32.049Z"
 last_activity: "2026-03-18 — Phase 96 Plan 01: stove polling simplification complete"
 progress:
   total_phases: 3

@@ -1,13 +1,14 @@
 import { withAuthAndErrorHandler, success } from '@/lib/core';
-import { getStoveStatus } from '@/lib/stoveApi';
+import { getStatus } from '@/lib/thermorossiProxy';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/stove/status
- * Returns the current operational status of the stove
- * Supports sandbox mode in localhost
+ * Returns combined stove telemetry from the HA proxy.
  * Protected: Requires Auth0 authentication
  */
 export const GET = withAuthAndErrorHandler(async () => {
-  const data = await getStoveStatus();
+  const data = await getStatus();
   return success(data as unknown as Record<string, unknown>);
 }, 'Stove/Status');

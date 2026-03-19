@@ -1,13 +1,14 @@
 import { withAuthAndErrorHandler, success } from '@/lib/core';
-import { getPowerLevel } from '@/lib/stoveApi';
+import { getPower } from '@/lib/thermorossiProxy';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/stove/getPower
- * Returns the current power level
- * Supports sandbox mode in localhost
+ * Returns current power level from the HA proxy.
  * Protected: Requires Auth0 authentication
  */
 export const GET = withAuthAndErrorHandler(async () => {
-  const data = await getPowerLevel();
+  const data = await getPower();
   return success(data as unknown as Record<string, unknown>);
 }, 'Stove/GetPower');

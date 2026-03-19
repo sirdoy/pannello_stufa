@@ -145,10 +145,10 @@ Plans:
   1. The scheduler route reads `stove_state` (exact string) for all state-based decisions — no reference to `StatusDescription` or WiNet status strings remains
   2. Alarm notifications in the health monitoring path use `error_code` and `error_description` from the proxy status response
   3. All stove API calls in the scheduler route go through `lib/thermorossiProxy.ts` — no direct WiNet URLs or old `lib/stoveApi.ts` imports remain
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 102-01: Scheduler stove_state migration + error_code alarm notifications + proxy client wiring
+- [ ] 102-01-PLAN.md — Scheduler proxy migration + alarm notifications + test suite update
 
 ### Phase 103: Cleanup & Debug Panel
 **Goal**: All WiNet infrastructure is deleted and the debug panel reflects the proxy architecture
@@ -189,11 +189,11 @@ Plans:
 | 99. Proxy Client Foundation | 2/2 | Complete    | 2026-03-19 | - |
 | 100. Control Endpoints | 2/2 | Complete    | 2026-03-19 | - |
 | 101. Frontend Hooks | 2/2 | Complete    | 2026-03-19 | - |
-| 102. Scheduler Update | v13.0 | 0/TBD | Not started | - |
+| 102. Scheduler Update | v13.0 | 0/1 | Not started | - |
 | 103. Cleanup & Debug Panel | v13.0 | 0/TBD | Not started | - |
 
 **Total:** 17 milestones shipped, 98 phases complete, 375 plans executed. v13.0 in progress (5 phases planned).
 
 ---
 
-*Roadmap updated: 2026-03-19 — Phase 101 planned: 2 plans in 2 waves*
+*Roadmap updated: 2026-03-19 — Phase 102 planned: 1 plan in 1 wave*

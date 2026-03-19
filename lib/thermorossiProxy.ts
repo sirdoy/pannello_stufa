@@ -1,7 +1,7 @@
 /**
  * Thermorossi Proxy Client
  *
- * Convenience wrappers around the shared HA proxy client (haGet).
+ * Convenience wrappers around the shared HA proxy client (haGet/haPost).
  * All endpoints delegate to haGet which handles auth, timeouts, and error
  * mapping via HA_API_URL and HA_API_KEY env vars.
  *
@@ -18,13 +18,14 @@
  *   - Other non-ok → ApiError(EXTERNAL_API_ERROR)
  */
 
-import { haGet } from '@/lib/haClient';
+import { haGet, haPost } from '@/lib/haClient';
 import type {
   ThermorossiStatusResponse,
   ThermorossiPowerResponse,
   ThermorossiFanResponse,
   ThermorossiHealthResponse,
   ThermorossiHistoryResponse,
+  ThermorossiCommandResponse,
 } from '@/types/thermorossiProxy';
 
 // =============================================================================
@@ -73,4 +74,68 @@ export async function getHistory(params?: URLSearchParams): Promise<ThermorossiH
     ? `/api/v1/thermorossi/history?${params.toString()}`
     : '/api/v1/thermorossi/history';
   return haGet<ThermorossiHistoryResponse>(endpoint);
+}
+
+// =============================================================================
+// COMMAND WRAPPERS
+// =============================================================================
+
+/**
+ * Ignite the stove.
+ * Calls POST /api/v1/thermorossi/commands/ignit on the HA proxy.
+ * Returns 202 Accepted with suggested_poll_delay_s.
+ */
+export async function sendIgnit(): Promise<ThermorossiCommandResponse> {
+  return haPost<ThermorossiCommandResponse>(
+    '/api/v1/thermorossi/commands/ignit',
+    {}
+  );
+}
+
+/**
+ * Shut down the stove.
+ * Calls POST /api/v1/thermorossi/commands/shutdown on the HA proxy.
+ * Returns 202 Accepted with suggested_poll_delay_s.
+ */
+export async function sendShutdown(): Promise<ThermorossiCommandResponse> {
+  return haPost<ThermorossiCommandResponse>(
+    '/api/v1/thermorossi/commands/shutdown',
+    {}
+  );
+}
+
+/**
+ * Set the stove power level.
+ * Calls POST /api/v1/thermorossi/settings/power on the HA proxy.
+ * @param value - Power level (range validated by proxy; 422 on out-of-range)
+ */
+export async function setPower(value: number): Promise<ThermorossiCommandResponse> {
+  return haPost<ThermorossiCommandResponse>(
+    '/api/v1/thermorossi/settings/power',
+    { value }
+  );
+}
+
+/**
+ * Set the stove fan level.
+ * Calls POST /api/v1/thermorossi/settings/fan-level on the HA proxy.
+ * @param value - Fan level (range validated by proxy; 422 on out-of-range)
+ */
+export async function setFan(value: number): Promise<ThermorossiCommandResponse> {
+  return haPost<ThermorossiCommandResponse>(
+    '/api/v1/thermorossi/settings/fan-level',
+    { value }
+  );
+}
+
+/**
+ * Set the water temperature setpoint.
+ * Calls POST /api/v1/thermorossi/settings/temperature/water on the HA proxy.
+ * @param value - Temperature in Celsius (range 40-80, validated by proxy; 422 on out-of-range)
+ */
+export async function setWaterTemp(value: number): Promise<ThermorossiCommandResponse> {
+  return haPost<ThermorossiCommandResponse>(
+    '/api/v1/thermorossi/settings/temperature/water',
+    { value }
+  );
 }

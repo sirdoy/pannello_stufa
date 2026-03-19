@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v12.0
 milestone_name: Data Fetching Simplification & E2E Verification
 status: completed
-stopped_at: Completed 98-01-PLAN.md
-last_updated: "2026-03-19T08:41:32.049Z"
-last_activity: "2026-03-18 — Phase 96 Plan 01: stove polling simplification complete"
+stopped_at: Milestone v12.0 archived
+last_updated: "2026-03-19"
+last_activity: "2026-03-19 — v12.0 milestone completed and archived"
 progress:
   total_phases: 3
   completed_phases: 3
@@ -18,27 +18,25 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-18)
+See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v12.0 — Phase 96: Polling Simplification
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 96 of 97 (Polling Simplification)
-Plan: 1 of 1 complete
-Status: Phase 96 complete — ready for Phase 97
-Last activity: 2026-03-18 — Phase 96 Plan 01: stove polling simplification complete
+Milestone v12.0 completed and archived.
+All 17 milestones shipped, 98 phases complete, 375 plans executed.
 
 Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (all milestones): 370
+- Total plans completed (all milestones): 375
+- v12.0 average: 1.3 plans/phase (4 plans / 3 phases)
 - v11.1 average: 2.25 plans/phase (9 plans / 4 phases)
 - v11.0 average: 1.6 plans/phase (13 plans / 8 phases)
-- v10.0 average: 2.0 plans/phase (18 plans / 9 phases)
 
 **By Milestone (recent):**
 
@@ -48,26 +46,13 @@ Progress: [██████████] 100%
 | v10.0 Netatmo API Migration | 75-83 | 18 | 2 days |
 | v11.0 API Unification & Raspberry Pi | 84-91 | 13 | 2 days |
 | v11.1 Test Suite & Tech Debt Cleanup | 92-95 | 9 | 1 day |
-| Phase 96 P02 | 3m43s | 2 tasks | 7 files |
-| Phase 96 P01 | 9 | 2 tasks | 16 files |
-| Phase 97-e2e-page-verification P01 | 59s | 1 tasks | 1 files |
-| Phase 98-gap-closure P01 | 8 | 2 tasks | 8 files |
+| v12.0 Data Fetching & E2E | 96-98 | 4 | 2 days |
 
 ## Accumulated Context
 
 ### Decisions
 
 See PROJECT.md Key Decisions table for full history.
-
-Recent decisions affecting current work:
-- v11.1: React Compiler replaces manual memoization — confirms polling simplification is the right next lever for server load reduction
-- v7.0: alwaysActive flag for stove polling (safety-critical) — Phase 96 must NOT regress this: stove hook rewrite must preserve always-on polling behavior
-- [Phase 96]: SPARKLINE_MAX_POINTS stays at 120 — 2h of sparkline history at 60s is acceptable and preferable to reducing history
-- [Phase 96]: useAdaptivePolling(60s, alwaysActive:true) replaces custom Firebase RTDB + polling loop in useStoveData
-- [Phase 96]: Stove-specific staleness thresholds: 90s when on, 180s when off via optional thresholdMs param
-- [Phase 97-e2e-page-verification]: collectConsoleErrors helper: attach listener before goto, call cleanup() before assertion — prevents late-arriving messages from polluting the error array
-- [Phase 97-e2e-page-verification]: E2E-09 /admin requirement maps to /debug — no /admin route exists in the app
-- [Phase 98-gap-closure]: JSX inline comments referencing Firebase in StoveCard.tsx render block are out of scope — audit targeted JSDoc blocks only
 
 ### Pending Todos
 
@@ -79,6 +64,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T08:38:55.908Z
-Stopped at: Completed 98-01-PLAN.md
+Last session: 2026-03-19
+Stopped at: Milestone v12.0 archived
 Resume file: None

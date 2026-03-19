@@ -8,20 +8,10 @@ PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo, lu
 
 I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-## Current Milestone: v12.0 Data Fetching Simplification & E2E Verification
-
-**Goal:** Ridurre il carico sul server semplificando il polling (tutti i device a 60s, rimuovere Firebase RTDB listener stufa e sync-external-state) e verificare tutte le pagine con Playwright.
-
-**Target features:**
-- Polling unificato su useAdaptivePolling 60s per tutti i device
-- Rimozione Firebase RTDB real-time listener stufa
-- Rimozione sync-external-state e staleness polling 5s
-- Test Playwright per tutte le pagine (home, device, settings, admin)
-
 ## Current State
 
-**Version:** v11.1 (shipped 2026-03-18)
-**Status:** Data Fetching Simplification & E2E Verification — in progress
+**Version:** v12.0 (shipped 2026-03-19)
+**Status:** Planning next milestone
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -436,17 +426,24 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ **DEBT-01**: ~179 useMemo/useCallback call-sites removed (React Compiler handles it) — v11.1 (Phase 95)
 - ✓ **DEBT-02**: 8 stale env vars removed from .env.local — v11.1 (Phase 95)
 
+**v12.0 Data Fetching Simplification & E2E Verification (Shipped 2026-03-19):**
+
+**Polling Simplification:**
+- ✓ **POLL-01**: StoveCard usa useAdaptivePolling (60s) invece del polling loop custom — v12.0 (Phase 96)
+- ✓ **POLL-02**: Firebase RTDB real-time listener della stufa rimosso — v12.0 (Phase 96)
+- ✓ **POLL-03**: sync-external-state call rimossa dal ciclo fetch stufa — v12.0 (Phase 96)
+- ✓ **POLL-04**: ThermostatCard polling esteso a 60s — v12.0 (Phase 96)
+- ✓ **POLL-05**: LightsCard polling esteso a 60s — v12.0 (Phase 96)
+- ✓ **POLL-06**: NetworkCard polling esteso a 60s visible / 5min hidden — v12.0 (Phase 96)
+- ✓ **POLL-07**: RaspiCard polling esteso a 60s visible / 5min hidden — v12.0 (Phase 96)
+- ✓ **POLL-08**: useDeviceStaleness polling rimosso o esteso a 60s — v12.0 (Phase 96)
+
+**E2E Page Verification:**
+- ✓ **E2E-01** through **E2E-10**: Playwright verification for all 9 pages — v12.0 (Phase 97)
+
 ### Active
 
-- [ ] POLL-01: StoveCard usa useAdaptivePolling (60s) invece del polling loop custom
-- [ ] POLL-02: Firebase RTDB real-time listener della stufa rimosso
-- [ ] POLL-03: sync-external-state call rimossa dal ciclo fetch stufa
-- [ ] POLL-04: ThermostatCard polling esteso a 60s
-- [ ] POLL-05: LightsCard polling esteso a 60s
-- [ ] POLL-06: NetworkCard polling esteso a 60s visible / 5min hidden
-- [ ] POLL-07: RaspiCard polling esteso a 60s visible / 5min hidden
-- [ ] POLL-08: useDeviceStaleness polling rimosso o esteso a 60s
-- [ ] E2E-01 through E2E-10: Playwright verification for all pages
+(No active requirements — planning next milestone)
 
 ### Out of Scope
 
@@ -481,18 +478,20 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Self-hosted Outfit + Space Grotesk fonts via next/font
 - Web Vitals pipeline (useReportWebVitals → sendBeacon → Firebase RTDB → dashboard)
 - Suspense streaming con loading.tsx skeleton shell + per-card boundaries
-- ~102,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
+- ~103,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
 - 560+ TypeScript source files, 4,000+ tests passing
 - GitHub Actions cron (5-min schedule) per health monitoring e coordination (stove, thermostat, Raspberry Pi)
 - GDPR-compliant analytics con consent banner
-- 16 milestones shipped, 95 phases, 370 plans executed
+- Playwright E2E smoke tests for all 9 app pages
+- All device polling unified at 60s via useAdaptivePolling (no Firebase RTDB real-time listener)
+- 17 milestones shipped, 98 phases, 375 plans executed
 
-**v11.0 Milestone (2026-03-17 → 2026-03-18):**
-- 8 phases executed (13 plans)
+**v12.0 Milestone (2026-03-18 → 2026-03-19):**
+- 3 phases executed (4 plans)
 - 18/18 requirements satisfied (100%)
-- 113 files changed (+13,189 insertions, -1,764 deletions)
-- 83 git commits with atomic changes
-- 2 days from phase 84 start to completion
+- 44 files changed (+3,363 insertions, -654 deletions)
+- 19 git commits with atomic changes
+- 2 days from phase 96 start to completion
 
 **Known Issues:**
 - Worker teardown warning (React 19 cosmetic, not actionable)
@@ -508,7 +507,6 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - CopyableIp uses plain button instead of design system Button (test simplicity)
 - 3 Netatmo routes without frontend consumer (synchomeschedule, createnewhomeschedule, getroommeasure)
 - Netatmo proxy connectivity depends on myfritz.net (same risk as Fritz!Box)
-- Nyquist validation missing for v10.0 phases (75-83) and partial for v11.0/v11.1 phases
 - DataTable retains 5 useMemo for TanStack Table referential stability (intentional exception)
 
 **User Feedback:**
@@ -588,6 +586,11 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 | Static imports for Jest mock interception | Dynamic `await import()` inside functions bypasses Jest module mocks | ✓ Good — withIdempotency tests pass reliably (v11.1) |
 | React Compiler replaces manual memoization | 271/271 components auto-memoized, manual useMemo/useCallback redundant | ✓ Good — ~179 call-sites removed, net -264 LOC (v11.1) |
 | DataTable useMemo exception | TanStack Table requires stable references for columns/data config | ✓ Good — 5 useMemo retained as intentional exception (v11.1) |
+| useAdaptivePolling(60s) for stove | Replaces Firebase RTDB listener + custom polling loop, alwaysActive preserves safety | ✓ Good — Simpler architecture, consistent with all device hooks (v12.0) |
+| SPARKLINE_MAX_POINTS stays at 120 | 2h of sparkline history at 60s intervals is acceptable | ✓ Good — No user-visible regression (v12.0) |
+| Stove-specific staleness thresholds | 90s when on, 180s when off via optional thresholdMs param | ✓ Good — Safety-critical staleness detection preserved (v12.0) |
+| collectConsoleErrors helper pattern | Attach listener before goto, cleanup before assertion | ✓ Good — Prevents late-arriving messages from polluting error arrays (v12.0) |
+| E2E-09 /admin maps to /debug | No /admin route exists, debug page serves admin function | ✓ Good — Requirement satisfied by existing route (v12.0) |
 
 ## Constraints
 
@@ -599,4 +602,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-18 after v12.0 milestone started*
+*Last updated: 2026-03-19 after v12.0 milestone*

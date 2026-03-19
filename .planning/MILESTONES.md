@@ -1,5 +1,39 @@
 # Project Milestones: Pannello Stufa
 
+## v12.0 Data Fetching Simplification & E2E Verification (Shipped: 2026-03-19)
+
+**Delivered:** Unified all device polling to 60s intervals via useAdaptivePolling, removed Firebase RTDB real-time listener and sync-external-state from the stove hook, and added Playwright smoke tests verifying all 9 application pages load without errors.
+
+**Phases completed:** 96-98 (4 plans total)
+
+**Key accomplishments:**
+
+- Stove hook rewritten: Firebase RTDB real-time listener + sync-external-state replaced with useAdaptivePolling(60s, alwaysActive:true), isFirebaseConnected/usePollingFallback removed from all consumers
+- All device hooks unified to 60s polling: Thermostat, Lights, Network, Raspi intervals updated from 30s to 60s visible / 5min hidden; useDeviceStaleness polling reduced from 5s to 60s
+- Playwright E2E smoke tests for all 9 app pages (homepage, stove, thermostat, lights, network, raspi, analytics, settings, debug) with console error collection and accessibility checks
+- Audit-driven gap closure: stale test assertion (30000→60000ms) fixed, Playwright selector fixes committed, stale JSDoc references cleaned, SUMMARY frontmatter populated
+
+**Stats:**
+
+- 4 plans executed across 3 phases
+- 18/18 v12.0 requirements satisfied (100%)
+- 44 files changed (+3,363 insertions, -654 deletions)
+- 19 git commits with atomic changes
+- 2 days (2026-03-18 → 2026-03-19)
+
+**Git range:** `docs(96)` (a22ad2b) → `docs(phase-98)` (073046a)
+
+**Archives:**
+- [Roadmap](milestones/v12.0-ROADMAP.md)
+- [Requirements](milestones/v12.0-REQUIREMENTS.md)
+- [Audit](milestones/v12.0-MILESTONE-AUDIT.md)
+
+**Tech debt:** None accumulated. All audit gaps closed by Phase 98.
+
+**What's next:** Polling simplified, E2E coverage established. Ready for next milestone planning.
+
+---
+
 ## v11.1 Test Suite & Tech Debt Cleanup (Shipped: 2026-03-18)
 
 **Delivered:** Clean test suite with zero ordering dependencies, all 12 failing test suites fixed (37 tests), ~179 useMemo/useCallback call-sites removed (React Compiler handles auto-memoization), and 8 stale environment variables deleted — net -264 lines of code cleanup.

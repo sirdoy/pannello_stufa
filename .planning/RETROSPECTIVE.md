@@ -119,6 +119,44 @@
 
 ---
 
+## Milestone: v12.0 — Data Fetching Simplification & E2E Verification
+
+**Shipped:** 2026-03-19
+**Phases:** 3 | **Plans:** 4
+
+### What Was Built
+- Stove hook rewritten: Firebase RTDB real-time listener + sync-external-state replaced with useAdaptivePolling(60s, alwaysActive:true)
+- All device hooks unified to 60s intervals (from 30s), useDeviceStaleness polling reduced from 5s to 60s
+- Playwright E2E smoke tests for all 9 app pages with console error collection
+- Audit gap closure: stale test assertion, Playwright selector fixes, JSDoc cleanup
+
+### What Worked
+- Smallest milestone yet in scope (3 phases, 4 plans) — focused and well-scoped
+- Milestone audit ran before shipping, caught 2 integration gaps that Phase 98 fixed cleanly
+- useAdaptivePolling was already battle-tested across 4 devices, so stove migration was straightforward
+- Playwright page-load tests are a good foundation for future E2E expansion
+
+### What Was Inefficient
+- Phase 98 gap closure could have been avoided if Phase 96 executor had caught the stale test assertion (30000→60000ms) during execution
+- SUMMARY one_liner field still not populated by extractors — recurring issue across milestones
+
+### Patterns Established
+- collectConsoleErrors helper for Playwright: attach before goto, cleanup before assertion
+- Stove-specific staleness thresholds (90s on, 180s off) via optional thresholdMs parameter
+- E2E-09 /admin maps to /debug — requirement mapping should document route aliases
+
+### Key Lessons
+1. **Polling unification is simple when the abstraction exists** — useAdaptivePolling made all device hooks consistent with minimal code changes
+2. **Removing Firebase RTDB listener simplifies architecture** — stove hook went from dual data source (RTDB + polling) to single source (polling)
+3. **Playwright smoke tests are cheap to add** — 1 plan for 9 pages, 59s execution. Worth adding early.
+4. **Gap closure phases are getting smaller** — from 4 phases (v10.0) to 1 phase (v12.0), showing improved execution quality
+
+### Cost Observations
+- Model mix: balanced profile (sonnet executors, sonnet verifiers)
+- Notable: 3 phases in 2 days — lightweight milestone, no complex migrations or architecture changes
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -129,6 +167,7 @@
 | v10.0 | 9 | 18 | API migration — audit-driven gap closure |
 | v11.0 | 8 | 13 | Transport unification + new device onboarding |
 | v11.1 | 4 | 9 | Test cleanup + memoization removal |
+| v12.0 | 3 | 4 | Polling unification + E2E smoke tests |
 
 ### Cumulative Quality
 
@@ -138,6 +177,7 @@
 | v10.0 | 4,000+ | 28/28 requirements | -3,848 |
 | v11.0 | 4,000+ | 18/18 requirements | +11,425 |
 | v11.1 | 4,000+ | 16/16 requirements | -264 |
+| v12.0 | 4,000+ | 18/18 requirements | +2,709 |
 
 ### Top Lessons (Verified Across Milestones)
 
@@ -146,3 +186,4 @@
 3. **Proxy pattern is reliable** — server-side proxy with rate limiting works for Fritz!Box, Netatmo, and Raspberry Pi (verified v8.0, v10.0, v11.0)
 4. **Established patterns accelerate** — new device onboarding follows Fritz!Box's proxy/card/page/cron template (verified v11.0)
 5. **Cleanup milestones after feature milestones** — v11.1 cleaned up v9.0-v11.0 tech debt in 1 day, keeping codebase healthy (verified v11.1)
+6. **Focused milestones ship faster** — v12.0 (3 phases, 4 plans) completed in 2 days with zero tech debt accumulated (verified v12.0)

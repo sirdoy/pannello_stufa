@@ -185,7 +185,7 @@ Plans:
 | 84-91 | v11.0 | 13/13 | ✓ Complete | 2026-03-18 |
 | 92-95 | v11.1 | 9/9 | ✓ Complete | 2026-03-18 |
 | 96-98 | v12.0 | 4/4 | ✓ Complete | 2026-03-19 |
-| 99. Proxy Client Foundation | 2/2 | Complete   | 2026-03-19 | - |
+| 99. Proxy Client Foundation | 2/2 | Complete    | 2026-03-19 | - |
 | 100. Control Endpoints | v13.0 | 0/TBD | Not started | - |
 | 101. Frontend Hooks | v13.0 | 0/TBD | Not started | - |
 | 102. Scheduler Update | v13.0 | 0/TBD | Not started | - |

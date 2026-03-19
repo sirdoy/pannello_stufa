@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v13.0
 milestone_name: Thermorossi Proxy Migration
-status: in-progress
-stopped_at: Completed 99-01-PLAN.md
-last_updated: "2026-03-19T12:03:00Z"
-last_activity: 2026-03-19 — Phase 99 Plan 01 complete: Thermorossi proxy client foundation
+status: completed
+stopped_at: Completed 99-02-PLAN.md
+last_updated: "2026-03-19T12:07:12.409Z"
+last_activity: "2026-03-19 — Phase 99 Plan 01 complete: types + proxy client + 11 unit tests"
 progress:
   total_phases: 5
-  completed_phases: 0
-  total_plans: 1
-  completed_plans: 1
+  completed_phases: 1
+  total_plans: 2
+  completed_plans: 2
   percent: 5
 ---
 
@@ -47,6 +47,7 @@ Progress: [█░░░░░░░░░] 5%
 | v11.0 API Unification & Raspberry Pi | 84-91 | 13 | 2 days |
 | v11.1 Test Suite & Tech Debt Cleanup | 92-95 | 9 | 1 day |
 | v12.0 Data Fetching & E2E | 96-98 | 4 | 2 days |
+| Phase 99 P02 | 87 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -63,6 +64,7 @@ Phase 99 Plan 01 decisions:
 - DataFreshness is 'LIVE' | 'STALE' only — UNREACHABLE triggers HTTP 503, never appears in body
 - No haPost in thermorossiProxy.ts — command wrappers deferred to Phase 100
 - getHistory accepts optional URLSearchParams, appends as query string (same pattern as getProxyRoomMeasure)
+- [Phase 99]: Migrated three stove read routes from stoveApi to thermorossiProxy; created new /api/stove/health route
 
 ### Pending Todos
 
@@ -76,6 +78,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T12:03:00Z
-Stopped at: Completed 99-01-PLAN.md
-Resume file: .planning/phases/99-proxy-client-foundation/99-01-SUMMARY.md
+Last session: 2026-03-19T12:07:12.406Z
+Stopped at: Completed 99-02-PLAN.md
+Resume file: None

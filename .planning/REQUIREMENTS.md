@@ -15,10 +15,10 @@ Requirements for Thermorossi Proxy Migration. Each maps to roadmap phases.
 
 ### Read Endpoints
 
-- [ ] **READ-01**: GET /status migrated to proxy — returns stove_state, power_level, fan_level, data_freshness, error_code, error_description
-- [ ] **READ-02**: GET /power migrated to proxy — returns power_level with data_freshness
-- [ ] **READ-03**: GET /fan-level migrated to proxy — returns fan_level with data_freshness
-- [ ] **READ-04**: GET /health migrated to proxy — returns provider health and cache freshness
+- [x] **READ-01**: GET /status migrated to proxy — returns stove_state, power_level, fan_level, data_freshness, error_code, error_description
+- [x] **READ-02**: GET /power migrated to proxy — returns power_level with data_freshness
+- [x] **READ-03**: GET /fan-level migrated to proxy — returns fan_level with data_freshness
+- [x] **READ-04**: GET /health migrated to proxy — returns provider health and cache freshness
 - [ ] **READ-05**: GET /history available via proxy — paginated telemetry with auto-granularity (raw/hourly/daily)
 
 ### Control Endpoints
@@ -76,10 +76,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CLIENT-01 | Phase 99 | Complete |
 | CLIENT-02 | Phase 99 | Complete |
 | CLIENT-03 | Phase 99 | Complete |
-| READ-01 | Phase 99 | Pending |
-| READ-02 | Phase 99 | Pending |
-| READ-03 | Phase 99 | Pending |
-| READ-04 | Phase 99 | Pending |
+| READ-01 | Phase 99 | Complete |
+| READ-02 | Phase 99 | Complete |
+| READ-03 | Phase 99 | Complete |
+| READ-04 | Phase 99 | Complete |
 | READ-05 | Phase 100 | Pending |
 | CMD-01 | Phase 100 | Pending |
 | CMD-02 | Phase 100 | Pending |

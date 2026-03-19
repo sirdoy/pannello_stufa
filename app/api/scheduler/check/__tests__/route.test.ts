@@ -27,7 +27,8 @@ jest.mock('@/lib/maintenanceServiceAdmin');
 jest.mock('@/lib/environmentHelper');
 jest.mock('@/lib/services/pidTuningLogService');
 jest.mock('@/lib/notificationTriggersServer');
-jest.mock('@/lib/stoveApi');
+jest.mock('@/lib/thermorossiProxy');
+jest.mock('@/lib/netatmoProxy');
 jest.mock('@/lib/stoveStateService');
 jest.mock('@/lib/netatmoCalibrationService');
 jest.mock('@/lib/hue/hueRemoteTokenHelper');
@@ -60,14 +61,13 @@ import {
   triggerMaintenanceAlertServer,
 } from '@/lib/notificationTriggersServer';
 import {
-  getStoveStatus,
-  getFanLevel,
-  getPowerLevel,
-  igniteStove,
-  shutdownStove,
-  setPowerLevel,
-  setFanLevel,
-} from '@/lib/stoveApi';
+  getStatus,
+  sendIgnit,
+  sendShutdown,
+  setPower,
+  setFan,
+  getHealth,
+} from '@/lib/thermorossiProxy';
 import { updateStoveState } from '@/lib/stoveStateService';
 import { calibrateValvesServer } from '@/lib/netatmoCalibrationService';
 import { proactiveTokenRefresh } from '@/lib/hue/hueRemoteTokenHelper';
@@ -81,13 +81,12 @@ import { cleanupStaleTokens } from '@/lib/services/tokenCleanupService';
 const mockAdminDbGet = jest.mocked(adminDbGet);
 const mockAdminDbSet = jest.mocked(adminDbSet);
 const mockAdminDbUpdate = jest.mocked(adminDbUpdate);
-const mockGetStoveStatus = jest.mocked(getStoveStatus);
-const mockGetFanLevel = jest.mocked(getFanLevel);
-const mockGetPowerLevel = jest.mocked(getPowerLevel);
-const mockIgniteStove = jest.mocked(igniteStove);
-const mockShutdownStove = jest.mocked(shutdownStove);
-const mockSetPowerLevel = jest.mocked(setPowerLevel);
-const mockSetFanLevel = jest.mocked(setFanLevel);
+const mockGetStatus = jest.mocked(getStatus);
+const mockSendIgnit = jest.mocked(sendIgnit);
+const mockSendShutdown = jest.mocked(sendShutdown);
+const mockSetPower = jest.mocked(setPower);
+const mockSetFan = jest.mocked(setFan);
+const mockGetHealth = jest.mocked(getHealth);
 const mockCanIgnite = jest.mocked(canIgnite);
 const mockTrackUsageHours = jest.mocked(trackUsageHours);
 const mockLogCronExecution = jest.mocked(logCronExecution);
@@ -132,9 +131,22 @@ describe('Scheduler Check Route', () => {
     mockLogAnalyticsEvent.mockResolvedValue(undefined as any);
 
     // Default stove data mocks (happy path)
-    mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
-    mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
-    mockGetPowerLevel.mockResolvedValue({ Result: 2 } as any);
+    mockGetStatus.mockResolvedValue({
+      stove_state: 'off',
+      power_level: 2,
+      fan_level: 3,
+      data_freshness: 'LIVE',
+      last_poll_at: null,
+      error_code: null,
+      error_description: null,
+    });
+
+    // Default health mock
+    mockGetHealth.mockResolvedValue({
+      status: 'ok',
+      data_freshness: 'LIVE',
+      last_poll_at: null,
+    });
 
     // Default maintenance mock
     mockTrackUsageHours.mockResolvedValue({ tracked: false } as any);
@@ -193,6 +205,7 @@ describe('Scheduler Check Route', () => {
       if (path.includes('lastWorkNotification')) return null;
       if (path.includes('lastIgnitionInterval')) return null;
       if (path.includes('lastUnexpectedOffNotification')) return null;
+      if (path.includes('lastAlarmNotification')) return null;
       return null;
     });
   }
@@ -363,15 +376,15 @@ describe('Scheduler Check Route', () => {
       expect(response.status).toBe(200);
       // No active schedule, stove should remain off (shutdown not called since already off)
       expect(data.activeSchedule).toBeNull();
-      expect(mockIgniteStove).not.toHaveBeenCalled();
-      expect(mockShutdownStove).not.toHaveBeenCalled();
+      expect(mockSendIgnit).not.toHaveBeenCalled();
+      expect(mockSendShutdown).not.toHaveBeenCalled();
 
       jest.useRealTimers();
     });
   });
 
   describe('Stove Data Fetching', () => {
-    it('fetches status, fan, and power in parallel', async () => {
+    it('fetches status (including fan and power) via getStatus', async () => {
       // Setup: scheduler enabled with empty intervals array (to trigger fetch)
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T06:00:00.000Z')); // 07:00 Rome time, outside schedule
@@ -384,17 +397,15 @@ describe('Scheduler Check Route', () => {
       const request = createMockRequest();
       await GET(request);
 
-      // Verify all three API functions called
-      expect(mockGetStoveStatus).toHaveBeenCalled();
-      expect(mockGetFanLevel).toHaveBeenCalled();
-      expect(mockGetPowerLevel).toHaveBeenCalled();
+      // Verify getStatus called (single call returns all stove data)
+      expect(mockGetStatus).toHaveBeenCalled();
 
       jest.useRealTimers();
     });
 
     it('handles status fetch failure with safe defaults', async () => {
       // Mock status fetch to fail
-      mockGetStoveStatus.mockRejectedValue(new Error('Network error'));
+      mockGetStatus.mockRejectedValue(new Error('Network error'));
 
       // Setup: active schedule with stove OFF
       jest.useFakeTimers();
@@ -417,14 +428,22 @@ describe('Scheduler Check Route', () => {
       expect(data.message).toContain('sicurezza');
 
       // Verify ignition NOT attempted (safety)
-      expect(mockIgniteStove).not.toHaveBeenCalled();
+      expect(mockSendIgnit).not.toHaveBeenCalled();
 
       jest.useRealTimers();
     });
 
-    it('uses default fan level (3) when getFanLevel returns null', async () => {
-      // Mock getFanLevel to return null
-      mockGetFanLevel.mockResolvedValue(null as any);
+    it('uses default fan level (3) when getStatus returns null fan_level', async () => {
+      // Mock getStatus to return null fan_level (triggers ?? 3 default)
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'off',
+        power_level: 2,
+        fan_level: null,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       setupSchedulerMocks({
         mode: { enabled: true, semiManual: false },
@@ -434,14 +453,21 @@ describe('Scheduler Check Route', () => {
       const request = createMockRequest();
       const response = await GET(request);
 
-      // Should not crash, processing continues
+      // Should not crash, processing continues with default fan level 3
       expect(response.status).toBe(200);
-      expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('Fan level unavailable'));
     });
 
-    it('uses default power level (2) when getPowerLevel returns null', async () => {
-      // Mock getPowerLevel to return null
-      mockGetPowerLevel.mockResolvedValue(null as any);
+    it('uses default power level (2) when getStatus returns null power_level', async () => {
+      // Mock getStatus to return null power_level (triggers ?? 2 default)
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'off',
+        power_level: null,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       setupSchedulerMocks({
         mode: { enabled: true, semiManual: false },
@@ -451,14 +477,21 @@ describe('Scheduler Check Route', () => {
       const request = createMockRequest();
       const response = await GET(request);
 
-      // Should not crash, processing continues
+      // Should not crash, processing continues with default power level 2
       expect(response.status).toBe(200);
-      expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('Power level unavailable'));
     });
 
-    it('detects stove as ON when status includes WORK', async () => {
-      // Mock stove status as WORK
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+    it('detects stove as ON when stove_state is working', async () => {
+      // Mock stove status as working
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'working',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -474,14 +507,22 @@ describe('Scheduler Check Route', () => {
       await GET(request);
 
       // Stove already on, no ignition attempt
-      expect(mockIgniteStove).not.toHaveBeenCalled();
+      expect(mockSendIgnit).not.toHaveBeenCalled();
 
       jest.useRealTimers();
     });
 
-    it('detects stove as ON when status includes START', async () => {
-      // Mock stove status as START
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'START', Result: 0 } as any);
+    it('detects stove as ON when stove_state is igniting', async () => {
+      // Mock stove status as igniting
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'igniting',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -497,7 +538,7 @@ describe('Scheduler Check Route', () => {
       await GET(request);
 
       // Stove already on, no ignition attempt
-      expect(mockIgniteStove).not.toHaveBeenCalled();
+      expect(mockSendIgnit).not.toHaveBeenCalled();
 
       jest.useRealTimers();
     });
@@ -532,9 +573,17 @@ describe('Scheduler Check Route', () => {
   });
 
   describe('Fire-and-Forget Side Effects', () => {
-    it('triggers stove status WORK notification when status includes WORK', async () => {
-      // Mock stove status as WORK
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+    it('triggers stove status working notification when stove_state is working', async () => {
+      // Mock stove status as working
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'working',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       // Setup scheduler mocks with empty intervals to continue processing
       setupSchedulerMocks({
@@ -645,7 +694,7 @@ describe('Scheduler Check Route', () => {
       expect(data.message).toContain('manutenzione');
 
       // Verify ignition NOT attempted
-      expect(mockIgniteStove).not.toHaveBeenCalled();
+      expect(mockSendIgnit).not.toHaveBeenCalled();
 
       jest.useRealTimers();
     });
@@ -668,7 +717,7 @@ describe('Scheduler Check Route', () => {
       await GET(request);
 
       // Verify ignition WAS attempted
-      expect(mockIgniteStove).toHaveBeenCalled();
+      expect(mockSendIgnit).toHaveBeenCalled();
 
       jest.useRealTimers();
     });
@@ -676,8 +725,16 @@ describe('Scheduler Check Route', () => {
 
   describe('Unexpected Off Detection', () => {
     it('does not notify when stove is on during active schedule', async () => {
-      // Mock stove as ON
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      // Mock stove as ON (working)
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'working',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -715,11 +772,19 @@ describe('Scheduler Check Route', () => {
 
   describe('State Transitions - Ignition', () => {
     it('ignites stove when schedule is active and stove is OFF', async () => {
-      // Mock igniteStove to succeed
-      mockIgniteStove.mockResolvedValue(undefined as any);
+      // Mock sendIgnit to succeed
+      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
 
       // Mock stove as OFF
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'off',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       // Mock updateStoveState
       const mockUpdateStoveState = jest.mocked(updateStoveState);
@@ -748,9 +813,10 @@ describe('Scheduler Check Route', () => {
       expect(data.status).toBe('ACCESA');
 
       // Verify ignition flow
-      expect(mockIgniteStove).toHaveBeenCalledWith(4);
+      expect(mockSendIgnit).toHaveBeenCalled();
+      expect(mockSetPower).toHaveBeenCalledWith(4);
       expect(mockUpdateStoveState).toHaveBeenCalledWith(expect.objectContaining({
-        status: 'START',
+        status: 'igniting',
         source: 'scheduler',
       }));
       expect(mockTriggerSchedulerActionServer).toHaveBeenCalledWith(
@@ -766,10 +832,26 @@ describe('Scheduler Check Route', () => {
 
     it('skips ignition when confirmation status shows stove already ON (ALREADY_ON race condition)', async () => {
       // First status fetch: OFF
-      // Second status fetch (confirmation): ON
-      mockGetStoveStatus
-        .mockResolvedValueOnce({ StatusDescription: 'Spento', Result: 0 } as any)
-        .mockResolvedValueOnce({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      // Second status fetch (confirmation inside handleIgnition): ON (working)
+      mockGetStatus
+        .mockResolvedValueOnce({
+          stove_state: 'off',
+          power_level: 2,
+          fan_level: 3,
+          data_freshness: 'LIVE',
+          last_poll_at: null,
+          error_code: null,
+          error_description: null,
+        })
+        .mockResolvedValueOnce({
+          stove_state: 'working',
+          power_level: 2,
+          fan_level: 3,
+          data_freshness: 'LIVE',
+          last_poll_at: null,
+          error_code: null,
+          error_description: null,
+        });
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -788,7 +870,7 @@ describe('Scheduler Check Route', () => {
       expect(data.message).toContain('race condition');
 
       // Verify ignition NOT attempted
-      expect(mockIgniteStove).not.toHaveBeenCalled();
+      expect(mockSendIgnit).not.toHaveBeenCalled();
 
       jest.useRealTimers();
     });
@@ -796,8 +878,16 @@ describe('Scheduler Check Route', () => {
     it('skips ignition when confirmation status fetch fails (CONFIRMATION_FAILED)', async () => {
       // First status fetch: OFF
       // Second status fetch (confirmation): Error
-      mockGetStoveStatus
-        .mockResolvedValueOnce({ StatusDescription: 'Spento', Result: 0 } as any)
+      mockGetStatus
+        .mockResolvedValueOnce({
+          stove_state: 'off',
+          power_level: 2,
+          fan_level: 3,
+          data_freshness: 'LIVE',
+          last_poll_at: null,
+          error_code: null,
+          error_description: null,
+        })
         .mockRejectedValueOnce(new Error('Network timeout'));
 
       jest.useFakeTimers();
@@ -817,15 +907,23 @@ describe('Scheduler Check Route', () => {
       expect(data.message).toContain('impossibile confermare');
 
       // Verify ignition NOT attempted
-      expect(mockIgniteStove).not.toHaveBeenCalled();
+      expect(mockSendIgnit).not.toHaveBeenCalled();
 
       jest.useRealTimers();
     });
 
     it('tracks ignition interval for unexpected off detection', async () => {
       // Mock successful ignition
-      mockIgniteStove.mockResolvedValue(undefined as any);
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'off',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       const mockUpdateStoveState = jest.mocked(updateStoveState);
       mockUpdateStoveState.mockResolvedValue(undefined as any);
@@ -855,8 +953,16 @@ describe('Scheduler Check Route', () => {
     });
 
     it('logs analytics event on successful ignition', async () => {
-      mockIgniteStove.mockResolvedValue(undefined as any);
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'off',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       const mockUpdateStoveState = jest.mocked(updateStoveState);
       mockUpdateStoveState.mockResolvedValue(undefined as any);
@@ -887,9 +993,17 @@ describe('Scheduler Check Route', () => {
 
   describe('State Transitions - Shutdown', () => {
     it('shuts down stove when no active schedule and stove is ON', async () => {
-      // Mock stove as ON
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockShutdownStove.mockResolvedValue(undefined as any);
+      // Mock stove as ON (working)
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'working',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
+      mockSendShutdown.mockResolvedValue({ command: 'shutdown', status: 'accepted', previous_state: 'working', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
 
       const mockUpdateStoveState = jest.mocked(updateStoveState);
       mockUpdateStoveState.mockResolvedValue(undefined as any);
@@ -910,9 +1024,9 @@ describe('Scheduler Check Route', () => {
       expect(data.status).toBe('SPENTA');
 
       // Verify shutdown flow
-      expect(mockShutdownStove).toHaveBeenCalled();
+      expect(mockSendShutdown).toHaveBeenCalled();
       expect(mockUpdateStoveState).toHaveBeenCalledWith(expect.objectContaining({
-        status: 'STANDBY',
+        status: 'standby',
         source: 'scheduler',
       }));
       expect(mockTriggerSchedulerActionServer).toHaveBeenCalledWith(
@@ -927,8 +1041,16 @@ describe('Scheduler Check Route', () => {
     });
 
     it('does not shutdown when no active schedule and stove already OFF', async () => {
-      // Mock stove as OFF
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      // Mock stove as OFF (default is already off, but explicit here for clarity)
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'off',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T08:00:00.000Z'));
@@ -942,14 +1064,22 @@ describe('Scheduler Check Route', () => {
       await GET(request);
 
       // Verify shutdown NOT called
-      expect(mockShutdownStove).not.toHaveBeenCalled();
+      expect(mockSendShutdown).not.toHaveBeenCalled();
 
       jest.useRealTimers();
     });
 
     it('logs analytics event on successful shutdown', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockShutdownStove.mockResolvedValue(undefined as any);
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'working',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
+      mockSendShutdown.mockResolvedValue({ command: 'shutdown', status: 'accepted', previous_state: 'working', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
 
       const mockUpdateStoveState = jest.mocked(updateStoveState);
       mockUpdateStoveState.mockResolvedValue(undefined as any);
@@ -980,10 +1110,16 @@ describe('Scheduler Check Route', () => {
   describe('Level Adjustments', () => {
     it('adjusts power level when schedule power differs from current', async () => {
       // Mock stove ON at power 2, schedule wants power 4
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 2 } as any);
-      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
-      mockSetPowerLevel.mockResolvedValue(undefined as any);
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'working',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
+      mockSetPower.mockResolvedValue({ command: 'set_power', status: 'accepted', previous_state: 'working', suggested_poll_delay_s: 5, poll_endpoint: '/status', requested_value: 4 });
 
       const mockUpdateStoveState = jest.mocked(updateStoveState);
       mockUpdateStoveState.mockResolvedValue(undefined as any);
@@ -1000,17 +1136,23 @@ describe('Scheduler Check Route', () => {
       await GET(request);
 
       // Verify power level adjusted
-      expect(mockSetPowerLevel).toHaveBeenCalledWith(4);
+      expect(mockSetPower).toHaveBeenCalledWith(4);
 
       jest.useRealTimers();
     });
 
     it('adjusts fan level when schedule fan differs from current', async () => {
       // Mock stove ON at fan 2, schedule wants fan 4
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
-      mockGetFanLevel.mockResolvedValue({ Result: 2 } as any);
-      mockSetFanLevel.mockResolvedValue(undefined as any);
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'working',
+        power_level: 4,
+        fan_level: 2,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
+      mockSetFan.mockResolvedValue({ command: 'set_fan', status: 'accepted', previous_state: 'working', suggested_poll_delay_s: 5, poll_endpoint: '/status', requested_value: 4 });
 
       const mockUpdateStoveState = jest.mocked(updateStoveState);
       mockUpdateStoveState.mockResolvedValue(undefined as any);
@@ -1027,16 +1169,22 @@ describe('Scheduler Check Route', () => {
       await GET(request);
 
       // Verify fan level adjusted
-      expect(mockSetFanLevel).toHaveBeenCalledWith(4);
+      expect(mockSetFan).toHaveBeenCalledWith(4);
 
       jest.useRealTimers();
     });
 
     it('skips power adjustment when PID boost is active', async () => {
       // Mock stove ON at power 3 (PID-set), schedule wants power 4
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 3 } as any);
-      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'working',
+        power_level: 3,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -1058,7 +1206,7 @@ describe('Scheduler Check Route', () => {
       await GET(request);
 
       // Verify power NOT adjusted (PID boost active)
-      expect(mockSetPowerLevel).not.toHaveBeenCalled();
+      expect(mockSetPower).not.toHaveBeenCalled();
 
       // Fan should still adjust (not managed by PID)
       // In this case both are 3, so no change anyway
@@ -1068,9 +1216,15 @@ describe('Scheduler Check Route', () => {
 
     it('does not adjust levels when already matching schedule', async () => {
       // Mock stove at power 4 fan 3, schedule also power 4 fan 3
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
-      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'working',
+        power_level: 4,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -1084,18 +1238,26 @@ describe('Scheduler Check Route', () => {
       await GET(request);
 
       // Verify neither level adjusted
-      expect(mockSetPowerLevel).not.toHaveBeenCalled();
-      expect(mockSetFanLevel).not.toHaveBeenCalled();
+      expect(mockSetPower).not.toHaveBeenCalled();
+      expect(mockSetFan).not.toHaveBeenCalled();
 
       jest.useRealTimers();
     });
   });
 
   describe('Error Scenarios', () => {
-    it('handles igniteStove failure gracefully', async () => {
-      // Mock igniteStove to reject
-      mockIgniteStove.mockRejectedValue(new Error('API timeout'));
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+    it('handles sendIgnit failure gracefully', async () => {
+      // Mock sendIgnit to reject
+      mockSendIgnit.mockRejectedValue(new Error('API timeout'));
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'off',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -1111,8 +1273,8 @@ describe('Scheduler Check Route', () => {
       // Route should still return 200 (error caught internally)
       expect(response.status).toBe(200);
 
-      // Verify igniteStove was called but failed
-      expect(mockIgniteStove).toHaveBeenCalled();
+      // Verify sendIgnit was called but failed
+      expect(mockSendIgnit).toHaveBeenCalled();
       expect(console.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to ignite'),
         expect.any(String)
@@ -1121,10 +1283,18 @@ describe('Scheduler Check Route', () => {
       jest.useRealTimers();
     });
 
-    it('handles shutdownStove failure gracefully', async () => {
+    it('handles sendShutdown failure gracefully', async () => {
       // Mock shutdown to reject
-      mockShutdownStove.mockRejectedValue(new Error('API timeout'));
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockSendShutdown.mockRejectedValue(new Error('API timeout'));
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'working',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T08:00:00.000Z'));
@@ -1140,8 +1310,8 @@ describe('Scheduler Check Route', () => {
       // Route should still return 200
       expect(response.status).toBe(200);
 
-      // Verify shutdownStove was called but failed
-      expect(mockShutdownStove).toHaveBeenCalled();
+      // Verify sendShutdown was called but failed
+      expect(mockSendShutdown).toHaveBeenCalled();
       expect(console.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to shutdown'),
         expect.any(String)
@@ -1150,12 +1320,18 @@ describe('Scheduler Check Route', () => {
       jest.useRealTimers();
     });
 
-    it('handles setPowerLevel failure without crashing', async () => {
-      // Mock setPowerLevel to reject
-      mockSetPowerLevel.mockRejectedValue(new Error('API timeout'));
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 2 } as any);
-      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+    it('handles setPower failure without crashing', async () => {
+      // Mock setPower to reject
+      mockSetPower.mockRejectedValue(new Error('API timeout'));
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'working',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -1171,8 +1347,8 @@ describe('Scheduler Check Route', () => {
       // Route should still return 200
       expect(response.status).toBe(200);
 
-      // Verify setPowerLevel was called but failed
-      expect(mockSetPowerLevel).toHaveBeenCalled();
+      // Verify setPower was called but failed
+      expect(mockSetPower).toHaveBeenCalled();
       expect(console.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to set power'),
         expect.any(String)
@@ -1181,12 +1357,18 @@ describe('Scheduler Check Route', () => {
       jest.useRealTimers();
     });
 
-    it('handles setFanLevel failure without crashing', async () => {
-      // Mock setFanLevel to reject
-      mockSetFanLevel.mockRejectedValue(new Error('API timeout'));
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
-      mockGetFanLevel.mockResolvedValue({ Result: 2 } as any);
+    it('handles setFan failure without crashing', async () => {
+      // Mock setFan to reject
+      mockSetFan.mockRejectedValue(new Error('API timeout'));
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'working',
+        power_level: 4,
+        fan_level: 2,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -1202,8 +1384,8 @@ describe('Scheduler Check Route', () => {
       // Route should still return 200
       expect(response.status).toBe(200);
 
-      // Verify setFanLevel was called but failed
-      expect(mockSetFanLevel).toHaveBeenCalled();
+      // Verify setFan was called but failed
+      expect(mockSetFan).toHaveBeenCalled();
       expect(console.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to set fan'),
         expect.any(String)
@@ -1215,11 +1397,17 @@ describe('Scheduler Check Route', () => {
   });
 
   describe('PID Automation', () => {
-    it('invokes PID automation when stove is in WORK state during active schedule', async () => {
-      // Mock stove in WORK state
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
-      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+    it('invokes PID automation when stove is in working state during active schedule', async () => {
+      // Mock stove in working state
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'working',
+        power_level: 4,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       // Mock PID Controller
       const { PIDController } = require('@/lib/utils/pidController');
@@ -1274,9 +1462,17 @@ describe('Scheduler Check Route', () => {
       jest.useRealTimers();
     });
 
-    it('skips PID when stove is not in WORK state', async () => {
-      // Mock stove in START state (not WORK)
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'START', Result: 0 } as any);
+    it('skips PID when stove is not in working state', async () => {
+      // Mock stove in igniting state (not working)
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'igniting',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -1299,8 +1495,16 @@ describe('Scheduler Check Route', () => {
     });
 
     it('skips PID when scheduler is in semi-manual mode', async () => {
-      // Mock stove in WORK state
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      // Mock stove in working state
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'working',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -1322,9 +1526,16 @@ describe('Scheduler Check Route', () => {
     });
 
     it('skips PID when PID config is disabled', async () => {
-      // Mock stove in WORK state
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
+      // Mock stove in working state
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'working',
+        power_level: 4,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -1360,8 +1571,17 @@ describe('Scheduler Check Route', () => {
   describe('Semi-Manual to Automatic Transition', () => {
     it('clears semi-manual mode when change is applied during semi-manual', async () => {
       // Mock successful ignition during semi-manual with past returnToAutoAt
-      mockIgniteStove.mockResolvedValue(undefined as any);
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
+      mockSetPower.mockResolvedValue({ command: 'set_power', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 5, poll_endpoint: '/status', requested_value: 4 });
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'off',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       const mockUpdateStoveState = jest.mocked(updateStoveState);
       mockUpdateStoveState.mockResolvedValue(undefined as any);
@@ -1398,10 +1618,16 @@ describe('Scheduler Check Route', () => {
     });
 
     it('does not clear semi-manual mode when no change applied', async () => {
-      // Mock stove already at correct state (no change)
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
-      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+      // Mock stove already at correct state (no change needed)
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'working',
+        power_level: 4,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       jest.useFakeTimers();
       const testTime = new Date('2025-02-12T18:00:00.000Z');
@@ -1513,8 +1739,16 @@ describe('Scheduler Check Route', () => {
       // Remove ADMIN_USER_ID
       delete process.env.ADMIN_USER_ID;
 
-      mockIgniteStove.mockResolvedValue(undefined as any);
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'off',
+        power_level: 2,
+        fan_level: 3,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: null,
+        error_description: null,
+      });
 
       const mockUpdateStoveState = jest.mocked(updateStoveState);
       mockUpdateStoveState.mockResolvedValue(undefined as any);
@@ -1535,6 +1769,72 @@ describe('Scheduler Check Route', () => {
 
       // Restore ADMIN_USER_ID
       process.env.ADMIN_USER_ID = 'admin-test-user';
+
+      jest.useRealTimers();
+    });
+
+    it('triggers alarm notification when stove_state is alarm (CRON-02)', async () => {
+      // Mock stove in alarm state with error details
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'alarm',
+        power_level: null,
+        fan_level: null,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: 42,
+        error_description: 'Surriscaldamento',
+      });
+
+      setupSchedulerMocks({
+        mode: { enabled: true, semiManual: false },
+        intervals: [],
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Verify alarm notification sent with error details
+      expect(mockTriggerStoveUnexpectedOffServer).toHaveBeenCalledWith(
+        'admin-test-user',
+        expect.objectContaining({
+          message: expect.stringContaining('Surriscaldamento'),
+        })
+      );
+    });
+
+    it('does not resend alarm notification within 1-hour cooldown', async () => {
+      // Mock stove in alarm state
+      mockGetStatus.mockResolvedValue({
+        stove_state: 'alarm',
+        power_level: null,
+        fan_level: null,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
+        error_code: 42,
+        error_description: 'Surriscaldamento',
+      });
+
+      jest.useFakeTimers();
+      const now = Date.now();
+      jest.setSystemTime(now);
+
+      // Mock recent alarm notification (within 1h cooldown)
+      mockAdminDbGet.mockImplementation(async (path: string) => {
+        if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
+        if (path === 'schedules-v2/activeScheduleId') return 'default';
+        if (path.includes('schedules-v2/schedules/') && path.includes('/slots/')) return [];
+        if (path.includes('lastAlarmNotification')) return now - 1800000; // 30 min ago
+        if (path === 'pidAutomation/boost') return { active: false };
+        return null;
+      });
+
+      const request = createMockRequest();
+      await GET(request);
+      await flushPromises();
+
+      // Alarm notification NOT sent (within cooldown)
+      expect(mockTriggerStoveUnexpectedOffServer).not.toHaveBeenCalled();
 
       jest.useRealTimers();
     });
@@ -1600,7 +1900,7 @@ describe('Scheduler Check Route', () => {
   describe('Unexpected Off Detection Edge Cases', () => {
     it('notifies when stove is off during active schedule after previous ignition', async () => {
       // Mock stove as OFF
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockGetStatus.mockResolvedValue({ stove_state: 'off', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -1635,7 +1935,7 @@ describe('Scheduler Check Route', () => {
     });
 
     it('does not notify unexpected off when different interval', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockGetStatus.mockResolvedValue({ stove_state: 'off', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -1664,7 +1964,7 @@ describe('Scheduler Check Route', () => {
     });
 
     it('respects cooldown for unexpected off notifications', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockGetStatus.mockResolvedValue({ stove_state: 'off', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
 
       jest.useFakeTimers();
       const now = Date.now();
@@ -1699,7 +1999,7 @@ describe('Scheduler Check Route', () => {
 
   describe('Work Notification Cooldown', () => {
     it('respects cooldown for stove WORK notifications', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
 
       jest.useFakeTimers();
       const now = Date.now();
@@ -1728,8 +2028,8 @@ describe('Scheduler Check Route', () => {
     it('skips PID when no ADMIN_USER_ID', async () => {
       delete process.env.ADMIN_USER_ID;
 
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
+      mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
+
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -1754,8 +2054,9 @@ describe('Scheduler Check Route', () => {
     });
 
     it('skips PID when no Netatmo data available', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
+      // power_level: 4 matches schedule so handleLevelChanges won't call setPower
+      mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 4, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
+
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -1781,14 +2082,15 @@ describe('Scheduler Check Route', () => {
 
       // PID should skip (no Netatmo data)
       // Verify no setPowerLevel called by PID
-      expect(mockSetPowerLevel).not.toHaveBeenCalled();
+      expect(mockSetPower).not.toHaveBeenCalled();
 
       jest.useRealTimers();
     });
 
     it('skips PID when target room not found', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
+      // power_level: 4 matches schedule so handleLevelChanges won't call setPower
+      mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 4, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
+
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -1819,14 +2121,15 @@ describe('Scheduler Check Route', () => {
       await GET(request);
 
       // PID should skip (room not found)
-      expect(mockSetPowerLevel).not.toHaveBeenCalled();
+      expect(mockSetPower).not.toHaveBeenCalled();
 
       jest.useRealTimers();
     });
 
     it('skips PID when temperature data is invalid', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
+      // power_level: 4 matches schedule so handleLevelChanges won't call setPower
+      mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 4, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
+
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -1857,14 +2160,15 @@ describe('Scheduler Check Route', () => {
       await GET(request);
 
       // PID should skip
-      expect(mockSetPowerLevel).not.toHaveBeenCalled();
+      expect(mockSetPower).not.toHaveBeenCalled();
 
       jest.useRealTimers();
     });
 
     it('skips PID when setpoint is invalid', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
+      // power_level: 4 matches schedule so handleLevelChanges won't call setPower
+      mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 4, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
+
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -1895,7 +2199,7 @@ describe('Scheduler Check Route', () => {
       await GET(request);
 
       // PID should skip
-      expect(mockSetPowerLevel).not.toHaveBeenCalled();
+      expect(mockSetPower).not.toHaveBeenCalled();
 
       jest.useRealTimers();
     });
@@ -2281,7 +2585,7 @@ describe('Scheduler Check Route', () => {
 
   describe('Fire-and-Forget Helper Branches - sendStoveStatusWorkNotification', () => {
     it('sends WORK notification and saves timestamp', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
       mockTriggerStoveStatusWorkServer.mockResolvedValue({ success: true } as any);
 
       setupSchedulerMocks({
@@ -2304,7 +2608,7 @@ describe('Scheduler Check Route', () => {
     });
 
     it('handles WORK notification exception', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
+      mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
       mockTriggerStoveStatusWorkServer.mockRejectedValue(new Error('Push failed'));
 
       setupSchedulerMocks({
@@ -2327,7 +2631,7 @@ describe('Scheduler Check Route', () => {
     });
 
     it('does not send WORK notification when stove is not in WORK status', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'START', Result: 0 } as any);
+      mockGetStatus.mockResolvedValue({ stove_state: 'igniting', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
 
       setupSchedulerMocks({
         mode: { enabled: true, semiManual: false },
@@ -2345,7 +2649,7 @@ describe('Scheduler Check Route', () => {
 
   describe('Fire-and-Forget Helper Branches - checkAndNotifyUnexpectedOff', () => {
     it('saves timestamp when unexpected off notification sent', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockGetStatus.mockResolvedValue({ stove_state: 'off', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
       mockTriggerStoveUnexpectedOffServer.mockResolvedValue({ success: true } as any);
 
       // Need fake timers to ensure time is within the 18:00-22:00 interval
@@ -2381,7 +2685,7 @@ describe('Scheduler Check Route', () => {
     });
 
     it('handles unexpected off notification exception', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockGetStatus.mockResolvedValue({ stove_state: 'off', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
       mockTriggerStoveUnexpectedOffServer.mockRejectedValue(new Error('Push failed'));
 
       // Need fake timers to ensure time is within the 18:00-22:00 interval
@@ -2420,7 +2724,7 @@ describe('Scheduler Check Route', () => {
     });
 
     it('does not notify when no previous ignition tracked', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockGetStatus.mockResolvedValue({ stove_state: 'off', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
 
       mockAdminDbGet.mockImplementation(async (path: string) => {
         if (path === 'schedules-v2/mode') return { enabled: true, semiManual: false };
@@ -2444,8 +2748,8 @@ describe('Scheduler Check Route', () => {
 
   describe('Fire-and-Forget Helper Branches - sendSchedulerNotification', () => {
     it('handles skipped scheduler notification', async () => {
-      mockIgniteStove.mockResolvedValue(undefined as any);
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
+      mockGetStatus.mockResolvedValue({ stove_state: 'off', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
       mockTriggerSchedulerActionServer.mockResolvedValue({
         success: false,
         skipped: true,
@@ -2477,8 +2781,8 @@ describe('Scheduler Check Route', () => {
     });
 
     it('logs error when scheduler notification fails', async () => {
-      mockIgniteStove.mockResolvedValue(undefined as any);
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
+      mockGetStatus.mockResolvedValue({ stove_state: 'off', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
       mockTriggerSchedulerActionServer.mockResolvedValue({
         success: false,
         skipped: false,
@@ -2510,8 +2814,8 @@ describe('Scheduler Check Route', () => {
     });
 
     it('handles scheduler notification exception', async () => {
-      mockIgniteStove.mockResolvedValue(undefined as any);
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'Spento', Result: 0 } as any);
+      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
+      mockGetStatus.mockResolvedValue({ stove_state: 'off', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
       mockTriggerSchedulerActionServer.mockRejectedValue(new Error('Network error'));
 
       const mockUpdateStoveState = jest.mocked(updateStoveState);
@@ -2554,11 +2858,9 @@ describe('Scheduler Check Route', () => {
     });
 
     it('adjusts power level when PID output differs from current', async () => {
-      // Mock stove in WORK state at power 4
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
-      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
-      mockSetPowerLevel.mockResolvedValue(undefined as any);
+      // Mock stove in WORK state at power 4 (PID will output 3, causing an adjustment)
+      mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 4, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
+      mockSetPower.mockResolvedValue({ command: 'set_power', status: 'accepted', previous_state: 'working', suggested_poll_delay_s: 5, poll_endpoint: '/status', requested_value: null });
 
       const mockUpdateStoveState = jest.mocked(updateStoveState);
       mockUpdateStoveState.mockResolvedValue(undefined as any);
@@ -2610,7 +2912,7 @@ describe('Scheduler Check Route', () => {
       await GET(request);
 
       // Verify power level adjusted to 3
-      expect(mockSetPowerLevel).toHaveBeenCalledWith(3);
+      expect(mockSetPower).toHaveBeenCalledWith(3);
 
       // Verify stove state updated with PID source
       expect(mockUpdateStoveState).toHaveBeenCalledWith(
@@ -2645,9 +2947,7 @@ describe('Scheduler Check Route', () => {
 
     it('does not adjust power when PID output matches current', async () => {
       // Mock stove in WORK state at power 4
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
-      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+      mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 4, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
 
       // Mock PID Controller to return same power level
       const { PIDController } = require('@/lib/utils/pidController');
@@ -2692,7 +2992,7 @@ describe('Scheduler Check Route', () => {
       await GET(request);
 
       // Verify power NOT adjusted
-      expect(mockSetPowerLevel).not.toHaveBeenCalled();
+      expect(mockSetPower).not.toHaveBeenCalled();
 
       // Verify boost cleared (PID agrees with schedule)
       expect(mockAdminDbSet).toHaveBeenCalledWith(
@@ -2704,9 +3004,7 @@ describe('Scheduler Check Route', () => {
     });
 
     it('restores PID state from previous run', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
-      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+      mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 4, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
 
       const { PIDController } = require('@/lib/utils/pidController');
       const mockCompute = jest.fn().mockReturnValue(4);
@@ -2768,9 +3066,7 @@ describe('Scheduler Check Route', () => {
     });
 
     it('logs PID tuning entry after compute', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
-      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+      mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 4, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
 
       const { PIDController } = require('@/lib/utils/pidController');
       const mockCompute = jest.fn().mockReturnValue(4);
@@ -2832,9 +3128,9 @@ describe('Scheduler Check Route', () => {
     });
 
     it('handles PID tuning log failure gracefully', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
-      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+      mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
+
+
 
       // Mock logPidTuningEntry to fail
       mockLogPidTuningEntry.mockRejectedValue(new Error('DB write error'));
@@ -2893,9 +3189,9 @@ describe('Scheduler Check Route', () => {
     });
 
     it('triggers cleanup of old logs when last cleanup >24h ago', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
-      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+      mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
+
+
 
       const { PIDController } = require('@/lib/utils/pidController');
       const mockCompute = jest.fn().mockReturnValue(4);
@@ -2962,9 +3258,10 @@ describe('Scheduler Check Route', () => {
     });
 
     it('skips PID when no targetRoomId in config', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
-      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+      // power_level: 4 matches schedule so handleLevelChanges won't call setPower
+      mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 4, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
+
+
 
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
@@ -2992,15 +3289,15 @@ describe('Scheduler Check Route', () => {
       await GET(request);
 
       // Verify PID skipped (no power adjustment)
-      expect(mockSetPowerLevel).not.toHaveBeenCalled();
+      expect(mockSetPower).not.toHaveBeenCalled();
 
       jest.useRealTimers();
     });
 
     it('handles cleanup old logs exception gracefully', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 4 } as any);
-      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
+      mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
+
+
 
       // Mock cleanupOldLogs to reject
       mockCleanupOldLogs.mockRejectedValue(new Error('DB error'));
@@ -3096,10 +3393,8 @@ describe('Scheduler Check Route', () => {
 
   describe('Additional Coverage - logAnalyticsEvent Power Change Handler', () => {
     it('handles logAnalyticsEvent exception during power change', async () => {
-      mockGetStoveStatus.mockResolvedValue({ StatusDescription: 'WORK 1', Result: 0 } as any);
-      mockGetPowerLevel.mockResolvedValue({ Result: 2 } as any);
-      mockGetFanLevel.mockResolvedValue({ Result: 3 } as any);
-      mockSetPowerLevel.mockResolvedValue(undefined as any);
+      mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
+      mockSetPower.mockResolvedValue({ command: 'set_power', status: 'accepted', previous_state: 'working', suggested_poll_delay_s: 5, poll_endpoint: '/status', requested_value: null });
       mockLogAnalyticsEvent.mockRejectedValue(new Error('Analytics service down'));
 
       const mockUpdateStoveState = jest.mocked(updateStoveState);
@@ -3121,7 +3416,7 @@ describe('Scheduler Check Route', () => {
       expect(response.status).toBe(200);
 
       // Verify power was set despite analytics failure
-      expect(mockSetPowerLevel).toHaveBeenCalledWith(4);
+      expect(mockSetPower).toHaveBeenCalledWith(4);
 
       jest.useRealTimers();
     });

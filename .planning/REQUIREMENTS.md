@@ -19,7 +19,7 @@ Requirements for Thermorossi Proxy Migration. Each maps to roadmap phases.
 - [x] **READ-02**: GET /power migrated to proxy — returns power_level with data_freshness
 - [x] **READ-03**: GET /fan-level migrated to proxy — returns fan_level with data_freshness
 - [x] **READ-04**: GET /health migrated to proxy — returns provider health and cache freshness
-- [ ] **READ-05**: GET /history available via proxy — paginated telemetry with auto-granularity (raw/hourly/daily)
+- [x] **READ-05**: GET /history available via proxy — paginated telemetry with auto-granularity (raw/hourly/daily)
 
 ### Control Endpoints
 
@@ -80,7 +80,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | READ-02 | Phase 99 | Complete |
 | READ-03 | Phase 99 | Complete |
 | READ-04 | Phase 99 | Complete |
-| READ-05 | Phase 100 | Pending |
+| READ-05 | Phase 100 | Complete |
 | CMD-01 | Phase 100 | Complete |
 | CMD-02 | Phase 100 | Complete |
 | CMD-03 | Phase 100 | Complete |

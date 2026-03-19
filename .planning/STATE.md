@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v13.0
 milestone_name: Thermorossi Proxy Migration
 status: unknown
-stopped_at: Completed 100-01-PLAN.md
-last_updated: "2026-03-19T14:07:21.477Z"
+stopped_at: Completed 100-02-PLAN.md
+last_updated: "2026-03-19T14:15:01.990Z"
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State
@@ -44,6 +44,7 @@ Plan: 2 of 2
 | v12.0 Data Fetching & E2E | 96-98 | 4 | 2 days |
 | Phase 99 P02 | 87 | 2 tasks | 4 files |
 | Phase 100-control-endpoints P01 | 5 | 2 tasks | 2 files |
+| Phase 100 P02 | 5 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -64,6 +65,8 @@ Phase 99 Plan 01 decisions:
 - getHistory accepts optional URLSearchParams, appends as query string (same pattern as getProxyRoomMeasure)
 - [Phase 99]: Migrated three stove read routes from stoveApi to thermorossiProxy; created new /api/stove/health route
 - [Phase 100-01]: Command wrappers use haPost<ThermorossiCommandResponse> matching existing haGet pattern — empty body commands pass empty object literal
+- [Phase 100]: Commands return HTTP 202 (proxy convention), history returns 200 (read endpoint)
+- [Phase 100]: setWaterTemperature gains withIdempotency for consistency; proxy handles range validation (validateRange removed)
 
 ### Pending Todos
 
@@ -83,6 +86,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T14:07:21.472Z
-Stopped at: Completed 100-01-PLAN.md
+Last session: 2026-03-19T14:15:01.983Z
+Stopped at: Completed 100-02-PLAN.md
 Resume file: None

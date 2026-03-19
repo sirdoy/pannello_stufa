@@ -168,7 +168,7 @@ export default function StoveCard() {
             )}
 
             {/* StoveAdjustments: Fan and power level controls - Visible ONLY when WORK */}
-            {stoveData.isOnline && stoveData.status?.toUpperCase().includes('WORK') && (
+            {stoveData.isOnline && stoveData.status === 'working' && (
               <StoveAdjustments
                 fanLevel={stoveData.fanLevel}
                 powerLevel={stoveData.powerLevel}

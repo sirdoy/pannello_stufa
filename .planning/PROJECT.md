@@ -25,7 +25,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v13.0 (started 2026-03-19)
-**Status:** Phase 101 complete — frontend hooks adapted for proxy response shapes, scheduler update next
+**Status:** Phase 102 complete — scheduler/cron migrated to proxy client with stove_state exact equality, cleanup next
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -616,4 +616,4 @@ v13.0 Thermorossi Proxy Migration — requirements being defined
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-19 after Phase 101 complete — frontend hooks adapted for proxy*
+*Last updated: 2026-03-19 after Phase 102 complete — scheduler migrated to proxy client*

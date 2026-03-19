@@ -86,7 +86,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 100: Control Endpoints** - All command and settings endpoints migrated with 202 Accepted pattern, plus history endpoint (completed 2026-03-19)
 - [x] **Phase 101: Frontend Hooks** - useStoveData and useStoveCommands updated for proxy response format (completed 2026-03-19)
 - [x] **Phase 102: Scheduler Update** - Cron/scheduler updated for stove_state strings and proxy client (completed 2026-03-19)
-- [ ] **Phase 103: Cleanup & Debug Panel** - WiNet infrastructure deleted, debug panel updated for proxy endpoints
+- [x] **Phase 103: Cleanup & Debug Panel** - WiNet infrastructure deleted, debug panel updated for proxy endpoints (completed 2026-03-19)
 
 ## Phase Details
 
@@ -160,7 +160,7 @@ Plans:
   3. Sandbox mode code (localhost WiNet simulation) is deleted with no remaining references
   4. Dead API routes (getRoomTemperature, getActualWaterTemperature, getWaterSetTemperature, settings, setSettings) are deleted with no remaining Next.js route handlers at those paths
   5. StoveTab in the debug panel shows proxy endpoint URLs (HA_API_URL-based paths) and documents the new response format (stove_state, 202 Accepted)
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 103-01-PLAN.md — WiNet client + sandbox + dead routes + dead service deletion + import cleanup
@@ -191,7 +191,7 @@ Plans:
 | 100. Control Endpoints | 2/2 | Complete    | 2026-03-19 | - |
 | 101. Frontend Hooks | 2/2 | Complete    | 2026-03-19 | - |
 | 102. Scheduler Update | 1/1 | Complete    | 2026-03-19 | - |
-| 103. Cleanup & Debug Panel | 1/2 | In Progress|  | - |
+| 103. Cleanup & Debug Panel | 2/2 | Complete   | 2026-03-19 | - |
 
 **Total:** 17 milestones shipped, 98 phases complete, 375 plans executed. v13.0 in progress (5 phases planned).
 

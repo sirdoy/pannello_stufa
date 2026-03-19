@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v13.0
 milestone_name: Thermorossi Proxy Migration
 status: unknown
-stopped_at: Completed 103-02-PLAN.md
-last_updated: "2026-03-19T20:32:22.949Z"
+stopped_at: Completed 103-01-PLAN.md
+last_updated: "2026-03-19T20:38:06.137Z"
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -49,6 +49,7 @@ Plan: 2 of 2 (COMPLETE)
 | Phase 101-frontend-hooks P02 | 595 | 2 tasks | 3 files |
 | Phase 102 P01 | 14 | 2 tasks | 3 files |
 | Phase 103 P02 | 5 | 1 tasks | 2 files |
+| Phase 103 P01 | 454 | 2 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,8 @@ Phase 99 Plan 01 decisions:
 - [Phase 102]: fetchStoveData uses single getStatus() replacing 3-way Promise.all — proxy response includes fan_level and power_level
 - [Phase 103-02]: connectionStatus from health endpoint: data.status === ok maps to connected badge (ThermorossiHealthResponse)
 - [Phase 103-02]: POST body uses { value: N } for settings (proxy convention), empty {} for commands (ignit/shutdown)
+- [Phase 103]: healthMonitoring.ts migrated to getStatus() from thermorossiProxy with lowercase exact state constants
+- [Phase 103]: sw.ts dead WiNet service worker cache rule removed (wsthermorossi.cloudwinet.it)
 
 ### Pending Todos
 
@@ -101,6 +104,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T20:32:22.945Z
-Stopped at: Completed 103-02-PLAN.md
+Last session: 2026-03-19T20:38:06.133Z
+Stopped at: Completed 103-01-PLAN.md
 Resume file: None

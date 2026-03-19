@@ -100,7 +100,7 @@ See `.planning/milestones/` for full archives.
   3. Convenience wrappers `getStatus`, `getPower`, `getFan`, `getHealth` call the correct proxy paths and return typed responses
   4. Next.js API routes for GET /stove/status, /stove/power, /stove/fan-level, and /stove/health all proxy through the new client and return 200 with correct shape
   5. `data_freshness` field (LIVE/STALE/UNREACHABLE) is present in status, power, and fan responses
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 99-01-PLAN.md — TypeScript types + thermorossi proxy client + unit tests
@@ -185,7 +185,7 @@ Plans:
 | 84-91 | v11.0 | 13/13 | ✓ Complete | 2026-03-18 |
 | 92-95 | v11.1 | 9/9 | ✓ Complete | 2026-03-18 |
 | 96-98 | v12.0 | 4/4 | ✓ Complete | 2026-03-19 |
-| 99. Proxy Client Foundation | v13.0 | 0/2 | Not started | - |
+| 99. Proxy Client Foundation | 1/2 | In Progress|  | - |
 | 100. Control Endpoints | v13.0 | 0/TBD | Not started | - |
 | 101. Frontend Hooks | v13.0 | 0/TBD | Not started | - |
 | 102. Scheduler Update | v13.0 | 0/TBD | Not started | - |

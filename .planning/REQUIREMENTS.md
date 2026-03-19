@@ -9,9 +9,9 @@ Requirements for Thermorossi Proxy Migration. Each maps to roadmap phases.
 
 ### Proxy Client
 
-- [ ] **CLIENT-01**: Thermorossi proxy client uses shared `haGet`/`haPost` transport with X-API-Key auth
-- [ ] **CLIENT-02**: TypeScript types for all proxy response interfaces (status, power, fan, history, command, health)
-- [ ] **CLIENT-03**: Convenience wrappers for each endpoint (getStatus, getPower, getFan, getHealth, getHistory)
+- [x] **CLIENT-01**: Thermorossi proxy client uses shared `haGet`/`haPost` transport with X-API-Key auth
+- [x] **CLIENT-02**: TypeScript types for all proxy response interfaces (status, power, fan, history, command, health)
+- [x] **CLIENT-03**: Convenience wrappers for each endpoint (getStatus, getPower, getFan, getHealth, getHistory)
 
 ### Read Endpoints
 
@@ -73,9 +73,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CLIENT-01 | Phase 99 | Pending |
-| CLIENT-02 | Phase 99 | Pending |
-| CLIENT-03 | Phase 99 | Pending |
+| CLIENT-01 | Phase 99 | Complete |
+| CLIENT-02 | Phase 99 | Complete |
+| CLIENT-03 | Phase 99 | Complete |
 | READ-01 | Phase 99 | Pending |
 | READ-02 | Phase 99 | Pending |
 | READ-03 | Phase 99 | Pending |

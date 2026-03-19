@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v13.0
 milestone_name: Thermorossi Proxy Migration
-status: planning
-stopped_at: Phase 99 context gathered
-last_updated: "2026-03-19T11:48:02.586Z"
-last_activity: 2026-03-19 — Roadmap created, 5 phases, 26/26 requirements mapped
+status: in-progress
+stopped_at: Completed 99-01-PLAN.md
+last_updated: "2026-03-19T12:03:00Z"
+last_activity: 2026-03-19 — Phase 99 Plan 01 complete: Thermorossi proxy client foundation
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 1
+  completed_plans: 1
+  percent: 5
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 ## Current Position
 
 Phase: 99 of 103 (Proxy Client Foundation)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-03-19 — Roadmap created, 5 phases, 26/26 requirements mapped
+Plan: 1 of 1 in current phase
+Status: Phase 99 complete
+Last activity: 2026-03-19 — Phase 99 Plan 01 complete: types + proxy client + 11 unit tests
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 5%
 
 ## Performance Metrics
 
@@ -59,6 +59,11 @@ Key decisions relevant to v13.0:
 - Function module pattern (v10.0/v11.0): thermorossiProxy.ts as function module, no class state
 - RFC 9457 error mapping (v10.0): proxy errors map to ApiError instances for error boundary compatibility
 
+Phase 99 Plan 01 decisions:
+- DataFreshness is 'LIVE' | 'STALE' only — UNREACHABLE triggers HTTP 503, never appears in body
+- No haPost in thermorossiProxy.ts — command wrappers deferred to Phase 100
+- getHistory accepts optional URLSearchParams, appends as query string (same pattern as getProxyRoomMeasure)
+
 ### Pending Todos
 
 None.
@@ -71,6 +76,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T11:48:02.581Z
-Stopped at: Phase 99 context gathered
-Resume file: .planning/phases/99-proxy-client-foundation/99-CONTEXT.md
+Last session: 2026-03-19T12:03:00Z
+Stopped at: Completed 99-01-PLAN.md
+Resume file: .planning/phases/99-proxy-client-foundation/99-01-SUMMARY.md

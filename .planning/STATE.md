@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v12.0
-milestone_name: Data Fetching Simplification & E2E Verification
-status: completed
-stopped_at: Milestone v12.0 archived
+milestone: v13.0
+milestone_name: Thermorossi Proxy Migration
+status: defining_requirements
+stopped_at: Defining requirements
 last_updated: "2026-03-19"
-last_activity: "2026-03-19 — v12.0 milestone completed and archived"
+last_activity: "2026-03-19 — Milestone v13.0 started"
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Planning next milestone
+**Current focus:** v13.0 Thermorossi Proxy Migration
 
 ## Current Position
 
-Milestone v12.0 completed and archived.
-All 17 milestones shipped, 98 phases complete, 375 plans executed.
-
-Progress: [██████████] 100%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-19 — Milestone v13.0 started
 
 ## Performance Metrics
 
@@ -65,5 +65,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-19
-Stopped at: Milestone v12.0 archived
+Stopped at: Defining requirements for v13.0
 Resume file: None

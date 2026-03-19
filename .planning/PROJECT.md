@@ -8,10 +8,24 @@ PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo, lu
 
 I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
+## Current Milestone: v13.0 Thermorossi Proxy Migration
+
+**Goal:** Migrate the Thermorossi stove provider from direct WiNet cloud API to the shared HomeAssistant proxy, completing the unified API architecture for all device providers.
+
+**Target features:**
+- Thermorossi proxy client via shared `haGet`/`haPost` transport (X-API-Key auth)
+- All read endpoints migrated: status (with error_code/error_description), power, fan-level
+- All control endpoints migrated: ignit, shutdown, set power/fan/water temp (202 Accepted pattern)
+- Telemetry history via proxy `/history` endpoint (new capability)
+- Frontend hooks updated: `stove_state` exact equality, `data_freshness` from proxy
+- Scheduler/cron updated for new response formats and status strings
+- Dead WiNet infrastructure deleted (API key, direct cloud calls, sandbox mode)
+- Debug panel updated for proxy endpoints
+
 ## Current State
 
-**Version:** v12.0 (shipped 2026-03-19)
-**Status:** Planning next milestone
+**Version:** v13.0 (started 2026-03-19)
+**Status:** Defining requirements
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -443,7 +457,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-(No active requirements — planning next milestone)
+v13.0 Thermorossi Proxy Migration — requirements being defined
 
 ### Out of Scope
 
@@ -602,4 +616,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-19 after v12.0 milestone*
+*Last updated: 2026-03-19 after v13.0 milestone start*

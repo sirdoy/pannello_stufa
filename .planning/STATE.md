@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v13.0
 milestone_name: Thermorossi Proxy Migration
 status: unknown
-stopped_at: Completed 101-01-PLAN.md
-last_updated: "2026-03-19T14:53:36.487Z"
+stopped_at: Completed 101-02-PLAN.md
+last_updated: "2026-03-19T15:06:50.725Z"
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 6
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State
@@ -46,6 +46,7 @@ Plan: 1 of 2
 | Phase 100-control-endpoints P01 | 5 | 2 tasks | 2 files |
 | Phase 100 P02 | 5 | 2 tasks | 6 files |
 | Phase 101 P01 | 400 | 2 tasks | 4 files |
+| Phase 101-frontend-hooks P02 | 595 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,9 @@ Phase 99 Plan 01 decisions:
 - [Phase 101]: switch/case on StoveState union replaces toUpperCase().includes() in stoveStatusUtils
 - [Phase 101]: data_freshness === STALE drives staleness — useDeviceStaleness removed from stove
 - [Phase 101]: modulating added to isStoveActive (missed by old WORK substring logic)
+- [Phase 101-02]: suggested_poll_delay_s drives fetchStatusAndUpdate delay (15s ignite/shutdown, 5s fan/power)
+- [Phase 101-02]: 409 Conflict throws 'Command not allowed in current state' for proxy state-gate errors
+- [Phase 101-02]: StoveCard uses status === 'working' exact equality for StoveAdjustments visibility
 
 ### Pending Todos
 
@@ -90,6 +94,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T14:53:24.261Z
-Stopped at: Completed 101-01-PLAN.md
+Last session: 2026-03-19T15:06:50.721Z
+Stopped at: Completed 101-02-PLAN.md
 Resume file: None

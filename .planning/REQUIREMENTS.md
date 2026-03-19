@@ -52,7 +52,7 @@ Requirements for Thermorossi Proxy Migration. Each maps to roadmap phases.
 
 ### Debug Panel
 
-- [ ] **DEBUG-01**: StoveTab updated with proxy endpoint URLs and response formats
+- [x] **DEBUG-01**: StoveTab updated with proxy endpoint URLs and response formats
 
 ## Future Requirements
 
@@ -98,7 +98,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CLEAN-02 | Phase 103 | Pending |
 | CLEAN-03 | Phase 103 | Pending |
 | CLEAN-04 | Phase 103 | Pending |
-| DEBUG-01 | Phase 103 | Pending |
+| DEBUG-01 | Phase 103 | Complete |
 
 **Coverage:**
 - v13.0 requirements: 26 total

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v13.0
 milestone_name: Thermorossi Proxy Migration
 status: unknown
-stopped_at: Phase 103 context gathered
-last_updated: "2026-03-19T20:18:50.760Z"
+stopped_at: Completed 103-02-PLAN.md
+last_updated: "2026-03-19T20:32:22.949Z"
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 9
+  completed_plans: 8
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 102 — scheduler-update
+**Current focus:** Phase 103 — cleanup-debug-panel
 
 ## Current Position
 
-Phase: 102 (scheduler-update) — EXECUTING
-Plan: 1 of 1
+Phase: 103 (cleanup-debug-panel) — EXECUTING
+Plan: 2 of 2 (COMPLETE)
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ Plan: 1 of 1
 | Phase 101 P01 | 400 | 2 tasks | 4 files |
 | Phase 101-frontend-hooks P02 | 595 | 2 tasks | 3 files |
 | Phase 102 P01 | 14 | 2 tasks | 3 files |
+| Phase 103 P02 | 5 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,8 @@ Phase 99 Plan 01 decisions:
 - [Phase 102]: Alarm notification reuses triggerStoveUnexpectedOffServer — alarm state detected via stove_state === 'alarm' in fetchStoveData with 1-hour cooldown
 - [Phase 102]: handleIgnition calls sendIgnit() + setPower() separately per proxy convention instead of bundled igniteStove(power)
 - [Phase 102]: fetchStoveData uses single getStatus() replacing 3-way Promise.all — proxy response includes fan_level and power_level
+- [Phase 103-02]: connectionStatus from health endpoint: data.status === ok maps to connected badge (ThermorossiHealthResponse)
+- [Phase 103-02]: POST body uses { value: N } for settings (proxy convention), empty {} for commands (ignit/shutdown)
 
 ### Pending Todos
 
@@ -98,6 +101,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T20:18:50.755Z
-Stopped at: Phase 103 context gathered
-Resume file: .planning/phases/103-cleanup-debug-panel/103-CONTEXT.md
+Last session: 2026-03-19T20:32:22.945Z
+Stopped at: Completed 103-02-PLAN.md
+Resume file: None

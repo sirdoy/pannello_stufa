@@ -10,7 +10,7 @@
  * - ApiError TIMEOUT on AbortError
  */
 
-import { getStatus, getPower, getFan, getHealth, getHistory } from '@/lib/thermorossiProxy';
+import { getStatus, getPower, getFan, getHealth, getHistory, sendIgnit, sendShutdown, setPower, setFan, setWaterTemp } from '@/lib/thermorossiProxy';
 import { ApiError, ERROR_CODES } from '@/lib/core/apiErrors';
 
 // Mock global fetch
@@ -222,5 +222,74 @@ describe('error handling', () => {
 
     expect(caught).toBeInstanceOf(ApiError);
     expect(caught?.code).toBe(ERROR_CODES.TIMEOUT);
+  });
+});
+
+describe('command wrappers', () => {
+  const MOCK_COMMAND_RESPONSE = {
+    command: 'ignit',
+    status: 'accepted' as const,
+    previous_state: 'off' as const,
+    suggested_poll_delay_s: 10,
+    poll_endpoint: '/api/v1/thermorossi/status',
+    requested_value: null,
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env.HA_API_URL = TEST_PROXY_URL;
+    process.env.HA_API_KEY = TEST_API_KEY;
+  });
+
+  afterEach(() => {
+    delete process.env.HA_API_URL;
+    delete process.env.HA_API_KEY;
+  });
+
+  it('sendIgnit() POSTs to /api/v1/thermorossi/commands/ignit with empty body', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => MOCK_COMMAND_RESPONSE });
+    await sendIgnit();
+    const [url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(`${TEST_PROXY_URL}/api/v1/thermorossi/commands/ignit`);
+    expect(options.method).toBe('POST');
+    expect(JSON.parse(options.body as string)).toEqual({});
+    expect((options.headers as Record<string, string>)['X-API-Key']).toBe(TEST_API_KEY);
+    expect((options.headers as Record<string, string>)['Content-Type']).toBe('application/json');
+  });
+
+  it('sendShutdown() POSTs to /api/v1/thermorossi/commands/shutdown with empty body', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ ...MOCK_COMMAND_RESPONSE, command: 'shutdown' }) });
+    await sendShutdown();
+    const [url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(`${TEST_PROXY_URL}/api/v1/thermorossi/commands/shutdown`);
+    expect(options.method).toBe('POST');
+    expect(JSON.parse(options.body as string)).toEqual({});
+  });
+
+  it('setPower(3) POSTs to /api/v1/thermorossi/settings/power with { value: 3 }', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ ...MOCK_COMMAND_RESPONSE, command: 'set_power', requested_value: 3 }) });
+    await setPower(3);
+    const [url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(`${TEST_PROXY_URL}/api/v1/thermorossi/settings/power`);
+    expect(options.method).toBe('POST');
+    expect(JSON.parse(options.body as string)).toEqual({ value: 3 });
+  });
+
+  it('setFan(4) POSTs to /api/v1/thermorossi/settings/fan-level with { value: 4 }', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ ...MOCK_COMMAND_RESPONSE, command: 'set_fan', requested_value: 4 }) });
+    await setFan(4);
+    const [url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(`${TEST_PROXY_URL}/api/v1/thermorossi/settings/fan-level`);
+    expect(options.method).toBe('POST');
+    expect(JSON.parse(options.body as string)).toEqual({ value: 4 });
+  });
+
+  it('setWaterTemp(55) POSTs to /api/v1/thermorossi/settings/temperature/water with { value: 55 }', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ ...MOCK_COMMAND_RESPONSE, command: 'set_water_temp', requested_value: 55 }) });
+    await setWaterTemp(55);
+    const [url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(`${TEST_PROXY_URL}/api/v1/thermorossi/settings/temperature/water`);
+    expect(options.method).toBe('POST');
+    expect(JSON.parse(options.body as string)).toEqual({ value: 55 });
   });
 });

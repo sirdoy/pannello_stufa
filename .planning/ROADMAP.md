@@ -19,6 +19,7 @@
 - ✅ **v11.0 API Unification & Raspberry Pi Monitor** — Phases 84-91 (shipped 2026-03-18)
 - ✅ **v11.1 Test Suite & Tech Debt Cleanup** — Phases 92-95 (shipped 2026-03-18)
 - ✅ **v12.0 Data Fetching Simplification & E2E Verification** — Phases 96-98 (shipped 2026-03-19)
+- 🚧 **v13.0 Thermorossi Proxy Migration** — Phases 99-103 (in progress)
 
 ## Phases
 
@@ -77,6 +78,91 @@ See `.planning/milestones/` for full archives.
 
 </details>
 
+### 🚧 v13.0 Thermorossi Proxy Migration (In Progress)
+
+**Milestone Goal:** Migrate the Thermorossi stove from direct WiNet cloud API to the shared HomeAssistant proxy, completing the unified API architecture for all device providers. Delete all WiNet infrastructure.
+
+- [ ] **Phase 99: Proxy Client Foundation** - TypeScript types, thermorossi proxy client, and all read endpoints migrated
+- [ ] **Phase 100: Control Endpoints** - All command and settings endpoints migrated with 202 Accepted pattern, plus history endpoint
+- [ ] **Phase 101: Frontend Hooks** - useStoveData and useStoveCommands updated for proxy response format
+- [ ] **Phase 102: Scheduler Update** - Cron/scheduler updated for stove_state strings and proxy client
+- [ ] **Phase 103: Cleanup & Debug Panel** - WiNet infrastructure deleted, debug panel updated for proxy endpoints
+
+## Phase Details
+
+### Phase 99: Proxy Client Foundation
+**Goal**: The thermorossi proxy client exists and all read endpoints are served through it with correct TypeScript types
+**Depends on**: Nothing (first phase of milestone)
+**Requirements**: CLIENT-01, CLIENT-02, CLIENT-03, READ-01, READ-02, READ-03, READ-04
+**Success Criteria** (what must be TRUE):
+  1. A `lib/thermorossiProxy.ts` module exists using `haGet`/`haPost` from `lib/haClient.ts` with X-API-Key auth
+  2. TypeScript interfaces exist for all proxy responses: status (stove_state, power_level, fan_level, data_freshness, error_code, error_description), power, fan, health, history, and command (202 Accepted + suggested_poll_delay_s)
+  3. Convenience wrappers `getStatus`, `getPower`, `getFan`, `getHealth` call the correct proxy paths and return typed responses
+  4. Next.js API routes for GET /stove/status, /stove/power, /stove/fan-level, and /stove/health all proxy through the new client and return 200 with correct shape
+  5. `data_freshness` field (LIVE/STALE/UNREACHABLE) is present in status, power, and fan responses
+**Plans**: TBD
+
+Plans:
+- [ ] 99-01: TypeScript types + thermorossi proxy client + read API routes
+
+### Phase 100: Control Endpoints
+**Goal**: All stove commands and settings can be sent through the proxy, and telemetry history is available
+**Depends on**: Phase 99
+**Requirements**: CMD-01, CMD-02, CMD-03, CMD-04, CMD-05, READ-05
+**Success Criteria** (what must be TRUE):
+  1. POST /stove/commands/ignit and POST /stove/commands/shutdown routes return 202 Accepted with `suggested_poll_delay_s` from the proxy
+  2. POST /stove/settings/power, /stove/settings/fan-level, and /stove/settings/temperature/water routes accept a `{ value: N }` body and return 202 Accepted
+  3. GET /stove/history route returns paginated telemetry with auto-granularity (raw/hourly/daily) proxied from the HA endpoint
+  4. The convenience wrapper `getHistory` exists in `lib/thermorossiProxy.ts` and accepts pagination params
+**Plans**: TBD
+
+Plans:
+- [ ] 100-01: Control endpoint routes (ignit, shutdown, power, fan-level, water temp) + history route
+
+### Phase 101: Frontend Hooks
+**Goal**: The stove card and stove page work correctly against proxy response shapes without WiNet-specific logic
+**Depends on**: Phase 100
+**Requirements**: UI-01, UI-02, UI-03, UI-04, UI-05
+**Success Criteria** (what must be TRUE):
+  1. `useStoveData` reads `stove_state` (exact string equality: working/off/igniting/standby/cleaning/alarm/modulating), `power_level`, and `fan_level` from the proxy status response
+  2. `stoveStatusUtils.ts` derives display state from exact `stove_state` matches — no regex or substring matching against the old StatusDescription format
+  3. `useStoveCommands` handles the 202 Accepted response (not 200) as a success signal for all command invocations
+  4. When proxy returns `error_code` and `error_description`, the stove card displays the error text to the user
+  5. Staleness display for the stove uses `data_freshness` from the proxy instead of custom timestamp-based logic
+**Plans**: TBD
+
+Plans:
+- [ ] 101-01: useStoveData + stoveStatusUtils proxy adaptation
+- [ ] 101-02: useStoveCommands 202 Accepted handling + error_code display + data_freshness staleness
+
+### Phase 102: Scheduler Update
+**Goal**: The scheduler/cron makes all stove decisions using proxy client and proxy response fields
+**Depends on**: Phase 99
+**Requirements**: CRON-01, CRON-02, CRON-03
+**Success Criteria** (what must be TRUE):
+  1. The scheduler route reads `stove_state` (exact string) for all state-based decisions — no reference to `StatusDescription` or WiNet status strings remains
+  2. Alarm notifications in the health monitoring path use `error_code` and `error_description` from the proxy status response
+  3. All stove API calls in the scheduler route go through `lib/thermorossiProxy.ts` — no direct WiNet URLs or old `lib/stoveApi.ts` imports remain
+**Plans**: TBD
+
+Plans:
+- [ ] 102-01: Scheduler stove_state migration + error_code alarm notifications + proxy client wiring
+
+### Phase 103: Cleanup & Debug Panel
+**Goal**: All WiNet infrastructure is deleted and the debug panel reflects the proxy architecture
+**Depends on**: Phase 101, Phase 102
+**Requirements**: CLEAN-01, CLEAN-02, CLEAN-03, CLEAN-04, DEBUG-01
+**Success Criteria** (what must be TRUE):
+  1. `lib/stoveApi.ts` (WiNet direct cloud client) is deleted — no file at that path exists
+  2. WiNet API key environment variable is removed from all configuration and `.env.local`
+  3. Sandbox mode code (localhost WiNet simulation) is deleted with no remaining references
+  4. Dead API routes (getRoomTemperature, getActualWaterTemperature, getWaterSetTemperature, settings, setSettings) are deleted with no remaining Next.js route handlers at those paths
+  5. StoveTab in the debug panel shows proxy endpoint URLs (HA_API_URL-based paths) and documents the new response format (stove_state, 202 Accepted)
+**Plans**: TBD
+
+Plans:
+- [ ] 103-01: WiNet client + API key + sandbox deletion + dead route removal + debug panel update
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -98,9 +184,14 @@ See `.planning/milestones/` for full archives.
 | 84-91 | v11.0 | 13/13 | ✓ Complete | 2026-03-18 |
 | 92-95 | v11.1 | 9/9 | ✓ Complete | 2026-03-18 |
 | 96-98 | v12.0 | 4/4 | ✓ Complete | 2026-03-19 |
+| 99. Proxy Client Foundation | v13.0 | 0/TBD | Not started | - |
+| 100. Control Endpoints | v13.0 | 0/TBD | Not started | - |
+| 101. Frontend Hooks | v13.0 | 0/TBD | Not started | - |
+| 102. Scheduler Update | v13.0 | 0/TBD | Not started | - |
+| 103. Cleanup & Debug Panel | v13.0 | 0/TBD | Not started | - |
 
-**Total:** 17 milestones shipped, 98 phases complete, 375 plans executed.
+**Total:** 17 milestones shipped, 98 phases complete, 375 plans executed. v13.0 in progress (5 phases planned).
 
 ---
 
-*Roadmap updated: 2026-03-19 — v12.0 milestone completed and archived*
+*Roadmap updated: 2026-03-19 — v13.0 Thermorossi Proxy Migration roadmap created*

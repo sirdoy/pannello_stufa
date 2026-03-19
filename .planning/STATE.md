@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v13.0
 milestone_name: Thermorossi Proxy Migration
-status: defining_requirements
-stopped_at: Defining requirements
+status: ready_to_plan
+stopped_at: Roadmap created, Phase 99 ready to plan
 last_updated: "2026-03-19"
-last_activity: "2026-03-19 — Milestone v13.0 started"
+last_activity: "2026-03-19 — Roadmap created for v13.0 (5 phases, 26 requirements)"
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,28 +21,28 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v13.0 Thermorossi Proxy Migration
+**Current focus:** v13.0 Thermorossi Proxy Migration — Phase 99: Proxy Client Foundation
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-19 — Milestone v13.0 started
+Phase: 99 of 103 (Proxy Client Foundation)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-03-19 — Roadmap created, 5 phases, 26/26 requirements mapped
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed (all milestones): 375
 - v12.0 average: 1.3 plans/phase (4 plans / 3 phases)
-- v11.1 average: 2.25 plans/phase (9 plans / 4 phases)
-- v11.0 average: 1.6 plans/phase (13 plans / 8 phases)
+- v10.0 average: 2.0 plans/phase (18 plans / 9 phases) — best migration reference
 
 **By Milestone (recent):**
 
 | Milestone | Phases | Plans | Duration |
 |-----------|--------|-------|----------|
-| v9.0 Performance Optimization | 70-74 | 8 | 2 days |
 | v10.0 Netatmo API Migration | 75-83 | 18 | 2 days |
 | v11.0 API Unification & Raspberry Pi | 84-91 | 13 | 2 days |
 | v11.1 Test Suite & Tech Debt Cleanup | 92-95 | 9 | 1 day |
@@ -54,16 +54,23 @@ Last activity: 2026-03-19 — Milestone v13.0 started
 
 See PROJECT.md Key Decisions table for full history.
 
+Key decisions relevant to v13.0:
+- Shared haClient (v11.0): use `haGet`/`haPost` from `lib/haClient.ts` — same pattern as Netatmo/Fritz!Box/Raspi
+- Function module pattern (v10.0/v11.0): thermorossiProxy.ts as function module, no class state
+- RFC 9457 error mapping (v10.0): proxy errors map to ApiError instances for error boundary compatibility
+
 ### Pending Todos
 
 None.
 
 ### Blockers/Concerns
 
-None.
+- Proxy returns `stove_state` (exact string) instead of `StatusDescription` — stoveStatusUtils.ts needs full rewrite
+- Proxy uses 202 Accepted for all commands — useStoveCommands success detection must change from 200 to 202
+- Scheduler has ~1032 lines; stove_state migration requires careful state-machine logic review
 
 ## Session Continuity
 
 Last session: 2026-03-19
-Stopped at: Defining requirements for v13.0
+Stopped at: Roadmap created — ready to plan Phase 99
 Resume file: None

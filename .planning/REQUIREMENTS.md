@@ -73,38 +73,38 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CLIENT-01 | — | Pending |
-| CLIENT-02 | — | Pending |
-| CLIENT-03 | — | Pending |
-| READ-01 | — | Pending |
-| READ-02 | — | Pending |
-| READ-03 | — | Pending |
-| READ-04 | — | Pending |
-| READ-05 | — | Pending |
-| CMD-01 | — | Pending |
-| CMD-02 | — | Pending |
-| CMD-03 | — | Pending |
-| CMD-04 | — | Pending |
-| CMD-05 | — | Pending |
-| UI-01 | — | Pending |
-| UI-02 | — | Pending |
-| UI-03 | — | Pending |
-| UI-04 | — | Pending |
-| UI-05 | — | Pending |
-| CRON-01 | — | Pending |
-| CRON-02 | — | Pending |
-| CRON-03 | — | Pending |
-| CLEAN-01 | — | Pending |
-| CLEAN-02 | — | Pending |
-| CLEAN-03 | — | Pending |
-| CLEAN-04 | — | Pending |
-| DEBUG-01 | — | Pending |
+| CLIENT-01 | Phase 99 | Pending |
+| CLIENT-02 | Phase 99 | Pending |
+| CLIENT-03 | Phase 99 | Pending |
+| READ-01 | Phase 99 | Pending |
+| READ-02 | Phase 99 | Pending |
+| READ-03 | Phase 99 | Pending |
+| READ-04 | Phase 99 | Pending |
+| READ-05 | Phase 100 | Pending |
+| CMD-01 | Phase 100 | Pending |
+| CMD-02 | Phase 100 | Pending |
+| CMD-03 | Phase 100 | Pending |
+| CMD-04 | Phase 100 | Pending |
+| CMD-05 | Phase 100 | Pending |
+| UI-01 | Phase 101 | Pending |
+| UI-02 | Phase 101 | Pending |
+| UI-03 | Phase 101 | Pending |
+| UI-04 | Phase 101 | Pending |
+| UI-05 | Phase 101 | Pending |
+| CRON-01 | Phase 102 | Pending |
+| CRON-02 | Phase 102 | Pending |
+| CRON-03 | Phase 102 | Pending |
+| CLEAN-01 | Phase 103 | Pending |
+| CLEAN-02 | Phase 103 | Pending |
+| CLEAN-03 | Phase 103 | Pending |
+| CLEAN-04 | Phase 103 | Pending |
+| DEBUG-01 | Phase 103 | Pending |
 
 **Coverage:**
 - v13.0 requirements: 26 total
-- Mapped to phases: 0
-- Unmapped: 26 ⚠️
+- Mapped to phases: 26
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-19*
-*Last updated: 2026-03-19 after initial definition*
+*Last updated: 2026-03-19 — traceability populated after roadmap creation*

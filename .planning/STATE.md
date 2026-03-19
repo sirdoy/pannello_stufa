@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 Phase: 99 of 103 (Proxy Client Foundation)
 Plan: 1 of 1 in current phase
 Status: Phase 99 complete
-Last activity: 2026-03-19 — Phase 99 Plan 01 complete: types + proxy client + 11 unit tests
+Last activity: 2026-03-19 - Completed quick task 260319-kd7: Fix Vercel env vars for HA proxy connection
 
 Progress: [█░░░░░░░░░] 5%
 
@@ -75,6 +75,12 @@ None.
 - Proxy returns `stove_state` (exact string) instead of `StatusDescription` — stoveStatusUtils.ts needs full rewrite
 - Proxy uses 202 Accepted for all commands — useStoveCommands success detection must change from 200 to 202
 - Scheduler has ~1032 lines; stove_state migration requires careful state-machine logic review
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260319-kd7 | Fix Vercel env vars for HA proxy connection | 2026-03-19 | — | [260319-kd7-su-vercel-non-sono-stati-caricati-i-dati](./quick/260319-kd7-su-vercel-non-sono-stati-caricati-i-dati/) |
 
 ## Session Continuity
 

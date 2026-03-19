@@ -80,6 +80,10 @@ See `.planning/milestones/` for full archives.
 
 - [x] **Phase 97: E2E Page Verification** - Playwright tests verifying every app page loads without errors (completed 2026-03-18)
 
+#### Phase 98: Gap Closure
+
+- [ ] **Phase 98: Gap Closure** - Fix stale test assertion, commit Playwright fixes, clean stale JSDoc, fill SUMMARY frontmatter
+
 ## Phase Details
 
 ### Phase 96: Polling Simplification
@@ -111,6 +115,21 @@ Plans:
 Plans:
 - [ ] 97-01-PLAN.md — Playwright smoke tests for all 9 app pages (homepage, 5 device pages, 3 support pages)
 
+### Phase 98: Gap Closure
+**Goal**: Fix all integration gaps and tech debt identified by v12.0 milestone audit
+**Depends on**: Phase 97
+**Requirements**: None (gap closure — no new requirements)
+**Gap Closure:** Closes gaps from audit (2 integration issues, 7 tech debt items)
+**Success Criteria** (what must be TRUE):
+  1. `useRaspiFullData.test.ts` asserts 60000ms (not 30000ms) for visible interval
+  2. `tests/smoke/page-loads.spec.ts` working tree changes are committed
+  3. No JSDoc in StoveCard, stove/page, useLightsData, or StovePageBanners references Firebase or 30s intervals
+  4. SUMMARY frontmatter for 96-01 and 96-02 has populated `requirements_completed` arrays
+**Plans**: 1 plan
+
+Plans:
+- [ ] 98-01-PLAN.md — Fix integration gaps + tech debt cleanup
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -132,9 +151,10 @@ Plans:
 | 84-91 | v11.0 | 13/13 | ✓ Complete | 2026-03-18 |
 | 92-95 | v11.1 | 9/9 | ✓ Complete | 2026-03-18 |
 | 96 | v12.0 | 2/2 | ✓ Complete | 2026-03-18 |
-| 97 | 1/1 | Complete    | 2026-03-18 | - |
+| 97 | v12.0 | 1/1 | ✓ Complete | 2026-03-18 |
+| 98 | v12.0 | 0/1 | In Progress | - |
 
-**Total:** 16 milestones shipped, 96 phases complete, 372 plans executed. v12.0 in progress.
+**Total:** 16 milestones shipped, 97 phases complete, 372 plans executed. v12.0 in progress.
 
 ---
 

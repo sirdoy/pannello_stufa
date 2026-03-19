@@ -31,12 +31,12 @@ interface TrackUsageResult {
 export async function trackUsageHours(stoveStatus: string): Promise<TrackUsageResult> {
   try {
     const isWorking = (
-      stoveStatus.includes('WORK') ||
-      stoveStatus.includes('MODULATION')
+      stoveStatus === 'working' ||
+      stoveStatus === 'modulating'
     );
 
     if (!isWorking) {
-      return { tracked: false, reason: 'Stove not in WORK/MODULATION status' };
+      return { tracked: false, reason: 'Stove not in working/modulating status' };
     }
 
     const now = new Date();

@@ -30,14 +30,14 @@ import {
   triggerMaintenanceAlertServer,
 } from '@/lib/notificationTriggersServer';
 import {
-  getStoveStatus,
-  getFanLevel,
-  getPowerLevel,
-  igniteStove,
-  shutdownStove,
-  setPowerLevel,
-  setFanLevel,
-} from '@/lib/stoveApi';
+  getStatus,
+  sendIgnit,
+  sendShutdown,
+  setPower,
+  setFan,
+  getHealth,
+} from '@/lib/thermorossiProxy';
+import type { StoveState } from '@/types/thermorossiProxy';
 import { updateStoveState } from '@/lib/stoveStateService';
 import { calibrateValvesServer } from '@/lib/netatmoCalibrationService';
 import { proactiveTokenRefresh } from '@/lib/hue/hueRemoteTokenHelper';
@@ -285,8 +285,8 @@ async function sendStoveStatusWorkNotification(currentStatus: string): Promise<v
   const adminUserId = process.env.ADMIN_USER_ID;
   if (!adminUserId) return;
 
-  // Only notify when status is WORK (not START, which is transitional)
-  if (!currentStatus.includes('WORK')) return;
+  // Only notify when status is working (not igniting, which is transitional)
+  if (currentStatus !== 'working') return;
 
   try {
     // Check if we already notified recently (30 min cooldown)
@@ -301,7 +301,7 @@ async function sendStoveStatusWorkNotification(currentStatus: string): Promise<v
 
     // Send notification
     await triggerStoveStatusWorkServer(adminUserId, {
-      message: 'La stufa e ora in funzione (stato WORK)',
+      message: 'La stufa e ora in funzione (stato working)',
     });
 
     // Save notification timestamp
@@ -376,50 +376,40 @@ async function trackIgnitionForInterval(active: any): Promise<void> {
 }
 
 async function fetchStoveData(): Promise<any> {
-  let currentStatus = 'unknown';
+  let currentStatus: StoveState = 'off';
   let isOn = false;
   let currentFanLevel = 3;
   let currentPowerLevel = 2;
   let statusFetchFailed = false;
 
   try {
-    const [statusData, fanData, powerData] = await Promise.all([
-      getStoveStatus().catch((err: any) => {
-        console.error('❌ Status fetch failed:', err.message);
-        return null;
-      }),
-      getFanLevel().catch((err: any) => {
-        console.error('❌ Fan fetch failed:', err.message);
-        return null;
-      }),
-      getPowerLevel().catch((err: any) => {
-        console.error('❌ Power fetch failed:', err.message);
-        return null;
-      })
-    ]);
+    const statusData = await getStatus();
+    currentStatus = statusData.stove_state;
+    isOn = statusData.stove_state === 'working'
+        || statusData.stove_state === 'igniting'
+        || statusData.stove_state === 'modulating';
+    currentFanLevel = statusData.fan_level ?? 3;
+    currentPowerLevel = statusData.power_level ?? 2;
 
-    if (statusData) {
-      currentStatus = statusData.StatusDescription || 'unknown';
-      isOn = currentStatus.includes('WORK') || currentStatus.includes('START');
-    } else {
-      console.warn('⚠️ Status unavailable - will skip state-changing actions for safety');
-      statusFetchFailed = true;
+    // CRON-02: alarm notification with 1-hour cooldown
+    if (statusData.stove_state === 'alarm') {
+      const alarmCooldownPath = getEnvironmentPath('scheduler/lastAlarmNotification');
+      const lastAlarmTs = await adminDbGet(alarmCooldownPath);
+      const oneHourAgo = Date.now() - 3600000;
+      if (!lastAlarmTs || (typeof lastAlarmTs === 'number' && lastAlarmTs < oneHourAgo)) {
+        const adminUserId = process.env.ADMIN_USER_ID;
+        if (adminUserId) {
+          const errorMsg = statusData.error_description
+            ? `Allarme stufa: ${statusData.error_description} (codice ${statusData.error_code})`
+            : 'Allarme stufa rilevato';
+          triggerStoveUnexpectedOffServer(adminUserId, { message: errorMsg }).catch(() => {});
+          await adminDbSet(alarmCooldownPath, Date.now()).catch(() => {});
+        }
+      }
     }
-
-    if (fanData) {
-      currentFanLevel = fanData.Result ?? 3;
-    } else {
-      console.warn('⚠️ Fan level unavailable - using default: 3');
-    }
-
-    if (powerData) {
-      currentPowerLevel = powerData.Result ?? 2;
-    } else {
-      console.warn('⚠️ Power level unavailable - using default: 2');
-    }
-
   } catch (error) {
-    console.error('❌ Critical error fetching stove data:', error instanceof Error ? error.message : String(error));
+    console.error('Status fetch failed:', error instanceof Error ? error.message : String(error));
+    console.warn('Status unavailable - will skip state-changing actions for safety');
     statusFetchFailed = true;
   }
 
@@ -428,10 +418,10 @@ async function fetchStoveData(): Promise<any> {
 
 async function handleIgnition(active: any, ora: string): Promise<any> {
   try {
-    const confirmStatusData = await getStoveStatus();
+    const confirmStatusData = await getStatus();
     if (confirmStatusData) {
-      const confirmStatus = confirmStatusData.StatusDescription || 'unknown';
-      if (confirmStatus.includes('WORK') || confirmStatus.includes('START')) {
+      const confirmStatus = confirmStatusData.stove_state;
+      if (confirmStatus === 'working' || confirmStatus === 'igniting') {
         return { skipped: true, reason: 'ALREADY_ON' };
       }
     }
@@ -441,10 +431,11 @@ async function handleIgnition(active: any, ora: string): Promise<any> {
   }
 
   try {
-    await igniteStove(active.power);
+    await sendIgnit();
+    await setPower(active.power);
 
     await updateStoveState({
-      status: 'START',
+      status: 'igniting',
       statusDescription: 'Avvio automatico',
       fanLevel: active.fan,
       powerLevel: active.power,
@@ -469,10 +460,10 @@ async function handleIgnition(active: any, ora: string): Promise<any> {
 
 async function handleShutdown(ora: string): Promise<any> {
   try {
-    await shutdownStove();
+    await sendShutdown();
 
     await updateStoveState({
-      status: 'STANDBY',
+      status: 'standby',
       statusDescription: 'Spegnimento automatico',
       source: 'scheduler',
     });
@@ -498,7 +489,7 @@ async function handleLevelChanges(active: any, currentPowerLevel: number, curren
 
   if (!skipPower && currentPowerLevel !== active.power) {
     try {
-      await setPowerLevel(active.power);
+      await setPower(active.power);
       await updateStoveState({ powerLevel: active.power, source: 'scheduler' });
 
       // Analytics: log scheduler-initiated power change (fire-and-forget, no consent needed)
@@ -516,7 +507,7 @@ async function handleLevelChanges(active: any, currentPowerLevel: number, curren
 
   if (currentFanLevel !== active.fan) {
     try {
-      await setFanLevel(active.fan);
+      await setFan(active.fan);
       await updateStoveState({ fanLevel: active.fan, source: 'scheduler' });
       changeApplied = true;
     } catch (error) {
@@ -543,8 +534,8 @@ async function runPidAutomationIfEnabled(currentStatus: string, currentPowerLeve
   const pidBoostPath = getEnvironmentPath('pidAutomation/boost');
 
   try {
-    // Skip if stove is not in WORK state (not during START or other states)
-    if (!currentStatus.includes('WORK')) {
+    // Skip if stove is not in working state (not during igniting or other states)
+    if (currentStatus !== 'working') {
       await adminDbSet(pidBoostPath, { active: false });
       return { skipped: true, reason: 'stove_not_in_work' };
     }
@@ -676,7 +667,7 @@ async function runPidAutomationIfEnabled(currentStatus: string, currentPowerLeve
     if (targetPower !== currentPowerLevel) {
 
       // Apply new power level
-      await setPowerLevel(targetPower as any);
+      await setPower(targetPower);
       await updateStoveState({ powerLevel: targetPower, source: 'pid_automation' as any });
 
       // Analytics: log PID-initiated power change (fire-and-forget, no consent needed)
@@ -1008,6 +999,25 @@ export const GET = withCronSecret(async (_request) => {
     const healthPath = getEnvironmentPath('netatmo/proxyHealth');
     await adminDbSet(healthPath, {
       provider_status: 'unreachable',
+      data_freshness: 'UNREACHABLE',
+      checked_at: Date.now(),
+    });
+  }
+
+  // Thermorossi proxy health check — snapshot to Firebase on every cron run
+  try {
+    const thermoHealth = await getHealth();
+    const thermoHealthPath = getEnvironmentPath('thermorossi/proxyHealth');
+    await adminDbSet(thermoHealthPath, {
+      status: thermoHealth.status,
+      data_freshness: thermoHealth.data_freshness,
+      last_poll_at: thermoHealth.last_poll_at,
+      checked_at: Date.now(),
+    });
+  } catch (thermoHealthError) {
+    const thermoHealthPath = getEnvironmentPath('thermorossi/proxyHealth');
+    await adminDbSet(thermoHealthPath, {
+      status: 'unreachable',
       data_freshness: 'UNREACHABLE',
       checked_at: Date.now(),
     });

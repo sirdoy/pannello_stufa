@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v13.0
 milestone_name: Thermorossi Proxy Migration
 status: completed
-stopped_at: Completed 99-02-PLAN.md
-last_updated: "2026-03-19T12:10:04.427Z"
-last_activity: "2026-03-19 — Phase 99 Plan 01 complete: types + proxy client + 11 unit tests"
+stopped_at: Phase 100 context gathered
+last_updated: "2026-03-19T13:49:11.817Z"
+last_activity: "2026-03-19 - Completed quick task 260319-kd7: Fix Vercel env vars for HA proxy connection"
 progress:
   total_phases: 5
   completed_phases: 1
@@ -35,6 +35,7 @@ Progress: [█░░░░░░░░░] 5%
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed (all milestones): 375
 - v12.0 average: 1.3 plans/phase (4 plans / 3 phases)
 - v10.0 average: 2.0 plans/phase (18 plans / 9 phases) — best migration reference
@@ -56,11 +57,13 @@ Progress: [█░░░░░░░░░] 5%
 See PROJECT.md Key Decisions table for full history.
 
 Key decisions relevant to v13.0:
+
 - Shared haClient (v11.0): use `haGet`/`haPost` from `lib/haClient.ts` — same pattern as Netatmo/Fritz!Box/Raspi
 - Function module pattern (v10.0/v11.0): thermorossiProxy.ts as function module, no class state
 - RFC 9457 error mapping (v10.0): proxy errors map to ApiError instances for error boundary compatibility
 
 Phase 99 Plan 01 decisions:
+
 - DataFreshness is 'LIVE' | 'STALE' only — UNREACHABLE triggers HTTP 503, never appears in body
 - No haPost in thermorossiProxy.ts — command wrappers deferred to Phase 100
 - getHistory accepts optional URLSearchParams, appends as query string (same pattern as getProxyRoomMeasure)
@@ -84,6 +87,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T12:07:12.406Z
-Stopped at: Completed 99-02-PLAN.md
-Resume file: None
+Last session: 2026-03-19T13:49:11.809Z
+Stopped at: Phase 100 context gathered
+Resume file: .planning/phases/100-control-endpoints/100-CONTEXT.md

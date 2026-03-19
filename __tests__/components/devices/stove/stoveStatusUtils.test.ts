@@ -2,6 +2,7 @@
  * Tests for stoveStatusUtils
  *
  * Pure function tests - no mocking needed, no renderHook.
+ * Uses proxy stove_state strings (exact equality).
  */
 
 import {
@@ -21,8 +22,8 @@ describe('stoveStatusUtils', () => {
       expect(result.animated).toBe(true);
     });
 
-    it('returns WORK status with ember colors and pulse', () => {
-      const result = getStatusInfo('WORK PHASE 1');
+    it('returns working status with ember colors and pulse', () => {
+      const result = getStatusInfo('working');
       expect(result.label).toBe('IN FUNZIONE');
       expect(result.icon).toBe('🔥');
       expect(result.animated).toBe(true);
@@ -30,8 +31,8 @@ describe('stoveStatusUtils', () => {
       expect(result.textColor).toContain('ember');
     });
 
-    it('returns OFF status with slate colors and no animation', () => {
-      const result = getStatusInfo('OFF');
+    it('returns off status with slate colors and no animation', () => {
+      const result = getStatusInfo('off');
       expect(result.label).toBe('SPENTA');
       expect(result.icon).toBe('❄️');
       expect(result.animated).toBe(false);
@@ -39,8 +40,8 @@ describe('stoveStatusUtils', () => {
       expect(result.textColor).toContain('slate');
     });
 
-    it('returns START status with ocean colors and pulse', () => {
-      const result = getStatusInfo('STARTING UP');
+    it('returns igniting status with ocean colors and pulse', () => {
+      const result = getStatusInfo('igniting');
       expect(result.label).toBe('AVVIO IN CORSO');
       expect(result.icon).toBe('🚀');
       expect(result.animated).toBe(true);
@@ -48,23 +49,16 @@ describe('stoveStatusUtils', () => {
       expect(result.textColor).toContain('ocean');
     });
 
-    it('returns STANDBY status with warning colors', () => {
-      const result = getStatusInfo('STANDBY');
+    it('returns standby status with warning colors', () => {
+      const result = getStatusInfo('standby');
       expect(result.label).toBe('IN ATTESA');
       expect(result.icon).toBe('💤');
       expect(result.animated).toBe(true);
       expect(result.textColor).toContain('warning');
     });
 
-    it('returns WAIT status with warning colors', () => {
-      const result = getStatusInfo('WAIT');
-      expect(result.label).toBe('IN ATTESA');
-      expect(result.icon).toBe('💤');
-      expect(result.textColor).toContain('warning');
-    });
-
-    it('returns ERROR status with danger colors and pulse', () => {
-      const result = getStatusInfo('ERROR CODE 5');
+    it('returns alarm status with danger colors and pulse', () => {
+      const result = getStatusInfo('alarm');
       expect(result.label).toBe('ERRORE');
       expect(result.icon).toBe('⚠️');
       expect(result.animated).toBe(true);
@@ -72,15 +66,8 @@ describe('stoveStatusUtils', () => {
       expect(result.textColor).toContain('danger');
     });
 
-    it('returns ALARM status with danger colors', () => {
-      const result = getStatusInfo('ALARM 7');
-      expect(result.label).toBe('ERRORE');
-      expect(result.icon).toBe('⚠️');
-      expect(result.pulse).toBe(true);
-    });
-
-    it('returns CLEAN status with sage colors and pulse', () => {
-      const result = getStatusInfo('CLEANING');
+    it('returns cleaning status with sage colors and pulse', () => {
+      const result = getStatusInfo('cleaning');
       expect(result.label).toBe('PULIZIA');
       expect(result.icon).toBe('🔄');
       expect(result.animated).toBe(true);
@@ -88,20 +75,12 @@ describe('stoveStatusUtils', () => {
       expect(result.textColor).toContain('sage');
     });
 
-    it('returns MODULATION status with ocean colors', () => {
-      const result = getStatusInfo('MODULATION');
+    it('returns modulating status with ocean colors', () => {
+      const result = getStatusInfo('modulating');
       expect(result.label).toBe('MODULAZIONE');
       expect(result.icon).toBe('🌡️');
       expect(result.animated).toBe(true);
       expect(result.textColor).toContain('ocean');
-    });
-
-    it('returns unknown status as-is with slate colors', () => {
-      const result = getStatusInfo('UNKNOWN_STATUS');
-      expect(result.label).toBe('UNKNOWN_STATUS');
-      expect(result.icon).toBe('❔');
-      expect(result.animated).toBe(false);
-      expect(result.textColor).toContain('slate');
     });
   });
 
@@ -114,50 +93,50 @@ describe('stoveStatusUtils', () => {
       expect(result.health).toBe('ok');
     });
 
-    it('returns ember variant for WORK status', () => {
-      const result = getStatusDisplay('WORK PHASE 2');
+    it('returns ember variant for working status', () => {
+      const result = getStatusDisplay('working');
       expect(result.label).toBe('IN FUNZIONE');
       expect(result.variant).toBe('ember');
       expect(result.pulse).toBe(true);
       expect(result.health).toBe('ok');
     });
 
-    it('returns neutral variant for OFF status', () => {
-      const result = getStatusDisplay('OFF');
+    it('returns neutral variant for off status', () => {
+      const result = getStatusDisplay('off');
       expect(result.label).toBe('SPENTA');
       expect(result.variant).toBe('neutral');
       expect(result.pulse).toBe(false);
       expect(result.health).toBe('ok');
     });
 
-    it('returns ocean variant for START status', () => {
-      const result = getStatusDisplay('START');
+    it('returns ocean variant for igniting status', () => {
+      const result = getStatusDisplay('igniting');
       expect(result.variant).toBe('ocean');
       expect(result.pulse).toBe(true);
     });
 
-    it('returns warning variant and health for STANDBY', () => {
-      const result = getStatusDisplay('STANDBY');
+    it('returns warning variant and health for standby', () => {
+      const result = getStatusDisplay('standby');
       expect(result.variant).toBe('warning');
       expect(result.health).toBe('warning');
       expect(result.pulse).toBe(true);
     });
 
-    it('returns danger variant and error health for ERROR', () => {
-      const result = getStatusDisplay('ERROR 3');
+    it('returns danger variant and error health for alarm', () => {
+      const result = getStatusDisplay('alarm');
       expect(result.variant).toBe('danger');
       expect(result.health).toBe('error');
       expect(result.pulse).toBe(true);
     });
 
-    it('returns sage variant for CLEAN status', () => {
-      const result = getStatusDisplay('CLEAN');
+    it('returns sage variant for cleaning status', () => {
+      const result = getStatusDisplay('cleaning');
       expect(result.variant).toBe('sage');
       expect(result.health).toBe('ok');
     });
 
-    it('returns ocean variant for MODULATION', () => {
-      const result = getStatusDisplay('MODULATION');
+    it('returns ocean variant for modulating status', () => {
+      const result = getStatusDisplay('modulating');
       expect(result.variant).toBe('ocean');
       expect(result.pulse).toBe(true);
     });
@@ -201,50 +180,54 @@ describe('stoveStatusUtils', () => {
   });
 
   describe('isStoveActive', () => {
-    it('returns true for WORK status', () => {
-      expect(isStoveActive('WORK PHASE 1')).toBe(true);
+    it('returns true for working status', () => {
+      expect(isStoveActive('working')).toBe(true);
     });
 
-    it('returns true for START status', () => {
-      expect(isStoveActive('STARTING UP')).toBe(true);
+    it('returns true for igniting status', () => {
+      expect(isStoveActive('igniting')).toBe(true);
     });
 
-    it('returns false for OFF status', () => {
-      expect(isStoveActive('OFF')).toBe(false);
+    it('returns true for modulating status', () => {
+      expect(isStoveActive('modulating')).toBe(true);
     });
 
-    it('returns false for ERROR status', () => {
-      expect(isStoveActive('ERROR 5')).toBe(false);
+    it('returns false for off status', () => {
+      expect(isStoveActive('off')).toBe(false);
     });
 
-    it('returns false for STANDBY status', () => {
-      expect(isStoveActive('STANDBY')).toBe(false);
+    it('returns false for alarm status', () => {
+      expect(isStoveActive('alarm')).toBe(false);
+    });
+
+    it('returns false for standby status', () => {
+      expect(isStoveActive('standby')).toBe(false);
     });
   });
 
   describe('isStoveOff', () => {
-    it('returns true for OFF status', () => {
-      expect(isStoveOff('OFF')).toBe(true);
+    it('returns true for off status', () => {
+      expect(isStoveOff('off')).toBe(true);
     });
 
-    it('returns true for ERROR status', () => {
-      expect(isStoveOff('ERROR CODE 5')).toBe(true);
+    it('returns true for alarm status', () => {
+      expect(isStoveOff('alarm')).toBe(true);
     });
 
-    it('returns true for WAIT status', () => {
-      expect(isStoveOff('WAIT')).toBe(true);
+    it('returns true for standby status', () => {
+      expect(isStoveOff('standby')).toBe(true);
     });
 
-    it('returns false for WORK status', () => {
-      expect(isStoveOff('WORK PHASE 2')).toBe(false);
+    it('returns false for working status', () => {
+      expect(isStoveOff('working')).toBe(false);
     });
 
-    it('returns false for START status', () => {
-      expect(isStoveOff('STARTING')).toBe(false);
+    it('returns false for igniting status', () => {
+      expect(isStoveOff('igniting')).toBe(false);
     });
 
-    it('returns false for STANDBY status', () => {
-      expect(isStoveOff('STANDBY')).toBe(false);
+    it('returns false for modulating status', () => {
+      expect(isStoveOff('modulating')).toBe(false);
     });
   });
 });

@@ -1,28 +1,23 @@
-/**
- * POST /api/stove/setWaterTemperature
- *
- * Sets the water temperature setpoint on the stove.
- * Used for hydronic/boiler stoves only (not applicable to air stoves).
- *
- * Request body:
- * {
- *   "temperature": 30-80 (degrees Celsius)
- * }
- */
-
-import { withAuthAndErrorHandler, success, badRequest, parseJsonOrThrow, validateRange } from '@/lib/core';
-import { setWaterTemperature } from '@/lib/stoveApi';
+import { withAuthAndErrorHandler, withIdempotency, success, parseJsonOrThrow } from '@/lib/core';
+import { setWaterTemp } from '@/lib/thermorossiProxy';
 
 export const dynamic = 'force-dynamic';
 
-export const POST = withAuthAndErrorHandler(async (request) => {
-  const body = await parseJsonOrThrow(request);
-  const { temperature } = body;
+/**
+ * POST /api/stove/setWaterTemperature
+ * Sets the water temperature setpoint via HA proxy.
+ * Body: { value: number } — range 40-80 validated by proxy (422 on out-of-range)
+ * Protected: Requires Auth0 authentication
+ * Idempotent: Returns cached response for duplicate Idempotency-Key
+ */
+export const POST = withAuthAndErrorHandler(
+  withIdempotency(async (request) => {
+    const body = await parseJsonOrThrow(request);
+    const value = body['value'] as number;
 
-  // Validate temperature
-  const validatedTemp = validateRange(temperature, 30, 80, 'temperature');
+    const data = await setWaterTemp(value);
 
-  // Call API
-  const data = await setWaterTemperature(validatedTemp);
-  return success(data);
-}, 'Stove/SetWaterTemperature');
+    return success(data as unknown as Record<string, unknown>, null, 202);
+  }),
+  'Stove/SetWaterTemperature'
+);

@@ -1,31 +1,23 @@
 import { withAuthAndErrorHandler, withIdempotency, success, parseJsonOrThrow } from '@/lib/core';
-import { validateSetFanInput } from '@/lib/validators';
-import { getStoveService } from '@/lib/services/StoveService';
+import { setFan } from '@/lib/thermorossiProxy';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/stove/setFan
- * Sets the fan level
- * Supports sandbox mode in localhost
+ * Sets the fan level via HA proxy.
+ * Body: { value: number }
  * Protected: Requires Auth0 authentication
  * Idempotent: Returns cached response for duplicate Idempotency-Key
  */
 export const POST = withAuthAndErrorHandler(
   withIdempotency(async (request) => {
     const body = await parseJsonOrThrow(request);
-    const { level, source } = validateSetFanInput(body);
+    const value = body['value'] as number;
 
-    const stoveService = getStoveService();
-    const result = await stoveService.setFan(level, source);
+    const data = await setFan(value);
 
-    // Maintain backward-compatible response format
-    if (result.modeChanged) {
-      return success({
-        ...result,
-        newMode: 'semi-manual',
-      });
-    }
-
-    return success(result);
+    return success(data as unknown as Record<string, unknown>, null, 202);
   }),
   'Stove/SetFan'
 );

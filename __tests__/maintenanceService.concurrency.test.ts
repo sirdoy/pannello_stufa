@@ -18,12 +18,6 @@ jest.mock('../lib/firebase', () => ({
   db: {},
 }));
 
-jest.mock('../lib/sandboxService', () => ({
-  isLocalEnvironment: jest.fn(() => false),
-  isSandboxEnabled: jest.fn(() => false),
-  getSandboxMaintenance: jest.fn(),
-}));
-
 // Get typed mocks
 const mockedFirebase = jest.mocked(firebase);
 

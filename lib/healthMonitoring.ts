@@ -8,14 +8,14 @@
  * - Parallel API fetching with graceful degradation
  */
 
-import { getStoveStatus } from './stoveApi';
+import { getStatus } from './thermorossiProxy';
 import { getProxyHomestatus } from './netatmoProxy';
 import { adminDbGet } from './firebaseAdmin';
 
 // Stove state categories for mismatch detection
-const ON_STATES = ['WORK', 'MODULATION'];
-const STARTING_STATES = ['START'];
-const OFF_STATES = ['STANDBY', 'SHUTDOWN', 'FINALIZZAZIONE'];
+const ON_STATES = ['working', 'modulating'];
+const STARTING_STATES = ['igniting'];
+const OFF_STATES = ['standby', 'off', 'cleaning'];
 const GRACE_PERIOD_MS = 15 * 60 * 1000; // 15 minutes for STARTING states
 
 /**
@@ -46,7 +46,7 @@ export async function checkUserStoveHealth(userId: string): Promise<HealthCheck>
 
   // Fetch data in parallel - use Promise.allSettled for graceful degradation
   const [stoveResult, scheduleResult, netatmoResult] = await Promise.allSettled([
-    getStoveStatus().catch(err => {
+    getStatus().catch(err => {
       console.error(`❌ Stove status fetch failed for user ${userId}:`, err.message);
       throw err;
     }),
@@ -75,7 +75,7 @@ export async function checkUserStoveHealth(userId: string): Promise<HealthCheck>
   return {
     userId,
     timestamp,
-    stoveStatus: stoveResult.status === 'fulfilled' ? (stoveStatus?.StatusDescription || 'unknown') : null,
+    stoveStatus: stoveResult.status === 'fulfilled' ? (stoveStatus?.stove_state || 'unknown') : null,
     stoveError,
     expectedState,
     netatmoDemand,
@@ -124,20 +124,20 @@ export function detectStateMismatch(stoveResult: any, scheduleResult: any, netat
   }
 
   // Parse actual stove state
-  const statusDescription = stoveStatus.StatusDescription || '';
+  const statusDescription = stoveStatus.stove_state || '';
   const actualCategory = categorizeStoveStatus(statusDescription);
 
-  // Check if status contains error code
-  const hasError = stoveStatus.Error && stoveStatus.Error !== 0;
+  // Check if status is alarm (proxy uses stove_state === 'alarm' + error_code)
+  const hasError = stoveStatus.stove_state === 'alarm' && stoveStatus.error_code && stoveStatus.error_code !== 0;
 
   // Handle ERROR states - always flag as mismatch
   if (hasError) {
     return {
       detected: true,
       expected: expectedState,
-      actual: `ERROR (AL${stoveStatus.Error})`,
+      actual: `ERROR (AL${stoveStatus.error_code})`,
       reason: 'stove_error',
-      errorDescription: stoveStatus.ErrorDescription || 'Unknown error',
+      errorDescription: stoveStatus.error_description || 'Unknown error',
     };
   }
 
@@ -196,25 +196,23 @@ export function detectStateMismatch(stoveResult: any, scheduleResult: any, netat
 function categorizeStoveStatus(status: string) {
   if (!status) return 'UNKNOWN';
 
-  const upperStatus = status.toUpperCase();
-
-  // Check ON states
-  if (ON_STATES.some(s => upperStatus.includes(s))) {
+  // Check ON states (proxy values are lowercase exact strings)
+  if (ON_STATES.includes(status)) {
     return 'ON';
   }
 
   // Check STARTING states
-  if (STARTING_STATES.some(s => upperStatus.includes(s))) {
+  if (STARTING_STATES.includes(status)) {
     return 'STARTING';
   }
 
   // Check OFF states
-  if (OFF_STATES.some(s => upperStatus.includes(s))) {
+  if (OFF_STATES.includes(status)) {
     return 'OFF';
   }
 
-  // Check for error indicators
-  if (upperStatus.includes('ERROR') || upperStatus.includes('AL')) {
+  // alarm state is handled separately via hasError check
+  if (status === 'alarm') {
     return 'ERROR';
   }
 

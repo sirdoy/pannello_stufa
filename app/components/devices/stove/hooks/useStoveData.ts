@@ -17,7 +17,6 @@ import { getFullSchedulerMode, getNextScheduledAction } from '@/lib/schedulerSer
 import { STOVE_ROUTES } from '@/lib/routes';
 import { logError, shouldNotify } from '@/lib/errorMonitor';
 import { getMaintenanceStatus } from '@/lib/maintenanceService';
-import { isSandboxEnabled, isLocalEnvironment } from '@/lib/sandboxService';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
@@ -172,12 +171,6 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
 
   const fetchStatusAndUpdate = async () => {
     try {
-      // Check sandbox mode
-      if (isLocalEnvironment()) {
-        const sandboxEnabled = await isSandboxEnabled();
-        setSandboxMode(sandboxEnabled);
-      }
-
       const res = await fetch(STOVE_ROUTES.status);
       if (!res.ok) throw new Error(`Status fetch failed: ${res.status}`);
       const json = await res.json() as ThermorossiStatusResponse;

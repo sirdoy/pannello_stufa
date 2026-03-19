@@ -1,6 +1,5 @@
 import { db } from './firebase';
 import { ref, get, set, update, runTransaction } from 'firebase/database';
-import { isLocalEnvironment, isSandboxEnabled, getSandboxMaintenance, SandboxMaintenance } from './sandboxService';
 import { shouldSendMaintenanceNotification } from './maintenance/helpers';
 
 const MAINTENANCE_REF = 'maintenance';
@@ -39,23 +38,7 @@ export interface MaintenanceStatus extends MaintenanceData {
  */
 export async function getMaintenanceData(): Promise<MaintenanceData> {
   try {
-    // Check sandbox mode
-    if (isLocalEnvironment()) {
-      const sandboxEnabled = await isSandboxEnabled();
-      if (sandboxEnabled) {
-        const sandboxData = (await getSandboxMaintenance()) as unknown as SandboxMaintenance;
-        // Convert sandbox format to maintenance format
-        return {
-          currentHours: sandboxData.hoursWorked || 0,
-          targetHours: sandboxData.maxHours || 150,
-          lastCleanedAt: null,
-          needsCleaning: sandboxData.needsCleaning || false,
-          lastUpdatedAt: sandboxData.lastUpdatedAt || null,
-        };
-      }
-    }
-
-    // Production mode - usa maintenance normale
+    // Read from Firebase
     const maintenanceRef = ref(db, MAINTENANCE_REF);
     const snapshot = await get(maintenanceRef);
 

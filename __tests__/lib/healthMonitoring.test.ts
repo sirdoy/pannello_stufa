@@ -16,11 +16,11 @@ import {
 } from '../../lib/healthMonitoring';
 
 // Mock dependencies
-jest.mock('../../lib/stoveApi');
+jest.mock('../../lib/thermorossiProxy');
 jest.mock('../../lib/netatmoProxy');
 jest.mock('../../lib/firebaseAdmin');
 
-import { getStoveStatus } from '../../lib/stoveApi';
+import { getStatus } from '../../lib/thermorossiProxy';
 import { getProxyHomestatus } from '../../lib/netatmoProxy';
 import { adminDbGet } from '../../lib/firebaseAdmin';
 
@@ -33,7 +33,7 @@ describe('healthMonitoring', () => {
     it('returns online when stove status fetched successfully', () => {
       const stoveResult = {
         status: 'fulfilled' as const,
-        value: { StatusDescription: 'WORK' },
+        value: { stove_state: 'working', power_level: 3, fan_level: 4, data_freshness: 'LIVE', error_code: null, error_description: null },
       } as PromiseSettledResult<unknown>;
 
       expect(determineConnectionStatus(stoveResult)).toBe('online');
@@ -77,7 +77,7 @@ describe('healthMonitoring', () => {
     });
 
     it('returns null when expected state unavailable', () => {
-      const stoveResult = { status: 'fulfilled', value: { StatusDescription: 'WORK', Error: 0 } };
+      const stoveResult = { status: 'fulfilled', value: { stove_state: 'working', power_level: 3, fan_level: 4, data_freshness: 'LIVE', error_code: null, error_description: null } };
       const scheduleResult = { status: 'rejected', reason: new Error('Failed') };
       const netatmoResult = { status: 'fulfilled', value: 'heating' };
 
@@ -85,7 +85,7 @@ describe('healthMonitoring', () => {
     });
 
     it('detects mismatch when stove should be ON but is OFF', () => {
-      const stoveResult = { status: 'fulfilled', value: { StatusDescription: 'STANDBY', Error: 0 } };
+      const stoveResult = { status: 'fulfilled', value: { stove_state: 'standby', power_level: null, fan_level: null, data_freshness: 'LIVE', error_code: null, error_description: null } };
       const scheduleResult = { status: 'fulfilled', value: 'ON' };
       const netatmoResult = { status: 'fulfilled', value: 'idle' };
 
@@ -94,12 +94,12 @@ describe('healthMonitoring', () => {
       expect(mismatch).not.toBeNull();
       expect(mismatch!.detected).toBe(true);
       expect(mismatch!.expected).toBe('ON');
-      expect(mismatch!.actual).toBe('STANDBY');
+      expect(mismatch!.actual).toBe('standby');
       expect(mismatch!.reason).toBe('should_be_on');
     });
 
     it('detects mismatch when stove should be OFF but is ON', () => {
-      const stoveResult = { status: 'fulfilled', value: { StatusDescription: 'WORK', Error: 0 } };
+      const stoveResult = { status: 'fulfilled', value: { stove_state: 'working', power_level: 3, fan_level: 4, data_freshness: 'LIVE', error_code: null, error_description: null } };
       const scheduleResult = { status: 'fulfilled', value: 'OFF' };
       const netatmoResult = { status: 'fulfilled', value: 'idle' };
 
@@ -108,12 +108,12 @@ describe('healthMonitoring', () => {
       expect(mismatch).not.toBeNull();
       expect(mismatch!.detected).toBe(true);
       expect(mismatch!.expected).toBe('OFF');
-      expect(mismatch!.actual).toBe('WORK');
+      expect(mismatch!.actual).toBe('working');
       expect(mismatch!.reason).toBe('should_be_off');
     });
 
     it('does not flag STARTING state as mismatch (grace period)', () => {
-      const stoveResult = { status: 'fulfilled', value: { StatusDescription: 'START', Error: 0 } };
+      const stoveResult = { status: 'fulfilled', value: { stove_state: 'igniting', power_level: null, fan_level: null, data_freshness: 'LIVE', error_code: null, error_description: null } };
       const scheduleResult = { status: 'fulfilled', value: 'ON' };
       const netatmoResult = { status: 'fulfilled', value: 'heating' };
 
@@ -124,7 +124,7 @@ describe('healthMonitoring', () => {
     it('detects error state as mismatch', () => {
       const stoveResult = {
         status: 'fulfilled',
-        value: { StatusDescription: 'ERROR', Error: 5, ErrorDescription: 'Temperature sensor failure' },
+        value: { stove_state: 'alarm', power_level: null, fan_level: null, data_freshness: 'LIVE', error_code: 5, error_description: 'Temperature sensor failure' },
       };
       const scheduleResult = { status: 'fulfilled', value: 'ON' };
       const netatmoResult = { status: 'fulfilled', value: 'heating' };
@@ -138,7 +138,7 @@ describe('healthMonitoring', () => {
     });
 
     it('detects coordination issue when Netatmo heating but stove OFF', () => {
-      const stoveResult = { status: 'fulfilled', value: { StatusDescription: 'STANDBY', Error: 0 } };
+      const stoveResult = { status: 'fulfilled', value: { stove_state: 'standby', power_level: null, fan_level: null, data_freshness: 'LIVE', error_code: null, error_description: null } };
       const scheduleResult = { status: 'fulfilled', value: 'OFF' }; // Schedule says OFF
       const netatmoResult = { status: 'fulfilled', value: 'heating' }; // But Netatmo heating
 
@@ -150,16 +150,16 @@ describe('healthMonitoring', () => {
       expect(mismatch!.netatmoDemand).toBe('heating');
     });
 
-    it('returns null when ON states match (WORK)', () => {
-      const stoveResult = { status: 'fulfilled', value: { StatusDescription: 'WORK', Error: 0 } };
+    it('returns null when ON states match (working)', () => {
+      const stoveResult = { status: 'fulfilled', value: { stove_state: 'working', power_level: 3, fan_level: 4, data_freshness: 'LIVE', error_code: null, error_description: null } };
       const scheduleResult = { status: 'fulfilled', value: 'ON' };
       const netatmoResult = { status: 'fulfilled', value: 'heating' };
 
       expect(detectStateMismatch(stoveResult, scheduleResult, netatmoResult)).toBeNull();
     });
 
-    it('returns null when ON states match (MODULATION)', () => {
-      const stoveResult = { status: 'fulfilled', value: { StatusDescription: 'MODULATION', Error: 0 } };
+    it('returns null when ON states match (modulating)', () => {
+      const stoveResult = { status: 'fulfilled', value: { stove_state: 'modulating', power_level: 2, fan_level: 3, data_freshness: 'LIVE', error_code: null, error_description: null } };
       const scheduleResult = { status: 'fulfilled', value: 'ON' };
       const netatmoResult = { status: 'fulfilled', value: 'heating' };
 
@@ -167,7 +167,7 @@ describe('healthMonitoring', () => {
     });
 
     it('returns null when OFF states match', () => {
-      const stoveResult = { status: 'fulfilled', value: { StatusDescription: 'STANDBY', Error: 0 } };
+      const stoveResult = { status: 'fulfilled', value: { stove_state: 'standby', power_level: null, fan_level: null, data_freshness: 'LIVE', error_code: null, error_description: null } };
       const scheduleResult = { status: 'fulfilled', value: 'OFF' };
       const netatmoResult = { status: 'fulfilled', value: 'idle' };
 
@@ -180,7 +180,7 @@ describe('healthMonitoring', () => {
       const userId = 'auth0|test123';
 
       // Mock successful responses
-      (getStoveStatus as jest.Mock).mockResolvedValue({ StatusDescription: 'WORK', Error: 0 });
+      (getStatus as jest.Mock).mockResolvedValue({ stove_state: 'working', power_level: 3, fan_level: 4, data_freshness: 'LIVE', error_code: null, error_description: null });
       (adminDbGet as jest.Mock)
         .mockResolvedValueOnce('auto') // mode
         .mockResolvedValueOnce([{ day: 1, start: 0, end: 1440, enabled: true }]); // schedule
@@ -205,7 +205,7 @@ describe('healthMonitoring', () => {
       const userId = 'auth0|test123';
 
       // Stove OK, Schedule OK, Netatmo fails
-      (getStoveStatus as jest.Mock).mockResolvedValue({ StatusDescription: 'WORK', Error: 0 });
+      (getStatus as jest.Mock).mockResolvedValue({ stove_state: 'working', power_level: 3, fan_level: 4, data_freshness: 'LIVE', error_code: null, error_description: null });
       (adminDbGet as jest.Mock)
         .mockResolvedValueOnce('auto')
         .mockResolvedValueOnce([{ day: 1, start: 0, end: 1440, enabled: true }]);
@@ -224,7 +224,7 @@ describe('healthMonitoring', () => {
       const userId = 'auth0|test123';
 
       // Stove timeout
-      (getStoveStatus as jest.Mock).mockRejectedValue(new Error('STOVE_TIMEOUT'));
+      (getStatus as jest.Mock).mockRejectedValue(new Error('STOVE_TIMEOUT'));
       (adminDbGet as jest.Mock)
         .mockResolvedValueOnce('auto')
         .mockResolvedValueOnce([{ day: 1, start: 0, end: 1440, enabled: true }]);
@@ -240,7 +240,7 @@ describe('healthMonitoring', () => {
       const userId = 'auth0|test123';
 
       // All APIs fail
-      (getStoveStatus as jest.Mock).mockRejectedValue(new Error('Network error'));
+      (getStatus as jest.Mock).mockRejectedValue(new Error('Network error'));
       (adminDbGet as jest.Mock).mockRejectedValue(new Error('Firebase error'));
       (getProxyHomestatus as jest.Mock).mockRejectedValue(new Error('Proxy error'));
 
@@ -257,7 +257,7 @@ describe('healthMonitoring', () => {
     it('includes timestamp in result', async () => {
       const userId = 'auth0|test123';
 
-      (getStoveStatus as jest.Mock).mockResolvedValue({ StatusDescription: 'STANDBY', Error: 0 });
+      (getStatus as jest.Mock).mockResolvedValue({ stove_state: 'standby', power_level: null, fan_level: null, data_freshness: 'LIVE', error_code: null, error_description: null });
       (adminDbGet as jest.Mock).mockResolvedValue('manual');
 
       const before = Date.now();

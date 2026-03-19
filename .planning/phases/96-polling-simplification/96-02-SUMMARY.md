@@ -3,6 +3,7 @@ phase: 96-polling-simplification
 plan: "02"
 subsystem: polling
 tags: [polling, performance, api-load]
+requirements_completed: [POLL-04, POLL-05, POLL-06, POLL-07]
 dependency_graph:
   requires: []
   provides: [unified-60s-polling]

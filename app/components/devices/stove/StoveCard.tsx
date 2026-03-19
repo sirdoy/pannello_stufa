@@ -23,7 +23,7 @@ import StoveMaintenance from './components/StoveMaintenance';
  * Orchestrator pattern: hooks manage state/commands, sub-components render UI
  *
  * Architecture:
- * - useStoveData: All state management + polling + Firebase
+ * - useStoveData: All state management + polling via useAdaptivePolling
  * - useStoveCommands: All command handlers with retry
  * - 6 sub-components: All presentational (no state/effects)
  * - Single polling loop guarantee (only in useStoveData)

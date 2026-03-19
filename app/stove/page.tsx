@@ -30,7 +30,7 @@ export default function StovePage() {
   const { checkVersion } = useVersion();
   const { user } = useUser();
 
-  // Reuse StoveCard hooks - SAME state management, polling, Firebase
+  // Reuse StoveCard hooks - SAME state management and polling via useAdaptivePolling
   const stoveData = useStoveData({ checkVersion, userId: user?.sub });
   const commands = useStoveCommands({
     stoveData: {

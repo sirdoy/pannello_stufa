@@ -4,7 +4,7 @@
  * Presentational component rendering page-level banners:
  * - Error alert (outside card layout)
  * - Maintenance warning
- * - Firebase connection status
+ * - Staleness status
  * - Pending commands queue
  *
  * Props in, JSX out. No state management.

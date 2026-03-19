@@ -3,6 +3,7 @@ phase: 96-polling-simplification
 plan: 01
 subsystem: stove-data-fetching
 tags: [polling, firebase-removal, staleness, simplification]
+requirements_completed: [POLL-01, POLL-02, POLL-03, POLL-08]
 dependency_graph:
   requires: []
   provides: [useStoveData-simplified, stove-staleness-thresholds]

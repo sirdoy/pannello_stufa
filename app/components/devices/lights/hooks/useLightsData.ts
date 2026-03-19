@@ -2,7 +2,7 @@
  * useLightsData Hook
  *
  * Encapsulates all Philips Hue lights state management:
- * - Polling via useAdaptivePolling (30s interval)
+ * - Polling via useAdaptivePolling (60s interval)
  * - Connection checking (local/remote/hybrid modes)
  * - Data fetching (rooms, lights, scenes)
  * - Pairing flow state

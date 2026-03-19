@@ -12,6 +12,7 @@ import * as schedulerService from '@/lib/schedulerService';
 import * as maintenanceService from '@/lib/maintenanceService';
 import { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
 import type { UseStoveDataReturn } from '@/app/components/devices/stove/hooks/useStoveData';
+import type { ThermorossiCommandResponse } from '@/types/thermorossiProxy';
 
 // Mock dependencies
 jest.mock('@/lib/logService');
@@ -61,8 +62,25 @@ describe('useStoveCommands', () => {
   const mockRetry = jest.fn();
   const mockClearError = jest.fn();
 
+  // Standard 202 command response
+  const mockCommandResponse: ThermorossiCommandResponse = {
+    command: 'ignite',
+    status: 'accepted',
+    previous_state: 'off',
+    suggested_poll_delay_s: 15,
+    poll_endpoint: '/api/stove/status',
+    requested_value: null,
+  };
+
+  const mockResponse202 = {
+    ok: true,
+    status: 202,
+    json: jest.fn().mockResolvedValue(mockCommandResponse),
+  } as unknown as Response;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.useFakeTimers();
 
     // Mock useRetryableCommand to return command objects
     jest.mocked(useRetryableCommand).mockReturnValue({
@@ -99,9 +117,13 @@ describe('useStoveCommands', () => {
       ok: true,
       json: jest.fn().mockResolvedValue({}),
     });
+
+    // Reset fetchStatusAndUpdate mock
+    (mockStoveData.fetchStatusAndUpdate as jest.Mock).mockResolvedValue(undefined);
   });
 
   afterEach(() => {
+    jest.useRealTimers();
     jest.restoreAllMocks();
   });
 
@@ -143,8 +165,316 @@ describe('useStoveCommands', () => {
   it('handleIgnite calls execute with correct endpoint', async () => {
     mockExecute.mockResolvedValue({
       ok: true,
-      json: jest.fn().mockResolvedValue({}),
+      status: 202,
+      json: jest.fn().mockResolvedValue(mockCommandResponse),
     });
+
+    const { result } = renderHook(() =>
+      useStoveCommands({
+        stoveData: mockStoveData,
+        router: mockRouter,
+        user: mockUser,
+      })
+    );
+
+    await act(async () => {
+      const p = result.current.handleIgnite();
+      await jest.runAllTimersAsync();
+      await p;
+    });
+
+    expect(mockExecute).toHaveBeenCalledWith(
+      expect.stringContaining('/api/stove/ignite'),
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ source: 'manual' }),
+      })
+    );
+  });
+
+  it('handleIgnite delays fetchStatusAndUpdate by suggested_poll_delay_s', async () => {
+    mockExecute.mockResolvedValue({
+      ok: true,
+      status: 202,
+      json: jest.fn().mockResolvedValue(mockCommandResponse),
+    });
+
+    const { result } = renderHook(() =>
+      useStoveCommands({
+        stoveData: mockStoveData,
+        router: mockRouter,
+        user: mockUser,
+      })
+    );
+
+    await act(async () => {
+      const p = result.current.handleIgnite();
+      await jest.runAllTimersAsync();
+      await p;
+    });
+
+    // After advancing timers, fetchStatusAndUpdate should have been called once
+    expect(mockStoveData.fetchStatusAndUpdate).toHaveBeenCalledTimes(1);
+  });
+
+  it('handleShutdown calls execute with correct endpoint', async () => {
+    const shutdownResponse: ThermorossiCommandResponse = {
+      ...mockCommandResponse,
+      command: 'shutdown',
+    };
+    mockExecute.mockResolvedValue({
+      ok: true,
+      status: 202,
+      json: jest.fn().mockResolvedValue(shutdownResponse),
+    });
+
+    const { result } = renderHook(() =>
+      useStoveCommands({
+        stoveData: mockStoveData,
+        router: mockRouter,
+        user: mockUser,
+      })
+    );
+
+    await act(async () => {
+      const p = result.current.handleShutdown();
+      await jest.runAllTimersAsync();
+      await p;
+    });
+
+    expect(mockExecute).toHaveBeenCalledWith(
+      expect.stringContaining('/api/stove/shutdown'),
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ source: 'manual' }),
+      })
+    );
+  });
+
+  it('handleFanChange calls execute with correct level', async () => {
+    const fanResponse: ThermorossiCommandResponse = {
+      command: 'setFan',
+      status: 'accepted',
+      previous_state: 'working',
+      suggested_poll_delay_s: 5,
+      poll_endpoint: '/api/stove/status',
+      requested_value: 4,
+    };
+    mockExecute.mockResolvedValue({
+      ok: true,
+      status: 202,
+      json: jest.fn().mockResolvedValue(fanResponse),
+    });
+
+    const { result } = renderHook(() =>
+      useStoveCommands({
+        stoveData: mockStoveData,
+        router: mockRouter,
+        user: mockUser,
+      })
+    );
+
+    await act(async () => {
+      const p = result.current.handleFanChange({ target: { value: '4' } });
+      await jest.runAllTimersAsync();
+      await p;
+    });
+
+    expect(mockExecute).toHaveBeenCalledWith(
+      expect.stringContaining('/api/stove/setFan'),
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ level: 4, source: 'manual' }),
+      })
+    );
+  });
+
+  it('handleFanChange does not call setSemiManualMode directly', async () => {
+    const fanResponse: ThermorossiCommandResponse = {
+      command: 'setFan',
+      status: 'accepted',
+      previous_state: 'working',
+      suggested_poll_delay_s: 5,
+      poll_endpoint: '/api/stove/status',
+      requested_value: 4,
+    };
+    mockExecute.mockResolvedValue({
+      ok: true,
+      status: 202,
+      json: jest.fn().mockResolvedValue(fanResponse),
+    });
+
+    const { result } = renderHook(() =>
+      useStoveCommands({
+        stoveData: mockStoveData,
+        router: mockRouter,
+        user: mockUser,
+      })
+    );
+
+    await act(async () => {
+      const p = result.current.handleFanChange({ target: { value: '4' } });
+      await jest.runAllTimersAsync();
+      await p;
+    });
+
+    // setSemiManualMode must NOT be called by handleFanChange (no modeChanged reading)
+    expect(mockStoveData.setSemiManualMode).not.toHaveBeenCalled();
+  });
+
+  it('handlePowerChange calls execute with correct level', async () => {
+    const powerResponse: ThermorossiCommandResponse = {
+      command: 'setPower',
+      status: 'accepted',
+      previous_state: 'working',
+      suggested_poll_delay_s: 5,
+      poll_endpoint: '/api/stove/status',
+      requested_value: 3,
+    };
+    mockExecute.mockResolvedValue({
+      ok: true,
+      status: 202,
+      json: jest.fn().mockResolvedValue(powerResponse),
+    });
+
+    const { result } = renderHook(() =>
+      useStoveCommands({
+        stoveData: mockStoveData,
+        router: mockRouter,
+        user: mockUser,
+      })
+    );
+
+    await act(async () => {
+      const p = result.current.handlePowerChange({ target: { value: '3' } });
+      await jest.runAllTimersAsync();
+      await p;
+    });
+
+    expect(mockExecute).toHaveBeenCalledWith(
+      expect.stringContaining('/api/stove/setPower'),
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ level: 3, source: 'manual' }),
+      })
+    );
+  });
+
+  it('handlePowerChange does not call setSemiManualMode directly', async () => {
+    const powerResponse: ThermorossiCommandResponse = {
+      command: 'setPower',
+      status: 'accepted',
+      previous_state: 'working',
+      suggested_poll_delay_s: 5,
+      poll_endpoint: '/api/stove/status',
+      requested_value: 3,
+    };
+    mockExecute.mockResolvedValue({
+      ok: true,
+      status: 202,
+      json: jest.fn().mockResolvedValue(powerResponse),
+    });
+
+    const { result } = renderHook(() =>
+      useStoveCommands({
+        stoveData: mockStoveData,
+        router: mockRouter,
+        user: mockUser,
+      })
+    );
+
+    await act(async () => {
+      const p = result.current.handlePowerChange({ target: { value: '3' } });
+      await jest.runAllTimersAsync();
+      await p;
+    });
+
+    // setSemiManualMode must NOT be called by handlePowerChange (no modeChanged reading)
+    expect(mockStoveData.setSemiManualMode).not.toHaveBeenCalled();
+  });
+
+  it('handleIgnite throws on 409 Conflict', async () => {
+    mockExecute.mockResolvedValue({
+      ok: false,
+      status: 409,
+      json: jest.fn().mockResolvedValue({}),
+    } as unknown as Response);
+
+    const { result } = renderHook(() =>
+      useStoveCommands({
+        stoveData: mockStoveData,
+        router: mockRouter,
+        user: mockUser,
+      })
+    );
+
+    await act(async () => {
+      await expect(result.current.handleIgnite()).rejects.toThrow('Command not allowed in current state');
+    });
+  });
+
+  it('handleShutdown throws on 409 Conflict', async () => {
+    mockExecute.mockResolvedValue({
+      ok: false,
+      status: 409,
+      json: jest.fn().mockResolvedValue({}),
+    } as unknown as Response);
+
+    const { result } = renderHook(() =>
+      useStoveCommands({
+        stoveData: mockStoveData,
+        router: mockRouter,
+        user: mockUser,
+      })
+    );
+
+    await act(async () => {
+      await expect(result.current.handleShutdown()).rejects.toThrow('Command not allowed in current state');
+    });
+  });
+
+  it('handleFanChange throws on 409 Conflict', async () => {
+    mockExecute.mockResolvedValue({
+      ok: false,
+      status: 409,
+      json: jest.fn().mockResolvedValue({}),
+    } as unknown as Response);
+
+    const { result } = renderHook(() =>
+      useStoveCommands({
+        stoveData: mockStoveData,
+        router: mockRouter,
+        user: mockUser,
+      })
+    );
+
+    await act(async () => {
+      await expect(result.current.handleFanChange({ target: { value: '3' } })).rejects.toThrow('Command not allowed in current state');
+    });
+  });
+
+  it('handlePowerChange throws on 409 Conflict', async () => {
+    mockExecute.mockResolvedValue({
+      ok: false,
+      status: 409,
+      json: jest.fn().mockResolvedValue({}),
+    } as unknown as Response);
+
+    const { result } = renderHook(() =>
+      useStoveCommands({
+        stoveData: mockStoveData,
+        router: mockRouter,
+        user: mockUser,
+      })
+    );
+
+    await act(async () => {
+      await expect(result.current.handlePowerChange({ target: { value: '3' } })).rejects.toThrow('Command not allowed in current state');
+    });
+  });
+
+  it('handleIgnite does not call fetchStatusAndUpdate when response is null (deduplicated)', async () => {
+    mockExecute.mockResolvedValue(null);
 
     const { result } = renderHook(() =>
       useStoveCommands({
@@ -158,94 +488,7 @@ describe('useStoveCommands', () => {
       await result.current.handleIgnite();
     });
 
-    expect(mockExecute).toHaveBeenCalledWith(
-      expect.stringContaining('/api/stove/ignite'),
-      expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({ source: 'manual' }),
-      })
-    );
-  });
-
-  it('handleShutdown calls execute with correct endpoint', async () => {
-    mockExecute.mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue({}),
-    });
-
-    const { result } = renderHook(() =>
-      useStoveCommands({
-        stoveData: mockStoveData,
-        router: mockRouter,
-        user: mockUser,
-      })
-    );
-
-    await act(async () => {
-      await result.current.handleShutdown();
-    });
-
-    expect(mockExecute).toHaveBeenCalledWith(
-      expect.stringContaining('/api/stove/shutdown'),
-      expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({ source: 'manual' }),
-      })
-    );
-  });
-
-  it('handleFanChange calls execute with correct level', async () => {
-    mockExecute.mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue({ modeChanged: false }),
-    });
-
-    const { result } = renderHook(() =>
-      useStoveCommands({
-        stoveData: mockStoveData,
-        router: mockRouter,
-        user: mockUser,
-      })
-    );
-
-    await act(async () => {
-      await result.current.handleFanChange({ target: { value: '4' } });
-    });
-
-    expect(mockExecute).toHaveBeenCalledWith(
-      expect.stringContaining('/api/stove/setFan'),
-      expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({ level: 4, source: 'manual' }),
-      })
-    );
-  });
-
-  it('handlePowerChange calls execute with correct level', async () => {
-    mockExecute.mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue({ modeChanged: false }),
-    });
-
-    const { result } = renderHook(() =>
-      useStoveCommands({
-        stoveData: mockStoveData,
-        router: mockRouter,
-        user: mockUser,
-      })
-    );
-
-    await act(async () => {
-      await result.current.handlePowerChange({ target: { value: '3' } });
-    });
-
-    expect(mockExecute).toHaveBeenCalledWith(
-      expect.stringContaining('/api/stove/setPower'),
-      expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({ level: 3, source: 'manual' }),
-      })
-    );
+    expect(mockStoveData.fetchStatusAndUpdate).not.toHaveBeenCalled();
   });
 
   it('handleSetManualMode calls scheduler API with enabled false', async () => {
@@ -301,7 +544,8 @@ describe('useStoveCommands', () => {
   it('command handlers set loading state', async () => {
     mockExecute.mockResolvedValue({
       ok: true,
-      json: jest.fn().mockResolvedValue({}),
+      status: 202,
+      json: jest.fn().mockResolvedValue(mockCommandResponse),
     });
 
     const { result } = renderHook(() =>
@@ -313,7 +557,9 @@ describe('useStoveCommands', () => {
     );
 
     await act(async () => {
-      await result.current.handleIgnite();
+      const p = result.current.handleIgnite();
+      await jest.runAllTimersAsync();
+      await p;
     });
 
     expect(mockStoveData.setLoading).toHaveBeenCalledWith(true);

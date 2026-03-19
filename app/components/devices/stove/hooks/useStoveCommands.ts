@@ -9,6 +9,10 @@
  * - Request deduplication
  * - Idempotency key injection
  * - Persistent error toasts
+ *
+ * Commands return 202 Accepted (proxy convention).
+ * Callers delay fetchStatusAndUpdate by suggested_poll_delay_s seconds.
+ * 409 Conflict indicates the proxy rejected the command due to current state.
  */
 
 'use client';
@@ -21,6 +25,7 @@ import { logStoveAction, logSchedulerAction } from '@/lib/logService';
 import { confirmCleaning } from '@/lib/maintenanceService';
 import { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
 import type { UseStoveDataReturn } from './useStoveData';
+import type { ThermorossiCommandResponse } from '@/types/thermorossiProxy';
 
 /**
  * Parameters required by useStoveCommands
@@ -96,7 +101,14 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
         body: JSON.stringify({ source: 'manual' }),
       });
       if (response) {
+        if (!response.ok) {
+          if (response.status === 409) throw new Error('Command not allowed in current state');
+          throw new Error(`Command failed: ${response.status}`);
+        }
+        const data = await response.json() as ThermorossiCommandResponse;
         await logStoveAction.ignite();
+        const delayMs = (data.suggested_poll_delay_s ?? 15) * 1000;
+        await new Promise<void>(resolve => setTimeout(resolve, delayMs));
         await stoveData.fetchStatusAndUpdate();
       }
       // If response is null, request was deduplicated (silently blocked)
@@ -114,7 +126,14 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
         body: JSON.stringify({ source: 'manual' }),
       });
       if (response) {
+        if (!response.ok) {
+          if (response.status === 409) throw new Error('Command not allowed in current state');
+          throw new Error(`Command failed: ${response.status}`);
+        }
+        const data = await response.json() as ThermorossiCommandResponse;
         await logStoveAction.shutdown();
+        const delayMs = (data.suggested_poll_delay_s ?? 15) * 1000;
+        await new Promise<void>(resolve => setTimeout(resolve, delayMs));
         await stoveData.fetchStatusAndUpdate();
       }
       // If response is null, request was deduplicated (silently blocked)
@@ -127,24 +146,20 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
     const level = Number(e.target.value);
     stoveData.setLoadingMessage('Modifica livello ventola...');
     stoveData.setLoading(true);
-
     try {
       const response = await setFanCmd.execute(STOVE_ROUTES.setFan, {
         method: 'POST',
         body: JSON.stringify({ level, source: 'manual' }),
       });
-
       if (response) {
-        const data = await response.json();
-
-        // Se la modalità è cambiata, aggiorna UI immediatamente
-        if (data.modeChanged) {
-          stoveData.setSemiManualMode(true);
-          stoveData.setReturnToAutoAt(data.returnToAutoAt || null);
-          stoveData.setNextScheduledAction(null);
+        if (!response.ok) {
+          if (response.status === 409) throw new Error('Command not allowed in current state');
+          throw new Error(`Command failed: ${response.status}`);
         }
-
+        const data = await response.json() as ThermorossiCommandResponse;
         await logStoveAction.setFan(level);
+        const delayMs = (data.suggested_poll_delay_s ?? 5) * 1000;
+        await new Promise<void>(resolve => setTimeout(resolve, delayMs));
         await stoveData.fetchStatusAndUpdate();
       }
       // If response is null, request was deduplicated (silently blocked)
@@ -157,24 +172,20 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
     const level = Number(e.target.value);
     stoveData.setLoadingMessage('Modifica livello potenza...');
     stoveData.setLoading(true);
-
     try {
       const response = await setPowerCmd.execute(STOVE_ROUTES.setPower, {
         method: 'POST',
         body: JSON.stringify({ level, source: 'manual' }),
       });
-
       if (response) {
-        const data = await response.json();
-
-        // Se la modalità è cambiata, aggiorna UI immediatamente
-        if (data.modeChanged) {
-          stoveData.setSemiManualMode(true);
-          stoveData.setReturnToAutoAt(data.returnToAutoAt || null);
-          stoveData.setNextScheduledAction(null);
+        if (!response.ok) {
+          if (response.status === 409) throw new Error('Command not allowed in current state');
+          throw new Error(`Command failed: ${response.status}`);
         }
-
+        const data = await response.json() as ThermorossiCommandResponse;
         await logStoveAction.setPower(level);
+        const delayMs = (data.suggested_poll_delay_s ?? 5) * 1000;
+        await new Promise<void>(resolve => setTimeout(resolve, delayMs));
         await stoveData.fetchStatusAndUpdate();
       }
       // If response is null, request was deduplicated (silently blocked)

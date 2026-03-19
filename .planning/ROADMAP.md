@@ -131,7 +131,7 @@ Plans:
   3. `useStoveCommands` handles the 202 Accepted response (not 200) as a success signal for all command invocations
   4. When proxy returns `error_code` and `error_description`, the stove card displays the error text to the user
   5. Staleness display for the stove uses `data_freshness` from the proxy instead of custom timestamp-based logic
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 101-01-PLAN.md — stoveStatusUtils rewrite + useStoveData proxy adaptation
@@ -188,7 +188,7 @@ Plans:
 | 96-98 | v12.0 | 4/4 | ✓ Complete | 2026-03-19 |
 | 99. Proxy Client Foundation | 2/2 | Complete    | 2026-03-19 | - |
 | 100. Control Endpoints | 2/2 | Complete    | 2026-03-19 | - |
-| 101. Frontend Hooks | v13.0 | 0/2 | Not started | - |
+| 101. Frontend Hooks | 1/2 | In Progress|  | - |
 | 102. Scheduler Update | v13.0 | 0/TBD | Not started | - |
 | 103. Cleanup & Debug Panel | v13.0 | 0/TBD | Not started | - |
 

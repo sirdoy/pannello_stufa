@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v13.0
 milestone_name: Thermorossi Proxy Migration
 status: unknown
-stopped_at: Phase 101 planned — 2 plans in 2 waves
-last_updated: "2026-03-19T14:43:16.250Z"
+stopped_at: Completed 101-01-PLAN.md
+last_updated: "2026-03-19T14:53:36.487Z"
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 100 — control-endpoints
+**Current focus:** Phase 101 — frontend-hooks
 
 ## Current Position
 
-Phase: 100 (control-endpoints) — EXECUTING
-Plan: 2 of 2
+Phase: 101 (frontend-hooks) — EXECUTING
+Plan: 1 of 2
 
 ## Performance Metrics
 
@@ -45,6 +45,7 @@ Plan: 2 of 2
 | Phase 99 P02 | 87 | 2 tasks | 4 files |
 | Phase 100-control-endpoints P01 | 5 | 2 tasks | 2 files |
 | Phase 100 P02 | 5 | 2 tasks | 6 files |
+| Phase 101 P01 | 400 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,9 @@ Phase 99 Plan 01 decisions:
 - [Phase 100-01]: Command wrappers use haPost<ThermorossiCommandResponse> matching existing haGet pattern — empty body commands pass empty object literal
 - [Phase 100]: Commands return HTTP 202 (proxy convention), history returns 200 (read endpoint)
 - [Phase 100]: setWaterTemperature gains withIdempotency for consistency; proxy handles range validation (validateRange removed)
+- [Phase 101]: switch/case on StoveState union replaces toUpperCase().includes() in stoveStatusUtils
+- [Phase 101]: data_freshness === STALE drives staleness — useDeviceStaleness removed from stove
+- [Phase 101]: modulating added to isStoveActive (missed by old WORK substring logic)
 
 ### Pending Todos
 
@@ -86,6 +90,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T14:43:16.242Z
-Stopped at: Phase 101 planned — 2 plans in 2 waves
-Resume file: .planning/phases/101-frontend-hooks/101-01-PLAN.md
+Last session: 2026-03-19T14:53:24.261Z
+Stopped at: Completed 101-01-PLAN.md
+Resume file: None

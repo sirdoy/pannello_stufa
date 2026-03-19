@@ -31,11 +31,11 @@ Requirements for Thermorossi Proxy Migration. Each maps to roadmap phases.
 
 ### Frontend
 
-- [ ] **UI-01**: useStoveData reads stove_state (exact equality), power_level, fan_level from proxy response
-- [ ] **UI-02**: stoveStatusUtils rewritten for exact stove_state matching (working, off, igniting, standby, cleaning, alarm, modulating)
+- [x] **UI-01**: useStoveData reads stove_state (exact equality), power_level, fan_level from proxy response
+- [x] **UI-02**: stoveStatusUtils rewritten for exact stove_state matching (working, off, igniting, standby, cleaning, alarm, modulating)
 - [ ] **UI-03**: useStoveCommands handles 202 Accepted response pattern from proxy
-- [ ] **UI-04**: Error display uses error_code and error_description from proxy status
-- [ ] **UI-05**: data_freshness from proxy replaces custom staleness logic for stove provider
+- [x] **UI-04**: Error display uses error_code and error_description from proxy status
+- [x] **UI-05**: data_freshness from proxy replaces custom staleness logic for stove provider
 
 ### Scheduler/Cron
 
@@ -86,11 +86,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CMD-03 | Phase 100 | Complete |
 | CMD-04 | Phase 100 | Complete |
 | CMD-05 | Phase 100 | Complete |
-| UI-01 | Phase 101 | Pending |
-| UI-02 | Phase 101 | Pending |
+| UI-01 | Phase 101 | Complete |
+| UI-02 | Phase 101 | Complete |
 | UI-03 | Phase 101 | Pending |
-| UI-04 | Phase 101 | Pending |
-| UI-05 | Phase 101 | Pending |
+| UI-04 | Phase 101 | Complete |
+| UI-05 | Phase 101 | Complete |
 | CRON-01 | Phase 102 | Pending |
 | CRON-02 | Phase 102 | Pending |
 | CRON-03 | Phase 102 | Pending |

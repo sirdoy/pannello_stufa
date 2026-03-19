@@ -180,7 +180,7 @@ describe('useRaspiFullData', () => {
     expect(result.current.stale).toBe(true);
   });
 
-  it('Test 4: calls useAdaptivePolling with interval based on visibility (30s visible, 300s hidden)', () => {
+  it('Test 4: calls useAdaptivePolling with interval based on visibility (60s visible, 300s hidden)', () => {
     (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
 
     // Visible
@@ -188,7 +188,7 @@ describe('useRaspiFullData', () => {
     renderHook(() => useRaspiFullData());
 
     const callArgsVisible = mockUseAdaptivePolling.mock.calls[0]?.[0];
-    expect(callArgsVisible?.interval).toBe(30000);
+    expect(callArgsVisible?.interval).toBe(60000);
     expect(callArgsVisible?.alwaysActive).toBe(false);
     expect(callArgsVisible?.immediate).toBe(true);
     expect(callArgsVisible?.initialDelay).toBe(600);

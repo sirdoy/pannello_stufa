@@ -160,10 +160,11 @@ Plans:
   3. Sandbox mode code (localhost WiNet simulation) is deleted with no remaining references
   4. Dead API routes (getRoomTemperature, getActualWaterTemperature, getWaterSetTemperature, settings, setSettings) are deleted with no remaining Next.js route handlers at those paths
   5. StoveTab in the debug panel shows proxy endpoint URLs (HA_API_URL-based paths) and documents the new response format (stove_state, 202 Accepted)
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 103-01: WiNet client + API key + sandbox deletion + dead route removal + debug panel update
+- [ ] 103-01-PLAN.md — WiNet client + sandbox + dead routes + dead service deletion + import cleanup
+- [ ] 103-02-PLAN.md — Debug panel StoveTab rewrite for proxy endpoints
 
 ## Progress
 
@@ -190,10 +191,10 @@ Plans:
 | 100. Control Endpoints | 2/2 | Complete    | 2026-03-19 | - |
 | 101. Frontend Hooks | 2/2 | Complete    | 2026-03-19 | - |
 | 102. Scheduler Update | 1/1 | Complete    | 2026-03-19 | - |
-| 103. Cleanup & Debug Panel | v13.0 | 0/TBD | Not started | - |
+| 103. Cleanup & Debug Panel | v13.0 | 0/2 | Not started | - |
 
 **Total:** 17 milestones shipped, 98 phases complete, 375 plans executed. v13.0 in progress (5 phases planned).
 
 ---
 
-*Roadmap updated: 2026-03-19 — Phase 102 planned: 1 plan in 1 wave*
+*Roadmap updated: 2026-03-19 — Phase 103 planned: 2 plans in 1 wave*

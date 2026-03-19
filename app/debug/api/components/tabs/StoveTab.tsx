@@ -3,9 +3,7 @@
 import { useState, useEffect } from 'react';
 import { EndpointCard, PostEndpointCard } from '../ApiTab';
 import Heading from '@/app/components/ui/Heading';
-import { API_KEY } from '@/lib/stoveApi';
-
-const BASE_URL = 'https://wsthermorossi.cloudwinet.it/WiNetStove.svc/json';
+import Badge from '@/app/components/ui/Badge';
 
 interface StoveTabProps {
   autoRefresh: boolean;
@@ -19,40 +17,16 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
   const [loadingPost, setLoadingPost] = useState<Record<string, boolean>>({});
   const [timings, setTimings] = useState<Record<string, number>>({});
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+  const [connectionStatus, setConnectionStatus] = useState<any>(null);
 
-  // External URL mapping
-  const getExternalUrl = (endpoint: string): string | undefined => {
-    const mapping: Record<string, string> = {
-      '/api/stove/status': `${BASE_URL}/GetStatus/${API_KEY}`,
-      '/api/stove/getPower': `${BASE_URL}/GetPower/${API_KEY}`,
-      '/api/stove/getFan': `${BASE_URL}/GetFanLevel/${API_KEY}`,
-      '/api/stove/getRoomTemperature': `${BASE_URL}/GetRoomControlTemperature/${API_KEY}`,
-      '/api/stove/settings': `${BASE_URL}/GetSettings/${API_KEY}`,
-      '/api/stove/getActualWaterTemperature': `${BASE_URL}/GetActualWaterTemperature/${API_KEY}`,
-      '/api/stove/getWaterSetTemperature': `${BASE_URL}/GetWaterSetTemperature/${API_KEY}`,
-      '/api/stove/ignite': `${BASE_URL}/Ignit/${API_KEY}`,
-      '/api/stove/shutdown': `${BASE_URL}/Shutdown/${API_KEY}`,
-      '/api/stove/setPower': `${BASE_URL}/SetPower/${API_KEY};[level]`,
-      '/api/stove/setFan': `${BASE_URL}/SetFanLevel/${API_KEY};[level]`,
-      '/api/stove/setWaterTemperature': `${BASE_URL}/SetWaterTemperature/${API_KEY};[temp]`,
-    };
-    return mapping[endpoint] || endpoint;
-  };
-
-  const copyUrlToClipboard = async (endpoint: string) => {
+  const copyUrlToClipboard = async (url: string) => {
     try {
-      await navigator.clipboard.writeText(getExternalUrl(endpoint) ?? '');
-      setCopiedUrl(endpoint);
+      await navigator.clipboard.writeText(url);
+      setCopiedUrl(url);
       setTimeout(() => setCopiedUrl(null), 2000);
     } catch (error) {
       console.error('Failed to copy URL:', error);
     }
-  };
-
-  const cleanApiResponse = (data: unknown) => {
-    if (!data || typeof data !== 'object') return data;
-    const { isSandbox, ...cleanData } = data as any;
-    return cleanData;
   };
 
   const fetchGetEndpoint = async (name: string, url: string) => {
@@ -63,7 +37,12 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
       const data = await res.json();
       const timing = Date.now() - startTime;
       setTimings((prev) => ({ ...prev, [name]: timing }));
-      setGetResponses((prev) => ({ ...prev, [name]: cleanApiResponse(data) }));
+      setGetResponses((prev) => ({ ...prev, [name]: data }));
+
+      // Check connection status from health response
+      if (name === 'health' && data.status) {
+        setConnectionStatus(data.status === 'ok' ? 'connected' : 'disconnected');
+      }
     } catch (error) {
       setGetResponses((prev) => ({ ...prev, [name]: { error: error instanceof Error ? error.message : String(error) } }));
     } finally {
@@ -72,13 +51,11 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
   };
 
   const fetchAllGetEndpoints = () => {
+    fetchGetEndpoint('health', '/api/stove/health');
     fetchGetEndpoint('status', '/api/stove/status');
     fetchGetEndpoint('power', '/api/stove/getPower');
     fetchGetEndpoint('fan', '/api/stove/getFan');
-    fetchGetEndpoint('roomTemp', '/api/stove/getRoomTemperature');
-    fetchGetEndpoint('settings', '/api/stove/settings');
-    fetchGetEndpoint('actualWaterTemp', '/api/stove/getActualWaterTemperature');
-    fetchGetEndpoint('waterSetTemp', '/api/stove/getWaterSetTemperature');
+    fetchGetEndpoint('history', '/api/stove/history');
   };
 
   const callPostEndpoint = async (name: string, url: string, body: any) => {
@@ -93,7 +70,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
       const data = await res.json();
       const timing = Date.now() - startTime;
       setTimings((prev) => ({ ...prev, [name]: timing }));
-      setPostResponses((prev) => ({ ...prev, [name]: cleanApiResponse(data) }));
+      setPostResponses((prev) => ({ ...prev, [name]: data }));
 
       // Refresh GET endpoints after successful POST
       if (res.ok) {
@@ -128,6 +105,18 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
 
   return (
     <div className="space-y-6">
+      {/* Connection Status */}
+      {connectionStatus && (
+        <div className="flex items-center gap-3">
+          <Heading level={3} size="md">
+            Connection Status:
+          </Heading>
+          <Badge variant={connectionStatus === 'connected' ? 'sage' : 'danger'}>
+            {connectionStatus === 'connected' ? '✓ Connected' : '✗ Disconnected'}
+          </Badge>
+        </div>
+      )}
+
       {/* GET Endpoints */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
@@ -135,9 +124,19 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
         </Heading>
         <div className="space-y-3">
           <EndpointCard
+            name="Proxy Health"
+            url="/api/stove/health"
+            response={getResponses.health}
+            loading={loadingGet.health ?? false}
+            timing={timings.health}
+            onRefresh={() => fetchGetEndpoint('health', '/api/stove/health')}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/health')}
+            isCopied={copiedUrl === '/api/stove/health'}
+          />
+
+          <EndpointCard
             name="Status"
             url="/api/stove/status"
-            externalUrl={getExternalUrl('/api/stove/status')}
             response={getResponses.status}
             loading={loadingGet.status ?? false}
             timing={timings.status}
@@ -149,7 +148,6 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
           <EndpointCard
             name="Power Level"
             url="/api/stove/getPower"
-            externalUrl={getExternalUrl('/api/stove/getPower')}
             response={getResponses.power}
             loading={loadingGet.power ?? false}
             timing={timings.power}
@@ -161,7 +159,6 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
           <EndpointCard
             name="Fan Level"
             url="/api/stove/getFan"
-            externalUrl={getExternalUrl('/api/stove/getFan')}
             response={getResponses.fan}
             loading={loadingGet.fan ?? false}
             timing={timings.fan}
@@ -171,51 +168,14 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
           />
 
           <EndpointCard
-            name="Room Temperature Setpoint"
-            url="/api/stove/getRoomTemperature"
-            externalUrl={getExternalUrl('/api/stove/getRoomTemperature')}
-            response={getResponses.roomTemp}
-            loading={loadingGet.roomTemp ?? false}
-            timing={timings.roomTemp}
-            onRefresh={() => fetchGetEndpoint('roomTemp', '/api/stove/getRoomTemperature')}
-            onCopyUrl={() => copyUrlToClipboard('/api/stove/getRoomTemperature')}
-            isCopied={copiedUrl === '/api/stove/getRoomTemperature'}
-          />
-
-          <EndpointCard
-            name="Settings (Fan/Power Defaults)"
-            url="/api/stove/settings"
-            externalUrl={getExternalUrl('/api/stove/settings')}
-            response={getResponses.settings}
-            loading={loadingGet.settings ?? false}
-            timing={timings.settings}
-            onRefresh={() => fetchGetEndpoint('settings', '/api/stove/settings')}
-            onCopyUrl={() => copyUrlToClipboard('/api/stove/settings')}
-            isCopied={copiedUrl === '/api/stove/settings'}
-          />
-
-          <EndpointCard
-            name="Actual Water Temperature (Boiler)"
-            url="/api/stove/getActualWaterTemperature"
-            externalUrl={getExternalUrl('/api/stove/getActualWaterTemperature')}
-            response={getResponses.actualWaterTemp}
-            loading={loadingGet.actualWaterTemp ?? false}
-            timing={timings.actualWaterTemp}
-            onRefresh={() => fetchGetEndpoint('actualWaterTemp', '/api/stove/getActualWaterTemperature')}
-            onCopyUrl={() => copyUrlToClipboard('/api/stove/getActualWaterTemperature')}
-            isCopied={copiedUrl === '/api/stove/getActualWaterTemperature'}
-          />
-
-          <EndpointCard
-            name="Water Temperature Setpoint (Boiler)"
-            url="/api/stove/getWaterSetTemperature"
-            externalUrl={getExternalUrl('/api/stove/getWaterSetTemperature')}
-            response={getResponses.waterSetTemp}
-            loading={loadingGet.waterSetTemp ?? false}
-            timing={timings.waterSetTemp}
-            onRefresh={() => fetchGetEndpoint('waterSetTemp', '/api/stove/getWaterSetTemperature')}
-            onCopyUrl={() => copyUrlToClipboard('/api/stove/getWaterSetTemperature')}
-            isCopied={copiedUrl === '/api/stove/getWaterSetTemperature'}
+            name="History"
+            url="/api/stove/history"
+            response={getResponses.history}
+            loading={loadingGet.history ?? false}
+            timing={timings.history}
+            onRefresh={() => fetchGetEndpoint('history', '/api/stove/history')}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/history')}
+            isCopied={copiedUrl === '/api/stove/history'}
           />
         </div>
       </div>
@@ -228,74 +188,66 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
         <div className="space-y-3">
           <PostEndpointCard
             name="Ignite Stove"
-            url="/api/stove/ignite"
-            externalUrl={getExternalUrl('/api/stove/ignite')}
-            params={[
-              { name: 'power', label: 'Power Level (1-5)', type: 'number', min: 1, max: 5, defaultValue: '3' },
-            ]}
+            url="/api/stove/commands/ignit"
             response={postResponses.ignite}
             loading={loadingPost.ignite ?? false}
             timing={timings.ignite}
-            onExecute={(values) => callPostEndpoint('ignite', '/api/stove/ignite', { source: 'manual', power: values.power })}
-            onCopyUrl={() => copyUrlToClipboard('/api/stove/ignite')}
-            isCopied={copiedUrl === '/api/stove/ignite'}
+            onExecute={() => callPostEndpoint('ignite', '/api/stove/commands/ignit', {})}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/commands/ignit')}
+            isCopied={copiedUrl === '/api/stove/commands/ignit'}
           />
 
           <PostEndpointCard
             name="Shutdown Stove"
-            url="/api/stove/shutdown"
-            externalUrl={getExternalUrl('/api/stove/shutdown')}
+            url="/api/stove/commands/shutdown"
             response={postResponses.shutdown}
             loading={loadingPost.shutdown ?? false}
             timing={timings.shutdown}
-            onExecute={() => callPostEndpoint('shutdown', '/api/stove/shutdown', { source: 'manual' })}
-            onCopyUrl={() => copyUrlToClipboard('/api/stove/shutdown')}
-            isCopied={copiedUrl === '/api/stove/shutdown'}
+            onExecute={() => callPostEndpoint('shutdown', '/api/stove/commands/shutdown', {})}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/commands/shutdown')}
+            isCopied={copiedUrl === '/api/stove/commands/shutdown'}
           />
 
           <PostEndpointCard
             name="Set Power Level"
-            url="/api/stove/setPower"
-            externalUrl={getExternalUrl('/api/stove/setPower')}
+            url="/api/stove/settings/power"
             params={[
-              { name: 'level', label: 'Level (1-5)', type: 'number', min: 1, max: 5, defaultValue: '3' },
+              { name: 'value', label: 'Power Level (1-5)', type: 'number', min: 1, max: 5, defaultValue: '3' },
             ]}
             response={postResponses.setPower}
             loading={loadingPost.setPower ?? false}
             timing={timings.setPower}
-            onExecute={(values) => callPostEndpoint('setPower', '/api/stove/setPower', { level: values.level, source: 'manual' })}
-            onCopyUrl={() => copyUrlToClipboard('/api/stove/setPower')}
-            isCopied={copiedUrl === '/api/stove/setPower'}
+            onExecute={(values) => callPostEndpoint('setPower', '/api/stove/settings/power', { value: Number(values.value) })}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/settings/power')}
+            isCopied={copiedUrl === '/api/stove/settings/power'}
           />
 
           <PostEndpointCard
             name="Set Fan Level"
-            url="/api/stove/setFan"
-            externalUrl={getExternalUrl('/api/stove/setFan')}
+            url="/api/stove/settings/fan-level"
             params={[
-              { name: 'level', label: 'Level (1-6)', type: 'number', min: 1, max: 6, defaultValue: '3' },
+              { name: 'value', label: 'Fan Level (1-6)', type: 'number', min: 1, max: 6, defaultValue: '3' },
             ]}
             response={postResponses.setFan}
             loading={loadingPost.setFan ?? false}
             timing={timings.setFan}
-            onExecute={(values) => callPostEndpoint('setFan', '/api/stove/setFan', { level: values.level, source: 'manual' })}
-            onCopyUrl={() => copyUrlToClipboard('/api/stove/setFan')}
-            isCopied={copiedUrl === '/api/stove/setFan'}
+            onExecute={(values) => callPostEndpoint('setFan', '/api/stove/settings/fan-level', { value: Number(values.value) })}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/settings/fan-level')}
+            isCopied={copiedUrl === '/api/stove/settings/fan-level'}
           />
 
           <PostEndpointCard
-            name="Set Water Temperature (Boiler)"
-            url="/api/stove/setWaterTemperature"
-            externalUrl={getExternalUrl('/api/stove/setWaterTemperature')}
+            name="Set Water Temperature"
+            url="/api/stove/settings/temperature/water"
             params={[
-              { name: 'temperature', label: 'Temperature (30-80°C)', type: 'number', min: 30, max: 80, defaultValue: '50' },
+              { name: 'value', label: 'Temperature (40-80C)', type: 'number', min: 40, max: 80, defaultValue: '50' },
             ]}
             response={postResponses.setWaterTemp}
             loading={loadingPost.setWaterTemp ?? false}
             timing={timings.setWaterTemp}
-            onExecute={(values) => callPostEndpoint('setWaterTemp', '/api/stove/setWaterTemperature', { temperature: values.temperature })}
-            onCopyUrl={() => copyUrlToClipboard('/api/stove/setWaterTemperature')}
-            isCopied={copiedUrl === '/api/stove/setWaterTemperature'}
+            onExecute={(values) => callPostEndpoint('setWaterTemp', '/api/stove/settings/temperature/water', { value: Number(values.value) })}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/settings/temperature/water')}
+            isCopied={copiedUrl === '/api/stove/settings/temperature/water'}
           />
         </div>
       </div>

@@ -2,16 +2,14 @@
 gsd_state_version: 1.0
 milestone: v13.0
 milestone_name: Thermorossi Proxy Migration
-status: completed
-stopped_at: Phase 100 context gathered
-last_updated: "2026-03-19T13:49:11.817Z"
-last_activity: "2026-03-19 - Completed quick task 260319-kd7: Fix Vercel env vars for HA proxy connection"
+status: unknown
+stopped_at: Completed 100-01-PLAN.md
+last_updated: "2026-03-19T14:07:21.477Z"
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
-  percent: 5
+  total_plans: 4
+  completed_plans: 3
 ---
 
 # Project State
@@ -21,16 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v13.0 Thermorossi Proxy Migration — Phase 99: Proxy Client Foundation
+**Current focus:** Phase 100 — control-endpoints
 
 ## Current Position
 
-Phase: 99 of 103 (Proxy Client Foundation)
-Plan: 1 of 1 in current phase
-Status: Phase 99 complete
-Last activity: 2026-03-19 - Completed quick task 260319-kd7: Fix Vercel env vars for HA proxy connection
-
-Progress: [█░░░░░░░░░] 5%
+Phase: 100 (control-endpoints) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -49,6 +43,7 @@ Progress: [█░░░░░░░░░] 5%
 | v11.1 Test Suite & Tech Debt Cleanup | 92-95 | 9 | 1 day |
 | v12.0 Data Fetching & E2E | 96-98 | 4 | 2 days |
 | Phase 99 P02 | 87 | 2 tasks | 4 files |
+| Phase 100-control-endpoints P01 | 5 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -68,6 +63,7 @@ Phase 99 Plan 01 decisions:
 - No haPost in thermorossiProxy.ts — command wrappers deferred to Phase 100
 - getHistory accepts optional URLSearchParams, appends as query string (same pattern as getProxyRoomMeasure)
 - [Phase 99]: Migrated three stove read routes from stoveApi to thermorossiProxy; created new /api/stove/health route
+- [Phase 100-01]: Command wrappers use haPost<ThermorossiCommandResponse> matching existing haGet pattern — empty body commands pass empty object literal
 
 ### Pending Todos
 
@@ -87,6 +83,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T13:49:11.809Z
-Stopped at: Phase 100 context gathered
-Resume file: .planning/phases/100-control-endpoints/100-CONTEXT.md
+Last session: 2026-03-19T14:07:21.472Z
+Stopped at: Completed 100-01-PLAN.md
+Resume file: None

@@ -115,7 +115,7 @@ Plans:
   2. POST /stove/settings/power, /stove/settings/fan-level, and /stove/settings/temperature/water routes accept a `{ value: N }` body and return 202 Accepted
   3. GET /stove/history route returns paginated telemetry with auto-granularity (raw/hourly/daily) proxied from the HA endpoint
   4. The convenience wrapper `getHistory` exists in `lib/thermorossiProxy.ts` and accepts pagination params
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 100-01-PLAN.md — Command wrappers in thermorossiProxy.ts + unit tests
@@ -187,7 +187,7 @@ Plans:
 | 92-95 | v11.1 | 9/9 | ✓ Complete | 2026-03-18 |
 | 96-98 | v12.0 | 4/4 | ✓ Complete | 2026-03-19 |
 | 99. Proxy Client Foundation | 2/2 | Complete    | 2026-03-19 | - |
-| 100. Control Endpoints | v13.0 | 0/2 | Not started | - |
+| 100. Control Endpoints | 1/2 | In Progress|  | - |
 | 101. Frontend Hooks | v13.0 | 0/TBD | Not started | - |
 | 102. Scheduler Update | v13.0 | 0/TBD | Not started | - |
 | 103. Cleanup & Debug Panel | v13.0 | 0/TBD | Not started | - |

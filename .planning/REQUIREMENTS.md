@@ -23,11 +23,11 @@ Requirements for Thermorossi Proxy Migration. Each maps to roadmap phases.
 
 ### Control Endpoints
 
-- [ ] **CMD-01**: POST /commands/ignit via proxy — handles 202 Accepted with suggested_poll_delay_s
-- [ ] **CMD-02**: POST /commands/shutdown via proxy — handles 202 Accepted with suggested_poll_delay_s
-- [ ] **CMD-03**: POST /settings/power via proxy — sends { value: N }, handles 202 Accepted
-- [ ] **CMD-04**: POST /settings/fan-level via proxy — sends { value: N }, handles 202 Accepted
-- [ ] **CMD-05**: POST /settings/temperature/water via proxy — sends { value: N }, range 40-80°C
+- [x] **CMD-01**: POST /commands/ignit via proxy — handles 202 Accepted with suggested_poll_delay_s
+- [x] **CMD-02**: POST /commands/shutdown via proxy — handles 202 Accepted with suggested_poll_delay_s
+- [x] **CMD-03**: POST /settings/power via proxy — sends { value: N }, handles 202 Accepted
+- [x] **CMD-04**: POST /settings/fan-level via proxy — sends { value: N }, handles 202 Accepted
+- [x] **CMD-05**: POST /settings/temperature/water via proxy — sends { value: N }, range 40-80°C
 
 ### Frontend
 
@@ -81,11 +81,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | READ-03 | Phase 99 | Complete |
 | READ-04 | Phase 99 | Complete |
 | READ-05 | Phase 100 | Pending |
-| CMD-01 | Phase 100 | Pending |
-| CMD-02 | Phase 100 | Pending |
-| CMD-03 | Phase 100 | Pending |
-| CMD-04 | Phase 100 | Pending |
-| CMD-05 | Phase 100 | Pending |
+| CMD-01 | Phase 100 | Complete |
+| CMD-02 | Phase 100 | Complete |
+| CMD-03 | Phase 100 | Complete |
+| CMD-04 | Phase 100 | Complete |
+| CMD-05 | Phase 100 | Complete |
 | UI-01 | Phase 101 | Pending |
 | UI-02 | Phase 101 | Pending |
 | UI-03 | Phase 101 | Pending |

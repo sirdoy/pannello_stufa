@@ -39,9 +39,9 @@ Requirements for Thermorossi Proxy Migration. Each maps to roadmap phases.
 
 ### Scheduler/Cron
 
-- [ ] **CRON-01**: Scheduler reads stove_state instead of StatusDescription for state decisions
-- [ ] **CRON-02**: Health monitoring reads error_code/error_description for alarm notifications
-- [ ] **CRON-03**: All scheduler stove API calls route through proxy client
+- [x] **CRON-01**: Scheduler reads stove_state instead of StatusDescription for state decisions
+- [x] **CRON-02**: Health monitoring reads error_code/error_description for alarm notifications
+- [x] **CRON-03**: All scheduler stove API calls route through proxy client
 
 ### Cleanup
 
@@ -91,9 +91,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-03 | Phase 101 | Complete |
 | UI-04 | Phase 101 | Complete |
 | UI-05 | Phase 101 | Complete |
-| CRON-01 | Phase 102 | Pending |
-| CRON-02 | Phase 102 | Pending |
-| CRON-03 | Phase 102 | Pending |
+| CRON-01 | Phase 102 | Complete |
+| CRON-02 | Phase 102 | Complete |
+| CRON-03 | Phase 102 | Complete |
 | CLEAN-01 | Phase 103 | Pending |
 | CLEAN-02 | Phase 103 | Pending |
 | CLEAN-03 | Phase 103 | Pending |

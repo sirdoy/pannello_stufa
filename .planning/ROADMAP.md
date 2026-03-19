@@ -85,7 +85,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 99: Proxy Client Foundation** - TypeScript types, thermorossi proxy client, and all read endpoints migrated (completed 2026-03-19)
 - [x] **Phase 100: Control Endpoints** - All command and settings endpoints migrated with 202 Accepted pattern, plus history endpoint (completed 2026-03-19)
 - [x] **Phase 101: Frontend Hooks** - useStoveData and useStoveCommands updated for proxy response format (completed 2026-03-19)
-- [ ] **Phase 102: Scheduler Update** - Cron/scheduler updated for stove_state strings and proxy client
+- [x] **Phase 102: Scheduler Update** - Cron/scheduler updated for stove_state strings and proxy client (completed 2026-03-19)
 - [ ] **Phase 103: Cleanup & Debug Panel** - WiNet infrastructure deleted, debug panel updated for proxy endpoints
 
 ## Phase Details
@@ -145,7 +145,7 @@ Plans:
   1. The scheduler route reads `stove_state` (exact string) for all state-based decisions — no reference to `StatusDescription` or WiNet status strings remains
   2. Alarm notifications in the health monitoring path use `error_code` and `error_description` from the proxy status response
   3. All stove API calls in the scheduler route go through `lib/thermorossiProxy.ts` — no direct WiNet URLs or old `lib/stoveApi.ts` imports remain
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 102-01-PLAN.md — Scheduler proxy migration + alarm notifications + test suite update
@@ -189,7 +189,7 @@ Plans:
 | 99. Proxy Client Foundation | 2/2 | Complete    | 2026-03-19 | - |
 | 100. Control Endpoints | 2/2 | Complete    | 2026-03-19 | - |
 | 101. Frontend Hooks | 2/2 | Complete    | 2026-03-19 | - |
-| 102. Scheduler Update | v13.0 | 0/1 | Not started | - |
+| 102. Scheduler Update | 1/1 | Complete   | 2026-03-19 | - |
 | 103. Cleanup & Debug Panel | v13.0 | 0/TBD | Not started | - |
 
 **Total:** 17 milestones shipped, 98 phases complete, 375 plans executed. v13.0 in progress (5 phases planned).

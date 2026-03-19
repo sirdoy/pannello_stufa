@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v13.0
 milestone_name: Thermorossi Proxy Migration
 status: unknown
-stopped_at: "Phase 102 planned: 1 plan in 1 wave"
-last_updated: "2026-03-19T17:34:46.105Z"
+stopped_at: Completed 102-01-PLAN.md
+last_updated: "2026-03-19T17:52:31.874Z"
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 7
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 101 — frontend-hooks
+**Current focus:** Phase 102 — scheduler-update
 
 ## Current Position
 
-Phase: 101 (frontend-hooks) — EXECUTING
-Plan: 1 of 2
+Phase: 102 (scheduler-update) — EXECUTING
+Plan: 1 of 1
 
 ## Performance Metrics
 
@@ -47,6 +47,7 @@ Plan: 1 of 2
 | Phase 100 P02 | 5 | 2 tasks | 6 files |
 | Phase 101 P01 | 400 | 2 tasks | 4 files |
 | Phase 101-frontend-hooks P02 | 595 | 2 tasks | 3 files |
+| Phase 102 P01 | 14 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,9 @@ Phase 99 Plan 01 decisions:
 - [Phase 101-02]: suggested_poll_delay_s drives fetchStatusAndUpdate delay (15s ignite/shutdown, 5s fan/power)
 - [Phase 101-02]: 409 Conflict throws 'Command not allowed in current state' for proxy state-gate errors
 - [Phase 101-02]: StoveCard uses status === 'working' exact equality for StoveAdjustments visibility
+- [Phase 102]: Alarm notification reuses triggerStoveUnexpectedOffServer — alarm state detected via stove_state === 'alarm' in fetchStoveData with 1-hour cooldown
+- [Phase 102]: handleIgnition calls sendIgnit() + setPower() separately per proxy convention instead of bundled igniteStove(power)
+- [Phase 102]: fetchStoveData uses single getStatus() replacing 3-way Promise.all — proxy response includes fan_level and power_level
 
 ### Pending Todos
 
@@ -94,6 +98,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T17:34:46.097Z
-Stopped at: Phase 102 planned: 1 plan in 1 wave
-Resume file: .planning/phases/102-scheduler-update/102-01-PLAN.md
+Last session: 2026-03-19T17:52:31.870Z
+Stopped at: Completed 102-01-PLAN.md
+Resume file: None

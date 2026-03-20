@@ -9,9 +9,9 @@ Requirements for Hue Proxy Migration. Each maps to roadmap phases.
 
 ### Proxy Client
 
-- [ ] **CLIENT-01**: Hue proxy client uses shared haGet/haPost transport (X-API-Key auth)
-- [ ] **CLIENT-02**: TypeScript types for all proxy response interfaces (HueLight, HueGroup, HueScene, HueBridgeHealth, HueHistoryItem)
-- [ ] **CLIENT-03**: Convenience wrappers for each endpoint (getLights, getGroups, getScenes, getHealth, getHistory)
+- [x] **CLIENT-01**: Hue proxy client uses shared haGet/haPost transport (X-API-Key auth)
+- [x] **CLIENT-02**: TypeScript types for all proxy response interfaces (HueLight, HueGroup, HueScene, HueBridgeHealth, HueHistoryItem)
+- [x] **CLIENT-03**: Convenience wrappers for each endpoint (getLights, getGroups, getScenes, getHealth, getHistory)
 
 ### Read Endpoints
 
@@ -73,9 +73,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CLIENT-01 | Phase 106 | Pending |
-| CLIENT-02 | Phase 106 | Pending |
-| CLIENT-03 | Phase 106 | Pending |
+| CLIENT-01 | Phase 106 | Complete |
+| CLIENT-02 | Phase 106 | Complete |
+| CLIENT-03 | Phase 106 | Complete |
 | READ-01 | Phase 106 | Pending |
 | READ-02 | Phase 106 | Pending |
 | READ-03 | Phase 106 | Pending |

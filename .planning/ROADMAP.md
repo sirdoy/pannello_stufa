@@ -223,7 +223,7 @@ Plans:
 | 102. Scheduler Update | 1/1 | Complete    | 2026-03-19 | - |
 | 103. Cleanup & Debug Panel | 2/2 | Complete    | 2026-03-19 | - |
 | 104. Fix Command Body Key Mismatch | 1/1 | Complete    | 2026-03-20 | - |
-| 105. Fix Debug Panel URLs & Stale Routes | 1/1 | Complete   | 2026-03-20 | - |
+| 105. Fix Debug Panel URLs & Stale Routes | 1/1 | Complete    | 2026-03-20 | - |
 
 **Total:** 17 milestones shipped, 98 phases complete, 375 plans executed. v13.0 in progress (5 phases complete, 2 gap closure phases planned).
 

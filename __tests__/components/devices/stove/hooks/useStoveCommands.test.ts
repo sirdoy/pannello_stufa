@@ -284,7 +284,7 @@ describe('useStoveCommands', () => {
       expect.stringContaining('/api/stove/setFan'),
       expect.objectContaining({
         method: 'POST',
-        body: JSON.stringify({ level: 4, source: 'manual' }),
+        body: JSON.stringify({ value: 4, source: 'manual' }),
       })
     );
   });
@@ -355,7 +355,7 @@ describe('useStoveCommands', () => {
       expect.stringContaining('/api/stove/setPower'),
       expect.objectContaining({
         method: 'POST',
-        body: JSON.stringify({ level: 3, source: 'manual' }),
+        body: JSON.stringify({ value: 3, source: 'manual' }),
       })
     );
   });

@@ -149,7 +149,7 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
     try {
       const response = await setFanCmd.execute(STOVE_ROUTES.setFan, {
         method: 'POST',
-        body: JSON.stringify({ level, source: 'manual' }),
+        body: JSON.stringify({ value: level, source: 'manual' }),
       });
       if (response) {
         if (!response.ok) {
@@ -175,7 +175,7 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
     try {
       const response = await setPowerCmd.execute(STOVE_ROUTES.setPower, {
         method: 'POST',
-        body: JSON.stringify({ level, source: 'manual' }),
+        body: JSON.stringify({ value: level, source: 'manual' }),
       });
       if (response) {
         if (!response.ok) {

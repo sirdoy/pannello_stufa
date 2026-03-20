@@ -188,66 +188,66 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
         <div className="space-y-3">
           <PostEndpointCard
             name="Ignite Stove"
-            url="/api/stove/commands/ignit"
+            url="/api/stove/ignite"
             response={postResponses.ignite}
             loading={loadingPost.ignite ?? false}
             timing={timings.ignite}
-            onExecute={() => callPostEndpoint('ignite', '/api/stove/commands/ignit', {})}
-            onCopyUrl={() => copyUrlToClipboard('/api/stove/commands/ignit')}
-            isCopied={copiedUrl === '/api/stove/commands/ignit'}
+            onExecute={() => callPostEndpoint('ignite', '/api/stove/ignite', {})}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/ignite')}
+            isCopied={copiedUrl === '/api/stove/ignite'}
           />
 
           <PostEndpointCard
             name="Shutdown Stove"
-            url="/api/stove/commands/shutdown"
+            url="/api/stove/shutdown"
             response={postResponses.shutdown}
             loading={loadingPost.shutdown ?? false}
             timing={timings.shutdown}
-            onExecute={() => callPostEndpoint('shutdown', '/api/stove/commands/shutdown', {})}
-            onCopyUrl={() => copyUrlToClipboard('/api/stove/commands/shutdown')}
-            isCopied={copiedUrl === '/api/stove/commands/shutdown'}
+            onExecute={() => callPostEndpoint('shutdown', '/api/stove/shutdown', {})}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/shutdown')}
+            isCopied={copiedUrl === '/api/stove/shutdown'}
           />
 
           <PostEndpointCard
             name="Set Power Level"
-            url="/api/stove/settings/power"
+            url="/api/stove/setPower"
             params={[
               { name: 'value', label: 'Power Level (1-5)', type: 'number', min: 1, max: 5, defaultValue: '3' },
             ]}
             response={postResponses.setPower}
             loading={loadingPost.setPower ?? false}
             timing={timings.setPower}
-            onExecute={(values) => callPostEndpoint('setPower', '/api/stove/settings/power', { value: Number(values.value) })}
-            onCopyUrl={() => copyUrlToClipboard('/api/stove/settings/power')}
-            isCopied={copiedUrl === '/api/stove/settings/power'}
+            onExecute={(values) => callPostEndpoint('setPower', '/api/stove/setPower', { value: Number(values.value) })}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/setPower')}
+            isCopied={copiedUrl === '/api/stove/setPower'}
           />
 
           <PostEndpointCard
             name="Set Fan Level"
-            url="/api/stove/settings/fan-level"
+            url="/api/stove/setFan"
             params={[
               { name: 'value', label: 'Fan Level (1-6)', type: 'number', min: 1, max: 6, defaultValue: '3' },
             ]}
             response={postResponses.setFan}
             loading={loadingPost.setFan ?? false}
             timing={timings.setFan}
-            onExecute={(values) => callPostEndpoint('setFan', '/api/stove/settings/fan-level', { value: Number(values.value) })}
-            onCopyUrl={() => copyUrlToClipboard('/api/stove/settings/fan-level')}
-            isCopied={copiedUrl === '/api/stove/settings/fan-level'}
+            onExecute={(values) => callPostEndpoint('setFan', '/api/stove/setFan', { value: Number(values.value) })}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/setFan')}
+            isCopied={copiedUrl === '/api/stove/setFan'}
           />
 
           <PostEndpointCard
             name="Set Water Temperature"
-            url="/api/stove/settings/temperature/water"
+            url="/api/stove/setWaterTemperature"
             params={[
               { name: 'value', label: 'Temperature (40-80C)', type: 'number', min: 40, max: 80, defaultValue: '50' },
             ]}
             response={postResponses.setWaterTemp}
             loading={loadingPost.setWaterTemp ?? false}
             timing={timings.setWaterTemp}
-            onExecute={(values) => callPostEndpoint('setWaterTemp', '/api/stove/settings/temperature/water', { value: Number(values.value) })}
-            onCopyUrl={() => copyUrlToClipboard('/api/stove/settings/temperature/water')}
-            isCopied={copiedUrl === '/api/stove/settings/temperature/water'}
+            onExecute={(values) => callPostEndpoint('setWaterTemp', '/api/stove/setWaterTemperature', { value: Number(values.value) })}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/setWaterTemperature')}
+            isCopied={copiedUrl === '/api/stove/setWaterTemperature'}
           />
         </div>
       </div>

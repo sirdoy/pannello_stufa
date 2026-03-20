@@ -25,7 +25,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v13.0 (started 2026-03-19)
-**Status:** v13.0 COMPLETE — all 5 phases done. Thermorossi fully migrated to HA proxy, WiNet infrastructure deleted, debug panel updated
+**Status:** v13.0 gap closure in progress — Phase 104 complete (command body key mismatch fixed)
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -616,4 +616,4 @@ v13.0 Thermorossi Proxy Migration — requirements being defined
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-19 after Phase 103 complete — v13.0 milestone complete, all WiNet infrastructure deleted*
+*Last updated: 2026-03-20 after Phase 104 complete — command body key mismatch fixed (BROKEN-02 closed)*

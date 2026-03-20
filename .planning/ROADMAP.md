@@ -20,6 +20,7 @@
 - ✅ **v11.1 Test Suite & Tech Debt Cleanup** — Phases 92-95 (shipped 2026-03-18)
 - ✅ **v12.0 Data Fetching Simplification & E2E Verification** — Phases 96-98 (shipped 2026-03-19)
 - ✅ **v13.0 Thermorossi Proxy Migration** — Phases 99-105 (shipped 2026-03-20)
+- 🚧 **v14.0 Hue Proxy Migration** — Phases 106-109 (in progress)
 
 ## Phases
 
@@ -52,6 +53,90 @@ See `.planning/milestones/` for full archives.
 
 </details>
 
+### 🚧 v14.0 Hue Proxy Migration (In Progress)
+
+**Milestone Goal:** Migrate Philips Hue from direct Bridge API (CLIP v2 local + v1 remote/cloud) to shared HomeAssistant proxy — eliminating OAuth, bridge discovery/pairing, and dual connection strategy. Same pattern as Netatmo (v10.0) and Thermorossi (v13.0).
+
+#### Phase 106: Proxy Client + Types + Read Endpoints
+
+- [ ] **Phase 106: Proxy Client + Types + Read Endpoints** — Hue proxy client with shared transport, TypeScript types, and all read endpoints migrated
+
+#### Phase 107: Control Endpoints
+
+- [ ] **Phase 107: Control Endpoints** — Light state, group action, and scene activate endpoints with 202 Accepted pattern
+
+#### Phase 108: Frontend Hooks Rewrite
+
+- [ ] **Phase 108: Frontend Hooks Rewrite** — useLightsData and useLightsCommands rewritten for proxy response shapes
+
+#### Phase 109: Cleanup
+
+- [ ] **Phase 109: Cleanup** — Old Hue infrastructure deleted (CLIP v2, remote API, connection strategy, OAuth, bridge discovery/pairing, env vars)
+
+## Phase Details
+
+### Phase 106: Proxy Client + Types + Read Endpoints
+**Goal**: Hue lights are accessible via the shared HomeAssistant proxy — typed client established, all read data flowing through the new transport
+**Depends on**: Nothing (first phase of milestone)
+**Requirements**: CLIENT-01, CLIENT-02, CLIENT-03, READ-01, READ-02, READ-03, READ-04, READ-05, READ-06, READ-07
+**Success Criteria** (what must be TRUE):
+  1. `hueProxy.ts` function module exists and calls haGet/haPost with X-API-Key auth
+  2. TypeScript types exist for HueLight, HueGroup, HueScene, HueBridgeHealth, HueHistoryItem
+  3. getLights() returns lights with capability_tier, ct_kelvin, and room enrichment
+  4. getGroups() returns groups with member lights array; getScenes() supports group_id filter
+  5. getHealth() reports data_freshness (LIVE/STALE) and 503 when UNREACHABLE; getHistory() paginates with auto-granularity
+**Plans**: TBD
+
+Plans:
+- [ ] 106-01: Hue proxy client + types + read endpoint wrappers
+- [ ] 106-02: Next.js API routes for all read endpoints
+
+### Phase 107: Control Endpoints
+**Goal**: Users can control Hue lights and groups through the proxy — all commands accepted with 202 Accepted and delayed-refresh pattern
+**Depends on**: Phase 106
+**Requirements**: CMD-01, CMD-02, CMD-03, CMD-04
+**Success Criteria** (what must be TRUE):
+  1. PUT /lights/{id}/state via proxy returns 202 Accepted with suggested_poll_delay_s
+  2. PUT /groups/{id}/action via proxy returns 202 Accepted
+  3. POST /groups/{gid}/scenes/{sid} activates scene via proxy with 202 Accepted
+  4. 409 Conflict response from proxy is surfaced to caller (unreachable light detection)
+**Plans**: TBD
+
+Plans:
+- [ ] 107-01: Control endpoint wrappers + Next.js API routes (light state, group action, scene activate, 409 handling)
+
+### Phase 108: Frontend Hooks Rewrite
+**Goal**: LightsCard and scene UI read proxy response shapes — users interact with lights using the new data format with no visible behavior change
+**Depends on**: Phase 107
+**Requirements**: UI-01, UI-02, UI-03, UI-04, UI-05, UI-06
+**Success Criteria** (what must be TRUE):
+  1. useLightsData reads flat proxy format (capability_tier instead of nested CLIP v2 objects)
+  2. useLightsCommands sends v1 body format (on/bri/ct keys, not nested objects)
+  3. Brightness slider shows 0-100% in UI while converting to 0-254 at the proxy boundary
+  4. Scene activation calls POST /groups/{gid}/scenes/{sid} (new path pattern)
+  5. 202 Accepted triggers delayed refresh using suggested_poll_delay_s
+  6. data_freshness from proxy drives staleness indicator (replaces custom connection checks)
+**Plans**: TBD
+
+Plans:
+- [ ] 108-01: useLightsData + useLightsCommands rewrite for proxy shapes
+- [ ] 108-02: LightsCard UI wiring + integration verification
+
+### Phase 109: Cleanup
+**Goal**: All legacy Hue infrastructure is deleted — no direct Bridge API code, no OAuth, no bridge discovery, no Hue-specific env vars remain in the codebase
+**Depends on**: Phase 108
+**Requirements**: CLEAN-01, CLEAN-02, CLEAN-03, CLEAN-04, CLEAN-05, CLEAN-06, CLEAN-07
+**Success Criteria** (what must be TRUE):
+  1. hueApi.ts (CLIP v2 local client) is deleted from the codebase
+  2. hueRemoteApi.ts (v1 remote/cloud client) is deleted
+  3. hueConnectionStrategy.ts and bridge discovery/pairing routes are deleted
+  4. hueRemoteTokenHelper.ts (OAuth) and hueLocalHelper.ts (Firebase bridge credentials) are deleted
+  5. HUE_CLIENT_SECRET, NEXT_PUBLIC_HUE_CLIENT_ID, NEXT_PUBLIC_HUE_APP_ID env vars removed from .env.local and all references
+**Plans**: TBD
+
+Plans:
+- [ ] 109-01: Delete legacy Hue files + env vars + verify no broken imports
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -74,9 +159,13 @@ See `.planning/milestones/` for full archives.
 | 92-95 | v11.1 | 9/9 | ✓ Complete | 2026-03-18 |
 | 96-98 | v12.0 | 4/4 | ✓ Complete | 2026-03-19 |
 | 99-105 | v13.0 | 11/11 | ✓ Complete | 2026-03-20 |
+| 106 | v14.0 | 0/TBD | Not started | - |
+| 107 | v14.0 | 0/TBD | Not started | - |
+| 108 | v14.0 | 0/TBD | Not started | - |
+| 109 | v14.0 | 0/TBD | Not started | - |
 
-**Total:** 18 milestones shipped, 105 phases complete, 386 plans executed.
+**Total:** 18 milestones shipped, 105 phases complete, 386 plans executed. v14.0 in progress (4 phases planned).
 
 ---
 
-*Roadmap updated: 2026-03-20 — v13.0 Thermorossi Proxy Migration shipped*
+*Roadmap updated: 2026-03-20 — v14.0 Hue Proxy Migration roadmap created*

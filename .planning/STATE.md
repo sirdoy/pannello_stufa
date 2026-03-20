@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v13.0
-milestone_name: Thermorossi Proxy Migration
-status: shipped
-stopped_at: Milestone v13.0 complete
-last_updated: "2026-03-20T11:30:00.000Z"
+milestone: v14.0
+milestone_name: Hue Proxy Migration
+status: defining_requirements
+stopped_at: Defining requirements
+last_updated: "2026-03-20T14:00:00.000Z"
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 11
-  completed_plans: 11
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
@@ -19,11 +19,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-20)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Planning next milestone
+**Current focus:** v14.0 Hue Proxy Migration
 
 ## Current Position
 
-Milestone v13.0 shipped. No active milestone.
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-20 — Milestone v14.0 started
 
 ## Performance Metrics
 
@@ -55,16 +58,10 @@ None.
 
 ### Blockers/Concerns
 
-None — all v13.0 blockers resolved.
-
-### Quick Tasks Completed
-
-| # | Description | Date | Commit | Directory |
-|---|-------------|------|--------|-----------|
-| 260319-kd7 | Fix Vercel env vars for HA proxy connection | 2026-03-19 | — | [260319-kd7-su-vercel-non-sono-stati-caricati-i-dati](./quick/260319-kd7-su-vercel-non-sono-stati-caricati-i-dati/) |
+None.
 
 ## Session Continuity
 
-Last session: 2026-03-20T11:30:00.000Z
-Stopped at: Milestone v13.0 complete
+Last session: 2026-03-20T14:00:00.000Z
+Stopped at: Defining requirements for v14.0
 Resume file: None

@@ -485,7 +485,17 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-(No active milestone — run `/gsd:new-milestone` to start next)
+## Current Milestone: v14.0 Hue Proxy Migration
+
+**Goal:** Migrate Philips Hue from direct Bridge API (CLIP v2 local + v1 remote/cloud) to shared HomeAssistant proxy, eliminating OAuth, bridge discovery/pairing, and dual connection strategy — same pattern as Netatmo (v10.0) and Thermorossi (v13.0).
+
+**Target features:**
+- New Hue proxy client using shared haGet/haPost transport (X-API-Key auth)
+- All read endpoints migrated (health, lights, groups, scenes)
+- All control endpoints migrated (light state, group action, scene activate)
+- Frontend hooks rewritten for proxy response shapes (v1 flat format, capability_tier, 202 Accepted)
+- Bridge discovery, pairing, OAuth, remote API, and connection strategy infrastructure deleted
+- Scene CRUD deferred until proxy team implements planned endpoints
 
 ### Out of Scope
 
@@ -649,4 +659,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-20 after v13.0 milestone — Thermorossi proxy migration complete, all 4 providers unified*
+*Last updated: 2026-03-20 after v14.0 milestone start — Hue proxy migration*

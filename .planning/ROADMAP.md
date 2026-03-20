@@ -177,6 +177,10 @@ Plans:
   1. `useStoveCommands` sends the body key that `setPower` and `setFan` routes expect — no `undefined` value reaches the proxy
   2. Unit tests verify the correct body shape for fan and power commands
   3. The fan/power adjustment E2E flow is unbroken from UI → route → proxy
+**Plans:** 1 plan
+
+Plans:
+- [ ] 104-01-PLAN.md — Fix body key from level to value in useStoveCommands + update test assertions
 
 ### Phase 105: Fix Debug Panel URLs & Stale Routes
 **Goal**: Debug panel POST operations work and no stale route references remain
@@ -214,11 +218,11 @@ Plans:
 | 101. Frontend Hooks | 2/2 | Complete    | 2026-03-19 | - |
 | 102. Scheduler Update | 1/1 | Complete    | 2026-03-19 | - |
 | 103. Cleanup & Debug Panel | 2/2 | Complete    | 2026-03-19 | - |
-| 104. Fix Command Body Key Mismatch | 0/0 | Planned | - | - |
+| 104. Fix Command Body Key Mismatch | 0/1 | Planned | - | - |
 | 105. Fix Debug Panel URLs & Stale Routes | 0/0 | Planned | - | - |
 
 **Total:** 17 milestones shipped, 98 phases complete, 375 plans executed. v13.0 in progress (5 phases complete, 2 gap closure phases planned).
 
 ---
 
-*Roadmap updated: 2026-03-19 — Phase 103 planned: 2 plans in 1 wave*
+*Roadmap updated: 2026-03-20 — Phase 104 planned: 1 plan in 1 wave*

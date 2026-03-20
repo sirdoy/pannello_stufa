@@ -10,8 +10,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v13.0 (shipped 2026-03-20)
-**Status:** All milestones complete. All 4 device providers unified behind shared HomeAssistant proxy. Ready for next milestone planning.
+**Version:** v14.0 (in progress)
+**Status:** v14.0 Hue Proxy Migration in progress. Phase 106 complete — Hue proxy client, types, and all read endpoints migrated. Next: Phase 107 (Control Endpoints).
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -659,4 +659,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-20 after v14.0 milestone start — Hue proxy migration*
+*Last updated: 2026-03-20 after Phase 106 complete — Hue proxy client + types + read endpoints*

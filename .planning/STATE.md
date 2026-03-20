@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v14.0
 milestone_name: Hue Proxy Migration
 status: unknown
-stopped_at: Phase 107 context gathered
-last_updated: "2026-03-20T13:52:00.275Z"
+stopped_at: Completed 107-01-PLAN.md
+last_updated: "2026-03-20T14:09:39.140Z"
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  total_plans: 4
+  completed_plans: 3
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-20)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 106 — proxy-client-types-read-endpoints
+**Current focus:** Phase 107 — control-endpoints
 
 ## Current Position
 
-Phase: 106 (proxy-client-types-read-endpoints) — EXECUTING
-Plan: 2 of 2
+Phase: 107 (control-endpoints) — EXECUTING
+Plan: 1 of 2
 
 ## Performance Metrics
 
@@ -43,6 +43,7 @@ Plan: 2 of 2
 | v13.0 Thermorossi Proxy | 99-105 | 11 | 2 days |
 | Phase 106 P01 | 3 | 2 tasks | 3 files |
 | Phase 106 P02 | 15m | 2 tasks | 14 files |
+| Phase 107 P01 | 2m | 1 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -58,6 +59,8 @@ See PROJECT.md Key Decisions table for full history. Relevant to v14.0:
 - [Phase 106]: getScenes accepts optional groupId string (not URLSearchParams) — single query param, simpler API
 - [106-02]: GET handlers in lights/[id] and rooms/[id] migrated to withAuthAndErrorHandler; PUT handlers kept unchanged for Phase 107
 - [106-02]: rooms/route.ts no longer does Promise.all(rooms+zones); getGroups() returns both from proxy
+- [Phase 107]: haPut is direct copy of haPost with method PUT — no abstraction over method, consistent with codebase pattern
+- [Phase 107]: 409 CONFLICT inserted before catch-all EXTERNAL_API_ERROR throw in mapResponseError — preserves exact status for unreachable-light errors
 
 ### Pending Todos
 
@@ -70,6 +73,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-20T13:52:00.271Z
-Stopped at: Phase 107 context gathered
-Resume file: .planning/phases/107-control-endpoints/107-CONTEXT.md
+Last session: 2026-03-20T14:09:39.136Z
+Stopped at: Completed 107-01-PLAN.md
+Resume file: None

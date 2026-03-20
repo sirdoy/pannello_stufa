@@ -25,10 +25,10 @@ Requirements for Hue Proxy Migration. Each maps to roadmap phases.
 
 ### Control Endpoints
 
-- [ ] **CMD-01**: PUT /lights/{light_id}/state via proxy (202 Accepted, v1 body format)
-- [ ] **CMD-02**: PUT /groups/{group_id}/action via proxy (202 Accepted)
-- [ ] **CMD-03**: POST /groups/{group_id}/scenes/{scene_id} via proxy (202 Accepted)
-- [ ] **CMD-04**: Frontend handles 409 Conflict for unreachable lights
+- [x] **CMD-01**: PUT /lights/{light_id}/state via proxy (202 Accepted, v1 body format)
+- [x] **CMD-02**: PUT /groups/{group_id}/action via proxy (202 Accepted)
+- [x] **CMD-03**: POST /groups/{group_id}/scenes/{scene_id} via proxy (202 Accepted)
+- [x] **CMD-04**: Frontend handles 409 Conflict for unreachable lights
 
 ### Frontend
 
@@ -83,10 +83,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | READ-05 | Phase 106 | Complete |
 | READ-06 | Phase 106 | Complete |
 | READ-07 | Phase 106 | Complete |
-| CMD-01 | Phase 107 | Pending |
-| CMD-02 | Phase 107 | Pending |
-| CMD-03 | Phase 107 | Pending |
-| CMD-04 | Phase 107 | Pending |
+| CMD-01 | Phase 107 | Complete |
+| CMD-02 | Phase 107 | Complete |
+| CMD-03 | Phase 107 | Complete |
+| CMD-04 | Phase 107 | Complete |
 | UI-01 | Phase 108 | Pending |
 | UI-02 | Phase 108 | Pending |
 | UI-03 | Phase 108 | Pending |

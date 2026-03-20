@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v14.0
 milestone_name: Hue Proxy Migration
 status: unknown
-stopped_at: Completed 107-01-PLAN.md
-last_updated: "2026-03-20T14:09:39.140Z"
+stopped_at: Completed 107-02-PLAN.md
+last_updated: "2026-03-20T14:23:59.012Z"
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State
@@ -44,6 +44,7 @@ Plan: 1 of 2
 | Phase 106 P01 | 3 | 2 tasks | 3 files |
 | Phase 106 P02 | 15m | 2 tasks | 14 files |
 | Phase 107 P01 | 2m | 1 tasks | 4 files |
+| Phase 107 P02 | 11 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -61,6 +62,8 @@ See PROJECT.md Key Decisions table for full history. Relevant to v14.0:
 - [106-02]: rooms/route.ts no longer does Promise.all(rooms+zones); getGroups() returns both from proxy
 - [Phase 107]: haPut is direct copy of haPost with method PUT — no abstraction over method, consistent with codebase pattern
 - [Phase 107]: 409 CONFLICT inserted before catch-all EXTERNAL_API_ERROR throw in mapResponseError — preserves exact status for unreachable-light errors
+- [Phase 107]: PUT tests for [id] routes belong in [id]/__tests__/ not collection __tests__/ — different route files
+- [Phase 107]: JSDOM parseJson returns empty body for Request objects — use expect.any(Object) for body assertions in Hue PUT/POST tests
 
 ### Pending Todos
 
@@ -73,6 +76,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-20T14:09:39.136Z
-Stopped at: Completed 107-01-PLAN.md
+Last session: 2026-03-20T14:23:59.008Z
+Stopped at: Completed 107-02-PLAN.md
 Resume file: None

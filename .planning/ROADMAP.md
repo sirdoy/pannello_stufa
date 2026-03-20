@@ -63,7 +63,7 @@ See `.planning/milestones/` for full archives.
 
 #### Phase 107: Control Endpoints
 
-- [ ] **Phase 107: Control Endpoints** — Light state, group action, and scene activate endpoints with 202 Accepted pattern
+- [x] **Phase 107: Control Endpoints** — Light state, group action, and scene activate endpoints with 202 Accepted pattern (completed 2026-03-20)
 
 #### Phase 108: Frontend Hooks Rewrite
 
@@ -161,7 +161,7 @@ Plans:
 | 96-98 | v12.0 | 4/4 | ✓ Complete | 2026-03-19 |
 | 99-105 | v13.0 | 11/11 | ✓ Complete | 2026-03-20 |
 | 106 | v14.0 | 2/2 | ✓ Complete | 2026-03-20 |
-| 107 | 1/2 | In Progress|  | - |
+| 107 | 2/2 | Complete   | 2026-03-20 | - |
 | 108 | v14.0 | 0/TBD | Not started | - |
 | 109 | v14.0 | 0/TBD | Not started | - |
 

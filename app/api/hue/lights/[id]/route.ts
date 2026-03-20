@@ -1,30 +1,21 @@
 /**
  * Philips Hue Single Light Control Route
  * GET: Fetch single light state from HA proxy
- * PUT: Update light state (on/off, brightness, color) — legacy direct Bridge access
- *
- * PUT handler preserved for Phase 107 migration.
+ * PUT: Update light state (on/off, brightness, color) via HA proxy
  */
 
 import {
-  withHueHandler,
   withAuthAndErrorHandler,
   success,
   getPathParam,
   parseJson,
 } from '@/lib/core';
-import { getLight } from '@/lib/hue/hueProxy';
-import { HueConnectionStrategy } from '@/lib/hue/hueConnectionStrategy';
+import { getLight, setLightState } from '@/lib/hue/hueProxy';
 import { adminDbPush } from '@/lib/firebaseAdmin';
 import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
+import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
-
-interface LightStateBody {
-  on?: { on: boolean };
-  dimming?: { brightness: number };
-  [key: string]: unknown;
-}
 
 export const GET = withAuthAndErrorHandler(async (_request, context) => {
   const id = await getPathParam(context, 'id');
@@ -32,25 +23,26 @@ export const GET = withAuthAndErrorHandler(async (_request, context) => {
   return success(data as unknown as Record<string, unknown>);
 }, 'Hue/Light/Get');
 
-export const PUT = withHueHandler(async (request, context, session) => {
+export const PUT = withAuthAndErrorHandler(async (request, context) => {
   const id = await getPathParam(context, 'id');
-  const body = await parseJson(request) as LightStateBody;
-  const user = session.user;
+  const body = await parseJson(request) as Record<string, unknown>;
 
-  const provider = await HueConnectionStrategy.getProvider();
-  const response = await provider.setLightState(id, body) as any;
+  const proxyResponse = await setLightState(id, body);
 
-  // Log action
-  const actionDescription = body.on !== undefined
-    ? (body.on.on ? 'Luce accesa' : 'Luce spenta')
-    : body.dimming !== undefined
+  // Log action — v1 flat body format
+  const on = body.on as boolean | undefined;
+  const bri = body.bri as number | undefined;
+
+  const actionDescription = on !== undefined
+    ? (on ? 'Luce accesa' : 'Luce spenta')
+    : bri !== undefined
       ? 'Luminosita modificata'
       : 'Luce modificata';
 
-  const value = body.dimming?.brightness !== undefined
-    ? `${Math.round(body.dimming.brightness)}%`
-    : body.on?.on !== undefined
-      ? (body.on.on ? 'ON' : 'OFF')
+  const value = bri !== undefined
+    ? `${Math.round((bri / 254) * 100)}%`
+    : on !== undefined
+      ? (on ? 'ON' : 'OFF')
       : null;
 
   await adminDbPush('log', {
@@ -59,16 +51,8 @@ export const PUT = withHueHandler(async (request, context, session) => {
     value,
     lightId: id,
     timestamp: Date.now(),
-    user: user ? {
-      email: user.email,
-      name: user.name,
-      picture: user.picture,
-      sub: user.sub,
-    } : null,
     source: 'manual',
   });
 
-  return success({
-    data: response.data || [],
-  });
+  return NextResponse.json(proxyResponse, { status: 202 });
 }, 'Hue/Light/Update');

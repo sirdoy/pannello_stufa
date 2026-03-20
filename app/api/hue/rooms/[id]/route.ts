@@ -1,31 +1,21 @@
 /**
  * Philips Hue Room Control Route
  * GET: Fetch room group state from HA proxy
- * PUT: Update all lights in room (on/off, brightness, color) — legacy direct Bridge access
- *
- * PUT handler preserved for Phase 107 migration.
+ * PUT: Update all lights in room (on/off, brightness, color) via HA proxy
  */
 
 import {
-  withHueHandler,
   withAuthAndErrorHandler,
-  withIdempotency,
   success,
   getPathParam,
   parseJson,
 } from '@/lib/core';
-import { getGroup } from '@/lib/hue/hueProxy';
-import { HueConnectionStrategy } from '@/lib/hue/hueConnectionStrategy';
+import { getGroup, setGroupAction } from '@/lib/hue/hueProxy';
 import { adminDbPush } from '@/lib/firebaseAdmin';
 import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
+import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
-
-interface GroupedLightStateBody {
-  on?: { on: boolean };
-  dimming?: { brightness: number };
-  [key: string]: unknown;
-}
 
 export const GET = withAuthAndErrorHandler(async (_request, context) => {
   const id = await getPathParam(context, 'id');
@@ -33,46 +23,36 @@ export const GET = withAuthAndErrorHandler(async (_request, context) => {
   return success(data as unknown as Record<string, unknown>);
 }, 'Hue/Room/Get');
 
-export const PUT = withHueHandler(
-  withIdempotency(async (request, context, session) => {
-    const id = await getPathParam(context, 'id');
-    const body = await parseJson(request) as GroupedLightStateBody;
-    const user = session.user;
+export const PUT = withAuthAndErrorHandler(async (request, context) => {
+  const id = await getPathParam(context, 'id');
+  const body = await parseJson(request) as Record<string, unknown>;
 
-    const provider = await HueConnectionStrategy.getProvider();
-    const response = await provider.setGroupedLightState(id, body) as any;
+  const proxyResponse = await setGroupAction(id, body);
 
-    // Log action
-    const actionDescription = body.on !== undefined
-      ? (body.on.on ? 'Stanza accesa' : 'Stanza spenta')
-      : body.dimming !== undefined
-        ? 'Luminosita stanza modificata'
-        : 'Luci stanza modificate';
+  // Log action — v1 flat body format
+  const on = body.on as boolean | undefined;
+  const bri = body.bri as number | undefined;
 
-    const value = body.dimming?.brightness !== undefined
-      ? `${Math.round(body.dimming.brightness)}%`
-      : body.on?.on !== undefined
-        ? (body.on.on ? 'ON' : 'OFF')
-        : null;
+  const actionDescription = on !== undefined
+    ? (on ? 'Stanza accesa' : 'Stanza spenta')
+    : bri !== undefined
+      ? 'Luminosita stanza modificata'
+      : 'Luci stanza modificate';
 
-    await adminDbPush('log', {
-      action: actionDescription,
-      device: DEVICE_TYPES.LIGHTS,
-      value,
-      roomId: id,
-      timestamp: Date.now(),
-      user: user ? {
-        email: user.email,
-        name: user.name,
-        picture: user.picture,
-        sub: user.sub,
-      } : null,
-      source: 'manual',
-    });
+  const value = bri !== undefined
+    ? `${Math.round((bri / 254) * 100)}%`
+    : on !== undefined
+      ? (on ? 'ON' : 'OFF')
+      : null;
 
-    return success({
-      data: response.data || [],
-    });
-  }),
-  'Hue/Room/Update'
-);
+  await adminDbPush('log', {
+    action: actionDescription,
+    device: DEVICE_TYPES.LIGHTS,
+    value,
+    roomId: id,
+    timestamp: Date.now(),
+    source: 'manual',
+  });
+
+  return NextResponse.json(proxyResponse, { status: 202 });
+}, 'Hue/Room/Update');

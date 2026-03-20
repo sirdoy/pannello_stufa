@@ -49,11 +49,8 @@ export const STOVE_ROUTES = {
   shutdown: `${API_BASE}/stove/shutdown`,
   getFan: `${API_BASE}/stove/getFan`,
   getPower: `${API_BASE}/stove/getPower`,
-  getRoomTemperature: `${API_BASE}/stove/getRoomTemperature`,
   setFan: `${API_BASE}/stove/setFan`,
   setPower: `${API_BASE}/stove/setPower`,
-  getSettings: `${API_BASE}/stove/settings`,
-  setSettings: `${API_BASE}/stove/setSettings`,
 } as const;
 
 // Scheduler endpoints

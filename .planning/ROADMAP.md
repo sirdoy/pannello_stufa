@@ -103,8 +103,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 107-01-PLAN.md — haPut transport + 409 handling + command wrapper types + 3 proxy wrappers + unit tests
-- [ ] 107-02-PLAN.md — Route rewrites (lights PUT, rooms PUT) + new scene POST route + route tests
+- [x] 107-01-PLAN.md — haPut transport + 409 handling + command wrapper types + 3 proxy wrappers + unit tests
+- [x] 107-02-PLAN.md — Route rewrites (lights PUT, rooms PUT) + new scene POST route + route tests
 
 ### Phase 108: Frontend Hooks Rewrite
 **Goal**: LightsCard and scene UI read proxy response shapes — users interact with lights using the new data format with no visible behavior change
@@ -120,8 +120,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 108-01: useLightsData + useLightsCommands rewrite for proxy shapes
-- [ ] 108-02: LightsCard UI wiring + integration verification
+- [ ] 108-01-PLAN.md — Route array wrapping fix + useLightsData/useLightsCommands rewrite + colorUtils adaptation + hook tests
+- [ ] 108-02-PLAN.md — LightsCard orchestrator + LightsBanners + LightsScenes + LightsRoomControl wiring update + integration tests
 
 ### Phase 109: Cleanup
 **Goal**: All legacy Hue infrastructure is deleted — no direct Bridge API code, no OAuth, no bridge discovery, no Hue-specific env vars remain in the codebase
@@ -161,12 +161,12 @@ Plans:
 | 96-98 | v12.0 | 4/4 | ✓ Complete | 2026-03-19 |
 | 99-105 | v13.0 | 11/11 | ✓ Complete | 2026-03-20 |
 | 106 | v14.0 | 2/2 | ✓ Complete | 2026-03-20 |
-| 107 | 2/2 | Complete    | 2026-03-20 | - |
-| 108 | v14.0 | 0/TBD | Not started | - |
+| 107 | v14.0 | 2/2 | ✓ Complete | 2026-03-20 |
+| 108 | v14.0 | 0/2 | Not started | - |
 | 109 | v14.0 | 0/TBD | Not started | - |
 
-**Total:** 18 milestones shipped, 106 phases complete, 388 plans executed. v14.0 in progress (4 phases planned).
+**Total:** 18 milestones shipped, 107 phases complete, 390 plans executed. v14.0 in progress (4 phases planned).
 
 ---
 
-*Roadmap updated: 2026-03-20 — Phase 107 plans created (2 plans, 2 waves)*
+*Roadmap updated: 2026-03-20 — Phase 108 plans created (2 plans, 2 waves)*

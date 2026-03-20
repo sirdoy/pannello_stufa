@@ -1,18 +1,20 @@
 /**
  * Philips Hue Room Control Route
- * GET: Fetch room's grouped light state
- * PUT: Update all lights in room (on/off, brightness, color)
+ * GET: Fetch room group state from HA proxy
+ * PUT: Update all lights in room (on/off, brightness, color) — legacy direct Bridge access
  *
- * Uses Strategy Pattern (automatic local/remote fallback)
+ * PUT handler preserved for Phase 107 migration.
  */
 
 import {
   withHueHandler,
+  withAuthAndErrorHandler,
   withIdempotency,
   success,
   getPathParam,
   parseJson,
 } from '@/lib/core';
+import { getGroup } from '@/lib/hue/hueProxy';
 import { HueConnectionStrategy } from '@/lib/hue/hueConnectionStrategy';
 import { adminDbPush } from '@/lib/firebaseAdmin';
 import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
@@ -25,15 +27,10 @@ interface GroupedLightStateBody {
   [key: string]: unknown;
 }
 
-export const GET = withHueHandler(async (request, context, session) => {
+export const GET = withAuthAndErrorHandler(async (_request, context) => {
   const id = await getPathParam(context, 'id');
-
-  const provider = await HueConnectionStrategy.getProvider();
-  const response = await provider.getGroupedLight(id) as any;
-
-  return success({
-    groupedLight: response.data?.[0] || null,
-  });
+  const data = await getGroup(id);
+  return success(data as unknown as Record<string, unknown>);
 }, 'Hue/Room/Get');
 
 export const PUT = withHueHandler(

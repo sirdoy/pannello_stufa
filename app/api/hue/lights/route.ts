@@ -1,26 +1,14 @@
-/**
- * API Route: Philips Hue Lights
- *
- * GET /api/hue/lights - Fetch all lights
- *
- * Uses Strategy Pattern (automatic local/remote fallback)
- * Protected: Requires Auth0 authentication
- */
-
-import { withHueHandler, success } from '@/lib/core';
-import { HueConnectionStrategy } from '@/lib/hue/hueConnectionStrategy';
+import { withAuthAndErrorHandler, success } from '@/lib/core';
+import { getLights } from '@/lib/hue/hueProxy';
 
 export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/hue/lights
- * Fetch all Hue lights
+ * Returns all Hue lights with state, capability tier, and room enrichment from the HA proxy.
+ * Protected: Requires Auth0 authentication
  */
-export const GET = withHueHandler(async () => {
-  const provider = await HueConnectionStrategy.getProvider();
-  const response = await provider.getLights() as any;
-
-  return success({
-    lights: response.data || [],
-  });
+export const GET = withAuthAndErrorHandler(async () => {
+  const data = await getLights();
+  return success(data as unknown as Record<string, unknown>);
 }, 'Hue/Lights');

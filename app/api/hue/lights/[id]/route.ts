@@ -1,17 +1,19 @@
 /**
  * Philips Hue Single Light Control Route
- * GET: Fetch single light state
- * PUT: Update light state (on/off, brightness, color)
+ * GET: Fetch single light state from HA proxy
+ * PUT: Update light state (on/off, brightness, color) — legacy direct Bridge access
  *
- * Uses Strategy Pattern (automatic local/remote fallback)
+ * PUT handler preserved for Phase 107 migration.
  */
 
 import {
   withHueHandler,
+  withAuthAndErrorHandler,
   success,
   getPathParam,
   parseJson,
 } from '@/lib/core';
+import { getLight } from '@/lib/hue/hueProxy';
 import { HueConnectionStrategy } from '@/lib/hue/hueConnectionStrategy';
 import { adminDbPush } from '@/lib/firebaseAdmin';
 import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
@@ -24,15 +26,10 @@ interface LightStateBody {
   [key: string]: unknown;
 }
 
-export const GET = withHueHandler(async (request, context, session) => {
+export const GET = withAuthAndErrorHandler(async (_request, context) => {
   const id = await getPathParam(context, 'id');
-
-  const provider = await HueConnectionStrategy.getProvider();
-  const response = await provider.getLight(id) as any;
-
-  return success({
-    light: response.data?.[0] || null,
-  });
+  const data = await getLight(id);
+  return success(data as unknown as Record<string, unknown>);
 }, 'Hue/Light/Get');
 
 export const PUT = withHueHandler(async (request, context, session) => {

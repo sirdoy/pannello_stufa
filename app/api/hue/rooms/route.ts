@@ -1,30 +1,14 @@
-/**
- * Philips Hue Rooms Route
- * GET: Fetch all rooms with their grouped lights
- *
- * Uses Strategy Pattern (automatic local/remote fallback)
- */
-
-import { withHueHandler, success } from '@/lib/core';
-import { HueConnectionStrategy } from '@/lib/hue/hueConnectionStrategy';
+import { withAuthAndErrorHandler, success } from '@/lib/core';
+import { getGroups } from '@/lib/hue/hueProxy';
 
 export const dynamic = 'force-dynamic';
 
-export const GET = withHueHandler(async () => {
-  const provider = await HueConnectionStrategy.getProvider();
-
-  const [roomsResponse, zonesResponse] = await Promise.all([
-    provider.getRooms() as any,
-    provider.getZones() as any,
-  ]);
-
-  // Combine rooms and zones
-  const rooms = [
-    ...(roomsResponse.data || []),
-    ...(zonesResponse.data || []),
-  ];
-
-  return success({
-    rooms,
-  });
+/**
+ * GET /api/hue/rooms
+ * Returns all Hue groups (rooms, zones) from the HA proxy.
+ * Protected: Requires Auth0 authentication
+ */
+export const GET = withAuthAndErrorHandler(async () => {
+  const data = await getGroups();
+  return success(data as unknown as Record<string, unknown>);
 }, 'Hue/Rooms');

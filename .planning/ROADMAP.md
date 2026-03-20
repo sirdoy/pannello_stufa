@@ -88,8 +88,8 @@ See `.planning/milestones/` for full archives.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 106-01-PLAN.md — Hue proxy types + client module + client tests
-- [ ] 106-02-PLAN.md — API route rewrites (7 routes) + route tests
+- [x] 106-01-PLAN.md — Hue proxy types + client module + client tests
+- [x] 106-02-PLAN.md — API route rewrites (7 routes) + route tests
 
 ### Phase 107: Control Endpoints
 **Goal**: Users can control Hue lights and groups through the proxy — all commands accepted with 202 Accepted and delayed-refresh pattern
@@ -103,7 +103,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 107-01: Control endpoint wrappers + Next.js API routes (light state, group action, scene activate, 409 handling)
+- [ ] 107-01-PLAN.md — haPut transport + 409 handling + command wrapper types + 3 proxy wrappers + unit tests
+- [ ] 107-02-PLAN.md — Route rewrites (lights PUT, rooms PUT) + new scene POST route + route tests
 
 ### Phase 108: Frontend Hooks Rewrite
 **Goal**: LightsCard and scene UI read proxy response shapes — users interact with lights using the new data format with no visible behavior change
@@ -159,13 +160,13 @@ Plans:
 | 92-95 | v11.1 | 9/9 | ✓ Complete | 2026-03-18 |
 | 96-98 | v12.0 | 4/4 | ✓ Complete | 2026-03-19 |
 | 99-105 | v13.0 | 11/11 | ✓ Complete | 2026-03-20 |
-| 106 | 2/2 | Complete    | 2026-03-20 | - |
-| 107 | v14.0 | 0/TBD | Not started | - |
+| 106 | v14.0 | 2/2 | ✓ Complete | 2026-03-20 |
+| 107 | v14.0 | 0/2 | Not started | - |
 | 108 | v14.0 | 0/TBD | Not started | - |
 | 109 | v14.0 | 0/TBD | Not started | - |
 
-**Total:** 18 milestones shipped, 105 phases complete, 386 plans executed. v14.0 in progress (4 phases planned).
+**Total:** 18 milestones shipped, 106 phases complete, 388 plans executed. v14.0 in progress (4 phases planned).
 
 ---
 
-*Roadmap updated: 2026-03-20 — v14.0 Hue Proxy Migration roadmap created*
+*Roadmap updated: 2026-03-20 — Phase 107 plans created (2 plans, 2 waves)*

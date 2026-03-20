@@ -25,7 +25,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v13.0 (started 2026-03-19)
-**Status:** v13.0 gap closure in progress — Phase 104 complete (command body key mismatch fixed)
+**Status:** v13.0 gap closure complete — Phase 105 complete (debug panel URLs fixed, stale routes removed). All gap closure phases done.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -616,4 +616,4 @@ v13.0 Thermorossi Proxy Migration — requirements being defined
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-20 after Phase 104 complete — command body key mismatch fixed (BROKEN-02 closed)*
+*Last updated: 2026-03-20 after Phase 105 complete — debug panel URLs fixed, stale routes removed (BROKEN-01 + BROKEN-03 closed)*

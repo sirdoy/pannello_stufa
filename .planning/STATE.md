@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v13.0
 milestone_name: Thermorossi Proxy Migration
 status: unknown
-stopped_at: Completed 104-01-PLAN.md
-last_updated: "2026-03-20T09:41:33.360Z"
+stopped_at: Phase 105 context gathered
+last_updated: "2026-03-20T09:51:42.501Z"
 progress:
   total_phases: 7
   completed_phases: 6
@@ -106,6 +106,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-20T09:38:23.608Z
-Stopped at: Completed 104-01-PLAN.md
-Resume file: None
+Last session: 2026-03-20T09:51:42.493Z
+Stopped at: Phase 105 context gathered
+Resume file: .planning/phases/105-fix-debug-panel-urls-stale-routes/105-CONTEXT.md
